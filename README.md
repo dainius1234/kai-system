@@ -1,27 +1,122 @@
-# kai-system
-kai system
-Kai System – Offline AI Orchestrator with Autonomous Squads, Model Fusion, and Workflow Automation Kai is a fully offline, sovereign AI system built to operate with complete autonomy, high modularity, and maximum real-world utility. It coordinates multiple local LLMs through a central decision core and distributes work via squads, all communicating over an internal EventBus. Everything is designed to function without cloud reliance, respecting both data integrity and GDPR compliance.
+# Regal Industries – Institutional-Grade Autonomous Market Maker
 
-🔧 Core System Components Kai Orchestrator: Final authority for output. Filters, verifies, and fuses model responses, ensuring no raw hallucinations or rogue actions reach the user.
+**Regal Industries** is the institutional-grade trading core of the Kai System.  
+It is a sovereign, modular, event-driven market-making and arbitrage engine designed to rival professional desks.  
+No retail “indicator soup” – pure liquidity, flow, and macro intelligence.  
+It is built to be **self-sufficient, autonomous, and sovereign AI-powered infrastructure**.
 
-EventBus: Central nervous system. All model outputs, commands, tasks, memory updates, and tool signals flow through this unified communication layer.
+---
 
-Fusion Engine: Handles fallback logic, multi-model voting, and team stacking (e.g., Mistral + LLaMA3 combos). Prioritizes accuracy through scoring and consensus.
+## 🔧 Core Components
 
-Supervisor: Oversees real-time execution, logs failures, enforces task priority, and quarantines faulty outputs or failing modules.
+### 🏦 Trading Squads
+- **Market Maker Core** – adaptive spreads, inventory control, rebate capture.  
+- **Liquidity Grab Hunter** – fades stop runs and fake breakouts.  
+- **Iceberg Ride** – detects absorption, trades with institutions.  
+- **Funding/OI Divergence** – exploits leverage imbalances.  
+- **Session Expansion** – trades Asia/EU/US flow patterns.  
+- **Arbitrage Engines** – spot ↔ spot, triangular, spot vs perp, ETF vs BTC.  
 
-Junior (Self-Healing Agent): Autonomous system engineer. Handles backup integrity, quarantine scans, environment syncs, and automated CLI repairs.
+### ⚙️ Engineering Squad
+- Order book tools: multi-venue L2 heatmaps, iceberg/spoof detection.  
+- Flow analytics: CVD, delta footprint, absorption/exhaustion.  
+- Pattern recognition: stop clusters, BOS/CHOCH, FVG, OB.  
+- Institutional metrics: OI, funding, ETF flows, basis spreads.  
+- Simulation: fill probability models, spread efficiency tests.  
+- System: replay, DuckDB/Parquet storage, latency monitors.  
 
-🧠 Squad System Each squad operates like a task-specific microservice — equipped with its own tools, hooks, and memory logs.
+### 📒 Accounting Squad
+- Trade ledger: all fills, hedges, arb legs, fees.  
+- PnL attribution: spread capture, rebates, taker fees, funding, inventory.  
+- Equity & risk book: leverage ratios, margin stress, equity curve.  
+- Tax/compliance: FIFO/LIFO, annual reports, CSV/Excel exports.  
+- Treasury functions: capital allocation, stablecoin/fiat tracking.  
 
-Squads currently include: engineering, accounting, trading, survey, research, and document_processing.
+### 🛡️ Risk & Governance
+- **Orchestrator** – final authority before execution, risk checks.  
+- **Supervisor** – watchdog, circuit breakers, auto-restart adapters.  
+- **Junior (Self-Healer)** – repairs state, resyncs order books, crash recovery.  
+- **Verifier (Fact Checker)** – cross-checks signals against raw tape.  
+- **Fusion Engine** – consensus of multiple squads + optional LLM advisor.  
 
-Future squads can be added by dropping them into the squads/ folder and registering them in the tool manager.
+### 🖥️ Operator Console (Dash App)
+- Chart with multi-venue liquidity heatmaps, iceberg markers, BOS/CHOCH overlays.  
+- Flow panels: CVD, VPIN, delta footprint.  
+- Arbitrage dashboard: cross-venue spreads, triangular arb cycles.  
+- Institutional panel: OI, funding, basis, ETF flows, macro events.  
+- Accounting panel: ledger, equity curve, tax reports.  
+- Replay mode: study past engineered moves.  
+- Kill-switch & hotkeys for safety.  
 
-📦 Tool Manager and Environment Libraries Each squad links to a curated Environment Library, managed by the Tool Manager:
+---
 
-Engineering: LibreCAD, CSV-to-ASB, 3CAT, QGIS, elevation processors, PDF survey extractors. Trading: Arbitrage engines, strategy testers, real-time API hooks (future), logging dashboards. Accounting: KMyMoney, invoice generators, timesheet trackers, ledger tools. Survey: Leica integration tools, topographical renderers, volume calculators. R&D: Reinforcement learning kits, AutoML platforms (e.g. AutoGluon, Stable Baselines3, H2O.ai). Docs: LibreOffice, OCR, PDF-to-text, form processors. 🌐 GUI + Automation Ubuntu-native Dashboard GUI: Operates like a browser — each squad gets its own window/tab for live updates, task entry, and monitoring.
+## 📦 Repo Structure
+core/         # Strategy engines, risk manager
+engineering/  # Orderbook, flow, pattern, institutional tools
+accounting/   # Ledger, pnl, tax, treasury
+data/         # Venue adapters, book builder
+arb/          # Arbitrage engines
+risk/         # Risk guards, supervisor, self-healing
+storage/      # DuckDB, replay, compression
+ui/           # Dash operator console
+agents/       # LLM advisors + verifier
+scripts/      # Run scripts, Docker, launchers
+tests/        # Unit + integration tests
 
-n8n Integration: Fully wired for event-driven automation:
+---
 
-Inputs: Email, Telegram, WhatsApp, file uploads. Outputs: Auto-responses, email reports, dashboard logs, task completion triggers. Middleware: Can connect actions like “survey file → parse → ASB sheet → send email.” 🔒 Key Design Principles 100% offline-capable, all models local. Extensible: Just add new .py modules or squad/ folders — no cloud APIs required. Memory-driven: State awareness is preserved via persistent logs. Autonomy: System can run daily tasks, self-repair, and enforce logic flow without human input. GitHub-Ready: Structured for static code review, logic tracing, and collaborative debugging. Note: Model binaries are excluded from repo — expected paths are defined in the brain registry. All logic assumes local deployment, but can be scaled to private cloud if needed.
+## 🚀 Roadmap
+
+### Phase 0 – Core Skeleton  
+- Repo scaffold, EventBus, config loader, Docker + CI.  
+- Kraken adapter + BookBuilder.  
+- Basic Dash UI with kill-switch.  
+
+### Phase 1 – Microstructure Battlefield  
+- Multi-venue L2 heatmaps.  
+- Iceberg/spoof detection.  
+- Stop clusters + BOS/CHOCH.  
+- Persistent storage for replay.  
+
+### Phase 2 – Flow & Arb Engines  
+- CVD + delta footprint + absorption.  
+- Cross-venue divergence (Kraken, Coinbase, Bitstamp).  
+- Spot↔Spot & triangular arbitrage engines.  
+- Trade logging → Accounting Squad.  
+
+### Phase 3 – Institutional Intelligence  
+- Accumulation/distribution detector.  
+- Funding & OI dashboard (multi-venue).  
+- ETF flow tracker (BTC, Gold, SPY/QQQ).  
+- Cross-asset correlations (BTC, ETH, Gold, DXY, SPX).  
+- Macro calendar overlay (auto-throttle).  
+
+### Phase 4 – Playbook & Autonomy  
+- Strategy toggle panel.  
+- Alt rotation detector (majors → mid-caps → small-caps).  
+- Replay mode.  
+- Verifier + LLM advisor integration.  
+
+### Phase 5 – Institutional Polish  
+- Liquidity shock index.  
+- Whale inflows/outflows (on-chain).  
+- Options skew (Deribit, CME).  
+- Ubuntu desktop launcher, operator presets.  
+
+---
+
+## 🔒 Design Principles
+
+- 100% event-driven & modular – no monolith rewrites.  
+- Offline-capable, sovereign, GDPR-compliant.  
+- Backtest/live parity – same engine.  
+- Extensible: drop in new squad or venue adapter.  
+- Autonomous with safeguards: kill-switch, circuit breakers, verifier.  
+- Institutional discipline: ledger, attribution, tax-ready.  
+
+---
+
+⚠️ **Disclaimer**  
+For research, backtesting, and paper trading only.  
+Live trading requires explicit configuration and operator consent.  
+Derivatives trading may be restricted in your jurisdiction. Use responsibly.
