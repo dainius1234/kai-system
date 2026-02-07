@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 import httpx
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 app = FastAPI(title="LangGraph Orchestrator", version="0.1.0")
@@ -24,6 +24,7 @@ class GraphResponse(BaseModel):
     specialist: str
     plan: Dict[str, Any]
     gate_decision: Optional[Dict[str, Any]] = None
+    context_payload: Optional[Dict[str, Any]] = None
 
 
 def build_plan(user_input: str, specialist: str) -> Dict[str, Any]:
@@ -48,17 +49,20 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
         raise HTTPException(status_code=400, detail="user_input is required")
 
     async with httpx.AsyncClient() as client:
-        route_response = await client.post(
-            f"{MEMU_URL}/route",
-            json={
-                "query": request.user_input,
-                "session_id": request.session_id,
-                "timestamp": "now",
-            },
-            timeout=5.0,
-        )
-    route_response.raise_for_status()
-    route_payload = route_response.json()
+        try:
+            route_response = await client.post(
+                f"{MEMU_URL}/route",
+                json={
+                    "query": request.user_input,
+                    "session_id": request.session_id,
+                    "timestamp": "now",
+                },
+                timeout=5.0,
+            )
+            route_response.raise_for_status()
+            route_payload = route_response.json()
+        except httpx.HTTPError as exc:
+            raise HTTPException(status_code=502, detail=f"memu-core error: {exc}") from exc
     specialist = route_payload["specialist"]
 
     plan = build_plan(request.user_input, specialist)
@@ -79,7 +83,12 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
         gate_resp.raise_for_status()
         gate_decision = gate_resp.json()
 
-    return GraphResponse(specialist=specialist, plan=plan, gate_decision=gate_decision)
+    return GraphResponse(
+        specialist=specialist,
+        plan=plan,
+        gate_decision=gate_decision,
+        context_payload=route_payload.get("context_payload"),
+    )
 
 
 if __name__ == "__main__":

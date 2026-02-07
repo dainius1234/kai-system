@@ -5,7 +5,7 @@ import json
 import os
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -29,6 +29,7 @@ class GateDecision(BaseModel):
     status: str
     reason: str
     ledger_hash: str
+    required_cosign: bool
 
 
 class ModeChange(BaseModel):
@@ -86,11 +87,20 @@ class GatePolicy:
     def __init__(self) -> None:
         self.mode = os.getenv("MODE", "PUB").upper()
         self.required_confidence = float(os.getenv("REQUIRED_CONFIDENCE", "0.7"))
+        self.high_risk_tools: Set[str] = {
+            tool.strip()
+            for tool in os.getenv("HIGH_RISK_TOOLS", "shell,n8n,qgis").split(",")
+            if tool.strip()
+        }
 
     def evaluate(self, request: GateRequest) -> GateDecision:
+        requires_cosign = request.tool in self.high_risk_tools
         if self.mode == "PUB":
             approved = False
             reason = "Tool Gate in PUB mode (execution disabled)."
+        elif requires_cosign and not request.cosign:
+            approved = False
+            reason = "High-risk tool requires co-sign."
         elif request.confidence >= self.required_confidence or request.cosign:
             approved = True
             reason = "Approved by confidence threshold or co-sign."
@@ -105,6 +115,7 @@ class GatePolicy:
             status="approved" if approved else "blocked",
             reason=reason,
             ledger_hash=entry.entry_hash,
+            required_cosign=requires_cosign,
         )
 
 

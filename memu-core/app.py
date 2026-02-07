@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import os
+import hashlib
+import math
 import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 app = FastAPI(title="Sovereign Memory Core", version="0.1.0")
@@ -52,7 +54,13 @@ class InMemoryVectorStore:
         self._records.append(record)
 
     def search(self, query: str, top_k: int) -> List[MemoryRecord]:
-        return list(reversed(self._records))[:top_k]
+        query_embedding = generate_embedding(query)
+        scored = [
+            (record, cosine_similarity(query_embedding, record.embedding))
+            for record in self._records
+        ]
+        scored.sort(key=lambda item: item[1], reverse=True)
+        return [record for record, _score in scored[:top_k]]
 
     def get_state(self) -> Dict[str, Any]:
         return dict(self._state)
@@ -60,13 +68,27 @@ class InMemoryVectorStore:
     def apply_state_delta(self, delta: Dict[str, Any]) -> None:
         self._state.update(delta)
 
+    def count(self) -> int:
+        return len(self._records)
+
 
 store = InMemoryVectorStore()
 
 
 def generate_embedding(text: str) -> List[float]:
-    seed = sum(bytearray(text.encode("utf-8"))) % 100
-    return [seed / 100.0 for _ in range(8)]
+    digest = hashlib.sha256(text.encode("utf-8")).digest()
+    return [(byte / 255.0) for byte in digest[:16]]
+
+
+def cosine_similarity(left: List[float], right: List[float]) -> float:
+    if not left or not right or len(left) != len(right):
+        return 0.0
+    dot = sum(l * r for l, r in zip(left, right))
+    norm_left = math.sqrt(sum(l * l for l in left))
+    norm_right = math.sqrt(sum(r * r for r in right))
+    if norm_left == 0.0 or norm_right == 0.0:
+        return 0.0
+    return dot / (norm_left * norm_right)
 
 
 def extract_tags(query: str) -> List[str]:
@@ -133,6 +155,14 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
 @app.get("/memory/retrieve")
 async def retrieve_context(query: str, user_id: str, top_k: int = 20) -> List[MemoryRecord]:
     return store.search(query, top_k=top_k)
+
+
+@app.get("/memory/stats")
+async def memory_stats() -> Dict[str, Any]:
+    return {
+        "total_records": store.count(),
+        "state_keys": list(store.get_state().keys()),
+    }
 
 
 if __name__ == "__main__":

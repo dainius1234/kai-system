@@ -10,6 +10,7 @@ app = FastAPI(title="Audio Service", version="0.1.0")
 
 HOTWORD = os.getenv("PORCUPINE_KEYWORD", "ara")
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "large-v3")
+SAMPLE_RATE = os.getenv("SAMPLE_RATE", "16000")
 
 
 @app.get("/health")
@@ -24,6 +25,15 @@ async def health() -> Dict[str, str]:
 @app.post("/listen")
 async def listen() -> Dict[str, str]:
     return {"status": "ok", "message": "listening"}
+
+
+@app.get("/config")
+async def config() -> Dict[str, str]:
+    return {
+        "hotword": HOTWORD,
+        "whisper_model": WHISPER_MODEL,
+        "sample_rate": SAMPLE_RATE,
+    }
 
 
 if __name__ == "__main__":

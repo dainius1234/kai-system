@@ -18,6 +18,7 @@ class ExecutionRequest(BaseModel):
     tool: str
     params: Dict[str, Any]
     task_id: str
+    actor: str = "executor"
 
 
 class ExecutionResult(BaseModel):
@@ -32,13 +33,26 @@ async def health() -> Dict[str, str]:
     return {"status": "ok"}
 
 
+def run_tool(tool: str, params: Dict[str, Any]) -> str:
+    if tool == "noop":
+        return "no operation executed"
+    if tool == "echo":
+        return str(params.get("message", ""))
+    raise ValueError(f"Unsupported tool: {tool}")
+
+
 @app.post("/execute", response_model=ExecutionResult)
 async def execute(request: ExecutionRequest) -> ExecutionResult:
     if not request.tool:
         raise HTTPException(status_code=400, detail="tool is required")
 
     start = time.time()
-    output = f"Executed {request.tool} with params {request.params}"
+    try:
+        output = run_tool(request.tool, request.params)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    output = f"[{request.actor}] {output}"
     if len(output) > MAX_OUTPUT_SIZE:
         output = output[:MAX_OUTPUT_SIZE] + "..."
 
