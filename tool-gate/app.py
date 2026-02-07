@@ -78,9 +78,6 @@ class InMemoryLedger:
     def tail(self, limit: int = 10) -> List[LedgerEntry]:
         return self._entries[-limit:]
 
-    def count(self) -> int:
-        return len(self._entries)
-
 
 ledger = InMemoryLedger()
 
@@ -151,11 +148,6 @@ async def ledger_tail(limit: int = 10) -> List[Dict[str, Any]]:
         }
         for entry in entries
     ]
-
-
-@app.get("/ledger/stats")
-async def ledger_stats() -> Dict[str, Any]:
-    return {"status": "ok", "count": ledger.count()}
 
 
 if __name__ == "__main__":
