@@ -1,0 +1,241 @@
+version: '3.8'
+
+x-service-defaults: &service_defaults
+  user: "1000:1000"
+  read_only: true
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  tmpfs:
+    - /tmp:size=64M,noexec,nosuid
+  deploy:
+    resources:
+      limits:
+        cpus: '1.0'
+        memory: 2G
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sovereign-postgres
+    hostname: ledger-db
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.2
+    environment:
+      POSTGRES_DB: sovereign
+      POSTGRES_USER: keeper
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-localdev}
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+
+  tool-gate:
+    <<: *service_defaults
+    build: ./tool-gate
+    container_name: sovereign-tool-gate
+    hostname: tool-gate
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.3
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      TPM_DEVICE: "/dev/tpm0"
+      MODE: "PUB"
+      REQUIRED_CONFIDENCE: "0.7"
+    depends_on:
+      - postgres
+
+  memu-core:
+    <<: *service_defaults
+    build: ./memu-core
+    container_name: sovereign-memu-core
+    hostname: memu-core
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.5
+    environment:
+      DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/memu_db"
+      VECTOR_STORE: "pgvector"
+      API_HOST: "0.0.0.0"
+      API_PORT: "8001"
+    depends_on:
+      - postgres
+      - tool-gate
+
+  executor:
+    <<: *service_defaults
+    build: ./executor
+    container_name: executor
+    hostname: executor
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.9
+    environment:
+      TOOL_GATE_URL: "http://tool-gate:8000"
+      MEMU_URL: "http://memu-core:8001"
+      EXECUTION_TIMEOUT: "30"
+      MAX_OUTPUT_SIZE: "1048576"
+    depends_on:
+      - tool-gate
+      - memu-core
+
+  dashboard:
+    <<: *service_defaults
+    build: ./dashboard
+    container_name: sovereign-dashboard
+    hostname: dashboard
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.4
+    ports:
+      - "8080:8080"
+    environment:
+      TOOL_GATE_URL: "http://tool-gate:8000"
+      LEDGER_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      MEMU_URL: "http://memu-core:8001"
+      LANGGRAPH_URL: "http://langgraph:8007"
+      EXECUTOR_URL: "http://executor:8002"
+      HEARTBEAT_URL: "http://heartbeat:8010"
+      TTS_URL: "http://tts-service:8030"
+      AVATAR_URL: "http://avatar-service:8081"
+    depends_on:
+      - tool-gate
+      - memu-core
+      - executor
+
+  langgraph:
+    <<: *service_defaults
+    build: ./langgraph
+    container_name: langgraph
+    hostname: langgraph
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.7
+    environment:
+      REDIS_URL: "redis://redis:6379"
+      MEMU_URL: "http://memu-core:8001"
+      TOOL_GATE_URL: "http://tool-gate:8000"
+      OLLAMA_URL: "http://ollama:11434"
+    depends_on:
+      - memu-core
+      - tool-gate
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: sovereign-redis
+    hostname: redis
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.8
+    command: ["redis-server", "--appendonly", "yes", "--save", "900 1", "--maxmemory", "1gb"]
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+
+  heartbeat:
+    <<: *service_defaults
+    build: ./heartbeat
+    container_name: sovereign-heartbeat
+    hostname: heartbeat
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.13
+    environment:
+      TOOL_GATE_URL: "http://tool-gate:8000"
+      CHECK_INTERVAL: "60"
+      ALERT_WINDOW: "300"
+
+  camera-service:
+    <<: *service_defaults
+    build: ./perception/camera
+    container_name: camera-service
+    hostname: camera-service
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.10
+    environment:
+      CAMERA_DEVICE: "/dev/video0"
+      VIRTUAL_DEVICE: "/dev/video10"
+
+  audio-service:
+    <<: *service_defaults
+    build: ./perception/audio
+    container_name: audio-service
+    hostname: audio-service
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.11
+    environment:
+      PORCUPINE_KEYWORD: "ara"
+      WHISPER_MODEL: "large-v3"
+      SAMPLE_RATE: "16000"
+
+  # TODO: enable GPU when core is stable.
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: ollama
+  #   hostname: ollama
+  #   networks:
+  #     sovereign-net:
+  #       ipv4_address: 172.20.0.6
+  #   environment:
+  #     OLLAMA_KEEP_ALIVE: "24h"
+  #     OLLAMA_MAX_LOADED_MODELS: "3"
+
+  # TODO: enable GPU when core is stable.
+  # tts-service:
+  #   build: ./output/tts
+  #   container_name: tts-service
+  #   hostname: tts-service
+  #   networks:
+  #     sovereign-net:
+  #       ipv4_address: 172.20.0.15
+  #   environment:
+  #     MODEL: "tts_models/multilingual/multi-dataset/xtts_v2"
+  #     SAMPLE_RATE: "16000"
+  #     LANGUAGE: "en"
+
+  avatar-service:
+    <<: *service_defaults
+    build: ./output/avatar
+    container_name: avatar-service
+    hostname: avatar-service
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.16
+    environment:
+      TTS_URL: "http://tts-service:8030"
+      WEBRTC_PORT: "8081"
+
+volumes:
+  postgres_data:
+
+networks:
+  sovereign-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
