@@ -11,6 +11,15 @@ from pydantic import BaseModel, Field
 
 app = FastAPI(title="Sovereign Memory Core", version="0.1.0")
 
+try:
+    import torch
+except ImportError:  # pragma: no cover - optional dependency
+    torch = None
+
+DEVICE = "cuda" if torch and torch.cuda.is_available() else "cpu"
+if DEVICE == "cpu":
+    print("No GPU — running on CPU only")
+
 
 class MemoryRequest(BaseModel):
     query: str
@@ -86,7 +95,11 @@ def select_specialist(query: str) -> str:
 
 @app.get("/health")
 async def health() -> Dict[str, str]:
-    return {"status": "ok", "storage": os.getenv("VECTOR_STORE", "memory")}
+    return {
+        "status": "ok",
+        "storage": os.getenv("VECTOR_STORE", "memory"),
+        "device": DEVICE,
+    }
 
 
 @app.post("/route", response_model=RoutingResponse)
@@ -105,6 +118,7 @@ async def route_request(request: MemoryRequest) -> RoutingResponse:
             "query": request.query,
             "memory_vectors": [record.embedding for record in similar],
             "metadata": metadata,
+            "device": DEVICE,
         },
     )
 

@@ -10,6 +10,15 @@ from fastapi import FastAPI
 
 app = FastAPI(title="Sovereign Dashboard", version="0.1.0")
 
+try:
+    import torch
+except ImportError:  # pragma: no cover - optional dependency
+    torch = None
+
+DEVICE = "cuda" if torch and torch.cuda.is_available() else "cpu"
+if DEVICE == "cpu":
+    print("No GPU — running on CPU only")
+
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 LEDGER_URL = os.getenv("LEDGER_URL", "postgresql://keeper:***@postgres:5432/sovereign")
 
@@ -57,7 +66,10 @@ async def fetch_memory_count() -> int:
 
 @app.get("/health")
 async def health() -> Dict[str, str]:
-    return {"status": "ok", "tool_gate_url": TOOL_GATE_URL}
+    return {
+        "status": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
+        "tool_gate_url": TOOL_GATE_URL,
+    }
 
 
 @app.get("/")
@@ -66,6 +78,7 @@ async def index() -> Dict[str, object]:
     alive_nodes = [name for name, payload in statuses.items() if payload.get("status") == "ok"]
     return {
         "service": "dashboard",
+        "status": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
         "tool_gate_url": TOOL_GATE_URL,
         "ledger_url": LEDGER_URL,
         "alive_nodes": alive_nodes,

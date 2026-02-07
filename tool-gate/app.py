@@ -13,6 +13,15 @@ from pydantic import BaseModel, Field
 
 app = FastAPI(title="Tool Gate", version="0.1.0")
 
+try:
+    import torch
+except ImportError:  # pragma: no cover - optional dependency
+    torch = None
+
+DEVICE = "cuda" if torch and torch.cuda.is_available() else "cpu"
+if DEVICE == "cpu":
+    print("No GPU — running on CPU only")
+
 
 class GateRequest(BaseModel):
     tool: str
@@ -21,6 +30,7 @@ class GateRequest(BaseModel):
     actor_did: str
     cosign: bool = False
     rationale: Optional[str] = None
+    device: Optional[str] = None
 
 
 class GateDecision(BaseModel):
@@ -116,13 +126,15 @@ policy = GatePolicy()
 
 @app.get("/health")
 async def health() -> Dict[str, str]:
-    return {"status": "ok", "mode": policy.mode}
+    return {"status": "ok", "mode": policy.mode, "device": DEVICE}
 
 
 @app.post("/gate/request", response_model=GateDecision)
 async def gate_request(request: GateRequest) -> GateDecision:
     if not request.tool:
         raise HTTPException(status_code=400, detail="Tool name is required.")
+    if request.device is None:
+        request = request.model_copy(update={"device": DEVICE})
     return policy.evaluate(request)
 
 
