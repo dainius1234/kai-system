@@ -1,5 +1,20 @@
 version: '3.8'
 
+x-service-defaults: &service_defaults
+  user: "1000:1000"
+  read_only: true
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  tmpfs:
+    - /tmp:size=64M,noexec,nosuid
+  deploy:
+    resources:
+      limits:
+        cpus: '1.0'
+        memory: 2G
+
 services:
   postgres:
     image: postgres:15-alpine
@@ -20,8 +35,14 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
 
   tool-gate:
+    <<: *service_defaults
     build: ./tool-gate
     container_name: sovereign-tool-gate
     hostname: tool-gate
@@ -38,7 +59,42 @@ services:
     depends_on:
       - postgres
 
+  memu-core:
+    <<: *service_defaults
+    build: ./memu-core
+    container_name: sovereign-memu-core
+    hostname: memu-core
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.5
+    environment:
+      DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/memu_db"
+      VECTOR_STORE: "pgvector"
+      API_HOST: "0.0.0.0"
+      API_PORT: "8001"
+    depends_on:
+      - postgres
+      - tool-gate
+
+  executor:
+    <<: *service_defaults
+    build: ./executor
+    container_name: executor
+    hostname: executor
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.9
+    environment:
+      TOOL_GATE_URL: "http://tool-gate:8000"
+      MEMU_URL: "http://memu-core:8001"
+      EXECUTION_TIMEOUT: "30"
+      MAX_OUTPUT_SIZE: "1048576"
+    depends_on:
+      - tool-gate
+      - memu-core
+
   dashboard:
+    <<: *service_defaults
     build: ./dashboard
     container_name: sovereign-dashboard
     hostname: dashboard
@@ -58,34 +114,11 @@ services:
       AVATAR_URL: "http://avatar-service:8081"
     depends_on:
       - tool-gate
-
-  memu-core:
-    build: ./memu-core
-    container_name: sovereign-memu-core
-    hostname: memu-core
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.5
-    environment:
-      DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/memu_db"
-      VECTOR_STORE: "pgvector"
-      API_HOST: "0.0.0.0"
-      API_PORT: "8001"
-    depends_on:
-      - tool-gate
-
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    hostname: ollama
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.6
-    environment:
-      OLLAMA_KEEP_ALIVE: "24h"
-      OLLAMA_MAX_LOADED_MODELS: "3"
+      - memu-core
+      - executor
 
   langgraph:
+    <<: *service_defaults
     build: ./langgraph
     container_name: langgraph
     hostname: langgraph
@@ -100,7 +133,7 @@ services:
     depends_on:
       - memu-core
       - tool-gate
-      - ollama
+      - redis
 
   redis:
     image: redis:7-alpine
@@ -110,57 +143,19 @@ services:
       sovereign-net:
         ipv4_address: 172.20.0.8
     command: ["redis-server", "--appendonly", "yes", "--save", "900 1", "--maxmemory", "1gb"]
-
-  executor:
-    build: ./executor
-    container_name: executor
-    hostname: executor
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.9
-    environment:
-      TOOL_GATE_URL: "http://tool-gate:8000"
-      MEMU_URL: "http://memu-core:8001"
-      EXECUTION_TIMEOUT: "30"
-      MAX_OUTPUT_SIZE: "1048576"
-    depends_on:
-      - memu-core
-
-  camera-service:
-    build: ./perception/camera
-    container_name: camera-service
-    hostname: camera-service
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.10
-    environment:
-      CAMERA_DEVICE: "/dev/video0"
-      VIRTUAL_DEVICE: "/dev/video10"
-
-  audio-service:
-    build: ./perception/audio
-    container_name: audio-service
-    hostname: audio-service
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.11
-    environment:
-      PORCUPINE_KEYWORD: "ara"
-      WHISPER_MODEL: "large-v3"
-      SAMPLE_RATE: "16000"
-
-  screen-capture:
-    build: ./screen-capture
-    container_name: screen-capture
-    hostname: screen-capture
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.12
-    environment:
-      SERVICE_NAME: "screen-capture"
-      PORT: "8050"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
 
   heartbeat:
+    <<: *service_defaults
     build: ./heartbeat
     container_name: sovereign-heartbeat
     hostname: heartbeat
@@ -172,30 +167,58 @@ services:
       CHECK_INTERVAL: "60"
       ALERT_WINDOW: "300"
 
-  calendar-sync:
-    build: ./calendar-sync
-    container_name: calendar-sync
-    hostname: calendar-sync
+  camera-service:
+    <<: *service_defaults
+    build: ./perception/camera
+    container_name: camera-service
+    hostname: camera-service
     networks:
       sovereign-net:
-        ipv4_address: 172.20.0.14
+        ipv4_address: 172.20.0.10
     environment:
-      SERVICE_NAME: "calendar-sync"
-      PORT: "8050"
+      CAMERA_DEVICE: "/dev/video0"
+      VIRTUAL_DEVICE: "/dev/video10"
 
-  tts-service:
-    build: ./output/tts
-    container_name: tts-service
-    hostname: tts-service
+  audio-service:
+    <<: *service_defaults
+    build: ./perception/audio
+    container_name: audio-service
+    hostname: audio-service
     networks:
       sovereign-net:
-        ipv4_address: 172.20.0.15
+        ipv4_address: 172.20.0.11
     environment:
-      MODEL: "tts_models/multilingual/multi-dataset/xtts_v2"
+      PORCUPINE_KEYWORD: "ara"
+      WHISPER_MODEL: "large-v3"
       SAMPLE_RATE: "16000"
-      LANGUAGE: "en"
+
+  # TODO: enable GPU when core is stable.
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: ollama
+  #   hostname: ollama
+  #   networks:
+  #     sovereign-net:
+  #       ipv4_address: 172.20.0.6
+  #   environment:
+  #     OLLAMA_KEEP_ALIVE: "24h"
+  #     OLLAMA_MAX_LOADED_MODELS: "3"
+
+  # TODO: enable GPU when core is stable.
+  # tts-service:
+  #   build: ./output/tts
+  #   container_name: tts-service
+  #   hostname: tts-service
+  #   networks:
+  #     sovereign-net:
+  #       ipv4_address: 172.20.0.15
+  #   environment:
+  #     MODEL: "tts_models/multilingual/multi-dataset/xtts_v2"
+  #     SAMPLE_RATE: "16000"
+  #     LANGUAGE: "en"
 
   avatar-service:
+    <<: *service_defaults
     build: ./output/avatar
     container_name: avatar-service
     hostname: avatar-service
@@ -205,183 +228,6 @@ services:
     environment:
       TTS_URL: "http://tts-service:8030"
       WEBRTC_PORT: "8081"
-
-  qgis-sandbox:
-    image: qgis/qgis:latest
-    container_name: qgis-sandbox
-    network_mode: "none"
-    read_only: true
-    cap_drop:
-      - ALL
-
-  n8n-sandbox:
-    image: n8nio/n8n:latest
-    container_name: n8n-sandbox
-    network_mode: "none"
-    read_only: true
-    cap_drop:
-      - ALL
-    environment:
-      N8N_ENCRYPTION_KEY: "${N8N_ENCRYPTION_KEY:-localdev}"
-
-  shell-sandbox:
-    build: ./sandboxes/shell
-    container_name: shell-sandbox
-    network_mode: "none"
-    read_only: true
-    cap_drop:
-      - ALL
-
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: sovereign-prometheus
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.17
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: sovereign-grafana
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.18
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_PASSWORD:-localdev}"
-      GF_USERS_ALLOW_SIGN_UP: "false"
-
-  loki:
-    image: grafana/loki:latest
-    container_name: sovereign-loki
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.19
-
-  promtail:
-    image: grafana/promtail:latest
-    container_name: sovereign-promtail
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.20
-
-  node-exporter:
-    image: prom/node-exporter:latest
-    container_name: sovereign-node-exporter
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.21
-
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: sovereign-cadvisor
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.22
-
-  alertmanager:
-    image: prom/alertmanager:latest
-    container_name: sovereign-alertmanager
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.23
-
-  backup-service:
-    build: ./backup-service
-    container_name: backup-service
-    hostname: backup-service
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.24
-    environment:
-      SERVICE_NAME: "backup-service"
-      PORT: "8050"
-
-  ledger-worker:
-    build: ./ledger-worker
-    container_name: ledger-worker
-    hostname: ledger-worker
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.25
-    environment:
-      SERVICE_NAME: "ledger-worker"
-      PORT: "8050"
-
-  verifier:
-    build: ./verifier
-    container_name: verifier
-    hostname: verifier
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.26
-    environment:
-      SERVICE_NAME: "verifier"
-      PORT: "8050"
-
-  supervisor:
-    build: ./supervisor
-    container_name: supervisor
-    hostname: supervisor
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.27
-    environment:
-      SERVICE_NAME: "supervisor"
-      PORT: "8050"
-
-  orchestrator:
-    build: ./orchestrator
-    container_name: orchestrator
-    hostname: orchestrator
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.28
-    environment:
-      SERVICE_NAME: "orchestrator"
-      PORT: "8050"
-
-  fusion-engine:
-    build: ./fusion-engine
-    container_name: fusion-engine
-    hostname: fusion-engine
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.29
-    environment:
-      SERVICE_NAME: "fusion-engine"
-      PORT: "8050"
-
-  memory-compressor:
-    build: ./memory-compressor
-    container_name: memory-compressor
-    hostname: memory-compressor
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.30
-    environment:
-      SERVICE_NAME: "memory-compressor"
-      PORT: "8050"
-
-  workspace-manager:
-    build: ./workspace-manager
-    container_name: workspace-manager
-    hostname: workspace-manager
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.31
-    environment:
-      SERVICE_NAME: "workspace-manager"
-      PORT: "8050"
-
-  metrics-gateway:
-    build: ./metrics-gateway
-    container_name: metrics-gateway
-    hostname: metrics-gateway
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.32
-    environment:
-      SERVICE_NAME: "metrics-gateway"
-      PORT: "8050"
 
 volumes:
   postgres_data:
