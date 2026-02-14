@@ -35,6 +35,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keeper -d sovereign"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     deploy:
       resources:
         limits:
@@ -57,7 +62,13 @@ services:
       MODE: "PUB"
       REQUIRED_CONFIDENCE: "0.7"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8000/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   memu-core:
     <<: *service_defaults
@@ -73,8 +84,15 @@ services:
       API_HOST: "0.0.0.0"
       API_PORT: "8001"
     depends_on:
-      - postgres
-      - tool-gate
+      postgres:
+        condition: service_healthy
+      tool-gate:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8001/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   executor:
     <<: *service_defaults
@@ -90,8 +108,15 @@ services:
       EXECUTION_TIMEOUT: "30"
       MAX_OUTPUT_SIZE: "1048576"
     depends_on:
-      - tool-gate
-      - memu-core
+      tool-gate:
+        condition: service_healthy
+      memu-core:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8002/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   dashboard:
     <<: *service_defaults
@@ -113,9 +138,12 @@ services:
       TTS_URL: "http://tts-service:8030"
       AVATAR_URL: "http://avatar-service:8081"
     depends_on:
-      - tool-gate
-      - memu-core
-      - executor
+      tool-gate:
+        condition: service_healthy
+      memu-core:
+        condition: service_healthy
+      executor:
+        condition: service_healthy
 
   langgraph:
     <<: *service_defaults
@@ -131,9 +159,17 @@ services:
       TOOL_GATE_URL: "http://tool-gate:8000"
       OLLAMA_URL: "http://ollama:11434"
     depends_on:
-      - memu-core
-      - tool-gate
-      - redis
+      memu-core:
+        condition: service_healthy
+      tool-gate:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8007/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -148,6 +184,11 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     deploy:
       resources:
         limits:

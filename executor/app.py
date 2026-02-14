@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import os
 import time
-from typing import Any, Dict
+from typing import Any, Dict, Literal
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
-app = FastAPI(title="Executor Service", version="0.1.0")
+app = FastAPI(title="Executor Service", version="0.2.0")
 
 MAX_OUTPUT_SIZE = int(os.getenv("MAX_OUTPUT_SIZE", "1048576"))
 EXECUTION_TIMEOUT = int(os.getenv("EXECUTION_TIMEOUT", "30"))
@@ -18,6 +18,7 @@ class ExecutionRequest(BaseModel):
     tool: str
     params: Dict[str, Any]
     task_id: str
+    device: Literal["cpu", "cuda"]
 
 
 class ExecutionResult(BaseModel):
@@ -25,6 +26,10 @@ class ExecutionResult(BaseModel):
     status: str
     output: str
     duration_ms: int
+    truncated: bool
+    exit_code: int
+    stderr: str = ""
+    policy_context: Dict[str, Any] = Field(default_factory=dict)
 
 
 @app.get("/health")
@@ -38,19 +43,32 @@ async def execute(request: ExecutionRequest) -> ExecutionResult:
         raise HTTPException(status_code=400, detail="tool is required")
 
     start = time.time()
-    output = f"Executed {request.tool} with params {request.params}"
+    output = f"Executed {request.tool} on {request.device} with params {request.params}"
+    truncated = False
     if len(output) > MAX_OUTPUT_SIZE:
         output = output[:MAX_OUTPUT_SIZE] + "..."
+        truncated = True
 
     duration_ms = int((time.time() - start) * 1000)
     if duration_ms > EXECUTION_TIMEOUT * 1000:
-        raise HTTPException(status_code=408, detail="execution timeout")
+        raise HTTPException(
+            status_code=408,
+            detail={
+                "task_id": request.task_id,
+                "status": "timeout",
+                "duration_ms": duration_ms,
+                "limit_ms": EXECUTION_TIMEOUT * 1000,
+            },
+        )
 
     return ExecutionResult(
         task_id=request.task_id,
         status="completed",
         output=output,
         duration_ms=duration_ms,
+        truncated=truncated,
+        exit_code=0,
+        policy_context={"device": request.device},
     )
 
 

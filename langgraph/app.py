@@ -5,10 +5,10 @@ from typing import Any, Dict, Optional
 
 import httpx
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
-app = FastAPI(title="LangGraph Orchestrator", version="0.1.0")
+app = FastAPI(title="LangGraph Orchestrator", version="0.2.0")
 
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
@@ -26,9 +26,10 @@ class GraphResponse(BaseModel):
     gate_decision: Optional[Dict[str, Any]] = None
 
 
-def build_plan(user_input: str, specialist: str) -> Dict[str, Any]:
+def build_plan(user_input: str, specialist: str, device: str) -> Dict[str, Any]:
     return {
         "specialist": specialist,
+        "device": device,
         "summary": f"Route task to {specialist} for analysis.",
         "steps": [
             {"action": "analyze", "input": user_input},
@@ -60,8 +61,9 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     route_response.raise_for_status()
     route_payload = route_response.json()
     specialist = route_payload["specialist"]
+    device = route_payload.get("context_payload", {}).get("device", "cpu")
 
-    plan = build_plan(request.user_input, specialist)
+    plan = build_plan(request.user_input, specialist, device)
 
     gate_decision = None
     if request.task_hint:
@@ -73,6 +75,8 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
                     "params": {"plan": plan},
                     "confidence": 0.7,
                     "actor_did": "langgraph",
+                    "device": device,
+                    "request_source": "langgraph",
                 },
                 timeout=5.0,
             )
