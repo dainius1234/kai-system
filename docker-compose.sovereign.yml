@@ -9,6 +9,7 @@ x-service-defaults: &service_defaults
     - no-new-privileges:true
   tmpfs:
     - /tmp:size=64M,noexec,nosuid
+  restart: unless-stopped
   deploy:
     resources:
       limits:
@@ -29,6 +30,11 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-localdev}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keeper -d sovereign"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
   tailscale:
     image: tailscale/tailscale:latest
@@ -45,7 +51,7 @@ services:
       TS_STATE_DIR: /var/lib/tailscale
       TS_EXTRA_ARGS: --ssh --accept-routes=true
       TS_HOSTNAME: sovereign-core
-    command: tailscaled --state=/var/lib/tailscale/tailscaled.state
+    command: sh -c "tailscaled --state=/var/lib/tailscale/tailscaled.state & sleep 2 && tailscale up --authkey=${TS_AUTHKEY} --hostname=${TS_HOSTNAME} --ssh --accept-routes=true && wait"
 
   tool-gate:
     <<: *service_defaults
@@ -66,6 +72,12 @@ services:
       TRUSTED_TOKENS_PATH: "/config/trusted_tokens.txt"
     depends_on:
       - postgres
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
 
   memu-core:
     <<: *service_defaults
@@ -83,6 +95,12 @@ services:
     depends_on:
       - postgres
       - tool-gate
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8001/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
 
   executor:
     build: ./executor
@@ -107,6 +125,12 @@ services:
     depends_on:
       - tool-gate
       - memu-core
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8002/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
 
   dashboard:
     <<: *service_defaults
@@ -129,6 +153,12 @@ services:
       - tool-gate
       - memu-core
       - executor
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
 
   langgraph:
     <<: *service_defaults
@@ -146,6 +176,12 @@ services:
       - memu-core
       - tool-gate
       - redis
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8007/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
 
   redis:
     image: redis:7-alpine
@@ -165,6 +201,7 @@ services:
     environment:
       LANGGRAPH_URL: "http://langgraph:8007/run"
       TELEGRAM_API: "http://telegram-bridge:9000"
+      BRIDGE_SHARED_SECRET: "${BRIDGE_SHARED_SECRET:-}"
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.12
@@ -188,6 +225,12 @@ services:
       EXECUTOR_LOG_PATH: "/var/log/sovereign/executor.log"
       TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
       TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID:-}"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8010/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
 
   camera-service:
     <<: *service_defaults
@@ -206,6 +249,12 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.11
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8021/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
 
   # TODO: enable GPU when core is stable.
   # ollama:
