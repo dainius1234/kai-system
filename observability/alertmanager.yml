@@ -1,0 +1,7 @@
+route:
+  receiver: telegram
+receivers:
+  - name: telegram
+    webhook_configs:
+      - url: "${TELEGRAM_WEBHOOK_URL}"
+        send_resolved: true

@@ -1,0 +1,17 @@
+groups:
+  - name: sovereign-alerts
+    rules:
+      - alert: HighErrorRatio
+        expr: executor_error_ratio > 0.03
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Executor 5xx/timeout error ratio exceeded 3% in 5m"
+      - alert: ExecutorHighLoad
+        expr: executor_load_ratio > 0.90
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Executor load ratio > 90%"

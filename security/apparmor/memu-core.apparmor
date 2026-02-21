@@ -1,0 +1,11 @@
+#include <tunables/global>
+
+profile memu-core-restricted flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+  network,
+  /data/** rw,
+  deny /** w,
+  /usr/** rix,
+  /bin/** rix,
+  /tmp/** rw,
+}

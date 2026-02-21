@@ -1,0 +1,12 @@
+#include <tunables/global>
+
+profile executor-restricted flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+  network,
+  deny network raw,
+  deny /proc/** w,
+  deny /sys/** w,
+  /usr/** rix,
+  /bin/** rix,
+  /tmp/** rw,
+}

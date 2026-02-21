@@ -10,11 +10,8 @@ x-service-defaults: &service_defaults
   tmpfs:
     - /tmp:size=64M,noexec,nosuid
   restart: unless-stopped
-  deploy:
-    resources:
-      limits:
-        cpus: '1.0'
-        memory: 2G
+  networks:
+    - sovereign-net
 
 services:
   postgres:
@@ -35,6 +32,34 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: sovereign-redis
+    hostname: redis
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.8
+
+  vault:
+    image: hashicorp/vault:1.17
+    container_name: sovereign-vault
+    hostname: vault
+    cap_add:
+      - IPC_LOCK
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.20
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN_ID:-}
+      VAULT_ADDR: http://0.0.0.0:8200
+      VAULT_LOCAL_CONFIG: '{"storage":{"file":{"path":"/vault/file"}},"listener":{"tcp":{"address":"0.0.0.0:8200","tls_disable":1}},"default_lease_ttl":"24h","max_lease_ttl":"720h","ui":true}'
+      VAULT_UNSEAL_KEY: ${VAULT_UNSEAL_KEY:-}
+    command: sh -c 'vault server -config=/vault/config/local.json || vault server -dev'
+    volumes:
+      - ./vault-data:/vault/file
+    ports:
+      - "8200:8200"
 
   tailscale:
     image: tailscale/tailscale:latest
@@ -65,19 +90,27 @@ services:
       - "8000:8000"
     volumes:
       - ./security/trusted_tokens.txt:/config/trusted_tokens.txt:ro
+      - ./scripts/vault-agent-entrypoint.sh:/vault-agent-entrypoint.sh:ro
     environment:
       DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
       MODE: "PUB"
       REQUIRED_CONFIDENCE: "0.7"
       TRUSTED_TOKENS_PATH: "/config/trusted_tokens.txt"
+      REDIS_URL: "redis://redis:6379/0"
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_ROLE: "tool-gate"
+      VAULT_SECRET_PATH: "secret/data/tool-gate"
+      SECRET_ROTATION_DAYS: "30"
+    command: ["sh", "/vault-agent-entrypoint.sh", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
     depends_on:
       - postgres
+      - vault
+      - redis
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8000/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
-
 
   memu-core:
     <<: *service_defaults
@@ -87,50 +120,71 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.5
+    security_opt:
+      - no-new-privileges:true
+      - apparmor:memu-core-restricted
+    volumes:
+      - ./data/memu:/data
+      - ./scripts/vault-agent-entrypoint.sh:/vault-agent-entrypoint.sh:ro
+      - ./security/apparmor/memu-core.apparmor:/etc/apparmor.d/memu-core-restricted:ro
     environment:
       DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/memu_db"
       VECTOR_STORE: "pgvector"
       API_HOST: "0.0.0.0"
       API_PORT: "8001"
+      REDIS_URL: "redis://redis:6379/0"
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_ROLE: "memu-core"
+      VAULT_SECRET_PATH: "secret/data/memu-core"
+      SECRET_ROTATION_DAYS: "30"
+    command: ["sh", "/vault-agent-entrypoint.sh", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8001"]
     depends_on:
       - postgres
       - tool-gate
+      - vault
+      - redis
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8001/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
 
-
   executor:
+    <<: *service_defaults
     build: ./executor
     container_name: executor
     hostname: executor
-    user: "1000:1000"
-    read_only: true
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
-    tmpfs:
-      - /tmp:size=64M,noexec,nosuid
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.9
+    security_opt:
+      - no-new-privileges:true
+      - apparmor:executor-restricted
+    volumes:
+      - ./scripts/vault-agent-entrypoint.sh:/vault-agent-entrypoint.sh:ro
+      - ./security/apparmor/executor.apparmor:/etc/apparmor.d/executor-restricted:ro
     environment:
       TOOL_GATE_URL: "http://tool-gate:8000"
       MEMU_URL: "http://memu-core:8001"
       EXECUTION_TIMEOUT: "30"
       MAX_OUTPUT_SIZE: "1048576"
+      REDIS_URL: "redis://redis:6379/0"
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_ROLE: "executor"
+      VAULT_SECRET_PATH: "secret/data/executor"
+      SECRET_ROTATION_DAYS: "30"
+    command: ["sh", "/vault-agent-entrypoint.sh", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8002"]
+    restart: always
     depends_on:
       - tool-gate
       - memu-core
+      - vault
+      - redis
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8002/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8002/alive || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
-
 
   dashboard:
     <<: *service_defaults
@@ -142,6 +196,8 @@ services:
         ipv4_address: 172.20.0.4
     ports:
       - "8080:8080"
+    volumes:
+      - ./scripts/vault-agent-entrypoint.sh:/vault-agent-entrypoint.sh:ro
     environment:
       TOOL_GATE_URL: "http://tool-gate:8000"
       LEDGER_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
@@ -149,16 +205,23 @@ services:
       LANGGRAPH_URL: "http://langgraph:8007"
       EXECUTOR_URL: "http://executor:8002"
       HEARTBEAT_URL: "http://heartbeat:8010"
+      REDIS_URL: "redis://redis:6379/0"
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_ROLE: "dashboard"
+      VAULT_SECRET_PATH: "secret/data/dashboard"
+      SECRET_ROTATION_DAYS: "30"
+    command: ["sh", "/vault-agent-entrypoint.sh", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
     depends_on:
       - tool-gate
       - memu-core
       - executor
+      - vault
+      - redis
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
-
 
   langgraph:
     <<: *service_defaults
@@ -168,45 +231,27 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.7
+    volumes:
+      - ./scripts/vault-agent-entrypoint.sh:/vault-agent-entrypoint.sh:ro
     environment:
-      REDIS_URL: "redis://redis:6379"
+      REDIS_URL: "redis://redis:6379/0"
       MEMU_URL: "http://memu-core:8001"
       TOOL_GATE_URL: "http://tool-gate:8000"
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_ROLE: "langgraph"
+      VAULT_SECRET_PATH: "secret/data/langgraph"
+      SECRET_ROTATION_DAYS: "30"
+    command: ["sh", "/vault-agent-entrypoint.sh", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8007"]
     depends_on:
       - memu-core
       - tool-gate
       - redis
+      - vault
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8007/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
-
-
-  redis:
-    image: redis:7-alpine
-    container_name: sovereign-redis
-    hostname: redis
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.8
-
-
-  perception-telegram:
-    image: python:3.11-slim
-    container_name: perception-telegram
-    command: sh -c "pip install --no-cache-dir httpx && python /app/telegram.py"
-    volumes:
-      - ./perception:/app:ro
-    environment:
-      LANGGRAPH_URL: "http://langgraph:8007/run"
-      TELEGRAM_API: "http://telegram-bridge:9000"
-      BRIDGE_SHARED_SECRET: "${BRIDGE_SHARED_SECRET:-}"
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.12
-    depends_on:
-      - langgraph
 
   heartbeat:
     <<: *service_defaults
@@ -231,39 +276,70 @@ services:
       timeout: 5s
       retries: 3
 
-
-  camera-service:
-    <<: *service_defaults
-    build: ./perception/camera
-    container_name: camera-service
-    hostname: camera-service
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: sovereign-prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/alerts.yml:/etc/prometheus/alerts.yml:ro
+    ports:
+      - "9090:9090"
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.10
+      - sovereign-net
+    depends_on:
+      - tool-gate
+      - memu-core
+      - executor
+      - dashboard
+      - langgraph
 
-  audio-service:
-    <<: *service_defaults
-    build: ./perception/audio
-    container_name: audio-service
-    hostname: audio-service
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: sovereign-alertmanager
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+    volumes:
+      - ./observability/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    ports:
+      - "9093:9093"
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.11
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8021/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+      - sovereign-net
 
+  grafana:
+    image: grafana/grafana:11.1.5
+    container_name: sovereign-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+    networks:
+      - sovereign-net
+    depends_on:
+      - prometheus
 
-  # TODO: enable GPU when core is stable.
-  # ollama:
-  #   image: ollama/ollama:latest
-  #   container_name: ollama
-
-  # TODO: enable GPU when core is stable.
-  # tts-service:
-  #   build: ./output/tts
+  executor-autoscaler:
+    image: docker:27-cli
+    container_name: sovereign-executor-autoscaler
+    entrypoint: ["sh", "/app/executor_autoscaler.sh"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./scripts/executor_autoscaler.sh:/app/executor_autoscaler.sh:ro
+    environment:
+      COMPOSE_FILE: docker-compose.sovereign.yml
+      SCALE_TARGET: executor
+      SCALE_UP_THRESHOLD: "0.80"
+      SCALE_DOWN_THRESHOLD: "0.50"
+      METRICS_URL: "http://executor:8002/metrics"
+    networks:
+      - sovereign-net
+    depends_on:
+      - executor
 
 volumes:
   postgres_data:

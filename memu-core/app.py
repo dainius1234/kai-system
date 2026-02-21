@@ -1,22 +1,24 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import time
 import uuid
-from collections import Counter
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
-from common.runtime import ErrorBudget, detect_device, sanitize_string, setup_json_logger
+from common.runtime import ErrorBudget, detect_device, init_audit_or_exit, sanitize_string, setup_json_logger
 
 logger = setup_json_logger("memu-core", os.getenv("LOG_PATH", "/tmp/memu-core.json.log"))
 DEVICE = detect_device()
 logger.info("Running on %s.", DEVICE)
+audit = init_audit_or_exit("memu-core", logger)
 
-app = FastAPI(title="Sovereign Memory Core", version="0.4.0")
+app = FastAPI(title="Sovereign Memory Core", version="0.5.0")
 budget = ErrorBudget(window_seconds=300)
 last_compress_run = 0.0
 
@@ -40,6 +42,7 @@ class MemoryUpdate(BaseModel):
     metrics: Optional[Dict[str, Any]] = None
     state_delta: Optional[Dict[str, Any]] = None
     relevance: float = 1.0
+    user_id: str = "keeper"
 
 
 class MemoryRecord(BaseModel):
@@ -51,6 +54,17 @@ class MemoryRecord(BaseModel):
     relevance: float = 1.0
 
 
+class VersionRef(BaseModel):
+    version_id: int
+    commit_hash: str
+    message: str
+    timestamp: str
+
+
+class RevertRequest(BaseModel):
+    version_id: int
+
+
 SPECIALISTS = ["DeepSeek-V4", "Kimi-2.5", "Qwen-VL"]
 
 
@@ -58,9 +72,34 @@ class InMemoryVectorStore:
     def __init__(self) -> None:
         self._records: List[MemoryRecord] = []
         self._state: Dict[str, Any] = {}
+        self._versions: List[Dict[str, Any]] = []
+        self._last_commit_hash = "GENESIS"
 
-    def insert(self, record: MemoryRecord) -> None:
+    def _snapshot(self) -> Dict[str, Any]:
+        return {
+            "records": [r.model_dump() for r in self._records],
+            "state": dict(self._state),
+        }
+
+    def _commit(self, message: str) -> VersionRef:
+        snapshot = self._snapshot()
+        material = json.dumps(snapshot, sort_keys=True)
+        commit_hash = hashlib.sha256(f"{self._last_commit_hash}|{material}|{message}".encode("utf-8")).hexdigest()
+        version = {
+            "version_id": len(self._versions),
+            "commit_hash": commit_hash,
+            "message": message,
+            "timestamp": datetime.utcnow().isoformat(),
+            "snapshot": snapshot,
+        }
+        self._versions.append(version)
+        self._last_commit_hash = commit_hash
+        return VersionRef(version_id=version["version_id"], commit_hash=commit_hash, message=message, timestamp=version["timestamp"])
+
+    def insert(self, record: MemoryRecord, user_id: str) -> VersionRef:
         self._records.append(record)
+        msg = f"update: user_id={sanitize_string(user_id)}, timestamp={record.timestamp}, record_id={record.id}"
+        return self._commit(msg)
 
     def search(self, top_k: int) -> List[MemoryRecord]:
         return list(reversed(self._records))[:top_k]
@@ -74,6 +113,18 @@ class InMemoryVectorStore:
     def apply_state_delta(self, delta: Dict[str, Any]) -> None:
         self._state.update(delta)
 
+    def revert(self, version_id: int) -> VersionRef:
+        if version_id < 0 or version_id >= len(self._versions):
+            raise ValueError("invalid version_id")
+        snapshot = self._versions[version_id]["snapshot"]
+        self._records = [MemoryRecord(**r) for r in snapshot["records"]]
+        self._state = dict(snapshot["state"])
+        return self._commit(f"revert: version={version_id}")
+
+    def versions(self, limit: int = 20) -> List[VersionRef]:
+        payload = self._versions[-limit:]
+        return [VersionRef(version_id=v["version_id"], commit_hash=v["commit_hash"], message=v["message"], timestamp=v["timestamp"]) for v in payload]
+
     def compress(self) -> Dict[str, Any]:
         threshold = datetime.utcnow() - timedelta(days=90)
         before_bytes = sum(len(r.model_dump_json()) for r in self._records)
@@ -86,8 +137,10 @@ class InMemoryVectorStore:
         self._records = kept
         after_bytes = sum(len(r.model_dump_json()) for r in self._records)
         saved = max(before_bytes - after_bytes, 0)
+        self._commit("compress: prune records older than 90 days")
         logger.info("weekly compression complete, bytes_saved=%s", saved)
-        return {"before": before, "after": len(self._records), "bytes_saved": saved}
+        audit.write("INFO", f"weekly compression complete bytes_saved={saved}")
+        return {"before": before, "after": len(self._records), "bytes_saved": saved, "retention_days": 90}
 
 
 store = InMemoryVectorStore()
@@ -155,7 +208,7 @@ async def route_request(request: MemoryRequest) -> RoutingResponse:
 
 @app.post("/memory/memorize")
 async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
-    update = update.model_copy(update={"event_type": sanitize_string(update.event_type), "result_raw": sanitize_string(update.result_raw) if update.result_raw else None})
+    update = update.model_copy(update={"event_type": sanitize_string(update.event_type), "result_raw": sanitize_string(update.result_raw) if update.result_raw else None, "user_id": sanitize_string(update.user_id)})
     if update.state_delta:
         existing = store.get_state()
         for key in update.state_delta:
@@ -164,8 +217,24 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
         store.apply_state_delta(update.state_delta)
 
     record = MemoryRecord(id=str(uuid.uuid4()), timestamp=update.timestamp, event_type=update.event_type, content={"result": update.result_raw, "metrics": update.metrics or {}, "state_changes": update.state_delta or {}}, embedding=generate_embedding(f"{update.event_type}: {update.result_raw}"), relevance=update.relevance)
-    store.insert(record)
-    return {"status": "appended", "id": record.id}
+    version = store.insert(record, user_id=update.user_id)
+    audit.write("INFO", f"memory append id={record.id} version={version.version_id} hash={version.commit_hash}")
+    return {"status": "appended", "id": record.id, "version": str(version.version_id), "hash": version.commit_hash}
+
+
+@app.post("/memory/revert")
+async def revert_memory(payload: RevertRequest) -> Dict[str, str]:
+    try:
+        version = store.revert(payload.version_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    audit.write("WARN", f"memory reverted target={payload.version_id} new_hash={version.commit_hash}")
+    return {"status": "reverted", "target_version": str(payload.version_id), "new_version": str(version.version_id), "hash": version.commit_hash}
+
+
+@app.get("/memory/versions")
+async def memory_versions(limit: int = 20) -> List[VersionRef]:
+    return store.versions(limit=limit)
 
 
 @app.get("/memory/retrieve")
@@ -182,13 +251,12 @@ async def memory_state() -> Dict[str, Any]:
 
 @app.get("/memory/stats")
 async def memory_stats() -> Dict[str, Any]:
-    counts = Counter(record.event_type for record in store.search(top_k=10_000))
-    return {"status": "ok", "records": store.count(), "event_types": dict(counts)}
+    return {"status": "ok", "records": store.count(), "versions": len(store.versions(limit=100000))}
 
 
 @app.post("/memory/compress")
-async def memory_compress() -> Dict[str, Any]:
-    return {"status": "ok", **store.compress()}
+async def compress_now() -> Dict[str, Any]:
+    return store.compress()
 
 
 if __name__ == "__main__":

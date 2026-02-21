@@ -1,0 +1,27 @@
+{
+  "id": null,
+  "title": "Sovereign Overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Executor Error Ratio",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "targets": [{"expr": "executor_error_ratio", "refId": "A"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Executor Tokens/sec",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "targets": [{"expr": "executor_tokens_per_sec", "refId": "A"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Executor Load Ratio",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "targets": [{"expr": "executor_load_ratio", "refId": "A"}]
+    }
+  ]
+}
