@@ -136,3 +136,10 @@ Derivatives trading may be restricted in your jurisdiction. Use responsibly.
 - Host egress policy helper: `scripts/enforce_egress.sh`.
 - Run `kai-control` as normal user (no sudo).
 - Monthly drill helper: `scripts/kai-drill.sh` (cron suggested: `0 0 1 * *`).
+
+
+## Contingency library (self-fix method statements)
+- Runtime source: `heartbeat/contingencies.json`
+- API inspect: `GET /contingency/library`
+- API run: `POST /contingency/run?event=intrusion_detected`
+- Test: `make test-contingency`

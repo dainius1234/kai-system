@@ -1,0 +1,30 @@
+{
+  "intrusion_detected": {
+    "method_statement": "Contain suspicious execution and preserve state for keeper review.",
+    "checklist": [
+      "Notify keeper",
+      "Attempt executor restart",
+      "Trigger memu memory compression checkpoint",
+      "Record contingency execution in audit trail"
+    ],
+    "actions": ["notify_keeper", "restart_executor", "memu_compress", "audit_log"]
+  },
+  "executor_stale": {
+    "method_statement": "Recover executor liveness while preserving memory and logs.",
+    "checklist": [
+      "Notify keeper",
+      "Restart executor",
+      "Run go/no-go check"
+    ],
+    "actions": ["notify_keeper", "restart_executor", "go_no_go_check", "audit_log"]
+  },
+  "low_conviction_trend": {
+    "method_statement": "Stabilize planning quality and request better grounding data.",
+    "checklist": [
+      "Notify keeper",
+      "Run memory compression to reduce stale noise",
+      "Log intervention"
+    ],
+    "actions": ["notify_keeper", "memu_compress", "audit_log"]
+  }
+}
