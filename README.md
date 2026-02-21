@@ -120,3 +120,19 @@ tests/        # Unit + integration tests
 For research, backtesting, and paper trading only.  
 Live trading requires explicit configuration and operator consent.  
 Derivatives trading may be restricted in your jurisdiction. Use responsibly.
+
+---
+
+## Sovereign Implementation Planning Docs
+- `docs/first_implementation_plan.md` — step-by-step first implementation runbook (commands, expected outputs, failure conditions)
+- `docs/phase1_patch_set.md` — concrete Phase-1 patch set aligned to current repo layout
+- `docs/production_hardening_plan.md` — production-grade hardening plan with owners and acceptance criteria
+
+
+## Kai Control Offline Triple-Recovery
+- `scripts/kai_control.py` provides a standalone local keeper console (USB primary, USB backup, paper restore).
+- Build binary: `make build-kai-control` (PyInstaller one-file output).
+- Local self-check: `make kai-control-selftest`.
+- Host egress policy helper: `scripts/enforce_egress.sh`.
+- Run `kai-control` as normal user (no sudo).
+- Monthly drill helper: `scripts/kai-drill.sh` (cron suggested: `0 0 1 * *`).
