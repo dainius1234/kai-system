@@ -1,0 +1,2 @@
+- TikTok script templates
+- YouTube SEO offline templates
