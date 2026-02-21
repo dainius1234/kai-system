@@ -18,6 +18,17 @@ class _MemVault:
     data = {}
 
 
+class _DummyAESGCM:
+    def __init__(self, key: bytes) -> None:
+        self.key = key
+
+    def encrypt(self, nonce: bytes, data: bytes, aad: bytes) -> bytes:
+        return data + self.key[:16]
+
+    def decrypt(self, nonce: bytes, data: bytes, aad: bytes) -> bytes:
+        return data[:-16]
+
+
 def _write(path: str, value: str) -> None:
     _MemVault.data[path] = value
 
@@ -29,6 +40,8 @@ def _read(path: str):
 def main() -> None:
     kc.vault_write = _write
     kc.vault_read = _read
+    if kc.AESGCM is None:
+        kc.AESGCM = _DummyAESGCM
     os.environ["KAI_CONTROL_TEST_MODE"] = "true"
 
     with tempfile.TemporaryDirectory() as td:
