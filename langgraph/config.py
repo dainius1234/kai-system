@@ -5,7 +5,6 @@ import os
 import time
 from typing import Any, Dict, List, Protocol
 
-import redis
 
 
 class EpisodeSaver(Protocol):
@@ -18,6 +17,8 @@ class EpisodeSaver(Protocol):
 
 class RedisSaver:
     def __init__(self, redis_url: str) -> None:
+        import redis
+
         self.redis = redis.from_url(redis_url, decode_responses=True)
 
     def save_episode(self, payload: Dict[str, Any]) -> None:
