@@ -1,0 +1,6 @@
+route:
+  receiver: telegram-webhook
+receivers:
+  - name: telegram-webhook
+    webhook_configs:
+      - url: 'http://perception-telegram:9000/alert'

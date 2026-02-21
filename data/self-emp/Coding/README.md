@@ -1,0 +1,3 @@
+- VS Code portable
+- Git
+- Python templates

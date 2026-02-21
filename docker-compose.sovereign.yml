@@ -1,0 +1,426 @@
+version: '3.8'
+
+x-service-defaults: &service_defaults
+  user: "1000:1000"
+  read_only: true
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  tmpfs:
+    - /tmp:size=64M,noexec,nosuid
+  restart: unless-stopped
+  deploy:
+    resources:
+      limits:
+        cpus: '1.0'
+        memory: 2G
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sovereign-postgres
+    hostname: ledger-db
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.2
+    environment:
+      POSTGRES_DB: sovereign
+      POSTGRES_USER: keeper
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-localdev}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keeper -d sovereign"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: sovereign-tailscale
+    hostname: sovereign-tailscale
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - tailscale_state:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY:?set TS_AUTHKEY}
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_EXTRA_ARGS: --ssh --accept-routes=true
+      TS_HOSTNAME: sovereign-core
+    command: sh -c "tailscaled --state=/var/lib/tailscale/tailscaled.state & sleep 2 && tailscale up --authkey=${TS_AUTHKEY} --hostname=${TS_HOSTNAME} --ssh --accept-routes=true && wait"
+
+
+  vault:
+    image: hashicorp/vault:latest
+    container_name: sovereign-vault
+    hostname: vault
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_ROOT_TOKEN:?set VAULT_ROOT_TOKEN}
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./vault-data:/vault/file
+      - ./scripts/vault-init.sh:/vault/scripts/vault-init.sh:ro
+    command: sh -c "vault server -dev -dev-root-token-id=${VAULT_ROOT_TOKEN} & sleep 3 && sh /vault/scripts/vault-init.sh && wait"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.14
+
+
+  vault-rotator:
+    image: hashicorp/vault:latest
+    container_name: sovereign-vault-rotator
+    volumes:
+      - ./scripts/vault-rotate.sh:/vault/scripts/vault-rotate.sh:ro
+    environment:
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_ROOT_TOKEN: ${VAULT_ROOT_TOKEN:?set VAULT_ROOT_TOKEN}
+    command: sh /vault/scripts/vault-rotate.sh
+    depends_on:
+      - vault
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.18
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sovereign-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alert.rules.yml:/etc/prometheus/alert.rules.yml:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.15
+
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: sovereign-alertmanager
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+    ports:
+      - "9093:9093"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.17
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sovereign-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.16
+
+  tool-gate:
+    <<: *service_defaults
+    build: ./tool-gate
+    container_name: sovereign-tool-gate
+    hostname: tool-gate
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.3
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./security/trusted_tokens.txt:/config/trusted_tokens.txt:ro
+    environment:
+      DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      MODE: "PUB"
+      REQUIRED_CONFIDENCE: "0.7"
+      TRUSTED_TOKENS_PATH: "/config/trusted_tokens.txt"
+      AUDIT_REDIS_URL: "redis://redis:6379"
+
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+
+  memu-core:
+    <<: *service_defaults
+    read_only: true
+    build: ./memu-core
+    container_name: sovereign-memu-core
+    hostname: memu-core
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.5
+    environment:
+      DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/memu_db"
+      VECTOR_STORE: "pgvector"
+      API_HOST: "0.0.0.0"
+      API_PORT: "8001"
+      AUDIT_REDIS_URL: "redis://redis:6379"
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_TOKEN: "${VAULT_ROOT_TOKEN:?set VAULT_ROOT_TOKEN}"
+    volumes:
+      - memu_data:/data
+
+    depends_on:
+      - postgres
+      - tool-gate
+      - vault
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8001/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+
+  executor:
+    build: ./executor
+    runtime: gvisor
+    restart: always
+    container_name: executor
+    hostname: executor
+    user: "1000:1000"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+      - apparmor:executor-aa
+    tmpfs:
+      - /tmp:size=64M,noexec,nosuid
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.9
+    environment:
+      BACKOFF_SCHEDULE: "10 60 300"
+      TOOL_GATE_URL: "http://tool-gate:8000"
+      MEMU_URL: "http://memu-core:8001"
+      EXECUTION_TIMEOUT: "30"
+      MAX_OUTPUT_SIZE: "1048576"
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_TOKEN: "${VAULT_ROOT_TOKEN:?set VAULT_ROOT_TOKEN}"
+      AUDIT_REDIS_URL: "redis://redis:6379"
+
+    command: sh -c "set -e; for d in $BACKOFF_SCHEDULE; do python app.py && exit 0 || sleep $d; done; exec python app.py"
+    depends_on:
+      - tool-gate
+      - memu-core
+      - vault
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8002/alive || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 300s
+
+
+  dashboard:
+    <<: *service_defaults
+    build: ./dashboard
+    container_name: sovereign-dashboard
+    hostname: dashboard
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.4
+    ports:
+      - "8080:8080"
+    environment:
+      TOOL_GATE_URL: "http://tool-gate:8000"
+      LEDGER_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      MEMU_URL: "http://memu-core:8001"
+      LANGGRAPH_URL: "http://langgraph:8007"
+      EXECUTOR_URL: "http://executor:8002"
+      HEARTBEAT_URL: "http://heartbeat:8010"
+      AUDIT_REDIS_URL: "redis://redis:6379"
+
+    depends_on:
+      - tool-gate
+      - memu-core
+      - vault
+      - executor
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+
+  langgraph:
+    <<: *service_defaults
+    build: ./langgraph
+    container_name: langgraph
+    hostname: langgraph
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.7
+    volumes:
+      - ./data/self-emp:/data/self-emp:ro
+    environment:
+      REDIS_URL: "redis://redis:6379"
+      MEMU_URL: "http://memu-core:8001"
+      TOOL_GATE_URL: "http://tool-gate:8000"
+      AUDIT_REDIS_URL: "redis://redis:6379"
+      MTD_START: "50000"
+      VAT_THRESHOLD: "85000"
+      MILEAGE_RATE: "0.45"
+      SELF_EMP_ROOT: "/data/self-emp"
+      INCOME_CSV: "/data/self-emp/Accounting/income.csv"
+      EXPENSES_LOG: "/data/self-emp/Accounting/expenses.log"
+
+    depends_on:
+      - memu-core
+      - tool-gate
+      - redis
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8007/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --save ""
+    container_name: sovereign-redis
+    hostname: redis
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.8
+
+
+  perception-telegram:
+    image: python:3.11-slim
+    container_name: perception-telegram
+    command: sh -c "pip install --no-cache-dir httpx && python /app/telegram.py"
+    volumes:
+      - ./perception:/app:ro
+    environment:
+      LANGGRAPH_URL: "http://langgraph:8007/run"
+      TELEGRAM_API: "http://telegram-bridge:9000"
+      BRIDGE_SHARED_SECRET: "${BRIDGE_SHARED_SECRET:-}"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.12
+    depends_on:
+      - langgraph
+
+  heartbeat:
+    <<: *service_defaults
+    build: ./heartbeat
+    container_name: sovereign-heartbeat
+    hostname: heartbeat
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.13
+    volumes:
+      - /var/log/sovereign:/var/log/sovereign:ro
+    environment:
+      TOOL_GATE_URL: "http://tool-gate:8000"
+      CHECK_INTERVAL: "60"
+      ALERT_WINDOW: "300"
+      EXECUTOR_LOG_PATH: "/var/log/sovereign/executor.log"
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
+      TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID:-}"
+      AUDIT_REDIS_URL: "redis://redis:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8010/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+
+  camera-service:
+    <<: *service_defaults
+    build: ./perception/camera
+    container_name: camera-service
+    hostname: camera-service
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.10
+
+  audio-service:
+    <<: *service_defaults
+    build: ./perception/audio
+    container_name: audio-service
+    hostname: audio-service
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.11
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8021/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+
+  # TODO: enable GPU when core is stable.
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: ollama
+
+  # TODO: enable GPU when core is stable.
+  # tts-service:
+  #   build: ./output/tts
+
+
+  clamav-service:
+    image: clamav/clamav:stable
+    container_name: clamav-service
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.21
+    volumes:
+      - ./tools:/tools
+      - ./data:/data
+      - ./quarantine:/quarantine
+      - ./logs:/logs
+    command: sh -c "freshclam --datadir=/tools/db || true; sleep infinity"
+
+  lynis-cron:
+    image: alpine:3.20
+    container_name: lynis-cron
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.22
+    volumes:
+      - ./tools:/tools
+      - ./data:/data
+      - ./quarantine:/quarantine
+      - ./logs:/logs
+      - ./scripts:/scripts:ro
+    command: sh -c "apk add --no-cache bash lynis python3 >/dev/null 2>&1 || true; while true; do python3 /tools/medic_scan.py || true; sleep 14400; done"
+
+volumes:
+  postgres_data:
+  tailscale_state:
+  memu_data:
+
+networks:
+  sovereign-net:
+    internal: true
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
