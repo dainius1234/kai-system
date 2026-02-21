@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 import httpx
 from fastapi import FastAPI, Request
 
-from common.runtime import ErrorBudget, detect_device, setup_json_logger
+from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
 
 logger = setup_json_logger("dashboard", os.getenv("LOG_PATH", "/tmp/dashboard.json.log"))
 DEVICE = detect_device()
@@ -16,6 +16,7 @@ app = FastAPI(title="Sovereign Dashboard", version="0.4.0")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 LEDGER_URL = os.getenv("LEDGER_URL", "postgresql://keeper:***@postgres:5432/sovereign")
 budget = ErrorBudget(window_seconds=300)
+audit = AuditStream("dashboard", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
 
 NODES = {
     "tool-gate": f"{TOOL_GATE_URL}/health",
@@ -34,9 +35,11 @@ async def metrics_middleware(request: Request, call_next):
     try:
         response = await call_next(request)
         budget.record(response.status_code)
+        audit.log("info", f"{request.method} {request.url.path} -> {response.status_code}")
         return response
     except Exception:
         budget.record(500)
+        audit.log("error", f"{request.method} {request.url.path} -> 500")
         raise
 
 

@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional, Set
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from common.runtime import ErrorBudget, detect_device, sanitize_string, setup_json_logger
+from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
 
 logger = setup_json_logger("tool-gate", os.getenv("LOG_PATH", "/tmp/tool-gate.json.log"))
 DEVICE = detect_device()
@@ -22,6 +22,7 @@ app = FastAPI(title="Tool Gate", version="0.4.0")
 TOKENS_PATH = Path(os.getenv("TRUSTED_TOKENS_PATH", "/config/trusted_tokens.txt"))
 TRUSTED_TOKENS: Set[str] = set()
 budget = ErrorBudget(window_seconds=300)
+audit = AuditStream("tool-gate", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
 
 
 class GateRequest(BaseModel):
@@ -118,9 +119,11 @@ async def metrics_middleware(request: Request, call_next):
     try:
         response = await call_next(request)
         budget.record(response.status_code)
+        audit.log("info", f"{request.method} {request.url.path} -> {response.status_code}")
         return response
     except Exception:
         budget.record(500)
+        audit.log("error", f"{request.method} {request.url.path} -> 500")
         raise
 
 

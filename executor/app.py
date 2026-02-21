@@ -10,7 +10,7 @@ import httpx
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
-from common.runtime import ErrorBudget, detect_device, sanitize_string, setup_json_logger
+from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
 
 logger = setup_json_logger("executor", os.getenv("LOG_PATH", "/tmp/executor.json.log"))
 DEVICE = detect_device()
@@ -21,6 +21,7 @@ MAX_OUTPUT_SIZE = int(os.getenv("MAX_OUTPUT_SIZE", "1048576"))
 EXECUTION_TIMEOUT = int(os.getenv("EXECUTION_TIMEOUT", "30"))
 HEARTBEAT_URL = os.getenv("HEARTBEAT_URL", "http://heartbeat:8010")
 budget = ErrorBudget(window_seconds=300)
+audit = AuditStream("executor", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
 
 
 class StateStore:
@@ -74,9 +75,11 @@ async def metrics_middleware(request: Request, call_next):
     try:
         response = await call_next(request)
         budget.record(response.status_code)
+        audit.log("info", f"{request.method} {request.url.path} -> {response.status_code}")
         return response
     except Exception:
         budget.record(500)
+        audit.log("error", f"{request.method} {request.url.path} -> 500")
         raise
 
 

@@ -5,7 +5,6 @@ import json
 import os
 import time
 import uuid
-import zlib
 from collections import Counter
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
@@ -13,7 +12,8 @@ from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from common.runtime import ErrorBudget, detect_device, sanitize_string, setup_json_logger
+from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
+from lakefs_client import LakeFSClient, VersionCommit
 
 logger = setup_json_logger("memu-core", os.getenv("LOG_PATH", "/tmp/memu-core.json.log"))
 DEVICE = detect_device()
@@ -21,6 +21,7 @@ logger.info("Running on %s.", DEVICE)
 
 app = FastAPI(title="Sovereign Memory Core", version="0.5.0")
 budget = ErrorBudget(window_seconds=300)
+audit = AuditStream("memu-core", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
 last_compress_run = 0.0
 
 
@@ -53,80 +54,10 @@ class MemoryRecord(BaseModel):
     content: Dict[str, Any]
     embedding: List[float]
     relevance: float = 1.0
-
-
-class VersionCommit(BaseModel):
-    commit_id: str
-    branch: str
-    timestamp: float
-    message: str
-    sha256: str
+    pinned: bool = False
 
 
 SPECIALISTS = ["DeepSeek-V4", "Kimi-2.5", "Qwen-VL"]
-
-
-class LakeFSClient:
-    """Lightweight lakeFS-like local versioning wrapper for memu-core state."""
-
-    def __init__(self) -> None:
-        self._branches: Dict[str, Dict[str, Any]] = {"main": {"records": [], "state": {}}}
-        self._commits: List[VersionCommit] = []
-
-    def create_branch(self, source: str, branch: str) -> str:
-        source_state = self._branches.get(source, {"records": [], "state": {}})
-        self._branches[branch] = {
-            "records": [MemoryRecord.model_validate(r.model_dump()) for r in source_state["records"]],
-            "state": dict(source_state["state"]),
-        }
-        return branch
-
-    def put_branch_state(self, branch: str, records: List[MemoryRecord], state: Dict[str, Any], message: str) -> VersionCommit:
-        self._branches[branch] = {"records": [MemoryRecord.model_validate(r.model_dump()) for r in records], "state": dict(state)}
-        payload = json.dumps(
-            {
-                "branch": branch,
-                "records": [r.model_dump() for r in records],
-                "state": state,
-                "message": message,
-                "ts": time.time(),
-            },
-            sort_keys=True,
-        )
-        sha = hashlib.sha256(payload.encode("utf-8")).hexdigest()
-        commit = VersionCommit(
-            commit_id=sha[:12],
-            branch=branch,
-            timestamp=time.time(),
-            message=message,
-            sha256=sha,
-        )
-        self._commits.append(commit)
-        self._branches["main"] = self._branches[branch]
-        return commit
-
-    def revert(self, commit_id: str) -> None:
-        index = next((i for i, c in enumerate(self._commits) if c.commit_id == commit_id), -1)
-        if index < 0:
-            raise KeyError(f"unknown commit: {commit_id}")
-        replay_branch = "main"
-        records: List[MemoryRecord] = []
-        state: Dict[str, Any] = {}
-        for commit in self._commits[: index + 1]:
-            branch_data = self._branches.get(commit.branch)
-            if branch_data:
-                records = [MemoryRecord.model_validate(r.model_dump()) for r in branch_data["records"]]
-                state = dict(branch_data["state"])
-                replay_branch = commit.branch
-        self._branches["main"] = {"records": records, "state": state}
-        self._commits = self._commits[: index + 1]
-        logger.info("reverted to commit=%s branch=%s", commit_id, replay_branch)
-
-    def latest_main(self) -> Dict[str, Any]:
-        return self._branches["main"]
-
-    def list_commits(self) -> List[VersionCommit]:
-        return list(reversed(self._commits))
 
 
 class InMemoryVectorStore:
@@ -139,7 +70,7 @@ class InMemoryVectorStore:
     def insert(self, record: MemoryRecord) -> VersionCommit:
         branch = self.vc.create_branch("main", f"update-keeper-{int(time.time())}")
         next_records = [*self._records, record]
-        commit = self.vc.put_branch_state(branch, next_records, self._state, f"update: user_id=keeper, record={record.id}")
+        commit = self.vc.put_branch_state(branch, [r.model_dump() for r in next_records], self._state, f"update: user_id=keeper, ts={int(time.time())}")
         self._records = next_records
         return commit
 
@@ -155,7 +86,7 @@ class InMemoryVectorStore:
     def apply_state_delta(self, delta: Dict[str, Any]) -> VersionCommit:
         next_state = {**self._state, **delta}
         branch = self.vc.create_branch("main", f"update-state-{int(time.time())}")
-        commit = self.vc.put_branch_state(branch, self._records, next_state, "update: state delta")
+        commit = self.vc.put_branch_state(branch, [r.model_dump() for r in self._records], next_state, "update: user_id=keeper, state delta")
         self._state = next_state
         return commit
 
@@ -164,12 +95,22 @@ class InMemoryVectorStore:
         before_bytes = sum(len(r.model_dump_json()) for r in self._records)
         kept: List[MemoryRecord] = []
         archived = 0
+        try:
+            import zstandard as zstd
+
+            compressor = zstd.ZstdCompressor(level=10)
+            use_zstd = True
+        except Exception:
+            compressor = None
+            use_zstd = False
+
         for record in self._records:
             ts = datetime.fromisoformat(record.timestamp) if "T" in record.timestamp else datetime.utcnow()
-            if ts > threshold or record.relevance >= 0.2:
+            if record.pinned or ts > threshold or record.relevance >= 0.2:
                 kept.append(record)
             else:
-                packed = zlib.compress(record.model_dump_json().encode("utf-8"), level=9)
+                blob = record.model_dump_json().encode("utf-8")
+                packed = compressor.compress(blob) if use_zstd else blob
                 self._compressed_archive.append(packed)
                 archived += 1
         before = len(self._records)
@@ -183,7 +124,7 @@ class InMemoryVectorStore:
     def revert(self, commit_id: str) -> None:
         self.vc.revert(commit_id)
         main = self.vc.latest_main()
-        self._records = [MemoryRecord.model_validate(r.model_dump()) for r in main["records"]]
+        self._records = [MemoryRecord.model_validate(r) for r in main["records"]]
         self._state = dict(main["state"])
 
 
@@ -218,9 +159,11 @@ async def metrics_middleware(request: Request, call_next):
         response = await call_next(request)
         _weekly_compress_if_due()
         budget.record(response.status_code)
+        audit.log("info", f"{request.method} {request.url.path} -> {response.status_code}")
         return response
     except Exception:
         budget.record(500)
+        audit.log("error", f"{request.method} {request.url.path} -> 500")
         raise
 
 
@@ -261,7 +204,8 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
                 raise HTTPException(status_code=400, detail=f"Duplicate key in state_delta: {key}")
         commit = store.apply_state_delta(update.state_delta)
 
-    record = MemoryRecord(id=str(uuid.uuid4()), timestamp=update.timestamp, event_type=update.event_type, content={"result": update.result_raw, "metrics": update.metrics or {}, "state_changes": update.state_delta or {}, "user_id": sanitize_string(update.user_id)}, embedding=generate_embedding(f"{update.event_type}: {update.result_raw}"), relevance=update.relevance)
+    user_id = sanitize_string(update.user_id)
+    record = MemoryRecord(id=str(uuid.uuid4()), timestamp=update.timestamp, event_type=update.event_type, content={"result": update.result_raw, "metrics": update.metrics or {}, "state_changes": update.state_delta or {}, "user_id": user_id}, embedding=generate_embedding(f"{update.event_type}: {update.result_raw}"), relevance=update.relevance, pinned=(user_id == "keeper"))
     record_commit = store.insert(record)
     return {"status": "appended", "id": record.id, "commit": record_commit.commit_id, "state_commit": commit.commit_id if commit else "none"}
 
@@ -281,7 +225,7 @@ async def memory_state() -> Dict[str, Any]:
 @app.get("/memory/stats")
 async def memory_stats() -> Dict[str, Any]:
     counts = Counter(record.event_type for record in store.search(top_k=10_000))
-    return {"status": "ok", "records": store.count(), "event_types": dict(counts), "commits": [c.model_dump() for c in store.vc.list_commits()[:20]]}
+    return {"status": "ok", "records": store.count(), "event_types": dict(counts), "commits": [c.__dict__ for c in store.vc.list_commits()[:20]]}
 
 
 @app.post("/memory/compress")
@@ -290,12 +234,13 @@ async def memory_compress() -> Dict[str, Any]:
 
 
 @app.post("/memory/revert")
+@app.post("/revert")
 async def memory_revert(version: str = Query(..., description="Commit hash/id")) -> Dict[str, Any]:
     try:
         store.revert(sanitize_string(version))
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
-    chain = hashlib.sha256(json.dumps([c.model_dump() for c in store.vc.list_commits()], sort_keys=True).encode("utf-8")).hexdigest()
+    chain = hashlib.sha256(json.dumps([c.__dict__ for c in store.vc.list_commits()], sort_keys=True).encode("utf-8")).hexdigest()
     return {"status": "ok", "reverted_to": version, "sha256_chain": chain, "records": store.count()}
 
 

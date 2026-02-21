@@ -9,7 +9,7 @@ import httpx
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
-from common.runtime import ErrorBudget, detect_device, sanitize_string, setup_json_logger
+from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
 from config import build_saver
 
 logger = setup_json_logger("langgraph", os.getenv("LOG_PATH", "/tmp/langgraph.json.log"))
@@ -21,6 +21,7 @@ MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 INJECTION_RE = re.compile(r"(ignore|system|override|you are).*?", re.IGNORECASE)
 budget = ErrorBudget(window_seconds=300)
+audit = AuditStream("langgraph", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
 saver = build_saver()
 
 
@@ -51,9 +52,11 @@ async def metrics_middleware(request: Request, call_next):
     try:
         response = await call_next(request)
         budget.record(response.status_code)
+        audit.log("info", f"{request.method} {request.url.path} -> {response.status_code}")
         return response
     except Exception:
         budget.record(500)
+        audit.log("error", f"{request.method} {request.url.path} -> 500")
         raise
 
 
