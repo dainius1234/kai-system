@@ -2,10 +2,11 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt ./
+COPY dashboard/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py ./
+COPY common ./common
+COPY dashboard/app.py ./app.py
 
 EXPOSE 8080
 

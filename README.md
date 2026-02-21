@@ -65,6 +65,15 @@ tests/        # Unit + integration tests
 
 ---
 
+
+## Core Bring-Up (Current Repo)
+- Start core stack:
+  - `docker compose -f docker-compose.sovereign.yml up -d`
+- Start optional ops profile (tailscale):
+  - `docker compose -f docker-compose.sovereign.yml --profile ops up -d`
+- Start optional perception profile:
+  - `docker compose -f docker-compose.sovereign.yml --profile perception up -d`
+
 ## 🚀 Roadmap
 
 ### Phase 0 – Core Skeleton  
@@ -127,3 +136,5 @@ Derivatives trading may be restricted in your jurisdiction. Use responsibly.
 - `docs/first_implementation_plan.md` — step-by-step first implementation runbook (commands, expected outputs, failure conditions)
 - `docs/phase1_patch_set.md` — concrete Phase-1 patch set aligned to current repo layout
 - `docs/production_hardening_plan.md` — production-grade hardening plan with owners and acceptance criteria
+
+- `docs/execution_board_14d.md` — 14-day non-generic execution board with pass/fail gates for core stabilization

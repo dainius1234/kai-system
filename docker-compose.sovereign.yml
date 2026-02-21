@@ -37,6 +37,7 @@ services:
       retries: 5
 
   tailscale:
+    profiles: ["ops"]
     image: tailscale/tailscale:latest
     container_name: sovereign-tailscale
     hostname: sovereign-tailscale
@@ -55,7 +56,9 @@ services:
 
   tool-gate:
     <<: *service_defaults
-    build: ./tool-gate
+    build:
+      context: .
+      dockerfile: tool-gate/Dockerfile
     container_name: sovereign-tool-gate
     hostname: tool-gate
     networks:
@@ -81,7 +84,9 @@ services:
 
   memu-core:
     <<: *service_defaults
-    build: ./memu-core
+    build:
+      context: .
+      dockerfile: memu-core/Dockerfile
     container_name: sovereign-memu-core
     hostname: memu-core
     networks:
@@ -103,7 +108,9 @@ services:
 
 
   executor:
-    build: ./executor
+    build:
+      context: .
+      dockerfile: executor/Dockerfile
     container_name: executor
     hostname: executor
     user: "1000:1000"
@@ -134,7 +141,9 @@ services:
 
   dashboard:
     <<: *service_defaults
-    build: ./dashboard
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
     container_name: sovereign-dashboard
     hostname: dashboard
     networks:
@@ -162,7 +171,9 @@ services:
 
   langgraph:
     <<: *service_defaults
-    build: ./langgraph
+    build:
+      context: .
+      dockerfile: langgraph/Dockerfile
     container_name: langgraph
     hostname: langgraph
     networks:
@@ -193,11 +204,13 @@ services:
 
 
   perception-telegram:
+    profiles: ["perception"]
     image: python:3.11-slim
     container_name: perception-telegram
     command: sh -c "pip install --no-cache-dir httpx && python /app/telegram.py"
     volumes:
       - ./perception:/app:ro
+      - ./common:/app/common:ro
     environment:
       LANGGRAPH_URL: "http://langgraph:8007/run"
       TELEGRAM_API: "http://telegram-bridge:9000"
@@ -210,7 +223,9 @@ services:
 
   heartbeat:
     <<: *service_defaults
-    build: ./heartbeat
+    build:
+      context: .
+      dockerfile: heartbeat/Dockerfile
     container_name: sovereign-heartbeat
     hostname: heartbeat
     networks:
@@ -233,6 +248,7 @@ services:
 
 
   camera-service:
+    profiles: ["perception"]
     <<: *service_defaults
     build: ./perception/camera
     container_name: camera-service
@@ -242,8 +258,11 @@ services:
         ipv4_address: 172.20.0.10
 
   audio-service:
+    profiles: ["perception"]
     <<: *service_defaults
-    build: ./perception/audio
+    build:
+      context: .
+      dockerfile: perception/audio/Dockerfile
     container_name: audio-service
     hostname: audio-service
     networks:

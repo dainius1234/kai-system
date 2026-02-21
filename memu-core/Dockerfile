@@ -2,10 +2,11 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt ./
+COPY memu-core/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py ./
+COPY common ./common
+COPY memu-core/app.py ./app.py
 
 EXPOSE 8001
 
