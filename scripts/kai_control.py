@@ -106,14 +106,14 @@ def wait_for_usb_mounts(timeout_s: int = USB_TIMEOUT_SECONDS) -> List[Path]:
     deadline = time.time() + max(timeout_s, 1)
     mounts: List[Path] = []
     while time.time() < deadline:
-        mounts = wait_for_usb_mounts()
+        mounts = list_usb_mounts()
         if mounts:
             return mounts
         time.sleep(0.5)
     # adaptive extension for slow media
     slow_deadline = time.time() + 5
     while time.time() < slow_deadline:
-        mounts = wait_for_usb_mounts()
+        mounts = list_usb_mounts()
         if mounts:
             return mounts
         time.sleep(0.5)
