@@ -1,0 +1,229 @@
+version: '3.8'
+
+x-service-defaults: &service_defaults
+  user: "1000:1000"
+  read_only: true
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  tmpfs:
+    - /tmp:size=64M,noexec,nosuid
+  deploy:
+    resources:
+      limits:
+        cpus: '1.0'
+        memory: 2G
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sovereign-postgres
+    hostname: ledger-db
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.2
+    environment:
+      POSTGRES_DB: sovereign
+      POSTGRES_USER: keeper
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-localdev}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: sovereign-tailscale
+    hostname: sovereign-tailscale
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - tailscale_state:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY:?set TS_AUTHKEY}
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_EXTRA_ARGS: --ssh --accept-routes=true
+      TS_HOSTNAME: sovereign-core
+    command: tailscaled --state=/var/lib/tailscale/tailscaled.state
+
+  tool-gate:
+    <<: *service_defaults
+    build: ./tool-gate
+    container_name: sovereign-tool-gate
+    hostname: tool-gate
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.3
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./security/trusted_tokens.txt:/config/trusted_tokens.txt:ro
+    environment:
+      DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      MODE: "PUB"
+      REQUIRED_CONFIDENCE: "0.7"
+      TRUSTED_TOKENS_PATH: "/config/trusted_tokens.txt"
+    depends_on:
+      - postgres
+
+  memu-core:
+    <<: *service_defaults
+    build: ./memu-core
+    container_name: sovereign-memu-core
+    hostname: memu-core
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.5
+    environment:
+      DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/memu_db"
+      VECTOR_STORE: "pgvector"
+      API_HOST: "0.0.0.0"
+      API_PORT: "8001"
+    depends_on:
+      - postgres
+      - tool-gate
+
+  executor:
+    build: ./executor
+    container_name: executor
+    hostname: executor
+    user: "1000:1000"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=64M,noexec,nosuid
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.9
+    environment:
+      TOOL_GATE_URL: "http://tool-gate:8000"
+      MEMU_URL: "http://memu-core:8001"
+      EXECUTION_TIMEOUT: "30"
+      MAX_OUTPUT_SIZE: "1048576"
+    depends_on:
+      - tool-gate
+      - memu-core
+
+  dashboard:
+    <<: *service_defaults
+    build: ./dashboard
+    container_name: sovereign-dashboard
+    hostname: dashboard
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.4
+    ports:
+      - "8080:8080"
+    environment:
+      TOOL_GATE_URL: "http://tool-gate:8000"
+      LEDGER_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      MEMU_URL: "http://memu-core:8001"
+      LANGGRAPH_URL: "http://langgraph:8007"
+      EXECUTOR_URL: "http://executor:8002"
+      HEARTBEAT_URL: "http://heartbeat:8010"
+    depends_on:
+      - tool-gate
+      - memu-core
+      - executor
+
+  langgraph:
+    <<: *service_defaults
+    build: ./langgraph
+    container_name: langgraph
+    hostname: langgraph
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.7
+    environment:
+      REDIS_URL: "redis://redis:6379"
+      MEMU_URL: "http://memu-core:8001"
+      TOOL_GATE_URL: "http://tool-gate:8000"
+    depends_on:
+      - memu-core
+      - tool-gate
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: sovereign-redis
+    hostname: redis
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.8
+
+
+  perception-telegram:
+    image: python:3.11-slim
+    container_name: perception-telegram
+    command: sh -c "pip install --no-cache-dir httpx && python /app/telegram.py"
+    volumes:
+      - ./perception:/app:ro
+    environment:
+      LANGGRAPH_URL: "http://langgraph:8007/run"
+      TELEGRAM_API: "http://telegram-bridge:9000"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.12
+    depends_on:
+      - langgraph
+
+  heartbeat:
+    <<: *service_defaults
+    build: ./heartbeat
+    container_name: sovereign-heartbeat
+    hostname: heartbeat
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.13
+    volumes:
+      - /var/log/sovereign:/var/log/sovereign:ro
+    environment:
+      TOOL_GATE_URL: "http://tool-gate:8000"
+      CHECK_INTERVAL: "60"
+      ALERT_WINDOW: "300"
+      EXECUTOR_LOG_PATH: "/var/log/sovereign/executor.log"
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
+      TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID:-}"
+
+  camera-service:
+    <<: *service_defaults
+    build: ./perception/camera
+    container_name: camera-service
+    hostname: camera-service
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.10
+
+  audio-service:
+    <<: *service_defaults
+    build: ./perception/audio
+    container_name: audio-service
+    hostname: audio-service
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.11
+
+  # TODO: enable GPU when core is stable.
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: ollama
+
+  # TODO: enable GPU when core is stable.
+  # tts-service:
+  #   build: ./output/tts
+
+volumes:
+  postgres_data:
+  tailscale_state:
+
+networks:
+  sovereign-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
