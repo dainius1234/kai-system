@@ -51,17 +51,18 @@ It is built to be **self-sufficient, autonomous, and sovereign AI-powered infras
 ---
 
 ## 📦 Repo Structure
-core/         # Strategy engines, risk manager
-engineering/  # Orderbook, flow, pattern, institutional tools
-accounting/   # Ledger, pnl, tax, treasury
-data/         # Venue adapters, book builder
-arb/          # Arbitrage engines
-risk/         # Risk guards, supervisor, self-healing
-storage/      # DuckDB, replay, compression
-ui/           # Dash operator console
-agents/       # LLM advisors + verifier
-scripts/      # Run scripts, Docker, launchers
-tests/        # Unit + integration tests
+orchestrator/       # Final risk authority before execution
+supervisor/         # Watchdog and circuit-breaker control loop
+fusion-engine/      # Multi-signal consensus and conviction gating
+verifier/           # Fact-checking and signal cross-validation
+executor/           # Execution bridge and order-routing stubs
+dashboard/          # Operator console (Dash)
+memu-core/          # Memory/compression and operator state helpers
+tool-gate/          # Tool access policy and local gatekeeping
+langgraph/          # Graph/runtime app integration layer
+data/               # Seed datasets and local advisor inputs
+scripts/            # Operational scripts and validation checks
+docs/               # Implementation plans and hardening runbooks
 
 ---
 
