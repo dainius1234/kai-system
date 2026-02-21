@@ -274,11 +274,19 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.7
+    volumes:
+      - ./data/self-emp:/data/self-emp:ro
     environment:
       REDIS_URL: "redis://redis:6379"
       MEMU_URL: "http://memu-core:8001"
       TOOL_GATE_URL: "http://tool-gate:8000"
       AUDIT_REDIS_URL: "redis://redis:6379"
+      MTD_START: "50000"
+      VAT_THRESHOLD: "85000"
+      MILEAGE_RATE: "0.45"
+      SELF_EMP_ROOT: "/data/self-emp"
+      INCOME_CSV: "/data/self-emp/Accounting/income.csv"
+      EXPENSES_LOG: "/data/self-emp/Accounting/expenses.log"
 
     depends_on:
       - memu-core

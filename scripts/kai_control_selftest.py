@@ -7,6 +7,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 spec = importlib.util.spec_from_file_location("kai_control", ROOT / "scripts" / "kai_control.py")
 kc = importlib.util.module_from_spec(spec)

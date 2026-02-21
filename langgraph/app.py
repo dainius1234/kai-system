@@ -11,6 +11,7 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
 from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
+from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from config import build_saver
 from conviction import build_plan, low_conviction_feedback, score_conviction
 
@@ -29,6 +30,9 @@ saver = build_saver()
 MIN_CONVICTION = 8.0
 MAX_RETHINKS = 3
 last_low_conviction_alert = 0.0
+SELF_EMP_ROOT = os.getenv("SELF_EMP_ROOT", "/data/self-emp")
+INCOME_CSV = os.getenv("INCOME_CSV", f"{SELF_EMP_ROOT}/Accounting/income.csv")
+EXPENSES_LOG = os.getenv("EXPENSES_LOG", f"{SELF_EMP_ROOT}/Accounting/expenses.log")
 
 
 class GraphRequest(BaseModel):
@@ -64,6 +68,34 @@ async def fetch_offline_chunks(query: str, user_id: str, top_k: int = 5) -> List
     except Exception:
         return []
 
+
+
+
+def strategy_node(user_input: str) -> Dict[str, object]:
+    income_total = load_income_total(INCOME_CSV)
+    expenses_lines = load_expenses(EXPENSES_LOG)
+    suggestions = advise(income_total=income_total, expenses_lines=expenses_lines)
+    return {
+        "advisor_mode": True,
+        "input": user_input,
+        "income_total": income_total,
+        "suggestions": suggestions,
+        "thresholds": thresholds(),
+    }
+
+
+
+async def maybe_alert_mtd_proximity(strategy: Dict[str, object]) -> None:
+    th = strategy.get("thresholds", {})
+    income = float(strategy.get("income_total", 0.0))
+    mtd = float((th or {}).get("mtd_start", 50000))
+    left = mtd - income
+    if left <= 2000:
+        try:
+            async with httpx.AsyncClient(timeout=4.0) as client:
+                await client.post(TELEGRAM_ALERT_URL, json={"text": f"Alert: £{max(left,0):.0f} left till MTD — prep GnuCash"})
+        except Exception:
+            logger.warning("Failed to deliver MTD proximity alert")
 
 async def maybe_alert_low_conviction_average() -> None:
     global last_low_conviction_alert
@@ -149,6 +181,9 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     if conviction < MIN_CONVICTION:
         plan["summary"] = f"Conviction too low ({conviction}/10). Need more data — suggest file or clarify?"
 
+    strategy = strategy_node(request.user_input)
+    plan["strategy"] = strategy
+
     gate_decision = None
     if request.task_hint:
         async with httpx.AsyncClient() as client:
@@ -183,6 +218,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     )
     saver.decay("keeper", days=30, score_threshold=0.2)
     await maybe_alert_low_conviction_average()
+    await maybe_alert_mtd_proximity(strategy)
 
     return GraphResponse(specialist=specialist, plan=plan, gate_decision=gate_decision)
 

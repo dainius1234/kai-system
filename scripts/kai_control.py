@@ -18,6 +18,8 @@ from tkinter import messagebox, simpledialog
 
 import urllib.request
 
+from common.self_emp_advisor import advise, load_expenses, load_income_total
+
 try:
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 except Exception:  # pragma: no cover
@@ -41,6 +43,9 @@ APP_DIR = Path.home() / ".kai-control"
 APP_DIR.mkdir(parents=True, exist_ok=True)
 LOG_PATH = APP_DIR / "emergency_actions.log"
 USB_TIMEOUT_SECONDS = int(os.getenv("KAI_USB_TIMEOUT", "15"))
+SELF_EMP_ROOT = os.getenv("SELF_EMP_ROOT", "/data/self-emp")
+INCOME_CSV = os.getenv("INCOME_CSV", f"{SELF_EMP_ROOT}/Accounting/income.csv")
+EXPENSES_LOG = os.getenv("EXPENSES_LOG", f"{SELF_EMP_ROOT}/Accounting/expenses.log")
 
 
 def _run(cmd: List[str], check: bool = True) -> subprocess.CompletedProcess:
@@ -101,14 +106,14 @@ def wait_for_usb_mounts(timeout_s: int = USB_TIMEOUT_SECONDS) -> List[Path]:
     deadline = time.time() + max(timeout_s, 1)
     mounts: List[Path] = []
     while time.time() < deadline:
-        mounts = list_usb_mounts()
+        mounts = wait_for_usb_mounts()
         if mounts:
             return mounts
         time.sleep(0.5)
     # adaptive extension for slow media
     slow_deadline = time.time() + 5
     while time.time() < slow_deadline:
-        mounts = list_usb_mounts()
+        mounts = wait_for_usb_mounts()
         if mounts:
             return mounts
         time.sleep(0.5)
@@ -271,6 +276,18 @@ def rollback_memu(method: str) -> None:
     log_action(method, f"rollback:{version}", "TPM")
 
 
+
+
+def advisor_mode(prompt: str) -> str:
+    income = load_income_total(INCOME_CSV)
+    expenses = load_expenses(EXPENSES_LOG)
+    suggestions = advise(income_total=income, expenses_lines=expenses)
+    lines = ["Дайниус, что на уме?", f"Prompt: {prompt}", f"Income: £{income:.2f}"]
+    lines.extend(f"- {x}" for x in suggestions)
+    return "\n".join(lines)
+
+
+
 def unlock_logs(method: str) -> str:
     try:
         output = _run(["docker", "logs", "--tail", "50", "executor"], check=False).stdout
@@ -297,14 +314,15 @@ class KaiControlUI:
         self.btn_kill = tk.Button(self.root, text="Kill", command=self._kill)
         self.btn_roll = tk.Button(self.root, text="Rollback", command=self._rollback)
         self.btn_logs = tk.Button(self.root, text="Unlock Logs", command=self._logs)
+        self.btn_advisor = tk.Button(self.root, text="Advisor Mode", command=self._advisor)
 
-        for b in [self.btn_seal, self.btn_backup, self.btn_paper, self.btn_restore, self.btn_kill, self.btn_roll, self.btn_logs]:
+        for b in [self.btn_seal, self.btn_backup, self.btn_paper, self.btn_restore, self.btn_kill, self.btn_roll, self.btn_logs, self.btn_advisor]:
             b.pack_forget()
 
         self._refresh()
 
     def _first_usb(self) -> Path:
-        mounts = list_usb_mounts()
+        mounts = wait_for_usb_mounts()
         if not mounts:
             raise RuntimeError("No USB detected")
         return mounts[0]
@@ -315,7 +333,7 @@ class KaiControlUI:
         messagebox.showinfo("kai-control", f"Primary sealed: {h[:16]}...")
 
     def _seal_backup(self) -> None:
-        mounts = list_usb_mounts()
+        mounts = wait_for_usb_mounts()
         if len(mounts) < 2:
             raise RuntimeError("Insert second USB for backup")
         h = self.mgr.seal_backup(mounts[1], mounts[0])
@@ -353,8 +371,13 @@ class KaiControlUI:
         logs = unlock_logs(self.method or "usb")
         messagebox.showinfo("kai-control", logs[:3500])
 
+    def _advisor(self) -> None:
+        prompt = simpledialog.askstring("Advisor Mode", "Дайниус, что на уме?") or "General strategy"
+        advice = advisor_mode(prompt)
+        messagebox.showinfo("Advisor Mode", advice[:3800])
+
     def _refresh(self) -> None:
-        for b in [self.btn_seal, self.btn_backup, self.btn_paper, self.btn_restore, self.btn_kill, self.btn_roll, self.btn_logs]:
+        for b in [self.btn_seal, self.btn_backup, self.btn_paper, self.btn_restore, self.btn_kill, self.btn_roll, self.btn_logs, self.btn_advisor]:
             b.pack_forget()
 
         method = self.mgr.validate_inserted_key()
@@ -369,6 +392,7 @@ class KaiControlUI:
             self.btn_backup.pack(pady=4)
             self.btn_paper.pack(pady=4)
             self.btn_restore.pack(pady=4)
+            self.btn_advisor.pack(pady=4)
         elif method:
             self.method = method
             allowed, _ = self.mgr.can_destructive_actions()
@@ -379,6 +403,7 @@ class KaiControlUI:
             else:
                 self.status.config(text="Single key recognized. Insert both keys for Kill/Rollback.")
             self.btn_logs.pack(pady=4)
+            self.btn_advisor.pack(pady=4)
             self.btn_paper.pack(pady=4)
             self.btn_restore.pack(pady=4)
         else:

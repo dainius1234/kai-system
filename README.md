@@ -136,3 +136,11 @@ Derivatives trading may be restricted in your jurisdiction. Use responsibly.
 - Host egress policy helper: `scripts/enforce_egress.sh`.
 - Run `kai-control` as normal user (no sudo).
 - Monthly drill helper: `scripts/kai-drill.sh` (cron suggested: `0 0 1 * *`).
+
+
+## Self-Employment Advisor Mode (Offline, UK-focused)
+- Preloaded folders: `data/self-emp/{Accounting,Legal,Coding,Engineering,Social}`.
+- Skill map: `data/self-emp/skill_map.yml`.
+- Advisor rules use local thresholds: `MTD_START`, `VAT_THRESHOLD`, `MILEAGE_RATE`.
+- Kai Control has **Advisor Mode** button (`Дайниус, что на уме?`) for strategic suggestions from local income/expense logs.
+- Run `kai-control` as normal user (no sudo).
