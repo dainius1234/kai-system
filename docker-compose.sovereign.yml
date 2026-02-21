@@ -63,6 +63,8 @@ services:
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_ROOT_TOKEN:?set VAULT_ROOT_TOKEN}
       VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+      REQUIRE_TPM: "true"
+      TPM_UNSEAL_CMD: ${TPM_UNSEAL_CMD:?set TPM_UNSEAL_CMD}
     ports:
       - "8200:8200"
     volumes:
@@ -307,10 +309,16 @@ services:
     command: sh -c "pip install --no-cache-dir httpx && python /app/telegram.py"
     volumes:
       - ./perception:/app:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/kai:/etc/kai:ro
     environment:
       LANGGRAPH_URL: "http://langgraph:8007/run"
       TELEGRAM_API: "http://telegram-bridge:9000"
       BRIDGE_SHARED_SECRET: "${BRIDGE_SHARED_SECRET:-}"
+      KEEPER_TELEGRAM_USER_ID: "${KEEPER_TELEGRAM_USER_ID:?set KEEPER_TELEGRAM_USER_ID}"
+      KAI_TPM_SIGNING_KEY_CTX: "${KAI_TPM_SIGNING_KEY_CTX:-/etc/kai/keeper_signing.ctx}"
+      KAI_KEEPER_PUBKEY_CTX: "${KAI_KEEPER_PUBKEY_CTX:-/etc/kai/keeper_pub.ctx}"
+      KAI_DOCKER_CMD: "${KAI_DOCKER_CMD:-docker}"
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.12

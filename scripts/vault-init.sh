@@ -2,13 +2,15 @@
 set -eu
 
 export VAULT_ADDR="${VAULT_ADDR:-http://127.0.0.1:8200}"
-if [ -n "${TPM_UNSEAL_CMD:-}" ]; then
+REQUIRE_TPM="${REQUIRE_TPM:-true}"
+
+if [ "$REQUIRE_TPM" = "true" ]; then
+  command -v tpm2_sign >/dev/null 2>&1 || { echo "TPM required but tpm2_sign missing" >&2; exit 1; }
+  [ -n "${TPM_UNSEAL_CMD:-}" ] || { echo "TPM required but TPM_UNSEAL_CMD is empty" >&2; exit 1; }
   VAULT_RUNTIME_TOKEN="$(sh -c "$TPM_UNSEAL_CMD")"
-elif [ -n "${VAULT_ROOT_TOKEN:-}" ]; then
-  VAULT_RUNTIME_TOKEN="${VAULT_ROOT_TOKEN}"
 else
-  echo "VAULT_ROOT_TOKEN or TPM_UNSEAL_CMD is required" >&2
-  exit 1
+  [ -n "${VAULT_ROOT_TOKEN:-}" ] || { echo "VAULT_ROOT_TOKEN required" >&2; exit 1; }
+  VAULT_RUNTIME_TOKEN="${VAULT_ROOT_TOKEN}"
 fi
 
 vault login "$VAULT_RUNTIME_TOKEN" >/dev/null
