@@ -120,3 +120,10 @@ tests/        # Unit + integration tests
 For research, backtesting, and paper trading only.  
 Live trading requires explicit configuration and operator consent.  
 Derivatives trading may be restricted in your jurisdiction. Use responsibly.
+
+---
+
+## Sovereign Implementation Planning Docs
+- `docs/first_implementation_plan.md` — step-by-step first implementation runbook (commands, expected outputs, failure conditions)
+- `docs/phase1_patch_set.md` — concrete Phase-1 patch set aligned to current repo layout
+- `docs/production_hardening_plan.md` — production-grade hardening plan with owners and acceptance criteria

@@ -1,29 +1,49 @@
 from __future__ import annotations
 
+import logging
 import os
+import re
 import time
 import uuid
-from collections import deque
-from dataclasses import dataclass
-from typing import Deque, Dict, List, Optional
+from collections import Counter, deque
+from datetime import datetime, timedelta
+from logging.handlers import RotatingFileHandler
+from typing import Any, Deque, Dict, List, Optional, Tuple
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import FastAPI, HTTPException, Request
+from pydantic import BaseModel
 
 
-app = FastAPI(title="Sovereign Memory Core", version="0.1.0")
+LOG_PATH = os.getenv("LOG_PATH", "/tmp/memu-core.json.log")
+handler = RotatingFileHandler(LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=30)
+handler.setFormatter(logging.Formatter('{"time":"%(asctime)s","level":"%(levelname)s","service":"%(name)s","msg":"%(message)s"}'))
+logger = logging.getLogger("memu-core")
+logger.setLevel(logging.INFO)
+logger.handlers = [handler]
+logger.propagate = False
+
+try:
+    import torch
+    DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+except Exception:
+    DEVICE = "cpu"
+logger.info("Running on %s.", DEVICE)
+
+app = FastAPI(title="Sovereign Memory Core", version="0.3.0")
+
+ERROR_WINDOW_SECONDS = 300
+_metrics: Deque[Tuple[float, int]] = deque()
+last_compress_run = 0.0
 
 
 class MemoryRequest(BaseModel):
     query: str
     session_id: str
-    timestamp: Optional[str] = None
     timestamp: str
 
 
 class RoutingResponse(BaseModel):
     specialist: str
-    context_payload: Dict[str, object]
     context_payload: Dict[str, Any]
 
 
@@ -32,57 +52,9 @@ class MemoryUpdate(BaseModel):
     event_type: str
     task_id: Optional[str] = None
     result_raw: Optional[str] = None
-    metrics: Optional[Dict[str, object]] = None
-    state_delta: Optional[Dict[str, object]] = None
-
-
-class MemoryEntry(BaseModel):
-    id: str
-    timestamp: str
-    event_type: str
-    content: Dict[str, object]
-    session_id: Optional[str] = None
-    query: Optional[str] = None
-
-
-class MemoryRetrieve(BaseModel):
-    query: str
-    session_id: Optional[str] = None
-    user_id: Optional[str] = None
-    top_k: int = Field(default=20, ge=1, le=200)
-
-
-@dataclass
-class MemoryStore:
-    max_entries: int
-    entries: Deque[MemoryEntry]
-
-    def append(self, entry: MemoryEntry) -> None:
-        self.entries.append(entry)
-
-    def retrieve(self, query: str, top_k: int) -> List[MemoryEntry]:
-        if not query:
-            return list(self.entries)[-top_k:]
-        matches = [entry for entry in self.entries if entry.query and query.lower() in entry.query.lower()]
-        if not matches:
-            return list(self.entries)[-top_k:]
-        return matches[-top_k:]
-
-
-store = MemoryStore(max_entries=2000, entries=deque(maxlen=2000))
-
-SPECIALIST_ROUTING = {
-    "vision": "Qwen-VL",
-    "image": "Qwen-VL",
-    "chart": "DeepSeek-V4",
-    "analysis": "DeepSeek-V4",
-    "research": "Kimi-2.5",
-    "strategy": "Kimi-2.5",
-}
-
-DEFAULT_SPECIALIST = os.getenv("DEFAULT_SPECIALIST", "DeepSeek-V4")
     metrics: Optional[Dict[str, Any]] = None
     state_delta: Optional[Dict[str, Any]] = None
+    relevance: float = 1.0
 
 
 class MemoryRecord(BaseModel):
@@ -91,6 +63,7 @@ class MemoryRecord(BaseModel):
     event_type: str
     content: Dict[str, Any]
     embedding: List[float]
+    relevance: float = 1.0
 
 
 SPECIALISTS = ["DeepSeek-V4", "Kimi-2.5", "Qwen-VL"]
@@ -107,14 +80,66 @@ class InMemoryVectorStore:
     def search(self, query: str, top_k: int) -> List[MemoryRecord]:
         return list(reversed(self._records))[:top_k]
 
+    def count(self) -> int:
+        return len(self._records)
+
     def get_state(self) -> Dict[str, Any]:
         return dict(self._state)
 
     def apply_state_delta(self, delta: Dict[str, Any]) -> None:
         self._state.update(delta)
 
+    def compress(self) -> Dict[str, Any]:
+        threshold = datetime.utcnow() - timedelta(days=90)
+        before = len(self._records)
+        before_bytes = sum(len(r.model_dump_json()) for r in self._records)
+        kept: List[MemoryRecord] = []
+        for record in self._records:
+            ts = datetime.fromisoformat(record.timestamp) if "T" in record.timestamp else datetime.utcnow()
+            if ts > threshold or record.relevance >= 0.2:
+                kept.append(record)
+        self._records = kept
+        after_bytes = sum(len(r.model_dump_json()) for r in self._records)
+        saved = max(before_bytes - after_bytes, 0)
+        logger.info("weekly compression complete, bytes_saved=%s", saved)
+        return {"before": before, "after": len(self._records), "bytes_saved": saved}
+
 
 store = InMemoryVectorStore()
+
+
+def sanitize_string(value: str) -> str:
+    sanitized = re.sub(r"[;|&]", "", value)
+    return sanitized[:1024]
+
+
+def _prune_metrics(now: float) -> None:
+    while _metrics and now - _metrics[0][0] > ERROR_WINDOW_SECONDS:
+        _metrics.popleft()
+
+
+def _record_status(code: int) -> None:
+    now = time.time()
+    _metrics.append((now, code))
+    _prune_metrics(now)
+
+
+def _error_budget() -> Dict[str, float]:
+    now = time.time()
+    _prune_metrics(now)
+    total = len(_metrics)
+    if total == 0:
+        return {"error_ratio": 0.0, "total": 0}
+    errors = sum(1 for _, code in _metrics if code in {429, 500, 408})
+    return {"error_ratio": errors / total, "total": total}
+
+
+def _weekly_compress_if_due() -> None:
+    global last_compress_run
+    now = time.time()
+    if now - last_compress_run >= 7 * 24 * 3600:
+        store.compress()
+        last_compress_run = now
 
 
 def generate_embedding(text: str) -> List[float]:
@@ -134,62 +159,64 @@ def select_specialist(query: str) -> str:
     return "Kimi-2.5"
 
 
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    try:
+        response = await call_next(request)
+        _weekly_compress_if_due()
+        _record_status(response.status_code)
+        return response
+    except Exception:
+        _record_status(500)
+        raise
+
+
 @app.get("/health")
 async def health() -> Dict[str, str]:
     return {
         "status": "ok",
-        "entries": str(len(store.entries)),
-        "time": str(time.time()),
+        "storage": os.getenv("VECTOR_STORE", "memory"),
+        "device": DEVICE,
     }
-    return {"status": "ok", "storage": os.getenv("VECTOR_STORE", "memory")}
+
+
+@app.get("/metrics")
+async def metrics() -> Dict[str, Any]:
+    return _error_budget()
 
 
 @app.post("/route", response_model=RoutingResponse)
 async def route_request(request: MemoryRequest) -> RoutingResponse:
-    if not request.query:
-        raise HTTPException(status_code=400, detail="Query is required.")
-    lowered = request.query.lower()
-    specialist = DEFAULT_SPECIALIST
-    for keyword, target in SPECIALIST_ROUTING.items():
-        if keyword in lowered:
-            specialist = target
-            break
-
-    context_payload = {
-        "query": request.query,
-        "session_id": request.session_id,
-        "recent": [entry.model_dump() for entry in store.retrieve(request.query, top_k=5)],
-        "routed_at": time.time(),
-    }
-    return RoutingResponse(specialist=specialist, context_payload=context_payload)
-    similar = store.search(request.query, top_k=50)
+    query = sanitize_string(request.query)
+    session_id = sanitize_string(request.session_id)
+    similar = store.search(query, top_k=50)
     metadata = {
         "time": datetime.utcnow().isoformat(),
-        "session_id": request.session_id,
-        "tags": extract_tags(request.query),
+        "session_id": session_id,
+        "tags": extract_tags(query),
         "specialists": SPECIALISTS,
     }
-    specialist = select_specialist(request.query)
+    specialist = select_specialist(query)
     return RoutingResponse(
         specialist=specialist,
         context_payload={
-            "query": request.query,
+            "query": query,
             "memory_vectors": [record.embedding for record in similar],
             "metadata": metadata,
+            "device": DEVICE,
         },
     )
 
 
 @app.post("/memory/memorize")
 async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
+    update = update.model_copy(
+        update={
+            "event_type": sanitize_string(update.event_type),
+            "result_raw": sanitize_string(update.result_raw) if update.result_raw else None,
+        }
+    )
     if update.state_delta:
-        seen = set()
-        for key in update.state_delta:
-            if key in seen:
-                raise HTTPException(status_code=400, detail=f"Duplicate key in state_delta: {key}")
-            seen.add(key)
-
-    entry = MemoryEntry(
         existing = store.get_state()
         for key in update.state_delta:
             if key in existing:
@@ -205,16 +232,8 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
             "metrics": update.metrics or {},
             "state_changes": update.state_delta or {},
         },
-    )
-    store.append(entry)
-    return {"status": "appended", "id": entry.id}
-
-
-@app.post("/memory/retrieve")
-async def retrieve_context(request: MemoryRetrieve) -> List[Dict[str, object]]:
-    results = store.retrieve(request.query, top_k=request.top_k)
-    return [entry.model_dump() for entry in results]
         embedding=generate_embedding(f"{update.event_type}: {update.result_raw}"),
+        relevance=update.relevance,
     )
     store.insert(record)
     return {"status": "appended", "id": record.id}
@@ -222,7 +241,27 @@ async def retrieve_context(request: MemoryRetrieve) -> List[Dict[str, object]]:
 
 @app.get("/memory/retrieve")
 async def retrieve_context(query: str, user_id: str, top_k: int = 20) -> List[MemoryRecord]:
-    return store.search(query, top_k=top_k)
+    return store.search(sanitize_string(query), top_k=top_k)
+
+
+@app.get("/memory/state")
+async def memory_state() -> Dict[str, Any]:
+    return {"status": "ok", "state": store.get_state()}
+
+
+@app.get("/memory/stats")
+async def memory_stats() -> Dict[str, Any]:
+    counts = Counter(record.event_type for record in store.search("", top_k=10_000))
+    return {
+        "status": "ok",
+        "records": store.count(),
+        "event_types": dict(counts),
+    }
+
+
+@app.post("/memory/compress")
+async def memory_compress() -> Dict[str, Any]:
+    return {"status": "ok", **store.compress()}
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 from typing import Dict
 
 from fastapi import FastAPI
@@ -19,6 +20,11 @@ class SpeakRequest(BaseModel):
     emotion: str = "neutral"
 
 
+def sanitize_string(value: str) -> str:
+    sanitized = re.sub(r"[;|&]", "", value)
+    return sanitized[:1024]
+
+
 @app.get("/health")
 async def health() -> Dict[str, str]:
     return {"status": "ok", "tts_url": TTS_URL, "webrtc_port": WEBRTC_PORT}
@@ -29,9 +35,10 @@ async def speak(request: SpeakRequest) -> Dict[str, str]:
     return {
         "status": "ok",
         "tts_url": TTS_URL,
-        "voice": request.voice,
-        "emotion": request.emotion,
+        "voice": sanitize_string(request.voice),
+        "emotion": sanitize_string(request.emotion),
         "message": "avatar request queued",
+        "text": sanitize_string(request.text),
     }
 
 

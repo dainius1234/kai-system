@@ -27,19 +27,25 @@ services:
       POSTGRES_DB: sovereign
       POSTGRES_USER: keeper
       POSTGRES_PASSWORD: ${DB_PASSWORD:-localdev}
-      POSTGRES_INITDB_ARGS: "--data-checksums"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init:/docker-entrypoint-initdb.d:ro
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 2G
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: sovereign-tailscale
+    hostname: sovereign-tailscale
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - tailscale_state:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY:?set TS_AUTHKEY}
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_EXTRA_ARGS: --ssh --accept-routes=true
+      TS_HOSTNAME: sovereign-core
+    command: tailscaled --state=/var/lib/tailscale/tailscaled.state
 
   tool-gate:
     <<: *service_defaults
@@ -51,11 +57,13 @@ services:
         ipv4_address: 172.20.0.3
     ports:
       - "8000:8000"
+    volumes:
+      - ./security/trusted_tokens.txt:/config/trusted_tokens.txt:ro
     environment:
       DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
-      TPM_DEVICE: "/dev/tpm0"
       MODE: "PUB"
       REQUIRED_CONFIDENCE: "0.7"
+      TRUSTED_TOKENS_PATH: "/config/trusted_tokens.txt"
     depends_on:
       - postgres
 
@@ -77,10 +85,17 @@ services:
       - tool-gate
 
   executor:
-    <<: *service_defaults
     build: ./executor
     container_name: executor
     hostname: executor
+    user: "1000:1000"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=64M,noexec,nosuid
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.9
@@ -110,8 +125,6 @@ services:
       LANGGRAPH_URL: "http://langgraph:8007"
       EXECUTOR_URL: "http://executor:8002"
       HEARTBEAT_URL: "http://heartbeat:8010"
-      TTS_URL: "http://tts-service:8030"
-      AVATAR_URL: "http://avatar-service:8081"
     depends_on:
       - tool-gate
       - memu-core
@@ -129,7 +142,6 @@ services:
       REDIS_URL: "redis://redis:6379"
       MEMU_URL: "http://memu-core:8001"
       TOOL_GATE_URL: "http://tool-gate:8000"
-      OLLAMA_URL: "http://ollama:11434"
     depends_on:
       - memu-core
       - tool-gate
@@ -142,17 +154,22 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.8
-    command: ["redis-server", "--appendonly", "yes", "--save", "900 1", "--maxmemory", "1gb"]
-    read_only: true
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 2G
+
+
+  perception-telegram:
+    image: python:3.11-slim
+    container_name: perception-telegram
+    command: sh -c "pip install --no-cache-dir httpx && python /app/telegram.py"
+    volumes:
+      - ./perception:/app:ro
+    environment:
+      LANGGRAPH_URL: "http://langgraph:8007/run"
+      TELEGRAM_API: "http://telegram-bridge:9000"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.12
+    depends_on:
+      - langgraph
 
   heartbeat:
     <<: *service_defaults
@@ -162,10 +179,15 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.13
+    volumes:
+      - /var/log/sovereign:/var/log/sovereign:ro
     environment:
       TOOL_GATE_URL: "http://tool-gate:8000"
       CHECK_INTERVAL: "60"
       ALERT_WINDOW: "300"
+      EXECUTOR_LOG_PATH: "/var/log/sovereign/executor.log"
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
+      TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID:-}"
 
   camera-service:
     <<: *service_defaults
@@ -175,9 +197,6 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.10
-    environment:
-      CAMERA_DEVICE: "/dev/video0"
-      VIRTUAL_DEVICE: "/dev/video10"
 
   audio-service:
     <<: *service_defaults
@@ -187,50 +206,19 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.11
-    environment:
-      PORCUPINE_KEYWORD: "ara"
-      WHISPER_MODEL: "large-v3"
-      SAMPLE_RATE: "16000"
 
   # TODO: enable GPU when core is stable.
   # ollama:
   #   image: ollama/ollama:latest
   #   container_name: ollama
-  #   hostname: ollama
-  #   networks:
-  #     sovereign-net:
-  #       ipv4_address: 172.20.0.6
-  #   environment:
-  #     OLLAMA_KEEP_ALIVE: "24h"
-  #     OLLAMA_MAX_LOADED_MODELS: "3"
 
   # TODO: enable GPU when core is stable.
   # tts-service:
   #   build: ./output/tts
-  #   container_name: tts-service
-  #   hostname: tts-service
-  #   networks:
-  #     sovereign-net:
-  #       ipv4_address: 172.20.0.15
-  #   environment:
-  #     MODEL: "tts_models/multilingual/multi-dataset/xtts_v2"
-  #     SAMPLE_RATE: "16000"
-  #     LANGUAGE: "en"
-
-  avatar-service:
-    <<: *service_defaults
-    build: ./output/avatar
-    container_name: avatar-service
-    hostname: avatar-service
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.16
-    environment:
-      TTS_URL: "http://tts-service:8030"
-      WEBRTC_PORT: "8081"
 
 volumes:
   postgres_data:
+  tailscale_state:
 
 networks:
   sovereign-net:

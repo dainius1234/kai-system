@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 from typing import Dict
 
 from fastapi import FastAPI
@@ -20,6 +21,11 @@ class SynthesisRequest(BaseModel):
     emotion: str = "neutral"
 
 
+def sanitize_string(value: str) -> str:
+    sanitized = re.sub(r"[;|&]", "", value)
+    return sanitized[:1024]
+
+
 @app.get("/health")
 async def health() -> Dict[str, str]:
     return {
@@ -34,9 +40,9 @@ async def health() -> Dict[str, str]:
 async def synthesize(request: SynthesisRequest) -> Dict[str, str]:
     return {
         "status": "ok",
-        "voice": request.voice,
-        "emotion": request.emotion,
-        "audio_path": f"/audio/{request.voice}_{request.emotion}.wav",
+        "voice": sanitize_string(request.voice),
+        "emotion": sanitize_string(request.emotion),
+        "audio_path": f"/audio/{sanitize_string(request.voice)}_{sanitize_string(request.emotion)}.wav",
     }
 
 

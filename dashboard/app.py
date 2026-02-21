@@ -1,18 +1,40 @@
 from __future__ import annotations
 
+import logging
 import os
-from typing import Dict, List
+import shutil
+import subprocess
+import time
+from collections import deque
+from logging.handlers import RotatingFileHandler
+from typing import Any, Deque, Dict, Tuple
 
 import httpx
+from fastapi import FastAPI, Request
 
-from fastapi import FastAPI
 
+LOG_PATH = os.getenv("LOG_PATH", "/tmp/dashboard.json.log")
+handler = RotatingFileHandler(LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=30)
+handler.setFormatter(logging.Formatter('{"time":"%(asctime)s","level":"%(levelname)s","service":"%(name)s","msg":"%(message)s"}'))
+logger = logging.getLogger("dashboard")
+logger.setLevel(logging.INFO)
+logger.handlers = [handler]
+logger.propagate = False
 
-app = FastAPI(title="Sovereign Dashboard", version="0.1.0")
+try:
+    import torch
+    DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+except Exception:
+    DEVICE = "cpu"
+logger.info("Running on %s.", DEVICE)
+
+app = FastAPI(title="Sovereign Dashboard", version="0.2.0")
 
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 LEDGER_URL = os.getenv("LEDGER_URL", "postgresql://keeper:***@postgres:5432/sovereign")
-
+ERROR_WINDOW_SECONDS = 300
+SERVICE_CONTAINER = os.getenv("SERVICE_CONTAINER", "sovereign-dashboard")
+_metrics: Deque[Tuple[float, int]] = deque()
 
 NODES = {
     "tool-gate": f"{TOOL_GATE_URL}/health",
@@ -20,13 +42,40 @@ NODES = {
     "langgraph": os.getenv("LANGGRAPH_URL", "http://langgraph:8007") + "/health",
     "executor": os.getenv("EXECUTOR_URL", "http://executor:8002") + "/health",
     "heartbeat": os.getenv("HEARTBEAT_URL", "http://heartbeat:8010") + "/status",
-    "tts": os.getenv("TTS_URL", "http://tts-service:8030") + "/health",
-    "avatar": os.getenv("AVATAR_URL", "http://avatar-service:8081") + "/health",
 }
 
 
-async def fetch_status() -> Dict[str, Dict[str, str]]:
-    results: Dict[str, Dict[str, str]] = {}
+def _prune_metrics(now: float) -> None:
+    while _metrics and now - _metrics[0][0] > ERROR_WINDOW_SECONDS:
+        _metrics.popleft()
+
+
+def _record_status(code: int) -> None:
+    now = time.time()
+    _metrics.append((now, code))
+    _prune_metrics(now)
+
+
+def _error_budget() -> Dict[str, float]:
+    now = time.time()
+    _prune_metrics(now)
+    total = len(_metrics)
+    if total == 0:
+        return {"error_ratio": 0.0, "total": 0}
+    errors = sum(1 for _, code in _metrics if code in {429, 500, 408})
+    return {"error_ratio": errors / total, "total": total}
+
+
+def _maybe_restart() -> None:
+    budget = _error_budget()
+    if budget["total"] < 10:
+        return
+    if budget["error_ratio"] > 0.03 and shutil.which("docker"):
+        subprocess.run(["docker", "restart", SERVICE_CONTAINER], check=False)
+
+
+async def fetch_status() -> Dict[str, Dict[str, Any]]:
+    results: Dict[str, Dict[str, Any]] = {}
     async with httpx.AsyncClient() as client:
         for name, url in NODES.items():
             try:
@@ -55,9 +104,30 @@ async def fetch_memory_count() -> int:
     return int(payload.get("records", 0))
 
 
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    try:
+        response = await call_next(request)
+        _record_status(response.status_code)
+        _maybe_restart()
+        return response
+    except Exception:
+        _record_status(500)
+        _maybe_restart()
+        raise
+
+
 @app.get("/health")
 async def health() -> Dict[str, str]:
-    return {"status": "ok", "tool_gate_url": TOOL_GATE_URL}
+    return {
+        "status": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
+        "tool_gate_url": TOOL_GATE_URL,
+    }
+
+
+@app.get("/metrics")
+async def metrics() -> Dict[str, Any]:
+    return _error_budget()
 
 
 @app.get("/")
@@ -66,6 +136,7 @@ async def index() -> Dict[str, object]:
     alive_nodes = [name for name, payload in statuses.items() if payload.get("status") == "ok"]
     return {
         "service": "dashboard",
+        "status": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
         "tool_gate_url": TOOL_GATE_URL,
         "ledger_url": LEDGER_URL,
         "alive_nodes": alive_nodes,
