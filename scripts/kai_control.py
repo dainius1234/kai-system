@@ -42,8 +42,8 @@ APP_DIR.mkdir(parents=True, exist_ok=True)
 LOG_PATH = APP_DIR / "emergency_actions.log"
 
 
-def _run(cmd: List[str], check: bool = True) -> subprocess.CompletedProcess:
-    return subprocess.run(cmd, check=check, capture_output=True, text=True)
+def _run(cmd: List[str], check: bool = True, timeout: int = 20) -> subprocess.CompletedProcess:
+    return subprocess.run(cmd, check=check, capture_output=True, text=True, timeout=timeout)
 
 
 def _sha256_file(path: Path) -> str:
@@ -90,10 +90,12 @@ def vault_read(path: str) -> Optional[str]:
 
 def list_usb_mounts() -> List[Path]:
     mounts: List[Path] = []
-    for root in [Path("/media") / os.getenv("USER", ""), Path("/run/media") / os.getenv("USER", "")]:
+    user = os.getenv("USER", "")
+    roots = [Path("/media") / user, Path("/run/media") / user] if user else [Path("/media"), Path("/run/media")]
+    for root in roots:
         if root.exists():
             mounts.extend([p for p in root.iterdir() if p.is_dir()])
-    return mounts
+    return sorted({m.resolve() for m in mounts})
 
 
 @dataclass
@@ -219,7 +221,7 @@ def rollback_memu(method: str) -> None:
     if not commits:
         raise RuntimeError("No commits available for rollback")
     version = commits[0]["commit_id"]
-    req = urllib.request.Request(f"{url}/revert?version={version}", data=b"", method="POST")
+    req = urllib.request.Request(f"{url}/revert?version={version}", data=b"{}", method="POST")
     urllib.request.urlopen(req, timeout=5).read()
     log_action(method, f"rollback:{version}", "TPM")
 

@@ -50,15 +50,18 @@ def main() -> None:
         usb3 = Path(td) / "usb3"
         usb1.mkdir(); usb2.mkdir(); usb3.mkdir()
 
+        kc.list_usb_mounts = lambda: [usb1, usb2, usb3]
         mgr = kc.KeeperRecoveryManager()
         h1 = mgr.seal_primary(usb1)
         assert h1 == kc._sha256_file(usb1 / "kai-primary.pub")
         h2 = mgr.seal_backup(usb2, usb1)
         assert h1 == h2
+        assert mgr.validate_inserted_key() in {"usb", "backup"}
 
         rec = mgr.generate_paper_recovery()
         mgr.restore_from_paper(rec["payload"], rec["words"], usb3)
         assert (usb3 / "kai-primary.pub").exists()
+        assert mgr.sealed_primary_exists() is True
 
     print("kai-control selftest passed")
 
