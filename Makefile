@@ -1,4 +1,4 @@
-.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill
+.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate chaos-ci
 
 go_no_go:
 	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py langgraph/app.py executor/app.py
@@ -38,3 +38,11 @@ game-day-scorecard:
 
 hmac-rotation-drill:
 	PYTHONPATH=. python scripts/hmac_rotation_drill.py
+
+
+hmac-auto-rotate:
+	PYTHONPATH=. python scripts/auto_rotate_hmac.py
+
+
+chaos-ci:
+	PYTHONPATH=. python scripts/chaos_ci.py

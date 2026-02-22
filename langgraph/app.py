@@ -13,7 +13,7 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
 from common.auth import sign_gate_request
-from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, detect_device, sanitize_string, setup_json_logger
+from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from config import build_saver
 from conviction import build_plan, low_conviction_feedback, score_conviction
@@ -39,6 +39,9 @@ EXPENSES_LOG = os.getenv("EXPENSES_LOG", f"{SELF_EMP_ROOT}/Accounting/expenses.l
 MEMU_BREAKER = CircuitBreaker(failure_threshold=int(os.getenv("MEMU_BREAKER_THRESHOLD", "3")), recovery_seconds=int(os.getenv("MEMU_BREAKER_RECOVERY", "30")))
 TOOL_GATE_BREAKER = CircuitBreaker(failure_threshold=int(os.getenv("TOOL_BREAKER_THRESHOLD", "3")), recovery_seconds=int(os.getenv("TOOL_BREAKER_RECOVERY", "30")))
 BREAKER_STATE_PATH = Path(os.getenv("BREAKER_STATE_PATH", "/tmp/langgraph_breakers.json"))
+CONVICTION_OVERRIDE_PATH = Path(os.getenv("CONVICTION_OVERRIDE_PATH", "/tmp/conviction_overrides.txt"))
+MEMU_ERROR_GUARD = ErrorBudgetCircuitBreaker(warn_ratio=float(os.getenv("MEMU_WARN_RATIO", "0.05")), open_ratio=float(os.getenv("MEMU_OPEN_RATIO", "0.10")), window_seconds=300, recovery_seconds=int(os.getenv("MEMU_GUARD_RECOVERY", "60")))
+TOOL_ERROR_GUARD = ErrorBudgetCircuitBreaker(warn_ratio=float(os.getenv("TOOL_WARN_RATIO", "0.05")), open_ratio=float(os.getenv("TOOL_OPEN_RATIO", "0.10")), window_seconds=300, recovery_seconds=int(os.getenv("TOOL_GUARD_RECOVERY", "60")))
 
 
 class GraphRequest(BaseModel):
@@ -82,6 +85,17 @@ def _persist_breakers() -> None:
         BREAKER_STATE_PATH.write_text(json.dumps(payload), encoding="utf-8")
     except Exception:
         logger.warning("Failed to persist breaker state")
+
+
+def load_conviction_overrides() -> List[str]:
+    if not CONVICTION_OVERRIDE_PATH.exists():
+        return []
+    return [line.strip().lower() for line in CONVICTION_OVERRIDE_PATH.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def is_conviction_override(text: str) -> bool:
+    candidate = text.lower()
+    return any(rule in candidate for rule in load_conviction_overrides())
 
 
 def infer_specialist_fallback(user_input: str, task_hint: Optional[str]) -> str:
@@ -166,7 +180,7 @@ async def metrics_middleware(request: Request, call_next):
 
 @app.get("/health")
 async def health() -> Dict[str, Any]:
-    return {"status": "ok", "device": DEVICE, "dependencies": {"memu": MEMU_BREAKER.snapshot(), "tool_gate": TOOL_GATE_BREAKER.snapshot()}}
+    return {"status": "ok", "device": DEVICE, "dependencies": {"memu": MEMU_BREAKER.snapshot(), "tool_gate": TOOL_GATE_BREAKER.snapshot()}, "error_guards": {"memu": MEMU_ERROR_GUARD.snapshot(), "tool_gate": TOOL_ERROR_GUARD.snapshot()}}
 
 
 @app.get("/metrics")
@@ -178,7 +192,8 @@ async def metrics() -> Dict[str, float]:
 async def run_graph(request: GraphRequest) -> GraphResponse:
     if not request.user_input:
         raise HTTPException(status_code=400, detail="user_input is required")
-    if INJECTION_RE.search(request.user_input):
+    override_active = is_conviction_override(request.user_input)
+    if INJECTION_RE.search(request.user_input) and not override_active:
         raise HTTPException(status_code=400, detail="prompt injection pattern blocked")
     if request.device not in {"cpu", "cuda"}:
         raise HTTPException(status_code=400, detail="device must be cpu or cuda")
@@ -192,7 +207,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     )
 
     specialist = infer_specialist_fallback(request.user_input, request.task_hint)
-    if MEMU_BREAKER.allow():
+    if MEMU_BREAKER.allow() and MEMU_ERROR_GUARD.allow():
         try:
             async with httpx.AsyncClient() as client:
                 route_response = await client.post(
@@ -201,9 +216,11 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
                     timeout=5.0,
                 )
             route_response.raise_for_status()
+            MEMU_ERROR_GUARD.record(route_response.status_code)
             specialist = route_response.json().get("specialist", specialist)
             MEMU_BREAKER.record_success()
         except httpx.HTTPError:
+            MEMU_ERROR_GUARD.record(500)
             MEMU_BREAKER.record_failure()
             _persist_breakers()
             logger.warning("MEMU route unavailable; using local specialist fallback")
@@ -225,14 +242,16 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
         plan["rethink_count"] = rethink_count
         conviction = score_conviction(prompt, plan, chunks, rethink_count)
 
-    if conviction < MIN_CONVICTION:
+    if override_active:
+        plan["conviction_override"] = "operator override matched"
+    if conviction < MIN_CONVICTION and not override_active:
         plan["summary"] = f"Conviction too low ({conviction}/10). Need more data — suggest file or clarify?"
 
     plan["strategy"] = strategy_node(request.user_input)
 
     gate_decision = None
     if request.task_hint:
-        if TOOL_GATE_BREAKER.allow():
+        if TOOL_GATE_BREAKER.allow() and TOOL_ERROR_GUARD.allow():
             nonce = str(uuid.uuid4())
             ts = time.time()
             signature = sign_gate_request(actor_did="langgraph", session_id=request.session_id, tool=request.task_hint, nonce=nonce, ts=ts)
@@ -254,13 +273,16 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
                         timeout=5.0,
                     )
                 gate_resp.raise_for_status()
+                TOOL_ERROR_GUARD.record(gate_resp.status_code)
                 gate_decision = gate_resp.json()
                 TOOL_GATE_BREAKER.record_success()
             except httpx.HTTPStatusError as exc:
+                TOOL_ERROR_GUARD.record(int(exc.response.status_code))
                 TOOL_GATE_BREAKER.record_failure()
                 _persist_breakers()
                 gate_decision = {"approved": False, "status": "blocked", "reason": f"tool-gate rejected request ({exc.response.status_code})"}
             except httpx.HTTPError:
+                TOOL_ERROR_GUARD.record(500)
                 TOOL_GATE_BREAKER.record_failure()
                 _persist_breakers()
                 gate_decision = {"approved": False, "status": "unavailable", "reason": "tool-gate unavailable"}

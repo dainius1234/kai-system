@@ -39,3 +39,11 @@ This document explains **why** the hardening direction was chosen, plus decision
 ## Implemented now
 - HMAC zero-downtime runbook: `docs/hmac_rotation_runbook.md`.
 - Drill automation: `make hmac-rotation-drill`.
+
+## Implemented from Ara review
+
+- Checksummed append-only episode spool fallback implemented in `langgraph/config.py`.
+- Error-budget-based guard added for dependency gating in `langgraph/app.py`.
+- HMAC auto-rotation helper + revocation support added.
+- Chaos CI script (`scripts/chaos_ci.py`) added for kill/restart resilience drill.
+- Conviction override operator control added in `kai_control` and consumed by `langgraph`.
