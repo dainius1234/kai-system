@@ -51,17 +51,18 @@ It is built to be **self-sufficient, autonomous, and sovereign AI-powered infras
 ---
 
 ## 📦 Repo Structure
-core/         # Strategy engines, risk manager
-engineering/  # Orderbook, flow, pattern, institutional tools
-accounting/   # Ledger, pnl, tax, treasury
-data/         # Venue adapters, book builder
-arb/          # Arbitrage engines
-risk/         # Risk guards, supervisor, self-healing
-storage/      # DuckDB, replay, compression
-ui/           # Dash operator console
-agents/       # LLM advisors + verifier
-scripts/      # Run scripts, Docker, launchers
-tests/        # Unit + integration tests
+orchestrator/       # Final risk authority before execution
+supervisor/         # Watchdog and circuit-breaker control loop
+fusion-engine/      # Multi-signal consensus and conviction gating
+verifier/           # Fact-checking and signal cross-validation
+executor/           # Execution bridge and order-routing stubs
+dashboard/          # Operator console (Dash)
+memu-core/          # Memory/compression and operator state helpers
+tool-gate/          # Tool access policy and local gatekeeping
+langgraph/          # Graph/runtime app integration layer
+data/               # Seed datasets and local advisor inputs
+scripts/            # Operational scripts and validation checks
+docs/               # Implementation plans and hardening runbooks
 
 ---
 
@@ -120,3 +121,27 @@ tests/        # Unit + integration tests
 For research, backtesting, and paper trading only.  
 Live trading requires explicit configuration and operator consent.  
 Derivatives trading may be restricted in your jurisdiction. Use responsibly.
+
+---
+
+## Sovereign Implementation Planning Docs
+- `docs/first_implementation_plan.md` — step-by-step first implementation runbook (commands, expected outputs, failure conditions)
+- `docs/phase1_patch_set.md` — concrete Phase-1 patch set aligned to current repo layout
+- `docs/production_hardening_plan.md` — production-grade hardening plan with owners and acceptance criteria
+
+
+## Kai Control Offline Triple-Recovery
+- `scripts/kai_control.py` provides a standalone local keeper console (USB primary, USB backup, paper restore).
+- Build binary: `make build-kai-control` (PyInstaller one-file output).
+- Local self-check: `make kai-control-selftest`.
+- Host egress policy helper: `scripts/enforce_egress.sh`.
+- Run `kai-control` as normal user (no sudo).
+- Monthly drill helper: `scripts/kai-drill.sh` (cron suggested: `0 0 1 * *`).
+
+
+## Self-Employment Advisor Mode (Offline, UK-focused)
+- Preloaded folders: `data/self-emp/{Accounting,Legal,Coding,Engineering,Social}`.
+- Skill map: `data/self-emp/skill_map.yml`.
+- Advisor rules use local thresholds: `MTD_START`, `VAT_THRESHOLD`, `MILEAGE_RATE`.
+- Kai Control has **Advisor Mode** button (`Дайниус, что на уме?`) for strategic suggestions from local income/expense logs.
+- Run `kai-control` as normal user (no sudo).
