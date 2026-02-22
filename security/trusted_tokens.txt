@@ -1,0 +1,2 @@
+# token[:comma,separated,allowed,tools]
+bootstrap-token-1:executor
