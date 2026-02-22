@@ -106,14 +106,14 @@ def wait_for_usb_mounts(timeout_s: int = USB_TIMEOUT_SECONDS) -> List[Path]:
     deadline = time.time() + max(timeout_s, 1)
     mounts: List[Path] = []
     while time.time() < deadline:
-        mounts = list_usb_mounts()
+        mounts = wait_for_usb_mounts()
         if mounts:
             return mounts
         time.sleep(0.5)
     # adaptive extension for slow media
     slow_deadline = time.time() + 5
     while time.time() < slow_deadline:
-        mounts = list_usb_mounts()
+        mounts = wait_for_usb_mounts()
         if mounts:
             return mounts
         time.sleep(0.5)
@@ -288,20 +288,6 @@ def advisor_mode(prompt: str) -> str:
 
 
 
-def add_conviction_override(rule: str) -> str:
-    text = rule.strip()
-    if not text:
-        raise RuntimeError("Override text is empty")
-    existing: set[str] = set()
-    if CONVICTION_OVERRIDE_PATH.exists():
-        existing = {line.strip().lower() for line in CONVICTION_OVERRIDE_PATH.read_text(encoding="utf-8").splitlines() if line.strip()}
-    lowered = text.lower()
-    if lowered not in existing:
-        with CONVICTION_OVERRIDE_PATH.open("a", encoding="utf-8") as f:
-            f.write(lowered + "\n")
-    return lowered
-
-
 def unlock_logs(method: str) -> str:
     try:
         output = _run(["docker", "logs", "--tail", "50", "executor"], check=False).stdout
@@ -329,9 +315,8 @@ class KaiControlUI:
         self.btn_roll = tk.Button(self.root, text="Rollback", command=self._rollback)
         self.btn_logs = tk.Button(self.root, text="Unlock Logs", command=self._logs)
         self.btn_advisor = tk.Button(self.root, text="Advisor Mode", command=self._advisor)
-        self.btn_override = tk.Button(self.root, text="Ignore threat override", command=self._override)
 
-        for b in [self.btn_seal, self.btn_backup, self.btn_paper, self.btn_restore, self.btn_kill, self.btn_roll, self.btn_logs, self.btn_advisor, self.btn_override]:
+        for b in [self.btn_seal, self.btn_backup, self.btn_paper, self.btn_restore, self.btn_kill, self.btn_roll, self.btn_logs, self.btn_advisor]:
             b.pack_forget()
 
         self._refresh()
@@ -391,15 +376,8 @@ class KaiControlUI:
         advice = advisor_mode(prompt)
         messagebox.showinfo("Advisor Mode", advice[:3800])
 
-    def _override(self) -> None:
-        rule = simpledialog.askstring("Conviction Override", "Type phrase to trust (false-positive bypass)")
-        if not rule:
-            return
-        added = add_conviction_override(rule)
-        messagebox.showinfo("Conviction Override", f"Saved override: {added}")
-
     def _refresh(self) -> None:
-        for b in [self.btn_seal, self.btn_backup, self.btn_paper, self.btn_restore, self.btn_kill, self.btn_roll, self.btn_logs, self.btn_advisor, self.btn_override]:
+        for b in [self.btn_seal, self.btn_backup, self.btn_paper, self.btn_restore, self.btn_kill, self.btn_roll, self.btn_logs, self.btn_advisor]:
             b.pack_forget()
 
         method = self.mgr.validate_inserted_key()
@@ -415,7 +393,6 @@ class KaiControlUI:
             self.btn_paper.pack(pady=4)
             self.btn_restore.pack(pady=4)
             self.btn_advisor.pack(pady=4)
-            self.btn_override.pack(pady=4)
         elif method:
             self.method = method
             allowed, _ = self.mgr.can_destructive_actions()
@@ -427,7 +404,6 @@ class KaiControlUI:
                 self.status.config(text="Single key recognized. Insert both keys for Kill/Rollback.")
             self.btn_logs.pack(pady=4)
             self.btn_advisor.pack(pady=4)
-            self.btn_override.pack(pady=4)
             self.btn_paper.pack(pady=4)
             self.btn_restore.pack(pady=4)
         else:

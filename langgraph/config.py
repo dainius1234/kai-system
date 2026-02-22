@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import time
-from pathlib import Path
 from typing import Any, Dict, List, Protocol
 
 import redis
@@ -91,55 +89,15 @@ class InMemorySaver:
         return moved
 
 
-class ChecksummedSpoolSaver(InMemorySaver):
-    def __init__(self, spool_path: str) -> None:
-        super().__init__()
-        self.spool_path = Path(spool_path)
-        self.spool_path.parent.mkdir(parents=True, exist_ok=True)
-        self._load_from_spool()
-
-    def _line_for(self, payload: Dict[str, Any]) -> str:
-        raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-        checksum = hashlib.sha256(raw.encode("utf-8")).hexdigest()
-        return json.dumps({"checksum": checksum, "payload": payload}, sort_keys=True)
-
-    def _load_from_spool(self) -> None:
-        if not self.spool_path.exists():
-            return
-        for line in self.spool_path.read_text(encoding="utf-8").splitlines():
-            if not line.strip():
-                continue
-            try:
-                obj = json.loads(line)
-                payload = obj["payload"]
-                checksum = str(obj.get("checksum", ""))
-                raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-                expected = hashlib.sha256(raw.encode("utf-8")).hexdigest()
-                if checksum != expected:
-                    continue
-                super().save_episode(payload)
-            except Exception:
-                continue
-
-    def save_episode(self, payload: Dict[str, Any]) -> None:
-        line = self._line_for(payload)
-        with self.spool_path.open("a", encoding="utf-8") as f:
-            f.write(line + "\n")
-            f.flush()
-            os.fsync(f.fileno())
-        super().save_episode(payload)
-
-
 def build_saver() -> EpisodeSaver:
     redis_url = os.getenv("REDIS_URL", "redis://redis:6379")
     prefer_memory = os.getenv("EPISODE_STORE", "redis").lower() == "memory"
-    spool_path = os.getenv("EPISODE_SPOOL_PATH", "/tmp/langgraph_episode_spool.log")
     if prefer_memory:
-        return ChecksummedSpoolSaver(spool_path=spool_path)
+        return InMemorySaver()
 
     try:
         saver = RedisSaver(redis_url=redis_url)
         saver.redis.ping()
         return saver
     except Exception:
-        return ChecksummedSpoolSaver(spool_path=spool_path)
+        return InMemorySaver()
