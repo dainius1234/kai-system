@@ -1,4 +1,4 @@
-.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard
+.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp
 
 go_no_go:
 	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py langgraph/app.py executor/app.py
@@ -30,7 +30,3 @@ kai-drill-test:
 
 test-self-emp:
 	python scripts/test_self_emp_advisor.py
-
-
-game-day-scorecard:
-	PYTHONPATH=. python scripts/gameday_scorecard.py
