@@ -9,6 +9,26 @@ from common.runtime import detect_device, sanitize_string, setup_json_logger
 
 logger = setup_json_logger("perception-telegram", os.getenv("LOG_PATH", "/tmp/perception-telegram.json.log"))
 DEVICE = detect_device()
+import logging
+import os
+import time
+from logging.handlers import RotatingFileHandler
+
+import httpx
+
+LOG_PATH = os.getenv("LOG_PATH", "/tmp/perception-telegram.json.log")
+handler = RotatingFileHandler(LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=30)
+handler.setFormatter(logging.Formatter('{"time":"%(asctime)s","level":"%(levelname)s","service":"%(name)s","msg":"%(message)s"}'))
+logger = logging.getLogger("perception-telegram")
+logger.setLevel(logging.INFO)
+logger.handlers = [handler]
+logger.propagate = False
+
+try:
+    import torch
+    DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+except Exception:
+    DEVICE = "cpu"
 logger.info("Running on %s.", DEVICE)
 
 TELEGRAM_API = os.getenv("TELEGRAM_API", "http://telegram-bridge:9000")
@@ -22,6 +42,7 @@ def poll_loop() -> None:
             with httpx.Client(timeout=5.0) as client:
                 headers = {"x-bridge-secret": BRIDGE_SHARED_SECRET} if BRIDGE_SHARED_SECRET else {}
                 resp = client.get(f"{TELEGRAM_API}/messages", headers=headers)
+                resp = client.get(f"{TELEGRAM_API}/messages")
                 resp.raise_for_status()
                 payload = resp.json()
                 for msg in payload.get("messages", []):
@@ -30,6 +51,8 @@ def poll_loop() -> None:
                         json={
                             "user_input": sanitize_string(str(msg.get("text", ""))),
                             "session_id": sanitize_string(str(msg.get("session_id", "telegram"))),
+                            "user_input": str(msg.get("text", ""))[:1024],
+                            "session_id": str(msg.get("session_id", "telegram"))[:1024],
                             "device": DEVICE,
                         },
                     )
