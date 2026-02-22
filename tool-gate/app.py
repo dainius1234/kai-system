@@ -21,6 +21,9 @@ logger.info("Running on %s.", DEVICE)
 app = FastAPI(title="Tool Gate", version="0.4.0")
 TOKENS_PATH = Path(os.getenv("TRUSTED_TOKENS_PATH", "/config/trusted_tokens.txt"))
 TRUSTED_TOKENS: Set[str] = set()
+TOKEN_SCOPES: Dict[str, Set[str]] = {}
+NONCE_TTL_SECONDS = int(os.getenv("NONCE_TTL_SECONDS", "300"))
+SEEN_NONCES: Dict[str, float] = {}
 budget = ErrorBudget(window_seconds=300)
 audit = AuditStream("tool-gate", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
 
@@ -34,6 +37,8 @@ class GateRequest(BaseModel):
     cosign: bool = False
     rationale: Optional[str] = None
     device: Optional[str] = None
+    nonce: Optional[str] = None
+    ts: Optional[float] = None
 
 
 class GateDecision(BaseModel):
@@ -84,12 +89,54 @@ ledger = InMemoryLedger()
 
 
 def load_trusted_tokens() -> None:
-    global TRUSTED_TOKENS
-    TRUSTED_TOKENS = {t.strip() for t in TOKENS_PATH.read_text(encoding="utf-8").splitlines() if t.strip()} if TOKENS_PATH.exists() else set()
+    global TRUSTED_TOKENS, TOKEN_SCOPES
+    TRUSTED_TOKENS = set()
+    TOKEN_SCOPES = {}
+    if not TOKENS_PATH.exists():
+        return
+    for raw in TOKENS_PATH.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if ":" in line:
+            token, scope_raw = line.split(":", 1)
+            token = token.strip()
+            scopes = {x.strip() for x in scope_raw.split(",") if x.strip()}
+            TRUSTED_TOKENS.add(token)
+            TOKEN_SCOPES[token] = scopes
+        else:
+            TRUSTED_TOKENS.add(line)
+            TOKEN_SCOPES[line] = {"*"}
 
 
 def _reload_tokens(_signum: int, _frame: Any) -> None:
     load_trusted_tokens()
+
+
+def _cleanup_nonces(now: float) -> None:
+    stale = [k for k, ts in SEEN_NONCES.items() if now - ts > NONCE_TTL_SECONDS]
+    for key in stale:
+        SEEN_NONCES.pop(key, None)
+
+
+def _validate_nonce(request: GateRequest) -> None:
+    if request.nonce is None and request.ts is None:
+        return
+    if not request.nonce or request.ts is None:
+        raise HTTPException(status_code=400, detail="nonce and ts must be provided together")
+    now = time.time()
+    if abs(now - request.ts) > NONCE_TTL_SECONDS:
+        raise HTTPException(status_code=401, detail="request timestamp outside allowed window")
+    _cleanup_nonces(now)
+    nonce_key = f"{request.session_id}:{request.nonce}"
+    if nonce_key in SEEN_NONCES:
+        raise HTTPException(status_code=409, detail="replay detected")
+    SEEN_NONCES[nonce_key] = now
+
+
+def _is_tool_allowed(token: str, tool: str) -> bool:
+    scopes = TOKEN_SCOPES.get(token, set())
+    return "*" in scopes or tool in scopes
 
 
 class GatePolicy:
@@ -139,11 +186,14 @@ async def metrics() -> Dict[str, float]:
 
 @app.post("/gate/request", response_model=GateDecision)
 async def gate_request(request: GateRequest) -> GateDecision:
-    request = request.model_copy(update={"tool": sanitize_string(request.tool), "actor_did": sanitize_string(request.actor_did), "session_id": sanitize_string(request.session_id), "rationale": sanitize_string(request.rationale) if request.rationale else None})
+    request = request.model_copy(update={"tool": sanitize_string(request.tool), "actor_did": sanitize_string(request.actor_did), "session_id": sanitize_string(request.session_id), "rationale": sanitize_string(request.rationale) if request.rationale else None, "nonce": sanitize_string(request.nonce) if request.nonce else None})
     if not request.tool:
         raise HTTPException(status_code=400, detail="Tool name is required.")
     if request.session_id not in TRUSTED_TOKENS:
         raise HTTPException(status_code=401, detail="Session not trusted")
+    if not _is_tool_allowed(request.session_id, request.tool):
+        raise HTTPException(status_code=403, detail="Token not authorized for this tool")
+    _validate_nonce(request)
     if request.device is None:
         request = request.model_copy(update={"device": DEVICE})
     return policy.evaluate(request)

@@ -10,7 +10,7 @@ import httpx
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
-from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
+from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from config import build_saver
 from conviction import build_plan, low_conviction_feedback, score_conviction
@@ -33,6 +33,8 @@ last_low_conviction_alert = 0.0
 SELF_EMP_ROOT = os.getenv("SELF_EMP_ROOT", "/data/self-emp")
 INCOME_CSV = os.getenv("INCOME_CSV", f"{SELF_EMP_ROOT}/Accounting/income.csv")
 EXPENSES_LOG = os.getenv("EXPENSES_LOG", f"{SELF_EMP_ROOT}/Accounting/expenses.log")
+MEMU_BREAKER = CircuitBreaker(failure_threshold=int(os.getenv("MEMU_BREAKER_THRESHOLD", "3")), recovery_seconds=int(os.getenv("MEMU_BREAKER_RECOVERY", "30")))
+TOOL_GATE_BREAKER = CircuitBreaker(failure_threshold=int(os.getenv("TOOL_BREAKER_THRESHOLD", "3")), recovery_seconds=int(os.getenv("TOOL_BREAKER_RECOVERY", "30")))
 
 
 def infer_specialist_fallback(user_input: str, task_hint: Optional[str]) -> str:
@@ -137,8 +139,8 @@ async def metrics_middleware(request: Request, call_next):
 
 
 @app.get("/health")
-async def health() -> Dict[str, str]:
-    return {"status": "ok", "device": DEVICE}
+async def health() -> Dict[str, Any]:
+    return {"status": "ok", "device": DEVICE, "dependencies": {"memu": MEMU_BREAKER.snapshot(), "tool_gate": TOOL_GATE_BREAKER.snapshot()}}
 
 
 @app.get("/metrics")
@@ -164,18 +166,23 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     )
 
     specialist = infer_specialist_fallback(request.user_input, request.task_hint)
-    try:
-        async with httpx.AsyncClient() as client:
-            route_response = await client.post(
-                f"{MEMU_URL}/route",
-                json={"query": request.user_input, "session_id": request.session_id, "timestamp": "now"},
-                timeout=5.0,
-            )
-        route_response.raise_for_status()
-        payload = route_response.json()
-        specialist = payload.get("specialist", specialist)
-    except httpx.HTTPError:
-        logger.warning("MEMU route unavailable; using local specialist fallback")
+    if MEMU_BREAKER.allow():
+        try:
+            async with httpx.AsyncClient() as client:
+                route_response = await client.post(
+                    f"{MEMU_URL}/route",
+                    json={"query": request.user_input, "session_id": request.session_id, "timestamp": "now"},
+                    timeout=5.0,
+                )
+            route_response.raise_for_status()
+            payload = route_response.json()
+            specialist = payload.get("specialist", specialist)
+            MEMU_BREAKER.record_success()
+        except httpx.HTTPError:
+            MEMU_BREAKER.record_failure()
+            logger.warning("MEMU route unavailable; using local specialist fallback")
+    else:
+        logger.warning("MEMU circuit open; using local specialist fallback")
 
     rethink_count = 0
     chunks = await fetch_offline_chunks(request.user_input, user_id="keeper", top_k=5)
@@ -200,26 +207,34 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
 
     gate_decision = None
     if request.task_hint:
-        try:
-            async with httpx.AsyncClient() as client:
-                gate_resp = await client.post(
-                    f"{TOOL_GATE_URL}/gate/request",
-                    json={
-                        "tool": request.task_hint,
-                        "params": {"plan": plan},
-                        "confidence": min(max(conviction / 10.0, 0.0), 1.0),
-                        "actor_did": "langgraph",
-                        "session_id": request.session_id,
-                        "device": request.device,
-                    },
-                    timeout=5.0,
-                )
-            gate_resp.raise_for_status()
-            gate_decision = gate_resp.json()
-        except httpx.HTTPStatusError as exc:
-            gate_decision = {"approved": False, "status": "blocked", "reason": f"tool-gate rejected request ({exc.response.status_code})"}
-        except httpx.HTTPError:
-            gate_decision = {"approved": False, "status": "unavailable", "reason": "tool-gate unavailable"}
+        if TOOL_GATE_BREAKER.allow():
+            try:
+                async with httpx.AsyncClient() as client:
+                    gate_resp = await client.post(
+                        f"{TOOL_GATE_URL}/gate/request",
+                        json={
+                            "tool": request.task_hint,
+                            "params": {"plan": plan},
+                            "confidence": min(max(conviction / 10.0, 0.0), 1.0),
+                            "actor_did": "langgraph",
+                            "session_id": request.session_id,
+                            "device": request.device,
+                            "nonce": str(uuid.uuid4()),
+                            "ts": time.time(),
+                        },
+                        timeout=5.0,
+                    )
+                gate_resp.raise_for_status()
+                gate_decision = gate_resp.json()
+                TOOL_GATE_BREAKER.record_success()
+            except httpx.HTTPStatusError as exc:
+                TOOL_GATE_BREAKER.record_failure()
+                gate_decision = {"approved": False, "status": "blocked", "reason": f"tool-gate rejected request ({exc.response.status_code})"}
+            except httpx.HTTPError:
+                TOOL_GATE_BREAKER.record_failure()
+                gate_decision = {"approved": False, "status": "unavailable", "reason": "tool-gate unavailable"}
+        else:
+            gate_decision = {"approved": False, "status": "blocked", "reason": "tool-gate circuit open"}
 
     episode_id = str(uuid.uuid4())
     saver.save_episode(

@@ -146,6 +146,28 @@ def select_specialist(query: str) -> str:
     return "Kimi-2.5"
 
 
+
+
+def _similarity(a: List[float], b: List[float]) -> float:
+    if not a or not b:
+        return 0.0
+    return sum(x * y for x, y in zip(a, b))
+
+
+def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
+    q_emb = generate_embedding(query)
+    ranked: List[tuple[float, MemoryRecord]] = []
+    for record in store.search(top_k=10_000):
+        rid = str(record.content.get("user_id", ""))
+        if user_id and rid and user_id != rid:
+            continue
+        score = _similarity(q_emb, record.embedding) + float(record.relevance)
+        if record.pinned:
+            score += 0.5
+        ranked.append((score, record))
+    ranked.sort(key=lambda x: x[0], reverse=True)
+    return [r for _, r in ranked[:max(1, min(top_k, 100))]]
+
 def _weekly_compress_if_due() -> None:
     global last_compress_run
     now = time.time()
@@ -216,9 +238,9 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
 
 @app.get("/memory/retrieve")
 async def retrieve_context(query: str, user_id: str, top_k: int = 20) -> List[MemoryRecord]:
-    _ = sanitize_string(query)
-    _ = sanitize_string(user_id)
-    return store.search(top_k=top_k)
+    q = sanitize_string(query)
+    uid = sanitize_string(user_id)
+    return retrieve_ranked(q, uid, top_k=top_k)
 
 
 @app.get("/memory/state")

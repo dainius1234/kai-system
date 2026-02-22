@@ -130,3 +130,37 @@ class AuditStream:
             if self.required:
                 raise
             self._client = None
+
+
+class CircuitBreaker:
+    def __init__(self, failure_threshold: int = 3, recovery_seconds: int = 30) -> None:
+        self.failure_threshold = max(1, failure_threshold)
+        self.recovery_seconds = max(1, recovery_seconds)
+        self.failures = 0
+        self.state = "closed"
+        self.opened_at = 0.0
+
+    def allow(self) -> bool:
+        if self.state == "open":
+            if time.time() - self.opened_at >= self.recovery_seconds:
+                self.state = "half_open"
+                return True
+            return False
+        return True
+
+    def record_success(self) -> None:
+        self.failures = 0
+        self.state = "closed"
+        self.opened_at = 0.0
+
+    def record_failure(self) -> None:
+        self.failures += 1
+        if self.failures >= self.failure_threshold:
+            self.state = "open"
+            self.opened_at = time.time()
+
+    def snapshot(self) -> Dict[str, float | str | int]:
+        cooldown = 0.0
+        if self.state == "open":
+            cooldown = max(self.recovery_seconds - (time.time() - self.opened_at), 0.0)
+        return {"state": self.state, "failures": self.failures, "recovery_seconds": self.recovery_seconds, "cooldown_seconds": round(cooldown, 2)}
