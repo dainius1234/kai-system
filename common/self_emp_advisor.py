@@ -5,6 +5,8 @@ import os
 from pathlib import Path
 from typing import Dict, List
 
+from common.market_cache import load_cache
+
 
 def _to_float(value: object) -> float:
     if value is None:
@@ -67,6 +69,12 @@ def advise(income_total: float, expenses_lines: List[str]) -> List[str]:
             deduction = 300 * t["mileage_rate"]
             out.append(f"Car service £300 noted — log mileage and keep receipt; indicative mileage-method deduction example: £{deduction:.0f}.")
             break
+
+    market = load_cache()
+    petrol = market.get("petrol", {}) if isinstance(market, dict) else {}
+    trend = str(petrol.get("trend", "")).lower()
+    if "+" in trend or "up" in trend:
+        out.append("Fuel trend rising — fill up today to reduce next-day cost impact.")
 
     if not out:
         out.append("No major tax timing risks detected from current offline data. Keep receipts and update income/expense logs weekly.")

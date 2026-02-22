@@ -28,6 +28,12 @@ def start() -> List[subprocess.Popen]:
     return procs
 
 
+def restart(procs: List[subprocess.Popen], idx: int) -> None:
+    env = os.environ.copy()
+    env.update(PORT_ENVS[idx])
+    procs[idx] = subprocess.Popen(SERVICES[idx], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
 def stop_all(procs: List[subprocess.Popen]) -> None:
     for p in procs:
         try:
@@ -49,17 +55,21 @@ def main() -> None:
     procs = start()
     try:
         time.sleep(2)
-        victim = random.choice(procs)
-        victim.send_signal(signal.SIGTERM)
+        # Scenario 1: random hard kill + restart
+        kill_idx = random.randrange(len(procs))
+        procs[kill_idx].send_signal(signal.SIGKILL)
         time.sleep(1)
-        # if victim died, restart it
-        if victim.poll() is not None:
-            idx = procs.index(victim)
-            env = os.environ.copy()
-            env.update(PORT_ENVS[idx])
-            procs[idx] = subprocess.Popen(SERVICES[idx], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        restart(procs, kill_idx)
+
+        # Scenario 2: simulate network/tool degradation by stopping memu briefly
+        memu_idx = 1
+        procs[memu_idx].send_signal(signal.SIGTERM)
+        time.sleep(1)
+        restart(procs, memu_idx)
         time.sleep(2)
-        rc = subprocess.run(["make", "game-day-scorecard"]).returncode
+
+        # Fail PR if scorecard SLOs fail under chaos pressure
+        rc = subprocess.run(["make", "game-day-scorecard"], check=False).returncode
         if rc != 0:
             raise SystemExit(rc)
         print("chaos ci passed")

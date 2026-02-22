@@ -9,13 +9,16 @@ x-service-defaults: &service_defaults
     - no-new-privileges:true
   tmpfs:
     - /tmp:size=64M,noexec,nosuid
-restart: unless-stopped
+  restart: unless-stopped
   deploy:
     resources:
       limits:
         cpus: '1.0'
         memory: 2G
 
+# Profiles:
+# - dev: local development with Vault dev server
+# - default/no-profile: expects external Vault via VAULT_ADDR
 services:
   postgres:
     image: postgres:15-alpine
@@ -51,10 +54,11 @@ services:
       TS_STATE_DIR: /var/lib/tailscale
       TS_EXTRA_ARGS: --ssh --accept-routes=true
       TS_HOSTNAME: sovereign-core
-      command: sh -c "tailscaled --state=/var/lib/tailscale/tailscaled.state & sleep 2 && tailscale up --authkey=${TS_AUTHKEY} --hostname=${TS_HOSTNAME} --ssh --accept-routes=true && wait"
+    command: sh -c "tailscaled --state=/var/lib/tailscale/tailscaled.state & sleep 2 && tailscale up --authkey=${TS_AUTHKEY} --hostname=${TS_HOSTNAME} --ssh --accept-routes=true && wait"
 
 
   vault:
+    profiles: ["dev"]
     image: hashicorp/vault:latest
     container_name: sovereign-vault
     hostname: vault
@@ -75,12 +79,13 @@ services:
 
 
   vault-rotator:
+    profiles: ["dev"]
     image: hashicorp/vault:latest
     container_name: sovereign-vault-rotator
     volumes:
       - ./scripts/vault-rotate.sh:/vault/scripts/vault-rotate.sh:ro
     environment:
-      VAULT_ADDR: "http://vault:8200"
+      VAULT_ADDR: "${VAULT_ADDR:-http://vault:8200}"
       VAULT_ROOT_TOKEN: ${VAULT_ROOT_TOKEN:?set VAULT_ROOT_TOKEN}
     command: sh /vault/scripts/vault-rotate.sh
     depends_on:
@@ -129,7 +134,6 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.16
-    command: tailscaled --state=/var/lib/tailscale/tailscaled.state
 
   tool-gate:
     <<: *service_defaults
@@ -162,11 +166,6 @@ services:
   memu-core:
     <<: *service_defaults
     read_only: true
-    depends_on:
-      - postgres
-
-  memu-core:
-    <<: *service_defaults
     build: ./memu-core
     container_name: sovereign-memu-core
     hostname: memu-core
@@ -179,15 +178,14 @@ services:
       API_HOST: "0.0.0.0"
       API_PORT: "8001"
       AUDIT_REDIS_URL: "redis://redis:6379"
-      VAULT_ADDR: "http://vault:8200"
-      VAULT_TOKEN: "${VAULT_ROOT_TOKEN:?set VAULT_ROOT_TOKEN}"
+      VAULT_ADDR: "${VAULT_ADDR:-http://vault:8200}"
+      VAULT_TOKEN: "${VAULT_ROOT_TOKEN:-}"
     volumes:
       - memu_data:/data
 
     depends_on:
       - postgres
       - tool-gate
-      - vault
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8001/health || exit 1"]
       interval: 30s
@@ -199,12 +197,6 @@ services:
     build: ./executor
     runtime: gvisor
     restart: always
-    depends_on:
-      - postgres
-      - tool-gate
-
-  executor:
-    build: ./executor
     container_name: executor
     hostname: executor
     user: "1000:1000"
@@ -225,15 +217,14 @@ services:
       MEMU_URL: "http://memu-core:8001"
       EXECUTION_TIMEOUT: "30"
       MAX_OUTPUT_SIZE: "1048576"
-      VAULT_ADDR: "http://vault:8200"
-      VAULT_TOKEN: "${VAULT_ROOT_TOKEN:?set VAULT_ROOT_TOKEN}"
+      VAULT_ADDR: "${VAULT_ADDR:-http://vault:8200}"
+      VAULT_TOKEN: "${VAULT_ROOT_TOKEN:-}"
       AUDIT_REDIS_URL: "redis://redis:6379"
 
     command: sh -c "set -e; for d in $BACKOFF_SCHEDULE; do python app.py && exit 0 || sleep $d; done; exec python app.py"
     depends_on:
       - tool-gate
       - memu-core
-      - vault
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8002/alive || exit 1"]
       interval: 30s
@@ -246,9 +237,6 @@ services:
         max_attempts: 5
         window: 300s
 
-    depends_on:
-      - tool-gate
-      - memu-core
 
   dashboard:
     <<: *service_defaults
@@ -272,7 +260,6 @@ services:
     depends_on:
       - tool-gate
       - memu-core
-      - vault
       - executor
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
@@ -280,10 +267,6 @@ services:
       timeout: 5s
       retries: 3
 
-    depends_on:
-      - tool-gate
-      - memu-core
-      - executor
 
   langgraph:
     <<: *service_defaults
@@ -321,9 +304,6 @@ services:
   redis:
     image: redis:7-alpine
     command: redis-server --appendonly yes --save ""
-
-  redis:
-    image: redis:7-alpine
     container_name: sovereign-redis
     hostname: redis
     networks:
@@ -413,9 +393,6 @@ volumes:
 networks:
   sovereign-net:
     internal: true
-
-networks:
-  sovereign-net:
     driver: bridge
     ipam:
       config:

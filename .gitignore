@@ -1,3 +1,7 @@
 __pycache__/
 *.pyc
 .env
+
+output/gameday_scorecard.json
+data/self-emp/Accounting/market_price_cache.json
+security/ed25519_rotation_state.json
