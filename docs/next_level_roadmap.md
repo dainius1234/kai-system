@@ -34,3 +34,16 @@ This document explains **why** the hardening direction was chosen, plus decision
 - Introduce dual-key rotation runbook for `INTERSERVICE_HMAC_SECRET` / `_PREV`.
 - Add CI policy that validates both compose modes (`default` and `--profile dev`) in an environment with Docker.
 - Add per-service p95 latency and degraded-serve ratio targets to scorecard.
+
+
+## Implemented now
+- HMAC zero-downtime runbook: `docs/hmac_rotation_runbook.md`.
+- Drill automation: `make hmac-rotation-drill`.
+
+## Implemented from Ara review
+
+- Checksummed append-only episode spool fallback implemented in `langgraph/config.py`.
+- Error-budget-based guard added for dependency gating in `langgraph/app.py`.
+- HMAC auto-rotation helper + revocation support added.
+- Chaos CI script (`scripts/chaos_ci.py`) added for kill/restart resilience drill.
+- Conviction override operator control added in `kai_control` and consumed by `langgraph`.

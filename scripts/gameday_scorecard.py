@@ -14,6 +14,8 @@ CHECKS = [
     ["make", "hardening_smoke"],
     ["make", "kai-drill-test"],
     ["python", "scripts/test_episode_saver.py"],
+    ["python", "scripts/test_episode_spool.py"],
+    ["python", "scripts/test_error_budget_breaker.py"],
     ["python", "scripts/test_tool_gate_security.py"],
     ["python", "scripts/test_memu_retrieval.py"],
 ]
