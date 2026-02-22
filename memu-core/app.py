@@ -108,10 +108,6 @@ class InMemoryVectorStore:
         self._records = next_records
         return commit
 
-    def search(self, top_k: int) -> List[MemoryRecord]:
-
-    def insert(self, record: MemoryRecord) -> None:
-        self._records.append(record)
 
     def search(self, query: str, top_k: int) -> List[MemoryRecord]:
         return list(reversed(self._records))[:top_k]
@@ -311,17 +307,6 @@ async def metrics() -> Dict[str, Any]:
     return _error_budget()
 
 
-@app.post("/route", response_model=RoutingResponse)
-async def route_request(request: MemoryRequest) -> RoutingResponse:
-    query = sanitize_string(request.query)
-    session_id = sanitize_string(request.session_id)
-    similar = store.search(top_k=50)
-    return RoutingResponse(
-        specialist=select_specialist(query),
-        context_payload={
-            "query": query,
-            "memory_vectors": [record.embedding for record in similar],
-            "metadata": {"time": datetime.utcnow().isoformat(), "session_id": session_id, "specialists": SPECIALISTS},
     similar = store.search(query, top_k=50)
     metadata = {
         "time": datetime.utcnow().isoformat(),
@@ -365,22 +350,6 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
     record = MemoryRecord(id=str(uuid.uuid4()), timestamp=update.timestamp, event_type=update.event_type, content={"result": update.result_raw, "metrics": update.metrics or {}, "state_changes": update.state_delta or {}, "user_id": user_id, "pin": keeper_pin}, embedding=generate_embedding(f"{update.event_type}: {update.result_raw}"), relevance=relevance, pinned=keeper_pin)
     record_commit = store.insert(record)
     return {"status": "appended", "id": record.id, "commit": record_commit.commit_id, "state_commit": commit.commit_id if commit else "none"}
-        store.apply_state_delta(update.state_delta)
-
-    record = MemoryRecord(
-        id=str(uuid.uuid4()),
-        timestamp=update.timestamp,
-        event_type=update.event_type,
-        content={
-            "result": update.result_raw,
-            "metrics": update.metrics or {},
-            "state_changes": update.state_delta or {},
-        },
-        embedding=generate_embedding(f"{update.event_type}: {update.result_raw}"),
-        relevance=update.relevance,
-    )
-    store.insert(record)
-    return {"status": "appended", "id": record.id}
 
 
 @app.get("/memory/retrieve")

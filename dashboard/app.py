@@ -242,11 +242,6 @@ async def go_no_go() -> Dict[str, Any]:
     return await build_go_no_go_report()
 
 
-        "ledger_size": await fetch_ledger_size(),
-        "memory_count": await fetch_memory_count(),
-    }
-
-
 if __name__ == "__main__":
     import uvicorn
 

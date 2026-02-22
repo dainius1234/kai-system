@@ -262,21 +262,6 @@ async def execute(request: ExecutionRequest) -> ExecutionResult:
         raise HTTPException(status_code=408, detail="execution timeout")
 
     return ExecutionResult(task_id=sanitize_string(request.task_id), status="completed", output=output, duration_ms=duration_ms, exit_code=proc.returncode, stderr=proc.stderr, truncated=truncated)
-        await notify_heartbeat({"status": "rolled", "reason": f"subprocess failure ({proc.returncode})"})
-        raise HTTPException(status_code=500, detail="execution failed")
-
-    output = proc.stdout.strip()
-    truncated = False
-    if len(output) > MAX_OUTPUT_SIZE:
-        output = output[:MAX_OUTPUT_SIZE] + "..."
-        truncated = True
-
-    duration_ms = int((time.time() - start) * 1000)
-    if duration_ms > EXECUTION_TIMEOUT * 1000:
-        _record_status(408)
-        store.revert_last_state()
-        await notify_heartbeat({"status": "rolled", "reason": "execution timeout"})
-        raise HTTPException(status_code=408, detail="execution timeout")
 
     return ExecutionResult(
         task_id=sanitize_string(request.task_id),

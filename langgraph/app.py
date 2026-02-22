@@ -226,13 +226,6 @@ async def health() -> Dict[str, Any]:
 
 
 @app.get("/metrics")
-async def metrics() -> Dict[str, float]:
-    return budget.snapshot()
-async def health() -> Dict[str, str]:
-    return {"status": "ok", "device": DEVICE}
-
-
-@app.get("/metrics")
 async def metrics() -> Dict[str, Any]:
     return _error_budget()
 

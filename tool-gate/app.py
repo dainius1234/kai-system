@@ -257,23 +257,6 @@ class GatePolicy:
 
         entry = ledger.append(request.model_dump(), approved, reason)
         return GateDecision(request_id=entry.request_id, approved=approved, status="approved" if approved else "blocked", reason=reason, ledger_hash=entry.entry_hash)
-            approved = False
-            reason = "Tool Gate in PUB mode (execution disabled)."
-        elif request.confidence >= self.required_confidence or request.cosign:
-            approved = True
-            reason = "Approved by confidence threshold or co-sign."
-        else:
-            approved = False
-            reason = "Insufficient confidence; co-sign required."
-
-        entry = ledger.append(request.model_dump(), approved, reason)
-        return GateDecision(
-            request_id=entry.request_id,
-            approved=approved,
-            status="approved" if approved else "blocked",
-            reason=reason,
-            ledger_hash=entry.entry_hash,
-        )
 
 
 policy = GatePolicy()
