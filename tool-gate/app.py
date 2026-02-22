@@ -2,6 +2,30 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import signal
+import time
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set
+
+from fastapi import FastAPI, HTTPException, Request
+from pydantic import BaseModel, Field
+
+from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
+
+logger = setup_json_logger("tool-gate", os.getenv("LOG_PATH", "/tmp/tool-gate.json.log"))
+DEVICE = detect_device()
+logger.info("Running on %s.", DEVICE)
+
+app = FastAPI(title="Tool Gate", version="0.4.0")
+TOKENS_PATH = Path(os.getenv("TRUSTED_TOKENS_PATH", "/config/trusted_tokens.txt"))
+TRUSTED_TOKENS: Set[str] = set()
+TOKEN_SCOPES: Dict[str, Set[str]] = {}
+NONCE_TTL_SECONDS = int(os.getenv("NONCE_TTL_SECONDS", "300"))
+SEEN_NONCES: Dict[str, float] = {}
+budget = ErrorBudget(window_seconds=300)
+audit = AuditStream("tool-gate", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
 import logging
 import os
 import re
@@ -52,6 +76,8 @@ class GateRequest(BaseModel):
     cosign: bool = False
     rationale: Optional[str] = None
     device: Optional[str] = None
+    nonce: Optional[str] = None
+    ts: Optional[float] = None
 
 
 class GateDecision(BaseModel):
@@ -85,6 +111,9 @@ class InMemoryLedger:
     def append(self, payload: Dict[str, Any], approved: bool, reason: str) -> LedgerEntry:
         request_id = hashlib.sha256(f"{time.time_ns()}-{payload}".encode()).hexdigest()
         prev_hash = self._entries[-1].entry_hash if self._entries else "GENESIS"
+        entry_data = {"request_id": request_id, "timestamp": time.time(), "payload": payload, "approved": approved, "reason": reason, "prev_hash": prev_hash}
+        entry_hash = hashlib.sha256(json.dumps(entry_data, sort_keys=True).encode()).hexdigest()
+        entry = LedgerEntry(request_id=request_id, timestamp=entry_data["timestamp"], payload=payload, approved=approved, reason=reason, prev_hash=prev_hash, entry_hash=entry_hash)
         entry_data = {
             "request_id": request_id,
             "timestamp": time.time(),
@@ -116,6 +145,55 @@ class InMemoryLedger:
 ledger = InMemoryLedger()
 
 
+def load_trusted_tokens() -> None:
+    global TRUSTED_TOKENS, TOKEN_SCOPES
+    TRUSTED_TOKENS = set()
+    TOKEN_SCOPES = {}
+    if not TOKENS_PATH.exists():
+        return
+    for raw in TOKENS_PATH.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if ":" in line:
+            token, scope_raw = line.split(":", 1)
+            token = token.strip()
+            scopes = {x.strip() for x in scope_raw.split(",") if x.strip()}
+            TRUSTED_TOKENS.add(token)
+            TOKEN_SCOPES[token] = scopes
+        else:
+            TRUSTED_TOKENS.add(line)
+            TOKEN_SCOPES[line] = {"*"}
+
+
+def _reload_tokens(_signum: int, _frame: Any) -> None:
+    load_trusted_tokens()
+
+
+def _cleanup_nonces(now: float) -> None:
+    stale = [k for k, ts in SEEN_NONCES.items() if now - ts > NONCE_TTL_SECONDS]
+    for key in stale:
+        SEEN_NONCES.pop(key, None)
+
+
+def _validate_nonce(request: GateRequest) -> None:
+    if request.nonce is None and request.ts is None:
+        return
+    if not request.nonce or request.ts is None:
+        raise HTTPException(status_code=400, detail="nonce and ts must be provided together")
+    now = time.time()
+    if abs(now - request.ts) > NONCE_TTL_SECONDS:
+        raise HTTPException(status_code=401, detail="request timestamp outside allowed window")
+    _cleanup_nonces(now)
+    nonce_key = f"{request.session_id}:{request.nonce}"
+    if nonce_key in SEEN_NONCES:
+        raise HTTPException(status_code=409, detail="replay detected")
+    SEEN_NONCES[nonce_key] = now
+
+
+def _is_tool_allowed(token: str, tool: str) -> bool:
+    scopes = TOKEN_SCOPES.get(token, set())
+    return "*" in scopes or tool in scopes
 def sanitize_string(value: str) -> str:
     sanitized = re.sub(r"[;|&]", "", value)
     return sanitized[:1024]
@@ -171,6 +249,14 @@ class GatePolicy:
 
     def evaluate(self, request: GateRequest) -> GateDecision:
         if self.mode == "PUB":
+            approved, reason = False, "Tool Gate in PUB mode (execution disabled)."
+        elif request.confidence >= self.required_confidence or request.cosign:
+            approved, reason = True, "Approved by confidence threshold or co-sign."
+        else:
+            approved, reason = False, "Insufficient confidence; co-sign required."
+
+        entry = ledger.append(request.model_dump(), approved, reason)
+        return GateDecision(request_id=entry.request_id, approved=approved, status="approved" if approved else "blocked", reason=reason, ledger_hash=entry.entry_hash)
             approved = False
             reason = "Tool Gate in PUB mode (execution disabled)."
         elif request.confidence >= self.required_confidence or request.cosign:
@@ -199,6 +285,12 @@ signal.signal(signal.SIGHUP, _reload_tokens)
 async def metrics_middleware(request: Request, call_next):
     try:
         response = await call_next(request)
+        budget.record(response.status_code)
+        audit.log("info", f"{request.method} {request.url.path} -> {response.status_code}")
+        return response
+    except Exception:
+        budget.record(500)
+        audit.log("error", f"{request.method} {request.url.path} -> 500")
         _record_status(response.status_code)
         _maybe_restart()
         return response
@@ -210,6 +302,12 @@ async def metrics_middleware(request: Request, call_next):
 
 @app.get("/health")
 async def health() -> Dict[str, str]:
+    return {"status": "ok", "mode": policy.mode, "device": DEVICE, "trusted_tokens": str(len(TRUSTED_TOKENS))}
+
+
+@app.get("/metrics")
+async def metrics() -> Dict[str, float]:
+    return budget.snapshot()
     return {
         "status": "ok",
         "mode": policy.mode,
@@ -225,6 +323,7 @@ async def metrics() -> Dict[str, Any]:
 
 @app.post("/gate/request", response_model=GateDecision)
 async def gate_request(request: GateRequest) -> GateDecision:
+    request = request.model_copy(update={"tool": sanitize_string(request.tool), "actor_did": sanitize_string(request.actor_did), "session_id": sanitize_string(request.session_id), "rationale": sanitize_string(request.rationale) if request.rationale else None, "nonce": sanitize_string(request.nonce) if request.nonce else None})
     request = request.model_copy(
         update={
             "tool": sanitize_string(request.tool),
@@ -237,6 +336,9 @@ async def gate_request(request: GateRequest) -> GateDecision:
         raise HTTPException(status_code=400, detail="Tool name is required.")
     if request.session_id not in TRUSTED_TOKENS:
         raise HTTPException(status_code=401, detail="Session not trusted")
+    if not _is_tool_allowed(request.session_id, request.tool):
+        raise HTTPException(status_code=403, detail="Token not authorized for this tool")
+    _validate_nonce(request)
     if request.device is None:
         request = request.model_copy(update={"device": DEVICE})
     return policy.evaluate(request)
@@ -254,6 +356,7 @@ async def set_mode(change: ModeChange) -> Dict[str, str]:
 
 @app.get("/ledger/tail")
 async def ledger_tail(limit: int = 10) -> List[Dict[str, Any]]:
+    return [{"request_id": e.request_id, "timestamp": e.timestamp, "payload": e.payload, "approved": e.approved, "reason": e.reason, "prev_hash": e.prev_hash, "entry_hash": e.entry_hash} for e in ledger.tail(limit)]
     entries = ledger.tail(limit=limit)
     return [
         {

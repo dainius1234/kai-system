@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import os
+import time
+from pathlib import Path
+from typing import Any, Dict
 import logging
 import os
 import shutil
@@ -14,6 +18,17 @@ import httpx
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 
+from common.runtime import ErrorBudget, detect_device, setup_json_logger
+
+logger = setup_json_logger("heartbeat", os.getenv("LOG_PATH", "/tmp/heartbeat.json.log"))
+DEVICE = detect_device()
+logger.info("Running on %s.", DEVICE)
+
+app = FastAPI(title="Heartbeat Monitor", version="0.4.0")
+CHECK_INTERVAL = int(os.getenv("CHECK_INTERVAL", "60"))
+ALERT_WINDOW = int(os.getenv("ALERT_WINDOW", "300"))
+AUTO_SLEEP_SECONDS = int(os.getenv("AUTO_SLEEP_SECONDS", "1800"))
+SLEEP_COOLDOWN_SECONDS = int(os.getenv("SLEEP_COOLDOWN_SECONDS", "600"))
 
 LOG_PATH = os.getenv("LOG_PATH", "/tmp/heartbeat.json.log")
 handler = RotatingFileHandler(LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=30)
@@ -39,6 +54,11 @@ MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 EXECUTOR_LOG_PATH = Path(os.getenv("EXECUTOR_LOG_PATH", "/var/log/sovereign/executor.log"))
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
+
+last_tick = time.time()
+last_activity = time.time()
+last_sleep_action = 0.0
+budget = ErrorBudget(window_seconds=300)
 SERVICE_CONTAINER = os.getenv("SERVICE_CONTAINER", "heartbeat")
 ERROR_WINDOW_SECONDS = 300
 
@@ -105,6 +125,19 @@ def _scan_executor_log() -> int:
 
 
 async def _auto_sleep_check() -> None:
+    global last_sleep_action
+    now = time.time()
+    if now - last_activity <= AUTO_SLEEP_SECONDS:
+        return
+    if now - last_sleep_action <= SLEEP_COOLDOWN_SECONDS:
+        return
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"{MEMU_URL}/memory/compress")
+        logger.info("System sleeping")
+        last_sleep_action = now
+    except Exception:
+        logger.warning("System sleeping trigger failed")
     global last_activity
     if time.time() - last_activity > AUTO_SLEEP_SECONDS:
         try:
@@ -121,6 +154,10 @@ async def metrics_middleware(request: Request, call_next):
     last_activity = time.time()
     try:
         response = await call_next(request)
+        budget.record(response.status_code)
+        return response
+    except Exception:
+        budget.record(500)
         _record_status(response.status_code)
         _maybe_restart()
         return response
@@ -137,6 +174,8 @@ async def health() -> Dict[str, str]:
 
 
 @app.get("/metrics")
+async def metrics() -> Dict[str, float]:
+    return budget.snapshot()
 async def metrics() -> Dict[str, Any]:
     return _error_budget()
 
@@ -157,6 +196,11 @@ async def tick() -> Dict[str, str]:
 
 
 @app.get("/status")
+async def status() -> Dict[str, Any]:
+    await _auto_sleep_check()
+    elapsed = time.time() - last_tick
+    state = "healthy" if elapsed <= ALERT_WINDOW else "stale"
+    return {"status": state, "elapsed_seconds": f"{elapsed:.1f}", "check_interval": str(CHECK_INTERVAL), "alert_window": str(ALERT_WINDOW), "intrusion_hits": str(_scan_executor_log())}
 async def status() -> Dict[str, str]:
     await _auto_sleep_check()
     elapsed = time.time() - last_tick

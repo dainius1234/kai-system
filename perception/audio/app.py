@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import os
+import re
+from pathlib import Path
+from typing import Any, Dict
 import logging
 import os
 import re
@@ -14,6 +18,13 @@ from typing import Any, Deque, Dict, Tuple
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
+from common.runtime import ErrorBudget, detect_device, sanitize_string, setup_json_logger
+
+logger = setup_json_logger("perception-audio", os.getenv("LOG_PATH", "/tmp/perception-audio.json.log"))
+DEVICE = detect_device()
+logger.info("Running on %s.", DEVICE)
+
+app = FastAPI(title="Audio Service", version="0.4.0")
 LOG_PATH = os.getenv("LOG_PATH", "/tmp/perception-audio.json.log")
 handler = RotatingFileHandler(LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=30)
 handler.setFormatter(logging.Formatter('{"time":"%(asctime)s","level":"%(levelname)s","service":"%(name)s","msg":"%(message)s"}'))
@@ -35,6 +46,7 @@ HOTWORD = os.getenv("PORCUPINE_KEYWORD", "ara")
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "large-v3")
 INJECTION_RE = re.compile(r"(ignore|system|override|you are).*?", re.IGNORECASE)
 INJECTION_LOG = Path(os.getenv("INJECTION_LOG", "/tmp/injection_events.log"))
+budget = ErrorBudget(window_seconds=300)
 ERROR_WINDOW_SECONDS = 300
 SERVICE_CONTAINER = os.getenv("SERVICE_CONTAINER", "audio-service")
 _metrics: Deque[Tuple[float, int]] = deque()
@@ -83,6 +95,10 @@ def _maybe_restart() -> None:
 async def metrics_middleware(request: Request, call_next):
     try:
         response = await call_next(request)
+        budget.record(response.status_code)
+        return response
+    except Exception:
+        budget.record(500)
         _record_status(response.status_code)
         _maybe_restart()
         return response
@@ -94,6 +110,12 @@ async def metrics_middleware(request: Request, call_next):
 
 @app.get("/health")
 async def health() -> Dict[str, str]:
+    return {"status": "ok", "hotword": HOTWORD, "whisper_model": WHISPER_MODEL, "device": DEVICE}
+
+
+@app.get("/metrics")
+async def metrics() -> Dict[str, float]:
+    return budget.snapshot()
     return {
         "status": "ok",
         "hotword": HOTWORD,
