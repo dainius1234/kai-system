@@ -2,9 +2,17 @@ from __future__ import annotations
 
 import os
 from typing import Any, Dict, List
+import logging
+import os
+import shutil
+import subprocess
+import time
+from collections import deque
+from logging.handlers import RotatingFileHandler
+from typing import Any, Deque, Dict, Tuple
 
 import httpx
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 
 from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
 
@@ -17,6 +25,29 @@ TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 LEDGER_URL = os.getenv("LEDGER_URL", "postgresql://keeper:***@postgres:5432/sovereign")
 budget = ErrorBudget(window_seconds=300)
 audit = AuditStream("dashboard", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
+
+LOG_PATH = os.getenv("LOG_PATH", "/tmp/dashboard.json.log")
+handler = RotatingFileHandler(LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=30)
+handler.setFormatter(logging.Formatter('{"time":"%(asctime)s","level":"%(levelname)s","service":"%(name)s","msg":"%(message)s"}'))
+logger = logging.getLogger("dashboard")
+logger.setLevel(logging.INFO)
+logger.handlers = [handler]
+logger.propagate = False
+
+try:
+    import torch
+    DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+except Exception:
+    DEVICE = "cpu"
+logger.info("Running on %s.", DEVICE)
+
+app = FastAPI(title="Sovereign Dashboard", version="0.2.0")
+
+TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
+LEDGER_URL = os.getenv("LEDGER_URL", "postgresql://keeper:***@postgres:5432/sovereign")
+ERROR_WINDOW_SECONDS = 300
+SERVICE_CONTAINER = os.getenv("SERVICE_CONTAINER", "sovereign-dashboard")
+_metrics: Deque[Tuple[float, int]] = deque()
 
 NODES = {
     "tool-gate": f"{TOOL_GATE_URL}/health",
@@ -41,6 +72,34 @@ async def metrics_middleware(request: Request, call_next):
         budget.record(500)
         audit.log("error", f"{request.method} {request.url.path} -> 500")
         raise
+
+def _prune_metrics(now: float) -> None:
+    while _metrics and now - _metrics[0][0] > ERROR_WINDOW_SECONDS:
+        _metrics.popleft()
+
+
+def _record_status(code: int) -> None:
+    now = time.time()
+    _metrics.append((now, code))
+    _prune_metrics(now)
+
+
+def _error_budget() -> Dict[str, float]:
+    now = time.time()
+    _prune_metrics(now)
+    total = len(_metrics)
+    if total == 0:
+        return {"error_ratio": 0.0, "total": 0}
+    errors = sum(1 for _, code in _metrics if code in {429, 500, 408})
+    return {"error_ratio": errors / total, "total": total}
+
+
+def _maybe_restart() -> None:
+    budget = _error_budget()
+    if budget["total"] < 10:
+        return
+    if budget["error_ratio"] > 0.03 and shutil.which("docker"):
+        subprocess.run(["docker", "restart", SERVICE_CONTAINER], check=False)
 
 
 async def fetch_status() -> Dict[str, Dict[str, Any]]:
@@ -106,6 +165,34 @@ async def build_go_no_go_report() -> Dict[str, Any]:
         },
         "reasons": reasons,
     }
+async def fetch_ledger_size() -> int:
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(f"{TOOL_GATE_URL}/ledger/stats", timeout=2.0)
+        resp.raise_for_status()
+        payload = resp.json()
+    return int(payload.get("count", 0))
+
+
+async def fetch_memory_count() -> int:
+    memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(f"{memu_url}/memory/stats", timeout=2.0)
+        resp.raise_for_status()
+        payload = resp.json()
+    return int(payload.get("records", 0))
+
+
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    try:
+        response = await call_next(request)
+        _record_status(response.status_code)
+        _maybe_restart()
+        return response
+    except Exception:
+        _record_status(500)
+        _maybe_restart()
+        raise
 
 
 @app.get("/health")
@@ -116,6 +203,15 @@ async def health() -> Dict[str, str]:
 @app.get("/metrics")
 async def metrics() -> Dict[str, float]:
     return budget.snapshot()
+    return {
+        "status": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
+        "tool_gate_url": TOOL_GATE_URL,
+    }
+
+
+@app.get("/metrics")
+async def metrics() -> Dict[str, Any]:
+    return _error_budget()
 
 
 @app.get("/")
@@ -128,21 +224,15 @@ async def index() -> Dict[str, object]:
         memory_count = int((await client.get(f"{memu_url}/memory/stats", timeout=2.0)).json().get("records", 0))
 
     go_no_go = await build_go_no_go_report()
-    tool_gate_health = statuses.get("tool-gate", {}).get("details", {})
-    policy_mode = str(tool_gate_health.get("mode", "PUB")).upper()
-    core_ready = all(node in alive_nodes for node in ["tool-gate", "memu-core", "executor"]) and ledger_size >= 0 and memory_count >= 0
     return {
         "service": "dashboard",
         "status": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
         "tool_gate_url": TOOL_GATE_URL,
         "ledger_url": LEDGER_URL,
-        "core_ready": core_ready,
         "alive_nodes": alive_nodes,
         "node_status": statuses,
         "ledger_size": ledger_size,
         "memory_count": memory_count,
-        "policy_mode": policy_mode,
-        "device_summary": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
         "go_no_go": go_no_go,
     }
 
@@ -152,12 +242,9 @@ async def go_no_go() -> Dict[str, Any]:
     return await build_go_no_go_report()
 
 
-@app.get("/readiness")
-async def readiness() -> Dict[str, Any]:
-    payload = await index()
-    if not payload["core_ready"]:
-        raise HTTPException(status_code=503, detail={"status": "not_ready", "core_ready": False, "reasons": payload["go_no_go"]["reasons"]})
-    return {"status": "ready", "core_ready": True}
+        "ledger_size": await fetch_ledger_size(),
+        "memory_count": await fetch_memory_count(),
+    }
 
 
 if __name__ == "__main__":
