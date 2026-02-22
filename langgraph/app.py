@@ -1,19 +1,25 @@
 from __future__ import annotations
 
-import json
 import os
 import re
 import time
 import uuid
-from pathlib import Path
 from typing import Any, Dict, List, Optional
+import logging
+import os
+import re
+import shutil
+import subprocess
+import time
+from collections import deque
+from logging.handlers import RotatingFileHandler
+from typing import Any, Deque, Dict, Optional, Tuple
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
-from common.auth import sign_gate_request, sign_gate_request_bundle
-from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
+from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from config import build_saver
 from conviction import build_plan, low_conviction_feedback, score_conviction
@@ -38,10 +44,39 @@ INCOME_CSV = os.getenv("INCOME_CSV", f"{SELF_EMP_ROOT}/Accounting/income.csv")
 EXPENSES_LOG = os.getenv("EXPENSES_LOG", f"{SELF_EMP_ROOT}/Accounting/expenses.log")
 MEMU_BREAKER = CircuitBreaker(failure_threshold=int(os.getenv("MEMU_BREAKER_THRESHOLD", "3")), recovery_seconds=int(os.getenv("MEMU_BREAKER_RECOVERY", "30")))
 TOOL_GATE_BREAKER = CircuitBreaker(failure_threshold=int(os.getenv("TOOL_BREAKER_THRESHOLD", "3")), recovery_seconds=int(os.getenv("TOOL_BREAKER_RECOVERY", "30")))
-BREAKER_STATE_PATH = Path(os.getenv("BREAKER_STATE_PATH", "/tmp/langgraph_breakers.json"))
-CONVICTION_OVERRIDE_PATH = Path(os.getenv("CONVICTION_OVERRIDE_PATH", "/tmp/conviction_overrides.txt"))
-MEMU_ERROR_GUARD = ErrorBudgetCircuitBreaker(warn_ratio=float(os.getenv("MEMU_WARN_RATIO", "0.05")), open_ratio=float(os.getenv("MEMU_OPEN_RATIO", "0.10")), window_seconds=300, recovery_seconds=int(os.getenv("MEMU_GUARD_RECOVERY", "60")))
-TOOL_ERROR_GUARD = ErrorBudgetCircuitBreaker(warn_ratio=float(os.getenv("TOOL_WARN_RATIO", "0.05")), open_ratio=float(os.getenv("TOOL_OPEN_RATIO", "0.10")), window_seconds=300, recovery_seconds=int(os.getenv("TOOL_GUARD_RECOVERY", "60")))
+
+
+def infer_specialist_fallback(user_input: str, task_hint: Optional[str]) -> str:
+    combined = f"{user_input} {task_hint or ''}".lower()
+    if any(token in combined for token in ("image", "vision", "camera", "diagram")):
+        return "Qwen-VL"
+    if any(token in combined for token in ("plan", "reason", "policy", "risk")):
+        return "DeepSeek-V4"
+    return "Kimi-2.5"
+
+LOG_PATH = os.getenv("LOG_PATH", "/tmp/langgraph.json.log")
+handler = RotatingFileHandler(LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=30)
+handler.setFormatter(logging.Formatter('{"time":"%(asctime)s","level":"%(levelname)s","service":"%(name)s","msg":"%(message)s"}'))
+logger = logging.getLogger("langgraph")
+logger.setLevel(logging.INFO)
+logger.handlers = [handler]
+logger.propagate = False
+
+try:
+    import torch
+    DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+except Exception:
+    DEVICE = "cpu"
+logger.info("Running on %s.", DEVICE)
+
+app = FastAPI(title="LangGraph Orchestrator", version="0.2.0")
+
+MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
+TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
+INJECTION_RE = re.compile(r"(ignore|system|override|you are).*?", re.IGNORECASE)
+ERROR_WINDOW_SECONDS = 300
+SERVICE_CONTAINER = os.getenv("SERVICE_CONTAINER", "langgraph")
+_metrics: Deque[Tuple[float, int]] = deque()
 
 
 class GraphRequest(BaseModel):
@@ -62,50 +97,6 @@ class EpisodeRequest(BaseModel):
     days: int = 7
 
 
-def _restore_breakers() -> None:
-    if not BREAKER_STATE_PATH.exists():
-        return
-    try:
-        payload = json.loads(BREAKER_STATE_PATH.read_text(encoding="utf-8"))
-        for breaker, key in ((MEMU_BREAKER, "memu"), (TOOL_GATE_BREAKER, "tool_gate")):
-            state = payload.get(key, {})
-            breaker.state = str(state.get("state", breaker.state))
-            breaker.failures = int(state.get("failures", breaker.failures))
-            breaker.opened_at = float(state.get("opened_at", breaker.opened_at))
-    except Exception:
-        logger.warning("Failed to restore breaker state")
-
-
-def _persist_breakers() -> None:
-    payload = {
-        "memu": {**MEMU_BREAKER.snapshot(), "opened_at": MEMU_BREAKER.opened_at},
-        "tool_gate": {**TOOL_GATE_BREAKER.snapshot(), "opened_at": TOOL_GATE_BREAKER.opened_at},
-    }
-    try:
-        BREAKER_STATE_PATH.write_text(json.dumps(payload), encoding="utf-8")
-    except Exception:
-        logger.warning("Failed to persist breaker state")
-
-
-def load_conviction_overrides() -> List[str]:
-    if not CONVICTION_OVERRIDE_PATH.exists():
-        return []
-    return [line.strip().lower() for line in CONVICTION_OVERRIDE_PATH.read_text(encoding="utf-8").splitlines() if line.strip()]
-
-
-def is_conviction_override(text: str) -> bool:
-    candidate = text.lower()
-    return any(rule in candidate for rule in load_conviction_overrides())
-
-
-def infer_specialist_fallback(user_input: str, task_hint: Optional[str]) -> str:
-    combined = f"{user_input} {task_hint or ''}".lower()
-    if any(token in combined for token in ("image", "vision", "camera", "diagram")):
-        return "Qwen-VL"
-    if any(token in combined for token in ("plan", "reason", "policy", "risk")):
-        return "DeepSeek-V4"
-    return "Kimi-2.5"
-
 
 async def fetch_offline_chunks(query: str, user_id: str, top_k: int = 5) -> List[Dict[str, Any]]:
     try:
@@ -122,6 +113,8 @@ async def fetch_offline_chunks(query: str, user_id: str, top_k: int = 5) -> List
         return []
 
 
+
+
 def strategy_node(user_input: str) -> Dict[str, object]:
     income_total = load_income_total(INCOME_CSV)
     expenses_lines = load_expenses(EXPENSES_LOG)
@@ -135,6 +128,7 @@ def strategy_node(user_input: str) -> Dict[str, object]:
     }
 
 
+
 async def maybe_alert_mtd_proximity(strategy: Dict[str, object]) -> None:
     th = strategy.get("thresholds", {})
     income = float(strategy.get("income_total", 0.0))
@@ -146,7 +140,6 @@ async def maybe_alert_mtd_proximity(strategy: Dict[str, object]) -> None:
                 await client.post(TELEGRAM_ALERT_URL, json={"text": f"Alert: £{max(left,0):.0f} left till MTD — prep GnuCash"})
         except Exception:
             logger.warning("Failed to deliver MTD proximity alert")
-
 
 async def maybe_alert_low_conviction_average() -> None:
     global last_low_conviction_alert
@@ -163,6 +156,49 @@ async def maybe_alert_low_conviction_average() -> None:
                 await client.post(TELEGRAM_ALERT_URL, json={"text": f"Kai needs tuning: 7-day conviction average={avg_score:.2f}/10"})
         except Exception:
             logger.warning("Failed to deliver low-conviction alert")
+def sanitize_string(value: str) -> str:
+    sanitized = re.sub(r"[;|&]", "", value)
+    return sanitized[:1024]
+
+
+def _prune_metrics(now: float) -> None:
+    while _metrics and now - _metrics[0][0] > ERROR_WINDOW_SECONDS:
+        _metrics.popleft()
+
+
+def _record_status(code: int) -> None:
+    now = time.time()
+    _metrics.append((now, code))
+    _prune_metrics(now)
+
+
+def _error_budget() -> Dict[str, float]:
+    now = time.time()
+    _prune_metrics(now)
+    total = len(_metrics)
+    if total == 0:
+        return {"error_ratio": 0.0, "total": 0}
+    errors = sum(1 for _, code in _metrics if code in {429, 500, 408})
+    return {"error_ratio": errors / total, "total": total}
+
+
+def _maybe_restart() -> None:
+    budget = _error_budget()
+    if budget["total"] < 10:
+        return
+    if budget["error_ratio"] > 0.03 and shutil.which("docker"):
+        subprocess.run(["docker", "restart", SERVICE_CONTAINER], check=False)
+
+
+def build_plan(user_input: str, specialist: str) -> Dict[str, Any]:
+    return {
+        "specialist": specialist,
+        "summary": f"Route task to {specialist} for analysis.",
+        "steps": [
+            {"action": "analyze", "input": user_input},
+            {"action": "propose", "output": "draft"},
+        ],
+    }
 
 
 @app.middleware("http")
@@ -175,25 +211,37 @@ async def metrics_middleware(request: Request, call_next):
     except Exception:
         budget.record(500)
         audit.log("error", f"{request.method} {request.url.path} -> 500")
+        _record_status(response.status_code)
+        _maybe_restart()
+        return response
+    except Exception:
+        _record_status(500)
+        _maybe_restart()
         raise
 
 
 @app.get("/health")
 async def health() -> Dict[str, Any]:
-    return {"status": "ok", "device": DEVICE, "dependencies": {"memu": MEMU_BREAKER.snapshot(), "tool_gate": TOOL_GATE_BREAKER.snapshot()}, "error_guards": {"memu": MEMU_ERROR_GUARD.snapshot(), "tool_gate": TOOL_ERROR_GUARD.snapshot()}}
+    return {"status": "ok", "device": DEVICE, "dependencies": {"memu": MEMU_BREAKER.snapshot(), "tool_gate": TOOL_GATE_BREAKER.snapshot()}}
 
 
 @app.get("/metrics")
 async def metrics() -> Dict[str, float]:
     return budget.snapshot()
+async def health() -> Dict[str, str]:
+    return {"status": "ok", "device": DEVICE}
+
+
+@app.get("/metrics")
+async def metrics() -> Dict[str, Any]:
+    return _error_budget()
 
 
 @app.post("/run", response_model=GraphResponse)
 async def run_graph(request: GraphRequest) -> GraphResponse:
     if not request.user_input:
         raise HTTPException(status_code=400, detail="user_input is required")
-    override_active = is_conviction_override(request.user_input)
-    if INJECTION_RE.search(request.user_input) and not override_active:
+    if INJECTION_RE.search(request.user_input):
         raise HTTPException(status_code=400, detail="prompt injection pattern blocked")
     if request.device not in {"cpu", "cuda"}:
         raise HTTPException(status_code=400, detail="device must be cpu or cuda")
@@ -207,7 +255,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     )
 
     specialist = infer_specialist_fallback(request.user_input, request.task_hint)
-    if MEMU_BREAKER.allow() and MEMU_ERROR_GUARD.allow():
+    if MEMU_BREAKER.allow():
         try:
             async with httpx.AsyncClient() as client:
                 route_response = await client.post(
@@ -216,13 +264,11 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
                     timeout=5.0,
                 )
             route_response.raise_for_status()
-            MEMU_ERROR_GUARD.record(route_response.status_code)
-            specialist = route_response.json().get("specialist", specialist)
+            payload = route_response.json()
+            specialist = payload.get("specialist", specialist)
             MEMU_BREAKER.record_success()
         except httpx.HTTPError:
-            MEMU_ERROR_GUARD.record(500)
             MEMU_BREAKER.record_failure()
-            _persist_breakers()
             logger.warning("MEMU route unavailable; using local specialist fallback")
     else:
         logger.warning("MEMU circuit open; using local specialist fallback")
@@ -242,21 +288,15 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
         plan["rethink_count"] = rethink_count
         conviction = score_conviction(prompt, plan, chunks, rethink_count)
 
-    if override_active:
-        plan["conviction_override"] = "operator override matched"
-    if conviction < MIN_CONVICTION and not override_active:
+    if conviction < MIN_CONVICTION:
         plan["summary"] = f"Conviction too low ({conviction}/10). Need more data — suggest file or clarify?"
 
-    plan["strategy"] = strategy_node(request.user_input)
+    strategy = strategy_node(request.user_input)
+    plan["strategy"] = strategy
 
     gate_decision = None
     if request.task_hint:
-        if TOOL_GATE_BREAKER.allow() and TOOL_ERROR_GUARD.allow():
-            nonce = str(uuid.uuid4())
-            ts = time.time()
-            signature = sign_gate_request(actor_did="langgraph", session_id=request.session_id, tool=request.task_hint, nonce=nonce, ts=ts)
-            dual_sign = os.getenv("TOOL_GATE_DUAL_SIGN", "false").lower() in {"1", "true", "yes"}
-            signatures = sign_gate_request_bundle(actor_did="langgraph", session_id=request.session_id, tool=request.task_hint, nonce=nonce, ts=ts) if dual_sign else []
+        if TOOL_GATE_BREAKER.allow():
             try:
                 async with httpx.AsyncClient() as client:
                     gate_resp = await client.post(
@@ -268,33 +308,27 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
                             "actor_did": "langgraph",
                             "session_id": request.session_id,
                             "device": request.device,
-                            "nonce": nonce,
-                            "ts": ts,
-                            "signature": signature,
-                            "signatures": signatures,
+                            "nonce": str(uuid.uuid4()),
+                            "ts": time.time(),
                         },
                         timeout=5.0,
                     )
                 gate_resp.raise_for_status()
-                TOOL_ERROR_GUARD.record(gate_resp.status_code)
                 gate_decision = gate_resp.json()
                 TOOL_GATE_BREAKER.record_success()
             except httpx.HTTPStatusError as exc:
-                TOOL_ERROR_GUARD.record(int(exc.response.status_code))
                 TOOL_GATE_BREAKER.record_failure()
-                _persist_breakers()
                 gate_decision = {"approved": False, "status": "blocked", "reason": f"tool-gate rejected request ({exc.response.status_code})"}
             except httpx.HTTPError:
-                TOOL_ERROR_GUARD.record(500)
                 TOOL_GATE_BREAKER.record_failure()
-                _persist_breakers()
                 gate_decision = {"approved": False, "status": "unavailable", "reason": "tool-gate unavailable"}
         else:
             gate_decision = {"approved": False, "status": "blocked", "reason": "tool-gate circuit open"}
 
+    episode_id = str(uuid.uuid4())
     saver.save_episode(
         {
-            "episode_id": str(uuid.uuid4()),
+            "episode_id": episode_id,
             "user_id": "keeper",
             "ts": time.time(),
             "input": request.user_input,
@@ -307,8 +341,40 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     )
     saver.decay("keeper", days=30, score_threshold=0.2)
     await maybe_alert_low_conviction_average()
-    await maybe_alert_mtd_proximity(plan["strategy"])
-    _persist_breakers()
+    await maybe_alert_mtd_proximity(strategy)
+    async with httpx.AsyncClient() as client:
+        route_response = await client.post(
+            f"{MEMU_URL}/route",
+            json={
+                "query": request.user_input,
+                "session_id": request.session_id,
+                "timestamp": "now",
+            },
+            timeout=5.0,
+        )
+    route_response.raise_for_status()
+    route_payload = route_response.json()
+    specialist = route_payload["specialist"]
+
+    plan = build_plan(request.user_input, specialist)
+
+    gate_decision = None
+    if request.task_hint:
+        async with httpx.AsyncClient() as client:
+            gate_resp = await client.post(
+                f"{TOOL_GATE_URL}/gate/request",
+                json={
+                    "tool": request.task_hint,
+                    "params": {"plan": plan},
+                    "confidence": 0.7,
+                    "actor_did": "langgraph",
+                    "session_id": request.session_id,
+                    "device": request.device,
+                },
+                timeout=5.0,
+            )
+        gate_resp.raise_for_status()
+        gate_decision = gate_resp.json()
 
     return GraphResponse(specialist=specialist, plan=plan, gate_decision=gate_decision)
 
@@ -320,8 +386,6 @@ async def recall_last_episode(req: EpisodeRequest) -> Dict[str, Any]:
     raw_context = "\n".join(f"[{e.get('ts')}] IN={e.get('input')} OUT={e.get('output')} C={e.get('final_conviction')}" for e in episodes)
     return {"status": "ok", "count": len(episodes), "context": raw_context, "episodes": episodes}
 
-
-_restore_breakers()
 
 if __name__ == "__main__":
     import uvicorn
