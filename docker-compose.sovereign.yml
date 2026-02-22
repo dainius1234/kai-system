@@ -9,7 +9,7 @@ x-service-defaults: &service_defaults
     - no-new-privileges:true
   tmpfs:
     - /tmp:size=64M,noexec,nosuid
-  restart: unless-stopped
+restart: unless-stopped
   deploy:
     resources:
       limits:
@@ -51,7 +51,7 @@ services:
       TS_STATE_DIR: /var/lib/tailscale
       TS_EXTRA_ARGS: --ssh --accept-routes=true
       TS_HOSTNAME: sovereign-core
-    command: sh -c "tailscaled --state=/var/lib/tailscale/tailscaled.state & sleep 2 && tailscale up --authkey=${TS_AUTHKEY} --hostname=${TS_HOSTNAME} --ssh --accept-routes=true && wait"
+      command: sh -c "tailscaled --state=/var/lib/tailscale/tailscaled.state & sleep 2 && tailscale up --authkey=${TS_AUTHKEY} --hostname=${TS_HOSTNAME} --ssh --accept-routes=true && wait"
 
 
   vault:
@@ -129,6 +129,7 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.16
+    command: tailscaled --state=/var/lib/tailscale/tailscaled.state
 
   tool-gate:
     <<: *service_defaults
@@ -161,6 +162,11 @@ services:
   memu-core:
     <<: *service_defaults
     read_only: true
+    depends_on:
+      - postgres
+
+  memu-core:
+    <<: *service_defaults
     build: ./memu-core
     container_name: sovereign-memu-core
     hostname: memu-core
@@ -193,6 +199,12 @@ services:
     build: ./executor
     runtime: gvisor
     restart: always
+    depends_on:
+      - postgres
+      - tool-gate
+
+  executor:
+    build: ./executor
     container_name: executor
     hostname: executor
     user: "1000:1000"
@@ -234,6 +246,9 @@ services:
         max_attempts: 5
         window: 300s
 
+    depends_on:
+      - tool-gate
+      - memu-core
 
   dashboard:
     <<: *service_defaults
@@ -265,6 +280,10 @@ services:
       timeout: 5s
       retries: 3
 
+    depends_on:
+      - tool-gate
+      - memu-core
+      - executor
 
   langgraph:
     <<: *service_defaults
@@ -302,6 +321,9 @@ services:
   redis:
     image: redis:7-alpine
     command: redis-server --appendonly yes --save ""
+
+  redis:
+    image: redis:7-alpine
     container_name: sovereign-redis
     hostname: redis
     networks:
@@ -391,6 +413,9 @@ volumes:
 networks:
   sovereign-net:
     internal: true
+
+networks:
+  sovereign-net:
     driver: bridge
     ipam:
       config:

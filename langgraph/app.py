@@ -5,6 +5,15 @@ import re
 import time
 import uuid
 from typing import Any, Dict, List, Optional
+import logging
+import os
+import re
+import shutil
+import subprocess
+import time
+from collections import deque
+from logging.handlers import RotatingFileHandler
+from typing import Any, Deque, Dict, Optional, Tuple
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
@@ -44,6 +53,30 @@ def infer_specialist_fallback(user_input: str, task_hint: Optional[str]) -> str:
     if any(token in combined for token in ("plan", "reason", "policy", "risk")):
         return "DeepSeek-V4"
     return "Kimi-2.5"
+
+LOG_PATH = os.getenv("LOG_PATH", "/tmp/langgraph.json.log")
+handler = RotatingFileHandler(LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=30)
+handler.setFormatter(logging.Formatter('{"time":"%(asctime)s","level":"%(levelname)s","service":"%(name)s","msg":"%(message)s"}'))
+logger = logging.getLogger("langgraph")
+logger.setLevel(logging.INFO)
+logger.handlers = [handler]
+logger.propagate = False
+
+try:
+    import torch
+    DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+except Exception:
+    DEVICE = "cpu"
+logger.info("Running on %s.", DEVICE)
+
+app = FastAPI(title="LangGraph Orchestrator", version="0.2.0")
+
+MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
+TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
+INJECTION_RE = re.compile(r"(ignore|system|override|you are).*?", re.IGNORECASE)
+ERROR_WINDOW_SECONDS = 300
+SERVICE_CONTAINER = os.getenv("SERVICE_CONTAINER", "langgraph")
+_metrics: Deque[Tuple[float, int]] = deque()
 
 
 class GraphRequest(BaseModel):
@@ -123,6 +156,49 @@ async def maybe_alert_low_conviction_average() -> None:
                 await client.post(TELEGRAM_ALERT_URL, json={"text": f"Kai needs tuning: 7-day conviction average={avg_score:.2f}/10"})
         except Exception:
             logger.warning("Failed to deliver low-conviction alert")
+def sanitize_string(value: str) -> str:
+    sanitized = re.sub(r"[;|&]", "", value)
+    return sanitized[:1024]
+
+
+def _prune_metrics(now: float) -> None:
+    while _metrics and now - _metrics[0][0] > ERROR_WINDOW_SECONDS:
+        _metrics.popleft()
+
+
+def _record_status(code: int) -> None:
+    now = time.time()
+    _metrics.append((now, code))
+    _prune_metrics(now)
+
+
+def _error_budget() -> Dict[str, float]:
+    now = time.time()
+    _prune_metrics(now)
+    total = len(_metrics)
+    if total == 0:
+        return {"error_ratio": 0.0, "total": 0}
+    errors = sum(1 for _, code in _metrics if code in {429, 500, 408})
+    return {"error_ratio": errors / total, "total": total}
+
+
+def _maybe_restart() -> None:
+    budget = _error_budget()
+    if budget["total"] < 10:
+        return
+    if budget["error_ratio"] > 0.03 and shutil.which("docker"):
+        subprocess.run(["docker", "restart", SERVICE_CONTAINER], check=False)
+
+
+def build_plan(user_input: str, specialist: str) -> Dict[str, Any]:
+    return {
+        "specialist": specialist,
+        "summary": f"Route task to {specialist} for analysis.",
+        "steps": [
+            {"action": "analyze", "input": user_input},
+            {"action": "propose", "output": "draft"},
+        ],
+    }
 
 
 @app.middleware("http")
@@ -135,6 +211,12 @@ async def metrics_middleware(request: Request, call_next):
     except Exception:
         budget.record(500)
         audit.log("error", f"{request.method} {request.url.path} -> 500")
+        _record_status(response.status_code)
+        _maybe_restart()
+        return response
+    except Exception:
+        _record_status(500)
+        _maybe_restart()
         raise
 
 
@@ -146,6 +228,13 @@ async def health() -> Dict[str, Any]:
 @app.get("/metrics")
 async def metrics() -> Dict[str, float]:
     return budget.snapshot()
+async def health() -> Dict[str, str]:
+    return {"status": "ok", "device": DEVICE}
+
+
+@app.get("/metrics")
+async def metrics() -> Dict[str, Any]:
+    return _error_budget()
 
 
 @app.post("/run", response_model=GraphResponse)
@@ -253,6 +342,39 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     saver.decay("keeper", days=30, score_threshold=0.2)
     await maybe_alert_low_conviction_average()
     await maybe_alert_mtd_proximity(strategy)
+    async with httpx.AsyncClient() as client:
+        route_response = await client.post(
+            f"{MEMU_URL}/route",
+            json={
+                "query": request.user_input,
+                "session_id": request.session_id,
+                "timestamp": "now",
+            },
+            timeout=5.0,
+        )
+    route_response.raise_for_status()
+    route_payload = route_response.json()
+    specialist = route_payload["specialist"]
+
+    plan = build_plan(request.user_input, specialist)
+
+    gate_decision = None
+    if request.task_hint:
+        async with httpx.AsyncClient() as client:
+            gate_resp = await client.post(
+                f"{TOOL_GATE_URL}/gate/request",
+                json={
+                    "tool": request.task_hint,
+                    "params": {"plan": plan},
+                    "confidence": 0.7,
+                    "actor_did": "langgraph",
+                    "session_id": request.session_id,
+                    "device": request.device,
+                },
+                timeout=5.0,
+            )
+        gate_resp.raise_for_status()
+        gate_decision = gate_resp.json()
 
     return GraphResponse(specialist=specialist, plan=plan, gate_decision=gate_decision)
 
