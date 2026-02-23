@@ -17,18 +17,6 @@ docs/               # Implementation plans and hardening runbooks
 
 ---
 
-## 🚀 Roadmap
-
-### Phase 0 – Core Skeleton  
-- Repo scaffold, EventBus, config loader, Docker + CI.  
-- Kraken adapter + BookBuilder.  
-- Basic Dash UI with kill-switch.  
-
-### Phase 1 – Microstructure Battlefield  
-- Multi-venue L2 heatmaps.  
-- Iceberg/spoof detection.  
-- Stop clusters + BOS/CHOCH.  
-- Persistent storage for replay.  
 
 ---
 
