@@ -5,6 +5,9 @@ from typing import Any, Dict, List
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 
 from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
 
@@ -13,6 +16,13 @@ DEVICE = detect_device()
 logger.info("Running on %s.", DEVICE)
 
 app = FastAPI(title="Sovereign Dashboard", version="0.4.0")
+
+# mount static UI stub
+app.mount("/static", StaticFiles(directory="dashboard/static"), name="static")
+
+@app.get("/ui")
+async def ui_index():
+    return RedirectResponse(url="/static/index.html")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 LEDGER_URL = os.getenv("LEDGER_URL", "postgresql://keeper:***@postgres:5432/sovereign")
 budget = ErrorBudget(window_seconds=300)
@@ -150,6 +160,35 @@ async def index() -> Dict[str, object]:
 @app.get("/go-no-go")
 async def go_no_go() -> Dict[str, Any]:
     return await build_go_no_go_report()
+
+
+@app.get("/ui")
+async def ui() -> HTMLResponse:
+    # minimal single-page status dashboard
+    html = """<!doctype html>
+<html><head><title>Sovereign Dashboard</title>
+<style>body{font-family:sans-serif;} .node{display:inline-block;padding:0.5em;margin:0.2em;border:1px solid #333;border-radius:4px;} .ok{background:#8f8;} .down{background:#f88;} </style>
+</head><body>
+<h1>Sovereign Core Status</h1>
+<div id="nodes"></div>
+<script>
+async function refresh(){
+  const r = await fetch('/');
+  if(!r.ok){document.body.innerHTML='<p>unable to fetch status</p>';return;}
+  const data = await r.json();
+  const container=document.getElementById('nodes');
+  container.innerHTML='';
+  for(const [name,st] of Object.entries(data.node_status||{})){
+    const div=document.createElement('div');div.className='node '+(st.status==='ok'?'ok':'down');
+    div.textContent=name+' '+st.status;
+    container.appendChild(div);
+  }
+}
+setInterval(refresh,2000);
+refresh();
+</script>
+</body></html>"""
+    return HTMLResponse(html)
 
 
 @app.get("/readiness")

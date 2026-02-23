@@ -1,0 +1,151 @@
+version: '3.8'
+
+networks:
+  sovereign-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: sovereign
+      POSTGRES_USER: keeper
+      POSTGRES_PASSWORD: "localdev"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data:rw
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.2
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.4
+
+  tool-gate:
+    build: ./tool-gate
+    environment:
+      MODE: "WORK"
+      REQUIRED_CONFIDENCE: "0.7"
+    ports:
+      - "8000:8000"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.3
+    depends_on:
+      - postgres
+
+  memu-core:
+    build: ./memu-core
+    environment:
+      MEMU_URL: http://memu-core:8001
+      MAX_MEMORY_RECORDS: "5000"
+    ports:
+      - "8001:8001"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.5
+    depends_on:
+      - redis
+      - tool-gate
+
+  heartbeat:
+    build: ./heartbeat
+    environment:
+      MEMU_URL: http://memu-core:8001
+      CHECK_INTERVAL: "60"
+      ALERT_WINDOW: "300"
+    ports:
+      - "8010:8010"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.6
+    depends_on:
+      - memu-core
+
+  dashboard:
+    build: ./dashboard
+    environment:
+      TOOL_GATE_URL: http://tool-gate:8000
+      MEMU_URL: http://memu-core:8001
+      LANGGRAPH_URL: http://langgraph:8007
+      EXECUTOR_URL: http://executor:8002
+      HEARTBEAT_URL: http://heartbeat:8010
+    ports:
+      - "8080:8080"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.7
+    depends_on:
+      - tool-gate
+      - memu-core
+      - heartbeat
+
+  langgraph:
+    build: ./langgraph
+    ports:
+      - "8007:8007"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.8
+    depends_on:
+      - memu-core
+
+  executor:
+    build: ./executor
+    ports:
+      - "8002:8002"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.9
+    depends_on:
+      - tool-gate
+
+  audio-service:
+    build: ./perception/audio
+    ports:
+      - "8030:8030"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.10
+
+  camera-service:
+    build: ./perception/camera
+    ports:
+      - "8040:8040"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.11
+
+  grok:
+    build: ./grok
+    ports:
+      - "8090:8090"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.12
+
+  tts-service:
+    build: ./output/tts
+    ports:
+      - "8030:8030"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.13
+
+  avatar-service:
+    build: ./output/avatar
+    ports:
+      - "8081:8081"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.14
+
+  # additional placeholder services (sandboxes) can be added here
+
+volumes:
+  postgres_data:

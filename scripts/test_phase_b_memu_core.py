@@ -11,6 +11,9 @@ from fastapi import HTTPException
 
 def load_module():
     root = Path(__file__).resolve().parents[1]
+    # add workspace root for importing common and other packages
+    sys.path.insert(0, str(root))
+    # also ensure memu-core itself is on path
     sys.path.insert(0, str(root / "memu-core"))
     module_path = root / "memu-core" / "app.py"
     spec = importlib.util.spec_from_file_location("memu_phase_b_app", module_path)

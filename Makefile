@@ -1,4 +1,4 @@
-.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate
+.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke
 
 go_no_go:
 	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py langgraph/app.py executor/app.py
@@ -59,6 +59,48 @@ test-auth-hmac:
 test-phase-b-memu:
 	PYTHONPATH=. python scripts/test_phase_b_memu_core.py
 
+test-memu-pg:
+	PYTHONPATH=. python scripts/test_memu_pgvector.py
+
+# audio & camera smoke
+
+test-audio:
+	PYTHONPATH=. python scripts/test_audio_service.py
+
+test-camera:
+	PYTHONPATH=. python scripts/test_camera_service.py
+
+test-executor:
+	PYTHONPATH=. python scripts/test_executor_service.py
+
+test-langgraph:
+	PYTHONPATH=. python scripts/test_langgraph_service.py
+
+test-grok:
+	PYTHONPATH=. python grok/test_grok.py
+
+test-tts:
+	PYTHONPATH=. python scripts/test_tts_service.py
+
+test-avatar:
+	PYTHONPATH=. python scripts/test_avatar_service.py
+
+# wrapper to run all core memory tests
+test-core: test-phase-b-memu test-memu-pg test-dashboard-ui test-audio test-camera test-executor test-langgraph test-grok test-tts test-avatar
+
+test-dashboard-ui:
+	PYTHONPATH=. python scripts/test_dashboard_ui.py
+
+test-integration:
+	python3 scripts/test_core_integration.py
+
+# bring up full-stack composition
+full-up:
+	docker compose -f docker-compose.full.yml up -d --build
+
+full-down:
+	docker compose -f docker-compose.full.yml down
+
 
 health-sweep:
 	bash scripts/health_sweep.sh
@@ -82,6 +124,23 @@ merge-gate:
 
 phase1-closure:
 	PYTHONPATH=. python scripts/phase1_closure_check.py
+
+# bring up the minimal sovereign AI core stack for development
+core-up:
+	docker compose -f docker-compose.minimal.yml up -d --build
+
+# tear down the minimal core stack
+core-down:
+	docker compose -f docker-compose.minimal.yml down
+
+# run quick health checks against the core services
+core-smoke:
+	python3 scripts/smoke_core.py
+
+# create database schema for memu-core when using postgres
+init-memu-db:
+	PG_URI=$${PG_URI:-postgresql://keeper:localdev@postgres:5432/sovereign} \
+	python3 scripts/init_memu_db.py
 
 
 paper-backup:

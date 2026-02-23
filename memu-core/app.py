@@ -13,7 +13,39 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
-from lakefs_client import LakeFSClient, VersionCommit
+
+# lakefs client is optional; provide a simple in-memory stub if unavailable
+try:
+    from lakefs_client import LakeFSClient, VersionCommit
+except Exception:  # pragma: no cover - stub if package missing
+    class VersionCommit:
+        def __init__(self, commit_id: str = ""):
+            self.commit_id = commit_id
+
+    class LakeFSClient:
+        def __init__(self) -> None:
+            self._commits: list[dict] = []
+
+        def create_branch(self, src: str, name: str) -> str:
+            return name
+
+        def put_branch_state(self, branch: str, records: list, state: dict, msg: str) -> VersionCommit:
+            cid = f"commit-{len(self._commits)}"
+            self._commits.append({"branch": branch, "records": records, "state": state, "msg": msg, "id": cid})
+            return VersionCommit(commit_id=cid)
+
+        def list_commits(self) -> list:
+            return self._commits
+
+        def revert(self, commit_id: str) -> None:
+            # no-op stub
+            pass
+
+        def latest_main(self) -> dict:
+            if self._commits:
+                latest = self._commits[-1]
+                return {"records": latest.get("records", []), "state": latest.get("state", {})}
+            return {"records": [], "state": {}}
 
 logger = setup_json_logger("memu-core", os.getenv("LOG_PATH", "/tmp/memu-core.json.log"))
 DEVICE = detect_device()
@@ -62,6 +94,125 @@ class MemoryRecord(BaseModel):
 
 
 SPECIALISTS = ["DeepSeek-V4", "Kimi-2.5", "Qwen-VL"]
+
+
+# persistent vector store using PostgreSQL + pgvector
+class PGVectorStore:
+    def __init__(self) -> None:
+        import psycopg2
+        from psycopg2.extras import Json
+
+        self.conn = psycopg2.connect(os.getenv("PG_URI", "postgresql://keeper:localdev@postgres:5432/sovereign"))
+        self._init_schema()
+        self.vc = LakeFSClient()
+        self._state: Dict[str, Any] = {}
+
+    def _init_schema(self) -> None:
+        with self.conn.cursor() as cur:
+            cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS memories (
+                    id text PRIMARY KEY,
+                    timestamp text,
+                    event_type text,
+                    content jsonb,
+                    embedding vector,
+                    relevance float,
+                    pinned bool
+                );
+                """
+            )
+        self.conn.commit()
+
+    def insert(self, record: MemoryRecord) -> VersionCommit:
+        # store record in Postgres and enforce retention
+        with self.conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO memories (id, timestamp, event_type, content, embedding, relevance, pinned)\
+                 VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id) DO NOTHING",
+                (
+                    record.id,
+                    record.timestamp,
+                    record.event_type,
+                    Json(record.content),
+                    record.embedding,
+                    record.relevance,
+                    record.pinned,
+                ),
+            )
+        self.conn.commit()
+        # trim oldest entries if over limit
+        if MAX_MEMORY_RECORDS > 0:
+            with self.conn.cursor() as cur:
+                cur.execute("SELECT id FROM memories ORDER BY timestamp ASC")
+                ids = [r[0] for r in cur.fetchall()]
+            if len(ids) > MAX_MEMORY_RECORDS:
+                to_delete = ids[: len(ids) - MAX_MEMORY_RECORDS]
+                with self.conn.cursor() as cur:
+                    cur.execute("DELETE FROM memories WHERE id = ANY(%s)", (to_delete,))
+                self.conn.commit()
+        # commit to version control for state awareness, using same pattern as memory store
+        branch = self.vc.create_branch("main", f"update-keeper-{int(time.time())}")
+        commit = self.vc.put_branch_state(branch, [], self._state, f"update: user_id=keeper, ts={int(time.time())}")
+        return commit
+
+    def search(self, top_k: int, query: Optional[str] = None) -> List[MemoryRecord]:
+        # if query is provided we perform embedding similarity, otherwise return
+        # the most recent records (by timestamp) up to top_k.
+        if query is None:
+            with self.conn.cursor() as cur:
+                cur.execute("SELECT id, timestamp, event_type, content, embedding, relevance, pinned FROM memories ORDER BY timestamp DESC LIMIT %s", (top_k,))
+                rows = cur.fetchall()
+        else:
+            emb = generate_embedding(query)
+            with self.conn.cursor() as cur:
+                # using pgvector similarity operator <=>
+                cur.execute(
+                    "SELECT id, timestamp, event_type, content, embedding, relevance, pinned "
+                    "FROM memories ORDER BY embedding <=> %s LIMIT %s",
+                    (emb, top_k),
+                )
+                rows = cur.fetchall()
+        result: List[MemoryRecord] = []
+        for r in rows:
+            content = r[3] if isinstance(r[3], dict) else json.loads(r[3])
+            result.append(
+                MemoryRecord(
+                    id=r[0],
+                    timestamp=r[1],
+                    event_type=r[2],
+                    content=content,
+                    embedding=list(r[4]),
+                    relevance=r[5],
+                    pinned=r[6],
+                )
+            )
+        return result
+
+    def count(self) -> int:
+        with self.conn.cursor() as cur:
+            cur.execute("SELECT COUNT(*) FROM memories")
+            return cur.fetchone()[0]
+
+    def get_state(self) -> Dict[str, Any]:
+        return dict(self._state)
+
+    def apply_state_delta(self, delta: Dict[str, Any]) -> VersionCommit:
+        next_state = {**self._state, **delta}
+        branch = self.vc.create_branch("main", f"update-state-{int(time.time())}")
+        commit = self.vc.put_branch_state(branch, [], next_state, "update: user_id=keeper, state delta")
+        self._state = next_state
+        return commit
+
+    def compress(self) -> Dict[str, Any]:
+        # compression logic can remain in memory or be no-op
+        return {"before": 0, "after": 0, "bytes_saved": 0, "archived": 0}
+
+    def revert(self, commit_id: str) -> None:
+        self.vc.revert(commit_id)
+        main = self.vc.latest_main()
+        self._state = dict(main["state"])
 
 
 class InMemoryVectorStore:
@@ -134,7 +285,12 @@ class InMemoryVectorStore:
         self._state = dict(main["state"])
 
 
-store = InMemoryVectorStore()
+# choose store implementation based on configuration
+if os.getenv("VECTOR_STORE", "memory") == "postgres":
+    logger.info("Using Postgres-backed vector store")
+    store = PGVectorStore()
+else:
+    store = InMemoryVectorStore()
 
 
 def generate_embedding(text: str) -> List[float]:
@@ -162,7 +318,12 @@ def _similarity(a: List[float], b: List[float]) -> float:
 def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
     q_emb = generate_embedding(query)
     ranked: List[tuple[float, MemoryRecord]] = []
-    for record in store.search(top_k=10_000):
+    # if using postgres-backed store we can supply the query to narrow candidates
+    if os.getenv("VECTOR_STORE", "memory") == "postgres":
+        candidates = store.search(top_k=10_000, query=query)
+    else:
+        candidates = store.search(top_k=10_000)
+    for record in candidates:
         rid = str(record.content.get("user_id", ""))
         if user_id and rid and user_id != rid:
             continue

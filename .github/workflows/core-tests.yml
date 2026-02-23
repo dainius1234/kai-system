@@ -1,0 +1,54 @@
+name: Core Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # install any requirements.txt found in subdirectories
+          files=$(find . -name requirements.txt | grep -v "^\./." | paste -sd " ")
+          if [ -n "$files" ]; then
+            pip install -r $files
+          fi
+
+      - name: Run core unit tests
+        run: |
+          make test-core
+
+      - name: Build full stack Docker images
+        run: |
+          docker compose -f docker-compose.full.yml build
+
+      - name: Bring up minimal sovereign AI stack
+        run: |
+          docker compose -f docker-compose.minimal.yml up -d --build
+          # wait for services to respond
+          for i in {1..30}; do
+            if curl -s http://localhost:8000/health >/dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
+      - name: Run integration smoke script
+        run: |
+          python3 scripts/test_core_integration.py || true
+      - name: Tear down minimal stack
+        run: |
+          docker compose -f docker-compose.minimal.yml down

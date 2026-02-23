@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sovereign Dashboard</title>
+    <style>
+        body { font-family: sans-serif; margin: 2rem; }
+        .status { margin-bottom: 1rem; }
+        .ok { color: green; }
+        .down { color: red; }
+        button { padding: 0.5rem 1rem; }
+    </style>
+</head>
+<body>
+<h1>Sovereign Dashboard (UI Stub)</h1>
+<div id="nodes"></div>
+<div class="status" id="go-no-go"></div>
+<button id="toggle-mode">Toggle Gate Mode</button>
+
+<script>
+async function fetchStatus() {
+    try {
+        const resp = await fetch('/');
+        if (!resp.ok) throw new Error(resp.status);
+        const data = await resp.json();
+        const nodes = data.node_status || {};
+        const container = document.getElementById('nodes');
+        container.innerHTML = '<h2>Nodes</h2>' + Object.entries(nodes).map(
+            ([name, info]) => `<div>${name}: <span class="${info.status}">${info.status}</span></div>`
+        ).join('');
+        const gonogo = data.go_no_go || {decision:'?'};
+        document.getElementById('go-no-go').innerText = `Go/No-Go: ${gonogo.decision}`;
+    } catch (e) {
+        document.getElementById('nodes').innerText = 'Error fetching status';
+    }
+}
+
+async function toggleMode() {
+    try {
+        const resp = await fetch('/go-no-go');
+        if (!resp.ok) return;
+        // no actual toggle, just a placeholder
+        alert('Toggle not implemented in stub');
+    } catch (e) { console.error(e); }
+}
+
+setInterval(fetchStatus, 5000);
+fetchStatus();
+document.getElementById('toggle-mode').addEventListener('click', toggleMode);
+</script>
+</body>
+</html>

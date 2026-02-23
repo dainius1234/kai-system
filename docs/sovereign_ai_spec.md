@@ -34,9 +34,11 @@ flowchart TD
         MemCore["Sovereign Memory Core<br/>Port: 8001"]
         LLM_Pool["Specialist LLM Pool<br/>Ollama:11434"]
         LangGraph["LangGraph Engine<br/>Redis:6379"]
+        Grok["ARA Grok Advisor<br/>Port: 8090"]
         
         MemCore -->|/route → JSON| LangGraph
         LangGraph -->|Selects Specialist| LLM_Pool
+        LangGraph -->|Consults| Grok
         LLM_Pool -->|Plan/Code| LangGraph
     end
 

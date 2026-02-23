@@ -79,6 +79,96 @@ docs/               # Implementation plans and hardening runbooks
 - Stop clusters + BOS/CHOCH.  
 - Persistent storage for replay.  
 
+---
+
+## 🧠 Sovereign AI Minimal Core Stack
+
+The latter half of this repository implements a completely separate project: **Sovereign AI (Local-Only)**, a self-sovereign, air-gapped personal intelligence platform.
+
+A lightweight development stack is provided by `docker-compose.minimal.yml`, which starts the six essential services:
+
+1. `postgres` – immutable ledger and vector store
+2. `redis` – short-term memory spool
+3. `tool-gate` – execution choke point with human co-sign
+4. `memu-core` – in-memory memory & routing engine
+5. `heartbeat` – system pulse and auto-sleep controller
+6. `dashboard` – health UI and go/no-go report
+
+When you graduate to the complete prototype, `docker-compose.full.yml` layers on additional stubs and placeholders: `langgraph`, `executor`, `perception/audio`, `perception/camera`, `grok`, `tts-service`, `avatar-service` (plus later sandbox services). These extra containers currently just expose health endpoints and simple behaviours but they bring the full network topology into play.
+
+Run the stack:
+
+```bash
+# build images (includes audio/camera in full stack)
+
+docker compose -f docker-compose.minimal.yml build
+
+# optionally initialise the database for pgvector persistence
+make init-memu-db
+
+# bring the core up
+
+docker compose -f docker-compose.minimal.yml up -d
+
+# validate that services are alive
+
+python3 scripts/smoke_core.py  # also probes executor, langgraph, audio, camera, grok if they are running
+
+# exercise unit tests across the core services (memu-core, dashboard, audio, camera, executor, langgraph, grok)
+make test-core
+
+> **Note:** In restricted environments (e.g. GitHub Codespaces) Docker containers may
+not be reachable on `localhost` due to networking limitations.  If the smoke
+script reports connection failures, try running the same commands from within a
+container or on a machine where the ports are exposed.
+
+```
+
+### Vector store configuration
+
+By default the memory core keeps episodes in memory. To enable
+PostgreSQL/pgvector persistence, set the following environment variables
+before starting the stack or running tests:
+
+```bash
+export VECTOR_STORE=postgres
+export PG_URI=postgresql://keeper:localdev@localhost:5432/sovereign
+```
+
+The helper script `scripts/init_memu_db.py` will create the necessary
+extension and table.  The unit test `scripts/test_memu_pgvector.py` will
+execute when `PG_URI` is defined and silently skip otherwise.
+
+Stop the stack with `docker compose -f docker-compose.minimal.yml down`.
+
+Once the services are running you can open a browser to `http://localhost:8080/ui` to view the
+simple HTML/JS dashboard stub. It polls the core services every 5 seconds and
+includes a placeholder "Toggle Gate Mode" button.
+
+When you're ready to bring up the **complete** stack including language graph,
+executor, perception and output services, use the `docker-compose.full.yml` file:
+
+```bash
+# build everything and start
+
+docker compose -f docker-compose.full.yml build
+
+docker compose -f docker-compose.full.yml up -d
+```
+
+This full composition is primarily useful for later development; the extra
+services initially act as stubs but they establish the networking and
+configuration for future expansion.  After the containers are up you can run
+an end-to-end smoke/integration script:
+
+```bash
+python3 scripts/test_core_integration.py
+```
+
+The smoke test script polls each service endpoint and prints the health status.  These components form the hardened foundation; additional features and scripts are developed on top of them as the system grows.
+
+For further architecture details, see `docs/sovereign_ai_spec.md` and the Phase‑1 patch set in `docs/phase1_patch_set.md`.
+
 ### Phase 2 – Flow & Arb Engines  
 - CVD + delta footprint + absorption.  
 - Cross-venue divergence (Kraken, Coinbase, Bitstamp).  
