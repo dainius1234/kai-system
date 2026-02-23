@@ -1,0 +1,8 @@
+#include <tunables/global>
+profile executor-aa flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+  file,
+  capability,
+  network inet stream,
+  deny network,
+}
