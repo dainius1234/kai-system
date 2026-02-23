@@ -1,0 +1,1 @@
+{"type":"object","title":"MTD submission draft","properties":{"income":{"type":"number"},"expenses":{"type":"number"},"period":{"type":"string"}}}

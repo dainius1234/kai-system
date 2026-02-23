@@ -1,0 +1,15 @@
+tax_deduction:
+  script: scripts/deduct_advisor.py
+  input: /data/self-emp/Accounting/expenses.log
+  output: /data/self-emp/Accounting/suggestions.txt
+  tool: GnuCash + HMRC rules
+invoice_optimize:
+  script: scripts/invoice.py
+  input: client_data
+  output: invoice.pdf
+  tool: python-docx + VAT calc
+hse_form:
+  script: scripts/hse_rams.py
+  input: site_data.csv
+  output: RAMS.docx
+  tool: python-docx + HSE standards

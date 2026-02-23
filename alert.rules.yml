@@ -1,0 +1,17 @@
+groups:
+  - name: sovereign-health
+    rules:
+      - alert: HighErrorRatio
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / clamp_min(rate(http_requests_total[5m]), 1) > 0.03
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "5xx ratio above 3%"
+      - alert: ExecutorHighVRAM
+        expr: executor_vram_utilization_percent > 90
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Executor VRAM > 90%"
