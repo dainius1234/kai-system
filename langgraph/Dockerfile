@@ -2,12 +2,13 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt ./
+COPY langgraph/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py ./
-COPY config.py ./
-COPY conviction.py ./
+COPY langgraph/app.py ./
+COPY langgraph/config.py ./
+COPY langgraph/conviction.py ./
+COPY common/ ./common/
 
 EXPOSE 8007
 

@@ -1,52 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Sovereign Dashboard</title>
-    <style>
-        body { font-family: sans-serif; margin: 2rem; }
-        .status { margin-bottom: 1rem; }
-        .ok { color: green; }
-        .down { color: red; }
-        button { padding: 0.5rem 1rem; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sovereign AI — Control Panel</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0d0d0f;
+      --surface: #16181d;
+      --border:  #2a2d36;
+      --accent:  #00e5ff;
+      --ok:      #00c853;
+      --down:    #ff3d3d;
+      --warn:    #ffab00;
+      --text:    #dce1ec;
+      --muted:   #6b7280;
+      --go:      #00c853;
+      --nogo:    #ff3d3d;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Courier New', Courier, monospace;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+
+    header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    header h1 {
+      font-size: 1.25rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    header .subtitle {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    #last-updated {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+    }
+
+    .card-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .card-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    .card-value.accent { color: var(--accent); }
+
+    /* go/no-go banner */
+    #gonogo-banner {
+      border-radius: 6px;
+      padding: 0.9rem 1.2rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+    }
+
+    #gonogo-banner.GO   { border-color: var(--go);   background: rgba(0,200,83,0.07);  }
+    #gonogo-banner.NOGO { border-color: var(--nogo); background: rgba(255,61,61,0.07); }
+
+    #gonogo-decision {
+      font-size: 1.4rem;
+      font-weight: bold;
+      min-width: 80px;
+    }
+
+    .GO   #gonogo-decision { color: var(--go);   }
+    .NOGO #gonogo-decision { color: var(--nogo); }
+
+    #gonogo-summary { color: var(--muted); font-size: 0.8rem; }
+
+    /* node grid */
+    #nodes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .node-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot.ok   { background: var(--ok);   box-shadow: 0 0 6px var(--ok); }
+    .dot.down { background: var(--down); box-shadow: 0 0 6px var(--down); }
+    .dot.unknown { background: var(--warn); }
+
+    .node-name  { font-size: 0.85rem; flex: 1; }
+    .node-state { font-size: 0.7rem; color: var(--muted); margin-left: auto; }
+    .node-state.ok   { color: var(--ok); }
+    .node-state.down { color: var(--down); }
+
+    /* reasons list */
+    #reasons-section { display: none; margin-bottom: 1.5rem; }
+    #reasons-section h3 {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    #reasons-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    #reasons-list li {
+      font-size: 0.8rem;
+      color: var(--down);
+      padding-left: 1.2em;
+      position: relative;
+    }
+
+    #reasons-list li::before { content: "✗ "; position: absolute; left: 0; }
+
+    footer {
+      font-size: 0.65rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .error-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .error-overlay.visible { display: flex; }
+    .error-box {
+      background: var(--surface);
+      border: 1px solid var(--down);
+      border-radius: 8px;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      color: var(--down);
+    }
+  </style>
 </head>
 <body>
-<h1>Sovereign Dashboard (UI Stub)</h1>
-<div id="nodes"></div>
-<div class="status" id="go-no-go"></div>
-<button id="toggle-mode">Toggle Gate Mode</button>
+
+<header>
+  <h1>⬡ Sovereign AI</h1>
+  <span class="subtitle">Local-Only Control Panel</span>
+  <span id="last-updated">—</span>
+</header>
+
+<div id="gonogo-banner" class="NOGO">
+  <div id="gonogo-decision">—</div>
+  <div>
+    <div id="gonogo-trust" style="font-size:0.75rem; color: var(--muted); margin-bottom:0.2rem;"></div>
+    <div id="gonogo-summary">Fetching status…</div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">Ledger Size</div>
+    <div class="card-value accent" id="ledger-size">—</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Memory Records</div>
+    <div class="card-value accent" id="memory-count">—</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Policy Mode</div>
+    <div class="card-value" id="policy-mode">—</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Device</div>
+    <div class="card-value" id="device-summary">—</div>
+  </div>
+</div>
+
+<div id="nodes-grid"></div>
+
+<div id="reasons-section">
+  <h3>Blockers</h3>
+  <ul id="reasons-list"></ul>
+</div>
+
+<footer>
+  <span>self-sovereign memory · no cloud · no trust</span>
+  <span id="error-ratio">error ratio: —</span>
+  <span id="alive-count">alive: —</span>
+</footer>
 
 <script>
-async function fetchStatus() {
+  async function refresh() {
     try {
-        const resp = await fetch('/');
-        if (!resp.ok) throw new Error(resp.status);
-        const data = await resp.json();
-        const nodes = data.node_status || {};
-        const container = document.getElementById('nodes');
-        container.innerHTML = '<h2>Nodes</h2>' + Object.entries(nodes).map(
-            ([name, info]) => `<div>${name}: <span class="${info.status}">${info.status}</span></div>`
-        ).join('');
-        const gonogo = data.go_no_go || {decision:'?'};
-        document.getElementById('go-no-go').innerText = `Go/No-Go: ${gonogo.decision}`;
+      const [statusResp, metricsResp] = await Promise.all([
+        fetch('/'),
+        fetch('/metrics'),
+      ]);
+
+      if (!statusResp.ok) throw new Error('status ' + statusResp.status);
+      const data = await statusResp.json();
+
+      // go/no-go banner
+      const gng = data.go_no_go || {};
+      const decision = (gng.decision || 'NO_GO').replace('_', '-');
+      const banner = document.getElementById('gonogo-banner');
+      banner.className = decision === 'GO' ? 'GO' : 'NOGO';
+      document.getElementById('gonogo-decision').textContent = decision;
+      document.getElementById('gonogo-trust').textContent = gng.trust_status || '';
+      document.getElementById('gonogo-summary').textContent = gng.summary || '';
+
+      // stat cards
+      document.getElementById('ledger-size').textContent =
+        data.ledger_size !== undefined ? data.ledger_size : '—';
+      document.getElementById('memory-count').textContent =
+        data.memory_count !== undefined ? data.memory_count : '—';
+      document.getElementById('policy-mode').textContent =
+        data.policy_mode || '—';
+      document.getElementById('device-summary').textContent =
+        (data.device_summary || '').replace('running (', '').replace(')', '') || '—';
+
+      // nodes
+      const nodeStatuses = data.node_status || {};
+      const grid = document.getElementById('nodes-grid');
+      grid.innerHTML = '';
+      for (const [name, info] of Object.entries(nodeStatuses)) {
+        const st = info.status === 'ok' ? 'ok' : 'down';
+        const card = document.createElement('div');
+        card.className = 'node-card';
+        card.innerHTML =
+          `<div class="dot ${st}"></div>` +
+          `<div class="node-name">${name}</div>` +
+          `<div class="node-state ${st}">${st}</div>`;
+        grid.appendChild(card);
+      }
+
+      // reasons
+      const reasons = (gng.reasons || []);
+      const section = document.getElementById('reasons-section');
+      const list = document.getElementById('reasons-list');
+      if (reasons.length > 0) {
+        section.style.display = 'block';
+        list.innerHTML = reasons.map(r => `<li>${r}</li>`).join('');
+      } else {
+        section.style.display = 'none';
+        list.innerHTML = '';
+      }
+
+      // footer
+      const alive = (data.alive_nodes || []).length;
+      const total = Object.keys(nodeStatuses).length;
+      document.getElementById('alive-count').textContent =
+        `alive: ${alive}/${total}`;
+
+      if (metricsResp.ok) {
+        const m = await metricsResp.json();
+        const ratio = (m.error_ratio !== undefined)
+          ? (m.error_ratio * 100).toFixed(1) + '%'
+          : '—';
+        document.getElementById('error-ratio').textContent = 'error ratio: ' + ratio;
+      }
+
+      document.getElementById('last-updated').textContent =
+        'updated ' + new Date().toLocaleTimeString();
+
     } catch (e) {
-        document.getElementById('nodes').innerText = 'Error fetching status';
+      document.getElementById('last-updated').textContent = '⚠ unreachable';
     }
-}
+  }
 
-async function toggleMode() {
-    try {
-        const resp = await fetch('/go-no-go');
-        if (!resp.ok) return;
-        // no actual toggle, just a placeholder
-        alert('Toggle not implemented in stub');
-    } catch (e) { console.error(e); }
-}
-
-setInterval(fetchStatus, 5000);
-fetchStatus();
-document.getElementById('toggle-mode').addEventListener('click', toggleMode);
+  setInterval(refresh, 2000);
+  refresh();
 </script>
 </body>
 </html>

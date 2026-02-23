@@ -18,7 +18,7 @@ logger.info("Running on %s.", DEVICE)
 app = FastAPI(title="Sovereign Dashboard", version="0.4.0")
 
 # mount static UI stub
-app.mount("/static", StaticFiles(directory="dashboard/static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/ui")
 async def ui_index():
@@ -28,13 +28,17 @@ LEDGER_URL = os.getenv("LEDGER_URL", "postgresql://keeper:***@postgres:5432/sove
 budget = ErrorBudget(window_seconds=300)
 audit = AuditStream("dashboard", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
 
-NODES = {
+NODES: Dict[str, str] = {
     "tool-gate": f"{TOOL_GATE_URL}/health",
     "memu-core": os.getenv("MEMU_URL", "http://memu-core:8001") + "/health",
-    "langgraph": os.getenv("LANGGRAPH_URL", "http://langgraph:8007") + "/health",
-    "executor": os.getenv("EXECUTOR_URL", "http://executor:8002") + "/health",
     "heartbeat": os.getenv("HEARTBEAT_URL", "http://heartbeat:8010") + "/status",
 }
+_langgraph_url = os.getenv("LANGGRAPH_URL", "")
+if _langgraph_url:
+    NODES["langgraph"] = _langgraph_url + "/health"
+_executor_url = os.getenv("EXECUTOR_URL", "")
+if _executor_url:
+    NODES["executor"] = _executor_url + "/health"
 
 NO_GO_GRACE_REQUESTS = int(os.getenv("NO_GO_GRACE_REQUESTS", "20"))
 MAX_ERROR_RATIO = float(os.getenv("MAX_ERROR_RATIO", "0.05"))
