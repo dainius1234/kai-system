@@ -22,7 +22,7 @@ docs/               # Implementation plans and hardening runbooks
 
 ## 🧠 Sovereign AI Minimal Core Stack
 
-The latter half of this repository implements a completely separate project: **Sovereign AI (Local-Only)**, a self-sovereign, air-gapped personal intelligence platform.  The documentation below now matches the stack actually built in the previous iteration of development; nothing has been left as a stale placeholder – every listed service can be started, tested and has accompanying unit/integration scripts.
+ **Sovereign AI (Local-Only)**, a self-sovereign, air-gapped personal intelligence platform.  The documentation below now matches the stack actually built in the previous iteration of development; nothing has been left as a stale placeholder – every listed service can be started, tested and has accompanying unit/integration scripts.
 
 A lightweight development stack is provided by `docker-compose.minimal.yml`, which starts the six essential services:
 
