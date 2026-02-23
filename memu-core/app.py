@@ -1,29 +1,73 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import time
 import uuid
-from collections import deque
-from dataclasses import dataclass
-from typing import Deque, Dict, List, Optional
+from collections import Counter
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import FastAPI, HTTPException, Query, Request
+from pydantic import BaseModel
 
+from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
 
-app = FastAPI(title="Sovereign Memory Core", version="0.1.0")
+# lakefs client is optional; provide a simple in-memory stub if unavailable
+try:
+    from lakefs_client import LakeFSClient, VersionCommit
+except Exception:  # pragma: no cover - stub if package missing
+    class VersionCommit:
+        def __init__(self, commit_id: str = ""):
+            self.commit_id = commit_id
+
+    class LakeFSClient:
+        def __init__(self) -> None:
+            self._commits: list[dict] = []
+
+        def create_branch(self, src: str, name: str) -> str:
+            return name
+
+        def put_branch_state(self, branch: str, records: list, state: dict, msg: str) -> VersionCommit:
+            cid = f"commit-{len(self._commits)}"
+            self._commits.append({"branch": branch, "records": records, "state": state, "msg": msg, "id": cid})
+            return VersionCommit(commit_id=cid)
+
+        def list_commits(self) -> list:
+            return self._commits
+
+        def revert(self, commit_id: str) -> None:
+            # no-op stub
+            pass
+
+        def latest_main(self) -> dict:
+            if self._commits:
+                latest = self._commits[-1]
+                return {"records": latest.get("records", []), "state": latest.get("state", {})}
+            return {"records": [], "state": {}}
+
+logger = setup_json_logger("memu-core", os.getenv("LOG_PATH", "/tmp/memu-core.json.log"))
+DEVICE = detect_device()
+logger.info("Running on %s.", DEVICE)
+
+app = FastAPI(title="Sovereign Memory Core", version="0.5.0")
+budget = ErrorBudget(window_seconds=300)
+audit = AuditStream("memu-core", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
+last_compress_run = 0.0
+MAX_MEMORY_RECORDS = int(os.getenv("MAX_MEMORY_RECORDS", "5000"))
+MAX_STATE_KEY_SIZE = int(os.getenv("MAX_STATE_KEY_SIZE", "128"))
+MAX_STATE_VALUE_SIZE = int(os.getenv("MAX_STATE_VALUE_SIZE", "4096"))
 
 
 class MemoryRequest(BaseModel):
     query: str
     session_id: str
-    timestamp: Optional[str] = None
     timestamp: str
 
 
 class RoutingResponse(BaseModel):
     specialist: str
-    context_payload: Dict[str, object]
     context_payload: Dict[str, Any]
 
 
@@ -32,57 +76,11 @@ class MemoryUpdate(BaseModel):
     event_type: str
     task_id: Optional[str] = None
     result_raw: Optional[str] = None
-    metrics: Optional[Dict[str, object]] = None
-    state_delta: Optional[Dict[str, object]] = None
-
-
-class MemoryEntry(BaseModel):
-    id: str
-    timestamp: str
-    event_type: str
-    content: Dict[str, object]
-    session_id: Optional[str] = None
-    query: Optional[str] = None
-
-
-class MemoryRetrieve(BaseModel):
-    query: str
-    session_id: Optional[str] = None
-    user_id: Optional[str] = None
-    top_k: int = Field(default=20, ge=1, le=200)
-
-
-@dataclass
-class MemoryStore:
-    max_entries: int
-    entries: Deque[MemoryEntry]
-
-    def append(self, entry: MemoryEntry) -> None:
-        self.entries.append(entry)
-
-    def retrieve(self, query: str, top_k: int) -> List[MemoryEntry]:
-        if not query:
-            return list(self.entries)[-top_k:]
-        matches = [entry for entry in self.entries if entry.query and query.lower() in entry.query.lower()]
-        if not matches:
-            return list(self.entries)[-top_k:]
-        return matches[-top_k:]
-
-
-store = MemoryStore(max_entries=2000, entries=deque(maxlen=2000))
-
-SPECIALIST_ROUTING = {
-    "vision": "Qwen-VL",
-    "image": "Qwen-VL",
-    "chart": "DeepSeek-V4",
-    "analysis": "DeepSeek-V4",
-    "research": "Kimi-2.5",
-    "strategy": "Kimi-2.5",
-}
-
-DEFAULT_SPECIALIST = os.getenv("DEFAULT_SPECIALIST", "DeepSeek-V4")
     metrics: Optional[Dict[str, Any]] = None
     state_delta: Optional[Dict[str, Any]] = None
+    relevance: float = 1.0
+    user_id: str = "keeper"
+    pin: bool = False
 
 
 class MemoryRecord(BaseModel):
@@ -91,30 +89,208 @@ class MemoryRecord(BaseModel):
     event_type: str
     content: Dict[str, Any]
     embedding: List[float]
+    relevance: float = 1.0
+    pinned: bool = False
 
 
 SPECIALISTS = ["DeepSeek-V4", "Kimi-2.5", "Qwen-VL"]
+
+
+# persistent vector store using PostgreSQL + pgvector
+class PGVectorStore:
+    def __init__(self) -> None:
+        import psycopg2
+        from psycopg2.extras import Json
+
+        self.conn = psycopg2.connect(os.getenv("PG_URI", "postgresql://keeper:localdev@postgres:5432/sovereign"))
+        self._init_schema()
+        self.vc = LakeFSClient()
+        self._state: Dict[str, Any] = {}
+
+    def _init_schema(self) -> None:
+        with self.conn.cursor() as cur:
+            cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS memories (
+                    id text PRIMARY KEY,
+                    timestamp text,
+                    event_type text,
+                    content jsonb,
+                    embedding vector,
+                    relevance float,
+                    pinned bool
+                );
+                """
+            )
+        self.conn.commit()
+
+    def insert(self, record: MemoryRecord) -> VersionCommit:
+        # store record in Postgres and enforce retention
+        with self.conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO memories (id, timestamp, event_type, content, embedding, relevance, pinned)\
+                 VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id) DO NOTHING",
+                (
+                    record.id,
+                    record.timestamp,
+                    record.event_type,
+                    Json(record.content),
+                    record.embedding,
+                    record.relevance,
+                    record.pinned,
+                ),
+            )
+        self.conn.commit()
+        # trim oldest entries if over limit
+        if MAX_MEMORY_RECORDS > 0:
+            with self.conn.cursor() as cur:
+                cur.execute("SELECT id FROM memories ORDER BY timestamp ASC")
+                ids = [r[0] for r in cur.fetchall()]
+            if len(ids) > MAX_MEMORY_RECORDS:
+                to_delete = ids[: len(ids) - MAX_MEMORY_RECORDS]
+                with self.conn.cursor() as cur:
+                    cur.execute("DELETE FROM memories WHERE id = ANY(%s)", (to_delete,))
+                self.conn.commit()
+        # commit to version control for state awareness, using same pattern as memory store
+        branch = self.vc.create_branch("main", f"update-keeper-{int(time.time())}")
+        commit = self.vc.put_branch_state(branch, [], self._state, f"update: user_id=keeper, ts={int(time.time())}")
+        return commit
+
+    def search(self, top_k: int, query: Optional[str] = None) -> List[MemoryRecord]:
+        # if query is provided we perform embedding similarity, otherwise return
+        # the most recent records (by timestamp) up to top_k.
+        if query is None:
+            with self.conn.cursor() as cur:
+                cur.execute("SELECT id, timestamp, event_type, content, embedding, relevance, pinned FROM memories ORDER BY timestamp DESC LIMIT %s", (top_k,))
+                rows = cur.fetchall()
+        else:
+            emb = generate_embedding(query)
+            with self.conn.cursor() as cur:
+                # using pgvector similarity operator <=>
+                cur.execute(
+                    "SELECT id, timestamp, event_type, content, embedding, relevance, pinned "
+                    "FROM memories ORDER BY embedding <=> %s LIMIT %s",
+                    (emb, top_k),
+                )
+                rows = cur.fetchall()
+        result: List[MemoryRecord] = []
+        for r in rows:
+            content = r[3] if isinstance(r[3], dict) else json.loads(r[3])
+            result.append(
+                MemoryRecord(
+                    id=r[0],
+                    timestamp=r[1],
+                    event_type=r[2],
+                    content=content,
+                    embedding=list(r[4]),
+                    relevance=r[5],
+                    pinned=r[6],
+                )
+            )
+        return result
+
+    def count(self) -> int:
+        with self.conn.cursor() as cur:
+            cur.execute("SELECT COUNT(*) FROM memories")
+            return cur.fetchone()[0]
+
+    def get_state(self) -> Dict[str, Any]:
+        return dict(self._state)
+
+    def apply_state_delta(self, delta: Dict[str, Any]) -> VersionCommit:
+        next_state = {**self._state, **delta}
+        branch = self.vc.create_branch("main", f"update-state-{int(time.time())}")
+        commit = self.vc.put_branch_state(branch, [], next_state, "update: user_id=keeper, state delta")
+        self._state = next_state
+        return commit
+
+    def compress(self) -> Dict[str, Any]:
+        # compression logic can remain in memory or be no-op
+        return {"before": 0, "after": 0, "bytes_saved": 0, "archived": 0}
+
+    def revert(self, commit_id: str) -> None:
+        self.vc.revert(commit_id)
+        main = self.vc.latest_main()
+        self._state = dict(main["state"])
 
 
 class InMemoryVectorStore:
     def __init__(self) -> None:
         self._records: List[MemoryRecord] = []
         self._state: Dict[str, Any] = {}
+        self._compressed_archive: List[bytes] = []
+        self.vc = LakeFSClient()
 
-    def insert(self, record: MemoryRecord) -> None:
-        self._records.append(record)
+    def insert(self, record: MemoryRecord) -> VersionCommit:
+        branch = self.vc.create_branch("main", f"update-keeper-{int(time.time())}")
+        next_records = [*self._records, record]
+        if MAX_MEMORY_RECORDS > 0 and len(next_records) > MAX_MEMORY_RECORDS:
+            next_records = next_records[-MAX_MEMORY_RECORDS:]
+        commit = self.vc.put_branch_state(branch, [r.model_dump() for r in next_records], self._state, f"update: user_id=keeper, ts={int(time.time())}")
+        self._records = next_records
+        return commit
 
-    def search(self, query: str, top_k: int) -> List[MemoryRecord]:
+    def search(self, top_k: int) -> List[MemoryRecord]:
         return list(reversed(self._records))[:top_k]
+
+    def count(self) -> int:
+        return len(self._records)
 
     def get_state(self) -> Dict[str, Any]:
         return dict(self._state)
 
-    def apply_state_delta(self, delta: Dict[str, Any]) -> None:
-        self._state.update(delta)
+    def apply_state_delta(self, delta: Dict[str, Any]) -> VersionCommit:
+        next_state = {**self._state, **delta}
+        branch = self.vc.create_branch("main", f"update-state-{int(time.time())}")
+        commit = self.vc.put_branch_state(branch, [r.model_dump() for r in self._records], next_state, "update: user_id=keeper, state delta")
+        self._state = next_state
+        return commit
+
+    def compress(self) -> Dict[str, Any]:
+        threshold = datetime.utcnow() - timedelta(days=90)
+        before_bytes = sum(len(r.model_dump_json()) for r in self._records)
+        kept: List[MemoryRecord] = []
+        archived = 0
+        try:
+            import zstandard as zstd
+
+            compressor = zstd.ZstdCompressor(level=10)
+            use_zstd = True
+        except Exception:
+            compressor = None
+            use_zstd = False
+
+        for record in self._records:
+            ts = datetime.fromisoformat(record.timestamp) if "T" in record.timestamp else datetime.utcnow()
+            if record.pinned or ts > threshold or record.relevance >= 0.2:
+                kept.append(record)
+            else:
+                blob = record.model_dump_json().encode("utf-8")
+                packed = compressor.compress(blob) if use_zstd else blob
+                self._compressed_archive.append(packed)
+                archived += 1
+        before = len(self._records)
+        self._records = kept
+        after_bytes = sum(len(r.model_dump_json()) for r in self._records)
+        target_bytes = int(before_bytes * 0.1)
+        saved = max(before_bytes - max(after_bytes, target_bytes), 0)
+        logger.info("weekly compression complete, bytes_saved=%s archived=%s", saved, archived)
+        return {"before": before, "after": len(self._records), "bytes_saved": saved, "archived": archived}
+
+    def revert(self, commit_id: str) -> None:
+        self.vc.revert(commit_id)
+        main = self.vc.latest_main()
+        self._records = [MemoryRecord.model_validate(r) for r in main["records"]]
+        self._state = dict(main["state"])
 
 
-store = InMemoryVectorStore()
+# choose store implementation based on configuration
+if os.getenv("VECTOR_STORE", "memory") == "postgres":
+    logger.info("Using Postgres-backed vector store")
+    store = PGVectorStore()
+else:
+    store = InMemoryVectorStore()
 
 
 def generate_embedding(text: str) -> List[float]:
@@ -122,107 +298,163 @@ def generate_embedding(text: str) -> List[float]:
     return [seed / 100.0 for _ in range(8)]
 
 
-def extract_tags(query: str) -> List[str]:
-    return [token.strip(".,!?;:") for token in query.lower().split()[:5]]
-
-
 def select_specialist(query: str) -> str:
-    if any(keyword in query.lower() for keyword in ["image", "vision", "camera", "diagram"]):
+    q = query.lower()
+    if any(k in q for k in ["image", "vision", "camera", "diagram"]):
         return "Qwen-VL"
-    if any(keyword in query.lower() for keyword in ["plan", "reason", "policy", "risk"]):
+    if any(k in q for k in ["plan", "reason", "policy", "risk"]):
         return "DeepSeek-V4"
     return "Kimi-2.5"
 
 
+def _similarity(a: List[float], b: List[float]) -> float:
+    if not a or not b:
+        return 0.0
+    return sum(x * y for x, y in zip(a, b))
+
+
+def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
+    q_emb = generate_embedding(query)
+    ranked: List[tuple[float, MemoryRecord]] = []
+    # if using postgres-backed store we can supply the query to narrow candidates
+    if os.getenv("VECTOR_STORE", "memory") == "postgres":
+        candidates = store.search(top_k=10_000, query=query)
+    else:
+        candidates = store.search(top_k=10_000)
+    for record in candidates:
+        rid = str(record.content.get("user_id", ""))
+        if user_id and rid and user_id != rid:
+            continue
+        score = _similarity(q_emb, record.embedding) + float(record.relevance)
+        if record.pinned:
+            score += 0.5
+        ranked.append((score, record))
+    ranked.sort(key=lambda x: x[0], reverse=True)
+    return [r for _, r in ranked[:max(1, min(top_k, 100))]]
+
+def _weekly_compress_if_due() -> None:
+    global last_compress_run
+    now = time.time()
+    if now - last_compress_run >= 7 * 24 * 3600:
+        store.compress()
+        last_compress_run = now
+
+
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    try:
+        response = await call_next(request)
+        _weekly_compress_if_due()
+        budget.record(response.status_code)
+        audit.log("info", f"{request.method} {request.url.path} -> {response.status_code}")
+        return response
+    except Exception:
+        budget.record(500)
+        audit.log("error", f"{request.method} {request.url.path} -> 500")
+        raise
+
+
 @app.get("/health")
 async def health() -> Dict[str, str]:
-    return {
-        "status": "ok",
-        "entries": str(len(store.entries)),
-        "time": str(time.time()),
-    }
-    return {"status": "ok", "storage": os.getenv("VECTOR_STORE", "memory")}
+    return {"status": "ok", "storage": os.getenv("VECTOR_STORE", "memory"), "device": DEVICE}
+
+
+@app.get("/metrics")
+async def metrics() -> Dict[str, float]:
+    return budget.snapshot()
 
 
 @app.post("/route", response_model=RoutingResponse)
 async def route_request(request: MemoryRequest) -> RoutingResponse:
-    if not request.query:
-        raise HTTPException(status_code=400, detail="Query is required.")
-    lowered = request.query.lower()
-    specialist = DEFAULT_SPECIALIST
-    for keyword, target in SPECIALIST_ROUTING.items():
-        if keyword in lowered:
-            specialist = target
-            break
-
-    context_payload = {
-        "query": request.query,
-        "session_id": request.session_id,
-        "recent": [entry.model_dump() for entry in store.retrieve(request.query, top_k=5)],
-        "routed_at": time.time(),
-    }
-    return RoutingResponse(specialist=specialist, context_payload=context_payload)
-    similar = store.search(request.query, top_k=50)
-    metadata = {
-        "time": datetime.utcnow().isoformat(),
-        "session_id": request.session_id,
-        "tags": extract_tags(request.query),
-        "specialists": SPECIALISTS,
-    }
-    specialist = select_specialist(request.query)
+    query = sanitize_string(request.query)
+    session_id = sanitize_string(request.session_id)
+    similar = store.search(top_k=50)
     return RoutingResponse(
-        specialist=specialist,
+        specialist=select_specialist(query),
         context_payload={
-            "query": request.query,
+            "query": query,
             "memory_vectors": [record.embedding for record in similar],
-            "metadata": metadata,
+            "metadata": {"time": datetime.utcnow().isoformat(), "session_id": session_id, "specialists": SPECIALISTS},
+            "device": DEVICE,
         },
     )
+
+
+def _validate_state_delta_size(delta: Dict[str, Any]) -> None:
+    for key, value in delta.items():
+        key_len = len(str(key))
+        value_len = len(json.dumps(value, ensure_ascii=False))
+        if key_len > MAX_STATE_KEY_SIZE:
+            raise HTTPException(status_code=400, detail=f"state key too large: {key}")
+        if value_len > MAX_STATE_VALUE_SIZE:
+            raise HTTPException(status_code=400, detail=f"state value too large for key: {key}")
 
 
 @app.post("/memory/memorize")
 async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
+    update = update.model_copy(update={"event_type": sanitize_string(update.event_type), "result_raw": sanitize_string(update.result_raw) if update.result_raw else None})
+    commit = None
     if update.state_delta:
-        seen = set()
-        for key in update.state_delta:
-            if key in seen:
-                raise HTTPException(status_code=400, detail=f"Duplicate key in state_delta: {key}")
-            seen.add(key)
-
-    entry = MemoryEntry(
         existing = store.get_state()
         for key in update.state_delta:
             if key in existing:
                 raise HTTPException(status_code=400, detail=f"Duplicate key in state_delta: {key}")
-        store.apply_state_delta(update.state_delta)
+        _validate_state_delta_size(update.state_delta)
+        commit = store.apply_state_delta(update.state_delta)
 
-    record = MemoryRecord(
-        id=str(uuid.uuid4()),
-        timestamp=update.timestamp,
-        event_type=update.event_type,
-        content={
-            "result": update.result_raw,
-            "metrics": update.metrics or {},
-            "state_changes": update.state_delta or {},
-        },
-    )
-    store.append(entry)
-    return {"status": "appended", "id": entry.id}
-
-
-@app.post("/memory/retrieve")
-async def retrieve_context(request: MemoryRetrieve) -> List[Dict[str, object]]:
-    results = store.retrieve(request.query, top_k=request.top_k)
-    return [entry.model_dump() for entry in results]
-        embedding=generate_embedding(f"{update.event_type}: {update.result_raw}"),
-    )
-    store.insert(record)
-    return {"status": "appended", "id": record.id}
+    user_id = sanitize_string(update.user_id)
+    pin_default = os.getenv("PIN_KEEPER_DEFAULT", "false").lower() == "true"
+    keeper_pin = user_id == "keeper" and (update.pin or pin_default)
+    relevance = 1.0 if keeper_pin else update.relevance
+    record = MemoryRecord(id=str(uuid.uuid4()), timestamp=update.timestamp, event_type=update.event_type, content={"result": update.result_raw, "metrics": update.metrics or {}, "state_changes": update.state_delta or {}, "user_id": user_id, "pin": keeper_pin}, embedding=generate_embedding(f"{update.event_type}: {update.result_raw}"), relevance=relevance, pinned=keeper_pin)
+    record_commit = store.insert(record)
+    return {"status": "appended", "id": record.id, "commit": record_commit.commit_id, "state_commit": commit.commit_id if commit else "none"}
 
 
 @app.get("/memory/retrieve")
 async def retrieve_context(query: str, user_id: str, top_k: int = 20) -> List[MemoryRecord]:
-    return store.search(query, top_k=top_k)
+    q = sanitize_string(query)
+    uid = sanitize_string(user_id)
+    return retrieve_ranked(q, uid, top_k=top_k)
+
+
+@app.get("/memory/state")
+async def memory_state() -> Dict[str, Any]:
+    return {"status": "ok", "state": store.get_state()}
+
+
+@app.get("/memory/stats")
+async def memory_stats() -> Dict[str, Any]:
+    counts = Counter(record.event_type for record in store.search(top_k=10_000))
+    return {"status": "ok", "records": store.count(), "event_types": dict(counts), "commits": [c.__dict__ for c in store.vc.list_commits()[:20]]}
+
+
+@app.get("/memory/diagnostics")
+async def memory_diagnostics() -> Dict[str, Any]:
+    counts = Counter(record.event_type for record in store.search(top_k=10_000))
+    return {
+        "status": "ok",
+        "records": store.count(),
+        "max_memory_records": MAX_MEMORY_RECORDS,
+        "state_limits": {"max_key_size": MAX_STATE_KEY_SIZE, "max_value_size": MAX_STATE_VALUE_SIZE},
+        "event_type_counts": dict(counts),
+    }
+
+
+@app.post("/memory/compress")
+async def memory_compress() -> Dict[str, Any]:
+    return {"status": "ok", **store.compress()}
+
+
+@app.post("/memory/revert")
+@app.post("/revert")
+async def memory_revert(version: str = Query(..., description="Commit hash/id")) -> Dict[str, Any]:
+    try:
+        store.revert(sanitize_string(version))
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    chain = hashlib.sha256(json.dumps([c.__dict__ for c in store.vc.list_commits()], sort_keys=True).encode("utf-8")).hexdigest()
+    return {"status": "ok", "reverted_to": version, "sha256_chain": chain, "records": store.count()}
 
 
 if __name__ == "__main__":
