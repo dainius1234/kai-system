@@ -1,54 +1,5 @@
-# Regal Industries – Institutional-Grade Autonomous Market Maker
 
-**Regal Industries** is the institutional-grade trading core of the Kai System.  
-It is a sovereign, modular, event-driven market-making and arbitrage engine designed to rival professional desks.  
-No retail “indicator soup” – pure liquidity, flow, and macro intelligence.  
-It is built to be **self-sufficient, autonomous, and sovereign AI-powered infrastructure**.
 
----
-
-## 🔧 Core Components
-
-### 🏦 Trading Squads
-- **Market Maker Core** – adaptive spreads, inventory control, rebate capture.  
-- **Liquidity Grab Hunter** – fades stop runs and fake breakouts.  
-- **Iceberg Ride** – detects absorption, trades with institutions.  
-- **Funding/OI Divergence** – exploits leverage imbalances.  
-- **Session Expansion** – trades Asia/EU/US flow patterns.  
-- **Arbitrage Engines** – spot ↔ spot, triangular, spot vs perp, ETF vs BTC.  
-
-### ⚙️ Engineering Squad
-- Order book tools: multi-venue L2 heatmaps, iceberg/spoof detection.  
-- Flow analytics: CVD, delta footprint, absorption/exhaustion.  
-- Pattern recognition: stop clusters, BOS/CHOCH, FVG, OB.  
-- Institutional metrics: OI, funding, ETF flows, basis spreads.  
-- Simulation: fill probability models, spread efficiency tests.  
-- System: replay, DuckDB/Parquet storage, latency monitors.  
-
-### 📒 Accounting Squad
-- Trade ledger: all fills, hedges, arb legs, fees.  
-- PnL attribution: spread capture, rebates, taker fees, funding, inventory.  
-- Equity & risk book: leverage ratios, margin stress, equity curve.  
-- Tax/compliance: FIFO/LIFO, annual reports, CSV/Excel exports.  
-- Treasury functions: capital allocation, stablecoin/fiat tracking.  
-
-### 🛡️ Risk & Governance
-- **Orchestrator** – final authority before execution, risk checks.  
-- **Supervisor** – watchdog, circuit breakers, auto-restart adapters.  
-- **Junior (Self-Healer)** – repairs state, resyncs order books, crash recovery.  
-- **Verifier (Fact Checker)** – cross-checks signals against raw tape.  
-- **Fusion Engine** – consensus of multiple squads + optional LLM advisor.  
-
-### 🖥️ Operator Console (Dash App)
-- Chart with multi-venue liquidity heatmaps, iceberg markers, BOS/CHOCH overlays.  
-- Flow panels: CVD, VPIN, delta footprint.  
-- Arbitrage dashboard: cross-venue spreads, triangular arb cycles.  
-- Institutional panel: OI, funding, basis, ETF flows, macro events.  
-- Accounting panel: ledger, equity curve, tax reports.  
-- Replay mode: study past engineered moves.  
-- Kill-switch & hotkeys for safety.  
-
----
 
 ## 📦 Repo Structure
 orchestrator/       # Final risk authority before execution
