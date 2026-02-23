@@ -121,8 +121,8 @@ services:
       sovereign-net:
         ipv4_address: 172.20.0.11
 
-  grok:
-    build: ./grok
+  kai-advisor:
+    build: ./kai-advisor
     ports:
       - "8090:8090"
     networks:

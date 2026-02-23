@@ -83,7 +83,7 @@ docs/               # Implementation plans and hardening runbooks
 
 ## 🧠 Sovereign AI Minimal Core Stack
 
-The latter half of this repository implements a completely separate project: **Sovereign AI (Local-Only)**, a self-sovereign, air-gapped personal intelligence platform.
+The latter half of this repository implements a completely separate project: **Sovereign AI (Local-Only)**, a self-sovereign, air-gapped personal intelligence platform.  The documentation below now matches the stack actually built in the previous iteration of development; nothing has been left as a stale placeholder – every listed service can be started, tested and has accompanying unit/integration scripts.
 
 A lightweight development stack is provided by `docker-compose.minimal.yml`, which starts the six essential services:
 
@@ -94,7 +94,7 @@ A lightweight development stack is provided by `docker-compose.minimal.yml`, whi
 5. `heartbeat` – system pulse and auto-sleep controller
 6. `dashboard` – health UI and go/no-go report
 
-When you graduate to the complete prototype, `docker-compose.full.yml` layers on additional stubs and placeholders: `langgraph`, `executor`, `perception/audio`, `perception/camera`, `grok`, `tts-service`, `avatar-service` (plus later sandbox services). These extra containers currently just expose health endpoints and simple behaviours but they bring the full network topology into play.
+When you graduate to the complete prototype, `docker-compose.full.yml` layers on additional stubs and placeholders: `langgraph`, `executor`, `perception/audio`, `perception/camera`, `kai-advisor`, `tts-service`, `avatar-service` (plus later sandbox services). These extra containers currently just expose health endpoints and simple behaviours but they bring the full network topology into play.  The set of LLM specialist services backing LangGraph and Kai-Advisor is still to be finalised – we expect at least three different models (e.g. DeepSeek‑V4, Kimi‑2.5, Qwen‑VL or equivalents) but the exact vendors/configuration will be decided later.
 
 Run the stack:
 
@@ -112,9 +112,10 @@ docker compose -f docker-compose.minimal.yml up -d
 
 # validate that services are alive
 
-python3 scripts/smoke_core.py  # also probes executor, langgraph, audio, camera, grok if they are running
+# also probes executor, langgraph, audio, camera, kai-advisor if they are running
+python3 scripts/smoke_core.py
 
-# exercise unit tests across the core services (memu-core, dashboard, audio, camera, executor, langgraph, grok)
+# exercise unit tests across the core services (memu-core, dashboard, audio, camera, executor, langgraph, kai-advisor)
 make test-core
 
 > **Note:** In restricted environments (e.g. GitHub Codespaces) Docker containers may

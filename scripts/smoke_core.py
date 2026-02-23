@@ -30,7 +30,7 @@ def main() -> int:
         "http://localhost:8007/health",  # langgraph
         "http://localhost:8021/health",  # audio service
         "http://localhost:8040/health",  # camera
-        "http://localhost:8090/health",  # grok
+        "http://localhost:8090/health",  # kai-advisor
         "http://localhost:8030/health",  # tts service
         "http://localhost:8081/health",  # avatar service
     ]

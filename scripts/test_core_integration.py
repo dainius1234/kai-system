@@ -32,7 +32,7 @@ def main():
         "langgraph": "http://localhost:8007/health",
         "audio": "http://localhost:8021/health",
         "camera": "http://localhost:8040/health",
-        "grok": "http://localhost:8090/health",
+        "kai-advisor": "http://localhost:8090/health",
         "tts": "http://localhost:8030/health",
         "avatar": "http://localhost:8081/health",
     }
@@ -84,10 +84,10 @@ def main():
     r5 = safe_post("http://localhost:8040/process")
     if r5:
         print("camera process", r5.status_code, r5.text)
-    # optionally ask grok
+    # optionally ask kai-advisor
     r6 = safe_post("http://localhost:8090/ask", json={"question": "hello"})
     if r6:
-        print("grok ask", r6.status_code, r6.text)
+        print("kai-advisor ask", r6.status_code, r6.text)
     # output services
     r7 = safe_post("http://localhost:8030/synthesize", json={"text": "hello"})
     if r7:

@@ -76,8 +76,8 @@ test-executor:
 test-langgraph:
 	PYTHONPATH=. python scripts/test_langgraph_service.py
 
-test-grok:
-	PYTHONPATH=. python grok/test_grok.py
+test-kai-advisor:
+	PYTHONPATH=. python kai-advisor/test_kai_advisor.py
 
 test-tts:
 	PYTHONPATH=. python scripts/test_tts_service.py
@@ -86,7 +86,7 @@ test-avatar:
 	PYTHONPATH=. python scripts/test_avatar_service.py
 
 # wrapper to run all core memory tests
-test-core: test-phase-b-memu test-memu-pg test-dashboard-ui test-audio test-camera test-executor test-langgraph test-grok test-tts test-avatar
+test-core: test-phase-b-memu test-memu-pg test-dashboard-ui test-audio test-camera test-executor test-langgraph test-kai-advisor test-tts test-avatar
 
 test-dashboard-ui:
 	PYTHONPATH=. python scripts/test_dashboard_ui.py
