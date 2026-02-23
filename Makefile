@@ -1,4 +1,4 @@
-.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate
+.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate mobile-pr-rescue
 
 go_no_go:
 	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py langgraph/app.py executor/app.py
@@ -93,3 +93,8 @@ weekly-key-rotate:
 
 weekly-ed25519-rotate:
 	bash scripts/weekly_ed25519_rotation.sh
+
+
+mobile-pr-rescue:
+	@echo "Run: scripts/rescue_pr32.sh origin main rescue/pr32 e6e2692"
+	@echo "See docs/mobile_pr_rescue.md"
