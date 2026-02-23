@@ -109,48 +109,7 @@ The smoke test script polls each service endpoint and prints the health status. 
 
 For further architecture details, see `docs/sovereign_ai_spec.md` and the Phase‑1 patch set in `docs/phase1_patch_set.md`.
 
-### Phase 2 – Flow & Arb Engines  
-- CVD + delta footprint + absorption.  
-- Cross-venue divergence (Kraken, Coinbase, Bitstamp).  
-- Spot↔Spot & triangular arbitrage engines.  
-- Trade logging → Accounting Squad.  
 
-### Phase 3 – Institutional Intelligence  
-- Accumulation/distribution detector.  
-- Funding & OI dashboard (multi-venue).  
-- ETF flow tracker (BTC, Gold, SPY/QQQ).  
-- Cross-asset correlations (BTC, ETH, Gold, DXY, SPX).  
-- Macro calendar overlay (auto-throttle).  
-
-### Phase 4 – Playbook & Autonomy  
-- Strategy toggle panel.  
-- Alt rotation detector (majors → mid-caps → small-caps).  
-- Replay mode.  
-- Verifier + LLM advisor integration.  
-
-### Phase 5 – Institutional Polish  
-- Liquidity shock index.  
-- Whale inflows/outflows (on-chain).  
-- Options skew (Deribit, CME).  
-- Ubuntu desktop launcher, operator presets.  
-
----
-
-## 🔒 Design Principles
-
-- 100% event-driven & modular – no monolith rewrites.  
-- Offline-capable, sovereign, GDPR-compliant.  
-- Backtest/live parity – same engine.  
-- Extensible: drop in new squad or venue adapter.  
-- Autonomous with safeguards: kill-switch, circuit breakers, verifier.  
-- Institutional discipline: ledger, attribution, tax-ready.  
-
----
-
-⚠️ **Disclaimer**  
-For research, backtesting, and paper trading only.  
-Live trading requires explicit configuration and operator consent.  
-Derivatives trading may be restricted in your jurisdiction. Use responsibly.
 
 ---
 
