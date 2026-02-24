@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import re
 from typing import Any, Dict, List
 
 from fastapi import FastAPI, HTTPException

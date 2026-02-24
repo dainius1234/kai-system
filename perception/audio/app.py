@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import re
 from pathlib import Path
-from typing import Any, Dict
+from typing import Dict
 
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel

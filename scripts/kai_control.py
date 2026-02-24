@@ -47,6 +47,7 @@ USB_TIMEOUT_SECONDS = int(os.getenv("KAI_USB_TIMEOUT", "15"))
 SELF_EMP_ROOT = os.getenv("SELF_EMP_ROOT", "/data/self-emp")
 INCOME_CSV = os.getenv("INCOME_CSV", f"{SELF_EMP_ROOT}/Accounting/income.csv")
 EXPENSES_LOG = os.getenv("EXPENSES_LOG", f"{SELF_EMP_ROOT}/Accounting/expenses.log")
+CONVICTION_OVERRIDE_PATH = APP_DIR / "conviction_overrides.txt"
 
 
 def _run(cmd: List[str], check: bool = True) -> subprocess.CompletedProcess:

@@ -5,8 +5,6 @@ import os
 import sys
 from pathlib import Path
 
-from fastapi import HTTPException
-
 
 def load_module():
     root = Path(__file__).resolve().parents[1]

@@ -100,8 +100,9 @@ SPECIALISTS = ["DeepSeek-V4", "Kimi-2.5", "Qwen-VL"]
 class PGVectorStore:
     def __init__(self) -> None:
         import psycopg2
-        from psycopg2.extras import Json
+        from psycopg2.extras import Json as _Json
 
+        self._Json = _Json
         self.conn = psycopg2.connect(os.getenv("PG_URI", "postgresql://keeper:localdev@postgres:5432/sovereign"))
         self._init_schema()
         self.vc = LakeFSClient()
@@ -135,7 +136,7 @@ class PGVectorStore:
                     record.id,
                     record.timestamp,
                     record.event_type,
-                    Json(record.content),
+                    self._Json(record.content),
                     record.embedding,
                     record.relevance,
                     record.pinned,

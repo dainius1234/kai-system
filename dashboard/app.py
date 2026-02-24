@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from fastapi.responses import HTMLResponse
 
 from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger

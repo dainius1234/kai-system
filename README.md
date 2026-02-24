@@ -1,5 +1,6 @@
+# Sovereign AI — kai-system
 
-
+Self-sovereign, air-gapped personal intelligence platform.
 
 ## 📦 Repo Structure
 orchestrator/       # Final risk authority before execution
