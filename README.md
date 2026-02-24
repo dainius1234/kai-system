@@ -25,16 +25,18 @@ docs/               # Implementation plans and hardening runbooks
 
  **Sovereign AI (Local-Only)**, a self-sovereign, air-gapped personal intelligence platform.  The documentation below now matches the stack actually built in the previous iteration of development; nothing has been left as a stale placeholder – every listed service can be started, tested and has accompanying unit/integration scripts.
 
-A lightweight development stack is provided by `docker-compose.minimal.yml`, which starts the six essential services:
+A lightweight development stack is provided by `docker-compose.minimal.yml`, which starts the eight core services:
 
 1. `postgres` – immutable ledger and vector store
-2. `redis` – short-term memory spool
+2. `redis` – session buffer and short-term memory spool
 3. `tool-gate` – execution choke point with human co-sign
-4. `memu-core` – in-memory memory & routing engine
+4. `memu-core` – memory engine (vector search, session buffer, auto-classification)
 5. `heartbeat` – system pulse and auto-sleep controller
 6. `dashboard` – health UI and go/no-go report
+7. `supervisor` – watchdog with circuit breakers and health sweeps
+8. `verifier` – fact-checking and signal cross-validation
 
-When you graduate to the complete prototype, `docker-compose.full.yml` layers on additional stubs and placeholders: `langgraph`, `executor`, `perception/audio`, `perception/camera`, `kai-advisor`, `tts-service`, `avatar-service` (plus later sandbox services). These extra containers currently just expose health endpoints and simple behaviours but they bring the full network topology into play.  The set of LLM specialist services backing LangGraph and Kai-Advisor is still to be finalised – we expect at least three different models (e.g. DeepSeek‑V4, Kimi‑2.5, Qwen‑VL or equivalents) but the exact vendors/configuration will be decided later.
+The full stack (`docker-compose.full.yml`) adds production services: `fusion-engine`, `langgraph`, `executor`, `perception/audio`, `perception/camera`, `kai-advisor`, `tts-service`, `avatar-service`. Three local LLM backends are supported: DeepSeek-V4 (reasoning/code), Kimi-2.5 (general/multimodal), Dolphin (uncensored PUB mode).
 
 Run the stack:
 

@@ -1,7 +1,7 @@
 .PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke
 
 go_no_go:
-	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py langgraph/app.py executor/app.py
+	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py langgraph/app.py executor/app.py heartbeat/app.py supervisor/app.py verifier/app.py fusion-engine/app.py common/llm.py
 	python scripts/go_no_go_check.py
 
 hardening_smoke:
@@ -85,8 +85,11 @@ test-tts:
 test-avatar:
 	PYTHONPATH=. python scripts/test_avatar_service.py
 
+test-tool-gate:
+	PYTHONPATH=. python scripts/test_tool_gate_api.py
+
 # wrapper to run all core memory tests
-test-core: test-phase-b-memu test-memu-pg test-dashboard-ui test-audio test-camera test-executor test-langgraph test-kai-advisor test-tts test-avatar
+test-core: test-phase-b-memu test-memu-pg test-dashboard-ui test-tool-gate test-conviction test-audio test-camera test-executor test-langgraph test-kai-advisor test-tts test-avatar
 
 test-dashboard-ui:
 	PYTHONPATH=. python scripts/test_dashboard_ui.py
@@ -113,6 +116,7 @@ contract-smoke:
 merge-gate:
 	$(MAKE) go_no_go
 	$(MAKE) test-conviction
+	$(MAKE) test-tool-gate
 	$(MAKE) test-self-emp
 	$(MAKE) kai-control-selftest
 	$(MAKE) hardening_smoke

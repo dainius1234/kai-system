@@ -5,6 +5,7 @@ import os
 import re
 import time
 import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -124,6 +125,61 @@ async def fetch_offline_chunks(query: str, user_id: str, top_k: int = 5) -> List
         return payload if isinstance(payload, list) else []
     except Exception:
         return []
+
+
+# ── session buffer + auto-memorize helpers ──────────────────────────
+
+async def _append_session_turn(session_id: str, role: str, content: str) -> None:
+    """Push a turn into memu-core's working memory (session buffer)."""
+    try:
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                f"{MEMU_URL}/session/{session_id}/append",
+                json={"role": role, "content": content},
+                timeout=3.0,
+            )
+    except Exception:
+        logger.debug("Session append failed (memu-core may be down)")
+
+
+async def _fetch_session_context(session_id: str, query: str, top_k: int = 5) -> Dict[str, Any]:
+    """Fetch combined working + long-term memory context from memu-core."""
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(
+                f"{MEMU_URL}/session/{session_id}/context",
+                params={"query": query, "top_k": top_k},
+                timeout=5.0,
+            )
+        resp.raise_for_status()
+        return resp.json()
+    except Exception:
+        return {"long_term_memories": [], "session_messages": [], "query": query}
+
+
+async def _auto_memorize(user_input: str, response_summary: str, specialist: str, conviction: float) -> None:
+    """Write the Q&A exchange back to memu-core so vector search learns.
+
+    This is the key feedback loop — every conversation becomes a memory
+    that future queries can find.  The system literally gets smarter
+    with every interaction.
+    """
+    try:
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                f"{MEMU_URL}/memory/memorize",
+                json={
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "event_type": "conversation",
+                    "result_raw": f"Q: {user_input[:500]}\nA: {response_summary[:1000]}",
+                    "metrics": {"specialist": specialist, "conviction": conviction},
+                    "relevance": min(conviction / 10.0, 1.0),
+                    "user_id": "keeper",
+                },
+                timeout=5.0,
+            )
+    except Exception:
+        logger.debug("Auto-memorize failed (memu-core may be down)")
 
 
 def strategy_node(user_input: str) -> Dict[str, object]:
@@ -254,20 +310,35 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     else:
         logger.warning("MEMU circuit open; using local specialist fallback")
 
+    # ── 1. Record user turn in session buffer (working memory) ──────
+    await _append_session_turn(request.session_id, "user", request.user_input)
+
+    # ── 2. Fetch combined session + long-term context ───────────────
+    session_ctx = await _fetch_session_context(request.session_id, request.user_input, top_k=5)
+    chunks = session_ctx.get("long_term_memories", [])
+    # convert string memories to chunk dicts for conviction scoring
+    chunk_dicts = [{"content": c} if isinstance(c, str) else c for c in chunks]
+    session_messages = session_ctx.get("session_messages", [])
+
     rethink_count = 0
-    chunks = await fetch_offline_chunks(request.user_input, user_id="keeper", top_k=5)
-    plan = build_plan(request.user_input, specialist, chunks)
-    conviction = score_conviction(request.user_input, plan, chunks, rethink_count)
+    plan = build_plan(request.user_input, specialist, chunk_dicts)
+    # inject session context into the plan so downstream consumers see it
+    plan["session_context"] = {
+        "turns": len(session_messages),
+        "long_term_memories_used": len(chunks),
+    }
+    conviction = score_conviction(request.user_input, plan, chunk_dicts, rethink_count)
 
     while conviction < MIN_CONVICTION and rethink_count < MAX_RETHINKS:
         rethink_count += 1
-        feedback = low_conviction_feedback(conviction, chunks)
+        feedback = low_conviction_feedback(conviction, chunk_dicts)
         prompt = f"{request.user_input}\n\nReflection: {feedback}"
-        chunks = await fetch_offline_chunks(prompt, user_id="keeper", top_k=5)
-        plan = build_plan(prompt, specialist, chunks)
+        extra_chunks = await fetch_offline_chunks(prompt, user_id="keeper", top_k=5)
+        chunk_dicts = chunk_dicts + [{"content": c} if isinstance(c, str) else c for c in extra_chunks]
+        plan = build_plan(prompt, specialist, chunk_dicts)
         plan["reflection_feedback"] = feedback
         plan["rethink_count"] = rethink_count
-        conviction = score_conviction(prompt, plan, chunks, rethink_count)
+        conviction = score_conviction(prompt, plan, chunk_dicts, rethink_count)
 
     if override_active:
         plan["conviction_override"] = "operator override matched"
@@ -333,6 +404,16 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
         }
     )
     saver.decay("keeper", days=30, score_threshold=0.2)
+
+    # ── 3. Record assistant response in session buffer ──────────────
+    response_summary = plan.get("summary", "")
+    await _append_session_turn(request.session_id, "assistant", response_summary)
+
+    # ── 4. Auto-memorize: write Q&A to long-term vector memory ──────
+    # This is the learning loop — every conversation becomes searchable
+    # memory for future queries.  The system gets smarter over time.
+    await _auto_memorize(request.user_input, response_summary, specialist, conviction)
+
     await maybe_alert_low_conviction_average()
     await maybe_alert_mtd_proximity(plan["strategy"])
     await maybe_alert_error_budget_guard("memu", MEMU_ERROR_GUARD)

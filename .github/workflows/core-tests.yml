@@ -22,11 +22,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # install any requirements.txt found in subdirectories
-          files=$(find . -name requirements.txt | grep -v "^\./." | paste -sd " ")
-          if [ -n "$files" ]; then
-            pip install -r $files
-          fi
+          pip install flake8 pytest
+          # install each requirements.txt individually (skip hidden/archive dirs)
+          find . -name requirements.txt \
+               -not -path './.venv/*' \
+               -not -path './_archive/*' \
+               -not -path './.*' \
+            | while read f; do pip install -r "$f" || true; done
 
       - name: Run core unit tests
         run: |
