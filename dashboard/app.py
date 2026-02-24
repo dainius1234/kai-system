@@ -6,7 +6,6 @@ from typing import Any, Dict, List
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
 from fastapi.responses import HTMLResponse
 
 from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
@@ -20,11 +19,7 @@ app = FastAPI(title="Sovereign Dashboard", version="0.4.0")
 # mount static UI stub
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.get("/ui")
-async def ui_index():
-    return RedirectResponse(url="/static/index.html")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
-LEDGER_URL = os.getenv("LEDGER_URL", "postgresql://keeper:***@postgres:5432/sovereign")
 budget = ErrorBudget(window_seconds=300)
 audit = AuditStream("dashboard", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
 
@@ -77,16 +72,21 @@ async def build_go_no_go_report() -> Dict[str, Any]:
     if down_nodes:
         reasons.append(f"Critical services are down: {', '.join(down_nodes)}")
 
-    async with httpx.AsyncClient() as client:
-        tool_health_resp = await client.get(f"{TOOL_GATE_URL}/health", timeout=2.0)
-        tool_health_resp.raise_for_status()
-        tool_health = tool_health_resp.json()
+    try:
+        async with httpx.AsyncClient() as client:
+            tool_health_resp = await client.get(f"{TOOL_GATE_URL}/health", timeout=2.0)
+            tool_health_resp.raise_for_status()
+            tool_health = tool_health_resp.json()
 
-        ledger_stats_resp = await client.get(f"{TOOL_GATE_URL}/ledger/stats", timeout=2.0)
-        ledger_stats_resp.raise_for_status()
-        ledger_stats = ledger_stats_resp.json()
+            ledger_stats_resp = await client.get(f"{TOOL_GATE_URL}/ledger/stats", timeout=2.0)
+            ledger_stats_resp.raise_for_status()
+            ledger_stats = ledger_stats_resp.json()
+    except Exception:
+        tool_health = {}
+        ledger_stats = {}
+        reasons.append("Unable to reach tool-gate for go/no-go checks.")
 
-        metrics = budget.snapshot()
+    metrics = budget.snapshot()
 
     mode = str(tool_health.get("mode", "PUB")).upper()
     if mode != "WORK":
@@ -136,20 +136,27 @@ async def metrics() -> Dict[str, float]:
 async def index() -> Dict[str, object]:
     statuses = await fetch_status()
     alive_nodes = [name for name, payload in statuses.items() if payload.get("status") == "ok"]
-    async with httpx.AsyncClient() as client:
-        ledger_size = int((await client.get(f"{TOOL_GATE_URL}/ledger/stats", timeout=2.0)).json().get("count", 0))
-        memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
-        memory_count = int((await client.get(f"{memu_url}/memory/stats", timeout=2.0)).json().get("records", 0))
+    ledger_size = 0
+    memory_count = 0
+    try:
+        async with httpx.AsyncClient() as client:
+            ledger_size = int((await client.get(f"{TOOL_GATE_URL}/ledger/stats", timeout=2.0)).json().get("count", 0))
+            memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
+            memory_count = int((await client.get(f"{memu_url}/memory/stats", timeout=2.0)).json().get("records", 0))
+    except Exception:
+        logger.warning("Failed to fetch ledger/memory stats for index")
 
     go_no_go = await build_go_no_go_report()
     tool_gate_health = statuses.get("tool-gate", {}).get("details", {})
     policy_mode = str(tool_gate_health.get("mode", "PUB")).upper()
-    core_ready = all(node in alive_nodes for node in ["tool-gate", "memu-core", "executor"]) and ledger_size >= 0 and memory_count >= 0
+    core_nodes = ["tool-gate", "memu-core"]
+    if _executor_url:
+        core_nodes.append("executor")
+    core_ready = all(node in alive_nodes for node in core_nodes) and ledger_size >= 0 and memory_count >= 0
     return {
         "service": "dashboard",
         "status": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
         "tool_gate_url": TOOL_GATE_URL,
-        "ledger_url": LEDGER_URL,
         "core_ready": core_ready,
         "alive_nodes": alive_nodes,
         "node_status": statuses,

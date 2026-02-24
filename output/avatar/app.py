@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import os
-import re
 from typing import Dict
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+
+from common.runtime import sanitize_string
 
 
 app = FastAPI(title="Avatar Service", version="0.1.0")
@@ -18,11 +19,6 @@ class SpeakRequest(BaseModel):
     text: str
     voice: str = "keeper"
     emotion: str = "neutral"
-
-
-def sanitize_string(value: str) -> str:
-    sanitized = re.sub(r"[;|&]", "", value)
-    return sanitized[:1024]
 
 
 @app.get("/health")

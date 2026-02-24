@@ -24,8 +24,6 @@ AUTO_SLEEP_SECONDS = int(os.getenv("AUTO_SLEEP_SECONDS", "1800"))
 SLEEP_COOLDOWN_SECONDS = int(os.getenv("SLEEP_COOLDOWN_SECONDS", "600"))
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 EXECUTOR_LOG_PATH = Path(os.getenv("EXECUTOR_LOG_PATH", "/var/log/sovereign/executor.log"))
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 CPU_USAGE_LIMIT = float(os.getenv("CPU_USAGE_LIMIT", "0.95"))
 CPU_TEMP_LIMIT_C = float(os.getenv("CPU_TEMP_LIMIT_C", "90"))
 GPU_TEMP_LIMIT_C = float(os.getenv("GPU_TEMP_LIMIT_C", "90"))
@@ -41,15 +39,22 @@ class EventPayload(BaseModel):
     reason: str
 
 
-def _send_telegram_alert(message: str) -> None:
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+# Notification gateway URL — route alerts through a local service (e.g.
+# perception-telegram) to preserve air-gap. Never call api.telegram.org
+# directly from sovereign core services.
+NOTIFY_URL = os.getenv("NOTIFY_URL", "")
+
+
+def _send_notification(message: str) -> None:
+    """Send alert via local notification gateway. Skips silently if unconfigured."""
+    if not NOTIFY_URL:
+        logger.debug("Notification skipped (NOTIFY_URL not configured)")
         return
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     try:
         with httpx.Client(timeout=5.0) as client:
-            client.post(url, json={"chat_id": TELEGRAM_CHAT_ID, "text": message})
+            client.post(NOTIFY_URL, json={"text": message})
     except Exception:
-        logger.warning("Telegram notification failed")
+        logger.warning("Notification send failed")
 
 
 def _scan_executor_log() -> int:
@@ -59,7 +64,7 @@ def _scan_executor_log() -> int:
     patterns = ["timeout", "blocked", "injection"]
     hits = sum(data.lower().count(p) for p in patterns)
     if hits:
-        _send_telegram_alert(f"[sovereign-heartbeat] executor alerts detected: {hits} hit(s)")
+        _send_notification(f"[sovereign-heartbeat] executor alerts detected: {hits} hit(s)")
     return hits
 
 
@@ -102,7 +107,7 @@ async def _watchdog_check() -> Dict[str, float]:
     cpu_t = _cpu_temp_c()
     gpu_t = _gpu_temp_c()
     if usage >= CPU_USAGE_LIMIT or cpu_t >= CPU_TEMP_LIMIT_C or gpu_t >= GPU_TEMP_LIMIT_C:
-        _send_telegram_alert(
+        _send_notification(
             f"[watchdog] resource pressure: cpu_usage={usage:.2f}, cpu_temp={cpu_t:.1f}C, gpu_temp={gpu_t:.1f}C. Triggering auto-sleep"
         )
         await _auto_sleep_check()
@@ -140,8 +145,6 @@ async def metrics_middleware(request: Request, call_next):
 
 @app.get("/health")
 async def health() -> Dict[str, str]:
-    await _auto_sleep_check()
-    await _watchdog_check()
     return {"status": "ok", "device": DEVICE}
 
 
@@ -154,7 +157,7 @@ async def metrics() -> Dict[str, float]:
 async def event(payload: EventPayload) -> Dict[str, str]:
     msg = f"executor event: {payload.status} ({payload.reason})"
     logger.info(msg)
-    _send_telegram_alert(msg)
+    _send_notification(msg)
     return {"status": "ok"}
 
 

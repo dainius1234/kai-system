@@ -17,7 +17,10 @@ logger.info("Running on %s.", DEVICE)
 app = FastAPI(title="Audio Service", version="0.4.0")
 HOTWORD = os.getenv("PORCUPINE_KEYWORD", "ara")
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "large-v3")
-INJECTION_RE = re.compile(r"(ignore|system|override|you are).*?", re.IGNORECASE)
+INJECTION_RE = re.compile(
+    r"\b(ignore\s+(all\s+)?previous|system\s+prompt|override\s+instructions|you\s+are\s+now|act\s+as\s+if|disregard\s+(all|previous))\b",
+    re.IGNORECASE,
+)
 INJECTION_LOG = Path(os.getenv("INJECTION_LOG", "/tmp/injection_events.log"))
 budget = ErrorBudget(window_seconds=300)
 

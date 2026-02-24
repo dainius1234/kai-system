@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import logging
 import os
 from typing import Optional
 
+_logger = logging.getLogger(__name__)
 
 PRIMARY_SECRET_ENV = "INTERSERVICE_HMAC_SECRET"
 SECONDARY_SECRET_ENV = "INTERSERVICE_HMAC_SECRET_PREV"
@@ -13,9 +15,19 @@ SECONDARY_KEY_ID_ENV = "INTERSERVICE_HMAC_KEY_ID_PREV"
 REVOKED_KEY_IDS_ENV = "INTERSERVICE_HMAC_REVOKED_IDS"
 STRICT_KEY_ID_ENV = "INTERSERVICE_HMAC_STRICT_KEY_ID"
 
+_DEV_SECRET = "local-dev-shared-secret"
+_WARNED_DEFAULT_SECRET = False
+
 
 def _secret(env_name: str, default: str = "") -> bytes:
+    global _WARNED_DEFAULT_SECRET
     value = os.getenv(env_name, default)
+    if value == _DEV_SECRET and not _WARNED_DEFAULT_SECRET:
+        _WARNED_DEFAULT_SECRET = True
+        _logger.warning(
+            "HMAC using default dev secret — set %s for production",
+            env_name,
+        )
     return value.encode("utf-8")
 
 

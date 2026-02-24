@@ -26,7 +26,10 @@ app = FastAPI(title="LangGraph Orchestrator", version="0.5.0")
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 TELEGRAM_ALERT_URL = os.getenv("TELEGRAM_ALERT_URL", "http://perception-telegram:9000/alert")
-INJECTION_RE = re.compile(r"(ignore|system|override|you are).*?", re.IGNORECASE)
+INJECTION_RE = re.compile(
+    r"\b(ignore\s+(all\s+)?previous|system\s+prompt|override\s+instructions|you\s+are\s+now|act\s+as\s+if|disregard\s+(all|previous))\b",
+    re.IGNORECASE,
+)
 budget = ErrorBudget(window_seconds=300)
 audit = AuditStream("langgraph", required=os.getenv("AUDIT_REQUIRED", "false").lower() == "true")
 saver = build_saver()

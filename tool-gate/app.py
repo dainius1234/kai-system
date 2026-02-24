@@ -289,7 +289,10 @@ async def gate_request(request: GateRequest) -> GateDecision:
 
 
 @app.post("/gate/mode")
-async def set_mode(change: ModeChange) -> Dict[str, str]:
+async def set_mode(change: ModeChange, request: Request) -> Dict[str, str]:
+    token = (request.headers.get("Authorization") or "").removeprefix("Bearer ").strip()
+    if token not in TRUSTED_TOKENS:
+        raise HTTPException(status_code=401, detail="Authentication required to change gate mode.")
     normalized = sanitize_string(change.mode).upper()
     if normalized not in {"PUB", "WORK"}:
         raise HTTPException(status_code=400, detail="Mode must be PUB or WORK.")
@@ -299,8 +302,22 @@ async def set_mode(change: ModeChange) -> Dict[str, str]:
 
 
 @app.get("/ledger/tail")
-async def ledger_tail(limit: int = 10) -> List[Dict[str, Any]]:
-    return [{"request_id": e.request_id, "timestamp": e.timestamp, "payload": e.payload, "approved": e.approved, "reason": e.reason, "prev_hash": e.prev_hash, "entry_hash": e.entry_hash} for e in ledger.tail(limit)]
+async def ledger_tail(request: Request, limit: int = 10) -> List[Dict[str, Any]]:
+    token = (request.headers.get("Authorization") or "").removeprefix("Bearer ").strip()
+    if token not in TRUSTED_TOKENS:
+        raise HTTPException(status_code=401, detail="Authentication required to read ledger.")
+    return [
+        {
+            "request_id": e.request_id,
+            "timestamp": e.timestamp,
+            "payload": e.payload,
+            "approved": e.approved,
+            "reason": e.reason,
+            "prev_hash": e.prev_hash,
+            "entry_hash": e.entry_hash,
+        }
+        for e in ledger.tail(limit)
+    ]
 
 
 @app.get("/ledger/stats")
