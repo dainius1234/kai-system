@@ -22,6 +22,7 @@ logger.info("Running on %s.", DEVICE)
 app = FastAPI(title="Tool Gate", version="0.4.0")
 TOKENS_PATH = Path(os.getenv("TRUSTED_TOKENS_PATH", "/config/trusted_tokens.txt"))
 NONCE_CACHE_PATH = Path(os.getenv("NONCE_CACHE_PATH", "/tmp/tool-gate-nonces.json"))
+LEDGER_PATH = Path(os.getenv("LEDGER_PATH", "/data/tool-gate/ledger.jsonl"))
 TRUSTED_TOKENS: Set[str] = set()
 TOKEN_SCOPES: Dict[str, Set[str]] = {}
 NONCE_TTL_SECONDS = int(os.getenv("NONCE_TTL_SECONDS", "300"))
@@ -76,17 +77,122 @@ class LedgerEntry:
     entry_hash: str
 
 
-class InMemoryLedger:
-    def __init__(self) -> None:
+class PersistentLedger:
+    """Append-only hash-chain ledger backed by a JSONL file.
+
+    Every entry is appended as a single JSON line.  On startup the file is
+    replayed to rebuild the in-memory chain so reads stay fast.  The hash
+    chain is verified during replay — if a corrupt or tampered entry is
+    found, it is logged and the chain continues from the last good entry.
+    """
+
+    def __init__(self, path: Path) -> None:
         self._entries: List[LedgerEntry] = []
+        self._path = path
+        self._path.parent.mkdir(parents=True, exist_ok=True)
+        self._replay()
+
+    # -- persistence --------------------------------------------------------
+
+    def _replay(self) -> None:
+        """Reconstruct in-memory chain from the on-disk JSONL file."""
+        if not self._path.exists():
+            return
+        prev_hash = "GENESIS"
+        loaded = 0
+        for lineno, raw in enumerate(
+            self._path.read_text(encoding="utf-8").splitlines(), start=1
+        ):
+            raw = raw.strip()
+            if not raw:
+                continue
+            try:
+                obj = json.loads(raw)
+            except json.JSONDecodeError:
+                logger.warning("Ledger line %d: invalid JSON — skipped", lineno)
+                continue
+
+            entry = LedgerEntry(
+                request_id=obj["request_id"],
+                timestamp=obj["timestamp"],
+                payload=obj["payload"],
+                approved=obj["approved"],
+                reason=obj["reason"],
+                prev_hash=obj["prev_hash"],
+                entry_hash=obj["entry_hash"],
+            )
+
+            # verify chain integrity
+            expected_data = {
+                "request_id": entry.request_id,
+                "timestamp": entry.timestamp,
+                "payload": entry.payload,
+                "approved": entry.approved,
+                "reason": entry.reason,
+                "prev_hash": entry.prev_hash,
+            }
+            expected_hash = hashlib.sha256(
+                json.dumps(expected_data, sort_keys=True).encode()
+            ).hexdigest()
+
+            if entry.prev_hash != prev_hash or entry.entry_hash != expected_hash:
+                logger.warning(
+                    "Ledger line %d: chain integrity mismatch — skipped", lineno
+                )
+                continue
+
+            self._entries.append(entry)
+            prev_hash = entry.entry_hash
+            loaded += 1
+
+        logger.info("Ledger replayed: %d entries loaded from %s", loaded, self._path)
+
+    def _persist_entry(self, entry: LedgerEntry) -> None:
+        """Append a single entry as one JSON line."""
+        record = {
+            "request_id": entry.request_id,
+            "timestamp": entry.timestamp,
+            "payload": entry.payload,
+            "approved": entry.approved,
+            "reason": entry.reason,
+            "prev_hash": entry.prev_hash,
+            "entry_hash": entry.entry_hash,
+        }
+        try:
+            with self._path.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps(record, sort_keys=True) + "\n")
+        except Exception:
+            logger.error("Failed to persist ledger entry %s", entry.request_id)
+
+    # -- public API (same interface as the old InMemoryLedger) --------------
 
     def append(self, payload: Dict[str, Any], approved: bool, reason: str) -> LedgerEntry:
-        request_id = hashlib.sha256(f"{time.time_ns()}-{payload}".encode()).hexdigest()
+        request_id = hashlib.sha256(
+            f"{time.time_ns()}-{payload}".encode()
+        ).hexdigest()
         prev_hash = self._entries[-1].entry_hash if self._entries else "GENESIS"
-        entry_data = {"request_id": request_id, "timestamp": time.time(), "payload": payload, "approved": approved, "reason": reason, "prev_hash": prev_hash}
-        entry_hash = hashlib.sha256(json.dumps(entry_data, sort_keys=True).encode()).hexdigest()
-        entry = LedgerEntry(request_id=request_id, timestamp=entry_data["timestamp"], payload=payload, approved=approved, reason=reason, prev_hash=prev_hash, entry_hash=entry_hash)
+        entry_data = {
+            "request_id": request_id,
+            "timestamp": time.time(),
+            "payload": payload,
+            "approved": approved,
+            "reason": reason,
+            "prev_hash": prev_hash,
+        }
+        entry_hash = hashlib.sha256(
+            json.dumps(entry_data, sort_keys=True).encode()
+        ).hexdigest()
+        entry = LedgerEntry(
+            request_id=request_id,
+            timestamp=entry_data["timestamp"],
+            payload=payload,
+            approved=approved,
+            reason=reason,
+            prev_hash=prev_hash,
+            entry_hash=entry_hash,
+        )
         self._entries.append(entry)
+        self._persist_entry(entry)
         return entry
 
     def tail(self, limit: int = 10) -> List[LedgerEntry]:
@@ -96,7 +202,7 @@ class InMemoryLedger:
         return len(self._entries)
 
 
-ledger = InMemoryLedger()
+ledger = PersistentLedger(LEDGER_PATH)
 
 
 def _merkle_root(entries: List[LedgerEntry]) -> str:

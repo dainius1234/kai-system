@@ -92,10 +92,12 @@ class InMemorySaver:
 
 
 class ChecksummedSpoolSaver(InMemorySaver):
-    def __init__(self, spool_path: str) -> None:
+    def __init__(self, spool_path: str, max_bytes: int = 0) -> None:
         super().__init__()
         self.spool_path = Path(spool_path)
         self.spool_path.parent.mkdir(parents=True, exist_ok=True)
+        # max_bytes=0 means use the env var or default 10 MB
+        self.max_bytes = max_bytes or int(os.getenv("SPOOL_MAX_BYTES", str(10 * 1024 * 1024)))
         self._load_from_spool()
 
     def _line_for(self, payload: Dict[str, Any]) -> str:
@@ -122,12 +124,38 @@ class ChecksummedSpoolSaver(InMemorySaver):
                 continue
 
     def save_episode(self, payload: Dict[str, Any]) -> None:
+        self._rotate_if_needed()
         line = self._line_for(payload)
         with self.spool_path.open("a", encoding="utf-8") as f:
             f.write(line + "\n")
             f.flush()
             os.fsync(f.fileno())
         super().save_episode(payload)
+
+    def _rotate_if_needed(self) -> None:
+        """Rotate spool when it exceeds max_bytes.
+
+        Keeps the newest half of lines so the in-memory state stays
+        approximately warm.  The rotated portion is written to a
+        timestamped archive file alongside the spool.
+        """
+        if not self.spool_path.exists():
+            return
+        size = self.spool_path.stat().st_size
+        if size <= self.max_bytes:
+            return
+        lines = self.spool_path.read_text(encoding="utf-8").splitlines()
+        if not lines:
+            return
+        # keep the newest half
+        keep = max(len(lines) // 2, 1)
+        archive_lines = lines[:-keep]
+        kept_lines = lines[-keep:]
+        # write archive
+        archive_path = self.spool_path.with_suffix(f".{int(time.time())}.archive")
+        archive_path.write_text("\n".join(archive_lines) + "\n", encoding="utf-8")
+        # rewrite spool with kept lines
+        self.spool_path.write_text("\n".join(kept_lines) + "\n", encoding="utf-8")
 
 
 def build_saver() -> EpisodeSaver:

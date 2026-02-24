@@ -7,7 +7,7 @@ import time
 import uuid
 from collections import Counter
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Protocol, runtime_checkable
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel
@@ -93,7 +93,27 @@ class MemoryRecord(BaseModel):
     pinned: bool = False
 
 
-SPECIALISTS = ["DeepSeek-V4", "Kimi-2.5", "Qwen-VL"]
+# LLM specialists available for routing.  PUB mode defaults to Dolphin
+# (uncensored).  WORK mode routes to DeepSeek-V4 or Kimi-2.5 based on
+# task type.  Memu picks the right one; executor only runs what memu says.
+SPECIALISTS = ["DeepSeek-V4", "Kimi-2.5", "Dolphin"]
+
+
+@runtime_checkable
+class VectorStore(Protocol):
+    """Contract that every memory backend must satisfy.
+
+    Adding a new backend (FAISS, SQLite, etc.)? Implement this Protocol
+    and the linter will tell you if you missed anything.
+    """
+
+    def insert(self, record: MemoryRecord) -> VersionCommit: ...
+    def search(self, top_k: int, query: Optional[str] = None) -> List[MemoryRecord]: ...
+    def count(self) -> int: ...
+    def get_state(self) -> Dict[str, Any]: ...
+    def apply_state_delta(self, delta: Dict[str, Any]) -> VersionCommit: ...
+    def compress(self) -> Dict[str, Any]: ...
+    def revert(self, commit_id: str) -> None: ...
 
 
 # persistent vector store using PostgreSQL + pgvector
@@ -232,7 +252,10 @@ class InMemoryVectorStore:
         self._records = next_records
         return commit
 
-    def search(self, top_k: int) -> List[MemoryRecord]:
+    def search(self, top_k: int, query: Optional[str] = None) -> List[MemoryRecord]:
+        # In-memory: query param is accepted for interface compatibility but
+        # similarity search is not meaningful with fake embeddings.  Returns
+        # most-recent records, matching PGVectorStore's fallback behaviour.
         return list(reversed(self._records))[:top_k]
 
     def count(self) -> int:
@@ -287,6 +310,7 @@ class InMemoryVectorStore:
 
 
 # choose store implementation based on configuration
+store: VectorStore
 if os.getenv("VECTOR_STORE", "memory") == "postgres":
     logger.info("Using Postgres-backed vector store")
     store = PGVectorStore()
@@ -299,11 +323,18 @@ def generate_embedding(text: str) -> List[float]:
     return [seed / 100.0 for _ in range(8)]
 
 
-def select_specialist(query: str) -> str:
+def select_specialist(query: str, mode: str = "WORK") -> str:
+    """Pick the right LLM based on mode and query content.
+
+    PUB mode (chill/uncensored):  Always routes to Dolphin.
+    WORK mode (gated execution):  Routes to DeepSeek-V4 for reasoning/code
+                                  tasks, Kimi-2.5 for general or multimodal.
+    """
+    if mode == "PUB":
+        return "Dolphin"
+
     q = query.lower()
-    if any(k in q for k in ["image", "vision", "camera", "diagram"]):
-        return "Qwen-VL"
-    if any(k in q for k in ["plan", "reason", "policy", "risk"]):
+    if any(k in q for k in ["code", "plan", "reason", "policy", "risk", "debug", "build"]):
         return "DeepSeek-V4"
     return "Kimi-2.5"
 
@@ -319,11 +350,7 @@ def _similarity(a: List[float], b: List[float]) -> float:
 def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
     q_emb = generate_embedding(query)
     ranked: List[tuple[float, MemoryRecord]] = []
-    # if using postgres-backed store we can supply the query to narrow candidates
-    if os.getenv("VECTOR_STORE", "memory") == "postgres":
-        candidates = store.search(top_k=10_000, query=query)
-    else:
-        candidates = store.search(top_k=10_000)
+    candidates = store.search(top_k=10_000, query=query)
     for record in candidates:
         rid = str(record.content.get("user_id", ""))
         if user_id and rid and user_id != rid:

@@ -1,3 +1,10 @@
+"""Orchestrator stub — DEPRECATED.
+
+Memu-core is the real orchestrator in this architecture.  This service
+exists only as a placeholder for a potential future "final risk authority"
+layer that sits between memu-core and executor.  It currently does nothing
+beyond exposing a /health endpoint.
+"""
 from __future__ import annotations
 
 import os
@@ -6,12 +13,16 @@ from typing import Dict
 from fastapi import FastAPI
 
 
-app = FastAPI(title=os.getenv("SERVICE_NAME", "service"), version="0.1.0")
+app = FastAPI(title="Orchestrator (stub)", version="0.1.0")
 
 
 @app.get("/health")
 async def health() -> Dict[str, str]:
-    return {"status": "ok", "service": os.getenv("SERVICE_NAME", "service")}
+    return {
+        "status": "ok",
+        "service": "orchestrator",
+        "note": "stub — memu-core is the active orchestrator",
+    }
 
 
 if __name__ == "__main__":
