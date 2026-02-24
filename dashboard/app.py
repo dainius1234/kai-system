@@ -23,10 +23,13 @@ TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 budget = ErrorBudget(window_seconds=300)
 audit = AuditStream("dashboard", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
 
+SUPERVISOR_URL = os.getenv("SUPERVISOR_URL", "http://supervisor:8051")
+
 NODES: Dict[str, str] = {
     "tool-gate": f"{TOOL_GATE_URL}/health",
     "memu-core": os.getenv("MEMU_URL", "http://memu-core:8001") + "/health",
     "heartbeat": os.getenv("HEARTBEAT_URL", "http://heartbeat:8010") + "/status",
+    "supervisor": f"{SUPERVISOR_URL}/health",
 }
 _langgraph_url = os.getenv("LANGGRAPH_URL", "")
 if _langgraph_url:
@@ -200,6 +203,18 @@ refresh();
 </script>
 </body></html>"""
     return HTMLResponse(html)
+
+
+@app.get("/fleet")
+async def fleet() -> Dict[str, Any]:
+    """Proxy the supervisor's fleet health view into the dashboard."""
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.get(f"{SUPERVISOR_URL}/status")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"fleet": "unknown", "error": "supervisor unreachable"}
 
 
 @app.get("/readiness")

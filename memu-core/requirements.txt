@@ -3,3 +3,5 @@ uvicorn==0.30.6
 pydantic==2.8.2
 redis==5.0.8
 zstandard==0.23.0
+# real embeddings — comment out to use hash-based fallback
+sentence-transformers>=2.7.0

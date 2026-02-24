@@ -5,8 +5,9 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py ./
+COPY common/ ./common/
+COPY verifier/app.py ./app.py
 
-EXPOSE 8050
+EXPOSE 8052
 
 CMD ["python", "app.py"]

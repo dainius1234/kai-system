@@ -319,8 +319,36 @@ else:
 
 
 def generate_embedding(text: str) -> List[float]:
-    seed = sum(bytearray(text.encode("utf-8"))) % 100
-    return [seed / 100.0 for _ in range(8)]
+    """Generate a semantic embedding for *text*.
+
+    Uses ``sentence-transformers`` when available (real 384-dim vectors
+    with ``all-MiniLM-L6-v2`` by default).  Falls back to a deterministic
+    hash-based pseudo-embedding (8-dim) when the library is not installed
+    — keeps CI and lightweight tests running without the heavy dependency.
+    """
+    return _embedding_backend(text)
+
+
+# ── embedding backend (loaded once at import time) ──────────────────
+EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+
+try:
+    from sentence_transformers import SentenceTransformer as _ST
+
+    _st_model = _ST(EMBEDDING_MODEL_NAME)
+    logger.info("sentence-transformers loaded — model=%s  dim=%d", EMBEDDING_MODEL_NAME, _st_model.get_sentence_embedding_dimension())
+
+    def _embedding_backend(text: str) -> List[float]:
+        vec = _st_model.encode(text, show_progress_bar=False)
+        return vec.tolist()
+
+except Exception:  # pragma: no cover
+    logger.warning("sentence-transformers not available — using hash-based fake embeddings")
+
+    def _embedding_backend(text: str) -> List[float]:
+        # deterministic pseudo-embedding: SHA-256 → 8 floats in [0,1)
+        h = hashlib.sha256(text.encode("utf-8")).digest()
+        return [b / 255.0 for b in h[:8]]
 
 
 def select_specialist(query: str, mode: str = "WORK") -> str:

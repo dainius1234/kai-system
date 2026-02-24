@@ -32,6 +32,35 @@ SEEN_NONCES: Dict[str, float] = {}
 budget = ErrorBudget(window_seconds=300)
 audit = AuditStream("tool-gate", required=os.getenv("AUDIT_REQUIRED", "false").lower() == "true")
 
+# ── co-sign configuration ──────────────────────────────────────────
+# Tools listed here ALWAYS require human approval before execution,
+# regardless of confidence score.  Comma-separated in env var.
+COSIGN_REQUIRED_TOOLS: Set[str] = set(
+    t.strip() for t in os.getenv("COSIGN_REQUIRED_TOOLS", "shell").split(",") if t.strip()
+)
+# Requests below this confidence threshold also require co-sign, even
+# if the tool is not in the required list.
+COSIGN_CONFIDENCE_THRESHOLD = float(os.getenv("COSIGN_CONFIDENCE_THRESHOLD", "0.5"))
+# Maximum seconds a pending co-sign request is kept before expiring.
+COSIGN_TTL_SECONDS = int(os.getenv("COSIGN_TTL_SECONDS", "600"))
+# Notification endpoint for co-sign requests (air-gapped local gateway).
+NOTIFY_URL = os.getenv("NOTIFY_URL", "")
+
+# pending co-sign requests waiting for operator approval
+_pending_cosign: Dict[str, Dict[str, Any]] = {}
+
+
+def _send_notification(message: str) -> None:
+    """Route alert through local gateway.  Skips silently if unconfigured."""
+    if not NOTIFY_URL:
+        return
+    try:
+        import httpx
+        with httpx.Client(timeout=5.0) as client:
+            client.post(NOTIFY_URL, json={"text": message})
+    except Exception:
+        logger.warning("Co-sign notification delivery failed")
+
 
 class GateRequest(BaseModel):
     tool: str
@@ -64,6 +93,13 @@ class GateDecision(BaseModel):
 class ModeChange(BaseModel):
     mode: str
     reason: str
+
+
+class CosignAction(BaseModel):
+    """Operator's approval or denial of a pending co-sign request."""
+    request_id: str
+    approved: bool
+    reason: str = ""
 
 
 @dataclass
@@ -316,16 +352,38 @@ class GatePolicy:
     def evaluate(self, request: GateRequest) -> GateDecision:
         if self.mode == "PUB":
             approved, reason, reason_code = False, "Tool Gate in PUB mode (execution disabled).", "PUB_MODE"
-        elif request.confidence >= self.required_confidence or request.cosign:
-            approved, reason, reason_code = True, "Approved by confidence threshold or co-sign.", "APPROVED"
+            entry = ledger.append(request.model_dump(), approved, reason)
+        elif request.cosign:
+            # operator has already co-signed upstream
+            approved, reason, reason_code = True, "Approved by operator co-sign.", "COSIGNED"
+            entry = ledger.append(request.model_dump(), approved, reason)
+        elif request.confidence >= self.required_confidence and request.tool not in COSIGN_REQUIRED_TOOLS:
+            approved, reason, reason_code = True, "Approved by confidence threshold.", "APPROVED"
+            entry = ledger.append(request.model_dump(), approved, reason)
+        elif request.tool in COSIGN_REQUIRED_TOOLS or request.confidence < COSIGN_CONFIDENCE_THRESHOLD:
+            # high-risk tool or low confidence → park for human co-sign
+            entry = ledger.append(request.model_dump(), False, "Pending human co-sign")
+            _pending_cosign[entry.request_id] = {
+                "request": request.model_dump(),
+                "entry": entry,
+                "parked_at": time.time(),
+            }
+            # clean up expired pending requests
+            _cleanup_pending()
+            # notify operator
+            _send_notification(
+                f"[tool-gate] Co-sign needed: tool={request.tool} "
+                f"confidence={request.confidence:.0%} request_id={entry.request_id[:12]}…"
+            )
+            approved, reason, reason_code = False, "Awaiting human co-sign.", "PENDING_COSIGN"
         else:
             approved, reason, reason_code = False, "Insufficient confidence; co-sign required.", "LOW_CONFIDENCE"
+            entry = ledger.append(request.model_dump(), approved, reason)
 
-        entry = ledger.append(request.model_dump(), approved, reason)
         return GateDecision(
             request_id=entry.request_id,
             approved=approved,
-            status="approved" if approved else "blocked",
+            status="approved" if approved else ("pending_cosign" if reason_code == "PENDING_COSIGN" else "blocked"),
             reason=reason,
             ledger_hash=entry.entry_hash,
             reason_code=reason_code,
@@ -338,6 +396,17 @@ policy = GatePolicy()
 load_trusted_tokens()
 _restore_nonces()
 signal.signal(signal.SIGHUP, _reload_tokens)
+
+
+def _cleanup_pending() -> None:
+    """Remove expired co-sign requests."""
+    now = time.time()
+    expired = [rid for rid, info in _pending_cosign.items()
+               if now - info.get("parked_at", 0) > COSIGN_TTL_SECONDS]
+    for rid in expired:
+        _pending_cosign.pop(rid, None)
+        ledger.append({"request_id": rid}, False, "Co-sign request expired (TTL)")
+        logger.info("Co-sign request expired: %s", rid[:12])
 
 
 @app.middleware("http")
@@ -405,6 +474,66 @@ async def set_mode(change: ModeChange, request: Request) -> Dict[str, str]:
     policy.mode = normalized
     ledger.append({"mode": normalized, "reason": sanitize_string(change.reason)}, True, "Mode updated")
     return {"status": "ok", "mode": policy.mode}
+
+
+@app.get("/gate/pending")
+async def pending_cosigns(request: Request) -> List[Dict[str, Any]]:
+    """List requests awaiting human co-sign approval."""
+    token = (request.headers.get("Authorization") or "").removeprefix("Bearer ").strip()
+    if token not in TRUSTED_TOKENS:
+        raise HTTPException(status_code=401, detail="Authentication required.")
+    _cleanup_pending()
+    return [
+        {
+            "request_id": rid,
+            "tool": info["request"].get("tool"),
+            "confidence": info["request"].get("confidence"),
+            "actor_did": info["request"].get("actor_did"),
+            "parked_at": info.get("parked_at"),
+            "ttl_remaining": max(COSIGN_TTL_SECONDS - (time.time() - info.get("parked_at", 0)), 0),
+        }
+        for rid, info in _pending_cosign.items()
+    ]
+
+
+@app.post("/gate/cosign")
+async def cosign(action: CosignAction, request: Request) -> Dict[str, Any]:
+    """Operator approves or denies a pending co-sign request.
+
+    This is the human-in-the-loop gate.  Only trusted tokens can call it.
+    The decision is recorded in the immutable ledger.
+    """
+    token = (request.headers.get("Authorization") or "").removeprefix("Bearer ").strip()
+    if token not in TRUSTED_TOKENS:
+        raise HTTPException(status_code=401, detail="Authentication required to co-sign.")
+
+    _cleanup_pending()
+
+    pending = _pending_cosign.pop(action.request_id, None)
+    if pending is None:
+        raise HTTPException(status_code=404, detail="Request not found or expired.")
+
+    reason = f"Operator {'approved' if action.approved else 'denied'}: {sanitize_string(action.reason)}" if action.reason else (
+        "Operator approved" if action.approved else "Operator denied"
+    )
+
+    entry = ledger.append(
+        {"original_request": pending["request"], "cosign_decision": action.model_dump()},
+        action.approved,
+        reason,
+    )
+
+    status_word = "approved" if action.approved else "denied"
+    logger.info("Co-sign %s for request %s", status_word, action.request_id[:12])
+    _send_notification(f"[tool-gate] Co-sign {status_word}: {pending['request'].get('tool')} (request_id={action.request_id[:12]}…)")
+
+    return {
+        "status": "ok",
+        "request_id": action.request_id,
+        "approved": action.approved,
+        "reason": reason,
+        "ledger_hash": entry.entry_hash,
+    }
 
 
 @app.get("/ledger/tail")

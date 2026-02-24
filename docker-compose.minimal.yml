@@ -87,11 +87,34 @@ services:
       TOOL_GATE_URL: http://tool-gate:8000
       MEMU_URL: http://memu-core:8001
       HEARTBEAT_URL: http://heartbeat:8010
+      SUPERVISOR_URL: http://supervisor:8051
     ports:
       - "8080:8080"
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.7
+    depends_on:
+      - tool-gate
+      - memu-core
+      - heartbeat
+      - supervisor
+
+  supervisor:
+    build:
+      context: .
+      dockerfile: supervisor/Dockerfile
+    container_name: sovereign-supervisor
+    environment:
+      TOOL_GATE_URL: http://tool-gate:8000
+      MEMU_URL: http://memu-core:8001
+      HEARTBEAT_URL: http://heartbeat:8010
+      DASHBOARD_URL: http://dashboard:8080
+      SUPERVISOR_CHECK_INTERVAL: "15"
+    ports:
+      - "8051:8051"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.8
     depends_on:
       - tool-gate
       - memu-core
