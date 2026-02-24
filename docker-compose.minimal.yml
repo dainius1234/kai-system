@@ -29,7 +29,9 @@ services:
         ipv4_address: 172.20.0.4
 
   tool-gate:
-    build: ./tool-gate
+    build:
+      context: .
+      dockerfile: tool-gate/Dockerfile
     container_name: sovereign-tool-gate
     environment:
       MODE: "WORK"
@@ -44,7 +46,9 @@ services:
       - postgres
 
   memu-core:
-    build: ./memu-core
+    build:
+      context: .
+      dockerfile: memu-core/Dockerfile
     container_name: sovereign-memu-core
     environment:
       MEMU_URL: http://memu-core:8001
@@ -58,7 +62,9 @@ services:
       - redis
 
   heartbeat:
-    build: ./heartbeat
+    build:
+      context: .
+      dockerfile: heartbeat/Dockerfile
     container_name: sovereign-heartbeat
     environment:
       MEMU_URL: http://memu-core:8001
@@ -73,13 +79,13 @@ services:
       - memu-core
 
   dashboard:
-    build: ./dashboard
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
     container_name: sovereign-dashboard
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
       MEMU_URL: http://memu-core:8001
-      LANGGRAPH_URL: http://langgraph:8007
-      EXECUTOR_URL: http://executor:8002
       HEARTBEAT_URL: http://heartbeat:8010
     ports:
       - "8080:8080"
