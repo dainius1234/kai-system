@@ -161,12 +161,61 @@ services:
       dockerfile: executor/Dockerfile
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
+      HEARTBEAT_URL: http://heartbeat:8010
     ports:
       - "8002:8002"
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.12
     depends_on:
+      - tool-gate
+      - heartbeat
+
+  memory-compressor:
+    build:
+      context: .
+      dockerfile: memory-compressor/Dockerfile
+    environment:
+      MEMU_URL: http://memu-core:8001
+      COMPRESSOR_INTERVAL_HOURS: "24"
+    ports:
+      - "8057:8057"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.18
+    depends_on:
+      - memu-core
+
+  ledger-worker:
+    build:
+      context: .
+      dockerfile: ledger-worker/Dockerfile
+    environment:
+      TOOL_GATE_URL: http://tool-gate:8000
+      HEARTBEAT_URL: http://heartbeat:8010
+      LEDGER_VERIFY_INTERVAL: "60"
+    ports:
+      - "8056:8056"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.19
+    depends_on:
+      - tool-gate
+      - heartbeat
+
+  metrics-gateway:
+    build:
+      context: .
+      dockerfile: metrics-gateway/Dockerfile
+    environment:
+      METRICS_SCRAPE_INTERVAL: "30"
+    ports:
+      - "8058:8058"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.20
+    depends_on:
+      - memu-core
       - tool-gate
 
   audio-service:

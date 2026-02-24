@@ -41,6 +41,11 @@ SERVICES: List[Dict[str, str]] = [
     {"name": "heartbeat", "url": os.getenv("HEARTBEAT_URL", "http://heartbeat:8010")},
     {"name": "dashboard", "url": os.getenv("DASHBOARD_URL", "http://dashboard:8080")},
     {"name": "verifier", "url": os.getenv("VERIFIER_URL", "http://verifier:8052")},
+    {"name": "executor", "url": os.getenv("EXECUTOR_URL", "http://executor:8002")},
+    {"name": "fusion-engine", "url": os.getenv("FUSION_URL", "http://fusion-engine:8053")},
+    {"name": "memory-compressor", "url": os.getenv("MEMORY_COMPRESSOR_URL", "http://memory-compressor:8057")},
+    {"name": "ledger-worker", "url": os.getenv("LEDGER_WORKER_URL", "http://ledger-worker:8056")},
+    {"name": "metrics-gateway", "url": os.getenv("METRICS_GATEWAY_URL", "http://metrics-gateway:8058")},
 ]
 
 # Extra services added when running the full stack.

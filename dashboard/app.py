@@ -31,6 +31,10 @@ NODES: Dict[str, str] = {
     "heartbeat": os.getenv("HEARTBEAT_URL", "http://heartbeat:8010") + "/status",
     "supervisor": f"{SUPERVISOR_URL}/health",
     "verifier": os.getenv("VERIFIER_URL", "http://verifier:8052") + "/health",
+    "fusion-engine": os.getenv("FUSION_URL", "http://fusion-engine:8053") + "/health",
+    "memory-compressor": os.getenv("MEMORY_COMPRESSOR_URL", "http://memory-compressor:8057") + "/health",
+    "ledger-worker": os.getenv("LEDGER_WORKER_URL", "http://ledger-worker:8056") + "/health",
+    "metrics-gateway": os.getenv("METRICS_GATEWAY_URL", "http://metrics-gateway:8058") + "/health",
 }
 _langgraph_url = os.getenv("LANGGRAPH_URL", "")
 if _langgraph_url:
