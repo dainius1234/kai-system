@@ -30,6 +30,7 @@ NODES: Dict[str, str] = {
     "memu-core": os.getenv("MEMU_URL", "http://memu-core:8001") + "/health",
     "heartbeat": os.getenv("HEARTBEAT_URL", "http://heartbeat:8010") + "/status",
     "supervisor": f"{SUPERVISOR_URL}/health",
+    "verifier": os.getenv("VERIFIER_URL", "http://verifier:8052") + "/health",
 }
 _langgraph_url = os.getenv("LANGGRAPH_URL", "")
 if _langgraph_url:

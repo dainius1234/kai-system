@@ -120,5 +120,20 @@ services:
       - memu-core
       - heartbeat
 
+  verifier:
+    build:
+      context: .
+      dockerfile: verifier/Dockerfile
+    container_name: sovereign-verifier
+    environment:
+      MEMU_URL: http://memu-core:8001
+    ports:
+      - "8052:8052"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.9
+    depends_on:
+      - memu-core
+
 volumes:
   postgres_data:

@@ -105,7 +105,7 @@ def is_conviction_override(text: str) -> bool:
 def infer_specialist_fallback(user_input: str, task_hint: Optional[str]) -> str:
     combined = f"{user_input} {task_hint or ''}".lower()
     if any(token in combined for token in ("image", "vision", "camera", "diagram")):
-        return "Qwen-VL"
+        return "Kimi-2.5"
     if any(token in combined for token in ("plan", "reason", "policy", "risk")):
         return "DeepSeek-V4"
     return "Kimi-2.5"

@@ -40,6 +40,7 @@ SERVICES: List[Dict[str, str]] = [
     {"name": "memu-core", "url": os.getenv("MEMU_URL", "http://memu-core:8001")},
     {"name": "heartbeat", "url": os.getenv("HEARTBEAT_URL", "http://heartbeat:8010")},
     {"name": "dashboard", "url": os.getenv("DASHBOARD_URL", "http://dashboard:8080")},
+    {"name": "verifier", "url": os.getenv("VERIFIER_URL", "http://verifier:8052")},
 ]
 
 # Extra services added when running the full stack.

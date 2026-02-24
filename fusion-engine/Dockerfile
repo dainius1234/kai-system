@@ -5,8 +5,9 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py ./
+COPY common/ ./common/
+COPY fusion-engine/app.py ./app.py
 
-EXPOSE 8050
+EXPOSE 8053
 
 CMD ["python", "app.py"]

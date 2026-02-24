@@ -1,3 +1,13 @@
+"""memU core — file-based agent memory engine.
+
+The cognitive heart of the sovereign AI system.  Turns logs, sessions,
+and interactions into persistent, queryable memory with vector search.
+Replaces OpenClaw's executor-centric approach with long-term memory
+that remembers everything, builds context, and stays proactive.
+
+This service IS the orchestrator: it routes decisions to the right
+LLM specialist, manages memory retrieval, and handles state.
+"""
 from __future__ import annotations
 
 import hashlib
@@ -51,7 +61,7 @@ logger = setup_json_logger("memu-core", os.getenv("LOG_PATH", "/tmp/memu-core.js
 DEVICE = detect_device()
 logger.info("Running on %s.", DEVICE)
 
-app = FastAPI(title="Sovereign Memory Core", version="0.5.0")
+app = FastAPI(title="memU — core memory engine", version="0.6.0")
 budget = ErrorBudget(window_seconds=300)
 audit = AuditStream("memu-core", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
 last_compress_run = 0.0
@@ -74,6 +84,7 @@ class RoutingResponse(BaseModel):
 class MemoryUpdate(BaseModel):
     timestamp: str
     event_type: str
+    category: Optional[str] = None  # UK construction domain category (auto-classified if omitted)
     task_id: Optional[str] = None
     result_raw: Optional[str] = None
     metrics: Optional[Dict[str, Any]] = None
@@ -87,10 +98,47 @@ class MemoryRecord(BaseModel):
     id: str
     timestamp: str
     event_type: str
+    category: str = "general"  # domain category
     content: Dict[str, Any]
     embedding: List[float]
     relevance: float = 1.0
     pinned: bool = False
+
+
+# ── UK construction domain categories ───────────────────────────────
+# memU auto-classifies incoming records when no explicit category is
+# provided.  This turns free-form logs into structured, queryable data
+# so you can ask "last week's setting-out on Grid B" and it pulls
+# everything relevant.
+
+CONSTRUCTION_CATEGORIES: Dict[str, List[str]] = {
+    "setting-out":   ["setting out", "set out", "peg", "grid", "baseline", "offset", "coord", "station", "benchmark", "control point"],
+    "survey-data":   ["survey", "level", "total station", "gps", "rtk", "theodolite", "traverse", "elevation", "datum", "topographic"],
+    "rams":          ["rams", "risk assessment", "method statement", "hazard", "coshh", "ppe", "permit to work", "safe system"],
+    "itp":           ["itp", "inspection", "test plan", "hold point", "witness point", "quality check", "ncr", "snag", "defect"],
+    "drawings":      ["drawing", "cad", "autocad", "lisp", "dwg", "revision", "rfi", "design", "detail", "section", "elevation drawing"],
+    "hs-briefings":  ["briefing", "toolbox talk", "safety", "h&s", "health and safety", "induction", "near miss", "accident", "incident"],
+    "client-ncrs":   ["ncr", "non-conformance", "non conformance", "client complaint", "deficiency", "remedial", "corrective action"],
+    "daily-logs":    ["daily log", "daily report", "site diary", "progress", "weather", "labour", "plant", "material delivery"],
+}
+DEFAULT_CATEGORY = "general"
+
+
+def classify_category(text: str) -> str:
+    """Auto-classify text into a construction domain category.
+
+    Scans the combined event_type + content for domain keywords.
+    Returns the best-matching category or 'general' if nothing fits.
+    """
+    lower = text.lower()
+    best_cat = DEFAULT_CATEGORY
+    best_hits = 0
+    for cat, keywords in CONSTRUCTION_CATEGORIES.items():
+        hits = sum(1 for kw in keywords if kw in lower)
+        if hits > best_hits:
+            best_hits = hits
+            best_cat = cat
+    return best_cat
 
 
 # LLM specialists available for routing.  PUB mode defaults to Dolphin
@@ -464,9 +512,27 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
     pin_default = os.getenv("PIN_KEEPER_DEFAULT", "false").lower() == "true"
     keeper_pin = user_id == "keeper" and (update.pin or pin_default)
     relevance = 1.0 if keeper_pin else update.relevance
-    record = MemoryRecord(id=str(uuid.uuid4()), timestamp=update.timestamp, event_type=update.event_type, content={"result": update.result_raw, "metrics": update.metrics or {}, "state_changes": update.state_delta or {}, "user_id": user_id, "pin": keeper_pin}, embedding=generate_embedding(f"{update.event_type}: {update.result_raw}"), relevance=relevance, pinned=keeper_pin)
+    # auto-classify into construction domain category if not provided
+    text_for_classify = f"{update.event_type} {update.result_raw or ''}"
+    category = update.category or classify_category(text_for_classify)
+    record = MemoryRecord(
+        id=str(uuid.uuid4()),
+        timestamp=update.timestamp,
+        event_type=update.event_type,
+        category=category,
+        content={
+            "result": update.result_raw,
+            "metrics": update.metrics or {},
+            "state_changes": update.state_delta or {},
+            "user_id": user_id,
+            "pin": keeper_pin,
+        },
+        embedding=generate_embedding(f"{update.event_type}: {update.result_raw}"),
+        relevance=relevance,
+        pinned=keeper_pin,
+    )
     record_commit = store.insert(record)
-    return {"status": "appended", "id": record.id, "commit": record_commit.commit_id, "state_commit": commit.commit_id if commit else "none"}
+    return {"status": "appended", "id": record.id, "category": category, "commit": record_commit.commit_id, "state_commit": commit.commit_id if commit else "none"}
 
 
 @app.get("/memory/retrieve")
@@ -479,6 +545,39 @@ async def retrieve_context(query: str, user_id: str, top_k: int = 20) -> List[Me
 @app.get("/memory/state")
 async def memory_state() -> Dict[str, Any]:
     return {"status": "ok", "state": store.get_state()}
+
+
+@app.get("/memory/categories")
+async def memory_categories() -> Dict[str, Any]:
+    """List known construction domain categories and per-category record counts."""
+    all_records = store.search(top_k=10_000)
+    cat_counts: Dict[str, int] = {}
+    for rec in all_records:
+        cat = getattr(rec, "category", "general")
+        cat_counts[cat] = cat_counts.get(cat, 0) + 1
+    return {
+        "status": "ok",
+        "available_categories": list(CONSTRUCTION_CATEGORIES.keys()) + [DEFAULT_CATEGORY],
+        "record_counts": cat_counts,
+    }
+
+
+@app.get("/memory/search-by-category")
+async def search_by_category(
+    category: str,
+    query: Optional[str] = None,
+    top_k: int = Query(default=20, ge=1, le=200),
+) -> List[MemoryRecord]:
+    """Retrieve memory records filtered by construction domain category."""
+    cat = sanitize_string(category).lower()
+    candidates = store.search(top_k=10_000, query=query)
+    filtered = [r for r in candidates if getattr(r, "category", "general") == cat]
+    if query:
+        q_emb = generate_embedding(query)
+        scored = [((_similarity(q_emb, r.embedding) + r.relevance), r) for r in filtered]
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [r for _, r in scored[:top_k]]
+    return filtered[:top_k]
 
 
 @app.get("/memory/stats")
