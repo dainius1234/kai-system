@@ -2,11 +2,11 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt ./
+COPY backup-service/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py ./
+COPY backup-service/app.py ./app.py
 
-EXPOSE 8050
+EXPOSE 8054
 
 CMD ["python", "app.py"]

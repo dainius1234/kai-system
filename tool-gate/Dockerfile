@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY tool-gate/app.py ./
 COPY common/ ./common/
+COPY security/ ./security/
 
 EXPOSE 8000
 

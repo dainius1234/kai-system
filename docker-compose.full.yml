@@ -222,18 +222,22 @@ services:
     build:
       context: .
       dockerfile: perception/audio/Dockerfile
+    environment:
+      MEMU_URL: http://memu-core:8001
     ports:
-      - "8030:8030"
+      - "8021:8021"
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.13
+    depends_on:
+      - memu-core
 
   camera-service:
     build:
       context: .
       dockerfile: perception/camera/Dockerfile
     ports:
-      - "8040:8040"
+      - "8020:8020"
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.14
@@ -253,7 +257,7 @@ services:
       context: .
       dockerfile: output/tts/Dockerfile
     ports:
-      - "8031:8031"
+      - "8030:8030"
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.16
@@ -267,6 +271,69 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.17
+
+  screen-capture:
+    build:
+      context: .
+      dockerfile: screen-capture/Dockerfile
+    environment:
+      MEMU_URL: http://memu-core:8001
+    ports:
+      - "8059:8059"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.21
+    depends_on:
+      - memu-core
+
+  backup-service:
+    build:
+      context: .
+      dockerfile: backup-service/Dockerfile
+    ports:
+      - "8054:8054"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.22
+
+  calendar-sync:
+    build:
+      context: .
+      dockerfile: calendar-sync/Dockerfile
+    ports:
+      - "8055:8055"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.23
+
+  orchestrator:
+    build:
+      context: .
+      dockerfile: orchestrator/Dockerfile
+    environment:
+      TOOL_GATE_URL: http://tool-gate:8000
+      MEMU_URL: http://memu-core:8001
+      VERIFIER_URL: http://verifier:8052
+      EXECUTOR_URL: http://executor:8002
+    ports:
+      - "8050:8050"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.24
+    depends_on:
+      - tool-gate
+      - memu-core
+      - verifier
+
+  workspace-manager:
+    build:
+      context: .
+      dockerfile: workspace-manager/Dockerfile
+    ports:
+      - "8060:8060"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.25
 
 volumes:
   postgres_data:

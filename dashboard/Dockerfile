@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY dashboard/app.py ./
 COPY dashboard/static/ ./static/
 COPY common/ ./common/
+COPY security/ ./security/
 
 EXPOSE 8080
 

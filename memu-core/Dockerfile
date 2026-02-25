@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY memu-core/app.py ./
 COPY memu-core/lakefs_client.py ./
 COPY common/ ./common/
+COPY security/ ./security/
 
 EXPOSE 8001
 

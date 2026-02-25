@@ -2,10 +2,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt ./
+COPY output/tts/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py ./
+COPY common/ ./common/
+COPY security/ ./security/
+COPY output/tts/app.py ./app.py
 
 EXPOSE 8030
 
