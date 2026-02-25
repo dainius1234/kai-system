@@ -52,7 +52,53 @@ _pending_cosign: Dict[str, Dict[str, Any]] = {}
 
 # idempotency cache — maps key → (GateDecision, expiry_timestamp)
 _IDEMPOTENCY_TTL = int(os.getenv("IDEMPOTENCY_TTL_SECONDS", "300"))
-_idempotency_cache: Dict[str, tuple] = {}
+_idempotency_cache: Dict[str, tuple] = {}  # in-memory fallback
+
+# Redis-backed idempotency (survives restarts)
+_redis_client = None
+try:
+    import redis as _redis_mod
+    _redis_url = os.getenv("REDIS_URL", "")
+    if _redis_url:
+        _redis_client = _redis_mod.from_url(_redis_url, decode_responses=True)
+        _redis_client.ping()
+        logger.info("Redis idempotency cache connected: %s", _redis_url)
+except Exception as _re:
+    _redis_client = None
+    logger.warning("Redis unavailable — idempotency falls back to in-memory: %s", _re)
+
+
+def _idem_get(key: str):
+    """Return cached GateDecision JSON or None."""
+    if _redis_client:
+        try:
+            raw = _redis_client.get(f"idem:{key}")
+            if raw:
+                return json.loads(raw)
+        except Exception:
+            pass
+    cached = _idempotency_cache.get(key)
+    if cached:
+        dec_dict, expiry = cached
+        if time.time() < expiry:
+            return dec_dict
+        _idempotency_cache.pop(key, None)
+    return None
+
+
+def _idem_set(key: str, decision_dict: dict):
+    """Cache a gate decision."""
+    if _redis_client:
+        try:
+            _redis_client.setex(f"idem:{key}", _IDEMPOTENCY_TTL, json.dumps(decision_dict))
+        except Exception:
+            pass
+    _idempotency_cache[key] = (decision_dict, time.time() + _IDEMPOTENCY_TTL)
+    # prune stale in-memory entries
+    now = time.time()
+    stale = [k for k, (_, exp) in _idempotency_cache.items() if now >= exp]
+    for k in stale:
+        _idempotency_cache.pop(k, None)
 
 
 def _send_notification(message: str) -> None:
@@ -444,13 +490,9 @@ async def gate_request(request: GateRequest) -> GateDecision:
     # idempotency: return cached decision if key was seen recently
     idem_key = request.idempotency_key
     if idem_key:
-        cached = _idempotency_cache.get(idem_key)
-        if cached:
-            decision, expiry = cached
-            if time.time() < expiry:
-                return decision
-            else:
-                _idempotency_cache.pop(idem_key, None)
+        cached_dict = _idem_get(idem_key)
+        if cached_dict:
+            return GateDecision(**cached_dict)
     request = request.model_copy(
         update={
             "tool": sanitize_string(request.tool),
@@ -480,12 +522,7 @@ async def gate_request(request: GateRequest) -> GateDecision:
     decision = policy.evaluate(request)
     # cache for idempotency
     if idem_key:
-        _idempotency_cache[idem_key] = (decision, time.time() + _IDEMPOTENCY_TTL)
-        # prune stale entries (keep cache bounded)
-        now = time.time()
-        stale = [k for k, (_, exp) in _idempotency_cache.items() if now >= exp]
-        for k in stale:
-            _idempotency_cache.pop(k, None)
+        _idem_set(idem_key, decision.model_dump())
     return decision
 
 

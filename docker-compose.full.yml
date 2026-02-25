@@ -9,7 +9,7 @@ networks:
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg15
     environment:
       POSTGRES_DB: sovereign
       POSTGRES_USER: keeper
@@ -33,6 +33,7 @@ services:
     environment:
       MODE: "WORK"
       REQUIRED_CONFIDENCE: "0.7"
+      REDIS_URL: redis://redis:6379
     ports:
       - "8000:8000"
     networks:
@@ -40,6 +41,7 @@ services:
         ipv4_address: 172.20.0.3
     depends_on:
       - postgres
+      - redis
 
   memu-core:
     build:
@@ -49,6 +51,8 @@ services:
       MEMU_URL: http://memu-core:8001
       MAX_MEMORY_RECORDS: "5000"
       REDIS_URL: redis://redis:6379
+      VECTOR_STORE: postgres
+      PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
     ports:
       - "8001:8001"
     networks:
@@ -57,6 +61,7 @@ services:
     depends_on:
       - redis
       - tool-gate
+      - postgres
 
   heartbeat:
     build:

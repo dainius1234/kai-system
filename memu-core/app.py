@@ -205,101 +205,212 @@ class VectorStore(Protocol):
 class PGVectorStore:
     def __init__(self) -> None:
         import psycopg2
-        from psycopg2.extras import Json as _Json
+        import psycopg2.pool
+        from psycopg2.extras import Json as _Json, RealDictCursor as _RDC
 
+        self._psycopg2 = psycopg2
         self._Json = _Json
-        self.conn = psycopg2.connect(os.getenv("PG_URI", "postgresql://keeper:localdev@postgres:5432/sovereign"))
+        self._RDC = _RDC
+        self._pg_uri = os.getenv("PG_URI", "postgresql://keeper:localdev@postgres:5432/sovereign")
+        # min 1, max 5 connections — enough for a single-instance service
+        self._pool = psycopg2.pool.SimpleConnectionPool(1, 5, self._pg_uri)
         self._init_schema()
         self.vc = LakeFSClient()
         self._state: Dict[str, Any] = {}
 
+    def _get_conn(self):
+        """Get a connection from the pool, reconnect if stale."""
+        conn = self._pool.getconn()
+        try:
+            conn.isolation_level  # quick liveness check
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1")
+        except Exception:
+            try:
+                conn.close()
+            except Exception:
+                pass
+            self._pool = self._psycopg2.pool.SimpleConnectionPool(1, 5, self._pg_uri)
+            conn = self._pool.getconn()
+        return conn
+
+    def _put_conn(self, conn):
+        """Return a connection to the pool."""
+        try:
+            self._pool.putconn(conn)
+        except Exception:
+            pass
+
     def _init_schema(self) -> None:
-        with self.conn.cursor() as cur:
-            cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
-            cur.execute(
-                """
-                CREATE TABLE IF NOT EXISTS memories (
-                    id text PRIMARY KEY,
-                    timestamp text,
-                    event_type text,
-                    content jsonb,
-                    embedding vector,
-                    relevance float,
-                    pinned bool
-                );
-                """
-            )
-        self.conn.commit()
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+                cur.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS memories (
+                        id text PRIMARY KEY,
+                        timestamp text,
+                        event_type text,
+                        category text DEFAULT 'general',
+                        content jsonb,
+                        embedding vector,
+                        relevance float DEFAULT 1.0,
+                        importance float DEFAULT 0.5,
+                        access_count int DEFAULT 0,
+                        last_accessed text,
+                        pinned bool DEFAULT false,
+                        trust_tier text DEFAULT 'unverified',
+                        source_id text,
+                        poisoned bool DEFAULT false,
+                        quarantine_reason text
+                    );
+                    """
+                )
+                # migrate: add columns if table existed with old schema
+                for col, typ, default in [
+                    ("category", "text", "'general'"),
+                    ("importance", "float", "0.5"),
+                    ("access_count", "int", "0"),
+                    ("last_accessed", "text", "NULL"),
+                    ("trust_tier", "text", "'unverified'"),
+                    ("source_id", "text", "NULL"),
+                    ("poisoned", "bool", "false"),
+                    ("quarantine_reason", "text", "NULL"),
+                ]:
+                    try:
+                        cur.execute(f"ALTER TABLE memories ADD COLUMN IF NOT EXISTS {col} {typ} DEFAULT {default};")
+                    except Exception:
+                        conn.rollback()
+            conn.commit()
+        finally:
+            self._put_conn(conn)
 
     def insert(self, record: MemoryRecord) -> VersionCommit:
-        # store record in Postgres and enforce retention
-        with self.conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO memories (id, timestamp, event_type, content, embedding, relevance, pinned)\
-                 VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id) DO NOTHING",
-                (
-                    record.id,
-                    record.timestamp,
-                    record.event_type,
-                    self._Json(record.content),
-                    record.embedding,
-                    record.relevance,
-                    record.pinned,
-                ),
-            )
-        self.conn.commit()
-        # trim oldest entries if over limit
-        if MAX_MEMORY_RECORDS > 0:
-            with self.conn.cursor() as cur:
-                cur.execute("SELECT id FROM memories ORDER BY timestamp ASC")
-                ids = [r[0] for r in cur.fetchall()]
-            if len(ids) > MAX_MEMORY_RECORDS:
-                to_delete = ids[: len(ids) - MAX_MEMORY_RECORDS]
-                with self.conn.cursor() as cur:
-                    cur.execute("DELETE FROM memories WHERE id = ANY(%s)", (to_delete,))
-                self.conn.commit()
-        # commit to version control for state awareness, using same pattern as memory store
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """INSERT INTO memories
+                       (id, timestamp, event_type, category, content, embedding,
+                        relevance, importance, access_count, last_accessed,
+                        pinned, trust_tier, source_id, poisoned, quarantine_reason)
+                       VALUES (%s,%s,%s,%s,%s,%s::vector,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                       ON CONFLICT (id) DO UPDATE SET
+                         content = EXCLUDED.content,
+                         embedding = EXCLUDED.embedding,
+                         relevance = EXCLUDED.relevance,
+                         importance = EXCLUDED.importance,
+                         category = EXCLUDED.category
+                    """,
+                    (
+                        record.id,
+                        record.timestamp,
+                        record.event_type,
+                        getattr(record, "category", "general"),
+                        self._Json(record.content),
+                        str(record.embedding),  # pgvector needs string format
+                        record.relevance,
+                        getattr(record, "importance", 0.5),
+                        getattr(record, "access_count", 0),
+                        getattr(record, "last_accessed", None),
+                        record.pinned,
+                        getattr(record, "trust_tier", "unverified"),
+                        getattr(record, "source_id", None),
+                        getattr(record, "poisoned", False),
+                        getattr(record, "quarantine_reason", None),
+                    ),
+                )
+            conn.commit()
+            # trim oldest entries if over limit
+            if MAX_MEMORY_RECORDS > 0:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "DELETE FROM memories WHERE id IN "
+                        "(SELECT id FROM memories ORDER BY timestamp ASC "
+                        " OFFSET %s)", (MAX_MEMORY_RECORDS,)
+                    )
+                conn.commit()
+        finally:
+            self._put_conn(conn)
         branch = self.vc.create_branch("main", f"update-keeper-{int(time.time())}")
         commit = self.vc.put_branch_state(branch, [], self._state, f"update: user_id=keeper, ts={int(time.time())}")
         return commit
 
-    def search(self, top_k: int, query: Optional[str] = None) -> List[MemoryRecord]:
-        # if query is provided we perform embedding similarity, otherwise return
-        # the most recent records (by timestamp) up to top_k.
-        if query is None:
-            with self.conn.cursor() as cur:
-                cur.execute("SELECT id, timestamp, event_type, content, embedding, relevance, pinned FROM memories ORDER BY timestamp DESC LIMIT %s", (top_k,))
-                rows = cur.fetchall()
+    _SELECT_COLS = ("id, timestamp, event_type, category, content, embedding, "
+                    "relevance, importance, access_count, last_accessed, pinned, "
+                    "trust_tier, source_id, poisoned, quarantine_reason")
+
+    def _row_to_record(self, r: tuple) -> MemoryRecord:
+        content = r[4] if isinstance(r[4], dict) else json.loads(r[4])
+        # pgvector returns embedding as string '[0.1,0.2,...]' via psycopg2
+        raw_emb = r[5]
+        if isinstance(raw_emb, str):
+            emb = json.loads(raw_emb)
+        elif raw_emb is not None:
+            emb = list(raw_emb)
         else:
-            emb = generate_embedding(query)
-            with self.conn.cursor() as cur:
-                # using pgvector similarity operator <=>
-                cur.execute(
-                    "SELECT id, timestamp, event_type, content, embedding, relevance, pinned "
-                    "FROM memories ORDER BY embedding <=> %s LIMIT %s",
-                    (emb, top_k),
-                )
-                rows = cur.fetchall()
-        result: List[MemoryRecord] = []
-        for r in rows:
-            content = r[3] if isinstance(r[3], dict) else json.loads(r[3])
-            result.append(
-                MemoryRecord(
-                    id=r[0],
-                    timestamp=r[1],
-                    event_type=r[2],
-                    content=content,
-                    embedding=list(r[4]),
-                    relevance=r[5],
-                    pinned=r[6],
-                )
-            )
-        return result
+            emb = []
+        return MemoryRecord(
+            id=r[0], timestamp=r[1], event_type=r[2],
+            category=r[3] or "general", content=content, embedding=emb,
+            relevance=r[6] or 1.0, importance=r[7] or 0.5,
+            access_count=r[8] or 0, last_accessed=r[9],
+            pinned=r[10] or False, trust_tier=r[11] or "unverified",
+            source_id=r[12], poisoned=r[13] or False,
+            quarantine_reason=r[14],
+        )
+
+    def search(self, top_k: int, query: Optional[str] = None) -> List[MemoryRecord]:
+        conn = self._get_conn()
+        try:
+            if query is None:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        f"SELECT {self._SELECT_COLS} FROM memories "
+                        "ORDER BY timestamp DESC LIMIT %s", (top_k,))
+                    rows = cur.fetchall()
+            else:
+                emb = generate_embedding(query)
+                emb_str = str(emb)  # pgvector needs '[0.1, 0.2, ...]' string format
+                with conn.cursor() as cur:
+                    cur.execute(
+                        f"SELECT {self._SELECT_COLS} FROM memories "
+                        "ORDER BY embedding <=> %s::vector LIMIT %s", (emb_str, top_k))
+                    rows = cur.fetchall()
+            return [self._row_to_record(r) for r in rows]
+        finally:
+            self._put_conn(conn)
+
+    def update_record(self, record_id: str, **kwargs) -> bool:
+        """Update arbitrary fields on a stored memory record."""
+        if not kwargs:
+            return False
+        allowed = {"relevance", "importance", "access_count", "last_accessed",
+                    "pinned", "trust_tier", "source_id", "poisoned",
+                    "quarantine_reason", "category"}
+        fields = {k: v for k, v in kwargs.items() if k in allowed}
+        if not fields:
+            return False
+        set_clause = ", ".join(f"{k} = %s" for k in fields)
+        values = list(fields.values()) + [record_id]
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(f"UPDATE memories SET {set_clause} WHERE id = %s", values)
+            conn.commit()
+            return True
+        finally:
+            self._put_conn(conn)
 
     def count(self) -> int:
-        with self.conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*) FROM memories")
-            return cur.fetchone()[0]
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) FROM memories")
+                return cur.fetchone()[0]
+        finally:
+            self._put_conn(conn)
 
     def get_state(self) -> Dict[str, Any]:
         return dict(self._state)
@@ -312,7 +423,6 @@ class PGVectorStore:
         return commit
 
     def compress(self) -> Dict[str, Any]:
-        # compression logic can remain in memory or be no-op
         return {"before": 0, "after": 0, "bytes_saved": 0, "archived": 0}
 
     def revert(self, commit_id: str) -> None:
@@ -387,6 +497,16 @@ class InMemoryVectorStore:
         saved = max(before_bytes - max(after_bytes, target_bytes), 0)
         logger.info("weekly compression complete, bytes_saved=%s archived=%s", saved, archived)
         return {"before": before, "after": len(self._records), "bytes_saved": saved, "archived": archived}
+
+    def update_record(self, record_id: str, **kwargs) -> bool:
+        """Update fields on an in-memory record."""
+        for rec in self._records:
+            if rec.id == record_id:
+                for k, v in kwargs.items():
+                    if hasattr(rec, k):
+                        setattr(rec, k, v)
+                return True
+        return False
 
     def revert(self, commit_id: str) -> None:
         self.vc.revert(commit_id)
@@ -591,6 +711,13 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
     for record in results:
         record.access_count = getattr(record, "access_count", 0) + 1
         record.last_accessed = now_iso
+        # persist the access bump so it survives restarts
+        if hasattr(store, "update_record"):
+            store.update_record(
+                record.id,
+                access_count=record.access_count,
+                last_accessed=record.last_accessed,
+            )
 
     return results
 
@@ -784,6 +911,14 @@ class QuarantineRequest(BaseModel):
 @app.post("/memory/quarantine")
 async def quarantine_record(req: QuarantineRequest) -> Dict[str, str]:
     """Mark a memory record as poisoned — excluded from all future retrieval."""
+    # Persistent path: use update_record if backend supports it (PGVectorStore)
+    if hasattr(store, "update_record"):
+        ok = store.update_record(req.record_id, poisoned=True, quarantine_reason=req.reason)
+        if ok:
+            logger.info("quarantined record=%s reason=%s", req.record_id, req.reason)
+            return {"status": "quarantined", "id": req.record_id, "reason": req.reason}
+        raise HTTPException(status_code=404, detail=f"record {req.record_id} not found")
+    # In-memory fallback
     all_records = store.search(top_k=10_000)
     for rec in all_records:
         if rec.id == req.record_id:
@@ -797,6 +932,12 @@ async def quarantine_record(req: QuarantineRequest) -> Dict[str, str]:
 @app.post("/memory/quarantine/clear")
 async def clear_quarantine(req: QuarantineRequest) -> Dict[str, str]:
     """Remove quarantine flag from a record, restoring it to retrieval."""
+    if hasattr(store, "update_record"):
+        ok = store.update_record(req.record_id, poisoned=False, quarantine_reason=None)
+        if ok:
+            logger.info("cleared quarantine record=%s", req.record_id)
+            return {"status": "cleared", "id": req.record_id}
+        raise HTTPException(status_code=404, detail=f"record {req.record_id} not found")
     all_records = store.search(top_k=10_000)
     for rec in all_records:
         if rec.id == req.record_id:
