@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 
 from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
 
@@ -274,6 +274,53 @@ async def readiness() -> Dict[str, Any]:
     if not payload["core_ready"]:
         raise HTTPException(status_code=503, detail={"status": "not_ready", "core_ready": False, "reasons": payload["go_no_go"]["reasons"]})
     return {"status": "ready", "core_ready": True}
+
+
+# ── Chat proxy — Kai's face ─────────────────────────────────────────
+LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
+
+
+@app.get("/chat")
+async def chat_page() -> HTMLResponse:
+    """Serve the chat UI."""
+    chat_html = os.path.join(os.path.dirname(__file__), "static", "chat.html")
+    with open(chat_html, "r") as f:
+        return HTMLResponse(f.read())
+
+
+@app.post("/api/chat")
+async def api_chat_proxy(request: Request):
+    """Proxy chat requests to langgraph /chat with SSE streaming.
+
+    This keeps the browser talking only to dashboard:8080.
+    The langgraph service does the actual LLM inference.
+    """
+    body = await request.json()
+
+    async def stream_proxy():
+        try:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(180.0, connect=10.0, read=120.0)) as client:
+                async with client.stream(
+                    "POST",
+                    f"{LANGGRAPH_URL}/chat",
+                    json=body,
+                    headers={"Content-Type": "application/json"},
+                ) as resp:
+                    async for chunk in resp.aiter_bytes():
+                        yield chunk
+        except Exception as exc:
+            import json as _json
+            yield f"data: {_json.dumps({'token': f'[connection error: {str(exc)[:200]}]'})}\n\n"
+            yield "data: [DONE]\n\n"
+
+    return StreamingResponse(
+        stream_proxy(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 if __name__ == "__main__":

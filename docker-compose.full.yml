@@ -98,6 +98,7 @@ services:
     depends_on:
       - tool-gate
       - memu-core
+      - langgraph
       - heartbeat
 
   supervisor:
@@ -151,6 +152,9 @@ services:
       MEMU_URL: http://memu-core:8001
       TOOL_GATE_URL: http://tool-gate:8000
       REDIS_URL: redis://redis:6379
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_MODEL: qwen2:0.5b
+      LLM_TIMEOUT: "120"
     ports:
       - "8007:8007"
     networks:
@@ -159,6 +163,7 @@ services:
     depends_on:
       - memu-core
       - redis
+      - ollama
 
   executor:
     build:
@@ -311,6 +316,16 @@ services:
       sovereign-net:
         ipv4_address: 172.20.0.23
 
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.30
+
   orchestrator:
     build:
       context: .
@@ -320,6 +335,7 @@ services:
       MEMU_URL: http://memu-core:8001
       VERIFIER_URL: http://verifier:8052
       EXECUTOR_URL: http://executor:8002
+      OLLAMA_URL: http://ollama:11434
     ports:
       - "8050:8050"
     networks:
@@ -329,6 +345,7 @@ services:
       - tool-gate
       - memu-core
       - verifier
+      - ollama
 
   workspace-manager:
     build:
@@ -342,3 +359,4 @@ services:
 
 volumes:
   postgres_data:
+  ollama_data:

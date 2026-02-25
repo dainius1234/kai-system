@@ -40,13 +40,31 @@ class LLMResponse:
 
 
 # ── Specialist URL registry ─────────────────────────────────────────
+# Ollama is the primary local backend — add it as the default
+_OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama:11434")
+_OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2:0.5b")
+
 _DEFAULT_URLS: Dict[str, str] = {
+    "Ollama": _OLLAMA_URL,
     "DeepSeek-V4": os.getenv("LLM_DEEPSEEK_URL", ""),
     "Kimi-2.5": os.getenv("LLM_KIMI_URL", ""),
     "Dolphin": os.getenv("LLM_DOLPHIN_URL", ""),
 }
 
-LLM_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "30"))
+# Maps specialist names to their Ollama model identifiers.
+# When a specialist has a configured URL it uses the OpenAI-compatible
+# /v1/chat/completions endpoint.  For Ollama specifically, the model
+# field is overridden by OLLAMA_MODEL so any pulled model works.
+_MODEL_MAP: Dict[str, str] = {
+    "Ollama": _OLLAMA_MODEL,
+    "DeepSeek-V4": os.getenv("LLM_DEEPSEEK_MODEL", "deepseek-v4"),
+    "Kimi-2.5": os.getenv("LLM_KIMI_MODEL", "kimi-2.5"),
+    "Dolphin": os.getenv("LLM_DOLPHIN_MODEL", "dolphin-mistral"),
+}
+
+LLM_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "120"))
+LLM_CONNECT_TIMEOUT = float(os.getenv("LLM_CONNECT_TIMEOUT", "10"))
+LLM_READ_TIMEOUT = float(os.getenv("LLM_READ_TIMEOUT", "120"))
 
 
 class LLMRouter:
@@ -121,16 +139,18 @@ class LLMRouter:
         import httpx
 
         payload = {
-            "model": specialist,
+            "model": _MODEL_MAP.get(specialist, specialist),
             "messages": [
                 {"role": "system", "content": system},
                 {"role": "user", "content": prompt},
             ],
             "temperature": temperature,
             "max_tokens": max_tokens,
+            "stream": False,
         }
         try:
-            async with httpx.AsyncClient(timeout=LLM_TIMEOUT) as client:
+            timeout = httpx.Timeout(LLM_TIMEOUT, connect=LLM_CONNECT_TIMEOUT, read=LLM_READ_TIMEOUT)
+            async with httpx.AsyncClient(timeout=timeout) as client:
                 resp = await client.post(f"{url}/v1/chat/completions", json=payload)
                 resp.raise_for_status()
                 data = resp.json()
@@ -164,8 +184,7 @@ class LLMRouter:
         h = hashlib.sha256(f"{specialist}:{prompt[:200]}".encode()).hexdigest()[:8]
         text = (
             f"[{specialist} stub-{h}] This is a local stub response. "
-            f"Wire LLM_{'DEEPSEEK' if 'Deep' in specialist else 'KIMI' if 'Kimi' in specialist else 'DOLPHIN'}_URL "
-            f"to enable live inference."
+            f"Wire OLLAMA_URL to enable live inference (Ollama is the default backend)."
         )
         latency = (time.monotonic() - start) * 1000
         return LLMResponse(
@@ -174,6 +193,61 @@ class LLMRouter:
             latency_ms=round(latency, 1),
             source="stub",
         )
+
+    async def stream(
+        self,
+        specialist: str,
+        messages: List[Dict[str, str]],
+        *,
+        temperature: float = 0.7,
+        max_tokens: int = 1024,
+    ):
+        """Yield text chunks from a streaming LLM call.
+
+        *messages* is a full conversation in OpenAI format:
+          [{"role": "system", "content": ...}, {"role": "user", ...}, ...]
+
+        Yields plain-text token strings as they arrive.
+        Falls back to a single stub yield when no backend is configured.
+        """
+        url = self.backends.get(specialist, "")
+        if not url:
+            h = hashlib.sha256(str(messages[-1:]).encode()).hexdigest()[:8]
+            yield f"[{specialist} stub-{h}] Wire OLLAMA_URL or LLM env vars to enable live responses."
+            return
+
+        import httpx
+
+        model = _MODEL_MAP.get(specialist, specialist)
+        payload = {
+            "model": model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "stream": True,
+        }
+        import json as _json
+        try:
+            timeout = httpx.Timeout(LLM_TIMEOUT, connect=LLM_CONNECT_TIMEOUT, read=LLM_READ_TIMEOUT)
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                async with client.stream("POST", f"{url}/v1/chat/completions", json=payload) as resp:
+                    resp.raise_for_status()
+                    async for line in resp.aiter_lines():
+                        if not line.startswith("data: "):
+                            continue
+                        data_str = line[6:].strip()
+                        if data_str == "[DONE]":
+                            break
+                        try:
+                            chunk = _json.loads(data_str)
+                            delta = chunk.get("choices", [{}])[0].get("delta", {})
+                            token = delta.get("content", "")
+                            if token:
+                                yield token
+                        except Exception:
+                            continue
+        except Exception as exc:
+            yield f"\n[LLM error: {str(exc)[:200]}]"
 
 
 # ── module-level convenience ─────────────────────────────────────────

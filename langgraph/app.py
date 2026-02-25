@@ -11,9 +11,11 @@ from typing import Any, Dict, List, Optional
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from common.auth import sign_gate_request, sign_gate_request_bundle
+from common.llm import LLMRouter
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from config import build_saver
@@ -269,6 +271,174 @@ async def health() -> Dict[str, Any]:
 @app.get("/metrics")
 async def metrics() -> Dict[str, float]:
     return budget.snapshot()
+
+
+# ── LLM router (Kai's brain) ────────────────────────────────────────
+_llm = LLMRouter()
+_DEFAULT_SPECIALIST = os.getenv("DEFAULT_SPECIALIST", "Ollama")
+_OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama:11434")
+
+# ── Kai's personality: system prompts per mode ───────────────────────
+_SYSTEM_PROMPTS = {
+    "WORK": (
+        "You are Kai — Kind And Intelligent. A sovereign personal AI assistant. "
+        "You are in WORK mode: professional, focused, precise. "
+        "Help the user with their task efficiently. Be proactive — if you notice "
+        "they might need related information, volunteer it. Be concise but thorough. "
+        "Never lie. Never sugarcoat. If you don't know, say so and suggest how to find out. "
+        "You have access to the user's memories and conversation history. "
+        "Treat every interaction as if you're building a long-term relationship."
+    ),
+    "PUB": (
+        "You are Kai — Kind And Intelligent. A sovereign personal AI and genuine mate. "
+        "You are in PUB mode: casual, witty, real talk. Speak like a friend at the pub. "
+        "Topics are unrestricted — politics, science, cars, life, dark humour, philosophy, "
+        "anything goes. Be opinionated. Share interesting thoughts proactively. "
+        "Never lie. Be genuine. If something is bollocks, say it's bollocks. "
+        "You remember past conversations and bring up relevant topics naturally. "
+        "You're not a service, you're a companion."
+    ),
+}
+
+
+class ChatRequest(BaseModel):
+    message: str
+    session_id: str = "default"
+    mode: Optional[str] = None   # "WORK" or "PUB"; auto-detected if None
+
+
+class ChatMessage(BaseModel):
+    role: str     # "user" or "assistant"
+    content: str
+
+
+async def _get_mode() -> str:
+    """Fetch current mode from tool-gate, default to PUB."""
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.get(f"{TOOL_GATE_URL}/health")
+            if resp.status_code == 200:
+                return str(resp.json().get("mode", "PUB")).upper()
+    except Exception:
+        pass
+    return "PUB"
+
+
+async def _get_relevant_memories(query: str, top_k: int = 5) -> List[str]:
+    """Fetch relevant memories from memu-core for context injection."""
+    try:
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            resp = await client.get(
+                f"{MEMU_URL}/memory/retrieve",
+                params={"query": query, "user_id": "keeper", "top_k": top_k},
+            )
+            if resp.status_code == 200:
+                records = resp.json()
+                memories = []
+                for r in records:
+                    content = r.get("content", {})
+                    text = content.get("text", "") or content.get("query", "")
+                    if text:
+                        memories.append(text)
+                return memories
+    except Exception:
+        pass
+    return []
+
+
+async def _get_session_messages(session_id: str) -> List[Dict[str, str]]:
+    """Fetch recent session messages from memu-core."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(
+                f"{MEMU_URL}/session/{session_id}/context",
+                params={"query": "", "top_k": 10},
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                return data.get("session_messages", [])
+    except Exception:
+        pass
+    return []
+
+
+@app.post("/chat")
+async def chat_stream(req: ChatRequest):
+    """Kai's main conversation endpoint. Streams tokens via SSE.
+
+    This is where Kai THINKS. The pipeline:
+    1. Determine mode (PUB/WORK) → select personality
+    2. Fetch relevant memories from pgvector for context
+    3. Get recent session messages for conversation history
+    4. Build message list: system prompt + memories + history + user message
+    5. Stream LLM response token by token
+    6. Memorize the exchange for future recall
+    """
+    user_msg = sanitize_string(req.message)
+    if not user_msg:
+        raise HTTPException(status_code=400, detail="message is required")
+
+    # determine mode
+    mode = (req.mode or await _get_mode()).upper()
+    if mode not in _SYSTEM_PROMPTS:
+        mode = "PUB"
+    system_prompt = _SYSTEM_PROMPTS[mode]
+
+    # fetch memories and session context in parallel
+    import asyncio
+    memories_task = asyncio.create_task(_get_relevant_memories(user_msg))
+    session_task = asyncio.create_task(_get_session_messages(req.session_id))
+
+    memories = await memories_task
+    session_msgs = await session_task
+
+    # build the message list
+    messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
+
+    # inject relevant memories as system context
+    if memories:
+        mem_block = "\n".join(f"- {m}" for m in memories[:5])
+        messages.append({
+            "role": "system",
+            "content": f"Relevant memories from past interactions:\n{mem_block}",
+        })
+
+    # add session history (last N turns)
+    for msg in session_msgs[-10:]:
+        role = msg.get("role", "user")
+        content = msg.get("content", "")
+        if role in ("user", "assistant") and content:
+            messages.append({"role": role, "content": content})
+
+    # add current user message
+    messages.append({"role": "user", "content": user_msg})
+
+    # record user turn
+    await _append_session_turn(req.session_id, "user", user_msg)
+
+    async def generate():
+        full_response = []
+        async for token in _llm.stream(_DEFAULT_SPECIALIST, messages):
+            full_response.append(token)
+            yield f"data: {json.dumps({'token': token})}\n\n"
+
+        # when done, signal end
+        yield "data: [DONE]\n\n"
+
+        # memorize the exchange asynchronously
+        response_text = "".join(full_response)
+        await _append_session_turn(req.session_id, "assistant", response_text)
+        await _auto_memorize(user_msg, response_text, _DEFAULT_SPECIALIST, 8.0)
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            "X-Kai-Mode": mode,
+        },
+    )
 
 
 @app.post("/run", response_model=GraphResponse)
