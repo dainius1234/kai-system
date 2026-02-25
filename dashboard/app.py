@@ -10,6 +10,12 @@ from fastapi.responses import HTMLResponse
 
 from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
 
+try:
+    from common.policy import policy_hash, policy_version
+except Exception:
+    policy_hash = "unavailable"
+    policy_version = "unknown"
+
 logger = setup_json_logger("dashboard", os.getenv("LOG_PATH", "/tmp/dashboard.json.log"))
 DEVICE = detect_device()
 logger.info("Running on %s.", DEVICE)
@@ -132,7 +138,12 @@ async def build_go_no_go_report() -> Dict[str, Any]:
 
 @app.get("/health")
 async def health() -> Dict[str, str]:
-    return {"status": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)", "tool_gate_url": TOOL_GATE_URL}
+    return {
+        "status": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
+        "tool_gate_url": TOOL_GATE_URL,
+        "policy_version": policy_version,
+        "policy_hash": policy_hash,
+    }
 
 
 @app.get("/metrics")
@@ -157,6 +168,36 @@ async def index() -> Dict[str, object]:
     go_no_go = await build_go_no_go_report()
     tool_gate_health = statuses.get("tool-gate", {}).get("details", {})
     policy_mode = str(tool_gate_health.get("mode", "PUB")).upper()
+
+    # v7: fetch breaker states, quarantine count, verifier stats
+    breaker_states: Dict[str, Any] = {}
+    quarantine_count = 0
+    verifier_stats: Dict[str, Any] = {}
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            # breakers from supervisor
+            br_resp = await client.get(f"{SUPERVISOR_URL}/breakers")
+            if br_resp.status_code == 200:
+                breaker_states = br_resp.json()
+    except Exception:
+        pass
+    try:
+        memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            # quarantine count
+            q_resp = await client.get(f"{memu_url}/memory/quarantine/list")
+            if q_resp.status_code == 200:
+                quarantine_count = q_resp.json().get("count", 0)
+    except Exception:
+        pass
+    try:
+        verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8052")
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            v_resp = await client.get(f"{verifier_url}/metrics")
+            if v_resp.status_code == 200:
+                verifier_stats = v_resp.json()
+    except Exception:
+        pass
     core_nodes = ["tool-gate", "memu-core"]
     if _executor_url:
         core_nodes.append("executor")
@@ -173,6 +214,11 @@ async def index() -> Dict[str, object]:
         "policy_mode": policy_mode,
         "device_summary": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
         "go_no_go": go_no_go,
+        "policy_version": policy_version,
+        "policy_hash": policy_hash,
+        "breaker_states": breaker_states,
+        "quarantine_count": quarantine_count,
+        "verifier_stats": verifier_stats,
     }
 
 

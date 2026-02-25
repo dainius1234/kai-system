@@ -50,6 +50,10 @@ NOTIFY_URL = os.getenv("NOTIFY_URL", "")
 # pending co-sign requests waiting for operator approval
 _pending_cosign: Dict[str, Dict[str, Any]] = {}
 
+# idempotency cache — maps key → (GateDecision, expiry_timestamp)
+_IDEMPOTENCY_TTL = int(os.getenv("IDEMPOTENCY_TTL_SECONDS", "300"))
+_idempotency_cache: Dict[str, tuple] = {}
+
 
 def _send_notification(message: str) -> None:
     """Route alert through local gateway.  Skips silently if unconfigured."""
@@ -78,6 +82,7 @@ class GateRequest(BaseModel):
     signatures: List[str] = Field(default_factory=list)
     request_source: Optional[str] = None
     trace_id: Optional[str] = None
+    idempotency_key: Optional[str] = None  # client-supplied dedup key
 
 
 class GateDecision(BaseModel):
@@ -436,6 +441,16 @@ async def metrics() -> Dict[str, float]:
 @app.post("/gate/request", response_model=GateDecision)
 async def gate_request(request: GateRequest) -> GateDecision:
     check_rate_limit("gate_request")
+    # idempotency: return cached decision if key was seen recently
+    idem_key = request.idempotency_key
+    if idem_key:
+        cached = _idempotency_cache.get(idem_key)
+        if cached:
+            decision, expiry = cached
+            if time.time() < expiry:
+                return decision
+            else:
+                _idempotency_cache.pop(idem_key, None)
     request = request.model_copy(
         update={
             "tool": sanitize_string(request.tool),
@@ -462,7 +477,16 @@ async def gate_request(request: GateRequest) -> GateDecision:
     _validate_nonce_and_sig(request)
     if request.device is None:
         request = request.model_copy(update={"device": DEVICE})
-    return policy.evaluate(request)
+    decision = policy.evaluate(request)
+    # cache for idempotency
+    if idem_key:
+        _idempotency_cache[idem_key] = (decision, time.time() + _IDEMPOTENCY_TTL)
+        # prune stale entries (keep cache bounded)
+        now = time.time()
+        stale = [k for k, (_, exp) in _idempotency_cache.items() if now >= exp]
+        for k in stale:
+            _idempotency_cache.pop(k, None)
+    return decision
 
 
 @app.post("/gate/mode")

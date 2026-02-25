@@ -24,6 +24,17 @@ from pydantic import BaseModel
 
 from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
 
+try:
+    from common.policy import POLICY
+    _mem_policy = POLICY.get("memory", {})
+    REQUIRE_VERDICT_PASS = str(_mem_policy.get("require_verdict_pass", "false")).lower() == "true"
+    LOG_ONLY_MODE = str(_mem_policy.get("log_only_mode", "false")).lower() == "true"
+except Exception:
+    REQUIRE_VERDICT_PASS = False
+    LOG_ONLY_MODE = False
+
+VERIFIER_URL = os.getenv("VERIFIER_URL", "http://verifier:8052")
+
 # lakefs client is optional; provide a simple in-memory stub if unavailable
 try:
     from lakefs_client import LakeFSClient, VersionCommit
@@ -642,7 +653,34 @@ def _validate_state_delta_size(delta: Dict[str, Any]) -> None:
 
 @app.post("/memory/memorize")
 async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
+    import httpx as _httpx
     update = update.model_copy(update={"event_type": sanitize_string(update.event_type), "result_raw": sanitize_string(update.result_raw) if update.result_raw else None})
+
+    # v7 verdict gating — verify claim before storing if policy requires it
+    verdict = "SKIPPED"
+    if REQUIRE_VERDICT_PASS and update.result_raw:
+        try:
+            async with _httpx.AsyncClient(timeout=5.0) as vc:
+                v_resp = await vc.post(
+                    f"{VERIFIER_URL}/verify",
+                    json={"claim": update.result_raw[:1000], "source": "memu-memorize"},
+                )
+                v_resp.raise_for_status()
+                verdict = v_resp.json().get("verdict", "FAIL_CLOSED")
+        except Exception:
+            verdict = "VERIFIER_UNREACHABLE"
+            logger.warning("Verifier unreachable during memorize — verdict=%s", verdict)
+
+        if verdict == "FAIL_CLOSED":
+            if LOG_ONLY_MODE:
+                logger.info("memorize FAIL_CLOSED (log-only mode) — storing anyway")
+            else:
+                logger.warning("memorize blocked: verdict=%s", verdict)
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"Verifier verdict {verdict} — memory promotion blocked",
+                )
+
     commit = None
     if update.state_delta:
         existing = store.get_state()
@@ -683,7 +721,14 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
         pinned=keeper_pin,
     )
     record_commit = store.insert(record)
-    return {"status": "appended", "id": record.id, "category": category, "commit": record_commit.commit_id, "state_commit": commit.commit_id if commit else "none"}
+    return {
+        "status": "appended",
+        "id": record.id,
+        "category": category,
+        "commit": record_commit.commit_id,
+        "state_commit": commit.commit_id if commit else "none",
+        "verdict": verdict,
+    }
 
 
 @app.get("/memory/retrieve")

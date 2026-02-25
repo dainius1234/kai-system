@@ -269,23 +269,43 @@ async def trigger_archive() -> Dict[str, Any]:
 
 
 @app.get("/archive/list")
-async def list_archives() -> List[Dict[str, Any]]:
-    """List available archived snapshots."""
+async def list_archives(offset: int = 0, limit: int = 30) -> Dict[str, Any]:
+    """List available archived snapshots with pagination."""
     archives = sorted(ARCHIVE_DIR.glob("ledger_snapshot_*.jsonl"), reverse=True)
-    return [
-        {
-            "name": a.name,
-            "bytes": a.stat().st_size,
-            "created": datetime.fromtimestamp(a.stat().st_mtime).isoformat(),
-        }
-        for a in archives[:30]
-    ]
+    total = len(archives)
+    page = archives[offset:offset + limit]
+    return {
+        "total": total,
+        "offset": offset,
+        "limit": limit,
+        "archives": [
+            {
+                "name": a.name,
+                "bytes": a.stat().st_size,
+                "created": datetime.fromtimestamp(a.stat().st_mtime).isoformat(),
+            }
+            for a in page
+        ],
+    }
 
 
 @app.get("/history")
-async def verification_history(limit: int = 20) -> List[Dict[str, Any]]:
-    """Return recent verification results."""
-    return _verification_history[-limit:]
+async def verification_history(
+    limit: int = 20, offset: int = 0,
+) -> Dict[str, Any]:
+    """Return recent verification results with pagination."""
+    total = len(_verification_history)
+    # slice from the end (most recent first)
+    end = total - offset
+    start = max(end - limit, 0)
+    page = _verification_history[start:end]
+    page.reverse()  # newest first
+    return {
+        "total": total,
+        "offset": offset,
+        "limit": limit,
+        "history": page,
+    }
 
 
 if __name__ == "__main__":

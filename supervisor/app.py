@@ -160,9 +160,32 @@ async def status() -> Dict[str, Any]:
     so this endpoint is always fast and side-effect-free."""
     open_count = sum(1 for cb in breakers.values() if cb.state == "open")
     fleet = "degraded" if open_count else "healthy"
+
+    # v7: pull quarantine count + verifier verdict stats for fleet view
+    quarantine_count = 0
+    verifier_verdicts: Dict[str, Any] = {}
+    try:
+        memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            q_resp = await client.get(f"{memu_url}/memory/quarantine/list")
+            if q_resp.status_code == 200:
+                quarantine_count = q_resp.json().get("count", 0)
+    except Exception:
+        pass
+    try:
+        verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8052")
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            v_resp = await client.get(f"{verifier_url}/metrics")
+            if v_resp.status_code == 200:
+                verifier_verdicts = v_resp.json().get("verdicts", {})
+    except Exception:
+        pass
+
     return {
         "fleet": fleet,
         "open_breakers": open_count,
+        "quarantine_count": quarantine_count,
+        "verifier_verdicts": verifier_verdicts,
         "services": _last_status,
     }
 

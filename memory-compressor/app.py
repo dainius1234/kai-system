@@ -30,12 +30,17 @@ SCHEDULE_INTERVAL_HOURS = int(os.getenv("COMPRESSOR_INTERVAL_HOURS", "24"))
 MAX_RETRIES = int(os.getenv("COMPRESSOR_MAX_RETRIES", "3"))
 RETRY_BACKOFF = float(os.getenv("COMPRESSOR_RETRY_BACKOFF", "5.0"))
 
+# watermark-based triggering — auto-compress when record count exceeds this
+WATERMARK_HIGH = int(os.getenv("COMPRESSOR_WATERMARK_HIGH", "4500"))
+WATERMARK_CHECK_INTERVAL = int(os.getenv("COMPRESSOR_WATERMARK_CHECK_SECONDS", "300"))
+
 budget = ErrorBudget(window_seconds=600)
 audit = AuditStream("memory-compressor", required=os.getenv("AUDIT_REQUIRED", "false").lower() == "true")
 
 # ── run history ───────────────────────────────────────────────────────
 _run_history: List[Dict[str, Any]] = []
 _scheduler_task: asyncio.Task | None = None
+_watermark_task: asyncio.Task | None = None
 
 
 async def _call_memu(path: str, method: str = "POST", timeout: float = 60.0) -> Dict[str, Any]:
@@ -138,22 +143,53 @@ async def _scheduled_loop() -> None:
             logger.error("Scheduled compression failed: %s", exc)
 
 
+async def _watermark_loop() -> None:
+    """Event-driven compressor — triggers when memory count exceeds watermark.
+
+    Checks memu-core /memory/stats on a short interval.  When the record
+    count exceeds WATERMARK_HIGH, a compression cycle runs immediately.
+    This prevents unbounded memory growth between scheduled cycles.
+    """
+    logger.info(
+        "Watermark compressor started (high=%d, check every %ds)",
+        WATERMARK_HIGH, WATERMARK_CHECK_INTERVAL,
+    )
+    while True:
+        await asyncio.sleep(WATERMARK_CHECK_INTERVAL)
+        try:
+            stats = await _call_memu("/memory/stats", method="GET", timeout=10.0)
+            count = int(stats.get("records", 0))
+            if count >= WATERMARK_HIGH:
+                logger.info(
+                    "Watermark triggered: %d records >= %d — running compression",
+                    count, WATERMARK_HIGH,
+                )
+                await run_compression_cycle()
+        except Exception as exc:
+            logger.warning("Watermark check failed: %s", exc)
+
+
 # ── HTTP endpoints ────────────────────────────────────────────────────
 
 @app.on_event("startup")
 async def startup() -> None:
-    global _scheduler_task
+    global _scheduler_task, _watermark_task
     if os.getenv("COMPRESSOR_SCHEDULE_ENABLED", "true").lower() == "true":
         _scheduler_task = asyncio.create_task(_scheduled_loop())
         logger.info("Background scheduler enabled")
+    if os.getenv("COMPRESSOR_WATERMARK_ENABLED", "true").lower() == "true":
+        _watermark_task = asyncio.create_task(_watermark_loop())
+        logger.info("Watermark compressor enabled (high=%d)", WATERMARK_HIGH)
 
 
 @app.get("/health")
-async def health() -> Dict[str, str]:
+async def health() -> Dict[str, Any]:
     return {
         "status": "ok",
         "service": "memory-compressor",
         "scheduler": "active" if _scheduler_task and not _scheduler_task.done() else "inactive",
+        "watermark": "active" if _watermark_task and not _watermark_task.done() else "inactive",
+        "watermark_high": WATERMARK_HIGH,
     }
 
 
