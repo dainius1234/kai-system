@@ -31,8 +31,8 @@ logger.info("Running on %s.", DEVICE)
 
 app = FastAPI(title="Audio Service", version="0.5.0")
 HOTWORD = os.getenv("PORCUPINE_KEYWORD", "ara")
-WHISPER_MODEL = os.getenv("WHISPER_MODEL", "large-v3")
-WHISPER_BACKEND = os.getenv("WHISPER_BACKEND", "stub")  # "stub", "local", "api"
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "tiny")
+WHISPER_BACKEND = os.getenv("WHISPER_BACKEND", "local")  # "stub", "local", "api"
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 AUDIO_DIR = Path(os.getenv("AUDIO_DIR", "/tmp/audio-captures"))
 AUDIO_DIR.mkdir(parents=True, exist_ok=True)
@@ -62,6 +62,25 @@ try:
     _whisper_available = True
 except ImportError:
     logger.info("faster-whisper not available — transcription in stub mode")
+
+# Cached Whisper model — loaded once on first transcription request
+_whisper_model = None
+
+
+def _get_whisper_model():
+    """Lazy-load and cache the Whisper model."""
+    global _whisper_model
+    if _whisper_model is None and _whisper_available:
+        logger.info(
+            "Loading Whisper model '%s' (first-time download may be slow)...",
+            WHISPER_MODEL,
+        )
+        _whisper_model = WhisperModel(
+            WHISPER_MODEL, device="cpu", compute_type="int8",
+        )
+        logger.info("Whisper model '%s' loaded successfully.", WHISPER_MODEL)
+    return _whisper_model
+
 
 # transcript buffer for recent captures (ring buffer, max 50)
 _transcript_buffer: List[Dict[str, Any]] = []
@@ -94,26 +113,38 @@ def _check_injection(text: str, session_id: str = "unknown") -> bool:
     return False
 
 
-def _transcribe_audio(audio_bytes: bytes) -> str:
+def _transcribe_audio(audio_bytes: bytes, ext: str = ".wav") -> str:
     """Transcribe audio bytes via configured backend."""
     if WHISPER_BACKEND == "local" and _whisper_available:
-        # write to temp file for faster-whisper
-        tmp = AUDIO_DIR / f"_tmp_{int(time.time())}.wav"
+        model = _get_whisper_model()
+        if model is None:
+            return "[transcript: Whisper model failed to load]"
+        # write to temp file (faster-whisper needs a file path)
+        tmp = AUDIO_DIR / f"_tmp_{int(time.time())}{ext}"
         try:
             tmp.write_bytes(audio_bytes)
-            model = WhisperModel(WHISPER_MODEL, device="auto", compute_type="auto")
-            segments, _ = model.transcribe(str(tmp))
-            return " ".join(seg.text for seg in segments).strip()
+            segments, info = model.transcribe(
+                str(tmp), language="en", beam_size=1,
+            )
+            text = " ".join(seg.text for seg in segments).strip()
+            logger.info(
+                "transcribed %d bytes → %d chars (lang=%s prob=%.2f)",
+                len(audio_bytes), len(text),
+                info.language, info.language_probability,
+            )
+            return text if text else "[transcript: no speech detected]"
+        except Exception as e:
+            logger.error("Whisper transcription error: %s", e)
+            return f"[transcript: error — {str(e)[:100]}]"
         finally:
             tmp.unlink(missing_ok=True)
 
     if WHISPER_BACKEND == "api":
-        # placeholder for remote Whisper API endpoint
         logger.info("Whisper API backend not yet implemented")
         return "[transcript: Whisper API backend pending]"
 
-    # stub mode — return placeholder
-    return "[transcript: Whisper not available — GPU required for local transcription]"
+    # stub mode
+    return "[transcript: stub mode — set WHISPER_BACKEND=local for real STT]"
 
 
 def _record_microphone(seconds: int = RECORD_SECONDS) -> bytes:
@@ -202,7 +233,7 @@ async def listen(request: TranscriptRequest) -> Dict[str, str]:
         _transcript_buffer.pop(0)
 
     # auto-memorize if enabled
-    if os.getenv("AUTO_MEMORIZE_AUDIO", "false").lower() == "true":
+    if os.getenv("AUTO_MEMORIZE_AUDIO", "true").lower() == "true":
         await _auto_memorize(clean, "listen")
 
     return {"status": "ok", "message": "accepted", "text": clean}
@@ -219,10 +250,10 @@ async def capture_mic(seconds: int = RECORD_SECONDS) -> AudioCaptureResult:
     out_path = AUDIO_DIR / f"mic_{ts}.wav"
     out_path.write_bytes(audio_bytes)
 
-    transcript = _transcribe_audio(audio_bytes)
+    transcript = _transcribe_audio(audio_bytes, ext=".wav")
     injection = _check_injection(transcript)
 
-    if not injection and os.getenv("AUTO_MEMORIZE_AUDIO", "false").lower() == "true":
+    if not injection and os.getenv("AUTO_MEMORIZE_AUDIO", "true").lower() == "true":
         await _auto_memorize(transcript, f"mic:{out_path.name}")
 
     _transcript_buffer.append({"text": transcript, "source": "mic", "ts": time.time()})
@@ -255,10 +286,17 @@ async def capture_file(file: UploadFile = File(...)) -> AudioCaptureResult:
     out_path = AUDIO_DIR / f"upload_{ts}_{sanitize_string(file.filename)}"
     out_path.write_bytes(audio_bytes)
 
-    transcript = _transcribe_audio(audio_bytes)
+    # detect format from filename extension
+    _ext = ".wav"
+    if file.filename:
+        _parts = file.filename.rsplit(".", 1)
+        if len(_parts) > 1:
+            _ext = f".{_parts[1].lower()}"
+
+    transcript = _transcribe_audio(audio_bytes, ext=_ext)
     injection = _check_injection(transcript)
 
-    if not injection and os.getenv("AUTO_MEMORIZE_AUDIO", "false").lower() == "true":
+    if not injection and os.getenv("AUTO_MEMORIZE_AUDIO", "true").lower() == "true":
         await _auto_memorize(transcript, f"file:{file.filename}")
 
     return AudioCaptureResult(

@@ -234,6 +234,9 @@ services:
       dockerfile: perception/audio/Dockerfile
     environment:
       MEMU_URL: http://memu-core:8001
+      WHISPER_BACKEND: "local"
+      WHISPER_MODEL: "tiny"
+      AUTO_MEMORIZE_AUDIO: "true"
     ports:
       - "8021:8021"
     networks:
@@ -266,6 +269,9 @@ services:
     build:
       context: .
       dockerfile: output/tts/Dockerfile
+    environment:
+      TTS_BACKEND: "edge"
+      TTS_VOICE: "en-GB-RyanNeural"
     ports:
       - "8030:8030"
     networks:
@@ -325,6 +331,28 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.30
+
+  telegram-bot:
+    build:
+      context: .
+      dockerfile: telegram-bot/Dockerfile
+    environment:
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
+      LANGGRAPH_URL: http://langgraph:8007
+      AUDIO_SERVICE_URL: http://audio-service:8021
+      TTS_SERVICE_URL: http://tts-service:8030
+      TTS_ENABLED: "true"
+      DEFAULT_MODE: "PUB"
+      ALLOWED_CHAT_IDS: "${ALLOWED_CHAT_IDS:-}"
+    ports:
+      - "8025:8025"
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.26
+    depends_on:
+      - langgraph
+      - audio-service
+      - tts-service
 
   orchestrator:
     build:
