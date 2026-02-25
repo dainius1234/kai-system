@@ -42,13 +42,13 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
       3 compose port mismatches, 5 missing services in compose.
 - [x] **Health sweep automation** — scripts/health_sweep.py hits every
       `/health` → green/red scorecard. 22/22 ALL GREEN (commit 93ac2db).
-- [ ] **Postgres persistence** — switch memu-core default from in-memory to
-      postgres+pgvector (compose already has postgres service). Memories
-      survive restarts. This is fundamental to "organic" — an organism
-      that forgets everything on restart isn't learning.
-- [ ] **Redis for shared state** — rate-limit windows, idempotency cache,
-      and session state need to survive process restarts. Compose already
-      has Redis.
+- [x] **Postgres persistence** — pgvector/pgvector:pg15 image, full 15-column
+      schema with auto-migration, connection pooling, `::vector` casts,
+      embedding string parsing. memorize → INSERT, retrieve → cosine
+      similarity, access_count persisted (spaced repetition). Commit 39a7f37.
+- [x] **Redis for shared state** — tool-gate idempotency cache backed by
+      Redis (SETEX with TTL), graceful fallback to in-memory if Redis down.
+      rate_limit.py restored. Commit 39a7f37.
 
 ### P1 — Give it senses (perception)
 *An organism needs input channels. These all work without GPU.*
