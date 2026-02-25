@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-02-25 — session: v7 test coverage + perception wiring
+**Last updated:** 2026-02-25 — session: P0 Docker stack — 22/22 services healthy
 
 ---
 
@@ -20,11 +20,11 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
 | Metric | Value |
 |---|---|
-| Services | 23 (all with /health) |
+| Services | 22 (all with /health) |
 | Tests | 76 passing |
 | Lines of Python | ~10,500 |
 | Compose files | 3 (minimal/full/sovereign) |
-| Stack actually runs as containers? | **NO — untested** |
+| Stack actually runs as containers? | **YES — 22/22 ALL GREEN** |
 | Real LLM wired? | No (stubs) |
 | Real persistence? | No (in-memory default) |
 | Real input channel? | No (telegram is a dead polling loop) |
@@ -37,10 +37,11 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 ### P0 — Give it a body (stack must run)
 *Without this, everything else is fiction.*
 
-- [ ] **Docker compose build** — build all services, fix whatever breaks.
-      Every Dockerfile must produce a working image.
-- [ ] **Health sweep automation** — `docker compose up` → script hits every
-      `/health` → green/red scorecard. Must pass before any PR merges.
+- [x] **Docker compose build** — all 22 services build successfully.
+      Fixed 14 broken Dockerfiles (COPY paths), 7 wrong EXPOSE ports,
+      3 compose port mismatches, 5 missing services in compose.
+- [x] **Health sweep automation** — scripts/health_sweep.py hits every
+      `/health` → green/red scorecard. 22/22 ALL GREEN (commit 93ac2db).
 - [ ] **Postgres persistence** — switch memu-core default from in-memory to
       postgres+pgvector (compose already has postgres service). Memories
       survive restarts. This is fundamental to "organic" — an organism
