@@ -122,6 +122,13 @@ class MemoryRecord(BaseModel):
     access_count: int = 0  # how many times this memory was retrieved (spaced repetition)
     last_accessed: Optional[str] = None  # ISO timestamp of last retrieval
     pinned: bool = False
+    # v7 evidence pack fields (populated on retrieval, not stored)
+    rank_score: Optional[float] = None  # composite retrieval score
+    trust_tier: str = "unverified"  # unverified | PASS | REPAIR | FAIL_CLOSED
+    source_id: Optional[str] = None  # originating service or actor
+    # quarantine fields
+    poisoned: bool = False
+    quarantine_reason: Optional[str] = None
 
 
 # ── UK construction domain categories ───────────────────────────────
@@ -539,6 +546,9 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
     now_iso = datetime.utcnow().isoformat()
 
     for record in candidates:
+        # skip quarantined records — they never surface in retrieval
+        if getattr(record, "poisoned", False):
+            continue
         rid = str(record.content.get("user_id", ""))
         if user_id and rid and user_id != rid:
             continue
@@ -560,6 +570,10 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
 
     ranked.sort(key=lambda x: x[0], reverse=True)
     results = [r for _, r in ranked[:max(1, min(top_k, 100))]]
+
+    # attach rank_score to each returned record + bump access count
+    for i, (score, _) in enumerate(ranked[:max(1, min(top_k, 100))]):
+        results[i].rank_score = round(score, 4)
 
     # bump access count on retrieved records (spaced repetition)
     for record in results:
@@ -677,6 +691,86 @@ async def retrieve_context(query: str, user_id: str, top_k: int = 20) -> List[Me
     q = sanitize_string(query)
     uid = sanitize_string(user_id)
     return retrieve_ranked(q, uid, top_k=top_k)
+
+
+@app.get("/memory/evidence-pack")
+async def evidence_pack(query: str, user_id: str = "keeper",
+                        top_k: int = 10) -> Dict[str, Any]:
+    """Return a scored evidence pack for the verifier.
+
+    Each record includes its rank_score, trust_tier, and a summary of
+    why it was selected. The verifier uses this to decide PASS/REPAIR/FAIL_CLOSED.
+    """
+    q = sanitize_string(query)
+    uid = sanitize_string(user_id)
+    records = retrieve_ranked(q, uid, top_k=top_k)
+
+    pack = []
+    for rec in records:
+        pack.append({
+            "id": rec.id,
+            "rank_score": rec.rank_score,
+            "trust_tier": rec.trust_tier,
+            "source_id": rec.source_id or rec.content.get("user_id", "unknown"),
+            "category": rec.category,
+            "relevance": rec.relevance,
+            "importance": rec.importance,
+            "pinned": rec.pinned,
+            "content": rec.content,
+            "timestamp": rec.timestamp,
+        })
+
+    return {
+        "query": q,
+        "pack_size": len(pack),
+        "evidence": pack,
+    }
+
+
+# ── Quarantine endpoints ────────────────────────────────────────────
+
+
+class QuarantineRequest(BaseModel):
+    record_id: str
+    reason: str = "manual quarantine"
+
+
+@app.post("/memory/quarantine")
+async def quarantine_record(req: QuarantineRequest) -> Dict[str, str]:
+    """Mark a memory record as poisoned — excluded from all future retrieval."""
+    all_records = store.search(top_k=10_000)
+    for rec in all_records:
+        if rec.id == req.record_id:
+            rec.poisoned = True
+            rec.quarantine_reason = req.reason
+            logger.info("quarantined record=%s reason=%s", req.record_id, req.reason)
+            return {"status": "quarantined", "id": req.record_id, "reason": req.reason}
+    raise HTTPException(status_code=404, detail=f"record {req.record_id} not found")
+
+
+@app.post("/memory/quarantine/clear")
+async def clear_quarantine(req: QuarantineRequest) -> Dict[str, str]:
+    """Remove quarantine flag from a record, restoring it to retrieval."""
+    all_records = store.search(top_k=10_000)
+    for rec in all_records:
+        if rec.id == req.record_id:
+            rec.poisoned = False
+            rec.quarantine_reason = None
+            logger.info("cleared quarantine record=%s", req.record_id)
+            return {"status": "cleared", "id": req.record_id}
+    raise HTTPException(status_code=404, detail=f"record {req.record_id} not found")
+
+
+@app.get("/memory/quarantine/list")
+async def list_quarantined() -> Dict[str, Any]:
+    """List all quarantined (poisoned) records."""
+    all_records = store.search(top_k=10_000)
+    quarantined = [
+        {"id": r.id, "reason": r.quarantine_reason, "timestamp": r.timestamp,
+         "event_type": r.event_type, "category": r.category}
+        for r in all_records if getattr(r, "poisoned", False)
+    ]
+    return {"count": len(quarantined), "quarantined": quarantined}
 
 
 @app.get("/memory/state")

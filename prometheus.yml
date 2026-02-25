@@ -10,23 +10,98 @@ alerting:
         - targets: ["alertmanager:9093"]
 
 scrape_configs:
-  - job_name: sovereign-services
+  # ── Core services ─────────────────────────────────────────────────
+  - job_name: tool-gate
     metrics_path: /metrics
     static_configs:
-      - targets:
-          - tool-gate:8000
-          - memu-core:8001
-          - executor:8002
-          - langgraph:8007
-          - dashboard:8080
-          - heartbeat:8010
+      - targets: ["tool-gate:8000"]
+        labels:
+          service: tool-gate
+
+  - job_name: memu-core
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["memu-core:8001"]
+        labels:
+          service: memu-core
+
+  - job_name: executor
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["executor:8002"]
         labels:
           service: executor
-          metric: 500s
+
+  - job_name: langgraph
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["langgraph:8007"]
+        labels:
+          service: langgraph
+
+  - job_name: heartbeat
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["heartbeat:8010"]
+        labels:
+          service: heartbeat
+
+  - job_name: dashboard
+    metrics_path: /health
+    static_configs:
+      - targets: ["dashboard:8080"]
+        labels:
+          service: dashboard
+
+  # ── Watchdog services ─────────────────────────────────────────────
+  - job_name: supervisor
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["supervisor:8051"]
+        labels:
+          service: supervisor
+
+  - job_name: verifier
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["verifier:8052"]
+        labels:
+          service: verifier
+
+  - job_name: fusion-engine
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["fusion-engine:8053"]
+        labels:
+          service: fusion-engine
+
+  # ── Background workers ────────────────────────────────────────────
+  - job_name: memory-compressor
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["memory-compressor:8057"]
+        labels:
+          service: memory-compressor
+
+  - job_name: ledger-worker
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["ledger-worker:8056"]
+        labels:
+          service: ledger-worker
+
+  - job_name: metrics-gateway
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["metrics-gateway:8058"]
+        labels:
+          service: metrics-gateway
+
+  # ── Liveness probe ────────────────────────────────────────────────
   - job_name: executor-alive
     metrics_path: /alive
     static_configs:
       - targets: ["executor:8002"]
         labels:
           service: executor
-          metric: tokens_per_sec
+          probe: alive

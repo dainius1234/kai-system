@@ -1,13 +1,34 @@
 groups:
   - name: sovereign-health
     rules:
+      # ── Service availability ────────────────────────────────────────
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.job }} is unreachable"
+          description: "Prometheus cannot scrape {{ $labels.job }} for >1m"
+
+      # ── Error rates ─────────────────────────────────────────────────
       - alert: HighErrorRatio
         expr: rate(http_requests_total{status=~"5.."}[5m]) / clamp_min(rate(http_requests_total[5m]), 1) > 0.03
         for: 5m
         labels:
           severity: critical
         annotations:
-          summary: "5xx ratio above 3%"
+          summary: "5xx ratio above 3% on {{ $labels.service }}"
+
+      - alert: ErrorBudgetBurn
+        expr: rate(http_requests_total{status=~"5.."}[1h]) / clamp_min(rate(http_requests_total[1h]), 1) > 0.01
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow error budget burn on {{ $labels.service }} (>1% over 1h)"
+
+      # ── Executor ────────────────────────────────────────────────────
       - alert: ExecutorHighVRAM
         expr: executor_vram_utilization_percent > 90
         for: 2m
@@ -15,3 +36,39 @@ groups:
           severity: critical
         annotations:
           summary: "Executor VRAM > 90%"
+
+      # ── Verifier ────────────────────────────────────────────────────
+      - alert: VerifierHighFailRate
+        expr: rate(verifier_verdicts_total{verdict="FAIL_CLOSED"}[15m]) / clamp_min(rate(verifier_verdicts_total[15m]), 1) > 0.30
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Verifier FAIL_CLOSED rate >30% over 15m — possible data quality issue"
+
+      # ── Circuit breakers ────────────────────────────────────────────
+      - alert: CircuitBreakerOpen
+        expr: sovereign_circuit_breaker_state == 2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Circuit breaker OPEN on {{ $labels.service }} for >2m"
+
+      # ── Memory ──────────────────────────────────────────────────────
+      - alert: MemoryStoreGrowth
+        expr: sovereign_memory_record_count > 4500
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memory store approaching limit ({{ $value }}/5000 records)"
+
+      # ── Quarantine ──────────────────────────────────────────────────
+      - alert: QuarantineSpike
+        expr: rate(sovereign_quarantine_total[15m]) > 0.1
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Quarantine rate spiking — possible poisoning event"

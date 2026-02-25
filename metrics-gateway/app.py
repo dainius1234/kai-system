@@ -20,7 +20,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 
 from common.runtime import ErrorBudget, setup_json_logger
@@ -168,6 +168,19 @@ async def _scraper_loop() -> None:
 
 # ── HTTP endpoints ────────────────────────────────────────────────────
 
+# Bearer auth — if METRICS_AUTH_TOKEN is set, all data endpoints require it.
+_AUTH_TOKEN = os.getenv("METRICS_AUTH_TOKEN", "")
+
+
+def _check_auth(request: Request) -> None:
+    """Enforce Bearer auth when configured."""
+    if not _AUTH_TOKEN:
+        return
+    header = (request.headers.get("Authorization") or "").removeprefix("Bearer ").strip()
+    if header != _AUTH_TOKEN:
+        raise HTTPException(status_code=401, detail="Authentication required")
+
+
 @app.on_event("startup")
 async def startup() -> None:
     global _scraper_task
@@ -185,8 +198,9 @@ async def health() -> Dict[str, str]:
 
 
 @app.get("/metrics")
-async def aggregated_metrics() -> Dict[str, Any]:
+async def aggregated_metrics(request: Request) -> Dict[str, Any]:
     """Return aggregated metrics from all services."""
+    _check_auth(request)
     return {
         "status": "ok",
         "last_scrape": datetime.fromtimestamp(_last_scrape).isoformat() if _last_scrape else None,
@@ -245,8 +259,9 @@ async def trigger_scrape() -> Dict[str, Any]:
 
 
 @app.get("/fleet")
-async def fleet_status() -> Dict[str, Any]:
+async def fleet_status(request: Request) -> Dict[str, Any]:
     """Fleet overview — health + uptime of all services."""
+    _check_auth(request)
     fleet = {}
     for name, url, *_ in SERVICES:
         h = _latest_health.get(name, {})

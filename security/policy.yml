@@ -1,0 +1,132 @@
+# ═══════════════════════════════════════════════════════════════════════
+#  Sovereign AI — Policy-as-Code (single source of truth)
+#
+#  Every runtime decision (tool-gate gating, verifier verdicts, circuit
+#  breaker thresholds, quarantine triggers) reads from this file.
+#
+#  Changing this file IS a policy revision.  Changes are logged,
+#  diffable, and auditable.  Never edit in production without a PR.
+#
+#  Version: 1.0.0
+#  Last updated: 2026-02-25
+# ═══════════════════════════════════════════════════════════════════════
+
+version: "1.0.0"
+
+# ── Risk tiers ────────────────────────────────────────────────────────
+# Every tool-gate decision maps to a risk tier based on tool + confidence.
+risk_tiers:
+  LOW:
+    confidence_min: 0.85
+    requires_cosign: false
+    max_rate_per_minute: 30
+    tools: ["noop"]
+  MEDIUM:
+    confidence_min: 0.70
+    requires_cosign: false
+    max_rate_per_minute: 10
+    tools: ["shell", "python"]
+  HIGH:
+    confidence_min: 0.90
+    requires_cosign: true
+    max_rate_per_minute: 3
+    tools: ["qgis", "n8n"]
+
+# ── Verifier thresholds ──────────────────────────────────────────────
+# Controls how the verifier maps signal scores to verdicts.
+verifier:
+  # PASS: memory promotion allowed, tool execution approved
+  pass_threshold: 0.65
+  # REPAIR: auto-retry with broadened retrieval before failing
+  repair_threshold: 0.35
+  # Below repair_threshold → FAIL_CLOSED (no promotion, no execution)
+
+  # Material claim extraction: which types of claims trigger strict verification
+  material_claim_types:
+    - numbers        # quantities, measurements, coordinates
+    - dates          # deadlines, milestones, schedule dates
+    - identifiers    # drawing numbers, NCR IDs, grid references
+    - instructions   # "do X then Y" action sequences
+    - safety         # H&S, RAMS, permits, COSHH references
+    - financial      # costs, invoices, payment terms
+    - config         # ports, auth settings, encryption, backup paths
+
+  # Minimum number of strong evidence chunks to reach PASS
+  min_strong_chunks: 2
+  # Chunk relevance minimum to count as "strong"
+  strong_chunk_threshold: 0.60
+
+# ── Evidence scoring ─────────────────────────────────────────────────
+# How the evidence pack scores are weighted.
+evidence:
+  weights:
+    similarity: 0.35
+    relevance: 0.20
+    importance: 0.20
+    recency: 0.20
+    pin_bonus: 0.05
+  # Minimum evidence score for promotion to long-term memory
+  promotion_threshold: 0.50
+  # Freshness: records older than this get a staleness penalty
+  freshness_days: 30
+  staleness_penalty: 0.15
+
+# ── Circuit breakers ─────────────────────────────────────────────────
+circuit_breakers:
+  default:
+    failure_threshold: 3
+    recovery_seconds: 30
+  error_budget:
+    warn_ratio: 0.05
+    open_ratio: 0.10
+    window_seconds: 300
+    recovery_seconds: 60
+
+# ── Rate limits ──────────────────────────────────────────────────────
+rate_limits:
+  # Global per-actor limits (requests per minute)
+  gate_request: 20
+  memory_memorize: 60
+  memory_retrieve: 120
+  execute: 10
+  # Burst allowance (multiplier on the per-minute limit for short bursts)
+  burst_multiplier: 2.0
+
+# ── Quarantine ───────────────────────────────────────────────────────
+quarantine:
+  # After this many FAIL_CLOSED verdicts in the spike window, enter containment
+  spike_threshold: 5
+  spike_window_minutes: 15
+  # Containment actions (applied automatically)
+  containment:
+    raise_pass_threshold_to: 0.80
+    force_evidence_first: true
+    slow_write_factor: 0.5      # halve the write rate
+    open_breakers_aggressively: true
+  # Records marked poisoned are excluded from retrieval until cleared
+  auto_clear_after_hours: null   # null = manual clear only
+
+# ── Memory promotion rules ───────────────────────────────────────────
+memory:
+  # Only PASS verdicts allow memory promotion
+  require_verdict_pass: true
+  # Log-only mode: writes are logged but not promoted (safe for debugging)
+  log_only_mode: false
+  # Maximum records before compression triggers
+  max_records: 5000
+  # Compression: archive records older than this with relevance below threshold
+  compression:
+    age_days: 90
+    relevance_floor: 0.20
+
+# ── Mode governance ──────────────────────────────────────────────────
+modes:
+  PUB:
+    execution_allowed: false
+    memory_promotion: true
+    cosign_required: false
+  WORK:
+    execution_allowed: true
+    memory_promotion: true
+    cosign_required: true
+    cosign_ttl_seconds: 300

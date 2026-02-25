@@ -22,13 +22,26 @@ import httpx
 from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
 
-from common.runtime import ErrorBudget, detect_device, setup_json_logger
+from common.runtime import (
+    CircuitBreaker,
+    ErrorBudget,
+    ErrorBudgetCircuitBreaker,
+    detect_device,
+    setup_json_logger,
+)
 
 logger = setup_json_logger("fusion-engine", os.getenv("LOG_PATH", "/tmp/fusion-engine.json.log"))
 DEVICE = detect_device()
 
-app = FastAPI(title="Fusion Engine", version="0.2.0")
+app = FastAPI(title="Fusion Engine", version="0.3.0")
 budget = ErrorBudget(window_seconds=300)
+
+# Circuit breakers for outbound calls
+VERIFIER_BREAKER = CircuitBreaker(failure_threshold=3, recovery_seconds=30)
+MEMU_BREAKER = CircuitBreaker(failure_threshold=3, recovery_seconds=30)
+LLM_ERROR_GUARD = ErrorBudgetCircuitBreaker(
+    warn_ratio=0.05, open_ratio=0.10
+)
 
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 VERIFIER_URL = os.getenv("VERIFIER_URL", "http://verifier:8052")
@@ -85,6 +98,9 @@ async def _query_specialist(client: httpx.AsyncClient, name: str, prompt: str, c
 
     if url:
         # real LLM backend — expects OpenAI-compatible /v1/chat/completions
+        if not LLM_ERROR_GUARD.allow():
+            latency = (time.monotonic() - start) * 1000
+            return SpecialistResponse(specialist=name, response="[circuit open — LLM backends]", latency_ms=round(latency, 1), source="error")
         try:
             payload = {
                 "model": name,
@@ -97,11 +113,13 @@ async def _query_specialist(client: httpx.AsyncClient, name: str, prompt: str, c
             }
             resp = await client.post(f"{url}/v1/chat/completions", json=payload, timeout=30.0)
             resp.raise_for_status()
+            LLM_ERROR_GUARD.record(resp.status_code)
             data = resp.json()
             text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
             latency = (time.monotonic() - start) * 1000
             return SpecialistResponse(specialist=name, response=text, latency_ms=round(latency, 1), source="live")
         except Exception as exc:
+            LLM_ERROR_GUARD.record(500)
             latency = (time.monotonic() - start) * 1000
             logger.warning("LLM query failed for %s: %s", name, str(exc)[:100])
             return SpecialistResponse(specialist=name, response=f"[error: {str(exc)[:80]}]", latency_ms=round(latency, 1), source="error")
@@ -166,12 +184,17 @@ def _merge_responses(responses: List[SpecialistResponse]) -> str:
 # ── Endpoints ───────────────────────────────────────────────────────
 
 @app.get("/health")
-async def health() -> Dict[str, str]:
+async def health() -> Dict[str, Any]:
     return {
         "status": "ok",
         "device": DEVICE,
         "llm_backends": str(len(LLM_BACKENDS)),
         "configured_backends": ",".join(LLM_BACKENDS.keys()) or "none (using stubs)",
+        "breakers": {
+            "verifier": VERIFIER_BREAKER.state,
+            "memu": MEMU_BREAKER.state,
+            "llm": LLM_ERROR_GUARD.state,
+        },
     }
 
 
@@ -201,7 +224,7 @@ async def fuse(req: FusionRequest) -> FusionResult:
 
     # optional verification pass through the verifier service
     verification = None
-    if req.require_consensus:
+    if req.require_consensus and VERIFIER_BREAKER.allow():
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 v_resp = await client.post(
@@ -210,7 +233,9 @@ async def fuse(req: FusionRequest) -> FusionResult:
                 )
                 v_resp.raise_for_status()
                 verification = v_resp.json()
+                VERIFIER_BREAKER.record_success()
         except Exception:
+            VERIFIER_BREAKER.record_failure()
             logger.warning("Verifier unavailable — skipping verification pass")
 
     fusion_hash = hashlib.sha256(

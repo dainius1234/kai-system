@@ -13,6 +13,7 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from common.auth import verify_gate_signature
+from common.rate_limit import check_rate_limit
 from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
 
 logger = setup_json_logger("tool-gate", os.getenv("LOG_PATH", "/tmp/tool-gate.json.log"))
@@ -434,6 +435,7 @@ async def metrics() -> Dict[str, float]:
 
 @app.post("/gate/request", response_model=GateDecision)
 async def gate_request(request: GateRequest) -> GateDecision:
+    check_rate_limit("gate_request")
     request = request.model_copy(
         update={
             "tool": sanitize_string(request.tool),
