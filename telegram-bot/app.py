@@ -121,7 +121,7 @@ async def _download_file(file_id: str) -> bytes:
 async def _chat_kai(text: str, session_id: str, mode: str) -> str:
     """Stream /chat and collect full response."""
     try:
-        timeout = httpx.Timeout(pool=180.0, connect=10.0, read=120.0)
+        timeout = httpx.Timeout(120.0, connect=10.0, pool=180.0)
         async with httpx.AsyncClient(timeout=timeout) as c:
             async with c.stream(
                 "POST",
@@ -291,8 +291,7 @@ async def _poll():
 
     while _bot_running:
         try:
-            timeout = httpx.Timeout(pool=60.0, connect=10.0, read=45.0)
-            async with httpx.AsyncClient(timeout=timeout) as c:
+            async with httpx.AsyncClient(timeout=45.0) as c:
                 r = await c.get(
                     f"{TG_API}/getUpdates",
                     params={
