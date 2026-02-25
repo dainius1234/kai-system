@@ -1,4 +1,4 @@
-.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke
+.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7
 
 go_no_go:
 	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py langgraph/app.py executor/app.py heartbeat/app.py supervisor/app.py verifier/app.py fusion-engine/app.py common/llm.py memory-compressor/app.py ledger-worker/app.py metrics-gateway/app.py
@@ -88,8 +88,26 @@ test-avatar:
 test-tool-gate:
 	PYTHONPATH=. python scripts/test_tool_gate_api.py
 
+# v7 feature tests
+test-v7-verifier:
+	PYTHONPATH=. python scripts/test_v7_verifier.py
+
+test-v7-quarantine:
+	PYTHONPATH=. python scripts/test_v7_quarantine.py
+
+test-v7-policy:
+	PYTHONPATH=. python scripts/test_v7_policy_and_ratelimit.py
+
+test-v7-idempotency:
+	PYTHONPATH=. python scripts/test_v7_idempotency.py
+
+test-integration-chain:
+	PYTHONPATH=. python scripts/test_integration_chain.py
+
+test-v7: test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain
+
 # wrapper to run all core memory tests
-test-core: test-phase-b-memu test-memu-pg test-dashboard-ui test-tool-gate test-conviction test-audio test-camera test-executor test-langgraph test-kai-advisor test-tts test-avatar
+test-core: test-phase-b-memu test-memu-pg test-dashboard-ui test-tool-gate test-conviction test-audio test-camera test-executor test-langgraph test-kai-advisor test-tts test-avatar test-v7
 
 test-dashboard-ui:
 	PYTHONPATH=. python scripts/test_dashboard_ui.py

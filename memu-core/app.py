@@ -16,7 +16,7 @@ import os
 import time
 import uuid
 from collections import Counter
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Protocol, runtime_checkable
 
 from fastapi import FastAPI, HTTPException, Query, Request
@@ -357,7 +357,7 @@ class InMemoryVectorStore:
         return commit
 
     def compress(self) -> Dict[str, Any]:
-        threshold = datetime.utcnow() - timedelta(days=90)
+        threshold = datetime.now(tz=timezone.utc) - timedelta(days=90)
         before_bytes = sum(len(r.model_dump_json()) for r in self._records)
         kept: List[MemoryRecord] = []
         archived = 0
@@ -371,7 +371,8 @@ class InMemoryVectorStore:
             use_zstd = False
 
         for record in self._records:
-            ts = datetime.fromisoformat(record.timestamp) if "T" in record.timestamp else datetime.utcnow()
+            ts_raw = datetime.fromisoformat(record.timestamp) if "T" in record.timestamp else datetime.now(tz=timezone.utc)
+            ts = ts_raw if ts_raw.tzinfo else ts_raw.replace(tzinfo=timezone.utc)
             if record.pinned or ts > threshold or record.relevance >= 0.2:
                 kept.append(record)
             else:
@@ -554,7 +555,7 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
     q_emb = generate_embedding(query)
     ranked: List[tuple[float, MemoryRecord]] = []
     candidates = store.search(top_k=10_000, query=query)
-    now_iso = datetime.utcnow().isoformat()
+    now_iso = datetime.now(tz=timezone.utc).isoformat()
 
     for record in candidates:
         # skip quarantined records — they never surface in retrieval
