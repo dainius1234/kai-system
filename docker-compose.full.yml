@@ -107,6 +107,9 @@ services:
       dockerfile: supervisor/Dockerfile
     environment:
       SWEEP_INTERVAL: "30"
+      MEMU_URL: http://memu-core:8001
+      TELEGRAM_ALERT_URL: http://telegram-bot:8025/alert
+      PROACTIVE_INTERVAL: "900"
     ports:
       - "8051:8051"
     networks:
@@ -115,6 +118,7 @@ services:
     depends_on:
       - memu-core
       - tool-gate
+      - telegram-bot
 
   verifier:
     build:

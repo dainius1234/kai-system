@@ -1219,6 +1219,102 @@ async def quick_note(note: NoteRequest) -> Dict[str, str]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
+#  PROACTIVE SURFACING — "What should I tell the keeper?"
+#
+#  Scans recent memories for time-sensitive content: dates, deadlines,
+#  appointments, reminders.  Returns nudges that the supervisor can
+#  push to Telegram without the operator asking.
+#
+#  This is what makes Kai *organic* — it thinks ahead.
+# ═══════════════════════════════════════════════════════════════════════
+
+import re as _re_mod
+from datetime import date as _date_type
+
+# patterns that signal time-sensitive content
+_DATE_PATTERNS = [
+    _re_mod.compile(r"\b(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})\b"),                          # 25/02/2026
+    _re_mod.compile(r"\b(\d{4}-\d{2}-\d{2})\b"),                                       # 2026-02-26
+    _re_mod.compile(r"\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b", _re_mod.I),
+    _re_mod.compile(r"\b(tomorrow|tonight|today|this\s+week|next\s+week|end\s+of\s+week)\b", _re_mod.I),
+    _re_mod.compile(r"\b(deadline|due\s+date|due\s+by|expires?|expiry|renewal)\b", _re_mod.I),
+    _re_mod.compile(r"\b(meeting|appointment|inspection|visit|delivery|hand-?over|review)\b", _re_mod.I),
+    _re_mod.compile(r"\b(remind|don'?t\s+forget|remember\s+to|make\s+sure)\b", _re_mod.I),
+]
+
+PROACTIVE_WINDOW_DAYS = int(os.getenv("PROACTIVE_WINDOW_DAYS", "7"))
+MAX_NUDGES = int(os.getenv("MAX_PROACTIVE_NUDGES", "5"))
+
+
+def _extract_time_signals(text: str) -> List[str]:
+    """Find date/deadline/reminder signals in text."""
+    signals = []
+    for pat in _DATE_PATTERNS:
+        for m in pat.finditer(text):
+            signals.append(m.group(0))
+    return signals
+
+
+@app.get("/memory/proactive")
+async def proactive_nudges() -> Dict[str, Any]:
+    """Scan recent memories for things the keeper should be reminded about.
+
+    Returns a list of nudges — each with the original memory, why it's
+    time-sensitive, and a suggested message for the operator.
+    """
+    threshold = datetime.utcnow() - timedelta(days=PROACTIVE_WINDOW_DAYS)
+    all_records = store.search(top_k=10_000)
+
+    # filter to recent + non-quarantined
+    candidates: List[tuple[MemoryRecord, List[str]]] = []
+    for r in all_records:
+        if getattr(r, "poisoned", False):
+            continue
+        try:
+            ts = datetime.fromisoformat(r.timestamp.replace("Z", "+00:00")) if "T" in r.timestamp else datetime.fromisoformat(r.timestamp)
+            if ts.replace(tzinfo=None) < threshold:
+                continue
+        except Exception:
+            pass
+
+        content_text = str(r.content.get("result", ""))
+        if not content_text:
+            continue
+
+        signals = _extract_time_signals(content_text)
+        if signals:
+            candidates.append((r, signals))
+
+    # sort by importance (most important first)
+    candidates.sort(key=lambda x: getattr(x[0], "importance", 0.5), reverse=True)
+
+    nudges = []
+    for record, signals in candidates[:MAX_NUDGES]:
+        content_text = str(record.content.get("result", ""))[:200]
+        signal_summary = ", ".join(set(signals))
+        nudge_msg = f"Reminder: {content_text}"
+        if len(content_text) >= 200:
+            nudge_msg += "..."
+        nudges.append({
+            "memory_id": record.id,
+            "category": record.category,
+            "importance": record.importance,
+            "time_signals": list(set(signals)),
+            "content_preview": content_text,
+            "nudge_message": nudge_msg,
+            "timestamp": record.timestamp,
+        })
+
+    return {
+        "status": "ok",
+        "nudge_count": len(nudges),
+        "scanned": len(all_records),
+        "window_days": PROACTIVE_WINDOW_DAYS,
+        "nudges": nudges,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
 #  REFLECTION / CONSOLIDATION — "Sleep" endpoint
 #
 #  Inspired by how the human brain consolidates memories during sleep:
@@ -1243,8 +1339,7 @@ async def reflect() -> Dict[str, Any]:
 
     Writes insight summaries back as high-importance pinned memories
     so the system "learns" from its own experience over time.
-    """
-    threshold = datetime.utcnow() - timedelta(days=REFLECTION_WINDOW_DAYS)
+    """    threshold = datetime.utcnow() - timedelta(days=REFLECTION_WINDOW_DAYS)
     all_records = store.search(top_k=10_000)
 
     # filter to recent window

@@ -77,6 +77,13 @@ NOTIFY_URL = os.getenv("NOTIFY_URL", "")
 
 budget = ErrorBudget(window_seconds=300)
 
+# ── proactive nudge config ──────────────────────────────────────────
+TELEGRAM_ALERT_URL = os.getenv("TELEGRAM_ALERT_URL", "http://telegram-bot:8025/alert")
+PROACTIVE_INTERVAL = int(os.getenv("PROACTIVE_INTERVAL", "900"))  # 15 min
+_last_proactive_check = 0.0
+_nudges_sent: Dict[str, float] = {}  # memory_id → timestamp (dedup)
+NUDGE_COOLDOWN = int(os.getenv("NUDGE_COOLDOWN", "7200"))  # 2h between same nudge
+
 
 def _send_notification(message: str) -> None:
     """Route alert through local gateway.  Skips silently if unconfigured."""
@@ -123,6 +130,67 @@ async def _sweep() -> List[Dict[str, Any]]:
     return list(results)
 
 
+# ── proactive nudge engine ──────────────────────────────────────────
+async def _proactive_check() -> None:
+    """Poll memu-core for time-sensitive memories and push nudges via Telegram."""
+    global _last_proactive_check
+    now = time.time()
+    if now - _last_proactive_check < PROACTIVE_INTERVAL:
+        return
+    _last_proactive_check = now
+
+    memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(f"{memu_url}/memory/proactive")
+            if resp.status_code != 200:
+                return
+            data = resp.json()
+    except Exception:
+        logger.debug("proactive check: memu-core unreachable")
+        return
+
+    nudges = data.get("nudges", [])
+    if not nudges:
+        return
+
+    # deduplicate — don't send the same nudge within NUDGE_COOLDOWN
+    to_send = []
+    for nudge in nudges:
+        mid = nudge.get("memory_id", "")
+        last_sent = _nudges_sent.get(mid, 0.0)
+        if now - last_sent >= NUDGE_COOLDOWN:
+            to_send.append(nudge)
+
+    if not to_send:
+        return
+
+    # build a single message with all nudges
+    lines = ["🧠 *Kai — Proactive Nudges*\n"]
+    for nudge in to_send[:5]:
+        cat = nudge.get("category", "general")
+        msg = nudge.get("nudge_message", "")
+        signals = ", ".join(nudge.get("time_signals", []))
+        lines.append(f"• [{cat}] {msg}")
+        if signals:
+            lines.append(f"  _Triggers: {signals}_")
+
+    message = "\n".join(lines)
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.post(
+                TELEGRAM_ALERT_URL,
+                json={"text": message},
+            )
+            if resp.status_code == 200:
+                for nudge in to_send:
+                    _nudges_sent[nudge.get("memory_id", "")] = now
+                logger.info("Proactive nudge sent: %d items", len(to_send))
+    except Exception:
+        logger.debug("proactive nudge: telegram-bot unreachable")
+
+
 async def _background_loop() -> None:
     """Runs forever in the background, sweeping at CHECK_INTERVAL."""
     while True:
@@ -130,6 +198,10 @@ async def _background_loop() -> None:
             await _sweep()
         except Exception:
             logger.exception("Sweep failed")
+        try:
+            await _proactive_check()
+        except Exception:
+            logger.exception("Proactive check failed")
         await asyncio.sleep(CHECK_INTERVAL)
 
 

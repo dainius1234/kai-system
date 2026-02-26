@@ -355,6 +355,45 @@ async def metrics() -> Dict[str, Any]:
     }
 
 
+# ── Alert / proactive nudge endpoint ────────────────────────────────
+# Called by supervisor when memu-core surfaces time-sensitive memories.
+# Sends a message to the operator's chat without them asking.
+
+
+class AlertPayload(BaseModel):
+    text: str
+    chat_id: Optional[int] = None  # if omitted, sends to first allowed chat
+
+
+@app.post("/alert")
+async def send_alert(payload: AlertPayload) -> Dict[str, Any]:
+    """Push a proactive message to the operator via Telegram."""
+    if not BOT_TOKEN:
+        return {"status": "skipped", "reason": "no bot token"}
+
+    chat_id = payload.chat_id
+    if not chat_id:
+        # find the first allowed chat, or use the last active chat
+        if ALLOWED_CHAT_IDS:
+            for cid in ALLOWED_CHAT_IDS.split(","):
+                cid = cid.strip()
+                if cid.lstrip("-").isdigit():
+                    chat_id = int(cid)
+                    break
+        if not chat_id and _chat_modes:
+            chat_id = next(iter(_chat_modes))
+
+    if not chat_id:
+        return {"status": "skipped", "reason": "no chat_id available"}
+
+    try:
+        await _send_text(chat_id, payload.text)
+        return {"status": "sent", "chat_id": chat_id}
+    except Exception as e:
+        logger.error("alert send failed: %s", e)
+        return {"status": "error", "detail": str(e)[:200]}
+
+
 if __name__ == "__main__":
     import uvicorn
 

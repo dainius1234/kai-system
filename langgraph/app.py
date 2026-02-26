@@ -573,6 +573,27 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
         else:
             gate_decision = {"approved": False, "status": "blocked", "reason": "tool-gate circuit open"}
 
+    # ── Correction learning: store correction memory if verifier says REPAIR/FAIL_CLOSED ──
+    try:
+        if plan.get("verifier_verdict") in ("REPAIR", "FAIL_CLOSED"):
+            correction = plan.get("evidence_summary") or plan.get("summary") or "Correction required."
+            async with httpx.AsyncClient() as client:
+                await client.post(
+                    f"{MEMU_URL}/memory/memorize",
+                    json={
+                        "timestamp": datetime.utcnow().isoformat(),
+                        "event_type": "correction",
+                        "result_raw": f"Correction for: {request.user_input[:500]}\nReason: {correction[:1000]}",
+                        "metrics": {"verdict": plan.get("verifier_verdict", "")},
+                        "relevance": 1.0,
+                        "importance": 0.95,
+                        "user_id": "verifier",
+                    },
+                    timeout=5.0,
+                )
+    except Exception:
+        logger.debug("Correction memorize failed (memu-core may be down)")
+
     saver.save_episode(
         {
             "episode_id": str(uuid.uuid4()),
