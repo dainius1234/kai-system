@@ -45,6 +45,7 @@ INCOME_CSV = os.getenv("INCOME_CSV", f"{SELF_EMP_ROOT}/Accounting/income.csv")
 EXPENSES_LOG = os.getenv("EXPENSES_LOG", f"{SELF_EMP_ROOT}/Accounting/expenses.log")
 MEMU_BREAKER = CircuitBreaker(failure_threshold=int(os.getenv("MEMU_BREAKER_THRESHOLD", "3")), recovery_seconds=int(os.getenv("MEMU_BREAKER_RECOVERY", "30")))
 TOOL_GATE_BREAKER = CircuitBreaker(failure_threshold=int(os.getenv("TOOL_BREAKER_THRESHOLD", "3")), recovery_seconds=int(os.getenv("TOOL_BREAKER_RECOVERY", "30")))
+LLM_BREAKER = CircuitBreaker(failure_threshold=int(os.getenv("LLM_BREAKER_THRESHOLD", "3")), recovery_seconds=int(os.getenv("LLM_BREAKER_RECOVERY", "60")))
 BREAKER_STATE_PATH = Path(os.getenv("BREAKER_STATE_PATH", "/tmp/langgraph_breakers.json"))
 CONVICTION_OVERRIDE_PATH = Path(os.getenv("CONVICTION_OVERRIDE_PATH", "/tmp/conviction_overrides.txt"))
 MEMU_ERROR_GUARD = ErrorBudgetCircuitBreaker(warn_ratio=float(os.getenv("MEMU_WARN_RATIO", "0.05")), open_ratio=float(os.getenv("MEMU_OPEN_RATIO", "0.10")), window_seconds=300, recovery_seconds=int(os.getenv("MEMU_GUARD_RECOVERY", "60")))
@@ -418,17 +419,29 @@ async def chat_stream(req: ChatRequest):
 
     async def generate():
         full_response = []
-        async for token in _llm.stream(_DEFAULT_SPECIALIST, messages):
-            full_response.append(token)
-            yield f"data: {json.dumps({'token': token})}\n\n"
+        try:
+            if not LLM_BREAKER.allow():
+                yield f"data: {json.dumps({'token': '[Kai\'s brain needs a moment — LLM circuit breaker is open. Try again shortly.]'})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
+            async for token in _llm.stream(_DEFAULT_SPECIALIST, messages):
+                full_response.append(token)
+                yield f"data: {json.dumps({'token': token})}\n\n"
+            LLM_BREAKER.record_success()
+        except Exception as e:
+            LLM_BREAKER.record_failure()
+            logger.error("LLM stream error: %s", e)
+            if not full_response:
+                yield f"data: {json.dumps({'token': '[LLM error: ' + str(e)[:120] + ']'})}\n\n"
 
         # when done, signal end
         yield "data: [DONE]\n\n"
 
-        # memorize the exchange asynchronously
+        # memorize the exchange (outside the stream read)
         response_text = "".join(full_response)
-        await _append_session_turn(req.session_id, "assistant", response_text)
-        await _auto_memorize(user_msg, response_text, _DEFAULT_SPECIALIST, 8.0)
+        if response_text:
+            await _append_session_turn(req.session_id, "assistant", response_text)
+            await _auto_memorize(user_msg, response_text, _DEFAULT_SPECIALIST, 8.0)
 
     return StreamingResponse(
         generate(),

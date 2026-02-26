@@ -36,4 +36,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=.venv,_archive,__pycache__
     - name: Test with pytest
       run: |
-        PYTHONPATH=. pytest --ignore=_archive --ignore=.venv -q || true
+        PYTHONPATH=. pytest --ignore=_archive --ignore=.venv --ignore=scripts/test_dashboard.py --ignore=scripts/test_dashboard_ui.py -q
+    - name: Test dashboard (needs CWD=dashboard/)
+      run: |
+        cd dashboard && PYTHONPATH=.. pytest ../scripts/test_dashboard.py ../scripts/test_dashboard_ui.py -q

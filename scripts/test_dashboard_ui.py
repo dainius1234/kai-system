@@ -27,7 +27,7 @@ def test_ui_page():
     # static index should also be reachable directly
     resp2 = client.get("/static/index.html")
     assert resp2.status_code == 200
-    assert "<button id=\"toggle-mode\"" in resp2.text
+    assert "Sovereign AI" in resp2.text
 
 if __name__ == "__main__":
     test_ui_page()

@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-02-25 — session: P0 Docker stack — 22/22 services healthy
+**Last updated:** 2026-02-26 — session: Quality hardening — 25 containers, LLM + TTS + STT + Telegram live
 
 ---
 
@@ -20,15 +20,18 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
 | Metric | Value |
 |---|---|
-| Services | 22 (all with /health) |
-| Tests | 76 passing |
-| Lines of Python | ~10,500 |
+| Services | 25 (22 build + postgres + redis + ollama) |
+| Tests | 86 passing |
+| Lines of Python | ~12,000 |
 | Compose files | 3 (minimal/full/sovereign) |
-| Stack actually runs as containers? | **YES — 22/22 ALL GREEN** |
-| Real LLM wired? | No (stubs) |
-| Real persistence? | No (in-memory default) |
-| Real input channel? | No (telegram is a dead polling loop) |
-| Can Kai learn right now? | Yes — memu-core stores, ranks, decays, but only via API calls in tests |
+| Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
+| Real LLM wired? | **YES — qwen2:0.5b via Ollama (CPU)** |
+| Real persistence? | **YES — pgvector + Redis** |
+| Real input channel? | **YES — Telegram bot (voice + text)** |
+| Real voice output? | **YES — edge-tts (British Ryan Neural)** |
+| Real speech-to-text? | **YES — faster-whisper tiny (CPU)** |
+| Can Kai learn right now? | **YES — memorize → pgvector, retrieve → cosine similarity, spaced repetition** |
+| Chat UI? | **YES — markdown, persistence, streaming, stop/copy** |
 
 ---
 
@@ -53,24 +56,22 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 ### P1 — Give it senses (perception)
 *An organism needs input channels. These all work without GPU.*
 
-- [ ] **Telegram bot (real)** — Wire python-telegram-bot or aiogram.
-      Commands: /ask, /remember, /status, /gate. Webhook to langgraph.
-      This is the operator interface — you talk to Kai from your phone.
-      **Single highest-value feature for daily use.**
+- [x] **Telegram bot (real)** — Async polling bot (aiogram-style, httpx).
+      Commands: /start, /mode, /status. Voice + text. Webhook to langgraph /chat.
+      **LIVE — tested on phone 2026-02-25.**
 - [ ] **Screen capture → OCR → memorize pipeline** — The app.py is wired
       (mss + pytesseract). Needs: actually test it in Docker with X11/Xvfb,
       or run headless with a screenshot file input mode.
-- [ ] **Audio capture → VAD → memorize pipeline** — app.py has sounddevice
-      + VAD. Needs: test in Docker, fallback for headless (file input mode).
+- [x] **Audio capture → STT → memorize pipeline** — faster-whisper tiny model,
+      CPU int8, ffmpeg for format support. Port 8021. Working.
 
 ### P2 — Give it a voice (output)
 *Kai should be able to respond, not just process.*
 
-- [ ] **TTS wiring** — output/tts/app.py exists as stub. Wire piper-tts
-      or edge-tts (both CPU-only). Kai can speak responses back.
-- [ ] **Telegram response** — after /ask, send the response back via
-      Telegram message. Closes the loop: human asks → Kai reasons → Kai
-      responds.
+- [x] **TTS wiring** — edge-tts with British Ryan Neural voice. 5 voice presets.
+      Returns real MP3 audio. Port 8030. Working.
+- [x] **Telegram response** — Full loop working: human asks → Kai reasons →
+      Kai responds as text + optional voice note. Closes the loop.
 
 ### P3 — Make memory organic (the core differentiator)
 *This is what separates Kai from every other agent framework.*
@@ -96,26 +97,27 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
       boosting (setting-out memories score higher when the current query
       is about setting-out).
 
-### P4 — Wire the brain (when RTX 5080 arrives)
-*These are blocked on hardware. Don't touch until GPU is here.*
+### P4 — Wire the brain (LLM integration)
+*CPU-only for now. GPU upgrade enables multi-model.*
 
-- [ ] **Ollama integration** — wire common/llm.py LLMRouter to real
-      endpoints. DeepSeek-V4 for reasoning, Kimi-2.5 for general,
-      Dolphin for uncensored PUB mode.
+- [x] **Ollama integration** — common/llm.py LLMRouter wired to Ollama.
+      qwen2:0.5b running on CPU (352MB). Streaming working via /chat endpoint.
 - [ ] **Multi-LLM consensus** — fusion-engine asks 2+ models the same
       question, verifier checks agreement. Real "organic" reasoning.
-- [ ] **Whisper transcription** — audio service captures → whisper.cpp
-      transcribes → memu-core stores. Full audio memory pipeline.
+      **Blocked on GPU (need larger models for meaningful consensus).**
+- [x] **Whisper transcription** — perception/audio uses faster-whisper tiny,
+      CPU int8. Full pipeline: voice msg → ffmpeg → whisper → text → /chat.
 - [ ] **Vision model** — screen capture → local vision model (LLaVA or
       similar) instead of just OCR. Kai *sees* what's on screen.
+      **Blocked on GPU.**
 
 ### P5 — Production hardening
 *Important but not urgent. Do after P0-P3 are solid.*
 
-- [ ] **CI docker build** — GitHub Actions builds all images on every PR.
-      Catches Dockerfile regressions before merge.
-- [ ] **Integration test in CI** — compose up → smoke test → compose down.
-      Runs on every push.
+- [x] **CI docker build** — GitHub Actions (python-app.yml + core-tests.yml).
+      Lint + test on push/PR. Integration smoke in core-tests. `|| true` removed.
+- [x] **Integration test in CI** — compose up → smoke test → compose down.
+      core-tests.yml runs on every push.
 - [ ] **Secrets management** — move from .env to Docker secrets or Vault.
       sovereign compose has Vault config but it's not wired.
 - [ ] **Backup-service validation** — backup-service/app.py exists but
@@ -185,7 +187,32 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
 ## Session Notes
 
-### 2026-02-25
+### 2026-02-26
+- Quality hardening session after proof-of-life milestone
+- Fixed 3 stale tests (TTS expects audio/mpeg not JSON, audio injection text)
+- CI: removed `|| true` from both workflows — tests now gate merges
+- CI: updated core-tests action versions (checkout@v4, setup-python@v5)
+- Dashboard health dot fixed (checks for "ok" not just "running")
+- LLM circuit breaker added to /chat (LLM_BREAKER, wraps generate() in try/except)
+- Chat UI: markdown rendering (marked.js + DOMPurify)
+- Chat UI: session persistence (localStorage for messages + sessionId + mode)
+- Chat UI: stop generation button (AbortController)
+- Chat UI: copy response button on assistant messages
+- Disk cleanup: freed ~109MB build cache + orphaned volumes → 3.8GB free
+- Updated PROJECT_BACKLOG.md to reflect current reality
+- Test count: 86 (3 previously failing now fixed)
+- 25 containers running: 22 services + postgres + redis + ollama
+
+### 2026-02-25 (evening)
+- Gave Kai voice, ears, and phone
+- TTS: rewrote output/tts/app.py with edge-tts (British Ryan Neural), real MP3
+- STT: upgraded perception/audio/app.py with faster-whisper tiny, ffmpeg
+- Telegram bot: created telegram-bot/ service, async polling, voice+text
+- Fixed httpx.Timeout in polling loop (commit 978557d)
+- Configured bot token, tested on phone — "ITS ALIVE!!"
+- 25 containers running
+
+### 2026-02-25 (earlier)
 - v7 plan from GPT/Grok/DeepSeek was ~70% accurate, 30% inflated
 - Adapted into 12 PRs, all completed in 2 commits
 - Test count: 15 → 76 (5x)

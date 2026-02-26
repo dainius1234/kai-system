@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KAI — Kind And Intelligent</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -142,6 +144,42 @@
       margin: 0.5rem 0;
       font-size: 0.85rem;
     }
+    .msg-content pre code {
+      background: none;
+      padding: 0;
+    }
+    .msg-content p { margin: 0.3em 0; }
+    .msg-content ul, .msg-content ol { margin: 0.3em 0 0.3em 1.5em; }
+    .msg-content blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 0.75em;
+      color: var(--muted); margin: 0.3em 0;
+    }
+    .msg-content table {
+      border-collapse: collapse; margin: 0.5em 0; font-size: 0.85em;
+    }
+    .msg-content th, .msg-content td {
+      border: 1px solid var(--border); padding: 0.3em 0.6em;
+    }
+    .msg-content th { background: var(--surface2); }
+    .msg-actions {
+      display: flex; gap: 0.25rem; margin-top: 0.4rem;
+    }
+    .msg-actions button {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 6px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .msg-actions button:hover { color: var(--text); border-color: var(--accent); }
+
+    .stop-btn {
+      background: var(--danger) !important; color: #fff !important;
+      border: none !important; width: 36px; height: 36px;
+      border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; transition: all 0.2s;
+    }
+    .stop-btn:hover { filter: brightness(1.2); }
 
     .typing-indicator {
       display: inline-flex; gap: 4px; padding: 0.5rem 0;
@@ -331,6 +369,7 @@
         <button class="action-btn" title="Attach file" onclick="attachFile()">📎</button>
         <button class="action-btn" title="Voice input" id="voiceBtn" onclick="toggleVoice()">🎤</button>
         <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send">➤</button>
+        <button class="stop-btn" id="stopBtn" onclick="stopStreaming()" title="Stop" style="display:none">⬛</button>
       </div>
     </div>
     <div class="footer-note">
@@ -343,12 +382,51 @@
 
   <script>
     const LANGGRAPH_URL = '/api/chat';  // proxied through dashboard
-    let currentMode = 'PUB';
-    let sessionId = 'kai-' + Date.now().toString(36);
+    let currentMode = localStorage.getItem('kai-mode') || 'PUB';
+    let sessionId = localStorage.getItem('kai-session') || ('kai-' + Date.now().toString(36));
+    localStorage.setItem('kai-session', sessionId);
     let isStreaming = false;
+    let abortController = null;
+
+    // ── Markdown renderer ───────────────────────────────
+    function renderMarkdown(text) {
+      if (typeof marked !== 'undefined') {
+        try {
+          const html = marked.parse(text);
+          return typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(html) : html;
+        } catch (e) { /* fall through */ }
+      }
+      // fallback: plain text with escaped HTML
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ── Persistence ─────────────────────────────────────
+    function saveChatHistory() {
+      const msgs = [];
+      document.querySelectorAll('.message').forEach(el => {
+        const role = el.classList.contains('user') ? 'user' : 'assistant';
+        const content = el.querySelector('.msg-content');
+        if (content) msgs.push({ role, text: content.getAttribute('data-raw') || content.textContent });
+      });
+      try { localStorage.setItem('kai-history', JSON.stringify(msgs.slice(-100))); } catch(e) {}
+    }
+
+    function loadChatHistory() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('kai-history') || '[]');
+        if (saved.length) {
+          const welcome = document.getElementById('welcome');
+          if (welcome) welcome.remove();
+          saved.forEach(m => addMessage(m.role, m.text, true));
+        }
+      } catch(e) {}
+    }
 
     function setMode(mode) {
       currentMode = mode;
+      localStorage.setItem('kai-mode', mode);
       document.getElementById('btnWork').classList.toggle('active', mode === 'WORK');
       document.getElementById('btnPub').classList.toggle('active', mode === 'PUB');
       document.getElementById('modeLabel').textContent = mode + ' MODE';
@@ -367,7 +445,7 @@
       }
     }
 
-    function addMessage(role, content) {
+    function addMessage(role, content, skipSave) {
       const welcome = document.getElementById('welcome');
       if (welcome) welcome.remove();
 
@@ -376,12 +454,23 @@
       div.className = 'message ' + role;
 
       const avatar = role === 'user' ? 'Y' : 'K';
+      const rendered = role === 'assistant' ? renderMarkdown(content) : escapeHtml(content);
       div.innerHTML = `
         <div class="msg-avatar">${avatar}</div>
-        <div class="msg-content">${escapeHtml(content)}</div>
+        <div class="msg-content" data-raw="${escapeAttr(content)}">${rendered}</div>
       `;
+
+      // copy button for assistant msgs
+      if (role === 'assistant') {
+        const actions = document.createElement('div');
+        actions.className = 'msg-actions';
+        actions.innerHTML = '<button onclick="copyMsg(this)">📋 Copy</button>';
+        div.querySelector('.msg-content').appendChild(actions);
+      }
+
       container.appendChild(div);
       container.scrollTop = container.scrollHeight;
+      if (!skipSave) saveChatHistory();
       return div;
     }
 
@@ -409,6 +498,25 @@
       return div.innerHTML;
     }
 
+    function escapeAttr(text) {
+      return text.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function copyMsg(btn) {
+      const raw = btn.closest('.msg-content').getAttribute('data-raw') || btn.closest('.msg-content').textContent;
+      navigator.clipboard.writeText(raw).then(() => {
+        btn.textContent = '✓ Copied';
+        setTimeout(() => btn.textContent = '📋 Copy', 1500);
+      });
+    }
+
+    function stopStreaming() {
+      if (abortController) {
+        abortController.abort();
+        abortController = null;
+      }
+    }
+
     async function sendMessage() {
       const input = document.getElementById('msgInput');
       const text = input.value.trim();
@@ -419,10 +527,12 @@
       addMessage('user', text);
 
       isStreaming = true;
-      document.getElementById('sendBtn').disabled = true;
+      document.getElementById('sendBtn').style.display = 'none';
+      document.getElementById('stopBtn').style.display = 'flex';
 
       const contentEl = addStreamingMessage();
       let fullText = '';
+      abortController = new AbortController();
 
       try {
         const resp = await fetch(LANGGRAPH_URL, {
@@ -433,11 +543,12 @@
             session_id: sessionId,
             mode: currentMode,
           }),
+          signal: abortController.signal,
         });
 
         if (!resp.ok) {
           const err = await resp.text();
-          contentEl.textContent = '[Error: ' + resp.status + '] ' + err;
+          contentEl.innerHTML = renderMarkdown('[Error: ' + resp.status + '] ' + err);
           return;
         }
 
@@ -461,7 +572,7 @@
               const data = JSON.parse(line.slice(6));
               if (data.token) {
                 fullText += data.token;
-                contentEl.textContent = fullText;
+                contentEl.innerHTML = renderMarkdown(fullText);
                 document.getElementById('chatContainer').scrollTop =
                   document.getElementById('chatContainer').scrollHeight;
               }
@@ -470,13 +581,34 @@
         }
 
         if (!fullText) {
-          contentEl.textContent = '[No response from Kai — LLM may not be connected yet]';
+          contentEl.innerHTML = renderMarkdown('[No response from Kai — LLM may not be connected yet]');
+        } else {
+          // re-render final + add copy button + save raw text
+          contentEl.setAttribute('data-raw', fullText);
+          contentEl.innerHTML = renderMarkdown(fullText);
+          const actions = document.createElement('div');
+          actions.className = 'msg-actions';
+          actions.innerHTML = '<button onclick="copyMsg(this)">📋 Copy</button>';
+          contentEl.appendChild(actions);
+          saveChatHistory();
         }
       } catch (err) {
-        contentEl.textContent = '[Connection error: ' + err.message + ']';
+        if (err.name === 'AbortError') {
+          if (fullText) {
+            contentEl.setAttribute('data-raw', fullText);
+            contentEl.innerHTML = renderMarkdown(fullText + '\n\n*[stopped]*');
+            saveChatHistory();
+          } else {
+            contentEl.innerHTML = '<em>[Stopped]</em>';
+          }
+        } else {
+          contentEl.innerHTML = renderMarkdown('[Connection error: ' + err.message + ']');
+        }
       } finally {
         isStreaming = false;
-        document.getElementById('sendBtn').disabled = false;
+        abortController = null;
+        document.getElementById('sendBtn').style.display = 'flex';
+        document.getElementById('stopBtn').style.display = 'none';
         input.focus();
       }
     }
@@ -549,7 +681,7 @@
         const resp = await fetch('/health');
         const data = await resp.json();
         document.getElementById('statusDot').style.background =
-          data.status && data.status.includes('running') ? 'var(--ok)' : 'var(--danger)';
+          (data.status === 'ok' || (data.status && data.status.includes('running'))) ? 'var(--ok)' : 'var(--danger)';
       } catch {
         document.getElementById('statusDot').style.background = 'var(--danger)';
       }
@@ -557,7 +689,9 @@
     checkHealth();
     setInterval(checkHealth, 30000);
 
-    // Focus input on load
+    // Init: load history + set mode + focus
+    setMode(currentMode);
+    loadChatHistory();
     document.getElementById('msgInput').focus();
   </script>
 </body>
