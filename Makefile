@@ -1,3 +1,6 @@
+# Self-audit and feedback
+self-audit:
+	python3 scripts/self_audit.py
 .PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7
 
 go_no_go:
@@ -131,8 +134,11 @@ contract-smoke:
 	bash scripts/contract_smoke.sh
 
 
+
+
 merge-gate:
 	$(MAKE) go_no_go
+	python3 scripts/quality_gate.py
 	$(MAKE) test-conviction
 	$(MAKE) test-tool-gate
 	$(MAKE) test-self-emp
@@ -142,6 +148,11 @@ merge-gate:
 	$(MAKE) test-auth-hmac
 	$(MAKE) test-phase-b-memu
 	$(MAKE) hmac-migration-advice
+	$(MAKE) health-sweep
+	$(MAKE) contract-smoke
+	$(MAKE) paper-backup
+	$(MAKE) weekly-key-rotate
+	$(MAKE) weekly-ed25519-rotate
 
 
 phase1-closure:
