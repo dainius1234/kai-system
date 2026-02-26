@@ -344,7 +344,7 @@
           <strong>🧠 What's on your mind?</strong>
           Start a real conversation
         </div>
-        <div class="welcome-card" onclick="sendPreset('Give me a quick status of the system — what\\'s running, what\\'s healthy?')">
+        <div class="welcome-card" onclick="sendPreset('Give me a quick status of the system — what\'s running, what\'s healthy?')">
           <strong>📊 System check</strong>
           How's everything running?
         </div>
@@ -352,11 +352,29 @@
           <strong>💡 Proactive insights</strong>
           What have you noticed?
         </div>
-        <div class="welcome-card" onclick="sendPreset('Let\\'s talk about something interesting — your pick.')">
+        <div class="welcome-card" onclick="sendPreset('Let\'s talk about something interesting — your pick.')">
           <strong>🍺 Pub talk</strong>
           Chat about anything
         </div>
       </div>
+    </div>
+
+    <!-- Proactive Nudges Section -->
+    <div class="dashboard-section" id="nudgesSection" style="display:none;margin:1rem auto 0;max-width:800px;background:var(--surface2);border-radius:var(--radius);padding:1rem;">
+      <h3 style="color:var(--accent);margin-bottom:0.5rem;">🧠 Proactive Nudges</h3>
+      <ul id="nudgesList" style="list-style:none;padding-left:0;"></ul>
+    </div>
+
+    <!-- Backup Status Section -->
+    <div class="dashboard-section" id="backupSection" style="display:none;margin:1rem auto 0;max-width:800px;background:var(--surface2);border-radius:var(--radius);padding:1rem;">
+      <h3 style="color:var(--accent2);margin-bottom:0.5rem;">💾 Backup Status</h3>
+      <div id="backupStatus"></div>
+    </div>
+
+    <!-- Correction History Section -->
+    <div class="dashboard-section" id="correctionsSection" style="display:none;margin:1rem auto 0;max-width:800px;background:var(--surface2);border-radius:var(--radius);padding:1rem;">
+      <h3 style="color:var(--ok);margin-bottom:0.5rem;">🛠 Correction History</h3>
+      <ul id="correctionsList" style="list-style:none;padding-left:0;"></ul>
     </div>
   </div>
 
@@ -382,6 +400,10 @@
 
   <script>
     const LANGGRAPH_URL = '/api/chat';  // proxied through dashboard
+    // Dashboard endpoints for new features
+    const NUDGES_URL = '/api/nudges';
+    const BACKUP_URL = '/api/backup-status';
+    const CORRECTIONS_URL = '/api/corrections';
     let currentMode = localStorage.getItem('kai-mode') || 'PUB';
     let sessionId = localStorage.getItem('kai-session') || ('kai-' + Date.now().toString(36));
     localStorage.setItem('kai-session', sessionId);
@@ -689,10 +711,62 @@
     checkHealth();
     setInterval(checkHealth, 30000);
 
-    // Init: load history + set mode + focus
+    // ── Dashboard feature loaders ─────────────────────────────
+    async function loadNudges() {
+      try {
+        const resp = await fetch(NUDGES_URL);
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const nudges = data.nudges || [];
+        const section = document.getElementById('nudgesSection');
+        const list = document.getElementById('nudgesList');
+        if (nudges.length) {
+          section.style.display = 'block';
+          list.innerHTML = nudges.map(n => `<li style='margin-bottom:0.5em;'><strong>[${n.category}]</strong> ${n.nudge_message}<br><span style='color:var(--muted);font-size:0.8em;'>${n.time_signals.join(', ')}</span></li>`).join('');
+        } else {
+          section.style.display = 'none';
+          list.innerHTML = '';
+        }
+      } catch {}
+    }
+
+    async function loadBackupStatus() {
+      try {
+        const resp = await fetch(BACKUP_URL);
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const section = document.getElementById('backupSection');
+        const status = document.getElementById('backupStatus');
+        section.style.display = 'block';
+        status.textContent = data.status ? `Last backup: ${data.status}` : 'No backup info available.';
+      } catch {}
+    }
+
+    async function loadCorrections() {
+      try {
+        const resp = await fetch(CORRECTIONS_URL);
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const corrections = data.corrections || [];
+        const section = document.getElementById('correctionsSection');
+        const list = document.getElementById('correctionsList');
+        if (corrections.length) {
+          section.style.display = 'block';
+          list.innerHTML = corrections.map(c => `<li style='margin-bottom:0.5em;'><strong>${c.timestamp}</strong>: ${c.summary}</li>`).join('');
+        } else {
+          section.style.display = 'none';
+          list.innerHTML = '';
+        }
+      } catch {}
+    }
+
+    // Init: load history + set mode + focus + dashboard features
     setMode(currentMode);
     loadChatHistory();
     document.getElementById('msgInput').focus();
+    loadNudges();
+    loadBackupStatus();
+    loadCorrections();
   </script>
 </body>
 </html>

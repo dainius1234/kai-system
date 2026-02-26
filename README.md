@@ -2,6 +2,28 @@
 
 Self-sovereign, air-gapped personal intelligence platform.
 
+## 📝 Simple System Overview (For Everyone)
+
+Kai System is like a secure AI brain made of different parts, each with a job:
+
+- **Tool-Gate & Orchestrator:** The main gatekeepers. They check every action for safety and give the final OK before anything important happens.
+- **Memu-Core:** The memory. It remembers everything and gives context to help the AI make better decisions.
+- **LangGraph, AutoGen, CrewAI, OpenAgents:** The planners and thinkers. They help the AI plan, reason, and work as a team of smart assistants.
+- **Executor & Sandboxes:** The doers. They safely run actions that have been approved.
+- **Dashboard & Output:** The display and feedback. They show you what’s happening and let you interact.
+
+**How it works:**
+1. You (or another service) make a request.
+2. Tool-Gate and Orchestrator check it for safety.
+3. The planners (LangGraph, etc.) figure out what to do, using Memu-Core for memory.
+4. If approved, Executor runs the action in a safe sandbox.
+5. Results are saved in Memu-Core and shown on the Dashboard.
+
+**In short:**
+Kai is a secure, multi-part AI system. Everything is checked, logged, and controlled for safety and privacy.
+
+---
+
 ## 📦 Repo Structure
 orchestrator/       # Final risk authority before execution
 supervisor/         # Watchdog and circuit-breaker control loop
@@ -139,3 +161,151 @@ For further architecture details, see `docs/sovereign_ai_spec.md` and the Phase�
 - Advisor rules use local thresholds: `MTD_START`, `VAT_THRESHOLD`, `MILEAGE_RATE`.
 - Kai Control has **Advisor Mode** button (`Дайниус, что на уме?`) for strategic suggestions from local income/expense logs.
 - Run `kai-control` as normal user (no sudo).
+
+---
+
+## 🤖 Self-Audit & Feedback
+
+- Run `make self-audit` to:
+  - Review recent test, lint, and health check results
+  - Summarize system health and recurring issues
+  - Propose actionable improvements
+  - Log lessons/incidents to memu-core (if running)
+  - Output a summary and full audit log to `output/self_audit_log.json`
+- This is the first step toward a self-reflective, self-improving AI partner.
+
+---
+
+## 🗣️ Operator Feedback Channel
+
+- Submit feedback, suggestions, or goals directly to the system:
+  - `python3 scripts/operator_feedback.py "<your message>"`
+- Feedback is logged as a structured event in memu-core (if running), or saved locally for later ingestion.
+- This builds a persistent memory of operator guidance, enabling the system to learn and adapt from your input.
+
+---
+
+## 📝 Feedback & Memory Summary
+
+- Run `python3 scripts/feedback_summary.py` to:
+  - Retrieve and summarize recent operator feedback, lessons, and system actions from memory
+  - Fallback to local logs if memu-core is unavailable
+  - Surface actionable insights for both operator and AI review
+
+---
+
+## 🛡️ CI & Automation Coverage (2026)
+
+- **All scripts and Makefile targets** are now enforced in CI via the `merge-gate` target.
+- Every operational, utility, and maintenance script is tested or invoked automatically on every PR and push.
+- The new `scripts/quality_gate.py` blocks stubs, TODOs, and missing docstrings from merging.
+- Linting, unit tests, integration tests, and system health checks are all run in CI.
+- Maintenance and rotation scripts (e.g., paper-backup, weekly-key-rotate) are included in the automation pipeline.
+- Failures in CI will block merges, ensuring only high-quality, production-ready code is accepted.
+
+### Operator Workflow
+
+- To validate the system locally, run:
+  - `make merge-gate` — runs all quality, test, and maintenance checks as in CI
+  - `make test-core` — runs all core unit and integration tests
+  - `make health-sweep` — probes all service health endpoints
+  - `make contract-smoke` — runs contract-level smoke tests
+- All scripts in `scripts/` are now subject to automated quality checks and must have docstrings, no stubs, and no TODOs.
+- For new scripts or features, ensure they are added to the Makefile and covered by tests or invoked in CI.
+
+---
+
+## 🦾 Kai Supervisor Agent (Prototype)
+
+- Run `python3 scripts/kai_supervisor.py` to:
+  - Review recent memory for patterns, recurring issues, and actionable improvements
+  - Suggest or draft improvements (e.g., docstrings, stub removal)
+  - Log its own actions and suggestions as system_action events in memory
+  - (Future) Auto-apply safe changes or request operator approval for higher-impact actions
+
+---
+
+## ⚠️ Agentic Integration Notes (Feb 2026)
+
+- **Namespace Clashes:**
+  - Local file `langgraph/config.py` was renamed to avoid shadowing the installed `langgraph` package. Always avoid naming local modules after installed packages.
+  - If you need the local config, import it as `kai_langgraph_config.py`.
+- **OpenAgents API:**
+  - The class `AgentContainer` is not available at the top level. Check OpenAgents documentation for the correct import path or usage.
+- **Best Practices:**
+  - Never name local files/folders after installed packages.
+  - Always check for API changes in fast-evolving agentic frameworks.
+  - Log and document all integration issues and fixes in the README for future reference.
+
+---
+
+## 🤖 Agentic Framework Integration (2026)
+
+### Integrated Frameworks
+- **LangGraph**: For agent orchestration and stateful multi-actor workflows. Use `from langgraph.graph import StateGraph` for graph construction.
+- **AutoGen**: For multi-agent orchestration and self-reflection. Use `from autogen import AssistantAgent, UserProxyAgent`.
+- **CrewAI**: For collaborative, role-based agent tasking. Use `from crewai import Crew, Task, Agent`.
+- **OpenAgents**: For multi-agent protocol and containerization. Use `from openagents.container.agent_container import AgentContainer` (not top-level import).
+
+### Integration Test
+- See `scripts/agentic_integration_test.py` for a working example that exercises all four frameworks in a minimal, side-effect-free way.
+- The test verifies:
+  - LangGraph node orchestration
+  - AutoGen agent instantiation
+  - CrewAI crew/task setup
+  - OpenAgents agent container creation
+
+### Troubleshooting & Lessons Learned
+- **Namespace Clashes**: Never name local files/folders after installed packages (e.g., avoid `langgraph/config.py`). This caused import errors and shadowed the installed package. Local config was renamed.
+- **OpenAgents API**: The `AgentContainer` class is not available at the top level. Use `from openagents.container.agent_container import AgentContainer`.
+- **API Drift**: Agentic frameworks evolve rapidly. Always check the latest documentation and inspect installed packages if imports fail.
+- **Testing**: Always run `python3 scripts/agentic_integration_test.py` after changes to agentic dependencies or imports.
+- **Documentation**: Log all integration issues, fixes, and best practices in the README for future maintainers.
+
+### Best Practices
+- Use explicit, non-conflicting names for all local modules.
+- Document all architectural decisions and integration issues.
+- Prefer minimal, side-effect-free integration tests for new frameworks.
+- Update requirements and test scripts with every new agentic dependency.
+- Review and update this section as frameworks evolve.
+
+---
+
+## 🏛️ Architectural Analysis (2026)
+
+### System Overview
+Kai System is a modular, air-gapped, self-sovereign AI platform. It is designed with strict local-only, no-egress security, layered defense, and composable microservices. The architecture is documented in detail in `docs/sovereign_ai_spec.md` (see layered Mermaid diagram and service breakdown).
+
+#### Layered Architecture
+- **L0: Hardware Root** — TPM, encrypted storage, direct device access (camera, mic, GPU)
+- **L1: Sovereign Core** — Tool Gate (execution choke), Ledger (Postgres+pgvector), Dashboard (operator UI)
+- **L2: Intelligence** — Memu-Core (memory), LangGraph (agent orchestration), LLM Pool, Kai Advisor
+- **L3: Perception** — Audio, Camera, Screen Capture pipelines
+- **L4: Awareness** — Heartbeat, Calendar sync
+- **L5: Execution** — Executor, Sandboxes (QGIS, n8n, shell)
+- **L6: Output** — TTS, Avatar, Display overlay
+
+#### Agentic Integration Points
+- **LangGraph**: Orchestrates agent workflows, routes context and tasks between memory, LLMs, and advisors.
+- **AutoGen**: Enables multi-agent, self-reflective reasoning and user proxying.
+- **CrewAI**: Coordinates collaborative, role-based agent teams for complex tasks.
+- **OpenAgents**: Provides protocol and containerization for multi-agent systems.
+
+#### Security Invariants
+- All execution requests pass through Tool Gate (with HMAC co-sign).
+- No network egress; all inter-service traffic is on a private bridge network.
+- All persistent storage is local and encrypted where possible.
+- Sandboxes are isolated (network_mode: none, read-only, dropped caps).
+
+#### Best Practices & Lessons
+- **Namespace Hygiene**: Never shadow installed packages with local files (e.g., langgraph/config.py).
+- **Explicit Imports**: Use explicit, version-checked imports for agentic frameworks (see Integration section above).
+- **API Drift Management**: Regularly audit and test all agentic integrations; document all breakages and fixes.
+- **Minimal, Isolated Tests**: Use scripts/agentic_integration_test.py as a template for future framework integrations.
+- **Documentation**: All architectural and integration decisions, issues, and fixes are logged in this README and in docs/.
+
+#### References
+- See `docs/sovereign_ai_spec.md` for full technical specification, layered diagrams, and service details.
+- See `scripts/agentic_integration_test.py` for a working, minimal agentic integration test.
+
+---

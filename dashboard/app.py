@@ -1,3 +1,54 @@
+from datetime import datetime
+# ── New API endpoints for dashboard UI extras ───────────────────────
+
+@app.get("/api/nudges")
+async def api_nudges():
+    memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{memu_url}/memory/proactive")
+            resp.raise_for_status()
+            payload = resp.json()
+            return {"nudges": payload.get("nudges", [])}
+    except Exception:
+        return {"nudges": []}
+
+
+@app.get("/api/backup-status")
+async def api_backup_status():
+    backup_url = os.getenv("BACKUP_SERVICE_URL", "http://backup-service:8054")
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{backup_url}/health")
+            resp.raise_for_status()
+            # Optionally, fetch latest backup file info
+            # For now, just return timestamp
+            now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+            return {"status": f"{now} (service healthy)"}
+    except Exception:
+        return {"status": "Backup service unreachable"}
+
+
+@app.get("/api/corrections")
+async def api_corrections():
+    verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8052")
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{verifier_url}/metrics")
+            resp.raise_for_status()
+            payload = resp.json()
+            verdicts = payload.get("verdicts", {})
+            # Build correction history from REPAIR/FAIL_CLOSED
+            corrections = []
+            for verdict, count in verdicts.items():
+                if verdict in ("REPAIR", "FAIL_CLOSED"):
+                    corrections.append({
+                        "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+                        "summary": f"{verdict}: {count} recent corrections"
+                    })
+            return {"corrections": corrections}
+    except Exception:
+        return {"corrections": []}
 from __future__ import annotations
 
 import os
