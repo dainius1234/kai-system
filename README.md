@@ -201,3 +201,39 @@ Run `make go_no_go` before committing to catch syntax errors early.
 5. Full stack: `make full-up` for all services including LLM, perception, and Telegram.
 
 For architecture details see `docs/sovereign_ai_spec.md`.
+
+---
+
+## Session Continuation Guide
+
+> **For AI assistants resuming work on this codebase.**
+
+### Current State (as of 2 March 2026)
+- **All 33 test-core targets pass.** Run `make test-core` to confirm.
+- **Phase 2 complete:** Specialist Router, Memory-Driven Planner, Adversary Challenge Engine — all built, tested, wired into `/chat` and `/run`.
+- **Phase 3 not started:** Dashboard UI for route/adversary visibility.
+- **Phase 4 brainstormed:** 10 AI-native advantages documented in `docs/unfair_advantages.md` — read that file first.
+
+### Key Docs (read in this order)
+1. `docs/unfair_advantages.md` — Strategic competitive edge analysis + Phase 4 brainstorm + continuation notes
+2. `docs/agentic_patterns_spec.md` — Technical spec for the 3-pattern agentic architecture
+3. This README for repo structure and test commands
+
+### Agentic Pipeline (how /run works)
+```
+Request → injection filter → specialist selection → session buffer
+  → gather_context() (memory + episodes + corrections + nudges)
+  → build_enriched_plan() (history similarity + conviction modifiers)
+  → challenge_plan() (5 adversary challenges in parallel)
+  → conviction scoring (5-signal + planner modifier + adversary modifier)
+  → rethink loop (if conviction < 8.0, max 3 retries)
+  → tool-gate policy check (HMAC, rate limit, co-sign)
+  → executor (sandboxed)
+  → post-mortem (episode save, correction learning, auto-memorize)
+```
+
+### Next Priorities
+1. **Phase 4h: Failure Taxonomy** — classify WHY things fail, not just that they fail
+2. **Phase 4a: Contradiction Memory** — detect when Kai contradicts its own past assertions
+3. **Phase 4c: Knowledge Boundary Mapping** — explicitly track what Kai doesn't know
+4. **Phase 3: Dashboard** — show route decisions + adversary findings in UI
