@@ -20,6 +20,8 @@ from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudget
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from kai_config import build_saver
 from conviction import build_plan, low_conviction_feedback, score_conviction
+from router import classify, dispatch_route
+from planner import gather_context, build_enriched_plan
 
 logger = setup_json_logger("langgraph", os.getenv("LOG_PATH", "/tmp/langgraph.json.log"))
 DEVICE = detect_device()
@@ -368,17 +370,50 @@ async def chat_stream(req: ChatRequest):
     """Kai's main conversation endpoint. Streams tokens via SSE.
 
     This is where Kai THINKS. The pipeline:
-    1. Determine mode (PUB/WORK) → select personality
-    2. Fetch relevant memories from pgvector for context
-    3. Get recent session messages for conversation history
-    4. Build message list: system prompt + memories + history + user message
-    5. Stream LLM response token by token
-    6. Memorize the exchange for future recall
+    0. Classify the message — many queries don't need an LLM at all
+    1. If routed to a specialist service, dispatch directly (zero LLM cost)
+    2. Otherwise: determine mode (PUB/WORK) → select personality
+    3. Fetch relevant memories from pgvector for context
+    4. Get recent session messages for conversation history
+    5. Build message list: system prompt + memories + history + user message
+    6. Stream LLM response token by token
+    7. Memorize the exchange for future recall
     """
     user_msg = sanitize_string(req.message)
     if not user_msg:
         raise HTTPException(status_code=400, detail="message is required")
 
+    # ── Step 0: Classify request ────────────────────────────────────
+    route_decision = classify(user_msg)
+    logger.info("Router: %s (confidence=%.2f, bypass_llm=%s)",
+                route_decision.route, route_decision.confidence, route_decision.bypass_llm)
+
+    # ── Step 1: Try zero-LLM dispatch ──────────────────────────────
+    if route_decision.bypass_llm and route_decision.confidence >= 0.7:
+        direct_response = await dispatch_route(route_decision, user_msg, req.session_id)
+        if direct_response is not None:
+            # record the interaction in session and memory
+            await _append_session_turn(req.session_id, "user", user_msg)
+            await _append_session_turn(req.session_id, "assistant", direct_response)
+            await _auto_memorize(user_msg, direct_response, route_decision.route, 9.0)
+
+            # stream the response as SSE (same format, instant delivery)
+            async def direct_stream():
+                yield f"data: {json.dumps({'token': direct_response, 'route': route_decision.route})}\n\n"
+                yield "data: [DONE]\n\n"
+
+            return StreamingResponse(
+                direct_stream(),
+                media_type="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "X-Accel-Buffering": "no",
+                    "X-Kai-Mode": "DIRECT",
+                    "X-Kai-Route": route_decision.route,
+                },
+            )
+
+    # ── Step 2+: LLM pipeline for GENERAL_CHAT / EXECUTE / MULTI ──
     # determine mode
     mode = (req.mode or await _get_mode()).upper()
     if mode not in _SYSTEM_PROMPTS:
@@ -450,6 +485,7 @@ async def chat_stream(req: ChatRequest):
             "Cache-Control": "no-cache",
             "X-Accel-Buffering": "no",
             "X-Kai-Mode": mode,
+            "X-Kai-Route": route_decision.route,
         },
     )
 
@@ -496,21 +532,44 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     # ── 1. Record user turn in session buffer (working memory) ──────
     await _append_session_turn(request.session_id, "user", request.user_input)
 
-    # ── 2. Fetch combined session + long-term context ───────────────
+    # ── 2. Memory-driven context gathering ──────────────────────────
+    # Fetch episode history, memory chunks, corrections, nudges in parallel
+    recent_episodes = saver.recall(user_id="keeper", days=30)
+    plan_context = await gather_context(
+        request.user_input, request.session_id, recent_episodes, MEMU_URL,
+    )
+
+    # also fetch session context for conversation continuity
     session_ctx = await _fetch_session_context(request.session_id, request.user_input, top_k=5)
     chunks = session_ctx.get("long_term_memories", [])
-    # convert string memories to chunk dicts for conviction scoring
     chunk_dicts = [{"content": c} if isinstance(c, str) else c for c in chunks]
+    # merge memory chunks from planner + session context
+    chunk_dicts = chunk_dicts + plan_context.memory_chunks
     session_messages = session_ctx.get("session_messages", [])
 
-    rethink_count = 0
-    plan = build_plan(request.user_input, specialist, chunk_dicts)
-    # inject session context into the plan so downstream consumers see it
+    # ── 3. Build enriched plan using history ────────────────────────
+    enriched = build_enriched_plan(plan_context, specialist)
+    plan = enriched.plan
+
+    # inject session context into the plan
     plan["session_context"] = {
         "turns": len(session_messages),
         "long_term_memories_used": len(chunks),
+        "history_consulted": len(plan_context.past_outcomes),
+        "corrections_applied": enriched.plan.get("corrections_applied", 0),
+        "history_influence": enriched.history_influence,
+        "context_summary": enriched.context_summary,
     }
+
+    # ── 4. Conviction scoring with history modifier ─────────────────
+    rethink_count = 0
     conviction = score_conviction(request.user_input, plan, chunk_dicts, rethink_count)
+    conviction = min(max(conviction + enriched.conviction_modifier, 0.0), 10.0)
+
+    # add warnings from planner
+    if enriched.warnings:
+        plan["history_warnings"] = enriched.warnings
+        logger.info("Planner warnings: %s", enriched.warnings)
 
     while conviction < MIN_CONVICTION and rethink_count < MAX_RETHINKS:
         rethink_count += 1
