@@ -42,7 +42,7 @@ executor/            # Execution bridge and order-routing stubs
 dashboard/           # Operator console (FastAPI + Starlette)
 memu-core/           # Memory engine, vector search, reflection, quarantine
 tool-gate/           # Tool access policy, HMAC auth, ledger
-langgraph/           # Graph/runtime app integration (kai_config.py, conviction.py)
+langgraph/           # Graph/runtime app integration (router.py, planner.py, adversary.py, conviction.py, kai_config.py)
 kai-advisor/         # Self-employment advisor (offline, UK-focused)
 telegram-bot/        # Telegram bot interface (text/voice pipeline)
 heartbeat/           # System pulse and auto-sleep controller
@@ -138,6 +138,9 @@ make test-episode-spool      # episode spool integrity tests
 make test-error-budget       # error budget breaker tests
 make test-invoice            # invoice tests
 make test-memu-retrieval     # memu retrieval tests
+make test-router             # specialist router classification tests
+make test-planner            # memory-driven planner tests
+make test-adversary          # adversary challenge engine tests
 
 # v7 feature tests
 make test-v7                 # verifier, quarantine, policy, idempotency, integration-chain

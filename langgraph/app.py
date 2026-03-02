@@ -22,6 +22,7 @@ from kai_config import build_saver
 from conviction import build_plan, low_conviction_feedback, score_conviction
 from router import classify, dispatch_route
 from planner import gather_context, build_enriched_plan
+from adversary import challenge_plan, verdict_to_plan_metadata
 
 logger = setup_json_logger("langgraph", os.getenv("LOG_PATH", "/tmp/langgraph.json.log"))
 DEVICE = detect_device()
@@ -570,6 +571,23 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     if enriched.warnings:
         plan["history_warnings"] = enriched.warnings
         logger.info("Planner warnings: %s", enriched.warnings)
+
+    # ── 4b. Adversary challenge: stress-test the plan ──────────────
+    # Five parallel challenges attack the plan before execution.
+    # The adversary modifier adjusts conviction up or down based on
+    # history, verifier evidence, policy, consistency, and calibration.
+    adversary_verdict = await challenge_plan(
+        plan=plan,
+        user_input=request.user_input,
+        context_chunks=chunk_dicts,
+        episodes=recent_episodes,
+        predicted_conviction=conviction,
+        tool_hint=request.task_hint,
+    )
+    conviction = min(max(conviction + adversary_verdict.total_modifier, 0.0), 10.0)
+    plan.update(verdict_to_plan_metadata(adversary_verdict))
+    if adversary_verdict.critical_warnings:
+        logger.warning("Adversary warnings: %s", adversary_verdict.critical_warnings)
 
     while conviction < MIN_CONVICTION and rethink_count < MAX_RETHINKS:
         rethink_count += 1

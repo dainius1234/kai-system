@@ -282,9 +282,13 @@ langgraph/
 - [x] Add Makefile targets (test-router, test-planner) — test-core now 26 targets
 - [x] All 32 test targets pass as of commit da677f1
 - [x] `/chat` returns `X-Kai-Route` header in SSE responses
-- [ ] Build adversary.py (Phase 2c — Proposer-Adversary loop)
-- [ ] Dashboard: show route decisions in UI
+- [x] Build adversary.py (Phase 2c) — 5 challenge strategies, orchestrator, plan metadata
+- [x] Wire adversary into /run (between enriched plan and conviction scoring)
+- [x] 7 adversary test groups passing, test-core now 27 targets
+- [ ] Dashboard: show route decisions + adversary findings in UI
 - [ ] Update conviction.py with configurable history modifier weights
+- [ ] Calibration dashboard (predicted vs actual conviction)
+- [ ] Token budget tracking per route
 
 ---
 
@@ -292,7 +296,8 @@ langgraph/
 
 If picking up from here, check:
 1. `git log --oneline -5` to see where we stopped
-2. `make test-core` to confirm baseline is green (expect 32 passes)
-3. Read this doc for the full plan
-4. Start with Phase 2c: adversary.py (Proposer-Adversary loop)
-5. All 32 tests were passing as of commit da677f1
+2. `make test-core` to confirm baseline is green (expect 33+ passes)
+3. Read this doc for technical spec
+4. Read `docs/unfair_advantages.md` for strategic context — Kai's competitive edge analysis
+5. Phases 2a+2b+2c all complete. Next: Phase 3 (dashboard, calibration UI, token tracking)
+6. All agentic modules: router.py, planner.py, adversary.py, conviction.py, kai_config.py in langgraph/

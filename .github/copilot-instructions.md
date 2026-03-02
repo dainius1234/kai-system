@@ -79,6 +79,9 @@ make test-episode-spool      # episode spool integrity tests
 make test-error-budget       # error budget breaker tests
 make test-invoice            # invoice tests
 make test-memu-retrieval     # memu retrieval tests
+make test-router             # specialist router classification tests
+make test-planner            # memory-driven planner tests
+make test-adversary          # adversary challenge engine tests
 make test-v7                 # v7 feature tests (verifier, quarantine, policy, idempotency, integration-chain)
 
 # Integration / smoke tests (requires running stack)
