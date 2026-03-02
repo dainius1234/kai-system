@@ -1,8 +1,6 @@
 from __future__ import annotations
-
-### RENAMED: This file was renamed to avoid namespace clash with the installed langgraph package.
-### If you need to use this config, import it as kai_langgraph_config.py
-from __future__ import annotations
+# Renamed from config.py to avoid shadowing the installed langgraph package.
+# Import as: from kai_config import build_saver
 
 import hashlib
 import json

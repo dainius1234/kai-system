@@ -18,7 +18,7 @@ from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.llm import LLMRouter
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
-from config import build_saver
+from kai_config import build_saver
 from conviction import build_plan, low_conviction_feedback, score_conviction
 
 logger = setup_json_logger("langgraph", os.getenv("LOG_PATH", "/tmp/langgraph.json.log"))

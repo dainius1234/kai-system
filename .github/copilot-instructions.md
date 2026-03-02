@@ -58,6 +58,7 @@ make test-core
 # Run individual service tests
 make test-phase-b-memu       # memu-core unit tests
 make test-dashboard-ui       # dashboard UI tests
+make test-dashboard          # dashboard structural tests
 make test-audio              # audio service smoke test
 make test-camera             # camera service smoke test
 make test-executor           # executor service smoke test
@@ -65,6 +66,20 @@ make test-langgraph          # langgraph service smoke test
 make test-kai-advisor        # kai-advisor unit tests
 make test-tts                # TTS service smoke test
 make test-avatar             # avatar service smoke test
+make test-telegram           # telegram-bot smoke test
+make test-heartbeat          # heartbeat service tests
+make test-tool-gate          # tool-gate API tests
+make test-tool-gate-security # tool-gate HMAC/nonce security tests
+make test-conviction         # conviction scoring tests
+make test-self-emp           # self-employment advisor tests
+make test-auth-hmac          # HMAC auth hardening tests
+make test-agentic            # agentic framework integration tests
+make test-episode-saver      # episode saver fallback tests
+make test-episode-spool      # episode spool integrity tests
+make test-error-budget       # error budget breaker tests
+make test-invoice            # invoice tests
+make test-memu-retrieval     # memu retrieval tests
+make test-v7                 # v7 feature tests (verifier, quarantine, policy, idempotency, integration-chain)
 
 # Integration / smoke tests (requires running stack)
 make core-smoke              # python3 scripts/smoke_core.py
@@ -97,7 +112,7 @@ Run `make go_no_go` before committing changes to Python service entry points to 
 4. **Service entry points**: each service exposes at least a `/health` HTTP endpoint returning `{"status": "ok"}`.
 5. **Tests**: place unit tests in `scripts/test_<service>.py`; service-level tests in `<service>/test_<service>.py`. Use `pytest` or plain `unittest`.
 6. **Secrets**: never commit real credentials; use `.env` files (see `.env.example`) and environment variables. The `.gitignore` excludes `.env`.
-7. **Docker**: each service has its own `Dockerfile`. Multi-service compositions use `docker-compose.minimal.yml` (core 6) or `docker-compose.full.yml` (full stack).
+7. **Docker**: each service has its own `Dockerfile`. Multi-service compositions use `docker-compose.minimal.yml` (core 8) or `docker-compose.full.yml` (full stack).
 8. **HMAC auth**: inter-service calls use HMAC signing. Set `TOOL_GATE_DUAL_SIGN=true` and later `INTERSERVICE_HMAC_STRICT_KEY_ID=true` after overlap stabilises.
 
 ## Key Guidelines

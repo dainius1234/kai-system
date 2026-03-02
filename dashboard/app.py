@@ -1,4 +1,35 @@
+
+
+from __future__ import annotations
 from datetime import datetime
+import os
+from typing import Any, Dict, List
+
+import httpx
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse, StreamingResponse
+
+from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
+
+try:
+    from common.policy import policy_hash, policy_version
+except Exception:
+    policy_hash = "unavailable"
+    policy_version = "unknown"
+
+logger = setup_json_logger("dashboard", os.getenv("LOG_PATH", "/tmp/dashboard.json.log"))
+DEVICE = detect_device()
+logger.info("Running on %s.", DEVICE)
+
+app = FastAPI(title="Sovereign Dashboard", version="0.4.0")
+
+# mount static UI stub
+app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
+
+TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
+budget = ErrorBudget(window_seconds=300)
+
 # ── New API endpoints for dashboard UI extras ───────────────────────
 
 @app.get("/api/nudges")
@@ -49,35 +80,7 @@ async def api_corrections():
             return {"corrections": corrections}
     except Exception:
         return {"corrections": []}
-from __future__ import annotations
 
-import os
-from typing import Any, Dict, List
-
-import httpx
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, StreamingResponse
-
-from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
-
-try:
-    from common.policy import policy_hash, policy_version
-except Exception:
-    policy_hash = "unavailable"
-    policy_version = "unknown"
-
-logger = setup_json_logger("dashboard", os.getenv("LOG_PATH", "/tmp/dashboard.json.log"))
-DEVICE = detect_device()
-logger.info("Running on %s.", DEVICE)
-
-app = FastAPI(title="Sovereign Dashboard", version="0.4.0")
-
-# mount static UI stub
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
-budget = ErrorBudget(window_seconds=300)
 audit = AuditStream("dashboard", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
 
 SUPERVISOR_URL = os.getenv("SUPERVISOR_URL", "http://supervisor:8051")

@@ -1,311 +1,200 @@
-# Sovereign AI — kai-system
+# Sovereign AI -- kai-system
 
-Self-sovereign, air-gapped personal intelligence platform.
+A secure, operator-controlled personal intelligence platform. Kai can run fully offline for privacy, or safely connect to the internet when you allow it. All network access, data sharing, and external actions are controlled by you -- the operator.
 
-## 📝 Simple System Overview (For Everyone)
+## System Overview
 
-Kai System is like a secure AI brain made of different parts, each with a job:
+Kai is a modular, secure AI system designed for real-world use:
+- **Operator Control:** You decide when Kai can access the internet, update, or interact externally. All network activity is logged and can be blocked or reviewed.
+- **Growth & Learning:** Kai can develop and improve when you enable online mode, but defaults to privacy-first offline operation.
+- **Safety:** Every action, data flow, and external request is checked by Tool-Gate and Orchestrator. Sandboxes and dashboards provide transparency and control.
 
-- **Tool-Gate & Orchestrator:** The main gatekeepers. They check every action for safety and give the final OK before anything important happens.
-- **Memu-Core:** The memory. It remembers everything and gives context to help the AI make better decisions.
-- **LangGraph, AutoGen, CrewAI, OpenAgents:** The planners and thinkers. They help the AI plan, reason, and work as a team of smart assistants.
-- **Executor & Sandboxes:** The doers. They safely run actions that have been approved.
-- **Dashboard & Output:** The display and feedback. They show you what’s happening and let you interact.
+**Main Components:**
+- **Tool-Gate & Orchestrator:** Final authority and policy enforcement. You set internet and execution rules.
+- **Memu-Core:** Memory and context engine. Stores history, feedback, and lessons.
+- **LangGraph:** Primary agentic graph/runtime for planning and orchestration.
+- **AutoGen, CrewAI, OpenAgents:** Additional agentic frameworks (smoke-tested, available for future multi-agent workflows).
+- **Executor & Sandboxes:** Safe execution of approved actions.
+- **Dashboard & Output:** Operator interface (FastAPI), TTS, and avatar feedback.
 
 **How it works:**
-1. You (or another service) make a request.
-2. Tool-Gate and Orchestrator check it for safety.
-3. The planners (LangGraph, etc.) figure out what to do, using Memu-Core for memory.
-4. If approved, Executor runs the action in a safe sandbox.
-5. Results are saved in Memu-Core and shown on the Dashboard.
+1. Operator or service makes a request.
+2. Tool-Gate and Orchestrator check for safety, policy, and internet rules.
+3. Agentic planners use Memu-Core for context and decide next steps.
+4. Executor runs approved actions in a sandbox.
+5. Results and logs are visible in the Dashboard.
 
-**In short:**
-Kai is a secure, multi-part AI system. Everything is checked, logged, and controlled for safety and privacy.
-
----
-
-## 📦 Repo Structure
-orchestrator/       # Final risk authority before execution
-supervisor/         # Watchdog and circuit-breaker control loop
-fusion-engine/      # Multi-signal consensus and conviction gating
-verifier/           # Fact-checking and signal cross-validation
-executor/           # Execution bridge and order-routing stubs
-dashboard/          # Operator console (Dash)
-memu-core/          # Memory/compression and operator state helpers
-tool-gate/          # Tool access policy and local gatekeeping
-langgraph/          # Graph/runtime app integration layer
-data/               # Seed datasets and local advisor inputs
-scripts/            # Operational scripts and validation checks
-docs/               # Implementation plans and hardening runbooks
+**Internet Access Policy:**
+- Default: Offline for privacy and safety.
+- Operator can enable online mode for updates, learning, or external tasks.
+- All network activity is logged, reviewable, and can be blocked at any time.
 
 ---
 
+## Repo Structure
+
+```
+orchestrator/        # Final risk authority before execution
+supervisor/          # Watchdog and circuit-breaker control loop
+fusion-engine/       # Multi-signal consensus and conviction gating
+verifier/            # Fact-checking and signal cross-validation
+executor/            # Execution bridge and order-routing stubs
+dashboard/           # Operator console (FastAPI + Starlette)
+memu-core/           # Memory engine, vector search, reflection, quarantine
+tool-gate/           # Tool access policy, HMAC auth, ledger
+langgraph/           # Graph/runtime app integration (kai_config.py, conviction.py)
+kai-advisor/         # Self-employment advisor (offline, UK-focused)
+telegram-bot/        # Telegram bot interface (text/voice pipeline)
+heartbeat/           # System pulse and auto-sleep controller
+memory-compressor/   # Memory compression and summarisation
+ledger-worker/       # Ledger persistence worker
+metrics-gateway/     # Prometheus metrics aggregator
+screen-capture/      # Screen capture and OCR service
+backup-service/      # Backup and restore service
+calendar-sync/       # Calendar synchronisation service
+workspace-manager/   # Workspace lifecycle manager
+perception/          # Audio and camera capture services
+  audio/             # Audio capture and transcription
+  camera/            # Camera capture and vision
+output/              # Output services
+  tts/               # Text-to-speech (edge-tts)
+  avatar/            # Avatar generation
+sandboxes/           # Ephemeral sandbox environments
+  shell/             # Shell sandbox
+common/              # Shared utilities (auth, llm, policy, rate_limit)
+security/            # HMAC/auth hardening helpers
+scripts/             # Operational scripts, tests, and validation
+data/                # Seed datasets and local advisor inputs
+docs/                # Implementation plans and hardening runbooks
+```
 
 ---
 
-## 🧠 Sovereign AI Minimal Core Stack
+## Minimal Core Stack
 
- **Sovereign AI (Local-Only)**, a self-sovereign, air-gapped personal intelligence platform.  The documentation below now matches the stack actually built in the previous iteration of development; nothing has been left as a stale placeholder – every listed service can be started, tested and has accompanying unit/integration scripts.
+`docker-compose.minimal.yml` starts the 8 core services:
 
-A lightweight development stack is provided by `docker-compose.minimal.yml`, which starts the eight core services:
+| # | Service    | Purpose                 |
+|---|-----------|-------------------------|
+| 1 | postgres  | Ledger and vector store |
+| 2 | redis     | Session buffer          |
+| 3 | tool-gate | Execution choke point   |
+| 4 | memu-core | Memory engine           |
+| 5 | heartbeat | System pulse            |
+| 6 | dashboard | Health UI               |
+| 7 | supervisor| Watchdog                |
+| 8 | verifier  | Fact-checking           |
 
-1. `postgres` – immutable ledger and vector store
-2. `redis` – session buffer and short-term memory spool
-3. `tool-gate` – execution choke point with human co-sign
-4. `memu-core` – memory engine (vector search, session buffer, auto-classification)
-5. `heartbeat` – system pulse and auto-sleep controller
-6. `dashboard` – health UI and go/no-go report
-7. `supervisor` – watchdog with circuit breakers and health sweeps
-8. `verifier` – fact-checking and signal cross-validation
+The full stack (`docker-compose.full.yml`) adds: `fusion-engine`, `langgraph`, `executor`, `orchestrator`, `memory-compressor`, `ledger-worker`, `metrics-gateway`, `audio-service`, `camera-service`, `kai-advisor`, `tts-service`, `avatar-service`, `screen-capture`, `telegram-bot`, `backup-service`, `calendar-sync`, `workspace-manager`, and Ollama (local LLM).
 
-The full stack (`docker-compose.full.yml`) adds production services: `fusion-engine`, `langgraph`, `executor`, `perception/audio`, `perception/camera`, `kai-advisor`, `tts-service`, `avatar-service`. Three local LLM backends are supported: DeepSeek-V4 (reasoning/code), Kimi-2.5 (general/multimodal), Dolphin (uncensored PUB mode).
+---
 
-Run the stack:
+## Build & Run
 
 ```bash
-# build images (includes audio/camera in full stack)
-
+# Build the minimal stack
 docker compose -f docker-compose.minimal.yml build
 
-# optionally initialise the database for pgvector persistence
-make init-memu-db
-
-# bring the core up
-
-docker compose -f docker-compose.minimal.yml up -d
-
-# validate that services are alive
-
-# also probes executor, langgraph, audio, camera, kai-advisor if they are running
-python3 scripts/smoke_core.py
-
-# exercise unit tests across the core services (memu-core, dashboard, audio, camera, executor, langgraph, kai-advisor)
-make test-core
-
-> **Note:** In restricted environments (e.g. GitHub Codespaces) Docker containers may
-not be reachable on `localhost` due to networking limitations.  If the smoke
-script reports connection failures, try running the same commands from within a
-container or on a machine where the ports are exposed.
-
-```
-
-### Vector store configuration
-
-By default the memory core keeps episodes in memory. To enable
-PostgreSQL/pgvector persistence, set the following environment variables
-before starting the stack or running tests:
-
-```bash
-export VECTOR_STORE=postgres
-export PG_URI=postgresql://keeper:localdev@localhost:5432/sovereign
-```
-
-The helper script `scripts/init_memu_db.py` will create the necessary
-extension and table.  The unit test `scripts/test_memu_pgvector.py` will
-execute when `PG_URI` is defined and silently skip otherwise.
-
-Stop the stack with `docker compose -f docker-compose.minimal.yml down`.
-
-Once the services are running you can open a browser to `http://localhost:8080/ui` to view the
-simple HTML/JS dashboard stub. It polls the core services every 5 seconds and
-includes a placeholder "Toggle Gate Mode" button.
-
-When you're ready to bring up the **complete** stack including language graph,
-executor, perception and output services, use the `docker-compose.full.yml` file:
-
-```bash
-# build everything and start
-
+# Build the full stack
 docker compose -f docker-compose.full.yml build
 
-docker compose -f docker-compose.full.yml up -d
+# Start/stop
+make core-up          # minimal stack
+make core-down
+make full-up          # full stack
+make full-down
 ```
 
-This full composition is primarily useful for later development; the extra
-services initially act as stubs but they establish the networking and
-configuration for future expansion.  After the containers are up you can run
-an end-to-end smoke/integration script:
+---
+
+## Test
 
 ```bash
-python3 scripts/test_core_integration.py
+# Run ALL core unit/smoke tests (~30 tests across all services)
+make test-core
+
+# Individual service tests
+make test-phase-b-memu       # memu-core unit tests
+make test-memu-pg            # memu pgvector tests (requires PG_URI)
+make test-dashboard-ui       # dashboard UI tests
+make test-dashboard          # dashboard structural tests
+make test-tool-gate          # tool-gate API tests
+make test-tool-gate-security # tool-gate HMAC/nonce security tests
+make test-telegram           # telegram-bot smoke test
+make test-audio              # audio service smoke test
+make test-camera             # camera service smoke test
+make test-executor           # executor service smoke test
+make test-langgraph          # langgraph service smoke test
+make test-kai-advisor        # kai-advisor unit tests
+make test-tts                # TTS service smoke test
+make test-avatar             # avatar service smoke test
+make test-heartbeat          # heartbeat service tests
+make test-conviction         # conviction scoring tests
+make test-self-emp           # self-employment advisor tests
+make test-auth-hmac          # HMAC auth hardening tests
+make test-agentic            # agentic framework integration tests
+make test-episode-saver      # episode saver fallback tests
+make test-episode-spool      # episode spool integrity tests
+make test-error-budget       # error budget breaker tests
+make test-invoice            # invoice tests
+make test-memu-retrieval     # memu retrieval tests
+
+# v7 feature tests
+make test-v7                 # verifier, quarantine, policy, idempotency, integration-chain
+
+# Integration (requires running stack)
+make core-smoke
+make test-integration
+
+# Full merge-gate check
+make merge-gate
 ```
 
-The smoke test script polls each service endpoint and prints the health status.  These components form the hardened foundation; additional features and scripts are developed on top of them as the system grows.
+---
 
-For further architecture details, see `docs/sovereign_ai_spec.md` and the Phase‑1 patch set in `docs/phase1_patch_set.md`.
+## Lint / Validate
 
+```bash
+# Syntax check all service entry points
+make go_no_go
 
+# Flake8
+flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+```
+
+Run `make go_no_go` before committing to catch syntax errors early.
 
 ---
 
-## Sovereign Implementation Planning Docs
-- `docs/first_implementation_plan.md` — step-by-step first implementation runbook (commands, expected outputs, failure conditions)
-- `docs/phase1_patch_set.md` — concrete Phase-1 patch set aligned to current repo layout
-- `docs/production_hardening_plan.md` — production-grade hardening plan with owners and acceptance criteria
+## Architecture & Controls
 
-
-## Kai Control Offline Triple-Recovery
-- `scripts/kai_control.py` provides a standalone local keeper console (USB primary, USB backup, paper restore).
-- Build binary: `make build-kai-control` (PyInstaller one-file output).
-- Local self-check: `make kai-control-selftest`.
-- Host egress policy helper: `scripts/enforce_egress.sh`.
-- Run `kai-control` as normal user (no sudo).
-- Monthly drill helper: `scripts/kai-drill.sh` (cron suggested: `0 0 1 * *`).
-- HMAC migration readiness advisor: `make hmac-migration-advice` (decides when to leave shared-secret auth).
-- HMAC prepare-now hardening: `TOOL_GATE_DUAL_SIGN=true` and then `INTERSERVICE_HMAC_STRICT_KEY_ID=true` after overlap stabilizes.
-
-
-## Self-Employment Advisor Mode (Offline, UK-focused)
-- Preloaded folders: `data/self-emp/{Accounting,Legal,Coding,Engineering,Social}`.
-- Skill map: `data/self-emp/skill_map.yml`.
-- Advisor rules use local thresholds: `MTD_START`, `VAT_THRESHOLD`, `MILEAGE_RATE`.
-- Kai Control has **Advisor Mode** button (`Дайниус, что на уме?`) for strategic suggestions from local income/expense logs.
-- Run `kai-control` as normal user (no sudo).
+- **Tool-Gate:** Central policy engine for all tool and network access. HMAC-signed inter-service calls.
+- **Orchestrator:** Final risk authority before any execution.
+- **Memu-Core:** Memory engine with vector search, session buffer, reflection, proactive nudges, and quarantine.
+- **LangGraph service:** Graph-based orchestrator with conviction scoring and episode saving (`kai_config.py`).
+- **Executor & Sandboxes:** Safe, isolated execution of approved actions.
+- **Dashboard:** FastAPI operator console for monitoring, approval, and override.
 
 ---
 
-## 🤖 Self-Audit & Feedback
+## Key Guidelines
 
-- Run `make self-audit` to:
-  - Review recent test, lint, and health check results
-  - Summarize system health and recurring issues
-  - Propose actionable improvements
-  - Log lessons/incidents to memu-core (if running)
-  - Output a summary and full audit log to `output/self_audit_log.json`
-- This is the first step toward a self-reflective, self-improving AI partner.
-
----
-
-## 🗣️ Operator Feedback Channel
-
-- Submit feedback, suggestions, or goals directly to the system:
-  - `python3 scripts/operator_feedback.py "<your message>"`
-- Feedback is logged as a structured event in memu-core (if running), or saved locally for later ingestion.
-- This builds a persistent memory of operator guidance, enabling the system to learn and adapt from your input.
+- Always add or update `requirements.txt` when introducing new Python dependencies.
+- When modifying a service `app.py`, run `make go_no_go` to catch syntax errors.
+- Every service must expose a `/health` HTTP endpoint returning `{"status": "ok"}`.
+- Prefer small, focused pull requests. Use `make merge-gate` to confirm checks pass.
+- HMAC auth: Set `TOOL_GATE_DUAL_SIGN=true` and `INTERSERVICE_HMAC_STRICT_KEY_ID=true` after overlap stabilises.
+- Never commit real credentials; use `.env` files and environment variables.
+- The `langgraph/` directory contains the local orchestrator service; the installed `langgraph` pip package is separate.
 
 ---
 
-## 📝 Feedback & Memory Summary
+## Quickstart
 
-- Run `python3 scripts/feedback_summary.py` to:
-  - Retrieve and summarize recent operator feedback, lessons, and system actions from memory
-  - Fallback to local logs if memu-core is unavailable
-  - Surface actionable insights for both operator and AI review
+1. Clone the repo.
+2. Start core stack: `make core-up`
+3. Run tests: `make test-core`
+4. Monitor: open dashboard at `http://localhost:8080`
+5. Full stack: `make full-up` for all services including LLM, perception, and Telegram.
 
----
-
-## 🛡️ CI & Automation Coverage (2026)
-
-- **All scripts and Makefile targets** are now enforced in CI via the `merge-gate` target.
-- Every operational, utility, and maintenance script is tested or invoked automatically on every PR and push.
-- The new `scripts/quality_gate.py` blocks stubs, TODOs, and missing docstrings from merging.
-- Linting, unit tests, integration tests, and system health checks are all run in CI.
-- Maintenance and rotation scripts (e.g., paper-backup, weekly-key-rotate) are included in the automation pipeline.
-- Failures in CI will block merges, ensuring only high-quality, production-ready code is accepted.
-
-### Operator Workflow
-
-- To validate the system locally, run:
-  - `make merge-gate` — runs all quality, test, and maintenance checks as in CI
-  - `make test-core` — runs all core unit and integration tests
-  - `make health-sweep` — probes all service health endpoints
-  - `make contract-smoke` — runs contract-level smoke tests
-- All scripts in `scripts/` are now subject to automated quality checks and must have docstrings, no stubs, and no TODOs.
-- For new scripts or features, ensure they are added to the Makefile and covered by tests or invoked in CI.
-
----
-
-## 🦾 Kai Supervisor Agent (Prototype)
-
-- Run `python3 scripts/kai_supervisor.py` to:
-  - Review recent memory for patterns, recurring issues, and actionable improvements
-  - Suggest or draft improvements (e.g., docstrings, stub removal)
-  - Log its own actions and suggestions as system_action events in memory
-  - (Future) Auto-apply safe changes or request operator approval for higher-impact actions
-
----
-
-## ⚠️ Agentic Integration Notes (Feb 2026)
-
-- **Namespace Clashes:**
-  - Local file `langgraph/config.py` was renamed to avoid shadowing the installed `langgraph` package. Always avoid naming local modules after installed packages.
-  - If you need the local config, import it as `kai_langgraph_config.py`.
-- **OpenAgents API:**
-  - The class `AgentContainer` is not available at the top level. Check OpenAgents documentation for the correct import path or usage.
-- **Best Practices:**
-  - Never name local files/folders after installed packages.
-  - Always check for API changes in fast-evolving agentic frameworks.
-  - Log and document all integration issues and fixes in the README for future reference.
-
----
-
-## 🤖 Agentic Framework Integration (2026)
-
-### Integrated Frameworks
-- **LangGraph**: For agent orchestration and stateful multi-actor workflows. Use `from langgraph.graph import StateGraph` for graph construction.
-- **AutoGen**: For multi-agent orchestration and self-reflection. Use `from autogen import AssistantAgent, UserProxyAgent`.
-- **CrewAI**: For collaborative, role-based agent tasking. Use `from crewai import Crew, Task, Agent`.
-- **OpenAgents**: For multi-agent protocol and containerization. Use `from openagents.container.agent_container import AgentContainer` (not top-level import).
-
-### Integration Test
-- See `scripts/agentic_integration_test.py` for a working example that exercises all four frameworks in a minimal, side-effect-free way.
-- The test verifies:
-  - LangGraph node orchestration
-  - AutoGen agent instantiation
-  - CrewAI crew/task setup
-  - OpenAgents agent container creation
-
-### Troubleshooting & Lessons Learned
-- **Namespace Clashes**: Never name local files/folders after installed packages (e.g., avoid `langgraph/config.py`). This caused import errors and shadowed the installed package. Local config was renamed.
-- **OpenAgents API**: The `AgentContainer` class is not available at the top level. Use `from openagents.container.agent_container import AgentContainer`.
-- **API Drift**: Agentic frameworks evolve rapidly. Always check the latest documentation and inspect installed packages if imports fail.
-- **Testing**: Always run `python3 scripts/agentic_integration_test.py` after changes to agentic dependencies or imports.
-- **Documentation**: Log all integration issues, fixes, and best practices in the README for future maintainers.
-
-### Best Practices
-- Use explicit, non-conflicting names for all local modules.
-- Document all architectural decisions and integration issues.
-- Prefer minimal, side-effect-free integration tests for new frameworks.
-- Update requirements and test scripts with every new agentic dependency.
-- Review and update this section as frameworks evolve.
-
----
-
-## 🏛️ Architectural Analysis (2026)
-
-### System Overview
-Kai System is a modular, air-gapped, self-sovereign AI platform. It is designed with strict local-only, no-egress security, layered defense, and composable microservices. The architecture is documented in detail in `docs/sovereign_ai_spec.md` (see layered Mermaid diagram and service breakdown).
-
-#### Layered Architecture
-- **L0: Hardware Root** — TPM, encrypted storage, direct device access (camera, mic, GPU)
-- **L1: Sovereign Core** — Tool Gate (execution choke), Ledger (Postgres+pgvector), Dashboard (operator UI)
-- **L2: Intelligence** — Memu-Core (memory), LangGraph (agent orchestration), LLM Pool, Kai Advisor
-- **L3: Perception** — Audio, Camera, Screen Capture pipelines
-- **L4: Awareness** — Heartbeat, Calendar sync
-- **L5: Execution** — Executor, Sandboxes (QGIS, n8n, shell)
-- **L6: Output** — TTS, Avatar, Display overlay
-
-#### Agentic Integration Points
-- **LangGraph**: Orchestrates agent workflows, routes context and tasks between memory, LLMs, and advisors.
-- **AutoGen**: Enables multi-agent, self-reflective reasoning and user proxying.
-- **CrewAI**: Coordinates collaborative, role-based agent teams for complex tasks.
-- **OpenAgents**: Provides protocol and containerization for multi-agent systems.
-
-#### Security Invariants
-- All execution requests pass through Tool Gate (with HMAC co-sign).
-- No network egress; all inter-service traffic is on a private bridge network.
-- All persistent storage is local and encrypted where possible.
-- Sandboxes are isolated (network_mode: none, read-only, dropped caps).
-
-#### Best Practices & Lessons
-- **Namespace Hygiene**: Never shadow installed packages with local files (e.g., langgraph/config.py).
-- **Explicit Imports**: Use explicit, version-checked imports for agentic frameworks (see Integration section above).
-- **API Drift Management**: Regularly audit and test all agentic integrations; document all breakages and fixes.
-- **Minimal, Isolated Tests**: Use scripts/agentic_integration_test.py as a template for future framework integrations.
-- **Documentation**: All architectural and integration decisions, issues, and fixes are logged in this README and in docs/.
-
-#### References
-- See `docs/sovereign_ai_spec.md` for full technical specification, layered diagrams, and service details.
-- See `scripts/agentic_integration_test.py` for a working, minimal agentic integration test.
-
----
+For architecture details see `docs/sovereign_ai_spec.md`.

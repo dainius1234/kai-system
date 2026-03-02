@@ -1330,16 +1330,18 @@ MIN_MEMORIES_FOR_REFLECTION = int(os.getenv("MIN_MEMORIES_FOR_REFLECTION", "5"))
 
 @app.post("/memory/reflect")
 async def reflect() -> Dict[str, Any]:
-    """Consolidate recent memories into pattern insights.
+    """
+    Consolidate recent memories into pattern insights.
 
     Scans the last REFLECTION_WINDOW_DAYS of memories, finds:
-      1. Recurring categories — what topics keep coming up?
-      2. Frequently accessed memories — what matters most?
-      3. Keyword clusters — emerging themes across notes
+        1. Recurring categories — what topics keep coming up?
+        2. Frequently accessed memories — what matters most?
+        3. Keyword clusters — emerging themes across notes
 
     Writes insight summaries back as high-importance pinned memories
     so the system "learns" from its own experience over time.
-    """    threshold = datetime.utcnow() - timedelta(days=REFLECTION_WINDOW_DAYS)
+    """
+    threshold = datetime.utcnow() - timedelta(days=REFLECTION_WINDOW_DAYS)
     all_records = store.search(top_k=10_000)
 
     # filter to recent window

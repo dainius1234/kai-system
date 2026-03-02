@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 import tempfile
 import time
 from pathlib import Path
 
-from langgraph.config import ChecksummedSpoolSaver
+# Import our local kai_config, avoiding the installed langgraph package
+_mod_path = Path(__file__).resolve().parents[1] / "langgraph" / "kai_config.py"
+_spec = importlib.util.spec_from_file_location("kai_config", _mod_path)
+assert _spec and _spec.loader
+_mod = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_mod)
+ChecksummedSpoolSaver = _mod.ChecksummedSpoolSaver
 
 with tempfile.TemporaryDirectory() as td:
     p = Path(td) / "episodes.log"

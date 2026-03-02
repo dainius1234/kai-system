@@ -1,13 +1,19 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import sys
+import tempfile
 import time
 from pathlib import Path
 
 from fastapi import HTTPException
 
 from common.auth import sign_gate_request
+
+# Set LEDGER_PATH to a temp dir before importing tool-gate (it creates the dir on import)
+_tmpdir = tempfile.mkdtemp()
+os.environ["LEDGER_PATH"] = os.path.join(_tmpdir, "ledger.jsonl")
 
 module_path = Path(__file__).resolve().parents[1] / "tool-gate" / "app.py"
 spec = importlib.util.spec_from_file_location("tool_gate_app", module_path)

@@ -1,38 +1,100 @@
+"""Kai System Agentic Integration Test
+
+Verifies that all four agentic frameworks can be imported and
+basic objects instantiated without external API keys or services.
+This is a structural / smoke test — it does NOT call any LLMs.
+
+Frameworks tested:
+  1. LangGraph  — graph construction
+  2. AutoGen    — agent class instantiation
+  3. CrewAI     — crew/task/agent wiring
+  4. OpenAgents — agent runner class loading
 """
-Kai System Agentic Integration Test
+import sys
+import os
 
-- Tests LangGraph, AutoGen, CrewAI, and OpenAgents integration
-- Verifies agent orchestration, self-reflection, and task coordination
-"""
-from langgraph.graph import StateGraph
-from autogen import AssistantAgent, UserProxyAgent
-from crewai import Crew, Task, Agent
-from openagents.container.agent_container import AgentContainer
+# Ensure the workspace root is NOT first on sys.path so our local
+# langgraph/ service directory does not shadow the installed package.
+_ws = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if sys.path and os.path.abspath(sys.path[0]) == _ws:
+    sys.path.pop(0)
+
+passed = 0
+failed = 0
 
 
-# LangGraph: simple state graph
-G = StateGraph()
-G.add_node("start", lambda state: state)
-G.add_node("end", lambda state: state)
-G.add_edge("start", "end")
+def check(label: str, fn):
+    """Run *fn* and report pass/fail."""
+    global passed, failed
+    try:
+        fn()
+        print(f"  [PASS] {label}")
+        passed += 1
+    except Exception as exc:
+        print(f"  [FAIL] {label}: {exc}")
+        failed += 1
 
-# AutoGen: assistant and user proxy
-assistant = AssistantAgent("assistant")
-user = UserProxyAgent("user")
 
-# CrewAI: crew and task
-crew_agent = Agent(name="KaiCrew", role="planner")
-task = Task(description="Plan a test workflow.", agent=crew_agent)
-crew = Crew(agents=[crew_agent], tasks=[task])
+# ── 1. LangGraph ────────────────────────────────────────────────────
+def test_langgraph():
+    from langgraph.graph import StateGraph
+    from typing_extensions import TypedDict
 
-# OpenAgents: container
-container = AgentContainer()
-container.add_agent("test_agent", lambda x: f"Echo: {x}")
+    class St(TypedDict):
+        value: str
 
-# Run basic tests
-print("LangGraph nodes:", G.nodes())
-print("AutoGen assistant name:", assistant.name)
-print("CrewAI crew agents:", [a.name for a in crew.agents])
-print("OpenAgents container agents:", list(container.agents.keys()))
+    g = StateGraph(St)
+    g.add_node("echo", lambda s: s)
+    g.set_entry_point("echo")
+    g.set_finish_point("echo")
+    compiled = g.compile()
+    assert compiled is not None, "StateGraph did not compile"
 
-print("Integration test passed.")
+
+# ── 2. AutoGen ──────────────────────────────────────────────────────
+def test_autogen():
+    from autogen import AssistantAgent, UserProxyAgent
+
+    # llm_config=False means no LLM calls — pure structural test
+    assistant = AssistantAgent("kai-assistant", llm_config=False)
+    user = UserProxyAgent("kai-user", llm_config=False, code_execution_config=False)
+    assert assistant.name == "kai-assistant"
+    assert user.name == "kai-user"
+
+
+# ── 3. CrewAI ───────────────────────────────────────────────────────
+def test_crewai():
+    # CrewAI requires OPENAI_API_KEY even for object construction;
+    # set a placeholder so the smoke test can verify wiring.
+    os.environ.setdefault("OPENAI_API_KEY", "sk-test-placeholder-not-real")
+    from crewai import Agent, Task, Crew
+
+    agent = Agent(role="planner", goal="plan tasks", backstory="test")
+    task = Task(description="Plan a workflow.", expected_output="plan", agent=agent)
+    crew = Crew(agents=[agent], tasks=[task])
+    assert len(crew.agents) == 1
+    assert len(crew.tasks) == 1
+
+
+# ── 4. OpenAgents ───────────────────────────────────────────────────
+def test_openagents():
+    from openagents.agents.simple_agent import SimpleAutoAgent
+    assert SimpleAutoAgent is not None, "SimpleAutoAgent class not found"
+
+
+# ── Run ─────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    print("Kai System — Agentic Framework Smoke Test")
+    print("=" * 48)
+    check("LangGraph  — graph construction", test_langgraph)
+    check("AutoGen    — agent instantiation", test_autogen)
+    check("CrewAI     — crew/task wiring", test_crewai)
+    check("OpenAgents — class loading", test_openagents)
+    print("=" * 48)
+    print(f"Results: {passed} passed, {failed} failed")
+    if failed:
+        print("WARNING: Some frameworks had issues — check API changes.")
+        raise SystemExit(1)
+    else:
+        print("All agentic integration checks passed.")
+        raise SystemExit(0)

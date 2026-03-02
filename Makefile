@@ -1,10 +1,10 @@
 # Self-audit and feedback
 self-audit:
 	python3 scripts/self_audit.py
-.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7
+.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-agentic
 
 go_no_go:
-	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py langgraph/app.py executor/app.py heartbeat/app.py supervisor/app.py verifier/app.py fusion-engine/app.py common/llm.py memory-compressor/app.py ledger-worker/app.py metrics-gateway/app.py
+	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py langgraph/app.py executor/app.py heartbeat/app.py supervisor/app.py verifier/app.py fusion-engine/app.py common/llm.py memory-compressor/app.py ledger-worker/app.py metrics-gateway/app.py telegram-bot/app.py
 	python scripts/go_no_go_check.py
 
 hardening_smoke:
@@ -91,6 +91,37 @@ test-avatar:
 test-tool-gate:
 	PYTHONPATH=. python scripts/test_tool_gate_api.py
 
+test-telegram:
+	PYTHONPATH=. python scripts/test_telegram_bot.py
+
+test-agentic:
+	python3 scripts/agentic_integration_test.py
+
+# previously orphan tests — now wired in
+test-heartbeat:
+	PYTHONPATH=. python scripts/test_heartbeat.py
+
+test-episode-saver:
+	PYTHONPATH=. python scripts/test_episode_saver.py
+
+test-episode-spool:
+	PYTHONPATH=. python scripts/test_episode_spool.py
+
+test-tool-gate-security:
+	PYTHONPATH=. python scripts/test_tool_gate_security.py
+
+test-error-budget:
+	PYTHONPATH=. python scripts/test_error_budget_breaker.py
+
+test-invoice:
+	PYTHONPATH=. python scripts/test_invoice.py
+
+test-dashboard:
+	PYTHONPATH=. python scripts/test_dashboard.py
+
+test-memu-retrieval:
+	PYTHONPATH=. python scripts/test_memu_retrieval.py
+
 # v7 feature tests
 test-v7-verifier:
 	PYTHONPATH=. python scripts/test_v7_verifier.py
@@ -109,8 +140,8 @@ test-integration-chain:
 
 test-v7: test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain
 
-# wrapper to run all core memory tests
-test-core: test-phase-b-memu test-memu-pg test-dashboard-ui test-tool-gate test-conviction test-audio test-camera test-executor test-langgraph test-kai-advisor test-tts test-avatar test-v7
+# wrapper to run all core unit/smoke tests
+test-core: test-phase-b-memu test-memu-pg test-dashboard-ui test-dashboard test-tool-gate test-tool-gate-security test-telegram test-conviction test-audio test-camera test-executor test-langgraph test-kai-advisor test-tts test-avatar test-heartbeat test-episode-saver test-episode-spool test-error-budget test-invoice test-memu-retrieval test-self-emp test-auth-hmac test-agentic test-v7
 
 test-dashboard-ui:
 	PYTHONPATH=. python scripts/test_dashboard_ui.py
