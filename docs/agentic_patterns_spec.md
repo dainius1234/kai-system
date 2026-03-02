@@ -274,15 +274,17 @@ langgraph/
 - [x] Designed Router (8 routes, rule-based, zero-LLM for 5 of 8)
 - [x] Designed Memory-Driven Planner (history lookup, conviction modifiers)
 - [x] Designed Proposer-Adversary (LangGraph graph, deferred to Phase 2c)
-- [ ] Build `langgraph/router.py`
-- [ ] Build `langgraph/planner.py`
-- [ ] Wire router into `/chat` endpoint
-- [ ] Wire planner into `/run` endpoint
-- [ ] Write tests
-- [ ] Update conviction.py with history modifiers
-- [ ] Extend `/chat` to return route metadata in SSE headers
+- [x] Build `langgraph/router.py` — classify() + 5 dispatch functions
+- [x] Build `langgraph/planner.py` — gather_context() + build_enriched_plan()
+- [x] Wire router into `/chat` endpoint (Step 0: classify, Step 1: zero-LLM dispatch)
+- [x] Wire planner into `/run` endpoint (history lookup → enriched plan → conviction modifier)
+- [x] Write tests — 27 router tests + 4 planner test groups, all pass
+- [x] Add Makefile targets (test-router, test-planner) — test-core now 26 targets
+- [x] All 32 test targets pass as of commit da677f1
+- [x] `/chat` returns `X-Kai-Route` header in SSE responses
+- [ ] Build adversary.py (Phase 2c — Proposer-Adversary loop)
 - [ ] Dashboard: show route decisions in UI
-- [ ] Build adversary.py (Phase 2c)
+- [ ] Update conviction.py with configurable history modifier weights
 
 ---
 
@@ -290,7 +292,7 @@ langgraph/
 
 If picking up from here, check:
 1. `git log --oneline -5` to see where we stopped
-2. `make test-core` to confirm baseline is green
+2. `make test-core` to confirm baseline is green (expect 32 passes)
 3. Read this doc for the full plan
-4. Start with whatever is next in the Progress Tracker above
-5. All 30 tests were passing as of 2 Mar 2026
+4. Start with Phase 2c: adversary.py (Proposer-Adversary loop)
+5. All 32 tests were passing as of commit da677f1
