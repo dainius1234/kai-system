@@ -42,7 +42,7 @@ class LLMResponse:
 # ── Specialist URL registry ─────────────────────────────────────────
 # Ollama is the primary local backend — add it as the default
 _OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama:11434")
-_OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2:0.5b")
+_OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3.5:0.6b")
 
 _DEFAULT_URLS: Dict[str, str] = {
     "Ollama": _OLLAMA_URL,
