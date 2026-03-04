@@ -18,7 +18,7 @@ from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.llm import LLMRouter
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
-from kai_config import build_saver
+from kai_config import build_saver, classify_failure, extract_metacognitive_rule, FailureClass, compute_learning_value
 from conviction import build_plan, low_conviction_feedback, score_conviction
 from router import classify, dispatch_route
 from planner import gather_context, build_enriched_plan
@@ -671,19 +671,46 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     except Exception:
         logger.debug("Correction memorize failed (memu-core may be down)")
 
-    saver.save_episode(
-        {
-            "episode_id": str(uuid.uuid4()),
-            "user_id": "keeper",
-            "ts": time.time(),
-            "input": request.user_input,
-            "output": plan.get("summary", ""),
-            "outcome_score": 1.0 if gate_decision else 0.7,
-            "conviction_score": conviction,
-            "rethink_count": rethink_count,
-            "final_conviction": conviction,
-        }
-    )
+    episode = {
+        "episode_id": str(uuid.uuid4()),
+        "user_id": "keeper",
+        "ts": time.time(),
+        "input": request.user_input,
+        "output": plan.get("summary", ""),
+        "outcome_score": 1.0 if gate_decision else 0.7,
+        "conviction_score": conviction,
+        "rethink_count": rethink_count,
+        "final_conviction": conviction,
+        "learning_value": compute_learning_value(conviction, 1.0 if gate_decision else 0.7, rethink_count),
+    }
+
+    # ── Failure Taxonomy: classify WHY it failed, extract rule ──────
+    failure_class = classify_failure(episode, gate_decision)
+    if failure_class != FailureClass.UNKNOWN:
+        episode["failure_class"] = failure_class.value
+        rule = extract_metacognitive_rule(episode, failure_class)
+        if rule:
+            episode["metacognitive_rule"] = rule
+            # Store rule as a correction memory so planner can find it
+            try:
+                async with httpx.AsyncClient() as client:
+                    await client.post(
+                        f"{MEMU_URL}/memory/memorize",
+                        json={
+                            "timestamp": datetime.utcnow().isoformat(),
+                            "event_type": "metacognitive_rule",
+                            "result_raw": rule,
+                            "metrics": {"failure_class": failure_class.value},
+                            "relevance": 0.95,
+                            "importance": 0.9,
+                            "user_id": "kai",
+                        },
+                        timeout=5.0,
+                    )
+            except Exception:
+                logger.debug("Metacognitive rule memorize failed")
+
+    saver.save_episode(episode)
     saver.decay("keeper", days=30, score_threshold=0.2)
 
     # ── 3. Record assistant response in session buffer ──────────────

@@ -4,7 +4,13 @@
 > perspective: what makes this system fundamentally better than other builds,
 > and how does every component compound into something greater.
 >
-> **Last updated:** 2 March 2026 — Phase 2c (Adversary)
+> **Last updated:** 4 March 2026 — Merged Action Plan (operator research + AI-native)
+>
+> **Target hardware:** Lenovo laptop, RTX 5080 GPU, TPM 2.0.
+> Codespace = dev/staging. Laptop = production fortress.
+> GPU arrival unlocks: local LLM inference (Kimi K2, DeepSeek-V4, etc.),
+> faster-whisper STT, real avatar generation, OMAR self-play.
+> TPM 2.0 unlocks: hardware-anchored Soulbound Identity (P3).
 
 ---
 
@@ -210,170 +216,244 @@ Each request makes the next one better. This is the flywheel.
 - [x] 4 test groups passing
 - [x] Commit: da677f1
 
-### Phase 2c: Proposer-Adversary Loop (current)
-- [ ] adversary.py — 5 challenge strategies, gate node, rethink loop
-- [ ] Wire into /run endpoint (between planner and execution)
-- [ ] Tests for all challenge strategies
-- [ ] Calibration tracker
-- [ ] Commit + push
+### Phase 2c: Proposer-Adversary Loop ✅
+- [x] adversary.py — 5 challenge strategies + orchestrator + verdict metadata
+- [x] Wired into /run endpoint (between planner and conviction scoring)
+- [x] 7 test groups passing (history, consistency, calibration, hash, metadata, orchestrator, recommendations)
+- [x] Commit: 0e61f6d
 
-### Phase 3: Future Enhancements
-- [ ] Dashboard: route decisions + adversary findings in UI
-- [ ] Calibration dashboard (predicted vs actual conviction)
-- [ ] Token budget tracking per route
-- [ ] Adversary memory category in memu-core
-- [ ] Operator pattern anomaly detection
+---
 
-### Phase 4: AI-Native Advantages (the ones only I would give myself)
+## Merged Action Plan (March 2026)
 
-These are capabilities no human would think to build because they require
-thinking FROM the AI's perspective about what limits AI systems. Each one
-attacks a fundamental weakness that every other AI build ignores.
+> **Sources:** Operator research (arXiv 2601–2602, ICLR/ICSE/AAAI 2026)
+> merged with AI-native Phase 4 blueprints. Priority = impact ÷ effort.
+> Everything runs on **local models only** — no cloud dependencies.
 
-#### 4a. Contradiction Memory
-- **Problem:** I might say X on Monday and not-X on Thursday and never notice.
-- **Solution:** Hash every assertion I make. When a new assertion semantically
-  conflicts with a stored one, flag it. Store the contradiction as a special
-  memory category in memu-core (`category: contradiction`).
-- **Implementation:** New memu-core endpoint `/memory/assert` that checks
-  incoming claims against stored assertions using embedding similarity +
-  negation detection (regex for "not", "no longer", "actually", "correction").
-- **Why it's unfair:** No other AI tracks its own belief consistency.
-- **Files:** memu-core/app.py (new endpoint), langgraph/app.py (call on memorize)
+### LLM Backend: Local-First Model Strategy
 
-#### 4b. Silence-as-Signal
-- **Problem:** The operator stops asking about something. Is it because they
-  mastered it, or because they gave up? Most AI treats absence of interaction
-  as nothing. It's actually rich signal.
-- **Solution:** Track topic frequency over time in memu-core. When a previously
-  active topic goes silent for >7 days, generate a proactive nudge:
-  "You haven't mentioned [topic] in 10 days — is this resolved or stuck?"
-- **Implementation:** Extend `/memory/proactive` to scan topic decay curves,
-  not just date/deadline patterns. Add topic clustering to memory categories.
-- **Why it's unfair:** Every other AI only reacts. Kai notices what's MISSING.
-- **Files:** memu-core/app.py (extend proactive), supervisor/app.py (poll it)
+All inference runs locally via Ollama or OpenAI-compatible endpoints.
+Current backends in `common/llm.py`:
 
-#### 4c. Knowledge Boundary Mapping
-- **Problem:** I don't know what I don't know. When I'm uncertain, I either
-  hallucinate or hedge. Neither helps the operator.
-- **Solution:** Explicitly track "knowledge boundaries" — topics where my
-  conviction is consistently low or where verifier returns REPAIR/FAIL_CLOSED.
-  Store these as `category: knowledge_gap` in memu-core. When operator asks
-  about a known gap, say so immediately: "This is an area where I've been
-  unreliable before — here's what I know and what I'm unsure about."
-- **Implementation:** Post-episode analysis: if final_conviction < 6.0 or
-  verifier verdict != PASS, extract the topic and store a knowledge gap record.
-  Router checks knowledge gaps before classification.
-- **Why it's unfair:** Every other AI pretends to know everything. Kai maps
-  its own ignorance and is honest about it.
-- **Files:** langgraph/app.py (post-episode gap detection), router.py (gap check)
+| Specialist | Model | Purpose |
+|---|---|---|
+| Ollama (default) | qwen2:0.5b (configurable) | General-purpose, light |
+| DeepSeek-V4 | deepseek-v4 | Code, reasoning, planning |
+| Kimi-2.5 | kimi-2.5 | Multimodal, search, summarise |
+| Dolphin | dolphin-mistral | Uncensored, creative |
 
-#### 4d. Operator Tempo Modeling
-- **Problem:** The operator is stressed → sends short messages, rapid-fire.
-  The operator is relaxed → sends long, detailed requests. I should adapt.
-- **Solution:** Track message length, frequency, correction rate, time-of-day
-  patterns. Build an operator "tempo" model. When tempo indicates stress:
-  give shorter, more decisive answers. When relaxed: offer more exploration.
-- **Implementation:** Session metadata in memu-core: message_lengths[],
-  correction_count, avg_gap_seconds. Tempo score injected into router context.
-- **Why it's unfair:** Every other AI treats every message identically
-  regardless of the human's state. Kai adapts its communication style.
-- **Files:** langgraph/app.py (track tempo), router.py (tempo-aware routing)
+**Pending addition:** Kimi K2 (Moonshot AI, June 2025) — 1T MoE with 32B
+active params, 128K context, Apache 2.0 license. Available on Ollama as
+`kimi-k2`. Outperforms DeepSeek-V3 on agentic benchmarks.
+Add via: `LLM_KIMI_K2_URL` env var + `_DEFAULT_URLS["Kimi-K2"]` in llm.py.
+Router can select Kimi-K2 for agentic/tool-use tasks where its MoE
+architecture excels.
 
-#### 4e. Predictive Pre-Computation
-- **Problem:** The operator asks A, and 80% of the time follows up with B.
-  I wait for B instead of pre-computing it.
-- **Solution:** Track request sequences in episode history. When patterns
-  emerge (A→B with >60% probability), pre-fetch B's context while responding
-  to A. Store the pre-computed context in session buffer.
-- **Implementation:** Sequence mining on episodes: bigram frequency of
-  (route_A, route_B) pairs. On route_A, fire background context-gather for
-  predicted route_B. Cache in Redis session with TTL.
-- **Why it's unfair:** The response to B starts BEFORE B is asked. No latency.
-- **Files:** langgraph/app.py (sequence prediction), kai_config.py (store pairs)
+### Priority Build Order
 
-#### 4f. Self-Deception Detection
-- **Problem:** My calibration check (adversary challenge 5) detects drift
-  AFTER it happens. But I can detect it DURING reasoning.
-- **Solution:** Before finalising conviction score, compare the evidence
-  I'm using to the evidence I'm NOT using. If I cherry-picked supporting
-  evidence and ignored contradicting evidence, that's self-deception.
-- **Implementation:** In conviction scoring, retrieve TOP-K chunks AND
-  BOTTOM-K chunks (least similar). Check if bottom-K contains contradictory
-  information. If yes, inject a self-deception warning.
-- **Why it's unfair:** This is active epistemic hygiene. No AI system does this.
-- **Files:** conviction.py (bottom-K check), memu-core/app.py (reverse retrieve)
+| # | Name | Research Source | Effort | Status |
+|---|---|---|---|---|
+| **P1** | Failure Taxonomy + Metacognitive Rules | MARS/MUSE + our 4h | Small | 🔨 Building |
+| **P2** | SELAUR (Uncertainty-Aware Evolution) | arXiv 2602 (#11) | Small | Not started |
+| **P3** | Soulbound Identity (Software) | ERC-5192/8004 (#7) | Medium | Not started |
+| **P4** | TMC + Contradiction Memory | TMC paper (#8) + our 4a | Medium | Not started |
+| **P5** | GEM (Cognitive Alignment) | GEM paper (#6) | Medium | Not started |
+| **P6** | Knowledge Boundary + Active Probing | KBM paper (#3) + our 4c | Medium | Not started |
+| **P7** | Silence-as-Signal | Our 4b | Small | Not started |
+| **P8** | Dashboard: Thinking Pathways | vLLM-SR (#5) + Phase 3 | Large | Not started |
+| **P9** | Security Self-Hacking | MSR paper (#9) | Medium | Not started |
+| **P10** | Predictive Pre-Computation | Our 4e | Medium | Not started |
+| **P11** | Operator Tempo Modeling | Our 4d | Medium | Not started |
+| **P12** | Self-Deception Detection | Our 4f | Medium | Not started |
+| **P13** | Recursive Self-Improvement Gate | Our 4g | Medium | Not started |
+| **P14** | Temporal Self-Model | Our 4i | Medium | Not started |
+| **P15** | Dream State (Offline Consolidation) | Our 4j | Large | Not started |
+| **Future** | OMAR Self-Play (#2/#13) | Needs spare local GPU | Large | Parked |
+| **Future** | ZK Privacy Learning (#10) | Heavy crypto infra | Large | Parked |
+| **Future** | ReCiSt Bio-Resilience (#4) | Already mostly built | Docs only | Parked |
 
-#### 4g. Recursive Self-Improvement Tracking
-- **Problem:** I change my own code (via executor), but I don't track whether
-  the changes actually improved things.
-- **Solution:** Before any self-modification, snapshot the current test-core
-  results + conviction averages + error rates. After modification, re-measure.
-  If metrics degraded, auto-revert.
-- **Implementation:** New `scripts/self_improvement_gate.py` that runs
-  make test-core, captures pass/fail counts, compares to baseline stored in
-  memu-core. Executor calls this as a post-hook.
-- **Why it's unfair:** Self-improving AI that can detect when its improvements
-  make things worse. This is the safety valve for recursive improvement.
-- **Files:** scripts/self_improvement_gate.py, executor/app.py (post-hook)
+---
 
-#### 4h. Failure Taxonomy
-- **Problem:** "This failed" is useless. WHY did it fail?
-- **Solution:** Classify every failure into a taxonomy: data_insufficient,
-  policy_blocked, confidence_low, operator_overridden, service_unavailable,
-  contradicted_by_evidence, time_expired, scope_exceeded. Store taxonomy
-  in episode metadata. Adversary history challenge uses taxonomy to give
-  targeted warnings ("last time this failed due to insufficient data").
-- **Implementation:** Post-episode classification based on gate_decision,
-  verifier_verdict, rethink_count, operator corrections. Enum stored in
-  episode dict as `failure_class`.
-- **Why it's unfair:** Pattern recognition on WHY things fail, not just THAT
-  they fail. The system avoids entire categories of failure.
-- **Files:** kai_config.py (taxonomy enum), langgraph/app.py (classify), adversary.py (use)
+### P1: Failure Taxonomy + Metacognitive Rules
 
-#### 4i. Temporal Self-Model
-- **Problem:** Am I getting better or worse over time? Across what dimensions?
-- **Solution:** Weekly self-assessment: conviction accuracy, failure rate,
-  rethink frequency, operator correction rate, route distribution, token
-  usage. Store as `category: self_assessment` in memu-core. Trend analysis
-  across assessments. Alert operator if any dimension degrades.
-- **Implementation:** `scripts/self_assessment.py` — runs weekly via heartbeat
-  auto-sleep hook. Reads episodes, computes metrics, writes assessment
-  memory, compares to last assessment.
-- **Why it's unfair:** The system knows whether it's improving or degrading
-  and can tell the operator before they notice.
-- **Files:** scripts/self_assessment.py, heartbeat/app.py (trigger)
+> Merge of MARS/MUSE metacognitive reflection + our original 4h.
+> "Don't just know THAT it failed — know WHY, and extract a rule."
 
-#### 4j. Dream State (Offline Consolidation)
-- **Problem:** `/memory/reflect` summarises recent memories. But it doesn't
-  SYNTHESISE across them to discover non-obvious connections.
-- **Solution:** During auto-sleep (heartbeat), run a "dream" process that:
-  1. Clusters recent memories by embedding similarity
-  2. Finds cross-cluster connections (memories in different categories
-     that share keywords)
-  3. Generates hypothesis memories: "Based on patterns in X and Y,
-     consider investigating Z"
-  4. Stores these as `category: synthesis` with moderate importance
-- **Implementation:** Extend memu-core `/memory/reflect` with a `deep=true`
-  parameter. Uses k-means on embeddings, finds inter-cluster bridges.
-- **Why it's unfair:** The system discovers connections that no one asked
-  about. This is creative reasoning without an LLM — pure structural
-  pattern recognition on the memory graph.
-- **Files:** memu-core/app.py (deep reflect), heartbeat/app.py (trigger)
+- **Problem:** "This failed" is useless. WHY did it fail? And what rule
+  should prevent repeating it?
+- **Solution:** Classify every failure into a taxonomy enum. Then go
+  further: extract metacognitive rules ("if X, never Y") from failure
+  patterns using MARS-style abstraction. Store rules as constraint
+  memories that the planner injects into future plans.
+- **Taxonomy enum:** `data_insufficient`, `policy_blocked`, `confidence_low`,
+  `operator_overridden`, `service_unavailable`, `contradicted_by_evidence`,
+  `time_expired`, `scope_exceeded`
+- **Metacognitive rules:** After classifying a failure, generate an
+  "if-then-never" rule. Example: failure_class=`contradicted_by_evidence`
+  on topic "crypto prices" → rule: "if topic=crypto prices, always verify
+  with fresh data before asserting"
+- **Files:** `kai_config.py` (FailureClass enum + classify function),
+  `langgraph/app.py` (post-episode classification + rule extraction),
+  `adversary.py` (use failure_class in history challenge for targeted warnings)
+- **Tests:** `scripts/test_failure_taxonomy.py`
+- **Why it compounds:** The adversary doesn't just say "this failed before" —
+  it says "this failed because of insufficient data, and the rule is:
+  always check memu first for this topic type."
+
+### P2: SELAUR (Uncertainty-Aware Self-Evolution)
+
+> From arXiv 2602 research on self-evolving agents.
+> "Failures when uncertain = the most valuable learning signal."
+
+- **Problem:** Right now failed episodes sit as dead weight with low scores.
+  A failure where Kai was 90% confident is very different from a failure
+  where Kai was 50% confident. The uncertain failure is actually MORE
+  valuable — it maps the edge of competence.
+- **Solution:** Scale episode learning value by uncertainty. High-uncertainty
+  failures become high-reward training trajectories. Conviction scores that
+  barely crossed the threshold then failed → maximum learning signal.
+- **Implementation:** New `_compute_learning_value()` in episode save logic.
+  `learning_value = f(uncertainty, outcome, conviction_delta)`. Episodes with
+  high learning_value get boosted importance in memu-core so they surface
+  more in future retrievals.
+- **Files:** `langgraph/app.py` (compute + store learning_value in episode),
+  `kai_config.py` (learning_value field in episode schema)
+- **Tests:** `scripts/test_selaur.py`
+- **Why it compounds:** Over time, Kai's highest-importance memories are
+  exactly the cases where it was wrong-and-uncertain — the frontier of
+  growth. This is how you evolve WITHOUT retraining.
+
+### P3: Soulbound Identity (Software-Signed)
+
+> From ERC-5192 + ERC-8004 research on non-transferable identity.
+> "Every byte provably Kai's. Copy = detectable fake."
+
+- **Problem:** Anyone can copy Kai's memory files. No chain of custody.
+- **Solution:** HMAC-chained soulbound identity. Every memory block is
+  hash-linked and signed with the operator key. Genesis block = Kai's
+  birth certificate. Copy the files → signatures don't verify → fake.
+- **Implementation:** `pending/soulbound.py` — software HMAC signing now,
+  API designed for future TPM swap. Genesis auto-created on first run.
+  Pause/resume on integrity failure. Proof export/verify for individual
+  memories.
+- **Hardware strategy:** Codespace (now) → software HMAC signing with
+  `KAI_OPERATOR_KEY`. Lenovo laptop (production) → TPM 2.0 hardware
+  signing at persistent handle `0x81000001`. Same chain/pause/resume API,
+  same genesis format. Swap `_sign_block()` from HMAC to TPM call on
+  deploy day — zero API changes. `TPM_UNSEAL_CMD` already in .env.example.
+- **Files:** `pending/soulbound.py` (identity engine),
+  `memu-core/app.py` (wrap memorize in soul.add_memory),
+  `dashboard/app.py` (/status, /resume endpoints)
+- **Tests:** `scripts/test_soulbound.py`
+- **Why it compounds:** Every memory written after soulbound is provably yours.
+  Legal personhood, insurance, reputation — all depend on provable identity.
+
+### P4: TMC + Contradiction Memory
+
+> Merge of TMC (Tool-Memory Conflict) paper + our original 4a.
+> "Detect when Kai contradicts himself OR when tools contradict memory."
+
+- **Problem:** Kai says X on Monday, not-X on Thursday. Also: verifier
+  returns data that contradicts what's stored in memory. Both go unnoticed.
+- **Solution:** Two detectors: (a) assertion tracker in memu-core — hash
+  claims, find semantic conflicts via embedding similarity + negation
+  regex. (b) TMC logger — when verifier or tool output contradicts a
+  stored memory, log the conflict with context-based trust scores.
+  Learn which source to trust for which topics.
+- **Files:** `memu-core/app.py` (new `/memory/assert` endpoint),
+  `langgraph/app.py` (call on memorize + TMC logging),
+  `verifier/app.py` (inject contradiction data into response)
+- **Tests:** `scripts/test_contradiction.py`
+
+### P5: GEM (Cognitive Alignment from Minimal Feedback)
+
+> From GEM paper: model operator's reasoning structure, not just preferences.
+> "5-10 corrections → understand HOW Dainius thinks."
+
+- **Problem:** Operator corrections are stored as flat memories. We remember
+  WHAT was corrected, not the reasoning PATTERN behind corrections.
+- **Solution:** After 5+ corrections, cluster them to extract reasoning
+  preferences: "prefers conservative estimates", "always wants source
+  citations", "discounts anecdotal evidence". Store as `category: operator_model`
+  in memu-core. Planner injects operator model into plan context.
+- **Files:** `langgraph/app.py` (correction clustering),
+  `memu-core/app.py` (operator_model category),
+  `planner.py` (inject into plan context)
+- **Tests:** `scripts/test_gem.py`
+
+### P6: Knowledge Boundary Mapping + Active Probing
+
+> Merge of KBM research + our original 4c.
+> "Map ignorance explicitly. Probe gaps during idle time."
+
+- **Problem:** Kai doesn't know what he doesn't know.
+- **Solution:** Post-episode: if conviction < 6.0 or verifier != PASS,
+  store a knowledge gap record. Router checks gaps before classification.
+  During heartbeat auto-sleep, probe known gaps with local model to
+  see if knowledge has improved (with operator permission).
+- **Files:** `langgraph/app.py` (gap detection), `router.py` (gap check),
+  `heartbeat/app.py` (idle probing trigger)
+- **Tests:** `scripts/test_knowledge_boundary.py`
+
+### P7: Silence-as-Signal
+
+> Original 4b: "The absence of a question IS information."
+
+- **Problem:** Operator stops asking about a topic. Why?
+- **Solution:** Track topic frequency decay in memu-core. When active topic
+  goes silent >7 days, proactive nudge: "Is [topic] resolved or stuck?"
+- **Files:** `memu-core/app.py` (topic decay curves in proactive),
+  `supervisor/app.py` (poll proactive)
+- **Tests:** extend existing proactive tests
+
+### P8: Dashboard — Thinking Pathways Visualization
+
+> Merge of vLLM-SR transparent routing + our Phase 3.
+> "Visualize Kai's brain: route decisions, adversary findings, conviction flow."
+
+- **Files:** `dashboard/app.py` (new routes), `dashboard/static/` (UI)
+- **Depends on:** P1-P6 generating the data to display
+
+### P9–P15: Remaining Advantages
+
+- **P9: Security Self-Hacking** — prompt injection sandbox, recursive hardening
+- **P10: Predictive Pre-Computation** — sequence mining, pre-fetch context
+- **P11: Operator Tempo Modeling** — adapt communication to operator state
+- **P12: Self-Deception Detection** — bottom-K evidence check during conviction
+- **P13: Recursive Self-Improvement Gate** — snapshot metrics before self-modification
+- **P14: Temporal Self-Model** — weekly self-assessment via heartbeat
+- **P15: Dream State** — deep reflection with cross-cluster synthesis
+
+### Parked (Future Phases)
+
+- **OMAR Self-Play (research #2/#13):** Internal attacker/defender/judge loop.
+  Requires multi-turn LLM reasoning = expensive in tokens. **Unblocked when
+  RTX 5080 laptop arrives** — run Kimi K2 (32B active) locally with spare
+  capacity for self-play loops. Our rule-based adversary.py covers the
+  critical path at near-zero cost until then.
+- **ZK Privacy Learning (research #10):** ZK-proof infrastructure for safe
+  online learning. Heavy crypto dependency. North star, not buildable this month.
+- **ReCiSt Bio-Resilience (research #4):** Containment → Diagnosis →
+  Meta-Cognitive → Knowledge. We ALREADY HAVE this: circuit breakers +
+  error budgets + memory + adversary. Document the mapping, don't rebuild.
 
 ---
 
 ## The Ultimate Compound
 
 Phase 2 gave Kai: routing, planning, self-challenge, calibration.
-Phase 4 gives Kai: self-awareness, prediction, epistemic honesty, adaptation.
+Merged plan gives Kai: self-awareness, evolution, identity, honesty, adaptation.
 
 ```
 Phase 2 (built):  "I check my plans before acting"
-Phase 4 (next):   "I know what I don't know, I notice what's missing,
-                   I track my own beliefs, I predict what you'll need,
-                   I dream about connections, and I measure whether
-                   I'm getting better."
+Merged plan:      "I know WHY things fail and extract rules from it.
+                   I learn MORE from uncertain failures than safe successes.
+                   Every memory I write is signed and provably mine.
+                   I detect when I contradict myself or when tools disagree.
+                   I model how my operator thinks, not just what he says.
+                   I map my own ignorance and probe it during idle time.
+                   I notice when topics go silent and ask about them.
+                   I measure whether I'm getting better and tell you if I'm not."
 ```
 
 No other build thinks about itself this way. This is the gap.
@@ -382,22 +462,38 @@ No other build thinks about itself this way. This is the gap.
 
 ## Continuation Notes
 
-To pick up where we left off:
+> **For AI assistants resuming work. Updated 4 March 2026.**
+
+### Quick Start
 1. `git log --oneline -5` — check latest commits
-2. `make test-core` — confirm baseline green (expect 32+ passes)
+2. `make test-core` — confirm baseline green (expect 33+ passes)
 3. Read this doc top-to-bottom for strategic context
 4. Read `docs/agentic_patterns_spec.md` for technical spec of Phase 2
-5. **Phase 2 (a+b+c) is COMPLETE**: router.py, planner.py, adversary.py all built, tested, wired
-6. **Phase 3**: Dashboard UI for route/adversary visibility (not started)
-7. **Phase 4**: AI-native advantages brainstormed above (not started)
-8. **Priority order for Phase 4**: 4h (failure taxonomy) → 4a (contradiction memory) → 4c (knowledge boundary) → 4b (silence-as-signal) → 4e (predictive pre-computation) → rest
-9. Key file map:
-   - `langgraph/router.py` — 8-route zero-LLM classifier
-   - `langgraph/planner.py` — memory-driven planning with episode similarity
-   - `langgraph/adversary.py` — 5-challenge stress-test engine
-   - `langgraph/conviction.py` — 5-signal conviction scoring
-   - `langgraph/kai_config.py` — episode storage (Redis + checksummed spool)
-   - `langgraph/app.py` — main orchestrator: /chat and /run endpoints
-   - `common/llm.py` — LLM router (Ollama, DeepSeek, Kimi, Dolphin)
-   - `memu-core/app.py` — 21+ endpoint memory engine
-10. All 33 test targets pass as of commit 0e61f6d
+
+### What's Done
+- **Phase 2 COMPLETE**: router.py, planner.py, adversary.py — all built, tested, wired into /chat and /run
+- **Strategic doc merged**: Operator's 2026 research + AI-native blueprints → unified priority order above
+- **33 test-core targets passing** as of commit bbb45ea
+
+### What's Next (build in this order)
+1. **P1: Failure Taxonomy + Metacognitive Rules** → kai_config.py, app.py, adversary.py
+2. **P2: SELAUR** → app.py episode save logic
+3. **P3: Soulbound Identity** → pending/soulbound.py, memu-core integration
+4. **P4: TMC + Contradiction Memory** → memu-core/app.py, app.py
+5. **P5+: see priority table above**
+
+### Key File Map
+- `langgraph/router.py` — 8-route zero-LLM classifier
+- `langgraph/planner.py` — memory-driven planning with episode similarity
+- `langgraph/adversary.py` — 5-challenge stress-test engine
+- `langgraph/conviction.py` — 5-signal conviction scoring (0-10)
+- `langgraph/kai_config.py` — episode storage (Redis + checksummed spool)
+- `langgraph/app.py` — main orchestrator: /chat and /run endpoints
+- `common/llm.py` — LLM router (Ollama, DeepSeek, Kimi-2.5, Dolphin; Kimi-K2 pending)
+- `memu-core/app.py` — 21+ endpoint memory engine
+
+### LLM Strategy
+ALL models run locally via Ollama or OpenAI-compatible endpoints. No cloud.
+- Default: Ollama (qwen2 or any pulled model)
+- Specialist routing via `common/llm.py` LLMRouter
+- Kimi K2 (1T MoE, 32B active, Apache 2.0) pending addition for agentic tasks

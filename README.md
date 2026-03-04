@@ -206,18 +206,26 @@ For architecture details see `docs/sovereign_ai_spec.md`.
 
 ## Session Continuation Guide
 
-> **For AI assistants resuming work on this codebase.**
+> **For AI assistants resuming work on this codebase. Updated 4 March 2026.**
 
-### Current State (as of 2 March 2026)
+### Target Hardware
+- **Dev/staging:** GitHub Codespace (CPU only, no TPM)
+- **Production:** Lenovo laptop, **RTX 5080 GPU**, **TPM 2.0**
+- GPU arrival = local LLM inference, real STT/TTS, OMAR self-play
+- TPM 2.0 = hardware-anchored Soulbound Identity
+- All code must work in BOTH environments (stubs in codespace, live on laptop)
+
+### Current State
 - **All 33 test-core targets pass.** Run `make test-core` to confirm.
-- **Phase 2 complete:** Specialist Router, Memory-Driven Planner, Adversary Challenge Engine — all built, tested, wired into `/chat` and `/run`.
-- **Phase 3 not started:** Dashboard UI for route/adversary visibility.
-- **Phase 4 brainstormed:** 10 AI-native advantages documented in `docs/unfair_advantages.md` — read that file first.
+- **Phase 2 COMPLETE:** Specialist Router, Memory-Driven Planner, Adversary Challenge Engine — all built, tested, wired into `/chat` and `/run`.
+- **Merged Action Plan:** Operator's 2026 paper research + AI-native blueprints → 15 prioritised advantages in `docs/unfair_advantages.md`.
+- **LLM strategy:** ALL local models via Ollama. Kimi K2 (1T MoE, Apache 2.0) pending addition.
 
 ### Key Docs (read in this order)
-1. `docs/unfair_advantages.md` — Strategic competitive edge analysis + Phase 4 brainstorm + continuation notes
+1. `docs/unfair_advantages.md` — Strategic edge analysis + merged build order + continuation notes
 2. `docs/agentic_patterns_spec.md` — Technical spec for the 3-pattern agentic architecture
-3. This README for repo structure and test commands
+3. `docs/PROJECT_BACKLOG.md` — Living backlog with hardware constraints
+4. This README for repo structure and test commands
 
 ### Agentic Pipeline (how /run works)
 ```
@@ -232,8 +240,26 @@ Request → injection filter → specialist selection → session buffer
   → post-mortem (episode save, correction learning, auto-memorize)
 ```
 
-### Next Priorities
-1. **Phase 4h: Failure Taxonomy** — classify WHY things fail, not just that they fail
-2. **Phase 4a: Contradiction Memory** — detect when Kai contradicts its own past assertions
-3. **Phase 4c: Knowledge Boundary Mapping** — explicitly track what Kai doesn't know
-4. **Phase 3: Dashboard** — show route decisions + adversary findings in UI
+### Build Order (merged action plan — tackle in this sequence)
+
+| # | Feature | Files to Touch | Status |
+|---|---|---|---|
+| P1 | Failure Taxonomy + Metacognitive Rules | kai_config.py, app.py, adversary.py | 🔨 Next |
+| P2 | SELAUR (Uncertainty-Aware Evolution) | app.py, kai_config.py | Not started |
+| P3 | Soulbound Identity (HMAC now → TPM on laptop) | pending/soulbound.py, memu-core | Not started |
+| P4 | TMC + Contradiction Memory | memu-core/app.py, app.py | Not started |
+| P5 | GEM (Cognitive Alignment) | app.py, planner.py | Not started |
+| P6 | Knowledge Boundary + Active Probing | app.py, router.py, heartbeat | Not started |
+| P7 | Silence-as-Signal | memu-core/app.py, supervisor | Not started |
+| P8 | Dashboard: Thinking Pathways | dashboard/app.py, static/ | Not started |
+
+Full details + P9-P15 + parked items in `docs/unfair_advantages.md`.
+
+### Cross-Check: What's Been Done
+- [x] Phase 2a: router.py (8 routes, 27 classification tests)
+- [x] Phase 2b: planner.py (gather_context, build_enriched_plan)
+- [x] Phase 2c: adversary.py (5 challenges, 7 test groups)
+- [x] Merged action plan documented (operator research + AI-native)
+- [x] Kimi K2 research noted in LLM strategy
+- [ ] P1: Failure Taxonomy → building
+- [ ] P2-P15: see build order above

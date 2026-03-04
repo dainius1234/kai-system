@@ -5,11 +5,187 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import time
+from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Protocol
+from typing import Any, Dict, List, Optional, Protocol
 
 import redis
+
+
+# ── Failure Taxonomy ─────────────────────────────────────────────────
+# Every failed episode gets a failure_class explaining WHY it failed.
+# The adversary uses these for targeted warnings and the planner uses
+# them to extract metacognitive rules ("if X, never Y").
+
+class FailureClass(str, Enum):
+    DATA_INSUFFICIENT = "data_insufficient"
+    POLICY_BLOCKED = "policy_blocked"
+    CONFIDENCE_LOW = "confidence_low"
+    OPERATOR_OVERRIDDEN = "operator_overridden"
+    SERVICE_UNAVAILABLE = "service_unavailable"
+    CONTRADICTED_BY_EVIDENCE = "contradicted_by_evidence"
+    TIME_EXPIRED = "time_expired"
+    SCOPE_EXCEEDED = "scope_exceeded"
+    UNKNOWN = "unknown"
+
+
+def classify_failure(
+    episode: Dict[str, Any],
+    gate_decision: Optional[Dict[str, Any]] = None,
+) -> FailureClass:
+    """Classify an episode's failure into a taxonomy category.
+
+    Uses signals from the episode and gate decision to determine
+    the root cause.  Order matters — more specific checks first.
+    """
+    outcome = float(episode.get("outcome_score", 0.5))
+    if outcome >= 0.5:
+        return FailureClass.UNKNOWN  # not a failure
+
+    # Check gate decision signals
+    if gate_decision:
+        status = str(gate_decision.get("status", "")).lower()
+        reason = str(gate_decision.get("reason", "")).lower()
+        if status == "blocked" and "policy" in reason:
+            return FailureClass.POLICY_BLOCKED
+        if status == "blocked" and "circuit" in reason:
+            return FailureClass.SERVICE_UNAVAILABLE
+        if status == "unavailable":
+            return FailureClass.SERVICE_UNAVAILABLE
+        if not gate_decision.get("approved", True):
+            return FailureClass.POLICY_BLOCKED
+
+    # Check conviction / rethink signals
+    rethink_count = int(episode.get("rethink_count", 0))
+    conviction = float(episode.get("final_conviction", episode.get("conviction_score", 5.0)))
+    if conviction < 6.0 and rethink_count >= 2:
+        return FailureClass.CONFIDENCE_LOW
+
+    # Check verifier signals
+    verdict = str(episode.get("verifier_verdict", "")).upper()
+    if verdict in ("FAIL_CLOSED", "REPAIR"):
+        return FailureClass.CONTRADICTED_BY_EVIDENCE
+
+    # Check for data insufficiency (low context coverage)
+    context_used = int(episode.get("offline_context_used", -1))
+    if context_used == 0:
+        return FailureClass.DATA_INSUFFICIENT
+
+    # Check for operator override
+    if episode.get("conviction_override"):
+        return FailureClass.OPERATOR_OVERRIDDEN
+
+    # Check for scope/timeout signals
+    if episode.get("scope_exceeded") or episode.get("time_expired"):
+        return FailureClass.SCOPE_EXCEEDED if episode.get("scope_exceeded") else FailureClass.TIME_EXPIRED
+
+    return FailureClass.CONFIDENCE_LOW if conviction < 8.0 else FailureClass.UNKNOWN
+
+
+def extract_metacognitive_rule(
+    episode: Dict[str, Any],
+    failure_class: FailureClass,
+) -> Optional[str]:
+    """Extract an 'if X, never Y' rule from a failed episode.
+
+    Uses the failure classification + episode content to generate
+    a concrete, reusable constraint for future planning.
+    Returns None if no meaningful rule can be extracted.
+    """
+    if failure_class == FailureClass.UNKNOWN:
+        return None
+
+    user_input = str(episode.get("input", ""))[:200]
+    # Extract key topic words for rule specificity
+    topic_words = sorted(set(re.findall(r"\w{4,}", user_input.lower())))[:5]
+    topic = ", ".join(topic_words) if topic_words else "this topic"
+
+    rules = {
+        FailureClass.DATA_INSUFFICIENT: (
+            f"if topic=[{topic}], always check memu-core for existing data "
+            f"before asserting — last attempt had zero context chunks"
+        ),
+        FailureClass.POLICY_BLOCKED: (
+            f"if topic=[{topic}], verify tool-gate policy allows the required "
+            f"tool/action before planning — last attempt was policy-blocked"
+        ),
+        FailureClass.CONFIDENCE_LOW: (
+            f"if topic=[{topic}], gather more evidence before proceeding — "
+            f"conviction stayed below threshold after {episode.get('rethink_count', 0)} rethinks"
+        ),
+        FailureClass.OPERATOR_OVERRIDDEN: (
+            f"if topic=[{topic}], note that operator overrode this result — "
+            f"review operator's correction pattern before attempting similar tasks"
+        ),
+        FailureClass.SERVICE_UNAVAILABLE: (
+            f"if topic=[{topic}], pre-check service health before depending on "
+            f"external calls — last attempt failed due to service unavailability"
+        ),
+        FailureClass.CONTRADICTED_BY_EVIDENCE: (
+            f"if topic=[{topic}], always cross-check with verifier before "
+            f"asserting — last attempt was contradicted by evidence"
+        ),
+        FailureClass.TIME_EXPIRED: (
+            f"if topic=[{topic}], set tighter time bounds or break into "
+            f"smaller sub-tasks — last attempt ran out of time"
+        ),
+        FailureClass.SCOPE_EXCEEDED: (
+            f"if topic=[{topic}], decompose into smaller scope — "
+            f"last attempt exceeded actionable scope"
+        ),
+    }
+    return rules.get(failure_class)
+
+
+def compute_learning_value(
+    conviction: float,
+    outcome_score: float,
+    rethink_count: int = 0,
+) -> float:
+    """SELAUR: Uncertainty-Aware Learning Value.
+
+    Scales how valuable an episode is for future learning based on
+    uncertainty and outcome.  The key insight: a failure when Kai was
+    50% confident is MORE valuable than a failure when Kai was 90%
+    confident.  The uncertain failure maps the edge of competence.
+
+    Returns 0.0-1.0 learning value.
+
+    Scoring logic:
+    - Uncertainty = |conviction - 5.0| / 5.0 inverted: closer to 5.0 = more uncertain
+    - High uncertainty + failure = highest learning value (frontier of growth)
+    - High uncertainty + success = moderately valuable (frontier validated)
+    - Low uncertainty + failure = valuable (calibration error — overconfident)
+    - Low uncertainty + success = low value (already knew this would work)
+    - Rethinks add value: the system worked hard → more to learn
+    """
+    # Uncertainty: 0.0 = very certain (conviction near 0 or 10), 1.0 = maximally uncertain (conviction near 5)
+    uncertainty = 1.0 - abs(conviction - 5.0) / 5.0
+
+    failed = outcome_score < 0.5
+    overconfident = conviction >= 7.0 and failed
+
+    if overconfident:
+        # Calibration error: system was confident but wrong — high value
+        value = 0.7 + 0.2 * uncertainty
+    elif failed and uncertainty > 0.5:
+        # Uncertain failure: the frontier of growth — maximum value
+        value = 0.8 + 0.2 * uncertainty
+    elif failed:
+        # Certain failure: something went wrong despite confidence
+        value = 0.5 + 0.2 * uncertainty
+    elif uncertainty > 0.5:
+        # Uncertain success: frontier validated — moderate value
+        value = 0.4 + 0.3 * uncertainty
+    else:
+        # Certain success: low learning value, already competent here
+        value = 0.1 + 0.2 * uncertainty
+
+    # Rethinks add value: the harder it was, the more to learn
+    rethink_bonus = min(rethink_count * 0.1, 0.2)
+    return round(min(value + rethink_bonus, 1.0), 3)
 
 
 class EpisodeSaver(Protocol):

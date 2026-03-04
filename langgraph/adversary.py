@@ -124,15 +124,22 @@ def challenge_history(
 
     if failures:
         worst = max(failures, key=lambda e: e["_similarity"])
+        failure_class = worst.get("failure_class", "")
+        rule = worst.get("metacognitive_rule", "")
+        finding_parts = [
+            f"Similar request failed before (similarity={worst['_similarity']:.0%}, "
+            f"outcome={worst.get('outcome_score', '?')}): "
+            f"{str(worst.get('input', ''))[:120]}"
+        ]
+        if failure_class:
+            finding_parts.append(f"Failure class: {failure_class}")
+        if rule:
+            finding_parts.append(f"Learned rule: {rule}")
         return ChallengeResult(
             strategy="history",
             passed=False,
             confidence=min(worst["_similarity"] + 0.2, 1.0),
-            finding=(
-                f"Similar request failed before (similarity={worst['_similarity']:.0%}, "
-                f"outcome={worst.get('outcome_score', '?')}): "
-                f"{str(worst.get('input', ''))[:120]}"
-            ),
+            finding=". ".join(finding_parts),
             modifier=-1.5 * worst["_similarity"],
             evidence=[str(worst.get("input", ""))[:200]],
         )
