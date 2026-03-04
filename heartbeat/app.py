@@ -177,6 +177,156 @@ async def status() -> Dict[str, Any]:
     return {"status": state, "elapsed_seconds": f"{elapsed:.1f}", "check_interval": str(CHECK_INTERVAL), "alert_window": str(ALERT_WINDOW), "intrusion_hits": str(_scan_executor_log()), "watchdog": watchdog}
 
 
+# ═══════════════════════════════════════════════════════════════════════
+#  P14: TEMPORAL SELF-MODEL — "/self-assessment"
+#
+#  Weekly self-assessment: compare this week's metrics against the
+#  previous week to detect improvement, decline, or stability.
+#  "Systems that cannot measure themselves cannot improve themselves."
+# ═══════════════════════════════════════════════════════════════════════
+
+ASSESSMENT_WINDOW_DAYS = int(os.getenv("ASSESSMENT_WINDOW_DAYS", "7"))
+
+
+def _trend(current: float, previous: float) -> str:
+    """Label the direction of change between two numeric values."""
+    if previous == 0:
+        return "new" if current > 0 else "stable"
+    delta = (current - previous) / max(abs(previous), 1e-9)
+    if delta > 0.10:
+        return "improving"
+    if delta < -0.10:
+        return "declining"
+    return "stable"
+
+
+async def _fetch_memu_stats(days: int, offset_days: int = 0) -> Dict[str, Any]:
+    """Fetch memory stats from memu-core for a given window."""
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            r = await client.get(f"{MEMU_URL}/memory/stats")
+            if r.status_code == 200:
+                return r.json()
+    except Exception as exc:
+        logger.warning("Failed to fetch memu stats: %s", exc)
+    return {}
+
+
+async def _fetch_recent_episodes(days: int) -> Dict[str, Any]:
+    """Fetch recent episode data for self-assessment metrics."""
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            r = await client.get(f"{MEMU_URL}/memory/diagnostics")
+            if r.status_code == 200:
+                return r.json()
+    except Exception as exc:
+        logger.warning("Failed to fetch diagnostics: %s", exc)
+    return {}
+
+
+@app.get("/self-assessment")
+async def self_assessment() -> Dict[str, Any]:
+    """Compute a temporal self-model comparing current vs previous period.
+
+    Metrics tracked:
+      - total_memories: growth in knowledge base
+      - error_budget_usage: how often the system hit errors
+      - uptime_ratio: heartbeat freshness
+      - cpu_peak / gpu_peak: resource pressure trends
+
+    Each metric gets a trend label: improving | declining | stable | new
+    """
+    stats = await _fetch_memu_stats(ASSESSMENT_WINDOW_DAYS)
+    diagnostics = await _fetch_recent_episodes(ASSESSMENT_WINDOW_DAYS)
+
+    # current snapshot
+    total_memories = stats.get("total_memories", stats.get("total", 0))
+    categories = stats.get("category_count", stats.get("categories", 0))
+    budget_snap = budget.snapshot()
+    error_rate = budget_snap.get("error_rate", 0.0)
+    budget_ok = budget_snap.get("budget_ok", True)
+    elapsed = time.time() - last_tick
+    uptime_ratio = round(1.0 - min(elapsed / max(ALERT_WINDOW, 1), 1.0), 3)
+
+    # resource snapshot
+    cpu_pct = _cpu_usage_ratio()
+    gpu_temp = _gpu_temp_c()
+    cpu_temp = _cpu_temp_c()
+
+    current = {
+        "total_memories": total_memories,
+        "categories": categories,
+        "error_rate": round(error_rate, 4),
+        "budget_ok": budget_ok,
+        "uptime_ratio": uptime_ratio,
+        "cpu_usage": round(cpu_pct, 3),
+        "cpu_temp_c": cpu_temp,
+        "gpu_temp_c": gpu_temp,
+    }
+
+    # We store previous assessment in memory so we can compare.
+    # On first run, there's no previous — everything is "new".
+    previous = _load_previous_assessment()
+
+    trends = {}
+    for key in ["total_memories", "error_rate", "uptime_ratio", "cpu_usage"]:
+        curr_val = current.get(key, 0)
+        prev_val = previous.get(key, 0) if previous else 0
+        raw_trend = _trend(float(curr_val), float(prev_val))
+        # for error_rate and cpu_usage, improving means going DOWN
+        if key in ("error_rate", "cpu_usage") and raw_trend == "improving":
+            raw_trend = "declining"
+        elif key in ("error_rate", "cpu_usage") and raw_trend == "declining":
+            raw_trend = "improving"
+        trends[key] = raw_trend
+
+    # overall health
+    declining_count = sum(1 for v in trends.values() if v == "declining")
+    improving_count = sum(1 for v in trends.values() if v == "improving")
+    if declining_count >= 2:
+        overall = "needs_attention"
+    elif improving_count >= 2:
+        overall = "improving"
+    else:
+        overall = "stable"
+
+    assessment = {
+        "status": "ok",
+        "window_days": ASSESSMENT_WINDOW_DAYS,
+        "current": current,
+        "trends": trends,
+        "overall": overall,
+        "has_previous": previous is not None,
+    }
+
+    # save current as previous for next assessment
+    _save_assessment(current)
+
+    return assessment
+
+
+# simple file-based storage for previous assessment
+_ASSESSMENT_FILE = Path(os.getenv("ASSESSMENT_FILE", "/tmp/heartbeat_assessment.json"))
+
+
+def _load_previous_assessment() -> Dict[str, Any] | None:
+    import json
+    if _ASSESSMENT_FILE.exists():
+        try:
+            return json.loads(_ASSESSMENT_FILE.read_text())
+        except Exception:
+            return None
+    return None
+
+
+def _save_assessment(current: Dict[str, Any]) -> None:
+    import json
+    try:
+        _ASSESSMENT_FILE.write_text(json.dumps(current))
+    except Exception as exc:
+        logger.warning("Failed to save assessment: %s", exc)
+
+
 if __name__ == "__main__":
     import uvicorn
 

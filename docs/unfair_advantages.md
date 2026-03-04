@@ -259,14 +259,14 @@ architecture excels.
 | **P4** | TMC + Contradiction Memory | TMC paper (#8) + our 4a | Medium | ✅ DONE |
 | **P5** | GEM (Cognitive Alignment) | GEM paper (#6) | Medium | ✅ DONE |
 | **P6** | Knowledge Boundary + Active Probing | KBM paper (#3) + our 4c | Medium | ✅ DONE |
-| **P7** | Silence-as-Signal | Our 4b | Small | Not started |
+| **P7** | Silence-as-Signal | Our 4b | Small | ✅ DONE |
 | **P8** | Dashboard: Thinking Pathways | vLLM-SR (#5) + Phase 3 | Large | Not started |
 | **P9** | Security Self-Hacking | MSR paper (#9) | Medium | Not started |
 | **P10** | Predictive Pre-Computation | Our 4e | Medium | Not started |
 | **P11** | Operator Tempo Modeling | Our 4d | Medium | Not started |
-| **P12** | Self-Deception Detection | Our 4f | Medium | Not started |
+| **P12** | Self-Deception Detection | Our 4f | Medium | ✅ DONE |
 | **P13** | Recursive Self-Improvement Gate | Our 4g | Medium | Not started |
-| **P14** | Temporal Self-Model | Our 4i | Medium | Not started |
+| **P14** | Temporal Self-Model | Our 4i | Medium | ✅ DONE |
 | **P15** | Dream State (Offline Consolidation) | Our 4j | Large | Not started |
 | **Future** | OMAR Self-Play (#2/#13) | Needs spare local GPU | Large | Parked |
 | **Future** | ZK Privacy Learning (#10) | Heavy crypto infra | Large | Parked |
@@ -404,16 +404,20 @@ architecture excels.
 - **Tests:** `scripts/test_gem_preferences.py` — 6 tests on knowledge boundary
   (gap identification, empty episodes, min filter, probe questions, sort order, dataclass fields)
 
-### P7: Silence-as-Signal
+### P7: Silence-as-Signal ✅
 
 > Original 4b: "The absence of a question IS information."
 
 - **Problem:** Operator stops asking about a topic. Why?
-- **Solution:** Track topic frequency decay in memu-core. When active topic
-  goes silent >7 days, proactive nudge: "Is [topic] resolved or stuck?"
-- **Files:** `memu-core/app.py` (topic decay curves in proactive),
-  `supervisor/app.py` (poll proactive)
-- **Tests:** extend existing proactive tests
+- **Solution:** `GET /memory/silence` endpoint in memu-core. Scans all memories grouped
+  by category, identifies categories with >= min_activity (default 3) historically but
+  zero recent activity within threshold window (default 7 days). Generates nudges:
+  "You used to ask about [topic] but haven't in X days. Is it resolved or stuck?"
+  Sorted by total activity (highest signal first). Skips poisoned records.
+- **Files:** `memu-core/app.py` (`/memory/silence` endpoint)
+- **Tests:** `scripts/test_silence_signal.py` — 8 tests (config defaults, active topic
+  not flagged, silent topic identified, low activity excluded, nudge format, sort order,
+  poisoned records excluded)
 
 ### P8: Dashboard — Thinking Pathways Visualization
 
@@ -428,9 +432,18 @@ architecture excels.
 - **P9: Security Self-Hacking** — prompt injection sandbox, recursive hardening
 - **P10: Predictive Pre-Computation** — sequence mining, pre-fetch context
 - **P11: Operator Tempo Modeling** — adapt communication to operator state
-- **P12: Self-Deception Detection** — bottom-K evidence check during conviction
+- **P12: Self-Deception Detection** ✅ — `detect_self_deception()` in conviction.py.
+  3 checks: evidence_gap (high conviction but < 2 chunks), relevance_gap (chunks exist
+  but coverage < 0.5), rethink_blind_spot (complex query >= 15 words with zero rethinks).
+  Wired into langgraph/app.py: if deceived, forces conviction below MIN_CONVICTION to
+  trigger rethink. Tests: `scripts/test_self_deception.py` — 12 tests.
 - **P13: Recursive Self-Improvement Gate** — snapshot metrics before self-modification
-- **P14: Temporal Self-Model** — weekly self-assessment via heartbeat
+- **P14: Temporal Self-Model** ✅ — `GET /self-assessment` in heartbeat/app.py.
+  Compares current vs previous period metrics (total_memories, error_rate, uptime_ratio,
+  cpu_usage). Trend detection via `_trend()` with inverted labels for error metrics.
+  Overall health: needs_attention (2+ declining), improving (2+ improving), stable.
+  File-based persistence for period-over-period comparison.
+  Tests: `scripts/test_temporal_self.py` — 19 tests.
 - **P15: Dream State** — deep reflection with cross-cluster synthesis
 
 ### Parked (Future Phases)

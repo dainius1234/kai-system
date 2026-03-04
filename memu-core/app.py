@@ -1685,6 +1685,82 @@ async def proactive_nudges() -> Dict[str, Any]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
+#  P7: SILENCE-AS-SIGNAL — "/memory/silence"
+#
+#  Track topic frequency decay.  When a previously active topic goes
+#  silent for more than SILENCE_THRESHOLD_DAYS, generate a nudge.
+#  "The absence of a question IS information."
+# ═══════════════════════════════════════════════════════════════════════
+
+SILENCE_THRESHOLD_DAYS = int(os.getenv("SILENCE_THRESHOLD_DAYS", "7"))
+SILENCE_MIN_ACTIVITY = int(os.getenv("SILENCE_MIN_ACTIVITY", "3"))
+
+
+@app.get("/memory/silence")
+async def silence_signals() -> Dict[str, Any]:
+    """Detect topics that went silent — previously active, now quiet.
+
+    Scans all memories, groups by category, finds categories where:
+    1. There were >= SILENCE_MIN_ACTIVITY memories historically
+    2. No new memories in the last SILENCE_THRESHOLD_DAYS
+
+    Returns nudges like: "Is [topic] resolved or stuck?"
+    """
+    all_records = store.search(top_k=10_000)
+    now = datetime.utcnow()
+    threshold = now - timedelta(days=SILENCE_THRESHOLD_DAYS)
+
+    # group by category with timestamps
+    category_activity: Dict[str, Dict[str, Any]] = {}
+    for r in all_records:
+        if getattr(r, "poisoned", False):
+            continue
+        cat = getattr(r, "category", "general")
+        if cat not in category_activity:
+            category_activity[cat] = {"total": 0, "recent": 0, "last_ts": None}
+        category_activity[cat]["total"] += 1
+        try:
+            ts_str = r.timestamp.replace("Z", "+00:00") if "T" in r.timestamp else r.timestamp
+            ts = datetime.fromisoformat(ts_str).replace(tzinfo=None)
+            if ts >= threshold:
+                category_activity[cat]["recent"] += 1
+            existing_last = category_activity[cat]["last_ts"]
+            if existing_last is None or ts > existing_last:
+                category_activity[cat]["last_ts"] = ts
+        except Exception:
+            pass
+
+    # find silent topics
+    silent_topics = []
+    for cat, info in category_activity.items():
+        if info["total"] < SILENCE_MIN_ACTIVITY:
+            continue
+        if info["recent"] > 0:
+            continue
+        # this topic was active but has gone silent
+        days_since = (now - info["last_ts"]).days if info["last_ts"] else SILENCE_THRESHOLD_DAYS
+        silent_topics.append({
+            "category": cat,
+            "total_memories": info["total"],
+            "days_silent": days_since,
+            "last_activity": info["last_ts"].isoformat() if info["last_ts"] else "unknown",
+            "nudge": f"You used to ask about [{cat}] ({info['total']} memories) but haven't in {days_since} days. Is it resolved or stuck?",
+        })
+
+    # sort by total activity (most active topics first — higher signal)
+    silent_topics.sort(key=lambda x: -x["total_memories"])
+
+    return {
+        "status": "ok",
+        "silent_count": len(silent_topics),
+        "threshold_days": SILENCE_THRESHOLD_DAYS,
+        "min_activity": SILENCE_MIN_ACTIVITY,
+        "categories_scanned": len(category_activity),
+        "silent_topics": silent_topics[:10],
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
 #  REFLECTION / CONSOLIDATION — "Sleep" endpoint
 #
 #  Inspired by how the human brain consolidates memories during sleep:

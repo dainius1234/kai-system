@@ -161,6 +161,80 @@ def score_conviction(user_input: str, plan: Dict[str, Any], context_chunks: List
     return round(min(sum(signals), 10.0), 2)
 
 
+# ═══════════════════════════════════════════════════════════════════════
+#  P12: SELF-DECEPTION DETECTION
+#
+#  Flag cases where conviction is high but evidence is weak.
+#  "Confidence without evidence is the root of all reasoning failures."
+#
+#  Checks:
+#    1. Evidence gap: high conviction (>= threshold) with few chunks
+#    2. Relevance gap: high conviction but low context_coverage signal
+#    3. Rethink blind spot: high conviction with zero rethinks on a
+#       complex query (many words)
+# ═══════════════════════════════════════════════════════════════════════
+
+SELF_DECEPTION_THRESHOLD = 7.0
+
+
+def detect_self_deception(
+    user_input: str,
+    plan: Dict[str, Any],
+    context_chunks: List[Dict[str, Any]],
+    rethink_count: int,
+    conviction_score: float,
+) -> Dict[str, Any]:
+    """Check if the system is over-confident relative to its evidence.
+
+    Returns a dict with:
+      - deceived: bool — True if self-deception detected
+      - flags: list of specific deception signals found
+      - recommendation: str — what the system should do
+    """
+    if conviction_score < SELF_DECEPTION_THRESHOLD:
+        return {"deceived": False, "flags": [], "recommendation": "none"}
+
+    flags: List[str] = []
+
+    # 1. Evidence gap: high conviction but very few context chunks
+    if len(context_chunks) < 2:
+        flags.append(
+            f"evidence_gap: conviction={conviction_score} but only "
+            f"{len(context_chunks)} context chunk(s) — confidence exceeds evidence"
+        )
+
+    # 2. Relevance gap: high conviction but low coverage score
+    coverage = _context_coverage(context_chunks, user_input)
+    if context_chunks and coverage < 0.5:
+        flags.append(
+            f"relevance_gap: {len(context_chunks)} chunks retrieved but "
+            f"coverage={coverage} — retrieved context may not actually support the plan"
+        )
+
+    # 3. Rethink blind spot: complex query, no reflection, high confidence
+    word_count = len(user_input.split())
+    if word_count >= 15 and rethink_count == 0:
+        flags.append(
+            f"rethink_blind_spot: complex query ({word_count} words) with "
+            f"zero rethinks — jumped to conclusion without reflection"
+        )
+
+    if not flags:
+        return {"deceived": False, "flags": [], "recommendation": "none"}
+
+    recommendation = (
+        "Force a rethink cycle and/or retrieve additional context before proceeding. "
+        f"Detected {len(flags)} self-deception signal(s)."
+    )
+
+    return {
+        "deceived": True,
+        "flags": flags,
+        "conviction_score": conviction_score,
+        "recommendation": recommendation,
+    }
+
+
 def low_conviction_feedback(score: float, chunks: List[Dict[str, Any]]) -> str:
     """Human-readable explanation of why conviction is low."""
     reasons: List[str] = []

@@ -19,7 +19,7 @@ from common.llm import LLMRouter
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value
-from conviction import build_plan, low_conviction_feedback, score_conviction
+from conviction import build_plan, detect_self_deception, low_conviction_feedback, score_conviction
 from router import classify, dispatch_route
 from planner import gather_context, build_enriched_plan
 from adversary import challenge_plan, verdict_to_plan_metadata
@@ -588,6 +588,16 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     plan.update(verdict_to_plan_metadata(adversary_verdict))
     if adversary_verdict.critical_warnings:
         logger.warning("Adversary warnings: %s", adversary_verdict.critical_warnings)
+
+    # ── 4c. P12: Self-deception detection ──────────────────────────
+    deception = detect_self_deception(
+        request.user_input, plan, chunk_dicts, rethink_count, conviction
+    )
+    if deception["deceived"]:
+        logger.warning("Self-deception detected: %s", deception["flags"])
+        plan["self_deception"] = deception
+        # force a rethink by dropping conviction below threshold
+        conviction = min(conviction, MIN_CONVICTION - 0.5)
 
     while conviction < MIN_CONVICTION and rethink_count < MAX_RETHINKS:
         rethink_count += 1
