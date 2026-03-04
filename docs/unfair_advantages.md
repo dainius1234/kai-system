@@ -262,10 +262,10 @@ architecture excels.
 | **P7** | Silence-as-Signal | Our 4b | Small | ✅ DONE |
 | **P8** | Dashboard: Thinking Pathways | vLLM-SR (#5) + Phase 3 | Large | Not started |
 | **P9** | Security Self-Hacking | MSR paper (#9) | Medium | Not started |
-| **P10** | Predictive Pre-Computation | Our 4e | Medium | Not started |
-| **P11** | Operator Tempo Modeling | Our 4d | Medium | Not started |
+| **P10** | Predictive Pre-Computation | Our 4e | Medium | ✅ DONE |
+| **P11** | Operator Tempo Modeling | Our 4d | Medium | ✅ DONE |
 | **P12** | Self-Deception Detection | Our 4f | Medium | ✅ DONE |
-| **P13** | Recursive Self-Improvement Gate | Our 4g | Medium | Not started |
+| **P13** | Recursive Self-Improvement Gate | Our 4g | Medium | ✅ DONE |
 | **P14** | Temporal Self-Model | Our 4i | Medium | ✅ DONE |
 | **P15** | Dream State (Offline Consolidation) | Our 4j | Large | Not started |
 | **Future** | OMAR Self-Play (#2/#13) | Needs spare local GPU | Large | Parked |
@@ -430,14 +430,27 @@ architecture excels.
 ### P9–P15: Remaining Advantages
 
 - **P9: Security Self-Hacking** — prompt injection sandbox, recursive hardening
-- **P10: Predictive Pre-Computation** — sequence mining, pre-fetch context
-- **P11: Operator Tempo Modeling** — adapt communication to operator state
+- **P10: Predictive Pre-Computation** ✅ — `predict_next_request()` + `mine_request_sequences()`
+  in planner.py. Mines bigram sequences from episode history to predict what the operator
+  will ask next. Pre-fetches memory context for top-3 predictions via `pre_fetch_predicted_context()`.
+  Wired into langgraph/app.py: predictions added to plan as `predicted_next` metadata.
+  Tests: `scripts/test_predictive.py` — 15 tests.
+- **P11: Operator Tempo Modeling** ✅ — `GET /memory/tempo` in memu-core/app.py.
+  Analyses memory timestamps to detect operator pace. Four categories: rapid (<30s),
+  normal (30s-5min), reflective (5-30min), idle (>30min). Returns dominant tempo,
+  style_hint for response adaptation, gap distribution, avg/median gaps, burst detection.
+  Tests: `scripts/test_tempo.py` — 12 tests.
 - **P12: Self-Deception Detection** ✅ — `detect_self_deception()` in conviction.py.
   3 checks: evidence_gap (high conviction but < 2 chunks), relevance_gap (chunks exist
   but coverage < 0.5), rethink_blind_spot (complex query >= 15 words with zero rethinks).
   Wired into langgraph/app.py: if deceived, forces conviction below MIN_CONVICTION to
   trigger rethink. Tests: `scripts/test_self_deception.py` — 12 tests.
-- **P13: Recursive Self-Improvement Gate** — snapshot metrics before self-modification
+- **P13: Recursive Self-Improvement Gate** ✅ — `capture_snapshot()`, `evaluate_improvement()`
+  in kai_config.py. Before self-modification, snapshots avg_conviction, avg_outcome,
+  failure_rate, rethink_rate. After change, compares metrics against tolerance (default 0.1).
+  If any metric degrades beyond tolerance → flags for revert. Auto-snapshots every 10
+  episodes in langgraph/app.py. File-based snapshot persistence (last 50 snapshots).
+  Tests: `scripts/test_improvement_gate.py` — 20 tests.
 - **P14: Temporal Self-Model** ✅ — `GET /self-assessment` in heartbeat/app.py.
   Compares current vs previous period metrics (total_memories, error_rate, uptime_ratio,
   cpu_usage). Trend detection via `_trend()` with inverted labels for error metrics.

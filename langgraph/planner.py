@@ -5,6 +5,7 @@ Before building a plan or calling the LLM, the planner checks:
   2. Past outcomes — did it succeed or fail?
   3. Correction memories — any recorded fixes for this pattern?
   4. Proactive nudges — any time-sensitive context?
+  5. P10: Sequence prediction — what will the operator likely ask next?
 
 This is what makes Kai learn from experience rather than repeat mistakes.
 
@@ -16,8 +17,9 @@ from __future__ import annotations
 
 import re
 import time
+from collections import Counter
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
 
@@ -335,3 +337,134 @@ def build_enriched_plan(context: PlanContext, specialist: str) -> PlanDecision:
         warnings=warnings,
         context_summary="; ".join(summary_parts) if summary_parts else "no relevant history",
     )
+
+
+# ── P10: Predictive Pre-Computation ─────────────────────────────────
+# Mine operator request sequences to predict what's coming next.
+# If the operator always asks A→B→C, and we just saw A→B, predict C
+# and pre-fetch relevant context so the response is faster + richer.
+
+SEQUENCE_MIN_SUPPORT = int(__import__("os").getenv("SEQUENCE_MIN_SUPPORT", "2"))
+PREDICTION_CONFIDENCE_THRESHOLD = float(__import__("os").getenv("PREDICTION_CONFIDENCE", "0.3"))
+
+
+@dataclass
+class PredictedRequest:
+    """A predicted next request based on sequential pattern mining."""
+    predicted_topic: str
+    confidence: float        # 0-1, fraction of times this followed
+    support: int             # how many times the bigram appeared
+    pre_fetched_context: List[Dict[str, Any]] = field(default_factory=list)
+
+
+def _extract_topic_key(text: str) -> str:
+    """Extract a normalised topic key from request text."""
+    words = sorted(set(re.findall(r"\w{4,}", text.lower())))[:3]
+    return "+".join(words) if words else "general"
+
+
+def mine_request_sequences(
+    episodes: List[Dict[str, Any]],
+    min_support: int = SEQUENCE_MIN_SUPPORT,
+) -> Dict[str, List[Tuple[str, float, int]]]:
+    """Build a bigram transition table from episode history.
+
+    Returns {topic_a: [(topic_b, probability, count), ...]} sorted
+    by probability descending.  Only includes transitions with
+    >= min_support occurrences.
+    """
+    # sort episodes chronologically
+    sorted_eps = sorted(episodes, key=lambda e: float(e.get("ts", 0)))
+
+    # extract topic sequence
+    topic_sequence: List[str] = []
+    for ep in sorted_eps:
+        topic = _extract_topic_key(str(ep.get("input", "")))
+        if topic != "general":
+            topic_sequence.append(topic)
+
+    if len(topic_sequence) < 2:
+        return {}
+
+    # count bigrams
+    bigram_counts: Counter = Counter()
+    prefix_counts: Counter = Counter()
+    for i in range(len(topic_sequence) - 1):
+        a, b = topic_sequence[i], topic_sequence[i + 1]
+        if a != b:  # skip self-loops (repeated same topic)
+            bigram_counts[(a, b)] += 1
+            prefix_counts[a] += 1
+
+    # build transition table
+    transitions: Dict[str, List[Tuple[str, float, int]]] = {}
+    for (a, b), count in bigram_counts.items():
+        if count < min_support:
+            continue
+        prob = count / prefix_counts[a] if prefix_counts[a] > 0 else 0.0
+        transitions.setdefault(a, []).append((b, round(prob, 3), count))
+
+    # sort each topic's transitions by probability
+    for topic in transitions:
+        transitions[topic].sort(key=lambda x: -x[1])
+
+    return transitions
+
+
+def predict_next_request(
+    current_input: str,
+    episodes: List[Dict[str, Any]],
+    min_support: int = SEQUENCE_MIN_SUPPORT,
+    confidence_threshold: float = PREDICTION_CONFIDENCE_THRESHOLD,
+) -> List[PredictedRequest]:
+    """Predict what the operator will ask next based on historical patterns.
+
+    Mines bigram sequences from episode history and returns predictions
+    for the most likely follow-up topics, filtered by confidence threshold.
+    """
+    current_topic = _extract_topic_key(current_input)
+    if current_topic == "general":
+        return []
+
+    transitions = mine_request_sequences(episodes, min_support=min_support)
+    candidates = transitions.get(current_topic, [])
+
+    predictions: List[PredictedRequest] = []
+    for next_topic, prob, count in candidates:
+        if prob >= confidence_threshold:
+            predictions.append(PredictedRequest(
+                predicted_topic=next_topic,
+                confidence=prob,
+                support=count,
+            ))
+
+    return predictions
+
+
+async def pre_fetch_predicted_context(
+    predictions: List[PredictedRequest],
+    memu_url: str,
+    top_k: int = 3,
+) -> List[PredictedRequest]:
+    """Pre-fetch memory context for predicted next requests.
+
+    For each prediction with sufficient confidence, query memu-core
+    so the context is already warm when the operator asks.
+    """
+    if not predictions:
+        return predictions
+
+    async with httpx.AsyncClient(timeout=3.0) as client:
+        for pred in predictions[:3]:  # cap at 3 pre-fetches
+            query = pred.predicted_topic.replace("+", " ")
+            try:
+                resp = await client.get(
+                    f"{memu_url}/memory/retrieve",
+                    params={"query": query, "user_id": "keeper", "top_k": top_k},
+                )
+                if resp.status_code == 200:
+                    data = resp.json()
+                    pred.pre_fetched_context = data if isinstance(data, list) else []
+            except Exception:
+                pass  # pre-fetch is best-effort
+
+    return predictions

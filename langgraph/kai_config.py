@@ -479,3 +479,192 @@ def build_saver() -> EpisodeSaver:
         return saver
     except Exception:
         return ChecksummedSpoolSaver(spool_path=spool_path)
+
+
+# ── P13: Recursive Self-Improvement Gate ─────────────────────────────
+# Before any self-modification, snapshot current performance metrics.
+# After the change, compare.  If performance degrades beyond tolerance,
+# the change is flagged for revert.  This prevents Kai from accidentally
+# making itself worse when tweaking its own rules or thresholds.
+
+IMPROVEMENT_TOLERANCE = float(os.getenv("IMPROVEMENT_TOLERANCE", "0.1"))
+IMPROVEMENT_SNAPSHOT_PATH = Path(
+    os.getenv("IMPROVEMENT_SNAPSHOT_PATH", "/tmp/kai_improvement_snapshot.json")
+)
+
+
+@dataclass
+class PerformanceSnapshot:
+    """Point-in-time capture of system performance metrics."""
+    timestamp: float
+    avg_conviction: float
+    avg_outcome: float
+    failure_rate: float
+    total_episodes: int
+    rethink_rate: float
+    label: str = ""
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "timestamp": self.timestamp,
+            "avg_conviction": self.avg_conviction,
+            "avg_outcome": self.avg_outcome,
+            "failure_rate": self.failure_rate,
+            "total_episodes": self.total_episodes,
+            "rethink_rate": self.rethink_rate,
+            "label": self.label,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "PerformanceSnapshot":
+        return cls(
+            timestamp=float(d.get("timestamp", 0)),
+            avg_conviction=float(d.get("avg_conviction", 0)),
+            avg_outcome=float(d.get("avg_outcome", 0)),
+            failure_rate=float(d.get("failure_rate", 0)),
+            total_episodes=int(d.get("total_episodes", 0)),
+            rethink_rate=float(d.get("rethink_rate", 0)),
+            label=str(d.get("label", "")),
+        )
+
+
+def capture_snapshot(
+    episodes: List[Dict[str, Any]],
+    label: str = "",
+) -> PerformanceSnapshot:
+    """Capture current performance metrics from episode history."""
+    if not episodes:
+        return PerformanceSnapshot(
+            timestamp=time.time(),
+            avg_conviction=0.0,
+            avg_outcome=0.0,
+            failure_rate=0.0,
+            total_episodes=0,
+            rethink_rate=0.0,
+            label=label,
+        )
+
+    total = len(episodes)
+    convictions = [float(e.get("final_conviction", e.get("conviction_score", 5.0))) for e in episodes]
+    outcomes = [float(e.get("outcome_score", 0.5)) for e in episodes]
+    failures = sum(1 for o in outcomes if o < 0.5)
+    rethinks = sum(1 for e in episodes if int(e.get("rethink_count", 0)) > 0)
+
+    return PerformanceSnapshot(
+        timestamp=time.time(),
+        avg_conviction=round(sum(convictions) / total, 3),
+        avg_outcome=round(sum(outcomes) / total, 3),
+        failure_rate=round(failures / total, 3),
+        total_episodes=total,
+        rethink_rate=round(rethinks / total, 3),
+        label=label,
+    )
+
+
+def save_snapshot(snapshot: PerformanceSnapshot) -> None:
+    """Persist a performance snapshot to disk."""
+    try:
+        existing: List[Dict[str, Any]] = []
+        if IMPROVEMENT_SNAPSHOT_PATH.exists():
+            existing = json.loads(
+                IMPROVEMENT_SNAPSHOT_PATH.read_text(encoding="utf-8")
+            )
+        existing.append(snapshot.to_dict())
+        # keep last 50 snapshots
+        existing = existing[-50:]
+        IMPROVEMENT_SNAPSHOT_PATH.write_text(
+            json.dumps(existing, indent=2), encoding="utf-8"
+        )
+    except Exception:
+        pass
+
+
+def load_latest_snapshot() -> Optional[PerformanceSnapshot]:
+    """Load the most recent performance snapshot from disk."""
+    try:
+        if not IMPROVEMENT_SNAPSHOT_PATH.exists():
+            return None
+        data = json.loads(
+            IMPROVEMENT_SNAPSHOT_PATH.read_text(encoding="utf-8")
+        )
+        if not data:
+            return None
+        return PerformanceSnapshot.from_dict(data[-1])
+    except Exception:
+        return None
+
+
+@dataclass
+class ImprovementVerdict:
+    """Result of comparing before/after performance snapshots."""
+    approved: bool
+    delta_conviction: float
+    delta_outcome: float
+    delta_failure_rate: float
+    degraded_metrics: List[str]
+    improved_metrics: List[str]
+    recommendation: str
+
+
+def evaluate_improvement(
+    before: PerformanceSnapshot,
+    after: PerformanceSnapshot,
+    tolerance: float = IMPROVEMENT_TOLERANCE,
+) -> ImprovementVerdict:
+    """Compare two snapshots and decide if the change helped or hurt.
+
+    A metric is considered degraded if it worsened beyond the tolerance.
+    For failure_rate and rethink_rate, LOWER is better (inverted check).
+    """
+    delta_conv = after.avg_conviction - before.avg_conviction
+    delta_out = after.avg_outcome - before.avg_outcome
+    delta_fail = after.failure_rate - before.failure_rate
+    delta_rethink = after.rethink_rate - before.rethink_rate
+
+    degraded: List[str] = []
+    improved: List[str] = []
+
+    # conviction: higher is better
+    if delta_conv < -tolerance:
+        degraded.append("avg_conviction")
+    elif delta_conv > tolerance:
+        improved.append("avg_conviction")
+
+    # outcome: higher is better
+    if delta_out < -tolerance:
+        degraded.append("avg_outcome")
+    elif delta_out > tolerance:
+        improved.append("avg_outcome")
+
+    # failure_rate: lower is better (inverted)
+    if delta_fail > tolerance:
+        degraded.append("failure_rate")
+    elif delta_fail < -tolerance:
+        improved.append("failure_rate")
+
+    # rethink_rate: lower is better (inverted)
+    if delta_rethink > tolerance:
+        degraded.append("rethink_rate")
+    elif delta_rethink < -tolerance:
+        improved.append("rethink_rate")
+
+    approved = len(degraded) == 0
+
+    if not approved:
+        recommendation = (
+            f"Revert recommended: {', '.join(degraded)} degraded beyond tolerance ({tolerance})."
+        )
+    elif improved:
+        recommendation = f"Change approved: {', '.join(improved)} improved."
+    else:
+        recommendation = "Change neutral: no significant metric shifts."
+
+    return ImprovementVerdict(
+        approved=approved,
+        delta_conviction=round(delta_conv, 3),
+        delta_outcome=round(delta_out, 3),
+        delta_failure_rate=round(delta_fail, 3),
+        degraded_metrics=degraded,
+        improved_metrics=improved,
+        recommendation=recommendation,
+    )

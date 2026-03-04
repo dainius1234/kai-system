@@ -1761,6 +1761,123 @@ async def silence_signals() -> Dict[str, Any]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
+# P11: OPERATOR TEMPO MODELING
+#  Analyse memory timestamps to detect the operator's current pace.
+#  Pace categories: rapid (< 30s gaps), normal (30s-5min), reflective
+#  (5min-30min), idle (> 30min).
+#  Returns tempo profile + suggested response style adaptation.
+# ═══════════════════════════════════════════════════════════════════════
+
+TEMPO_RAPID_THRESHOLD = float(os.getenv("TEMPO_RAPID_SECONDS", "30"))
+TEMPO_NORMAL_THRESHOLD = float(os.getenv("TEMPO_NORMAL_SECONDS", "300"))
+TEMPO_REFLECTIVE_THRESHOLD = float(os.getenv("TEMPO_REFLECTIVE_SECONDS", "1800"))
+TEMPO_MIN_INTERACTIONS = int(os.getenv("TEMPO_MIN_INTERACTIONS", "3"))
+
+
+@app.get("/memory/tempo")
+async def operator_tempo(
+    hours: int = Query(default=2, ge=1, le=168),
+) -> Dict[str, Any]:
+    """Analyse operator interaction tempo from recent memory timestamps.
+
+    Returns the dominant pace, gap distribution, and a suggested
+    communication style so Kai can adapt its responses.
+    """
+    cutoff = time.time() - (hours * 3600)
+
+    all_records = store.search(top_k=10_000)
+    timestamps: List[float] = []
+    for r in all_records:
+        try:
+            ts_str = r.timestamp
+            if "T" in ts_str:
+                dt = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                ts_val = dt.timestamp()
+            else:
+                ts_val = float(ts_str)
+            if ts_val >= cutoff:
+                timestamps.append(ts_val)
+        except Exception:
+            continue
+
+    timestamps.sort()
+
+    if len(timestamps) < TEMPO_MIN_INTERACTIONS:
+        return {
+            "status": "insufficient_data",
+            "interactions": len(timestamps),
+            "minimum_required": TEMPO_MIN_INTERACTIONS,
+            "tempo": "unknown",
+            "style_hint": "default",
+        }
+
+    # compute inter-request gaps
+    gaps: List[float] = []
+    for i in range(1, len(timestamps)):
+        gaps.append(timestamps[i] - timestamps[i - 1])
+
+    if not gaps:
+        return {
+            "status": "insufficient_data",
+            "interactions": len(timestamps),
+            "minimum_required": TEMPO_MIN_INTERACTIONS,
+            "tempo": "unknown",
+            "style_hint": "default",
+        }
+
+    # classify each gap
+    rapid = sum(1 for g in gaps if g < TEMPO_RAPID_THRESHOLD)
+    normal = sum(1 for g in gaps if TEMPO_RAPID_THRESHOLD <= g < TEMPO_NORMAL_THRESHOLD)
+    reflective = sum(1 for g in gaps if TEMPO_NORMAL_THRESHOLD <= g < TEMPO_REFLECTIVE_THRESHOLD)
+    idle_count = sum(1 for g in gaps if g >= TEMPO_REFLECTIVE_THRESHOLD)
+
+    total_gaps = len(gaps)
+    avg_gap = sum(gaps) / total_gaps
+    median_gap = sorted(gaps)[total_gaps // 2]
+
+    # determine dominant tempo
+    counts = {"rapid": rapid, "normal": normal, "reflective": reflective, "idle": idle_count}
+    dominant = max(counts, key=lambda k: counts[k])
+
+    # style hints based on tempo
+    style_map = {
+        "rapid": "Keep responses concise and action-oriented. Operator is in a hurry.",
+        "normal": "Standard detail level. Balanced pace.",
+        "reflective": "Operator is thinking deeply. Provide thorough analysis and context.",
+        "idle": "Long gaps suggest breaks or task-switching. Summarise where we left off.",
+    }
+
+    # detect bursts (3+ rapid interactions in a row)
+    burst_count = 0
+    current_streak = 0
+    for g in gaps:
+        if g < TEMPO_RAPID_THRESHOLD:
+            current_streak += 1
+            if current_streak >= 3:
+                burst_count += 1
+        else:
+            current_streak = 0
+
+    return {
+        "status": "ok",
+        "window_hours": hours,
+        "interactions": len(timestamps),
+        "gaps_analysed": total_gaps,
+        "tempo": dominant,
+        "style_hint": style_map[dominant],
+        "distribution": {
+            "rapid": rapid,
+            "normal": normal,
+            "reflective": reflective,
+            "idle": idle_count,
+        },
+        "avg_gap_seconds": round(avg_gap, 1),
+        "median_gap_seconds": round(median_gap, 1),
+        "burst_episodes": burst_count,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
 #  REFLECTION / CONSOLIDATION — "Sleep" endpoint
 #
 #  Inspired by how the human brain consolidates memories during sleep:

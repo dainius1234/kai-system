@@ -216,11 +216,12 @@ For architecture details see `docs/sovereign_ai_spec.md`.
 - All code must work in BOTH environments (stubs in codespace, live on laptop)
 
 ### Current State
-- **All 41 test-core targets pass.** Run `make test-core` to confirm.
+- **All 44 test-core targets pass.** Run `make test-core` to confirm.
 - **Phase 2 COMPLETE:** Specialist Router, Memory-Driven Planner, Adversary Challenge Engine — all built, tested, wired into `/chat` and `/run`.
 - **P1+P2 COMPLETE:** Failure Taxonomy, Metacognitive Rules, SELAUR learning value — all generating real episode metadata.
 - **P4+P5+P6 COMPLETE:** Contradiction Memory, GEM Cognitive Alignment, Knowledge Boundary Mapping — full engines in memu-core + kai_config + planner + app.py.
 - **P7+P12+P14 COMPLETE:** Silence-as-Signal, Self-Deception Detection, Temporal Self-Model — cognitive self-awareness layer.
+- **P10+P11+P13 COMPLETE:** Predictive Pre-Computation, Operator Tempo Modeling, Recursive Self-Improvement Gate — adaptive intelligence layer.
 - **Merged Action Plan:** Operator's 2026 paper research + AI-native blueprints → 15 prioritised advantages in `docs/unfair_advantages.md`.
 - **LLM strategy:** ALL local models via Ollama. Kimi K2 (1T MoE, Apache 2.0) pending addition.
 
@@ -258,7 +259,7 @@ Request → injection filter → specialist selection → session buffer
 
 Full details + P9-P15 + parked items in `docs/unfair_advantages.md`.
 
-P12 (Self-Deception Detection) and P14 (Temporal Self-Model) also complete — see unfair_advantages.md.
+P10 (Predictive Pre-Computation), P11 (Operator Tempo), P12 (Self-Deception Detection), P13 (Self-Improvement Gate), and P14 (Temporal Self-Model) also complete — see unfair_advantages.md.
 
 ### Cross-Check: What's Been Done
 - [x] Phase 2a: router.py (8 routes, 27 classification tests)
@@ -272,6 +273,9 @@ P12 (Self-Deception Detection) and P14 (Temporal Self-Model) also complete — s
 - [x] P5: GEM Cognitive Alignment (13 + 8 = 21 tests)
 - [x] P6: Knowledge Boundary Mapping (6 tests in gem suite)
 - [x] P7: Silence-as-Signal (8 tests)
+- [x] P10: Predictive Pre-Computation (15 tests)
+- [x] P11: Operator Tempo Modeling (12 tests)
 - [x] P12: Self-Deception Detection (12 tests)
+- [x] P13: Recursive Self-Improvement Gate (20 tests)
 - [x] P14: Temporal Self-Model (19 tests)
-- [ ] P8-P11, P13, P15: see build order above
+- [ ] P8, P9, P15: see build order above

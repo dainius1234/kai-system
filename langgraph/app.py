@@ -18,10 +18,10 @@ from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.llm import LLMRouter
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
-from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value
+from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot
 from conviction import build_plan, detect_self_deception, low_conviction_feedback, score_conviction
 from router import classify, dispatch_route
-from planner import gather_context, build_enriched_plan
+from planner import gather_context, build_enriched_plan, predict_next_request, pre_fetch_predicted_context
 from adversary import challenge_plan, verdict_to_plan_metadata
 
 logger = setup_json_logger("langgraph", os.getenv("LOG_PATH", "/tmp/langgraph.json.log"))
@@ -738,6 +738,31 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
 
     saver.save_episode(episode)
     saver.decay("keeper", days=30, score_threshold=0.2)
+
+    # ── P13: Recursive self-improvement snapshot ────────────────────
+    # Periodically capture performance snapshots so future changes
+    # can be evaluated before/after.  Snapshots every 10 episodes.
+    if len(recent_episodes) % 10 == 0 and recent_episodes:
+        try:
+            snap = capture_snapshot(recent_episodes, label=f"auto-{len(recent_episodes)}")
+            save_snapshot(snap)
+        except Exception:
+            logger.debug("P13 snapshot failed (non-critical)")
+
+    # ── P10: Predictive pre-computation ─────────────────────────────
+    # Mine sequential patterns to predict what the operator will ask
+    # next and pre-fetch relevant memory context.
+    try:
+        predictions = predict_next_request(request.user_input, recent_episodes)
+        if predictions:
+            predictions = await pre_fetch_predicted_context(predictions, MEMU_URL)
+            plan["predicted_next"] = [
+                {"topic": p.predicted_topic, "confidence": p.confidence,
+                 "support": p.support, "context_ready": len(p.pre_fetched_context)}
+                for p in predictions[:3]
+            ]
+    except Exception:
+        logger.debug("P10 prediction failed (non-critical)")
 
     # ── 3. Record assistant response in session buffer ──────────────
     response_summary = plan.get("summary", "")
