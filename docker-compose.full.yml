@@ -157,7 +157,7 @@ services:
       TOOL_GATE_URL: http://tool-gate:8000
       REDIS_URL: redis://redis:6379
       OLLAMA_URL: http://ollama:11434
-      OLLAMA_MODEL: qwen3.5:0.6b
+      OLLAMA_MODEL: qwen2:0.5b
       LLM_TIMEOUT: "120"
     ports:
       - "8007:8007"
