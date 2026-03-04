@@ -18,7 +18,7 @@ from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.llm import LLMRouter
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
-from kai_config import build_saver, classify_failure, extract_metacognitive_rule, FailureClass, compute_learning_value
+from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value
 from conviction import build_plan, low_conviction_feedback, score_conviction
 from router import classify, dispatch_route
 from planner import gather_context, build_enriched_plan
@@ -668,6 +668,22 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
                     },
                     timeout=5.0,
                 )
+            # P5 GEM: extract operator preference from correction and store it
+            pref = extract_preference(
+                original_output=plan.get("summary", ""),
+                correction=correction,
+                user_input=request.user_input,
+            )
+            if pref:
+                try:
+                    async with httpx.AsyncClient() as pref_client:
+                        await pref_client.post(
+                            f"{MEMU_URL}/memory/preferences",
+                            json={"preference": pref, "context": "auto-extracted from correction", "user_id": "keeper"},
+                            timeout=5.0,
+                        )
+                except Exception:
+                    logger.debug("Preference store failed (memu-core may be down)")
     except Exception:
         logger.debug("Correction memorize failed (memu-core may be down)")
 

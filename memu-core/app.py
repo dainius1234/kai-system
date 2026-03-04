@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import time
 import uuid
 from collections import Counter
@@ -779,6 +780,151 @@ def _validate_state_delta_size(delta: Dict[str, Any]) -> None:
             raise HTTPException(status_code=400, detail=f"state value too large for key: {key}")
 
 
+# ── Contradiction Detection (P4: TMC) ──────────────────────────────
+# Before storing a new memory, scan existing memories for semantic
+# contradictions.  If found, flag the conflict so the operator decides
+# which version is correct rather than silently overwriting truth.
+
+CONTRADICTION_SIMILARITY_THRESHOLD = float(os.getenv("CONTRADICTION_SIM_THRESHOLD", "0.4"))
+CONTRADICTION_MAX_CANDIDATES = int(os.getenv("CONTRADICTION_MAX_CANDIDATES", "20"))
+
+# signal words that indicate a factual assertion (worth checking)
+_ASSERTION_SIGNALS = re.compile(
+    r"\b(is|are|was|were|equals?|costs?|threshold|limit|rate|deadline|"
+    r"amount|total|changed?\s+to|updated?\s+to|now\s+\w+|set\s+to)\b",
+    re.IGNORECASE,
+)
+
+# negation and change signals that flip meaning
+_NEGATION_SIGNALS = re.compile(
+    r"\b(not|no longer|never|isn't|aren't|wasn't|weren't|don't|doesn't|"
+    r"didn't|won't|cannot|can't|stopped|removed|cancelled|revoked|"
+    r"decreased|increased|changed|updated|revised|replaced)\b",
+    re.IGNORECASE,
+)
+
+
+class ContradictionResult:
+    """Result of scanning for contradictions against existing memory."""
+    __slots__ = ("has_conflict", "conflicting_memory_id", "conflicting_text",
+                 "similarity", "conflict_type", "explanation")
+
+    def __init__(
+        self,
+        has_conflict: bool = False,
+        conflicting_memory_id: str = "",
+        conflicting_text: str = "",
+        similarity: float = 0.0,
+        conflict_type: str = "",
+        explanation: str = "",
+    ):
+        self.has_conflict = has_conflict
+        self.conflicting_memory_id = conflicting_memory_id
+        self.conflicting_text = conflicting_text
+        self.similarity = similarity
+        self.conflict_type = conflict_type
+        self.explanation = explanation
+
+
+def _extract_numeric_claims(text: str) -> List[tuple]:
+    """Pull out number-bearing claims: '£85,000', '90 days', '£50k'."""
+    pattern = re.compile(r"[£$€]?\s*[\d,]+\.?\d*\s*[kKmM]?\s*(?:days?|weeks?|months?|years?|%|percent)?", re.IGNORECASE)
+    return [(m.group(0).strip(), m.start()) for m in pattern.finditer(text)]
+
+
+def detect_contradiction(new_text: str, existing_records: List[MemoryRecord]) -> ContradictionResult:
+    """Check if new_text contradicts any existing memory record.
+
+    Detection strategies:
+    1. Numeric drift — same topic but different numbers (e.g. "VAT threshold £85k" vs "£90k")
+    2. Negation flip — same topic but opposite assertion (e.g. "X is required" vs "X is not required")
+    3. Direct replacement — explicit "changed to" / "updated to" signals
+
+    Returns ContradictionResult with conflict details if found.
+    """
+    if not new_text or not existing_records:
+        return ContradictionResult()
+
+    new_lower = new_text.lower()
+    new_nums = _extract_numeric_claims(new_text)
+    new_words = set(re.findall(r"\w{4,}", new_lower))
+    new_has_negation = bool(_NEGATION_SIGNALS.search(new_text))
+
+    for record in existing_records:
+        if getattr(record, "poisoned", False):
+            continue
+        existing_text = str(record.content.get("result", ""))
+        if not existing_text:
+            continue
+
+        existing_lower = existing_text.lower()
+        existing_words = set(re.findall(r"\w{4,}", existing_lower))
+
+        # topic overlap (Jaccard) — only compare if talking about similar things
+        overlap = new_words & existing_words
+        union = new_words | existing_words
+        if not union:
+            continue
+        topic_sim = len(overlap) / len(union)
+        if topic_sim < CONTRADICTION_SIMILARITY_THRESHOLD:
+            continue
+
+        # Strategy 1: Numeric drift
+        existing_nums = _extract_numeric_claims(existing_text)
+        if new_nums and existing_nums:
+            for new_val, _ in new_nums:
+                for old_val, _ in existing_nums:
+                    # same context words but different numbers
+                    n_clean = re.sub(r"[£$€,\s]", "", new_val.lower())
+                    o_clean = re.sub(r"[£$€,\s]", "", old_val.lower())
+                    if n_clean != o_clean and len(overlap) >= 2:
+                        return ContradictionResult(
+                            has_conflict=True,
+                            conflicting_memory_id=record.id,
+                            conflicting_text=existing_text[:300],
+                            similarity=round(topic_sim, 3),
+                            conflict_type="numeric_drift",
+                            explanation=f"New value '{new_val}' vs existing '{old_val}' on overlapping topic ({', '.join(sorted(overlap)[:5])})",
+                        )
+
+        # Strategy 2: Negation flip
+        existing_has_negation = bool(_NEGATION_SIGNALS.search(existing_text))
+        if new_has_negation != existing_has_negation and topic_sim >= 0.5:
+            return ContradictionResult(
+                has_conflict=True,
+                conflicting_memory_id=record.id,
+                conflicting_text=existing_text[:300],
+                similarity=round(topic_sim, 3),
+                conflict_type="negation_flip",
+                explanation=f"Assertion polarity changed (negation {'added' if new_has_negation else 'removed'}) on overlapping topic",
+            )
+
+    return ContradictionResult()
+
+
+class AssertRequest(BaseModel):
+    """Request body for /memory/assert — memorize with contradiction check."""
+    timestamp: str
+    event_type: str
+    result_raw: str
+    category: Optional[str] = None
+    importance: Optional[float] = None
+    user_id: str = "keeper"
+    force: bool = False  # if True, store even if contradiction found
+
+
+# ── Operator Preferences (P5: GEM) ─────────────────────────────────
+# When the operator corrects Kai, extract a preference and store it.
+# Preferences are high-importance pinned memories that the planner
+# injects into future plans for cognitive alignment.
+
+class PreferenceRequest(BaseModel):
+    """Operator preference — 'keeper prefers X over Y'."""
+    preference: str
+    context: str = ""
+    user_id: str = "keeper"
+
+
 @app.post("/memory/memorize")
 async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
     import httpx as _httpx
@@ -1216,6 +1362,230 @@ async def quick_note(note: NoteRequest) -> Dict[str, str]:
     )
     commit = store.insert(record)
     return {"status": "noted", "id": record.id, "category": category, "importance": str(importance), "commit": commit.commit_id}
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  P4: CONTRADICTION MEMORY — "/memory/assert"
+#
+#  The trust engine.  Before blindly storing a fact, check if it
+#  contradicts something already in memory.  If so: flag it, don't
+#  silently overwrite.  The operator decides which version is true.
+#
+#  This prevents "VAT threshold is £85k" and "VAT threshold is £90k"
+#  from coexisting without resolution.
+# ═══════════════════════════════════════════════════════════════════════
+
+@app.post("/memory/assert")
+async def assert_memory(req: AssertRequest) -> Dict[str, Any]:
+    """Store a memory with contradiction checking.
+
+    1. Scan existing memories for semantic contradictions
+    2. If conflict found and force=False, return the conflict for operator review
+    3. If no conflict (or force=True), store the memory
+    4. If stored after conflict, mark the old memory as superseded
+    """
+    text = sanitize_string(req.result_raw)
+    if not text:
+        raise HTTPException(status_code=400, detail="result_raw cannot be empty")
+
+    # only check assertions (not casual conversation)
+    is_assertion = bool(_ASSERTION_SIGNALS.search(text))
+
+    conflict = ContradictionResult()
+    if is_assertion:
+        candidates = store.search(top_k=CONTRADICTION_MAX_CANDIDATES, query=text)
+        conflict = detect_contradiction(text, candidates)
+
+    if conflict.has_conflict and not req.force:
+        return {
+            "status": "conflict_detected",
+            "conflict_type": conflict.conflict_type,
+            "conflicting_memory_id": conflict.conflicting_memory_id,
+            "conflicting_text": conflict.conflicting_text,
+            "similarity": conflict.similarity,
+            "explanation": conflict.explanation,
+            "action": "review_required — POST again with force=true to override",
+        }
+
+    # store the new memory
+    user_id = sanitize_string(req.user_id)
+    category = req.category or classify_category(f"{req.event_type} {text}")
+    importance = req.importance if req.importance is not None else score_importance(
+        text, is_keeper=(user_id == "keeper")
+    )
+
+    record = MemoryRecord(
+        id=str(uuid.uuid4()),
+        timestamp=req.timestamp,
+        event_type=req.event_type,
+        category=category,
+        content={
+            "result": text,
+            "user_id": user_id,
+            "supersedes": conflict.conflicting_memory_id if conflict.has_conflict else None,
+            "conflict_resolved": conflict.has_conflict,
+        },
+        embedding=generate_embedding(f"{req.event_type}: {text}"),
+        relevance=1.0,
+        importance=importance,
+        access_count=0,
+        last_accessed=None,
+        pinned=False,
+    )
+    commit = store.insert(record)
+
+    # if we're overriding a conflict, mark the old memory as superseded
+    if conflict.has_conflict and conflict.conflicting_memory_id:
+        if hasattr(store, "update_record"):
+            store.update_record(
+                conflict.conflicting_memory_id,
+                quarantine_reason=f"superseded by {record.id}: {conflict.explanation}",
+            )
+        logger.info("Contradiction resolved: %s superseded by %s (%s)",
+                     conflict.conflicting_memory_id, record.id, conflict.conflict_type)
+
+    return {
+        "status": "asserted",
+        "id": record.id,
+        "category": category,
+        "commit": commit.commit_id,
+        "contradiction_found": conflict.has_conflict,
+        "conflict_type": conflict.conflict_type if conflict.has_conflict else None,
+        "superseded_id": conflict.conflicting_memory_id if conflict.has_conflict else None,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  P5: OPERATOR PREFERENCES — "/memory/preferences"
+#
+#  Cognitive alignment (GEM).  When the operator corrects Kai or
+#  expresses a preference, it becomes a high-importance pinned memory.
+#  The planner fetches these before every plan to stay aligned.
+# ═══════════════════════════════════════════════════════════════════════
+
+@app.post("/memory/preferences")
+async def store_preference(req: PreferenceRequest) -> Dict[str, str]:
+    """Store an operator preference for cognitive alignment."""
+    pref_text = sanitize_string(req.preference)
+    if not pref_text:
+        raise HTTPException(status_code=400, detail="preference cannot be empty")
+
+    context_text = sanitize_string(req.context) if req.context else ""
+    user_id = sanitize_string(req.user_id)
+
+    record = MemoryRecord(
+        id=str(uuid.uuid4()),
+        timestamp=datetime.utcnow().isoformat(),
+        event_type="operator_preference",
+        category="general",
+        content={
+            "result": pref_text,
+            "context": context_text,
+            "user_id": user_id,
+            "pin": True,
+        },
+        embedding=generate_embedding(f"preference: {pref_text}"),
+        relevance=1.0,
+        importance=0.95,
+        access_count=0,
+        last_accessed=None,
+        pinned=True,  # preferences always surface
+    )
+    commit = store.insert(record)
+    logger.info("Stored operator preference: %s", pref_text[:100])
+    return {"status": "preference_stored", "id": record.id, "commit": commit.commit_id}
+
+
+@app.get("/memory/preferences")
+async def get_preferences(user_id: str = "keeper", top_k: int = 20) -> Dict[str, Any]:
+    """Retrieve all operator preferences for plan injection."""
+    all_records = store.search(top_k=10_000)
+    prefs = []
+    for r in all_records:
+        if r.event_type == "operator_preference" and not getattr(r, "poisoned", False):
+            uid = str(r.content.get("user_id", ""))
+            if user_id and uid and uid != user_id:
+                continue
+            prefs.append({
+                "id": r.id,
+                "preference": r.content.get("result", ""),
+                "context": r.content.get("context", ""),
+                "timestamp": r.timestamp,
+                "importance": r.importance,
+            })
+    # most recent first
+    prefs.sort(key=lambda p: p.get("timestamp", ""), reverse=True)
+    return {"status": "ok", "count": len(prefs[:top_k]), "preferences": prefs[:top_k]}
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  P6: KNOWLEDGE BOUNDARY MAP — "/memory/boundary"
+#
+#  Track what Kai knows vs doesn't know.  Aggregate episode history and
+#  memory coverage by category to find gaps.  Generate probing questions
+#  for categories with low coverage or high failure rates.
+# ═══════════════════════════════════════════════════════════════════════
+
+@app.get("/memory/boundary")
+async def knowledge_boundary() -> Dict[str, Any]:
+    """Map Kai's knowledge boundaries by category.
+
+    For each category, reports:
+    - memory_count: how many memories exist
+    - avg_importance: average importance score
+    - avg_relevance: average relevance score
+    - coverage: normalised 0-1 coverage score
+    - gap_signal: True if this is a weak area
+    """
+    all_records = store.search(top_k=10_000)
+    active = [r for r in all_records if not getattr(r, "poisoned", False)]
+
+    cat_stats: Dict[str, Dict[str, Any]] = {}
+    for r in active:
+        cat = getattr(r, "category", "general")
+        if cat not in cat_stats:
+            cat_stats[cat] = {"count": 0, "importance_sum": 0.0, "relevance_sum": 0.0}
+        cat_stats[cat]["count"] += 1
+        cat_stats[cat]["importance_sum"] += getattr(r, "importance", 0.5)
+        cat_stats[cat]["relevance_sum"] += float(r.relevance)
+
+    total = len(active) or 1
+    boundaries = []
+    for cat, stats in cat_stats.items():
+        count = stats["count"]
+        avg_imp = round(stats["importance_sum"] / max(count, 1), 3)
+        avg_rel = round(stats["relevance_sum"] / max(count, 1), 3)
+        coverage = round(min(count / (total * 0.2), 1.0), 3)  # normalised against 20% share
+        gap = coverage < 0.3 or avg_imp < 0.4
+        boundaries.append({
+            "category": cat,
+            "memory_count": count,
+            "avg_importance": avg_imp,
+            "avg_relevance": avg_rel,
+            "coverage": coverage,
+            "gap_signal": gap,
+        })
+
+    boundaries.sort(key=lambda b: b["coverage"])
+
+    # generate probing questions for weak areas
+    probes = []
+    for b in boundaries:
+        if b["gap_signal"]:
+            cat = b["category"]
+            if cat in CONSTRUCTION_CATEGORIES:
+                probes.append(f"What recent {cat.replace('-', ' ')} work should I know about?")
+            else:
+                probes.append(f"Are there any updates on '{cat}' I should record?")
+
+    return {
+        "status": "ok",
+        "total_memories": total,
+        "categories": len(boundaries),
+        "boundaries": boundaries,
+        "probing_questions": probes[:5],
+        "weak_areas": [b["category"] for b in boundaries if b["gap_signal"]],
+    }
 
 
 # ═══════════════════════════════════════════════════════════════════════

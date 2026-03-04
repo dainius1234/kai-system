@@ -44,6 +44,7 @@ class PlanContext:
     past_outcomes: List[PastOutcome] = field(default_factory=list)
     correction_memories: List[Dict[str, Any]] = field(default_factory=list)
     nudges: List[Dict[str, Any]] = field(default_factory=list)
+    preferences: List[Dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -166,6 +167,18 @@ async def _fetch_nudges(memu_url: str) -> List[Dict[str, Any]]:
         return []
 
 
+async def _fetch_preferences(memu_url: str) -> List[Dict[str, Any]]:
+    """Fetch operator preferences for plan constraint injection (P5 GEM)."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{memu_url}/memory/preferences")
+            resp.raise_for_status()
+            data = resp.json()
+            return data.get("preferences", [])
+    except Exception:
+        return []
+
+
 # ── Plan construction ────────────────────────────────────────────────
 
 def _compute_conviction_modifier(past_outcomes: List[PastOutcome], corrections: List[Dict[str, Any]]) -> tuple[float, str, List[str]]:
@@ -228,10 +241,12 @@ async def gather_context(
     chunks_task = asyncio.create_task(_fetch_memory_chunks(memu_url, user_input))
     corrections_task = asyncio.create_task(_fetch_correction_memories(memu_url, user_input))
     nudges_task = asyncio.create_task(_fetch_nudges(memu_url))
+    prefs_task = asyncio.create_task(_fetch_preferences(memu_url))
 
     chunks = await chunks_task
     corrections = await corrections_task
     nudges = await nudges_task
+    preferences = await prefs_task
 
     # find similar past episodes (local, no network call)
     similar = _find_similar_episodes(user_input, episodes)
@@ -244,6 +259,7 @@ async def gather_context(
         past_outcomes=similar,
         correction_memories=corrections,
         nudges=nudges,
+        preferences=preferences,
     )
 
 
@@ -281,6 +297,13 @@ def build_enriched_plan(context: PlanContext, specialist: str) -> PlanDecision:
             correction_text = str(content.get("result", ""))[:300]
             steps.append({"action": "apply_correction", "correction": correction_text})
 
+    # P5 GEM: inject operator preferences as planning constraints
+    if context.preferences:
+        for pref in context.preferences[:5]:
+            pref_text = str(pref.get("content", {}).get("text", ""))[:200]
+            if pref_text:
+                steps.append({"action": "apply_preference", "preference": pref_text})
+
     steps.append({"action": "propose", "output": "draft"})
 
     # context summary for transparency
@@ -301,6 +324,7 @@ def build_enriched_plan(context: PlanContext, specialist: str) -> PlanDecision:
         "offline_context_used": len(context.memory_chunks),
         "history_consulted": len(context.past_outcomes),
         "corrections_applied": len(context.correction_memories),
+        "preferences_applied": len(context.preferences),
     }
 
     return PlanDecision(

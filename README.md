@@ -216,8 +216,10 @@ For architecture details see `docs/sovereign_ai_spec.md`.
 - All code must work in BOTH environments (stubs in codespace, live on laptop)
 
 ### Current State
-- **All 33 test-core targets pass.** Run `make test-core` to confirm.
+- **All 38 test-core targets pass.** Run `make test-core` to confirm.
 - **Phase 2 COMPLETE:** Specialist Router, Memory-Driven Planner, Adversary Challenge Engine — all built, tested, wired into `/chat` and `/run`.
+- **P1+P2 COMPLETE:** Failure Taxonomy, Metacognitive Rules, SELAUR learning value — all generating real episode metadata.
+- **P4+P5+P6 COMPLETE:** Contradiction Memory, GEM Cognitive Alignment, Knowledge Boundary Mapping — full engines in memu-core + kai_config + planner + app.py.
 - **Merged Action Plan:** Operator's 2026 paper research + AI-native blueprints → 15 prioritised advantages in `docs/unfair_advantages.md`.
 - **LLM strategy:** ALL local models via Ollama. Kimi K2 (1T MoE, Apache 2.0) pending addition.
 
@@ -230,14 +232,14 @@ For architecture details see `docs/sovereign_ai_spec.md`.
 ### Agentic Pipeline (how /run works)
 ```
 Request → injection filter → specialist selection → session buffer
-  → gather_context() (memory + episodes + corrections + nudges)
-  → build_enriched_plan() (history similarity + conviction modifiers)
+  → gather_context() (memory + episodes + corrections + nudges + preferences)
+  → build_enriched_plan() (history + conviction modifiers + preference constraints)
   → challenge_plan() (5 adversary challenges in parallel)
   → conviction scoring (5-signal + planner modifier + adversary modifier)
   → rethink loop (if conviction < 8.0, max 3 retries)
   → tool-gate policy check (HMAC, rate limit, co-sign)
   → executor (sandboxed)
-  → post-mortem (episode save, correction learning, auto-memorize)
+  → post-mortem (episode save, correction learning, preference extraction, auto-memorize)
 ```
 
 ### Build Order (merged action plan — tackle in this sequence)
@@ -246,10 +248,10 @@ Request → injection filter → specialist selection → session buffer
 |---|---|---|---|
 | P1 | Failure Taxonomy + Metacognitive Rules | kai_config.py, app.py, adversary.py | ✅ DONE |
 | P2 | SELAUR (Uncertainty-Aware Evolution) | app.py, kai_config.py | ✅ DONE |
-| P3 | Soulbound Identity (HMAC now → TPM on laptop) | pending/soulbound.py, memu-core | Not started |
-| P4 | TMC + Contradiction Memory | memu-core/app.py, app.py | Not started |
-| P5 | GEM (Cognitive Alignment) | app.py, planner.py | Not started |
-| P6 | Knowledge Boundary + Active Probing | app.py, router.py, heartbeat | Not started |
+| P3 | Soulbound Identity (HMAC now → TPM on laptop) | pending/soulbound.py, memu-core | Skipped (HMAC works; one env flip on hardware) |
+| P4 | TMC + Contradiction Memory | memu-core/app.py, kai_config.py | ✅ DONE |
+| P5 | GEM (Cognitive Alignment) | kai_config.py, planner.py, memu-core, app.py | ✅ DONE |
+| P6 | Knowledge Boundary + Active Probing | kai_config.py, memu-core/app.py | ✅ DONE |
 | P7 | Silence-as-Signal | memu-core/app.py, supervisor | Not started |
 | P8 | Dashboard: Thinking Pathways | dashboard/app.py, static/ | Not started |
 
@@ -257,9 +259,13 @@ Full details + P9-P15 + parked items in `docs/unfair_advantages.md`.
 
 ### Cross-Check: What's Been Done
 - [x] Phase 2a: router.py (8 routes, 27 classification tests)
-- [x] Phase 2b: planner.py (gather_context, build_enriched_plan)
+- [x] Phase 2b: planner.py (gather_context, build_enriched_plan, preference injection)
 - [x] Phase 2c: adversary.py (5 challenges, 7 test groups)
 - [x] Merged action plan documented (operator research + AI-native)
 - [x] Kimi K2 research noted in LLM strategy
-- [ ] P1: Failure Taxonomy → building
-- [ ] P2-P15: see build order above
+- [x] P1: Failure Taxonomy + Metacognitive Rules (27 tests)
+- [x] P2: SELAUR Uncertainty-Aware Evolution (13 tests)
+- [x] P4: TMC Contradiction Memory (13 tests)
+- [x] P5: GEM Cognitive Alignment (13 + 8 = 21 tests)
+- [x] P6: Knowledge Boundary Mapping (6 tests in gem suite)
+- [ ] P7-P15: see build order above

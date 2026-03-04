@@ -7,6 +7,7 @@ import json
 import os
 import re
 import time
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Protocol
@@ -186,6 +187,135 @@ def compute_learning_value(
     # Rethinks add value: the harder it was, the more to learn
     rethink_bonus = min(rethink_count * 0.1, 0.2)
     return round(min(value + rethink_bonus, 1.0), 3)
+
+
+# ── GEM: Cognitive Alignment / Preference Extraction (P5) ───────────
+# When the operator corrects Kai, extract a preference pattern.
+# Format: "keeper prefers X over Y" or "keeper wants X when Y"
+# These get stored in memu-core as high-importance preferences.
+
+def extract_preference(
+    original_output: str,
+    correction: str,
+    user_input: str,
+) -> Optional[str]:
+    """Extract an operator preference from a correction.
+
+    Compares what Kai said vs what the operator corrected to,
+    and generates a preference statement.  Returns None if no
+    meaningful preference can be extracted.
+    """
+    if not correction or not original_output:
+        return None
+
+    # extract topic words from the user's original question
+    topic_words = sorted(set(re.findall(r"\w{4,}", user_input.lower())))[:5]
+    topic = ", ".join(topic_words) if topic_words else "general"
+
+    # detect what changed
+    orig_lower = original_output.lower()[:300]
+    corr_lower = correction.lower()[:300]
+
+    # find words unique to correction (what operator added/changed)
+    orig_words = set(re.findall(r"\w{3,}", orig_lower))
+    corr_words = set(re.findall(r"\w{3,}", corr_lower))
+    new_words = corr_words - orig_words
+    removed_words = orig_words - corr_words
+
+    if not new_words and not removed_words:
+        return None
+
+    if new_words and removed_words:
+        return (
+            f"when topic=[{topic}], keeper prefers "
+            f"'{' '.join(sorted(new_words)[:4])}' over "
+            f"'{' '.join(sorted(removed_words)[:4])}'"
+        )
+    elif new_words:
+        return (
+            f"when topic=[{topic}], keeper wants emphasis on: "
+            f"{' '.join(sorted(new_words)[:5])}"
+        )
+    else:
+        return (
+            f"when topic=[{topic}], keeper does NOT want: "
+            f"{' '.join(sorted(removed_words)[:5])}"
+        )
+
+
+# ── Knowledge Boundary Tracker (P6) ─────────────────────────────────
+# Aggregate episode outcomes per topic to map Kai's competence frontier.
+# Topics with high failure rates or low conviction = knowledge gaps.
+
+@dataclass
+class TopicBoundary:
+    """Competence snapshot for one topic cluster."""
+    topic: str
+    total_episodes: int = 0
+    successes: int = 0
+    failures: int = 0
+    avg_conviction: float = 0.0
+    avg_learning_value: float = 0.0
+    is_gap: bool = False
+    probe_question: str = ""
+
+
+def build_knowledge_boundary(
+    episodes: List[Dict[str, Any]],
+    min_episodes: int = 2,
+) -> List[TopicBoundary]:
+    """Build a competence map from episode history.
+
+    Groups episodes by topic keywords, computes success/failure rates,
+    and flags gaps where Kai struggles or has low confidence.
+    """
+    # cluster episodes by topic words
+    topic_clusters: Dict[str, List[Dict[str, Any]]] = {}
+    for ep in episodes:
+        input_text = str(ep.get("input", ""))
+        words = sorted(set(re.findall(r"\w{4,}", input_text.lower())))[:3]
+        if not words:
+            continue
+        topic_key = "+".join(words)
+        topic_clusters.setdefault(topic_key, []).append(ep)
+
+    boundaries: List[TopicBoundary] = []
+    for topic_key, eps in topic_clusters.items():
+        if len(eps) < min_episodes:
+            continue
+
+        total = len(eps)
+        successes = sum(1 for e in eps if float(e.get("outcome_score", 0)) >= 0.5)
+        failures = total - successes
+        avg_conv = sum(float(e.get("final_conviction", e.get("conviction_score", 5.0))) for e in eps) / total
+        avg_lv = sum(float(e.get("learning_value", 0.5)) for e in eps) / total
+        success_rate = successes / total
+
+        is_gap = success_rate < 0.5 or avg_conv < 6.0
+
+        # generate a probing question for gaps
+        probe = ""
+        if is_gap:
+            readable = topic_key.replace("+", ", ")
+            if failures > successes:
+                probe = f"I've struggled with [{readable}] — can you give me more context or examples?"
+            else:
+                probe = f"My confidence on [{readable}] is low — any corrections or guidance?"
+
+        boundaries.append(TopicBoundary(
+            topic=topic_key,
+            total_episodes=total,
+            successes=successes,
+            failures=failures,
+            avg_conviction=round(avg_conv, 2),
+            avg_learning_value=round(avg_lv, 3),
+            is_gap=is_gap,
+            probe_question=probe,
+        ))
+
+    # sort: gaps first, then by failure count
+    boundaries.sort(key=lambda b: (-int(b.is_gap), -b.failures))
+    return boundaries
 
 
 class EpisodeSaver(Protocol):

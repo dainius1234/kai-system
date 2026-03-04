@@ -255,10 +255,10 @@ architecture excels.
 |---|---|---|---|---|
 | **P1** | Failure Taxonomy + Metacognitive Rules | MARS/MUSE + our 4h | Small | ✅ DONE |
 | **P2** | SELAUR (Uncertainty-Aware Evolution) | arXiv 2602 (#11) | Small | ✅ DONE |
-| **P3** | Soulbound Identity (Software) | ERC-5192/8004 (#7) | Medium | Not started |
-| **P4** | TMC + Contradiction Memory | TMC paper (#8) + our 4a | Medium | Not started |
-| **P5** | GEM (Cognitive Alignment) | GEM paper (#6) | Medium | Not started |
-| **P6** | Knowledge Boundary + Active Probing | KBM paper (#3) + our 4c | Medium | Not started |
+| **P3** | Soulbound Identity (Software) | ERC-5192/8004 (#7) | Medium | Skipped (HMAC works; TPM swap on hardware arrival) |
+| **P4** | TMC + Contradiction Memory | TMC paper (#8) + our 4a | Medium | ✅ DONE |
+| **P5** | GEM (Cognitive Alignment) | GEM paper (#6) | Medium | ✅ DONE |
+| **P6** | Knowledge Boundary + Active Probing | KBM paper (#3) + our 4c | Medium | ✅ DONE |
 | **P7** | Silence-as-Signal | Our 4b | Small | Not started |
 | **P8** | Dashboard: Thinking Pathways | vLLM-SR (#5) + Phase 3 | Large | Not started |
 | **P9** | Security Self-Hacking | MSR paper (#9) | Medium | Not started |
@@ -348,52 +348,61 @@ architecture excels.
 - **Why it compounds:** Every memory written after soulbound is provably yours.
   Legal personhood, insurance, reputation — all depend on provable identity.
 
-### P4: TMC + Contradiction Memory
+### P4: TMC + Contradiction Memory ✅ DONE
 
 > Merge of TMC (Tool-Memory Conflict) paper + our original 4a.
 > "Detect when Kai contradicts himself OR when tools contradict memory."
 
-- **Problem:** Kai says X on Monday, not-X on Thursday. Also: verifier
-  returns data that contradicts what's stored in memory. Both go unnoticed.
-- **Solution:** Two detectors: (a) assertion tracker in memu-core — hash
-  claims, find semantic conflicts via embedding similarity + negation
-  regex. (b) TMC logger — when verifier or tool output contradicts a
-  stored memory, log the conflict with context-based trust scores.
-  Learn which source to trust for which topics.
-- **Files:** `memu-core/app.py` (new `/memory/assert` endpoint),
-  `langgraph/app.py` (call on memorize + TMC logging),
-  `verifier/app.py` (inject contradiction data into response)
-- **Tests:** `scripts/test_contradiction.py`
+- **What was built:**
+  - `detect_contradiction()` in memu-core — 3 detection strategies: numeric drift,
+    negation flip, topic overlap threshold. Skips quarantined records.
+  - `ContradictionResult` class with conflict type, similarity, explanation.
+  - `POST /memory/assert` endpoint — contradiction-checked memorize. Returns conflict
+    for operator review (unless `force=True`). Marks superseded memories.
+  - `_extract_numeric_claims()` — pulls currency, percentage, duration claims.
+  - `_ASSERTION_SIGNALS` and `_NEGATION_SIGNALS` regex patterns for polarity detection.
+- **Files:** `memu-core/app.py` (contradiction engine + `/memory/assert` endpoint),
+  `langgraph/app.py` (wired into correction learning path)
+- **Tests:** `scripts/test_contradiction.py` — 13 tests (numeric drift, negation flip,
+  empty/unrelated/poisoned edge cases, numeric extraction, default result)
 
-### P5: GEM (Cognitive Alignment from Minimal Feedback)
+### P5: GEM (Cognitive Alignment from Minimal Feedback) ✅ DONE
 
 > From GEM paper: model operator's reasoning structure, not just preferences.
-> "5-10 corrections → understand HOW Dainius thinks."
+> "Corrections → understand HOW the keeper thinks."
 
-- **Problem:** Operator corrections are stored as flat memories. We remember
-  WHAT was corrected, not the reasoning PATTERN behind corrections.
-- **Solution:** After 5+ corrections, cluster them to extract reasoning
-  preferences: "prefers conservative estimates", "always wants source
-  citations", "discounts anecdotal evidence". Store as `category: operator_model`
-  in memu-core. Planner injects operator model into plan context.
-- **Files:** `langgraph/app.py` (correction clustering),
-  `memu-core/app.py` (operator_model category),
-  `planner.py` (inject into plan context)
-- **Tests:** `scripts/test_gem.py`
+- **What was built:**
+  - `extract_preference()` in kai_config.py — compares original output vs correction,
+    extracts word-level diffs, generates "keeper prefers X over Y" statements with topic context.
+  - `POST /memory/preferences` in memu-core — stores operator preference as pinned memory
+    (importance=0.95, category="preference").
+  - `GET /memory/preferences` in memu-core — retrieves all preferences for plan injection.
+  - `_fetch_preferences()` in planner.py — parallel fetch during context gathering.
+  - Preferences injected as `apply_preference` steps in `build_enriched_plan()`.
+  - Wired into langgraph/app.py correction learning: corrections auto-extract and store preferences.
+- **Files:** `langgraph/kai_config.py` (extract_preference), `memu-core/app.py` (preference endpoints),
+  `langgraph/planner.py` (fetch + inject), `langgraph/app.py` (correction → preference pipeline)
+- **Tests:** `scripts/test_gem_preferences.py` — 13 tests (extraction, empty cases, topic context,
+  added/removed words). `scripts/test_planner_preferences.py` — 8 tests (injection, context population,
+  max cap, plan counting).
 
-### P6: Knowledge Boundary Mapping + Active Probing
+### P6: Knowledge Boundary Mapping + Active Probing ✅ DONE
 
 > Merge of KBM research + our original 4c.
-> "Map ignorance explicitly. Probe gaps during idle time."
+> "Map ignorance explicitly. Know what you don't know."
 
-- **Problem:** Kai doesn't know what he doesn't know.
-- **Solution:** Post-episode: if conviction < 6.0 or verifier != PASS,
-  store a knowledge gap record. Router checks gaps before classification.
-  During heartbeat auto-sleep, probe known gaps with local model to
-  see if knowledge has improved (with operator permission).
-- **Files:** `langgraph/app.py` (gap detection), `router.py` (gap check),
-  `heartbeat/app.py` (idle probing trigger)
-- **Tests:** `scripts/test_knowledge_boundary.py`
+- **What was built:**
+  - `TopicBoundary` dataclass in kai_config.py — competence snapshot per topic cluster
+    (episodes, successes, failures, avg conviction, gap flag, probe question).
+  - `build_knowledge_boundary()` in kai_config.py — clusters episodes by topic keywords,
+    computes success/failure rates, flags gaps (success < 50% or conviction < 6.0),
+    generates probing questions for weak areas. Sorted gaps-first.
+  - `GET /memory/boundary` in memu-core — aggregates stored memories by category,
+    calculates coverage metrics, generates probing questions for low-coverage categories.
+- **Files:** `langgraph/kai_config.py` (TopicBoundary, build_knowledge_boundary),
+  `memu-core/app.py` (`/memory/boundary` endpoint)
+- **Tests:** `scripts/test_gem_preferences.py` — 6 tests on knowledge boundary
+  (gap identification, empty episodes, min filter, probe questions, sort order, dataclass fields)
 
 ### P7: Silence-as-Signal
 
