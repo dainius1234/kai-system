@@ -260,7 +260,7 @@ architecture excels.
 | **P5** | GEM (Cognitive Alignment) | GEM paper (#6) | Medium | ✅ DONE |
 | **P6** | Knowledge Boundary + Active Probing | KBM paper (#3) + our 4c | Medium | ✅ DONE |
 | **P7** | Silence-as-Signal | Our 4b | Small | ✅ DONE |
-| **P8** | Dashboard: Thinking Pathways | vLLM-SR (#5) + Phase 3 | Large | Not started |
+| **P8** | Dashboard: Thinking Pathways | vLLM-SR (#5) + Phase 3 | Large | ✅ DONE |
 | **P9** | Security Self-Hacking | MSR paper (#9) | Medium | Not started |
 | **P10** | Predictive Pre-Computation | Our 4e | Medium | ✅ DONE |
 | **P11** | Operator Tempo Modeling | Our 4d | Medium | ✅ DONE |
@@ -419,13 +419,37 @@ architecture excels.
   not flagged, silent topic identified, low activity excluded, nudge format, sort order,
   poisoned records excluded)
 
-### P8: Dashboard — Thinking Pathways Visualization
+### P8: Dashboard — Thinking Pathways Visualization ✅ DONE
 
 > Merge of vLLM-SR transparent routing + our Phase 3.
 > "Visualize Kai's brain: route decisions, adversary findings, conviction flow."
 
-- **Files:** `dashboard/app.py` (new routes), `dashboard/static/` (UI)
-- **Depends on:** P1-P6 generating the data to display
+- **What was built:**
+  - `GET /thinking` — serves `dashboard/static/thinking.html`, a full cognitive transparency page.
+  - 5 new proxy API endpoints in `dashboard/app.py`:
+    - `GET /api/thinking` — fetches recent episodes from langgraph, extracts conviction pipeline
+      data (initial score → rethinks → final conviction → learning value → failure class → metacognitive rule).
+    - `GET /api/tempo` — proxies memu-core `/memory/tempo` (operator pace gauge).
+    - `GET /api/boundary` — proxies memu-core `/memory/boundary` (knowledge confidence map).
+    - `GET /api/silence` — proxies memu-core `/memory/silence` (absence-of-question signals).
+    - `GET /api/self-assessment` — proxies heartbeat `/self-assessment` (temporal self-model).
+  - `thinking.html` — dark-themed visualization page with 6 cards:
+    - **Conviction Pipeline** — visual flow: Input → Initial Score → Rethinks → Final Score → Learning Value.
+      Shows metacognitive rules when present. Color-coded (green ≥7.5, yellow ≥5, red <5).
+    - **Recent Thinking Episodes** — scrollable list with conviction tags, rethink counts,
+      failure classes, learning values. Border colors indicate conviction level.
+    - **Operator Tempo** — SVG gauge showing pace (rapid/normal/reflective/idle) with
+      distribution bars, average gap time, burst detection.
+    - **Knowledge Boundary Map** — confidence bars per topic zone, overall confidence metric.
+    - **Silence-as-Signal** — tag cloud of topics where silence was chosen, with reasons.
+    - **Temporal Self-Assessment** — metric grid showing memories, error rate, uptime,
+      response time, episodes, avg conviction. Delta indicators (▲/▼) for trend direction.
+  - Navigation links between Chat, Control Panel, and Thinking pages.
+  - Auto-refresh every 15 seconds + manual refresh button.
+  - All endpoints gracefully degrade when backend services are unavailable.
+- **Files:** `dashboard/app.py` (6 new endpoints), `dashboard/static/thinking.html` (visualization page)
+- **Tests:** `scripts/test_thinking_pathways.py` — 21 tests (HTML content, API proxying with mocks,
+  graceful degradation, input truncation, episode limiting, page existence checks).
 
 ### P9–P15: Remaining Advantages
 

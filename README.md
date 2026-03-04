@@ -216,12 +216,13 @@ For architecture details see `docs/sovereign_ai_spec.md`.
 - All code must work in BOTH environments (stubs in codespace, live on laptop)
 
 ### Current State
-- **All 44 test-core targets pass.** Run `make test-core` to confirm.
+- **All 45 test-core targets pass.** Run `make test-core` to confirm.
 - **Phase 2 COMPLETE:** Specialist Router, Memory-Driven Planner, Adversary Challenge Engine — all built, tested, wired into `/chat` and `/run`.
 - **P1+P2 COMPLETE:** Failure Taxonomy, Metacognitive Rules, SELAUR learning value — all generating real episode metadata.
 - **P4+P5+P6 COMPLETE:** Contradiction Memory, GEM Cognitive Alignment, Knowledge Boundary Mapping — full engines in memu-core + kai_config + planner + app.py.
 - **P7+P12+P14 COMPLETE:** Silence-as-Signal, Self-Deception Detection, Temporal Self-Model — cognitive self-awareness layer.
 - **P10+P11+P13 COMPLETE:** Predictive Pre-Computation, Operator Tempo Modeling, Recursive Self-Improvement Gate — adaptive intelligence layer.
+- **P8 COMPLETE:** Dashboard Thinking Pathways — cognitive transparency visualization (conviction pipeline, tempo gauge, boundary map, silence signals, self-assessment).
 - **Merged Action Plan:** Operator's 2026 paper research + AI-native blueprints → 15 prioritised advantages in `docs/unfair_advantages.md`.
 - **LLM strategy:** ALL local models via Ollama. Kimi K2 (1T MoE, Apache 2.0) pending addition.
 
@@ -255,7 +256,7 @@ Request → injection filter → specialist selection → session buffer
 | P5 | GEM (Cognitive Alignment) | kai_config.py, planner.py, memu-core, app.py | ✅ DONE |
 | P6 | Knowledge Boundary + Active Probing | kai_config.py, memu-core/app.py | ✅ DONE |
 | P7 | Silence-as-Signal | memu-core/app.py | ✅ DONE |
-| P8 | Dashboard: Thinking Pathways | dashboard/app.py, static/ | Not started |
+| P8 | Dashboard: Thinking Pathways | dashboard/app.py, static/thinking.html | ✅ DONE |
 
 Full details + P9-P15 + parked items in `docs/unfair_advantages.md`.
 
@@ -278,4 +279,5 @@ P10 (Predictive Pre-Computation), P11 (Operator Tempo), P12 (Self-Deception Dete
 - [x] P12: Self-Deception Detection (12 tests)
 - [x] P13: Recursive Self-Improvement Gate (20 tests)
 - [x] P14: Temporal Self-Model (19 tests)
-- [ ] P8, P9, P15: see build order above
+- [x] P8: Dashboard Thinking Pathways (21 tests)
+- [ ] P9, P15: see build order above

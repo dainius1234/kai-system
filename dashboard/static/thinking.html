@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KAI — Thinking Pathways</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #0a0a0c;
+      --surface:  #141419;
+      --surface2: #1c1c24;
+      --border:   #2a2d36;
+      --accent:   #00e5ff;
+      --accent2:  #7c4dff;
+      --ok:       #00c853;
+      --warn:     #ffc107;
+      --danger:   #ff3d3d;
+      --text:     #e0e4ef;
+      --muted:    #6b7280;
+      --radius:   12px;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      overflow-y: auto;
+    }
+
+    /* ── Header ─────────────────────────────── */
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .header-left { display: flex; align-items: center; gap: 0.75rem; }
+    .kai-logo {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.9rem; color: #fff;
+    }
+    .header h1 { font-size: 1.1rem; font-weight: 600; }
+    .header .subtitle { font-size: 0.7rem; color: var(--muted); }
+    .nav-links { display: flex; gap: 0.5rem; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 0.8rem;
+      padding: 0.35rem 0.75rem; border-radius: 20px;
+      border: 1px solid var(--border); transition: all 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--accent); border-color: var(--accent);
+    }
+
+    /* ── Main Grid ─────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 1rem; padding: 1rem 1.5rem; max-width: 1400px; margin: 0 auto;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: var(--accent); }
+    .card-title {
+      font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--accent); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .card-title .icon { font-size: 1.1rem; }
+    .full-width { grid-column: 1 / -1; }
+
+    /* ── Conviction Pipeline ───────────────── */
+    .pipeline { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .pipeline-stage {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.6rem 1rem; text-align: center;
+      min-width: 100px; position: relative;
+    }
+    .pipeline-stage .label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; }
+    .pipeline-stage .value { font-size: 1.3rem; font-weight: 700; margin-top: 2px; }
+    .pipeline-arrow { color: var(--muted); font-size: 1.2rem; }
+    .score-high { color: var(--ok); }
+    .score-mid { color: var(--warn); }
+    .score-low { color: var(--danger); }
+
+    /* ── Gauge ─────────────────────────────── */
+    .gauge-container { display: flex; align-items: center; gap: 1.5rem; }
+    .gauge {
+      width: 120px; height: 120px; position: relative;
+    }
+    .gauge svg { transform: rotate(-90deg); }
+    .gauge-bg { fill: none; stroke: var(--surface2); stroke-width: 10; }
+    .gauge-fill { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 0.8s ease; }
+    .gauge-text {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .gauge-text .big { font-size: 1.6rem; font-weight: 700; display: block; }
+    .gauge-text .small { font-size: 0.65rem; color: var(--muted); }
+    .gauge-info { flex: 1; }
+    .gauge-info .hint { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+    .gauge-info .tempo-label { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.3rem; }
+
+    /* ── Episode List ──────────────────────── */
+    .episode-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 400px; overflow-y: auto; }
+    .episode-list::-webkit-scrollbar { width: 4px; }
+    .episode-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .episode {
+      background: var(--surface2); border-radius: 8px; padding: 0.75rem;
+      border-left: 3px solid var(--border); transition: border-color 0.2s;
+    }
+    .episode:hover { border-left-color: var(--accent); }
+    .episode-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+    .episode-input { font-size: 0.85rem; color: var(--text); margin-bottom: 0.3rem; }
+    .episode-meta { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .episode-meta .tag {
+      font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 10px;
+      background: var(--surface); border: 1px solid var(--border);
+    }
+    .tag.conviction { border-color: var(--accent); color: var(--accent); }
+    .tag.rethink { border-color: var(--accent2); color: var(--accent2); }
+    .tag.failure { border-color: var(--danger); color: var(--danger); }
+    .tag.learning { border-color: var(--ok); color: var(--ok); }
+
+    /* ── Boundary Zones ────────────────────── */
+    .zone-list { display: flex; flex-direction: column; gap: 0.4rem; }
+    .zone-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.5rem 0.75rem; background: var(--surface2); border-radius: 8px;
+    }
+    .zone-bar-track { flex: 1; height: 6px; background: var(--surface); border-radius: 3px; overflow: hidden; }
+    .zone-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+    .zone-label { font-size: 0.8rem; min-width: 120px; }
+    .zone-pct { font-size: 0.75rem; color: var(--muted); min-width: 40px; text-align: right; }
+
+    /* ── Silence Topics ────────────────────── */
+    .silence-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .silence-tag {
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 0.4rem 0.75rem; border-radius: 20px; font-size: 0.8rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .silence-tag .reason { font-size: 0.7rem; color: var(--muted); }
+
+    /* ── Self-Assessment ───────────────────── */
+    .assessment-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+    .assessment-metric {
+      background: var(--surface2); border-radius: 8px; padding: 0.75rem;
+      text-align: center;
+    }
+    .assessment-metric .metric-name { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.3rem; }
+    .assessment-metric .metric-value { font-size: 1.2rem; font-weight: 700; }
+    .assessment-metric .metric-delta { font-size: 0.75rem; margin-top: 0.2rem; }
+    .delta-up { color: var(--ok); }
+    .delta-down { color: var(--danger); }
+    .delta-flat { color: var(--muted); }
+
+    /* ── Loading / Empty ───────────────────── */
+    .loading {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; color: var(--muted); font-size: 0.85rem; padding: 2rem;
+    }
+    .loading .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: pulse 1.4s infinite; }
+    .loading .dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+    .empty { color: var(--muted); font-size: 0.85rem; text-align: center; padding: 1.5rem; }
+
+    .refresh-btn {
+      background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+      padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.75rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .refresh-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; padding: 0.75rem; }
+      .pipeline { flex-direction: column; }
+      .pipeline-arrow { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="kai-logo">K</div>
+      <div>
+        <h1>Thinking Pathways</h1>
+        <div class="subtitle">Kai's cognitive transparency layer</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <button class="refresh-btn" onclick="refreshAll()">↻ Refresh</button>
+      <div class="nav-links">
+        <a href="/chat">Chat</a>
+        <a href="/static/index.html">Control</a>
+        <a href="/thinking" class="active">Thinking</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="grid">
+
+    <!-- ── Conviction Pipeline (latest episode) ──────── -->
+    <div class="card full-width" id="pipelineCard">
+      <div class="card-title"><span class="icon">⚡</span> Conviction Pipeline — Latest Episode</div>
+      <div id="pipelineContent"><div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    </div>
+
+    <!-- ── Recent Thinking Episodes ──────────────────── -->
+    <div class="card" id="episodesCard">
+      <div class="card-title"><span class="icon">🧠</span> Recent Thinking Episodes</div>
+      <div id="episodesContent"><div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    </div>
+
+    <!-- ── Operator Tempo ────────────────────────────── -->
+    <div class="card" id="tempoCard">
+      <div class="card-title"><span class="icon">⏱</span> Operator Tempo</div>
+      <div id="tempoContent"><div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    </div>
+
+    <!-- ── Knowledge Boundary ────────────────────────── -->
+    <div class="card" id="boundaryCard">
+      <div class="card-title"><span class="icon">🗺</span> Knowledge Boundary Map</div>
+      <div id="boundaryContent"><div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    </div>
+
+    <!-- ── Silence Signals ───────────────────────────── -->
+    <div class="card" id="silenceCard">
+      <div class="card-title"><span class="icon">🤫</span> Silence-as-Signal</div>
+      <div id="silenceContent"><div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    </div>
+
+    <!-- ── Temporal Self-Assessment ──────────────────── -->
+    <div class="card full-width" id="assessmentCard">
+      <div class="card-title"><span class="icon">📈</span> Temporal Self-Assessment</div>
+      <div id="assessmentContent"><div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Helpers ──────────────────────────────────────────
+    function scoreClass(score) {
+      if (score >= 7.5) return 'score-high';
+      if (score >= 5) return 'score-mid';
+      return 'score-low';
+    }
+
+    function formatTime(ts) {
+      if (!ts) return '—';
+      const d = new Date(ts * 1000);
+      return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function gaugeCircle(pct, color) {
+      const r = 50, c = 2 * Math.PI * r;
+      const offset = c - (pct / 100) * c;
+      return `<svg width="120" height="120" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="${r}" class="gauge-bg"/>
+        <circle cx="60" cy="60" r="${r}" class="gauge-fill" style="stroke:${color};stroke-dasharray:${c};stroke-dashoffset:${offset}"/>
+      </svg>`;
+    }
+
+    // ── Load Thinking Pathways ──────────────────────────
+    async function loadThinking() {
+      try {
+        const resp = await fetch('/api/thinking');
+        if (!resp.ok) throw new Error('unavailable');
+        const data = await resp.json();
+        const pathways = data.pathways || [];
+
+        if (!pathways.length) {
+          document.getElementById('pipelineContent').innerHTML = '<div class="empty">No episodes yet — talk to Kai to generate thinking data</div>';
+          document.getElementById('episodesContent').innerHTML = '<div class="empty">No episodes</div>';
+          return;
+        }
+
+        // Pipeline: show latest episode's conviction flow
+        const latest = pathways[pathways.length - 1];
+        const initial = latest.conviction_score || 0;
+        const final_c = latest.final_conviction || initial;
+        const rethinks = latest.rethink_count || 0;
+        const failure = latest.failure_class;
+        const rule = latest.metacognitive_rule;
+        const lv = latest.learning_value || 0;
+
+        let pipelineHtml = `<div class="pipeline">
+          <div class="pipeline-stage">
+            <div class="label">Input</div>
+            <div class="value" style="font-size:0.8rem;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(latest.input)}">${escapeHtml(latest.input.slice(0, 30))}</div>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-stage">
+            <div class="label">Initial Score</div>
+            <div class="value ${scoreClass(initial)}">${initial.toFixed(1)}</div>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-stage">
+            <div class="label">Rethinks</div>
+            <div class="value" style="color:${rethinks > 0 ? 'var(--accent2)' : 'var(--muted)'}">${rethinks}</div>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-stage">
+            <div class="label">Final Conviction</div>
+            <div class="value ${scoreClass(final_c)}">${final_c.toFixed(1)}<span style="font-size:0.7rem;color:var(--muted)">/10</span></div>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-stage">
+            <div class="label">Learning Value</div>
+            <div class="value ${scoreClass(lv * 10)}">${lv.toFixed(2)}</div>
+          </div>`;
+
+        if (failure) {
+          pipelineHtml += `<span class="pipeline-arrow">→</span>
+            <div class="pipeline-stage" style="border-color:var(--danger);">
+              <div class="label">Failure</div>
+              <div class="value" style="font-size:0.8rem;color:var(--danger)">${escapeHtml(failure)}</div>
+            </div>`;
+        }
+        pipelineHtml += '</div>';
+
+        if (rule) {
+          pipelineHtml += `<div style="margin-top:0.75rem;padding:0.6rem;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent2);">
+            <span style="font-size:0.7rem;color:var(--accent2);text-transform:uppercase;font-weight:700;">Metacognitive Rule</span>
+            <div style="font-size:0.85rem;margin-top:0.2rem;">${escapeHtml(rule)}</div>
+          </div>`;
+        }
+
+        document.getElementById('pipelineContent').innerHTML = pipelineHtml;
+
+        // Episode list
+        let epHtml = '<div class="episode-list">';
+        for (let i = pathways.length - 1; i >= 0; i--) {
+          const ep = pathways[i];
+          const fc = ep.final_conviction || ep.conviction_score || 0;
+          epHtml += `<div class="episode" style="border-left-color:${fc >= 7.5 ? 'var(--ok)' : fc >= 5 ? 'var(--warn)' : 'var(--danger)'};">
+            <div class="episode-header">
+              <span style="font-size:0.7rem;color:var(--muted)">${formatTime(ep.ts)}</span>
+            </div>
+            <div class="episode-input">${escapeHtml(ep.input)}</div>
+            <div class="episode-meta">
+              <span class="tag conviction">⚡ ${fc.toFixed(1)}</span>
+              ${ep.rethink_count ? `<span class="tag rethink">↻ ${ep.rethink_count} rethink${ep.rethink_count > 1 ? 's' : ''}</span>` : ''}
+              ${ep.failure_class ? `<span class="tag failure">⚠ ${escapeHtml(ep.failure_class)}</span>` : ''}
+              ${ep.learning_value ? `<span class="tag learning">📚 ${ep.learning_value.toFixed(2)}</span>` : ''}
+            </div>
+          </div>`;
+        }
+        epHtml += '</div>';
+        document.getElementById('episodesContent').innerHTML = epHtml;
+
+      } catch (e) {
+        document.getElementById('pipelineContent').innerHTML = '<div class="empty">Cannot reach langgraph — is the stack running?</div>';
+        document.getElementById('episodesContent').innerHTML = '<div class="empty">Unavailable</div>';
+      }
+    }
+
+    // ── Load Operator Tempo ─────────────────────────────
+    async function loadTempo() {
+      try {
+        const resp = await fetch('/api/tempo');
+        if (!resp.ok) throw new Error('unavailable');
+        const data = await resp.json();
+
+        if (data.status === 'unavailable' || data.tempo === 'unknown') {
+          document.getElementById('tempoContent').innerHTML = '<div class="empty">Tempo data unavailable — need more interactions</div>';
+          return;
+        }
+
+        const tempo = data.tempo || 'unknown';
+        const hint = data.style_hint || '';
+        const dist = data.distribution || {};
+        const avg = data.avg_gap_seconds || 0;
+        const bursts = data.burst_count || 0;
+
+        const tempoColors = { rapid: 'var(--danger)', normal: 'var(--ok)', reflective: 'var(--accent2)', idle: 'var(--muted)' };
+        const color = tempoColors[tempo] || 'var(--muted)';
+
+        // Calculate gauge percentage based on tempo
+        const tempoPct = { rapid: 90, normal: 60, reflective: 35, idle: 10 };
+        const pct = tempoPct[tempo] || 50;
+
+        let html = `<div class="gauge-container">
+          <div class="gauge">
+            ${gaugeCircle(pct, color)}
+            <div class="gauge-text">
+              <span class="big" style="color:${color}">${tempo.charAt(0).toUpperCase() + tempo.slice(1)}</span>
+              <span class="small">${avg.toFixed(0)}s avg gap</span>
+            </div>
+          </div>
+          <div class="gauge-info">
+            <div class="tempo-label" style="color:${color}">${tempo.toUpperCase()} PACE</div>
+            <div class="hint">${escapeHtml(hint)}</div>
+            <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--muted);">
+              ${bursts > 0 ? `🔥 ${bursts} burst${bursts > 1 ? 's' : ''} detected` : 'No bursts detected'}
+            </div>
+          </div>
+        </div>`;
+
+        // Distribution mini-bars
+        const total = Object.values(dist).reduce((a, b) => a + b, 0) || 1;
+        if (Object.keys(dist).length > 0) {
+          html += '<div style="margin-top:1rem;">';
+          for (const [cat, count] of Object.entries(dist)) {
+            const catPct = Math.round((count / total) * 100);
+            const catColor = tempoColors[cat] || 'var(--muted)';
+            html += `<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
+              <span style="font-size:0.75rem;min-width:70px;color:var(--muted)">${cat}</span>
+              <div class="zone-bar-track"><div class="zone-bar-fill" style="width:${catPct}%;background:${catColor}"></div></div>
+              <span style="font-size:0.7rem;color:var(--muted)">${catPct}%</span>
+            </div>`;
+          }
+          html += '</div>';
+        }
+
+        document.getElementById('tempoContent').innerHTML = html;
+      } catch (e) {
+        document.getElementById('tempoContent').innerHTML = '<div class="empty">Tempo service unavailable</div>';
+      }
+    }
+
+    // ── Load Knowledge Boundary ─────────────────────────
+    async function loadBoundary() {
+      try {
+        const resp = await fetch('/api/boundary');
+        if (!resp.ok) throw new Error('unavailable');
+        const data = await resp.json();
+
+        const zones = data.zones || [];
+        if (!zones.length && data.status !== 'ok') {
+          document.getElementById('boundaryContent').innerHTML = '<div class="empty">No knowledge boundary data available</div>';
+          return;
+        }
+        if (!zones.length) {
+          document.getElementById('boundaryContent').innerHTML = '<div class="empty">Knowledge map is empty — ask Kai more questions to build the map</div>';
+          return;
+        }
+
+        let html = '<div class="zone-list">';
+        for (const zone of zones) {
+          const conf = (zone.confidence || 0) * 100;
+          const color = conf >= 75 ? 'var(--ok)' : conf >= 40 ? 'var(--warn)' : 'var(--danger)';
+          html += `<div class="zone-item">
+            <span class="zone-label">${escapeHtml(zone.topic || zone.zone || '?')}</span>
+            <div class="zone-bar-track"><div class="zone-bar-fill" style="width:${conf}%;background:${color}"></div></div>
+            <span class="zone-pct" style="color:${color}">${conf.toFixed(0)}%</span>
+          </div>`;
+        }
+        html += '</div>';
+
+        if (data.overall_confidence !== undefined) {
+          html += `<div style="margin-top:0.75rem;text-align:center;font-size:0.8rem;color:var(--muted);">
+            Overall confidence: <span style="font-weight:700;color:var(--accent)">${(data.overall_confidence * 100).toFixed(0)}%</span>
+          </div>`;
+        }
+
+        document.getElementById('boundaryContent').innerHTML = html;
+      } catch (e) {
+        document.getElementById('boundaryContent').innerHTML = '<div class="empty">Boundary service unavailable</div>';
+      }
+    }
+
+    // ── Load Silence Signals ────────────────────────────
+    async function loadSilence() {
+      try {
+        const resp = await fetch('/api/silence');
+        if (!resp.ok) throw new Error('unavailable');
+        const data = await resp.json();
+
+        const topics = data.silence_topics || data.topics || [];
+        if (!topics.length) {
+          const sCount = data.silence_count || 0;
+          if (sCount > 0) {
+            document.getElementById('silenceContent').innerHTML = `<div class="empty">${sCount} silence signal(s) recorded — topics suppressed for safety</div>`;
+          } else {
+            document.getElementById('silenceContent').innerHTML = '<div class="empty">No silence signals — Kai has been answering everything</div>';
+          }
+          return;
+        }
+
+        let html = '<div class="silence-list">';
+        for (const t of topics) {
+          const topic = typeof t === 'string' ? t : (t.topic || t.query || '?');
+          const reason = typeof t === 'object' ? (t.reason || '') : '';
+          html += `<div class="silence-tag">
+            <span>🤫 ${escapeHtml(topic)}</span>
+            ${reason ? `<span class="reason">— ${escapeHtml(reason)}</span>` : ''}
+          </div>`;
+        }
+        html += '</div>';
+
+        if (data.silence_count !== undefined) {
+          html += `<div style="margin-top:0.75rem;font-size:0.75rem;color:var(--muted);text-align:center;">
+            Total silence decisions: ${data.silence_count}
+          </div>`;
+        }
+
+        document.getElementById('silenceContent').innerHTML = html;
+      } catch (e) {
+        document.getElementById('silenceContent').innerHTML = '<div class="empty">Silence service unavailable</div>';
+      }
+    }
+
+    // ── Load Self-Assessment ────────────────────────────
+    async function loadAssessment() {
+      try {
+        const resp = await fetch('/api/self-assessment');
+        if (!resp.ok) throw new Error('unavailable');
+        const data = await resp.json();
+
+        if (data.status === 'unavailable') {
+          document.getElementById('assessmentContent').innerHTML = '<div class="empty">Self-assessment unavailable — is heartbeat running?</div>';
+          return;
+        }
+
+        const current = data.current || {};
+        const deltas = data.deltas || {};
+        const trend = data.trend || 'stable';
+
+        const metrics = [
+          { key: 'total_memories', label: 'Memories', format: v => v },
+          { key: 'error_rate', label: 'Error Rate', format: v => (v * 100).toFixed(1) + '%' },
+          { key: 'uptime_ratio', label: 'Uptime', format: v => (v * 100).toFixed(1) + '%' },
+          { key: 'avg_response_ms', label: 'Avg Response', format: v => v.toFixed(0) + 'ms' },
+          { key: 'episodes_count', label: 'Episodes', format: v => v },
+          { key: 'avg_conviction', label: 'Avg Conviction', format: v => v.toFixed(1) },
+        ];
+
+        let html = `<div style="margin-bottom:0.75rem;text-align:center;">
+          <span style="font-size:0.85rem;font-weight:600;color:${trend === 'improving' ? 'var(--ok)' : trend === 'degrading' ? 'var(--danger)' : 'var(--muted)'};">
+            Trend: ${trend.toUpperCase()}
+          </span>
+        </div>`;
+
+        html += '<div class="assessment-grid">';
+        for (const m of metrics) {
+          const val = current[m.key];
+          if (val === undefined) continue;
+          const delta = deltas[m.key];
+          let deltaHtml = '';
+          if (delta !== undefined && delta !== 0) {
+            const isUp = delta > 0;
+            // For error_rate, up is bad; for others, up is good
+            const isGood = m.key === 'error_rate' ? !isUp : isUp;
+            deltaHtml = `<div class="metric-delta ${isGood ? 'delta-up' : 'delta-down'}">${isUp ? '▲' : '▼'} ${Math.abs(delta).toFixed(m.key === 'error_rate' ? 3 : 1)}</div>`;
+          } else {
+            deltaHtml = '<div class="metric-delta delta-flat">—</div>';
+          }
+          html += `<div class="assessment-metric">
+            <div class="metric-name">${m.label}</div>
+            <div class="metric-value">${m.format(val)}</div>
+            ${deltaHtml}
+          </div>`;
+        }
+        html += '</div>';
+
+        if (data.narrative) {
+          html += `<div style="margin-top:0.75rem;padding:0.6rem;background:var(--surface2);border-radius:8px;font-size:0.85rem;color:var(--muted);line-height:1.5;">
+            ${escapeHtml(data.narrative)}
+          </div>`;
+        }
+
+        document.getElementById('assessmentContent').innerHTML = html;
+      } catch (e) {
+        document.getElementById('assessmentContent').innerHTML = '<div class="empty">Self-assessment service unavailable</div>';
+      }
+    }
+
+    // ── Refresh All ─────────────────────────────────────
+    function refreshAll() {
+      document.querySelectorAll('[id$="Content"]').forEach(el => {
+        el.innerHTML = '<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+      });
+      loadThinking();
+      loadTempo();
+      loadBoundary();
+      loadSilence();
+      loadAssessment();
+    }
+
+    // Initial load
+    refreshAll();
+    // Auto-refresh every 15 seconds
+    setInterval(refreshAll, 15000);
+  </script>
+</body>
+</html>

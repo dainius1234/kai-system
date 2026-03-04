@@ -330,6 +330,104 @@ async def readiness() -> Dict[str, Any]:
     return {"status": "ready", "core_ready": True}
 
 
+# ── P8: Thinking Pathways — intelligence proxy endpoints ─────────────
+MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
+HEARTBEAT_URL = os.getenv("HEARTBEAT_URL", "http://heartbeat:8010")
+
+
+@app.get("/thinking")
+async def thinking_page() -> HTMLResponse:
+    """Serve the Thinking Pathways visualization."""
+    html_path = os.path.join(os.path.dirname(__file__), "static", "thinking.html")
+    with open(html_path, "r") as f:
+        return HTMLResponse(f.read())
+
+
+@app.get("/api/thinking")
+async def api_thinking():
+    """Fetch latest episode data from langgraph for thinking pathway visualization."""
+    langgraph_url = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.post(
+                f"{langgraph_url}/episodes/recall",
+                json={"user_id": "keeper", "days": 7},
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            episodes = data.get("episodes", [])
+            # Extract thinking pathway data from most recent episodes
+            pathways = []
+            for ep in episodes[-10:]:
+                pathways.append({
+                    "episode_id": ep.get("episode_id", ""),
+                    "input": ep.get("input", "")[:200],
+                    "output": ep.get("output", "")[:200],
+                    "conviction_score": ep.get("conviction_score", 0),
+                    "final_conviction": ep.get("final_conviction", 0),
+                    "rethink_count": ep.get("rethink_count", 0),
+                    "failure_class": ep.get("failure_class"),
+                    "metacognitive_rule": ep.get("metacognitive_rule"),
+                    "learning_value": ep.get("learning_value", 0),
+                    "ts": ep.get("ts", 0),
+                })
+            return {
+                "status": "ok",
+                "total_episodes": data.get("count", 0),
+                "pathways": pathways,
+            }
+    except Exception:
+        return {"status": "unavailable", "total_episodes": 0, "pathways": []}
+
+
+@app.get("/api/tempo")
+async def api_tempo():
+    """Proxy operator tempo from memu-core."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{MEMU_URL}/memory/tempo")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable", "tempo": "unknown"}
+
+
+@app.get("/api/boundary")
+async def api_boundary():
+    """Proxy knowledge boundary map from memu-core."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{MEMU_URL}/memory/boundary")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable", "zones": []}
+
+
+@app.get("/api/silence")
+async def api_silence():
+    """Proxy silence-as-signal data from memu-core."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{MEMU_URL}/memory/silence")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable", "silence_topics": []}
+
+
+@app.get("/api/self-assessment")
+async def api_self_assessment():
+    """Proxy temporal self-model from heartbeat."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{HEARTBEAT_URL}/self-assessment")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable"}
+
+
 # ── Chat proxy — Kai's face ─────────────────────────────────────────
 LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
 
