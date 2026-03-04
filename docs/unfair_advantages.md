@@ -253,8 +253,8 @@ architecture excels.
 
 | # | Name | Research Source | Effort | Status |
 |---|---|---|---|---|
-| **P1** | Failure Taxonomy + Metacognitive Rules | MARS/MUSE + our 4h | Small | 🔨 Building |
-| **P2** | SELAUR (Uncertainty-Aware Evolution) | arXiv 2602 (#11) | Small | Not started |
+| **P1** | Failure Taxonomy + Metacognitive Rules | MARS/MUSE + our 4h | Small | ✅ DONE |
+| **P2** | SELAUR (Uncertainty-Aware Evolution) | arXiv 2602 (#11) | Small | ✅ DONE |
 | **P3** | Soulbound Identity (Software) | ERC-5192/8004 (#7) | Medium | Not started |
 | **P4** | TMC + Contradiction Memory | TMC paper (#8) + our 4a | Medium | Not started |
 | **P5** | GEM (Cognitive Alignment) | GEM paper (#6) | Medium | Not started |

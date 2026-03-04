@@ -244,8 +244,8 @@ Request → injection filter → specialist selection → session buffer
 
 | # | Feature | Files to Touch | Status |
 |---|---|---|---|
-| P1 | Failure Taxonomy + Metacognitive Rules | kai_config.py, app.py, adversary.py | 🔨 Next |
-| P2 | SELAUR (Uncertainty-Aware Evolution) | app.py, kai_config.py | Not started |
+| P1 | Failure Taxonomy + Metacognitive Rules | kai_config.py, app.py, adversary.py | ✅ DONE |
+| P2 | SELAUR (Uncertainty-Aware Evolution) | app.py, kai_config.py | ✅ DONE |
 | P3 | Soulbound Identity (HMAC now → TPM on laptop) | pending/soulbound.py, memu-core | Not started |
 | P4 | TMC + Contradiction Memory | memu-core/app.py, app.py | Not started |
 | P5 | GEM (Cognitive Alignment) | app.py, planner.py | Not started |
