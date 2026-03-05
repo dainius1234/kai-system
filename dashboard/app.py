@@ -441,6 +441,19 @@ async def api_dream():
         return {"status": "unavailable", "message": "Cannot reach langgraph for dream cycle"}
 
 
+@app.get("/api/ledger-stats")
+async def api_ledger_stats():
+    """Proxy ledger statistics from ledger-worker."""
+    ledger_url = os.getenv("LEDGER_WORKER_URL", "http://ledger-worker:8056")
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{ledger_url}/stats")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable", "total_entries": 0}
+
+
 @app.get("/api/security-audit")
 async def api_security_audit():
     """Proxy security self-hacking audit from langgraph."""

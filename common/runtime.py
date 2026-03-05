@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import re
+import sys
 import time
 from collections import deque
 from logging.handlers import TimedRotatingFileHandler
@@ -14,19 +15,20 @@ from typing import Deque, Dict, Optional, Tuple
 def setup_json_logger(name: str, log_path: str) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
-    handler = TimedRotatingFileHandler(
+    _json_fmt = logging.Formatter(
+        '{"time":"%(asctime)s","level":"%(levelname)s","service":"%(name)s","msg":"%(message)s"}'
+    )
+    file_handler = TimedRotatingFileHandler(
         log_path,
         when="midnight",
         interval=1,
         backupCount=30,
         encoding="utf-8",
     )
-    handler.setFormatter(
-        logging.Formatter(
-            '{"time":"%(asctime)s","level":"%(levelname)s","service":"%(name)s","msg":"%(message)s"}'
-        )
-    )
-    logger.handlers = [handler]
+    file_handler.setFormatter(_json_fmt)
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_handler.setFormatter(_json_fmt)
+    logger.handlers = [file_handler, stdout_handler]
     logger.propagate = False
     return logger
 

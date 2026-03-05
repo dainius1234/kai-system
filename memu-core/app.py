@@ -196,6 +196,7 @@ class VectorStore(Protocol):
     def insert(self, record: MemoryRecord) -> VersionCommit: ...
     def search(self, top_k: int, query: Optional[str] = None) -> List[MemoryRecord]: ...
     def count(self) -> int: ...
+    def delete_old(self, max_age_days: int = 90) -> Dict[str, Any]: ...
     def get_state(self) -> Dict[str, Any]: ...
     def apply_state_delta(self, delta: Dict[str, Any]) -> VersionCommit: ...
     def compress(self) -> Dict[str, Any]: ...
@@ -413,6 +414,24 @@ class PGVectorStore:
         finally:
             self._put_conn(conn)
 
+    def delete_old(self, max_age_days: int = 90) -> Dict[str, Any]:
+        """Delete non-pinned memories older than max_age_days."""
+        from datetime import datetime, timedelta, timezone
+        cutoff = (datetime.now(tz=timezone.utc) - timedelta(days=max_age_days)).isoformat()
+        conn = self._get_conn()
+        try:
+            before = self.count()
+            with conn.cursor() as cur:
+                cur.execute(
+                    "DELETE FROM memories WHERE pinned = false AND timestamp < %s",
+                    (cutoff,),
+                )
+                deleted = cur.rowcount
+            conn.commit()
+            return {"before": before, "after": before - deleted, "deleted": deleted, "cutoff": cutoff}
+        finally:
+            self._put_conn(conn)
+
     def get_state(self) -> Dict[str, Any]:
         return dict(self._state)
 
@@ -456,6 +475,25 @@ class InMemoryVectorStore:
 
     def count(self) -> int:
         return len(self._records)
+
+    def delete_old(self, max_age_days: int = 90) -> Dict[str, Any]:
+        """Delete non-pinned memories older than max_age_days."""
+        from datetime import datetime, timedelta, timezone
+        cutoff = datetime.now(tz=timezone.utc) - timedelta(days=max_age_days)
+        before = len(self._records)
+        kept: List[MemoryRecord] = []
+        for r in self._records:
+            try:
+                ts = datetime.fromisoformat(r.timestamp)
+                if ts.tzinfo is None:
+                    ts = ts.replace(tzinfo=timezone.utc)
+            except (ValueError, TypeError):
+                ts = datetime.now(tz=timezone.utc)
+            if r.pinned or ts >= cutoff:
+                kept.append(r)
+        deleted = before - len(kept)
+        self._records = kept
+        return {"before": before, "after": len(kept), "deleted": deleted, "cutoff": cutoff.isoformat()}
 
     def get_state(self) -> Dict[str, Any]:
         return dict(self._state)
@@ -1148,6 +1186,16 @@ async def search_by_category(
 async def memory_stats() -> Dict[str, Any]:
     counts = Counter(record.event_type for record in store.search(top_k=10_000))
     return {"status": "ok", "records": store.count(), "event_types": dict(counts), "commits": [c.__dict__ for c in store.vc.list_commits()[:20]]}
+
+
+@app.post("/memory/cleanup")
+async def memory_cleanup(max_age_days: int = 90) -> Dict[str, Any]:
+    """Delete non-pinned memories older than max_age_days."""
+    if max_age_days < 1:
+        return {"status": "error", "message": "max_age_days must be >= 1"}
+    result = store.delete_old(max_age_days)
+    logger.info("memory cleanup: deleted=%s cutoff=%s", result["deleted"], result["cutoff"])
+    return {"status": "ok", **result}
 
 
 @app.get("/memory/diagnostics")

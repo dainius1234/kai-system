@@ -143,6 +143,7 @@ make test-planner            # memory-driven planner tests
 make test-adversary          # adversary challenge engine tests (6 challenges)
 make test-dream-state        # P15 dream state consolidation tests
 make test-security-audit     # P9 security self-hacking audit tests
+make test-gaps-sprint        # JSON logging, vector cleanup, ledger stats tests
 
 # v7 feature tests
 make test-v7                 # verifier, quarantine, policy, idempotency, integration-chain
@@ -241,7 +242,7 @@ For architecture details see `docs/sovereign_ai_spec.md`.
 - All code must work in BOTH environments (stubs in codespace, live on laptop)
 
 ### Current State
-- **All 47 test-core targets pass.** Run `make test-core` to confirm.
+- **All 48 test-core targets pass.** Run `make test-core` to confirm.
 - **Phase 2 COMPLETE:** Specialist Router, Memory-Driven Planner, Adversary Challenge Engine — all built, tested, wired into `/chat` and `/run`.
 - **P1+P2 COMPLETE:** Failure Taxonomy, Metacognitive Rules, SELAUR learning value — all generating real episode metadata.
 - **P4+P5+P6 COMPLETE:** Contradiction Memory, GEM Cognitive Alignment, Knowledge Boundary Mapping — full engines in memu-core + kai_config + planner + app.py.
