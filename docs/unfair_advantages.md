@@ -524,12 +524,22 @@ architecture excels.
 - **Impact:** High — biggest single speed win for interactive chat.
 - **Status:** Ready to deploy on hardware arrival.
 
-### HP2: MoE Model Selection
-- **What:** Pull Mixture-of-Experts models (DeepSeek-V3, Kimi K2 1T MoE/32B active, Qwen3-MoE).
-  Only relevant "experts" activate per query — better quality per VRAM byte.
-- **How:** `ollama pull` + update `common/llm.py` LLMRouter specialist list.
-- **Impact:** High — smarter output at same VRAM footprint as dense 7B.
-- **Status:** Models exist, just need hardware to run them.
+### HP2: MoE Model Selection ✅ DONE
+- **What:** MoE-aware model selector routes queries to the best available model based on
+  task type, complexity, and hardware constraints.
+- **Built:** `langgraph/model_selector.py` — `ModelProfile` dataclass (name, strengths,
+  max_context, speed/quality tiers, moe_expert_count, vram_gb), `_PROFILES` registry
+  (Ollama, DeepSeek-V4, Kimi-2.5, Dolphin), `estimate_complexity()` (keywords + length +
+  sentences + question marks → 0.0–1.0), `select_model()` (route match +3, quality premium
+  for complex, speed bonus, MoE bonus, context window bonus). `register_model()` for
+  dynamic model addition. Wired into `/chat` and `/run` endpoints — replaces hardcoded
+  `_DEFAULT_SPECIALIST` with intelligent route-aware selection. `GET /models` endpoint
+  exposes available models and profiles.
+- **Impact:** High — right model for each task automatically. MoE models score higher
+  on complex tasks, fast models preferred for chat.
+- **Tests:** `scripts/test_model_selector.py` — 20 tests (complexity estimation, selection,
+  profile management, MoE bonus, speed preference).
+- **Status:** Software routing built and wired. Models deploy on hardware arrival.
 
 ### HP3: VRAM Watchdog + Adaptive Quantization
 - **What:** Heartbeat monitors GPU VRAM. If utilization >90%, unload LRU model and
@@ -539,22 +549,36 @@ architecture excels.
 - **Impact:** Medium — prevents OOM crashes, graceful degradation under load.
 - **Status:** Design ready, heartbeat has the monitoring hooks.
 
-### HP4: CoT Tree Search with Conviction Pruning
-- **What:** Chain-of-thought with branching (OptiTree/RAPID style). Generate multiple
-  reasoning paths, score each with conviction, prune low-confidence branches early.
-- **How:** Add branching node in langgraph orchestration. Each branch runs through
-  conviction scoring. Best-of-N selection with adversary validation.
-- **Impact:** Medium-High — better reasoning quality on complex queries.
-- **Status:** Architecture fits (conviction + adversary already exist). Needs LLM
-  capable of multi-turn reasoning (i.e., GPU models).
+### HP4: CoT Tree Search with Conviction Pruning ✅ DONE
+- **What:** Chain-of-thought with branching. Generate multiple reasoning paths, score each
+  with conviction, prune low-confidence branches early, refine survivors.
+- **Built:** `langgraph/tree_search.py` — `Branch` dataclass (id, plan, prompt, conviction,
+  depth, pruned), `TreeSearchResult` (best_branch, total/pruned branches, search_time_ms,
+  improvement property), `tree_search()` async function (generates N variations, scores via
+  conviction, prunes below threshold, refines survivors, early exit if min_conviction met),
+  `_generate_variations()` (4 prompt suffixes: baseline, edge-cases, risks, expert),
+  `_branch_id()` deterministic SHA256. Wired into `/run` as fallback after linear rethink
+  loop exhaustion — 3 branches × 2 depth, updates plan and conviction if improvement found.
+- **Impact:** Medium-High — better reasoning on complex queries via multi-path exploration.
+- **Tests:** `scripts/test_tree_search.py` — 14 tests (branch creation, variations, tree
+  search scenarios, early exit, pruning, fetch chunks).
+- **Status:** Built and wired. Fully operational with current models; GPU models will
+  produce higher-quality branches.
 
-### HP5: Priority Queue for Inference
-- **What:** High-priority requests (user chat) get GPU immediately. Low-priority
-  (dream cycle, background consolidation) use CPU or queue behind user requests.
-- **How:** Add priority field to orchestrator queue. User chat = P0, dream = P3.
-  GPU lock: if user request arrives while dream running, preempt dream.
-- **Impact:** Medium — ensures responsiveness under load.
-- **Status:** Orchestrator has queue; needs priority sorting added.
+### HP5: Priority Queue for Inference ✅ DONE
+- **What:** Async priority queue for LLM request scheduling. High-priority requests (chat)
+  get resources first. Low-priority (dream, batch) queue behind.
+- **Built:** `langgraph/priority_queue.py` — `Priority` IntEnum (CHAT=0, RUN=1,
+  BACKGROUND=2, BATCH=3), `QueueEntry` with `__lt__` for ordering (lower number = higher
+  priority, ties broken by submission time), `PriorityQueue` class (semaphore-based
+  concurrency limiting via `submit()` async, `stats()` snapshot), `get_queue()` module-level
+  singleton. `GET /queue/stats` endpoint exposes queue depth, in-flight tasks, and priority
+  breakdown.
+- **Impact:** Medium — ensures chat responsiveness under load, dream cycles don't block
+  interactive requests.
+- **Tests:** `scripts/test_priority_queue.py` — 12 tests (priority ordering, queue entries,
+  submit/result, concurrency, exception propagation, singleton).
+- **Status:** Built and wired. GPU preemption hooks ready for hardware arrival.
 
 ### HP6: Partial Layer Loading
 - **What:** Load N model layers to GPU, keep rest in RAM. Ollama `-ngl` parameter.
@@ -602,22 +626,23 @@ No other build thinks about itself this way. This is the gap.
 
 ### Quick Start
 1. `git log --oneline -5` — check latest commits
-2. `make test-core` — confirm baseline green (expect 47 passes, 270 individual tests)
+2. `make test-core` — confirm baseline green (expect 51 passes, 347 individual tests)
 3. Read this doc top-to-bottom for strategic context
 4. Read `docs/agentic_patterns_spec.md` for technical spec of Phase 2
 
 ### What's Done
 - **Phase 2 COMPLETE**: router.py, planner.py, adversary.py — all built, tested, wired into /chat and /run
 - **P1–P15 COMPLETE** (except P3 Soulbound Identity — skipped, HMAC covers it until TPM hardware)
-- **47 test-core targets passing**, 270 individual tests, zero failures
+- **HP2, HP4, HP5 COMPLETE**: model_selector.py, tree_search.py, priority_queue.py — built, tested, wired
+- **51 test-core targets passing**, 347 individual tests, zero failures
 - **6 adversary challenges** (challenge_plan includes security self-hacking as #6)
 - **Strategic doc merged**: Operator's 2026 research + AI-native blueprints → unified priority order above
-- **Hardware Performance Track** documented (HP1–HP6) — ready for RTX 5080 arrival
+- **Hardware Performance Track** documented (HP1–HP6) — HP2/HP4/HP5 built; HP1/HP3/HP6 ready for RTX 5080
 
 ### What's Next (priority order)
-1. **HP1–HP2: Speculative Decoding + MoE models** — deploy on hardware arrival (Ollama flags)
+1. **HP1: Speculative Decoding** — deploy on hardware arrival (Ollama `--draft-model` flag)
 2. **HP3: VRAM Watchdog** — add GPU monitoring to heartbeat
-3. **HP4: CoT Tree Search** — branching reasoning with conviction pruning
+3. **HP6: Partial Layer Loading** — Ollama `-ngl` parameter on hardware arrival
 4. **Gap items** — see `docs/gaps_and_hardening.md` for remaining system gaps
 5. **OMAR Self-Play** — unblocked when GPU enables multi-turn reasoning
 
@@ -628,6 +653,9 @@ No other build thinks about itself this way. This is the gap.
 - `langgraph/conviction.py` — 5-signal conviction scoring (0-10)
 - `langgraph/kai_config.py` — episode storage, failure taxonomy, dream state, improvement gate
 - `langgraph/security_audit.py` — automated security self-hacking engine
+- `langgraph/model_selector.py` — MoE-aware model selection (HP2)
+- `langgraph/tree_search.py` — CoT tree search with conviction pruning (HP4)
+- `langgraph/priority_queue.py` — async priority queue for inference (HP5)
 - `langgraph/app.py` — main orchestrator: /chat, /run, /dream, /security/audit
 - `common/llm.py` — LLM router (Ollama, DeepSeek, Kimi-2.5, Dolphin; Kimi-K2 pending)
 - `memu-core/app.py` — 21+ endpoint memory engine

@@ -24,6 +24,9 @@ from router import classify, dispatch_route
 from planner import gather_context, build_enriched_plan, predict_next_request, pre_fetch_predicted_context
 from adversary import challenge_plan, verdict_to_plan_metadata
 from security_audit import run_security_audit
+from tree_search import tree_search, TreeSearchResult
+from priority_queue import Priority, get_queue
+from model_selector import select_model, estimate_complexity
 
 logger = setup_json_logger("langgraph", os.getenv("LOG_PATH", "/tmp/langgraph.json.log"))
 DEVICE = detect_device()
@@ -278,6 +281,26 @@ async def metrics() -> Dict[str, float]:
     return budget.snapshot()
 
 
+@app.get("/queue/stats")
+async def queue_stats() -> Dict[str, Any]:
+    """HP5: Priority queue statistics."""
+    q = get_queue()
+    s = q.stats()
+    return {"pending": s.pending, "active": s.active, "total_processed": s.total_processed, "avg_wait_ms": s.avg_wait_ms}
+
+
+@app.get("/models")
+async def models_info() -> Dict[str, Any]:
+    """HP2: Available models and selection info."""
+    from model_selector import list_models, get_profile
+    profiles = {}
+    for name in list_models():
+        p = get_profile(name)
+        if p:
+            profiles[name] = {"strengths": p.strengths, "speed_tier": p.speed_tier, "quality_tier": p.quality_tier, "moe_experts": p.moe_expert_count}
+    return {"available_live": _llm.available, "registered": profiles}
+
+
 # ── LLM router (Kai's brain) ────────────────────────────────────────
 _llm = LLMRouter()
 _DEFAULT_SPECIALIST = os.getenv("DEFAULT_SPECIALIST", "Ollama")
@@ -461,7 +484,7 @@ async def chat_stream(req: ChatRequest):
                 yield f"data: {json.dumps({'token': '[Kai\'s brain needs a moment — LLM circuit breaker is open. Try again shortly.]'})}\n\n"
                 yield "data: [DONE]\n\n"
                 return
-            async for token in _llm.stream(_DEFAULT_SPECIALIST, messages):
+            async for token in _llm.stream(select_model(route_decision.route, user_msg, _llm.available, prefer_speed=True), messages):
                 full_response.append(token)
                 yield f"data: {json.dumps({'token': token})}\n\n"
             LLM_BREAKER.record_success()
@@ -510,7 +533,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
         }
     )
 
-    specialist = infer_specialist_fallback(request.user_input, request.task_hint)
+    specialist = select_model("EXECUTE_ACTION", request.user_input, _llm.available)
     if MEMU_BREAKER.allow() and MEMU_ERROR_GUARD.allow():
         try:
             async with httpx.AsyncClient() as client:
@@ -612,6 +635,33 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
         plan["reflection_feedback"] = feedback
         plan["rethink_count"] = rethink_count
         conviction = score_conviction(prompt, plan, chunk_dicts, rethink_count)
+
+    # HP4: If rethink loop exhausted and still below threshold, try tree search
+    if conviction < MIN_CONVICTION and rethink_count >= MAX_RETHINKS and not override_active:
+        tree_result = await tree_search(
+            user_input=request.user_input,
+            specialist=specialist,
+            chunk_dicts=chunk_dicts,
+            build_plan_fn=build_plan,
+            score_fn=score_conviction,
+            fetch_chunks_fn=lambda p: fetch_offline_chunks(p, user_id="keeper", top_k=5),
+            n_branches=3,
+            max_depth=2,
+            prune_threshold=MIN_CONVICTION * 0.5,
+            min_conviction=MIN_CONVICTION,
+        )
+        if tree_result.best_branch.conviction > conviction:
+            plan = tree_result.best_branch.plan
+            conviction = tree_result.best_branch.conviction
+            plan["tree_search"] = {
+                "total_branches": tree_result.total_branches,
+                "pruned": tree_result.pruned_branches,
+                "improvement": round(tree_result.improvement, 2),
+                "search_time_ms": tree_result.search_time_ms,
+            }
+            logger.info("Tree search improved conviction: %.1f → %.1f (%d branches)",
+                        tree_result.all_scores[0] if tree_result.all_scores else 0,
+                        conviction, tree_result.total_branches)
 
     if override_active:
         plan["conviction_override"] = "operator override matched"

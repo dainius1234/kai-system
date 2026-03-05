@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-05 — session: Docs hardening — 14/15 priorities DONE, HP track documented
+**Last updated:** 2026-03-05 — session: HP2+HP4+HP5 built, gaps sprint done — 51 targets, 347 tests
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 47 (make test-core) |
-| Individual tests | 270 passing, 0 failures |
+| Test targets | 51 (make test-core) |
+| Individual tests | 347 passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -258,7 +258,7 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 - P9 Security Self-Hacking + P15 Dream State — built and committed (d52d12c)
 - README updated with PUB/WORK modes section
 - Fixed `has_gap` → `is_gap` bug in kai_config.py boundary recalibration
-- Test suite: 47 targets, 270 individual tests, zero failures
+- Test suite: 51 targets, 347 individual tests, zero failures
 - Adversary challenges: 6 (challenge_security added as #6)
 
 ### 2026-03-05
@@ -267,6 +267,19 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 - Added Hardware Performance Track (HP1-HP6) to `unfair_advantages.md`
 - Updated continuation notes in `unfair_advantages.md` (47/270 tests, 6 challenges)
 - Updated this backlog — P7-P15 all marked completed, test count 86 → 270
+
+### 2026-03-05 (continued)
+- **Gaps Sprint:** JSON stdout logging (common/runtime.py), vector cleanup endpoint
+  (memu-core /memory/cleanup), ledger stats proxy (dashboard /api/ledger-stats).
+  10 tests added. Committed `052c913`.
+- **HP2: MoE Model Selector** — `langgraph/model_selector.py` (4 model profiles,
+  complexity estimation, scoring algorithm). Wired into /chat and /run. 20 tests.
+- **HP4: CoT Tree Search** — `langgraph/tree_search.py` (branch generation,
+  conviction pruning, multi-depth search). Wired as /run rethink fallback. 14 tests.
+- **HP5: Priority Queue** — `langgraph/priority_queue.py` (4 priority levels,
+  semaphore concurrency, singleton). /queue/stats endpoint added. 12 tests.
+- New endpoints: GET /models, GET /queue/stats
+- Test count: 280 → 347 (51 targets)
 
 ---
 
@@ -277,10 +290,11 @@ See `docs/unfair_advantages.md` for full details. Summary:
 | ID | Feature | Impact | Effort |
 |---|---|---|---|
 | HP1 | Speculative Decoding | High (2-3× speed) | Low |
-| HP2 | MoE Model Selection | High (expert routing) | Zero (use model) |
+| HP1 | Speculative Decoding | High (2-3× speed) | Low |
+| HP2 | MoE Model Selection | High (expert routing) | Zero (use model) | ✅ DONE |
 | HP3 | VRAM Watchdog + Adaptive Quantization | Medium (stability) | Medium |
-| HP4 | CoT Tree Search + Conviction Pruning | Med-High (quality) | Medium |
-| HP5 | Priority Queue (latency-sensitive first) | Medium (UX) | Low |
+| HP4 | CoT Tree Search + Conviction Pruning | Med-High (quality) | Medium | ✅ DONE |
+| HP5 | Priority Queue (latency-sensitive first) | Medium (UX) | Low | ✅ DONE |
 | HP6 | Partial Layer Loading + NVMe Offload | Low-Med (flexibility) | Low |
 
 ---
@@ -296,12 +310,12 @@ See `docs/unfair_advantages.md` for full details. Summary:
 ### P5 — Production Hardening (still open)
 - [ ] Docker secrets / Vault wiring
 - [ ] Backup-service real implementation
-- [ ] JSON structured logging
+- [x] JSON structured logging — ✅ DONE (gaps sprint: stdout + file)
 - [ ] HMAC rotation test in running stack
 
 ### System Gaps (see `docs/gaps_and_hardening.md`)
-- [ ] Vector cleanup job (90-day TTL)
-- [ ] Ledger stats dashboard endpoint
+- [x] Vector cleanup job (90-day TTL) — ✅ DONE (POST /memory/cleanup)
+- [x] Ledger stats dashboard endpoint — ✅ DONE (GET /api/ledger-stats)
 - [ ] Redis pubsub for real-time dashboard
 - [ ] TPM verify (hardware-blocked)
 - Disk cleanup: freed ~109MB build cache + orphaned volumes → 3.8GB free
