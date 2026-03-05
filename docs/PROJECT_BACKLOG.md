@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-02-26 — session: Quality hardening — 25 containers, LLM + TTS + STT + Telegram live
+**Last updated:** 2026-03-05 — session: Docs hardening — 14/15 priorities DONE, HP track documented
 
 ---
 
@@ -21,8 +21,9 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Tests | 86 passing |
-| Lines of Python | ~12,000 |
+| Test targets | 47 (make test-core) |
+| Individual tests | 270 passing, 0 failures |
+| Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
 | Real LLM wired? | **YES — qwen2:0.5b via Ollama (CPU)** |
@@ -31,7 +32,10 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Real voice output? | **YES — edge-tts (British Ryan Neural)** |
 | Real speech-to-text? | **YES — faster-whisper tiny (CPU)** |
 | Can Kai learn right now? | **YES — memorize → pgvector, retrieve → cosine similarity, spaced repetition** |
-| Chat UI? | **YES — markdown, persistence, streaming, stop/copy** |
+| Chat UI? | **YES — markdown, persistence, streaming, stop/copy, PUB/WORK modes** |
+| Dream state? | **YES — 6-phase memory consolidation, boundary recalibration** |
+| Security self-hacking? | **YES — 4 audit categories, 34 payloads, 6 adversary challenges** |
+| Thinking dashboard? | **YES — 6 visualization cards (conviction, tempo, boundary, silence, dream, security)** |
 
 ---
 
@@ -183,6 +187,57 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 - [x] Tool-gate with co-sign flow
 - [x] Ledger with hash-chain integrity
 
+### P7 — Agentic patterns (2026-02-28)
+- [x] Episode saver with fallback (memory, disk, spool)
+- [x] Episode spool integrity with checksum verification
+- [x] Error budget circuit breaker (window-based, auto-recovery)
+- [x] Specialist router (8-category classification + LLM fallback)
+- [x] Memory-driven planner (gap analysis, recent-weighted, priority queue)
+- [x] Invoice generator (memu-core /invoice endpoint)
+- [x] Memu retrieval ranking (recency, importance, access boost)
+
+### P8 — Dashboard Thinking Pathways (2026-03-01)
+- [x] Thinking Pathways page (thinking.html)
+- [x] 4 visualization cards (conviction, tempo, boundary, silence)
+- [x] Real-time data from fusion-engine + langgraph endpoints
+- [x] Chart.js gauge + radar visualizations
+
+### P9 — Security Self-Hacking (2026-03-04)
+- [x] Security audit engine (langgraph/security_audit.py)
+- [x] 4 audit categories: injection, auth_bypass, data_leak, resource_abuse
+- [x] 21 + 13 test payloads (34 total)
+- [x] 6 adversary challenges (including challenge_security)
+- [x] Dashboard security audit card + runSecurityAudit() JS
+- [x] 23 unit tests
+
+### P10 — memu-core retrieval hardening (2026-02-28)
+- [x] Multi-signal retrieval ranking
+- [x] Recency + importance + access boost scoring
+
+### P11 — Specialist router (2026-02-28)
+- [x] 8-category keyword classification
+- [x] LLM fallback for ambiguous queries
+
+### P12 — Memory-driven planner (2026-02-28)
+- [x] Gap analysis from memory
+- [x] Priority queue with recent-weighted scoring
+
+### P13 — Error budget breaker (2026-02-28)
+- [x] Window-based error tracking
+- [x] Auto-recovery on success streak
+
+### P14 — Adversary challenge engine (2026-02-28)
+- [x] 6 challenge types (hallucination, confidence, evidence, boundary, planning, security)
+- [x] ChallengeResult with modifier + confidence
+
+### P15 — Dream State (2026-03-04)
+- [x] 6-phase dream cycle (ENTER → CONSOLIDATE → PRUNE → CONNECT → RECALIBRATE → WAKE)
+- [x] Memory consolidation (cluster, merge, boost high-importance)
+- [x] Boundary recalibration (gap detection, drift detection)
+- [x] DreamInsight generation
+- [x] Dashboard dream card + triggerDream() JS
+- [x] 26 unit tests
+
 ---
 
 ## Session Notes
@@ -198,6 +253,57 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 - Chat UI: session persistence (localStorage for messages + sessionId + mode)
 - Chat UI: stop generation button (AbortController)
 - Chat UI: copy response button on assistant messages
+
+### 2026-03-04
+- P9 Security Self-Hacking + P15 Dream State — built and committed (d52d12c)
+- README updated with PUB/WORK modes section
+- Fixed `has_gap` → `is_gap` bug in kai_config.py boundary recalibration
+- Test suite: 47 targets, 270 individual tests, zero failures
+- Adversary challenges: 6 (challenge_security added as #6)
+
+### 2026-03-05
+- Full documentation hardening pass
+- Created `docs/gaps_and_hardening.md` — honest status on all gap items
+- Added Hardware Performance Track (HP1-HP6) to `unfair_advantages.md`
+- Updated continuation notes in `unfair_advantages.md` (47/270 tests, 6 challenges)
+- Updated this backlog — P7-P15 all marked completed, test count 86 → 270
+
+---
+
+## Hardware Performance Track (Future — GPU Arrival)
+
+See `docs/unfair_advantages.md` for full details. Summary:
+
+| ID | Feature | Impact | Effort |
+|---|---|---|---|
+| HP1 | Speculative Decoding | High (2-3× speed) | Low |
+| HP2 | MoE Model Selection | High (expert routing) | Zero (use model) |
+| HP3 | VRAM Watchdog + Adaptive Quantization | Medium (stability) | Medium |
+| HP4 | CoT Tree Search + Conviction Pruning | Med-High (quality) | Medium |
+| HP5 | Priority Queue (latency-sensitive first) | Medium (UX) | Low |
+| HP6 | Partial Layer Loading + NVMe Offload | Low-Med (flexibility) | Low |
+
+---
+
+## Remaining Open Items
+
+### P3 — Organic Memory (still open)
+- [ ] Spaced repetition enforcement (production decay path)
+- [ ] Proactive memory surfacing (background loop)
+- [ ] Learning from corrections (verifier → memory feedback)
+- [ ] Category-aware retrieval boosting
+
+### P5 — Production Hardening (still open)
+- [ ] Docker secrets / Vault wiring
+- [ ] Backup-service real implementation
+- [ ] JSON structured logging
+- [ ] HMAC rotation test in running stack
+
+### System Gaps (see `docs/gaps_and_hardening.md`)
+- [ ] Vector cleanup job (90-day TTL)
+- [ ] Ledger stats dashboard endpoint
+- [ ] Redis pubsub for real-time dashboard
+- [ ] TPM verify (hardware-blocked)
 - Disk cleanup: freed ~109MB build cache + orphaned volumes → 3.8GB free
 - Updated PROJECT_BACKLOG.md to reflect current reality
 - Test count: 86 (3 previously failing now fixed)

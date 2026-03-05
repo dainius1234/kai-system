@@ -512,6 +512,69 @@ architecture excels.
 
 ---
 
+## Hardware Performance Track (GPU Arrival)
+
+> Unlocked when RTX 5080 laptop arrives. All items are infrastructure-level
+> optimizations — they make Kai faster and more efficient, not smarter.
+> Intelligence features (P1–P15) are separate.
+
+### HP1: Speculative Decoding (Ollama)
+- **What:** Small draft model (1B) predicts tokens, large model verifies. 2–3x throughput.
+- **How:** Ollama `--draft-model` flag or API parameter. Zero code change.
+- **Impact:** High — biggest single speed win for interactive chat.
+- **Status:** Ready to deploy on hardware arrival.
+
+### HP2: MoE Model Selection
+- **What:** Pull Mixture-of-Experts models (DeepSeek-V3, Kimi K2 1T MoE/32B active, Qwen3-MoE).
+  Only relevant "experts" activate per query — better quality per VRAM byte.
+- **How:** `ollama pull` + update `common/llm.py` LLMRouter specialist list.
+- **Impact:** High — smarter output at same VRAM footprint as dense 7B.
+- **Status:** Models exist, just need hardware to run them.
+
+### HP3: VRAM Watchdog + Adaptive Quantization
+- **What:** Heartbeat monitors GPU VRAM. If utilization >90%, unload LRU model and
+  reload lower quantization variant (e.g. Q8 → Q4). If below 50%, upgrade to higher quant.
+- **How:** Add `nvidia-smi` polling to heartbeat, Ollama `/api/ps` for loaded models,
+  Ollama `/api/pull` with quantization suffix.
+- **Impact:** Medium — prevents OOM crashes, graceful degradation under load.
+- **Status:** Design ready, heartbeat has the monitoring hooks.
+
+### HP4: CoT Tree Search with Conviction Pruning
+- **What:** Chain-of-thought with branching (OptiTree/RAPID style). Generate multiple
+  reasoning paths, score each with conviction, prune low-confidence branches early.
+- **How:** Add branching node in langgraph orchestration. Each branch runs through
+  conviction scoring. Best-of-N selection with adversary validation.
+- **Impact:** Medium-High — better reasoning quality on complex queries.
+- **Status:** Architecture fits (conviction + adversary already exist). Needs LLM
+  capable of multi-turn reasoning (i.e., GPU models).
+
+### HP5: Priority Queue for Inference
+- **What:** High-priority requests (user chat) get GPU immediately. Low-priority
+  (dream cycle, background consolidation) use CPU or queue behind user requests.
+- **How:** Add priority field to orchestrator queue. User chat = P0, dream = P3.
+  GPU lock: if user request arrives while dream running, preempt dream.
+- **Impact:** Medium — ensures responsiveness under load.
+- **Status:** Orchestrator has queue; needs priority sorting added.
+
+### HP6: Partial Layer Loading
+- **What:** Load N model layers to GPU, keep rest in RAM. Ollama `-ngl` parameter.
+- **How:** Set `OLLAMA_NUM_GPU` env var. Already supported.
+- **Impact:** Low-Medium — useful for running models larger than VRAM.
+- **Status:** Ready (Ollama native feature).
+
+### Parked Hardware Items
+- **vLLM backend:** Paged KV-cache + continuous batching. High throughput but adds
+  complexity vs Ollama. Revisit if Ollama becomes a bottleneck.
+- **NVMe layer offload:** `accelerate` disk_offload for models exceeding RAM+VRAM.
+  OS swap handles this adequately for now.
+- **FlashAttention-2:** Modern backends (Ollama, vLLM) use it by default. No action needed.
+- **Quantum-inspired embeddings:** Complex-valued vectors, Bell/CHSH checks, Qiskit surrogates.
+  Interesting research but unproven in production. No measurable advantage over standard
+  embeddings in benchmarks. Revisit when peer-reviewed results appear.
+- **Multi-GPU tensor parallelism:** For future multi-GPU setups. Single RTX 5080 for now.
+
+---
+
 ## The Ultimate Compound
 
 Phase 2 gave Kai: routing, planning, self-challenge, calibration.
@@ -535,38 +598,45 @@ No other build thinks about itself this way. This is the gap.
 
 ## Continuation Notes
 
-> **For AI assistants resuming work. Updated 4 March 2026.**
+> **For AI assistants resuming work. Updated 5 March 2026.**
 
 ### Quick Start
 1. `git log --oneline -5` — check latest commits
-2. `make test-core` — confirm baseline green (expect 33+ passes)
+2. `make test-core` — confirm baseline green (expect 47 passes, 270 individual tests)
 3. Read this doc top-to-bottom for strategic context
 4. Read `docs/agentic_patterns_spec.md` for technical spec of Phase 2
 
 ### What's Done
 - **Phase 2 COMPLETE**: router.py, planner.py, adversary.py — all built, tested, wired into /chat and /run
+- **P1–P15 COMPLETE** (except P3 Soulbound Identity — skipped, HMAC covers it until TPM hardware)
+- **47 test-core targets passing**, 270 individual tests, zero failures
+- **6 adversary challenges** (challenge_plan includes security self-hacking as #6)
 - **Strategic doc merged**: Operator's 2026 research + AI-native blueprints → unified priority order above
-- **33 test-core targets passing** as of commit bbb45ea
+- **Hardware Performance Track** documented (HP1–HP6) — ready for RTX 5080 arrival
 
-### What's Next (build in this order)
-1. **P1: Failure Taxonomy + Metacognitive Rules** → kai_config.py, app.py, adversary.py
-2. **P2: SELAUR** → app.py episode save logic
-3. **P3: Soulbound Identity** → pending/soulbound.py, memu-core integration
-4. **P4: TMC + Contradiction Memory** → memu-core/app.py, app.py
-5. **P5+: see priority table above**
+### What's Next (priority order)
+1. **HP1–HP2: Speculative Decoding + MoE models** — deploy on hardware arrival (Ollama flags)
+2. **HP3: VRAM Watchdog** — add GPU monitoring to heartbeat
+3. **HP4: CoT Tree Search** — branching reasoning with conviction pruning
+4. **Gap items** — see `docs/gaps_and_hardening.md` for remaining system gaps
+5. **OMAR Self-Play** — unblocked when GPU enables multi-turn reasoning
 
 ### Key File Map
 - `langgraph/router.py` — 8-route zero-LLM classifier
 - `langgraph/planner.py` — memory-driven planning with episode similarity
-- `langgraph/adversary.py` — 5-challenge stress-test engine
+- `langgraph/adversary.py` — 6-challenge stress-test engine
 - `langgraph/conviction.py` — 5-signal conviction scoring (0-10)
-- `langgraph/kai_config.py` — episode storage (Redis + checksummed spool)
-- `langgraph/app.py` — main orchestrator: /chat and /run endpoints
+- `langgraph/kai_config.py` — episode storage, failure taxonomy, dream state, improvement gate
+- `langgraph/security_audit.py` — automated security self-hacking engine
+- `langgraph/app.py` — main orchestrator: /chat, /run, /dream, /security/audit
 - `common/llm.py` — LLM router (Ollama, DeepSeek, Kimi-2.5, Dolphin; Kimi-K2 pending)
 - `memu-core/app.py` — 21+ endpoint memory engine
+- `dashboard/static/thinking.html` — cognitive transparency visualization
 
 ### LLM Strategy
 ALL models run locally via Ollama or OpenAI-compatible endpoints. No cloud.
 - Default: Ollama (qwen2 or any pulled model)
 - Specialist routing via `common/llm.py` LLMRouter
 - Kimi K2 (1T MoE, 32B active, Apache 2.0) pending addition for agentic tasks
+- HP1: Speculative decoding for 2-3x throughput on arrival
+- HP2: MoE models (DeepSeek-V3, Kimi K2, Qwen3-MoE) for better quality/VRAM
