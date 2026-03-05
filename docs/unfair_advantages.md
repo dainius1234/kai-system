@@ -261,13 +261,13 @@ architecture excels.
 | **P6** | Knowledge Boundary + Active Probing | KBM paper (#3) + our 4c | Medium | ✅ DONE |
 | **P7** | Silence-as-Signal | Our 4b | Small | ✅ DONE |
 | **P8** | Dashboard: Thinking Pathways | vLLM-SR (#5) + Phase 3 | Large | ✅ DONE |
-| **P9** | Security Self-Hacking | MSR paper (#9) | Medium | Not started |
+| **P9** | Security Self-Hacking | MSR paper (#9) | Medium | ✅ DONE |
 | **P10** | Predictive Pre-Computation | Our 4e | Medium | ✅ DONE |
 | **P11** | Operator Tempo Modeling | Our 4d | Medium | ✅ DONE |
 | **P12** | Self-Deception Detection | Our 4f | Medium | ✅ DONE |
 | **P13** | Recursive Self-Improvement Gate | Our 4g | Medium | ✅ DONE |
 | **P14** | Temporal Self-Model | Our 4i | Medium | ✅ DONE |
-| **P15** | Dream State (Offline Consolidation) | Our 4j | Large | Not started |
+| **P15** | Dream State (Offline Consolidation) | Our 4j | Large | ✅ DONE |
 | **Future** | OMAR Self-Play (#2/#13) | Needs spare local GPU | Large | Parked |
 | **Future** | ZK Privacy Learning (#10) | Heavy crypto infra | Large | Parked |
 | **Future** | ReCiSt Bio-Resilience (#4) | Already mostly built | Docs only | Parked |
@@ -453,7 +453,14 @@ architecture excels.
 
 ### P9–P15: Remaining Advantages
 
-- **P9: Security Self-Hacking** — prompt injection sandbox, recursive hardening
+- **P9: Security Self-Hacking** ✅ — `run_security_audit()` in `langgraph/security_audit.py`.
+  4 audit categories: injection filter fuzzing (21 bypass payloads), input sanitization
+  (13 adversarial payloads + XSS/SQL/path-traversal/command-injection), HMAC auth
+  boundary testing (4 edge cases), policy governance checks (4 env var audits).
+  `challenge_security()` wired as adversary challenge #6. Risk score 0.0–1.0
+  with severity-weighted findings. Dashboard: `GET /api/security-audit` proxy,
+  Security Self-Hacking card in thinking.html with risk gauge and findings list.
+  Tests: `scripts/test_security_audit.py` — 23 tests.
 - **P10: Predictive Pre-Computation** ✅ — `predict_next_request()` + `mine_request_sequences()`
   in planner.py. Mines bigram sequences from episode history to predict what the operator
   will ask next. Pre-fetches memory context for top-3 predictions via `pre_fetch_predicted_context()`.
@@ -481,7 +488,14 @@ architecture excels.
   Overall health: needs_attention (2+ declining), improving (2+ improving), stable.
   File-based persistence for period-over-period comparison.
   Tests: `scripts/test_temporal_self.py` — 19 tests.
-- **P15: Dream State** — deep reflection with cross-cluster synthesis
+- **P15: Dream State** ✅ — `run_dream_cycle()` in `langgraph/kai_config.py`.
+  6-phase offline consolidation: cluster failures by class, deduplicate metacognitive
+  rules (Jaccard similarity threshold), synthesize recurring patterns (struggling topics,
+  complex topics, learning trends), detect rule contradictions (always/never conflicts),
+  recalibrate knowledge boundary, package insights. `DreamCycle` + `DreamInsight`
+  dataclasses with file-based persistence (last 20 cycles). Dashboard: `POST /api/dream`
+  proxy, Dream State card in thinking.html with trigger button and insight visualization.
+  Tests: `scripts/test_dream_state.py` — 26 tests.
 
 ### Parked (Future Phases)
 

@@ -140,7 +140,9 @@ make test-invoice            # invoice tests
 make test-memu-retrieval     # memu retrieval tests
 make test-router             # specialist router classification tests
 make test-planner            # memory-driven planner tests
-make test-adversary          # adversary challenge engine tests
+make test-adversary          # adversary challenge engine tests (6 challenges)
+make test-dream-state        # P15 dream state consolidation tests
+make test-security-audit     # P9 security self-hacking audit tests
 
 # v7 feature tests
 make test-v7                 # verifier, quarantine, policy, idempotency, integration-chain
@@ -180,6 +182,29 @@ Run `make go_no_go` before committing to catch syntax errors early.
 
 ---
 
+## Personality Modes: PUB & WORK
+
+Kai operates in two distinct personality modes, toggled from the chat UI header:
+
+| Mode | Personality | Use Case |
+|------|------------|----------|
+| **WORK** | Professional, focused, precise. Proactive but concise. | Tasks, research, planning |
+| **PUB** | Casual, witty, opinionated. Real talk like a mate at the pub. | Open discussion, philosophy, banter |
+
+**How it works:**
+- The chat UI (`dashboard/static/chat.html`) has WORK/PUB toggle buttons in the header.
+- Selected mode is stored in the browser's `localStorage` as `kai-mode`.
+- Each chat request sends `{ "message": "...", "mode": "WORK" }` (or `"PUB"`) to `/chat`.
+- The langgraph service selects a system prompt from `_SYSTEM_PROMPTS` dict in `langgraph/app.py`.
+- If no mode is specified, defaults to **PUB**.
+- Mode can also be fetched from tool-gate's `/mode` endpoint for cross-service consistency.
+
+**WORK mode prompt** (summary): Sovereign AI assistant — professional, focused, proactive, concise but thorough. Never lies, never sugarcoats.
+
+**PUB mode prompt** (summary): Genuine mate — casual, witty, opinionated. All topics welcome (politics, science, philosophy, dark humour). Not a service, a companion.
+
+---
+
 ## Key Guidelines
 
 - Always add or update `requirements.txt` when introducing new Python dependencies.
@@ -216,13 +241,15 @@ For architecture details see `docs/sovereign_ai_spec.md`.
 - All code must work in BOTH environments (stubs in codespace, live on laptop)
 
 ### Current State
-- **All 45 test-core targets pass.** Run `make test-core` to confirm.
+- **All 47 test-core targets pass.** Run `make test-core` to confirm.
 - **Phase 2 COMPLETE:** Specialist Router, Memory-Driven Planner, Adversary Challenge Engine — all built, tested, wired into `/chat` and `/run`.
 - **P1+P2 COMPLETE:** Failure Taxonomy, Metacognitive Rules, SELAUR learning value — all generating real episode metadata.
 - **P4+P5+P6 COMPLETE:** Contradiction Memory, GEM Cognitive Alignment, Knowledge Boundary Mapping — full engines in memu-core + kai_config + planner + app.py.
 - **P7+P12+P14 COMPLETE:** Silence-as-Signal, Self-Deception Detection, Temporal Self-Model — cognitive self-awareness layer.
 - **P10+P11+P13 COMPLETE:** Predictive Pre-Computation, Operator Tempo Modeling, Recursive Self-Improvement Gate — adaptive intelligence layer.
 - **P8 COMPLETE:** Dashboard Thinking Pathways — cognitive transparency visualization (conviction pipeline, tempo gauge, boundary map, silence signals, self-assessment).
+- **P9 COMPLETE:** Security Self-Hacking — automated security audit engine (injection fuzzing, sanitization, HMAC boundary, policy governance). 6th adversary challenge. Risk scoring.
+- **P15 COMPLETE:** Dream State — offline consolidation engine (failure clustering, rule deduplication, pattern synthesis, contradiction detection, boundary recalibration).
 - **Merged Action Plan:** Operator's 2026 paper research + AI-native blueprints → 15 prioritised advantages in `docs/unfair_advantages.md`.
 - **LLM strategy:** ALL local models via Ollama. Kimi K2 (1T MoE, Apache 2.0) pending addition.
 
@@ -237,7 +264,7 @@ For architecture details see `docs/sovereign_ai_spec.md`.
 Request → injection filter → specialist selection → session buffer
   → gather_context() (memory + episodes + corrections + nudges + preferences)
   → build_enriched_plan() (history + conviction modifiers + preference constraints)
-  → challenge_plan() (5 adversary challenges in parallel)
+  → challenge_plan() (6 adversary challenges in parallel)
   → conviction scoring (5-signal + planner modifier + adversary modifier)
   → rethink loop (if conviction < 8.0, max 3 retries)
   → tool-gate policy check (HMAC, rate limit, co-sign)
@@ -257,8 +284,10 @@ Request → injection filter → specialist selection → session buffer
 | P6 | Knowledge Boundary + Active Probing | kai_config.py, memu-core/app.py | ✅ DONE |
 | P7 | Silence-as-Signal | memu-core/app.py | ✅ DONE |
 | P8 | Dashboard: Thinking Pathways | dashboard/app.py, static/thinking.html | ✅ DONE |
+| P9 | Security Self-Hacking | langgraph/security_audit.py, adversary.py, app.py | ✅ DONE |
+| P15 | Dream State (Offline Consolidation) | langgraph/kai_config.py, app.py, dashboard | ✅ DONE |
 
-Full details + P9-P15 + parked items in `docs/unfair_advantages.md`.
+Full details + parked items in `docs/unfair_advantages.md`.
 
 P10 (Predictive Pre-Computation), P11 (Operator Tempo), P12 (Self-Deception Detection), P13 (Self-Improvement Gate), and P14 (Temporal Self-Model) also complete — see unfair_advantages.md.
 
@@ -280,4 +309,5 @@ P10 (Predictive Pre-Computation), P11 (Operator Tempo), P12 (Self-Deception Dete
 - [x] P13: Recursive Self-Improvement Gate (20 tests)
 - [x] P14: Temporal Self-Model (19 tests)
 - [x] P8: Dashboard Thinking Pathways (21 tests)
-- [ ] P9, P15: see build order above
+- [x] P9: Security Self-Hacking (23 tests)
+- [x] P15: Dream State (26 tests)

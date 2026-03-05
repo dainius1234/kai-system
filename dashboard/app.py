@@ -428,6 +428,32 @@ async def api_self_assessment():
         return {"status": "unavailable"}
 
 
+@app.post("/api/dream")
+async def api_dream():
+    """Trigger a dream consolidation cycle via langgraph."""
+    langgraph_url = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(f"{langgraph_url}/dream")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable", "message": "Cannot reach langgraph for dream cycle"}
+
+
+@app.get("/api/security-audit")
+async def api_security_audit():
+    """Proxy security self-hacking audit from langgraph."""
+    langgraph_url = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.get(f"{langgraph_url}/security/audit")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable", "findings": [], "risk_score": -1}
+
+
 # ── Chat proxy — Kai's face ─────────────────────────────────────────
 LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
 

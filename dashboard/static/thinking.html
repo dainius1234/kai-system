@@ -250,6 +250,24 @@
       <div id="assessmentContent"><div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
     </div>
 
+    <!-- ── Dream State ───────────────────────────────── -->
+    <div class="card full-width" id="dreamCard">
+      <div class="card-title">
+        <span class="icon">💤</span> Dream State — Offline Consolidation
+        <button class="refresh-btn" style="margin-left:auto;" onclick="triggerDream()">⚡ Trigger Dream Cycle</button>
+      </div>
+      <div id="dreamContent"><div class="empty">Click "Trigger Dream Cycle" to run deep consolidation. Kai analyses all episodes, deduplicates rules, clusters failures, and discovers patterns.</div></div>
+    </div>
+
+    <!-- ── Security Self-Hacking ─────────────────────── -->
+    <div class="card full-width" id="securityCard">
+      <div class="card-title">
+        <span class="icon">🔒</span> Security Self-Hacking Audit
+        <button class="refresh-btn" style="margin-left:auto;" onclick="runSecurityAudit()">🛡 Run Audit</button>
+      </div>
+      <div id="securityContent"><div class="empty">Click "Run Audit" to fuzz-test injection filters, sanitization, and policy governance. Kai attacks its own defences to find weaknesses.</div></div>
+    </div>
+
   </div>
 
   <script>
@@ -583,6 +601,120 @@
         document.getElementById('assessmentContent').innerHTML = html;
       } catch (e) {
         document.getElementById('assessmentContent').innerHTML = '<div class="empty">Self-assessment service unavailable</div>';
+      }
+    }
+
+    // ── Trigger Dream Cycle ────────────────────────────
+    async function triggerDream() {
+      const content = document.getElementById('dreamContent');
+      content.innerHTML = '<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div> Running dream consolidation...</div>';
+      try {
+        const resp = await fetch('/api/dream', { method: 'POST' });
+        if (!resp.ok) throw new Error('unavailable');
+        const data = await resp.json();
+
+        if (data.status === 'insufficient_data') {
+          content.innerHTML = `<div class="empty">${escapeHtml(data.message)}</div>`;
+          return;
+        }
+        if (data.status === 'unavailable') {
+          content.innerHTML = '<div class="empty">Cannot reach langgraph — is the stack running?</div>';
+          return;
+        }
+
+        let html = `<div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+          <div class="pipeline-stage"><div class="label">Episodes</div><div class="value">${data.episodes_analysed}</div></div>
+          <div class="pipeline-stage"><div class="label">Insights</div><div class="value" style="color:var(--accent)">${data.insights_count}</div></div>
+          <div class="pipeline-stage"><div class="label">Rules Merged</div><div class="value">${data.merged_rules}</div></div>
+          <div class="pipeline-stage"><div class="label">Boundary Gaps</div><div class="value" style="color:${data.boundary_gaps > 0 ? 'var(--warn)' : 'var(--ok)'}">${data.boundary_gaps}</div></div>
+          <div class="pipeline-stage"><div class="label">Duration</div><div class="value" style="font-size:1rem">${data.duration_ms.toFixed(0)}ms</div></div>
+        </div>`;
+
+        const insights = data.insights || [];
+        if (insights.length) {
+          html += '<div class="episode-list" style="max-height:300px;">';
+          for (const ins of insights) {
+            const typeColors = {
+              pattern: 'var(--accent)', failure_cluster: 'var(--danger)',
+              rule_merge: 'var(--accent2)', boundary_shift: 'var(--warn)',
+              contradiction: 'var(--danger)'
+            };
+            const color = typeColors[ins.insight_type] || 'var(--muted)';
+            html += `<div class="episode" style="border-left-color:${color};">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:0.7rem;color:${color};text-transform:uppercase;font-weight:700;">${escapeHtml(ins.insight_type)}</span>
+                <span style="font-size:0.7rem;color:var(--muted);">${ins.actionable ? '⚡ Actionable' : '📊 Informational'}</span>
+              </div>
+              <div style="font-size:0.85rem;margin-top:0.3rem;">${escapeHtml(ins.description)}</div>
+              <div style="font-size:0.7rem;color:var(--muted);margin-top:0.2rem;">Confidence: ${(ins.confidence * 100).toFixed(0)}% · ${ins.source_episodes} episodes</div>
+            </div>`;
+          }
+          html += '</div>';
+        } else {
+          html += '<div class="empty">No insights generated — system is running cleanly.</div>';
+        }
+
+        content.innerHTML = html;
+      } catch (e) {
+        content.innerHTML = '<div class="empty">Dream cycle failed — check if langgraph is running.</div>';
+      }
+    }
+
+    // ── Security Audit ──────────────────────────────────
+    async function runSecurityAudit() {
+      const content = document.getElementById('securityContent');
+      content.innerHTML = '<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div> Running security audit...</div>';
+      try {
+        const resp = await fetch('/api/security-audit');
+        if (!resp.ok) throw new Error('unavailable');
+        const data = await resp.json();
+
+        if (data.status === 'unavailable') {
+          content.innerHTML = '<div class="empty">Cannot reach langgraph for security audit.</div>';
+          return;
+        }
+
+        const risk = data.risk_score || 0;
+        const riskColor = risk >= 0.5 ? 'var(--danger)' : risk >= 0.2 ? 'var(--warn)' : 'var(--ok)';
+        const riskLabel = risk >= 0.5 ? 'HIGH RISK' : risk >= 0.2 ? 'MODERATE' : 'LOW RISK';
+        const findings = data.findings || [];
+
+        let html = `<div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:1rem;">
+          <div style="text-align:center;">
+            <div style="font-size:2rem;font-weight:700;color:${riskColor}">${(risk * 100).toFixed(0)}%</div>
+            <div style="font-size:0.7rem;color:${riskColor};font-weight:600;">${riskLabel}</div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:0.85rem;color:var(--muted);">
+              ${data.passed || 0}/${data.total_tests || 0} tests passed &middot;
+              ${(data.categories_tested || []).join(', ')} &middot;
+              ${(data.duration_ms || 0).toFixed(0)}ms
+            </div>
+          </div>
+        </div>`;
+
+        if (findings.length > 0) {
+          html += '<div class="episode-list" style="max-height:300px;">';
+          const sevColors = { critical: 'var(--danger)', high: '#ff6b35', medium: 'var(--warn)', low: 'var(--muted)', info: 'var(--accent)' };
+          for (const f of findings) {
+            const sc = sevColors[f.severity] || 'var(--muted)';
+            html += `<div class="episode" style="border-left-color:${sc};">
+              <div class="episode-header">
+                <span class="tag" style="border-color:${sc};color:${sc};">${f.severity.toUpperCase()}</span>
+                <span style="font-size:0.7rem;color:var(--muted)">${escapeHtml(f.category)}</span>
+              </div>
+              <div class="episode-input">${escapeHtml(f.description)}</div>
+              <div style="font-size:0.75rem;color:var(--muted);margin-top:0.3rem;">💡 ${escapeHtml(f.recommendation)}</div>
+            </div>`;
+          }
+          html += '</div>';
+        } else {
+          html += '<div class="empty" style="color:var(--ok);">All security tests passed — no findings.</div>';
+        }
+
+        content.innerHTML = html;
+      } catch (e) {
+        content.innerHTML = '<div class="empty">Security audit failed — check if langgraph is running.</div>';
       }
     }
 

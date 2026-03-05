@@ -668,3 +668,326 @@ def evaluate_improvement(
         improved_metrics=improved,
         recommendation=recommendation,
     )
+
+
+# ── P15: Dream State — Offline Consolidation Engine ─────────────────
+# When Kai is idle, it consolidates knowledge: cross-referencing episodes,
+# deduplicating metacognitive rules, clustering failures, synthesizing
+# new insights, and recalibrating the knowledge boundary.
+
+DREAM_MIN_EPISODES = int(os.getenv("DREAM_MIN_EPISODES", "5"))
+DREAM_RULE_SIMILARITY_THRESHOLD = float(os.getenv("DREAM_RULE_SIMILARITY", "0.6"))
+DREAM_INSIGHT_PATH = Path(os.getenv("DREAM_INSIGHT_PATH", "/tmp/kai_dream_insights.json"))
+
+
+@dataclass
+class DreamInsight:
+    """A single insight produced during a dream cycle."""
+    insight_type: str       # "pattern", "rule_merge", "boundary_shift", "failure_cluster", "contradiction"
+    description: str
+    confidence: float       # 0.0–1.0
+    source_episodes: int    # how many episodes contributed
+    actionable: bool        # whether this insight suggests a behaviour change
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "insight_type": self.insight_type,
+            "description": self.description,
+            "confidence": round(self.confidence, 3),
+            "source_episodes": self.source_episodes,
+            "actionable": self.actionable,
+        }
+
+
+@dataclass
+class DreamCycle:
+    """Results of a complete dream consolidation cycle."""
+    cycle_id: str
+    ts: float
+    episodes_analysed: int
+    insights: List[DreamInsight]
+    merged_rules: int
+    failure_clusters: Dict[str, int]
+    boundary_shifts: List[Dict[str, Any]]
+    duration_ms: float
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "cycle_id": self.cycle_id,
+            "ts": self.ts,
+            "episodes_analysed": self.episodes_analysed,
+            "insights": [i.to_dict() for i in self.insights],
+            "merged_rules": self.merged_rules,
+            "failure_clusters": self.failure_clusters,
+            "boundary_shifts": self.boundary_shifts,
+            "duration_ms": round(self.duration_ms, 1),
+        }
+
+
+def _extract_words(text: str) -> set:
+    """Extract normalised word tokens from text."""
+    return set(re.findall(r"\w{3,}", text.lower()))
+
+
+def _word_overlap(a: str, b: str) -> float:
+    """Jaccard similarity between word sets of two strings."""
+    wa, wb = _extract_words(a), _extract_words(b)
+    if not wa or not wb:
+        return 0.0
+    return len(wa & wb) / len(wa | wb)
+
+
+def deduplicate_rules(rules: List[str], threshold: float = DREAM_RULE_SIMILARITY_THRESHOLD) -> List[str]:
+    """Merge near-duplicate metacognitive rules.
+
+    Keeps the longest version of each cluster (most specific).
+    Returns the deduplicated list.
+    """
+    if not rules:
+        return []
+    kept: List[str] = []
+    for rule in sorted(rules, key=len, reverse=True):
+        if not any(_word_overlap(rule, k) >= threshold for k in kept):
+            kept.append(rule)
+    return kept
+
+
+def cluster_failures(episodes: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+    """Group failed episodes by their failure class.
+
+    Returns a dict of failure_class → list of episode summaries.
+    """
+    clusters: Dict[str, List[Dict[str, Any]]] = {}
+    for ep in episodes:
+        fc = ep.get("failure_class")
+        if not fc:
+            continue
+        if fc not in clusters:
+            clusters[fc] = []
+        clusters[fc].append({
+            "input": ep.get("input", "")[:200],
+            "conviction": ep.get("final_conviction", ep.get("conviction_score", 0)),
+            "ts": ep.get("ts", 0),
+        })
+    return clusters
+
+
+def synthesize_patterns(episodes: List[Dict[str, Any]]) -> List[DreamInsight]:
+    """Discover recurring patterns across episodes.
+
+    Looks for:
+    1. Topics that consistently have low conviction (struggling areas)
+    2. Topics with high rethink rates (complex areas requiring iteration)
+    3. Conviction improvement trends (learning signals)
+    """
+    insights: List[DreamInsight] = []
+    if len(episodes) < DREAM_MIN_EPISODES:
+        return insights
+
+    # Group by topic keywords (first 3 significant words)
+    topic_groups: Dict[str, List[Dict[str, Any]]] = {}
+    for ep in episodes:
+        words = sorted(_extract_words(ep.get("input", "")))[:3]
+        key = " ".join(words) if words else "unknown"
+        if key not in topic_groups:
+            topic_groups[key] = []
+        topic_groups[key].append(ep)
+
+    for topic, eps in topic_groups.items():
+        if len(eps) < 2:
+            continue
+
+        convictions = [float(e.get("final_conviction", e.get("conviction_score", 0))) for e in eps]
+        rethinks = [int(e.get("rethink_count", 0)) for e in eps]
+        avg_conv = sum(convictions) / len(convictions)
+        avg_rethink = sum(rethinks) / len(rethinks)
+
+        # Struggling topic: consistently low conviction
+        if avg_conv < 6.0 and len(eps) >= 3:
+            insights.append(DreamInsight(
+                insight_type="pattern",
+                description=f"Struggling with '{topic}': avg conviction {avg_conv:.1f}/10 across {len(eps)} episodes.",
+                confidence=min(0.5 + len(eps) * 0.1, 0.95),
+                source_episodes=len(eps),
+                actionable=True,
+            ))
+
+        # Complex topic: high rethink rate
+        if avg_rethink >= 1.5:
+            insights.append(DreamInsight(
+                insight_type="pattern",
+                description=f"Topic '{topic}' requires frequent rethinking: avg {avg_rethink:.1f} rethinks/episode.",
+                confidence=min(0.4 + len(eps) * 0.1, 0.9),
+                source_episodes=len(eps),
+                actionable=True,
+            ))
+
+        # Learning trend: conviction improving over time
+        if len(eps) >= 3:
+            sorted_eps = sorted(eps, key=lambda e: e.get("ts", 0))
+            early = [float(e.get("final_conviction", 0)) for e in sorted_eps[:len(sorted_eps)//2]]
+            late = [float(e.get("final_conviction", 0)) for e in sorted_eps[len(sorted_eps)//2:]]
+            if early and late:
+                early_avg = sum(early) / len(early)
+                late_avg = sum(late) / len(late)
+                if late_avg - early_avg > 1.0:
+                    insights.append(DreamInsight(
+                        insight_type="pattern",
+                        description=f"Learning detected for '{topic}': conviction improved from {early_avg:.1f} to {late_avg:.1f}.",
+                        confidence=0.8,
+                        source_episodes=len(eps),
+                        actionable=False,
+                    ))
+
+    return insights
+
+
+def detect_rule_contradictions(rules: List[str]) -> List[DreamInsight]:
+    """Find metacognitive rules that contradict each other.
+
+    Simple heuristic: two rules about the same topic with opposing advice
+    (e.g. "always X" vs "never X").
+    """
+    insights: List[DreamInsight] = []
+    for i, r1 in enumerate(rules):
+        for r2 in rules[i + 1:]:
+            overlap = _word_overlap(r1, r2)
+            if overlap < 0.3:
+                continue
+            # Check for opposing signals
+            r1_lower, r2_lower = r1.lower(), r2.lower()
+            has_conflict = (
+                ("always" in r1_lower and "never" in r2_lower)
+                or ("never" in r1_lower and "always" in r2_lower)
+                or ("should" in r1_lower and "should not" in r2_lower)
+                or ("should not" in r1_lower and "should" in r2_lower)
+            )
+            if has_conflict:
+                insights.append(DreamInsight(
+                    insight_type="contradiction",
+                    description=f"Contradictory rules detected: '{r1[:80]}' vs '{r2[:80]}'",
+                    confidence=overlap,
+                    source_episodes=0,
+                    actionable=True,
+                ))
+    return insights
+
+
+def run_dream_cycle(
+    episodes: List[Dict[str, Any]],
+    cycle_id: Optional[str] = None,
+) -> DreamCycle:
+    """Execute a complete dream consolidation cycle.
+
+    Phases:
+    1. Cluster failures by class
+    2. Extract and deduplicate metacognitive rules
+    3. Synthesize recurring patterns
+    4. Detect rule contradictions
+    5. Recalibrate knowledge boundary
+    6. Package insights
+
+    This is meant to run during idle periods (triggered by heartbeat
+    when the operator goes quiet for > 30 minutes).
+    """
+    start = time.monotonic()
+    cycle_id = cycle_id or hashlib.sha256(str(time.time()).encode()).hexdigest()[:12]
+    insights: List[DreamInsight] = []
+
+    # Phase 1: Cluster failures
+    failure_clusters = cluster_failures(episodes)
+    cluster_counts = {k: len(v) for k, v in failure_clusters.items()}
+    for fc, eps in failure_clusters.items():
+        if len(eps) >= 3:
+            insights.append(DreamInsight(
+                insight_type="failure_cluster",
+                description=f"Recurring failure cluster '{fc}': {len(eps)} episodes. Dominant pattern needs attention.",
+                confidence=min(0.5 + len(eps) * 0.1, 0.95),
+                source_episodes=len(eps),
+                actionable=True,
+            ))
+
+    # Phase 2: Deduplicate metacognitive rules
+    all_rules = [ep.get("metacognitive_rule", "") for ep in episodes if ep.get("metacognitive_rule")]
+    deduped_rules = deduplicate_rules(all_rules)
+    merged_count = len(all_rules) - len(deduped_rules)
+
+    if merged_count > 0:
+        insights.append(DreamInsight(
+            insight_type="rule_merge",
+            description=f"Merged {merged_count} duplicate metacognitive rules (kept {len(deduped_rules)}).",
+            confidence=0.9,
+            source_episodes=len(all_rules),
+            actionable=False,
+        ))
+
+    # Phase 3: Synthesize patterns
+    pattern_insights = synthesize_patterns(episodes)
+    insights.extend(pattern_insights)
+
+    # Phase 4: Detect rule contradictions
+    contradiction_insights = detect_rule_contradictions(deduped_rules)
+    insights.extend(contradiction_insights)
+
+    # Phase 5: Recalibrate knowledge boundary
+    boundary = build_knowledge_boundary(episodes)
+    boundary_shifts: List[Dict[str, Any]] = []
+    for b in boundary:
+        if b.is_gap:
+            boundary_shifts.append({
+                "topic": b.topic,
+                "success_rate": round(b.successes / max(b.total_episodes, 1), 2),
+                "avg_conviction": round(b.avg_conviction, 1),
+                "probe_question": b.probe_question,
+            })
+            insights.append(DreamInsight(
+                insight_type="boundary_shift",
+                description=f"Knowledge gap in '{b.topic}': {b.successes}/{b.total_episodes} success rate, avg conviction {b.avg_conviction:.1f}.",
+                confidence=min(0.6 + b.total_episodes * 0.05, 0.95),
+                source_episodes=b.total_episodes,
+                actionable=True,
+            ))
+
+    elapsed = (time.monotonic() - start) * 1000
+
+    cycle = DreamCycle(
+        cycle_id=cycle_id,
+        ts=time.time(),
+        episodes_analysed=len(episodes),
+        insights=insights,
+        merged_rules=merged_count,
+        failure_clusters=cluster_counts,
+        boundary_shifts=boundary_shifts,
+        duration_ms=elapsed,
+    )
+
+    # Persist the dream cycle
+    save_dream_cycle(cycle)
+
+    return cycle
+
+
+def save_dream_cycle(cycle: DreamCycle) -> None:
+    """Persist a dream cycle to disk."""
+    try:
+        if DREAM_INSIGHT_PATH.exists():
+            data = json.loads(DREAM_INSIGHT_PATH.read_text(encoding="utf-8"))
+        else:
+            data = {"cycles": []}
+        data["cycles"].append(cycle.to_dict())
+        # Keep last 20 cycles
+        data["cycles"] = data["cycles"][-20:]
+        DREAM_INSIGHT_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def load_dream_cycles() -> List[Dict[str, Any]]:
+    """Load all persisted dream cycles."""
+    try:
+        if DREAM_INSIGHT_PATH.exists():
+            data = json.loads(DREAM_INSIGHT_PATH.read_text(encoding="utf-8"))
+            return data.get("cycles", [])
+    except Exception:
+        pass
+    return []

@@ -1,7 +1,7 @@
 """Proposer-Adversary Challenge Engine — langgraph/adversary.py
 
 The adversary is Kai's self-doubt engine.  Before any plan reaches the
-executor, it must survive five independent challenges.  Each challenge
+executor, it must survive six independent challenges.  Each challenge
 attacks the plan from a different angle:
 
 1. History challenge  — "Did something like this fail before?"
@@ -9,6 +9,7 @@ attacks the plan from a different angle:
 3. Policy challenge   — "Does the gate policy allow this tool/action?"
 4. Consistency check  — "Is the plan internally coherent?"
 5. Calibration check  — "Were we right when we were this confident before?"
+6. Security check     — "Can our defences be bypassed?"
 
 The adversary returns an AdversaryVerdict that includes:
 - An aggregated modifier to add to the conviction score
@@ -495,6 +496,69 @@ def challenge_calibration(
         )
 
 
+# ── Challenge 6: Security self-hacking ──────────────────────────────
+
+def challenge_security(injection_re, sanitize_fn=None) -> ChallengeResult:
+    """Challenge 6: Run the security audit against live defences.
+
+    Fuzz-tests the injection filter and input sanitizer to find bypasses.
+    If critical findings exist, the plan should be blocked or flagged.
+    """
+    try:
+        from security_audit import run_security_audit
+        audit_result = run_security_audit(
+            injection_re=injection_re,
+            sanitize_fn=sanitize_fn,
+        )
+    except Exception as e:
+        return ChallengeResult(
+            strategy="security",
+            passed=True,
+            confidence=0.3,
+            finding=f"Security audit could not run: {str(e)[:100]}",
+            modifier=0.0,
+        )
+
+    critical = [f for f in audit_result.findings if f.severity == "critical"]
+    high = [f for f in audit_result.findings if f.severity == "high"]
+
+    if critical:
+        return ChallengeResult(
+            strategy="security",
+            passed=False,
+            confidence=0.9,
+            finding=(
+                f"Security audit found {len(critical)} CRITICAL issue(s): "
+                + "; ".join(f.description for f in critical[:3])
+            ),
+            modifier=-1.5,
+            evidence=[f.payload[:80] for f in critical[:3]],
+        )
+    elif high:
+        return ChallengeResult(
+            strategy="security",
+            passed=False,
+            confidence=0.7,
+            finding=(
+                f"Security audit found {len(high)} HIGH issue(s): "
+                + "; ".join(f.description for f in high[:3])
+            ),
+            modifier=-0.5,
+            evidence=[f.payload[:80] for f in high[:3]],
+        )
+    else:
+        return ChallengeResult(
+            strategy="security",
+            passed=True,
+            confidence=0.8,
+            finding=(
+                f"Security audit passed ({audit_result.passed}/{audit_result.total_tests} tests, "
+                f"risk_score={audit_result.risk_score:.2f})."
+            ),
+            modifier=0.2,
+        )
+
+
 # ── Orchestration ────────────────────────────────────────────────────
 
 async def challenge_plan(
@@ -504,10 +568,12 @@ async def challenge_plan(
     episodes: List[Dict[str, Any]],
     predicted_conviction: float,
     tool_hint: Optional[str] = None,
+    injection_re=None,
+    sanitize_fn=None,
 ) -> AdversaryVerdict:
-    """Run all five challenges against the plan.
+    """Run all six challenges against the plan.
 
-    Challenges 1, 4, 5 are local (no network), so they're always fast.
+    Challenges 1, 4, 5, 6 are local (no network), so they're always fast.
     Challenges 2, 3 require network (verifier, tool-gate) but degrade
     gracefully if services are down.
 
@@ -531,6 +597,11 @@ async def challenge_plan(
         user_input, predicted_conviction, episodes
     )
 
+    # Challenge 6: Security self-hacking (local, no network)
+    security_result = None
+    if injection_re is not None:
+        security_result = challenge_security(injection_re, sanitize_fn)
+
     # Await network challenges
     verifier_result = await verifier_task
     policy_result = await policy_task
@@ -544,6 +615,10 @@ async def challenge_plan(
         consistency_result,
         calibration_result,
     ]
+    if security_result is not None:
+        challenges.append(security_result)
+
+    total_challenges = len(challenges)
 
     # Aggregate
     total_modifier = sum(c.modifier for c in challenges)
@@ -565,7 +640,7 @@ async def challenge_plan(
         recommendation = "proceed"
 
     # Build human-readable summary
-    summary_parts = [f"{passed_count}/5 challenges passed"]
+    summary_parts = [f"{passed_count}/{total_challenges} challenges passed"]
     if critical_warnings:
         summary_parts.append(f"{len(critical_warnings)} critical warning(s)")
     summary_parts.append(f"modifier={total_modifier:+.2f}")

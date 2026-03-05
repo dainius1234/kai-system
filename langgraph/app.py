@@ -18,11 +18,12 @@ from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.llm import LLMRouter
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
-from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot
+from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, run_dream_cycle
 from conviction import build_plan, detect_self_deception, low_conviction_feedback, score_conviction
 from router import classify, dispatch_route
 from planner import gather_context, build_enriched_plan, predict_next_request, pre_fetch_predicted_context
 from adversary import challenge_plan, verdict_to_plan_metadata
+from security_audit import run_security_audit
 
 logger = setup_json_logger("langgraph", os.getenv("LOG_PATH", "/tmp/langgraph.json.log"))
 DEVICE = detect_device()
@@ -583,6 +584,8 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
         episodes=recent_episodes,
         predicted_conviction=conviction,
         tool_hint=request.task_hint,
+        injection_re=INJECTION_RE,
+        sanitize_fn=sanitize_string,
     )
     conviction = min(max(conviction + adversary_verdict.total_modifier, 0.0), 10.0)
     plan.update(verdict_to_plan_metadata(adversary_verdict))
@@ -788,6 +791,69 @@ async def recall_last_episode(req: EpisodeRequest) -> Dict[str, Any]:
     episodes = saver.recall(user_id=user_id, days=req.days)
     raw_context = "\n".join(f"[{e.get('ts')}] IN={e.get('input')} OUT={e.get('output')} C={e.get('final_conviction')}" for e in episodes)
     return {"status": "ok", "count": len(episodes), "context": raw_context, "episodes": episodes}
+
+
+# ── P15: Dream State — manual and automatic consolidation ───────────
+
+@app.post("/dream")
+async def trigger_dream():
+    """Trigger a dream consolidation cycle.
+
+    Can be called manually by the operator or automatically by heartbeat
+    when the system detects extended idle time (> 30 min).
+    """
+    episodes = saver.recall(user_id="keeper", days=30)
+    if len(episodes) < 5:
+        return {"status": "insufficient_data", "message": "Need at least 5 episodes to dream."}
+
+    cycle = run_dream_cycle(episodes)
+
+    # Store actionable insights as memories for future retrieval
+    actionable = [i for i in cycle.insights if i.actionable]
+    stored = 0
+    for insight in actionable[:5]:
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                await client.post(
+                    f"{MEMU_URL}/memory/memorize",
+                    json={
+                        "timestamp": datetime.utcnow().isoformat(),
+                        "event_type": "dream_insight",
+                        "result_raw": insight.description,
+                        "metrics": {"insight_type": insight.insight_type, "confidence": insight.confidence},
+                        "relevance": insight.confidence,
+                        "importance": 0.85,
+                        "user_id": "kai",
+                    },
+                )
+                stored += 1
+        except Exception:
+            logger.debug("Dream insight memorize failed")
+
+    return {
+        "status": "ok",
+        "cycle_id": cycle.cycle_id,
+        "episodes_analysed": cycle.episodes_analysed,
+        "insights_count": len(cycle.insights),
+        "insights_stored": stored,
+        "merged_rules": cycle.merged_rules,
+        "failure_clusters": cycle.failure_clusters,
+        "boundary_gaps": len(cycle.boundary_shifts),
+        "duration_ms": cycle.duration_ms,
+        "insights": [i.to_dict() for i in cycle.insights],
+    }
+
+
+# ── P9: Security Self-Hacking — automated audit endpoint ────────────
+
+@app.get("/security/audit")
+async def security_audit_endpoint():
+    """Run the security self-hacking audit against live defences."""
+    audit_result = run_security_audit(
+        injection_re=INJECTION_RE,
+        sanitize_fn=sanitize_string,
+    )
+    return audit_result.to_dict()
 
 
 _restore_breakers()
