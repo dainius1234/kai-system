@@ -1,11 +1,14 @@
 
 
 from __future__ import annotations
+import asyncio
 from datetime import datetime
+import json as _json
 import os
 from typing import Any, Dict, List
 
 import httpx
+import redis.asyncio as aioredis
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, StreamingResponse
@@ -454,6 +457,75 @@ async def api_ledger_stats():
         return {"status": "unavailable", "total_entries": 0}
 
 
+# ── Redis pub/sub — real-time event streaming ────────────────────────
+REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
+
+# Channels that the dashboard subscribes to
+_EVENT_CHANNELS = [
+    "kai:health",          # service up/down events
+    "kai:episode",         # new episode recorded
+    "kai:breaker",         # circuit breaker state change
+    "kai:memory",          # memory store changes
+]
+
+
+async def _publish_event(channel: str, data: dict) -> None:
+    """Publish a JSON event to a Redis channel (fire-and-forget)."""
+    try:
+        r = aioredis.from_url(REDIS_URL, decode_responses=True)
+        await r.publish(channel, _json.dumps(data))
+        await r.aclose()
+    except Exception:
+        logger.debug("Redis publish to %s failed (non-critical)", channel)
+
+
+@app.get("/api/events")
+async def sse_events(request: Request):
+    """Server-Sent Events stream backed by Redis pub/sub.
+
+    The dashboard JS connects via EventSource('/api/events') and receives
+    real-time updates instead of polling.
+    """
+    async def event_generator():
+        try:
+            r = aioredis.from_url(REDIS_URL, decode_responses=True)
+            pubsub = r.pubsub()
+            await pubsub.subscribe(*_EVENT_CHANNELS)
+        except Exception:
+            yield f"data: {_json.dumps({'channel': 'error', 'error': 'redis unavailable'})}\n\n"
+            return
+
+        try:
+            while True:
+                if await request.is_disconnected():
+                    break
+                msg = await asyncio.wait_for(
+                    pubsub.get_message(ignore_subscribe_messages=True),
+                    timeout=15.0,
+                )
+                if msg and msg["type"] == "message":
+                    payload = {
+                        "channel": msg["channel"],
+                        "data": _json.loads(msg["data"]) if isinstance(msg["data"], str) else msg["data"],
+                    }
+                    yield f"data: {_json.dumps(payload)}\n\n"
+                else:
+                    # keepalive heartbeat every 15s
+                    yield f"data: {_json.dumps({'channel': 'heartbeat', 'ts': datetime.utcnow().isoformat()})}\n\n"
+        except asyncio.CancelledError:
+            pass
+        finally:
+            await pubsub.unsubscribe(*_EVENT_CHANNELS)
+            await pubsub.aclose()
+            await r.aclose()
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
 @app.get("/api/security-audit")
 async def api_security_audit():
     """Proxy security self-hacking audit from langgraph."""
@@ -500,7 +572,6 @@ async def api_chat_proxy(request: Request):
                     async for chunk in resp.aiter_bytes():
                         yield chunk
         except Exception as exc:
-            import json as _json
             yield f"data: {_json.dumps({'token': f'[connection error: {str(exc)[:200]}]'})}\n\n"
             yield "data: [DONE]\n\n"
 

@@ -4,9 +4,34 @@ import hashlib
 import hmac
 import logging
 import os
+from pathlib import Path
 from typing import Optional
 
 _logger = logging.getLogger(__name__)
+
+
+def load_secret(env_name: str, default: str = "") -> str:
+    """Load a secret from Docker secrets file or environment variable.
+
+    Docker secrets are mounted at /run/secrets/<name>.  If the env var
+    value looks like a Docker secret path (starts with /run/secrets/)
+    and the file exists, read the value from the file.  Otherwise fall
+    back to the raw env var value.
+    """
+    value = os.getenv(env_name, default)
+    # Convention: if env value is a /run/secrets/ path, read from file
+    if value.startswith("/run/secrets/"):
+        secret_path = Path(value)
+        if secret_path.is_file():
+            return secret_path.read_text().strip()
+        _logger.warning("Secret file %s not found, falling back to empty", value)
+        return default
+    # Also check if a Docker secret file exists by convention:
+    # /run/secrets/<env_name_lowercase>
+    secret_by_name = Path(f"/run/secrets/{env_name.lower()}")
+    if secret_by_name.is_file():
+        return secret_by_name.read_text().strip()
+    return value
 
 PRIMARY_SECRET_ENV = "INTERSERVICE_HMAC_SECRET"
 SECONDARY_SECRET_ENV = "INTERSERVICE_HMAC_SECRET_PREV"
@@ -21,7 +46,7 @@ _WARNED_DEFAULT_SECRET = False
 
 def _secret(env_name: str, default: str = "") -> bytes:
     global _WARNED_DEFAULT_SECRET
-    value = os.getenv(env_name, default)
+    value = load_secret(env_name, default)
     if value == _DEV_SECRET and not _WARNED_DEFAULT_SECRET:
         _WARNED_DEFAULT_SECRET = True
         _logger.warning(

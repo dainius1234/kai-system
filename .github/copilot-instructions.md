@@ -83,6 +83,8 @@ make test-router             # specialist router classification tests
 make test-planner            # memory-driven planner tests
 make test-adversary          # adversary challenge engine tests
 make test-v7                 # v7 feature tests (verifier, quarantine, policy, idempotency, integration-chain)
+make test-prod-hardening     # production hardening (secrets, pubsub, backup, HMAC)
+make test-hmac-rotation-drill # HMAC rotation lifecycle drill
 
 # Integration / smoke tests (requires running stack)
 make core-smoke              # python3 scripts/smoke_core.py

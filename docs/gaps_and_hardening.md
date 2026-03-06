@@ -37,7 +37,7 @@
 
 | Item | Status | Notes |
 |---|---|---|
-| Real-time status (Redis pubsub) | 🔲 Open | Dashboard currently polls `/health`. Pubsub would give instant updates. Low priority. |
+| Real-time status (Redis pubsub) | ✅ Done | SSE endpoint `GET /api/events` with Redis pubsub subscription. 4 channels: `kai:health`, `kai:episode`, `kai:breaker`, `kai:memory`. 15s keepalive heartbeat. |
 | Ledger stats (last write, entry count) | ✅ Done | `GET /api/ledger-stats` in dashboard, proxies to ledger-worker `/stats`. |
 | Memory heatmap (top 5 tags, word cloud) | 🔲 Open | Low priority. Nice-to-have visualization. |
 | Thinking Pathways (conviction, tempo, boundary, silence) | ✅ Done | P8 complete. `thinking.html` with 6 visualization cards. |
@@ -70,6 +70,6 @@
 3. **HP1–HP6** — see Hardware Performance Track in `unfair_advantages.md`
 
 ### Park (Nice-to-Have)
-- Redis pubsub for real-time dashboard
+- ~~Redis pubsub for real-time dashboard~~ ✅ Done (SSE /api/events)
 - Memory heatmap visualization
 - Redis cache for routing results

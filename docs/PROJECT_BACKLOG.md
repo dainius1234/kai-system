@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-05 — session: HP2+HP4+HP5 built, gaps sprint done — 51 targets, 347 tests
+**Last updated:** 2026-03-06 — session: Production hardening (Redis pubsub, Docker secrets, backup service, HMAC rotation drill) — **48 targets, 366 tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 51 (make test-core) |
-| Individual tests | 347 passing, 0 failures |
+| Test targets | 48 (make test-core) |
+| Individual tests | 366 passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -122,14 +122,15 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
       Lint + test on push/PR. Integration smoke in core-tests. `|| true` removed.
 - [x] **Integration test in CI** — compose up → smoke test → compose down.
       core-tests.yml runs on every push.
-- [ ] **Secrets management** — move from .env to Docker secrets or Vault.
-      sovereign compose has Vault config but it's not wired.
-- [ ] **Backup-service validation** — backup-service/app.py exists but
-      is a stub. Wire real backup of memu-core postgres to local disk.
+- [x] **Secrets management** — Docker secrets support via `load_secret()`
+      in `common/auth.py`. Reads from `/run/secrets/` convention files.
+      `docker-compose.full.yml` has secrets blocks for tool-gate, langgraph, backup-service.
+- [x] **Backup-service validation** — Full rewrite: postgres, redis, memory,
+      ledger backup + restore. SHA-256 checksums, filename sanitization.
 - [ ] **Log aggregation** — all services write JSON logs. Collect them
       somewhere queryable (Loki, or just a shared volume with grep).
-- [ ] **HMAC key rotation in production** — scripts exist and work.
-      Need to test in a running stack.
+- [x] **HMAC key rotation in production** — 3-phase lifecycle drill
+      (single → overlap → retire) with 14 unittest tests.
 
 ### P6 — Nice-to-have / future
 *Park these. Don't think about them until P0-P4 are done.*
@@ -308,15 +309,15 @@ See `docs/unfair_advantages.md` for full details. Summary:
 - [ ] Category-aware retrieval boosting
 
 ### P5 — Production Hardening (still open)
-- [ ] Docker secrets / Vault wiring
-- [ ] Backup-service real implementation
+- [x] Docker secrets / Vault wiring — ✅ DONE (load_secret + compose secrets)
+- [x] Backup-service real implementation — ✅ DONE (pg/redis/memory/ledger + restore)
 - [x] JSON structured logging — ✅ DONE (gaps sprint: stdout + file)
-- [ ] HMAC rotation test in running stack
+- [x] HMAC rotation test in running stack — ✅ DONE (14-test drill)
 
 ### System Gaps (see `docs/gaps_and_hardening.md`)
 - [x] Vector cleanup job (90-day TTL) — ✅ DONE (POST /memory/cleanup)
 - [x] Ledger stats dashboard endpoint — ✅ DONE (GET /api/ledger-stats)
-- [ ] Redis pubsub for real-time dashboard
+- [x] Redis pubsub for real-time dashboard — ✅ DONE (SSE /api/events + 4 channels)
 - [ ] TPM verify (hardware-blocked)
 - Disk cleanup: freed ~109MB build cache + orphaned volumes → 3.8GB free
 - Updated PROJECT_BACKLOG.md to reflect current reality

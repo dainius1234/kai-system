@@ -34,6 +34,9 @@ services:
       MODE: "WORK"
       REQUIRED_CONFIDENCE: "0.7"
       REDIS_URL: redis://redis:6379
+    secrets:
+      - hmac_secret
+      - bridge_secret
     ports:
       - "8000:8000"
     networks:
@@ -159,6 +162,8 @@ services:
       OLLAMA_URL: http://ollama:11434
       OLLAMA_MODEL: qwen2:0.5b
       LLM_TIMEOUT: "120"
+    secrets:
+      - hmac_secret
     ports:
       - "8007:8007"
     networks:
@@ -310,11 +315,21 @@ services:
     build:
       context: .
       dockerfile: backup-service/Dockerfile
+    environment:
+      PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
+      REDIS_URL: redis://redis:6379
+      MEMU_URL: http://memu-core:8001
+      TOOL_GATE_URL: http://tool-gate:8000
+    secrets:
+      - db_password
     ports:
       - "8054:8054"
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.22
+    depends_on:
+      - postgres
+      - redis
 
   calendar-sync:
     build:
@@ -392,3 +407,19 @@ services:
 volumes:
   postgres_data:
   ollama_data:
+
+# ── Docker Secrets (production) ──────────────────────────────────────
+# Create runtime-secrets/ directory with secret files before deploying:
+#   echo "my-hmac-secret" > runtime-secrets/hmac_secret
+#   echo "my-db-password" > runtime-secrets/db_password
+#   echo "my-bridge-secret" > runtime-secrets/bridge_secret
+# Then set env vars to point to the mount path:
+#   INTERSERVICE_HMAC_SECRET=/run/secrets/hmac_secret
+# The common.auth.load_secret() function reads from the file automatically.
+secrets:
+  hmac_secret:
+    file: ${SECRETS_DIR:-./runtime-secrets}/hmac_secret
+  db_password:
+    file: ${SECRETS_DIR:-./runtime-secrets}/db_password
+  bridge_secret:
+    file: ${SECRETS_DIR:-./runtime-secrets}/bridge_secret

@@ -110,7 +110,7 @@ make full-down
 ## Test
 
 ```bash
-# Run ALL core unit/smoke tests (~30 tests across all services)
+# Run ALL core unit/smoke tests (48 targets, ~366 tests)
 make test-core
 
 # Individual service tests
@@ -147,6 +147,8 @@ make test-gaps-sprint        # JSON logging, vector cleanup, ledger stats tests
 make test-tree-search        # HP4 CoT tree search tests
 make test-priority-queue      # HP5 priority queue tests
 make test-model-selector      # HP2 MoE model selector tests
+make test-prod-hardening     # production hardening (secrets, pubsub, backup, HMAC)
+make test-hmac-rotation-drill # HMAC rotation lifecycle drill
 
 # v7 feature tests
 make test-v7                 # verifier, quarantine, policy, idempotency, integration-chain
