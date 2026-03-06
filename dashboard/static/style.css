@@ -1270,3 +1270,281 @@ a:hover { text-decoration: underline; }
   .nodes-grid { grid-template-columns: 1fr; }
   .assessment-grid { grid-template-columns: 1fr 1fr; }
 }
+
+
+/* ─── Settings View ─────────────────────────────────────────────── */
+
+.settings-grid {
+  display: grid;
+  gap: var(--sp-4);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.settings-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+}
+
+.settings-card h3 {
+  margin: 0 0 var(--sp-3);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) 0;
+}
+
+.settings-row + .settings-row {
+  border-top: 1px solid var(--border);
+}
+
+.settings-row label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Toggle switch */
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--surface-hover);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background var(--fast);
+  flex-shrink: 0;
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  transition: transform var(--fast);
+}
+
+.toggle:checked {
+  background: var(--accent);
+}
+
+.toggle:checked::after {
+  transform: translateX(20px);
+}
+
+.settings-btn {
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background var(--fast), border-color var(--fast);
+}
+
+.settings-btn:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+.settings-btn.danger {
+  color: var(--red);
+}
+
+.settings-btn.danger:hover {
+  background: rgba(255, 59, 48, .12);
+  border-color: var(--red);
+}
+
+
+/* ─── Shortcuts Grid ────────────────────────────────────────────── */
+
+.shortcuts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.shortcut-row + .shortcut-row {
+  border-top: 1px solid var(--border);
+}
+
+kbd {
+  display: inline-block;
+  padding: 2px 8px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 1px 0 var(--border);
+  min-width: 24px;
+  text-align: center;
+}
+
+
+/* ─── First-Run Wizard ──────────────────────────────────────────── */
+
+.wizard-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, .72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.wizard-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: var(--sp-6);
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  animation: slideUp var(--slow) ease-out;
+}
+
+.wizard-card h2 {
+  margin: 0 0 var(--sp-2);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wizard-card p {
+  margin: 0 0 var(--sp-4);
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.wizard-step {
+  display: none;
+}
+
+.wizard-step:first-child {
+  display: block;
+}
+
+.wizard-modes {
+  display: flex;
+  gap: var(--sp-3);
+  justify-content: center;
+  margin-bottom: var(--sp-4);
+}
+
+.wizard-mode-card {
+  flex: 1;
+  max-width: 180px;
+  padding: var(--sp-4);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition: border-color var(--fast), background var(--fast);
+}
+
+.wizard-mode-card:hover {
+  border-color: var(--text-muted);
+}
+
+.wizard-mode-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.wizard-mode-card .mode-icon {
+  font-size: 28px;
+  margin-bottom: var(--sp-2);
+}
+
+.wizard-mode-card .mode-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.wizard-mode-card .mode-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: var(--sp-1);
+}
+
+.wizard-next {
+  display: inline-block;
+  width: 100%;
+  padding: var(--sp-3);
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--r-md);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--fast);
+}
+
+.wizard-next:hover {
+  opacity: .88;
+}
+
+.wizard-orb {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--sp-4);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, var(--accent), var(--accent-dim));
+  animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Wizard checkbox row */
+.wizard-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+
+/* ─── PWA Install ───────────────────────────────────────────────── */
+
+#settingsPWA {
+  display: none;
+}

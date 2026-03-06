@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/static/manifest.json">
   <title>KAI — Sovereign AI</title>
   <link rel="stylesheet" href="/static/style.css">
   <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
@@ -35,6 +39,10 @@
         <a class="nav-item" data-view="thinking" onclick="switchView('thinking')">
           <span class="nav-icon">🧠</span>
           <span class="nav-label">Thinking</span>
+        </a>
+        <a class="nav-item" data-view="settings" onclick="switchView('settings')">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
         </a>
       </nav>
 
@@ -212,9 +220,129 @@
           </div>
         </section>
 
+        <!-- ═══ Settings View ═══ -->
+        <section class="view" id="settingsView">
+          <div style="max-width:720px;margin:0 auto;padding:var(--sp-6);">
+            <h2 class="text-heading" style="margin-bottom:var(--sp-6);">Settings</h2>
+
+            <!-- Personality Mode -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">🎭</span> Personality Mode</div>
+              <p style="font-size:13px;color:var(--text3);margin-bottom:var(--sp-4);">
+                WORK mode is professional and focused. PUB mode is casual and opinionated — like a mate at the pub.
+              </p>
+              <div class="mode-toggle" style="display:inline-flex;">
+                <button class="mode-btn" data-mode="WORK" onclick="setMode('WORK')">WORK</button>
+                <button class="mode-btn" data-mode="PUB" onclick="setMode('PUB')">PUB</button>
+              </div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">🔔</span> Notifications</div>
+              <label class="settings-toggle">
+                <input type="checkbox" id="settingToasts" checked onchange="saveSetting('toasts', this.checked)">
+                <span>Show toast notifications</span>
+              </label>
+              <label class="settings-toggle">
+                <input type="checkbox" id="settingSounds" onchange="saveSetting('sounds', this.checked)">
+                <span>Play notification sounds</span>
+              </label>
+            </div>
+
+            <!-- Chat -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">💬</span> Chat</div>
+              <label class="settings-toggle">
+                <input type="checkbox" id="settingMarkdown" checked onchange="saveSetting('markdown', this.checked)">
+                <span>Render markdown in responses</span>
+              </label>
+              <div style="margin-top:var(--sp-3);">
+                <button class="refresh-btn" onclick="clearChatHistory()">🗑 Clear Chat History</button>
+              </div>
+            </div>
+
+            <!-- Keyboard Shortcuts -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">⌨️</span> Keyboard Shortcuts</div>
+              <div class="shortcuts-grid">
+                <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>1</kbd><span>Chat</span></div>
+                <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>2</kbd><span>Dashboard</span></div>
+                <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>3</kbd><span>Thinking</span></div>
+                <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>4</kbd><span>Settings</span></div>
+                <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>K</kbd><span>Focus chat input</span></div>
+                <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd><span>Toggle WORK/PUB</span></div>
+                <div class="shortcut-row"><kbd>Escape</kbd><span>Close dropdown / stop generation</span></div>
+              </div>
+            </div>
+
+            <!-- System Info -->
+            <div class="card">
+              <div class="card-title"><span class="icon">ℹ️</span> System Info</div>
+              <div style="font-size:13px;color:var(--text3);line-height:2;">
+                <div>Version: <span style="color:var(--text);">0.5.0</span></div>
+                <div>UI: <span style="color:var(--text);">Unified App Shell (Wave 2)</span></div>
+                <div>Design: <span style="color:var(--text);">Glass-morphism + Inter</span></div>
+                <div id="settingsPWA" style="margin-top:var(--sp-3);display:none;">
+                  <button class="refresh-btn" id="pwaInstallBtn" onclick="installPWA()">📲 Install as App</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
       </div><!-- .content -->
     </main>
   </div><!-- .app -->
+
+  <!-- First-Run Wizard Overlay -->
+  <div class="wizard-overlay" id="wizardOverlay" style="display:none;">
+    <div class="wizard-card">
+      <div class="wizard-step" id="wizStep0">
+        <div class="orb-container" data-state="idle" style="margin:0 auto 1.5rem;width:80px;height:80px;">
+          <div class="orb"></div>
+          <div class="orb-glow"></div>
+        </div>
+        <h2 class="text-heading" style="text-align:center;margin-bottom:var(--sp-2);">Welcome to Kai</h2>
+        <p style="text-align:center;color:var(--text3);margin-bottom:var(--sp-6);font-size:14px;">Your sovereign AI assistant. Let's set you up in 30 seconds.</p>
+        <button class="wizard-next" onclick="wizardNext()">Get Started →</button>
+      </div>
+      <div class="wizard-step" id="wizStep1" style="display:none;">
+        <div class="card-title" style="margin-bottom:var(--sp-4);"><span class="icon">🎭</span> Choose Your Mode</div>
+        <p style="color:var(--text3);font-size:13px;margin-bottom:var(--sp-4);">How should Kai talk to you?</p>
+        <div style="display:flex;gap:var(--sp-3);">
+          <div class="welcome-card wizard-mode-card" data-wmode="WORK" onclick="wizardSelectMode('WORK')" style="flex:1;">
+            <strong>🔧 WORK</strong>
+            Professional, focused, precise. For tasks and research.
+          </div>
+          <div class="welcome-card wizard-mode-card" data-wmode="PUB" onclick="wizardSelectMode('PUB')" style="flex:1;">
+            <strong>🍺 PUB</strong>
+            Casual, witty, opinionated. Like a mate at the pub.
+          </div>
+        </div>
+        <button class="wizard-next" style="margin-top:var(--sp-4);" onclick="wizardNext()">Next →</button>
+      </div>
+      <div class="wizard-step" id="wizStep2" style="display:none;">
+        <div class="card-title" style="margin-bottom:var(--sp-4);"><span class="icon">🔔</span> Notifications</div>
+        <p style="color:var(--text3);font-size:13px;margin-bottom:var(--sp-4);">Get real-time updates when services change state.</p>
+        <label class="settings-toggle">
+          <input type="checkbox" id="wizToasts" checked>
+          <span>Enable toast notifications</span>
+        </label>
+        <button class="wizard-next" style="margin-top:var(--sp-4);" onclick="wizardNext()">Next →</button>
+      </div>
+      <div class="wizard-step" id="wizStep3" style="display:none;">
+        <div class="orb-container" data-state="speaking" style="margin:0 auto 1.5rem;width:64px;height:64px;">
+          <div class="orb"></div>
+          <div class="orb-glow"></div>
+        </div>
+        <h2 class="text-heading" style="text-align:center;margin-bottom:var(--sp-2);">You're All Set</h2>
+        <p style="text-align:center;color:var(--text3);margin-bottom:var(--sp-6);font-size:14px;">Kai is ready. Talk to me anytime.</p>
+        <button class="wizard-next" onclick="wizardFinish()">Start Chatting →</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Notification Dropdown (fixed position) -->
   <div class="notif-dropdown" id="notifDropdown">
@@ -298,7 +426,7 @@ function switchView(name) {
   const navEl = document.querySelector(`.nav-item[data-view="${name}"]`);
   if (navEl) navEl.classList.add('active');
 
-  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways' };
+  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings' };
   document.getElementById('viewTitle').textContent = titles[name] || name;
 
   currentView = name;
@@ -310,6 +438,9 @@ function switchView(name) {
   if (name === 'thinking') {
     refreshThinking();
     thinkingInterval = setInterval(refreshThinking, 15000);
+  }
+  if (name === 'settings') {
+    loadSettings();
   }
 }
 
@@ -1252,6 +1383,133 @@ async function runSecurityAudit() {
 }
 
 
+// ── Settings ───────────────────────────────────────────────────────
+
+function loadSettings() {
+  const s = getSettings();
+  document.getElementById('settingToasts').checked = s.toasts !== false;
+  document.getElementById('settingSounds').checked = s.sounds === true;
+  document.getElementById('settingMarkdown').checked = s.markdown !== false;
+  // Sync mode buttons in settings view
+  loadMode();
+}
+
+function getSettings() {
+  try { return JSON.parse(localStorage.getItem('kai-settings') || '{}'); } catch { return {}; }
+}
+
+function saveSetting(key, value) {
+  const s = getSettings();
+  s[key] = value;
+  localStorage.setItem('kai-settings', JSON.stringify(s));
+}
+
+function clearChatHistory() {
+  chatHistory = [];
+  localStorage.removeItem('kai-chat-history');
+  const scroll = document.getElementById('chatScroll');
+  const welcome = document.getElementById('welcomeScreen');
+  // Remove all messages but keep welcome and typing row
+  scroll.querySelectorAll('.message:not(#typingRow)').forEach(m => m.remove());
+  if (welcome) welcome.style.display = '';
+  showToast('Chat', 'History cleared', 'success');
+}
+
+
+// ── Keyboard Shortcuts ─────────────────────────────────────────────
+
+document.addEventListener('keydown', function(e) {
+  // Don't capture when typing in input fields (except Escape)
+  const inInput = e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT';
+
+  if (e.key === 'Escape') {
+    const dd = document.getElementById('notifDropdown');
+    if (dd.classList.contains('open')) { dd.classList.remove('open'); return; }
+    if (chatAbortController) { stopGeneration(); return; }
+    return;
+  }
+
+  if (inInput) return;
+
+  // Ctrl+1/2/3/4 — switch views
+  if (e.ctrlKey && !e.shiftKey) {
+    const viewMap = { '1': 'chat', '2': 'dashboard', '3': 'thinking', '4': 'settings' };
+    if (viewMap[e.key]) { e.preventDefault(); switchView(viewMap[e.key]); return; }
+  }
+
+  // Ctrl+K — focus chat input
+  if (e.ctrlKey && e.key === 'k') {
+    e.preventDefault();
+    switchView('chat');
+    document.getElementById('chatInput').focus();
+    return;
+  }
+
+  // Ctrl+Shift+M — toggle mode
+  if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+    e.preventDefault();
+    const cur = localStorage.getItem('kai-mode') || 'WORK';
+    setMode(cur === 'WORK' ? 'PUB' : 'WORK');
+    showToast('Mode', 'Switched to ' + (cur === 'WORK' ? 'PUB' : 'WORK'), 'info', 2000);
+    return;
+  }
+});
+
+
+// ── First-Run Wizard ───────────────────────────────────────────────
+
+let wizardStep = 0;
+
+function checkFirstRun() {
+  if (localStorage.getItem('kai-onboarded')) return;
+  document.getElementById('wizardOverlay').style.display = 'flex';
+}
+
+function wizardNext() {
+  document.getElementById('wizStep' + wizardStep).style.display = 'none';
+  wizardStep++;
+  const next = document.getElementById('wizStep' + wizardStep);
+  if (next) next.style.display = '';
+}
+
+function wizardSelectMode(mode) {
+  setMode(mode);
+  document.querySelectorAll('.wizard-mode-card').forEach(c => {
+    c.style.borderColor = c.getAttribute('data-wmode') === mode ? 'var(--accent)' : '';
+    c.style.background = c.getAttribute('data-wmode') === mode ? 'var(--accent-dim)' : '';
+  });
+}
+
+function wizardFinish() {
+  const toasts = document.getElementById('wizToasts').checked;
+  saveSetting('toasts', toasts);
+  localStorage.setItem('kai-onboarded', '1');
+  document.getElementById('wizardOverlay').style.display = 'none';
+  showToast('Welcome', 'Kai is ready. Type a message or use Ctrl+K.', 'success', 5000);
+}
+
+
+// ── PWA Install ────────────────────────────────────────────────────
+
+let pwaDeferred = null;
+
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  pwaDeferred = e;
+  document.getElementById('settingsPWA').style.display = '';
+});
+
+function installPWA() {
+  if (!pwaDeferred) { showToast('PWA', 'Install not available — try from Chrome/Edge', 'info'); return; }
+  pwaDeferred.prompt();
+  pwaDeferred.userChoice.then(function(r) {
+    if (r.outcome === 'accepted') showToast('PWA', 'Kai installed as an app!', 'success');
+    pwaDeferred = null;
+    document.getElementById('settingsPWA').style.display = 'none';
+  });
+}
+
+
 // ── Initialisation ─────────────────────────────────────────────────
 
 (function init() {
@@ -1263,6 +1521,9 @@ async function runSecurityAudit() {
 
   // Initial dashboard data fetch for sidebar health dots
   refreshDashboard();
+
+  // First-run wizard
+  checkFirstRun();
 })();
 
 </script>

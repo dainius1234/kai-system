@@ -285,3 +285,6 @@ weekly-key-rotate:
 
 weekly-ed25519-rotate:
 	bash scripts/weekly_ed25519_rotation.sh
+
+setup:
+	bash scripts/setup.sh

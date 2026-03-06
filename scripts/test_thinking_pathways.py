@@ -59,11 +59,19 @@ class TestThinkingPage(unittest.TestCase):
         self.assertIn('data-view="chat"', text)
         self.assertIn('data-view="dashboard"', text)
         self.assertIn('data-view="thinking"', text)
+        self.assertIn('data-view="settings"', text)
 
     def test_app_shell_has_dream_and_audit(self):
         resp = client.get("/app")
         self.assertIn("triggerDream()", resp.text)
         self.assertIn("runSecurityAudit()", resp.text)
+
+    def test_app_shell_has_settings_and_wizard(self):
+        resp = client.get("/app")
+        text = resp.text
+        self.assertIn('id="settingsView"', text)
+        self.assertIn('id="wizardOverlay"', text)
+        self.assertIn('manifest.json', text)
 
 
 # ── API /api/thinking Tests ──────────────────────────────────────────

@@ -89,6 +89,17 @@ The full stack (`docker-compose.full.yml`) adds: `fusion-engine`, `langgraph`, `
 
 ---
 
+## Quick Start
+
+```bash
+make setup            # check deps, create .env, build images
+# Edit .env with your API keys
+make core-up          # start core services
+# Open http://localhost:8050/app
+```
+
+---
+
 ## Build & Run
 
 ```bash
@@ -174,6 +185,33 @@ flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 ```
 
 Run `make go_no_go` before committing to catch syntax errors early.
+
+---
+
+## Operator Console
+
+Open **http://localhost:8050/app** for the unified operator interface.
+
+| View | Description |
+|------|-------------|
+| **Chat** | Conversational interface with streaming SSE, markdown rendering, PUB/WORK mode toggle |
+| **Dashboard** | Service health, nodes grid, pipeline status, fusion metrics |
+| **Thinking** | Live thinking-pathway trace, chain-of-thought visibility |
+| **Settings** | Mode, notifications, markdown, keyboard shortcuts, PWA install |
+
+**Keyboard shortcuts** (when not focused in a text field):
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+1` | Switch to Chat |
+| `Ctrl+2` | Switch to Dashboard |
+| `Ctrl+3` | Switch to Thinking |
+| `Ctrl+4` | Switch to Settings |
+| `Ctrl+K` | Focus chat input |
+| `Ctrl+Shift+M` | Toggle PUB/WORK mode |
+| `Escape` | Close dropdown / stop generation |
+
+**PWA:** Kai can be installed as a standalone app on desktop and mobile via Chrome/Edge. The manifest and icons are served from `/static/`.
 
 ---
 

@@ -1,0 +1,22 @@
+{
+  "name": "KAI — Sovereign AI",
+  "short_name": "KAI",
+  "description": "Self-sovereign personal intelligence platform",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#0a0a0c",
+  "theme_color": "#0a0a0c",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/static/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
