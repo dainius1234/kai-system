@@ -340,10 +340,8 @@ HEARTBEAT_URL = os.getenv("HEARTBEAT_URL", "http://heartbeat:8010")
 
 @app.get("/thinking")
 async def thinking_page() -> HTMLResponse:
-    """Serve the Thinking Pathways visualization."""
-    html_path = os.path.join(os.path.dirname(__file__), "static", "thinking.html")
-    with open(html_path, "r") as f:
-        return HTMLResponse(f.read())
+    """Serve the Thinking Pathways (legacy standalone, redirects to /app)."""
+    return HTMLResponse('<meta http-equiv="refresh" content="0;url=/app">')
 
 
 @app.get("/api/thinking")
@@ -539,16 +537,25 @@ async def api_security_audit():
         return {"status": "unavailable", "findings": [], "risk_score": -1}
 
 
+# ── Unified App Shell ────────────────────────────────────────────────
+
+@app.get("/app")
+async def app_shell() -> HTMLResponse:
+    """Serve the unified single-page app shell."""
+    html_path = os.path.join(os.path.dirname(__file__), "static", "app.html")
+    with open(html_path, "r") as f:
+        return HTMLResponse(f.read())
+
+
 # ── Chat proxy — Kai's face ─────────────────────────────────────────
 LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
 
 
 @app.get("/chat")
 async def chat_page() -> HTMLResponse:
-    """Serve the chat UI."""
-    chat_html = os.path.join(os.path.dirname(__file__), "static", "chat.html")
-    with open(chat_html, "r") as f:
-        return HTMLResponse(f.read())
+    """Serve the chat UI (legacy standalone, redirects to /app)."""
+    return HTMLResponse('<meta http-equiv="refresh" content="0;url=/app">')
+
 
 
 @app.post("/api/chat")

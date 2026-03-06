@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KAI — Sovereign AI</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+</head>
+<body>
+  <div class="app">
+
+    <!-- ═══════════════ Sidebar ═══════════════ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="orb-container" id="orbContainer" data-state="idle">
+          <div class="orb"></div>
+          <div class="orb-glow"></div>
+          <div class="orb-ring"></div>
+        </div>
+        <div class="sidebar-brand">KAI</div>
+        <div class="sidebar-subtitle" id="sidebarSubtitle">Sovereign AI</div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-item active" data-view="chat" onclick="switchView('chat')">
+          <span class="nav-icon">💬</span>
+          <span class="nav-label">Chat</span>
+        </a>
+        <a class="nav-item" data-view="dashboard" onclick="switchView('dashboard')">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a class="nav-item" data-view="thinking" onclick="switchView('thinking')">
+          <span class="nav-icon">🧠</span>
+          <span class="nav-label">Thinking</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-footer">
+        <div class="sidebar-health">
+          <span>Health</span>
+          <div class="health-dots" id="healthDots"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═══════════════ Main ═══════════════ -->
+    <main class="main">
+
+      <!-- ── Top Bar ── -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-title" id="viewTitle">Chat</div>
+        </div>
+        <div class="topbar-right">
+          <div class="mode-toggle">
+            <button class="mode-btn active work" data-mode="WORK" onclick="setMode('WORK')">WORK</button>
+            <button class="mode-btn" data-mode="PUB" onclick="setMode('PUB')">PUB</button>
+          </div>
+          <button class="notif-btn" id="notifBtn" onclick="toggleNotifDropdown()">
+            🔔
+            <span class="notif-badge" id="notifBadge"></span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ── Content Views ── -->
+      <div class="content">
+
+        <!-- ═══ Chat View ═══ -->
+        <section class="view active" id="chatView" style="display:flex;flex-direction:column;">
+          <div class="chat-scroll" id="chatScroll">
+            <div class="welcome" id="welcomeScreen">
+              <div class="orb-container" data-state="idle" style="margin:0 auto 1.5rem;width:64px;height:64px;">
+                <div class="orb"></div>
+                <div class="orb-glow"></div>
+              </div>
+              <h2>Hello, I'm Kai</h2>
+              <p>Your sovereign AI assistant. Ask me anything.</p>
+              <div class="welcome-grid">
+                <div class="welcome-card" onclick="sendPreset('What is the current system status?')">
+                  <strong>System Status</strong>
+                  Check all services and health
+                </div>
+                <div class="welcome-card" onclick="sendPreset('Show me recent thinking episodes')">
+                  <strong>Thinking</strong>
+                  Review cognitive pathways
+                </div>
+                <div class="welcome-card" onclick="sendPreset('Help me with self-employment tax')">
+                  <strong>Tax Advisor</strong>
+                  UK self-employment help
+                </div>
+                <div class="welcome-card" onclick="sendPreset('What have you learned recently?')">
+                  <strong>Insights</strong>
+                  Recent learnings and patterns
+                </div>
+              </div>
+            </div>
+            <!-- Messages appended here by JS -->
+            <div id="typingRow" class="message assistant" style="display:none;">
+              <div class="msg-avatar">K</div>
+              <div class="msg-content">
+                <div class="typing-indicator">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="input-area">
+            <div class="input-wrapper">
+              <textarea id="chatInput" placeholder="Message Kai..." rows="1"
+                        onkeydown="handleInputKey(event)" oninput="autoResize(this)"></textarea>
+              <div class="input-actions">
+                <button class="action-btn" onclick="toggleVoice()" id="voiceBtn" title="Voice input">🎤</button>
+                <button class="action-btn" onclick="attachFile()" title="Attach file">📎</button>
+                <button class="send-btn" onclick="sendMessage()" id="sendBtn" title="Send">↑</button>
+                <button class="stop-btn" onclick="stopGeneration()" id="stopBtn" style="display:none" title="Stop">■</button>
+              </div>
+            </div>
+            <input type="file" id="fileInput" style="display:none" multiple onchange="handleFiles(this.files)">
+          </div>
+        </section>
+
+        <!-- ═══ Dashboard View ═══ -->
+        <section class="view" id="dashboardView">
+          <div class="gonogo-banner nogo" id="goBanner">
+            <div class="gonogo-decision" id="goDecision">—</div>
+            <div style="flex:1;">
+              <div style="font-weight:600;" id="goSummary">Loading...</div>
+              <div id="goMeta" style="font-size:12px;color:var(--text3);margin-top:4px;"></div>
+            </div>
+          </div>
+          <div class="dash-grid" id="dashGrid">
+            <div class="stat-card">
+              <div class="stat-label">Ledger Entries</div>
+              <div class="stat-value" id="statLedger">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Memory Records</div>
+              <div class="stat-value" id="statMemory">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Policy Mode</div>
+              <div class="stat-value accent" id="statPolicy">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Device</div>
+              <div class="stat-value" id="statDevice">—</div>
+            </div>
+          </div>
+          <div style="padding:0 var(--sp-6);max-width:1200px;margin:var(--sp-4) auto 0;">
+            <div class="card">
+              <div class="card-title"><span class="icon">🏥</span> Service Health</div>
+              <div class="nodes-grid" id="nodesGrid"></div>
+            </div>
+          </div>
+          <div id="reasonsCard" style="display:none;padding:0 var(--sp-6);max-width:1200px;margin:var(--sp-4) auto 0;">
+            <div class="card">
+              <div class="card-title" style="color:var(--warn);"><span class="icon">⚠️</span> Blockers</div>
+              <ul id="reasonsList" style="margin:0;padding-left:1.5em;color:var(--text2);font-size:13px;line-height:1.8;"></ul>
+            </div>
+          </div>
+          <div class="footer-note" id="dashFooter">— / — nodes alive · error ratio: —</div>
+        </section>
+
+        <!-- ═══ Thinking View ═══ -->
+        <section class="view" id="thinkingView">
+          <div class="think-grid">
+            <div class="card full-width">
+              <div class="card-title"><span class="icon">⚡</span> Conviction Pipeline — Latest Episode</div>
+              <div id="pipelineContent"><div class="skeleton" style="height:60px"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-title"><span class="icon">🧠</span> Recent Thinking Episodes</div>
+              <div id="episodesContent"><div class="skeleton" style="height:200px"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-title"><span class="icon">⏱</span> Operator Tempo</div>
+              <div id="tempoContent"><div class="skeleton" style="height:150px"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-title"><span class="icon">🗺</span> Knowledge Boundary Map</div>
+              <div id="boundaryContent"><div class="skeleton" style="height:150px"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-title"><span class="icon">🤫</span> Silence-as-Signal</div>
+              <div id="silenceContent"><div class="skeleton" style="height:100px"></div></div>
+            </div>
+            <div class="card full-width">
+              <div class="card-title"><span class="icon">📈</span> Temporal Self-Assessment</div>
+              <div id="assessmentContent"><div class="skeleton" style="height:120px"></div></div>
+            </div>
+            <div class="card full-width">
+              <div class="card-title">
+                <span class="icon">💤</span> Dream State — Offline Consolidation
+                <span style="flex:1"></span>
+                <button class="refresh-btn" onclick="triggerDream()">⚡ Trigger Dream</button>
+              </div>
+              <div id="dreamContent"><div class="empty">Click "Trigger Dream" to run deep consolidation. Kai analyses episodes, deduplicates rules, clusters failures, and discovers patterns.</div></div>
+            </div>
+            <div class="card full-width">
+              <div class="card-title">
+                <span class="icon">🔒</span> Security Self-Hacking Audit
+                <span style="flex:1"></span>
+                <button class="refresh-btn" onclick="runSecurityAudit()">🛡 Run Audit</button>
+              </div>
+              <div id="securityContent"><div class="empty">Click "Run Audit" to fuzz-test injection filters, sanitisation, and policy governance.</div></div>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- .content -->
+    </main>
+  </div><!-- .app -->
+
+  <!-- Notification Dropdown (fixed position) -->
+  <div class="notif-dropdown" id="notifDropdown">
+    <div class="notif-dropdown-header">
+      Notifications
+      <button class="refresh-btn" style="float:right;font-size:11px;padding:2px 10px;" onclick="clearNotifications()">Clear</button>
+    </div>
+    <div id="notifList">
+      <div class="empty" style="padding:var(--sp-6);">No notifications yet</div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   KAI — Unified App Shell
+   All JS for chat, dashboard, thinking, navigation, SSE, toasts
+   ═══════════════════════════════════════════════════════════════════ */
+
+// ── Utilities ──────────────────────────────────────────────────────
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = String(text);
+  return d.innerHTML;
+}
+
+function formatTime(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts * 1000);
+  return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+function scoreClass(score) {
+  if (score >= 7.5) return 'score-high';
+  if (score >= 5) return 'score-mid';
+  return 'score-low';
+}
+
+function gaugeCircle(pct, color) {
+  const r = 50, c = 2 * Math.PI * r;
+  const offset = c - (pct / 100) * c;
+  return `<svg width="120" height="120" viewBox="0 0 120 120">
+    <circle cx="60" cy="60" r="${r}" class="gauge-bg"/>
+    <circle cx="60" cy="60" r="${r}" class="gauge-fill" style="stroke:${escapeHtml(color)};stroke-dasharray:${c};stroke-dashoffset:${offset}"/>
+  </svg>`;
+}
+
+function renderMarkdown(text) {
+  if (typeof marked !== 'undefined') {
+    const raw = marked.parse(text);
+    return typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(raw) : raw;
+  }
+  return escapeHtml(text).replace(/\n/g, '<br>');
+}
+
+
+// ── State ──────────────────────────────────────────────────────────
+
+let currentView = 'chat';
+let chatHistory = [];
+let chatAbortController = null;
+let dashboardInterval = null;
+let thinkingInterval = null;
+let notifications = [];
+let nodeStatuses = {};
+
+
+// ── Navigation ─────────────────────────────────────────────────────
+
+function switchView(name) {
+  if (dashboardInterval) { clearInterval(dashboardInterval); dashboardInterval = null; }
+  if (thinkingInterval) { clearInterval(thinkingInterval); thinkingInterval = null; }
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(name + 'View').classList.add('active');
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navEl = document.querySelector(`.nav-item[data-view="${name}"]`);
+  if (navEl) navEl.classList.add('active');
+
+  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways' };
+  document.getElementById('viewTitle').textContent = titles[name] || name;
+
+  currentView = name;
+
+  if (name === 'dashboard') {
+    refreshDashboard();
+    dashboardInterval = setInterval(refreshDashboard, 3000);
+  }
+  if (name === 'thinking') {
+    refreshThinking();
+    thinkingInterval = setInterval(refreshThinking, 15000);
+  }
+}
+
+
+// ── Orb State ──────────────────────────────────────────────────────
+
+function setOrbState(state) {
+  document.getElementById('orbContainer').setAttribute('data-state', state);
+}
+
+
+// ── Mode Toggle ────────────────────────────────────────────────────
+
+function setMode(mode) {
+  localStorage.setItem('kai-mode', mode);
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    const m = btn.getAttribute('data-mode');
+    btn.classList.toggle('active', m === mode);
+    btn.classList.toggle('work', m === 'WORK' && mode === 'WORK');
+  });
+}
+
+function loadMode() {
+  const mode = localStorage.getItem('kai-mode') || 'WORK';
+  setMode(mode);
+}
+
+
+// ── Toast Notifications ────────────────────────────────────────────
+
+function showToast(title, msg, type, duration) {
+  type = type || 'info';
+  duration = duration || 4000;
+  const icons = { info: 'ℹ️', success: '✅', warning: '⚠️', error: '❌' };
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.innerHTML = `
+    <span class="toast-icon">${icons[type] || 'ℹ️'}</span>
+    <div class="toast-body">
+      <div class="toast-title">${escapeHtml(title)}</div>
+      ${msg ? '<div class="toast-msg">' + escapeHtml(msg) + '</div>' : ''}
+    </div>
+    <button class="toast-close" onclick="this.parentElement.classList.add('leaving');setTimeout(()=>this.parentElement.remove(),300)">×</button>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('leaving');
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+
+
+// ── Notification Center ────────────────────────────────────────────
+
+function addNotification(channel, data) {
+  const summary = typeof data === 'string' ? data : JSON.stringify(data).slice(0, 120);
+  notifications.unshift({ channel: channel, body: summary, ts: Date.now() });
+  if (notifications.length > 50) notifications.pop();
+  updateNotifBadge();
+  renderNotifications();
+}
+
+function toggleNotifDropdown() {
+  document.getElementById('notifDropdown').classList.toggle('open');
+}
+
+function clearNotifications() {
+  notifications = [];
+  updateNotifBadge();
+  renderNotifications();
+}
+
+function updateNotifBadge() {
+  const badge = document.getElementById('notifBadge');
+  if (notifications.length > 0) {
+    badge.textContent = notifications.length > 99 ? '99+' : notifications.length;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function renderNotifications() {
+  const list = document.getElementById('notifList');
+  if (!notifications.length) {
+    list.innerHTML = '<div class="empty" style="padding:var(--sp-6);">No notifications yet</div>';
+    return;
+  }
+  list.innerHTML = notifications.map(n => {
+    const ago = Math.round((Date.now() - n.ts) / 1000);
+    const time = ago < 60 ? ago + 's ago' : Math.round(ago / 60) + 'm ago';
+    return `<div class="notif-item">
+      <div class="notif-text">${escapeHtml(n.body)}</div>
+      <div class="notif-time">${time}</div>
+    </div>`;
+  }).join('');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('notifDropdown');
+  const btn = document.getElementById('notifBtn');
+  if (dd.classList.contains('open') && !dd.contains(e.target) && !btn.contains(e.target)) {
+    dd.classList.remove('open');
+  }
+});
+
+
+// ── SSE Event Stream ───────────────────────────────────────────────
+
+let sseRetryTimeout = null;
+
+function connectSSE() {
+  try {
+    const es = new EventSource('/api/events');
+    es.onmessage = function(event) {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.channel === 'heartbeat') return;
+        if (data.channel === 'error') {
+          showToast('SSE Error', data.error, 'warning');
+          return;
+        }
+        addNotification(data.channel, data.data);
+        if (data.channel === 'kai:health') {
+          showToast('Health Update', JSON.stringify(data.data).slice(0, 80), 'info', 3000);
+          if (currentView === 'dashboard') refreshDashboard();
+        }
+        if (data.channel === 'kai:episode') {
+          if (currentView === 'thinking') refreshThinking();
+        }
+        if (data.channel === 'kai:breaker') {
+          showToast('Circuit Breaker', JSON.stringify(data.data).slice(0, 80), 'warning');
+        }
+      } catch { /* ignore parse errors */ }
+    };
+    es.onerror = function() {
+      es.close();
+      if (sseRetryTimeout) clearTimeout(sseRetryTimeout);
+      sseRetryTimeout = setTimeout(connectSSE, 5000);
+    };
+  } catch { /* SSE not available */ }
+}
+
+
+// ── Chat ───────────────────────────────────────────────────────────
+
+function loadChatHistory() {
+  try {
+    const saved = localStorage.getItem('kai-chat-history');
+    if (saved) {
+      chatHistory = JSON.parse(saved);
+      if (chatHistory.length > 0) {
+        document.getElementById('welcomeScreen').style.display = 'none';
+        chatHistory.forEach(function(m) { addMessage(m.role, m.content, true); });
+        scrollChat();
+      }
+    }
+  } catch { chatHistory = []; }
+}
+
+function saveChatHistory() {
+  const maxHistory = 100;
+  if (chatHistory.length > maxHistory) chatHistory = chatHistory.slice(-maxHistory);
+  try { localStorage.setItem('kai-chat-history', JSON.stringify(chatHistory)); } catch {}
+}
+
+function addMessage(role, content, skipSave) {
+  const scroll = document.getElementById('chatScroll');
+  const typing = document.getElementById('typingRow');
+  const div = document.createElement('div');
+  div.className = 'message ' + (role === 'user' ? 'user' : 'assistant');
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = role === 'user' ? 'Y' : 'K';
+
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'msg-content';
+
+  const textDiv = document.createElement('div');
+  textDiv.innerHTML = role === 'user' ? escapeHtml(content) : renderMarkdown(content);
+  contentDiv.appendChild(textDiv);
+
+  if (role !== 'user') {
+    const actions = document.createElement('div');
+    actions.className = 'msg-actions';
+    actions.innerHTML = '<button onclick="copyMsg(this)">Copy</button>';
+    contentDiv.appendChild(actions);
+  }
+
+  div.appendChild(avatar);
+  div.appendChild(contentDiv);
+  scroll.insertBefore(div, typing);
+
+  if (!skipSave) {
+    chatHistory.push({ role: role, content: content });
+    saveChatHistory();
+  }
+}
+
+function addStreamingMessage() {
+  const scroll = document.getElementById('chatScroll');
+  const typing = document.getElementById('typingRow');
+  const div = document.createElement('div');
+  div.className = 'message assistant';
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = 'K';
+
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'msg-content';
+
+  const textDiv = document.createElement('div');
+  textDiv.className = 'streaming-text';
+  contentDiv.appendChild(textDiv);
+
+  div.appendChild(avatar);
+  div.appendChild(contentDiv);
+  scroll.insertBefore(div, typing);
+  return textDiv;
+}
+
+function scrollChat() {
+  const scroll = document.getElementById('chatScroll');
+  scroll.scrollTop = scroll.scrollHeight;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const welcome = document.getElementById('welcomeScreen');
+  if (welcome) welcome.style.display = 'none';
+
+  addMessage('user', text);
+  input.value = '';
+  autoResize(input);
+
+  const typingRow = document.getElementById('typingRow');
+  typingRow.style.display = 'flex';
+  setOrbState('thinking');
+  scrollChat();
+
+  const streamEl = addStreamingMessage();
+  typingRow.style.display = 'none';
+  scrollChat();
+
+  try {
+    chatAbortController = new AbortController();
+    const mode = localStorage.getItem('kai-mode') || 'WORK';
+    const resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: text,
+        mode: mode,
+        history: chatHistory.slice(-10)
+      }),
+      signal: chatAbortController.signal,
+    });
+
+    document.getElementById('sendBtn').style.display = 'none';
+    document.getElementById('stopBtn').style.display = 'flex';
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let fullResponse = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data:')) continue;
+        const data = line.slice(5).trim();
+        if (data === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(data);
+          const token = parsed.token || parsed.content || '';
+          if (token) {
+            fullResponse += token;
+            streamEl.innerHTML = renderMarkdown(fullResponse);
+            scrollChat();
+          }
+        } catch {
+          if (data && data !== '[DONE]') {
+            fullResponse += data;
+            streamEl.innerHTML = renderMarkdown(fullResponse);
+          }
+        }
+      }
+    }
+
+    // Add copy action to completed message
+    const msgDiv = streamEl.closest('.msg-content');
+    if (msgDiv && !msgDiv.querySelector('.msg-actions')) {
+      const actions = document.createElement('div');
+      actions.className = 'msg-actions';
+      actions.innerHTML = '<button onclick="copyMsg(this)">Copy</button>';
+      msgDiv.appendChild(actions);
+    }
+
+    chatHistory.push({ role: 'assistant', content: fullResponse });
+    saveChatHistory();
+
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      streamEl.innerHTML += '<em style="color:var(--text3);"> (stopped)</em>';
+    } else {
+      streamEl.innerHTML = '<span style="color:var(--danger)">Error: ' + escapeHtml(e.message) + '</span>';
+    }
+  } finally {
+    setOrbState('idle');
+    document.getElementById('sendBtn').style.display = 'flex';
+    document.getElementById('stopBtn').style.display = 'none';
+    chatAbortController = null;
+  }
+}
+
+function stopGeneration() {
+  if (chatAbortController) chatAbortController.abort();
+}
+
+function sendPreset(text) {
+  document.getElementById('chatInput').value = text;
+  sendMessage();
+}
+
+function copyMsg(btn) {
+  const content = btn.closest('.msg-content');
+  if (!content) return;
+  const textEl = content.querySelector('div:first-child');
+  const text = textEl ? textEl.textContent : content.textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+  });
+}
+
+function handleInputKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+}
+
+// Voice input
+let voiceRecognition = null;
+
+function toggleVoice() {
+  if (voiceRecognition) {
+    voiceRecognition.stop();
+    voiceRecognition = null;
+    document.getElementById('voiceBtn').style.color = '';
+    setOrbState('idle');
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast('Voice', 'Speech recognition not supported', 'warning'); return; }
+
+  voiceRecognition = new SR();
+  voiceRecognition.lang = 'en-GB';
+  voiceRecognition.continuous = false;
+  voiceRecognition.interimResults = false;
+
+  voiceRecognition.onstart = function() {
+    document.getElementById('voiceBtn').style.color = 'var(--danger)';
+    setOrbState('listening');
+  };
+  voiceRecognition.onresult = function(e) {
+    const transcript = e.results[0][0].transcript;
+    document.getElementById('chatInput').value = transcript;
+    sendMessage();
+  };
+  voiceRecognition.onend = function() {
+    document.getElementById('voiceBtn').style.color = '';
+    voiceRecognition = null;
+    setOrbState('idle');
+  };
+  voiceRecognition.onerror = function() {
+    voiceRecognition = null;
+    document.getElementById('voiceBtn').style.color = '';
+    setOrbState('idle');
+  };
+
+  voiceRecognition.start();
+}
+
+function attachFile() {
+  document.getElementById('fileInput').click();
+}
+
+function handleFiles(files) {
+  if (!files || !files.length) return;
+  showToast('Attachment', 'File attachments coming soon', 'info');
+}
+
+
+// ── Dashboard ──────────────────────────────────────────────────────
+
+async function refreshDashboard() {
+  try {
+    const [indexResp, metricsResp] = await Promise.all([
+      fetch('/'),
+      fetch('/metrics'),
+    ]);
+    const data = await indexResp.json();
+    const metrics = await metricsResp.json();
+
+    // Go / No-Go
+    const gng = data.go_no_go || {};
+    const isGo = gng.decision === 'GO';
+    const banner = document.getElementById('goBanner');
+    banner.className = 'gonogo-banner ' + (isGo ? 'go' : 'nogo');
+    document.getElementById('goDecision').textContent = gng.decision || '—';
+    document.getElementById('goSummary').textContent = gng.summary || '';
+    const checks = gng.checks || {};
+    document.getElementById('goMeta').textContent =
+      'Mode: ' + (checks.current_mode || '?') +
+      ' · Gate decisions: ' + (checks.current_gate_decisions || 0) +
+      ' · Error ratio: ' + ((checks.current_error_ratio || 0) * 100).toFixed(1) + '%';
+
+    // Stats
+    document.getElementById('statLedger').textContent = data.ledger_size || 0;
+    document.getElementById('statMemory').textContent = data.memory_count || 0;
+    document.getElementById('statPolicy').textContent = data.policy_mode || '—';
+    document.getElementById('statDevice').textContent = data.device_summary || '—';
+
+    // Node grid
+    const ns = data.node_status || {};
+    nodeStatuses = ns;
+    const grid = document.getElementById('nodesGrid');
+    grid.innerHTML = '';
+    for (const [name, info] of Object.entries(ns)) {
+      const ok = info.status === 'ok';
+      grid.innerHTML += `<div class="node-card${ok ? '' : ' down'}">
+        <span class="node-name">${escapeHtml(name)}</span>
+        <span class="node-state ${ok ? 'ok' : 'down'}">${ok ? '● OK' : '● DOWN'}</span>
+      </div>`;
+    }
+
+    // Reasons
+    const reasons = gng.reasons || [];
+    const reasonsCard = document.getElementById('reasonsCard');
+    const reasonsList = document.getElementById('reasonsList');
+    if (reasons.length > 0) {
+      reasonsCard.style.display = 'block';
+      reasonsList.innerHTML = reasons.map(r => '<li>' + escapeHtml(r) + '</li>').join('');
+    } else {
+      reasonsCard.style.display = 'none';
+    }
+
+    // Footer
+    const alive = (data.alive_nodes || []).length;
+    const total = Object.keys(ns).length;
+    const errorRatio = (metrics.error_ratio || 0) * 100;
+    document.getElementById('dashFooter').textContent =
+      alive + ' / ' + total + ' nodes alive · error ratio: ' + errorRatio.toFixed(1) + '%';
+
+    // Update sidebar health dots
+    updateSidebarHealth(ns);
+
+  } catch { /* dashboard fetch failed silently */ }
+}
+
+
+// ── Sidebar Health Dots ────────────────────────────────────────────
+
+function updateSidebarHealth(statuses) {
+  const container = document.getElementById('healthDots');
+  container.innerHTML = '';
+  for (const [name, info] of Object.entries(statuses)) {
+    const ok = info.status === 'ok';
+    const dot = document.createElement('div');
+    dot.className = 'dot ' + (ok ? 'dot-ok' : 'dot-danger');
+    dot.title = name + ': ' + (ok ? 'OK' : 'DOWN');
+    container.appendChild(dot);
+  }
+}
+
+
+// ── Health Check (background) ──────────────────────────────────────
+
+let systemHealthy = true;
+
+async function checkHealth() {
+  try {
+    const resp = await fetch('/health');
+    if (!resp.ok) throw new Error('unhealthy');
+    if (!systemHealthy) {
+      systemHealthy = true;
+      setOrbState(!chatAbortController ? 'idle' : 'thinking');
+      showToast('System', 'Connection restored', 'success');
+    }
+  } catch {
+    if (systemHealthy) {
+      systemHealthy = false;
+      if (!chatAbortController) setOrbState('error');
+      showToast('System', 'Connection lost', 'error');
+    }
+  }
+}
+
+
+// ── Thinking Pathways ──────────────────────────────────────────────
+
+function refreshThinking() {
+  loadThinking();
+  loadTempo();
+  loadBoundary();
+  loadSilence();
+  loadAssessment();
+}
+
+async function loadThinking() {
+  try {
+    const resp = await fetch('/api/thinking');
+    if (!resp.ok) throw new Error('unavailable');
+    const data = await resp.json();
+    const pathways = data.pathways || [];
+
+    if (!pathways.length) {
+      document.getElementById('pipelineContent').innerHTML =
+        '<div class="empty">No episodes yet — talk to Kai to generate thinking data</div>';
+      document.getElementById('episodesContent').innerHTML =
+        '<div class="empty">No episodes</div>';
+      return;
+    }
+
+    // Pipeline: latest episode's conviction flow
+    const latest = pathways[pathways.length - 1];
+    const initial = latest.conviction_score || 0;
+    const finalC = latest.final_conviction || initial;
+    const rethinks = latest.rethink_count || 0;
+    const failure = latest.failure_class;
+    const rule = latest.metacognitive_rule;
+    const lv = latest.learning_value || 0;
+
+    let pHtml = '<div class="pipeline">';
+    pHtml += `<div class="pipeline-stage">
+      <div class="label">Input</div>
+      <div class="value" style="font-size:12px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(latest.input)}">${escapeHtml(latest.input.slice(0, 30))}</div>
+    </div><span class="pipeline-arrow">→</span>`;
+    pHtml += `<div class="pipeline-stage">
+      <div class="label">Initial Score</div>
+      <div class="value ${scoreClass(initial)}">${initial.toFixed(1)}</div>
+    </div><span class="pipeline-arrow">→</span>`;
+    pHtml += `<div class="pipeline-stage">
+      <div class="label">Rethinks</div>
+      <div class="value" style="color:${rethinks > 0 ? 'var(--accent2)' : 'var(--text3)'}">${rethinks}</div>
+    </div><span class="pipeline-arrow">→</span>`;
+    pHtml += `<div class="pipeline-stage">
+      <div class="label">Final Conviction</div>
+      <div class="value ${scoreClass(finalC)}">${finalC.toFixed(1)}<span style="font-size:11px;color:var(--text3)">/10</span></div>
+    </div><span class="pipeline-arrow">→</span>`;
+    pHtml += `<div class="pipeline-stage">
+      <div class="label">Learning Value</div>
+      <div class="value ${scoreClass(lv * 10)}">${lv.toFixed(2)}</div>
+    </div>`;
+
+    if (failure) {
+      pHtml += `<span class="pipeline-arrow">→</span>
+        <div class="pipeline-stage" style="border-color:var(--danger);">
+          <div class="label">Failure</div>
+          <div class="value" style="font-size:12px;color:var(--danger)">${escapeHtml(failure)}</div>
+        </div>`;
+    }
+    pHtml += '</div>';
+
+    if (rule) {
+      pHtml += `<div style="margin-top:var(--sp-3);padding:var(--sp-3);background:var(--surface-solid);border-radius:var(--r-md);border-left:3px solid var(--accent2);">
+        <span style="font-size:11px;color:var(--accent2);text-transform:uppercase;font-weight:700;">Metacognitive Rule</span>
+        <div style="font-size:14px;margin-top:4px;">${escapeHtml(rule)}</div>
+      </div>`;
+    }
+    document.getElementById('pipelineContent').innerHTML = pHtml;
+
+    // Episode list
+    let eHtml = '<div class="episode-list">';
+    for (let i = pathways.length - 1; i >= 0; i--) {
+      const ep = pathways[i];
+      const fc = ep.final_conviction || ep.conviction_score || 0;
+      eHtml += `<div class="episode" style="border-left-color:${fc >= 7.5 ? 'var(--ok)' : fc >= 5 ? 'var(--warn)' : 'var(--danger)'};">
+        <div class="episode-header">
+          <span style="font-size:11px;color:var(--text3)">${formatTime(ep.ts)}</span>
+        </div>
+        <div class="episode-input">${escapeHtml(ep.input)}</div>
+        <div class="episode-meta">
+          <span class="tag conviction">⚡ ${fc.toFixed(1)}</span>
+          ${ep.rethink_count ? '<span class="tag rethink">↻ ' + ep.rethink_count + ' rethink' + (ep.rethink_count > 1 ? 's' : '') + '</span>' : ''}
+          ${ep.failure_class ? '<span class="tag failure">⚠ ' + escapeHtml(ep.failure_class) + '</span>' : ''}
+          ${ep.learning_value ? '<span class="tag learning">📚 ' + ep.learning_value.toFixed(2) + '</span>' : ''}
+        </div>
+      </div>`;
+    }
+    eHtml += '</div>';
+    document.getElementById('episodesContent').innerHTML = eHtml;
+
+  } catch {
+    document.getElementById('pipelineContent').innerHTML =
+      '<div class="empty">Cannot reach langgraph — is the stack running?</div>';
+    document.getElementById('episodesContent').innerHTML =
+      '<div class="empty">Unavailable</div>';
+  }
+}
+
+async function loadTempo() {
+  try {
+    const resp = await fetch('/api/tempo');
+    if (!resp.ok) throw new Error('unavailable');
+    const data = await resp.json();
+
+    if (data.status === 'unavailable' || data.tempo === 'unknown') {
+      document.getElementById('tempoContent').innerHTML =
+        '<div class="empty">Tempo data unavailable — need more interactions</div>';
+      return;
+    }
+
+    const tempo = data.tempo || 'unknown';
+    const hint = data.style_hint || '';
+    const dist = data.distribution || {};
+    const avg = data.avg_gap_seconds || 0;
+    const bursts = data.burst_count || 0;
+
+    const tempoColors = { rapid: 'var(--danger)', normal: 'var(--ok)', reflective: 'var(--accent2)', idle: 'var(--text3)' };
+    const color = tempoColors[tempo] || 'var(--text3)';
+    const tempoPct = { rapid: 90, normal: 60, reflective: 35, idle: 10 };
+    const pct = tempoPct[tempo] || 50;
+
+    let html = `<div class="gauge-container">
+      <div class="gauge">
+        ${gaugeCircle(pct, color)}
+        <div class="gauge-text">
+          <span class="big" style="color:${escapeHtml(color)}">${tempo.charAt(0).toUpperCase() + tempo.slice(1)}</span>
+          <span class="small">${avg.toFixed(0)}s avg gap</span>
+        </div>
+      </div>
+      <div class="gauge-info">
+        <div class="tempo-label" style="color:${escapeHtml(color)}">${tempo.toUpperCase()} PACE</div>
+        <div class="hint">${escapeHtml(hint)}</div>
+        <div style="margin-top:var(--sp-2);font-size:12px;color:var(--text3);">
+          ${bursts > 0 ? '🔥 ' + bursts + ' burst' + (bursts > 1 ? 's' : '') + ' detected' : 'No bursts detected'}
+        </div>
+      </div>
+    </div>`;
+
+    const total = Object.values(dist).reduce(function(a, b) { return a + b; }, 0) || 1;
+    if (Object.keys(dist).length > 0) {
+      html += '<div style="margin-top:var(--sp-4);">';
+      for (const [cat, count] of Object.entries(dist)) {
+        const catPct = Math.round((count / total) * 100);
+        const catColor = tempoColors[cat] || 'var(--text3)';
+        html += `<div style="display:flex;align-items:center;gap:var(--sp-2);margin-bottom:4px;">
+          <span style="font-size:12px;min-width:70px;color:var(--text3)">${escapeHtml(cat)}</span>
+          <div class="zone-bar-track"><div class="zone-bar-fill" style="width:${catPct}%;background:${escapeHtml(catColor)}"></div></div>
+          <span style="font-size:11px;color:var(--text3)">${catPct}%</span>
+        </div>`;
+      }
+      html += '</div>';
+    }
+    document.getElementById('tempoContent').innerHTML = html;
+  } catch {
+    document.getElementById('tempoContent').innerHTML =
+      '<div class="empty">Tempo service unavailable</div>';
+  }
+}
+
+async function loadBoundary() {
+  try {
+    const resp = await fetch('/api/boundary');
+    if (!resp.ok) throw new Error('unavailable');
+    const data = await resp.json();
+    const zones = data.zones || [];
+
+    if (!zones.length && data.status !== 'ok') {
+      document.getElementById('boundaryContent').innerHTML =
+        '<div class="empty">No knowledge boundary data available</div>';
+      return;
+    }
+    if (!zones.length) {
+      document.getElementById('boundaryContent').innerHTML =
+        '<div class="empty">Knowledge map is empty — ask Kai more questions</div>';
+      return;
+    }
+
+    let html = '<div class="zone-list">';
+    for (const zone of zones) {
+      const conf = (zone.confidence || 0) * 100;
+      const color = conf >= 75 ? 'var(--ok)' : conf >= 40 ? 'var(--warn)' : 'var(--danger)';
+      html += `<div class="zone-item">
+        <span class="zone-label">${escapeHtml(zone.topic || zone.zone || '?')}</span>
+        <div class="zone-bar-track"><div class="zone-bar-fill" style="width:${conf}%;background:${escapeHtml(color)}"></div></div>
+        <span class="zone-pct" style="color:${escapeHtml(color)}">${conf.toFixed(0)}%</span>
+      </div>`;
+    }
+    html += '</div>';
+
+    if (data.overall_confidence !== undefined) {
+      html += `<div style="margin-top:var(--sp-3);text-align:center;font-size:13px;color:var(--text3);">
+        Overall confidence: <span style="font-weight:700;color:var(--accent)">${(data.overall_confidence * 100).toFixed(0)}%</span>
+      </div>`;
+    }
+    document.getElementById('boundaryContent').innerHTML = html;
+  } catch {
+    document.getElementById('boundaryContent').innerHTML =
+      '<div class="empty">Boundary service unavailable</div>';
+  }
+}
+
+async function loadSilence() {
+  try {
+    const resp = await fetch('/api/silence');
+    if (!resp.ok) throw new Error('unavailable');
+    const data = await resp.json();
+    const topics = data.silence_topics || data.topics || [];
+
+    if (!topics.length) {
+      const sCount = data.silence_count || 0;
+      document.getElementById('silenceContent').innerHTML = sCount > 0
+        ? '<div class="empty">' + sCount + ' silence signal(s) recorded</div>'
+        : '<div class="empty">No silence signals — Kai has been answering everything</div>';
+      return;
+    }
+
+    let html = '<div class="silence-list">';
+    for (const t of topics) {
+      const topic = typeof t === 'string' ? t : (t.topic || t.query || '?');
+      const reason = typeof t === 'object' ? (t.reason || '') : '';
+      html += `<div class="silence-tag">
+        <span>🤫 ${escapeHtml(topic)}</span>
+        ${reason ? '<span class="reason">— ' + escapeHtml(reason) + '</span>' : ''}
+      </div>`;
+    }
+    html += '</div>';
+
+    if (data.silence_count !== undefined) {
+      html += `<div style="margin-top:var(--sp-3);font-size:12px;color:var(--text3);text-align:center;">
+        Total silence decisions: ${data.silence_count}
+      </div>`;
+    }
+    document.getElementById('silenceContent').innerHTML = html;
+  } catch {
+    document.getElementById('silenceContent').innerHTML =
+      '<div class="empty">Silence service unavailable</div>';
+  }
+}
+
+async function loadAssessment() {
+  try {
+    const resp = await fetch('/api/self-assessment');
+    if (!resp.ok) throw new Error('unavailable');
+    const data = await resp.json();
+
+    if (data.status === 'unavailable') {
+      document.getElementById('assessmentContent').innerHTML =
+        '<div class="empty">Self-assessment unavailable — is heartbeat running?</div>';
+      return;
+    }
+
+    const current = data.current || {};
+    const deltas = data.deltas || {};
+    const trend = data.trend || 'stable';
+
+    const metricDefs = [
+      { key: 'total_memories', label: 'Memories', fmt: function(v) { return v; } },
+      { key: 'error_rate', label: 'Error Rate', fmt: function(v) { return (v * 100).toFixed(1) + '%'; } },
+      { key: 'uptime_ratio', label: 'Uptime', fmt: function(v) { return (v * 100).toFixed(1) + '%'; } },
+      { key: 'avg_response_ms', label: 'Avg Response', fmt: function(v) { return v.toFixed(0) + 'ms'; } },
+      { key: 'episodes_count', label: 'Episodes', fmt: function(v) { return v; } },
+      { key: 'avg_conviction', label: 'Avg Conviction', fmt: function(v) { return v.toFixed(1); } },
+    ];
+
+    let html = `<div style="margin-bottom:var(--sp-3);text-align:center;">
+      <span style="font-size:14px;font-weight:600;color:${trend === 'improving' ? 'var(--ok)' : trend === 'degrading' ? 'var(--danger)' : 'var(--text3)'};">
+        Trend: ${trend.toUpperCase()}
+      </span>
+    </div>`;
+
+    html += '<div class="assessment-grid">';
+    for (const m of metricDefs) {
+      const val = current[m.key];
+      if (val === undefined) continue;
+      const delta = deltas[m.key];
+      let deltaHtml;
+      if (delta !== undefined && delta !== 0) {
+        const isUp = delta > 0;
+        const isGood = m.key === 'error_rate' ? !isUp : isUp;
+        deltaHtml = '<div class="metric-delta ' + (isGood ? 'delta-up' : 'delta-down') + '">' +
+          (isUp ? '▲' : '▼') + ' ' + Math.abs(delta).toFixed(m.key === 'error_rate' ? 3 : 1) + '</div>';
+      } else {
+        deltaHtml = '<div class="metric-delta delta-flat">—</div>';
+      }
+      html += `<div class="assessment-metric">
+        <div class="metric-name">${m.label}</div>
+        <div class="metric-value">${m.fmt(val)}</div>
+        ${deltaHtml}
+      </div>`;
+    }
+    html += '</div>';
+
+    if (data.narrative) {
+      html += `<div style="margin-top:var(--sp-3);padding:var(--sp-3);background:var(--surface-solid);border-radius:var(--r-md);font-size:14px;color:var(--text3);line-height:1.5;">
+        ${escapeHtml(data.narrative)}
+      </div>`;
+    }
+    document.getElementById('assessmentContent').innerHTML = html;
+  } catch {
+    document.getElementById('assessmentContent').innerHTML =
+      '<div class="empty">Self-assessment service unavailable</div>';
+  }
+}
+
+async function triggerDream() {
+  const content = document.getElementById('dreamContent');
+  content.innerHTML = '<div class="loading"><div class="typing-indicator"><span></span><span></span><span></span></div>&nbsp;Running dream consolidation...</div>';
+  setOrbState('dreaming');
+
+  try {
+    const resp = await fetch('/api/dream', { method: 'POST' });
+    if (!resp.ok) throw new Error('unavailable');
+    const data = await resp.json();
+
+    if (data.status === 'insufficient_data') {
+      content.innerHTML = '<div class="empty">' + escapeHtml(data.message) + '</div>';
+      return;
+    }
+    if (data.status === 'unavailable') {
+      content.innerHTML = '<div class="empty">Cannot reach langgraph — is the stack running?</div>';
+      return;
+    }
+
+    let html = '<div style="display:flex;gap:var(--sp-4);flex-wrap:wrap;margin-bottom:var(--sp-4);">';
+    html += '<div class="pipeline-stage"><div class="label">Episodes</div><div class="value">' + data.episodes_analysed + '</div></div>';
+    html += '<div class="pipeline-stage"><div class="label">Insights</div><div class="value" style="color:var(--accent)">' + data.insights_count + '</div></div>';
+    html += '<div class="pipeline-stage"><div class="label">Rules Merged</div><div class="value">' + data.merged_rules + '</div></div>';
+    html += '<div class="pipeline-stage"><div class="label">Boundary Gaps</div><div class="value" style="color:' + (data.boundary_gaps > 0 ? 'var(--warn)' : 'var(--ok)') + '">' + data.boundary_gaps + '</div></div>';
+    html += '<div class="pipeline-stage"><div class="label">Duration</div><div class="value" style="font-size:14px">' + data.duration_ms.toFixed(0) + 'ms</div></div>';
+    html += '</div>';
+
+    const insights = data.insights || [];
+    if (insights.length) {
+      html += '<div class="episode-list" style="max-height:300px;">';
+      const typeColors = {
+        pattern: 'var(--accent)', failure_cluster: 'var(--danger)',
+        rule_merge: 'var(--accent2)', boundary_shift: 'var(--warn)',
+        contradiction: 'var(--danger)'
+      };
+      for (const ins of insights) {
+        const color = typeColors[ins.insight_type] || 'var(--text3)';
+        html += `<div class="episode" style="border-left-color:${color};">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:11px;color:${escapeHtml(color)};text-transform:uppercase;font-weight:700;">${escapeHtml(ins.insight_type)}</span>
+            <span style="font-size:11px;color:var(--text3);">${ins.actionable ? '⚡ Actionable' : '📊 Informational'}</span>
+          </div>
+          <div style="font-size:14px;margin-top:4px;">${escapeHtml(ins.description)}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Confidence: ${(ins.confidence * 100).toFixed(0)}% · ${ins.source_episodes} episodes</div>
+        </div>`;
+      }
+      html += '</div>';
+    } else {
+      html += '<div class="empty">No insights generated — system is running cleanly.</div>';
+    }
+    content.innerHTML = html;
+  } catch {
+    content.innerHTML = '<div class="empty">Dream cycle failed — check if langgraph is running.</div>';
+  } finally {
+    setOrbState('idle');
+  }
+}
+
+async function runSecurityAudit() {
+  const content = document.getElementById('securityContent');
+  content.innerHTML = '<div class="loading"><div class="typing-indicator"><span></span><span></span><span></span></div>&nbsp;Running security audit...</div>';
+
+  try {
+    const resp = await fetch('/api/security-audit');
+    if (!resp.ok) throw new Error('unavailable');
+    const data = await resp.json();
+
+    if (data.status === 'unavailable') {
+      content.innerHTML = '<div class="empty">Cannot reach langgraph for security audit.</div>';
+      return;
+    }
+
+    const risk = data.risk_score || 0;
+    const riskColor = risk >= 0.5 ? 'var(--danger)' : risk >= 0.2 ? 'var(--warn)' : 'var(--ok)';
+    const riskLabel = risk >= 0.5 ? 'HIGH RISK' : risk >= 0.2 ? 'MODERATE' : 'LOW RISK';
+    const findings = data.findings || [];
+
+    let html = `<div style="display:flex;align-items:center;gap:var(--sp-6);margin-bottom:var(--sp-4);">
+      <div style="text-align:center;">
+        <div style="font-size:32px;font-weight:700;color:${riskColor}">${(risk * 100).toFixed(0)}%</div>
+        <div style="font-size:11px;color:${escapeHtml(riskColor)};font-weight:600;">${riskLabel}</div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:14px;color:var(--text3);">
+          ${data.passed || 0}/${data.total_tests || 0} tests passed &middot;
+          ${(data.categories_tested || []).join(', ')} &middot;
+          ${(data.duration_ms || 0).toFixed(0)}ms
+        </div>
+      </div>
+    </div>`;
+
+    if (findings.length > 0) {
+      html += '<div class="episode-list" style="max-height:300px;">';
+      const sevColors = { critical: 'var(--danger)', high: '#ff6b35', medium: 'var(--warn)', low: 'var(--text3)', info: 'var(--accent)' };
+      for (const f of findings) {
+        const sc = sevColors[f.severity] || 'var(--text3)';
+        html += `<div class="episode" style="border-left-color:${sc};">
+          <div class="episode-header">
+            <span class="tag" style="border-color:${escapeHtml(sc)};color:${escapeHtml(sc)};">${escapeHtml(f.severity.toUpperCase())}</span>
+            <span style="font-size:11px;color:var(--text3)">${escapeHtml(f.category)}</span>
+          </div>
+          <div class="episode-input">${escapeHtml(f.description)}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px;">💡 ${escapeHtml(f.recommendation)}</div>
+        </div>`;
+      }
+      html += '</div>';
+    } else {
+      html += '<div class="empty" style="color:var(--ok);">All security tests passed — no findings.</div>';
+    }
+    content.innerHTML = html;
+  } catch {
+    content.innerHTML = '<div class="empty">Security audit failed — check if langgraph is running.</div>';
+  }
+}
+
+
+// ── Initialisation ─────────────────────────────────────────────────
+
+(function init() {
+  loadMode();
+  loadChatHistory();
+  connectSSE();
+  checkHealth();
+  setInterval(checkHealth, 30000);
+
+  // Initial dashboard data fetch for sidebar health dots
+  refreshDashboard();
+})();
+
+</script>
+</body>
+</html>

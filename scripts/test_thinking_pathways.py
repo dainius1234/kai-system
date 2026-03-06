@@ -28,20 +28,24 @@ client = TestClient(mod.app)
 # ── Thinking Page Tests ──────────────────────────────────────────────
 
 class TestThinkingPage(unittest.TestCase):
-    """Test the /thinking HTML endpoint."""
+    """Test the thinking pathways content (now served via /app unified shell)."""
 
-    def test_thinking_page_serves_html(self):
-        resp = client.get("/thinking")
+    def test_thinking_redirect(self):
+        resp = client.get("/thinking", follow_redirects=False)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn("Thinking Pathways", resp.text)
+        self.assertIn("/app", resp.text)
+
+    def test_app_shell_has_thinking_content(self):
+        resp = client.get("/app")
+        self.assertEqual(resp.status_code, 200)
         self.assertIn("Conviction Pipeline", resp.text)
         self.assertIn("Operator Tempo", resp.text)
         self.assertIn("Knowledge Boundary", resp.text)
         self.assertIn("Silence-as-Signal", resp.text)
         self.assertIn("Temporal Self-Assessment", resp.text)
 
-    def test_thinking_page_has_api_endpoints(self):
-        resp = client.get("/thinking")
+    def test_app_shell_has_thinking_api_endpoints(self):
+        resp = client.get("/app")
         text = resp.text
         self.assertIn("/api/thinking", text)
         self.assertIn("/api/tempo", text)
@@ -49,15 +53,17 @@ class TestThinkingPage(unittest.TestCase):
         self.assertIn("/api/silence", text)
         self.assertIn("/api/self-assessment", text)
 
-    def test_thinking_page_has_nav_links(self):
-        resp = client.get("/thinking")
+    def test_app_shell_has_navigation(self):
+        resp = client.get("/app")
         text = resp.text
-        self.assertIn('href="/chat"', text)
-        self.assertIn('href="/thinking"', text)
+        self.assertIn('data-view="chat"', text)
+        self.assertIn('data-view="dashboard"', text)
+        self.assertIn('data-view="thinking"', text)
 
-    def test_thinking_page_has_refresh_button(self):
-        resp = client.get("/thinking")
-        self.assertIn("refreshAll()", resp.text)
+    def test_app_shell_has_dream_and_audit(self):
+        resp = client.get("/app")
+        self.assertIn("triggerDream()", resp.text)
+        self.assertIn("runSecurityAudit()", resp.text)
 
 
 # ── API /api/thinking Tests ──────────────────────────────────────────
