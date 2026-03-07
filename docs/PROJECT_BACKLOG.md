@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-07 — session: P4 Personality & Proactive (deep prompts, anti-annoyance, topics, mode transitions, greeting/check-in) — **50 targets, 439 tests**
+**Last updated:** 2026-03-07 — session: P16 Operational Intelligence (struggle detection, feedback loop, log aggregation, goals UI, memory browser) — **51 targets, 479 tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 50 (make test-core) |
-| Individual tests | 439 passing, 0 failures |
+| Test targets | 51 (make test-core) |
+| Individual tests | 479 passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -41,6 +41,10 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Personality? | **YES — deep PUB/WORK system prompts, core identity, mode-aware proactive, conversation holding** |
 | Mode transitions? | **YES — time-of-day schedule, manual override, auto-expire** |
 | Talks first? | **YES — greeting on session start, periodic check-ins, deferred topic resurfacing** |
+| Struggle detection? | **YES — 5-signal frustration analysis (short msgs, repeated questions, keywords, question density, rapid-fire)** |
+| Feedback loop? | **YES — 1-5 star ratings per response, boost/correction effects on memory** |
+| Log aggregation? | **YES — ring-buffer capture on memu-core + langgraph, level/time-filtered, dashboard aggregator** |
+| Dashboard views? | **YES — 7 views: Chat, Thinking, Goals, Memory Browser, Logs, Settings, Wizard** |
 
 ---
 
@@ -165,8 +169,9 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
       `docker-compose.full.yml` has secrets blocks for tool-gate, langgraph, backup-service.
 - [x] **Backup-service validation** — Full rewrite: postgres, redis, memory,
       ledger backup + restore. SHA-256 checksums, filename sanitization.
-- [ ] **Log aggregation** — all services write JSON logs. Collect them
-      somewhere queryable (Loki, or just a shared volume with grep).
+- [x] **Log aggregation** — ring-buffer capture (500 entries) on memu-core +
+      langgraph. Level/time filtering. Dashboard aggregates from both services,
+      sorted by timestamp. Monospace log viewer with level filter dropdown.
 - [x] **HMAC key rotation in production** — 3-phase lifecycle drill
       (single → overlap → retire) with 14 unittest tests.
 
@@ -277,6 +282,26 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 - [x] Dashboard dream card + triggerDream() JS
 - [x] 26 unit tests
 
+### P16 — Operational Intelligence (2026-03-07)
+- [x] Struggle detection engine — 5-signal frustration analysis in memu-core
+      (short messages, repeated questions, frustration keywords, question density,
+      rapid-fire). Score 0-1, offer generated if ≥0.4 with cooldown.
+- [x] Feedback rating loop — 1-5 star rating per response. Rating 4-5 boosts
+      memory (importance 0.85), rating 1-2 stores correction (importance 0.90).
+      Stats endpoint with distribution and averages.
+- [x] Log aggregation — ring-buffer capture (500 entries) on memu-core +
+      langgraph. Level/time filtering. Dashboard aggregates both services.
+- [x] Dashboard Goals view — goal creation form, drift alert card, progress bars,
+      feedback stats with bar chart.
+- [x] Dashboard Memory Browser — search by query or category, stats overview
+      with clickable categories, results rendering.
+- [x] Dashboard Logs view — level filter dropdown, monospace log viewer with
+      time/level/service/msg columns, auto-refresh.
+- [x] Struggle check periodic — runs every 2 minutes in chat view, offers help
+      when frustration detected.
+- [x] Feedback buttons — star rating buttons on every assistant message.
+- [x] 40 unit tests (scripts/test_p16_operational.py)
+
 ---
 
 ## Session Notes
@@ -357,6 +382,25 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
   into LLM messages alongside memories and session history.
 - 43 new tests (scripts/test_p4_personality.py), all passing.
 - Test count: 396 → 439 (50 targets), zero failures.
+
+### 2026-03-07 (continued again)
+- **P16 Operational Intelligence — ALL DONE.** Dashboard now has 7 views.
+- P16a: Struggle detection engine — 5-signal frustration analysis in memu-core
+  (short msgs, repeated questions, keywords, question density, rapid-fire).
+  Score 0-1, offer generated if ≥0.4 with 30-min cooldown.
+- P16b: Log aggregation — ring-buffer capture (500 entries) on memu-core +
+  langgraph with level/time filtering. Dashboard aggregates both services.
+- P16c: Dashboard Goals view — goal creation form, drift alert card, progress
+  bars, feedback stats with bar chart.
+- P16d: Dashboard Memory Browser — search by query or category, stats overview,
+  clickable categories, results rendering.
+- P16e: Feedback rating loop — 1-5 star rating per response. Boost (4-5) /
+  correction (1-2) effects on memory. Stats endpoint with distribution.
+- Dashboard Logs view — level filter dropdown, monospace log viewer.
+- Struggle check periodic — runs every 2min in chat view. Feedback buttons on
+  all assistant messages.
+- 40 new tests (scripts/test_p16_operational.py).
+- Test count: 439 → 479 (51 targets), zero failures.
 
 ---
 

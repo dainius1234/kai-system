@@ -537,6 +537,166 @@ async def api_security_audit():
         return {"status": "unavailable", "findings": [], "risk_score": -1}
 
 
+# ── P16 API proxies ─────────────────────────────────────────────────
+
+@app.get("/api/goals")
+async def api_goals():
+    """Proxy Ohana goals from memu-core."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{MEMU_URL}/memory/goals")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable", "goals": []}
+
+
+@app.post("/api/goals")
+async def api_goals_create(request: Request):
+    """Proxy create goal to memu-core."""
+    body = await request.json()
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.post(f"{MEMU_URL}/memory/goals", json=body)
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "error", "detail": "Cannot reach memu-core"}
+
+
+@app.post("/api/goals/update")
+async def api_goals_update(request: Request):
+    """Proxy update goal progress to memu-core."""
+    body = await request.json()
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.post(f"{MEMU_URL}/memory/goals/update", json=body)
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "error", "detail": "Cannot reach memu-core"}
+
+
+@app.get("/api/drift")
+async def api_drift():
+    """Proxy drift detection from memu-core."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{MEMU_URL}/memory/drift")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable"}
+
+
+@app.get("/api/memories")
+async def api_memories(query: str = "", category: str = "", top_k: int = 20):
+    """Browse memories — search or list by category."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            if query:
+                resp = await client.get(f"{MEMU_URL}/memory/retrieve", params={"query": query, "top_k": top_k})
+            elif category:
+                resp = await client.get(f"{MEMU_URL}/memory/search-by-category", params={"category": category, "top_k": top_k})
+            else:
+                resp = await client.get(f"{MEMU_URL}/memory/stats")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable", "memories": []}
+
+
+@app.get("/api/memory/stats")
+async def api_memory_stats():
+    """Proxy memory statistics from memu-core."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{MEMU_URL}/memory/stats")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable"}
+
+
+@app.get("/api/struggle")
+async def api_struggle(session_id: str = "default"):
+    """Proxy struggle detection from memu-core."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{MEMU_URL}/memory/struggle", params={"session_id": session_id})
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable", "struggle_score": 0}
+
+
+@app.post("/api/feedback")
+async def api_feedback(request: Request):
+    """Proxy feedback rating to memu-core."""
+    body = await request.json()
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.post(f"{MEMU_URL}/memory/feedback", json=body)
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "error", "detail": "Cannot reach memu-core"}
+
+
+@app.get("/api/feedback/stats")
+async def api_feedback_stats():
+    """Proxy feedback stats from memu-core."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{MEMU_URL}/memory/feedback/stats")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"status": "unavailable"}
+
+
+@app.get("/api/logs")
+async def api_logs(limit: int = 100, level: str = "", since: float = 0):
+    """Aggregate logs from memu-core (and potentially other services)."""
+    all_logs: list = []
+    params: dict = {"limit": limit}
+    if level:
+        params["level"] = level
+    if since:
+        params["since"] = since
+
+    # Collect from memu-core
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{MEMU_URL}/logs", params=params)
+            if resp.status_code == 200:
+                data = resp.json()
+                all_logs.extend(data.get("entries", []))
+    except Exception:
+        pass
+
+    # Collect from langgraph
+    langgraph_url = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{langgraph_url}/logs", params=params)
+            if resp.status_code == 200:
+                data = resp.json()
+                all_logs.extend(data.get("entries", []))
+    except Exception:
+        pass
+
+    # Sort all by timestamp (most recent first)
+    all_logs.sort(key=lambda x: x.get("time", 0), reverse=True)
+
+    return {
+        "status": "ok",
+        "count": len(all_logs[:limit]),
+        "entries": all_logs[:limit],
+    }
+
+
+
 # ── Unified App Shell ────────────────────────────────────────────────
 
 @app.get("/app")

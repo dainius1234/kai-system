@@ -12,13 +12,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import re
 import time
 import uuid
-from collections import Counter
+from collections import Counter, deque
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional, Protocol, runtime_checkable
+from typing import Any, Deque, Dict, List, Optional, Protocol, runtime_checkable
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel
@@ -2917,6 +2918,265 @@ async def proactive_check_in() -> Dict[str, Any]:
         "status": "ok",
         "check_in": " ".join(messages),
         "timestamp": now,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# P16a: STRUGGLE DETECTION ENGINE
+#  Detects operator frustration patterns from session messages.
+#  Signals: short messages, repeated questions, corrections, keywords,
+#  rapid-fire msgs, undo/retry patterns.
+#  Returns a struggle score (0-1) and contextual help offer.
+# ═══════════════════════════════════════════════════════════════════════
+
+import re as _re
+
+_FRUSTRATION_KEYWORDS = {
+    "stuck", "confused", "help", "wrong", "broken", "doesn't work",
+    "not working", "can't", "failed", "error", "ugh", "wtf", "ffs",
+    "again", "still", "why", "how", "same issue", "same problem",
+}
+
+_STRUGGLE_COOLDOWN = int(os.getenv("STRUGGLE_COOLDOWN_SECONDS", "1800"))  # 30 min
+_last_struggle_alert: float = 0.0
+
+
+@app.get("/memory/struggle")
+async def detect_struggle(session_id: str = Query(default="default")) -> Dict[str, Any]:
+    """Analyse recent session messages for frustration patterns.
+
+    Returns a struggle_score (0.0 - 1.0) and, if high enough, a
+    contextual help offer that Kai can inject into conversation.
+    """
+    global _last_struggle_alert
+    now = time.time()
+
+    sid = sanitize_string(session_id)
+    messages = _get_session_messages(sid)
+
+    # only look at recent messages (last 15)
+    recent = messages[-15:] if len(messages) > 15 else messages
+    user_msgs = [m for m in recent if m.get("role") == "user"]
+
+    if len(user_msgs) < 2:
+        return {"status": "ok", "struggle_score": 0.0, "offer": None, "reason": "insufficient_data"}
+
+    signals: List[str] = []
+    score = 0.0
+
+    # Signal 1: Short frustrated messages (< 20 chars, likely "??", "help", etc.)
+    short_count = sum(1 for m in user_msgs[-5:] if len(m.get("content", "")) < 20)
+    if short_count >= 3:
+        score += 0.25
+        signals.append(f"short_messages ({short_count}/5)")
+
+    # Signal 2: Repeated questions (similar content appearing twice)
+    contents = [m.get("content", "").lower().strip() for m in user_msgs[-8:]]
+    repeated = 0
+    for i, c1 in enumerate(contents):
+        for c2 in contents[i + 1:]:
+            if c1 and c2 and (c1 == c2 or (len(c1) > 10 and c1 in c2) or (len(c2) > 10 and c2 in c1)):
+                repeated += 1
+    if repeated > 0:
+        score += min(repeated * 0.15, 0.3)
+        signals.append(f"repeated_questions ({repeated})")
+
+    # Signal 3: Frustration keywords
+    all_text = " ".join(contents[-5:])
+    keyword_hits = sum(1 for kw in _FRUSTRATION_KEYWORDS if kw in all_text)
+    if keyword_hits > 0:
+        score += min(keyword_hits * 0.1, 0.3)
+        signals.append(f"frustration_keywords ({keyword_hits})")
+
+    # Signal 4: Question marks density (lots of "?" = confusion)
+    qmark_count = sum(m.get("content", "").count("?") for m in user_msgs[-5:])
+    if qmark_count >= 3:
+        score += 0.1
+        signals.append(f"question_density ({qmark_count})")
+
+    # Signal 5: Rapid-fire messages (3+ msgs within 60 seconds gaps)
+    timestamps = []
+    for m in recent[-8:]:
+        ts = m.get("timestamp")
+        if ts:
+            timestamps.append(float(ts) if isinstance(ts, (int, float)) else now)
+    if len(timestamps) >= 3:
+        gaps = [timestamps[i + 1] - timestamps[i] for i in range(len(timestamps) - 1) if timestamps[i + 1] > timestamps[i]]
+        rapid = sum(1 for g in gaps if g < 60)
+        if rapid >= 2:
+            score += 0.15
+            signals.append(f"rapid_fire ({rapid} quick gaps)")
+
+    score = min(score, 1.0)
+
+    # generate help offer if score is high enough and cooldown allows
+    offer = None
+    if score >= 0.4 and (now - _last_struggle_alert) >= _STRUGGLE_COOLDOWN:
+        # try to determine what they're struggling with
+        topic = contents[-1] if contents else "this"
+        offer = f"I can see you might be having trouble with {topic[:60]}. Want me to try a different approach, or break it down step by step?"
+        _last_struggle_alert = now
+
+    return {
+        "status": "ok",
+        "struggle_score": round(score, 2),
+        "signals": signals,
+        "offer": offer,
+        "cooldown_remaining": max(0, _STRUGGLE_COOLDOWN - (now - _last_struggle_alert)),
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# P16e: FEEDBACK RATING LOOP
+#  Operator rates Kai's responses. Ratings feed back into memory
+#  importance scoring. Helps Kai learn what's useful vs what isn't.
+# ═══════════════════════════════════════════════════════════════════════
+
+_feedback_store: List[Dict[str, Any]] = []
+
+
+class FeedbackRequest(BaseModel):
+    session_id: str = "default"
+    message_index: int = -1
+    rating: int  # 1-5
+    comment: Optional[str] = None
+
+
+@app.post("/memory/feedback")
+async def submit_feedback(req: FeedbackRequest) -> Dict[str, Any]:
+    """Rate a Kai response. Ratings 1-5 (1=bad, 5=great).
+
+    Positive ratings (4-5) boost the corresponding memory's importance.
+    Negative ratings (1-2) create a correction signal.
+    """
+    if req.rating < 1 or req.rating > 5:
+        raise HTTPException(status_code=400, detail="rating must be 1-5")
+
+    entry = {
+        "session_id": sanitize_string(req.session_id),
+        "message_index": req.message_index,
+        "rating": req.rating,
+        "comment": sanitize_string(req.comment) if req.comment else None,
+        "timestamp": time.time(),
+    }
+    _feedback_store.append(entry)
+
+    # if great rating, try to boost the memory importance
+    if req.rating >= 4:
+        try:
+            sid = sanitize_string(req.session_id)
+            msgs = _get_session_messages(sid)
+            if msgs and req.message_index < len(msgs):
+                content = msgs[req.message_index].get("content", "")
+                if content:
+                    store.memorize(
+                        text=f"[positive feedback] {content[:200]}",
+                        event_type="feedback_positive",
+                        importance=0.85,
+                        metadata={"rating": req.rating, "session": sid},
+                    )
+        except Exception:
+            pass
+
+    # if bad rating, store as correction signal
+    if req.rating <= 2:
+        try:
+            sid = sanitize_string(req.session_id)
+            msgs = _get_session_messages(sid)
+            if msgs and req.message_index < len(msgs):
+                content = msgs[req.message_index].get("content", "")
+                if content:
+                    store.memorize(
+                        text=f"[negative feedback] Response was unhelpful: {content[:200]}",
+                        event_type="correction",
+                        importance=0.90,
+                        metadata={"rating": req.rating, "comment": req.comment, "session": sid},
+                    )
+        except Exception:
+            pass
+
+    return {
+        "status": "ok",
+        "rating": req.rating,
+        "effect": "boost" if req.rating >= 4 else ("correction" if req.rating <= 2 else "noted"),
+        "total_feedback": len(_feedback_store),
+    }
+
+
+@app.get("/memory/feedback/stats")
+async def feedback_stats() -> Dict[str, Any]:
+    """Get aggregate feedback statistics."""
+    if not _feedback_store:
+        return {"status": "ok", "count": 0, "avg_rating": 0, "distribution": {}}
+
+    ratings = [f["rating"] for f in _feedback_store]
+    dist = {}
+    for r in range(1, 6):
+        dist[str(r)] = sum(1 for x in ratings if x == r)
+
+    return {
+        "status": "ok",
+        "count": len(ratings),
+        "avg_rating": round(sum(ratings) / len(ratings), 2),
+        "distribution": dist,
+        "recent": _feedback_store[-5:],
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# P16b: LOG AGGREGATION
+#  Expose recent log entries from this service for dashboard querying.
+#  Other services push logs to a shared format; this serves them.
+# ═══════════════════════════════════════════════════════════════════════
+
+_log_buffer: Deque[Dict[str, Any]] = deque(maxlen=500)
+
+
+class _LogCapture(logging.Handler):
+    """Captures log records into a ring buffer for /logs endpoint."""
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            _log_buffer.append({
+                "time": record.created,
+                "level": record.levelname,
+                "service": record.name,
+                "msg": record.getMessage()[:500],
+            })
+        except Exception:
+            pass
+
+
+# attach to root logger so we capture everything
+_log_capture = _LogCapture()
+_log_capture.setLevel(logging.INFO)
+logging.getLogger().addHandler(_log_capture)
+
+
+@app.get("/logs")
+async def get_logs(
+    limit: int = Query(default=100, ge=1, le=500),
+    level: Optional[str] = Query(default=None),
+    since: Optional[float] = Query(default=None),
+) -> Dict[str, Any]:
+    """Query recent log entries. Supports filtering by level and timestamp."""
+    entries = list(_log_buffer)
+
+    if level:
+        level_upper = level.upper()
+        entries = [e for e in entries if e["level"] == level_upper]
+
+    if since:
+        entries = [e for e in entries if e["time"] >= since]
+
+    # most recent first
+    entries.reverse()
+    entries = entries[:limit]
+
+    return {
+        "status": "ok",
+        "count": len(entries),
+        "total_buffered": len(_log_buffer),
+        "entries": entries,
     }
 
 

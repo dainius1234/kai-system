@@ -44,6 +44,18 @@
           <span class="nav-icon">⚙️</span>
           <span class="nav-label">Settings</span>
         </a>
+        <a class="nav-item" data-view="goals" onclick="switchView('goals')">
+          <span class="nav-icon">🎯</span>
+          <span class="nav-label">Goals</span>
+        </a>
+        <a class="nav-item" data-view="memory" onclick="switchView('memory')">
+          <span class="nav-icon">🧬</span>
+          <span class="nav-label">Memory</span>
+        </a>
+        <a class="nav-item" data-view="logs" onclick="switchView('logs')">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">Logs</span>
+        </a>
       </nav>
 
       <div class="sidebar-divider"></div>
@@ -292,6 +304,100 @@
           </div>
         </section>
 
+        <!-- ═══ Goals View ═══ -->
+        <section class="view" id="goalsView">
+          <div style="max-width:900px;margin:0 auto;padding:var(--sp-6);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-4);">
+              <h2 class="text-heading">Ohana Goals</h2>
+              <button class="refresh-btn" onclick="showGoalForm()">+ New Goal</button>
+            </div>
+
+            <!-- New Goal Form (hidden by default) -->
+            <div class="card" id="goalForm" style="display:none;margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">🎯</span> Create Goal</div>
+              <div style="display:grid;gap:var(--sp-3);">
+                <input type="text" id="goalTitle" placeholder="Goal title" class="input-field">
+                <select id="goalPriority" class="input-field">
+                  <option value="high">High Priority</option>
+                  <option value="medium" selected>Medium Priority</option>
+                  <option value="low">Low Priority</option>
+                </select>
+                <input type="text" id="goalDeadline" placeholder="Deadline (e.g. 2026-04-01)" class="input-field">
+                <div style="display:flex;gap:var(--sp-2);">
+                  <button class="refresh-btn" onclick="createGoal()">Create</button>
+                  <button class="refresh-btn" style="background:var(--surface-solid);" onclick="hideGoalForm()">Cancel</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Drift Alert -->
+            <div class="card" id="driftCard" style="display:none;margin-bottom:var(--sp-4);border-left:3px solid var(--warn);">
+              <div class="card-title" style="color:var(--warn);"><span class="icon">⚠️</span> Drift Detection</div>
+              <div id="driftContent"></div>
+            </div>
+
+            <!-- Goals List -->
+            <div id="goalsList">
+              <div class="skeleton" style="height:200px"></div>
+            </div>
+
+            <!-- Feedback Stats -->
+            <div class="card" style="margin-top:var(--sp-4);">
+              <div class="card-title"><span class="icon">📊</span> Feedback Summary</div>
+              <div id="feedbackContent"><div class="empty">No feedback data yet</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ Memory Browser View ═══ -->
+        <section class="view" id="memoryView">
+          <div style="max-width:1000px;margin:0 auto;padding:var(--sp-6);">
+            <h2 class="text-heading" style="margin-bottom:var(--sp-4);">Memory Browser</h2>
+
+            <!-- Search Bar -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div style="display:flex;gap:var(--sp-2);">
+                <input type="text" id="memorySearch" placeholder="Search memories..." class="input-field" style="flex:1;" onkeydown="if(event.key==='Enter')searchMemories()">
+                <button class="refresh-btn" onclick="searchMemories()">🔍 Search</button>
+              </div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">📈</span> Memory Statistics</div>
+              <div id="memStatsContent"><div class="skeleton" style="height:60px"></div></div>
+            </div>
+
+            <!-- Memory Results -->
+            <div id="memoryResults">
+              <div class="empty">Search for memories or browse by category above</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ Logs View ═══ -->
+        <section class="view" id="logsView">
+          <div style="max-width:1200px;margin:0 auto;padding:var(--sp-6);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-4);">
+              <h2 class="text-heading">System Logs</h2>
+              <div style="display:flex;gap:var(--sp-2);">
+                <select id="logLevel" class="input-field" onchange="refreshLogs()">
+                  <option value="">All Levels</option>
+                  <option value="ERROR">Error</option>
+                  <option value="WARNING">Warning</option>
+                  <option value="INFO">Info</option>
+                </select>
+                <button class="refresh-btn" onclick="refreshLogs()">↻ Refresh</button>
+              </div>
+            </div>
+            <div class="card">
+              <div id="logsContent" style="font-family:monospace;font-size:12px;max-height:70vh;overflow-y:auto;">
+                <div class="empty">Click Refresh to load logs</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </div><!-- .content -->
     </main>
   </div><!-- .app -->
@@ -426,7 +532,7 @@ function switchView(name) {
   const navEl = document.querySelector(`.nav-item[data-view="${name}"]`);
   if (navEl) navEl.classList.add('active');
 
-  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings' };
+  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs' };
   document.getElementById('viewTitle').textContent = titles[name] || name;
 
   currentView = name;
@@ -441,6 +547,15 @@ function switchView(name) {
   }
   if (name === 'settings') {
     loadSettings();
+  }
+  if (name === 'goals') {
+    refreshGoals();
+  }
+  if (name === 'memory') {
+    refreshMemoryStats();
+  }
+  if (name === 'logs') {
+    refreshLogs();
   }
 }
 
@@ -631,6 +746,9 @@ function addMessage(role, content, skipSave) {
     actions.className = 'msg-actions';
     actions.innerHTML = '<button onclick="copyMsg(this)">Copy</button>';
     contentDiv.appendChild(actions);
+    // add feedback buttons
+    const msgIdx = chatHistory.length;
+    setTimeout(function() { addFeedbackButtons(contentDiv, msgIdx); }, 0);
   }
 
   div.appendChild(avatar);
@@ -1433,7 +1551,7 @@ document.addEventListener('keydown', function(e) {
 
   // Ctrl+1/2/3/4 — switch views
   if (e.ctrlKey && !e.shiftKey) {
-    const viewMap = { '1': 'chat', '2': 'dashboard', '3': 'thinking', '4': 'settings' };
+    const viewMap = { '1': 'chat', '2': 'dashboard', '3': 'thinking', '4': 'settings', '5': 'goals', '6': 'memory', '7': 'logs' };
     if (viewMap[e.key]) { e.preventDefault(); switchView(viewMap[e.key]); return; }
   }
 
@@ -1524,7 +1642,283 @@ function installPWA() {
 
   // First-run wizard
   checkFirstRun();
+
+  // Struggle detection (periodic)
+  setInterval(checkStruggle, 120000);
 })();
+
+
+// ── P16c: Goals View ────────────────────────────────────────────────
+
+function showGoalForm() { document.getElementById('goalForm').style.display = ''; }
+function hideGoalForm() { document.getElementById('goalForm').style.display = 'none'; }
+
+async function createGoal() {
+  const title = document.getElementById('goalTitle').value.trim();
+  if (!title) { showToast('Goals', 'Title is required', 'warning'); return; }
+  const priority = document.getElementById('goalPriority').value;
+  const deadline = document.getElementById('goalDeadline').value.trim() || 'none';
+  try {
+    await fetch('/api/goals', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, priority, deadline }),
+    });
+    hideGoalForm();
+    document.getElementById('goalTitle').value = '';
+    document.getElementById('goalDeadline').value = '';
+    refreshGoals();
+    showToast('Goals', 'Goal created: ' + title, 'success');
+  } catch { showToast('Goals', 'Failed to create goal', 'error'); }
+}
+
+async function refreshGoals() {
+  try {
+    const [goalsResp, driftResp, fbResp] = await Promise.all([
+      fetch('/api/goals'),
+      fetch('/api/drift'),
+      fetch('/api/feedback/stats'),
+    ]);
+    const goalsData = await goalsResp.json();
+    const driftData = await driftResp.json();
+    const fbData = await fbResp.json();
+
+    // Goals list
+    const goals = goalsData.goals || [];
+    if (!goals.length) {
+      document.getElementById('goalsList').innerHTML =
+        '<div class="empty">No goals yet — create one above. Ohana means no one gets left behind.</div>';
+    } else {
+      let html = '';
+      for (const g of goals) {
+        const progress = g.progress || 0;
+        const priority = g.priority || 'medium';
+        const deadline = g.deadline || 'none';
+        const status = g.status || 'active';
+        const pColor = priority === 'high' ? 'var(--danger)' : priority === 'medium' ? 'var(--warn)' : 'var(--text3)';
+        const barColor = progress >= 80 ? 'var(--ok)' : progress >= 40 ? 'var(--accent2)' : 'var(--accent)';
+        html += `<div class="card" style="margin-bottom:var(--sp-3);border-left:3px solid ${escapeHtml(pColor)};">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-weight:600;font-size:15px;">${escapeHtml(g.title || 'Untitled')}</div>
+              <div style="font-size:12px;color:var(--text3);margin-top:2px;">
+                <span style="color:${escapeHtml(pColor)};font-weight:600;">${priority.toUpperCase()}</span>
+                · Status: ${escapeHtml(status)} · Deadline: ${escapeHtml(deadline)}
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:22px;font-weight:700;color:${escapeHtml(barColor)}">${progress}%</div>
+            </div>
+          </div>
+          <div style="margin-top:var(--sp-2);height:6px;background:var(--surface-solid);border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:${progress}%;background:${escapeHtml(barColor)};border-radius:3px;transition:width 0.5s;"></div>
+          </div>
+        </div>`;
+      }
+      document.getElementById('goalsList').innerHTML = html;
+    }
+
+    // Drift
+    const driftCard = document.getElementById('driftCard');
+    if (driftData.status === 'ok' && driftData.drifting) {
+      driftCard.style.display = '';
+      const msg = driftData.nudge || 'You might be drifting from your goals.';
+      document.getElementById('driftContent').innerHTML =
+        `<div style="font-size:14px;color:var(--text2);">${escapeHtml(msg)}</div>`;
+    } else {
+      driftCard.style.display = 'none';
+    }
+
+    // Feedback stats
+    if (fbData.count > 0) {
+      const avg = fbData.avg_rating || 0;
+      const dist = fbData.distribution || {};
+      let fbHtml = `<div style="font-size:14px;margin-bottom:var(--sp-2);">
+        Average rating: <strong>${avg.toFixed(1)}</strong> / 5 (${fbData.count} ratings)
+      </div>`;
+      fbHtml += '<div style="display:flex;gap:var(--sp-2);align-items:flex-end;height:60px;">';
+      for (let i = 1; i <= 5; i++) {
+        const cnt = dist[String(i)] || 0;
+        const maxCnt = Math.max(...Object.values(dist), 1);
+        const h = Math.max(cnt / maxCnt * 50, 2);
+        const color = i >= 4 ? 'var(--ok)' : i === 3 ? 'var(--warn)' : 'var(--danger)';
+        fbHtml += `<div style="text-align:center;flex:1;">
+          <div style="height:${h}px;background:${color};border-radius:3px;margin-bottom:4px;"></div>
+          <div style="font-size:11px;color:var(--text3);">${'★'.repeat(i)} (${cnt})</div>
+        </div>`;
+      }
+      fbHtml += '</div>';
+      document.getElementById('feedbackContent').innerHTML = fbHtml;
+    }
+  } catch { /* goals refresh failed silently */ }
+}
+
+
+// ── P16d: Memory Browser ────────────────────────────────────────────
+
+async function refreshMemoryStats() {
+  try {
+    const resp = await fetch('/api/memory/stats');
+    if (!resp.ok) throw new Error('unavailable');
+    const data = await resp.json();
+
+    let html = `<div style="display:flex;gap:var(--sp-6);flex-wrap:wrap;">`;
+    html += `<div><div style="font-size:11px;color:var(--text3);">Total Memories</div><div style="font-size:22px;font-weight:700;color:var(--accent);">${data.total || data.count || 0}</div></div>`;
+
+    const cats = data.categories || data.by_category || {};
+    if (typeof cats === 'object' && Object.keys(cats).length > 0) {
+      for (const [cat, count] of Object.entries(cats)) {
+        html += `<div style="cursor:pointer;" onclick="searchByCategory('${escapeHtml(cat)}')">
+          <div style="font-size:11px;color:var(--text3);">${escapeHtml(cat)}</div>
+          <div style="font-size:16px;font-weight:600;">${count}</div>
+        </div>`;
+      }
+    }
+    html += '</div>';
+    document.getElementById('memStatsContent').innerHTML = html;
+  } catch {
+    document.getElementById('memStatsContent').innerHTML = '<div class="empty">Stats unavailable</div>';
+  }
+}
+
+async function searchMemories() {
+  const query = document.getElementById('memorySearch').value.trim();
+  if (!query) { showToast('Memory', 'Enter a search query', 'warning'); return; }
+  try {
+    const resp = await fetch('/api/memories?query=' + encodeURIComponent(query) + '&top_k=20');
+    if (!resp.ok) throw new Error('unavailable');
+    const data = await resp.json();
+    renderMemories(data.results || data.memories || []);
+  } catch {
+    document.getElementById('memoryResults').innerHTML = '<div class="empty">Search failed</div>';
+  }
+}
+
+async function searchByCategory(cat) {
+  document.getElementById('memorySearch').value = '';
+  try {
+    const resp = await fetch('/api/memories?category=' + encodeURIComponent(cat) + '&top_k=20');
+    if (!resp.ok) throw new Error('unavailable');
+    const data = await resp.json();
+    renderMemories(data.results || data.memories || []);
+  } catch {
+    document.getElementById('memoryResults').innerHTML = '<div class="empty">Search failed</div>';
+  }
+}
+
+function renderMemories(memories) {
+  if (!memories.length) {
+    document.getElementById('memoryResults').innerHTML = '<div class="empty">No memories found</div>';
+    return;
+  }
+  let html = '';
+  for (const m of memories) {
+    const text = m.text || m.content || JSON.stringify(m);
+    const cat = m.category || m.event_type || 'general';
+    const importance = m.importance || m.score || 0;
+    const ts = m.timestamp || '';
+    const pinned = m.pinned ? '📌 ' : '';
+    const impColor = importance >= 0.8 ? 'var(--ok)' : importance >= 0.5 ? 'var(--warn)' : 'var(--text3)';
+
+    html += `<div class="card" style="margin-bottom:var(--sp-2);padding:var(--sp-3);">
+      <div style="display:flex;justify-content:space-between;align-items:start;">
+        <div style="flex:1;">
+          <div style="font-size:13px;line-height:1.5;">${pinned}${escapeHtml(typeof text === 'string' ? text.slice(0, 300) : JSON.stringify(text).slice(0, 300))}</div>
+        </div>
+        <div style="text-align:right;min-width:80px;margin-left:var(--sp-3);">
+          <div style="font-size:11px;font-weight:600;color:${escapeHtml(impColor)};">${(importance * 100).toFixed(0)}%</div>
+          <div style="font-size:10px;color:var(--text3);">${escapeHtml(cat)}</div>
+        </div>
+      </div>
+      ${ts ? '<div style="font-size:10px;color:var(--text3);margin-top:4px;">' + escapeHtml(String(ts)) + '</div>' : ''}
+    </div>`;
+  }
+  document.getElementById('memoryResults').innerHTML = html;
+}
+
+
+// ── P16b: Logs View ─────────────────────────────────────────────────
+
+async function refreshLogs() {
+  const level = document.getElementById('logLevel').value;
+  try {
+    const url = '/api/logs?limit=200' + (level ? '&level=' + level : '');
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('unavailable');
+    const data = await resp.json();
+    const entries = data.entries || [];
+
+    if (!entries.length) {
+      document.getElementById('logsContent').innerHTML = '<div class="empty">No log entries</div>';
+      return;
+    }
+
+    let html = '<div style="display:grid;gap:1px;">';
+    for (const e of entries) {
+      const levelColor = e.level === 'ERROR' ? 'var(--danger)' : e.level === 'WARNING' ? 'var(--warn)' : 'var(--text3)';
+      const time = new Date(e.time * 1000).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      html += `<div style="display:flex;gap:var(--sp-2);padding:2px 0;border-bottom:1px solid var(--border);">
+        <span style="min-width:70px;color:var(--text3);">${time}</span>
+        <span style="min-width:55px;font-weight:600;color:${escapeHtml(levelColor)};">${escapeHtml(e.level)}</span>
+        <span style="min-width:80px;color:var(--accent);">${escapeHtml(e.service || '?')}</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(e.msg || '')}</span>
+      </div>`;
+    }
+    html += '</div>';
+    document.getElementById('logsContent').innerHTML = html;
+  } catch {
+    document.getElementById('logsContent').innerHTML = '<div class="empty">Cannot load logs</div>';
+  }
+}
+
+
+// ── P16a: Struggle Detection (background) ───────────────────────────
+
+async function checkStruggle() {
+  // Only check when in chat view with recent messages
+  if (currentView !== 'chat' || chatHistory.length < 4) return;
+  try {
+    const resp = await fetch('/api/struggle?session_id=default');
+    if (!resp.ok) return;
+    const data = await resp.json();
+    if (data.offer && data.struggle_score >= 0.4) {
+      showToast('Kai', data.offer, 'info', 8000);
+    }
+  } catch { /* ignore */ }
+}
+
+
+// ── P16e: Feedback Rating ───────────────────────────────────────────
+
+function addFeedbackButtons(msgDiv, msgIndex) {
+  const actions = msgDiv.querySelector('.msg-actions');
+  if (!actions || actions.querySelector('.fb-btn')) return;
+  const wrap = document.createElement('span');
+  wrap.style.marginLeft = '8px';
+  for (let r = 1; r <= 5; r++) {
+    const btn = document.createElement('button');
+    btn.className = 'fb-btn';
+    btn.textContent = '★'.repeat(r);
+    btn.style.fontSize = '10px';
+    btn.style.opacity = '0.5';
+    btn.title = r + ' star';
+    btn.onclick = function() { submitRating(msgIndex, r, btn); };
+    wrap.appendChild(btn);
+  }
+  actions.appendChild(wrap);
+}
+
+async function submitRating(msgIndex, rating, btn) {
+  try {
+    await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: 'default', message_index: msgIndex, rating }),
+    });
+    btn.parentElement.innerHTML = '<span style="font-size:11px;color:var(--accent);">Rated ' + '★'.repeat(rating) + '</span>';
+    showToast('Feedback', 'Thanks! Rated ' + rating + '/5', 'success', 2000);
+  } catch { /* ignore */ }
+}
 
 </script>
 </body>

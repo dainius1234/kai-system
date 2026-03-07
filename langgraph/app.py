@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 import time
 import uuid
+from collections import deque
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Deque, Dict, List, Optional
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
@@ -988,6 +990,43 @@ async def security_audit_endpoint():
 
 
 _restore_breakers()
+
+
+# ── P16b: Log aggregation ───────────────────────────────────────────
+
+_log_buffer: Deque[Dict[str, Any]] = deque(maxlen=500)
+
+
+class _LogCapture(logging.Handler):
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            _log_buffer.append({
+                "time": record.created,
+                "level": record.levelname,
+                "service": "langgraph",
+                "msg": record.getMessage()[:500],
+            })
+        except Exception:
+            pass
+
+
+_log_capture = _LogCapture()
+_log_capture.setLevel(logging.INFO)
+logging.getLogger().addHandler(_log_capture)
+
+
+@app.get("/logs")
+async def get_logs(limit: int = 100, level: str = "", since: float = 0):
+    """Query recent log entries from langgraph."""
+    entries = list(_log_buffer)
+    if level:
+        entries = [e for e in entries if e["level"] == level.upper()]
+    if since:
+        entries = [e for e in entries if e["time"] >= since]
+    entries.reverse()
+    entries = entries[:limit]
+    return {"status": "ok", "count": len(entries), "entries": entries}
+
 
 if __name__ == "__main__":
     import uvicorn

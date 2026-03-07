@@ -1548,3 +1548,37 @@ kbd {
 #settingsPWA {
   display: none;
 }
+
+
+/* ─── P16: Input fields for goals/memory ────────────────────────── */
+
+.input-field {
+  padding: 8px 12px;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-field:focus {
+  border-color: var(--accent);
+}
+
+.fb-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 10px;
+  color: var(--text3);
+  transition: opacity 0.2s;
+}
+
+.fb-btn:hover {
+  opacity: 1 !important;
+  color: var(--accent2);
+}
