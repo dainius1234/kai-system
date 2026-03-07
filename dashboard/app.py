@@ -771,6 +771,66 @@ async def proxy_confess(request: Request):
         return resp.json()
 
 
+# ── P18: Narrative Identity proxies ──────────────────────────────────
+
+@app.post("/api/autobiography/record")
+async def proxy_autobiography_record(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/autobiography/record", json=body)
+        return resp.json()
+
+
+@app.get("/api/autobiography")
+async def proxy_autobiography(request: Request):
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/autobiography", params=dict(request.query_params))
+        return resp.json()
+
+
+@app.get("/api/identity")
+async def proxy_identity():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/identity")
+        return resp.json()
+
+
+@app.get("/api/story-arcs")
+async def proxy_story_arcs():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/story-arcs")
+        return resp.json()
+
+
+@app.get("/api/future-self")
+async def proxy_future_self():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/future-self")
+        return resp.json()
+
+
+@app.post("/api/legacy/write")
+async def proxy_legacy_write(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/legacy/write", json=body)
+        return resp.json()
+
+
+@app.get("/api/legacy")
+async def proxy_legacy(request: Request):
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/legacy", params=dict(request.query_params))
+        return resp.json()
+
+
+@app.get("/api/narrative/summary")
+async def proxy_narrative_summary():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/narrative/summary")
+        return resp.json()
+
+
 # ── Unified App Shell ────────────────────────────────────────────────
 
 @app.get("/app")

@@ -470,6 +470,27 @@ async def _get_emotional_context(query: str) -> Dict[str, Any]:
     return result
 
 
+async def _get_narrative_identity() -> Dict[str, Any]:
+    """Fetch Kai's evolving identity narrative + story arc."""
+    result: Dict[str, Any] = {}
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            id_task = client.get(f"{MEMU_URL}/memory/identity")
+            arc_task = client.get(f"{MEMU_URL}/memory/story-arcs")
+            id_resp, arc_resp = await asyncio.gather(id_task, arc_task, return_exceptions=True)
+            if not isinstance(id_resp, Exception) and id_resp.status_code == 200:
+                data = id_resp.json()
+                result["narrative"] = data.get("narrative", "")
+                result["days_alive"] = data.get("stats", {}).get("days_alive", 0)
+            if not isinstance(arc_resp, Exception) and arc_resp.status_code == 200:
+                data = arc_resp.json()
+                result["current_chapter"] = data.get("current_chapter", "")
+                result["chapter_number"] = data.get("chapter_number", 1)
+    except Exception:
+        pass
+    return result
+
+
 @app.post("/chat")
 async def chat_stream(req: ChatRequest):
     """Kai's main conversation endpoint. Streams tokens via SSE.
@@ -532,12 +553,14 @@ async def chat_stream(req: ChatRequest):
     goals_task = asyncio.create_task(_get_active_goals())
     topics_task = asyncio.create_task(_get_active_topics())
     eq_task = asyncio.create_task(_get_emotional_context(user_msg))
+    narrative_task = asyncio.create_task(_get_narrative_identity())
 
     memories = await memories_task
     session_msgs = await session_task
     goals = await goals_task
     topics = await topics_task
     eq_context = await eq_task
+    narrative = await narrative_task
 
     # build the message list
     messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
@@ -587,6 +610,20 @@ async def chat_stream(req: ChatRequest):
                 "content": "Emotional intelligence context:\n" + "\n".join(eq_parts),
             })
 
+    # inject narrative identity — Kai's sense of self and current life chapter
+    if narrative:
+        identity_text = narrative.get("narrative", "")
+        chapter = narrative.get("current_chapter", "")
+        if identity_text:
+            id_parts = [identity_text]
+            if chapter:
+                ch_num = narrative.get("chapter_number", 1)
+                id_parts.append(f"Current life chapter: Chapter {ch_num} — {chapter}.")
+            messages.append({
+                "role": "system",
+                "content": "Self-identity (who I am, derived from experience):\n" + " ".join(id_parts),
+            })
+
     # add session history (last N turns)
     for msg in session_msgs[-10:]:
         role = msg.get("role", "user")
@@ -631,6 +668,15 @@ async def chat_stream(req: ChatRequest):
                     await _eq_cl.post(
                         f"{MEMU_URL}/memory/emotion/record",
                         json={"session_id": req.session_id, "text": user_msg},
+                    )
+            except Exception:
+                pass
+            # record to autobiography if significant
+            try:
+                async with httpx.AsyncClient(timeout=3.0) as _auto_cl:
+                    await _auto_cl.post(
+                        f"{MEMU_URL}/memory/autobiography/record",
+                        json={"text": user_msg, "context": "chat"},
                     )
             except Exception:
                 pass

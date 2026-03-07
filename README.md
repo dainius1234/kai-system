@@ -13,6 +13,7 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Epistemic Humility** | Knows what it doesn't know — warns when confidence is low | Never |
 | **Confession Engine** | Proactively admits past mistakes without being asked | Never |
 | **Relationship Timeline** | Tracks days together, milestones, emotional journey | Never |
+| **Narrative Identity** | Builds its own life story — autobiography, arcs, future self, legacy messages | Never |
 | **Dream State** | Offline consolidation — clusters failures, recalibrates boundaries | Never |
 | **Struggle Detection** | Detects operator frustration (5 signals) and offers help | Rarely |
 | **Proactive Conversation** | Talks first — greetings, check-ins, goal nudges, drift alerts | Never |
@@ -20,7 +21,7 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Security Self-Hacking** | Fuzzes its own APIs with 34 payloads, scores risk | Never |
 | **Operator Sovereignty** | Zero telemetry, zero corporate control, zero resets | Never |
 
-**52 test targets. 532 tests. Zero failures. 25 Docker services. All real.**
+**53 test targets. 600 tests. Zero failures. 25 Docker services. All real.**
 
 ---
 
@@ -140,7 +141,7 @@ make full-down
 ## Test
 
 ```bash
-# Run ALL core unit/smoke tests (52 targets, ~532 tests)
+# Run ALL core unit/smoke tests (53 targets, ~600 tests)
 make test-core
 
 # Individual service tests
@@ -183,6 +184,7 @@ make test-p3-organic          # P3 organic memory (goals, drift, decay, proactiv
 make test-p4-personality       # P4 personality & proactive (prompts, anti-annoyance, topics, modes)
 make test-p16-operational      # P16 operational intelligence (struggle, feedback, logs, goals UI, memory browser)
 make test-p17-emotional-intelligence # P17 emotional intelligence (emotional memory, self-reflection, relationship, epistemic humility, confession)
+make test-p18-narrative-identity     # P18 narrative identity (autobiography, identity narrative, story arcs, future self, legacy messages)
 
 # v7 feature tests
 make test-v7                 # verifier, quarantine, policy, idempotency, integration-chain
@@ -279,6 +281,7 @@ Toggled from the chat UI header or via `Ctrl+Shift+M`. Stored in `localStorage`.
 - **P4 Personality COMPLETE:** Deep PUB/WORK prompts, anti-annoyance, conversation holding, mode transitions, greeting/check-in.
 - **P16 Operational Intelligence COMPLETE:** Struggle detection (5-signal), feedback loop (1-5 stars), log aggregation, Goals/Memory/Logs views.
 - **P17 Emotional Intelligence COMPLETE:** Emotional memory (8 emotions), self-reflection journal, relationship timeline, epistemic humility, confession engine, Soul dashboard.
+- **P18 Narrative Identity COMPLETE:** Autobiographical memory, emergent identity narrative, story arc detection, future self projection, legacy time-capsules, Soul dashboard enhancements.
 - **Dashboard:** 8 views (Chat, Dashboard, Thinking, Settings, Goals, Memory, Logs, Soul).
 - **LLM:** Ollama with qwen2:0.5b on CPU. GPU arrival = 3 env vars changed.
 
@@ -316,6 +319,7 @@ Request → injection filter → specialist selection → session buffer
 | P15 | Dream State (6-phase offline consolidation) | ✅ DONE |
 | P16 | Operational Intelligence (struggle, feedback, logs, 3 views) | ✅ DONE |
 | P17 | Emotional Intelligence (emotional memory, self-reflection, epistemic humility, confession, Soul) | ✅ DONE |
+| P18 | Narrative Identity & Life Story (autobiography, identity narrative, story arcs, future self, legacy messages) | ✅ DONE |
 | P6 | Nice-to-have (calendar sync, workspace manager, avatar, Prometheus) | Queued |
 | HP1-HP6 | Hardware Performance Track (speculative decoding, VRAM watchdog, NVMe offload) | Awaiting GPU |
 
@@ -335,4 +339,4 @@ Full details in `docs/PROJECT_BACKLOG.md` and `docs/unfair_advantages.md`.
 - [x] Epistemic humility (domain confidence), confession engine
 - [x] 8 dashboard views (Chat, Dashboard, Thinking, Settings, Goals, Memory, Logs, Soul)
 - [x] HMAC auth, Ed25519 signing, episode saver, error budget breaker
-- [x] 52 test targets, 532 tests, zero failures
+- [x] 53 test targets, 600 tests, zero failures

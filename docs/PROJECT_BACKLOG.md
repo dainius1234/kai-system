@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-07 — session: P17 Emotional Intelligence (emotional memory, self-reflection, relationship timeline, epistemic humility, confession engine, Soul dashboard) — **52 targets, 532 tests**
+**Last updated:** 2026-03-07 — session: P18 Narrative Identity & Life Story Engine (autobiography, identity narrative, story arcs, future self projection, legacy messages, Soul dashboard enhancements) — **53 targets, 600 tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 52 (make test-core) |
-| Individual tests | 532 passing, 0 failures |
+| Test targets | 53 (make test-core) |
+| Individual tests | 600 passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -46,7 +46,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Log aggregation? | **YES — ring-buffer capture on memu-core + langgraph, level/time-filtered, dashboard aggregator** |
 | Dashboard views? | **YES — 8 views: Chat, Thinking, Goals, Memory Browser, Logs, Settings, Wizard, Soul** |
 | Emotional intelligence? | **YES — emotional memory, self-reflection, relationship timeline, epistemic humility, confession engine** |
-| Soul dashboard? | **YES — mood tracking, emotion timeline, domain confidence, self-reflection journal, milestones** |
+| Soul dashboard? | **YES — mood tracking, emotion timeline, domain confidence, self-reflection journal, milestones, identity card, story arcs, future self, autobiography, legacy messages** |
+| Narrative identity? | **YES — autobiographical memory, emergent identity narrative, story arc detection, future self projection, legacy time-capsules** |
 
 ---
 
@@ -322,9 +323,24 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
       cards, emotion timeline, domain confidence bars, reflection journal, milestones.
 - [x] 53 unit tests (scripts/test_p17_emotional_intelligence.py)
 
----
-
-## Session Notes
+### P18 — Narrative Identity & Life Story Engine (2026-03-07)
+- [x] Autobiographical memory — significance assessment (18 weighted keywords),
+      6 nature types (breakthrough/learning_moment/connection/struggle/achievement/
+      observation), journal-style entries (200 cap), filter by nature.
+- [x] Identity narrative — emergent "who am I" from lived experience (days alive,
+      top domains, corrections, emotional character, strengths/weaknesses).
+- [x] Story arc detection — memory windows, correction/diversity analysis,
+      arc types (learning_curve/growing_pains/expansion/mastery/steady_growth).
+- [x] Future self projection — learning rate, per-domain projections,
+      goal-based projections, overall trajectory assessment.
+- [x] Legacy messages — time-capsule messages to future self or operator,
+      surface after N days (write/read/pending).
+- [x] Narrative summary — combined endpoint for all 5 subsystems.
+- [x] LLM context injection — 6th parallel fetch, identity narrative +
+      current chapter as system message, auto-autobiography post-chat.
+- [x] Dashboard Soul enhancements — Identity Card, Story Arcs, Future Self,
+      Autobiography, Legacy Messages with write form.
+- [x] 68 unit tests (scripts/test_p18_narrative_identity.py)
 
 ### 2026-02-26
 - Quality hardening session after proof-of-life milestone
@@ -451,6 +467,32 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 - Dashboard proxy — 9 new API endpoints for EQ features.
 - 53 new tests (scripts/test_p17_emotional_intelligence.py), all passing.
 - Test count: 479 → 532 (52 targets), zero failures.
+
+### 2026-03-07 (continued — P18)
+- **P18 Narrative Identity & Life Story Engine — ALL DONE.** Kai now has a life story.
+- P18a: Autobiographical Memory — significance assessment (18 weighted keywords),
+  6 nature types (breakthrough, learning_moment, connection, struggle, achievement,
+  observation), journal-style entries, 200-entry cap, filter by nature.
+- P18b: Identity Narrative — emergent "who am I" built from lived experience.
+  Days alive, top domains, correction count, emotional character, strengths/weaknesses
+  from reflection journal. Not a prompt — a self-discovery.
+- P18c: Story Arc Detection — splits memories into ~6 windows, analyzes correction
+  rate and category diversity to detect arc types (learning_curve, growing_pains,
+  expansion, mastery, steady_growth). Returns chapters with current chapter.
+- P18d: Future Self Projection — learning rate (corrections/day, memories/day),
+  per-domain projections (needs_work/improving/strong with estimated days),
+  goal-based projections, overall trajectory (learning/growing/maturing/mastering).
+- P18e: Legacy Messages — time-capsule messages to future self or operator.
+  Surface after N days. Write/read/pending endpoints.
+- Narrative Summary — combined endpoint for all P18 subsystems.
+- LLM context injection — 6-way parallel fetch (memories, session, goals, topics, EQ,
+  **narrative identity**). Identity narrative injected as system message with current
+  chapter. Auto-autobiography recording after every chat memorization.
+- Dashboard Soul enhancements — Identity Card (🪪), Story Arcs (📖), Future Self (🔮),
+  Autobiography (📜), Legacy Messages (💌) with write form. 8 new JS functions.
+- Dashboard proxy — 8 new API endpoints for P18 features.
+- 68 new tests (scripts/test_p18_narrative_identity.py), all passing.
+- Test count: 532 → 600 (53 targets), zero failures.
 
 ---
 

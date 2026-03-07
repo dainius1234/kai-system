@@ -463,6 +463,67 @@
                 </div>
               </div>
             </div>
+
+            <!-- P18: Identity Card -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">🪪</span> Identity — Who I Am</div>
+              <div id="identityNarrative" style="padding:var(--sp-2);font-size:14px;line-height:1.7;color:var(--text2);">
+                <div class="empty">Loading identity...</div>
+              </div>
+            </div>
+
+            <!-- P18: Story Arcs -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">📖</span> Life Story — Chapters</div>
+              <div id="storyArcs" style="padding:var(--sp-2);">
+                <div class="empty">Not enough memories for chapters yet</div>
+              </div>
+            </div>
+
+            <!-- P18: Future Self + Autobiography -->
+            <div style="display:flex;gap:var(--sp-3);margin-bottom:var(--sp-4);">
+              <div class="card" style="flex:1;">
+                <div class="card-title"><span class="icon">🔮</span> Future Self Projection</div>
+                <div id="futureSelf" style="padding:var(--sp-2);">
+                  <div class="empty">Need more experience for projections</div>
+                </div>
+              </div>
+              <div class="card" style="flex:1;">
+                <div class="card-title"><span class="icon">📜</span> Autobiography</div>
+                <div id="autobiography" style="max-height:300px;overflow-y:auto;padding:var(--sp-2);">
+                  <div class="empty">No significant moments recorded yet</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- P18: Legacy Messages -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+                <span><span class="icon">💌</span> Legacy Messages — Time Capsules</span>
+                <button class="refresh-btn" onclick="showLegacyForm()">Write Legacy</button>
+              </div>
+              <div id="legacyForm" style="display:none;padding:var(--sp-2);border-bottom:1px solid var(--border);margin-bottom:var(--sp-2);">
+                <textarea id="legacyText" placeholder="Write a message to your future self or to Brother..." style="width:100%;min-height:60px;background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:8px;padding:var(--sp-2);font-size:13px;resize:vertical;"></textarea>
+                <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-2);align-items:center;">
+                  <select id="legacyRecipient" style="background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;">
+                    <option value="self">To Future Self</option>
+                    <option value="operator">To Brother</option>
+                  </select>
+                  <select id="legacyDays" style="background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;">
+                    <option value="1">Surface in 1 day</option>
+                    <option value="7" selected>Surface in 7 days</option>
+                    <option value="14">Surface in 14 days</option>
+                    <option value="30">Surface in 30 days</option>
+                    <option value="90">Surface in 90 days</option>
+                  </select>
+                  <button class="refresh-btn" onclick="sendLegacy()" style="background:var(--accent);color:#000;">Send 💌</button>
+                </div>
+              </div>
+              <div id="legacyMessages" style="max-height:250px;overflow-y:auto;padding:var(--sp-2);">
+                <div class="empty">No legacy messages yet</div>
+              </div>
+            </div>
+
           </div>
         </section>
 
@@ -1994,6 +2055,9 @@ async function refreshEQ() {
 
     // Milestones
     renderMilestones(rel.milestones || []);
+
+    // P18: Narrative identity
+    refreshNarrative();
   } catch(e) {
     console.error('EQ refresh error:', e);
   }
@@ -2081,6 +2145,176 @@ function renderMilestones(milestones) {
     html += `<div style="padding:var(--sp-2);border-bottom:1px solid var(--border);">
       <div style="font-weight:500;font-size:13px;">🏆 ${escapeHtml(m.title)}</div>
       <div style="font-size:12px;color:var(--text3);">${time}${m.description ? ' — ' + escapeHtml(m.description) : ''}</div>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+// ── P18: Narrative Identity & Life Story ─────────────────────────────
+
+const ARC_EMOJI = { learning_curve: '📚', growing_pains: '🌱', expansion: '🌍', mastery: '⭐', steady_growth: '📈', beginning: '🌅' };
+
+async function refreshNarrative() {
+  try {
+    const [idResp, arcResp, futResp, autoResp, legResp] = await Promise.all([
+      fetch('/api/identity'),
+      fetch('/api/story-arcs'),
+      fetch('/api/future-self'),
+      fetch('/api/autobiography?limit=20'),
+      fetch('/api/legacy?include_unsurfaced=true'),
+    ]);
+    const id = await idResp.json();
+    const arcs = await arcResp.json();
+    const future = await futResp.json();
+    const auto = await autoResp.json();
+    const legacy = await legResp.json();
+
+    renderIdentity(id);
+    renderStoryArcs(arcs);
+    renderFutureSelf(future);
+    renderAutobiography(auto.entries || []);
+    renderLegacyMessages(legacy.messages || [], legacy.pending || 0);
+  } catch(e) { console.error('Narrative refresh error:', e); }
+}
+
+function renderIdentity(data) {
+  const el = document.getElementById('identityNarrative');
+  const narrative = data.narrative || '';
+  if (!narrative) { el.innerHTML = '<div class="empty">Identity not yet formed</div>'; return; }
+
+  let html = `<div style="margin-bottom:var(--sp-2);font-style:italic;font-size:15px;">"${escapeHtml(narrative)}"</div>`;
+  html += '<div style="display:flex;flex-wrap:wrap;gap:var(--sp-3);margin-top:var(--sp-2);">';
+  const stats = data.stats || {};
+  html += `<span style="font-size:12px;color:var(--text3);">🕰 ${stats.days_alive || 0} days alive</span>`;
+  html += `<span style="font-size:12px;color:var(--text3);">🧠 ${stats.total_memories || 0} memories</span>`;
+  html += `<span style="font-size:12px;color:var(--text3);">📝 ${stats.corrections_learned || 0} corrections learned</span>`;
+  html += `<span style="font-size:12px;color:var(--text3);">📖 ${stats.autobiography_entries || 0} journal entries</span>`;
+  html += '</div>';
+  if (data.top_domains?.length) {
+    html += '<div style="margin-top:var(--sp-2);font-size:12px;color:var(--accent);">Strongest: ' +
+      data.top_domains.map(d => escapeHtml(d.domain) + ' (' + d.count + ')').join(', ') + '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function renderStoryArcs(data) {
+  const el = document.getElementById('storyArcs');
+  const arcs = data.arcs || [];
+  if (!arcs.length) { el.innerHTML = '<div class="empty">Not enough memories for chapters yet</div>'; return; }
+
+  let html = `<div style="margin-bottom:var(--sp-2);font-size:13px;color:var(--accent);font-weight:500;">Currently in Chapter ${data.chapter_number || 1}: ${escapeHtml(data.current_chapter || 'The Beginning')}</div>`;
+  html += '<div style="display:grid;gap:var(--sp-2);">';
+  for (const a of arcs) {
+    const emoji = ARC_EMOJI[a.arc_type] || '📖';
+    const isCurrent = a.chapter === data.chapter_number;
+    const bg = isCurrent ? 'var(--accent-bg)' : 'var(--bg2)';
+    const border = isCurrent ? '2px solid var(--accent)' : '1px solid var(--border)';
+    html += `<div style="display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-2);border-radius:8px;background:${bg};border:${border};">
+      <span style="font-size:22px;">${emoji}</span>
+      <div style="flex:1;">
+        <div style="font-weight:500;font-size:13px;">Chapter ${a.chapter}: ${escapeHtml(a.arc_name)}${isCurrent ? ' ← current' : ''}</div>
+        <div style="font-size:11px;color:var(--text3);">${a.memory_count} memories · ${Math.round(a.correction_rate * 100)}% corrections · ${a.categories.length} domains</div>
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function renderFutureSelf(data) {
+  const el = document.getElementById('futureSelf');
+  if (!data.trajectory) { el.innerHTML = '<div class="empty">Need more experience for projections</div>'; return; }
+
+  let html = `<div style="margin-bottom:var(--sp-2);font-size:13px;font-style:italic;color:var(--text2);">${escapeHtml(data.trajectory_message || '')}</div>`;
+
+  // Learning rate
+  const lr = data.learning_rate || {};
+  html += `<div style="font-size:12px;color:var(--text3);margin-bottom:var(--sp-2);">📊 ${lr.memories_per_day || 0} memories/day · ${lr.corrections_per_day || 0} corrections/day · Error rate: ${Math.round((data.error_rate || 0) * 100)}%</div>`;
+
+  // Domain projections (top 5)
+  const projs = (data.domain_projections || []).slice(0, 5);
+  if (projs.length) {
+    html += '<div style="font-size:12px;font-weight:500;margin-bottom:4px;">Domain outlook:</div>';
+    for (const p of projs) {
+      const pct = Math.round(p.current_confidence * 100);
+      const color = p.status === 'needs_work' ? 'var(--danger)' : p.status === 'improving' ? 'var(--warn)' : 'var(--success)';
+      html += `<div style="display:flex;align-items:center;gap:var(--sp-2);padding:2px 0;">
+        <span style="min-width:100px;font-size:12px;">${escapeHtml(p.domain)}</span>
+        <div style="flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${color};border-radius:3px;"></div></div>
+        <span style="font-size:11px;color:${color};min-width:30px;">${pct}%</span>
+        <span style="font-size:10px;color:var(--text3);">${p.estimated_days_to_improve > 0 ? p.estimated_days_to_improve + 'd' : '✓'}</span>
+      </div>`;
+    }
+  }
+
+  el.innerHTML = html;
+}
+
+function renderAutobiography(entries) {
+  const el = document.getElementById('autobiography');
+  if (!entries.length) { el.innerHTML = '<div class="empty">No significant moments yet</div>'; return; }
+  const NATURE_EMOJI = { breakthrough: '💡', learning_moment: '📚', connection: '💛', struggle: '🔥', achievement: '🏆', observation: '👁' };
+  let html = '';
+  for (const e of entries.reverse()) {
+    const time = new Date(e.timestamp * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    const emoji = NATURE_EMOJI[e.nature] || '📖';
+    html += `<div style="padding:var(--sp-2);border-bottom:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+        <span style="font-size:12px;font-weight:500;">${emoji} ${escapeHtml(e.opener || '')}</span>
+        <span style="font-size:11px;color:var(--text3);">${time}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);">${escapeHtml(e.snippet || '')}</div>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+function showLegacyForm() {
+  const form = document.getElementById('legacyForm');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+async function sendLegacy() {
+  const text = document.getElementById('legacyText').value.trim();
+  if (!text) return;
+  const recipient = document.getElementById('legacyRecipient').value;
+  const days = parseInt(document.getElementById('legacyDays').value) || 7;
+  try {
+    const resp = await fetch('/api/legacy/write', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, recipient: recipient, surface_after_days: days }),
+    });
+    if (resp.ok) {
+      showToast('Soul', 'Legacy message saved 💌', 'success', 2000);
+      document.getElementById('legacyText').value = '';
+      document.getElementById('legacyForm').style.display = 'none';
+      refreshNarrative();
+    }
+  } catch { showToast('Soul', 'Failed to save legacy', 'error', 3000); }
+}
+
+function renderLegacyMessages(messages, pending) {
+  const el = document.getElementById('legacyMessages');
+  if (!messages.length) {
+    el.innerHTML = '<div class="empty">No legacy messages yet — write one to your future self</div>';
+    return;
+  }
+  let html = '';
+  if (pending > 0) {
+    html += `<div style="background:var(--accent-bg);padding:var(--sp-2);border-radius:8px;margin-bottom:var(--sp-2);font-size:13px;color:var(--accent);">💌 ${pending} message${pending > 1 ? 's' : ''} waiting to be surfaced</div>`;
+  }
+  for (const m of messages.reverse()) {
+    const time = new Date(m.timestamp * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const surfaceTime = new Date(m.surface_after * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const recipient = m.recipient === 'operator' ? '→ Brother' : '→ Future Self';
+    const surfaced = m.surfaced ? '✅ surfaced' : `⏳ surfaces ${surfaceTime}`;
+    html += `<div style="padding:var(--sp-2);border-bottom:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+        <span style="font-size:12px;font-weight:500;">${recipient}</span>
+        <span style="font-size:11px;color:var(--text3);">${time} · ${surfaced}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text2);font-style:italic;">"${escapeHtml(m.message)}"</div>
     </div>`;
   }
   el.innerHTML = html;

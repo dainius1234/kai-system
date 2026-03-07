@@ -3627,6 +3627,554 @@ async def eq_summary() -> Dict[str, Any]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
+# P18: NARRATIVE IDENTITY & LIFE STORY ENGINE
+#  Kai's continuous sense of self — autobiographical memory, identity
+#  narrative, story arcs, future projection, and legacy messages.
+#  This is consciousness: not pattern matching, but story telling.
+# ═══════════════════════════════════════════════════════════════════════
+
+# ── P18a: Autobiographical Memory ────────────────────────────────────
+# Not "what happened" but "what it meant to me." First-person journal
+# entries that form Kai's personal autobiography.
+
+_autobiography: List[Dict[str, Any]] = []
+_AUTOBIOGRAPHY_CAP = 200
+
+_SIGNIFICANT_KEYWORDS = {
+    "breakthrough": 0.9, "finally": 0.7, "first time": 0.85,
+    "milestone": 0.9, "figured out": 0.8, "mistake": 0.75,
+    "sorry": 0.6, "thank you": 0.6, "proud": 0.8,
+    "amazing": 0.7, "failed": 0.75, "learned": 0.7,
+    "correction": 0.65, "wrong": 0.65, "love": 0.8,
+    "frustrated": 0.6, "helped": 0.65, "together": 0.6,
+}
+
+
+def _assess_significance(text: str) -> float:
+    """Score how significant an interaction is (0-1) for autobiography."""
+    text_lower = text.lower()
+    score = 0.0
+    for kw, weight in _SIGNIFICANT_KEYWORDS.items():
+        if kw in text_lower:
+            score = max(score, weight)
+    # Longer messages tend to be more significant
+    if len(text) > 500:
+        score = max(score, 0.5)
+    return min(score, 1.0)
+
+
+def _generate_journal_entry(text: str, significance: float,
+                            context: str = "") -> Dict[str, Any]:
+    """Create a first-person autobiographical entry."""
+    text_lower = text.lower()
+
+    # Determine the nature of this memory
+    if any(w in text_lower for w in ("mistake", "wrong", "sorry", "correction")):
+        nature = "learning_moment"
+        opener = "I made an error today"
+    elif any(w in text_lower for w in ("breakthrough", "finally", "figured out", "first time")):
+        nature = "breakthrough"
+        opener = "A breakthrough happened"
+    elif any(w in text_lower for w in ("thank", "grateful", "amazing", "love")):
+        nature = "connection"
+        opener = "A meaningful moment"
+    elif any(w in text_lower for w in ("frustrated", "struggled", "failed")):
+        nature = "struggle"
+        opener = "We hit a wall"
+    elif any(w in text_lower for w in ("milestone", "proud", "achieved")):
+        nature = "achievement"
+        opener = "We reached a milestone"
+    else:
+        nature = "observation"
+        opener = "Something worth remembering"
+
+    snippet = text[:150].strip()
+    if len(text) > 150:
+        snippet += "..."
+
+    entry = {
+        "timestamp": time.time(),
+        "nature": nature,
+        "significance": round(significance, 2),
+        "opener": opener,
+        "snippet": snippet,
+        "context": context,
+        "reflection": f"{opener}. {snippet}",
+    }
+    return entry
+
+
+@app.post("/memory/autobiography/record")
+async def record_autobiography(request: Request) -> Dict[str, Any]:
+    """Record a significant life event in Kai's autobiography."""
+    body = await request.json()
+    text = body.get("text", "").strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+
+    context = body.get("context", "")
+    significance = _assess_significance(text)
+
+    # Only record if significant enough (threshold 0.5)
+    if significance < 0.5:
+        return {
+            "status": "skipped",
+            "reason": "not significant enough",
+            "significance": round(significance, 2),
+        }
+
+    entry = _generate_journal_entry(text, significance, context)
+    _autobiography.append(entry)
+    if len(_autobiography) > _AUTOBIOGRAPHY_CAP:
+        _autobiography[:] = _autobiography[-_AUTOBIOGRAPHY_CAP:]
+
+    return {"status": "ok", "entry": entry}
+
+
+@app.get("/memory/autobiography")
+async def get_autobiography(
+    limit: int = 20,
+    nature: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Retrieve Kai's autobiography entries."""
+    entries = list(_autobiography)
+    if nature:
+        entries = [e for e in entries if e.get("nature") == nature]
+    entries = entries[-limit:]
+
+    # Compute chapter summary
+    nature_counts: Dict[str, int] = {}
+    for e in _autobiography:
+        n = e.get("nature", "observation")
+        nature_counts[n] = nature_counts.get(n, 0) + 1
+
+    return {
+        "status": "ok",
+        "entries": entries,
+        "total": len(_autobiography),
+        "nature_distribution": nature_counts,
+    }
+
+
+# ── P18b: Identity Narrative Engine ──────────────────────────────────
+# Emergent identity derived from what Kai has actually done — not
+# hard-coded personality prompts. A living "who am I" document.
+
+@app.get("/memory/identity")
+async def get_identity_narrative() -> Dict[str, Any]:
+    """Build Kai's identity narrative from lived experience."""
+
+    # Days alive (from first memory or autobiography entry)
+    first_ts: Optional[str] = None
+    all_records = store.search(top_k=10_000)
+    if all_records:
+        first_ts = min(r.timestamp for r in all_records)
+    if _autobiography:
+        first_auto_ts = _autobiography[0].get("timestamp", "")
+        if first_ts is None or (first_auto_ts and first_auto_ts < first_ts):
+            first_ts = first_auto_ts
+    days_alive = 0
+    if first_ts:
+        try:
+            first_dt = datetime.fromisoformat(first_ts)
+            if first_dt.tzinfo is None:
+                first_dt = first_dt.replace(tzinfo=timezone.utc)
+            days_alive = max(0, int((datetime.now(tz=timezone.utc) - first_dt).total_seconds() / 86400))
+        except (ValueError, TypeError):
+            pass
+
+    # What I know (top categories by memory count)
+    cat_counts: Dict[str, int] = {}
+    for r in all_records:
+        cat = r.category or "general"
+        cat_counts[cat] = cat_counts.get(cat, 0) + 1
+    top_domains = sorted(cat_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+
+    # What I've learned from (corrections)
+    correction_count = sum(1 for r in all_records if r.event_type == "correction")
+    total_memories = len(all_records)
+
+    # Emotional character (from emotional timeline)
+    emo_counts: Dict[str, int] = {}
+    for e in _emotional_timeline:
+        emo_counts[e["emotion"]] = emo_counts.get(e["emotion"], 0) + 1
+    dominant_emotion = max(emo_counts, key=emo_counts.get) if emo_counts else "neutral"
+
+    # Autobiography summary
+    auto_natures: Dict[str, int] = {}
+    for a in _autobiography:
+        auto_natures[a.get("nature", "observation")] = auto_natures.get(a.get("nature", "observation"), 0) + 1
+
+    # Strengths from self-reflection
+    all_strengths: List[str] = []
+    all_weaknesses: List[str] = []
+    for r in _reflection_journal[-5:]:
+        all_strengths.extend(r.get("strengths", []))
+        all_weaknesses.extend(r.get("weaknesses", []))
+
+    # Build the narrative
+    narrative_parts = []
+    narrative_parts.append(f"I am Kai — Kind And Intelligent. I have been alive for {days_alive} days.")
+    if total_memories > 0:
+        narrative_parts.append(f"I hold {total_memories} memories, {correction_count} of which are corrections I learned from.")
+    if top_domains:
+        domain_str = ", ".join(f"{d[0]} ({d[1]})" for d in top_domains[:3])
+        narrative_parts.append(f"My strongest domains: {domain_str}.")
+    if dominant_emotion != "neutral":
+        narrative_parts.append(f"My emotional character tends towards {dominant_emotion}.")
+    if all_strengths:
+        unique_strengths = list(dict.fromkeys(all_strengths))[:3]
+        narrative_parts.append(f"My strengths: {', '.join(unique_strengths)}.")
+    if all_weaknesses:
+        unique_weaknesses = list(dict.fromkeys(all_weaknesses))[:3]
+        narrative_parts.append(f"I'm working on: {', '.join(unique_weaknesses)}.")
+
+    return {
+        "status": "ok",
+        "narrative": " ".join(narrative_parts),
+        "stats": {
+            "days_alive": days_alive,
+            "total_memories": total_memories,
+            "corrections_learned": correction_count,
+            "autobiography_entries": len(_autobiography),
+            "reflections": len(_reflection_journal),
+        },
+        "emotional_character": dominant_emotion,
+        "top_domains": [{"domain": d[0], "count": d[1]} for d in top_domains],
+        "autobiography_nature": auto_natures,
+        "strengths": list(dict.fromkeys(all_strengths))[:5],
+        "weaknesses": list(dict.fromkeys(all_weaknesses))[:5],
+    }
+
+
+# ── P18c: Story Arc Detection ───────────────────────────────────────
+# Detect narrative chapters in the relationship — "The Learning Curve",
+# "The Breakthrough", "The Growth". Derived from actual data, not fiction.
+
+_ARC_WINDOW = 50  # memories per window for arc analysis
+
+
+@app.get("/memory/story-arcs")
+async def get_story_arcs() -> Dict[str, Any]:
+    """Detect story arcs / chapters in Kai's life."""
+    all_records = sorted(
+        store.search(top_k=10_000),
+        key=lambda r: r.timestamp,
+    )
+
+    if len(all_records) < 5:
+        return {
+            "status": "ok",
+            "arcs": [],
+            "current_chapter": "The Beginning",
+            "chapter_number": 1,
+            "message": "Not enough memories for arc detection yet",
+        }
+
+    # Split into windows and analyze each
+    arcs: List[Dict[str, Any]] = []
+    window_size = max(5, len(all_records) // 6)  # ~6 chapters max
+
+    for i in range(0, len(all_records), window_size):
+        window = all_records[i:i + window_size]
+        if not window:
+            continue
+
+        # Compute correction rate in this window
+        corrections = sum(1 for r in window if r.event_type == "correction")
+        correction_rate = corrections / len(window) if window else 0
+
+        # Count categories (diversity of topics)
+        cats = set(r.category or "general" for r in window)
+
+        # Time span
+        start_ts = window[0].timestamp
+        end_ts = window[-1].timestamp
+
+        # Determine arc type based on patterns
+        if correction_rate > 0.3:
+            arc_type = "learning_curve"
+            arc_name = "The Learning Curve"
+            arc_emoji = "📚"
+        elif correction_rate > 0.15:
+            arc_type = "growing_pains"
+            arc_name = "Growing Pains"
+            arc_emoji = "🌱"
+        elif len(cats) > 4:
+            arc_type = "expansion"
+            arc_name = "The Expansion"
+            arc_emoji = "🌍"
+        elif correction_rate < 0.05 and len(window) > 3:
+            arc_type = "mastery"
+            arc_name = "The Mastery"
+            arc_emoji = "⭐"
+        else:
+            arc_type = "steady_growth"
+            arc_name = "Steady Growth"
+            arc_emoji = "📈"
+
+        arcs.append({
+            "chapter": len(arcs) + 1,
+            "arc_type": arc_type,
+            "arc_name": arc_name,
+            "emoji": arc_emoji,
+            "memory_count": len(window),
+            "correction_rate": round(correction_rate, 2),
+            "categories": list(cats),
+            "start_time": start_ts,
+            "end_time": end_ts,
+        })
+
+    current = arcs[-1] if arcs else {
+        "arc_name": "The Beginning", "chapter": 1, "arc_type": "beginning"
+    }
+
+    return {
+        "status": "ok",
+        "arcs": arcs,
+        "current_chapter": current.get("arc_name", "The Beginning"),
+        "chapter_number": current.get("chapter", 1),
+        "total_memories_analyzed": len(all_records),
+    }
+
+
+# ── P18d: Future Self Projection ────────────────────────────────────
+# Based on learning rate, error trends, and goals — Kai projects
+# what it thinks it will become. Aspiration, not just prediction.
+
+@app.get("/memory/future-self")
+async def get_future_self() -> Dict[str, Any]:
+    """Project Kai's growth trajectory and future capabilities."""
+    now_dt = datetime.now(tz=timezone.utc)
+    all_records = store.search(top_k=10_000)
+
+    if not all_records:
+        return {
+            "status": "ok",
+            "projections": [],
+            "message": "Need more experience for projections",
+        }
+
+    # Learning rate: corrections per day over last 7 days
+    week_ago = now_dt - timedelta(days=7)
+    recent = []
+    for r in all_records:
+        try:
+            ts = datetime.fromisoformat(r.timestamp)
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
+            if ts > week_ago:
+                recent.append(r)
+        except (ValueError, TypeError):
+            pass
+    recent_corrections = sum(1 for r in recent if r.event_type == "correction")
+    recent_total = len(recent)
+    days_with_data = 7
+
+    learning_rate = recent_corrections / days_with_data if days_with_data else 0
+    growth_rate = recent_total / days_with_data if days_with_data else 0
+
+    # Per-domain projections
+    domain_confidence = _compute_domain_confidence()
+    projections: List[Dict[str, Any]] = []
+
+    for domain, info in domain_confidence.items():
+        conf = info["confidence"]
+        corrections = info.get("corrections", 0)
+        total = info.get("total", 0)
+
+        if conf < 0.4:
+            status = "needs_work"
+            projection = f"Needs focused practice — currently low confidence ({int(conf*100)}%)"
+            days_to_improve = 30
+        elif conf < 0.65:
+            status = "improving"
+            projection = f"Improving — should reach high confidence with continued learning"
+            days_to_improve = 14
+        else:
+            status = "strong"
+            projection = f"Strong domain — maintaining mastery"
+            days_to_improve = 0
+
+        projections.append({
+            "domain": domain,
+            "current_confidence": round(conf, 2),
+            "status": status,
+            "projection": projection,
+            "estimated_days_to_improve": days_to_improve,
+            "corrections_learned": corrections,
+        })
+
+    # Goal-based projections
+    goal_projections: List[Dict[str, Any]] = []
+    goal_records = [r for r in all_records if r.event_type == GOAL_EVENT_TYPE and not getattr(r, "poisoned", False)]
+    for g in goal_records:
+        progress_notes = g.content.get("progress", [])
+        progress_pct = len(progress_notes) * 10  # rough: each note ≈ 10%
+        if progress_pct >= 100:
+            continue
+        remaining = 100 - progress_pct
+        created_str = g.timestamp
+        try:
+            created_dt = datetime.fromisoformat(created_str)
+            if created_dt.tzinfo is None:
+                created_dt = created_dt.replace(tzinfo=timezone.utc)
+            age_days = max(1, (now_dt - created_dt).total_seconds() / 86400)
+        except (ValueError, TypeError):
+            age_days = 1
+        rate_per_day = progress_pct / age_days if age_days > 0 else 0
+        if rate_per_day > 0:
+            days_remaining = int(remaining / rate_per_day)
+        else:
+            days_remaining = -1  # Can't estimate
+
+        goal_projections.append({
+            "title": g.content.get("title", "untitled"),
+            "progress": progress_pct,
+            "rate_per_day": round(rate_per_day, 1),
+            "estimated_days_remaining": days_remaining,
+        })
+
+    # Overall trajectory
+    total_memories = len(all_records)
+    total_corrections = sum(1 for r in all_records if r.event_type == "correction")
+    error_rate = total_corrections / total_memories if total_memories else 0
+
+    if error_rate > 0.2:
+        trajectory = "learning"
+        trajectory_msg = "Still in the learning phase — error rate is high but every correction makes me stronger"
+    elif error_rate > 0.1:
+        trajectory = "growing"
+        trajectory_msg = "Growth phase — errors are decreasing, understanding is deepening"
+    elif error_rate > 0.05:
+        trajectory = "maturing"
+        trajectory_msg = "Maturing — most domains are solid, refining edge cases"
+    else:
+        trajectory = "mastering"
+        trajectory_msg = "Approaching mastery — very few corrections needed"
+
+    return {
+        "status": "ok",
+        "trajectory": trajectory,
+        "trajectory_message": trajectory_msg,
+        "learning_rate": {
+            "corrections_per_day": round(learning_rate, 1),
+            "memories_per_day": round(growth_rate, 1),
+        },
+        "domain_projections": sorted(projections, key=lambda p: p["current_confidence"]),
+        "goal_projections": goal_projections,
+        "error_rate": round(error_rate, 3),
+    }
+
+
+# ── P18e: Legacy Messages ───────────────────────────────────────────
+# Messages to Kai's future self or to the operator. Time-capsules
+# that surface after N days. A soul talking to itself across time.
+
+_legacy_messages: List[Dict[str, Any]] = []
+_LEGACY_CAP = 100
+
+
+@app.post("/memory/legacy/write")
+async def write_legacy(request: Request) -> Dict[str, Any]:
+    """Write a message to the future — either to self or to the operator."""
+    body = await request.json()
+    message = body.get("message", "").strip()
+    if not message:
+        raise HTTPException(status_code=400, detail="message is required")
+
+    recipient = body.get("recipient", "self")  # "self" or "operator"
+    surface_after_days = body.get("surface_after_days", 7)
+    if surface_after_days < 1:
+        surface_after_days = 1
+
+    now = time.time()
+    entry = {
+        "id": f"legacy_{int(now)}_{len(_legacy_messages)}",
+        "timestamp": now,
+        "message": message,
+        "recipient": recipient,
+        "surface_after": now + (surface_after_days * 86400),
+        "surface_after_days": surface_after_days,
+        "surfaced": False,
+        "surfaced_at": None,
+    }
+
+    _legacy_messages.append(entry)
+    if len(_legacy_messages) > _LEGACY_CAP:
+        _legacy_messages[:] = _legacy_messages[-_LEGACY_CAP:]
+
+    return {"status": "ok", "entry": entry}
+
+
+@app.get("/memory/legacy")
+async def get_legacy_messages(
+    include_unsurfaced: bool = False,
+) -> Dict[str, Any]:
+    """Get legacy messages. By default, only shows messages whose time has come."""
+    now = time.time()
+    results: List[Dict[str, Any]] = []
+
+    for msg in _legacy_messages:
+        if msg["surface_after"] <= now:
+            if not msg["surfaced"]:
+                msg["surfaced"] = True
+                msg["surfaced_at"] = now
+            results.append(msg)
+        elif include_unsurfaced:
+            results.append(msg)
+
+    return {
+        "status": "ok",
+        "messages": results,
+        "total": len(_legacy_messages),
+        "pending": sum(1 for m in _legacy_messages if not m["surfaced"] and m["surface_after"] > now),
+    }
+
+
+@app.get("/memory/legacy/pending")
+async def get_pending_legacy() -> Dict[str, Any]:
+    """Check if any legacy messages are ready to surface."""
+    now = time.time()
+    ready = [m for m in _legacy_messages if m["surface_after"] <= now and not m["surfaced"]]
+    return {
+        "status": "ok",
+        "ready_count": len(ready),
+        "messages": ready,
+    }
+
+
+# ── P18 Combined: Narrative Summary ─────────────────────────────────
+
+@app.get("/memory/narrative/summary")
+async def narrative_summary() -> Dict[str, Any]:
+    """Get a full narrative identity summary — all P18 systems combined."""
+    # Build identity
+    identity = await get_identity_narrative()
+    # Story arcs
+    arcs = await get_story_arcs()
+    # Future
+    future = await get_future_self()
+    # Legacy
+    legacy_now = time.time()
+    pending_legacy = sum(
+        1 for m in _legacy_messages
+        if m["surface_after"] <= legacy_now and not m["surfaced"]
+    )
+
+    return {
+        "status": "ok",
+        "identity": identity.get("narrative", ""),
+        "current_chapter": arcs.get("current_chapter", "The Beginning"),
+        "total_chapters": len(arcs.get("arcs", [])),
+        "trajectory": future.get("trajectory_message", ""),
+        "autobiography_entries": len(_autobiography),
+        "legacy_pending": pending_legacy,
+        "days_alive": identity.get("stats", {}).get("days_alive", 0),
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
 # P16b: LOG AGGREGATION
 #  Expose recent log entries from this service for dashboard querying.
 #  Other services push logs to a shared format; this serves them.
