@@ -831,6 +831,90 @@ async def proxy_narrative_summary():
         return resp.json()
 
 
+# ── P19 Imagination proxies ─────────────────────────────────────────
+
+@app.post("/api/imagine/counterfactual")
+async def proxy_counterfactual(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/imagine/counterfactual", json=body)
+        return resp.json()
+
+
+@app.get("/api/imagine/counterfactuals")
+async def proxy_counterfactuals():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/imagine/counterfactuals")
+        return resp.json()
+
+
+@app.post("/api/imagine/empathize")
+async def proxy_empathize(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/imagine/empathize", json=body)
+        return resp.json()
+
+
+@app.get("/api/imagine/empathy-map")
+async def proxy_empathy_map():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/imagine/empathy-map")
+        return resp.json()
+
+
+@app.post("/api/imagine/synthesize")
+async def proxy_synthesize(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/imagine/synthesize", json=body)
+        return resp.json()
+
+
+@app.get("/api/imagine/ideas")
+async def proxy_ideas():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/imagine/ideas")
+        return resp.json()
+
+
+@app.post("/api/imagine/thought")
+async def proxy_thought(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/imagine/thought", json=body)
+        return resp.json()
+
+
+@app.get("/api/imagine/inner-monologue")
+async def proxy_inner_monologue():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/imagine/inner-monologue")
+        return resp.json()
+
+
+@app.post("/api/imagine/aspire")
+async def proxy_aspire(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/imagine/aspire", json=body)
+        return resp.json()
+
+
+@app.get("/api/imagine/aspirations")
+async def proxy_aspirations():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/imagine/aspirations")
+        return resp.json()
+
+
+@app.get("/api/imagine/summary")
+async def proxy_imagination_summary():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/imagine/summary")
+        return resp.json()
+
+
 # ── Unified App Shell ────────────────────────────────────────────────
 
 @app.get("/app")

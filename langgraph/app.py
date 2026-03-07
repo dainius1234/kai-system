@@ -491,6 +491,28 @@ async def _get_narrative_identity() -> Dict[str, Any]:
     return result
 
 
+async def _get_imagination_context(user_msg: str) -> Dict[str, Any]:
+    """Run empathetic simulation and fetch inner thought state."""
+    result: Dict[str, Any] = {}
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            emp_task = client.post(
+                f"{MEMU_URL}/memory/imagine/empathize",
+                json={"text": user_msg},
+            )
+            map_task = client.get(f"{MEMU_URL}/memory/imagine/empathy-map")
+            emp_resp, map_resp = await asyncio.gather(emp_task, map_task, return_exceptions=True)
+            if not isinstance(emp_resp, Exception) and emp_resp.status_code == 200:
+                data = emp_resp.json()
+                result["empathy"] = data.get("empathy", {})
+            if not isinstance(map_resp, Exception) and map_resp.status_code == 200:
+                data = map_resp.json()
+                result["empathy_map"] = data.get("empathy_map", {})
+    except Exception:
+        pass
+    return result
+
+
 @app.post("/chat")
 async def chat_stream(req: ChatRequest):
     """Kai's main conversation endpoint. Streams tokens via SSE.
@@ -554,6 +576,7 @@ async def chat_stream(req: ChatRequest):
     topics_task = asyncio.create_task(_get_active_topics())
     eq_task = asyncio.create_task(_get_emotional_context(user_msg))
     narrative_task = asyncio.create_task(_get_narrative_identity())
+    imagination_task = asyncio.create_task(_get_imagination_context(user_msg))
 
     memories = await memories_task
     session_msgs = await session_task
@@ -561,6 +584,7 @@ async def chat_stream(req: ChatRequest):
     topics = await topics_task
     eq_context = await eq_task
     narrative = await narrative_task
+    imagination = await imagination_task
 
     # build the message list
     messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
@@ -624,6 +648,26 @@ async def chat_stream(req: ChatRequest):
                 "content": "Self-identity (who I am, derived from experience):\n" + " ".join(id_parts),
             })
 
+    # inject imagination context — theory of mind about the operator
+    if imagination:
+        empathy = imagination.get("empathy", {})
+        if empathy:
+            emp_parts = []
+            if empathy.get("energy_level") and empathy["energy_level"] != "unknown":
+                emp_parts.append(f"Operator energy: {empathy['energy_level']}")
+            if empathy.get("focus") and empathy["focus"] != "general":
+                emp_parts.append(f"Current focus: {empathy['focus']}")
+            if empathy.get("communication_style") and empathy["communication_style"] != "unknown":
+                emp_parts.append(f"Communication style: {empathy['communication_style']}")
+            needs = empathy.get("unspoken_needs", [])
+            if needs:
+                emp_parts.append(f"What they might need: {needs[0]}")
+            if emp_parts:
+                messages.append({
+                    "role": "system",
+                    "content": "Theory of mind (imagining operator's state):\n" + ". ".join(emp_parts) + ".",
+                })
+
     # add session history (last N turns)
     for msg in session_msgs[-10:]:
         role = msg.get("role", "user")
@@ -677,6 +721,18 @@ async def chat_stream(req: ChatRequest):
                     await _auto_cl.post(
                         f"{MEMU_URL}/memory/autobiography/record",
                         json={"text": user_msg, "context": "chat"},
+                    )
+            except Exception:
+                pass
+            # record inner monologue — what Kai was thinking
+            try:
+                async with httpx.AsyncClient(timeout=3.0) as _thought_cl:
+                    await _thought_cl.post(
+                        f"{MEMU_URL}/memory/imagine/thought",
+                        json={
+                            "thought": f"Responding to: '{user_msg[:100]}' — considered the operator's tone and context",
+                            "context": "chat_reflection",
+                        },
                     )
             except Exception:
                 pass

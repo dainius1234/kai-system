@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-07 — session: P18 Narrative Identity & Life Story Engine (autobiography, identity narrative, story arcs, future self projection, legacy messages, Soul dashboard enhancements) — **53 targets, 600 tests**
+**Last updated:** 2026-03-07 — session: P19 Imagination Engine (counterfactual replay, empathetic simulation, creative synthesis, inner monologue, aspirational futures, Soul dashboard enhancements) — **54 targets, 679 tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 53 (make test-core) |
-| Individual tests | 600 passing, 0 failures |
+| Test targets | 54 (make test-core) |
+| Individual tests | 679 passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -48,6 +48,7 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Emotional intelligence? | **YES — emotional memory, self-reflection, relationship timeline, epistemic humility, confession engine** |
 | Soul dashboard? | **YES — mood tracking, emotion timeline, domain confidence, self-reflection journal, milestones, identity card, story arcs, future self, autobiography, legacy messages** |
 | Narrative identity? | **YES — autobiographical memory, emergent identity narrative, story arc detection, future self projection, legacy time-capsules** |
+| Imagination engine? | **YES — counterfactual replay, empathetic simulation (theory of mind), creative synthesis, inner monologue, aspirational futures** |
 
 ---
 
@@ -342,6 +343,28 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
       Autobiography, Legacy Messages with write form.
 - [x] 68 unit tests (scripts/test_p18_narrative_identity.py)
 
+### P19 — Imagination Engine (2026-03-07)
+- [x] Counterfactual replay — re-imagine past conversations with alternative angles,
+      detect emotional signals missed, generate "what I'd do differently" learnings.
+- [x] Empathetic simulation (theory of mind) — detect operator energy level (high/low/
+      frustrated via keyword analysis), infer focus mode (deep_work/exploration/
+      maintenance/conversation), communication style, unspoken needs. Running model.
+- [x] Creative synthesis — cross-pollinate memories from different domains,
+      sample from distinct categories, generate novel connections with novelty scoring.
+      Seed-guided synthesis option.
+- [x] Inner monologue — stream-of-consciousness thought recording with 7 thought
+      type classification (wonder/doubt/curiosity/amusement/concern/conviction/empathy),
+      type-filtered queries, distribution analysis. 500-entry cap.
+- [x] Aspirational futures — ground visions in current domain confidence, calculate
+      gap-to-close, learning velocity, feasibility rating (achievable/stretch/ambitious).
+- [x] Imagination summary — combined endpoint for all 5 subsystems.
+- [x] LLM context injection — 7th parallel fetch, empathy model injected as
+      theory-of-mind system message, inner monologue recorded after every chat.
+- [x] Dashboard Soul enhancements — Inner Monologue stream (💭), Empathy Map (🎭),
+      What-Ifs (🔄), Creative Synthesis (💡), Aspirations (🌅) with forms.
+      10 new JS functions, THOUGHT_EMOJI map.
+- [x] 79 unit tests (scripts/test_p19_imagination_engine.py)
+
 ### 2026-02-26
 - Quality hardening session after proof-of-life milestone
 - Fixed 3 stale tests (TTS expects audio/mpeg not JSON, audio injection text)
@@ -493,6 +516,42 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 - Dashboard proxy — 8 new API endpoints for P18 features.
 - 68 new tests (scripts/test_p18_narrative_identity.py), all passing.
 - Test count: 532 → 600 (53 targets), zero failures.
+
+### 2026-03-07 (continued — P19)
+- **P19 Imagination Engine — ALL DONE.** Kai now has imagination.
+- P19a: Counterfactual Replay — re-imagines past conversations. Analyzes original text,
+  finds related memories, detects emotional signals missed (via _EMOTION_KEYWORDS),
+  generates alternative angles based on domain confidence and correction history.
+  Stores what-ifs with context for learning from paths not taken.
+- P19b: Empathetic Simulation (Theory of Mind) — models operator's inner state.
+  Energy detection (high/low/frustrated via keyword sets), focus mode inference
+  (deep_work/exploration/maintenance/conversation), communication style classification
+  (directive/exploratory/expressive/detailed/conversational), unspoken needs inference
+  (rest, encouragement, space, focus, challenge). Running empathy map updates over time.
+- P19c: Creative Synthesis — cross-pollinates knowledge across domains. Gets all
+  categories from memory, picks 2 different domains, samples representative memories,
+  generates "connection" describing bridge insight, computes novelty_score based on
+  how rarely the domains overlap. Seed-guided synthesis for targeted exploration.
+- P19d: Inner Monologue — stream of consciousness. 7 thought types detected via
+  keyword analysis (wonder/doubt/curiosity/amusement/concern/conviction/empathy,
+  default "observation"). Type-filtered queries, distribution statistics. 500-entry
+  cap. Records what Kai was *really thinking* during conversations.
+- P19e: Aspirational Futures — grounds visions in reality. Retrieves current domain
+  confidence from epistemic humility engine, calculates gap-to-close, estimates
+  learning velocity from memory density, rates feasibility (achievable: gap<0.3,
+  stretch: gap<0.6, ambitious: gap≥0.6). Aspirational messages generated.
+- Imagination Summary — all 5 subsystem counts + empathy map + thought distribution.
+- LLM context injection — 7-way parallel fetch. _get_imagination_context() POSTs to
+  empathize + GETs empathy-map. Theory of mind injected as system message (energy,
+  focus, communication style, unspoken needs). Inner monologue recorded fire-and-forget
+  after every chat.
+- Dashboard Soul enhancements — 5 new sections: Inner Monologue stream with thought
+  type emojis and distribution chart, Empathy Map with energy/focus/style indicators,
+  What-Ifs with count badge, Creative Synthesis with "Synthesize" button, Aspirations
+  with "Dream" button and aspire form. 10 new JS functions. THOUGHT_EMOJI map.
+- Dashboard proxy — 11 new API endpoints for P19 features.
+- 79 new tests (scripts/test_p19_imagination_engine.py), all passing.
+- Test count: 600 → 679 (54 targets), zero failures.
 
 ---
 

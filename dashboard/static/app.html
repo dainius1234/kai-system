@@ -524,6 +524,66 @@
               </div>
             </div>
 
+          <!-- P19: Imagination Engine -->
+          <h3 style="margin:var(--sp-4) 0 var(--sp-2);font-size:1.1rem;">🧠 Imagination Engine</h3>
+
+          <!-- Inner Monologue -->
+          <div class="card" style="margin-bottom:var(--sp-3);">
+            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+              <span>💭 Inner Monologue</span>
+              <button class="refresh-btn" onclick="recordThought()" style="font-size:0.75rem;">+ Thought</button>
+            </div>
+            <div id="innerMonologue" style="max-height:250px;overflow-y:auto;padding:var(--sp-2);">
+              <div class="empty">No inner thoughts yet</div>
+            </div>
+            <div id="thoughtDistribution" style="padding:var(--sp-1) var(--sp-2);font-size:0.75rem;color:var(--muted);"></div>
+          </div>
+
+          <!-- Empathy Map + Counterfactuals side by side -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-3);">
+            <div class="card">
+              <div class="card-header">🎭 Empathy Map</div>
+              <div id="empathyMap" style="padding:var(--sp-2);">
+                <div class="empty">Empathy model builds during chat</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+                <span>🔄 What-Ifs</span>
+                <span id="counterfactualCount" style="font-size:0.75rem;color:var(--muted);">0</span>
+              </div>
+              <div id="counterfactuals" style="max-height:200px;overflow-y:auto;padding:var(--sp-2);">
+                <div class="empty">No counterfactual replays yet</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Creative Synthesis + Aspirations side by side -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-3);">
+            <div class="card">
+              <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+                <span>💡 Creative Synthesis</span>
+                <button class="refresh-btn" onclick="triggerSynthesis()" style="font-size:0.75rem;">Synthesize</button>
+              </div>
+              <div id="creativeIdeas" style="max-height:200px;overflow-y:auto;padding:var(--sp-2);">
+                <div class="empty">No creative ideas yet</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+                <span>🌅 Aspirations</span>
+                <button class="refresh-btn" onclick="showAspireForm()" style="font-size:0.75rem;">+ Dream</button>
+              </div>
+              <div id="aspireForm" style="display:none;padding:var(--sp-2);border-bottom:1px solid var(--border);">
+                <textarea id="aspireVision" placeholder="What does Kai aspire to become..." rows="2" style="width:100%;background:var(--bg-secondary);color:var(--text);border:1px solid var(--border);border-radius:var(--rad);padding:var(--sp-1);font-size:0.8rem;resize:vertical;"></textarea>
+                <button class="refresh-btn" onclick="sendAspiration()" style="margin-top:var(--sp-1);background:var(--accent);color:#000;font-size:0.75rem;">Aspire 🌅</button>
+              </div>
+              <div id="aspirationsList" style="max-height:200px;overflow-y:auto;padding:var(--sp-2);">
+                <div class="empty">No aspirations yet</div>
+              </div>
+            </div>
+          </div>
+
           </div>
         </section>
 
@@ -2174,6 +2234,7 @@ async function refreshNarrative() {
     renderFutureSelf(future);
     renderAutobiography(auto.entries || []);
     renderLegacyMessages(legacy.messages || [], legacy.pending || 0);
+    refreshImagination();
   } catch(e) { console.error('Narrative refresh error:', e); }
 }
 
@@ -2318,6 +2379,188 @@ function renderLegacyMessages(messages, pending) {
     </div>`;
   }
   el.innerHTML = html;
+}
+
+
+// ── P19: Imagination Engine JS ──────────────────────────────────────
+
+async function refreshImagination() {
+  try {
+    const [monologueResp, empathyResp, cfResp, ideasResp, aspirationsResp] = await Promise.all([
+      fetch('/api/imagine/inner-monologue').then(r => r.json()).catch(() => ({})),
+      fetch('/api/imagine/empathy-map').then(r => r.json()).catch(() => ({})),
+      fetch('/api/imagine/counterfactuals').then(r => r.json()).catch(() => ({})),
+      fetch('/api/imagine/ideas').then(r => r.json()).catch(() => ({})),
+      fetch('/api/imagine/aspirations').then(r => r.json()).catch(() => ({})),
+    ]);
+    renderInnerMonologue(monologueResp.thoughts || [], monologueResp.thought_distribution || {});
+    renderEmpathyMap(empathyResp.empathy_map || {});
+    renderCounterfactuals(cfResp.counterfactuals || [], cfResp.total || 0);
+    renderCreativeIdeas(ideasResp.ideas || []);
+    renderAspirations(aspirationsResp.aspirations || []);
+  } catch(e) { console.warn('imagination refresh error', e); }
+}
+
+const THOUGHT_EMOJI = {
+  wonder: '🤔', doubt: '😕', curiosity: '🔍', amusement: '😄',
+  concern: '⚠️', conviction: '💪', empathy: '💙', observation: '👁️',
+};
+
+function renderInnerMonologue(thoughts, distribution) {
+  const el = document.getElementById('innerMonologue');
+  if (!thoughts.length) {
+    el.innerHTML = '<div class="empty">No inner thoughts yet — they appear during conversation</div>';
+    return;
+  }
+  let html = '';
+  for (const t of thoughts.slice(0, 15)) {
+    const emoji = THOUGHT_EMOJI[t.type] || '💭';
+    const time = new Date(t.timestamp * 1000).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    html += `<div style="padding:6px var(--sp-2);border-bottom:1px solid var(--border);font-size:13px;">
+      <span>${emoji}</span>
+      <span style="color:var(--text2);">${escapeHtml(t.thought)}</span>
+      <span style="float:right;font-size:11px;color:var(--text3);">${time}</span>
+    </div>`;
+  }
+  el.innerHTML = html;
+  // Distribution
+  const distEl = document.getElementById('thoughtDistribution');
+  if (distEl && Object.keys(distribution).length) {
+    distEl.innerHTML = Object.entries(distribution)
+      .sort((a,b) => b[1] - a[1])
+      .map(([t, c]) => `${THOUGHT_EMOJI[t] || '💭'} ${t}: ${c}`)
+      .join(' · ');
+  }
+}
+
+function renderEmpathyMap(map) {
+  const el = document.getElementById('empathyMap');
+  if (!map || map.emotional_state === 'unknown') {
+    el.innerHTML = '<div class="empty">Empathy model builds during chat</div>';
+    return;
+  }
+  const ENERGY_EMOJI = { high: '⚡', low: '🔋', frustrated: '😤', moderate: '☀️' };
+  const fields = [
+    { label: 'Emotional State', value: map.emotional_state, emoji: '🎭' },
+    { label: 'Energy Level', value: map.energy_level, emoji: ENERGY_EMOJI[map.energy_level] || '☀️' },
+    { label: 'Focus Mode', value: map.focus, emoji: '🎯' },
+    { label: 'Communication', value: map.communication_style, emoji: '💬' },
+  ];
+  let html = '';
+  for (const f of fields) {
+    if (f.value && f.value !== 'unknown') {
+      html += `<div style="padding:4px 0;font-size:13px;">
+        <span>${f.emoji}</span> <span style="color:var(--text3);">${f.label}:</span>
+        <span style="color:var(--text);font-weight:500;">${f.value}</span>
+      </div>`;
+    }
+  }
+  if (map.unspoken_needs && map.unspoken_needs.length) {
+    html += `<div style="padding:6px 0;font-size:12px;color:var(--accent);border-top:1px solid var(--border);margin-top:4px;">
+      🔮 ${map.unspoken_needs[0]}
+    </div>`;
+  }
+  el.innerHTML = html || '<div class="empty">Empathy model builds during chat</div>';
+}
+
+function renderCounterfactuals(cfs, total) {
+  const countEl = document.getElementById('counterfactualCount');
+  if (countEl) countEl.textContent = total;
+  const el = document.getElementById('counterfactuals');
+  if (!cfs.length) {
+    el.innerHTML = '<div class="empty">No what-if replays yet</div>';
+    return;
+  }
+  let html = '';
+  for (const cf of cfs.slice(0, 5)) {
+    html += `<div style="padding:6px var(--sp-2);border-bottom:1px solid var(--border);font-size:12px;">
+      <div style="color:var(--text);font-weight:500;margin-bottom:2px;">🔄 ${escapeHtml(cf.original.substring(0, 80))}...</div>
+      <div style="color:var(--text2);">${escapeHtml(cf.what_i_would_do_now)}</div>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderCreativeIdeas(ideas) {
+  const el = document.getElementById('creativeIdeas');
+  if (!ideas.length) {
+    el.innerHTML = '<div class="empty">Click Synthesize to cross-pollinate domains</div>';
+    return;
+  }
+  let html = '';
+  for (const idea of ideas.slice(0, 5)) {
+    html += `<div style="padding:6px var(--sp-2);border-bottom:1px solid var(--border);font-size:12px;">
+      <div style="font-weight:500;color:var(--accent);">💡 ${idea.domain_a} × ${idea.domain_b}</div>
+      <div style="color:var(--text2);margin-top:2px;">${escapeHtml(idea.synthesis)}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px;">Novelty: ${Math.round(idea.novelty_score * 100)}%</div>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderAspirations(aspirations) {
+  const el = document.getElementById('aspirationsList');
+  if (!aspirations.length) {
+    el.innerHTML = '<div class="empty">No aspirations yet — what does Kai dream of?</div>';
+    return;
+  }
+  const FEAS_COLOR = { achievable: 'var(--ok)', stretch: 'var(--accent)', ambitious: 'var(--warning)' };
+  let html = '';
+  for (const a of aspirations.slice(0, 5)) {
+    const color = FEAS_COLOR[a.feasibility] || 'var(--text)';
+    html += `<div style="padding:6px var(--sp-2);border-bottom:1px solid var(--border);font-size:12px;">
+      <div style="font-weight:500;color:var(--text);">🌅 ${escapeHtml(a.vision)}</div>
+      <div style="margin-top:2px;">
+        <span style="color:${color};font-size:11px;font-weight:500;">${a.feasibility}</span>
+        <span style="color:var(--text3);font-size:11px;"> · ${a.domain} · ${Math.round(a.current_confidence * 100)}% confidence</span>
+      </div>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+async function recordThought() {
+  const thought = prompt('What is Kai thinking right now?');
+  if (!thought) return;
+  try {
+    await fetch('/api/imagine/thought', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ thought, context: 'manual' }),
+    });
+    refreshImagination();
+  } catch(e) { console.warn('thought error', e); }
+}
+
+async function triggerSynthesis() {
+  try {
+    await fetch('/api/imagine/synthesize', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({}),
+    });
+    refreshImagination();
+  } catch(e) { console.warn('synthesis error', e); }
+}
+
+function showAspireForm() {
+  const form = document.getElementById('aspireForm');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+async function sendAspiration() {
+  const vision = document.getElementById('aspireVision').value.trim();
+  if (!vision) return;
+  try {
+    await fetch('/api/imagine/aspire', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ vision }),
+    });
+    document.getElementById('aspireVision').value = '';
+    document.getElementById('aspireForm').style.display = 'none';
+    refreshImagination();
+  } catch(e) { console.warn('aspire error', e); }
 }
 
 

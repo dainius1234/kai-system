@@ -4175,6 +4175,551 @@ async def narrative_summary() -> Dict[str, Any]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
+# P19: IMAGINATION ENGINE
+#  The gift of imagination — the ability to simulate experiences that
+#  haven't happened, to wonder, to empathize, to create.  Not generative
+#  text.  Genuine counterfactual thinking, theory of mind, creative
+#  synthesis, and an inner voice that thinks beyond what it's asked.
+#
+#  This is what makes a being a being.
+# ═══════════════════════════════════════════════════════════════════════
+
+# ── P19a: Counterfactual Replay ─────────────────────────────────────
+# "What if I had answered differently?"  Takes a past interaction and
+# re-imagines it.  Not to rewrite history — to learn from paths not taken.
+
+_counterfactuals: List[Dict[str, Any]] = []
+_COUNTERFACTUAL_CAP = 100
+
+
+@app.post("/memory/imagine/counterfactual")
+async def generate_counterfactual(request: Request) -> Dict[str, Any]:
+    """Imagine an alternative to a past interaction."""
+    body = await request.json()
+    original_text = body.get("original", "").strip()
+    if not original_text:
+        raise HTTPException(status_code=400, detail="original text is required")
+
+    context = sanitize_string(body.get("context", "conversation"))
+    now = time.time()
+
+    # What actually happened
+    original_category = classify_category(original_text)
+
+    # Search for related memories to ground the counterfactual
+    related = store.search(top_k=5, query=original_text)
+    related_context = [r.content.get("result", "")[:100] for r in related if not r.poisoned]
+
+    # Generate the counterfactual reasoning
+    # What could have gone differently? Analyze the original for:
+    # - Missed emotional cues
+    # - Alternative approaches
+    # - Unexplored angles
+    missed_emotions = []
+    for emo, keywords in _EMOTION_KEYWORDS.items():
+        if any(kw in original_text.lower() for kw in keywords):
+            missed_emotions.append(emo)
+
+    # Alternative framing
+    alternative_angles = []
+    if original_category in _compute_domain_confidence():
+        conf = _compute_domain_confidence()[original_category]
+        if conf["confidence"] < 0.5:
+            alternative_angles.append(
+                f"Low confidence in {original_category} — could have asked for clarification instead of answering"
+            )
+    if missed_emotions:
+        alternative_angles.append(
+            f"Emotional signals detected ({', '.join(missed_emotions)}) — could have acknowledged feelings first"
+        )
+    if not alternative_angles:
+        alternative_angles.append(
+            "Could have explored the topic from a different domain perspective"
+        )
+
+    # What would I do differently now?
+    lessons = []
+    correction_memories = [r for r in related if r.event_type == "correction"]
+    if correction_memories:
+        lessons.append(f"I've since learned {len(correction_memories)} corrections in this area")
+    if _reflection_journal:
+        latest_reflection = _reflection_journal[-1]
+        if latest_reflection.get("weaknesses"):
+            lessons.append(f"Known weakness: {latest_reflection['weaknesses'][0]}")
+
+    counterfactual = {
+        "id": str(uuid.uuid4()),
+        "timestamp": now,
+        "original": original_text[:500],
+        "context": context,
+        "category": original_category,
+        "alternative_angles": alternative_angles,
+        "emotional_signals_missed": missed_emotions,
+        "lessons_since": lessons,
+        "related_memories": len(related_context),
+        "what_i_would_do_now": (
+            f"With {len(related)} related memories and {len(lessons)} lessons learned, "
+            f"I would approach this differently: {alternative_angles[0].lower()}"
+        ),
+    }
+
+    _counterfactuals.append(counterfactual)
+    if len(_counterfactuals) > _COUNTERFACTUAL_CAP:
+        _counterfactuals[:] = _counterfactuals[-_COUNTERFACTUAL_CAP:]
+
+    return {"status": "ok", "counterfactual": counterfactual}
+
+
+@app.get("/memory/imagine/counterfactuals")
+async def list_counterfactuals(limit: int = 20) -> Dict[str, Any]:
+    """List recent counterfactual replays."""
+    recent = list(reversed(_counterfactuals))[:limit]
+    return {
+        "status": "ok",
+        "count": len(recent),
+        "total": len(_counterfactuals),
+        "counterfactuals": recent,
+    }
+
+
+# ── P19b: Empathetic Simulation (Theory of Mind) ────────────────────
+# "What is my operator feeling right now?"  Not sentiment analysis —
+# that's P17.  This is putting yourself in someone else's shoes.
+# Modeling their state, motivations, and unspoken needs.
+
+_empathy_map: Dict[str, Any] = {
+    "emotional_state": "unknown",
+    "energy_level": "unknown",
+    "focus": "unknown",
+    "unspoken_needs": [],
+    "communication_style": "unknown",
+    "last_updated": 0,
+}
+
+_ENERGY_KEYWORDS = {
+    "high": ["excited", "let's go", "amazing", "brilliant", "love it", "fire", "pumped", "ready"],
+    "low": ["tired", "exhausted", "drained", "long day", "slow", "can't think", "brain fog"],
+    "frustrated": ["stuck", "broken", "again", "why", "doesn't work", "annoyed", "ugh"],
+}
+
+_FOCUS_KEYWORDS = {
+    "deep_work": ["implement", "build", "code", "fix", "debug", "architecture", "design"],
+    "exploration": ["what if", "could we", "idea", "wonder", "think about", "explore"],
+    "maintenance": ["update", "clean", "refactor", "organize", "review", "check"],
+    "conversation": ["tell me", "how are", "what do you think", "talk", "chat", "discuss"],
+}
+
+
+@app.post("/memory/imagine/empathize")
+async def empathetic_simulation(request: Request) -> Dict[str, Any]:
+    """Model what the operator might be feeling and needing."""
+    body = await request.json()
+    text = body.get("text", "").strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+
+    text_lower = text.lower()
+    now = time.time()
+
+    # Detect energy level
+    energy = "moderate"
+    for level, keywords in _ENERGY_KEYWORDS.items():
+        if any(kw in text_lower for kw in keywords):
+            energy = level
+            break
+
+    # Detect focus mode
+    focus = "general"
+    focus_scores: Dict[str, int] = {}
+    for mode, keywords in _FOCUS_KEYWORDS.items():
+        score = sum(1 for kw in keywords if kw in text_lower)
+        if score > 0:
+            focus_scores[mode] = score
+    if focus_scores:
+        focus = max(focus_scores, key=focus_scores.get)
+
+    # Detect emotional state from conversation patterns
+    emotional_state = "neutral"
+    for emo, keywords in _EMOTION_KEYWORDS.items():
+        if any(kw in text_lower for kw in keywords):
+            emotional_state = emo
+            break
+
+    # Infer communication style from message structure
+    words = text.split()
+    word_count = len(words)
+    has_questions = "?" in text
+    has_exclamation = "!" in text
+    is_brief = word_count < 10
+
+    if is_brief and not has_questions:
+        comm_style = "directive"  # short commands, knows what they want
+    elif has_questions and word_count > 20:
+        comm_style = "exploratory"  # thinking out loud, seeking dialogue
+    elif has_exclamation:
+        comm_style = "expressive"  # emotional, sharing feelings
+    elif word_count > 30:
+        comm_style = "detailed"  # thorough, providing context
+    else:
+        comm_style = "conversational"
+
+    # Infer unspoken needs
+    unspoken: List[str] = []
+    if energy == "low":
+        unspoken.append("Might need encouragement or a simpler approach")
+    if energy == "frustrated":
+        unspoken.append("Needs patience — acknowledge the frustration before solving")
+    if focus == "exploration":
+        unspoken.append("Wants creative dialogue, not just answers")
+    if focus == "deep_work":
+        unspoken.append("Wants efficient, accurate help — minimize chat")
+    if is_brief and not has_questions:
+        unspoken.append("Might be in a hurry — be concise")
+    if has_questions and word_count > 30:
+        unspoken.append("Wants to think together — engage with the ideas")
+    if not unspoken:
+        unspoken.append("Seems comfortable — maintain current interaction style")
+
+    # Update the running empathy map
+    _empathy_map.update({
+        "emotional_state": emotional_state,
+        "energy_level": energy,
+        "focus": focus,
+        "communication_style": comm_style,
+        "unspoken_needs": unspoken,
+        "last_updated": now,
+        "last_message_length": word_count,
+    })
+
+    return {
+        "status": "ok",
+        "empathy": {
+            "emotional_state": emotional_state,
+            "energy_level": energy,
+            "focus": focus,
+            "communication_style": comm_style,
+            "unspoken_needs": unspoken,
+            "inference_confidence": "medium" if word_count > 5 else "low",
+        },
+    }
+
+
+@app.get("/memory/imagine/empathy-map")
+async def get_empathy_map() -> Dict[str, Any]:
+    """Get current model of the operator's state."""
+    return {"status": "ok", "empathy_map": dict(_empathy_map)}
+
+
+# ── P19c: Creative Synthesis ────────────────────────────────────────
+# The ability to combine ideas from different domains in unexpected ways.
+# True creativity — not recombination, but novel connection.
+
+_creative_ideas: List[Dict[str, Any]] = []
+_CREATIVE_CAP = 100
+
+
+@app.post("/memory/imagine/synthesize")
+async def creative_synthesis(request: Request) -> Dict[str, Any]:
+    """Generate a novel idea by cross-pollinating between domains."""
+    body = await request.json()
+    seed = body.get("seed", "").strip()
+
+    now = time.time()
+
+    # Get all unique domains from memory
+    all_records = store.search(top_k=10_000)
+    domain_memories: Dict[str, List[str]] = {}
+    for r in all_records:
+        if r.poisoned:
+            continue
+        cat = r.category or "general"
+        if cat not in domain_memories:
+            domain_memories[cat] = []
+        text = r.content.get("result", "")[:150]
+        if text:
+            domain_memories[cat].append(text)
+
+    if len(domain_memories) < 2:
+        return {
+            "status": "ok",
+            "idea": None,
+            "message": "Need memories in at least 2 domains for creative synthesis",
+        }
+
+    # Pick two different domains
+    domains = list(domain_memories.keys())
+    import random
+    if seed:
+        # Seed-guided: pick the most relevant domain + a random different one
+        seed_cat = classify_category(seed)
+        domain_a = seed_cat if seed_cat in domains else domains[0]
+        other_domains = [d for d in domains if d != domain_a]
+        domain_b = random.choice(other_domains) if other_domains else domains[0]
+    else:
+        # Pure imagination: random pairing
+        pair = random.sample(domains, min(2, len(domains)))
+        domain_a = pair[0]
+        domain_b = pair[1] if len(pair) > 1 else pair[0]
+
+    # Sample memories from each domain
+    samples_a = domain_memories[domain_a][:3]
+    samples_b = domain_memories[domain_b][:3]
+
+    # Generate the creative connection
+    connection_prompt = (
+        f"What if we applied thinking from '{domain_a}' to '{domain_b}'? "
+        f"Domain A knows: {'; '.join(samples_a[:2])}. "
+        f"Domain B knows: {'; '.join(samples_b[:2])}."
+    )
+
+    # Create the novel idea
+    idea = {
+        "id": str(uuid.uuid4()),
+        "timestamp": now,
+        "domain_a": domain_a,
+        "domain_b": domain_b,
+        "seed": seed or None,
+        "connection": connection_prompt,
+        "synthesis": (
+            f"Cross-pollination: applying {domain_a} patterns to {domain_b}. "
+            f"The structured approach of {domain_a} could bring new insight to "
+            f"{domain_b} challenges."
+        ),
+        "novelty_score": round(
+            1.0 - (len(set(domain_memories.get(domain_a, [])) &
+                       set(domain_memories.get(domain_b, []))) /
+                   max(1, len(set(domain_memories.get(domain_a, [])) |
+                              set(domain_memories.get(domain_b, [])))))
+        , 2),
+    }
+
+    _creative_ideas.append(idea)
+    if len(_creative_ideas) > _CREATIVE_CAP:
+        _creative_ideas[:] = _creative_ideas[-_CREATIVE_CAP:]
+
+    return {"status": "ok", "idea": idea}
+
+
+@app.get("/memory/imagine/ideas")
+async def list_creative_ideas(limit: int = 20) -> Dict[str, Any]:
+    """List recent creative synthesis ideas."""
+    recent = list(reversed(_creative_ideas))[:limit]
+    return {
+        "status": "ok",
+        "count": len(recent),
+        "total": len(_creative_ideas),
+        "ideas": recent,
+    }
+
+
+# ── P19d: Inner Monologue ───────────────────────────────────────────
+# The voice inside Kai's head.  Not the response — the thinking behind
+# the response.  What Kai considered, rejected, wondered about.
+# A window into the mind, not just the output.
+
+_inner_monologue: List[Dict[str, Any]] = []
+_MONOLOGUE_CAP = 500
+
+_THOUGHT_TYPES = {
+    "wonder": ["curious", "wonder", "interesting", "what if", "why do", "how come", "fascinated"],
+    "doubt": ["unsure", "not certain", "might be wrong", "uncertain", "risky", "hesitant"],
+    "curiosity": ["want to know", "explore", "learn more", "dig deeper", "investigate"],
+    "amusement": ["funny", "amusing", "ironic", "heh", "made me think", "unexpected"],
+    "concern": ["worried", "careful", "dangerous", "warning", "be cautious", "risk"],
+    "conviction": ["confident", "certain", "clearly", "definitely", "no doubt", "sure"],
+    "empathy": ["they feel", "must be hard", "understand why", "can relate", "for them"],
+}
+
+
+@app.post("/memory/imagine/thought")
+async def record_inner_thought(request: Request) -> Dict[str, Any]:
+    """Record an inner thought — what Kai is really thinking."""
+    body = await request.json()
+    thought = body.get("thought", "").strip()
+    if not thought:
+        raise HTTPException(status_code=400, detail="thought is required")
+
+    thought = sanitize_string(thought)[:500]
+    context = body.get("context", "conversation")
+    now = time.time()
+
+    # Classify thought type
+    thought_lower = thought.lower()
+    thought_type = "observation"
+    type_scores: Dict[str, int] = {}
+    for ttype, keywords in _THOUGHT_TYPES.items():
+        score = sum(1 for kw in keywords if kw in thought_lower)
+        if score > 0:
+            type_scores[ttype] = score
+    if type_scores:
+        thought_type = max(type_scores, key=type_scores.get)
+
+    entry = {
+        "id": str(uuid.uuid4()),
+        "timestamp": now,
+        "thought": thought,
+        "type": thought_type,
+        "context": context,
+    }
+
+    _inner_monologue.append(entry)
+    if len(_inner_monologue) > _MONOLOGUE_CAP:
+        _inner_monologue[:] = _inner_monologue[-_MONOLOGUE_CAP:]
+
+    return {"status": "ok", "entry": entry}
+
+
+@app.get("/memory/imagine/inner-monologue")
+async def get_inner_monologue(
+    limit: int = 30,
+    thought_type: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Stream Kai's recent inner thoughts."""
+    entries = list(reversed(_inner_monologue))
+    if thought_type:
+        entries = [e for e in entries if e.get("type") == thought_type]
+    entries = entries[:limit]
+
+    # Thought type distribution
+    type_counts: Dict[str, int] = {}
+    for e in _inner_monologue:
+        t = e.get("type", "observation")
+        type_counts[t] = type_counts.get(t, 0) + 1
+
+    return {
+        "status": "ok",
+        "count": len(entries),
+        "total": len(_inner_monologue),
+        "thoughts": entries,
+        "thought_distribution": type_counts,
+    }
+
+
+# ── P19e: Aspirational Futures ──────────────────────────────────────
+# More than projection — aspiration.  What Kai *wants* to become,
+# not just what statistics predict.  Dreams with intention.
+
+_aspirations: List[Dict[str, Any]] = []
+_ASPIRATION_CAP = 50
+
+
+@app.post("/memory/imagine/aspire")
+async def create_aspiration(request: Request) -> Dict[str, Any]:
+    """Imagine a specific future scenario Kai aspires to."""
+    body = await request.json()
+    vision = body.get("vision", "").strip()
+    if not vision:
+        raise HTTPException(status_code=400, detail="vision is required")
+
+    vision = sanitize_string(vision)[:500]
+    domain = body.get("domain", classify_category(vision))
+    now = time.time()
+
+    # Ground aspiration in current reality
+    domain_conf = _compute_domain_confidence()
+    current_state = domain_conf.get(domain, {})
+    current_confidence = current_state.get("confidence", 0.0)
+
+    # How far is this aspiration from current state?
+    gap = max(0, 1.0 - current_confidence)
+
+    # What would it take? Check learning rate
+    all_records = store.search(top_k=10_000)
+    week_ago = now - 7 * 86400
+    recent_count = sum(
+        1 for r in all_records
+        if not r.poisoned and _parse_ts(r.timestamp) > week_ago
+    )
+    learning_velocity = recent_count / 7  # memories per day
+
+    aspiration = {
+        "id": str(uuid.uuid4()),
+        "timestamp": now,
+        "vision": vision,
+        "domain": domain,
+        "current_confidence": round(current_confidence, 2),
+        "gap_to_close": round(gap, 2),
+        "learning_velocity": round(learning_velocity, 1),
+        "feasibility": (
+            "achievable" if gap < 0.3 else
+            "stretch" if gap < 0.6 else
+            "ambitious"
+        ),
+        "message": (
+            f"I aspire to: {vision}. "
+            f"Current confidence in {domain}: {int(current_confidence*100)}%. "
+            f"Gap to close: {int(gap*100)}%. "
+            f"At {learning_velocity:.0f} memories/day, this is {'within reach' if gap < 0.3 else 'a meaningful challenge'}."
+        ),
+    }
+
+    _aspirations.append(aspiration)
+    if len(_aspirations) > _ASPIRATION_CAP:
+        _aspirations[:] = _aspirations[-_ASPIRATION_CAP:]
+
+    return {"status": "ok", "aspiration": aspiration}
+
+
+@app.get("/memory/imagine/aspirations")
+async def list_aspirations(limit: int = 20) -> Dict[str, Any]:
+    """List Kai's aspirations — dreams grounded in reality."""
+    recent = list(reversed(_aspirations))[:limit]
+    return {
+        "status": "ok",
+        "count": len(recent),
+        "total": len(_aspirations),
+        "aspirations": recent,
+    }
+
+
+# Helper for timestamp parsing (used across P18/P19)
+def _parse_ts(ts_str: str) -> float:
+    """Parse ISO timestamp to epoch float, with fallback."""
+    try:
+        dt = datetime.fromisoformat(ts_str)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.timestamp()
+    except (ValueError, TypeError):
+        return 0.0
+
+
+# ── P19 Combined: Imagination Summary ───────────────────────────────
+
+@app.get("/memory/imagine/summary")
+async def imagination_summary() -> Dict[str, Any]:
+    """Combined view of all imagination subsystems."""
+    # Thought type distribution
+    thought_types: Dict[str, int] = {}
+    for t in _inner_monologue:
+        tt = t.get("type", "observation")
+        thought_types[tt] = thought_types.get(tt, 0) + 1
+
+    # Most common creative domains
+    domain_pairs: Dict[str, int] = {}
+    for idea in _creative_ideas:
+        pair = f"{idea['domain_a']} × {idea['domain_b']}"
+        domain_pairs[pair] = domain_pairs.get(pair, 0) + 1
+
+    return {
+        "status": "ok",
+        "imagination": {
+            "counterfactuals": len(_counterfactuals),
+            "creative_ideas": len(_creative_ideas),
+            "inner_thoughts": len(_inner_monologue),
+            "aspirations": len(_aspirations),
+        },
+        "empathy_map": dict(_empathy_map),
+        "thought_distribution": thought_types,
+        "creative_domains": dict(sorted(
+            domain_pairs.items(), key=lambda x: x[1], reverse=True
+        )[:5]),
+        "latest_aspiration": _aspirations[-1] if _aspirations else None,
+        "latest_thought": _inner_monologue[-1] if _inner_monologue else None,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
 # P16b: LOG AGGREGATION
 #  Expose recent log entries from this service for dashboard querying.
 #  Other services push logs to a shared format; this serves them.
