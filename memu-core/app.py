@@ -2527,6 +2527,399 @@ async def full_proactive_scan() -> Dict[str, Any]:
     }
 
 
+# ── P4b: Anti-annoyance engine ──────────────────────────────────────
+
+# In-memory state for dismissal tracking and DND
+_dismissal_counts: Dict[str, int] = {}     # nudge_type → dismiss count
+_dnd_until: float = 0.0                     # DND timestamp (0 = not active)
+_last_nudge_by_type: Dict[str, float] = {}  # nudge_type → last sent timestamp
+
+# Default cooldowns per nudge type (seconds). Higher = less annoying.
+_TYPE_COOLDOWNS: Dict[str, int] = {
+    "reminder": 3600,       # 1 hour
+    "silence": 7200,        # 2 hours
+    "goal_deadline": 1800,  # 30 minutes (urgent)
+    "drift": 7200,          # 2 hours
+    "fading_memory": 14400, # 4 hours
+    "greeting": 28800,      # 8 hours
+    "check_in": 14400,      # 4 hours
+}
+
+DISMISSAL_ESCALATION = 1.5   # multiply cooldown per dismiss
+MAX_COOLDOWN_SECONDS = 86400  # cap at 24 hours
+
+
+class DismissRequest(BaseModel):
+    nudge_type: str
+    memory_id: Optional[str] = None
+
+
+class DNDRequest(BaseModel):
+    hours: float = 2.0
+
+
+@app.post("/memory/nudge/dismiss")
+async def dismiss_nudge(req: DismissRequest) -> Dict[str, Any]:
+    """Operator dismissed a nudge — learn to interrupt less for this type."""
+    ntype = req.nudge_type
+    _dismissal_counts[ntype] = _dismissal_counts.get(ntype, 0) + 1
+    base_cd = _TYPE_COOLDOWNS.get(ntype, 3600)
+    effective_cd = min(base_cd * (DISMISSAL_ESCALATION ** _dismissal_counts[ntype]), MAX_COOLDOWN_SECONDS)
+    return {
+        "status": "ok",
+        "nudge_type": ntype,
+        "dismissals": _dismissal_counts[ntype],
+        "effective_cooldown_seconds": int(effective_cd),
+    }
+
+
+@app.post("/memory/dnd")
+async def set_dnd(req: DNDRequest) -> Dict[str, Any]:
+    """Operator says 'Kai, quiet' — silence proactive nudges for N hours."""
+    global _dnd_until
+    _dnd_until = time.time() + (req.hours * 3600)
+    return {
+        "status": "ok",
+        "dnd_until": _dnd_until,
+        "hours": req.hours,
+        "message": f"Got it. I'll be quiet for {req.hours:.1f} hours.",
+    }
+
+
+@app.get("/memory/dnd")
+async def get_dnd() -> Dict[str, Any]:
+    """Check DND status."""
+    now = time.time()
+    active = _dnd_until > now
+    remaining = max(_dnd_until - now, 0) if active else 0
+    return {
+        "active": active,
+        "remaining_seconds": int(remaining),
+        "dnd_until": _dnd_until if active else None,
+    }
+
+
+def _nudge_allowed(nudge_type: str, urgency: float = 0.5) -> bool:
+    """Check if a nudge is allowed given DND, cooldowns, and dismissals."""
+    now = time.time()
+    # DND blocks everything except critical urgency (>= 0.9)
+    if _dnd_until > now and urgency < 0.9:
+        return False
+    # Check type-specific cooldown (escalated by dismissals)
+    base_cd = _TYPE_COOLDOWNS.get(nudge_type, 3600)
+    dismiss_count = _dismissal_counts.get(nudge_type, 0)
+    effective_cd = min(base_cd * (DISMISSAL_ESCALATION ** dismiss_count), MAX_COOLDOWN_SECONDS)
+    last_sent = _last_nudge_by_type.get(nudge_type, 0)
+    if now - last_sent < effective_cd:
+        # High urgency (>= 0.8) can break cooldown at half the interval
+        if urgency >= 0.8 and now - last_sent >= effective_cd * 0.5:
+            return True
+        return False
+    return True
+
+
+@app.get("/memory/nudge/status")
+async def nudge_status() -> Dict[str, Any]:
+    """Return current anti-annoyance state: dismissals, cooldowns, DND."""
+    now = time.time()
+    cooldowns = {}
+    for ntype, base_cd in _TYPE_COOLDOWNS.items():
+        dismiss_count = _dismissal_counts.get(ntype, 0)
+        effective_cd = min(base_cd * (DISMISSAL_ESCALATION ** dismiss_count), MAX_COOLDOWN_SECONDS)
+        last_sent = _last_nudge_by_type.get(ntype, 0)
+        remaining = max(effective_cd - (now - last_sent), 0) if last_sent else 0
+        cooldowns[ntype] = {
+            "base_cooldown": base_cd,
+            "effective_cooldown": int(effective_cd),
+            "dismissals": dismiss_count,
+            "cooldown_remaining": int(remaining),
+        }
+    return {
+        "dnd_active": _dnd_until > now,
+        "dnd_remaining": int(max(_dnd_until - now, 0)),
+        "cooldowns": cooldowns,
+    }
+
+
+# ── P4c: Conversation holding — active topics & deferred topics ─────
+
+_active_topics: List[Dict[str, Any]] = []   # current conversation topics
+_deferred_topics: List[Dict[str, Any]] = []  # "remind me about X" list
+
+
+class TopicRequest(BaseModel):
+    topic: str
+    context: Optional[str] = None
+
+
+class DeferRequest(BaseModel):
+    topic: str
+    context: Optional[str] = None
+    resurface_after_hours: float = 4.0
+
+
+@app.post("/memory/topics/track")
+async def track_topic(req: TopicRequest) -> Dict[str, Any]:
+    """Track an active conversation topic."""
+    topic_entry = {
+        "id": hashlib.sha256(f"{req.topic}{time.time()}".encode()).hexdigest()[:12],
+        "topic": req.topic,
+        "context": req.context,
+        "started_at": time.time(),
+        "last_mentioned": time.time(),
+        "mention_count": 1,
+        "deferred": False,
+    }
+    # update if topic already exists (fuzzy match by text)
+    for t in _active_topics:
+        if req.topic.lower() in t["topic"].lower() or t["topic"].lower() in req.topic.lower():
+            t["last_mentioned"] = time.time()
+            t["mention_count"] += 1
+            if req.context:
+                t["context"] = req.context
+            return {"status": "ok", "action": "updated", "topic": t}
+    _active_topics.append(topic_entry)
+    # cap at 20 active topics
+    if len(_active_topics) > 20:
+        _active_topics.sort(key=lambda x: x["last_mentioned"], reverse=True)
+        _active_topics[:] = _active_topics[:20]
+    return {"status": "ok", "action": "created", "topic": topic_entry}
+
+
+@app.post("/memory/topics/defer")
+async def defer_topic(req: DeferRequest) -> Dict[str, Any]:
+    """Defer a topic — Kai will bring it up later unprompted."""
+    deferred_entry = {
+        "id": hashlib.sha256(f"{req.topic}{time.time()}".encode()).hexdigest()[:12],
+        "topic": req.topic,
+        "context": req.context,
+        "deferred_at": time.time(),
+        "resurface_after": time.time() + (req.resurface_after_hours * 3600),
+        "resurfaced": False,
+        "deferred": True,
+    }
+    _deferred_topics.append(deferred_entry)
+    return {
+        "status": "ok",
+        "topic": deferred_entry,
+        "message": f"Got it. I'll bring up '{req.topic}' in about {req.resurface_after_hours:.0f} hours.",
+    }
+
+
+@app.get("/memory/topics/active")
+async def get_active_topics() -> Dict[str, Any]:
+    """Return active + ready-to-resurface deferred topics."""
+    now = time.time()
+    # resurface deferred topics that are due
+    ready_deferred = [
+        t for t in _deferred_topics
+        if not t.get("resurfaced") and t.get("resurface_after", float("inf")) <= now
+    ]
+    combined = _active_topics + ready_deferred
+    # sort by last mentioned/deferred time (most recent first)
+    combined.sort(key=lambda x: x.get("last_mentioned", x.get("deferred_at", 0)), reverse=True)
+    return {"status": "ok", "count": len(combined), "topics": combined[:10]}
+
+
+@app.get("/memory/topics/deferred")
+async def get_deferred_topics() -> Dict[str, Any]:
+    """Return all deferred topics (pending + resurfaced)."""
+    return {
+        "status": "ok",
+        "count": len(_deferred_topics),
+        "topics": _deferred_topics,
+    }
+
+
+@app.post("/memory/topics/resurface")
+async def resurface_topic(topic_id: str = "") -> Dict[str, Any]:
+    """Mark a deferred topic as resurfaced after Kai brings it up."""
+    for t in _deferred_topics:
+        if t["id"] == topic_id:
+            t["resurfaced"] = True
+            return {"status": "ok", "topic": t}
+    raise HTTPException(status_code=404, detail="Deferred topic not found")
+
+
+# ── P4d: Mode-aware proactive thresholds ─────────────────────────────
+
+_PROACTIVE_MODE_CONFIG = {
+    "WORK": {
+        "enabled_types": ["reminder", "goal_deadline", "drift", "fading_memory"],
+        "urgency_threshold": 0.4,   # only show important nudges
+        "max_nudges": 3,            # keep it focused
+    },
+    "PUB": {
+        "enabled_types": ["reminder", "silence", "goal_deadline", "drift", "fading_memory", "greeting", "check_in"],
+        "urgency_threshold": 0.2,   # more relaxed
+        "max_nudges": 5,            # allow more
+    },
+}
+
+
+@app.get("/memory/proactive/filtered")
+async def proactive_filtered(mode: str = "PUB") -> Dict[str, Any]:
+    """Return proactive nudges filtered by mode-aware rules + anti-annoyance."""
+    mode = mode.upper()
+    config = _PROACTIVE_MODE_CONFIG.get(mode, _PROACTIVE_MODE_CONFIG["PUB"])
+
+    # get the full nudge set from proactive/full logic
+    full_resp = await proactive_full_scan()
+    all_nudges = full_resp.get("nudges", [])
+
+    filtered = []
+    for nudge in all_nudges:
+        ntype = nudge.get("type", "reminder")
+        urgency = nudge.get("urgency", 0.5)
+        # must be an enabled type for this mode
+        if ntype not in config["enabled_types"]:
+            continue
+        # must meet urgency threshold
+        if urgency < config["urgency_threshold"]:
+            continue
+        # must pass anti-annoyance check
+        if not _nudge_allowed(ntype, urgency):
+            continue
+        filtered.append(nudge)
+
+    # cap at max
+    filtered = filtered[:config["max_nudges"]]
+
+    # mark these nudges as sent (update last_nudge timestamps)
+    now = time.time()
+    for nudge in filtered:
+        _last_nudge_by_type[nudge.get("type", "reminder")] = now
+
+    return {
+        "status": "ok",
+        "mode": mode,
+        "nudge_count": len(filtered),
+        "nudges": filtered,
+    }
+
+
+# ── P4f: Proactive greeting & check-in ──────────────────────────────
+
+_last_greeting: float = 0.0
+_last_check_in: float = 0.0
+_session_start_time: float = time.time()
+GREETING_COOLDOWN = int(os.getenv("GREETING_COOLDOWN", "28800"))  # 8 hours
+CHECK_IN_COOLDOWN = int(os.getenv("CHECK_IN_COOLDOWN", "10800"))  # 3 hours
+
+
+@app.get("/memory/greeting")
+async def proactive_greeting() -> Dict[str, Any]:
+    """Generate a proactive greeting when operator starts a session.
+
+    Kai talks first — this is THE differentiator.
+    """
+    global _last_greeting
+    now = time.time()
+
+    if not _nudge_allowed("greeting", urgency=0.6):
+        return {"status": "ok", "greeting": None, "reason": "cooldown"}
+
+    # build a context-aware greeting
+    parts = []
+
+    # check time of day for appropriate greeting
+    from datetime import datetime
+    hour = datetime.now().hour
+    if hour < 6:
+        parts.append("You're up late, brother.")
+    elif hour < 12:
+        parts.append("Morning, brother.")
+    elif hour < 17:
+        parts.append("Afternoon.")
+    elif hour < 21:
+        parts.append("Evening, brother.")
+    else:
+        parts.append("Late one tonight?")
+
+    # check for active goals
+    try:
+        active_goals = [
+            r for r in store.search(top_k=10_000)
+            if getattr(r, "event_type", None) == "goal"
+            and r.content.get("status", "active") == "active"
+            and not getattr(r, "poisoned", False)
+        ]
+        if active_goals:
+            top_goal = max(active_goals, key=lambda g: g.content.get("priority_score", 0.5))
+            parts.append(f"Top goal is still '{top_goal.content.get('title', 'untitled')}' — want to work on that?")
+    except Exception:
+        pass
+
+    # check for deferred topics that are due
+    ready_deferred = [
+        t for t in _deferred_topics
+        if not t.get("resurfaced") and t.get("resurface_after", float("inf")) <= now
+    ]
+    if ready_deferred:
+        topic = ready_deferred[0]["topic"]
+        parts.append(f"Oh, and you wanted me to remind you about: {topic}")
+
+    if not parts:
+        parts.append("What's on the agenda?")
+
+    _last_greeting = now
+    _last_nudge_by_type["greeting"] = now
+
+    return {
+        "status": "ok",
+        "greeting": " ".join(parts),
+        "timestamp": now,
+    }
+
+
+@app.get("/memory/check-in")
+async def proactive_check_in() -> Dict[str, Any]:
+    """Check on the operator — 'how are you?' periodically.
+
+    This is emotional continuity: Kai cares about the human, not just the task.
+    """
+    global _last_check_in
+    now = time.time()
+
+    if not _nudge_allowed("check_in", urgency=0.3):
+        return {"status": "ok", "check_in": None, "reason": "cooldown"}
+
+    # how long since last interaction?
+    silence_hours = (now - _session_start_time) / 3600
+
+    messages = []
+    if silence_hours > 3:
+        messages.append("Been a while. You alright?")
+    elif silence_hours > 1:
+        messages.append("How's it going? Need anything?")
+
+    # check drift — if operator is off-goal, mention it gently
+    try:
+        all_records = store.search(top_k=10_000)
+        recent_count = sum(1 for r in all_records if (now - r.timestamp) < 3600)
+        active_goals = [
+            r for r in all_records
+            if getattr(r, "event_type", None) == "goal"
+            and r.content.get("status", "active") == "active"
+        ]
+        if active_goals and recent_count > 5:
+            messages.append("You've been busy. Making progress on the goals?")
+    except Exception:
+        pass
+
+    if not messages:
+        return {"status": "ok", "check_in": None, "reason": "nothing_to_say"}
+
+    _last_check_in = now
+    _last_nudge_by_type["check_in"] = now
+
+    return {
+        "status": "ok",
+        "check_in": " ".join(messages),
+        "timestamp": now,
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
 

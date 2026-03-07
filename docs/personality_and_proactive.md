@@ -173,14 +173,16 @@ isolated. Kai maintains:
 
 | Component | Status | Notes |
 |---|---|---|
-| MODE env var | ✅ Done | tool-gate `/gate/mode` endpoint |
+| MODE env var | ✅ Done | tool-gate `/gate/mode` endpoint (GET + POST) |
 | Perception capture | ✅ Services exist | audio, camera, screen-capture |
 | Memory storage | ✅ Postgres + pgvector | Full schema with access_count, decay |
-| Proactive engine | ⬜ Not started | Needs langgraph node + trigger rules |
+| Proactive engine | ✅ Done | 5 nudge types, mode-filtered + anti-annoyance |
 | Struggle detection | ⬜ Not started | Screen capture analysis needed |
-| Conversation holding | ⬜ Not started | Session context in memu-core |
-| Tone switching | ⬜ Not started | LLM system prompt per mode |
-| Anti-annoyance | ⬜ Not started | Cooldown + dismissal tracking |
+| Conversation holding | ✅ Done | Active topics, deferred topics, resurfacing |
+| Tone switching | ✅ Done | Deep PUB/WORK system prompts with core identity |
+| Anti-annoyance | ✅ Done | DND, dismissal escalation, per-type cooldowns |
+| Mode transitions | ✅ Done | Time-of-day schedule, manual override (4h expiry) |
+| Greeting/check-in | ✅ Done | Time-aware greeting, emotional check-in, goal-aware |
 
 ---
 

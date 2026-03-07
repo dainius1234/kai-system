@@ -121,7 +121,7 @@ make full-down
 ## Test
 
 ```bash
-# Run ALL core unit/smoke tests (49 targets, ~396 tests)
+# Run ALL core unit/smoke tests (50 targets, ~439 tests)
 make test-core
 
 # Individual service tests
@@ -161,6 +161,7 @@ make test-model-selector      # HP2 MoE model selector tests
 make test-prod-hardening     # production hardening (secrets, pubsub, backup, HMAC)
 make test-hmac-rotation-drill # HMAC rotation lifecycle drill
 make test-p3-organic          # P3 organic memory (goals, drift, decay, proactive)
+make test-p4-personality       # P4 personality & proactive (prompts, anti-annoyance, topics, modes)
 
 # v7 feature tests
 make test-v7                 # verifier, quarantine, policy, idempotency, integration-chain
@@ -286,7 +287,7 @@ For architecture details see `docs/sovereign_ai_spec.md`.
 - All code must work in BOTH environments (stubs in codespace, live on laptop)
 
 ### Current State
-- **All 49 test-core targets pass.** Run `make test-core` to confirm.
+- **All 50 test-core targets pass.** Run `make test-core` to confirm.
 - **Phase 2 COMPLETE:** Specialist Router, Memory-Driven Planner, Adversary Challenge Engine — all built, tested, wired into `/chat` and `/run`.
 - **P1+P2 COMPLETE:** Failure Taxonomy, Metacognitive Rules, SELAUR learning value — all generating real episode metadata.
 - **P4+P5+P6 COMPLETE:** Contradiction Memory, GEM Cognitive Alignment, Knowledge Boundary Mapping — full engines in memu-core + kai_config + planner + app.py.

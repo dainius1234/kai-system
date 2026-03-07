@@ -535,8 +535,50 @@ async def set_mode(change: ModeChange, request: Request) -> Dict[str, str]:
     if normalized not in {"PUB", "WORK"}:
         raise HTTPException(status_code=400, detail="Mode must be PUB or WORK.")
     policy.mode = normalized
+    _mode_override_until[0] = time.time() + 3600 * 4  # manual override lasts 4h
     ledger.append({"mode": normalized, "reason": sanitize_string(change.reason)}, True, "Mode updated")
     return {"status": "ok", "mode": policy.mode}
+
+
+# ── P4e: Implicit mode transitions (time-of-day schedule) ───────────
+
+# Schedule: list of (start_hour, end_hour, mode). First match wins.
+# Default: WORK 08:00—18:00 weekdays, PUB otherwise.
+_MODE_SCHEDULE = json.loads(os.getenv("MODE_SCHEDULE", "[]")) or [
+    {"start": 8, "end": 18, "mode": "WORK", "days": [0, 1, 2, 3, 4]},  # Mon-Fri
+]
+_mode_override_until: List[float] = [0.0]  # manual override expiry
+
+
+def _effective_mode() -> str:
+    """Determine the effective mode considering manual override + schedule."""
+    now = time.time()
+    # manual override takes precedence
+    if _mode_override_until[0] > now:
+        return policy.mode
+    # check schedule
+    from datetime import datetime
+    dt = datetime.now()
+    for rule in _MODE_SCHEDULE:
+        days = rule.get("days", [0, 1, 2, 3, 4, 5, 6])
+        if dt.weekday() in days:
+            if rule.get("start", 0) <= dt.hour < rule.get("end", 24):
+                return str(rule.get("mode", "WORK")).upper()
+    return "PUB"  # default outside schedule
+
+
+@app.get("/gate/mode")
+async def get_mode() -> Dict[str, Any]:
+    """Return the current effective mode (manual override > schedule > default)."""
+    now = time.time()
+    mode = _effective_mode()
+    override_active = _mode_override_until[0] > now
+    return {
+        "mode": mode,
+        "source": "manual_override" if override_active else "schedule",
+        "override_remaining": int(max(_mode_override_until[0] - now, 0)) if override_active else 0,
+        "schedule": _MODE_SCHEDULE,
+    }
 
 
 @app.get("/gate/pending")

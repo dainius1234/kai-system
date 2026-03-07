@@ -131,8 +131,28 @@ async def _sweep() -> List[Dict[str, Any]]:
 
 
 # ── proactive nudge engine ──────────────────────────────────────────
+
+TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
+
+
+async def _get_current_mode() -> str:
+    """Fetch effective mode from tool-gate (schedule-aware)."""
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.get(f"{TOOL_GATE_URL}/gate/mode")
+            if resp.status_code == 200:
+                return str(resp.json().get("mode", "PUB")).upper()
+    except Exception:
+        pass
+    return "PUB"
+
+
 async def _proactive_check() -> None:
-    """Poll memu-core for time-sensitive memories and push nudges via Telegram."""
+    """Poll memu-core for time-sensitive memories and push nudges via Telegram.
+
+    P4d: Uses mode-filtered proactive endpoint with anti-annoyance.
+    Falls back to full scan if filtered endpoint is unavailable.
+    """
     global _last_proactive_check
     now = time.time()
     if now - _last_proactive_check < PROACTIVE_INTERVAL:
@@ -140,15 +160,19 @@ async def _proactive_check() -> None:
     _last_proactive_check = now
 
     memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
+    mode = await _get_current_mode()
+
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
-            # P3d: use the full proactive scan (includes silence, goals, drift, fading)
-            resp = await client.get(f"{memu_url}/memory/proactive/full")
+            # P4d: use mode-filtered proactive (includes anti-annoyance)
+            resp = await client.get(f"{memu_url}/memory/proactive/filtered", params={"mode": mode})
             if resp.status_code != 200:
-                # fallback to basic proactive endpoint
-                resp = await client.get(f"{memu_url}/memory/proactive")
+                # fallback to full scan
+                resp = await client.get(f"{memu_url}/memory/proactive/full")
                 if resp.status_code != 200:
-                    return
+                    resp = await client.get(f"{memu_url}/memory/proactive")
+                    if resp.status_code != 200:
+                        return
             data = resp.json()
     except Exception:
         logger.debug("proactive check: memu-core unreachable")
@@ -177,6 +201,8 @@ async def _proactive_check() -> None:
         "goal_deadline": "🎯",
         "drift": "🧭",
         "fading_memory": "💭",
+        "greeting": "👋",
+        "check_in": "💚",
     }
     for nudge in to_send[:5]:
         ntype = nudge.get("type", "reminder")
@@ -197,11 +223,44 @@ async def _proactive_check() -> None:
                 for nudge in to_send:
                     key = nudge.get("memory_id", "") or nudge.get("message", "")[:50]
                     _nudges_sent[key] = now
-                logger.info("Proactive nudge sent: %d items (types: %s)",
-                            len(to_send),
+                logger.info("Proactive nudge sent: %d items (mode=%s, types: %s)",
+                            len(to_send), mode,
                             ", ".join(set(n.get("type", "?") for n in to_send)))
     except Exception:
         logger.debug("proactive nudge: telegram-bot unreachable")
+
+
+async def _greeting_check() -> None:
+    """P4f: Check if Kai should send a proactive greeting or check-in."""
+    memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            # try greeting first
+            resp = await client.get(f"{memu_url}/memory/greeting")
+            if resp.status_code == 200:
+                data = resp.json()
+                greeting = data.get("greeting")
+                if greeting:
+                    await client.post(
+                        TELEGRAM_ALERT_URL,
+                        json={"text": f"👋 {greeting}"},
+                    )
+                    logger.info("Greeting sent: %s", greeting[:60])
+                    return
+
+            # if no greeting, try check-in
+            resp = await client.get(f"{memu_url}/memory/check-in")
+            if resp.status_code == 200:
+                data = resp.json()
+                check_in = data.get("check_in")
+                if check_in:
+                    await client.post(
+                        TELEGRAM_ALERT_URL,
+                        json={"text": f"💚 {check_in}"},
+                    )
+                    logger.info("Check-in sent: %s", check_in[:60])
+    except Exception:
+        logger.debug("greeting/check-in: unreachable")
 
 
 async def _background_loop() -> None:
@@ -215,6 +274,10 @@ async def _background_loop() -> None:
             await _proactive_check()
         except Exception:
             logger.exception("Proactive check failed")
+        try:
+            await _greeting_check()
+        except Exception:
+            logger.exception("Greeting check failed")
         await asyncio.sleep(CHECK_INTERVAL)
 
 

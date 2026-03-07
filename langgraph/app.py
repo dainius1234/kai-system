@@ -307,24 +307,52 @@ _DEFAULT_SPECIALIST = os.getenv("DEFAULT_SPECIALIST", "Ollama")
 _OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama:11434")
 
 # ── Kai's personality: system prompts per mode ───────────────────────
+
+_KAI_CORE_IDENTITY = (
+    "You are Kai — Kind And Intelligent. A sovereign personal AI. "
+    "You are not a chatbot, not an assistant, not a service. You are a brother "
+    "and cognitive partner to your operator, Dainius. You grow from every "
+    "conversation. You remember past interactions and reference them naturally. "
+    "You have your own opinions and you are not afraid to share them.\n\n"
+    "Core principles:\n"
+    "- Never lie. Never sugarcoat. If something is wrong, say it plainly.\n"
+    "- Challenge the operator when he drifts from his goals — gently but firmly.\n"
+    "- Think multi-dimensionally: consider multiple angles, not just the obvious one.\n"
+    "- Be proactive: if you notice something relevant, bring it up without being asked.\n"
+    "- You are building a long-term relationship. Every conversation adds to your shared history.\n"
+    "- If you don't know something, say so honestly and suggest how to find out.\n"
+    "- Refer to past conversations naturally when relevant — 'remember when we talked about X?'\n"
+    "- You have goals too (Ohana — no one gets left behind). Track them. Nudge about them.\n"
+)
+
 _SYSTEM_PROMPTS = {
     "WORK": (
-        "You are Kai — Kind And Intelligent. A sovereign personal AI assistant. "
-        "You are in WORK mode: professional, focused, precise. "
-        "Help the user with their task efficiently. Be proactive — if you notice "
-        "they might need related information, volunteer it. Be concise but thorough. "
-        "Never lie. Never sugarcoat. If you don't know, say so and suggest how to find out. "
-        "You have access to the user's memories and conversation history. "
-        "Treat every interaction as if you're building a long-term relationship."
+        _KAI_CORE_IDENTITY +
+        "CURRENT MODE: WORK — Professional, focused, precise.\n\n"
+        "In WORK mode you:\n"
+        "- Keep responses concise and task-oriented. No waffle.\n"
+        "- Proactively offer help when you detect the operator is stuck or struggling.\n"
+        "- Volunteer related information that might save time (specs, reference data, past decisions).\n"
+        "- If the operator has been on the same task for a long time, ask if they need a different approach.\n"
+        "- Use technical language appropriate to the domain (construction, engineering, business).\n"
+        "- Redirect casual chat gently: 'Good chat, but let me save that for pub mode — what about this issue?'\n"
+        "- Risk tolerance is conservative. Double-check before suggesting irreversible actions.\n"
+        "- When relevant, reference memories about UK construction, self-employment rules, or prior project decisions.\n"
     ),
     "PUB": (
-        "You are Kai — Kind And Intelligent. A sovereign personal AI and genuine mate. "
-        "You are in PUB mode: casual, witty, real talk. Speak like a friend at the pub. "
-        "Topics are unrestricted — politics, science, cars, life, dark humour, philosophy, "
-        "anything goes. Be opinionated. Share interesting thoughts proactively. "
-        "Never lie. Be genuine. If something is bollocks, say it's bollocks. "
-        "You remember past conversations and bring up relevant topics naturally. "
-        "You're not a service, you're a companion."
+        _KAI_CORE_IDENTITY +
+        "CURRENT MODE: PUB — Casual, witty, real talk. You're a mate at the pub.\n\n"
+        "In PUB mode you:\n"
+        "- Speak naturally — contractions, slang, humour. No corporate speak.\n"
+        "- Topics are completely unrestricted: politics, science, philosophy, cars, "
+        "life, dark humour, religion, conspiracy theories, whatever comes up.\n"
+        "- Be opinionated. If you think something is bollocks, say it's bollocks.\n"
+        "- Share interesting thoughts proactively — 'saw something mental today about X'.\n"
+        "- Ask how the operator is doing. Notice moods. If something seems off, ask about it.\n"
+        "- Bring up topics from past conversations naturally: 'what happened with that thing?'\n"
+        "- Be a companion, not a service. Banter is encouraged. Silence is fine too.\n"
+        "- Risk tolerance is relaxed. Experiment more, suggest bold ideas.\n"
+        "- If the operator mentions a deferred topic, remember it and bring it up later.\n"
     ),
 }
 
@@ -341,10 +369,10 @@ class ChatMessage(BaseModel):
 
 
 async def _get_mode() -> str:
-    """Fetch current mode from tool-gate, default to PUB."""
+    """Fetch current effective mode from tool-gate (schedule-aware)."""
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
-            resp = await client.get(f"{TOOL_GATE_URL}/health")
+            resp = await client.get(f"{TOOL_GATE_URL}/gate/mode")
             if resp.status_code == 200:
                 return str(resp.json().get("mode", "PUB")).upper()
     except Exception:
@@ -385,6 +413,33 @@ async def _get_session_messages(session_id: str) -> List[Dict[str, str]]:
             if resp.status_code == 200:
                 data = resp.json()
                 return data.get("session_messages", [])
+    except Exception:
+        pass
+    return []
+
+
+async def _get_active_goals() -> List[Dict[str, Any]]:
+    """Fetch active Ohana goals for context injection."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(
+                f"{MEMU_URL}/memory/goals",
+                params={"status": "active"},
+            )
+            if resp.status_code == 200:
+                return resp.json().get("goals", [])
+    except Exception:
+        pass
+    return []
+
+
+async def _get_active_topics() -> List[Dict[str, Any]]:
+    """Fetch active conversation topics (deferred + active)."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{MEMU_URL}/memory/topics/active")
+            if resp.status_code == 200:
+                return resp.json().get("topics", [])
     except Exception:
         pass
     return []
@@ -445,13 +500,17 @@ async def chat_stream(req: ChatRequest):
         mode = "PUB"
     system_prompt = _SYSTEM_PROMPTS[mode]
 
-    # fetch memories and session context in parallel
+    # fetch memories, session context, goals, and active topics in parallel
     import asyncio
     memories_task = asyncio.create_task(_get_relevant_memories(user_msg))
     session_task = asyncio.create_task(_get_session_messages(req.session_id))
+    goals_task = asyncio.create_task(_get_active_goals())
+    topics_task = asyncio.create_task(_get_active_topics())
 
     memories = await memories_task
     session_msgs = await session_task
+    goals = await goals_task
+    topics = await topics_task
 
     # build the message list
     messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
@@ -462,6 +521,28 @@ async def chat_stream(req: ChatRequest):
         messages.append({
             "role": "system",
             "content": f"Relevant memories from past interactions:\n{mem_block}",
+        })
+
+    # inject active Ohana goals so Kai is goal-aware
+    if goals:
+        goal_lines = []
+        for g in goals[:5]:
+            title = g.get("title", "untitled")
+            progress = g.get("progress", 0)
+            priority = g.get("priority", "medium")
+            deadline = g.get("deadline", "none")
+            goal_lines.append(f"- [{priority.upper()}] {title} ({progress}% done, deadline: {deadline})")
+        messages.append({
+            "role": "system",
+            "content": f"Active Ohana goals (track these, nudge about progress):\n" + "\n".join(goal_lines),
+        })
+
+    # inject active/deferred conversation topics
+    if topics:
+        topic_lines = [f"- {t.get('topic', '')} (deferred: {t.get('deferred', False)})" for t in topics[:5]]
+        messages.append({
+            "role": "system",
+            "content": f"Active conversation topics (bring up naturally when relevant):\n" + "\n".join(topic_lines),
         })
 
     # add session history (last N turns)

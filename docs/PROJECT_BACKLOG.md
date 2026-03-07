@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-07 — session: P3 Organic Memory (correction learning, category boost, spaced rep, proactive engine, Ohana goals, drift detection) — **49 targets, 396 tests**
+**Last updated:** 2026-03-07 — session: P4 Personality & Proactive (deep prompts, anti-annoyance, topics, mode transitions, greeting/check-in) — **50 targets, 439 tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 49 (make test-core) |
-| Individual tests | 396 passing, 0 failures |
+| Test targets | 50 (make test-core) |
+| Individual tests | 439 passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -36,8 +36,11 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Dream state? | **YES — 6-phase memory consolidation, boundary recalibration** |
 | Security self-hacking? | **YES — 4 audit categories, 34 payloads, 6 adversary challenges** |
 | Thinking dashboard? | **YES — 6 visualization cards (conviction, tempo, boundary, silence, dream, security)** |
-| Proactive conversation? | **YES — unified nudge engine (reminders, silence, goals, drift, fading memories)** |
+| Proactive conversation? | **YES — unified nudge engine (reminders, silence, goals, drift, fading memories) + anti-annoyance (DND, dismissals, cooldowns)** |
 | Goal tracking? | **YES — Ohana goals (create/update/list, priority-sorted, deadline-aware)** |
+| Personality? | **YES — deep PUB/WORK system prompts, core identity, mode-aware proactive, conversation holding** |
+| Mode transitions? | **YES — time-of-day schedule, manual override, auto-expire** |
+| Talks first? | **YES — greeting on session start, periodic check-ins, deferred topic resurfacing** |
 
 ---
 
@@ -119,6 +122,36 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 - [ ] **Vision model** — screen capture → local vision model (LLaVA or
       similar) instead of just OCR. Kai *sees* what's on screen.
       **Blocked on GPU.**
+
+### P4.5 — Full-stack personality & proactive conversation
+*Kai becomes a real presence, not just a reactive tool.*
+
+- [x] **Deep personality system prompts** — Rich multi-paragraph prompts for
+      PUB and WORK modes. Core identity block shared between modes. Memory-aware,
+      proactive, goal-aware, conversation-holding style instructions.
+- [x] **Anti-annoyance engine** — Dismissal tracking (escalating cooldowns per
+      nudge type), Do Not Disturb mode (POST /memory/dnd), priority-based cooldown
+      override (critical urgency breaks DND). Per-type configurable cooldowns.
+- [x] **Conversation holding** — Active topic tracking (POST /memory/topics/track),
+      deferred topics (POST /memory/topics/defer with configurable resurface time),
+      topic resurfacing (GET /memory/topics/active returns due deferred topics).
+      Cap at 20 active topics. Fuzzy match for topic updates.
+- [x] **Mode-aware proactive thresholds** — GET /memory/proactive/filtered takes
+      mode param. WORK mode: fewer nudge types, higher urgency threshold, max 3.
+      PUB mode: all types, lower threshold, max 5. Anti-annoyance applied.
+- [x] **Implicit mode transitions** — Time-of-day schedule in tool-gate
+      (GET /gate/mode). Default: WORK 08-18 Mon-Fri, PUB otherwise. Manual
+      override lasts 4h then expires back to schedule. Configurable via
+      MODE_SCHEDULE env var.
+- [x] **Proactive greeting** — GET /memory/greeting. Time-of-day aware greeting,
+      references top goal, mentions due deferred topics. 8h cooldown.
+- [x] **Proactive check-in** — GET /memory/check-in. Emotional continuity:
+      checks on operator after silence, asks about goal progress. 3h cooldown.
+- [x] **Context injection into /chat** — Goals and active topics fetched in
+      parallel and injected into LLM context alongside memories and session
+      history. Kai is always goal-aware and topic-aware.
+- [x] **Supervisor greeting loop** — Background loop now calls greeting/check-in
+      endpoints and pushes to Telegram with typed icons (👋 greeting, 💚 check-in).
 
 ### P5 — Production hardening
 *Important but not urgent. Do after P0-P3 are solid.*
@@ -302,6 +335,28 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
   semaphore concurrency, singleton). /queue/stats endpoint added. 12 tests.
 - New endpoints: GET /models, GET /queue/stats
 - Test count: 280 → 347 (51 targets)
+
+### 2026-03-07 (continued)
+- **P4.5 Personality & Proactive — ALL DONE.** Kai now talks first.
+- P4a: Deep personality system prompts — rich multi-paragraph PUB/WORK prompts with
+  shared core identity, memory awareness, goal awareness, proactive instructions.
+- P4b: Anti-annoyance engine — per-type cooldowns (7 types), dismissal escalation
+  (1.5× per dismiss, capped 24h), DND mode (POST /memory/dnd), priority override
+  (urgency ≥0.9 breaks DND, ≥0.8 breaks half-cooldown).
+- P4c: Conversation holding — active topics (track/list), deferred topics (defer with
+  configurable resurface time, resurface endpoint), 20-topic cap, fuzzy match updates.
+- P4d: Mode-aware proactive — GET /memory/proactive/filtered. WORK = 4 types/0.4
+  threshold/max 3. PUB = 7 types/0.2 threshold/max 5.
+- P4e: Implicit mode transitions — GET /gate/mode with time-of-day schedule (WORK
+  08-18 Mon-Fri, PUB otherwise). Manual override lasts 4h then expires. Supervisor
+  now fetches mode before proactive check.
+- P4f: Greeting & check-in — GET /memory/greeting (time-aware, goal-aware, deferred
+  topics). GET /memory/check-in (silence detection, drift check). Supervisor calls
+  both in background loop → Telegram.
+- Context injection — /chat now fetches goals + active topics in parallel, injects
+  into LLM messages alongside memories and session history.
+- 43 new tests (scripts/test_p4_personality.py), all passing.
+- Test count: 396 → 439 (50 targets), zero failures.
 
 ---
 
