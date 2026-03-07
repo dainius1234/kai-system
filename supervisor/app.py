@@ -142,9 +142,13 @@ async def _proactive_check() -> None:
     memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
-            resp = await client.get(f"{memu_url}/memory/proactive")
+            # P3d: use the full proactive scan (includes silence, goals, drift, fading)
+            resp = await client.get(f"{memu_url}/memory/proactive/full")
             if resp.status_code != 200:
-                return
+                # fallback to basic proactive endpoint
+                resp = await client.get(f"{memu_url}/memory/proactive")
+                if resp.status_code != 200:
+                    return
             data = resp.json()
     except Exception:
         logger.debug("proactive check: memu-core unreachable")
@@ -157,7 +161,7 @@ async def _proactive_check() -> None:
     # deduplicate — don't send the same nudge within NUDGE_COOLDOWN
     to_send = []
     for nudge in nudges:
-        mid = nudge.get("memory_id", "")
+        mid = nudge.get("memory_id", "") or nudge.get("message", "")[:50]
         last_sent = _nudges_sent.get(mid, 0.0)
         if now - last_sent >= NUDGE_COOLDOWN:
             to_send.append(nudge)
@@ -166,14 +170,20 @@ async def _proactive_check() -> None:
         return
 
     # build a single message with all nudges
-    lines = ["🧠 *Kai — Proactive Nudges*\n"]
+    lines = ["🧠 *Kai — Proactive*\n"]
+    type_icons = {
+        "reminder": "⏰",
+        "silence": "🤫",
+        "goal_deadline": "🎯",
+        "drift": "🧭",
+        "fading_memory": "💭",
+    }
     for nudge in to_send[:5]:
+        ntype = nudge.get("type", "reminder")
+        icon = type_icons.get(ntype, "•")
         cat = nudge.get("category", "general")
-        msg = nudge.get("nudge_message", "")
-        signals = ", ".join(nudge.get("time_signals", []))
-        lines.append(f"• [{cat}] {msg}")
-        if signals:
-            lines.append(f"  _Triggers: {signals}_")
+        msg = nudge.get("message", "")
+        lines.append(f"{icon} [{cat}] {msg}")
 
     message = "\n".join(lines)
 
@@ -185,8 +195,11 @@ async def _proactive_check() -> None:
             )
             if resp.status_code == 200:
                 for nudge in to_send:
-                    _nudges_sent[nudge.get("memory_id", "")] = now
-                logger.info("Proactive nudge sent: %d items", len(to_send))
+                    key = nudge.get("memory_id", "") or nudge.get("message", "")[:50]
+                    _nudges_sent[key] = now
+                logger.info("Proactive nudge sent: %d items (types: %s)",
+                            len(to_send),
+                            ", ".join(set(n.get("type", "?") for n in to_send)))
     except Exception:
         logger.debug("proactive nudge: telegram-bot unreachable")
 

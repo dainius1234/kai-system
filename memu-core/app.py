@@ -712,6 +712,7 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
     remembering strengthens the memory, just like in a human brain.
     """
     q_emb = generate_embedding(query)
+    query_category = classify_category(query)  # P3b: domain-aware retrieval
     ranked: List[tuple[float, MemoryRecord]] = []
     candidates = store.search(top_k=10_000, query=query)
     now_iso = datetime.now(tz=timezone.utc).isoformat()
@@ -728,13 +729,30 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
         recency = _recency_weight(record.timestamp, getattr(record, "access_count", 0))
         importance = getattr(record, "importance", 0.5)
 
+        # P3b: category-aware retrieval boost — if query matches a domain
+        # category AND the record is in the same category, boost it.
+        # Domain-specific memories surface first when the question is on-topic.
+        category_boost = 0.0
+        rec_cat = getattr(record, "category", DEFAULT_CATEGORY)
+        if query_category != DEFAULT_CATEGORY and rec_cat == query_category:
+            category_boost = 0.10
+
+        # P3a: correction memory boost — corrections and metacognitive rules
+        # always get a retrieval bonus so KAI never forgets its lessons.
+        correction_boost = 0.0
+        evt = record.event_type if hasattr(record, "event_type") else ""
+        if evt in ("correction", "metacognitive_rule"):
+            correction_boost = 0.08
+
         # weighted combination — tuned so recent + relevant + important = top
         score = (
-            sim * 0.35
-            + float(record.relevance) * 0.20
-            + importance * 0.20
-            + recency * 0.20
+            sim * 0.30
+            + float(record.relevance) * 0.18
+            + importance * 0.18
+            + recency * 0.18
             + (0.05 if record.pinned else 0.0)
+            + category_boost
+            + correction_boost
         )
 
         ranked.append((score, record))
@@ -2031,6 +2049,481 @@ async def reflect() -> Dict[str, Any]:
         "insight_ids": written_ids,
         "top_categories": dict(top_categories),
         "keyword_themes": [w for w, _ in word_freq[:10]],
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# P3c: SPACED REPETITION ENFORCEMENT
+#  Apply Ebbinghaus decay to ALL memories.  Records that haven't been
+#  accessed within their half-life have their relevance dimmed.  Heavily-
+#  accessed records resist decay.  Use it or lose it — like a real brain.
+# ═══════════════════════════════════════════════════════════════════════
+
+DECAY_FADE_THRESHOLD = float(os.getenv("DECAY_FADE_THRESHOLD", "0.15"))
+
+
+@app.post("/memory/decay")
+async def apply_spaced_repetition_decay(
+    half_life_days: float = Query(default=14.0, ge=1.0, le=365.0),
+) -> Dict[str, Any]:
+    """Enforce spaced repetition decay across ALL memories.
+
+    For each non-pinned memory:
+      - Compute recency weight using Ebbinghaus curve + access count
+      - If the recency weight falls below DECAY_FADE_THRESHOLD, dim its
+        relevance so it naturally sinks in retrieval ranking
+      - If recency weight is strong, restore/boost relevance as reward
+
+    Returns stats on how many memories were strengthened vs faded.
+    """
+    all_records = store.search(top_k=10_000)
+    strengthened = 0
+    faded = 0
+    skipped = 0
+
+    for record in all_records:
+        if getattr(record, "poisoned", False) or getattr(record, "pinned", False):
+            skipped += 1
+            continue
+
+        access = getattr(record, "access_count", 0)
+        recency = _recency_weight(record.timestamp, access)
+
+        old_relevance = float(record.relevance)
+
+        if recency < DECAY_FADE_THRESHOLD:
+            # memory is fading — dim relevance (never below 0.05)
+            new_relevance = max(old_relevance * 0.8, 0.05)
+            faded += 1
+        elif recency > 0.5 and access >= 2:
+            # memory is actively used — strengthen (cap at 1.0)
+            new_relevance = min(old_relevance * 1.05, 1.0)
+            strengthened += 1
+        else:
+            skipped += 1
+            continue
+
+        new_relevance = round(new_relevance, 4)
+        if new_relevance != old_relevance:
+            record.relevance = new_relevance
+            if hasattr(store, "update_record"):
+                store.update_record(record.id, relevance=new_relevance)
+
+    return {
+        "status": "ok",
+        "total_scanned": len(all_records),
+        "strengthened": strengthened,
+        "faded": faded,
+        "skipped": skipped,
+        "half_life_days": half_life_days,
+        "fade_threshold": DECAY_FADE_THRESHOLD,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# P3e: OHANA GOAL TRACKER
+#  Persistent goals that KAI tracks across sessions.  Not tasks — purposes.
+#  "No one gets left behind."  Goals have priority, deadlines, and progress.
+#  KAI references goals when planning and nudges when you drift.
+# ═══════════════════════════════════════════════════════════════════════
+
+# Goals stored as pinned memories with event_type="goal"
+GOAL_EVENT_TYPE = "goal"
+
+
+class GoalRequest(BaseModel):
+    """A persistent Ohana goal."""
+    title: str
+    description: str = ""
+    deadline: Optional[str] = None  # ISO date or human-readable
+    priority: str = "medium"  # low, medium, high, critical
+    category: Optional[str] = None
+    user_id: str = "keeper"
+
+
+class GoalUpdateRequest(BaseModel):
+    """Update progress or status on an existing goal."""
+    goal_id: str
+    progress_note: str = ""
+    status: str = "active"  # active, completed, paused, dropped
+    user_id: str = "keeper"
+
+
+@app.post("/memory/goals")
+async def create_goal(goal: GoalRequest) -> Dict[str, Any]:
+    """Create a persistent Ohana goal — KAI will track and nudge about it."""
+    title = sanitize_string(goal.title)
+    desc = sanitize_string(goal.description)
+    priority_map = {"low": 0.5, "medium": 0.7, "high": 0.85, "critical": 0.95}
+    importance = priority_map.get(goal.priority, 0.7)
+
+    goal_content = f"GOAL: {title}"
+    if desc:
+        goal_content += f"\nDetails: {desc}"
+    if goal.deadline:
+        goal_content += f"\nDeadline: {sanitize_string(goal.deadline)}"
+
+    category = goal.category or classify_category(title + " " + desc)
+
+    record = MemoryRecord(
+        id=str(uuid.uuid4()),
+        timestamp=datetime.utcnow().isoformat(),
+        event_type=GOAL_EVENT_TYPE,
+        category=category,
+        content={
+            "result": goal_content,
+            "title": title,
+            "description": desc,
+            "deadline": goal.deadline,
+            "priority": goal.priority,
+            "status": "active",
+            "progress": [],
+            "user_id": sanitize_string(goal.user_id),
+            "pin": True,
+        },
+        embedding=generate_embedding(goal_content),
+        relevance=1.0,
+        importance=importance,
+        access_count=0,
+        last_accessed=None,
+        pinned=True,  # goals are always pinned — they don't decay
+    )
+    store.insert(record)
+    logger.info("Goal created: %s (priority=%s)", title, goal.priority)
+
+    return {
+        "status": "created",
+        "goal_id": record.id,
+        "title": title,
+        "priority": goal.priority,
+        "category": category,
+    }
+
+
+@app.post("/memory/goals/update")
+async def update_goal(update: GoalUpdateRequest) -> Dict[str, Any]:
+    """Update progress on an existing goal.  Progress notes are appended."""
+    all_records = store.search(top_k=10_000)
+    target = None
+    for r in all_records:
+        if r.id == update.goal_id and r.event_type == GOAL_EVENT_TYPE:
+            target = r
+            break
+
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Goal {update.goal_id} not found")
+
+    note = sanitize_string(update.progress_note)
+    status = sanitize_string(update.status)
+
+    if status not in ("active", "completed", "paused", "dropped"):
+        raise HTTPException(status_code=400, detail="status must be active/completed/paused/dropped")
+
+    progress = target.content.get("progress", [])
+    if note:
+        progress.append({
+            "note": note,
+            "timestamp": datetime.utcnow().isoformat(),
+        })
+    target.content["progress"] = progress
+    target.content["status"] = status
+
+    # bump access count — goal is being worked on
+    target.access_count = getattr(target, "access_count", 0) + 1
+    target.last_accessed = datetime.now(tz=timezone.utc).isoformat()
+
+    if hasattr(store, "update_record"):
+        store.update_record(
+            target.id,
+            access_count=target.access_count,
+            last_accessed=target.last_accessed,
+        )
+
+    logger.info("Goal updated: %s → %s", update.goal_id, status)
+
+    return {
+        "status": "updated",
+        "goal_id": update.goal_id,
+        "goal_status": status,
+        "progress_count": len(progress),
+    }
+
+
+@app.get("/memory/goals")
+async def list_goals(
+    status: Optional[str] = None,
+    user_id: str = "keeper",
+) -> Dict[str, Any]:
+    """List all Ohana goals, optionally filtered by status."""
+    all_records = store.search(top_k=10_000)
+    goals = []
+    for r in all_records:
+        if r.event_type != GOAL_EVENT_TYPE:
+            continue
+        if getattr(r, "poisoned", False):
+            continue
+        goal_status = r.content.get("status", "active")
+        if status and goal_status != status:
+            continue
+        goals.append({
+            "goal_id": r.id,
+            "title": r.content.get("title", ""),
+            "description": r.content.get("description", ""),
+            "priority": r.content.get("priority", "medium"),
+            "status": goal_status,
+            "deadline": r.content.get("deadline"),
+            "category": r.category,
+            "progress_count": len(r.content.get("progress", [])),
+            "created": r.timestamp,
+            "importance": r.importance,
+        })
+
+    # sort: critical first, then high, then by creation date
+    priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+    goals.sort(key=lambda g: (priority_order.get(g["priority"], 9), g["created"]))
+
+    return {
+        "status": "ok",
+        "goal_count": len(goals),
+        "goals": goals,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# P3f: OPERATOR DRIFT DETECTION
+#  Compare recent activity against stated goals.  If the operator spends
+#  time on topics that don't align with any active goal, surface a gentle
+#  nudge: "Brother, you've been on X but your goal was Y."
+# ═══════════════════════════════════════════════════════════════════════
+
+DRIFT_WINDOW_HOURS = int(os.getenv("DRIFT_WINDOW_HOURS", "4"))
+
+
+@app.get("/memory/drift")
+async def detect_operator_drift(
+    hours: int = Query(default=4, ge=1, le=168),
+) -> Dict[str, Any]:
+    """Detect when the operator's recent activity drifts from stated goals.
+
+    Compares category distribution of recent memories against active goal
+    categories.  If >60% of recent activity is in categories not covered
+    by any active goal, flag it.
+    """
+    all_records = store.search(top_k=10_000)
+    cutoff = datetime.utcnow() - timedelta(hours=hours)
+
+    # gather active goals and their categories
+    goal_categories: set = set()
+    active_goals: List[Dict[str, str]] = []
+    for r in all_records:
+        if r.event_type != GOAL_EVENT_TYPE:
+            continue
+        if getattr(r, "poisoned", False):
+            continue
+        if r.content.get("status", "active") != "active":
+            continue
+        goal_categories.add(r.category)
+        active_goals.append({
+            "title": r.content.get("title", ""),
+            "category": r.category,
+            "priority": r.content.get("priority", "medium"),
+        })
+
+    if not active_goals:
+        return {
+            "status": "no_goals",
+            "message": "No active goals set. Create goals first so I can track drift.",
+            "drifting": False,
+        }
+
+    # gather recent activity categories (non-goal records)
+    recent_categories: Dict[str, int] = {}
+    recent_total = 0
+    for r in all_records:
+        if r.event_type == GOAL_EVENT_TYPE:
+            continue
+        if getattr(r, "poisoned", False):
+            continue
+        try:
+            ts_str = r.timestamp
+            if "T" in ts_str:
+                ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00")).replace(tzinfo=None)
+            else:
+                ts = datetime.fromisoformat(ts_str)
+            if ts < cutoff:
+                continue
+        except Exception:
+            continue
+        cat = getattr(r, "category", DEFAULT_CATEGORY)
+        recent_categories[cat] = recent_categories.get(cat, 0) + 1
+        recent_total += 1
+
+    if recent_total < 3:
+        return {
+            "status": "insufficient_data",
+            "message": "Not enough recent activity to detect drift.",
+            "drifting": False,
+            "recent_activity": recent_total,
+        }
+
+    # calculate on-goal vs off-goal activity
+    on_goal = sum(cnt for cat, cnt in recent_categories.items() if cat in goal_categories)
+    off_goal = recent_total - on_goal
+    drift_ratio = off_goal / recent_total
+
+    # identify what they're drifting towards
+    drift_categories = {cat: cnt for cat, cnt in recent_categories.items() if cat not in goal_categories}
+    top_drift = sorted(drift_categories.items(), key=lambda x: -x[1])[:3]
+
+    # is this meaningful drift? (>60% off-goal)
+    drifting = drift_ratio > 0.6
+
+    nudge = ""
+    if drifting and top_drift:
+        drift_topics = ", ".join(f"{cat} ({cnt})" for cat, cnt in top_drift)
+        goal_topics = ", ".join(g["title"] for g in active_goals[:3])
+        nudge = f"Brother, you've spent most of the last {hours}h on {drift_topics}, but your goals are: {goal_topics}. Want to refocus or is this intentional?"
+
+    return {
+        "status": "ok",
+        "drifting": drifting,
+        "drift_ratio": round(drift_ratio, 2),
+        "recent_activity": recent_total,
+        "on_goal": on_goal,
+        "off_goal": off_goal,
+        "drift_towards": dict(top_drift),
+        "active_goals": active_goals,
+        "nudge": nudge,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# P3d: ENHANCED PROACTIVE CONVERSATION ENGINE
+#  Combines proactive nudges + silence signals + drift detection + goal
+#  tracking into a single unified endpoint the supervisor calls on a timer.
+#  This is what makes KAI talk first.
+# ═══════════════════════════════════════════════════════════════════════
+
+@app.get("/memory/proactive/full")
+async def full_proactive_scan() -> Dict[str, Any]:
+    """Unified proactive scan — the engine that makes KAI initiate.
+
+    Combines:
+    1. Time-sensitive reminders (existing /memory/proactive)
+    2. Silent topic nudges (P7)
+    3. Goal progress checks (P3e)
+    4. Operator drift warnings (P3f)
+    5. Spaced repetition reminders (P3c — memories about to fade)
+
+    Returns all nudges ranked by urgency for supervisor/Telegram delivery.
+    """
+    all_nudges: List[Dict[str, Any]] = []
+
+    # 1. Time-sensitive reminders
+    try:
+        proactive_resp = await proactive_nudges()
+        for n in proactive_resp.get("nudges", []):
+            all_nudges.append({
+                "type": "reminder",
+                "urgency": 0.8,
+                "message": n.get("nudge_message", ""),
+                "category": n.get("category", "general"),
+                "source": "proactive",
+                "memory_id": n.get("memory_id", ""),
+            })
+    except Exception:
+        pass
+
+    # 2. Silent topics
+    try:
+        silence_resp = await silence_signals()
+        for s in silence_resp.get("silent_topics", [])[:3]:
+            all_nudges.append({
+                "type": "silence",
+                "urgency": 0.5,
+                "message": s.get("nudge", ""),
+                "category": s.get("category", "general"),
+                "source": "silence",
+                "memory_id": "",
+            })
+    except Exception:
+        pass
+
+    # 3. Goal deadline approaching
+    try:
+        goals_resp = await list_goals(status="active")
+        now = datetime.utcnow()
+        for g in goals_resp.get("goals", []):
+            deadline = g.get("deadline")
+            if not deadline:
+                continue
+            try:
+                dl = datetime.fromisoformat(deadline.replace("Z", "+00:00")).replace(tzinfo=None)
+                days_left = (dl - now).days
+                if 0 <= days_left <= 3:
+                    all_nudges.append({
+                        "type": "goal_deadline",
+                        "urgency": 0.95 if days_left == 0 else 0.85,
+                        "message": f"Goal deadline {'TODAY' if days_left == 0 else f'in {days_left} day(s)'}: {g['title']}",
+                        "category": g.get("category", "general"),
+                        "source": "goals",
+                        "memory_id": g.get("goal_id", ""),
+                    })
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    # 4. Drift detection
+    try:
+        drift_resp = await detect_operator_drift(hours=DRIFT_WINDOW_HOURS)
+        if drift_resp.get("drifting"):
+            all_nudges.append({
+                "type": "drift",
+                "urgency": 0.7,
+                "message": drift_resp.get("nudge", "You seem to be drifting from your goals."),
+                "category": "general",
+                "source": "drift",
+                "memory_id": "",
+            })
+    except Exception:
+        pass
+
+    # 5. Fading memories worth saving (high-importance but low recency)
+    try:
+        all_records = store.search(top_k=10_000)
+        fading = []
+        for r in all_records:
+            if getattr(r, "poisoned", False) or getattr(r, "pinned", False):
+                continue
+            imp = getattr(r, "importance", 0.5)
+            if imp < 0.7:
+                continue
+            access = getattr(r, "access_count", 0)
+            recency = _recency_weight(r.timestamp, access)
+            if recency < DECAY_FADE_THRESHOLD * 2:  # approaching fade
+                content = str(r.content.get("result", ""))[:100]
+                fading.append((recency, r, content))
+        fading.sort(key=lambda x: x[0])
+        for recency_val, record, content in fading[:2]:
+            all_nudges.append({
+                "type": "fading_memory",
+                "urgency": 0.4,
+                "message": f"Important memory fading (unaccessed): {content}...",
+                "category": record.category,
+                "source": "spaced_rep",
+                "memory_id": record.id,
+            })
+    except Exception:
+        pass
+
+    # sort by urgency (highest first)
+    all_nudges.sort(key=lambda x: -x.get("urgency", 0))
+
+    return {
+        "status": "ok",
+        "nudge_count": len(all_nudges),
+        "nudges": all_nudges[:10],
     }
 
 

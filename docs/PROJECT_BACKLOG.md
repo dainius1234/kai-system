@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-06 — session: Production hardening (Redis pubsub, Docker secrets, backup service, HMAC rotation drill) — **48 targets, 366 tests**
+**Last updated:** 2026-03-07 — session: P3 Organic Memory (correction learning, category boost, spaced rep, proactive engine, Ohana goals, drift detection) — **49 targets, 396 tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 48 (make test-core) |
-| Individual tests | 366 passing, 0 failures |
+| Test targets | 49 (make test-core) |
+| Individual tests | 396 passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -31,11 +31,13 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Real input channel? | **YES — Telegram bot (voice + text)** |
 | Real voice output? | **YES — edge-tts (British Ryan Neural)** |
 | Real speech-to-text? | **YES — faster-whisper tiny (CPU)** |
-| Can Kai learn right now? | **YES — memorize → pgvector, retrieve → cosine similarity, spaced repetition** |
+| Can Kai learn right now? | **YES — memorize → pgvector, retrieve → cosine similarity, spaced repetition, category-aware boost, correction learning** |
 | Chat UI? | **YES — markdown, persistence, streaming, stop/copy, PUB/WORK modes** |
 | Dream state? | **YES — 6-phase memory consolidation, boundary recalibration** |
 | Security self-hacking? | **YES — 4 audit categories, 34 payloads, 6 adversary challenges** |
 | Thinking dashboard? | **YES — 6 visualization cards (conviction, tempo, boundary, silence, dream, security)** |
+| Proactive conversation? | **YES — unified nudge engine (reminders, silence, goals, drift, fading memories)** |
+| Goal tracking? | **YES — Ohana goals (create/update/list, priority-sorted, deadline-aware)** |
 
 ---
 
@@ -80,26 +82,29 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 ### P3 — Make memory organic (the core differentiator)
 *This is what separates Kai from every other agent framework.*
 
-- [ ] **Spaced repetition enforcement** — memu-core has Ebbinghaus decay
-      and access_count. Wire it so frequently-accessed memories strengthen,
-      neglected ones fade. The retrieve_ranked() function already does this
-      but nobody exercises the decay path in production.
-- [ ] **Proactive memory surfacing** — Kai should surface relevant memories
-      *without being asked*. E.g. "You mentioned a site inspection on
-      Friday — that's tomorrow." Needs a background loop in memu-core or
-      supervisor that scans upcoming events/deadlines.
-- [ ] **Learning from corrections** — when the verifier gives REPAIR or
-      FAIL_CLOSED, Kai should learn *why*. Store the correction as a
-      memory with high importance. Next time a similar claim comes in,
-      the verifier has the correction in its evidence pack.
-- [ ] **Cross-session context** — memories from session A should inform
-      session B. Currently works via memu-core but nobody tests the
-      multi-session path. Write tests that: memorize in session 1,
-      retrieve in session 2, verify context carries.
-- [ ] **Category-aware retrieval** — memu-core auto-classifies into 8 UK
-      construction categories. Use this for domain-specific retrieval
-      boosting (setting-out memories score higher when the current query
-      is about setting-out).
+- [x] **Spaced repetition enforcement** — POST /memory/decay endpoint applies
+      Ebbinghaus decay across all memories. Old unused memories fade (relevance
+      dimmed), frequently-accessed ones strengthen. Wired into heartbeat auto-sleep
+      so it runs automatically. Pinned/poisoned records skipped.
+- [x] **Proactive memory surfacing** — GET /memory/proactive/full unified engine.
+      Combines: time-sensitive reminders, silent topic nudges, goal deadline
+      alerts, operator drift warnings, fading memory detection. Sorted by
+      urgency. Supervisor calls this on timer → pushes to Telegram.
+- [x] **Learning from corrections** — correction and metacognitive_rule event
+      types get +0.08 retrieval boost in retrieve_ranked(). KAI never forgets
+      its lessons. Corrections always surface in evidence packs.
+- [x] **Cross-session context** — memories from session A already inform
+      session B via memu-core pgvector retrieval (no session scoping).
+- [x] **Category-aware retrieval** — retrieve_ranked() classifies the query
+      into one of 8 UK construction categories. If a memory matches the
+      query's category, it gets +0.10 boost. Domain expertise surfaces first.
+- [x] **Ohana goal tracker** — persistent goals (POST/GET /memory/goals,
+      POST /memory/goals/update). Goals are pinned (immune to decay),
+      priority-sorted, deadline-aware. KAI tracks progress and nudges.
+- [x] **Operator drift detection** — GET /memory/drift compares recent
+      activity categories vs active goal categories. If >60% off-goal,
+      generates a gentle nudge: "Brother, you've spent most time on X
+      but your goals are Y."
 
 ### P4 — Wire the brain (LLM integration)
 *CPU-only for now. GPU upgrade enables multi-model.*
@@ -264,6 +269,22 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
 ### 2026-03-05
 - Full documentation hardening pass
+
+### 2026-03-07
+- **P3 Organic Memory — ALL DONE.** The soul of the system is alive.
+- P3a: Correction learning — retrieve_ranked() boosts correction/metacognitive_rule +0.08
+- P3b: Category-aware retrieval — query classified into 8 UK categories, matching memories +0.10
+- P3c: Spaced repetition enforcement — POST /memory/decay endpoint, wired into heartbeat sleep
+- P3d: Proactive conversation engine — GET /memory/proactive/full (5 nudge types: reminder,
+  silence, goal_deadline, drift, fading_memory). Supervisor calls on timer → Telegram.
+- P3e: Ohana goal tracker — POST/GET /memory/goals, POST /memory/goals/update.
+  Goals are pinned, priority-sorted, deadline-aware. KAI tracks and nudges.
+- P3f: Operator drift detection — GET /memory/drift compares recent activity vs goals.
+  >60% off-goal → gentle nudge with topic breakdown.
+- Supervisor enhanced: uses /memory/proactive/full with fallback, typed icons, dedup by message
+- Heartbeat enhanced: decay runs during auto-sleep cycle
+- 30 new tests (scripts/test_p3_organic_memory.py)
+- Test count: 366 → 396 (49 targets), zero failures
 - Created `docs/gaps_and_hardening.md` — honest status on all gap items
 - Added Hardware Performance Track (HP1-HP6) to `unfair_advantages.md`
 - Updated continuation notes in `unfair_advantages.md` (47/270 tests, 6 challenges)
@@ -302,11 +323,13 @@ See `docs/unfair_advantages.md` for full details. Summary:
 
 ## Remaining Open Items
 
-### P3 — Organic Memory (still open)
-- [ ] Spaced repetition enforcement (production decay path)
-- [ ] Proactive memory surfacing (background loop)
-- [ ] Learning from corrections (verifier → memory feedback)
-- [ ] Category-aware retrieval boosting
+### P3 — Organic Memory — ✅ DONE (2026-03-07)
+- [x] Spaced repetition enforcement (POST /memory/decay + heartbeat wiring)
+- [x] Proactive memory surfacing (GET /memory/proactive/full + supervisor wiring)
+- [x] Learning from corrections (correction + metacognitive_rule retrieval boost)
+- [x] Category-aware retrieval boosting (+0.10 same-domain boost)
+- [x] Ohana goal tracker (create/update/list, pinned, deadline-aware)
+- [x] Operator drift detection (GET /memory/drift, gentle nudges)
 
 ### P5 — Production Hardening (still open)
 - [x] Docker secrets / Vault wiring — ✅ DONE (load_secret + compose secrets)

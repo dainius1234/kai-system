@@ -124,7 +124,9 @@ async def _auto_sleep_check() -> None:
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             await client.post(f"{MEMU_URL}/memory/compress")
-        logger.info("System sleeping")
+            # P3c: enforce spaced repetition decay during sleep
+            await client.post(f"{MEMU_URL}/memory/decay?half_life_days=14")
+        logger.info("System sleeping — memory compressed + decay applied")
         last_sleep_action = now
     except Exception:
         logger.warning("System sleeping trigger failed")
