@@ -1,33 +1,52 @@
-# Sovereign AI -- kai-system
+# Sovereign AI — kai-system
 
-A secure, operator-controlled personal intelligence platform. Kai can run fully offline for privacy, or safely connect to the internet when you allow it. All network access, data sharing, and external actions are controlled by you -- the operator.
+> *Not a chatbot. Not an agent framework. A sovereign intelligence that grows, reflects, and earns the right to act.*
+
+A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offline by default — all network access, data sharing, and external actions are controlled by the operator. Built with soul, not just syntax.
+
+## What Makes Kai Different
+
+| Capability | What It Means | Commercial AI? |
+|---|---|---|
+| **Emotional Memory** | Detects 8 emotions in conversation, tracks mood arcs over time | Never |
+| **Self-Reflection** | Analyzes its own mistakes, builds strengths/weaknesses journal | Never |
+| **Epistemic Humility** | Knows what it doesn't know — warns when confidence is low | Never |
+| **Confession Engine** | Proactively admits past mistakes without being asked | Never |
+| **Relationship Timeline** | Tracks days together, milestones, emotional journey | Never |
+| **Dream State** | Offline consolidation — clusters failures, recalibrates boundaries | Never |
+| **Struggle Detection** | Detects operator frustration (5 signals) and offers help | Rarely |
+| **Proactive Conversation** | Talks first — greetings, check-ins, goal nudges, drift alerts | Never |
+| **Correction Learning** | Learns from mistakes, corrections always surface in evidence | Rarely |
+| **Security Self-Hacking** | Fuzzes its own APIs with 34 payloads, scores risk | Never |
+| **Operator Sovereignty** | Zero telemetry, zero corporate control, zero resets | Never |
+
+**52 test targets. 532 tests. Zero failures. 25 Docker services. All real.**
+
+---
 
 ## System Overview
 
-Kai is a modular, secure AI system designed for real-world use:
-- **Operator Control:** You decide when Kai can access the internet, update, or interact externally. All network activity is logged and can be blocked or reviewed.
-- **Growth & Learning:** Kai can develop and improve when you enable online mode, but defaults to privacy-first offline operation.
-- **Safety:** Every action, data flow, and external request is checked by Tool-Gate and Orchestrator. Sandboxes and dashboards provide transparency and control.
+Kai is modular, secure, and designed for real-world use:
+- **Operator Control:** You decide when Kai can access the internet, update, or interact externally. All activity is logged.
+- **Growth & Learning:** Kai improves through conversation — correction learning, spaced repetition, proactive memory surfacing.
+- **Safety:** Every action is checked by Tool-Gate and Orchestrator. HMAC-signed inter-service calls. Sandboxed execution.
+- **Personality:** Two modes — **WORK** (professional, focused) and **PUB** (uncensored friend, real talk like a mate at the pub).
 
 **Main Components:**
-- **Tool-Gate & Orchestrator:** Final authority and policy enforcement. You set internet and execution rules.
-- **Memu-Core:** Memory and context engine. Stores history, feedback, and lessons.
-- **LangGraph:** Primary agentic graph/runtime for planning and orchestration.
-- **AutoGen, CrewAI, OpenAgents:** Additional agentic frameworks (smoke-tested, available for future multi-agent workflows).
-- **Executor & Sandboxes:** Safe execution of approved actions.
-- **Dashboard & Output:** Operator interface (FastAPI), TTS, and avatar feedback.
+- **Tool-Gate & Orchestrator:** Policy enforcement and final risk authority.
+- **Memu-Core:** Memory engine — vector search, emotional memory, self-reflection, epistemic humility, goals, relationship tracking.
+- **LangGraph:** Agentic brain — routing, planning, conviction scoring, tree search, adversary challenges, EQ context injection.
+- **Dashboard:** 8-view operator console — Chat, Dashboard, Thinking, Goals, Memory, Logs, Settings, Soul.
+- **Perception:** Telegram bot (voice + text), audio capture (faster-whisper), camera, screen capture.
+- **Executor & Sandboxes:** Isolated execution of approved actions.
 
 **How it works:**
-1. Operator or service makes a request.
-2. Tool-Gate and Orchestrator check for safety, policy, and internet rules.
-3. Agentic planners use Memu-Core for context and decide next steps.
-4. Executor runs approved actions in a sandbox.
-5. Results and logs are visible in the Dashboard.
-
-**Internet Access Policy:**
-- Default: Offline for privacy and safety.
-- Operator can enable online mode for updates, learning, or external tasks.
-- All network activity is logged, reviewable, and can be blocked at any time.
+1. Operator sends a message (Telegram, Dashboard, or API).
+2. LangGraph enriches context: memories + session + goals + topics + emotional intelligence (5-way parallel fetch).
+3. Specialist router classifies the domain. Planner builds a gap-aware plan.
+4. Adversary challenges the plan (6 challenge types). Conviction scoring gates execution.
+5. Tool-Gate checks policy (HMAC, rate limit, co-sign). Executor runs in sandbox.
+6. Post-mortem: episode saved, corrections learned, emotion recorded, memory updated.
 
 ---
 
@@ -196,21 +215,21 @@ Run `make go_no_go` before committing to catch syntax errors early.
 
 Open **http://localhost:8050/app** for the unified operator interface.
 
-| View | Description |
-|------|-------------|
-| **Chat** | Conversational interface with streaming SSE, markdown rendering, PUB/WORK mode toggle |
-| **Dashboard** | Service health, nodes grid, pipeline status, fusion metrics |
-| **Thinking** | Live thinking-pathway trace, chain-of-thought visibility |
-| **Settings** | Mode, notifications, markdown, keyboard shortcuts, PWA install |
+| View | Shortcut | Description |
+|------|----------|-------------|
+| **Chat** | `Ctrl+1` | Conversational interface — streaming SSE, markdown, PUB/WORK toggle, feedback ratings, struggle detection |
+| **Dashboard** | `Ctrl+2` | Service health grid, pipeline status, fusion metrics |
+| **Thinking** | `Ctrl+3` | Live thinking-pathway trace — conviction pipeline, tempo gauge, boundary map, silence signals, dream state, security audit |
+| **Settings** | `Ctrl+4` | Mode, notifications, markdown, keyboard shortcuts, PWA install |
+| **Goals** | `Ctrl+5` | Ohana goal tracker — create/update goals, drift alerts, progress bars, feedback stats |
+| **Memory** | `Ctrl+6` | Memory browser — search by query or category, stats overview, results with scores |
+| **Logs** | `Ctrl+7` | Log aggregator — level filter, monospace viewer, time/level/service/msg columns |
+| **💎 Soul** | `Ctrl+8` | Emotional intelligence — mood cards, emotion timeline, domain confidence, self-reflection journal, relationship milestones |
 
-**Keyboard shortcuts** (when not focused in a text field):
+**Additional shortcuts:**
 
 | Shortcut | Action |
 |----------|--------|
-| `Ctrl+1` | Switch to Chat |
-| `Ctrl+2` | Switch to Dashboard |
-| `Ctrl+3` | Switch to Thinking |
-| `Ctrl+4` | Switch to Settings |
 | `Ctrl+K` | Focus chat input |
 | `Ctrl+Shift+M` | Toggle PUB/WORK mode |
 | `Escape` | Close dropdown / stop generation |
@@ -219,37 +238,14 @@ Open **http://localhost:8050/app** for the unified operator interface.
 
 ---
 
-## Architecture & Controls
-
-- **Tool-Gate:** Central policy engine for all tool and network access. HMAC-signed inter-service calls.
-- **Orchestrator:** Final risk authority before any execution.
-- **Memu-Core:** Memory engine with vector search, session buffer, reflection, proactive nudges, and quarantine.
-- **LangGraph service:** Graph-based orchestrator with conviction scoring and episode saving (`kai_config.py`).
-- **Executor & Sandboxes:** Safe, isolated execution of approved actions.
-- **Dashboard:** FastAPI operator console for monitoring, approval, and override.
-
----
-
 ## Personality Modes: PUB & WORK
-
-Kai operates in two distinct personality modes, toggled from the chat UI header:
 
 | Mode | Personality | Use Case |
 |------|------------|----------|
-| **WORK** | Professional, focused, precise. Proactive but concise. | Tasks, research, planning |
-| **PUB** | Casual, witty, opinionated. Real talk like a mate at the pub. | Open discussion, philosophy, banter |
+| **WORK** | Professional, focused, precise. Proactive but concise. Never lies, never sugarcoats. | Tasks, research, planning |
+| **PUB** | Genuine mate — casual, witty, opinionated. All topics welcome. Not a service, a companion. | Open discussion, philosophy, banter |
 
-**How it works:**
-- The chat UI (`dashboard/static/chat.html`) has WORK/PUB toggle buttons in the header.
-- Selected mode is stored in the browser's `localStorage` as `kai-mode`.
-- Each chat request sends `{ "message": "...", "mode": "WORK" }` (or `"PUB"`) to `/chat`.
-- The langgraph service selects a system prompt from `_SYSTEM_PROMPTS` dict in `langgraph/app.py`.
-- If no mode is specified, defaults to **PUB**.
-- Mode can also be fetched from tool-gate's `/mode` endpoint for cross-service consistency.
-
-**WORK mode prompt** (summary): Sovereign AI assistant — professional, focused, proactive, concise but thorough. Never lies, never sugarcoats.
-
-**PUB mode prompt** (summary): Genuine mate — casual, witty, opinionated. All topics welcome (politics, science, philosophy, dark humour). Not a service, a companion.
+Toggled from the chat UI header or via `Ctrl+Shift+M`. Stored in `localStorage`. Time-of-day auto-schedule: WORK 08-18 Mon-Fri, PUB otherwise. Manual override lasts 4h. Mode from tool-gate `/gate/mode` for cross-service consistency.
 
 ---
 
@@ -265,46 +261,31 @@ Kai operates in two distinct personality modes, toggled from the chat UI header:
 
 ---
 
-## Quickstart
-
-1. Clone the repo.
-2. Start core stack: `make core-up`
-3. Run tests: `make test-core`
-4. Monitor: open dashboard at `http://localhost:8080`
-5. Full stack: `make full-up` for all services including LLM, perception, and Telegram.
-
-For architecture details see `docs/sovereign_ai_spec.md`.
-
----
-
 ## Session Continuation Guide
 
-> **For AI assistants resuming work on this codebase. Updated 4 March 2026.**
+> **For AI assistants resuming work on this codebase. Updated 7 March 2026.**
 
 ### Target Hardware
 - **Dev/staging:** GitHub Codespace (CPU only, no TPM)
 - **Production:** Lenovo laptop, **RTX 5080 GPU**, **TPM 2.0**
-- GPU arrival = local LLM inference, real STT/TTS, OMAR self-play
-- TPM 2.0 = hardware-anchored Soulbound Identity
+- GPU arrival = local LLM inference, real STT/TTS, multi-model consensus
 - All code must work in BOTH environments (stubs in codespace, live on laptop)
 
 ### Current State
-- **All 50 test-core targets pass.** Run `make test-core` to confirm.
-- **Phase 2 COMPLETE:** Specialist Router, Memory-Driven Planner, Adversary Challenge Engine — all built, tested, wired into `/chat` and `/run`.
-- **P1+P2 COMPLETE:** Failure Taxonomy, Metacognitive Rules, SELAUR learning value — all generating real episode metadata.
-- **P4+P5+P6 COMPLETE:** Contradiction Memory, GEM Cognitive Alignment, Knowledge Boundary Mapping — full engines in memu-core + kai_config + planner + app.py.
-- **P7+P12+P14 COMPLETE:** Silence-as-Signal, Self-Deception Detection, Temporal Self-Model — cognitive self-awareness layer.
-- **P10+P11+P13 COMPLETE:** Predictive Pre-Computation, Operator Tempo Modeling, Recursive Self-Improvement Gate — adaptive intelligence layer.
-- **P8 COMPLETE:** Dashboard Thinking Pathways — cognitive transparency visualization (conviction pipeline, tempo gauge, boundary map, silence signals, self-assessment).
-- **P9 COMPLETE:** Security Self-Hacking — automated security audit engine (injection fuzzing, sanitization, HMAC boundary, policy governance). 6th adversary challenge. Risk scoring.
-- **P15 COMPLETE:** Dream State — offline consolidation engine (failure clustering, rule deduplication, pattern synthesis, contradiction detection, boundary recalibration).
-- **Merged Action Plan:** Operator's 2026 paper research + AI-native blueprints → 15 prioritised advantages in `docs/unfair_advantages.md`.
-- **LLM strategy:** ALL local models via Ollama. Kimi K2 (1T MoE, Apache 2.0) pending addition.
+- **52 test-core targets pass, ~532 individual tests.** Run `make test-core` to confirm.
+- **P0-P5 COMPLETE:** All 25 services built, running, tested. CI/CD, secrets, backup, HMAC rotation.
+- **P7-P15 COMPLETE:** Agentic patterns, thinking pathways, security self-hacking, dream state.
+- **P3 Organic Memory COMPLETE:** Correction learning, category boost, spaced repetition, proactive engine, Ohana goals, drift detection.
+- **P4 Personality COMPLETE:** Deep PUB/WORK prompts, anti-annoyance, conversation holding, mode transitions, greeting/check-in.
+- **P16 Operational Intelligence COMPLETE:** Struggle detection (5-signal), feedback loop (1-5 stars), log aggregation, Goals/Memory/Logs views.
+- **P17 Emotional Intelligence COMPLETE:** Emotional memory (8 emotions), self-reflection journal, relationship timeline, epistemic humility, confession engine, Soul dashboard.
+- **Dashboard:** 8 views (Chat, Dashboard, Thinking, Settings, Goals, Memory, Logs, Soul).
+- **LLM:** Ollama with qwen2:0.5b on CPU. GPU arrival = 3 env vars changed.
 
 ### Key Docs (read in this order)
-1. `docs/unfair_advantages.md` — Strategic edge analysis + merged build order + continuation notes
-2. `docs/agentic_patterns_spec.md` — Technical spec for the 3-pattern agentic architecture
-3. `docs/PROJECT_BACKLOG.md` — Living backlog with hardware constraints
+1. `docs/PROJECT_BACKLOG.md` — Living backlog with session notes and all completed phases
+2. `docs/unfair_advantages.md` — Strategic edge analysis + hardware performance track
+3. `docs/agentic_patterns_spec.md` — Technical spec for the agentic architecture
 4. This README for repo structure and test commands
 
 ### Agentic Pipeline (how /run works)
@@ -320,42 +301,38 @@ Request → injection filter → specialist selection → session buffer
   → post-mortem (episode save, correction learning, preference extraction, auto-memorize)
 ```
 
-### Build Order (merged action plan — tackle in this sequence)
+### Build Order (merged action plan)
 
-| # | Feature | Files to Touch | Status |
-|---|---|---|---|
-| P1 | Failure Taxonomy + Metacognitive Rules | kai_config.py, app.py, adversary.py | ✅ DONE |
-| P2 | SELAUR (Uncertainty-Aware Evolution) | app.py, kai_config.py | ✅ DONE |
-| P3 | Soulbound Identity (HMAC now → TPM on laptop) | pending/soulbound.py, memu-core | Skipped (HMAC works; one env flip on hardware) |
-| P4 | TMC + Contradiction Memory | memu-core/app.py, kai_config.py | ✅ DONE |
-| P5 | GEM (Cognitive Alignment) | kai_config.py, planner.py, memu-core, app.py | ✅ DONE |
-| P6 | Knowledge Boundary + Active Probing | kai_config.py, memu-core/app.py | ✅ DONE |
-| P7 | Silence-as-Signal | memu-core/app.py | ✅ DONE |
-| P8 | Dashboard: Thinking Pathways | dashboard/app.py, static/thinking.html | ✅ DONE |
-| P9 | Security Self-Hacking | langgraph/security_audit.py, adversary.py, app.py | ✅ DONE |
-| P15 | Dream State (Offline Consolidation) | langgraph/kai_config.py, app.py, dashboard | ✅ DONE |
+| # | Feature | Status |
+|---|---|---|
+| P0-P2 | Stack, Perception, Voice | ✅ DONE |
+| P3 | Organic Memory (spaced rep, proactive, goals, drift) | ✅ DONE |
+| P4 | Full-Stack Personality & Proactive Conversation | ✅ DONE |
+| P5 | Production Hardening (CI, secrets, backup, HMAC) | ✅ DONE |
+| P7 | Agentic Patterns (episodes, error budget, router, planner) | ✅ DONE |
+| P8 | Dashboard Thinking Pathways (6 visualization cards) | ✅ DONE |
+| P9 | Security Self-Hacking (34 payloads, 6 adversary challenges) | ✅ DONE |
+| P10-P14 | Adaptive Intelligence (predictive, tempo, self-deception, improvement gate, temporal self) | ✅ DONE |
+| P15 | Dream State (6-phase offline consolidation) | ✅ DONE |
+| P16 | Operational Intelligence (struggle, feedback, logs, 3 views) | ✅ DONE |
+| P17 | Emotional Intelligence (emotional memory, self-reflection, epistemic humility, confession, Soul) | ✅ DONE |
+| P6 | Nice-to-have (calendar sync, workspace manager, avatar, Prometheus) | Queued |
+| HP1-HP6 | Hardware Performance Track (speculative decoding, VRAM watchdog, NVMe offload) | Awaiting GPU |
 
-Full details + parked items in `docs/unfair_advantages.md`.
-
-P10 (Predictive Pre-Computation), P11 (Operator Tempo), P12 (Self-Deception Detection), P13 (Self-Improvement Gate), and P14 (Temporal Self-Model) also complete — see unfair_advantages.md.
+Full details in `docs/PROJECT_BACKLOG.md` and `docs/unfair_advantages.md`.
 
 ### Cross-Check: What's Been Done
-- [x] Phase 2a: router.py (8 routes, 27 classification tests)
-- [x] Phase 2b: planner.py (gather_context, build_enriched_plan, preference injection)
-- [x] Phase 2c: adversary.py (5 challenges, 7 test groups)
-- [x] Merged action plan documented (operator research + AI-native)
-- [x] Kimi K2 research noted in LLM strategy
-- [x] P1: Failure Taxonomy + Metacognitive Rules (27 tests)
-- [x] P2: SELAUR Uncertainty-Aware Evolution (13 tests)
-- [x] P4: TMC Contradiction Memory (13 tests)
-- [x] P5: GEM Cognitive Alignment (13 + 8 = 21 tests)
-- [x] P6: Knowledge Boundary Mapping (6 tests in gem suite)
-- [x] P7: Silence-as-Signal (8 tests)
-- [x] P10: Predictive Pre-Computation (15 tests)
-- [x] P11: Operator Tempo Modeling (12 tests)
-- [x] P12: Self-Deception Detection (12 tests)
-- [x] P13: Recursive Self-Improvement Gate (20 tests)
-- [x] P14: Temporal Self-Model (19 tests)
-- [x] P8: Dashboard Thinking Pathways (21 tests)
-- [x] P9: Security Self-Hacking (23 tests)
-- [x] P15: Dream State (26 tests)
+- [x] All 25 services built, running, health-checked
+- [x] Real LLM (Ollama qwen2:0.5b), real persistence (pgvector + Redis)
+- [x] Real input (Telegram voice + text), real output (edge-tts British Ryan)
+- [x] Specialist router (8 categories), memory-driven planner, adversary engine (6 challenges)
+- [x] Conviction scoring (5-signal), tree search (CoT pruning), priority queue
+- [x] Deep personality (PUB/WORK), proactive conversation (greetings, check-ins, nudges)
+- [x] Anti-annoyance (cooldowns, DND, dismissal escalation)
+- [x] Dream state (6-phase consolidation), security self-hacking (34 payloads)
+- [x] Struggle detection (5-signal), feedback loop (1-5 stars), log aggregation
+- [x] Emotional memory (8 emotions), self-reflection journal, relationship timeline
+- [x] Epistemic humility (domain confidence), confession engine
+- [x] 8 dashboard views (Chat, Dashboard, Thinking, Settings, Goals, Memory, Logs, Soul)
+- [x] HMAC auth, Ed25519 signing, episode saver, error budget breaker
+- [x] 52 test targets, 532 tests, zero failures
