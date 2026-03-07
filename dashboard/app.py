@@ -696,6 +696,80 @@ async def api_logs(limit: int = 100, level: str = "", since: float = 0):
     }
 
 
+# ── P17: Emotional Intelligence Proxies ──────────────────────────────
+
+@app.post("/api/emotion/record")
+async def proxy_emotion_record(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/emotion/record", json=body)
+        return resp.json()
+
+
+@app.get("/api/emotion/timeline")
+async def proxy_emotion_timeline(
+    session_id: str | None = None,
+    limit: int = 50,
+):
+    params: dict = {"limit": limit}
+    if session_id:
+        params["session_id"] = session_id
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/emotion/timeline", params=params)
+        return resp.json()
+
+
+@app.post("/api/reflect")
+async def proxy_reflect(request: Request):
+    body = await request.json() if (await request.body()) else {}
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/self-reflect", json=body)
+        return resp.json()
+
+
+@app.get("/api/reflections")
+async def proxy_reflections(limit: int = 10):
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/self-reflections", params={"limit": limit})
+        return resp.json()
+
+
+@app.get("/api/relationship")
+async def proxy_relationship():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/relationship")
+        return resp.json()
+
+
+@app.post("/api/relationship/milestone")
+async def proxy_milestone(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/relationship/milestone", json=body)
+        return resp.json()
+
+
+@app.get("/api/confidence")
+async def proxy_confidence():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/confidence")
+        return resp.json()
+
+
+@app.get("/api/eq/summary")
+async def proxy_eq_summary():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/eq/summary")
+        return resp.json()
+
+
+@app.post("/api/confess")
+async def proxy_confess(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/confess", json=body)
+        return resp.json()
+
 
 # ── Unified App Shell ────────────────────────────────────────────────
 

@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-07 — session: P16 Operational Intelligence (struggle detection, feedback loop, log aggregation, goals UI, memory browser) — **51 targets, 479 tests**
+**Last updated:** 2026-03-07 — session: P17 Emotional Intelligence (emotional memory, self-reflection, relationship timeline, epistemic humility, confession engine, Soul dashboard) — **52 targets, 532 tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 51 (make test-core) |
-| Individual tests | 479 passing, 0 failures |
+| Test targets | 52 (make test-core) |
+| Individual tests | 532 passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -44,7 +44,9 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Struggle detection? | **YES — 5-signal frustration analysis (short msgs, repeated questions, keywords, question density, rapid-fire)** |
 | Feedback loop? | **YES — 1-5 star ratings per response, boost/correction effects on memory** |
 | Log aggregation? | **YES — ring-buffer capture on memu-core + langgraph, level/time-filtered, dashboard aggregator** |
-| Dashboard views? | **YES — 7 views: Chat, Thinking, Goals, Memory Browser, Logs, Settings, Wizard** |
+| Dashboard views? | **YES — 8 views: Chat, Thinking, Goals, Memory Browser, Logs, Settings, Wizard, Soul** |
+| Emotional intelligence? | **YES — emotional memory, self-reflection, relationship timeline, epistemic humility, confession engine** |
+| Soul dashboard? | **YES — mood tracking, emotion timeline, domain confidence, self-reflection journal, milestones** |
 
 ---
 
@@ -302,6 +304,24 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 - [x] Feedback buttons — star rating buttons on every assistant message.
 - [x] 40 unit tests (scripts/test_p16_operational.py)
 
+### P17 — Emotional Intelligence & Self-Awareness (2026-03-07)
+- [x] Emotional memory — 8-emotion keyword detection with intensity scoring,
+      timeline tracking (500 entries), dominant emotion + arc detection.
+- [x] Self-reflection journal — analyzes feedback corrections, emotional patterns,
+      correction categories → strengths/weaknesses/insights (100 entries).
+- [x] Relationship timeline — days together, total memories, corrections given,
+      pinned memories, top categories, emotional journey, named milestones.
+- [x] Epistemic humility — per-domain confidence scored from error rates
+      (low/medium/high flags), per-query confidence check with warnings.
+- [x] Confession engine — identifies potential mistakes, generates honest
+      confessions with 1-hour per-category cooldown.
+- [x] EQ summary endpoint — combines all 5 systems into one response.
+- [x] LLM context injection — 5th parallel fetch for EQ, mood + epistemic
+      warnings injected as system message, emotion recorded post-chat.
+- [x] Dashboard Soul view — 💎 Soul nav (Ctrl+8), mood/relationship/awareness
+      cards, emotion timeline, domain confidence bars, reflection journal, milestones.
+- [x] 53 unit tests (scripts/test_p17_emotional_intelligence.py)
+
 ---
 
 ## Session Notes
@@ -401,6 +421,36 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
   all assistant messages.
 - 40 new tests (scripts/test_p16_operational.py).
 - Test count: 439 → 479 (51 targets), zero failures.
+
+### 2026-03-07 (continued again again)
+- **P17 Emotional Intelligence — ALL DONE.** Kai now has a soul.
+- P17a: Emotional memory — 8-emotion keyword detection (frustrated, stressed, happy,
+  confused, excited, sad, grateful, neutral), intensity scoring, timeline tracking (500
+  entries), dominant emotion + arc detection, session-filtered queries.
+- P17b: Self-reflection journal — analyzes feedback store corrections/positives,
+  emotional patterns (frustration/happy balance), correction categories. Generates
+  strengths/weaknesses/insights. Capped at 100 journal entries.
+- P17c: Relationship timeline — days_together, total_memories, corrections_given,
+  pinned_memories, top_categories, emotional_journey, named milestones with timestamps.
+- P17d: Epistemic humility — per-domain confidence scoring (error_rate-based formula:
+  max(0.1, 0.8 - error_rate * 2.0), capped 0.95). Flags: low (<0.4), medium (<0.65),
+  high (≥0.65). Per-query confidence check with should_warn boolean and warning message.
+  Injected into /chat LLM context as 5th parallel fetch.
+- P17e: Confession engine — searches related memories, identifies potential mistakes,
+  generates honest confession messages. 1-hour cooldown per category.
+- EQ Summary endpoint — combines emotional_state, self_awareness, epistemic_humility,
+  relationship stats into single response.
+- LLM context injection — 5-way parallel fetch (memories, session, goals, topics, EQ).
+  Emotional intelligence injected as system message (mood awareness + epistemic warnings).
+  Emotion recorded after every chat memorization.
+- Dashboard Soul view — 💎 Soul nav item (Ctrl+8). 3 summary cards (Current Mood with
+  emoji, Relationship with days_together, Self-Awareness with last reflection). Emotional
+  Timeline with intensity bars and trigger snippets. Domain Confidence sorted bar chart
+  with low/medium/high color coding. Self-Reflection Journal with Generate button.
+  Milestones with timestamps.
+- Dashboard proxy — 9 new API endpoints for EQ features.
+- 53 new tests (scripts/test_p17_emotional_intelligence.py), all passing.
+- Test count: 479 → 532 (52 targets), zero failures.
 
 ---
 

@@ -56,6 +56,10 @@
           <span class="nav-icon">📋</span>
           <span class="nav-label">Logs</span>
         </a>
+        <a class="nav-item" data-view="eq" onclick="switchView('eq')">
+          <span class="nav-icon">💎</span>
+          <span class="nav-label">Soul</span>
+        </a>
       </nav>
 
       <div class="sidebar-divider"></div>
@@ -283,6 +287,7 @@
                 <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>3</kbd><span>Thinking</span></div>
                 <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>4</kbd><span>Settings</span></div>
                 <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>K</kbd><span>Focus chat input</span></div>
+                <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>8</kbd><span>Soul Dashboard</span></div>
                 <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd><span>Toggle WORK/PUB</span></div>
                 <div class="shortcut-row"><kbd>Escape</kbd><span>Close dropdown / stop generation</span></div>
               </div>
@@ -393,6 +398,69 @@
             <div class="card">
               <div id="logsContent" style="font-family:monospace;font-size:12px;max-height:70vh;overflow-y:auto;">
                 <div class="empty">Click Refresh to load logs</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══════ EQ / Soul View (P17) ═══════ -->
+        <section class="view" id="eqView">
+          <div style="max-width:1200px;margin:0 auto;padding:var(--sp-6);">
+            <h2 class="text-heading" style="margin-bottom:var(--sp-4);">Soul Dashboard</h2>
+
+            <!-- EQ Summary Cards -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--sp-3);margin-bottom:var(--sp-4);">
+              <div class="card" id="eqMoodCard">
+                <div class="card-title"><span class="icon">🎭</span> Current Mood</div>
+                <div id="eqMood" class="text-heading" style="font-size:32px;text-align:center;padding:var(--sp-3) 0;">—</div>
+                <div id="eqArc" style="text-align:center;color:var(--text3);font-size:12px;"></div>
+              </div>
+              <div class="card" id="eqRelCard">
+                <div class="card-title"><span class="icon">🤝</span> Relationship</div>
+                <div id="eqDays" class="text-heading" style="font-size:28px;text-align:center;padding:var(--sp-2) 0;">—</div>
+                <div id="eqRelStats" style="text-align:center;color:var(--text3);font-size:12px;"></div>
+              </div>
+              <div class="card" id="eqConfCard">
+                <div class="card-title"><span class="icon">🎯</span> Self-Awareness</div>
+                <div id="eqReflectionSummary" style="padding:var(--sp-2) 0;font-size:13px;color:var(--text2);">No reflections yet</div>
+              </div>
+            </div>
+
+            <!-- Emotional Timeline -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+                <span><span class="icon">📈</span> Emotional Timeline</span>
+                <button class="refresh-btn" onclick="refreshEQ()">↻ Refresh</button>
+              </div>
+              <div id="eqTimeline" style="max-height:200px;overflow-y:auto;padding:var(--sp-2);">
+                <div class="empty">No emotional data yet</div>
+              </div>
+            </div>
+
+            <!-- Domain Confidence -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">🧠</span> Epistemic Humility — Domain Confidence</div>
+              <div id="eqConfidence" style="padding:var(--sp-2);">
+                <div class="empty">No domain data yet</div>
+              </div>
+            </div>
+
+            <!-- Self-Reflection -->
+            <div style="display:flex;gap:var(--sp-3);margin-bottom:var(--sp-4);">
+              <div class="card" style="flex:1;">
+                <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+                  <span><span class="icon">📝</span> Self-Reflection Journal</span>
+                  <button class="refresh-btn" onclick="triggerReflection()">Generate Reflection</button>
+                </div>
+                <div id="eqReflections" style="max-height:300px;overflow-y:auto;padding:var(--sp-2);">
+                  <div class="empty">No reflections yet — click Generate</div>
+                </div>
+              </div>
+              <div class="card" style="flex:1;">
+                <div class="card-title"><span class="icon">🏆</span> Milestones</div>
+                <div id="eqMilestones" style="max-height:300px;overflow-y:auto;padding:var(--sp-2);">
+                  <div class="empty">No milestones recorded yet</div>
+                </div>
               </div>
             </div>
           </div>
@@ -532,7 +600,7 @@ function switchView(name) {
   const navEl = document.querySelector(`.nav-item[data-view="${name}"]`);
   if (navEl) navEl.classList.add('active');
 
-  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs' };
+  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard' };
   document.getElementById('viewTitle').textContent = titles[name] || name;
 
   currentView = name;
@@ -556,6 +624,9 @@ function switchView(name) {
   }
   if (name === 'logs') {
     refreshLogs();
+  }
+  if (name === 'eq') {
+    refreshEQ();
   }
 }
 
@@ -1551,7 +1622,7 @@ document.addEventListener('keydown', function(e) {
 
   // Ctrl+1/2/3/4 — switch views
   if (e.ctrlKey && !e.shiftKey) {
-    const viewMap = { '1': 'chat', '2': 'dashboard', '3': 'thinking', '4': 'settings', '5': 'goals', '6': 'memory', '7': 'logs' };
+    const viewMap = { '1': 'chat', '2': 'dashboard', '3': 'thinking', '4': 'settings', '5': 'goals', '6': 'memory', '7': 'logs', '8': 'eq' };
     if (viewMap[e.key]) { e.preventDefault(); switchView(viewMap[e.key]); return; }
   }
 
@@ -1869,6 +1940,150 @@ async function refreshLogs() {
   } catch {
     document.getElementById('logsContent').innerHTML = '<div class="empty">Cannot load logs</div>';
   }
+}
+
+
+// ── P17: Soul Dashboard (Emotional Intelligence) ────────────────────
+
+const EQ_EMOJI = { frustrated: '😤', stressed: '😰', happy: '😊', confused: '🤔', excited: '🔥', sad: '😢', grateful: '🙏', neutral: '😐', unknown: '❓' };
+
+async function refreshEQ() {
+  try {
+    const [eqResp, relResp, confResp, refResp] = await Promise.all([
+      fetch('/api/eq/summary'),
+      fetch('/api/relationship'),
+      fetch('/api/confidence'),
+      fetch('/api/reflections?limit=5'),
+    ]);
+    const eq = await eqResp.json();
+    const rel = await relResp.json();
+    const conf = await confResp.json();
+    const refs = await refResp.json();
+
+    // Mood card
+    const mood = eq.emotional_state?.current_mood || 'unknown';
+    document.getElementById('eqMood').textContent = (EQ_EMOJI[mood] || '❓') + ' ' + mood;
+    const tl = await fetch('/api/emotion/timeline?limit=10');
+    const tlData = await tl.json();
+    document.getElementById('eqArc').textContent = 'Arc: ' + (tlData.arc || 'stable');
+
+    // Relationship card
+    document.getElementById('eqDays').textContent = rel.days_together + ' days together';
+    document.getElementById('eqRelStats').innerHTML =
+      `${rel.total_memories || 0} memories · ${rel.corrections_given || 0} corrections · ${rel.pinned_memories || 0} pinned` +
+      (rel.avg_rating ? ` · avg rating ${rel.avg_rating}⭐` : '');
+
+    // Self-awareness card
+    const lastRef = eq.self_awareness?.last_reflection;
+    if (lastRef) {
+      const strengths = (lastRef.strengths || []).join('; ') || 'none identified';
+      const weaknesses = (lastRef.weaknesses || []).join('; ') || 'none identified';
+      document.getElementById('eqReflectionSummary').innerHTML =
+        `<div style="color:var(--success);margin-bottom:4px;">✓ ${escapeHtml(strengths)}</div>` +
+        `<div style="color:var(--warn);">⚠ ${escapeHtml(weaknesses)}</div>`;
+    }
+
+    // Emotional timeline
+    renderEmotionTimeline(tlData.entries || []);
+
+    // Domain confidence
+    renderDomainConfidence(conf.domains || {});
+
+    // Reflections
+    renderReflections(refs.entries || []);
+
+    // Milestones
+    renderMilestones(rel.milestones || []);
+  } catch(e) {
+    console.error('EQ refresh error:', e);
+  }
+}
+
+function renderEmotionTimeline(entries) {
+  const el = document.getElementById('eqTimeline');
+  if (!entries.length) { el.innerHTML = '<div class="empty">No emotional data yet</div>'; return; }
+  let html = '';
+  for (const e of entries) {
+    const time = new Date(e.timestamp * 1000).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    const emoji = EQ_EMOJI[e.emotion] || '❓';
+    const bar = `<div style="width:${Math.round(e.intensity*100)}%;height:4px;background:var(--accent);border-radius:2px;"></div>`;
+    html += `<div style="display:flex;align-items:center;gap:var(--sp-2);padding:4px 0;border-bottom:1px solid var(--border);">
+      <span style="min-width:50px;color:var(--text3);font-size:12px;">${time}</span>
+      <span style="font-size:18px;">${emoji}</span>
+      <span style="min-width:80px;font-size:13px;">${escapeHtml(e.emotion)}</span>
+      <div style="flex:1;">${bar}</div>
+      <span style="font-size:11px;color:var(--text3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(e.trigger_snippet || '')}</span>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderDomainConfidence(domains) {
+  const el = document.getElementById('eqConfidence');
+  const keys = Object.keys(domains);
+  if (!keys.length) { el.innerHTML = '<div class="empty">No domain data yet</div>'; return; }
+  let html = '<div style="display:grid;gap:var(--sp-2);">';
+  const sorted = keys.sort((a,b) => domains[a].confidence - domains[b].confidence);
+  for (const d of sorted) {
+    const info = domains[d];
+    const pct = Math.round(info.confidence * 100);
+    const color = info.flag === 'low' ? 'var(--danger)' : info.flag === 'medium' ? 'var(--warn)' : 'var(--success)';
+    html += `<div style="display:flex;align-items:center;gap:var(--sp-2);">
+      <span style="min-width:120px;font-size:13px;font-weight:500;">${escapeHtml(d)}</span>
+      <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;">
+        <div style="width:${pct}%;height:100%;background:${color};border-radius:4px;transition:width 0.3s;"></div>
+      </div>
+      <span style="min-width:40px;text-align:right;font-size:12px;color:${color};">${pct}%</span>
+      <span style="font-size:11px;color:var(--text3);">${info.corrections || 0} corrections</span>
+    </div>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function renderReflections(entries) {
+  const el = document.getElementById('eqReflections');
+  if (!entries.length) { el.innerHTML = '<div class="empty">No reflections yet — click Generate</div>'; return; }
+  let html = '';
+  for (const r of entries.reverse()) {
+    const time = new Date(r.timestamp * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    const balance = r.emotional_balance === 'positive' ? '😊' : r.emotional_balance === 'negative' ? '😟' : '😐';
+    html += `<div style="padding:var(--sp-2);border-bottom:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+        <span style="font-size:12px;color:var(--text3);">${time}</span>
+        <span>${balance} ${escapeHtml(r.emotional_balance || 'neutral')}</span>
+      </div>`;
+    if (r.strengths?.length) html += `<div style="color:var(--success);font-size:12px;">✓ ${r.strengths.map(s=>escapeHtml(s)).join(' · ')}</div>`;
+    if (r.weaknesses?.length) html += `<div style="color:var(--warn);font-size:12px;">⚠ ${r.weaknesses.map(s=>escapeHtml(s)).join(' · ')}</div>`;
+    if (r.insights?.length) html += `<div style="color:var(--accent);font-size:12px;">💡 ${r.insights.map(s=>escapeHtml(s)).join(' · ')}</div>`;
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
+
+async function triggerReflection() {
+  try {
+    showToast('Soul', 'Generating self-reflection...', 'info', 3000);
+    const resp = await fetch('/api/reflect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    if (resp.ok) {
+      showToast('Soul', 'Reflection generated', 'success', 2000);
+      refreshEQ();
+    }
+  } catch { showToast('Soul', 'Reflection failed', 'error', 3000); }
+}
+
+function renderMilestones(milestones) {
+  const el = document.getElementById('eqMilestones');
+  if (!milestones.length) { el.innerHTML = '<div class="empty">No milestones yet</div>'; return; }
+  let html = '';
+  for (const m of milestones.reverse()) {
+    const time = new Date(m.timestamp * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    html += `<div style="padding:var(--sp-2);border-bottom:1px solid var(--border);">
+      <div style="font-weight:500;font-size:13px;">🏆 ${escapeHtml(m.title)}</div>
+      <div style="font-size:12px;color:var(--text3);">${time}${m.description ? ' — ' + escapeHtml(m.description) : ''}</div>
+    </div>`;
+  }
+  el.innerHTML = html;
 }
 
 

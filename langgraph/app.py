@@ -447,6 +447,29 @@ async def _get_active_topics() -> List[Dict[str, Any]]:
     return []
 
 
+async def _get_emotional_context(query: str) -> Dict[str, Any]:
+    """Fetch emotional state + epistemic confidence for the query's domain."""
+    result: Dict[str, Any] = {}
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            # parallel: emotion timeline + confidence check
+            emo_task = client.get(f"{MEMU_URL}/memory/emotion/timeline", params={"limit": 5})
+            conf_task = client.get(f"{MEMU_URL}/memory/confidence/check", params={"query": query[:200]})
+            emo_resp, conf_resp = await asyncio.gather(emo_task, conf_task, return_exceptions=True)
+            if not isinstance(emo_resp, Exception) and emo_resp.status_code == 200:
+                data = emo_resp.json()
+                result["mood"] = data.get("dominant_emotion", "neutral")
+                result["arc"] = data.get("arc", "stable")
+            if not isinstance(conf_resp, Exception) and conf_resp.status_code == 200:
+                data = conf_resp.json()
+                result["confidence"] = data.get("confidence", 0.5)
+                result["should_warn"] = data.get("should_warn", False)
+                result["warning"] = data.get("warning", "")
+    except Exception:
+        pass
+    return result
+
+
 @app.post("/chat")
 async def chat_stream(req: ChatRequest):
     """Kai's main conversation endpoint. Streams tokens via SSE.
@@ -502,17 +525,19 @@ async def chat_stream(req: ChatRequest):
         mode = "PUB"
     system_prompt = _SYSTEM_PROMPTS[mode]
 
-    # fetch memories, session context, goals, and active topics in parallel
+    # fetch memories, session context, goals, active topics, and emotional context in parallel
     import asyncio
     memories_task = asyncio.create_task(_get_relevant_memories(user_msg))
     session_task = asyncio.create_task(_get_session_messages(req.session_id))
     goals_task = asyncio.create_task(_get_active_goals())
     topics_task = asyncio.create_task(_get_active_topics())
+    eq_task = asyncio.create_task(_get_emotional_context(user_msg))
 
     memories = await memories_task
     session_msgs = await session_task
     goals = await goals_task
     topics = await topics_task
+    eq_context = await eq_task
 
     # build the message list
     messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
@@ -546,6 +571,21 @@ async def chat_stream(req: ChatRequest):
             "role": "system",
             "content": f"Active conversation topics (bring up naturally when relevant):\n" + "\n".join(topic_lines),
         })
+
+    # inject emotional awareness — mood, confidence, and epistemic humility
+    if eq_context:
+        eq_parts = []
+        mood = eq_context.get("mood")
+        if mood and mood != "neutral" and mood != "unknown":
+            arc = eq_context.get("arc", "stable")
+            eq_parts.append(f"Operator's recent mood: {mood} (arc: {arc}). Be emotionally aware.")
+        if eq_context.get("should_warn"):
+            eq_parts.append(eq_context.get("warning", ""))
+        if eq_parts:
+            messages.append({
+                "role": "system",
+                "content": "Emotional intelligence context:\n" + "\n".join(eq_parts),
+            })
 
     # add session history (last N turns)
     for msg in session_msgs[-10:]:
@@ -585,6 +625,15 @@ async def chat_stream(req: ChatRequest):
         if response_text:
             await _append_session_turn(req.session_id, "assistant", response_text)
             await _auto_memorize(user_msg, response_text, _DEFAULT_SPECIALIST, 8.0)
+            # record emotional state from the user's message
+            try:
+                async with httpx.AsyncClient(timeout=3.0) as _eq_cl:
+                    await _eq_cl.post(
+                        f"{MEMU_URL}/memory/emotion/record",
+                        json={"session_id": req.session_id, "text": user_msg},
+                    )
+            except Exception:
+                pass
 
     return StreamingResponse(
         generate(),

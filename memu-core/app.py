@@ -3124,6 +3124,509 @@ async def feedback_stats() -> Dict[str, Any]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
+# P17: EMOTIONAL INTELLIGENCE & SELF-AWARENESS
+#  The soul of Kai — what no commercial AI will ever build.
+#  Five subsystems: Emotional Memory, Self-Reflection, Relationship
+#  Timeline, Epistemic Humility, and the Confession Engine.
+# ═══════════════════════════════════════════════════════════════════════
+
+# ── P17a: Emotional Memory ──────────────────────────────────────────
+# Track how conversations *feel*, not just what was said. Remembers
+# arcs: stressed → resolved, excited → deflated. Commercial AI treats
+# sessions as transactions; Kai remembers the human behind the words.
+
+_EMOTION_KEYWORDS: Dict[str, List[str]] = {
+    "frustrated": ["frustrated", "annoying", "annoyed", "broken", "useless", "waste", "stuck", "hate", "ugh", "ffs"],
+    "stressed": ["stressed", "overwhelmed", "deadline", "pressure", "worried", "anxious", "panic", "urgent"],
+    "happy": ["great", "awesome", "perfect", "brilliant", "excellent", "love", "amazing", "happy", "fantastic", "legend"],
+    "confused": ["confused", "lost", "understand", "what do you mean", "makes no sense", "unclear", "huh"],
+    "excited": ["excited", "cant wait", "pumped", "hyped", "lets go", "fire", "stoked"],
+    "sad": ["sad", "disappointed", "gutted", "sucks", "terrible", "depressing", "miss"],
+    "grateful": ["thanks", "thank you", "cheers", "appreciate", "legend", "lifesaver", "brother"],
+    "neutral": [],
+}
+
+_emotional_timeline: List[Dict[str, Any]] = []  # [{session_id, timestamp, emotion, intensity, trigger_msg}]
+
+
+def _detect_emotion(text: str) -> tuple[str, float]:
+    """Simple keyword-based emotion detection. Returns (emotion, intensity 0-1)."""
+    lower = text.lower()
+    scores: Dict[str, float] = {}
+    for emotion, keywords in _EMOTION_KEYWORDS.items():
+        if not keywords:
+            continue
+        hits = sum(1 for kw in keywords if kw in lower)
+        if hits > 0:
+            scores[emotion] = min(hits * 0.25, 1.0)
+    if not scores:
+        return "neutral", 0.1
+    best = max(scores, key=scores.get)
+    return best, scores[best]
+
+
+def _record_emotion(session_id: str, text: str) -> Dict[str, Any]:
+    """Record an emotional state for the timeline."""
+    emotion, intensity = _detect_emotion(text)
+    entry = {
+        "session_id": session_id,
+        "timestamp": time.time(),
+        "emotion": emotion,
+        "intensity": round(intensity, 2),
+        "trigger_snippet": text[:80],
+    }
+    _emotional_timeline.append(entry)
+    # keep last 500 entries
+    if len(_emotional_timeline) > 500:
+        del _emotional_timeline[:-500]
+    return entry
+
+
+@app.post("/memory/emotion/record")
+async def record_emotion(request: Request) -> Dict[str, Any]:
+    """Record current emotional state from a message."""
+    body = await request.json()
+    session_id = sanitize_string(body.get("session_id", "default"))
+    text = sanitize_string(body.get("text", ""))
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+    entry = _record_emotion(session_id, text)
+    return {"status": "ok", **entry}
+
+
+@app.get("/memory/emotion/timeline")
+async def emotion_timeline(
+    session_id: Optional[str] = Query(default=None),
+    limit: int = Query(default=50, ge=1, le=200),
+) -> Dict[str, Any]:
+    """Get the emotional timeline — how conversations have felt over time."""
+    entries = _emotional_timeline
+    if session_id:
+        sid = sanitize_string(session_id)
+        entries = [e for e in entries if e["session_id"] == sid]
+    recent = entries[-limit:]
+
+    # compute emotional arc — what changed?
+    arc = "stable"
+    if len(recent) >= 2:
+        first_emo = recent[0]["emotion"]
+        last_emo = recent[-1]["emotion"]
+        if first_emo != last_emo:
+            arc = f"{first_emo} → {last_emo}"
+
+    # dominant emotion
+    if recent:
+        emo_counts: Dict[str, int] = {}
+        for e in recent:
+            emo_counts[e["emotion"]] = emo_counts.get(e["emotion"], 0) + 1
+        dominant = max(emo_counts, key=emo_counts.get)
+    else:
+        dominant = "unknown"
+
+    return {
+        "status": "ok",
+        "count": len(recent),
+        "dominant_emotion": dominant,
+        "arc": arc,
+        "entries": recent,
+    }
+
+
+# ── P17b: Self-Reflection Journal ──────────────────────────────────
+# Kai examines its own performance periodically. What corrections
+# was I given? Where am I weak? What went well? This feeds back into
+# actual behavior — not a gimmick display.
+
+_reflection_journal: List[Dict[str, Any]] = []
+
+
+@app.post("/memory/self-reflect")
+async def generate_self_reflection(request: Request) -> Dict[str, Any]:
+    """Generate a self-reflection entry based on recent activity."""
+    # Gather signals from various stores
+    correction_count = sum(
+        1 for f in _feedback_store if f.get("rating", 3) <= 2
+    )
+    positive_count = sum(
+        1 for f in _feedback_store if f.get("rating", 3) >= 4
+    )
+    total_feedback = len(_feedback_store)
+
+    # Check emotional patterns
+    recent_emotions = _emotional_timeline[-20:] if _emotional_timeline else []
+    frustration_count = sum(1 for e in recent_emotions if e["emotion"] in ("frustrated", "stressed"))
+    happy_count = sum(1 for e in recent_emotions if e["emotion"] in ("happy", "excited", "grateful"))
+
+    # Analyse correction patterns by category
+    correction_categories: Dict[str, int] = {}
+    for rec in store.search(top_k=500, query="correction"):
+        if hasattr(rec, "event_type") and rec.event_type == "correction":
+            cat = getattr(rec, "category", "general")
+            correction_categories[cat] = correction_categories.get(cat, 0) + 1
+
+    # Build the reflection
+    strengths = []
+    weaknesses = []
+    insights = []
+
+    if positive_count > correction_count:
+        strengths.append(f"Operator rated {positive_count} responses positively vs {correction_count} corrections")
+    elif correction_count > 0:
+        weaknesses.append(f"Received {correction_count} corrections — need to improve accuracy")
+
+    if correction_categories:
+        worst = max(correction_categories, key=correction_categories.get)
+        weaknesses.append(f"Most corrections in '{worst}' category ({correction_categories[worst]} times) — I need extra care here")
+
+    if frustration_count > happy_count and recent_emotions:
+        weaknesses.append("Recent sessions show more frustration than satisfaction")
+        insights.append("Consider being more proactive about checking understanding")
+    elif happy_count > frustration_count:
+        strengths.append("Recent conversations have been positive")
+
+    if total_feedback == 0:
+        insights.append("No feedback received yet — hard to self-assess without data")
+
+    # epistemic humility check
+    weak_domains = [cat for cat, count in correction_categories.items() if count >= 2]
+    if weak_domains:
+        insights.append(f"Low confidence domains (2+ corrections): {', '.join(weak_domains)}")
+
+    entry = {
+        "timestamp": time.time(),
+        "corrections_total": correction_count,
+        "positives_total": positive_count,
+        "emotional_balance": "positive" if happy_count > frustration_count else (
+            "negative" if frustration_count > happy_count else "neutral"
+        ),
+        "strengths": strengths,
+        "weaknesses": weaknesses,
+        "insights": insights,
+        "correction_categories": correction_categories,
+        "weak_domains": weak_domains,
+    }
+    _reflection_journal.append(entry)
+    # keep last 100 reflections
+    if len(_reflection_journal) > 100:
+        del _reflection_journal[:-100]
+
+    return {"status": "ok", "reflection": entry}
+
+
+@app.get("/memory/self-reflections")
+async def get_self_reflections(limit: int = Query(default=10, ge=1, le=50)) -> Dict[str, Any]:
+    """Get recent self-reflection entries."""
+    return {
+        "status": "ok",
+        "count": len(_reflection_journal),
+        "entries": _reflection_journal[-limit:],
+    }
+
+
+# ── P17c: Relationship Timeline ────────────────────────────────────
+# A narrative of the partnership. First conversation, milestones,
+# shared victories, tough moments. No commercial AI remembers *you*.
+
+_relationship_milestones: List[Dict[str, Any]] = []
+_RELATIONSHIP_START = float(os.getenv("KAI_RELATIONSHIP_START", "0"))  # set to first interaction epoch
+
+
+@app.get("/memory/relationship")
+async def relationship_timeline() -> Dict[str, Any]:
+    """Get the relationship narrative — our story together."""
+    now = time.time()
+
+    # Count interactions from memory
+    all_records = store.search(top_k=10_000, query="")
+    total_memories = len(all_records) if all_records else 0
+    correction_count = sum(1 for r in (all_records or []) if getattr(r, "event_type", "") == "correction")
+    keeper_count = sum(1 for r in (all_records or []) if r.content.get("pin", False))
+
+    # Track categories worked on
+    categories_worked: Dict[str, int] = {}
+    for r in (all_records or []):
+        cat = getattr(r, "category", "general")
+        categories_worked[cat] = categories_worked.get(cat, 0) + 1
+    top_categories = sorted(categories_worked.items(), key=lambda x: x[1], reverse=True)[:5]
+
+    # Total feedback
+    total_feedback = len(_feedback_store)
+    avg_rating = round(sum(f["rating"] for f in _feedback_store) / total_feedback, 2) if total_feedback else 0
+
+    # Days together
+    start = _RELATIONSHIP_START if _RELATIONSHIP_START > 0 else (
+        min((e.get("timestamp", now) if isinstance(e, dict) else getattr(e, "timestamp", now))
+            for e in (all_records or [{"timestamp": now}]))
+        if all_records else now
+    )
+    # handle ISO timestamp strings
+    if isinstance(start, str):
+        try:
+            start = datetime.fromisoformat(start.replace("Z", "+00:00")).timestamp()
+        except Exception:
+            start = now
+    days_together = max(1, int((now - start) / 86400))
+
+    # Emotional journey summary
+    emo_summary: Dict[str, int] = {}
+    for e in _emotional_timeline:
+        emo_summary[e["emotion"]] = emo_summary.get(e["emotion"], 0) + 1
+
+    return {
+        "status": "ok",
+        "days_together": days_together,
+        "total_memories": total_memories,
+        "corrections_given": correction_count,
+        "pinned_memories": keeper_count,
+        "total_feedback": total_feedback,
+        "avg_rating": avg_rating,
+        "top_categories": [{"category": c, "count": n} for c, n in top_categories],
+        "emotional_journey": emo_summary,
+        "milestones": _relationship_milestones[-20:],
+    }
+
+
+@app.post("/memory/relationship/milestone")
+async def add_milestone(request: Request) -> Dict[str, Any]:
+    """Record a relationship milestone."""
+    body = await request.json()
+    title = sanitize_string(body.get("title", ""))
+    if not title:
+        raise HTTPException(status_code=400, detail="title is required")
+    milestone = {
+        "timestamp": time.time(),
+        "title": title,
+        "description": sanitize_string(body.get("description", "")),
+    }
+    _relationship_milestones.append(milestone)
+    if len(_relationship_milestones) > 200:
+        del _relationship_milestones[:-200]
+    return {"status": "ok", "milestone": milestone}
+
+
+# ── P17d: Epistemic Humility ───────────────────────────────────────
+# Track confidence per domain based on correction history. Flag
+# uncertainty honestly instead of confidently bullshitting.
+# "I'm not confident about X — I've been wrong before."
+
+def _compute_domain_confidence() -> Dict[str, Dict[str, Any]]:
+    """Compute confidence per domain based on correction vs positive history."""
+    domain_stats: Dict[str, Dict[str, int]] = {}
+    for rec in store.search(top_k=10_000, query=""):
+        if not rec:
+            continue
+        cat = getattr(rec, "category", "general")
+        if cat not in domain_stats:
+            domain_stats[cat] = {"total": 0, "corrections": 0, "positive": 0}
+        domain_stats[cat]["total"] += 1
+        evt = getattr(rec, "event_type", "")
+        if evt == "correction":
+            domain_stats[cat]["corrections"] += 1
+        elif evt == "feedback_positive":
+            domain_stats[cat]["positive"] += 1
+
+    # Also use feedback store ratings
+    for fb in _feedback_store:
+        cat = fb.get("category", "general")
+        if cat not in domain_stats:
+            domain_stats[cat] = {"total": 0, "corrections": 0, "positive": 0}
+        if fb.get("rating", 3) <= 2:
+            domain_stats[cat]["corrections"] += 1
+        elif fb.get("rating", 3) >= 4:
+            domain_stats[cat]["positive"] += 1
+
+    result: Dict[str, Dict[str, Any]] = {}
+    for cat, stats in domain_stats.items():
+        total = stats["total"]
+        corrections = stats["corrections"]
+        positive = stats["positive"]
+
+        if total == 0:
+            confidence = 0.5
+        elif corrections == 0:
+            confidence = min(0.95, 0.6 + positive * 0.05)
+        else:
+            # more corrections → lower confidence
+            error_rate = corrections / max(1, total)
+            confidence = max(0.1, 0.8 - error_rate * 2.0)
+
+        result[cat] = {
+            "confidence": round(confidence, 2),
+            "total_memories": total,
+            "corrections": corrections,
+            "positive_feedback": positive,
+            "flag": "low" if confidence < 0.4 else ("medium" if confidence < 0.65 else "high"),
+        }
+    return result
+
+
+@app.get("/memory/confidence")
+async def domain_confidence() -> Dict[str, Any]:
+    """Get Kai's confidence level per domain. Honest self-assessment."""
+    domains = _compute_domain_confidence()
+
+    low_confidence = [d for d, info in domains.items() if info["flag"] == "low"]
+    high_confidence = [d for d, info in domains.items() if info["flag"] == "high"]
+
+    return {
+        "status": "ok",
+        "domains": domains,
+        "low_confidence_domains": low_confidence,
+        "high_confidence_domains": high_confidence,
+        "total_domains": len(domains),
+    }
+
+
+@app.get("/memory/confidence/check")
+async def confidence_check(query: str = Query(..., min_length=1)) -> Dict[str, Any]:
+    """Check confidence for a specific query — should Kai flag uncertainty?"""
+    q = sanitize_string(query)
+    category = classify_category(q)
+    domains = _compute_domain_confidence()
+    domain_info = domains.get(category, {"confidence": 0.5, "corrections": 0, "flag": "medium"})
+
+    should_warn = domain_info.get("flag") == "low"
+    warning_msg = ""
+    if should_warn:
+        corrections = domain_info.get("corrections", 0)
+        warning_msg = (
+            f"I should be honest — I'm not highly confident about {category}. "
+            f"I've been corrected {corrections} time(s) in this area. "
+            "Please double-check my answer."
+        )
+
+    return {
+        "status": "ok",
+        "query_category": category,
+        "confidence": domain_info.get("confidence", 0.5),
+        "flag": domain_info.get("flag", "medium"),
+        "should_warn": should_warn,
+        "warning": warning_msg,
+    }
+
+
+# ── P17e: Confession Engine ────────────────────────────────────────
+# When Kai learns something was wrong (via correction), check if
+# related advice was given before. If so, proactively confess:
+# "I've been thinking — that advice about X might have been off."
+
+_confession_cooldown: Dict[str, float] = {}  # category → last confession time
+_CONFESSION_COOLDOWN_SECS = 3600  # 1 hour between confessions per category
+
+
+@app.post("/memory/confess")
+async def check_confessions(request: Request) -> Dict[str, Any]:
+    """Check for things Kai should proactively confess about.
+
+    Triggers when a correction is received — looks back at related
+    memories to find potentially wrong advice. Returns confession
+    messages if any.
+    """
+    body = await request.json()
+    correction_text = sanitize_string(body.get("correction", ""))
+    category = sanitize_string(body.get("category", ""))
+    if not correction_text:
+        raise HTTPException(status_code=400, detail="correction text required")
+
+    # auto-classify if no category provided
+    if not category:
+        category = classify_category(correction_text)
+
+    now = time.time()
+
+    # check cooldown
+    last = _confession_cooldown.get(category, 0)
+    if now - last < _CONFESSION_COOLDOWN_SECS:
+        return {"status": "ok", "confessions": [], "reason": "cooldown_active"}
+
+    # search for related memories that might have been wrong
+    related = retrieve_ranked(correction_text, "keeper", top_k=10)
+    confessions = []
+
+    for rec in related:
+        evt = getattr(rec, "event_type", "")
+        # skip the correction itself and other corrections
+        if evt in ("correction", "metacognitive_rule", "feedback_positive"):
+            continue
+        rec_cat = getattr(rec, "category", "general")
+        if rec_cat != category:
+            continue
+        content = rec.content.get("result", "")
+        if not content:
+            continue
+        # this is a related memory in the same category — it might be wrong
+        confessions.append({
+            "memory_id": rec.id,
+            "original_advice": content[:200],
+            "category": rec_cat,
+            "timestamp": rec.timestamp,
+            "message": (
+                f"Brother, I've been thinking — I gave advice about {rec_cat} "
+                f"that might have been off: \"{content[:100]}...\" "
+                f"Now that I've been corrected, I want to flag this so you know."
+            ),
+        })
+
+    # only return top 3 most relevant confessions, and update cooldown
+    confessions = confessions[:3]
+    if confessions:
+        _confession_cooldown[category] = now
+
+    return {
+        "status": "ok",
+        "confessions": confessions,
+        "correction_category": category,
+    }
+
+
+@app.get("/memory/eq/summary")
+async def eq_summary() -> Dict[str, Any]:
+    """Get a full emotional intelligence summary — all P17 systems combined."""
+    # Emotional state
+    recent_emotions = _emotional_timeline[-10:]
+    if recent_emotions:
+        emo_counts: Dict[str, int] = {}
+        for e in recent_emotions:
+            emo_counts[e["emotion"]] = emo_counts.get(e["emotion"], 0) + 1
+        current_mood = max(emo_counts, key=emo_counts.get)
+    else:
+        current_mood = "unknown"
+
+    # Self-awareness
+    last_reflection = _reflection_journal[-1] if _reflection_journal else None
+
+    # Confidence
+    domains = _compute_domain_confidence()
+    low_conf = [d for d, info in domains.items() if info["flag"] == "low"]
+
+    # Relationship
+    total_feedback = len(_feedback_store)
+    avg_rating = round(sum(f["rating"] for f in _feedback_store) / total_feedback, 2) if total_feedback else 0
+
+    return {
+        "status": "ok",
+        "emotional_state": {
+            "current_mood": current_mood,
+            "recent_emotions": len(recent_emotions),
+            "timeline_total": len(_emotional_timeline),
+        },
+        "self_awareness": {
+            "reflections_total": len(_reflection_journal),
+            "last_reflection": last_reflection,
+        },
+        "epistemic_humility": {
+            "total_domains": len(domains),
+            "low_confidence": low_conf,
+        },
+        "relationship": {
+            "total_feedback": total_feedback,
+            "avg_rating": avg_rating,
+            "milestones": len(_relationship_milestones),
+        },
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
 # P16b: LOG AGGREGATION
 #  Expose recent log entries from this service for dashboard querying.
 #  Other services push logs to a shared format; this serves them.

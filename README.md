@@ -121,7 +121,7 @@ make full-down
 ## Test
 
 ```bash
-# Run ALL core unit/smoke tests (51 targets, ~479 tests)
+# Run ALL core unit/smoke tests (52 targets, ~532 tests)
 make test-core
 
 # Individual service tests
@@ -163,6 +163,7 @@ make test-hmac-rotation-drill # HMAC rotation lifecycle drill
 make test-p3-organic          # P3 organic memory (goals, drift, decay, proactive)
 make test-p4-personality       # P4 personality & proactive (prompts, anti-annoyance, topics, modes)
 make test-p16-operational      # P16 operational intelligence (struggle, feedback, logs, goals UI, memory browser)
+make test-p17-emotional-intelligence # P17 emotional intelligence (emotional memory, self-reflection, relationship, epistemic humility, confession)
 
 # v7 feature tests
 make test-v7                 # verifier, quarantine, policy, idempotency, integration-chain
