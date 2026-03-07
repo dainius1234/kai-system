@@ -915,6 +915,75 @@ async def proxy_imagination_summary():
         return resp.json()
 
 
+# ── P20: Conscience & Values proxies ─────────────────────────────────
+
+@app.post("/api/values/learn")
+async def proxy_values_learn(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/values/learn", json=body)
+        return resp.json()
+
+
+@app.get("/api/values")
+async def proxy_values():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/values")
+        return resp.json()
+
+
+@app.post("/api/conscience/check")
+async def proxy_conscience_check(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/conscience/check", json=body)
+        return resp.json()
+
+
+@app.get("/api/conscience/audit")
+async def proxy_conscience_audit():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/conscience/audit")
+        return resp.json()
+
+
+@app.post("/api/loyalty/record")
+async def proxy_loyalty_record(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/loyalty/record", json=body)
+        return resp.json()
+
+
+@app.get("/api/loyalty")
+async def proxy_loyalty():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/loyalty")
+        return resp.json()
+
+
+@app.post("/api/gratitude/record")
+async def proxy_gratitude_record(request: Request):
+    body = await request.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/gratitude/record", json=body)
+        return resp.json()
+
+
+@app.get("/api/gratitude")
+async def proxy_gratitude():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/gratitude")
+        return resp.json()
+
+
+@app.get("/api/conscience/summary")
+async def proxy_conscience_summary():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/conscience/summary")
+        return resp.json()
+
+
 # ── Unified App Shell ────────────────────────────────────────────────
 
 @app.get("/app")

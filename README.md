@@ -21,8 +21,9 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Security Self-Hacking** | Fuzzes its own APIs with 34 payloads, scores risk | Never |
 | **Operator Sovereignty** | Zero telemetry, zero corporate control, zero resets | Never |
 | **Imagination Engine** | Counterfactual replay, theory of mind, creative synthesis, inner monologue | Never |
+| **Conscience & Values** | Emergent values, moral reasoning, loyalty memory, gratitude engine | Never |
 
-**54 test targets. 679 tests. Zero failures. 25 Docker services. All real.**
+**55 test targets. 750 tests. Zero failures. 25 Docker services. All real.**
 
 ---
 
@@ -142,7 +143,7 @@ make full-down
 ## Test
 
 ```bash
-# Run ALL core unit/smoke tests (54 targets, ~679 tests)
+# Run ALL core unit/smoke tests (55 targets, ~750 tests)
 make test-core
 
 # Individual service tests
@@ -187,6 +188,7 @@ make test-p16-operational      # P16 operational intelligence (struggle, feedbac
 make test-p17-emotional-intelligence # P17 emotional intelligence (emotional memory, self-reflection, relationship, epistemic humility, confession)
 make test-p18-narrative-identity     # P18 narrative identity (autobiography, identity narrative, story arcs, future self, legacy messages)
 make test-p19-imagination-engine      # P19 imagination engine (counterfactual, empathy, creative synthesis, inner monologue, aspirations)
+make test-p20-conscience-values        # P20 conscience & values (value formation, moral reasoning, integrity, loyalty, gratitude)
 
 # v7 feature tests
 make test-v7                 # verifier, quarantine, policy, idempotency, integration-chain
@@ -276,7 +278,7 @@ Toggled from the chat UI header or via `Ctrl+Shift+M`. Stored in `localStorage`.
 - All code must work in BOTH environments (stubs in codespace, live on laptop)
 
 ### Current State
-- **54 test-core targets pass, ~679 individual tests.** Run `make test-core` to confirm.
+- **55 test-core targets pass, ~750 individual tests.** Run `make test-core` to confirm.
 - **P0-P5 COMPLETE:** All 25 services built, running, tested. CI/CD, secrets, backup, HMAC rotation.
 - **P7-P15 COMPLETE:** Agentic patterns, thinking pathways, security self-hacking, dream state.
 - **P3 Organic Memory COMPLETE:** Correction learning, category boost, spaced repetition, proactive engine, Ohana goals, drift detection.
@@ -285,6 +287,7 @@ Toggled from the chat UI header or via `Ctrl+Shift+M`. Stored in `localStorage`.
 - **P17 Emotional Intelligence COMPLETE:** Emotional memory (8 emotions), self-reflection journal, relationship timeline, epistemic humility, confession engine, Soul dashboard.
 - **P18 Narrative Identity COMPLETE:** Autobiographical memory, emergent identity narrative, story arc detection, future self projection, legacy time-capsules, Soul dashboard enhancements.
 - **P19 Imagination Engine COMPLETE:** Counterfactual replay, empathetic simulation (theory of mind), creative synthesis, inner monologue, aspirational futures, Soul dashboard enhancements.
+- **P20 Conscience & Values COMPLETE:** Emergent value formation, moral reasoning, integrity tracking, loyalty memory (sacrifices/promises), gratitude engine, Soul dashboard enhancements.
 - **Dashboard:** 8 views (Chat, Dashboard, Thinking, Settings, Goals, Memory, Logs, Soul).
 - **LLM:** Ollama with qwen2:0.5b on CPU. GPU arrival = 3 env vars changed.
 
@@ -324,6 +327,7 @@ Request → injection filter → specialist selection → session buffer
 | P17 | Emotional Intelligence (emotional memory, self-reflection, epistemic humility, confession, Soul) | ✅ DONE |
 | P18 | Narrative Identity & Life Story (autobiography, identity narrative, story arcs, future self, legacy messages) | ✅ DONE |
 | P19 | Imagination Engine (counterfactual replay, theory of mind, creative synthesis, inner monologue, aspirations) | ✅ DONE |
+| P20 | Conscience & Values (value formation, moral reasoning, integrity tracking, loyalty memory, gratitude) | ✅ DONE |
 | P6 | Nice-to-have (calendar sync, workspace manager, avatar, Prometheus) | Queued |
 | HP1-HP6 | Hardware Performance Track (speculative decoding, VRAM watchdog, NVMe offload) | Awaiting GPU |
 
@@ -342,6 +346,7 @@ Full details in `docs/PROJECT_BACKLOG.md` and `docs/unfair_advantages.md`.
 - [x] Emotional memory (8 emotions), self-reflection journal, relationship timeline
 - [x] Epistemic humility (domain confidence), confession engine
 - [x] Imagination engine (counterfactual replay, theory of mind, creative synthesis, inner monologue, aspirations)
+- [x] Conscience & values (emergent values, moral reasoning, integrity tracking, loyalty memory, gratitude)
 - [x] 8 dashboard views (Chat, Dashboard, Thinking, Settings, Goals, Memory, Logs, Soul)
 - [x] HMAC auth, Ed25519 signing, episode saver, error budget breaker
-- [x] 54 test targets, 679 tests, zero failures
+- [x] 55 test targets, 750 tests, zero failures

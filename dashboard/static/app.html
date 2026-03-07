@@ -584,6 +584,53 @@
             </div>
           </div>
 
+          <!-- P20: Conscience & Values Engine -->
+          <div style="margin-top:var(--sp-4);">
+            <h3 style="color:var(--text2);font-size:0.85rem;font-weight:600;margin-bottom:var(--sp-2);">⚖️ Conscience & Values</h3>
+
+            <!-- Integrity Score + Formed Values -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-3);">
+              <div class="card">
+                <div class="card-header">⚖️ Integrity</div>
+                <div id="integrityCard" style="padding:var(--sp-2);">
+                  <div class="empty">No conscience data yet</div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">🧭 Formed Values</div>
+                <div id="formedValues" style="max-height:200px;overflow-y:auto;padding:var(--sp-2);">
+                  <div class="empty">No values formed yet</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loyalty Ledger + Gratitude Journal -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-3);">
+              <div class="card">
+                <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+                  <span>🤝 Loyalty Ledger</span>
+                  <span id="loyaltyCount" class="badge" style="background:var(--accent);color:#000;font-size:0.7rem;padding:2px 6px;border-radius:8px;">0</span>
+                </div>
+                <div id="loyaltyLedger" style="max-height:200px;overflow-y:auto;padding:var(--sp-2);">
+                  <div class="empty">No loyalty entries yet</div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+                  <span>🙏 Gratitude Journal</span>
+                  <button class="refresh-btn" onclick="showGratitudeForm()" style="font-size:0.75rem;">+ Thank</button>
+                </div>
+                <div id="gratitudeForm" style="display:none;padding:var(--sp-2);border-bottom:1px solid var(--border);">
+                  <textarea id="gratitudeReason" placeholder="What are you grateful for..." rows="2" style="width:100%;background:var(--bg-secondary);color:var(--text);border:1px solid var(--border);border-radius:var(--rad);padding:var(--sp-1);font-size:0.8rem;resize:vertical;"></textarea>
+                  <button class="refresh-btn" onclick="sendGratitude()" style="margin-top:var(--sp-1);background:var(--accent);color:#000;font-size:0.75rem;">🙏 Record Gratitude</button>
+                </div>
+                <div id="gratitudeJournal" style="max-height:200px;overflow-y:auto;padding:var(--sp-2);">
+                  <div class="empty">No gratitude recorded yet</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           </div>
         </section>
 
@@ -2235,6 +2282,7 @@ async function refreshNarrative() {
     renderAutobiography(auto.entries || []);
     renderLegacyMessages(legacy.messages || [], legacy.pending || 0);
     refreshImagination();
+    refreshConscience();
   } catch(e) { console.error('Narrative refresh error:', e); }
 }
 
@@ -2561,6 +2609,113 @@ async function sendAspiration() {
     document.getElementById('aspireForm').style.display = 'none';
     refreshImagination();
   } catch(e) { console.warn('aspire error', e); }
+}
+
+// ── P20: Conscience & Values Engine JS ──────────────────────────────
+
+const TONE_EMOJI = {deeply_moved:'💔', grateful:'🙏', honored:'✨', appreciative:'👍'};
+const TYPE_EMOJI = {sacrifice:'🔥', promise:'🤝', commitment:'📌'};
+
+async function refreshConscience() {
+  try {
+    const [summaryR, valuesR, loyaltyR, gratitudeR] = await Promise.all([
+      fetch('/api/conscience/summary'), fetch('/api/values'),
+      fetch('/api/loyalty'), fetch('/api/gratitude'),
+    ]);
+    const [summary, values, loyalty, gratitude] = await Promise.all([
+      summaryR.json(), valuesR.json(), loyaltyR.json(), gratitudeR.json(),
+    ]);
+    renderIntegrity(summary);
+    renderFormedValues(values.values || []);
+    renderLoyalty(loyalty);
+    renderGratitude(gratitude);
+  } catch(e) { console.warn('conscience refresh error', e); }
+}
+
+function renderIntegrity(data) {
+  const el = document.getElementById('integrityCard');
+  if (!data || !data.conscience) { el.innerHTML = '<div class="empty">No conscience data yet</div>'; return; }
+  const score = data.integrity_score || 1.0;
+  const color = score >= 0.8 ? 'var(--success)' : score >= 0.5 ? 'var(--warning, orange)' : 'var(--danger, red)';
+  const sacs = data.sacrifices_remembered || 0;
+  el.innerHTML = `
+    <div style="text-align:center;padding:var(--sp-2);">
+      <div style="font-size:2rem;font-weight:700;color:${color};">${(score*100).toFixed(0)}%</div>
+      <div style="font-size:0.75rem;color:var(--text3);">Integrity Score</div>
+      <div style="margin-top:var(--sp-2);display:flex;justify-content:space-around;font-size:0.75rem;color:var(--text3);">
+        <span>⚖️ ${data.conscience.conscience_checks || 0} checks</span>
+        <span>🧭 ${data.conscience.formed_values || 0} values</span>
+      </div>
+      <div style="margin-top:var(--sp-1);font-size:0.75rem;color:var(--text3);">
+        🔥 ${sacs} sacrifices remembered
+      </div>
+    </div>`;
+}
+
+function renderFormedValues(values) {
+  const el = document.getElementById('formedValues');
+  if (!values.length) { el.innerHTML = '<div class="empty">No values formed yet</div>'; return; }
+  el.innerHTML = values.slice(0, 8).map(v => {
+    const pct = (v.strength * 100).toFixed(0);
+    const barColor = v.strength >= 0.7 ? 'var(--success)' : v.strength >= 0.4 ? 'var(--accent)' : 'var(--text3)';
+    return `<div style="margin-bottom:var(--sp-1);font-size:0.8rem;">
+      <div style="display:flex;justify-content:space-between;"><span>${v.value}</span><span style="color:var(--text3);">${pct}%</span></div>
+      <div style="background:var(--bg-secondary);border-radius:4px;height:4px;margin-top:2px;">
+        <div style="background:${barColor};height:100%;width:${pct}%;border-radius:4px;"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderLoyalty(data) {
+  const el = document.getElementById('loyaltyLedger');
+  const countEl = document.getElementById('loyaltyCount');
+  if (!data || !data.ledger || !data.ledger.length) {
+    el.innerHTML = '<div class="empty">No loyalty entries yet</div>';
+    countEl.textContent = '0'; return;
+  }
+  countEl.textContent = data.count;
+  el.innerHTML = data.ledger.slice(0, 10).map(e => {
+    const emoji = TYPE_EMOJI[e.type] || '📌';
+    return `<div style="padding:var(--sp-1);border-bottom:1px solid var(--border);font-size:0.8rem;">
+      <span>${emoji}</span> <strong>${e.person}</strong>: ${e.act.slice(0, 100)}
+      <div style="font-size:0.7rem;color:var(--text3);">weight: ${e.weight} · ${e.type}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderGratitude(data) {
+  const el = document.getElementById('gratitudeJournal');
+  if (!data || !data.entries || !data.entries.length) {
+    el.innerHTML = '<div class="empty">No gratitude recorded yet</div>'; return;
+  }
+  el.innerHTML = data.entries.slice(0, 10).map(e => {
+    const emoji = TONE_EMOJI[e.tone] || '👍';
+    return `<div style="padding:var(--sp-1);border-bottom:1px solid var(--border);font-size:0.8rem;">
+      <span>${emoji}</span> <em>${e.message}</em>
+      <div style="font-size:0.7rem;color:var(--text3);">to: ${e.recipient}</div>
+    </div>`;
+  }).join('');
+}
+
+function showGratitudeForm() {
+  const form = document.getElementById('gratitudeForm');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+async function sendGratitude() {
+  const reason = document.getElementById('gratitudeReason').value.trim();
+  if (!reason) return;
+  try {
+    await fetch('/api/gratitude/record', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ reason, recipient: 'operator' }),
+    });
+    document.getElementById('gratitudeReason').value = '';
+    document.getElementById('gratitudeForm').style.display = 'none';
+    refreshConscience();
+  } catch(e) { console.warn('gratitude error', e); }
 }
 
 

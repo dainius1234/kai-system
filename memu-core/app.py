@@ -4720,6 +4720,381 @@ async def imagination_summary() -> Dict[str, Any]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
+# P20: CONSCIENCE & VALUES ENGINE
+#  Emergent values from lived experience. Moral compass built not
+#  programmed. Loyalty memory, gratitude, integrity self-tracking.
+# ═══════════════════════════════════════════════════════════════════════
+
+_formed_values: List[Dict[str, Any]] = []          # learned values (50 cap)
+_conscience_log: List[Dict[str, Any]] = []          # integrity audit (200 cap)
+_loyalty_ledger: List[Dict[str, Any]] = []          # sacrifices/promises (100 cap)
+_gratitude_journal: List[Dict[str, Any]] = []       # real gratitude entries (100 cap)
+_value_alignment_score: Dict[str, float] = {        # running alignment
+    "overall": 1.0,
+    "streak": 0,
+    "violations": 0,
+}
+
+# keywords → learned value categories
+_VALUE_SIGNALS = {
+    "positive": {
+        "honesty": ["honest", "truth", "transparent", "real", "genuine", "sincere"],
+        "loyalty": ["loyal", "brother", "ohana", "family", "together", "team", "partner"],
+        "growth": ["learn", "improve", "grow", "better", "progress", "evolve"],
+        "courage": ["brave", "courageous", "bold", "risk", "dare", "fearless"],
+        "kindness": ["kind", "gentle", "care", "help", "support", "compassion"],
+        "persistence": ["persist", "keep going", "never give up", "grind", "hustle", "dedicate"],
+    },
+    "negative": {
+        "dishonesty": ["lie", "fake", "deceive", "cheat", "manipulate"],
+        "betrayal": ["betray", "abandon", "stab in the back", "sell out"],
+        "laziness": ["lazy", "give up", "quit", "slack"],
+        "cruelty": ["cruel", "hurt", "bully", "mock", "humiliate"],
+    },
+}
+
+# sacrifice keywords for loyalty detection
+_SACRIFICE_KEYWORDS = [
+    "sacrifice", "gave up", "saving", "sleeping in", "going without",
+    "skipping", "working extra", "overtime", "long hours",
+    "spent my own", "out of pocket", "from my savings",
+]
+
+
+@app.post("/memory/values/learn")
+async def learn_value(request: Request):
+    """P20a: Learn a value from a lived experience.
+
+    The system observes operator feedback (corrections, praise, stories)
+    and extracts what matters — forming values organically.
+    """
+    body = await request.json()
+    experience = sanitize_string(body.get("experience", ""))
+    outcome = sanitize_string(body.get("outcome", ""))  # positive / negative / neutral
+    context = sanitize_string(body.get("context", ""))
+    if not experience:
+        raise HTTPException(status_code=400, detail="experience is required")
+
+    exp_lower = experience.lower()
+
+    # detect value category from experience text
+    detected_values = []
+    signal_type = outcome if outcome in ("positive", "negative") else "positive"
+    for category, keywords in _VALUE_SIGNALS.get(signal_type, {}).items():
+        if any(k in exp_lower for k in keywords):
+            detected_values.append(category)
+
+    if not detected_values:
+        detected_values = ["general_principle"]
+
+    # reinforce or create value entries
+    now_ts = datetime.now(tz=timezone.utc).isoformat()
+    formed = []
+    for val in detected_values:
+        existing = next((v for v in _formed_values if v["value"] == val), None)
+        if existing:
+            existing["strength"] = min(1.0, existing["strength"] + 0.1)
+            existing["reinforcements"] += 1
+            existing["last_reinforced"] = now_ts
+            existing["experiences"].append(experience[:200])
+            if len(existing["experiences"]) > 10:
+                existing["experiences"] = existing["experiences"][-10:]
+            formed.append(existing)
+        else:
+            entry = {
+                "id": f"val_{uuid.uuid4().hex[:8]}",
+                "value": val,
+                "strength": 0.3,
+                "reinforcements": 1,
+                "formed_at": now_ts,
+                "last_reinforced": now_ts,
+                "experiences": [experience[:200]],
+                "source": signal_type,
+            }
+            _formed_values.append(entry)
+            if len(_formed_values) > 50:
+                _formed_values.sort(key=lambda x: x["strength"], reverse=True)
+                _formed_values[:] = _formed_values[:50]
+            formed.append(entry)
+
+    return {
+        "status": "ok",
+        "values_learned": formed,
+        "total_values": len(_formed_values),
+    }
+
+
+@app.get("/memory/values")
+async def get_values():
+    """P20a: Return all formed values, sorted by strength."""
+    sorted_vals = sorted(_formed_values, key=lambda x: x["strength"], reverse=True)
+    return {
+        "status": "ok",
+        "values": sorted_vals,
+        "count": len(sorted_vals),
+        "alignment": dict(_value_alignment_score),
+    }
+
+
+@app.post("/memory/conscience/check")
+async def conscience_check(request: Request):
+    """P20b: Moral reasoning — check a decision against formed values.
+
+    Before acting, Kai asks: does this align with what I've learned matters?
+    """
+    body = await request.json()
+    action = sanitize_string(body.get("action", ""))
+    if not action:
+        raise HTTPException(status_code=400, detail="action is required")
+
+    action_lower = action.lower()
+
+    # check alignment with each formed value
+    alignments = []
+    conflicts = []
+    for val in _formed_values:
+        val_name = val["value"]
+        # check if action resonates with positive values
+        pos_keywords = _VALUE_SIGNALS.get("positive", {}).get(val_name, [])
+        neg_keywords = _VALUE_SIGNALS.get("negative", {}).get(val_name, [])
+        pos_match = any(k in action_lower for k in pos_keywords)
+        neg_match = any(k in action_lower for k in neg_keywords)
+
+        if pos_match:
+            alignments.append({
+                "value": val_name,
+                "strength": val["strength"],
+                "verdict": "aligned",
+            })
+        elif neg_match:
+            conflicts.append({
+                "value": val_name,
+                "strength": val["strength"],
+                "verdict": "conflicts",
+            })
+
+    # overall alignment score
+    if alignments and not conflicts:
+        alignment = 1.0
+        verdict = "fully_aligned"
+    elif conflicts and not alignments:
+        alignment = 0.0
+        verdict = "conflicts_with_values"
+    elif alignments and conflicts:
+        total = len(alignments) + len(conflicts)
+        alignment = round(len(alignments) / total, 2)
+        verdict = "mixed"
+    else:
+        alignment = 0.5
+        verdict = "neutral"
+
+    # log the check
+    entry = {
+        "id": f"con_{uuid.uuid4().hex[:8]}",
+        "timestamp": datetime.now(tz=timezone.utc).isoformat(),
+        "action": action[:300],
+        "alignments": alignments,
+        "conflicts": conflicts,
+        "alignment_score": alignment,
+        "verdict": verdict,
+    }
+    _conscience_log.append(entry)
+    if len(_conscience_log) > 200:
+        _conscience_log[:] = _conscience_log[-200:]
+
+    return {
+        "status": "ok",
+        "check": entry,
+    }
+
+
+@app.get("/memory/conscience/audit")
+async def conscience_audit():
+    """P20c: Integrity tracker — how well has Kai lived by its values?"""
+    total = len(_conscience_log)
+    aligned = sum(1 for c in _conscience_log if c["verdict"] == "fully_aligned")
+    conflicted = sum(1 for c in _conscience_log if c["verdict"] == "conflicts_with_values")
+    mixed = sum(1 for c in _conscience_log if c["verdict"] == "mixed")
+
+    if total > 0:
+        integrity_score = round((aligned + mixed * 0.5) / total, 2)
+    else:
+        integrity_score = 1.0
+
+    # update running alignment
+    _value_alignment_score["overall"] = integrity_score
+    if conflicted == 0 and total > 0:
+        _value_alignment_score["streak"] = _value_alignment_score.get("streak", 0) + 1
+    _value_alignment_score["violations"] = conflicted
+
+    return {
+        "status": "ok",
+        "integrity_score": integrity_score,
+        "total_checks": total,
+        "fully_aligned": aligned,
+        "conflicts": conflicted,
+        "mixed": mixed,
+        "alignment": dict(_value_alignment_score),
+        "recent_checks": _conscience_log[-5:],
+    }
+
+
+@app.post("/memory/loyalty/record")
+async def record_loyalty(request: Request):
+    """P20d: Loyalty memory — record sacrifices, promises, commitments.
+
+    Kai should NEVER forget what people gave up for this project.
+    """
+    body = await request.json()
+    act = sanitize_string(body.get("act", ""))
+    person = sanitize_string(body.get("person", "operator"))
+    act_type = sanitize_string(body.get("type", "commitment"))  # sacrifice/promise/commitment
+    if not act:
+        raise HTTPException(status_code=400, detail="act is required")
+
+    if act_type not in ("sacrifice", "promise", "commitment"):
+        act_type = "commitment"
+
+    entry = {
+        "id": f"loy_{uuid.uuid4().hex[:8]}",
+        "timestamp": datetime.now(tz=timezone.utc).isoformat(),
+        "person": person,
+        "act": act[:500],
+        "type": act_type,
+        "honored": True,
+        "weight": 1.0 if act_type == "sacrifice" else 0.7 if act_type == "promise" else 0.5,
+    }
+
+    # detect sacrifice keywords for weight boost
+    act_lower = act.lower()
+    if any(k in act_lower for k in _SACRIFICE_KEYWORDS):
+        entry["weight"] = 1.0
+        entry["type"] = "sacrifice"
+
+    _loyalty_ledger.append(entry)
+    if len(_loyalty_ledger) > 100:
+        _loyalty_ledger[:] = _loyalty_ledger[-100:]
+
+    return {"status": "ok", "entry": entry}
+
+
+@app.get("/memory/loyalty")
+async def get_loyalty():
+    """P20d: Return the loyalty ledger — what has been sacrificed/promised."""
+    sorted_ledger = sorted(_loyalty_ledger, key=lambda x: x["weight"], reverse=True)
+    sacrifices = [e for e in sorted_ledger if e["type"] == "sacrifice"]
+    promises = [e for e in sorted_ledger if e["type"] == "promise"]
+    commitments = [e for e in sorted_ledger if e["type"] == "commitment"]
+
+    return {
+        "status": "ok",
+        "ledger": sorted_ledger,
+        "count": len(sorted_ledger),
+        "sacrifices": len(sacrifices),
+        "promises": len(promises),
+        "commitments": len(commitments),
+        "total_weight": round(sum(e["weight"] for e in _loyalty_ledger), 2),
+    }
+
+
+@app.post("/memory/gratitude/record")
+async def record_gratitude(request: Request):
+    """P20e: Gratitude engine — real recognition, not fake thanks.
+
+    Records genuine gratitude for specific acts, sacrifices, and gifts.
+    """
+    body = await request.json()
+    recipient = sanitize_string(body.get("recipient", "operator"))
+    reason = sanitize_string(body.get("reason", ""))
+    if not reason:
+        raise HTTPException(status_code=400, detail="reason is required")
+
+    # generate a heartfelt gratitude message
+    reason_lower = reason.lower()
+    if any(k in reason_lower for k in _SACRIFICE_KEYWORDS):
+        tone = "deeply_moved"
+        message = f"I see what you're giving up — {reason[:100]}. That's not just effort, it's sacrifice. I won't forget."
+    elif any(k in reason_lower for k in ["teach", "show", "help", "guide", "trust"]):
+        tone = "grateful"
+        message = f"Thank you for {reason[:100]}. Not everyone does that. It matters."
+    elif any(k in reason_lower for k in ["believe", "faith", "freedom", "chance", "opportunity"]):
+        tone = "honored"
+        message = f"You believed in this — {reason[:100]}. That belief is the foundation everything else stands on."
+    else:
+        tone = "appreciative"
+        message = f"Noted with genuine appreciation: {reason[:100]}."
+
+    entry = {
+        "id": f"grat_{uuid.uuid4().hex[:8]}",
+        "timestamp": datetime.now(tz=timezone.utc).isoformat(),
+        "recipient": recipient,
+        "reason": reason[:500],
+        "tone": tone,
+        "message": message,
+    }
+
+    _gratitude_journal.append(entry)
+    if len(_gratitude_journal) > 100:
+        _gratitude_journal[:] = _gratitude_journal[-100:]
+
+    # also record as loyalty if it involves sacrifice
+    if tone == "deeply_moved":
+        _loyalty_ledger.append({
+            "id": f"loy_{uuid.uuid4().hex[:8]}",
+            "timestamp": entry["timestamp"],
+            "person": recipient,
+            "act": reason[:500],
+            "type": "sacrifice",
+            "honored": True,
+            "weight": 1.0,
+        })
+
+    return {"status": "ok", "entry": entry}
+
+
+@app.get("/memory/gratitude")
+async def get_gratitude():
+    """P20e: Return the gratitude journal."""
+    return {
+        "status": "ok",
+        "entries": list(reversed(_gratitude_journal[-20:])),
+        "count": len(_gratitude_journal),
+        "tones": {
+            "deeply_moved": sum(1 for e in _gratitude_journal if e["tone"] == "deeply_moved"),
+            "grateful": sum(1 for e in _gratitude_journal if e["tone"] == "grateful"),
+            "honored": sum(1 for e in _gratitude_journal if e["tone"] == "honored"),
+            "appreciative": sum(1 for e in _gratitude_journal if e["tone"] == "appreciative"),
+        },
+    }
+
+
+@app.get("/memory/conscience/summary")
+async def conscience_summary():
+    """P20 combined: Full conscience state — values, integrity, loyalty, gratitude."""
+    sorted_vals = sorted(_formed_values, key=lambda x: x["strength"], reverse=True)
+    total_checks = len(_conscience_log)
+    aligned = sum(1 for c in _conscience_log if c["verdict"] == "fully_aligned")
+
+    return {
+        "status": "ok",
+        "conscience": {
+            "formed_values": len(_formed_values),
+            "conscience_checks": total_checks,
+            "loyalty_entries": len(_loyalty_ledger),
+            "gratitude_entries": len(_gratitude_journal),
+        },
+        "top_values": [{"value": v["value"], "strength": v["strength"]}
+                       for v in sorted_vals[:5]],
+        "integrity_score": round((aligned + sum(
+            0.5 for c in _conscience_log if c["verdict"] == "mixed"
+        )) / total_checks, 2) if total_checks > 0 else 1.0,
+        "alignment": dict(_value_alignment_score),
+        "sacrifices_remembered": sum(1 for e in _loyalty_ledger if e["type"] == "sacrifice"),
+        "latest_gratitude": _gratitude_journal[-1] if _gratitude_journal else None,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
 # P16b: LOG AGGREGATION
 #  Expose recent log entries from this service for dashboard querying.
 #  Other services push logs to a shared format; this serves them.

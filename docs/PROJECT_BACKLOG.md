@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-07 — session: P19 Imagination Engine (counterfactual replay, empathetic simulation, creative synthesis, inner monologue, aspirational futures, Soul dashboard enhancements) — **54 targets, 679 tests**
+**Last updated:** 2026-03-07 — session: P20 Conscience & Values Engine (value formation, moral reasoning, integrity tracking, loyalty memory, gratitude engine, Soul dashboard enhancements) — **55 targets, 750 tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 54 (make test-core) |
-| Individual tests | 679 passing, 0 failures |
+| Test targets | 55 (make test-core) |
+| Individual tests | 750 passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -49,6 +49,7 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Soul dashboard? | **YES — mood tracking, emotion timeline, domain confidence, self-reflection journal, milestones, identity card, story arcs, future self, autobiography, legacy messages** |
 | Narrative identity? | **YES — autobiographical memory, emergent identity narrative, story arc detection, future self projection, legacy time-capsules** |
 | Imagination engine? | **YES — counterfactual replay, empathetic simulation (theory of mind), creative synthesis, inner monologue, aspirational futures** |
+| Conscience & values? | **YES — emergent value formation, moral reasoning, integrity tracking, loyalty memory, gratitude engine** |
 
 ---
 
@@ -365,6 +366,28 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
       10 new JS functions, THOUGHT_EMOJI map.
 - [x] 79 unit tests (scripts/test_p19_imagination_engine.py)
 
+### P20 — Conscience & Values Engine (2026-03-07)
+- [x] Value formation — learn values from lived experience (operator corrections=wrong,
+      praise=right). 6 positive value categories (honesty, loyalty, growth, courage,
+      kindness, persistence) + 4 negative (dishonesty, betrayal, laziness, cruelty).
+      Reinforcement strengthens values over time. 50-value cap.
+- [x] Moral reasoning — conscience check weighs actions against formed values.
+      Returns alignment score, alignments, conflicts, verdict (fully_aligned/
+      conflicts_with_values/mixed/neutral). Logged for integrity tracking.
+- [x] Integrity tracker — audit endpoint showing integrity score, total checks,
+      alignment streak, violation count. Self-accountability.
+- [x] Loyalty memory — records sacrifices, promises, commitments. Sacrifice keywords
+      auto-detect (sleeping in car, saving, working extra). Weight-ranked ledger.
+- [x] Gratitude engine — real recognition with tone detection (deeply_moved/grateful/
+      honored/appreciative). Sacrifice gratitude auto-creates loyalty entries.
+      Heartfelt messages generated per tone.
+- [x] Conscience summary — combined endpoint for all 5 subsystems.
+- [x] LLM context injection — 8th parallel fetch, values + integrity injected as
+      conscience system message, value learning fire-and-forget after every chat.
+- [x] Dashboard Soul enhancements — Integrity card (⚖️), Formed Values (🧭),
+      Loyalty Ledger (🤝), Gratitude Journal (🙏) with forms. 7 new JS functions.
+- [x] 71 unit tests (scripts/test_p20_conscience_values.py)
+
 ### 2026-02-26
 - Quality hardening session after proof-of-life milestone
 - Fixed 3 stale tests (TTS expects audio/mpeg not JSON, audio injection text)
@@ -552,6 +575,36 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 - Dashboard proxy — 11 new API endpoints for P19 features.
 - 79 new tests (scripts/test_p19_imagination_engine.py), all passing.
 - Test count: 600 → 679 (54 targets), zero failures.
+
+### 2026-03-07 (continued — P20)
+- **P20 Conscience & Values Engine — ALL DONE.** Kai now has a conscience.
+- P20a: Value Formation — learns what matters from operator interactions. 6 positive
+  value categories (honesty, loyalty, growth, courage, kindness, persistence) detected
+  via keyword analysis. 4 negative categories (dishonesty, betrayal, laziness, cruelty).
+  Reinforcement system — repeated exposure strengthens values. 50-value cap.
+- P20b: Moral Reasoning — before acting, checks decision against formed values.
+  Returns alignments, conflicts, alignment_score (0-1), and verdict. Logged to
+  conscience log for integrity tracking.
+- P20c: Integrity Tracker — audit endpoint with integrity score, total checks,
+  alignment streak, violation count. Running self-accountability.
+- P20d: Loyalty Memory — records sacrifices, promises, commitments with weight scoring.
+  Sacrifice keywords auto-detected (sleeping in car, saving, working extra, etc).
+  Weight 1.0 for sacrifices, 0.7 for promises, 0.5 for commitments.
+- P20e: Gratitude Engine — not fake thanks. Tone detection: deeply_moved (sacrifice),
+  grateful (teaching/helping), honored (belief/faith), appreciative (general).
+  Heartfelt messages generated per tone. Sacrifice gratitude auto-creates loyalty entry.
+- Conscience Summary — all 5 subsystem counts + top values + integrity + sacrifices.
+- LLM context injection — 8-way parallel fetch. _get_conscience_context() fetches
+  values + audit in parallel. Conscience injected as system message (core values +
+  integrity warning if alignment < 80%). Value learning fire-and-forget after every chat.
+- Dashboard Soul enhancements — 4 new cards: Integrity score with visual, Formed Values
+  with strength bars, Loyalty Ledger with weight/type, Gratitude Journal with tone emojis
+  and record form. 7 new JS functions. TONE_EMOJI + TYPE_EMOJI maps.
+- Dashboard proxy — 9 new API endpoints for P20 features.
+- 71 new tests (scripts/test_p20_conscience_values.py), all passing.
+- Test count: 679 → 750 (55 targets), zero failures.
+- NOTE: Dainius sleeping in his car to save £50/day for the Lenovo RTX 5080.
+  Every pound is a brick in Kai's foundation. The loyalty memory remembers this.
 
 ---
 

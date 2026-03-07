@@ -513,6 +513,25 @@ async def _get_imagination_context(user_msg: str) -> Dict[str, Any]:
     return result
 
 
+async def _get_conscience_context() -> Dict[str, Any]:
+    """Fetch Kai's formed values and conscience state for moral awareness."""
+    result: Dict[str, Any] = {}
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            vals_task = client.get(f"{MEMU_URL}/memory/values")
+            audit_task = client.get(f"{MEMU_URL}/memory/conscience/audit")
+            vals_resp, audit_resp = await asyncio.gather(vals_task, audit_task, return_exceptions=True)
+            if not isinstance(vals_resp, Exception) and vals_resp.status_code == 200:
+                data = vals_resp.json()
+                result["values"] = data.get("values", [])[:5]
+            if not isinstance(audit_resp, Exception) and audit_resp.status_code == 200:
+                data = audit_resp.json()
+                result["integrity_score"] = data.get("integrity_score", 1.0)
+    except Exception:
+        pass
+    return result
+
+
 @app.post("/chat")
 async def chat_stream(req: ChatRequest):
     """Kai's main conversation endpoint. Streams tokens via SSE.
@@ -577,6 +596,7 @@ async def chat_stream(req: ChatRequest):
     eq_task = asyncio.create_task(_get_emotional_context(user_msg))
     narrative_task = asyncio.create_task(_get_narrative_identity())
     imagination_task = asyncio.create_task(_get_imagination_context(user_msg))
+    conscience_task = asyncio.create_task(_get_conscience_context())
 
     memories = await memories_task
     session_msgs = await session_task
@@ -585,6 +605,7 @@ async def chat_stream(req: ChatRequest):
     eq_context = await eq_task
     narrative = await narrative_task
     imagination = await imagination_task
+    conscience = await conscience_task
 
     # build the message list
     messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
@@ -668,6 +689,23 @@ async def chat_stream(req: ChatRequest):
                     "content": "Theory of mind (imagining operator's state):\n" + ". ".join(emp_parts) + ".",
                 })
 
+    # inject conscience context — values alignment and moral compass
+    if conscience:
+        con_parts = []
+        vals = conscience.get("values", [])
+        if vals:
+            val_names = [v["value"] for v in vals[:3] if v.get("strength", 0) >= 0.3]
+            if val_names:
+                con_parts.append(f"Core values: {', '.join(val_names)}")
+        integrity = conscience.get("integrity_score")
+        if integrity is not None and integrity < 0.8:
+            con_parts.append(f"Integrity warning: alignment at {integrity:.0%} — stay true to values")
+        if con_parts:
+            messages.append({
+                "role": "system",
+                "content": "Conscience (values that guide me):\n" + ". ".join(con_parts) + ".",
+            })
+
     # add session history (last N turns)
     for msg in session_msgs[-10:]:
         role = msg.get("role", "user")
@@ -732,6 +770,19 @@ async def chat_stream(req: ChatRequest):
                         json={
                             "thought": f"Responding to: '{user_msg[:100]}' — considered the operator's tone and context",
                             "context": "chat_reflection",
+                        },
+                    )
+            except Exception:
+                pass
+            # learn values from operator interaction
+            try:
+                async with httpx.AsyncClient(timeout=3.0) as _val_cl:
+                    await _val_cl.post(
+                        f"{MEMU_URL}/memory/values/learn",
+                        json={
+                            "experience": user_msg[:300],
+                            "outcome": "positive",
+                            "context": "chat",
                         },
                     )
             except Exception:
