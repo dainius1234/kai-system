@@ -8,7 +8,6 @@ Self-Audit & Feedback Script for Kai System
 - Logs lessons/incidents to memu-core (if available)
 - Optionally opens GitHub issues (future)
 """
-import os
 import sys
 import json
 import subprocess

@@ -41,7 +41,6 @@ from langgraph.kai_config import (
     diff_checkpoints,
     delete_checkpoint,
     _checkpoint_path,
-    _enforce_cap,
 )
 
 

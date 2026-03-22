@@ -30,7 +30,6 @@ from kai_config import (  # noqa: E402
     load_evolver_reports,
     _extract_topic,
     _assign_priority,
-    EVOLVER_MIN_PATTERN_COUNT,
     DreamInsight,
 )
 

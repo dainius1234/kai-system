@@ -3,7 +3,6 @@ def safe_experimentation():
     Prototype: Try a minor config tweak or test addition in a sandbox, log outcome.
     """
     from pathlib import Path
-    import shutil
     SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
     sandbox = SCRIPTS / "sandbox_experiment.py"
     # Example: create a dummy script and run it
@@ -32,8 +31,6 @@ Kai Supervisor Agent (Prototype)
 import time
 import requests
 import subprocess
-import json
-from pathlib import Path
 
 MEMU_URL = "http://localhost:8001/memory/query"
 LOG_ACTION_URL = "http://localhost:8001/memory/memorize"

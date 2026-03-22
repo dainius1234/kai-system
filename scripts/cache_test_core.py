@@ -47,7 +47,7 @@ def run_target(target):
         }
 
 def main():
-    results = load_results()
+    load_results()
     new_results = []
     for target in TEST_TARGETS:
         res = run_target(target)

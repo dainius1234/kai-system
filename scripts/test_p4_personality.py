@@ -10,14 +10,11 @@ Tests for:
 """
 
 import importlib
-import json
 import os
 import sys
 import time
-import types
 import unittest
-from datetime import datetime, timedelta, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock
 
 # ---------------------------------------------------------------------------
 # bootstrap: stub heavy deps so memu-core/app.py can import in test

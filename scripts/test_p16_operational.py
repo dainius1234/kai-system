@@ -11,12 +11,10 @@ from __future__ import annotations
 
 import importlib
 import importlib.util
-import json
 import os
 import sys
 import time
-import types
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 

@@ -5,7 +5,7 @@ import os
 import sys
 import unittest
 from datetime import datetime, timedelta, timezone
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, patch
 
 # ── JSON Logging Tests ────────────────────────────────────────────────
 
@@ -96,7 +96,7 @@ class TestVectorCleanup(unittest.TestCase):
 
     def test_cleanup_preserves_pinned(self):
         store = self._make_store()
-        result = store.delete_old(max_age_days=1)
+        store.delete_old(max_age_days=1)
         remaining_ids = {r.id for r in store._records}
         self.assertIn("pinned-old", remaining_ids)
 

@@ -3,10 +3,6 @@
 Covers all 5 subsystems + LangGraph integration + dashboard proxies + supervisor + UI.
 """
 import ast
-import inspect
-import os
-import re
-import textwrap
 import unittest
 from pathlib import Path
 

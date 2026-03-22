@@ -43,7 +43,7 @@ def test_langgraph():
     except ImportError:
         pytest.skip("langgraph.graph not installed")
         return
-    from langgraph.graph import StateGraph
+    from langgraph.graph import StateGraph  # noqa: F811
     from typing_extensions import TypedDict
 
     class St(TypedDict):
@@ -65,7 +65,7 @@ def test_autogen():
     except ImportError:
         pytest.skip("autogen not installed")
         return
-    from autogen import AssistantAgent, UserProxyAgent
+    from autogen import AssistantAgent, UserProxyAgent  # noqa: F811
 
     # llm_config=False means no LLM calls — pure structural test
     assistant = AssistantAgent("kai-assistant", llm_config=False)
@@ -85,7 +85,7 @@ def test_crewai():
     except ImportError:
         pytest.skip("crewai not installed")
         return
-    from crewai import Agent, Task, Crew
+    from crewai import Agent, Task, Crew  # noqa: F811
 
     agent = Agent(role="planner", goal="plan tasks", backstory="test")
     task = Task(description="Plan a workflow.", expected_output="plan", agent=agent)
@@ -102,7 +102,7 @@ def test_openagents():
     except ImportError:
         pytest.skip("openagents not installed")
         return
-    from openagents.agents.simple_agent import SimpleAutoAgent
+    from openagents.agents.simple_agent import SimpleAutoAgent  # noqa: F811
     assert SimpleAutoAgent is not None, "SimpleAutoAgent class not found"
 
 

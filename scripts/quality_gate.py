@@ -3,7 +3,6 @@
 Script Quality Gate: Scan for stubs, TODOs, and missing docstrings in scripts/.
 Fails with exit code 1 if any issues are found.
 """
-import os
 import sys
 import ast
 from pathlib import Path

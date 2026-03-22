@@ -1,5 +1,7 @@
 """Tests for P11: Operator Tempo Modeling — pace detection + style hints."""
-import sys, os, time, unittest
+import sys
+import os
+import unittest
 from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta, timezone
 

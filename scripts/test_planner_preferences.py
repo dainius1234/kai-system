@@ -6,7 +6,6 @@ and that the planner's gather_context includes the preferences field.
 from __future__ import annotations
 
 import asyncio
-import importlib.util
 import sys
 import unittest
 from pathlib import Path
@@ -31,11 +30,9 @@ if "redis" not in sys.modules:
 
 from planner import (
     PlanContext,
-    PlanDecision,
     build_enriched_plan,
     gather_context,
     _fetch_preferences,
-    _keyword_similarity,
 )
 
 

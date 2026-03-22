@@ -10,7 +10,6 @@ Usage:
 """
 from __future__ import annotations
 
-import asyncio
 import hashlib
 import time
 from dataclasses import dataclass, field

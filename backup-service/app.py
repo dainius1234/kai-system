@@ -6,7 +6,7 @@ import os
 import shutil
 import subprocess
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import httpx
 from fastapi import FastAPI, HTTPException

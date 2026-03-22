@@ -259,7 +259,7 @@ async def self_assessment() -> Dict[str, Any]:
     Each metric gets a trend label: improving | declining | stable | new
     """
     stats = await _fetch_memu_stats(ASSESSMENT_WINDOW_DAYS)
-    diagnostics = await _fetch_recent_episodes(ASSESSMENT_WINDOW_DAYS)
+    await _fetch_recent_episodes(ASSESSMENT_WINDOW_DAYS)
 
     # current snapshot
     total_memories = stats.get("total_memories", stats.get("total", 0))

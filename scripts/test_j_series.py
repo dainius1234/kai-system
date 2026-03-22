@@ -10,14 +10,12 @@ J7: Skills Auto-Install Hub
 """
 from __future__ import annotations
 
-import importlib
 import os
-import re
 import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import patch
 
 # Ensure repo root is on path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))

@@ -388,7 +388,6 @@ class TestSelfReviewMultipleIssues(unittest.TestCase):
         # Should flag: false-consensus (all passed, avg conf < 0.5)
         # and degraded-groupthink (3 with modifier=0, conf<=0.3)
         self.assertFalse(result.passed)
-        issue_count = result.finding.count(":")
         self.assertGreater(len(result.evidence), 1)
 
     def test_penalty_capped_at_one(self):

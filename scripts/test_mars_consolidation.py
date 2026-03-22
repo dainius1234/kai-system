@@ -6,8 +6,6 @@ conscience-filtered pruning, and nightly consolidation cycle.
 from __future__ import annotations
 
 import math
-import re
-import textwrap
 import unittest
 from pathlib import Path
 

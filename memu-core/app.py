@@ -1778,7 +1778,6 @@ async def knowledge_boundary() -> Dict[str, Any]:
 # ═══════════════════════════════════════════════════════════════════════
 
 import re as _re_mod
-from datetime import date as _date_type
 
 # patterns that signal time-sensitive content
 _DATE_PATTERNS = [
@@ -1842,7 +1841,7 @@ async def proactive_nudges() -> Dict[str, Any]:
     nudges = []
     for record, signals in candidates[:MAX_NUDGES]:
         content_text = str(record.content.get("result", ""))[:200]
-        signal_summary = ", ".join(set(signals))
+        ", ".join(set(signals))
         nudge_msg = f"Reminder: {content_text}"
         if len(content_text) >= 200:
             nudge_msg += "..."
@@ -2256,7 +2255,6 @@ async def mars_consolidate() -> Dict[str, Any]:
 
     Returns pruning/strengthening stats for monitoring.
     """
-    import math
 
     all_records = store.search(top_k=10_000)
     pruned = 0
@@ -2461,7 +2459,6 @@ async def focus_compress(
 
     Source: arxiv.org/abs/2601.07190 (Active Context Compression)
     """
-    import math
 
     all_records = store.search(top_k=10_000)
     if not all_records:
@@ -3440,7 +3437,6 @@ async def proactive_check_in() -> Dict[str, Any]:
 #  Returns a struggle score (0-1) and contextual help offer.
 # ═══════════════════════════════════════════════════════════════════════
 
-import re as _re
 
 _FRUSTRATION_KEYWORDS = {
     "stuck", "confused", "help", "wrong", "broken", "doesn't work",
@@ -4504,7 +4500,7 @@ async def get_future_self() -> Dict[str, Any]:
     for domain, info in domain_confidence.items():
         conf = info["confidence"]
         corrections = info.get("corrections", 0)
-        total = info.get("total", 0)
+        info.get("total", 0)
 
         if conf < 0.4:
             status = "needs_work"
@@ -5294,7 +5290,7 @@ async def learn_value(request: Request):
     body = await request.json()
     experience = sanitize_string(body.get("experience", ""))
     outcome = sanitize_string(body.get("outcome", ""))  # positive / negative / neutral
-    context = sanitize_string(body.get("context", ""))
+    sanitize_string(body.get("context", ""))
     if not experience:
         raise HTTPException(status_code=400, detail="experience is required")
 
@@ -6644,7 +6640,6 @@ async def shadow_branch(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
             related_mems.append(content[:100])
 
     # find existing counterfactuals on this topic
-    from collections import deque as _deque_type
     existing_counterfactuals = []
     if hasattr(app.state, "_counterfactual_log"):
         for cf in getattr(app.state, "_counterfactual_log", []):
@@ -6736,7 +6731,6 @@ async def operator_model_summary() -> Dict[str, Any]:
     recent_cross = list(_cross_mode_insights)[-3:]
 
     # oracle predictions
-    recent_oracle = list(_oracle_predictions)[-3:]
     high_risk = sum(1 for p in _oracle_predictions if p.get("overall_risk") == "high")
 
     # shadow branches

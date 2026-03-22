@@ -12,7 +12,6 @@ Endpoints:
 """
 from __future__ import annotations
 
-import base64
 import io
 import os
 import time
@@ -72,8 +71,8 @@ class CaptureResult(BaseModel):
 def _ocr_image_bytes(img_bytes: bytes) -> str:
     """Run OCR on raw image bytes. Falls back to stub if dependencies missing."""
     if _tesseract_available and _pil_available:
-        from PIL import Image
-        import pytesseract
+        from PIL import Image  # noqa: F811
+        import pytesseract  # noqa: F811
         img = Image.open(io.BytesIO(img_bytes))
         return pytesseract.image_to_string(img).strip()
     return "[OCR unavailable — install pytesseract + Pillow + tesseract-ocr]"
@@ -82,13 +81,13 @@ def _ocr_image_bytes(img_bytes: bytes) -> str:
 def _capture_screen() -> tuple[bytes, str]:
     """Capture screen and return (image_bytes, source_description)."""
     if _mss_available:
-        import mss
+        import mss  # noqa: F811
         with mss.mss() as sct:
             monitor = sct.monitors[0]  # all monitors combined
             screenshot = sct.grab(monitor)
             # convert to PNG bytes
             if _pil_available:
-                from PIL import Image
+                from PIL import Image  # noqa: F811
                 img = Image.frombytes("RGB", screenshot.size, screenshot.bgra, "raw", "BGRX")
                 buf = io.BytesIO()
                 img.save(buf, format="PNG")

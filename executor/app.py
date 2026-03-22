@@ -29,7 +29,6 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import httpx
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 

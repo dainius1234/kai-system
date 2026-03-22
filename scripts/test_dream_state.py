@@ -1,5 +1,4 @@
 """P15 Dream State — unit tests for offline consolidation engine."""
-import json
 import sys
 import os
 import tempfile
@@ -17,9 +16,7 @@ from kai_config import (
     detect_rule_contradictions,
     load_dream_cycles,
     run_dream_cycle,
-    save_dream_cycle,
     synthesize_patterns,
-    DREAM_INSIGHT_PATH,
 )
 
 
@@ -236,7 +233,7 @@ class TestPersistence(unittest.TestCase):
                 os.unlink(tmp)
 
             # run_dream_cycle calls save_dream_cycle internally
-            cycle = run_dream_cycle([], cycle_id="persist-test")
+            run_dream_cycle([], cycle_id="persist-test")
             loaded = load_dream_cycles()
             self.assertGreaterEqual(len(loaded), 1)
             self.assertEqual(loaded[-1]["cycle_id"], "persist-test")

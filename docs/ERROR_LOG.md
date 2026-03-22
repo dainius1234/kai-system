@@ -2,54 +2,52 @@
 
 > Every issue tracked until eliminated. No matter how small.
 
-**Generated:** 2026-03-22 | **Test suite:** 1,488 passed, 5 skipped, 0 failed
+**Updated:** 2026-03-23 | **Test suite:** 1,513 passed, 5 skipped, 0 failed
 
 ---
 
 ## Active Issues
 
-### Deprecation Warnings (110 total — 3 source patterns)
+### Deprecation Warnings — NONE
 
-| # | File | Line(s) | Warning | Fix |
-|---|------|---------|---------|-----|
-| W1 | memu-core/app.py | 1814, 1889, 2670, 2726, 2813, 2955 | `datetime.utcnow()` deprecated | Replace with `datetime.now(datetime.UTC)` |
-| W2 | scripts/test_p3_organic_memory.py | 76, 197, 216, 229, 405, 418, 434, 482, 510 | `datetime.utcnow()` deprecated | Replace with `datetime.now(datetime.UTC)` |
-| W3 | scripts/test_silence_signal.py | 28, 57, 62, 100 | `datetime.utcnow()` deprecated | Replace with `datetime.now(datetime.UTC)` |
-| W4 | scripts/test_tempo.py | 18 (x48 calls) | `datetime.utcnow()` deprecated | Replace with `datetime.now(datetime.UTC)` |
-| W5 | scripts/test_gaps_sprint.py | 127 | `no current event loop` | Use `asyncio.new_event_loop()` |
+All `datetime.utcnow()` and `get_event_loop` deprecations resolved.
 
-### Flake8 Lint (435 total — by category)
+### Flake8 Lint — Medium/High Severity CLEAR
 
-| # | Category | Count | Severity | Fix Priority |
-|---|----------|-------|----------|-------------|
-| L1 | E501 line too long (>127) | 101 | Style | Low — cosmetic |
-| L2 | F401 unused imports | 98 | Medium | Batch cleanup |
-| L3 | C901 too complex (>10) | 45 | Medium | Refactor hot paths |
-| L4 | E402 import not at top | 47 | Low | Intentional (lazy imports) |
-| L5 | E302/E301 blank line issues | 31 | Style | Low — cosmetic |
-| L6 | F541 f-string no placeholders | 16 | Low | Convert to plain strings |
-| L7 | F811 redefinition of unused var | 16 | Medium | Dead code in memu-core |
-| L8 | F841 assigned but unused | 10 | Medium | Remove dead assignments |
-| L9 | E231/E225 whitespace | 21 | Style | Low — cosmetic |
-| L10 | E702 multiple statements | 2 | Style | Low |
-| L11 | E401 multiple imports | 3 | Style | Low |
+| # | Category | Count | Severity | Notes |
+|---|----------|-------|----------|-------|
+| L1 | E501 line too long (>127) | ~101 | Style | Low — cosmetic, non-blocking |
+| L3 | C901 too complex (>10) | ~45 | Medium | Refactor candidates — tracked |
+| L4 | E402 import not at top | ~47 | Low | Intentional lazy/conditional imports |
+| L5 | E302/E301 blank line issues | ~31 | Style | Low — cosmetic |
+| L6 | F541 f-string no placeholders | ~16 | Low | Convert to plain strings |
+| L9 | E231/E225 whitespace | ~21 | Style | Low — cosmetic |
+| L10 | E702 multiple statements | ~2 | Style | Low |
+| L11 | E401 multiple imports | ~3 | Style | Low |
+
+**Critical (E9/F63/F7/F82): 0** | **F401: 0** | **F811: 0** | **F841: 0**
 
 ### Skipped Tests (5)
 
 | # | Test | Reason | Action |
 |---|------|--------|--------|
-| S1 | agentic_integration_test::test_langgraph | langgraph.graph not installed | Install or keep skip |
-| S2 | agentic_integration_test::test_autogen | autogen not installed | Install or keep skip |
-| S3 | agentic_integration_test::test_crewai | crewai not installed | Install or keep skip |
-| S4 | agentic_integration_test::test_openagents | openagents not installed | Install or keep skip |
+| S1 | agentic_integration_test::test_langgraph | langgraph.graph not installed | Env-specific — OK |
+| S2 | agentic_integration_test::test_autogen | autogen not installed | Env-specific — OK |
+| S3 | agentic_integration_test::test_crewai | crewai not installed | Env-specific — OK |
+| S4 | agentic_integration_test::test_openagents | openagents not installed | Env-specific — OK |
 | S5 | test_cross_session_context | No vector store configured | Env-specific — OK |
 
 ---
 
-## Resolved (This Sprint)
+## Resolved
 
 | Date | Issue | Resolution |
 |------|-------|------------|
+| 2026-03-23 | W1-W4: 63× `datetime.utcnow()` deprecation warnings | Replaced with `datetime.now(datetime.UTC)` |
+| 2026-03-23 | W5: `no current event loop` in test_gaps_sprint | Fixed to `asyncio.new_event_loop()` |
+| 2026-03-23 | L2: F401 unused imports (98 instances) | autoflake bulk removal + manual cleanup |
+| 2026-03-23 | L7: F811 redefinition of unused var (16 instances) | autoflake + `# noqa: F811` for intentional try/except re-imports |
+| 2026-03-23 | L8: F841 assigned but unused (10 instances) | autoflake + manual removal of dead assignments |
 | 2026-03-22 | kai_supervisor.py duplicate function defs + missing main() | Removed dupes, added main() |
 | 2026-03-22 | langgraph/app.py missing `import asyncio` (6 F821) | Added import |
 | 2026-03-22 | memu-core/app.py undefined `proactive_full_scan` | Fixed to `full_proactive_scan` |

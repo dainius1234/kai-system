@@ -4,7 +4,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "langgraph"))
 
 from kai_config import (
     PerformanceSnapshot,
-    ImprovementVerdict,
     capture_snapshot,
     save_snapshot,
     load_latest_snapshot,

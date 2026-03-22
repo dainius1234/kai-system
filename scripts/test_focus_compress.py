@@ -7,7 +7,6 @@ Source: arxiv.org/abs/2601.07190 (Active Context Compression)
 """
 from __future__ import annotations
 
-import math
 import re
 import unittest
 from pathlib import Path

@@ -6,7 +6,6 @@ Feedback Summary Tool for Kai System
 - Falls back to local logs if memu-core is unavailable
 - Surfaces actionable insights for both operator and AI review
 """
-import time
 import requests
 from pathlib import Path
 

@@ -214,8 +214,6 @@ async def analysis_history(limit: int = 10) -> Dict[str, Any]:
 #  All offline, no cloud, CPU-only.
 # ═══════════════════════════════════════════════════════════════════════
 
-import re  # noqa: E402
-
 PROACTIVE_COOLDOWN = int(os.getenv("PROACTIVE_COOLDOWN_SECONDS", "120"))
 TTS_URL = os.getenv("TTS_URL", "http://tts:8022")
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
@@ -248,7 +246,7 @@ def _speak_or_not(
     messages = []
 
     # Audio signals
-    emotion_scores = audio_signals.get("scores", {})
+    audio_signals.get("scores", {})
     dominant = audio_signals.get("dominant", "neutral")
     dominant_score = audio_signals.get("dominant_score", 0.0)
     rms = audio_signals.get("rms_level")
@@ -346,7 +344,6 @@ async def interpret_multi(
 
 class ProactiveRequest:
     """Simple container for proactive voice request data."""
-    pass
 
 
 @app.post("/proactive/evaluate")

@@ -154,7 +154,6 @@ def _record_microphone(seconds: int = RECORD_SECONDS) -> bytes:
         raise HTTPException(status_code=503, detail="sounddevice not available — cannot capture from mic")
 
     import sounddevice as sd
-    import numpy as np
 
     logger.info("recording %d seconds from microphone at %d Hz", seconds, SAMPLE_RATE)
     audio_data = sd.rec(int(seconds * SAMPLE_RATE), samplerate=SAMPLE_RATE, channels=1, dtype="int16")
