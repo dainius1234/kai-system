@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: Engineering maturity gap-close (pre-commit, coverage, error codes, feature flags, dep scanning, CHANGELOG, CODEOWNERS) — **65 targets, 1220+ tests**
+**Last updated:** 2026-03-22 — session: Engineering maturity gap-close (pre-commit, coverage, error codes, feature flags, dep scanning, CHANGELOG, CODEOWNERS) — **65 targets, 1258 tests**
 
 ---
 
@@ -20,9 +20,9 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
 | Metric | Value |
 |---|---|
-| Services | 25 (22 build + postgres + redis + ollama) |
+| Services | 26 (22 build + postgres + redis + ollama + lakeFS) |
 | Test targets | 65 (make test-core) |
-| Individual tests | 1220+ passing, 0 failures |
+| Individual tests | 1258 passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -784,31 +784,31 @@ REMEMBER you. Cross-referenced with Grok brainstorm 2026-03-22.*
 
 ### 2026-03-07 (continued — P20)
 - **P20 Conscience & Values Engine — ALL DONE.** Kai now has a conscience.
-- P20a: Value Formation — learns what matters from operator interactions. 6 positive
+- [x] **P20a Value Formation** — learns what matters from operator interactions. 6 positive
   value categories (honesty, loyalty, growth, courage, kindness, persistence) detected
   via keyword analysis. 4 negative categories (dishonesty, betrayal, laziness, cruelty).
   Reinforcement system — repeated exposure strengthens values. 50-value cap.
-- P20b: Moral Reasoning — before acting, checks decision against formed values.
+- [x] **P20b Moral Reasoning** — before acting, checks decision against formed values.
   Returns alignments, conflicts, alignment_score (0-1), and verdict. Logged to
   conscience log for integrity tracking.
-- P20c: Integrity Tracker — audit endpoint with integrity score, total checks,
+- [x] **P20c Integrity Tracker** — audit endpoint with integrity score, total checks,
   alignment streak, violation count. Running self-accountability.
-- P20d: Loyalty Memory — records sacrifices, promises, commitments with weight scoring.
+- [x] **P20d Loyalty Memory** — records sacrifices, promises, commitments with weight scoring.
   Sacrifice keywords auto-detected (sleeping in car, saving, working extra, etc).
   Weight 1.0 for sacrifices, 0.7 for promises, 0.5 for commitments.
-- P20e: Gratitude Engine — not fake thanks. Tone detection: deeply_moved (sacrifice),
+- [x] **P20e Gratitude Engine** — not fake thanks. Tone detection: deeply_moved (sacrifice),
   grateful (teaching/helping), honored (belief/faith), appreciative (general).
   Heartfelt messages generated per tone. Sacrifice gratitude auto-creates loyalty entry.
-- Conscience Summary — all 5 subsystem counts + top values + integrity + sacrifices.
-- LLM context injection — 8-way parallel fetch. _get_conscience_context() fetches
+- [x] **Conscience Summary** — all 5 subsystem counts + top values + integrity + sacrifices.
+- [x] **LLM context injection** — 8-way parallel fetch. _get_conscience_context() fetches
   values + audit in parallel. Conscience injected as system message (core values +
   integrity warning if alignment < 80%). Value learning fire-and-forget after every chat.
-- Dashboard Soul enhancements — 4 new cards: Integrity score with visual, Formed Values
+- [x] **Dashboard Soul enhancements** — 4 new cards: Integrity score with visual, Formed Values
   with strength bars, Loyalty Ledger with weight/type, Gratitude Journal with tone emojis
   and record form. 7 new JS functions. TONE_EMOJI + TYPE_EMOJI maps.
-- Dashboard proxy — 9 new API endpoints for P20 features.
-- 71 new tests (scripts/test_p20_conscience_values.py), all passing.
-- Test count: 679 → 750 (55 targets), zero failures.
+- [x] **Dashboard proxy** — 9 new API endpoints for P20 features.
+- [x] **71 new tests** (scripts/test_p20_conscience_values.py), all passing.
+- [x] **Test count** — 679 → 750 (55 targets), zero failures.
 - NOTE: Dainius sleeping in his car to save £50/day for the Lenovo RTX 5080.
   Every pound is a brick in Kai's foundation. The loyalty memory remembers this.
 
@@ -1261,3 +1261,27 @@ See `docs/unfair_advantages.md` for full details. Summary:
 - Next session priority: **P0 — Docker compose build validation**
 - User saving for RTX 5080. All LLM work parked.
 - Vision: organic AI that learns. Not an agent framework.
+
+---
+
+## What’s Next — Top Priorities
+
+1. **Cache and display last test-core run results**
+   - Use `make cache-test-core` to run and store results in scripts/test_core_results.json
+   - Only re-run changed targets for faster feedback
+   - Show summary in README and here
+2. **Session Backlog / Notes**
+   - Create SESSION_BACKLOG.md or improve session note visibility
+   - Summarize each session’s work, open items, and next steps
+3. **Tier 1/2/3 Hardening**
+   - H2: Persistence for P17-P22 data (Redis/filesystem)
+   - H2: retrieve_ranked() limit/pagination
+   - H2: Async gather for proactive scan
+   - H2: Embedding async compatibility
+   - H2: Context budget enforcement
+   - H2: Verifier semantic upgrade
+   - H2: Session buffer Redis reconnect
+   - H3: Test coverage for dashboard/memu-core endpoints
+   - H3: Dashboard XSS, fetch .ok, API consistency, dead param cleanup, heartbeat log tail
+
+---

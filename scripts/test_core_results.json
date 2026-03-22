@@ -1,0 +1,355 @@
+{
+  "last_run": "2026-03-22T16:23:29",
+  "results": [
+    {
+      "target": "test-phase-b-memu",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_phase_b_memu_core.py\n{\"time\":\"2026-03-22 16:22:56,730\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Running on cpu.\"}\n{\"time\":\"2026-03-22 16:22:56,735\",\"level\":\"WARNING\",\"service\":\"memu-core\",\"msg\":\"sentence-transformers not available \u2014 using hash-based fake embeddings\"}\n{\"time\":\"2026-03-22 16:22:56,817\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Session buffer using in-memory fallback (Redis unavailable)\"}\ntest_phase_b_memu_core: PASS\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:22:56"
+    },
+    {
+      "target": "test-memu-pg",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_memu_pgvector.py\nPG_URI not set; skipping pgvector tests\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:22:57"
+    },
+    {
+      "target": "test-dashboard-ui",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_dashboard_ui.py\n{\"time\":\"2026-03-22 16:22:57,505\",\"level\":\"INFO\",\"service\":\"dashboard\",\"msg\":\"Running on cpu.\"}\ndashboard UI test passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:22:57"
+    },
+    {
+      "target": "test-dashboard",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_dashboard.py\n{\"time\":\"2026-03-22 16:22:58,148\",\"level\":\"INFO\",\"service\":\"dashboard\",\"msg\":\"Running on cpu.\"}\n{\"time\":\"2026-03-22 16:22:58,267\",\"level\":\"WARNING\",\"service\":\"dashboard\",\"msg\":\"Failed to fetch ledger/memory stats for index\"}\ndashboard tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:22:58"
+    },
+    {
+      "target": "test-thinking-pathways",
+      "returncode": 0,
+      "stdout": "on_error PASSED [ 60%]\nscripts/test_thinking_pathways.py::TestApiSilence::test_silence_proxies_data PASSED [ 65%]\nscripts/test_thinking_pathways.py::TestApiSilence::test_silence_returns_fallback_on_error PASSED [ 69%]\nscripts/test_thinking_pathways.py::TestApiSelfAssessment::test_assessment_proxies_data PASSED [ 73%]\nscripts/test_thinking_pathways.py::TestApiSelfAssessment::test_assessment_returns_unavailable_on_error PASSED [ 78%]\nscripts/test_thinking_pathways.py::TestDashboardPages::test_chat_page PASSED [ 82%]\nscripts/test_thinking_pathways.py::TestDashboardPages::test_health PASSED [ 86%]\nscripts/test_thinking_pathways.py::TestDashboardPages::test_static_thinking_html PASSED [ 91%]\nscripts/test_thinking_pathways.py::TestDashboardPages::test_thinking_page PASSED [ 95%]\nscripts/test_thinking_pathways.py::TestDashboardPages::test_ui_page PASSED [100%]\n\n============================== 23 passed in 0.79s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:22:59"
+    },
+    {
+      "target": "test-tool-gate",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_tool_gate_api.py\n{\"time\":\"2026-03-22 16:23:00,505\",\"level\":\"INFO\",\"service\":\"tool-gate\",\"msg\":\"Running on cpu.\"}\ntool-gate api tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "HMAC using default dev secret \u2014 set INTERSERVICE_HMAC_SECRET for production\n",
+      "timestamp": "2026-03-22T16:23:00"
+    },
+    {
+      "target": "test-tool-gate-security",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_tool_gate_security.py\n{\"time\":\"2026-03-22 16:23:01,207\",\"level\":\"INFO\",\"service\":\"tool-gate\",\"msg\":\"Running on cpu.\"}\ntool-gate security tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "HMAC using default dev secret \u2014 set INTERSERVICE_HMAC_SECRET for production\n",
+      "timestamp": "2026-03-22T16:23:01"
+    },
+    {
+      "target": "test-telegram",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_telegram_bot.py\ntelegram-bot smoke test: PASS\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:01"
+    },
+    {
+      "target": "test-conviction",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\npython scripts/test_conviction.py\nconviction avg=6.24  scores=['6.9', '5.9', '6.3', '6.3', '5.9', '6.3', '5.8', '6.3', '6.3', '6.4']\nconviction tests passed (avg=6.24)\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:01"
+    },
+    {
+      "target": "test-audio",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_audio_service.py\n{\"time\":\"2026-03-22 16:23:02,310\",\"level\":\"INFO\",\"service\":\"perception-audio\",\"msg\":\"Running on cpu.\"}\n{\"time\":\"2026-03-22 16:23:02,312\",\"level\":\"INFO\",\"service\":\"perception-audio\",\"msg\":\"sounddevice not available \u2014 mic capture disabled, file upload only\"}\n{\"time\":\"2026-03-22 16:23:03,467\",\"level\":\"WARNING\",\"service\":\"perception-audio\",\"msg\":\"auto-memorize failed: [Errno -2] Name or service not known\"}\n{\"time\":\"2026-03-22 16:23:03,471\",\"level\":\"WARNING\",\"service\":\"perception-audio\",\"msg\":\"prompt injection blocked in audio transcript\"}\naudio service tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:03"
+    },
+    {
+      "target": "test-camera",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_camera_service.py\ncamera service tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:04"
+    },
+    {
+      "target": "test-executor",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_executor_service.py\n{\"time\":\"2026-03-22 16:23:04,753\",\"level\":\"INFO\",\"service\":\"executor\",\"msg\":\"Running on cpu.\"}\nexecutor service tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:04"
+    },
+    {
+      "target": "test-langgraph",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_langgraph_service.py\n{\"time\":\"2026-03-22 16:23:05,485\",\"level\":\"INFO\",\"service\":\"langgraph\",\"msg\":\"Running on cpu.\"}\nlanggraph service tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:05"
+    },
+    {
+      "target": "test-kai-advisor",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python kai-advisor/test_kai_advisor.py\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:06"
+    },
+    {
+      "target": "test-tts",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_tts_service.py\n{\"time\":\"2026-03-22 16:23:06,842\",\"level\":\"INFO\",\"service\":\"tts-service\",\"msg\":\"edge-tts loaded \u2014 voice synthesis enabled\"}\n{\"time\":\"2026-03-22 16:23:07,008\",\"level\":\"INFO\",\"service\":\"tts-service\",\"msg\":\"synthesized 5 chars \u2192 8928 bytes (voice=en-GB-RyanNeural)\"}\ntts service tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:07"
+    },
+    {
+      "target": "test-avatar",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_avatar_service.py\navatar service tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:07"
+    },
+    {
+      "target": "test-heartbeat",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_heartbeat.py\n{\"time\":\"2026-03-22 16:23:07,984\",\"level\":\"INFO\",\"service\":\"heartbeat\",\"msg\":\"Running on cpu.\"}\n{\"time\":\"2026-03-22 16:23:08,048\",\"level\":\"INFO\",\"service\":\"heartbeat\",\"msg\":\"executor event: test (unit)\"}\nheartbeat tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:08"
+    },
+    {
+      "target": "test-episode-saver",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_episode_saver.py\nepisode saver fallback tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:08"
+    },
+    {
+      "target": "test-episode-spool",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_episode_spool.py\nepisode spool tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:08"
+    },
+    {
+      "target": "test-error-budget",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_error_budget_breaker.py\nerror-budget breaker tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:08"
+    },
+    {
+      "target": "test-invoice",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_invoice.py\ninvoice tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:08"
+    },
+    {
+      "target": "test-memu-retrieval",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_memu_retrieval.py\n{\"time\":\"2026-03-22 16:23:09,266\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Running on cpu.\"}\n{\"time\":\"2026-03-22 16:23:09,271\",\"level\":\"WARNING\",\"service\":\"memu-core\",\"msg\":\"sentence-transformers not available \u2014 using hash-based fake embeddings\"}\n{\"time\":\"2026-03-22 16:23:09,418\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Session buffer using in-memory fallback (Redis unavailable)\"}\nmemu retrieval tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:09"
+    },
+    {
+      "target": "test-router",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_router.py\n\nRouter tests: 27/27 passed, 0 failed\nrouter classification tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:09"
+    },
+    {
+      "target": "test-planner",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_planner.py\n  _keyword_similarity tests passed\n  _find_similar_episodes tests passed\n  _compute_conviction_modifier tests passed\n  build_enriched_plan tests passed\n\nAll planner tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:09"
+    },
+    {
+      "target": "test-adversary",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_adversary.py\nTesting challenge_history...\n  challenge_history: PASSED\nTesting challenge_consistency...\n  challenge_consistency: PASSED\nTesting challenge_calibration...\n  challenge_calibration: PASSED\nTesting _pattern_hash...\n  _pattern_hash: PASSED\nTesting verdict_to_plan_metadata...\n  verdict_to_plan_metadata: PASSED\nTesting challenge_plan (full orchestrator, degraded mode)...\n  challenge_plan: PASSED (recommendation=caution, modifier=+0.30, time=258ms)\nTesting recommendation logic...\n  recommendation logic: PASSED\n\nAll adversary tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:10"
+    },
+    {
+      "target": "test-failure-taxonomy",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_failure_taxonomy.py\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "...........................\n----------------------------------------------------------------------\nRan 27 tests in 0.001s\n\nOK\n",
+      "timestamp": "2026-03-22T16:23:10"
+    },
+    {
+      "target": "test-selaur",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_selaur.py\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": ".............\n----------------------------------------------------------------------\nRan 13 tests in 0.001s\n\nOK\n",
+      "timestamp": "2026-03-22T16:23:10"
+    },
+    {
+      "target": "test-self-emp",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\npython scripts/test_self_emp_advisor.py\nself-employment advisor tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:11"
+    },
+    {
+      "target": "test-auth-hmac",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_auth_hmac_hardening.py\ntest_auth_hmac_hardening: PASS\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:11"
+    },
+    {
+      "target": "test-agentic",
+      "returncode": 2,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\npython3 scripts/agentic_integration_test.py\nKai System \u2014 Agentic Framework Smoke Test\n================================================\n  [FAIL] LangGraph  \u2014 graph construction: No module named 'langgraph'\n  [FAIL] AutoGen    \u2014 agent instantiation: No module named 'autogen'\n  [FAIL] CrewAI     \u2014 crew/task wiring: No module named 'crewai'\n  [FAIL] OpenAgents \u2014 class loading: No module named 'openagents'\n================================================\nResults: 0 passed, 4 failed\nWARNING: Some frameworks had issues \u2014 check API changes.\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "make[1]: *** [Makefile:98: test-agentic] Error 1\n",
+      "timestamp": "2026-03-22T16:23:11"
+    },
+    {
+      "target": "test-v7",
+      "returncode": 0,
+      "stdout": ",\"level\":\"WARNING\",\"service\":\"memu-core\",\"msg\":\"Verifier unreachable during memorize \u2014 verdict=VERIFIER_UNREACHABLE\"}\n{\"time\":\"2026-03-22 16:23:14,778\",\"level\":\"WARNING\",\"service\":\"memu-core\",\"msg\":\"Verifier unreachable during memorize \u2014 verdict=VERIFIER_UNREACHABLE\"}\n{\"time\":\"2026-03-22 16:23:14,785\",\"level\":\"INFO\",\"service\":\"verifier\",\"msg\":\"verify claim_hash=c7caa2e99a189138 verdict=REPAIR confidence=0.483 strong_chunks=1 material_claims=2\"}\n{\"time\":\"2026-03-22 16:23:14,787\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"quarantined record=b770a227-6a8f-4ea3-b0f0-38b96d94f928 reason=integration test quarantine\"}\n{\"time\":\"2026-03-22 16:23:14,791\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"cleared quarantine record=b770a227-6a8f-4ea3-b0f0-38b96d94f928\"}\n{\"time\":\"2026-03-22 16:23:14,830\",\"level\":\"INFO\",\"service\":\"verifier\",\"msg\":\"verify claim_hash=2469706f4bd7ff6f verdict=FAIL_CLOSED confidence=0.295 strong_chunks=0 material_claims=2\"}\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "............................\n----------------------------------------------------------------------\nRan 28 tests in 0.175s\n\nOK\n.........\n----------------------------------------------------------------------\nRan 9 tests in 0.260s\n\nOK\n.................\n----------------------------------------------------------------------\nRan 17 tests in 0.001s\n\nOK\nHMAC using default dev secret \u2014 set INTERSERVICE_HMAC_SECRET for production\n....\n----------------------------------------------------------------------\nRan 4 tests in 0.020s\n\nOK\n...\n----------------------------------------------------------------------\nRan 3 tests in 0.207s\n\nOK\n",
+      "timestamp": "2026-03-22T16:23:14"
+    },
+    {
+      "target": "test-contradiction",
+      "returncode": 0,
+      "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_contradiction.py\n{\"time\":\"2026-03-22 16:23:15,287\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Running on cpu.\"}\n{\"time\":\"2026-03-22 16:23:15,291\",\"level\":\"WARNING\",\"service\":\"memu-core\",\"msg\":\"sentence-transformers not available \u2014 using hash-based fake embeddings\"}\n{\"time\":\"2026-03-22 16:23:15,420\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Session buffer using in-memory fallback (Redis unavailable)\"}\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": ".............\n----------------------------------------------------------------------\nRan 13 tests in 0.003s\n\nOK\n",
+      "timestamp": "2026-03-22T16:23:15"
+    },
+    {
+      "target": "test-mars-consolidation",
+      "returncode": 0,
+      "stdout": "test_mars_consolidation.py::TestCompressorMARSIntegration::test_consolidation_step_in_cycle PASSED [ 77%]\nscripts/test_mars_consolidation.py::TestCompressorMARSIntegration::test_pruned_count_in_result PASSED [ 80%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_fresh_memory_full_retention PASSED [ 82%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_one_day_high_stability PASSED [ 85%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_one_day_low_stability PASSED [ 88%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_prune_threshold_math PASSED [ 91%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_rehearsed_survives_prune PASSED [ 94%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_stability_growth_formula PASSED [ 97%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_ten_rehearsals_compound PASSED [100%]\n\n============================== 35 passed in 0.07s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:16"
+    },
+    {
+      "target": "test-p3-organic",
+      "returncode": 0,
+      "stdout": " goal (priority=medium)\"}\n{\"time\":\"2026-03-22 16:23:16,641\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Goal created: To be paused (priority=medium)\"}\n{\"time\":\"2026-03-22 16:23:16,641\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Goal updated: 53ed070c-5ac5-4fb0-b983-5004e5e23548 \u2192 paused\"}\n{\"time\":\"2026-03-22 16:23:16,641\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Goal created: Finish test (priority=medium)\"}\n{\"time\":\"2026-03-22 16:23:16,641\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Goal updated: c404468c-b89f-40e3-99d7-749edeb6191d \u2192 completed\"}\n{\"time\":\"2026-03-22 16:23:16,642\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Goal created: Test goal (priority=medium)\"}\n{\"time\":\"2026-03-22 16:23:16,642\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Goal updated: 640e2ba2-1506-4fe5-b252-fac76f011fa6 \u2192 active\"}\n{\"time\":\"2026-03-22 16:23:16,643\",\"level\":\"INFO\",\"service\":\"memu-core\",\"msg\":\"Goal created: Submit tender (priority=critical)\"}\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "tetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n  recent_ts = (datetime.utcnow() - timedelta(hours=2)).isoformat()\n./workspaces/kai-system/scripts/test_p3_organic_memory.py:197: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n  old_ts = (datetime.utcnow() - timedelta(days=30)).isoformat()\n./workspaces/kai-system/scripts/test_p3_organic_memory.py:216: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n  old_ts = (datetime.utcnow() - timedelta(days=60)).isoformat()\n..\n----------------------------------------------------------------------\nRan 30 tests in 0.014s\n\nOK\n",
+      "timestamp": "2026-03-22T16:23:16"
+    },
+    {
+      "target": "test-p4-personality",
+      "returncode": 0,
+      "stdout": "TestModeTransitions::test_manual_override_takes_precedence PASSED [ 81%]\nscripts/test_p4_personality.py::TestModeTransitions::test_mode_schedule_loaded PASSED [ 83%]\nscripts/test_p4_personality.py::TestGreetingAndCheckIn::test_check_in_cooldown_var_exists PASSED [ 86%]\nscripts/test_p4_personality.py::TestGreetingAndCheckIn::test_check_in_respects_cooldown PASSED [ 88%]\nscripts/test_p4_personality.py::TestGreetingAndCheckIn::test_greeting_allowed_after_cooldown PASSED [ 90%]\nscripts/test_p4_personality.py::TestGreetingAndCheckIn::test_greeting_cooldown_var_exists PASSED [ 93%]\nscripts/test_p4_personality.py::TestGreetingAndCheckIn::test_greeting_respects_cooldown PASSED [ 95%]\nscripts/test_p4_personality.py::TestP4EndpointsExist::test_memu_p4_routes PASSED [ 97%]\nscripts/test_p4_personality.py::TestP4EndpointsExist::test_toolgate_mode_route PASSED [100%]\n\n==================== 43 passed, 4 subtests passed in 0.60s =====================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:17"
+    },
+    {
+      "target": "test-p16-operational",
+      "returncode": 0,
+      "stdout": "dViews::test_logs_nav_exists PASSED [ 77%]\nscripts/test_p16_operational.py::TestDashboardViews::test_goals_view_exists PASSED [ 80%]\nscripts/test_p16_operational.py::TestDashboardViews::test_memory_view_exists PASSED [ 82%]\nscripts/test_p16_operational.py::TestDashboardViews::test_logs_view_exists PASSED [ 85%]\nscripts/test_p16_operational.py::TestDashboardViews::test_feedback_buttons_js PASSED [ 87%]\nscripts/test_p16_operational.py::TestDashboardViews::test_struggle_check_js PASSED [ 90%]\nscripts/test_p16_operational.py::TestDashboardViews::test_goal_form_exists PASSED [ 92%]\nscripts/test_p16_operational.py::TestDashboardViews::test_memory_search_exists PASSED [ 95%]\nscripts/test_p16_operational.py::TestDashboardViews::test_log_level_filter PASSED [ 97%]\nscripts/test_p16_operational.py::TestDashboardViews::test_keyboard_shortcuts_extended PASSED [100%]\n\n============================== 40 passed in 0.66s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:18"
+    },
+    {
+      "target": "test-p17-emotional-intelligence",
+      "returncode": 0,
+      "stdout": "n PASSED [ 84%]\nscripts/test_p17_emotional_intelligence.py::TestDashboardEQView::test_eq_reflections_section PASSED [ 86%]\nscripts/test_p17_emotional_intelligence.py::TestDashboardEQView::test_eq_milestones_section PASSED [ 88%]\nscripts/test_p17_emotional_intelligence.py::TestDashboardEQView::test_refresh_eq_js PASSED [ 90%]\nscripts/test_p17_emotional_intelligence.py::TestDashboardEQView::test_trigger_reflection_js PASSED [ 92%]\nscripts/test_p17_emotional_intelligence.py::TestDashboardEQView::test_render_emotion_timeline_js PASSED [ 94%]\nscripts/test_p17_emotional_intelligence.py::TestDashboardEQView::test_render_domain_confidence_js PASSED [ 96%]\nscripts/test_p17_emotional_intelligence.py::TestDashboardEQView::test_keyboard_shortcut_eq PASSED [ 98%]\nscripts/test_p17_emotional_intelligence.py::TestDashboardEQView::test_soul_dashboard_title PASSED [100%]\n\n============================== 53 passed in 0.59s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:19"
+    },
+    {
+      "target": "test-p18-narrative-identity",
+      "returncode": 0,
+      "stdout": "8%]\nscripts/test_p18_narrative_identity.py::TestDashboardSoulView::test_identity_card_title PASSED [ 89%]\nscripts/test_p18_narrative_identity.py::TestDashboardSoulView::test_story_arcs_title PASSED [ 91%]\nscripts/test_p18_narrative_identity.py::TestDashboardSoulView::test_future_self_title PASSED [ 92%]\nscripts/test_p18_narrative_identity.py::TestDashboardSoulView::test_legacy_title PASSED [ 94%]\nscripts/test_p18_narrative_identity.py::TestDashboardSoulView::test_arc_emoji_map PASSED [ 95%]\nscripts/test_p18_narrative_identity.py::TestDashboardSoulView::test_narrative_called_from_refresh_eq PASSED [ 97%]\nscripts/test_p18_narrative_identity.py::TestLangGraphNarrativeIntegration::test_get_narrative_identity_function_exists PASSED [ 98%]\nscripts/test_p18_narrative_identity.py::TestLangGraphNarrativeIntegration::test_narrative_identity_is_async PASSED [100%]\n\n============================== 68 passed in 0.90s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:21"
+    },
+    {
+      "target": "test-p19-imagination-engine",
+      "returncode": 0,
+      "stdout": "SSED [ 89%]\nscripts/test_p19_imagination_engine.py::TestDashboardSoulView::test_imagination_called_from_narrative PASSED [ 91%]\nscripts/test_p19_imagination_engine.py::TestDashboardSoulView::test_inner_monologue_title PASSED [ 92%]\nscripts/test_p19_imagination_engine.py::TestDashboardSoulView::test_empathy_map_title PASSED [ 93%]\nscripts/test_p19_imagination_engine.py::TestDashboardSoulView::test_what_ifs_title PASSED [ 94%]\nscripts/test_p19_imagination_engine.py::TestDashboardSoulView::test_creative_synthesis_title PASSED [ 96%]\nscripts/test_p19_imagination_engine.py::TestDashboardSoulView::test_aspirations_title PASSED [ 97%]\nscripts/test_p19_imagination_engine.py::TestLangGraphIntegration::test_get_imagination_context_exists PASSED [ 98%]\nscripts/test_p19_imagination_engine.py::TestLangGraphIntegration::test_imagination_context_is_async PASSED [100%]\n\n============================== 79 passed in 0.73s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:22"
+    },
+    {
+      "target": "test-p20-conscience-values",
+      "returncode": 0,
+      "stdout": "_emoji_map PASSED [ 88%]\nscripts/test_p20_conscience_values.py::TestDashboardSoulView::test_type_emoji_map PASSED [ 90%]\nscripts/test_p20_conscience_values.py::TestDashboardSoulView::test_conscience_called_from_narrative PASSED [ 91%]\nscripts/test_p20_conscience_values.py::TestDashboardSoulView::test_integrity_title PASSED [ 92%]\nscripts/test_p20_conscience_values.py::TestDashboardSoulView::test_formed_values_title PASSED [ 94%]\nscripts/test_p20_conscience_values.py::TestDashboardSoulView::test_loyalty_ledger_title PASSED [ 95%]\nscripts/test_p20_conscience_values.py::TestDashboardSoulView::test_gratitude_journal_title PASSED [ 97%]\nscripts/test_p20_conscience_values.py::TestLangGraphIntegration::test_get_conscience_context_exists PASSED [ 98%]\nscripts/test_p20_conscience_values.py::TestLangGraphIntegration::test_conscience_context_is_async PASSED [100%]\n\n============================== 71 passed in 0.71s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:23"
+    },
+    {
+      "target": "test-p21-proactive-agent",
+      "returncode": 0,
+      "stdout": "_function PASSED [ 91%]\nscripts/test_p21_proactive_agent.py::TestSupervisorIntegration::test_fire_due_items_is_async PASSED [ 92%]\nscripts/test_p21_proactive_agent.py::TestSupervisorIntegration::test_fires_reminders PASSED [ 93%]\nscripts/test_p21_proactive_agent.py::TestSupervisorIntegration::test_fires_scheduled_tasks PASSED [ 94%]\nscripts/test_p21_proactive_agent.py::TestSupervisorIntegration::test_marks_reminders_fired PASSED [ 95%]\nscripts/test_p21_proactive_agent.py::TestSupervisorIntegration::test_marks_tasks_fired PASSED [ 96%]\nscripts/test_p21_proactive_agent.py::TestSupervisorIntegration::test_reminder_telegram_icon PASSED [ 97%]\nscripts/test_p21_proactive_agent.py::TestSupervisorIntegration::test_scheduled_icon_in_supervisor PASSED [ 98%]\nscripts/test_p21_proactive_agent.py::TestSupervisorIntegration::test_scheduled_telegram_icon PASSED [100%]\n\n============================== 93 passed in 0.13s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:24"
+    },
+    {
+      "target": "test-p22-operator-model",
+      "returncode": 0,
+      "stdout": "etches PASSED [ 93%]\nscripts/test_p22_operator_model.py::TestSupervisorIntegration::test_check_escalations_function PASSED [ 94%]\nscripts/test_p22_operator_model.py::TestSupervisorIntegration::test_check_escalations_is_async PASSED [ 94%]\nscripts/test_p22_operator_model.py::TestSupervisorIntegration::test_echo_icon PASSED [ 95%]\nscripts/test_p22_operator_model.py::TestSupervisorIntegration::test_escalation_checks_ladder PASSED [ 96%]\nscripts/test_p22_operator_model.py::TestSupervisorIntegration::test_escalation_fires_at_level_3 PASSED [ 97%]\nscripts/test_p22_operator_model.py::TestSupervisorIntegration::test_escalation_icon PASSED [ 98%]\nscripts/test_p22_operator_model.py::TestSupervisorIntegration::test_escalation_in_background_loop PASSED [ 99%]\nscripts/test_p22_operator_model.py::TestSupervisorIntegration::test_escalation_sends_telegram PASSED [100%]\n\n============================= 117 passed in 0.21s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:24"
+    },
+    {
+      "target": "test-h1-hardening",
+      "returncode": 0,
+      "stdout": "Guards::test_no_bare_httpx_in_p17_plus PASSED [ 82%]\nscripts/test_h1_hardening.py::TestH1_7_DashboardProxyGuards::test_operator_model_uses_proxy PASSED [ 84%]\nscripts/test_h1_hardening.py::TestH1_7_DashboardProxyGuards::test_proxy_get_defined PASSED [ 86%]\nscripts/test_h1_hardening.py::TestH1_7_DashboardProxyGuards::test_proxy_get_has_try_except PASSED [ 89%]\nscripts/test_h1_hardening.py::TestH1_7_DashboardProxyGuards::test_proxy_post_defined PASSED [ 91%]\nscripts/test_h1_hardening.py::TestH1_7_DashboardProxyGuards::test_proxy_post_has_try_except PASSED [ 93%]\nscripts/test_h1_hardening.py::TestH1_7_DashboardProxyGuards::test_reflections_uses_proxy PASSED [ 95%]\nscripts/test_h1_hardening.py::TestH1_7_DashboardProxyGuards::test_shadow_uses_proxy PASSED [ 97%]\nscripts/test_h1_hardening.py::TestH1_7_DashboardProxyGuards::test_values_uses_proxy PASSED [100%]\n\n============================== 46 passed in 0.08s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:25"
+    },
+    {
+      "target": "test-h2-self-healing",
+      "returncode": 0,
+      "stdout": "call PASSED [ 90%]\nscripts/test_h2_self_healing.py::TestResilientCalls::test_dashboard_proxy_post_uses_resilient_call PASSED [ 92%]\nscripts/test_h2_self_healing.py::TestResilientCalls::test_dashboard_proxy_uses_resilient_call PASSED [ 95%]\nscripts/test_h2_self_healing.py::TestResilientCalls::test_executor_imports_resilient_call PASSED [ 97%]\nscripts/test_h2_self_healing.py::TestResilientCalls::test_executor_uses_resilient_call PASSED [100%]\n\n=============================== warnings summary ===============================\nscripts/test_h2_self_healing.py::TestResilienceRuntime::test_resilient_call_fallback_on_bad_url\n  /workspaces/kai-system/scripts/test_h2_self_healing.py:111: DeprecationWarning: There is no current event loop\n    result = asyncio.get_event_loop().run_until_complete(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n======================== 42 passed, 1 warning in 0.42s =========================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:25"
+    },
+    {
+      "target": "test-mars-consolidation",
+      "returncode": 0,
+      "stdout": "test_mars_consolidation.py::TestCompressorMARSIntegration::test_consolidation_step_in_cycle PASSED [ 77%]\nscripts/test_mars_consolidation.py::TestCompressorMARSIntegration::test_pruned_count_in_result PASSED [ 80%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_fresh_memory_full_retention PASSED [ 82%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_one_day_high_stability PASSED [ 85%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_one_day_low_stability PASSED [ 88%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_prune_threshold_math PASSED [ 91%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_rehearsed_survives_prune PASSED [ 94%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_stability_growth_formula PASSED [ 97%]\nscripts/test_mars_consolidation.py::TestMARSMath::test_ten_rehearsals_compound PASSED [100%]\n\n============================== 35 passed in 0.07s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:26"
+    },
+    {
+      "target": "test-sage-critique",
+      "returncode": 0,
+      "stdout": "same_direction_no_conflict PASSED [ 73%]\nscripts/test_sage_critique.py::TestSelfReviewConflict::test_verifier_history_conflict PASSED [ 76%]\nscripts/test_sage_critique.py::TestSelfReviewOverOptimism::test_negative_modifier_no_over_optimism PASSED [ 80%]\nscripts/test_sage_critique.py::TestSelfReviewOverOptimism::test_over_optimism_flagged PASSED [ 83%]\nscripts/test_sage_critique.py::TestSelfReviewClean::test_clean_challenges PASSED [ 86%]\nscripts/test_sage_critique.py::TestSelfReviewMultipleIssues::test_penalty_capped_at_one PASSED [ 90%]\nscripts/test_sage_critique.py::TestSelfReviewMultipleIssues::test_two_issues PASSED [ 93%]\nscripts/test_sage_critique.py::TestSelfCritiqueAffectsVerdict::test_clean_critique_preserves_pass PASSED [ 96%]\nscripts/test_sage_critique.py::TestSelfCritiqueAffectsVerdict::test_groupthink_downgrades_pass_to_repair PASSED [100%]\n\n============================== 30 passed in 0.41s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:27"
+    },
+    {
+      "target": "test-agent-evolver",
+      "returncode": 0,
+      "stdout": "ipts/test_agent_evolver.py::TestPersistence::test_cap_at_20 PASSED    [ 73%]\nscripts/test_agent_evolver.py::TestPersistence::test_load_empty PASSED   [ 76%]\nscripts/test_agent_evolver.py::TestPersistence::test_save_and_load PASSED [ 79%]\nscripts/test_agent_evolver.py::TestSerialization::test_report_json_serializable PASSED [ 82%]\nscripts/test_agent_evolver.py::TestSerialization::test_report_to_dict PASSED [ 85%]\nscripts/test_agent_evolver.py::TestSerialization::test_suggestion_to_dict PASSED [ 88%]\nscripts/test_agent_evolver.py::TestEdgeCases::test_confidence_bounded PASSED [ 91%]\nscripts/test_agent_evolver.py::TestEdgeCases::test_episodes_with_missing_fields PASSED [ 94%]\nscripts/test_agent_evolver.py::TestEdgeCases::test_episodes_with_unknown_failure_class PASSED [ 97%]\nscripts/test_agent_evolver.py::TestEdgeCases::test_report_has_timing PASSED [100%]\n\n============================== 34 passed in 0.14s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:27"
+    },
+    {
+      "target": "test-checkpoint",
+      "returncode": 0,
+      "stdout": "ble PASSED [ 71%]\nscripts/test_checkpoint.py::TestSerialization::test_iso_time_format PASSED [ 75%]\nscripts/test_checkpoint.py::TestEdgeCases::test_empty_state PASSED       [ 78%]\nscripts/test_checkpoint.py::TestEdgeCases::test_special_chars_in_label PASSED [ 81%]\nscripts/test_checkpoint.py::TestEdgeCases::test_checkpoint_id_is_filesystem_safe PASSED [ 84%]\nscripts/test_checkpoint.py::TestEdgeCases::test_concurrent_create_no_collision PASSED [ 87%]\nscripts/test_checkpoint.py::TestEdgeCases::test_from_dict_missing_fields PASSED [ 90%]\nscripts/test_checkpoint.py::TestAutoCheckpointIntegration::test_pre_recover_checkpoint_pattern PASSED [ 93%]\nscripts/test_checkpoint.py::TestAutoCheckpointIntegration::test_post_dream_checkpoint_pattern PASSED [ 96%]\nscripts/test_checkpoint.py::TestAutoCheckpointIntegration::test_pre_restore_checkpoint_pattern PASSED [100%]\n\n============================== 32 passed in 1.10s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:29"
+    },
+    {
+      "target": "test-error-codes",
+      "returncode": 0,
+      "stdout": "e_limited_is_429 PASSED [ 47%]\nscripts/test_error_codes.py::TestStatusMapping::test_circuit_open_is_503 PASSED [ 52%]\nscripts/test_error_codes.py::TestStatusMapping::test_not_found_is_404 PASSED [ 57%]\nscripts/test_error_codes.py::TestKaiError::test_basic_construction PASSED [ 63%]\nscripts/test_error_codes.py::TestKaiError::test_default_detail_from_name PASSED [ 68%]\nscripts/test_error_codes.py::TestKaiError::test_to_dict_structure PASSED [ 73%]\nscripts/test_error_codes.py::TestKaiError::test_to_dict_json_serializable PASSED [ 78%]\nscripts/test_error_codes.py::TestKaiError::test_str_includes_code PASSED [ 84%]\nscripts/test_error_codes.py::TestKaiError::test_is_exception PASSED      [ 89%]\nscripts/test_error_codes.py::TestKaiError::test_context_field PASSED     [ 94%]\nscripts/test_error_codes.py::TestKaiError::test_unknown_code_defaults_500 PASSED [100%]\n\n============================== 19 passed in 0.04s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:29"
+    },
+    {
+      "target": "test-feature-flags",
+      "returncode": 0,
+      "stdout": "gs.py::TestIsEnabled::test_env_override_true PASSED [ 40%]\nscripts/test_feature_flags.py::TestIsEnabled::test_env_override_false_string PASSED [ 46%]\nscripts/test_feature_flags.py::TestIsEnabled::test_env_override_true_string PASSED [ 53%]\nscripts/test_feature_flags.py::TestIsEnabled::test_unknown_flag_returns_false PASSED [ 60%]\nscripts/test_feature_flags.py::TestIsEnabled::test_case_insensitive_env PASSED [ 66%]\nscripts/test_feature_flags.py::TestGetAllFlags::test_returns_list PASSED [ 73%]\nscripts/test_feature_flags.py::TestGetAllFlags::test_entries_have_name_and_enabled PASSED [ 80%]\nscripts/test_feature_flags.py::TestGetAllFlags::test_respects_env_override PASSED [ 86%]\nscripts/test_feature_flags.py::TestRegisterFlag::test_register_new_flag PASSED [ 93%]\nscripts/test_feature_flags.py::TestRegisterFlag::test_register_does_not_overwrite PASSED [100%]\n\n============================== 15 passed in 0.04s ==============================\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
+      "stderr": "",
+      "timestamp": "2026-03-22T16:23:29"
+    }
+  ]
+}

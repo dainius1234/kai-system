@@ -146,6 +146,9 @@ Run `make go_no_go` before committing changes to Python service entry points to 
 - When modifying a service's `app.py`, re-run `make go_no_go` to catch syntax errors.
 - Prefer small, focused pull requests. Use `make merge-gate` to confirm all checks pass locally before opening a PR.
 - Document significant changes in `docs/` and update `README.md` if the public interface changes.
+
+- **After any major code, test, or service change, always run `make sync-docs` and `make check-docs` to ensure all documentation, metrics, and project state are up to date.**
+- The `merge-gate` requires documentation freshness; stale README or PROJECT_BACKLOG will block merges.
 - For PostgreSQL/pgvector persistence, set `VECTOR_STORE=postgres` and `PG_URI=<connection-string>` before running tests.
 - Kai Control (`scripts/kai_control.py`) must run without `sudo`. Keep it dependency-light and offline-capable.
 - Memory retention uses MARS formula R = e^{-τ/S}. When adding new memory record fields, update: MemoryRecord model, PG schema CREATE TABLE, _init_schema migration list, _SELECT_COLS, _row_to_record, INSERT VALUES, update_record allowed set.
