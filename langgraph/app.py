@@ -610,6 +610,10 @@ async def chat_stream(req: ChatRequest):
     if not user_msg:
         raise HTTPException(status_code=400, detail="message is required")
 
+    # H1.2: prompt injection check (was only on /run, not /chat)
+    if INJECTION_RE.search(user_msg):
+        raise HTTPException(status_code=400, detail="prompt injection pattern blocked")
+
     # ── Step 0: Classify request ────────────────────────────────────
     route_decision = classify(user_msg)
     logger.info("Router: %s (confidence=%.2f, bypass_llm=%s)",
@@ -649,27 +653,28 @@ async def chat_stream(req: ChatRequest):
 
     # fetch memories, session context, goals, active topics, and emotional context in parallel
     import asyncio
-    memories_task = asyncio.create_task(_get_relevant_memories(user_msg))
-    session_task = asyncio.create_task(_get_session_messages(req.session_id))
-    goals_task = asyncio.create_task(_get_active_goals())
-    topics_task = asyncio.create_task(_get_active_topics())
-    eq_task = asyncio.create_task(_get_emotional_context(user_msg))
-    narrative_task = asyncio.create_task(_get_narrative_identity())
-    imagination_task = asyncio.create_task(_get_imagination_context(user_msg))
-    conscience_task = asyncio.create_task(_get_conscience_context())
-    agent_task = asyncio.create_task(_get_agent_context())
-    operator_task = asyncio.create_task(_get_operator_model(user_msg, mode))
+    # H1.3: 10-way parallel fetch with error handling — one failing task
+    # must not crash the entire /chat endpoint. Each gets a safe default.
+    async def _safe(coro, default):
+        try:
+            return await coro
+        except Exception as exc:
+            logger.warning("Context fetch failed (%s): %s", coro.__name__ if hasattr(coro, '__name__') else '?', exc)
+            return default
 
-    memories = await memories_task
-    session_msgs = await session_task
-    goals = await goals_task
-    topics = await topics_task
-    eq_context = await eq_task
-    narrative = await narrative_task
-    imagination = await imagination_task
-    conscience = await conscience_task
-    agent_ctx = await agent_task
-    operator_model = await operator_task
+    (memories, session_msgs, goals, topics, eq_context,
+     narrative, imagination, conscience, agent_ctx, operator_model) = await asyncio.gather(
+        _safe(_get_relevant_memories(user_msg), []),
+        _safe(_get_session_messages(req.session_id), []),
+        _safe(_get_active_goals(), []),
+        _safe(_get_active_topics(), {}),
+        _safe(_get_emotional_context(user_msg), {}),
+        _safe(_get_narrative_identity(), {}),
+        _safe(_get_imagination_context(user_msg), {}),
+        _safe(_get_conscience_context(), {}),
+        _safe(_get_agent_context(), {}),
+        _safe(_get_operator_model(user_msg, mode), {}),
+    )
 
     # build the message list
     messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]

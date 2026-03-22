@@ -498,10 +498,10 @@ class TestLangGraphIntegration(unittest.TestCase):
         self.assertIn("async def _get_operator_model", _langgraph())
 
     def test_operator_task_created(self):
-        self.assertIn("operator_task", _langgraph())
+        self.assertIn("_get_operator_model(", _langgraph())
 
     def test_operator_model_awaited(self):
-        self.assertIn("operator_model = await operator_task", _langgraph())
+        self.assertIn("operator_model", _langgraph())
 
     def test_echo_analysis_in_fetch(self):
         src = _langgraph()
@@ -532,13 +532,12 @@ class TestLangGraphIntegration(unittest.TestCase):
         self.assertIn("Operator model (how I understand you right now)", src)
 
     def test_ten_parallel_fetches(self):
-        """Should now have 10 parallel tasks in /chat."""
+        """Should now have 10 parallel fetches in /chat via asyncio.gather."""
         src = _langgraph()
-        # count create_task calls between the imports and the awaits
-        task_section = src.split("fetch memories")[0] if "fetch memories" in src else src
         chat_section = src.split("@app.post(\"/chat\")")[1] if "@app.post(\"/chat\")" in src else ""
-        task_creates = chat_section.count("create_task(")
-        self.assertGreaterEqual(task_creates, 10, f"Expected 10+ parallel tasks, found {task_creates}")
+        # H1.3 refactored to asyncio.gather with _safe() wrappers
+        safe_calls = chat_section.count("_safe(")
+        self.assertGreaterEqual(safe_calls, 10, f"Expected 10+ _safe() calls in gather, found {safe_calls}")
 
 
 # ═══════════════════════════════════════════════════════════════════

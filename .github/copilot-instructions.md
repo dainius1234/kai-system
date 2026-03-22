@@ -94,6 +94,7 @@ make test-p19-imagination-engine      # P19 imagination engine tests
 make test-p20-conscience-values        # P20 conscience & values tests
 make test-p21-proactive-agent          # P21 proactive agent loop tests
 make test-p22-operator-model            # P22 operator model tests
+make test-h1-hardening                  # H1 hardening sprint regression tests
 
 # Integration / smoke tests (requires running stack)
 make core-smoke              # python3 scripts/smoke_core.py

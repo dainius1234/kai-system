@@ -25,7 +25,29 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Proactive Agent Loop** | Scheduled tasks, reminders, morning/evening briefings, action registry | Never |
 | **Operator Model** | Echo-response engine, nudge escalation ladder, cross-mode insight bridge, impact oracle, shadow memory branches | Never |
 
-**57 test targets. 960 tests. Zero failures. 25 Docker services. All real.**
+**57 test targets. 960+ tests. Zero failures. 25 Docker services. All real.**
+
+**Current focus: Hardening Sprint H1** — Deep system audit found 10 critical issues (race conditions, missing error handling, security gaps). Fixing all before adding new features. Quality over velocity.
+
+---
+
+## Known Issues & Honest State
+
+> We built 22 milestones fast. Now we're building them right.
+
+| Area | Issue | Status |
+|---|---|---|
+| **memu-core** | 13+ race conditions (global state, no asyncio.Lock) | **FIXED in H1** |
+| **langgraph /chat** | No prompt injection check (only /run had one) | **FIXED in H1** |
+| **langgraph 10-way fetch** | No error handling on parallel context gather | **FIXED in H1** |
+| **memu-core feedback** | Called store.memorize() which doesn't exist | **FIXED in H1** |
+| **executor** | shell=True allows command chaining | **FIXED in H1** |
+| **telegram-bot** | Voice file download with no size limit | **FIXED in H1** |
+| **dashboard** | 50+ proxy endpoints with no try/except | **FIXED in H1** |
+| **P17-P22 data** | In-memory only — restart = data loss | Planned (H2) |
+| **verifier** | Keyword matcher, not semantic | Planned (H2) |
+| **context budget** | System prompt can grow unbounded | Planned (H2) |
+| **test coverage** | 40+ endpoints with zero tests | Planned (H3) |
 
 ---
 
@@ -282,7 +304,8 @@ Toggled from the chat UI header or via `Ctrl+Shift+M`. Stored in `localStorage`.
 - All code must work in BOTH environments (stubs in codespace, live on laptop)
 
 ### Current State
-- **57 test-core targets pass, ~960 individual tests.** Run `make test-core` to confirm.
+- **57 test-core targets pass, ~960+ individual tests.** Run `make test-core` to confirm.
+- **H1 Critical Hardening Sprint COMPLETE:** 10 critical issues fixed (race conditions, injection, error handling, shell safety, size limits, proxy guards).
 - **P0-P5 COMPLETE:** All 25 services built, running, tested. CI/CD, secrets, backup, HMAC rotation.
 - **P7-P15 COMPLETE:** Agentic patterns, thinking pathways, security self-hacking, dream state.
 - **P3 Organic Memory COMPLETE:** Correction learning, category boost, spaced repetition, proactive engine, Ohana goals, drift detection.
@@ -336,6 +359,8 @@ Request → injection filter → specialist selection → session buffer
 | P20 | Conscience & Values (value formation, moral reasoning, integrity tracking, loyalty memory, gratitude) | ✅ DONE |
 | P21 | Proactive Agent Loop (action registry, scheduled tasks, reminders, briefings, agent summary, supervisor firing) | ✅ DONE |
 | P22 | Operator Model & Adaptive Response (echo engine, nudge escalation, cross-mode bridge, impact oracle, shadow branches) | ✅ DONE |
+| **H1** | **Critical Hardening Sprint (race conditions, injection, error handling, security)** | **✅ DONE** |
+| H2 | Resilience (persistence, circuit breakers, context budget, verifier upgrade) | Planned |
 | P6 | Nice-to-have (calendar sync, workspace manager, avatar, Prometheus) | Queued |
 | HP1-HP6 | Hardware Performance Track (speculative decoding, VRAM watchdog, NVMe offload) | Awaiting GPU |
 
@@ -359,4 +384,5 @@ Full details in `docs/PROJECT_BACKLOG.md` and `docs/unfair_advantages.md`.
 - [x] HMAC auth, Ed25519 signing, episode saver, error budget breaker
 - [x] Proactive agent loop (action registry, scheduled tasks, reminders, morning/evening briefings, agent summary)
 - [x] Operator model (echo-response engine, nudge escalation ladder, cross-mode insight bridge, impact oracle, shadow branches)
-- [x] 57 test targets, 960 tests, zero failures
+- [x] H1 hardening: asyncio locks, injection check, error handling, shell=False, size limits, proxy guards
+- [x] 57 test targets, 960+ tests, zero failures

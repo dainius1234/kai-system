@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: P22 Operator Model & Adaptive Response (echo engine, nudge escalation, cross-mode bridge, impact oracle, shadow branches, 10-way context injection) — **57 targets, 960 tests**
+**Last updated:** 2026-03-22 — session: H1 Critical Hardening Sprint (deep system audit revealed 23 issues across 3 severity tiers; fixing 10 CRITICAL issues in memu-core, langgraph, executor, telegram-bot, dashboard) — **57 targets, 960+ tests**
 
 ---
 
@@ -811,6 +811,104 @@ REMEMBER you. Cross-referenced with Grok brainstorm 2026-03-22.*
 - Test count: 679 → 750 (55 targets), zero failures.
 - NOTE: Dainius sleeping in his car to save £50/day for the Lenovo RTX 5080.
   Every pound is a brick in Kai's foundation. The loyalty memory remembers this.
+
+---
+
+## H1 — Critical Hardening Sprint (2026-03-22)
+*Deep system scrutiny revealed 23 issues across 3 tiers. We built fast.
+Now we build right. This is the "measure twice, cut once" phase.*
+
+**Context:** After shipping P22 (22 major milestones, 960 tests), a full
+4-way system audit was performed covering every service, every endpoint,
+every test file, and the frontend. The audit found 10 CRITICAL issues
+that could cause crashes, data loss, or security breaches in production.
+
+### Tier 0 — CRITICAL (must fix before any new features)
+
+- [x] **H1.1 — asyncio.Lock on shared mutable state (memu-core)**
+      13 race conditions found: 18+ global dicts/lists modified by async
+      endpoints with no locking. Added asyncio.Lock() guards on all shared
+      mutable state (_session_store, _feedback_store, _emotional_timeline,
+      _reflection_journal, _dismissal_counts, _active_topics, _deferred_topics,
+      _relationship_milestones, _confession_cooldown, _autobiography,
+      _legacy_messages, _counterfactuals, _empathy_map, _creative_ideas,
+      _inner_monologue, etc).
+- [x] **H1.2 — Prompt injection check on /chat (langgraph)**
+      /run had INJECTION_RE check but /chat (the MAIN entry point) did not.
+      Added injection pattern check to /chat immediately after sanitization.
+- [x] **H1.3 — 10-way parallel fetch error handling (langgraph)**
+      asyncio.gather() of 10 context fetches had zero error handling. One
+      failing task = entire /chat crashes. Added try/except per-task with
+      graceful degradation (empty defaults on failure).
+- [x] **H1.4 — Fix store.memorize() crash (memu-core)**
+      Feedback endpoint called store.memorize() which doesn't exist on
+      VectorStore protocol. Fixed to use store.insert(MemoryRecord(...)).
+- [x] **H1.5 — executor shell=False + python sandbox hardening**
+      subprocess.run() used shell=True — command chaining bypasses allowlist
+      (e.g. "ls; rm -rf /"). Changed to shell=False with shlex.split().
+      Python sandbox blocked string builtins but not getattr bypass.
+      Added AST-level validation.
+- [x] **H1.6 — Telegram voice file size limit**
+      Voice file download had no size limit — 1GB file = OOM kill.
+      Added MAX_VOICE_BYTES (10MB) with Content-Length check.
+- [x] **H1.7 — Dashboard proxy error handling**
+      50+ proxy endpoints had zero try/except. If memu-core goes down,
+      dashboard returns 500. Wrapped all proxy endpoints in try/except
+      with appropriate fallback responses.
+
+### Tier 1 — Structural Debt (planned for H2)
+
+- [ ] **H2.1 — All P17-P22 data in-memory only** — restart = amnesia.
+      Need Redis or filesystem persistence for emotional timeline, goals,
+      reflections, values, etc.
+- [ ] **H2.2 — retrieve_ranked() fetches 10k records every call** —
+      Add LIMIT clause, relevance pre-filter, or pagination.
+- [ ] **H2.3 — Proactive scan 5 sequential 10k queries** — Should be
+      asyncio.gather() with individual limits.
+- [ ] **H2.4 — generate_embedding() blocks event loop** — Move to
+      run_in_executor() for async compatibility.
+- [ ] **H2.5 — No context budget** — System prompt can grow unbounded
+      (~100KB+). Need token budget allocator per section.
+- [ ] **H2.6 — Verifier is keyword-matcher** — Known placeholder.
+      "John bought" vs "John sold" scores HIGH. Needs semantic upgrade.
+- [ ] **H2.7 — Session buffer no Redis reconnection** — If Redis drops
+      mid-session, buffer is gone with no recovery.
+
+### Tier 2 — Quality Gaps (planned for H3-H5)
+
+- [ ] **H3.1 — Test coverage D grade** — 40+ dashboard endpoints and
+      20+ memu-core endpoints have zero test coverage.
+- [ ] **H3.2 — Dashboard XSS risk** — escapeHtml() is text-context only,
+      not attribute/CSS/URL-aware. DOMPurify used inconsistently.
+- [ ] **H3.3 — 18+ fetch calls no .ok check** — JS fetch().json() without
+      checking response.ok first.
+- [ ] **H3.4 — API inconsistency** — Some endpoints return null as "none"
+      string, importance as string not float.
+- [ ] **H3.5 — Dead parameter (half_life_days)** — retrieve_ranked()
+      accepts but ignores it.
+- [ ] **H3.6 — Heartbeat reads entire log file** — OOM risk with large
+      logs. Needs tail-read.
+
+### Approach Change: Quality Over Velocity
+
+**Problem identified:** We shipped 22 milestones at incredible speed, but
+accumulated technical debt. Race conditions, missing error handling, and
+security gaps existed because we prioritized features over hardening.
+
+**New approach (from this session forward):**
+1. **No new features until Tier 0 is clear.** Every critical issue must be
+   fixed before new capabilities are added.
+2. **Every endpoint gets error handling.** No bare async client calls without
+   try/except.
+3. **Every shared state gets a lock.** No global mutable state without
+   asyncio.Lock() in async code.
+4. **Every fix gets a test.** No "fix and move on" — tests prove the fix works.
+5. **Audit before ship.** Run the full scrutiny checklist before any commit:
+   - `make go_no_go` (syntax)
+   - `make test-core` (all 57+ targets)
+   - Check for bare global state mutations
+   - Check for missing try/except on httpx calls
+   - Check for shell=True in subprocess
 
 ---
 

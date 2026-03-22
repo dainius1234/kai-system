@@ -18,8 +18,10 @@ All execution happens in subprocess with:
 """
 from __future__ import annotations
 
+import ast
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -178,9 +180,10 @@ def _execute_shell(params: Dict[str, Any], timeout: int) -> subprocess.Completed
         "HOME": "/tmp",
         "LANG": "C.UTF-8",
     }
+    # H1.5: shell=False prevents command chaining (e.g. "ls; rm -rf /")
     return subprocess.run(
-        command,
-        shell=True,
+        shlex.split(command),
+        shell=False,
         capture_output=True,
         text=True,
         timeout=timeout,
@@ -230,14 +233,31 @@ def _execute_python(params: Dict[str, Any]) -> subprocess.CompletedProcess:
     if not expression:
         raise HTTPException(status_code=400, detail="python tool requires 'expression' param")
 
-    # block dangerous builtins
-    blocked = ["__import__", "exec", "eval", "compile", "open", "breakpoint", "exit", "quit"]
-    for b in blocked:
-        if b in expression:
+    # H1.5: AST-level validation — catches getattr bypass, attribute access to
+    # builtins, and other patterns that string matching misses.
+    try:
+        tree = ast.parse(expression, mode="eval")
+    except SyntaxError:
+        raise HTTPException(status_code=400, detail="Invalid Python expression")
+
+    # Walk AST to block dangerous patterns
+    for node in ast.walk(tree):
+        # Block all attribute access to dunder methods (getattr trick)
+        if isinstance(node, ast.Attribute) and node.attr.startswith("_"):
             raise HTTPException(status_code=403, detail={
-                "reason": "blocked_builtin",
-                "message": f"Expression contains blocked builtin: {b}",
+                "reason": "blocked_attribute",
+                "message": f"Access to private/dunder attributes is blocked: {node.attr}",
             })
+        # Block calls to getattr, setattr, delattr, type, globals, locals, vars, dir
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            if node.func.id in ("getattr", "setattr", "delattr", "type",
+                                "globals", "locals", "vars", "dir",
+                                "__import__", "exec", "eval", "compile",
+                                "open", "breakpoint", "exit", "quit"):
+                raise HTTPException(status_code=403, detail={
+                    "reason": "blocked_builtin",
+                    "message": f"Call to {node.func.id}() is blocked",
+                })
 
     # run in isolated subprocess with restricted builtins
     wrapper = f"""

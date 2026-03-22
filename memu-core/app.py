@@ -10,6 +10,7 @@ LLM specialist, manages memory retrieval, and handles state.
 """
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import logging
@@ -81,6 +82,20 @@ last_compress_run = 0.0
 MAX_MEMORY_RECORDS = int(os.getenv("MAX_MEMORY_RECORDS", "5000"))
 MAX_STATE_KEY_SIZE = int(os.getenv("MAX_STATE_KEY_SIZE", "128"))
 MAX_STATE_VALUE_SIZE = int(os.getenv("MAX_STATE_VALUE_SIZE", "4096"))
+
+# ── H1.1: asyncio locks for shared mutable state ────────────────────
+# Grouped by subsystem to avoid per-list overhead while preventing races.
+_session_lock = asyncio.Lock()       # protects _session_store, _session_timestamps
+_feedback_lock = asyncio.Lock()      # protects _feedback_store
+_nudge_lock = asyncio.Lock()         # protects _dismissal_counts, _last_nudge_by_type, _dnd_until
+_topic_lock = asyncio.Lock()         # protects _active_topics, _deferred_topics
+_emotion_lock = asyncio.Lock()       # protects _emotional_timeline, _reflection_journal, _confession_cooldown
+_relationship_lock = asyncio.Lock()  # protects _relationship_milestones
+_narrative_lock = asyncio.Lock()     # protects _autobiography, _legacy_messages
+_imagination_lock = asyncio.Lock()   # protects _counterfactuals, _empathy_map, _creative_ideas, _inner_monologue, _aspirations
+_conscience_lock = asyncio.Lock()    # protects _formed_values, _conscience_log, _loyalty_ledger, _gratitude_journal, _value_alignment_score
+_agent_lock = asyncio.Lock()         # protects _scheduled_tasks, _reminders, _briefing_log
+_operator_lock = asyncio.Lock()      # protects _echo_history, _nudge_ladder, _cross_mode_insights, _oracle_predictions, _shadow_branches
 
 
 class MemoryRequest(BaseModel):
@@ -3059,7 +3074,8 @@ async def submit_feedback(req: FeedbackRequest) -> Dict[str, Any]:
         "comment": sanitize_string(req.comment) if req.comment else None,
         "timestamp": time.time(),
     }
-    _feedback_store.append(entry)
+    async with _feedback_lock:
+        _feedback_store.append(entry)
 
     # if great rating, try to boost the memory importance
     if req.rating >= 4:
@@ -3069,12 +3085,17 @@ async def submit_feedback(req: FeedbackRequest) -> Dict[str, Any]:
             if msgs and req.message_index < len(msgs):
                 content = msgs[req.message_index].get("content", "")
                 if content:
-                    store.memorize(
-                        text=f"[positive feedback] {content[:200]}",
+                    record = MemoryRecord(
+                        id=str(uuid.uuid4()),
+                        timestamp=datetime.now(timezone.utc).isoformat(),
                         event_type="feedback_positive",
+                        category="general",
+                        content={"result": f"[positive feedback] {content[:200]}",
+                                 "rating": req.rating, "session": sid},
+                        embedding=generate_embedding(f"positive feedback: {content[:200]}"),
                         importance=0.85,
-                        metadata={"rating": req.rating, "session": sid},
                     )
+                    store.insert(record)
         except Exception:
             pass
 
@@ -3086,12 +3107,17 @@ async def submit_feedback(req: FeedbackRequest) -> Dict[str, Any]:
             if msgs and req.message_index < len(msgs):
                 content = msgs[req.message_index].get("content", "")
                 if content:
-                    store.memorize(
-                        text=f"[negative feedback] Response was unhelpful: {content[:200]}",
+                    record = MemoryRecord(
+                        id=str(uuid.uuid4()),
+                        timestamp=datetime.now(timezone.utc).isoformat(),
                         event_type="correction",
+                        category="general",
+                        content={"result": f"[negative feedback] Response was unhelpful: {content[:200]}",
+                                 "rating": req.rating, "comment": req.comment, "session": sid},
+                        embedding=generate_embedding(f"correction: {content[:200]}"),
                         importance=0.90,
-                        metadata={"rating": req.rating, "comment": req.comment, "session": sid},
                     )
+                    store.insert(record)
         except Exception:
             pass
 
@@ -3190,7 +3216,8 @@ async def record_emotion(request: Request) -> Dict[str, Any]:
     text = sanitize_string(body.get("text", ""))
     if not text:
         raise HTTPException(status_code=400, detail="text is required")
-    entry = _record_emotion(session_id, text)
+    async with _emotion_lock:
+        entry = _record_emotion(session_id, text)
     return {"status": "ok", **entry}
 
 

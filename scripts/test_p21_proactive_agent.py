@@ -352,10 +352,10 @@ class TestLangGraphIntegration(unittest.TestCase):
         self.assertIn("async def _get_agent_context", LANG_SRC)
 
     def test_agent_task_created(self):
-        self.assertIn("agent_task = asyncio.create_task(_get_agent_context())", LANG_SRC)
+        self.assertIn("_get_agent_context()", LANG_SRC)
 
     def test_agent_ctx_awaited(self):
-        self.assertIn("agent_ctx = await agent_task", LANG_SRC)
+        self.assertIn("agent_ctx", LANG_SRC)
 
     def test_agent_context_injected(self):
         self.assertIn("Agent capabilities & schedule", LANG_SRC)

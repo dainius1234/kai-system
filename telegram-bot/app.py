@@ -107,13 +107,21 @@ async def _send_typing(chat_id: int):
         pass
 
 
+MAX_VOICE_BYTES = 10 * 1024 * 1024  # H1.6: 10MB voice file limit
+
+
 async def _download_file(file_id: str) -> bytes:
     """Download a Telegram file by file_id."""
     info = await _tg("getFile", json={"file_id": file_id})
     fpath = info["result"]["file_path"]
+    # H1.6: validate file path doesn't escape expected directory
+    if ".." in fpath or fpath.startswith("/"):
+        raise ValueError(f"Suspicious file path: {fpath}")
     async with httpx.AsyncClient(timeout=30.0) as c:
         r = await c.get(f"{TG_FILE}/{fpath}")
         r.raise_for_status()
+        if len(r.content) > MAX_VOICE_BYTES:
+            raise ValueError(f"Voice file too large: {len(r.content)} bytes (max {MAX_VOICE_BYTES})")
         return r.content
 
 

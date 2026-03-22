@@ -33,6 +33,34 @@ app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 budget = ErrorBudget(window_seconds=300)
 
+
+# ── H1.7: Safe proxy helpers — all external calls wrapped ───────────
+async def _proxy_get(url: str, params: dict | None = None,
+                     fallback: Any = None, timeout: float = 10.0) -> Any:
+    """GET from a backend service with error handling. Returns fallback on failure."""
+    try:
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            resp = await client.get(url, params=params)
+            resp.raise_for_status()
+            return resp.json()
+    except Exception as exc:
+        logger.warning("Proxy GET %s failed: %s", url, exc)
+        return fallback if fallback is not None else {"status": "unavailable", "error": str(exc)}
+
+
+async def _proxy_post(url: str, body: dict | None = None,
+                      fallback: Any = None, timeout: float = 10.0) -> Any:
+    """POST to a backend service with error handling. Returns fallback on failure."""
+    try:
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            resp = await client.post(url, json=body or {})
+            resp.raise_for_status()
+            return resp.json()
+    except Exception as exc:
+        logger.warning("Proxy POST %s failed: %s", url, exc)
+        return fallback if fallback is not None else {"status": "unavailable", "error": str(exc)}
+
+
 # ── New API endpoints for dashboard UI extras ───────────────────────
 
 @app.get("/api/nudges")
@@ -696,14 +724,12 @@ async def api_logs(limit: int = 100, level: str = "", since: float = 0):
     }
 
 
-# ── P17: Emotional Intelligence Proxies ──────────────────────────────
+# ── P17: Emotional Intelligence Proxies (H1.7: all wrapped) ──────────
 
 @app.post("/api/emotion/record")
 async def proxy_emotion_record(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/emotion/record", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/emotion/record", body)
 
 
 @app.get("/api/emotion/timeline")
@@ -714,425 +740,315 @@ async def proxy_emotion_timeline(
     params: dict = {"limit": limit}
     if session_id:
         params["session_id"] = session_id
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/emotion/timeline", params=params)
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/emotion/timeline", params=params,
+                            fallback={"entries": [], "count": 0})
 
 
 @app.post("/api/reflect")
 async def proxy_reflect(request: Request):
     body = await request.json() if (await request.body()) else {}
-    async with httpx.AsyncClient(timeout=15.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/self-reflect", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/self-reflect", body, timeout=15.0)
 
 
 @app.get("/api/reflections")
 async def proxy_reflections(limit: int = 10):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/self-reflections", params={"limit": limit})
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/self-reflections", params={"limit": limit},
+                            fallback={"entries": [], "count": 0})
 
 
 @app.get("/api/relationship")
 async def proxy_relationship():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/relationship")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/relationship")
 
 
 @app.post("/api/relationship/milestone")
 async def proxy_milestone(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/relationship/milestone", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/relationship/milestone", body)
 
 
 @app.get("/api/confidence")
 async def proxy_confidence():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/confidence")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/confidence")
 
 
 @app.get("/api/eq/summary")
 async def proxy_eq_summary():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/eq/summary")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/eq/summary")
 
 
 @app.post("/api/confess")
 async def proxy_confess(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/confess", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/confess", body)
 
 
-# ── P18: Narrative Identity proxies ──────────────────────────────────
+# ── P18: Narrative Identity proxies (H1.7: all wrapped) ─────────────
 
 @app.post("/api/autobiography/record")
 async def proxy_autobiography_record(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/autobiography/record", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/autobiography/record", body)
 
 
 @app.get("/api/autobiography")
 async def proxy_autobiography(request: Request):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/autobiography", params=dict(request.query_params))
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/autobiography", params=dict(request.query_params),
+                            fallback={"entries": [], "count": 0})
 
 
 @app.get("/api/identity")
 async def proxy_identity():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/identity")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/identity")
 
 
 @app.get("/api/story-arcs")
 async def proxy_story_arcs():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/story-arcs")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/story-arcs", fallback={"arcs": []})
 
 
 @app.get("/api/future-self")
 async def proxy_future_self():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/future-self")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/future-self")
 
 
 @app.post("/api/legacy/write")
 async def proxy_legacy_write(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/legacy/write", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/legacy/write", body)
 
 
 @app.get("/api/legacy")
 async def proxy_legacy(request: Request):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/legacy", params=dict(request.query_params))
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/legacy", params=dict(request.query_params),
+                            fallback={"messages": []})
 
 
 @app.get("/api/narrative/summary")
 async def proxy_narrative_summary():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/narrative/summary")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/narrative/summary")
 
 
-# ── P19 Imagination proxies ─────────────────────────────────────────
+# ── P19 Imagination proxies (H1.7: all wrapped) ─────────────────────
 
 @app.post("/api/imagine/counterfactual")
 async def proxy_counterfactual(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/imagine/counterfactual", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/imagine/counterfactual", body)
 
 
 @app.get("/api/imagine/counterfactuals")
 async def proxy_counterfactuals():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/imagine/counterfactuals")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/imagine/counterfactuals", fallback={"entries": []})
 
 
 @app.post("/api/imagine/empathize")
 async def proxy_empathize(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/imagine/empathize", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/imagine/empathize", body)
 
 
 @app.get("/api/imagine/empathy-map")
 async def proxy_empathy_map():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/imagine/empathy-map")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/imagine/empathy-map")
 
 
 @app.post("/api/imagine/synthesize")
 async def proxy_synthesize(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/imagine/synthesize", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/imagine/synthesize", body)
 
 
 @app.get("/api/imagine/ideas")
 async def proxy_ideas():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/imagine/ideas")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/imagine/ideas", fallback={"ideas": []})
 
 
 @app.post("/api/imagine/thought")
 async def proxy_thought(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/imagine/thought", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/imagine/thought", body)
 
 
 @app.get("/api/imagine/inner-monologue")
 async def proxy_inner_monologue():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/imagine/inner-monologue")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/imagine/inner-monologue", fallback={"entries": []})
 
 
 @app.post("/api/imagine/aspire")
 async def proxy_aspire(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/imagine/aspire", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/imagine/aspire", body)
 
 
 @app.get("/api/imagine/aspirations")
 async def proxy_aspirations():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/imagine/aspirations")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/imagine/aspirations", fallback={"entries": []})
 
 
 @app.get("/api/imagine/summary")
 async def proxy_imagination_summary():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/imagine/summary")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/imagine/summary")
 
 
-# ── P20: Conscience & Values proxies ─────────────────────────────────
+# ── P20: Conscience & Values proxies (H1.7: all wrapped) ────────────
 
 @app.post("/api/values/learn")
 async def proxy_values_learn(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/values/learn", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/values/learn", body)
 
 
 @app.get("/api/values")
 async def proxy_values():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/values")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/values", fallback={"values": []})
 
 
 @app.post("/api/conscience/check")
 async def proxy_conscience_check(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/conscience/check", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/conscience/check", body)
 
 
 @app.get("/api/conscience/audit")
 async def proxy_conscience_audit():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/conscience/audit")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/conscience/audit")
 
 
 @app.post("/api/loyalty/record")
 async def proxy_loyalty_record(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/loyalty/record", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/loyalty/record", body)
 
 
 @app.get("/api/loyalty")
 async def proxy_loyalty():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/loyalty")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/loyalty", fallback={"entries": []})
 
 
 @app.post("/api/gratitude/record")
 async def proxy_gratitude_record(request: Request):
     body = await request.json()
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/gratitude/record", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/gratitude/record", body)
 
 
 @app.get("/api/gratitude")
 async def proxy_gratitude():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/gratitude")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/gratitude", fallback={"entries": []})
 
 
 @app.get("/api/conscience/summary")
 async def proxy_conscience_summary():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/conscience/summary")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/conscience/summary")
 
 
-# ── P21: Proactive Agent Loop proxies ────────────────────────────────
+# ── P21: Proactive Agent Loop proxies (H1.7: all wrapped) ───────────
 
 @app.get("/api/actions")
 async def proxy_actions():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/actions")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/actions", fallback={"actions": []})
 
 
 @app.post("/api/schedule/task")
 async def proxy_schedule_task(body: dict):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/schedule/task", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/schedule/task", body)
 
 
 @app.get("/api/schedule/tasks")
 async def proxy_schedule_tasks():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/schedule/tasks")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/schedule/tasks", fallback={"tasks": []})
 
 
 @app.post("/api/schedule/task/{task_id}/cancel")
 async def proxy_cancel_task(task_id: str):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/schedule/task/{task_id}/cancel")
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/schedule/task/{task_id}/cancel")
 
 
 @app.post("/api/reminders/set")
 async def proxy_set_reminder(body: dict):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/reminders/set", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/reminders/set", body)
 
 
 @app.get("/api/reminders")
 async def proxy_reminders():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/reminders")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/reminders", fallback={"reminders": []})
 
 
 @app.post("/api/reminders/{reminder_id}/cancel")
 async def proxy_cancel_reminder(reminder_id: str):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/reminders/{reminder_id}/cancel")
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/reminders/{reminder_id}/cancel")
 
 
 @app.post("/api/briefing/morning")
 async def proxy_morning_briefing():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/briefing/morning")
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/briefing/morning")
 
 
 @app.post("/api/briefing/evening")
 async def proxy_evening_checkin():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/briefing/evening")
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/briefing/evening")
 
 
 @app.get("/api/agent/summary")
 async def proxy_agent_summary():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/agent/summary")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/agent/summary")
 
 
-# ── P22 Operator Model proxies ──────────────────────────────────────
+# ── P22 Operator Model proxies (H1.7: all wrapped) ─────────────────
 
 @app.post("/api/echo/analyse")
 async def proxy_echo_analyse(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/echo/analyse", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/echo/analyse", body)
 
 
 @app.get("/api/echo/history")
 async def proxy_echo_history():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/echo/history")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/echo/history", fallback={"entries": []})
 
 
 @app.post("/api/nudge/escalate")
 async def proxy_nudge_escalate(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/nudge/escalate", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/nudge/escalate", body)
 
 
 @app.get("/api/nudge/ladder")
 async def proxy_nudge_ladder():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/nudge/ladder")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/nudge/ladder", fallback={"ladder": {}})
 
 
 @app.post("/api/cross-mode/scan")
 async def proxy_cross_mode_scan(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/cross-mode/scan", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/cross-mode/scan", body)
 
 
 @app.get("/api/cross-mode")
 async def proxy_cross_mode():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/cross-mode")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/cross-mode", fallback={"insights": []})
 
 
 @app.post("/api/oracle/predict")
 async def proxy_oracle_predict(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/oracle/predict", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/oracle/predict", body)
 
 
 @app.get("/api/oracle/chains")
 async def proxy_oracle_chains():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/oracle/chains")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/oracle/chains", fallback={"chains": []})
 
 
 @app.post("/api/shadow/branch")
 async def proxy_shadow_branch(body: Dict[str, Any] = Body(...)):
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.post(f"{MEMU_URL}/memory/shadow/branch", json=body)
-        return resp.json()
+    return await _proxy_post(f"{MEMU_URL}/memory/shadow/branch", body)
 
 
 @app.get("/api/shadow/branches")
 async def proxy_shadow_branches():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/shadow/branches")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/shadow/branches", fallback={"branches": []})
 
 
 @app.get("/api/operator-model")
 async def proxy_operator_model():
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        resp = await client.get(f"{MEMU_URL}/memory/operator-model")
-        return resp.json()
+    return await _proxy_get(f"{MEMU_URL}/memory/operator-model")
 
 
 # ── Unified App Shell ────────────────────────────────────────────────
