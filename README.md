@@ -1,8 +1,22 @@
-# Sovereign AI — kai-system
+<p align="center">
+  <b>S O V E R E I G N &nbsp; A I</b><br>
+  <code>kai-system</code>
+</p>
 
-> *Not a chatbot. Not an agent framework. A sovereign intelligence that grows, reflects, and earns the right to act.*
+<p align="center">
+  <em>"Not a chatbot. Not an agent framework. A sovereign intelligence that grows, reflects, and earns the right to act."</em>
+</p>
 
-A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offline by default — all network access, data sharing, and external actions are controlled by the operator. Built with soul, not just syntax.
+<p align="center">
+  <img src="https://img.shields.io/badge/services-26-blue?style=flat-square" alt="services">
+  <img src="https://img.shields.io/badge/tests-1%2C258_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/Python-~36%2C063_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/milestones-29_shipped-purple?style=flat-square" alt="milestones">
+  <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
+  <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
+</p>
+
+---
 
 ## Project Status (22 March 2026)
 
@@ -11,312 +25,206 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Services** | 26 Docker containers |
 | **Test targets** | 65 (`make test-core`) |
 | **Individual tests** | 1,258 (`def test_` across 71 files) |
-| **Python LOC** | ~36,006 |
+| **Python LOC** | ~36,063 |
 | **Compose files** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 24 |
+| **Milestones shipped** | 29 |
 | **Failures** | 0 |
+
+> **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
+
+---
+
+## Quick Reference
+
+```
+make core-up          # Start minimal stack (8 services)
+make core-down        # Stop it
+make full-up          # Start all 26 services
+make test-core        # Run all 65 test targets (~1,258 tests)
+make go_no_go         # Syntax check all entry points
+make merge-gate       # Full pre-merge validation
+make sync-docs        # Auto-update README + backlog metrics
+make dep-audit        # CVE scan on pip packages
+make coverage         # pytest-cov HTML report
+```
+
+---
 
 ## What Makes Kai Different
 
-| Capability | What It Means | Commercial AI? |
-|---|---|---|
-| **Emotional Memory** | Detects 8 emotions in conversation, tracks mood arcs over time | Never |
-| **Self-Reflection** | Analyzes its own mistakes, builds strengths/weaknesses journal | Never |
-| **Epistemic Humility** | Knows what it doesn't know — warns when confidence is low | Never |
-| **Confession Engine** | Proactively admits past mistakes without being asked | Never |
-| **Narrative Identity** | Builds its own life story — autobiography, arcs, future self, legacy messages | Never |
-| **Dream State** | 6-phase offline consolidation — failure clustering, boundary recalibration, MARS decay | Never |
-| **SAGE Critique** | Verifier self-critique + adversary self-review — AI arguing with itself | Never |
-| **Agent-Evolver** | Learns from failure clusters during dream cycles, generates proactive fix insights | Never |
-| **Imagination Engine** | Counterfactual replay, theory of mind, creative synthesis, inner monologue | Never |
-| **Conscience & Values** | Emergent values, moral reasoning, loyalty memory, gratitude engine | Never |
-| **Proactive Agent Loop** | Scheduled tasks, reminders, morning/evening briefings, 13-action registry | Never |
-| **Operator Model** | Echo-response, nudge escalation, cross-mode bridge, impact oracle, shadow branches | Never |
-| **Time-Travel Debug** | Checkpoint any state, diff between snapshots, rollback to any previous state | Never |
-| **Self-Healing** | Deep /health → /recover → supervisor auto-heal loop across all services | Rarely |
-| **Security Self-Hacking** | Fuzzes own APIs with 34 payloads, adversary challenges, SAGE self-review | Never |
-| **Feature Flags** | 13 capabilities toggleable via environment without code changes | Standard |
-| **Structured Error Codes** | 20 enumerated codes (E1001-E4004) — no more "something broke" | Standard |
-| **Operator Sovereignty** | Zero telemetry, zero corporate control, zero resets | Never |
+> Every row below is **implemented and tested**. Nothing is vaporware.
+
+### Soul & Inner Life
+
+| Capability | What It Does |
+|---|---|
+| **Emotional Memory** | Detects 8 emotions in conversation, tracks mood arcs over time, surfaces emotional continuity |
+| **Self-Reflection** | Analyzes its own mistakes, builds a strengths/weaknesses journal, knows where it fails |
+| **Epistemic Humility** | Knows what it doesn't know — warns operator when confidence is low |
+| **Confession Engine** | Proactively admits past mistakes without being asked |
+| **Narrative Identity** | Builds its own life story — autobiography, story arcs, future self projection, legacy time-capsules |
+| **Imagination Engine** | Counterfactual replay, theory of mind, creative synthesis, inner monologue, aspirational futures |
+| **Conscience & Values** | Emergent value formation, moral reasoning, integrity tracking, loyalty memory, gratitude engine |
+| **Dream State** | 6-phase offline consolidation — failure clustering, boundary recalibration, MARS memory decay |
+
+### Intelligence & Reasoning
+
+| Capability | What It Does |
+|---|---|
+| **10-Way Context** | Every response enriched with: memories + session + goals + topics + EQ + narrative + imagination + conscience + agent + operator model |
+| **Specialist Router** | Classifies queries into 8 UK construction domains for category-aware retrieval |
+| **Memory-Driven Planner** | Gap-aware plans with preference constraints and history-informed conviction modifiers |
+| **Adversary Engine** | 7 challenge types (incl. SAGE self-review) test every plan before execution |
+| **Conviction Scoring** | 5-signal + modifiers gate; below 8.0 triggers rethink (max 3 retries) |
+| **SAGE Critique** | Verifier self-critique + adversary self-review — AI arguing with itself for quality |
+| **Agent-Evolver** | Learns from failure clusters during dream cycles, generates proactive fix insights |
+| **Tree Search** | Chain-of-thought pruning with priority queue for complex reasoning |
+
+### Operator Relationship
+
+| Capability | What It Does |
+|---|---|
+| **Operator Model** | Echo-response engine, nudge escalation ladder (4-tier), cross-mode insight bridge |
+| **Impact Oracle** | Predicts consequences of actions on goals and emotions — "if you skip X, Y suffers" |
+| **Shadow Branches** | Persistent what-if timelines from counterfactuals, queryable alternate histories |
+| **Proactive Agent** | Scheduled tasks, reminders, morning briefing, evening check-in, 13-action registry |
+| **Struggle Detection** | 5-signal frustration analysis — auto-adapts when operator is struggling |
+| **Anti-Annoyance** | Per-type cooldowns, dismissal tracking, DND mode, escalating suppression |
+| **PUB/WORK Modes** | Deep personality system — mate at the pub vs. focused professional |
+
+### Production & Security
+
+| Capability | What It Does |
+|---|---|
+| **Self-Healing** | Deep `/health` + `/recover` + supervisor auto-heal loop across all services |
+| **Recovery Log** | Every self-heal event logged to conscience — ties resilience to narrative |
+| **Security Self-Hacking** | Fuzzes own APIs with 34 payloads, adversary challenges, SAGE self-review |
+| **HMAC Auth** | Inter-service HMAC signing, Ed25519, dual-sign rotation, nonce replay protection |
+| **Time-Travel Debug** | Checkpoint any state, diff between snapshots, rollback to any previous state |
+| **Feature Flags** | 13 capabilities toggleable via `FF_` env vars without code changes |
+| **Structured Errors** | 20 enumerated codes (E1001–E4004) — no more "something broke" |
+| **Zero Telemetry** | No corporate control, no data exfiltration, no resets. Ever. |
 
 ---
 
-## Known Issues & Honest State
-
-> We built 28 milestones fast. Now we're building them right.
-
-| Area | Issue | Status |
-|---|---|---|
-| **memu-core** | 13+ race conditions (global state, no asyncio.Lock) | **FIXED in H1** |
-| **langgraph /chat** | No prompt injection check (only /run had one) | **FIXED in H1** |
-| **langgraph 10-way fetch** | No error handling on parallel context gather | **FIXED in H1** |
-| **memu-core feedback** | Called store.memorize() which doesn't exist | **FIXED in H1** |
-| **executor** | shell=True allows command chaining | **FIXED in H1** |
-| **telegram-bot** | Voice file download with no size limit | **FIXED in H1** |
-| **dashboard** | 50+ proxy endpoints with no try/except | **FIXED in H1** |
-| **All services** | /health returns 200 without checking dependencies | **FIXED in H2** |
-| **Inter-service calls** | No retry, no circuit breaker, no fallback | **FIXED in H2** |
-| **Supervisor** | Observes but can't heal (advisory-only circuit breakers) | **FIXED in H2** |
-| **Background tasks** | Frozen loops undetectable (/health still returns 200) | **FIXED in H2** |
-| **memu-core memory** | Basic Ebbinghaus decay (no stability growth, no pruning) | **FIXED — MARS** |
-| **verifier** | Self-critique loop added (was keyword-only) | **FIXED — P23 SAGE** |
-| **Failure learning** | No pattern extraction from failures | **FIXED — P24 Agent-Evolver** |
-| **State debugging** | No crash recovery, no state snapshots | **FIXED — H3b Checkpoint** |
-| **Error messages** | Ad-hoc HTTP statuses, no structured codes | **FIXED — Gap-Close** |
-| **Feature toggles** | Hardcoded in code, no env overrides | **FIXED — Gap-Close** |
-| **Dep scanning** | No vulnerability checks on pip packages or containers | **FIXED — Gap-Close** |
-| **Pre-commit** | No automated quality checks before commit | **FIXED — Gap-Close** |
-| **verifier semantic** | Keyword matcher, not embedding-based | Planned |
-| **context budget** | System prompt can grow unbounded | Planned |
-| **test coverage** | ~60% estimated, no formal measurement yet | Tracking (`.coveragerc` added) |
-
-| **Recovery log** | After every /recover, Kai logs what was healed and what was learned to its conscience. | **NEW in H2** |
-
----
-
-## System Overview
-
-Kai is modular, secure, and designed for real-world use:
-- **Operator Control:** You decide when Kai can access the internet, update, or interact externally. All activity is logged.
-- **Growth & Learning:** Kai improves through conversation — correction learning, spaced repetition, proactive memory surfacing.
-- **Safety:** Every action is checked by Tool-Gate and Orchestrator. HMAC-signed inter-service calls. Sandboxed execution.
-- **Personality:** Two modes — **WORK** (professional, focused) and **PUB** (uncensored friend, real talk like a mate at the pub).
-
-**Main Components:**
-- **Tool-Gate & Orchestrator:** Policy enforcement and final risk authority.
-- **Memu-Core:** Memory engine — vector search, emotional memory, self-reflection, epistemic humility, goals, relationship tracking.
-- **LangGraph:** Agentic brain — routing, planning, conviction scoring, tree search, adversary challenges, EQ context injection.
-- **Dashboard:** 8-view operator console — Chat, Dashboard, Thinking, Goals, Memory, Logs, Settings, Soul.
-- **Perception:** Telegram bot (voice + text), audio capture (faster-whisper), camera, screen capture.
-- **Executor & Sandboxes:** Isolated execution of approved actions.
-
-**How it works:**
-1. Operator sends a message (Telegram, Dashboard, or API).
-2. LangGraph enriches context: memories + session + goals + topics + EQ + narrative + imagination + conscience + agent + operator model (10-way parallel fetch).
-3. Specialist router classifies the domain. Planner builds a gap-aware plan.
-4. Adversary challenges the plan (7 challenge types incl. SAGE self-review). Conviction scoring gates execution.
-5. Tool-Gate checks policy (HMAC, rate limit, co-sign). Executor runs in sandbox.
-6. Post-mortem: episode saved, corrections learned, emotion recorded, memory updated.
-
----
-
-## Resilience Architecture (H2)
-
-> "A system that can't heal itself isn't intelligent — it's just complicated."
-
-Two-layer self-healing, modelled on how biological organisms work:
-
-| Layer | Where | What It Does |
-|-------|-------|-------------|
-| **Layer 1 (Process)** | Each service | Deep `/health` checks real dependencies (DB, Redis, disk). `/recover` endpoint self-heals (reconnect pools, reset breakers, clear caches). `resilient_call()` wraps all inter-service HTTP with retry + backoff + circuit breaker. |
-| **Layer 2 (System)** | Supervisor | Calls deep `/health` on all services every 15s. Detects `degraded` status. Triggers `/recover` on services with open circuit breakers. `TaskWatchdog` detects frozen background loops. Fleet health history for trend analysis. Manual recovery endpoint for operator. |
-
-**What happens when something breaks:**
-1. Service X's dependency fails (e.g., Redis goes down)
-2. Service X's deep `/health` returns `{"status": "degraded", "checks": {"redis": "fail"}}`
-3. Supervisor sees "degraded" → records failure → circuit breaker opens
-4. Supervisor POSTs to `X/recover` → service reconnects to Redis
-5. Next sweep: `/health` returns `"ok"` → circuit closes → fleet healthy
-6. If recovery fails: Telegram alert + operator notified for manual intervention
-
-**Key files:**
-- `common/resilience.py` — `resilient_call()`, `ServiceHealth`, `TaskWatchdog`
-- `supervisor/app.py` — recovery registry, fleet history, `/watchdog`, `/fleet/history`
-- All core `*/app.py` — deep `/health` + `/recover` endpoints
-
----
-
-## Repo Structure
+## Architecture Overview
 
 ```
-orchestrator/        # Final risk authority before execution
-supervisor/          # Dual-layer watchdog, circuit-breaker, and self-heal
-fusion-engine/       # Multi-signal consensus and conviction gating
-verifier/            # Fact-checking and signal cross-validation
-executor/            # Execution bridge and order-routing stubs
-dashboard/           # Operator console (FastAPI + Starlette)
-memu-core/           # Memory engine, vector search, reflection, quarantine
-tool-gate/           # Tool access policy, HMAC auth, ledger
-langgraph/           # Graph/runtime app integration (router.py, planner.py, adversary.py, conviction.py, kai_config.py)
-kai-advisor/         # Self-employment advisor (offline, UK-focused)
-telegram-bot/        # Telegram bot interface (text/voice pipeline)
-heartbeat/           # System pulse and auto-sleep controller
-memory-compressor/   # Memory compression and summarisation
-ledger-worker/       # Ledger persistence worker
-metrics-gateway/     # Prometheus metrics aggregator
-screen-capture/      # Screen capture and OCR service
-backup-service/      # Backup and restore service
-calendar-sync/       # Calendar synchronisation service
-workspace-manager/   # Workspace lifecycle manager
-perception/          # Audio and camera capture services
-  audio/             # Audio capture and transcription
-  camera/            # Camera capture and vision
-output/              # Output services
-  tts/               # Text-to-speech (edge-tts)
-  avatar/            # Avatar generation
-sandboxes/           # Ephemeral sandbox environments
-  shell/             # Shell sandbox
-common/              # Shared utilities (auth, llm, policy, rate_limit, resilience)
-security/            # HMAC/auth hardening helpers
-scripts/             # Operational scripts, tests, and validation
-data/                # Seed datasets and local advisor inputs
-docs/                # Implementation plans and hardening runbooks
+┌─────────────────────────────────────────────────────────────────────┐
+│  OPERATOR INPUT                                                      │
+│  Telegram Bot ─── Dashboard (8 views) ─── API Direct                 │
+└────────────────────────────┬────────────────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────────────────┐
+│  INTELLIGENCE LAYER (LangGraph)                                      │
+│                                                                      │
+│  ┌─ 10-way parallel context fetch ──────────────────────────────┐    │
+│  │ memories│session│goals│topics│EQ│narrative│imagination│       │    │
+│  │ conscience│agent│operator_model                               │    │
+│  └──────────────────────────────────────────────────────────────┘    │
+│  → Specialist Router → Planner → Adversary (7 challenges)            │
+│  → Conviction Scoring → Tree Search → Agent-Evolver                  │
+└────────────────────────────┬────────────────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────────────────┐
+│  SAFETY & POLICY                                                     │
+│  Tool-Gate (HMAC, rate limit) → Orchestrator → Verifier (SAGE)       │
+│  Supervisor (watchdog, circuit breaker, auto-heal every 15s)         │
+└────────────────────────────┬────────────────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────────────────┐
+│  MEMORY & STATE                                                      │
+│  Memu-Core → PostgreSQL/pgvector (vector search, MARS decay)         │
+│  Redis (session buffer) → Ledger-Worker (audit trail)                │
+│  Memory-Compressor → Backup-Service (pg/redis/memory)                │
+└────────────────────────────┬────────────────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────────────────┐
+│  EXECUTION & I/O                                                     │
+│  Executor (sandboxed) → TTS (British Ryan) → Avatar                  │
+│  Telegram (voice+text) → Audio (faster-whisper) → Camera → Screen    │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### How a Message Flows
+
+```
+1. Operator sends message (Telegram / Dashboard / API)
+2. LangGraph: injection filter → 10-way context fetch → specialist router
+3. Planner builds gap-aware plan → Adversary challenges it (7 types + SAGE)
+4. Conviction scoring: if < 8.0, rethink (max 3 retries)
+5. Tool-Gate: HMAC + rate limit + policy → Executor: sandboxed run
+6. Post-mortem: episode saved, corrections learned, emotion recorded, memory updated
+7. Response streamed back (SSE)
+```
+
+### Self-Healing Flow
+
+```
+Supervisor (every 15s) → deep /health on each service
+  ├─ "ok"       → record in fleet history, circuit stays closed
+  ├─ "degraded" → open circuit → POST /recover → service self-heals
+  │               → log recovery to conscience (what healed, what learned)
+  │               → next sweep: "ok" → circuit closes
+  └─ unreachable → Telegram alert → operator intervenes
 ```
 
 ---
 
-## Minimal Core Stack
+## Service Map
 
-`docker-compose.minimal.yml` starts the 8 core services:
+### Minimal Core Stack (`docker-compose.minimal.yml`)
 
-| # | Service    | Purpose                 |
-|---|-----------|-------------------------|
-| 1 | postgres  | Ledger and vector store |
-| 2 | redis     | Session buffer          |
-| 3 | tool-gate | Execution choke point   |
-| 4 | memu-core | Memory engine           |
-| 5 | heartbeat | System pulse            |
-| 6 | dashboard | Health UI               |
-| 7 | supervisor| Watchdog                |
-| 8 | verifier  | Fact-checking           |
+| # | Service | Port | Purpose |
+|---|---------|------|---------|
+| 1 | postgres | 5432 | pgvector DB — memories, ledger, embeddings |
+| 2 | redis | 6379 | Session buffer, caches |
+| 3 | tool-gate | 8010 | Policy enforcement, HMAC auth |
+| 4 | memu-core | 8020 | Memory engine — the soul |
+| 5 | heartbeat | 8090 | System pulse, auto-sleep |
+| 6 | dashboard | 8050 | 8-view operator console |
+| 7 | supervisor | 8100 | Watchdog, auto-heal |
+| 8 | verifier | 8060 | Fact-checking, SAGE |
 
-The full stack (`docker-compose.full.yml`) adds: `fusion-engine`, `langgraph`, `executor`, `orchestrator`, `memory-compressor`, `ledger-worker`, `metrics-gateway`, `audio-service`, `camera-service`, `kai-advisor`, `tts-service`, `avatar-service`, `screen-capture`, `telegram-bot`, `backup-service`, `calendar-sync`, `workspace-manager`, and Ollama (local LLM).
+### Full Stack Additions (`docker-compose.full.yml`)
 
----
-
-## Quick Start
-
-```bash
-make setup            # check deps, create .env, build images
-# Edit .env with your API keys
-make core-up          # start core services
-# Open http://localhost:8050/app
-```
-
----
-
-## Build & Run
-
-```bash
-# Build the minimal stack
-docker compose -f docker-compose.minimal.yml build
-
-# Build the full stack
-docker compose -f docker-compose.full.yml build
-
-# Start/stop
-make core-up          # minimal stack
-make core-down
-make full-up          # full stack
-make full-down
-```
-
----
-
-## Test
-
-```bash
-# Run ALL core unit/smoke tests (65 targets, ~1258 tests)
-make test-core
-
-# Individual service tests
-make test-phase-b-memu       # memu-core unit tests
-make test-memu-pg            # memu pgvector tests (requires PG_URI)
-make test-dashboard-ui       # dashboard UI tests
-make test-dashboard          # dashboard structural tests
-make test-tool-gate          # tool-gate API tests
-make test-tool-gate-security # tool-gate HMAC/nonce security tests
-make test-telegram           # telegram-bot smoke test
-make test-audio              # audio service smoke test
-make test-camera             # camera service smoke test
-make test-executor           # executor service smoke test
-make test-langgraph          # langgraph service smoke test
-make test-kai-advisor        # kai-advisor unit tests
-make test-tts                # TTS service smoke test
-make test-avatar             # avatar service smoke test
-make test-heartbeat          # heartbeat service tests
-make test-conviction         # conviction scoring tests
-make test-self-emp           # self-employment advisor tests
-make test-auth-hmac          # HMAC auth hardening tests
-make test-agentic            # agentic framework integration tests
-make test-episode-saver      # episode saver fallback tests
-make test-episode-spool      # episode spool integrity tests
-make test-error-budget       # error budget breaker tests
-make test-invoice            # invoice tests
-make test-memu-retrieval     # memu retrieval tests
-make test-router             # specialist router classification tests
-make test-planner            # memory-driven planner tests
-make test-adversary          # adversary challenge engine tests
-make test-dream-state        # P15 dream state consolidation tests
-make test-security-audit     # P9 security self-hacking audit tests
-make test-tree-search        # HP4 CoT tree search tests
-make test-priority-queue     # HP5 priority queue tests
-make test-model-selector     # HP2 MoE model selector tests
-make test-prod-hardening     # production hardening (secrets, pubsub, backup, HMAC)
-make test-hmac-rotation-drill # HMAC rotation lifecycle drill
-make test-p3-organic          # P3 organic memory
-make test-p4-personality      # P4 personality & proactive
-make test-p16-operational     # P16 operational intelligence
-make test-p17-emotional-intelligence # P17 emotional intelligence
-make test-p18-narrative-identity     # P18 narrative identity
-make test-p19-imagination-engine     # P19 imagination engine
-make test-p20-conscience-values      # P20 conscience & values
-make test-p21-proactive-agent        # P21 proactive agent loop
-make test-p22-operator-model         # P22 operator model
-make test-h1-hardening               # H1 hardening regression
-make test-h2-self-healing            # H2 self-healing & resilience
-make test-mars-consolidation         # MARS memory consolidation
-make test-sage-critique              # P23 SAGE multi-agent critique
-make test-agent-evolver              # P24 Agent-Evolver insight engine
-make test-checkpoint                 # H3b checkpoint engine
-make test-error-codes                # structured error code tests
-make test-feature-flags              # feature flag system tests
-make test-v7                         # v7 (verifier, quarantine, policy, idempotency, integration-chain)
-
-# Engineering tools
-make dep-audit               # pip-audit dependency vulnerability scan
-make coverage                # pytest-cov coverage report (HTML + terminal)
-
-# Integration (requires running stack)
-make core-smoke
-make test-integration
-
-# Full merge-gate check
-make merge-gate
-```
-
----
-
-## Lint / Validate
-
-```bash
-# Syntax check all service entry points
-make go_no_go
-
-# Flake8
-flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-```
-
-Run `make go_no_go` before committing to catch syntax errors early.
+| Service | Port | Purpose |
+|---------|------|---------|
+| langgraph | 8030 | Agentic brain, all reasoning |
+| executor | 8040 | Sandboxed execution |
+| fusion-engine | 8070 | Multi-signal consensus |
+| orchestrator | 8080 | Final risk authority |
+| telegram-bot | 8110 | Telegram interface |
+| kai-advisor | 8120 | Self-employment advisor (UK) |
+| memory-compressor | — | Memory summarisation |
+| ledger-worker | — | Action audit trail |
+| metrics-gateway | 9090 | Prometheus metrics |
+| audio-service | 8021 | STT (faster-whisper) |
+| camera-service | — | Camera capture |
+| tts-service | 8030 | Text-to-speech (British Ryan) |
+| avatar-service | — | Avatar generation |
+| screen-capture | — | Screen OCR pipeline |
+| backup-service | — | pg/redis/memory backup |
+| calendar-sync | — | Calendar integration |
+| workspace-manager | — | Workspace lifecycle |
+| ollama | 11434 | Local LLM (qwen2:0.5b CPU) |
 
 ---
 
 ## Operator Console
 
-Open **http://localhost:8050/app** for the unified operator interface.
+**http://localhost:8050/app** — 8 views, keyboard shortcuts, installable as PWA.
 
-| View | Shortcut | Description |
-|------|----------|-------------|
-| **Chat** | `Ctrl+1` | Conversational interface — streaming SSE, markdown, PUB/WORK toggle, feedback ratings, struggle detection |
+| View | Key | What You See |
+|------|-----|-------------|
+| **Chat** | `Ctrl+1` | Streaming conversation, PUB/WORK toggle, feedback ratings, struggle detection |
 | **Dashboard** | `Ctrl+2` | Service health grid, pipeline status, fusion metrics |
-| **Thinking** | `Ctrl+3` | Live thinking-pathway trace — conviction pipeline, tempo gauge, boundary map, silence signals, dream state, security audit |
-| **Settings** | `Ctrl+4` | Mode, notifications, markdown, keyboard shortcuts, PWA install |
-| **Goals** | `Ctrl+5` | Ohana goal tracker — create/update goals, drift alerts, progress bars, feedback stats |
-| **Memory** | `Ctrl+6` | Memory browser — search by query or category, stats overview, results with scores |
-| **Logs** | `Ctrl+7` | Log aggregator — level filter, monospace viewer, time/level/service/msg columns |
-| **💎 Soul** | `Ctrl+8` | Emotional intelligence — mood cards, emotion timeline, domain confidence, self-reflection journal, relationship milestones |
-
-**Additional shortcuts:**
+| **Thinking** | `Ctrl+3` | Live conviction pipeline, tempo gauge, boundary map, silence signals, dream state |
+| **Settings** | `Ctrl+4` | Mode, notifications, markdown toggle, PWA install |
+| **Goals** | `Ctrl+5` | Ohana goals, drift alerts, progress bars, reminders, scheduled tasks |
+| **Memory** | `Ctrl+6` | Memory browser — search by query or category, scores, stats |
+| **Logs** | `Ctrl+7` | Ring-buffer log viewer — level/time filter, monospace, color-coded |
+| **Soul** | `Ctrl+8` | Mood cards, emotion timeline, domain confidence, self-reflection journal, milestones |
 
 | Shortcut | Action |
 |----------|--------|
@@ -324,128 +232,270 @@ Open **http://localhost:8050/app** for the unified operator interface.
 | `Ctrl+Shift+M` | Toggle PUB/WORK mode |
 | `Escape` | Close dropdown / stop generation |
 
-**PWA:** Kai can be installed as a standalone app on desktop and mobile via Chrome/Edge. The manifest and icons are served from `/static/`.
+---
+
+## Known Issues & Honest State
+
+> We built 24 milestones fast. Now we're building them right.
+
+### Fixed
+
+| Area | Issue | Fix |
+|---|---|---|
+| memu-core | 13+ race conditions (global state, no asyncio.Lock) | H1 |
+| langgraph /chat | No prompt injection check | H1 |
+| langgraph 10-way fetch | No error handling on parallel gather | H1 |
+| memu-core feedback | Called non-existent store.memorize() | H1 |
+| executor | shell=True allows command chaining | H1 |
+| telegram-bot | Voice file download with no size limit | H1 |
+| dashboard | 50+ proxy endpoints with no try/except | H1 |
+| All services | /health returns 200 without checking deps | H2 |
+| Inter-service calls | No retry, no circuit breaker, no fallback | H2 |
+| Supervisor | Advisory-only circuit breakers (can't heal) | H2 |
+| Background tasks | Frozen loops undetectable | H2 |
+| memu-core memory | Basic Ebbinghaus (no stability, no pruning) | MARS |
+| verifier | Keyword-only (no self-critique) | P23 SAGE |
+| Failure learning | No pattern extraction | P24 Evolver |
+| State debugging | No crash recovery, no snapshots | H3b |
+| Error messages | Ad-hoc HTTP statuses | Gap-Close |
+| Feature toggles | Hardcoded, no env overrides | Gap-Close |
+| Dep scanning | No CVE checks | Gap-Close |
+| Pre-commit | No automated quality checks | Gap-Close |
+| Conscience log | Race condition on /conscience/check write | Session fix |
+| Recovery log | Missing schema fields for audit compat | Session fix |
+
+### Open
+
+| Area | Issue | Status |
+|---|---|---|
+| verifier semantic | Keyword matcher, not embedding-based | Planned |
+| context budget | System prompt can grow unbounded | Planned |
+| test coverage | ~60% estimated | Tracking (`.coveragerc` added) |
 
 ---
 
-## Personality Modes: PUB & WORK
+## Milestone History
 
-| Mode | Personality | Use Case |
-|------|------------|----------|
-| **WORK** | Professional, focused, precise. Proactive but concise. Never lies, never sugarcoats. | Tasks, research, planning |
-| **PUB** | Genuine mate — casual, witty, opinionated. All topics welcome. Not a service, a companion. | Open discussion, philosophy, banter |
+> 29 shipped. Zero skipped. Every milestone has tests.
 
-Toggled from the chat UI header or via `Ctrl+Shift+M`. Stored in `localStorage`. Time-of-day auto-schedule: WORK 08-18 Mon-Fri, PUB otherwise. Manual override lasts 4h. Mode from tool-gate `/gate/mode` for cross-service consistency.
+```
+P0  Stack runs              ██████████ DONE   P14 Temporal Self       ██████████ DONE
+P1  Perception (senses)     ██████████ DONE   P15 Dream State         ██████████ DONE
+P2  Voice (output)          ██████████ DONE   P16 Operational Intel   ██████████ DONE
+P3  Organic Memory          ██████████ DONE   P17 Emotional Intel     ██████████ DONE
+P4  Personality & Proactive ██████████ DONE   P18 Narrative Identity  ██████████ DONE
+P5  Production Hardening    ██████████ DONE   P19 Imagination Engine  ██████████ DONE
+P7  Agentic Patterns        ██████████ DONE   P20 Conscience & Values ██████████ DONE
+P8  Thinking Pathways       ██████████ DONE   P21 Proactive Agent     ██████████ DONE
+P9  Security Self-Hacking   ██████████ DONE   P22 Operator Model      ██████████ DONE
+P10 Predictive Coding       ██████████ DONE   H1  Hardening Sprint    ██████████ DONE
+P11 Reasoning Tempo         ██████████ DONE   H2  Self-Healing        ██████████ DONE
+P12 Self-Deception Detector ██████████ DONE   H3b Checkpointing       ██████████ DONE
+P13 Improvement Gate        ██████████ DONE   MARS Memory Consol.     ██████████ DONE
+─── ─────────────────────── ────────── ────   P23 SAGE Critique       ██████████ DONE
+                                              P24 Agent-Evolver       ██████████ DONE
+                                              GC  Eng. Gap-Close      ██████████ DONE
+```
+
+### What's Next
+
+| Priority | Feature | Why |
+|---|---|---|
+| **H3** | Context Budget Manager | System prompt can overflow — smart pruning needed |
+| **P29** | Financial Awareness | Savings tracker, RTX 5080 countdown, expense categorization |
+| **P25** | Voice Pipeline (Car) | Hands-free mode for driving — wake word, continuous listen |
+| **P23b** | Knowledge Ingestion (RAG) | Upload PDF/TXT/CSV, chunk, embed, source attribution |
+| **P24b** | Temporal Intelligence | Activity patterns, habit tracking, circadian awareness |
+| **GPU** | Hardware Performance | Multi-model consensus, real STT/TTS, speculative decoding |
 
 ---
 
-## Key Guidelines
+## Repo Structure
 
-- Always add or update `requirements.txt` when introducing new Python dependencies.
-- When modifying a service `app.py`, run `make go_no_go` to catch syntax errors.
-- Every service must expose a `/health` HTTP endpoint returning `{"status": "ok"}`. **Core services must implement deep /health** (check real dependencies) and return `{"status": "degraded"}` if internal checks fail.
-- Every core service must expose a `/recover` POST endpoint for self-healing.
-- Inter-service HTTP calls must use `common.resilience.resilient_call()` with retry + circuit breaker.
-- Prefer small, focused pull requests. Use `make merge-gate` to confirm checks pass.
-- HMAC auth: Set `TOOL_GATE_DUAL_SIGN=true` and `INTERSERVICE_HMAC_STRICT_KEY_ID=true` after overlap stabilises.
-- Never commit real credentials; use `.env` files and environment variables.
-- The `langgraph/` directory contains the local orchestrator service; the installed `langgraph` pip package is separate.
+```
+orchestrator/        # Final risk authority before execution
+supervisor/          # Dual-layer watchdog, circuit-breaker, self-heal
+fusion-engine/       # Multi-signal consensus and conviction gating
+verifier/            # Fact-checking, SAGE self-critique
+executor/            # Sandboxed execution bridge
+dashboard/           # 8-view operator console (FastAPI + Starlette)
+memu-core/           # Memory engine — the soul (~6,100 lines)
+tool-gate/           # HMAC auth, rate limit, policy enforcement
+langgraph/           # Agentic brain (router, planner, adversary, conviction, config)
+kai-advisor/         # Self-employment advisor (offline, UK-focused)
+telegram-bot/        # Telegram bot (voice + text pipeline)
+heartbeat/           # System pulse and auto-sleep
+memory-compressor/   # Memory compression and summarisation
+ledger-worker/       # Ledger persistence worker
+metrics-gateway/     # Prometheus metrics aggregator
+screen-capture/      # Screen capture and OCR
+backup-service/      # Backup and restore (pg/redis/memory)
+calendar-sync/       # Calendar synchronisation
+workspace-manager/   # Workspace lifecycle manager
+perception/          # Audio and camera capture
+  audio/             # STT (faster-whisper tiny, CPU)
+  camera/            # Camera capture
+output/              # Output services
+  tts/               # Text-to-speech (edge-tts British Ryan)
+  avatar/            # Avatar generation
+sandboxes/           # Ephemeral sandbox environments
+  shell/             # Shell sandbox
+common/              # Shared: auth, llm, policy, rate_limit, resilience, errors, feature_flags
+security/            # HMAC/auth hardening helpers
+scripts/             # Tests, validation, automation (~71 test files)
+data/                # Seed datasets and advisor inputs
+docs/                # Plans, runbooks, architecture, backlog
+```
+
+---
+
+## Engineering Toolchain
+
+| Tool | Purpose | Command | Auto? |
+|---|---|---|---|
+| **sync-docs** | Patch README/backlog metrics from codebase scan | `make sync-docs` | On demand, gates merge |
+| **check-docs** | Read-only freshness check (exit 1 if stale) | `make check-docs` | In merge-gate |
+| **go_no_go** | py_compile all 16 service entry points | `make go_no_go` | Pre-commit hook |
+| **merge-gate** | Full validation: lint + docs + tests + quality | `make merge-gate` | Manual before merge |
+| **pre-commit** | Flake8, mypy, secret-detect, YAML, go_no_go | Auto on `git commit` | Yes |
+| **dep-audit** | pip-audit for known CVEs | `make dep-audit` | CI |
+| **coverage** | pytest-cov HTML report | `make coverage` | On demand |
+| **Trivy** | Container image scanning (CRITICAL+HIGH) | CI auto | In core-tests.yml |
+| **cache-test-core** | Cache and compare test results across runs | `python scripts/cache_test_core.py` | On demand |
+| **health-sweep** | Hit /health on all running services | `make health-sweep` | On demand |
+| **chaos-ci** | Fault injection for resilience testing | `python scripts/chaos_ci.py` | On demand |
+
+---
+
+## Personality Modes
+
+| Mode | Personality | When |
+|------|------------|------|
+| **WORK** | Professional, focused, precise. Never lies, never sugarcoats. Proactive but concise. | Mon-Fri 08-18 (auto) |
+| **PUB** | Genuine mate. Casual, witty, opinionated. All topics. Not a service — a companion. | Evenings, weekends (auto) |
+
+Toggle: `Ctrl+Shift+M` in dashboard, or auto-schedule from tool-gate `/gate/mode`. Manual override lasts 4h.
+
+---
+
+## Build & Run
+
+```bash
+# Build
+docker compose -f docker-compose.minimal.yml build    # Core 8
+docker compose -f docker-compose.full.yml build        # All 26
+
+# Run
+make core-up       # Start core stack
+make core-down     # Stop it
+make full-up       # Start everything
+make full-down     # Stop everything
+
+# Validate
+make go_no_go      # Syntax check
+make test-core     # All 65 targets
+make merge-gate    # Full pre-merge
+```
+
+---
+
+## Test Targets (65)
+
+<details>
+<summary>Click to expand full test target list</summary>
+
+```bash
+# Service tests
+make test-phase-b-memu        make test-memu-pg             make test-dashboard-ui
+make test-dashboard            make test-thinking-pathways   make test-tool-gate
+make test-tool-gate-security   make test-telegram            make test-audio
+make test-camera               make test-executor            make test-langgraph
+make test-kai-advisor          make test-tts                 make test-avatar
+make test-heartbeat            make test-conviction          make test-self-emp
+make test-auth-hmac            make test-agentic
+
+# Feature/subsystem tests
+make test-episode-saver        make test-episode-spool       make test-error-budget
+make test-invoice              make test-memu-retrieval      make test-router
+make test-planner              make test-adversary           make test-failure-taxonomy
+make test-selaur               make test-contradiction
+
+# Phase tests
+make test-p3-organic           make test-p4-personality      make test-p16-operational
+make test-p17-emotional-intelligence    make test-p18-narrative-identity
+make test-p19-imagination-engine        make test-p20-conscience-values
+make test-p21-proactive-agent           make test-p22-operator-model
+
+# Hardening tests
+make test-h1-hardening         make test-h2-self-healing     make test-mars-consolidation
+make test-sage-critique        make test-agent-evolver       make test-checkpoint
+make test-v7                   make test-prod-hardening      make test-hmac-rotation-drill
+make test-error-codes          make test-feature-flags
+
+# Specialised
+make test-dream-state          make test-security-audit      make test-tree-search
+make test-priority-queue       make test-model-selector
+
+# Engineering
+make dep-audit                 make coverage
+make core-smoke                make test-integration
+```
+
+</details>
 
 ---
 
 ## Session Continuation Guide
 
-> **For AI assistants resuming work on this codebase. Updated 22 March 2026.**
+> For AI assistants resuming work. Read `docs/PROJECT_BACKLOG.md` first.
 
 ### Target Hardware
-- **Dev/staging:** GitHub Codespace (CPU only, no TPM)
-- **Production:** Lenovo laptop, **RTX 5080 GPU**, **TPM 2.0**
+- **Dev:** GitHub Codespace (CPU only)
+- **Prod:** Lenovo laptop + **RTX 5080 GPU** + **TPM 2.0**
 - GPU arrival = local LLM inference, real STT/TTS, multi-model consensus
-- All code must work in BOTH environments (stubs in codespace, live on laptop)
+- All code works in BOTH environments (stubs in Codespace, live on laptop)
 
-### Current State
-- **65 test-core targets pass, 1,258 individual tests.** Run `make -k test-core` to confirm.
-- **Latest commit: `1192fa7`** — Engineering maturity gap-close.
-- **Commit chain:** P22 → H1 → H2 → MARS → P23-SAGE → P24-Evolver → H3b-Checkpoint → Gap-Close.
+### Key Docs (read in order)
+1. `docs/PROJECT_BACKLOG.md` — Living backlog, all phases, session notes
+2. `docs/known_issues.md` — Gotchas, environment quirks, workarounds
+3. `docs/architecture.md` — Service relationships and data flow diagrams
+4. `CHANGELOG.md` — Full semver changelog (v0.1.0 → v0.25.0)
+5. `SESSION_BACKLOG.md` — Per-session work log and open items
 
-### Key Docs (read in this order)
-1. `docs/PROJECT_BACKLOG.md` — Living backlog with session notes and all completed phases
-2. `docs/known_issues.md` — Known gotchas, environment quirks, and workarounds
-3. `docs/architecture.md` — Service relationships and data flow
-4. `CHANGELOG.md` — Full semver changelog (v0.1.0 through v0.25.0)
-5. This README for repo structure and test commands
+### Cross-Check: What's Real
 
-### Engineering Infrastructure
-| Tool | Purpose | Command |
-|---|---|---|
-| Pre-commit hooks | Flake8, mypy, secret detection, YAML check, go-no-go | Auto on `git commit` |
-| Coverage | pytest-cov on common/, langgraph/, verifier/, etc. | `make coverage` |
-| Dep scanning | pip-audit for known CVEs in dependencies | `make dep-audit` |
-| Container scanning | Trivy CRITICAL+HIGH in CI | Automatic in core-tests.yml |
-| Error codes | 20 structured codes (E1001-E4004) in `common/errors.py` | Import `KaiError, ErrorCode` |
-| Feature flags | 13 toggles via FF_ env vars in `common/feature_flags.py` | `is_enabled("FLAG_NAME")` |
-| CODEOWNERS | Auto-review assignment on PRs | `.github/CODEOWNERS` |
-| CHANGELOG | Keep a Changelog format | `CHANGELOG.md` |
-
-### Agentic Pipeline (how /run works)
-```
-Request → injection filter → specialist selection → session buffer
-  → gather_context() (memory + episodes + corrections + nudges + preferences)
-  → build_enriched_plan() (history + conviction modifiers + preference constraints)
-  → challenge_plan() (6 adversary challenges + SAGE self-review in parallel)
-  → conviction scoring (5-signal + planner modifier + adversary modifier)
-  → rethink loop (if conviction < 8.0, max 3 retries)
-  → tool-gate policy check (HMAC, rate limit, co-sign)
-  → executor (sandboxed)
-  → post-mortem (episode save, correction learning, preference extraction, auto-memorize)
-```
-
-### Build Order (all milestones)
-
-| # | Feature | Status |
-|---|---|---|
-| P0-P2 | Stack, Perception, Voice | DONE |
-| P3 | Organic Memory (spaced rep, proactive, goals, drift) | DONE |
-| P4 | Full-Stack Personality & Proactive Conversation | DONE |
-| P5 | Production Hardening (CI, secrets, backup, HMAC) | DONE |
-| P7 | Agentic Patterns (episodes, error budget, router, planner) | DONE |
-| P8 | Dashboard Thinking Pathways (6 visualization cards) | DONE |
-| P9 | Security Self-Hacking (34 payloads, 6 adversary challenges) | DONE |
-| P10-P14 | Adaptive Intelligence (predictive, tempo, self-deception, improvement gate, temporal self) | DONE |
-| P15 | Dream State (6-phase offline consolidation) | DONE |
-| P16 | Operational Intelligence (struggle, feedback, logs, 3 views) | DONE |
-| P17 | Emotional Intelligence (emotional memory, self-reflection, epistemic humility, confession, Soul) | DONE |
-| P18 | Narrative Identity & Life Story | DONE |
-| P19 | Imagination Engine (counterfactual, theory of mind, creative synthesis, inner monologue, aspirations) | DONE |
-| P20 | Conscience & Values (value formation, moral reasoning, integrity, loyalty, gratitude) | DONE |
-| P21 | Proactive Agent Loop (13-action registry, scheduled tasks, briefings, supervisor firing) | DONE |
-| P22 | Operator Model (echo engine, nudge escalation, impact oracle, shadow branches, 10-way context) | DONE |
-| HP2/HP4/HP5 | MoE Model Selector, CoT Tree Search, Priority Queue | DONE |
-| **H1** | **Critical Hardening Sprint (race conditions, injection, shell safety, error handling)** | **DONE** |
-| **H2** | **Self-Healing & Resilience (deep health, /recover, resilient_call, TaskWatchdog)** | **DONE** |
-| **MARS** | **Memory Consolidation (Ebbinghaus stability, conscience-filtered pruning, nightly cycle)** | **DONE** |
-| **P23** | **SAGE Multi-Agent Critique (verifier self-critique + adversary self-review)** | **DONE** |
-| **P24** | **Agent-Evolver Insight Engine (failure clustering, dream-cycle insights)** | **DONE** |
-| **H3b** | **LangGraph Checkpointing (time-travel debug, state snapshots, auto-checkpoint)** | **DONE** |
-| **Gap-Close** | **Engineering maturity (pre-commit, coverage, error codes, feature flags, dep scanning, CHANGELOG)** | **DONE** |
-| H3 | Data Persistence & Quality (context budget, verifier upgrade) | Next |
-| P25 | Mini-COSMO Recursive Self-Build | Backlog |
-| P6 | Nice-to-have (calendar sync, workspace manager, avatar, Prometheus) | Queued |
-| HP1-HP6 | Hardware Performance Track (speculative decoding, VRAM watchdog, NVMe offload) | Awaiting GPU |
-
-### Cross-Check: What's Actually Real
-- [x] All 25 services built, running, health-checked
-- [x] Real LLM (Ollama qwen2:0.5b), real persistence (pgvector + Redis)
-- [x] Real input (Telegram voice + text), real output (edge-tts British Ryan)
-- [x] Specialist router (8 categories), memory-driven planner, adversary engine (6 challenges + SAGE)
-- [x] Conviction scoring (5-signal), tree search (CoT pruning), priority queue
+- [x] All 26 services built, running, health-checked
+- [x] Real LLM: Ollama qwen2:0.5b (CPU), GPU = 3 env vars to upgrade
+- [x] Real persistence: pgvector + Redis
+- [x] Real input: Telegram voice + text
+- [x] Real output: edge-tts British Ryan Neural
+- [x] 8-domain specialist router, memory-driven planner, 7-type adversary + SAGE
+- [x] 5-signal conviction scoring, CoT tree search, priority queue
 - [x] Deep personality (PUB/WORK), proactive conversation, anti-annoyance
-- [x] Dream state (6-phase), MARS memory decay (R=e^{-tau/S}), Agent-Evolver insights
+- [x] Dream state (6-phase), MARS decay (R = e^{-τ/S}), Agent-Evolver
 - [x] Security self-hacking (34 payloads), SAGE multi-agent critique
-- [x] Emotional memory (8 emotions), self-reflection, imagination engine, conscience & values
-- [x] 8 dashboard views (Chat, Dashboard, Thinking, Settings, Goals, Memory, Logs, Soul)
-- [x] HMAC auth, Ed25519 signing, structured error codes, feature flags
-- [x] Dual-layer self-healing (service /recover + supervisor auto-heal)
-- [x] LangGraph checkpointing (save/load/diff/rollback state snapshots)
-- [x] Pre-commit hooks, dep scanning, container scanning, coverage tracking
+- [x] Emotional memory (8 emotions), self-reflection, imagination, conscience
+- [x] 8 dashboard views, PWA installable, keyboard shortcuts
+- [x] HMAC + Ed25519 auth, structured errors, feature flags
+- [x] Dual-layer self-healing, recovery logging to conscience
+- [x] LangGraph checkpointing (save/load/diff/rollback)
+- [x] Pre-commit, dep scanning, container scanning, coverage tracking
 - [x] 65 test targets, 1,258 tests, zero failures
+
+---
+
+## Key Guidelines
+
+- Run `make go_no_go` before committing any service `app.py` changes
+- Every service: `/health` endpoint. Core services: deep `/health` + `/recover`
+- Inter-service HTTP: use `common.resilience.resilient_call()` (retry + circuit breaker)
+- HMAC: `TOOL_GATE_DUAL_SIGN=true`, then `INTERSERVICE_HMAC_STRICT_KEY_ID=true`
+- Never commit credentials — `.env` files only (see `.env.example`)
+- `make merge-gate` before every PR
+- `make sync-docs` after major changes
+
+---
+
+<p align="center">
+  <em>Built by Dainius + Kai. Not for sale. Not for anyone else. Sovereign.</em>
+</p>

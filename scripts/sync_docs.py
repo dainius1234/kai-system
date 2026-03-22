@@ -89,10 +89,14 @@ def count_services() -> int:
 
 
 def count_milestones() -> int:
-    """Count DONE milestones in README build order table."""
+    """Count DONE milestones in README milestone section."""
     readme = (ROOT / "README.md").read_text()
-    # Match both `| DONE |` and `| **DONE** |` variants
-    return len(re.findall(r"\|\s*\*{0,2}DONE\*{0,2}\s*\|", readme))
+    # Match table rows `| DONE |` / `| **DONE** |` AND ascii chart `DONE`
+    table_hits = len(re.findall(r"\|\s*\*{0,2}DONE\*{0,2}\s*\|", readme))
+    if table_hits:
+        return table_hits
+    # Fallback: count `██████████ DONE` lines in ascii milestone chart
+    return len(re.findall(r"██+ DONE", readme))
 
 
 def count_compose_files() -> int:
