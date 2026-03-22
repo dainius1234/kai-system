@@ -47,3 +47,17 @@ repos:
         language: pygrep
         types: [python]
         exclude: '(test_|\.env\.example|_archive/)'
+
+      - id: commit-msg-format
+        name: Enforce conventional commit format
+        entry: python scripts/check_commit_msg.py
+        language: python
+        stages: [commit-msg]
+        always_run: true
+
+      - id: sync-docs-check
+        name: Check documentation freshness
+        entry: python scripts/sync_docs.py --check
+        language: python
+        always_run: true
+        pass_filenames: false
