@@ -11,9 +11,9 @@
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
   <img src="https://img.shields.io/badge/services-26-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-1%2C258_passing-brightgreen?style=flat-square" alt="tests">
-  <img src="https://img.shields.io/badge/Python-~36%2C063_LOC-yellow?style=flat-square" alt="loc">
-  <img src="https://img.shields.io/badge/milestones-29_shipped-purple?style=flat-square" alt="milestones">
+  <img src="https://img.shields.io/badge/tests-1%2C518_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/Python-~40%2C453_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/milestones-30_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
 </p>
@@ -25,11 +25,11 @@
 | Metric | Value |
 |---|---|
 | **Services** | 26 Docker containers |
-| **Test targets** | 70 (`make test-core`) |
-| **Individual tests** | 1,492 (`def test_` across 77 files) |
-| **Python LOC** | ~39,789 |
+| **Test targets** | 85 (`make test-core`) |
+| **Individual tests** | 1,518 (`def test_` across 77 files) |
+| **Python LOC** | ~40,453 |
 | **Compose files** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 29 |
+| **Milestones shipped** | 30 |
 | **Failures** | 0 |
 
 > **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
@@ -42,7 +42,7 @@
 make core-up          # Start minimal stack (8 services)
 make core-down        # Stop it
 make full-up          # Start all 26 services
-make test-core        # Run all 65 test targets (~1,258 tests)
+make test-core        # Run all 85 test targets (~1,518 tests)
 make go_no_go         # Syntax check all entry points
 make merge-gate       # Full pre-merge validation
 make sync-docs        # Auto-update README + backlog metrics
@@ -80,7 +80,7 @@ make coverage         # pytest-cov HTML report
 | **Conviction Scoring** | 5-signal + modifiers gate; below 8.0 triggers rethink (max 3 retries) |
 | **SAGE Critique** | Verifier self-critique + adversary self-review — AI arguing with itself for quality |
 | **Agent-Evolver** | Learns from failure clusters during dream cycles, generates proactive fix insights |
-| **Tree Search** | Chain-of-thought pruning with priority queue for complex reasoning |
+| **Tree Search** | Chain-of-thought pruning with priority queue + counterargument debate gating |
 
 ### Operator Relationship
 
@@ -106,6 +106,9 @@ make coverage         # pytest-cov HTML report
 | **Feature Flags** | 13 capabilities toggleable via `FF_` env vars without code changes |
 | **Structured Errors** | 20 enumerated codes (E1001–E4004) — no more "something broke" |
 | **Zero Telemetry** | No corporate control, no data exfiltration, no resets. Ever. |
+| **Skills Hub** | Hot-loadable .md skill files with security scanning, TTL pruning, and unload |
+| **Multi-modal Fusion** | Combined audio + video signals interpreted by LLM for proactive voice |
+| **World Anchor** | Daily date/time/context fetch cached locally — Kai knows what day it is |
 
 ---
 
@@ -278,7 +281,7 @@ Supervisor (every 15s) → deep /health on each service
 
 ## Milestone History
 
-> 29 shipped. Zero skipped. Every milestone has tests.
+> 30 shipped. Zero skipped. Every milestone has tests.
 
 ```
 P0  Stack runs              ██████████ DONE   P14 Temporal Self       ██████████ DONE
@@ -295,24 +298,29 @@ P11 Reasoning Tempo         ██████████ DONE   H2  Self-Heali
 P12 Self-Deception Detector ██████████ DONE   H3b Checkpointing       ██████████ DONE
 P13 Improvement Gate        ██████████ DONE   MARS Memory Consol.     ██████████ DONE
 ─── ─────────────────────── ────────── ────   P23 SAGE Critique       ██████████ DONE
-                                              P24 Agent-Evolver       ██████████ DONE
-                                              GC  Eng. Gap-Close      ██████████ DONE
+J1–J7 Jewels (7 features)  ██████████ DONE   P24 Agent-Evolver       ██████████ DONE
+P1–P5 Enhancements         ██████████ DONE   GC  Eng. Gap-Close      ██████████ DONE
 ```
 
 ### What's Next
 
-| Priority | Feature | Why |
+| Priority | Feature | Status |
 |---|---|---|
-| **J2** ⭐ | Wake-word "Kai" + Intent Judge | Makes nudges feel real — catch "Kai" in any sentence, tiny LLM decides intent |
-| **J1** | Live Canvas Visualization | Mind-map / graph / timeline rendering in dashboard for plans and emotions |
-| **J6** | SOUL.md + AGENTS.md | Persistent identity files — user edits, Kai adapts personality on startup |
-| **J3** | Auto-Redaction PII | Regex + OCR strip emails/tokens/passwords before any processing |
-| **J5** | Memory Viewer GUI | Diary-style browser tab — chronological view with emotion/category filters |
-| **J4** | Proactive Low-Latency Voice | Audio/video cue → speak-or-not decision (sigh = "need help?") |
-| **J7** | Skills Auto-Install Hub | Local skill loader — user drops .md files, Kai picks them up |
-| **H3** | Context Budget Manager | System prompt can overflow — smart pruning needed |
-| **P29** | Financial Awareness | Savings tracker, RTX 5080 countdown, expense categorization |
-| **GPU** | Hardware Performance | Multi-model consensus, real STT/TTS, speculative decoding |
+| **J1** | Live Canvas Visualization | **DONE** — mind-map/graph in dashboard |
+| **J2** | Wake-word "Kai" + Intent Judge | **DONE** — whisper + tiny LLM intent |
+| **J3** | Auto-Redaction PII | **DONE** — regex strip before processing |
+| **J4** | Proactive Low-Latency Voice | **DONE** — audio/video cue → speak-or-not |
+| **J5** | Memory Viewer GUI | **DONE** — diary-style dashboard tab |
+| **J6** | SOUL.md + AGENTS.md | **DONE** — persistent identity files |
+| **J7** | Skills Auto-Install Hub | **DONE** — local .md skill loader + security scan |
+| **P1** | Skill Security + TTL | **DONE** — scan/unload/prune endpoints |
+| **P2** | Multi-modal LLM Fusion | **DONE** — interpret_multi + /proactive/interpret |
+| **P3** | World Anchor | **DONE** — heartbeat /world endpoint |
+| **P4** | Debate Branching | **DONE** — counterargument tree search |
+| **P5** | Deprecation Cleanup | **DONE** — 110+ warnings eliminated |
+| **H3** | Context Budget Manager | Planned — system prompt overflow pruning |
+| **P29** | Financial Awareness | Planned — savings tracker, expense categorization |
+| **GPU** | Hardware Performance | Planned — multi-model, real STT/TTS, speculative decoding |
 
 *Sources: OpenClaw, Jarvis variants, Proact-VL (arXiv:2603.03447). All offline, low-resource, test on qwen2:0.5b first.*
 
@@ -350,7 +358,7 @@ sandboxes/           # Ephemeral sandbox environments
   shell/             # Shell sandbox
 common/              # Shared: auth, llm, policy, rate_limit, resilience, errors, feature_flags
 security/            # HMAC/auth hardening helpers
-scripts/             # Tests, validation, automation (~71 test files)
+scripts/             # Tests, validation, automation (~77 test files)
 data/                # Seed datasets and advisor inputs
 docs/                # Plans, runbooks, architecture, backlog
 ```
@@ -401,13 +409,13 @@ make full-down     # Stop everything
 
 # Validate
 make go_no_go      # Syntax check
-make test-core     # All 65 targets
+make test-core     # All 85 targets
 make merge-gate    # Full pre-merge
 ```
 
 ---
 
-## Test Targets (65)
+## Test Targets (85)
 
 <details>
 <summary>Click to expand full test target list</summary>
@@ -488,7 +496,7 @@ make core-smoke                make test-integration
 - [x] Dual-layer self-healing, recovery logging to conscience
 - [x] LangGraph checkpointing (save/load/diff/rollback)
 - [x] Pre-commit, dep scanning, container scanning, coverage tracking
-- [x] 65 test targets, 1,258 tests, zero failures
+- [x] 85 test targets, 1,518 tests, zero failures
 
 ---
 
