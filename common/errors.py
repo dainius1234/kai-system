@@ -43,7 +43,7 @@ class ErrorCode(str, Enum):
 
     # ── Conviction / safety (5xx) ────────────────────────────────────
     CONVICTION_TOO_LOW = "E3001"      # Plan below conviction threshold
-    SELF_DECEPTION_DETECTED = "E3002" # Self-deception guard triggered
+    SELF_DECEPTION_DETECTED = "E3002"  # Self-deception guard triggered
     VERIFIER_FAIL_CLOSED = "E3003"    # Verifier rejected with FAIL_CLOSED
     ADVERSARY_BLOCKED = "E3004"       # Adversary challenge hard-block
     ERROR_BUDGET_EXHAUSTED = "E3005"  # Error budget breaker tripped

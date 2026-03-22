@@ -33,6 +33,7 @@ def load_secret(env_name: str, default: str = "") -> str:
         return secret_by_name.read_text().strip()
     return value
 
+
 PRIMARY_SECRET_ENV = "INTERSERVICE_HMAC_SECRET"
 SECONDARY_SECRET_ENV = "INTERSERVICE_HMAC_SECRET_PREV"
 KEY_ID_ENV = "INTERSERVICE_HMAC_KEY_ID"

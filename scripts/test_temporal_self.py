@@ -30,6 +30,7 @@ for mod_name in ("redis", "httpx"):
                 def __init__(self, **kw): pass
                 async def __aenter__(self): return self
                 async def __aexit__(self, *a): pass
+
                 async def get(self, *a, **kw):
                     class _Resp:
                         status_code = 200

@@ -7,21 +7,45 @@ networks:
       config:
         - subnet: 172.20.0.0/16
 
+# ── Shared defaults ─────────────────────────────────────────────────
+x-service-defaults: &defaults
+  restart: unless-stopped
+  deploy:
+    resources:
+      limits:
+        cpus: '1.0'
+        memory: 2G
+  security_opt:
+    - no-new-privileges:true
+
 services:
   postgres:
     image: pgvector/pgvector:pg15
+    <<: *defaults
     environment:
       POSTGRES_DB: sovereign
       POSTGRES_USER: keeper
-      POSTGRES_PASSWORD: "localdev"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-localdev}"
     volumes:
       - postgres_data:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keeper -d sovereign"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.2
 
   redis:
     image: redis:7-alpine
+    <<: *defaults
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.4
@@ -30,6 +54,7 @@ services:
     build:
       context: .
       dockerfile: tool-gate/Dockerfile
+    <<: *defaults
     environment:
       MODE: "WORK"
       REQUIRED_CONFIDENCE: "0.7"
@@ -39,6 +64,12 @@ services:
       - bridge_secret
     ports:
       - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.3
@@ -50,6 +81,7 @@ services:
     build:
       context: .
       dockerfile: memu-core/Dockerfile
+    <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
       MAX_MEMORY_RECORDS: "5000"
@@ -58,6 +90,12 @@ services:
       PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
     ports:
       - "8001:8001"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.5
@@ -70,12 +108,19 @@ services:
     build:
       context: .
       dockerfile: heartbeat/Dockerfile
+    <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
       CHECK_INTERVAL: "60"
       ALERT_WINDOW: "300"
     ports:
       - "8010:8010"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8010/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.6
@@ -86,6 +131,7 @@ services:
     build:
       context: .
       dockerfile: dashboard/Dockerfile
+    <<: *defaults
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
       MEMU_URL: http://memu-core:8001
@@ -95,6 +141,12 @@ services:
       SUPERVISOR_URL: http://supervisor:8051
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.7
@@ -108,6 +160,7 @@ services:
     build:
       context: .
       dockerfile: supervisor/Dockerfile
+    <<: *defaults
     environment:
       SWEEP_INTERVAL: "30"
       MEMU_URL: http://memu-core:8001
@@ -115,6 +168,12 @@ services:
       PROACTIVE_INTERVAL: "900"
     ports:
       - "8051:8051"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8051/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.8
@@ -127,10 +186,17 @@ services:
     build:
       context: .
       dockerfile: verifier/Dockerfile
+    <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
     ports:
       - "8052:8052"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8052/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.9
@@ -141,10 +207,17 @@ services:
     build:
       context: .
       dockerfile: fusion-engine/Dockerfile
+    <<: *defaults
     environment:
       VERIFIER_URL: http://verifier:8052
     ports:
       - "8053:8053"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8053/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.10
@@ -155,6 +228,7 @@ services:
     build:
       context: .
       dockerfile: langgraph/Dockerfile
+    <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
       TOOL_GATE_URL: http://tool-gate:8000
@@ -166,6 +240,12 @@ services:
       - hmac_secret
     ports:
       - "8007:8007"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8007/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.11
@@ -178,11 +258,18 @@ services:
     build:
       context: .
       dockerfile: executor/Dockerfile
+    <<: *defaults
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
       HEARTBEAT_URL: http://heartbeat:8010
     ports:
       - "8002:8002"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8002/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.12
@@ -194,11 +281,18 @@ services:
     build:
       context: .
       dockerfile: memory-compressor/Dockerfile
+    <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
       COMPRESSOR_INTERVAL_HOURS: "24"
     ports:
       - "8057:8057"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8057/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.18
@@ -209,12 +303,19 @@ services:
     build:
       context: .
       dockerfile: ledger-worker/Dockerfile
+    <<: *defaults
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
       HEARTBEAT_URL: http://heartbeat:8010
       LEDGER_VERIFY_INTERVAL: "60"
     ports:
       - "8056:8056"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8056/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.19
@@ -226,10 +327,17 @@ services:
     build:
       context: .
       dockerfile: metrics-gateway/Dockerfile
+    <<: *defaults
     environment:
       METRICS_SCRAPE_INTERVAL: "30"
     ports:
       - "8058:8058"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8058/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.20
@@ -241,6 +349,7 @@ services:
     build:
       context: .
       dockerfile: perception/audio/Dockerfile
+    <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
       WHISPER_BACKEND: "local"
@@ -248,6 +357,12 @@ services:
       AUTO_MEMORIZE_AUDIO: "true"
     ports:
       - "8021:8021"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8021/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.13
@@ -258,8 +373,15 @@ services:
     build:
       context: .
       dockerfile: perception/camera/Dockerfile
+    <<: *defaults
     ports:
       - "8020:8020"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8020/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.14
@@ -268,8 +390,15 @@ services:
     build:
       context: .
       dockerfile: kai-advisor/Dockerfile
+    <<: *defaults
     ports:
       - "8090:8090"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8090/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.15
@@ -278,11 +407,18 @@ services:
     build:
       context: .
       dockerfile: output/tts/Dockerfile
+    <<: *defaults
     environment:
       TTS_BACKEND: "edge"
       TTS_VOICE: "en-GB-RyanNeural"
     ports:
       - "8030:8030"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8030/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.16
@@ -291,8 +427,15 @@ services:
     build:
       context: .
       dockerfile: output/avatar/Dockerfile
+    <<: *defaults
     ports:
       - "8081:8081"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8081/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.17
@@ -301,10 +444,17 @@ services:
     build:
       context: .
       dockerfile: screen-capture/Dockerfile
+    <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
     ports:
       - "8059:8059"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8059/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.21
@@ -315,6 +465,7 @@ services:
     build:
       context: .
       dockerfile: backup-service/Dockerfile
+    <<: *defaults
     environment:
       PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
       REDIS_URL: redis://redis:6379
@@ -324,6 +475,12 @@ services:
       - db_password
     ports:
       - "8054:8054"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8054/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.22
@@ -335,14 +492,22 @@ services:
     build:
       context: .
       dockerfile: calendar-sync/Dockerfile
+    <<: *defaults
     ports:
       - "8055:8055"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8055/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.23
 
   ollama:
     image: ollama/ollama:latest
+    <<: *defaults
     ports:
       - "11434:11434"
     volumes:
@@ -355,6 +520,7 @@ services:
     build:
       context: .
       dockerfile: telegram-bot/Dockerfile
+    <<: *defaults
     environment:
       TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
       LANGGRAPH_URL: http://langgraph:8007
@@ -365,6 +531,12 @@ services:
       ALLOWED_CHAT_IDS: "${ALLOWED_CHAT_IDS:-}"
     ports:
       - "8025:8025"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8025/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.26
@@ -377,6 +549,7 @@ services:
     build:
       context: .
       dockerfile: orchestrator/Dockerfile
+    <<: *defaults
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
       MEMU_URL: http://memu-core:8001
@@ -385,6 +558,12 @@ services:
       OLLAMA_URL: http://ollama:11434
     ports:
       - "8050:8050"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8050/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.24
@@ -398,8 +577,15 @@ services:
     build:
       context: .
       dockerfile: workspace-manager/Dockerfile
+    <<: *defaults
     ports:
       - "8060:8060"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8060/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.25

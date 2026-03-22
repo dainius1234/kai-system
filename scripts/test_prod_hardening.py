@@ -59,7 +59,7 @@ class TestLoadSecret(unittest.TestCase):
             path = f.name
         try:
             # Simulate Docker secret: patch check so our temp file is read
-            os.environ["_TEST_LS_FILE"] = f"/run/secrets/test_ls_file"
+            os.environ["_TEST_LS_FILE"] = "/run/secrets/test_ls_file"
             with patch("pathlib.Path.is_file", return_value=True), \
                  patch("pathlib.Path.read_text", return_value="  secret-from-file  \n"):
                 val = self._load("_TEST_LS_FILE")

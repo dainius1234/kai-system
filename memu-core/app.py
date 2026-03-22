@@ -77,7 +77,7 @@ logger.info("Running on %s.", DEVICE)
 
 app = FastAPI(title="memU — core memory engine", version="0.6.0")
 budget = ErrorBudget(window_seconds=300)
-audit = AuditStream("memu-core", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
+audit = AuditStream("memu-core", required=os.getenv("AUDIT_REQUIRED", "false").lower() == "true")
 last_compress_run = 0.0
 MAX_MEMORY_RECORDS = int(os.getenv("MAX_MEMORY_RECORDS", "5000"))
 MAX_STATE_KEY_SIZE = int(os.getenv("MAX_STATE_KEY_SIZE", "128"))
@@ -733,8 +733,6 @@ def _recency_weight(record_timestamp: str, access_count: int = 0,
     return round(retention, 4)
 
 
-
-
 def _similarity(a: List[float], b: List[float]) -> float:
     if not a or not b:
         return 0.0
@@ -839,6 +837,7 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
             )
 
     return results
+
 
 def _weekly_compress_if_due() -> None:
     global last_compress_run
@@ -3049,7 +3048,7 @@ _TYPE_COOLDOWNS: Dict[str, int] = {
     "silence": 7200,        # 2 hours
     "goal_deadline": 1800,  # 30 minutes (urgent)
     "drift": 7200,          # 2 hours
-    "fading_memory": 14400, # 4 hours
+    "fading_memory": 14400,  # 4 hours
     "greeting": 28800,      # 8 hours
     "check_in": 14400,      # 4 hours
 }
@@ -4082,7 +4081,7 @@ async def check_confessions(request: Request) -> Dict[str, Any]:
             "message": (
                 f"Brother, I've been thinking — I gave advice about {rec_cat} "
                 f"that might have been off: \"{content[:100]}...\" "
-                f"Now that I've been corrected, I want to flag this so you know."
+                "Now that I've been corrected, I want to flag this so you know."
             ),
         })
 
@@ -4508,11 +4507,11 @@ async def get_future_self() -> Dict[str, Any]:
             days_to_improve = 30
         elif conf < 0.65:
             status = "improving"
-            projection = f"Improving — should reach high confidence with continued learning"
+            projection = "Improving — should reach high confidence with continued learning"
             days_to_improve = 14
         else:
             status = "strong"
-            projection = f"Strong domain — maintaining mastery"
+            projection = "Strong domain — maintaining mastery"
             days_to_improve = 0
 
         projections.append({
@@ -5625,6 +5624,7 @@ _log_buffer: Deque[Dict[str, Any]] = deque(maxlen=500)
 
 class _LogCapture(logging.Handler):
     """Captures log records into a ring buffer for /logs endpoint."""
+
     def emit(self, record: logging.LogRecord) -> None:
         try:
             _log_buffer.append({
@@ -6188,7 +6188,7 @@ async def echo_analyse(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
         if intensity >= 0.6:
             echo = (f"I can feel you're {current_emotion} again — "
                     f"reminds me of {time_desc} when '{past_trigger}' came up. "
-                    f"Different situation, same energy. Want to talk about what's underneath?")
+                    "Different situation, same energy. Want to talk about what's underneath?")
             echo_type = "deep_bridge"
         elif intensity >= 0.4:
             echo = (f"Getting a {current_emotion} vibe — similar to {time_desc} "
@@ -6196,7 +6196,7 @@ async def echo_analyse(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
             echo_type = "gentle_bridge"
         else:
             echo = (f"Noticing some {current_emotion} energy. "
-                    f"Let me know if you want me to adjust my approach.")
+                    "Let me know if you want me to adjust my approach.")
             echo_type = "soft_mirror"
 
     # record the echo event
@@ -6545,7 +6545,7 @@ async def oracle_predict(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
         elif impact_direction == "positive":
             chain["consequence"] = (
                 f"This advances '{goal_data.get('title', '')}' (currently {progress}%). "
-                f"Good move — keep the momentum."
+                "Good move — keep the momentum."
             )
         else:
             chain["consequence"] = f"Uncertain impact on '{goal_data.get('title', '')}'."
@@ -6675,7 +6675,7 @@ async def shadow_branch(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
             "projected_difference": (
                 f"With {len(affected_goals)} goals potentially affected "
                 f"and {len(related_mems)} related memories, this alternate path "
-                f"would have changed your trajectory."
+                "would have changed your trajectory."
                 if affected_goals or related_mems
                 else "Limited data to project alternate timeline."
             ),

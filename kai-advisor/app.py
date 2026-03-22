@@ -22,18 +22,22 @@ for root, dirs, files in os.walk("docs"):
             except Exception:
                 pass
 
+
 @app.get("/health")
 async def health() -> Dict[str, Any]:
     return {"status": "ok", "model": MODEL, "device": DEVICE, "knowledge_chunks": len(knowledge)}
 
+
 class QueryRequest(BaseModel):
     question: str
+
 
 class QueryResponse(BaseModel):
     question: str
     answer: str
     model: str
     device: str
+
 
 @app.post("/ask", response_model=QueryResponse)
 async def ask(req: QueryRequest) -> QueryResponse:

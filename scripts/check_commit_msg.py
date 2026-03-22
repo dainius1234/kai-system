@@ -43,7 +43,7 @@ def main() -> int:
         return 0
 
     print("ERROR: Commit message does not follow conventional format.")
-    print(f"  Expected: <type>: <description>")
+    print("  Expected: <type>: <description>")
     print(f"  Types: {', '.join(sorted(TYPES))}")
     print(f"  Got: {msg.strip().splitlines()[0] if msg.strip() else '(empty)'}")
     return 1

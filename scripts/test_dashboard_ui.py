@@ -29,6 +29,7 @@ def test_ui_page():
     assert resp2.status_code == 200
     assert "Sovereign AI" in resp2.text
 
+
 if __name__ == "__main__":
     test_ui_page()
     print("dashboard UI test passed")

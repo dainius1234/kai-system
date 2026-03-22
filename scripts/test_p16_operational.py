@@ -58,6 +58,8 @@ def _load_memu():
 memu = _load_memu()
 
 # ── Load langgraph ───────────────────────────────────────────────────
+
+
 def _load_langgraph():
     spec = importlib.util.spec_from_file_location(
         "langgraph_app", os.path.join(ROOT, "langgraph", "app.py")
@@ -71,6 +73,8 @@ def _load_langgraph():
 lg = _load_langgraph()
 
 # ── Load dashboard ───────────────────────────────────────────────────
+
+
 def _load_dashboard():
     spec = importlib.util.spec_from_file_location(
         "dashboard_app", os.path.join(ROOT, "dashboard", "app.py")

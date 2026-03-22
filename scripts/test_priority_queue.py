@@ -39,6 +39,7 @@ class TestPriorityQueue(unittest.TestCase):
 
     def test_submit_and_get_result(self):
         q = PriorityQueue(max_concurrent=2)
+
         async def work():
             return 42
         result = self._run(q.submit(Priority.CHAT, work))
@@ -46,6 +47,7 @@ class TestPriorityQueue(unittest.TestCase):
 
     def test_stats_after_processing(self):
         q = PriorityQueue(max_concurrent=2)
+
         async def work():
             return "done"
         self._run(q.submit(Priority.CHAT, work))
@@ -74,6 +76,7 @@ class TestPriorityQueue(unittest.TestCase):
 
     def test_auto_task_id(self):
         q = PriorityQueue()
+
         async def work():
             return True
         self._run(q.submit(Priority.RUN, work))
@@ -81,6 +84,7 @@ class TestPriorityQueue(unittest.TestCase):
 
     def test_exception_propagation(self):
         q = PriorityQueue()
+
         async def failing():
             raise ValueError("test error")
         with self.assertRaises(ValueError):
@@ -91,6 +95,7 @@ class TestPriorityQueue(unittest.TestCase):
     def test_multiple_priorities(self):
         q = PriorityQueue(max_concurrent=4)
         results = []
+
         async def work(label):
             results.append(label)
             return label

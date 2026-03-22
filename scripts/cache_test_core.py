@@ -16,15 +16,18 @@ TEST_TARGETS = [
     "test-phase-b-memu", "test-memu-pg", "test-dashboard-ui", "test-dashboard", "test-thinking-pathways", "test-tool-gate", "test-tool-gate-security", "test-telegram", "test-conviction", "test-audio", "test-camera", "test-executor", "test-langgraph", "test-kai-advisor", "test-tts", "test-avatar", "test-heartbeat", "test-episode-saver", "test-episode-spool", "test-error-budget", "test-invoice", "test-memu-retrieval", "test-router", "test-planner", "test-adversary", "test-failure-taxonomy", "test-selaur", "test-self-emp", "test-auth-hmac", "test-agentic", "test-v7", "test-contradiction", "test-mars-consolidation", "test-p3-organic", "test-p4-personality", "test-p16-operational", "test-p17-emotional-intelligence", "test-p18-narrative-identity", "test-p19-imagination-engine", "test-p20-conscience-values", "test-p21-proactive-agent", "test-p22-operator-model", "test-h1-hardening", "test-h2-self-healing", "test-mars-consolidation", "test-sage-critique", "test-agent-evolver", "test-checkpoint", "test-error-codes", "test-feature-flags"
 ]
 
+
 def load_results():
     if not os.path.exists(RESULTS_PATH):
         return {"last_run": None, "results": []}
     with open(RESULTS_PATH, "r") as f:
         return json.load(f)
 
+
 def save_results(data):
     with open(RESULTS_PATH, "w") as f:
         json.dump(data, f, indent=2)
+
 
 def run_target(target):
     print(f"Running {target}...")
@@ -46,6 +49,7 @@ def run_target(target):
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S")
         }
 
+
 def main():
     load_results()
     new_results = []
@@ -54,6 +58,7 @@ def main():
         new_results.append(res)
         save_results({"last_run": time.strftime("%Y-%m-%dT%H:%M:%S"), "results": new_results})
     print("All test-core targets run. Results cached.")
+
 
 if __name__ == "__main__":
     main()

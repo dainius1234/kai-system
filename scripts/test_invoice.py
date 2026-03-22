@@ -37,4 +37,5 @@ def test_main_defaults(monkeypatch, tmp_path, capsys):
     assert "inv.pdf generated" in captured.out
     assert outfile.exists()
 
+
 print("invoice tests passed")

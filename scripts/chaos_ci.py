@@ -29,7 +29,6 @@ PORT_ENVS = [
 ]
 
 
-
 def start(verbose: bool = False) -> List[subprocess.Popen]:
     procs = []
     for i, (cmd, env_extra) in enumerate(zip(SERVICES, PORT_ENVS)):
@@ -47,7 +46,6 @@ def start(verbose: bool = False) -> List[subprocess.Popen]:
     return procs
 
 
-
 def restart(procs: List[subprocess.Popen], idx: int, verbose: bool = False) -> None:
     env = os.environ.copy()
     env.update(PORT_ENVS[idx])
@@ -59,7 +57,6 @@ def restart(procs: List[subprocess.Popen], idx: int, verbose: bool = False) -> N
     except Exception as e:
         logging.error(f"Failed to restart service {idx}: {e}")
         raise
-
 
 
 def stop_all(procs: List[subprocess.Popen]) -> None:
@@ -78,7 +75,6 @@ def stop_all(procs: List[subprocess.Popen]) -> None:
                 logging.info(f"Killed service {i}")
             except Exception as e:
                 logging.warning(f"Failed to kill service {i}: {e}")
-
 
 
 def run_scenario(procs: List[subprocess.Popen], scenario: str, verbose: bool = False) -> None:
@@ -131,7 +127,6 @@ def main():
         raise
     finally:
         stop_all(procs)
-
 
 
 if __name__ == "__main__":

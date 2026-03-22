@@ -133,7 +133,7 @@ def build_status_table(metrics: dict) -> str:
         f'| **Python LOC** | ~{metrics["loc"]:,} |',
         f'| **Compose files** | {metrics["compose"]} (minimal / full / sovereign) |',
         f'| **Milestones shipped** | {metrics["milestones"]} |',
-        f'| **Failures** | 0 |',
+        '| **Failures** | 0 |',
     ]
     return "\n".join(rows) + "\n"
 
@@ -216,9 +216,9 @@ def sync_backlog(metrics: dict, check_only: bool = False) -> bool:
 
     if changed:
         backlog_path.write_text(text)
-        print(f"docs-sync: PROJECT_BACKLOG.md updated")
+        print("docs-sync: PROJECT_BACKLOG.md updated")
     else:
-        print(f"docs-sync: PROJECT_BACKLOG.md is current")
+        print("docs-sync: PROJECT_BACKLOG.md is current")
 
     return True
 

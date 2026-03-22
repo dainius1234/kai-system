@@ -218,7 +218,7 @@ async def maybe_alert_mtd_proximity(strategy: Dict[str, object]) -> None:
     if 0 <= left <= 2000:
         try:
             async with httpx.AsyncClient(timeout=4.0) as client:
-                await client.post(TELEGRAM_ALERT_URL, json={"text": f"Alert: £{max(left,0):.0f} left till MTD — prep GnuCash"})
+                await client.post(TELEGRAM_ALERT_URL, json={"text": f"Alert: £{max(left, 0):.0f} left till MTD — prep GnuCash"})
         except Exception:
             logger.warning("Failed to deliver MTD proximity alert")
 
@@ -852,6 +852,7 @@ async def chat_stream(req: ChatRequest):
     import asyncio
     # H1.3: 10-way parallel fetch with error handling — one failing task
     # must not crash the entire /chat endpoint. Each gets a safe default.
+
     async def _safe(coro, default):
         try:
             return await coro
@@ -895,7 +896,7 @@ async def chat_stream(req: ChatRequest):
             goal_lines.append(f"- [{priority.upper()}] {title} ({progress}% done, deadline: {deadline})")
         messages.append({
             "role": "system",
-            "content": f"Active Ohana goals (track these, nudge about progress):\n" + "\n".join(goal_lines),
+            "content": "Active Ohana goals (track these, nudge about progress):\n" + "\n".join(goal_lines),
         })
 
     # inject active/deferred conversation topics
@@ -903,7 +904,7 @@ async def chat_stream(req: ChatRequest):
         topic_lines = [f"- {t.get('topic', '')} (deferred: {t.get('deferred', False)})" for t in topics[:5]]
         messages.append({
             "role": "system",
-            "content": f"Active conversation topics (bring up naturally when relevant):\n" + "\n".join(topic_lines),
+            "content": "Active conversation topics (bring up naturally when relevant):\n" + "\n".join(topic_lines),
         })
 
     # inject emotional awareness — mood, confidence, and epistemic humility

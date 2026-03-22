@@ -254,7 +254,7 @@ async def dispatch_tax_advisory(query: str) -> str:
     suggestions = advise(income_total=income_total, expenses_lines=expenses_lines)
     th = thresholds()
 
-    parts = [f"**Tax Advisory (offline UK rules)**\n"]
+    parts = ["**Tax Advisory (offline UK rules)**\n"]
     parts.append(f"- Recorded income: £{income_total:,.2f}")
     parts.append(f"- MTD threshold: £{th.get('mtd_start', 50000):,.0f}")
     parts.append(f"- VAT threshold: £{th.get('vat_threshold', 90000):,.0f}")

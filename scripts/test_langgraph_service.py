@@ -29,7 +29,6 @@ def test_health():
     assert resp.json().get("status") == "ok"
 
 
-
 if __name__ == "__main__":
     test_health()
     print("langgraph service tests passed")

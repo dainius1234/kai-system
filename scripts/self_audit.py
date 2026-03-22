@@ -17,6 +17,8 @@ from pathlib import Path
 AUDIT_LOG = Path("output/self_audit_log.json")
 
 # 1. Gather recent test and lint results
+
+
 def run_make(target):
     try:
         result = subprocess.run(["make", target], capture_output=True, text=True, timeout=120)
@@ -29,14 +31,17 @@ def run_make(target):
     except Exception as e:
         return {"target": target, "error": str(e)}
 
+
 def summarize_results(results):
     summary = []
     for r in results:
         if r.get("returncode", 0) != 0:
-            summary.append(f"{r['target']} failed: {r.get('stderr','').strip()[:200]}")
+            summary.append(f"{r['target']} failed: {r.get('stderr', '').strip()[:200]}")
     return summary or ["All checks passed."]
 
 # 2. Log lessons/incidents to memu-core (if available)
+
+
 def log_lesson_to_memu(lesson):
     try:
         import requests
@@ -49,6 +54,7 @@ def log_lesson_to_memu(lesson):
         requests.post("http://localhost:8001/memory/memorize", json=payload, timeout=2)
     except Exception:
         pass  # memu-core may not be running
+
 
 def main():
     checks = ["merge-gate", "test-core", "health-sweep"]
@@ -69,6 +75,7 @@ def main():
     print(f"\nFull audit log: {AUDIT_LOG}")
     if any("failed" in s for s in summary):
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

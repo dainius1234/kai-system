@@ -73,12 +73,12 @@ def main():
     r2 = safe_get("http://localhost:8080/ui")
     print("dashboard UI", r2.status_code if r2 else None)
     # try a simple executor run if available
-    r3 = safe_post("http://localhost:8002/execute", json={"tool":"noop","params":{},"task_id":"t1","device":"cpu"})
+    r3 = safe_post("http://localhost:8002/execute", json={"tool": "noop", "params": {}, "task_id": "t1", "device": "cpu"})
     if r3:
         print("executor execute", r3.status_code, r3.text)
 
     # test perception endpoints if reachable
-    r4 = safe_post("http://localhost:8021/listen", json={"text":"hello","session_id":"int"})
+    r4 = safe_post("http://localhost:8021/listen", json={"text": "hello", "session_id": "int"})
     if r4:
         print("audio listen", r4.status_code, r4.text)
     r5 = safe_post("http://localhost:8040/process")

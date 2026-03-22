@@ -107,7 +107,7 @@ async def api_corrections():
     except Exception:
         return {"corrections": []}
 
-audit = AuditStream("dashboard", required=os.getenv("AUDIT_REQUIRED", "false").lower()=="true")
+audit = AuditStream("dashboard", required=os.getenv("AUDIT_REQUIRED", "false").lower() == "true")
 
 SUPERVISOR_URL = os.getenv("SUPERVISOR_URL", "http://supervisor:8051")
 
@@ -1064,7 +1064,6 @@ LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
 async def chat_page() -> HTMLResponse:
     """Serve the chat UI (legacy standalone, redirects to /app)."""
     return HTMLResponse('<meta http-equiv="refresh" content="0;url=/app">')
-
 
 
 @app.post("/api/chat")

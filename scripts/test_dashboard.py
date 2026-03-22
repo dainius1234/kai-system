@@ -43,6 +43,7 @@ def test_index_minimal():
         jsonp = resp.json()
         assert "service" in jsonp and jsonp["service"] == "dashboard"
 
+
 if __name__ == "__main__":
     test_health()
     test_index_minimal()

@@ -72,7 +72,7 @@ def check_health(name: str, port: int) -> Dict[str, str]:
 
 def main() -> int:
     print(f"\n{'='*60}")
-    print(f"  Kai System — Health Sweep")
+    print("  Kai System — Health Sweep")
     print(f"  {len(SERVICES)} services | host={HOST}")
     print(f"{'='*60}\n")
 
@@ -91,11 +91,11 @@ def main() -> int:
     print(f"  SCORECARD: {up} UP / {degraded} DEGRADED / {down} DOWN — {len(SERVICES)} total")
 
     if down == 0 and degraded == 0:
-        print(f"  RESULT: ALL GREEN")
+        print("  RESULT: ALL GREEN")
     elif down == 0:
-        print(f"  RESULT: PARTIAL (some degraded)")
+        print("  RESULT: PARTIAL (some degraded)")
     else:
-        print(f"  RESULT: FAILURES DETECTED")
+        print("  RESULT: FAILURES DETECTED")
     print(f"{'='*60}\n")
 
     # write JSON scorecard
@@ -110,7 +110,7 @@ def main() -> int:
     try:
         with open("output/health_scorecard.json", "w") as f:
             json.dump(scorecard, f, indent=2)
-        print(f"  Scorecard written: output/health_scorecard.json\n")
+        print("  Scorecard written: output/health_scorecard.json\n")
     except Exception:
         pass
 

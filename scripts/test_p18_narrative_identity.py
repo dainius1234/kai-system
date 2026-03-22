@@ -72,6 +72,8 @@ def _load_dashboard():
 dash = _load_dashboard()
 
 # ── Load langgraph ───────────────────────────────────────────────────
+
+
 def _load_langgraph():
     spec = importlib.util.spec_from_file_location(
         "langgraph_app_p18", os.path.join(ROOT, "langgraph", "app.py")

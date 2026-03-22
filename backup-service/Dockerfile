@@ -5,8 +5,15 @@ WORKDIR /app
 COPY backup-service/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN addgroup --system app && adduser --system --ingroup app app
+
 COPY backup-service/app.py ./app.py
 
 EXPOSE 8054
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8054/health')" || exit 1
+
+USER app
 
 CMD ["python", "app.py"]

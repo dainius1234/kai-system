@@ -19,10 +19,12 @@ sys.path.insert(0, str(ROOT / "common"))
 if "redis" not in sys.modules:
     from types import ModuleType
     _r = ModuleType("redis")
+
     class _FakeRedis:
         @classmethod
         def from_url(cls, *a, **kw):
             return cls()
+
         def ping(self):
             return True
     _r.Redis = _FakeRedis

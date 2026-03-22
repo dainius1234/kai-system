@@ -39,6 +39,7 @@ def test_tick_and_event():
     r2 = client.post("/event", json={"status": "test", "reason": "unit"})
     assert r2.status_code == 200
 
+
 if __name__ == "__main__":
     test_health()
     test_status()

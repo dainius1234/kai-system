@@ -100,7 +100,7 @@ def append_session(block: str, dry_run: bool = False) -> bool:
         new_text = text + block
 
     SESSION_LOG.write_text(new_text)
-    print(f"auto-session: SESSION_BACKLOG.md updated")
+    print("auto-session: SESSION_BACKLOG.md updated")
     return True
 
 

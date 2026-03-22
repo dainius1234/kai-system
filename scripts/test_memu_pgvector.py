@@ -40,7 +40,7 @@ def main() -> int:
     # insert a few records
     mod.store.conn.autocommit = True
     mod.store.conn.cursor().execute("DELETE FROM memories;")
-    r1 = mod.MemoryRecord(id="1", timestamp="2026-01-01T00:00:00", event_type="a", content={"user_id": "keeper"}, embedding=[0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1], relevance=0.1)
+    r1 = mod.MemoryRecord(id="1", timestamp="2026-01-01T00:00:00", event_type="a", content={"user_id": "keeper"}, embedding=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], relevance=0.1)
     r2 = mod.MemoryRecord(id="2", timestamp="2026-01-02T00:00:00", event_type="b", content={"user_id": "keeper"}, embedding=[0.2]*8, relevance=0.2)
     r3 = mod.MemoryRecord(id="3", timestamp="2026-01-03T00:00:00", event_type="c", content={"user_id": "keeper"}, embedding=[0.3]*8, relevance=0.3)
     mod.store.insert(r1)

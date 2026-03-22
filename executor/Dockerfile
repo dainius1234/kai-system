@@ -5,9 +5,16 @@ WORKDIR /app
 COPY executor/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN addgroup --system app && adduser --system --ingroup app app
+
 COPY executor/app.py ./
 COPY common/ ./common/
 
 EXPOSE 8002
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')" || exit 1
+
+USER app
 
 CMD ["python", "app.py"]

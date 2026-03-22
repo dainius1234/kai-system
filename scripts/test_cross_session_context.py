@@ -39,6 +39,7 @@ def test_cross_session_context():
     found = any("site inspection" in m for m in ltm)
     assert found, "Session B should see session A's memory"
 
+
 if __name__ == "__main__":
     test_cross_session_context()
     print("cross-session context test passed")

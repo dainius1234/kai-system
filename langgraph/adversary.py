@@ -37,6 +37,7 @@ import httpx
 
 # ── Data structures ──────────────────────────────────────────────────
 
+
 @dataclass
 class ChallengeResult:
     """Result of a single challenge strategy."""

@@ -5,10 +5,17 @@ WORKDIR /app
 COPY output/tts/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN addgroup --system app && adduser --system --ingroup app app
+
 COPY common/ ./common/
 COPY security/ ./security/
 COPY output/tts/app.py ./app.py
 
 EXPOSE 8030
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8030/health')" || exit 1
+
+USER app
 
 CMD ["python", "app.py"]

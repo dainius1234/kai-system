@@ -297,8 +297,6 @@ def rollback_memu(method: str) -> None:
     log_action(method, f"rollback:{version}", "TPM")
 
 
-
-
 def advisor_mode(prompt: str) -> str:
     income = load_income_total(INCOME_CSV)
     expenses = load_expenses(EXPENSES_LOG)
@@ -306,7 +304,6 @@ def advisor_mode(prompt: str) -> str:
     lines = ["Дайниус, что на уме?", "You’re tired — upload a receipt photo and I’ll log it for you.", f"Prompt: {prompt}", f"Income: £{income:.2f}"]
     lines.extend(f"- {x}" for x in suggestions)
     return "\n".join(lines)
-
 
 
 def add_conviction_override(rule: str) -> str:
