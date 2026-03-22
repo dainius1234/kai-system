@@ -1,4 +1,4 @@
-"""Verifier — deterministic fact-checking and verdict gating.
+"""Verifier — deterministic fact-checking and verdict gating with SAGE self-critique.
 
 The single authority that decides whether a claim is trustworthy enough
 for memory promotion or tool execution.  Returns one of three verdicts:
@@ -13,6 +13,8 @@ Verification strategies:
   3. Self-consistency:  check whether the plan's own steps are coherent
   4. Keyword plausibility: heuristic language analysis (placeholder for
      multi-LLM consensus when DeepSeek-V4 + Kimi-2.5 are wired)
+  5. SAGE self-critique: meta-review of own signals to detect groupthink,
+     thin-evidence passes, and signal contradictions (P23)
 
 The verifier never executes anything.  It only reads and reports.
 Thresholds are read from security/policy.yml via common.policy.
@@ -312,6 +314,73 @@ def _material_claim_signal(claims: List[MaterialClaim],
                   detail=detail)
 
 
+# ── SAGE Self-Critique (P23) ─────────────────────────────────────────
+
+
+def _self_critique(signals: List[Signal],
+                   strong_chunks: int,
+                   material_claims: List[MaterialClaim]) -> Signal:
+    """SAGE self-critique: meta-review of own verification signals.
+
+    Detects three failure modes that individual strategies miss:
+    1. Groupthink — all signals agree too easily (suspiciously uniform)
+    2. Thin-evidence pass — high scores despite weak evidence base
+    3. Signal contradiction — large divergence between strategies
+    """
+    if not signals:
+        return Signal(strategy="self_critique", score=0.5,
+                      detail="no signals to critique")
+
+    scores = [s.score for s in signals]
+    avg = sum(scores) / len(scores)
+    issues: list[str] = []
+
+    # 1. Groupthink detection: all scores within a narrow band
+    score_range = max(scores) - min(scores)
+    if len(scores) >= 3 and score_range < 0.08:
+        issues.append(
+            f"groupthink: all {len(scores)} signals within "
+            f"{score_range:.2f} range — suspiciously uniform"
+        )
+
+    # 2. Thin-evidence pass: high average but weak backing
+    if avg >= PASS_THRESHOLD and strong_chunks < MIN_STRONG_CHUNKS:
+        issues.append(
+            f"thin-evidence: avg={avg:.2f} meets pass threshold "
+            f"but only {strong_chunks} strong chunks "
+            f"(need {MIN_STRONG_CHUNKS})"
+        )
+
+    # 3. High confidence on material claims with no evidence
+    if material_claims and strong_chunks == 0 and avg >= REPAIR_THRESHOLD:
+        issues.append(
+            f"unsupported-material: {len(material_claims)} material "
+            f"claims but zero strong evidence chunks"
+        )
+
+    # 4. Signal contradiction: large spread between strategies
+    if len(scores) >= 2:
+        max_divergence = max(scores) - min(scores)
+        if max_divergence >= 0.5:
+            high_strat = max(signals, key=lambda s: s.score).strategy
+            low_strat = min(signals, key=lambda s: s.score).strategy
+            issues.append(
+                f"contradiction: {high_strat}={max(scores):.2f} vs "
+                f"{low_strat}={min(scores):.2f} (divergence={max_divergence:.2f})"
+            )
+
+    # Score: start at avg, penalise for each issue found
+    critique_score = max(avg - (len(issues) * 0.15), 0.0)
+
+    if issues:
+        detail = f"SAGE critique flagged {len(issues)} issue(s): {'; '.join(issues)}"
+    else:
+        detail = "SAGE critique: signals are coherent, no blind spots detected"
+
+    return Signal(strategy="self_critique", score=round(critique_score, 3),
+                  detail=detail)
+
+
 # ── Verdict aggregation ─────────────────────────────────────────────
 
 
@@ -395,6 +464,9 @@ async def verify(req: VerifyRequest) -> VerifyResponse:
 
     # 5. material claim signal (needs strong chunk count from step 2)
     signals.append(_material_claim_signal(material_claims, strong_chunks))
+
+    # 6. SAGE self-critique — meta-review of signals 1-5
+    signals.append(_self_critique(signals[:], strong_chunks, material_claims))
 
     # aggregate all signals into a deterministic verdict
     verdict, confidence, evidence_summary = _aggregate(signals, strong_chunks)

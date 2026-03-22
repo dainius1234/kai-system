@@ -249,15 +249,15 @@ async def _test_full_orchestrator():
         tool_hint="shell",
     )
     assert isinstance(verdict, AdversaryVerdict)
-    assert len(verdict.challenges) == 5
+    assert len(verdict.challenges) == 6  # 5 core + self_review (no security)
     assert isinstance(verdict.total_modifier, float)
     assert verdict.recommendation in ("proceed", "caution", "block")
     assert isinstance(verdict.challenge_time_ms, float)
 
-    # check that all 5 strategies ran
+    # check that all 6 strategies ran (5 core + self_review)
     strategies = {c.strategy for c in verdict.challenges}
-    assert strategies == {"history", "verifier", "policy", "consistency", "calibration"}, \
-        f"expected all 5 strategies, got {strategies}"
+    assert strategies == {"history", "verifier", "policy", "consistency", "calibration", "self_review"}, \
+        f"expected all 6 strategies, got {strategies}"
 
     # verifier and policy should be in degraded mode (services not running)
     for c in verdict.challenges:

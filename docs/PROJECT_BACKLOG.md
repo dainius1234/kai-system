@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: MARS Memory Consolidation (Ebbinghaus stability parameter, conscience-filtered pruning, nightly consolidation cycle) — **60 targets, 1085+ tests**
+**Last updated:** 2026-03-22 — session: P23 SAGE Multi-Agent Critique Loop (verifier self-critique, adversary self-review challenge 7) — **61 targets, 1115+ tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 59 (make test-core) |
-| Individual tests | 1050+ passing, 0 failures |
+| Test targets | 61 (make test-core) |
+| Individual tests | 1115+ passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -1006,19 +1006,81 @@ stays or goes.
 - Math validation: retention curves at various τ/S values, compound rehearsals
 - Integration: compressor calls consolidate before compress
 
+---
+
+## P23 — SAGE Multi-Agent Critique Loop (2026-03-22) ✅ COMPLETE
+
+**Source:** arXiv:2603.15255 — SAGE: Self-Aware Generative Engine
+
+**Problem:** The verifier returned verdicts without questioning its own
+signals. The adversary challenged plans with 6 strategies but never
+reviewed whether the challenges themselves were coherent. A system that
+doesn't question its own conclusions is blind to its blind spots.
+
+**Architecture: Dual-layer SAGE self-critique**
+
+#### Layer 1 — Verifier Self-Critique (verifier/app.py)
+New `_self_critique()` function runs after all 4 verification signals
+but before verdict aggregation. Detects 4 failure modes:
+
+- [x] **SAGE.1 — Groupthink detection** — If all signals are within
+      0.08 range (suspiciously uniform agreement), flags "groupthink".
+      Requires ≥3 signals to trigger.
+- [x] **SAGE.2 — Thin-evidence pass** — High average score (≥ PASS_THRESHOLD)
+      but insufficient strong chunks (< MIN_STRONG_CHUNKS). The numbers
+      look good but the evidence doesn't back them up.
+- [x] **SAGE.3 — Unsupported material claims** — Material claims detected
+      but zero strong evidence chunks. Most dangerous failure mode:
+      hallucinated facts with no supporting evidence.
+- [x] **SAGE.4 — Signal contradiction** — Divergence ≥0.5 between highest
+      and lowest scoring strategies. Indicates one strategy sees something
+      the others miss.
+
+Each issue penalises the critique score by 0.15. The self-critique signal
+is included in the aggregate, so multiple issues can downgrade a PASS to
+REPAIR or FAIL_CLOSED.
+
+#### Layer 2 — Adversary Self-Review (langgraph/adversary.py)
+New `challenge_self_review()` runs as challenge 7 after all other
+challenges complete. Detects 4 meta-failure modes:
+
+- [x] **SAGE.5 — False consensus** — All challenges passed but average
+      confidence is below 0.5 (low-quality agreement).
+- [x] **SAGE.6 — Degraded groupthink** — ≥2 challenges returned
+      modifier=0.0 with confidence ≤0.3 (likely skipped/degraded).
+      Insufficient scrutiny signals.
+- [x] **SAGE.7 — Conflicting findings** — Paired challenges disagree
+      with high confidence (verifier↔history, policy↔consistency,
+      calibration↔verifier). One says pass, other says fail.
+- [x] **SAGE.8 — Over-optimism** — Total modifier is positive despite
+      ≥2 failed challenges. Positive scores may be masking real problems.
+
+Penalty capped at -1.0. Self-review is included in the adversary verdict.
+
+#### Tests
+- 30 tests in `scripts/test_sage_critique.py`
+- Verifier self-critique: groupthink, thin-evidence, unsupported-material,
+  contradiction, clean signals, multiple issues, edge cases
+- Adversary self-review: false consensus, degraded groupthink, conflicting
+  findings, over-optimism, clean challenges, penalty cap
+- Integration: self-critique downgrades PASS→REPAIR, clean critique preserves PASS
+
 ## Research Roadmap (2026 — arXiv/GitHub sourced)
 
 | ID | Enhancement | Source | Status |
 |---|---|---|---|
 | **MARS** | **Memory Consolidation (Ebbinghaus stability, conscience-filtered pruning)** | arXiv:2503.19271 | **✅ DONE** |
-| P23 | SAGE Multi-Agent Critique (verifier self-critique loop) | arXiv:2603.15255 | Planned |
+| **P23** | **SAGE Multi-Agent Critique (verifier self-critique + adversary self-review)** | arXiv:2603.15255 | **✅ DONE** |
 | P24 | Agent-Evolver Insight Engine (failure→pattern→fix suggestions) | clawskills.sh | Planned |
 | P25 | Mini-COSMO Recursive Self-Build (prompt→code→test→optimize) | github.com/XiangJinyu/mini-cosmo | Backlog |
 | H3b | LangGraph Checkpointing (time-travel debug, state snapshots) | LangGraph docs | Planned |
 
-**P23 — SAGE Multi-Agent Critique:** Add Challenger/Critic agents to verifier.
-Before proposing any output, the verifier self-critiques for flaws. Extends
-the adversary engine (which challenges plans) into the output phase.
+**P23 — SAGE Multi-Agent Critique:** ✅ DONE. Dual-layer self-critique:
+(1) Verifier self-critique signal detects groupthink, thin-evidence passes,
+unsupported material claims, and signal contradictions. (2) Adversary
+self-review challenge 7 detects false consensus, degraded groupthink,
+conflicting findings, and over-optimism. Both fire automatically — the
+system questions its own conclusions before proposing any action.
 
 **P24 — Agent-Evolver Insight Engine:** Analyze failure logs, extract patterns,
 proactively suggest fixes. Integrate with Dream State for nightly insight

@@ -25,9 +25,9 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Proactive Agent Loop** | Scheduled tasks, reminders, morning/evening briefings, action registry | Never |
 | **Operator Model** | Echo-response engine, nudge escalation ladder, cross-mode insight bridge, impact oracle, shadow memory branches | Never |
 
-**60 test targets. 1085+ tests. Zero failures. 25 Docker services. All real.**
+**61 test targets. 1115+ tests. Zero failures. 25 Docker services. All real.**
 
-**Current focus: MARS Memory Consolidation** — Ebbinghaus forgetting curve with adaptive stability parameter (R = e^{-τ/S}). Memories that aren't rehearsed decay and get pruned. Memories linked to conscience values survive. Stability grows with each retrieval. Nightly consolidation cycle prunes noise, strengthens lessons.
+**Current focus: P23 SAGE Multi-Agent Critique Loop** — Verifier self-critique detects groupthink, thin-evidence passes, unsupported material claims, and signal contradictions before returning any verdict. Adversary self-review (challenge 7) catches false consensus, degraded groupthink, conflicting findings, and over-optimism across all challenge results. The system now questions its own conclusions before acting.
 
 ---
 
@@ -75,7 +75,7 @@ Kai is modular, secure, and designed for real-world use:
 1. Operator sends a message (Telegram, Dashboard, or API).
 2. LangGraph enriches context: memories + session + goals + topics + EQ + narrative + imagination + conscience + agent + operator model (10-way parallel fetch).
 3. Specialist router classifies the domain. Planner builds a gap-aware plan.
-4. Adversary challenges the plan (6 challenge types). Conviction scoring gates execution.
+4. Adversary challenges the plan (7 challenge types incl. SAGE self-review). Conviction scoring gates execution.
 5. Tool-Gate checks policy (HMAC, rate limit, co-sign). Executor runs in sandbox.
 6. Post-mortem: episode saved, corrections learned, emotion recorded, memory updated.
 

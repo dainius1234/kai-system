@@ -559,6 +559,115 @@ def challenge_security(injection_re, sanitize_fn=None) -> ChallengeResult:
         )
 
 
+# ── Challenge 7: SAGE self-review (P23) ──────────────────────────────
+
+def challenge_self_review(challenges: List[ChallengeResult]) -> ChallengeResult:
+    """Challenge 7: SAGE meta-review of all other challenge results.
+
+    Detects failure modes invisible to individual challenges:
+    1. False consensus — all challenges passed but with low confidence
+    2. Degraded groupthink — multiple challenges ran in degraded mode
+    3. Conflicting findings — one challenge passed while another failed
+       on the same dimension
+    """
+    if not challenges:
+        return ChallengeResult(
+            strategy="self_review",
+            passed=True,
+            confidence=0.2,
+            finding="No challenges to review.",
+            modifier=0.0,
+        )
+
+    issues: List[str] = []
+
+    # 1. False consensus: all passed but average confidence < 0.5
+    all_passed = all(c.passed for c in challenges)
+    avg_confidence = sum(c.confidence for c in challenges) / len(challenges)
+    if all_passed and avg_confidence < 0.5:
+        issues.append(
+            f"false-consensus: all {len(challenges)} challenges passed "
+            f"but avg confidence is only {avg_confidence:.2f} — "
+            f"low-quality agreement"
+        )
+
+    # 2. Degraded groupthink: multiple challenges returned modifier=0.0
+    #    with low confidence (likely degraded/skipped)
+    degraded = [
+        c for c in challenges
+        if c.modifier == 0.0 and c.confidence <= 0.3
+    ]
+    if len(degraded) >= 2:
+        strategies = [c.strategy for c in degraded]
+        issues.append(
+            f"degraded-groupthink: {len(degraded)} challenges "
+            f"appear degraded ({', '.join(strategies)}) — "
+            f"insufficient scrutiny"
+        )
+
+    # 3. Conflicting findings: verifier+history disagree, or
+    #    policy+consistency disagree
+    by_strategy = {c.strategy: c for c in challenges}
+    conflict_pairs = [
+        ("verifier", "history"),
+        ("policy", "consistency"),
+        ("calibration", "verifier"),
+    ]
+    for a_key, b_key in conflict_pairs:
+        a = by_strategy.get(a_key)
+        b = by_strategy.get(b_key)
+        if a and b:
+            # one passed with high confidence, other failed with high confidence
+            if (a.passed and a.confidence >= 0.7
+                    and not b.passed and b.confidence >= 0.7):
+                issues.append(
+                    f"conflict: {a_key} passed (conf={a.confidence:.2f}) "
+                    f"but {b_key} failed (conf={b.confidence:.2f})"
+                )
+            elif (b.passed and b.confidence >= 0.7
+                    and not a.passed and a.confidence >= 0.7):
+                issues.append(
+                    f"conflict: {b_key} passed (conf={b.confidence:.2f}) "
+                    f"but {a_key} failed (conf={a.confidence:.2f})"
+                )
+
+    # 4. Over-optimism: high total modifier but contains failed challenges
+    total_mod = sum(c.modifier for c in challenges)
+    failed_count = sum(1 for c in challenges if not c.passed)
+    if total_mod > 0.0 and failed_count >= 2:
+        issues.append(
+            f"over-optimism: total modifier is {total_mod:+.2f} despite "
+            f"{failed_count} failed challenges — positive modifiers "
+            f"may be masking real problems"
+        )
+
+    if issues:
+        penalty = min(len(issues) * 0.3, 1.0)
+        return ChallengeResult(
+            strategy="self_review",
+            passed=False,
+            confidence=min(0.5 + len(issues) * 0.1, 0.9),
+            finding=(
+                f"SAGE self-review flagged {len(issues)} meta-issue(s): "
+                + "; ".join(issues)
+            ),
+            modifier=-penalty,
+            evidence=issues,
+        )
+
+    return ChallengeResult(
+        strategy="self_review",
+        passed=True,
+        confidence=min(avg_confidence + 0.1, 0.9),
+        finding=(
+            f"SAGE self-review: {len(challenges)} challenges are "
+            f"coherent (avg confidence={avg_confidence:.2f}, "
+            f"no meta-issues detected)."
+        ),
+        modifier=0.1,
+    )
+
+
 # ── Orchestration ────────────────────────────────────────────────────
 
 async def challenge_plan(
@@ -617,6 +726,10 @@ async def challenge_plan(
     ]
     if security_result is not None:
         challenges.append(security_result)
+
+    # Challenge 7: SAGE self-review of all previous challenges (P23)
+    self_review_result = challenge_self_review(challenges)
+    challenges.append(self_review_result)
 
     total_challenges = len(challenges)
 

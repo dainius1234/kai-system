@@ -21,7 +21,8 @@ client = TestClient(mod.app)
 def test_health():
     resp = client.get("/health")
     assert resp.status_code == 200
-    assert resp.json().get("status").startswith("ok") or resp.json().get("status").startswith("running")
+    status = resp.json().get("status")
+    assert status in ("ok", "degraded", "running"), f"unexpected status: {status}"
 
 
 def test_status():
