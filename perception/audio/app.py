@@ -100,6 +100,7 @@ class AudioCaptureResult(BaseModel):
     timestamp: float
     whisper_backend: str
     injection_detected: bool
+    emotion: Optional[Dict[str, Any]] = None
 
 
 def _check_injection(text: str, session_id: str = "unknown") -> bool:
@@ -187,6 +188,92 @@ async def _auto_memorize(transcript: str, source: str) -> None:
         logger.warning("auto-memorize failed: %s", e)
 
 
+# ═══════════════════════════════════════════════════════════════════════
+# VOICE EMOTION ANALYSIS
+#  Analyses transcript text for emotional tone indicators using keyword
+#  heuristics.  No ML model needed — fast, offline, low-CPU.
+#  When audio energy analysis is available (numpy), also checks RMS level.
+#
+#  Signals: stress/frustration, calm, excitement, fatigue, uncertainty
+#  Action: "voice low, take break" nudge type
+#
+#  Source: simular-ai Agent-S multi-modal sensory patterns
+# ═══════════════════════════════════════════════════════════════════════
+
+_EMOTION_KEYWORDS: Dict[str, List[str]] = {
+    "stress": ["frustrated", "annoyed", "angry", "damn", "ugh",
+               "terrible", "stressed", "overwhelm", "deadline", "panic"],
+    "fatigue": ["tired", "exhausted", "sleepy", "yawn", "drained",
+                "can't focus", "need break", "so tired", "burned out"],
+    "excitement": ["amazing", "awesome", "brilliant", "fantastic",
+                   "great news", "love it", "excited", "perfect"],
+    "uncertainty": ["maybe", "not sure", "i think", "hmm", "i guess",
+                    "don't know", "confused", "unclear", "doubt"],
+    "calm": ["okay", "fine", "good", "alright", "no worries",
+             "sounds good", "sure", "understood"],
+}
+
+_EMOTION_NUDGES: Dict[str, str] = {
+    "stress": "Voice sounds tense — consider a 5-minute break",
+    "fatigue": "Energy seems low — maybe take a break or stretch",
+    "uncertainty": "Sounds uncertain — want to break this problem down?",
+}
+
+
+def _analyse_voice_emotion(
+    transcript: str,
+    audio_bytes: Optional[bytes] = None,
+) -> Dict[str, Any]:
+    """Analyse voice emotion from transcript keywords and optional audio energy.
+
+    Returns emotion scores (0.0-1.0 per emotion) and a nudge suggestion
+    if stress/fatigue is detected.
+    """
+    text_lower = transcript.lower()
+    scores: Dict[str, float] = {}
+
+    for emotion, keywords in _EMOTION_KEYWORDS.items():
+        hits = sum(1 for kw in keywords if kw in text_lower)
+        scores[emotion] = min(hits / max(len(keywords) * 0.3, 1.0), 1.0)
+
+    # Audio energy analysis (RMS) if numpy and raw audio available
+    rms_level = None
+    if audio_bytes:
+        try:
+            import numpy as np
+            # Parse WAV: skip 44-byte header, read int16 samples
+            if len(audio_bytes) > 44:
+                samples = np.frombuffer(audio_bytes[44:], dtype=np.int16)
+                if len(samples) > 0:
+                    rms = float(np.sqrt(np.mean(samples.astype(np.float64) ** 2)))
+                    rms_level = round(rms, 1)
+                    # Low RMS (<500) may indicate low energy / whisper
+                    if rms < 500:
+                        scores["fatigue"] = min(scores.get("fatigue", 0) + 0.3, 1.0)
+                    # High RMS (>5000) may indicate shouting / stress
+                    elif rms > 5000:
+                        scores["stress"] = min(scores.get("stress", 0) + 0.3, 1.0)
+        except (ImportError, Exception):
+            pass  # numpy not required
+
+    # Determine dominant emotion
+    dominant = max(scores, key=scores.get) if scores else "neutral"
+    dominant_score = scores.get(dominant, 0.0)
+
+    # Generate nudge if stress/fatigue high
+    nudge = None
+    if dominant_score >= 0.3 and dominant in _EMOTION_NUDGES:
+        nudge = _EMOTION_NUDGES[dominant]
+
+    return {
+        "scores": {k: round(v, 2) for k, v in scores.items()},
+        "dominant": dominant,
+        "dominant_score": round(dominant_score, 2),
+        "rms_level": rms_level,
+        "nudge": nudge,
+    }
+
+
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
     try:
@@ -252,11 +339,12 @@ async def capture_mic(seconds: int = RECORD_SECONDS) -> AudioCaptureResult:
 
     transcript = _transcribe_audio(audio_bytes, ext=".wav")
     injection = _check_injection(transcript)
+    emotion = _analyse_voice_emotion(transcript, audio_bytes)
 
     if not injection and os.getenv("AUTO_MEMORIZE_AUDIO", "true").lower() == "true":
         await _auto_memorize(transcript, f"mic:{out_path.name}")
 
-    _transcript_buffer.append({"text": transcript, "source": "mic", "ts": time.time()})
+    _transcript_buffer.append({"text": transcript, "source": "mic", "ts": time.time(), "emotion": emotion})
     if len(_transcript_buffer) > _MAX_BUFFER:
         _transcript_buffer.pop(0)
 
@@ -268,6 +356,7 @@ async def capture_mic(seconds: int = RECORD_SECONDS) -> AudioCaptureResult:
         timestamp=time.time(),
         whisper_backend=WHISPER_BACKEND,
         injection_detected=injection,
+        emotion=emotion,
     )
 
 
@@ -318,6 +407,14 @@ async def get_transcripts(limit: int = 10) -> Dict[str, Any]:
         "count": len(_transcript_buffer),
         "transcripts": _transcript_buffer[-limit:],
     }
+
+
+@app.post("/analyse/emotion")
+async def analyse_emotion(request: TranscriptRequest) -> Dict[str, Any]:
+    """Analyse voice emotion from a transcript text."""
+    clean = sanitize_string(request.text)
+    emotion = _analyse_voice_emotion(clean)
+    return {"status": "ok", **emotion}
 
 
 if __name__ == "__main__":

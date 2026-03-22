@@ -457,6 +457,10 @@ async def _background_loop() -> None:
             await _greeting_check()
         except Exception:
             logger.exception("Greeting check failed")
+        try:
+            await _proactive_forecast()
+        except Exception:
+            logger.exception("Predictive forecast failed")
         _watchdog.heartbeat("main_loop")
         await asyncio.sleep(CHECK_INTERVAL)
 
@@ -554,6 +558,150 @@ async def trigger_sweep() -> Dict[str, Any]:
 async def fleet_history() -> Dict[str, Any]:
     """Rolling fleet health history for trend analysis."""
     return {"history": _fleet_history, "count": len(_fleet_history)}
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# PREDICTIVE FAILURE MODELING
+#  Analyses fleet_history trend data to forecast failures BEFORE they hit.
+#  Uses simple linear regression on unhealthy-service count to predict
+#  when a threshold will be breached.  No ML libs needed — pure math.
+#
+#  Source: arxiv.org/abs/2602.08912 (Anticipatory Resilience)
+# ═══════════════════════════════════════════════════════════════════════
+
+PREDICT_HORIZON_MINUTES = int(os.getenv("PREDICT_HORIZON_MINUTES", "30"))
+PREDICT_ALERT_THRESHOLD = int(os.getenv("PREDICT_ALERT_THRESHOLD", "3"))
+_last_forecast_alert = 0.0
+FORECAST_ALERT_COOLDOWN = int(os.getenv("FORECAST_ALERT_COOLDOWN", "600"))
+
+
+def _linear_regression(xs: List[float], ys: List[float]):
+    """Simple OLS linear regression.  Returns (slope, intercept, r_squared)."""
+    n = len(xs)
+    if n < 3:
+        return 0.0, 0.0, 0.0
+    sum_x = sum(xs)
+    sum_y = sum(ys)
+    sum_xy = sum(x * y for x, y in zip(xs, ys))
+    sum_x2 = sum(x * x for x in xs)
+    denom = n * sum_x2 - sum_x * sum_x
+    if denom == 0:
+        return 0.0, sum_y / n, 0.0
+    slope = (n * sum_xy - sum_x * sum_y) / denom
+    intercept = (sum_y - slope * sum_x) / n
+    # R² for confidence
+    y_mean = sum_y / n
+    ss_tot = sum((y - y_mean) ** 2 for y in ys) or 1.0
+    ss_res = sum((y - (slope * x + intercept)) ** 2 for x, y in zip(xs, ys))
+    r_sq = max(1.0 - ss_res / ss_tot, 0.0)
+    return slope, intercept, r_sq
+
+
+def _forecast_failures() -> Dict[str, Any]:
+    """Analyse fleet_history to predict future unhealthy count.
+
+    Uses linear regression on the unhealthy-service time series.
+    If the trend predicts crossing PREDICT_ALERT_THRESHOLD within
+    PREDICT_HORIZON_MINUTES, returns a warning with ETA.
+    """
+    if len(_fleet_history) < 5:
+        return {"status": "insufficient_data", "samples": len(_fleet_history)}
+
+    # Build time series: (relative_minutes, unhealthy_count)
+    t0 = _fleet_history[0]["ts"]
+    xs = [(snap["ts"] - t0) / 60.0 for snap in _fleet_history]
+    ys = [float(snap["unhealthy"]) for snap in _fleet_history]
+
+    slope, intercept, r_sq = _linear_regression(xs, ys)
+
+    current = ys[-1]
+    now_min = xs[-1]
+    horizon = now_min + PREDICT_HORIZON_MINUTES
+
+    predicted_at_horizon = slope * horizon + intercept
+
+    # ETA to threshold breach (in minutes from now)
+    if slope > 0 and current < PREDICT_ALERT_THRESHOLD:
+        eta_min = (PREDICT_ALERT_THRESHOLD - intercept) / slope - now_min
+        eta_min = max(eta_min, 0.0)
+    else:
+        eta_min = None
+
+    warning = None
+    if (slope > 0 and predicted_at_horizon >= PREDICT_ALERT_THRESHOLD
+            and current < PREDICT_ALERT_THRESHOLD):
+        if eta_min is not None:
+            warning = (
+                f"Trend predicts {PREDICT_ALERT_THRESHOLD}+ unhealthy services "
+                f"in ~{eta_min:.0f} min (slope={slope:.3f}/min, R²={r_sq:.2f})"
+            )
+
+    return {
+        "status": "warning" if warning else "ok",
+        "current_unhealthy": int(current),
+        "slope_per_min": round(slope, 4),
+        "intercept": round(intercept, 2),
+        "r_squared": round(r_sq, 3),
+        "predicted_at_horizon": round(max(predicted_at_horizon, 0), 1),
+        "horizon_minutes": PREDICT_HORIZON_MINUTES,
+        "alert_threshold": PREDICT_ALERT_THRESHOLD,
+        "eta_minutes": round(eta_min, 1) if eta_min is not None else None,
+        "warning": warning,
+        "samples": len(_fleet_history),
+    }
+
+
+async def _proactive_forecast() -> None:
+    """Run during sweep loop — send Telegram alert if crash predicted."""
+    global _last_forecast_alert
+    now = time.time()
+    if now - _last_forecast_alert < FORECAST_ALERT_COOLDOWN:
+        return
+    forecast = _forecast_failures()
+    if forecast.get("warning"):
+        _last_forecast_alert = now
+        _send_notification(f"[supervisor] ⚠️ PREDICTIVE: {forecast['warning']}")
+        logger.warning("Predictive alert: %s", forecast["warning"])
+
+
+@app.get("/predict")
+async def predict() -> Dict[str, Any]:
+    """Predictive failure forecast from fleet health trend."""
+    return _forecast_failures()
+
+
+@app.get("/predict/per-service")
+async def predict_per_service() -> Dict[str, Any]:
+    """Per-service failure trend analysis."""
+    if len(_fleet_history) < 5:
+        return {"status": "insufficient_data"}
+
+    t0 = _fleet_history[0]["ts"]
+    per_svc: Dict[str, Dict[str, Any]] = {}
+
+    # Track per-service health from fleet snapshots
+    for svc in SERVICES:
+        name = svc["name"]
+        xs: List[float] = []
+        ys: List[float] = []
+        for snap in _fleet_history:
+            xs.append((snap["ts"] - t0) / 60.0)
+            # 1.0 if service was recovered in that snap, else check breaker
+            was_recovered = name in snap.get("recovered", [])
+            cb = breakers.get(name)
+            is_open = cb.state == "open" if cb else False
+            ys.append(0.0 if was_recovered or not is_open else 1.0)
+
+        slope, intercept, r_sq = _linear_regression(xs, ys)
+        risk = "rising" if slope > 0.01 else "stable" if slope > -0.01 else "improving"
+        per_svc[name] = {
+            "slope_per_min": round(slope, 4),
+            "r_squared": round(r_sq, 3),
+            "trend": risk,
+            "current_breaker": cb.state if cb else "unknown",
+        }
+
+    return {"status": "ok", "services": per_svc}
 
 
 @app.get("/watchdog")

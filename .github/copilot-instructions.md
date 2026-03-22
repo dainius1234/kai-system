@@ -103,6 +103,10 @@ make test-agent-evolver                 # Agent-Evolver insight engine tests
 make test-checkpoint                    # H3b checkpoint engine tests
 make test-error-codes                   # structured error code tests
 make test-feature-flags                 # feature flag system tests
+make test-predictive-failure            # predictive failure modeling tests
+make test-multi-modal                   # multi-modal sensory input tests
+make test-world-anchor                  # external world anchor tests
+make test-self-healing-phases           # bio-inspired self-healing phase tests
 make dep-audit                          # pip-audit dependency vulnerability scan
 make coverage                           # pytest-cov coverage report (HTML + terminal)
 # Integration / smoke tests (requires running stack)
