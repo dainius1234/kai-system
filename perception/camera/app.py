@@ -201,6 +201,174 @@ async def analysis_history(limit: int = 10) -> Dict[str, Any]:
     return {"count": len(_analysis_history), "history": _analysis_history[-limit:]}
 
 
+# ═══════════════════════════════════════════════════════════════════════
+# J4: PROACTIVE LOW-LATENCY VOICE
+#  Combines audio (emotion, energy) + video (brightness, motion) signals
+#  to decide whether Kai should speak unprompted.
+#
+#  speak_or_not gate:
+#    - Input: audio emotion scores + video frame analysis
+#    - Output: should_speak (bool) + reason + suggested_message
+#    - Cooldown: won't re-trigger within PROACTIVE_COOLDOWN_SECONDS
+#
+#  All offline, no cloud, CPU-only.
+# ═══════════════════════════════════════════════════════════════════════
+
+import re  # noqa: E402
+
+PROACTIVE_COOLDOWN = int(os.getenv("PROACTIVE_COOLDOWN_SECONDS", "120"))
+TTS_URL = os.getenv("TTS_URL", "http://tts:8022")
+MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
+_last_proactive_ts: float = 0.0
+
+
+def _speak_or_not(
+    audio_signals: Dict[str, Any],
+    video_signals: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Decide whether Kai should speak based on combined sensory signals.
+
+    Returns dict with: should_speak, reason, urgency (0-1), suggested_message.
+    """
+    global _last_proactive_ts
+    now = time.time()
+
+    # Cooldown check
+    if now - _last_proactive_ts < PROACTIVE_COOLDOWN:
+        return {
+            "should_speak": False,
+            "reason": "cooldown_active",
+            "urgency": 0.0,
+            "suggested_message": None,
+            "cooldown_remaining": round(PROACTIVE_COOLDOWN - (now - _last_proactive_ts)),
+        }
+
+    urgency = 0.0
+    reasons = []
+    messages = []
+
+    # Audio signals
+    emotion_scores = audio_signals.get("scores", {})
+    dominant = audio_signals.get("dominant", "neutral")
+    dominant_score = audio_signals.get("dominant_score", 0.0)
+    rms = audio_signals.get("rms_level")
+
+    if dominant == "stress" and dominant_score >= 0.4:
+        urgency += 0.4
+        reasons.append("high_stress_detected")
+        messages.append("You sound stressed. Want to take a step back for a minute?")
+    if dominant == "fatigue" and dominant_score >= 0.3:
+        urgency += 0.3
+        reasons.append("fatigue_detected")
+        messages.append("Energy seems low — maybe time for a break?")
+    if rms is not None and rms < 300:
+        urgency += 0.1
+        reasons.append("very_low_voice_energy")
+    if rms is not None and rms > 6000:
+        urgency += 0.2
+        reasons.append("shouting_detected")
+        messages.append("Things sound heated. Need to talk it through?")
+
+    # Video signals
+    brightness = video_signals.get("brightness", 128)
+    motion = video_signals.get("motion_level", 0)
+    motion_detected = video_signals.get("motion_detected", False)
+
+    if brightness < 30:
+        urgency += 0.2
+        reasons.append("very_dark_environment")
+        messages.append("It's quite dark — everything okay?")
+    if not motion_detected and motion < 2.0:
+        # User hasn't moved in a while (based on last frame)
+        urgency += 0.1
+        reasons.append("no_motion_detected")
+    if motion > 50:
+        urgency += 0.15
+        reasons.append("excessive_motion")
+        messages.append("Lots of movement — need anything?")
+
+    # Decision gate
+    should_speak = urgency >= 0.3
+    suggested = messages[0] if messages else None
+
+    if should_speak:
+        _last_proactive_ts = now
+
+    return {
+        "should_speak": should_speak,
+        "reason": "|".join(reasons) if reasons else "normal",
+        "urgency": round(min(urgency, 1.0), 2),
+        "suggested_message": suggested,
+        "audio_dominant": dominant,
+        "video_brightness": brightness,
+    }
+
+
+class ProactiveRequest:
+    """Simple container for proactive voice request data."""
+    pass
+
+
+@app.post("/proactive/evaluate")
+async def proactive_evaluate(
+    audio_signals: Dict[str, Any] = {},
+    video_signals: Dict[str, Any] = {},
+) -> Dict[str, Any]:
+    """Evaluate whether Kai should speak proactively based on sensor fusion.
+
+    Accepts audio emotion signals and video frame analysis signals.
+    Returns speak_or_not decision with urgency score.
+    """
+    decision = _speak_or_not(audio_signals, video_signals)
+    return {"status": "ok", **decision}
+
+
+@app.post("/proactive/auto")
+async def proactive_auto() -> Dict[str, Any]:
+    """Auto-capture from both sensors and decide whether to speak.
+
+    Captures fresh screen frame + uses the latest audio emotion from
+    the analysis history, then runs the speak-or-not gate.
+    """
+    # Get latest video signal
+    try:
+        frame = _capture_screen()
+        video_signals = _analyse_frame(frame)
+    except Exception:
+        video_signals = {"brightness": 128, "motion_level": 0, "motion_detected": False}
+
+    # Get latest audio signal from audio service
+    audio_signals: Dict[str, Any] = {"scores": {}, "dominant": "neutral", "dominant_score": 0.0}
+    try:
+        import httpx
+        audio_url = os.getenv("AUDIO_URL", "http://perception-audio:8021")
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.get(f"{audio_url}/transcripts", params={"limit": 1})
+            if resp.status_code == 200:
+                data = resp.json()
+                transcripts = data.get("transcripts", [])
+                if transcripts and "emotion" in transcripts[-1]:
+                    audio_signals = transcripts[-1]["emotion"]
+    except Exception:
+        pass  # Use defaults
+
+    decision = _speak_or_not(audio_signals, video_signals)
+
+    # If should speak, optionally trigger TTS
+    if decision["should_speak"] and decision.get("suggested_message"):
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                await client.post(f"{TTS_URL}/synthesize", json={
+                    "text": decision["suggested_message"],
+                    "voice": "kai-default",
+                })
+        except Exception:
+            pass  # TTS is best-effort
+
+    return {"status": "ok", **decision}
+
+
 if __name__ == "__main__":
     import uvicorn
 

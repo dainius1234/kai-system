@@ -505,6 +505,40 @@ async def metrics_middleware(request: Request, call_next):
         raise
 
 
+# ═══════════════════════════════════════════════════════════════════════
+# J3: PII REDACTION GATE
+#  Pre-store check: scan text for PII and optionally auto-redact.
+#  Audit counts only — never log PII content.
+# ═══════════════════════════════════════════════════════════════════════
+
+from common.runtime import detect_pii, redact_pii  # noqa: E402
+
+
+class RedactRequest(BaseModel):
+    text: str
+    auto_redact: bool = True
+
+
+@app.post("/redact")
+async def redact_endpoint(req: RedactRequest) -> Dict[str, Any]:
+    """Scan text for PII and optionally redact it."""
+    counts = detect_pii(req.text)
+    if req.auto_redact and counts:
+        redacted, counts = redact_pii(req.text)
+        return {
+            "status": "redacted",
+            "pii_found": counts,
+            "total_pii": sum(counts.values()),
+            "redacted_text": redacted,
+        }
+    return {
+        "status": "clean" if not counts else "pii_detected",
+        "pii_found": counts,
+        "total_pii": sum(counts.values()) if counts else 0,
+        "redacted_text": req.text if not counts else None,
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
 

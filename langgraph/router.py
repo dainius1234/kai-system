@@ -377,3 +377,139 @@ async def dispatch_route(decision: RouteDecision, user_input: str, session_id: s
     # GENERAL_CHAT, EXECUTE_ACTION, MULTI_SIGNAL → return None
     # to signal "use the LLM pipeline"
     return None
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# J7: SKILLS AUTO-INSTALL HUB
+#  Reads .md skill files from /skills/ directory, parses trigger patterns,
+#  and registers them as additional routes.
+#
+#  Skill file format:
+#    # Skill: <Name>
+#    ## Trigger patterns
+#    - "pattern1"
+#    - "pattern2"
+#    ## Action
+#    <instruction text or endpoint URL>
+#    ## Response template
+#    <optional response format>
+#
+#  Hot-reload: call load_skills() or POST /skills/reload
+# ═══════════════════════════════════════════════════════════════════════
+
+import os  # noqa: E402
+from pathlib import Path as _Path  # noqa: E402
+
+
+@dataclass
+class Skill:
+    """A loaded skill definition from a .md file."""
+    name: str
+    trigger_patterns: List[re.Pattern]
+    trigger_strings: List[str]
+    action: str
+    response_template: str
+    source_file: str
+
+
+_SKILLS_DIR = _Path(os.getenv("SKILLS_DIR", "/skills"))
+_LOCAL_SKILLS_DIR = _Path("data/skills")  # fallback for dev
+_loaded_skills: List[Skill] = []
+
+
+def _parse_skill_file(path: _Path) -> Optional[Skill]:
+    """Parse a skill .md file into a Skill object."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except Exception:
+        return None
+
+    name = ""
+    triggers: List[str] = []
+    action = ""
+    response_template = ""
+    section = ""
+
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("# Skill:"):
+            name = stripped[8:].strip()
+        elif stripped.lower().startswith("## trigger"):
+            section = "trigger"
+        elif stripped.lower().startswith("## action"):
+            section = "action"
+        elif stripped.lower().startswith("## response"):
+            section = "response"
+        elif stripped.startswith("## "):
+            section = ""
+        elif section == "trigger" and stripped.startswith("- "):
+            # Extract pattern from "- "pattern"" or "- pattern"
+            pat = stripped[2:].strip().strip('"').strip("'")
+            if pat:
+                triggers.append(pat)
+        elif section == "action" and stripped:
+            action += stripped + "\n"
+        elif section == "response" and stripped:
+            response_template += stripped + "\n"
+
+    if not name or not triggers:
+        return None
+
+    patterns = []
+    for t in triggers:
+        try:
+            patterns.append(re.compile(r"\b" + re.escape(t) + r"\b", re.IGNORECASE))
+        except re.error:
+            patterns.append(re.compile(re.escape(t), re.IGNORECASE))
+
+    return Skill(
+        name=name,
+        trigger_patterns=patterns,
+        trigger_strings=triggers,
+        action=action.strip(),
+        response_template=response_template.strip(),
+        source_file=str(path),
+    )
+
+
+def load_skills() -> List[Skill]:
+    """Scan skills directories and load all .md skill files."""
+    global _loaded_skills
+    skills: List[Skill] = []
+
+    for skills_dir in [_SKILLS_DIR, _LOCAL_SKILLS_DIR]:
+        if not skills_dir.exists():
+            continue
+        for md_file in sorted(skills_dir.glob("*.md")):
+            skill = _parse_skill_file(md_file)
+            if skill:
+                skills.append(skill)
+
+    _loaded_skills = skills
+    return skills
+
+
+def match_skill(user_input: str) -> Optional[Skill]:
+    """Check if user input matches any loaded skill trigger patterns."""
+    for skill in _loaded_skills:
+        for pattern in skill.trigger_patterns:
+            if pattern.search(user_input):
+                return skill
+    return None
+
+
+def list_skills() -> List[Dict[str, Any]]:
+    """Return summary of all loaded skills."""
+    return [
+        {
+            "name": s.name,
+            "triggers": s.trigger_strings,
+            "action": s.action[:200],
+            "source": s.source_file,
+        }
+        for s in _loaded_skills
+    ]
+
+
+# Load skills on import
+load_skills()

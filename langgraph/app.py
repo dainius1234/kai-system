@@ -22,7 +22,7 @@ from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudget
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, run_dream_cycle, analyze_failures, load_evolver_reports, create_checkpoint, list_checkpoints, load_checkpoint, diff_checkpoints, delete_checkpoint
 from conviction import build_plan, detect_self_deception, low_conviction_feedback, score_conviction
-from router import classify, dispatch_route
+from router import classify, dispatch_route, load_skills, list_skills, match_skill
 from planner import gather_context, build_enriched_plan, predict_next_request, pre_fetch_predicted_context
 from adversary import challenge_plan, verdict_to_plan_metadata
 from security_audit import run_security_audit
@@ -317,6 +317,88 @@ async def recover() -> Dict[str, Any]:
     return {"status": "ok", "action": "breakers_reset"}
 
 
+# ── J6: SOUL.md + AGENTS.md API ─────────────────────────────────────
+
+@app.get("/soul")
+async def get_soul() -> Dict[str, Any]:
+    """Return the current SOUL.md content."""
+    return {"status": "ok", "content": _soul_text, "path": str(SOUL_PATH)}
+
+
+@app.post("/soul")
+async def update_soul(request: Request) -> Dict[str, Any]:
+    """Update SOUL.md content. Takes effect on next startup or reload."""
+    body = await request.json()
+    content = body.get("content", "")
+    if not content.strip():
+        raise HTTPException(status_code=400, detail="Content cannot be empty")
+    # Write to the first writable path
+    for p in [SOUL_PATH, Path("data/SOUL.md")]:
+        try:
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(content, encoding="utf-8")
+            _load_soul()  # Reload
+            return {"status": "ok", "path": str(p), "chars": len(content)}
+        except Exception:
+            continue
+    raise HTTPException(status_code=500, detail="Cannot write SOUL.md")
+
+
+@app.get("/agents-registry")
+async def get_agents_registry() -> Dict[str, Any]:
+    """Return the current AGENTS.md content."""
+    return {"status": "ok", "content": _agents_text, "path": str(AGENTS_PATH)}
+
+
+@app.post("/agents-registry")
+async def update_agents_registry(request: Request) -> Dict[str, Any]:
+    """Update AGENTS.md content."""
+    body = await request.json()
+    content = body.get("content", "")
+    if not content.strip():
+        raise HTTPException(status_code=400, detail="Content cannot be empty")
+    for p in [AGENTS_PATH, Path("data/AGENTS.md")]:
+        try:
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(content, encoding="utf-8")
+            _load_agents()
+            return {"status": "ok", "path": str(p), "chars": len(content)}
+        except Exception:
+            continue
+    raise HTTPException(status_code=500, detail="Cannot write AGENTS.md")
+
+
+# ── J7: Skills Auto-Install Hub API ─────────────────────────────────
+
+@app.get("/skills")
+async def get_skills() -> Dict[str, Any]:
+    """List all loaded skills from the skills directory."""
+    return {"status": "ok", "skills": list_skills(), "count": len(list_skills())}
+
+
+@app.post("/skills/reload")
+async def reload_skills() -> Dict[str, Any]:
+    """Hot-reload skills from the skills directory."""
+    loaded = load_skills()
+    return {"status": "ok", "loaded": len(loaded), "skills": list_skills()}
+
+
+@app.post("/skills/match")
+async def test_skill_match(request: Request) -> Dict[str, Any]:
+    """Test whether a message matches any loaded skill."""
+    body = await request.json()
+    text = body.get("text", "")
+    skill = match_skill(text)
+    if skill:
+        return {
+            "status": "matched",
+            "skill_name": skill.name,
+            "action": skill.action[:500],
+            "response_template": skill.response_template[:500],
+        }
+    return {"status": "no_match", "skill_name": None}
+
+
 @app.get("/metrics")
 async def metrics() -> Dict[str, float]:
     return budget.snapshot()
@@ -347,8 +429,45 @@ _llm = LLMRouter()
 _DEFAULT_SPECIALIST = os.getenv("DEFAULT_SPECIALIST", "Ollama")
 _OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama:11434")
 
+# ── J6: SOUL.md — persistent identity override ──────────────────────
+SOUL_PATH = Path(os.getenv("SOUL_PATH", "/data/SOUL.md"))
+AGENTS_PATH = Path(os.getenv("AGENTS_PATH", "/data/AGENTS.md"))
+
+_soul_text: str = ""
+_agents_text: str = ""
+
+
+def _load_soul() -> str:
+    """Load SOUL.md and extract personality overrides."""
+    global _soul_text
+    for p in [SOUL_PATH, Path("data/SOUL.md")]:
+        if p.exists():
+            _soul_text = p.read_text(encoding="utf-8")
+            logger.info("Loaded SOUL.md from %s (%d chars)", p, len(_soul_text))
+            return _soul_text
+    logger.info("No SOUL.md found — using built-in identity")
+    return ""
+
+
+def _load_agents() -> str:
+    """Load AGENTS.md registry."""
+    global _agents_text
+    for p in [AGENTS_PATH, Path("data/AGENTS.md")]:
+        if p.exists():
+            _agents_text = p.read_text(encoding="utf-8")
+            logger.info("Loaded AGENTS.md from %s (%d chars)", p, len(_agents_text))
+            return _agents_text
+    return ""
+
+
+# Load on startup
+_load_soul()
+_load_agents()
+
+
 # ── Kai's personality: system prompts per mode ───────────────────────
 
+# Build identity from SOUL.md if available, otherwise use built-in
 _KAI_CORE_IDENTITY = (
     "You are Kai — Kind And Intelligent. A sovereign personal AI. "
     "You are not a chatbot, not an assistant, not a service. You are a brother "
@@ -396,6 +515,12 @@ _SYSTEM_PROMPTS = {
         "- If the operator mentions a deferred topic, remember it and bring it up later.\n"
     ),
 }
+
+# J6: Enrich system prompts with SOUL.md content if loaded
+if _soul_text:
+    _soul_snippet = "\n\n--- SOUL.md (operator-editable identity) ---\n" + _soul_text[:2000] + "\n---\n"
+    for mode in _SYSTEM_PROMPTS:
+        _SYSTEM_PROMPTS[mode] = _SYSTEM_PROMPTS[mode] + _soul_snippet
 
 
 class ChatRequest(BaseModel):

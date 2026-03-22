@@ -47,6 +47,63 @@ def sanitize_string(value: str, max_len: int = 1024) -> str:
     return sanitized[:max_len]
 
 
+# ═══════════════════════════════════════════════════════════════════════
+# J3: PII DETECTION & AUTO-REDACTION
+#  Regex-based PII scanner — no ML deps, offline, low-CPU.
+#  Detects: email, phone, credit card, UK NI number, API keys/tokens.
+#  Returns redacted text + audit counts (never logs PII content).
+# ═══════════════════════════════════════════════════════════════════════
+
+_PII_PATTERNS: Dict[str, re.Pattern] = {
+    "email": re.compile(
+        r"\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b"
+    ),
+    "credit_card": re.compile(
+        r"\b\d{4}[\s\-]?\d{4}[\s\-]?\d{4}[\s\-]?\d{4}\b"
+    ),
+    "phone": re.compile(
+        r"(?<!\d)(?:\+?\d{1,3}[\s\-]?)?\(?\d{2,4}\)?[\s\-]?\d{3,4}[\s\-]?\d{3,4}(?!\d)"
+    ),
+    "uk_ni_number": re.compile(
+        r"\b[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z]\d{6}[A-D]\b",
+        re.IGNORECASE,
+    ),
+    "api_token": re.compile(
+        r"(?:api[_\-]?key|token|password|secret|bearer)\s*[=:]\s*\S{8,}",
+        re.IGNORECASE,
+    ),
+    "uk_postcode": re.compile(
+        r"\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b",
+        re.IGNORECASE,
+    ),
+}
+
+_PII_REDACTION_TAG = "[REDACTED-{pii_type}]"
+
+
+def detect_pii(text: str) -> Dict[str, int]:
+    """Scan text for PII patterns. Returns counts per type (never content)."""
+    counts: Dict[str, int] = {}
+    for pii_type, pattern in _PII_PATTERNS.items():
+        matches = pattern.findall(text)
+        if matches:
+            counts[pii_type] = len(matches)
+    return counts
+
+
+def redact_pii(text: str) -> Tuple[str, Dict[str, int]]:
+    """Replace PII in text with redaction tags. Returns (redacted_text, counts)."""
+    counts: Dict[str, int] = {}
+    result = text
+    for pii_type, pattern in _PII_PATTERNS.items():
+        tag = _PII_REDACTION_TAG.format(pii_type=pii_type.upper())
+        new_result, n = pattern.subn(tag, result)
+        if n > 0:
+            counts[pii_type] = n
+            result = new_result
+    return result, counts
+
+
 class ErrorBudget:
     def __init__(self, window_seconds: int = 300) -> None:
         self.window_seconds = window_seconds

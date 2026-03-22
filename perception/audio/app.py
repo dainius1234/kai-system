@@ -417,6 +417,133 @@ async def analyse_emotion(request: TranscriptRequest) -> Dict[str, Any]:
     return {"status": "ok", **emotion}
 
 
+# ═══════════════════════════════════════════════════════════════════════
+# J2: WAKE-WORD "KAI" + INTENT JUDGE
+#  Keyword-spot for "Kai" in whisper transcript stream.
+#  Tiny LLM (qwen2:0.5b) classifies intent: command | mention | echo.
+#  Wired into nudge engine via memu-core /memory/proactive.
+# ═══════════════════════════════════════════════════════════════════════
+
+WAKE_WORD = os.getenv("WAKE_WORD", "kai").lower()
+WAKE_WORD_RE = re.compile(
+    r"\b" + re.escape(WAKE_WORD) + r"\b",
+    re.IGNORECASE,
+)
+
+# Intent classification categories
+_INTENT_COMMAND = "command"     # "Kai, what's the weather?"
+_INTENT_MENTION = "mention"    # "I told Kai about it"
+_INTENT_ECHO = "echo"          # "...kai..." in background noise
+_INTENT_UNKNOWN = "unknown"
+
+_INTENT_PROMPT = (
+    "Classify the user's intent toward the AI assistant named Kai.\n"
+    "Given this transcript, determine if the speaker is:\n"
+    "- 'command': directly asking Kai to do something or answering Kai\n"
+    "- 'mention': talking about Kai to someone else\n"
+    "- 'echo': Kai's name appears incidentally or in background noise\n\n"
+    "Respond with ONLY one word: command, mention, or echo.\n\n"
+    "Transcript: {text}"
+)
+
+# Recent wake-word detections (ring buffer)
+_wake_detections: List[Dict[str, Any]] = []
+_MAX_WAKE_BUFFER = 100
+
+
+def detect_wake_word(transcript: str) -> bool:
+    """Return True if wake word "Kai" found in transcript."""
+    return bool(WAKE_WORD_RE.search(transcript))
+
+
+async def classify_intent(transcript: str) -> str:
+    """Use tiny LLM to classify whether this is a command, mention, or echo."""
+    try:
+        from common.llm import query_specialist
+        prompt = _INTENT_PROMPT.format(text=sanitize_string(transcript[:500]))
+        resp = await query_specialist(
+            "Ollama", prompt,
+            system="You are an intent classifier. Respond with exactly one word.",
+            temperature=0.1,
+            max_tokens=10,
+        )
+        raw = resp.text.strip().lower()
+        # Extract the intent from the response
+        for intent in (_INTENT_COMMAND, _INTENT_MENTION, _INTENT_ECHO):
+            if intent in raw:
+                return intent
+        return _INTENT_UNKNOWN
+    except Exception as e:
+        logger.warning("intent classification failed: %s", e)
+        # Fallback: heuristic — if "Kai" is at start or after comma, likely command
+        text_lower = transcript.lower().strip()
+        if text_lower.startswith(WAKE_WORD) or f", {WAKE_WORD}" in text_lower:
+            return _INTENT_COMMAND
+        return _INTENT_UNKNOWN
+
+
+async def _send_wake_nudge(transcript: str, intent: str) -> None:
+    """Forward wake-word activation to memu-core proactive nudge engine."""
+    if intent not in (_INTENT_COMMAND,):
+        return  # only nudge for direct commands
+    try:
+        import httpx
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(f"{MEMU_URL}/memory/memorize", json={
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "event_type": "wake_word_activation",
+                "result_raw": sanitize_string(transcript[:500]),
+                "user_id": "perception-audio",
+                "category": "daily-logs",
+            })
+    except Exception as e:
+        logger.warning("wake-word nudge failed: %s", e)
+
+
+@app.post("/wake-word/detect")
+async def wake_word_detect(request: TranscriptRequest) -> Dict[str, Any]:
+    """Detect wake-word and classify intent in a transcript."""
+    clean = sanitize_string(request.text)
+    detected = detect_wake_word(clean)
+
+    result: Dict[str, Any] = {
+        "wake_word": WAKE_WORD,
+        "detected": detected,
+        "intent": None,
+        "transcript": clean[:200],
+    }
+
+    if detected:
+        intent = await classify_intent(clean)
+        result["intent"] = intent
+
+        entry = {
+            "text": clean[:200],
+            "intent": intent,
+            "ts": time.time(),
+            "session_id": request.session_id,
+        }
+        _wake_detections.append(entry)
+        if len(_wake_detections) > _MAX_WAKE_BUFFER:
+            _wake_detections.pop(0)
+
+        # Forward command intents to nudge engine
+        await _send_wake_nudge(clean, intent)
+
+    return result
+
+
+@app.get("/wake-word/history")
+async def wake_word_history(limit: int = 20) -> Dict[str, Any]:
+    """Return recent wake-word detections."""
+    limit = min(max(limit, 1), _MAX_WAKE_BUFFER)
+    return {
+        "wake_word": WAKE_WORD,
+        "count": len(_wake_detections),
+        "detections": _wake_detections[-limit:],
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
 

@@ -1,7 +1,7 @@
 # Self-audit and feedback
 self-audit:
 	python3 scripts/self_audit.py
-.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-agentic test-router test-planner test-adversary test-failure-taxonomy test-selaur test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-tempo test-improvement-gate test-thinking-pathways test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-hmac-rotation-drill test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-error-codes test-feature-flags dep-audit coverage sync-docs check-docs auto-changelog auto-session-log test-focus-compress test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases
+.PHONY: go_no_go hardening_smoke build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-agentic test-router test-planner test-adversary test-failure-taxonomy test-selaur test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-tempo test-improvement-gate test-thinking-pathways test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-hmac-rotation-drill test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-error-codes test-feature-flags dep-audit coverage sync-docs check-docs auto-changelog auto-session-log test-focus-compress test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-j1-live-canvas test-j2-wake-word test-j3-pii-redact test-j4-proactive-voice test-j5-memory-diary test-j6-soul-agents test-j7-skills-hub
 
 go_no_go:
 	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py langgraph/app.py executor/app.py heartbeat/app.py supervisor/app.py verifier/app.py fusion-engine/app.py common/llm.py common/errors.py common/feature_flags.py memory-compressor/app.py ledger-worker/app.py metrics-gateway/app.py telegram-bot/app.py
@@ -257,6 +257,30 @@ test-world-anchor:
 test-self-healing-phases:
 	PYTHONPATH=. python -m pytest scripts/test_self_healing_phases.py -v
 
+test-j-series:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v
+
+test-j2-wake-word:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J2"
+
+test-j3-pii-redact:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J3"
+
+test-j4-proactive-voice:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J4"
+
+test-j5-memory-diary:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J5"
+
+test-j6-soul-agents:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J6"
+
+test-j7-skills-hub:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J7"
+
+test-j1-live-canvas:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J1"
+
 dep-audit:
 	pip-audit --strict --desc
 
@@ -282,7 +306,7 @@ test-integration-chain:
 test-v7: test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain
 
 # wrapper to run all core unit/smoke tests
-test-core: test-phase-b-memu test-memu-pg test-dashboard-ui test-dashboard test-thinking-pathways test-tool-gate test-tool-gate-security test-telegram test-conviction test-audio test-camera test-executor test-langgraph test-kai-advisor test-tts test-avatar test-heartbeat test-episode-saver test-episode-spool test-error-budget test-invoice test-memu-retrieval test-router test-planner test-adversary test-failure-taxonomy test-selaur test-self-emp test-auth-hmac test-agentic test-v7 test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-tempo test-improvement-gate test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-hmac-rotation-drill test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-h1-hardening test-h2-self-healing test-mars-consolidation test-sage-critique test-agent-evolver test-checkpoint test-error-codes test-feature-flags test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases
+test-core: test-phase-b-memu test-memu-pg test-dashboard-ui test-dashboard test-thinking-pathways test-tool-gate test-tool-gate-security test-telegram test-conviction test-audio test-camera test-executor test-langgraph test-kai-advisor test-tts test-avatar test-heartbeat test-episode-saver test-episode-spool test-error-budget test-invoice test-memu-retrieval test-router test-planner test-adversary test-failure-taxonomy test-selaur test-self-emp test-auth-hmac test-agentic test-v7 test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-tempo test-improvement-gate test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-hmac-rotation-drill test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-h1-hardening test-h2-self-healing test-mars-consolidation test-sage-critique test-agent-evolver test-checkpoint test-error-codes test-feature-flags test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series
 
 test-dashboard-ui:
 	PYTHONPATH=. python scripts/test_dashboard_ui.py

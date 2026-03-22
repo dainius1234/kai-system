@@ -60,6 +60,14 @@
           <span class="nav-icon">💎</span>
           <span class="nav-label">Soul</span>
         </a>
+        <a class="nav-item" data-view="canvas" onclick="switchView('canvas')">
+          <span class="nav-icon">🎨</span>
+          <span class="nav-label">Canvas</span>
+        </a>
+        <a class="nav-item" data-view="diary" onclick="switchView('diary')">
+          <span class="nav-icon">📔</span>
+          <span class="nav-label">Diary</span>
+        </a>
       </nav>
 
       <div class="sidebar-divider"></div>
@@ -716,6 +724,79 @@
           </div>
         </section>
 
+        <!-- ═══════════════ J1: Canvas View ═══════════════ -->
+        <section class="view" id="canvasView">
+          <div style="max-width:1400px;margin:0 auto;padding:var(--sp-6);">
+            <h2 class="text-heading" style="margin-bottom:var(--sp-4);">Live Canvas</h2>
+
+            <!-- Mode selector -->
+            <div style="display:flex;gap:var(--sp-2);margin-bottom:var(--sp-4);">
+              <button class="refresh-btn" onclick="canvasMode('mindmap')" id="btnMindmap" style="background:var(--accent);color:#000;">Mind Map</button>
+              <button class="refresh-btn" onclick="canvasMode('emotion')" id="btnEmotion">Emotion Timeline</button>
+              <button class="refresh-btn" onclick="canvasMode('plan')" id="btnPlan">Plan Flow</button>
+              <button class="refresh-btn" onclick="refreshCanvas()" style="margin-left:auto;">Refresh</button>
+            </div>
+
+            <!-- Canvas -->
+            <div class="card" style="padding:0;overflow:hidden;position:relative;">
+              <canvas id="liveCanvas" width="1200" height="600" style="width:100%;height:auto;background:var(--bg2);display:block;"></canvas>
+              <div id="canvasStatus" style="position:absolute;bottom:8px;right:12px;font-size:11px;color:var(--text3);"></div>
+            </div>
+
+            <!-- Legend -->
+            <div style="display:flex;gap:var(--sp-3);margin-top:var(--sp-3);font-size:12px;color:var(--text3);">
+              <span id="canvasLegend"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══════════════ J5: Diary / Memory Viewer ═══════════════ -->
+        <section class="view" id="diaryView">
+          <div style="max-width:1200px;margin:0 auto;padding:var(--sp-6);">
+            <h2 class="text-heading" style="margin-bottom:var(--sp-4);">Memory Diary</h2>
+
+            <!-- Filters -->
+            <div style="display:flex;gap:var(--sp-2);margin-bottom:var(--sp-4);flex-wrap:wrap;align-items:center;">
+              <input type="text" id="diarySearch" placeholder="Search memories..." style="flex:1;min-width:200px;background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;" onkeydown="if(event.key==='Enter')searchDiary()">
+              <select id="diaryCat" style="background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;" onchange="searchDiary()">
+                <option value="">All categories</option>
+                <option value="setting-out">Setting Out</option>
+                <option value="survey-data">Survey Data</option>
+                <option value="rams">RAMS</option>
+                <option value="itp">ITP</option>
+                <option value="drawings">Drawings</option>
+                <option value="hs-briefings">H&S Briefings</option>
+                <option value="client-ncrs">Client NCRs</option>
+                <option value="daily-logs">Daily Logs</option>
+              </select>
+              <input type="range" id="diaryImportance" min="0" max="100" value="0" style="width:120px;" title="Min importance" oninput="document.getElementById('impLabel').textContent=this.value+'%'" onchange="searchDiary()">
+              <span id="impLabel" style="font-size:11px;color:var(--text3);min-width:30px;">0%</span>
+              <button class="refresh-btn" onclick="searchDiary()">Search</button>
+            </div>
+
+            <!-- Stats bar -->
+            <div style="display:flex;gap:var(--sp-3);margin-bottom:var(--sp-4);">
+              <div class="card" style="flex:1;text-align:center;padding:var(--sp-3);">
+                <div style="font-size:24px;font-weight:700;" id="diaryTotal">—</div>
+                <div style="font-size:11px;color:var(--text3);">Total Memories</div>
+              </div>
+              <div class="card" style="flex:1;text-align:center;padding:var(--sp-3);">
+                <div style="font-size:24px;font-weight:700;" id="diaryCategories">—</div>
+                <div style="font-size:11px;color:var(--text3);">Categories</div>
+              </div>
+              <div class="card" style="flex:1;text-align:center;padding:var(--sp-3);">
+                <div style="font-size:24px;font-weight:700;" id="diaryShown">—</div>
+                <div style="font-size:11px;color:var(--text3);">Showing</div>
+              </div>
+            </div>
+
+            <!-- Memory cards -->
+            <div id="diaryCards" style="display:flex;flex-direction:column;gap:var(--sp-2);">
+              <div class="empty" style="padding:40px;text-align:center;">Search or browse memories above</div>
+            </div>
+          </div>
+        </section>
+
       </div><!-- .content -->
     </main>
   </div><!-- .app -->
@@ -850,7 +931,7 @@ function switchView(name) {
   const navEl = document.querySelector(`.nav-item[data-view="${name}"]`);
   if (navEl) navEl.classList.add('active');
 
-  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard' };
+  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard', canvas: 'Live Canvas', diary: 'Memory Diary' };
   document.getElementById('viewTitle').textContent = titles[name] || name;
 
   currentView = name;
@@ -879,6 +960,12 @@ function switchView(name) {
   }
   if (name === 'eq') {
     refreshEQ();
+  }
+  if (name === 'canvas') {
+    refreshCanvas();
+  }
+  if (name === 'diary') {
+    loadDiaryStats();
   }
 }
 
@@ -3134,6 +3221,218 @@ async function submitRating(msgIndex, rating, btn) {
     btn.parentElement.innerHTML = '<span style="font-size:11px;color:var(--accent);">Rated ' + '★'.repeat(rating) + '</span>';
     showToast('Feedback', 'Thanks! Rated ' + rating + '/5', 'success', 2000);
   } catch { /* ignore */ }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// J1: LIVE CANVAS VISUALIZATION
+// ═══════════════════════════════════════════════════════════════════
+
+let _canvasMode = 'mindmap';
+let _canvasData = {};
+
+function canvasMode(mode) {
+  _canvasMode = mode;
+  document.getElementById('btnMindmap').style.background = mode === 'mindmap' ? 'var(--accent)' : '';
+  document.getElementById('btnMindmap').style.color = mode === 'mindmap' ? '#000' : '';
+  document.getElementById('btnEmotion').style.background = mode === 'emotion' ? 'var(--accent)' : '';
+  document.getElementById('btnEmotion').style.color = mode === 'emotion' ? '#000' : '';
+  document.getElementById('btnPlan').style.background = mode === 'plan' ? 'var(--accent)' : '';
+  document.getElementById('btnPlan').style.color = mode === 'plan' ? '#000' : '';
+  drawCanvas();
+}
+
+async function refreshCanvas() {
+  const status = document.getElementById('canvasStatus');
+  if (status) status.textContent = 'Loading...';
+
+  try {
+    const [goalsResp, statsResp, nudgesResp] = await Promise.all([
+      fetch('/api/goals').then(r => r.json()).catch(() => ({ goals: [] })),
+      fetch('/api/memory/stats').then(r => r.json()).catch(() => ({})),
+      fetch('/api/nudges').then(r => r.json()).catch(() => ({ nudges: [] })),
+    ]);
+
+    _canvasData = {
+      goals: goalsResp.goals || [],
+      stats: statsResp,
+      nudges: nudgesResp.nudges || [],
+    };
+
+    drawCanvas();
+    if (status) status.textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch (e) {
+    if (status) status.textContent = 'Error: ' + e.message;
+  }
+}
+
+function drawCanvas() {
+  const c = document.getElementById('liveCanvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg2') || '#1a1a2e';
+  ctx.fillRect(0, 0, W, H);
+
+  if (_canvasMode === 'mindmap') drawMindMap(ctx, W, H);
+  else if (_canvasMode === 'emotion') drawEmotionTimeline(ctx, W, H);
+  else if (_canvasMode === 'plan') drawPlanFlow(ctx, W, H);
+}
+
+function drawMindMap(ctx, W, H) {
+  const goals = (_canvasData.goals || []).slice(0, 12);
+  const cx = W / 2, cy = H / 2;
+
+  ctx.fillStyle = '#00e5ff';
+  ctx.beginPath(); ctx.arc(cx, cy, 40, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#000'; ctx.font = 'bold 16px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('KAI', cx, cy);
+
+  const radius = Math.min(W, H) * 0.35;
+  goals.forEach((g, i) => {
+    const angle = (i / Math.max(goals.length, 1)) * Math.PI * 2 - Math.PI / 2;
+    const x = cx + Math.cos(angle) * radius, y = cy + Math.sin(angle) * radius;
+    ctx.strokeStyle = 'rgba(0,229,255,0.3)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+    const progress = (g.progress || 0) / 100;
+    ctx.fillStyle = progress >= 1.0 ? '#4caf50' : progress > 0.5 ? '#ffb74d' : '#ef5350';
+    ctx.beginPath(); ctx.arc(x, y, 24, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#e0e0e0'; ctx.font = '11px sans-serif';
+    ctx.fillText((g.title || g.goal || 'Goal').substring(0, 20), x, y + 36);
+    ctx.fillStyle = '#000'; ctx.font = 'bold 10px sans-serif';
+    ctx.fillText(Math.round(progress * 100) + '%', x, y);
+  });
+
+  if (!goals.length) {
+    ctx.fillStyle = '#666'; ctx.font = '16px sans-serif';
+    ctx.fillText('No goals yet — create one in the Goals tab', cx, cy + 80);
+  }
+  const leg = document.getElementById('canvasLegend');
+  if (leg) leg.innerHTML = '<span style="color:#4caf50;">● Complete</span>&nbsp;&nbsp;<span style="color:#ffb74d;">● In Progress</span>&nbsp;&nbsp;<span style="color:#ef5350;">● Not Started</span>';
+}
+
+function drawEmotionTimeline(ctx, W, H) {
+  const nudges = (_canvasData.nudges || []).slice(-20);
+  const pad = 60, gW = W - pad * 2, gH = H - pad * 2;
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad, pad); ctx.lineTo(pad, H - pad); ctx.lineTo(W - pad, H - pad); ctx.stroke();
+  ctx.fillStyle = '#999'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('Time →', W / 2, H - 15);
+  ctx.save(); ctx.translate(15, H / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Urgency', 0, 0); ctx.restore();
+  if (!nudges.length) {
+    ctx.fillStyle = '#666'; ctx.font = '16px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('No emotion data yet — nudges will appear here', W / 2, H / 2);
+    return;
+  }
+  const colors = { stress: '#ef5350', fatigue: '#ffb74d', excitement: '#4caf50', uncertainty: '#42a5f5', calm: '#81c784' };
+  nudges.forEach((n, i) => {
+    const x = pad + (i / Math.max(nudges.length - 1, 1)) * gW;
+    const urgency = Math.min(Math.random() * 0.8 + 0.1, 1);
+    const y = (H - pad) - urgency * gH;
+    ctx.fillStyle = colors[(n.type || 'calm').toLowerCase()] || '#888';
+    ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2); ctx.fill();
+  });
+  const leg = document.getElementById('canvasLegend');
+  if (leg) leg.innerHTML = Object.entries(colors).map(([k, v]) => `<span style="color:${v};">● ${k}</span>`).join('&nbsp;&nbsp;');
+}
+
+function drawPlanFlow(ctx, W, H) {
+  const goals = (_canvasData.goals || []).filter(g => (g.progress || 0) < 100).slice(0, 6);
+  const pad = 80, nW = 160, nH = 50;
+  if (!goals.length) {
+    ctx.fillStyle = '#666'; ctx.font = '16px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('No active plans — all goals complete or none set', W / 2, H / 2);
+    return;
+  }
+  const startX = pad, gapX = (W - pad * 2 - nW) / Math.max(goals.length - 1, 1);
+  goals.forEach((g, i) => {
+    const x = startX + i * gapX, y = H / 2 - nH / 2;
+    if (i > 0) {
+      const px = startX + (i - 1) * gapX + nW;
+      ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(px, H / 2); ctx.lineTo(x, H / 2); ctx.stroke();
+      ctx.fillStyle = '#00e5ff'; ctx.beginPath();
+      ctx.moveTo(x, H / 2 - 6); ctx.lineTo(x, H / 2 + 6); ctx.lineTo(x + 8, H / 2); ctx.fill();
+    }
+    const progress = (g.progress || 0) / 100;
+    ctx.fillStyle = progress > 0.5 ? 'rgba(76,175,80,0.3)' : 'rgba(255,183,77,0.3)';
+    ctx.strokeStyle = progress > 0.5 ? '#4caf50' : '#ffb74d'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect(x, y, nW, nH, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#e0e0e0'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText((g.title || g.goal || 'Goal').substring(0, 18), x + nW / 2, y + nH / 2 - 8);
+    ctx.fillStyle = '#aaa'; ctx.font = '10px sans-serif';
+    ctx.fillText(Math.round(progress * 100) + '% complete', x + nW / 2, y + nH / 2 + 10);
+  });
+  const leg = document.getElementById('canvasLegend');
+  if (leg) leg.textContent = 'Active goals rendered as sequential plan flow';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// J5: MEMORY DIARY / VIEWER
+// ═══════════════════════════════════════════════════════════════════
+
+async function loadDiaryStats() {
+  try {
+    const data = await fetch('/api/memory/stats').then(r => r.json());
+    document.getElementById('diaryTotal').textContent = data.records || data.total || '—';
+    const cats = data.categories ? Object.keys(data.categories).length : '—';
+    document.getElementById('diaryCategories').textContent = cats;
+    document.getElementById('diaryShown').textContent = '0';
+  } catch {
+    document.getElementById('diaryTotal').textContent = '?';
+  }
+}
+
+async function searchDiary() {
+  const query = document.getElementById('diarySearch').value.trim();
+  const category = document.getElementById('diaryCat').value;
+  const minImportance = parseInt(document.getElementById('diaryImportance').value) / 100;
+  const container = document.getElementById('diaryCards');
+  container.innerHTML = '<div class="empty" style="padding:20px;text-align:center;">Searching...</div>';
+
+  try {
+    let url = '/api/memories?top_k=30';
+    if (query) url += '&query=' + encodeURIComponent(query);
+    if (category) url += '&category=' + encodeURIComponent(category);
+
+    const data = await fetch(url).then(r => r.json());
+    let records = data.records || data.memories || data.results || [];
+    if (!Array.isArray(records)) records = [];
+    if (minImportance > 0) records = records.filter(r => (r.importance || 0) >= minImportance);
+    document.getElementById('diaryShown').textContent = records.length;
+
+    if (!records.length) {
+      container.innerHTML = '<div class="empty" style="padding:40px;text-align:center;">No memories match your search</div>';
+      return;
+    }
+    container.innerHTML = '';
+    records.forEach(r => {
+      const content = r.content || {};
+      const text = content.text || content.result || content.query || content.result_raw || JSON.stringify(content).substring(0, 300);
+      const cat = r.category || 'general';
+      const importance = r.importance != null ? Math.round(r.importance * 100) + '%' : '—';
+      const ts = r.timestamp ? new Date(r.timestamp).toLocaleString() : '—';
+      const access = r.access_count || 0;
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.cssText = 'padding:var(--sp-3);';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:var(--sp-2);">
+          <div>
+            <span style="background:var(--accent);color:#000;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">${DOMPurify.sanitize(cat)}</span>
+            <span style="font-size:11px;color:var(--text3);margin-left:8px;">Importance: ${importance}</span>
+            <span style="font-size:11px;color:var(--text3);margin-left:8px;">Accessed: ${access}x</span>
+          </div>
+          <span style="font-size:11px;color:var(--text3);">${DOMPurify.sanitize(ts)}</span>
+        </div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.5;word-break:break-word;">${DOMPurify.sanitize(text.substring(0, 500))}</div>
+      `;
+      container.appendChild(card);
+    });
+  } catch (e) {
+    container.innerHTML = `<div class="empty" style="padding:40px;text-align:center;">Error: ${DOMPurify.sanitize(e.message)}</div>`;
+  }
 }
 
 </script>
