@@ -149,6 +149,7 @@ class MemoryRecord(BaseModel):
     importance: float = 0.5  # 0-1 importance score (novelty + specificity + keeper)
     access_count: int = 0  # how many times this memory was retrieved (spaced repetition)
     last_accessed: Optional[str] = None  # ISO timestamp of last retrieval
+    stability: float = 1.0  # MARS: memory stability (grows with rehearsal)
     pinned: bool = False
     # v7 evidence pack fields (populated on retrieval, not stored)
     rank_score: Optional[float] = None  # composite retrieval score
@@ -213,6 +214,7 @@ class VectorStore(Protocol):
     def search(self, top_k: int, query: Optional[str] = None) -> List[MemoryRecord]: ...
     def count(self) -> int: ...
     def delete_old(self, max_age_days: int = 90) -> Dict[str, Any]: ...
+    def delete_record(self, record_id: str) -> bool: ...
     def get_state(self) -> Dict[str, Any]: ...
     def apply_state_delta(self, delta: Dict[str, Any]) -> VersionCommit: ...
     def compress(self) -> Dict[str, Any]: ...
@@ -277,6 +279,7 @@ class PGVectorStore:
                         importance float DEFAULT 0.5,
                         access_count int DEFAULT 0,
                         last_accessed text,
+                        stability float DEFAULT 1.0,
                         pinned bool DEFAULT false,
                         trust_tier text DEFAULT 'unverified',
                         source_id text,
@@ -291,6 +294,7 @@ class PGVectorStore:
                     ("importance", "float", "0.5"),
                     ("access_count", "int", "0"),
                     ("last_accessed", "text", "NULL"),
+                    ("stability", "float", "1.0"),
                     ("trust_tier", "text", "'unverified'"),
                     ("source_id", "text", "NULL"),
                     ("poisoned", "bool", "false"),
@@ -312,8 +316,8 @@ class PGVectorStore:
                     """INSERT INTO memories
                        (id, timestamp, event_type, category, content, embedding,
                         relevance, importance, access_count, last_accessed,
-                        pinned, trust_tier, source_id, poisoned, quarantine_reason)
-                       VALUES (%s,%s,%s,%s,%s,%s::vector,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                        stability, pinned, trust_tier, source_id, poisoned, quarantine_reason)
+                       VALUES (%s,%s,%s,%s,%s,%s::vector,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                        ON CONFLICT (id) DO UPDATE SET
                          content = EXCLUDED.content,
                          embedding = EXCLUDED.embedding,
@@ -332,6 +336,7 @@ class PGVectorStore:
                         getattr(record, "importance", 0.5),
                         getattr(record, "access_count", 0),
                         getattr(record, "last_accessed", None),
+                        getattr(record, "stability", 1.0),
                         record.pinned,
                         getattr(record, "trust_tier", "unverified"),
                         getattr(record, "source_id", None),
@@ -356,7 +361,7 @@ class PGVectorStore:
         return commit
 
     _SELECT_COLS = ("id, timestamp, event_type, category, content, embedding, "
-                    "relevance, importance, access_count, last_accessed, pinned, "
+                    "relevance, importance, access_count, last_accessed, stability, pinned, "
                     "trust_tier, source_id, poisoned, quarantine_reason")
 
     def _row_to_record(self, r: tuple) -> MemoryRecord:
@@ -374,9 +379,10 @@ class PGVectorStore:
             category=r[3] or "general", content=content, embedding=emb,
             relevance=r[6] or 1.0, importance=r[7] or 0.5,
             access_count=r[8] or 0, last_accessed=r[9],
-            pinned=r[10] or False, trust_tier=r[11] or "unverified",
-            source_id=r[12], poisoned=r[13] or False,
-            quarantine_reason=r[14],
+            stability=r[10] or 1.0,
+            pinned=r[11] or False, trust_tier=r[12] or "unverified",
+            source_id=r[13], poisoned=r[14] or False,
+            quarantine_reason=r[15],
         )
 
     def search(self, top_k: int, query: Optional[str] = None) -> List[MemoryRecord]:
@@ -405,7 +411,7 @@ class PGVectorStore:
         if not kwargs:
             return False
         allowed = {"relevance", "importance", "access_count", "last_accessed",
-                    "pinned", "trust_tier", "source_id", "poisoned",
+                    "stability", "pinned", "trust_tier", "source_id", "poisoned",
                     "quarantine_reason", "category"}
         fields = {k: v for k, v in kwargs.items() if k in allowed}
         if not fields:
@@ -445,6 +451,18 @@ class PGVectorStore:
                 deleted = cur.rowcount
             conn.commit()
             return {"before": before, "after": before - deleted, "deleted": deleted, "cutoff": cutoff}
+        finally:
+            self._put_conn(conn)
+
+    def delete_record(self, record_id: str) -> bool:
+        """Delete a single memory record by id."""
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM memories WHERE id = %s", (record_id,))
+                deleted = cur.rowcount
+            conn.commit()
+            return deleted > 0
         finally:
             self._put_conn(conn)
 
@@ -510,6 +528,12 @@ class InMemoryVectorStore:
         deleted = before - len(kept)
         self._records = kept
         return {"before": before, "after": len(kept), "deleted": deleted, "cutoff": cutoff.isoformat()}
+
+    def delete_record(self, record_id: str) -> bool:
+        """Delete a single memory record by id."""
+        before = len(self._records)
+        self._records = [r for r in self._records if r.id != record_id]
+        return len(self._records) < before
 
     def get_state(self) -> Dict[str, Any]:
         return dict(self._state)
@@ -680,11 +704,17 @@ def score_importance(text: str, is_keeper: bool = False, is_pinned: bool = False
 RECENCY_HALF_LIFE_DAYS = float(os.getenv("RECENCY_HALF_LIFE_DAYS", "14"))
 
 
-def _recency_weight(record_timestamp: str, access_count: int = 0) -> float:
-    """Compute a 0.0-1.0 recency weight using exponential decay.
+def _recency_weight(record_timestamp: str, access_count: int = 0,
+                    stability: float = 1.0) -> float:
+    """MARS retention strength: R = e^{-τ/S}.
 
-    Half-life is configurable (default 14 days).  Each access extends
-    the effective age by 10% — spaced repetition effect.
+    τ = days since last access (or creation).  S = stability, which
+    grows each time the memory is rehearsed.  A freshly created memory
+    has S=1.0 (half-life ≈ 0.7 days); after 10 retrievals S may be
+    30+, making it nearly permanent.  Pinned memories set stability
+    artificially high.
+
+    Source: Ebbinghaus + MARS (arXiv:2503.19271).
     """
     try:
         if "T" in record_timestamp:
@@ -695,14 +725,12 @@ def _recency_weight(record_timestamp: str, access_count: int = 0) -> float:
     except Exception:
         age_seconds = 0.0
 
-    age_days = age_seconds / 86400.0
-
-    # spaced repetition: each access effectively makes the memory 10% "younger"
-    effective_age = age_days / (1.0 + 0.1 * access_count)
+    tau = age_seconds / 86400.0  # age in days
+    S = max(stability, 0.1)     # safety floor
 
     import math
-    decay = math.exp(-0.693 * effective_age / max(RECENCY_HALF_LIFE_DAYS, 0.1))
-    return round(decay, 4)
+    retention = math.exp(-tau / S)
+    return round(retention, 4)
 
 
 
@@ -742,7 +770,9 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
             continue
 
         sim = _similarity(q_emb, record.embedding)
-        recency = _recency_weight(record.timestamp, getattr(record, "access_count", 0))
+        rec_stability = getattr(record, "stability", 1.0)
+        recency = _recency_weight(record.timestamp, getattr(record, "access_count", 0),
+                                  stability=rec_stability)
         importance = getattr(record, "importance", 0.5)
 
         # P3b: category-aware retrieval boost — if query matches a domain
@@ -780,16 +810,32 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
     for i, (score, _) in enumerate(ranked[:max(1, min(top_k, 100))]):
         results[i].rank_score = round(score, 4)
 
-    # bump access count on retrieved records (spaced repetition)
+    # bump access count + grow stability on retrieved records (MARS spaced repetition)
     for record in results:
         record.access_count = getattr(record, "access_count", 0) + 1
         record.last_accessed = now_iso
-        # persist the access bump so it survives restarts
+        # MARS: stability grows with each rehearsal.
+        # S_new = S * (1 + 0.1 * sqrt(interval_days + 1))
+        # Early rehearsals add ~0.1, later ones grow faster.
+        import math
+        old_s = getattr(record, "stability", 1.0)
+        if record.last_accessed and record.last_accessed != now_iso:
+            try:
+                prev = datetime.fromisoformat(record.last_accessed.replace("Z", "+00:00"))
+                interval_days = max((datetime.now(tz=timezone.utc) - prev).total_seconds() / 86400.0, 0.01)
+            except Exception:
+                interval_days = 1.0
+        else:
+            interval_days = 1.0
+        new_s = round(old_s * (1.0 + 0.1 * math.sqrt(interval_days + 1.0)), 3)
+        record.stability = min(new_s, 365.0)  # cap at 1-year half-life
+        # persist the access bump + stability so it survives restarts
         if hasattr(store, "update_record"):
             store.update_record(
                 record.id,
                 access_count=record.access_count,
                 last_accessed=record.last_accessed,
+                stability=record.stability,
             )
 
     return results
@@ -2103,26 +2149,28 @@ async def reflect() -> Dict[str, Any]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# P3c: SPACED REPETITION ENFORCEMENT
-#  Apply Ebbinghaus decay to ALL memories.  Records that haven't been
-#  accessed within their half-life have their relevance dimmed.  Heavily-
-#  accessed records resist decay.  Use it or lose it — like a real brain.
+# P3c: MARS MEMORY CONSOLIDATION
+#  Ebbinghaus forgetting curve with MARS stability parameter.
+#  R = e^{-τ/S} where S grows with each rehearsal.
+#  Nightly consolidation: prune dead memories, strengthen active ones,
+#  apply conscience filter before retention.
+#  Source: arXiv:2503.19271
 # ═══════════════════════════════════════════════════════════════════════
 
 DECAY_FADE_THRESHOLD = float(os.getenv("DECAY_FADE_THRESHOLD", "0.15"))
+MARS_PRUNE_THRESHOLD = float(os.getenv("MARS_PRUNE_THRESHOLD", "0.02"))
 
 
 @app.post("/memory/decay")
 async def apply_spaced_repetition_decay(
     half_life_days: float = Query(default=14.0, ge=1.0, le=365.0),
 ) -> Dict[str, Any]:
-    """Enforce spaced repetition decay across ALL memories.
+    """Enforce MARS spaced repetition decay across ALL memories.
 
     For each non-pinned memory:
-      - Compute recency weight using Ebbinghaus curve + access count
-      - If the recency weight falls below DECAY_FADE_THRESHOLD, dim its
-        relevance so it naturally sinks in retrieval ranking
-      - If recency weight is strong, restore/boost relevance as reward
+      - Compute retention R = e^{-τ/S} using MARS stability
+      - If R < DECAY_FADE_THRESHOLD: dim relevance (memory is fading)
+      - If R > 0.5 and accessed 2+: strengthen relevance (actively used)
 
     Returns stats on how many memories were strengthened vs faded.
     """
@@ -2137,7 +2185,8 @@ async def apply_spaced_repetition_decay(
             continue
 
         access = getattr(record, "access_count", 0)
-        recency = _recency_weight(record.timestamp, access)
+        stab = getattr(record, "stability", 1.0)
+        recency = _recency_weight(record.timestamp, access, stability=stab)
 
         old_relevance = float(record.relevance)
 
@@ -2166,6 +2215,108 @@ async def apply_spaced_repetition_decay(
         "faded": faded,
         "skipped": skipped,
         "half_life_days": half_life_days,
+        "fade_threshold": DECAY_FADE_THRESHOLD,
+    }
+
+
+@app.post("/memory/consolidate")
+async def mars_consolidate() -> Dict[str, Any]:
+    """MARS nightly memory consolidation cycle.
+
+    Steps:
+      1. Scan all non-pinned, non-poisoned memories
+      2. Compute retention R = e^{-τ/S} for each
+      3. PRUNE: Delete memories where R < MARS_PRUNE_THRESHOLD (nearly forgotten)
+         — but run conscience filter first: memories tied to formed values survive
+      4. FADE: Dim relevance for memories in the fade zone (R < DECAY_FADE_THRESHOLD)
+      5. STRENGTHEN: Boost relevance for high-retention memories (R > 0.5, accessed 2+)
+
+    Returns pruning/strengthening stats for monitoring.
+    """
+    import math
+
+    all_records = store.search(top_k=10_000)
+    pruned = 0
+    faded = 0
+    strengthened = 0
+    conscience_saved = 0
+    skipped = 0
+
+    # gather formed value keywords for conscience filter
+    value_keywords: set[str] = set()
+    for val in _formed_values:
+        value_keywords.add(val.get("value", "").lower())
+        for trigger in val.get("triggers", []):
+            value_keywords.add(trigger.lower())
+
+    for record in all_records:
+        if getattr(record, "poisoned", False) or getattr(record, "pinned", False):
+            skipped += 1
+            continue
+
+        access = getattr(record, "access_count", 0)
+        stab = getattr(record, "stability", 1.0)
+        retention = _recency_weight(record.timestamp, access, stability=stab)
+
+        # PRUNE: nearly forgotten memories
+        if retention < MARS_PRUNE_THRESHOLD:
+            # Conscience filter: check if memory content aligns with formed values
+            content_str = str(record.content).lower()
+            has_conscience_link = any(kw in content_str for kw in value_keywords) if value_keywords else False
+
+            if has_conscience_link:
+                # value-linked memory survives — boost stability instead
+                new_stab = round(stab * 1.5, 3)
+                record.stability = min(new_stab, 365.0)
+                if hasattr(store, "update_record"):
+                    store.update_record(record.id, stability=record.stability)
+                conscience_saved += 1
+                continue
+
+            # truly forgotten — delete
+            if hasattr(store, "delete_record"):
+                store.delete_record(record.id)
+            elif hasattr(store, "delete_old"):
+                # fallback: mark as extremely low relevance for next compress
+                record.relevance = 0.01
+                if hasattr(store, "update_record"):
+                    store.update_record(record.id, relevance=0.01)
+            pruned += 1
+            continue
+
+        # FADE: memories losing strength
+        if retention < DECAY_FADE_THRESHOLD:
+            old_rel = float(record.relevance)
+            new_rel = round(max(old_rel * 0.8, 0.05), 4)
+            if new_rel != old_rel:
+                record.relevance = new_rel
+                if hasattr(store, "update_record"):
+                    store.update_record(record.id, relevance=new_rel)
+            faded += 1
+            continue
+
+        # STRENGTHEN: high-retention memories
+        if retention > 0.5 and access >= 2:
+            old_rel = float(record.relevance)
+            new_rel = round(min(old_rel * 1.05, 1.0), 4)
+            if new_rel != old_rel:
+                record.relevance = new_rel
+                if hasattr(store, "update_record"):
+                    store.update_record(record.id, relevance=new_rel)
+            strengthened += 1
+            continue
+
+        skipped += 1
+
+    return {
+        "status": "ok",
+        "total_scanned": len(all_records),
+        "pruned": pruned,
+        "faded": faded,
+        "strengthened": strengthened,
+        "conscience_saved": conscience_saved,
+        "skipped": skipped,
+        "prune_threshold": MARS_PRUNE_THRESHOLD,
         "fade_threshold": DECAY_FADE_THRESHOLD,
     }
 

@@ -68,13 +68,14 @@ async def _call_memu(path: str, method: str = "POST", timeout: float = 60.0) -> 
 
 
 async def run_compression_cycle() -> Dict[str, Any]:
-    """Execute a full compression + reflection cycle.
+    """Execute a full MARS consolidation + compression + reflection cycle.
 
     Steps:
       1. GET /memory/stats — record baseline
-      2. POST /memory/compress — archive old records
-      3. POST /memory/reflect — generate insight summaries
-      4. GET /memory/stats — record post-cycle state
+      2. POST /memory/consolidate — MARS prune/strengthen (conscience-filtered)
+      3. POST /memory/compress — archive remaining stale memories
+      4. POST /memory/reflect — generate insight summaries
+      5. GET /memory/stats — record post-cycle state
     """
     started = time.time()
     result: Dict[str, Any] = {"started_at": datetime.utcnow().isoformat(), "steps": {}}
@@ -86,7 +87,17 @@ async def run_compression_cycle() -> Dict[str, Any]:
         result["pre_record_count"] = pre_stats.get("records", 0)
         logger.info("Pre-compression: %d records", pre_stats.get("records", 0))
 
-        # 2. Compress — archive stale memories
+        # 2. MARS consolidation — prune dead memories, strengthen active ones
+        consolidate_result = await _call_memu("/memory/consolidate")
+        result["steps"]["consolidate"] = consolidate_result
+        logger.info(
+            "MARS consolidation: pruned=%s, strengthened=%s, conscience_saved=%s",
+            consolidate_result.get("pruned", 0),
+            consolidate_result.get("strengthened", 0),
+            consolidate_result.get("conscience_saved", 0),
+        )
+
+        # 3. Compress — archive stale memories
         compress_result = await _call_memu("/memory/compress")
         result["steps"]["compress"] = compress_result
         logger.info(
@@ -95,26 +106,28 @@ async def run_compression_cycle() -> Dict[str, Any]:
             compress_result.get("bytes_saved", 0),
         )
 
-        # 3. Reflect — consolidate recent memories into insights
+        # 4. Reflect — consolidate recent memories into insights
         reflect_result = await _call_memu("/memory/reflect")
         result["steps"]["reflect"] = reflect_result
         insights_count = len(reflect_result.get("insights", []))
         logger.info("Reflection: %d insights generated", insights_count)
 
-        # 4. Post-cycle stats
+        # 5. Post-cycle stats
         post_stats = await _call_memu("/memory/stats", method="GET")
         result["steps"]["post_stats"] = post_stats
         result["post_record_count"] = post_stats.get("records", 0)
 
         result["status"] = "completed"
         result["duration_ms"] = int((time.time() - started) * 1000)
+        result["pruned"] = consolidate_result.get("pruned", 0)
         result["archived"] = compress_result.get("archived", 0)
         result["bytes_saved"] = compress_result.get("bytes_saved", 0)
         result["insights_generated"] = insights_count
 
         audit.log(
             "info",
-            f"Compression cycle complete: archived="
+            f"Compression cycle complete: pruned="
+            f"{consolidate_result.get('pruned', 0)}, archived="
             f"{compress_result.get('archived', 0)}, insights={insights_count}",
         )
     except Exception as exc:

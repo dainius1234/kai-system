@@ -25,9 +25,9 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Proactive Agent Loop** | Scheduled tasks, reminders, morning/evening briefings, action registry | Never |
 | **Operator Model** | Echo-response engine, nudge escalation ladder, cross-mode insight bridge, impact oracle, shadow memory branches | Never |
 
-**59 test targets. 1050+ tests. Zero failures. 25 Docker services. All real.**
+**60 test targets. 1085+ tests. Zero failures. 25 Docker services. All real.**
 
-**Current focus: Hardening Sprint H2** — Dual-layer self-healing architecture. Every service now has deep /health (checks real dependencies), /recover (self-heal endpoint), and resilient inter-service calls (retry + circuit breaker + fallback). Supervisor enforces recovery. System monitors itself, heals itself.
+**Current focus: MARS Memory Consolidation** — Ebbinghaus forgetting curve with adaptive stability parameter (R = e^{-τ/S}). Memories that aren't rehearsed decay and get pruned. Memories linked to conscience values survive. Stability grows with each retrieval. Nightly consolidation cycle prunes noise, strengthens lessons.
 
 ---
 
@@ -48,7 +48,7 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Inter-service calls** | No retry, no circuit breaker, no fallback | **FIXED in H2** |
 | **Supervisor** | Observes but can't heal (advisory-only circuit breakers) | **FIXED in H2** |
 | **Background tasks** | Frozen loops undetectable (/health still returns 200) | **FIXED in H2** |
-| **P17-P22 data** | In-memory only — restart = data loss | Planned (H3) |
+| **memu-core memory** | Basic Ebbinghaus decay (no stability growth, no pruning) | **FIXED — MARS** |
 | **verifier** | Keyword matcher, not semantic | Planned (H3) |
 | **context budget** | System prompt can grow unbounded | Planned (H3) |
 | **test coverage** | 40+ endpoints with zero tests | Planned (H4) |
@@ -394,7 +394,12 @@ Request → injection filter → specialist selection → session buffer
 | P22 | Operator Model & Adaptive Response (echo engine, nudge escalation, cross-mode bridge, impact oracle, shadow branches) | ✅ DONE |
 | **H1** | **Critical Hardening Sprint (race conditions, injection, error handling, security)** | **✅ DONE** |
 | **H2** | **Self-Healing & Resilience (deep health, /recover, resilient_call, TaskWatchdog, supervisor recovery)** | **✅ DONE** |
+| **MARS** | **Memory Consolidation (Ebbinghaus stability, conscience-filtered pruning, nightly consolidation)** | **✅ DONE** |
 | H3 | Data Persistence & Quality (P17-P22 persistence, context budget, verifier upgrade) | Planned |
+| P23 | SAGE Multi-Agent Critique (verifier self-critique loop, challenger/critic agents) | Planned |
+| P24 | Agent-Evolver Insight Engine (failure pattern extraction, proactive fix suggestions) | Planned |
+| P25 | Mini-COSMO Recursive Self-Build (prompt→code→test→optimize loop) | Backlog |
+| H3b | LangGraph Checkpointing (time-travel debug on crashes, state snapshots) | Planned |
 | P6 | Nice-to-have (calendar sync, workspace manager, avatar, Prometheus) | Queued |
 | HP1-HP6 | Hardware Performance Track (speculative decoding, VRAM watchdog, NVMe offload) | Awaiting GPU |
 
@@ -420,4 +425,5 @@ Full details in `docs/PROJECT_BACKLOG.md` and `docs/unfair_advantages.md`.
 - [x] Operator model (echo-response engine, nudge escalation ladder, cross-mode insight bridge, impact oracle, shadow branches)
 - [x] H1 hardening: asyncio locks, injection check, error handling, shell=False, size limits, proxy guards
 - [x] H2 self-healing: deep /health, /recover, resilient_call, TaskWatchdog, supervisor recovery, fleet history
-- [x] 59 test targets, 1050+ tests, zero failures
+- [x] MARS memory consolidation: stability parameter, conscience-filtered pruning, nightly consolidation cycle
+- [x] 60 test targets, 1085+ tests, zero failures

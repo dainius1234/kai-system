@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: H2 Self-Healing & Resilience Sprint (dual-layer self-healing architecture: deep /health, /recover, resilient_call, TaskWatchdog, supervisor recovery actions) — **59 targets, 1050+ tests**
+**Last updated:** 2026-03-22 — session: MARS Memory Consolidation (Ebbinghaus stability parameter, conscience-filtered pruning, nightly consolidation cycle) — **60 targets, 1085+ tests**
 
 ---
 
@@ -956,6 +956,80 @@ breakers existed but weren't enforced. A frozen background task was invisible.
 - 42 tests in `scripts/test_h2_self_healing.py`
 - Runtime tests: TaskWatchdog heartbeat/frozen detection, ServiceHealth
   probe with mixed pass/fail, resilient_call fallback on unreachable URL
+
+---
+
+## MARS — Memory Consolidation (2026-03-22) ✅ COMPLETE
+
+**Source:** arXiv:2503.19271 — MARS: Memory-Enhanced Adaptive Retrieval System
+
+**Problem:** The existing Ebbinghaus decay used a flat formula with a basic
+access_count modifier. Memories faded but were never pruned. No concept of
+memory stability growth through rehearsal. No conscience filter on what
+stays or goes.
+
+**Architecture: MARS retention R = e^{-τ/S}**
+
+- τ = days since last access
+- S = stability parameter (starts 1.0, grows with each retrieval)
+- S_new = S × (1 + 0.1 × √(interval_days + 1))
+- Stability capped at 365.0 (1-year half-life)
+
+#### Core Changes
+- [x] **MARS.1 — stability field on MemoryRecord** — `stability: float = 1.0`.
+      Added to PG schema, INSERT, SELECT, migration, update_record allowed set.
+- [x] **MARS.2 — _recency_weight() upgrade** — Replaced old formula with
+      R = e^{-τ/S}. No more RECENCY_HALF_LIFE_DAYS dependency. Stability
+      safety floor at 0.1 prevents division by zero.
+- [x] **MARS.3 — stability growth on retrieval** — Each `retrieve_ranked()`
+      call grows S using interval-aware formula. Persisted via update_record.
+- [x] **MARS.4 — delete_record()** — New method on VectorStore protocol,
+      PGVectorStore (DELETE WHERE id), and InMemoryVectorStore (list filter).
+- [x] **MARS.5 — /memory/decay upgrade** — Now passes stability to
+      _recency_weight() for accurate MARS retention calculation.
+- [x] **MARS.6 — POST /memory/consolidate** — Nightly MARS cycle:
+      - Scan all non-pinned, non-poisoned memories
+      - PRUNE: R < 0.02 → conscience filter → delete or boost
+      - FADE: R < 0.15 → dim relevance by ×0.8
+      - STRENGTHEN: R > 0.5 and accessed ≥ 2 → boost relevance by ×1.05
+      - Returns: {pruned, faded, strengthened, conscience_saved, skipped}
+- [x] **MARS.7 — conscience filter integration** — Memories linked to
+      formed values (P20) survive pruning. Their stability is boosted ×1.5
+      instead. Values teach Kai what matters.
+- [x] **MARS.8 — memory-compressor integration** — Consolidation step
+      runs BEFORE compression in the nightly cycle. Order: stats → MARS
+      consolidate → compress → reflect → stats.
+
+#### Tests
+- 35 tests in `scripts/test_mars_consolidation.py`
+- Pattern tests: formula structure, stability growth, PG schema, endpoints
+- Math validation: retention curves at various τ/S values, compound rehearsals
+- Integration: compressor calls consolidate before compress
+
+## Research Roadmap (2026 — arXiv/GitHub sourced)
+
+| ID | Enhancement | Source | Status |
+|---|---|---|---|
+| **MARS** | **Memory Consolidation (Ebbinghaus stability, conscience-filtered pruning)** | arXiv:2503.19271 | **✅ DONE** |
+| P23 | SAGE Multi-Agent Critique (verifier self-critique loop) | arXiv:2603.15255 | Planned |
+| P24 | Agent-Evolver Insight Engine (failure→pattern→fix suggestions) | clawskills.sh | Planned |
+| P25 | Mini-COSMO Recursive Self-Build (prompt→code→test→optimize) | github.com/XiangJinyu/mini-cosmo | Backlog |
+| H3b | LangGraph Checkpointing (time-travel debug, state snapshots) | LangGraph docs | Planned |
+
+**P23 — SAGE Multi-Agent Critique:** Add Challenger/Critic agents to verifier.
+Before proposing any output, the verifier self-critiques for flaws. Extends
+the adversary engine (which challenges plans) into the output phase.
+
+**P24 — Agent-Evolver Insight Engine:** Analyze failure logs, extract patterns,
+proactively suggest fixes. Integrate with Dream State for nightly insight
+generation. Crashes become learning opportunities.
+
+**P25 — Mini-COSMO Recursive Self-Build:** Kai bootstraps mini-versions of
+himself: prompt → architecture → code → sandbox-test → optimize. The ultimate
+self-evolution capability. Requires GPU + careful sandbox boundaries.
+
+**H3b — LangGraph Checkpointing:** Add state snapshots to heartbeat for
+time-travel debugging on crashes. Roll back to last known good state.
 
 ---
 

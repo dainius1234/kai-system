@@ -96,6 +96,7 @@ make test-p21-proactive-agent          # P21 proactive agent loop tests
 make test-p22-operator-model            # P22 operator model tests
 make test-h1-hardening                  # H1 hardening sprint regression tests
 make test-h2-self-healing               # H2 self-healing & resilience tests
+make test-mars-consolidation            # MARS memory consolidation tests
 
 # Integration / smoke tests (requires running stack)
 make core-smoke              # python3 scripts/smoke_core.py
@@ -141,3 +142,4 @@ Run `make go_no_go` before committing changes to Python service entry points to 
 - Document significant changes in `docs/` and update `README.md` if the public interface changes.
 - For PostgreSQL/pgvector persistence, set `VECTOR_STORE=postgres` and `PG_URI=<connection-string>` before running tests.
 - Kai Control (`scripts/kai_control.py`) must run without `sudo`. Keep it dependency-light and offline-capable.
+- Memory retention uses MARS formula R = e^{-τ/S}. When adding new memory record fields, update: MemoryRecord model, PG schema CREATE TABLE, _init_schema migration list, _SELECT_COLS, _row_to_record, INSERT VALUES, update_record allowed set.
