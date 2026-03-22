@@ -899,17 +899,20 @@ async def recover() -> Dict[str, Any]:
     except Exception:
         pass
 
-    # Log recovery event to conscience
+    # Log recovery event to conscience (with verdict for audit compat)
+    healed = list(recovered)
     entry = {
         "id": f"rec_{uuid.uuid4().hex[:8]}",
         "timestamp": datetime.now(tz=timezone.utc).isoformat(),
         "action": "recovery",
-        "healed": list(recovered),
+        "healed": healed,
         "lesson": "Kai self-healed and restored critical subsystems.",
+        "verdict": "fully_aligned",
     }
-    _conscience_log.append(entry)
-    if len(_conscience_log) > 200:
-        _conscience_log[:] = _conscience_log[-200:]
+    async with _conscience_lock:
+        _conscience_log.append(entry)
+        if len(_conscience_log) > 200:
+            _conscience_log[:] = _conscience_log[-200:]
 
     return {"status": "ok", "recovered": recovered, "recovery_log": entry}
 
