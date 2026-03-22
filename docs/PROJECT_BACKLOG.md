@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-07 — session: P20 Conscience & Values Engine (value formation, moral reasoning, integrity tracking, loyalty memory, gratitude engine, Soul dashboard enhancements) — **55 targets, 750 tests**
+**Last updated:** 2026-03-22 — session: P21 Proactive Agent Loop (scheduled tasks, reminders, morning briefing, evening check-in, action registry, agent summary, supervisor firing, 9-way context injection) — **56 targets, 843 tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 55 (make test-core) |
-| Individual tests | 750 passing, 0 failures |
+| Test targets | 56 (make test-core) |
+| Individual tests | 843 passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -50,6 +50,7 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Narrative identity? | **YES — autobiographical memory, emergent identity narrative, story arc detection, future self projection, legacy time-capsules** |
 | Imagination engine? | **YES — counterfactual replay, empathetic simulation (theory of mind), creative synthesis, inner monologue, aspirational futures** |
 | Conscience & values? | **YES — emergent value formation, moral reasoning, integrity tracking, loyalty memory, gratitude engine** |
+| Proactive agent? | **YES — scheduled tasks, reminders, morning briefing, evening check-in, action registry, agent summary, supervisor auto-fires** |
 
 ---
 
@@ -180,8 +181,118 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 - [x] **HMAC key rotation in production** — 3-phase lifecycle drill
       (single → overlap → retire) with 14 unittest tests.
 
-### P6 — Nice-to-have / future
-*Park these. Don't think about them until P0-P4 are done.*
+### P21 — Proactive Agent Loop (Soul → Action Bridge)
+*Kai initiates. Not just responds. This is what makes it daily-useful.*
+
+- [x] **Scheduled task engine** — cron-like scheduler in memu-core. Register
+      recurring tasks (morning briefing, savings check, goal review). Fires
+      at configured times via supervisor polling of /memory/schedule/due.
+- [x] **Morning briefing** — POST /memory/briefing/morning: goals summary,
+      pending reminders, emotional arc, proactive nudges, today's schedule.
+      Time-of-day greeting. POST /memory/briefing/evening: daily summary,
+      reflection prompt, tomorrow preview.
+- [x] **Reminder system** — POST /memory/reminders/set (text, fire_at, repeat).
+      GET /memory/reminders. GET /memory/reminders/due. Fire/cancel endpoints.
+      Repeat support: once, daily, weekly, hourly.
+- [x] **Proactive firing** — supervisor enhanced: polls /memory/reminders/due
+      and /memory/schedule/due every loop. Fires and pushes to Telegram with
+      type-specific icons (⏰ reminder, 📅 scheduled, 📰 briefing).
+- [x] **Action registry** — GET /memory/actions: catalog of 13+ capabilities.
+      Foundation for "Kai, do X" commands. Self-awareness of abilities.
+- [x] **Agent summary** — GET /memory/agent/summary: active tasks, pending
+      reminders, due items, briefings generated, capability count.
+- [x] **LLM context injection** — 9th parallel fetch: due tasks + due reminders
+      + capabilities injected as system message. Kai is schedule-aware.
+- [x] **Dashboard Goals enhancements** — Reminders card (set/cancel/list),
+      Scheduled Tasks card (schedule/cancel/list), Agent Status card with
+      briefing buttons. 9 new JS functions.
+- [x] **93 unit tests** (scripts/test_p21_proactive_agent.py)
+
+### P22 — Financial Awareness
+*Dainius sleeps in his car saving £50/day. Kai should track this.*
+
+- [ ] **Savings tracker** — POST /memory/finance/log (amount, category, note).
+      Running total, daily burn rate, goal countdown.
+- [ ] **RTX 5080 goal countdown** — target amount, current savings, days remaining
+      at current rate. Dashboard widget + Telegram daily update.
+- [ ] **Expense categorization** — auto-categorize from text (fuel, food, tools,
+      materials, savings). Monthly/weekly breakdowns.
+- [ ] **Financial summary** — GET /memory/finance/summary. Net position,
+      trajectory, goal progress. Part of morning briefing.
+
+### P23 — Knowledge Ingestion (RAG Pipeline)
+*Kai can memorize from conversation. Now it reads documents.*
+
+- [ ] **Document upload endpoint** — POST /memory/ingest (file upload).
+      Accept PDF, TXT, MD, CSV. Size limits, sanitization.
+- [ ] **Chunking pipeline** — split documents into overlapping chunks
+      (512 tokens, 50 overlap). Preserve section headers as metadata.
+- [ ] **Embedding + storage** — chunks → pgvector embeddings. Source tracking
+      (filename, page, chunk_id). Retrievable via existing cosine search.
+- [ ] **Source attribution** — retrieve results include source document info.
+      "I read this in [document.pdf, page 3]."
+
+### P24 — Temporal Intelligence
+*Kai sees patterns in time. "You always X on Y."*
+
+- [ ] **Activity pattern detection** — analyze memory timestamps for recurring
+      patterns (day-of-week, time-of-day, seasonal). Cluster by category.
+- [ ] **Habit tracking** — detect forming/breaking habits from interaction patterns.
+      Streak counting, consistency scoring.
+- [ ] **Predictive nudges** — "It's Monday morning — you usually check invoices
+      around now." Grounded in actual data, not assumptions.
+- [ ] **Circadian awareness** — energy level inference from message timing,
+      length, emotional tone. Adapts proactive behavior to operator rhythm.
+
+### P25 — Voice Pipeline (Car Interface)
+*Voice is the natural interface when you're driving.*
+
+- [ ] **Real-time STT** — Whisper integration for continuous listening mode.
+      CPU-capable (tiny/base models). Wake word detection.
+- [ ] **TTS streaming** — Piper/Coqui local TTS. Low-latency for conversation.
+      British voice. Emotion-aware pacing.
+- [ ] **Voice-first Telegram** — voice messages processed with full context
+      (not just transcription — emotional tone from audio features).
+- [ ] **Hands-free mode** — continuous listen → process → speak loop.
+      Safe for driving. Minimal UI interaction needed.
+
+### P26 — Context Budget Manager
+*As memories grow, context windows overflow. Smart pruning needed.*
+
+- [ ] **Token budget allocator** — configurable per-section token limits
+      (memories: 2000, session: 1000, goals: 500, EQ: 300, etc.).
+- [ ] **Relevance-ranked selection** — score memories by relevance to current
+      query, recency, importance. Fill budget greedily.
+- [ ] **Summarization fallback** — when budget exceeded, summarize lower-priority
+      sections rather than truncating.
+- [ ] **Budget telemetry** — track how much context each section uses.
+      Dashboard visualization of context allocation.
+
+### P27 — Event Bus (Redis Pub/Sub)
+*Services react to events, not just requests. Foundation for autonomy.*
+
+- [ ] **Event publisher** — common/events.py. Publish typed events to Redis
+      channels (memory.stored, emotion.detected, struggle.detected, goal.updated).
+- [ ] **Event subscribers** — services subscribe to relevant channels.
+      Example: struggle.detected → auto-trigger emotional support + conscience check.
+- [ ] **Event log** — append-only event history for debugging and replay.
+- [ ] **Cross-service triggers** — replace fire-and-forget HTTP with pub/sub.
+      More reliable, decoupled, supports fan-out.
+
+### P28 — Soulbound Identity (TPM 2.0)
+*Hardware-bound. Unclonable. The endgame differentiator.*
+
+- [ ] **TPM key generation** — Ed25519 keypair sealed to TPM. Identity cannot
+      exist outside this specific hardware.
+- [ ] **Identity attestation** — prove Kai is running on authorized hardware.
+      Remote attestation for any future integrations.
+- [ ] **Memory signing** — all memories signed with TPM key. Tamper detection
+      at the hardware level.
+- [ ] **Portable sovereign package** — `kai export` → encrypted tar with
+      TPM-sealed keys. Only importable on same hardware or authorized successor.
+
+### P6 — Parking Lot
+*Items that don't fit current priorities.*
 
 - [ ] Calendar sync — calendar-sync/app.py stub. Wire to CalDAV.
 - [ ] Workspace manager — workspace-manager stub. Wire to file system ops.
@@ -387,6 +498,37 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 - [x] Dashboard Soul enhancements — Integrity card (⚖️), Formed Values (🧭),
       Loyalty Ledger (🤝), Gratitude Journal (🙏) with forms. 7 new JS functions.
 - [x] 71 unit tests (scripts/test_p20_conscience_values.py)
+
+### P21 — Proactive Agent Loop (2026-03-22)
+- [x] Action registry — 13+ capabilities discoverable via GET /memory/actions.
+      Kai knows what it can do. Foundation for autonomous action.
+- [x] Scheduled task engine — POST /memory/schedule/task (title, type, frequency,
+      fire_at). GET /memory/schedule/tasks. Cancel/fire/due endpoints. Supports
+      once/daily/weekly/monthly/hourly frequencies. 200-task cap.
+- [x] Reminder system — POST /memory/reminders/set (text, fire_at, repeat).
+      GET /memory/reminders. Due/fire/cancel endpoints. Default 1h fire_at.
+      Repeat support (once, daily, weekly, hourly). 200-reminder cap.
+- [x] Morning briefing — POST /memory/briefing/morning: 5 sections (active goals,
+      upcoming reminders, emotional arc, proactive nudges, today's scheduled tasks).
+      Time-of-day greeting (morning/afternoon/evening).
+- [x] Evening check-in — POST /memory/briefing/evening: today's activity count,
+      completed reminders, reflection prompt, tomorrow's scheduled tasks.
+- [x] Briefing history — GET /memory/briefing/history: last 50 briefings.
+- [x] Agent summary — GET /memory/agent/summary: capabilities, active tasks,
+      pending/due reminders, briefings generated.
+- [x] Supervisor fires due items — polls /memory/reminders/due and /memory/schedule/due
+      every loop, pushes to Telegram (⏰ reminders, 📅 scheduled tasks),
+      marks items as fired via POST endpoints.
+- [x] LLM context injection — 9th parallel fetch (_get_agent_context), due tasks
+      + reminders + capability count injected as system message.
+- [x] Dashboard proxies — 10 new proxy routes (actions, schedule CRUD, reminders
+      CRUD, briefings, agent summary).
+- [x] Dashboard Goals enhancements — Reminders card with set/cancel, Scheduled Tasks
+      card with schedule/cancel, Agent Status card with briefing trigger buttons.
+      9 new JS functions (refreshReminders, setReminder, cancelReminder,
+      refreshScheduled, scheduleTask, cancelScheduled, refreshAgentSummary,
+      triggerBriefing, refreshP21).
+- [x] 93 unit tests (scripts/test_p21_proactive_agent.py)
 
 ### 2026-02-26
 - Quality hardening session after proof-of-life milestone

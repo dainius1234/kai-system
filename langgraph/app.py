@@ -532,6 +532,28 @@ async def _get_conscience_context() -> Dict[str, Any]:
     return result
 
 
+async def _get_agent_context() -> Dict[str, Any]:
+    """P21: Fetch scheduled tasks, reminders, and action capabilities."""
+    result: Dict[str, Any] = {"tasks": [], "reminders": [], "capabilities": 0}
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            tasks_req = client.get(f"{MEMU_URL}/memory/schedule/due")
+            reminders_req = client.get(f"{MEMU_URL}/memory/reminders/due")
+            summary_req = client.get(f"{MEMU_URL}/memory/agent/summary")
+            tasks_resp, rem_resp, sum_resp = await asyncio.gather(
+                tasks_req, reminders_req, summary_req, return_exceptions=True
+            )
+            if not isinstance(tasks_resp, Exception) and tasks_resp.status_code == 200:
+                result["tasks"] = tasks_resp.json().get("tasks", [])[:5]
+            if not isinstance(rem_resp, Exception) and rem_resp.status_code == 200:
+                result["reminders"] = rem_resp.json().get("reminders", [])[:5]
+            if not isinstance(sum_resp, Exception) and sum_resp.status_code == 200:
+                result["capabilities"] = sum_resp.json().get("capabilities", 0)
+    except Exception:
+        pass
+    return result
+
+
 @app.post("/chat")
 async def chat_stream(req: ChatRequest):
     """Kai's main conversation endpoint. Streams tokens via SSE.
@@ -597,6 +619,7 @@ async def chat_stream(req: ChatRequest):
     narrative_task = asyncio.create_task(_get_narrative_identity())
     imagination_task = asyncio.create_task(_get_imagination_context(user_msg))
     conscience_task = asyncio.create_task(_get_conscience_context())
+    agent_task = asyncio.create_task(_get_agent_context())
 
     memories = await memories_task
     session_msgs = await session_task
@@ -606,6 +629,7 @@ async def chat_stream(req: ChatRequest):
     narrative = await narrative_task
     imagination = await imagination_task
     conscience = await conscience_task
+    agent_ctx = await agent_task
 
     # build the message list
     messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
@@ -704,6 +728,26 @@ async def chat_stream(req: ChatRequest):
             messages.append({
                 "role": "system",
                 "content": "Conscience (values that guide me):\n" + ". ".join(con_parts) + ".",
+            })
+
+    # inject agent context — scheduled tasks, reminders, capabilities
+    if agent_ctx:
+        agent_parts = []
+        due_tasks = agent_ctx.get("tasks", [])
+        if due_tasks:
+            task_lines = [f"- {t.get('title', 'task')}" for t in due_tasks[:3]]
+            agent_parts.append("Due scheduled tasks:\n" + "\n".join(task_lines))
+        due_rems = agent_ctx.get("reminders", [])
+        if due_rems:
+            rem_lines = [f"- {r.get('text', 'reminder')}" for r in due_rems[:3]]
+            agent_parts.append("Due reminders (mention naturally):\n" + "\n".join(rem_lines))
+        caps = agent_ctx.get("capabilities", 0)
+        if caps:
+            agent_parts.append(f"I can perform {caps} different actions (set reminders, check emotions, search memory, etc).")
+        if agent_parts:
+            messages.append({
+                "role": "system",
+                "content": "Agent capabilities & schedule:\n" + "\n".join(agent_parts),
             })
 
     # add session history (last N turns)

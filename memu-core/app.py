@@ -5151,6 +5151,469 @@ async def get_logs(
     }
 
 
+# ═══════════════════════════════════════════════════════════════════════
+# P21: PROACTIVE AGENT LOOP — Scheduled Tasks, Reminders, Briefings
+#
+# Kai doesn't just respond — it initiates. Scheduled reminders, morning
+# briefings, evening check-ins, action registry. The soul gets hands.
+# ═══════════════════════════════════════════════════════════════════════
+
+_MAX_SCHEDULED = 200
+_MAX_REMINDERS = 200
+_scheduled_tasks: Dict[str, Dict[str, Any]] = {}
+_reminders: Dict[str, Dict[str, Any]] = {}
+_briefing_log: Deque[Dict[str, Any]] = deque(maxlen=50)
+
+# ── P21a: Action Registry — what can Kai do? ──────────────────────
+
+_ACTION_REGISTRY: List[Dict[str, str]] = [
+    {"action": "set_reminder", "description": "Set a timed reminder", "endpoint": "POST /memory/reminders/set"},
+    {"action": "create_goal", "description": "Create an Ohana goal", "endpoint": "POST /memory/goals"},
+    {"action": "check_drift", "description": "Detect topic drift from goals", "endpoint": "GET /memory/drift"},
+    {"action": "morning_briefing", "description": "Generate morning briefing", "endpoint": "POST /memory/briefing/morning"},
+    {"action": "evening_checkin", "description": "Generate evening check-in", "endpoint": "POST /memory/briefing/evening"},
+    {"action": "search_memory", "description": "Search past memories", "endpoint": "GET /memory/retrieve"},
+    {"action": "check_emotions", "description": "Check emotional state", "endpoint": "GET /memory/emotion/timeline"},
+    {"action": "reflect", "description": "Trigger self-reflection", "endpoint": "GET /memory/reflection"},
+    {"action": "imagine_counterfactual", "description": "Re-imagine past scenario", "endpoint": "POST /memory/imagine/counterfactual"},
+    {"action": "check_conscience", "description": "Check action against values", "endpoint": "POST /memory/conscience/check"},
+    {"action": "record_gratitude", "description": "Express gratitude", "endpoint": "POST /memory/gratitude/record"},
+    {"action": "dream", "description": "Trigger dream consolidation", "endpoint": "POST /memory/dream"},
+    {"action": "schedule_task", "description": "Schedule a recurring task", "endpoint": "POST /memory/schedule/task"},
+]
+
+
+@app.get("/memory/actions")
+async def list_actions() -> Dict[str, Any]:
+    """P21a: What can Kai do? Action discovery for self-awareness."""
+    return {
+        "status": "ok",
+        "count": len(_ACTION_REGISTRY),
+        "actions": _ACTION_REGISTRY,
+    }
+
+
+# ── P21b: Scheduled Tasks Engine ──────────────────────────────────
+
+_VALID_FREQUENCIES = {"once", "daily", "weekly", "monthly", "hourly"}
+
+
+@app.post("/memory/schedule/task")
+async def schedule_task(body: Dict[str, Any]) -> Dict[str, Any]:
+    """P21b: Register a scheduled task (reminder, briefing, custom).
+
+    body: {
+        "title": "Check invoices",
+        "type": "reminder|briefing|check_in|custom",
+        "frequency": "once|daily|weekly|monthly|hourly",
+        "fire_at": "2026-03-23T08:00:00" (ISO, optional for recurring),
+        "payload": {...} (optional extra data)
+    }
+    """
+    title = sanitize_string(str(body.get("title", "")).strip())
+    if not title:
+        raise HTTPException(status_code=400, detail="title is required")
+    if len(_scheduled_tasks) >= _MAX_SCHEDULED:
+        raise HTTPException(status_code=409, detail="scheduler full")
+
+    task_type = str(body.get("type", "reminder")).lower()
+    frequency = str(body.get("frequency", "once")).lower()
+    if frequency not in _VALID_FREQUENCIES:
+        frequency = "once"
+
+    fire_at = body.get("fire_at")
+    if fire_at:
+        fire_at = sanitize_string(str(fire_at))
+
+    task_id = str(uuid.uuid4())[:12]
+    now_iso = datetime.utcnow().isoformat()
+
+    _scheduled_tasks[task_id] = {
+        "task_id": task_id,
+        "title": title[:200],
+        "type": task_type,
+        "frequency": frequency,
+        "fire_at": fire_at,
+        "created": now_iso,
+        "last_fired": None,
+        "fire_count": 0,
+        "active": True,
+        "payload": body.get("payload", {}),
+    }
+    logger.info("Scheduled task created: id=%s title=%s freq=%s", task_id, title[:50], frequency)
+    return {"status": "scheduled", "task_id": task_id, "title": title}
+
+
+@app.get("/memory/schedule/tasks")
+async def list_scheduled_tasks() -> Dict[str, Any]:
+    """P21b: List all active scheduled tasks."""
+    active = [t for t in _scheduled_tasks.values() if t.get("active", True)]
+    active.sort(key=lambda t: t.get("fire_at") or t.get("created", ""), reverse=False)
+    return {
+        "status": "ok",
+        "count": len(active),
+        "total": len(_scheduled_tasks),
+        "tasks": active,
+    }
+
+
+@app.post("/memory/schedule/task/{task_id}/cancel")
+async def cancel_task(task_id: str) -> Dict[str, Any]:
+    """P21b: Cancel a scheduled task."""
+    task_id = sanitize_string(task_id)
+    if task_id in _scheduled_tasks:
+        _scheduled_tasks[task_id]["active"] = False
+        return {"status": "cancelled", "task_id": task_id}
+    raise HTTPException(status_code=404, detail="task not found")
+
+
+@app.post("/memory/schedule/task/{task_id}/fire")
+async def fire_task(task_id: str) -> Dict[str, Any]:
+    """P21b: Mark a task as fired (called by supervisor when executed)."""
+    task_id = sanitize_string(task_id)
+    task = _scheduled_tasks.get(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="task not found")
+    task["last_fired"] = datetime.utcnow().isoformat()
+    task["fire_count"] = task.get("fire_count", 0) + 1
+    if task["frequency"] == "once":
+        task["active"] = False
+    return {"status": "fired", "task_id": task_id, "fire_count": task["fire_count"]}
+
+
+@app.get("/memory/schedule/due")
+async def get_due_tasks() -> Dict[str, Any]:
+    """P21b: Get tasks that are due to fire now. Supervisor polls this."""
+    now = datetime.utcnow()
+    now_iso = now.isoformat()
+    due = []
+
+    for task in _scheduled_tasks.values():
+        if not task.get("active", True):
+            continue
+
+        fire_at = task.get("fire_at")
+        frequency = task.get("frequency", "once")
+        last_fired = task.get("last_fired")
+
+        # one-shot: fire if fire_at <= now and never fired
+        if frequency == "once":
+            if fire_at and fire_at <= now_iso and not last_fired:
+                due.append(task)
+            continue
+
+        # recurring: check if enough time has passed since last fire
+        if last_fired:
+            try:
+                last_dt = datetime.fromisoformat(last_fired)
+                if frequency == "hourly" and (now - last_dt).total_seconds() < 3600:
+                    continue
+                elif frequency == "daily" and (now - last_dt).total_seconds() < 86400:
+                    continue
+                elif frequency == "weekly" and (now - last_dt).days < 7:
+                    continue
+                elif frequency == "monthly" and (now - last_dt).days < 28:
+                    continue
+            except (ValueError, TypeError):
+                pass
+        elif fire_at and fire_at > now_iso:
+            continue  # not yet time for first fire
+
+        due.append(task)
+
+    return {"status": "ok", "count": len(due), "tasks": due}
+
+
+# ── P21c: Reminders — "Don't forget" system ──────────────────────
+
+@app.post("/memory/reminders/set")
+async def set_reminder(body: Dict[str, Any]) -> Dict[str, Any]:
+    """P21c: Set a timed reminder.
+
+    body: {
+        "text": "Call the accountant",
+        "fire_at": "2026-03-23T14:00:00" (ISO datetime),
+        "repeat": "once|daily|weekly" (default once)
+    }
+    """
+    text = sanitize_string(str(body.get("text", "")).strip())
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+    if len(_reminders) >= _MAX_REMINDERS:
+        raise HTTPException(status_code=409, detail="reminders full")
+
+    fire_at = sanitize_string(str(body.get("fire_at", "")))
+    if not fire_at:
+        # default: 1 hour from now
+        fire_at = (datetime.utcnow() + timedelta(hours=1)).isoformat()
+
+    repeat = str(body.get("repeat", "once")).lower()
+    if repeat not in _VALID_FREQUENCIES:
+        repeat = "once"
+
+    reminder_id = str(uuid.uuid4())[:12]
+    _reminders[reminder_id] = {
+        "reminder_id": reminder_id,
+        "text": text[:500],
+        "fire_at": fire_at,
+        "repeat": repeat,
+        "created": datetime.utcnow().isoformat(),
+        "fired": False,
+        "fire_count": 0,
+    }
+    logger.info("Reminder set: id=%s fire_at=%s text=%s", reminder_id, fire_at, text[:50])
+    return {"status": "set", "reminder_id": reminder_id, "fire_at": fire_at}
+
+
+@app.get("/memory/reminders")
+async def list_reminders() -> Dict[str, Any]:
+    """P21c: List all pending reminders."""
+    pending = [r for r in _reminders.values() if not r.get("fired")]
+    pending.sort(key=lambda r: r.get("fire_at", ""))
+    return {
+        "status": "ok",
+        "count": len(pending),
+        "total": len(_reminders),
+        "reminders": pending,
+    }
+
+
+@app.get("/memory/reminders/due")
+async def get_due_reminders() -> Dict[str, Any]:
+    """P21c: Get reminders that should fire now. Supervisor polls this."""
+    now_iso = datetime.utcnow().isoformat()
+    now = datetime.utcnow()
+    due = []
+
+    for r in _reminders.values():
+        if r.get("fired") and r.get("repeat", "once") == "once":
+            continue
+        fire_at = r.get("fire_at", "")
+        if fire_at and fire_at <= now_iso:
+            # for repeating reminders, check cooldown
+            if r.get("fire_count", 0) > 0 and r.get("repeat", "once") != "once":
+                last_fire = r.get("last_fire")
+                if last_fire:
+                    try:
+                        last_dt = datetime.fromisoformat(last_fire)
+                        if r["repeat"] == "daily" and (now - last_dt).total_seconds() < 86400:
+                            continue
+                        elif r["repeat"] == "weekly" and (now - last_dt).days < 7:
+                            continue
+                        elif r["repeat"] == "hourly" and (now - last_dt).total_seconds() < 3600:
+                            continue
+                    except (ValueError, TypeError):
+                        pass
+            due.append(r)
+
+    return {"status": "ok", "count": len(due), "reminders": due}
+
+
+@app.post("/memory/reminders/{reminder_id}/fire")
+async def fire_reminder(reminder_id: str) -> Dict[str, Any]:
+    """P21c: Mark a reminder as fired."""
+    reminder_id = sanitize_string(reminder_id)
+    r = _reminders.get(reminder_id)
+    if not r:
+        raise HTTPException(status_code=404, detail="reminder not found")
+    r["fire_count"] = r.get("fire_count", 0) + 1
+    r["last_fire"] = datetime.utcnow().isoformat()
+    if r.get("repeat", "once") == "once":
+        r["fired"] = True
+    return {"status": "fired", "reminder_id": reminder_id}
+
+
+@app.post("/memory/reminders/{reminder_id}/cancel")
+async def cancel_reminder(reminder_id: str) -> Dict[str, Any]:
+    """P21c: Cancel a reminder."""
+    reminder_id = sanitize_string(reminder_id)
+    if reminder_id in _reminders:
+        _reminders[reminder_id]["fired"] = True
+        return {"status": "cancelled", "reminder_id": reminder_id}
+    raise HTTPException(status_code=404, detail="reminder not found")
+
+
+# ── P21d: Morning Briefing & Evening Check-in ─────────────────────
+
+@app.post("/memory/briefing/morning")
+async def morning_briefing() -> Dict[str, Any]:
+    """P21d: Generate morning briefing — goals, reminders, emotional arc, nudges."""
+    now = datetime.utcnow()
+    briefing: Dict[str, Any] = {
+        "timestamp": now.isoformat(),
+        "type": "morning",
+        "greeting": "",
+        "sections": [],
+    }
+
+    # time-of-day greeting
+    hour = now.hour
+    if hour < 12:
+        briefing["greeting"] = "Good morning, brother."
+    elif hour < 17:
+        briefing["greeting"] = "Afternoon check-in."
+    else:
+        briefing["greeting"] = "Evening briefing."
+
+    # 1. Active goals
+    goals = [r for r in store.search(top_k=10_000)
+             if r.event_type == "goal" and not getattr(r, "poisoned", False)]
+    if goals:
+        goal_items = []
+        for g in goals[:5]:
+            c = g.content
+            title = c.get("title", c.get("result", ""))[:100]
+            progress = c.get("progress", 0)
+            goal_items.append({"title": title, "progress": progress})
+        briefing["sections"].append({
+            "type": "goals",
+            "title": "Active Goals",
+            "items": goal_items,
+        })
+
+    # 2. Pending reminders
+    pending = [r for r in _reminders.values() if not r.get("fired")]
+    if pending:
+        reminder_items = [{"text": r["text"][:100], "fire_at": r.get("fire_at", "")}
+                          for r in sorted(pending, key=lambda x: x.get("fire_at", ""))[:5]]
+        briefing["sections"].append({
+            "type": "reminders",
+            "title": "Upcoming Reminders",
+            "items": reminder_items,
+        })
+
+    # 3. Emotional arc (last 24h)
+    recent_emotions = list(_emotional_timeline)[-24:]
+    if recent_emotions:
+        dominant = Counter(e.get("emotion", "neutral") for e in recent_emotions).most_common(1)
+        arc_text = dominant[0][0] if dominant else "neutral"
+        briefing["sections"].append({
+            "type": "emotional_arc",
+            "title": "Yesterday's Emotional Arc",
+            "dominant": arc_text,
+            "count": len(recent_emotions),
+        })
+
+    # 4. Proactive nudges (reuse existing engine)
+    try:
+        nudge_resp = await proactive_nudges()
+        nudge_list = nudge_resp.get("nudges", [])
+        if nudge_list:
+            briefing["sections"].append({
+                "type": "nudges",
+                "title": "Things To Keep In Mind",
+                "items": [n.get("nudge_message", "")[:150] for n in nudge_list[:3]],
+            })
+    except Exception:
+        pass
+
+    # 5. Scheduled tasks due today
+    due_today = []
+    today_str = now.strftime("%Y-%m-%d")
+    for t in _scheduled_tasks.values():
+        if t.get("active") and t.get("fire_at", "").startswith(today_str):
+            due_today.append({"title": t["title"][:100], "fire_at": t.get("fire_at", "")})
+    if due_today:
+        briefing["sections"].append({
+            "type": "scheduled",
+            "title": "Scheduled For Today",
+            "items": due_today,
+        })
+
+    _briefing_log.append(briefing)
+    return briefing
+
+
+@app.post("/memory/briefing/evening")
+async def evening_checkin() -> Dict[str, Any]:
+    """P21d: Evening check-in — daily summary, reflections, tomorrow preview."""
+    now = datetime.utcnow()
+    today_str = now.strftime("%Y-%m-%d")
+    checkin: Dict[str, Any] = {
+        "timestamp": now.isoformat(),
+        "type": "evening",
+        "greeting": "End of day check-in.",
+        "sections": [],
+    }
+
+    # 1. Today's activity count
+    all_records = store.search(top_k=10_000)
+    today_records = [r for r in all_records
+                     if r.timestamp.startswith(today_str) and not getattr(r, "poisoned", False)]
+    checkin["sections"].append({
+        "type": "activity",
+        "title": "Today's Activity",
+        "count": len(today_records),
+        "message": f"We had {len(today_records)} interactions today." if today_records else "Quiet day.",
+    })
+
+    # 2. Reminders that fired today
+    fired_today = [r for r in _reminders.values()
+                   if r.get("last_fire", "").startswith(today_str)]
+    if fired_today:
+        checkin["sections"].append({
+            "type": "reminders_done",
+            "title": "Reminders Completed",
+            "count": len(fired_today),
+        })
+
+    # 3. Reflection prompt
+    checkin["sections"].append({
+        "type": "reflection",
+        "title": "Reflection",
+        "prompt": "What went well today? What could be better tomorrow?",
+    })
+
+    # 4. Tomorrow's scheduled tasks
+    tomorrow = now + timedelta(days=1)
+    tomorrow_str = tomorrow.strftime("%Y-%m-%d")
+    tomorrow_tasks = [t for t in _scheduled_tasks.values()
+                      if t.get("active") and t.get("fire_at", "").startswith(tomorrow_str)]
+    if tomorrow_tasks:
+        checkin["sections"].append({
+            "type": "tomorrow",
+            "title": "Tomorrow's Schedule",
+            "items": [{"title": t["title"][:100]} for t in tomorrow_tasks[:5]],
+        })
+
+    _briefing_log.append(checkin)
+    return checkin
+
+
+@app.get("/memory/briefing/history")
+async def briefing_history() -> Dict[str, Any]:
+    """P21d: Recent briefing history."""
+    return {
+        "status": "ok",
+        "count": len(_briefing_log),
+        "briefings": list(_briefing_log),
+    }
+
+
+# ── P21e: Agent Loop Summary ─────────────────────────────────────
+
+@app.get("/memory/agent/summary")
+async def agent_summary() -> Dict[str, Any]:
+    """P21e: Summary of Kai's proactive capabilities and current state."""
+    active_tasks = sum(1 for t in _scheduled_tasks.values() if t.get("active"))
+    pending_reminders = sum(1 for r in _reminders.values() if not r.get("fired"))
+
+    # count due items
+    now_iso = datetime.utcnow().isoformat()
+    due_reminders = sum(1 for r in _reminders.values()
+                        if not r.get("fired") and r.get("fire_at", "") <= now_iso)
+
+    return {
+        "status": "ok",
+        "capabilities": len(_ACTION_REGISTRY),
+        "scheduled_tasks": {"active": active_tasks, "total": len(_scheduled_tasks)},
+        "reminders": {"pending": pending_reminders, "due_now": due_reminders, "total": len(_reminders)},
+        "briefings_generated": len(_briefing_log),
+        "message": f"Kai can do {len(_ACTION_REGISTRY)} things. "
+                   f"{active_tasks} scheduled tasks, {pending_reminders} pending reminders.",
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
 

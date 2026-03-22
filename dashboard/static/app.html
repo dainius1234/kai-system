@@ -346,6 +346,47 @@
               <div class="skeleton" style="height:200px"></div>
             </div>
 
+            <!-- P21: Reminders & Scheduled Tasks -->
+            <div class="card" style="margin-top:var(--sp-4);border-left:3px solid var(--accent);">
+              <div class="card-title"><span class="icon">⏰</span> Reminders</div>
+              <div id="remindersContent"><div class="empty">No reminders yet</div></div>
+              <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-3);">
+                <input type="text" id="reminderText" placeholder="What to remind about?" class="input-field" style="flex:2;">
+                <input type="text" id="reminderTime" placeholder="When? (e.g. 2026-03-23T14:00)" class="input-field" style="flex:1;">
+                <select id="reminderRepeat" class="input-field" style="width:100px;">
+                  <option value="once">Once</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                </select>
+                <button class="refresh-btn" onclick="setReminder()">+ Set</button>
+              </div>
+            </div>
+
+            <!-- P21: Scheduled Tasks -->
+            <div class="card" style="margin-top:var(--sp-4);border-left:3px solid var(--primary);">
+              <div class="card-title"><span class="icon">📅</span> Scheduled Tasks</div>
+              <div id="scheduledContent"><div class="empty">No scheduled tasks</div></div>
+              <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-3);">
+                <input type="text" id="taskTitle" placeholder="Task title" class="input-field" style="flex:2;">
+                <select id="taskFrequency" class="input-field" style="width:100px;">
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="once">Once</option>
+                </select>
+                <button class="refresh-btn" onclick="scheduleTask()">+ Schedule</button>
+              </div>
+            </div>
+
+            <!-- P21: Agent Summary -->
+            <div class="card" style="margin-top:var(--sp-4);">
+              <div class="card-title"><span class="icon">🤖</span> Kai Agent Status</div>
+              <div id="agentSummaryContent"><div class="empty">Loading...</div></div>
+              <div style="margin-top:var(--sp-3);display:flex;gap:var(--sp-2);">
+                <button class="refresh-btn" onclick="triggerBriefing('morning')">📰 Morning Briefing</button>
+                <button class="refresh-btn" onclick="triggerBriefing('evening')">🌙 Evening Check-in</button>
+              </div>
+            </div>
+
             <!-- Feedback Stats -->
             <div class="card" style="margin-top:var(--sp-4);">
               <div class="card-title"><span class="icon">📊</span> Feedback Summary</div>
@@ -786,6 +827,7 @@ function switchView(name) {
   }
   if (name === 'goals') {
     refreshGoals();
+    refreshP21();
   }
   if (name === 'memory') {
     refreshMemoryStats();
@@ -1990,6 +2032,161 @@ async function refreshGoals() {
       document.getElementById('feedbackContent').innerHTML = fbHtml;
     }
   } catch { /* goals refresh failed silently */ }
+}
+
+
+// ── P21: Proactive Agent Loop — Reminders, Tasks, Briefings ────────
+
+async function refreshReminders() {
+  try {
+    const resp = await fetch('/api/reminders');
+    const data = await resp.json();
+    const container = document.getElementById('remindersContent');
+    const rems = data.reminders || [];
+    if (!rems.length) {
+      container.innerHTML = '<div class="empty">No pending reminders</div>';
+      return;
+    }
+    container.innerHTML = rems.map(r => {
+      const fireAt = r.fire_at ? new Date(r.fire_at).toLocaleString() : 'soon';
+      const repeat = r.repeat && r.repeat !== 'once' ? ` (🔁 ${r.repeat})` : '';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:var(--sp-2);background:var(--surface);border-radius:4px;margin-bottom:var(--sp-1);">
+        <div>
+          <div style="font-weight:600;">⏰ ${escapeHtml(r.text || '')}</div>
+          <div style="font-size:12px;color:var(--text3);">Fire: ${escapeHtml(fireAt)}${escapeHtml(repeat)}</div>
+        </div>
+        <button class="refresh-btn" onclick="cancelReminder('${escapeHtml(r.reminder_id)}')" style="background:var(--danger);padding:4px 8px;font-size:12px;">✕</button>
+      </div>`;
+    }).join('');
+  } catch { /* silent */ }
+}
+
+async function setReminder() {
+  const text = document.getElementById('reminderText').value.trim();
+  if (!text) return;
+  const fireAt = document.getElementById('reminderTime').value.trim() || undefined;
+  const repeat = document.getElementById('reminderRepeat').value || 'once';
+  try {
+    const resp = await fetch('/api/reminders/set', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({text, fire_at: fireAt, repeat}),
+    });
+    const data = await resp.json();
+    if (data.status === 'set') {
+      document.getElementById('reminderText').value = '';
+      document.getElementById('reminderTime').value = '';
+      refreshReminders();
+      showToast('Reminders', 'Reminder set: ' + text, 'success');
+    }
+  } catch { showToast('Reminders', 'Failed to set reminder', 'error'); }
+}
+
+async function cancelReminder(rid) {
+  try {
+    await fetch(`/api/reminders/${rid}/cancel`, {method: 'POST'});
+    refreshReminders();
+  } catch { /* silent */ }
+}
+
+async function refreshScheduled() {
+  try {
+    const resp = await fetch('/api/schedule/tasks');
+    const data = await resp.json();
+    const container = document.getElementById('scheduledContent');
+    const tasks = data.tasks || [];
+    if (!tasks.length) {
+      container.innerHTML = '<div class="empty">No scheduled tasks</div>';
+      return;
+    }
+    container.innerHTML = tasks.map(t => {
+      const freq = t.frequency || 'once';
+      const fired = t.fire_count || 0;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:var(--sp-2);background:var(--surface);border-radius:4px;margin-bottom:var(--sp-1);">
+        <div>
+          <div style="font-weight:600;">📅 ${escapeHtml(t.title || '')}</div>
+          <div style="font-size:12px;color:var(--text3);">Freq: ${escapeHtml(freq)} · Fired: ${fired}x</div>
+        </div>
+        <button class="refresh-btn" onclick="cancelScheduled('${escapeHtml(t.task_id)}')" style="background:var(--danger);padding:4px 8px;font-size:12px;">✕</button>
+      </div>`;
+    }).join('');
+  } catch { /* silent */ }
+}
+
+async function scheduleTask() {
+  const title = document.getElementById('taskTitle').value.trim();
+  if (!title) return;
+  const frequency = document.getElementById('taskFrequency').value || 'daily';
+  try {
+    const resp = await fetch('/api/schedule/task', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({title, type: 'custom', frequency}),
+    });
+    const data = await resp.json();
+    if (data.status === 'scheduled') {
+      document.getElementById('taskTitle').value = '';
+      refreshScheduled();
+      showToast('Schedule', 'Task scheduled: ' + title, 'success');
+    }
+  } catch { showToast('Schedule', 'Failed to schedule task', 'error'); }
+}
+
+async function cancelScheduled(tid) {
+  try {
+    await fetch(`/api/schedule/task/${tid}/cancel`, {method: 'POST'});
+    refreshScheduled();
+  } catch { /* silent */ }
+}
+
+async function refreshAgentSummary() {
+  try {
+    const resp = await fetch('/api/agent/summary');
+    const data = await resp.json();
+    const container = document.getElementById('agentSummaryContent');
+    const tasks = data.scheduled_tasks || {};
+    const rems = data.reminders || {};
+    container.innerHTML = `
+      <div style="display:flex;gap:var(--sp-6);flex-wrap:wrap;">
+        <div><div style="font-size:11px;color:var(--text3);">Capabilities</div><div style="font-size:22px;font-weight:700;color:var(--accent);">${data.capabilities || 0}</div></div>
+        <div><div style="font-size:11px;color:var(--text3);">Active Tasks</div><div style="font-size:22px;font-weight:700;">${tasks.active || 0}</div></div>
+        <div><div style="font-size:11px;color:var(--text3);">Pending Reminders</div><div style="font-size:22px;font-weight:700;">${rems.pending || 0}</div></div>
+        <div><div style="font-size:11px;color:var(--text3);">Due Now</div><div style="font-size:22px;font-weight:700;color:var(--warn);">${rems.due_now || 0}</div></div>
+        <div><div style="font-size:11px;color:var(--text3);">Briefings</div><div style="font-size:22px;font-weight:700;">${data.briefings_generated || 0}</div></div>
+      </div>`;
+  } catch { document.getElementById('agentSummaryContent').innerHTML = '<div class="empty">Agent status unavailable</div>'; }
+}
+
+async function triggerBriefing(type) {
+  try {
+    const resp = await fetch(`/api/briefing/${type}`, {method: 'POST'});
+    const data = await resp.json();
+    const greeting = data.greeting || `${type} briefing`;
+    const sections = data.sections || [];
+    let msg = `**${greeting}**\n\n`;
+    for (const s of sections) {
+      msg += `**${s.title || s.type}**\n`;
+      if (s.items) {
+        for (const item of Array.isArray(s.items) ? s.items : []) {
+          if (typeof item === 'string') msg += `• ${item}\n`;
+          else msg += `• ${item.title || item.text || JSON.stringify(item)}\n`;
+        }
+      }
+      if (s.message) msg += `${s.message}\n`;
+      if (s.dominant) msg += `Dominant emotion: ${s.dominant}\n`;
+      if (s.prompt) msg += `${s.prompt}\n`;
+      msg += '\n';
+    }
+    showToast('Briefing', greeting, 'success');
+    // Show in a simple alert for now — could be a modal in future
+    alert(msg);
+    refreshAgentSummary();
+  } catch { showToast('Briefing', 'Failed to generate briefing', 'error'); }
+}
+
+// Wire P21 refresh into goals view
+function refreshP21() {
+  refreshReminders();
+  refreshScheduled();
+  refreshAgentSummary();
 }
 
 

@@ -984,6 +984,78 @@ async def proxy_conscience_summary():
         return resp.json()
 
 
+# ── P21: Proactive Agent Loop proxies ────────────────────────────────
+
+@app.get("/api/actions")
+async def proxy_actions():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/actions")
+        return resp.json()
+
+
+@app.post("/api/schedule/task")
+async def proxy_schedule_task(body: dict):
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/schedule/task", json=body)
+        return resp.json()
+
+
+@app.get("/api/schedule/tasks")
+async def proxy_schedule_tasks():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/schedule/tasks")
+        return resp.json()
+
+
+@app.post("/api/schedule/task/{task_id}/cancel")
+async def proxy_cancel_task(task_id: str):
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/schedule/task/{task_id}/cancel")
+        return resp.json()
+
+
+@app.post("/api/reminders/set")
+async def proxy_set_reminder(body: dict):
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/reminders/set", json=body)
+        return resp.json()
+
+
+@app.get("/api/reminders")
+async def proxy_reminders():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/reminders")
+        return resp.json()
+
+
+@app.post("/api/reminders/{reminder_id}/cancel")
+async def proxy_cancel_reminder(reminder_id: str):
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/reminders/{reminder_id}/cancel")
+        return resp.json()
+
+
+@app.post("/api/briefing/morning")
+async def proxy_morning_briefing():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/briefing/morning")
+        return resp.json()
+
+
+@app.post("/api/briefing/evening")
+async def proxy_evening_checkin():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/briefing/evening")
+        return resp.json()
+
+
+@app.get("/api/agent/summary")
+async def proxy_agent_summary():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/agent/summary")
+        return resp.json()
+
+
 # ── Unified App Shell ────────────────────────────────────────────────
 
 @app.get("/app")

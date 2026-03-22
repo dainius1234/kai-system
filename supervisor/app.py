@@ -203,6 +203,8 @@ async def _proactive_check() -> None:
         "fading_memory": "💭",
         "greeting": "👋",
         "check_in": "💚",
+        "scheduled_task": "📅",
+        "briefing": "📰",
     }
     for nudge in to_send[:5]:
         ntype = nudge.get("type", "reminder")
@@ -263,6 +265,50 @@ async def _greeting_check() -> None:
         logger.debug("greeting/check-in: unreachable")
 
 
+async def _fire_due_items() -> None:
+    """P21: Fire due reminders and scheduled tasks via Telegram."""
+    memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            # fire due reminders
+            resp = await client.get(f"{memu_url}/memory/reminders/due")
+            if resp.status_code == 200:
+                due_rems = resp.json().get("reminders", [])
+                for r in due_rems[:5]:
+                    rid = r.get("reminder_id", "")
+                    text = r.get("text", "Reminder")[:300]
+                    repeat = r.get("repeat", "once")
+                    icon = "🔁" if repeat != "once" else "⏰"
+                    try:
+                        await client.post(
+                            TELEGRAM_ALERT_URL,
+                            json={"text": f"{icon} *Reminder:* {text}"},
+                        )
+                        await client.post(f"{memu_url}/memory/reminders/{rid}/fire")
+                        logger.info("Reminder fired: %s", text[:50])
+                    except Exception:
+                        pass
+
+            # fire due scheduled tasks
+            resp = await client.get(f"{memu_url}/memory/schedule/due")
+            if resp.status_code == 200:
+                due_tasks = resp.json().get("tasks", [])
+                for t in due_tasks[:5]:
+                    tid = t.get("task_id", "")
+                    title = t.get("title", "Task")[:300]
+                    try:
+                        await client.post(
+                            TELEGRAM_ALERT_URL,
+                            json={"text": f"📅 *Scheduled:* {title}"},
+                        )
+                        await client.post(f"{memu_url}/memory/schedule/task/{tid}/fire")
+                        logger.info("Scheduled task fired: %s", title[:50])
+                    except Exception:
+                        pass
+    except Exception:
+        logger.debug("fire_due_items: memu-core unreachable")
+
+
 async def _background_loop() -> None:
     """Runs forever in the background, sweeping at CHECK_INTERVAL."""
     while True:
@@ -274,6 +320,10 @@ async def _background_loop() -> None:
             await _proactive_check()
         except Exception:
             logger.exception("Proactive check failed")
+        try:
+            await _fire_due_items()
+        except Exception:
+            logger.exception("Fire due items failed")
         try:
             await _greeting_check()
         except Exception:
