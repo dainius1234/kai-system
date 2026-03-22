@@ -8,6 +8,8 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
   <img src="https://img.shields.io/badge/services-26-blue?style=flat-square" alt="services">
   <img src="https://img.shields.io/badge/tests-1%2C258_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/Python-~36%2C063_LOC-yellow?style=flat-square" alt="loc">
