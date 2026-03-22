@@ -66,6 +66,33 @@ LLM_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "120"))
 LLM_CONNECT_TIMEOUT = float(os.getenv("LLM_CONNECT_TIMEOUT", "10"))
 LLM_READ_TIMEOUT = float(os.getenv("LLM_READ_TIMEOUT", "120"))
 
+# ── model-aware token counting (replaces 4-char heuristic) ──────────
+try:
+    from common.model_registry import (
+        count_tokens as _count_tokens,
+        model_timeout as _model_timeout,
+        get_model_spec,
+    )
+except ImportError:
+    def _count_tokens(text: str, model=None) -> int:  # type: ignore[misc]
+        return max(len(text) * 10 // 35, 1)
+
+    def _model_timeout(model=None) -> float:  # type: ignore[misc]
+        return LLM_TIMEOUT
+
+    def get_model_spec(model=None):  # type: ignore[misc]
+        return None
+
+
+def _validate_llm_response(text: str) -> str:
+    """Validate LLM response — reject empty or error-only output."""
+    if not text or not text.strip():
+        return "[empty response from model]"
+    # Detect common Ollama error patterns
+    if text.strip().startswith("{\"error\""):
+        return f"[model error: {text[:200]}]"
+    return text
+
 
 class LLMRouter:
     """Route prompts to the right local LLM via OpenAI-compatible API.
@@ -157,6 +184,7 @@ class LLMRouter:
 
             choice = data.get("choices", [{}])[0]
             text = choice.get("message", {}).get("content", "")
+            text = _validate_llm_response(text)
             usage = data.get("usage", {})
             model = data.get("model", specialist)
             latency = (time.monotonic() - start) * 1000

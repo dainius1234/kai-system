@@ -134,24 +134,9 @@ async def _query_specialist(client: httpx.AsyncClient, name: str, prompt: str, c
 
 # ── Consensus measurement ──────────────────────────────────────────
 
-def _measure_agreement(responses: List[SpecialistResponse]) -> float:
-    """Measure agreement between specialist responses.
-
-    Uses keyword overlap between responses as a proxy for consensus.
-    When real LLMs are wired, this can be upgraded to embedding-based
-    similarity.
-    """
-    if len(responses) < 2:
-        return 1.0  # single specialist → trivially agrees with itself
-
-    texts = [r.response for r in responses if r.source != "error"]
-    if len(texts) < 2:
-        return 0.0  # only one non-error response
-
-    # extract significant words from each response
+def _jaccard_agreement(texts: List[str]) -> float:
+    """Keyword overlap (Jaccard) — fast baseline for agreement."""
     word_sets = [set(re.findall(r"\w{4,}", t.lower())) for t in texts]
-
-    # pairwise Jaccard similarity
     scores: List[float] = []
     for i in range(len(word_sets)):
         for j in range(i + 1, len(word_sets)):
@@ -161,8 +146,62 @@ def _measure_agreement(responses: List[SpecialistResponse]) -> float:
                 continue
             intersection = word_sets[i] & word_sets[j]
             scores.append(len(intersection) / len(union))
+    return sum(scores) / max(len(scores), 1)
 
-    return round(sum(scores) / max(len(scores), 1), 3)
+
+def _semantic_agreement(texts: List[str]) -> float:
+    """Embedding-based cosine similarity — more accurate for real LLM output.
+
+    Falls back to Jaccard when sentence-transformers is not available.
+    """
+    try:
+        from sentence_transformers import SentenceTransformer
+        import numpy as np
+    except ImportError:
+        return _jaccard_agreement(texts)
+
+    model_name = os.getenv("FUSION_EMBED_MODEL", "all-MiniLM-L6-v2")
+    try:
+        model = SentenceTransformer(model_name)
+        embeddings = model.encode(texts, normalize_embeddings=True)
+        scores: List[float] = []
+        for i in range(len(embeddings)):
+            for j in range(i + 1, len(embeddings)):
+                cos_sim = float(np.dot(embeddings[i], embeddings[j]))
+                scores.append(max(cos_sim, 0.0))
+        return sum(scores) / max(len(scores), 1)
+    except Exception:
+        return _jaccard_agreement(texts)
+
+
+# Agreement strategy: semantic when available, Jaccard as fallback
+_AGREEMENT_STRATEGY = os.getenv("FUSION_AGREEMENT", "auto")  # auto|semantic|jaccard
+
+
+def _measure_agreement(responses: List[SpecialistResponse]) -> float:
+    """Measure agreement between specialist responses.
+
+    Strategy (FUSION_AGREEMENT env var):
+    - "auto": tries semantic first, falls back to Jaccard
+    - "semantic": embedding cosine similarity
+    - "jaccard": keyword overlap only
+    """
+    if len(responses) < 2:
+        return 1.0
+
+    texts = [r.response for r in responses if r.source != "error"]
+    if len(texts) < 2:
+        return 0.0
+
+    strategy = _AGREEMENT_STRATEGY.lower()
+    if strategy == "jaccard":
+        score = _jaccard_agreement(texts)
+    elif strategy == "semantic":
+        score = _semantic_agreement(texts)
+    else:  # auto
+        score = _semantic_agreement(texts)
+
+    return round(score, 3)
 
 
 def _merge_responses(responses: List[SpecialistResponse]) -> str:

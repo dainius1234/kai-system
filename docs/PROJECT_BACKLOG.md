@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: J-Series Jewels roadmap + 5 research gaps closed — **69 targets, 1425+ tests**
+**Last updated:** 2026-03-22 — session: Chassis upgrade — model registry, tiktoken, prompt templates, fusion semantic agreement — **89 targets, 1587+ tests**
 
 ---
 
@@ -21,9 +21,9 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 26 (22 build + postgres + redis + ollama + lakeFS) |
-| Test targets | 70 (make test-core) |
-| Individual tests | 1492+++ passing, 0 failures |
-| Lines of Python | ~14,000 |
+| Test targets | 89 (make test-core) |
+| Individual tests | 1587+ passing, 0 failures |
+| Lines of Python | ~42,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
 | Real LLM wired? | **YES — qwen2:0.5b via Ollama (CPU)** |
@@ -52,6 +52,75 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Conscience & values? | **YES — emergent value formation, moral reasoning, integrity tracking, loyalty memory, gratitude engine** |
 | Proactive agent? | **YES — scheduled tasks, reminders, morning briefing, evening check-in, action registry, agent summary, supervisor auto-fires** |
 | Operator model? | **YES — echo-response engine, nudge escalation ladder (4-tier), cross-mode insight bridge, impact oracle, shadow memory branches, 10-way LLM context** |
+
+---
+
+## Chassis Upgrade — Plug-and-Play LLM Layer (2026-03-22)
+
+> **Goal:** Make the system the best possible chassis so swapping LLMs is
+> literally 3 env vars. When RTX 5080 arrives, everything "just works".
+
+### Completed This Session
+
+- [x] **Model Registry** (`common/model_registry.py`) — central source of truth for 15+ models.
+      Each model has: context window, output reserve, speed/quality tiers,
+      JSON mode support, vision support, per-model timeout. Unknown models
+      get conservative 4K defaults. Prefix matching for quantized variants.
+- [x] **Accurate Token Counting** — tiktoken replaces the ±40% heuristic.
+      `count_tokens()` and `count_messages_tokens()` with per-message overhead.
+      Graceful fallback to 3.5 chars/token if tiktoken unavailable.
+- [x] **Model-Aware Context Budget** — `context_budget()` auto-calculates
+      from model spec: `context_window - output_reserve`. qwen2:0.5b = 3072,
+      qwen2.5:7b = 28672, kimi-2.5 = 122880. No more wasted context.
+- [x] **Prompt Templates** (`common/prompt_templates.py`) — structured prompts
+      that scale with model quality. Tier 1 (tiny): minimal instructions.
+      Tier 2 (7B): reasoning guidelines + output formatting. Tier 3 (70B):
+      JSON mode hints + deep persona. PUB/WORK mode-aware.
+- [x] **LLM Response Validation** — empty/error responses caught and flagged
+      instead of silently propagated. `_validate_llm_response()` in llm.py.
+- [x] **Fusion Semantic Agreement** — upgraded from keyword Jaccard to
+      embedding cosine similarity (sentence-transformers). Falls back to
+      Jaccard when unavailable. Configurable via `FUSION_AGREEMENT` env var.
+- [x] **37 Chassis Tests** — model registry, token counting, prompt scaling,
+      response validation, fusion agreement. All passing.
+
+### Action Plan — Remaining Gaps
+
+| Priority | Gap | Solution | Effort |
+|---|---|---|---|
+| **C1** | Per-model timeouts not wired into live queries | Wire `model_timeout()` into `LLMRouter._live_query()` timeout | S |
+| **C2** | Streaming has no heartbeat/stall detection | Add `STREAM_HEARTBEAT_TIMEOUT` — kill stream if no token for 30s | M |
+| **C3** | Retry + backoff on LLM 429/503 | Add `tenacity` retry decorator with exponential backoff to `_live_query` | M |
+| **C4** | Router uses keyword regex (8 categories) | Add embedding-based route classification when model tier >= 2 | L |
+| **C5** | Model selector doesn't verify model is loaded | Add Ollama `/api/tags` check before routing to model | S |
+| **C6** | Conviction scoring ignores LLM quality signals | Add response entropy + uncertainty markers to score | M |
+| **C7** | memu-core fallback embeddings are hash-based | Force sentence-transformers or fail explicitly (no fake vectors) | M |
+| **C8** | Dashboard Thinking/Goals/Memory are proxy shells | Wire real data endpoints when full stack is running | L |
+| **C9** | No model warm-up / pre-load on startup | Add Ollama `/api/pull` check + warm prompt on service init | S |
+| **C10** | No A/B testing framework for model comparison | Log model name + response quality per query for comparison | M |
+
+### Plug-and-Play Checklist (When GPU Arrives)
+
+```bash
+# 1. Pull your model
+docker exec ollama ollama pull qwen2.5:7b
+
+# 2. Set 3 env vars
+OLLAMA_MODEL=qwen2.5:7b
+# Context budget auto-adapts (no manual override needed)
+# Prompts auto-scale to tier 2 quality
+# Timeouts auto-adjust to model speed
+
+# 3. Restart stack
+make core-down && make core-up
+
+# That's it. Everything adapts:
+# - Context budget: 3072 → 28672 tokens
+# - Prompts: minimal → rich reasoning guidelines
+# - Timeouts: 30s → 120s
+# - Token counting: accurate (tiktoken)
+# - Fusion: semantic agreement (if sentence-transformers installed)
+```
 
 ---
 

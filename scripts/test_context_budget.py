@@ -31,7 +31,9 @@ class TestEstimateTokens(unittest.TestCase):
     """Test _estimate_tokens approximation."""
 
     def test_empty_string(self):
-        self.assertEqual(mod._estimate_tokens(""), 1)
+        # tiktoken returns 0 for empty, heuristic returned 1
+        self.assertGreaterEqual(mod._estimate_tokens(""), 0)
+        self.assertLessEqual(mod._estimate_tokens(""), 1)
 
     def test_short_text(self):
         result = mod._estimate_tokens("hello world")
@@ -41,7 +43,9 @@ class TestEstimateTokens(unittest.TestCase):
     def test_longer_text(self):
         text = "a" * 400
         result = mod._estimate_tokens(text)
-        self.assertEqual(result, 100)
+        # tiktoken counts vary; should be in reasonable range
+        self.assertGreater(result, 10)
+        self.assertLess(result, 500)
 
     def test_always_positive(self):
         self.assertGreaterEqual(mod._estimate_tokens("x"), 1)

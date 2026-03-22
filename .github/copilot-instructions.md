@@ -120,6 +120,7 @@ make test-world-anchor                  # external world anchor tests
 make test-self-healing-phases           # bio-inspired self-healing phase tests
 make test-behavioral                    # behavioral reasoning tests
 make test-docker-e2e                    # Docker compose validation tests
+make test-chassis                       # chassis layer (model registry, tokens, prompts, fusion)
 make dep-audit                          # pip-audit dependency vulnerability scan
 make coverage                           # pytest-cov coverage report (HTML + terminal)
 # Integration / smoke tests (requires running stack)

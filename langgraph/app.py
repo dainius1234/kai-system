@@ -51,9 +51,18 @@ saver = build_saver()
 MIN_CONVICTION = 8.0
 MAX_RETHINKS = 3
 # ── context budget: prevent system prompt from exceeding the model's window ──
-# Default 3072 tokens leaves ~1K for output on qwen2:0.5b (4K context).
-# Override via CONTEXT_BUDGET_TOKENS for larger models.
-CONTEXT_BUDGET_TOKENS = int(os.getenv("CONTEXT_BUDGET_TOKENS", "3072"))
+# Auto-detects from model registry when CONTEXT_BUDGET_TOKENS is not set.
+# Falls back to 3072 for unknown/tiny models.
+try:
+    from common.model_registry import context_budget as _auto_budget, count_tokens as _count_tokens_real
+    _AUTO_BUDGET = _auto_budget()
+except ImportError:
+    _AUTO_BUDGET = 3072
+
+    def _count_tokens_real(text, model=None):  # type: ignore[misc]
+        return max(len(text) * 10 // 35, 1)
+
+CONTEXT_BUDGET_TOKENS = int(os.getenv("CONTEXT_BUDGET_TOKENS", str(_AUTO_BUDGET)))
 last_low_conviction_alert = 0.0
 last_guard_alerts: Dict[str, float] = {"memu": 0.0, "tool_gate": 0.0}
 SELF_EMP_ROOT = os.getenv("SELF_EMP_ROOT", "/data/self-emp")
@@ -126,8 +135,8 @@ def is_conviction_override(text: str) -> bool:
 
 
 def _estimate_tokens(text: str) -> int:
-    """Approximate token count (~4 chars per token for English)."""
-    return max(len(text) // 4, 1)
+    """Token count — uses tiktoken when available, heuristic fallback."""
+    return _count_tokens_real(text)
 
 
 def _trim_context(messages: List[Dict[str, str]], budget: int) -> List[Dict[str, str]]:
