@@ -554,6 +554,44 @@ async def _get_agent_context() -> Dict[str, Any]:
     return result
 
 
+async def _get_operator_model(query: str, mode: str) -> Dict[str, Any]:
+    """P22: Fetch the unified operator model — echo state, escalation,
+    cross-mode insights, oracle predictions."""
+    result: Dict[str, Any] = {
+        "echo": None, "escalation_level": 1, "cross_mode": None, "model_completeness": 0
+    }
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            echo_req = client.post(
+                f"{MEMU_URL}/memory/echo/analyse",
+                json={"text": query[:500], "session_id": "chat"},
+            )
+            model_req = client.get(f"{MEMU_URL}/memory/operator-model")
+            cross_req = client.post(
+                f"{MEMU_URL}/memory/cross-mode/scan",
+                json={"query": query[:200], "mode": mode},
+            )
+            echo_resp, model_resp, cross_resp = await asyncio.gather(
+                echo_req, model_req, cross_req, return_exceptions=True
+            )
+            if not isinstance(echo_resp, Exception) and echo_resp.status_code == 200:
+                data = echo_resp.json()
+                result["echo"] = data.get("echo_message")
+                result["echo_type"] = data.get("echo_type", "none")
+                result["current_emotion"] = data.get("current_emotion", "neutral")
+            if not isinstance(model_resp, Exception) and model_resp.status_code == 200:
+                data = model_resp.json()
+                result["escalation_level"] = data.get("escalation_state", {}).get("max_level", 1)
+                result["model_completeness"] = data.get("model_completeness", 0)
+            if not isinstance(cross_resp, Exception) and cross_resp.status_code == 200:
+                data = cross_resp.json()
+                result["cross_mode"] = data.get("bridge_message")
+                result["cross_mode_count"] = data.get("insights_count", 0)
+    except Exception:
+        pass
+    return result
+
+
 @app.post("/chat")
 async def chat_stream(req: ChatRequest):
     """Kai's main conversation endpoint. Streams tokens via SSE.
@@ -620,6 +658,7 @@ async def chat_stream(req: ChatRequest):
     imagination_task = asyncio.create_task(_get_imagination_context(user_msg))
     conscience_task = asyncio.create_task(_get_conscience_context())
     agent_task = asyncio.create_task(_get_agent_context())
+    operator_task = asyncio.create_task(_get_operator_model(user_msg, mode))
 
     memories = await memories_task
     session_msgs = await session_task
@@ -630,6 +669,7 @@ async def chat_stream(req: ChatRequest):
     imagination = await imagination_task
     conscience = await conscience_task
     agent_ctx = await agent_task
+    operator_model = await operator_task
 
     # build the message list
     messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
@@ -748,6 +788,24 @@ async def chat_stream(req: ChatRequest):
             messages.append({
                 "role": "system",
                 "content": "Agent capabilities & schedule:\n" + "\n".join(agent_parts),
+            })
+
+    # inject operator model — emotional echo, escalation, cross-mode insights
+    if operator_model:
+        op_parts = []
+        echo_msg = operator_model.get("echo")
+        if echo_msg:
+            op_parts.append(f"Emotional echo: {echo_msg}")
+        esc_level = operator_model.get("escalation_level", 1)
+        if esc_level > 1:
+            op_parts.append(f"Nudge escalation level {esc_level}/4 — be more {'direct' if esc_level == 2 else 'blunt' if esc_level == 3 else 'urgent'}.")
+        cross_msg = operator_model.get("cross_mode")
+        if cross_msg:
+            op_parts.append(f"Cross-mode insight: {cross_msg}")
+        if op_parts:
+            messages.append({
+                "role": "system",
+                "content": "Operator model (how I understand you right now):\n" + "\n".join(op_parts),
             })
 
     # add session history (last N turns)

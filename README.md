@@ -23,8 +23,9 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Imagination Engine** | Counterfactual replay, theory of mind, creative synthesis, inner monologue | Never |
 | **Conscience & Values** | Emergent values, moral reasoning, loyalty memory, gratitude engine | Never |
 | **Proactive Agent Loop** | Scheduled tasks, reminders, morning/evening briefings, action registry | Never |
+| **Operator Model** | Echo-response engine, nudge escalation ladder, cross-mode insight bridge, impact oracle, shadow memory branches | Never |
 
-**56 test targets. 843 tests. Zero failures. 25 Docker services. All real.**
+**57 test targets. 960 tests. Zero failures. 25 Docker services. All real.**
 
 ---
 
@@ -46,7 +47,7 @@ Kai is modular, secure, and designed for real-world use:
 
 **How it works:**
 1. Operator sends a message (Telegram, Dashboard, or API).
-2. LangGraph enriches context: memories + session + goals + topics + EQ + narrative + imagination + conscience + agent (9-way parallel fetch).
+2. LangGraph enriches context: memories + session + goals + topics + EQ + narrative + imagination + conscience + agent + operator model (10-way parallel fetch).
 3. Specialist router classifies the domain. Planner builds a gap-aware plan.
 4. Adversary challenges the plan (6 challenge types). Conviction scoring gates execution.
 5. Tool-Gate checks policy (HMAC, rate limit, co-sign). Executor runs in sandbox.
@@ -144,7 +145,7 @@ make full-down
 ## Test
 
 ```bash
-# Run ALL core unit/smoke tests (56 targets, ~843 tests)
+# Run ALL core unit/smoke tests (57 targets, ~960 tests)
 make test-core
 
 # Individual service tests
@@ -191,6 +192,7 @@ make test-p18-narrative-identity     # P18 narrative identity (autobiography, id
 make test-p19-imagination-engine      # P19 imagination engine (counterfactual, empathy, creative synthesis, inner monologue, aspirations)
 make test-p20-conscience-values        # P20 conscience & values (value formation, moral reasoning, integrity, loyalty, gratitude)
 make test-p21-proactive-agent          # P21 proactive agent loop (action registry, scheduled tasks, reminders, briefings, agent summary)
+make test-p22-operator-model            # P22 operator model (echo engine, nudge escalation, cross-mode, impact oracle, shadow branches)
 
 # v7 feature tests
 make test-v7                 # verifier, quarantine, policy, idempotency, integration-chain
@@ -280,7 +282,7 @@ Toggled from the chat UI header or via `Ctrl+Shift+M`. Stored in `localStorage`.
 - All code must work in BOTH environments (stubs in codespace, live on laptop)
 
 ### Current State
-- **56 test-core targets pass, ~843 individual tests.** Run `make test-core` to confirm.
+- **57 test-core targets pass, ~960 individual tests.** Run `make test-core` to confirm.
 - **P0-P5 COMPLETE:** All 25 services built, running, tested. CI/CD, secrets, backup, HMAC rotation.
 - **P7-P15 COMPLETE:** Agentic patterns, thinking pathways, security self-hacking, dream state.
 - **P3 Organic Memory COMPLETE:** Correction learning, category boost, spaced repetition, proactive engine, Ohana goals, drift detection.
@@ -291,6 +293,7 @@ Toggled from the chat UI header or via `Ctrl+Shift+M`. Stored in `localStorage`.
 - **P19 Imagination Engine COMPLETE:** Counterfactual replay, empathetic simulation (theory of mind), creative synthesis, inner monologue, aspirational futures, Soul dashboard enhancements.
 - **P20 Conscience & Values COMPLETE:** Emergent value formation, moral reasoning, integrity tracking, loyalty memory (sacrifices/promises), gratitude engine, Soul dashboard enhancements.
 - **P21 Proactive Agent Loop COMPLETE:** Action registry (13 actions), scheduled tasks (recurring support), reminders, morning/evening briefings, agent summary, supervisor auto-firing, 9-way LLM context.
+- **P22 Operator Model COMPLETE:** Echo-response engine (emotional continuity), nudge escalation ladder (4-tier), cross-mode insight bridge, impact oracle (goal-to-goal predictions), shadow memory branches (what-if timelines), 10-way LLM context.
 - **Dashboard:** 8 views (Chat, Dashboard, Thinking, Settings, Goals, Memory, Logs, Soul).
 - **LLM:** Ollama with qwen2:0.5b on CPU. GPU arrival = 3 env vars changed.
 
@@ -332,6 +335,7 @@ Request → injection filter → specialist selection → session buffer
 | P19 | Imagination Engine (counterfactual replay, theory of mind, creative synthesis, inner monologue, aspirations) | ✅ DONE |
 | P20 | Conscience & Values (value formation, moral reasoning, integrity tracking, loyalty memory, gratitude) | ✅ DONE |
 | P21 | Proactive Agent Loop (action registry, scheduled tasks, reminders, briefings, agent summary, supervisor firing) | ✅ DONE |
+| P22 | Operator Model & Adaptive Response (echo engine, nudge escalation, cross-mode bridge, impact oracle, shadow branches) | ✅ DONE |
 | P6 | Nice-to-have (calendar sync, workspace manager, avatar, Prometheus) | Queued |
 | HP1-HP6 | Hardware Performance Track (speculative decoding, VRAM watchdog, NVMe offload) | Awaiting GPU |
 
@@ -354,4 +358,5 @@ Full details in `docs/PROJECT_BACKLOG.md` and `docs/unfair_advantages.md`.
 - [x] 8 dashboard views (Chat, Dashboard, Thinking, Settings, Goals, Memory, Logs, Soul)
 - [x] HMAC auth, Ed25519 signing, episode saver, error budget breaker
 - [x] Proactive agent loop (action registry, scheduled tasks, reminders, morning/evening briefings, agent summary)
-- [x] 56 test targets, 843 tests, zero failures
+- [x] Operator model (echo-response engine, nudge escalation ladder, cross-mode insight bridge, impact oracle, shadow branches)
+- [x] 57 test targets, 960 tests, zero failures

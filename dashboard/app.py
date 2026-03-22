@@ -1056,6 +1056,85 @@ async def proxy_agent_summary():
         return resp.json()
 
 
+# ── P22 Operator Model proxies ──────────────────────────────────────
+
+@app.post("/api/echo/analyse")
+async def proxy_echo_analyse(body: Dict[str, Any] = Body(...)):
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/echo/analyse", json=body)
+        return resp.json()
+
+
+@app.get("/api/echo/history")
+async def proxy_echo_history():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/echo/history")
+        return resp.json()
+
+
+@app.post("/api/nudge/escalate")
+async def proxy_nudge_escalate(body: Dict[str, Any] = Body(...)):
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/nudge/escalate", json=body)
+        return resp.json()
+
+
+@app.get("/api/nudge/ladder")
+async def proxy_nudge_ladder():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/nudge/ladder")
+        return resp.json()
+
+
+@app.post("/api/cross-mode/scan")
+async def proxy_cross_mode_scan(body: Dict[str, Any] = Body(...)):
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/cross-mode/scan", json=body)
+        return resp.json()
+
+
+@app.get("/api/cross-mode")
+async def proxy_cross_mode():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/cross-mode")
+        return resp.json()
+
+
+@app.post("/api/oracle/predict")
+async def proxy_oracle_predict(body: Dict[str, Any] = Body(...)):
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/oracle/predict", json=body)
+        return resp.json()
+
+
+@app.get("/api/oracle/chains")
+async def proxy_oracle_chains():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/oracle/chains")
+        return resp.json()
+
+
+@app.post("/api/shadow/branch")
+async def proxy_shadow_branch(body: Dict[str, Any] = Body(...)):
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(f"{MEMU_URL}/memory/shadow/branch", json=body)
+        return resp.json()
+
+
+@app.get("/api/shadow/branches")
+async def proxy_shadow_branches():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/shadow/branches")
+        return resp.json()
+
+
+@app.get("/api/operator-model")
+async def proxy_operator_model():
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(f"{MEMU_URL}/memory/operator-model")
+        return resp.json()
+
+
 # ── Unified App Shell ────────────────────────────────────────────────
 
 @app.get("/app")

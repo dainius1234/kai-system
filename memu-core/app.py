@@ -5614,6 +5614,643 @@ async def agent_summary() -> Dict[str, Any]:
     }
 
 
+# ═══════════════════════════════════════════════════════════════════════
+# P22: OPERATOR MODEL & ADAPTIVE RESPONSE
+#  Kai doesn't just remember you — it MODELS you. Emotional continuity,
+#  nudge escalation, cross-mode learning, impact prediction, shadow branches.
+#  Inspired by 2026 research: Echo Agents, Fractal Context, Shadow Agents.
+# ═══════════════════════════════════════════════════════════════════════
+
+# ── P22a: Echo-Response Engine ──────────────────────────────────────
+# Mirror operator's emotion back with context. "You're frustrated AGAIN
+# — like when we talked about VAT last week." Emotional continuity.
+
+_echo_history: Deque[Dict[str, Any]] = deque(maxlen=100)
+
+
+@app.post("/memory/echo/analyse")
+async def echo_analyse(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
+    """P22a: Analyse current message for emotional echo opportunities.
+
+    Looks at the emotional timeline, finds past moments with the SAME
+    emotion, and generates a bridge message. This is what makes Kai say
+    "I notice you're frustrated AGAIN — last time was about X."
+    """
+    text = sanitize_string(body.get("text", ""))
+    session_id = sanitize_string(body.get("session_id", "default"))
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+
+    # detect current emotion
+    current_emotion, intensity = _detect_emotion(text)
+
+    # find past moments with the same emotion
+    past_matches = [
+        e for e in _emotional_timeline
+        if e.get("emotion") == current_emotion
+        and e.get("session_id") != session_id
+        and (time.time() - e.get("timestamp", 0)) > 3600  # at least 1h ago
+    ]
+
+    # build echo response
+    echo: Optional[str] = None
+    bridge_memory: Optional[Dict[str, Any]] = None
+    echo_type = "none"
+
+    if past_matches and intensity >= 0.3:
+        # find the most recent relevant past match
+        past_matches.sort(key=lambda x: x.get("timestamp", 0), reverse=True)
+        bridge_memory = past_matches[0]
+        past_trigger = bridge_memory.get("trigger_msg", "something")[:80]
+        hours_ago = (time.time() - bridge_memory.get("timestamp", 0)) / 3600
+        time_desc = f"{int(hours_ago)}h ago" if hours_ago < 24 else f"{int(hours_ago / 24)}d ago"
+
+        if intensity >= 0.6:
+            echo = (f"I can feel you're {current_emotion} again — "
+                    f"reminds me of {time_desc} when '{past_trigger}' came up. "
+                    f"Different situation, same energy. Want to talk about what's underneath?")
+            echo_type = "deep_bridge"
+        elif intensity >= 0.4:
+            echo = (f"Getting a {current_emotion} vibe — similar to {time_desc} "
+                    f"around '{past_trigger}'. Shall I approach this differently?")
+            echo_type = "gentle_bridge"
+        else:
+            echo = (f"Noticing some {current_emotion} energy. "
+                    f"Let me know if you want me to adjust my approach.")
+            echo_type = "soft_mirror"
+
+    # record the echo event
+    entry = {
+        "timestamp": time.time(),
+        "session_id": session_id,
+        "emotion": current_emotion,
+        "intensity": round(intensity, 2),
+        "echo_type": echo_type,
+        "echo_message": echo,
+        "bridge_to": bridge_memory.get("trigger_msg", "")[:80] if bridge_memory else None,
+    }
+    _echo_history.append(entry)
+
+    return {
+        "status": "ok",
+        "current_emotion": current_emotion,
+        "intensity": round(intensity, 2),
+        "echo_type": echo_type,
+        "echo_message": echo,
+        "bridge_memory": {
+            "trigger": bridge_memory.get("trigger_msg", "")[:80],
+            "emotion": bridge_memory.get("emotion"),
+            "when": bridge_memory.get("timestamp"),
+        } if bridge_memory else None,
+        "past_matches_count": len(past_matches),
+    }
+
+
+@app.get("/memory/echo/history")
+async def echo_history(limit: int = Query(default=20, le=100)) -> Dict[str, Any]:
+    """P22a: Echo event history — when did Kai mirror emotions?"""
+    entries = list(_echo_history)[-limit:]
+    entries.reverse()
+    return {
+        "status": "ok",
+        "count": len(entries),
+        "total": len(_echo_history),
+        "entries": entries,
+    }
+
+
+# ── P22b: Nudge Escalation Ladder ──────────────────────────────────
+# Not all nudges should be gentle. After 3 ignores → firm. After 5 →
+# tough love. After 7 → intervention. Tracks per-goal, per-type.
+
+_ESCALATION_TIERS = [
+    {"level": 1, "name": "gentle", "threshold": 0, "tone": "supportive and encouraging"},
+    {"level": 2, "name": "firm", "threshold": 3, "tone": "direct and clear"},
+    {"level": 3, "name": "tough_love", "threshold": 5, "tone": "blunt and challenging"},
+    {"level": 4, "name": "intervention", "threshold": 7, "tone": "urgent and confrontational"},
+]
+
+_nudge_ladder: Dict[str, Dict[str, Any]] = {}  # keyed by goal_id or nudge_type
+_MAX_LADDER_ENTRIES = 200
+
+
+@app.post("/memory/nudge/escalate")
+async def nudge_escalate(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
+    """P22b: Record a nudge dismissal and escalate if threshold reached.
+
+    Tracks dismissals per target (goal_id or nudge_type). Returns the
+    current escalation tier and a tone-adjusted message.
+    """
+    target = sanitize_string(body.get("target", "general"))
+    reason = sanitize_string(body.get("reason", ""))[:200]
+    original_message = sanitize_string(body.get("message", ""))[:300]
+
+    if target not in _nudge_ladder:
+        if len(_nudge_ladder) >= _MAX_LADDER_ENTRIES:
+            oldest = min(_nudge_ladder, key=lambda k: _nudge_ladder[k].get("last_dismissed", 0))
+            del _nudge_ladder[oldest]
+        _nudge_ladder[target] = {
+            "target": target,
+            "dismissals": 0,
+            "last_dismissed": 0,
+            "escalation_level": 1,
+            "history": [],
+        }
+
+    state = _nudge_ladder[target]
+    state["dismissals"] += 1
+    state["last_dismissed"] = time.time()
+    state["history"].append({
+        "timestamp": time.time(),
+        "reason": reason,
+    })
+    # cap history
+    if len(state["history"]) > 20:
+        state["history"] = state["history"][-20:]
+
+    # determine new escalation level
+    dismiss_count = state["dismissals"]
+    current_tier = _ESCALATION_TIERS[0]
+    for tier in _ESCALATION_TIERS:
+        if dismiss_count >= tier["threshold"]:
+            current_tier = tier
+
+    state["escalation_level"] = current_tier["level"]
+
+    # generate escalated message
+    escalated_msg = None
+    if original_message:
+        if current_tier["level"] == 1:
+            escalated_msg = f"Just a gentle reminder: {original_message}"
+        elif current_tier["level"] == 2:
+            escalated_msg = f"I've mentioned this {dismiss_count} times now. {original_message} — this matters."
+        elif current_tier["level"] == 3:
+            escalated_msg = (f"Brother, I've nudged you {dismiss_count} times about this. "
+                             f"{original_message} — stop dodging it.")
+        elif current_tier["level"] == 4:
+            escalated_msg = (f"INTERVENTION: {dismiss_count} nudges ignored. "
+                             f"{original_message} — this is hurting your goals. We need to talk about this NOW.")
+
+    return {
+        "status": "ok",
+        "target": target,
+        "dismissals": dismiss_count,
+        "escalation_level": current_tier["level"],
+        "escalation_name": current_tier["name"],
+        "tone": current_tier["tone"],
+        "escalated_message": escalated_msg,
+    }
+
+
+@app.get("/memory/nudge/ladder")
+async def nudge_ladder() -> Dict[str, Any]:
+    """P22b: Current escalation state for all tracked nudge targets."""
+    entries = []
+    for target, state in _nudge_ladder.items():
+        current_tier = _ESCALATION_TIERS[0]
+        for tier in _ESCALATION_TIERS:
+            if state["dismissals"] >= tier["threshold"]:
+                current_tier = tier
+        entries.append({
+            "target": target,
+            "dismissals": state["dismissals"],
+            "level": current_tier["level"],
+            "name": current_tier["name"],
+            "tone": current_tier["tone"],
+            "last_dismissed": state["last_dismissed"],
+        })
+    entries.sort(key=lambda x: x["dismissals"], reverse=True)
+    return {
+        "status": "ok",
+        "count": len(entries),
+        "tiers": _ESCALATION_TIERS,
+        "targets": entries,
+    }
+
+
+# ── P22c: Cross-Mode Insight Bridge ────────────────────────────────
+# PUB mode insights should inform WORK mode and vice versa. Tag memories
+# by mode, surface cross-mode insights when relevant.
+
+_cross_mode_insights: Deque[Dict[str, Any]] = deque(maxlen=100)
+
+
+@app.post("/memory/cross-mode/scan")
+async def cross_mode_scan(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
+    """P22c: Scan for cross-mode insights. Given a query in one mode,
+    find relevant memories from the OTHER mode.
+
+    Example: In WORK mode, query about stress → find PUB mode conversations
+    where operator casually mentioned stress causes.
+    """
+    query = sanitize_string(body.get("query", ""))
+    current_mode = sanitize_string(body.get("mode", "WORK")).upper()
+    if current_mode not in ("PUB", "WORK"):
+        current_mode = "WORK"
+    if not query:
+        raise HTTPException(status_code=400, detail="query is required")
+
+    opposite_mode = "PUB" if current_mode == "WORK" else "WORK"
+
+    # search all memories for relevant content
+    try:
+        all_records = store.search(top_k=10_000)
+    except Exception:
+        all_records = []
+
+    # filter by opposite mode tag or infer from content patterns
+    cross_insights = []
+    query_lower = query.lower()
+    query_words = set(query_lower.split())
+
+    for r in all_records:
+        content = r.content if isinstance(r.content, str) else str(r.content)
+        content_lower = content.lower()
+
+        # check if memory is tagged with opposite mode
+        mem_mode = ""
+        if isinstance(r.content, dict):
+            mem_mode = r.content.get("mode", "")
+
+        # also infer mode from content patterns
+        is_pub = any(w in content_lower for w in ["pub", "casual", "mate", "beer", "laugh", "girl", "fun"])
+        is_work = any(w in content_lower for w in ["work", "site", "invoice", "client", "project", "deadline"])
+
+        # check if this memory is from the opposite mode
+        from_opposite = False
+        if mem_mode.upper() == opposite_mode:
+            from_opposite = True
+        elif opposite_mode == "PUB" and is_pub and not is_work:
+            from_opposite = True
+        elif opposite_mode == "WORK" and is_work and not is_pub:
+            from_opposite = True
+
+        if not from_opposite:
+            continue
+
+        # check relevance to query (simple overlap)
+        content_words = set(content_lower.split())
+        overlap = query_words & content_words
+        if len(overlap) >= 2 or any(w in content_lower for w in query_words if len(w) > 4):
+            cross_insights.append({
+                "content": content[:200],
+                "source_mode": opposite_mode,
+                "relevance_words": list(overlap)[:5],
+                "timestamp": getattr(r, "timestamp", 0),
+                "category": getattr(r, "category", "general"),
+            })
+
+    # sort by relevance (more overlapping words = more relevant)
+    cross_insights.sort(key=lambda x: len(x["relevance_words"]), reverse=True)
+    cross_insights = cross_insights[:5]
+
+    # generate bridge message
+    bridge_message = None
+    if cross_insights:
+        top = cross_insights[0]
+        bridge_message = (
+            f"From your {opposite_mode} conversations: '{top['content'][:100]}' "
+            f"— this might be relevant to what you're asking in {current_mode} mode."
+        )
+
+    # record the insight
+    if cross_insights:
+        _cross_mode_insights.append({
+            "timestamp": time.time(),
+            "query": query[:100],
+            "current_mode": current_mode,
+            "insights_found": len(cross_insights),
+            "bridge_message": bridge_message,
+        })
+
+    return {
+        "status": "ok",
+        "current_mode": current_mode,
+        "opposite_mode": opposite_mode,
+        "insights": cross_insights,
+        "bridge_message": bridge_message,
+        "insights_count": len(cross_insights),
+    }
+
+
+@app.get("/memory/cross-mode")
+async def cross_mode_history(limit: int = Query(default=20, le=100)) -> Dict[str, Any]:
+    """P22c: History of cross-mode insight discoveries."""
+    entries = list(_cross_mode_insights)[-limit:]
+    entries.reverse()
+    return {
+        "status": "ok",
+        "count": len(entries),
+        "total": len(_cross_mode_insights),
+        "entries": entries,
+    }
+
+
+# ── P22d: Impact Oracle ────────────────────────────────────────────
+# Predict consequences of actions on goals and emotions. "If you skip
+# Goal X, Goal Y suffers." Causal chain reasoning.
+
+_oracle_predictions: Deque[Dict[str, Any]] = deque(maxlen=100)
+
+
+@app.post("/memory/oracle/predict")
+async def oracle_predict(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
+    """P22d: Given a proposed action, predict its impact on goals and
+    emotional state. Returns causal chains and risk assessment.
+
+    Example: "skip gym this week" → impact on health goal, energy levels,
+    mood trajectory.
+    """
+    action = sanitize_string(body.get("action", ""))
+    if not action:
+        raise HTTPException(status_code=400, detail="action is required")
+
+    action_lower = action.lower()
+
+    # fetch active goals
+    try:
+        all_records = store.search(top_k=10_000)
+    except Exception:
+        all_records = []
+
+    active_goals = [
+        r for r in all_records
+        if getattr(r, "event_type", None) == "goal"
+        and (r.content.get("status", "active") == "active" if isinstance(r.content, dict) else False)
+    ]
+
+    # analyse which goals are affected
+    chains = []
+    action_words = set(action_lower.split())
+
+    for g in active_goals:
+        goal_data = g.content if isinstance(g.content, dict) else {}
+        title = goal_data.get("title", "untitled").lower()
+        title_words = set(title.split())
+
+        # check if action relates to this goal
+        overlap = action_words & title_words
+        related = len(overlap) >= 1 or any(w in title for w in action_words if len(w) > 3)
+
+        if not related:
+            continue
+
+        progress = goal_data.get("progress", 0)
+        priority = goal_data.get("priority", "medium")
+        deadline = goal_data.get("deadline", "none")
+
+        # simple impact analysis
+        is_skip = any(w in action_lower for w in ["skip", "miss", "ignore", "postpone", "delay", "cancel"])
+        is_advance = any(w in action_lower for w in ["do", "complete", "finish", "start", "begin", "work on"])
+
+        impact_direction = "negative" if is_skip else "positive" if is_advance else "neutral"
+        risk_level = "high" if priority == "high" and is_skip else "medium" if is_skip else "low"
+
+        chain = {
+            "goal": goal_data.get("title", "untitled"),
+            "current_progress": progress,
+            "priority": priority,
+            "deadline": deadline,
+            "impact_direction": impact_direction,
+            "risk_level": risk_level,
+        }
+
+        if impact_direction == "negative":
+            chain["consequence"] = (
+                f"Skipping this could stall '{goal_data.get('title', '')}' at {progress}%. "
+                f"Priority: {priority}. "
+                + (f"Deadline: {deadline}. " if deadline != "none" else "")
+                + "This will compound if repeated."
+            )
+        elif impact_direction == "positive":
+            chain["consequence"] = (
+                f"This advances '{goal_data.get('title', '')}' (currently {progress}%). "
+                f"Good move — keep the momentum."
+            )
+        else:
+            chain["consequence"] = f"Uncertain impact on '{goal_data.get('title', '')}'."
+
+        chains.append(chain)
+
+    # emotional impact prediction based on recent emotional arc
+    recent_emotions = _emotional_timeline[-10:]
+    emotion_prediction = "stable"
+    if recent_emotions:
+        recent_moods = [e.get("emotion", "neutral") for e in recent_emotions]
+        neg_count = sum(1 for m in recent_moods if m in ("frustrated", "stressed", "sad"))
+        if neg_count > len(recent_moods) * 0.5:
+            emotion_prediction = "declining — already stressed, this could make it worse"
+        elif neg_count > len(recent_moods) * 0.3:
+            emotion_prediction = "fragile — handle with care"
+        else:
+            emotion_prediction = "stable — operator is in a good place"
+
+    # build summary
+    neg_impacts = [c for c in chains if c["impact_direction"] == "negative"]
+    pos_impacts = [c for c in chains if c["impact_direction"] == "positive"]
+    overall_risk = "high" if any(c["risk_level"] == "high" for c in neg_impacts) else \
+                   "medium" if neg_impacts else "low"
+
+    prediction = {
+        "timestamp": time.time(),
+        "action": action[:200],
+        "chains": chains,
+        "emotional_forecast": emotion_prediction,
+        "overall_risk": overall_risk,
+        "goals_affected": len(chains),
+        "negative_impacts": len(neg_impacts),
+        "positive_impacts": len(pos_impacts),
+    }
+    _oracle_predictions.append(prediction)
+
+    return {
+        "status": "ok",
+        **prediction,
+    }
+
+
+@app.get("/memory/oracle/chains")
+async def oracle_chains(limit: int = Query(default=20, le=100)) -> Dict[str, Any]:
+    """P22d: History of impact predictions."""
+    entries = list(_oracle_predictions)[-limit:]
+    entries.reverse()
+    return {
+        "status": "ok",
+        "count": len(entries),
+        "total": len(_oracle_predictions),
+        "predictions": entries,
+    }
+
+
+# ── P22e: Shadow Memory Branches ───────────────────────────────────
+# Persistent what-if branches from counterfactuals. Queryable alternate
+# timelines. "What would have happened if I'd said yes?"
+
+_shadow_branches: Deque[Dict[str, Any]] = deque(maxlen=100)
+
+
+@app.post("/memory/shadow/branch")
+async def shadow_branch(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
+    """P22e: Create a shadow branch — an alternate timeline from a past
+    decision. Persists as a queryable entry.
+
+    Takes a decision point and generates an alternate path based on
+    existing memories, counterfactuals, and goal state.
+    """
+    decision = sanitize_string(body.get("decision", ""))
+    alternative = sanitize_string(body.get("alternative", ""))
+    if not decision:
+        raise HTTPException(status_code=400, detail="decision is required")
+    if not alternative:
+        raise HTTPException(status_code=400, detail="alternative is required")
+
+    # gather context for the alternate timeline
+    try:
+        all_records = store.search(top_k=10_000)
+    except Exception:
+        all_records = []
+
+    decision_lower = decision.lower()
+
+    # find related memories
+    related_mems = []
+    for r in all_records:
+        content = r.content if isinstance(r.content, str) else str(r.content)
+        if any(w in content.lower() for w in decision_lower.split() if len(w) > 3):
+            related_mems.append(content[:100])
+
+    # find existing counterfactuals on this topic
+    from collections import deque as _deque_type
+    existing_counterfactuals = []
+    if hasattr(app.state, "_counterfactual_log"):
+        for cf in getattr(app.state, "_counterfactual_log", []):
+            if any(w in str(cf).lower() for w in decision_lower.split() if len(w) > 3):
+                existing_counterfactuals.append(cf)
+
+    # check goal impact
+    active_goals = [
+        r for r in all_records
+        if getattr(r, "event_type", None) == "goal"
+        and (r.content.get("status", "active") == "active" if isinstance(r.content, dict) else False)
+    ]
+
+    affected_goals = []
+    for g in active_goals:
+        title = g.content.get("title", "") if isinstance(g.content, dict) else ""
+        if any(w in title.lower() for w in decision_lower.split() if len(w) > 3):
+            affected_goals.append(title)
+
+    # build the shadow branch
+    branch_id = hashlib.sha256(f"{decision}{alternative}{time.time()}".encode()).hexdigest()[:12]
+    branch = {
+        "branch_id": branch_id,
+        "timestamp": time.time(),
+        "decision_point": decision[:300],
+        "alternative_chosen": alternative[:300],
+        "related_memories": related_mems[:5],
+        "affected_goals": affected_goals[:5],
+        "existing_counterfactuals": len(existing_counterfactuals),
+        "timeline": {
+            "original": f"You chose: {decision[:100]}",
+            "shadow": f"What if instead: {alternative[:100]}",
+            "projected_difference": (
+                f"With {len(affected_goals)} goals potentially affected "
+                f"and {len(related_mems)} related memories, this alternate path "
+                f"would have changed your trajectory."
+                if affected_goals or related_mems
+                else "Limited data to project alternate timeline."
+            ),
+        },
+        "queryable": True,
+    }
+
+    _shadow_branches.append(branch)
+
+    return {"status": "ok", **branch}
+
+
+@app.get("/memory/shadow/branches")
+async def shadow_branches_list(limit: int = Query(default=20, le=100)) -> Dict[str, Any]:
+    """P22e: List all shadow branches (alternate timelines)."""
+    entries = list(_shadow_branches)[-limit:]
+    entries.reverse()
+    return {
+        "status": "ok",
+        "count": len(entries),
+        "total": len(_shadow_branches),
+        "branches": entries,
+    }
+
+
+@app.get("/memory/shadow/explore/{branch_id}")
+async def shadow_explore(branch_id: str) -> Dict[str, Any]:
+    """P22e: Explore a specific shadow branch's details."""
+    bid = sanitize_string(branch_id)
+    for b in _shadow_branches:
+        if b.get("branch_id") == bid:
+            return {"status": "ok", "branch": b}
+    raise HTTPException(status_code=404, detail="branch not found")
+
+
+# ── P22 Operator Model Summary ─────────────────────────────────────
+
+@app.get("/memory/operator-model")
+async def operator_model_summary() -> Dict[str, Any]:
+    """P22: Unified operator model — how well does Kai understand you?"""
+    # echo state
+    recent_echoes = list(_echo_history)[-5:]
+    echo_emotions = [e.get("emotion") for e in recent_echoes if e.get("echo_type") != "none"]
+
+    # escalation state
+    escalated_targets = [
+        {"target": t, "level": s["escalation_level"], "dismissals": s["dismissals"]}
+        for t, s in _nudge_ladder.items()
+        if s["escalation_level"] > 1
+    ]
+
+    # cross-mode insights
+    recent_cross = list(_cross_mode_insights)[-3:]
+
+    # oracle predictions
+    recent_oracle = list(_oracle_predictions)[-3:]
+    high_risk = sum(1 for p in _oracle_predictions if p.get("overall_risk") == "high")
+
+    # shadow branches
+    branch_count = len(_shadow_branches)
+
+    return {
+        "status": "ok",
+        "echo_state": {
+            "recent_emotions_mirrored": echo_emotions,
+            "total_echoes": len(_echo_history),
+            "deep_bridges": sum(1 for e in _echo_history if e.get("echo_type") == "deep_bridge"),
+        },
+        "escalation_state": {
+            "escalated_targets": escalated_targets,
+            "max_level": max((s["escalation_level"] for s in _nudge_ladder.values()), default=1),
+        },
+        "cross_mode": {
+            "insights_found": len(_cross_mode_insights),
+            "recent_bridges": len(recent_cross),
+        },
+        "oracle": {
+            "predictions_made": len(_oracle_predictions),
+            "high_risk_count": high_risk,
+        },
+        "shadow_branches": {
+            "total": branch_count,
+            "queryable": branch_count,
+        },
+        "model_completeness": min(100, int(
+            (len(_echo_history) > 0) * 20 +
+            (len(_nudge_ladder) > 0) * 20 +
+            (len(_cross_mode_insights) > 0) * 20 +
+            (len(_oracle_predictions) > 0) * 20 +
+            (branch_count > 0) * 20
+        )),
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
 

@@ -205,6 +205,8 @@ async def _proactive_check() -> None:
         "check_in": "💚",
         "scheduled_task": "📅",
         "briefing": "📰",
+        "escalation": "📢",
+        "echo": "🪞",
     }
     for nudge in to_send[:5]:
         ntype = nudge.get("type", "reminder")
@@ -309,6 +311,30 @@ async def _fire_due_items() -> None:
         logger.debug("fire_due_items: memu-core unreachable")
 
 
+async def _check_escalations() -> None:
+    """P22: Check nudge escalation ladder and send escalated nudges via Telegram."""
+    memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(f"{memu_url}/memory/nudge/ladder")
+            if resp.status_code == 200:
+                targets = resp.json().get("targets", [])
+                for t in targets[:3]:
+                    if t.get("level", 1) >= 3:  # tough love or intervention
+                        icon = "🚨" if t["level"] >= 4 else "📢"
+                        try:
+                            await client.post(
+                                TELEGRAM_ALERT_URL,
+                                json={"text": f"{icon} *Escalated nudge:* {t['target']} "
+                                              f"({t.get('name', '?')}, {t.get('dismissals', 0)}x ignored)"},
+                            )
+                            logger.info("Escalated nudge sent: %s level=%d", t["target"], t["level"])
+                        except Exception:
+                            pass
+    except Exception:
+        logger.debug("check_escalations: memu-core unreachable")
+
+
 async def _background_loop() -> None:
     """Runs forever in the background, sweeping at CHECK_INTERVAL."""
     while True:
@@ -324,6 +350,10 @@ async def _background_loop() -> None:
             await _fire_due_items()
         except Exception:
             logger.exception("Fire due items failed")
+        try:
+            await _check_escalations()
+        except Exception:
+            logger.exception("Escalation check failed")
         try:
             await _greeting_check()
         except Exception:

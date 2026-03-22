@@ -387,6 +387,47 @@
               </div>
             </div>
 
+            <!-- P22: Operator Model -->
+            <div class="card" style="margin-top:var(--sp-4);border-left:3px solid var(--success);">
+              <div class="card-title"><span class="icon">🧠</span> Operator Model</div>
+              <div id="operatorModelContent"><div class="empty">Loading...</div></div>
+            </div>
+
+            <!-- P22: Echo History -->
+            <div class="card" style="margin-top:var(--sp-4);border-left:3px solid #e74c3c;">
+              <div class="card-title"><span class="icon">🪞</span> Emotional Echoes</div>
+              <div id="echoHistoryContent"><div class="empty">No echoes yet</div></div>
+            </div>
+
+            <!-- P22: Nudge Escalation -->
+            <div class="card" style="margin-top:var(--sp-4);border-left:3px solid var(--warn);">
+              <div class="card-title"><span class="icon">📢</span> Nudge Escalation Ladder</div>
+              <div id="nudgeLadderContent"><div class="empty">All nudges at gentle level</div></div>
+            </div>
+
+            <!-- P22: Impact Oracle -->
+            <div class="card" style="margin-top:var(--sp-4);border-left:3px solid #9b59b6;">
+              <div class="card-title"><span class="icon">🔮</span> Impact Oracle</div>
+              <div id="oracleContent"><div class="empty">No predictions yet</div></div>
+              <div style="margin-top:var(--sp-3);display:flex;gap:var(--sp-2);">
+                <input type="text" id="oracleAction" placeholder="What are you thinking of doing?" class="input" style="flex:1;">
+                <button class="refresh-btn" onclick="predictImpact()">🔮 Predict</button>
+              </div>
+            </div>
+
+            <!-- P22: Shadow Branches -->
+            <div class="card" style="margin-top:var(--sp-4);border-left:3px solid #1abc9c;">
+              <div class="card-title"><span class="icon">🌿</span> Shadow Branches</div>
+              <div id="shadowContent"><div class="empty">No alternate timelines yet</div></div>
+              <div style="margin-top:var(--sp-3);">
+                <input type="text" id="shadowDecision" placeholder="What decision?" class="input" style="width:100%;margin-bottom:var(--sp-2);">
+                <div style="display:flex;gap:var(--sp-2);">
+                  <input type="text" id="shadowAlternative" placeholder="What if instead...?" class="input" style="flex:1;">
+                  <button class="refresh-btn" onclick="createShadowBranch()">🌿 Branch</button>
+                </div>
+              </div>
+            </div>
+
             <!-- Feedback Stats -->
             <div class="card" style="margin-top:var(--sp-4);">
               <div class="card-title"><span class="icon">📊</span> Feedback Summary</div>
@@ -828,6 +869,7 @@ function switchView(name) {
   if (name === 'goals') {
     refreshGoals();
     refreshP21();
+    refreshP22();
   }
   if (name === 'memory') {
     refreshMemoryStats();
@@ -2187,6 +2229,136 @@ function refreshP21() {
   refreshReminders();
   refreshScheduled();
   refreshAgentSummary();
+}
+
+// ── P22: Operator Model & Adaptive Response ─────────────────────
+
+async function refreshOperatorModel() {
+  try {
+    const resp = await fetch('/api/operator-model');
+    const data = await resp.json();
+    const c = document.getElementById('operatorModelContent');
+    const echo = data.echo_state || {};
+    const esc = data.escalation_state || {};
+    const cross = data.cross_mode || {};
+    const oracle = data.oracle || {};
+    const shadow = data.shadow_branches || {};
+    c.innerHTML = `
+      <div style="display:flex;gap:var(--sp-6);flex-wrap:wrap;">
+        <div><div style="font-size:11px;color:var(--text3);">Model Complete</div><div style="font-size:22px;font-weight:700;color:var(--success);">${data.model_completeness || 0}%</div></div>
+        <div><div style="font-size:11px;color:var(--text3);">Echoes</div><div style="font-size:22px;font-weight:700;">${echo.total_echoes || 0}</div></div>
+        <div><div style="font-size:11px;color:var(--text3);">Deep Bridges</div><div style="font-size:22px;font-weight:700;color:#e74c3c;">${echo.deep_bridges || 0}</div></div>
+        <div><div style="font-size:11px;color:var(--text3);">Max Escalation</div><div style="font-size:22px;font-weight:700;color:var(--warn);">${esc.max_level || 1}/4</div></div>
+        <div><div style="font-size:11px;color:var(--text3);">Cross-Mode</div><div style="font-size:22px;font-weight:700;">${cross.insights_found || 0}</div></div>
+        <div><div style="font-size:11px;color:var(--text3);">Predictions</div><div style="font-size:22px;font-weight:700;color:#9b59b6;">${oracle.predictions_made || 0}</div></div>
+        <div><div style="font-size:11px;color:var(--text3);">Shadows</div><div style="font-size:22px;font-weight:700;color:#1abc9c;">${shadow.total || 0}</div></div>
+      </div>`;
+  } catch { document.getElementById('operatorModelContent').innerHTML = '<div class="empty">Operator model unavailable</div>'; }
+}
+
+async function refreshEchoHistory() {
+  try {
+    const resp = await fetch('/api/echo/history');
+    const data = await resp.json();
+    const c = document.getElementById('echoHistoryContent');
+    const entries = data.entries || [];
+    if (!entries.length) { c.innerHTML = '<div class="empty">No emotional echoes yet</div>'; return; }
+    c.innerHTML = entries.slice(0, 5).map(e =>
+      `<div style="padding:var(--sp-2) 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <span style="color:${e.echo_type === 'deep_bridge' ? '#e74c3c' : e.echo_type === 'gentle_bridge' ? 'var(--warn)' : 'var(--text3)'};">
+          ${e.echo_type === 'deep_bridge' ? '🔴' : e.echo_type === 'gentle_bridge' ? '🟡' : '⚪'} ${e.emotion || 'neutral'}
+        </span>
+        <span style="color:var(--text3);margin-left:var(--sp-2);">${e.echo_type}</span>
+        ${e.echo_message ? `<div style="color:var(--text2);margin-top:2px;font-size:12px;">${e.echo_message.substring(0, 120)}</div>` : ''}
+      </div>`
+    ).join('');
+  } catch { document.getElementById('echoHistoryContent').innerHTML = '<div class="empty">Echo history unavailable</div>'; }
+}
+
+async function refreshNudgeLadder() {
+  try {
+    const resp = await fetch('/api/nudge/ladder');
+    const data = await resp.json();
+    const c = document.getElementById('nudgeLadderContent');
+    const targets = data.targets || [];
+    if (!targets.length) { c.innerHTML = '<div class="empty">All nudges at gentle level</div>'; return; }
+    c.innerHTML = targets.slice(0, 5).map(t =>
+      `<div style="padding:var(--sp-2) 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+        <span>${t.target}</span>
+        <span style="background:${t.level >= 4 ? '#e74c3c' : t.level >= 3 ? 'var(--warn)' : t.level >= 2 ? '#f39c12' : 'var(--success)'};color:white;padding:2px 8px;border-radius:4px;font-size:11px;">${t.name} (${t.dismissals}x)</span>
+      </div>`
+    ).join('');
+  } catch { document.getElementById('nudgeLadderContent').innerHTML = '<div class="empty">Ladder unavailable</div>'; }
+}
+
+async function refreshOracleChains() {
+  try {
+    const resp = await fetch('/api/oracle/chains');
+    const data = await resp.json();
+    const c = document.getElementById('oracleContent');
+    const preds = data.predictions || [];
+    if (!preds.length) { c.innerHTML = '<div class="empty">No predictions yet — try predicting an action below</div>'; return; }
+    c.innerHTML = preds.slice(0, 3).map(p =>
+      `<div style="padding:var(--sp-2) 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <div style="font-weight:600;">${p.action || '?'}</div>
+        <div style="display:flex;gap:var(--sp-4);margin-top:2px;">
+          <span style="color:${p.overall_risk === 'high' ? '#e74c3c' : p.overall_risk === 'medium' ? 'var(--warn)' : 'var(--success)'};">Risk: ${p.overall_risk}</span>
+          <span>Goals affected: ${p.goals_affected || 0}</span>
+          <span style="color:var(--text3);">${p.emotional_forecast || 'stable'}</span>
+        </div>
+      </div>`
+    ).join('');
+  } catch { document.getElementById('oracleContent').innerHTML = '<div class="empty">Oracle unavailable</div>'; }
+}
+
+async function predictImpact() {
+  const action = document.getElementById('oracleAction').value.trim();
+  if (!action) return;
+  try {
+    const resp = await fetch('/api/oracle/predict', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action})});
+    const data = await resp.json();
+    showToast('Oracle', `Risk: ${data.overall_risk} — ${data.goals_affected} goals affected`, data.overall_risk === 'high' ? 'error' : 'success');
+    document.getElementById('oracleAction').value = '';
+    refreshOracleChains();
+  } catch { showToast('Oracle', 'Prediction failed', 'error'); }
+}
+
+async function refreshShadowBranches() {
+  try {
+    const resp = await fetch('/api/shadow/branches');
+    const data = await resp.json();
+    const c = document.getElementById('shadowContent');
+    const branches = data.branches || [];
+    if (!branches.length) { c.innerHTML = '<div class="empty">No alternate timelines — create one below</div>'; return; }
+    c.innerHTML = branches.slice(0, 5).map(b =>
+      `<div style="padding:var(--sp-2) 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <div style="font-weight:600;color:#1abc9c;">🌿 ${b.decision_point ? b.decision_point.substring(0, 80) : '?'}</div>
+        <div style="color:var(--text2);font-size:12px;">What if: ${b.alternative_chosen ? b.alternative_chosen.substring(0, 80) : '?'}</div>
+        <div style="color:var(--text3);font-size:11px;">Goals affected: ${(b.affected_goals || []).length} | Related memories: ${(b.related_memories || []).length}</div>
+      </div>`
+    ).join('');
+  } catch { document.getElementById('shadowContent').innerHTML = '<div class="empty">Shadow branches unavailable</div>'; }
+}
+
+async function createShadowBranch() {
+  const decision = document.getElementById('shadowDecision').value.trim();
+  const alternative = document.getElementById('shadowAlternative').value.trim();
+  if (!decision || !alternative) return;
+  try {
+    await fetch('/api/shadow/branch', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({decision, alternative})});
+    showToast('Shadow', 'Alternate timeline created', 'success');
+    document.getElementById('shadowDecision').value = '';
+    document.getElementById('shadowAlternative').value = '';
+    refreshShadowBranches();
+  } catch { showToast('Shadow', 'Failed to create branch', 'error'); }
+}
+
+function refreshP22() {
+  refreshOperatorModel();
+  refreshEchoHistory();
+  refreshNudgeLadder();
+  refreshOracleChains();
+  refreshShadowBranches();
 }
 
 

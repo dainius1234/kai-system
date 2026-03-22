@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: P21 Proactive Agent Loop (scheduled tasks, reminders, morning briefing, evening check-in, action registry, agent summary, supervisor firing, 9-way context injection) — **56 targets, 843 tests**
+**Last updated:** 2026-03-22 — session: P22 Operator Model & Adaptive Response (echo engine, nudge escalation, cross-mode bridge, impact oracle, shadow branches, 10-way context injection) — **57 targets, 960 tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 56 (make test-core) |
-| Individual tests | 843 passing, 0 failures |
+| Test targets | 57 (make test-core) |
+| Individual tests | 960 passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -51,6 +51,7 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Imagination engine? | **YES — counterfactual replay, empathetic simulation (theory of mind), creative synthesis, inner monologue, aspirational futures** |
 | Conscience & values? | **YES — emergent value formation, moral reasoning, integrity tracking, loyalty memory, gratitude engine** |
 | Proactive agent? | **YES — scheduled tasks, reminders, morning briefing, evening check-in, action registry, agent summary, supervisor auto-fires** |
+| Operator model? | **YES — echo-response engine, nudge escalation ladder (4-tier), cross-mode insight bridge, impact oracle, shadow memory branches, 10-way LLM context** |
 
 ---
 
@@ -208,7 +209,38 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
       briefing buttons. 9 new JS functions.
 - [x] **93 unit tests** (scripts/test_p21_proactive_agent.py)
 
-### P22 — Financial Awareness
+### P22 — Operator Model & Adaptive Response
+*Inspired by 2026 research (Echo Agents, Fractal Context, Shadow Agents,
+adversarial training, predictive coding). Kai should MODEL you, not just
+REMEMBER you. Cross-referenced with Grok brainstorm 2026-03-22.*
+
+- [x] **P22a Echo-Response Engine** — emotional continuity in replies. Detects
+      frustration from P17 emotion timeline, bridges past struggles ("frustrated
+      AGAIN like when we talked about VAT"). Response intensity modulation.
+      POST /memory/echo/analyse, GET /memory/echo/history.
+- [x] **P22b Nudge Escalation Ladder** — 4-tier escalation (gentle → firm →
+      tough love → intervention). Tracks dismissals per nudge, escalates tone
+      after 3+ ignores. Learns from pushback. POST /memory/nudge/escalate,
+      GET /memory/nudge/ladder.
+- [x] **P22c Cross-Mode Insight Bridge** — tag memories by mode (PUB/WORK).
+      Surface cross-mode insights ("in pub mode you mentioned X, relevant here").
+      GET /memory/cross-mode, POST /memory/cross-mode/scan.
+- [x] **P22d Impact Oracle** — goal-to-goal causal chains. Predicts consequences
+      of actions on goals, emotions, time. "If you skip Goal X, Goal Y suffers."
+      POST /memory/oracle/predict, GET /memory/oracle/chains.
+- [x] **P22e Shadow Memory Branches** — persistent what-if branches from
+      counterfactuals. Queryable alternate timelines. Nightly shadow generation.
+      POST /memory/shadow/branch, GET /memory/shadow/branches,
+      GET /memory/shadow/explore.
+- [x] **LLM context injection** — 10th parallel fetch: operator model context
+      (echo state, escalation level, cross-mode insights, oracle predictions).
+- [x] **Dashboard enhancements** — Operator Model card (echo state, nudge
+      ladder, cross-mode insights, oracle predictions, shadow branches).
+- [x] **Supervisor escalation alerts** — _check_escalations() polls nudge
+      ladder, fires Telegram alerts for level 3+ (tough love, intervention).
+- [x] **117 unit tests** (scripts/test_p22_operator_model.py)
+
+### P29 — Financial Awareness
 *Dainius sleeps in his car saving £50/day. Kai should track this.*
 
 - [ ] **Savings tracker** — POST /memory/finance/log (amount, category, note).
@@ -529,6 +561,38 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
       refreshScheduled, scheduleTask, cancelScheduled, refreshAgentSummary,
       triggerBriefing, refreshP21).
 - [x] 93 unit tests (scripts/test_p21_proactive_agent.py)
+
+### P22 — Operator Model & Adaptive Response (2026-03-22)
+- [x] Echo-Response Engine — emotional continuity. Detects current emotion from
+      P17 timeline, finds past emotional matches, generates bridge messages
+      (3 intensity tiers: deep_bridge ≥0.6, gentle_bridge ≥0.4, soft_mirror).
+      POST /memory/echo/analyse, GET /memory/echo/history. 100-entry cap.
+- [x] Nudge Escalation Ladder — 4-tier escalation (gentle → firm → tough love →
+      intervention). Tracks dismissals per nudge target, escalates after thresholds
+      (3 for firm, 5 for tough love, 7 for intervention). Tier-specific messages.
+      POST /memory/nudge/escalate, GET /memory/nudge/ladder. 200-target cap.
+- [x] Cross-Mode Insight Bridge — finds memories from opposite mode using content
+      pattern inference (pub/work keywords, word overlap relevance scoring).
+      Bridge messages for cross-pollination. POST /memory/cross-mode/scan,
+      GET /memory/cross-mode. 100-entry cap.
+- [x] Impact Oracle — analyzes actions against active goals, detects skip/advance
+      patterns, computes risk levels, emotional forecast from recent timeline.
+      Goal-to-goal causal chain prediction. POST /memory/oracle/predict,
+      GET /memory/oracle/chains. 100-entry cap.
+- [x] Shadow Memory Branches — creates alternate timelines from decision +
+      alternative. Finds related memories and affected goals. Queryable branches.
+      POST /memory/shadow/branch, GET /memory/shadow/branches,
+      GET /memory/shadow/explore/{branch_id}. 100-branch cap.
+- [x] Operator Model Summary — GET /memory/operator-model: unified view of all
+      5 subsystems with model_completeness percentage.
+- [x] LLM context injection — 10th parallel fetch (_get_operator_model). Echo
+      message, escalation tone adjustment, cross-mode insights injected as system message.
+- [x] Dashboard — 5 new cards (Operator Model 🧠, Emotional Echoes 🪞, Nudge
+      Escalation 📢, Impact Oracle 🔮, Shadow Branches 🌿). 11 proxy routes,
+      8 JS functions, wired into goals view.
+- [x] Supervisor — _check_escalations() polls nudge ladder, fires Telegram alerts
+      for level 3+ (🚨 intervention, 📢 tough love). Added to background loop.
+- [x] 117 unit tests (scripts/test_p22_operator_model.py)
 
 ### 2026-02-26
 - Quality hardening session after proof-of-life milestone
