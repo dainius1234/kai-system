@@ -290,18 +290,30 @@ class TestPersistence(unittest.TestCase):
     def setUp(self):
         import kai_config
         self._orig_path = kai_config.EVOLVER_INSIGHT_PATH
-        self._tmpfile = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
-        self._tmpfile.close()
-        kai_config.EVOLVER_INSIGHT_PATH = type(kai_config.EVOLVER_INSIGHT_PATH)(self._tmpfile.name)
-        # Clean the file
-        os.unlink(self._tmpfile.name)
+        self._tmpdir = tempfile.mkdtemp()
+        self._tmppath = os.path.join(self._tmpdir, "evolver_test.json")
+        kai_config.EVOLVER_INSIGHT_PATH = type(kai_config.EVOLVER_INSIGHT_PATH)(self._tmppath)
+        # Also patch the default file to prevent cross-test contamination
+        default = self._orig_path
+        if default.exists():
+            self._default_backup = default.read_bytes()
+            default.unlink()
+        else:
+            self._default_backup = None
 
     def tearDown(self):
         import kai_config
         kai_config.EVOLVER_INSIGHT_PATH = self._orig_path
+        # Restore default file if it existed
+        if self._default_backup is not None:
+            self._orig_path.write_bytes(self._default_backup)
         try:
-            os.unlink(self._tmpfile.name)
+            os.unlink(self._tmppath)
         except FileNotFoundError:
+            pass
+        try:
+            os.rmdir(self._tmpdir)
+        except OSError:
             pass
 
     def test_save_and_load(self):

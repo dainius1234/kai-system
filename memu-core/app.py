@@ -3264,7 +3264,7 @@ async def proactive_filtered(mode: str = "PUB") -> Dict[str, Any]:
     config = _PROACTIVE_MODE_CONFIG.get(mode, _PROACTIVE_MODE_CONFIG["PUB"])
 
     # get the full nudge set from proactive/full logic
-    full_resp = await proactive_full_scan()
+    full_resp = await full_proactive_scan()
     all_nudges = full_resp.get("nudges", [])
 
     filtered = []

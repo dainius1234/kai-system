@@ -83,8 +83,6 @@ def analyze_events(events):
     return issues, suggestions, sentiment, operator_questions
 
 # 3. Log supervisor actions to memory
-def log_supervisor_action(action, details):
-
 def log_supervisor_action(action, details, rationale=None, references=None, mood=None):
     payload = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -103,10 +101,7 @@ def log_supervisor_action(action, details, rationale=None, references=None, mood
     except Exception:
         pass
 
-# 4. (Optional) Auto-apply safe improvements (stub)
-
-def auto_apply_improvements(suggestions):
-
+# 4. (Optional) Auto-apply safe improvements
 def auto_apply_improvements(suggestions, mood=None):
     import ast
     from pathlib import Path
@@ -145,9 +140,7 @@ def auto_apply_improvements(suggestions, mood=None):
         log_supervisor_action("auto_formatting_failed", "black not available or failed", rationale="Formatting failed; operator review needed.", mood=mood)
 
 
-
-
-
+def main():
     events = get_recent_events()
     issues, suggestions, sentiment, operator_questions = analyze_events(events)
     mood = "positive" if sentiment["positive"] > sentiment["negative"] else "neutral" if sentiment["neutral"] >= sentiment["positive"] else "negative"
@@ -159,13 +152,17 @@ def auto_apply_improvements(suggestions, mood=None):
     for s in suggestions:
         print("-", s)
     print("\nOperator Sentiment:")
-    print(f"Positive: {sentiment['positive']} | Neutral: {sentiment['neutral']} | Negative: {sentiment['negative']}")
+    print(f"  Positive: {sentiment['positive']} | Neutral: {sentiment['neutral']} | Negative: {sentiment['negative']}")
     if operator_questions:
         print("\nQuestions for Operator:")
         for q in operator_questions:
             print("-", q)
-    log_supervisor_action("supervisor_report", {"issues": issues, "suggestions": suggestions, "sentiment": sentiment, "questions": operator_questions}, rationale="Report based on memory analysis and best practices.", mood=mood)
-    # Approval workflow for high-impact changes (stub)
+    log_supervisor_action(
+        "supervisor_report",
+        {"issues": issues, "suggestions": suggestions, "sentiment": sentiment, "questions": operator_questions},
+        rationale="Report based on memory analysis and best practices.",
+        mood=mood,
+    )
     if mood == "negative":
         print("\nOperator approval required for high-impact changes due to negative mood.")
         log_supervisor_action("approval_required", "Operator review needed before applying changes.", rationale="Operator-in-the-loop for trust and safety.", mood=mood)
