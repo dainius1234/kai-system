@@ -21,7 +21,7 @@ from collections import Counter, deque
 from datetime import datetime, timedelta, timezone
 from typing import Any, Deque, Dict, List, Optional, Protocol, runtime_checkable
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import Body, FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
