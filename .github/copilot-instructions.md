@@ -98,6 +98,7 @@ make test-h1-hardening                  # H1 hardening sprint regression tests
 make test-h2-self-healing               # H2 self-healing & resilience tests
 make test-mars-consolidation            # MARS memory consolidation tests
 make test-sage-critique                 # SAGE multi-agent critique tests
+make test-agent-evolver                 # Agent-Evolver insight engine tests
 
 # Integration / smoke tests (requires running stack)
 make core-smoke              # python3 scripts/smoke_core.py

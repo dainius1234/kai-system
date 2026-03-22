@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: P23 SAGE Multi-Agent Critique Loop (verifier self-critique, adversary self-review challenge 7) — **61 targets, 1115+ tests**
+**Last updated:** 2026-03-22 — session: P24 Agent-Evolver Insight Engine (failure→pattern→fix, Dream Phase 7, priority-sorted suggestions) — **62 targets, 1150+ tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 61 (make test-core) |
-| Individual tests | 1115+ passing, 0 failures |
+| Test targets | 62 (make test-core) |
+| Individual tests | 1150+ passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -1065,13 +1065,68 @@ Penalty capped at -1.0. Self-review is included in the adversary verdict.
   findings, over-optimism, clean challenges, penalty cap
 - Integration: self-critique downgrades PASS→REPAIR, clean critique preserves PASS
 
+---
+
+## P24 — Agent-Evolver Insight Engine (2026-03-22) ✅ COMPLETE
+
+**Source:** clawskills.sh — Agent self-evolution through failure pattern analysis
+
+**Problem:** Failures were classified and stored as metacognitive rules, but
+no system analyzed patterns across multiple failures to generate proactive
+fix suggestions. Dream State Phase 5 recalibrated boundaries, but never
+said "here's exactly what to do differently."
+
+**Architecture: failure→pattern→fix pipeline**
+
+#### Core Engine (langgraph/kai_config.py)
+- [x] **P24.1 — EvolutionSuggestion dataclass** — suggestion_id, pattern
+      description, failure_class, frequency, fix (concrete action), confidence,
+      source_episodes, priority (critical/high/medium/low).
+- [x] **P24.2 — EvolutionReport dataclass** — Aggregates all suggestions with
+      top failure class, total failures, timing metadata.
+- [x] **P24.3 — analyze_failures()** — Groups failed episodes by failure class,
+      filters by minimum pattern count (default 2), generates fix from templates,
+      assigns priority by severity × frequency, sorts critical-first.
+- [x] **P24.4 — Fix templates per failure class** — 8 templates covering all
+      9 FailureClass values (DATA_INSUFFICIENT→memu pre-fetch,
+      POLICY_BLOCKED→tool-gate pre-check, CONFIDENCE_LOW→evidence gathering,
+      CONTRADICTED_BY_EVIDENCE→cross-verification, etc).
+- [x] **P24.5 — Priority assignment** — Critical: critical class + freq≥3 or
+      any class + freq≥5. High: freq≥3 or critical class. Medium: freq≥2.
+      Low: everything else.
+- [x] **P24.6 — Topic extraction** — Identifies dominant topic from episode
+      input words, picks top 3 by frequency.
+- [x] **P24.7 — Persistence** — save/load evolver reports to JSON, cap at 20.
+
+#### Dream State Integration
+- [x] **P24.8 — evolver_dream_phase()** — New Phase 7 in dream cycle. Converts
+      evolution suggestions into DreamInsights. Adds dominant failure mode insight
+      when top failure ≥3 occurrences. All insights marked actionable=True.
+- [x] **P24.9 — Dream cycle wiring** — Phase 7 runs after boundary recalibration,
+      before insight packaging.
+
+#### API Endpoints (langgraph/app.py)
+- [x] **P24.10 — POST /evolve/analyze** — Analyzes 30-day episode history,
+      generates report, stores critical/high suggestions as memories.
+- [x] **P24.11 — GET /evolve/suggestions** — Returns last 5 evolver reports.
+
+#### Tests
+- 34 tests in `scripts/test_agent_evolver.py`
+- Core logic: empty/success episodes, recurring patterns, class separation, sorting
+- Fix templates: each class generates appropriate fix text
+- Priority: 6 severity/frequency combinations tested
+- Dream integration: empty, recurring, dominant failure, fix-in-description
+- Persistence: save/load, empty, cap at 20
+- Serialization: to_dict, JSON round-trip
+- Edge cases: missing fields, unknown classes, confidence bounds, timing
+
 ## Research Roadmap (2026 — arXiv/GitHub sourced)
 
 | ID | Enhancement | Source | Status |
 |---|---|---|---|
 | **MARS** | **Memory Consolidation (Ebbinghaus stability, conscience-filtered pruning)** | arXiv:2503.19271 | **✅ DONE** |
 | **P23** | **SAGE Multi-Agent Critique (verifier self-critique + adversary self-review)** | arXiv:2603.15255 | **✅ DONE** |
-| P24 | Agent-Evolver Insight Engine (failure→pattern→fix suggestions) | clawskills.sh | Planned |
+| **P24** | **Agent-Evolver Insight Engine (failure→pattern→fix suggestions)** | clawskills.sh | **✅ DONE** |
 | P25 | Mini-COSMO Recursive Self-Build (prompt→code→test→optimize) | github.com/XiangJinyu/mini-cosmo | Backlog |
 | H3b | LangGraph Checkpointing (time-travel debug, state snapshots) | LangGraph docs | Planned |
 
@@ -1082,9 +1137,10 @@ self-review challenge 7 detects false consensus, degraded groupthink,
 conflicting findings, and over-optimism. Both fire automatically — the
 system questions its own conclusions before proposing any action.
 
-**P24 — Agent-Evolver Insight Engine:** Analyze failure logs, extract patterns,
-proactively suggest fixes. Integrate with Dream State for nightly insight
-generation. Crashes become learning opportunities.
+**P24 — Agent-Evolver Insight Engine:** ✅ DONE. Analyzes recurring failure
+patterns and generates prioritized fix suggestions. Integrated as Dream
+State Phase 7 — evolution insights fire during nightly consolidation.
+POST /evolve/analyze, GET /evolve/suggestions endpoints.
 
 **P25 — Mini-COSMO Recursive Self-Build:** Kai bootstraps mini-versions of
 himself: prompt → architecture → code → sandbox-test → optimize. The ultimate

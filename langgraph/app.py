@@ -20,7 +20,7 @@ from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.llm import LLMRouter
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
-from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, run_dream_cycle
+from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, run_dream_cycle, analyze_failures, load_evolver_reports
 from conviction import build_plan, detect_self_deception, low_conviction_feedback, score_conviction
 from router import classify, dispatch_route
 from planner import gather_context, build_enriched_plan, predict_next_request, pre_fetch_predicted_context
@@ -1302,6 +1302,61 @@ async def trigger_dream():
         "boundary_gaps": len(cycle.boundary_shifts),
         "duration_ms": cycle.duration_ms,
         "insights": [i.to_dict() for i in cycle.insights],
+    }
+
+
+# ── P24: Agent-Evolver Insight Engine ────────────────────────────────
+
+@app.post("/evolve/analyze")
+async def evolve_analyze():
+    """Analyze recent failures and generate evolution suggestions.
+
+    Returns concrete fix recommendations based on recurring failure patterns.
+    """
+    episodes = saver.recall(user_id="keeper", days=30)
+    report = analyze_failures(episodes)
+
+    # Store high-priority suggestions as memories
+    stored = 0
+    for s in report.suggestions:
+        if s.priority in ("critical", "high"):
+            try:
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    await client.post(
+                        f"{MEMU_URL}/memory/memorize",
+                        json={
+                            "timestamp": datetime.utcnow().isoformat(),
+                            "event_type": "evolution_suggestion",
+                            "result_raw": f"[{s.priority}] {s.fix}",
+                            "metrics": {
+                                "failure_class": s.failure_class,
+                                "frequency": s.frequency,
+                                "confidence": s.confidence,
+                            },
+                            "relevance": s.confidence,
+                            "importance": 0.9 if s.priority == "critical" else 0.8,
+                            "user_id": "kai",
+                        },
+                    )
+                    stored += 1
+            except Exception:
+                pass
+
+    return {
+        "status": "ok",
+        "report": report.to_dict(),
+        "suggestions_stored": stored,
+    }
+
+
+@app.get("/evolve/suggestions")
+async def evolve_suggestions():
+    """Get all stored evolution reports and their suggestions."""
+    reports = load_evolver_reports()
+    return {
+        "status": "ok",
+        "report_count": len(reports),
+        "reports": reports[-5:],  # last 5 reports
     }
 
 

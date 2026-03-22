@@ -886,6 +886,7 @@ def run_dream_cycle(
     4. Detect rule contradictions
     5. Recalibrate knowledge boundary
     6. Package insights
+    7. Agent-Evolver failure→fix suggestions (P24)
 
     This is meant to run during idle periods (triggered by heartbeat
     when the operator goes quiet for > 30 minutes).
@@ -948,6 +949,10 @@ def run_dream_cycle(
                 actionable=True,
             ))
 
+    # Phase 7: Agent-Evolver failure→fix suggestions (P24)
+    evolver_insights = evolver_dream_phase(episodes)
+    insights.extend(evolver_insights)
+
     elapsed = (time.monotonic() - start) * 1000
 
     cycle = DreamCycle(
@@ -991,3 +996,293 @@ def load_dream_cycles() -> List[Dict[str, Any]]:
     except Exception:
         pass
     return []
+
+
+# ── P24: Agent-Evolver Insight Engine ────────────────────────────────
+# Analyzes failure logs, extracts patterns, and proactively suggests
+# fixes. Each EvolutionSuggestion is a concrete, actionable fix that
+# maps a failure pattern to a recommended behavior change.
+
+EVOLVER_INSIGHT_PATH = Path(os.getenv(
+    "EVOLVER_INSIGHT_PATH", "/tmp/kai_evolver_insights.json",
+))
+EVOLVER_MIN_PATTERN_COUNT = int(os.getenv("EVOLVER_MIN_PATTERN_COUNT", "2"))
+
+
+@dataclass
+class EvolutionSuggestion:
+    """A concrete fix suggestion derived from failure pattern analysis."""
+    suggestion_id: str
+    pattern: str            # human-readable failure pattern description
+    failure_class: str      # FailureClass value
+    frequency: int          # how many episodes matched this pattern
+    fix: str                # recommended behavior change
+    confidence: float       # 0.0-1.0
+    source_episodes: int    # episodes that contributed
+    priority: str           # "critical", "high", "medium", "low"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "suggestion_id": self.suggestion_id,
+            "pattern": self.pattern,
+            "failure_class": self.failure_class,
+            "frequency": self.frequency,
+            "fix": self.fix,
+            "confidence": round(self.confidence, 3),
+            "source_episodes": self.source_episodes,
+            "priority": self.priority,
+        }
+
+
+@dataclass
+class EvolutionReport:
+    """Complete output of an Agent-Evolver analysis run."""
+    report_id: str
+    ts: float
+    episodes_analyzed: int
+    suggestions: List[EvolutionSuggestion]
+    top_failure_class: Optional[str]
+    top_failure_count: int
+    total_failures: int
+    duration_ms: float
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "report_id": self.report_id,
+            "ts": self.ts,
+            "episodes_analyzed": self.episodes_analyzed,
+            "suggestions": [s.to_dict() for s in self.suggestions],
+            "top_failure_class": self.top_failure_class,
+            "top_failure_count": self.top_failure_count,
+            "total_failures": self.total_failures,
+            "duration_ms": round(self.duration_ms, 1),
+        }
+
+
+# ── Fix templates per failure class ─────────────────────────────────
+
+_FIX_TEMPLATES: Dict[str, str] = {
+    FailureClass.DATA_INSUFFICIENT: (
+        "Pre-fetch memu-core context for '{topic}' before planning. "
+        "If zero chunks returned, widen the query or flag as unknown territory."
+    ),
+    FailureClass.POLICY_BLOCKED: (
+        "Pre-check tool-gate policy for '{topic}' actions before committing "
+        "to a plan. In PUB mode, defer tool-heavy plans until WORK mode."
+    ),
+    FailureClass.CONFIDENCE_LOW: (
+        "For '{topic}', gather additional evidence sources before proceeding. "
+        "Consider decomposing into smaller, independently verifiable sub-tasks."
+    ),
+    FailureClass.OPERATOR_OVERRIDDEN: (
+        "Operator preferences for '{topic}' differ from model predictions. "
+        "Record the preference pattern and adjust conviction weighting."
+    ),
+    FailureClass.SERVICE_UNAVAILABLE: (
+        "Check service health before planning '{topic}' tasks that depend on "
+        "external services. Use resilient_call with fallback strategies."
+    ),
+    FailureClass.CONTRADICTED_BY_EVIDENCE: (
+        "Cross-verify claims about '{topic}' against multiple evidence sources. "
+        "The verifier has repeatedly flagged this area — increase evidence threshold."
+    ),
+    FailureClass.TIME_EXPIRED: (
+        "Set tighter time bounds for '{topic}' tasks. Consider breaking "
+        "into phases with intermediate checkpoints."
+    ),
+    FailureClass.SCOPE_EXCEEDED: (
+        "Decompose '{topic}' into smaller sub-tasks. The current scope "
+        "exceeds single-plan capacity — use multi-step sequential execution."
+    ),
+}
+
+
+def _extract_topic(episodes: List[Dict[str, Any]]) -> str:
+    """Extract the dominant topic from a group of episodes."""
+    all_words: Dict[str, int] = {}
+    for ep in episodes:
+        for w in re.findall(r"\w{4,}", str(ep.get("input", "")).lower()):
+            all_words[w] = all_words.get(w, 0) + 1
+    if not all_words:
+        return "general"
+    top = sorted(all_words.items(), key=lambda x: -x[1])[:3]
+    return ", ".join(w for w, _ in top)
+
+
+def _assign_priority(frequency: int, failure_class: str) -> str:
+    """Assign priority based on frequency and severity."""
+    critical_classes = {
+        FailureClass.CONTRADICTED_BY_EVIDENCE,
+        FailureClass.POLICY_BLOCKED,
+    }
+    if failure_class in critical_classes and frequency >= 3:
+        return "critical"
+    if frequency >= 5:
+        return "critical"
+    if frequency >= 3 or failure_class in critical_classes:
+        return "high"
+    if frequency >= 2:
+        return "medium"
+    return "low"
+
+
+def analyze_failures(episodes: List[Dict[str, Any]]) -> EvolutionReport:
+    """Analyze episode failures and generate evolution suggestions.
+
+    Groups failures by class + topic, identifies recurring patterns,
+    and generates concrete fix suggestions for each pattern.
+    """
+    start = time.monotonic()
+    report_id = hashlib.sha256(str(time.time()).encode()).hexdigest()[:12]
+
+    # Filter to failed episodes only
+    failed = [
+        ep for ep in episodes
+        if float(ep.get("outcome_score", 0.5)) < 0.5
+        or ep.get("failure_class", "unknown") != "unknown"
+    ]
+
+    if not failed:
+        return EvolutionReport(
+            report_id=report_id,
+            ts=time.time(),
+            episodes_analyzed=len(episodes),
+            suggestions=[],
+            top_failure_class=None,
+            top_failure_count=0,
+            total_failures=0,
+            duration_ms=(time.monotonic() - start) * 1000,
+        )
+
+    # Group by failure_class, then sub-group similar topics
+    class_groups: Dict[str, List[Dict[str, Any]]] = {}
+    for ep in failed:
+        fc = ep.get("failure_class", "unknown")
+        if fc not in class_groups:
+            class_groups[fc] = []
+        class_groups[fc].append(ep)
+
+    # Generate suggestions for failure classes that exceed threshold
+    suggestions: List[EvolutionSuggestion] = []
+    for fc_str, eps in class_groups.items():
+        if len(eps) < EVOLVER_MIN_PATTERN_COUNT:
+            continue
+
+        topic = _extract_topic(eps)
+        template = _FIX_TEMPLATES.get(fc_str, (
+            "Review recurring failures in '{topic}' and consider "
+            "adjusting the approach or gathering more context."
+        ))
+        fix = template.format(topic=topic)
+
+        avg_conviction = sum(
+            float(e.get("final_conviction", e.get("conviction_score", 0)))
+            for e in eps
+        ) / len(eps)
+
+        suggestion_id = hashlib.sha256(fc_str.encode()).hexdigest()[:10]
+        priority = _assign_priority(len(eps), fc_str)
+        confidence = min(0.4 + len(eps) * 0.1 + (10.0 - avg_conviction) * 0.02, 0.95)
+
+        suggestions.append(EvolutionSuggestion(
+            suggestion_id=suggestion_id,
+            pattern=f"{fc_str} on '{topic}' ({len(eps)} occurrences, "
+                    f"avg conviction {avg_conviction:.1f}/10)",
+            failure_class=fc_str,
+            frequency=len(eps),
+            fix=fix,
+            confidence=round(confidence, 3),
+            source_episodes=len(eps),
+            priority=priority,
+        ))
+
+    # Sort by priority (critical first) then frequency
+    priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+    suggestions.sort(key=lambda s: (priority_order.get(s.priority, 4), -s.frequency))
+
+    # Find top failure class
+    class_counts: Dict[str, int] = {}
+    for ep in failed:
+        fc = ep.get("failure_class", "unknown")
+        class_counts[fc] = class_counts.get(fc, 0) + 1
+    top_fc = max(class_counts, key=class_counts.get) if class_counts else None
+    top_count = class_counts.get(top_fc, 0) if top_fc else 0
+
+    elapsed = (time.monotonic() - start) * 1000
+    report = EvolutionReport(
+        report_id=report_id,
+        ts=time.time(),
+        episodes_analyzed=len(episodes),
+        suggestions=suggestions,
+        top_failure_class=top_fc,
+        top_failure_count=top_count,
+        total_failures=len(failed),
+        duration_ms=elapsed,
+    )
+
+    save_evolver_report(report)
+    return report
+
+
+def save_evolver_report(report: EvolutionReport) -> None:
+    """Persist an evolver report to disk."""
+    try:
+        if EVOLVER_INSIGHT_PATH.exists():
+            data = json.loads(EVOLVER_INSIGHT_PATH.read_text(encoding="utf-8"))
+        else:
+            data = {"reports": []}
+        data["reports"].append(report.to_dict())
+        data["reports"] = data["reports"][-20:]
+        EVOLVER_INSIGHT_PATH.write_text(
+            json.dumps(data, indent=2), encoding="utf-8",
+        )
+    except Exception:
+        pass
+
+
+def load_evolver_reports() -> List[Dict[str, Any]]:
+    """Load all persisted evolver reports."""
+    try:
+        if EVOLVER_INSIGHT_PATH.exists():
+            data = json.loads(EVOLVER_INSIGHT_PATH.read_text(encoding="utf-8"))
+            return data.get("reports", [])
+    except Exception:
+        pass
+    return []
+
+
+def evolver_dream_phase(episodes: List[Dict[str, Any]]) -> List[DreamInsight]:
+    """Dream Phase 7: Agent-Evolver failure→fix insight generation.
+
+    Called during dream consolidation cycle. Analyzes failures and
+    converts evolution suggestions into DreamInsights for storage.
+    """
+    report = analyze_failures(episodes)
+    insights: List[DreamInsight] = []
+
+    for suggestion in report.suggestions:
+        insights.append(DreamInsight(
+            insight_type="evolution",
+            description=(
+                f"[{suggestion.priority.upper()}] {suggestion.pattern} → "
+                f"Fix: {suggestion.fix}"
+            ),
+            confidence=suggestion.confidence,
+            source_episodes=suggestion.source_episodes,
+            actionable=True,
+        ))
+
+    if report.top_failure_class and report.top_failure_count >= 3:
+        insights.append(DreamInsight(
+            insight_type="evolution",
+            description=(
+                f"Dominant failure mode: {report.top_failure_class} "
+                f"({report.top_failure_count} episodes). "
+                f"This is the highest-priority area for improvement."
+            ),
+            confidence=min(0.6 + report.top_failure_count * 0.05, 0.95),
+            source_episodes=report.top_failure_count,
+            actionable=True,
+        ))
+
+    return insights

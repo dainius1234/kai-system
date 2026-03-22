@@ -25,9 +25,9 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Proactive Agent Loop** | Scheduled tasks, reminders, morning/evening briefings, action registry | Never |
 | **Operator Model** | Echo-response engine, nudge escalation ladder, cross-mode insight bridge, impact oracle, shadow memory branches | Never |
 
-**61 test targets. 1115+ tests. Zero failures. 25 Docker services. All real.**
+**62 test targets. 1150+ tests. Zero failures. 25 Docker services. All real.**
 
-**Current focus: P23 SAGE Multi-Agent Critique Loop** — Verifier self-critique detects groupthink, thin-evidence passes, unsupported material claims, and signal contradictions before returning any verdict. Adversary self-review (challenge 7) catches false consensus, degraded groupthink, conflicting findings, and over-optimism across all challenge results. The system now questions its own conclusions before acting.
+**Current focus: P24 Agent-Evolver Insight Engine** — Analyzes recurring failure patterns from episode history and generates concrete fix suggestions. Each failure class (9 types) maps to a prioritized behavior change recommendation. Integrated as Dream State Phase 7 — failures become learning opportunities during nightly consolidation.
 
 ---
 
