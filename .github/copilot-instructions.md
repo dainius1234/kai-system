@@ -98,7 +98,12 @@ make test-h1-hardening                  # H1 hardening sprint regression tests
 make test-h2-self-healing               # H2 self-healing & resilience tests
 make test-mars-consolidation            # MARS memory consolidation tests
 make test-sage-critique                 # SAGE multi-agent critique tests
-make test-agent-evolver                 # Agent-Evolver insight engine testsmake test-checkpoint                    # H3b checkpoint engine tests
+make test-agent-evolver                 # Agent-Evolver insight engine tests
+make test-checkpoint                    # H3b checkpoint engine tests
+make test-error-codes                   # structured error code tests
+make test-feature-flags                 # feature flag system tests
+make dep-audit                          # pip-audit dependency vulnerability scan
+make coverage                           # pytest-cov coverage report (HTML + terminal)
 # Integration / smoke tests (requires running stack)
 make core-smoke              # python3 scripts/smoke_core.py
 make test-integration        # python3 scripts/test_core_integration.py

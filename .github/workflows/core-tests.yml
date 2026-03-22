@@ -22,13 +22,17 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 pytest
+          pip install flake8 pytest pytest-cov pip-audit
           # install each requirements.txt individually (skip hidden/archive dirs)
           find . -name requirements.txt \
                -not -path './.venv/*' \
                -not -path './_archive/*' \
                -not -path './.*' \
             | while read f; do pip install -r "$f" || true; done
+
+      - name: Dependency vulnerability scan
+        run: |
+          pip-audit --strict --desc 2>/dev/null || echo "::warning::pip-audit found vulnerabilities"
 
       - name: Run core unit tests
         run: |
@@ -37,6 +41,15 @@ jobs:
       - name: Build full stack Docker images
         run: |
           docker compose -f docker-compose.full.yml build
+
+      - name: Scan container images for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+          format: 'table'
 
       - name: Bring up minimal sovereign AI stack
         run: |

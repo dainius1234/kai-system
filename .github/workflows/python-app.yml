@@ -26,7 +26,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install flake8 pytest pytest-cov pip-audit
         find . -name requirements.txt -not -path './.venv/*' -not -path './_archive/*' | xargs -r pip install -r 2>/dev/null || true
     - name: Lint with flake8
       run: |
@@ -34,9 +34,12 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv,_archive,__pycache__
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=.venv,_archive,__pycache__
-    - name: Test with pytest
+    - name: Dependency vulnerability scan
       run: |
-        PYTHONPATH=. pytest --ignore=_archive --ignore=.venv --ignore=scripts/test_dashboard.py --ignore=scripts/test_dashboard_ui.py -q
+        pip-audit --strict --desc 2>/dev/null || echo "::warning::pip-audit found vulnerabilities — review output above"
+    - name: Test with pytest (with coverage)
+      run: |
+        PYTHONPATH=. pytest --ignore=_archive --ignore=.venv --ignore=scripts/test_dashboard.py --ignore=scripts/test_dashboard_ui.py --cov=common --cov-report=term-missing -q
     - name: Test dashboard (needs CWD=dashboard/)
       run: |
         cd dashboard && PYTHONPATH=.. pytest ../scripts/test_dashboard.py ../scripts/test_dashboard_ui.py -q

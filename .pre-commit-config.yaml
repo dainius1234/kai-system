@@ -1,0 +1,49 @@
+# Pre-commit hooks — run `pre-commit install` to activate.
+# Manual run: pre-commit run --all-files
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+        exclude: ^output/
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: detect-private-key
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        args:
+          - '--select=E9,F63,F7,F82'
+          - '--exclude=.venv,_archive,__pycache__'
+          - '--max-line-length=127'
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        args: ['--ignore-missing-imports', '--no-strict-optional']
+        additional_dependencies: []
+        # Type-check common/ only for now — expand as stubs improve
+        files: ^common/
+
+  - repo: local
+    hooks:
+      - id: go-no-go
+        name: Syntax check service entry points
+        entry: python -m py_compile
+        language: python
+        files: '(dashboard|tool-gate|memu-core|langgraph|executor|heartbeat|supervisor|verifier|fusion-engine|memory-compressor|ledger-worker|metrics-gateway|telegram-bot)/app\.py$'
+        pass_filenames: true
+
+      - id: no-secrets
+        name: Block hardcoded secrets
+        entry: '(?i)(password|secret|token|api_key)\s*=\s*["\x27][^"\x27]{8,}'
+        language: pygrep
+        types: [python]
+        exclude: '(test_|\.env\.example|_archive/)'

@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: H3b LangGraph Checkpointing (time-travel debug, state snapshots, auto-checkpoint on recover/dream) — **63 targets, 1180+ tests**
+**Last updated:** 2026-03-22 — session: Engineering maturity gap-close (pre-commit, coverage, error codes, feature flags, dep scanning, CHANGELOG, CODEOWNERS) — **65 targets, 1220+ tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 63 (make test-core) |
-| Individual tests | 1180+ passing, 0 failures |
+| Test targets | 65 (make test-core) |
+| Individual tests | 1220+ passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |

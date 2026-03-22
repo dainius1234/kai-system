@@ -1,0 +1,19 @@
+[run]
+source = common/,langgraph/,verifier/,executor/,heartbeat/,supervisor/,memu-core/,tool-gate/,dashboard/,fusion-engine/
+omit =
+    */test_*
+    */_archive/*
+    */.venv/*
+    */migrations/*
+
+[report]
+show_missing = true
+fail_under = 0
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__
+    raise NotImplementedError
+    pass
+
+[html]
+directory = output/coverage_html

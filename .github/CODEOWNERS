@@ -1,0 +1,23 @@
+# Owners for code review — GitHub will auto-request reviews from these
+# users when files matching the pattern are changed in a pull request.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+*                       @dainius1234
+
+# Core safety — changes here need extra scrutiny
+common/auth.py          @dainius1234
+common/resilience.py    @dainius1234
+common/runtime.py       @dainius1234
+common/policy.py        @dainius1234
+security/               @dainius1234
+
+# Orchestration layer
+langgraph/              @dainius1234
+orchestrator/           @dainius1234
+supervisor/             @dainius1234
+
+# CI/CD and infrastructure
+.github/                @dainius1234
+Makefile                @dainius1234
+docker-compose*.yml     @dainius1234
