@@ -303,12 +303,18 @@ P13 Improvement Gate        ██████████ DONE   MARS Memory Co
 
 | Priority | Feature | Why |
 |---|---|---|
+| **J2** ⭐ | Wake-word "Kai" + Intent Judge | Makes nudges feel real — catch "Kai" in any sentence, tiny LLM decides intent |
+| **J1** | Live Canvas Visualization | Mind-map / graph / timeline rendering in dashboard for plans and emotions |
+| **J6** | SOUL.md + AGENTS.md | Persistent identity files — user edits, Kai adapts personality on startup |
+| **J3** | Auto-Redaction PII | Regex + OCR strip emails/tokens/passwords before any processing |
+| **J5** | Memory Viewer GUI | Diary-style browser tab — chronological view with emotion/category filters |
+| **J4** | Proactive Low-Latency Voice | Audio/video cue → speak-or-not decision (sigh = "need help?") |
+| **J7** | Skills Auto-Install Hub | Local skill loader — user drops .md files, Kai picks them up |
 | **H3** | Context Budget Manager | System prompt can overflow — smart pruning needed |
 | **P29** | Financial Awareness | Savings tracker, RTX 5080 countdown, expense categorization |
-| **P25** | Voice Pipeline (Car) | Hands-free mode for driving — wake word, continuous listen |
-| **P23b** | Knowledge Ingestion (RAG) | Upload PDF/TXT/CSV, chunk, embed, source attribution |
-| **P24b** | Temporal Intelligence | Activity patterns, habit tracking, circadian awareness |
 | **GPU** | Hardware Performance | Multi-model consensus, real STT/TTS, speculative decoding |
+
+*Sources: OpenClaw, Jarvis variants, Proact-VL (arXiv:2603.03447). All offline, low-resource, test on qwen2:0.5b first.*
 
 ---
 

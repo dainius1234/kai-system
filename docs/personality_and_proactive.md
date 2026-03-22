@@ -175,9 +175,14 @@ isolated. Kai maintains:
 |---|---|---|
 | MODE env var | ✅ Done | tool-gate `/gate/mode` endpoint (GET + POST) |
 | Perception capture | ✅ Services exist | audio, camera, screen-capture |
+| Voice emotion analysis | ✅ Done | keyword heuristics + RMS energy in audio/app.py |
+| Frame analysis | ✅ Done | brightness, edge density, motion detect in camera/app.py |
 | Memory storage | ✅ Postgres + pgvector | Full schema with access_count, decay |
 | Proactive engine | ✅ Done | 5 nudge types, mode-filtered + anti-annoyance |
 | Struggle detection | ⬜ Not started | Screen capture analysis needed |
+| Wake-word "Kai" | ⬜ Planned (J2) | Whisper keyword-spot + tiny LLM intent judge |
+| Proactive voice | ⬜ Planned (J4) | Audio/video cue → speak-or-not decision |
+| SOUL.md identity | ⬜ Planned (J6) | User-editable identity file, read on startup |
 | Conversation holding | ✅ Done | Active topics, deferred topics, resurfacing |
 | Tone switching | ✅ Done | Deep PUB/WORK system prompts with core identity |
 | Anti-annoyance | ✅ Done | DND, dismissal escalation, per-type cooldowns |

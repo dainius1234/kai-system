@@ -47,3 +47,20 @@ This document explains **why** the hardening direction was chosen, plus decision
 - HMAC auto-rotation helper + revocation support added.
 - Chaos CI script (`scripts/chaos_ci.py`) added for kill/restart resilience drill.
 - Conviction override operator control added in `kai_control` and consumed by `langgraph`.
+
+## J-Series: 2026 Jewels from OpenClaw / Jarvis / Proact-VL
+
+*Small, stealable "jewels" to make Kai feel more alive. All offline, low-resource, no external deps.*
+
+| ID | Feature | Impact | Source |
+|---|---|---|---|
+| **J2** ⭐ | Wake-word "Kai" + Intent Judge | High — natural interaction | github.com/isair/jarvis |
+| **J1** | Live Canvas Visualization | Med — visual planning | OpenClaw Live Canvas + A2UI |
+| **J6** | SOUL.md + AGENTS.md | Med — persistent identity | OpenClaw persistent identity |
+| **J3** | Auto-Redaction PII | Med — security improvement | github.com/isair/jarvis |
+| **J5** | Memory Viewer GUI | Med — UX improvement | github.com/isair/jarvis |
+| **J4** | Proactive Low-Latency Voice | High — embodied feel | arXiv:2603.03447 Proact-VL |
+| **J7** | Skills Auto-Install Hub | Med — extensibility | OpenClaw ClawHub |
+
+**Decision:** Start with J2 (wake-word) — easiest win, makes nudges feel real.
+Test all on qwen2:0.5b first before scaling to larger models.

@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: Recovery log + conscience audit hardening + doc sync — **65 targets, 1258 tests**
+**Last updated:** 2026-03-22 — session: J-Series Jewels roadmap + 5 research gaps closed — **69 targets, 1425+ tests**
 
 ---
 
@@ -1129,6 +1129,18 @@ said "here's exactly what to do differently."
 | **P24** | **Agent-Evolver Insight Engine (failure→pattern→fix suggestions)** | clawskills.sh | **✅ DONE** |
 | P25 | Mini-COSMO Recursive Self-Build (prompt→code→test→optimize) | github.com/XiangJinyu/mini-cosmo | Backlog |
 | **H3b** | **LangGraph Checkpointing (time-travel debug, state snapshots)** | LangGraph docs | **✅ DONE** |
+| **FC** | **Active Context Compression (MARS-ranked focus, Jaccard merge, 50K budget)** | arXiv:2601.07190 | **✅ DONE** |
+| **PF** | **Predictive Failure Modeling (OLS trend, proactive Telegram alerts)** | supervisor/app.py | **✅ DONE** |
+| **MM** | **Multi-Modal Sensory (voice emotion + frame analysis)** | perception/ | **✅ DONE** |
+| **WA** | **External World Anchor (date/news/events proxy)** | calendar-sync/app.py | **✅ DONE** |
+| **SH** | **Bio-inspired Self-Healing (4-phase ReCiSt model)** | common/resilience.py | **✅ DONE** |
+| J1 | Live Canvas Visualization (mind-map/graph in dashboard) | OpenClaw Live Canvas + A2UI | Backlog |
+| J2 | Wake-word "Kai" + Intent Judge (whisper + tiny LLM) | github.com/isair/jarvis | Backlog |
+| J3 | Auto-Redaction PII (regex + OCR strip before processing) | github.com/isair/jarvis | Backlog |
+| J4 | Proactive Low-Latency Voice (speak-or-not from cues) | arXiv:2603.03447 Proact-VL | Backlog |
+| J5 | Memory Viewer GUI (diary-style browser in dashboard) | github.com/isair/jarvis | Backlog |
+| J6 | SOUL.md + AGENTS.md (persistent identity files) | OpenClaw persistent identity | Backlog |
+| J7 | Skills Auto-Install Hub (local skill loader) | OpenClaw ClawHub | Backlog |
 
 **P23 — SAGE Multi-Agent Critique:** ✅ DONE. Dual-layer self-critique:
 (1) Verifier self-critique signal detects groupthink, thin-evidence passes,
@@ -1201,6 +1213,76 @@ listing, diff, cap enforcement, serialization, and edge cases.
 
 ---
 
+## J-Series — 2026 Jewels (Stealable Ideas, All Offline)
+
+*Sourced from OpenClaw, Jarvis variants, Proact-VL (March 2026). All offline, low-resource, no external deps. Test on qwen2:0.5b first.*
+
+### J1 — Live Canvas Visualization (dashboard — mind-map/graph)
+*Agent draws dynamic workspace (nodes, graphs, timelines) on screen for plans/emotions. Source: OpenClaw Live Canvas + A2UI.*
+
+- [ ] **HTML canvas component** — simple JS-based node/edge renderer in `dashboard/static/`
+- [ ] **Mind-map mode** — "show my week as mind-map" from goals + memories
+- [ ] **Emotion timeline** — visual graph of mood arcs over time
+- [ ] **Plan visualization** — render planner output as flowchart
+- [ ] **Tests** (scripts/test_live_canvas.py)
+
+### J2 — Wake-word "Kai" Anywhere + Intent Judge ⭐ RECOMMENDED START
+*Catch "Kai" in any sentence, mini-LLM decides if it's command or echo. Source: github.com/isair/jarvis (wake-word + intent-judge).*
+
+- [ ] **Wake-word detection** — keyword-spot "Kai" in whisper transcript stream
+- [ ] **Intent judge** — tiny llama3.2 / qwen2:0.5b classifies: command vs. mention vs. echo
+- [ ] **Natural nudge trigger** — detected intent fires nudge engine (not just explicit commands)
+- [ ] **Perception integration** — wire into `perception/audio/app.py` mic capture loop
+- [ ] **Tests** (scripts/test_wake_word.py)
+
+### J3 — Auto-Redaction PII
+*Strip emails, tokens, passwords before processing — even locally. Source: github.com/isair/jarvis.*
+
+- [ ] **Regex PII detector** — email, phone, credit card, API token, password patterns
+- [ ] **OCR-check for screenshots** — scan screen captures for PII before storing
+- [ ] **Verifier integration** — PII check as verifier signal before any memorize/log
+- [ ] **Redaction audit log** — track what was stripped (counts, not content)
+- [ ] **Tests** (scripts/test_pii_redaction.py)
+
+### J4 — Proactive Low-Latency Voice
+*Decide "speak or not" based on audio/video cues (e.g., sigh = "need help?"). Source: arXiv:2603.03447 (Proact-VL low-latency).*
+
+- [ ] **Audio cue detection** — sigh, frustration sounds, long silence after error
+- [ ] **Video cue detection** — head-in-hands, leaning back (OpenCV pose hints)
+- [ ] **Speak-or-not gate** — combine audio + video signals → decision to intervene
+- [ ] **Sandbox integration** — whisper + opencv in sandbox for safe experimentation
+- [ ] **TTS trigger** — "Your voice sounds tired" / "Need a hand?" via edge-tts
+- [ ] **Tests** (scripts/test_proactive_voice.py)
+
+### J5 — Memory Viewer GUI
+*Open window to browse full history like diary. Source: github.com/isair/jarvis.*
+
+- [ ] **Memory Browser tab** — new dashboard view with search, filter, timeline
+- [ ] **Diary mode** — chronological view with emotion tags, categories, importance
+- [ ] **Memory detail panel** — view full context, related memories, decay status
+- [ ] **Export/print** — simple markdown export of memory entries
+- [ ] **Tests** (scripts/test_memory_viewer.py)
+
+### J6 — SOUL.md + AGENTS.md (Persistent Identity)
+*Files define "who I am" (style, loyalty) — Kai reads on startup. Source: OpenClaw persistent identity.*
+
+- [ ] **SOUL.md file** — user-editable identity document in MemU (style, values, loyalty tone)
+- [ ] **AGENTS.md file** — defines multi-agent roles and behaviours
+- [ ] **Startup loader** — Kai reads SOUL.md on boot, adapts system prompt accordingly
+- [ ] **Mode adaptation** — e.g., "loyal but dirty in PUB" → PUB system prompt injection
+- [ ] **Tests** (scripts/test_soul_identity.py)
+
+### J7 — Skills Auto-Install Hub
+*Local "skill-hub": user adds .md, Kai tries to use. Source: OpenClaw ClawHub.*
+
+- [ ] **Skills volume** — Docker volume `/skills` with .md skill files
+- [ ] **Skill loader** — scan skills dir on startup, register available capabilities
+- [ ] **Skill matching** — route user queries to matching skill if available
+- [ ] **Hot-reload** — detect new skills without restart (inotify or polling)
+- [ ] **Tests** (scripts/test_skill_hub.py)
+
+---
+
 ## Hardware Performance Track (Future — GPU Arrival)
 
 See `docs/unfair_advantages.md` for full details. Summary:
@@ -1266,22 +1348,33 @@ See `docs/unfair_advantages.md` for full details. Summary:
 
 ## What’s Next — Top Priorities
 
-1. **Cache and display last test-core run results**
-   - Use `make cache-test-core` to run and store results in scripts/test_core_results.json
-   - Only re-run changed targets for faster feedback
-   - Show summary in README and here
-2. **Session Backlog / Notes**
-   - Create SESSION_BACKLOG.md or improve session note visibility
-   - Summarize each session’s work, open items, and next steps
-3. **Tier 1/2/3 Hardening**
-   - H2: Persistence for P17-P22 data (Redis/filesystem)
-   - H2: retrieve_ranked() limit/pagination
-   - H2: Async gather for proactive scan
-   - H2: Embedding async compatibility
-   - H2: Context budget enforcement
-   - H2: Verifier semantic upgrade
-   - H2: Session buffer Redis reconnect
-   - H3: Test coverage for dashboard/memu-core endpoints
-   - H3: Dashboard XSS, fetch .ok, API consistency, dead param cleanup, heartbeat log tail
+1. **J2: Wake-word "Kai" + Intent Judge** ⭐
+   - Easiest win from J-series — makes nudges feel real
+   - Whisper keyword-spot + tiny LLM intent classifier
+   - Wire into perception/audio mic capture loop
+2. **J1: Live Canvas Visualization**
+   - Mind-map / graph / timeline rendering in dashboard
+   - Uses existing goals + memories data
+3. **J6: SOUL.md + AGENTS.md**
+   - Persistent identity files read on startup
+   - User edits style/values, Kai adapts
+4. **J3: Auto-Redaction PII**
+   - Regex + OCR strip before any memorize/log
+   - Security improvement — relevant for production
+5. **J5: Memory Viewer GUI**
+   - Diary-style browser tab in dashboard
+   - Chronological view with emotion/category filters
+6. **J4: Proactive Low-Latency Voice**
+   - Audio/video cue → speak-or-not decision
+   - Requires perception + TTS integration
+7. **J7: Skills Auto-Install Hub**
+   - Local skill loader with hot-reload
+   - Opens extensibility without code changes
+8. **H3: Context Budget Manager**
+   - System prompt overflow — smart pruning needed
+9. **P29: Financial Awareness**
+   - Savings tracker, RTX 5080 countdown, expense categorization
+10. **GPU: Hardware Performance**
+    - Multi-model consensus, real STT/TTS, speculative decoding
 
 ---

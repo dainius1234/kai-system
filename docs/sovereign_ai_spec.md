@@ -753,6 +753,25 @@ class AudioPipeline:
 
 ---
 
+## 4b) Perception Layer — Implemented
+
+> The stub code in §4.1–4.2 above shows the *target* design.
+> Current implementations are simpler but functional:
+
+| Component | Service | Status |
+|---|---|---|
+| Camera frame analysis | `perception/camera/app.py` | ✅ brightness, edge density, motion detect (OpenCV optional) |
+| Screen capture | `perception/camera/app.py` | ✅ mss-based, with dummy fallback |
+| Voice emotion analysis | `perception/audio/app.py` | ✅ keyword heuristics + RMS energy |
+| Speech-to-text | `perception/audio/app.py` | ✅ faster-whisper tiny (CPU) |
+| Predictive failure forecast | `supervisor/app.py` | ✅ OLS regression, proactive Telegram alerts |
+| World anchor (date/news/events) | `calendar-sync/app.py` | ✅ offline local proxy |
+| Bio-inspired self-healing | `common/resilience.py` | ✅ 4-phase ReCiSt model |
+| Active context compression | `memu-core/app.py` | ✅ MARS-ranked focus, Jaccard merge, 50K budget |
+| Wake-word "Kai" | *planned* (J2) | ⬜ whisper keyword-spot + tiny LLM intent judge |
+| Proactive voice | *planned* (J4) | ⬜ audio/video cue → speak-or-not decision |
+| Auto-redaction PII | *planned* (J3) | ⬜ regex + OCR strip |
+
 ## 5) Workspace System (MD Files)
 
 ### 5.1 Directory Structure

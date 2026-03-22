@@ -14,14 +14,24 @@ This repository implements **Sovereign AI** — a self-sovereign, air-gapped per
 - `tool-gate/` — tool access policy and local gatekeeping
 - `langgraph/` — graph/runtime app integration layer
 - `kai-advisor/` — self-employment advisor (offline, UK-focused)
-- `perception/` — audio and camera capture services
+- `perception/` — audio (voice emotion) and camera (frame analysis) capture services
 - `heartbeat/` — system pulse and auto-sleep controller
+- `calendar-sync/` — external world anchor (date/time context, local news/events)
 - `scripts/` — operational scripts and validation checks
 - `data/` — seed datasets and local advisor inputs
 - `docs/` — implementation plans and hardening runbooks
-- `common/` — shared utilities and helpers
+- `common/` — shared utilities, helpers, and bio-inspired self-healing engine
 - `security/` — HMAC/auth hardening helpers
 - `sandboxes/` — ephemeral sandbox environments
+
+### Planned (J-Series Jewels — all offline, test on qwen2:0.5b)
+- J1: Live Canvas Visualization (dashboard mind-map/graph)
+- J2: Wake-word "Kai" + Intent Judge (whisper + tiny LLM) ⭐ NEXT
+- J3: Auto-Redaction PII (regex + OCR strip)
+- J4: Proactive Low-Latency Voice (audio/video cue → speak-or-not)
+- J5: Memory Viewer GUI (diary-style dashboard tab)
+- J6: SOUL.md + AGENTS.md (persistent identity files)
+- J7: Skills Auto-Install Hub (local skill loader)
 
 ## Development Flow
 

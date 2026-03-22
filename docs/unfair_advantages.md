@@ -199,6 +199,11 @@ Each request makes the next one better. This is the flywheel.
 | Operator correction learning | ❌ | Limited | ❌ | ❌ | ✅ |
 | Tamper-evident audit trail | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Air-gapped capable | ❌ | ❌ | ❌ | ✅ | ✅ |
+| Voice emotion analysis | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Predictive failure forecast | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Bio-inspired self-healing | ❌ | ❌ | ❌ | ❌ | ✅ |
+| World-anchor grounding | ❌ | Plugin | Plugin | ❌ | ✅ |
+| Context compression (MARS) | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 ---
 
@@ -640,11 +645,16 @@ No other build thinks about itself this way. This is the gap.
 - **Hardware Performance Track** documented (HP1–HP6) — HP2/HP4/HP5 built; HP1/HP3/HP6 ready for RTX 5080
 
 ### What's Next (priority order)
-1. **HP1: Speculative Decoding** — deploy on hardware arrival (Ollama `--draft-model` flag)
-2. **HP3: VRAM Watchdog** — add GPU monitoring to heartbeat
-3. **HP6: Partial Layer Loading** — Ollama `-ngl` parameter on hardware arrival
-4. **Gap items** — see `docs/gaps_and_hardening.md` for remaining system gaps
-5. **OMAR Self-Play** — unblocked when GPU enables multi-turn reasoning
+1. **J2: Wake-word "Kai" + Intent Judge** ⭐ — whisper keyword-spot + tiny LLM intent classifier
+2. **J1: Live Canvas Visualization** — mind-map/graph/timeline in dashboard
+3. **J6: SOUL.md + AGENTS.md** — persistent identity files
+4. **J3: Auto-Redaction PII** — regex + OCR strip before processing
+5. **J5: Memory Viewer GUI** — diary-style dashboard tab
+6. **J4: Proactive Low-Latency Voice** — audio/video cue → speak-or-not
+7. **J7: Skills Auto-Install Hub** — local skill loader
+8. **HP1: Speculative Decoding** — deploy on hardware arrival (Ollama `--draft-model` flag)
+9. **HP3: VRAM Watchdog** — add GPU monitoring to heartbeat
+10. **OMAR Self-Play** — unblocked when GPU enables multi-turn reasoning
 
 ### Key File Map
 - `langgraph/router.py` — 8-route zero-LLM classifier

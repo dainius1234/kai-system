@@ -33,12 +33,38 @@
 - Ran sync-docs to re-align README LOC count (~36,006)
 - All 65 test targets passing (1 expected Codespace skip: test-agentic)
 
+## 2026-03-22 (cont.) — Research Gap Close Sprint
+
+- Closed all 5 research gaps from 2026 arXiv/GitHub:
+  - Gap 3: Active Context Compression (memu-core, 44 tests, commit 39c677c)
+  - Gap 1: Predictive Failure Modeling (supervisor/app.py)
+  - Gap 2: Multi-Modal Sensory Input (audio emotion + camera frame analysis)
+  - Gap 4: External World Anchor (calendar-sync rewrite)
+  - Gap 5: Bio-inspired Self-Healing (4-phase ReCiSt in common/resilience.py)
+- 123 new tests across 4 test files, all passing
+- 4 new Makefile targets, docs synced (commit 4121d4b)
+
+## 2026-03-22 (cont.) — J-Series Jewels Roadmap
+
+- Added 7 new planned features (J1–J7) from 2026 research to PROJECT_BACKLOG
+- Sources: OpenClaw (Live Canvas, SOUL.md, ClawHub), Jarvis (wake-word, PII, memory viewer), Proact-VL (low-latency voice)
+- Updated What's Next priorities: J2 (wake-word) recommended as first build
+- Full documentation sweep: PROJECT_BACKLOG, README, CHANGELOG, SESSION_BACKLOG, personality_and_proactive, unfair_advantages, next_level_roadmap, copilot-instructions
+- Next: Start implementing J2 (wake-word detection + intent judge)
+
 ---
 
 ## Open Items
 
 ### As of 2026-03-22
 
-- Continue session note workflow improvements
-- Monitor and display last test-core results
-- Address Tier 1/2/3 hardening (see PROJECT_BACKLOG.md)
+- **J2: Wake-word "Kai" + Intent Judge** ⭐ — recommended first J-series build
+- J1: Live Canvas Visualization — dashboard mind-map/graph
+- J3: Auto-Redaction PII — regex + OCR strip
+- J4: Proactive Low-Latency Voice — audio/video cue → speak-or-not
+- J5: Memory Viewer GUI — diary-style dashboard tab
+- J6: SOUL.md + AGENTS.md — persistent identity files
+- J7: Skills Auto-Install Hub — local skill loader
+- H3: Context Budget Manager — system prompt pruning
+- P29: Financial Awareness — savings tracker
+- GPU track: hardware performance features (pending RTX 5080)

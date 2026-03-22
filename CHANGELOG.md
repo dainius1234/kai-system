@@ -15,6 +15,38 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Container image scanning (Trivy in CI)
 - CHANGELOG.md (this file)
 
+## [0.28.0] — 2026-03-22 — J-Series Jewels Roadmap
+
+### Added
+- 7 new planned features (J1–J7) from 2026 research (OpenClaw, Jarvis, Proact-VL)
+- J1: Live Canvas Visualization (dashboard mind-map/graph)
+- J2: Wake-word "Kai" + Intent Judge (whisper + tiny LLM)
+- J3: Auto-Redaction PII (regex + OCR strip)
+- J4: Proactive Low-Latency Voice (audio/video cue → speak-or-not)
+- J5: Memory Viewer GUI (diary-style dashboard tab)
+- J6: SOUL.md + AGENTS.md (persistent identity files)
+- J7: Skills Auto-Install Hub (local skill loader)
+- Full documentation update across PROJECT_BACKLOG, README, SESSION_BACKLOG,
+  personality_and_proactive, unfair_advantages, next_level_roadmap, copilot-instructions
+
+## [0.27.0] — 2026-03-22 — Close All Research Gaps
+
+### Added
+- Predictive Failure Modeling: `_linear_regression()`, `_forecast_failures()`, `/predict` endpoints (supervisor/app.py)
+- Multi-Modal Sensory Input: voice emotion analysis (perception/audio/app.py), OpenCV frame analysis (perception/camera/app.py)
+- External World Anchor: date/time context, local news/events feeds (calendar-sync/app.py)
+- Bio-inspired Self-Healing: 4-phase ReCiSt engine in common/resilience.py
+- 123 tests across 4 test files (test_predictive_failure, test_multi_modal, test_world_anchor, test_self_healing_phases)
+- 4 new Makefile targets
+
+## [0.26.0] — 2026-03-22 — Active Context Compression Loop
+
+### Added
+- Focus-compress endpoint: POST `/memory/focus-compress` with MARS-ranked focus zone
+- Jaccard keyword clustering and memory merge logic
+- Token budget meter: GET `/memory/token-budget` (configurable 50K default)
+- 44 tests (`scripts/test_focus_compress.py`)
+
 ## [0.25.0] — 2026-03-22 — H3b LangGraph Checkpointing
 
 ### Added
