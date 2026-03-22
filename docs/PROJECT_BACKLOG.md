@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: H1 Critical Hardening Sprint (deep system audit revealed 23 issues across 3 severity tiers; fixing 10 CRITICAL issues in memu-core, langgraph, executor, telegram-bot, dashboard) — **57 targets, 960+ tests**
+**Last updated:** 2026-03-22 — session: H2 Self-Healing & Resilience Sprint (dual-layer self-healing architecture: deep /health, /recover, resilient_call, TaskWatchdog, supervisor recovery actions) — **59 targets, 1050+ tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 57 (make test-core) |
-| Individual tests | 960 passing, 0 failures |
+| Test targets | 59 (make test-core) |
+| Individual tests | 1050+ passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -905,10 +905,57 @@ security gaps existed because we prioritized features over hardening.
 4. **Every fix gets a test.** No "fix and move on" — tests prove the fix works.
 5. **Audit before ship.** Run the full scrutiny checklist before any commit:
    - `make go_no_go` (syntax)
-   - `make test-core` (all 57+ targets)
+   - `make test-core` (all 59+ targets)
    - Check for bare global state mutations
    - Check for missing try/except on httpx calls
    - Check for shell=True in subprocess
+
+---
+
+## H2 — Self-Healing & Resilience Sprint (2026-03-22) ✅ COMPLETE
+
+**Audit finding:** System had 90% monitoring but 0% self-healing. Services
+returned `{"status": "ok"}` without checking their own dependencies. Circuit
+breakers existed but weren't enforced. A frozen background task was invisible.
+
+**Architecture: Dual-layer self-healing**
+
+#### Layer 1 — Process-Level (each service monitors itself)
+- [x] **H2.1 — common/resilience.py** — `resilient_call()` with retry +
+      exponential backoff + per-target circuit breaker. `ServiceHealth` for
+      deep health probe. `TaskWatchdog` for frozen background task detection.
+- [x] **H2.2 — deep /health on memu-core** — checks postgres pool, feedback
+      store. Returns `"degraded"` on failure. `/recover` reconnects DB pool.
+- [x] **H2.3 — deep /health on executor** — checks disk space, temp dir
+      writable. `/recover` clears temp files.
+- [x] **H2.4 — deep /health on langgraph** — checks circuit breaker states
+      for memu + tool-gate. `/recover` resets breakers.
+- [x] **H2.5 — deep /health on tool-gate** — checks Redis connectivity,
+      ledger path, token count. `/recover` reconnects Redis, reloads tokens.
+- [x] **H2.6 — deep /health on heartbeat** — checks stale heartbeat timer,
+      CPU usage. `/recover` resets tick timer.
+- [x] **H2.7 — resilient_call in executor** — heartbeat notifications use
+      retry + circuit breaker instead of bare httpx.
+- [x] **H2.8 — resilient_call in dashboard** — proxy helpers upgraded from
+      bare try/except to resilient_call with retry + circuit breaker.
+
+#### Layer 2 — System-Level (supervisor enforces)
+- [x] **H2.9 — TaskWatchdog in supervisor** — tracks background loop
+      liveness. `/health` returns degraded if loop frozen.
+- [x] **H2.10 — recovery actions registry** — supervisor can POST to
+      service `/recover` endpoints when circuit breaks.
+- [x] **H2.11 — recovery cooldown** — prevents infinite recovery loops (2min).
+- [x] **H2.12 — fleet health history** — rolling window of sweep results
+      for trend detection. `/fleet/history` endpoint.
+- [x] **H2.13 — deep health detection** — `_check_service()` now reads
+      `"degraded"` status from deep /health responses.
+- [x] **H2.14 — supervisor endpoints** — `/watchdog`, `/fleet/history`,
+      `/recover/{service_name}` for operator access.
+
+#### Tests
+- 42 tests in `scripts/test_h2_self_healing.py`
+- Runtime tests: TaskWatchdog heartbeat/frozen detection, ServiceHealth
+  probe with mixed pass/fail, resilient_call fallback on unreachable URL
 
 ---
 

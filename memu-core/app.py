@@ -817,8 +817,42 @@ async def metrics_middleware(request: Request, call_next):
 
 
 @app.get("/health")
-async def health() -> Dict[str, str]:
-    return {"status": "ok", "storage": os.getenv("VECTOR_STORE", "memory"), "device": DEVICE}
+async def health() -> Dict[str, Any]:
+    """Deep health — checks actual dependency liveness, not just process alive."""
+    storage_type = os.getenv("VECTOR_STORE", "memory")
+    checks: Dict[str, str] = {}
+
+    # Check vector store connectivity
+    try:
+        if hasattr(store, "_pool"):
+            conn = store._get_conn()
+            store._put_conn(conn)
+            checks["postgres"] = "ok"
+        else:
+            checks["memory_store"] = "ok"
+    except Exception as e:
+        checks["postgres"] = f"fail: {str(e)[:80]}"
+
+    # Check if feedback store is accessible
+    checks["feedback_store"] = "ok" if isinstance(_feedback_store, list) else "fail"
+
+    degraded = any(v.startswith("fail") for v in checks.values())
+    status = "degraded" if degraded else "ok"
+    return {"status": status, "storage": storage_type, "device": DEVICE, "checks": checks}
+
+
+@app.post("/recover")
+async def recover() -> Dict[str, Any]:
+    """Self-heal endpoint — reconnect DB pool, clear stale caches."""
+    recovered: list[str] = []
+    try:
+        if hasattr(store, "_pool") and hasattr(store, "_psycopg2"):
+            store._pool = store._psycopg2.pool.SimpleConnectionPool(
+                1, 5, store._pg_uri)
+            recovered.append("postgres_pool")
+    except Exception:
+        pass
+    return {"status": "ok", "recovered": recovered}
 
 
 @app.get("/metrics")

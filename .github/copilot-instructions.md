@@ -95,6 +95,7 @@ make test-p20-conscience-values        # P20 conscience & values tests
 make test-p21-proactive-agent          # P21 proactive agent loop tests
 make test-p22-operator-model            # P22 operator model tests
 make test-h1-hardening                  # H1 hardening sprint regression tests
+make test-h2-self-healing               # H2 self-healing & resilience tests
 
 # Integration / smoke tests (requires running stack)
 make core-smoke              # python3 scripts/smoke_core.py
@@ -126,6 +127,8 @@ Run `make go_no_go` before committing changes to Python service entry points to 
 3. **Imports**: follow PEP 8; stdlib first, then third-party, then local.
 4. **Service entry points**: each service exposes at least a `/health` HTTP endpoint returning `{"status": "ok"}`.
 5. **Tests**: place unit tests in `scripts/test_<service>.py`; service-level tests in `<service>/test_<service>.py`. Use `pytest` or plain `unittest`.
+6. **Health endpoints**: every service exposes `/health` returning `{"status": "ok"}`. Core services (memu-core, executor, langgraph, tool-gate, heartbeat) implement **deep /health** (check real dependencies) and return `{"status": "degraded"}` on internal failures. Core services also expose `/recover` for self-healing.
+7. **Inter-service calls**: use `common.resilience.resilient_call()` instead of bare `httpx` for retry + circuit breaker + fallback.
 6. **Secrets**: never commit real credentials; use `.env` files (see `.env.example`) and environment variables. The `.gitignore` excludes `.env`.
 7. **Docker**: each service has its own `Dockerfile`. Multi-service compositions use `docker-compose.minimal.yml` (core 8) or `docker-compose.full.yml` (full stack).
 8. **HMAC auth**: inter-service calls use HMAC signing. Set `TOOL_GATE_DUAL_SIGN=true` and later `INTERSERVICE_HMAC_STRICT_KEY_ID=true` after overlap stabilises.

@@ -33,6 +33,7 @@ import httpx
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
+from common.resilience import resilient_call
 from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
 
 logger = setup_json_logger("executor", os.getenv("LOG_PATH", "/tmp/executor.json.log"))
@@ -146,11 +147,12 @@ def _is_approved_script(script_name: str) -> bool:
 
 
 async def notify_heartbeat(reason: str, status: str = "executor_event") -> None:
-    try:
-        async with httpx.AsyncClient(timeout=2.0) as client:
-            await client.post(f"{HEARTBEAT_URL}/event", json={"status": status, "reason": reason})
-    except Exception:
-        logger.warning("Heartbeat notification failed")
+    await resilient_call(
+        "POST", f"{HEARTBEAT_URL}/event",
+        service_name="heartbeat",
+        json={"status": status, "reason": reason},
+        retries=2, backoff=0.5, fallback=None, logger=logger,
+    )
 
 
 def _execute_shell(params: Dict[str, Any], timeout: int) -> subprocess.CompletedProcess:
@@ -318,8 +320,38 @@ async def metrics_middleware(request: Request, call_next):
 
 
 @app.get("/health")
-async def health() -> Dict[str, str]:
-    return {"status": "ok", "device": DEVICE}
+async def health() -> Dict[str, Any]:
+    """Deep health — checks disk space and heartbeat reachability."""
+    checks: Dict[str, str] = {}
+    # Check temp dir writable (sandboxes need it)
+    try:
+        import tempfile as _tf
+        with _tf.NamedTemporaryFile(dir="/tmp", delete=True):
+            pass
+        checks["tmp_writable"] = "ok"
+    except Exception:
+        checks["tmp_writable"] = "fail"
+    # Check disk space (>100MB free)
+    try:
+        st = os.statvfs("/tmp")
+        free_mb = (st.f_bavail * st.f_frsize) / (1024 * 1024)
+        checks["disk_space"] = "ok" if free_mb > 100 else f"low: {free_mb:.0f}MB"
+    except Exception:
+        checks["disk_space"] = "unknown"
+    degraded = any(v.startswith("fail") or v.startswith("low") for v in checks.values())
+    return {"status": "degraded" if degraded else "ok", "device": DEVICE, "checks": checks}
+
+
+@app.post("/recover")
+async def recover() -> Dict[str, str]:
+    """Self-heal — clear temp files, reset state."""
+    import glob
+    for f in glob.glob("/tmp/sovereign_exec_*"):
+        try:
+            os.remove(f)
+        except Exception:
+            pass
+    return {"status": "ok", "action": "temp_cleanup"}
 
 
 @app.get("/alive")

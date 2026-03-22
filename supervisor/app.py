@@ -1,12 +1,14 @@
-"""Supervisor — watchdog and circuit-breaker control loop.
+"""Supervisor — dual-layer watchdog, circuit-breaker, and self-heal control loop.
 
-Periodically health-checks every core service, maintains per-service
-circuit breakers, and fires alerts through the local NOTIFY_URL gateway
-when something trips.  The dashboard can poll /status or /breakers
-to render fleet health.
+Layer 2 (System-Level) of the resilience architecture:
+  - Calls *deep* /health on every service (checks real dependencies)
+  - Enforces circuit breakers — prevents cascade calls to dead services
+  - Maintains recovery action registry (can restart/heal services)
+  - Dead-man's switch on its own background loop
+  - Provides fleet diagnostics to the dashboard
 
-This service does NOT make any decisions — it only observes and reports.
-Memu-core remains the orchestrator; supervisor is the ops-level safety net.
+Memu-core remains the cognitive orchestrator; supervisor is the ops-level
+safety net that ENFORCES resilience, not just observes it.
 """
 from __future__ import annotations
 
@@ -18,6 +20,7 @@ from typing import Any, Dict, List
 import httpx
 from fastapi import FastAPI
 
+from common.resilience import TaskWatchdog
 from common.runtime import (
     CircuitBreaker,
     ErrorBudget,
@@ -77,6 +80,26 @@ NOTIFY_URL = os.getenv("NOTIFY_URL", "")
 
 budget = ErrorBudget(window_seconds=300)
 
+# ── Layer 2: task watchdog (detects frozen background loops) ────────
+_watchdog = TaskWatchdog(stale_seconds=CHECK_INTERVAL * 3)
+
+# ── Layer 2: recovery actions registry ──────────────────────────────
+# Maps service → URL to POST when that service needs recovery.
+# Services can expose a /recover endpoint that flushes caches, reconnects
+# DB pools, etc.  This is the "self-heal" hook.
+RECOVERY_ACTIONS: Dict[str, str] = {}
+for svc in SERVICES:
+    base = svc["url"]
+    RECOVERY_ACTIONS[svc["name"]] = f"{base}/recover"
+
+# Track recovery attempts to avoid infinite loops
+_recovery_attempts: Dict[str, float] = {}
+RECOVERY_COOLDOWN = int(os.getenv("RECOVERY_COOLDOWN", "120"))  # 2min between retries
+
+# ── fleet health history (rolling window for trend detection) ───────
+_fleet_history: List[Dict[str, Any]] = []  # last N sweep summaries
+FLEET_HISTORY_MAX = 60  # ~15min at 15s interval
+
 # ── proactive nudge config ──────────────────────────────────────────
 TELEGRAM_ALERT_URL = os.getenv("TELEGRAM_ALERT_URL", "http://telegram-bot:8025/alert")
 PROACTIVE_INTERVAL = int(os.getenv("PROACTIVE_INTERVAL", "900"))  # 15 min
@@ -99,15 +122,30 @@ def _send_notification(message: str) -> None:
 
 # ── health-check loop ──────────────────────────────────────────────
 async def _check_service(client: httpx.AsyncClient, svc: Dict[str, str]) -> Dict[str, Any]:
-    """Hit /health on a single service and update its circuit breaker."""
+    """Hit /health on a single service and update its circuit breaker.
+
+    Layer 2 upgrades:
+      - Checks 'status' field in response (supports deep health)
+      - Marks 'degraded' services as partial failures
+      - Triggers recovery action when circuit opens
+    """
     name = svc["name"]
     url = f"{svc['url']}/health"
     cb = breakers[name]
     try:
         resp = await client.get(url)
         if resp.status_code == 200:
+            data = resp.json()
+            svc_status = data.get("status", "ok")
+            if svc_status == "degraded":
+                # Service is up but unhealthy internally
+                cb.record_failure()
+                return {"name": name, "healthy": False, "degraded": True,
+                        "checks": data.get("checks", {}),
+                        "status_code": 200, "breaker": cb.state}
             cb.record_success()
-            return {"name": name, "healthy": True, "status_code": 200, "breaker": cb.state}
+            return {"name": name, "healthy": True, "status_code": 200,
+                    "breaker": cb.state, "checks": data.get("checks", {})}
         cb.record_failure()
         return {"name": name, "healthy": False, "status_code": resp.status_code, "breaker": cb.state}
     except Exception as exc:
@@ -115,18 +153,73 @@ async def _check_service(client: httpx.AsyncClient, svc: Dict[str, str]) -> Dict
         return {"name": name, "healthy": False, "error": str(exc)[:120], "breaker": cb.state}
 
 
+async def _attempt_recovery(client: httpx.AsyncClient, name: str) -> bool:
+    """Layer 2: attempt to self-heal a service via its /recover endpoint."""
+    now = time.time()
+    last_attempt = _recovery_attempts.get(name, 0.0)
+    if now - last_attempt < RECOVERY_COOLDOWN:
+        return False  # cooldown active
+
+    recover_url = RECOVERY_ACTIONS.get(name)
+    if not recover_url:
+        return False
+
+    _recovery_attempts[name] = now
+    try:
+        resp = await client.post(recover_url, timeout=10.0)
+        if resp.status_code == 200:
+            logger.info("Recovery succeeded for %s", name)
+            _send_notification(f"[supervisor] ✅ self-heal SUCCESS for {name}")
+            return True
+        logger.warning("Recovery returned %d for %s", resp.status_code, name)
+    except Exception:
+        logger.warning("Recovery endpoint unreachable for %s", name)
+    _send_notification(f"[supervisor] ❌ self-heal FAILED for {name} — manual intervention needed")
+    return False
+
+
 async def _sweep() -> List[Dict[str, Any]]:
-    """Check every registered service in parallel."""
+    """Check every registered service in parallel.
+
+    Layer 2 upgrades:
+      - Attempts recovery on services with open circuit breakers
+      - Records fleet health history for trend detection
+      - Reports frozen background tasks via TaskWatchdog
+    """
     async with httpx.AsyncClient(timeout=5.0) as client:
         results = await asyncio.gather(*[_check_service(client, svc) for svc in SERVICES])
+
+    unhealthy_count = 0
+    recovered = []
 
     for r in results:
         name = r["name"]
         _last_status[name] = {**r, "checked_at": time.time()}
         cb = breakers[name]
+        if not r.get("healthy"):
+            unhealthy_count += 1
         if cb.state == "open":
             _send_notification(f"[supervisor] circuit OPEN for {name}")
             logger.warning("Circuit breaker OPEN: %s", name)
+            # Layer 2: attempt self-heal
+            async with httpx.AsyncClient(timeout=10.0) as rclient:
+                ok = await _attempt_recovery(rclient, name)
+                if ok:
+                    recovered.append(name)
+
+    # Record fleet snapshot for trend detection
+    snap = {
+        "ts": time.time(),
+        "total": len(results),
+        "healthy": len(results) - unhealthy_count,
+        "unhealthy": unhealthy_count,
+        "recovered": recovered,
+        "frozen_tasks": _watchdog.frozen(),
+    }
+    _fleet_history.append(snap)
+    if len(_fleet_history) > FLEET_HISTORY_MAX:
+        _fleet_history.pop(0)
+
     return list(results)
 
 
@@ -336,12 +429,18 @@ async def _check_escalations() -> None:
 
 
 async def _background_loop() -> None:
-    """Runs forever in the background, sweeping at CHECK_INTERVAL."""
+    """Runs forever in the background, sweeping at CHECK_INTERVAL.
+
+    Layer 2: beats the TaskWatchdog each iteration so the /health
+    endpoint can detect if THIS loop freezes.
+    """
     while True:
+        _watchdog.heartbeat("main_loop")
         try:
             await _sweep()
         except Exception:
             logger.exception("Sweep failed")
+        _watchdog.heartbeat("proactive")
         try:
             await _proactive_check()
         except Exception:
@@ -358,6 +457,7 @@ async def _background_loop() -> None:
             await _greeting_check()
         except Exception:
             logger.exception("Greeting check failed")
+        _watchdog.heartbeat("main_loop")
         await asyncio.sleep(CHECK_INTERVAL)
 
 
@@ -373,7 +473,12 @@ async def start_background_tasks() -> None:
 
 # ── HTTP endpoints ──────────────────────────────────────────────────
 @app.get("/health")
-async def health() -> Dict[str, str]:
+async def health() -> Dict[str, Any]:
+    """Deep health — checks if background loop is alive, not just the process."""
+    frozen = _watchdog.frozen()
+    if frozen:
+        return {"status": "degraded", "device": DEVICE,
+                "frozen_tasks": frozen, "watchdog": _watchdog.snapshot()}
     return {"status": "ok", "device": DEVICE}
 
 
@@ -384,10 +489,21 @@ async def metrics() -> Dict[str, float]:
 
 @app.get("/status")
 async def status() -> Dict[str, Any]:
-    """Fleet health overview.  Returns cached results from last sweep
-    so this endpoint is always fast and side-effect-free."""
+    """Fleet health overview with trend data and recovery history."""
     open_count = sum(1 for cb in breakers.values() if cb.state == "open")
     fleet = "degraded" if open_count else "healthy"
+
+    # fleet trend — last 5 snapshots for mini-sparkline
+    trend = []
+    for snap in _fleet_history[-5:]:
+        trend.append({
+            "ts": snap["ts"],
+            "healthy": snap["healthy"],
+            "unhealthy": snap["unhealthy"],
+        })
+
+    # frozen task warning
+    frozen = _watchdog.frozen()
 
     # v7: pull quarantine count + verifier verdict stats for fleet view
     quarantine_count = 0
@@ -414,6 +530,9 @@ async def status() -> Dict[str, Any]:
         "open_breakers": open_count,
         "quarantine_count": quarantine_count,
         "verifier_verdicts": verifier_verdicts,
+        "trend": trend,
+        "frozen_tasks": frozen,
+        "recovery_attempts": {k: v for k, v in _recovery_attempts.items()},
         "services": _last_status,
     }
 
@@ -429,6 +548,28 @@ async def trigger_sweep() -> Dict[str, Any]:
     """On-demand sweep — useful for the dashboard 'refresh' button."""
     results = await _sweep()
     return {"results": results}
+
+
+@app.get("/fleet/history")
+async def fleet_history() -> Dict[str, Any]:
+    """Rolling fleet health history for trend analysis."""
+    return {"history": _fleet_history, "count": len(_fleet_history)}
+
+
+@app.get("/watchdog")
+async def watchdog_status() -> Dict[str, Any]:
+    """Background task watchdog status — shows which loops are alive/frozen."""
+    return {"watchdog": _watchdog.snapshot(), "frozen": _watchdog.frozen()}
+
+
+@app.post("/recover/{service_name}")
+async def manual_recover(service_name: str) -> Dict[str, Any]:
+    """Manually trigger recovery for a named service."""
+    if service_name not in RECOVERY_ACTIONS:
+        return {"ok": False, "error": f"unknown service: {service_name}"}
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        ok = await _attempt_recovery(client, service_name)
+    return {"ok": ok, "service": service_name}
 
 
 @app.middleware("http")

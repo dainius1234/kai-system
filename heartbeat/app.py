@@ -146,8 +146,23 @@ async def metrics_middleware(request: Request, call_next):
 
 
 @app.get("/health")
-async def health() -> Dict[str, str]:
-    return {"status": "ok", "device": DEVICE}
+async def health() -> Dict[str, Any]:
+    """Deep health — checks stale heartbeat and resource pressure."""
+    checks: Dict[str, str] = {}
+    elapsed = time.time() - last_tick
+    checks["heartbeat"] = "ok" if elapsed <= ALERT_WINDOW else f"stale: {elapsed:.0f}s"
+    usage = _cpu_usage_ratio()
+    checks["cpu"] = "ok" if usage < CPU_USAGE_LIMIT else f"high: {usage:.2f}"
+    degraded = any("stale" in v or "high" in v for v in checks.values())
+    return {"status": "degraded" if degraded else "ok", "device": DEVICE, "checks": checks}
+
+
+@app.post("/recover")
+async def recover() -> Dict[str, str]:
+    """Self-heal — reset tick timer to prevent false stale alerts."""
+    global last_tick
+    last_tick = time.time()
+    return {"status": "ok", "action": "tick_reset"}
 
 
 @app.get("/metrics")

@@ -275,7 +275,26 @@ async def metrics_middleware(request: Request, call_next):
 
 @app.get("/health")
 async def health() -> Dict[str, Any]:
-    return {"status": "ok", "device": DEVICE, "dependencies": {"memu": MEMU_BREAKER.snapshot(), "tool_gate": TOOL_GATE_BREAKER.snapshot()}, "error_guards": {"memu": MEMU_ERROR_GUARD.snapshot(), "tool_gate": TOOL_ERROR_GUARD.snapshot()}}
+    """Deep health — reports degraded if dependency circuit breakers are open."""
+    memu_cb = MEMU_BREAKER.snapshot()
+    tg_cb = TOOL_GATE_BREAKER.snapshot()
+    degraded = memu_cb.get("state") == "open" or tg_cb.get("state") == "open"
+    return {
+        "status": "degraded" if degraded else "ok",
+        "device": DEVICE,
+        "dependencies": {"memu": memu_cb, "tool_gate": tg_cb},
+        "error_guards": {"memu": MEMU_ERROR_GUARD.snapshot(), "tool_gate": TOOL_ERROR_GUARD.snapshot()},
+    }
+
+
+@app.post("/recover")
+async def recover() -> Dict[str, Any]:
+    """Self-heal — reset circuit breakers to allow retry."""
+    MEMU_BREAKER.failures = 0
+    MEMU_BREAKER.state = "closed"
+    TOOL_GATE_BREAKER.failures = 0
+    TOOL_GATE_BREAKER.state = "closed"
+    return {"status": "ok", "action": "breakers_reset"}
 
 
 @app.get("/metrics")

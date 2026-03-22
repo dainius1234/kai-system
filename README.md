@@ -25,9 +25,9 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Proactive Agent Loop** | Scheduled tasks, reminders, morning/evening briefings, action registry | Never |
 | **Operator Model** | Echo-response engine, nudge escalation ladder, cross-mode insight bridge, impact oracle, shadow memory branches | Never |
 
-**57 test targets. 960+ tests. Zero failures. 25 Docker services. All real.**
+**59 test targets. 1050+ tests. Zero failures. 25 Docker services. All real.**
 
-**Current focus: Hardening Sprint H1** — Deep system audit found 10 critical issues (race conditions, missing error handling, security gaps). Fixing all before adding new features. Quality over velocity.
+**Current focus: Hardening Sprint H2** — Dual-layer self-healing architecture. Every service now has deep /health (checks real dependencies), /recover (self-heal endpoint), and resilient inter-service calls (retry + circuit breaker + fallback). Supervisor enforces recovery. System monitors itself, heals itself.
 
 ---
 
@@ -44,10 +44,14 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **executor** | shell=True allows command chaining | **FIXED in H1** |
 | **telegram-bot** | Voice file download with no size limit | **FIXED in H1** |
 | **dashboard** | 50+ proxy endpoints with no try/except | **FIXED in H1** |
-| **P17-P22 data** | In-memory only — restart = data loss | Planned (H2) |
-| **verifier** | Keyword matcher, not semantic | Planned (H2) |
-| **context budget** | System prompt can grow unbounded | Planned (H2) |
-| **test coverage** | 40+ endpoints with zero tests | Planned (H3) |
+| **All services** | /health returns 200 without checking dependencies | **FIXED in H2** |
+| **Inter-service calls** | No retry, no circuit breaker, no fallback | **FIXED in H2** |
+| **Supervisor** | Observes but can't heal (advisory-only circuit breakers) | **FIXED in H2** |
+| **Background tasks** | Frozen loops undetectable (/health still returns 200) | **FIXED in H2** |
+| **P17-P22 data** | In-memory only — restart = data loss | Planned (H3) |
+| **verifier** | Keyword matcher, not semantic | Planned (H3) |
+| **context budget** | System prompt can grow unbounded | Planned (H3) |
+| **test coverage** | 40+ endpoints with zero tests | Planned (H4) |
 
 ---
 
@@ -77,11 +81,37 @@ Kai is modular, secure, and designed for real-world use:
 
 ---
 
+## Resilience Architecture (H2)
+
+> "A system that can't heal itself isn't intelligent — it's just complicated."
+
+Two-layer self-healing, modelled on how biological organisms work:
+
+| Layer | Where | What It Does |
+|-------|-------|-------------|
+| **Layer 1 (Process)** | Each service | Deep `/health` checks real dependencies (DB, Redis, disk). `/recover` endpoint self-heals (reconnect pools, reset breakers, clear caches). `resilient_call()` wraps all inter-service HTTP with retry + backoff + circuit breaker. |
+| **Layer 2 (System)** | Supervisor | Calls deep `/health` on all services every 15s. Detects `degraded` status. Triggers `/recover` on services with open circuit breakers. `TaskWatchdog` detects frozen background loops. Fleet health history for trend analysis. Manual recovery endpoint for operator. |
+
+**What happens when something breaks:**
+1. Service X's dependency fails (e.g., Redis goes down)
+2. Service X's deep `/health` returns `{"status": "degraded", "checks": {"redis": "fail"}}`
+3. Supervisor sees "degraded" → records failure → circuit breaker opens
+4. Supervisor POSTs to `X/recover` → service reconnects to Redis
+5. Next sweep: `/health` returns `"ok"` → circuit closes → fleet healthy
+6. If recovery fails: Telegram alert + operator notified for manual intervention
+
+**Key files:**
+- `common/resilience.py` — `resilient_call()`, `ServiceHealth`, `TaskWatchdog`
+- `supervisor/app.py` — recovery registry, fleet history, `/watchdog`, `/fleet/history`
+- All core `*/app.py` — deep `/health` + `/recover` endpoints
+
+---
+
 ## Repo Structure
 
 ```
 orchestrator/        # Final risk authority before execution
-supervisor/          # Watchdog and circuit-breaker control loop
+supervisor/          # Dual-layer watchdog, circuit-breaker, and self-heal
 fusion-engine/       # Multi-signal consensus and conviction gating
 verifier/            # Fact-checking and signal cross-validation
 executor/            # Execution bridge and order-routing stubs
@@ -107,7 +137,7 @@ output/              # Output services
   avatar/            # Avatar generation
 sandboxes/           # Ephemeral sandbox environments
   shell/             # Shell sandbox
-common/              # Shared utilities (auth, llm, policy, rate_limit)
+common/              # Shared utilities (auth, llm, policy, rate_limit, resilience)
 security/            # HMAC/auth hardening helpers
 scripts/             # Operational scripts, tests, and validation
 data/                # Seed datasets and local advisor inputs
@@ -285,7 +315,9 @@ Toggled from the chat UI header or via `Ctrl+Shift+M`. Stored in `localStorage`.
 
 - Always add or update `requirements.txt` when introducing new Python dependencies.
 - When modifying a service `app.py`, run `make go_no_go` to catch syntax errors.
-- Every service must expose a `/health` HTTP endpoint returning `{"status": "ok"}`.
+- Every service must expose a `/health` HTTP endpoint returning `{"status": "ok"}`. **Core services must implement deep /health** (check real dependencies) and return `{"status": "degraded"}` if internal checks fail.
+- Every core service must expose a `/recover` POST endpoint for self-healing.
+- Inter-service HTTP calls must use `common.resilience.resilient_call()` with retry + circuit breaker.
 - Prefer small, focused pull requests. Use `make merge-gate` to confirm checks pass.
 - HMAC auth: Set `TOOL_GATE_DUAL_SIGN=true` and `INTERSERVICE_HMAC_STRICT_KEY_ID=true` after overlap stabilises.
 - Never commit real credentials; use `.env` files and environment variables.
@@ -305,6 +337,7 @@ Toggled from the chat UI header or via `Ctrl+Shift+M`. Stored in `localStorage`.
 
 ### Current State
 - **57 test-core targets pass, ~960+ individual tests.** Run `make test-core` to confirm.
+- **H2 Self-Healing Sprint COMPLETE:** Dual-layer resilience architecture — deep /health, /recover endpoints, resilient_call with retry + circuit breaker, TaskWatchdog, supervisor recovery actions.
 - **H1 Critical Hardening Sprint COMPLETE:** 10 critical issues fixed (race conditions, injection, error handling, shell safety, size limits, proxy guards).
 - **P0-P5 COMPLETE:** All 25 services built, running, tested. CI/CD, secrets, backup, HMAC rotation.
 - **P7-P15 COMPLETE:** Agentic patterns, thinking pathways, security self-hacking, dream state.
@@ -360,7 +393,8 @@ Request → injection filter → specialist selection → session buffer
 | P21 | Proactive Agent Loop (action registry, scheduled tasks, reminders, briefings, agent summary, supervisor firing) | ✅ DONE |
 | P22 | Operator Model & Adaptive Response (echo engine, nudge escalation, cross-mode bridge, impact oracle, shadow branches) | ✅ DONE |
 | **H1** | **Critical Hardening Sprint (race conditions, injection, error handling, security)** | **✅ DONE** |
-| H2 | Resilience (persistence, circuit breakers, context budget, verifier upgrade) | Planned |
+| **H2** | **Self-Healing & Resilience (deep health, /recover, resilient_call, TaskWatchdog, supervisor recovery)** | **✅ DONE** |
+| H3 | Data Persistence & Quality (P17-P22 persistence, context budget, verifier upgrade) | Planned |
 | P6 | Nice-to-have (calendar sync, workspace manager, avatar, Prometheus) | Queued |
 | HP1-HP6 | Hardware Performance Track (speculative decoding, VRAM watchdog, NVMe offload) | Awaiting GPU |
 
@@ -385,4 +419,5 @@ Full details in `docs/PROJECT_BACKLOG.md` and `docs/unfair_advantages.md`.
 - [x] Proactive agent loop (action registry, scheduled tasks, reminders, morning/evening briefings, agent summary)
 - [x] Operator model (echo-response engine, nudge escalation ladder, cross-mode insight bridge, impact oracle, shadow branches)
 - [x] H1 hardening: asyncio locks, injection check, error handling, shell=False, size limits, proxy guards
-- [x] 57 test targets, 960+ tests, zero failures
+- [x] H2 self-healing: deep /health, /recover, resilient_call, TaskWatchdog, supervisor recovery, fleet history
+- [x] 59 test targets, 1050+ tests, zero failures

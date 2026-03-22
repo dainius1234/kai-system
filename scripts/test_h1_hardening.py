@@ -207,14 +207,14 @@ class TestH1_7_DashboardProxyGuards(unittest.TestCase):
         self.assertIn("async def _proxy_post(", DASH_SRC)
 
     def test_proxy_get_has_try_except(self):
+        """H2 upgraded proxy to use resilient_call (replaces bare try/except)."""
         fn = DASH_SRC.split("async def _proxy_get(")[1].split("async def ")[0]
-        self.assertIn("try:", fn)
-        self.assertIn("except Exception", fn)
+        self.assertIn("resilient_call(", fn)
 
     def test_proxy_post_has_try_except(self):
+        """H2 upgraded proxy to use resilient_call (replaces bare try/except)."""
         fn = DASH_SRC.split("async def _proxy_post(")[1].split("async def ")[0]
-        self.assertIn("try:", fn)
-        self.assertIn("except Exception", fn)
+        self.assertIn("resilient_call(", fn)
 
     def test_emotion_endpoint_uses_proxy(self):
         section = DASH_SRC.split("proxy_emotion_record")[1].split("@app.")[0]

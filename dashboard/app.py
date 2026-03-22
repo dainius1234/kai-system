@@ -13,6 +13,7 @@ from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, StreamingResponse
 
+from common.resilience import resilient_call
 from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
 
 try:
@@ -34,31 +35,25 @@ TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 budget = ErrorBudget(window_seconds=300)
 
 
-# ── H1.7: Safe proxy helpers — all external calls wrapped ───────────
+# ── H1.7 + H2: Safe proxy helpers with retry + circuit breaker ──────
 async def _proxy_get(url: str, params: dict | None = None,
                      fallback: Any = None, timeout: float = 10.0) -> Any:
-    """GET from a backend service with error handling. Returns fallback on failure."""
-    try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            resp = await client.get(url, params=params)
-            resp.raise_for_status()
-            return resp.json()
-    except Exception as exc:
-        logger.warning("Proxy GET %s failed: %s", url, exc)
-        return fallback if fallback is not None else {"status": "unavailable", "error": str(exc)}
+    """GET from a backend with retry, circuit breaker, and fallback."""
+    default = fallback if fallback is not None else {"status": "unavailable"}
+    return await resilient_call(
+        "GET", url, params=params, timeout=timeout,
+        retries=2, backoff=0.3, fallback=default, logger=logger,
+    )
 
 
 async def _proxy_post(url: str, body: dict | None = None,
                       fallback: Any = None, timeout: float = 10.0) -> Any:
-    """POST to a backend service with error handling. Returns fallback on failure."""
-    try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            resp = await client.post(url, json=body or {})
-            resp.raise_for_status()
-            return resp.json()
-    except Exception as exc:
-        logger.warning("Proxy POST %s failed: %s", url, exc)
-        return fallback if fallback is not None else {"status": "unavailable", "error": str(exc)}
+    """POST to a backend with retry, circuit breaker, and fallback."""
+    default = fallback if fallback is not None else {"status": "unavailable"}
+    return await resilient_call(
+        "POST", url, json=body or {}, timeout=timeout,
+        retries=2, backoff=0.3, fallback=default, logger=logger,
+    )
 
 
 # ── New API endpoints for dashboard UI extras ───────────────────────

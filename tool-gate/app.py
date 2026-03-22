@@ -475,8 +475,50 @@ async def metrics_middleware(request: Request, call_next):
 
 
 @app.get("/health")
-async def health() -> Dict[str, str]:
-    return {"status": "ok", "mode": policy.mode, "device": DEVICE, "trusted_tokens": str(len(TRUSTED_TOKENS))}
+async def health() -> Dict[str, Any]:
+    """Deep health — checks Redis, ledger, and token state."""
+    checks: Dict[str, str] = {}
+    # Redis connectivity
+    if _redis_client:
+        try:
+            _redis_client.ping()
+            checks["redis"] = "ok"
+        except Exception:
+            checks["redis"] = "fail"
+    else:
+        checks["redis"] = "not_configured"
+    # Ledger writable
+    checks["ledger"] = "ok" if LEDGER_PATH.parent.exists() else "fail"
+    # Tokens loaded
+    checks["tokens"] = "ok" if len(TRUSTED_TOKENS) > 0 else "warn: no tokens"
+    degraded = any(v.startswith("fail") for v in checks.values())
+    return {"status": "degraded" if degraded else "ok", "mode": policy.mode,
+            "device": DEVICE, "trusted_tokens": str(len(TRUSTED_TOKENS)),
+            "checks": checks}
+
+
+@app.post("/recover")
+async def recover() -> Dict[str, Any]:
+    """Self-heal — reconnect Redis, reload tokens, prune nonces."""
+    global _redis_client
+    recovered: list[str] = []
+    # Reconnect Redis
+    _redis_url = os.getenv("REDIS_URL", "")
+    if _redis_url:
+        try:
+            import redis as _redis_mod
+            _redis_client = _redis_mod.from_url(_redis_url, decode_responses=True)
+            _redis_client.ping()
+            recovered.append("redis")
+        except Exception:
+            _redis_client = None
+    # Reload tokens
+    load_trusted_tokens()
+    recovered.append("tokens")
+    # Prune stale nonces
+    _cleanup_nonces(time.time())
+    recovered.append("nonces")
+    return {"status": "ok", "recovered": recovered}
 
 
 @app.get("/metrics")
