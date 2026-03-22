@@ -124,7 +124,7 @@ class TestCleanupEndpoint(unittest.TestCase):
         import importlib
         mod = importlib.import_module("memu_core_app")
         import asyncio
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             mod.memory_cleanup(max_age_days=0)
         )
         self.assertEqual(result["status"], "error")
@@ -134,7 +134,7 @@ class TestCleanupEndpoint(unittest.TestCase):
         import importlib
         mod = importlib.import_module("memu_core_app")
         import asyncio
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             mod.memory_cleanup(max_age_days=90)
         )
         self.assertEqual(result["status"], "ok")
@@ -159,7 +159,7 @@ class TestLedgerStatsEndpoint(unittest.TestCase):
             mock_client.get.side_effect = Exception("connection refused")
             mock_client_cls.return_value = mock_client
 
-            result = asyncio.get_event_loop().run_until_complete(
+            result = asyncio.run(
                 dashboard.api_ledger_stats()
             )
             self.assertEqual(result["status"], "unavailable")

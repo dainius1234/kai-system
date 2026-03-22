@@ -73,7 +73,7 @@ def _make_record(content_text, category=None, event_type="observation",
     """Helper: build a MemoryRecord for testing."""
     import uuid
     cat = category or classify_category(content_text)
-    ts = timestamp or datetime.utcnow().isoformat()
+    ts = timestamp or datetime.now(timezone.utc).isoformat()
     return MemoryRecord(
         id=str(uuid.uuid4()),
         timestamp=ts,
@@ -194,7 +194,7 @@ class TestSpacedRepetitionDecay(unittest.TestCase):
 
     def test_old_unused_memories_fade(self):
         """Memories not accessed in > half_life should have reduced relevance."""
-        old_ts = (datetime.utcnow() - timedelta(days=30)).isoformat()
+        old_ts = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
         old_rec = _make_record(
             "old memory nobody accessed",
             timestamp=old_ts,
@@ -205,7 +205,7 @@ class TestSpacedRepetitionDecay(unittest.TestCase):
         store.insert(old_rec)
 
         import asyncio
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             memu.apply_spaced_repetition_decay(half_life_days=14.0)
         )
         self.assertEqual(result["status"], "ok")
@@ -213,26 +213,26 @@ class TestSpacedRepetitionDecay(unittest.TestCase):
 
     def test_pinned_memories_not_decayed(self):
         """Pinned memories are never decayed."""
-        old_ts = (datetime.utcnow() - timedelta(days=60)).isoformat()
+        old_ts = (datetime.now(timezone.utc) - timedelta(days=60)).isoformat()
         pinned = _make_record("pinned goal memory", timestamp=old_ts,
                               pinned=True, relevance=1.0)
         store.insert(pinned)
 
         import asyncio
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             memu.apply_spaced_repetition_decay(half_life_days=14.0)
         )
         self.assertEqual(result["skipped"], 1)
 
     def test_frequently_accessed_strengthened(self):
         """Memories with high access count and recent use get strengthened."""
-        recent_ts = (datetime.utcnow() - timedelta(hours=2)).isoformat()
+        recent_ts = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()
         active = _make_record("actively used memory", timestamp=recent_ts,
                               relevance=0.7, access_count=5)
         store.insert(active)
 
         import asyncio
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             memu.apply_spaced_repetition_decay(half_life_days=14.0)
         )
         # active memory should be in strengthened or skipped
@@ -244,7 +244,7 @@ class TestSpacedRepetitionDecay(unittest.TestCase):
         store.insert(bad)
 
         import asyncio
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             memu.apply_spaced_repetition_decay(half_life_days=14.0)
         )
         self.assertEqual(result["skipped"], 1)
@@ -269,7 +269,7 @@ class TestOhanaGoals(unittest.TestCase):
             deadline="2026-03-14",
             priority="high",
         )
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             memu.create_goal(req)
         )
         self.assertEqual(result["status"], "created")
@@ -281,7 +281,7 @@ class TestOhanaGoals(unittest.TestCase):
         """Goals should be pinned (immune to decay)."""
         import asyncio
         req = memu.GoalRequest(title="Build KAI", priority="critical")
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             memu.create_goal(req)
         )
         # find the record
@@ -293,7 +293,7 @@ class TestOhanaGoals(unittest.TestCase):
     def test_list_goals(self):
         """Listing goals returns active goals sorted by priority."""
         import asyncio
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
         loop.run_until_complete(memu.create_goal(
             memu.GoalRequest(title="Low priority task", priority="low")))
         loop.run_until_complete(memu.create_goal(
@@ -307,7 +307,7 @@ class TestOhanaGoals(unittest.TestCase):
     def test_update_goal_progress(self):
         """Updating a goal adds a progress note."""
         import asyncio
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
         create_resp = loop.run_until_complete(memu.create_goal(
             memu.GoalRequest(title="Test goal")))
         goal_id = create_resp["goal_id"]
@@ -324,7 +324,7 @@ class TestOhanaGoals(unittest.TestCase):
     def test_update_goal_complete(self):
         """Completing a goal changes its status."""
         import asyncio
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
         create_resp = loop.run_until_complete(memu.create_goal(
             memu.GoalRequest(title="Finish test")))
         goal_id = create_resp["goal_id"]
@@ -340,14 +340,14 @@ class TestOhanaGoals(unittest.TestCase):
         import asyncio
         from fastapi import HTTPException
         with self.assertRaises(HTTPException) as ctx:
-            asyncio.get_event_loop().run_until_complete(memu.update_goal(
+            asyncio.run(memu.update_goal(
                 memu.GoalUpdateRequest(goal_id="nonexistent")))
         self.assertEqual(ctx.exception.status_code, 404)
 
     def test_goal_importance_by_priority(self):
         """Critical goals should have higher importance than low goals."""
         import asyncio
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
         low = loop.run_until_complete(memu.create_goal(
             memu.GoalRequest(title="Low task", priority="low")))
         crit = loop.run_until_complete(memu.create_goal(
@@ -360,7 +360,7 @@ class TestOhanaGoals(unittest.TestCase):
     def test_list_goals_filter_status(self):
         """Filtering by status should only return matching goals."""
         import asyncio
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
         loop.run_until_complete(memu.create_goal(
             memu.GoalRequest(title="Active goal")))
         resp = loop.run_until_complete(memu.create_goal(
@@ -387,7 +387,7 @@ class TestDriftDetection(unittest.TestCase):
     def test_no_goals_returns_no_drift(self):
         """With no goals set, drift detection should say 'no_goals'."""
         import asyncio
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             memu.detect_operator_drift(hours=4)
         )
         self.assertEqual(result["status"], "no_goals")
@@ -396,13 +396,13 @@ class TestDriftDetection(unittest.TestCase):
     def test_insufficient_recent_activity(self):
         """With too few recent records, should report insufficient data."""
         import asyncio
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
         # create a goal
         loop.run_until_complete(memu.create_goal(
             memu.GoalRequest(title="Build walls", category="construction")))
         # add only 1 recent activity (below threshold of 3)
         recent = _make_record("one recent thing",
-                              timestamp=datetime.utcnow().isoformat())
+                              timestamp=datetime.now(timezone.utc).isoformat())
         store.insert(recent)
 
         result = loop.run_until_complete(memu.detect_operator_drift(hours=4))
@@ -411,11 +411,11 @@ class TestDriftDetection(unittest.TestCase):
     def test_on_goal_no_drift(self):
         """When recent activity matches goal categories, no drift."""
         import asyncio
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
         loop.run_until_complete(memu.create_goal(
             memu.GoalRequest(title="Review drainage", category="drainage")))
 
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         for i in range(5):
             rec = _make_record(f"drainage check {i}", category="drainage",
                                timestamp=(now - timedelta(minutes=i*10)).isoformat())
@@ -427,11 +427,11 @@ class TestDriftDetection(unittest.TestCase):
     def test_drift_detected_with_nudge(self):
         """When most activity is off-goal, drift should be flagged with nudge."""
         import asyncio
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
         loop.run_until_complete(memu.create_goal(
             memu.GoalRequest(title="Finish brickwork", category="brickwork")))
 
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         # add 5 off-goal activities
         for i in range(5):
             rec = _make_record(f"browsing internet thing {i}",
@@ -468,7 +468,7 @@ class TestProactiveEngine(unittest.TestCase):
     def test_proactive_full_returns_nudges(self):
         """Full proactive scan should return a nudge list."""
         import asyncio
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             memu.full_proactive_scan()
         )
         self.assertEqual(result["status"], "ok")
@@ -478,8 +478,8 @@ class TestProactiveEngine(unittest.TestCase):
     def test_proactive_goal_deadline_nudge(self):
         """Goals with approaching deadlines should produce nudges."""
         import asyncio
-        loop = asyncio.get_event_loop()
-        tomorrow = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
+        loop = asyncio.new_event_loop()
+        tomorrow = (datetime.now(timezone.utc) + timedelta(days=1)).strftime("%Y-%m-%d")
         loop.run_until_complete(memu.create_goal(
             memu.GoalRequest(title="Submit tender", deadline=tomorrow,
                              priority="critical")))
@@ -493,7 +493,7 @@ class TestProactiveEngine(unittest.TestCase):
     def test_proactive_sorted_by_urgency(self):
         """Nudges should be sorted highest urgency first."""
         import asyncio
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             memu.full_proactive_scan()
         )
         nudges = result.get("nudges", [])
@@ -507,7 +507,7 @@ class TestProactiveEngine(unittest.TestCase):
     def test_proactive_fading_memory_detection(self):
         """High-importance old memories approaching fade should trigger nudge."""
         import asyncio
-        old_ts = (datetime.utcnow() - timedelta(days=30)).isoformat()
+        old_ts = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
         important = _make_record(
             "Critical site measurement from last month",
             timestamp=old_ts,
@@ -516,7 +516,7 @@ class TestProactiveEngine(unittest.TestCase):
         )
         store.insert(important)
 
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             memu.full_proactive_scan()
         )
         fading = [n for n in result["nudges"] if n.get("type") == "fading_memory"]
@@ -525,7 +525,7 @@ class TestProactiveEngine(unittest.TestCase):
     def test_proactive_max_10_nudges(self):
         """Proactive scan should cap at 10 nudges max."""
         import asyncio
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             memu.full_proactive_scan()
         )
         self.assertLessEqual(len(result.get("nudges", [])), 10)

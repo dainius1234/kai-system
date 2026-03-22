@@ -32,7 +32,7 @@ class QueueEntry:
     priority: Priority
     submitted_at: float
     task_id: str
-    future: asyncio.Future = field(default_factory=lambda: asyncio.get_event_loop().create_future())
+    future: asyncio.Future = field(default=None)
 
     def __lt__(self, other: "QueueEntry") -> bool:
         """Lower priority number wins. Ties broken by submission time."""

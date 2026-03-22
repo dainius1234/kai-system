@@ -74,7 +74,7 @@ class TestVariations(unittest.TestCase):
 
 class TestTreeSearch(unittest.TestCase):
     def _run(self, coro):
-        return asyncio.get_event_loop().run_until_complete(coro)
+        return asyncio.run(coro)
 
     def test_finds_best_branch(self):
         result = self._run(tree_search(

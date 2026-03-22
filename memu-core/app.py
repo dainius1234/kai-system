@@ -933,7 +933,7 @@ async def route_request(request: MemoryRequest) -> RoutingResponse:
         context_payload={
             "query": query,
             "memory_vectors": [record.embedding for record in similar],
-            "metadata": {"time": datetime.utcnow().isoformat(), "session_id": session_id, "specialists": SPECIALISTS},
+            "metadata": {"time": datetime.now(timezone.utc).isoformat(), "session_id": session_id, "specialists": SPECIALISTS},
             "device": DEVICE,
         },
     )
@@ -1528,7 +1528,7 @@ async def quick_note(note: NoteRequest) -> Dict[str, str]:
 
     record = MemoryRecord(
         id=str(uuid.uuid4()),
-        timestamp=datetime.utcnow().isoformat(),
+        timestamp=datetime.now(timezone.utc).isoformat(),
         event_type="note",
         category=category,
         content={"result": text, "user_id": user_id, "pin": note.pin},
@@ -1654,7 +1654,7 @@ async def store_preference(req: PreferenceRequest) -> Dict[str, str]:
 
     record = MemoryRecord(
         id=str(uuid.uuid4()),
-        timestamp=datetime.utcnow().isoformat(),
+        timestamp=datetime.now(timezone.utc).isoformat(),
         event_type="operator_preference",
         category="general",
         content={
@@ -1811,7 +1811,7 @@ async def proactive_nudges() -> Dict[str, Any]:
     Returns a list of nudges — each with the original memory, why it's
     time-sensitive, and a suggested message for the operator.
     """
-    threshold = datetime.utcnow() - timedelta(days=PROACTIVE_WINDOW_DAYS)
+    threshold = datetime.now(timezone.utc) - timedelta(days=PROACTIVE_WINDOW_DAYS)
     all_records = store.search(top_k=10_000)
 
     # filter to recent + non-quarantined
@@ -1821,7 +1821,9 @@ async def proactive_nudges() -> Dict[str, Any]:
             continue
         try:
             ts = datetime.fromisoformat(r.timestamp.replace("Z", "+00:00")) if "T" in r.timestamp else datetime.fromisoformat(r.timestamp)
-            if ts.replace(tzinfo=None) < threshold:
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
+            if ts < threshold:
                 continue
         except Exception:
             pass
@@ -1886,7 +1888,7 @@ async def silence_signals() -> Dict[str, Any]:
     Returns nudges like: "Is [topic] resolved or stuck?"
     """
     all_records = store.search(top_k=10_000)
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     threshold = now - timedelta(days=SILENCE_THRESHOLD_DAYS)
 
     # group by category with timestamps
@@ -1900,7 +1902,9 @@ async def silence_signals() -> Dict[str, Any]:
         category_activity[cat]["total"] += 1
         try:
             ts_str = r.timestamp.replace("Z", "+00:00") if "T" in r.timestamp else r.timestamp
-            ts = datetime.fromisoformat(ts_str).replace(tzinfo=None)
+            ts = datetime.fromisoformat(ts_str)
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
             if ts >= threshold:
                 category_activity[cat]["recent"] += 1
             existing_last = category_activity[cat]["last_ts"]
@@ -2083,7 +2087,7 @@ async def reflect() -> Dict[str, Any]:
     Writes insight summaries back as high-importance pinned memories
     so the system "learns" from its own experience over time.
     """
-    threshold = datetime.utcnow() - timedelta(days=REFLECTION_WINDOW_DAYS)
+    threshold = datetime.now(timezone.utc) - timedelta(days=REFLECTION_WINDOW_DAYS)
     all_records = store.search(top_k=10_000)
 
     # filter to recent window
@@ -2091,7 +2095,9 @@ async def reflect() -> Dict[str, Any]:
     for r in all_records:
         try:
             ts = datetime.fromisoformat(r.timestamp.replace("Z", "+00:00")) if "T" in r.timestamp else datetime.fromisoformat(r.timestamp)
-            if ts.replace(tzinfo=None) >= threshold:
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
+            if ts >= threshold:
                 recent.append(r)
         except Exception:
             recent.append(r)  # if we can't parse, include it
@@ -2140,7 +2146,7 @@ async def reflect() -> Dict[str, Any]:
     for insight in insights:
         record = MemoryRecord(
             id=str(uuid.uuid4()),
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             event_type="reflection",
             category="general",
             content={"result": insight, "user_id": "system", "pin": False, "reflection_window_days": REFLECTION_WINDOW_DAYS, "source_count": len(recent)},
@@ -2667,7 +2673,7 @@ async def create_goal(goal: GoalRequest) -> Dict[str, Any]:
 
     record = MemoryRecord(
         id=str(uuid.uuid4()),
-        timestamp=datetime.utcnow().isoformat(),
+        timestamp=datetime.now(timezone.utc).isoformat(),
         event_type=GOAL_EVENT_TYPE,
         category=category,
         content={
@@ -2723,7 +2729,7 @@ async def update_goal(update: GoalUpdateRequest) -> Dict[str, Any]:
     if note:
         progress.append({
             "note": note,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         })
     target.content["progress"] = progress
     target.content["status"] = status
@@ -2810,7 +2816,7 @@ async def detect_operator_drift(
     by any active goal, flag it.
     """
     all_records = store.search(top_k=10_000)
-    cutoff = datetime.utcnow() - timedelta(hours=hours)
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
 
     # gather active goals and their categories
     goal_categories: set = set()
@@ -2847,9 +2853,13 @@ async def detect_operator_drift(
         try:
             ts_str = r.timestamp
             if "T" in ts_str:
-                ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00")).replace(tzinfo=None)
+                ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                if ts.tzinfo is None:
+                    ts = ts.replace(tzinfo=timezone.utc)
             else:
                 ts = datetime.fromisoformat(ts_str)
+                if ts.tzinfo is None:
+                    ts = ts.replace(tzinfo=timezone.utc)
             if ts < cutoff:
                 continue
         except Exception:
@@ -2952,13 +2962,15 @@ async def full_proactive_scan() -> Dict[str, Any]:
     # 3. Goal deadline approaching
     try:
         goals_resp = await list_goals(status="active")
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         for g in goals_resp.get("goals", []):
             deadline = g.get("deadline")
             if not deadline:
                 continue
             try:
-                dl = datetime.fromisoformat(deadline.replace("Z", "+00:00")).replace(tzinfo=None)
+                dl = datetime.fromisoformat(deadline.replace("Z", "+00:00"))
+                if dl.tzinfo is None:
+                    dl = dl.replace(tzinfo=timezone.utc)
                 days_left = (dl - now).days
                 if 0 <= days_left <= 3:
                     all_nudges.append({
@@ -5738,7 +5750,7 @@ async def schedule_task(body: Dict[str, Any]) -> Dict[str, Any]:
         fire_at = sanitize_string(str(fire_at))
 
     task_id = str(uuid.uuid4())[:12]
-    now_iso = datetime.utcnow().isoformat()
+    now_iso = datetime.now(timezone.utc).isoformat()
 
     _scheduled_tasks[task_id] = {
         "task_id": task_id,
@@ -5786,7 +5798,7 @@ async def fire_task(task_id: str) -> Dict[str, Any]:
     task = _scheduled_tasks.get(task_id)
     if not task:
         raise HTTPException(status_code=404, detail="task not found")
-    task["last_fired"] = datetime.utcnow().isoformat()
+    task["last_fired"] = datetime.now(timezone.utc).isoformat()
     task["fire_count"] = task.get("fire_count", 0) + 1
     if task["frequency"] == "once":
         task["active"] = False
@@ -5796,7 +5808,7 @@ async def fire_task(task_id: str) -> Dict[str, Any]:
 @app.get("/memory/schedule/due")
 async def get_due_tasks() -> Dict[str, Any]:
     """P21b: Get tasks that are due to fire now. Supervisor polls this."""
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     now_iso = now.isoformat()
     due = []
 
@@ -5857,7 +5869,7 @@ async def set_reminder(body: Dict[str, Any]) -> Dict[str, Any]:
     fire_at = sanitize_string(str(body.get("fire_at", "")))
     if not fire_at:
         # default: 1 hour from now
-        fire_at = (datetime.utcnow() + timedelta(hours=1)).isoformat()
+        fire_at = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
 
     repeat = str(body.get("repeat", "once")).lower()
     if repeat not in _VALID_FREQUENCIES:
@@ -5869,7 +5881,7 @@ async def set_reminder(body: Dict[str, Any]) -> Dict[str, Any]:
         "text": text[:500],
         "fire_at": fire_at,
         "repeat": repeat,
-        "created": datetime.utcnow().isoformat(),
+        "created": datetime.now(timezone.utc).isoformat(),
         "fired": False,
         "fire_count": 0,
     }
@@ -5893,8 +5905,8 @@ async def list_reminders() -> Dict[str, Any]:
 @app.get("/memory/reminders/due")
 async def get_due_reminders() -> Dict[str, Any]:
     """P21c: Get reminders that should fire now. Supervisor polls this."""
-    now_iso = datetime.utcnow().isoformat()
-    now = datetime.utcnow()
+    now_iso = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(timezone.utc)
     due = []
 
     for r in _reminders.values():
@@ -5929,7 +5941,7 @@ async def fire_reminder(reminder_id: str) -> Dict[str, Any]:
     if not r:
         raise HTTPException(status_code=404, detail="reminder not found")
     r["fire_count"] = r.get("fire_count", 0) + 1
-    r["last_fire"] = datetime.utcnow().isoformat()
+    r["last_fire"] = datetime.now(timezone.utc).isoformat()
     if r.get("repeat", "once") == "once":
         r["fired"] = True
     return {"status": "fired", "reminder_id": reminder_id}
@@ -5950,7 +5962,7 @@ async def cancel_reminder(reminder_id: str) -> Dict[str, Any]:
 @app.post("/memory/briefing/morning")
 async def morning_briefing() -> Dict[str, Any]:
     """P21d: Generate morning briefing — goals, reminders, emotional arc, nudges."""
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     briefing: Dict[str, Any] = {
         "timestamp": now.isoformat(),
         "type": "morning",
@@ -6039,7 +6051,7 @@ async def morning_briefing() -> Dict[str, Any]:
 @app.post("/memory/briefing/evening")
 async def evening_checkin() -> Dict[str, Any]:
     """P21d: Evening check-in — daily summary, reflections, tomorrow preview."""
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     today_str = now.strftime("%Y-%m-%d")
     checkin: Dict[str, Any] = {
         "timestamp": now.isoformat(),
@@ -6111,7 +6123,7 @@ async def agent_summary() -> Dict[str, Any]:
     pending_reminders = sum(1 for r in _reminders.values() if not r.get("fired"))
 
     # count due items
-    now_iso = datetime.utcnow().isoformat()
+    now_iso = datetime.now(timezone.utc).isoformat()
     due_reminders = sum(1 for r in _reminders.values()
                         if not r.get("fired") and r.get("fire_at", "") <= now_iso)
 

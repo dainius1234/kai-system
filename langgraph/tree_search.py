@@ -182,3 +182,115 @@ async def tree_search(
         search_time_ms=round(elapsed, 1),
         all_scores=[b.conviction for b in all_branches],
     )
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  P4: Counterargument Debate Branching
+#
+#  For each surviving branch, generate a "devil's advocate" counter-
+#  argument, score it, and only accept the original if it survives.
+#  This strengthens conviction gating with explicit opposition.
+# ═══════════════════════════════════════════════════════════════════════
+
+_COUNTER_PROMPTS = [
+    "\n\nNow argue AGAINST this plan. What are the strongest objections?",
+    "\n\nPlay devil's advocate: why might this approach FAIL?",
+    "\n\nA sceptic would say this is wrong because...",
+]
+
+
+@dataclass
+class DebateResult:
+    """Output of a debate round between a branch and its counterargument."""
+    original: Branch
+    counter: Branch
+    survived: bool
+    margin: float
+
+
+async def debate_branches(
+    branches: List[Branch],
+    build_plan_fn: Callable,
+    score_fn: Callable,
+    chunk_dicts: List[Dict[str, Any]],
+    min_margin: float = 1.0,
+) -> List[DebateResult]:
+    """Run counterargument debate on each branch.
+
+    For each branch, generate a counter-prompt, score it, and keep
+    the original only if it beats the counter by min_margin points.
+    """
+    results: List[DebateResult] = []
+    for i, branch in enumerate(branches):
+        counter_suffix = _COUNTER_PROMPTS[i % len(_COUNTER_PROMPTS)]
+        counter_prompt = branch.prompt + counter_suffix
+
+        counter_plan = build_plan_fn(counter_prompt, "debate", chunk_dicts)
+        counter_score = score_fn(counter_prompt, counter_plan, chunk_dicts, branch.depth)
+
+        counter_branch = Branch(
+            id=_branch_id(counter_prompt, branch.depth),
+            plan=counter_plan,
+            prompt=counter_prompt,
+            conviction=counter_score,
+            depth=branch.depth,
+            parent_id=branch.id,
+            metadata={"role": "counterargument"},
+        )
+
+        margin = branch.conviction - counter_score
+        survived = margin >= min_margin
+        results.append(DebateResult(
+            original=branch,
+            counter=counter_branch,
+            survived=survived,
+            margin=round(margin, 2),
+        ))
+
+    return results
+
+
+async def tree_search_with_debate(
+    user_input: str,
+    specialist: str,
+    chunk_dicts: List[Dict[str, Any]],
+    build_plan_fn: Callable,
+    score_fn: Callable,
+    fetch_chunks_fn: Optional[Callable] = None,
+    n_branches: int = 3,
+    max_depth: int = 2,
+    prune_threshold: float = 5.0,
+    min_conviction: float = 8.0,
+    debate_margin: float = 1.0,
+) -> TreeSearchResult:
+    """Tree search + counterargument debate on surviving branches.
+
+    Runs standard tree_search first, then challenges top branches with
+    devil's-advocate counterarguments. Only branches that survive the
+    debate (beat counter by debate_margin) are kept.
+    """
+    result = await tree_search(
+        user_input, specialist, chunk_dicts,
+        build_plan_fn, score_fn, fetch_chunks_fn,
+        n_branches, max_depth, prune_threshold, min_conviction,
+    )
+
+    # Gather unpruned branches for debate
+    candidates = [b for b in [result.best_branch] if not b.pruned]
+    if not candidates:
+        return result
+
+    debates = await debate_branches(
+        candidates, build_plan_fn, score_fn, chunk_dicts, debate_margin,
+    )
+
+    # Update best branch if it survived debate
+    for d in debates:
+        if d.survived:
+            result.best_branch.metadata["debate_survived"] = True
+            result.best_branch.metadata["debate_margin"] = d.margin
+        else:
+            result.best_branch.metadata["debate_survived"] = False
+            result.best_branch.metadata["debate_margin"] = d.margin
+
+    return result

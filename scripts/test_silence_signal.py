@@ -8,7 +8,7 @@ from __future__ import annotations
 import importlib.util
 import sys
 import unittest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,7 +25,7 @@ MemoryRecord = memu.MemoryRecord
 
 def _make_record(text: str, category: str = "general", days_ago: int = 0,
                  record_id: str = "r") -> MemoryRecord:
-    ts = (datetime.utcnow() - timedelta(days=days_ago)).isoformat()
+    ts = (datetime.now(timezone.utc) - timedelta(days=days_ago)).isoformat()
     return MemoryRecord(
         id=f"{record_id}-{days_ago}",
         timestamp=ts,
@@ -54,12 +54,12 @@ class TestSilenceDetection(unittest.TestCase):
         # Simulate by checking: if a category has recent=1, it's not silent
         # Since we can't easily call the endpoint, test the filtering logic
         # Category with total >= min_activity AND recent > 0 → not silent
-        info = {"total": 5, "recent": 2, "last_ts": datetime.utcnow()}
+        info = {"total": 5, "recent": 2, "last_ts": datetime.now(timezone.utc)}
         self.assertGreater(info["recent"], 0)  # would NOT be included
 
     def test_silent_topic_identified(self):
         """Topics with no recent activity and enough history ARE silent."""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         info = {"total": 5, "recent": 0, "last_ts": now - timedelta(days=10)}
         # meets criteria: total >= 3, recent == 0
         self.assertGreaterEqual(info["total"], memu.SILENCE_MIN_ACTIVITY)
@@ -97,7 +97,7 @@ class TestSilenceDetection(unittest.TestCase):
         self.assertFalse(rec.poisoned)  # default is not poisoned
         rec_poisoned = MemoryRecord(
             id="p1",
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             event_type="test",
             category="survey-data",
             content={"result": "bad"},

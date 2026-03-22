@@ -81,7 +81,7 @@ class TestJ2IntentClassification(unittest.TestCase):
 
         # Patch query_specialist at its source so lazy import picks up the mock
         with patch("common.llm.query_specialist", side_effect=Exception("no LLM")):
-            result = asyncio.get_event_loop().run_until_complete(
+            result = asyncio.run(
                 classify_intent("Kai what time is it")
             )
             self.assertEqual(result, "command")
@@ -92,7 +92,7 @@ class TestJ2IntentClassification(unittest.TestCase):
         from perception.audio.app import classify_intent
 
         with patch("common.llm.query_specialist", side_effect=Exception("no LLM")):
-            result = asyncio.get_event_loop().run_until_complete(
+            result = asyncio.run(
                 classify_intent("i was talking to someone about kai yesterday")
             )
             self.assertEqual(result, "unknown")
@@ -103,7 +103,7 @@ class TestJ2IntentClassification(unittest.TestCase):
         from perception.audio.app import classify_intent
 
         with patch("common.llm.query_specialist", side_effect=Exception("no LLM")):
-            result = asyncio.get_event_loop().run_until_complete(
+            result = asyncio.run(
                 classify_intent("hey, kai please help me")
             )
             self.assertEqual(result, "command")

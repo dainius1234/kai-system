@@ -92,7 +92,7 @@ class TestFetchPreferences(unittest.TestCase):
 
     def test_returns_empty_on_failure(self):
         """Should return [] if memu-core is unavailable."""
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             _fetch_preferences("http://nonexistent:9999")
         )
         self.assertEqual(result, [])
@@ -113,7 +113,7 @@ class TestGatherContextIncludesPreferences(unittest.TestCase):
                 ctx = await gather_context("test input", "s1", [])
                 return ctx
 
-        ctx = asyncio.get_event_loop().run_until_complete(_run())
+        ctx = asyncio.run(_run())
         self.assertEqual(ctx.preferences, fake_prefs)
 
 

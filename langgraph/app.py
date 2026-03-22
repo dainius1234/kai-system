@@ -23,7 +23,9 @@ from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudget
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, run_dream_cycle, analyze_failures, load_evolver_reports, create_checkpoint, list_checkpoints, load_checkpoint, diff_checkpoints, delete_checkpoint
 from conviction import build_plan, detect_self_deception, low_conviction_feedback, score_conviction
-from router import classify, dispatch_route, load_skills, list_skills, match_skill
+from router import (classify, dispatch_route, load_skills, list_skills,
+                     match_skill, unload_skill, prune_stale_skills,
+                     scan_skill_md)
 from planner import gather_context, build_enriched_plan, predict_next_request, pre_fetch_predicted_context
 from adversary import challenge_plan, verdict_to_plan_metadata
 from security_audit import run_security_audit
@@ -398,6 +400,36 @@ async def test_skill_match(request: Request) -> Dict[str, Any]:
             "response_template": skill.response_template[:500],
         }
     return {"status": "no_match", "skill_name": None}
+
+
+@app.post("/skills/unload")
+async def unload_skill_endpoint(request: Request) -> Dict[str, Any]:
+    """Unload a skill by name."""
+    body = await request.json()
+    name = body.get("name", "")
+    if not name:
+        raise HTTPException(status_code=400, detail="name is required")
+    removed = unload_skill(name)
+    return {"status": "ok" if removed else "not_found", "name": name}
+
+
+@app.post("/skills/scan")
+async def scan_skill_endpoint(request: Request) -> Dict[str, Any]:
+    """Scan raw skill markdown text for security red flags."""
+    body = await request.json()
+    text = body.get("text", "")
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+    return {"status": "ok", **scan_skill_md(text)}
+
+
+@app.post("/skills/prune")
+async def prune_skills_endpoint(request: Request) -> Dict[str, Any]:
+    """Prune skills not used within max_age_days (default 30)."""
+    body = await request.json()
+    max_age = body.get("max_age_days", 30)
+    pruned = prune_stale_skills(max_age)
+    return {"status": "ok", "pruned": pruned, "pruned_count": len(pruned)}
 
 
 @app.get("/metrics")

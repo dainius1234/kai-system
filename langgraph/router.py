@@ -398,7 +398,25 @@ async def dispatch_route(decision: RouteDecision, user_input: str, session_id: s
 # ═══════════════════════════════════════════════════════════════════════
 
 import os  # noqa: E402
+import time as _time  # noqa: E402
 from pathlib import Path as _Path  # noqa: E402
+
+# ── Skill security scanner ──────────────────────────────────────────
+_SKILL_RED_FLAGS = re.compile(
+    r"(curl\s|wget\s|bash\s|sh\s|base64\s|<script|eval\(|exec\(|"
+    r"import\s+os|import\s+subprocess|import\s+shutil|__import__|"
+    r"os\.system|subprocess\.|shutil\.rmtree|open\(.*/etc/)",
+    re.IGNORECASE,
+)
+
+
+def scan_skill_md(text: str) -> Dict[str, Any]:
+    """Scan a skill .md file for red-flag patterns.
+
+    Returns {"safe": bool, "flags": [matched strings]}.
+    """
+    flags = _SKILL_RED_FLAGS.findall(text)
+    return {"safe": len(flags) == 0, "flags": [f.strip() for f in flags]}
 
 
 @dataclass
@@ -410,11 +428,13 @@ class Skill:
     action: str
     response_template: str
     source_file: str
+    loaded_at: float = 0.0
 
 
 _SKILLS_DIR = _Path(os.getenv("SKILLS_DIR", "/skills"))
 _LOCAL_SKILLS_DIR = _Path("data/skills")  # fallback for dev
 _loaded_skills: List[Skill] = []
+_skill_last_used: Dict[str, float] = {}  # name -> epoch timestamp
 
 
 def _parse_skill_file(path: _Path) -> Optional[Skill]:
@@ -455,6 +475,11 @@ def _parse_skill_file(path: _Path) -> Optional[Skill]:
     if not name or not triggers:
         return None
 
+    # Security scan — reject skills with dangerous patterns
+    scan = scan_skill_md(text)
+    if not scan["safe"]:
+        return None
+
     patterns = []
     for t in triggers:
         try:
@@ -469,6 +494,7 @@ def _parse_skill_file(path: _Path) -> Optional[Skill]:
         action=action.strip(),
         response_template=response_template.strip(),
         source_file=str(path),
+        loaded_at=_time.time(),
     )
 
 
@@ -494,8 +520,35 @@ def match_skill(user_input: str) -> Optional[Skill]:
     for skill in _loaded_skills:
         for pattern in skill.trigger_patterns:
             if pattern.search(user_input):
+                _skill_last_used[skill.name] = _time.time()
                 return skill
     return None
+
+
+def unload_skill(name: str) -> bool:
+    """Remove a skill from the loaded list by name. Returns True if found."""
+    global _loaded_skills
+    before = len(_loaded_skills)
+    _loaded_skills = [s for s in _loaded_skills if s.name != name]
+    _skill_last_used.pop(name, None)
+    return len(_loaded_skills) < before
+
+
+def prune_stale_skills(max_age_days: int = 30) -> List[str]:
+    """Remove skills that haven't been used in max_age_days. Returns pruned names."""
+    global _loaded_skills
+    cutoff = _time.time() - (max_age_days * 86400)
+    pruned: List[str] = []
+    keep: List[Skill] = []
+    for s in _loaded_skills:
+        last = _skill_last_used.get(s.name, s.loaded_at)
+        if last < cutoff:
+            pruned.append(s.name)
+            _skill_last_used.pop(s.name, None)
+        else:
+            keep.append(s)
+    _loaded_skills = keep
+    return pruned
 
 
 def list_skills() -> List[Dict[str, Any]]:

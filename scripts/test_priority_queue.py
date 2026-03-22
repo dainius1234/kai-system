@@ -36,7 +36,7 @@ class TestQueueEntry(unittest.TestCase):
 
 class TestPriorityQueue(unittest.TestCase):
     def _run(self, coro):
-        return asyncio.get_event_loop().run_until_complete(coro)
+        return asyncio.run(coro)
 
     def test_submit_and_get_result(self):
         q = PriorityQueue(max_concurrent=2)

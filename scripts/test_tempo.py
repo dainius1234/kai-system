@@ -1,7 +1,7 @@
 """Tests for P11: Operator Tempo Modeling — pace detection + style hints."""
 import sys, os, time, unittest
 from unittest.mock import patch, MagicMock
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "memu-core"))
 
@@ -15,7 +15,7 @@ import app as memu_app
 
 def _make_record(ts_offset_seconds: float) -> MagicMock:
     """Create a mock MemoryRecord with a timestamp offset from now."""
-    ts = datetime.utcnow() - timedelta(seconds=ts_offset_seconds)
+    ts = datetime.now(timezone.utc) - timedelta(seconds=ts_offset_seconds)
     rec = MagicMock()
     rec.timestamp = ts.isoformat()
     rec.poisoned = False

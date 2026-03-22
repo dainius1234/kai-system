@@ -349,6 +349,70 @@ def _save_assessment(current: Dict[str, Any]) -> None:
         logger.warning("Failed to save assessment: %s", exc)
 
 
+# ═══════════════════════════════════════════════════════════════════════
+#  P3: WORLD ANCHOR — External Context Fetch
+#
+#  Fetches date/time, weather, and headlines once per day to a local
+#  file so Kai has a grounded sense of the world without live internet.
+#  Uses WORLD_ANCHOR_URL (local proxy or calendar-sync) — never direct.
+# ═══════════════════════════════════════════════════════════════════════
+
+WORLD_ANCHOR_DIR = Path(os.getenv("WORLD_ANCHOR_DIR", "/tmp/world-anchor"))
+WORLD_ANCHOR_DIR.mkdir(parents=True, exist_ok=True)
+CALENDAR_SYNC_URL = os.getenv("CALENDAR_SYNC_URL", "http://calendar-sync:8030")
+_last_world_fetch: float = 0.0
+WORLD_FETCH_INTERVAL = int(os.getenv("WORLD_FETCH_INTERVAL", "86400"))  # once/day
+
+
+async def fetch_world() -> Dict[str, Any]:
+    """Fetch external world context from calendar-sync and cache locally."""
+    import json as _json
+    global _last_world_fetch
+    now = time.time()
+
+    # Rate limit: once per WORLD_FETCH_INTERVAL
+    if now - _last_world_fetch < WORLD_FETCH_INTERVAL:
+        cached = WORLD_ANCHOR_DIR / "latest.json"
+        if cached.exists():
+            try:
+                return _json.loads(cached.read_text())
+            except Exception:
+                pass
+        return {"status": "cached", "stale": False}
+
+    anchor: Dict[str, Any] = {
+        "fetched_at": now,
+        "date": time.strftime("%Y-%m-%d"),
+        "time": time.strftime("%H:%M"),
+        "day_of_week": time.strftime("%A"),
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(f"{CALENDAR_SYNC_URL}/context")
+            if resp.status_code == 200:
+                anchor.update(resp.json())
+    except Exception:
+        anchor["calendar_sync"] = "unavailable"
+
+    # Persist to disk
+    try:
+        out = WORLD_ANCHOR_DIR / "latest.json"
+        out.write_text(_json.dumps(anchor, indent=2))
+    except Exception as exc:
+        logger.warning("World anchor write failed: %s", exc)
+
+    _last_world_fetch = now
+    anchor["status"] = "ok"
+    return anchor
+
+
+@app.get("/world")
+async def world_anchor() -> Dict[str, Any]:
+    """Return current world context (date, weather, headlines)."""
+    return await fetch_world()
+
+
 if __name__ == "__main__":
     import uvicorn
 

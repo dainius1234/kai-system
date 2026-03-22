@@ -101,14 +101,14 @@ class TestResilienceRuntime(unittest.TestCase):
         sh = ServiceHealth(service_name="test-svc")
         sh.register("dep_ok", _ok)
         sh.register("dep_fail", _fail)
-        result = asyncio.get_event_loop().run_until_complete(sh.probe())
+        result = asyncio.run(sh.probe())
         self.assertEqual(result["status"], "degraded")
         self.assertEqual(result["checks"]["dep_ok"], "ok")
         self.assertTrue(result["checks"]["dep_fail"].startswith("fail"))
 
     def test_resilient_call_fallback_on_bad_url(self):
         from common.resilience import resilient_call
-        result = asyncio.get_event_loop().run_until_complete(
+        result = asyncio.run(
             resilient_call("GET", "http://127.0.0.1:1/nonexistent",
                            retries=1, backoff=0.01, fallback={"fallback": True})
         )

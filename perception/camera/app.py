@@ -304,6 +304,46 @@ def _speak_or_not(
     }
 
 
+# ── P2: Multi-modal LLM fusion ──────────────────────────────────────
+LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://langgraph:8000")
+
+
+async def interpret_multi(
+    audio_signals: Dict[str, Any],
+    video_signals: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Send combined audio + video signals to LLM for richer interpretation.
+
+    Falls back to the heuristic _speak_or_not() if the LLM is unavailable.
+    """
+    heuristic = _speak_or_not(audio_signals, video_signals)
+    summary = (
+        f"Audio: dominant={audio_signals.get('dominant', 'unknown')}, "
+        f"score={audio_signals.get('dominant_score', 0)}, "
+        f"rms={audio_signals.get('rms_level', 'n/a')}. "
+        f"Video: brightness={video_signals.get('brightness', 'n/a')}, "
+        f"motion={video_signals.get('motion_level', 0)}."
+    )
+    try:
+        import httpx
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            resp = await client.post(
+                f"{LANGGRAPH_URL}/run",
+                json={"message": f"[SENSOR FUSION] {summary} Should I speak? Why?"},
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                llm_text = data.get("response", "")
+                return {
+                    **heuristic,
+                    "llm_interpretation": llm_text[:500],
+                    "fusion_mode": "llm",
+                }
+    except Exception:
+        pass
+    return {**heuristic, "llm_interpretation": None, "fusion_mode": "heuristic"}
+
+
 class ProactiveRequest:
     """Simple container for proactive voice request data."""
     pass
@@ -321,6 +361,16 @@ async def proactive_evaluate(
     """
     decision = _speak_or_not(audio_signals, video_signals)
     return {"status": "ok", **decision}
+
+
+@app.post("/proactive/interpret")
+async def proactive_interpret(
+    audio_signals: Dict[str, Any] = {},
+    video_signals: Dict[str, Any] = {},
+) -> Dict[str, Any]:
+    """LLM-enhanced multi-modal fusion interpretation."""
+    result = await interpret_multi(audio_signals, video_signals)
+    return {"status": "ok", **result}
 
 
 @app.post("/proactive/auto")
