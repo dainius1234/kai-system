@@ -131,6 +131,9 @@ Call /health on each core service (deep health)
   │   Service reconnects to dependency
   │     │
   │     ▼
+  │   memu-core logs recovery event: what was healed and what was learned to conscience/narrative system
+  │     │
+  │     ▼
   │   Next sweep: /health returns "ok" → circuit closes
   │
   └─ Unreachable → alert via Telegram, log failure

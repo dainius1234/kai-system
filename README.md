@@ -70,6 +70,8 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **context budget** | System prompt can grow unbounded | Planned |
 | **test coverage** | ~60% estimated, no formal measurement yet | Tracking (`.coveragerc` added) |
 
+| **Recovery log** | After every /recover, Kai logs what was healed and what was learned to its conscience. | **NEW in H2** |
+
 ---
 
 ## System Overview

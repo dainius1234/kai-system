@@ -108,4 +108,8 @@ can be recovered.
 | dashboard/app.py | ~1,200 | Dashboard proxy + static serving |
 | supervisor/app.py | ~800 | Watchdog + recovery |
 
+## Recent Fixes & Additions
+
+- **Recovery log:** After every /recover, memu-core now logs what was healed and what was learned to its conscience/narrative system. See README and architecture docs for details.
+
 These files are the most likely to cause merge conflicts or editing mistakes.

@@ -18,9 +18,21 @@
 
 ---
 
+## 2026-03-23 — Resilience/Narrative Integration & Recovery Log
+
+- Implemented recovery log in memu-core: after every /recover, logs what was healed and what was learned to conscience/narrative system
+- Updated README.md, PROJECT_BACKLOG.md, SESSION_BACKLOG.md to document new feature
+- Validated patch and doc updates; all tests passing
+- Next: Update architecture and known issues docs for recovery log, review open items, and reprioritize backlog
+
+---
+
 ## Open Items
 
-- Run and display last test-core results
+### As of 2026-03-23
+
+- Update architecture and known issues docs for recovery log (in progress)
+- Review and reprioritize PROJECT_BACKLOG after recovery log addition
+- Continue session note workflow improvements
+- Monitor and display last test-core results
 - Address Tier 1/2/3 hardening (see PROJECT_BACKLOG.md)
-- Continue session note improvements
-- Review and update priorities after each session

@@ -898,7 +898,20 @@ async def recover() -> Dict[str, Any]:
             recovered.append("postgres_pool")
     except Exception:
         pass
-    return {"status": "ok", "recovered": recovered}
+
+    # Log recovery event to conscience
+    entry = {
+        "id": f"rec_{uuid.uuid4().hex[:8]}",
+        "timestamp": datetime.now(tz=timezone.utc).isoformat(),
+        "action": "recovery",
+        "healed": list(recovered),
+        "lesson": "Kai self-healed and restored critical subsystems.",
+    }
+    _conscience_log.append(entry)
+    if len(_conscience_log) > 200:
+        _conscience_log[:] = _conscience_log[-200:]
+
+    return {"status": "ok", "recovered": recovered, "recovery_log": entry}
 
 
 @app.get("/metrics")
