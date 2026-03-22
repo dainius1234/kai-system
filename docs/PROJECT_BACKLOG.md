@@ -867,10 +867,10 @@ that could cause crashes, data loss, or security breaches in production.
       asyncio.gather() with individual limits.
 - [ ] **H2.4 — generate_embedding() blocks event loop** — Move to
       run_in_executor() for async compatibility.
-- [ ] **H2.5 — No context budget** — System prompt can grow unbounded
-      (~100KB+). Need token budget allocator per section.
-- [ ] **H2.6 — Verifier is keyword-matcher** — Known placeholder.
-      "John bought" vs "John sold" scores HIGH. Needs semantic upgrade.
+- [x] **H2.5 — Context budget** — `_trim_context()` enforces `CONTEXT_BUDGET_TOKENS` (default 3072) in langgraph. Drops oldest middle messages when prompt exceeds budget.
+- [x] **H2.6 — Verifier semantic upgrade** — Uses memu-core rank_score
+      (30% embedding similarity + relevance + importance + recency) with
+      keyword overlap as supplementary signal. No longer pure keyword-matcher.
 - [ ] **H2.7 — Session buffer no Redis reconnection** — If Redis drops
       mid-session, buffer is gone with no recovery.
 

@@ -11,9 +11,9 @@
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
   <img src="https://img.shields.io/badge/services-26-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-1%2C518_passing-brightgreen?style=flat-square" alt="tests">
-  <img src="https://img.shields.io/badge/Python-~40%2C453_LOC-yellow?style=flat-square" alt="loc">
-  <img src="https://img.shields.io/badge/milestones-30_shipped-purple?style=flat-square" alt="milestones">
+  <img src="https://img.shields.io/badge/tests-1%2C550_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/Python-~40%2C647_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/milestones-31_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
 </p>
@@ -25,11 +25,11 @@
 | Metric | Value |
 |---|---|
 | **Services** | 26 Docker containers |
-| **Test targets** | 85 (`make test-core`) |
-| **Individual tests** | 1,518 (`def test_` across 77 files) |
-| **Python LOC** | ~40,453 |
+| **Test targets** | 86 (`make test-core`) |
+| **Individual tests** | 1,550 (`def test_` across 78 files) |
+| **Python LOC** | ~40,647 |
 | **Compose files** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 30 |
+| **Milestones shipped** | 31 |
 | **Failures** | 0 |
 
 > **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
@@ -42,7 +42,7 @@
 make core-up          # Start minimal stack (8 services)
 make core-down        # Stop it
 make full-up          # Start all 26 services
-make test-core        # Run all 85 test targets (~1,518 tests)
+make test-core        # Run all 86 test targets (~1,550 tests)
 make go_no_go         # Syntax check all entry points
 make merge-gate       # Full pre-merge validation
 make sync-docs        # Auto-update README + backlog metrics
@@ -189,7 +189,7 @@ Supervisor (every 15s) → deep /health on each service
 | 5 | heartbeat | 8090 | System pulse, auto-sleep |
 | 6 | dashboard | 8050 | 8-view operator console |
 | 7 | supervisor | 8100 | Watchdog, auto-heal |
-| 8 | verifier | 8060 | Fact-checking, SAGE |
+| 8 | verifier | 8060 | Semantic fact-checking, SAGE |
 
 ### Full Stack Additions (`docker-compose.full.yml`)
 
@@ -259,7 +259,7 @@ Supervisor (every 15s) → deep /health on each service
 | Supervisor | Advisory-only circuit breakers (can't heal) | H2 |
 | Background tasks | Frozen loops undetectable | H2 |
 | memu-core memory | Basic Ebbinghaus (no stability, no pruning) | MARS |
-| verifier | Keyword-only (no self-critique) | P23 SAGE |
+| verifier | Keyword-only (no self-critique, no semantic) | P23 SAGE + semantic upgrade |
 | Failure learning | No pattern extraction | P24 Evolver |
 | State debugging | No crash recovery, no snapshots | H3b |
 | Error messages | Ad-hoc HTTP statuses | Gap-Close |
@@ -273,15 +273,15 @@ Supervisor (every 15s) → deep /health on each service
 
 | Area | Issue | Status |
 |---|---|---|
-| verifier semantic | Keyword matcher, not embedding-based | Planned |
-| context budget | System prompt can grow unbounded | Planned |
+| verifier semantic | ~~Keyword matcher, not embedding-based~~ | **Done** — semantic rank_score (embedding + relevance + importance + recency) |
+| context budget | ~~System prompt can grow unbounded~~ | **Done** — `_trim_context()` enforces `CONTEXT_BUDGET_TOKENS` (default 3072) |
 | test coverage | ~60% estimated | Tracking (`.coveragerc` added) |
 
 ---
 
 ## Milestone History
 
-> 30 shipped. Zero skipped. Every milestone has tests.
+> 31 shipped. Zero skipped. Every milestone has tests.
 
 ```
 P0  Stack runs              ██████████ DONE   P14 Temporal Self       ██████████ DONE
@@ -300,6 +300,7 @@ P13 Improvement Gate        ██████████ DONE   MARS Memory Co
 ─── ─────────────────────── ────────── ────   P23 SAGE Critique       ██████████ DONE
 J1–J7 Jewels (7 features)  ██████████ DONE   P24 Agent-Evolver       ██████████ DONE
 P1–P5 Enhancements         ██████████ DONE   GC  Eng. Gap-Close      ██████████ DONE
+H3  Context Budget          ██████████ DONE
 ```
 
 ### What's Next
@@ -318,7 +319,7 @@ P1–P5 Enhancements         ██████████ DONE   GC  Eng. Gap-
 | **P3** | World Anchor | **DONE** — heartbeat /world endpoint |
 | **P4** | Debate Branching | **DONE** — counterargument tree search |
 | **P5** | Deprecation Cleanup | **DONE** — 110+ warnings eliminated |
-| **H3** | Context Budget Manager | Planned — system prompt overflow pruning |
+| **H3** | Context Budget Manager | **DONE** — `_trim_context()` + `CONTEXT_BUDGET_TOKENS` env var |
 | **P29** | Financial Awareness | Planned — savings tracker, expense categorization |
 | **GPU** | Hardware Performance | Planned — multi-model, real STT/TTS, speculative decoding |
 
@@ -332,7 +333,7 @@ P1–P5 Enhancements         ██████████ DONE   GC  Eng. Gap-
 orchestrator/        # Final risk authority before execution
 supervisor/          # Dual-layer watchdog, circuit-breaker, self-heal
 fusion-engine/       # Multi-signal consensus and conviction gating
-verifier/            # Fact-checking, SAGE self-critique
+verifier/            # Semantic fact-checking (embedding + keyword), SAGE self-critique
 executor/            # Sandboxed execution bridge
 dashboard/           # 8-view operator console (FastAPI + Starlette)
 memu-core/           # Memory engine — the soul (~6,100 lines)
@@ -415,7 +416,7 @@ make merge-gate    # Full pre-merge
 
 ---
 
-## Test Targets (85)
+## Test Targets (86)
 
 <details>
 <summary>Click to expand full test target list</summary>
@@ -450,7 +451,7 @@ make test-error-codes          make test-feature-flags
 
 # Specialised
 make test-dream-state          make test-security-audit      make test-tree-search
-make test-priority-queue       make test-model-selector
+make test-priority-queue       make test-model-selector       make test-context-budget
 
 # Engineering
 make dep-audit                 make coverage
@@ -496,7 +497,7 @@ make core-smoke                make test-integration
 - [x] Dual-layer self-healing, recovery logging to conscience
 - [x] LangGraph checkpointing (save/load/diff/rollback)
 - [x] Pre-commit, dep scanning, container scanning, coverage tracking
-- [x] 85 test targets, 1,518 tests, zero failures
+- [x] 86 test targets, 1,550 tests, zero failures
 
 ---
 

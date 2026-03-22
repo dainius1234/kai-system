@@ -8,7 +8,9 @@ for memory promotion or tool execution.  Returns one of three verdicts:
   FAIL_CLOSED → block promotion, quarantine trajectory, log only
 
 Verification strategies:
-  1. Memory cross-ref:  check the claim against stored records in memu
+  1. Memory cross-ref:  semantic verification via memu-core's ranked retrieval
+     (embedding cosine similarity + relevance + importance + recency + category),
+     supplemented by keyword overlap for interpretability
   2. Material claim extraction: identify numbers, dates, IDs, instructions
   3. Self-consistency:  check whether the plan's own steps are coherent
   4. Keyword plausibility: heuristic language analysis (placeholder for
@@ -37,7 +39,7 @@ from common.runtime import ErrorBudget, detect_device, setup_json_logger
 logger = setup_json_logger("verifier", os.getenv("LOG_PATH", "/tmp/verifier.json.log"))
 DEVICE = detect_device()
 
-app = FastAPI(title="Verifier", version="0.5.0")
+app = FastAPI(title="Verifier", version="0.6.0")
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 budget = ErrorBudget(window_seconds=300)
 
@@ -160,6 +162,10 @@ async def _memory_cross_ref(claim: str, top_k: int,
                             evidence_pack: Optional[List[Dict]] = None) -> tuple[Signal, int]:
     """Check whether memu holds records that support the claim.
 
+    Uses **semantic similarity** via memu-core's ranked retrieval (which
+    combines embedding cosine similarity, relevance, importance, recency,
+    and category boost) rather than keyword overlap alone.
+
     Returns the signal AND the count of strong evidence chunks.
     """
     records: List[Dict] = []
@@ -168,20 +174,32 @@ async def _memory_cross_ref(claim: str, top_k: int,
     if evidence_pack:
         records = evidence_pack
     else:
+        # try the richer /memory/evidence-pack first; fall back to /memory/retrieve
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 resp = await client.get(
-                    f"{MEMU_URL}/memory/retrieve",
+                    f"{MEMU_URL}/memory/evidence-pack",
                     params={"query": claim, "user_id": "keeper", "top_k": top_k},
                 )
                 resp.raise_for_status()
-                records = resp.json()
+                data = resp.json()
+                records = data.get("evidence", [])
         except Exception:
-            return Signal(
-                strategy="memory_cross_ref",
-                score=0.0,
-                detail="memu unreachable — cannot verify against memory",
-            ), 0
+            # fall back to basic retrieve
+            try:
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    resp = await client.get(
+                        f"{MEMU_URL}/memory/retrieve",
+                        params={"query": claim, "user_id": "keeper", "top_k": top_k},
+                    )
+                    resp.raise_for_status()
+                    records = resp.json()
+            except Exception:
+                return Signal(
+                    strategy="memory_cross_ref",
+                    score=0.0,
+                    detail="memu unreachable — cannot verify against memory",
+                ), 0
 
     if not records:
         return Signal(
@@ -190,24 +208,36 @@ async def _memory_cross_ref(claim: str, top_k: int,
             detail="no matching memory records found",
         ), 0
 
-    # score based on keyword overlap + relevance scoring
+    # score using semantic rank_score from memu-core (embedding + relevance
+    # + importance + recency + category boost), with keyword overlap as a
+    # supplementary signal for interpretability.
     claim_words = set(re.findall(r"\w{3,}", claim.lower()))
     hits = 0
     strong_chunks = 0
 
     for rec in records:
         content = rec if isinstance(rec, dict) else {}
+
+        # rank_score is the multi-signal composite from retrieve_ranked()
+        # (30% embedding similarity + 18% relevance + 18% importance +
+        #  18% recency + pin/category/correction boosts)
+        rank_score = float(content.get("rank_score", 0))
+        relevance = float(content.get("relevance", 0))
+        importance = float(content.get("importance", 0.5))
+
+        # keyword overlap as supplementary signal
         text = str(content.get("content", content.get("result", "")))
+        if isinstance(content.get("content"), dict):
+            text = str(content["content"].get("result", ""))
         rec_words = set(re.findall(r"\w{3,}", text.lower()))
         overlap = claim_words & rec_words
         overlap_ratio = len(overlap) / max(len(claim_words), 1)
 
-        if overlap_ratio >= 0.3:
+        # combined chunk score: semantic rank is primary, keyword overlap secondary
+        chunk_score = rank_score * 0.6 + overlap_ratio * 0.2 + relevance * 0.1 + importance * 0.1
+
+        if chunk_score >= 0.25:
             hits += 1
-        # strong chunk: high relevance AND good overlap
-        relevance = float(content.get("relevance", 0))
-        importance = float(content.get("importance", 0.5))
-        chunk_score = overlap_ratio * 0.5 + relevance * 0.3 + importance * 0.2
         if chunk_score >= STRONG_CHUNK_THRESHOLD:
             strong_chunks += 1
 
@@ -215,7 +245,7 @@ async def _memory_cross_ref(claim: str, top_k: int,
     return Signal(
         strategy="memory_cross_ref",
         score=round(ratio, 3),
-        detail=f"{hits}/{len(records)} records support the claim; "
+        detail=f"{hits}/{len(records)} records support the claim (semantic+keyword); "
                f"{strong_chunks} strong chunks (threshold={STRONG_CHUNK_THRESHOLD})",
     ), strong_chunks
 

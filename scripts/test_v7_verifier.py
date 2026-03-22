@@ -231,17 +231,17 @@ class TestVerifyEndpoint(unittest.TestCase):
         self.assertIn("evidence_summary", data)
 
     def test_verify_with_evidence_pack(self):
-        """Supply pre-built evidence pack — skips memu call."""
+        """Supply pre-built evidence pack — uses semantic rank_score."""
         resp = client.post("/verify", json={
             "claim": "Drainage at grid B5 is 200mm deep",
             "source": "test",
             "evidence_pack": [
-                {"content": "Drainage at grid B5 is 200mm deep per DWG-005",
-                 "relevance": 0.9, "importance": 0.8},
-                {"content": "Grid B5 drainage confirmed at 200mm",
-                 "relevance": 0.85, "importance": 0.7},
-                {"content": "B5 drainage spec 200mm as-built",
-                 "relevance": 0.8, "importance": 0.75},
+                {"content": {"result": "Drainage at grid B5 is 200mm deep per DWG-005"},
+                 "relevance": 0.9, "importance": 0.8, "rank_score": 0.7},
+                {"content": {"result": "Grid B5 drainage confirmed at 200mm"},
+                 "relevance": 0.85, "importance": 0.7, "rank_score": 0.65},
+                {"content": {"result": "B5 drainage spec 200mm as-built"},
+                 "relevance": 0.8, "importance": 0.75, "rank_score": 0.6},
             ],
         })
         self.assertEqual(resp.status_code, 200)

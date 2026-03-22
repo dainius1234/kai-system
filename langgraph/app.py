@@ -50,6 +50,10 @@ audit = AuditStream("langgraph", required=os.getenv("AUDIT_REQUIRED", "false").l
 saver = build_saver()
 MIN_CONVICTION = 8.0
 MAX_RETHINKS = 3
+# ── context budget: prevent system prompt from exceeding the model's window ──
+# Default 3072 tokens leaves ~1K for output on qwen2:0.5b (4K context).
+# Override via CONTEXT_BUDGET_TOKENS for larger models.
+CONTEXT_BUDGET_TOKENS = int(os.getenv("CONTEXT_BUDGET_TOKENS", "3072"))
 last_low_conviction_alert = 0.0
 last_guard_alerts: Dict[str, float] = {"memu": 0.0, "tool_gate": 0.0}
 SELF_EMP_ROOT = os.getenv("SELF_EMP_ROOT", "/data/self-emp")
@@ -116,6 +120,56 @@ def load_conviction_overrides() -> List[str]:
 def is_conviction_override(text: str) -> bool:
     candidate = text.lower()
     return any(rule in candidate for rule in load_conviction_overrides())
+
+
+# ── context budget utilities ────────────────────────────────────────
+
+
+def _estimate_tokens(text: str) -> int:
+    """Approximate token count (~4 chars per token for English)."""
+    return max(len(text) // 4, 1)
+
+
+def _trim_context(messages: List[Dict[str, str]], budget: int) -> List[Dict[str, str]]:
+    """Trim *messages* so total tokens stay within *budget*.
+
+    Preserves the first message (system prompt) and the last message
+    (current user query) unconditionally.  Middle messages (system
+    context injections + conversation history) are dropped oldest-first
+    when the budget is exceeded.
+
+    Returns a new list — does not mutate the input.
+    """
+    if not messages:
+        return messages
+
+    total = sum(_estimate_tokens(m.get("content", "")) for m in messages)
+    if total <= budget:
+        return messages
+
+    # always keep first (system prompt) and last (user query)
+    keep_first = messages[:1]
+    keep_last = messages[-1:]
+    middle = messages[1:-1] if len(messages) > 2 else []
+
+    first_cost = _estimate_tokens(keep_first[0].get("content", ""))
+    last_cost = _estimate_tokens(keep_last[0].get("content", ""))
+    remaining = budget - first_cost - last_cost
+
+    # keep middle messages from newest to oldest (preserve recent context)
+    kept_middle: List[Dict[str, str]] = []
+    for msg in reversed(middle):
+        cost = _estimate_tokens(msg.get("content", ""))
+        if remaining >= cost:
+            kept_middle.insert(0, msg)
+            remaining -= cost
+        # else: drop this message to stay within budget
+
+    trimmed = keep_first + kept_middle + keep_last
+    logger.info("context_budget: trimmed %d→%d messages (%d→%d est. tokens)",
+                len(messages), len(trimmed), total,
+                sum(_estimate_tokens(m.get("content", "")) for m in trimmed))
+    return trimmed
 
 
 def infer_specialist_fallback(user_input: str, task_hint: Optional[str]) -> str:
@@ -1020,6 +1074,10 @@ async def chat_stream(req: ChatRequest):
 
     # add current user message
     messages.append({"role": "user", "content": user_msg})
+
+    # enforce context budget — trim oldest middle messages when the
+    # assembled prompt exceeds the model's context window
+    messages = _trim_context(messages, CONTEXT_BUDGET_TOKENS)
 
     # record user turn
     await _append_session_turn(req.session_id, "user", user_msg)
