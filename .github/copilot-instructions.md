@@ -85,6 +85,15 @@ make test-adversary          # adversary challenge engine tests
 make test-v7                 # v7 feature tests (verifier, quarantine, policy, idempotency, integration-chain)
 make test-prod-hardening     # production hardening (secrets, pubsub, backup, HMAC)
 make test-hmac-rotation-drill # HMAC rotation lifecycle drill
+make test-p3-organic          # P3 organic memory tests
+make test-p4-personality       # P4 personality & proactive tests
+make test-p16-operational      # P16 operational intelligence tests
+make test-p17-emotional-intelligence # P17 emotional intelligence tests
+make test-p18-narrative-identity     # P18 narrative identity tests
+make test-p19-imagination-engine      # P19 imagination engine tests
+make test-p20-conscience-values        # P20 conscience & values tests
+make test-p21-proactive-agent          # P21 proactive agent loop tests
+make test-p22-operator-model            # P22 operator model tests
 
 # Integration / smoke tests (requires running stack)
 make core-smoke              # python3 scripts/smoke_core.py
