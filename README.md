@@ -11,8 +11,8 @@
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
   <img src="https://img.shields.io/badge/services-26-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-1%2C550_passing-brightgreen?style=flat-square" alt="tests">
-  <img src="https://img.shields.io/badge/Python-~40%2C647_LOC-yellow?style=flat-square" alt="loc">
+  <img src=\"https://img.shields.io/badge/tests-1%2C555_passing-brightgreen?style=flat-square\" alt=\"tests\">
+  <img src="https://img.shields.io/badge/Python-~41%2C107_LOC-yellow?style=flat-square" alt="loc">
   <img src="https://img.shields.io/badge/milestones-31_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
@@ -25,9 +25,9 @@
 | Metric | Value |
 |---|---|
 | **Services** | 26 Docker containers |
-| **Test targets** | 86 (`make test-core`) |
-| **Individual tests** | 1,550 (`def test_` across 78 files) |
-| **Python LOC** | ~40,647 |
+| **Test targets** | 88 (`make test-core`) |
+| **Individual tests** | 1,572 (`def test_` across 82 files) |
+| **Python LOC** | ~41,107 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 31 |
 | **Failures** | 0 |
@@ -42,7 +42,7 @@
 make core-up          # Start minimal stack (8 services)
 make core-down        # Stop it
 make full-up          # Start all 26 services
-make test-core        # Run all 86 test targets (~1,550 tests)
+make test-core        # Run all 88 test targets (~1,555 tests)
 make go_no_go         # Syntax check all entry points
 make merge-gate       # Full pre-merge validation
 make sync-docs        # Auto-update README + backlog metrics
@@ -54,7 +54,7 @@ make coverage         # pytest-cov HTML report
 
 ## What Makes Kai Different
 
-> Every row below is **implemented and tested**. Nothing is vaporware.
+> Every capability below has code and tests. Reasoning quality depends on the LLM model — see [Honest Limitations](#honest-limitations) below.
 
 ### Soul & Inner Life
 
@@ -101,7 +101,7 @@ make coverage         # pytest-cov HTML report
 | **Self-Healing** | Deep `/health` + `/recover` + supervisor auto-heal loop across all services |
 | **Recovery Log** | Every self-heal event logged to conscience — ties resilience to narrative |
 | **Security Self-Hacking** | Fuzzes own APIs with 34 payloads, adversary challenges, SAGE self-review |
-| **HMAC Auth** | Inter-service HMAC signing, Ed25519, dual-sign rotation, nonce replay protection |
+| **HMAC Auth** | Inter-service HMAC signing, Ed25519, dual-sign rotation, nonce replay protection. Dev secret requires explicit `HMAC_ALLOW_DEV_SECRET=true` |
 | **Time-Travel Debug** | Checkpoint any state, diff between snapshots, rollback to any previous state |
 | **Feature Flags** | 13 capabilities toggleable via `FF_` env vars without code changes |
 | **Structured Errors** | 20 enumerated codes (E1001–E4004) — no more "something broke" |
@@ -112,12 +112,29 @@ make coverage         # pytest-cov HTML report
 
 ---
 
+## Honest Limitations
+
+> No illusions. Here's what's real and what's waiting.
+
+| Area | Reality | What Fixes It |
+|---|---|---|
+| **LLM Model** | Default `qwen2:0.5b` (~400M params) is a test placeholder — too small for meaningful reasoning, planning, or emotional intelligence | Upgrade to 7B+ model (`qwen2.5:7b`, `llama3:8b`). RTX 5080 laptop = 3 env vars to switch |
+| **Specialist Routing** | Keyword regex classification, not ML-based. All 3 "specialists" route to the same Ollama endpoint by default | Wire separate model endpoints when GPU hardware arrives |
+| **Fusion Consensus** | Uses Jaccard word-overlap to measure agreement, not semantic similarity | Swap to embedding-based agreement when real models are running |
+| **Test Style** | 1,555 tests verify **structural correctness** (endpoints exist, return right JSON keys, scoring math works). 15 behavioral tests verify reasoning logic. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
+| **Dashboard** | Chat, Health, Mode toggle, Canvas are functional. Other views (Thinking, Goals, Memory, Soul, Diary, Logs) are **proxy shells** — they work when backends are running but show "unavailable" in minimal stack | Views become live with `make full-up` |
+| **Memory Persistence** | Minimal stack now uses pgvector (fixed). Full persistence requires `make full-up` or setting `VECTOR_STORE=postgres` + `PG_URI` | Default is now correct |
+| **Security Defaults** | HMAC enforced, but DB password is `localdev` by default. Nonce replay persisted to file. Dev HMAC secret now blocked unless explicitly allowed | Set `DB_PASSWORD`, `INTERSERVICE_HMAC_SECRET` env vars for production |
+| **Coverage** | ~60% estimated. Dashboard proxy endpoints and memu-core complex paths have gaps | `.coveragerc` configured; `make coverage` tracks it |
+
+---
+
 ## Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │  OPERATOR INPUT                                                      │
-│  Telegram Bot ─── Dashboard (8 views) ─── API Direct                 │
+| Telegram Bot ─── Dashboard (10 views) ─── API Direct                │
 └────────────────────────────┬────────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────────┐
@@ -275,13 +292,17 @@ Supervisor (every 15s) → deep /health on each service
 |---|---|---|
 | verifier semantic | ~~Keyword matcher, not embedding-based~~ | **Done** — semantic rank_score (embedding + relevance + importance + recency) |
 | context budget | ~~System prompt can grow unbounded~~ | **Done** — `_trim_context()` enforces `CONTEXT_BUDGET_TOKENS` (default 3072) |
+| minimal pgvector | ~~InMemoryVectorStore loses data on restart~~ | **Done** — minimal stack now uses `pgvector/pgvector:pg15` + `VECTOR_STORE=postgres` |
+| dev secret hardcoded | ~~Silently falls back to dev HMAC secret~~ | **Done** — requires explicit `HMAC_ALLOW_DEV_SECRET=true` env var |
+| behavioral tests | ~~Tests verify JSON shape, not reasoning quality~~ | **Done** — 15 behavioral + 8 Docker e2e tests added |
+| dashboard UX | ~~Basic web UI, not native-feeling~~ | **Done** — Apple/glassmorphism redesign (SF Pro, backdrop-blur, smooth transitions) |
 | test coverage | ~60% estimated | Tracking (`.coveragerc` added) |
 
 ---
 
 ## Milestone History
 
-> 31 shipped. Zero skipped. Every milestone has tests.
+> 31 shipped. Zero skipped. Every milestone has tests. Quality of AI reasoning depends on model — see [Honest Limitations](#honest-limitations).
 
 ```
 P0  Stack runs              ██████████ DONE   P14 Temporal Self       ██████████ DONE
@@ -335,7 +356,7 @@ supervisor/          # Dual-layer watchdog, circuit-breaker, self-heal
 fusion-engine/       # Multi-signal consensus and conviction gating
 verifier/            # Semantic fact-checking (embedding + keyword), SAGE self-critique
 executor/            # Sandboxed execution bridge
-dashboard/           # 8-view operator console (FastAPI + Starlette)
+dashboard/           # 10-view operator console (FastAPI + Starlette)
 memu-core/           # Memory engine — the soul (~6,100 lines)
 tool-gate/           # HMAC auth, rate limit, policy enforcement
 langgraph/           # Agentic brain (router, planner, adversary, conviction, config)
@@ -359,7 +380,7 @@ sandboxes/           # Ephemeral sandbox environments
   shell/             # Shell sandbox
 common/              # Shared: auth, llm, policy, rate_limit, resilience, errors, feature_flags
 security/            # HMAC/auth hardening helpers
-scripts/             # Tests, validation, automation (~77 test files)
+scripts/             # Tests, validation, automation (~68 test files)
 data/                # Seed datasets and advisor inputs
 docs/                # Plans, runbooks, architecture, backlog
 ```
@@ -410,13 +431,13 @@ make full-down     # Stop everything
 
 # Validate
 make go_no_go      # Syntax check
-make test-core     # All 85 targets
+make test-core     # All 88 targets
 make merge-gate    # Full pre-merge
 ```
 
 ---
 
-## Test Targets (86)
+## Test Targets (88)
 
 <details>
 <summary>Click to expand full test target list</summary>
@@ -453,6 +474,9 @@ make test-error-codes          make test-feature-flags
 make test-dream-state          make test-security-audit      make test-tree-search
 make test-priority-queue       make test-model-selector       make test-context-budget
 
+# Quality & validation
+make test-behavioral           make test-docker-e2e
+
 # Engineering
 make dep-audit                 make coverage
 make core-smoke                make test-integration
@@ -479,25 +503,28 @@ make core-smoke                make test-integration
 4. `CHANGELOG.md` — Full semver changelog (v0.1.0 → v0.25.0)
 5. `SESSION_BACKLOG.md` — Per-session work log and open items
 
-### Cross-Check: What's Real
+### Cross-Check: What's Real vs What Needs Hardware
 
-- [x] All 26 services built, running, health-checked
-- [x] Real LLM: Ollama qwen2:0.5b (CPU), GPU = 3 env vars to upgrade
-- [x] Real persistence: pgvector + Redis
-- [x] Real input: Telegram voice + text
-- [x] Real output: edge-tts British Ryan Neural
-- [x] 8-domain specialist router, memory-driven planner, 7-type adversary + SAGE
-- [x] 5-signal conviction scoring, CoT tree search, priority queue
-- [x] Deep personality (PUB/WORK), proactive conversation, anti-annoyance
-- [x] Dream state (6-phase), MARS decay (R = e^{-τ/S}), Agent-Evolver
-- [x] Security self-hacking (34 payloads), SAGE multi-agent critique
-- [x] Emotional memory (8 emotions), self-reflection, imagination, conscience
-- [x] 8 dashboard views, PWA installable, keyboard shortcuts
-- [x] HMAC + Ed25519 auth, structured errors, feature flags
-- [x] Dual-layer self-healing, recovery logging to conscience
-- [x] LangGraph checkpointing (save/load/diff/rollback)
-- [x] Pre-commit, dep scanning, container scanning, coverage tracking
-- [x] 86 test targets, 1,550 tests, zero failures
+**Working now (CPU/Codespace):**
+- [x] 26 services built, health-checked, compose validated
+- [x] pgvector persistence (both minimal + full stacks)
+- [x] HMAC auth enforced, dev secret blocked by default
+- [x] Supervisor auto-healing loop (deep /health + /recover)
+- [x] Executor sandboxing (allowlist + AST validation + shell=False)
+- [x] Prometheus + Alertmanager + Telegram alerts wired
+- [x] 88 test targets, 1,555 tests, zero failures
+- [x] Pre-commit, dep scanning, container scanning
+- [x] Circuit breakers, exponential backoff, resilient_call()
+- [x] MARS memory decay (R = e^{-τ/S}), spaced repetition
+- [x] Context budget trimming, structured errors, feature flags
+
+**Infrastructure ready, needs real LLM (GPU) to shine:**
+- [ ] Emotional intelligence — code works, but qwen2:0.5b can't actually detect emotions well
+- [ ] Imagination/counterfactual — endpoints exist, reasoning quality depends on model
+- [ ] Multi-model consensus — architecture ready, all 3 specialists currently route to same model
+- [ ] SAGE critique — self-review logic works, quality depends on model's introspection ability
+- [ ] Dashboard Thinking/Soul/Canvas views — proxy shells, need full stack running
+- [ ] Real STT (faster-whisper) / TTS (edge-tts) — code ready, need audio hardware
 
 ---
 

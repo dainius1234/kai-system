@@ -45,15 +45,25 @@ _DEV_SECRET = "local-dev-shared-secret"
 _WARNED_DEFAULT_SECRET = False
 
 
+def _allow_dev_secret() -> bool:
+    return os.getenv("HMAC_ALLOW_DEV_SECRET", "false").lower() in {"1", "true", "yes"}
+
+
 def _secret(env_name: str, default: str = "") -> bytes:
     global _WARNED_DEFAULT_SECRET
     value = load_secret(env_name, default)
-    if value == _DEV_SECRET and not _WARNED_DEFAULT_SECRET:
-        _WARNED_DEFAULT_SECRET = True
-        _logger.warning(
-            "HMAC using default dev secret — set %s for production",
-            env_name,
-        )
+    if value == _DEV_SECRET:
+        if not _allow_dev_secret():
+            raise RuntimeError(
+                f"HMAC dev secret in use but HMAC_ALLOW_DEV_SECRET is not set. "
+                f"Set {env_name} to a real secret, or set HMAC_ALLOW_DEV_SECRET=true for local dev."
+            )
+        if not _WARNED_DEFAULT_SECRET:
+            _WARNED_DEFAULT_SECRET = True
+            _logger.warning(
+                "HMAC using default dev secret — set %s for production",
+                env_name,
+            )
     return value.encode("utf-8")
 
 
@@ -93,7 +103,10 @@ def sign_gate_request_bundle(*, actor_did: str, session_id: str, tool: str, nonc
     return signatures
 
 
-def verify_gate_signature(*, actor_did: str, session_id: str, tool: str, nonce: str, ts: float, signature: Optional[str]) -> bool:
+def verify_gate_signature(
+    *, actor_did: str, session_id: str, tool: str,
+    nonce: str, ts: float, signature: Optional[str],
+) -> bool:
     if not signature or ":" not in signature:
         return False
     key_id, candidate = signature.split(":", 1)

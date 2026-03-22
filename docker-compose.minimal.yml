@@ -20,7 +20,7 @@ x-service-defaults: &defaults
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg15
     container_name: sovereign-postgres
     <<: *defaults
     environment:
@@ -62,6 +62,7 @@ services:
       MODE: "WORK"
       REQUIRED_CONFIDENCE: "0.7"
       NONCE_TTL_SECONDS: "300"
+      HMAC_ALLOW_DEV_SECRET: "true"
     ports:
       - "8000:8000"
     healthcheck:
@@ -86,6 +87,8 @@ services:
     environment:
       MEMU_URL: http://memu-core:8001
       MAX_MEMORY_RECORDS: "5000"
+      VECTOR_STORE: postgres
+      PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
     ports:
       - "8001:8001"
     healthcheck:
@@ -99,6 +102,8 @@ services:
         ipv4_address: 172.20.0.5
     depends_on:
       redis:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
   heartbeat:

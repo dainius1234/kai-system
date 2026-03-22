@@ -118,6 +118,8 @@ make test-predictive-failure            # predictive failure modeling tests
 make test-multi-modal                   # multi-modal sensory input tests
 make test-world-anchor                  # external world anchor tests
 make test-self-healing-phases           # bio-inspired self-healing phase tests
+make test-behavioral                    # behavioral reasoning tests
+make test-docker-e2e                    # Docker compose validation tests
 make dep-audit                          # pip-audit dependency vulnerability scan
 make coverage                           # pytest-cov coverage report (HTML + terminal)
 # Integration / smoke tests (requires running stack)
