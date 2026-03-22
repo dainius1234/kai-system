@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: Engineering maturity gap-close (pre-commit, coverage, error codes, feature flags, dep scanning, CHANGELOG, CODEOWNERS) — **65 targets, 1258 tests**
+**Last updated:** 2026-03-22 — session: Recovery log + conscience audit hardening + doc sync — **65 targets, 1258 tests**
 
 ---
 

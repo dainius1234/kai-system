@@ -23,16 +23,22 @@
 - Implemented recovery log in memu-core: after every /recover, logs what was healed and what was learned to conscience/narrative system
 - Updated README.md, PROJECT_BACKLOG.md, SESSION_BACKLOG.md to document new feature
 - Validated patch and doc updates; all tests passing
-- Next: Update architecture and known issues docs for recovery log, review open items, and reprioritize backlog
+
+## 2026-03-22 (cont.) — Quality Audit & Conscience Hardening
+
+- Full audit of GPT-4.1 commits: found 2 bugs in recovery log (missing verdict → KeyError, missing conscience lock → race condition)
+- Fixed recovery entry schema: added alignments, conflicts, alignment_score for full /conscience/audit compatibility
+- Fixed pre-existing race condition: /memory/conscience/check now uses _conscience_lock
+- Updated architecture.md and known_issues.md for recovery log
+- Ran sync-docs to re-align README LOC count (~36,006)
+- All 65 test targets passing (1 expected Codespace skip: test-agentic)
 
 ---
 
 ## Open Items
 
-### As of 2026-03-23
+### As of 2026-03-22
 
-- Update architecture and known issues docs for recovery log (in progress)
-- Review and reprioritize PROJECT_BACKLOG after recovery log addition
 - Continue session note workflow improvements
 - Monitor and display last test-core results
 - Address Tier 1/2/3 hardening (see PROJECT_BACKLOG.md)

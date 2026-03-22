@@ -11,7 +11,7 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Services** | 26 Docker containers |
 | **Test targets** | 65 (`make test-core`) |
 | **Individual tests** | 1,258 (`def test_` across 71 files) |
-| **Python LOC** | ~35,929 |
+| **Python LOC** | ~36,006 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 24 |
 | **Failures** | 0 |
