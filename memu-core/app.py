@@ -2339,6 +2339,288 @@ async def mars_consolidate() -> Dict[str, Any]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
+# ACTIVE CONTEXT COMPRESSION LOOP
+#  Compresses non-focus memories into merged summaries to save tokens
+#  while preserving accuracy on active/hot topics.
+#
+#  Algorithm (offline, pure math, no LLM):
+#    1. Estimate token usage per memory (~len/4)
+#    2. Rank all memories by MARS retention R = e^{-τ/S}
+#    3. Top-K by retention = "focus zone" (kept verbatim)
+#    4. Remaining memories grouped by category
+#    5. Within each category, merge clusters into summary records
+#    6. Replace originals with merged summaries
+#
+#  Source: arxiv.org/abs/2601.07190 (Active Context Compression)
+# ═══════════════════════════════════════════════════════════════════════
+
+FOCUS_COMPRESS_TOKEN_BUDGET = int(os.getenv("FOCUS_COMPRESS_TOKEN_BUDGET", "50000"))
+FOCUS_COMPRESS_TOP_K = int(os.getenv("FOCUS_COMPRESS_TOP_K", "50"))
+
+
+def _estimate_tokens(text: str) -> int:
+    """Approximate token count (~4 chars per token for English)."""
+    return max(len(text) // 4, 1)
+
+
+def _memory_token_cost(record: MemoryRecord) -> int:
+    """Estimate the token cost of a single memory record's content."""
+    content_str = str(record.content.get("result", ""))
+    metadata = f"{record.event_type} {record.category}"
+    return _estimate_tokens(content_str + metadata)
+
+
+def _keyword_set(text: str) -> set:
+    """Extract lowercase 4+ char words as a keyword fingerprint."""
+    import re as _re
+    return set(_re.findall(r"\b[a-z]{4,}\b", text.lower()))
+
+
+def _keyword_overlap(a: set, b: set) -> float:
+    """Jaccard similarity between two keyword sets."""
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
+
+
+def _merge_memory_cluster(
+    cluster: List[MemoryRecord],
+) -> MemoryRecord:
+    """Merge a cluster of related memories into a single summary record.
+
+    Keeps: best relevance, max stability, combined access count,
+    latest timestamp, union of content keys, concatenated results
+    truncated to stay compact.
+    """
+    # Sort by retention (most relevant first)
+    cluster.sort(key=lambda r: r.relevance, reverse=True)
+    best = cluster[0]
+
+    # Merge content: take first 80 chars of each result, deduplicate
+    seen_snippets: set = set()
+    merged_parts: List[str] = []
+    for rec in cluster:
+        snippet = str(rec.content.get("result", ""))[:80].strip()
+        if snippet and snippet not in seen_snippets:
+            seen_snippets.add(snippet)
+            merged_parts.append(snippet)
+
+    merged_result = " | ".join(merged_parts[:10])  # cap at 10 snippets
+
+    return MemoryRecord(
+        id=str(uuid.uuid4()),
+        timestamp=max(r.timestamp for r in cluster),
+        event_type="focus_compress_summary",
+        category=best.category,
+        content={
+            "result": f"[merged {len(cluster)} memories] {merged_result}",
+            "user_id": best.content.get("user_id", "system"),
+            "merged_count": len(cluster),
+            "original_categories": list({r.category for r in cluster}),
+        },
+        embedding=best.embedding,  # reuse best record's embedding
+        relevance=max(r.relevance for r in cluster),
+        importance=max(r.importance for r in cluster),
+        access_count=sum(r.access_count for r in cluster),
+        last_accessed=max(
+            (r.last_accessed for r in cluster if r.last_accessed),
+            default=None,
+        ),
+        stability=max(r.stability for r in cluster),
+        pinned=False,
+    )
+
+
+@app.post("/memory/focus-compress")
+async def focus_compress(
+    token_budget: int = Query(
+        default=FOCUS_COMPRESS_TOKEN_BUDGET, ge=1000, le=500000,
+    ),
+    focus_top_k: int = Query(
+        default=FOCUS_COMPRESS_TOP_K, ge=5, le=500,
+    ),
+) -> Dict[str, Any]:
+    """Active Context Compression Loop.
+
+    Compresses non-focus memories to fit within a token budget while
+    preserving full accuracy on focus topics (high-retention memories).
+
+    Steps:
+      1. Estimate total token usage across all memories
+      2. Identify focus memories (top-K by MARS retention)
+      3. Group remaining memories by category
+      4. Merge similar memories within each category (keyword overlap > 0.3)
+      5. Enforce token budget — truncate lowest-retention merged groups
+      6. Report savings
+
+    Source: arxiv.org/abs/2601.07190 (Active Context Compression)
+    """
+    import math
+
+    all_records = store.search(top_k=10_000)
+    if not all_records:
+        return {"status": "ok", "reason": "no memories to compress",
+                "tokens_before": 0, "tokens_after": 0, "savings_pct": 0.0}
+
+    # 1. Compute retention and token cost for every record
+    scored: List[tuple] = []  # (retention, token_cost, record)
+    total_tokens_before = 0
+    for rec in all_records:
+        if getattr(rec, "poisoned", False):
+            continue
+        access = getattr(rec, "access_count", 0)
+        stab = getattr(rec, "stability", 1.0)
+        ret = _recency_weight(rec.timestamp, access, stability=stab)
+        cost = _memory_token_cost(rec)
+        total_tokens_before += cost
+        scored.append((ret, cost, rec))
+
+    # 2. Sort by retention descending
+    scored.sort(key=lambda x: x[0], reverse=True)
+
+    # 3. Split into focus zone (kept verbatim) and compress zone
+    focus_records: List[MemoryRecord] = []
+    compress_candidates: List[tuple] = []
+    for i, (ret, cost, rec) in enumerate(scored):
+        if rec.pinned or i < focus_top_k:
+            focus_records.append(rec)
+        else:
+            compress_candidates.append((ret, cost, rec))
+
+    focus_tokens = sum(_memory_token_cost(r) for r in focus_records)
+
+    # If already under budget, skip
+    if total_tokens_before <= token_budget:
+        return {
+            "status": "ok",
+            "reason": "already within token budget",
+            "tokens_before": total_tokens_before,
+            "tokens_after": total_tokens_before,
+            "savings_pct": 0.0,
+            "focus_count": len(focus_records),
+            "compress_candidates": len(compress_candidates),
+        }
+
+    # 4. Group compress candidates by category
+    cat_groups: Dict[str, List[MemoryRecord]] = {}
+    for _ret, _cost, rec in compress_candidates:
+        cat = getattr(rec, "category", "general")
+        cat_groups.setdefault(cat, []).append(rec)
+
+    # 5. Within each category, cluster by keyword overlap and merge
+    merged_records: List[MemoryRecord] = []
+    originals_removed = 0
+
+    for cat, records in cat_groups.items():
+        # Build keyword fingerprints
+        fingerprints = [
+            (rec, _keyword_set(str(rec.content.get("result", ""))))
+            for rec in records
+        ]
+
+        # Simple greedy clustering: merge records with overlap > 0.3
+        clusters: List[List[MemoryRecord]] = []
+        used = set()
+
+        for i, (rec_i, kw_i) in enumerate(fingerprints):
+            if i in used:
+                continue
+            cluster = [rec_i]
+            used.add(i)
+            for j, (rec_j, kw_j) in enumerate(fingerprints):
+                if j in used:
+                    continue
+                if _keyword_overlap(kw_i, kw_j) > 0.3:
+                    cluster.append(rec_j)
+                    used.add(j)
+            clusters.append(cluster)
+
+        for cluster in clusters:
+            if len(cluster) >= 2:
+                # Merge the cluster
+                summary = _merge_memory_cluster(cluster)
+                merged_records.append(summary)
+                originals_removed += len(cluster)
+            else:
+                # Singleton — keep as-is
+                merged_records.append(cluster[0])
+
+    # 6. Token budget enforcement: if still over budget after merging,
+    #    truncate lowest-retention merged records' content
+    merged_tokens = sum(_memory_token_cost(r) for r in merged_records)
+    total_after_merge = focus_tokens + merged_tokens
+    truncated = 0
+
+    if total_after_merge > token_budget:
+        # Sort merged by relevance ascending (lowest first to truncate)
+        merged_records.sort(key=lambda r: r.relevance)
+        overshoot = total_after_merge - token_budget
+        for rec in merged_records:
+            if overshoot <= 0:
+                break
+            result = str(rec.content.get("result", ""))
+            old_tokens = _estimate_tokens(result)
+            # Truncate to 25% of original
+            keep_chars = max(len(result) // 4, 40)
+            if len(result) > keep_chars:
+                rec.content["result"] = result[:keep_chars] + "…"
+                new_tokens = _estimate_tokens(rec.content["result"])
+                overshoot -= (old_tokens - new_tokens)
+                truncated += 1
+
+    # 7. Apply changes to the store
+    # Remove originals that were merged and insert summaries
+    original_ids = {r.id for _, _, r in compress_candidates}
+    for oid in original_ids:
+        store.delete_record(oid)
+    for rec in merged_records:
+        store.insert(rec)
+
+    # Final token count
+    final_records = store.search(top_k=10_000)
+    tokens_after = sum(_memory_token_cost(r) for r in final_records)
+    savings_pct = round(
+        (1.0 - tokens_after / max(total_tokens_before, 1)) * 100, 1,
+    )
+
+    logger.info(
+        "focus-compress complete: tokens %d→%d (%.1f%% saved), "
+        "focus=%d, merged=%d clusters, truncated=%d",
+        total_tokens_before, tokens_after, savings_pct,
+        len(focus_records), originals_removed, truncated,
+    )
+
+    return {
+        "status": "ok",
+        "tokens_before": total_tokens_before,
+        "tokens_after": tokens_after,
+        "savings_pct": savings_pct,
+        "focus_count": len(focus_records),
+        "compress_candidates": len(compress_candidates),
+        "clusters_merged": originals_removed,
+        "truncated": truncated,
+        "token_budget": token_budget,
+    }
+
+
+@app.get("/memory/token-budget")
+async def token_budget_status() -> Dict[str, Any]:
+    """Live token budget meter — shows current usage vs budget."""
+    all_records = store.search(top_k=10_000)
+    total_tokens = sum(_memory_token_cost(r) for r in all_records)
+    budget = FOCUS_COMPRESS_TOKEN_BUDGET
+    usage_pct = round(total_tokens / max(budget, 1) * 100, 1)
+    return {
+        "status": "ok",
+        "total_tokens": total_tokens,
+        "token_budget": budget,
+        "usage_pct": usage_pct,
+        "records": len(all_records),
+        "headroom": max(budget - total_tokens, 0),
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
 # P3e: OHANA GOAL TRACKER
 #  Persistent goals that KAI tracks across sessions.  Not tasks — purposes.
 #  "No one gets left behind."  Goals have priority, deadlines, and progress.

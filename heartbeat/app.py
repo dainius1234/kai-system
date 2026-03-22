@@ -124,9 +124,14 @@ async def _auto_sleep_check() -> None:
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             await client.post(f"{MEMU_URL}/memory/compress")
+            # Active context compression — merge non-focus memories
+            try:
+                await client.post(f"{MEMU_URL}/memory/focus-compress")
+            except Exception:
+                pass  # non-fatal: new endpoint may not be deployed yet
             # P3c: enforce spaced repetition decay during sleep
             await client.post(f"{MEMU_URL}/memory/decay?half_life_days=14")
-        logger.info("System sleeping — memory compressed + decay applied")
+        logger.info("System sleeping — memory compressed + focus-compressed + decay applied")
         last_sleep_action = now
     except Exception:
         logger.warning("System sleeping trigger failed")

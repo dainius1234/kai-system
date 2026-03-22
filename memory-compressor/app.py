@@ -73,9 +73,10 @@ async def run_compression_cycle() -> Dict[str, Any]:
     Steps:
       1. GET /memory/stats — record baseline
       2. POST /memory/consolidate — MARS prune/strengthen (conscience-filtered)
-      3. POST /memory/compress — archive remaining stale memories
-      4. POST /memory/reflect — generate insight summaries
-      5. GET /memory/stats — record post-cycle state
+      3. POST /memory/focus-compress — active context compression (merge + budget)
+      4. POST /memory/compress — archive remaining stale memories
+      5. POST /memory/reflect — generate insight summaries
+      6. GET /memory/stats — record post-cycle state
     """
     started = time.time()
     result: Dict[str, Any] = {"started_at": datetime.utcnow().isoformat(), "steps": {}}
@@ -97,7 +98,22 @@ async def run_compression_cycle() -> Dict[str, Any]:
             consolidate_result.get("conscience_saved", 0),
         )
 
-        # 3. Compress — archive stale memories
+        # 3. Active context compression — merge non-focus memories, enforce token budget
+        try:
+            focus_result = await _call_memu("/memory/focus-compress")
+            result["steps"]["focus_compress"] = focus_result
+            logger.info(
+                "Focus-compress: tokens %s→%s (%.1f%% saved), merged=%s",
+                focus_result.get("tokens_before", 0),
+                focus_result.get("tokens_after", 0),
+                focus_result.get("savings_pct", 0.0),
+                focus_result.get("clusters_merged", 0),
+            )
+        except Exception as exc:
+            logger.warning("Focus-compress skipped (non-fatal): %s", exc)
+            result["steps"]["focus_compress"] = {"status": "skipped", "error": str(exc)}
+
+        # 4. Compress — archive stale memories
         compress_result = await _call_memu("/memory/compress")
         result["steps"]["compress"] = compress_result
         logger.info(
@@ -106,13 +122,13 @@ async def run_compression_cycle() -> Dict[str, Any]:
             compress_result.get("bytes_saved", 0),
         )
 
-        # 4. Reflect — consolidate recent memories into insights
+        # 5. Reflect — consolidate recent memories into insights
         reflect_result = await _call_memu("/memory/reflect")
         result["steps"]["reflect"] = reflect_result
         insights_count = len(reflect_result.get("insights", []))
         logger.info("Reflection: %d insights generated", insights_count)
 
-        # 5. Post-cycle stats
+        # 6. Post-cycle stats
         post_stats = await _call_memu("/memory/stats", method="GET")
         result["steps"]["post_stats"] = post_stats
         result["post_record_count"] = post_stats.get("records", 0)
@@ -122,6 +138,7 @@ async def run_compression_cycle() -> Dict[str, Any]:
         result["pruned"] = consolidate_result.get("pruned", 0)
         result["archived"] = compress_result.get("archived", 0)
         result["bytes_saved"] = compress_result.get("bytes_saved", 0)
+        result["tokens_saved"] = focus_result.get("savings_pct", 0.0) if isinstance(result["steps"].get("focus_compress"), dict) else 0.0
         result["insights_generated"] = insights_count
 
         audit.log(
