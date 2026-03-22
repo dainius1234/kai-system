@@ -25,9 +25,9 @@ A self-sovereign, air-gapped personal intelligence platform. Kai runs fully offl
 | **Proactive Agent Loop** | Scheduled tasks, reminders, morning/evening briefings, action registry | Never |
 | **Operator Model** | Echo-response engine, nudge escalation ladder, cross-mode insight bridge, impact oracle, shadow memory branches | Never |
 
-**62 test targets. 1150+ tests. Zero failures. 25 Docker services. All real.**
+**63 test targets. 1180+ tests. Zero failures. 25 Docker services. All real.**
 
-**Current focus: P24 Agent-Evolver Insight Engine** — Analyzes recurring failure patterns from episode history and generates concrete fix suggestions. Each failure class (9 types) maps to a prioritized behavior change recommendation. Integrated as Dream State Phase 7 — failures become learning opportunities during nightly consolidation.
+**Current focus: H3b LangGraph Checkpointing** — Time-travel debug and state snapshots. Full operational state (circuit breakers, error guards, error budget, conviction overrides) captured before every /recover and after every dream cycle. Manual save-points, diff between checkpoints, and rollback to any previous state.
 
 ---
 

@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: P24 Agent-Evolver Insight Engine (failure→pattern→fix, Dream Phase 7, priority-sorted suggestions) — **62 targets, 1150+ tests**
+**Last updated:** 2026-03-22 — session: H3b LangGraph Checkpointing (time-travel debug, state snapshots, auto-checkpoint on recover/dream) — **63 targets, 1180+ tests**
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 25 (22 build + postgres + redis + ollama) |
-| Test targets | 62 (make test-core) |
-| Individual tests | 1150+ passing, 0 failures |
+| Test targets | 63 (make test-core) |
+| Individual tests | 1180+ passing, 0 failures |
 | Lines of Python | ~14,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -1128,7 +1128,7 @@ said "here's exactly what to do differently."
 | **P23** | **SAGE Multi-Agent Critique (verifier self-critique + adversary self-review)** | arXiv:2603.15255 | **✅ DONE** |
 | **P24** | **Agent-Evolver Insight Engine (failure→pattern→fix suggestions)** | clawskills.sh | **✅ DONE** |
 | P25 | Mini-COSMO Recursive Self-Build (prompt→code→test→optimize) | github.com/XiangJinyu/mini-cosmo | Backlog |
-| H3b | LangGraph Checkpointing (time-travel debug, state snapshots) | LangGraph docs | Planned |
+| **H3b** | **LangGraph Checkpointing (time-travel debug, state snapshots)** | LangGraph docs | **✅ DONE** |
 
 **P23 — SAGE Multi-Agent Critique:** ✅ DONE. Dual-layer self-critique:
 (1) Verifier self-critique signal detects groupthink, thin-evidence passes,
@@ -1146,8 +1146,58 @@ POST /evolve/analyze, GET /evolve/suggestions endpoints.
 himself: prompt → architecture → code → sandbox-test → optimize. The ultimate
 self-evolution capability. Requires GPU + careful sandbox boundaries.
 
-**H3b — LangGraph Checkpointing:** Add state snapshots to heartbeat for
-time-travel debugging on crashes. Roll back to last known good state.
+**H3b — LangGraph Checkpointing:** ✅ DONE. Full state checkpoint engine:
+create/list/load/diff/delete/restore checkpoints. Auto-checkpoint before
+/recover (pre_recover) and after /dream (post_dream). Manual save-points
+via POST /checkpoint. Time-travel diff between any two checkpoints.
+Rollback via POST /checkpoint/{id}/restore (creates pre_restore safety
+checkpoint before applying). 32 tests covering creation, persistence,
+listing, diff, cap enforcement, serialization, and edge cases.
+
+### H3b Implementation Details
+
+**Architecture:**
+- `Checkpoint` dataclass: checkpoint_id, timestamp, label, trigger, breakers, error_guards, error_budget, conviction_overrides
+- File-based persistence: each checkpoint stored as individual JSON file in CHECKPOINT_DIR
+- Cap enforcement: CHECKPOINT_MAX (default 30), oldest removed first
+
+**Functions (langgraph/kai_config.py):**
+1. `create_checkpoint()` — Capture and persist full operational state
+2. `list_checkpoints()` — List available checkpoints, newest first
+3. `load_checkpoint()` — Load specific checkpoint by ID
+4. `diff_checkpoints()` — Compare two checkpoints, highlight changes
+5. `delete_checkpoint()` — Remove a single checkpoint
+
+**API Endpoints (langgraph/app.py):**
+1. `POST /checkpoint` — Create manual save-point with optional label
+2. `GET /checkpoints` — List checkpoints (newest first, limit param)
+3. `GET /checkpoint/{id}` — Full detail of specific checkpoint
+4. `POST /checkpoint/{id}/restore` — Time-travel rollback (creates pre_restore safety checkpoint first)
+5. `GET /checkpoint/diff/{id_a}/{id_b}` — Diff two checkpoints
+6. `DELETE /checkpoint/{id}` — Delete a checkpoint
+
+**Auto-checkpoint triggers:**
+- `pre_recover` — Before every /recover endpoint resets breakers
+- `post_dream` — After every dream consolidation cycle completes
+- `pre_restore` — Before every rollback (safety net)
+
+**Diff capabilities:**
+- Breaker state changes (per-dependency)
+- Error guard changes
+- Error budget changes
+- Conviction override additions/removals
+- Time delta between checkpoints
+
+**Tests (scripts/test_checkpoint.py): 32 tests**
+- Creation: basic, unique IDs, disk persistence, conviction overrides
+- Listing: empty, newest-first order, limit, metadata
+- Loading: existing, missing, full field roundtrip
+- Diff: identical, breaker changes, guard changes, budget changes, override diff, time delta
+- Delete: existing, nonexistent
+- Cap: max enforcement, oldest-first removal
+- Serialization: to_dict roundtrip, JSON serializable, ISO time format
+- Edge cases: empty state, special chars, filesystem safety, rapid creates, partial data
+- Integration: pre_recover pattern, post_dream pattern, pre_restore pattern
 
 ---
 

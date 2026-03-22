@@ -20,7 +20,7 @@ from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.llm import LLMRouter
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
-from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, run_dream_cycle, analyze_failures, load_evolver_reports
+from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, run_dream_cycle, analyze_failures, load_evolver_reports, create_checkpoint, list_checkpoints, load_checkpoint, diff_checkpoints, delete_checkpoint
 from conviction import build_plan, detect_self_deception, low_conviction_feedback, score_conviction
 from router import classify, dispatch_route
 from planner import gather_context, build_enriched_plan, predict_next_request, pre_fetch_predicted_context
@@ -289,7 +289,27 @@ async def health() -> Dict[str, Any]:
 
 @app.post("/recover")
 async def recover() -> Dict[str, Any]:
-    """Self-heal — reset circuit breakers to allow retry."""
+    """Self-heal — reset circuit breakers to allow retry.
+
+    Automatically creates a pre-recovery checkpoint so the previous
+    state can be inspected or restored via time-travel.
+    """
+    # H3b: snapshot state before resetting anything
+    try:
+        create_checkpoint(
+            label="pre-recover",
+            trigger="pre_recover",
+            breaker_states={
+                "memu": {**MEMU_BREAKER.snapshot(), "opened_at": MEMU_BREAKER.opened_at},
+                "tool_gate": {**TOOL_GATE_BREAKER.snapshot(), "opened_at": TOOL_GATE_BREAKER.opened_at},
+            },
+            guard_states={"memu": MEMU_ERROR_GUARD.snapshot(), "tool_gate": TOOL_ERROR_GUARD.snapshot()},
+            budget_state=budget.snapshot(),
+            conviction_overrides=load_conviction_overrides(),
+        )
+    except Exception:
+        logger.debug("Pre-recover checkpoint failed (non-critical)")
+
     MEMU_BREAKER.failures = 0
     MEMU_BREAKER.state = "closed"
     TOOL_GATE_BREAKER.failures = 0
@@ -1291,6 +1311,20 @@ async def trigger_dream():
         except Exception:
             logger.debug("Dream insight memorize failed")
 
+    # H3b: post-dream checkpoint
+    try:
+        state = _current_state_dict()
+        create_checkpoint(
+            label=f"post-dream-{cycle.cycle_id[:8]}",
+            trigger="post_dream",
+            breaker_states=state["breakers"],
+            guard_states=state["guards"],
+            budget_state=state["budget"],
+            conviction_overrides=state["overrides"],
+        )
+    except Exception:
+        logger.debug("Post-dream checkpoint failed (non-critical)")
+
     return {
         "status": "ok",
         "cycle_id": cycle.cycle_id,
@@ -1303,6 +1337,116 @@ async def trigger_dream():
         "duration_ms": cycle.duration_ms,
         "insights": [i.to_dict() for i in cycle.insights],
     }
+
+
+# ── H3b: State Checkpoint endpoints ─────────────────────────────────
+
+def _current_state_dict() -> Dict[str, Any]:
+    """Gather current operational state for checkpoint capture."""
+    return {
+        "breakers": {
+            "memu": {**MEMU_BREAKER.snapshot(), "opened_at": MEMU_BREAKER.opened_at},
+            "tool_gate": {**TOOL_GATE_BREAKER.snapshot(), "opened_at": TOOL_GATE_BREAKER.opened_at},
+        },
+        "guards": {"memu": MEMU_ERROR_GUARD.snapshot(), "tool_gate": TOOL_ERROR_GUARD.snapshot()},
+        "budget": budget.snapshot(),
+        "overrides": load_conviction_overrides(),
+    }
+
+
+class CheckpointRequest(BaseModel):
+    label: str = ""
+
+
+@app.post("/checkpoint")
+async def checkpoint_create(req: CheckpointRequest) -> Dict[str, Any]:
+    """Create a manual state checkpoint."""
+    state = _current_state_dict()
+    cp = create_checkpoint(
+        label=req.label or "manual",
+        trigger="manual",
+        breaker_states=state["breakers"],
+        guard_states=state["guards"],
+        budget_state=state["budget"],
+        conviction_overrides=state["overrides"],
+    )
+    return {"status": "ok", "checkpoint_id": cp.checkpoint_id, "timestamp": cp.iso_time}
+
+
+@app.get("/checkpoints")
+async def checkpoint_list(limit: int = 20) -> Dict[str, Any]:
+    """List available checkpoints, newest first."""
+    cps = list_checkpoints(limit=limit)
+    return {"status": "ok", "count": len(cps), "checkpoints": cps}
+
+
+@app.get("/checkpoint/{checkpoint_id}")
+async def checkpoint_detail(checkpoint_id: str) -> Dict[str, Any]:
+    """Load full detail for a specific checkpoint."""
+    cp = load_checkpoint(checkpoint_id)
+    if not cp:
+        raise HTTPException(status_code=404, detail="Checkpoint not found")
+    return {"status": "ok", "checkpoint": cp.to_dict()}
+
+
+@app.post("/checkpoint/{checkpoint_id}/restore")
+async def checkpoint_restore(checkpoint_id: str) -> Dict[str, Any]:
+    """Restore LangGraph state from a checkpoint (time-travel rollback).
+
+    Before restoring, creates a pre-restore checkpoint so the current
+    state is never lost.
+    """
+    cp = load_checkpoint(checkpoint_id)
+    if not cp:
+        raise HTTPException(status_code=404, detail="Checkpoint not found")
+
+    # Save current state before rollback
+    state = _current_state_dict()
+    create_checkpoint(
+        label=f"pre-restore-to-{checkpoint_id[:16]}",
+        trigger="pre_restore",
+        breaker_states=state["breakers"],
+        guard_states=state["guards"],
+        budget_state=state["budget"],
+        conviction_overrides=state["overrides"],
+    )
+
+    # Restore breaker states
+    for breaker, key in ((MEMU_BREAKER, "memu"), (TOOL_GATE_BREAKER, "tool_gate")):
+        b_state = cp.breakers.get(key, {})
+        breaker.state = str(b_state.get("state", "closed"))
+        breaker.failures = int(b_state.get("failures", 0))
+        breaker.opened_at = float(b_state.get("opened_at", 0.0))
+
+    _persist_breakers()
+    logger.info("State restored from checkpoint %s (%s)", checkpoint_id, cp.label)
+
+    return {
+        "status": "ok",
+        "restored_from": checkpoint_id,
+        "label": cp.label,
+        "original_time": cp.iso_time,
+    }
+
+
+@app.get("/checkpoint/diff/{id_a}/{id_b}")
+async def checkpoint_diff(id_a: str, id_b: str) -> Dict[str, Any]:
+    """Compare two checkpoints and return differences."""
+    cp_a = load_checkpoint(id_a)
+    cp_b = load_checkpoint(id_b)
+    if not cp_a:
+        raise HTTPException(status_code=404, detail=f"Checkpoint {id_a} not found")
+    if not cp_b:
+        raise HTTPException(status_code=404, detail=f"Checkpoint {id_b} not found")
+    return {"status": "ok", "diff": diff_checkpoints(cp_a, cp_b)}
+
+
+@app.delete("/checkpoint/{checkpoint_id}")
+async def checkpoint_delete(checkpoint_id: str) -> Dict[str, Any]:
+    """Delete a single checkpoint."""
+    if delete_checkpoint(checkpoint_id):
+        return {"status": "ok", "deleted": checkpoint_id}
+    raise HTTPException(status_code=404, detail="Checkpoint not found")
 
 
 # ── P24: Agent-Evolver Insight Engine ────────────────────────────────

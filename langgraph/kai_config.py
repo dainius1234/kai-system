@@ -1286,3 +1286,190 @@ def evolver_dream_phase(episodes: List[Dict[str, Any]]) -> List[DreamInsight]:
         ))
 
     return insights
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  H3b: STATE CHECKPOINT ENGINE — time-travel debug & rollback
+#
+#  Captures the full operational state of the LangGraph orchestrator
+#  at a point in time.  Checkpoints enable:
+#    1. Pre-recovery snapshots (before /recover resets anything)
+#    2. Post-dream snapshots (after consolidation cycle)
+#    3. Manual save-points (operator-triggered via API)
+#    4. Time-travel diff (compare any two checkpoints)
+#    5. Rollback (restore state to any previous checkpoint)
+# ═══════════════════════════════════════════════════════════════════════
+
+CHECKPOINT_DIR = Path(os.getenv("CHECKPOINT_DIR", "/tmp/kai_checkpoints"))
+CHECKPOINT_MAX = int(os.getenv("CHECKPOINT_MAX", "30"))
+
+
+@dataclass
+class Checkpoint:
+    """Frozen state of the LangGraph orchestrator at a point in time."""
+    checkpoint_id: str
+    timestamp: float
+    label: str
+    trigger: str  # "manual", "pre_recover", "post_dream", "auto"
+    breakers: Dict[str, Any]
+    error_guards: Dict[str, Any]
+    error_budget: Dict[str, Any]
+    conviction_overrides: List[str]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "checkpoint_id": self.checkpoint_id,
+            "timestamp": self.timestamp,
+            "label": self.label,
+            "trigger": self.trigger,
+            "breakers": self.breakers,
+            "error_guards": self.error_guards,
+            "error_budget": self.error_budget,
+            "conviction_overrides": self.conviction_overrides,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "Checkpoint":
+        return cls(
+            checkpoint_id=str(d.get("checkpoint_id", "")),
+            timestamp=float(d.get("timestamp", 0)),
+            label=str(d.get("label", "")),
+            trigger=str(d.get("trigger", "unknown")),
+            breakers=d.get("breakers", {}),
+            error_guards=d.get("error_guards", {}),
+            error_budget=d.get("error_budget", {}),
+            conviction_overrides=d.get("conviction_overrides", []),
+        )
+
+    @property
+    def iso_time(self) -> str:
+        from datetime import datetime, timezone
+        return datetime.fromtimestamp(self.timestamp, tz=timezone.utc).isoformat()
+
+
+def _checkpoint_path(checkpoint_id: str) -> Path:
+    safe_id = re.sub(r"[^a-zA-Z0-9_\-]", "", checkpoint_id)
+    return CHECKPOINT_DIR / f"{safe_id}.json"
+
+
+def create_checkpoint(
+    label: str,
+    trigger: str,
+    breaker_states: Dict[str, Any],
+    guard_states: Dict[str, Any],
+    budget_state: Dict[str, Any],
+    conviction_overrides: Optional[List[str]] = None,
+) -> Checkpoint:
+    """Capture and persist a full state checkpoint."""
+    import uuid as _uuid
+    ts = time.time()
+    cid = f"{int(ts)}-{_uuid.uuid4().hex[:8]}"
+    cp = Checkpoint(
+        checkpoint_id=cid,
+        timestamp=ts,
+        label=label,
+        trigger=trigger,
+        breakers=breaker_states,
+        error_guards=guard_states,
+        error_budget=budget_state,
+        conviction_overrides=conviction_overrides or [],
+    )
+    _save_checkpoint(cp)
+    _enforce_cap()
+    return cp
+
+
+def _save_checkpoint(cp: Checkpoint) -> None:
+    CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
+    path = _checkpoint_path(cp.checkpoint_id)
+    path.write_text(json.dumps(cp.to_dict(), indent=2), encoding="utf-8")
+
+
+def _enforce_cap() -> None:
+    """Keep only the most recent CHECKPOINT_MAX checkpoints."""
+    files = sorted(CHECKPOINT_DIR.glob("*.json"), key=lambda p: p.stat().st_mtime)
+    while len(files) > CHECKPOINT_MAX:
+        files.pop(0).unlink(missing_ok=True)
+
+
+def list_checkpoints(limit: int = 20) -> List[Dict[str, Any]]:
+    """List available checkpoints, newest first."""
+    if not CHECKPOINT_DIR.exists():
+        return []
+    files = sorted(CHECKPOINT_DIR.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+    result: List[Dict[str, Any]] = []
+    for f in files[:limit]:
+        try:
+            cp = Checkpoint.from_dict(json.loads(f.read_text(encoding="utf-8")))
+            result.append({
+                "checkpoint_id": cp.checkpoint_id,
+                "timestamp": cp.timestamp,
+                "iso_time": cp.iso_time,
+                "label": cp.label,
+                "trigger": cp.trigger,
+            })
+        except Exception:
+            continue
+    return result
+
+
+def load_checkpoint(checkpoint_id: str) -> Optional[Checkpoint]:
+    """Load a specific checkpoint by ID."""
+    path = _checkpoint_path(checkpoint_id)
+    if not path.exists():
+        return None
+    try:
+        return Checkpoint.from_dict(json.loads(path.read_text(encoding="utf-8")))
+    except Exception:
+        return None
+
+
+def diff_checkpoints(
+    cp_a: Checkpoint, cp_b: Checkpoint
+) -> Dict[str, Any]:
+    """Compare two checkpoints and highlight differences.
+
+    Returns a dict of changed fields with before/after values.
+    """
+    changes: Dict[str, Any] = {}
+
+    # breaker diffs
+    for key in set(list(cp_a.breakers.keys()) + list(cp_b.breakers.keys())):
+        a_val = cp_a.breakers.get(key, {})
+        b_val = cp_b.breakers.get(key, {})
+        if a_val != b_val:
+            changes[f"breaker.{key}"] = {"before": a_val, "after": b_val}
+
+    # error guard diffs
+    for key in set(list(cp_a.error_guards.keys()) + list(cp_b.error_guards.keys())):
+        a_val = cp_a.error_guards.get(key, {})
+        b_val = cp_b.error_guards.get(key, {})
+        if a_val != b_val:
+            changes[f"guard.{key}"] = {"before": a_val, "after": b_val}
+
+    # error budget diff
+    if cp_a.error_budget != cp_b.error_budget:
+        changes["error_budget"] = {"before": cp_a.error_budget, "after": cp_b.error_budget}
+
+    # conviction override diff
+    if cp_a.conviction_overrides != cp_b.conviction_overrides:
+        added = [o for o in cp_b.conviction_overrides if o not in cp_a.conviction_overrides]
+        removed = [o for o in cp_a.conviction_overrides if o not in cp_b.conviction_overrides]
+        changes["conviction_overrides"] = {"added": added, "removed": removed}
+
+    return {
+        "checkpoint_a": cp_a.checkpoint_id,
+        "checkpoint_b": cp_b.checkpoint_id,
+        "time_delta_seconds": round(cp_b.timestamp - cp_a.timestamp, 2),
+        "changed_fields": len(changes),
+        "changes": changes,
+    }
+
+
+def delete_checkpoint(checkpoint_id: str) -> bool:
+    """Delete a single checkpoint by ID."""
+    path = _checkpoint_path(checkpoint_id)
+    if path.exists():
+        path.unlink()
+        return True
+    return False
