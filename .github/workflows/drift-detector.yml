@@ -2,6 +2,7 @@ name: Weekly Drift Detector
 
 on:
   schedule:
+    # Every Monday at 08:00 UTC
     - cron: '0 8 * * 1'
   workflow_dispatch:
 
@@ -20,7 +21,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
+        shell: bash
         run: |
+          #!/usr/bin/env bash
           set -euo pipefail
 
           today="$(date -u +%F)"
@@ -61,7 +64,7 @@ jobs:
           while IFS= read -r file; do
             line="$(grep -Eim1 'Last-updated:' "${file}" || true)"
             [ -z "${line}" ] && continue
-            date_str="$(printf '%s\n' "${line}" | sed -E 's/.*([0-9]{4}-[0-9]{2}-[0-9]{2}).*/\1/')"
+            date_str="$(printf '%s\n' "${line}" | sed -nE 's/.*Last-updated:[[:space:]]*([0-9]{4}-[0-9]{2}-[0-9]{2}).*/\1/p')"
             if [[ "${date_str}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
               file_epoch="$(date -u -d "${date_str}" +%s)"
               age_days="$(( (now_epoch - file_epoch) / 86400 ))"
@@ -93,7 +96,8 @@ jobs:
             printf '%s\n' "${copilot_stale}"
           } > "${body_file}"
 
-          existing_issue="$(gh issue list --state open --search '"Weekly drift report (" in:title' --json number --jq '.[0].number // empty')"
+          # Reuse the most recently updated open issue titled "Weekly drift report (...)".
+          existing_issue="$(gh issue list --state open --label pm --search 'Weekly drift report in:title' --json number,title,updatedAt --jq '[.[] | select(.title | startswith(\"Weekly drift report (\"))] | sort_by(.updatedAt) | reverse | .[0].number // empty')"
 
           if [ -n "${existing_issue}" ]; then
             gh issue comment "${existing_issue}" --body-file "${body_file}"
