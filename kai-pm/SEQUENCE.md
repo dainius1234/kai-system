@@ -1,48 +1,30 @@
-# Kai Locked Delivery Sequence
+# Sovereign AI Delivery Sequence (5-Phase Model)
 
-This roadmap is **locked-order**. A step can start only when its dependencies and unlock condition are satisfied.
+This sequence follows the canonical roadmap in [STRATEGIC_PLAN.md](STRATEGIC_PLAN.md).
 
 ```mermaid
 graph TD
-  S01[S01 Phase 1 GPU Foundation] --> S02[S02 Phase 2 Model Upgrade]
-  S02 --> S04[S04 Phase 4 Low-Latency Voice]
-  S02 --> S05[S05 Phase 5 Specialist Multi-Model]
-  S03[S03 Consolidation and J2 Merge Sequencing] --> S06[S06 J6 Identity Files]
-  S03 --> S07[S07 MCP Refactor]
-  S06 --> S08[S08 J1 Live Canvas]
-  S07 --> S08
-  S08 --> S09[S09 J3 Auto-Redaction]
-  S08 --> S10[S10 J5 Memory Viewer]
-  S09 --> S11[S11 J7 Skills Auto-Install]
-  S10 --> S11
-  S04 --> S11
-  S05 --> S11
+  P0[Phase 0: Pre-GPU Hardening] --> P1[Phase 1: Local LLM Integration]
+  P1 --> P2[Phase 2: Multi-Specialist Routing]
+  P0 --> P3[Phase 3: Memory & Reflection Hardening]
+  P2 --> P3
+  P2 --> P4[Phase 4: Avatar/Voice/Multimodal]
+  P2 --> P5[Phase 5: Production Hardening & Self-Improvement]
+  P3 --> P5
+  P4 --> P5
 ```
 
-## Sequence table
+## Phase table
 
-| ID | Name | Depends on | Unlock condition | Status |
+| ID | Name | Status | Depends on | Unlock condition |
 |---|---|---|---|---|
-| S01 | Phase 1 — GPU foundation procurement and bring-up | None | Hardware purchased, provisioned, and validated with Docker + Ollama | **BLOCKED (GPU)** |
-| S02 | Phase 2 — Model-tier upgrade (7B+ baseline) | S01 | 7B model running with acceptable latency and memory headroom | **BLOCKED (GPU)** |
-| S03 | Consolidation + J2 merge sequencing | None | Consolidation PR merged, PM source of truth installed | **IN-FLIGHT** |
-| S04 | Phase 4 — Proactive low-latency voice (J4) | S02 | Multimodal low-latency voice path meets response SLA | **BLOCKED (GPU)** |
-| S05 | Phase 5 — Specialist multi-model split | S02 | Separate specialist endpoints configured and validated | **BLOCKED (GPU)** |
-| S06 | J6 — SOUL.md + AGENTS.md identity layer | S03 | Identity docs present, wired into session bootstrap and PM flow | **QUEUED** |
-| S07 | MCP refactor (independent from J6) | S03 | MCP surface cleaned and documented with migration notes | **QUEUED** |
-| S08 | J1 — Live Canvas visualization | S06, S07 | Dashboard graph/canvas view live with current state overlays | **QUEUED** |
-| S09 | J3 — Auto-redaction PII | S08 | Redaction path tested for text + OCR extraction scenarios | **QUEUED** |
-| S10 | J5 — Memory Viewer GUI | S08 | Memory diary view available and linked in operator dashboard | **QUEUED** |
-| S11 | J7 — Skills auto-install hub and closeout | S04, S05, S09, S10 | Skills install flow hardened; PM sequence enters steady-state ops | **QUEUED** |
+| Phase 0 | Pre-GPU Hardening | **ACTIVE** | None | Continue CPU-friendly delivery (tests, coverage, docs sync, CI stability, MCP refactor, Phase-0-safe backlog work) |
+| Phase 1 | Local LLM Integration | **BLOCKED (GPU)** | Phase 0 | RTX 5080 procured/provisioned and local model runtime validated on target hardware |
+| Phase 2 | Multi-Specialist Routing | **BLOCKED (GPU)** | Phase 1 | Local multi-model routing performance validated on GPU host |
+| Phase 3 | Memory & Reflection Hardening | **PARTIAL (ACTIVE + BLOCKED)** | Phase 0 (active), Phase 2 (blocked parts) | CPU-safe memory/reliability tasks proceed now; GPU-coupled portions unlock after Phase 2 |
+| Phase 4 | Avatar / Voice / Multimodal | **BLOCKED (GPU)** | Phase 2 | GPU throughput and multimodal latency budget validated |
+| Phase 5 | Production Hardening & Self-Improvement | **BLOCKED (GPU)** | Phase 2, Phase 3, Phase 4 | Core runtime and multimodal stack stable on GPU-capable baseline |
 
-## Jewel-to-phase mapping
+## J-Series status correction
 
-| Jewel | Mapped sequence step(s) |
-|---|---|
-| J1 Live Canvas Visualization | S08 |
-| J2 Wake-word + Intent Judge | S03 (integration/merge sequencing anchor) |
-| J3 Auto-Redaction PII | S09 |
-| J4 Proactive Low-Latency Voice | S04 |
-| J5 Memory Viewer GUI | S10 |
-| J6 SOUL.md + AGENTS.md | S06 |
-| J7 Skills Auto-Install Hub | S11 |
+J1–J7 are **DONE** (already shipped in repo history/changelog) and are not part of a queued 11-step sequence.

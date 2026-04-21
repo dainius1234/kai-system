@@ -5,6 +5,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- flake8 E999 (f-string backslash) blocking CI on main
+- Removed stray file `pulls/48/review_comments`
+
 ### Added
 - PM: introduced `kai-pm/` brain + `.github` automation (PM System v2)
 - Context budget management (`CONTEXT_BUDGET_TOKENS` env, default 3072) — `_trim_context()` in langgraph prevents system prompt from exceeding model context window
@@ -20,6 +24,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - New feature flag: `FF_WAKE_INTENT_ROUTING` (default off)
 
 ### Changed
+- Replaced fabricated PM v2 content (DECISIONS, SEQUENCE, STATUS, RISKS) with honest, repo-grounded versions
+- Added `kai-pm/STRATEGIC_PLAN.md` as canonical 5-phase roadmap pointer
 - Verifier upgraded to semantic verification (v0.6.0) — uses memu-core `rank_score` (embedding similarity + relevance + importance + recency) instead of keyword-only matching
 - Verifier now calls `/memory/evidence-pack` for richer evidence scoring, with fallback to `/memory/retrieve`
 - Updated all stale documentation (README metrics, PROJECT_BACKLOG, Known Issues table)

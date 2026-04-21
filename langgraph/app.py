@@ -1139,7 +1139,8 @@ async def chat_stream(req: ChatRequest):
         full_response = []
         try:
             if not LLM_BREAKER.allow():
-                yield f"data: {json.dumps({'token': '[Kai\'s brain needs a moment — LLM circuit breaker is open. Try again shortly.]'})}\n\n"
+                breaker_msg = {"token": "[Kai's brain needs a moment — LLM circuit breaker is open. Try again shortly.]"}
+                yield f"data: {json.dumps(breaker_msg)}\n\n"
                 yield "data: [DONE]\n\n"
                 return
             async for token in _llm.stream(select_model(route_decision.route, user_msg, _llm.available, prefer_speed=True), messages):
