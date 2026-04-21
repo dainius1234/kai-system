@@ -9,11 +9,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Context budget management (`CONTEXT_BUDGET_TOKENS` env, default 3072) — `_trim_context()` in langgraph prevents system prompt from exceeding model context window
 - Context budget test suite (`scripts/test_context_budget.py`, 11 tests)
 - `make test-context-budget` Makefile target
+- J2 wake-intent service (`perception/wake/app.py`) with:
+  - `POST /wake/detect` (text/audio_b64 wake-word detect + confidence + debounce)
+  - `POST /wake/intent` (tiny-model intent taxonomy classifier with strict JSON validation)
+  - `POST /wake/process` (detect + intent combined)
+  - `GET /health` (dependency-aware status)
+- Wake-intent test suite (`scripts/test_wake_intent.py`) and `make test-wake` target (wired into `test-core`)
+- Wake-intent dashboard proxy endpoints (`/api/wake/detect`, `/api/wake/intent`, `/api/wake/process`)
+- New feature flag: `FF_WAKE_INTENT_ROUTING` (default off)
 
 ### Changed
 - Verifier upgraded to semantic verification (v0.6.0) — uses memu-core `rank_score` (embedding similarity + relevance + importance + recency) instead of keyword-only matching
 - Verifier now calls `/memory/evidence-pack` for richer evidence scoring, with fallback to `/memory/retrieve`
 - Updated all stale documentation (README metrics, PROJECT_BACKLOG, Known Issues table)
+- Langgraph `/chat` can now optionally pre-classify intent through wake-intent service before route selection when `FF_WAKE_INTENT_ROUTING=true`
 
 ### Previously Added
 - Pre-commit hooks (flake8, trailing whitespace, secret detection, syntax check)

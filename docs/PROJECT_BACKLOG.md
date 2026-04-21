@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 26 (22 build + postgres + redis + ollama + lakeFS) |
-| Test targets | 89 (make test-core) |
-| Individual tests | 1587+ passing, 0 failures |
+| Test targets | 74 (make test-core) |
+| Individual tests | 1617++ passing, 0 failures |
 | Lines of Python | ~42,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -1204,7 +1204,7 @@ said "here's exactly what to do differently."
 | **WA** | **External World Anchor (date/news/events proxy)** | calendar-sync/app.py | **✅ DONE** |
 | **SH** | **Bio-inspired Self-Healing (4-phase ReCiSt model)** | common/resilience.py | **✅ DONE** |
 | J1 | Live Canvas Visualization (mind-map/graph in dashboard) | OpenClaw Live Canvas + A2UI | Backlog |
-| J2 | Wake-word "Kai" + Intent Judge (whisper + tiny LLM) | github.com/isair/jarvis | Backlog |
+| J2 | Wake-word "Kai" + Intent Judge (whisper + tiny LLM) | github.com/isair/jarvis | **✅ DONE** |
 | J3 | Auto-Redaction PII (regex + OCR strip before processing) | github.com/isair/jarvis | Backlog |
 | J4 | Proactive Low-Latency Voice (speak-or-not from cues) | arXiv:2603.03447 Proact-VL | Backlog |
 | J5 | Memory Viewer GUI (diary-style browser in dashboard) | github.com/isair/jarvis | Backlog |
@@ -1295,14 +1295,14 @@ listing, diff, cap enforcement, serialization, and edge cases.
 - [ ] **Plan visualization** — render planner output as flowchart
 - [ ] **Tests** (scripts/test_live_canvas.py)
 
-### J2 — Wake-word "Kai" Anywhere + Intent Judge ⭐ RECOMMENDED START
+### J2 — Wake-word "Kai" Anywhere + Intent Judge ✅ DONE
 *Catch "Kai" in any sentence, mini-LLM decides if it's command or echo. Source: github.com/isair/jarvis (wake-word + intent-judge).*
 
-- [ ] **Wake-word detection** — keyword-spot "Kai" in whisper transcript stream
-- [ ] **Intent judge** — tiny llama3.2 / qwen2:0.5b classifies: command vs. mention vs. echo
-- [ ] **Natural nudge trigger** — detected intent fires nudge engine (not just explicit commands)
-- [ ] **Perception integration** — wire into `perception/audio/app.py` mic capture loop
-- [ ] **Tests** (scripts/test_wake_word.py)
+- [x] **Wake-word detection** — configurable wake words (`WAKE_WORDS`) + cooldown debounce (`WAKE_COOLDOWN_SECONDS`)
+- [x] **Intent judge** — tiny-model taxonomy classifier with strict JSON output validation
+- [x] **Natural fallback** — regex/keyword heuristic when model output is invalid/unavailable
+- [x] **Perception integration** — dedicated `perception/wake/app.py` service with `/wake/detect`, `/wake/intent`, `/wake/process`
+- [x] **Tests** (`scripts/test_wake_intent.py`) with endpoint smoke and feature-flag integration coverage
 
 ### J3 — Auto-Redaction PII
 *Strip emails, tokens, passwords before processing — even locally. Source: github.com/isair/jarvis.*
@@ -1417,16 +1417,15 @@ See `docs/unfair_advantages.md` for full details. Summary:
 
 ## What’s Next — Top Priorities
 
-1. **J2: Wake-word "Kai" + Intent Judge** ⭐
-   - Easiest win from J-series — makes nudges feel real
-   - Whisper keyword-spot + tiny LLM intent classifier
-   - Wire into perception/audio mic capture loop
+1. **J6: SOUL.md + AGENTS.md** ⭐ NEXT
+   - J2 front-door is now in place; identity persistence is the natural follow-up
+   - Persistent identity files read on startup, operator-editable
 2. **J1: Live Canvas Visualization**
    - Mind-map / graph / timeline rendering in dashboard
    - Uses existing goals + memories data
-3. **J6: SOUL.md + AGENTS.md**
-   - Persistent identity files read on startup
-   - User edits style/values, Kai adapts
+3. **J2: Wake-word "Kai" + Intent Judge** ✅
+   - Delivered as perception wake service + dashboard proxy + optional langgraph pre-routing
+   - Configurable wake words, debounce, tiny-model intent judge, heuristic fallback
 4. **J3: Auto-Redaction PII**
    - Regex + OCR strip before any memorize/log
    - Security improvement — relevant for production

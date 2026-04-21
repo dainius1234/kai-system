@@ -41,6 +41,7 @@ _REGISTRY: Dict[str, tuple] = {
     "MARS_CONSOLIDATION":    ("MARS memory decay + consolidation", True),
     "SELF_ASSESSMENT":       ("P14 temporal self-model", True),
     "SECURITY_AUDIT":        ("P9 automated security self-hacking", True),
+    "WAKE_INTENT_ROUTING":   ("Pre-classify chat intent via wake-intent service before routing", False),
 }
 
 

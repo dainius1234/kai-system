@@ -20,16 +20,16 @@
 
 ---
 
-## Project Status (22 March 2026)
+## Project Status (21 April 2026)
 
 | Metric | Value |
 |---|---|
-| **Services** | 26 Docker containers |
-| **Test targets** | 88 (`make test-core`) |
-| **Individual tests** | 1,609 (`def test_` across 83 files) |
-| **Python LOC** | ~41,107 |
+| **Services** | 27 Docker containers |
+| **Test targets** | 74 (`make test-core`) |
+| **Individual tests** | 1,617 (`def test_` across 83 files) |
+| **Python LOC** | ~42,474 |
 | **Compose files** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 31 |
+| **Milestones shipped** | 32 |
 | **Failures** | 0 |
 
 > **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
@@ -93,6 +93,7 @@ make coverage         # pytest-cov HTML report
 | **Struggle Detection** | 5-signal frustration analysis — auto-adapts when operator is struggling |
 | **Anti-Annoyance** | Per-type cooldowns, dismissal tracking, DND mode, escalating suppression |
 | **PUB/WORK Modes** | Deep personality system — mate at the pub vs. focused professional |
+| **Wake & Intent (J2)** | Wake-word detection (`/wake/detect`) + tiny-model intent judge (`/wake/intent`) with safe heuristic fallback |
 
 ### Production & Security
 
@@ -332,7 +333,7 @@ H3  Context Budget          ██████████ DONE
 | Priority | Feature | Status |
 |---|---|---|
 | **J1** | Live Canvas Visualization | **DONE** — mind-map/graph in dashboard |
-| **J2** | Wake-word "Kai" + Intent Judge | **DONE** — whisper + tiny LLM intent |
+| **J2** | Wake-word "Kai" + Intent Judge | **DONE** — wake-service `/wake/*`, cooldown/debounce, dashboard proxy + optional langgraph pre-routing |
 | **J3** | Auto-Redaction PII | **DONE** — regex strip before processing |
 | **J4** | Proactive Low-Latency Voice | **DONE** — audio/video cue → speak-or-not |
 | **J5** | Memory Viewer GUI | **DONE** — diary-style dashboard tab |
@@ -376,6 +377,7 @@ workspace-manager/   # Workspace lifecycle manager
 perception/          # Audio and camera capture
   audio/             # STT (faster-whisper tiny, CPU)
   camera/            # Camera capture
+  wake/              # Wake-word + intent judge (J2)
 output/              # Output services
   tts/               # Text-to-speech (edge-tts British Ryan)
   avatar/            # Avatar generation
