@@ -6,6 +6,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- PM: introduced `kai-pm/` brain + `.github` automation (PM System v2)
 - Context budget management (`CONTEXT_BUDGET_TOKENS` env, default 3072) — `_trim_context()` in langgraph prevents system prompt from exceeding model context window
 - Context budget test suite (`scripts/test_context_budget.py`, 11 tests)
 - `make test-context-budget` Makefile target

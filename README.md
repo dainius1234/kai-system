@@ -26,8 +26,8 @@
 |---|---|
 | **Services** | 27 Docker containers |
 | **Test targets** | 74 (`make test-core`) |
-| **Individual tests** | 1,617 (`def test_` across 83 files) |
-| **Python LOC** | ~42,474 |
+| **Individual tests** | 1,618 (`def test_` across 83 files) |
+| **Python LOC** | ~42,537 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 32 |
 | **Failures** | 0 |
@@ -49,6 +49,10 @@ make sync-docs        # Auto-update README + backlog metrics
 make dep-audit        # CVE scan on pip packages
 make coverage         # pytest-cov HTML report
 ```
+
+## Project Management
+
+Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md) as the entry point for fast session re-hydration, current roadmap state, and decision/risk tracking.
 
 ---
 
