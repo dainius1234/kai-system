@@ -1,0 +1,60 @@
+## 🔧 Corrections from repo audit (please apply before merge)
+
+A post-dispatch audit of `SESSION_BACKLOG.md` (2026-04-21 entry), `README.md`, `CHANGELOG.md`, and merged PRs revealed several inaccuracies in the original problem statement. Please update the following before finalizing:
+
+### 1. Jewels J1–J7 are ALL DONE — do NOT mark J6 as queued
+Per `SESSION_BACKLOG.md` (2026-04-21) and README, the following are shipped:
+- ✅ J1 Live Canvas
+- ✅ J2 Wake-word + Intent Judge (PR #47, merged today 20:57 UTC)
+- ✅ J3 Auto-Redaction PII
+- ✅ J4 Proactive Low-Latency Voice
+- ✅ J5 Memory Viewer GUI
+- ✅ **J6 SOUL.md + AGENTS.md** ← already done, do not list as queued
+- ✅ J7 Skills Auto-Install Hub
+
+Also done: H1/H2/H3 hardening, P1–P5, P16–P24, MARS consolidation, Active Context Compression, Predictive Failure Modeling, Multi-Modal Sensory, World Anchor, Bio-inspired Self-Healing, Checkpointing, SAGE critique, Agent-Evolver.
+
+### 2. Replace the fabricated "11-step locked sequence" + "decisions D1–D8"
+Neither exists in the repo. Build `kai-pm/SEQUENCE.md` from the **actual** structure found in `PROJECT_BACKLOG.md` and `next_level_roadmap.md`:
+- Jewels (J1–J7) — all DONE
+- Hardening (H1–H3) — all DONE
+- Projects (P1–P29) — most DONE; **P29 Financial Awareness still open**
+- GPU track — in flight (PR #46 consolidation open; PR #45 merged)
+
+Mermaid graph should reflect real dependencies, not invented ones.
+
+### 3. Replace the seeded `DECISIONS.md` entries with this honest list (D1–D6 only)
+Discard prior "D1–D13". Use only:
+- **D1** (2026-04-21) — Adopt `kai-pm/` directory as PM brain (single source of truth, append-only decisions, session bootstrap)
+- **D2** (2026-04-21) — Adopt parallel agent dispatch when file scopes do not overlap
+- **D3** (2026-04-21) — Add `.github/` automation: PR template, `pm-status.yml`, `tech-watch-reminder.yml`, `drift-detector.yml`, issue templates (bug, tech_adoption, drift_alert, decision_needed)
+- **D4** (2026-04-21) — Defer sub-agents (Doc-Bot, Test-Bot, Bench-Bot, Health-Bot) until value clearly exceeds review overhead
+- **D5** (2026-04-21) — Active priorities (in order): (1) Coverage measurement — replace "~60% estimated" in README with real number from `make coverage`; (2) P29 Financial Awareness — savings tracker, expense categorization; (3) GPU readiness — pre-wire multi-model endpoints, real STT/TTS adapters, speculative decoding hooks for RTX 5080
+- **D6** (2026-04-21) — Reconciliation rule: every session begins by diffing `SESSION_BACKLOG.md` vs README before any feature work (drift discipline)
+
+Header rule still stands: append-only, never edit past entries.
+
+### 4. STATUS.md current state
+- **In-flight PRs:** #46 (GPU Phase 0 consolidation), #48 (this PR)
+- **Last merged today:** #47 (J2 wake-word), #45 (GPU integration)
+- **Current focus:** coverage measurement → P29 → GPU readiness
+- **Hardware blocker:** GPU procurement gates the GPU-readiness track from going live (RTX 5080 not yet in hand)
+
+### 5. SESSION_BOOTSTRAP.md must reference SESSION_BACKLOG.md
+The repo already has `SESSION_BACKLOG.md` as the living scratchpad. Link to it from `SESSION_BOOTSTRAP.md` and document the diff-vs-README ritual (D6).
+
+### 6. RISKS.md — seed with real risks only
+- GPU procurement delay (H, blocks GPU track)
+- Doc drift (M, mitigated by D6 ritual + drift-detector workflow)
+- Coverage number unverified (M, mitigated by priority #1)
+- Single-maintainer bus-factor (M, mitigated by kai-pm/ system itself)
+- Stale `claude/*` branches (L, mitigated by drift-detector)
+
+### 7. TECH_WATCH.md — keep light, honest
+Only list techs actually evaluated. Do not invent assessments. If unsure, mark "TBD — not yet assessed".
+
+---
+
+Everything else in the original problem statement (file structure, .github automation, PR template, workflows, root README pointer, CHANGELOG entry, quality bar) stays exactly as specified.
+
+Thanks — quality bar is professional, ship it clean. 🫡
