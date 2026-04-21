@@ -28,7 +28,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest pytest-cov pip-audit
         [ -f requirements.txt ] && pip install -r requirements.txt || true
-        for req in $(find . -maxdepth 3 -name requirements.txt -not -path './.venv/*' -not -path './_archive/*'); do
+        find . -maxdepth 3 -name requirements.txt -not -path './.venv/*' -not -path './_archive/*' -print0 | while IFS= read -r -d '' req; do
           echo "Installing $req"
           pip install -r "$req"
         done
