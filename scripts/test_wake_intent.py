@@ -262,3 +262,59 @@ def test_langgraph_feature_flag_enabled_uses_service(monkeypatch):
     result = asyncio.run(lg_mod._preclassify_wake_intent("where are my tasks?"))
     assert result["intent"] == "question"
     assert result["confidence"] == 0.8
+
+
+def test_langgraph_chat_route_override_from_wake_intent(monkeypatch):
+    lg_mod = _load_langgraph_module()
+    lg_client = TestClient(lg_mod.app)
+    decision_type = type(lg_mod.classify("hello"))
+
+    async def fake_preclassify(_text: str):
+        return {"intent": "command", "confidence": 0.95, "reasoning": "stop keyword"}
+
+    def fake_classify(_text: str):
+        return decision_type(
+            route="GENERAL_CHAT",
+            confidence=0.5,
+            reason="fallback",
+            bypass_llm=False,
+            matched_keywords=[],
+        )
+
+    async def _empty_list(*_args, **_kwargs):
+        return []
+
+    async def _empty_dict(*_args, **_kwargs):
+        return {}
+
+    async def _noop(*_args, **_kwargs):
+        return None
+
+    async def fake_stream(*_args, **_kwargs):
+        yield "ok"
+
+    async def fake_get_mode():
+        return "PUB"
+
+    monkeypatch.setattr(lg_mod, "_preclassify_wake_intent", fake_preclassify)
+    monkeypatch.setattr(lg_mod, "classify", fake_classify)
+    monkeypatch.setattr(lg_mod, "_get_mode", fake_get_mode)
+    monkeypatch.setattr(lg_mod, "_get_relevant_memories", _empty_list)
+    monkeypatch.setattr(lg_mod, "_get_session_messages", _empty_list)
+    monkeypatch.setattr(lg_mod, "_get_active_goals", _empty_list)
+    monkeypatch.setattr(lg_mod, "_get_active_topics", _empty_list)
+    monkeypatch.setattr(lg_mod, "_get_emotional_context", _empty_dict)
+    monkeypatch.setattr(lg_mod, "_get_narrative_identity", _empty_dict)
+    monkeypatch.setattr(lg_mod, "_get_imagination_context", _empty_dict)
+    monkeypatch.setattr(lg_mod, "_get_conscience_context", _empty_dict)
+    monkeypatch.setattr(lg_mod, "_get_agent_context", _empty_dict)
+    monkeypatch.setattr(lg_mod, "_get_operator_model", _empty_dict)
+    monkeypatch.setattr(lg_mod, "_append_session_turn", _noop)
+    monkeypatch.setattr(lg_mod, "_auto_memorize", _noop)
+    monkeypatch.setattr(lg_mod, "_trim_context", lambda messages, _budget: messages)
+    monkeypatch.setattr(lg_mod._llm, "stream", fake_stream)
+
+    response = lg_client.post("/chat", json={"message": "Kai stop now", "session_id": "s1", "mode": "PUB"})
+    assert response.status_code == 200
+    assert response.headers.get("X-Kai-Route") == "EXECUTE_ACTION"
+    assert response.headers.get("X-Kai-Intent") == "command"

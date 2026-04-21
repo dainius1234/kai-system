@@ -24,7 +24,7 @@ from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudget
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, run_dream_cycle, analyze_failures, load_evolver_reports, create_checkpoint, list_checkpoints, load_checkpoint, diff_checkpoints, delete_checkpoint
 from conviction import build_plan, detect_self_deception, low_conviction_feedback, score_conviction
-from router import (classify, dispatch_route, load_skills, list_skills,
+from router import (RouteDecision, classify, dispatch_route, load_skills, list_skills,
                      match_skill, unload_skill, prune_stale_skills,
                      scan_skill_md)
 from planner import gather_context, build_enriched_plan, predict_next_request, pre_fetch_predicted_context
@@ -43,6 +43,8 @@ MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 TELEGRAM_ALERT_URL = os.getenv("TELEGRAM_ALERT_URL", "http://perception-telegram:9000/alert")
 WAKE_URL = os.getenv("WAKE_URL", "http://wake-service:8022")
+WAKE_INTENT_COMMAND_THRESHOLD = float(os.getenv("WAKE_INTENT_COMMAND_THRESHOLD", "0.6"))
+WAKE_INTENT_OVERRIDE_CONFIDENCE = float(os.getenv("WAKE_INTENT_OVERRIDE_CONFIDENCE", "0.7"))
 INJECTION_RE = re.compile(
     r"\b(ignore\s+(all\s+)?previous|system\s+prompt|override\s+instructions|you\s+are\s+now|act\s+as\s+if|disregard\s+(all|previous))\b",
     re.IGNORECASE,
@@ -899,10 +901,10 @@ async def chat_stream(req: ChatRequest):
 
     # ── Step 0: Classify request ────────────────────────────────────
     route_decision = classify(user_msg)
-    if wake_intent.get("intent") == "command" and wake_intent.get("confidence", 0.0) >= 0.6:
-        route_decision = route_decision.__class__(
+    if wake_intent.get("intent") == "command" and wake_intent.get("confidence", 0.0) >= WAKE_INTENT_COMMAND_THRESHOLD:
+        route_decision = RouteDecision(
             route="EXECUTE_ACTION",
-            confidence=max(route_decision.confidence, 0.7),
+            confidence=max(route_decision.confidence, WAKE_INTENT_OVERRIDE_CONFIDENCE),
             reason=f"wake-intent override: {wake_intent.get('reasoning', 'command')}",
             bypass_llm=False,
             matched_keywords=route_decision.matched_keywords,

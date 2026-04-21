@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import base64
 import binascii
-import io
 import json
 import os
 import re
 import tempfile
+import threading
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -28,10 +28,12 @@ WAKE_COOLDOWN_SECONDS = float(os.getenv("WAKE_COOLDOWN_SECONDS", "2"))
 WAKE_INTENT_MODEL = os.getenv("WAKE_INTENT_MODEL", "qwen2:0.5b")
 WAKE_CONFIDENCE_THRESHOLD = float(os.getenv("WAKE_CONFIDENCE_THRESHOLD", "0.6"))
 WAKE_WHISPER_MODEL = os.getenv("WAKE_WHISPER_MODEL", "tiny")
+WAKE_WHISPER_LANGUAGE = os.getenv("WAKE_WHISPER_LANGUAGE", "en")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama:11434")
 
 _ALLOWED_INTENTS = {"chat", "task", "question", "command", "emotional", "unknown"}
 _last_wake_ts: float = 0.0
+_wake_ts_lock = threading.Lock()
 
 _whisper_available = False
 try:
@@ -42,6 +44,7 @@ except Exception:
     WhisperModel = None  # type: ignore
 
 _whisper_model = None
+_whisper_lock = threading.Lock()
 
 
 class WakeDetectRequest(BaseModel):
@@ -88,10 +91,10 @@ def detect_wake_word(text: str) -> Tuple[bool, float, Optional[str]]:
 
     global _last_wake_ts
     now = time.time()
-    if now - _last_wake_ts < WAKE_COOLDOWN_SECONDS:
-        return False, min(best_conf, 0.49), best_word
-
-    _last_wake_ts = now
+    with _wake_ts_lock:
+        if now - _last_wake_ts < WAKE_COOLDOWN_SECONDS:
+            return False, min(best_conf, 0.49), best_word
+        _last_wake_ts = now
     return True, best_conf, best_word
 
 
@@ -152,7 +155,9 @@ async def classify_intent(text: str) -> Dict[str, Any]:
 def _get_whisper_model():
     global _whisper_model
     if _whisper_model is None and _whisper_available and WhisperModel is not None:
-        _whisper_model = WhisperModel(WAKE_WHISPER_MODEL, device="cpu", compute_type="int8")
+        with _whisper_lock:
+            if _whisper_model is None:
+                _whisper_model = WhisperModel(WAKE_WHISPER_MODEL, device="cpu", compute_type="int8")
     return _whisper_model
 
 
@@ -165,7 +170,7 @@ def _transcribe_audio(audio_bytes: bytes) -> str:
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=True) as tmp:
         tmp.write(audio_bytes)
         tmp.flush()
-        segments, _ = model.transcribe(tmp.name, language="en", beam_size=1)
+        segments, _ = model.transcribe(tmp.name, language=WAKE_WHISPER_LANGUAGE, beam_size=1)
         return " ".join(seg.text for seg in segments).strip()
 
 
