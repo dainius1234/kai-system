@@ -1,0 +1,29 @@
+name: Drift alert
+description: Report drift between docs/PM artifacts and code reality.
+title: "drift: "
+labels:
+  - pm
+body:
+  - type: textarea
+    id: stale
+    attributes:
+      label: What is stale?
+      description: Describe the stale statement/artifact.
+    validations:
+      required: true
+
+  - type: textarea
+    id: source-of-truth
+    attributes:
+      label: Where does the current truth live?
+      description: Link files/commits/PRs/issues that show correct reality.
+    validations:
+      required: true
+
+  - type: textarea
+    id: fix
+    attributes:
+      label: Suggested fix
+      description: Minimal update needed to remove drift.
+    validations:
+      required: true

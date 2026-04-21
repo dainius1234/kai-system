@@ -2,116 +2,104 @@ name: Weekly Drift Detector
 
 on:
   schedule:
-    - cron: '0 9 * * 1'
+    - cron: '0 8 * * 1'
   workflow_dispatch:
 
 permissions:
-  issues: write
   contents: read
+  issues: write
 
 jobs:
   drift-report:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate/update weekly drift report
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const marker = '<!-- weekly-drift-report -->';
-            const title = 'Weekly drift report';
-            const now = new Date();
-            const DAY_MS = 24 * 60 * 60 * 1000;
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            const branches = await github.paginate(github.rest.repos.listBranches, {
-              owner,
-              repo,
-              per_page: 100,
-            });
+      - name: Generate and publish drift snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
 
-            const staleBranches = [];
-            for (const branch of branches) {
-              const commit = await github.rest.repos.getCommit({
-                owner,
-                repo,
-                ref: branch.name,
-              });
-              const commitDate = new Date(commit.data.commit.committer.date);
-              const ageDays = Math.floor((now - commitDate) / DAY_MS);
-              if (ageDays >= 30) {
-                staleBranches.push(`- ${branch.name} (${ageDays} days since last commit)`);
-              }
-            }
+          today="$(date -u +%F)"
+          now_epoch="$(date -u +%s)"
 
-            const openIssues = await github.paginate(github.rest.issues.listForRepo, {
-              owner,
-              repo,
-              state: 'open',
-              per_page: 100,
-            });
+          stale_branches=""
+          copilot_stale=""
 
-            const staleIssues = openIssues
-              .filter((issue) => !issue.pull_request)
-              .map((issue) => {
-                const updated = new Date(issue.updated_at);
-                const ageDays = Math.floor((now - updated) / DAY_MS);
-                return { issue, ageDays };
-              })
-              .filter((x) => x.ageDays >= 60)
-              .map((x) => `- #${x.issue.number} ${x.issue.title} (${x.ageDays} days inactivity)`);
+          while IFS=$'\t' read -r name sha; do
+            [ -z "${name}" ] && continue
+            [ "${name}" = "main" ] && continue
 
-            let statusPresent = true;
-            try {
-              await github.rest.repos.getContent({
-                owner,
-                repo,
-                path: 'kai-pm/STATUS.md',
-              });
-            } catch (error) {
-              if (error.status === 404) {
-                statusPresent = false;
-              } else {
-                throw error;
-              }
-            }
+            commit_date="$(gh api "repos/${REPO}/commits/${sha}" --jq '.commit.committer.date')"
+            commit_epoch="$(date -u -d "${commit_date}" +%s)"
+            age_days="$(( (now_epoch - commit_epoch) / 86400 ))"
 
-            const lines = [
-              marker,
-              `Generated: ${now.toISOString()}`,
-              '',
-              '## Drift checks',
-              `- kai-pm/STATUS.md present: ${statusPresent ? '✅ yes' : '❌ no'}`,
-              '',
-              '## Branches with no commits in 30+ days',
-              staleBranches.length ? staleBranches.join('\n') : '- None',
-              '',
-              '## Issues with no activity in 60+ days',
-              staleIssues.length ? staleIssues.join('\n') : '- None',
-            ];
+            if [ "${age_days}" -gt 30 ]; then
+              stale_branches+="- ${name} (${age_days}d old)"$'\n'
+              case "${name}" in
+                copilot/*)
+                  copilot_stale+="- ${name} (${age_days}d old)"$'\n'
+                  ;;
+              esac
+            fi
+          done < <(gh api "repos/${REPO}/branches?per_page=100" --jq '.[] | [.name, .commit.sha] | @tsv')
 
-            const body = lines.join('\n');
+          stale_issues=""
+          while IFS=$'\t' read -r number title updated_at is_pr; do
+            [ "${is_pr}" = "true" ] && continue
+            updated_epoch="$(date -u -d "${updated_at}" +%s)"
+            age_days="$(( (now_epoch - updated_epoch) / 86400 ))"
+            if [ "${age_days}" -gt 60 ]; then
+              stale_issues+="- #${number} ${title} (${age_days}d inactivity)"$'\n'
+            fi
+          done < <(gh api "repos/${REPO}/issues?state=open&per_page=100" --jq '.[] | [.number, .title, .updated_at, has("pull_request")] | @tsv')
 
-            const issues = await github.paginate(github.rest.issues.listForRepo, {
-              owner,
-              repo,
-              state: 'open',
-              per_page: 100,
-            });
+          pm_stale=""
+          while IFS= read -r file; do
+            line="$(grep -Eim1 'Last-updated:' "${file}" || true)"
+            [ -z "${line}" ] && continue
+            date_str="$(printf '%s\n' "${line}" | sed -E 's/.*([0-9]{4}-[0-9]{2}-[0-9]{2}).*/\1/')"
+            if [[ "${date_str}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+              file_epoch="$(date -u -d "${date_str}" +%s)"
+              age_days="$(( (now_epoch - file_epoch) / 86400 ))"
+              if [ "${age_days}" -gt 14 ]; then
+                pm_stale+="- ${file#./} (Last-updated: ${date_str}, ${age_days}d old)"$'\n'
+              fi
+            fi
+          done < <(find kai-pm -type f)
 
-            const existing = issues.find((issue) => issue.title === title && !issue.pull_request);
-            if (existing) {
-              await github.rest.issues.update({
-                owner,
-                repo,
-                issue_number: existing.number,
-                body,
-              });
-            } else {
-              await github.rest.issues.create({
-                owner,
-                repo,
-                title,
-                body,
-              });
-            }
+          [ -z "${stale_branches}" ] && stale_branches="- None"
+          [ -z "${stale_issues}" ] && stale_issues="- None"
+          [ -z "${pm_stale}" ] && pm_stale="- None"
+          [ -z "${copilot_stale}" ] && copilot_stale="- None"
+
+          body_file="/tmp/drift-report-${today}.md"
+          {
+            echo "Snapshot date: ${today}"
+            echo
+            echo "## Branches not updated in >30 days (excluding main)"
+            printf '%s\n' "${stale_branches}"
+            echo
+            echo "## Issues with no activity in >60 days"
+            printf '%s\n' "${stale_issues}"
+            echo
+            echo "## kai-pm files with Last-updated older than 14 days"
+            printf '%s\n' "${pm_stale}"
+            echo
+            echo "## Stale Copilot agent branches (copilot/* older than 30 days)"
+            printf '%s\n' "${copilot_stale}"
+          } > "${body_file}"
+
+          existing_issue="$(gh issue list --state open --search '"Weekly drift report (" in:title' --json number --jq '.[0].number // empty')"
+
+          if [ -n "${existing_issue}" ]; then
+            gh issue comment "${existing_issue}" --body-file "${body_file}"
+          else
+            gh issue create \
+              --title "Weekly drift report (${today})" \
+              --body-file "${body_file}" \
+              --label pm
+          fi
