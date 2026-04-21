@@ -756,7 +756,10 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
     q_emb = generate_embedding(query)
     query_category = classify_category(query)  # P3b: domain-aware retrieval
     ranked: List[tuple[float, MemoryRecord]] = []
-    candidates = store.search(top_k=10_000, query=query)
+    # H2.2: Limit candidate fetch to prevent unbounded queries
+    # Fetch top 1000 candidates by vector similarity, then re-rank with full scoring
+    max_candidates = int(os.getenv("MEMU_MAX_CANDIDATES", "1000"))
+    candidates = store.search(top_k=max_candidates, query=query)
     now_iso = datetime.now(tz=timezone.utc).isoformat()
 
     for record in candidates:
