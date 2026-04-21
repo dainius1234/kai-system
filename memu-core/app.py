@@ -948,7 +948,8 @@ async def persist_memory() -> Dict[str, Any]:
             "failed": failed,
         }
     except Exception as e:
-        return {"status": "error", "detail": str(e)[:200]}
+        logger.warning("Manual /memory/persist failed: %s", e)
+        return {"status": "error", "detail": "persistence unavailable"}
 
 
 @app.get("/metrics")
@@ -1413,6 +1414,7 @@ _redis_client = None
 _redis_url = os.getenv("REDIS_URL", "redis://redis:6379")
 _redis_last_attempt = 0.0
 _redis_retry_delay = 1.0  # exponential backoff
+_REDIS_MAX_RETRY_DELAY = 60.0
 
 
 def _get_redis_client():
@@ -1457,7 +1459,7 @@ def _get_redis_client():
         return _redis_client
     except Exception as e:
         # Exponential backoff: 1s → 2s → 4s → 8s → ... → max 60s
-        _redis_retry_delay = min(_redis_retry_delay * 2, 60.0)
+        _redis_retry_delay = min(_redis_retry_delay * 2, _REDIS_MAX_RETRY_DELAY)
         logger.debug("Redis unavailable, retry in %.1fs: %s", _redis_retry_delay, e)
         return None
 
@@ -1471,7 +1473,7 @@ else:
 
 
 # ── H2.1: Background sync for P17-P22 data ──────────────────────────
-_PERSIST_INTERVAL_SECONDS = int(os.getenv("PERSIST_INTERVAL_SECONDS", "300"))  # 5 min default
+_PERSIST_INTERVAL_SECONDS = int(os.getenv("PERSIST_INTERVAL_SECONDS", "300"))  # default: 300s (5 min)
 _last_persist_time = 0.0
 
 
