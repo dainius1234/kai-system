@@ -1,0 +1,74 @@
+name: Tech Watch Reminder
+
+on:
+  schedule:
+    - cron: '0 9 1 * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  tech-watch-reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open monthly tech watch issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const now = new Date();
+            const month = now.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' });
+            const year = now.toLocaleString('en-US', { year: 'numeric', timeZone: 'UTC' });
+            const title = `Tech Watch review due — ${month} ${year}`;
+
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+              } catch (error) {
+                if (error.status === 404) {
+                  await github.rest.issues.createLabel({ owner, repo, name, color, description });
+                } else {
+                  throw error;
+                }
+              }
+            }
+
+            await ensureLabel('pm', '5319e7', 'Project management system tasks');
+            await ensureLabel('tech-watch', '1d76db', 'Technology watchlist and evaluations');
+
+            const openIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              per_page: 100,
+            });
+
+            if (openIssues.some((i) => i.title === title)) {
+              core.info(`Issue already exists: ${title}`);
+              return;
+            }
+
+            const body = [
+              'Monthly review for `kai-pm/TECH_WATCH.md`.',
+              '',
+              'Use the evaluation checklist from `kai-pm/PLAYBOOKS/tech_evaluation.md`:',
+              '- Strategic fit',
+              '- Offline/sovereign fit',
+              '- Operational cost',
+              '- Security/privacy impact',
+              '- Performance impact',
+              '- Migration effort',
+              '',
+              'Then update radar placement (Adopt / Trial / Assess / Hold), date assessed, and re-evaluate date.'
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner,
+              repo,
+              title,
+              body,
+              labels: ['pm', 'tech-watch'],
+            });
