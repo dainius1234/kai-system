@@ -176,7 +176,10 @@ class LLMRouter:
             "stream": False,
         }
         try:
-            timeout = httpx.Timeout(LLM_TIMEOUT, connect=LLM_CONNECT_TIMEOUT, read=LLM_READ_TIMEOUT)
+            # C1: Use model-aware timeout from registry instead of hardcoded LLM_TIMEOUT
+            model_name = _MODEL_MAP.get(specialist, specialist)
+            query_timeout = _model_timeout(model_name)
+            timeout = httpx.Timeout(query_timeout, connect=LLM_CONNECT_TIMEOUT, read=query_timeout)
             async with httpx.AsyncClient(timeout=timeout) as client:
                 resp = await client.post(f"{url}/v1/chat/completions", json=payload)
                 resp.raise_for_status()

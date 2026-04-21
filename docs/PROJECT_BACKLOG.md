@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-03-22 — session: Chassis upgrade — model registry, tiktoken, prompt templates, fusion semantic agreement — **89 targets, 1587+ tests**
+**Last updated:** 2026-04-21 — session: GPU Phase 0 consolidation, memu Redis persistence/reconnection hardening, model-timeout wiring
 
 ---
 
@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 26 (22 build + postgres + redis + ollama + lakeFS) |
-| Test targets | 89 (make test-core) |
-| Individual tests | 1587+ passing, 0 failures |
+| Test targets | 73 (make test-core) |
+| Individual tests | 1593++ passing, 0 failures |
 | Lines of Python | ~42,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -88,7 +88,7 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
 | Priority | Gap | Solution | Effort |
 |---|---|---|---|
-| **C1** | Per-model timeouts not wired into live queries | Wire `model_timeout()` into `LLMRouter._live_query()` timeout | S |
+| **C1** | Per-model timeouts not wired into live queries | **DONE** — `model_timeout()` wired into `LLMRouter._live_query()` timeout | S |
 | **C2** | Streaming has no heartbeat/stall detection | Add `STREAM_HEARTBEAT_TIMEOUT` — kill stream if no token for 30s | M |
 | **C3** | Retry + backoff on LLM 429/503 | Add `tenacity` retry decorator with exponential backoff to `_live_query` | M |
 | **C4** | Router uses keyword regex (8 categories) | Add embedding-based route classification when model tier >= 2 | L |
@@ -927,11 +927,11 @@ that could cause crashes, data loss, or security breaches in production.
 
 ### Tier 1 — Structural Debt (planned for H2)
 
-- [ ] **H2.1 — All P17-P22 data in-memory only** — restart = amnesia.
-      Need Redis or filesystem persistence for emotional timeline, goals,
-      reflections, values, etc.
-- [ ] **H2.2 — retrieve_ranked() fetches 10k records every call** —
-      Add LIMIT clause, relevance pre-filter, or pagination.
+- [x] **H2.1 — All P17-P22 data in-memory only** — ✅ DONE.
+      Added Redis persist/restore helpers for P17–P22 plus manual
+      `POST /memory/persist` and periodic sync via `/health`.
+- [x] **H2.2 — retrieve_ranked() fetches 10k records every call** — ✅ DONE.
+      `MEMU_MAX_CANDIDATES` now caps ranked retrieval candidate pulls.
 - [ ] **H2.3 — Proactive scan 5 sequential 10k queries** — Should be
       asyncio.gather() with individual limits.
 - [ ] **H2.4 — generate_embedding() blocks event loop** — Move to
@@ -940,8 +940,8 @@ that could cause crashes, data loss, or security breaches in production.
 - [x] **H2.6 — Verifier semantic upgrade** — Uses memu-core rank_score
       (30% embedding similarity + relevance + importance + recency) with
       keyword overlap as supplementary signal. No longer pure keyword-matcher.
-- [ ] **H2.7 — Session buffer no Redis reconnection** — If Redis drops
-      mid-session, buffer is gone with no recovery.
+- [x] **H2.7 — Session buffer no Redis reconnection** — ✅ DONE.
+      Added `_get_redis_client()` reconnection with exponential backoff.
 
 ### Tier 2 — Quality Gaps (planned for H3-H5)
 
@@ -1355,6 +1355,8 @@ listing, diff, cap enforcement, serialization, and edge cases.
 ## Hardware Performance Track (Future — GPU Arrival)
 
 See `docs/unfair_advantages.md` for full details. Summary:
+
+Phase 0 completed and documented in [`docs/gpu_integration_phase0.md`](gpu_integration_phase0.md).
 
 | ID | Feature | Impact | Effort |
 |---|---|---|---|
