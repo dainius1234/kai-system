@@ -885,7 +885,6 @@ async def health() -> Dict[str, Any]:
     checks["feedback_store"] = "ok" if isinstance(_feedback_store, list) else "fail"
 
     # H2.1: Periodic P17-P22 persistence (every PERSIST_INTERVAL_SECONDS)
-    global _last_persist_time
     if time.time() - _last_persist_time > _PERSIST_INTERVAL_SECONDS:
         try:
             persist_results = _persist_p17_p22_to_redis()
@@ -1627,12 +1626,6 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     return results
 
 
-# Restore P17-P22 data at startup
-_restored = _restore_p17_p22_from_redis()
-if _restored:
-    logger.info("Restored %d P17-P22 data structures from Redis", len(_restored))
-
-
 def _session_key(session_id: str) -> str:
     return f"session:{session_id}:messages"
 
@@ -1715,6 +1708,12 @@ def _load_from_redis(key: str, default: Any = None) -> Any:
     except Exception as e:
         logger.debug("Redis load failed for %s: %s", key, e)
     return default
+
+
+# Restore P17-P22 data at startup
+_restored = _restore_p17_p22_from_redis()
+if _restored:
+    logger.info("Restored %d P17-P22 data structures from Redis", len(_restored))
 
 
 @app.get("/session/{session_id}")

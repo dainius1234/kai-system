@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import os
 import sys
+import types
 from pathlib import Path
 
 from fastapi import HTTPException
@@ -52,6 +54,80 @@ def main() -> int:
         raise AssertionError("expected value size violation")
     except HTTPException as exc:
         assert exc.status_code == 400
+
+    class FakeRedis:
+        def __init__(self):
+            self.data = {}
+
+        def ping(self):
+            return True
+
+        def set(self, key, value):
+            self.data[key] = value
+
+        def get(self, key):
+            return self.data.get(key)
+
+        def expire(self, _key, _ttl):
+            return True
+
+    fake_redis = FakeRedis()
+    original_get_redis_client = mod._get_redis_client
+    mod._get_redis_client = lambda: fake_redis
+    try:
+        assert mod._persist_to_redis("kai:test:key", {"ok": True}) is True
+        assert mod._load_from_redis("kai:test:key", {}) == {"ok": True}
+
+        mod._emotional_timeline = [{"emotion": "focused"}]
+        mod._formed_values = [{"value": "discipline"}]
+        persist_results = mod._persist_p17_p22_to_redis()
+        assert persist_results["emotional_timeline"] is True
+        assert persist_results["formed_values"] is True
+
+        fake_redis.data["kai:p17:emotional_timeline"] = json.dumps([{"emotion": "calm"}])
+        fake_redis.data["kai:p20:formed_values"] = json.dumps([{"value": "integrity"}])
+        restored = mod._restore_p17_p22_from_redis()
+        assert restored["emotional_timeline"] is True
+        assert restored["formed_values"] is True
+        assert mod._emotional_timeline[0]["emotion"] == "calm"
+        assert mod._formed_values[0]["value"] == "integrity"
+    finally:
+        mod._get_redis_client = original_get_redis_client
+
+    # H2.7 reconnection backoff: failed connection attempts should be rate-limited
+    class FailingRedisModule:
+        def __init__(self):
+            self.calls = 0
+
+        def from_url(self, *_args, **_kwargs):
+            self.calls += 1
+            raise RuntimeError("redis unavailable")
+
+    failing_mod = FailingRedisModule()
+    original_redis_module = sys.modules.get("redis")
+    original_time = mod.time.time
+    now = [1000.0]
+    mod._redis_client = None
+    mod._redis_last_attempt = 0.0
+    mod._redis_retry_delay = 1.0
+    mod.time.time = lambda: now[0]
+    sys.modules["redis"] = types.SimpleNamespace(from_url=failing_mod.from_url)
+    try:
+        assert mod._get_redis_client() is None
+        assert failing_mod.calls == 1
+        current_delay = mod._redis_retry_delay
+        now[0] += 0.5
+        assert mod._get_redis_client() is None
+        assert failing_mod.calls == 1
+        now[0] += current_delay
+        assert mod._get_redis_client() is None
+        assert failing_mod.calls == 2
+    finally:
+        mod.time.time = original_time
+        if original_redis_module is not None:
+            sys.modules["redis"] = original_redis_module
+        else:
+            sys.modules.pop("redis", None)
 
     print("test_phase_b_memu_core: PASS")
     return 0

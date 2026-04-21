@@ -9,11 +9,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Context budget management (`CONTEXT_BUDGET_TOKENS` env, default 3072) — `_trim_context()` in langgraph prevents system prompt from exceeding model context window
 - Context budget test suite (`scripts/test_context_budget.py`, 11 tests)
 - `make test-context-budget` Makefile target
+- GPU Phase 0 hardware utilities in `common/gpu_utils.py` (`has_cuda`, `get_gpu_info`, `should_use_speculative_decoding`, `get_recommended_model`)
+- Phase 0 implementation report: `docs/gpu_integration_phase0.md`
+- memu-core manual persistence endpoint: `POST /memory/persist`
+- New env controls for GPU/scaling and retrieval cap in `.env.example` (including `MEMU_MAX_CANDIDATES`)
 
 ### Changed
 - Verifier upgraded to semantic verification (v0.6.0) — uses memu-core `rank_score` (embedding similarity + relevance + importance + recency) instead of keyword-only matching
 - Verifier now calls `/memory/evidence-pack` for richer evidence scoring, with fallback to `/memory/retrieve`
 - Updated all stale documentation (README metrics, PROJECT_BACKLOG, Known Issues table)
+- memu-core Redis handling hardened with reconnection backoff and persisted P17–P22 restore/sync lifecycle
+- `common.llm.LLMRouter` live query path now uses model-aware timeout from `common.model_registry.model_timeout()`
+- `common.model_registry` expanded with `deepseek-coder-v2:6.7b`, `qwen2.5-math:7b`, and `yi:34b`
 
 ### Previously Added
 - Pre-commit hooks (flake8, trailing whitespace, secret detection, syntax check)
