@@ -89,6 +89,21 @@ _REGISTRY: Dict[str, ModelSpec] = {
         speed_tier=2, quality_tier=3, supports_json=True,
         supports_vision=False, timeout_s=180, tiktoken_encoding="cl100k_base",
     ),
+    "deepseek-coder-v2:6.7b": ModelSpec(
+        name="deepseek-coder-v2:6.7b", context_window=32768, output_reserve=4096,
+        speed_tier=2, quality_tier=3, supports_json=True,
+        supports_vision=False, timeout_s=120, tiktoken_encoding="cl100k_base",
+    ),
+    "qwen2.5-math:7b": ModelSpec(
+        name="qwen2.5-math:7b", context_window=32768, output_reserve=4096,
+        speed_tier=2, quality_tier=3, supports_json=True,
+        supports_vision=False, timeout_s=120, tiktoken_encoding="cl100k_base",
+    ),
+    "yi:34b": ModelSpec(
+        name="yi:34b", context_window=200000, output_reserve=8192,
+        speed_tier=3, quality_tier=3, supports_json=False,
+        supports_vision=False, timeout_s=240, tiktoken_encoding="cl100k_base",
+    ),
     "kimi-2.5": ModelSpec(
         name="kimi-2.5", context_window=131072, output_reserve=8192,
         speed_tier=2, quality_tier=3, supports_json=True,
