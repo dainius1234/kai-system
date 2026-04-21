@@ -142,6 +142,7 @@ services:
       MEMU_URL: http://memu-core:8001
       HEARTBEAT_URL: http://heartbeat:8010
       SUPERVISOR_URL: http://supervisor:8051
+      WAKE_URL: http://wake-service:8022
     ports:
       - "8080:8080"
     healthcheck:
@@ -162,6 +163,35 @@ services:
         condition: service_healthy
       supervisor:
         condition: service_started
+      wake-service:
+        condition: service_started
+
+  wake-service:
+    build:
+      context: .
+      dockerfile: perception/wake/Dockerfile
+    container_name: sovereign-wake-service
+    <<: *defaults
+    environment:
+      OLLAMA_URL: http://ollama:11434
+      WAKE_WORDS: "${WAKE_WORDS:-kai,hey kai,ok kai}"
+      WAKE_COOLDOWN_SECONDS: "${WAKE_COOLDOWN_SECONDS:-2}"
+      WAKE_INTENT_MODEL: "${WAKE_INTENT_MODEL:-qwen2:0.5b}"
+      WAKE_CONFIDENCE_THRESHOLD: "${WAKE_CONFIDENCE_THRESHOLD:-0.6}"
+    ports:
+      - "8022:8022"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8022/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.10
+    depends_on:
+      memu-core:
+        condition: service_healthy
 
   supervisor:
     build:

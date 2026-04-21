@@ -18,6 +18,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from common.auth import sign_gate_request, sign_gate_request_bundle
+from common.feature_flags import is_enabled
 from common.llm import LLMRouter
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
@@ -41,6 +42,7 @@ app = FastAPI(title="LangGraph Orchestrator", version="0.5.0")
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 TELEGRAM_ALERT_URL = os.getenv("TELEGRAM_ALERT_URL", "http://perception-telegram:9000/alert")
+WAKE_URL = os.getenv("WAKE_URL", "http://wake-service:8022")
 INJECTION_RE = re.compile(
     r"\b(ignore\s+(all\s+)?previous|system\s+prompt|override\s+instructions|you\s+are\s+now|act\s+as\s+if|disregard\s+(all|previous))\b",
     re.IGNORECASE,
@@ -852,6 +854,25 @@ async def _get_operator_model(query: str, mode: str) -> Dict[str, Any]:
     return result
 
 
+async def _preclassify_wake_intent(text: str) -> Dict[str, Any]:
+    """Optionally pre-classify intent via wake service (feature-flagged)."""
+    if not is_enabled("WAKE_INTENT_ROUTING"):
+        return {"intent": "unknown", "confidence": 0.0, "reasoning": "feature_flag_disabled"}
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.post(f"{WAKE_URL}/wake/intent", json={"text": text})
+            if resp.status_code == 200:
+                payload = resp.json()
+                intent = str(payload.get("intent", "unknown")).lower()
+                confidence = float(payload.get("confidence", 0.0))
+                reasoning = str(payload.get("reasoning", ""))
+                if intent in {"chat", "task", "question", "command", "emotional", "unknown"}:
+                    return {"intent": intent, "confidence": confidence, "reasoning": reasoning}
+    except Exception:
+        pass
+    return {"intent": "unknown", "confidence": 0.0, "reasoning": "wake_service_unavailable"}
+
+
 @app.post("/chat")
 async def chat_stream(req: ChatRequest):
     """Kai's main conversation endpoint. Streams tokens via SSE.
@@ -874,8 +895,18 @@ async def chat_stream(req: ChatRequest):
     if INJECTION_RE.search(user_msg):
         raise HTTPException(status_code=400, detail="prompt injection pattern blocked")
 
+    wake_intent = await _preclassify_wake_intent(user_msg)
+
     # ── Step 0: Classify request ────────────────────────────────────
     route_decision = classify(user_msg)
+    if wake_intent.get("intent") == "command" and wake_intent.get("confidence", 0.0) >= 0.6:
+        route_decision = route_decision.__class__(
+            route="EXECUTE_ACTION",
+            confidence=max(route_decision.confidence, 0.7),
+            reason=f"wake-intent override: {wake_intent.get('reasoning', 'command')}",
+            bypass_llm=False,
+            matched_keywords=route_decision.matched_keywords,
+        )
     logger.info("Router: %s (confidence=%.2f, bypass_llm=%s)",
                 route_decision.route, route_decision.confidence, route_decision.bypass_llm)
 
@@ -946,6 +977,17 @@ async def chat_stream(req: ChatRequest):
         messages.append({
             "role": "system",
             "content": f"Relevant memories from past interactions:\n{mem_block}",
+        })
+
+    if wake_intent.get("intent") != "unknown":
+        messages.append({
+            "role": "system",
+            "content": (
+                "Wake-intent pre-classification:\n"
+                f"- intent: {wake_intent.get('intent')}\n"
+                f"- confidence: {wake_intent.get('confidence', 0.0):.2f}\n"
+                f"- reasoning: {wake_intent.get('reasoning', '')}"
+            ),
         })
 
     # inject active Ohana goals so Kai is goal-aware
@@ -1168,6 +1210,7 @@ async def chat_stream(req: ChatRequest):
             "X-Accel-Buffering": "no",
             "X-Kai-Mode": mode,
             "X-Kai-Route": route_decision.route,
+            "X-Kai-Intent": str(wake_intent.get("intent", "unknown")),
         },
     )
 

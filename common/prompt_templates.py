@@ -190,6 +190,24 @@ def reflection_prompt(topic: str, context: str = "") -> str:
     return f"Think about: {topic}"
 
 
+def wake_intent_prompt(user_text: str) -> str:
+    """Prompt for strict JSON wake-intent classification."""
+    return (
+        "Classify the user's intent into exactly one label from:\n"
+        "- chat\n"
+        "- task\n"
+        "- question\n"
+        "- command\n"
+        "- emotional\n"
+        "- unknown\n\n"
+        "Return ONLY valid JSON with this exact schema:\n"
+        '{"intent":"<label>","confidence":0.0,"reasoning":"short reason"}\n'
+        "Confidence must be between 0.0 and 1.0.\n"
+        "No markdown. No extra keys. No extra text.\n\n"
+        f"User text: {user_text}"
+    )
+
+
 # ── Template registry for extensibility ──────────────────────────────
 
 _CUSTOM_TEMPLATES: Dict[str, str] = {}
