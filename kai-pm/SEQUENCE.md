@@ -27,4 +27,4 @@ graph TD
 
 ## J-Series status correction
 
-J1–J7 are **DONE** (already shipped in repo history/changelog) and are not part of a queued 11-step sequence.
+J1–J7 are **DONE** (see `CHANGELOG.md` [0.28.0] + commit `97a3a61`) and are not part of a queued 11-step sequence.
