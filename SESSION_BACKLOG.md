@@ -4,17 +4,12 @@
 
 ---
 
-## 2026-03-22 — Engineering Maturity Gap-Close
+## 2026-04-21 — Backlog Reconciliation
 
-- Added sync-docs/check-docs Makefile targets
-- Updated copilot-instructions to require sync-docs after major changes
-- Validated documentation freshness (README, PROJECT_BACKLOG, architecture, known issues)
-- Ran go_no_go and merge-gate; fixed all doc/test/infra staleness
-- Implemented test-core result caching (scripts/cache_test_core.py, test_core_results.json)
-- Added 'What’s Next' priority list to PROJECT_BACKLOG.md
-- Created SESSION_BACKLOG.md for session notes
-- All repo memory and docs are now up to date
-- Next: Run cache-test-core, address Tier 1/2/3 hardening, improve session note workflow
+- Audited backlog vs README: J1–J7 all marked DONE in README but still listed as "Open Items" here. Closed out.
+- Removed stale "J2 recommended next build" — J2 wake-word shipped.
+- Reset Open Items to reflect actual current state (P29, GPU track, coverage measurement, doc drift discipline).
+- No code changes this session — pure doc hygiene to stop reality drift before resuming feature work.
 
 ---
 
@@ -52,19 +47,35 @@
 - Full documentation sweep: PROJECT_BACKLOG, README, CHANGELOG, SESSION_BACKLOG, personality_and_proactive, unfair_advantages, next_level_roadmap, copilot-instructions
 - Next: Start implementing J2 (wake-word detection + intent judge)
 
+## 2026-03-22 — Engineering Maturity Gap-Close
+
+- Added sync-docs/check-docs Makefile targets
+- Updated copilot-instructions to require sync-docs after major changes
+- Validated documentation freshness (README, PROJECT_BACKLOG, architecture, known issues)
+- Ran go_no_go and merge-gate; fixed all doc/test/infra staleness
+- Implemented test-core result caching (scripts/cache_test_core.py, test_core_results.json)
+- Added 'What's Next' priority list to PROJECT_BACKLOG.md
+- Created SESSION_BACKLOG.md for session notes
+- All repo memory and docs are now up to date
+- Next: Run cache-test-core, address Tier 1/2/3 hardening, improve session note workflow
+
 ---
 
 ## Open Items
 
-### As of 2026-03-22
+### As of 2026-04-21
 
-- **J2: Wake-word "Kai" + Intent Judge** ⭐ — recommended first J-series build
-- J1: Live Canvas Visualization — dashboard mind-map/graph
-- J3: Auto-Redaction PII — regex + OCR strip
-- J4: Proactive Low-Latency Voice — audio/video cue → speak-or-not
-- J5: Memory Viewer GUI — diary-style dashboard tab
-- J6: SOUL.md + AGENTS.md — persistent identity files
-- J7: Skills Auto-Install Hub — local skill loader
-- H3: Context Budget Manager — system prompt pruning
-- P29: Financial Awareness — savings tracker
-- GPU track: hardware performance features (pending RTX 5080)
+**Active priorities (in order):**
+1. **Coverage measurement** — replace "~60% estimated" with a real number. Run `make coverage`, commit the report, update README.
+2. **P29: Financial Awareness** — savings tracker, expense categorization. Scope first, build second.
+3. **GPU readiness** — pre-wire multi-model endpoints, real STT/TTS adapters, speculative decoding hooks so the RTX 5080 lights up day one.
+
+**Discipline / hygiene:**
+- Run `make sync-docs` after every significant change (still the rule, still drifts).
+- Reconcile SESSION_BACKLOG with README at the start of every session — drift caught here this round.
+- `.coveragerc` exists but coverage number in README is unverified — must fix before next feature.
+
+**Done since last reconciliation (now closed):**
+- ✅ J1 Live Canvas, J2 Wake-word + Intent Judge, J3 Auto-Redaction PII, J4 Proactive Low-Latency Voice, J5 Memory Viewer GUI, J6 SOUL.md + AGENTS.md, J7 Skills Auto-Install Hub
+- ✅ H3 Context Budget Manager
+- ✅ P1 Skill Security + TTL, P2 Multi-modal LLM Fusion, P3 World Anchor, P4 Debate Branching, P5 Deprecation Cleanup
