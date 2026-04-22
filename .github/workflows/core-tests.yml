@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      HMAC_ALLOW_DEV_SECRET: "true"
 
     steps:
       - name: Checkout repository
