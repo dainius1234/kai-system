@@ -54,7 +54,7 @@ _whisper_available = False
 try:
     import sounddevice  # noqa: F401
     _sounddevice_available = True
-except ImportError:
+except (ImportError, OSError):
     logger.info("sounddevice not available — mic capture disabled, file upload only")
 
 try:
