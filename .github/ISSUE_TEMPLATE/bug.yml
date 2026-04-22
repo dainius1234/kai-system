@@ -1,0 +1,91 @@
+name: Bug report
+description: Report a defect with reproducible details and environment context.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is broken?
+      placeholder: Short bug summary
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: Exact steps to reproduce.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: dropdown
+    id: service
+    attributes:
+      label: Service affected
+      # Keep this list aligned with docker-compose.full.yml service inventory.
+      options:
+        - orchestrator
+        - supervisor
+        - fusion-engine
+        - verifier
+        - executor
+        - dashboard
+        - memu-core
+        - tool-gate
+        - langgraph
+        - kai-advisor
+        - audio-service
+        - camera-service
+        - wake-service
+        - heartbeat
+        - calendar-sync
+        - memory-compressor
+        - ledger-worker
+        - metrics-gateway
+        - tts-service
+        - avatar-service
+        - screen-capture
+        - backup-service
+        - telegram-bot
+        - workspace-manager
+        - postgres
+        - redis
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / traces
+      description: Paste relevant logs, stack traces, or links.
+      render: shell
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, runtime, branch/commit, docker compose profile, etc.
+      placeholder: "Ubuntu 24.04, python 3.11, docker-compose.full.yml, commit <sha>"
+    validations:
+      required: true

@@ -1,30 +1,44 @@
-# Dispatch Jewel Playbook
+# Playbook: Dispatch a J-Series Jewel
 
-## Purpose
-Dispatch one coding agent to deliver a single jewel safely and reviewably.
+Use this recipe when handing a single J-series jewel (for example J2 wake-word) to a coding agent.
 
-## Steps
-1. Confirm jewel scope and locked sequence step from `kai-pm/SEQUENCE.md`.
-2. Confirm prerequisites and dependency unlocks are met.
-3. Open/identify target branch (base: `main` unless an approved integration branch is specified).
-4. Send the agent a complete problem statement using the template below.
-5. Require: minimal surgical changes, tests updated where relevant, docs synced.
-6. After delivery, verify changed file scope matches requested jewel.
-7. Validate tests/checks that cover touched areas.
-8. Ensure PR description includes sequence step + jewel + risk note.
+## 1) Pre-flight checks
 
-## Problem statement template
-- **Repository:** `dainius1234/kai-system`
-- **Base branch:** `main`
-- **Jewel:** `Jx`
-- **Sequence step:** `Sxx`
-- **Goal:** (single-sentence functional objective)
-- **Must change:** (explicit files/areas)
-- **Must not change:** (out-of-scope areas)
-- **Validation required:** (test targets + manual checks)
-- **Docs required:** (`kai-pm/STATUS.md`, `CHANGELOG.md`, README if interface changed)
+1. Confirm the jewel ID exists in `kai-pm/SEQUENCE.md` (or is explicitly tracked as DONE there).
+2. Confirm all dependencies are marked DONE before dispatch.
+3. Confirm CI on `main` is green before dispatching implementation work.
 
-## Verify after dispatch
-- PR file list is jewel-scoped and minimal.
-- Sequence row and jewel are declared in PR body.
-- Status and changelog are updated (or explicitly N/A with rationale).
+If any pre-flight check fails, stop and resolve that first.
+
+## 2) Draft the problem statement
+
+Include all of the following, explicitly:
+
+- **Goal:** one clear outcome for this jewel only.
+- **Scope limits:** what files/areas are in-bounds and out-of-bounds.
+- **Acceptance criteria:** objective pass/fail checks.
+- **File + test surface:** exact files expected to change and tests to run.
+
+Keep the statement deterministic and parallel-safe.
+
+## 3) Dispatch execution
+
+- **Base branch:** `main` unless an integration branch is explicitly approved.
+- **Agent:** assign one coding agent to one jewel.
+- **Parallel-safety check:** verify no overlap with other active PRs before dispatch.
+
+Suggested dispatch note:
+- Jewel ID
+- Dependency confirmation
+- Parallel-safe confirmation
+- Required validations
+
+## 4) Post-merge updates
+
+After merge to `main`:
+
+1. Update `kai-pm/STATUS.md`.
+2. Append to `kai-pm/DECISIONS.md` if an architectural decision was made (append-only).
+3. Refresh `kai-pm/METRICS.md` test count when it changed.
+
+Do not retro-edit historical decision entries.

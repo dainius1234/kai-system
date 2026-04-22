@@ -1,0 +1,47 @@
+name: Decision needed
+description: Escalate an architectural decision that needs explicit call.
+title: "decision: "
+labels:
+  - pm
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why this decision is required now.
+    validations:
+      required: true
+
+  - type: textarea
+    id: options
+    attributes:
+      label: Options considered
+      description: List options with key trade-offs.
+    validations:
+      required: true
+
+  - type: textarea
+    id: recommendation
+    attributes:
+      label: Recommended option
+      description: Preferred option and rationale.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: blocking
+    attributes:
+      label: Is this decision blocking delivery?
+      options:
+        - "Yes — blocking"
+        - "No — non-blocking"
+    validations:
+      required: true
+
+  - type: input
+    id: deadline
+    attributes:
+      label: Decision deadline
+      placeholder: "YYYY-MM-DD"
+    validations:
+      required: true

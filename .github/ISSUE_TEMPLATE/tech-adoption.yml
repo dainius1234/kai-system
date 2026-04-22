@@ -1,0 +1,46 @@
+name: Tech adoption proposal
+description: Propose a model/library/tool for structured evaluation.
+title: "tech: evaluate "
+labels:
+  - pm
+  - tech-watch
+body:
+  - type: input
+    id: tech
+    attributes:
+      label: What is it?
+      placeholder: Name + version
+    validations:
+      required: true
+
+  - type: textarea
+    id: sovereignty
+    attributes:
+      label: Sovereignty check
+      description: Offline capability, phone-home behavior, and license compatibility.
+    validations:
+      required: true
+
+  - type: textarea
+    id: footprint
+    attributes:
+      label: Footprint check
+      description: VRAM/RAM cost, dependency weight, and notable transitive dependencies.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why-now
+    attributes:
+      label: Why now?
+      description: Which blocker/opportunity does this address right now?
+    validations:
+      required: true
+
+  - type: input
+    id: tech-watch-link
+    attributes:
+      label: Link to TECH_WATCH entry
+      placeholder: https://github.com/.../blob/main/kai-pm/TECH_WATCH.md
+    validations:
+      required: true
