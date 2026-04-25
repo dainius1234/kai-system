@@ -89,14 +89,14 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Priority | Gap | Solution | Effort |
 |---|---|---|---|
 | **C1** | Per-model timeouts not wired into live queries | Wire `model_timeout()` into `LLMRouter._live_query()` timeout | S |
-| **C2** | Streaming has no heartbeat/stall detection | Add `STREAM_HEARTBEAT_TIMEOUT` — kill stream if no token for 30s | M |
+| **C2** ✅ | Streaming has no heartbeat/stall detection | `STREAM_HEARTBEAT_TIMEOUT` + `asyncio.wait_for` in `LLMRouter.stream()` — shipped in chassis-polish PR | M |
 | **C3** | Retry + backoff on LLM 429/503 | Add `tenacity` retry decorator with exponential backoff to `_live_query` | M |
 | **C4** | Router uses keyword regex (8 categories) | Add embedding-based route classification when model tier >= 2 | L |
-| **C5** | Model selector doesn't verify model is loaded | Add Ollama `/api/tags` check before routing to model | S |
+| **C5** ✅ | Model selector doesn't verify model is loaded | `ensure_model_available()` + TTL cache + fallback in `_live_query()` — shipped in chassis-polish PR | S |
 | **C6** | Conviction scoring ignores LLM quality signals | Add response entropy + uncertainty markers to score | M |
 | **C7** | memu-core fallback embeddings are hash-based | Force sentence-transformers or fail explicitly (no fake vectors) | M |
 | **C8** | Dashboard Thinking/Goals/Memory are proxy shells | Wire real data endpoints when full stack is running | L |
-| **C9** | No model warm-up / pre-load on startup | Add Ollama `/api/pull` check + warm prompt on service init | S |
+| **C9** ✅ | No model warm-up / pre-load on startup | `llm_warmup()` + `OLLAMA_AUTO_PULL` + FastAPI startup hook — shipped in chassis-polish PR | S |
 | **C10** | No A/B testing framework for model comparison | Log model name + response quality per query for comparison | M |
 
 ### Plug-and-Play Checklist (When GPU Arrives)

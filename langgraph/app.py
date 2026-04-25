@@ -19,7 +19,7 @@ from pydantic import BaseModel
 
 from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.feature_flags import is_enabled
-from common.llm import LLMRouter
+from common.llm import LLMRouter, llm_warmup
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, run_dream_cycle, analyze_failures, load_evolver_reports, create_checkpoint, list_checkpoints, load_checkpoint, diff_checkpoints, delete_checkpoint
@@ -1789,6 +1789,16 @@ async def security_audit_endpoint():
 
 
 _restore_breakers()
+
+
+# ── C9: Model warm-up — non-blocking async task on startup ──────────
+
+@app.on_event("startup")
+async def _startup_warmup() -> None:
+    """Schedule LLM warm-up as a background task so liveness is not gated on it."""
+    asyncio.create_task(
+        llm_warmup(router=_llm, specialist=_DEFAULT_SPECIALIST, ollama_base_url=_OLLAMA_URL)
+    )
 
 
 # ── P16b: Log aggregation ───────────────────────────────────────────

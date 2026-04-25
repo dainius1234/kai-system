@@ -10,6 +10,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Removed stray file `pulls/48/review_comments`
 
 ### Added
+- **C2 — Stream heartbeat / stall detection**: `STREAM_HEARTBEAT_TIMEOUT` env var (default 30 s).
+  `LLMRouter.stream()` wraps per-token reads in `asyncio.wait_for`; emits a structured stall
+  message and closes cleanly if no token arrives within the window.
+- **C5 — Ollama pre-flight check**: `ensure_model_available()` in `common/llm.py` queries
+  `/api/tags`, does prefix-aware name matching, caches results for `MODEL_TAGS_CACHE_TTL`
+  (default 60 s), and falls back to `OLLAMA_MODEL` in `_live_query()` when the requested
+  model is absent.  Ollama-unreachable → fail-open (returns `True`).
+- **C9 — Model warm-up on startup**: `llm_warmup()` in `common/llm.py` fires via
+  `asyncio.create_task` from a FastAPI `startup` hook in `langgraph/app.py`.  Checks model
+  availability, optionally pulls it (`OLLAMA_AUTO_PULL=true`, default `false`), sends a
+  single warm prompt, and logs completion time.  Controlled by `LLM_WARMUP_ENABLED`
+  (default `true`).
+- New env vars: `STREAM_HEARTBEAT_TIMEOUT=30`, `MODEL_TAGS_CACHE_TTL=60`,
+  `LLM_WARMUP_ENABLED=true`, `OLLAMA_AUTO_PULL=false` (all documented in `.env.example`).
+- Test suite `scripts/test_chassis_runtime.py` (C2/C5/C9 unit tests, 10 cases, all mocked).
 - PM: introduced `kai-pm/` brain + `.github` automation (PM System v2)
 - Context budget management (`CONTEXT_BUDGET_TOKENS` env, default 3072) — `_trim_context()` in langgraph prevents system prompt from exceeding model context window
 - Context budget test suite (`scripts/test_context_budget.py`, 11 tests)
