@@ -6,10 +6,14 @@ Falls back to a stub response when no live backend is configured, so
 the full pipeline can be exercised in dev/test without GPU hardware.
 
 Configuration via environment variables:
-    LLM_DEEPSEEK_URL  — e.g. http://llm-deepseek:11434
-    LLM_KIMI_URL      — e.g. http://llm-kimi:11434
-    LLM_DOLPHIN_URL   — e.g. http://llm-dolphin:11434
-    LLM_TIMEOUT        — request timeout in seconds (default: 30)
+    LLM_DEEPSEEK_URL         — e.g. http://llm-deepseek:11434
+    LLM_KIMI_URL             — e.g. http://llm-kimi:11434
+    LLM_DOLPHIN_URL          — e.g. http://llm-dolphin:11434
+    LLM_TIMEOUT              — request timeout in seconds (default: 120)
+    STREAM_HEARTBEAT_TIMEOUT — kill stream if no token for N seconds (default: 30)
+    MODEL_TAGS_CACHE_TTL     — seconds to cache Ollama /api/tags response (default: 60)
+    LLM_WARMUP_ENABLED       — send a warm prompt on startup (default: true)
+    OLLAMA_AUTO_PULL         — pull missing model automatically on warmup (default: false)
 
 Usage:
     from common.llm import LLMRouter, query_specialist
@@ -21,11 +25,15 @@ Usage:
 """
 from __future__ import annotations
 
+import asyncio
 import hashlib
+import logging
 import os
 import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -66,6 +74,11 @@ LLM_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "120"))
 LLM_CONNECT_TIMEOUT = float(os.getenv("LLM_CONNECT_TIMEOUT", "10"))
 LLM_READ_TIMEOUT = float(os.getenv("LLM_READ_TIMEOUT", "120"))
 
+# ── C5: Ollama /api/tags pre-flight cache ────────────────────────────
+# In-process cache; TTL read at call time so tests can override via env.
+_model_tags_cache: Optional[List[str]] = None
+_model_tags_cache_ts: float = 0.0
+
 # ── model-aware token counting (replaces 4-char heuristic) ──────────
 try:
     from common.model_registry import (
@@ -92,6 +105,70 @@ def _validate_llm_response(text: str) -> str:
     if text.strip().startswith("{\"error\""):
         return f"[model error: {text[:200]}]"
     return text
+
+
+# ── C5: Ollama /api/tags pre-flight helpers ──────────────────────────
+
+def _check_model_in_tags(tags: List[str], model_name: str) -> bool:
+    """Return True if *model_name* (or a prefix match) appears in *tags*.
+
+    Supports partial matching so ``qwen2:0.5b`` matches a tag like
+    ``qwen2:0.5b-instruct-q4_0``.
+    """
+    model_lower = model_name.lower()
+    model_base = model_lower.split(":")[0]
+    for tag in tags:
+        tag_lower = tag.lower()
+        if tag_lower == model_lower:
+            return True
+        # Prefix match on the base name (before ":")
+        tag_base = tag_lower.split(":")[0]
+        if model_base and model_base == tag_base:
+            return True
+    return False
+
+
+async def ensure_model_available(model_name: str) -> bool:
+    """Check whether *model_name* is pulled and available in Ollama.
+
+    Queries ``{OLLAMA_URL}/api/tags`` and does a prefix-aware name match.
+    The tag list is cached in-process for ``MODEL_TAGS_CACHE_TTL`` seconds
+    (default 60) to avoid hammering Ollama on every request.
+
+    Returns:
+        True  — model is available OR Ollama is unreachable (fail-open so
+                the existing circuit breaker handles real outages).
+        False — Ollama responded but the model is not in the tag list.
+    """
+    global _model_tags_cache, _model_tags_cache_ts
+
+    cache_ttl = float(os.getenv("MODEL_TAGS_CACHE_TTL", "60"))
+    ollama_base = os.getenv("OLLAMA_URL", "http://ollama:11434")
+    now = time.monotonic()
+
+    # Serve from cache if still fresh
+    if _model_tags_cache is not None and (now - _model_tags_cache_ts) < cache_ttl:
+        return _check_model_in_tags(_model_tags_cache, model_name)
+
+    import httpx
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{ollama_base}/api/tags")
+            resp.raise_for_status()
+            data = resp.json()
+            tags = [m.get("name", "") for m in data.get("models", [])]
+            _model_tags_cache = tags
+            _model_tags_cache_ts = now
+            available = _check_model_in_tags(tags, model_name)
+            if not available:
+                logger.warning(
+                    "model_unavailable: model=%s not found in Ollama tags (%d models)",
+                    model_name, len(tags),
+                )
+            return available
+    except Exception:
+        # Ollama unreachable — fail open; circuit breaker handles real outages
+        return True
 
 
 class LLMRouter:
@@ -165,8 +242,19 @@ class LLMRouter:
     ) -> LLMResponse:
         import httpx
 
+        model = _MODEL_MAP.get(specialist, specialist)
+
+        # C5: verify model is loaded before routing; fall back to default if not
+        if not await ensure_model_available(model):
+            fallback = _OLLAMA_MODEL
+            logger.warning(
+                "model_fallback: requested=%s not available, using default=%s",
+                model, fallback,
+            )
+            model = fallback
+
         payload = {
-            "model": _MODEL_MAP.get(specialist, specialist),
+            "model": model,
             "messages": [
                 {"role": "system", "content": system},
                 {"role": "user", "content": prompt},
@@ -237,6 +325,11 @@ class LLMRouter:
 
         Yields plain-text token strings as they arrive.
         Falls back to a single stub yield when no backend is configured.
+
+        C2: wraps per-token reads in ``asyncio.wait_for`` with
+        ``STREAM_HEARTBEAT_TIMEOUT`` (default 30 s).  If no token arrives
+        within the window the stream is cancelled and a stall message is
+        emitted so the caller can surface it to the operator.
         """
         url = self.backends.get(specialist, "")
         if not url:
@@ -255,12 +348,36 @@ class LLMRouter:
             "stream": True,
         }
         import json as _json
+
+        # C2: read heartbeat timeout at call time so tests can override via env
+        heartbeat_timeout = float(os.getenv("STREAM_HEARTBEAT_TIMEOUT", "30"))
+        stream_start = time.monotonic()
+
         try:
             timeout = httpx.Timeout(LLM_TIMEOUT, connect=LLM_CONNECT_TIMEOUT, read=LLM_READ_TIMEOUT)
             async with httpx.AsyncClient(timeout=timeout) as client:
                 async with client.stream("POST", f"{url}/v1/chat/completions", json=payload) as resp:
                     resp.raise_for_status()
-                    async for line in resp.aiter_lines():
+                    aiter = resp.aiter_lines()
+                    while True:
+                        try:
+                            line = await asyncio.wait_for(
+                                aiter.__anext__(),
+                                timeout=heartbeat_timeout,
+                            )
+                        except asyncio.TimeoutError:
+                            elapsed = time.monotonic() - stream_start
+                            logger.warning(
+                                "stream_stall: model=%s no_token_for=%.0fs elapsed=%.1fs",
+                                model, heartbeat_timeout, elapsed,
+                            )
+                            yield (
+                                f"[stream stalled — no token for "
+                                f"{heartbeat_timeout:.0f}s, cutting]"
+                            )
+                            return
+                        except StopAsyncIteration:
+                            break
                         if not line.startswith("data: "):
                             continue
                         data_str = line[6:].strip()
@@ -290,3 +407,77 @@ async def query_specialist(specialist: str, prompt: str, **kwargs: Any) -> LLMRe
 async def query_multi(specialists: List[str], prompt: str, **kwargs: Any) -> List[LLMResponse]:
     """Module-level shortcut: query multiple specialists in parallel."""
     return await _router.query_multi(specialists, prompt, **kwargs)
+
+
+# ── C9: Model warm-up / pre-load ─────────────────────────────────────
+
+async def _pull_model(model: str, ollama_base_url: str) -> None:
+    """Stream an Ollama /api/pull for *model*, logging progress at INFO."""
+    import httpx
+    import json as _json
+    try:
+        async with httpx.AsyncClient(timeout=300.0) as client:
+            async with client.stream(
+                "POST", f"{ollama_base_url}/api/pull", json={"name": model}
+            ) as resp:
+                async for line in resp.aiter_lines():
+                    if line:
+                        try:
+                            status = _json.loads(line).get("status", "")
+                            if status:
+                                logger.info("LLM pull [%s]: %s", model, status)
+                        except Exception:
+                            pass
+    except Exception as exc:
+        logger.warning("LLM pull failed for model=%s: %s", model, exc)
+
+
+async def llm_warmup(
+    router: Optional["LLMRouter"] = None,
+    model: Optional[str] = None,
+    specialist: Optional[str] = None,
+    ollama_base_url: Optional[str] = None,
+) -> None:
+    """Warm up the LLM to reduce first-request cold-start latency.
+
+    Steps:
+    1. Check model availability via ``ensure_model_available``.
+    2. If absent and ``OLLAMA_AUTO_PULL=true``: stream ``/api/pull``.
+    3. Send a single warm prompt to force model load into RAM.
+    4. Log completion time.
+
+    Controlled by ``LLM_WARMUP_ENABLED`` (default ``true``).
+    All parameters default to their corresponding env vars so callers
+    only need to pass what they want to override.
+    """
+    if os.getenv("LLM_WARMUP_ENABLED", "true").lower() != "true":
+        return
+
+    model = model or os.getenv("OLLAMA_MODEL", "qwen2:0.5b")
+    specialist = specialist or os.getenv("DEFAULT_SPECIALIST", "Ollama")
+    ollama_base_url = ollama_base_url or os.getenv("OLLAMA_URL", "http://ollama:11434")
+    router = router or _router
+
+    start = time.monotonic()
+    logger.info("LLM warmup: starting for model=%s specialist=%s", model, specialist)
+
+    available = await ensure_model_available(model)
+
+    if not available:
+        auto_pull = os.getenv("OLLAMA_AUTO_PULL", "false").lower() == "true"
+        if auto_pull:
+            logger.info("LLM warmup: model=%s not found, pulling…", model)
+            await _pull_model(model, ollama_base_url)
+        else:
+            logger.warning(
+                "LLM warmup: model=%s not available and OLLAMA_AUTO_PULL=false — skipping warm prompt",
+                model,
+            )
+            return
+
+    try:
+        resp = await router.query(specialist, "warmup", system="You are helpful.", max_tokens=1)
+        elapsed = time.monotonic() - start
+        logger.info("LLM warmup complete in %.1fs (source=%s)", elapsed, resp.source)
+    except Exception as exc:
+        logger.warning("LLM warmup: warm prompt failed: %s", exc)
