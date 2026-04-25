@@ -166,8 +166,12 @@ async def ensure_model_available(model_name: str) -> bool:
                     model_name, len(tags),
                 )
             return available
+    except (httpx.ConnectError, httpx.TimeoutException, httpx.HTTPStatusError, httpx.HTTPError):
+        # Ollama unreachable or returned an error — fail open;
+        # the circuit breaker handles real persistent outages.
+        return True
     except Exception:
-        # Ollama unreachable — fail open; circuit breaker handles real outages
+        # Unexpected error (e.g. JSON decode failure) — also fail open.
         return True
 
 
@@ -427,7 +431,7 @@ async def _pull_model(model: str, ollama_base_url: str) -> None:
                             if status:
                                 logger.info("LLM pull [%s]: %s", model, status)
                         except Exception:
-                            pass
+                            logger.debug("LLM pull [%s]: failed to parse progress line: %r", model, line)
     except Exception as exc:
         logger.warning("LLM pull failed for model=%s: %s", model, exc)
 
