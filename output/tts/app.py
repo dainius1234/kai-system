@@ -142,7 +142,19 @@ async def _synthesize_edge(
         return audio
     except HTTPException:
         raise
+    except OSError as e:
+        # Network / socket errors — upstream TTS endpoint unreachable
+        logger.error("edge-tts network error: %s", e)
+        raise HTTPException(status_code=503, detail=f"TTS upstream unreachable: {e}")
     except Exception as e:
+        err = str(e)
+        # aiohttp raises generic exceptions for bad HTTP status codes (e.g. 403 from
+        # Bing's WebSocket endpoint).  Surface these as 503 so callers know the
+        # upstream is unavailable rather than that we made a bad request.
+        if any(kw in err for kw in ("ClientError", "ClientConnectorError",
+                                    "Invalid response status", "Cannot connect")):
+            logger.error("edge-tts upstream error: %s", e)
+            raise HTTPException(status_code=503, detail=f"TTS upstream error: {e}")
         logger.error("edge-tts failed: %s", e)
         raise HTTPException(status_code=500, detail=f"TTS synthesis error: {e}")
 

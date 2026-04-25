@@ -1,13 +1,12 @@
 # Kai PM Status Dashboard
 
-- **Last updated (UTC):** 2026-04-21
+- **Last updated (UTC):** 2026-04-25
 - **Current phase:** Phase 0 — Pre-GPU Hardening
-- **Current focus:** Coverage uplift + CI green + PM v2 cleanup (this PR)
+- **Current focus:** CI green-again sweep — regression fixes, TTS de-flake, CVE dep bumps
 
 ## In-flight PRs
 
-- [#49](https://github.com/dainius1234/kai-system/pull/49) — PM v2 corrections + CI fix + cleanup
-- [#46](https://github.com/dainius1234/kai-system/pull/46) — Consolidate GPU Phase 0 baseline work
+- [#46](https://github.com/dainius1234/kai-system/pull/46) — Consolidate GPU Phase 0 baseline work (draft)
 
 ## Blocked items (GPU)
 
@@ -18,6 +17,6 @@
 
 ## Next 3 actions
 
-1. Merge this cleanup PR.
-2. Verify CI is green on `main`.
-3. Resume Phase 0 coverage uplift work.
+1. Land or close PR #46 (GPU Phase 0 consolidation — still draft).
+2. Resume H2 backlog work (H2.3 proactive-scan gather, H2.4 embedding executor).
+3. Automate coverage gate (R3 risk reduction).

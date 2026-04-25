@@ -7,20 +7,19 @@ Kai is a self-sovereign, local-first personal AI system built as cooperating ser
 
 ## 2) Current phase + current jewel
 - **Current phase:** Phase 0 — Pre-GPU Hardening
-- **Current focus:** Coverage uplift + CI green + PM v2 cleanup
+- **Current focus:** CI green-again sweep complete; resume H2 backlog + close/land PR #46
 
 ## 3) In-flight PRs (link)
-- PM cleanup and CI fix: https://github.com/dainius1234/kai-system/pull/49
-- Consolidation baseline: https://github.com/dainius1234/kai-system/pull/46
+- GPU Phase 0 consolidation: https://github.com/dainius1234/kai-system/pull/46 (draft, awaiting review)
 
 ## 4) Blocked items + unlock conditions
 - **Phase 1/2/4/5 blocked** until RTX 5080 hardware is procured, provisioned, and validated.
 - Unlock criteria: GPU host online, Docker + Ollama healthy, and target local model baseline validated.
 
 ## 5) Next 3 actions in priority order
-1. Merge PR #49 (PM v2 corrections + CI fix + cleanup).
-2. Confirm CI is green on `main` post-merge.
-3. Continue Phase 0 coverage/documentation hardening work.
+1. Land or close PR #46 (GPU Phase 0 consolidation).
+2. Resume H2 backlog: H2.3 (proactive-scan gather), H2.4 (embedding executor).
+3. Automate coverage gate to reduce R3 risk.
 
 ## 6) Pointer to STATUS.md, SEQUENCE.md, DECISIONS.md
 - Status dashboard: [STATUS.md](STATUS.md)

@@ -31,3 +31,10 @@
 **Decision:** Preserve existing flake8 + pytest workflow checks and fix failures directly instead of weakening CI.
 **Rationale:** CI catches real regressions; disabling checks would hide quality issues.
 **Consequences:** Syntax/test breakages on `main` should be corrected immediately in follow-up PRs.
+
+## D6 — 2026-04-25 — CI green-again sweep
+**Context:** PRs #49, #50, #51 merged but left `main` CI red: TTS test hitting live network, starlette/pillow/python-multipart CVEs unpatched, and PM docs drifted from reality.
+**Decision:** Bundle regression fixes (TTS de-flake, dep CVE bumps, H2.2 retrieve_ranked cap) + PM brain refresh into a single green-again PR.
+**Rationale:** Keeps `main` always-green discipline; clears outstanding hardening debt before resuming H2 backlog.
+**Consequences:** TTS test is now offline + deterministic; three dep CVEs cleared; `retrieve_ranked()` capped at `MEMU_MAX_CANDIDATES` (default 500); PM docs reflect post-merge reality. H2.4 (`generate_embedding` executor) deferred — requires async cascade.
+**PR:** https://github.com/dainius1234/kai-system/pull/52
