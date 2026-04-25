@@ -62,12 +62,16 @@ def test_synthesize_offline_happy_path():
 def test_synthesize_network_failure_returns_503():
     """A network error from edge-tts surfaces as HTTP 503 (upstream unavailable)."""
 
-    async def _bad_stream():
-        raise Exception("Invalid response status, url='wss://speech.platform.bing.com/...'")
-        yield  # noqa: unreachable — makes function an async generator
+    class _ErrorStream:
+        """Async iterable that immediately raises a network-style exception."""
+        def __aiter__(self):
+            return self
+
+        async def __anext__(self):
+            raise Exception("Invalid response status, url='wss://speech.platform.bing.com/...'")
 
     fake_comm = MagicMock()
-    fake_comm.stream = _bad_stream
+    fake_comm.stream = _ErrorStream
     fake_edge_tts = ModuleType("edge_tts")
     fake_edge_tts.Communicate = MagicMock(return_value=fake_comm)
 
