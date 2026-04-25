@@ -37,6 +37,9 @@ except Exception:
     LOG_ONLY_MODE = False
 
 VERIFIER_URL = os.getenv("VERIFIER_URL", "http://verifier:8052")
+# H2.2: cap the number of candidate records fetched before scoring to avoid
+# loading the entire store on every retrieval call.  Override via env var.
+MEMU_MAX_CANDIDATES: int = int(os.getenv("MEMU_MAX_CANDIDATES", "500"))
 
 # lakefs client is optional; provide a simple in-memory stub if unavailable
 try:
@@ -756,7 +759,7 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
     q_emb = generate_embedding(query)
     query_category = classify_category(query)  # P3b: domain-aware retrieval
     ranked: List[tuple[float, MemoryRecord]] = []
-    candidates = store.search(top_k=10_000, query=query)
+    candidates = store.search(top_k=MEMU_MAX_CANDIDATES, query=query)
     now_iso = datetime.now(tz=timezone.utc).isoformat()
 
     for record in candidates:
