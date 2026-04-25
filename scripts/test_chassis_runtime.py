@@ -101,7 +101,7 @@ class TestStreamHeartbeat(unittest.TestCase):
         router = self._make_router()
         fake_client = _FakeHttpxClient(response)
 
-        deadline = float(os.environ["STREAM_HEARTBEAT_TIMEOUT"]) + 2.0  # 1 s HB + 1 s slack
+        deadline = float(os.environ["STREAM_HEARTBEAT_TIMEOUT"]) + 2.0  # 1 s HB + 2 s slack
         start = time.monotonic()
 
         with patch("httpx.AsyncClient", return_value=fake_client):
