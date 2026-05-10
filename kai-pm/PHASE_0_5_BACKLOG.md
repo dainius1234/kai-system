@@ -3,121 +3,107 @@
 > **Open this file when sitting down to work on Kai.** Pick the top unblocked item.
 > All items here are CPU-only — no GPU required. They de-risk Phase 1 and ship value now.
 
-**Status:** Active
-**Created:** 2026-05-10
-**Owner:** @dainius1234
+**Status:** Active — 4-week PM-driven sprint
+**Last updated:** 2026-05-10
+**Owner:** @dainius1234 (PM-assisted, max automation)
 
 ---
 
-## Why "Phase 0.5"?
+## The 4-week plan
 
-Phase 0 = pre-GPU hardening (CI, docs, stability) — mostly done.
-Phase 1 = local LLM integration — **blocked on RTX 5080 hardware arriving**.
+| Week | Theme | Outcome |
+|---|---|---|
+| **1 (now)** | Real intelligence backend + automation infrastructure | Real LLM output on real prompts (CPU-only) + self-running maintenance |
+| **2** | Domain skills + first real usage | Kai becomes *yours*, not generic |
+| **3** | CIS-aware finances + phone access (PWA) | Kai becomes useful on a Tuesday morning |
+| **4** | Self-scoring + safety net | Kai self-sustains, you stop babysitting |
 
-Phase 0.5 = the months of legitimate engineering we can do *between* those two,
-all of it CPU-testable, all of it making Phase 1 land cleaner when GPU arrives.
+End of month definition of done: **You can demo Kai to a friend. You use it daily. It scores itself weekly. It backs itself up.**
 
 ---
 
-## The 5 items, in order
+## The items, in dependency order
 
-### 1. Behavioral test scoreboard ⭐ HIGHEST LEVERAGE
-**What:** Add `@pytest.mark.gpu_required` marker. Write 50–100 behavioral test
-*questions* Kai should get right (emotion detection accuracy, planning quality,
-conviction calibration, refusal correctness). Skip them on CPU CI; run them
-the moment GPU is online.
+### Week 1 — In flight / dispatching now (PM-driven, agent-implemented)
 
-**Why first:** When GPU lands, you have an instant scoreboard to know if Kai
-*actually* got smarter, instead of guessing. This is the only way to honestly
-measure Phase 1 success.
+#### 0. ⭐ GitHub Models backend + Phi-4-mini default + behavioral scoreboard + coverage gate
+**Status:** 🚧 Coding agent dispatched (PR opening shortly)
+**Why first:** unblocks every later item — gives Kai a real LLM today, CPU-only, free.
 
+#### 0a. Automation infrastructure (Friday cleanup, weekly Report Card, off-site backup, demo doc, journal/skills templates)
+**Status:** 🚧 Will dispatch immediately after item 0 lands
 **Deliverable:**
-- `pytest.ini` registers `gpu_required` marker
-- New `make test-behavioral-cpu` (skips gpu_required) and `make test-behavioral-gpu` (runs all)
-- `tests/behavioral/` with at least 50 test stubs grouped by capability
-- CI lane in `.github/workflows/core-tests.yml` runs CPU lane only
-- Doc: `docs/BEHAVIORAL_TESTING.md` explains the contract
+- `.github/workflows/friday-cleanup.yml` — weekly auto-PR: lint, dep bump, stale-branch list, metric refresh
+- `.github/workflows/weekly-report-card.yml` — Mon 09:00 cron runs behavioral scoreboard, posts to tracking issue
+- `scripts/backup_offsite.sh` + verification — encrypted nightly backup with restore test
+- `docs/DEMO.md` — 5-min "show a friend" walkthrough
+- `docs/operator-journal/_template.md` — for Dainius to dump real session notes
+- `skills/_template.md` + 3 starter empty skill files (cis-deductions, ladder-safety, mtd-vat) for Dainius to fill in
+- `docs/CIS_FINANCE_DESIGN.md` — design doc for CIS-aware P29
 
-**Effort:** 1–2 sessions
-**Blocked by:** Nothing
-
----
-
-### 2. P29 Financial Awareness
-**What:** Savings tracker, expense categorization, monthly summary.
-Memory-centric, CPU-safe, ships actual user-facing value.
-
-**Why:** Concrete deliverable, not infrastructure. Proves Phase 0.5 produces
-real things. Already placed in Phase 3 in STRATEGIC_PLAN but has zero GPU dependency.
-
-**Deliverable:**
-- New service `financial-awareness/` or extension inside `memu-core/`
-- Endpoints: `/finance/expense`, `/finance/summary`, `/finance/categorize`
-- Storage in pgvector with category embeddings
-- 20+ tests
-- Dashboard tab (or extend Memory view)
-
-**Effort:** 2–3 sessions
-**Blocked by:** Nothing
+#### 0b. Additional remote backends (Groq, HuggingFace, OpenRouter) as fallback chain
+**Status:** Queued (depends on 0)
+**Why:** Redundancy. Free. Groq runs Llama-3.3-70B at ~500 tok/s — *faster than your future GPU*.
 
 ---
 
-### 3. Coverage gate in CI
-**What:** `.coveragerc` exists; wire `--cov-fail-under=60` (current baseline)
-into `make merge-gate`. Ratchet to 70% over next 4 weeks.
+### Week 2 — Things only Dainius can do (PM-supported, not dispatchable)
 
-**Why:** Stops silent regression. Currently coverage is "estimated ~60%" with
-no enforcement, which is the textbook drift pattern this repo just spent a PR cleaning up.
+#### 1. Write 10 site-engineer skill files
+**Why:** This is the moat. Nobody else can write your domain knowledge. Skills Hub already loads `.md` files hot.
+**Templates ready:** `skills/_template.md` + 3 starters scaffolded by item 0a.
+**Suggested topics:** CIS deductions, CSCS card requirements, ladder/scaffold safety (Working at Height Regs 2005), CDM 2015 duties, NICEIC checks, BS 7671 basics, asbestos awareness (CAR 2012), site diary template, RAMS template, TBT topics rota.
 
-**Deliverable:**
-- `Makefile` `coverage-gate` target
-- `core-tests.yml` runs coverage gate
-- `kai-pm/METRICS.md` shows real coverage %, not "estimated"
-
-**Effort:** half a session
-**Blocked by:** Nothing
+#### 2. First real operator journal entries
+**Why:** Right now Kai is built but nobody drives it. Even one real session a week is the only feedback loop that matters.
+**Template ready:** `docs/operator-journal/_template.md` scaffolded by item 0a.
+**Cadence:** 1 entry per week minimum. PM (me) will read them and propose follow-up work.
 
 ---
 
-### 4. Branch hygiene
-**What:** Delete 6 stale `claude/*` branches and any merged `copilot/*` branches.
-Update R5 in RISKS.md.
+### Week 3 — User-facing value (PM-driven, agent-implemented)
 
-**Why:** RISKS.md flags this as Active. It's a 5-minute cleanup that closes a risk row.
+#### 3. CIS-aware P29 Financial Awareness
+**Status:** Queued behind item 0a (design doc lands in 0a, build in week 3)
+**Scope:** NOT generic savings tracker. UK construction-subcontractor reality:
+- CIS deductions tracker (20% / 30% / gross)
+- Invoice generator with CIS line
+- MTD-ready VAT summary
+- Class 2/4 NI calculator
+- Mileage tracker
+**Deliverable:** `financial-awareness/` service + `/finance/cis`, `/finance/invoice`, `/finance/vat`, `/finance/summary` endpoints + dashboard tab.
 
-**Deliverable:**
-- Stale branches deleted
-- `RISKS.md` R5 → Resolved (or Active with count = 0)
-- Optional: `.github/workflows/branch-hygiene.yml` cron to flag stale branches
-
-**Effort:** 15 minutes (manual) or half session (automated)
-**Blocked by:** Nothing
-
----
-
-### 5. Close PR #46 + PR #54
-**What:** PR #46 (GPU Phase 0 consolidation) and PR #54 (chassis polish: stream
-heartbeat, Ollama pre-flight, model warm-up) have been open for 15+ days.
-Either merge, rebase, or close.
-
-**Why:** Open PRs > 14 days old are R2 (drift) waiting to happen.
-
-**Deliverable:** Both PRs in a terminal state.
-**Effort:** depends on conflict count
-**Blocked by:** Review attention
+#### 4. PWA polish for one-tap phone install
+**Status:** README says PWA exists — verify and harden.
+**Deliverable:** App icon, splash screen, offline shell, voice button on home, install instructions in `docs/PHONE_SETUP.md`.
 
 ---
 
-## What's NOT in Phase 0.5 (deliberately)
+### Week 4 — Self-sustaining (PM-driven, agent-implemented)
 
-- Anything requiring real LLM quality (emotion *quality*, plan *quality*, etc.) — Phase 1.
-- Multi-specialist *consensus quality* — Phase 2.
-- Voice/avatar quality — Phase 4.
-- Anything we'd be tempted to fake metrics for.
+#### 5. Wire weekly Report Card to surface trends
+**Status:** Cron lands in 0a — week 4 adds trend graph + auto-issue if regression.
+
+#### 6. Verify off-site backup + restore drill
+**Status:** Script lands in 0a — week 4 runs first restore drill, documents in runbook.
+
+#### 7. Close lingering open PRs (#46, #54)
+**Status:** Either merge, rebase, or close. PM (me) will summarise diff and recommend per-PR.
+
+---
+
+## What's still NOT in scope (deliberately)
+
+- Anything requiring real LLM quality measurement before item 0 lands
+- Multi-specialist *consensus quality* — Phase 2
+- Voice/avatar quality — Phase 4
+- Custom mobile app (PWA only — no app store accounts)
+- Anything that would tempt fake metrics
 
 ---
 
 ## Done definition for Phase 0.5
 
-All 5 items shipped → mark Phase 0 truly closed in STRATEGIC_PLAN → ready to
-flip to Phase 1 the day GPU arrives.
+End of week 4 → mark Phase 0 truly closed in STRATEGIC_PLAN → ready to flip to
+Phase 1 the day RTX 5080 lands. By that point, Kai is already *useful* — GPU
+becomes optimisation, not blocker.
