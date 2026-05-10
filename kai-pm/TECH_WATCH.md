@@ -1,4 +1,4 @@
-# Kai Tech Watch (April 2026)
+# Kai Tech Watch (May 2026)
 
 Monthly review reminder is automated via `.github/workflows/tech-watch-reminder.yml`.
 

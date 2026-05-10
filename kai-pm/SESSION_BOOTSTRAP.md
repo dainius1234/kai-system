@@ -26,6 +26,7 @@ Kai is a self-sovereign, local-first personal AI system built as cooperating ser
 - Phase sequence: [SEQUENCE.md](SEQUENCE.md)
 - Append-only decisions: [DECISIONS.md](DECISIONS.md)
 - Canonical roadmap: [STRATEGIC_PLAN.md](STRATEGIC_PLAN.md)
+- Latest reality check: [REALITY_CHECK_2026-05-10.md](REALITY_CHECK_2026-05-10.md)
 - Prior session backlog (if present): [SESSION_BACKLOG.md](SESSION_BACKLOG.md)
 
 ## 7) PM operating rules (commitments)

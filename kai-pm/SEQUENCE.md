@@ -28,3 +28,5 @@ graph TD
 ## J-Series status correction
 
 J1–J7 are **DONE** (see `CHANGELOG.md` [0.28.0] + commit `97a3a61`) and are not part of a queued 11-step sequence.
+
+P29 (Financial Awareness) is placed in **Phase 3** to align with `STRATEGIC_PLAN.md` (memory/reflection hardening, CPU-safe scope).
