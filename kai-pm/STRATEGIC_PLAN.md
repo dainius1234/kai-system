@@ -64,6 +64,7 @@ Route tasks to specialist paths using measurable policy signals while preserving
 
 **Entry criteria:** Phase 0 foundation is stable.  
 **Status note:** Partial; CPU-friendly portions are already active.
+**Scope note:** P29 (Financial Awareness) is placed here because it is memory/state + reflection work and is CPU-safe.
 
 ### Phase goal
 
@@ -116,5 +117,5 @@ Consolidate reliability, observability, and controlled self-improvement loops in
 - J1–J7 are DONE, not queued.
 - RTX 5080 16GB VRAM cannot fit llama3.3:70b at usable quant — plan must reflect 8B/13B class for primary and use 70B only via remote/cloud fallback.
 - Ollama speculative decoding support is partial / version-dependent — verify before claiming.
-- P29 placement TBD — confirm phase.
+- P29 (Financial Awareness) is in Phase 3 (Memory & Reflection Hardening), since savings tracking/categorization/summary is memory-centric and not GPU-gated.
 - All cited external benchmarks need source links.
