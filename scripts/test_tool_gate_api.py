@@ -10,6 +10,7 @@ from pathlib import Path
 # ── ensure workspace root is on the import path for common/ and services ──
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+os.environ.setdefault("HMAC_ALLOW_DEV_SECRET", "true")
 
 from common.auth import sign_gate_request
 
