@@ -14,6 +14,7 @@ if [[ -n "${KAI_SHADOW_ALLOW:-}" ]]; then
   IFS=',' read -ra allow_entries <<<"${KAI_SHADOW_ALLOW}"
   for entry in "${allow_entries[@]}"; do
     name="$(echo "${entry}" | xargs)"
+    [[ "${name}" =~ ^[a-zA-Z0-9._-]+$ ]] || continue
     [[ -n "${name}" ]] && allow_map["${name}"]=1
   done
 fi
@@ -23,6 +24,7 @@ while IFS= read -r name; do
   name="${name%%#*}"
   name="$(echo "${name}" | xargs)"
   [[ -z "${name}" ]] && continue
+  [[ "${name}" =~ ^[a-zA-Z0-9._-]+$ ]] || continue
 
   if [[ -d "${ROOT_DIR}/${name}" ]] && [[ -z "${allow_map["${name}"]:-}" ]]; then
     violations+=("${name}")
