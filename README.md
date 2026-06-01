@@ -10,10 +10,10 @@
 <p align="center">
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
-  <img src="https://img.shields.io/badge/services-26-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-1%2C593_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/services-27-blue?style=flat-square" alt="services">
+  <img src="https://img.shields.io/badge/tests-1%2C620_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
-  <img src="https://img.shields.io/badge/Python-~42%2C556_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/Python-~42%2C613_LOC-yellow?style=flat-square" alt="loc">
   <img src="https://img.shields.io/badge/milestones-32_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
@@ -21,14 +21,14 @@
 
 ---
 
-## Project Status (21 April 2026)
+## Project Status (10 May 2026)
 
 | Metric | Value |
 |---|---|
-| **Services** | 26 Docker containers |
-| **Test targets** | 73 (`make test-core`) |
-| **Individual tests** | 1,593 (`def test_` across 82 files) |
-| **Python LOC** | ~42,556 |
+| **Services** | 27 Docker containers |
+| **Test targets** | 74 (`make test-core`) |
+| **Individual tests** | 1,620 (`def test_` across 83 files) |
+| **Python LOC** | ~42,613 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 32 |
 | **Failures** | 0 |
@@ -42,8 +42,8 @@
 ```
 make core-up          # Start minimal stack (8 services)
 make core-down        # Stop it
-make full-up          # Start all 26 services
-make test-core        # Run all 73 test targets (~1,593 tests)
+make full-up          # Start all 27 services
+make test-core        # Run all 74 test targets (~1,620 tests)
 make go_no_go         # Syntax check all entry points
 make merge-gate       # Full pre-merge validation
 make sync-docs        # Auto-update README + backlog metrics
@@ -52,6 +52,10 @@ make coverage         # pytest-cov HTML report
 ```
 
 GPU integration status: **Phase 0 complete** — see [`docs/gpu_integration_phase0.md`](docs/gpu_integration_phase0.md).
+
+## Project Management
+
+Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md) as the entry point for fast session re-hydration, current roadmap state, and decision/risk tracking.
 
 ---
 
@@ -96,6 +100,7 @@ GPU integration status: **Phase 0 complete** — see [`docs/gpu_integration_phas
 | **Struggle Detection** | 5-signal frustration analysis — auto-adapts when operator is struggling |
 | **Anti-Annoyance** | Per-type cooldowns, dismissal tracking, DND mode, escalating suppression |
 | **PUB/WORK Modes** | Deep personality system — mate at the pub vs. focused professional |
+| **Wake & Intent (J2)** | Wake-word detection (`/wake/detect`) + tiny-model intent judge (`/wake/intent`) with safe heuristic fallback |
 
 ### Production & Security
 
@@ -127,7 +132,7 @@ GPU integration status: **Phase 0 complete** — see [`docs/gpu_integration_phas
 | **Token Counting** | ~~±40% heuristic (4 chars per token)~~ **Fixed**: tiktoken-based accurate counting + per-message overhead | Already done — tiktoken installed |
 | **Context Budget** | ~~Hardcoded 3072 tokens wastes 90% of larger models~~ **Fixed**: auto-adapts from model registry. qwen2:0.5b→3072, qwen2.5:7b→28672, kimi→122K | Already done — model-aware |
 | **Prompt Templates** | ~~Hardcoded strings~~ **Fixed**: model-aware templates. Tier 1 (tiny): minimal. Tier 2 (7B): reasoning guidelines. Tier 3 (70B): JSON hints + deep persona | Already done — scales automatically |
-| **Test Style** | 1,587 tests verify structural correctness + 37 chassis tests + 15 behavioral tests. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
+| **Test Style** | 1,620 tests verify structural correctness + 37 chassis tests + 15 behavioral tests. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
 | **Dashboard** | Chat, Health, Mode toggle, Canvas are functional. Other views (Thinking, Goals, Memory, Soul, Diary, Logs) are **proxy shells** — they work when backends are running but show "unavailable" in minimal stack | Views become live with `make full-up` |
 | **Memory Persistence** | Minimal stack now uses pgvector (fixed). Full persistence requires `make full-up` or setting `VECTOR_STORE=postgres` + `PG_URI` | Default is now correct |
 | **Security Defaults** | HMAC enforced, but DB password is `localdev` by default. Nonce replay persisted to file. Dev HMAC secret now blocked unless explicitly allowed | Set `DB_PASSWORD`, `INTERSERVICE_HMAC_SECRET` env vars for production |
@@ -313,7 +318,7 @@ Supervisor (every 15s) → deep /health on each service
 
 ## Milestone History
 
-> 31 shipped. Zero skipped. Every milestone has tests. Quality of AI reasoning depends on model — see [Honest Limitations](#honest-limitations).
+> 32 shipped. Zero skipped. Every milestone has tests. Quality of AI reasoning depends on model — see [Honest Limitations](#honest-limitations).
 
 ```
 P0  Stack runs              ██████████ DONE   P14 Temporal Self       ██████████ DONE
@@ -340,7 +345,7 @@ H3  Context Budget          ██████████ DONE
 | Priority | Feature | Status |
 |---|---|---|
 | **J1** | Live Canvas Visualization | **DONE** — mind-map/graph in dashboard |
-| **J2** | Wake-word "Kai" + Intent Judge | **DONE** — whisper + tiny LLM intent |
+| **J2** | Wake-word "Kai" + Intent Judge | **DONE** — wake-service `/wake/*`, cooldown/debounce, dashboard proxy + optional langgraph pre-routing |
 | **J3** | Auto-Redaction PII | **DONE** — regex strip before processing |
 | **J4** | Proactive Low-Latency Voice | **DONE** — audio/video cue → speak-or-not |
 | **J5** | Memory Viewer GUI | **DONE** — diary-style dashboard tab |
@@ -384,6 +389,7 @@ workspace-manager/   # Workspace lifecycle manager
 perception/          # Audio and camera capture
   audio/             # STT (faster-whisper tiny, CPU)
   camera/            # Camera capture
+  wake/              # Wake-word + intent judge (J2)
 output/              # Output services
   tts/               # Text-to-speech (edge-tts British Ryan)
   avatar/            # Avatar generation
@@ -432,7 +438,7 @@ Toggle: `Ctrl+Shift+M` in dashboard, or auto-schedule from tool-gate `/gate/mode
 ```bash
 # Build
 docker compose -f docker-compose.minimal.yml build    # Core 8
-docker compose -f docker-compose.full.yml build        # All 26
+docker compose -f docker-compose.full.yml build        # All 27
 
 # Run
 make core-up       # Start core stack
@@ -442,13 +448,13 @@ make full-down     # Stop everything
 
 # Validate
 make go_no_go      # Syntax check
-make test-core     # All 88 targets
+make test-core     # All 74 targets
 make merge-gate    # Full pre-merge
 ```
 
 ---
 
-## Test Targets (89)
+## Test Targets (74)
 
 <details>
 <summary>Click to expand full test target list</summary>
@@ -521,13 +527,13 @@ make core-smoke                make test-integration
 ### Cross-Check: What's Real vs What Needs Hardware
 
 **Working now (CPU/Codespace):**
-- [x] 26 services built, health-checked, compose validated
+- [x] 27 services built, health-checked, compose validated
 - [x] pgvector persistence (both minimal + full stacks)
 - [x] HMAC auth enforced, dev secret blocked by default
 - [x] Supervisor auto-healing loop (deep /health + /recover)
 - [x] Executor sandboxing (allowlist + AST validation + shell=False)
 - [x] Prometheus + Alertmanager + Telegram alerts wired
-- [x] 89 test targets, 1,587 tests, zero failures
+- [x] 74 test targets, 1,620 tests, zero failures
 - [x] Pre-commit, dep scanning, container scanning
 - [x] Circuit breakers, exponential backoff, resilient_call()
 - [x] MARS memory decay (R = e^{-τ/S}), spaced repetition

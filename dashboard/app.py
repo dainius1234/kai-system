@@ -128,6 +128,9 @@ if _langgraph_url:
 _executor_url = os.getenv("EXECUTOR_URL", "")
 if _executor_url:
     NODES["executor"] = _executor_url + "/health"
+_wake_url = os.getenv("WAKE_URL", "")
+if _wake_url:
+    NODES["wake-service"] = _wake_url + "/health"
 
 NO_GO_GRACE_REQUESTS = int(os.getenv("NO_GO_GRACE_REQUESTS", "20"))
 MAX_ERROR_RATIO = float(os.getenv("MAX_ERROR_RATIO", "0.05"))
@@ -359,6 +362,7 @@ async def readiness() -> Dict[str, Any]:
 # ── P8: Thinking Pathways — intelligence proxy endpoints ─────────────
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 HEARTBEAT_URL = os.getenv("HEARTBEAT_URL", "http://heartbeat:8010")
+WAKE_URL = os.getenv("WAKE_URL", "http://wake-service:8022")
 
 
 @app.get("/thinking")
@@ -1044,6 +1048,23 @@ async def proxy_shadow_branches():
 @app.get("/api/operator-model")
 async def proxy_operator_model():
     return await _proxy_get(f"{MEMU_URL}/memory/operator-model")
+
+
+# ── J2 Wake + Intent proxies ──────────────────────────────────────────
+
+@app.post("/api/wake/detect")
+async def proxy_wake_detect(body: Dict[str, Any] = Body(...)):
+    return await _proxy_post(f"{WAKE_URL}/wake/detect", body)
+
+
+@app.post("/api/wake/intent")
+async def proxy_wake_intent(body: Dict[str, Any] = Body(...)):
+    return await _proxy_post(f"{WAKE_URL}/wake/intent", body)
+
+
+@app.post("/api/wake/process")
+async def proxy_wake_process(body: Dict[str, Any] = Body(...)):
+    return await _proxy_post(f"{WAKE_URL}/wake/process", body)
 
 
 # ── Unified App Shell ────────────────────────────────────────────────

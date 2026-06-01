@@ -139,6 +139,7 @@ services:
       EXECUTOR_URL: http://executor:8002
       HEARTBEAT_URL: http://heartbeat:8010
       SUPERVISOR_URL: http://supervisor:8051
+      WAKE_URL: http://wake-service:8022
     ports:
       - "8080:8080"
     healthcheck:
@@ -155,6 +156,7 @@ services:
       - memu-core
       - langgraph
       - heartbeat
+      - wake-service
 
   supervisor:
     build:
@@ -236,6 +238,8 @@ services:
       OLLAMA_URL: http://ollama:11434
       OLLAMA_MODEL: qwen2:0.5b
       LLM_TIMEOUT: "120"
+      WAKE_URL: http://wake-service:8022
+      FF_WAKE_INTENT_ROUTING: "${FF_WAKE_INTENT_ROUTING:-false}"
     secrets:
       - hmac_secret
     ports:
@@ -385,6 +389,31 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.14
+
+  wake-service:
+    build:
+      context: .
+      dockerfile: perception/wake/Dockerfile
+    <<: *defaults
+    environment:
+      OLLAMA_URL: http://ollama:11434
+      WAKE_WORDS: "${WAKE_WORDS:-kai,hey kai,ok kai}"
+      WAKE_COOLDOWN_SECONDS: "${WAKE_COOLDOWN_SECONDS:-2}"
+      WAKE_INTENT_MODEL: "${WAKE_INTENT_MODEL:-qwen2:0.5b}"
+      WAKE_CONFIDENCE_THRESHOLD: "${WAKE_CONFIDENCE_THRESHOLD:-0.6}"
+    ports:
+      - "8022:8022"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8022/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.24
+    depends_on:
+      - memu-core
 
   kai-advisor:
     build:

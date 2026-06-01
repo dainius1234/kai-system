@@ -1,0 +1,109 @@
+name: Weekly Drift Detector
+
+on:
+  schedule:
+    # Every Monday at 08:00 UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  drift-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate and publish drift snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          today="$(date -u +%F)"
+          now_epoch="$(date -u +%s)"
+
+          stale_branches=""
+          copilot_stale=""
+
+          while IFS=$'\t' read -r name sha; do
+            [ -z "${name}" ] && continue
+            [ "${name}" = "main" ] && continue
+
+            commit_date="$(gh api "repos/${REPO}/commits/${sha}" --jq '.commit.committer.date')"
+            commit_epoch="$(date -u -d "${commit_date}" +%s)"
+            age_days="$(( (now_epoch - commit_epoch) / 86400 ))"
+
+            if [ "${age_days}" -gt 30 ]; then
+              stale_branches+="- ${name} (${age_days}d old)"$'\n'
+              case "${name}" in
+                copilot/*)
+                  copilot_stale+="- ${name} (${age_days}d old)"$'\n'
+                  ;;
+              esac
+            fi
+          done < <(gh api "repos/${REPO}/branches?per_page=100" --jq '.[] | [.name, .commit.sha] | @tsv')
+
+          stale_issues=""
+          while IFS=$'\t' read -r number title updated_at is_pr; do
+            [ "${is_pr}" = "true" ] && continue
+            updated_epoch="$(date -u -d "${updated_at}" +%s)"
+            age_days="$(( (now_epoch - updated_epoch) / 86400 ))"
+            if [ "${age_days}" -gt 60 ]; then
+              stale_issues+="- #${number} ${title} (${age_days}d inactivity)"$'\n'
+            fi
+          done < <(gh api "repos/${REPO}/issues?state=open&per_page=100" --jq '.[] | [.number, .title, .updated_at, has("pull_request")] | @tsv')
+
+          pm_stale=""
+          while IFS= read -r file; do
+            line="$(grep -Eim1 'Last-updated:' "${file}" || true)"
+            [ -z "${line}" ] && continue
+            date_str="$(printf '%s\n' "${line}" | sed -nE 's/.*Last-updated:[[:space:]]*([0-9]{4}-[0-9]{2}-[0-9]{2}).*/\1/p')"
+            if [[ "${date_str}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+              file_epoch="$(date -u -d "${date_str}" +%s)"
+              age_days="$(( (now_epoch - file_epoch) / 86400 ))"
+              if [ "${age_days}" -gt 14 ]; then
+                pm_stale+="- ${file#./} (Last-updated: ${date_str}, ${age_days}d old)"$'\n'
+              fi
+            fi
+          done < <(find kai-pm -type f)
+
+          [ -z "${stale_branches}" ] && stale_branches="- None"
+          [ -z "${stale_issues}" ] && stale_issues="- None"
+          [ -z "${pm_stale}" ] && pm_stale="- None"
+          [ -z "${copilot_stale}" ] && copilot_stale="- None"
+
+          body_file="/tmp/drift-report-${today}.md"
+          {
+            echo "Snapshot date: ${today}"
+            echo
+            echo "## Branches not updated in >30 days (excluding main)"
+            printf '%s\n' "${stale_branches}"
+            echo
+            echo "## Issues with no activity in >60 days"
+            printf '%s\n' "${stale_issues}"
+            echo
+            echo "## kai-pm files with Last-updated older than 14 days"
+            printf '%s\n' "${pm_stale}"
+            echo
+            echo "## Stale Copilot agent branches (copilot/* older than 30 days)"
+            printf '%s\n' "${copilot_stale}"
+          } > "${body_file}"
+
+          # Reuse the most recently updated open issue titled "Weekly drift report (...)".
+          existing_issue="$(gh issue list --state open --label pm --search 'Weekly drift report in:title' --json number,title,updatedAt --jq '[.[] | select(.title | startswith(\"Weekly drift report (\"))] | sort_by(.updatedAt) | reverse | .[0].number // empty')"
+
+          if [ -n "${existing_issue}" ]; then
+            gh issue comment "${existing_issue}" --body-file "${body_file}"
+          else
+            gh issue create \
+              --title "Weekly drift report (${today})" \
+              --body-file "${body_file}" \
+              --label pm
+          fi

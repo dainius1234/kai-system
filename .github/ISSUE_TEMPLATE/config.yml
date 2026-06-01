@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Kai PM bootstrap
+    url: https://github.com/dainius1234/kai-system/blob/main/kai-pm/SESSION_BOOTSTRAP.md
+    about: Read this first for PM context and current operating state.

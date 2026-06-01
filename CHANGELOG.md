@@ -5,7 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+- flake8 E999 (f-string backslash) blocking CI on main
+- Removed stray file `pulls/48/review_comments`
+- **TTS test de-flaked**: `scripts/test_tts_service.py` now mocks `edge_tts.Communicate` so the test runs offline and is deterministic — no more Bing WebSocket 403 failures in CI sandboxes
+- **TTS app network errors → 503**: `output/tts/app.py` `_synthesize_edge` now maps aiohttp/OSError network failures to HTTP 503 (upstream unavailable) instead of 500
+- **CVE-2026-40192**: Bumped `Pillow` from `10.4.0` to `>=12.2.0` in `screen-capture/requirements.txt`
+- **CVE-2024-53981 / CVE-2026-24486 / CVE-2026-40347**: Bumped `python-multipart` from `0.0.12` to `>=0.0.26` in `perception/audio/requirements.txt` and `screen-capture/requirements.txt`
+- **CVE-2024-47874 / CVE-2025-54121**: Bumped `fastapi` from `==0.115.0` to `>=0.116.2` and added explicit `starlette>=0.47.2` constraint across all 25 per-service `requirements.txt` files
+
 ### Added
+- PM: introduced `kai-pm/` brain + `.github` automation (PM System v2)
 - Context budget management (`CONTEXT_BUDGET_TOKENS` env, default 3072) — `_trim_context()` in langgraph prevents system prompt from exceeding model context window
 - Context budget test suite (`scripts/test_context_budget.py`, 11 tests)
 - `make test-context-budget` Makefile target
@@ -13,14 +23,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Phase 0 implementation report: `docs/gpu_integration_phase0.md`
 - memu-core manual persistence endpoint: `POST /memory/persist`
 - New env controls for GPU/scaling and retrieval cap in `.env.example` (including `MEMU_MAX_CANDIDATES`)
+- J2 wake-intent service (`perception/wake/app.py`) with:
+  - `POST /wake/detect` (text/audio_b64 wake-word detect + confidence + debounce)
+  - `POST /wake/intent` (tiny-model intent taxonomy classifier with strict JSON validation)
+  - `POST /wake/process` (detect + intent combined)
+  - `GET /health` (dependency-aware status)
+- Wake-intent test suite (`scripts/test_wake_intent.py`) and `make test-wake` target (wired into `test-core`)
+- Wake-intent dashboard proxy endpoints (`/api/wake/detect`, `/api/wake/intent`, `/api/wake/process`)
+- New feature flag: `FF_WAKE_INTENT_ROUTING` (default off)
+- **H2.2**: `MEMU_MAX_CANDIDATES` env var (default 500) caps `retrieve_ranked()` candidate fetch, preventing unbounded 10k-record loads on every retrieval call
 
 ### Changed
+- Replaced fabricated PM v2 content (DECISIONS, SEQUENCE, STATUS, RISKS) with honest, repo-grounded versions
+- Added `kai-pm/STRATEGIC_PLAN.md` as canonical 5-phase roadmap pointer
 - Verifier upgraded to semantic verification (v0.6.0) — uses memu-core `rank_score` (embedding similarity + relevance + importance + recency) instead of keyword-only matching
 - Verifier now calls `/memory/evidence-pack` for richer evidence scoring, with fallback to `/memory/retrieve`
 - Updated all stale documentation (README metrics, PROJECT_BACKLOG, Known Issues table)
 - memu-core Redis handling hardened with reconnection backoff and persisted P17–P22 restore/sync lifecycle
 - `common.llm.LLMRouter` live query path now uses model-aware timeout from `common.model_registry.model_timeout()`
 - `common.model_registry` expanded with `deepseek-coder-v2:6.7b`, `qwen2.5-math:7b`, and `yi:34b`
+- Langgraph `/chat` can now optionally pre-classify intent through wake-intent service before route selection when `FF_WAKE_INTENT_ROUTING=true`
 
 ### Previously Added
 - Pre-commit hooks (flake8, trailing whitespace, secret detection, syntax check)
