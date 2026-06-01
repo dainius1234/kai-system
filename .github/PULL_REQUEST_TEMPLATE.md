@@ -1,28 +1,27 @@
-## PM scope declaration
+## What this PR does
 
-- **Sequence step:** <!-- Link to the exact row/step in kai-pm/SEQUENCE.md -->
-- **Jewel:** <!-- J1-J7 or N/A -->
+<!-- 1-2 sentences in plain English -->
 
-## Documentation updates
+## CLEANUP TODO touch
 
-- [ ] `kai-pm/STATUS.md` updated (or N/A with reason)
-- [ ] `CHANGELOG.md` updated (or N/A with reason)
-- [ ] `README.md` updated if public behavior/state changed
+- [ ] This PR updates `kai-pm/CLEANUP_TODO.md`
+- [ ] This PR does not update `kai-pm/CLEANUP_TODO.md`
 
-## Tests
+## Risk level
 
-- Tests added/updated? **Yes / No / N/A**
-- Explain:
+- [ ] low
+- [ ] medium
+- [ ] high
 
-## Risk assessment
+## Reversibility
 
-- Risk introduced? **Yes / No**
-- If yes, link/update `kai-pm/RISKS.md` entry:
+- [ ] easy revert
+- [ ] hard revert
 
-## Reviewer checklist
+## Acceptance criteria
 
-- [ ] Sequence step and jewel mapping are clear
-- [ ] File scope matches declared task
-- [ ] Docs and changelog updates are correct
-- [ ] Validation evidence is included
-- [ ] No unrelated runtime changes
+- [ ] Criteria listed and verified
+
+## Linked TODO item
+
+<!-- Link to `kai-pm/CLEANUP_TODO.md` item or anchor -->

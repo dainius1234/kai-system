@@ -1,0 +1,30 @@
+- name: triage:keep
+  color: 2EA043
+  description: Keep PR open and continue iteration
+- name: triage:rebase
+  color: D29922
+  description: Needs rebase before review
+- name: triage:close
+  color: CF222E
+  description: Close PR without merging
+- name: cleanup-week-1
+  color: 1F6FEB
+  description: Cleanup sprint work for week 1
+- name: cleanup-week-2
+  color: 1F6FEB
+  description: Cleanup sprint work for week 2
+- name: cleanup-week-3
+  color: 1F6FEB
+  description: Cleanup sprint work for week 3
+- name: drift-watch
+  color: FB8500
+  description: PR may revert or drift cleanup work
+- name: pm-blocked
+  color: 8250DF
+  description: Needs Dainius decision to proceed
+- name: keystone
+  color: E3B341
+  description: Must-merge structural cleanup PR
+- name: salvage-later
+  color: 8C959F
+  description: Material to revisit after cleanup

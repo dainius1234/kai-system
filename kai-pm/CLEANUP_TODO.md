@@ -1,5 +1,19 @@
 # Cleanup Sprint TODO — Live Tracker
 
+## Week 0 — PM Infrastructure (this PR)
+
+- [x] Add `.github/CODEOWNERS` protection for critical paths
+- [x] Add `.github/PULL_REQUEST_TEMPLATE.md` drift-proof checklist
+- [x] Add layman-friendly issue templates (`bug.md`, `feature.md`)
+- [x] Add label spec (`.github/labels.yml`) and sync workflow
+- [x] Add daily PM dashboard workflow (`.github/workflows/pm-dashboard.yml`)
+- [x] Add PyPI-shadow tripwire script + pre-commit hook integration
+- [x] Add `docs/CODEX_BRIEFS/README.md` + cleanup sprint brief
+- [x] Add `kai-pm/PM_TOOLBOX.md` for PM automation inventory
+- [x] Update `kai-pm/PM_HANDOFF.md` with toolbox + dashboard references
+
+---
+
 > **Single source of truth.** Tick boxes as work lands on `main`.
 
 ---

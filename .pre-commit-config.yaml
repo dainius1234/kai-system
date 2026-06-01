@@ -41,6 +41,16 @@ repos:
         files: '(dashboard|tool-gate|memu-core|langgraph|executor|heartbeat|supervisor|verifier|fusion-engine|memory-compressor|ledger-worker|metrics-gateway|telegram-bot)/app\.py$'
         pass_filenames: true
 
+
+      - id: check-pypi-shadow
+        name: Block PyPI package shadowing at repo root
+        # Temporary unblock while cleanup rename is pending: KAI_SHADOW_ALLOW=langgraph
+        # This guard must stay enabled; remove allowlist overrides once CLEANUP_TODO item 1.4 lands.
+        entry: bash scripts/check_pypi_shadow.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+
       - id: no-secrets
         name: Block hardcoded secrets
         entry: '(?i)(password|secret|token|api_key)\s*=\s*["\x27][^"\x27]{8,}'
