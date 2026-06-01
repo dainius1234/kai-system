@@ -26,6 +26,7 @@ jobs:
           set -euo pipefail
 
           title='📊 PM Dashboard — auto-updated daily'
+          owner_ping='@dainius1234'
           todo_file='kai-pm/CLEANUP_TODO.md'
 
           labels=(
@@ -88,7 +89,7 @@ jobs:
           ping=''
           if [[ "${days_since_merge}" != 'unknown' ]] && [[ "${days_since_merge}" -gt 5 ]]; then
             blocked_notice='No merge to main in the last 5 days.'
-            ping='@dainius1234 please review cleanup sequencing.'
+            ping="${owner_ping} please review cleanup sequencing."
             gh issue edit "${issue_number}" --add-label "pm-blocked" >/dev/null || true
           fi
 
