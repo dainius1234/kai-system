@@ -21,11 +21,20 @@ if sys.path and os.path.abspath(sys.path[0]) == _ws:
 
 passed = 0
 failed = 0
+skipped = 0
 
 
 def check(label: str, fn):
-    """Run *fn* and report pass/fail."""
-    global passed, failed
+    """Run *fn* and report pass/skip/fail.
+
+    pytest.skip() raises pytest.outcomes.Skipped which is a BaseException
+    subclass (not Exception).  When this script runs as a standalone process
+    (i.e. not under a pytest session) that exception is uncaught by a plain
+    ``except Exception`` block, causing the script to exit non-zero even
+    though the intent was merely to skip.  We catch it here and count it as
+    a skip rather than a failure.
+    """
+    global passed, failed, skipped
     try:
         fn()
         print(f"  [PASS] {label}")
@@ -33,6 +42,14 @@ def check(label: str, fn):
     except Exception as exc:
         print(f"  [FAIL] {label}: {exc}")
         failed += 1
+    except BaseException as exc:
+        # pytest.skip() raises pytest.outcomes.Skipped, a BaseException subclass.
+        # Only suppress genuine skips; re-raise KeyboardInterrupt, SystemExit, etc.
+        if type(exc).__name__ == "Skipped":
+            print(f"  [SKIP] {label}: {exc}")
+            skipped += 1
+        else:
+            raise
 
 
 # ── 1. LangGraph ────────────────────────────────────────────────────
@@ -115,7 +132,7 @@ if __name__ == "__main__":
     check("CrewAI     — crew/task wiring", test_crewai)
     check("OpenAgents — class loading", test_openagents)
     print("=" * 48)
-    print(f"Results: {passed} passed, {failed} failed")
+    print(f"Results: {passed} passed, {skipped} skipped, {failed} failed")
     if failed:
         print("WARNING: Some frameworks had issues — check API changes.")
         raise SystemExit(1)
