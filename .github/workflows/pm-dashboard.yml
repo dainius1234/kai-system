@@ -44,10 +44,10 @@ jobs:
 
           label_rows=''
           for label in "${labels[@]}"; do
-            count=$(gh pr list --state open --search "label:\"${label}\"" --json number --limit 200 | jq 'length')
+            count=$(gh pr list --state open --search "label:\"${label}\"" --json number --limit 1000 | jq 'length')
             label_rows+="| ${label} | ${count} |"$'\n'
           done
-          total_open_prs=$(gh pr list --state open --json number --limit 200 | jq 'length')
+          total_open_prs=$(gh pr list --state open --json number --limit 1000 | jq 'length')
 
           latest_ci=$(gh run list --branch main --limit 1 --json workflowName,status,conclusion,updatedAt,url | jq '.[0]')
           ci_name=$(jq -r '.workflowName // "n/a"' <<<"${latest_ci}")
@@ -61,13 +61,8 @@ jobs:
           merge_url=$(jq -r '.url // ""' <<<"${last_merge}")
 
           if [[ -n "${merged_at}" ]]; then
-            merge_epoch=$(date -d "${merged_at}" +%s 2>/dev/null || true)
-            if [[ -n "${merge_epoch}" ]]; then
-              now_epoch=$(date -u +%s)
-              days_since_merge=$(( (now_epoch - merge_epoch) / 86400 ))
-            else
-              days_since_merge='unknown'
-            fi
+            days_since_merge=$(MERGED_AT="${merged_at}" python3 -c 'import datetime, os; m=os.environ.get("MERGED_AT",""); dt=datetime.datetime.fromisoformat(m.replace("Z","+00:00")); print((datetime.datetime.now(datetime.timezone.utc)-dt).days)' 2>/dev/null || true)
+            [[ -n "${days_since_merge}" ]] || days_since_merge='unknown'
           else
             days_since_merge='unknown'
           fi
