@@ -24,7 +24,7 @@ while IFS= read -r name; do
   name="$(echo "${name}" | xargs)"
   [[ -z "${name}" ]] && continue
 
-  if [[ -d "${ROOT_DIR}/${name}" ]] && [[ -z "${allow_map[${name}]:-}" ]]; then
+  if [[ -d "${ROOT_DIR}/${name}" ]] && [[ -z "${allow_map["${name}"]:-}" ]]; then
     violations+=("${name}")
   fi
 done < "${BLOCKLIST_FILE}"
