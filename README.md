@@ -133,7 +133,7 @@ Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTR
 | **Dashboard** | Chat, Health, Mode toggle, Canvas are functional. Other views (Thinking, Goals, Memory, Soul, Diary, Logs) are **proxy shells** — they work when backends are running but show "unavailable" in minimal stack | Views become live with `make full-up` |
 | **Memory Persistence** | Minimal stack now uses pgvector (fixed). Full persistence requires `make full-up` or setting `VECTOR_STORE=postgres` + `PG_URI` | Default is now correct |
 | **Security Defaults** | HMAC enforced, but DB password is `localdev` by default. Nonce replay persisted to file. Dev HMAC secret now blocked unless explicitly allowed | Set `DB_PASSWORD`, `INTERSERVICE_HMAC_SECRET` env vars for production |
-| **Coverage** | ~60% estimated. Dashboard proxy endpoints and memu-core complex paths have gaps | `.coveragerc` configured; `make coverage` tracks it |
+| **Coverage** | 78% on `common/` (1,616 tests, measured 2026-06-01). Dashboard proxy endpoints and memu-core complex paths have gaps | `.coveragerc` configured; `make coverage` tracks it |
 
 ---
 
@@ -304,7 +304,7 @@ Supervisor (every 15s) → deep /health on each service
 | dev secret hardcoded | ~~Silently falls back to dev HMAC secret~~ | **Done** — requires explicit `HMAC_ALLOW_DEV_SECRET=true` env var |
 | behavioral tests | ~~Tests verify JSON shape, not reasoning quality~~ | **Done** — 15 behavioral + 8 Docker e2e tests added |
 | dashboard UX | ~~Basic web UI, not native-feeling~~ | **Done** — Apple/glassmorphism redesign (SF Pro, backdrop-blur, smooth transitions) |
-| test coverage | ~60% estimated | Tracking (`.coveragerc` added) |
+| test coverage | 78% on `common/` (measured 2026-06-01, 1,616 tests passing) | Tracking (`.coveragerc`; `make coverage`) |
 
 ---
 
