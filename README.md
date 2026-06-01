@@ -136,7 +136,7 @@ Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTR
 | **Dashboard** | Chat, Health, Mode toggle, Canvas are functional. Other views (Thinking, Goals, Memory, Soul, Diary, Logs) are **proxy shells** — they work when backends are running but show "unavailable" in minimal stack | Views become live with `make full-up` |
 | **Memory Persistence** | Minimal stack now uses pgvector (fixed). Full persistence requires `make full-up` or setting `VECTOR_STORE=postgres` + `PG_URI` | Default is now correct |
 | **Security Defaults** | HMAC enforced, but DB password is `localdev` by default. Nonce replay persisted to file. Dev HMAC secret now blocked unless explicitly allowed | Set `DB_PASSWORD`, `INTERSERVICE_HMAC_SECRET` env vars for production |
-| **Coverage** | ~60% estimated. Dashboard proxy endpoints and memu-core complex paths have gaps | `.coveragerc` configured; `make coverage` tracks it |
+| **Coverage** | 78% on `common/` (1,616 tests, measured 2026-06-01). Dashboard proxy endpoints and memu-core complex paths have gaps | `.coveragerc` configured; `make coverage` tracks it |
 
 ---
 
@@ -312,7 +312,7 @@ Supervisor (every 15s) → deep /health on each service
 | memu Redis resilience | ~~No reconnect strategy when Redis drops~~ | **Done** — exponential backoff reconnect in `_get_redis_client()` |
 | model timeout wiring | ~~Per-model timeout metadata not used in live calls~~ | **Done** — `_model_timeout()` now used for live query timeout |
 | retrieval candidate cap | ~~Hardcoded broad candidate pull~~ | **Done** — `MEMU_MAX_CANDIDATES` env guard for ranked retrieval |
-| test coverage | ~60% estimated | Tracking (`.coveragerc` added) |
+| test coverage | 78% on `common/` (measured 2026-06-01, 1,616 tests passing) | Tracking (`.coveragerc`; `make coverage`) |
 
 ---
 

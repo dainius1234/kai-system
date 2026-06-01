@@ -66,16 +66,16 @@
 ### As of 2026-04-21
 
 **Active priorities (in order):**
-1. **Coverage measurement** — replace "~60% estimated" with a real number. Run `make coverage`, commit the report, update README.
-2. **P29: Financial Awareness** — savings tracker, expense categorization. Scope first, build second.
-3. **GPU readiness** — pre-wire multi-model endpoints, real STT/TTS adapters, speculative decoding hooks so the RTX 5080 lights up day one.
+1. **Land or close PR #46** — GPU Phase 0 consolidation draft PR is still open. Either merge it or close it to unblock main.
+2. **P29: Financial Awareness** — savings tracker, expense categorization (scope first, build second).
+3. **GPU readiness** — pre-wire multi-model endpoints, real STT/TTS adapters, speculative decoding hooks for the RTX 5080.
 
 **Discipline / hygiene:**
 - Run `make sync-docs` after every significant change (still the rule, still drifts).
 - Reconcile SESSION_BACKLOG with README at the start of every session — drift caught here this round.
-- `.coveragerc` exists but coverage number in README is unverified — must fix before next feature.
 
 **Done since last reconciliation (now closed):**
+- ✅ **Coverage measurement** — 78% on `common/` measured 2026-06-01 (1,616 tests). README updated with real number.
 - ✅ J1 Live Canvas, J2 Wake-word + Intent Judge, J3 Auto-Redaction PII, J4 Proactive Low-Latency Voice, J5 Memory Viewer GUI, J6 SOUL.md + AGENTS.md, J7 Skills Auto-Install Hub
 - ✅ H3 Context Budget Manager
 - ✅ P1 Skill Security + TTL, P2 Multi-modal LLM Fusion, P3 World Anchor, P4 Debate Branching, P5 Deprecation Cleanup

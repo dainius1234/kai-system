@@ -19,15 +19,22 @@ from unittest.mock import MagicMock
 # ---------------------------------------------------------------------------
 # bootstrap: stub heavy deps so memu-core/app.py can import in test
 # ---------------------------------------------------------------------------
-for mod_name in [
+# Always replace these in sys.modules before loading the app module so that
+# test_p3 gets deterministic hash-based embeddings regardless of collection
+# order (real sentence_transformers may already be in sys.modules when pytest
+# runs the full suite; the old `if not in sys.modules` guard would skip the
+# stub and leave real embeddings active, making similarity-dependent rank
+# assertions non-deterministic).
+_STUB_NAMES = [
     "sentence_transformers",
     "psutil",
     "redis", "redis.asyncio",
     "psycopg2",
     "lakefs_client",
-]:
-    if mod_name not in sys.modules:
-        sys.modules[mod_name] = MagicMock()
+]
+_originals = {m: sys.modules.get(m) for m in _STUB_NAMES}
+for mod_name in _STUB_NAMES:
+    sys.modules[mod_name] = MagicMock()
 
 os.environ.setdefault("MEMU_HMAC_KEY", "test-key")
 os.environ.setdefault("VECTOR_STORE", "memory")
@@ -37,6 +44,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 spec = importlib.util.spec_from_file_location("memu_app", "memu-core/app.py")
 memu = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(memu)
+
+# Restore originals so other tests can use the real libraries if needed.
+for mod_name, orig in _originals.items():
+    if orig is not None:
+        sys.modules[mod_name] = orig
+    else:
+        sys.modules.pop(mod_name, None)
 
 # rebuild pydantic models — inject typing names into module's global namespace
 # needed because `from __future__ import annotations` makes them string refs

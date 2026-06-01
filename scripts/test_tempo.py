@@ -1,18 +1,26 @@
 """Tests for P11: Operator Tempo Modeling — pace detection + style hints."""
+import importlib.util
 import sys
 import os
 import unittest
 from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta, timezone
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "memu-core"))
-
 # We test the tempo logic by calling the endpoint via the FastAPI test client
 # but the logic uses store.search() — so we mock the store.
 
-# Import the app after path setup
+# Load memu-core/app.py directly by file path so we always get the right
+# module even when pytest has already imported another service's 'app' module
+# (e.g. kai-advisor/test_kai_advisor.py sets sys.modules["app"] at collection
+# time — using spec_from_file_location with a unique name bypasses that cache).
+_here = os.path.dirname(os.path.abspath(__file__))
 os.environ.setdefault("VECTOR_STORE", "memory")
-import app as memu_app
+_spec = importlib.util.spec_from_file_location(
+    "memu_core_app_tempo",
+    os.path.join(_here, "..", "memu-core", "app.py"),
+)
+memu_app = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(memu_app)
 
 
 def _make_record(ts_offset_seconds: float) -> MagicMock:
