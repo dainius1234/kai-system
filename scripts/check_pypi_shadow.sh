@@ -26,7 +26,8 @@ while IFS= read -r name; do
   [[ -z "${name}" ]] && continue
   [[ "${name}" =~ ^[a-zA-Z0-9._-]+$ ]] || continue
 
-  if [[ -d "${ROOT_DIR}/${name}" ]] && [[ -z "${allow_map["${name}"]:-}" ]]; then
+  allowed_entry="${allow_map["${name}"]:-}"
+  if [[ -d "${ROOT_DIR}/${name}" ]] && [[ -z "${allowed_entry}" ]]; then
     violations+=("${name}")
   fi
 done < "${BLOCKLIST_FILE}"

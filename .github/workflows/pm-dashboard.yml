@@ -61,7 +61,13 @@ jobs:
           merge_url=$(jq -r '.url // ""' <<<"${last_merge}")
 
           if [[ -n "${merged_at}" ]]; then
-            days_since_merge=$(python3 -c "import datetime; m=datetime.datetime.fromisoformat('${merged_at}'.replace('Z','+00:00')); print((datetime.datetime.now(datetime.timezone.utc)-m).days)")
+            merge_epoch=$(date -d "${merged_at}" +%s 2>/dev/null || true)
+            if [[ -n "${merge_epoch}" ]]; then
+              now_epoch=$(date -u +%s)
+              days_since_merge=$(( (now_epoch - merge_epoch) / 86400 ))
+            else
+              days_since_merge='unknown'
+            fi
           else
             days_since_merge='unknown'
           fi
@@ -81,9 +87,11 @@ jobs:
             issue_id=$(jq -r '.id' <<<"${created}")
           fi
 
-          gh api graphql \
+          if ! gh api graphql \
             -f query='mutation($issueId:ID!){pinIssue(input:{issueId:$issueId}){issue{number}}}' \
-            -F issueId="${issue_id}" >/dev/null 2>&1 || true
+            -F issueId="${issue_id}" >/dev/null 2>&1; then
+            echo "WARNING: Could not pin dashboard issue #${issue_number}" >&2
+          fi
 
           blocked_notice='No blocker detected.'
           ping=''
