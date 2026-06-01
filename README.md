@@ -307,16 +307,12 @@ Supervisor (every 15s) → deep /health on each service
 | dev secret hardcoded | ~~Silently falls back to dev HMAC secret~~ | **Done** — requires explicit `HMAC_ALLOW_DEV_SECRET=true` env var |
 | behavioral tests | ~~Tests verify JSON shape, not reasoning quality~~ | **Done** — 15 behavioral + 8 Docker e2e tests added |
 | dashboard UX | ~~Basic web UI, not native-feeling~~ | **Done** — Apple/glassmorphism redesign (SF Pro, backdrop-blur, smooth transitions) |
-<<<<<<< HEAD
-| test coverage | 78% on `common/` (measured 2026-06-01, 1,616 tests passing) | Tracking (`.coveragerc`; `make coverage`) |
-=======
 | GPU Phase 0 | ~~No hardware-aware model routing scaffolding~~ | **Done** — `common/gpu_utils.py` + env toggles + model registry expansion + rollout report |
 | memu persistence | ~~P17–P22 state in-memory only~~ | **Done** — Redis persist/restore (`/memory/persist` + periodic sync in `/health`) |
 | memu Redis resilience | ~~No reconnect strategy when Redis drops~~ | **Done** — exponential backoff reconnect in `_get_redis_client()` |
 | model timeout wiring | ~~Per-model timeout metadata not used in live calls~~ | **Done** — `_model_timeout()` now used for live query timeout |
 | retrieval candidate cap | ~~Hardcoded broad candidate pull~~ | **Done** — `MEMU_MAX_CANDIDATES` env guard for ranked retrieval |
-| test coverage | ~60% estimated | Tracking (`.coveragerc` added) |
->>>>>>> origin/main
+| test coverage | 78% on `common/` (measured 2026-06-01, 1,616 tests passing) | Tracking (`.coveragerc`; `make coverage`) |
 
 ---
 
