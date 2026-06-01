@@ -5,8 +5,10 @@ prompt template scaling, and LLM response validation.
 """
 from __future__ import annotations
 
+import asyncio
 import os
 import sys
+import types
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -70,6 +72,12 @@ class TestModelRegistry(unittest.TestCase):
         from common.model_registry import list_models
         models = list_models()
         self.assertGreater(len(models), 10)
+
+    def test_new_gpu_models_registered(self):
+        from common.model_registry import get_model_spec
+        self.assertGreaterEqual(get_model_spec("deepseek-coder-v2:6.7b").quality_tier, 2)
+        self.assertGreaterEqual(get_model_spec("qwen2.5-math:7b").quality_tier, 2)
+        self.assertGreaterEqual(get_model_spec("yi:34b").context_window, 200000)
 
 
 class TestTokenCounting(unittest.TestCase):
@@ -213,6 +221,118 @@ class TestLLMResponseValidation(unittest.TestCase):
         from common.llm import _validate_llm_response
         result = _validate_llm_response('{"error": "model not found"}')
         self.assertIn("error", result.lower())
+
+    def test_live_query_uses_model_aware_timeout(self):
+        from common import llm
+
+        calls = {"model": None, "timeout": None}
+
+        class FakeTimeout:
+            def __init__(self, timeout, connect=None, read=None):
+                self.timeout = timeout
+                self.connect = connect
+                self.read = read
+
+        class FakeResponse:
+            def raise_for_status(self):
+                return None
+
+            def json(self):
+                return {
+                    "choices": [{"message": {"content": "ok"}}],
+                    "usage": {"total_tokens": 1},
+                    "model": "fake-model",
+                }
+
+        class FakeAsyncClient:
+            def __init__(self, timeout):
+                calls["timeout"] = timeout
+
+            async def __aenter__(self):
+                return self
+
+            async def __aexit__(self, exc_type, exc, tb):
+                return False
+
+            async def post(self, _url, json):
+                calls["payload_model"] = json.get("model")
+                return FakeResponse()
+
+        fake_httpx = types.SimpleNamespace(Timeout=FakeTimeout, AsyncClient=FakeAsyncClient)
+        original_httpx = sys.modules.get("httpx")
+        original_model_timeout = llm._model_timeout
+
+        def _fake_model_timeout(model_name=None):
+            calls["model"] = model_name
+            return 77.0
+
+        try:
+            llm._model_timeout = _fake_model_timeout
+            sys.modules["httpx"] = fake_httpx
+            router = llm.LLMRouter(backends={"DeepSeek-V4": "http://llm:11434"})
+            response = asyncio.run(
+                router._live_query("DeepSeek-V4", "http://llm:11434", "hello", "system", 0.3, 32, 0.0)
+            )
+            self.assertEqual(response.source, "live")
+            self.assertEqual(calls["model"], "deepseek-v4")
+            self.assertEqual(calls["payload_model"], "deepseek-v4")
+            self.assertEqual(calls["timeout"].timeout, 77.0)
+            self.assertEqual(calls["timeout"].read, 77.0)
+            self.assertEqual(calls["timeout"].connect, llm.LLM_CONNECT_TIMEOUT)
+        finally:
+            llm._model_timeout = original_model_timeout
+            if original_httpx is not None:
+                sys.modules["httpx"] = original_httpx
+            else:
+                sys.modules.pop("httpx", None)
+
+
+class TestGPUUtils(unittest.TestCase):
+    def test_force_cpu_disables_cuda(self):
+        from common import gpu_utils
+        original_force_cpu = os.environ.get("FORCE_CPU")
+        os.environ["FORCE_CPU"] = "true"
+        try:
+            self.assertFalse(gpu_utils.has_cuda())
+        finally:
+            if original_force_cpu is None:
+                os.environ.pop("FORCE_CPU", None)
+            else:
+                os.environ["FORCE_CPU"] = original_force_cpu
+
+    def test_recommended_model_from_gpu_memory(self):
+        from common import gpu_utils
+        original_has_cuda = gpu_utils.has_cuda
+        original_get_gpu_info = gpu_utils.get_gpu_info
+        try:
+            gpu_utils.has_cuda = lambda: True
+            gpu_utils.get_gpu_info = lambda: gpu_utils.GPUInfo(available=True, total_memory_gb=16.0)
+            self.assertEqual(gpu_utils.get_recommended_model(), "qwen2.5:14b")
+        finally:
+            gpu_utils.has_cuda = original_has_cuda
+            gpu_utils.get_gpu_info = original_get_gpu_info
+
+    def test_speculative_decoding_requires_models_and_gpu(self):
+        from common import gpu_utils
+        original_has_cuda = gpu_utils.has_cuda
+        original_env = {
+            "ENABLE_SPECULATIVE_DECODING": os.environ.get("ENABLE_SPECULATIVE_DECODING"),
+            "SPECULATIVE_DRAFT_MODEL": os.environ.get("SPECULATIVE_DRAFT_MODEL"),
+            "SPECULATIVE_VERIFY_MODEL": os.environ.get("SPECULATIVE_VERIFY_MODEL"),
+        }
+        try:
+            gpu_utils.has_cuda = lambda: True
+            os.environ["ENABLE_SPECULATIVE_DECODING"] = "true"
+            os.environ["SPECULATIVE_DRAFT_MODEL"] = "qwen2:0.5b"
+            os.environ["SPECULATIVE_VERIFY_MODEL"] = "qwen2.5:7b"
+            self.assertTrue(gpu_utils.should_use_speculative_decoding())
+        finally:
+            gpu_utils.has_cuda = original_has_cuda
+            for key, value in original_env.items():
+                if value is None:
+                    os.environ.pop(key, None)
+                else:
+                    os.environ[key] = value
 
 
 class TestFusionAgreement(unittest.TestCase):

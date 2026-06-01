@@ -884,6 +884,15 @@ async def health() -> Dict[str, Any]:
     # Check if feedback store is accessible
     checks["feedback_store"] = "ok" if isinstance(_feedback_store, list) else "fail"
 
+    # H2.1: Periodic P17-P22 persistence (every PERSIST_INTERVAL_SECONDS)
+    if time.time() - _last_persist_time > _PERSIST_INTERVAL_SECONDS:
+        try:
+            persist_results = _persist_p17_p22_to_redis()
+            persisted_count = sum(1 for v in persist_results.values() if v)
+            checks["redis_persist"] = f"synced {persisted_count}/{len(persist_results)}"
+        except Exception as e:
+            checks["redis_persist"] = f"fail: {str(e)[:60]}"
+
     degraded = any(v.startswith("fail") for v in checks.values())
     status = "degraded" if degraded else "ok"
     return {"status": status, "storage": storage_type, "device": DEVICE, "checks": checks}
@@ -918,6 +927,29 @@ async def recover() -> Dict[str, Any]:
             _conscience_log[:] = _conscience_log[-200:]
 
     return {"status": "ok", "recovered": recovered, "recovery_log": entry}
+
+
+@app.post("/memory/persist")
+async def persist_memory() -> Dict[str, Any]:
+    """Manual trigger for P17-P22 Redis persistence.
+
+    H2.1: Allows explicit sync of emotional timeline, values, goals, etc.
+    Called automatically by /health every PERSIST_INTERVAL_SECONDS.
+    """
+    try:
+        results = _persist_p17_p22_to_redis()
+        persisted = [k for k, v in results.items() if v]
+        failed = [k for k, v in results.items() if not v]
+        return {
+            "status": "ok",
+            "persisted_count": len(persisted),
+            "failed_count": len(failed),
+            "persisted": persisted,
+            "failed": failed,
+        }
+    except Exception as e:
+        logger.warning("Manual /memory/persist failed: %s", e)
+        return {"status": "error", "detail": "persistence unavailable"}
 
 
 @app.get("/metrics")
@@ -1375,20 +1407,225 @@ async def memory_revert(version: str = Query(..., description="Commit hash/id"))
 SESSION_MAX_TURNS = int(os.getenv("SESSION_MAX_TURNS", "40"))
 SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "3600"))
 
-# session store: Redis when available, dict fallback
+# ── Redis connection manager with H2.7 reconnection logic ──────────
 _session_store: Dict[str, List[Dict[str, Any]]] = {}
 _session_timestamps: Dict[str, float] = {}
 _redis_client = None
+_redis_url = os.getenv("REDIS_URL", "redis://redis:6379")
+_redis_last_attempt = 0.0
+_redis_retry_delay = 1.0  # exponential backoff
+_REDIS_MAX_RETRY_DELAY = 60.0
 
-try:
-    import redis as _redis_module
-    _redis_url = os.getenv("REDIS_URL", "redis://redis:6379")
-    _redis_client = _redis_module.from_url(_redis_url, decode_responses=True)
-    _redis_client.ping()
+
+def _get_redis_client():
+    """Get Redis client with automatic reconnection and exponential backoff.
+
+    H2.7: Implements retry logic with exponential backoff.
+    If Redis is unavailable, returns None and uses in-memory fallback.
+    """
+    global _redis_client, _redis_last_attempt, _redis_retry_delay
+
+    # If we have a working client, verify it's still alive
+    if _redis_client:
+        try:
+            _redis_client.ping()
+            _redis_retry_delay = 1.0  # reset backoff on success
+            return _redis_client
+        except Exception:
+            logger.warning("Redis connection lost, will attempt reconnect")
+            _redis_client = None
+
+    # Rate limit reconnection attempts (exponential backoff)
+    now = time.time()
+    if now - _redis_last_attempt < _redis_retry_delay:
+        return None
+
+    _redis_last_attempt = now
+
+    try:
+        import redis as _redis_module
+        client = _redis_module.from_url(
+            _redis_url,
+            decode_responses=True,
+            socket_connect_timeout=2,
+            socket_timeout=2,
+            retry_on_timeout=True,
+            health_check_interval=30
+        )
+        client.ping()
+        _redis_client = client
+        _redis_retry_delay = 1.0  # reset backoff on success
+        logger.info("Redis reconnected at %s", _redis_url)
+        return _redis_client
+    except Exception as e:
+        # Exponential backoff: 1s → 2s → 4s → 8s → ... → max 60s
+        _redis_retry_delay = min(_redis_retry_delay * 2, _REDIS_MAX_RETRY_DELAY)
+        logger.debug("Redis unavailable, retry in %.1fs: %s", _redis_retry_delay, e)
+        return None
+
+
+# Initialize Redis connection at startup
+_redis_client = _get_redis_client()
+if _redis_client:
     logger.info("Session buffer using Redis at %s", _redis_url)
-except Exception:
-    _redis_client = None
+else:
     logger.info("Session buffer using in-memory fallback (Redis unavailable)")
+
+
+# ── H2.1: Background sync for P17-P22 data ──────────────────────────
+_PERSIST_INTERVAL_SECONDS = int(os.getenv("PERSIST_INTERVAL_SECONDS", "300"))  # default: 300s (5 min)
+_last_persist_time = 0.0
+
+
+def _persist_p17_p22_to_redis() -> Dict[str, bool]:
+    """Persist P17-P22 data structures to Redis.
+
+    H2.1: Ensures emotional timeline, goals, values, etc. survive restarts.
+    Returns dict of {data_key: success_bool}.
+    """
+    global _last_persist_time
+    _last_persist_time = time.time()
+
+    results = {}
+    # P17: Emotional Intelligence data
+    results["emotional_timeline"] = _persist_to_redis("kai:p17:emotional_timeline", _emotional_timeline)
+    results["reflection_journal"] = _persist_to_redis("kai:p17:reflection_journal", _reflection_journal)
+    results["relationship_milestones"] = _persist_to_redis("kai:p17:relationship_milestones", _relationship_milestones)
+
+    # P18: Narrative Identity
+    results["autobiography"] = _persist_to_redis("kai:p18:autobiography", _autobiography)
+    results["legacy_messages"] = _persist_to_redis("kai:p18:legacy_messages", _legacy_messages)
+
+    # P19: Imagination Engine
+    results["counterfactuals"] = _persist_to_redis("kai:p19:counterfactuals", list(_counterfactuals))
+    results["creative_ideas"] = _persist_to_redis("kai:p19:creative_ideas", list(_creative_ideas))
+    results["aspirations"] = _persist_to_redis("kai:p19:aspirations", list(_aspirations))
+
+    # P20: Conscience & Values
+    results["formed_values"] = _persist_to_redis("kai:p20:formed_values", _formed_values)
+    results["conscience_log"] = _persist_to_redis("kai:p20:conscience_log", list(_conscience_log))
+    results["loyalty_ledger"] = _persist_to_redis("kai:p20:loyalty_ledger", _loyalty_ledger)
+    results["gratitude_journal"] = _persist_to_redis("kai:p20:gratitude_journal", list(_gratitude_journal))
+
+    # P21: Proactive Agent
+    results["scheduled_tasks"] = _persist_to_redis("kai:p21:scheduled_tasks", _scheduled_tasks)
+    results["reminders"] = _persist_to_redis("kai:p21:reminders", _reminders)
+
+    # P22: Operator Model
+    results["echo_history"] = _persist_to_redis("kai:p22:echo_history", list(_echo_history))
+    results["nudge_ladder"] = _persist_to_redis("kai:p22:nudge_ladder", _nudge_ladder)
+    results["cross_mode_insights"] = _persist_to_redis("kai:p22:cross_mode_insights", list(_cross_mode_insights))
+    results["oracle_predictions"] = _persist_to_redis("kai:p22:oracle_predictions", list(_oracle_predictions))
+    results["shadow_branches"] = _persist_to_redis("kai:p22:shadow_branches", list(_shadow_branches))
+
+    return results
+
+
+def _restore_p17_p22_from_redis() -> Dict[str, bool]:
+    """Restore P17-P22 data structures from Redis at startup.
+
+    H2.1: Loads emotional timeline, goals, values, etc. from previous sessions.
+    Returns dict of {data_key: loaded_bool}.
+    """
+    global _emotional_timeline, _reflection_journal, _relationship_milestones
+    global _autobiography, _legacy_messages
+    global _counterfactuals, _creative_ideas, _aspirations
+    global _formed_values, _conscience_log, _loyalty_ledger, _gratitude_journal
+    global _scheduled_tasks, _reminders
+    global _echo_history, _nudge_ladder, _cross_mode_insights
+    global _oracle_predictions, _shadow_branches
+
+    results = {}
+
+    # P17: Emotional Intelligence
+    loaded = _load_from_redis("kai:p17:emotional_timeline", [])
+    if loaded:
+        _emotional_timeline = loaded
+        results["emotional_timeline"] = True
+    loaded = _load_from_redis("kai:p17:reflection_journal", [])
+    if loaded:
+        _reflection_journal = loaded
+        results["reflection_journal"] = True
+    loaded = _load_from_redis("kai:p17:relationship_milestones", [])
+    if loaded:
+        _relationship_milestones = loaded
+        results["relationship_milestones"] = True
+
+    # P18: Narrative Identity
+    loaded = _load_from_redis("kai:p18:autobiography", [])
+    if loaded:
+        _autobiography = loaded
+        results["autobiography"] = True
+    loaded = _load_from_redis("kai:p18:legacy_messages", [])
+    if loaded:
+        _legacy_messages = loaded
+        results["legacy_messages"] = True
+
+    # P19: Imagination Engine
+    loaded = _load_from_redis("kai:p19:counterfactuals", [])
+    if loaded:
+        _counterfactuals = deque(loaded, maxlen=100)
+        results["counterfactuals"] = True
+    loaded = _load_from_redis("kai:p19:creative_ideas", [])
+    if loaded:
+        _creative_ideas = deque(loaded, maxlen=100)
+        results["creative_ideas"] = True
+    loaded = _load_from_redis("kai:p19:aspirations", [])
+    if loaded:
+        _aspirations = deque(loaded, maxlen=50)
+        results["aspirations"] = True
+
+    # P20: Conscience & Values
+    loaded = _load_from_redis("kai:p20:formed_values", [])
+    if loaded:
+        _formed_values = loaded
+        results["formed_values"] = True
+    loaded = _load_from_redis("kai:p20:conscience_log", [])
+    if loaded:
+        _conscience_log = deque(loaded, maxlen=500)
+        results["conscience_log"] = True
+    loaded = _load_from_redis("kai:p20:loyalty_ledger", {})
+    if loaded:
+        _loyalty_ledger = loaded
+        results["loyalty_ledger"] = True
+    loaded = _load_from_redis("kai:p20:gratitude_journal", [])
+    if loaded:
+        _gratitude_journal = deque(loaded, maxlen=100)
+        results["gratitude_journal"] = True
+
+    # P21: Proactive Agent
+    loaded = _load_from_redis("kai:p21:scheduled_tasks", {})
+    if loaded:
+        _scheduled_tasks = loaded
+        results["scheduled_tasks"] = True
+    loaded = _load_from_redis("kai:p21:reminders", {})
+    if loaded:
+        _reminders = loaded
+        results["reminders"] = True
+
+    # P22: Operator Model
+    loaded = _load_from_redis("kai:p22:echo_history", [])
+    if loaded:
+        _echo_history = deque(loaded, maxlen=100)
+        results["echo_history"] = True
+    loaded = _load_from_redis("kai:p22:nudge_ladder", {})
+    if loaded:
+        _nudge_ladder = loaded
+        results["nudge_ladder"] = True
+    loaded = _load_from_redis("kai:p22:cross_mode_insights", [])
+    if loaded:
+        _cross_mode_insights = deque(loaded, maxlen=100)
+        results["cross_mode_insights"] = True
+    loaded = _load_from_redis("kai:p22:oracle_predictions", [])
+    if loaded:
+        _oracle_predictions = deque(loaded, maxlen=100)
+        results["oracle_predictions"] = True
+    loaded = _load_from_redis("kai:p22:shadow_branches", [])
+    if loaded:
+        _shadow_branches = deque(loaded, maxlen=100)
+        results["shadow_branches"] = True
+
+    return results
 
 
 def _session_key(session_id: str) -> str:
@@ -1397,9 +1634,10 @@ def _session_key(session_id: str) -> str:
 
 def _get_session_messages(session_id: str) -> List[Dict[str, Any]]:
     """Read the session buffer — last N turns for this session."""
-    if _redis_client:
+    redis = _get_redis_client()  # H2.7: use reconnection-aware getter
+    if redis:
         try:
-            raw = _redis_client.lrange(_session_key(session_id), 0, SESSION_MAX_TURNS - 1)
+            raw = redis.lrange(_session_key(session_id), 0, SESSION_MAX_TURNS - 1)
             return [json.loads(r) for r in raw]
         except Exception:
             pass
@@ -1411,12 +1649,13 @@ def _get_session_messages(session_id: str) -> List[Dict[str, Any]]:
 def _append_session_message(session_id: str, role: str, content: str) -> None:
     """Append a message to the session buffer."""
     msg = {"role": role, "content": content, "timestamp": time.time()}
-    if _redis_client:
+    redis = _get_redis_client()  # H2.7: use reconnection-aware getter
+    if redis:
         try:
             key = _session_key(session_id)
-            _redis_client.rpush(key, json.dumps(msg))
-            _redis_client.ltrim(key, -SESSION_MAX_TURNS, -1)
-            _redis_client.expire(key, SESSION_TTL_SECONDS)
+            redis.rpush(key, json.dumps(msg))
+            redis.ltrim(key, -SESSION_MAX_TURNS, -1)
+            redis.expire(key, SESSION_TTL_SECONDS)
             return
         except Exception:
             pass
@@ -1434,6 +1673,49 @@ def _cleanup_expired_sessions() -> None:
     for sid in expired:
         _session_store.pop(sid, None)
         _session_timestamps.pop(sid, None)
+
+
+# ── H2.1: Redis persistence for P17-P22 data structures ─────────────
+def _persist_to_redis(key: str, data: Any, ttl: Optional[int] = None) -> bool:
+    """Persist data structure to Redis.
+
+    H2.1: Enables survival of P17-P22 data across restarts.
+    Returns True on success, False if Redis unavailable (falls back to in-memory).
+    """
+    redis = _get_redis_client()
+    if not redis:
+        return False
+    try:
+        redis.set(key, json.dumps(data))
+        if ttl:
+            redis.expire(key, ttl)
+        return True
+    except Exception as e:
+        logger.debug("Redis persist failed for %s: %s", key, e)
+        return False
+
+
+def _load_from_redis(key: str, default: Any = None) -> Any:
+    """Load data structure from Redis with fallback to default.
+
+    H2.1: Restores P17-P22 data on service restart.
+    """
+    redis = _get_redis_client()
+    if not redis:
+        return default
+    try:
+        raw = redis.get(key)
+        if raw:
+            return json.loads(raw)
+    except Exception as e:
+        logger.debug("Redis load failed for %s: %s", key, e)
+    return default
+
+
+# Restore P17-P22 data at startup
+_restored = _restore_p17_p22_from_redis()
+if _restored:
+    logger.info("Restored %d P17-P22 data structures from Redis", len(_restored))
 
 
 @app.get("/session/{session_id}")
@@ -1460,9 +1742,10 @@ async def append_to_session(session_id: str, msg: SessionMessage) -> Dict[str, A
 async def clear_session(session_id: str) -> Dict[str, Any]:
     """Clear the working memory for a session (start fresh)."""
     sid = sanitize_string(session_id)
-    if _redis_client:
+    redis = _get_redis_client()  # H2.7: use reconnection-aware getter
+    if redis:
         try:
-            _redis_client.delete(_session_key(sid))
+            redis.delete(_session_key(sid))
         except Exception:
             pass
     _session_store.pop(sid, None)

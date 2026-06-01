@@ -12,6 +12,7 @@
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
   <img src="https://img.shields.io/badge/services-27-blue?style=flat-square" alt="services">
   <img src="https://img.shields.io/badge/tests-1%2C620_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
   <img src="https://img.shields.io/badge/Python-~42%2C613_LOC-yellow?style=flat-square" alt="loc">
   <img src="https://img.shields.io/badge/milestones-32_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
@@ -49,6 +50,8 @@ make sync-docs        # Auto-update README + backlog metrics
 make dep-audit        # CVE scan on pip packages
 make coverage         # pytest-cov HTML report
 ```
+
+GPU integration status: **Phase 0 complete** — see [`docs/gpu_integration_phase0.md`](docs/gpu_integration_phase0.md).
 
 ## Project Management
 
@@ -304,7 +307,16 @@ Supervisor (every 15s) → deep /health on each service
 | dev secret hardcoded | ~~Silently falls back to dev HMAC secret~~ | **Done** — requires explicit `HMAC_ALLOW_DEV_SECRET=true` env var |
 | behavioral tests | ~~Tests verify JSON shape, not reasoning quality~~ | **Done** — 15 behavioral + 8 Docker e2e tests added |
 | dashboard UX | ~~Basic web UI, not native-feeling~~ | **Done** — Apple/glassmorphism redesign (SF Pro, backdrop-blur, smooth transitions) |
+<<<<<<< HEAD
 | test coverage | 78% on `common/` (measured 2026-06-01, 1,616 tests passing) | Tracking (`.coveragerc`; `make coverage`) |
+=======
+| GPU Phase 0 | ~~No hardware-aware model routing scaffolding~~ | **Done** — `common/gpu_utils.py` + env toggles + model registry expansion + rollout report |
+| memu persistence | ~~P17–P22 state in-memory only~~ | **Done** — Redis persist/restore (`/memory/persist` + periodic sync in `/health`) |
+| memu Redis resilience | ~~No reconnect strategy when Redis drops~~ | **Done** — exponential backoff reconnect in `_get_redis_client()` |
+| model timeout wiring | ~~Per-model timeout metadata not used in live calls~~ | **Done** — `_model_timeout()` now used for live query timeout |
+| retrieval candidate cap | ~~Hardcoded broad candidate pull~~ | **Done** — `MEMU_MAX_CANDIDATES` env guard for ranked retrieval |
+| test coverage | ~60% estimated | Tracking (`.coveragerc` added) |
+>>>>>>> origin/main
 
 ---
 
@@ -350,7 +362,7 @@ H3  Context Budget          ██████████ DONE
 | **P5** | Deprecation Cleanup | **DONE** — 110+ warnings eliminated |
 | **H3** | Context Budget Manager | **DONE** — `_trim_context()` + `CONTEXT_BUDGET_TOKENS` env var |
 | **P29** | Financial Awareness | Planned — savings tracker, expense categorization |
-| **GPU** | Hardware Performance | Planned — multi-model, real STT/TTS, speculative decoding |
+| **GPU** | Hardware Performance | **Phase 0 DONE** — detection, env toggles, speculative-decoding config, model registry expansion (`docs/gpu_integration_phase0.md`); hardware-dependent execution still pending |
 
 *Sources: OpenClaw, Jarvis variants, Proact-VL (arXiv:2603.03447). All offline, low-resource, test on qwen2:0.5b first.*
 
