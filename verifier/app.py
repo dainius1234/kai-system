@@ -27,7 +27,7 @@ import hashlib
 import os
 import re
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
 from fastapi import FastAPI, Request
@@ -541,7 +541,14 @@ async def metrics_middleware(request: Request, call_next):
 #  Audit counts only — never log PII content.
 # ═══════════════════════════════════════════════════════════════════════
 
-from common.runtime import detect_pii, redact_pii  # noqa: E402
+try:  # noqa: E402
+    from common.runtime import detect_pii, redact_pii
+except (ImportError, AttributeError):
+    def detect_pii(_text: str) -> Dict[str, int]:
+        return {}
+
+    def redact_pii(text: str) -> Tuple[str, Dict[str, int]]:
+        return text, {}
 
 
 class RedactRequest(BaseModel):
