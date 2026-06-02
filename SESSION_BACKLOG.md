@@ -4,6 +4,37 @@
 
 ---
 
+## 2026-06-01 (evening) — Cleanup Sprint Kickoff + Agent Fleet Dispatched
+
+**Context.** Audit earlier today revealed three hot spots blocking healthy progress:
+1. `langgraph/` folder shadows the upstream `langgraph` PyPI package (self-inflicted import hazard).
+2. `langgraph/app.py` is **80,212 bytes** of mixed concerns — routes, state, flows, providers, prompts all in one file.
+3. Makefile has ~100 targets with no honesty gate; `merge-gate` doesn't run the live list.
+
+**Decision.** Pause all feature PRs. Run a 4-week cleanup sprint. Tracker: `kai-pm/CLEANUP_TODO.md`.
+
+**Action taken this session.** Dispatched a fleet of cloud agents in parallel:
+
+| Agent | Task | PR type |
+|---|---|---|
+| 1 | Week 1 housekeeping — close PR #59 + #60, label other PRs, delete orphan `scripts/test_tempo.py` + `test-tempo` Makefile target | code |
+| 2 | **Week 1.4 KEYSTONE** — rename `langgraph/` → `agentic/` (mechanical rename, ~30 file edits, update imports/compose/Dockerfile/Makefile/docs, remove `sys.path` hack in `scripts/agentic_integration_test.py`) | code |
+| 3 | Week 2.1 prep — produce `kai-pm/AGENTIC_APP_MAP.md` (responsibility map of `app.py`, proposed split into routes/state/flows/providers/prompts, ordered PR sequence) | docs |
+| 4 | Week 2.2 prep — produce `kai-pm/COMPOSE_DRIFT.md` (diff of minimal/sovereign/full compose files, base extraction plan) | docs |
+| 5 | Week 2.3 prep — produce `kai-pm/MAKEFILE_AUDIT.md` (every target categorized keep/archive/delete, honest merge-gate proposal) | docs |
+
+**Why parallel.** All four prep tasks are read-only or scoped to non-overlapping paths, so they cannot collide with the keystone rename. By morning we should have full Week 2 plans ready to execute.
+
+**Refreshed `kai-pm/SESSION_BOOTSTRAP.md`** so any future session (new chat, new agent, future-Dainius) can pick up in under 2 minutes from `CLEANUP_TODO.md` + `STATUS.md` + open PRs.
+
+**Next session resume sequence:**
+1. Read `kai-pm/SESSION_BOOTSTRAP.md`
+2. Check open PRs — review the 4 dispatched ones
+3. Tick Week 1 boxes in `CLEANUP_TODO.md` as PRs land
+4. Dispatch first Week 2.1 split PR (smallest leaf — likely `prompts/` extraction — pure data, no behavior)
+
+---
+
 ## 2026-04-21 — Backlog Reconciliation
 
 - Audited backlog vs README: J1–J7 all marked DONE in README but still listed as "Open Items" here. Closed out.
@@ -63,16 +94,22 @@
 
 ## Open Items
 
-### As of 2026-04-21
+### As of 2026-06-01 (evening)
 
-**Active priorities (in order):**
-1. **Land or close PR #46** — GPU Phase 0 consolidation draft PR is still open. Either merge it or close it to unblock main.
-2. **P29: Financial Awareness** — savings tracker, expense categorization (scope first, build second).
-3. **GPU readiness** — pre-wire multi-model endpoints, real STT/TTS adapters, speculative decoding hooks for the RTX 5080.
+**Active priorities (in order — Cleanup Sprint):**
+1. **Land keystone rename** `langgraph/` → `agentic/` (Week 1.4) — unblocks all Week 2.
+2. **Review 3 prep docs** when their PRs land: AGENTIC_APP_MAP, COMPOSE_DRIFT, MAKEFILE_AUDIT.
+3. **Dispatch first Week 2.1 split** — smallest leaf from app.py.
+
+**Paused until cleanup done:**
+- P29 Financial Awareness
+- GPU readiness pre-wiring
+- Any new feature PRs
 
 **Discipline / hygiene:**
-- Run `make sync-docs` after every significant change (still the rule, still drifts).
-- Reconcile SESSION_BACKLOG with README at the start of every session — drift caught here this round.
+- Run `make sync-docs` after every significant change.
+- Update `kai-pm/CLEANUP_TODO.md` checkboxes the moment a PR merges.
+- Keep `SESSION_BOOTSTRAP.md` and this file fresh — they are the resume-after-context-loss layer.
 
 **Done since last reconciliation (now closed):**
 - ✅ **Coverage measurement** — 78% on `common/` measured 2026-06-01 (1,616 tests). README updated with real number.
