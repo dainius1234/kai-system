@@ -201,17 +201,19 @@ def sync_backlog(metrics: dict, check_only: bool = False) -> bool:
         changed = True
 
     # Patch individual tests row
-    m2 = re.search(r"\| Individual tests \| (\d+)\+?", text)
+    m2 = re.search(r"^\| Individual tests \| (\d+)\+?(.*)$", text, re.MULTILINE)
     if m2:
         current = int(m2.group(1))
         if current != metrics["tests"]:
             if check_only:
                 print(f"docs-sync: PROJECT_BACKLOG.md stale — tests {current} → {metrics['tests']}")
                 return False
-            text = text[:m2.start(1)] + str(metrics["tests"]) + "+" + text[m2.end(1):]
-            if text[m2.end(1)] == "+":
-                # Don't double the +
-                text = text[:m2.start(1)] + str(metrics["tests"]) + text[m2.end(1):]
+            suffix = m2.group(2)
+            text = (
+                text[:m2.start()]
+                + f"| Individual tests | {metrics['tests']}{suffix}"
+                + text[m2.end():]
+            )
             changed = True
 
     if changed:
