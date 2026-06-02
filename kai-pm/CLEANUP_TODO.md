@@ -34,7 +34,7 @@
 ### 2.1 Split `agentic/app.py`
 - [~] Map responsibilities → `kai-pm/AGENTIC_APP_MAP.md` (agent dispatched 2026-06-01, not yet landed).
 - [ ] Split into routes / state / flows / providers / prompts. One PR per split.
-- [ ] First split target: `prompts/` (pure data, no behavior — lowest risk leaf).
+- [~] First split target: `prompts/` (pure data, no behavior — lowest risk leaf). PR open.
 
 ### 2.2 Reconcile docker-compose files
 - [~] Diff minimal vs sovereign vs full → `kai-pm/COMPOSE_DRIFT.md` (agent dispatched 2026-06-01, not yet landed).
@@ -74,6 +74,7 @@
 | 2026-06-01 | Delete tempo tests | Test attributes don't exist; orphans, not bugs |
 | 2026-06-02 | MAKEFILE_AUDIT landed | Week 2.3 design spec ready; archival + merge-gate work unblocked |
 | 2026-06-02 | First Week 2.1 split = `prompts/` | Pure data leaf, lowest risk, sets pattern for harder splits |
+| 2026-06-02 | First Week 2.1 split (prompts/) PR opened | Pattern-setter for harder splits |
 
 ---
 

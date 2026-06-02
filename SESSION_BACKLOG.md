@@ -4,6 +4,26 @@
 
 ---
 
+## 2026-06-02 — Week 2.1 First Split: `prompts/` extracted from `agentic/app.py`
+
+**What moved:**
+- `_KAI_CORE_IDENTITY` (Kai's base identity string) → `agentic/prompts/system.py`
+- `_SYSTEM_PROMPTS` (WORK + PUB mode system prompts dict) → `agentic/prompts/system.py`
+- New package `agentic/prompts/__init__.py` re-exports both names for clean external imports.
+
+**What stayed in `agentic/app.py`:**
+- `_load_soul()` / `_soul_text` / `_load_agents()` — runtime file loading (behavior, not data)
+- J6 SOUL.md enrichment block — mutates `_SYSTEM_PROMPTS` dict after loading soul file at startup
+
+**Why:** Pure data leaf with no behavior or imports from sibling modules. Lowest-risk first split.
+Sets the pattern for the harder splits (state → flows → providers → routes) that follow.
+
+**Impact on tests:** `test_p4_personality.py::TestPersonalityPrompts` (9 tests) all pass unchanged
+because `_SYSTEM_PROMPTS` and `_KAI_CORE_IDENTITY` are still importable from `agentic.app`
+(Python name binding via `from agentic.prompts import ...` in app.py).
+
+---
+
 ## 2026-06-02 (00:15 UTC) — CI Failure Triage (no new bugs)
 
 Pulled latest failing runs (Core Tests, Python application). All 14 failures map to known cleanup items:
