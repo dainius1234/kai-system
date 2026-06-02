@@ -6,7 +6,6 @@ import os
 import time
 import uuid
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import httpx
@@ -32,30 +31,28 @@ from priority_queue import get_queue
 from model_selector import select_model
 import prompts as prompt_catalog
 from prompts import (
-    AGENTS_PATH,
     INJECTION_RE,
-    SOUL_PATH,
     _KAI_CORE_IDENTITY,
     _SYSTEM_PROMPTS,
-    _load_agents,
-    _load_soul,
 )
+from routes_identity import router as identity_router
+from routes_observability import build_router as build_observability_router
 from routes_ops import (
     build_health_payload,
     checkpoint_pre_recover,
     get_metrics_payload,
-    get_models_payload,
-    get_queue_stats_payload,
     install_log_capture,
-    query_logs,
     reset_breakers,
 )
+from routes_skills import router as skills_router
 
 logger = setup_json_logger("langgraph", os.getenv("LOG_PATH", "/tmp/langgraph.json.log"))
 DEVICE = detect_device()
 logger.info("Running on %s.", DEVICE)
 
 app = FastAPI(title="LangGraph Orchestrator", version="0.5.0")
+app.include_router(identity_router)
+app.include_router(skills_router)
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 TELEGRAM_ALERT_URL = os.getenv("TELEGRAM_ALERT_URL", "http://perception-telegram:9000/alert")
@@ -391,140 +388,6 @@ async def recover() -> Dict[str, Any]:
     )
     reset_breakers(memu_breaker=MEMU_BREAKER, tool_gate_breaker=TOOL_GATE_BREAKER)
     return {"status": "ok", "action": "breakers_reset"}
-
-
-# ── J6: SOUL.md + AGENTS.md API ─────────────────────────────────────
-
-@app.get("/soul")
-async def get_soul() -> Dict[str, Any]:
-    """Return the current SOUL.md content."""
-    return {"status": "ok", "content": prompt_catalog._soul_text, "path": str(SOUL_PATH)}
-
-
-@app.post("/soul")
-async def update_soul(request: Request) -> Dict[str, Any]:
-    """Update SOUL.md content. Takes effect on next startup or reload."""
-    body = await request.json()
-    content = body.get("content", "")
-    if not content.strip():
-        raise HTTPException(status_code=400, detail="Content cannot be empty")
-    # Write to the first writable path
-    for p in [SOUL_PATH, Path("data/SOUL.md")]:
-        try:
-            p.parent.mkdir(parents=True, exist_ok=True)
-            p.write_text(content, encoding="utf-8")
-            _load_soul()  # Reload
-            return {"status": "ok", "path": str(p), "chars": len(content)}
-        except Exception:
-            continue
-    raise HTTPException(status_code=500, detail="Cannot write SOUL.md")
-
-
-@app.get("/agents-registry")
-async def get_agents_registry() -> Dict[str, Any]:
-    """Return the current AGENTS.md content."""
-    return {"status": "ok", "content": prompt_catalog._agents_text, "path": str(AGENTS_PATH)}
-
-
-@app.post("/agents-registry")
-async def update_agents_registry(request: Request) -> Dict[str, Any]:
-    """Update AGENTS.md content."""
-    body = await request.json()
-    content = body.get("content", "")
-    if not content.strip():
-        raise HTTPException(status_code=400, detail="Content cannot be empty")
-    for p in [AGENTS_PATH, Path("data/AGENTS.md")]:
-        try:
-            p.parent.mkdir(parents=True, exist_ok=True)
-            p.write_text(content, encoding="utf-8")
-            _load_agents()
-            return {"status": "ok", "path": str(p), "chars": len(content)}
-        except Exception:
-            continue
-    raise HTTPException(status_code=500, detail="Cannot write AGENTS.md")
-
-
-# ── J7: Skills Auto-Install Hub API ─────────────────────────────────
-
-@app.get("/skills")
-async def get_skills() -> Dict[str, Any]:
-    """List all loaded skills from the skills directory."""
-    return {"status": "ok", "skills": list_skills(), "count": len(list_skills())}
-
-
-@app.post("/skills/reload")
-async def reload_skills() -> Dict[str, Any]:
-    """Hot-reload skills from the skills directory."""
-    loaded = load_skills()
-    return {"status": "ok", "loaded": len(loaded), "skills": list_skills()}
-
-
-@app.post("/skills/match")
-async def test_skill_match(request: Request) -> Dict[str, Any]:
-    """Test whether a message matches any loaded skill."""
-    body = await request.json()
-    text = body.get("text", "")
-    skill = match_skill(text)
-    if skill:
-        return {
-            "status": "matched",
-            "skill_name": skill.name,
-            "action": skill.action[:500],
-            "response_template": skill.response_template[:500],
-        }
-    return {"status": "no_match", "skill_name": None}
-
-
-@app.post("/skills/unload")
-async def unload_skill_endpoint(request: Request) -> Dict[str, Any]:
-    """Unload a skill by name."""
-    body = await request.json()
-    name = body.get("name", "")
-    if not name:
-        raise HTTPException(status_code=400, detail="name is required")
-    removed = unload_skill(name)
-    return {"status": "ok" if removed else "not_found", "name": name}
-
-
-@app.post("/skills/scan")
-async def scan_skill_endpoint(request: Request) -> Dict[str, Any]:
-    """Scan raw skill markdown text for security red flags."""
-    body = await request.json()
-    text = body.get("text", "")
-    if not text:
-        raise HTTPException(status_code=400, detail="text is required")
-    return {"status": "ok", **scan_skill_md(text)}
-
-
-@app.post("/skills/prune")
-async def prune_skills_endpoint(request: Request) -> Dict[str, Any]:
-    """Prune skills not used within max_age_days (default 30)."""
-    body = await request.json()
-    max_age = body.get("max_age_days", 30)
-    pruned = prune_stale_skills(max_age)
-    return {"status": "ok", "pruned": pruned, "pruned_count": len(pruned)}
-
-
-@app.get("/metrics")
-async def metrics() -> Dict[str, float]:
-    return get_metrics_payload(budget)
-
-
-@app.get("/queue/stats")
-async def queue_stats() -> Dict[str, Any]:
-    """HP5: Priority queue statistics."""
-    return get_queue_stats_payload(get_queue)
-
-
-@app.get("/models")
-async def models_info() -> Dict[str, Any]:
-    """HP2: Available models and selection info."""
-    from model_selector import list_models, get_profile
-    return get_models_payload(
-        available_live=_llm.available,
-        get_profile=get_profile,
-        list_models=list_models,
-    )
 
 
 # ── LLM router (Kai's brain) ────────────────────────────────────────
@@ -1712,12 +1575,14 @@ _restore_breakers()
 # ── P16b: Log aggregation ───────────────────────────────────────────
 
 _log_buffer, _log_capture = install_log_capture(service_name="langgraph")
-
-
-@app.get("/logs")
-async def get_logs(limit: int = 100, level: str = "", since: float = 0):
-    """Query recent log entries from langgraph."""
-    return query_logs(_log_buffer, level=level, limit=limit, since=since)
+app.include_router(
+    build_observability_router(
+        available_live=_llm.available,
+        budget=budget,
+        get_queue=get_queue,
+        log_buffer=_log_buffer,
+    )
+)
 
 
 if __name__ == "__main__":

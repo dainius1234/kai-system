@@ -20,6 +20,22 @@ Next: after housekeeping + keystone PRs merge, only §1.3 should remain red — 
 
 ---
 
+## 2026-06-02 (20:35 UTC) — Week 2.1 route split + PM truth reconciliation
+
+- Re-verified current reality before editing:
+  - `make go_no_go` ✅
+  - `make check-docs` ✅
+  - `make test-core` blocked in this sandbox until Python deps are installed (`ModuleNotFoundError: fastapi`)
+- Confirmed PR #46 is already merged on `main` (2026-06-01), so any PM note still saying "land or close PR #46" is stale and needed cleanup.
+- Started the next Week 2.1 leaf split from `agentic/app.py`:
+  - moved SOUL/AGENTS endpoints to `agentic/routes_identity.py`
+  - moved skills endpoints to `agentic/routes_skills.py`
+  - moved metrics/queue/models/logs endpoints to `agentic/routes_observability.py`
+- Goal: reduce `agentic/app.py` surface without changing route behavior.
+- Next: install the missing Python deps needed for sandbox validation, run targeted agentic route tests, then refresh PM docs/status to match the merged reality.
+
+---
+
 ## 2026-06-01 (evening) — Cleanup Sprint Kickoff + Agent Fleet Dispatched
 
 **Context.** Audit earlier today revealed three hot spots blocking healthy progress:
