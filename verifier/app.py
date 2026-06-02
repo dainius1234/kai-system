@@ -27,7 +27,7 @@ import hashlib
 import os
 import re
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
 from fastapi import FastAPI, Request
@@ -547,7 +547,7 @@ except (ImportError, AttributeError):
     def detect_pii(_text: str) -> Dict[str, int]:
         return {}
 
-    def redact_pii(text: str) -> tuple[str, Dict[str, int]]:
+    def redact_pii(text: str) -> Tuple[str, Dict[str, int]]:
         return text, {}
 
 
