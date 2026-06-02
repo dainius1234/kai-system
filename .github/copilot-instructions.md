@@ -94,7 +94,7 @@ make test-planner            # memory-driven planner tests
 make test-adversary          # adversary challenge engine tests
 make test-v7                 # v7 feature tests (verifier, quarantine, policy, idempotency, integration-chain)
 make test-prod-hardening     # production hardening (secrets, pubsub, backup, HMAC)
-make test-hmac-rotation-drill # HMAC rotation lifecycle drill
+make hmac-rotation-drill      # HMAC rotation lifecycle drill
 make test-p3-organic          # P3 organic memory tests
 make test-p4-personality       # P4 personality & proactive tests
 make test-p16-operational      # P16 operational intelligence tests

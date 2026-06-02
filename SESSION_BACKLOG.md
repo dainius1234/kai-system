@@ -104,7 +104,7 @@ Next: after housekeeping + keystone PRs merge, only §1.3 should remain red — 
 - Added 'What's Next' priority list to PROJECT_BACKLOG.md
 - Created SESSION_BACKLOG.md for session notes
 - All repo memory and docs are now up to date
-- Next: Run cache-test-core, address Tier 1/2/3 hardening, improve session note workflow
+- Next: Run make test-core, address Tier 1/2/3 hardening, improve session note workflow
 
 ---
 
