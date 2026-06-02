@@ -73,8 +73,7 @@
 | 2026-06-01 | langgraph → agentic rename merged | Unblocks Week 2 app.py split |
 | 2026-06-01 | Delete tempo tests | Test attributes don't exist; orphans, not bugs |
 | 2026-06-02 | MAKEFILE_AUDIT landed | Week 2.3 design spec ready; archival + merge-gate work unblocked |
-| 2026-06-02 | First Week 2.1 split = `prompts/` | Pure data leaf, lowest risk, sets pattern for harder splits |
-| 2026-06-02 | First Week 2.1 split (prompts/) PR opened | Pattern-setter for harder splits |
+| 2026-06-02 | First Week 2.1 split (`prompts/`) PR opened | Pure data leaf, lowest risk, pattern-setter for harder splits |
 
 ---
 
