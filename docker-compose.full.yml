@@ -135,7 +135,7 @@ services:
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
       MEMU_URL: http://memu-core:8001
-      LANGGRAPH_URL: http://langgraph:8007
+      LANGGRAPH_URL: http://agentic:8007
       EXECUTOR_URL: http://executor:8002
       HEARTBEAT_URL: http://heartbeat:8010
       SUPERVISOR_URL: http://supervisor:8051
@@ -154,7 +154,7 @@ services:
     depends_on:
       - tool-gate
       - memu-core
-      - langgraph
+      - agentic
       - heartbeat
       - wake-service
 
@@ -226,10 +226,10 @@ services:
     depends_on:
       - verifier
 
-  langgraph:
+  agentic:
     build:
       context: .
-      dockerfile: langgraph/Dockerfile
+      dockerfile: agentic/Dockerfile
     <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
@@ -552,7 +552,7 @@ services:
     <<: *defaults
     environment:
       TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
-      LANGGRAPH_URL: http://langgraph:8007
+      LANGGRAPH_URL: http://agentic:8007
       AUDIO_SERVICE_URL: http://audio-service:8021
       TTS_SERVICE_URL: http://tts-service:8030
       TTS_ENABLED: "true"
@@ -570,7 +570,7 @@ services:
       sovereign-net:
         ipv4_address: 172.20.0.26
     depends_on:
-      - langgraph
+      - agentic
       - audio-service
       - tts-service
 

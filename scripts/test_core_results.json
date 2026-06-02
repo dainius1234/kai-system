@@ -86,7 +86,7 @@
       "timestamp": "2026-03-22T16:23:04"
     },
     {
-      "target": "test-langgraph",
+      "target": "test-agentic-service",
       "returncode": 0,
       "stdout": "make[1]: Entering directory '/workspaces/kai-system'\nPYTHONPATH=. python scripts/test_langgraph_service.py\n{\"time\":\"2026-03-22 16:23:05,485\",\"level\":\"INFO\",\"service\":\"langgraph\",\"msg\":\"Running on cpu.\"}\nlanggraph service tests passed\nmake[1]: Leaving directory '/workspaces/kai-system'\n",
       "stderr": "",

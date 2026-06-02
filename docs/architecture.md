@@ -142,7 +142,7 @@ Call /health on each core service (deep health)
 ## Data Flow: Dream Cycle
 
 ```
-POST /dream (langgraph)
+POST /dream (agentic)
   │
   ▼
 Checkpoint current state (auto-checkpoint)
@@ -163,19 +163,19 @@ Checkpoint post-dream state
 
 | Service | Depends On | Called By |
 |---|---|---|
-| **langgraph** | memu-core, ollama, verifier, tool-gate | dashboard, telegram-bot |
-| **memu-core** | postgres, redis | langgraph, dashboard, supervisor |
-| **tool-gate** | redis | langgraph, orchestrator |
-| **verifier** | memu-core | langgraph, fusion-engine |
+| **agentic** | memu-core, ollama, verifier, tool-gate | dashboard, telegram-bot |
+| **memu-core** | postgres, redis | agentic, dashboard, supervisor |
+| **tool-gate** | redis | agentic, orchestrator |
+| **verifier** | memu-core | agentic, fusion-engine |
 | **supervisor** | all services (health checks) | heartbeat, dashboard |
 | **dashboard** | all services (proxy) | operator (browser) |
-| **executor** | tool-gate | langgraph, orchestrator |
-| **fusion-engine** | verifier, memu-core | langgraph |
-| **orchestrator** | tool-gate, executor | langgraph |
+| **executor** | tool-gate | agentic, orchestrator |
+| **fusion-engine** | verifier, memu-core | agentic |
+| **orchestrator** | tool-gate, executor | agentic |
 | **heartbeat** | supervisor | — |
-| **telegram-bot** | langgraph, memu-core | Telegram API |
+| **telegram-bot** | agentic, memu-core | Telegram API |
 | **backup-service** | postgres, redis, memu-core | operator (manual) |
-| **ledger-worker** | postgres | langgraph, tool-gate |
+| **ledger-worker** | postgres | agentic, tool-gate |
 | **metrics-gateway** | all services (scrape) | Prometheus |
 | **memory-compressor** | memu-core | supervisor (scheduled) |
 
@@ -194,7 +194,7 @@ Checkpoint post-dream state
 | dashboard | 8050 | Operator console |
 | tool-gate | 8010 | Policy enforcement |
 | memu-core | 8020 | Memory engine |
-| langgraph | 8030 | Brain / LLM |
+| agentic | 8030 | Brain / LLM |
 | executor | 8040 | Sandboxed execution |
 | verifier | 8060 | Fact checking |
 | fusion-engine | 8070 | Signal consensus |

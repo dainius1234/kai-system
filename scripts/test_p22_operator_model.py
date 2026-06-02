@@ -26,7 +26,7 @@ def _memu() -> str:
 
 
 def _langgraph() -> str:
-    return _read("langgraph/app.py")
+    return _read("agentic/app.py")
 
 
 def _dashboard() -> str:
@@ -485,7 +485,7 @@ class TestDashboardUI(unittest.TestCase):
 # ═══════════════════════════════════════════════════════════════════
 
 class TestLangGraphIntegration(unittest.TestCase):
-    """P22 operator model integration in langgraph/app.py."""
+    """P22 operator model integration in agentic/app.py."""
 
     def test_get_operator_model_function(self):
         self.assertIn("_get_operator_model", _langgraph())

@@ -16,7 +16,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - PM: introduced `kai-pm/` brain + `.github` automation (PM System v2)
-- Context budget management (`CONTEXT_BUDGET_TOKENS` env, default 3072) — `_trim_context()` in langgraph prevents system prompt from exceeding model context window
+- Context budget management (`CONTEXT_BUDGET_TOKENS` env, default 3072) — `_trim_context()` in agentic prevents system prompt from exceeding model context window
 - Context budget test suite (`scripts/test_context_budget.py`, 11 tests)
 - `make test-context-budget` Makefile target
 - GPU Phase 0 hardware utilities in `common/gpu_utils.py` (`has_cuda`, `get_gpu_info`, `should_use_speculative_decoding`, `get_recommended_model`)

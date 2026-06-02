@@ -4,7 +4,7 @@ This runbook is the concrete operating procedure for `INTERSERVICE_HMAC_SECRET` 
 
 ## Preconditions
 - `tool-gate` is running with `REQUIRE_SIGNATURE=true`.
-- `langgraph` signs requests through `common.auth.sign_gate_request`.
+- `agentic` signs requests through `common.auth.sign_gate_request`.
 - Operators can deploy environment-variable changes in two steps.
 
 ## Rotation Procedure

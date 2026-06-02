@@ -39,7 +39,7 @@ DEFAULT_SERVICES: List[Tuple[str, str, str, str]] = [
     ("tool-gate", "http://tool-gate:8000", "/metrics", "/health"),
     ("memu-core", "http://memu-core:8001", "/metrics", "/health"),
     ("executor", "http://executor:8002", "/metrics", "/health"),
-    ("langgraph", "http://langgraph:8007", "/metrics", "/health"),
+    ("agentic", "http://agentic:8007", "/metrics", "/health"),
     ("heartbeat", "http://heartbeat:8010", "/metrics", "/health"),
     ("supervisor", "http://supervisor:8051", "/metrics", "/health"),
     ("verifier", "http://verifier:8052", "/metrics", "/health"),

@@ -53,7 +53,7 @@ body:
         - dashboard
         - memu-core
         - tool-gate
-        - langgraph
+        - agentic
         - kai-advisor
         - audio-service
         - camera-service

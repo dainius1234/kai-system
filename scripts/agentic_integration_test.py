@@ -13,12 +13,6 @@ Frameworks tested:
 import sys
 import os
 
-# Ensure the workspace root is NOT first on sys.path so our local
-# langgraph/ service directory does not shadow the installed package.
-_ws = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if sys.path and os.path.abspath(sys.path[0]) == _ws:
-    sys.path.pop(0)
-
 passed = 0
 failed = 0
 skipped = 0

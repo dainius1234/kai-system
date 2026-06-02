@@ -6,7 +6,7 @@ This plan executes the minimum viable core stack for local-only validation:
 - tool-gate
 - memu-core
 - executor
-- langgraph
+- agentic
 - redis
 - dashboard
 - heartbeat
@@ -16,7 +16,7 @@ Perception/output/GPU-heavy services are out-of-scope for initial go-live.
 ## Owners
 - **Platform Owner**: Compose runtime, container policy, startup sequencing
 - **Core API Owner**: tool-gate + memu-core + executor API contracts
-- **Orchestration Owner**: langgraph integration and routing behavior
+- **Orchestration Owner**: agentic integration and routing behavior
 - **Ops Owner**: dashboard visibility, health sweep, runbook logging
 
 ## Entry Criteria
@@ -64,7 +64,7 @@ docker compose -f docker-compose.sovereign.yml config > /var/log/sovereign/compo
 
 ### Command
 ```bash
-docker compose -f docker-compose.sovereign.yml up -d postgres tool-gate memu-core redis executor langgraph heartbeat dashboard
+docker compose -f docker-compose.sovereign.yml up -d postgres tool-gate memu-core redis executor agentic heartbeat dashboard
 ```
 
 ### Expected output
@@ -106,9 +106,9 @@ for ep in \
  done
 
 # Internal endpoints via docker network
-for svc in memu-core executor langgraph heartbeat; do
+for svc in memu-core executor agentic heartbeat; do
   docker compose -f docker-compose.sovereign.yml exec -T dashboard \
-    sh -lc "wget -qO- http://$svc:$(case $svc in memu-core) echo 8001;; executor) echo 8002;; langgraph) echo 8007;; heartbeat) echo 8010;; esac)/health"
+    sh -lc "wget -qO- http://$svc:$(case $svc in memu-core) echo 8001;; executor) echo 8002;; agentic) echo 8007;; heartbeat) echo 8010;; esac)/health"
 done
 ```
 

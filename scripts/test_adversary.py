@@ -1,4 +1,4 @@
-"""Tests for the Proposer-Adversary Challenge Engine — langgraph/adversary.py
+"""Tests for the Proposer-Adversary Challenge Engine — agentic/adversary.py
 
 Validates all five challenge strategies independently and the orchestrator.
 """
@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 
 # Load adversary.py directly (avoid installed langgraph package)
-_mod_path = Path(__file__).resolve().parents[1] / "langgraph" / "adversary.py"
+_mod_path = Path(__file__).resolve().parents[1] / "agentic" / "adversary.py"
 _spec = importlib.util.spec_from_file_location("adversary", _mod_path)
 assert _spec and _spec.loader
 _mod = importlib.util.module_from_spec(_spec)

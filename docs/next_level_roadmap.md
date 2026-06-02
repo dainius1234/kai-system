@@ -42,11 +42,11 @@ This document explains **why** the hardening direction was chosen, plus decision
 
 ## Implemented from Ara review
 
-- Checksummed append-only episode spool fallback implemented in `langgraph/config.py`.
-- Error-budget-based guard added for dependency gating in `langgraph/app.py`.
+- Checksummed append-only episode spool fallback implemented in `agentic/config.py`.
+- Error-budget-based guard added for dependency gating in `agentic/app.py`.
 - HMAC auto-rotation helper + revocation support added.
 - Chaos CI script (`scripts/chaos_ci.py`) added for kill/restart resilience drill.
-- Conviction override operator control added in `kai_control` and consumed by `langgraph`.
+- Conviction override operator control added in `kai_control` and consumed by `agentic`.
 
 ## J-Series: 2026 Jewels from OpenClaw / Jarvis / Proact-VL
 

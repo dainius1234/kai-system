@@ -252,7 +252,7 @@ services:
       TOOL_GATE_URL: "http://tool-gate:8000"
       LEDGER_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
       MEMU_URL: "http://memu-core:8001"
-      LANGGRAPH_URL: "http://langgraph:8007"
+      LANGGRAPH_URL: "http://agentic:8007"
       EXECUTOR_URL: "http://executor:8002"
       HEARTBEAT_URL: "http://heartbeat:8010"
       AUDIT_REDIS_URL: "redis://redis:6379"
@@ -268,11 +268,11 @@ services:
       retries: 3
 
 
-  langgraph:
+  agentic:
     <<: *service_defaults
-    build: ./langgraph
-    container_name: langgraph
-    hostname: langgraph
+    build: ./agentic
+    container_name: agentic
+    hostname: agentic
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.7
@@ -318,14 +318,14 @@ services:
     volumes:
       - ./perception:/app:ro
     environment:
-      LANGGRAPH_URL: "http://langgraph:8007/run"
+      LANGGRAPH_URL: "http://agentic:8007/run"
       TELEGRAM_API: "http://telegram-bridge:9000"
       BRIDGE_SHARED_SECRET: "${BRIDGE_SHARED_SECRET:-}"
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.12
     depends_on:
-      - langgraph
+      - agentic
 
   heartbeat:
     <<: *service_defaults

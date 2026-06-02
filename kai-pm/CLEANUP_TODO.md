@@ -22,16 +22,16 @@
 - [ ] Investigate `scripts/test_p3_organic_memory.py::test_correction_memory_gets_boost` after 1.2 lands.
 
 ### 1.4 Rename `langgraph/` → `agentic/` ⭐ KEYSTONE
-- [ ] Mechanical rename. ~30 file edits.
-- [ ] Update imports, compose files, Dockerfiles, Makefile, docs.
-- [ ] Remove sys.path hack in `scripts/agentic_integration_test.py`.
-- [ ] CI green. Merge.
+- [x] Mechanical rename. ~30 file edits.
+- [x] Update imports, compose files, Dockerfiles, Makefile, docs.
+- [x] Remove sys.path hack in `scripts/agentic_integration_test.py`.
+- [x] CI green. Merge.
 
 ---
 
 ## Week 2 — Untangle the Giant
 
-### 2.1 Split `agentic/app.py` (was `langgraph/app.py`)
+### 2.1 Split `agentic/app.py` (was `agentic/app.py`)
 - [ ] Map responsibilities → `kai-pm/AGENTIC_APP_MAP.md`.
 - [ ] Split into routes / state / flows / providers / prompts. One PR per split.
 
@@ -68,6 +68,7 @@
 | 2026-06-01 | Close PR #60 | Empty (only "Initial plan" commit, no code) |
 | 2026-06-01 | Close PR #59 | Built on stale main; rebuild post-cleanup |
 | 2026-06-01 | Rename langgraph → agentic | Self-inflicted PyPI shadowing |
+| 2026-06-01 | langgraph → agentic rename merged | Unblocks Week 2 app.py split |
 | 2026-06-01 | Delete tempo tests | Test attributes don't exist; orphans, not bugs |
 
 ---

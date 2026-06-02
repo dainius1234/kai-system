@@ -59,7 +59,7 @@ All `datetime.utcnow()` and `get_event_loop` deprecations resolved.
 | 2026-03-22 | L7: F811 redefinition of unused var (16 instances) | autoflake + `# noqa: F811` for intentional try/except re-imports |
 | 2026-03-22 | L8: F841 assigned but unused (10 instances) | autoflake + manual removal of dead assignments |
 | 2026-03-22 | kai_supervisor.py duplicate function defs + missing main() | Removed dupes, added main() |
-| 2026-03-22 | langgraph/app.py missing `import asyncio` (6 F821) | Added import |
+| 2026-03-22 | agentic/app.py missing `import asyncio` (6 F821) | Added import |
 | 2026-03-22 | memu-core/app.py undefined `proactive_full_scan` | Fixed to `full_proactive_scan` |
 | 2026-03-22 | agentic_integration_test 4 hard fails on missing deps | Added pytest.skip() |
 | 2026-03-22 | test_agent_evolver cross-test state contamination | Isolated temp paths |

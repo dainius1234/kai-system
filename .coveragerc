@@ -1,5 +1,5 @@
 [run]
-source = common/,langgraph/,verifier/,executor/,heartbeat/,supervisor/,memu-core/,tool-gate/,dashboard/,fusion-engine/
+source = common/,agentic/,verifier/,executor/,heartbeat/,supervisor/,memu-core/,tool-gate/,dashboard/,fusion-engine/
 omit =
     */test_*
     */_archive/*

@@ -112,7 +112,7 @@ Perception streams (screen, audio, camera)
            ▼
 ┌──────────────────────┐
 │  Pattern Detector     │  ← rules + LLM inference
-│  (langgraph node)    │
+│  (agentic node)    │
 │                      │
 │  Conditions:         │
 │  - same_screen > 30m │

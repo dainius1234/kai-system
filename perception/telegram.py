@@ -12,7 +12,7 @@ DEVICE = detect_device()
 logger.info("Running on %s.", DEVICE)
 
 TELEGRAM_API = os.getenv("TELEGRAM_API", "http://telegram-bridge:9000")
-LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://langgraph:8007/run")
+LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://agentic:8007/run")
 BRIDGE_SHARED_SECRET = os.getenv("BRIDGE_SHARED_SECRET", "")
 
 

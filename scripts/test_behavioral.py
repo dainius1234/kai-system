@@ -18,11 +18,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "langgraph"))
+sys.path.insert(0, str(ROOT / "agentic"))
 
 # ── Load conviction module ────────────────────────────────────────────
 _conv_spec = importlib.util.spec_from_file_location(
-    "conviction", ROOT / "langgraph" / "conviction.py"
+    "conviction", ROOT / "agentic" / "conviction.py"
 )
 _conv = importlib.util.module_from_spec(_conv_spec)
 sys.modules[_conv_spec.name] = _conv
@@ -30,7 +30,7 @@ _conv_spec.loader.exec_module(_conv)
 
 # ── Load router module ────────────────────────────────────────────────
 _router_spec = importlib.util.spec_from_file_location(
-    "router", ROOT / "langgraph" / "router.py"
+    "router", ROOT / "agentic" / "router.py"
 )
 _router = importlib.util.module_from_spec(_router_spec)
 sys.modules["router"] = _router
@@ -38,16 +38,16 @@ _router_spec.loader.exec_module(_router)
 
 # ── Load adversary module ─────────────────────────────────────────────
 _adv_spec = importlib.util.spec_from_file_location(
-    "adversary", ROOT / "langgraph" / "adversary.py"
+    "adversary", ROOT / "agentic" / "adversary.py"
 )
 _adv = importlib.util.module_from_spec(_adv_spec)
 sys.modules["adversary"] = _adv
 _adv_spec.loader.exec_module(_adv)
 
-# ── Load context budget from langgraph/app.py ─────────────────────────
+# ── Load context budget from agentic/app.py ─────────────────────────
 sys.modules.setdefault("redis", types.SimpleNamespace())
 _app_spec = importlib.util.spec_from_file_location(
-    "langgraph_app", ROOT / "langgraph" / "app.py"
+    "agentic_app", ROOT / "agentic" / "app.py"
 )
 _app = importlib.util.module_from_spec(_app_spec)
 sys.modules[_app_spec.name] = _app

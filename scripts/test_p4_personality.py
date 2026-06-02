@@ -1,7 +1,7 @@
 """P4 Personality & Proactive Conversation — Comprehensive Tests
 
 Tests for:
-  P4a — Deep personality system prompts (langgraph)
+  P4a — Deep personality system prompts (agentic)
   P4b — Anti-annoyance engine (memu-core: dismissal, DND, cooldowns)
   P4c — Conversation holding (topics: track, defer, resurface)
   P4d — Mode-aware proactive thresholds (filtered nudges)
@@ -71,17 +71,17 @@ sys.modules["toolgate_app"] = tg
 tg_spec.loader.exec_module(tg)
 
 # ---------------------------------------------------------------------------
-# import langgraph system prompts (extract without loading full app)
-# langgraph has many deps (kai_config, conviction, router, etc.)
+# import agentic system prompts (extract without loading full app)
+# agentic has many deps (kai_config, conviction, router, etc.)
 # we only need the prompt constants, so we parse them from source
 # ---------------------------------------------------------------------------
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "langgraph"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
 for _stub in ["kai_config", "conviction", "router", "planner", "adversary",
               "security_audit", "tree_search", "priority_queue", "model_selector"]:
     if _stub not in sys.modules:
         sys.modules[_stub] = MagicMock()
 
-lg_spec = importlib.util.spec_from_file_location("lg_app", "langgraph/app.py")
+lg_spec = importlib.util.spec_from_file_location("lg_app", "agentic/app.py")
 lg = importlib.util.module_from_spec(lg_spec)
 sys.modules["lg_app"] = lg
 lg_spec.loader.exec_module(lg)

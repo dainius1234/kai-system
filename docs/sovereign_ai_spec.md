@@ -239,15 +239,15 @@ services:
               count: all
               capabilities: [gpu]
 
-  langgraph:
-    build: ./langgraph
-    container_name: langgraph
-    hostname: langgraph
+  agentic:
+    build: ./agentic
+    container_name: agentic
+    hostname: agentic
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.7
     volumes:
-      - langgraph_data:/data:rw
+      - agentic_data:/data:rw
       - ./workspaces:/workspaces:rw
     environment:
       REDIS_URL: "redis://redis:6379"
@@ -429,7 +429,7 @@ volumes:
   dashboard_data:
   memu_data:
   ollama_data:
-  langgraph_data:
+  agentic_data:
   redis_data:
   scratchpad:
 

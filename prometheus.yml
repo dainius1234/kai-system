@@ -32,12 +32,12 @@ scrape_configs:
         labels:
           service: executor
 
-  - job_name: langgraph
+  - job_name: agentic
     metrics_path: /metrics
     static_configs:
-      - targets: ["langgraph:8007"]
+      - targets: ["agentic:8007"]
         labels:
-          service: langgraph
+          service: agentic
 
   - job_name: heartbeat
     metrics_path: /metrics

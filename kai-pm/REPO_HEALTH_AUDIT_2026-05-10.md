@@ -16,7 +16,7 @@ are hiding the real signal under noise.
 
 ## 1. What's actually in the repo
 
-- **27 service directories** (langgraph, memu-core, kai-advisor, verifier,
+- **27 service directories** (agentic, memu-core, kai-advisor, verifier,
   tool-gate, executor, fusion-engine, perception, orchestrator, supervisor,
   dashboard, screen-capture, telegram-bot, calendar-sync, metrics-gateway,
   ledger-worker, memory-compressor, heartbeat, workspace-manager, sandboxes,
@@ -24,8 +24,8 @@ are hiding the real signal under noise.
 - **3 docker-compose files**: `minimal`, `sovereign`, `full`. Suspected drift.
 - **Makefile: 419 lines, ~100 test targets**. Most are one-off sprint relics.
 - **`merge-gate` runs only 18 of those 100 tests.** The other 82 are unverified.
-- **`langgraph/app.py`: 80,212 bytes (~2000 lines, single file).** Real god-object.
-- **`langgraph/kai_config.py`: 54,873 bytes (~1500 lines).** Second god-object.
+- **`agentic/app.py`: 80,212 bytes (~2000 lines, single file).** Real god-object.
+- **`agentic/kai_config.py`: 54,873 bytes (~1500 lines).** Second god-object.
 - **`kai-advisor/app.py`: 58 lines, a stub.** Not a god-object — a skeleton.
 - **1603 tests passing, 13 failing** (per latest CI on PR #59).
 - **Coverage: 79%** (but only over `common/`, not the whole repo).
@@ -35,18 +35,18 @@ are hiding the real signal under noise.
 
 ## 2. The five real problems
 
-### Problem 1: `langgraph/` shadows the PyPI `langgraph` package
+### Problem 1 (fixed): `langgraph/` was shadowing the PyPI `langgraph` package
 - Local folder with same name as installed package wins on `sys.path`.
 - `from langgraph.graph import StateGraph` (real package) is unreachable
   without `sys.path.pop(0)` hacks.
 - The hack already exists, in `scripts/agentic_integration_test.py`:
   > *"Ensure the workspace root is NOT first on sys.path so our local
-  >   langgraph/ service directory does not shadow the installed package."*
+  >   agentic/ service directory does not shadow the installed package."*
 - Consequence: agentic patterns described in `docs/agentic_patterns_spec.md`
-  cannot use real LangGraph. Custom Python is doing the job in `langgraph/app.py`.
-- **Fix:** rename `langgraph/` → `agentic/` (or `kai_orchestrator/`).
+  cannot use real LangGraph. Custom Python is doing the job in `agentic/app.py`.
+- **Fix:** rename `agentic/` → `agentic/` (or `kai_orchestrator/`).
 
-### Problem 2: `langgraph/app.py` is 80KB in one file
+### Problem 2: `agentic/app.py` is 80KB in one file
 - Almost certainly contains: HTTP routes + state + business logic + provider
   glue + retries + prompt assembly, all entangled.
 - Every PR that touches it tends to break unrelated tests.
@@ -102,10 +102,10 @@ financial, no skills templates. Garden first.
 ### Week 1 — Stop the bleeding
 1. Triage 13 open PRs — close, rebase, or merge.
 2. Delete (or de-orphan) the tempo test family.
-3. Rename `langgraph/` → `agentic/`. Mechanical PR.
+3. Rename `agentic/` → `agentic/`. Mechanical PR.
 
 ### Week 2 — Untangle the giant
-4. Split `langgraph/app.py` (now `agentic/app.py`) into 5-6 files. Behaviour-preserving.
+4. Split `agentic/app.py` (now `agentic/app.py`) into 5-6 files. Behaviour-preserving.
 5. Reconcile `docker-compose.{minimal,sovereign,full}.yml`. Document why each exists.
 6. Prune Makefile 100 → ~25 targets. Archive the rest.
 
@@ -134,7 +134,7 @@ financial, no skills templates. Garden first.
   between Phase 1 landing in days vs months when GPU arrives.
 - The "13 failing tests" are not your code being wrong. They're tests for
   features that don't exist anymore.
-- The "langgraph not installed" error is not a missing dependency. It's a
+- The "langgraph (PyPI) not installed" error is not a missing dependency. It's a
   naming collision we caused ourselves.
 - The way out is: rename, split, prune, verify. In that order. One PR at a time.
 

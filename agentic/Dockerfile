@@ -2,14 +2,14 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY langgraph/requirements.txt ./
+COPY agentic/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN addgroup --system app && adduser --system --ingroup app app
 
-COPY langgraph/app.py ./
-COPY langgraph/config.py ./
-COPY langgraph/conviction.py ./
+COPY agentic/app.py ./
+COPY agentic/config.py ./
+COPY agentic/conviction.py ./
 COPY common/ ./common/
 
 EXPOSE 8007

@@ -21,7 +21,7 @@ SERVICES: List[Tuple[str, int]] = [
     ("tool-gate",          8000),
     ("memu-core",          8001),
     ("executor",           8002),
-    ("langgraph",          8007),
+    ("agentic",          8007),
     ("heartbeat",          8010),
     ("audio-service",      8021),
     ("camera-service",     8020),

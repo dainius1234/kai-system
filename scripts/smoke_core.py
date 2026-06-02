@@ -27,7 +27,7 @@ def main() -> int:
     ]
     optional_services = [
         "http://localhost:8002/health",  # executor
-        "http://localhost:8007/health",  # langgraph
+        "http://localhost:8007/health",  # agentic
         "http://localhost:8021/health",  # audio service
         "http://localhost:8040/health",  # camera
         "http://localhost:8090/health",  # kai-advisor
