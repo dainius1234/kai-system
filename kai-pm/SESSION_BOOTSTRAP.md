@@ -33,8 +33,8 @@ Kai is a self-sovereign, local-first personal AI system built as cooperating ser
 ## 3) Current reality snapshot
 
 - **Current phase:** Phase 0 — Pre-GPU Hardening
-- **Current focus:** Cleanup Sprint Week 1 → Week 2 transition
-- **What changed recently:** the `langgraph/` → `agentic/` rename landed; cleanup now focuses on app untangling, compose drift, and Makefile pruning.
+- **Current focus:** Cleanup Sprint Week 2.1 — `agentic/app.py` route split + PM truth reconciliation
+- **What changed recently:** the `langgraph/` → `agentic/` rename landed, the `prompts.py` split landed, and the active cleanup PR now trims leftover route-split coupling while PM docs are reconciled to merged/open PR reality.
 
 For the authoritative live details, do **not** trust this file — open:
 

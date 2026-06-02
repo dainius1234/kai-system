@@ -397,6 +397,7 @@ _OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama:11434")
 def __getattr__(name: str) -> Any:
     if name in {
         "_agents_text",
+        "_SYSTEM_PROMPTS",
         "_load_agents",
         "_load_soul",
         "_KAI_CORE_IDENTITY",

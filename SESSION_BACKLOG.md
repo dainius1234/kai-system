@@ -20,6 +20,22 @@ Next: after housekeeping + keystone PRs merge, only §1.3 should remain red — 
 
 ---
 
+## 2026-06-02 (21:15 UTC) — Week 2.1 validation + PM truth reconciliation
+
+- Re-ran branch baselines:
+  - `make go_no_go` ✅
+  - `make check-docs` ✅
+- Installed Python dependencies in the sandbox using the same per-`requirements.txt` pattern as CI so targeted `agentic` tests could run locally.
+- Targeted validation surfaced two realities:
+  - **Directly caused by this branch:** `scripts/test_p4_personality.py` still imports `agentic.app._SYSTEM_PROMPTS`, so the compatibility shim in `agentic/app.py` must keep re-exporting that symbol.
+  - **Pre-existing / unrelated:** several `scripts/test_p16_operational.py` struggle-detection assertions still return zero scores even after deps are installed; do not conflate that with the route split.
+- Refreshed PM truth where it had drifted:
+  - `SESSION_BOOTSTRAP.md` now points at the active Week 2.1 route-split + truth-reconciliation focus.
+  - `METRICS.md` now reflects the current open PRs/issues instead of the old `#46/#58` snapshot.
+  - `PHASE_0_5_BACKLOG.md` no longer treats merged PR #46 as still open.
+
+---
+
 ## 2026-06-02 (20:35 UTC) — Week 2.1 route split + PM truth reconciliation
 
 - Re-verified current reality before editing:

@@ -87,8 +87,8 @@ End of month definition of done: **You can demo Kai to a friend. You use it dail
 #### 6. Verify off-site backup + restore drill
 **Status:** Script lands in 0a — week 4 runs first restore drill, documents in runbook.
 
-#### 7. Close lingering open PRs (#46, #54)
-**Status:** Either merge, rebase, or close. PM (me) will summarise diff and recommend per-PR.
+#### 7. Close lingering non-cleanup PRs (#54)
+**Status:** PR #46 already merged on 2026-06-01; only #54 remains in this older Phase 0.5 bucket. Cleanup Sprint draft PRs (#67, #69) are tracked separately in Week 2 PM docs.
 
 ---
 
