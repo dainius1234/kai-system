@@ -204,14 +204,16 @@ def sync_backlog(metrics: dict, check_only: bool = False) -> bool:
     m2 = re.search(r"^\| Individual tests \| (\d+)\+?(.*)$", text, re.MULTILINE)
     if m2:
         current = int(m2.group(1))
-        if current != metrics["tests"]:
+        suffix = re.sub(r"^\++", "", m2.group(2))
+        desired_row = f"| Individual tests | {metrics['tests']}{suffix}"
+        current_row = m2.group(0)
+        if current != metrics["tests"] or current_row != desired_row:
             if check_only:
                 print(f"docs-sync: PROJECT_BACKLOG.md stale — tests {current} → {metrics['tests']}")
                 return False
-            suffix = m2.group(2)
             text = (
                 text[:m2.start()]
-                + f"| Individual tests | {metrics['tests']}{suffix}"
+                + desired_row
                 + text[m2.end():]
             )
             changed = True
