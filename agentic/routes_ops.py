@@ -49,12 +49,11 @@ def checkpoint_pre_recover(
         logger.debug("Pre-recover checkpoint failed (non-critical)")
 
 
-def reset_breakers(*, memu_breaker: Any, tool_gate_breaker: Any) -> Dict[str, Any]:
+def reset_breakers(*, memu_breaker: Any, tool_gate_breaker: Any) -> None:
     memu_breaker.failures = 0
     memu_breaker.state = "closed"
     tool_gate_breaker.failures = 0
     tool_gate_breaker.state = "closed"
-    return {"status": "ok", "action": "breakers_reset"}
 
 
 def get_metrics_payload(budget: Any) -> Dict[str, float]:
@@ -111,7 +110,7 @@ class LogCapture(logging.Handler):
             pass
 
 
-def install_log_capture(service_name: str = "langgraph") -> tuple[Deque[Dict[str, Any]], LogCapture]:
+def install_log_capture(service_name: str) -> tuple[Deque[Dict[str, Any]], LogCapture]:
     log_buffer: Deque[Dict[str, Any]] = deque(maxlen=500)
     log_capture = LogCapture(log_buffer, service_name)
     log_capture.setLevel(logging.INFO)

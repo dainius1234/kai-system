@@ -389,10 +389,8 @@ async def recover() -> Dict[str, Any]:
         memu_error_guard=MEMU_ERROR_GUARD,
         tool_error_guard=TOOL_ERROR_GUARD,
     )
-    result = reset_breakers(memu_breaker=MEMU_BREAKER, tool_gate_breaker=TOOL_GATE_BREAKER)
-    if result.get("action") != "breakers_reset":
-        logger.warning("Unexpected recover action: %s", result.get("action"))
-    return result
+    reset_breakers(memu_breaker=MEMU_BREAKER, tool_gate_breaker=TOOL_GATE_BREAKER)
+    return {"status": "ok", "action": "breakers_reset"}
 
 
 # ── J6: SOUL.md + AGENTS.md API ─────────────────────────────────────
