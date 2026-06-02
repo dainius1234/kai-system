@@ -21,7 +21,7 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 26 (22 build + postgres + redis + ollama + lakeFS) |
-| Test targets | 74 (make test-core) |
+| Test targets | 73 (make test-core) |
 | Individual tests | 1625 passing, 0 failures |
 | Lines of Python | ~42,000 |
 | Compose files | 3 (minimal/full/sovereign) |

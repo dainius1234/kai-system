@@ -26,9 +26,9 @@
 | Metric | Value |
 |---|---|
 | **Services** | 27 Docker containers |
-| **Test targets** | 74 (`make test-core`) |
+| **Test targets** | 73 (`make test-core`) |
 | **Individual tests** | 1,625 (`def test_` across 83 files) |
-| **Python LOC** | ~49,786 |
+| **Python LOC** | ~49,721 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 32 |
 | **Failures** | 0 |
@@ -43,7 +43,7 @@
 make core-up          # Start minimal stack (8 services)
 make core-down        # Stop it
 make full-up          # Start all 27 services
-make test-core        # Run all 74 test targets (~1,620 tests)
+make test-core        # Run all 73 test targets (~1,625 tests)
 make go_no_go         # Syntax check all entry points
 make merge-gate       # Full pre-merge validation
 make sync-docs        # Auto-update README + backlog metrics
@@ -416,7 +416,6 @@ docs/                # Plans, runbooks, architecture, backlog
 | **dep-audit** | pip-audit for known CVEs | `make dep-audit` | CI |
 | **coverage** | pytest-cov HTML report | `make coverage` | On demand |
 | **Trivy** | Container image scanning (CRITICAL+HIGH) | CI auto | In core-tests.yml |
-| **cache-test-core** | Cache and compare test results across runs | `python scripts/cache_test_core.py` | On demand |
 | **health-sweep** | Hit /health on all running services | `make health-sweep` | On demand |
 | **chaos-ci** | Fault injection for resilience testing | `python scripts/chaos_ci.py` | On demand |
 
@@ -448,13 +447,13 @@ make full-down     # Stop everything
 
 # Validate
 make go_no_go      # Syntax check
-make test-core     # All 74 targets
+make test-core     # All 73 targets
 make merge-gate    # Full pre-merge
 ```
 
 ---
 
-## Test Targets (74)
+## Test Targets (73)
 
 <details>
 <summary>Click to expand full test target list</summary>
@@ -484,7 +483,7 @@ make test-p21-proactive-agent           make test-p22-operator-model
 # Hardening tests
 make test-h1-hardening         make test-h2-self-healing     make test-mars-consolidation
 make test-sage-critique        make test-agent-evolver       make test-checkpoint
-make test-v7                   make test-prod-hardening      make test-hmac-rotation-drill
+make test-v7                   make test-prod-hardening
 make test-error-codes          make test-feature-flags
 
 # Specialised
@@ -533,7 +532,7 @@ make core-smoke                make test-integration
 - [x] Supervisor auto-healing loop (deep /health + /recover)
 - [x] Executor sandboxing (allowlist + AST validation + shell=False)
 - [x] Prometheus + Alertmanager + Telegram alerts wired
-- [x] 74 test targets, 1,620 tests, zero failures
+- [x] 73 test targets, 1,625 tests, zero failures
 - [x] Pre-commit, dep scanning, container scanning
 - [x] Circuit breakers, exponential backoff, resilient_call()
 - [x] MARS memory decay (R = e^{-τ/S}), spaced repetition

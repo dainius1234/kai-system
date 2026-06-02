@@ -61,7 +61,7 @@ Prep work for Cleanup Sprint Week 2.3. This is a read-only audit of the current 
 | `test-self-deception` | `155-157` | Run self-deception tests. | nowhere | **archive** | ARCHIVE — test still exists, but it is only doc-listed (or unreferenced) and does not need a first-class top-level Make target once the live list is trimmed. |
 | `test-temporal-self` | `158-160` | Run temporal-self tests. | nowhere | **archive** | ARCHIVE — test still exists, but it is only doc-listed (or unreferenced) and does not need a first-class top-level Make target once the live list is trimmed. |
 | `test-predictive` | `161-163` | Run predictive tests. | docs | **archive** | ARCHIVE — test still exists, but it is only doc-listed (or unreferenced) and does not need a first-class top-level Make target once the live list is trimmed. |
-| `test-tempo` | `164-166` | Run tempo endpoint tests. | nowhere | **delete** | DELETE — PM docs already mark the tempo tests as orphaned/dead (`kai-pm/CLEANUP_TODO.md`, `kai-pm/REPO_HEALTH_AUDIT_2026-05-10.md`). |
+| `test-tempo` | `164-166` | Run tempo endpoint tests. | nowhere | **keep** | KEEP — despite zero doc refs, `scripts/test_tempo.py` now exercises live `memu-core` `/memory/tempo` behavior, so the old orphan assumption is stale. |
 | `test-improvement-gate` | `167-169` | Run improvement-gate tests. | nowhere | **archive** | ARCHIVE — test still exists, but it is only doc-listed (or unreferenced) and does not need a first-class top-level Make target once the live list is trimmed. |
 | `test-dream-state` | `170-172` | Run dream-state tests. | docs | **archive** | ARCHIVE — test still exists, but it is only doc-listed (or unreferenced) and does not need a first-class top-level Make target once the live list is trimmed. |
 | `test-security-audit` | `173-175` | Run security-audit tests. | docs | **archive** | ARCHIVE — test still exists, but it is only doc-listed (or unreferenced) and does not need a first-class top-level Make target once the live list is trimmed. |
@@ -192,7 +192,6 @@ The large majority of single-purpose tests and sprint-era helpers fit better in 
 
 ### Dead — DELETE
 
-- `test-tempo`
 - `cache-test-core`
 
 ### Duplicates / aliases — consolidate
@@ -396,7 +395,7 @@ Do not block this audit on the rename, but note these cleanup dependencies:
 ## Suggested PR sequence
 
 1. **PR 1 — Delete obviously dead targets**
-   - Delete `test-tempo` and `cache-test-core` first.
+   - Delete `cache-test-core` first.
    - Delete alias-only noise: `test-hmac-rotation-drill`, `test-j1-live-canvas`, `test-j2-wake-word`, `test-j3-pii-redact`, `test-j4-proactive-voice`, `test-j5-memory-diary`, `test-j6-soul-agents`, `test-j7-skills-hub`.
 2. **PR 2 — Move historical targets to `Makefile.archive`**
    - Move the one-shot sprint helpers, phase/jewel targets, and niche subsystem tests that are no longer part of the curated live loop.
@@ -407,4 +406,3 @@ Do not block this audit on the rename, but note these cleanup dependencies:
 4. **PR 4 — Make `merge-gate` honest**
    - Recompose `merge-gate` around validation-only targets (`go_no_go`, `check-docs`, `dep-audit`, `test-core`, `test-integration`, and later an honest coverage gate).
    - Remove operational side effects from the gate.
-

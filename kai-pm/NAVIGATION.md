@@ -28,6 +28,8 @@
 | What's risky right now? | [`RISKS.md`](RISKS.md) |
 | Should we adopt tech X? | [`TECH_WATCH.md`](TECH_WATCH.md) |
 | Why did we decide X? | [`DECISIONS.md`](DECISIONS.md) |
+| How is `agentic/app.py` supposed to be split? | [`AGENTIC_APP_MAP.md`](AGENTIC_APP_MAP.md) |
+| Where is the compose-file drift mapped? | [`COMPOSE_DRIFT.md`](COMPOSE_DRIFT.md) |
 | I'm a new session/agent — bootstrap me | [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md) |
 | What does the README *actually* mean? | [`../README.md`](../README.md) + the "Honest Limitations" section |
 | What's the running cross-session log? | [`../SESSION_BACKLOG.md`](../SESSION_BACKLOG.md) |
