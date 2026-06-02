@@ -31,7 +31,6 @@ from model_selector import select_model
 import prompts as prompt_catalog
 from prompts import (
     INJECTION_RE,
-    _SYSTEM_PROMPTS,
 )
 from routes_identity import router as identity_router
 from routes_observability import build_router as build_observability_router
@@ -46,13 +45,6 @@ from routes_skills import router as skills_router
 logger = setup_json_logger("langgraph", os.getenv("LOG_PATH", "/tmp/langgraph.json.log"))
 DEVICE = detect_device()
 logger.info("Running on %s.", DEVICE)
-
-AGENTS_PATH = prompt_catalog.AGENTS_PATH
-SOUL_PATH = prompt_catalog.SOUL_PATH
-_KAI_CORE_IDENTITY = prompt_catalog._KAI_CORE_IDENTITY
-_SYSTEM_PROMPTS = prompt_catalog._SYSTEM_PROMPTS
-_load_agents = prompt_catalog._load_agents
-_load_soul = prompt_catalog._load_soul
 
 app = FastAPI(title="LangGraph Orchestrator", version="0.5.0")
 app.include_router(identity_router)
@@ -401,9 +393,17 @@ _OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama:11434")
 
 # ── J6: SOUL.md — persistent identity override ──────────────────────
 # Temporary compatibility shim for legacy imports that still read
-# `_soul_text` / `_agents_text` from `agentic.app` instead of `prompts`.
+# prompt globals from `agentic.app` instead of `prompts`.
 def __getattr__(name: str) -> Any:
-    if name in {"_soul_text", "_agents_text"}:
+    if name in {
+        "_agents_text",
+        "_load_agents",
+        "_load_soul",
+        "_KAI_CORE_IDENTITY",
+        "_soul_text",
+        "AGENTS_PATH",
+        "SOUL_PATH",
+    }:
         return getattr(prompt_catalog, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
@@ -725,9 +725,9 @@ async def chat_stream(req: ChatRequest):
     # ── Step 2+: LLM pipeline for GENERAL_CHAT / EXECUTE / MULTI ──
     # determine mode
     mode = (req.mode or await _get_mode()).upper()
-    if mode not in _SYSTEM_PROMPTS:
+    if mode not in prompt_catalog._SYSTEM_PROMPTS:
         mode = "PUB"
-    system_prompt = _SYSTEM_PROMPTS[mode]
+    system_prompt = prompt_catalog._SYSTEM_PROMPTS[mode]
 
     # fetch memories, session context, goals, active topics, and emotional context in parallel
     import asyncio

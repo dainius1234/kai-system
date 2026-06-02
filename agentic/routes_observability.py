@@ -4,6 +4,7 @@ from collections import deque
 from typing import Any, Callable, Dict
 
 from fastapi import APIRouter
+from model_selector import get_profile, list_models
 
 from routes_ops import (
     get_metrics_payload,
@@ -34,8 +35,6 @@ def build_router(
     @router.get("/models")
     async def models_info() -> Dict[str, Any]:
         """HP2: Available models and selection info."""
-        from model_selector import get_profile, list_models
-
         return get_models_payload(
             available_live=available_live,
             get_profile=get_profile,
