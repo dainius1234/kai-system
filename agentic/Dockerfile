@@ -7,9 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 RUN addgroup --system app && adduser --system --ingroup app app
 
-COPY agentic/app.py ./
-COPY agentic/config.py ./
-COPY agentic/conviction.py ./
+COPY agentic/ ./
 COPY common/ ./common/
 
 EXPOSE 8007
