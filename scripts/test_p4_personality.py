@@ -16,16 +16,30 @@ import time
 import unittest
 from unittest.mock import MagicMock
 
+
+def _snapshot_modules(*names):
+    return {name: sys.modules.get(name) for name in names}
+
+
+def _restore_modules(snapshot):
+    for name, module in snapshot.items():
+        if module is None:
+            sys.modules.pop(name, None)
+        else:
+            sys.modules[name] = module
+
 # ---------------------------------------------------------------------------
 # bootstrap: stub heavy deps so memu-core/app.py can import in test
 # ---------------------------------------------------------------------------
-for mod_name in [
+_MEMU_STUBS = [
     "sentence_transformers",
     "psutil",
     "redis", "redis.asyncio",
     "psycopg2",
     "lakefs_client",
-]:
+]
+_memu_stub_snapshot = _snapshot_modules(*_MEMU_STUBS)
+for mod_name in _MEMU_STUBS:
     if mod_name not in sys.modules:
         sys.modules[mod_name] = MagicMock()
 
@@ -76,8 +90,19 @@ tg_spec.loader.exec_module(tg)
 # we only need the prompt constants, so we parse them from source
 # ---------------------------------------------------------------------------
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
-for _stub in ["kai_config", "conviction", "router", "planner", "adversary",
-              "security_audit", "tree_search", "priority_queue", "model_selector"]:
+_AGENTIC_STUBS = [
+    "kai_config",
+    "conviction",
+    "router",
+    "planner",
+    "adversary",
+    "security_audit",
+    "tree_search",
+    "priority_queue",
+    "model_selector",
+]
+_agentic_stub_snapshot = _snapshot_modules(*_AGENTIC_STUBS)
+for _stub in _AGENTIC_STUBS:
     if _stub not in sys.modules:
         sys.modules[_stub] = MagicMock()
 
@@ -85,6 +110,9 @@ lg_spec = importlib.util.spec_from_file_location("lg_app", "agentic/app.py")
 lg = importlib.util.module_from_spec(lg_spec)
 sys.modules["lg_app"] = lg
 lg_spec.loader.exec_module(lg)
+_restore_modules(_agentic_stub_snapshot)
+sys.path.pop(0)
+_restore_modules(_memu_stub_snapshot)
 
 
 def _clear_store():
