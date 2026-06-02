@@ -2,14 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import json
-import logging
 import os
 import time
 import uuid
-from collections import deque
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Deque, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
@@ -41,6 +39,16 @@ from prompts import (
     _SYSTEM_PROMPTS,
     _load_agents,
     _load_soul,
+)
+from routes_ops import (
+    build_health_payload,
+    checkpoint_pre_recover,
+    get_metrics_payload,
+    get_models_payload,
+    get_queue_stats_payload,
+    install_log_capture,
+    query_logs,
+    reset_breakers,
 )
 
 logger = setup_json_logger("langgraph", os.getenv("LOG_PATH", "/tmp/langgraph.json.log"))
@@ -354,12 +362,14 @@ async def health() -> Dict[str, Any]:
     memu_cb = MEMU_BREAKER.snapshot()
     tg_cb = TOOL_GATE_BREAKER.snapshot()
     degraded = memu_cb.get("state") == "open" or tg_cb.get("state") == "open"
-    return {
-        "status": "degraded" if degraded else "ok",
-        "device": DEVICE,
-        "dependencies": {"memu": memu_cb, "tool_gate": tg_cb},
-        "error_guards": {"memu": MEMU_ERROR_GUARD.snapshot(), "tool_gate": TOOL_ERROR_GUARD.snapshot()},
-    }
+    return build_health_payload(
+        device=DEVICE,
+        memu_cb=memu_cb,
+        tool_gate_cb=tg_cb,
+        memu_guard=MEMU_ERROR_GUARD.snapshot(),
+        tool_gate_guard=TOOL_ERROR_GUARD.snapshot(),
+        degraded=degraded,
+    )
 
 
 @app.post("/recover")
@@ -369,27 +379,17 @@ async def recover() -> Dict[str, Any]:
     Automatically creates a pre-recovery checkpoint so the previous
     state can be inspected or restored via time-travel.
     """
-    # H3b: snapshot state before resetting anything
-    try:
-        create_checkpoint(
-            label="pre-recover",
-            trigger="pre_recover",
-            breaker_states={
-                "memu": {**MEMU_BREAKER.snapshot(), "opened_at": MEMU_BREAKER.opened_at},
-                "tool_gate": {**TOOL_GATE_BREAKER.snapshot(), "opened_at": TOOL_GATE_BREAKER.opened_at},
-            },
-            guard_states={"memu": MEMU_ERROR_GUARD.snapshot(), "tool_gate": TOOL_ERROR_GUARD.snapshot()},
-            budget_state=budget.snapshot(),
-            conviction_overrides=load_conviction_overrides(),
-        )
-    except Exception:
-        logger.debug("Pre-recover checkpoint failed (non-critical)")
-
-    MEMU_BREAKER.failures = 0
-    MEMU_BREAKER.state = "closed"
-    TOOL_GATE_BREAKER.failures = 0
-    TOOL_GATE_BREAKER.state = "closed"
-    return {"status": "ok", "action": "breakers_reset"}
+    checkpoint_pre_recover(
+        create_checkpoint=create_checkpoint,
+        budget_snapshot=budget.snapshot(),
+        conviction_overrides=load_conviction_overrides(),
+        logger=logger,
+        memu_breaker=MEMU_BREAKER,
+        tool_gate_breaker=TOOL_GATE_BREAKER,
+        memu_error_guard=MEMU_ERROR_GUARD,
+        tool_error_guard=TOOL_ERROR_GUARD,
+    )
+    return reset_breakers(memu_breaker=MEMU_BREAKER, tool_gate_breaker=TOOL_GATE_BREAKER)
 
 
 # ── J6: SOUL.md + AGENTS.md API ─────────────────────────────────────
@@ -506,27 +506,24 @@ async def prune_skills_endpoint(request: Request) -> Dict[str, Any]:
 
 @app.get("/metrics")
 async def metrics() -> Dict[str, float]:
-    return budget.snapshot()
+    return get_metrics_payload(budget)
 
 
 @app.get("/queue/stats")
 async def queue_stats() -> Dict[str, Any]:
     """HP5: Priority queue statistics."""
-    q = get_queue()
-    s = q.stats()
-    return {"pending": s.pending, "active": s.active, "total_processed": s.total_processed, "avg_wait_ms": s.avg_wait_ms}
+    return get_queue_stats_payload(get_queue)
 
 
 @app.get("/models")
 async def models_info() -> Dict[str, Any]:
     """HP2: Available models and selection info."""
     from model_selector import list_models, get_profile
-    profiles = {}
-    for name in list_models():
-        p = get_profile(name)
-        if p:
-            profiles[name] = {"strengths": p.strengths, "speed_tier": p.speed_tier, "quality_tier": p.quality_tier, "moe_experts": p.moe_expert_count}
-    return {"available_live": _llm.available, "registered": profiles}
+    return get_models_payload(
+        available_live=_llm.available,
+        get_profile=get_profile,
+        list_models=list_models,
+    )
 
 
 # ── LLM router (Kai's brain) ────────────────────────────────────────
@@ -1711,38 +1708,13 @@ _restore_breakers()
 
 # ── P16b: Log aggregation ───────────────────────────────────────────
 
-_log_buffer: Deque[Dict[str, Any]] = deque(maxlen=500)
-
-
-class _LogCapture(logging.Handler):
-    def emit(self, record: logging.LogRecord) -> None:
-        try:
-            _log_buffer.append({
-                "time": record.created,
-                "level": record.levelname,
-                "service": "langgraph",
-                "msg": record.getMessage()[:500],
-            })
-        except Exception:
-            pass
-
-
-_log_capture = _LogCapture()
-_log_capture.setLevel(logging.INFO)
-logging.getLogger().addHandler(_log_capture)
+_log_buffer, _log_capture = install_log_capture()
 
 
 @app.get("/logs")
 async def get_logs(limit: int = 100, level: str = "", since: float = 0):
     """Query recent log entries from langgraph."""
-    entries = list(_log_buffer)
-    if level:
-        entries = [e for e in entries if e["level"] == level.upper()]
-    if since:
-        entries = [e for e in entries if e["time"] >= since]
-    entries.reverse()
-    entries = entries[:limit]
-    return {"status": "ok", "count": len(entries), "entries": entries}
+    return query_logs(_log_buffer, level=level, limit=limit, since=since)
 
 
 if __name__ == "__main__":
