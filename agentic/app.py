@@ -6,6 +6,7 @@ import os
 import time
 import uuid
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import httpx
@@ -31,9 +32,13 @@ from priority_queue import get_queue
 from model_selector import select_model
 import prompts as prompt_catalog
 from prompts import (
+    AGENTS_PATH,
     INJECTION_RE,
+    SOUL_PATH,
     _KAI_CORE_IDENTITY,
     _SYSTEM_PROMPTS,
+    _load_agents,
+    _load_soul,
 )
 from routes_identity import router as identity_router
 from routes_observability import build_router as build_observability_router
