@@ -3,8 +3,8 @@
 Tests verify that the critical issues found during the March 22 2026
 system audit are properly fixed:
   H1.1 — asyncio locks on shared mutable state (memu-core)
-  H1.2 — prompt injection check on /chat (langgraph)
-  H1.3 — 10-way parallel fetch error handling (langgraph)
+  H1.2 — prompt injection check on /chat (agentic)
+  H1.3 — 10-way parallel fetch error handling (agentic)
   H1.4 — store.memorize → store.insert fix (memu-core feedback)
   H1.5 — executor shell=False + AST sandbox validation
   H1.6 — telegram voice file size limit
@@ -26,7 +26,7 @@ def _read(path: str) -> str:
 
 
 MEMU_SRC = _read("memu-core/app.py")
-LANG_SRC = _read("langgraph/app.py")
+LANG_SRC = _read("agentic/app.py")
 EXEC_SRC = _read("executor/app.py")
 TELE_SRC = _read("telegram-bot/app.py")
 DASH_SRC = _read("dashboard/app.py")

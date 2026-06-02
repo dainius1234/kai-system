@@ -43,7 +43,7 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Talks first? | **YES — greeting on session start, periodic check-ins, deferred topic resurfacing** |
 | Struggle detection? | **YES — 5-signal frustration analysis (short msgs, repeated questions, keywords, question density, rapid-fire)** |
 | Feedback loop? | **YES — 1-5 star ratings per response, boost/correction effects on memory** |
-| Log aggregation? | **YES — ring-buffer capture on memu-core + langgraph, level/time-filtered, dashboard aggregator** |
+| Log aggregation? | **YES — ring-buffer capture on memu-core + agentic, level/time-filtered, dashboard aggregator** |
 | Dashboard views? | **YES — 8 views: Chat, Thinking, Goals, Memory Browser, Logs, Settings, Wizard, Soul** |
 | Emotional intelligence? | **YES — emotional memory, self-reflection, relationship timeline, epistemic humility, confession engine** |
 | Soul dashboard? | **YES — mood tracking, emotion timeline, domain confidence, self-reflection journal, milestones, identity card, story arcs, future self, autobiography, legacy messages** |
@@ -146,7 +146,7 @@ make core-down && make core-up
 *An organism needs input channels. These all work without GPU.*
 
 - [x] **Telegram bot (real)** — Async polling bot (aiogram-style, httpx).
-      Commands: /start, /mode, /status. Voice + text. Webhook to langgraph /chat.
+      Commands: /start, /mode, /status. Voice + text. Webhook to agentic /chat.
       **LIVE — tested on phone 2026-02-25.**
 - [ ] **Screen capture → OCR → memorize pipeline** — The app.py is wired
       (mss + pytesseract). Needs: actually test it in Docker with X11/Xvfb,
@@ -242,11 +242,11 @@ make core-down && make core-up
       core-tests.yml runs on every push.
 - [x] **Secrets management** — Docker secrets support via `load_secret()`
       in `common/auth.py`. Reads from `/run/secrets/` convention files.
-      `docker-compose.full.yml` has secrets blocks for tool-gate, langgraph, backup-service.
+      `docker-compose.full.yml` has secrets blocks for tool-gate, agentic, backup-service.
 - [x] **Backup-service validation** — Full rewrite: postgres, redis, memory,
       ledger backup + restore. SHA-256 checksums, filename sanitization.
 - [x] **Log aggregation** — ring-buffer capture (500 entries) on memu-core +
-      langgraph. Level/time filtering. Dashboard aggregates from both services,
+      agentic. Level/time filtering. Dashboard aggregates from both services,
       sorted by timestamp. Monospace log viewer with level filter dropdown.
 - [x] **HMAC key rotation in production** — 3-phase lifecycle drill
       (single → overlap → retire) with 14 unittest tests.
@@ -460,11 +460,11 @@ REMEMBER you. Cross-referenced with Grok brainstorm 2026-03-22.*
 ### P8 — Dashboard Thinking Pathways (2026-03-01)
 - [x] Thinking Pathways page (thinking.html)
 - [x] 4 visualization cards (conviction, tempo, boundary, silence)
-- [x] Real-time data from fusion-engine + langgraph endpoints
+- [x] Real-time data from fusion-engine + agentic endpoints
 - [x] Chart.js gauge + radar visualizations
 
 ### P9 — Security Self-Hacking (2026-03-04)
-- [x] Security audit engine (langgraph/security_audit.py)
+- [x] Security audit engine (agentic/security_audit.py)
 - [x] 4 audit categories: injection, auth_bypass, data_leak, resource_abuse
 - [x] 21 + 13 test payloads (34 total)
 - [x] 6 adversary challenges (including challenge_security)
@@ -507,7 +507,7 @@ REMEMBER you. Cross-referenced with Grok brainstorm 2026-03-22.*
       memory (importance 0.85), rating 1-2 stores correction (importance 0.90).
       Stats endpoint with distribution and averages.
 - [x] Log aggregation — ring-buffer capture (500 entries) on memu-core +
-      langgraph. Level/time filtering. Dashboard aggregates both services.
+      agentic. Level/time filtering. Dashboard aggregates both services.
 - [x] Dashboard Goals view — goal creation form, drift alert card, progress bars,
       feedback stats with bar chart.
 - [x] Dashboard Memory Browser — search by query or category, stats overview
@@ -709,11 +709,11 @@ REMEMBER you. Cross-referenced with Grok brainstorm 2026-03-22.*
 - **Gaps Sprint:** JSON stdout logging (common/runtime.py), vector cleanup endpoint
   (memu-core /memory/cleanup), ledger stats proxy (dashboard /api/ledger-stats).
   10 tests added. Committed `052c913`.
-- **HP2: MoE Model Selector** — `langgraph/model_selector.py` (4 model profiles,
+- **HP2: MoE Model Selector** — `agentic/model_selector.py` (4 model profiles,
   complexity estimation, scoring algorithm). Wired into /chat and /run. 20 tests.
-- **HP4: CoT Tree Search** — `langgraph/tree_search.py` (branch generation,
+- **HP4: CoT Tree Search** — `agentic/tree_search.py` (branch generation,
   conviction pruning, multi-depth search). Wired as /run rethink fallback. 14 tests.
-- **HP5: Priority Queue** — `langgraph/priority_queue.py` (4 priority levels,
+- **HP5: Priority Queue** — `agentic/priority_queue.py` (4 priority levels,
   semaphore concurrency, singleton). /queue/stats endpoint added. 12 tests.
 - New endpoints: GET /models, GET /queue/stats
 - Test count: 280 → 347 (51 targets)
@@ -746,7 +746,7 @@ REMEMBER you. Cross-referenced with Grok brainstorm 2026-03-22.*
   (short msgs, repeated questions, keywords, question density, rapid-fire).
   Score 0-1, offer generated if ≥0.4 with 30-min cooldown.
 - P16b: Log aggregation — ring-buffer capture (500 entries) on memu-core +
-  langgraph with level/time filtering. Dashboard aggregates both services.
+  agentic with level/time filtering. Dashboard aggregates both services.
 - P16c: Dashboard Goals view — goal creation form, drift alert card, progress
   bars, feedback stats with bar chart.
 - P16d: Dashboard Memory Browser — search by query or category, stats overview,
@@ -902,10 +902,10 @@ that could cause crashes, data loss, or security breaches in production.
       _relationship_milestones, _confession_cooldown, _autobiography,
       _legacy_messages, _counterfactuals, _empathy_map, _creative_ideas,
       _inner_monologue, etc).
-- [x] **H1.2 — Prompt injection check on /chat (langgraph)**
+- [x] **H1.2 — Prompt injection check on /chat (agentic)**
       /run had INJECTION_RE check but /chat (the MAIN entry point) did not.
       Added injection pattern check to /chat immediately after sanitization.
-- [x] **H1.3 — 10-way parallel fetch error handling (langgraph)**
+- [x] **H1.3 — 10-way parallel fetch error handling (agentic)**
       asyncio.gather() of 10 context fetches had zero error handling. One
       failing task = entire /chat crashes. Added try/except per-task with
       graceful degradation (empty defaults on failure).
@@ -936,7 +936,7 @@ that could cause crashes, data loss, or security breaches in production.
       asyncio.gather() with individual limits.
 - [ ] **H2.4 — generate_embedding() blocks event loop** — Move to
       run_in_executor() for async compatibility.
-- [x] **H2.5 — Context budget** — `_trim_context()` enforces `CONTEXT_BUDGET_TOKENS` (default 3072) in langgraph. Drops oldest middle messages when prompt exceeds budget.
+- [x] **H2.5 — Context budget** — `_trim_context()` enforces `CONTEXT_BUDGET_TOKENS` (default 3072) in agentic. Drops oldest middle messages when prompt exceeds budget.
 - [x] **H2.6 — Verifier semantic upgrade** — Uses memu-core rank_score
       (30% embedding similarity + relevance + importance + recency) with
       keyword overlap as supplementary signal. No longer pure keyword-matcher.
@@ -997,7 +997,7 @@ breakers existed but weren't enforced. A frozen background task was invisible.
       store. Returns `"degraded"` on failure. `/recover` reconnects DB pool.
 - [x] **H2.3 — deep /health on executor** — checks disk space, temp dir
       writable. `/recover` clears temp files.
-- [x] **H2.4 — deep /health on langgraph** — checks circuit breaker states
+- [x] **H2.4 — deep /health on agentic** — checks circuit breaker states
       for memu + tool-gate. `/recover` resets breakers.
 - [x] **H2.5 — deep /health on tool-gate** — checks Redis connectivity,
       ledger path, token count. `/recover` reconnects Redis, reloads tokens.
@@ -1109,7 +1109,7 @@ Each issue penalises the critique score by 0.15. The self-critique signal
 is included in the aggregate, so multiple issues can downgrade a PASS to
 REPAIR or FAIL_CLOSED.
 
-#### Layer 2 — Adversary Self-Review (langgraph/adversary.py)
+#### Layer 2 — Adversary Self-Review (agentic/adversary.py)
 New `challenge_self_review()` runs as challenge 7 after all other
 challenges complete. Detects 4 meta-failure modes:
 
@@ -1147,7 +1147,7 @@ said "here's exactly what to do differently."
 
 **Architecture: failure→pattern→fix pipeline**
 
-#### Core Engine (langgraph/kai_config.py)
+#### Core Engine (agentic/kai_config.py)
 - [x] **P24.1 — EvolutionSuggestion dataclass** — suggestion_id, pattern
       description, failure_class, frequency, fix (concrete action), confidence,
       source_episodes, priority (critical/high/medium/low).
@@ -1174,7 +1174,7 @@ said "here's exactly what to do differently."
 - [x] **P24.9 — Dream cycle wiring** — Phase 7 runs after boundary recalibration,
       before insight packaging.
 
-#### API Endpoints (langgraph/app.py)
+#### API Endpoints (agentic/app.py)
 - [x] **P24.10 — POST /evolve/analyze** — Analyzes 30-day episode history,
       generates report, stores critical/high suggestions as memories.
 - [x] **P24.11 — GET /evolve/suggestions** — Returns last 5 evolver reports.
@@ -1242,14 +1242,14 @@ listing, diff, cap enforcement, serialization, and edge cases.
 - File-based persistence: each checkpoint stored as individual JSON file in CHECKPOINT_DIR
 - Cap enforcement: CHECKPOINT_MAX (default 30), oldest removed first
 
-**Functions (langgraph/kai_config.py):**
+**Functions (agentic/kai_config.py):**
 1. `create_checkpoint()` — Capture and persist full operational state
 2. `list_checkpoints()` — List available checkpoints, newest first
 3. `load_checkpoint()` — Load specific checkpoint by ID
 4. `diff_checkpoints()` — Compare two checkpoints, highlight changes
 5. `delete_checkpoint()` — Remove a single checkpoint
 
-**API Endpoints (langgraph/app.py):**
+**API Endpoints (agentic/app.py):**
 1. `POST /checkpoint` — Create manual save-point with optional label
 2. `GET /checkpoints` — List checkpoints (newest first, limit param)
 3. `GET /checkpoint/{id}` — Full detail of specific checkpoint
@@ -1426,7 +1426,7 @@ Phase 0 completed and documented in [`docs/gpu_integration_phase0.md`](gpu_integ
    - Mind-map / graph / timeline rendering in dashboard
    - Uses existing goals + memories data
 3. **J2: Wake-word "Kai" + Intent Judge** ✅
-   - Delivered as perception wake service + dashboard proxy + optional langgraph pre-routing
+   - Delivered as perception wake service + dashboard proxy + optional agentic pre-routing
    - Configurable wake words, debounce, tiny-model intent judge, heuristic fallback
 4. **J3: Auto-Redaction PII**
    - Regex + OCR strip before any memorize/log

@@ -3,9 +3,9 @@
 Gives Kai a Telegram interface so the operator can chat from anywhere.
 
 Pipeline:
-  Text msg  → langgraph /chat → streaming response → Telegram reply
+  Text msg  → agentic /chat → streaming response → Telegram reply
   Voice msg → download audio → audio-service STT → transcript
-              → langgraph /chat → response → TTS → voice + text reply
+              → agentic /chat → response → TTS → voice + text reply
 
 Requires TELEGRAM_BOT_TOKEN from @BotFather.
 Set ALLOWED_CHAT_IDS to restrict access (comma-separated, empty = allow all).
@@ -37,7 +37,7 @@ DEVICE = detect_device()
 
 # ── config ──────────────────────────────────────────────────────────
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
-LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
+LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
 AUDIO_SERVICE_URL = os.getenv("AUDIO_SERVICE_URL", "http://audio-service:8021")
 TTS_SERVICE_URL = os.getenv("TTS_SERVICE_URL", "http://tts-service:8030")
 TTS_ENABLED = os.getenv("TTS_ENABLED", "true").lower() == "true"

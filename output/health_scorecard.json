@@ -24,7 +24,7 @@
       "detail": "ok"
     },
     {
-      "service": "langgraph",
+      "service": "agentic",
       "port": 8007,
       "status": "UP",
       "detail": "ok"

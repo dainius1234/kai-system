@@ -298,7 +298,7 @@ architecture excels.
   on topic "crypto prices" → rule: "if topic=crypto prices, always verify
   with fresh data before asserting"
 - **Files:** `kai_config.py` (FailureClass enum + classify function),
-  `langgraph/app.py` (post-episode classification + rule extraction),
+  `agentic/app.py` (post-episode classification + rule extraction),
   `adversary.py` (use failure_class in history challenge for targeted warnings)
 - **Tests:** `scripts/test_failure_taxonomy.py`
 - **Why it compounds:** The adversary doesn't just say "this failed before" —
@@ -321,7 +321,7 @@ architecture excels.
   `learning_value = f(uncertainty, outcome, conviction_delta)`. Episodes with
   high learning_value get boosted importance in memu-core so they surface
   more in future retrievals.
-- **Files:** `langgraph/app.py` (compute + store learning_value in episode),
+- **Files:** `agentic/app.py` (compute + store learning_value in episode),
   `kai_config.py` (learning_value field in episode schema)
 - **Tests:** `scripts/test_selaur.py`
 - **Why it compounds:** Over time, Kai's highest-importance memories are
@@ -367,7 +367,7 @@ architecture excels.
   - `_extract_numeric_claims()` — pulls currency, percentage, duration claims.
   - `_ASSERTION_SIGNALS` and `_NEGATION_SIGNALS` regex patterns for polarity detection.
 - **Files:** `memu-core/app.py` (contradiction engine + `/memory/assert` endpoint),
-  `langgraph/app.py` (wired into correction learning path)
+  `agentic/app.py` (wired into correction learning path)
 - **Tests:** `scripts/test_contradiction.py` — 13 tests (numeric drift, negation flip,
   empty/unrelated/poisoned edge cases, numeric extraction, default result)
 
@@ -384,9 +384,9 @@ architecture excels.
   - `GET /memory/preferences` in memu-core — retrieves all preferences for plan injection.
   - `_fetch_preferences()` in planner.py — parallel fetch during context gathering.
   - Preferences injected as `apply_preference` steps in `build_enriched_plan()`.
-  - Wired into langgraph/app.py correction learning: corrections auto-extract and store preferences.
-- **Files:** `langgraph/kai_config.py` (extract_preference), `memu-core/app.py` (preference endpoints),
-  `langgraph/planner.py` (fetch + inject), `langgraph/app.py` (correction → preference pipeline)
+  - Wired into agentic/app.py correction learning: corrections auto-extract and store preferences.
+- **Files:** `agentic/kai_config.py` (extract_preference), `memu-core/app.py` (preference endpoints),
+  `agentic/planner.py` (fetch + inject), `agentic/app.py` (correction → preference pipeline)
 - **Tests:** `scripts/test_gem_preferences.py` — 13 tests (extraction, empty cases, topic context,
   added/removed words). `scripts/test_planner_preferences.py` — 8 tests (injection, context population,
   max cap, plan counting).
@@ -404,7 +404,7 @@ architecture excels.
     generates probing questions for weak areas. Sorted gaps-first.
   - `GET /memory/boundary` in memu-core — aggregates stored memories by category,
     calculates coverage metrics, generates probing questions for low-coverage categories.
-- **Files:** `langgraph/kai_config.py` (TopicBoundary, build_knowledge_boundary),
+- **Files:** `agentic/kai_config.py` (TopicBoundary, build_knowledge_boundary),
   `memu-core/app.py` (`/memory/boundary` endpoint)
 - **Tests:** `scripts/test_gem_preferences.py` — 6 tests on knowledge boundary
   (gap identification, empty episodes, min filter, probe questions, sort order, dataclass fields)
@@ -432,7 +432,7 @@ architecture excels.
 - **What was built:**
   - `GET /thinking` — serves `dashboard/static/thinking.html`, a full cognitive transparency page.
   - 5 new proxy API endpoints in `dashboard/app.py`:
-    - `GET /api/thinking` — fetches recent episodes from langgraph, extracts conviction pipeline
+    - `GET /api/thinking` — fetches recent episodes from agentic, extracts conviction pipeline
       data (initial score → rethinks → final conviction → learning value → failure class → metacognitive rule).
     - `GET /api/tempo` — proxies memu-core `/memory/tempo` (operator pace gauge).
     - `GET /api/boundary` — proxies memu-core `/memory/boundary` (knowledge confidence map).
@@ -458,7 +458,7 @@ architecture excels.
 
 ### P9–P15: Remaining Advantages
 
-- **P9: Security Self-Hacking** ✅ — `run_security_audit()` in `langgraph/security_audit.py`.
+- **P9: Security Self-Hacking** ✅ — `run_security_audit()` in `agentic/security_audit.py`.
   4 audit categories: injection filter fuzzing (21 bypass payloads), input sanitization
   (13 adversarial payloads + XSS/SQL/path-traversal/command-injection), HMAC auth
   boundary testing (4 edge cases), policy governance checks (4 env var audits).
@@ -469,7 +469,7 @@ architecture excels.
 - **P10: Predictive Pre-Computation** ✅ — `predict_next_request()` + `mine_request_sequences()`
   in planner.py. Mines bigram sequences from episode history to predict what the operator
   will ask next. Pre-fetches memory context for top-3 predictions via `pre_fetch_predicted_context()`.
-  Wired into langgraph/app.py: predictions added to plan as `predicted_next` metadata.
+  Wired into agentic/app.py: predictions added to plan as `predicted_next` metadata.
   Tests: `scripts/test_predictive.py` — 15 tests.
 - **P11: Operator Tempo Modeling** ✅ — `GET /memory/tempo` in memu-core/app.py.
   Analyses memory timestamps to detect operator pace. Four categories: rapid (<30s),
@@ -479,13 +479,13 @@ architecture excels.
 - **P12: Self-Deception Detection** ✅ — `detect_self_deception()` in conviction.py.
   3 checks: evidence_gap (high conviction but < 2 chunks), relevance_gap (chunks exist
   but coverage < 0.5), rethink_blind_spot (complex query >= 15 words with zero rethinks).
-  Wired into langgraph/app.py: if deceived, forces conviction below MIN_CONVICTION to
+  Wired into agentic/app.py: if deceived, forces conviction below MIN_CONVICTION to
   trigger rethink. Tests: `scripts/test_self_deception.py` — 12 tests.
 - **P13: Recursive Self-Improvement Gate** ✅ — `capture_snapshot()`, `evaluate_improvement()`
   in kai_config.py. Before self-modification, snapshots avg_conviction, avg_outcome,
   failure_rate, rethink_rate. After change, compares metrics against tolerance (default 0.1).
   If any metric degrades beyond tolerance → flags for revert. Auto-snapshots every 10
-  episodes in langgraph/app.py. File-based snapshot persistence (last 50 snapshots).
+  episodes in agentic/app.py. File-based snapshot persistence (last 50 snapshots).
   Tests: `scripts/test_improvement_gate.py` — 20 tests.
 - **P14: Temporal Self-Model** ✅ — `GET /self-assessment` in heartbeat/app.py.
   Compares current vs previous period metrics (total_memories, error_rate, uptime_ratio,
@@ -493,7 +493,7 @@ architecture excels.
   Overall health: needs_attention (2+ declining), improving (2+ improving), stable.
   File-based persistence for period-over-period comparison.
   Tests: `scripts/test_temporal_self.py` — 19 tests.
-- **P15: Dream State** ✅ — `run_dream_cycle()` in `langgraph/kai_config.py`.
+- **P15: Dream State** ✅ — `run_dream_cycle()` in `agentic/kai_config.py`.
   6-phase offline consolidation: cluster failures by class, deduplicate metacognitive
   rules (Jaccard similarity threshold), synthesize recurring patterns (struggling topics,
   complex topics, learning trends), detect rule contradictions (always/never conflicts),
@@ -532,7 +532,7 @@ architecture excels.
 ### HP2: MoE Model Selection ✅ DONE
 - **What:** MoE-aware model selector routes queries to the best available model based on
   task type, complexity, and hardware constraints.
-- **Built:** `langgraph/model_selector.py` — `ModelProfile` dataclass (name, strengths,
+- **Built:** `agentic/model_selector.py` — `ModelProfile` dataclass (name, strengths,
   max_context, speed/quality tiers, moe_expert_count, vram_gb), `_PROFILES` registry
   (Ollama, DeepSeek-V4, Kimi-2.5, Dolphin), `estimate_complexity()` (keywords + length +
   sentences + question marks → 0.0–1.0), `select_model()` (route match +3, quality premium
@@ -557,7 +557,7 @@ architecture excels.
 ### HP4: CoT Tree Search with Conviction Pruning ✅ DONE
 - **What:** Chain-of-thought with branching. Generate multiple reasoning paths, score each
   with conviction, prune low-confidence branches early, refine survivors.
-- **Built:** `langgraph/tree_search.py` — `Branch` dataclass (id, plan, prompt, conviction,
+- **Built:** `agentic/tree_search.py` — `Branch` dataclass (id, plan, prompt, conviction,
   depth, pruned), `TreeSearchResult` (best_branch, total/pruned branches, search_time_ms,
   improvement property), `tree_search()` async function (generates N variations, scores via
   conviction, prunes below threshold, refines survivors, early exit if min_conviction met),
@@ -573,7 +573,7 @@ architecture excels.
 ### HP5: Priority Queue for Inference ✅ DONE
 - **What:** Async priority queue for LLM request scheduling. High-priority requests (chat)
   get resources first. Low-priority (dream, batch) queue behind.
-- **Built:** `langgraph/priority_queue.py` — `Priority` IntEnum (CHAT=0, RUN=1,
+- **Built:** `agentic/priority_queue.py` — `Priority` IntEnum (CHAT=0, RUN=1,
   BACKGROUND=2, BATCH=3), `QueueEntry` with `__lt__` for ordering (lower number = higher
   priority, ties broken by submission time), `PriorityQueue` class (semaphore-based
   concurrency limiting via `submit()` async, `stats()` snapshot), `get_queue()` module-level
@@ -657,16 +657,16 @@ No other build thinks about itself this way. This is the gap.
 10. **OMAR Self-Play** — unblocked when GPU enables multi-turn reasoning
 
 ### Key File Map
-- `langgraph/router.py` — 8-route zero-LLM classifier
-- `langgraph/planner.py` — memory-driven planning with episode similarity
-- `langgraph/adversary.py` — 6-challenge stress-test engine
-- `langgraph/conviction.py` — 5-signal conviction scoring (0-10)
-- `langgraph/kai_config.py` — episode storage, failure taxonomy, dream state, improvement gate
-- `langgraph/security_audit.py` — automated security self-hacking engine
-- `langgraph/model_selector.py` — MoE-aware model selection (HP2)
-- `langgraph/tree_search.py` — CoT tree search with conviction pruning (HP4)
-- `langgraph/priority_queue.py` — async priority queue for inference (HP5)
-- `langgraph/app.py` — main orchestrator: /chat, /run, /dream, /security/audit
+- `agentic/router.py` — 8-route zero-LLM classifier
+- `agentic/planner.py` — memory-driven planning with episode similarity
+- `agentic/adversary.py` — 6-challenge stress-test engine
+- `agentic/conviction.py` — 5-signal conviction scoring (0-10)
+- `agentic/kai_config.py` — episode storage, failure taxonomy, dream state, improvement gate
+- `agentic/security_audit.py` — automated security self-hacking engine
+- `agentic/model_selector.py` — MoE-aware model selection (HP2)
+- `agentic/tree_search.py` — CoT tree search with conviction pruning (HP4)
+- `agentic/priority_queue.py` — async priority queue for inference (HP5)
+- `agentic/app.py` — main orchestrator: /chat, /run, /dream, /security/audit
 - `common/llm.py` — LLM router (Ollama, DeepSeek, Kimi-2.5, Dolphin; Kimi-K2 pending)
 - `memu-core/app.py` — 21+ endpoint memory engine
 - `dashboard/static/thinking.html` — cognitive transparency visualization

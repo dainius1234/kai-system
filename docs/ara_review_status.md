@@ -7,7 +7,7 @@ Implemented in this update:
 3. HMAC revocation support + auto-rotation helper script.
 4. Egress whitelist policy script updated for tool-gate + telegram bridge.
 5. Chaos CI drill script with random service kill/restart and SLO gating.
-6. Conviction override control in `kai_control` UI and consumption in `langgraph`.
+6. Conviction override control in `kai_control` UI and consumption in `agentic`.
 7. Offline paper backup was already present before this update.
 
 8. Phase-1 Patch Set B catch-up: memu-core state key/value size guards, memory cap (`MAX_MEMORY_RECORDS`), and `/memory/diagnostics` endpoint.

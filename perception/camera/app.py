@@ -303,7 +303,7 @@ def _speak_or_not(
 
 
 # ── P2: Multi-modal LLM fusion ──────────────────────────────────────
-LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://langgraph:8000")
+LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://agentic:8000")
 
 
 async def interpret_multi(

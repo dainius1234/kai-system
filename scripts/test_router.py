@@ -1,4 +1,4 @@
-"""Tests for the Specialist Router — langgraph/router.py
+"""Tests for the Specialist Router — agentic/router.py
 
 Validates that user messages are classified into the correct route
 and that the zero-LLM dispatch functions return sensible results.
@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 # Load router.py directly to avoid the installed langgraph package
-_mod_path = Path(__file__).resolve().parents[1] / "langgraph" / "router.py"
+_mod_path = Path(__file__).resolve().parents[1] / "agentic" / "router.py"
 _spec = importlib.util.spec_from_file_location("router", _mod_path)
 assert _spec and _spec.loader
 _mod = importlib.util.module_from_spec(_spec)

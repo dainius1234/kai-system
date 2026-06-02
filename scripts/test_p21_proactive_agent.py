@@ -1,7 +1,7 @@
 """P21 Proactive Agent Loop — test suite.
 
 Tests: scheduled tasks, reminders, briefings, action registry, agent summary,
-       dashboard proxies, dashboard UI, langgraph integration, supervisor integration.
+       dashboard proxies, dashboard UI, agentic integration, supervisor integration.
 """
 from __future__ import annotations
 
@@ -56,7 +56,7 @@ def _read_file(rel_path: str) -> str:
 
 
 MEMU_SRC = _read_file("memu-core/app.py")
-LANG_SRC = _read_file("langgraph/app.py")
+LANG_SRC = _read_file("agentic/app.py")
 DASH_SRC = _read_file("dashboard/app.py")
 HTML_SRC = _read_file("dashboard/static/app.html")
 SUP_SRC = _read_file("supervisor/app.py")

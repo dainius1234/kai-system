@@ -1,4 +1,4 @@
-"""Tests for the Memory-Driven Planner — langgraph/planner.py
+"""Tests for the Memory-Driven Planner — agentic/planner.py
 
 Validates keyword similarity, episode matching, conviction modifiers,
 and enriched plan construction.
@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 
 # Load planner.py directly (avoid installed langgraph package)
-_mod_path = Path(__file__).resolve().parents[1] / "langgraph" / "planner.py"
+_mod_path = Path(__file__).resolve().parents[1] / "agentic" / "planner.py"
 _spec = importlib.util.spec_from_file_location("planner", _mod_path)
 assert _spec and _spec.loader
 _mod = importlib.util.module_from_spec(_spec)

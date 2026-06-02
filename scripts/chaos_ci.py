@@ -20,7 +20,7 @@ from typing import List
 SERVICES = [
     ["python", "tool-gate/app.py"],
     ["python", "memu-core/app.py"],
-    ["python", "langgraph/app.py"],
+    ["python", "agentic/app.py"],
 ]
 PORT_ENVS = [
     {"PORT": "19000", "TRUSTED_TOKENS_PATH": "security/trusted_tokens.txt", "MODE": "WORK", "REQUIRE_SIGNATURE": "true"},

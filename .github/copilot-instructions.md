@@ -12,7 +12,7 @@ This repository implements **Sovereign AI** — a self-sovereign, air-gapped per
 - `dashboard/` — operator console (Dash/Flask)
 - `memu-core/` — memory/compression and operator state helpers
 - `tool-gate/` — tool access policy and local gatekeeping
-- `langgraph/` — graph/runtime app integration layer
+- `agentic/` — graph/runtime app integration layer
 - `kai-advisor/` — self-employment advisor (offline, UK-focused)
 - `perception/` — audio (voice emotion) and camera (frame analysis) capture services
 - `heartbeat/` — system pulse and auto-sleep controller
@@ -72,7 +72,7 @@ make test-dashboard          # dashboard structural tests
 make test-audio              # audio service smoke test
 make test-camera             # camera service smoke test
 make test-executor           # executor service smoke test
-make test-langgraph          # langgraph service smoke test
+make test-agentic-service    # agentic service smoke test
 make test-kai-advisor        # kai-advisor unit tests
 make test-tts                # TTS service smoke test
 make test-avatar             # avatar service smoke test
@@ -153,7 +153,7 @@ Run `make go_no_go` before committing changes to Python service entry points to 
 3. **Imports**: follow PEP 8; stdlib first, then third-party, then local.
 4. **Service entry points**: each service exposes at least a `/health` HTTP endpoint returning `{"status": "ok"}`.
 5. **Tests**: place unit tests in `scripts/test_<service>.py`; service-level tests in `<service>/test_<service>.py`. Use `pytest` or plain `unittest`.
-6. **Health endpoints**: every service exposes `/health` returning `{"status": "ok"}`. Core services (memu-core, executor, langgraph, tool-gate, heartbeat) implement **deep /health** (check real dependencies) and return `{"status": "degraded"}` on internal failures. Core services also expose `/recover` for self-healing.
+6. **Health endpoints**: every service exposes `/health` returning `{"status": "ok"}`. Core services (memu-core, executor, agentic, tool-gate, heartbeat) implement **deep /health** (check real dependencies) and return `{"status": "degraded"}` on internal failures. Core services also expose `/recover` for self-healing.
 7. **Inter-service calls**: use `common.resilience.resilient_call()` instead of bare `httpx` for retry + circuit breaker + fallback.
 6. **Secrets**: never commit real credentials; use `.env` files (see `.env.example`) and environment variables. The `.gitignore` excludes `.env`.
 7. **Docker**: each service has its own `Dockerfile`. Multi-service compositions use `docker-compose.minimal.yml` (core 8) or `docker-compose.full.yml` (full stack).

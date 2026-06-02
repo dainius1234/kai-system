@@ -30,7 +30,7 @@
 | Item | Status | Notes |
 |---|---|---|
 | Sandbox timeout (30s max, kill + log) | ✅ Done | `EXECUTION_TIMEOUT` env var in executor. Default 30s. |
-| Output sanitization (strip dangerous commands) | ✅ Done | `sanitize_string()` in langgraph/app.py strips injection patterns. |
+| Output sanitization (strip dangerous commands) | ✅ Done | `sanitize_string()` in agentic/app.py strips injection patterns. |
 | Result hashing (SHA256 before ledger store) | ✅ Done | Ledger entries are hash-chained. Episode spool uses SHA256 checksums. |
 
 ## 4. Dashboard

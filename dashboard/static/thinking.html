@@ -388,7 +388,7 @@
         document.getElementById('episodesContent').innerHTML = epHtml;
 
       } catch (e) {
-        document.getElementById('pipelineContent').innerHTML = '<div class="empty">Cannot reach langgraph — is the stack running?</div>';
+        document.getElementById('pipelineContent').innerHTML = '<div class="empty">Cannot reach agentic — is the stack running?</div>';
         document.getElementById('episodesContent').innerHTML = '<div class="empty">Unavailable</div>';
       }
     }
@@ -618,7 +618,7 @@
           return;
         }
         if (data.status === 'unavailable') {
-          content.innerHTML = '<div class="empty">Cannot reach langgraph — is the stack running?</div>';
+          content.innerHTML = '<div class="empty">Cannot reach agentic — is the stack running?</div>';
           return;
         }
 
@@ -656,7 +656,7 @@
 
         content.innerHTML = html;
       } catch (e) {
-        content.innerHTML = '<div class="empty">Dream cycle failed — check if langgraph is running.</div>';
+        content.innerHTML = '<div class="empty">Dream cycle failed — check if agentic is running.</div>';
       }
     }
 
@@ -670,7 +670,7 @@
         const data = await resp.json();
 
         if (data.status === 'unavailable') {
-          content.innerHTML = '<div class="empty">Cannot reach langgraph for security audit.</div>';
+          content.innerHTML = '<div class="empty">Cannot reach agentic for security audit.</div>';
           return;
         }
 
@@ -714,7 +714,7 @@
 
         content.innerHTML = html;
       } catch (e) {
-        content.innerHTML = '<div class="empty">Security audit failed — check if langgraph is running.</div>';
+        content.innerHTML = '<div class="empty">Security audit failed — check if agentic is running.</div>';
       }
     }
 

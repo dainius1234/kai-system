@@ -38,7 +38,7 @@ repos:
         name: Syntax check service entry points
         entry: python -m py_compile
         language: python
-        files: '(dashboard|tool-gate|memu-core|langgraph|executor|heartbeat|supervisor|verifier|fusion-engine|memory-compressor|ledger-worker|metrics-gateway|telegram-bot)/app\.py$'
+        files: '(dashboard|tool-gate|memu-core|agentic|executor|heartbeat|supervisor|verifier|fusion-engine|memory-compressor|ledger-worker|metrics-gateway|telegram-bot)/app\.py$'
         pass_filenames: true
 
       - id: no-secrets

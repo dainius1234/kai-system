@@ -24,14 +24,14 @@ import pytest
 # ── path setup ───────────────────────────────────────────────────────
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "langgraph"))
+sys.path.insert(0, os.path.join(ROOT, "agentic"))
 
 # Use temp dir for checkpoints so tests don't interfere
 _test_dir = tempfile.mkdtemp(prefix="kai_checkpoint_test_")
 os.environ.setdefault("CHECKPOINT_DIR", _test_dir)
 os.environ.setdefault("REDIS_URL", "")
 
-from langgraph.kai_config import (
+from agentic.kai_config import (
     Checkpoint,
     CHECKPOINT_DIR,
     CHECKPOINT_MAX,

@@ -223,7 +223,7 @@ Supervisor (every 15s) → deep /health on each service
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| langgraph | 8030 | Agentic brain, all reasoning |
+| agentic | 8030 | Agentic brain, all reasoning |
 | executor | 8040 | Sandboxed execution |
 | fusion-engine | 8070 | Multi-signal consensus |
 | orchestrator | 8080 | Final risk authority |
@@ -276,8 +276,8 @@ Supervisor (every 15s) → deep /health on each service
 | Area | Issue | Fix |
 |---|---|---|
 | memu-core | 13+ race conditions (global state, no asyncio.Lock) | H1 |
-| langgraph /chat | No prompt injection check | H1 |
-| langgraph 10-way fetch | No error handling on parallel gather | H1 |
+| agentic /chat | No prompt injection check | H1 |
+| agentic 10-way fetch | No error handling on parallel gather | H1 |
 | memu-core feedback | Called non-existent store.memorize() | H1 |
 | executor | shell=True allows command chaining | H1 |
 | telegram-bot | Voice file download with no size limit | H1 |
@@ -345,7 +345,7 @@ H3  Context Budget          ██████████ DONE
 | Priority | Feature | Status |
 |---|---|---|
 | **J1** | Live Canvas Visualization | **DONE** — mind-map/graph in dashboard |
-| **J2** | Wake-word "Kai" + Intent Judge | **DONE** — wake-service `/wake/*`, cooldown/debounce, dashboard proxy + optional langgraph pre-routing |
+| **J2** | Wake-word "Kai" + Intent Judge | **DONE** — wake-service `/wake/*`, cooldown/debounce, dashboard proxy + optional agentic pre-routing |
 | **J3** | Auto-Redaction PII | **DONE** — regex strip before processing |
 | **J4** | Proactive Low-Latency Voice | **DONE** — audio/video cue → speak-or-not |
 | **J5** | Memory Viewer GUI | **DONE** — diary-style dashboard tab |
@@ -375,7 +375,7 @@ executor/            # Sandboxed execution bridge
 dashboard/           # 10-view operator console (FastAPI + Starlette)
 memu-core/           # Memory engine — the soul (~6,100 lines)
 tool-gate/           # HMAC auth, rate limit, policy enforcement
-langgraph/           # Agentic brain (router, planner, adversary, conviction, config)
+agentic/           # Agentic brain (router, planner, adversary, conviction, config)
 kai-advisor/         # Self-employment advisor (offline, UK-focused)
 telegram-bot/        # Telegram bot (voice + text pipeline)
 heartbeat/           # System pulse and auto-sleep
@@ -464,7 +464,7 @@ make merge-gate    # Full pre-merge
 make test-phase-b-memu        make test-memu-pg             make test-dashboard-ui
 make test-dashboard            make test-thinking-pathways   make test-tool-gate
 make test-tool-gate-security   make test-telegram            make test-audio
-make test-camera               make test-executor            make test-langgraph
+make test-camera               make test-executor            make test-agentic-service
 make test-kai-advisor          make test-tts                 make test-avatar
 make test-heartbeat            make test-conviction          make test-self-emp
 make test-auth-hmac            make test-agentic

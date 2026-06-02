@@ -13,7 +13,7 @@ common/policy.py        @dainius1234
 security/               @dainius1234
 
 # Orchestration layer
-langgraph/              @dainius1234
+agentic/                @dainius1234
 orchestrator/           @dainius1234
 supervisor/             @dainius1234
 

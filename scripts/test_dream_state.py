@@ -4,7 +4,7 @@ import os
 import tempfile
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "langgraph"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
 
 from kai_config import (
     DreamCycle,
@@ -222,7 +222,7 @@ class TestRunDreamCycle(unittest.TestCase):
 
 class TestPersistence(unittest.TestCase):
     def test_save_and_load(self):
-        import langgraph.kai_config as kc
+        import agentic.kai_config as kc
         original = kc.DREAM_INSIGHT_PATH
         try:
             with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:

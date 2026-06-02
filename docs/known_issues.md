@@ -5,7 +5,7 @@
 ## Environment Quirks
 
 ### `test-agentic` fails in Codespace
-The `test-agentic` target requires `langgraph`, `autogen`, and `crewai` pip
+The `test-agentic` target requires `langgraph` (PyPI), `autogen`, and `crewai` pip
 packages which are only installed inside Docker.  
 **Workaround:** Use `make -k test-core` to skip failures and run all other targets.
 
@@ -103,8 +103,8 @@ can be recovered.
 | File | Lines | Notes |
 |---|---|---|
 | memu-core/app.py | ~6,100 | Memory engine — largest single file |
-| langgraph/kai_config.py | ~1,500 | Brain config, checkpoint engine, agent-evolver |
-| langgraph/app.py | ~1,500 | All LangGraph endpoints |
+| agentic/kai_config.py | ~1,500 | Brain config, checkpoint engine, agent-evolver |
+| agentic/app.py | ~1,500 | All LangGraph endpoints |
 | dashboard/app.py | ~1,200 | Dashboard proxy + static serving |
 | supervisor/app.py | ~800 | Watchdog + recovery |
 

@@ -336,23 +336,23 @@ class TestJ6SoulAndAgents(unittest.TestCase):
 
 
 class TestJ6LanggraphEndpoints(unittest.TestCase):
-    """J6: SOUL/AGENTS endpoints in langgraph."""
+    """J6: SOUL/AGENTS endpoints in agentic."""
 
     @classmethod
     def setUpClass(cls):
-        # langgraph/app.py uses local imports like kai_config
-        langgraph_dir = os.path.join(os.path.dirname(__file__), "..", "langgraph")
-        if langgraph_dir not in sys.path:
-            sys.path.insert(0, langgraph_dir)
+        # agentic/app.py uses local imports like kai_config
+        agentic_dir = os.path.join(os.path.dirname(__file__), "..", "agentic")
+        if agentic_dir not in sys.path:
+            sys.path.insert(0, agentic_dir)
 
     def test_soul_endpoint_exists(self):
-        os.environ.setdefault("LOG_PATH", "/tmp/test-langgraph.json.log")
-        from langgraph.app import app
+        os.environ.setdefault("LOG_PATH", "/tmp/test-agentic.json.log")
+        from agentic.app import app
         routes = [r.path for r in app.routes]
         self.assertIn("/soul", routes)
 
     def test_agents_registry_endpoint_exists(self):
-        from langgraph.app import app
+        from agentic.app import app
         routes = [r.path for r in app.routes]
         self.assertIn("/agents-registry", routes)
 
@@ -362,13 +362,13 @@ class TestJ6SoulLoader(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        langgraph_dir = os.path.join(os.path.dirname(__file__), "..", "langgraph")
-        if langgraph_dir not in sys.path:
-            sys.path.insert(0, langgraph_dir)
+        agentic_dir = os.path.join(os.path.dirname(__file__), "..", "agentic")
+        if agentic_dir not in sys.path:
+            sys.path.insert(0, agentic_dir)
 
     def test_load_soul_returns_content(self):
-        os.environ.setdefault("LOG_PATH", "/tmp/test-langgraph.json.log")
-        from langgraph.app import _load_soul, _soul_text
+        os.environ.setdefault("LOG_PATH", "/tmp/test-agentic.json.log")
+        from agentic.app import _load_soul, _soul_text
         result = _load_soul()
         # Should find data/SOUL.md (we're running from repo root via PYTHONPATH=.)
         self.assertTrue(len(result) > 0 or len(_soul_text) > 0)
@@ -383,7 +383,7 @@ class TestJ7SkillLoader(unittest.TestCase):
     """J7: Skill file parser and loader."""
 
     def test_parse_skill_file(self):
-        from langgraph.router import _parse_skill_file
+        from agentic.router import _parse_skill_file
         with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(
                 "# Skill: Test Skill\n\n"
@@ -406,7 +406,7 @@ class TestJ7SkillLoader(unittest.TestCase):
         self.assertIn("POST /test/endpoint", skill.action)
 
     def test_parse_skill_file_no_triggers_returns_none(self):
-        from langgraph.router import _parse_skill_file
+        from agentic.router import _parse_skill_file
         with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write("# Skill: Empty\n\n## Action\nNothing\n")
             f.flush()
@@ -415,7 +415,7 @@ class TestJ7SkillLoader(unittest.TestCase):
         self.assertIsNone(skill)
 
     def test_match_skill(self):
-        from langgraph.router import _parse_skill_file, _loaded_skills, match_skill
+        from agentic.router import _parse_skill_file, _loaded_skills, match_skill
         with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(
                 "# Skill: Greeter\n\n"
@@ -440,7 +440,7 @@ class TestJ7SkillLoader(unittest.TestCase):
         self.assertIsNone(no_match)
 
     def test_load_skills_finds_sample_skills(self):
-        from langgraph.router import load_skills
+        from agentic.router import load_skills
         skills = load_skills()
         # Should find daily_brief.md and invoice.md in data/skills/
         names = [s.name for s in skills]
@@ -448,7 +448,7 @@ class TestJ7SkillLoader(unittest.TestCase):
         self.assertIn("Invoice Generator", names)
 
     def test_list_skills_returns_dicts(self):
-        from langgraph.router import load_skills, list_skills
+        from agentic.router import load_skills, list_skills
         load_skills()
         result = list_skills()
         self.assertIsInstance(result, list)
@@ -462,23 +462,23 @@ class TestJ7Endpoints(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        langgraph_dir = os.path.join(os.path.dirname(__file__), "..", "langgraph")
-        if langgraph_dir not in sys.path:
-            sys.path.insert(0, langgraph_dir)
+        agentic_dir = os.path.join(os.path.dirname(__file__), "..", "agentic")
+        if agentic_dir not in sys.path:
+            sys.path.insert(0, agentic_dir)
 
     def test_skills_endpoint_exists(self):
-        os.environ.setdefault("LOG_PATH", "/tmp/test-langgraph.json.log")
-        from langgraph.app import app
+        os.environ.setdefault("LOG_PATH", "/tmp/test-agentic.json.log")
+        from agentic.app import app
         routes = [r.path for r in app.routes]
         self.assertIn("/skills", routes)
 
     def test_skills_reload_endpoint_exists(self):
-        from langgraph.app import app
+        from agentic.app import app
         routes = [r.path for r in app.routes]
         self.assertIn("/skills/reload", routes)
 
     def test_skills_match_endpoint_exists(self):
-        from langgraph.app import app
+        from agentic.app import app
         routes = [r.path for r in app.routes]
         self.assertIn("/skills/match", routes)
 

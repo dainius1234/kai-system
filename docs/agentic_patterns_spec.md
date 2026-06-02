@@ -81,7 +81,7 @@ User request → classify(input) → Route
 
 ### Implementation
 
-New module: `langgraph/router.py`
+New module: `agentic/router.py`
 
 ```python
 class RouteDecision:
@@ -139,7 +139,7 @@ User request
 
 ### Implementation
 
-New module: `langgraph/planner.py`
+New module: `agentic/planner.py`
 
 ```python
 class PlanContext:
@@ -243,7 +243,7 @@ real-world side effects are at stake.
 ## File Layout
 
 ```
-langgraph/
+agentic/
 ├── app.py            # existing — add router dispatch to /chat
 ├── kai_config.py     # existing — episode saver
 ├── conviction.py     # existing — conviction scoring (add history modifiers)
@@ -274,8 +274,8 @@ langgraph/
 - [x] Designed Router (8 routes, rule-based, zero-LLM for 5 of 8)
 - [x] Designed Memory-Driven Planner (history lookup, conviction modifiers)
 - [x] Designed Proposer-Adversary (LangGraph graph, deferred to Phase 2c)
-- [x] Build `langgraph/router.py` — classify() + 5 dispatch functions
-- [x] Build `langgraph/planner.py` — gather_context() + build_enriched_plan()
+- [x] Build `agentic/router.py` — classify() + 5 dispatch functions
+- [x] Build `agentic/planner.py` — gather_context() + build_enriched_plan()
 - [x] Wire router into `/chat` endpoint (Step 0: classify, Step 1: zero-LLM dispatch)
 - [x] Wire planner into `/run` endpoint (history lookup → enriched plan → conviction modifier)
 - [x] Write tests — 27 router tests + 4 planner test groups, all pass
@@ -300,4 +300,4 @@ If picking up from here, check:
 3. Read this doc for technical spec
 4. Read `docs/unfair_advantages.md` for strategic context — Kai's competitive edge analysis
 5. Phases 2a+2b+2c all complete. Next: Phase 3 (dashboard, calibration UI, token tracking)
-6. All agentic modules: router.py, planner.py, adversary.py, conviction.py, kai_config.py in langgraph/
+6. All agentic modules: router.py, planner.py, adversary.py, conviction.py, kai_config.py in agentic/

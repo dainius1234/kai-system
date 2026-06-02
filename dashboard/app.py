@@ -122,9 +122,9 @@ NODES: Dict[str, str] = {
     "ledger-worker": os.getenv("LEDGER_WORKER_URL", "http://ledger-worker:8056") + "/health",
     "metrics-gateway": os.getenv("METRICS_GATEWAY_URL", "http://metrics-gateway:8058") + "/health",
 }
-_langgraph_url = os.getenv("LANGGRAPH_URL", "")
-if _langgraph_url:
-    NODES["langgraph"] = _langgraph_url + "/health"
+_agentic_url = os.getenv("LANGGRAPH_URL", "")
+if _agentic_url:
+    NODES["agentic"] = _agentic_url + "/health"
 _executor_url = os.getenv("EXECUTOR_URL", "")
 if _executor_url:
     NODES["executor"] = _executor_url + "/health"
@@ -373,12 +373,12 @@ async def thinking_page() -> HTMLResponse:
 
 @app.get("/api/thinking")
 async def api_thinking():
-    """Fetch latest episode data from langgraph for thinking pathway visualization."""
-    langgraph_url = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
+    """Fetch latest episode data from agentic for thinking pathway visualization."""
+    agentic_url = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             resp = await client.post(
-                f"{langgraph_url}/episodes/recall",
+                f"{agentic_url}/episodes/recall",
                 json={"user_id": "keeper", "days": 7},
             )
             resp.raise_for_status()
@@ -458,15 +458,15 @@ async def api_self_assessment():
 
 @app.post("/api/dream")
 async def api_dream():
-    """Trigger a dream consolidation cycle via langgraph."""
-    langgraph_url = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
+    """Trigger a dream consolidation cycle via agentic."""
+    agentic_url = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(f"{langgraph_url}/dream")
+            resp = await client.post(f"{agentic_url}/dream")
             resp.raise_for_status()
             return resp.json()
     except Exception:
-        return {"status": "unavailable", "message": "Cannot reach langgraph for dream cycle"}
+        return {"status": "unavailable", "message": "Cannot reach agentic for dream cycle"}
 
 
 @app.get("/api/ledger-stats")
@@ -553,11 +553,11 @@ async def sse_events(request: Request):
 
 @app.get("/api/security-audit")
 async def api_security_audit():
-    """Proxy security self-hacking audit from langgraph."""
-    langgraph_url = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
+    """Proxy security self-hacking audit from agentic."""
+    agentic_url = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
-            resp = await client.get(f"{langgraph_url}/security/audit")
+            resp = await client.get(f"{agentic_url}/security/audit")
             resp.raise_for_status()
             return resp.json()
     except Exception:
@@ -702,11 +702,11 @@ async def api_logs(limit: int = 100, level: str = "", since: float = 0):
     except Exception:
         pass
 
-    # Collect from langgraph
-    langgraph_url = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
+    # Collect from agentic
+    agentic_url = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.get(f"{langgraph_url}/logs", params=params)
+            resp = await client.get(f"{agentic_url}/logs", params=params)
             if resp.status_code == 200:
                 data = resp.json()
                 all_logs.extend(data.get("entries", []))
@@ -1078,7 +1078,7 @@ async def app_shell() -> HTMLResponse:
 
 
 # ── Chat proxy — Kai's face ─────────────────────────────────────────
-LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://langgraph:8007")
+LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
 
 
 @app.get("/chat")
@@ -1089,10 +1089,10 @@ async def chat_page() -> HTMLResponse:
 
 @app.post("/api/chat")
 async def api_chat_proxy(request: Request):
-    """Proxy chat requests to langgraph /chat with SSE streaming.
+    """Proxy chat requests to agentic /chat with SSE streaming.
 
     This keeps the browser talking only to dashboard:8080.
-    The langgraph service does the actual LLM inference.
+    The agentic service does the actual LLM inference.
     """
     body = await request.json()
 
