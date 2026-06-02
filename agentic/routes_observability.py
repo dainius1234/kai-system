@@ -44,7 +44,7 @@ def build_router(
 
     @router.get("/logs")
     async def get_logs(limit: int = 100, level: str = "", since: float = 0) -> Dict[str, Any]:
-        """Query recent log entries from langgraph."""
+        """Query recent log entries from the agentic service."""
         return query_logs(log_buffer, level=level, limit=limit, since=since)
 
     return router
