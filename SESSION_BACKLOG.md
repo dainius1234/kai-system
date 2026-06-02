@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-06-02 (00:15 UTC) — CI Failure Triage (no new bugs)
+
+Pulled latest failing runs (Core Tests, Python application). All 14 failures map to known cleanup items:
+
+- 12 × `scripts/test_tempo.py` failures → orphan tests, being deleted by Week 1 housekeeping agent (CLEANUP_TODO §1.5/§1.6)
+- 1 × `test_correction_memory_gets_boost` (`AssertionError: 1 != 0`) → tracked as Week 1 §1.3, sequenced after §1.2
+- 1 × `make test-conviction` FileNotFoundError on `langgraph/conviction.py` → resolves with keystone rename (§1.4)
+
+Decision: NO new agent dispatched. All failures are already on in-flight agent kill lists; a parallel fix would cause merge conflicts.
+
+Baseline: 1,608 passed / 5 skipped. Green core healthy. Reds are paper cuts.
+
+Next: after housekeeping + keystone PRs merge, only §1.3 should remain red — dispatch focused agent then.
+
+---
+
 ## 2026-06-01 (evening) — Cleanup Sprint Kickoff + Agent Fleet Dispatched
 
 **Context.** Audit earlier today revealed three hot spots blocking healthy progress:
