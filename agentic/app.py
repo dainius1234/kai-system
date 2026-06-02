@@ -533,6 +533,8 @@ _DEFAULT_SPECIALIST = os.getenv("DEFAULT_SPECIALIST", "Ollama")
 _OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama:11434")
 
 # ── J6: SOUL.md — persistent identity override ──────────────────────
+# Temporary compatibility shim for legacy imports that still read
+# `_soul_text` / `_agents_text` from `agentic.app` instead of `prompts`.
 def __getattr__(name: str) -> Any:
     if name in {"_soul_text", "_agents_text"}:
         return getattr(prompt_catalog, name)
