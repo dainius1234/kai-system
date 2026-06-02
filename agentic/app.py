@@ -21,9 +21,7 @@ from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudget
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, run_dream_cycle, analyze_failures, load_evolver_reports, create_checkpoint, list_checkpoints, load_checkpoint, diff_checkpoints, delete_checkpoint
 from conviction import build_plan, detect_self_deception, low_conviction_feedback, score_conviction
-from router import (RouteDecision, classify, dispatch_route, load_skills, list_skills,
-                     match_skill, unload_skill, prune_stale_skills,
-                     scan_skill_md)
+from router import RouteDecision, classify, dispatch_route
 from planner import gather_context, build_enriched_plan, predict_next_request, pre_fetch_predicted_context
 from adversary import challenge_plan, verdict_to_plan_metadata
 from security_audit import run_security_audit
@@ -32,20 +30,14 @@ from priority_queue import get_queue
 from model_selector import select_model
 import prompts as prompt_catalog
 from prompts import (
-    AGENTS_PATH,
     INJECTION_RE,
-    SOUL_PATH,
-    _KAI_CORE_IDENTITY,
     _SYSTEM_PROMPTS,
-    _load_agents,
-    _load_soul,
 )
 from routes_identity import router as identity_router
 from routes_observability import build_router as build_observability_router
 from routes_ops import (
     build_health_payload,
     checkpoint_pre_recover,
-    get_metrics_payload,
     install_log_capture,
     reset_breakers,
 )
@@ -54,6 +46,13 @@ from routes_skills import router as skills_router
 logger = setup_json_logger("langgraph", os.getenv("LOG_PATH", "/tmp/langgraph.json.log"))
 DEVICE = detect_device()
 logger.info("Running on %s.", DEVICE)
+
+AGENTS_PATH = prompt_catalog.AGENTS_PATH
+SOUL_PATH = prompt_catalog.SOUL_PATH
+_KAI_CORE_IDENTITY = prompt_catalog._KAI_CORE_IDENTITY
+_SYSTEM_PROMPTS = prompt_catalog._SYSTEM_PROMPTS
+_load_agents = prompt_catalog._load_agents
+_load_soul = prompt_catalog._load_soul
 
 app = FastAPI(title="LangGraph Orchestrator", version="0.5.0")
 app.include_router(identity_router)
