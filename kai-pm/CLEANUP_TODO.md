@@ -31,24 +31,26 @@
 
 ## Week 2 — Untangle the Giant
 
-### 2.1 Split `agentic/app.py` (was `agentic/app.py`)
-- [ ] Map responsibilities → `kai-pm/AGENTIC_APP_MAP.md`.
+### 2.1 Split `agentic/app.py`
+- [~] Map responsibilities → `kai-pm/AGENTIC_APP_MAP.md` (agent dispatched 2026-06-01, not yet landed).
 - [ ] Split into routes / state / flows / providers / prompts. One PR per split.
+- [ ] First split target: `prompts/` (pure data, no behavior — lowest risk leaf).
 
 ### 2.2 Reconcile docker-compose files
-- [ ] Diff minimal vs sovereign vs full → `kai-pm/COMPOSE_DRIFT.md`.
+- [~] Diff minimal vs sovereign vs full → `kai-pm/COMPOSE_DRIFT.md` (agent dispatched 2026-06-01, not yet landed).
 - [ ] Extract shared config to base.
 
 ### 2.3 Prune Makefile 100 → ~25 targets
-- [ ] Audit. Archive dead targets to `Makefile.archive`.
-- [ ] Update `merge-gate` to run the full live list.
+- [x] Audit landed → [`MAKEFILE_AUDIT.md`](MAKEFILE_AUDIT.md) (2026-06-02).
+- [ ] Archive dead targets to `Makefile.archive` per audit.
+- [ ] Update `merge-gate` to run the full live list per audit's "honest merge-gate" proposal.
 
 ---
 
 ## Week 3 — Honest Verification
 
 - [ ] Run every surviving Makefile target. Categorise.
-- [ ] Repo-wide coverage gate (currently only `common/`).
+- [ ] Repo-wide coverage gate (currently only `common/` at 78%).
 - [ ] `merge-gate` honesty.
 
 ---
@@ -70,6 +72,8 @@
 | 2026-06-01 | Rename langgraph → agentic | Self-inflicted PyPI shadowing |
 | 2026-06-01 | langgraph → agentic rename merged | Unblocks Week 2 app.py split |
 | 2026-06-01 | Delete tempo tests | Test attributes don't exist; orphans, not bugs |
+| 2026-06-02 | MAKEFILE_AUDIT landed | Week 2.3 design spec ready; archival + merge-gate work unblocked |
+| 2026-06-02 | First Week 2.1 split = `prompts/` | Pure data leaf, lowest risk, sets pattern for harder splits |
 
 ---
 
@@ -77,4 +81,8 @@
 
 | Dispatched | Scope | Status |
 |---|---|---|
-| 2026-06-01 | Week 1: close #59 + #60, label other PRs, delete tempo tests | running |
+| 2026-06-01 | Week 1 housekeeping (close #59 + #60, label PRs, delete tempo tests) | running |
+| 2026-06-01 | Week 1.4 KEYSTONE — `langgraph/` → `agentic/` rename | ✅ merged |
+| 2026-06-01 | Week 2.1 prep — `AGENTIC_APP_MAP.md` | running (not landed) |
+| 2026-06-01 | Week 2.2 prep — `COMPOSE_DRIFT.md` | running (not landed) |
+| 2026-06-01 | Week 2.3 prep — `MAKEFILE_AUDIT.md` | ✅ merged 2026-06-02 |
