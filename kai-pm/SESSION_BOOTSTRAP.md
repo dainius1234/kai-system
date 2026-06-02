@@ -13,29 +13,31 @@ Kai is a self-sovereign, local-first personal AI system built as cooperating ser
 
 ## 2) Current phase + current focus
 - **Current phase:** Phase 0 — Pre-GPU Hardening
-- **Current sprint (2026-06-01):** **Cleanup Sprint Week 1** — see `kai-pm/CLEANUP_TODO.md`
-- **Why we paused features:** Audit on 2026-06-01 revealed 3 hot spots — `langgraph/` shadows the PyPI package, `langgraph/app.py` is 80 KB of mixed concerns, and ~100 Makefile targets with no honesty gate. Foundation must stabilise before we resume J-series / P-series work.
+- **Current sprint (last refreshed 2026-06-02):** **Cleanup Sprint — Week 1 closing, Week 2 opening** — see `kai-pm/CLEANUP_TODO.md`
+- **Why we paused features:** Audit on 2026-06-01 revealed 3 hot spots — `langgraph/` shadowed the PyPI package (now renamed ✅), `agentic/app.py` is 80 KB of mixed concerns, and ~100 Makefile targets with no honesty gate. Foundation must stabilise before we resume J-series / P-series work.
 
-## 3) In-flight cloud agent sessions (dispatched 2026-06-01)
-Track these PRs — they are the active work right now:
+## 3) Sprint state (refreshed 2026-06-02)
+
+**✅ Merged to main:**
+- Week 1.4 KEYSTONE — `langgraph/` → `agentic/` rename
+- Week 2.3 prep doc — `kai-pm/MAKEFILE_AUDIT.md`
+
+**🟡 In flight / pending:**
 
 | # | Task | Type | Status |
 |---|---|---|---|
-| 1 | **KEYSTONE: rename `langgraph/` → `agentic/`** | code change | dispatched |
-| 2 | Map `agentic/app.py` responsibilities → `kai-pm/AGENTIC_APP_MAP.md` | docs only | dispatched |
-| 3 | Diff compose files → `kai-pm/COMPOSE_DRIFT.md` | docs only | dispatched |
-| 4 | Audit ~100 Makefile targets → `kai-pm/MAKEFILE_AUDIT.md` | docs only | dispatched |
-
-Plus the original Week 1 housekeeping agent (close #59 + #60, label PRs, delete tempo tests).
+| 1 | Week 1 housekeeping (close #59 + #60, label PRs, delete tempo tests) | code | dispatched |
+| 2 | Week 2.1 prep — `AGENTIC_APP_MAP.md` | docs | dispatched, not landed |
+| 3 | Week 2.2 prep — `COMPOSE_DRIFT.md` | docs | dispatched, not landed |
 
 **Where to check:** https://github.com/dainius1234/kai-system/pulls
 
 ## 4) The cleanup roadmap (4 weeks)
 Live tracker: [`CLEANUP_TODO.md`](CLEANUP_TODO.md). Summary:
 
-- **Week 1 — Stop the Bleeding** *(in progress)*: PR housekeeping, delete orphan tempo tests, **rename `langgraph/` → `agentic/`** ⭐.
-- **Week 2 — Untangle the Giant**: split `agentic/app.py` (one PR per slice: routes / state / flows / providers / prompts), reconcile docker-compose, prune Makefile.
-- **Week 3 — Honest Verification**: repo-wide coverage gate, honest `merge-gate`.
+- **Week 1 — Stop the Bleeding** *(closing)*: PR housekeeping in flight; tempo tests being deleted; **keystone rename ✅ merged**.
+- **Week 2 — Untangle the Giant** *(opening)*: split `agentic/app.py` (one PR per slice: routes / state / flows / providers / prompts), reconcile docker-compose, prune Makefile per `MAKEFILE_AUDIT.md`.
+- **Week 3 — Honest Verification**: repo-wide coverage gate (currently 78% on `common/` only), honest `merge-gate`.
 - **Week 4 — Resume Features** (only if 1–3 done): multi-backend LLM router, skills templates, journal templates, CIS P29.
 
 ## 5) Blocked items + unlock conditions
@@ -43,10 +45,10 @@ Live tracker: [`CLEANUP_TODO.md`](CLEANUP_TODO.md). Summary:
 - **Feature PRs** — paused until cleanup Weeks 1–3 are done.
 - **PR #46** (GPU Phase 0 consolidation, draft since 2026-04-21) — needs land-or-close decision.
 
-## 6) Next 3 actions in priority order (as of 2026-06-01)
-1. **Land the keystone rename PR** (`langgraph/` → `agentic/`). This unblocks all of Week 2.
-2. **Review the 3 prep docs** (AGENTIC_APP_MAP, COMPOSE_DRIFT, MAKEFILE_AUDIT) when they land.
-3. **Dispatch first Week 2.1 split PR** — smallest leaf split from AGENTIC_APP_MAP (probably `prompts/` extraction — pure data, no behavior).
+## 6) Next 3 actions in priority order (as of 2026-06-02)
+1. **Review + merge `AGENTIC_APP_MAP.md` and `COMPOSE_DRIFT.md`** when their PRs land. These are the design specs for Week 2.
+2. **Dispatch first Week 2.1 split PR** — smallest leaf from AGENTIC_APP_MAP (probably `prompts/` extraction — pure data, no behavior). Sets the pattern for routes / state / flows / providers.
+3. **Land-or-close PR #46** — stale draft from 2026-04-21 must be resolved.
 
 ## 7) PM operating rules (commitments)
 - **Document everything in the repo.** Chat sessions are ephemeral; the repo is forever.
@@ -70,6 +72,7 @@ If the chat resets or you (Dainius) come back tomorrow:
 - Phase sequence: [SEQUENCE.md](SEQUENCE.md)
 - Append-only decisions: [DECISIONS.md](DECISIONS.md)
 - Canonical roadmap: [STRATEGIC_PLAN.md](STRATEGIC_PLAN.md)
+- Makefile audit (Week 2.3 input): [MAKEFILE_AUDIT.md](MAKEFILE_AUDIT.md)
 - Latest reality check: [REALITY_CHECK_2026-05-10.md](REALITY_CHECK_2026-05-10.md)
 - Session backlog (running log): [../SESSION_BACKLOG.md](../SESSION_BACKLOG.md)
 - Repo health audit: [REPO_HEALTH_AUDIT_2026-05-10.md](REPO_HEALTH_AUDIT_2026-05-10.md)
