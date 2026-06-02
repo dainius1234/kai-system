@@ -92,9 +92,10 @@ def get_models_payload(
 
 
 class LogCapture(logging.Handler):
-    def __init__(self, log_buffer: Deque[Dict[str, Any]]) -> None:
+    def __init__(self, log_buffer: Deque[Dict[str, Any]], service_name: str) -> None:
         super().__init__()
         self._log_buffer = log_buffer
+        self._service_name = service_name
 
     def emit(self, record: logging.LogRecord) -> None:
         try:
@@ -102,7 +103,7 @@ class LogCapture(logging.Handler):
                 {
                     "time": record.created,
                     "level": record.levelname,
-                    "service": "langgraph",
+                    "service": self._service_name,
                     "msg": record.getMessage()[:500],
                 }
             )
@@ -110,9 +111,9 @@ class LogCapture(logging.Handler):
             pass
 
 
-def install_log_capture() -> tuple[Deque[Dict[str, Any]], LogCapture]:
+def install_log_capture(service_name: str = "langgraph") -> tuple[Deque[Dict[str, Any]], LogCapture]:
     log_buffer: Deque[Dict[str, Any]] = deque(maxlen=500)
-    log_capture = LogCapture(log_buffer)
+    log_capture = LogCapture(log_buffer, service_name)
     log_capture.setLevel(logging.INFO)
     logging.getLogger().addHandler(log_capture)
     return log_buffer, log_capture

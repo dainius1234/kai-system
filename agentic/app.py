@@ -1711,7 +1711,7 @@ _restore_breakers()
 
 # ── P16b: Log aggregation ───────────────────────────────────────────
 
-_log_buffer, _log_capture = install_log_capture()
+_log_buffer, _log_capture = install_log_capture(service_name="langgraph")
 
 
 @app.get("/logs")
