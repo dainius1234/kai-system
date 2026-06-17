@@ -1388,7 +1388,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
                         json={
                             "tool": request.task_hint,
                             "params": {"plan": plan},
-                            "confidence": min(max(conviction / 10.0, 0.0), 1.0),
+                            "conviction": min(max(conviction, 0.0), 10.0),
                             "actor_did": "langgraph",
                             "session_id": request.session_id,
                             "device": request.device,

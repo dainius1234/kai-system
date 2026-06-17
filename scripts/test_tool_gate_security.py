@@ -35,7 +35,7 @@ req = mod.GateRequest(
     tool="executor",
     actor_did="langgraph",
     session_id="bootstrap-token-1",
-    confidence=0.9,
+    conviction=9.0,
     nonce="n1",
     ts=now,
     signature=sign_gate_request(actor_did="langgraph", session_id="bootstrap-token-1", tool="executor", nonce="n1", ts=now),

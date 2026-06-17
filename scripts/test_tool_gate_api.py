@@ -40,6 +40,10 @@ mod.SEEN_NONCES.clear()
 mod.ledger = mod.PersistentLedger(Path(_TMPDIR) / "test-ledger.jsonl")
 mod.policy = mod.GatePolicy()
 mod.policy.mode = "WORK"
+# force WORK as the *effective* mode for these tests, same mechanism a real
+# manual /gate/mode override uses — otherwise _effective_mode() falls back
+# to the time-of-day schedule and tests become time-dependent.
+mod._mode_override_until[0] = time.time() + 3600 * 4
 mod.policy.allowed_tools.add("executor")
 
 client = TestClient(mod.app)
@@ -47,14 +51,14 @@ client = TestClient(mod.app)
 
 # ── helpers ──────────────────────────────────────────────────────────────
 
-def make_request(confidence: float, cosign: bool = False):
+def make_request(conviction: float, cosign: bool = False):
     now = time.time()
     nonce = f"n{now}"
     return {
         "tool": "executor",
         "actor_did": "langgraph",
         "session_id": AUTH_TOKEN,
-        "confidence": confidence,
+        "conviction": conviction,
         "nonce": nonce,
         "ts": now,
         "signature": sign_gate_request(
@@ -79,8 +83,8 @@ def test_health():
 
 
 def test_gate_pending_cosign_very_low():
-    """Very low confidence (< COSIGN_CONFIDENCE_THRESHOLD) parks for co-sign."""
-    resp = client.post("/gate/request", json=make_request(0.1))
+    """Very low conviction (< COSIGN_CONVICTION_THRESHOLD) parks for co-sign."""
+    resp = client.post("/gate/request", json=make_request(1.0))
     assert resp.status_code == 200
     data = resp.json()
     assert data["approved"] is False
@@ -88,16 +92,16 @@ def test_gate_pending_cosign_very_low():
 
 
 def test_gate_block_low_confidence():
-    """Mid-range confidence (above cosign threshold but below required) is blocked."""
-    resp = client.post("/gate/request", json=make_request(0.6))
+    """Mid-range conviction (above cosign threshold but below required) is blocked."""
+    resp = client.post("/gate/request", json=make_request(6.0))
     assert resp.status_code == 200
     data = resp.json()
     assert data["approved"] is False
-    assert data["reason_code"] == "LOW_CONFIDENCE"
+    assert data["reason_code"] == "LOW_CONVICTION"
 
 
 def test_gate_approve_confidence():
-    resp = client.post("/gate/request", json=make_request(0.9))
+    resp = client.post("/gate/request", json=make_request(9.0))
     assert resp.status_code == 200
     data = resp.json()
     assert data["approved"] is True
@@ -105,7 +109,7 @@ def test_gate_approve_confidence():
 
 
 def test_gate_cosign_overrides():
-    resp = client.post("/gate/request", json=make_request(0.1, cosign=True))
+    resp = client.post("/gate/request", json=make_request(1.0, cosign=True))
     assert resp.status_code == 200
     data = resp.json()
     assert data["approved"] is True

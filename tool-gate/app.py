@@ -35,17 +35,56 @@ audit = AuditStream("tool-gate", required=os.getenv("AUDIT_REQUIRED", "false").l
 
 # ── co-sign configuration ──────────────────────────────────────────
 # Tools listed here ALWAYS require human approval before execution,
-# regardless of confidence score.  Comma-separated in env var.
+# regardless of conviction score.  Comma-separated in env var.
 COSIGN_REQUIRED_TOOLS: Set[str] = set(
     t.strip() for t in os.getenv("COSIGN_REQUIRED_TOOLS", "shell").split(",") if t.strip()
 )
-# Requests below this confidence threshold also require co-sign, even
-# if the tool is not in the required list.
-COSIGN_CONFIDENCE_THRESHOLD = float(os.getenv("COSIGN_CONFIDENCE_THRESHOLD", "0.5"))
+# Requests below this conviction threshold (0-10 scale, matching agentic's
+# conviction scorer) also require co-sign, even if the tool is not in the
+# required list.
+COSIGN_CONVICTION_THRESHOLD = float(os.getenv("COSIGN_CONVICTION_THRESHOLD", "5.0"))
 # Maximum seconds a pending co-sign request is kept before expiring.
 COSIGN_TTL_SECONDS = int(os.getenv("COSIGN_TTL_SECONDS", "600"))
 # Notification endpoint for co-sign requests (air-gapped local gateway).
 NOTIFY_URL = os.getenv("NOTIFY_URL", "")
+
+# ── irreversible-action taxonomy ───────────────────────────────────
+# Destructive / financial / public actions require a higher conviction
+# floor AND explicit operator confirmation (cosign), no matter how the
+# request otherwise scores. Configurable without a redeploy via env JSON,
+# e.g. IRREVERSIBLE_TOOLS_JSON='{"destructive": ["shell"], "financial": [],
+# "public": []}'. Category is derived from the tool name server-side —
+# a caller cannot self-declare a lower-risk category.
+_IRREVERSIBLE_RAW = json.loads(os.getenv("IRREVERSIBLE_TOOLS_JSON", "{}")) or {
+    "destructive": ["shell"],
+    "financial": [],
+    "public": [],
+}
+IRREVERSIBLE_CATEGORIES: Dict[str, Set[str]] = {
+    category: set(tools) for category, tools in _IRREVERSIBLE_RAW.items()
+}
+IRREVERSIBLE_MIN_CONVICTION = float(os.getenv("IRREVERSIBLE_MIN_CONVICTION", "9.0"))
+
+
+def _classify_irreversibility(tool: str) -> Optional[str]:
+    """Return the irreversible category a tool belongs to, or None."""
+    for category, tools in IRREVERSIBLE_CATEGORIES.items():
+        if tool in tools:
+            return category
+    return None
+
+
+# ── mode-aware conviction requirement ───────────────────────────────
+# PUB mode doesn't get a separate hardcoded gate — it raises the bar on
+# the SAME real gate. Tuned so in practice almost nothing clears it while
+# off-duty, without it being a second, disconnected rule.
+_PUB_CONVICTION_OFFSET = float(os.getenv("PUB_CONVICTION_OFFSET", "2.5"))
+_WORK_CONVICTION_OFFSET = float(os.getenv("WORK_CONVICTION_OFFSET", "0.0"))
+
+
+def _mode_conviction_offset(mode: str) -> float:
+    """Extra conviction a mode demands on top of the base requirement."""
+    return {"PUB": _PUB_CONVICTION_OFFSET, "WORK": _WORK_CONVICTION_OFFSET}.get(mode, 0.0)
 
 # pending co-sign requests waiting for operator approval
 _pending_cosign: Dict[str, Dict[str, Any]] = {}
@@ -116,7 +155,9 @@ def _send_notification(message: str) -> None:
 class GateRequest(BaseModel):
     tool: str
     params: Dict[str, Any] = Field(default_factory=dict)
-    confidence: float = Field(ge=0.0, le=1.0)
+    # 0-10 scale — the SAME number agentic's conviction scorer produces.
+    # There is exactly one trust scale in the system; this is it.
+    conviction: float = Field(ge=0.0, le=10.0)
     actor_did: str
     session_id: str
     cosign: bool = False
@@ -397,23 +438,62 @@ def _is_tool_allowed(token: str, tool: str) -> bool:
 class GatePolicy:
     def __init__(self) -> None:
         self.mode = os.getenv("MODE", "PUB").upper()
-        self.required_confidence = float(os.getenv("REQUIRED_CONFIDENCE", "0.7"))
+        self.required_conviction = float(os.getenv("REQUIRED_CONVICTION", "7.0"))
         self.policy_version = os.getenv("POLICY_VERSION", "phase1-v1")
         self.allowed_tools = {"shell", "qgis", "n8n", "noop"}
 
     def evaluate(self, request: GateRequest) -> GateDecision:
-        if self.mode == "PUB":
-            approved, reason, reason_code = False, "Tool Gate in PUB mode (execution disabled).", "PUB_MODE"
-            entry = ledger.append(request.model_dump(), approved, reason)
+        effective_mode = _effective_mode()
+        required = self.required_conviction + _mode_conviction_offset(effective_mode)
+        category = _classify_irreversibility(request.tool)
+
+        if category is not None:
+            # Irreversible (destructive/financial/public) actions never get a
+            # pass on conviction alone — they need the floor AND an explicit
+            # operator confirmation, in either mode.
+            if request.conviction >= IRREVERSIBLE_MIN_CONVICTION and request.cosign:
+                approved, reason, reason_code = (
+                    True,
+                    f"Approved: irreversible ({category}) action confirmed by operator.",
+                    "IRREVERSIBLE_CONFIRMED",
+                )
+                entry = ledger.append(request.model_dump(), approved, reason)
+            else:
+                entry = ledger.append(
+                    request.model_dump(),
+                    False,
+                    f"Irreversible ({category}) action requires conviction >= "
+                    f"{IRREVERSIBLE_MIN_CONVICTION} and explicit confirmation.",
+                )
+                _pending_cosign[entry.request_id] = {
+                    "request": request.model_dump(),
+                    "entry": entry,
+                    "parked_at": time.time(),
+                }
+                _cleanup_pending()
+                _send_notification(
+                    f"[tool-gate] Irreversible action needs confirmation: tool={request.tool} "
+                    f"category={category} conviction={request.conviction:.1f}/10 "
+                    f"request_id={entry.request_id[:12]}…"
+                )
+                approved, reason, reason_code = (
+                    False,
+                    "Irreversible action awaiting explicit operator confirmation.",
+                    "IRREVERSIBLE_REQUIRES_CONFIRMATION",
+                )
         elif request.cosign:
             # operator has already co-signed upstream
             approved, reason, reason_code = True, "Approved by operator co-sign.", "COSIGNED"
             entry = ledger.append(request.model_dump(), approved, reason)
-        elif request.confidence >= self.required_confidence and request.tool not in COSIGN_REQUIRED_TOOLS:
-            approved, reason, reason_code = True, "Approved by confidence threshold.", "APPROVED"
+        elif request.conviction >= required and request.tool not in COSIGN_REQUIRED_TOOLS:
+            approved, reason, reason_code = (
+                True,
+                f"Approved by conviction threshold (mode={effective_mode}).",
+                "APPROVED",
+            )
             entry = ledger.append(request.model_dump(), approved, reason)
-        elif request.tool in COSIGN_REQUIRED_TOOLS or request.confidence < COSIGN_CONFIDENCE_THRESHOLD:
-            # high-risk tool or low confidence → park for human co-sign
+        elif request.tool in COSIGN_REQUIRED_TOOLS or request.conviction < COSIGN_CONVICTION_THRESHOLD:
+            # high-risk tool or low conviction → park for human co-sign
             entry = ledger.append(request.model_dump(), False, "Pending human co-sign")
             _pending_cosign[entry.request_id] = {
                 "request": request.model_dump(),
@@ -425,17 +505,21 @@ class GatePolicy:
             # notify operator
             _send_notification(
                 f"[tool-gate] Co-sign needed: tool={request.tool} "
-                f"confidence={request.confidence:.0%} request_id={entry.request_id[:12]}…"
+                f"conviction={request.conviction:.1f}/10 request_id={entry.request_id[:12]}…"
             )
             approved, reason, reason_code = False, "Awaiting human co-sign.", "PENDING_COSIGN"
         else:
-            approved, reason, reason_code = False, "Insufficient confidence; co-sign required.", "LOW_CONFIDENCE"
+            approved, reason, reason_code = False, "Insufficient conviction; co-sign required.", "LOW_CONVICTION"
             entry = ledger.append(request.model_dump(), approved, reason)
 
         return GateDecision(
             request_id=entry.request_id,
             approved=approved,
-            status="approved" if approved else ("pending_cosign" if reason_code == "PENDING_COSIGN" else "blocked"),
+            status="approved" if approved else (
+                "pending_cosign"
+                if reason_code in ("PENDING_COSIGN", "IRREVERSIBLE_REQUIRES_CONFIRMATION")
+                else "blocked"
+            ),
             reason=reason,
             ledger_hash=entry.entry_hash,
             reason_code=reason_code,
@@ -634,7 +718,7 @@ async def pending_cosigns(request: Request) -> List[Dict[str, Any]]:
         {
             "request_id": rid,
             "tool": info["request"].get("tool"),
-            "confidence": info["request"].get("confidence"),
+            "conviction": info["request"].get("conviction"),
             "actor_did": info["request"].get("actor_did"),
             "parked_at": info.get("parked_at"),
             "ttl_remaining": max(COSIGN_TTL_SECONDS - (time.time() - info.get("parked_at", 0)), 0),

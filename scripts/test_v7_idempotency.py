@@ -43,12 +43,13 @@ mod.SEEN_NONCES.clear()
 mod.ledger = mod.PersistentLedger(Path(_TMPDIR) / "test-ledger.jsonl")
 mod.policy = mod.GatePolicy()
 mod.policy.mode = "WORK"
+mod._mode_override_until[0] = time.time() + 3600 * 4
 mod.policy.allowed_tools.add("executor")
 
 client = TestClient(mod.app)
 
 
-def _make_request(confidence: float, idem_key: str | None = None, nonce: str | None = None):
+def _make_request(conviction: float, idem_key: str | None = None, nonce: str | None = None):
     """Build a gate request payload with HMAC signature."""
     now = time.time()
     n = nonce or f"n{now}"
@@ -56,7 +57,7 @@ def _make_request(confidence: float, idem_key: str | None = None, nonce: str | N
         "tool": "executor",
         "actor_did": "langgraph",
         "session_id": AUTH_TOKEN,
-        "confidence": confidence,
+        "conviction": conviction,
         "nonce": n,
         "ts": now,
         "signature": sign_gate_request(
@@ -82,13 +83,13 @@ class TestIdempotency(unittest.TestCase):
     def test_same_key_returns_cached(self):
         """Two requests with the same idempotency_key should return same decision."""
         idem = "idem-001"
-        payload1 = _make_request(0.95, idem_key=idem, nonce="nonce-a1")
+        payload1 = _make_request(9.5, idem_key=idem, nonce="nonce-a1")
         resp1 = client.post("/gate/request", json=payload1, headers=AUTH_HEADER)
         self.assertEqual(resp1.status_code, 200)
         decision1 = resp1.json()
 
         # second request with same key but different nonce
-        payload2 = _make_request(0.95, idem_key=idem, nonce="nonce-a2")
+        payload2 = _make_request(9.5, idem_key=idem, nonce="nonce-a2")
         resp2 = client.post("/gate/request", json=payload2, headers=AUTH_HEADER)
         self.assertEqual(resp2.status_code, 200)
         decision2 = resp2.json()
@@ -99,11 +100,11 @@ class TestIdempotency(unittest.TestCase):
 
     def test_different_keys_independent(self):
         """Different idempotency keys produce independent evaluations."""
-        payload1 = _make_request(0.95, idem_key="key-A", nonce="nonce-b1")
+        payload1 = _make_request(9.5, idem_key="key-A", nonce="nonce-b1")
         resp1 = client.post("/gate/request", json=payload1, headers=AUTH_HEADER)
         self.assertEqual(resp1.status_code, 200)
 
-        payload2 = _make_request(0.2, idem_key="key-B", nonce="nonce-b2")
+        payload2 = _make_request(2.0, idem_key="key-B", nonce="nonce-b2")
         resp2 = client.post("/gate/request", json=payload2, headers=AUTH_HEADER)
         self.assertEqual(resp2.status_code, 200)
 
@@ -113,7 +114,7 @@ class TestIdempotency(unittest.TestCase):
 
     def test_no_key_no_caching(self):
         """Requests without idempotency_key are not cached."""
-        payload = _make_request(0.95, nonce="nonce-c1")
+        payload = _make_request(9.5, nonce="nonce-c1")
         resp = client.post("/gate/request", json=payload, headers=AUTH_HEADER)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(len(mod._idempotency_cache), 0)
@@ -121,7 +122,7 @@ class TestIdempotency(unittest.TestCase):
     def test_stale_cache_entry_evicted(self):
         """Expired cache entries should be pruned."""
         idem = "idem-stale"
-        payload = _make_request(0.95, idem_key=idem, nonce="nonce-d1")
+        payload = _make_request(9.5, idem_key=idem, nonce="nonce-d1")
         resp = client.post("/gate/request", json=payload, headers=AUTH_HEADER)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(idem, mod._idempotency_cache)
@@ -131,7 +132,7 @@ class TestIdempotency(unittest.TestCase):
         mod._idempotency_cache[idem] = (decision, time.time() - 1)
 
         # next request with same key should NOT get cached version
-        payload2 = _make_request(0.95, idem_key=idem, nonce="nonce-d2")
+        payload2 = _make_request(9.5, idem_key=idem, nonce="nonce-d2")
         resp2 = client.post("/gate/request", json=payload2, headers=AUTH_HEADER)
         self.assertEqual(resp2.status_code, 200)
         # a new evaluation should have been made

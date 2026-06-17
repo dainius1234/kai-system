@@ -56,12 +56,12 @@ def main():
     r = safe_post("http://localhost:8001/memory/memorize", json=memu_payload)
     print("memu response", r.status_code if r else None, r.text if r else "")
 
-    # make a tool-gate request with low confidence
+    # make a tool-gate request with low conviction
     tg_payload = {
         "tool": "noop",
         "actor_did": "tester",
         "session_id": "bootstrap-token",
-        "confidence": 0.1,
+        "conviction": 1.0,
     }
     r = safe_post("http://localhost:8000/gate/request", json=tg_payload)
     print("tool-gate response", r.status_code if r else None, r.text if r else "")
