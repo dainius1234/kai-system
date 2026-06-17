@@ -742,6 +742,22 @@ def _similarity(a: List[float], b: List[float]) -> float:
     return sum(x * y for x, y in zip(a, b))
 
 
+def _trust_weight(trust_tier: str) -> float:
+    """Score adjustment from the verifier's trust_tier label.
+
+    Mirrors the existing poisoned-record exclusion pattern, just graduated
+    instead of binary: unverified memories rank as before, FAIL_CLOSED and
+    REPAIR records are down-weighted, PASS gets a small bonus. Trust flows
+    into conviction through better-ranked context, not a second gate.
+    """
+    return {
+        "PASS": 0.05,
+        "REPAIR": -0.15,
+        "FAIL_CLOSED": -0.5,
+        "unverified": 0.0,
+    }.get(trust_tier, 0.0)
+
+
 def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
     """Rank memories using a multi-signal scoring model.
 
@@ -752,6 +768,8 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
       4. Recency (Ebbinghaus)     — exponential time-decay with spaced-rep
       5. Pin bonus                — pinned memories always surface
       6. Access frequency bonus   — frequently-recalled memories resist decay
+      7. Trust tier                — verified memories rank above unverified;
+                                      FAIL_CLOSED/REPAIR are down-weighted
 
     Every record returned has its access_count incremented — the act of
     remembering strengthens the memory, just like in a human brain.
@@ -800,6 +818,7 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
             + (0.05 if record.pinned else 0.0)
             + category_boost
             + correction_boost
+            + _trust_weight(getattr(record, "trust_tier", "unverified"))
         )
 
         ranked.append((score, record))
