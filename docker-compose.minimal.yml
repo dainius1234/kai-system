@@ -60,7 +60,7 @@ services:
     <<: *defaults
     environment:
       MODE: "WORK"
-      REQUIRED_CONFIDENCE: "0.7"
+      REQUIRED_CONVICTION: "7.0"
       NONCE_TTL_SECONDS: "300"
       HMAC_ALLOW_DEV_SECRET: "true"
     ports:

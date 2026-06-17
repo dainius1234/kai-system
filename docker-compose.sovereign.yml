@@ -150,7 +150,7 @@ services:
     environment:
       DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
       MODE: "PUB"
-      REQUIRED_CONFIDENCE: "0.7"
+      REQUIRED_CONVICTION: "7.0"
       TRUSTED_TOKENS_PATH: "/config/trusted_tokens.txt"
       AUDIT_REDIS_URL: "redis://redis:6379"
 

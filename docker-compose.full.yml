@@ -57,7 +57,7 @@ services:
     <<: *defaults
     environment:
       MODE: "WORK"
-      REQUIRED_CONFIDENCE: "0.7"
+      REQUIRED_CONVICTION: "7.0"
       REDIS_URL: redis://redis:6379
     secrets:
       - hmac_secret
@@ -166,6 +166,8 @@ services:
     environment:
       SWEEP_INTERVAL: "30"
       MEMU_URL: http://memu-core:8001
+      TOOL_GATE_URL: http://tool-gate:8000
+      CAMERA_URL: http://camera-service:8020
       TELEGRAM_ALERT_URL: http://telegram-bot:8025/alert
       PROACTIVE_INTERVAL: "900"
     ports:
@@ -183,6 +185,7 @@ services:
       - memu-core
       - tool-gate
       - telegram-bot
+      - camera-service
 
   verifier:
     build:
@@ -378,6 +381,9 @@ services:
       context: .
       dockerfile: perception/camera/Dockerfile
     <<: *defaults
+    environment:
+      TOOL_GATE_URL: http://tool-gate:8000
+      GATE_SESSION_ID: "${CAMERA_GATE_TOKEN:-camera-gate-token-1}"
     ports:
       - "8020:8020"
     healthcheck:

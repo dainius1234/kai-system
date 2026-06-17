@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import os
 import time
+import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
+
+from common.auth import sign_gate_request
 
 
 app = FastAPI(title="Camera Service", version="0.2.0")
@@ -217,7 +220,44 @@ async def analysis_history(limit: int = 10) -> Dict[str, Any]:
 PROACTIVE_COOLDOWN = int(os.getenv("PROACTIVE_COOLDOWN_SECONDS", "120"))
 TTS_URL = os.getenv("TTS_URL", "http://tts:8022")
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
+TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
+GATE_SESSION_ID = os.getenv("GATE_SESSION_ID", "camera-gate-token-1")
 _last_proactive_ts: float = 0.0
+
+
+async def _gate_allows_speak(urgency: float) -> bool:
+    """Ask the tool-gate before interrupting the user — same trust/mode rules
+    that govern every other action govern unprompted speech too.
+
+    Maps the 0-1 speak urgency onto the system's single 0-10 conviction
+    scale. Fails closed: if the gate is unreachable, KAI stays quiet.
+    """
+    try:
+        import httpx
+        nonce = str(uuid.uuid4())
+        ts = time.time()
+        signature = sign_gate_request(
+            actor_did="perception-camera", session_id=GATE_SESSION_ID,
+            tool="speak", nonce=nonce, ts=ts,
+        )
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.post(
+                f"{TOOL_GATE_URL}/gate/request",
+                json={
+                    "tool": "speak",
+                    "actor_did": "perception-camera",
+                    "session_id": GATE_SESSION_ID,
+                    "conviction": round(min(max(urgency, 0.0), 1.0) * 10.0, 2),
+                    "nonce": nonce,
+                    "ts": ts,
+                    "signature": signature,
+                },
+            )
+            if resp.status_code == 200:
+                return bool(resp.json().get("approved", False))
+    except Exception:
+        pass
+    return False
 
 
 def _speak_or_not(
@@ -401,17 +441,21 @@ async def proactive_auto() -> Dict[str, Any]:
 
     decision = _speak_or_not(audio_signals, video_signals)
 
-    # If should speak, optionally trigger TTS
+    # If should speak, route through the same gate everything else uses —
+    # PUB mode and conviction govern whether KAI may interrupt the user too.
     if decision["should_speak"] and decision.get("suggested_message"):
-        try:
-            import httpx
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                await client.post(f"{TTS_URL}/synthesize", json={
-                    "text": decision["suggested_message"],
-                    "voice": "kai-default",
-                })
-        except Exception:
-            pass  # TTS is best-effort
+        gate_approved = await _gate_allows_speak(decision.get("urgency", 0.0))
+        decision["gate_approved"] = gate_approved
+        if gate_approved:
+            try:
+                import httpx
+                async with httpx.AsyncClient(timeout=10.0) as client:
+                    await client.post(f"{TTS_URL}/synthesize", json={
+                        "text": decision["suggested_message"],
+                        "voice": "kai-default",
+                    })
+            except Exception:
+                pass  # TTS is best-effort
 
     return {"status": "ok", **decision}
 

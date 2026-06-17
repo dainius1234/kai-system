@@ -440,7 +440,7 @@ class GatePolicy:
         self.mode = os.getenv("MODE", "PUB").upper()
         self.required_conviction = float(os.getenv("REQUIRED_CONVICTION", "7.0"))
         self.policy_version = os.getenv("POLICY_VERSION", "phase1-v1")
-        self.allowed_tools = {"shell", "qgis", "n8n", "noop"}
+        self.allowed_tools = {"shell", "qgis", "n8n", "noop", "speak"}
 
     def evaluate(self, request: GateRequest) -> GateDecision:
         effective_mode = _effective_mode()

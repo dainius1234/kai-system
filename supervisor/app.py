@@ -327,6 +327,32 @@ async def _proactive_check() -> None:
         logger.debug("proactive nudge: telegram-bot unreachable")
 
 
+CAMERA_URL = os.getenv("CAMERA_URL", "http://camera-service:8020")
+
+
+async def _signal_proactive_check() -> None:
+    """P0-E: sensor-driven proactive trigger, runs every loop tick (~CHECK_INTERVAL).
+
+    Asks perception-camera's auto-speak logic whether something urgent
+    (e.g. detected stress) warrants speaking now, rather than waiting for
+    the 15-minute memory-nudge poll. Relies entirely on perception's own
+    existing cooldown (PROACTIVE_COOLDOWN_SECONDS) and the tool-gate's
+    mode/conviction rules — this function adds no new throttling of its own.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.post(f"{CAMERA_URL}/proactive/auto")
+            if resp.status_code == 200:
+                data = resp.json()
+                if data.get("should_speak"):
+                    logger.info(
+                        "Signal-driven proactive check: should_speak=True gate_approved=%s reason=%s",
+                        data.get("gate_approved"), data.get("reason"),
+                    )
+    except Exception:
+        logger.debug("signal proactive check: camera-service unreachable")
+
+
 async def _greeting_check() -> None:
     """P4f: Check if Kai should send a proactive greeting or check-in."""
     memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
@@ -445,6 +471,10 @@ async def _background_loop() -> None:
             await _proactive_check()
         except Exception:
             logger.exception("Proactive check failed")
+        try:
+            await _signal_proactive_check()
+        except Exception:
+            logger.exception("Signal proactive check failed")
         try:
             await _fire_due_items()
         except Exception:
