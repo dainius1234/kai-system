@@ -330,6 +330,20 @@ async def maybe_alert_error_budget_guard(name: str, guard: ErrorBudgetCircuitBre
         logger.warning("Failed to deliver guard-state alert for %s", name)
 
 
+async def _capture_snapshot_background(recent_episodes: List[Dict[str, Any]]) -> None:
+    """P13 performance snapshot, run off the hot /run path.
+
+    Scheduled via asyncio.create_task (fire-and-forget) so a slow or
+    failing disk write never adds latency to the chat/run response.
+    """
+    try:
+        label = f"auto-{len(recent_episodes)}"
+        snap = await asyncio.to_thread(capture_snapshot, recent_episodes, label)
+        await asyncio.to_thread(save_snapshot, snap)
+    except Exception:
+        logger.debug("P13 snapshot failed (non-critical)")
+
+
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
     try:
@@ -1498,12 +1512,10 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     # ── P13: Recursive self-improvement snapshot ────────────────────
     # Periodically capture performance snapshots so future changes
     # can be evaluated before/after.  Snapshots every 10 episodes.
+    # Fired off-loop so a slow/failing disk write can never add latency
+    # to (or block) the hot /run response path.
     if len(recent_episodes) % 10 == 0 and recent_episodes:
-        try:
-            snap = capture_snapshot(recent_episodes, label=f"auto-{len(recent_episodes)}")
-            save_snapshot(snap)
-        except Exception:
-            logger.debug("P13 snapshot failed (non-critical)")
+        asyncio.create_task(_capture_snapshot_background(recent_episodes))
 
     # ── P10: Predictive pre-computation ─────────────────────────────
     # Mine sequential patterns to predict what the operator will ask
