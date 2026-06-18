@@ -60,9 +60,11 @@ record of intent, not current state:
 
 ## 5) Blocked items + unlock conditions
 - **GPU-dependent phases** — blocked until RTX 5080 is procured, provisioned, validated.
-- **PR #46** (GPU Phase 0 consolidation) and **PR #54** (chassis polish, draft since
-  2026-04-25) — both stale, need a land-or-close decision independent of the
-  agentic-split decision above.
+- **PR #54** (chassis polish C2/C5/C9, open since 2026-04-25) — stale, needs a
+  land-or-close decision, independent of the agentic-split decision above (it
+  doesn't touch `agentic/app.py`).
+- (PR #46, GPU Phase 0 consolidation, is **already merged** to `main` — corrected
+  2026-06-18, was wrongly listed here as open in an earlier pass.)
 
 ## 6) PM operating rules (commitments)
 - **Document everything in the repo.** Chat sessions are ephemeral; the repo is forever.

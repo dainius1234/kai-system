@@ -19,9 +19,10 @@
 
 ## Open PRs needing a decision
 
-- [#46](https://github.com/dainius1234/kai-system/pull/46) — GPU Phase 0 consolidation (draft since 2026-04-21).
-- [#54](https://github.com/dainius1234/kai-system/pull/54) — chassis polish C2/C5/C9 (draft since 2026-04-25).
-- [#67](https://github.com/dainius1234/kai-system/pull/67), [#69](https://github.com/dainius1234/kai-system/pull/69) — see merge-order decision above.
+- [#54](https://github.com/dainius1234/kai-system/pull/54) — chassis polish C2/C5/C9 (open, not draft, since 2026-04-25). Isolated to `common/llm.py`/model registry, doesn't touch `agentic/app.py` — independent of the split decision below.
+- [#67](https://github.com/dainius1234/kai-system/pull/67), [#69](https://github.com/dainius1234/kai-system/pull/69) — both draft, untouched since 2026-06-02, see merge-order decision above.
+
+(PR #46 — GPU Phase 0 consolidation — already merged to `main` on 2026-06-01. Previously and incorrectly listed here as open; corrected 2026-06-18.)
 
 Live list: https://github.com/dainius1234/kai-system/pulls
 
