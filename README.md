@@ -305,6 +305,7 @@ voice, avatar, integrations, and ops tooling.
 | Recovery log | Missing schema fields for audit compat | Session fix |
 | agentic monolith | 1,800-line process mixed hot chat/run path with cold self-improvement code — a dream/evolver bug could take down live chat | Phase A+B — P13 snapshot moved off hot path; `/dream`, `/evolve/*`, `/security/audit` split into separate `agentic-introspect` service/process |
 | minimal stack | `agentic`/`ollama` referenced by dashboard/wake-service but not defined as services — Chat was non-functional in minimal despite docs claiming otherwise | Phase 0.5 — added `ollama` (+healthcheck), `ollama-pull` one-shot init, `agentic`, fixed `HMAC_ALLOW_DEV_SECRET` parity |
+| sovereign profile | `agentic-introspect` split (Phase B) only added to `full.yml` — `dashboard` in `docker-compose.sovereign.yml` would silently degrade `/api/dream` and `/api/security-audit` to `"unavailable"` | Phase B follow-up — `agentic-introspect` added to `docker-compose.sovereign.yml` too, no silent gap left between profiles |
 
 ### Open
 
@@ -398,13 +399,7 @@ P-series/J-series feature milestones above.
    the `agentic-introspect` container and confirm `/chat`/`/run` keep
    working — that's the actual proof the split achieves its purpose, not
    just that both processes can boot independently.
-2. **Decide `docker-compose.sovereign.yml`'s fate for the introspect split.**
-   That profile shares `dashboard/app.py` but has no `agentic-introspect`
-   service, so `/api/dream` and `/api/security-audit` will silently degrade
-   to `"unavailable"` there. Sovereign already omits `agentic`/`ollama` by
-   design (external LLM over Tailscale), so this may be acceptable as-is —
-   needs an explicit decision, not a silent gap.
-3. **Apply the same hot/cold discipline to the next-biggest monolith** once
+2. **Apply the same hot/cold discipline to the next-biggest monolith** once
    agentic-introspect is live-verified — `memu-core` (~6,100 lines) is the
    next candidate flagged by size alone, not yet audited for hot/cold
    coupling the way agentic was.

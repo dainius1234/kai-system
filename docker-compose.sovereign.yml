@@ -253,6 +253,7 @@ services:
       LEDGER_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
       MEMU_URL: "http://memu-core:8001"
       LANGGRAPH_URL: "http://agentic:8007"
+      AGENTIC_INTROSPECT_URL: "http://agentic-introspect:8023"
       EXECUTOR_URL: "http://executor:8002"
       HEARTBEAT_URL: "http://heartbeat:8010"
       AUDIT_REDIS_URL: "redis://redis:6379"
@@ -296,6 +297,33 @@ services:
       - redis
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8007/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+
+  agentic-introspect:
+    <<: *service_defaults
+    build:
+      context: .
+      dockerfile: agentic/Dockerfile.introspect
+    container_name: agentic-introspect
+    hostname: agentic-introspect
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.6
+    ports:
+      - "8023:8023"
+    environment:
+      MEMU_URL: "http://memu-core:8001"
+      REDIS_URL: "redis://redis:6379"
+      AGENTIC_CORE_URL: "http://agentic:8007"
+    depends_on:
+      - memu-core
+      - redis
+      - agentic
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8023/health')"]
       interval: 30s
       timeout: 5s
       retries: 3
