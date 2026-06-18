@@ -831,6 +831,7 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
         results[i].rank_score = round(score, 4)
 
     # bump access count + grow stability on retrieved records (MARS spaced repetition)
+    pending_updates: List[Dict[str, Any]] = []
     for record in results:
         record.access_count = getattr(record, "access_count", 0) + 1
         record.last_accessed = now_iso
@@ -849,31 +850,70 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
             interval_days = 1.0
         new_s = round(old_s * (1.0 + 0.1 * math.sqrt(interval_days + 1.0)), 3)
         record.stability = min(new_s, 365.0)  # cap at 1-year half-life
-        # persist the access bump + stability so it survives restarts
         if hasattr(store, "update_record"):
-            store.update_record(
-                record.id,
-                access_count=record.access_count,
-                last_accessed=record.last_accessed,
-                stability=record.stability,
-            )
+            pending_updates.append({
+                "id": record.id,
+                "access_count": record.access_count,
+                "last_accessed": record.last_accessed,
+                "stability": record.stability,
+            })
+
+    # Persist the access bump + stability off the hot path — the response
+    # below already has the up-to-date in-memory records; a slow Postgres
+    # round-trip per result shouldn't make /memory/retrieve wait.
+    if pending_updates:
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+        if loop is not None:
+            loop.create_task(_persist_retrieval_updates_background(pending_updates))
+        else:
+            # no running event loop (e.g. called outside a request, in tests)
+            for u in pending_updates:
+                store.update_record(u["id"], access_count=u["access_count"],
+                                     last_accessed=u["last_accessed"], stability=u["stability"])
 
     return results
 
 
-def _weekly_compress_if_due() -> None:
+async def _persist_retrieval_updates_background(updates: List[Dict[str, Any]]) -> None:
+    """Fire-and-forget MARS access-bump persistence, off the retrieval hot path."""
+    def _write_all() -> None:
+        for u in updates:
+            store.update_record(u["id"], access_count=u["access_count"],
+                                 last_accessed=u["last_accessed"], stability=u["stability"])
+    try:
+        await asyncio.to_thread(_write_all)
+    except Exception:
+        logger.warning("Background retrieval-update persist failed", exc_info=True)
+
+
+def _weekly_compress_due() -> bool:
+    """Cheap, hot-path-safe check. Claims the slot immediately on a hit so
+    concurrent requests can't both schedule a compress for the same week."""
     global last_compress_run
     now = time.time()
     if now - last_compress_run >= 7 * 24 * 3600:
-        store.compress()
         last_compress_run = now
+        return True
+    return False
+
+
+async def _weekly_compress_background() -> None:
+    """Fire-and-forget weekly compression, off the request hot path."""
+    try:
+        await asyncio.to_thread(store.compress)
+    except Exception:
+        logger.warning("Background weekly compress failed", exc_info=True)
 
 
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
     try:
         response = await call_next(request)
-        _weekly_compress_if_due()
+        if _weekly_compress_due():
+            asyncio.create_task(_weekly_compress_background())
         budget.record(response.status_code)
         audit.log("info", f"{request.method} {request.url.path} -> {response.status_code}")
         return response
@@ -903,14 +943,15 @@ async def health() -> Dict[str, Any]:
     # Check if feedback store is accessible
     checks["feedback_store"] = "ok" if isinstance(_feedback_store, list) else "fail"
 
-    # H2.1: Periodic P17-P22 persistence (every PERSIST_INTERVAL_SECONDS)
+    # H2.1: Periodic P17-P22 persistence (every PERSIST_INTERVAL_SECONDS).
+    # Scheduled as a background task, not awaited — Docker hits /health every
+    # 30s and 16 sequential Redis round-trips inline here could stall the
+    # healthcheck itself if Redis is slow, causing a false-unhealthy restart.
     if time.time() - _last_persist_time > _PERSIST_INTERVAL_SECONDS:
-        try:
-            persist_results = _persist_p17_p22_to_redis()
-            persisted_count = sum(1 for v in persist_results.values() if v)
-            checks["redis_persist"] = f"synced {persisted_count}/{len(persist_results)}"
-        except Exception as e:
-            checks["redis_persist"] = f"fail: {str(e)[:60]}"
+        asyncio.create_task(_persist_p17_p22_background())
+        checks["redis_persist"] = "scheduled"
+    else:
+        checks["redis_persist"] = "ok"
 
     degraded = any(v.startswith("fail") for v in checks.values())
     status = "degraded" if degraded else "ok"
@@ -1538,6 +1579,17 @@ def _persist_p17_p22_to_redis() -> Dict[str, bool]:
     results["shadow_branches"] = _persist_to_redis("kai:p22:shadow_branches", list(_shadow_branches))
 
     return results
+
+
+async def _persist_p17_p22_background() -> None:
+    """Fire-and-forget P17-P22 Redis sync, off the /health request path."""
+    try:
+        results = await asyncio.to_thread(_persist_p17_p22_to_redis)
+        failed = [k for k, v in results.items() if not v]
+        if failed:
+            logger.warning("Background P17-P22 persist had failures: %s", failed)
+    except Exception:
+        logger.warning("Background P17-P22 persist failed", exc_info=True)
 
 
 def _restore_p17_p22_from_redis() -> Dict[str, bool]:
