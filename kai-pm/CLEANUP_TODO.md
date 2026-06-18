@@ -1,6 +1,13 @@
-# Cleanup Sprint TODO — Live Tracker
+# Cleanup Sprint TODO — Live Tracker (superseded — see note)
 
-> **Single source of truth.** Tick boxes as work lands on `main`.
+> ⚠️ **2026-06-18: this tracker describes a plan that did not execute as written.**
+> §2.1's routes/state/flows/providers/prompts split stalled in two open draft PRs
+> (#67, #69) that never merged. A different approach (process-level failure-domain
+> split) shipped on `claude/project-rework-plan-pgvp35` instead — not yet merged to
+> `main` either. See [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)
+> for the full picture before trusting any checkbox below as current.
+
+> **Single source of truth (historical).** Tick boxes as work lands on `main`.
 
 ---
 
@@ -32,9 +39,15 @@
 ## Week 2 — Untangle the Giant
 
 ### 2.1 Split `agentic/app.py`
-- [~] Map responsibilities → `kai-pm/AGENTIC_APP_MAP.md` (agent dispatched 2026-06-01, not yet landed).
-- [ ] Split into routes / state / flows / providers / prompts. One PR per split.
-- [ ] First split target: `prompts/` (pure data, no behavior — lowest risk leaf).
+- [ ] `AGENTIC_APP_MAP.md` — never landed, file does not exist in the repo.
+- [!] Stalled as written. PR #67 (`prompts/` only) and PR #69 (`prompts/` +
+      `routes_identity/observability/ops/skills.py`) are both open drafts, no
+      activity since 2026-06-02, neither merged.
+- [x] A different, process-level split (not a file reorg) shipped on
+      `claude/project-rework-plan-pgvp35`: `agentic` keeps chat/run/checkpoints/
+      skills, `agentic-introspect` is a new service owning dream/evolve/
+      security-audit. **Not yet merged to `main`** — needs the merge-order
+      decision in `REALITY_CHECK_2026-06-18.md` before #67/#69 are touched.
 
 ### 2.2 Reconcile docker-compose files
 - [~] Diff minimal vs sovereign vs full → `kai-pm/COMPOSE_DRIFT.md` (agent dispatched 2026-06-01, not yet landed).

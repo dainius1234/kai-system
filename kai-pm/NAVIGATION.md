@@ -3,7 +3,7 @@
 > **If you are lost, start here.** This file tells you which doc to open for which question.
 > All other PM docs are *referenced from here*, not the other way around.
 
-**Last updated:** 2026-05-10
+**Last updated:** 2026-06-18
 
 ---
 
@@ -14,7 +14,7 @@
 | **What should I work on right now?** | [`PHASE_0_5_BACKLOG.md`](PHASE_0_5_BACKLOG.md) ← **start here 99% of the time** |
 | What's the big-picture roadmap? | [`STRATEGIC_PLAN.md`](STRATEGIC_PLAN.md) |
 | What's the current phase order? | [`SEQUENCE.md`](SEQUENCE.md) |
-| What metrics are real today? | [`METRICS.md`](METRICS.md) + [`REALITY_CHECK_2026-05-10.md`](REALITY_CHECK_2026-05-10.md) |
+| What metrics are real today? | [`METRICS.md`](METRICS.md) + [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md) |
 | What's risky right now? | [`RISKS.md`](RISKS.md) |
 | Should we adopt tech X? | [`TECH_WATCH.md`](TECH_WATCH.md) |
 | Why did we decide X? | [`DECISIONS.md`](DECISIONS.md) |
@@ -30,7 +30,7 @@
 When two docs disagree, the higher one wins:
 
 ```
-1. REALITY_CHECK_<date>.md   ← most recent reality always wins
+1. REALITY_CHECK_<date>.md   ← most recent reality always wins (currently 2026-06-18)
 2. PHASE_0_5_BACKLOG.md      ← what to do now
 3. STRATEGIC_PLAN.md         ← canonical roadmap
 4. SEQUENCE.md / RISKS.md / METRICS.md / TECH_WATCH.md
