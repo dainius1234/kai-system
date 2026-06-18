@@ -11,6 +11,8 @@ COPY tool-gate/app.py ./
 COPY common/ ./common/
 COPY security/ ./security/
 
+RUN mkdir -p /data/tool-gate && chown -R app:app /data
+
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
