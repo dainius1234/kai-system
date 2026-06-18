@@ -166,12 +166,10 @@ async def ensure_model_available(model_name: str) -> bool:
                     model_name, len(tags),
                 )
             return available
-    except (httpx.ConnectError, httpx.TimeoutException, httpx.HTTPStatusError, httpx.HTTPError):
-        # Ollama unreachable or returned an error — fail open;
-        # the circuit breaker handles real persistent outages.
-        return True
     except Exception:
-        # Unexpected error (e.g. JSON decode failure) — also fail open.
+        # Ollama unreachable, returned an error, or any other unexpected
+        # failure (e.g. JSON decode) — fail open; the circuit breaker
+        # handles real persistent outages.
         return True
 
 
