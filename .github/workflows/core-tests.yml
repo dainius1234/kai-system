@@ -56,9 +56,16 @@ jobs:
       - name: Bring up minimal sovereign AI stack
         run: |
           docker compose -f docker-compose.minimal.yml up -d --build
-          # wait for services to respond
+          # wait for tool-gate (fast) and agentic (waits on the ollama model
+          # pull, so give it longer) to respond
           for i in {1..30}; do
             if curl -s http://localhost:8000/health >/dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
+          for i in {1..180}; do
+            if curl -s http://localhost:8007/health >/dev/null 2>&1; then
               break
             fi
             sleep 1

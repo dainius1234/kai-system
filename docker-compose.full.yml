@@ -59,6 +59,7 @@ services:
       MODE: "WORK"
       REQUIRED_CONVICTION: "7.0"
       REDIS_URL: redis://redis:6379
+      INTERSERVICE_HMAC_SECRET: /run/secrets/hmac_secret
     secrets:
       - hmac_secret
       - bridge_secret
@@ -243,6 +244,7 @@ services:
       LLM_TIMEOUT: "120"
       WAKE_URL: http://wake-service:8022
       FF_WAKE_INTENT_ROUTING: "${FF_WAKE_INTENT_ROUTING:-false}"
+      INTERSERVICE_HMAC_SECRET: /run/secrets/hmac_secret
     secrets:
       - hmac_secret
     ports:
@@ -257,9 +259,12 @@ services:
       sovereign-net:
         ipv4_address: 172.20.0.11
     depends_on:
-      - memu-core
-      - redis
-      - ollama
+      memu-core:
+        condition: service_started
+      redis:
+        condition: service_started
+      ollama-pull:
+        condition: service_completed_successfully
 
   executor:
     build:
@@ -384,6 +389,9 @@ services:
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
       GATE_SESSION_ID: "${CAMERA_GATE_TOKEN:-camera-gate-token-1}"
+      INTERSERVICE_HMAC_SECRET: /run/secrets/hmac_secret
+    secrets:
+      - hmac_secret
     ports:
       - "8020:8020"
     healthcheck:
@@ -419,7 +427,10 @@ services:
       sovereign-net:
         ipv4_address: 172.20.0.24
     depends_on:
-      - memu-core
+      memu-core:
+        condition: service_started
+      ollama-pull:
+        condition: service_completed_successfully
 
   kai-advisor:
     build:
@@ -547,9 +558,26 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.30
+
+  ollama-pull:
+    image: ollama/ollama:latest
+    restart: "no"
+    entrypoint: ["sh", "-c", "OLLAMA_HOST=ollama:11434 ollama pull ${OLLAMA_MODEL:-qwen2:0.5b}"]
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.31
 
   telegram-bot:
     build:
@@ -601,7 +629,7 @@ services:
       start_period: 10s
     networks:
       sovereign-net:
-        ipv4_address: 172.20.0.24
+        ipv4_address: 172.20.0.32
     depends_on:
       - tool-gate
       - memu-core

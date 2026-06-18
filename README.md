@@ -21,14 +21,14 @@
 
 ---
 
-## Project Status (10 May 2026)
+## Project Status (18 June 2026)
 
 | Metric | Value |
 |---|---|
-| **Services** | 27 Docker containers |
+| **Services** | 28 Docker containers |
 | **Test targets** | 74 (`make test-core`) |
-| **Individual tests** | 1,620 (`def test_` across 83 files) |
-| **Python LOC** | ~42,613 |
+| **Individual tests** | 1,635 (`def test_` across 87 files) |
+| **Python LOC** | ~50,288 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 32 |
 | **Failures** | 0 |
@@ -40,9 +40,9 @@
 ## Quick Reference
 
 ```
-make core-up          # Start minimal stack (8 services)
+make core-up          # Start minimal stack (11 services + 1 one-shot model pull)
 make core-down        # Stop it
-make full-up          # Start all 27 services
+make full-up          # Start all 28 services
 make test-core        # Run all 74 test targets (~1,620 tests)
 make go_no_go         # Syntax check all entry points
 make merge-gate       # Full pre-merge validation
@@ -210,20 +210,26 @@ Supervisor (every 15s) → deep /health on each service
 
 | # | Service | Port | Purpose |
 |---|---------|------|---------|
-| 1 | postgres | 5432 | pgvector DB — memories, ledger, embeddings |
-| 2 | redis | 6379 | Session buffer, caches |
-| 3 | tool-gate | 8010 | Policy enforcement, HMAC auth |
-| 4 | memu-core | 8020 | Memory engine — the soul |
-| 5 | heartbeat | 8090 | System pulse, auto-sleep |
-| 6 | dashboard | 8050 | 8-view operator console |
-| 7 | supervisor | 8100 | Watchdog, auto-heal |
-| 8 | verifier | 8060 | Semantic fact-checking, SAGE |
+| 1 | postgres | internal only | pgvector DB — memories, ledger, embeddings |
+| 2 | redis | internal only | Session buffer, caches |
+| 3 | tool-gate | 8000 | Policy enforcement, HMAC auth |
+| 4 | memu-core | 8001 | Memory engine — the soul |
+| 5 | heartbeat | 8010 | System pulse, auto-sleep |
+| 6 | dashboard | 8080 | 8-view operator console |
+| 7 | wake-service | 8022 | Wake-word + intent routing |
+| 8 | supervisor | 8051 | Watchdog, auto-heal, proactive checks |
+| 9 | verifier | 8052 | Semantic fact-checking, SAGE |
+| 10 | ollama | 11434 | Local LLM (qwen2:0.5b CPU) — pulled automatically by the `ollama-pull` one-shot init container on first boot |
+| 11 | agentic | 8007 | Agentic brain, all reasoning — the piece that actually drives chat/conviction/gate calls |
 
 ### Full Stack Additions (`docker-compose.full.yml`)
 
+`agentic` and `ollama` are part of the minimal core spine above and are not
+repeated here — full stack adds everything else: perception, execution,
+voice, avatar, integrations, and ops tooling.
+
 | Service | Port | Purpose |
 |---------|------|---------|
-| agentic | 8030 | Agentic brain, all reasoning |
 | executor | 8040 | Sandboxed execution |
 | fusion-engine | 8070 | Multi-signal consensus |
 | orchestrator | 8080 | Final risk authority |
@@ -527,7 +533,7 @@ make core-smoke                make test-integration
 ### Cross-Check: What's Real vs What Needs Hardware
 
 **Working now (CPU/Codespace):**
-- [x] 27 services built, health-checked, compose validated
+- [x] 28 services built, health-checked, compose validated
 - [x] pgvector persistence (both minimal + full stacks)
 - [x] HMAC auth enforced, dev secret blocked by default
 - [x] Supervisor auto-healing loop (deep /health + /recover)

@@ -52,6 +52,36 @@ services:
       sovereign-net:
         ipv4_address: 172.20.0.4
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: sovereign-ollama
+    <<: *defaults
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.11
+
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: sovereign-ollama-pull
+    restart: "no"
+    entrypoint: ["sh", "-c", "OLLAMA_HOST=ollama:11434 ollama pull ${OLLAMA_MODEL:-qwen2:0.5b}"]
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.13
+
   tool-gate:
     build:
       context: .
@@ -106,6 +136,41 @@ services:
       postgres:
         condition: service_healthy
 
+  agentic:
+    build:
+      context: .
+      dockerfile: agentic/Dockerfile
+    container_name: sovereign-agentic
+    <<: *defaults
+    environment:
+      MEMU_URL: http://memu-core:8001
+      TOOL_GATE_URL: http://tool-gate:8000
+      REDIS_URL: redis://redis:6379
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_MODEL: "${OLLAMA_MODEL:-qwen2:0.5b}"
+      LLM_TIMEOUT: "120"
+      WAKE_URL: http://wake-service:8022
+      FF_WAKE_INTENT_ROUTING: "${FF_WAKE_INTENT_ROUTING:-false}"
+      HMAC_ALLOW_DEV_SECRET: "true"
+    ports:
+      - "8007:8007"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8007/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.12
+    depends_on:
+      memu-core:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ollama-pull:
+        condition: service_completed_successfully
+
   heartbeat:
     build:
       context: .
@@ -143,6 +208,7 @@ services:
       HEARTBEAT_URL: http://heartbeat:8010
       SUPERVISOR_URL: http://supervisor:8051
       WAKE_URL: http://wake-service:8022
+      LANGGRAPH_URL: http://agentic:8007
     ports:
       - "8080:8080"
     healthcheck:
@@ -164,6 +230,8 @@ services:
       supervisor:
         condition: service_started
       wake-service:
+        condition: service_started
+      agentic:
         condition: service_started
 
   wake-service:
@@ -192,6 +260,8 @@ services:
     depends_on:
       memu-core:
         condition: service_healthy
+      ollama-pull:
+        condition: service_completed_successfully
 
   supervisor:
     build:
@@ -249,3 +319,4 @@ services:
 
 volumes:
   postgres_data:
+  ollama_data:
