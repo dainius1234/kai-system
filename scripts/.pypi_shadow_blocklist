@@ -1,0 +1,10 @@
+langgraph
+langchain
+openai
+anthropic
+fastapi
+pydantic
+pytest
+crewai
+autogen
+openagents

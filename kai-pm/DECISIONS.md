@@ -72,3 +72,28 @@ a thin startup hook in `agentic/app.py`.
 against streaming stalls, missing models, and cold-start latency — all without GPU hardware.
 **Consequences:** Any service that imports `common/llm.py` inherits C2 and C5 automatically.  C9
 must be wired per-service via the FastAPI startup hook pattern.
+
+## D11 — 2026-06-18 — Salvage PyPI-shadow check from an orphaned, never-reviewed branch; close the rest
+**Context:** During the branch-cleanup sweep (D9-era follow-up), `copilot/pm-infra-main` was found
+on the remote — 6 commits, no PR ever opened, never reviewed. It bundled a daily PM-dashboard
+GitHub Actions workflow, label-sync automation tied to a stale 2026-06-01 cleanup-sprint label
+taxonomy (`cleanup-week-1/2/3`, `keystone`, `salvage-later` — that sprint stalled per D9), issue/PR
+templates, a modified `CODEOWNERS`, pre-commit additions, and `scripts/check_pypi_shadow.sh` — a
+guard against local repo-root folders shadowing real PyPI package names (the exact bug class the
+`langgraph/` → `agentic/` rename fixed by hand). A draft PR (#71) was opened against current `main`
+purely so the diff was visible for review, per the project owner's request.
+**Decision:** Salvage only `scripts/check_pypi_shadow.sh` + `scripts/.pypi_shadow_blocklist`, wired
+into `make pypi-shadow-check` and into `merge-gate`. Close PR #71 and discard the dashboard/label-sync/
+templates/docs scaffolding rather than reviving a label taxonomy that no longer describes reality.
+One fix made while porting: the script's default blocklist includes `langgraph`, which still exists
+at the repo root as a permanent symlink shim into `agentic/` (not transitional debt) — changed the
+script to allow `langgraph` by default instead of requiring an ad hoc `KAI_SHADOW_ALLOW=langgraph`
+env var on every run, since that was a "temporary unblock" framing for what is actually permanent.
+**Rationale:** Reviving the dashboard/labels would mean either maintaining a fictional sprint
+taxonomy or doing a redesign now — that's new work, not a merge of old work. The shadow-check script
+has no such baggage and is a real regression guard for a bug class already hit once.
+**Consequences:** `make merge-gate` and `make go_no_go`-adjacent flows now fail fast if a future
+local package/folder is added at repo root that shadows a real PyPI package name (`langgraph`,
+`langchain`, `openai`, `anthropic`, `fastapi`, `pydantic`, `pytest`, `crewai`, `autogen`,
+`openagents` — extend `scripts/.pypi_shadow_blocklist` as needed). PR #71 closed without merging the
+rest; `copilot/pm-infra-main` branch is safe to delete once this lands.
