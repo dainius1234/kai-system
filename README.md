@@ -303,6 +303,8 @@ voice, avatar, integrations, and ops tooling.
 | Pre-commit | No automated quality checks | Gap-Close |
 | Conscience log | Race condition on /conscience/check write | Session fix |
 | Recovery log | Missing schema fields for audit compat | Session fix |
+| agentic monolith | 1,800-line process mixed hot chat/run path with cold self-improvement code — a dream/evolver bug could take down live chat | Phase A+B — P13 snapshot moved off hot path; `/dream`, `/evolve/*`, `/security/audit` split into separate `agentic-introspect` service/process |
+| minimal stack | `agentic`/`ollama` referenced by dashboard/wake-service but not defined as services — Chat was non-functional in minimal despite docs claiming otherwise | Phase 0.5 — added `ollama` (+healthcheck), `ollama-pull` one-shot init, `agentic`, fixed `HMAC_ALLOW_DEV_SECRET` parity |
 
 ### Open
 
@@ -364,10 +366,62 @@ H3  Context Budget          ██████████ DONE
 | **P4** | Debate Branching | **DONE** — counterargument tree search |
 | **P5** | Deprecation Cleanup | **DONE** — 110+ warnings eliminated |
 | **H3** | Context Budget Manager | **DONE** — `_trim_context()` + `CONTEXT_BUDGET_TOKENS` env var |
+| **Phase 0.5** | Minimal stack real spine (ollama+agentic wired in) | **DONE** — config-validated; live Docker boot-test still deferred (no daemon in sandbox) |
+| **Phase A** | agentic hot-path fix (P13 snapshot off `/run`) | **DONE** — fire-and-forget `asyncio.create_task`, zero added latency |
+| **Phase B** | agentic-introspect process split (dream/evolve/security-audit) | **DONE** — separate FastAPI service/container, own failure domain; live "kill it, prove chat survives" test still deferred |
 | **P29** | Financial Awareness | Planned — savings tracker, expense categorization |
 | **GPU** | Hardware Performance | **Phase 0 DONE** — detection, env toggles, speculative-decoding config, model registry expansion (`docs/gpu_integration_phase0.md`); hardware-dependent execution still pending |
 
 *Sources: OpenClaw, Jarvis variants, Proact-VL (arXiv:2603.03447). All offline, low-resource, test on qwen2:0.5b first.*
+
+---
+
+## Roadmap & End Goal
+
+**Where we are:** the trust loop (conviction → gate → mode → memory →
+proactive speech) is internally consistent (Phase 0), the minimal stack is
+config-validated as a real chat-able spine with a brain attached (Phase 0.5),
+and the agentic core's hot path is now isolated from its own
+self-improvement code by a real process boundary, not just a file split
+(Phase A/B). Every refactor so far has been deployment-config and
+failure-domain work — no new application capability has shipped since the
+P-series/J-series feature milestones above.
+
+**Immediate next steps (in order):**
+
+1. **Live verification, both deferred phases.** Neither Phase 0.5 nor
+   Phase B has been booted on a real Docker daemon yet — only `docker
+   compose config` and in-process `TestClient` tests have run. Next session
+   with Docker available should: bring up `docker-compose.minimal.yml`,
+   confirm `ollama` → `ollama-pull` → `agentic` come up healthy in order,
+   send a real chat message end-to-end, then for Phase B specifically kill
+   the `agentic-introspect` container and confirm `/chat`/`/run` keep
+   working — that's the actual proof the split achieves its purpose, not
+   just that both processes can boot independently.
+2. **Decide `docker-compose.sovereign.yml`'s fate for the introspect split.**
+   That profile shares `dashboard/app.py` but has no `agentic-introspect`
+   service, so `/api/dream` and `/api/security-audit` will silently degrade
+   to `"unavailable"` there. Sovereign already omits `agentic`/`ollama` by
+   design (external LLM over Tailscale), so this may be acceptable as-is —
+   needs an explicit decision, not a silent gap.
+3. **Apply the same hot/cold discipline to the next-biggest monolith** once
+   agentic-introspect is live-verified — `memu-core` (~6,100 lines) is the
+   next candidate flagged by size alone, not yet audited for hot/cold
+   coupling the way agentic was.
+
+**End-goal target:** a fully offline, self-hosted, sovereign AI companion
+that runs entirely on local hardware (no cloud LLM dependency) — chat,
+memory, perception (audio/camera/wake-word), voice output, and an avatar,
+all gated by the conviction/trust-loop and circuit-breaker infrastructure
+already built — where no single component's failure can take down the
+whole system. The architectural principle this phase established (process-
+level failure isolation between hot and cold paths, reused circuit breakers
+instead of new ones, no split without checking for hidden shared state
+first) is meant to be the template for hardening the rest of the stack, not
+a one-off fix to `agentic` alone. Full system expansion (wiring up
+perception/execution/voice/avatar end-to-end against the now-real minimal
+spine) is the next *major* roadmap phase — to be scoped only once the live
+verification above is closed out, not started in parallel with it.
 
 ---
 
