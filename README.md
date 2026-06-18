@@ -25,10 +25,10 @@
 
 | Metric | Value |
 |---|---|
-| **Services** | 28 Docker containers |
-| **Test targets** | 74 (`make test-core`) |
-| **Individual tests** | 1,635 (`def test_` across 87 files) |
-| **Python LOC** | ~50,288 |
+| **Services** | 29 Docker containers |
+| **Test targets** | 75 (`make test-core`) |
+| **Individual tests** | 1,640 (`def test_` across 88 files) |
+| **Python LOC** | ~50,308 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 32 |
 | **Failures** | 0 |
@@ -230,6 +230,7 @@ voice, avatar, integrations, and ops tooling.
 
 | Service | Port | Purpose |
 |---------|------|---------|
+| agentic-introspect | 8023 | Dream/evolve/security-audit — split out of `agentic` so a bug in self-improvement code can't take down live chat |
 | executor | 8040 | Sandboxed execution |
 | fusion-engine | 8070 | Multi-signal consensus |
 | orchestrator | 8080 | Final risk authority |

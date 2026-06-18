@@ -47,6 +47,14 @@ def sanitize_string(value: str, max_len: int = 1024) -> str:
     return sanitized[:max_len]
 
 
+# Shared prompt-injection detector — single source of truth so the
+# agentic core and introspection services can't drift out of sync.
+INJECTION_RE = re.compile(
+    r"\b(ignore\s+(all\s+)?previous|system\s+prompt|override\s+instructions|you\s+are\s+now|act\s+as\s+if|disregard\s+(all|previous))\b",
+    re.IGNORECASE,
+)
+
+
 # ═══════════════════════════════════════════════════════════════════════
 # J3: PII DETECTION & AUTO-REDACTION
 #  Regex-based PII scanner — no ML deps, offline, low-CPU.

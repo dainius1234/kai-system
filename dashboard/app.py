@@ -458,15 +458,15 @@ async def api_self_assessment():
 
 @app.post("/api/dream")
 async def api_dream():
-    """Trigger a dream consolidation cycle via agentic."""
-    agentic_url = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
+    """Trigger a dream consolidation cycle via agentic-introspect."""
+    introspect_url = os.getenv("AGENTIC_INTROSPECT_URL", "http://agentic-introspect:8023")
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(f"{agentic_url}/dream")
+            resp = await client.post(f"{introspect_url}/dream")
             resp.raise_for_status()
             return resp.json()
     except Exception:
-        return {"status": "unavailable", "message": "Cannot reach agentic for dream cycle"}
+        return {"status": "unavailable", "message": "Cannot reach agentic-introspect for dream cycle"}
 
 
 @app.get("/api/ledger-stats")
@@ -553,11 +553,11 @@ async def sse_events(request: Request):
 
 @app.get("/api/security-audit")
 async def api_security_audit():
-    """Proxy security self-hacking audit from agentic."""
-    agentic_url = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
+    """Proxy security self-hacking audit from agentic-introspect."""
+    introspect_url = os.getenv("AGENTIC_INTROSPECT_URL", "http://agentic-introspect:8023")
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
-            resp = await client.get(f"{agentic_url}/security/audit")
+            resp = await client.get(f"{introspect_url}/security/audit")
             resp.raise_for_status()
             return resp.json()
     except Exception:
