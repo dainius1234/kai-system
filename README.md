@@ -215,7 +215,7 @@ Supervisor (every 15s) → deep /health on each service
 | 3 | tool-gate | 8000 | Policy enforcement, HMAC auth |
 | 4 | memu-core | 8001 | Memory engine — the soul |
 | 5 | heartbeat | 8010 | System pulse, auto-sleep |
-| 6 | dashboard | 8080 | 8-view operator console |
+| 6 | dashboard | 8080 | 10-view operator console |
 | 7 | wake-service | 8022 | Wake-word + intent routing |
 | 8 | supervisor | 8051 | Watchdog, auto-heal, proactive checks |
 | 9 | verifier | 8052 | Semantic fact-checking, SAGE |
@@ -231,29 +231,29 @@ voice, avatar, integrations, and ops tooling.
 | Service | Port | Purpose |
 |---------|------|---------|
 | agentic-introspect | 8023 | Dream/evolve/security-audit — split out of `agentic` so a bug in self-improvement code can't take down live chat |
-| executor | 8040 | Sandboxed execution |
-| fusion-engine | 8070 | Multi-signal consensus |
-| orchestrator | 8080 | Final risk authority |
-| telegram-bot | 8110 | Telegram interface |
-| kai-advisor | 8120 | Self-employment advisor (UK) |
-| memory-compressor | — | Memory summarisation |
-| ledger-worker | — | Action audit trail |
-| metrics-gateway | 9090 | Prometheus metrics |
+| executor | 8002 | Sandboxed execution |
+| fusion-engine | 8053 | Multi-signal consensus |
+| orchestrator | 8050 | Final risk authority |
+| telegram-bot | 8025 | Telegram interface |
+| kai-advisor | 8090 | Self-employment advisor (UK) |
+| memory-compressor | 8057 | Memory summarisation |
+| ledger-worker | 8056 | Action audit trail |
+| metrics-gateway | 8058 | Prometheus metrics |
 | audio-service | 8021 | STT (faster-whisper) |
-| camera-service | — | Camera capture |
+| camera-service | 8020 | Camera capture |
 | tts-service | 8030 | Text-to-speech (British Ryan) |
-| avatar-service | — | Avatar generation |
-| screen-capture | — | Screen OCR pipeline |
-| backup-service | — | pg/redis/memory backup |
-| calendar-sync | — | Calendar integration |
-| workspace-manager | — | Workspace lifecycle |
-| ollama | 11434 | Local LLM (qwen2:0.5b CPU) |
+| avatar-service | 8081 | Avatar generation |
+| screen-capture | 8059 | Screen OCR pipeline |
+| backup-service | 8054 | pg/redis/memory backup |
+| calendar-sync | 8055 | Calendar integration |
+| workspace-manager | 8060 | Workspace lifecycle |
+| parakeet-server | internal only (8080) | Optional CPU ASR sidecar (parakeet.cpp) — not started by default, opt in with `--profile parakeet` + `WHISPER_BACKEND=api` |
 
 ---
 
 ## Operator Console
 
-**http://localhost:8050/app** — 8 views, keyboard shortcuts, installable as PWA.
+**http://localhost:8080/app** — 10 views, keyboard shortcuts, installable as PWA.
 
 | View | Key | What You See |
 |------|-----|-------------|
@@ -265,6 +265,8 @@ voice, avatar, integrations, and ops tooling.
 | **Memory** | `Ctrl+6` | Memory browser — search by query or category, scores, stats |
 | **Logs** | `Ctrl+7` | Ring-buffer log viewer — level/time filter, monospace, color-coded |
 | **Soul** | `Ctrl+8` | Mood cards, emotion timeline, domain confidence, self-reflection journal, milestones |
+| **Canvas** | — (nav only) | Live mind-map / emotion-timeline / plan-flow visualization |
+| **Diary** | — (nav only) | Memory diary — search by query, category, importance threshold |
 
 | Shortcut | Action |
 |----------|--------|
