@@ -105,13 +105,37 @@ services:
       - tool-gate
       - postgres
 
+  memu-core-introspect:
+    build:
+      context: .
+      dockerfile: memu-core/Dockerfile.introspect
+    <<: *defaults
+    environment:
+      REDIS_URL: redis://redis:6379
+      VECTOR_STORE: postgres
+      PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
+    ports:
+      - "8009:8009"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8009/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.33
+    depends_on:
+      - redis
+      - postgres
+
   heartbeat:
     build:
       context: .
       dockerfile: heartbeat/Dockerfile
     <<: *defaults
     environment:
-      MEMU_URL: http://memu-core:8001
+      MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
       CHECK_INTERVAL: "60"
       ALERT_WINDOW: "300"
     ports:
@@ -127,6 +151,7 @@ services:
         ipv4_address: 172.20.0.6
     depends_on:
       - memu-core
+      - memu-core-introspect
 
   dashboard:
     build:
@@ -136,6 +161,7 @@ services:
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
       MEMU_URL: http://memu-core:8001
+      MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
       LANGGRAPH_URL: http://agentic:8007
       AGENTIC_INTROSPECT_URL: http://agentic-introspect:8023
       EXECUTOR_URL: http://executor:8002
@@ -156,6 +182,7 @@ services:
     depends_on:
       - tool-gate
       - memu-core
+      - memu-core-introspect
       - agentic
       - heartbeat
       - wake-service
@@ -325,6 +352,7 @@ services:
     <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
+      MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
       COMPRESSOR_INTERVAL_HOURS: "24"
     ports:
       - "8057:8057"
@@ -339,6 +367,7 @@ services:
         ipv4_address: 172.20.0.18
     depends_on:
       - memu-core
+      - memu-core-introspect
 
   ledger-worker:
     build:

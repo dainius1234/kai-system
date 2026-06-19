@@ -167,7 +167,7 @@ class TestCompressorMARSIntegration(unittest.TestCase):
         cycle_fn = COMPRESSOR_SRC.split("async def run_compression_cycle")[1].split("\nasync def ")[0]
         # Find the actual _call_memu calls (not comments)
         consolidate_pos = cycle_fn.index('_call_memu("/memory/consolidate")')
-        compress_pos = cycle_fn.index('_call_memu("/memory/compress")')
+        compress_pos = cycle_fn.index('_call_memu("/memory/compress"')
         self.assertLess(consolidate_pos, compress_pos)
 
     def test_pruned_count_in_result(self):

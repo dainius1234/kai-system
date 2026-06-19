@@ -10,7 +10,7 @@
 <p align="center">
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
-  <img src="https://img.shields.io/badge/services-30-blue?style=flat-square" alt="services">
+  <img src="https://img.shields.io/badge/services-31-blue?style=flat-square" alt="services">
   <img src="https://img.shields.io/badge/tests-1%2C656_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
   <img src="https://img.shields.io/badge/Python-~51%2C487_LOC-yellow?style=flat-square" alt="loc">
@@ -25,10 +25,10 @@
 
 | Metric | Value |
 |---|---|
-| **Services** | 30 Docker containers |
+| **Services** | 31 Docker containers |
 | **Test targets** | 77 (`make test-core`) |
 | **Individual tests** | 1,656 (`def test_` across 90 files) |
-| **Python LOC** | ~51,487 |
+| **Python LOC** | ~51,613 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 32 |
 | **Failures** | 0 |
@@ -40,9 +40,9 @@
 ## Quick Reference
 
 ```
-make core-up          # Start minimal stack (11 services + 1 one-shot model pull)
+make core-up          # Start minimal stack (12 services + 1 one-shot model pull)
 make core-down        # Stop it
-make full-up          # Start all 30 services
+make full-up          # Start all 31 services
 make test-core        # Run all 77 test targets (~1,656 tests)
 make go_no_go         # Syntax check all entry points
 make merge-gate       # Full pre-merge validation
@@ -213,14 +213,15 @@ Supervisor (every 15s) → deep /health on each service
 | 1 | postgres | internal only | pgvector DB — memories, ledger, embeddings |
 | 2 | redis | internal only | Session buffer, caches |
 | 3 | tool-gate | 8000 | Policy enforcement, HMAC auth |
-| 4 | memu-core | 8001 | Memory engine — the soul |
-| 5 | heartbeat | 8010 | System pulse, auto-sleep |
-| 6 | dashboard | 8080 | 10-view operator console |
-| 7 | wake-service | 8022 | Wake-word + intent routing |
-| 8 | supervisor | 8051 | Watchdog, auto-heal, proactive checks |
-| 9 | verifier | 8052 | Semantic fact-checking, SAGE |
-| 10 | ollama | 11434 | Local LLM (qwen2:0.5b CPU) — pulled automatically by the `ollama-pull` one-shot init container on first boot |
-| 11 | agentic | 8007 | Agentic brain, all reasoning — the piece that actually drives chat/conviction/gate calls |
+| 4 | memu-core | 8001 | Memory engine — the soul (hot path: memorize/retrieve) |
+| 5 | memu-core-introspect | 8009 | Store maintenance — compress/focus-compress/reflect/decay/quarantine, split out of `memu-core` so a bug in cold/periodic memory-maintenance code can't take down live memorize/retrieve traffic |
+| 6 | heartbeat | 8010 | System pulse, auto-sleep |
+| 7 | dashboard | 8080 | 10-view operator console |
+| 8 | wake-service | 8022 | Wake-word + intent routing |
+| 9 | supervisor | 8051 | Watchdog, auto-heal, proactive checks |
+| 10 | verifier | 8052 | Semantic fact-checking, SAGE |
+| 11 | ollama | 11434 | Local LLM (qwen2:0.5b CPU) — pulled automatically by the `ollama-pull` one-shot init container on first boot |
+| 12 | agentic | 8007 | Agentic brain, all reasoning — the piece that actually drives chat/conviction/gate calls |
 
 ### Full Stack Additions (`docker-compose.full.yml`)
 
@@ -308,6 +309,7 @@ voice, avatar, integrations, and ops tooling.
 | agentic monolith | 1,800-line process mixed hot chat/run path with cold self-improvement code — a dream/evolver bug could take down live chat | Phase A+B — P13 snapshot moved off hot path; `/dream`, `/evolve/*`, `/security/audit` split into separate `agentic-introspect` service/process |
 | minimal stack | `agentic`/`ollama` referenced by dashboard/wake-service but not defined as services — Chat was non-functional in minimal despite docs claiming otherwise | Phase 0.5 — added `ollama` (+healthcheck), `ollama-pull` one-shot init, `agentic`, fixed `HMAC_ALLOW_DEV_SECRET` parity |
 | sovereign profile | `agentic-introspect` split (Phase B) only added to `full.yml` — `dashboard` in `docker-compose.sovereign.yml` would silently degrade `/api/dream` and `/api/security-audit` to `"unavailable"` | Phase B follow-up — `agentic-introspect` added to `docker-compose.sovereign.yml` too, no silent gap left between profiles |
+| memu-core monolith | Cold/periodic store-maintenance endpoints (compress, focus-compress, reflect, decay, quarantine, etc.) shared a process with hot live-chat memorize/retrieve traffic — same risk class as the agentic monolith | `memu-core-introspect` split — 13 functions/14 routes moved to their own process (re-importing the same handlers, zero duplication); P17-P22 personality engine and `/memory/consolidate`/`/memory/self-reflect` stay in `memu-core` (read live in-process state, not safely splittable) — see DECISIONS.md D21 |
 
 ### Open
 
@@ -392,22 +394,24 @@ P-series/J-series feature milestones above.
 
 **Immediate next steps (in order):**
 
-1. **Live verification, both deferred phases.** Neither Phase 0.5 nor
-   Phase B has been booted on a real running stack yet — only `docker
-   compose config` and in-process `TestClient` tests have run. The Docker
-   daemon itself works fine in this sandbox; the blocker is that
-   container-image blob-CDN egress to Docker Hub and GHCR is blocked, so
-   images can't be pulled. Next session with image-pull access should:
-   bring up `docker-compose.minimal.yml`,
-   confirm `ollama` → `ollama-pull` → `agentic` come up healthy in order,
-   send a real chat message end-to-end, then for Phase B specifically kill
-   the `agentic-introspect` container and confirm `/chat`/`/run` keep
-   working — that's the actual proof the split achieves its purpose, not
-   just that both processes can boot independently.
-2. **Apply the same hot/cold discipline to the next-biggest monolith** once
-   agentic-introspect is live-verified — `memu-core` (~6,100 lines) is the
-   next candidate flagged by size alone, not yet audited for hot/cold
-   coupling the way agentic was.
+1. **Live verification, all three deferred splits.** Phase 0.5, Phase B
+   (`agentic-introspect`), and the `memu-core-introspect` split (D21) have
+   none been booted on a real running stack yet — only `docker compose
+   config` and in-process `TestClient` tests have run; no Docker daemon is
+   available in this sandbox at all (`docker info` fails to reach
+   `/var/run/docker.sock`). Next session with a live daemon should: bring
+   up `docker-compose.minimal.yml`, confirm `ollama` → `ollama-pull` →
+   `agentic` come up healthy in order, send a real chat message
+   end-to-end, then kill `agentic-introspect` and confirm `/chat`/`/run`
+   keep working, and separately kill `memu-core-introspect` and confirm
+   `/memory/memorize`/`/memory/retrieve` keep working — that's the actual
+   proof each split achieves its purpose, not just that the processes can
+   boot independently.
+2. **memu-core's P17-P22 personality engine remains unsplit** (D21) —
+   eleven `asyncio.Lock()`-protected in-process dict buckets with only a
+   5-minute Redis persistence lag make it fundamentally unsplittable
+   without a backing-store rework first. Not a next step until that
+   rework is scoped.
 
 **End-goal target:** a fully offline, self-hosted, sovereign AI companion
 that runs entirely on local hardware (no cloud LLM dependency) — chat,
@@ -434,7 +438,8 @@ fusion-engine/       # Multi-signal consensus and conviction gating
 verifier/            # Semantic fact-checking (embedding + keyword), SAGE self-critique
 executor/            # Sandboxed execution bridge
 dashboard/           # 10-view operator console (FastAPI + Starlette)
-memu-core/           # Memory engine — the soul (~7,450 lines)
+memu-core/           # Memory engine — the soul (~7,450 lines); hot-path memorize/retrieve
+                     # + introspect_app.py — store-maintenance process split off (D21)
 tool-gate/           # HMAC auth, rate limit, policy enforcement
 agentic/           # Agentic brain (router, planner, adversary, conviction, config)
 langgraph/           # Pre-rename compatibility duplicate of agentic/'s core modules —

@@ -193,6 +193,34 @@ services:
       retries: 3
 
 
+  memu-core-introspect:
+    <<: *service_defaults
+    read_only: true
+    build:
+      context: .
+      dockerfile: memu-core/Dockerfile.introspect
+    container_name: memu-core-introspect
+    hostname: memu-core-introspect
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.19
+    environment:
+      DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/memu_db"
+      VECTOR_STORE: "pgvector"
+      AUDIT_REDIS_URL: "redis://redis:6379"
+      VAULT_ADDR: "${VAULT_ADDR:-http://vault:8200}"
+      VAULT_TOKEN: "${VAULT_ROOT_TOKEN:-}"
+    ports:
+      - "8009:8009"
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8009/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+
   executor:
     build: ./executor
     runtime: gvisor
@@ -367,12 +395,16 @@ services:
       - /var/log/sovereign:/var/log/sovereign:ro
     environment:
       TOOL_GATE_URL: "http://tool-gate:8000"
+      MEMU_INTROSPECT_URL: "http://memu-core-introspect:8009"
       CHECK_INTERVAL: "60"
       ALERT_WINDOW: "300"
       EXECUTOR_LOG_PATH: "/var/log/sovereign/executor.log"
       TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
       TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID:-}"
       AUDIT_REDIS_URL: "redis://redis:6379"
+    depends_on:
+      - memu-core
+      - memu-core-introspect
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8010/health || exit 1"]
       interval: 30s

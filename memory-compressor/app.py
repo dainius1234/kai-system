@@ -26,6 +26,11 @@ logger = setup_json_logger("memory-compressor", os.getenv("LOG_PATH", "/tmp/memo
 app = FastAPI(title="Memory Compressor", version="0.5.0")
 
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
+# Store-maintenance endpoints (stats/compress/focus-compress/reflect) live on
+# memu-core-introspect, split out from memu-core's hot path — see DECISIONS.md
+# D21. /memory/consolidate stays on MEMU_URL: its conscience filter reads
+# memu-core's live in-process _formed_values, which introspect has no access to.
+MEMU_INTROSPECT_URL = os.getenv("MEMU_INTROSPECT_URL", "http://memu-core-introspect:8009")
 SCHEDULE_INTERVAL_HOURS = int(os.getenv("COMPRESSOR_INTERVAL_HOURS", "24"))
 MAX_RETRIES = int(os.getenv("COMPRESSOR_MAX_RETRIES", "3"))
 RETRY_BACKOFF = float(os.getenv("COMPRESSOR_RETRY_BACKOFF", "5.0"))
@@ -43,27 +48,27 @@ _scheduler_task: asyncio.Task | None = None
 _watermark_task: asyncio.Task | None = None
 
 
-async def _call_memu(path: str, method: str = "POST", timeout: float = 60.0) -> Dict[str, Any]:
-    """Call a memu-core endpoint with retries and exponential backoff."""
+async def _call_memu(path: str, method: str = "POST", timeout: float = 60.0, base_url: str = MEMU_URL) -> Dict[str, Any]:
+    """Call a memu-core (or memu-core-introspect) endpoint with retries and exponential backoff."""
     last_err: Exception | None = None
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             async with httpx.AsyncClient(timeout=timeout) as client:
                 if method == "POST":
-                    resp = await client.post(f"{MEMU_URL}{path}")
+                    resp = await client.post(f"{base_url}{path}")
                 else:
-                    resp = await client.get(f"{MEMU_URL}{path}")
+                    resp = await client.get(f"{base_url}{path}")
                 resp.raise_for_status()
                 return resp.json()
         except Exception as exc:
             last_err = exc
             wait = RETRY_BACKOFF * (2 ** (attempt - 1))
             logger.warning(
-                "memu-core %s attempt %d/%d failed: %s — retrying in %.1fs",
-                path, attempt, MAX_RETRIES, exc, wait,
+                "%s %s attempt %d/%d failed: %s — retrying in %.1fs",
+                base_url, path, attempt, MAX_RETRIES, exc, wait,
             )
             await asyncio.sleep(wait)
-    logger.error("memu-core %s failed after %d attempts", path, MAX_RETRIES)
+    logger.error("%s %s failed after %d attempts", base_url, path, MAX_RETRIES)
     raise last_err  # type: ignore[misc]
 
 
@@ -83,7 +88,7 @@ async def run_compression_cycle() -> Dict[str, Any]:
 
     try:
         # 1. Pre-cycle stats
-        pre_stats = await _call_memu("/memory/stats", method="GET")
+        pre_stats = await _call_memu("/memory/stats", method="GET", base_url=MEMU_INTROSPECT_URL)
         result["steps"]["pre_stats"] = pre_stats
         result["pre_record_count"] = pre_stats.get("records", 0)
         logger.info("Pre-compression: %d records", pre_stats.get("records", 0))
@@ -100,7 +105,7 @@ async def run_compression_cycle() -> Dict[str, Any]:
 
         # 3. Active context compression — merge non-focus memories, enforce token budget
         try:
-            focus_result = await _call_memu("/memory/focus-compress")
+            focus_result = await _call_memu("/memory/focus-compress", base_url=MEMU_INTROSPECT_URL)
             result["steps"]["focus_compress"] = focus_result
             logger.info(
                 "Focus-compress: tokens %s→%s (%.1f%% saved), merged=%s",
@@ -114,7 +119,7 @@ async def run_compression_cycle() -> Dict[str, Any]:
             result["steps"]["focus_compress"] = {"status": "skipped", "error": str(exc)}
 
         # 4. Compress — archive stale memories
-        compress_result = await _call_memu("/memory/compress")
+        compress_result = await _call_memu("/memory/compress", base_url=MEMU_INTROSPECT_URL)
         result["steps"]["compress"] = compress_result
         logger.info(
             "Compression: archived=%s, bytes_saved=%s",
@@ -123,13 +128,13 @@ async def run_compression_cycle() -> Dict[str, Any]:
         )
 
         # 5. Reflect — consolidate recent memories into insights
-        reflect_result = await _call_memu("/memory/reflect")
+        reflect_result = await _call_memu("/memory/reflect", base_url=MEMU_INTROSPECT_URL)
         result["steps"]["reflect"] = reflect_result
         insights_count = len(reflect_result.get("insights", []))
         logger.info("Reflection: %d insights generated", insights_count)
 
         # 6. Post-cycle stats
-        post_stats = await _call_memu("/memory/stats", method="GET")
+        post_stats = await _call_memu("/memory/stats", method="GET", base_url=MEMU_INTROSPECT_URL)
         result["steps"]["post_stats"] = post_stats
         result["post_record_count"] = post_stats.get("records", 0)
 
@@ -187,7 +192,7 @@ async def _watermark_loop() -> None:
     while True:
         await asyncio.sleep(WATERMARK_CHECK_INTERVAL)
         try:
-            stats = await _call_memu("/memory/stats", method="GET", timeout=10.0)
+            stats = await _call_memu("/memory/stats", method="GET", timeout=10.0, base_url=MEMU_INTROSPECT_URL)
             count = int(stats.get("records", 0))
             if count >= WATERMARK_HIGH:
                 logger.info(

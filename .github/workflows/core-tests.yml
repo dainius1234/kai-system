@@ -70,6 +70,14 @@ jobs:
             fi
             sleep 1
           done
+          # memu-core-introspect — store-maintenance process split off memu-core
+          # (see DECISIONS.md D21), independent of the ollama pull above
+          for i in {1..30}; do
+            if curl -s http://localhost:8009/health >/dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
       - name: Run integration smoke script
         run: |
           python3 scripts/test_core_integration.py

@@ -82,7 +82,6 @@ logger.info("Running on %s.", DEVICE)
 app = FastAPI(title="memU — core memory engine", version="0.6.0")
 budget = ErrorBudget(window_seconds=300)
 audit = AuditStream("memu-core", required=os.getenv("AUDIT_REQUIRED", "false").lower() == "true")
-last_compress_run = 0.0
 MAX_MEMORY_RECORDS = int(os.getenv("MAX_MEMORY_RECORDS", "5000"))
 MAX_STATE_KEY_SIZE = int(os.getenv("MAX_STATE_KEY_SIZE", "128"))
 MAX_STATE_VALUE_SIZE = int(os.getenv("MAX_STATE_VALUE_SIZE", "4096"))
@@ -1148,31 +1147,13 @@ async def _persist_retrieval_updates_background(updates: List[Dict[str, Any]]) -
         logger.warning("Background retrieval-update persist failed", exc_info=True)
 
 
-def _weekly_compress_due() -> bool:
-    """Cheap, hot-path-safe check. Claims the slot immediately on a hit so
-    concurrent requests can't both schedule a compress for the same week."""
-    global last_compress_run
-    now = time.time()
-    if now - last_compress_run >= 7 * 24 * 3600:
-        last_compress_run = now
-        return True
-    return False
-
-
-async def _weekly_compress_background() -> None:
-    """Fire-and-forget weekly compression, off the request hot path."""
-    try:
-        await asyncio.to_thread(store.compress)
-    except Exception:
-        logger.warning("Background weekly compress failed", exc_info=True)
-
-
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
+    # Weekly store compaction now runs as its own periodic loop in
+    # memu-core-introspect (introspect_app.py), off this hot-path process
+    # entirely — see DECISIONS.md D21.
     try:
         response = await call_next(request)
-        if _weekly_compress_due():
-            asyncio.create_task(_weekly_compress_background())
         budget.record(response.status_code)
         audit.log("info", f"{request.method} {request.url.path} -> {response.status_code}")
         return response
@@ -1576,7 +1557,6 @@ class QuarantineRequest(BaseModel):
     reason: str = "manual quarantine"
 
 
-@app.post("/memory/quarantine")
 async def quarantine_record(req: QuarantineRequest) -> Dict[str, str]:
     """Mark a memory record as poisoned — excluded from all future retrieval."""
     # Persistent path: use update_record if backend supports it (PGVectorStore)
@@ -1597,7 +1577,6 @@ async def quarantine_record(req: QuarantineRequest) -> Dict[str, str]:
     raise HTTPException(status_code=404, detail=f"record {req.record_id} not found")
 
 
-@app.post("/memory/quarantine/clear")
 async def clear_quarantine(req: QuarantineRequest) -> Dict[str, str]:
     """Remove quarantine flag from a record, restoring it to retrieval."""
     if hasattr(store, "update_record"):
@@ -1616,7 +1595,6 @@ async def clear_quarantine(req: QuarantineRequest) -> Dict[str, str]:
     raise HTTPException(status_code=404, detail=f"record {req.record_id} not found")
 
 
-@app.get("/memory/quarantine/list")
 async def list_quarantined() -> Dict[str, Any]:
     """List all quarantined (poisoned) records."""
     all_records = store.search(top_k=10_000)
@@ -1628,12 +1606,10 @@ async def list_quarantined() -> Dict[str, Any]:
     return {"count": len(quarantined), "quarantined": quarantined}
 
 
-@app.get("/memory/state")
 async def memory_state() -> Dict[str, Any]:
     return {"status": "ok", "state": store.get_state()}
 
 
-@app.get("/memory/categories")
 async def memory_categories() -> Dict[str, Any]:
     """List known construction domain categories and per-category record counts."""
     all_records = store.search(top_k=10_000)
@@ -1648,7 +1624,6 @@ async def memory_categories() -> Dict[str, Any]:
     }
 
 
-@app.get("/memory/search-by-category")
 async def search_by_category(
     category: str,
     query: Optional[str] = None,
@@ -1666,13 +1641,11 @@ async def search_by_category(
     return filtered[:top_k]
 
 
-@app.get("/memory/stats")
 async def memory_stats() -> Dict[str, Any]:
     counts = Counter(record.event_type for record in store.search(top_k=10_000))
     return {"status": "ok", "records": store.count(), "event_types": dict(counts), "commits": [c.__dict__ for c in store.vc.list_commits()[:20]]}
 
 
-@app.post("/memory/cleanup")
 async def memory_cleanup(max_age_days: int = 90) -> Dict[str, Any]:
     """Delete non-pinned memories older than max_age_days."""
     if max_age_days < 1:
@@ -1682,7 +1655,6 @@ async def memory_cleanup(max_age_days: int = 90) -> Dict[str, Any]:
     return {"status": "ok", **result}
 
 
-@app.get("/memory/diagnostics")
 async def memory_diagnostics() -> Dict[str, Any]:
     counts = Counter(record.event_type for record in store.search(top_k=10_000))
     return {
@@ -1694,13 +1666,10 @@ async def memory_diagnostics() -> Dict[str, Any]:
     }
 
 
-@app.post("/memory/compress")
 async def memory_compress() -> Dict[str, Any]:
     return {"status": "ok", **store.compress()}
 
 
-@app.post("/memory/revert")
-@app.post("/revert")
 async def memory_revert(version: str = Query(..., description="Commit hash/id")) -> Dict[str, Any]:
     try:
         store.revert(sanitize_string(version))
@@ -2688,7 +2657,6 @@ REFLECTION_WINDOW_DAYS = int(os.getenv("REFLECTION_WINDOW_DAYS", "7"))
 MIN_MEMORIES_FOR_REFLECTION = int(os.getenv("MIN_MEMORIES_FOR_REFLECTION", "5"))
 
 
-@app.post("/memory/reflect")
 async def reflect() -> Dict[str, Any]:
     """
     Consolidate recent memories into pattern insights.
@@ -2798,7 +2766,6 @@ DECAY_FADE_THRESHOLD = float(os.getenv("DECAY_FADE_THRESHOLD", "0.15"))
 MARS_PRUNE_THRESHOLD = float(os.getenv("MARS_PRUNE_THRESHOLD", "0.02"))
 
 
-@app.post("/memory/decay")
 async def apply_spaced_repetition_decay(
     half_life_days: float = Query(default=14.0, ge=1.0, le=365.0),
 ) -> Dict[str, Any]:
@@ -3050,7 +3017,6 @@ def _merge_memory_cluster(
     )
 
 
-@app.post("/memory/focus-compress")
 async def focus_compress(
     token_budget: int = Query(
         default=FOCUS_COMPRESS_TOKEN_BUDGET, ge=1000, le=500000,

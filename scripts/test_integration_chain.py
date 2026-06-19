@@ -32,12 +32,17 @@ def _load_module(name: str, path: Path):
     return mod
 
 
-memu = _load_module("memu_integ", ROOT / "memu-core" / "app.py")
+memu = _load_module("app", ROOT / "memu-core" / "app.py")
 verifier = _load_module("verifier_integ", ROOT / "verifier" / "app.py")
+# Quarantine endpoints moved to memu-core-introspect (see DECISIONS.md D21).
+# introspect_app.py does `from app import store` — memu is registered under
+# the literal name "app" above so this reuses the same module/store instance.
+introspect = _load_module("introspect_app", ROOT / "memu-core" / "introspect_app.py")
 
 from fastapi.testclient import TestClient
 
 memu_client = TestClient(memu.app)
+introspect_client = TestClient(introspect.app)
 verifier_client = TestClient(verifier.app)
 
 
@@ -99,7 +104,7 @@ class TestIntegrationChain(unittest.TestCase):
 
         # ── Step 5: Quarantine a record ─────────────────────────────
         target_id = record_ids[0]
-        resp = memu_client.post("/memory/quarantine", json={
+        resp = introspect_client.post("/memory/quarantine", json={
             "record_id": target_id,
             "reason": "integration test quarantine",
         })
@@ -107,13 +112,13 @@ class TestIntegrationChain(unittest.TestCase):
         self.assertEqual(resp.json()["status"], "quarantined")
 
         # verify it's in quarantine list
-        resp = memu_client.get("/memory/quarantine/list")
+        resp = introspect_client.get("/memory/quarantine/list")
         self.assertEqual(resp.status_code, 200)
         q_ids = [r["id"] for r in resp.json()["quarantined"]]
         self.assertIn(target_id, q_ids)
 
         # ── Step 6: Clear quarantine ────────────────────────────────
-        resp = memu_client.post("/memory/quarantine/clear", json={
+        resp = introspect_client.post("/memory/quarantine/clear", json={
             "record_id": target_id,
             "reason": "cleared after review",
         })

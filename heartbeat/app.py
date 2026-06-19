@@ -22,7 +22,10 @@ CHECK_INTERVAL = int(os.getenv("CHECK_INTERVAL", "60"))
 ALERT_WINDOW = int(os.getenv("ALERT_WINDOW", "300"))
 AUTO_SLEEP_SECONDS = int(os.getenv("AUTO_SLEEP_SECONDS", "1800"))
 SLEEP_COOLDOWN_SECONDS = int(os.getenv("SLEEP_COOLDOWN_SECONDS", "600"))
-MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
+# Store-maintenance endpoints (compress/focus-compress/decay/stats/diagnostics)
+# live on memu-core-introspect, split out from memu-core's hot path — see
+# DECISIONS.md D21.
+MEMU_INTROSPECT_URL = os.getenv("MEMU_INTROSPECT_URL", "http://memu-core-introspect:8009")
 EXECUTOR_LOG_PATH = Path(os.getenv("EXECUTOR_LOG_PATH", "/var/log/sovereign/executor.log"))
 CPU_USAGE_LIMIT = float(os.getenv("CPU_USAGE_LIMIT", "0.95"))
 CPU_TEMP_LIMIT_C = float(os.getenv("CPU_TEMP_LIMIT_C", "90"))
@@ -123,14 +126,14 @@ async def _auto_sleep_check() -> None:
         return
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            await client.post(f"{MEMU_URL}/memory/compress")
+            await client.post(f"{MEMU_INTROSPECT_URL}/memory/compress")
             # Active context compression — merge non-focus memories
             try:
-                await client.post(f"{MEMU_URL}/memory/focus-compress")
+                await client.post(f"{MEMU_INTROSPECT_URL}/memory/focus-compress")
             except Exception:
                 pass  # non-fatal: new endpoint may not be deployed yet
             # P3c: enforce spaced repetition decay during sleep
-            await client.post(f"{MEMU_URL}/memory/decay?half_life_days=14")
+            await client.post(f"{MEMU_INTROSPECT_URL}/memory/decay?half_life_days=14")
         logger.info("System sleeping — memory compressed + focus-compressed + decay applied")
         last_sleep_action = now
     except Exception:
@@ -226,7 +229,7 @@ async def _fetch_memu_stats(days: int, offset_days: int = 0) -> Dict[str, Any]:
     """Fetch memory stats from memu-core for a given window."""
     try:
         async with httpx.AsyncClient(timeout=10) as client:
-            r = await client.get(f"{MEMU_URL}/memory/stats")
+            r = await client.get(f"{MEMU_INTROSPECT_URL}/memory/stats")
             if r.status_code == 200:
                 return r.json()
     except Exception as exc:
@@ -238,7 +241,7 @@ async def _fetch_recent_episodes(days: int) -> Dict[str, Any]:
     """Fetch recent episode data for self-assessment metrics."""
     try:
         async with httpx.AsyncClient(timeout=10) as client:
-            r = await client.get(f"{MEMU_URL}/memory/diagnostics")
+            r = await client.get(f"{MEMU_INTROSPECT_URL}/memory/diagnostics")
             if r.status_code == 200:
                 return r.json()
     except Exception as exc:
