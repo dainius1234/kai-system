@@ -5682,7 +5682,7 @@ async def narrative_summary() -> Dict[str, Any]:
         "current_chapter": arcs.get("current_chapter", "The Beginning"),
         "total_chapters": len(arcs.get("arcs", [])),
         "trajectory": future.get("trajectory_message", ""),
-        "autobiography_entries": len(_p18_all_capped(_P18_AUTOBIOGRAPHY_KEY, _autobiography)),
+        "autobiography_entries": identity.get("stats", {}).get("autobiography_entries", 0),
         "legacy_pending": pending_legacy,
         "days_alive": identity.get("stats", {}).get("days_alive", 0),
     }
