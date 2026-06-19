@@ -119,9 +119,22 @@ graph LR
   Cognee's ~40/Graphiti's ~10), and a real, version-specific gotcha found by reading the
   installed provider source directly — `OllamaProvider.list_llm_models_async()` only
   auto-discovers Ollama models that declare a `"tools"` capability, which this stack's
-  pinned `qwen2:0.5b` may not carry (unverified — no live Ollama reachable in the spike
-  sandbox). Manual `LLMConfig` construction can bypass the discovery filter if needed.
-  Full smoke test against a real Ollama instance is still owed before any integration.
+  pinned `qwen2:0.5b` may not carry. Manual `LLMConfig` construction can bypass the
+  discovery filter if needed. Traced further 2026-06-19 (D34) since no live Ollama was
+  reachable to test directly: Ollama's own source (`server/images.go`'s
+  `chatTemplateHasToolSupport()`) does a plain substring match for `"tools"`/`"tool_call"`
+  against the model's embedded chat template — no semantic judgment involved. Qwen's own
+  tooling repo (`QwenLM/Qwen-Agent` README) scopes its native function-call template
+  explicitly to "the Qwen2.5 series general models and QwQ-32B," not Qwen2; `QwenLM/Qwen2`'s
+  own README only points to Qwen-Agent's generic ReAct wrapper, which isn't evidence of a
+  native template. Conclusion: `qwen2:0.5b` very likely fails Letta's discovery filter for a
+  real, sourced reason, not a hypothetical one. Since `OLLAMA_MODEL` is already a plain env
+  var (`docker-compose.full.yml`, `docker-compose.minimal.yml`, `common/llm.py`), swapping
+  to `qwen2.5:0.5b` (same size class, newer generation, the one Qwen's own tooling scopes
+  native tool-call support to) is a one-line, zero-new-infrastructure candidate fix — not
+  yet live-tested (still no reachable Ollama instance in this sandbox), surfaced as a
+  recommendation for the user to weigh before any Letta integration work starts. Full smoke
+  test against a real Ollama instance is still owed before any integration.
 
 ### Phase 4/5 (still GPU-blocked, per STRATEGIC_PLAN's existing gate)
 - **ASI-Evolve**: real, Ollama-compatible (verified via cloned `utils/llm.py` — plain
@@ -145,12 +158,14 @@ graph LR
    2026-06-19 (D14):** path (a) chosen — Postgres holds metadata only, TurboVec's
    `IdMapIndex` owns similarity search. Implemented as `TurboVecStore` in
    `memu-core/app.py` behind `VECTOR_STORE=turbovec`.
-2. Letta version pin + Ollama smoke test — **partially resolved 2026-06-19 (D33):**
-   version pinned (0.16.8), package installs cleanly, but the full Ollama smoke test
-   against this stack's real `qwen2:0.5b` model is still blocked on no reachable live
-   Ollama instance in the spike sandbox (`ollama.com` itself is outside the sandbox's
-   network allowlist). A real go/no-go decision on Letta is deferred pending that test
-   and the user's read on the dependency-footprint/tool-capability findings in D33.
+2. Letta version pin + Ollama smoke test — **partially resolved 2026-06-19 (D33, D34):**
+   version pinned (0.16.8), package installs cleanly. The full Ollama smoke test against
+   this stack's real `qwen2:0.5b` model is still blocked on no reachable live Ollama
+   instance in the spike sandbox, but D34 traced *why* the tool-capability gotcha almost
+   certainly applies (sourced from Ollama's own capability-detection code and Qwen's own
+   tooling docs) and surfaced a concrete candidate fix (`OLLAMA_MODEL=qwen2.5:0.5b`) rather
+   than leaving it as an open unknown. A real go/no-go decision on Letta is deferred
+   pending a live test and the user's read on D33/D34's findings.
 3. LocateAnything-3B — get a working fetch or a pasted primary source before it appears
    in any build order with a checkmark next to it. Still open.
 4. OpenHands sandboxing requirement — write into whatever future Skill Forge design doc
