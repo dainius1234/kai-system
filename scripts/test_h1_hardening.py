@@ -47,8 +47,13 @@ class TestH1_1_AsyncioLocks(unittest.TestCase):
     def test_feedback_lock_defined(self):
         self.assertIn("_feedback_lock = asyncio.Lock()", MEMU_SRC)
 
-    def test_emotion_lock_defined(self):
-        self.assertIn("_emotion_lock = asyncio.Lock()", MEMU_SRC)
+    def test_emotion_no_longer_needs_lock(self):
+        """P17 dropped its asyncio.Lock (along with the relationship-
+        milestones one) — reads/writes go through atomic Redis list/hash
+        ops instead (see DECISIONS.md D23), same rationale as P20's D22."""
+        self.assertNotIn("_emotion_lock", MEMU_SRC)
+        self.assertNotIn("_relationship_lock", MEMU_SRC)
+        self.assertIn("_p17_append_capped", MEMU_SRC)
 
     def test_nudge_lock_defined(self):
         self.assertIn("_nudge_lock = asyncio.Lock()", MEMU_SRC)
@@ -78,8 +83,8 @@ class TestH1_1_AsyncioLocks(unittest.TestCase):
     def test_feedback_uses_lock(self):
         self.assertIn("async with _feedback_lock:", MEMU_SRC)
 
-    def test_emotion_uses_lock(self):
-        self.assertIn("async with _emotion_lock:", MEMU_SRC)
+    def test_emotion_uses_redis_native_store(self):
+        self.assertIn("_p17_append_capped(_P17_EMOTION_KEY", MEMU_SRC)
 
 
 # ═══════════════════════════════════════════════════════════════════

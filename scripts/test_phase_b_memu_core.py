@@ -78,21 +78,27 @@ def main() -> int:
         assert mod._persist_to_redis("kai:test:key", {"ok": True}) is True
         assert mod._load_from_redis("kai:test:key", {}) == {"ok": True}
 
-        # P20 (formed_values, conscience_log, loyalty_ledger, gratitude_journal)
-        # is intentionally excluded from this periodic snapshot/restore cycle —
-        # it now reads/writes live against Redis's own hash/list keys via the
-        # _p20_* helpers instead (see DECISIONS.md D22), so there's no global
-        # to round-trip here anymore.
-        mod._emotional_timeline = [{"emotion": "focused"}]
+        # P17 (emotional_timeline, reflection_journal, relationship_milestones,
+        # confession_cooldown) and P20 (formed_values, conscience_log,
+        # loyalty_ledger, gratitude_journal) are intentionally excluded from
+        # this periodic snapshot/restore cycle — they now read/write live
+        # against Redis's own list/hash keys via the _p17_*/_p20_* helpers
+        # instead (see DECISIONS.md D22/D23), so there's no global to
+        # round-trip here anymore. P18's autobiography is unconverted, so it
+        # still goes through this cycle — used here to prove the cycle still
+        # works for the areas that haven't been migrated yet.
+        mod._autobiography = [{"nature": "observation"}]
         persist_results = mod._persist_p17_p22_to_redis()
-        assert persist_results["emotional_timeline"] is True
+        assert persist_results["autobiography"] is True
+        assert "emotional_timeline" not in persist_results
         assert "formed_values" not in persist_results
 
-        fake_redis.data["kai:p17:emotional_timeline"] = json.dumps([{"emotion": "calm"}])
+        fake_redis.data["kai:p18:autobiography"] = json.dumps([{"nature": "milestone"}])
         restored = mod._restore_p17_p22_from_redis()
-        assert restored["emotional_timeline"] is True
+        assert restored["autobiography"] is True
+        assert "emotional_timeline" not in restored
         assert "formed_values" not in restored
-        assert mod._emotional_timeline[0]["emotion"] == "calm"
+        assert mod._autobiography[0]["nature"] == "milestone"
     finally:
         mod._get_redis_client = original_get_redis_client
 

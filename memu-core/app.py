@@ -92,14 +92,14 @@ _session_lock = asyncio.Lock()       # protects _session_store, _session_timesta
 _feedback_lock = asyncio.Lock()      # protects _feedback_store
 _nudge_lock = asyncio.Lock()         # protects _dismissal_counts, _last_nudge_by_type, _dnd_until
 _topic_lock = asyncio.Lock()         # protects _active_topics, _deferred_topics
-_emotion_lock = asyncio.Lock()       # protects _emotional_timeline, _reflection_journal, _confession_cooldown
-_relationship_lock = asyncio.Lock()  # protects _relationship_milestones
 _narrative_lock = asyncio.Lock()     # protects _autobiography, _legacy_messages
 _imagination_lock = asyncio.Lock()   # protects _counterfactuals, _empathy_map, _creative_ideas, _inner_monologue, _aspirations
-# P20 (_formed_values, _conscience_log, _loyalty_ledger, _gratitude_journal,
-# _value_alignment_score) no longer needs an asyncio.Lock — all reads/writes
-# go through atomic Redis hash/list ops (see _p20_* helpers) so the data can
-# safely be shared across processes once split out. See DECISIONS.md D22.
+# P17 (_emotional_timeline, _reflection_journal, _relationship_milestones,
+# _confession_cooldown) and P20 (_formed_values, _conscience_log,
+# _loyalty_ledger, _gratitude_journal, _value_alignment_score) no longer need
+# asyncio.Lock — all reads/writes go through atomic Redis list/hash ops (see
+# _p17_*/_p20_* helpers) so the data can safely be shared across processes
+# once split out. See DECISIONS.md D22/D23.
 _agent_lock = asyncio.Lock()         # protects _scheduled_tasks, _reminders, _briefing_log
 _operator_lock = asyncio.Lock()      # protects _echo_history, _nudge_ladder, _cross_mode_insights, _oracle_predictions, _shadow_branches
 
@@ -1775,10 +1775,11 @@ def _persist_p17_p22_to_redis() -> Dict[str, bool]:
     _last_persist_time = time.time()
 
     results = {}
-    # P17: Emotional Intelligence data
-    results["emotional_timeline"] = _persist_to_redis("kai:p17:emotional_timeline", _emotional_timeline)
-    results["reflection_journal"] = _persist_to_redis("kai:p17:reflection_journal", _reflection_journal)
-    results["relationship_milestones"] = _persist_to_redis("kai:p17:relationship_milestones", _relationship_milestones)
+    # P17: Emotional Intelligence — no longer snapshotted here. Reads/writes
+    # are always live against Redis's own kai:p17:* list/hash keys (see
+    # _p17_* helpers, DECISIONS.md D23); a periodic SET on those keys would
+    # clobber the live List/Hash with a stale type, so it's intentionally
+    # skipped now.
 
     # P18: Narrative Identity
     results["autobiography"] = _persist_to_redis("kai:p18:autobiography", _autobiography)
@@ -1826,7 +1827,6 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     H2.1: Loads emotional timeline, goals, values, etc. from previous sessions.
     Returns dict of {data_key: loaded_bool}.
     """
-    global _emotional_timeline, _reflection_journal, _relationship_milestones
     global _autobiography, _legacy_messages
     global _counterfactuals, _creative_ideas, _aspirations
     global _scheduled_tasks, _reminders
@@ -1835,19 +1835,9 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
 
     results = {}
 
-    # P17: Emotional Intelligence
-    loaded = _load_from_redis("kai:p17:emotional_timeline", [])
-    if loaded:
-        _emotional_timeline = loaded
-        results["emotional_timeline"] = True
-    loaded = _load_from_redis("kai:p17:reflection_journal", [])
-    if loaded:
-        _reflection_journal = loaded
-        results["reflection_journal"] = True
-    loaded = _load_from_redis("kai:p17:relationship_milestones", [])
-    if loaded:
-        _relationship_milestones = loaded
-        results["relationship_milestones"] = True
+    # P17: Emotional Intelligence — nothing to restore here. The data was
+    # never moved out of Redis in the first place (live list/hash keys),
+    # so there's no in-process global to repopulate at startup.
 
     # P18: Narrative Identity
     loaded = _load_from_redis("kai:p18:autobiography", [])
@@ -2116,6 +2106,72 @@ def _p20_alignment_set(overall: float, violations: int, increment_streak: bool) 
     if increment_streak:
         _value_alignment_score["streak"] = _value_alignment_score.get("streak", 0) + 1
     return dict(_value_alignment_score)
+
+
+# ── P17: Redis-native emotional intelligence store ───────────────────
+# Phase 1 of the P17-P22 Redis-backed split (see DECISIONS.md D23, same
+# approach piloted on P20 in D22): the three append-only logs use Redis
+# Lists (RPUSH + LTRIM, same idiom as the session-message buffer and
+# P20's conscience log), and the confession cooldown map uses a Redis
+# Hash (HSET/HGET) keyed by category. Falls back to the in-process
+# list/dict (declared in the P17 section below) when Redis is unavailable.
+_P17_EMOTION_KEY = "kai:p17:emotional_timeline"
+_P17_REFLECTION_KEY = "kai:p17:reflection_journal"
+_P17_MILESTONES_KEY = "kai:p17:relationship_milestones"
+_P17_COOLDOWN_KEY = "kai:p17:confession_cooldown"
+_EMOTIONAL_TIMELINE_CAP = 500
+_REFLECTION_JOURNAL_CAP = 100
+_RELATIONSHIP_MILESTONES_CAP = 200
+
+
+def _p17_append_capped(key: str, fallback: List[Dict[str, Any]], entry: Dict[str, Any], cap: int) -> None:
+    """Atomic append-with-cap for a P17 append-only log (RPUSH + LTRIM are
+    each atomic Redis ops, so two processes appending concurrently can't
+    clobber each other the way a read-modify-write on a shared list could)."""
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.rpush(key, json.dumps(entry))
+            redis.ltrim(key, -cap, -1)
+            return
+        except Exception:
+            pass
+    fallback.append(entry)
+    if len(fallback) > cap:
+        fallback[:] = fallback[-cap:]
+
+
+def _p17_all_capped(key: str, fallback: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(key, 0, -1)
+            return [json.loads(r) for r in raw]
+        except Exception:
+            pass
+    return list(fallback)
+
+
+def _p17_cooldown_get(category: str) -> float:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hget(_P17_COOLDOWN_KEY, category)
+            return float(raw) if raw else 0.0
+        except Exception:
+            pass
+    return _confession_cooldown.get(category, 0.0)
+
+
+def _p17_cooldown_set(category: str, timestamp: float) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.hset(_P17_COOLDOWN_KEY, category, timestamp)
+            return
+        except Exception:
+            pass
+    _confession_cooldown[category] = timestamp
 
 
 # Restore P17-P22 data at startup
@@ -4381,10 +4437,7 @@ def _record_emotion(session_id: str, text: str) -> Dict[str, Any]:
         "intensity": round(intensity, 2),
         "trigger_snippet": text[:80],
     }
-    _emotional_timeline.append(entry)
-    # keep last 500 entries
-    if len(_emotional_timeline) > 500:
-        del _emotional_timeline[:-500]
+    _p17_append_capped(_P17_EMOTION_KEY, _emotional_timeline, entry, _EMOTIONAL_TIMELINE_CAP)
     return entry
 
 
@@ -4396,8 +4449,7 @@ async def record_emotion(request: Request) -> Dict[str, Any]:
     text = sanitize_string(body.get("text", ""))
     if not text:
         raise HTTPException(status_code=400, detail="text is required")
-    async with _emotion_lock:
-        entry = _record_emotion(session_id, text)
+    entry = _record_emotion(session_id, text)
     return {"status": "ok", **entry}
 
 
@@ -4407,7 +4459,7 @@ async def emotion_timeline(
     limit: int = Query(default=50, ge=1, le=200),
 ) -> Dict[str, Any]:
     """Get the emotional timeline — how conversations have felt over time."""
-    entries = _emotional_timeline
+    entries = _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline)
     if session_id:
         sid = sanitize_string(session_id)
         entries = [e for e in entries if e["session_id"] == sid]
@@ -4460,7 +4512,7 @@ async def generate_self_reflection(request: Request) -> Dict[str, Any]:
     total_feedback = len(_feedback_store)
 
     # Check emotional patterns
-    recent_emotions = _emotional_timeline[-20:] if _emotional_timeline else []
+    recent_emotions = _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline)[-20:]
     frustration_count = sum(1 for e in recent_emotions if e["emotion"] in ("frustrated", "stressed"))
     happy_count = sum(1 for e in recent_emotions if e["emotion"] in ("happy", "excited", "grateful"))
 
@@ -4512,10 +4564,7 @@ async def generate_self_reflection(request: Request) -> Dict[str, Any]:
         "correction_categories": correction_categories,
         "weak_domains": weak_domains,
     }
-    _reflection_journal.append(entry)
-    # keep last 100 reflections
-    if len(_reflection_journal) > 100:
-        del _reflection_journal[:-100]
+    _p17_append_capped(_P17_REFLECTION_KEY, _reflection_journal, entry, _REFLECTION_JOURNAL_CAP)
 
     return {"status": "ok", "reflection": entry}
 
@@ -4523,10 +4572,11 @@ async def generate_self_reflection(request: Request) -> Dict[str, Any]:
 @app.get("/memory/self-reflections")
 async def get_self_reflections(limit: int = Query(default=10, ge=1, le=50)) -> Dict[str, Any]:
     """Get recent self-reflection entries."""
+    journal = _p17_all_capped(_P17_REFLECTION_KEY, _reflection_journal)
     return {
         "status": "ok",
-        "count": len(_reflection_journal),
-        "entries": _reflection_journal[-limit:],
+        "count": len(journal),
+        "entries": journal[-limit:],
     }
 
 
@@ -4576,7 +4626,7 @@ async def relationship_timeline() -> Dict[str, Any]:
 
     # Emotional journey summary
     emo_summary: Dict[str, int] = {}
-    for e in _emotional_timeline:
+    for e in _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline):
         emo_summary[e["emotion"]] = emo_summary.get(e["emotion"], 0) + 1
 
     return {
@@ -4589,7 +4639,7 @@ async def relationship_timeline() -> Dict[str, Any]:
         "avg_rating": avg_rating,
         "top_categories": [{"category": c, "count": n} for c, n in top_categories],
         "emotional_journey": emo_summary,
-        "milestones": _relationship_milestones[-20:],
+        "milestones": _p17_all_capped(_P17_MILESTONES_KEY, _relationship_milestones)[-20:],
     }
 
 
@@ -4605,9 +4655,7 @@ async def add_milestone(request: Request) -> Dict[str, Any]:
         "title": title,
         "description": sanitize_string(body.get("description", "")),
     }
-    _relationship_milestones.append(milestone)
-    if len(_relationship_milestones) > 200:
-        del _relationship_milestones[:-200]
+    _p17_append_capped(_P17_MILESTONES_KEY, _relationship_milestones, milestone, _RELATIONSHIP_MILESTONES_CAP)
     return {"status": "ok", "milestone": milestone}
 
 
@@ -4742,7 +4790,7 @@ async def check_confessions(request: Request) -> Dict[str, Any]:
     now = time.time()
 
     # check cooldown
-    last = _confession_cooldown.get(category, 0)
+    last = _p17_cooldown_get(category)
     if now - last < _CONFESSION_COOLDOWN_SECS:
         return {"status": "ok", "confessions": [], "reason": "cooldown_active"}
 
@@ -4777,7 +4825,7 @@ async def check_confessions(request: Request) -> Dict[str, Any]:
     # only return top 3 most relevant confessions, and update cooldown
     confessions = confessions[:3]
     if confessions:
-        _confession_cooldown[category] = now
+        _p17_cooldown_set(category, now)
 
     return {
         "status": "ok",
@@ -4789,8 +4837,12 @@ async def check_confessions(request: Request) -> Dict[str, Any]:
 @app.get("/memory/eq/summary")
 async def eq_summary() -> Dict[str, Any]:
     """Get a full emotional intelligence summary — all P17 systems combined."""
+    emotional_timeline = _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline)
+    reflection_journal = _p17_all_capped(_P17_REFLECTION_KEY, _reflection_journal)
+    relationship_milestones = _p17_all_capped(_P17_MILESTONES_KEY, _relationship_milestones)
+
     # Emotional state
-    recent_emotions = _emotional_timeline[-10:]
+    recent_emotions = emotional_timeline[-10:]
     if recent_emotions:
         emo_counts: Dict[str, int] = {}
         for e in recent_emotions:
@@ -4800,7 +4852,7 @@ async def eq_summary() -> Dict[str, Any]:
         current_mood = "unknown"
 
     # Self-awareness
-    last_reflection = _reflection_journal[-1] if _reflection_journal else None
+    last_reflection = reflection_journal[-1] if reflection_journal else None
 
     # Confidence
     domains = _compute_domain_confidence()
@@ -4815,10 +4867,10 @@ async def eq_summary() -> Dict[str, Any]:
         "emotional_state": {
             "current_mood": current_mood,
             "recent_emotions": len(recent_emotions),
-            "timeline_total": len(_emotional_timeline),
+            "timeline_total": len(emotional_timeline),
         },
         "self_awareness": {
-            "reflections_total": len(_reflection_journal),
+            "reflections_total": len(reflection_journal),
             "last_reflection": last_reflection,
         },
         "epistemic_humility": {
@@ -4828,7 +4880,7 @@ async def eq_summary() -> Dict[str, Any]:
         "relationship": {
             "total_feedback": total_feedback,
             "avg_rating": avg_rating,
-            "milestones": len(_relationship_milestones),
+            "milestones": len(relationship_milestones),
         },
     }
 
@@ -5003,7 +5055,7 @@ async def get_identity_narrative() -> Dict[str, Any]:
 
     # Emotional character (from emotional timeline)
     emo_counts: Dict[str, int] = {}
-    for e in _emotional_timeline:
+    for e in _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline):
         emo_counts[e["emotion"]] = emo_counts.get(e["emotion"], 0) + 1
     dominant_emotion = max(emo_counts, key=emo_counts.get) if emo_counts else "neutral"
 
@@ -5013,9 +5065,10 @@ async def get_identity_narrative() -> Dict[str, Any]:
         auto_natures[a.get("nature", "observation")] = auto_natures.get(a.get("nature", "observation"), 0) + 1
 
     # Strengths from self-reflection
+    reflection_journal = _p17_all_capped(_P17_REFLECTION_KEY, _reflection_journal)
     all_strengths: List[str] = []
     all_weaknesses: List[str] = []
-    for r in _reflection_journal[-5:]:
+    for r in reflection_journal[-5:]:
         all_strengths.extend(r.get("strengths", []))
         all_weaknesses.extend(r.get("weaknesses", []))
 
@@ -5044,7 +5097,7 @@ async def get_identity_narrative() -> Dict[str, Any]:
             "total_memories": total_memories,
             "corrections_learned": correction_count,
             "autobiography_entries": len(_autobiography),
-            "reflections": len(_reflection_journal),
+            "reflections": len(reflection_journal),
         },
         "emotional_character": dominant_emotion,
         "top_domains": [{"domain": d[0], "count": d[1]} for d in top_domains],
@@ -5449,8 +5502,9 @@ async def generate_counterfactual(request: Request) -> Dict[str, Any]:
     correction_memories = [r for r in related if r.event_type == "correction"]
     if correction_memories:
         lessons.append(f"I've since learned {len(correction_memories)} corrections in this area")
-    if _reflection_journal:
-        latest_reflection = _reflection_journal[-1]
+    reflection_journal = _p17_all_capped(_P17_REFLECTION_KEY, _reflection_journal)
+    if reflection_journal:
+        latest_reflection = reflection_journal[-1]
         if latest_reflection.get("weaknesses"):
             lessons.append(f"Known weakness: {latest_reflection['weaknesses'][0]}")
 
@@ -6694,7 +6748,7 @@ async def morning_briefing() -> Dict[str, Any]:
         })
 
     # 3. Emotional arc (last 24h)
-    recent_emotions = list(_emotional_timeline)[-24:]
+    recent_emotions = _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline)[-24:]
     if recent_emotions:
         dominant = Counter(e.get("emotion", "neutral") for e in recent_emotions).most_common(1)
         arc_text = dominant[0][0] if dominant else "neutral"
@@ -6857,7 +6911,7 @@ async def echo_analyse(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 
     # find past moments with the same emotion
     past_matches = [
-        e for e in _emotional_timeline
+        e for e in _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline)
         if e.get("emotion") == current_emotion
         and e.get("session_id") != session_id
         and (time.time() - e.get("timestamp", 0)) > 3600  # at least 1h ago
@@ -7244,7 +7298,7 @@ async def oracle_predict(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
         chains.append(chain)
 
     # emotional impact prediction based on recent emotional arc
-    recent_emotions = _emotional_timeline[-10:]
+    recent_emotions = _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline)[-10:]
     emotion_prediction = "stable"
     if recent_emotions:
         recent_moods = [e.get("emotion", "neutral") for e in recent_emotions]
