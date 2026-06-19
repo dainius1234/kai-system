@@ -86,8 +86,10 @@ class TestEchoResponseEngine(unittest.TestCase):
         self.assertIn("intensity >= 0.4", src)
 
     def test_echo_records_event(self):
+        """P22 dropped direct .append() — records go through the Redis-native
+        _p22_append_capped helper instead (see DECISIONS.md D27)."""
         src = _memu()
-        self.assertIn("_echo_history.append", src)
+        self.assertIn("_p22_append_capped(_P22_ECHO_KEY, _echo_history", src)
 
 
 # ═══════════════════════════════════════════════════════════════════

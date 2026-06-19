@@ -96,12 +96,13 @@ _topic_lock = asyncio.Lock()         # protects _active_topics, _deferred_topics
 # _confession_cooldown), P18 (_autobiography, _legacy_messages), P19
 # (_counterfactuals, _empathy_map, _creative_ideas, _inner_monologue,
 # _aspirations), P20 (_formed_values, _conscience_log, _loyalty_ledger,
-# _gratitude_journal, _value_alignment_score), and P21 (_scheduled_tasks,
-# _reminders, _briefing_log) no longer need asyncio.Lock — all reads/writes
-# go through atomic Redis list/hash ops (see _p17_*/_p18_*/_p19_*/_p20_*/
-# _p21_* helpers) so the data can safely be shared across processes once
-# split out. See DECISIONS.md D22/D23/D24/D25/D26.
-_operator_lock = asyncio.Lock()      # protects _echo_history, _nudge_ladder, _cross_mode_insights, _oracle_predictions, _shadow_branches
+# _gratitude_journal, _value_alignment_score), P21 (_scheduled_tasks,
+# _reminders, _briefing_log), and P22 (_echo_history, _nudge_ladder,
+# _cross_mode_insights, _oracle_predictions, _shadow_branches) no longer
+# need asyncio.Lock — all reads/writes go through atomic Redis list/hash
+# ops (see _p17_*/_p18_*/_p19_*/_p20_*/_p21_*/_p22_* helpers) so the data
+# can safely be shared across processes once split out. See DECISIONS.md
+# D22/D23/D24/D25/D26/D27.
 
 
 class MemoryRequest(BaseModel):
@@ -1804,12 +1805,11 @@ def _persist_p17_p22_to_redis() -> Dict[str, bool]:
     # clobber the live Hash/List with a stale type, so it's intentionally
     # skipped now.
 
-    # P22: Operator Model
-    results["echo_history"] = _persist_to_redis("kai:p22:echo_history", list(_echo_history))
-    results["nudge_ladder"] = _persist_to_redis("kai:p22:nudge_ladder", _nudge_ladder)
-    results["cross_mode_insights"] = _persist_to_redis("kai:p22:cross_mode_insights", list(_cross_mode_insights))
-    results["oracle_predictions"] = _persist_to_redis("kai:p22:oracle_predictions", list(_oracle_predictions))
-    results["shadow_branches"] = _persist_to_redis("kai:p22:shadow_branches", list(_shadow_branches))
+    # P22: Operator Model — no longer snapshotted here. Reads/writes are
+    # always live against Redis's own kai:p22:* hash/list keys (see
+    # _p22_* helpers, DECISIONS.md D27); a periodic SET on those keys would
+    # clobber the live Hash/List with a stale type, so it's intentionally
+    # skipped now.
 
     return results
 
@@ -1831,9 +1831,6 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     H2.1: Loads emotional timeline, goals, values, etc. from previous sessions.
     Returns dict of {data_key: loaded_bool}.
     """
-    global _echo_history, _nudge_ladder, _cross_mode_insights
-    global _oracle_predictions, _shadow_branches
-
     results = {}
 
     # P17: Emotional Intelligence — nothing to restore here. The data was
@@ -1856,27 +1853,9 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     # moved out of Redis in the first place (live hash/list keys), so
     # there's no in-process global to repopulate at startup.
 
-    # P22: Operator Model
-    loaded = _load_from_redis("kai:p22:echo_history", [])
-    if loaded:
-        _echo_history = deque(loaded, maxlen=100)
-        results["echo_history"] = True
-    loaded = _load_from_redis("kai:p22:nudge_ladder", {})
-    if loaded:
-        _nudge_ladder = loaded
-        results["nudge_ladder"] = True
-    loaded = _load_from_redis("kai:p22:cross_mode_insights", [])
-    if loaded:
-        _cross_mode_insights = deque(loaded, maxlen=100)
-        results["cross_mode_insights"] = True
-    loaded = _load_from_redis("kai:p22:oracle_predictions", [])
-    if loaded:
-        _oracle_predictions = deque(loaded, maxlen=100)
-        results["oracle_predictions"] = True
-    loaded = _load_from_redis("kai:p22:shadow_branches", [])
-    if loaded:
-        _shadow_branches = deque(loaded, maxlen=100)
-        results["shadow_branches"] = True
+    # P22: Operator Model — nothing to restore here. The data was never
+    # moved out of Redis in the first place (live hash/list keys), so
+    # there's no in-process global to repopulate at startup.
 
     return results
 
@@ -2368,6 +2347,82 @@ def _p21_briefing_len() -> int:
         except Exception:
             pass
     return len(_briefing_log)
+
+
+# ── P22 helpers: Redis Lists for the four append-only logs, Redis Hash
+# for the id-keyed _nudge_ladder (same get/put/all idiom as P20/P21) ──
+_P22_ECHO_KEY = "kai:p22:echo_history"
+_P22_LADDER_KEY = "kai:p22:nudge_ladder"
+_P22_CROSSMODE_KEY = "kai:p22:cross_mode_insights"
+_P22_ORACLE_KEY = "kai:p22:oracle_predictions"
+_P22_SHADOW_KEY = "kai:p22:shadow_branches"
+
+
+def _p22_append_capped(key: str, fallback: Deque[Dict[str, Any]], entry: Dict[str, Any], cap: int) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.rpush(key, json.dumps(entry))
+            redis.ltrim(key, -cap, -1)
+            return
+        except Exception:
+            pass
+    fallback.append(entry)
+
+
+def _p22_all_capped(key: str, fallback: Deque[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(key, 0, -1)
+            return [json.loads(r) for r in raw]
+        except Exception:
+            pass
+    return list(fallback)
+
+
+def _p22_hash_get(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str) -> Optional[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hget(key, item_id)
+            return json.loads(raw) if raw else None
+        except Exception:
+            pass
+    return fallback.get(item_id)
+
+
+def _p22_hash_put(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str, entry: Dict[str, Any]) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.hset(key, item_id, json.dumps(entry))
+            return
+        except Exception:
+            pass
+    fallback[item_id] = entry
+
+
+def _p22_hash_all(key: str, fallback: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hgetall(key)
+            return {k: json.loads(v) for k, v in raw.items()}
+        except Exception:
+            pass
+    return dict(fallback)
+
+
+def _p22_hash_delete(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.hdel(key, item_id)
+            return
+        except Exception:
+            pass
+    fallback.pop(item_id, None)
 
 
 # Restore P17-P22 data at startup
@@ -7157,7 +7212,7 @@ async def echo_analyse(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
         "echo_message": echo,
         "bridge_to": bridge_memory.get("trigger_msg", "")[:80] if bridge_memory else None,
     }
-    _echo_history.append(entry)
+    _p22_append_capped(_P22_ECHO_KEY, _echo_history, entry, 100)
 
     return {
         "status": "ok",
@@ -7177,12 +7232,13 @@ async def echo_analyse(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 @app.get("/memory/echo/history")
 async def echo_history(limit: int = Query(default=20, le=100)) -> Dict[str, Any]:
     """P22a: Echo event history — when did Kai mirror emotions?"""
-    entries = list(_echo_history)[-limit:]
+    all_echoes = _p22_all_capped(_P22_ECHO_KEY, _echo_history)
+    entries = all_echoes[-limit:]
     entries.reverse()
     return {
         "status": "ok",
         "count": len(entries),
-        "total": len(_echo_history),
+        "total": len(all_echoes),
         "entries": entries,
     }
 
@@ -7213,11 +7269,13 @@ async def nudge_escalate(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
     reason = sanitize_string(body.get("reason", ""))[:200]
     original_message = sanitize_string(body.get("message", ""))[:300]
 
-    if target not in _nudge_ladder:
-        if len(_nudge_ladder) >= _MAX_LADDER_ENTRIES:
-            oldest = min(_nudge_ladder, key=lambda k: _nudge_ladder[k].get("last_dismissed", 0))
-            del _nudge_ladder[oldest]
-        _nudge_ladder[target] = {
+    ladder = _p22_hash_all(_P22_LADDER_KEY, _nudge_ladder)
+    state = ladder.get(target)
+    if state is None:
+        if len(ladder) >= _MAX_LADDER_ENTRIES:
+            oldest = min(ladder, key=lambda k: ladder[k].get("last_dismissed", 0))
+            _p22_hash_delete(_P22_LADDER_KEY, _nudge_ladder, oldest)
+        state = {
             "target": target,
             "dismissals": 0,
             "last_dismissed": 0,
@@ -7225,7 +7283,6 @@ async def nudge_escalate(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
             "history": [],
         }
 
-    state = _nudge_ladder[target]
     state["dismissals"] += 1
     state["last_dismissed"] = time.time()
     state["history"].append({
@@ -7244,6 +7301,7 @@ async def nudge_escalate(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
             current_tier = tier
 
     state["escalation_level"] = current_tier["level"]
+    _p22_hash_put(_P22_LADDER_KEY, _nudge_ladder, target, state)
 
     # generate escalated message
     escalated_msg = None
@@ -7274,7 +7332,7 @@ async def nudge_escalate(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 async def nudge_ladder() -> Dict[str, Any]:
     """P22b: Current escalation state for all tracked nudge targets."""
     entries = []
-    for target, state in _nudge_ladder.items():
+    for target, state in _p22_hash_all(_P22_LADDER_KEY, _nudge_ladder).items():
         current_tier = _ESCALATION_TIERS[0]
         for tier in _ESCALATION_TIERS:
             if state["dismissals"] >= tier["threshold"]:
@@ -7383,13 +7441,13 @@ async def cross_mode_scan(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 
     # record the insight
     if cross_insights:
-        _cross_mode_insights.append({
+        _p22_append_capped(_P22_CROSSMODE_KEY, _cross_mode_insights, {
             "timestamp": time.time(),
             "query": query[:100],
             "current_mode": current_mode,
             "insights_found": len(cross_insights),
             "bridge_message": bridge_message,
-        })
+        }, 100)
 
     return {
         "status": "ok",
@@ -7404,12 +7462,13 @@ async def cross_mode_scan(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 @app.get("/memory/cross-mode")
 async def cross_mode_history(limit: int = Query(default=20, le=100)) -> Dict[str, Any]:
     """P22c: History of cross-mode insight discoveries."""
-    entries = list(_cross_mode_insights)[-limit:]
+    all_insights = _p22_all_capped(_P22_CROSSMODE_KEY, _cross_mode_insights)
+    entries = all_insights[-limit:]
     entries.reverse()
     return {
         "status": "ok",
         "count": len(entries),
-        "total": len(_cross_mode_insights),
+        "total": len(all_insights),
         "entries": entries,
     }
 
@@ -7529,7 +7588,7 @@ async def oracle_predict(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
         "negative_impacts": len(neg_impacts),
         "positive_impacts": len(pos_impacts),
     }
-    _oracle_predictions.append(prediction)
+    _p22_append_capped(_P22_ORACLE_KEY, _oracle_predictions, prediction, 100)
 
     return {
         "status": "ok",
@@ -7540,12 +7599,13 @@ async def oracle_predict(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 @app.get("/memory/oracle/chains")
 async def oracle_chains(limit: int = Query(default=20, le=100)) -> Dict[str, Any]:
     """P22d: History of impact predictions."""
-    entries = list(_oracle_predictions)[-limit:]
+    all_predictions = _p22_all_capped(_P22_ORACLE_KEY, _oracle_predictions)
+    entries = all_predictions[-limit:]
     entries.reverse()
     return {
         "status": "ok",
         "count": len(entries),
-        "total": len(_oracle_predictions),
+        "total": len(all_predictions),
         "predictions": entries,
     }
 
@@ -7631,7 +7691,7 @@ async def shadow_branch(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
         "queryable": True,
     }
 
-    _shadow_branches.append(branch)
+    _p22_append_capped(_P22_SHADOW_KEY, _shadow_branches, branch, 100)
 
     return {"status": "ok", **branch}
 
@@ -7639,12 +7699,13 @@ async def shadow_branch(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 @app.get("/memory/shadow/branches")
 async def shadow_branches_list(limit: int = Query(default=20, le=100)) -> Dict[str, Any]:
     """P22e: List all shadow branches (alternate timelines)."""
-    entries = list(_shadow_branches)[-limit:]
+    all_branches = _p22_all_capped(_P22_SHADOW_KEY, _shadow_branches)
+    entries = all_branches[-limit:]
     entries.reverse()
     return {
         "status": "ok",
         "count": len(entries),
-        "total": len(_shadow_branches),
+        "total": len(all_branches),
         "branches": entries,
     }
 
@@ -7653,7 +7714,7 @@ async def shadow_branches_list(limit: int = Query(default=20, le=100)) -> Dict[s
 async def shadow_explore(branch_id: str) -> Dict[str, Any]:
     """P22e: Explore a specific shadow branch's details."""
     bid = sanitize_string(branch_id)
-    for b in _shadow_branches:
+    for b in _p22_all_capped(_P22_SHADOW_KEY, _shadow_branches):
         if b.get("branch_id") == bid:
             return {"status": "ok", "branch": b}
     raise HTTPException(status_code=404, detail="branch not found")
@@ -7665,42 +7726,46 @@ async def shadow_explore(branch_id: str) -> Dict[str, Any]:
 async def operator_model_summary() -> Dict[str, Any]:
     """P22: Unified operator model — how well does Kai understand you?"""
     # echo state
-    recent_echoes = list(_echo_history)[-5:]
+    all_echoes = _p22_all_capped(_P22_ECHO_KEY, _echo_history)
+    recent_echoes = all_echoes[-5:]
     echo_emotions = [e.get("emotion") for e in recent_echoes if e.get("echo_type") != "none"]
 
     # escalation state
+    ladder = _p22_hash_all(_P22_LADDER_KEY, _nudge_ladder)
     escalated_targets = [
         {"target": t, "level": s["escalation_level"], "dismissals": s["dismissals"]}
-        for t, s in _nudge_ladder.items()
+        for t, s in ladder.items()
         if s["escalation_level"] > 1
     ]
 
     # cross-mode insights
-    recent_cross = list(_cross_mode_insights)[-3:]
+    all_cross = _p22_all_capped(_P22_CROSSMODE_KEY, _cross_mode_insights)
+    recent_cross = all_cross[-3:]
 
     # oracle predictions
-    high_risk = sum(1 for p in _oracle_predictions if p.get("overall_risk") == "high")
+    all_predictions = _p22_all_capped(_P22_ORACLE_KEY, _oracle_predictions)
+    high_risk = sum(1 for p in all_predictions if p.get("overall_risk") == "high")
 
     # shadow branches
-    branch_count = len(_shadow_branches)
+    branch_count = len(_p22_all_capped(_P22_SHADOW_KEY, _shadow_branches))
 
     return {
         "status": "ok",
         "echo_state": {
             "recent_emotions_mirrored": echo_emotions,
-            "total_echoes": len(_echo_history),
-            "deep_bridges": sum(1 for e in _echo_history if e.get("echo_type") == "deep_bridge"),
+            "total_echoes": len(all_echoes),
+            "deep_bridges": sum(1 for e in all_echoes if e.get("echo_type") == "deep_bridge"),
         },
         "escalation_state": {
             "escalated_targets": escalated_targets,
-            "max_level": max((s["escalation_level"] for s in _nudge_ladder.values()), default=1),
+            "max_level": max((s["escalation_level"] for s in ladder.values()), default=1),
         },
         "cross_mode": {
-            "insights_found": len(_cross_mode_insights),
+            "insights_found": len(all_cross),
             "recent_bridges": len(recent_cross),
         },
         "oracle": {
-            "predictions_made": len(_oracle_predictions),
+            "predictions_made": len(all_predictions),
             "high_risk_count": high_risk,
         },
         "shadow_branches": {
@@ -7708,10 +7773,10 @@ async def operator_model_summary() -> Dict[str, Any]:
             "queryable": branch_count,
         },
         "model_completeness": min(100, int(
-            (len(_echo_history) > 0) * 20 +
-            (len(_nudge_ladder) > 0) * 20 +
-            (len(_cross_mode_insights) > 0) * 20 +
-            (len(_oracle_predictions) > 0) * 20 +
+            (len(all_echoes) > 0) * 20 +
+            (len(ladder) > 0) * 20 +
+            (len(all_cross) > 0) * 20 +
+            (len(all_predictions) > 0) * 20 +
             (branch_count > 0) * 20
         )),
     }

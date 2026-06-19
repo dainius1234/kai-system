@@ -89,8 +89,12 @@ class TestH1_1_AsyncioLocks(unittest.TestCase):
         self.assertNotIn("_agent_lock", MEMU_SRC)
         self.assertIn("_p21_hash_put", MEMU_SRC)
 
-    def test_operator_lock_defined(self):
-        self.assertIn("_operator_lock = asyncio.Lock()", MEMU_SRC)
+    def test_operator_no_longer_needs_lock(self):
+        """P22 dropped its asyncio.Lock — reads/writes go through atomic
+        Redis hash/list ops instead (see DECISIONS.md D27), same rationale
+        as P17/P18/P19/P20/P21's D23/D24/D25/D22/D26."""
+        self.assertNotIn("_operator_lock", MEMU_SRC)
+        self.assertIn("_p22_hash_put", MEMU_SRC)
 
     def test_feedback_uses_lock(self):
         self.assertIn("async with _feedback_lock:", MEMU_SRC)
