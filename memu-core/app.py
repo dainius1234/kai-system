@@ -929,16 +929,22 @@ else:
 def generate_embedding(text: str) -> List[float]:
     """Generate a semantic embedding for *text*.
 
-    Uses ``sentence-transformers`` when available (real 384-dim vectors
-    with ``all-MiniLM-L6-v2`` by default).  Falls back to a deterministic
-    hash-based pseudo-embedding (8-dim) when the library is not installed
-    — keeps CI and lightweight tests running without the heavy dependency.
+    Uses ``sentence-transformers`` (real 384-dim vectors with
+    ``all-MiniLM-L6-v2`` by default). See ``MEMU_ALLOW_FAKE_EMBEDDINGS``
+    below for the only sanctioned exception to that.
     """
     return _embedding_backend(text)
 
 
 # ── embedding backend (loaded once at import time) ──────────────────
 EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+
+# Hash-based pseudo-embeddings carry no semantic content — every memory
+# write and vector search would keep "working" while silently returning
+# garbage. That's only acceptable when a test explicitly opts in (it's
+# checking unrelated logic and doesn't care about embedding quality), never
+# as a silent production fallback. Default is strict: real model or crash.
+_ALLOW_FAKE_EMBEDDINGS = os.getenv("MEMU_ALLOW_FAKE_EMBEDDINGS", "false").lower() == "true"
 
 try:
     from sentence_transformers import SentenceTransformer as _ST
@@ -950,8 +956,17 @@ try:
         vec = _st_model.encode(text, show_progress_bar=False)
         return vec.tolist()
 
-except Exception:  # pragma: no cover
-    logger.warning("sentence-transformers not available — using hash-based fake embeddings")
+except Exception as _st_exc:
+    if not _ALLOW_FAKE_EMBEDDINGS:
+        raise RuntimeError(
+            f"sentence-transformers failed to load (model={EMBEDDING_MODEL_NAME!r}): {_st_exc}. "
+            "Refusing to silently degrade to fake hash-based embeddings — memory retrieval would "
+            "keep returning results while being semantically meaningless. Set "
+            "MEMU_ALLOW_FAKE_EMBEDDINGS=true to explicitly opt into the deterministic hash "
+            "fallback for lightweight/offline tests that don't depend on real embedding quality."
+        ) from _st_exc
+
+    logger.warning("sentence-transformers not available — using hash-based fake embeddings (MEMU_ALLOW_FAKE_EMBEDDINGS=true)")
 
     def _embedding_backend(text: str) -> List[float]:
         # deterministic pseudo-embedding: SHA-256 → 8 floats in [0,1)

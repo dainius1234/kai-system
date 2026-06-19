@@ -172,6 +172,10 @@ if __name__ == "__main__":
     memu_path = os.path.join(os.path.dirname(__file__), "..", "memu-core")
     if memu_path not in sys.path:
         sys.path.insert(0, memu_path)
+    # This test exercises logging/cleanup/ledger logic, not embedding
+    # quality — opt into the lightweight hash fallback explicitly rather
+    # than requiring the real sentence-transformers model download.
+    os.environ.setdefault("MEMU_ALLOW_FAKE_EMBEDDINGS", "true")
     # create module alias
     import importlib.util
     spec = importlib.util.spec_from_file_location("memu_core_app",

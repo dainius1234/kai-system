@@ -1,11 +1,19 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import sys
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(root / "memu-core"))
+
+# This test's query text matches its records' text exactly, so even the
+# lightweight deterministic hash embedding ranks them correctly — opt in
+# explicitly rather than requiring the real sentence-transformers model
+# download.
+os.environ.setdefault("MEMU_ALLOW_FAKE_EMBEDDINGS", "true")
+
 module_path = root / "memu-core" / "app.py"
 spec = importlib.util.spec_from_file_location("memu_app", module_path)
 assert spec and spec.loader

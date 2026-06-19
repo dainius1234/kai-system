@@ -15,6 +15,10 @@ from datetime import datetime, timedelta, timezone
 # time — using spec_from_file_location with a unique name bypasses that cache).
 _here = os.path.dirname(os.path.abspath(__file__))
 os.environ.setdefault("VECTOR_STORE", "memory")
+# Tempo logic mocks the store directly — doesn't depend on embedding
+# quality. Opt into the lightweight hash fallback explicitly rather than
+# requiring the real sentence-transformers model download.
+os.environ.setdefault("MEMU_ALLOW_FAKE_EMBEDDINGS", "true")
 _spec = importlib.util.spec_from_file_location(
     "memu_core_app_tempo",
     os.path.join(_here, "..", "memu-core", "app.py"),
