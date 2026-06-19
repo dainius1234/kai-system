@@ -92,14 +92,14 @@ _session_lock = asyncio.Lock()       # protects _session_store, _session_timesta
 _feedback_lock = asyncio.Lock()      # protects _feedback_store
 _nudge_lock = asyncio.Lock()         # protects _dismissal_counts, _last_nudge_by_type, _dnd_until
 _topic_lock = asyncio.Lock()         # protects _active_topics, _deferred_topics
-_narrative_lock = asyncio.Lock()     # protects _autobiography, _legacy_messages
 _imagination_lock = asyncio.Lock()   # protects _counterfactuals, _empathy_map, _creative_ideas, _inner_monologue, _aspirations
 # P17 (_emotional_timeline, _reflection_journal, _relationship_milestones,
-# _confession_cooldown) and P20 (_formed_values, _conscience_log,
-# _loyalty_ledger, _gratitude_journal, _value_alignment_score) no longer need
-# asyncio.Lock — all reads/writes go through atomic Redis list/hash ops (see
-# _p17_*/_p20_* helpers) so the data can safely be shared across processes
-# once split out. See DECISIONS.md D22/D23.
+# _confession_cooldown), P18 (_autobiography, _legacy_messages), and P20
+# (_formed_values, _conscience_log, _loyalty_ledger, _gratitude_journal,
+# _value_alignment_score) no longer need asyncio.Lock — all reads/writes go
+# through atomic Redis list/hash ops (see _p17_*/_p18_*/_p20_* helpers) so
+# the data can safely be shared across processes once split out.
+# See DECISIONS.md D22/D23/D24.
 _agent_lock = asyncio.Lock()         # protects _scheduled_tasks, _reminders, _briefing_log
 _operator_lock = asyncio.Lock()      # protects _echo_history, _nudge_ladder, _cross_mode_insights, _oracle_predictions, _shadow_branches
 
@@ -1781,9 +1781,10 @@ def _persist_p17_p22_to_redis() -> Dict[str, bool]:
     # clobber the live List/Hash with a stale type, so it's intentionally
     # skipped now.
 
-    # P18: Narrative Identity
-    results["autobiography"] = _persist_to_redis("kai:p18:autobiography", _autobiography)
-    results["legacy_messages"] = _persist_to_redis("kai:p18:legacy_messages", _legacy_messages)
+    # P18: Narrative Identity — no longer snapshotted here. Reads/writes are
+    # always live against Redis's own kai:p18:* list keys (see _p18_*
+    # helpers, DECISIONS.md D24); a periodic SET on those keys would clobber
+    # the live List with a stale type, so it's intentionally skipped now.
 
     # P19: Imagination Engine
     results["counterfactuals"] = _persist_to_redis("kai:p19:counterfactuals", list(_counterfactuals))
@@ -1827,7 +1828,6 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     H2.1: Loads emotional timeline, goals, values, etc. from previous sessions.
     Returns dict of {data_key: loaded_bool}.
     """
-    global _autobiography, _legacy_messages
     global _counterfactuals, _creative_ideas, _aspirations
     global _scheduled_tasks, _reminders
     global _echo_history, _nudge_ladder, _cross_mode_insights
@@ -1839,15 +1839,9 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     # never moved out of Redis in the first place (live list/hash keys),
     # so there's no in-process global to repopulate at startup.
 
-    # P18: Narrative Identity
-    loaded = _load_from_redis("kai:p18:autobiography", [])
-    if loaded:
-        _autobiography = loaded
-        results["autobiography"] = True
-    loaded = _load_from_redis("kai:p18:legacy_messages", [])
-    if loaded:
-        _legacy_messages = loaded
-        results["legacy_messages"] = True
+    # P18: Narrative Identity — nothing to restore here. The data was never
+    # moved out of Redis in the first place (live list keys), so there's no
+    # in-process global to repopulate at startup.
 
     # P19: Imagination Engine
     loaded = _load_from_redis("kai:p19:counterfactuals", [])
@@ -2172,6 +2166,66 @@ def _p17_cooldown_set(category: str, timestamp: float) -> None:
         except Exception:
             pass
     _confession_cooldown[category] = timestamp
+
+
+# ── P18: Redis-native narrative identity store ───────────────────────
+# Phase 1 of the P17-P22 Redis-backed split (see DECISIONS.md D24, same
+# approach as P17/D23 and P20/D22): both append-only logs use Redis Lists
+# (RPUSH + LTRIM). Legacy messages also get mutated in place when they
+# surface, so _p18_update_entry does a read-modify-write via LSET keyed by
+# entry "id" — list ops stay atomic per-call, but the read-then-LSET pair
+# is not a single atomic transaction; acceptable here since "surfaced"
+# flips false->true and a duplicate flip is harmless. Falls back to the
+# in-process list (declared in the P18 section below) when Redis is
+# unavailable.
+_P18_AUTOBIOGRAPHY_KEY = "kai:p18:autobiography"
+_P18_LEGACY_KEY = "kai:p18:legacy_messages"
+
+
+def _p18_append_capped(key: str, fallback: List[Dict[str, Any]], entry: Dict[str, Any], cap: int) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.rpush(key, json.dumps(entry))
+            redis.ltrim(key, -cap, -1)
+            return
+        except Exception:
+            pass
+    fallback.append(entry)
+    if len(fallback) > cap:
+        fallback[:] = fallback[-cap:]
+
+
+def _p18_all_capped(key: str, fallback: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(key, 0, -1)
+            return [json.loads(r) for r in raw]
+        except Exception:
+            pass
+    return list(fallback)
+
+
+def _p18_update_entry(key: str, fallback: List[Dict[str, Any]], entry_id: str, updates: Dict[str, Any]) -> None:
+    """Apply field updates to the list entry matching entry_id (used for
+    flipping legacy-message "surfaced" state in place)."""
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(key, 0, -1)
+            for idx, item_raw in enumerate(raw):
+                item = json.loads(item_raw)
+                if item.get("id") == entry_id:
+                    item.update(updates)
+                    redis.lset(key, idx, json.dumps(item))
+                    return
+        except Exception:
+            pass
+    for item in fallback:
+        if item.get("id") == entry_id:
+            item.update(updates)
+            return
 
 
 # Restore P17-P22 data at startup
@@ -4983,9 +5037,7 @@ async def record_autobiography(request: Request) -> Dict[str, Any]:
         }
 
     entry = _generate_journal_entry(text, significance, context)
-    _autobiography.append(entry)
-    if len(_autobiography) > _AUTOBIOGRAPHY_CAP:
-        _autobiography[:] = _autobiography[-_AUTOBIOGRAPHY_CAP:]
+    _p18_append_capped(_P18_AUTOBIOGRAPHY_KEY, _autobiography, entry, _AUTOBIOGRAPHY_CAP)
 
     return {"status": "ok", "entry": entry}
 
@@ -4996,21 +5048,22 @@ async def get_autobiography(
     nature: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Retrieve Kai's autobiography entries."""
-    entries = list(_autobiography)
+    autobiography = _p18_all_capped(_P18_AUTOBIOGRAPHY_KEY, _autobiography)
+    entries = list(autobiography)
     if nature:
         entries = [e for e in entries if e.get("nature") == nature]
     entries = entries[-limit:]
 
     # Compute chapter summary
     nature_counts: Dict[str, int] = {}
-    for e in _autobiography:
+    for e in autobiography:
         n = e.get("nature", "observation")
         nature_counts[n] = nature_counts.get(n, 0) + 1
 
     return {
         "status": "ok",
         "entries": entries,
-        "total": len(_autobiography),
+        "total": len(autobiography),
         "nature_distribution": nature_counts,
     }
 
@@ -5024,12 +5077,13 @@ async def get_identity_narrative() -> Dict[str, Any]:
     """Build Kai's identity narrative from lived experience."""
 
     # Days alive (from first memory or autobiography entry)
+    autobiography = _p18_all_capped(_P18_AUTOBIOGRAPHY_KEY, _autobiography)
     first_ts: Optional[str] = None
     all_records = store.search(top_k=10_000)
     if all_records:
         first_ts = min(r.timestamp for r in all_records)
-    if _autobiography:
-        first_auto_ts = _autobiography[0].get("timestamp", "")
+    if autobiography:
+        first_auto_ts = autobiography[0].get("timestamp", "")
         if first_ts is None or (first_auto_ts and first_auto_ts < first_ts):
             first_ts = first_auto_ts
     days_alive = 0
@@ -5061,7 +5115,7 @@ async def get_identity_narrative() -> Dict[str, Any]:
 
     # Autobiography summary
     auto_natures: Dict[str, int] = {}
-    for a in _autobiography:
+    for a in autobiography:
         auto_natures[a.get("nature", "observation")] = auto_natures.get(a.get("nature", "observation"), 0) + 1
 
     # Strengths from self-reflection
@@ -5096,7 +5150,7 @@ async def get_identity_narrative() -> Dict[str, Any]:
             "days_alive": days_alive,
             "total_memories": total_memories,
             "corrections_learned": correction_count,
-            "autobiography_entries": len(_autobiography),
+            "autobiography_entries": len(autobiography),
             "reflections": len(reflection_journal),
         },
         "emotional_character": dominant_emotion,
@@ -5350,7 +5404,7 @@ async def write_legacy(request: Request) -> Dict[str, Any]:
 
     now = time.time()
     entry = {
-        "id": f"legacy_{int(now)}_{len(_legacy_messages)}",
+        "id": f"legacy_{int(now)}_{len(_p18_all_capped(_P18_LEGACY_KEY, _legacy_messages))}",
         "timestamp": now,
         "message": message,
         "recipient": recipient,
@@ -5360,9 +5414,7 @@ async def write_legacy(request: Request) -> Dict[str, Any]:
         "surfaced_at": None,
     }
 
-    _legacy_messages.append(entry)
-    if len(_legacy_messages) > _LEGACY_CAP:
-        _legacy_messages[:] = _legacy_messages[-_LEGACY_CAP:]
+    _p18_append_capped(_P18_LEGACY_KEY, _legacy_messages, entry, _LEGACY_CAP)
 
     return {"status": "ok", "entry": entry}
 
@@ -5373,13 +5425,16 @@ async def get_legacy_messages(
 ) -> Dict[str, Any]:
     """Get legacy messages. By default, only shows messages whose time has come."""
     now = time.time()
+    messages = _p18_all_capped(_P18_LEGACY_KEY, _legacy_messages)
     results: List[Dict[str, Any]] = []
 
-    for msg in _legacy_messages:
+    for msg in messages:
         if msg["surface_after"] <= now:
             if not msg["surfaced"]:
                 msg["surfaced"] = True
                 msg["surfaced_at"] = now
+                _p18_update_entry(_P18_LEGACY_KEY, _legacy_messages, msg["id"],
+                                   {"surfaced": True, "surfaced_at": now})
             results.append(msg)
         elif include_unsurfaced:
             results.append(msg)
@@ -5387,8 +5442,8 @@ async def get_legacy_messages(
     return {
         "status": "ok",
         "messages": results,
-        "total": len(_legacy_messages),
-        "pending": sum(1 for m in _legacy_messages if not m["surfaced"] and m["surface_after"] > now),
+        "total": len(messages),
+        "pending": sum(1 for m in messages if not m["surfaced"] and m["surface_after"] > now),
     }
 
 
@@ -5396,7 +5451,8 @@ async def get_legacy_messages(
 async def get_pending_legacy() -> Dict[str, Any]:
     """Check if any legacy messages are ready to surface."""
     now = time.time()
-    ready = [m for m in _legacy_messages if m["surface_after"] <= now and not m["surfaced"]]
+    messages = _p18_all_capped(_P18_LEGACY_KEY, _legacy_messages)
+    ready = [m for m in messages if m["surface_after"] <= now and not m["surfaced"]]
     return {
         "status": "ok",
         "ready_count": len(ready),
@@ -5417,8 +5473,9 @@ async def narrative_summary() -> Dict[str, Any]:
     future = await get_future_self()
     # Legacy
     legacy_now = time.time()
+    legacy_messages = _p18_all_capped(_P18_LEGACY_KEY, _legacy_messages)
     pending_legacy = sum(
-        1 for m in _legacy_messages
+        1 for m in legacy_messages
         if m["surface_after"] <= legacy_now and not m["surfaced"]
     )
 
@@ -5428,7 +5485,7 @@ async def narrative_summary() -> Dict[str, Any]:
         "current_chapter": arcs.get("current_chapter", "The Beginning"),
         "total_chapters": len(arcs.get("arcs", [])),
         "trajectory": future.get("trajectory_message", ""),
-        "autobiography_entries": len(_autobiography),
+        "autobiography_entries": len(_p18_all_capped(_P18_AUTOBIOGRAPHY_KEY, _autobiography)),
         "legacy_pending": pending_legacy,
         "days_alive": identity.get("stats", {}).get("days_alive", 0),
     }

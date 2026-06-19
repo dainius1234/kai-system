@@ -79,26 +79,29 @@ def main() -> int:
         assert mod._load_from_redis("kai:test:key", {}) == {"ok": True}
 
         # P17 (emotional_timeline, reflection_journal, relationship_milestones,
-        # confession_cooldown) and P20 (formed_values, conscience_log,
-        # loyalty_ledger, gratitude_journal) are intentionally excluded from
-        # this periodic snapshot/restore cycle — they now read/write live
-        # against Redis's own list/hash keys via the _p17_*/_p20_* helpers
-        # instead (see DECISIONS.md D22/D23), so there's no global to
-        # round-trip here anymore. P18's autobiography is unconverted, so it
-        # still goes through this cycle — used here to prove the cycle still
-        # works for the areas that haven't been migrated yet.
-        mod._autobiography = [{"nature": "observation"}]
+        # confession_cooldown), P18 (autobiography, legacy_messages), and P20
+        # (formed_values, conscience_log, loyalty_ledger, gratitude_journal)
+        # are intentionally excluded from this periodic snapshot/restore
+        # cycle — they now read/write live against Redis's own list/hash
+        # keys via the _p17_*/_p18_*/_p20_* helpers instead (see
+        # DECISIONS.md D22/D23/D24), so there's no global to round-trip here
+        # anymore. P19's creative_ideas is unconverted, so it still goes
+        # through this cycle — used here to prove the cycle still works for
+        # the areas that haven't been migrated yet.
+        mod._creative_ideas = [{"idea": "observation"}]
         persist_results = mod._persist_p17_p22_to_redis()
-        assert persist_results["autobiography"] is True
+        assert persist_results["creative_ideas"] is True
         assert "emotional_timeline" not in persist_results
+        assert "autobiography" not in persist_results
         assert "formed_values" not in persist_results
 
-        fake_redis.data["kai:p18:autobiography"] = json.dumps([{"nature": "milestone"}])
+        fake_redis.data["kai:p19:creative_ideas"] = json.dumps([{"idea": "milestone"}])
         restored = mod._restore_p17_p22_from_redis()
-        assert restored["autobiography"] is True
+        assert restored["creative_ideas"] is True
         assert "emotional_timeline" not in restored
+        assert "autobiography" not in restored
         assert "formed_values" not in restored
-        assert mod._autobiography[0]["nature"] == "milestone"
+        assert mod._creative_ideas[0]["idea"] == "milestone"
     finally:
         mod._get_redis_client = original_get_redis_client
 
