@@ -185,6 +185,9 @@ test-security-audit:
 test-gaps-sprint:
 	PYTHONPATH=. python scripts/test_gaps_sprint.py
 
+test-github-models:
+	PYTHONPATH=. python scripts/test_github_models_eval.py
+
 test-tree-search:
 	PYTHONPATH=. python scripts/test_tree_search.py
 

@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      models: read
     env:
       HMAC_ALLOW_DEV_SECRET: "true"
 
@@ -39,6 +42,17 @@ jobs:
       - name: Run core unit tests
         run: |
           make test-core
+
+      - name: GitHub Models CI backend smoke test (best-effort)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # CI/tests-only LLM backend (D36) — gives a real model response
+          # for test feedback instead of relying solely on the local
+          # qwen2:0.5b stub. Free-tier/rate-limited by design (see
+          # scripts/github_models_client.py), so failures here are a
+          # warning, not a build-breaker.
+          make test-github-models || echo "::warning::GitHub Models smoke test failed (likely rate-limited) — not build-breaking"
 
       - name: Build full stack Docker images
         run: |

@@ -27,7 +27,7 @@ End of month definition of done: **You can demo Kai to a friend. You use it dail
 ### Week 1 — In flight / dispatching now (PM-driven, agent-implemented)
 
 #### 0. ⭐ GitHub Models backend + Phi-4-mini default + behavioral scoreboard + coverage gate
-**Status:** 🚧 Coding agent dispatched (PR opening shortly)
+**Status:** ◐ Partially done (2026-06-19, D36) — GitHub Models backend + Phi-4-mini default landed, scoped CI/tests-only per explicit user decision (never a production fallback, preserving "local-first, sovereign-safe"). `scripts/github_models_client.py` + `scripts/test_github_models_eval.py` + a best-effort step in `.github/workflows/core-tests.yml`. Live round-trip against `models.github.ai` not yet verified (sandbox network policy blocks it; needs a real Actions run). **Behavioral scoreboard + coverage gate are still not started** — separate, unrelated deliverables bundled into this item's original title; track them as their own follow-up rather than implying this item is fully closed.
 **Why first:** unblocks every later item — gives Kai a real LLM today, CPU-only, free.
 
 #### 0a. Automation infrastructure (Friday cleanup, weekly Report Card, off-site backup, demo doc, journal/skills templates)
