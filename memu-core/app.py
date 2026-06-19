@@ -92,14 +92,14 @@ _session_lock = asyncio.Lock()       # protects _session_store, _session_timesta
 _feedback_lock = asyncio.Lock()      # protects _feedback_store
 _nudge_lock = asyncio.Lock()         # protects _dismissal_counts, _last_nudge_by_type, _dnd_until
 _topic_lock = asyncio.Lock()         # protects _active_topics, _deferred_topics
-_imagination_lock = asyncio.Lock()   # protects _counterfactuals, _empathy_map, _creative_ideas, _inner_monologue, _aspirations
 # P17 (_emotional_timeline, _reflection_journal, _relationship_milestones,
-# _confession_cooldown), P18 (_autobiography, _legacy_messages), and P20
-# (_formed_values, _conscience_log, _loyalty_ledger, _gratitude_journal,
-# _value_alignment_score) no longer need asyncio.Lock — all reads/writes go
-# through atomic Redis list/hash ops (see _p17_*/_p18_*/_p20_* helpers) so
-# the data can safely be shared across processes once split out.
-# See DECISIONS.md D22/D23/D24.
+# _confession_cooldown), P18 (_autobiography, _legacy_messages), P19
+# (_counterfactuals, _empathy_map, _creative_ideas, _inner_monologue,
+# _aspirations), and P20 (_formed_values, _conscience_log, _loyalty_ledger,
+# _gratitude_journal, _value_alignment_score) no longer need asyncio.Lock —
+# all reads/writes go through atomic Redis list/hash ops (see
+# _p17_*/_p18_*/_p19_*/_p20_* helpers) so the data can safely be shared
+# across processes once split out. See DECISIONS.md D22/D23/D24/D25.
 _agent_lock = asyncio.Lock()         # protects _scheduled_tasks, _reminders, _briefing_log
 _operator_lock = asyncio.Lock()      # protects _echo_history, _nudge_ladder, _cross_mode_insights, _oracle_predictions, _shadow_branches
 
@@ -1786,10 +1786,11 @@ def _persist_p17_p22_to_redis() -> Dict[str, bool]:
     # helpers, DECISIONS.md D24); a periodic SET on those keys would clobber
     # the live List with a stale type, so it's intentionally skipped now.
 
-    # P19: Imagination Engine
-    results["counterfactuals"] = _persist_to_redis("kai:p19:counterfactuals", list(_counterfactuals))
-    results["creative_ideas"] = _persist_to_redis("kai:p19:creative_ideas", list(_creative_ideas))
-    results["aspirations"] = _persist_to_redis("kai:p19:aspirations", list(_aspirations))
+    # P19: Imagination Engine — no longer snapshotted here. Reads/writes are
+    # always live against Redis's own kai:p19:* list/string keys (see
+    # _p19_* helpers, DECISIONS.md D25); a periodic SET on the list keys
+    # would clobber the live List with a stale type, so it's intentionally
+    # skipped now.
 
     # P20: Conscience & Values — no longer snapshotted here. Reads/writes
     # are always live against Redis's own kai:p20:* hash/list keys (see
@@ -1828,7 +1829,6 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     H2.1: Loads emotional timeline, goals, values, etc. from previous sessions.
     Returns dict of {data_key: loaded_bool}.
     """
-    global _counterfactuals, _creative_ideas, _aspirations
     global _scheduled_tasks, _reminders
     global _echo_history, _nudge_ladder, _cross_mode_insights
     global _oracle_predictions, _shadow_branches
@@ -1843,19 +1843,9 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     # moved out of Redis in the first place (live list keys), so there's no
     # in-process global to repopulate at startup.
 
-    # P19: Imagination Engine
-    loaded = _load_from_redis("kai:p19:counterfactuals", [])
-    if loaded:
-        _counterfactuals = deque(loaded, maxlen=100)
-        results["counterfactuals"] = True
-    loaded = _load_from_redis("kai:p19:creative_ideas", [])
-    if loaded:
-        _creative_ideas = deque(loaded, maxlen=100)
-        results["creative_ideas"] = True
-    loaded = _load_from_redis("kai:p19:aspirations", [])
-    if loaded:
-        _aspirations = deque(loaded, maxlen=50)
-        results["aspirations"] = True
+    # P19: Imagination Engine — nothing to restore here. The data was never
+    # moved out of Redis in the first place (live list/string keys), so
+    # there's no in-process global to repopulate at startup.
 
     # P20: Conscience & Values — nothing to restore here. The data was
     # never moved out of Redis in the first place (live hash/list keys),
@@ -2226,6 +2216,63 @@ def _p18_update_entry(key: str, fallback: List[Dict[str, Any]], entry_id: str, u
         if item.get("id") == entry_id:
             item.update(updates)
             return
+
+
+# ── P19: Redis-native imagination engine store ───────────────────────
+# Phase 1 of the P17-P22 Redis-backed split (see DECISIONS.md D25, same
+# approach as P17/D23, P18/D24, P20/D22). Four append-only logs use Redis
+# Lists (RPUSH + LTRIM); the empathy map is a single continuously-
+# overwritten "current state" object (not an append log), so it reuses the
+# existing _persist_to_redis/_load_from_redis GET/SET primitives directly
+# rather than a Hash — there's no per-field atomic increment need the way
+# P20's alignment streak had. Falls back to the in-process list/dict
+# (declared in the P19 section below) when Redis is unavailable.
+_P19_COUNTERFACTUALS_KEY = "kai:p19:counterfactuals"
+_P19_CREATIVE_KEY = "kai:p19:creative_ideas"
+_P19_MONOLOGUE_KEY = "kai:p19:inner_monologue"
+_P19_ASPIRATIONS_KEY = "kai:p19:aspirations"
+_P19_EMPATHY_KEY = "kai:p19:empathy_map"
+
+
+def _p19_append_capped(key: str, fallback: List[Dict[str, Any]], entry: Dict[str, Any], cap: int) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.rpush(key, json.dumps(entry))
+            redis.ltrim(key, -cap, -1)
+            return
+        except Exception:
+            pass
+    fallback.append(entry)
+    if len(fallback) > cap:
+        fallback[:] = fallback[-cap:]
+
+
+def _p19_all_capped(key: str, fallback: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(key, 0, -1)
+            return [json.loads(r) for r in raw]
+        except Exception:
+            pass
+    return list(fallback)
+
+
+def _p19_empathy_get() -> Dict[str, Any]:
+    loaded = _load_from_redis(_P19_EMPATHY_KEY, None)
+    if loaded is not None:
+        return loaded
+    return dict(_empathy_map)
+
+
+def _p19_empathy_update(updates: Dict[str, Any]) -> Dict[str, Any]:
+    current = _p19_empathy_get()
+    current.update(updates)
+    if _persist_to_redis(_P19_EMPATHY_KEY, current):
+        return current
+    _empathy_map.update(updates)
+    return dict(_empathy_map)
 
 
 # Restore P17-P22 data at startup
@@ -5581,9 +5628,7 @@ async def generate_counterfactual(request: Request) -> Dict[str, Any]:
         ),
     }
 
-    _counterfactuals.append(counterfactual)
-    if len(_counterfactuals) > _COUNTERFACTUAL_CAP:
-        _counterfactuals[:] = _counterfactuals[-_COUNTERFACTUAL_CAP:]
+    _p19_append_capped(_P19_COUNTERFACTUALS_KEY, _counterfactuals, counterfactual, _COUNTERFACTUAL_CAP)
 
     return {"status": "ok", "counterfactual": counterfactual}
 
@@ -5591,11 +5636,12 @@ async def generate_counterfactual(request: Request) -> Dict[str, Any]:
 @app.get("/memory/imagine/counterfactuals")
 async def list_counterfactuals(limit: int = 20) -> Dict[str, Any]:
     """List recent counterfactual replays."""
-    recent = list(reversed(_counterfactuals))[:limit]
+    counterfactuals = _p19_all_capped(_P19_COUNTERFACTUALS_KEY, _counterfactuals)
+    recent = list(reversed(counterfactuals))[:limit]
     return {
         "status": "ok",
         "count": len(recent),
-        "total": len(_counterfactuals),
+        "total": len(counterfactuals),
         "counterfactuals": recent,
     }
 
@@ -5699,7 +5745,7 @@ async def empathetic_simulation(request: Request) -> Dict[str, Any]:
         unspoken.append("Seems comfortable — maintain current interaction style")
 
     # Update the running empathy map
-    _empathy_map.update({
+    _p19_empathy_update({
         "emotional_state": emotional_state,
         "energy_level": energy,
         "focus": focus,
@@ -5725,7 +5771,7 @@ async def empathetic_simulation(request: Request) -> Dict[str, Any]:
 @app.get("/memory/imagine/empathy-map")
 async def get_empathy_map() -> Dict[str, Any]:
     """Get current model of the operator's state."""
-    return {"status": "ok", "empathy_map": dict(_empathy_map)}
+    return {"status": "ok", "empathy_map": _p19_empathy_get()}
 
 
 # ── P19c: Creative Synthesis ────────────────────────────────────────
@@ -5811,9 +5857,7 @@ async def creative_synthesis(request: Request) -> Dict[str, Any]:
         , 2),
     }
 
-    _creative_ideas.append(idea)
-    if len(_creative_ideas) > _CREATIVE_CAP:
-        _creative_ideas[:] = _creative_ideas[-_CREATIVE_CAP:]
+    _p19_append_capped(_P19_CREATIVE_KEY, _creative_ideas, idea, _CREATIVE_CAP)
 
     return {"status": "ok", "idea": idea}
 
@@ -5821,11 +5865,12 @@ async def creative_synthesis(request: Request) -> Dict[str, Any]:
 @app.get("/memory/imagine/ideas")
 async def list_creative_ideas(limit: int = 20) -> Dict[str, Any]:
     """List recent creative synthesis ideas."""
-    recent = list(reversed(_creative_ideas))[:limit]
+    creative_ideas = _p19_all_capped(_P19_CREATIVE_KEY, _creative_ideas)
+    recent = list(reversed(creative_ideas))[:limit]
     return {
         "status": "ok",
         "count": len(recent),
-        "total": len(_creative_ideas),
+        "total": len(creative_ideas),
         "ideas": recent,
     }
 
@@ -5880,9 +5925,7 @@ async def record_inner_thought(request: Request) -> Dict[str, Any]:
         "context": context,
     }
 
-    _inner_monologue.append(entry)
-    if len(_inner_monologue) > _MONOLOGUE_CAP:
-        _inner_monologue[:] = _inner_monologue[-_MONOLOGUE_CAP:]
+    _p19_append_capped(_P19_MONOLOGUE_KEY, _inner_monologue, entry, _MONOLOGUE_CAP)
 
     return {"status": "ok", "entry": entry}
 
@@ -5893,21 +5936,22 @@ async def get_inner_monologue(
     thought_type: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Stream Kai's recent inner thoughts."""
-    entries = list(reversed(_inner_monologue))
+    inner_monologue = _p19_all_capped(_P19_MONOLOGUE_KEY, _inner_monologue)
+    entries = list(reversed(inner_monologue))
     if thought_type:
         entries = [e for e in entries if e.get("type") == thought_type]
     entries = entries[:limit]
 
     # Thought type distribution
     type_counts: Dict[str, int] = {}
-    for e in _inner_monologue:
+    for e in inner_monologue:
         t = e.get("type", "observation")
         type_counts[t] = type_counts.get(t, 0) + 1
 
     return {
         "status": "ok",
         "count": len(entries),
-        "total": len(_inner_monologue),
+        "total": len(inner_monologue),
         "thoughts": entries,
         "thought_distribution": type_counts,
     }
@@ -5971,9 +6015,7 @@ async def create_aspiration(request: Request) -> Dict[str, Any]:
         ),
     }
 
-    _aspirations.append(aspiration)
-    if len(_aspirations) > _ASPIRATION_CAP:
-        _aspirations[:] = _aspirations[-_ASPIRATION_CAP:]
+    _p19_append_capped(_P19_ASPIRATIONS_KEY, _aspirations, aspiration, _ASPIRATION_CAP)
 
     return {"status": "ok", "aspiration": aspiration}
 
@@ -5981,11 +6023,12 @@ async def create_aspiration(request: Request) -> Dict[str, Any]:
 @app.get("/memory/imagine/aspirations")
 async def list_aspirations(limit: int = 20) -> Dict[str, Any]:
     """List Kai's aspirations — dreams grounded in reality."""
-    recent = list(reversed(_aspirations))[:limit]
+    aspirations = _p19_all_capped(_P19_ASPIRATIONS_KEY, _aspirations)
+    recent = list(reversed(aspirations))[:limit]
     return {
         "status": "ok",
         "count": len(recent),
-        "total": len(_aspirations),
+        "total": len(aspirations),
         "aspirations": recent,
     }
 
@@ -6007,33 +6050,38 @@ def _parse_ts(ts_str: str) -> float:
 @app.get("/memory/imagine/summary")
 async def imagination_summary() -> Dict[str, Any]:
     """Combined view of all imagination subsystems."""
+    counterfactuals = _p19_all_capped(_P19_COUNTERFACTUALS_KEY, _counterfactuals)
+    creative_ideas = _p19_all_capped(_P19_CREATIVE_KEY, _creative_ideas)
+    inner_monologue = _p19_all_capped(_P19_MONOLOGUE_KEY, _inner_monologue)
+    aspirations = _p19_all_capped(_P19_ASPIRATIONS_KEY, _aspirations)
+
     # Thought type distribution
     thought_types: Dict[str, int] = {}
-    for t in _inner_monologue:
+    for t in inner_monologue:
         tt = t.get("type", "observation")
         thought_types[tt] = thought_types.get(tt, 0) + 1
 
     # Most common creative domains
     domain_pairs: Dict[str, int] = {}
-    for idea in _creative_ideas:
+    for idea in creative_ideas:
         pair = f"{idea['domain_a']} × {idea['domain_b']}"
         domain_pairs[pair] = domain_pairs.get(pair, 0) + 1
 
     return {
         "status": "ok",
         "imagination": {
-            "counterfactuals": len(_counterfactuals),
-            "creative_ideas": len(_creative_ideas),
-            "inner_thoughts": len(_inner_monologue),
-            "aspirations": len(_aspirations),
+            "counterfactuals": len(counterfactuals),
+            "creative_ideas": len(creative_ideas),
+            "inner_thoughts": len(inner_monologue),
+            "aspirations": len(aspirations),
         },
-        "empathy_map": dict(_empathy_map),
+        "empathy_map": _p19_empathy_get(),
         "thought_distribution": thought_types,
         "creative_domains": dict(sorted(
             domain_pairs.items(), key=lambda x: x[1], reverse=True
         )[:5]),
-        "latest_aspiration": _aspirations[-1] if _aspirations else None,
-        "latest_thought": _inner_monologue[-1] if _inner_monologue else None,
+        "latest_aspiration": aspirations[-1] if aspirations else None,
+        "latest_thought": inner_monologue[-1] if inner_monologue else None,
     }
 
 

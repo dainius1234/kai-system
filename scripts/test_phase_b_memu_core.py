@@ -79,29 +79,33 @@ def main() -> int:
         assert mod._load_from_redis("kai:test:key", {}) == {"ok": True}
 
         # P17 (emotional_timeline, reflection_journal, relationship_milestones,
-        # confession_cooldown), P18 (autobiography, legacy_messages), and P20
-        # (formed_values, conscience_log, loyalty_ledger, gratitude_journal)
-        # are intentionally excluded from this periodic snapshot/restore
-        # cycle — they now read/write live against Redis's own list/hash
-        # keys via the _p17_*/_p18_*/_p20_* helpers instead (see
-        # DECISIONS.md D22/D23/D24), so there's no global to round-trip here
-        # anymore. P19's creative_ideas is unconverted, so it still goes
-        # through this cycle — used here to prove the cycle still works for
-        # the areas that haven't been migrated yet.
-        mod._creative_ideas = [{"idea": "observation"}]
+        # confession_cooldown), P18 (autobiography, legacy_messages), P19
+        # (counterfactuals, empathy_map, creative_ideas, inner_monologue,
+        # aspirations), and P20 (formed_values, conscience_log,
+        # loyalty_ledger, gratitude_journal) are intentionally excluded from
+        # this periodic snapshot/restore cycle — they now read/write live
+        # against Redis's own list/hash/string keys via the
+        # _p17_*/_p18_*/_p19_*/_p20_* helpers instead (see DECISIONS.md
+        # D22/D23/D24/D25), so there's no global to round-trip here anymore.
+        # P21's scheduled_tasks is unconverted, so it still goes through
+        # this cycle — used here to prove the cycle still works for the
+        # areas that haven't been migrated yet.
+        mod._scheduled_tasks = {"t1": {"task": "observation"}}
         persist_results = mod._persist_p17_p22_to_redis()
-        assert persist_results["creative_ideas"] is True
+        assert persist_results["scheduled_tasks"] is True
         assert "emotional_timeline" not in persist_results
         assert "autobiography" not in persist_results
+        assert "creative_ideas" not in persist_results
         assert "formed_values" not in persist_results
 
-        fake_redis.data["kai:p19:creative_ideas"] = json.dumps([{"idea": "milestone"}])
+        fake_redis.data["kai:p21:scheduled_tasks"] = json.dumps({"t1": {"task": "milestone"}})
         restored = mod._restore_p17_p22_from_redis()
-        assert restored["creative_ideas"] is True
+        assert restored["scheduled_tasks"] is True
         assert "emotional_timeline" not in restored
         assert "autobiography" not in restored
+        assert "creative_ideas" not in restored
         assert "formed_values" not in restored
-        assert mod._creative_ideas[0]["idea"] == "milestone"
+        assert mod._scheduled_tasks["t1"]["task"] == "milestone"
     finally:
         mod._get_redis_client = original_get_redis_client
 

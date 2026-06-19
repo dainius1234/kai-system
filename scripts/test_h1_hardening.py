@@ -68,8 +68,12 @@ class TestH1_1_AsyncioLocks(unittest.TestCase):
         self.assertNotIn("_narrative_lock", MEMU_SRC)
         self.assertIn("_p18_append_capped", MEMU_SRC)
 
-    def test_imagination_lock_defined(self):
-        self.assertIn("_imagination_lock = asyncio.Lock()", MEMU_SRC)
+    def test_imagination_no_longer_needs_lock(self):
+        """P19 dropped its asyncio.Lock — reads/writes go through atomic
+        Redis list ops (and a GET/SET-backed empathy map) instead (see
+        DECISIONS.md D25), same rationale as P17/P18/P20's D23/D24/D22."""
+        self.assertNotIn("_imagination_lock", MEMU_SRC)
+        self.assertIn("_p19_append_capped", MEMU_SRC)
 
     def test_conscience_no_longer_needs_lock(self):
         """P20 dropped its asyncio.Lock — reads/writes go through atomic
