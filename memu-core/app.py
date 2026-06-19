@@ -95,12 +95,12 @@ _topic_lock = asyncio.Lock()         # protects _active_topics, _deferred_topics
 # P17 (_emotional_timeline, _reflection_journal, _relationship_milestones,
 # _confession_cooldown), P18 (_autobiography, _legacy_messages), P19
 # (_counterfactuals, _empathy_map, _creative_ideas, _inner_monologue,
-# _aspirations), and P20 (_formed_values, _conscience_log, _loyalty_ledger,
-# _gratitude_journal, _value_alignment_score) no longer need asyncio.Lock —
-# all reads/writes go through atomic Redis list/hash ops (see
-# _p17_*/_p18_*/_p19_*/_p20_* helpers) so the data can safely be shared
-# across processes once split out. See DECISIONS.md D22/D23/D24/D25.
-_agent_lock = asyncio.Lock()         # protects _scheduled_tasks, _reminders, _briefing_log
+# _aspirations), P20 (_formed_values, _conscience_log, _loyalty_ledger,
+# _gratitude_journal, _value_alignment_score), and P21 (_scheduled_tasks,
+# _reminders, _briefing_log) no longer need asyncio.Lock — all reads/writes
+# go through atomic Redis list/hash ops (see _p17_*/_p18_*/_p19_*/_p20_*/
+# _p21_* helpers) so the data can safely be shared across processes once
+# split out. See DECISIONS.md D22/D23/D24/D25/D26.
 _operator_lock = asyncio.Lock()      # protects _echo_history, _nudge_ladder, _cross_mode_insights, _oracle_predictions, _shadow_branches
 
 
@@ -1798,9 +1798,11 @@ def _persist_p17_p22_to_redis() -> Dict[str, bool]:
     # clobber the live Hash/List with a stale type, so it's intentionally
     # skipped now.
 
-    # P21: Proactive Agent
-    results["scheduled_tasks"] = _persist_to_redis("kai:p21:scheduled_tasks", _scheduled_tasks)
-    results["reminders"] = _persist_to_redis("kai:p21:reminders", _reminders)
+    # P21: Proactive Agent — no longer snapshotted here. Reads/writes are
+    # always live against Redis's own kai:p21:* hash/list keys (see
+    # _p21_* helpers, DECISIONS.md D26); a periodic SET on those keys would
+    # clobber the live Hash/List with a stale type, so it's intentionally
+    # skipped now.
 
     # P22: Operator Model
     results["echo_history"] = _persist_to_redis("kai:p22:echo_history", list(_echo_history))
@@ -1829,7 +1831,6 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     H2.1: Loads emotional timeline, goals, values, etc. from previous sessions.
     Returns dict of {data_key: loaded_bool}.
     """
-    global _scheduled_tasks, _reminders
     global _echo_history, _nudge_ladder, _cross_mode_insights
     global _oracle_predictions, _shadow_branches
 
@@ -1851,15 +1852,9 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     # never moved out of Redis in the first place (live hash/list keys),
     # so there's no in-process global to repopulate at startup.
 
-    # P21: Proactive Agent
-    loaded = _load_from_redis("kai:p21:scheduled_tasks", {})
-    if loaded:
-        _scheduled_tasks = loaded
-        results["scheduled_tasks"] = True
-    loaded = _load_from_redis("kai:p21:reminders", {})
-    if loaded:
-        _reminders = loaded
-        results["reminders"] = True
+    # P21: Proactive Agent — nothing to restore here. The data was never
+    # moved out of Redis in the first place (live hash/list keys), so
+    # there's no in-process global to repopulate at startup.
 
     # P22: Operator Model
     loaded = _load_from_redis("kai:p22:echo_history", [])
@@ -2273,6 +2268,106 @@ def _p19_empathy_update(updates: Dict[str, Any]) -> Dict[str, Any]:
         return current
     _empathy_map.update(updates)
     return dict(_empathy_map)
+
+
+# ── P21 helpers: Redis Hash for id-keyed dicts of mutable sub-dicts ──
+# _scheduled_tasks/_reminders are dicts keyed by id whose entries get
+# individual fields mutated in place after creation (e.g. task["active"] =
+# False), unlike P17/P18/P19's append-only logs or P19's single flat dict —
+# so each entry is its own Hash field (HSET id -> json), same approach as
+# P20's _p20_get_value/_p20_put_value/_p20_all_values but keyed by id
+# instead of value name.
+_P21_TASKS_KEY = "kai:p21:scheduled_tasks"
+_P21_REMINDERS_KEY = "kai:p21:reminders"
+_P21_BRIEFING_KEY = "kai:p21:briefing_log"
+
+
+def _p21_hash_get(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str) -> Optional[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hget(key, item_id)
+            return json.loads(raw) if raw else None
+        except Exception:
+            pass
+    return fallback.get(item_id)
+
+
+def _p21_hash_put(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str, entry: Dict[str, Any]) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.hset(key, item_id, json.dumps(entry))
+            return
+        except Exception:
+            pass
+    fallback[item_id] = entry
+
+
+def _p21_hash_all(key: str, fallback: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hgetall(key)
+            return {k: json.loads(v) for k, v in raw.items()}
+        except Exception:
+            pass
+    return dict(fallback)
+
+
+def _p21_hash_len(key: str, fallback: Dict[str, Dict[str, Any]]) -> int:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            return redis.hlen(key)
+        except Exception:
+            pass
+    return len(fallback)
+
+
+def _p21_hash_update(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str, updates: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Read-modify-write a single hash field — same race window as P20's
+    value-update path (acceptable here: single-operator system, not a
+    high-contention counter like alignment score)."""
+    item = _p21_hash_get(key, fallback, item_id)
+    if item is None:
+        return None
+    item.update(updates)
+    _p21_hash_put(key, fallback, item_id, item)
+    return item
+
+
+def _p21_append_capped(entry: Dict[str, Any], cap: int) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.rpush(_P21_BRIEFING_KEY, json.dumps(entry))
+            redis.ltrim(_P21_BRIEFING_KEY, -cap, -1)
+            return
+        except Exception:
+            pass
+    _briefing_log.append(entry)
+
+
+def _p21_briefing_all() -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(_P21_BRIEFING_KEY, 0, -1)
+            return [json.loads(r) for r in raw]
+        except Exception:
+            pass
+    return list(_briefing_log)
+
+
+def _p21_briefing_len() -> int:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            return redis.llen(_P21_BRIEFING_KEY)
+        except Exception:
+            pass
+    return len(_briefing_log)
 
 
 # Restore P17-P22 data at startup
@@ -6583,7 +6678,7 @@ async def schedule_task(body: Dict[str, Any]) -> Dict[str, Any]:
     title = sanitize_string(str(body.get("title", "")).strip())
     if not title:
         raise HTTPException(status_code=400, detail="title is required")
-    if len(_scheduled_tasks) >= _MAX_SCHEDULED:
+    if _p21_hash_len(_P21_TASKS_KEY, _scheduled_tasks) >= _MAX_SCHEDULED:
         raise HTTPException(status_code=409, detail="scheduler full")
 
     task_type = str(body.get("type", "reminder")).lower()
@@ -6598,7 +6693,7 @@ async def schedule_task(body: Dict[str, Any]) -> Dict[str, Any]:
     task_id = str(uuid.uuid4())[:12]
     now_iso = datetime.now(timezone.utc).isoformat()
 
-    _scheduled_tasks[task_id] = {
+    _p21_hash_put(_P21_TASKS_KEY, _scheduled_tasks, task_id, {
         "task_id": task_id,
         "title": title[:200],
         "type": task_type,
@@ -6609,7 +6704,7 @@ async def schedule_task(body: Dict[str, Any]) -> Dict[str, Any]:
         "fire_count": 0,
         "active": True,
         "payload": body.get("payload", {}),
-    }
+    })
     logger.info("Scheduled task created: id=%s title=%s freq=%s", task_id, title[:50], frequency)
     return {"status": "scheduled", "task_id": task_id, "title": title}
 
@@ -6617,12 +6712,13 @@ async def schedule_task(body: Dict[str, Any]) -> Dict[str, Any]:
 @app.get("/memory/schedule/tasks")
 async def list_scheduled_tasks() -> Dict[str, Any]:
     """P21b: List all active scheduled tasks."""
-    active = [t for t in _scheduled_tasks.values() if t.get("active", True)]
+    tasks = _p21_hash_all(_P21_TASKS_KEY, _scheduled_tasks)
+    active = [t for t in tasks.values() if t.get("active", True)]
     active.sort(key=lambda t: t.get("fire_at") or t.get("created", ""), reverse=False)
     return {
         "status": "ok",
         "count": len(active),
-        "total": len(_scheduled_tasks),
+        "total": len(tasks),
         "tasks": active,
     }
 
@@ -6631,8 +6727,7 @@ async def list_scheduled_tasks() -> Dict[str, Any]:
 async def cancel_task(task_id: str) -> Dict[str, Any]:
     """P21b: Cancel a scheduled task."""
     task_id = sanitize_string(task_id)
-    if task_id in _scheduled_tasks:
-        _scheduled_tasks[task_id]["active"] = False
+    if _p21_hash_update(_P21_TASKS_KEY, _scheduled_tasks, task_id, {"active": False}) is not None:
         return {"status": "cancelled", "task_id": task_id}
     raise HTTPException(status_code=404, detail="task not found")
 
@@ -6641,13 +6736,13 @@ async def cancel_task(task_id: str) -> Dict[str, Any]:
 async def fire_task(task_id: str) -> Dict[str, Any]:
     """P21b: Mark a task as fired (called by supervisor when executed)."""
     task_id = sanitize_string(task_id)
-    task = _scheduled_tasks.get(task_id)
+    task = _p21_hash_get(_P21_TASKS_KEY, _scheduled_tasks, task_id)
     if not task:
         raise HTTPException(status_code=404, detail="task not found")
-    task["last_fired"] = datetime.now(timezone.utc).isoformat()
-    task["fire_count"] = task.get("fire_count", 0) + 1
+    updates = {"last_fired": datetime.now(timezone.utc).isoformat(), "fire_count": task.get("fire_count", 0) + 1}
     if task["frequency"] == "once":
-        task["active"] = False
+        updates["active"] = False
+    task = _p21_hash_update(_P21_TASKS_KEY, _scheduled_tasks, task_id, updates)
     return {"status": "fired", "task_id": task_id, "fire_count": task["fire_count"]}
 
 
@@ -6658,7 +6753,7 @@ async def get_due_tasks() -> Dict[str, Any]:
     now_iso = now.isoformat()
     due = []
 
-    for task in _scheduled_tasks.values():
+    for task in _p21_hash_all(_P21_TASKS_KEY, _scheduled_tasks).values():
         if not task.get("active", True):
             continue
 
@@ -6709,7 +6804,7 @@ async def set_reminder(body: Dict[str, Any]) -> Dict[str, Any]:
     text = sanitize_string(str(body.get("text", "")).strip())
     if not text:
         raise HTTPException(status_code=400, detail="text is required")
-    if len(_reminders) >= _MAX_REMINDERS:
+    if _p21_hash_len(_P21_REMINDERS_KEY, _reminders) >= _MAX_REMINDERS:
         raise HTTPException(status_code=409, detail="reminders full")
 
     fire_at = sanitize_string(str(body.get("fire_at", "")))
@@ -6722,7 +6817,7 @@ async def set_reminder(body: Dict[str, Any]) -> Dict[str, Any]:
         repeat = "once"
 
     reminder_id = str(uuid.uuid4())[:12]
-    _reminders[reminder_id] = {
+    _p21_hash_put(_P21_REMINDERS_KEY, _reminders, reminder_id, {
         "reminder_id": reminder_id,
         "text": text[:500],
         "fire_at": fire_at,
@@ -6730,7 +6825,7 @@ async def set_reminder(body: Dict[str, Any]) -> Dict[str, Any]:
         "created": datetime.now(timezone.utc).isoformat(),
         "fired": False,
         "fire_count": 0,
-    }
+    })
     logger.info("Reminder set: id=%s fire_at=%s text=%s", reminder_id, fire_at, text[:50])
     return {"status": "set", "reminder_id": reminder_id, "fire_at": fire_at}
 
@@ -6738,12 +6833,13 @@ async def set_reminder(body: Dict[str, Any]) -> Dict[str, Any]:
 @app.get("/memory/reminders")
 async def list_reminders() -> Dict[str, Any]:
     """P21c: List all pending reminders."""
-    pending = [r for r in _reminders.values() if not r.get("fired")]
+    reminders = _p21_hash_all(_P21_REMINDERS_KEY, _reminders)
+    pending = [r for r in reminders.values() if not r.get("fired")]
     pending.sort(key=lambda r: r.get("fire_at", ""))
     return {
         "status": "ok",
         "count": len(pending),
-        "total": len(_reminders),
+        "total": len(reminders),
         "reminders": pending,
     }
 
@@ -6755,7 +6851,7 @@ async def get_due_reminders() -> Dict[str, Any]:
     now = datetime.now(timezone.utc)
     due = []
 
-    for r in _reminders.values():
+    for r in _p21_hash_all(_P21_REMINDERS_KEY, _reminders).values():
         if r.get("fired") and r.get("repeat", "once") == "once":
             continue
         fire_at = r.get("fire_at", "")
@@ -6783,13 +6879,13 @@ async def get_due_reminders() -> Dict[str, Any]:
 async def fire_reminder(reminder_id: str) -> Dict[str, Any]:
     """P21c: Mark a reminder as fired."""
     reminder_id = sanitize_string(reminder_id)
-    r = _reminders.get(reminder_id)
+    r = _p21_hash_get(_P21_REMINDERS_KEY, _reminders, reminder_id)
     if not r:
         raise HTTPException(status_code=404, detail="reminder not found")
-    r["fire_count"] = r.get("fire_count", 0) + 1
-    r["last_fire"] = datetime.now(timezone.utc).isoformat()
+    updates = {"fire_count": r.get("fire_count", 0) + 1, "last_fire": datetime.now(timezone.utc).isoformat()}
     if r.get("repeat", "once") == "once":
-        r["fired"] = True
+        updates["fired"] = True
+    _p21_hash_update(_P21_REMINDERS_KEY, _reminders, reminder_id, updates)
     return {"status": "fired", "reminder_id": reminder_id}
 
 
@@ -6797,8 +6893,7 @@ async def fire_reminder(reminder_id: str) -> Dict[str, Any]:
 async def cancel_reminder(reminder_id: str) -> Dict[str, Any]:
     """P21c: Cancel a reminder."""
     reminder_id = sanitize_string(reminder_id)
-    if reminder_id in _reminders:
-        _reminders[reminder_id]["fired"] = True
+    if _p21_hash_update(_P21_REMINDERS_KEY, _reminders, reminder_id, {"fired": True}) is not None:
         return {"status": "cancelled", "reminder_id": reminder_id}
     raise HTTPException(status_code=404, detail="reminder not found")
 
@@ -6842,7 +6937,7 @@ async def morning_briefing() -> Dict[str, Any]:
         })
 
     # 2. Pending reminders
-    pending = [r for r in _reminders.values() if not r.get("fired")]
+    pending = [r for r in _p21_hash_all(_P21_REMINDERS_KEY, _reminders).values() if not r.get("fired")]
     if pending:
         reminder_items = [{"text": r["text"][:100], "fire_at": r.get("fire_at", "")}
                           for r in sorted(pending, key=lambda x: x.get("fire_at", ""))[:5]]
@@ -6880,7 +6975,7 @@ async def morning_briefing() -> Dict[str, Any]:
     # 5. Scheduled tasks due today
     due_today = []
     today_str = now.strftime("%Y-%m-%d")
-    for t in _scheduled_tasks.values():
+    for t in _p21_hash_all(_P21_TASKS_KEY, _scheduled_tasks).values():
         if t.get("active") and t.get("fire_at", "").startswith(today_str):
             due_today.append({"title": t["title"][:100], "fire_at": t.get("fire_at", "")})
     if due_today:
@@ -6890,7 +6985,7 @@ async def morning_briefing() -> Dict[str, Any]:
             "items": due_today,
         })
 
-    _briefing_log.append(briefing)
+    _p21_append_capped(briefing, _briefing_log.maxlen or 50)
     return briefing
 
 
@@ -6918,7 +7013,7 @@ async def evening_checkin() -> Dict[str, Any]:
     })
 
     # 2. Reminders that fired today
-    fired_today = [r for r in _reminders.values()
+    fired_today = [r for r in _p21_hash_all(_P21_REMINDERS_KEY, _reminders).values()
                    if r.get("last_fire", "").startswith(today_str)]
     if fired_today:
         checkin["sections"].append({
@@ -6937,7 +7032,7 @@ async def evening_checkin() -> Dict[str, Any]:
     # 4. Tomorrow's scheduled tasks
     tomorrow = now + timedelta(days=1)
     tomorrow_str = tomorrow.strftime("%Y-%m-%d")
-    tomorrow_tasks = [t for t in _scheduled_tasks.values()
+    tomorrow_tasks = [t for t in _p21_hash_all(_P21_TASKS_KEY, _scheduled_tasks).values()
                       if t.get("active") and t.get("fire_at", "").startswith(tomorrow_str)]
     if tomorrow_tasks:
         checkin["sections"].append({
@@ -6946,17 +7041,18 @@ async def evening_checkin() -> Dict[str, Any]:
             "items": [{"title": t["title"][:100]} for t in tomorrow_tasks[:5]],
         })
 
-    _briefing_log.append(checkin)
+    _p21_append_capped(checkin, _briefing_log.maxlen or 50)
     return checkin
 
 
 @app.get("/memory/briefing/history")
 async def briefing_history() -> Dict[str, Any]:
     """P21d: Recent briefing history."""
+    briefings = _p21_briefing_all()
     return {
         "status": "ok",
-        "count": len(_briefing_log),
-        "briefings": list(_briefing_log),
+        "count": len(briefings),
+        "briefings": briefings,
     }
 
 
@@ -6965,20 +7061,22 @@ async def briefing_history() -> Dict[str, Any]:
 @app.get("/memory/agent/summary")
 async def agent_summary() -> Dict[str, Any]:
     """P21e: Summary of Kai's proactive capabilities and current state."""
-    active_tasks = sum(1 for t in _scheduled_tasks.values() if t.get("active"))
-    pending_reminders = sum(1 for r in _reminders.values() if not r.get("fired"))
+    tasks = _p21_hash_all(_P21_TASKS_KEY, _scheduled_tasks)
+    reminders = _p21_hash_all(_P21_REMINDERS_KEY, _reminders)
+    active_tasks = sum(1 for t in tasks.values() if t.get("active"))
+    pending_reminders = sum(1 for r in reminders.values() if not r.get("fired"))
 
     # count due items
     now_iso = datetime.now(timezone.utc).isoformat()
-    due_reminders = sum(1 for r in _reminders.values()
+    due_reminders = sum(1 for r in reminders.values()
                         if not r.get("fired") and r.get("fire_at", "") <= now_iso)
 
     return {
         "status": "ok",
         "capabilities": len(_ACTION_REGISTRY),
-        "scheduled_tasks": {"active": active_tasks, "total": len(_scheduled_tasks)},
-        "reminders": {"pending": pending_reminders, "due_now": due_reminders, "total": len(_reminders)},
-        "briefings_generated": len(_briefing_log),
+        "scheduled_tasks": {"active": active_tasks, "total": len(tasks)},
+        "reminders": {"pending": pending_reminders, "due_now": due_reminders, "total": len(reminders)},
+        "briefings_generated": _p21_briefing_len(),
         "message": f"Kai can do {len(_ACTION_REGISTRY)} things. "
                    f"{active_tasks} scheduled tasks, {pending_reminders} pending reminders.",
     }
