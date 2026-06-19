@@ -52,8 +52,18 @@ class TestMARSStabilityGrowth(unittest.TestCase):
         self.assertIn("365.0", fn)
 
     def test_stability_persisted(self):
+        """Grown stability must flow into the update_record persistence path.
+
+        D12 moved this off the hot path: retrieve_ranked() now collects
+        per-record updates into a dict (key "stability") instead of calling
+        update_record(stability=record.stability) directly; the dict is then
+        applied either inline or via the background task below.
+        """
         fn = MEMU_SRC.split("def retrieve_ranked(")[1].split("\ndef ")[0]
-        self.assertIn("stability=record.stability", fn)
+        self.assertIn('"stability": record.stability', fn)
+        self.assertIn("update_record", fn)
+        bg_fn = MEMU_SRC.split("def _persist_retrieval_updates_background(")[1].split("\ndef ")[0]
+        self.assertIn('stability=u["stability"]', bg_fn)
 
 
 class TestMARSMemoryRecord(unittest.TestCase):
