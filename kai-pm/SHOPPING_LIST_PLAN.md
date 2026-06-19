@@ -248,8 +248,22 @@ Both Phase 0 items are now implemented, behind opt-in switches, defaults unchang
   `make test-core`.
 - **Verified so far**: `py_compile`, `make go_no_go`, `docker compose -f
   docker-compose.full.yml config`, and the full existing regression suite all pass. The
-  new mocked audio tests pass. **Not yet live-verified**: no Postgres or Docker daemon is
-  available in this sandbox, so the real Postgres+TurboVec round-trip and the real HTTP
-  call to a running `parakeet-server` have not been exercised end-to-end. `TECH_WATCH.md`
-  verdicts stay at Trial/Assess (not Adopt) until that happens — see D14 in
-  `DECISIONS.md` for full detail.
+  new mocked audio tests pass.
+- **Live-verified 2026-06-19 (D15)**: the "no Postgres or Docker daemon" framing above was
+  imprecise — the Docker daemon starts fine in this sandbox, but its image-blob CDN egress
+  is blocked on *both* Docker Hub and GHCR (confirmed via a real `docker pull
+  ghcr.io/mudler/parakeet.cpp-server:latest`, 403). Postgres needs no container at all:
+  apt-installed PostgreSQL 16 + `pgvector` + `pip install turbovec` all succeeded from
+  this sandbox's allowed package sources. Against that real (non-Docker) Postgres
+  instance: `scripts/test_memu_pgvector.py` and `scripts/test_memu_turbovec.py` both now
+  pass for real (no mocks), and a manual script confirmed the TurboVec
+  index-rebuild-from-Postgres recovery path end-to-end. Three real bugs were found and
+  fixed along the way (a stale `.conn` reference in the pgvector test that had apparently
+  never run against real Postgres before; a missing column-migration path in
+  `TurboVecStore._init_schema`; a `uint64`-vs-`int64` dtype mismatch in the real
+  `turbovec` library's `add_with_ids()` call) — see D15 in `DECISIONS.md` for full detail.
+  The `WHISPER_BACKEND=api` HTTP contract was separately live-verified (success + error
+  paths) against a local FastAPI stand-in implementing the same `/v1/audio/transcriptions`
+  contract — **not** the real `parakeet-server` image, which remains unpullable in this
+  sandbox specifically. `TECH_WATCH.md`: TurboVec moves to Trial; parakeet.cpp stays at
+  Trial with the precise caveat that the upstream Docker image itself is still unverified.

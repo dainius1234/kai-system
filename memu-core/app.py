@@ -547,6 +547,18 @@ class TurboVecStore(PGVectorStore):
                     );
                     """
                 )
+                # migrate: add TurboVec-specific columns if table existed from PGVectorStore's schema
+                for col, typ, default in [
+                    ("int_id", "BIGSERIAL UNIQUE", None),
+                    ("embedding_raw", "jsonb", "NULL"),
+                ]:
+                    try:
+                        clause = f"ALTER TABLE memories ADD COLUMN IF NOT EXISTS {col} {typ}"
+                        if default is not None:
+                            clause += f" DEFAULT {default}"
+                        cur.execute(clause + ";")
+                    except Exception:
+                        conn.rollback()
             conn.commit()
         finally:
             self._put_conn(conn)
@@ -563,7 +575,7 @@ class TurboVecStore(PGVectorStore):
         if not rows:
             return
         import numpy as np
-        ids = np.array([r[0] for r in rows], dtype=np.int64)
+        ids = np.array([r[0] for r in rows], dtype=np.uint64)
         vecs = np.array([r[1] for r in rows], dtype=np.float32)
         self._index.add_with_ids(vecs, ids)
         self._save_index()
@@ -628,7 +640,7 @@ class TurboVecStore(PGVectorStore):
             self._put_conn(conn)
         if record.embedding:
             vec = np.array([record.embedding], dtype=np.float32)
-            ids = np.array([int_id], dtype=np.int64)
+            ids = np.array([int_id], dtype=np.uint64)
             self._index.add_with_ids(vec, ids)
             self._save_index()
         branch = self.vc.create_branch("main", f"update-keeper-{int(time.time())}")
