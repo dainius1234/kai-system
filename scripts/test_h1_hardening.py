@@ -62,8 +62,12 @@ class TestH1_1_AsyncioLocks(unittest.TestCase):
     def test_imagination_lock_defined(self):
         self.assertIn("_imagination_lock = asyncio.Lock()", MEMU_SRC)
 
-    def test_conscience_lock_defined(self):
-        self.assertIn("_conscience_lock = asyncio.Lock()", MEMU_SRC)
+    def test_conscience_no_longer_needs_lock(self):
+        """P20 dropped its asyncio.Lock — reads/writes go through atomic
+        Redis hash/list ops instead (see DECISIONS.md D22), since a Python
+        lock can't coordinate across the separate process P20 will move to."""
+        self.assertNotIn("_conscience_lock", MEMU_SRC)
+        self.assertIn("_p20_append_capped", MEMU_SRC)
 
     def test_agent_lock_defined(self):
         self.assertIn("_agent_lock = asyncio.Lock()", MEMU_SRC)

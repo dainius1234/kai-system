@@ -116,7 +116,9 @@ class TestMARSConsolidateEndpoint(unittest.TestCase):
         """Conscience-linked memories should survive pruning."""
         fn = MEMU_SRC.split("def mars_consolidate")[1].split("\n@app.")[0]
         self.assertIn("conscience_saved", fn)
-        self.assertIn("_formed_values", fn)
+        # P20's formed values now live behind the Redis-backed _p20_all_values()
+        # accessor rather than the raw module global (see DECISIONS.md D22).
+        self.assertIn("_p20_all_values", fn)
 
     def test_uses_delete_record(self):
         fn = MEMU_SRC.split("def mars_consolidate")[1].split("\n@app.")[0]

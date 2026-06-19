@@ -96,7 +96,10 @@ _emotion_lock = asyncio.Lock()       # protects _emotional_timeline, _reflection
 _relationship_lock = asyncio.Lock()  # protects _relationship_milestones
 _narrative_lock = asyncio.Lock()     # protects _autobiography, _legacy_messages
 _imagination_lock = asyncio.Lock()   # protects _counterfactuals, _empathy_map, _creative_ideas, _inner_monologue, _aspirations
-_conscience_lock = asyncio.Lock()    # protects _formed_values, _conscience_log, _loyalty_ledger, _gratitude_journal, _value_alignment_score
+# P20 (_formed_values, _conscience_log, _loyalty_ledger, _gratitude_journal,
+# _value_alignment_score) no longer needs an asyncio.Lock — all reads/writes
+# go through atomic Redis hash/list ops (see _p20_* helpers) so the data can
+# safely be shared across processes once split out. See DECISIONS.md D22.
 _agent_lock = asyncio.Lock()         # protects _scheduled_tasks, _reminders, _briefing_log
 _operator_lock = asyncio.Lock()      # protects _echo_history, _nudge_ladder, _cross_mode_insights, _oracle_predictions, _shadow_branches
 
@@ -1221,10 +1224,7 @@ async def recover() -> Dict[str, Any]:
         "alignment_score": 1.0,
         "verdict": "fully_aligned",
     }
-    async with _conscience_lock:
-        _conscience_log.append(entry)
-        if len(_conscience_log) > 200:
-            _conscience_log[:] = _conscience_log[-200:]
+    _p20_append_capped(_P20_CONSCIENCE_KEY, _conscience_log, entry, _CONSCIENCE_LOG_CAP)
 
     return {"status": "ok", "recovered": recovered, "recovery_log": entry}
 
@@ -1789,11 +1789,11 @@ def _persist_p17_p22_to_redis() -> Dict[str, bool]:
     results["creative_ideas"] = _persist_to_redis("kai:p19:creative_ideas", list(_creative_ideas))
     results["aspirations"] = _persist_to_redis("kai:p19:aspirations", list(_aspirations))
 
-    # P20: Conscience & Values
-    results["formed_values"] = _persist_to_redis("kai:p20:formed_values", _formed_values)
-    results["conscience_log"] = _persist_to_redis("kai:p20:conscience_log", list(_conscience_log))
-    results["loyalty_ledger"] = _persist_to_redis("kai:p20:loyalty_ledger", _loyalty_ledger)
-    results["gratitude_journal"] = _persist_to_redis("kai:p20:gratitude_journal", list(_gratitude_journal))
+    # P20: Conscience & Values — no longer snapshotted here. Reads/writes
+    # are always live against Redis's own kai:p20:* hash/list keys (see
+    # _p20_* helpers, DECISIONS.md D22); a periodic SET on those keys would
+    # clobber the live Hash/List with a stale type, so it's intentionally
+    # skipped now.
 
     # P21: Proactive Agent
     results["scheduled_tasks"] = _persist_to_redis("kai:p21:scheduled_tasks", _scheduled_tasks)
@@ -1829,7 +1829,6 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     global _emotional_timeline, _reflection_journal, _relationship_milestones
     global _autobiography, _legacy_messages
     global _counterfactuals, _creative_ideas, _aspirations
-    global _formed_values, _conscience_log, _loyalty_ledger, _gratitude_journal
     global _scheduled_tasks, _reminders
     global _echo_history, _nudge_ladder, _cross_mode_insights
     global _oracle_predictions, _shadow_branches
@@ -1874,23 +1873,9 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
         _aspirations = deque(loaded, maxlen=50)
         results["aspirations"] = True
 
-    # P20: Conscience & Values
-    loaded = _load_from_redis("kai:p20:formed_values", [])
-    if loaded:
-        _formed_values = loaded
-        results["formed_values"] = True
-    loaded = _load_from_redis("kai:p20:conscience_log", [])
-    if loaded:
-        _conscience_log = deque(loaded, maxlen=500)
-        results["conscience_log"] = True
-    loaded = _load_from_redis("kai:p20:loyalty_ledger", {})
-    if loaded:
-        _loyalty_ledger = loaded
-        results["loyalty_ledger"] = True
-    loaded = _load_from_redis("kai:p20:gratitude_journal", [])
-    if loaded:
-        _gratitude_journal = deque(loaded, maxlen=100)
-        results["gratitude_journal"] = True
+    # P20: Conscience & Values — nothing to restore here. The data was
+    # never moved out of Redis in the first place (live hash/list keys),
+    # so there's no in-process global to repopulate at startup.
 
     # P21: Proactive Agent
     loaded = _load_from_redis("kai:p21:scheduled_tasks", {})
@@ -2009,6 +1994,128 @@ def _load_from_redis(key: str, default: Any = None) -> Any:
     except Exception as e:
         logger.debug("Redis load failed for %s: %s", key, e)
     return default
+
+
+# ── P20: Redis-native conscience & values store ──────────────────────
+# Phase 1 of the P17-P22 Redis-backed split (see DECISIONS.md D22): reads
+# and writes go straight to Redis using its own atomic list/hash commands
+# instead of a Python lock + periodic snapshot, so a second process can
+# share this state without staleness or lost-update races. Falls back to
+# the module-level in-memory list/dict (declared in the P20 section below)
+# when Redis is unavailable, matching the rest of this file's degrade
+# pattern.
+_P20_VALUES_KEY = "kai:p20:formed_values"
+_P20_CONSCIENCE_KEY = "kai:p20:conscience_log"
+_P20_LOYALTY_KEY = "kai:p20:loyalty_ledger"
+_P20_GRATITUDE_KEY = "kai:p20:gratitude_journal"
+_P20_ALIGNMENT_KEY = "kai:p20:value_alignment"
+_CONSCIENCE_LOG_CAP = 200
+_LOYALTY_LEDGER_CAP = 100
+_GRATITUDE_JOURNAL_CAP = 100
+
+
+def _p20_get_value(name: str) -> Optional[Dict[str, Any]]:
+    """Look up one formed value by name (Redis Hash field — no cap/scan needed)."""
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hget(_P20_VALUES_KEY, name)
+            return json.loads(raw) if raw else None
+        except Exception:
+            pass
+    return next((v for v in _formed_values if v["value"] == name), None)
+
+
+def _p20_put_value(entry: Dict[str, Any]) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.hset(_P20_VALUES_KEY, entry["value"], json.dumps(entry))
+            return
+        except Exception:
+            pass
+    existing = next((v for v in _formed_values if v["value"] == entry["value"]), None)
+    if existing:
+        existing.update(entry)
+    else:
+        _formed_values.append(entry)
+
+
+def _p20_all_values() -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hgetall(_P20_VALUES_KEY)
+            return [json.loads(v) for v in raw.values()]
+        except Exception:
+            pass
+    return list(_formed_values)
+
+
+def _p20_append_capped(key: str, fallback: List[Dict[str, Any]], entry: Dict[str, Any], cap: int) -> None:
+    """Atomic append-with-cap for a P20 append-only log (RPUSH + LTRIM are
+    each atomic Redis ops, so two processes appending concurrently can't
+    clobber each other the way a read-modify-write on a shared list could)."""
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.rpush(key, json.dumps(entry))
+            redis.ltrim(key, -cap, -1)
+            return
+        except Exception:
+            pass
+    fallback.append(entry)
+    if len(fallback) > cap:
+        fallback[:] = fallback[-cap:]
+
+
+def _p20_all_capped(key: str, fallback: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(key, 0, -1)
+            return [json.loads(r) for r in raw]
+        except Exception:
+            pass
+    return list(fallback)
+
+
+def _p20_alignment_get() -> Dict[str, float]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hgetall(_P20_ALIGNMENT_KEY)
+            if raw:
+                return {
+                    "overall": float(raw.get("overall", 1.0)),
+                    "streak": int(float(raw.get("streak", 0))),
+                    "violations": int(float(raw.get("violations", 0))),
+                }
+        except Exception:
+            pass
+    return dict(_value_alignment_score)
+
+
+def _p20_alignment_set(overall: float, violations: int, increment_streak: bool) -> Dict[str, float]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.hset(_P20_ALIGNMENT_KEY, mapping={"overall": overall, "violations": violations})
+            if increment_streak:
+                redis.hincrby(_P20_ALIGNMENT_KEY, "streak", 1)
+            raw = redis.hgetall(_P20_ALIGNMENT_KEY)
+            return {
+                "overall": float(raw.get("overall", overall)),
+                "streak": int(float(raw.get("streak", 0))),
+                "violations": int(float(raw.get("violations", violations))),
+            }
+        except Exception:
+            pass
+    _value_alignment_score["overall"] = overall
+    _value_alignment_score["violations"] = violations
+    if increment_streak:
+        _value_alignment_score["streak"] = _value_alignment_score.get("streak", 0) + 1
+    return dict(_value_alignment_score)
 
 
 # Restore P17-P22 data at startup
@@ -2847,7 +2954,7 @@ async def mars_consolidate() -> Dict[str, Any]:
 
     # gather formed value keywords for conscience filter
     value_keywords: set[str] = set()
-    for val in _formed_values:
+    for val in _p20_all_values():
         value_keywords.add(val.get("value", "").lower())
         for trigger in val.get("triggers", []):
             value_keywords.add(trigger.lower())
@@ -5891,7 +5998,7 @@ async def learn_value(request: Request):
     now_ts = datetime.now(tz=timezone.utc).isoformat()
     formed = []
     for val in detected_values:
-        existing = next((v for v in _formed_values if v["value"] == val), None)
+        existing = _p20_get_value(val)
         if existing:
             existing["strength"] = min(1.0, existing["strength"] + 0.1)
             existing["reinforcements"] += 1
@@ -5899,6 +6006,7 @@ async def learn_value(request: Request):
             existing["experiences"].append(experience[:200])
             if len(existing["experiences"]) > 10:
                 existing["experiences"] = existing["experiences"][-10:]
+            _p20_put_value(existing)
             formed.append(existing)
         else:
             entry = {
@@ -5911,28 +6019,28 @@ async def learn_value(request: Request):
                 "experiences": [experience[:200]],
                 "source": signal_type,
             }
-            _formed_values.append(entry)
-            if len(_formed_values) > 50:
-                _formed_values.sort(key=lambda x: x["strength"], reverse=True)
-                _formed_values[:] = _formed_values[:50]
+            # stored as a Redis Hash field keyed by value name — the
+            # ~10 known value categories never approach a size where
+            # the old 50-cap eviction logic would matter
+            _p20_put_value(entry)
             formed.append(entry)
 
     return {
         "status": "ok",
         "values_learned": formed,
-        "total_values": len(_formed_values),
+        "total_values": len(_p20_all_values()),
     }
 
 
 @app.get("/memory/values")
 async def get_values():
     """P20a: Return all formed values, sorted by strength."""
-    sorted_vals = sorted(_formed_values, key=lambda x: x["strength"], reverse=True)
+    sorted_vals = sorted(_p20_all_values(), key=lambda x: x["strength"], reverse=True)
     return {
         "status": "ok",
         "values": sorted_vals,
         "count": len(sorted_vals),
-        "alignment": dict(_value_alignment_score),
+        "alignment": _p20_alignment_get(),
     }
 
 
@@ -5952,7 +6060,7 @@ async def conscience_check(request: Request):
     # check alignment with each formed value
     alignments = []
     conflicts = []
-    for val in _formed_values:
+    for val in _p20_all_values():
         val_name = val["value"]
         # check if action resonates with positive values
         pos_keywords = _VALUE_SIGNALS.get("positive", {}).get(val_name, [])
@@ -5998,10 +6106,7 @@ async def conscience_check(request: Request):
         "alignment_score": alignment,
         "verdict": verdict,
     }
-    async with _conscience_lock:
-        _conscience_log.append(entry)
-        if len(_conscience_log) > 200:
-            _conscience_log[:] = _conscience_log[-200:]
+    _p20_append_capped(_P20_CONSCIENCE_KEY, _conscience_log, entry, _CONSCIENCE_LOG_CAP)
 
     return {
         "status": "ok",
@@ -6012,10 +6117,11 @@ async def conscience_check(request: Request):
 @app.get("/memory/conscience/audit")
 async def conscience_audit():
     """P20c: Integrity tracker — how well has Kai lived by its values?"""
-    total = len(_conscience_log)
-    aligned = sum(1 for c in _conscience_log if c["verdict"] == "fully_aligned")
-    conflicted = sum(1 for c in _conscience_log if c["verdict"] == "conflicts_with_values")
-    mixed = sum(1 for c in _conscience_log if c["verdict"] == "mixed")
+    log = _p20_all_capped(_P20_CONSCIENCE_KEY, _conscience_log)
+    total = len(log)
+    aligned = sum(1 for c in log if c["verdict"] == "fully_aligned")
+    conflicted = sum(1 for c in log if c["verdict"] == "conflicts_with_values")
+    mixed = sum(1 for c in log if c["verdict"] == "mixed")
 
     if total > 0:
         integrity_score = round((aligned + mixed * 0.5) / total, 2)
@@ -6023,10 +6129,11 @@ async def conscience_audit():
         integrity_score = 1.0
 
     # update running alignment
-    _value_alignment_score["overall"] = integrity_score
-    if conflicted == 0 and total > 0:
-        _value_alignment_score["streak"] = _value_alignment_score.get("streak", 0) + 1
-    _value_alignment_score["violations"] = conflicted
+    alignment = _p20_alignment_set(
+        overall=integrity_score,
+        violations=conflicted,
+        increment_streak=(conflicted == 0 and total > 0),
+    )
 
     return {
         "status": "ok",
@@ -6035,8 +6142,8 @@ async def conscience_audit():
         "fully_aligned": aligned,
         "conflicts": conflicted,
         "mixed": mixed,
-        "alignment": dict(_value_alignment_score),
-        "recent_checks": _conscience_log[-5:],
+        "alignment": alignment,
+        "recent_checks": log[-5:],
     }
 
 
@@ -6072,9 +6179,7 @@ async def record_loyalty(request: Request):
         entry["weight"] = 1.0
         entry["type"] = "sacrifice"
 
-    _loyalty_ledger.append(entry)
-    if len(_loyalty_ledger) > 100:
-        _loyalty_ledger[:] = _loyalty_ledger[-100:]
+    _p20_append_capped(_P20_LOYALTY_KEY, _loyalty_ledger, entry, _LOYALTY_LEDGER_CAP)
 
     return {"status": "ok", "entry": entry}
 
@@ -6082,7 +6187,8 @@ async def record_loyalty(request: Request):
 @app.get("/memory/loyalty")
 async def get_loyalty():
     """P20d: Return the loyalty ledger — what has been sacrificed/promised."""
-    sorted_ledger = sorted(_loyalty_ledger, key=lambda x: x["weight"], reverse=True)
+    ledger = _p20_all_capped(_P20_LOYALTY_KEY, _loyalty_ledger)
+    sorted_ledger = sorted(ledger, key=lambda x: x["weight"], reverse=True)
     sacrifices = [e for e in sorted_ledger if e["type"] == "sacrifice"]
     promises = [e for e in sorted_ledger if e["type"] == "promise"]
     commitments = [e for e in sorted_ledger if e["type"] == "commitment"]
@@ -6094,7 +6200,7 @@ async def get_loyalty():
         "sacrifices": len(sacrifices),
         "promises": len(promises),
         "commitments": len(commitments),
-        "total_weight": round(sum(e["weight"] for e in _loyalty_ledger), 2),
+        "total_weight": round(sum(e["weight"] for e in ledger), 2),
     }
 
 
@@ -6134,13 +6240,11 @@ async def record_gratitude(request: Request):
         "message": message,
     }
 
-    _gratitude_journal.append(entry)
-    if len(_gratitude_journal) > 100:
-        _gratitude_journal[:] = _gratitude_journal[-100:]
+    _p20_append_capped(_P20_GRATITUDE_KEY, _gratitude_journal, entry, _GRATITUDE_JOURNAL_CAP)
 
     # also record as loyalty if it involves sacrifice
     if tone == "deeply_moved":
-        _loyalty_ledger.append({
+        _p20_append_capped(_P20_LOYALTY_KEY, _loyalty_ledger, {
             "id": f"loy_{uuid.uuid4().hex[:8]}",
             "timestamp": entry["timestamp"],
             "person": recipient,
@@ -6148,7 +6252,7 @@ async def record_gratitude(request: Request):
             "type": "sacrifice",
             "honored": True,
             "weight": 1.0,
-        })
+        }, _LOYALTY_LEDGER_CAP)
 
     return {"status": "ok", "entry": entry}
 
@@ -6156,15 +6260,16 @@ async def record_gratitude(request: Request):
 @app.get("/memory/gratitude")
 async def get_gratitude():
     """P20e: Return the gratitude journal."""
+    journal = _p20_all_capped(_P20_GRATITUDE_KEY, _gratitude_journal)
     return {
         "status": "ok",
-        "entries": list(reversed(_gratitude_journal[-20:])),
-        "count": len(_gratitude_journal),
+        "entries": list(reversed(journal[-20:])),
+        "count": len(journal),
         "tones": {
-            "deeply_moved": sum(1 for e in _gratitude_journal if e["tone"] == "deeply_moved"),
-            "grateful": sum(1 for e in _gratitude_journal if e["tone"] == "grateful"),
-            "honored": sum(1 for e in _gratitude_journal if e["tone"] == "honored"),
-            "appreciative": sum(1 for e in _gratitude_journal if e["tone"] == "appreciative"),
+            "deeply_moved": sum(1 for e in journal if e["tone"] == "deeply_moved"),
+            "grateful": sum(1 for e in journal if e["tone"] == "grateful"),
+            "honored": sum(1 for e in journal if e["tone"] == "honored"),
+            "appreciative": sum(1 for e in journal if e["tone"] == "appreciative"),
         },
     }
 
@@ -6172,26 +6277,30 @@ async def get_gratitude():
 @app.get("/memory/conscience/summary")
 async def conscience_summary():
     """P20 combined: Full conscience state — values, integrity, loyalty, gratitude."""
-    sorted_vals = sorted(_formed_values, key=lambda x: x["strength"], reverse=True)
-    total_checks = len(_conscience_log)
-    aligned = sum(1 for c in _conscience_log if c["verdict"] == "fully_aligned")
+    values = _p20_all_values()
+    log = _p20_all_capped(_P20_CONSCIENCE_KEY, _conscience_log)
+    ledger = _p20_all_capped(_P20_LOYALTY_KEY, _loyalty_ledger)
+    journal = _p20_all_capped(_P20_GRATITUDE_KEY, _gratitude_journal)
+    sorted_vals = sorted(values, key=lambda x: x["strength"], reverse=True)
+    total_checks = len(log)
+    aligned = sum(1 for c in log if c["verdict"] == "fully_aligned")
 
     return {
         "status": "ok",
         "conscience": {
-            "formed_values": len(_formed_values),
+            "formed_values": len(values),
             "conscience_checks": total_checks,
-            "loyalty_entries": len(_loyalty_ledger),
-            "gratitude_entries": len(_gratitude_journal),
+            "loyalty_entries": len(ledger),
+            "gratitude_entries": len(journal),
         },
         "top_values": [{"value": v["value"], "strength": v["strength"]}
                        for v in sorted_vals[:5]],
         "integrity_score": round((aligned + sum(
-            0.5 for c in _conscience_log if c["verdict"] == "mixed"
+            0.5 for c in log if c["verdict"] == "mixed"
         )) / total_checks, 2) if total_checks > 0 else 1.0,
-        "alignment": dict(_value_alignment_score),
-        "sacrifices_remembered": sum(1 for e in _loyalty_ledger if e["type"] == "sacrifice"),
-        "latest_gratitude": _gratitude_journal[-1] if _gratitude_journal else None,
+        "alignment": _p20_alignment_get(),
+        "sacrifices_remembered": sum(1 for e in ledger if e["type"] == "sacrifice"),
+        "latest_gratitude": journal[-1] if journal else None,
     }
 
 
