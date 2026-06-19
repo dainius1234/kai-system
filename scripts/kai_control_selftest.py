@@ -1,3 +1,4 @@
+"""Self-test harness that loads kai_control.py in isolation and exercises its recovery flows against a temp directory."""
 from __future__ import annotations
 
 import importlib.util

@@ -1,3 +1,4 @@
+"""Generate and rotate the inter-service HMAC secret on a timer, persisting versioned secrets and revocations to disk."""
 from __future__ import annotations
 
 import json

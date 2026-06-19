@@ -1,3 +1,4 @@
+"""CLI tool: OCR a receipt image (via pytesseract) and append parsed totals to the expense log."""
 from __future__ import annotations
 
 import csv

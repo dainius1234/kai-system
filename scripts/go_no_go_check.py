@@ -1,3 +1,4 @@
+"""CLI go/no-go check: poll the dashboard's go-no-go endpoint and exit non-zero on a non-GO decision."""
 from __future__ import annotations
 
 import json

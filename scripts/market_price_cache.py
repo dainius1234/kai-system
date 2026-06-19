@@ -1,3 +1,4 @@
+"""CLI entry point: refresh the local market price cache and print the result as JSON."""
 from __future__ import annotations
 
 import json
