@@ -114,6 +114,14 @@ graph LR
   with a real history of provider regressions (GitHub #2388, #2668, broken across
   0.7.21–0.7.29). Pin the exact version and smoke-test it against the exact Ollama model
   tag before treating it as a dependency, not just before "adopting" it in the abstract.
+  Spiked 2026-06-19 (D33, version-pinned at 0.16.8 — past the buggy range): heavier
+  dependency footprint than either graph-memory candidate (~170 transitive packages vs.
+  Cognee's ~40/Graphiti's ~10), and a real, version-specific gotcha found by reading the
+  installed provider source directly — `OllamaProvider.list_llm_models_async()` only
+  auto-discovers Ollama models that declare a `"tools"` capability, which this stack's
+  pinned `qwen2:0.5b` may not carry (unverified — no live Ollama reachable in the spike
+  sandbox). Manual `LLMConfig` construction can bypass the discovery filter if needed.
+  Full smoke test against a real Ollama instance is still owed before any integration.
 
 ### Phase 4/5 (still GPU-blocked, per STRATEGIC_PLAN's existing gate)
 - **ASI-Evolve**: real, Ollama-compatible (verified via cloned `utils/llm.py` — plain
@@ -137,7 +145,12 @@ graph LR
    2026-06-19 (D14):** path (a) chosen — Postgres holds metadata only, TurboVec's
    `IdMapIndex` owns similarity search. Implemented as `TurboVecStore` in
    `memu-core/app.py` behind `VECTOR_STORE=turbovec`.
-2. Letta version pin + Ollama smoke test, once Phase 3 work resumes. Still open.
+2. Letta version pin + Ollama smoke test — **partially resolved 2026-06-19 (D33):**
+   version pinned (0.16.8), package installs cleanly, but the full Ollama smoke test
+   against this stack's real `qwen2:0.5b` model is still blocked on no reachable live
+   Ollama instance in the spike sandbox (`ollama.com` itself is outside the sandbox's
+   network allowlist). A real go/no-go decision on Letta is deferred pending that test
+   and the user's read on the dependency-footprint/tool-capability findings in D33.
 3. LocateAnything-3B — get a working fetch or a pasted primary source before it appears
    in any build order with a checkmark next to it. Still open.
 4. OpenHands sandboxing requirement — write into whatever future Skill Forge design doc
