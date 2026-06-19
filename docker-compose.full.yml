@@ -393,8 +393,9 @@ services:
     <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
-      WHISPER_BACKEND: "local"
+      WHISPER_BACKEND: "${WHISPER_BACKEND:-local}"
       WHISPER_MODEL: "tiny"
+      WHISPER_API_URL: http://parakeet-server:8080
       AUTO_MEMORIZE_AUDIO: "true"
     ports:
       - "8021:8021"
@@ -409,6 +410,8 @@ services:
         ipv4_address: 172.20.0.13
     depends_on:
       - memu-core
+      # parakeet-server isn't depended on by default — it's only started/needed
+      # when WHISPER_BACKEND=api is set. Run with --profile parakeet to include it.
 
   camera-service:
     build:
@@ -607,6 +610,21 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.31
+
+  # Optional CPU ASR sidecar (parakeet.cpp). Not started by default — opt in by
+  # setting WHISPER_BACKEND=api on audio-service and uncommenting depends_on below.
+  parakeet-server:
+    image: ghcr.io/mudler/parakeet.cpp-server:latest
+    <<: *defaults
+    profiles: ["parakeet"]
+    command: ["--model", "${PARAKEET_MODEL:-tdt_ctc-110m}", "--port", "8080"]
+    # No healthcheck: the upstream image's exact base (and whether python/curl/nc
+    # exist inside it) isn't confirmed, and the server documents no /health route.
+    # Don't gate other services' depends_on on this until verified against a real
+    # container — see kai-pm/SHOPPING_LIST_PLAN.md open items.
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.28
 
   telegram-bot:
     build:

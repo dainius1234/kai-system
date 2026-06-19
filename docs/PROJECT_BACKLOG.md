@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 26 (22 build + postgres + redis + ollama + lakeFS) |
-| Test targets | 76 (make test-core) |
-| Individual tests | 1654++++ passing, 0 failures |
+| Test targets | 77 (make test-core) |
+| Individual tests | 1656+++++ passing, 0 failures |
 | Lines of Python | ~42,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |

@@ -21,14 +21,14 @@
 
 ---
 
-## Project Status (18 June 2026)
+## Project Status (19 June 2026)
 
 | Metric | Value |
 |---|---|
-| **Services** | 29 Docker containers |
-| **Test targets** | 76 (`make test-core`) |
-| **Individual tests** | 1,654 (`def test_` across 89 files) |
-| **Python LOC** | ~50,946 |
+| **Services** | 30 Docker containers |
+| **Test targets** | 77 (`make test-core`) |
+| **Individual tests** | 1,656 (`def test_` across 90 files) |
+| **Python LOC** | ~51,368 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 32 |
 | **Failures** | 0 |

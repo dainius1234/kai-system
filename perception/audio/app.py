@@ -8,7 +8,9 @@ Core pipeline:
   5. Auto-memorize transcripts to memu-core
 
 Designed to work without GPU: capture and injection detection work on CPU.
-Transcription uses a stub until RTX 5080 arrives, then flip WHISPER_BACKEND=local.
+Transcription uses a stub by default; flip WHISPER_BACKEND=local for GPU faster-whisper,
+or WHISPER_BACKEND=api to call an external CPU transcription server (e.g. parakeet.cpp's
+parakeet-server sidecar, configured via WHISPER_API_URL).
 """
 from __future__ import annotations
 
@@ -33,6 +35,7 @@ app = FastAPI(title="Audio Service", version="0.5.0")
 HOTWORD = os.getenv("PORCUPINE_KEYWORD", "ara")
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "tiny")
 WHISPER_BACKEND = os.getenv("WHISPER_BACKEND", "local")  # "stub", "local", "api"
+WHISPER_API_URL = os.getenv("WHISPER_API_URL", "http://parakeet-server:8080")
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 AUDIO_DIR = Path(os.getenv("AUDIO_DIR", "/tmp/audio-captures"))
 AUDIO_DIR.mkdir(parents=True, exist_ok=True)
@@ -141,8 +144,25 @@ def _transcribe_audio(audio_bytes: bytes, ext: str = ".wav") -> str:
             tmp.unlink(missing_ok=True)
 
     if WHISPER_BACKEND == "api":
-        logger.info("Whisper API backend not yet implemented")
-        return "[transcript: Whisper API backend pending]"
+        import httpx
+        tmp = AUDIO_DIR / f"_tmp_{int(time.time())}{ext}"
+        try:
+            tmp.write_bytes(audio_bytes)
+            with httpx.Client(timeout=30.0) as client, open(tmp, "rb") as f:
+                resp = client.post(
+                    f"{WHISPER_API_URL}/v1/audio/transcriptions",
+                    files={"file": (tmp.name, f, "audio/wav")},
+                    data={"response_format": "json"},
+                )
+                resp.raise_for_status()
+                text = resp.json().get("text", "").strip()
+            logger.info("transcribed %d bytes via API backend → %d chars", len(audio_bytes), len(text))
+            return text if text else "[transcript: no speech detected]"
+        except Exception as e:
+            logger.error("Whisper API transcription error: %s", e)
+            return f"[transcript: API backend error — {str(e)[:100]}]"
+        finally:
+            tmp.unlink(missing_ok=True)
 
     # stub mode
     return "[transcript: stub mode — set WHISPER_BACKEND=local for real STT]"

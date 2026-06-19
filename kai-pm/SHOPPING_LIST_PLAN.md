@@ -133,19 +133,25 @@ graph LR
 
 ## Open items before any of this is implemented
 
-1. TurboVec architecture choice (replace vs. bytea-wrap pgvector) — needs an explicit
-   decision before any code is written, since it changes `memu-core`'s storage model.
-2. Letta version pin + Ollama smoke test, once Phase 3 work resumes.
+1. ~~TurboVec architecture choice (replace vs. bytea-wrap pgvector)~~ — **Resolved
+   2026-06-19 (D14):** path (a) chosen — Postgres holds metadata only, TurboVec's
+   `IdMapIndex` owns similarity search. Implemented as `TurboVecStore` in
+   `memu-core/app.py` behind `VECTOR_STORE=turbovec`.
+2. Letta version pin + Ollama smoke test, once Phase 3 work resumes. Still open.
 3. LocateAnything-3B — get a working fetch or a pasted primary source before it appears
-   in any build order with a checkmark next to it.
+   in any build order with a checkmark next to it. Still open.
 4. OpenHands sandboxing requirement — write into whatever future Skill Forge design doc
-   covers code-gen, not assumed default-safe.
+   covers code-gen, not assumed default-safe. Still open.
 5. ASI-Evolve wandb-disable — one-line config fix, but must happen before first run, not
-   after.
+   after. Still open.
 
-None of the above blocks current Phase 0 work. TurboVec and parakeet.cpp are the only two
-items that could start immediately without waiting on GPU procurement or further
-verification.
+TurboVec and parakeet.cpp are now implemented in code (2026-06-19, see D14 in
+`DECISIONS.md`) — both behind opt-in switches with unchanged defaults
+(`VECTOR_STORE=memory`, `WHISPER_BACKEND=local`). **Neither is live-verified yet** — no
+Postgres or Docker daemon is available in this sandbox, so `scripts/test_memu_turbovec.py`
+and the real `WHISPER_BACKEND=api` HTTP round-trip have only been exercised via mocks and
+static checks (`py_compile`, `make go_no_go`, `docker compose config`). Items 2-5 above are
+unaffected and still block their respective tools.
 
 ## Implementation readiness assessment (current system, code-level)
 
@@ -169,26 +175,25 @@ new backend means following an established idiom, not inventing one:
   `faster_whisper`. parakeet.cpp adds as `WHISPER_BACKEND=parakeet` using the identical
   lazy-import-with-stub-fallback pattern — no new architecture needed.
 
-### What's NOT yet known and must be resolved before estimating real effort
+### Packaging questions — resolved 2026-06-19, both in the easier direction
 
-Neither of these was checked during the tool-evaluation pass — that pass verified the
-projects exist, are licensed permissively, and are technically compatible. It did not
-verify how they're *packaged*, which is what actually determines Docker integration cost:
+Both were spiked by reading each project's own README directly (not assumed) before any
+code was written:
 
-1. **TurboVec packaging** — it's described as Rust with Python bindings. Need to confirm:
-   is there a published `pip install turbovec` wheel, or does it require a Rust toolchain
-   + build step inside `memu-core`'s Dockerfile (currently just `pip install -r
-   requirements.txt`, no Rust/cargo present)? This changes the Dockerfile diff from
-   one line to a multi-stage build.
-2. **parakeet.cpp packaging** — it's a C++17/ggml binary, not a Python package.
-   `perception/audio/Dockerfile` currently only does `apt-get install` (ffmpeg,
-   libportaudio2) + `pip install`. Need to confirm: does it publish prebuilt binaries/a
-   Python wrapper, or does the Dockerfile need a `cmake`/build-from-source stage? This is
-   the single biggest unknown standing between "Trial" and "Adopt" for this item.
+1. **TurboVec packaging** — **resolved**: `pip install turbovec` is the documented,
+   primary install path (a real PyPI wheel exists) — no Rust toolchain or multi-stage
+   Docker build needed in `memu-core`'s Dockerfile. Python API is `TurboQuantIndex`/
+   `IdMapIndex` with `.add_with_ids()`/`.search()`/`.remove()`/`.write()`/`.load()`.
+   Added to `memu-core/requirements.txt` as a one-line dependency.
+2. **parakeet.cpp packaging** — **resolved**: ships prebuilt Docker images
+   (`ghcr.io/mudler/parakeet.cpp-server`, `-cli`, both CPU and CUDA variants) — no compile
+   step needed at all. Better outcome than anticipated: it runs as an independent sidecar
+   service (like `ollama` already does), not compiled into `perception/audio`'s own
+   Dockerfile. One open sub-question: the server's minimal example doesn't document a
+   `/health` route, so the new `parakeet-server` service in `docker-compose.full.yml` is
+   shipped without a healthcheck rather than asserting one that wasn't verified.
 
-**Recommendation: spike both packaging questions first, before writing any integration
-code.** This is a few hours of reading each project's own install docs/Dockerfile, and it
-determines whether each item is a half-day change or a multi-day one.
+Both are now implemented — see `## Implementation status` below.
 
 ### Sequencing — best-practice order, matching this repo's existing conventions
 
@@ -217,3 +222,34 @@ determines whether each item is a half-day change or a multi-day one.
    actually implemented and tested (not on verification alone), `make sync-docs` updates
    README's service/test counts automatically, and a new `DECISIONS.md` entry documents
    the real change — distinct from D13, which only documents the evaluation.
+
+## Implementation status — 2026-06-19 (D14)
+
+Both Phase 0 items are now implemented, behind opt-in switches, defaults unchanged:
+
+- **`memu-core/app.py`**: `TurboVecStore` class (subclasses `PGVectorStore`, overrides
+  schema/insert/search/delete to add an `int_id BIGSERIAL` column and route similarity
+  search through an in-process TurboVec `IdMapIndex` instead of pgvector's `<=>` operator).
+  Selected via `VECTOR_STORE=turbovec`; default (`memory`) unchanged. Index persists to
+  `TURBOVEC_INDEX_PATH` (default `/data/turbovec/memories.tv`), rebuilt from Postgres on
+  first boot if the file is missing.
+- **`perception/audio/app.py`**: the `WHISPER_BACKEND == "api"` branch (previously a
+  literal not-yet-implemented stub) now POSTs to `WHISPER_API_URL` (default
+  `http://parakeet-server:8080`) via `httpx.Client`, parses
+  `/v1/audio/transcriptions`'s JSON response, degrades gracefully on any error. Default
+  backend (`local`) unchanged.
+- **`docker-compose.full.yml`**: `parakeet-server` added as an opt-in sidecar
+  (`profiles: ["parakeet"]`, IP `172.20.0.28`, no healthcheck — see packaging notes above).
+  `docker-compose.minimal.yml` intentionally untouched (out of scope — minimal is
+  conversational-spine-only per the Phase 0.5 plan).
+- **Tests**: `scripts/test_memu_turbovec.py` added (skips without `PG_URI`/`turbovec`,
+  same pattern as `test_memu_pgvector.py`); `scripts/test_audio_service.py` extended with
+  two mocked-`httpx` cases for the new `api` branch. `test-memu-turbovec` wired into
+  `make test-core`.
+- **Verified so far**: `py_compile`, `make go_no_go`, `docker compose -f
+  docker-compose.full.yml config`, and the full existing regression suite all pass. The
+  new mocked audio tests pass. **Not yet live-verified**: no Postgres or Docker daemon is
+  available in this sandbox, so the real Postgres+TurboVec round-trip and the real HTTP
+  call to a running `parakeet-server` have not been exercised end-to-end. `TECH_WATCH.md`
+  verdicts stay at Trial/Assess (not Adopt) until that happens — see D14 in
+  `DECISIONS.md` for full detail.

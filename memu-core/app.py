@@ -20,6 +20,7 @@ import time
 import uuid
 from collections import Counter, deque
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional, Protocol, runtime_checkable
 
 from fastapi import Body, FastAPI, HTTPException, Query, Request
@@ -488,6 +489,248 @@ class PGVectorStore:
         self._state = dict(main["state"])
 
 
+# persistent vector store: Postgres holds full record metadata (no pgvector
+# extension needed), TurboVec's IdMapIndex owns compressed similarity search.
+# Architecture choice per kai-pm/SHOPPING_LIST_PLAN.md: path (a) — split
+# storage rather than wrap pgvector, since TurboVec has its own index format.
+class TurboVecStore(PGVectorStore):
+    def __init__(self) -> None:
+        import psycopg2
+        import psycopg2.pool
+        from psycopg2.extras import Json as _Json, RealDictCursor as _RDC
+        from turbovec import IdMapIndex
+
+        self._psycopg2 = psycopg2
+        self._Json = _Json
+        self._RDC = _RDC
+        self._pg_uri = os.getenv("PG_URI", "postgresql://keeper:localdev@postgres:5432/sovereign")
+        self._pool = psycopg2.pool.SimpleConnectionPool(1, 5, self._pg_uri)
+        self._init_schema()
+        self.vc = LakeFSClient()
+        self._state: Dict[str, Any] = {}
+
+        self._IdMapIndex = IdMapIndex
+        self._tv_bits = int(os.getenv("TURBOVEC_BITS", "4"))
+        self._tv_dim = len(generate_embedding("dimension probe"))
+        self._tv_path = Path(os.getenv("TURBOVEC_INDEX_PATH", "/data/turbovec/memories.tv"))
+        self._tv_path.parent.mkdir(parents=True, exist_ok=True)
+        if self._tv_path.exists():
+            self._index = self._IdMapIndex.load(str(self._tv_path))
+        else:
+            self._index = self._IdMapIndex(self._tv_dim, self._tv_bits)
+            self._rebuild_index_from_postgres()
+
+    def _init_schema(self) -> None:
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS memories (
+                        id text PRIMARY KEY,
+                        int_id BIGSERIAL UNIQUE,
+                        timestamp text,
+                        event_type text,
+                        category text DEFAULT 'general',
+                        content jsonb,
+                        embedding_raw jsonb,
+                        relevance float DEFAULT 1.0,
+                        importance float DEFAULT 0.5,
+                        access_count int DEFAULT 0,
+                        last_accessed text,
+                        stability float DEFAULT 1.0,
+                        pinned bool DEFAULT false,
+                        trust_tier text DEFAULT 'unverified',
+                        source_id text,
+                        poisoned bool DEFAULT false,
+                        quarantine_reason text
+                    );
+                    """
+                )
+            conn.commit()
+        finally:
+            self._put_conn(conn)
+
+    def _rebuild_index_from_postgres(self) -> None:
+        """Repopulate the TurboVec index from Postgres on first boot / lost index file."""
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT int_id, embedding_raw FROM memories WHERE embedding_raw IS NOT NULL")
+                rows = cur.fetchall()
+        finally:
+            self._put_conn(conn)
+        if not rows:
+            return
+        import numpy as np
+        ids = np.array([r[0] for r in rows], dtype=np.int64)
+        vecs = np.array([r[1] for r in rows], dtype=np.float32)
+        self._index.add_with_ids(vecs, ids)
+        self._save_index()
+
+    def _save_index(self) -> None:
+        self._index.write(str(self._tv_path))
+
+    _SELECT_COLS = ("id, timestamp, event_type, category, content, embedding_raw, "
+                    "relevance, importance, access_count, last_accessed, stability, pinned, "
+                    "trust_tier, source_id, poisoned, quarantine_reason")
+
+    def insert(self, record: MemoryRecord) -> VersionCommit:
+        import numpy as np
+
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """INSERT INTO memories
+                       (id, timestamp, event_type, category, content, embedding_raw,
+                        relevance, importance, access_count, last_accessed,
+                        stability, pinned, trust_tier, source_id, poisoned, quarantine_reason)
+                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                       ON CONFLICT (id) DO UPDATE SET
+                         content = EXCLUDED.content,
+                         embedding_raw = EXCLUDED.embedding_raw,
+                         relevance = EXCLUDED.relevance,
+                         importance = EXCLUDED.importance,
+                         category = EXCLUDED.category
+                       RETURNING int_id
+                    """,
+                    (
+                        record.id,
+                        record.timestamp,
+                        record.event_type,
+                        getattr(record, "category", "general"),
+                        self._Json(record.content),
+                        self._Json(record.embedding),
+                        record.relevance,
+                        getattr(record, "importance", 0.5),
+                        getattr(record, "access_count", 0),
+                        getattr(record, "last_accessed", None),
+                        getattr(record, "stability", 1.0),
+                        record.pinned,
+                        getattr(record, "trust_tier", "unverified"),
+                        getattr(record, "source_id", None),
+                        getattr(record, "poisoned", False),
+                        getattr(record, "quarantine_reason", None),
+                    ),
+                )
+                int_id = cur.fetchone()[0]
+            conn.commit()
+            if MAX_MEMORY_RECORDS > 0:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "DELETE FROM memories WHERE id IN "
+                        "(SELECT id FROM memories ORDER BY timestamp ASC "
+                        " OFFSET %s)", (MAX_MEMORY_RECORDS,)
+                    )
+                conn.commit()
+        finally:
+            self._put_conn(conn)
+        if record.embedding:
+            vec = np.array([record.embedding], dtype=np.float32)
+            ids = np.array([int_id], dtype=np.int64)
+            self._index.add_with_ids(vec, ids)
+            self._save_index()
+        branch = self.vc.create_branch("main", f"update-keeper-{int(time.time())}")
+        commit = self.vc.put_branch_state(branch, [], self._state, f"update: user_id=keeper, ts={int(time.time())}")
+        return commit
+
+    def _row_to_record(self, r: tuple) -> MemoryRecord:
+        content = r[4] if isinstance(r[4], dict) else json.loads(r[4])
+        raw_emb = r[5]
+        emb = list(raw_emb) if raw_emb is not None else []
+        return MemoryRecord(
+            id=r[0], timestamp=r[1], event_type=r[2],
+            category=r[3] or "general", content=content, embedding=emb,
+            relevance=r[6] or 1.0, importance=r[7] or 0.5,
+            access_count=r[8] or 0, last_accessed=r[9],
+            stability=r[10] or 1.0,
+            pinned=r[11] or False, trust_tier=r[12] or "unverified",
+            source_id=r[13], poisoned=r[14] or False,
+            quarantine_reason=r[15],
+        )
+
+    def search(self, top_k: int, query: Optional[str] = None) -> List[MemoryRecord]:
+        conn = self._get_conn()
+        try:
+            if query is None:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        f"SELECT {self._SELECT_COLS} FROM memories "
+                        "ORDER BY timestamp DESC LIMIT %s", (top_k,))
+                    rows = cur.fetchall()
+                return [self._row_to_record(r) for r in rows]
+
+            import numpy as np
+            emb = generate_embedding(query)
+            try:
+                _scores, int_ids = self._index.search(np.array(emb, dtype=np.float32), top_k)
+            except Exception:
+                int_ids = []
+            if len(int_ids) == 0:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        f"SELECT {self._SELECT_COLS} FROM memories "
+                        "ORDER BY timestamp DESC LIMIT %s", (top_k,))
+                    rows = cur.fetchall()
+                return [self._row_to_record(r) for r in rows]
+            with conn.cursor() as cur:
+                cur.execute(
+                    f"SELECT int_id, {self._SELECT_COLS} FROM memories WHERE int_id = ANY(%s)",
+                    (list(int(i) for i in int_ids),),
+                )
+                rows = cur.fetchall()
+            row_by_int_id = {row[0]: row[1:] for row in rows}
+            ordered = [row_by_int_id[i] for i in int_ids if i in row_by_int_id]
+            return [self._row_to_record(r) for r in ordered]
+        finally:
+            self._put_conn(conn)
+
+    def delete_record(self, record_id: str) -> bool:
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT int_id FROM memories WHERE id = %s", (record_id,))
+                row = cur.fetchone()
+                cur.execute("DELETE FROM memories WHERE id = %s", (record_id,))
+                deleted = cur.rowcount
+            conn.commit()
+            if row:
+                try:
+                    self._index.remove(int(row[0]))
+                    self._save_index()
+                except Exception:
+                    pass
+            return deleted > 0
+        finally:
+            self._put_conn(conn)
+
+    def delete_old(self, max_age_days: int = 90) -> Dict[str, Any]:
+        cutoff = (datetime.now(tz=timezone.utc) - timedelta(days=max_age_days)).isoformat()
+        conn = self._get_conn()
+        try:
+            before = self.count()
+            with conn.cursor() as cur:
+                cur.execute("SELECT int_id FROM memories WHERE pinned = false AND timestamp < %s", (cutoff,))
+                expired_int_ids = [r[0] for r in cur.fetchall()]
+                cur.execute(
+                    "DELETE FROM memories WHERE pinned = false AND timestamp < %s",
+                    (cutoff,),
+                )
+                deleted = cur.rowcount
+            conn.commit()
+            for iid in expired_int_ids:
+                try:
+                    self._index.remove(int(iid))
+                except Exception:
+                    pass
+            if expired_int_ids:
+                self._save_index()
+            return {"before": before, "after": before - deleted, "deleted": deleted, "cutoff": cutoff}
+        finally:
+            self._put_conn(conn)
+
+
 class InMemoryVectorStore:
     def __init__(self) -> None:
         self._records: List[MemoryRecord] = []
@@ -599,9 +842,13 @@ class InMemoryVectorStore:
 
 # choose store implementation based on configuration
 store: VectorStore
-if os.getenv("VECTOR_STORE", "memory") == "postgres":
+_vector_store_kind = os.getenv("VECTOR_STORE", "memory")
+if _vector_store_kind == "postgres":
     logger.info("Using Postgres-backed vector store")
     store = PGVectorStore()
+elif _vector_store_kind == "turbovec":
+    logger.info("Using TurboVec-backed vector store (Postgres metadata + compressed index)")
+    store = TurboVecStore()
 else:
     store = InMemoryVectorStore()
 
