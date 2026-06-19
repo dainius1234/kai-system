@@ -89,6 +89,8 @@ services:
       REDIS_URL: redis://redis:6379
       VECTOR_STORE: postgres
       PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
+      MEMU_GRAPH_URL: http://memu-graph:8061
+      FF_GRAPH_INGEST: "${FF_GRAPH_INGEST:-false}"
     ports:
       - "8001:8001"
     healthcheck:

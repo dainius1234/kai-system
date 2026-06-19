@@ -42,6 +42,14 @@ VERIFIER_URL = os.getenv("VERIFIER_URL", "http://verifier:8052")
 # loading the entire store on every retrieval call.  Override via env var.
 MEMU_MAX_CANDIDATES: int = int(os.getenv("MEMU_MAX_CANDIDATES", "500"))
 
+# Phase B graph-memory write-side fan-out (MEMORY_GRAPH_DESIGN.md §4).
+# Gated by FF_GRAPH_INGEST (off by default — memu-graph's live container
+# verification is still pending, see DECISIONS.md D29).
+from common.feature_flags import is_enabled as _ff_is_enabled
+
+MEMU_GRAPH_URL = os.getenv("MEMU_GRAPH_URL", "http://memu-graph:8061")
+MEMU_GRAPH_TIMEOUT = float(os.getenv("MEMU_GRAPH_TIMEOUT", "10.0"))
+
 # lakefs client is optional; provide a simple in-memory stub if unavailable
 try:
     from lakefs_client import LakeFSClient, VersionCommit
@@ -201,6 +209,40 @@ def classify_category(text: str) -> str:
             best_hits = hits
             best_cat = cat
     return best_cat
+
+
+# ── Phase B: graph-memory write-side fan-out (MEMORY_GRAPH_DESIGN.md §4) ──
+# memu-core's vector store stays the source of truth; this is a best-effort,
+# non-blocking side channel into memu-graph so construction-domain and
+# P17-P22 personality/relationship writes also get entity/relationship
+# structure. Never allowed to affect the calling endpoint's response.
+
+def _should_graph_ingest(category: str) -> bool:
+    """Cheap, no-LLM-call filter: skip pure chatter (category == 'general'),
+    ingest anything with a real construction-domain or personality-
+    relationship category. A single tunable function, per the design doc,
+    so the allowlist can be adjusted without touching every call site."""
+    return category != DEFAULT_CATEGORY
+
+
+async def _graph_ingest_fire_and_forget(
+    text: str, source_id: str, category: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None
+) -> None:
+    """Best-effort POST to memu-graph's /graph/ingest. Swallows all errors —
+    a slow or unreachable graph service must never affect memu-core's
+    synchronous write path."""
+    if not _ff_is_enabled("GRAPH_INGEST"):
+        return
+    import httpx as _httpx
+
+    try:
+        async with _httpx.AsyncClient(timeout=MEMU_GRAPH_TIMEOUT) as client:
+            await client.post(
+                f"{MEMU_GRAPH_URL}/graph/ingest",
+                json={"text": text, "source_id": source_id, "category": category, "metadata": metadata or {}},
+            )
+    except Exception as exc:  # noqa: BLE001 — best-effort, never propagate
+        logger.warning("memu-graph ingest fan-out failed for source_id=%s: %s", source_id, exc)
 
 
 # LLM specialists available for routing.  PUB mode defaults to Dolphin
@@ -1499,6 +1541,13 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
         pinned=keeper_pin,
     )
     record_commit = store.insert(record)
+    if _should_graph_ingest(category):
+        asyncio.create_task(_graph_ingest_fire_and_forget(
+            text=f"{update.event_type}: {update.result_raw or ''}",
+            source_id=record.id,
+            category=category,
+            metadata={"event_type": update.event_type, "user_id": user_id},
+        ))
     return {
         "status": "appended",
         "id": record.id,
@@ -2538,6 +2587,13 @@ async def quick_note(note: NoteRequest) -> Dict[str, str]:
         pinned=note.pin,
     )
     commit = store.insert(record)
+    if _should_graph_ingest(category):
+        asyncio.create_task(_graph_ingest_fire_and_forget(
+            text=text,
+            source_id=record.id,
+            category=category,
+            metadata={"event_type": "note", "user_id": user_id},
+        ))
     return {"status": "noted", "id": record.id, "category": category, "importance": str(importance), "commit": commit.commit_id}
 
 
@@ -2620,6 +2676,14 @@ async def assert_memory(req: AssertRequest) -> Dict[str, Any]:
             )
         logger.info("Contradiction resolved: %s superseded by %s (%s)",
                      conflict.conflicting_memory_id, record.id, conflict.conflict_type)
+
+    if _should_graph_ingest(category):
+        asyncio.create_task(_graph_ingest_fire_and_forget(
+            text=f"{req.event_type}: {text}",
+            source_id=record.id,
+            category=category,
+            metadata={"event_type": req.event_type, "user_id": user_id},
+        ))
 
     return {
         "status": "asserted",
@@ -4907,6 +4971,12 @@ async def add_milestone(request: Request) -> Dict[str, Any]:
         "description": sanitize_string(body.get("description", "")),
     }
     _p17_append_capped(_P17_MILESTONES_KEY, _relationship_milestones, milestone, _RELATIONSHIP_MILESTONES_CAP)
+    asyncio.create_task(_graph_ingest_fire_and_forget(
+        text=f"Relationship milestone: {title}. {milestone['description']}",
+        source_id=str(uuid.uuid4()),
+        category="milestone",
+        metadata={"event_type": "milestone"},
+    ))
     return {"status": "ok", "milestone": milestone}
 
 
@@ -5235,6 +5305,13 @@ async def record_autobiography(request: Request) -> Dict[str, Any]:
 
     entry = _generate_journal_entry(text, significance, context)
     _p18_append_capped(_P18_AUTOBIOGRAPHY_KEY, _autobiography, entry, _AUTOBIOGRAPHY_CAP)
+
+    asyncio.create_task(_graph_ingest_fire_and_forget(
+        text=entry["reflection"],
+        source_id=str(uuid.uuid4()),
+        category="autobiography",
+        metadata={"event_type": "autobiography", "nature": entry["nature"]},
+    ))
 
     return {"status": "ok", "entry": entry}
 
