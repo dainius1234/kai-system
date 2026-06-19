@@ -369,6 +369,38 @@ services:
       - memu-core
       - memu-core-introspect
 
+  memu-graph:
+    build:
+      context: .
+      dockerfile: memu-graph/Dockerfile
+    <<: *defaults
+    environment:
+      LLM_PROVIDER: ollama
+      LLM_MODEL: ollama/${OLLAMA_MODEL:-qwen2:0.5b}
+      LLM_ENDPOINT: http://ollama:11434/v1
+      EMBEDDING_PROVIDER: ollama
+      EMBEDDING_MODEL: ollama/${OLLAMA_MODEL:-qwen2:0.5b}
+      EMBEDDING_ENDPOINT: http://ollama:11434/api/embeddings
+      EMBEDDING_DIMENSIONS: "768"
+      HUGGINGFACE_TOKENIZER: bert-base-uncased
+      ENABLE_BACKEND_ACCESS_CONTROL: "false"
+      CACHING: "false"
+      TELEMETRY_DISABLED: "true"
+    ports:
+      - "8061:8061"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8061/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.29
+    depends_on:
+      ollama-pull:
+        condition: service_completed_successfully
+
   ledger-worker:
     build:
       context: .
