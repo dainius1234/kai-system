@@ -10,10 +10,10 @@
 <p align="center">
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
-  <img src="https://img.shields.io/badge/services-27-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-1%2C620_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/services-30-blue?style=flat-square" alt="services">
+  <img src="https://img.shields.io/badge/tests-1%2C656_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
-  <img src="https://img.shields.io/badge/Python-~42%2C613_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/Python-~51%2C487_LOC-yellow?style=flat-square" alt="loc">
   <img src="https://img.shields.io/badge/milestones-32_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
@@ -42,8 +42,8 @@
 ```
 make core-up          # Start minimal stack (11 services + 1 one-shot model pull)
 make core-down        # Stop it
-make full-up          # Start all 28 services
-make test-core        # Run all 74 test targets (~1,620 tests)
+make full-up          # Start all 30 services
+make test-core        # Run all 77 test targets (~1,656 tests)
 make go_no_go         # Syntax check all entry points
 make merge-gate       # Full pre-merge validation
 make sync-docs        # Auto-update README + backlog metrics
@@ -132,7 +132,7 @@ Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTR
 | **Token Counting** | ~~±40% heuristic (4 chars per token)~~ **Fixed**: tiktoken-based accurate counting + per-message overhead | Already done — tiktoken installed |
 | **Context Budget** | ~~Hardcoded 3072 tokens wastes 90% of larger models~~ **Fixed**: auto-adapts from model registry. qwen2:0.5b→3072, qwen2.5:7b→28672, kimi→122K | Already done — model-aware |
 | **Prompt Templates** | ~~Hardcoded strings~~ **Fixed**: model-aware templates. Tier 1 (tiny): minimal. Tier 2 (7B): reasoning guidelines. Tier 3 (70B): JSON hints + deep persona | Already done — scales automatically |
-| **Test Style** | 1,620 tests verify structural correctness + 37 chassis tests + 15 behavioral tests. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
+| **Test Style** | 1,656 tests verify structural correctness + 37 chassis tests + 15 behavioral tests. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
 | **Dashboard** | Chat, Health, Mode toggle, Canvas are functional. Other views (Thinking, Goals, Memory, Soul, Diary, Logs) are **proxy shells** — they work when backends are running but show "unavailable" in minimal stack | Views become live with `make full-up` |
 | **Memory Persistence** | Minimal stack now uses pgvector (fixed). Full persistence requires `make full-up` or setting `VECTOR_STORE=postgres` + `PG_URI` | Default is now correct |
 | **Security Defaults** | HMAC enforced, but DB password is `localdev` by default. Nonce replay persisted to file. Dev HMAC secret now blocked unless explicitly allowed | Set `DB_PASSWORD`, `INTERSERVICE_HMAC_SECRET` env vars for production |
@@ -367,7 +367,7 @@ H3  Context Budget          ██████████ DONE
 | **P4** | Debate Branching | **DONE** — counterargument tree search |
 | **P5** | Deprecation Cleanup | **DONE** — 110+ warnings eliminated |
 | **H3** | Context Budget Manager | **DONE** — `_trim_context()` + `CONTEXT_BUDGET_TOKENS` env var |
-| **Phase 0.5** | Minimal stack real spine (ollama+agentic wired in) | **DONE** — config-validated; live Docker boot-test still deferred (no daemon in sandbox) |
+| **Phase 0.5** | Minimal stack real spine (ollama+agentic wired in) | **DONE** — config-validated; live Docker boot-test still deferred (container-image pulls from Docker Hub/GHCR blocked in sandbox) |
 | **Phase A** | agentic hot-path fix (P13 snapshot off `/run`) | **DONE** — fire-and-forget `asyncio.create_task`, zero added latency |
 | **Phase B** | agentic-introspect process split (dream/evolve/security-audit) | **DONE** — separate FastAPI service/container, own failure domain; live "kill it, prove chat survives" test still deferred |
 | **P29** | Financial Awareness | Planned — savings tracker, expense categorization |
@@ -391,9 +391,12 @@ P-series/J-series feature milestones above.
 **Immediate next steps (in order):**
 
 1. **Live verification, both deferred phases.** Neither Phase 0.5 nor
-   Phase B has been booted on a real Docker daemon yet — only `docker
-   compose config` and in-process `TestClient` tests have run. Next session
-   with Docker available should: bring up `docker-compose.minimal.yml`,
+   Phase B has been booted on a real running stack yet — only `docker
+   compose config` and in-process `TestClient` tests have run. The Docker
+   daemon itself works fine in this sandbox; the blocker is that
+   container-image blob-CDN egress to Docker Hub and GHCR is blocked, so
+   images can't be pulled. Next session with image-pull access should:
+   bring up `docker-compose.minimal.yml`,
    confirm `ollama` → `ollama-pull` → `agentic` come up healthy in order,
    send a real chat message end-to-end, then for Phase B specifically kill
    the `agentic-introspect` container and confirm `/chat`/`/run` keep
@@ -493,8 +496,8 @@ Toggle: `Ctrl+Shift+M` in dashboard, or auto-schedule from tool-gate `/gate/mode
 
 ```bash
 # Build
-docker compose -f docker-compose.minimal.yml build    # Core 8
-docker compose -f docker-compose.full.yml build        # All 27
+docker compose -f docker-compose.minimal.yml build    # Core 12
+docker compose -f docker-compose.full.yml build        # All 30
 
 # Run
 make core-up       # Start core stack
@@ -504,13 +507,13 @@ make full-down     # Stop everything
 
 # Validate
 make go_no_go      # Syntax check
-make test-core     # All 74 targets
+make test-core     # All 77 targets
 make merge-gate    # Full pre-merge
 ```
 
 ---
 
-## Test Targets (74)
+## Test Targets (77)
 
 <details>
 <summary>Click to expand full test target list</summary>
@@ -583,13 +586,13 @@ make core-smoke                make test-integration
 ### Cross-Check: What's Real vs What Needs Hardware
 
 **Working now (CPU/Codespace):**
-- [x] 28 services built, health-checked, compose validated
+- [x] 30 services built, health-checked, compose validated
 - [x] pgvector persistence (both minimal + full stacks)
 - [x] HMAC auth enforced, dev secret blocked by default
 - [x] Supervisor auto-healing loop (deep /health + /recover)
 - [x] Executor sandboxing (allowlist + AST validation + shell=False)
 - [x] Prometheus + Alertmanager + Telegram alerts wired
-- [x] 74 test targets, 1,620 tests, zero failures
+- [x] 77 test targets, 1,656 tests, zero failures
 - [x] Pre-commit, dep scanning, container scanning
 - [x] Circuit breakers, exponential backoff, resilient_call()
 - [x] MARS memory decay (R = e^{-τ/S}), spaced repetition
