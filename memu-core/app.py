@@ -245,6 +245,22 @@ async def _graph_ingest_fire_and_forget(
         logger.warning("memu-graph ingest fan-out failed for source_id=%s: %s", source_id, exc)
 
 
+async def _graph_forget_fire_and_forget(source_id: str) -> None:
+    """Phase D (MEMORY_GRAPH_DESIGN.md §5): best-effort POST to memu-graph's
+    /graph/forget when MARS truly forgets a record, so the graph doesn't
+    accumulate orphaned nodes for memories the vector store no longer has.
+    Swallows all errors — same discipline as ingest fan-out."""
+    if not _ff_is_enabled("GRAPH_INGEST"):
+        return
+    import httpx as _httpx
+
+    try:
+        async with _httpx.AsyncClient(timeout=MEMU_GRAPH_TIMEOUT) as client:
+            await client.post(f"{MEMU_GRAPH_URL}/graph/forget", json={"source_id": source_id})
+    except Exception as exc:  # noqa: BLE001 — best-effort, never propagate
+        logger.warning("memu-graph forget fan-out failed for source_id=%s: %s", source_id, exc)
+
+
 # LLM specialists available for routing.  PUB mode defaults to Dolphin
 # (uncensored).  WORK mode routes to DeepSeek-V4 or Kimi-2.5 based on
 # task type.  Memu picks the right one; executor only runs what memu says.
@@ -3380,6 +3396,7 @@ async def mars_consolidate() -> Dict[str, Any]:
             # truly forgotten — delete
             if hasattr(store, "delete_record"):
                 store.delete_record(record.id)
+                asyncio.create_task(_graph_forget_fire_and_forget(record.id))
             elif hasattr(store, "delete_old"):
                 # fallback: mark as extremely low relevance for next compress
                 record.relevance = 0.01
