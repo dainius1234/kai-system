@@ -677,6 +677,29 @@ async def _get_relevant_memories(query: str, top_k: int = 5) -> List[str]:
     return []
 
 
+async def _get_graph_context(query: str, top_k: int = 5) -> Dict[str, Any]:
+    """Phase C (MEMORY_GRAPH_DESIGN.md §5): fetch entity/relationship context
+    from memu-core's /memory/graph/query proxy, alongside the flat-memory
+    fetch above. Feature-flagged off by default — same flag that gates
+    Phase B's write-side fan-out, since an empty graph isn't worth a round
+    trip."""
+    if not is_enabled("GRAPH_INGEST"):
+        return {}
+    try:
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            resp = await client.get(
+                f"{MEMU_URL}/memory/graph/query",
+                params={"q": query, "top_k": top_k},
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                if data.get("status") not in ("graph_disabled", "graph_unavailable"):
+                    return data
+    except Exception:
+        pass
+    return {}
+
+
 async def _get_session_messages(session_id: str) -> List[Dict[str, str]]:
     """Fetch recent session messages from memu-core."""
     try:
@@ -966,7 +989,7 @@ async def chat_stream(req: ChatRequest):
             return default
 
     (memories, session_msgs, goals, topics, eq_context,
-     narrative, imagination, conscience, agent_ctx, operator_model) = await asyncio.gather(
+     narrative, imagination, conscience, agent_ctx, operator_model, graph_context) = await asyncio.gather(
         _safe(_get_relevant_memories(user_msg), []),
         _safe(_get_session_messages(req.session_id), []),
         _safe(_get_active_goals(), []),
@@ -977,6 +1000,7 @@ async def chat_stream(req: ChatRequest):
         _safe(_get_conscience_context(), {}),
         _safe(_get_agent_context(), {}),
         _safe(_get_operator_model(user_msg, mode), {}),
+        _safe(_get_graph_context(user_msg), {}),
     )
 
     # build the message list
@@ -988,6 +1012,15 @@ async def chat_stream(req: ChatRequest):
         messages.append({
             "role": "system",
             "content": f"Relevant memories from past interactions:\n{mem_block}",
+        })
+
+    # inject graph-memory context (entities/relationships, Phase C) alongside
+    # the flat-memory block above — only present when FF_GRAPH_INGEST is on
+    graph_results = graph_context.get("results") if graph_context else None
+    if graph_results:
+        messages.append({
+            "role": "system",
+            "content": f"Related entities/relationships from graph memory:\n{graph_results}",
         })
 
     if wake_intent.get("intent") != "unknown":

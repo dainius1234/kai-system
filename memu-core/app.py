@@ -1565,6 +1565,29 @@ async def retrieve_context(query: str, user_id: str, top_k: int = 20) -> List[Me
     return retrieve_ranked(q, uid, top_k=top_k)
 
 
+@app.get("/memory/graph/query")
+async def graph_query_proxy(q: str, top_k: int = 10) -> Dict[str, Any]:
+    """Phase C (MEMORY_GRAPH_DESIGN.md §5): best-effort proxy to memu-graph's
+    /graph/query. Never raises — callers (agentic) treat a down/empty graph
+    the same as no graph results, not an error."""
+    query = sanitize_string(q)
+    if not _ff_is_enabled("GRAPH_INGEST"):
+        return {"query": query, "results": None, "status": "graph_disabled"}
+    import httpx as _httpx
+
+    try:
+        async with _httpx.AsyncClient(timeout=MEMU_GRAPH_TIMEOUT) as client:
+            resp = await client.get(
+                f"{MEMU_GRAPH_URL}/graph/query",
+                params={"q": query, "top_k": top_k},
+            )
+            resp.raise_for_status()
+            return resp.json()
+    except Exception as exc:  # noqa: BLE001 — best-effort, caller treats this as "graph unavailable"
+        logger.warning("memu-graph query proxy failed for q=%r: %s", query, exc)
+        return {"query": query, "results": None, "status": "graph_unavailable"}
+
+
 @app.get("/memory/evidence-pack")
 async def evidence_pack(query: str, user_id: str = "keeper",
                         top_k: int = 10) -> Dict[str, Any]:
