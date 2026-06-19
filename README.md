@@ -434,9 +434,12 @@ fusion-engine/       # Multi-signal consensus and conviction gating
 verifier/            # Semantic fact-checking (embedding + keyword), SAGE self-critique
 executor/            # Sandboxed execution bridge
 dashboard/           # 10-view operator console (FastAPI + Starlette)
-memu-core/           # Memory engine — the soul (~6,100 lines)
+memu-core/           # Memory engine — the soul (~7,450 lines)
 tool-gate/           # HMAC auth, rate limit, policy enforcement
 agentic/           # Agentic brain (router, planner, adversary, conviction, config)
+langgraph/           # Pre-rename compatibility duplicate of agentic/'s core modules —
+                     # ~20 scripts/test_*.py files still `sys.path.insert` against this
+                     # path; kept in sync manually, not a symlink
 kai-advisor/         # Self-employment advisor (offline, UK-focused)
 telegram-bot/        # Telegram bot (voice + text pipeline)
 heartbeat/           # System pulse and auto-sleep
@@ -517,51 +520,59 @@ make merge-gate    # Full pre-merge
 
 ## Test Targets (77)
 
+The list below is the exact `test-core:` dependency chain in the `Makefile` —
+running `make test-core` runs precisely these 77 targets, no more, no less.
+(`make dep-audit`, `make coverage`, `make core-smoke`, `make test-integration`,
+`make test-context-budget`, and `make test-focus-compress` are real targets
+too, but are standalone — not part of `test-core` — so they're not listed
+here to avoid implying they run automatically.)
+
 <details>
 <summary>Click to expand full test target list</summary>
 
 ```bash
 # Service tests
-make test-phase-b-memu        make test-memu-pg             make test-dashboard-ui
-make test-dashboard            make test-thinking-pathways   make test-tool-gate
-make test-tool-gate-security   make test-telegram            make test-audio
-make test-camera               make test-executor            make test-agentic-service
-make test-kai-advisor          make test-tts                 make test-avatar
-make test-heartbeat            make test-conviction          make test-self-emp
-make test-auth-hmac            make test-agentic
+make test-phase-b-memu          make test-memu-pg              make test-memu-turbovec
+make test-dashboard-ui          make test-dashboard            make test-thinking-pathways
+make test-tool-gate             make test-tool-gate-security    make test-telegram
+make test-conviction            make test-audio                make test-camera
+make test-executor              make test-agentic-service       make test-agentic-introspect
+make test-kai-advisor           make test-tts                  make test-avatar
+make test-heartbeat             make test-self-emp              make test-auth-hmac
+make test-agentic
 
 # Feature/subsystem tests
-make test-episode-saver        make test-episode-spool       make test-error-budget
-make test-invoice              make test-memu-retrieval      make test-router
-make test-planner              make test-adversary           make test-failure-taxonomy
-make test-selaur               make test-contradiction
+make test-episode-saver         make test-episode-spool         make test-error-budget
+make test-invoice               make test-memu-retrieval         make test-router
+make test-planner               make test-adversary             make test-failure-taxonomy
+make test-selaur                make test-contradiction         make test-gem
+make test-planner-prefs         make test-silence               make test-self-deception
+make test-temporal-self         make test-predictive            make test-tempo
+make test-improvement-gate
 
 # Phase tests
-make test-p3-organic           make test-p4-personality      make test-p16-operational
+make test-p3-organic            make test-p4-personality        make test-p16-operational
 make test-p17-emotional-intelligence    make test-p18-narrative-identity
 make test-p19-imagination-engine        make test-p20-conscience-values
 make test-p21-proactive-agent           make test-p22-operator-model
 
 # Hardening tests
-make test-h1-hardening         make test-h2-self-healing     make test-mars-consolidation
-make test-sage-critique        make test-agent-evolver       make test-checkpoint
-make test-v7                   make test-prod-hardening      make test-hmac-rotation-drill
-make test-error-codes          make test-feature-flags
+make test-h1-hardening          make test-h2-self-healing        make test-mars-consolidation
+make test-sage-critique         make test-agent-evolver          make test-checkpoint
+make test-v7                    make test-prod-hardening         make test-hmac-rotation-drill
+make test-error-codes           make test-feature-flags
 
 # Specialised
-make test-dream-state          make test-security-audit      make test-tree-search
-make test-priority-queue       make test-model-selector       make test-context-budget
+make test-dream-state           make test-security-audit         make test-gaps-sprint
+make test-tree-search           make test-priority-queue         make test-model-selector
 
 # Chassis (LLM layer)
-make test-chassis              make test-focus-compress       make test-predictive-failure
-make test-multi-modal          make test-world-anchor         make test-self-healing-phases
+make test-chassis               make test-chassis-runtime        make test-predictive-failure
+make test-multi-modal           make test-world-anchor           make test-self-healing-phases
 
 # Quality & validation
-make test-behavioral           make test-docker-e2e
-
-# Engineering
-make dep-audit                 make coverage
-make core-smoke                make test-integration
+make test-j-series               make test-wake                  make test-behavioral
+make test-docker-e2e
 ```
 
 </details>
