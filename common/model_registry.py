@@ -49,6 +49,11 @@ _REGISTRY: Dict[str, ModelSpec] = {
         speed_tier=1, quality_tier=1, supports_json=False,
         supports_vision=False, timeout_s=30, tiktoken_encoding="cl100k_base",
     ),
+    "qwen2.5:0.5b": ModelSpec(
+        name="qwen2.5:0.5b", context_window=32768, output_reserve=4096,
+        speed_tier=1, quality_tier=1, supports_json=True,
+        supports_vision=False, timeout_s=30, tiktoken_encoding="cl100k_base",
+    ),
     "qwen2:1.5b": ModelSpec(
         name="qwen2:1.5b", context_window=4096, output_reserve=1024,
         speed_tier=1, quality_tier=1, supports_json=False,
@@ -143,7 +148,7 @@ _DEFAULT_SPEC = ModelSpec(
 
 def active_model() -> str:
     """Return the currently configured Ollama model name."""
-    return os.getenv("OLLAMA_MODEL", "qwen2:0.5b")
+    return os.getenv("OLLAMA_MODEL", "qwen2.5:0.5b")
 
 
 def get_model_spec(model: Optional[str] = None) -> ModelSpec:

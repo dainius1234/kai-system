@@ -270,7 +270,7 @@ services:
       TOOL_GATE_URL: http://tool-gate:8000
       REDIS_URL: redis://redis:6379
       OLLAMA_URL: http://ollama:11434
-      OLLAMA_MODEL: qwen2:0.5b
+      OLLAMA_MODEL: qwen2.5:0.5b
       LLM_TIMEOUT: "120"
       WAKE_URL: http://wake-service:8022
       FF_WAKE_INTENT_ROUTING: "${FF_WAKE_INTENT_ROUTING:-false}"
@@ -378,10 +378,10 @@ services:
     <<: *defaults
     environment:
       LLM_PROVIDER: ollama
-      LLM_MODEL: ollama/${OLLAMA_MODEL:-qwen2:0.5b}
+      LLM_MODEL: ollama/${OLLAMA_MODEL:-qwen2.5:0.5b}
       LLM_ENDPOINT: http://ollama:11434/v1
       EMBEDDING_PROVIDER: ollama
-      EMBEDDING_MODEL: ollama/${OLLAMA_MODEL:-qwen2:0.5b}
+      EMBEDDING_MODEL: ollama/${OLLAMA_MODEL:-qwen2.5:0.5b}
       EMBEDDING_ENDPOINT: http://ollama:11434/api/embeddings
       EMBEDDING_DIMENSIONS: "768"
       HUGGINGFACE_TOKENIZER: bert-base-uncased
@@ -666,7 +666,7 @@ services:
   ollama-pull:
     image: ollama/ollama:latest
     restart: "no"
-    entrypoint: ["sh", "-c", "OLLAMA_HOST=ollama:11434 ollama pull ${OLLAMA_MODEL:-qwen2:0.5b}"]
+    entrypoint: ["sh", "-c", "OLLAMA_HOST=ollama:11434 ollama pull ${OLLAMA_MODEL:-qwen2.5:0.5b}"]
     depends_on:
       ollama:
         condition: service_healthy

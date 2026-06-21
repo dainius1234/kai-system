@@ -144,7 +144,7 @@ def get_speculative_config() -> Optional[dict]:
         return None
 
     return {
-        "draft_model": os.getenv("SPECULATIVE_DRAFT_MODEL", "qwen2:0.5b"),
+        "draft_model": os.getenv("SPECULATIVE_DRAFT_MODEL", "qwen2.5:0.5b"),
         "verify_model": os.getenv("SPECULATIVE_VERIFY_MODEL", "qwen2.5:7b"),
         "draft_tokens": int(os.getenv("SPECULATIVE_DRAFT_TOKENS", "5")),
     }
@@ -155,7 +155,7 @@ def get_recommended_model() -> str:
 
     Returns:
         - qwen2.5:7b if GPU is available
-        - qwen2:0.5b for CPU-only environments
+        - qwen2.5:0.5b for CPU-only environments
     """
     if has_cuda():
         gpu = get_gpu_info()
@@ -169,4 +169,4 @@ def get_recommended_model() -> str:
         else:
             return "qwen2:1.5b"    # Small model for low VRAM
 
-    return "qwen2:0.5b"  # CPU fallback
+    return "qwen2.5:0.5b"  # CPU fallback
