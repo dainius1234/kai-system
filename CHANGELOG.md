@@ -49,6 +49,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **H2.2**: `MEMU_MAX_CANDIDATES` env var (default 500) caps `retrieve_ranked()` candidate fetch, preventing unbounded 10k-record loads on every retrieval call
 
 ### Changed
+- Default Ollama model swapped `qwen2:0.5b` → `qwen2.5:0.5b` (compose defaults, `common/llm.py`, `common/gpu_utils.py`, `.env.example`) — `qwen2:0.5b`'s chat template very likely lacks tool-call markup, which would make Letta's model-discovery filter silently drop it; `qwen2.5:0.5b` is the generation Qwen's own tooling scopes native tool-call support to. `common/model_registry.py` gained a matching spec entry for the new tag.
 - Replaced fabricated PM v2 content (DECISIONS, SEQUENCE, STATUS, RISKS) with honest, repo-grounded versions
 - Added `kai-pm/STRATEGIC_PLAN.md` as canonical 5-phase roadmap pointer
 - Verifier upgraded to semantic verification (v0.6.0) — uses memu-core `rank_score` (embedding similarity + relevance + importance + recency) instead of keyword-only matching
