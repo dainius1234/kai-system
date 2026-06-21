@@ -387,12 +387,14 @@ services:
       # validator) — it never validates the key's value, Ollama doesn't check it.
       LLM_API_KEY: "ollama-local-no-key-required"
       EMBEDDING_PROVIDER: ollama
-      # Unlike LLM_MODEL above, this goes through Cognee's LiteLLMEmbeddingEngine,
-      # which calls litellm.aembedding() directly — litellm infers the provider
-      # from a "provider/model" prefix in the model string (get_llm_provider()),
-      # so this one DOES need the "ollama/" prefix, unlike the chat path which
-      # bypasses litellm via Cognee's own OllamaAPIAdapter.
-      EMBEDDING_MODEL: ollama/${OLLAMA_MODEL:-qwen2.5:0.5b}
+      # D45 incorrectly added "ollama/" here based on Cognee's
+      # LiteLLMEmbeddingEngine source — but EMBEDDING_PROVIDER=ollama
+      # actually routes to Cognee's own OllamaEmbeddingEngine (confirmed via
+      # this service's live logs: "Ollama embedding error: model
+      # 'ollama/qwen2.5:0.5b' not found"), which — like the chat path's
+      # OllamaAPIAdapter — passes self.model to Ollama's API as-is, no
+      # prefix. Bare tag, same rule as LLM_MODEL above.
+      EMBEDDING_MODEL: ${OLLAMA_MODEL:-qwen2.5:0.5b}
       EMBEDDING_ENDPOINT: http://ollama:11434/api/embeddings
       # qwen2.5:0.5b's native embedding_length is 896 (confirmed from its GGUF
       # metadata at model-load time), not 768 — must match or Cognee's
