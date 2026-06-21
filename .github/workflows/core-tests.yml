@@ -68,6 +68,11 @@ jobs:
           format: 'table'
 
       - name: Bring up minimal sovereign AI stack
+        env:
+          # memu-core's embedding backend is real-model-or-crash by design
+          # (DECISIONS.md) — CI exercises spine/gate logic, not embedding
+          # quality, and can't rely on the HF model download succeeding.
+          MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
         run: |
           docker compose -f docker-compose.minimal.yml up -d --build
           # wait for tool-gate (fast) and agentic (waits on the ollama model
@@ -92,9 +97,15 @@ jobs:
             fi
             sleep 1
           done
+      - name: Dump container logs on failure
+        if: failure()
+        run: |
+          docker compose -f docker-compose.minimal.yml ps
+          docker compose -f docker-compose.minimal.yml logs --no-color
       - name: Run integration smoke script
         run: |
           python3 scripts/test_core_integration.py
       - name: Tear down minimal stack
+        if: always()
         run: |
           docker compose -f docker-compose.minimal.yml down

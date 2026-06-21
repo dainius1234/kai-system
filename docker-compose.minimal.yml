@@ -119,6 +119,9 @@ services:
       MAX_MEMORY_RECORDS: "5000"
       VECTOR_STORE: postgres
       PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      # default false (real model or crash, per DECISIONS.md) — CI overrides
+      # to true since it's exercising spine/gate logic, not embedding quality
+      MEMU_ALLOW_FAKE_EMBEDDINGS: "${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}"
     ports:
       - "8001:8001"
     healthcheck:
@@ -145,6 +148,7 @@ services:
     environment:
       VECTOR_STORE: postgres
       PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      MEMU_ALLOW_FAKE_EMBEDDINGS: "${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}"
     ports:
       - "8009:8009"
     healthcheck:
