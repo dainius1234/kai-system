@@ -395,7 +395,14 @@ services:
       # OllamaAPIAdapter — passes self.model to Ollama's API as-is, no
       # prefix. Bare tag, same rule as LLM_MODEL above.
       EMBEDDING_MODEL: ${OLLAMA_MODEL:-qwen2.5:0.5b}
-      EMBEDDING_ENDPOINT: http://ollama:11434/api/embeddings
+      # Cognee's OllamaEmbeddingEngine sends {"model", "input", "dimensions"} —
+      # the "input" field belongs to Ollama's current /api/embed endpoint.
+      # The old /api/embeddings endpoint only reads "prompt"; pointed at it,
+      # "input" is silently ignored, the prompt is effectively empty, and
+      # Ollama returns 200 with an empty/invalid embedding vector (confirmed
+      # live: 200 OK in ~134ms, then "Embedding test did not return a valid
+      # vector." — too fast and too wrong to be a real inference).
+      EMBEDDING_ENDPOINT: http://ollama:11434/api/embed
       # qwen2.5:0.5b's native embedding_length is 896 (confirmed from its GGUF
       # metadata at model-load time), not 768 — must match or Cognee's
       # embedding-vector validation rejects the response.
