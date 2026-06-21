@@ -330,7 +330,14 @@ class PGVectorStore:
         conn = self._get_conn()
         try:
             with conn.cursor() as cur:
-                cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+                try:
+                    cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+                except self._psycopg2.errors.UniqueViolation:
+                    # Two services racing CREATE EXTENSION IF NOT EXISTS against a
+                    # freshly-initialized database can both pass the existence
+                    # check before either commits — Postgres's guard isn't safe
+                    # under true concurrency. The extension exists either way.
+                    conn.rollback()
                 cur.execute(
                     """
                     CREATE TABLE IF NOT EXISTS memories (

@@ -50,7 +50,7 @@ class LLMResponse:
 # ── Specialist URL registry ─────────────────────────────────────────
 # Ollama is the primary local backend — add it as the default
 _OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama:11434")
-_OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2:0.5b")
+_OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:0.5b")
 
 _DEFAULT_URLS: Dict[str, str] = {
     "Ollama": _OLLAMA_URL,
@@ -458,7 +458,7 @@ async def llm_warmup(
     if os.getenv("LLM_WARMUP_ENABLED", "true").lower() != "true":
         return
 
-    model = model or os.getenv("OLLAMA_MODEL", "qwen2:0.5b")
+    model = model or os.getenv("OLLAMA_MODEL", "qwen2.5:0.5b")
     specialist = specialist or os.getenv("DEFAULT_SPECIALIST", "Ollama")
     ollama_base_url = ollama_base_url or os.getenv("OLLAMA_URL", "http://ollama:11434")
     router = router or _router
