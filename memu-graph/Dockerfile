@@ -13,9 +13,13 @@ COPY common/ ./common/
 COPY security/ ./security/
 COPY memu-graph/app.py ./app.py
 
-RUN mkdir -p /data/cognee && chown -R app:app /data/cognee
+RUN mkdir -p /data/cognee /data/hf_cache && chown -R app:app /data/cognee /data/hf_cache
 ENV SYSTEM_ROOT_DIRECTORY=/data/cognee/system
 ENV DATA_ROOT_DIRECTORY=/data/cognee/data
+# adduser --system gives the "app" user HOME=/nonexistent, which breaks
+# HuggingFace's tokenizer download (it caches under $HF_HOME/$HOME by
+# default and can't write there). Point it at a writable directory instead.
+ENV HF_HOME=/data/hf_cache
 
 EXPOSE 8061
 
