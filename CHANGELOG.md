@@ -7,6 +7,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 - **memu-core Postgres extension race**: `PGVectorStore._init_schema()`'s `CREATE EXTENSION IF NOT EXISTS vector;` could raise `UniqueViolation` when `memu-core` and `memu-core-introspect` race against a freshly-initialized database — both can pass the existence check before either commits. Now caught and treated as success (the extension exists either way).
+- **memu-graph startup crash**: Cognee's `LLMConfig` requires `LLM_API_KEY` to be non-empty when `LLM_PROVIDER=ollama` (pydantic all-or-nothing validator); added a placeholder value since Ollama performs no real auth.
+- **memu-graph model-not-found 404s**: Cognee's `OllamaAPIAdapter` sends the configured model string to Ollama's API as-is, with no `ollama/` prefix-stripping. `LLM_MODEL`/`EMBEDDING_MODEL` in `docker-compose.full.yml`'s `memu-graph` block now use the bare model tag instead of `ollama/<tag>`.
 - flake8 E999 (f-string backslash) blocking CI on main
 - Removed stray file `pulls/48/review_comments`
 - **TTS test de-flaked**: `scripts/test_tts_service.py` now mocks `edge_tts.Communicate` so the test runs offline and is deterministic — no more Bing WebSocket 403 failures in CI sandboxes
