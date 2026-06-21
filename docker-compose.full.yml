@@ -89,6 +89,8 @@ services:
       REDIS_URL: redis://redis:6379
       VECTOR_STORE: postgres
       PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
+      MEMU_GRAPH_URL: http://memu-graph:8061
+      FF_GRAPH_INGEST: "${FF_GRAPH_INGEST:-false}"
     ports:
       - "8001:8001"
     healthcheck:
@@ -105,13 +107,37 @@ services:
       - tool-gate
       - postgres
 
+  memu-core-introspect:
+    build:
+      context: .
+      dockerfile: memu-core/Dockerfile.introspect
+    <<: *defaults
+    environment:
+      REDIS_URL: redis://redis:6379
+      VECTOR_STORE: postgres
+      PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
+    ports:
+      - "8009:8009"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8009/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.33
+    depends_on:
+      - redis
+      - postgres
+
   heartbeat:
     build:
       context: .
       dockerfile: heartbeat/Dockerfile
     <<: *defaults
     environment:
-      MEMU_URL: http://memu-core:8001
+      MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
       CHECK_INTERVAL: "60"
       ALERT_WINDOW: "300"
     ports:
@@ -127,6 +153,7 @@ services:
         ipv4_address: 172.20.0.6
     depends_on:
       - memu-core
+      - memu-core-introspect
 
   dashboard:
     build:
@@ -136,6 +163,7 @@ services:
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
       MEMU_URL: http://memu-core:8001
+      MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
       LANGGRAPH_URL: http://agentic:8007
       AGENTIC_INTROSPECT_URL: http://agentic-introspect:8023
       EXECUTOR_URL: http://executor:8002
@@ -156,6 +184,7 @@ services:
     depends_on:
       - tool-gate
       - memu-core
+      - memu-core-introspect
       - agentic
       - heartbeat
       - wake-service
@@ -325,6 +354,7 @@ services:
     <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
+      MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
       COMPRESSOR_INTERVAL_HOURS: "24"
     ports:
       - "8057:8057"
@@ -339,6 +369,39 @@ services:
         ipv4_address: 172.20.0.18
     depends_on:
       - memu-core
+      - memu-core-introspect
+
+  memu-graph:
+    build:
+      context: .
+      dockerfile: memu-graph/Dockerfile
+    <<: *defaults
+    environment:
+      LLM_PROVIDER: ollama
+      LLM_MODEL: ollama/${OLLAMA_MODEL:-qwen2:0.5b}
+      LLM_ENDPOINT: http://ollama:11434/v1
+      EMBEDDING_PROVIDER: ollama
+      EMBEDDING_MODEL: ollama/${OLLAMA_MODEL:-qwen2:0.5b}
+      EMBEDDING_ENDPOINT: http://ollama:11434/api/embeddings
+      EMBEDDING_DIMENSIONS: "768"
+      HUGGINGFACE_TOKENIZER: bert-base-uncased
+      ENABLE_BACKEND_ACCESS_CONTROL: "false"
+      CACHING: "false"
+      TELEMETRY_DISABLED: "true"
+    ports:
+      - "8061:8061"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8061/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.29
+    depends_on:
+      ollama-pull:
+        condition: service_completed_successfully
 
   ledger-worker:
     build:
@@ -393,8 +456,9 @@ services:
     <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
-      WHISPER_BACKEND: "local"
+      WHISPER_BACKEND: "${WHISPER_BACKEND:-local}"
       WHISPER_MODEL: "tiny"
+      WHISPER_API_URL: http://parakeet-server:8080
       AUTO_MEMORIZE_AUDIO: "true"
     ports:
       - "8021:8021"
@@ -409,6 +473,8 @@ services:
         ipv4_address: 172.20.0.13
     depends_on:
       - memu-core
+      # parakeet-server isn't depended on by default — it's only started/needed
+      # when WHISPER_BACKEND=api is set. Run with --profile parakeet to include it.
 
   camera-service:
     build:
@@ -607,6 +673,21 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.31
+
+  # Optional CPU ASR sidecar (parakeet.cpp). Not started by default — opt in by
+  # setting WHISPER_BACKEND=api on audio-service and uncommenting depends_on below.
+  parakeet-server:
+    image: ghcr.io/mudler/parakeet.cpp-server:latest
+    <<: *defaults
+    profiles: ["parakeet"]
+    command: ["--model", "${PARAKEET_MODEL:-tdt_ctc-110m}", "--port", "8080"]
+    # No healthcheck: the upstream image's exact base (and whether python/curl/nc
+    # exist inside it) isn't confirmed, and the server documents no /health route.
+    # Don't gate other services' depends_on on this until verified against a real
+    # container — see kai-pm/SHOPPING_LIST_PLAN.md open items.
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.28
 
   telegram-bot:
     build:

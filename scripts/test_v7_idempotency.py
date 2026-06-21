@@ -127,9 +127,10 @@ class TestIdempotency(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn(idem, mod._idempotency_cache)
 
-        # manually expire the entry
-        decision, _ = mod._idempotency_cache[idem]
-        mod._idempotency_cache[idem] = (decision, time.time() - 1)
+        # force-expire the entry in whichever store(s) are actually backing it
+        # (poking the in-memory dict alone is not enough once Redis is configured —
+        # _idem_get prefers Redis, so the entry must be evicted from both)
+        mod._idem_evict(idem)
 
         # next request with same key should NOT get cached version
         payload2 = _make_request(9.5, idem_key=idem, nonce="nonce-d2")

@@ -119,6 +119,9 @@ services:
       MAX_MEMORY_RECORDS: "5000"
       VECTOR_STORE: postgres
       PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      # default false (real model or crash, per DECISIONS.md) — CI overrides
+      # to true since it's exercising spine/gate logic, not embedding quality
+      MEMU_ALLOW_FAKE_EMBEDDINGS: "${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}"
     ports:
       - "8001:8001"
     healthcheck:
@@ -130,6 +133,33 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.5
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  memu-core-introspect:
+    build:
+      context: .
+      dockerfile: memu-core/Dockerfile.introspect
+    container_name: sovereign-memu-core-introspect
+    <<: *defaults
+    environment:
+      VECTOR_STORE: postgres
+      PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      MEMU_ALLOW_FAKE_EMBEDDINGS: "${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}"
+    ports:
+      - "8009:8009"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8009/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.14
     depends_on:
       redis:
         condition: service_healthy
@@ -178,7 +208,7 @@ services:
     container_name: sovereign-heartbeat
     <<: *defaults
     environment:
-      MEMU_URL: http://memu-core:8001
+      MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
       CHECK_INTERVAL: "60"
       ALERT_WINDOW: "300"
     ports:
@@ -195,6 +225,8 @@ services:
     depends_on:
       memu-core:
         condition: service_healthy
+      memu-core-introspect:
+        condition: service_healthy
 
   dashboard:
     build:
@@ -205,6 +237,7 @@ services:
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
       MEMU_URL: http://memu-core:8001
+      MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
       HEARTBEAT_URL: http://heartbeat:8010
       SUPERVISOR_URL: http://supervisor:8051
       WAKE_URL: http://wake-service:8022
@@ -224,6 +257,8 @@ services:
       tool-gate:
         condition: service_healthy
       memu-core:
+        condition: service_healthy
+      memu-core-introspect:
         condition: service_healthy
       heartbeat:
         condition: service_healthy

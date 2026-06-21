@@ -10,10 +10,10 @@
 <p align="center">
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
-  <img src="https://img.shields.io/badge/services-27-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-1%2C620_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/services-31-blue?style=flat-square" alt="services">
+  <img src="https://img.shields.io/badge/tests-1%2C656_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
-  <img src="https://img.shields.io/badge/Python-~42%2C613_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/Python-~51%2C487_LOC-yellow?style=flat-square" alt="loc">
   <img src="https://img.shields.io/badge/milestones-32_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
@@ -21,14 +21,14 @@
 
 ---
 
-## Project Status (18 June 2026)
+## Project Status (19 June 2026)
 
 | Metric | Value |
 |---|---|
-| **Services** | 29 Docker containers |
-| **Test targets** | 76 (`make test-core`) |
-| **Individual tests** | 1,654 (`def test_` across 89 files) |
-| **Python LOC** | ~50,946 |
+| **Services** | 31 Docker containers |
+| **Test targets** | 77 (`make test-core`) |
+| **Individual tests** | 1,656 (`def test_` across 90 files) |
+| **Python LOC** | ~51,613 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 32 |
 | **Failures** | 0 |
@@ -40,10 +40,10 @@
 ## Quick Reference
 
 ```
-make core-up          # Start minimal stack (11 services + 1 one-shot model pull)
+make core-up          # Start minimal stack (12 services + 1 one-shot model pull)
 make core-down        # Stop it
-make full-up          # Start all 28 services
-make test-core        # Run all 74 test targets (~1,620 tests)
+make full-up          # Start all 31 services
+make test-core        # Run all 77 test targets (~1,656 tests)
 make go_no_go         # Syntax check all entry points
 make merge-gate       # Full pre-merge validation
 make sync-docs        # Auto-update README + backlog metrics
@@ -132,7 +132,7 @@ Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTR
 | **Token Counting** | ~~±40% heuristic (4 chars per token)~~ **Fixed**: tiktoken-based accurate counting + per-message overhead | Already done — tiktoken installed |
 | **Context Budget** | ~~Hardcoded 3072 tokens wastes 90% of larger models~~ **Fixed**: auto-adapts from model registry. qwen2:0.5b→3072, qwen2.5:7b→28672, kimi→122K | Already done — model-aware |
 | **Prompt Templates** | ~~Hardcoded strings~~ **Fixed**: model-aware templates. Tier 1 (tiny): minimal. Tier 2 (7B): reasoning guidelines. Tier 3 (70B): JSON hints + deep persona | Already done — scales automatically |
-| **Test Style** | 1,620 tests verify structural correctness + 37 chassis tests + 15 behavioral tests. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
+| **Test Style** | 1,656 tests verify structural correctness + 37 chassis tests + 15 behavioral tests. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
 | **Dashboard** | Chat, Health, Mode toggle, Canvas are functional. Other views (Thinking, Goals, Memory, Soul, Diary, Logs) are **proxy shells** — they work when backends are running but show "unavailable" in minimal stack | Views become live with `make full-up` |
 | **Memory Persistence** | Minimal stack now uses pgvector (fixed). Full persistence requires `make full-up` or setting `VECTOR_STORE=postgres` + `PG_URI` | Default is now correct |
 | **Security Defaults** | HMAC enforced, but DB password is `localdev` by default. Nonce replay persisted to file. Dev HMAC secret now blocked unless explicitly allowed | Set `DB_PASSWORD`, `INTERSERVICE_HMAC_SECRET` env vars for production |
@@ -213,14 +213,15 @@ Supervisor (every 15s) → deep /health on each service
 | 1 | postgres | internal only | pgvector DB — memories, ledger, embeddings |
 | 2 | redis | internal only | Session buffer, caches |
 | 3 | tool-gate | 8000 | Policy enforcement, HMAC auth |
-| 4 | memu-core | 8001 | Memory engine — the soul |
-| 5 | heartbeat | 8010 | System pulse, auto-sleep |
-| 6 | dashboard | 8080 | 8-view operator console |
-| 7 | wake-service | 8022 | Wake-word + intent routing |
-| 8 | supervisor | 8051 | Watchdog, auto-heal, proactive checks |
-| 9 | verifier | 8052 | Semantic fact-checking, SAGE |
-| 10 | ollama | 11434 | Local LLM (qwen2:0.5b CPU) — pulled automatically by the `ollama-pull` one-shot init container on first boot |
-| 11 | agentic | 8007 | Agentic brain, all reasoning — the piece that actually drives chat/conviction/gate calls |
+| 4 | memu-core | 8001 | Memory engine — the soul (hot path: memorize/retrieve) |
+| 5 | memu-core-introspect | 8009 | Store maintenance — compress/focus-compress/reflect/decay/quarantine, split out of `memu-core` so a bug in cold/periodic memory-maintenance code can't take down live memorize/retrieve traffic |
+| 6 | heartbeat | 8010 | System pulse, auto-sleep |
+| 7 | dashboard | 8080 | 10-view operator console |
+| 8 | wake-service | 8022 | Wake-word + intent routing |
+| 9 | supervisor | 8051 | Watchdog, auto-heal, proactive checks |
+| 10 | verifier | 8052 | Semantic fact-checking, SAGE |
+| 11 | ollama | 11434 | Local LLM (qwen2:0.5b CPU) — pulled automatically by the `ollama-pull` one-shot init container on first boot |
+| 12 | agentic | 8007 | Agentic brain, all reasoning — the piece that actually drives chat/conviction/gate calls |
 
 ### Full Stack Additions (`docker-compose.full.yml`)
 
@@ -231,29 +232,29 @@ voice, avatar, integrations, and ops tooling.
 | Service | Port | Purpose |
 |---------|------|---------|
 | agentic-introspect | 8023 | Dream/evolve/security-audit — split out of `agentic` so a bug in self-improvement code can't take down live chat |
-| executor | 8040 | Sandboxed execution |
-| fusion-engine | 8070 | Multi-signal consensus |
-| orchestrator | 8080 | Final risk authority |
-| telegram-bot | 8110 | Telegram interface |
-| kai-advisor | 8120 | Self-employment advisor (UK) |
-| memory-compressor | — | Memory summarisation |
-| ledger-worker | — | Action audit trail |
-| metrics-gateway | 9090 | Prometheus metrics |
+| executor | 8002 | Sandboxed execution |
+| fusion-engine | 8053 | Multi-signal consensus |
+| orchestrator | 8050 | Final risk authority |
+| telegram-bot | 8025 | Telegram interface |
+| kai-advisor | 8090 | Self-employment advisor (UK) |
+| memory-compressor | 8057 | Memory summarisation |
+| ledger-worker | 8056 | Action audit trail |
+| metrics-gateway | 8058 | Prometheus metrics |
 | audio-service | 8021 | STT (faster-whisper) |
-| camera-service | — | Camera capture |
+| camera-service | 8020 | Camera capture |
 | tts-service | 8030 | Text-to-speech (British Ryan) |
-| avatar-service | — | Avatar generation |
-| screen-capture | — | Screen OCR pipeline |
-| backup-service | — | pg/redis/memory backup |
-| calendar-sync | — | Calendar integration |
-| workspace-manager | — | Workspace lifecycle |
-| ollama | 11434 | Local LLM (qwen2:0.5b CPU) |
+| avatar-service | 8081 | Avatar generation |
+| screen-capture | 8059 | Screen OCR pipeline |
+| backup-service | 8054 | pg/redis/memory backup |
+| calendar-sync | 8055 | Calendar integration |
+| workspace-manager | 8060 | Workspace lifecycle |
+| parakeet-server | internal only (8080) | Optional CPU ASR sidecar (parakeet.cpp) — not started by default, opt in with `--profile parakeet` + `WHISPER_BACKEND=api` |
 
 ---
 
 ## Operator Console
 
-**http://localhost:8050/app** — 8 views, keyboard shortcuts, installable as PWA.
+**http://localhost:8080/app** — 10 views, keyboard shortcuts, installable as PWA.
 
 | View | Key | What You See |
 |------|-----|-------------|
@@ -265,6 +266,8 @@ voice, avatar, integrations, and ops tooling.
 | **Memory** | `Ctrl+6` | Memory browser — search by query or category, scores, stats |
 | **Logs** | `Ctrl+7` | Ring-buffer log viewer — level/time filter, monospace, color-coded |
 | **Soul** | `Ctrl+8` | Mood cards, emotion timeline, domain confidence, self-reflection journal, milestones |
+| **Canvas** | — (nav only) | Live mind-map / emotion-timeline / plan-flow visualization |
+| **Diary** | — (nav only) | Memory diary — search by query, category, importance threshold |
 
 | Shortcut | Action |
 |----------|--------|
@@ -306,6 +309,7 @@ voice, avatar, integrations, and ops tooling.
 | agentic monolith | 1,800-line process mixed hot chat/run path with cold self-improvement code — a dream/evolver bug could take down live chat | Phase A+B — P13 snapshot moved off hot path; `/dream`, `/evolve/*`, `/security/audit` split into separate `agentic-introspect` service/process |
 | minimal stack | `agentic`/`ollama` referenced by dashboard/wake-service but not defined as services — Chat was non-functional in minimal despite docs claiming otherwise | Phase 0.5 — added `ollama` (+healthcheck), `ollama-pull` one-shot init, `agentic`, fixed `HMAC_ALLOW_DEV_SECRET` parity |
 | sovereign profile | `agentic-introspect` split (Phase B) only added to `full.yml` — `dashboard` in `docker-compose.sovereign.yml` would silently degrade `/api/dream` and `/api/security-audit` to `"unavailable"` | Phase B follow-up — `agentic-introspect` added to `docker-compose.sovereign.yml` too, no silent gap left between profiles |
+| memu-core monolith | Cold/periodic store-maintenance endpoints (compress, focus-compress, reflect, decay, quarantine, etc.) shared a process with hot live-chat memorize/retrieve traffic — same risk class as the agentic monolith | `memu-core-introspect` split — 13 functions/14 routes moved to their own process (re-importing the same handlers, zero duplication); P17-P22 personality engine and `/memory/consolidate`/`/memory/self-reflect` stay in `memu-core` (read live in-process state, not safely splittable) — see DECISIONS.md D21 |
 
 ### Open
 
@@ -367,7 +371,7 @@ H3  Context Budget          ██████████ DONE
 | **P4** | Debate Branching | **DONE** — counterargument tree search |
 | **P5** | Deprecation Cleanup | **DONE** — 110+ warnings eliminated |
 | **H3** | Context Budget Manager | **DONE** — `_trim_context()` + `CONTEXT_BUDGET_TOKENS` env var |
-| **Phase 0.5** | Minimal stack real spine (ollama+agentic wired in) | **DONE** — config-validated; live Docker boot-test still deferred (no daemon in sandbox) |
+| **Phase 0.5** | Minimal stack real spine (ollama+agentic wired in) | **DONE** — config-validated; live Docker boot-test still deferred (container-image pulls from Docker Hub/GHCR blocked in sandbox) |
 | **Phase A** | agentic hot-path fix (P13 snapshot off `/run`) | **DONE** — fire-and-forget `asyncio.create_task`, zero added latency |
 | **Phase B** | agentic-introspect process split (dream/evolve/security-audit) | **DONE** — separate FastAPI service/container, own failure domain; live "kill it, prove chat survives" test still deferred |
 | **P29** | Financial Awareness | Planned — savings tracker, expense categorization |
@@ -390,19 +394,24 @@ P-series/J-series feature milestones above.
 
 **Immediate next steps (in order):**
 
-1. **Live verification, both deferred phases.** Neither Phase 0.5 nor
-   Phase B has been booted on a real Docker daemon yet — only `docker
-   compose config` and in-process `TestClient` tests have run. Next session
-   with Docker available should: bring up `docker-compose.minimal.yml`,
-   confirm `ollama` → `ollama-pull` → `agentic` come up healthy in order,
-   send a real chat message end-to-end, then for Phase B specifically kill
-   the `agentic-introspect` container and confirm `/chat`/`/run` keep
-   working — that's the actual proof the split achieves its purpose, not
-   just that both processes can boot independently.
-2. **Apply the same hot/cold discipline to the next-biggest monolith** once
-   agentic-introspect is live-verified — `memu-core` (~6,100 lines) is the
-   next candidate flagged by size alone, not yet audited for hot/cold
-   coupling the way agentic was.
+1. **Live verification, all three deferred splits.** Phase 0.5, Phase B
+   (`agentic-introspect`), and the `memu-core-introspect` split (D21) have
+   none been booted on a real running stack yet — only `docker compose
+   config` and in-process `TestClient` tests have run; no Docker daemon is
+   available in this sandbox at all (`docker info` fails to reach
+   `/var/run/docker.sock`). Next session with a live daemon should: bring
+   up `docker-compose.minimal.yml`, confirm `ollama` → `ollama-pull` →
+   `agentic` come up healthy in order, send a real chat message
+   end-to-end, then kill `agentic-introspect` and confirm `/chat`/`/run`
+   keep working, and separately kill `memu-core-introspect` and confirm
+   `/memory/memorize`/`/memory/retrieve` keep working — that's the actual
+   proof each split achieves its purpose, not just that the processes can
+   boot independently.
+2. **memu-core's P17-P22 personality engine remains unsplit** (D21) —
+   eleven `asyncio.Lock()`-protected in-process dict buckets with only a
+   5-minute Redis persistence lag make it fundamentally unsplittable
+   without a backing-store rework first. Not a next step until that
+   rework is scoped.
 
 **End-goal target:** a fully offline, self-hosted, sovereign AI companion
 that runs entirely on local hardware (no cloud LLM dependency) — chat,
@@ -429,9 +438,13 @@ fusion-engine/       # Multi-signal consensus and conviction gating
 verifier/            # Semantic fact-checking (embedding + keyword), SAGE self-critique
 executor/            # Sandboxed execution bridge
 dashboard/           # 10-view operator console (FastAPI + Starlette)
-memu-core/           # Memory engine — the soul (~6,100 lines)
+memu-core/           # Memory engine — the soul (~7,450 lines); hot-path memorize/retrieve
+                     # + introspect_app.py — store-maintenance process split off (D21)
 tool-gate/           # HMAC auth, rate limit, policy enforcement
 agentic/           # Agentic brain (router, planner, adversary, conviction, config)
+langgraph/           # Pre-rename compatibility duplicate of agentic/'s core modules —
+                     # ~20 scripts/test_*.py files still `sys.path.insert` against this
+                     # path; kept in sync manually, not a symlink
 kai-advisor/         # Self-employment advisor (offline, UK-focused)
 telegram-bot/        # Telegram bot (voice + text pipeline)
 heartbeat/           # System pulse and auto-sleep
@@ -493,8 +506,8 @@ Toggle: `Ctrl+Shift+M` in dashboard, or auto-schedule from tool-gate `/gate/mode
 
 ```bash
 # Build
-docker compose -f docker-compose.minimal.yml build    # Core 8
-docker compose -f docker-compose.full.yml build        # All 27
+docker compose -f docker-compose.minimal.yml build    # Core 12
+docker compose -f docker-compose.full.yml build        # All 30
 
 # Run
 make core-up       # Start core stack
@@ -504,59 +517,67 @@ make full-down     # Stop everything
 
 # Validate
 make go_no_go      # Syntax check
-make test-core     # All 74 targets
+make test-core     # All 77 targets
 make merge-gate    # Full pre-merge
 ```
 
 ---
 
-## Test Targets (74)
+## Test Targets (77)
+
+The list below is the exact `test-core:` dependency chain in the `Makefile` —
+running `make test-core` runs precisely these 77 targets, no more, no less.
+(`make dep-audit`, `make coverage`, `make core-smoke`, `make test-integration`,
+`make test-context-budget`, and `make test-focus-compress` are real targets
+too, but are standalone — not part of `test-core` — so they're not listed
+here to avoid implying they run automatically.)
 
 <details>
 <summary>Click to expand full test target list</summary>
 
 ```bash
 # Service tests
-make test-phase-b-memu        make test-memu-pg             make test-dashboard-ui
-make test-dashboard            make test-thinking-pathways   make test-tool-gate
-make test-tool-gate-security   make test-telegram            make test-audio
-make test-camera               make test-executor            make test-agentic-service
-make test-kai-advisor          make test-tts                 make test-avatar
-make test-heartbeat            make test-conviction          make test-self-emp
-make test-auth-hmac            make test-agentic
+make test-phase-b-memu          make test-memu-pg              make test-memu-turbovec
+make test-dashboard-ui          make test-dashboard            make test-thinking-pathways
+make test-tool-gate             make test-tool-gate-security    make test-telegram
+make test-conviction            make test-audio                make test-camera
+make test-executor              make test-agentic-service       make test-agentic-introspect
+make test-kai-advisor           make test-tts                  make test-avatar
+make test-heartbeat             make test-self-emp              make test-auth-hmac
+make test-agentic
 
 # Feature/subsystem tests
-make test-episode-saver        make test-episode-spool       make test-error-budget
-make test-invoice              make test-memu-retrieval      make test-router
-make test-planner              make test-adversary           make test-failure-taxonomy
-make test-selaur               make test-contradiction
+make test-episode-saver         make test-episode-spool         make test-error-budget
+make test-invoice               make test-memu-retrieval         make test-router
+make test-planner               make test-adversary             make test-failure-taxonomy
+make test-selaur                make test-contradiction         make test-gem
+make test-planner-prefs         make test-silence               make test-self-deception
+make test-temporal-self         make test-predictive            make test-tempo
+make test-improvement-gate
 
 # Phase tests
-make test-p3-organic           make test-p4-personality      make test-p16-operational
+make test-p3-organic            make test-p4-personality        make test-p16-operational
 make test-p17-emotional-intelligence    make test-p18-narrative-identity
 make test-p19-imagination-engine        make test-p20-conscience-values
 make test-p21-proactive-agent           make test-p22-operator-model
 
 # Hardening tests
-make test-h1-hardening         make test-h2-self-healing     make test-mars-consolidation
-make test-sage-critique        make test-agent-evolver       make test-checkpoint
-make test-v7                   make test-prod-hardening      make test-hmac-rotation-drill
-make test-error-codes          make test-feature-flags
+make test-h1-hardening          make test-h2-self-healing        make test-mars-consolidation
+make test-sage-critique         make test-agent-evolver          make test-checkpoint
+make test-v7                    make test-prod-hardening         make test-hmac-rotation-drill
+make test-error-codes           make test-feature-flags
 
 # Specialised
-make test-dream-state          make test-security-audit      make test-tree-search
-make test-priority-queue       make test-model-selector       make test-context-budget
+make test-dream-state           make test-security-audit         make test-gaps-sprint
+make test-tree-search           make test-priority-queue         make test-model-selector
 
 # Chassis (LLM layer)
-make test-chassis              make test-focus-compress       make test-predictive-failure
-make test-multi-modal          make test-world-anchor         make test-self-healing-phases
+make test-chassis               make test-chassis-runtime        make test-predictive-failure
+make test-multi-modal           make test-world-anchor           make test-self-healing-phases
 
 # Quality & validation
-make test-behavioral           make test-docker-e2e
-
-# Engineering
-make dep-audit                 make coverage
-make core-smoke                make test-integration
+make test-j-series               make test-wake                  make test-behavioral
+make test-docker-e2e
 ```
 
 </details>
@@ -583,13 +604,13 @@ make core-smoke                make test-integration
 ### Cross-Check: What's Real vs What Needs Hardware
 
 **Working now (CPU/Codespace):**
-- [x] 28 services built, health-checked, compose validated
+- [x] 30 services built, health-checked, compose validated
 - [x] pgvector persistence (both minimal + full stacks)
 - [x] HMAC auth enforced, dev secret blocked by default
 - [x] Supervisor auto-healing loop (deep /health + /recover)
 - [x] Executor sandboxing (allowlist + AST validation + shell=False)
 - [x] Prometheus + Alertmanager + Telegram alerts wired
-- [x] 74 test targets, 1,620 tests, zero failures
+- [x] 77 test targets, 1,656 tests, zero failures
 - [x] Pre-commit, dep scanning, container scanning
 - [x] Circuit breakers, exponential backoff, resilient_call()
 - [x] MARS memory decay (R = e^{-τ/S}), spaced repetition

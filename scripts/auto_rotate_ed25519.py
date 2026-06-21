@@ -1,3 +1,4 @@
+"""Generate and rotate ed25519 key material on a timer, persisting rotation state to disk."""
 from __future__ import annotations
 
 import base64

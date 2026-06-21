@@ -127,7 +127,7 @@ class TestScheduledTasks(unittest.TestCase):
 
     def test_task_deactivated_on_once_fire(self):
         # When frequency is "once" and fired, task should be deactivated
-        self.assertIn('task["active"] = False', MEMU_SRC)
+        self.assertIn('updates["active"] = False', MEMU_SRC)
 
 
 class TestReminders(unittest.TestCase):

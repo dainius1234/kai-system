@@ -52,8 +52,18 @@ class TestMARSStabilityGrowth(unittest.TestCase):
         self.assertIn("365.0", fn)
 
     def test_stability_persisted(self):
+        """Grown stability must flow into the update_record persistence path.
+
+        D12 moved this off the hot path: retrieve_ranked() now collects
+        per-record updates into a dict (key "stability") instead of calling
+        update_record(stability=record.stability) directly; the dict is then
+        applied either inline or via the background task below.
+        """
         fn = MEMU_SRC.split("def retrieve_ranked(")[1].split("\ndef ")[0]
-        self.assertIn("stability=record.stability", fn)
+        self.assertIn('"stability": record.stability', fn)
+        self.assertIn("update_record", fn)
+        bg_fn = MEMU_SRC.split("def _persist_retrieval_updates_background(")[1].split("\ndef ")[0]
+        self.assertIn('stability=u["stability"]', bg_fn)
 
 
 class TestMARSMemoryRecord(unittest.TestCase):
@@ -106,7 +116,9 @@ class TestMARSConsolidateEndpoint(unittest.TestCase):
         """Conscience-linked memories should survive pruning."""
         fn = MEMU_SRC.split("def mars_consolidate")[1].split("\n@app.")[0]
         self.assertIn("conscience_saved", fn)
-        self.assertIn("_formed_values", fn)
+        # P20's formed values now live behind the Redis-backed _p20_all_values()
+        # accessor rather than the raw module global (see DECISIONS.md D22).
+        self.assertIn("_p20_all_values", fn)
 
     def test_uses_delete_record(self):
         fn = MEMU_SRC.split("def mars_consolidate")[1].split("\n@app.")[0]
@@ -157,7 +169,7 @@ class TestCompressorMARSIntegration(unittest.TestCase):
         cycle_fn = COMPRESSOR_SRC.split("async def run_compression_cycle")[1].split("\nasync def ")[0]
         # Find the actual _call_memu calls (not comments)
         consolidate_pos = cycle_fn.index('_call_memu("/memory/consolidate")')
-        compress_pos = cycle_fn.index('_call_memu("/memory/compress")')
+        compress_pos = cycle_fn.index('_call_memu("/memory/compress"')
         self.assertLess(consolidate_pos, compress_pos)
 
     def test_pruned_count_in_result(self):

@@ -1,7 +1,9 @@
+"""Smoke-test hardening behavior by loading memu-core and exercising its error paths directly, without a running server."""
 from __future__ import annotations
 
 import asyncio
 import importlib.util
+import os
 import sys
 from pathlib import Path
 
@@ -9,10 +11,16 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / 'memu-core'))
 
+# This smoke test exercises error-handling paths, not embedding quality —
+# opt into the lightweight hash fallback explicitly rather than requiring
+# the real sentence-transformers model download.
+os.environ.setdefault("MEMU_ALLOW_FAKE_EMBEDDINGS", "true")
+
 
 def load(path: str, name: str):
     spec = importlib.util.spec_from_file_location(name, ROOT / path)
     mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod  # required for pydantic's deferred ForwardRef resolution to find this module
     spec.loader.exec_module(mod)
     return mod
 

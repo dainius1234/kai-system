@@ -6,6 +6,7 @@ numeric drift, negation flip, and no-conflict scenarios.
 from __future__ import annotations
 
 import importlib.util
+import os
 import sys
 import unittest
 from pathlib import Path
@@ -13,6 +14,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "memu-core"))
 sys.path.insert(0, str(ROOT / "common"))
+
+# This test only exercises contradiction-detection logic, not embedding
+# quality — opt into the lightweight hash fallback explicitly rather than
+# requiring the real sentence-transformers model download.
+os.environ.setdefault("MEMU_ALLOW_FAKE_EMBEDDINGS", "true")
 
 spec = importlib.util.spec_from_file_location("memu_app", ROOT / "memu-core" / "app.py")
 memu = importlib.util.module_from_spec(spec)

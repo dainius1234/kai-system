@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import importlib.util
-import json
 import os
 import sys
 import types
@@ -78,19 +77,25 @@ def main() -> int:
         assert mod._persist_to_redis("kai:test:key", {"ok": True}) is True
         assert mod._load_from_redis("kai:test:key", {}) == {"ok": True}
 
-        mod._emotional_timeline = [{"emotion": "focused"}]
-        mod._formed_values = [{"value": "discipline"}]
+        # P17 (emotional_timeline, reflection_journal, relationship_milestones,
+        # confession_cooldown), P18 (autobiography, legacy_messages), P19
+        # (counterfactuals, empathy_map, creative_ideas, inner_monologue,
+        # aspirations), P20 (formed_values, conscience_log, loyalty_ledger,
+        # gratitude_journal), P21 (scheduled_tasks, reminders, briefing_log),
+        # and now P22 (echo_history, nudge_ladder, cross_mode_insights,
+        # oracle_predictions, shadow_branches) are all intentionally excluded
+        # from this periodic snapshot/restore cycle — they now read/write
+        # live against Redis's own list/hash/string keys via the
+        # _p17_*/_p18_*/_p19_*/_p20_*/_p21_*/_p22_* helpers instead (see
+        # DECISIONS.md D22/D23/D24/D25/D26/D27). P22 was the last unconverted
+        # area, so the cycle is now empty on both sides — the generic
+        # _persist_to_redis/_load_from_redis round-trip proven above is the
+        # only thing left for this cycle to exercise.
         persist_results = mod._persist_p17_p22_to_redis()
-        assert persist_results["emotional_timeline"] is True
-        assert persist_results["formed_values"] is True
+        assert persist_results == {}
 
-        fake_redis.data["kai:p17:emotional_timeline"] = json.dumps([{"emotion": "calm"}])
-        fake_redis.data["kai:p20:formed_values"] = json.dumps([{"value": "integrity"}])
         restored = mod._restore_p17_p22_from_redis()
-        assert restored["emotional_timeline"] is True
-        assert restored["formed_values"] is True
-        assert mod._emotional_timeline[0]["emotion"] == "calm"
-        assert mod._formed_values[0]["value"] == "integrity"
+        assert restored == {}
     finally:
         mod._get_redis_client = original_get_redis_client
 

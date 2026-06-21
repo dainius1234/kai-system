@@ -20,6 +20,7 @@ import time
 import uuid
 from collections import Counter, deque
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional, Protocol, runtime_checkable
 
 from fastapi import Body, FastAPI, HTTPException, Query, Request
@@ -40,6 +41,14 @@ VERIFIER_URL = os.getenv("VERIFIER_URL", "http://verifier:8052")
 # H2.2: cap the number of candidate records fetched before scoring to avoid
 # loading the entire store on every retrieval call.  Override via env var.
 MEMU_MAX_CANDIDATES: int = int(os.getenv("MEMU_MAX_CANDIDATES", "500"))
+
+# Phase B graph-memory write-side fan-out (MEMORY_GRAPH_DESIGN.md §4).
+# Gated by FF_GRAPH_INGEST (off by default — memu-graph's live container
+# verification is still pending, see DECISIONS.md D29).
+from common.feature_flags import is_enabled as _ff_is_enabled
+
+MEMU_GRAPH_URL = os.getenv("MEMU_GRAPH_URL", "http://memu-graph:8061")
+MEMU_GRAPH_TIMEOUT = float(os.getenv("MEMU_GRAPH_TIMEOUT", "10.0"))
 
 # lakefs client is optional; provide a simple in-memory stub if unavailable
 try:
@@ -81,7 +90,6 @@ logger.info("Running on %s.", DEVICE)
 app = FastAPI(title="memU — core memory engine", version="0.6.0")
 budget = ErrorBudget(window_seconds=300)
 audit = AuditStream("memu-core", required=os.getenv("AUDIT_REQUIRED", "false").lower() == "true")
-last_compress_run = 0.0
 MAX_MEMORY_RECORDS = int(os.getenv("MAX_MEMORY_RECORDS", "5000"))
 MAX_STATE_KEY_SIZE = int(os.getenv("MAX_STATE_KEY_SIZE", "128"))
 MAX_STATE_VALUE_SIZE = int(os.getenv("MAX_STATE_VALUE_SIZE", "4096"))
@@ -92,13 +100,17 @@ _session_lock = asyncio.Lock()       # protects _session_store, _session_timesta
 _feedback_lock = asyncio.Lock()      # protects _feedback_store
 _nudge_lock = asyncio.Lock()         # protects _dismissal_counts, _last_nudge_by_type, _dnd_until
 _topic_lock = asyncio.Lock()         # protects _active_topics, _deferred_topics
-_emotion_lock = asyncio.Lock()       # protects _emotional_timeline, _reflection_journal, _confession_cooldown
-_relationship_lock = asyncio.Lock()  # protects _relationship_milestones
-_narrative_lock = asyncio.Lock()     # protects _autobiography, _legacy_messages
-_imagination_lock = asyncio.Lock()   # protects _counterfactuals, _empathy_map, _creative_ideas, _inner_monologue, _aspirations
-_conscience_lock = asyncio.Lock()    # protects _formed_values, _conscience_log, _loyalty_ledger, _gratitude_journal, _value_alignment_score
-_agent_lock = asyncio.Lock()         # protects _scheduled_tasks, _reminders, _briefing_log
-_operator_lock = asyncio.Lock()      # protects _echo_history, _nudge_ladder, _cross_mode_insights, _oracle_predictions, _shadow_branches
+# P17 (_emotional_timeline, _reflection_journal, _relationship_milestones,
+# _confession_cooldown), P18 (_autobiography, _legacy_messages), P19
+# (_counterfactuals, _empathy_map, _creative_ideas, _inner_monologue,
+# _aspirations), P20 (_formed_values, _conscience_log, _loyalty_ledger,
+# _gratitude_journal, _value_alignment_score), P21 (_scheduled_tasks,
+# _reminders, _briefing_log), and P22 (_echo_history, _nudge_ladder,
+# _cross_mode_insights, _oracle_predictions, _shadow_branches) no longer
+# need asyncio.Lock — all reads/writes go through atomic Redis list/hash
+# ops (see _p17_*/_p18_*/_p19_*/_p20_*/_p21_*/_p22_* helpers) so the data
+# can safely be shared across processes once split out. See DECISIONS.md
+# D22/D23/D24/D25/D26/D27.
 
 
 class MemoryRequest(BaseModel):
@@ -197,6 +209,56 @@ def classify_category(text: str) -> str:
             best_hits = hits
             best_cat = cat
     return best_cat
+
+
+# ── Phase B: graph-memory write-side fan-out (MEMORY_GRAPH_DESIGN.md §4) ──
+# memu-core's vector store stays the source of truth; this is a best-effort,
+# non-blocking side channel into memu-graph so construction-domain and
+# P17-P22 personality/relationship writes also get entity/relationship
+# structure. Never allowed to affect the calling endpoint's response.
+
+def _should_graph_ingest(category: str) -> bool:
+    """Cheap, no-LLM-call filter: skip pure chatter (category == 'general'),
+    ingest anything with a real construction-domain or personality-
+    relationship category. A single tunable function, per the design doc,
+    so the allowlist can be adjusted without touching every call site."""
+    return category != DEFAULT_CATEGORY
+
+
+async def _graph_ingest_fire_and_forget(
+    text: str, source_id: str, category: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None
+) -> None:
+    """Best-effort POST to memu-graph's /graph/ingest. Swallows all errors —
+    a slow or unreachable graph service must never affect memu-core's
+    synchronous write path."""
+    if not _ff_is_enabled("GRAPH_INGEST"):
+        return
+    import httpx as _httpx
+
+    try:
+        async with _httpx.AsyncClient(timeout=MEMU_GRAPH_TIMEOUT) as client:
+            await client.post(
+                f"{MEMU_GRAPH_URL}/graph/ingest",
+                json={"text": text, "source_id": source_id, "category": category, "metadata": metadata or {}},
+            )
+    except Exception as exc:  # noqa: BLE001 — best-effort, never propagate
+        logger.warning("memu-graph ingest fan-out failed for source_id=%s: %s", source_id, exc)
+
+
+async def _graph_forget_fire_and_forget(source_id: str) -> None:
+    """Phase D (MEMORY_GRAPH_DESIGN.md §5): best-effort POST to memu-graph's
+    /graph/forget when MARS truly forgets a record, so the graph doesn't
+    accumulate orphaned nodes for memories the vector store no longer has.
+    Swallows all errors — same discipline as ingest fan-out."""
+    if not _ff_is_enabled("GRAPH_INGEST"):
+        return
+    import httpx as _httpx
+
+    try:
+        async with _httpx.AsyncClient(timeout=MEMU_GRAPH_TIMEOUT) as client:
+            await client.post(f"{MEMU_GRAPH_URL}/graph/forget", json={"source_id": source_id})
+    except Exception as exc:  # noqa: BLE001 — best-effort, never propagate
+        logger.warning("memu-graph forget fan-out failed for source_id=%s: %s", source_id, exc)
 
 
 # LLM specialists available for routing.  PUB mode defaults to Dolphin
@@ -488,6 +550,260 @@ class PGVectorStore:
         self._state = dict(main["state"])
 
 
+# persistent vector store: Postgres holds full record metadata (no pgvector
+# extension needed), TurboVec's IdMapIndex owns compressed similarity search.
+# Architecture choice per kai-pm/SHOPPING_LIST_PLAN.md: path (a) — split
+# storage rather than wrap pgvector, since TurboVec has its own index format.
+class TurboVecStore(PGVectorStore):
+    def __init__(self) -> None:
+        import psycopg2
+        import psycopg2.pool
+        from psycopg2.extras import Json as _Json, RealDictCursor as _RDC
+        from turbovec import IdMapIndex
+
+        self._psycopg2 = psycopg2
+        self._Json = _Json
+        self._RDC = _RDC
+        self._pg_uri = os.getenv("PG_URI", "postgresql://keeper:localdev@postgres:5432/sovereign")
+        self._pool = psycopg2.pool.SimpleConnectionPool(1, 5, self._pg_uri)
+        self._init_schema()
+        self.vc = LakeFSClient()
+        self._state: Dict[str, Any] = {}
+
+        self._IdMapIndex = IdMapIndex
+        self._tv_bits = int(os.getenv("TURBOVEC_BITS", "4"))
+        self._tv_dim = len(generate_embedding("dimension probe"))
+        self._tv_path = Path(os.getenv("TURBOVEC_INDEX_PATH", "/data/turbovec/memories.tv"))
+        self._tv_path.parent.mkdir(parents=True, exist_ok=True)
+        if self._tv_path.exists():
+            self._index = self._IdMapIndex.load(str(self._tv_path))
+        else:
+            self._index = self._IdMapIndex(self._tv_dim, self._tv_bits)
+            self._rebuild_index_from_postgres()
+
+    def _init_schema(self) -> None:
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS memories (
+                        id text PRIMARY KEY,
+                        int_id BIGSERIAL UNIQUE,
+                        timestamp text,
+                        event_type text,
+                        category text DEFAULT 'general',
+                        content jsonb,
+                        embedding_raw jsonb,
+                        relevance float DEFAULT 1.0,
+                        importance float DEFAULT 0.5,
+                        access_count int DEFAULT 0,
+                        last_accessed text,
+                        stability float DEFAULT 1.0,
+                        pinned bool DEFAULT false,
+                        trust_tier text DEFAULT 'unverified',
+                        source_id text,
+                        poisoned bool DEFAULT false,
+                        quarantine_reason text
+                    );
+                    """
+                )
+                # migrate: add TurboVec-specific columns if table existed from PGVectorStore's schema
+                for col, typ, default in [
+                    ("int_id", "BIGSERIAL UNIQUE", None),
+                    ("embedding_raw", "jsonb", "NULL"),
+                ]:
+                    try:
+                        clause = f"ALTER TABLE memories ADD COLUMN IF NOT EXISTS {col} {typ}"
+                        if default is not None:
+                            clause += f" DEFAULT {default}"
+                        cur.execute(clause + ";")
+                    except Exception:
+                        conn.rollback()
+            conn.commit()
+        finally:
+            self._put_conn(conn)
+
+    def _rebuild_index_from_postgres(self) -> None:
+        """Repopulate the TurboVec index from Postgres on first boot / lost index file."""
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT int_id, embedding_raw FROM memories WHERE embedding_raw IS NOT NULL")
+                rows = cur.fetchall()
+        finally:
+            self._put_conn(conn)
+        if not rows:
+            return
+        import numpy as np
+        ids = np.array([r[0] for r in rows], dtype=np.uint64)
+        vecs = np.array([r[1] for r in rows], dtype=np.float32)
+        self._index.add_with_ids(vecs, ids)
+        self._save_index()
+
+    def _save_index(self) -> None:
+        self._index.write(str(self._tv_path))
+
+    _SELECT_COLS = ("id, timestamp, event_type, category, content, embedding_raw, "
+                    "relevance, importance, access_count, last_accessed, stability, pinned, "
+                    "trust_tier, source_id, poisoned, quarantine_reason")
+
+    def insert(self, record: MemoryRecord) -> VersionCommit:
+        import numpy as np
+
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """INSERT INTO memories
+                       (id, timestamp, event_type, category, content, embedding_raw,
+                        relevance, importance, access_count, last_accessed,
+                        stability, pinned, trust_tier, source_id, poisoned, quarantine_reason)
+                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                       ON CONFLICT (id) DO UPDATE SET
+                         content = EXCLUDED.content,
+                         embedding_raw = EXCLUDED.embedding_raw,
+                         relevance = EXCLUDED.relevance,
+                         importance = EXCLUDED.importance,
+                         category = EXCLUDED.category
+                       RETURNING int_id
+                    """,
+                    (
+                        record.id,
+                        record.timestamp,
+                        record.event_type,
+                        getattr(record, "category", "general"),
+                        self._Json(record.content),
+                        self._Json(record.embedding),
+                        record.relevance,
+                        getattr(record, "importance", 0.5),
+                        getattr(record, "access_count", 0),
+                        getattr(record, "last_accessed", None),
+                        getattr(record, "stability", 1.0),
+                        record.pinned,
+                        getattr(record, "trust_tier", "unverified"),
+                        getattr(record, "source_id", None),
+                        getattr(record, "poisoned", False),
+                        getattr(record, "quarantine_reason", None),
+                    ),
+                )
+                int_id = cur.fetchone()[0]
+            conn.commit()
+            if MAX_MEMORY_RECORDS > 0:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "DELETE FROM memories WHERE id IN "
+                        "(SELECT id FROM memories ORDER BY timestamp ASC "
+                        " OFFSET %s)", (MAX_MEMORY_RECORDS,)
+                    )
+                conn.commit()
+        finally:
+            self._put_conn(conn)
+        if record.embedding:
+            vec = np.array([record.embedding], dtype=np.float32)
+            ids = np.array([int_id], dtype=np.uint64)
+            self._index.add_with_ids(vec, ids)
+            self._save_index()
+        branch = self.vc.create_branch("main", f"update-keeper-{int(time.time())}")
+        commit = self.vc.put_branch_state(branch, [], self._state, f"update: user_id=keeper, ts={int(time.time())}")
+        return commit
+
+    def _row_to_record(self, r: tuple) -> MemoryRecord:
+        content = r[4] if isinstance(r[4], dict) else json.loads(r[4])
+        raw_emb = r[5]
+        emb = list(raw_emb) if raw_emb is not None else []
+        return MemoryRecord(
+            id=r[0], timestamp=r[1], event_type=r[2],
+            category=r[3] or "general", content=content, embedding=emb,
+            relevance=r[6] or 1.0, importance=r[7] or 0.5,
+            access_count=r[8] or 0, last_accessed=r[9],
+            stability=r[10] or 1.0,
+            pinned=r[11] or False, trust_tier=r[12] or "unverified",
+            source_id=r[13], poisoned=r[14] or False,
+            quarantine_reason=r[15],
+        )
+
+    def search(self, top_k: int, query: Optional[str] = None) -> List[MemoryRecord]:
+        conn = self._get_conn()
+        try:
+            if query is None:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        f"SELECT {self._SELECT_COLS} FROM memories "
+                        "ORDER BY timestamp DESC LIMIT %s", (top_k,))
+                    rows = cur.fetchall()
+                return [self._row_to_record(r) for r in rows]
+
+            import numpy as np
+            emb = generate_embedding(query)
+            try:
+                _scores, int_ids = self._index.search(np.array(emb, dtype=np.float32), top_k)
+            except Exception:
+                int_ids = []
+            if len(int_ids) == 0:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        f"SELECT {self._SELECT_COLS} FROM memories "
+                        "ORDER BY timestamp DESC LIMIT %s", (top_k,))
+                    rows = cur.fetchall()
+                return [self._row_to_record(r) for r in rows]
+            with conn.cursor() as cur:
+                cur.execute(
+                    f"SELECT int_id, {self._SELECT_COLS} FROM memories WHERE int_id = ANY(%s)",
+                    (list(int(i) for i in int_ids),),
+                )
+                rows = cur.fetchall()
+            row_by_int_id = {row[0]: row[1:] for row in rows}
+            ordered = [row_by_int_id[i] for i in int_ids if i in row_by_int_id]
+            return [self._row_to_record(r) for r in ordered]
+        finally:
+            self._put_conn(conn)
+
+    def delete_record(self, record_id: str) -> bool:
+        conn = self._get_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT int_id FROM memories WHERE id = %s", (record_id,))
+                row = cur.fetchone()
+                cur.execute("DELETE FROM memories WHERE id = %s", (record_id,))
+                deleted = cur.rowcount
+            conn.commit()
+            if row:
+                try:
+                    self._index.remove(int(row[0]))
+                    self._save_index()
+                except Exception:
+                    pass
+            return deleted > 0
+        finally:
+            self._put_conn(conn)
+
+    def delete_old(self, max_age_days: int = 90) -> Dict[str, Any]:
+        cutoff = (datetime.now(tz=timezone.utc) - timedelta(days=max_age_days)).isoformat()
+        conn = self._get_conn()
+        try:
+            before = self.count()
+            with conn.cursor() as cur:
+                cur.execute("SELECT int_id FROM memories WHERE pinned = false AND timestamp < %s", (cutoff,))
+                expired_int_ids = [r[0] for r in cur.fetchall()]
+                cur.execute(
+                    "DELETE FROM memories WHERE pinned = false AND timestamp < %s",
+                    (cutoff,),
+                )
+                deleted = cur.rowcount
+            conn.commit()
+            for iid in expired_int_ids:
+                try:
+                    self._index.remove(int(iid))
+                except Exception:
+                    pass
+            if expired_int_ids:
+                self._save_index()
+            return {"before": before, "after": before - deleted, "deleted": deleted, "cutoff": cutoff}
+        finally:
+            self._put_conn(conn)
+
+
 class InMemoryVectorStore:
     def __init__(self) -> None:
         self._records: List[MemoryRecord] = []
@@ -599,9 +915,13 @@ class InMemoryVectorStore:
 
 # choose store implementation based on configuration
 store: VectorStore
-if os.getenv("VECTOR_STORE", "memory") == "postgres":
+_vector_store_kind = os.getenv("VECTOR_STORE", "memory")
+if _vector_store_kind == "postgres":
     logger.info("Using Postgres-backed vector store")
     store = PGVectorStore()
+elif _vector_store_kind == "turbovec":
+    logger.info("Using TurboVec-backed vector store (Postgres metadata + compressed index)")
+    store = TurboVecStore()
 else:
     store = InMemoryVectorStore()
 
@@ -609,16 +929,22 @@ else:
 def generate_embedding(text: str) -> List[float]:
     """Generate a semantic embedding for *text*.
 
-    Uses ``sentence-transformers`` when available (real 384-dim vectors
-    with ``all-MiniLM-L6-v2`` by default).  Falls back to a deterministic
-    hash-based pseudo-embedding (8-dim) when the library is not installed
-    — keeps CI and lightweight tests running without the heavy dependency.
+    Uses ``sentence-transformers`` (real 384-dim vectors with
+    ``all-MiniLM-L6-v2`` by default). See ``MEMU_ALLOW_FAKE_EMBEDDINGS``
+    below for the only sanctioned exception to that.
     """
     return _embedding_backend(text)
 
 
 # ── embedding backend (loaded once at import time) ──────────────────
 EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+
+# Hash-based pseudo-embeddings carry no semantic content — every memory
+# write and vector search would keep "working" while silently returning
+# garbage. That's only acceptable when a test explicitly opts in (it's
+# checking unrelated logic and doesn't care about embedding quality), never
+# as a silent production fallback. Default is strict: real model or crash.
+_ALLOW_FAKE_EMBEDDINGS = os.getenv("MEMU_ALLOW_FAKE_EMBEDDINGS", "false").lower() == "true"
 
 try:
     from sentence_transformers import SentenceTransformer as _ST
@@ -630,8 +956,17 @@ try:
         vec = _st_model.encode(text, show_progress_bar=False)
         return vec.tolist()
 
-except Exception:  # pragma: no cover
-    logger.warning("sentence-transformers not available — using hash-based fake embeddings")
+except Exception as _st_exc:
+    if not _ALLOW_FAKE_EMBEDDINGS:
+        raise RuntimeError(
+            f"sentence-transformers failed to load (model={EMBEDDING_MODEL_NAME!r}): {_st_exc}. "
+            "Refusing to silently degrade to fake hash-based embeddings — memory retrieval would "
+            "keep returning results while being semantically meaningless. Set "
+            "MEMU_ALLOW_FAKE_EMBEDDINGS=true to explicitly opt into the deterministic hash "
+            "fallback for lightweight/offline tests that don't depend on real embedding quality."
+        ) from _st_exc
+
+    logger.warning("sentence-transformers not available — using hash-based fake embeddings (MEMU_ALLOW_FAKE_EMBEDDINGS=true)")
 
     def _embedding_backend(text: str) -> List[float]:
         # deterministic pseudo-embedding: SHA-256 → 8 floats in [0,1)
@@ -889,31 +1224,13 @@ async def _persist_retrieval_updates_background(updates: List[Dict[str, Any]]) -
         logger.warning("Background retrieval-update persist failed", exc_info=True)
 
 
-def _weekly_compress_due() -> bool:
-    """Cheap, hot-path-safe check. Claims the slot immediately on a hit so
-    concurrent requests can't both schedule a compress for the same week."""
-    global last_compress_run
-    now = time.time()
-    if now - last_compress_run >= 7 * 24 * 3600:
-        last_compress_run = now
-        return True
-    return False
-
-
-async def _weekly_compress_background() -> None:
-    """Fire-and-forget weekly compression, off the request hot path."""
-    try:
-        await asyncio.to_thread(store.compress)
-    except Exception:
-        logger.warning("Background weekly compress failed", exc_info=True)
-
-
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
+    # Weekly store compaction now runs as its own periodic loop in
+    # memu-core-introspect (introspect_app.py), off this hot-path process
+    # entirely — see DECISIONS.md D21.
     try:
         response = await call_next(request)
-        if _weekly_compress_due():
-            asyncio.create_task(_weekly_compress_background())
         budget.record(response.status_code)
         audit.log("info", f"{request.method} {request.url.path} -> {response.status_code}")
         return response
@@ -981,10 +1298,7 @@ async def recover() -> Dict[str, Any]:
         "alignment_score": 1.0,
         "verdict": "fully_aligned",
     }
-    async with _conscience_lock:
-        _conscience_log.append(entry)
-        if len(_conscience_log) > 200:
-            _conscience_log[:] = _conscience_log[-200:]
+    _p20_append_capped(_P20_CONSCIENCE_KEY, _conscience_log, entry, _CONSCIENCE_LOG_CAP)
 
     return {"status": "ok", "recovered": recovered, "recovery_log": entry}
 
@@ -1258,6 +1572,13 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
         pinned=keeper_pin,
     )
     record_commit = store.insert(record)
+    if _should_graph_ingest(category):
+        asyncio.create_task(_graph_ingest_fire_and_forget(
+            text=f"{update.event_type}: {update.result_raw or ''}",
+            source_id=record.id,
+            category=category,
+            metadata={"event_type": update.event_type, "user_id": user_id},
+        ))
     return {
         "status": "appended",
         "id": record.id,
@@ -1273,6 +1594,29 @@ async def retrieve_context(query: str, user_id: str, top_k: int = 20) -> List[Me
     q = sanitize_string(query)
     uid = sanitize_string(user_id)
     return retrieve_ranked(q, uid, top_k=top_k)
+
+
+@app.get("/memory/graph/query")
+async def graph_query_proxy(q: str, top_k: int = 10) -> Dict[str, Any]:
+    """Phase C (MEMORY_GRAPH_DESIGN.md §5): best-effort proxy to memu-graph's
+    /graph/query. Never raises — callers (agentic) treat a down/empty graph
+    the same as no graph results, not an error."""
+    query = sanitize_string(q)
+    if not _ff_is_enabled("GRAPH_INGEST"):
+        return {"query": query, "results": None, "status": "graph_disabled"}
+    import httpx as _httpx
+
+    try:
+        async with _httpx.AsyncClient(timeout=MEMU_GRAPH_TIMEOUT) as client:
+            resp = await client.get(
+                f"{MEMU_GRAPH_URL}/graph/query",
+                params={"q": query, "top_k": top_k},
+            )
+            resp.raise_for_status()
+            return resp.json()
+    except Exception as exc:  # noqa: BLE001 — best-effort, caller treats this as "graph unavailable"
+        logger.warning("memu-graph query proxy failed for q=%r: %s", query, exc)
+        return {"query": query, "results": None, "status": "graph_unavailable"}
 
 
 @app.get("/memory/evidence-pack")
@@ -1317,7 +1661,6 @@ class QuarantineRequest(BaseModel):
     reason: str = "manual quarantine"
 
 
-@app.post("/memory/quarantine")
 async def quarantine_record(req: QuarantineRequest) -> Dict[str, str]:
     """Mark a memory record as poisoned — excluded from all future retrieval."""
     # Persistent path: use update_record if backend supports it (PGVectorStore)
@@ -1338,7 +1681,6 @@ async def quarantine_record(req: QuarantineRequest) -> Dict[str, str]:
     raise HTTPException(status_code=404, detail=f"record {req.record_id} not found")
 
 
-@app.post("/memory/quarantine/clear")
 async def clear_quarantine(req: QuarantineRequest) -> Dict[str, str]:
     """Remove quarantine flag from a record, restoring it to retrieval."""
     if hasattr(store, "update_record"):
@@ -1357,7 +1699,6 @@ async def clear_quarantine(req: QuarantineRequest) -> Dict[str, str]:
     raise HTTPException(status_code=404, detail=f"record {req.record_id} not found")
 
 
-@app.get("/memory/quarantine/list")
 async def list_quarantined() -> Dict[str, Any]:
     """List all quarantined (poisoned) records."""
     all_records = store.search(top_k=10_000)
@@ -1369,12 +1710,10 @@ async def list_quarantined() -> Dict[str, Any]:
     return {"count": len(quarantined), "quarantined": quarantined}
 
 
-@app.get("/memory/state")
 async def memory_state() -> Dict[str, Any]:
     return {"status": "ok", "state": store.get_state()}
 
 
-@app.get("/memory/categories")
 async def memory_categories() -> Dict[str, Any]:
     """List known construction domain categories and per-category record counts."""
     all_records = store.search(top_k=10_000)
@@ -1389,7 +1728,6 @@ async def memory_categories() -> Dict[str, Any]:
     }
 
 
-@app.get("/memory/search-by-category")
 async def search_by_category(
     category: str,
     query: Optional[str] = None,
@@ -1407,13 +1745,11 @@ async def search_by_category(
     return filtered[:top_k]
 
 
-@app.get("/memory/stats")
 async def memory_stats() -> Dict[str, Any]:
     counts = Counter(record.event_type for record in store.search(top_k=10_000))
     return {"status": "ok", "records": store.count(), "event_types": dict(counts), "commits": [c.__dict__ for c in store.vc.list_commits()[:20]]}
 
 
-@app.post("/memory/cleanup")
 async def memory_cleanup(max_age_days: int = 90) -> Dict[str, Any]:
     """Delete non-pinned memories older than max_age_days."""
     if max_age_days < 1:
@@ -1423,7 +1759,6 @@ async def memory_cleanup(max_age_days: int = 90) -> Dict[str, Any]:
     return {"status": "ok", **result}
 
 
-@app.get("/memory/diagnostics")
 async def memory_diagnostics() -> Dict[str, Any]:
     counts = Counter(record.event_type for record in store.search(top_k=10_000))
     return {
@@ -1435,13 +1770,10 @@ async def memory_diagnostics() -> Dict[str, Any]:
     }
 
 
-@app.post("/memory/compress")
 async def memory_compress() -> Dict[str, Any]:
     return {"status": "ok", **store.compress()}
 
 
-@app.post("/memory/revert")
-@app.post("/revert")
 async def memory_revert(version: str = Query(..., description="Commit hash/id")) -> Dict[str, Any]:
     try:
         store.revert(sanitize_string(version))
@@ -1547,36 +1879,40 @@ def _persist_p17_p22_to_redis() -> Dict[str, bool]:
     _last_persist_time = time.time()
 
     results = {}
-    # P17: Emotional Intelligence data
-    results["emotional_timeline"] = _persist_to_redis("kai:p17:emotional_timeline", _emotional_timeline)
-    results["reflection_journal"] = _persist_to_redis("kai:p17:reflection_journal", _reflection_journal)
-    results["relationship_milestones"] = _persist_to_redis("kai:p17:relationship_milestones", _relationship_milestones)
+    # P17: Emotional Intelligence — no longer snapshotted here. Reads/writes
+    # are always live against Redis's own kai:p17:* list/hash keys (see
+    # _p17_* helpers, DECISIONS.md D23); a periodic SET on those keys would
+    # clobber the live List/Hash with a stale type, so it's intentionally
+    # skipped now.
 
-    # P18: Narrative Identity
-    results["autobiography"] = _persist_to_redis("kai:p18:autobiography", _autobiography)
-    results["legacy_messages"] = _persist_to_redis("kai:p18:legacy_messages", _legacy_messages)
+    # P18: Narrative Identity — no longer snapshotted here. Reads/writes are
+    # always live against Redis's own kai:p18:* list keys (see _p18_*
+    # helpers, DECISIONS.md D24); a periodic SET on those keys would clobber
+    # the live List with a stale type, so it's intentionally skipped now.
 
-    # P19: Imagination Engine
-    results["counterfactuals"] = _persist_to_redis("kai:p19:counterfactuals", list(_counterfactuals))
-    results["creative_ideas"] = _persist_to_redis("kai:p19:creative_ideas", list(_creative_ideas))
-    results["aspirations"] = _persist_to_redis("kai:p19:aspirations", list(_aspirations))
+    # P19: Imagination Engine — no longer snapshotted here. Reads/writes are
+    # always live against Redis's own kai:p19:* list/string keys (see
+    # _p19_* helpers, DECISIONS.md D25); a periodic SET on the list keys
+    # would clobber the live List with a stale type, so it's intentionally
+    # skipped now.
 
-    # P20: Conscience & Values
-    results["formed_values"] = _persist_to_redis("kai:p20:formed_values", _formed_values)
-    results["conscience_log"] = _persist_to_redis("kai:p20:conscience_log", list(_conscience_log))
-    results["loyalty_ledger"] = _persist_to_redis("kai:p20:loyalty_ledger", _loyalty_ledger)
-    results["gratitude_journal"] = _persist_to_redis("kai:p20:gratitude_journal", list(_gratitude_journal))
+    # P20: Conscience & Values — no longer snapshotted here. Reads/writes
+    # are always live against Redis's own kai:p20:* hash/list keys (see
+    # _p20_* helpers, DECISIONS.md D22); a periodic SET on those keys would
+    # clobber the live Hash/List with a stale type, so it's intentionally
+    # skipped now.
 
-    # P21: Proactive Agent
-    results["scheduled_tasks"] = _persist_to_redis("kai:p21:scheduled_tasks", _scheduled_tasks)
-    results["reminders"] = _persist_to_redis("kai:p21:reminders", _reminders)
+    # P21: Proactive Agent — no longer snapshotted here. Reads/writes are
+    # always live against Redis's own kai:p21:* hash/list keys (see
+    # _p21_* helpers, DECISIONS.md D26); a periodic SET on those keys would
+    # clobber the live Hash/List with a stale type, so it's intentionally
+    # skipped now.
 
-    # P22: Operator Model
-    results["echo_history"] = _persist_to_redis("kai:p22:echo_history", list(_echo_history))
-    results["nudge_ladder"] = _persist_to_redis("kai:p22:nudge_ladder", _nudge_ladder)
-    results["cross_mode_insights"] = _persist_to_redis("kai:p22:cross_mode_insights", list(_cross_mode_insights))
-    results["oracle_predictions"] = _persist_to_redis("kai:p22:oracle_predictions", list(_oracle_predictions))
-    results["shadow_branches"] = _persist_to_redis("kai:p22:shadow_branches", list(_shadow_branches))
+    # P22: Operator Model — no longer snapshotted here. Reads/writes are
+    # always live against Redis's own kai:p22:* hash/list keys (see
+    # _p22_* helpers, DECISIONS.md D27); a periodic SET on those keys would
+    # clobber the live Hash/List with a stale type, so it's intentionally
+    # skipped now.
 
     return results
 
@@ -1598,103 +1934,31 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     H2.1: Loads emotional timeline, goals, values, etc. from previous sessions.
     Returns dict of {data_key: loaded_bool}.
     """
-    global _emotional_timeline, _reflection_journal, _relationship_milestones
-    global _autobiography, _legacy_messages
-    global _counterfactuals, _creative_ideas, _aspirations
-    global _formed_values, _conscience_log, _loyalty_ledger, _gratitude_journal
-    global _scheduled_tasks, _reminders
-    global _echo_history, _nudge_ladder, _cross_mode_insights
-    global _oracle_predictions, _shadow_branches
-
     results = {}
 
-    # P17: Emotional Intelligence
-    loaded = _load_from_redis("kai:p17:emotional_timeline", [])
-    if loaded:
-        _emotional_timeline = loaded
-        results["emotional_timeline"] = True
-    loaded = _load_from_redis("kai:p17:reflection_journal", [])
-    if loaded:
-        _reflection_journal = loaded
-        results["reflection_journal"] = True
-    loaded = _load_from_redis("kai:p17:relationship_milestones", [])
-    if loaded:
-        _relationship_milestones = loaded
-        results["relationship_milestones"] = True
+    # P17: Emotional Intelligence — nothing to restore here. The data was
+    # never moved out of Redis in the first place (live list/hash keys),
+    # so there's no in-process global to repopulate at startup.
 
-    # P18: Narrative Identity
-    loaded = _load_from_redis("kai:p18:autobiography", [])
-    if loaded:
-        _autobiography = loaded
-        results["autobiography"] = True
-    loaded = _load_from_redis("kai:p18:legacy_messages", [])
-    if loaded:
-        _legacy_messages = loaded
-        results["legacy_messages"] = True
+    # P18: Narrative Identity — nothing to restore here. The data was never
+    # moved out of Redis in the first place (live list keys), so there's no
+    # in-process global to repopulate at startup.
 
-    # P19: Imagination Engine
-    loaded = _load_from_redis("kai:p19:counterfactuals", [])
-    if loaded:
-        _counterfactuals = deque(loaded, maxlen=100)
-        results["counterfactuals"] = True
-    loaded = _load_from_redis("kai:p19:creative_ideas", [])
-    if loaded:
-        _creative_ideas = deque(loaded, maxlen=100)
-        results["creative_ideas"] = True
-    loaded = _load_from_redis("kai:p19:aspirations", [])
-    if loaded:
-        _aspirations = deque(loaded, maxlen=50)
-        results["aspirations"] = True
+    # P19: Imagination Engine — nothing to restore here. The data was never
+    # moved out of Redis in the first place (live list/string keys), so
+    # there's no in-process global to repopulate at startup.
 
-    # P20: Conscience & Values
-    loaded = _load_from_redis("kai:p20:formed_values", [])
-    if loaded:
-        _formed_values = loaded
-        results["formed_values"] = True
-    loaded = _load_from_redis("kai:p20:conscience_log", [])
-    if loaded:
-        _conscience_log = deque(loaded, maxlen=500)
-        results["conscience_log"] = True
-    loaded = _load_from_redis("kai:p20:loyalty_ledger", {})
-    if loaded:
-        _loyalty_ledger = loaded
-        results["loyalty_ledger"] = True
-    loaded = _load_from_redis("kai:p20:gratitude_journal", [])
-    if loaded:
-        _gratitude_journal = deque(loaded, maxlen=100)
-        results["gratitude_journal"] = True
+    # P20: Conscience & Values — nothing to restore here. The data was
+    # never moved out of Redis in the first place (live hash/list keys),
+    # so there's no in-process global to repopulate at startup.
 
-    # P21: Proactive Agent
-    loaded = _load_from_redis("kai:p21:scheduled_tasks", {})
-    if loaded:
-        _scheduled_tasks = loaded
-        results["scheduled_tasks"] = True
-    loaded = _load_from_redis("kai:p21:reminders", {})
-    if loaded:
-        _reminders = loaded
-        results["reminders"] = True
+    # P21: Proactive Agent — nothing to restore here. The data was never
+    # moved out of Redis in the first place (live hash/list keys), so
+    # there's no in-process global to repopulate at startup.
 
-    # P22: Operator Model
-    loaded = _load_from_redis("kai:p22:echo_history", [])
-    if loaded:
-        _echo_history = deque(loaded, maxlen=100)
-        results["echo_history"] = True
-    loaded = _load_from_redis("kai:p22:nudge_ladder", {})
-    if loaded:
-        _nudge_ladder = loaded
-        results["nudge_ladder"] = True
-    loaded = _load_from_redis("kai:p22:cross_mode_insights", [])
-    if loaded:
-        _cross_mode_insights = deque(loaded, maxlen=100)
-        results["cross_mode_insights"] = True
-    loaded = _load_from_redis("kai:p22:oracle_predictions", [])
-    if loaded:
-        _oracle_predictions = deque(loaded, maxlen=100)
-        results["oracle_predictions"] = True
-    loaded = _load_from_redis("kai:p22:shadow_branches", [])
-    if loaded:
-        _shadow_branches = deque(loaded, maxlen=100)
-        results["shadow_branches"] = True
+    # P22: Operator Model — nothing to restore here. The data was never
+    # moved out of Redis in the first place (live hash/list keys), so
+    # there's no in-process global to repopulate at startup.
 
     return results
 
@@ -1781,6 +2045,487 @@ def _load_from_redis(key: str, default: Any = None) -> Any:
     except Exception as e:
         logger.debug("Redis load failed for %s: %s", key, e)
     return default
+
+
+# ── P20: Redis-native conscience & values store ──────────────────────
+# Phase 1 of the P17-P22 Redis-backed split (see DECISIONS.md D22): reads
+# and writes go straight to Redis using its own atomic list/hash commands
+# instead of a Python lock + periodic snapshot, so a second process can
+# share this state without staleness or lost-update races. Falls back to
+# the module-level in-memory list/dict (declared in the P20 section below)
+# when Redis is unavailable, matching the rest of this file's degrade
+# pattern.
+_P20_VALUES_KEY = "kai:p20:formed_values"
+_P20_CONSCIENCE_KEY = "kai:p20:conscience_log"
+_P20_LOYALTY_KEY = "kai:p20:loyalty_ledger"
+_P20_GRATITUDE_KEY = "kai:p20:gratitude_journal"
+_P20_ALIGNMENT_KEY = "kai:p20:value_alignment"
+_CONSCIENCE_LOG_CAP = 200
+_LOYALTY_LEDGER_CAP = 100
+_GRATITUDE_JOURNAL_CAP = 100
+
+
+def _p20_get_value(name: str) -> Optional[Dict[str, Any]]:
+    """Look up one formed value by name (Redis Hash field — no cap/scan needed)."""
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hget(_P20_VALUES_KEY, name)
+            return json.loads(raw) if raw else None
+        except Exception:
+            pass
+    return next((v for v in _formed_values if v["value"] == name), None)
+
+
+def _p20_put_value(entry: Dict[str, Any]) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.hset(_P20_VALUES_KEY, entry["value"], json.dumps(entry))
+            return
+        except Exception:
+            pass
+    existing = next((v for v in _formed_values if v["value"] == entry["value"]), None)
+    if existing:
+        existing.update(entry)
+    else:
+        _formed_values.append(entry)
+
+
+def _p20_all_values() -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hgetall(_P20_VALUES_KEY)
+            return [json.loads(v) for v in raw.values()]
+        except Exception:
+            pass
+    return list(_formed_values)
+
+
+def _p20_append_capped(key: str, fallback: List[Dict[str, Any]], entry: Dict[str, Any], cap: int) -> None:
+    """Atomic append-with-cap for a P20 append-only log (RPUSH + LTRIM are
+    each atomic Redis ops, so two processes appending concurrently can't
+    clobber each other the way a read-modify-write on a shared list could)."""
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.rpush(key, json.dumps(entry))
+            redis.ltrim(key, -cap, -1)
+            return
+        except Exception:
+            pass
+    fallback.append(entry)
+    if len(fallback) > cap:
+        fallback[:] = fallback[-cap:]
+
+
+def _p20_all_capped(key: str, fallback: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(key, 0, -1)
+            return [json.loads(r) for r in raw]
+        except Exception:
+            pass
+    return list(fallback)
+
+
+def _p20_alignment_get() -> Dict[str, float]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hgetall(_P20_ALIGNMENT_KEY)
+            if raw:
+                return {
+                    "overall": float(raw.get("overall", 1.0)),
+                    "streak": int(float(raw.get("streak", 0))),
+                    "violations": int(float(raw.get("violations", 0))),
+                }
+        except Exception:
+            pass
+    return dict(_value_alignment_score)
+
+
+def _p20_alignment_set(overall: float, violations: int, increment_streak: bool) -> Dict[str, float]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.hset(_P20_ALIGNMENT_KEY, mapping={"overall": overall, "violations": violations})
+            if increment_streak:
+                redis.hincrby(_P20_ALIGNMENT_KEY, "streak", 1)
+            raw = redis.hgetall(_P20_ALIGNMENT_KEY)
+            return {
+                "overall": float(raw.get("overall", overall)),
+                "streak": int(float(raw.get("streak", 0))),
+                "violations": int(float(raw.get("violations", violations))),
+            }
+        except Exception:
+            pass
+    _value_alignment_score["overall"] = overall
+    _value_alignment_score["violations"] = violations
+    if increment_streak:
+        _value_alignment_score["streak"] = _value_alignment_score.get("streak", 0) + 1
+    return dict(_value_alignment_score)
+
+
+# ── P17: Redis-native emotional intelligence store ───────────────────
+# Phase 1 of the P17-P22 Redis-backed split (see DECISIONS.md D23, same
+# approach piloted on P20 in D22): the three append-only logs use Redis
+# Lists (RPUSH + LTRIM, same idiom as the session-message buffer and
+# P20's conscience log), and the confession cooldown map uses a Redis
+# Hash (HSET/HGET) keyed by category. Falls back to the in-process
+# list/dict (declared in the P17 section below) when Redis is unavailable.
+_P17_EMOTION_KEY = "kai:p17:emotional_timeline"
+_P17_REFLECTION_KEY = "kai:p17:reflection_journal"
+_P17_MILESTONES_KEY = "kai:p17:relationship_milestones"
+_P17_COOLDOWN_KEY = "kai:p17:confession_cooldown"
+_EMOTIONAL_TIMELINE_CAP = 500
+_REFLECTION_JOURNAL_CAP = 100
+_RELATIONSHIP_MILESTONES_CAP = 200
+
+
+def _p17_append_capped(key: str, fallback: List[Dict[str, Any]], entry: Dict[str, Any], cap: int) -> None:
+    """Atomic append-with-cap for a P17 append-only log (RPUSH + LTRIM are
+    each atomic Redis ops, so two processes appending concurrently can't
+    clobber each other the way a read-modify-write on a shared list could)."""
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.rpush(key, json.dumps(entry))
+            redis.ltrim(key, -cap, -1)
+            return
+        except Exception:
+            pass
+    fallback.append(entry)
+    if len(fallback) > cap:
+        fallback[:] = fallback[-cap:]
+
+
+def _p17_all_capped(key: str, fallback: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(key, 0, -1)
+            return [json.loads(r) for r in raw]
+        except Exception:
+            pass
+    return list(fallback)
+
+
+def _p17_cooldown_get(category: str) -> float:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hget(_P17_COOLDOWN_KEY, category)
+            return float(raw) if raw else 0.0
+        except Exception:
+            pass
+    return _confession_cooldown.get(category, 0.0)
+
+
+def _p17_cooldown_set(category: str, timestamp: float) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.hset(_P17_COOLDOWN_KEY, category, timestamp)
+            return
+        except Exception:
+            pass
+    _confession_cooldown[category] = timestamp
+
+
+# ── P18: Redis-native narrative identity store ───────────────────────
+# Phase 1 of the P17-P22 Redis-backed split (see DECISIONS.md D24, same
+# approach as P17/D23 and P20/D22): both append-only logs use Redis Lists
+# (RPUSH + LTRIM). Legacy messages also get mutated in place when they
+# surface, so _p18_update_entry does a read-modify-write via LSET keyed by
+# entry "id" — list ops stay atomic per-call, but the read-then-LSET pair
+# is not a single atomic transaction; acceptable here since "surfaced"
+# flips false->true and a duplicate flip is harmless. Falls back to the
+# in-process list (declared in the P18 section below) when Redis is
+# unavailable.
+_P18_AUTOBIOGRAPHY_KEY = "kai:p18:autobiography"
+_P18_LEGACY_KEY = "kai:p18:legacy_messages"
+
+
+def _p18_append_capped(key: str, fallback: List[Dict[str, Any]], entry: Dict[str, Any], cap: int) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.rpush(key, json.dumps(entry))
+            redis.ltrim(key, -cap, -1)
+            return
+        except Exception:
+            pass
+    fallback.append(entry)
+    if len(fallback) > cap:
+        fallback[:] = fallback[-cap:]
+
+
+def _p18_all_capped(key: str, fallback: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(key, 0, -1)
+            return [json.loads(r) for r in raw]
+        except Exception:
+            pass
+    return list(fallback)
+
+
+def _p18_update_entry(key: str, fallback: List[Dict[str, Any]], entry_id: str, updates: Dict[str, Any]) -> None:
+    """Apply field updates to the list entry matching entry_id (used for
+    flipping legacy-message "surfaced" state in place)."""
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(key, 0, -1)
+            for idx, item_raw in enumerate(raw):
+                item = json.loads(item_raw)
+                if item.get("id") == entry_id:
+                    item.update(updates)
+                    redis.lset(key, idx, json.dumps(item))
+                    return
+        except Exception:
+            pass
+    for item in fallback:
+        if item.get("id") == entry_id:
+            item.update(updates)
+            return
+
+
+# ── P19: Redis-native imagination engine store ───────────────────────
+# Phase 1 of the P17-P22 Redis-backed split (see DECISIONS.md D25, same
+# approach as P17/D23, P18/D24, P20/D22). Four append-only logs use Redis
+# Lists (RPUSH + LTRIM); the empathy map is a single continuously-
+# overwritten "current state" object (not an append log), so it reuses the
+# existing _persist_to_redis/_load_from_redis GET/SET primitives directly
+# rather than a Hash — there's no per-field atomic increment need the way
+# P20's alignment streak had. Falls back to the in-process list/dict
+# (declared in the P19 section below) when Redis is unavailable.
+_P19_COUNTERFACTUALS_KEY = "kai:p19:counterfactuals"
+_P19_CREATIVE_KEY = "kai:p19:creative_ideas"
+_P19_MONOLOGUE_KEY = "kai:p19:inner_monologue"
+_P19_ASPIRATIONS_KEY = "kai:p19:aspirations"
+_P19_EMPATHY_KEY = "kai:p19:empathy_map"
+
+
+def _p19_append_capped(key: str, fallback: List[Dict[str, Any]], entry: Dict[str, Any], cap: int) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.rpush(key, json.dumps(entry))
+            redis.ltrim(key, -cap, -1)
+            return
+        except Exception:
+            pass
+    fallback.append(entry)
+    if len(fallback) > cap:
+        fallback[:] = fallback[-cap:]
+
+
+def _p19_all_capped(key: str, fallback: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(key, 0, -1)
+            return [json.loads(r) for r in raw]
+        except Exception:
+            pass
+    return list(fallback)
+
+
+def _p19_empathy_get() -> Dict[str, Any]:
+    loaded = _load_from_redis(_P19_EMPATHY_KEY, None)
+    if loaded is not None:
+        return loaded
+    return dict(_empathy_map)
+
+
+def _p19_empathy_update(updates: Dict[str, Any]) -> Dict[str, Any]:
+    current = _p19_empathy_get()
+    current.update(updates)
+    if _persist_to_redis(_P19_EMPATHY_KEY, current):
+        return current
+    _empathy_map.update(updates)
+    return dict(_empathy_map)
+
+
+# ── P21 helpers: Redis Hash for id-keyed dicts of mutable sub-dicts ──
+# _scheduled_tasks/_reminders are dicts keyed by id whose entries get
+# individual fields mutated in place after creation (e.g. task["active"] =
+# False), unlike P17/P18/P19's append-only logs or P19's single flat dict —
+# so each entry is its own Hash field (HSET id -> json), same approach as
+# P20's _p20_get_value/_p20_put_value/_p20_all_values but keyed by id
+# instead of value name.
+_P21_TASKS_KEY = "kai:p21:scheduled_tasks"
+_P21_REMINDERS_KEY = "kai:p21:reminders"
+_P21_BRIEFING_KEY = "kai:p21:briefing_log"
+
+
+def _p21_hash_get(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str) -> Optional[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hget(key, item_id)
+            return json.loads(raw) if raw else None
+        except Exception:
+            pass
+    return fallback.get(item_id)
+
+
+def _p21_hash_put(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str, entry: Dict[str, Any]) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.hset(key, item_id, json.dumps(entry))
+            return
+        except Exception:
+            pass
+    fallback[item_id] = entry
+
+
+def _p21_hash_all(key: str, fallback: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hgetall(key)
+            return {k: json.loads(v) for k, v in raw.items()}
+        except Exception:
+            pass
+    return dict(fallback)
+
+
+def _p21_hash_len(key: str, fallback: Dict[str, Dict[str, Any]]) -> int:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            return redis.hlen(key)
+        except Exception:
+            pass
+    return len(fallback)
+
+
+def _p21_hash_update(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str, updates: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Read-modify-write a single hash field — same race window as P20's
+    value-update path (acceptable here: single-operator system, not a
+    high-contention counter like alignment score)."""
+    item = _p21_hash_get(key, fallback, item_id)
+    if item is None:
+        return None
+    item.update(updates)
+    _p21_hash_put(key, fallback, item_id, item)
+    return item
+
+
+def _p21_append_capped(entry: Dict[str, Any], cap: int) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.rpush(_P21_BRIEFING_KEY, json.dumps(entry))
+            redis.ltrim(_P21_BRIEFING_KEY, -cap, -1)
+            return
+        except Exception:
+            pass
+    _briefing_log.append(entry)
+
+
+def _p21_briefing_all() -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(_P21_BRIEFING_KEY, 0, -1)
+            return [json.loads(r) for r in raw]
+        except Exception:
+            pass
+    return list(_briefing_log)
+
+
+def _p21_briefing_len() -> int:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            return redis.llen(_P21_BRIEFING_KEY)
+        except Exception:
+            pass
+    return len(_briefing_log)
+
+
+# ── P22 helpers: Redis Lists for the four append-only logs, Redis Hash
+# for the id-keyed _nudge_ladder (same get/put/all idiom as P20/P21) ──
+_P22_ECHO_KEY = "kai:p22:echo_history"
+_P22_LADDER_KEY = "kai:p22:nudge_ladder"
+_P22_CROSSMODE_KEY = "kai:p22:cross_mode_insights"
+_P22_ORACLE_KEY = "kai:p22:oracle_predictions"
+_P22_SHADOW_KEY = "kai:p22:shadow_branches"
+
+
+def _p22_append_capped(key: str, fallback: Deque[Dict[str, Any]], entry: Dict[str, Any], cap: int) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.rpush(key, json.dumps(entry))
+            redis.ltrim(key, -cap, -1)
+            return
+        except Exception:
+            pass
+    fallback.append(entry)
+
+
+def _p22_all_capped(key: str, fallback: Deque[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.lrange(key, 0, -1)
+            return [json.loads(r) for r in raw]
+        except Exception:
+            pass
+    return list(fallback)
+
+
+def _p22_hash_get(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str) -> Optional[Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hget(key, item_id)
+            return json.loads(raw) if raw else None
+        except Exception:
+            pass
+    return fallback.get(item_id)
+
+
+def _p22_hash_put(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str, entry: Dict[str, Any]) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.hset(key, item_id, json.dumps(entry))
+            return
+        except Exception:
+            pass
+    fallback[item_id] = entry
+
+
+def _p22_hash_all(key: str, fallback: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            raw = redis.hgetall(key)
+            return {k: json.loads(v) for k, v in raw.items()}
+        except Exception:
+            pass
+    return dict(fallback)
+
+
+def _p22_hash_delete(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str) -> None:
+    redis = _get_redis_client()
+    if redis:
+        try:
+            redis.hdel(key, item_id)
+            return
+        except Exception:
+            pass
+    fallback.pop(item_id, None)
 
 
 # Restore P17-P22 data at startup
@@ -1896,6 +2641,13 @@ async def quick_note(note: NoteRequest) -> Dict[str, str]:
         pinned=note.pin,
     )
     commit = store.insert(record)
+    if _should_graph_ingest(category):
+        asyncio.create_task(_graph_ingest_fire_and_forget(
+            text=text,
+            source_id=record.id,
+            category=category,
+            metadata={"event_type": "note", "user_id": user_id},
+        ))
     return {"status": "noted", "id": record.id, "category": category, "importance": str(importance), "commit": commit.commit_id}
 
 
@@ -1978,6 +2730,14 @@ async def assert_memory(req: AssertRequest) -> Dict[str, Any]:
             )
         logger.info("Contradiction resolved: %s superseded by %s (%s)",
                      conflict.conflicting_memory_id, record.id, conflict.conflict_type)
+
+    if _should_graph_ingest(category):
+        asyncio.create_task(_graph_ingest_fire_and_forget(
+            text=f"{req.event_type}: {text}",
+            source_id=record.id,
+            category=category,
+            metadata={"event_type": req.event_type, "user_id": user_id},
+        ))
 
     return {
         "status": "asserted",
@@ -2429,7 +3189,6 @@ REFLECTION_WINDOW_DAYS = int(os.getenv("REFLECTION_WINDOW_DAYS", "7"))
 MIN_MEMORIES_FOR_REFLECTION = int(os.getenv("MIN_MEMORIES_FOR_REFLECTION", "5"))
 
 
-@app.post("/memory/reflect")
 async def reflect() -> Dict[str, Any]:
     """
     Consolidate recent memories into pattern insights.
@@ -2539,7 +3298,6 @@ DECAY_FADE_THRESHOLD = float(os.getenv("DECAY_FADE_THRESHOLD", "0.15"))
 MARS_PRUNE_THRESHOLD = float(os.getenv("MARS_PRUNE_THRESHOLD", "0.02"))
 
 
-@app.post("/memory/decay")
 async def apply_spaced_repetition_decay(
     half_life_days: float = Query(default=14.0, ge=1.0, le=365.0),
 ) -> Dict[str, Any]:
@@ -2621,7 +3379,7 @@ async def mars_consolidate() -> Dict[str, Any]:
 
     # gather formed value keywords for conscience filter
     value_keywords: set[str] = set()
-    for val in _formed_values:
+    for val in _p20_all_values():
         value_keywords.add(val.get("value", "").lower())
         for trigger in val.get("triggers", []):
             value_keywords.add(trigger.lower())
@@ -2653,6 +3411,7 @@ async def mars_consolidate() -> Dict[str, Any]:
             # truly forgotten — delete
             if hasattr(store, "delete_record"):
                 store.delete_record(record.id)
+                asyncio.create_task(_graph_forget_fire_and_forget(record.id))
             elif hasattr(store, "delete_old"):
                 # fallback: mark as extremely low relevance for next compress
                 record.relevance = 0.01
@@ -2791,7 +3550,6 @@ def _merge_memory_cluster(
     )
 
 
-@app.post("/memory/focus-compress")
 async def focus_compress(
     token_budget: int = Query(
         default=FOCUS_COMPRESS_TOKEN_BUDGET, ge=1000, le=500000,
@@ -4049,10 +4807,7 @@ def _record_emotion(session_id: str, text: str) -> Dict[str, Any]:
         "intensity": round(intensity, 2),
         "trigger_snippet": text[:80],
     }
-    _emotional_timeline.append(entry)
-    # keep last 500 entries
-    if len(_emotional_timeline) > 500:
-        del _emotional_timeline[:-500]
+    _p17_append_capped(_P17_EMOTION_KEY, _emotional_timeline, entry, _EMOTIONAL_TIMELINE_CAP)
     return entry
 
 
@@ -4064,8 +4819,7 @@ async def record_emotion(request: Request) -> Dict[str, Any]:
     text = sanitize_string(body.get("text", ""))
     if not text:
         raise HTTPException(status_code=400, detail="text is required")
-    async with _emotion_lock:
-        entry = _record_emotion(session_id, text)
+    entry = _record_emotion(session_id, text)
     return {"status": "ok", **entry}
 
 
@@ -4075,7 +4829,7 @@ async def emotion_timeline(
     limit: int = Query(default=50, ge=1, le=200),
 ) -> Dict[str, Any]:
     """Get the emotional timeline — how conversations have felt over time."""
-    entries = _emotional_timeline
+    entries = _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline)
     if session_id:
         sid = sanitize_string(session_id)
         entries = [e for e in entries if e["session_id"] == sid]
@@ -4128,7 +4882,7 @@ async def generate_self_reflection(request: Request) -> Dict[str, Any]:
     total_feedback = len(_feedback_store)
 
     # Check emotional patterns
-    recent_emotions = _emotional_timeline[-20:] if _emotional_timeline else []
+    recent_emotions = _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline)[-20:]
     frustration_count = sum(1 for e in recent_emotions if e["emotion"] in ("frustrated", "stressed"))
     happy_count = sum(1 for e in recent_emotions if e["emotion"] in ("happy", "excited", "grateful"))
 
@@ -4180,10 +4934,7 @@ async def generate_self_reflection(request: Request) -> Dict[str, Any]:
         "correction_categories": correction_categories,
         "weak_domains": weak_domains,
     }
-    _reflection_journal.append(entry)
-    # keep last 100 reflections
-    if len(_reflection_journal) > 100:
-        del _reflection_journal[:-100]
+    _p17_append_capped(_P17_REFLECTION_KEY, _reflection_journal, entry, _REFLECTION_JOURNAL_CAP)
 
     return {"status": "ok", "reflection": entry}
 
@@ -4191,10 +4942,11 @@ async def generate_self_reflection(request: Request) -> Dict[str, Any]:
 @app.get("/memory/self-reflections")
 async def get_self_reflections(limit: int = Query(default=10, ge=1, le=50)) -> Dict[str, Any]:
     """Get recent self-reflection entries."""
+    journal = _p17_all_capped(_P17_REFLECTION_KEY, _reflection_journal)
     return {
         "status": "ok",
-        "count": len(_reflection_journal),
-        "entries": _reflection_journal[-limit:],
+        "count": len(journal),
+        "entries": journal[-limit:],
     }
 
 
@@ -4244,7 +4996,7 @@ async def relationship_timeline() -> Dict[str, Any]:
 
     # Emotional journey summary
     emo_summary: Dict[str, int] = {}
-    for e in _emotional_timeline:
+    for e in _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline):
         emo_summary[e["emotion"]] = emo_summary.get(e["emotion"], 0) + 1
 
     return {
@@ -4257,7 +5009,7 @@ async def relationship_timeline() -> Dict[str, Any]:
         "avg_rating": avg_rating,
         "top_categories": [{"category": c, "count": n} for c, n in top_categories],
         "emotional_journey": emo_summary,
-        "milestones": _relationship_milestones[-20:],
+        "milestones": _p17_all_capped(_P17_MILESTONES_KEY, _relationship_milestones)[-20:],
     }
 
 
@@ -4273,9 +5025,13 @@ async def add_milestone(request: Request) -> Dict[str, Any]:
         "title": title,
         "description": sanitize_string(body.get("description", "")),
     }
-    _relationship_milestones.append(milestone)
-    if len(_relationship_milestones) > 200:
-        del _relationship_milestones[:-200]
+    _p17_append_capped(_P17_MILESTONES_KEY, _relationship_milestones, milestone, _RELATIONSHIP_MILESTONES_CAP)
+    asyncio.create_task(_graph_ingest_fire_and_forget(
+        text=f"Relationship milestone: {title}. {milestone['description']}",
+        source_id=str(uuid.uuid4()),
+        category="milestone",
+        metadata={"event_type": "milestone"},
+    ))
     return {"status": "ok", "milestone": milestone}
 
 
@@ -4410,7 +5166,7 @@ async def check_confessions(request: Request) -> Dict[str, Any]:
     now = time.time()
 
     # check cooldown
-    last = _confession_cooldown.get(category, 0)
+    last = _p17_cooldown_get(category)
     if now - last < _CONFESSION_COOLDOWN_SECS:
         return {"status": "ok", "confessions": [], "reason": "cooldown_active"}
 
@@ -4445,7 +5201,7 @@ async def check_confessions(request: Request) -> Dict[str, Any]:
     # only return top 3 most relevant confessions, and update cooldown
     confessions = confessions[:3]
     if confessions:
-        _confession_cooldown[category] = now
+        _p17_cooldown_set(category, now)
 
     return {
         "status": "ok",
@@ -4457,8 +5213,12 @@ async def check_confessions(request: Request) -> Dict[str, Any]:
 @app.get("/memory/eq/summary")
 async def eq_summary() -> Dict[str, Any]:
     """Get a full emotional intelligence summary — all P17 systems combined."""
+    emotional_timeline = _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline)
+    reflection_journal = _p17_all_capped(_P17_REFLECTION_KEY, _reflection_journal)
+    relationship_milestones = _p17_all_capped(_P17_MILESTONES_KEY, _relationship_milestones)
+
     # Emotional state
-    recent_emotions = _emotional_timeline[-10:]
+    recent_emotions = emotional_timeline[-10:]
     if recent_emotions:
         emo_counts: Dict[str, int] = {}
         for e in recent_emotions:
@@ -4468,7 +5228,7 @@ async def eq_summary() -> Dict[str, Any]:
         current_mood = "unknown"
 
     # Self-awareness
-    last_reflection = _reflection_journal[-1] if _reflection_journal else None
+    last_reflection = reflection_journal[-1] if reflection_journal else None
 
     # Confidence
     domains = _compute_domain_confidence()
@@ -4483,10 +5243,10 @@ async def eq_summary() -> Dict[str, Any]:
         "emotional_state": {
             "current_mood": current_mood,
             "recent_emotions": len(recent_emotions),
-            "timeline_total": len(_emotional_timeline),
+            "timeline_total": len(emotional_timeline),
         },
         "self_awareness": {
-            "reflections_total": len(_reflection_journal),
+            "reflections_total": len(reflection_journal),
             "last_reflection": last_reflection,
         },
         "epistemic_humility": {
@@ -4496,7 +5256,7 @@ async def eq_summary() -> Dict[str, Any]:
         "relationship": {
             "total_feedback": total_feedback,
             "avg_rating": avg_rating,
-            "milestones": len(_relationship_milestones),
+            "milestones": len(relationship_milestones),
         },
     }
 
@@ -4599,9 +5359,14 @@ async def record_autobiography(request: Request) -> Dict[str, Any]:
         }
 
     entry = _generate_journal_entry(text, significance, context)
-    _autobiography.append(entry)
-    if len(_autobiography) > _AUTOBIOGRAPHY_CAP:
-        _autobiography[:] = _autobiography[-_AUTOBIOGRAPHY_CAP:]
+    _p18_append_capped(_P18_AUTOBIOGRAPHY_KEY, _autobiography, entry, _AUTOBIOGRAPHY_CAP)
+
+    asyncio.create_task(_graph_ingest_fire_and_forget(
+        text=entry["reflection"],
+        source_id=str(uuid.uuid4()),
+        category="autobiography",
+        metadata={"event_type": "autobiography", "nature": entry["nature"]},
+    ))
 
     return {"status": "ok", "entry": entry}
 
@@ -4612,21 +5377,22 @@ async def get_autobiography(
     nature: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Retrieve Kai's autobiography entries."""
-    entries = list(_autobiography)
+    autobiography = _p18_all_capped(_P18_AUTOBIOGRAPHY_KEY, _autobiography)
+    entries = list(autobiography)
     if nature:
         entries = [e for e in entries if e.get("nature") == nature]
     entries = entries[-limit:]
 
     # Compute chapter summary
     nature_counts: Dict[str, int] = {}
-    for e in _autobiography:
+    for e in autobiography:
         n = e.get("nature", "observation")
         nature_counts[n] = nature_counts.get(n, 0) + 1
 
     return {
         "status": "ok",
         "entries": entries,
-        "total": len(_autobiography),
+        "total": len(autobiography),
         "nature_distribution": nature_counts,
     }
 
@@ -4640,12 +5406,13 @@ async def get_identity_narrative() -> Dict[str, Any]:
     """Build Kai's identity narrative from lived experience."""
 
     # Days alive (from first memory or autobiography entry)
+    autobiography = _p18_all_capped(_P18_AUTOBIOGRAPHY_KEY, _autobiography)
     first_ts: Optional[str] = None
     all_records = store.search(top_k=10_000)
     if all_records:
         first_ts = min(r.timestamp for r in all_records)
-    if _autobiography:
-        first_auto_ts = _autobiography[0].get("timestamp", "")
+    if autobiography:
+        first_auto_ts = autobiography[0].get("timestamp", "")
         if first_ts is None or (first_auto_ts and first_auto_ts < first_ts):
             first_ts = first_auto_ts
     days_alive = 0
@@ -4671,19 +5438,20 @@ async def get_identity_narrative() -> Dict[str, Any]:
 
     # Emotional character (from emotional timeline)
     emo_counts: Dict[str, int] = {}
-    for e in _emotional_timeline:
+    for e in _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline):
         emo_counts[e["emotion"]] = emo_counts.get(e["emotion"], 0) + 1
     dominant_emotion = max(emo_counts, key=emo_counts.get) if emo_counts else "neutral"
 
     # Autobiography summary
     auto_natures: Dict[str, int] = {}
-    for a in _autobiography:
+    for a in autobiography:
         auto_natures[a.get("nature", "observation")] = auto_natures.get(a.get("nature", "observation"), 0) + 1
 
     # Strengths from self-reflection
+    reflection_journal = _p17_all_capped(_P17_REFLECTION_KEY, _reflection_journal)
     all_strengths: List[str] = []
     all_weaknesses: List[str] = []
-    for r in _reflection_journal[-5:]:
+    for r in reflection_journal[-5:]:
         all_strengths.extend(r.get("strengths", []))
         all_weaknesses.extend(r.get("weaknesses", []))
 
@@ -4711,8 +5479,8 @@ async def get_identity_narrative() -> Dict[str, Any]:
             "days_alive": days_alive,
             "total_memories": total_memories,
             "corrections_learned": correction_count,
-            "autobiography_entries": len(_autobiography),
-            "reflections": len(_reflection_journal),
+            "autobiography_entries": len(autobiography),
+            "reflections": len(reflection_journal),
         },
         "emotional_character": dominant_emotion,
         "top_domains": [{"domain": d[0], "count": d[1]} for d in top_domains],
@@ -4965,7 +5733,7 @@ async def write_legacy(request: Request) -> Dict[str, Any]:
 
     now = time.time()
     entry = {
-        "id": f"legacy_{int(now)}_{len(_legacy_messages)}",
+        "id": f"legacy_{int(now)}_{len(_p18_all_capped(_P18_LEGACY_KEY, _legacy_messages))}",
         "timestamp": now,
         "message": message,
         "recipient": recipient,
@@ -4975,9 +5743,7 @@ async def write_legacy(request: Request) -> Dict[str, Any]:
         "surfaced_at": None,
     }
 
-    _legacy_messages.append(entry)
-    if len(_legacy_messages) > _LEGACY_CAP:
-        _legacy_messages[:] = _legacy_messages[-_LEGACY_CAP:]
+    _p18_append_capped(_P18_LEGACY_KEY, _legacy_messages, entry, _LEGACY_CAP)
 
     return {"status": "ok", "entry": entry}
 
@@ -4988,13 +5754,16 @@ async def get_legacy_messages(
 ) -> Dict[str, Any]:
     """Get legacy messages. By default, only shows messages whose time has come."""
     now = time.time()
+    messages = _p18_all_capped(_P18_LEGACY_KEY, _legacy_messages)
     results: List[Dict[str, Any]] = []
 
-    for msg in _legacy_messages:
+    for msg in messages:
         if msg["surface_after"] <= now:
             if not msg["surfaced"]:
                 msg["surfaced"] = True
                 msg["surfaced_at"] = now
+                _p18_update_entry(_P18_LEGACY_KEY, _legacy_messages, msg["id"],
+                                   {"surfaced": True, "surfaced_at": now})
             results.append(msg)
         elif include_unsurfaced:
             results.append(msg)
@@ -5002,8 +5771,8 @@ async def get_legacy_messages(
     return {
         "status": "ok",
         "messages": results,
-        "total": len(_legacy_messages),
-        "pending": sum(1 for m in _legacy_messages if not m["surfaced"] and m["surface_after"] > now),
+        "total": len(messages),
+        "pending": sum(1 for m in messages if not m["surfaced"] and m["surface_after"] > now),
     }
 
 
@@ -5011,7 +5780,8 @@ async def get_legacy_messages(
 async def get_pending_legacy() -> Dict[str, Any]:
     """Check if any legacy messages are ready to surface."""
     now = time.time()
-    ready = [m for m in _legacy_messages if m["surface_after"] <= now and not m["surfaced"]]
+    messages = _p18_all_capped(_P18_LEGACY_KEY, _legacy_messages)
+    ready = [m for m in messages if m["surface_after"] <= now and not m["surfaced"]]
     return {
         "status": "ok",
         "ready_count": len(ready),
@@ -5032,8 +5802,9 @@ async def narrative_summary() -> Dict[str, Any]:
     future = await get_future_self()
     # Legacy
     legacy_now = time.time()
+    legacy_messages = _p18_all_capped(_P18_LEGACY_KEY, _legacy_messages)
     pending_legacy = sum(
-        1 for m in _legacy_messages
+        1 for m in legacy_messages
         if m["surface_after"] <= legacy_now and not m["surfaced"]
     )
 
@@ -5043,7 +5814,7 @@ async def narrative_summary() -> Dict[str, Any]:
         "current_chapter": arcs.get("current_chapter", "The Beginning"),
         "total_chapters": len(arcs.get("arcs", [])),
         "trajectory": future.get("trajectory_message", ""),
-        "autobiography_entries": len(_autobiography),
+        "autobiography_entries": identity.get("stats", {}).get("autobiography_entries", 0),
         "legacy_pending": pending_legacy,
         "days_alive": identity.get("stats", {}).get("days_alive", 0),
     }
@@ -5117,8 +5888,9 @@ async def generate_counterfactual(request: Request) -> Dict[str, Any]:
     correction_memories = [r for r in related if r.event_type == "correction"]
     if correction_memories:
         lessons.append(f"I've since learned {len(correction_memories)} corrections in this area")
-    if _reflection_journal:
-        latest_reflection = _reflection_journal[-1]
+    reflection_journal = _p17_all_capped(_P17_REFLECTION_KEY, _reflection_journal)
+    if reflection_journal:
+        latest_reflection = reflection_journal[-1]
         if latest_reflection.get("weaknesses"):
             lessons.append(f"Known weakness: {latest_reflection['weaknesses'][0]}")
 
@@ -5138,9 +5910,7 @@ async def generate_counterfactual(request: Request) -> Dict[str, Any]:
         ),
     }
 
-    _counterfactuals.append(counterfactual)
-    if len(_counterfactuals) > _COUNTERFACTUAL_CAP:
-        _counterfactuals[:] = _counterfactuals[-_COUNTERFACTUAL_CAP:]
+    _p19_append_capped(_P19_COUNTERFACTUALS_KEY, _counterfactuals, counterfactual, _COUNTERFACTUAL_CAP)
 
     return {"status": "ok", "counterfactual": counterfactual}
 
@@ -5148,11 +5918,12 @@ async def generate_counterfactual(request: Request) -> Dict[str, Any]:
 @app.get("/memory/imagine/counterfactuals")
 async def list_counterfactuals(limit: int = 20) -> Dict[str, Any]:
     """List recent counterfactual replays."""
-    recent = list(reversed(_counterfactuals))[:limit]
+    counterfactuals = _p19_all_capped(_P19_COUNTERFACTUALS_KEY, _counterfactuals)
+    recent = list(reversed(counterfactuals))[:limit]
     return {
         "status": "ok",
         "count": len(recent),
-        "total": len(_counterfactuals),
+        "total": len(counterfactuals),
         "counterfactuals": recent,
     }
 
@@ -5256,7 +6027,7 @@ async def empathetic_simulation(request: Request) -> Dict[str, Any]:
         unspoken.append("Seems comfortable — maintain current interaction style")
 
     # Update the running empathy map
-    _empathy_map.update({
+    _p19_empathy_update({
         "emotional_state": emotional_state,
         "energy_level": energy,
         "focus": focus,
@@ -5282,7 +6053,7 @@ async def empathetic_simulation(request: Request) -> Dict[str, Any]:
 @app.get("/memory/imagine/empathy-map")
 async def get_empathy_map() -> Dict[str, Any]:
     """Get current model of the operator's state."""
-    return {"status": "ok", "empathy_map": dict(_empathy_map)}
+    return {"status": "ok", "empathy_map": _p19_empathy_get()}
 
 
 # ── P19c: Creative Synthesis ────────────────────────────────────────
@@ -5368,9 +6139,7 @@ async def creative_synthesis(request: Request) -> Dict[str, Any]:
         , 2),
     }
 
-    _creative_ideas.append(idea)
-    if len(_creative_ideas) > _CREATIVE_CAP:
-        _creative_ideas[:] = _creative_ideas[-_CREATIVE_CAP:]
+    _p19_append_capped(_P19_CREATIVE_KEY, _creative_ideas, idea, _CREATIVE_CAP)
 
     return {"status": "ok", "idea": idea}
 
@@ -5378,11 +6147,12 @@ async def creative_synthesis(request: Request) -> Dict[str, Any]:
 @app.get("/memory/imagine/ideas")
 async def list_creative_ideas(limit: int = 20) -> Dict[str, Any]:
     """List recent creative synthesis ideas."""
-    recent = list(reversed(_creative_ideas))[:limit]
+    creative_ideas = _p19_all_capped(_P19_CREATIVE_KEY, _creative_ideas)
+    recent = list(reversed(creative_ideas))[:limit]
     return {
         "status": "ok",
         "count": len(recent),
-        "total": len(_creative_ideas),
+        "total": len(creative_ideas),
         "ideas": recent,
     }
 
@@ -5437,9 +6207,7 @@ async def record_inner_thought(request: Request) -> Dict[str, Any]:
         "context": context,
     }
 
-    _inner_monologue.append(entry)
-    if len(_inner_monologue) > _MONOLOGUE_CAP:
-        _inner_monologue[:] = _inner_monologue[-_MONOLOGUE_CAP:]
+    _p19_append_capped(_P19_MONOLOGUE_KEY, _inner_monologue, entry, _MONOLOGUE_CAP)
 
     return {"status": "ok", "entry": entry}
 
@@ -5450,21 +6218,22 @@ async def get_inner_monologue(
     thought_type: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Stream Kai's recent inner thoughts."""
-    entries = list(reversed(_inner_monologue))
+    inner_monologue = _p19_all_capped(_P19_MONOLOGUE_KEY, _inner_monologue)
+    entries = list(reversed(inner_monologue))
     if thought_type:
         entries = [e for e in entries if e.get("type") == thought_type]
     entries = entries[:limit]
 
     # Thought type distribution
     type_counts: Dict[str, int] = {}
-    for e in _inner_monologue:
+    for e in inner_monologue:
         t = e.get("type", "observation")
         type_counts[t] = type_counts.get(t, 0) + 1
 
     return {
         "status": "ok",
         "count": len(entries),
-        "total": len(_inner_monologue),
+        "total": len(inner_monologue),
         "thoughts": entries,
         "thought_distribution": type_counts,
     }
@@ -5528,9 +6297,7 @@ async def create_aspiration(request: Request) -> Dict[str, Any]:
         ),
     }
 
-    _aspirations.append(aspiration)
-    if len(_aspirations) > _ASPIRATION_CAP:
-        _aspirations[:] = _aspirations[-_ASPIRATION_CAP:]
+    _p19_append_capped(_P19_ASPIRATIONS_KEY, _aspirations, aspiration, _ASPIRATION_CAP)
 
     return {"status": "ok", "aspiration": aspiration}
 
@@ -5538,11 +6305,12 @@ async def create_aspiration(request: Request) -> Dict[str, Any]:
 @app.get("/memory/imagine/aspirations")
 async def list_aspirations(limit: int = 20) -> Dict[str, Any]:
     """List Kai's aspirations — dreams grounded in reality."""
-    recent = list(reversed(_aspirations))[:limit]
+    aspirations = _p19_all_capped(_P19_ASPIRATIONS_KEY, _aspirations)
+    recent = list(reversed(aspirations))[:limit]
     return {
         "status": "ok",
         "count": len(recent),
-        "total": len(_aspirations),
+        "total": len(aspirations),
         "aspirations": recent,
     }
 
@@ -5564,33 +6332,38 @@ def _parse_ts(ts_str: str) -> float:
 @app.get("/memory/imagine/summary")
 async def imagination_summary() -> Dict[str, Any]:
     """Combined view of all imagination subsystems."""
+    counterfactuals = _p19_all_capped(_P19_COUNTERFACTUALS_KEY, _counterfactuals)
+    creative_ideas = _p19_all_capped(_P19_CREATIVE_KEY, _creative_ideas)
+    inner_monologue = _p19_all_capped(_P19_MONOLOGUE_KEY, _inner_monologue)
+    aspirations = _p19_all_capped(_P19_ASPIRATIONS_KEY, _aspirations)
+
     # Thought type distribution
     thought_types: Dict[str, int] = {}
-    for t in _inner_monologue:
+    for t in inner_monologue:
         tt = t.get("type", "observation")
         thought_types[tt] = thought_types.get(tt, 0) + 1
 
     # Most common creative domains
     domain_pairs: Dict[str, int] = {}
-    for idea in _creative_ideas:
+    for idea in creative_ideas:
         pair = f"{idea['domain_a']} × {idea['domain_b']}"
         domain_pairs[pair] = domain_pairs.get(pair, 0) + 1
 
     return {
         "status": "ok",
         "imagination": {
-            "counterfactuals": len(_counterfactuals),
-            "creative_ideas": len(_creative_ideas),
-            "inner_thoughts": len(_inner_monologue),
-            "aspirations": len(_aspirations),
+            "counterfactuals": len(counterfactuals),
+            "creative_ideas": len(creative_ideas),
+            "inner_thoughts": len(inner_monologue),
+            "aspirations": len(aspirations),
         },
-        "empathy_map": dict(_empathy_map),
+        "empathy_map": _p19_empathy_get(),
         "thought_distribution": thought_types,
         "creative_domains": dict(sorted(
             domain_pairs.items(), key=lambda x: x[1], reverse=True
         )[:5]),
-        "latest_aspiration": _aspirations[-1] if _aspirations else None,
-        "latest_thought": _inner_monologue[-1] if _inner_monologue else None,
+        "latest_aspiration": aspirations[-1] if aspirations else None,
+        "latest_thought": inner_monologue[-1] if inner_monologue else None,
     }
 
 
@@ -5666,7 +6439,7 @@ async def learn_value(request: Request):
     now_ts = datetime.now(tz=timezone.utc).isoformat()
     formed = []
     for val in detected_values:
-        existing = next((v for v in _formed_values if v["value"] == val), None)
+        existing = _p20_get_value(val)
         if existing:
             existing["strength"] = min(1.0, existing["strength"] + 0.1)
             existing["reinforcements"] += 1
@@ -5674,6 +6447,7 @@ async def learn_value(request: Request):
             existing["experiences"].append(experience[:200])
             if len(existing["experiences"]) > 10:
                 existing["experiences"] = existing["experiences"][-10:]
+            _p20_put_value(existing)
             formed.append(existing)
         else:
             entry = {
@@ -5686,28 +6460,28 @@ async def learn_value(request: Request):
                 "experiences": [experience[:200]],
                 "source": signal_type,
             }
-            _formed_values.append(entry)
-            if len(_formed_values) > 50:
-                _formed_values.sort(key=lambda x: x["strength"], reverse=True)
-                _formed_values[:] = _formed_values[:50]
+            # stored as a Redis Hash field keyed by value name — the
+            # ~10 known value categories never approach a size where
+            # the old 50-cap eviction logic would matter
+            _p20_put_value(entry)
             formed.append(entry)
 
     return {
         "status": "ok",
         "values_learned": formed,
-        "total_values": len(_formed_values),
+        "total_values": len(_p20_all_values()),
     }
 
 
 @app.get("/memory/values")
 async def get_values():
     """P20a: Return all formed values, sorted by strength."""
-    sorted_vals = sorted(_formed_values, key=lambda x: x["strength"], reverse=True)
+    sorted_vals = sorted(_p20_all_values(), key=lambda x: x["strength"], reverse=True)
     return {
         "status": "ok",
         "values": sorted_vals,
         "count": len(sorted_vals),
-        "alignment": dict(_value_alignment_score),
+        "alignment": _p20_alignment_get(),
     }
 
 
@@ -5727,7 +6501,7 @@ async def conscience_check(request: Request):
     # check alignment with each formed value
     alignments = []
     conflicts = []
-    for val in _formed_values:
+    for val in _p20_all_values():
         val_name = val["value"]
         # check if action resonates with positive values
         pos_keywords = _VALUE_SIGNALS.get("positive", {}).get(val_name, [])
@@ -5773,10 +6547,7 @@ async def conscience_check(request: Request):
         "alignment_score": alignment,
         "verdict": verdict,
     }
-    async with _conscience_lock:
-        _conscience_log.append(entry)
-        if len(_conscience_log) > 200:
-            _conscience_log[:] = _conscience_log[-200:]
+    _p20_append_capped(_P20_CONSCIENCE_KEY, _conscience_log, entry, _CONSCIENCE_LOG_CAP)
 
     return {
         "status": "ok",
@@ -5787,10 +6558,11 @@ async def conscience_check(request: Request):
 @app.get("/memory/conscience/audit")
 async def conscience_audit():
     """P20c: Integrity tracker — how well has Kai lived by its values?"""
-    total = len(_conscience_log)
-    aligned = sum(1 for c in _conscience_log if c["verdict"] == "fully_aligned")
-    conflicted = sum(1 for c in _conscience_log if c["verdict"] == "conflicts_with_values")
-    mixed = sum(1 for c in _conscience_log if c["verdict"] == "mixed")
+    log = _p20_all_capped(_P20_CONSCIENCE_KEY, _conscience_log)
+    total = len(log)
+    aligned = sum(1 for c in log if c["verdict"] == "fully_aligned")
+    conflicted = sum(1 for c in log if c["verdict"] == "conflicts_with_values")
+    mixed = sum(1 for c in log if c["verdict"] == "mixed")
 
     if total > 0:
         integrity_score = round((aligned + mixed * 0.5) / total, 2)
@@ -5798,10 +6570,11 @@ async def conscience_audit():
         integrity_score = 1.0
 
     # update running alignment
-    _value_alignment_score["overall"] = integrity_score
-    if conflicted == 0 and total > 0:
-        _value_alignment_score["streak"] = _value_alignment_score.get("streak", 0) + 1
-    _value_alignment_score["violations"] = conflicted
+    alignment = _p20_alignment_set(
+        overall=integrity_score,
+        violations=conflicted,
+        increment_streak=(conflicted == 0 and total > 0),
+    )
 
     return {
         "status": "ok",
@@ -5810,8 +6583,8 @@ async def conscience_audit():
         "fully_aligned": aligned,
         "conflicts": conflicted,
         "mixed": mixed,
-        "alignment": dict(_value_alignment_score),
-        "recent_checks": _conscience_log[-5:],
+        "alignment": alignment,
+        "recent_checks": log[-5:],
     }
 
 
@@ -5847,9 +6620,7 @@ async def record_loyalty(request: Request):
         entry["weight"] = 1.0
         entry["type"] = "sacrifice"
 
-    _loyalty_ledger.append(entry)
-    if len(_loyalty_ledger) > 100:
-        _loyalty_ledger[:] = _loyalty_ledger[-100:]
+    _p20_append_capped(_P20_LOYALTY_KEY, _loyalty_ledger, entry, _LOYALTY_LEDGER_CAP)
 
     return {"status": "ok", "entry": entry}
 
@@ -5857,7 +6628,8 @@ async def record_loyalty(request: Request):
 @app.get("/memory/loyalty")
 async def get_loyalty():
     """P20d: Return the loyalty ledger — what has been sacrificed/promised."""
-    sorted_ledger = sorted(_loyalty_ledger, key=lambda x: x["weight"], reverse=True)
+    ledger = _p20_all_capped(_P20_LOYALTY_KEY, _loyalty_ledger)
+    sorted_ledger = sorted(ledger, key=lambda x: x["weight"], reverse=True)
     sacrifices = [e for e in sorted_ledger if e["type"] == "sacrifice"]
     promises = [e for e in sorted_ledger if e["type"] == "promise"]
     commitments = [e for e in sorted_ledger if e["type"] == "commitment"]
@@ -5869,7 +6641,7 @@ async def get_loyalty():
         "sacrifices": len(sacrifices),
         "promises": len(promises),
         "commitments": len(commitments),
-        "total_weight": round(sum(e["weight"] for e in _loyalty_ledger), 2),
+        "total_weight": round(sum(e["weight"] for e in ledger), 2),
     }
 
 
@@ -5909,13 +6681,11 @@ async def record_gratitude(request: Request):
         "message": message,
     }
 
-    _gratitude_journal.append(entry)
-    if len(_gratitude_journal) > 100:
-        _gratitude_journal[:] = _gratitude_journal[-100:]
+    _p20_append_capped(_P20_GRATITUDE_KEY, _gratitude_journal, entry, _GRATITUDE_JOURNAL_CAP)
 
     # also record as loyalty if it involves sacrifice
     if tone == "deeply_moved":
-        _loyalty_ledger.append({
+        _p20_append_capped(_P20_LOYALTY_KEY, _loyalty_ledger, {
             "id": f"loy_{uuid.uuid4().hex[:8]}",
             "timestamp": entry["timestamp"],
             "person": recipient,
@@ -5923,7 +6693,7 @@ async def record_gratitude(request: Request):
             "type": "sacrifice",
             "honored": True,
             "weight": 1.0,
-        })
+        }, _LOYALTY_LEDGER_CAP)
 
     return {"status": "ok", "entry": entry}
 
@@ -5931,15 +6701,16 @@ async def record_gratitude(request: Request):
 @app.get("/memory/gratitude")
 async def get_gratitude():
     """P20e: Return the gratitude journal."""
+    journal = _p20_all_capped(_P20_GRATITUDE_KEY, _gratitude_journal)
     return {
         "status": "ok",
-        "entries": list(reversed(_gratitude_journal[-20:])),
-        "count": len(_gratitude_journal),
+        "entries": list(reversed(journal[-20:])),
+        "count": len(journal),
         "tones": {
-            "deeply_moved": sum(1 for e in _gratitude_journal if e["tone"] == "deeply_moved"),
-            "grateful": sum(1 for e in _gratitude_journal if e["tone"] == "grateful"),
-            "honored": sum(1 for e in _gratitude_journal if e["tone"] == "honored"),
-            "appreciative": sum(1 for e in _gratitude_journal if e["tone"] == "appreciative"),
+            "deeply_moved": sum(1 for e in journal if e["tone"] == "deeply_moved"),
+            "grateful": sum(1 for e in journal if e["tone"] == "grateful"),
+            "honored": sum(1 for e in journal if e["tone"] == "honored"),
+            "appreciative": sum(1 for e in journal if e["tone"] == "appreciative"),
         },
     }
 
@@ -5947,26 +6718,30 @@ async def get_gratitude():
 @app.get("/memory/conscience/summary")
 async def conscience_summary():
     """P20 combined: Full conscience state — values, integrity, loyalty, gratitude."""
-    sorted_vals = sorted(_formed_values, key=lambda x: x["strength"], reverse=True)
-    total_checks = len(_conscience_log)
-    aligned = sum(1 for c in _conscience_log if c["verdict"] == "fully_aligned")
+    values = _p20_all_values()
+    log = _p20_all_capped(_P20_CONSCIENCE_KEY, _conscience_log)
+    ledger = _p20_all_capped(_P20_LOYALTY_KEY, _loyalty_ledger)
+    journal = _p20_all_capped(_P20_GRATITUDE_KEY, _gratitude_journal)
+    sorted_vals = sorted(values, key=lambda x: x["strength"], reverse=True)
+    total_checks = len(log)
+    aligned = sum(1 for c in log if c["verdict"] == "fully_aligned")
 
     return {
         "status": "ok",
         "conscience": {
-            "formed_values": len(_formed_values),
+            "formed_values": len(values),
             "conscience_checks": total_checks,
-            "loyalty_entries": len(_loyalty_ledger),
-            "gratitude_entries": len(_gratitude_journal),
+            "loyalty_entries": len(ledger),
+            "gratitude_entries": len(journal),
         },
         "top_values": [{"value": v["value"], "strength": v["strength"]}
                        for v in sorted_vals[:5]],
         "integrity_score": round((aligned + sum(
-            0.5 for c in _conscience_log if c["verdict"] == "mixed"
+            0.5 for c in log if c["verdict"] == "mixed"
         )) / total_checks, 2) if total_checks > 0 else 1.0,
-        "alignment": dict(_value_alignment_score),
-        "sacrifices_remembered": sum(1 for e in _loyalty_ledger if e["type"] == "sacrifice"),
-        "latest_gratitude": _gratitude_journal[-1] if _gratitude_journal else None,
+        "alignment": _p20_alignment_get(),
+        "sacrifices_remembered": sum(1 for e in ledger if e["type"] == "sacrifice"),
+        "latest_gratitude": journal[-1] if journal else None,
     }
 
 
@@ -6090,7 +6865,7 @@ async def schedule_task(body: Dict[str, Any]) -> Dict[str, Any]:
     title = sanitize_string(str(body.get("title", "")).strip())
     if not title:
         raise HTTPException(status_code=400, detail="title is required")
-    if len(_scheduled_tasks) >= _MAX_SCHEDULED:
+    if _p21_hash_len(_P21_TASKS_KEY, _scheduled_tasks) >= _MAX_SCHEDULED:
         raise HTTPException(status_code=409, detail="scheduler full")
 
     task_type = str(body.get("type", "reminder")).lower()
@@ -6105,7 +6880,7 @@ async def schedule_task(body: Dict[str, Any]) -> Dict[str, Any]:
     task_id = str(uuid.uuid4())[:12]
     now_iso = datetime.now(timezone.utc).isoformat()
 
-    _scheduled_tasks[task_id] = {
+    _p21_hash_put(_P21_TASKS_KEY, _scheduled_tasks, task_id, {
         "task_id": task_id,
         "title": title[:200],
         "type": task_type,
@@ -6116,7 +6891,7 @@ async def schedule_task(body: Dict[str, Any]) -> Dict[str, Any]:
         "fire_count": 0,
         "active": True,
         "payload": body.get("payload", {}),
-    }
+    })
     logger.info("Scheduled task created: id=%s title=%s freq=%s", task_id, title[:50], frequency)
     return {"status": "scheduled", "task_id": task_id, "title": title}
 
@@ -6124,12 +6899,13 @@ async def schedule_task(body: Dict[str, Any]) -> Dict[str, Any]:
 @app.get("/memory/schedule/tasks")
 async def list_scheduled_tasks() -> Dict[str, Any]:
     """P21b: List all active scheduled tasks."""
-    active = [t for t in _scheduled_tasks.values() if t.get("active", True)]
+    tasks = _p21_hash_all(_P21_TASKS_KEY, _scheduled_tasks)
+    active = [t for t in tasks.values() if t.get("active", True)]
     active.sort(key=lambda t: t.get("fire_at") or t.get("created", ""), reverse=False)
     return {
         "status": "ok",
         "count": len(active),
-        "total": len(_scheduled_tasks),
+        "total": len(tasks),
         "tasks": active,
     }
 
@@ -6138,8 +6914,7 @@ async def list_scheduled_tasks() -> Dict[str, Any]:
 async def cancel_task(task_id: str) -> Dict[str, Any]:
     """P21b: Cancel a scheduled task."""
     task_id = sanitize_string(task_id)
-    if task_id in _scheduled_tasks:
-        _scheduled_tasks[task_id]["active"] = False
+    if _p21_hash_update(_P21_TASKS_KEY, _scheduled_tasks, task_id, {"active": False}) is not None:
         return {"status": "cancelled", "task_id": task_id}
     raise HTTPException(status_code=404, detail="task not found")
 
@@ -6148,13 +6923,13 @@ async def cancel_task(task_id: str) -> Dict[str, Any]:
 async def fire_task(task_id: str) -> Dict[str, Any]:
     """P21b: Mark a task as fired (called by supervisor when executed)."""
     task_id = sanitize_string(task_id)
-    task = _scheduled_tasks.get(task_id)
+    task = _p21_hash_get(_P21_TASKS_KEY, _scheduled_tasks, task_id)
     if not task:
         raise HTTPException(status_code=404, detail="task not found")
-    task["last_fired"] = datetime.now(timezone.utc).isoformat()
-    task["fire_count"] = task.get("fire_count", 0) + 1
+    updates = {"last_fired": datetime.now(timezone.utc).isoformat(), "fire_count": task.get("fire_count", 0) + 1}
     if task["frequency"] == "once":
-        task["active"] = False
+        updates["active"] = False
+    task = _p21_hash_update(_P21_TASKS_KEY, _scheduled_tasks, task_id, updates)
     return {"status": "fired", "task_id": task_id, "fire_count": task["fire_count"]}
 
 
@@ -6165,7 +6940,7 @@ async def get_due_tasks() -> Dict[str, Any]:
     now_iso = now.isoformat()
     due = []
 
-    for task in _scheduled_tasks.values():
+    for task in _p21_hash_all(_P21_TASKS_KEY, _scheduled_tasks).values():
         if not task.get("active", True):
             continue
 
@@ -6216,7 +6991,7 @@ async def set_reminder(body: Dict[str, Any]) -> Dict[str, Any]:
     text = sanitize_string(str(body.get("text", "")).strip())
     if not text:
         raise HTTPException(status_code=400, detail="text is required")
-    if len(_reminders) >= _MAX_REMINDERS:
+    if _p21_hash_len(_P21_REMINDERS_KEY, _reminders) >= _MAX_REMINDERS:
         raise HTTPException(status_code=409, detail="reminders full")
 
     fire_at = sanitize_string(str(body.get("fire_at", "")))
@@ -6229,7 +7004,7 @@ async def set_reminder(body: Dict[str, Any]) -> Dict[str, Any]:
         repeat = "once"
 
     reminder_id = str(uuid.uuid4())[:12]
-    _reminders[reminder_id] = {
+    _p21_hash_put(_P21_REMINDERS_KEY, _reminders, reminder_id, {
         "reminder_id": reminder_id,
         "text": text[:500],
         "fire_at": fire_at,
@@ -6237,7 +7012,7 @@ async def set_reminder(body: Dict[str, Any]) -> Dict[str, Any]:
         "created": datetime.now(timezone.utc).isoformat(),
         "fired": False,
         "fire_count": 0,
-    }
+    })
     logger.info("Reminder set: id=%s fire_at=%s text=%s", reminder_id, fire_at, text[:50])
     return {"status": "set", "reminder_id": reminder_id, "fire_at": fire_at}
 
@@ -6245,12 +7020,13 @@ async def set_reminder(body: Dict[str, Any]) -> Dict[str, Any]:
 @app.get("/memory/reminders")
 async def list_reminders() -> Dict[str, Any]:
     """P21c: List all pending reminders."""
-    pending = [r for r in _reminders.values() if not r.get("fired")]
+    reminders = _p21_hash_all(_P21_REMINDERS_KEY, _reminders)
+    pending = [r for r in reminders.values() if not r.get("fired")]
     pending.sort(key=lambda r: r.get("fire_at", ""))
     return {
         "status": "ok",
         "count": len(pending),
-        "total": len(_reminders),
+        "total": len(reminders),
         "reminders": pending,
     }
 
@@ -6262,7 +7038,7 @@ async def get_due_reminders() -> Dict[str, Any]:
     now = datetime.now(timezone.utc)
     due = []
 
-    for r in _reminders.values():
+    for r in _p21_hash_all(_P21_REMINDERS_KEY, _reminders).values():
         if r.get("fired") and r.get("repeat", "once") == "once":
             continue
         fire_at = r.get("fire_at", "")
@@ -6290,13 +7066,13 @@ async def get_due_reminders() -> Dict[str, Any]:
 async def fire_reminder(reminder_id: str) -> Dict[str, Any]:
     """P21c: Mark a reminder as fired."""
     reminder_id = sanitize_string(reminder_id)
-    r = _reminders.get(reminder_id)
+    r = _p21_hash_get(_P21_REMINDERS_KEY, _reminders, reminder_id)
     if not r:
         raise HTTPException(status_code=404, detail="reminder not found")
-    r["fire_count"] = r.get("fire_count", 0) + 1
-    r["last_fire"] = datetime.now(timezone.utc).isoformat()
+    updates = {"fire_count": r.get("fire_count", 0) + 1, "last_fire": datetime.now(timezone.utc).isoformat()}
     if r.get("repeat", "once") == "once":
-        r["fired"] = True
+        updates["fired"] = True
+    _p21_hash_update(_P21_REMINDERS_KEY, _reminders, reminder_id, updates)
     return {"status": "fired", "reminder_id": reminder_id}
 
 
@@ -6304,8 +7080,7 @@ async def fire_reminder(reminder_id: str) -> Dict[str, Any]:
 async def cancel_reminder(reminder_id: str) -> Dict[str, Any]:
     """P21c: Cancel a reminder."""
     reminder_id = sanitize_string(reminder_id)
-    if reminder_id in _reminders:
-        _reminders[reminder_id]["fired"] = True
+    if _p21_hash_update(_P21_REMINDERS_KEY, _reminders, reminder_id, {"fired": True}) is not None:
         return {"status": "cancelled", "reminder_id": reminder_id}
     raise HTTPException(status_code=404, detail="reminder not found")
 
@@ -6349,7 +7124,7 @@ async def morning_briefing() -> Dict[str, Any]:
         })
 
     # 2. Pending reminders
-    pending = [r for r in _reminders.values() if not r.get("fired")]
+    pending = [r for r in _p21_hash_all(_P21_REMINDERS_KEY, _reminders).values() if not r.get("fired")]
     if pending:
         reminder_items = [{"text": r["text"][:100], "fire_at": r.get("fire_at", "")}
                           for r in sorted(pending, key=lambda x: x.get("fire_at", ""))[:5]]
@@ -6360,7 +7135,7 @@ async def morning_briefing() -> Dict[str, Any]:
         })
 
     # 3. Emotional arc (last 24h)
-    recent_emotions = list(_emotional_timeline)[-24:]
+    recent_emotions = _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline)[-24:]
     if recent_emotions:
         dominant = Counter(e.get("emotion", "neutral") for e in recent_emotions).most_common(1)
         arc_text = dominant[0][0] if dominant else "neutral"
@@ -6387,7 +7162,7 @@ async def morning_briefing() -> Dict[str, Any]:
     # 5. Scheduled tasks due today
     due_today = []
     today_str = now.strftime("%Y-%m-%d")
-    for t in _scheduled_tasks.values():
+    for t in _p21_hash_all(_P21_TASKS_KEY, _scheduled_tasks).values():
         if t.get("active") and t.get("fire_at", "").startswith(today_str):
             due_today.append({"title": t["title"][:100], "fire_at": t.get("fire_at", "")})
     if due_today:
@@ -6397,7 +7172,7 @@ async def morning_briefing() -> Dict[str, Any]:
             "items": due_today,
         })
 
-    _briefing_log.append(briefing)
+    _p21_append_capped(briefing, _briefing_log.maxlen or 50)
     return briefing
 
 
@@ -6425,7 +7200,7 @@ async def evening_checkin() -> Dict[str, Any]:
     })
 
     # 2. Reminders that fired today
-    fired_today = [r for r in _reminders.values()
+    fired_today = [r for r in _p21_hash_all(_P21_REMINDERS_KEY, _reminders).values()
                    if r.get("last_fire", "").startswith(today_str)]
     if fired_today:
         checkin["sections"].append({
@@ -6444,7 +7219,7 @@ async def evening_checkin() -> Dict[str, Any]:
     # 4. Tomorrow's scheduled tasks
     tomorrow = now + timedelta(days=1)
     tomorrow_str = tomorrow.strftime("%Y-%m-%d")
-    tomorrow_tasks = [t for t in _scheduled_tasks.values()
+    tomorrow_tasks = [t for t in _p21_hash_all(_P21_TASKS_KEY, _scheduled_tasks).values()
                       if t.get("active") and t.get("fire_at", "").startswith(tomorrow_str)]
     if tomorrow_tasks:
         checkin["sections"].append({
@@ -6453,17 +7228,18 @@ async def evening_checkin() -> Dict[str, Any]:
             "items": [{"title": t["title"][:100]} for t in tomorrow_tasks[:5]],
         })
 
-    _briefing_log.append(checkin)
+    _p21_append_capped(checkin, _briefing_log.maxlen or 50)
     return checkin
 
 
 @app.get("/memory/briefing/history")
 async def briefing_history() -> Dict[str, Any]:
     """P21d: Recent briefing history."""
+    briefings = _p21_briefing_all()
     return {
         "status": "ok",
-        "count": len(_briefing_log),
-        "briefings": list(_briefing_log),
+        "count": len(briefings),
+        "briefings": briefings,
     }
 
 
@@ -6472,20 +7248,22 @@ async def briefing_history() -> Dict[str, Any]:
 @app.get("/memory/agent/summary")
 async def agent_summary() -> Dict[str, Any]:
     """P21e: Summary of Kai's proactive capabilities and current state."""
-    active_tasks = sum(1 for t in _scheduled_tasks.values() if t.get("active"))
-    pending_reminders = sum(1 for r in _reminders.values() if not r.get("fired"))
+    tasks = _p21_hash_all(_P21_TASKS_KEY, _scheduled_tasks)
+    reminders = _p21_hash_all(_P21_REMINDERS_KEY, _reminders)
+    active_tasks = sum(1 for t in tasks.values() if t.get("active"))
+    pending_reminders = sum(1 for r in reminders.values() if not r.get("fired"))
 
     # count due items
     now_iso = datetime.now(timezone.utc).isoformat()
-    due_reminders = sum(1 for r in _reminders.values()
+    due_reminders = sum(1 for r in reminders.values()
                         if not r.get("fired") and r.get("fire_at", "") <= now_iso)
 
     return {
         "status": "ok",
         "capabilities": len(_ACTION_REGISTRY),
-        "scheduled_tasks": {"active": active_tasks, "total": len(_scheduled_tasks)},
-        "reminders": {"pending": pending_reminders, "due_now": due_reminders, "total": len(_reminders)},
-        "briefings_generated": len(_briefing_log),
+        "scheduled_tasks": {"active": active_tasks, "total": len(tasks)},
+        "reminders": {"pending": pending_reminders, "due_now": due_reminders, "total": len(reminders)},
+        "briefings_generated": _p21_briefing_len(),
         "message": f"Kai can do {len(_ACTION_REGISTRY)} things. "
                    f"{active_tasks} scheduled tasks, {pending_reminders} pending reminders.",
     }
@@ -6523,7 +7301,7 @@ async def echo_analyse(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 
     # find past moments with the same emotion
     past_matches = [
-        e for e in _emotional_timeline
+        e for e in _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline)
         if e.get("emotion") == current_emotion
         and e.get("session_id") != session_id
         and (time.time() - e.get("timestamp", 0)) > 3600  # at least 1h ago
@@ -6566,7 +7344,7 @@ async def echo_analyse(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
         "echo_message": echo,
         "bridge_to": bridge_memory.get("trigger_msg", "")[:80] if bridge_memory else None,
     }
-    _echo_history.append(entry)
+    _p22_append_capped(_P22_ECHO_KEY, _echo_history, entry, 100)
 
     return {
         "status": "ok",
@@ -6586,12 +7364,13 @@ async def echo_analyse(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 @app.get("/memory/echo/history")
 async def echo_history(limit: int = Query(default=20, le=100)) -> Dict[str, Any]:
     """P22a: Echo event history — when did Kai mirror emotions?"""
-    entries = list(_echo_history)[-limit:]
+    all_echoes = _p22_all_capped(_P22_ECHO_KEY, _echo_history)
+    entries = all_echoes[-limit:]
     entries.reverse()
     return {
         "status": "ok",
         "count": len(entries),
-        "total": len(_echo_history),
+        "total": len(all_echoes),
         "entries": entries,
     }
 
@@ -6622,11 +7401,13 @@ async def nudge_escalate(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
     reason = sanitize_string(body.get("reason", ""))[:200]
     original_message = sanitize_string(body.get("message", ""))[:300]
 
-    if target not in _nudge_ladder:
-        if len(_nudge_ladder) >= _MAX_LADDER_ENTRIES:
-            oldest = min(_nudge_ladder, key=lambda k: _nudge_ladder[k].get("last_dismissed", 0))
-            del _nudge_ladder[oldest]
-        _nudge_ladder[target] = {
+    ladder = _p22_hash_all(_P22_LADDER_KEY, _nudge_ladder)
+    state = ladder.get(target)
+    if state is None:
+        if len(ladder) >= _MAX_LADDER_ENTRIES:
+            oldest = min(ladder, key=lambda k: ladder[k].get("last_dismissed", 0))
+            _p22_hash_delete(_P22_LADDER_KEY, _nudge_ladder, oldest)
+        state = {
             "target": target,
             "dismissals": 0,
             "last_dismissed": 0,
@@ -6634,7 +7415,6 @@ async def nudge_escalate(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
             "history": [],
         }
 
-    state = _nudge_ladder[target]
     state["dismissals"] += 1
     state["last_dismissed"] = time.time()
     state["history"].append({
@@ -6653,6 +7433,7 @@ async def nudge_escalate(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
             current_tier = tier
 
     state["escalation_level"] = current_tier["level"]
+    _p22_hash_put(_P22_LADDER_KEY, _nudge_ladder, target, state)
 
     # generate escalated message
     escalated_msg = None
@@ -6683,7 +7464,7 @@ async def nudge_escalate(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 async def nudge_ladder() -> Dict[str, Any]:
     """P22b: Current escalation state for all tracked nudge targets."""
     entries = []
-    for target, state in _nudge_ladder.items():
+    for target, state in _p22_hash_all(_P22_LADDER_KEY, _nudge_ladder).items():
         current_tier = _ESCALATION_TIERS[0]
         for tier in _ESCALATION_TIERS:
             if state["dismissals"] >= tier["threshold"]:
@@ -6792,13 +7573,13 @@ async def cross_mode_scan(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 
     # record the insight
     if cross_insights:
-        _cross_mode_insights.append({
+        _p22_append_capped(_P22_CROSSMODE_KEY, _cross_mode_insights, {
             "timestamp": time.time(),
             "query": query[:100],
             "current_mode": current_mode,
             "insights_found": len(cross_insights),
             "bridge_message": bridge_message,
-        })
+        }, 100)
 
     return {
         "status": "ok",
@@ -6813,12 +7594,13 @@ async def cross_mode_scan(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 @app.get("/memory/cross-mode")
 async def cross_mode_history(limit: int = Query(default=20, le=100)) -> Dict[str, Any]:
     """P22c: History of cross-mode insight discoveries."""
-    entries = list(_cross_mode_insights)[-limit:]
+    all_insights = _p22_all_capped(_P22_CROSSMODE_KEY, _cross_mode_insights)
+    entries = all_insights[-limit:]
     entries.reverse()
     return {
         "status": "ok",
         "count": len(entries),
-        "total": len(_cross_mode_insights),
+        "total": len(all_insights),
         "entries": entries,
     }
 
@@ -6910,7 +7692,7 @@ async def oracle_predict(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
         chains.append(chain)
 
     # emotional impact prediction based on recent emotional arc
-    recent_emotions = _emotional_timeline[-10:]
+    recent_emotions = _p17_all_capped(_P17_EMOTION_KEY, _emotional_timeline)[-10:]
     emotion_prediction = "stable"
     if recent_emotions:
         recent_moods = [e.get("emotion", "neutral") for e in recent_emotions]
@@ -6938,7 +7720,7 @@ async def oracle_predict(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
         "negative_impacts": len(neg_impacts),
         "positive_impacts": len(pos_impacts),
     }
-    _oracle_predictions.append(prediction)
+    _p22_append_capped(_P22_ORACLE_KEY, _oracle_predictions, prediction, 100)
 
     return {
         "status": "ok",
@@ -6949,12 +7731,13 @@ async def oracle_predict(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 @app.get("/memory/oracle/chains")
 async def oracle_chains(limit: int = Query(default=20, le=100)) -> Dict[str, Any]:
     """P22d: History of impact predictions."""
-    entries = list(_oracle_predictions)[-limit:]
+    all_predictions = _p22_all_capped(_P22_ORACLE_KEY, _oracle_predictions)
+    entries = all_predictions[-limit:]
     entries.reverse()
     return {
         "status": "ok",
         "count": len(entries),
-        "total": len(_oracle_predictions),
+        "total": len(all_predictions),
         "predictions": entries,
     }
 
@@ -7040,7 +7823,7 @@ async def shadow_branch(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
         "queryable": True,
     }
 
-    _shadow_branches.append(branch)
+    _p22_append_capped(_P22_SHADOW_KEY, _shadow_branches, branch, 100)
 
     return {"status": "ok", **branch}
 
@@ -7048,12 +7831,13 @@ async def shadow_branch(body: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
 @app.get("/memory/shadow/branches")
 async def shadow_branches_list(limit: int = Query(default=20, le=100)) -> Dict[str, Any]:
     """P22e: List all shadow branches (alternate timelines)."""
-    entries = list(_shadow_branches)[-limit:]
+    all_branches = _p22_all_capped(_P22_SHADOW_KEY, _shadow_branches)
+    entries = all_branches[-limit:]
     entries.reverse()
     return {
         "status": "ok",
         "count": len(entries),
-        "total": len(_shadow_branches),
+        "total": len(all_branches),
         "branches": entries,
     }
 
@@ -7062,7 +7846,7 @@ async def shadow_branches_list(limit: int = Query(default=20, le=100)) -> Dict[s
 async def shadow_explore(branch_id: str) -> Dict[str, Any]:
     """P22e: Explore a specific shadow branch's details."""
     bid = sanitize_string(branch_id)
-    for b in _shadow_branches:
+    for b in _p22_all_capped(_P22_SHADOW_KEY, _shadow_branches):
         if b.get("branch_id") == bid:
             return {"status": "ok", "branch": b}
     raise HTTPException(status_code=404, detail="branch not found")
@@ -7074,42 +7858,46 @@ async def shadow_explore(branch_id: str) -> Dict[str, Any]:
 async def operator_model_summary() -> Dict[str, Any]:
     """P22: Unified operator model — how well does Kai understand you?"""
     # echo state
-    recent_echoes = list(_echo_history)[-5:]
+    all_echoes = _p22_all_capped(_P22_ECHO_KEY, _echo_history)
+    recent_echoes = all_echoes[-5:]
     echo_emotions = [e.get("emotion") for e in recent_echoes if e.get("echo_type") != "none"]
 
     # escalation state
+    ladder = _p22_hash_all(_P22_LADDER_KEY, _nudge_ladder)
     escalated_targets = [
         {"target": t, "level": s["escalation_level"], "dismissals": s["dismissals"]}
-        for t, s in _nudge_ladder.items()
+        for t, s in ladder.items()
         if s["escalation_level"] > 1
     ]
 
     # cross-mode insights
-    recent_cross = list(_cross_mode_insights)[-3:]
+    all_cross = _p22_all_capped(_P22_CROSSMODE_KEY, _cross_mode_insights)
+    recent_cross = all_cross[-3:]
 
     # oracle predictions
-    high_risk = sum(1 for p in _oracle_predictions if p.get("overall_risk") == "high")
+    all_predictions = _p22_all_capped(_P22_ORACLE_KEY, _oracle_predictions)
+    high_risk = sum(1 for p in all_predictions if p.get("overall_risk") == "high")
 
     # shadow branches
-    branch_count = len(_shadow_branches)
+    branch_count = len(_p22_all_capped(_P22_SHADOW_KEY, _shadow_branches))
 
     return {
         "status": "ok",
         "echo_state": {
             "recent_emotions_mirrored": echo_emotions,
-            "total_echoes": len(_echo_history),
-            "deep_bridges": sum(1 for e in _echo_history if e.get("echo_type") == "deep_bridge"),
+            "total_echoes": len(all_echoes),
+            "deep_bridges": sum(1 for e in all_echoes if e.get("echo_type") == "deep_bridge"),
         },
         "escalation_state": {
             "escalated_targets": escalated_targets,
-            "max_level": max((s["escalation_level"] for s in _nudge_ladder.values()), default=1),
+            "max_level": max((s["escalation_level"] for s in ladder.values()), default=1),
         },
         "cross_mode": {
-            "insights_found": len(_cross_mode_insights),
+            "insights_found": len(all_cross),
             "recent_bridges": len(recent_cross),
         },
         "oracle": {
-            "predictions_made": len(_oracle_predictions),
+            "predictions_made": len(all_predictions),
             "high_risk_count": high_risk,
         },
         "shadow_branches": {
@@ -7117,10 +7905,10 @@ async def operator_model_summary() -> Dict[str, Any]:
             "queryable": branch_count,
         },
         "model_completeness": min(100, int(
-            (len(_echo_history) > 0) * 20 +
-            (len(_nudge_ladder) > 0) * 20 +
-            (len(_cross_mode_insights) > 0) * 20 +
-            (len(_oracle_predictions) > 0) * 20 +
+            (len(all_echoes) > 0) * 20 +
+            (len(ladder) > 0) * 20 +
+            (len(all_cross) > 0) * 20 +
+            (len(all_predictions) > 0) * 20 +
             (branch_count > 0) * 20
         )),
     }

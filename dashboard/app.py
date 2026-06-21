@@ -32,6 +32,9 @@ app = FastAPI(title="Sovereign Dashboard", version="0.4.0")
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
+# Store-maintenance reads (stats/search-by-category/quarantine listing) live on
+# memu-core-introspect, split out from memu-core's hot path — see DECISIONS.md D21.
+MEMU_INTROSPECT_URL = os.getenv("MEMU_INTROSPECT_URL", "http://memu-core-introspect:8009")
 budget = ErrorBudget(window_seconds=300)
 
 
@@ -243,8 +246,7 @@ async def index() -> Dict[str, object]:
     try:
         async with httpx.AsyncClient() as client:
             ledger_size = int((await client.get(f"{TOOL_GATE_URL}/ledger/stats", timeout=2.0)).json().get("count", 0))
-            memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
-            memory_count = int((await client.get(f"{memu_url}/memory/stats", timeout=2.0)).json().get("records", 0))
+            memory_count = int((await client.get(f"{MEMU_INTROSPECT_URL}/memory/stats", timeout=2.0)).json().get("records", 0))
     except Exception:
         logger.warning("Failed to fetch ledger/memory stats for index")
 
@@ -265,10 +267,9 @@ async def index() -> Dict[str, object]:
     except Exception:
         pass
     try:
-        memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
         async with httpx.AsyncClient(timeout=2.0) as client:
             # quarantine count
-            q_resp = await client.get(f"{memu_url}/memory/quarantine/list")
+            q_resp = await client.get(f"{MEMU_INTROSPECT_URL}/memory/quarantine/list")
             if q_resp.status_code == 200:
                 quarantine_count = q_resp.json().get("count", 0)
     except Exception:
@@ -624,9 +625,9 @@ async def api_memories(query: str = "", category: str = "", top_k: int = 20):
             if query:
                 resp = await client.get(f"{MEMU_URL}/memory/retrieve", params={"query": query, "top_k": top_k})
             elif category:
-                resp = await client.get(f"{MEMU_URL}/memory/search-by-category", params={"category": category, "top_k": top_k})
+                resp = await client.get(f"{MEMU_INTROSPECT_URL}/memory/search-by-category", params={"category": category, "top_k": top_k})
             else:
-                resp = await client.get(f"{MEMU_URL}/memory/stats")
+                resp = await client.get(f"{MEMU_INTROSPECT_URL}/memory/stats")
             resp.raise_for_status()
             return resp.json()
     except Exception:
@@ -635,10 +636,10 @@ async def api_memories(query: str = "", category: str = "", top_k: int = 20):
 
 @app.get("/api/memory/stats")
 async def api_memory_stats():
-    """Proxy memory statistics from memu-core."""
+    """Proxy memory statistics from memu-core-introspect."""
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.get(f"{MEMU_URL}/memory/stats")
+            resp = await client.get(f"{MEMU_INTROSPECT_URL}/memory/stats")
             resp.raise_for_status()
             return resp.json()
     except Exception:

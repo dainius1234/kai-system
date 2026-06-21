@@ -1,3 +1,4 @@
+"""Smoke-test helper: HTTP-probe a list of service health endpoints and report which are reachable."""
 from __future__ import annotations
 
 import time

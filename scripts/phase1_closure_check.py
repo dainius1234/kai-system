@@ -1,3 +1,4 @@
+"""Static checks that confirm docker-compose.sovereign.yml meets Phase 1 closure requirements."""
 from __future__ import annotations
 
 import json

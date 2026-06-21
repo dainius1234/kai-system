@@ -1,3 +1,4 @@
+"""CLI entry point: generate a monthly paper backup of keeper recovery material via KeeperRecoveryManager."""
 from __future__ import annotations
 
 import json

@@ -13,6 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MEMU_SRC = (ROOT / "memu-core" / "app.py").read_text()
+INTROSPECT_SRC = (ROOT / "memu-core" / "introspect_app.py").read_text()
 COMPRESSOR_SRC = (ROOT / "memory-compressor" / "app.py").read_text()
 HEARTBEAT_SRC = (ROOT / "heartbeat" / "app.py").read_text()
 
@@ -20,13 +21,14 @@ HEARTBEAT_SRC = (ROOT / "heartbeat" / "app.py").read_text()
 # ── Endpoint existence ──────────────────────────────────────────────
 
 class TestFocusCompressEndpoint(unittest.TestCase):
-    """Verify the focus-compress endpoint is registered."""
+    """Verify the focus-compress endpoint is registered on memu-core-introspect
+    (split out from memu-core's hot path — see DECISIONS.md D21)."""
 
     def test_focus_compress_endpoint_exists(self):
-        self.assertIn('"/memory/focus-compress"', MEMU_SRC)
+        self.assertIn('"/memory/focus-compress"', INTROSPECT_SRC)
 
     def test_focus_compress_is_post(self):
-        self.assertIn('@app.post("/memory/focus-compress")', MEMU_SRC)
+        self.assertIn('app.post("/memory/focus-compress")(focus_compress)', INTROSPECT_SRC)
 
     def test_token_budget_endpoint_exists(self):
         self.assertIn('"/memory/token-budget"', MEMU_SRC)

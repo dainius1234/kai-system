@@ -5,5 +5,8 @@ pydantic==2.8.2
 redis==5.0.8
 zstandard==0.23.0
 psycopg2-binary==2.9.10
+numpy>=1.26.4
 # real embeddings — comment out to use hash-based fallback
 sentence-transformers>=2.7.0
+# TurboVec vector store backend — only needed when VECTOR_STORE=turbovec
+turbovec>=0.1.0

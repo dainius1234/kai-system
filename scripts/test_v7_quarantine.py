@@ -23,15 +23,28 @@ os.environ["MAX_MEMORY_RECORDS"] = "100"
 os.environ.setdefault("VECTOR_STORE", "memory")
 
 module_path = ROOT / "memu-core" / "app.py"
-spec = importlib.util.spec_from_file_location("memu_core_app", module_path)
+spec = importlib.util.spec_from_file_location("app", module_path)
 assert spec and spec.loader
 mod = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = mod
+sys.modules["app"] = mod
 spec.loader.exec_module(mod)
+
+# Quarantine endpoints moved to memu-core-introspect (see DECISIONS.md D21).
+# introspect_app.py does `from app import store` — by registering memu-core's
+# app.py under the literal name "app" above, introspect_app reuses the same
+# cached module (and the same VectorStore instance) instead of re-importing
+# app.py a second time under a different name.
+introspect_module_path = ROOT / "memu-core" / "introspect_app.py"
+introspect_spec = importlib.util.spec_from_file_location("introspect_app", introspect_module_path)
+assert introspect_spec and introspect_spec.loader
+introspect_mod = importlib.util.module_from_spec(introspect_spec)
+sys.modules["introspect_app"] = introspect_mod
+introspect_spec.loader.exec_module(introspect_mod)
 
 from fastapi.testclient import TestClient
 
 client = TestClient(mod.app)
+introspect_client = TestClient(introspect_mod.app)
 
 
 def _memorize(text: str, event_type: str = "test") -> str:
@@ -53,7 +66,7 @@ class TestQuarantine(unittest.TestCase):
         rid = _memorize("Record to quarantine")
 
         # quarantine it
-        resp = client.post("/memory/quarantine", json={
+        resp = introspect_client.post("/memory/quarantine", json={
             "record_id": rid,
             "reason": "suspected confabulation",
         })
@@ -61,7 +74,7 @@ class TestQuarantine(unittest.TestCase):
         self.assertEqual(resp.json()["status"], "quarantined")
 
         # list quarantined
-        resp = client.get("/memory/quarantine/list")
+        resp = introspect_client.get("/memory/quarantine/list")
         self.assertEqual(resp.status_code, 200)
         data = resp.json()
         self.assertGreaterEqual(data["count"], 1)
@@ -72,13 +85,13 @@ class TestQuarantine(unittest.TestCase):
         rid = _memorize("Record to quarantine then clear")
 
         # quarantine
-        client.post("/memory/quarantine", json={
+        introspect_client.post("/memory/quarantine", json={
             "record_id": rid,
             "reason": "test",
         })
 
         # clear
-        resp = client.post("/memory/quarantine/clear", json={
+        resp = introspect_client.post("/memory/quarantine/clear", json={
             "record_id": rid,
             "reason": "cleared after review",
         })
@@ -86,7 +99,7 @@ class TestQuarantine(unittest.TestCase):
         self.assertEqual(resp.json()["status"], "cleared")
 
     def test_quarantine_nonexistent_record(self):
-        resp = client.post("/memory/quarantine", json={
+        resp = introspect_client.post("/memory/quarantine", json={
             "record_id": "nonexistent-id-999",
             "reason": "test",
         })
@@ -97,7 +110,7 @@ class TestQuarantine(unittest.TestCase):
         rid = _memorize("unique_quarantine_test_token_xyz123")
 
         # quarantine it
-        client.post("/memory/quarantine", json={
+        introspect_client.post("/memory/quarantine", json={
             "record_id": rid,
             "reason": "bad data",
         })

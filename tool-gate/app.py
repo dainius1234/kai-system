@@ -140,6 +140,16 @@ def _idem_set(key: str, decision_dict: dict):
         _idempotency_cache.pop(k, None)
 
 
+def _idem_evict(key: str):
+    """Remove a cached decision from both the Redis and in-memory stores."""
+    if _redis_client:
+        try:
+            _redis_client.delete(f"idem:{key}")
+        except Exception:
+            pass
+    _idempotency_cache.pop(key, None)
+
+
 def _send_notification(message: str) -> None:
     """Route alert through local gateway.  Skips silently if unconfigured."""
     if not NOTIFY_URL:

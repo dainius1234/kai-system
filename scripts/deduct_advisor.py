@@ -1,3 +1,4 @@
+"""CLI entry point: print self-employment tax/expense advice from local income and expense logs."""
 from __future__ import annotations
 
 from common.self_emp_advisor import advise, load_expenses, load_income_total

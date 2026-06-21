@@ -90,4 +90,6 @@ record of intent, not current state:
 - Phase sequence: [SEQUENCE.md](SEQUENCE.md)
 - Append-only decisions: [DECISIONS.md](DECISIONS.md)
 - Canonical roadmap: [STRATEGIC_PLAN.md](STRATEGIC_PLAN.md)
+- External tool evaluations: [TECH_WATCH.md](TECH_WATCH.md)
+- External tool integration plan (phased, with diagrams): [SHOPPING_LIST_PLAN.md](SHOPPING_LIST_PLAN.md)
 - Session backlog (running log): [../SESSION_BACKLOG.md](../SESSION_BACKLOG.md)

@@ -1,3 +1,4 @@
+"""Run the full game-day drill suite (go_no_go, hardening, drills, smoke tests) and report pass/fail per check."""
 from __future__ import annotations
 
 import json

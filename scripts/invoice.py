@@ -1,3 +1,4 @@
+"""CLI helpers for generating simple self-employment invoice files and checking VAT-threshold status."""
 from __future__ import annotations
 
 import argparse

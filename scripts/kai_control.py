@@ -1,3 +1,4 @@
+"""Keeper recovery/control utilities: key backup, rotation, and recovery flows for the sovereign stack."""
 from __future__ import annotations
 
 import base64
@@ -13,8 +14,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-import tkinter as tk
-from tkinter import messagebox, simpledialog
+try:
+    import tkinter as tk
+    from tkinter import messagebox, simpledialog
+except Exception:  # pragma: no cover - tkinter is a system package, not always installed
+    tk = None
+    messagebox = None
+    simpledialog = None
 
 import urllib.request
 
@@ -22,12 +28,12 @@ from common.self_emp_advisor import advise, load_expenses, load_income_total
 
 try:
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-except Exception:  # pragma: no cover
+except BaseException:  # pragma: no cover - broken native deps can raise non-Exception errors (e.g. pyo3 panics)
     AESGCM = None
 
 try:
     import qrcode
-except Exception:  # pragma: no cover
+except BaseException:  # pragma: no cover
     qrcode = None
 
 WORDLIST = [
@@ -332,6 +338,8 @@ def unlock_logs(method: str) -> str:
 
 class KaiControlUI:
     def __init__(self) -> None:
+        if tk is None:
+            raise RuntimeError("tkinter is not installed; the GUI control panel is unavailable")
         self.mgr = KeeperRecoveryManager()
         self.method: Optional[str] = None
         self.root = tk.Tk()

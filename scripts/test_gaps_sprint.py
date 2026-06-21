@@ -11,6 +11,36 @@ from unittest.mock import AsyncMock, patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+# Setup import aliases so modules can be imported without package structure.
+# Module-level (not just under __main__) so this also runs under pytest
+# collection, not only `python scripts/test_gaps_sprint.py` directly.
+if "memu_core_app" not in sys.modules:
+    import importlib.util
+
+    # memu-core/app.py → memu_core_app
+    memu_path = os.path.join(os.path.dirname(__file__), "..", "memu-core")
+    if memu_path not in sys.path:
+        sys.path.insert(0, memu_path)
+    # This test exercises logging/cleanup/ledger logic, not embedding
+    # quality — opt into the lightweight hash fallback explicitly rather
+    # than requiring the real sentence-transformers model download.
+    os.environ.setdefault("MEMU_ALLOW_FAKE_EMBEDDINGS", "true")
+    spec = importlib.util.spec_from_file_location(
+        "memu_core_app", os.path.join(memu_path, "app.py"))
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["memu_core_app"] = mod
+    spec.loader.exec_module(mod)
+
+    # dashboard/app.py → dashboard_app
+    dash_path = os.path.join(os.path.dirname(__file__), "..", "dashboard")
+    if dash_path not in sys.path:
+        sys.path.insert(0, dash_path)
+    spec2 = importlib.util.spec_from_file_location(
+        "dashboard_app", os.path.join(dash_path, "app.py"))
+    mod2 = importlib.util.module_from_spec(spec2)
+    sys.modules["dashboard_app"] = mod2
+    spec2.loader.exec_module(mod2)
+
 
 class TestJSONLogger(unittest.TestCase):
     """Test setup_json_logger produces JSON on both file and stdout."""
@@ -167,27 +197,4 @@ class TestLedgerStatsEndpoint(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # Setup import aliases so modules can be imported without package structure
-    # memu-core/app.py → memu_core_app
-    memu_path = os.path.join(os.path.dirname(__file__), "..", "memu-core")
-    if memu_path not in sys.path:
-        sys.path.insert(0, memu_path)
-    # create module alias
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("memu_core_app",
-                                                    os.path.join(memu_path, "app.py"))
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules["memu_core_app"] = mod
-    spec.loader.exec_module(mod)
-
-    # dashboard/app.py → dashboard_app
-    dash_path = os.path.join(os.path.dirname(__file__), "..", "dashboard")
-    if dash_path not in sys.path:
-        sys.path.insert(0, dash_path)
-    spec2 = importlib.util.spec_from_file_location("dashboard_app",
-                                                     os.path.join(dash_path, "app.py"))
-    mod2 = importlib.util.module_from_spec(spec2)
-    sys.modules["dashboard_app"] = mod2
-    spec2.loader.exec_module(mod2)
-
     unittest.main()

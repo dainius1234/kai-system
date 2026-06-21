@@ -1,26 +1,3 @@
-def safe_experimentation():
-    """
-    Prototype: Try a minor config tweak or test addition in a sandbox, log outcome.
-    """
-    from pathlib import Path
-    SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
-    sandbox = SCRIPTS / "sandbox_experiment.py"
-    # Example: create a dummy script and run it
-    code = "print('Sandbox experiment: success')"
-    sandbox.write_text(code, encoding="utf-8")
-    try:
-        result = subprocess.run(["python3", str(sandbox)], capture_output=True, text=True, timeout=10)
-        outcome = result.stdout.strip() + " | " + result.stderr.strip()
-        log_supervisor_action("safe_experiment", {"script": str(sandbox), "outcome": outcome})
-    except Exception as e:
-        log_supervisor_action("safe_experiment_failed", str(e))
-    finally:
-        try:
-            sandbox.unlink()
-        except Exception:
-            pass
-
-
 #!/usr/bin/env python3
 """
 Kai Supervisor Agent (Prototype)
@@ -30,9 +7,10 @@ Kai Supervisor Agent (Prototype)
 - Optionally, can auto-apply safe changes or request operator approval for higher-impact actions
 - Logs its own actions and suggestions as system_action events
 """
-import time
-import requests
 import subprocess
+import time
+
+import requests
 
 MEMU_URL = "http://localhost:8001/memory/query"
 LOG_ACTION_URL = "http://localhost:8001/memory/memorize"
@@ -144,6 +122,29 @@ def auto_apply_improvements(suggestions, mood=None):
         log_supervisor_action("auto_formatting", "black applied to scripts/", rationale="Formatting for code quality and readability.", mood=mood)
     except Exception:
         log_supervisor_action("auto_formatting_failed", "black not available or failed", rationale="Formatting failed; operator review needed.", mood=mood)
+
+
+def safe_experimentation():
+    """
+    Prototype: Try a minor config tweak or test addition in a sandbox, log outcome.
+    """
+    from pathlib import Path
+    SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
+    sandbox = SCRIPTS / "sandbox_experiment.py"
+    # Example: create a dummy script and run it
+    code = "print('Sandbox experiment: success')"
+    sandbox.write_text(code, encoding="utf-8")
+    try:
+        result = subprocess.run(["python3", str(sandbox)], capture_output=True, text=True, timeout=10)
+        outcome = result.stdout.strip() + " | " + result.stderr.strip()
+        log_supervisor_action("safe_experiment", {"script": str(sandbox), "outcome": outcome})
+    except Exception as e:
+        log_supervisor_action("safe_experiment_failed", str(e))
+    finally:
+        try:
+            sandbox.unlink()
+        except Exception:
+            pass
 
 
 def main():

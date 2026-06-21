@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      models: read
     env:
       HMAC_ALLOW_DEV_SECRET: "true"
 
@@ -40,6 +43,17 @@ jobs:
         run: |
           make test-core
 
+      - name: GitHub Models CI backend smoke test (best-effort)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # CI/tests-only LLM backend (D36) — gives a real model response
+          # for test feedback instead of relying solely on the local
+          # qwen2:0.5b stub. Free-tier/rate-limited by design (see
+          # scripts/github_models_client.py), so failures here are a
+          # warning, not a build-breaker.
+          make test-github-models || echo "::warning::GitHub Models smoke test failed (likely rate-limited) — not build-breaking"
+
       - name: Build full stack Docker images
         run: |
           docker compose -f docker-compose.full.yml build
@@ -54,6 +68,11 @@ jobs:
           format: 'table'
 
       - name: Bring up minimal sovereign AI stack
+        env:
+          # memu-core's embedding backend is real-model-or-crash by design
+          # (DECISIONS.md) — CI exercises spine/gate logic, not embedding
+          # quality, and can't rely on the HF model download succeeding.
+          MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
         run: |
           docker compose -f docker-compose.minimal.yml up -d --build
           # wait for tool-gate (fast) and agentic (waits on the ollama model
@@ -70,9 +89,23 @@ jobs:
             fi
             sleep 1
           done
+          # memu-core-introspect — store-maintenance process split off memu-core
+          # (see DECISIONS.md D21), independent of the ollama pull above
+          for i in {1..30}; do
+            if curl -s http://localhost:8009/health >/dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
+      - name: Dump container logs on failure
+        if: failure()
+        run: |
+          docker compose -f docker-compose.minimal.yml ps
+          docker compose -f docker-compose.minimal.yml logs --no-color
       - name: Run integration smoke script
         run: |
           python3 scripts/test_core_integration.py
       - name: Tear down minimal stack
+        if: always()
         run: |
           docker compose -f docker-compose.minimal.yml down

@@ -21,8 +21,8 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Metric | Value |
 |---|---|
 | Services | 26 (22 build + postgres + redis + ollama + lakeFS) |
-| Test targets | 76 (make test-core) |
-| Individual tests | 1654++++ passing, 0 failures |
+| Test targets | 77 (make test-core) |
+| Individual tests | 1656+++++ passing, 0 failures |
 | Lines of Python | ~42,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |
@@ -94,7 +94,7 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | **C4** | Router uses keyword regex (8 categories) | Add embedding-based route classification when model tier >= 2 | L |
 | **C5** ✅ | Model selector doesn't verify model is loaded | `ensure_model_available()` + TTL cache + fallback in `_live_query()` — shipped in chassis-polish PR | S |
 | **C6** | Conviction scoring ignores LLM quality signals | Add response entropy + uncertainty markers to score | M |
-| **C7** | memu-core fallback embeddings are hash-based | Force sentence-transformers or fail explicitly (no fake vectors) | M |
+| **C7** ✅ | memu-core fallback embeddings are hash-based | **DONE 2026-06-19 (D35)** — `generate_embedding()` raises `RuntimeError` by default if sentence-transformers/model load fails; hash fallback now requires explicit `MEMU_ALLOW_FAKE_EMBEDDINGS=true` opt-in, wired into the lightweight test scripts that don't depend on real embedding quality | M |
 | **C8** | Dashboard Thinking/Goals/Memory are proxy shells | Wire real data endpoints when full stack is running | L |
 | **C9** ✅ | No model warm-up / pre-load on startup | `llm_warmup()` + `OLLAMA_AUTO_PULL` + FastAPI startup hook — shipped in chassis-polish PR | S |
 | **C10** | No A/B testing framework for model comparison | Log model name + response quality per query for comparison | M |

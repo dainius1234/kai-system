@@ -1,3 +1,4 @@
+"""One-shot CLI: create the pgvector extension and memu-core schema against PG_URI."""
 from __future__ import annotations
 
 import os

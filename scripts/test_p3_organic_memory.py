@@ -45,6 +45,14 @@ spec = importlib.util.spec_from_file_location("memu_app", "memu-core/app.py")
 memu = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(memu)
 
+# /memory/decay moved to memu-core-introspect (see DECISIONS.md D21). Register
+# memu's app.py under the literal name "app" so introspect_app's
+# `from app import ...` reuses this instance instead of importing a second one.
+sys.modules["app"] = memu
+introspect_spec = importlib.util.spec_from_file_location("introspect_app", "memu-core/introspect_app.py")
+introspect_app = importlib.util.module_from_spec(introspect_spec)
+introspect_spec.loader.exec_module(introspect_app)
+
 # Restore originals so other tests can use the real libraries if needed.
 for mod_name, orig in _originals.items():
     if orig is not None:
@@ -200,8 +208,8 @@ class TestSpacedRepetitionDecay(unittest.TestCase):
         _clear_store()
 
     def test_decay_endpoint_exists(self):
-        """The /memory/decay route should exist."""
-        routes = [r.path for r in memu.app.routes]
+        """The /memory/decay route should exist (on memu-core-introspect)."""
+        routes = [r.path for r in introspect_app.app.routes]
         self.assertIn("/memory/decay", routes)
 
     def test_old_unused_memories_fade(self):
@@ -552,8 +560,11 @@ class TestEndpointsExist(unittest.TestCase):
 
     def test_all_p3_endpoints_registered(self):
         routes = [r.path for r in memu.app.routes]
+        introspect_routes = [r.path for r in introspect_app.app.routes]
+        # /memory/decay moved to memu-core-introspect (see DECISIONS.md D21);
+        # the rest are still on memu-core's hot-path app.
+        self.assertIn("/memory/decay", introspect_routes, "Missing endpoint: /memory/decay")
         expected = [
-            "/memory/decay",
             "/memory/goals",
             "/memory/goals/update",
             "/memory/drift",
