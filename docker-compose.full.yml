@@ -380,6 +380,10 @@ services:
       LLM_PROVIDER: ollama
       LLM_MODEL: ollama/${OLLAMA_MODEL:-qwen2.5:0.5b}
       LLM_ENDPOINT: http://ollama:11434/v1
+      # Cognee's LLMConfig requires all three of LLM_MODEL/LLM_ENDPOINT/LLM_API_KEY
+      # to be non-empty when llm_provider=="ollama" (pydantic all-or-nothing
+      # validator) — it never validates the key's value, Ollama doesn't check it.
+      LLM_API_KEY: "ollama-local-no-key-required"
       EMBEDDING_PROVIDER: ollama
       EMBEDDING_MODEL: ollama/${OLLAMA_MODEL:-qwen2.5:0.5b}
       EMBEDDING_ENDPOINT: http://ollama:11434/api/embeddings
