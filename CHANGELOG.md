@@ -16,6 +16,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **CVE-2024-47874 / CVE-2025-54121**: Bumped `fastapi` from `==0.115.0` to `>=0.116.2` and added explicit `starlette>=0.47.2` constraint across all 25 per-service `requirements.txt` files
 
 ### Added
+- **memu-graph live verification in CI**: `core-tests.yml` now boots `ollama`/`ollama-pull`/`memu-graph` from `docker-compose.full.yml` after the minimal-stack teardown and runs `scripts/test_graph_live.py` — a real ingest → cognify → query → forget cycle against live Ollama + Cognee/Kuzu. Best-effort (`::warning`, non-build-breaking) since it depends on an external download (`extension.kuzudb.com`) and small-model extraction quality, neither of which should gate merges.
 - **C2 — Stream heartbeat / stall detection**: `STREAM_HEARTBEAT_TIMEOUT` env var (default 30 s).
   `LLMRouter.stream()` wraps per-token reads in `asyncio.wait_for`; emits a structured stall
   message and closes cleanly if no token arrives within the window.
