@@ -109,3 +109,43 @@ jobs:
         if: always()
         run: |
           docker compose -f docker-compose.minimal.yml down
+
+      - name: Bring up memu-graph (Cognee/Kuzu live verification)
+        env:
+          # D49/D51: qwen2.5:0.5b is too small to reliably produce valid
+          # structured JSON under Cognee's instructor/Pydantic validation
+          # (acreate_structured_output) — failures there surface as a
+          # misleading "LLM connection test timed out" even though Ollama
+          # itself responds 200 OK promptly. qwen2.5:1.5b (D49) got past
+          # invalid-JSON-syntax failures but still echoed the Response
+          # schema's *description* back instead of filling it in (D51) —
+          # syntactically valid JSON, semantically wrong. qwen2.5:3b is the
+          # next step up. Override OLLAMA_MODEL just for this step/stack
+          # (only ollama, ollama-pull, memu-graph are started here) so the
+          # project-wide CPU-safe default in docker-compose.full.yml and
+          # .env.example is untouched.
+          OLLAMA_MODEL: qwen2.5:3b
+        run: |
+          docker compose -f docker-compose.full.yml up -d ollama ollama-pull memu-graph
+          for i in {1..120}; do
+            if curl -s http://localhost:8061/health >/dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
+
+      - name: Run memu-graph live ingest/query/forget cycle (best-effort)
+        run: |
+          pip install requests
+          python3 scripts/test_graph_live.py || echo "::warning::memu-graph live verification failed — see logs (external deps: Ollama model quality, extension.kuzudb.com download)"
+
+      - name: Dump memu-graph logs (always, since the step above is best-effort)
+        if: always()
+        run: |
+          docker compose -f docker-compose.full.yml ps
+          docker compose -f docker-compose.full.yml logs ollama ollama-pull memu-graph --no-color
+
+      - name: Tear down memu-graph stack
+        if: always()
+        run: |
+          docker compose -f docker-compose.full.yml down

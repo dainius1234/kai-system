@@ -378,12 +378,38 @@ services:
     <<: *defaults
     environment:
       LLM_PROVIDER: ollama
-      LLM_MODEL: ollama/${OLLAMA_MODEL:-qwen2.5:0.5b}
+      # Cognee's OllamaAPIAdapter passes this string to Ollama's API as-is,
+      # with no "ollama/" prefix-stripping — must be the bare model tag.
+      LLM_MODEL: ${OLLAMA_MODEL:-qwen2.5:0.5b}
       LLM_ENDPOINT: http://ollama:11434/v1
+      # Cognee's LLMConfig requires all three of LLM_MODEL/LLM_ENDPOINT/LLM_API_KEY
+      # to be non-empty when llm_provider=="ollama" (pydantic all-or-nothing
+      # validator) — it never validates the key's value, Ollama doesn't check it.
+      LLM_API_KEY: "ollama-local-no-key-required"
       EMBEDDING_PROVIDER: ollama
-      EMBEDDING_MODEL: ollama/${OLLAMA_MODEL:-qwen2.5:0.5b}
-      EMBEDDING_ENDPOINT: http://ollama:11434/api/embeddings
-      EMBEDDING_DIMENSIONS: "768"
+      # D45 incorrectly added "ollama/" here based on Cognee's
+      # LiteLLMEmbeddingEngine source — but EMBEDDING_PROVIDER=ollama
+      # actually routes to Cognee's own OllamaEmbeddingEngine (confirmed via
+      # this service's live logs: "Ollama embedding error: model
+      # 'ollama/qwen2.5:0.5b' not found"), which — like the chat path's
+      # OllamaAPIAdapter — passes self.model to Ollama's API as-is, no
+      # prefix. Bare tag, same rule as LLM_MODEL above.
+      # Must be a model Ollama recognizes as embedding-capable — qwen2.5:0.5b
+      # is a chat model, so Ollama never starts its llama-server runner with
+      # --embeddings for it (confirmed live: /api/embed 501s "This server
+      # does not support embeddings. Start it with `--embeddings`"; the old
+      # /api/embeddings endpoint silently returns an empty vector for the
+      # same reason instead of erroring). all-minilm is pulled by
+      # ollama-pull specifically so a real embedding-capable model exists.
+      EMBEDDING_MODEL: ${EMBEDDING_OLLAMA_MODEL:-all-minilm}
+      # Cognee's OllamaEmbeddingEngine sends {"model", "input", "dimensions"} —
+      # the "input" field belongs to Ollama's current /api/embed endpoint.
+      # The old /api/embeddings endpoint only reads "prompt"; pointed at it,
+      # "input" is silently ignored and the prompt is effectively empty.
+      EMBEDDING_ENDPOINT: http://ollama:11434/api/embed
+      # all-minilm's native embedding_length is 384 — must match or Cognee's
+      # embedding-vector validation rejects the response.
+      EMBEDDING_DIMENSIONS: "384"
       HUGGINGFACE_TOKENIZER: bert-base-uncased
       ENABLE_BACKEND_ACCESS_CONTROL: "false"
       CACHING: "false"
@@ -666,7 +692,13 @@ services:
   ollama-pull:
     image: ollama/ollama:latest
     restart: "no"
-    entrypoint: ["sh", "-c", "OLLAMA_HOST=ollama:11434 ollama pull ${OLLAMA_MODEL:-qwen2.5:0.5b}"]
+    # Also pulls EMBEDDING_OLLAMA_MODEL (default all-minilm) — qwen2.5:0.5b is
+    # a chat model with no "embedding" capability declared in its Modelfile,
+    # so Ollama never starts its llama-server runner with --embeddings for
+    # it; any /api/embed(dings) request against it 501s or silently returns
+    # an empty vector no matter which endpoint/field names are used. A model
+    # Ollama actually recognizes as embedding-capable is required.
+    entrypoint: ["sh", "-c", "OLLAMA_HOST=ollama:11434 ollama pull ${OLLAMA_MODEL:-qwen2.5:0.5b} && OLLAMA_HOST=ollama:11434 ollama pull ${EMBEDDING_OLLAMA_MODEL:-all-minilm}"]
     depends_on:
       ollama:
         condition: service_healthy
