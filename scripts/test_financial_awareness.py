@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib
+import importlib.util
 import json
 import os
 import sys
@@ -12,14 +13,15 @@ from pathlib import Path
 from unittest.mock import patch
 
 # ── Path setup ────────────────────────────────────────────────────────────────
-_svc_dir = os.path.join(os.path.dirname(__file__), "..", "financial-awareness")
-if _svc_dir not in sys.path:
-    sys.path.insert(0, _svc_dir)
-
 from fastapi.testclient import TestClient  # noqa: E402
 
-# Import after path setup; reload so FINANCE_ROOT env override takes effect per test
-import app as _app_module  # noqa: E402
+# Load by file path so we never collide with sys.modules['app'] from other service tests
+_FA_APP_PATH = os.path.join(os.path.dirname(__file__), "..", "financial-awareness", "app.py")
+_spec = importlib.util.spec_from_file_location("financial_awareness_app", _FA_APP_PATH)
+assert _spec and _spec.loader
+_app_module = importlib.util.module_from_spec(_spec)
+sys.modules["financial_awareness_app"] = _app_module
+_spec.loader.exec_module(_app_module)
 
 
 def _make_client(tmp_dir: str) -> TestClient:
