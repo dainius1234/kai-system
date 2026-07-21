@@ -282,6 +282,8 @@ services:
       WAKE_URL: http://wake-service:8022
       FF_WAKE_INTENT_ROUTING: "${FF_WAKE_INTENT_ROUTING:-false}"
       LETTA_URL: http://letta-agent:8062
+      FINANCIAL_URL: http://financial-awareness:8063
+      FF_FINANCIAL_CONTEXT: "${FF_FINANCIAL_CONTEXT:-true}"
       FF_LETTA_TASKS: "${FF_LETTA_TASKS:-false}"
       FF_LETTA_MEMORY_SYNC: "${FF_LETTA_MEMORY_SYNC:-false}"
       INTERSERVICE_HMAC_SECRET: /run/secrets/hmac_secret
