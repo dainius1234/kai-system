@@ -234,6 +234,8 @@ class TestLLMResponseValidation(unittest.TestCase):
                 self.read = read
 
         class FakeResponse:
+            status_code = 200
+
             def raise_for_status(self):
                 return None
 
@@ -245,7 +247,7 @@ class TestLLMResponseValidation(unittest.TestCase):
                 }
 
         class FakeAsyncClient:
-            def __init__(self, timeout):
+            def __init__(self, timeout, headers=None):
                 calls["timeout"] = timeout
 
             async def __aenter__(self):
@@ -258,7 +260,18 @@ class TestLLMResponseValidation(unittest.TestCase):
                 calls["payload_model"] = json.get("model")
                 return FakeResponse()
 
-        fake_httpx = types.SimpleNamespace(Timeout=FakeTimeout, AsyncClient=FakeAsyncClient)
+        class FakeConnectError(Exception):
+            pass
+
+        class FakeTimeoutException(Exception):
+            pass
+
+        fake_httpx = types.SimpleNamespace(
+            Timeout=FakeTimeout,
+            AsyncClient=FakeAsyncClient,
+            ConnectError=FakeConnectError,
+            TimeoutException=FakeTimeoutException,
+        )
         original_httpx = sys.modules.get("httpx")
         original_model_timeout = llm._model_timeout
 

@@ -1600,7 +1600,7 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
         "commit": record_commit.commit_id,
         "state_commit": commit.commit_id if commit else "none",
         "verdict": verdict,
-        "pii_redacted": sum(pii_counts.values()) if pii_counts else 0,
+        "pii_redacted": str(sum(pii_counts.values()) if pii_counts else 0),
     }
 
 
