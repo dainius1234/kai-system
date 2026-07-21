@@ -1147,3 +1147,31 @@ Follow-up the same session, after the user asked to actually try rather than jus
 - Archive targets (60+) flagged in the audit remain in the main Makefile for now, pending the `test-core` restructuring that would allow their definitions to be removed.
 
 **Consequences:** Makefile is 10 targets slimmer. `cache-test-core` (which produced misleading partial results) is gone. CI `test-core` is unaffected since only the two actually-dead targets (`test-tempo`, `test-hmac-rotation-drill`) were removed from its dependency list.
+
+---
+
+## D71 — Honest merge-gate + remove orchestrator stub from docker-compose.full.yml
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:**
+`MAKEFILE_AUDIT.md` flagged `merge-gate` as "dishonest" — it mixed validation steps with side-effectful operational targets (`paper-backup`, `weekly-key-rotate`, `weekly-ed25519-rotate`, `health-sweep`, `contract-smoke`) and redundant individual test calls already covered by `test-core`. Running `make merge-gate` in CI or a fresh checkout would fail on the ops targets (no running services, no GPG keys, no external HMAC endpoints) and give false confidence by duplicating subset tests instead of running the full `test-core` suite.
+
+`STUBS_AND_PLACEHOLDERS.md` S6 flagged `orchestrator/app.py` as a DEPRECATED stub exposing only `/health`. No service in any compose file depended on it; it consumed a Dockerfile build slot and a reserved IP (172.20.0.32) for zero benefit.
+
+**Decisions / Changes:**
+
+*`Makefile` — `merge-gate` target:*
+Recomposed to validation-only steps:
+```
+go_no_go → pypi-shadow-check → check-docs → quality_gate.py → dep-audit → test-core → test-integration → coverage
+```
+Removed: `test-conviction`, `test-tool-gate`, `test-self-emp`, `kai-control-selftest`, `hardening_smoke`, `kai-drill-test`, `test-auth-hmac`, `test-phase-b-memu`, `hmac-migration-advice`, `health-sweep`, `contract-smoke`, `paper-backup`, `weekly-key-rotate`, `weekly-ed25519-rotate`.
+
+Individual test targets removed are fully covered by `test-core`; operational targets are still callable directly (`make paper-backup`, `make health-sweep`, etc.) — they just no longer block the pre-merge gate.
+
+*`docker-compose.full.yml`:*
+Removed the `orchestrator` service block (build, env, ports, healthcheck, network, depends_on). Port 8050 and IP 172.20.0.32 freed. The `orchestrator/` directory is kept as-is pending a future decision on whether to implement the risk-authority layer or delete the directory entirely.
+
+**Consequences:** `make merge-gate` now runs cleanly in CI and on a fresh checkout with no running services or external credentials. It covers the full 77-target test suite (`test-core`) plus integration smoke, coverage gate, dep-audit, and doc freshness — all in a single honest command. `make full-up` no longer starts the orchestrator stub.

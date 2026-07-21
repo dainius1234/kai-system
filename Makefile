@@ -346,20 +346,10 @@ merge-gate:
 	$(MAKE) pypi-shadow-check
 	$(MAKE) check-docs
 	python3 scripts/quality_gate.py
-	$(MAKE) test-conviction
-	$(MAKE) test-tool-gate
-	$(MAKE) test-self-emp
-	$(MAKE) kai-control-selftest
-	$(MAKE) hardening_smoke
-	$(MAKE) kai-drill-test
-	$(MAKE) test-auth-hmac
-	$(MAKE) test-phase-b-memu
-	$(MAKE) hmac-migration-advice
-	$(MAKE) health-sweep
-	$(MAKE) contract-smoke
-	$(MAKE) paper-backup
-	$(MAKE) weekly-key-rotate
-	$(MAKE) weekly-ed25519-rotate
+	$(MAKE) dep-audit
+	$(MAKE) test-core
+	$(MAKE) test-integration
+	$(MAKE) coverage
 
 
 phase1-closure:

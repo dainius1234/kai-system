@@ -41,5 +41,5 @@ Unlock condition: RTX 5080 procurement + provisioning + validation.
 ## Source of truth pointers
 
 - Resume layer: [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md)
-- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D70)
+- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D71)
 - Latest reality check: [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)

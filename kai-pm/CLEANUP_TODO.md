@@ -56,8 +56,8 @@
 ### 2.3 Prune Makefile 100 → ~25 targets
 - [x] Audit landed → [`MAKEFILE_AUDIT.md`](MAKEFILE_AUDIT.md) (2026-06-02).
 - [x] 10 DELETE targets removed; `Makefile.archive` created with preserved definitions (D70, 2026-07-21).
-- [ ] Slim `test-core` deps to KEEP-only list (blocked: needs honest merge-gate recomposition first).
-- [ ] Update `merge-gate` to run the full live list per audit's "honest merge-gate" proposal.
+- [ ] Slim `test-core` deps to KEEP-only list (deferred: no rush now that merge-gate is honest).
+- [x] `merge-gate` recomposed: go_no_go → pypi-shadow-check → check-docs → quality_gate → dep-audit → test-core → test-integration → coverage (D71, 2026-07-21).
 
 ---
 
