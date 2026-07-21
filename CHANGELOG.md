@@ -7,6 +7,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 - **memu-core Postgres extension race**: `PGVectorStore._init_schema()`'s `CREATE EXTENSION IF NOT EXISTS vector;` could raise `UniqueViolation` when `memu-core` and `memu-core-introspect` race against a freshly-initialized database — both can pass the existence check before either commits. Now caught and treated as success (the extension exists either way).
+- **memu-graph startup crash**: Cognee's `LLMConfig` requires `LLM_API_KEY` to be non-empty when `LLM_PROVIDER=ollama` (pydantic all-or-nothing validator); added a placeholder value since Ollama performs no real auth.
+- **memu-graph model-not-found 404s**: Cognee's `OllamaAPIAdapter` sends the configured model string to Ollama's API as-is, with no `ollama/` prefix-stripping. `LLM_MODEL`/`EMBEDDING_MODEL` in `docker-compose.full.yml`'s `memu-graph` block now use the bare model tag instead of `ollama/<tag>`.
 - flake8 E999 (f-string backslash) blocking CI on main
 - Removed stray file `pulls/48/review_comments`
 - **TTS test de-flaked**: `scripts/test_tts_service.py` now mocks `edge_tts.Communicate` so the test runs offline and is deterministic — no more Bing WebSocket 403 failures in CI sandboxes
@@ -16,6 +18,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **CVE-2024-47874 / CVE-2025-54121**: Bumped `fastapi` from `==0.115.0` to `>=0.116.2` and added explicit `starlette>=0.47.2` constraint across all 25 per-service `requirements.txt` files
 
 ### Added
+- **memu-graph live verification in CI**: `core-tests.yml` now boots `ollama`/`ollama-pull`/`memu-graph` from `docker-compose.full.yml` after the minimal-stack teardown and runs `scripts/test_graph_live.py` — a real ingest → cognify → query → forget cycle against live Ollama + Cognee/Kuzu. Best-effort (`::warning`, non-build-breaking) since it depends on an external download (`extension.kuzudb.com`) and small-model extraction quality, neither of which should gate merges.
 - **C2 — Stream heartbeat / stall detection**: `STREAM_HEARTBEAT_TIMEOUT` env var (default 30 s).
   `LLMRouter.stream()` wraps per-token reads in `asyncio.wait_for`; emits a structured stall
   message and closes cleanly if no token arrives within the window.
