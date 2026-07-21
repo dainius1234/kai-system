@@ -788,11 +788,34 @@
         <!-- ═══════════════ J5: Diary / Memory Viewer ═══════════════ -->
         <section class="view" id="diaryView">
           <div style="max-width:1200px;margin:0 auto;padding:var(--sp-6);">
-            <h2 class="text-heading" style="margin-bottom:var(--sp-4);">Memory Diary</h2>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-4);">
+              <h2 class="text-heading">Memory Diary</h2>
+              <button class="refresh-btn" onclick="loadDiaryStats()">↻ Refresh</button>
+            </div>
+
+            <!-- Stats bar -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:var(--sp-3);margin-bottom:var(--sp-4);">
+              <div class="card" style="text-align:center;padding:var(--sp-3);">
+                <div style="font-size:22px;font-weight:700;" id="diaryTotal">—</div>
+                <div style="font-size:11px;color:var(--text3);">Total Memories</div>
+              </div>
+              <div class="card" style="text-align:center;padding:var(--sp-3);">
+                <div style="font-size:22px;font-weight:700;" id="diaryCategories">—</div>
+                <div style="font-size:11px;color:var(--text3);">Event Types</div>
+              </div>
+              <div class="card" style="text-align:center;padding:var(--sp-3);">
+                <div style="font-size:22px;font-weight:700;" id="diaryShown">—</div>
+                <div style="font-size:11px;color:var(--text3);">Showing</div>
+              </div>
+              <div class="card" style="text-align:center;padding:var(--sp-3);">
+                <div style="font-size:22px;font-weight:700;" id="diaryPinned">—</div>
+                <div style="font-size:11px;color:var(--text3);">Pinned</div>
+              </div>
+            </div>
 
             <!-- Filters -->
-            <div style="display:flex;gap:var(--sp-2);margin-bottom:var(--sp-4);flex-wrap:wrap;align-items:center;">
-              <input type="text" id="diarySearch" placeholder="Search memories..." style="flex:1;min-width:200px;background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;" onkeydown="if(event.key==='Enter')searchDiary()">
+            <div style="display:flex;gap:var(--sp-2);margin-bottom:var(--sp-3);flex-wrap:wrap;align-items:center;">
+              <input type="text" id="diarySearch" placeholder="Search memories…" style="flex:1;min-width:200px;background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;" onkeydown="if(event.key==='Enter')searchDiary()">
               <select id="diaryCat" style="background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;" onchange="searchDiary()">
                 <option value="">All categories</option>
                 <option value="setting-out">Setting Out</option>
@@ -803,31 +826,39 @@
                 <option value="hs-briefings">H&S Briefings</option>
                 <option value="client-ncrs">Client NCRs</option>
                 <option value="daily-logs">Daily Logs</option>
+                <option value="general">General</option>
               </select>
-              <input type="range" id="diaryImportance" min="0" max="100" value="0" style="width:120px;" title="Min importance" oninput="document.getElementById('impLabel').textContent=this.value+'%'" onchange="searchDiary()">
-              <span id="impLabel" style="font-size:11px;color:var(--text3);min-width:30px;">0%</span>
-              <button class="refresh-btn" onclick="searchDiary()">Search</button>
+              <select id="diaryEventType" style="background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;" onchange="searchDiary()">
+                <option value="">All event types</option>
+              </select>
+              <select id="diarySort" style="background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;" onchange="searchDiary()">
+                <option value="recent">Most Recent</option>
+                <option value="importance">Highest Importance</option>
+                <option value="accessed">Most Accessed</option>
+                <option value="pinned">Pinned First</option>
+              </select>
             </div>
-
-            <!-- Stats bar -->
-            <div style="display:flex;gap:var(--sp-3);margin-bottom:var(--sp-4);">
-              <div class="card" style="flex:1;text-align:center;padding:var(--sp-3);">
-                <div style="font-size:24px;font-weight:700;" id="diaryTotal">—</div>
-                <div style="font-size:11px;color:var(--text3);">Total Memories</div>
-              </div>
-              <div class="card" style="flex:1;text-align:center;padding:var(--sp-3);">
-                <div style="font-size:24px;font-weight:700;" id="diaryCategories">—</div>
-                <div style="font-size:11px;color:var(--text3);">Categories</div>
-              </div>
-              <div class="card" style="flex:1;text-align:center;padding:var(--sp-3);">
-                <div style="font-size:24px;font-weight:700;" id="diaryShown">—</div>
-                <div style="font-size:11px;color:var(--text3);">Showing</div>
-              </div>
+            <div style="display:flex;gap:var(--sp-2);margin-bottom:var(--sp-4);align-items:center;">
+              <label style="font-size:12px;color:var(--text3);">Min importance:</label>
+              <input type="range" id="diaryImportance" min="0" max="100" value="0" style="width:120px;" title="Min importance"
+                oninput="document.getElementById('impLabel').textContent=this.value+'%'"
+                onchange="searchDiary()">
+              <span id="impLabel" style="font-size:11px;color:var(--text3);min-width:30px;">0%</span>
+              <label style="font-size:12px;color:var(--text3);margin-left:var(--sp-2);">
+                <input type="checkbox" id="diaryPinnedOnly" onchange="searchDiary()"> Pinned only
+              </label>
+              <button class="refresh-btn" onclick="searchDiary()" style="margin-left:auto;">Search</button>
+              <button class="refresh-btn" onclick="diaryBrowseRecent()" style="background:var(--accent);color:#000;">Browse Recent</button>
             </div>
 
             <!-- Memory cards -->
             <div id="diaryCards" style="display:flex;flex-direction:column;gap:var(--sp-2);">
-              <div class="empty" style="padding:40px;text-align:center;">Search or browse memories above</div>
+              <div class="empty" style="padding:40px;text-align:center;color:var(--text3);">Loading recent memories…</div>
+            </div>
+
+            <!-- Load more -->
+            <div style="text-align:center;margin-top:var(--sp-4);">
+              <button class="refresh-btn" id="diaryLoadMore" onclick="loadMoreDiary()" style="display:none;padding:8px 24px;">Load more</button>
             </div>
           </div>
         </section>
@@ -3873,67 +3904,223 @@ function _drawPlanFlow(container, W, H) {
 // J5: MEMORY DIARY / VIEWER
 // ═══════════════════════════════════════════════════════════════════
 
+let _diaryTopK = 30;
+let _diaryMode = 'recent'; // 'recent' | 'search'
+
 async function loadDiaryStats() {
   try {
     const data = await fetch('/api/memory/stats').then(r => r.json());
     document.getElementById('diaryTotal').textContent = data.records || data.total || '—';
-    const cats = data.categories ? Object.keys(data.categories).length : '—';
-    document.getElementById('diaryCategories').textContent = cats;
-    document.getElementById('diaryShown').textContent = '0';
+    const etypes = data.event_types || {};
+    document.getElementById('diaryCategories').textContent = Object.keys(etypes).length || '—';
+
+    // Populate event-type select
+    const sel = document.getElementById('diaryEventType');
+    const current = sel.value;
+    while (sel.options.length > 1) sel.remove(1);
+    Object.entries(etypes).sort((a, b) => b[1] - a[1]).forEach(([et, cnt]) => {
+      const opt = document.createElement('option');
+      opt.value = et;
+      opt.textContent = `${et} (${cnt})`;
+      sel.appendChild(opt);
+    });
+    if (current) sel.value = current;
   } catch {
     document.getElementById('diaryTotal').textContent = '?';
   }
+  // Auto-load recent memories on first open
+  _diaryTopK = 30;
+  _diaryMode = 'recent';
+  await _fetchAndRenderDiary();
+}
+
+async function diaryBrowseRecent() {
+  _diaryMode = 'recent';
+  _diaryTopK = 30;
+  document.getElementById('diarySearch').value = '';
+  document.getElementById('diaryCat').value = '';
+  document.getElementById('diaryEventType').value = '';
+  document.getElementById('diaryImportance').value = 0;
+  document.getElementById('impLabel').textContent = '0%';
+  document.getElementById('diaryPinnedOnly').checked = false;
+  await _fetchAndRenderDiary();
 }
 
 async function searchDiary() {
-  const query = document.getElementById('diarySearch').value.trim();
-  const category = document.getElementById('diaryCat').value;
-  const minImportance = parseInt(document.getElementById('diaryImportance').value) / 100;
+  _diaryMode = 'search';
+  _diaryTopK = 30;
+  await _fetchAndRenderDiary();
+}
+
+async function loadMoreDiary() {
+  _diaryTopK += 20;
+  await _fetchAndRenderDiary();
+}
+
+async function _fetchAndRenderDiary() {
   const container = document.getElementById('diaryCards');
-  container.innerHTML = '<div class="empty" style="padding:20px;text-align:center;">Searching...</div>';
+  const loadMoreBtn = document.getElementById('diaryLoadMore');
+  container.innerHTML = '<div class="empty" style="padding:20px;text-align:center;color:var(--text3);">Loading…</div>';
+  if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+
+  const query    = document.getElementById('diarySearch').value.trim();
+  const category = document.getElementById('diaryCat').value;
+  const eventType = document.getElementById('diaryEventType').value;
+  const minImp   = parseInt(document.getElementById('diaryImportance').value) / 100;
+  const pinnedOnly = document.getElementById('diaryPinnedOnly').checked;
+  const sortBy   = document.getElementById('diarySort').value;
 
   try {
-    let url = '/api/memories?top_k=30';
-    if (query) url += '&query=' + encodeURIComponent(query);
-    if (category) url += '&category=' + encodeURIComponent(category);
+    let records = [];
 
-    const data = await fetch(url).then(r => r.json());
-    let records = data.records || data.memories || data.results || [];
+    if (_diaryMode === 'recent' && !query && !category) {
+      const data = await fetch(`/api/memories/recent?top_k=${_diaryTopK}`).then(r => r.json());
+      records = data.records || [];
+    } else if (query) {
+      const data = await fetch(`/api/memories?query=${encodeURIComponent(query)}&top_k=${_diaryTopK}`).then(r => r.json());
+      records = Array.isArray(data) ? data : (data.records || data.memories || []);
+    } else if (category) {
+      const data = await fetch(`/api/memories?category=${encodeURIComponent(category)}&top_k=${_diaryTopK}`).then(r => r.json());
+      records = Array.isArray(data) ? data : (data.records || data.memories || []);
+    } else {
+      const data = await fetch(`/api/memories/recent?top_k=${_diaryTopK}`).then(r => r.json());
+      records = data.records || [];
+    }
+
     if (!Array.isArray(records)) records = [];
-    if (minImportance > 0) records = records.filter(r => (r.importance || 0) >= minImportance);
+
+    // Client-side filters
+    if (eventType)   records = records.filter(r => (r.event_type || '') === eventType);
+    if (minImp > 0)  records = records.filter(r => (r.importance || 0) >= minImp);
+    if (pinnedOnly)  records = records.filter(r => r.pinned);
+
+    // Sort
+    if (sortBy === 'importance') {
+      records.sort((a, b) => (b.importance || 0) - (a.importance || 0));
+    } else if (sortBy === 'accessed') {
+      records.sort((a, b) => (b.access_count || 0) - (a.access_count || 0));
+    } else if (sortBy === 'pinned') {
+      records.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+    } else {
+      records.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+    }
+
+    // Update counts
     document.getElementById('diaryShown').textContent = records.length;
+    const pinnedCount = records.filter(r => r.pinned).length;
+    document.getElementById('diaryPinned').textContent = pinnedCount;
 
     if (!records.length) {
-      container.innerHTML = '<div class="empty" style="padding:40px;text-align:center;">No memories match your search</div>';
+      container.innerHTML = '<div class="empty" style="padding:40px;text-align:center;color:var(--text3);">No memories match — try broadening your filters</div>';
       return;
     }
-    container.innerHTML = '';
-    records.forEach(r => {
-      const content = r.content || {};
-      const text = content.text || content.result || content.query || content.result_raw || JSON.stringify(content).substring(0, 300);
-      const cat = r.category || 'general';
-      const importance = r.importance != null ? Math.round(r.importance * 100) + '%' : '—';
-      const ts = r.timestamp ? new Date(r.timestamp).toLocaleString() : '—';
-      const access = r.access_count || 0;
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.style.cssText = 'padding:var(--sp-3);';
-      card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:var(--sp-2);">
-          <div>
-            <span style="background:var(--accent);color:#000;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">${DOMPurify.sanitize(cat)}</span>
-            <span style="font-size:11px;color:var(--text3);margin-left:8px;">Importance: ${importance}</span>
-            <span style="font-size:11px;color:var(--text3);margin-left:8px;">Accessed: ${access}x</span>
-          </div>
-          <span style="font-size:11px;color:var(--text3);">${DOMPurify.sanitize(ts)}</span>
-        </div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.5;word-break:break-word;">${DOMPurify.sanitize(text.substring(0, 500))}</div>
-      `;
-      container.appendChild(card);
-    });
+
+    _renderDiaryCards(records, container);
+
+    if (loadMoreBtn) {
+      loadMoreBtn.style.display = records.length >= _diaryTopK ? 'inline-block' : 'none';
+    }
   } catch (e) {
-    container.innerHTML = `<div class="empty" style="padding:40px;text-align:center;">Error: ${DOMPurify.sanitize(e.message)}</div>`;
+    container.innerHTML = `<div class="empty" style="padding:40px;text-align:center;color:var(--danger);">Error: ${DOMPurify.sanitize(e.message)}</div>`;
   }
+}
+
+function _diaryDateGroup(timestamp) {
+  if (!timestamp) return 'Unknown';
+  const d = new Date(timestamp);
+  if (isNaN(d)) return 'Unknown';
+  const now = new Date();
+  const diffMs = now - d;
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays <= 6) return 'This Week';
+  if (diffDays <= 30) return 'This Month';
+  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long' });
+}
+
+function _diaryMemoryText(content) {
+  if (!content || typeof content !== 'object') return String(content || '').substring(0, 600);
+  return (content.text || content.result || content.query || content.message ||
+    content.result_raw || content.observation || JSON.stringify(content)).substring(0, 600);
+}
+
+const _EMOTION_COLORS = {
+  happy: '#4caf50', excited: '#69f0ae', calm: '#42a5f5',
+  curious: '#ce93d8', sad: '#90a4ae', anxious: '#ef5350',
+  frustrated: '#ff7043', grateful: '#ffca28', neutral: '#888',
+};
+
+function _renderDiaryCards(records, container) {
+  container.innerHTML = '';
+  let lastGroup = null;
+
+  records.forEach((r, idx) => {
+    const group = _diaryDateGroup(r.timestamp);
+    if (group !== lastGroup) {
+      lastGroup = group;
+      const sep = document.createElement('div');
+      sep.style.cssText = 'font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:var(--sp-2) 0 var(--sp-1);border-bottom:1px solid var(--border);margin-top:var(--sp-2);';
+      sep.textContent = group;
+      container.appendChild(sep);
+    }
+
+    const content  = r.content || {};
+    const text     = _diaryMemoryText(content);
+    const cat      = r.category || 'general';
+    const etype    = r.event_type || '';
+    const imp      = r.importance != null ? r.importance : 0.5;
+    const ts       = r.timestamp ? new Date(r.timestamp).toLocaleString() : '—';
+    const access   = r.access_count || 0;
+    const pinned   = r.pinned || false;
+    const trust    = r.trust_tier || '';
+    const emotion  = content.emotion || content.emotional_state || '';
+    const source   = r.source_id || '';
+    const impPct   = Math.round(imp * 100);
+
+    const trustColor = { 'PASS': '#4caf50', 'REPAIR': '#ffb74d', 'FAIL_CLOSED': '#ef5350', 'unverified': '#666' }[trust] || '#666';
+    const emotionColor = _EMOTION_COLORS[(emotion || '').toLowerCase()] || '';
+
+    const cardId = `diary-card-${idx}`;
+    const textId = `diary-text-${idx}`;
+    const isLong = text.length > 280;
+    const preview = isLong ? text.substring(0, 280) + '…' : text;
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.cssText = `padding:var(--sp-3);border-left:3px solid ${pinned ? 'var(--accent)' : 'transparent'};`;
+    card.id = cardId;
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:var(--sp-2);gap:var(--sp-2);">
+        <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
+          ${pinned ? '<span title="Pinned" style="font-size:13px;">📌</span>' : ''}
+          <span style="background:var(--accent);color:#000;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;">${DOMPurify.sanitize(cat)}</span>
+          ${etype ? `<span style="background:var(--bg3,var(--bg2));color:var(--text3);padding:2px 7px;border-radius:4px;font-size:10px;border:1px solid var(--border);">${DOMPurify.sanitize(etype)}</span>` : ''}
+          ${emotion ? `<span style="background:${emotionColor}22;color:${emotionColor || 'var(--text3)'};padding:2px 7px;border-radius:4px;font-size:10px;border:1px solid ${emotionColor || 'var(--border)'};">${DOMPurify.sanitize(emotion)}</span>` : ''}
+          ${trust && trust !== 'unverified' ? `<span style="color:${trustColor};font-size:10px;font-weight:600;">${DOMPurify.sanitize(trust)}</span>` : ''}
+        </div>
+        <span style="font-size:11px;color:var(--text3);white-space:nowrap;">${DOMPurify.sanitize(ts)}</span>
+      </div>
+      <div id="${textId}" style="font-size:13px;color:var(--text2);line-height:1.55;word-break:break-word;">${DOMPurify.sanitize(preview)}</div>
+      ${isLong ? `<button onclick="_diaryExpand('${textId}',${JSON.stringify(DOMPurify.sanitize(text))},this)" style="margin-top:6px;font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;">▼ Expand</button>` : ''}
+      <div style="display:flex;gap:var(--sp-3);margin-top:var(--sp-2);align-items:center;">
+        <div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;" title="Importance: ${impPct}%">
+          <div style="width:${impPct}%;height:100%;background:${imp > 0.7 ? 'var(--accent)' : imp > 0.4 ? 'var(--warn)' : 'var(--border)'};"></div>
+        </div>
+        <span style="font-size:10px;color:var(--text3);">${impPct}% imp</span>
+        <span style="font-size:10px;color:var(--text3);">↺ ${access}</span>
+        ${source ? `<span style="font-size:10px;color:var(--text3);">from ${DOMPurify.sanitize(source.substring(0,20))}</span>` : ''}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function _diaryExpand(textId, fullText, btn) {
+  const el = document.getElementById(textId);
+  if (!el) return;
+  el.textContent = fullText;
+  btn.remove();
 }
 
 </script>

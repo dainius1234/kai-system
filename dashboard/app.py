@@ -647,6 +647,20 @@ async def api_memory_stats():
         return {"status": "unavailable"}
 
 
+@app.get("/api/memories/recent")
+async def api_memories_recent(top_k: int = 30):
+    """Browse recent memories for Diary tab (recency-weighted retrieve)."""
+    raw = await _proxy_get(
+        f"{MEMU_URL}/memory/retrieve",
+        params={"query": "memories thoughts observations experiences", "user_id": "keeper", "top_k": top_k},
+        fallback=[],
+    )
+    records = raw if isinstance(raw, list) else raw.get("records", raw.get("memories", []))
+    if not isinstance(records, list):
+        records = []
+    return {"records": records, "count": len(records)}
+
+
 @app.get("/api/finance/summary")
 async def api_finance_summary():
     """Proxy CIS/VAT/tax financial summary from the financial-awareness service (P29)."""

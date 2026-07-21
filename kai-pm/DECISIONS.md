@@ -946,3 +946,43 @@ Follow-up the same session, after the user asked to actually try rather than jus
 - The local D3 file means the dashboard functions offline without CDN access.
 
 **Consequences:** Canvas tab now delivers an interactive, physics-based mind map of Kai's goal and memory landscape; a real valence-over-time emotion chart sourced from the memory system; and a conviction-flow view of recent thinking episodes — all using D3 v7 SVG with zoom/drag interactivity.
+
+---
+
+## D62 — J5: Memory Viewer / Diary Tab
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** The Diary tab existed as a skeleton (HTML + two stub JS functions) but was not functional as a diary-style viewer. It had hard-coded construction categories, no default content on tab open, no date grouping, no expand/collapse, no emotion/pin/trust badges, and no load-more. The existing `/api/memories` endpoint returned stats when called with no query or category, making "browse recent" impossible from the frontend without a dedicated endpoint.
+
+**Decisions / Changes:**
+
+*dashboard/app.py — new endpoint:*
+- `/api/memories/recent` (GET, `top_k` param default 30): calls memu-core `/memory/retrieve` with the broad query `"memories thoughts observations experiences"` and `user_id="keeper"`. Wraps the raw list response in `{"records": [...], "count": N}` for consistent consumption. Falls back to `{"records": [], "count": 0}` if memu is unavailable.
+
+*dashboard/static/app.html — diary section rework:*
+- **Stats bar**: added "Pinned" count alongside Total/Event Types/Showing. "Categories" counter now shows count of distinct event_types from stats rather than construction categories.
+- **Filters**: retained search + category select (construction categories), added `#diaryEventType` select (populated dynamically from `/api/memory/stats` event_types on tab open), `#diarySort` select (Most Recent / Highest Importance / Most Accessed / Pinned First), `#diaryPinnedOnly` checkbox, importance range slider. Browse Recent button triggers a clean reset + reload.
+- **Load More**: `#diaryLoadMore` button hidden until a full page is returned; clicking increments `_diaryTopK` by 20 and re-fetches.
+
+*Rewritten JS functions:*
+- `loadDiaryStats()`: fetches stats, populates event-type select, auto-loads 30 recent memories on tab open.
+- `diaryBrowseRecent()`: resets all filters and shows 30 most recent.
+- `searchDiary()`: delegates to `_fetchAndRenderDiary()` in search mode.
+- `loadMoreDiary()`: increments `_diaryTopK += 20` and re-fetches.
+- `_fetchAndRenderDiary()`: selects endpoint (`/api/memories/recent` vs `/api/memories?query=…` vs `/api/memories?category=…`) based on current state; applies client-side filters (event type, min importance, pinned-only); sorts records; calls `_renderDiaryCards()`.
+- `_diaryDateGroup(timestamp)`: groups timestamps into Today / Yesterday / This Week / This Month / month-year label.
+- `_renderDiaryCards(records, container)`: renders date-group separators and cards. Each card shows: construction-domain category badge, event-type badge, emotion badge (with colour from `_EMOTION_COLORS` map), trust-tier label (coloured by tier: PASS green / REPAIR amber / FAIL_CLOSED red), pinned indicator (📌 + left accent border), importance progress bar, access count, source ID, expand/collapse button for memories > 280 chars. All user-facing strings are DOMPurify sanitised.
+- `_diaryExpand()`: replaces truncated preview with full text inline; removes the expand button.
+
+*scripts/test_j5_diary.py (new — 44 tests):*
+- Tests: `/api/memories/recent` endpoint, HTML structure, all new filter controls, JS function presence, date grouping labels, sort logic, pinned filter, importance bar, emotion badge, trust badge, expand/collapse, event-type select population, load-more increment, DOMPurify usage.
+
+**Key invariants preserved:**
+- All user-content rendered via `DOMPurify.sanitize()` — no XSS vectors.
+- Backend unavailability degrades gracefully (fallback empty records, error message in UI).
+- The existing `/api/memories` endpoint is unchanged — no regression for existing callers.
+- `_diaryTopK` state is reset to 30 on each fresh search or Browse Recent, then incremented only by Load More.
+
+**Consequences:** The Diary tab now opens with live recent memories on first visit, groups them by day, shows emotion/pin/trust metadata per entry, supports expand-in-place for long records, and can page through the memory store 20 entries at a time.
