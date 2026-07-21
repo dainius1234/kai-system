@@ -68,6 +68,10 @@
           <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span class="nav-label">Diary</span>
         </a>
+        <a class="nav-item" data-view="finance" onclick="switchView('finance')">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <span class="nav-label">Finance</span>
+        </a>
       </nav>
 
       <div class="sidebar-divider"></div>
@@ -797,6 +801,76 @@
           </div>
         </section>
 
+        <!-- ═══ Finance View (P29) ═══ -->
+        <section class="view" id="financeView">
+          <div style="max-width:1000px;margin:0 auto;padding:var(--sp-6);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-4);">
+              <h2 class="text-heading">CIS Finance</h2>
+              <button class="refresh-btn" onclick="refreshFinance()">↻ Refresh</button>
+            </div>
+
+            <!-- Summary stat cards -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--sp-3);margin-bottom:var(--sp-4);">
+              <div class="stat-card">
+                <div class="stat-label">Gross YTD</div>
+                <div class="stat-value accent" id="finGross">—</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">CIS Deductions</div>
+                <div class="stat-value" id="finDeductions" style="color:var(--warn);">—</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Net Received</div>
+                <div class="stat-value" id="finNet">—</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Tax Estimate</div>
+                <div class="stat-value" id="finTax" style="color:var(--danger);">—</div>
+              </div>
+            </div>
+
+            <!-- VAT position -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">🧾</span> VAT Position</div>
+              <div id="finVatContent"><div class="skeleton" style="height:60px"></div></div>
+            </div>
+
+            <!-- Tax breakdown -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">📊</span> Tax Breakdown</div>
+              <div id="finTaxContent"><div class="skeleton" style="height:80px"></div></div>
+            </div>
+
+            <!-- Log CIS payment -->
+            <div class="card" style="margin-bottom:var(--sp-4);border-left:3px solid var(--accent);">
+              <div class="card-title"><span class="icon">➕</span> Log CIS Payment</div>
+              <div style="display:grid;gap:var(--sp-3);margin-top:var(--sp-2);">
+                <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;">
+                  <input type="number" id="cisGross" placeholder="Gross amount (£)" class="input-field" style="flex:1;min-width:140px;" step="0.01" min="0">
+                  <input type="number" id="cisMaterials" placeholder="Materials (£, if any)" class="input-field" style="flex:1;min-width:140px;" step="0.01" min="0" value="0">
+                  <select id="cisStatus" class="input-field" style="min-width:160px;">
+                    <option value="registered">Registered (20%)</option>
+                    <option value="unregistered">Unregistered (30%)</option>
+                    <option value="gross">Gross (0%)</option>
+                  </select>
+                  <input type="text" id="cisContractor" placeholder="Contractor name" class="input-field" style="flex:2;min-width:180px;">
+                </div>
+                <div style="display:flex;gap:var(--sp-2);">
+                  <input type="text" id=cisRef placeholder="Reference / invoice no." class="input-field" style="flex:1;">
+                  <button class="refresh-btn" onclick="logCisPayment()">Record Payment</button>
+                </div>
+              </div>
+              <div id="cisRecordResult" style="margin-top:var(--sp-2);font-size:13px;"></div>
+            </div>
+
+            <!-- Recent CIS records -->
+            <div class="card">
+              <div class="card-title"><span class="icon">📋</span> Recent CIS Records</div>
+              <div id="finRecordsContent"><div class="empty">No records yet</div></div>
+            </div>
+          </div>
+        </section>
+
       </div><!-- .content -->
     </main>
   </div><!-- .app -->
@@ -931,7 +1005,7 @@ function switchView(name) {
   const navEl = document.querySelector(`.nav-item[data-view="${name}"]`);
   if (navEl) navEl.classList.add('active');
 
-  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard', canvas: 'Live Canvas', diary: 'Memory Diary' };
+  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard', canvas: 'Live Canvas', diary: 'Memory Diary', finance: 'CIS Finance' };
   document.getElementById('viewTitle').textContent = titles[name] || name;
 
   currentView = name;
@@ -966,6 +1040,107 @@ function switchView(name) {
   }
   if (name === 'diary') {
     loadDiaryStats();
+  }
+  if (name === 'finance') {
+    refreshFinance();
+  }
+}
+
+
+// ── Finance View ───────────────────────────────────────────────────
+
+function fmt_gbp(v) {
+  if (v == null) return '—';
+  return '£' + Number(v).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+async function refreshFinance() {
+  try {
+    const data = await fetch('/api/finance/summary').then(r => r.json());
+    const cis = data.cis_summary || {};
+    const vat = data.vat_position || {};
+    const tax = data.tax_estimate || {};
+    const invoices = data.invoices || [];
+
+    document.getElementById('finGross').textContent = fmt_gbp(cis.gross_ytd);
+    document.getElementById('finDeductions').textContent = fmt_gbp(cis.deductions_ytd);
+    document.getElementById('finNet').textContent = fmt_gbp(cis.net_ytd);
+    document.getElementById('finTax').textContent = fmt_gbp(tax.estimated_liability);
+
+    const vatEl = document.getElementById('finVatContent');
+    if (data.status === 'unavailable') {
+      vatEl.innerHTML = '<div class="empty">Finance service unavailable</div>';
+    } else {
+      vatEl.innerHTML = `<table style="width:100%;font-size:13px;border-collapse:collapse;">
+        <tr><td style="padding:4px 8px;color:var(--text3)">Output tax</td><td style="padding:4px 8px;">${fmt_gbp(vat.output_tax)}</td>
+            <td style="padding:4px 8px;color:var(--text3)">Input tax</td><td style="padding:4px 8px;">${fmt_gbp(vat.input_tax)}</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--text3)">Net VAT due</td><td style="padding:4px 8px;font-weight:600;">${fmt_gbp(vat.net_due)}</td>
+            <td style="padding:4px 8px;color:var(--text3)">Period</td><td style="padding:4px 8px;">${vat.period || '—'}</td></tr>
+      </table>`;
+    }
+
+    const taxEl = document.getElementById('finTaxContent');
+    if (data.status === 'unavailable') {
+      taxEl.innerHTML = '<div class="empty">Finance service unavailable</div>';
+    } else {
+      taxEl.innerHTML = `<table style="width:100%;font-size:13px;border-collapse:collapse;">
+        <tr><td style="padding:4px 8px;color:var(--text3)">Taxable income</td><td style="padding:4px 8px;">${fmt_gbp(tax.taxable_income)}</td>
+            <td style="padding:4px 8px;color:var(--text3)">CIS deducted</td><td style="padding:4px 8px;">${fmt_gbp(tax.cis_deducted)}</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--text3)">NI estimate</td><td style="padding:4px 8px;">${fmt_gbp(tax.ni_estimate)}</td>
+            <td style="padding:4px 8px;color:var(--text3)">Net liability</td><td style="padding:4px 8px;font-weight:600;">${fmt_gbp(tax.estimated_liability)}</td></tr>
+      </table>`;
+    }
+
+    const recEl = document.getElementById('finRecordsContent');
+    if (!invoices.length) {
+      recEl.innerHTML = '<div class="empty">No records yet</div>';
+    } else {
+      recEl.innerHTML = '<table style="width:100%;font-size:13px;border-collapse:collapse;">' +
+        '<tr style="color:var(--text3)"><th style="text-align:left;padding:4px 8px;">Date</th><th style="text-align:left;padding:4px 8px;">Contractor</th><th style="text-align:right;padding:4px 8px;">Gross</th><th style="text-align:right;padding:4px 8px;">Deduction</th><th style="text-align:left;padding:4px 8px;">Ref</th></tr>' +
+        invoices.slice(0, 20).map(r =>
+          `<tr><td style="padding:4px 8px;">${r.date || ''}</td><td style="padding:4px 8px;">${r.contractor || ''}</td><td style="text-align:right;padding:4px 8px;">${fmt_gbp(r.gross)}</td><td style="text-align:right;padding:4px 8px;color:var(--warn);">${fmt_gbp(r.deduction)}</td><td style="padding:4px 8px;">${r.reference || ''}</td></tr>`
+        ).join('') + '</table>';
+    }
+  } catch (e) {
+    document.getElementById('finVatContent').innerHTML = '<div class="empty">Error loading finance data</div>';
+  }
+}
+
+async function logCisPayment() {
+  const gross = parseFloat(document.getElementById('cisGross').value);
+  if (!gross || gross <= 0) {
+    document.getElementById('cisRecordResult').textContent = 'Enter a valid gross amount.';
+    return;
+  }
+  const body = {
+    gross,
+    materials: parseFloat(document.getElementById('cisMaterials').value) || 0,
+    status: document.getElementById('cisStatus').value,
+    contractor: document.getElementById('cisContractor').value.trim(),
+    reference: document.getElementById('cisRef').value.trim()
+  };
+  const resEl = document.getElementById('cisRecordResult');
+  resEl.textContent = 'Recording…';
+  try {
+    const r = await fetch('/api/finance/cis/record', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(r => r.json());
+    if (r.status === 'ok' || r.id) {
+      resEl.style.color = 'var(--success)';
+      resEl.textContent = '✓ Recorded. Refreshing…';
+      ['cisGross', 'cisMaterials', 'cisContractor', 'cisRef'].forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('cisStatus').value = 'registered';
+      await refreshFinance();
+      resEl.textContent = '✓ Recorded successfully.';
+    } else {
+      resEl.style.color = 'var(--danger)';
+      resEl.textContent = 'Error: ' + (r.error || r.status || 'unknown');
+    }
+  } catch (e) {
+    resEl.style.color = 'var(--danger)';
+    resEl.textContent = 'Request failed: ' + e.message;
   }
 }
 
