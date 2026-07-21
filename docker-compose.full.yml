@@ -91,7 +91,7 @@ services:
       PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
       TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
       MEMU_GRAPH_URL: http://memu-graph:8061
-      FF_GRAPH_INGEST: "${FF_GRAPH_INGEST:-false}"
+      FF_GRAPH_INGEST: "${FF_GRAPH_INGEST:-true}"
     volumes:
       - turbovec_data:/data/turbovec
     ports:
@@ -109,6 +109,7 @@ services:
       - redis
       - tool-gate
       - postgres
+      - memu-graph
 
   memu-core-introspect:
     build:

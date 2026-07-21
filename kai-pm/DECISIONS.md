@@ -748,3 +748,17 @@ Follow-up the same session, after the user asked to actually try rather than jus
 **Deliberately not changed:** `docker-compose.minimal.yml` (Letta is a full-stack enhancement, not part of the minimal spine). `docker-compose.sovereign.yml` (sovereign stays on known stack until GPU validation). `agentic/` conviction loop (Letta is additive context, not a replacement).
 
 **Consequences:** With `FF_LETTA_TASKS=false` (default), there is zero runtime impact — `_get_letta_context()` returns `{}` immediately. When set to `true`, each `/chat` request fires a 30s-timeout POST to `letta-agent`; the result is injected as a system message before the conviction loop runs. Memory sync is a separate opt-in (`FF_LETTA_MEMORY_SYNC`). First live validation requires a running Ollama with `qwen2.5:0.5b` available.
+
+## D56 — 2026-07-21 — FF_GRAPH_INGEST flipped to true: memu-core → memu-graph fan-out now active by default
+
+**Context:** memu-graph (Cognee/Kuzu) was CI-verified across D41–D53 (PR #79) and merged to `main`. The write-side fan-out from `memu-core` to `memu-graph` was already fully implemented in `memu-core/app.py` (`_graph_ingest_fire_and_forget`, `_graph_forget_fire_and_forget`) and correctly gated behind `FF_GRAPH_INGEST`. However the compose default was still `false` — meaning the knowledge graph was never receiving live writes even though the full stack was running.
+
+**Decision:** Flip `FF_GRAPH_INGEST` default from `false` to `true` in `docker-compose.full.yml`. The fan-out is already best-effort (all errors swallowed with a `logger.warning`, never propagating to the synchronous `/memory/memorize` path), so there is zero risk of memu-core degradation if memu-graph is slow or unavailable. Also added `memu-graph` to memu-core's `depends_on` so the full stack starts in the right order. Documented `FF_GRAPH_INGEST=true` in `.env.example` with an inline comment.
+
+**What changed:**
+- `docker-compose.full.yml` — `FF_GRAPH_INGEST: "${FF_GRAPH_INGEST:-false}"` → `"${FF_GRAPH_INGEST:-true}"`. `memu-graph` added to memu-core `depends_on`.
+- `.env.example` — new `FF_GRAPH_INGEST=true` entry with comment.
+
+**Deliberately not changed:** `common/feature_flags.py` code-level default stays `False` — unit tests run outside Docker and don't have a memu-graph available, so keeping the code default off is correct. The compose override is the sole activation lever for the full stack.
+
+**Consequences:** On the next `docker compose -f docker-compose.full.yml up`, every `POST /memory/memorize` and triggered MARS forget will fan-out to `memu-graph /graph/ingest` and `/graph/forget` respectively, building the Cognee/Kuzu knowledge graph from live memory writes. The graph will start accumulating entity relationships immediately. `minimal.yml` and `sovereign.yml` are unaffected (no FF_GRAPH_INGEST entry there).
