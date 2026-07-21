@@ -55,7 +55,7 @@ GPU integration status: **Phase 0 complete** — see [`docs/gpu_integration_phas
 
 ## Project Management
 
-Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md) as the entry point for fast session re-hydration, current roadmap state, and decision/risk tracking.
+Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md) as the entry point for fast session re-hydration, current roadmap state, and decision/risk tracking. All known stubs, placeholder credentials, UI shells, and deferred features are catalogued in [`kai-pm/STUBS_AND_PLACEHOLDERS.md`](kai-pm/STUBS_AND_PLACEHOLDERS.md).
 
 ---
 
@@ -133,10 +133,10 @@ Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTR
 | **Context Budget** | ~~Hardcoded 3072 tokens wastes 90% of larger models~~ **Fixed**: auto-adapts from model registry. qwen2:0.5b→3072, qwen2.5:7b→28672, kimi→122K | Already done — model-aware |
 | **Prompt Templates** | ~~Hardcoded strings~~ **Fixed**: model-aware templates. Tier 1 (tiny): minimal. Tier 2 (7B): reasoning guidelines. Tier 3 (70B): JSON hints + deep persona | Already done — scales automatically |
 | **Test Style** | 1,656 tests verify structural correctness + 37 chassis tests + 15 behavioral tests. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
-| **Dashboard** | Chat, Health, Mode toggle, Canvas are functional. Other views (Thinking, Goals, Memory, Soul, Diary, Logs) are **proxy shells** — they work when backends are running but show "unavailable" in minimal stack | Views become live with `make full-up` |
+| **Dashboard** | Chat, Health, Memory, Soul editor, Diary, Canvas (D3) are functional. Thinking, Goals, Logs are **proxy shells** — they work when backends are running but show "unavailable" in minimal stack | Views become live with `make full-up` |
 | **Memory Persistence** | Default is now TurboVec ANN index (persisted `.tv` file + Postgres metadata — no pgvector extension required). Sovereign stack stays on `pgvector`. Full graph memory (`memu-graph`) is feature-flagged off by default (`FF_GRAPH_INGEST=false`) | Set `VECTOR_STORE`, `TURBOVEC_INDEX_PATH` in `.env`; see `.env.example` |
 | **Security Defaults** | HMAC enforced, but DB password is `localdev` by default. Nonce replay persisted to file. Dev HMAC secret now blocked unless explicitly allowed | Set `DB_PASSWORD`, `INTERSERVICE_HMAC_SECRET` env vars for production |
-| **Coverage** | 78% on `common/` (1,616 tests, measured 2026-06-01). Dashboard proxy endpoints and memu-core complex paths have gaps | `.coveragerc` configured; `make coverage` tracks it |
+| **Coverage** | 78% on `common/` (1,616 tests, measured 2026-06-01). Dashboard proxy endpoints and memu-core complex paths have gaps | CI gate enforced at 65% via `--cov-fail-under=65`; `make coverage` enforces the same threshold locally |
 
 ---
 
@@ -267,9 +267,9 @@ voice, avatar, integrations, and ops tooling.
 | **Goals** | `Ctrl+5` | Ohana goals, drift alerts, progress bars, reminders, scheduled tasks |
 | **Memory** | `Ctrl+6` | Memory browser — search by query or category, scores, stats |
 | **Logs** | `Ctrl+7` | Ring-buffer log viewer — level/time filter, monospace, color-coded |
-| **Soul** | `Ctrl+8` | Mood cards, emotion timeline, domain confidence, self-reflection journal, milestones |
-| **Canvas** | — (nav only) | Live mind-map / emotion-timeline / plan-flow visualization |
-| **Diary** | — (nav only) | Memory diary — search by query, category, importance threshold |
+| **Soul** | `Ctrl+8` | Mood cards, emotion timeline, domain confidence, self-reflection journal, milestones; SOUL.md + AGENTS.md live editor |
+| **Canvas** | — | D3 v7 SVG: force-simulation mind-map (drag+zoom), emotion timeline area chart, plan-flow with arrows |
+| **Diary** | — | Memory diary — browse recent, date groups, rich cards with emotion/pin/trust badges, load more |
 
 | Shortcut | Action |
 |----------|--------|
@@ -632,7 +632,7 @@ make test-docker-e2e
 - [ ] Imagination/counterfactual — endpoints exist, reasoning quality depends on model
 - [ ] Multi-model consensus — architecture ready, all 3 specialists currently route to same model
 - [ ] SAGE critique — self-review logic works, quality depends on model's introspection ability
-- [ ] Dashboard Thinking/Soul/Canvas views — proxy shells, need full stack running
+- [ ] Dashboard Thinking/Goals/Logs views — proxy shells, need full stack running (Soul editor, Diary, Canvas now functional)
 - [ ] Real STT (faster-whisper) / TTS (edge-tts) — code ready, need audio hardware
 
 ---
