@@ -22,8 +22,8 @@
 ## Week 1 — Stop the Bleeding
 
 ### 1.1 / 1.2 / 1.5 / 1.6 — PR housekeeping + delete orphan tempo tests
-- [~] Coding agent dispatched 2026-06-01.
-- Single PR will: close #59, close #60, label other open PRs, delete `scripts/test_tempo.py`, remove `test-tempo` Makefile target.
+- [x] `scripts/test_tempo.py` deleted (D70, 2026-07-21).
+- [x] `test-tempo` Makefile target deleted and removed from `.PHONY` and `test-core` deps (D70, 2026-07-21).
 
 ### 1.3 Fix correction-memory ranking test
 - [ ] Investigate `scripts/test_p3_organic_memory.py::test_correction_memory_gets_boost` after 1.2 lands.
@@ -55,7 +55,8 @@
 
 ### 2.3 Prune Makefile 100 → ~25 targets
 - [x] Audit landed → [`MAKEFILE_AUDIT.md`](MAKEFILE_AUDIT.md) (2026-06-02).
-- [ ] Archive dead targets to `Makefile.archive` per audit.
+- [x] 10 DELETE targets removed; `Makefile.archive` created with preserved definitions (D70, 2026-07-21).
+- [ ] Slim `test-core` deps to KEEP-only list (blocked: needs honest merge-gate recomposition first).
 - [ ] Update `merge-gate` to run the full live list per audit's "honest merge-gate" proposal.
 
 ---

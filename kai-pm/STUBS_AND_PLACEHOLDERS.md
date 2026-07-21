@@ -1,6 +1,6 @@
 # Stubs, Placeholders & Shells
 
-**Last updated:** 2026-07-21
+**Last updated:** 2026-07-21 (post-D70)
 **Purpose:** Single reference for every known stub, placeholder, shell UI, hardcoded value, or graceful-degradation path that must eventually be replaced with a real implementation. Things in this file are NOT bugs — they are intentional, tracked deferrals.
 
 ---
@@ -34,7 +34,6 @@
 | S6 | `orchestrator/app.py` | entire file | Docstring: _"DEPRECATED. Exists only as a placeholder for a potential future 'final risk authority' layer."_ Exposes only `/health`, does nothing. Runs on port 8050. | Either implement the risk-authority gating layer or remove from compose files |
 | S7 | `sandboxes/shell/app.py` | 27 | `POST /run` always returns `{"status": "blocked", "message": "sandbox execution disabled in stub"}`. No shell command is ever executed. | Implement subprocess sandbox with timeout, resource limits, and command allowlist |
 | S8 | `kai-advisor/app.py` | 53 | When no knowledge chunk matches the query, advisor replies `"I heard: '{q}', but I'm just a simple KAI advisor stub."` — substring matching over markdown docs with no LLM inference. | Wire LLM-backed RAG using `MODEL` env var |
-| S9 | `scripts/auto_rotate_ed25519.py` | 16–20 | `_new_keypair()` generates `secrets.token_bytes(32)` for both private and public halves. Comment: _"lightweight offline placeholder key material (ed25519-ready envelope)"_. This is NOT a real ed25519 keypair — the public key is not derived from the private key. | Use `cryptography` library: `ed25519.Ed25519PrivateKey.generate()` |
 
 ---
 
@@ -72,10 +71,6 @@ These are distinct from placeholder defaults — the env var substitution is **m
 
 | # | File | Line(s) | What's hardcoded | Problem | Fix |
 |---|------|---------|-----------------|---------|-----|
-| H1 | `docker-compose.full.yml` | 91, 122, 712 | `PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign` — literal `localdev` in three services (`memu-core`, `memu-core-introspect`, `backup-service`) | Setting `DB_PASSWORD` in `.env` has NO effect on these lines | Change to `"postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"` |
-| H2 | `docker-compose.sovereign.yml` | 132 | `GF_SECURITY_ADMIN_USER: admin` — Grafana admin username hardcoded | Can't override without editing the file | Change to `${GRAFANA_ADMIN_USER:-admin}` |
-| H3 | `Makefile` | 409 | `init-memu-db` fallback: `PG_URI=$${PG_URI:-postgresql://keeper:localdev@…}` — literal `localdev` | Operators who don't export `PG_URI` silently use this | Reference `${DB_PASSWORD:-localdev}` in the URI instead |
-| H4 | `scripts/agentic_integration_test.py` | 93 | `os.environ.setdefault("OPENAI_API_KEY", "sk-test-placeholder-not-real")` | If any code path uses this key for a real API call it fails auth | Either skip-guard with a real key check, or set `""` explicitly |
 
 ---
 
