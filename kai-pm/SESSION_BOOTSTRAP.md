@@ -2,94 +2,96 @@
 
 **Read this first. In 60 seconds you will know everything.**
 
-> 📌 **If you are a new chat / new agent / future-Dainius reading this:**
-> The single source of truth for "what's actually true right now" is
-> [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md) — read it before
-> trusting anything else in this directory, including the rest of this file.
-> Then check open PRs. You will be productive in under 2 minutes.
+---
+
+## 1) Project one-liner
+
+Kai is a self-sovereign, local-first personal AI system — cooperating Docker services
+with tiered memory (vector + graph), a conviction/trust loop, and full process-level
+failure isolation between hot and cold paths.
 
 ---
 
-## 1) Project one-liner (what is Kai)
-Kai is a self-sovereign, local-first personal AI system built as cooperating services, designed to grow memory, reasoning, and operational reliability without external platform lock-in.
+## 2) Current phase + current focus (21 July 2026)
 
-## 2) Current phase + current focus
-- **Current phase:** Phase 0 — Pre-GPU Hardening.
-- **Active branch with real, tested work:** `claude/project-rework-plan-pgvp35` —
-  carries the trust-loop unification (conviction/gate/PUB mode), the minimal-stack
-  fix (it now actually has `agentic`+`ollama`), and the `agentic` hot/cold split
-  (Phase A: hot-path fix; Phase B: `agentic-introspect` service). **None of this is
-  merged to `main` yet.**
-- **The 2026-06-02 "Cleanup Sprint Week 1/2" plan referenced below did not execute
-  as written.** The planned routes/state/flows/providers/prompts split of
-  `agentic/app.py` stalled in two open draft PRs (#67, #69) that never merged.
-  A different, better approach (process-level failure-domain split, not a file
-  reorg) shipped instead, on the branch above. See
-  [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md) for the full
-  three-way divergence and the merge-order decision this creates.
+**Phase: Memory Architecture** — the core spine is live and battle-tested; the
+focus is now deepening the memory layer (graph memory CI-verified, TurboVec
+activated, Letta integration next) before the GPU hardware arrives.
 
-## 3) Sprint state — superseded, see reality check
+### What has shipped to `main` (merged PRs, in order)
 
-Everything below this line in the old "Sprint state (refreshed 2026-06-02)"
-section was aspirational and never landed on `main`. Treat it as historical
-record of intent, not current state:
+| PR | What | Key decisions |
+|----|------|--------------|
+| #77 | Phase 0.5: minimal-stack real spine (ollama+agentic wired in); live Docker boot-test confirmed in CI | D37 |
+| #78 | Default model `qwen2:0.5b` → `qwen2.5:0.5b`; memu-core Postgres extension race fixed | D38, D39 |
 
-- Week 1 housekeeping, keystone rename: actually merged, still true.
-- Week 2.1/2.2 prep docs (`AGENTIC_APP_MAP.md`, `COMPOSE_DRIFT.md`): **never
-  landed** — files do not exist in the repo today.
-- Week 2.1 first split (`prompts/`): attempted in PR #67, then exceeded by PR #69's
-  branch (which already has `routes_identity.py`, `routes_observability.py`,
-  `routes_ops.py`, `routes_skills.py`). Both PRs are still open drafts, untouched
-  since 2026-06-02.
+### What is in flight (open branches/PRs)
 
-**Where to check:** https://github.com/dainius1234/kai-system/pulls
+| Branch | PR | What | Status |
+|--------|----|------|--------|
+| `claude/graph-live-verify` | #79 | memu-graph (Cognee/Kuzu) live CI verification — real container boot, full ingest→query→forget cycle | CI running (D52 fix in flight: `COGNEE_SKIP_CONNECTION_TEST=true`) |
+| `claude/project-rework-plan-pgvp35` | (no PR yet) | TurboVec activated as default VECTOR_STORE; README refresh; D40 | Pushed, awaiting PR |
 
-## 4) What to actually do next (supersedes the old "4-week cleanup roadmap")
+---
 
-1. **Decide the merge order** for `claude/project-rework-plan-pgvp35` vs PR #67/#69
-   — they restructure `agentic/app.py` in incompatible ways. Recommended: land this
-   branch first (it's tested, documents its own tradeoffs, and closes real bugs),
-   then decide whether #67/#69 still add value against the new structure or should
-   be closed.
-2. **Live-verify** what's only been config/unit-tested so far: boot
-   `docker-compose.minimal.yml` and confirm `agentic-introspect` can die without
-   taking `/chat`/`/run` down — no Docker daemon was available in the sessions that
-   built this, so it's unverified end-to-end.
-3. **Next monolith candidate**: `memu-core` (~6,100 lines), once the above lands —
-   audit it for the same hot/cold coupling `agentic` had, don't assume it's clean.
+## 3) Next priorities (in order)
 
-## 5) Blocked items + unlock conditions
-- **GPU-dependent phases** — blocked until RTX 5080 is procured, provisioned, validated.
-- **PR #54** (chassis polish C2/C5/C9, open since 2026-04-25) — stale, needs a
-  land-or-close decision, independent of the agentic-split decision above (it
-  doesn't touch `agentic/app.py`).
-- (PR #46, GPU Phase 0 consolidation, is **already merged** to `main` — corrected
-  2026-06-18, was wrongly listed here as open in an earlier pass.)
+1. **Merge PR #79** once CI goes green — read the actual job log (`mcp__github__get_job_logs`), confirm ingest/query/forget cycle passes, then merge.
+2. **Merge `claude/project-rework-plan-pgvp35`** — TurboVec + README. Open a PR after #79 is closed to avoid compose-file conflicts.
+3. **Letta integration** — see `kai-pm/LETTA_INTEGRATION_PLAN.md` for the full scoped plan. First concrete step: confirm `qwen2.5:0.5b` has `"tools"` in its Ollama chat template on a live instance (`ollama show qwen2.5:0.5b --template | grep -i tools`).
+4. **GPU hardware arrival** — when the RTX 5080 lands: `OLLAMA_MODEL=qwen2.5:7b`, wire STT/TTS/avatar, enable `FF_GRAPH_INGEST=true` in production, run multi-model consensus.
 
-## 6) PM operating rules (commitments)
-- **Document everything in the repo.** Chat sessions are ephemeral; the repo is forever.
-- **Reality checks are append-by-new-file, not edit-in-place** — write a new
-  `REALITY_CHECK_<date>.md` when state has drifted, don't silently rewrite history.
-- No drift between docs, status, and delivered code — if you find drift (like this
-  one), fix the PM docs in the same session you found it, not "later."
-- Decision log (`DECISIONS.md`) is append-only; supersede with new entries.
+---
+
+## 4) Blocked items + unlock conditions
+
+| Blocked | Unlock |
+|---------|--------|
+| Letta live smoke-test | Live Ollama instance (not reachable in this sandbox) |
+| GPU-dependent phases (real STT, multi-model consensus, full Cognee graph quality) | RTX 5080 procurement + provisioning |
+| memu-core P17-P22 personality engine split | Backing-store rework first (currently 5-min Redis lag in-process) |
+
+---
+
+## 5) Key architecture facts (don't re-derive these)
+
+- **VECTOR_STORE env var** in `memu-core`: `turbovec` (default dev/CI) → TurboVec ANN index; `postgres` → pgvector extension; anything else → ephemeral InMemoryVectorStore. Sovereign uses `postgres`.
+- **`FF_GRAPH_INGEST`**: memu-core's write-side fan-out to memu-graph. Default `false`. Safe to flip to `true` when memu-graph is healthy.
+- **Process boundaries already in place**: `agentic` (hot chat/run) vs `agentic-introspect` (dream/evolve/security-audit); `memu-core` (hot memorize/retrieve) vs `memu-core-introspect` (compress/decay/quarantine etc.).
+- **HMAC**: inter-service signing enforced. Dev secret (`HMAC_ALLOW_DEV_SECRET=true`) is explicit opt-in only.
+- **Model registry** (`common/model_registry.py`): `qwen2.5:0.5b` entry present (context 32768, supports_json True). Active default: `qwen2.5:0.5b`.
+- **memu-graph** runs on port 8061. Cognee version: `1.1.3`. Embedding model: `all-minilm` (384-dim, separate from the chat model).
+
+---
+
+## 6) PM operating rules
+
+- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with a new numbered entry. Last entry: **D52**.
+- Reality checks → new file `REALITY_CHECK_<date>.md`, not silent rewrites.
+- No drift between docs, status, and delivered code.
+- `make sync-docs` after major changes; `make merge-gate` before every PR.
+
+---
 
 ## 7) How to resume after a context loss
+
 1. Open this file.
-2. Open [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md) — the actual
-   current state, verified against branches/PRs, not assumed.
-3. Open https://github.com/dainius1234/kai-system/pulls — see what's in flight.
-4. Say to your assistant: *"Resume brother — read SESSION_BOOTSTRAP and the latest
-   reality check and tell me the next move."*
+2. Check open PRs: `https://github.com/dainius1234/kai-system/pulls`
+3. Read tail of `kai-pm/DECISIONS.md` for the last 3–5 entries.
+4. Say: *"Resume — read SESSION_BOOTSTRAP and tell me the next move."*
+
+---
 
 ## 8) Pointer index
-- Latest reality check: [REALITY_CHECK_2026-06-18.md](REALITY_CHECK_2026-06-18.md) ← **most important file right now**
-- Previous reality check (historical): [REALITY_CHECK_2026-05-10.md](REALITY_CHECK_2026-05-10.md)
-- Status dashboard: [STATUS.md](STATUS.md)
-- Live cleanup tracker (historical, superseded — see §3 above): [CLEANUP_TODO.md](CLEANUP_TODO.md)
-- Phase sequence: [SEQUENCE.md](SEQUENCE.md)
-- Append-only decisions: [DECISIONS.md](DECISIONS.md)
-- Canonical roadmap: [STRATEGIC_PLAN.md](STRATEGIC_PLAN.md)
-- External tool evaluations: [TECH_WATCH.md](TECH_WATCH.md)
-- External tool integration plan (phased, with diagrams): [SHOPPING_LIST_PLAN.md](SHOPPING_LIST_PLAN.md)
-- Session backlog (running log): [../SESSION_BACKLOG.md](../SESSION_BACKLOG.md)
+
+| File | What |
+|------|------|
+| `kai-pm/DECISIONS.md` | Append-only decision log (D1–D52) |
+| `kai-pm/LETTA_INTEGRATION_PLAN.md` | Letta scoped integration plan (next priority) |
+| `kai-pm/STRATEGIC_PLAN.md` | Canonical 5-phase roadmap |
+| `kai-pm/TECH_WATCH.md` | External tool evaluations (Letta, TurboVec, Cognee, etc.) |
+| `kai-pm/SHOPPING_LIST_PLAN.md` | Tool-to-phase mapping with architecture diagrams |
+| `kai-pm/SEQUENCE.md` | Phase sequencing |
+| `docs/PROJECT_BACKLOG.md` | Living backlog |
+| `docs/known_issues.md` | Gotchas, environment quirks |
+| `CHANGELOG.md` | Full semver changelog |

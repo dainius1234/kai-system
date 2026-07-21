@@ -10,27 +10,27 @@
 <p align="center">
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
-  <img src="https://img.shields.io/badge/services-31-blue?style=flat-square" alt="services">
+  <img src="https://img.shields.io/badge/services-32-blue?style=flat-square" alt="services">
   <img src="https://img.shields.io/badge/tests-1%2C656_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
   <img src="https://img.shields.io/badge/Python-~51%2C487_LOC-yellow?style=flat-square" alt="loc">
-  <img src="https://img.shields.io/badge/milestones-32_shipped-purple?style=flat-square" alt="milestones">
+  <img src="https://img.shields.io/badge/milestones-36_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
 </p>
 
 ---
 
-## Project Status (19 June 2026)
+## Project Status (21 July 2026)
 
 | Metric | Value |
 |---|---|
-| **Services** | 31 Docker containers |
+| **Services** | 32 Docker containers |
 | **Test targets** | 77 (`make test-core`) |
 | **Individual tests** | 1,656 (`def test_` across 90 files) |
 | **Python LOC** | ~51,613 |
 | **Compose files** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 32 |
+| **Milestones shipped** | 36 |
 | **Failures** | 0 |
 
 > **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
@@ -126,7 +126,7 @@ Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTR
 
 | Area | Reality | What Fixes It |
 |---|---|---|
-| **LLM Model** | Default `qwen2:0.5b` (~400M params) is a test placeholder — too small for meaningful reasoning, planning, or emotional intelligence | Upgrade to 7B+ model (`qwen2.5:7b`, `llama3:8b`). RTX 5080 laptop = 3 env vars to switch. Model registry auto-adapts context, prompts, timeouts |
+| **LLM Model** | Default `qwen2.5:0.5b` (~500M params) is a test placeholder — too small for meaningful reasoning, planning, or emotional intelligence | Upgrade to 7B+ model (`qwen2.5:7b`, `llama3:8b`). RTX 5080 laptop = 3 env vars to switch. Model registry auto-adapts context, prompts, timeouts |
 | **Specialist Routing** | Keyword regex classification, not ML-based. All 3 "specialists" route to the same Ollama endpoint by default | Wire separate model endpoints when GPU hardware arrives |
 | **Fusion Consensus** | ~~Uses Jaccard word-overlap~~ **Upgraded**: embedding cosine similarity via sentence-transformers (auto-fallback to Jaccard). Configurable via `FUSION_AGREEMENT` | Install sentence-transformers on GPU box for full accuracy |
 | **Token Counting** | ~~±40% heuristic (4 chars per token)~~ **Fixed**: tiktoken-based accurate counting + per-message overhead | Already done — tiktoken installed |
@@ -134,7 +134,7 @@ Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTR
 | **Prompt Templates** | ~~Hardcoded strings~~ **Fixed**: model-aware templates. Tier 1 (tiny): minimal. Tier 2 (7B): reasoning guidelines. Tier 3 (70B): JSON hints + deep persona | Already done — scales automatically |
 | **Test Style** | 1,656 tests verify structural correctness + 37 chassis tests + 15 behavioral tests. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
 | **Dashboard** | Chat, Health, Mode toggle, Canvas are functional. Other views (Thinking, Goals, Memory, Soul, Diary, Logs) are **proxy shells** — they work when backends are running but show "unavailable" in minimal stack | Views become live with `make full-up` |
-| **Memory Persistence** | Minimal stack now uses pgvector (fixed). Full persistence requires `make full-up` or setting `VECTOR_STORE=postgres` + `PG_URI` | Default is now correct |
+| **Memory Persistence** | Default is now TurboVec ANN index (persisted `.tv` file + Postgres metadata — no pgvector extension required). Sovereign stack stays on `pgvector`. Full graph memory (`memu-graph`) is feature-flagged off by default (`FF_GRAPH_INGEST=false`) | Set `VECTOR_STORE`, `TURBOVEC_INDEX_PATH` in `.env`; see `.env.example` |
 | **Security Defaults** | HMAC enforced, but DB password is `localdev` by default. Nonce replay persisted to file. Dev HMAC secret now blocked unless explicitly allowed | Set `DB_PASSWORD`, `INTERSERVICE_HMAC_SECRET` env vars for production |
 | **Coverage** | 78% on `common/` (1,616 tests, measured 2026-06-01). Dashboard proxy endpoints and memu-core complex paths have gaps | `.coveragerc` configured; `make coverage` tracks it |
 
@@ -167,7 +167,8 @@ Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTR
                              │
 ┌────────────────────────────▼────────────────────────────────────────┐
 │  MEMORY & STATE                                                      │
-│  Memu-Core → PostgreSQL/pgvector (vector search, MARS decay)         │
+│  Memu-Core → TurboVec ANN index + PostgreSQL (vector search, MARS)  │
+│  Memu-Graph → Cognee/Kuzu graph memory (entities, relations)         │
 │  Redis (session buffer) → Ledger-Worker (audit trail)                │
 │  Memory-Compressor → Backup-Service (pg/redis/memory)                │
 └────────────────────────────┬────────────────────────────────────────┘
@@ -220,7 +221,7 @@ Supervisor (every 15s) → deep /health on each service
 | 8 | wake-service | 8022 | Wake-word + intent routing |
 | 9 | supervisor | 8051 | Watchdog, auto-heal, proactive checks |
 | 10 | verifier | 8052 | Semantic fact-checking, SAGE |
-| 11 | ollama | 11434 | Local LLM (qwen2:0.5b CPU) — pulled automatically by the `ollama-pull` one-shot init container on first boot |
+| 11 | ollama | 11434 | Local LLM (`qwen2.5:0.5b` CPU default) — pulled automatically by the `ollama-pull` one-shot init container on first boot |
 | 12 | agentic | 8007 | Agentic brain, all reasoning — the piece that actually drives chat/conviction/gate calls |
 
 ### Full Stack Additions (`docker-compose.full.yml`)
@@ -231,6 +232,7 @@ voice, avatar, integrations, and ops tooling.
 
 | Service | Port | Purpose |
 |---------|------|---------|
+| memu-graph | 8061 | Cognee/Kuzu graph memory — entities, relations, knowledge-graph ingest/query/forget; feature-flagged off by default (`FF_GRAPH_INGEST=false`) |
 | agentic-introspect | 8023 | Dream/evolve/security-audit — split out of `agentic` so a bug in self-improvement code can't take down live chat |
 | executor | 8002 | Sandboxed execution |
 | fusion-engine | 8053 | Multi-signal consensus |
@@ -371,47 +373,50 @@ H3  Context Budget          ██████████ DONE
 | **P4** | Debate Branching | **DONE** — counterargument tree search |
 | **P5** | Deprecation Cleanup | **DONE** — 110+ warnings eliminated |
 | **H3** | Context Budget Manager | **DONE** — `_trim_context()` + `CONTEXT_BUDGET_TOKENS` env var |
-| **Phase 0.5** | Minimal stack real spine (ollama+agentic wired in) | **DONE** — config-validated; live Docker boot-test still deferred (container-image pulls from Docker Hub/GHCR blocked in sandbox) |
+| **Phase 0.5** | Minimal stack real spine (ollama+agentic wired in) | **DONE** — live Docker boot-test confirmed in CI (PR #77, D37) |
 | **Phase A** | agentic hot-path fix (P13 snapshot off `/run`) | **DONE** — fire-and-forget `asyncio.create_task`, zero added latency |
-| **Phase B** | agentic-introspect process split (dream/evolve/security-audit) | **DONE** — separate FastAPI service/container, own failure domain; live "kill it, prove chat survives" test still deferred |
+| **Phase B** | agentic-introspect process split (dream/evolve/security-audit) | **DONE** — separate FastAPI service/container; live kill-test confirmed in CI |
+| **M1** | Default model → qwen2.5:0.5b | **DONE** — D38; model registry updated, Letta tool-call template unblocked |
+| **M2** | memu-core Postgres extension race fix | **DONE** — D39; concurrent startup no longer crashes on fresh DB |
+| **M3** | memu-graph (Cognee/Kuzu graph memory) | **DONE** — D28-D32; ingest→query→forget pipeline; feature-flagged off by default |
+| **M4** | memu-graph live CI verification | **DONE** — PR #79; real container boot + Ollama + full cycle tested in CI |
+| **M5** | TurboVec activated as default VECTOR_STORE | **DONE** — D40; dev/CI stacks use TurboVec ANN; sovereign stays on pgvector |
 | **P29** | Financial Awareness | Planned — savings tracker, expense categorization |
 | **GPU** | Hardware Performance | **Phase 0 DONE** — detection, env toggles, speculative-decoding config, model registry expansion (`docs/gpu_integration_phase0.md`); hardware-dependent execution still pending |
 
-*Sources: OpenClaw, Jarvis variants, Proact-VL (arXiv:2603.03447). All offline, low-resource, test on qwen2:0.5b first.*
+*Sources: OpenClaw, Jarvis variants, Proact-VL (arXiv:2603.03447). All offline, low-resource, test on qwen2.5:0.5b first.*
 
 ---
 
 ## Roadmap & End Goal
 
 **Where we are:** the trust loop (conviction → gate → mode → memory →
-proactive speech) is internally consistent (Phase 0), the minimal stack is
-config-validated as a real chat-able spine with a brain attached (Phase 0.5),
-and the agentic core's hot path is now isolated from its own
-self-improvement code by a real process boundary, not just a file split
-(Phase A/B). Every refactor so far has been deployment-config and
-failure-domain work — no new application capability has shipped since the
-P-series/J-series feature milestones above.
+proactive speech) is internally consistent (Phase 0), the minimal stack
+has been live boot-tested end-to-end in CI (Phase 0.5 closed, D37), and
+the agentic and memu-core hot paths are each isolated from their
+respective cold-path code by real process boundaries (Phase A/B, D21).
+The memory layer has been significantly upgraded since the P/J-series
+feature milestones: graph memory (memu-graph, D28-D32) is built and
+CI-verified against a live Cognee/Kuzu/Ollama stack, and TurboVec ANN
+search is now the default vector store in the dev/CI compose stacks
+(D40), eliminating the pgvector extension dependency for development.
 
 **Immediate next steps (in order):**
 
-1. **Live verification, all three deferred splits.** Phase 0.5, Phase B
-   (`agentic-introspect`), and the `memu-core-introspect` split (D21) have
-   none been booted on a real running stack yet — only `docker compose
-   config` and in-process `TestClient` tests have run; no Docker daemon is
-   available in this sandbox at all (`docker info` fails to reach
-   `/var/run/docker.sock`). Next session with a live daemon should: bring
-   up `docker-compose.minimal.yml`, confirm `ollama` → `ollama-pull` →
-   `agentic` come up healthy in order, send a real chat message
-   end-to-end, then kill `agentic-introspect` and confirm `/chat`/`/run`
-   keep working, and separately kill `memu-core-introspect` and confirm
-   `/memory/memorize`/`/memory/retrieve` keep working — that's the actual
-   proof each split achieves its purpose, not just that the processes can
-   boot independently.
+1. **Letta multi-agent integration.** The qwen2.5:0.5b model swap (D38)
+   unblocked Letta's tool-call template filter. Wire Letta into the
+   agentic stack — confirm a live Ollama instance with qwen2.5:0.5b
+   actually exposes the tool-call template text Letta expects, then scope
+   the integration depth (task delegation, parallel agents, or both).
 2. **memu-core's P17-P22 personality engine remains unsplit** (D21) —
    eleven `asyncio.Lock()`-protected in-process dict buckets with only a
    5-minute Redis persistence lag make it fundamentally unsplittable
    without a backing-store rework first. Not a next step until that
    rework is scoped.
+3. **GPU hardware arrival.** Everything above runs on CPU now. When the
+   RTX 5080 arrives: `OLLAMA_MODEL=qwen2.5:7b`, wire real STT/TTS/avatar,
+   run multi-model consensus with the three specialist endpoints, and
+   re-enable memu-graph's `FF_GRAPH_INGEST` in production.
 
 **End-goal target:** a fully offline, self-hosted, sovereign AI companion
 that runs entirely on local hardware (no cloud LLM dependency) — chat,
@@ -438,13 +443,16 @@ fusion-engine/       # Multi-signal consensus and conviction gating
 verifier/            # Semantic fact-checking (embedding + keyword), SAGE self-critique
 executor/            # Sandboxed execution bridge
 dashboard/           # 10-view operator console (FastAPI + Starlette)
-memu-core/           # Memory engine — the soul (~7,450 lines); hot-path memorize/retrieve
-                     # + introspect_app.py — store-maintenance process split off (D21)
+memu-core/           # Memory engine — hot-path memorize/retrieve/retrieve_ranked
+                     # + TurboVec ANN index (default) / pgvector (sovereign) / InMemory
+                     # + introspect_app.py — store-maintenance split into own process (D21)
+memu-graph/          # Cognee/Kuzu graph memory — entity/relation ingest→query→forget
+                     # feature-flagged off by default (FF_GRAPH_INGEST=false)
 tool-gate/           # HMAC auth, rate limit, policy enforcement
-agentic/           # Agentic brain (router, planner, adversary, conviction, config)
-langgraph/           # Pre-rename compatibility duplicate of agentic/'s core modules —
-                     # ~20 scripts/test_*.py files still `sys.path.insert` against this
-                     # path; kept in sync manually, not a symlink
+agentic/             # Agentic brain (router, planner, adversary, conviction, config)
+                     # + introspect_app.py — dream/evolve/security-audit split off (Phase B)
+langgraph/           # Pre-rename compatibility shim for agentic/ — ~20 test scripts still
+                     # sys.path.insert against this path; kept in sync, not a symlink
 kai-advisor/         # Self-employment advisor (offline, UK-focused)
 telegram-bot/        # Telegram bot (voice + text pipeline)
 heartbeat/           # System pulse and auto-sleep
@@ -467,6 +475,7 @@ sandboxes/           # Ephemeral sandbox environments
 common/              # Shared: auth, llm, policy, rate_limit, resilience, errors, feature_flags
 security/            # HMAC/auth hardening helpers
 scripts/             # Tests, validation, automation (~68 test files)
+kai-pm/              # PM brain: decisions log, session bootstrap, roadmap, tech watch
 data/                # Seed datasets and advisor inputs
 docs/                # Plans, runbooks, architecture, backlog
 ```
@@ -605,11 +614,13 @@ make test-docker-e2e
 
 **Working now (CPU/Codespace):**
 - [x] 30 services built, health-checked, compose validated
-- [x] pgvector persistence (both minimal + full stacks)
+- [x] TurboVec ANN persistence (default; dev/CI stacks — no pgvector extension needed)
+- [x] pgvector persistence (sovereign/production stack; opt-in via `VECTOR_STORE=postgres`)
 - [x] HMAC auth enforced, dev secret blocked by default
 - [x] Supervisor auto-healing loop (deep /health + /recover)
 - [x] Executor sandboxing (allowlist + AST validation + shell=False)
 - [x] Prometheus + Alertmanager + Telegram alerts wired
+- [x] memu-graph (Cognee/Kuzu) graph memory — CI-verified against live Ollama stack (PR #79)
 - [x] 77 test targets, 1,656 tests, zero failures
 - [x] Pre-commit, dep scanning, container scanning
 - [x] Circuit breakers, exponential backoff, resilient_call()

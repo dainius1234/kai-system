@@ -117,11 +117,14 @@ services:
     environment:
       MEMU_URL: http://memu-core:8001
       MAX_MEMORY_RECORDS: "5000"
-      VECTOR_STORE: postgres
+      VECTOR_STORE: turbovec
       PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
       # default false (real model or crash, per DECISIONS.md) — CI overrides
       # to true since it's exercising spine/gate logic, not embedding quality
       MEMU_ALLOW_FAKE_EMBEDDINGS: "${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}"
+    volumes:
+      - turbovec_data:/data/turbovec
     ports:
       - "8001:8001"
     healthcheck:
@@ -146,9 +149,12 @@ services:
     container_name: sovereign-memu-core-introspect
     <<: *defaults
     environment:
-      VECTOR_STORE: postgres
+      VECTOR_STORE: turbovec
       PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
       MEMU_ALLOW_FAKE_EMBEDDINGS: "${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}"
+    volumes:
+      - turbovec_data:/data/turbovec
     ports:
       - "8009:8009"
     healthcheck:
@@ -355,3 +361,4 @@ services:
 volumes:
   postgres_data:
   ollama_data:
+  turbovec_data:

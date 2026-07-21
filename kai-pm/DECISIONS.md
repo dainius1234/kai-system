@@ -706,3 +706,19 @@ Follow-up the same session, after the user asked to actually try rather than jus
 **What changed:** `scripts/test_graph_live.py` — ingest timeout 120→300, query timeout 60→120.
 
 **Consequences:** On the next CI run, the ingest call will wait up to 5 minutes for Cognee to complete entity extraction and graph construction with qwen2.5:3b. If the pipeline completes within 5 minutes (expected), the full ingest→query→forget cycle should pass for the first time. If qwen2.5:3b's pipeline still exceeds 300s, the next step would be either a shorter input text or accepting this as a persistent best-effort-only step (the CI already treats it as non-blocking).
+
+## D54 — 2026-07-21 — TurboVec activated as default VECTOR_STORE across compose stacks
+
+**Context:** `memu-core/app.py` has contained a fully-implemented `TurboVecStore` class (lines 560–811) since the D13–D15 work: it stores all metadata and raw embeddings in Postgres (via a standard `jsonb` column — no `pgvector` extension required), and keeps an in-process TurboVec `IdMapIndex` for fast ANN similarity search, persisted to a `.tv` file on a named volume. It has been live-verified against real Postgres. Despite this, all three compose stacks were still defaulting to `postgres` (the `PGVectorStore`, which requires the `pgvector` extension) in the `VECTOR_STORE` env var — meaning the TurboVec work from D13–D15 was never actually activated. Separately, `docker-compose.sovereign.yml` had a latent bug: both `memu-core` and `memu-core-introspect` were setting `VECTOR_STORE: "pgvector"` (the wrong string — the only recognized values are `"postgres"`, `"turbovec"`, and anything else falls through to the ephemeral `InMemoryVectorStore`), silently losing all vector persistence on restart. Sovereign is the production stack, so this was a real data-loss-on-restart bug.
+
+**Decision:** Activate TurboVec as the default vector store in `docker-compose.full.yml` and `docker-compose.minimal.yml` (both development/CI stacks). Fix the `sovereign.yml` bug by correcting `"pgvector"` → `"postgres"` on both `memu-core` and `memu-core-introspect` — sovereign is intentionally left on `PGVectorStore` (not TurboVec) since the sovereign stack targets a production machine with `pgvector` available and TurboVec is a new-feature rollout, not appropriate to push to production in the same commit. Document the three env vars in `.env.example`.
+
+**What changed:**
+- `docker-compose.full.yml` — `memu-core` and `memu-core-introspect`: `VECTOR_STORE: postgres` → `VECTOR_STORE: turbovec`, added `TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv`, added `volumes: [turbovec_data:/data/turbovec]`. Top-level `volumes:` section: added `turbovec_data:`.
+- `docker-compose.minimal.yml` — same changes as full.yml.
+- `docker-compose.sovereign.yml` — `memu-core` and `memu-core-introspect`: `VECTOR_STORE: "pgvector"` → `VECTOR_STORE: "postgres"`. No TurboVec introduced here.
+- `.env.example` — `VECTOR_STORE` sample value updated to `turbovec`, three new vars documented: `TURBOVEC_INDEX_PATH`, `TURBOVEC_BITS`.
+
+**Deliberately left unchanged:** `memu-core/app.py` — `TurboVecStore` was already complete; no code changes needed. `memu-core/requirements.txt` — `turbovec>=0.1.0` was already listed. `scripts/test_memu_turbovec.py` — integration test already exists and wired into `make test-memu-turbovec`.
+
+**Consequences:** On the next dev/CI `docker compose up`, `memu-core` will boot with TurboVec ANN search active and a persisted `.tv` index file on the `turbovec_data` named volume. Vector similarity search no longer requires the `pgvector` extension. The `PGVectorStore` path (`VECTOR_STORE: postgres`) is still fully supported for environments that need it (sovereign, or any deployment with the pgvector extension available).

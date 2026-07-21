@@ -87,10 +87,13 @@ services:
       MEMU_URL: http://memu-core:8001
       MAX_MEMORY_RECORDS: "5000"
       REDIS_URL: redis://redis:6379
-      VECTOR_STORE: postgres
+      VECTOR_STORE: turbovec
       PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
+      TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
       MEMU_GRAPH_URL: http://memu-graph:8061
       FF_GRAPH_INGEST: "${FF_GRAPH_INGEST:-false}"
+    volumes:
+      - turbovec_data:/data/turbovec
     ports:
       - "8001:8001"
     healthcheck:
@@ -114,8 +117,11 @@ services:
     <<: *defaults
     environment:
       REDIS_URL: redis://redis:6379
-      VECTOR_STORE: postgres
+      VECTOR_STORE: turbovec
       PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
+      TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
+    volumes:
+      - turbovec_data:/data/turbovec
     ports:
       - "8009:8009"
     healthcheck:
@@ -804,6 +810,7 @@ services:
 volumes:
   postgres_data:
   ollama_data:
+  turbovec_data:
 
 # ── Docker Secrets (production) ──────────────────────────────────────
 # Create runtime-secrets/ directory with secret files before deploying:
