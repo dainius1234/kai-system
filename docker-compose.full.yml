@@ -414,6 +414,12 @@ services:
       ENABLE_BACKEND_ACCESS_CONTROL: "false"
       CACHING: "false"
       TELEMETRY_DISABLED: "true"
+      # D52: Cognee's pre-flight LLM connection test times out at 30s — on the
+      # CI runner, even qwen2.5:3b needs 27-45s to respond. The model IS
+      # reachable (Ollama returns 200 OK); only the pre-flight probe fails.
+      # Bypass the probe; the ingest/query/forget cycle still exercises the
+      # real LLM end-to-end.
+      COGNEE_SKIP_CONNECTION_TEST: "true"
     ports:
       - "8061:8061"
     healthcheck:
