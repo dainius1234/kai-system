@@ -32,6 +32,7 @@ app = FastAPI(title="Sovereign Dashboard", version="0.4.0")
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
+VERIFIER_URL   = os.getenv("VERIFIER_URL", "http://verifier:8052")
 # Store-maintenance reads (stats/search-by-category/quarantine listing) live on
 # memu-core-introspect, split out from memu-core's hot path — see DECISIONS.md D21.
 MEMU_INTROSPECT_URL = os.getenv("MEMU_INTROSPECT_URL", "http://memu-core-introspect:8009")
@@ -713,6 +714,17 @@ async def api_agents_registry_post(request: Request):
     """Update AGENTS.md content via agentic."""
     body = await request.json()
     return await _proxy_post(f"{AGENTIC_URL}/agents-registry", body=body, fallback={"status": "unavailable"})
+
+
+@app.post("/api/pii/scan")
+async def api_pii_scan(request: Request):
+    """Scan text for PII (and optionally redact) via the verifier service."""
+    body = await request.json()
+    return await _proxy_post(
+        f"{VERIFIER_URL}/redact",
+        body={"text": body.get("text", ""), "auto_redact": body.get("auto_redact", True)},
+        fallback={"status": "unavailable", "pii_found": {}, "total_pii": 0},
+    )
 
 
 @app.get("/api/struggle")

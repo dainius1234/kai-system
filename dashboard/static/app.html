@@ -306,6 +306,24 @@
               </div>
             </div>
 
+            <!-- PII Scanner -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">🔍</span> PII Scanner</div>
+              <p style="font-size:13px;color:var(--text3);margin-bottom:var(--sp-3);">
+                Paste text to detect and redact personal information (email, phone, NI, postcodes, API tokens, card numbers) before sharing or storing.
+              </p>
+              <textarea id="piiInput" placeholder="Paste text here to scan for PII…" style="width:100%;height:120px;font-family:monospace;font-size:12px;background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:var(--sp-2);resize:vertical;box-sizing:border-box;"></textarea>
+              <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-2);align-items:center;">
+                <button class="refresh-btn" onclick="piiScan(false)" style="flex:none;">Detect only</button>
+                <button class="refresh-btn" onclick="piiScan(true)" style="flex:none;background:var(--accent);color:#000;">Detect &amp; Redact</button>
+                <button class="refresh-btn" onclick="piiClear()" style="flex:none;color:var(--text3);">Clear</button>
+              </div>
+              <div id="piiResult" style="margin-top:var(--sp-3);font-size:12px;display:none;">
+                <div id="piiSummary" style="color:var(--text3);margin-bottom:var(--sp-2);"></div>
+                <textarea id="piiOutput" readonly style="width:100%;height:100px;font-family:monospace;font-size:12px;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:6px;padding:var(--sp-2);resize:vertical;box-sizing:border-box;display:none;"></textarea>
+              </div>
+            </div>
+
             <!-- System Info -->
             <div class="card">
               <div class="card-title"><span class="icon">ℹ️</span> System Info</div>
@@ -1304,6 +1322,62 @@ function setMode(mode) {
 function loadMode() {
   const mode = localStorage.getItem('kai-mode') || 'WORK';
   setMode(mode);
+}
+
+
+// ── J3: PII Scanner (Settings tab) ────────────────────────────────
+
+async function piiScan(autoRedact) {
+  const text = document.getElementById('piiInput').value;
+  if (!text.trim()) return;
+  const resultEl  = document.getElementById('piiResult');
+  const summaryEl = document.getElementById('piiSummary');
+  const outputEl  = document.getElementById('piiOutput');
+  summaryEl.textContent = 'Scanning…';
+  resultEl.style.display = 'block';
+  outputEl.style.display = 'none';
+
+  try {
+    const r = await fetch('/api/pii/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, auto_redact: autoRedact }),
+    }).then(r => r.json());
+
+    const total  = r.total_pii || 0;
+    const found  = r.pii_found || {};
+    const status = r.status || 'unknown';
+
+    if (status === 'unavailable') {
+      summaryEl.textContent = 'PII scanner unavailable (verifier service offline)';
+      summaryEl.style.color = 'var(--danger)';
+      return;
+    }
+
+    if (total === 0) {
+      summaryEl.innerHTML = '<span style="color:var(--success);">✓ No PII detected</span>';
+    } else {
+      const types = Object.entries(found).map(([k, n]) => `${k.replace(/_/g,' ')} ×${n}`).join(', ');
+      const color = autoRedact ? 'var(--warn)' : 'var(--danger)';
+      summaryEl.innerHTML = `<span style="color:${color};">⚠ ${total} PII item${total > 1 ? 's' : ''} found: ${DOMPurify.sanitize(types)}</span>`;
+    }
+
+    if (autoRedact && r.redacted_text != null) {
+      outputEl.value = r.redacted_text;
+      outputEl.style.display = 'block';
+    }
+    summaryEl.style.color = '';
+  } catch (e) {
+    summaryEl.textContent = 'Error: ' + e.message;
+    summaryEl.style.color = 'var(--danger)';
+  }
+}
+
+function piiClear() {
+  document.getElementById('piiInput').value = '';
+  document.getElementById('piiResult').style.display = 'none';
+  document.getElementById('piiOutput').value = '';
+  document.getElementById('piiSummary').textContent = '';
 }
 
 

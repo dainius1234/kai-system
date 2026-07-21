@@ -986,3 +986,45 @@ Follow-up the same session, after the user asked to actually try rather than jus
 - `_diaryTopK` state is reset to 30 on each fresh search or Browse Recent, then incremented only by Load More.
 
 **Consequences:** The Diary tab now opens with live recent memories on first visit, groups them by day, shows emotion/pin/trust metadata per entry, supports expand-in-place for long records, and can page through the memory store 20 entries at a time.
+
+---
+
+## D63 — J3: PII Auto-Redaction
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** Memory content flowing through `memorize_event()` and `quick_note()` in memu-core could contain PII (email addresses, phone numbers, credit card numbers, UK NI numbers, API tokens/secrets, UK postcodes). Once stored in the vector store these records persist indefinitely and are surfaced in search results and the Diary view. The `redact_pii()` function and 6 regex patterns already existed in `common/runtime.py`; the `/redact` endpoint was already implemented in `verifier/app.py`. J3 wires both into the write path and adds a developer-facing scanner in the dashboard Settings tab.
+
+**Decisions / Changes:**
+
+*memu-core/app.py — write-path redaction:*
+- Added `redact_pii` to the `from common.runtime import …` line.
+- In `memorize_event()`: immediately after resolving `raw_text = update.result_raw or ""`, calls `redacted_text, pii_counts = redact_pii(raw_text)`. On any match, logs `"memorize pii_redacted counts=%s"` (counts only — never content). The `redacted_text` is used as the source for `text_for_classify`, `content["result"]`, embedding input, and graph ingest. Response dict now includes `"pii_redacted": sum(pii_counts.values())`.
+- In `quick_note()`: after `text = sanitize_string(note.text)` and the empty-check, calls `text, note_pii = redact_pii(text)` with the same audit-log pattern.
+
+*dashboard/app.py — new endpoint:*
+- Module-level `VERIFIER_URL = os.getenv("VERIFIER_URL", "http://verifier:8052")` constant (used for both the pre-existing verifier calls and the new endpoint).
+- `POST /api/pii/scan`: proxies `{"text": …, "auto_redact": …}` to `{VERIFIER_URL}/redact`. Fallback `{"status": "unavailable", "pii_found": {}, "total_pii": 0}` when verifier is offline.
+
+*dashboard/static/app.html — PII Scanner card in Settings tab:*
+- Card with `#piiInput` textarea, "Detect only" button (`piiScan(false)`), "Detect & Redact" button (`piiScan(true)`), "Clear" button (`piiClear()`).
+- Result area: `#piiResult` container (hidden until scan runs), `#piiSummary` div (shows count + type breakdown, green tick on no PII found, amber warning on finds), `#piiOutput` readonly textarea (shown only on Detect+Redact runs).
+- `piiScan(autoRedact)`: calls `/api/pii/scan`, reads `total_pii` and `pii_found` from response, DOMPurify-sanitises the type string before injecting into `summaryEl.innerHTML`.
+- `piiClear()`: resets input and hides result container.
+
+*scripts/test_j3_pii_redaction.py (new — 45 tests):*
+- `TestRuntimePiiPatterns` (12): all 6 pattern keys present, `detect_pii` and `redact_pii` function signatures, redaction tag format, return-value structure.
+- `TestMemuCorePiiWiring` (8): `redact_pii` in import line, `memorize_event` calls + uses `redacted_text` + returns `pii_redacted` count, audit log references counts not content, `quick_note` redaction present and ordered correctly.
+- `TestDashboardPiiEndpoint` (9): `VERIFIER_URL` constant, endpoint decorator, proxy target, `text`/`auto_redact` forwarding, fallback present, fallback contains `total_pii`, routes to `/redact`.
+- `TestHtmlPiiScanner` (8): card, input textarea, both action buttons, clear button, result/summary/output elements.
+- `TestHtmlPiiFunctions` (8): function signatures, API endpoint called, `pii_found`/`total_pii` fields read, DOMPurify sanitisation, clear function resets input and hides result.
+
+**Key invariants preserved:**
+- Audit logs never record PII content — only per-type counts. This satisfies the audit-without-exposure requirement: operators can confirm redaction happened without seeing what was redacted.
+- Redaction occurs before any downstream operation (classify, embed, graph ingest, store) so no PII reaches the vector index.
+- `common/runtime.py` is unchanged — all 6 patterns and both functions were pre-existing; J3 only consumes them.
+- The verifier `/redact` endpoint is unchanged.
+- Dashboard `/api/pii/scan` degrades gracefully when verifier is offline (fallback response, no 500).
+
+**Consequences:** Memory writes are now PII-clean at ingestion time. Developers and operators can use the Settings → PII Scanner to test arbitrary text before deploying or to audit clipboard contents without those strings entering the memory system.
