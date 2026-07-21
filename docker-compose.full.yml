@@ -474,6 +474,30 @@ services:
       ollama-pull:
         condition: service_completed_successfully
 
+  financial-awareness:
+    build:
+      context: .
+      dockerfile: financial-awareness/Dockerfile
+    <<: *defaults
+    environment:
+      FINANCE_ROOT: /data/finance
+      MTD_START: "${MTD_START:-50000}"
+      VAT_THRESHOLD: "${VAT_THRESHOLD:-85000}"
+      MILEAGE_RATE: "${MILEAGE_RATE:-0.45}"
+    ports:
+      - "8063:8063"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8063/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.35
+    volumes:
+      - finance_data:/data/finance
+
   ledger-worker:
     build:
       context: .
@@ -845,6 +869,7 @@ volumes:
   ollama_data:
   turbovec_data:
   letta_data:
+  finance_data:
 
 # ── Docker Secrets (production) ──────────────────────────────────────
 # Create runtime-secrets/ directory with secret files before deploying:
