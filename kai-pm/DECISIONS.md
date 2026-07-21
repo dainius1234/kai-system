@@ -696,3 +696,13 @@ Follow-up the same session, after the user asked to actually try rather than jus
 **What changed:** `docker-compose.full.yml` — added `COGNEE_SKIP_CONNECTION_TEST: "true"` to `memu-graph`'s environment block with an inline comment explaining the rationale.
 
 **Consequences:** On the next CI run, memu-graph will start without the connection pre-flight delay. The ingest/query/forget cycle will make the first real LLM call, which will still be slow (27-45s per token batch) but will no longer trigger a 30s timeout abort. The cycle should complete. The `COGNEE_SKIP_CONNECTION_TEST` env var has no effect in environments where the LLM responds within 30s (production with GPU, or with a faster endpoint).
+
+## D53 — 2026-07-21 — Increase ingest/query timeouts in test_graph_live.py; qwen2.5:3b cognify pipeline exceeds 120s on CPU
+
+**Context:** D52 fixed the Cognee pre-flight probe timeout. On the next CI run (commit `e65242b`), memu-graph started successfully (health: ok), but `POST /graph/ingest` timed out after 120 seconds — the test script's configured limit. The Cognee ingest→cognify pipeline chains 3-4 LLM calls (entity extraction, relation extraction, cognify graph construction) each taking 30-45s with qwen2.5:3b on the CPU-only runner. Total pipeline time: 90-180s, exceeding the 120s request timeout. The graph container ran for exactly the timeout window then returned `ReadTimeout`. The cycle never reached the query or forget phases.
+
+**Decision:** Increased `timeout=120` → `timeout=300` on the `/graph/ingest` POST in `scripts/test_graph_live.py`, and `timeout=60` → `timeout=120` on the `/graph/query` GET. Five minutes gives the full cognify pipeline (3-4 calls × 45s each + overhead) sufficient room on a CPU runner. No change to the query timeout would be needed in production (GPU shortens each call to <5s); the change is safe because it only adds patience, not new behavior.
+
+**What changed:** `scripts/test_graph_live.py` — ingest timeout 120→300, query timeout 60→120.
+
+**Consequences:** On the next CI run, the ingest call will wait up to 5 minutes for Cognee to complete entity extraction and graph construction with qwen2.5:3b. If the pipeline completes within 5 minutes (expected), the full ingest→query→forget cycle should pass for the first time. If qwen2.5:3b's pipeline still exceeds 300s, the next step would be either a shorter input text or accepting this as a persistent best-effort-only step (the CI already treats it as non-blocking).

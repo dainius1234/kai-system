@@ -38,7 +38,7 @@ def main() -> int:
             "source_id": SOURCE_ID,
             "category": "test",
         },
-        timeout=120,
+        timeout=300,  # D53: qwen2.5:3b needs up to 3-4 LLM calls at 30-45s each for cognify
     )
     print(f"ingest status={ingest.status_code} body={ingest.text[:500]}")
     ingest.raise_for_status()
@@ -55,7 +55,7 @@ def main() -> int:
     query = requests.get(
         f"{BASE_URL}/graph/query",
         params={"q": "What does Kai's memory subsystem use for vector search?"},
-        timeout=60,
+        timeout=120,  # D53: qwen2.5:3b graph search also needs headroom on CPU
     )
     print(f"query status={query.status_code} body={query.text[:1000]}")
     query.raise_for_status()
