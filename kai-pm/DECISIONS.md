@@ -828,3 +828,41 @@ Follow-up the same session, after the user asked to actually try rather than jus
 - All flags default to safe/enabled values; no existing behaviour broken.
 
 **Consequences:** Stack now has weekly automated health reports, cloud LLM fallback when local GPU is unavailable, offline-capable PWA shell, and context-aware financial advice in every chat that mentions CIS/VAT/tax topics.
+
+---
+
+## D59 — 2026-07-21 — C3 LLM retry/backoff, behavioral scoreboard, Finance dashboard tab, PHONE_SETUP.md
+
+**Context:** Post-Phase-0.5 follow-up batch completing the remaining backlog items approved in sequence: C3 (LLM retry), behavioral scoreboard (closures Phase 0.5 item 0's advisory scoring), Finance tab (C8 dashboard completeness), and PWA phone guide.
+
+**Decision:** Implement all four items in one commit batch, push to branch for merge.
+
+**What changed:**
+
+*C3 — LLM retry/backoff on 429/503:*
+- `common/llm.py`: Added `LLM_MAX_RETRIES` (default 3), `LLM_RETRY_BACKOFF` (default 1.0s), `_RETRY_STATUS_CODES = frozenset({429, 503})`.
+- `_live_query()` now wraps the HTTP call in a retry loop: on 429/503 or `ConnectError`/`TimeoutException`, sleeps `LLM_RETRY_BACKOFF × 2^attempt` seconds and retries. Non-retriable exceptions break immediately. After all retries exhausted, returns `LLMResponse(source="error")`. Renamed inner `model` variable to `model_out` to avoid shadowing the outer `model` payload variable.
+
+*Behavioral scoreboard:*
+- `scripts/behavioral_scoreboard.py` (new): Sends 5 test prompts (general, math, CIS construction, memory/KG, ladder safety) via `LLMRouter`, scores 0–100 (25 pts each: non-empty, no stub marker, length≥10, latency<30s). Prints PASS/WARN/FAIL per prompt, overall SCORE and GRADE (A–F). Always `sys.exit(0)` — advisory only. Reports gracefully when LLM is offline.
+- `.github/workflows/weekly-report-card.yml`: Added `scoreboard` step; wired `SCOREBOARD_OUT` into the issue body.
+
+*Finance tab (C8 reinterpretation):*
+- `dashboard/app.py`: Added `FINANCIAL_URL` env var; three new proxy endpoints: `GET /api/finance/summary`, `GET /api/finance/cis`, `POST /api/finance/cis/record` — each delegates to the `financial-awareness` service with graceful `{"status": "unavailable"}` fallback.
+- `dashboard/static/app.html`:
+  - Finance nav item added to sidebar (pound-sign SVG, `data-view="finance"`).
+  - Full Finance view section inserted (`#financeView`): 4 stat cards (gross YTD, CIS deductions, net received, tax estimate), VAT position table, tax breakdown table, Log CIS Payment form, Recent CIS records table.
+  - `switchView()`: `'finance': 'CIS Finance'` added to titles dict; `if (name === 'finance') { refreshFinance(); }` block added.
+  - `refreshFinance()`: fetches `/api/finance/summary`, populates all Finance view elements with formatted GBP values; renders "unavailable" gracefully.
+  - `logCisPayment()`: POSTs to `/api/finance/cis/record` with gross/materials/status/contractor/reference fields; shows success/error feedback; refreshes Finance view on success.
+
+*PWA phone guide:*
+- `docs/PHONE_SETUP.md` (new): Step-by-step PWA install for Android (Chrome) and iOS (Safari). Feature table (offline shell yes; push/background-sync not yet). Troubleshooting for local IP HTTPS requirement, Tailscale access, cache population, and auto-update behaviour.
+
+**Key invariants preserved:**
+- LLM retry is capped and exponential — no infinite retry storms.
+- Scoreboard is always advisory (exit 0) — never blocks CI.
+- Finance proxy endpoints use `_proxy_get`/`_proxy_post` helpers already present in dashboard; no new HTTP client code introduced.
+- Finance tab JS never throws on unavailable backend — all code paths end gracefully.
+
+**Consequences:** LLM reliability improved for rate-limited cloud backends; weekly CI now includes LLM quality scoring; dashboard has a working Finance / CIS tracker surface; users have documented PWA install instructions for phone access.

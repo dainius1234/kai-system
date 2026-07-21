@@ -80,6 +80,17 @@ jobs:
           echo "EOF" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - name: Behavioral scoreboard (LLM quality — advisory)
+        id: scoreboard
+        run: |
+          set +e
+          out=$(python scripts/behavioral_scoreboard.py 2>&1)
+          code=$?
+          echo "output<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$out" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          exit 0
+
       - name: Post Weekly Report Card issue
         env:
           GH_TOKEN: ${{ github.token }}
@@ -89,6 +100,7 @@ jobs:
           TEST_CODE: ${{ steps.tests.outputs.exit_code }}
           TEST_SUMMARY: ${{ steps.tests.outputs.summary }}
           TEST_OUT: ${{ steps.tests.outputs.output }}
+          SCOREBOARD_OUT: ${{ steps.scoreboard.outputs.output }}
         run: |
           today=$(date -u +%Y-%m-%d)
           gonogo_icon=$( [ "$GONOGO_CODE" = "0" ] && echo "✅ PASS" || echo "🔴 FAIL" )
@@ -107,6 +119,7 @@ jobs:
 |-------|--------|
 | go/no-go compile | ${gonogo_icon} |
 | Unit test suite | ${test_icon} |
+| Behavioral scoreboard | advisory (see below) |
 
 ### go/no-go detail
 \`\`\`
@@ -117,6 +130,11 @@ ${GONOGO_OUT}
 **${TEST_SUMMARY}**
 \`\`\`
 ${TEST_OUT}
+\`\`\`
+
+### Behavioral scoreboard (LLM quality — advisory)
+\`\`\`
+${SCOREBOARD_OUT}
 \`\`\`
 
 ---

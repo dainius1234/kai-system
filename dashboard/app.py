@@ -363,6 +363,7 @@ async def readiness() -> Dict[str, Any]:
 # ── P8: Thinking Pathways — intelligence proxy endpoints ─────────────
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 HEARTBEAT_URL = os.getenv("HEARTBEAT_URL", "http://heartbeat:8010")
+FINANCIAL_URL = os.getenv("FINANCIAL_URL", "http://financial-awareness:8063")
 WAKE_URL = os.getenv("WAKE_URL", "http://wake-service:8022")
 
 
@@ -644,6 +645,31 @@ async def api_memory_stats():
             return resp.json()
     except Exception:
         return {"status": "unavailable"}
+
+
+@app.get("/api/finance/summary")
+async def api_finance_summary():
+    """Proxy CIS/VAT/tax financial summary from the financial-awareness service (P29)."""
+    return await _proxy_get(f"{FINANCIAL_URL}/finance/summary", fallback={
+        "status": "unavailable",
+        "cis_summary": {},
+        "vat_position": {},
+        "tax_estimate": {},
+        "invoices": [],
+    })
+
+
+@app.get("/api/finance/cis")
+async def api_finance_cis():
+    """Proxy CIS YTD summary from the financial-awareness service."""
+    return await _proxy_get(f"{FINANCIAL_URL}/finance/cis/summary", fallback={"status": "unavailable"})
+
+
+@app.post("/api/finance/cis/record")
+async def api_finance_cis_record(request: Request):
+    """Proxy CIS payment record creation to the financial-awareness service."""
+    body = await request.json()
+    return await _proxy_post(f"{FINANCIAL_URL}/finance/cis/record", body=body, fallback={"status": "unavailable"})
 
 
 @app.get("/api/struggle")

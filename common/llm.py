@@ -87,6 +87,11 @@ _API_KEY_MAP: Dict[str, str] = {
 LLM_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "120"))
 LLM_CONNECT_TIMEOUT = float(os.getenv("LLM_CONNECT_TIMEOUT", "10"))
 LLM_READ_TIMEOUT = float(os.getenv("LLM_READ_TIMEOUT", "120"))
+LLM_MAX_RETRIES = int(os.getenv("LLM_MAX_RETRIES", "3"))
+LLM_RETRY_BACKOFF = float(os.getenv("LLM_RETRY_BACKOFF", "1.0"))
+
+# HTTP status codes that warrant a retry (rate-limited or temporarily unavailable).
+_RETRY_STATUS_CODES: frozenset[int] = frozenset({429, 503})
 
 # ── C5: Ollama /api/tags pre-flight cache ────────────────────────────
 # In-process cache; TTL read at call time so tests can override via env.
@@ -288,39 +293,67 @@ class LLMRouter:
             "max_tokens": max_tokens,
             "stream": False,
         }
-        try:
-            # C1: Use model-aware timeout from registry instead of hardcoded LLM_TIMEOUT
-            model_name = _MODEL_MAP.get(specialist, specialist)
-            query_timeout = _model_timeout(model_name)
-            timeout = httpx.Timeout(query_timeout, connect=LLM_CONNECT_TIMEOUT, read=query_timeout)
-            async with httpx.AsyncClient(timeout=timeout, headers=headers) as client:
-                resp = await client.post(f"{url}/v1/chat/completions", json=payload)
+
+        # C3: Retry with exponential backoff on 429/503 and transient connection errors.
+        last_exc: Optional[Exception] = None
+        for attempt in range(max(1, LLM_MAX_RETRIES)):
+            try:
+                # C1: Use model-aware timeout from registry instead of hardcoded LLM_TIMEOUT
+                model_name = _MODEL_MAP.get(specialist, specialist)
+                query_timeout = _model_timeout(model_name)
+                timeout = httpx.Timeout(query_timeout, connect=LLM_CONNECT_TIMEOUT, read=query_timeout)
+                async with httpx.AsyncClient(timeout=timeout, headers=headers) as client:
+                    resp = await client.post(f"{url}/v1/chat/completions", json=payload)
+
+                # Retry before raise_for_status so we can log and sleep first
+                if resp.status_code in _RETRY_STATUS_CODES and attempt < LLM_MAX_RETRIES - 1:
+                    wait = LLM_RETRY_BACKOFF * (2 ** attempt)
+                    logger.warning(
+                        "llm_retry: specialist=%s status=%d attempt=%d/%d wait=%.1fs",
+                        specialist, resp.status_code, attempt + 1, LLM_MAX_RETRIES, wait,
+                    )
+                    await asyncio.sleep(wait)
+                    last_exc = Exception(f"HTTP {resp.status_code}")
+                    continue
+
                 resp.raise_for_status()
                 data = resp.json()
+                choice = data.get("choices", [{}])[0]
+                text = choice.get("message", {}).get("content", "")
+                text = _validate_llm_response(text)
+                usage = data.get("usage", {})
+                model_out = data.get("model", specialist)
+                latency = (time.monotonic() - start) * 1000
+                return LLMResponse(
+                    specialist=specialist,
+                    text=text,
+                    latency_ms=round(latency, 1),
+                    source="live",
+                    model=model_out,
+                    usage=usage,
+                )
+            except (httpx.ConnectError, httpx.TimeoutException) as exc:
+                last_exc = exc
+                if attempt < LLM_MAX_RETRIES - 1:
+                    wait = LLM_RETRY_BACKOFF * (2 ** attempt)
+                    logger.warning(
+                        "llm_retry: specialist=%s error=%s attempt=%d/%d wait=%.1fs",
+                        specialist, type(exc).__name__, attempt + 1, LLM_MAX_RETRIES, wait,
+                    )
+                    await asyncio.sleep(wait)
+                    continue
+                break
+            except Exception as exc:
+                last_exc = exc
+                break
 
-            choice = data.get("choices", [{}])[0]
-            text = choice.get("message", {}).get("content", "")
-            text = _validate_llm_response(text)
-            usage = data.get("usage", {})
-            model = data.get("model", specialist)
-            latency = (time.monotonic() - start) * 1000
-
-            return LLMResponse(
-                specialist=specialist,
-                text=text,
-                latency_ms=round(latency, 1),
-                source="live",
-                model=model,
-                usage=usage,
-            )
-        except Exception as exc:
-            latency = (time.monotonic() - start) * 1000
-            return LLMResponse(
-                specialist=specialist,
-                text=f"[error: {str(exc)[:100]}]",
-                latency_ms=round(latency, 1),
-                source="error",
-            )
+        latency = (time.monotonic() - start) * 1000
+        return LLMResponse(
+            specialist=specialist,
+            text=f"[error: {str(last_exc)[:100]}]",
+            latency_ms=round(latency, 1),
+            source="error",
+        )
 
     @staticmethod
     def _stub_response(specialist: str, prompt: str, start: float) -> LLMResponse:
