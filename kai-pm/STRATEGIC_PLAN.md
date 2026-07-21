@@ -6,10 +6,10 @@
 
 Kai is being delivered as a local-first sovereign intelligence system with Phase 0 hardening as the current priority: keep the platform honest, testable, and stable while GPU-gated phases remain blocked; unlock larger-model routing, multimodal latency work, and production self-improvement only after hardware and reliability gates are actually met.
 
-## Phase 0 — Pre-GPU Hardening (current focus)
+## Phase 0 — Pre-GPU Hardening
 
-**Status:** ACTIVE  
-**Why now:** This is the highest-leverage work that does not depend on GPU capacity.
+**Status:** COMPLETE (2026-07-21 — all Phase 0.5 CPU-safe items shipped, PRs #77–#85, D37–D59)  
+**Why now:** This was the highest-leverage work that did not depend on GPU capacity.
 
 ### Exit criteria
 
@@ -117,5 +117,5 @@ Consolidate reliability, observability, and controlled self-improvement loops in
 - J1–J7 are DONE, not queued.
 - RTX 5080 16GB VRAM cannot fit llama3.3:70b at usable quant — plan must reflect 8B/13B class for primary and use 70B only via remote/cloud fallback.
 - Ollama speculative decoding support is partial / version-dependent — verify before claiming.
-- P29 (Financial Awareness) is in Phase 3 (Memory & Reflection Hardening), since savings tracking/categorization/summary is memory-centric and not GPU-gated.
+- P29 (Financial Awareness) is **DONE** — shipped as `financial-awareness/` service (PR #83, D57) with dashboard Finance tab and agentic context injection (PRs #84–#85, D58–D59).
 - All cited external benchmarks need source links.
