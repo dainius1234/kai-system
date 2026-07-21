@@ -789,3 +789,42 @@ Follow-up the same session, after the user asked to actually try rather than jus
 **Deliberately not changed:** `common/self_emp_advisor.py` (kept as-is — it handles the generic MTD/mileage advice path in `agentic`). No LLM dependency introduced — this service is pure arithmetic and is a suitable foundation for future LLM-augmented advice.
 
 **Consequences:** `make test-financial` runs 18 unit tests. `docker compose -f docker-compose.full.yml up financial-awareness` starts the CIS tracker at http://localhost:8063. Records accumulate across restarts via the `finance_data` named volume.
+
+---
+
+## D58 — 2026-07-21 — Phase 0.5 backlog: automation infra, cloud LLM backends, PWA service worker, agentic financial wiring
+
+**Context:** Four items remained from the Phase 0.5 backlog after PRs #82 and #83 merged: (0a) automation infrastructure, (0b) cloud LLM fallback backends, (3) PWA polish, (4) wire financial-awareness into agentic.
+
+**Decision:** Complete all four items in a single PR.
+
+**What changed:**
+
+*0a — Automation infrastructure:*
+- `.github/workflows/friday-cleanup.yml` (new): weekly maintenance sweep (flake8, pip-audit, stale branches >30d, doc sync check). Fires Friday 09:00 UTC, posts GitHub issue labelled `maintenance`.
+- `.github/workflows/weekly-report-card.yml` (new): Monday 09:00 UTC go/no-go + fast pytest subset, posts GitHub issue labelled `report-card`.
+- `scripts/backup_offsite.sh` (new, +x): GPG-encrypted offsite backup of finance data, letta data, DECISIONS.md, CHANGELOG.md. 90-day pruning. Requires `BACKUP_PASSPHRASE` env var; `BACKUP_SKIP_ENCRYPT=true` bypasses encryption for testing.
+- `docs/DEMO.md` (new): 5-minute walkthrough for live demonstrations.
+- `docs/operator-journal/_template.md` (new): weekly operator feedback loop journal template.
+- `skills/_template.md`, `skills/cis-deductions.md`, `skills/mtd-vat.md`, `skills/ladder-safety.md` (new): domain knowledge skill files loaded by the agentic skill hub at runtime.
+
+*0b — Cloud LLM fallback backends:*
+- `common/llm.py`: Groq (`llama-3.3-70b-versatile`) and OpenRouter (`meta-llama/llama-3.3-70b-instruct:free`) added to `_DEFAULT_URLS`, `_MODEL_MAP`, and `_API_KEY_MAP`. Only active when respective API key env var is set. Cloud URLs skip Ollama pre-flight model-availability check. `Authorization: Bearer` header injected in both `_live_query` and `stream` paths. OpenRouter adds `HTTP-Referer` header for attribution.
+- `.env.example`: `GROQ_API_KEY`, `GROQ_MODEL`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL` documented.
+
+*3 — PWA service worker:*
+- `dashboard/static/sw.js` (new): cache name `kai-shell-v1`, 8 shell assets cached on install, `skipWaiting()` on install, `clients.claim()` on activate, old caches purged on activate, network-first for navigation, cache-first for static assets, never intercepts `/api/`/`/stream`/`/health`/SSE.
+- `dashboard/static/index.html`: `<link rel="manifest" href="/static/manifest.json">` added to `<head>`; SW registration script added before `</body>`.
+
+*4 — Agentic financial wiring:*
+- `common/feature_flags.py`: `FF_FINANCIAL_CONTEXT` flag added (default `True`).
+- `agentic/app.py`: `FINANCIAL_URL` env var (default `http://financial-awareness:8063`); `_FINANCE_KEYWORDS` frozenset for trigger detection; `_get_financial_context(user_msg)` function — keyword-triggered, calls `GET /finance/summary`, returns empty dict on non-finance messages or when flag is off; 12-way gather expanded to 13-way with new `financial_context` slot; CIS/VAT/tax summary injected as system message after Letta context when non-empty.
+- `docker-compose.full.yml`: `FINANCIAL_URL` and `FF_FINANCIAL_CONTEXT` added to agentic service env block.
+
+**Key invariants preserved:**
+- Financial context fetch is keyword-gated — zero cost on non-finance messages.
+- Cloud LLM backends are opt-in (no API key = no call).
+- Service worker never intercepts API/streaming routes — no SSE breakage risk.
+- All flags default to safe/enabled values; no existing behaviour broken.
+
+**Consequences:** Stack now has weekly automated health reports, cloud LLM fallback when local GPU is unavailable, offline-capable PWA shell, and context-aware financial advice in every chat that mentions CIS/VAT/tax topics.

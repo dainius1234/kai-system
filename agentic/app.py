@@ -43,6 +43,7 @@ TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 TELEGRAM_ALERT_URL = os.getenv("TELEGRAM_ALERT_URL", "http://perception-telegram:9000/alert")
 WAKE_URL = os.getenv("WAKE_URL", "http://wake-service:8022")
 LETTA_URL = os.getenv("LETTA_URL", "http://letta-agent:8062")
+FINANCIAL_URL = os.getenv("FINANCIAL_URL", "http://financial-awareness:8063")
 WAKE_INTENT_COMMAND_THRESHOLD = float(os.getenv("WAKE_INTENT_COMMAND_THRESHOLD", "0.6"))
 WAKE_INTENT_OVERRIDE_CONFIDENCE = float(os.getenv("WAKE_INTENT_OVERRIDE_CONFIDENCE", "0.7"))
 budget = ErrorBudget(window_seconds=300)
@@ -742,6 +743,35 @@ async def _get_letta_context(user_msg: str) -> Dict[str, Any]:
     return {}
 
 
+_FINANCE_KEYWORDS = frozenset({
+    "cis", "invoice", "vat", "tax", "deduction", "hmrc", "subcontract",
+    "payment", "gross", "net", "mileage", "mtd", "flat rate", "turnover",
+    "self-employed", "self employed", "national insurance", "ni ", "income tax",
+})
+
+
+async def _get_financial_context(user_msg: str) -> Dict[str, Any]:
+    """P29: Fetch CIS/VAT/tax summary from financial-awareness service.
+
+    Only fires when the user message contains finance-related keywords and
+    FF_FINANCIAL_CONTEXT is enabled. Returns an empty dict otherwise so the
+    13-way gather slot stays cheap on non-finance messages.
+    """
+    if not is_enabled("FINANCIAL_CONTEXT"):
+        return {}
+    lower = user_msg.lower()
+    if not any(kw in lower for kw in _FINANCE_KEYWORDS):
+        return {}
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{FINANCIAL_URL}/finance/summary")
+            if resp.status_code == 200:
+                return resp.json()
+    except Exception:
+        pass
+    return {}
+
+
 async def _get_session_messages(session_id: str) -> List[Dict[str, str]]:
     """Fetch recent session messages from memu-core."""
     try:
@@ -1032,7 +1062,7 @@ async def chat_stream(req: ChatRequest):
 
     (memories, session_msgs, goals, topics, eq_context,
      narrative, imagination, conscience, agent_ctx, operator_model,
-     graph_context, letta_context) = await asyncio.gather(
+     graph_context, letta_context, financial_context) = await asyncio.gather(
         _safe(_get_relevant_memories(user_msg), []),
         _safe(_get_session_messages(req.session_id), []),
         _safe(_get_active_goals(), []),
@@ -1045,6 +1075,7 @@ async def chat_stream(req: ChatRequest):
         _safe(_get_operator_model(user_msg, mode), {}),
         _safe(_get_graph_context(user_msg), {}),
         _safe(_get_letta_context(user_msg), {}),
+        _safe(_get_financial_context(user_msg), {}),
     )
 
     # build the message list
@@ -1074,6 +1105,37 @@ async def chat_stream(req: ChatRequest):
             "role": "system",
             "content": f"Agent memory context (Letta):\n{letta_response}",
         })
+
+    # inject P29 financial context — CIS/VAT/tax summary, keyword-triggered
+    if financial_context:
+        fin_parts = []
+        cis = financial_context.get("cis_summary", {})
+        if cis:
+            fin_parts.append(
+                f"CIS YTD: gross £{cis.get('total_gross', 0):.2f}, "
+                f"deductions £{cis.get('total_deductions', 0):.2f}, "
+                f"net £{cis.get('total_net', 0):.2f} "
+                f"({cis.get('record_count', 0)} records)"
+            )
+        vat = financial_context.get("vat_position", {})
+        if vat:
+            fin_parts.append(
+                f"VAT: rolling 12-month £{vat.get('rolling_12m_turnover', 0):.2f} "
+                f"(threshold £{vat.get('threshold', 85000):.0f}, "
+                f"must register: {vat.get('must_register', False)})"
+            )
+        tax = financial_context.get("tax_estimate", {})
+        if tax:
+            fin_parts.append(
+                f"Tax estimate: income tax £{tax.get('income_tax', 0):.2f}, "
+                f"Class 4 NI £{tax.get('class4_ni', 0):.2f}, "
+                f"total £{tax.get('total_liability', 0):.2f}"
+            )
+        if fin_parts:
+            messages.append({
+                "role": "system",
+                "content": "Financial context (CIS/VAT/Tax — UK self-employed):\n" + "\n".join(fin_parts),
+            })
 
     if wake_intent.get("intent") != "unknown":
         messages.append({

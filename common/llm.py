@@ -57,6 +57,12 @@ _DEFAULT_URLS: Dict[str, str] = {
     "DeepSeek-V4": os.getenv("LLM_DEEPSEEK_URL", ""),
     "Kimi-2.5": os.getenv("LLM_KIMI_URL", ""),
     "Dolphin": os.getenv("LLM_DOLPHIN_URL", ""),
+    # Cloud fallback backends — only active when an API key is configured.
+    # URL stored WITHOUT /v1 suffix so _live_query's /v1/chat/completions append works.
+    "Groq": (os.getenv("GROQ_API_URL", "https://api.groq.com/openai")
+             if os.getenv("GROQ_API_KEY") else ""),
+    "OpenRouter": (os.getenv("OPENROUTER_API_URL", "https://openrouter.ai/api")
+                   if os.getenv("OPENROUTER_API_KEY") else ""),
 }
 
 # Maps specialist names to their Ollama model identifiers.
@@ -68,6 +74,14 @@ _MODEL_MAP: Dict[str, str] = {
     "DeepSeek-V4": os.getenv("LLM_DEEPSEEK_MODEL", "deepseek-v4"),
     "Kimi-2.5": os.getenv("LLM_KIMI_MODEL", "kimi-2.5"),
     "Dolphin": os.getenv("LLM_DOLPHIN_MODEL", "dolphin-mistral"),
+    "Groq": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+    "OpenRouter": os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free"),
+}
+
+# API keys for cloud backends (empty string = not configured).
+_API_KEY_MAP: Dict[str, str] = {
+    "Groq": os.getenv("GROQ_API_KEY", ""),
+    "OpenRouter": os.getenv("OPENROUTER_API_KEY", ""),
 }
 
 LLM_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "120"))
@@ -245,15 +259,24 @@ class LLMRouter:
         import httpx
 
         model = _MODEL_MAP.get(specialist, specialist)
+        is_cloud = url.startswith("https://")
 
-        # C5: verify model is loaded before routing; fall back to default if not
-        if not await ensure_model_available(model):
+        # C5: verify model is loaded before routing; skip for cloud APIs
+        if not is_cloud and not await ensure_model_available(model):
             fallback = _OLLAMA_MODEL
             logger.warning(
                 "model_fallback: requested=%s not available, using default=%s",
                 model, fallback,
             )
             model = fallback
+
+        # Auth header for cloud APIs
+        headers: Dict[str, str] = {}
+        api_key = _API_KEY_MAP.get(specialist, "")
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
+        if specialist == "OpenRouter":
+            headers["HTTP-Referer"] = "https://github.com/dainius1234/kai-system"
 
         payload = {
             "model": model,
@@ -270,7 +293,7 @@ class LLMRouter:
             model_name = _MODEL_MAP.get(specialist, specialist)
             query_timeout = _model_timeout(model_name)
             timeout = httpx.Timeout(query_timeout, connect=LLM_CONNECT_TIMEOUT, read=query_timeout)
-            async with httpx.AsyncClient(timeout=timeout) as client:
+            async with httpx.AsyncClient(timeout=timeout, headers=headers) as client:
                 resp = await client.post(f"{url}/v1/chat/completions", json=payload)
                 resp.raise_for_status()
                 data = resp.json()
@@ -358,9 +381,17 @@ class LLMRouter:
         heartbeat_timeout = float(os.getenv("STREAM_HEARTBEAT_TIMEOUT", "30"))
         stream_start = time.monotonic()
 
+        # Auth header for cloud streaming APIs
+        stream_headers: Dict[str, str] = {}
+        _stream_key = _API_KEY_MAP.get(specialist, "")
+        if _stream_key:
+            stream_headers["Authorization"] = f"Bearer {_stream_key}"
+        if specialist == "OpenRouter":
+            stream_headers["HTTP-Referer"] = "https://github.com/dainius1234/kai-system"
+
         try:
             timeout = httpx.Timeout(LLM_TIMEOUT, connect=LLM_CONNECT_TIMEOUT, read=LLM_READ_TIMEOUT)
-            async with httpx.AsyncClient(timeout=timeout) as client:
+            async with httpx.AsyncClient(timeout=timeout, headers=stream_headers) as client:
                 async with client.stream("POST", f"{url}/v1/chat/completions", json=payload) as resp:
                     resp.raise_for_status()
                     aiter = resp.aiter_lines()
