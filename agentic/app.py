@@ -549,14 +549,18 @@ _agents_text: str = ""
 
 
 def _load_soul() -> str:
-    """Load SOUL.md and extract personality overrides."""
+    """Load SOUL.md and extract personality overrides. Rebuilds system prompts if already built."""
     global _soul_text
     for p in [SOUL_PATH, Path("data/SOUL.md")]:
         if p.exists():
             _soul_text = p.read_text(encoding="utf-8")
             logger.info("Loaded SOUL.md from %s (%d chars)", p, len(_soul_text))
+            if "_SYSTEM_PROMPTS_BASE" in globals():
+                _rebuild_system_prompts()
             return _soul_text
     logger.info("No SOUL.md found — using built-in identity")
+    if "_SYSTEM_PROMPTS_BASE" in globals():
+        _rebuild_system_prompts()
     return ""
 
 
@@ -627,11 +631,20 @@ _SYSTEM_PROMPTS = {
     ),
 }
 
-# J6: Enrich system prompts with SOUL.md content if loaded
-if _soul_text:
-    _soul_snippet = "\n\n--- SOUL.md (operator-editable identity) ---\n" + _soul_text[:2000] + "\n---\n"
-    for mode in _SYSTEM_PROMPTS:
-        _SYSTEM_PROMPTS[mode] = _SYSTEM_PROMPTS[mode] + _soul_snippet
+_SYSTEM_PROMPTS_BASE = dict(_SYSTEM_PROMPTS)  # keep clean base for rebuilds
+
+
+def _rebuild_system_prompts() -> None:
+    """Rebuild _SYSTEM_PROMPTS from the base + current _soul_text. Call after any soul reload."""
+    for mode, base in _SYSTEM_PROMPTS_BASE.items():
+        if _soul_text:
+            snippet = "\n\n--- SOUL.md (operator-editable identity) ---\n" + _soul_text[:2000] + "\n---\n"
+            _SYSTEM_PROMPTS[mode] = base + snippet
+        else:
+            _SYSTEM_PROMPTS[mode] = base
+
+
+_rebuild_system_prompts()
 
 
 class ChatRequest(BaseModel):

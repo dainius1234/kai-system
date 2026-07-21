@@ -866,3 +866,46 @@ Follow-up the same session, after the user asked to actually try rather than jus
 - Finance tab JS never throws on unavailable backend — all code paths end gracefully.
 
 **Consequences:** LLM reliability improved for rate-limited cloud backends; weekly CI now includes LLM quality scoring; dashboard has a working Finance / CIS tracker surface; users have documented PWA install instructions for phone access.
+
+---
+
+## D60 — J6: SOUL.md / AGENTS.md Identity Infrastructure
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** Kai needs a live-editable identity layer — SOUL.md (personality, values, boundaries) and AGENTS.md (agent registry) — that operators can update at runtime without restarting the container. The agentic service already had `_load_soul()`, `_load_agents()`, and `/soul`/`/agents-registry` GET/POST endpoints, but five implementation gaps prevented the feature from working end-to-end.
+
+**Decisions / Changes:**
+
+*agentic/app.py (hot-reload bug fix):*
+- Added `_SYSTEM_PROMPTS_BASE = dict(_SYSTEM_PROMPTS)` to snapshot the undecorated prompts once.
+- Added `_rebuild_system_prompts()` that stamps the current `_soul_text` snippet into every mode's system prompt from the base snapshot, replacing a one-time import-time enrichment with a callable that re-runs on each soul reload.
+- Modified `_load_soul()` to call `_rebuild_system_prompts()` after updating `_soul_text`; the call is guarded with `if "_SYSTEM_PROMPTS_BASE" in globals()` to handle the startup call-order issue (`_load_soul()` executes before `_SYSTEM_PROMPTS_BASE` is defined).
+
+*agentic/Dockerfile:*
+- Added `COPY data/ ./data/` so `data/SOUL.md` and `data/AGENTS.md` are baked into the image as the default identity (overridable at runtime via the Docker volume).
+
+*docker-compose.full.yml:*
+- Added `SOUL_PATH: /data/soul/SOUL.md` and `AGENTS_PATH: /data/soul/AGENTS.md` env vars to the agentic service so the container reads/writes from the persistent volume, not the baked-in copy.
+- Added `soul_data:/data/soul` volume mount to the agentic service.
+- Added `soul_data:` to the top-level `volumes:` section so identity edits survive container restarts.
+
+*dashboard/app.py (proxy routes):*
+- Added module-level `AGENTIC_URL = os.getenv("LANGGRAPH_URL", "http://agentic:8007")` constant.
+- Added four proxy endpoints: `GET /api/soul`, `POST /api/soul`, `GET /api/agents-registry`, `POST /api/agents-registry` — each delegates to the agentic service using the existing `_proxy_get`/`_proxy_post` helpers with graceful `{"status": "unavailable"}` fallback.
+
+*dashboard/static/app.html (Soul Editor UI):*
+- Added collapsible Soul Editor panel to the EQ / Identity view with two textareas (SOUL.md, AGENTS.md) and Load/Save buttons.
+- Added five JS functions: `toggleSoulEditor()`, `loadSoulEditor()`, `saveSoulEditor()`, `loadAgentsEditor()`, `saveAgentsEditor()`. Save buttons provide inline success/error feedback with colour flash and auto-reset after 2.5 s.
+
+*scripts/test_soul_identity.py (new):*
+- Tests: soul file load, missing-file graceful degradation, `_rebuild_system_prompts` presence, route registration, Dockerfile `COPY data/` assertion, `data/SOUL.md` and `data/AGENTS.md` existence, docker-compose volume declarations, dashboard proxy route presence, data file content sanity.
+
+**Key invariants preserved:**
+- Hot-reload is safe: `_rebuild_system_prompts()` always reads from `_SYSTEM_PROMPTS_BASE`, never from the already-enriched `_SYSTEM_PROMPTS`, so repeated saves don't layer soul snippets.
+- Startup order is safe: the `globals()` guard prevents `NameError` when `_load_soul()` runs before `_SYSTEM_PROMPTS_BASE` is defined.
+- The baked-in `data/SOUL.md` image copy acts as a bootstrap default; the Docker volume gives operators a persistent override path without image rebuilds.
+- Dashboard proxy uses existing resilience helpers — no new HTTP client code introduced.
+
+**Consequences:** Operators can edit Kai's identity (values, personality, agent registry) through the EQ tab's Soul Editor panel without SSH, file editing, or container restarts. Changes take effect on the next `/soul` POST and propagate into all subsequent LLM system prompts within the same process.

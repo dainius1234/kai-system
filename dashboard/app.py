@@ -672,6 +672,35 @@ async def api_finance_cis_record(request: Request):
     return await _proxy_post(f"{FINANCIAL_URL}/finance/cis/record", body=body, fallback={"status": "unavailable"})
 
 
+AGENTIC_URL = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
+
+
+@app.get("/api/soul")
+async def api_soul_get():
+    """Return current SOUL.md content from agentic."""
+    return await _proxy_get(f"{AGENTIC_URL}/soul", fallback={"status": "unavailable", "content": ""})
+
+
+@app.post("/api/soul")
+async def api_soul_post(request: Request):
+    """Update SOUL.md content via agentic."""
+    body = await request.json()
+    return await _proxy_post(f"{AGENTIC_URL}/soul", body=body, fallback={"status": "unavailable"})
+
+
+@app.get("/api/agents-registry")
+async def api_agents_registry_get():
+    """Return current AGENTS.md content from agentic."""
+    return await _proxy_get(f"{AGENTIC_URL}/agents-registry", fallback={"status": "unavailable", "content": ""})
+
+
+@app.post("/api/agents-registry")
+async def api_agents_registry_post(request: Request):
+    """Update AGENTS.md content via agentic."""
+    body = await request.json()
+    return await _proxy_post(f"{AGENTIC_URL}/agents-registry", body=body, fallback={"status": "unavailable"})
+
+
 @app.get("/api/struggle")
 async def api_struggle(session_id: str = "default"):
     """Proxy struggle detection from memu-core."""

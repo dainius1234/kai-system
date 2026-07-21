@@ -725,6 +725,36 @@
             </div>
           </div>
 
+          <!-- ─── J6: Soul Editor ───────────────────────────────── -->
+          <div style="max-width:960px;margin:var(--sp-6) auto 0;padding:0 var(--sp-6) var(--sp-6);">
+            <div class="card" style="border-left:3px solid var(--accent);">
+              <div class="card-title" style="cursor:pointer;user-select:none;" onclick="toggleSoulEditor()">
+                <span class="icon">✍️</span> Identity Files
+                <span id="soulEditorChevron" style="float:right;font-size:12px;color:var(--text3);">▼ expand</span>
+              </div>
+              <div id="soulEditorPanel" style="display:none;margin-top:var(--sp-3);">
+                <p style="font-size:12px;color:var(--text3);margin-bottom:var(--sp-3);">
+                  Edit Kai's identity and agents registry. Changes take effect immediately — no restart needed.
+                </p>
+                <div style="display:flex;gap:var(--sp-2);margin-bottom:var(--sp-2);align-items:center;">
+                  <strong style="font-size:13px;">SOUL.md</strong>
+                  <button class="refresh-btn" style="font-size:11px;padding:2px 8px;" onclick="loadSoulEditor()">↻ Load</button>
+                  <button class="refresh-btn" style="font-size:11px;padding:2px 8px;background:var(--accent);color:#000;" onclick="saveSoulEditor()">💾 Save</button>
+                  <span id="soulSaveStatus" style="font-size:12px;color:var(--text3);"></span>
+                </div>
+                <textarea id="soulEditorText" style="width:100%;height:260px;font-family:monospace;font-size:12px;background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:var(--sp-2);resize:vertical;box-sizing:border-box;" placeholder="Loading SOUL.md…"></textarea>
+
+                <div style="display:flex;gap:var(--sp-2);margin:var(--sp-3) 0 var(--sp-2);align-items:center;">
+                  <strong style="font-size:13px;">AGENTS.md</strong>
+                  <button class="refresh-btn" style="font-size:11px;padding:2px 8px;" onclick="loadAgentsEditor()">↻ Load</button>
+                  <button class="refresh-btn" style="font-size:11px;padding:2px 8px;background:var(--accent);color:#000;" onclick="saveAgentsEditor()">💾 Save</button>
+                  <span id="agentsSaveStatus" style="font-size:12px;color:var(--text3);"></span>
+                </div>
+                <textarea id="agentsEditorText" style="width:100%;height:220px;font-family:monospace;font-size:12px;background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:var(--sp-2);resize:vertical;box-sizing:border-box;" placeholder="Loading AGENTS.md…"></textarea>
+              </div>
+            </div>
+          </div>
+
           </div>
         </section>
 
@@ -1142,6 +1172,82 @@ async function logCisPayment() {
     resEl.style.color = 'var(--danger)';
     resEl.textContent = 'Request failed: ' + e.message;
   }
+}
+
+
+// ── Soul / Agents Editor ───────────────────────────────────────────
+
+function toggleSoulEditor() {
+  const panel = document.getElementById('soulEditorPanel');
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) loadSoulEditor();
+}
+
+async function loadSoulEditor() {
+  const ta = document.getElementById('soulEditorText');
+  ta.placeholder = 'Loading…';
+  try {
+    const r = await fetch('/api/soul').then(r => r.json());
+    ta.value = r.content || '';
+    ta.placeholder = 'SOUL.md content';
+  } catch (e) {
+    ta.placeholder = 'Failed to load: ' + e.message;
+  }
+}
+
+async function saveSoulEditor() {
+  const ta = document.getElementById('soulEditorText');
+  const btn = document.querySelector('[onclick="saveSoulEditor()"]');
+  const orig = btn.textContent;
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/soul', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: ta.value })
+    }).then(r => r.json());
+    btn.textContent = r.status === 'ok' ? '✓ Saved' : '✗ Error';
+    btn.style.background = r.status === 'ok' ? 'var(--success)' : 'var(--danger)';
+  } catch (e) {
+    btn.textContent = '✗ Failed';
+    btn.style.background = 'var(--danger)';
+  }
+  setTimeout(() => { btn.textContent = orig; btn.disabled = false; btn.style.background = ''; }, 2500);
+}
+
+async function loadAgentsEditor() {
+  const ta = document.getElementById('agentsEditorText');
+  ta.placeholder = 'Loading…';
+  try {
+    const r = await fetch('/api/agents-registry').then(r => r.json());
+    ta.value = r.content || '';
+    ta.placeholder = 'AGENTS.md content';
+  } catch (e) {
+    ta.placeholder = 'Failed to load: ' + e.message;
+  }
+}
+
+async function saveAgentsEditor() {
+  const ta = document.getElementById('agentsEditorText');
+  const btn = document.querySelector('[onclick="saveAgentsEditor()"]');
+  const orig = btn.textContent;
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/agents-registry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: ta.value })
+    }).then(r => r.json());
+    btn.textContent = r.status === 'ok' ? '✓ Saved' : '✗ Error';
+    btn.style.background = r.status === 'ok' ? 'var(--success)' : 'var(--danger)';
+  } catch (e) {
+    btn.textContent = '✗ Failed';
+    btn.style.background = 'var(--danger)';
+  }
+  setTimeout(() => { btn.textContent = orig; btn.disabled = false; btn.style.background = ''; }, 2500);
 }
 
 

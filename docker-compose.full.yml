@@ -286,9 +286,13 @@ services:
       FF_FINANCIAL_CONTEXT: "${FF_FINANCIAL_CONTEXT:-true}"
       FF_LETTA_TASKS: "${FF_LETTA_TASKS:-false}"
       FF_LETTA_MEMORY_SYNC: "${FF_LETTA_MEMORY_SYNC:-false}"
+      SOUL_PATH: /data/soul/SOUL.md
+      AGENTS_PATH: /data/soul/AGENTS.md
       INTERSERVICE_HMAC_SECRET: /run/secrets/hmac_secret
     secrets:
       - hmac_secret
+    volumes:
+      - soul_data:/data/soul
     ports:
       - "8007:8007"
     healthcheck:
@@ -872,6 +876,7 @@ volumes:
   turbovec_data:
   letta_data:
   finance_data:
+  soul_data:
 
 # ── Docker Secrets (production) ──────────────────────────────────────
 # Create runtime-secrets/ directory with secret files before deploying:
