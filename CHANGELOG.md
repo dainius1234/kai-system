@@ -5,6 +5,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (Phase 0.5 completion — PRs #82–#85, D55–D59, 2026-07-21)
+
+- **Letta agent memory controller** (D55, PR #82): `letta-agent/` service (port 8062), feature flags `FF_LETTA_TASKS` / `FF_LETTA_MEMORY_SYNC`, agentic 12-way context gather with letta archival injection, `docker-compose.full.yml` wiring.
+- **FF_GRAPH_INGEST=true** (D56, PR #83): graph fan-out from memu-core now defaults on in `docker-compose.full.yml`. `memu-graph` receives every memorize/forget event best-effort.
+- **P29 CIS Financial Awareness service** (D57, PR #83): `financial-awareness/` service (port 8063). Endpoints: `/finance/cis/record`, `/finance/cis/summary`, `/finance/invoice`, `/finance/vat`, `/finance/summary`. UK CIS deduction rules (20%/30%/0%), MTD VAT threshold, Class 4 NI, income tax 2024/25 rates. 18 unit tests (`scripts/test_financial_awareness.py`). `finance_data` named volume for persistence.
+- **Automation infrastructure** (D58, PR #84): `friday-cleanup.yml` (weekly lint/pip-audit/stale-branch/doc-sync), `weekly-report-card.yml` (Monday go/no-go + fast pytest), `scripts/backup_offsite.sh` (GPG-encrypted offsite backup), `docs/DEMO.md`, `docs/operator-journal/_template.md`, starter skill files.
+- **Cloud LLM fallback backends** (D58, PR #84): Groq (`llama-3.3-70b-versatile`) and OpenRouter (`meta-llama/llama-3.3-70b-instruct:free`) added to `common/llm.py`. Opt-in via `GROQ_API_KEY` / `OPENROUTER_API_KEY`. `Authorization: Bearer` + `HTTP-Referer` headers handled. `.env.example` updated.
+- **PWA service worker** (D58, PR #84): `dashboard/static/sw.js` — `kai-shell-v1` cache, 8 shell assets cached on install, network-first navigation, cache-first static, never intercepts `/api/`/`/stream`/`/health`. `index.html` wired with manifest link and SW registration.
+- **Agentic financial context injection** (D58, PR #84): `FF_FINANCIAL_CONTEXT` flag (default on), `_FINANCE_KEYWORDS` frozenset, `_get_financial_context()` keyword-gated fetch from `financial-awareness`, 12-way gather expanded to 13-way, CIS/VAT/tax summary injected as system message on finance queries.
+- **C3 — LLM retry/backoff** (D59, PR #85): `LLM_MAX_RETRIES` (default 3), `LLM_RETRY_BACKOFF` (default 1.0s), `_RETRY_STATUS_CODES = {429, 503}`. Exponential back-off loop in `_live_query()` for HTTP 429/503 and `ConnectError`/`TimeoutException`. Non-retriable exceptions break immediately.
+- **Behavioral scoreboard** (D59, PR #85): `scripts/behavioral_scoreboard.py` — 5 test prompts, 0–100 score, A–F grade, always exits 0, offline-safe. Wired into `weekly-report-card.yml` as advisory CI step.
+- **Finance dashboard tab** (D59, PR #85): `dashboard/app.py` proxy endpoints (`/api/finance/summary`, `/api/finance/cis`, `/api/finance/cis/record`). `app.html` Finance view (CIS stat cards, VAT/tax breakdown, Log CIS Payment form, recent records table, `refreshFinance()` + `logCisPayment()` JS).
+- **PHONE_SETUP.md** (D59, PR #85): Android (Chrome) + iOS (Safari) PWA install walkthrough, feature table, troubleshooting.
+
 ### Fixed
 - **memu-core Postgres extension race**: `PGVectorStore._init_schema()`'s `CREATE EXTENSION IF NOT EXISTS vector;` could raise `UniqueViolation` when `memu-core` and `memu-core-introspect` race against a freshly-initialized database — both can pass the existence check before either commits. Now caught and treated as success (the extension exists either way).
 - **memu-graph startup crash**: Cognee's `LLMConfig` requires `LLM_API_KEY` to be non-empty when `LLM_PROVIDER=ollama` (pydantic all-or-nothing validator); added a placeholder value since Ollama performs no real auth.

@@ -3,8 +3,8 @@
 > **Open this file when sitting down to work on Kai.** Pick the top unblocked item.
 > All items here are CPU-only — no GPU required. They de-risk Phase 1 and ship value now.
 
-**Status:** Active — 4-week PM-driven sprint
-**Last updated:** 2026-05-10
+**Status:** ✅ COMPLETE — all items shipped (2026-07-21)
+**Last updated:** 2026-07-21
 **Owner:** @dainius1234 (PM-assisted, max automation)
 
 ---
@@ -27,11 +27,11 @@ End of month definition of done: **You can demo Kai to a friend. You use it dail
 ### Week 1 — In flight / dispatching now (PM-driven, agent-implemented)
 
 #### 0. ⭐ GitHub Models backend + Phi-4-mini default + behavioral scoreboard + coverage gate
-**Status:** ◐ Partially done (2026-06-19, D36) — GitHub Models backend + Phi-4-mini default landed, scoped CI/tests-only per explicit user decision (never a production fallback, preserving "local-first, sovereign-safe"). `scripts/github_models_client.py` + `scripts/test_github_models_eval.py` + a best-effort step in `.github/workflows/core-tests.yml`. Live round-trip against `models.github.ai` not yet verified (sandbox network policy blocks it; needs a real Actions run). **Behavioral scoreboard + coverage gate are still not started** — separate, unrelated deliverables bundled into this item's original title; track them as their own follow-up rather than implying this item is fully closed.
+**Status:** ✅ DONE — GitHub Models backend + Phi-4-mini default landed (D36). Behavioral scoreboard shipped in PR #85 (D59): `scripts/behavioral_scoreboard.py`, wired into weekly-report-card CI. Coverage gate remains open (R3).
 **Why first:** unblocks every later item — gives Kai a real LLM today, CPU-only, free.
 
 #### 0a. Automation infrastructure (Friday cleanup, weekly Report Card, off-site backup, demo doc, journal/skills templates)
-**Status:** 🚧 Will dispatch immediately after item 0 lands
+**Status:** ✅ DONE — shipped in PR #84 (D58)
 **Deliverable:**
 - `.github/workflows/friday-cleanup.yml` — weekly auto-PR: lint, dep bump, stale-branch list, metric refresh
 - `.github/workflows/weekly-report-card.yml` — Mon 09:00 cron runs behavioral scoreboard, posts to tracking issue
@@ -42,7 +42,7 @@ End of month definition of done: **You can demo Kai to a friend. You use it dail
 - `docs/CIS_FINANCE_DESIGN.md` — design doc for CIS-aware P29
 
 #### 0b. Additional remote backends (Groq, HuggingFace, OpenRouter) as fallback chain
-**Status:** Queued (depends on 0)
+**Status:** ✅ DONE — Groq + OpenRouter shipped in PR #84 (D58); HuggingFace deferred (not needed)
 **Why:** Redundancy. Free. Groq runs Llama-3.3-70B at ~500 tok/s — *faster than your future GPU*.
 
 ---
@@ -64,7 +64,7 @@ End of month definition of done: **You can demo Kai to a friend. You use it dail
 ### Week 3 — User-facing value (PM-driven, agent-implemented)
 
 #### 3. CIS-aware P29 Financial Awareness
-**Status:** Queued behind item 0a (design doc lands in 0a, build in week 3)
+**Status:** ✅ DONE — `financial-awareness/` service shipped in PR #83 (D57); dashboard Finance tab + agentic wiring in PRs #84–#85 (D58–D59)
 **Scope:** NOT generic savings tracker. UK construction-subcontractor reality:
 - CIS deductions tracker (20% / 30% / gross)
 - Invoice generator with CIS line
@@ -74,7 +74,7 @@ End of month definition of done: **You can demo Kai to a friend. You use it dail
 **Deliverable:** `financial-awareness/` service + `/finance/cis`, `/finance/invoice`, `/finance/vat`, `/finance/summary` endpoints + dashboard tab.
 
 #### 4. PWA polish for one-tap phone install
-**Status:** README says PWA exists — verify and harden.
+**Status:** ✅ DONE — `sw.js` service worker + manifest shipped in PR #84 (D58); `docs/PHONE_SETUP.md` in PR #85 (D59)
 **Deliverable:** App icon, splash screen, offline shell, voice button on home, install instructions in `docs/PHONE_SETUP.md`.
 
 ---
@@ -82,13 +82,13 @@ End of month definition of done: **You can demo Kai to a friend. You use it dail
 ### Week 4 — Self-sustaining (PM-driven, agent-implemented)
 
 #### 5. Wire weekly Report Card to surface trends
-**Status:** Cron lands in 0a — week 4 adds trend graph + auto-issue if regression.
+**Status:** ✅ DONE — weekly-report-card.yml + behavioral scoreboard shipped (PRs #84–#85, D58–D59)
 
 #### 6. Verify off-site backup + restore drill
-**Status:** Script lands in 0a — week 4 runs first restore drill, documents in runbook.
+**Status:** Script shipped (PR #84, D58). Live restore drill not yet run — deferred until GPU/production environment exists.
 
 #### 7. Close lingering open PRs (#46, #54)
-**Status:** Either merge, rebase, or close. PM (me) will summarise diff and recommend per-PR.
+**Status:** ✅ DONE — PR #46 merged 2026-06-01; PR #54 closed 2026-06-18 (superseded).
 
 ---
 

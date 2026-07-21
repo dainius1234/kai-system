@@ -321,7 +321,7 @@ dep-audit:
 	pip-audit --strict --desc
 
 coverage:
-	PYTHONPATH=. python -m pytest scripts/ --cov=common --cov-report=term-missing --cov-report=html:output/coverage_html -q
+	PYTHONPATH=. python -m pytest scripts/ --cov=common --cov-report=term-missing --cov-report=html:output/coverage_html --cov-fail-under=65 -q
 
 # v7 feature tests
 test-v7-verifier:

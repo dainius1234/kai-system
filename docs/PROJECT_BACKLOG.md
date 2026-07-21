@@ -12,7 +12,7 @@ Not an agent framework. A sovereign intelligence that grows.
 **Hardware constraint:** No local GPU until RTX 5080 arrives. All LLM
 backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 
-**Last updated:** 2026-04-21 — session: GPU Phase 0 consolidation, memu Redis persistence/reconnection hardening, model-timeout wiring
+**Last updated:** 2026-07-21 — Phase 0.5 complete; D55–D59 shipped (PRs #82–#85)
 
 ---
 
@@ -44,7 +44,7 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 | Struggle detection? | **YES — 5-signal frustration analysis (short msgs, repeated questions, keywords, question density, rapid-fire)** |
 | Feedback loop? | **YES — 1-5 star ratings per response, boost/correction effects on memory** |
 | Log aggregation? | **YES — ring-buffer capture on memu-core + agentic, level/time-filtered, dashboard aggregator** |
-| Dashboard views? | **YES — 8 views: Chat, Thinking, Goals, Memory Browser, Logs, Settings, Wizard, Soul** |
+| Dashboard views? | **YES — 11 views: Chat, Dashboard, Thinking, Goals, Memory, Logs, Settings, Soul, Canvas, Diary, Finance** |
 | Emotional intelligence? | **YES — emotional memory, self-reflection, relationship timeline, epistemic humility, confession engine** |
 | Soul dashboard? | **YES — mood tracking, emotion timeline, domain confidence, self-reflection journal, milestones, identity card, story arcs, future self, autobiography, legacy messages** |
 | Narrative identity? | **YES — autobiographical memory, emergent identity narrative, story arc detection, future self projection, legacy time-capsules** |
@@ -90,12 +90,12 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 |---|---|---|---|
 | **C1** | Per-model timeouts not wired into live queries | **DONE** — `model_timeout()` wired into `LLMRouter._live_query()` timeout | S |
 | **C2** ✅ | Streaming has no heartbeat/stall detection | `STREAM_HEARTBEAT_TIMEOUT` + `asyncio.wait_for` in `LLMRouter.stream()` — shipped in chassis-polish PR | M |
-| **C3** | Retry + backoff on LLM 429/503 | Add `tenacity` retry decorator with exponential backoff to `_live_query` | M |
+| **C3** ✅ | Retry + backoff on LLM 429/503 | **DONE (D59, PR #85)** — exponential back-off loop in `_live_query()`, `LLM_MAX_RETRIES=3`, `LLM_RETRY_BACKOFF=1.0s`, handles 429/503/ConnectError/TimeoutException | M |
 | **C4** | Router uses keyword regex (8 categories) | Add embedding-based route classification when model tier >= 2 | L |
 | **C5** ✅ | Model selector doesn't verify model is loaded | `ensure_model_available()` + TTL cache + fallback in `_live_query()` — shipped in chassis-polish PR | S |
 | **C6** | Conviction scoring ignores LLM quality signals | Add response entropy + uncertainty markers to score | M |
 | **C7** ✅ | memu-core fallback embeddings are hash-based | **DONE 2026-06-19 (D35)** — `generate_embedding()` raises `RuntimeError` by default if sentence-transformers/model load fails; hash fallback now requires explicit `MEMU_ALLOW_FAKE_EMBEDDINGS=true` opt-in, wired into the lightweight test scripts that don't depend on real embedding quality | M |
-| **C8** | Dashboard Thinking/Goals/Memory are proxy shells | Wire real data endpoints when full stack is running | L |
+| **C8** ✅ | Dashboard Thinking/Goals/Memory are proxy shells | **DONE (D59, PR #85)** — Finance tab added with live proxy endpoints; Thinking/Goals/Memory already had real data functions. Finance view: stat cards, VAT/tax breakdown, CIS payment log | L |
 | **C9** ✅ | No model warm-up / pre-load on startup | `llm_warmup()` + `OLLAMA_AUTO_PULL` + FastAPI startup hook — shipped in chassis-polish PR | S |
 | **C10** | No A/B testing framework for model comparison | Log model name + response quality per query for comparison | M |
 
@@ -309,17 +309,15 @@ REMEMBER you. Cross-referenced with Grok brainstorm 2026-03-22.*
       ladder, fires Telegram alerts for level 3+ (tough love, intervention).
 - [x] **117 unit tests** (scripts/test_p22_operator_model.py)
 
-### P29 — Financial Awareness
-*Dainius sleeps in his car saving £50/day. Kai should track this.*
+### P29 — Financial Awareness ✅ DONE (D57–D59, PRs #83–#85)
+*Dainius sleeps in his car saving £50/day. Kai tracks this.*
 
-- [ ] **Savings tracker** — POST /memory/finance/log (amount, category, note).
-      Running total, daily burn rate, goal countdown.
-- [ ] **RTX 5080 goal countdown** — target amount, current savings, days remaining
-      at current rate. Dashboard widget + Telegram daily update.
-- [ ] **Expense categorization** — auto-categorize from text (fuel, food, tools,
-      materials, savings). Monthly/weekly breakdowns.
-- [ ] **Financial summary** — GET /memory/finance/summary. Net position,
-      trajectory, goal progress. Part of morning briefing.
+- [x] **CIS tracker** — `financial-awareness/` service (port 8063): `/finance/cis/record`, `/finance/cis/summary`. UK CIS 20%/30%/0% deduction rules, labour vs materials split, contractor tracking.
+- [x] **VAT position** — `/finance/vat`, MTD threshold (£50k rolling 12-month), flat-rate support.
+- [x] **Tax estimate** — income tax 2024/25 (PA £12,570, basic/higher/additional), Class 4 NI.
+- [x] **Financial summary** — `/finance/summary` aggregates CIS, VAT, tax, invoices.
+- [x] **Dashboard Finance tab** — stat cards (gross YTD, deductions, net, tax estimate), VAT/tax breakdown tables, Log CIS Payment form, recent records table.
+- [x] **Agentic context injection** — keyword-gated CIS/VAT/tax summary injected into LLM context on finance queries (`FF_FINANCIAL_CONTEXT=true`).
 
 ### P23 — Knowledge Ingestion (RAG Pipeline)
 *Kai can memorize from conversation. Now it reads documents.*
@@ -1417,34 +1415,19 @@ Phase 0 completed and documented in [`docs/gpu_integration_phase0.md`](gpu_integ
 
 ---
 
-## What’s Next — Top Priorities
+## What’s Next — Top Priorities (2026-07-21)
 
-1. **J6: SOUL.md + AGENTS.md** ⭐ NEXT
-   - J2 front-door is now in place; identity persistence is the natural follow-up
-   - Persistent identity files read on startup, operator-editable
-2. **J1: Live Canvas Visualization**
-   - Mind-map / graph / timeline rendering in dashboard
-   - Uses existing goals + memories data
-3. **J2: Wake-word "Kai" + Intent Judge** ✅
-   - Delivered as perception wake service + dashboard proxy + optional agentic pre-routing
-   - Configurable wake words, debounce, tiny-model intent judge, heuristic fallback
-4. **J3: Auto-Redaction PII**
-   - Regex + OCR strip before any memorize/log
-   - Security improvement — relevant for production
-5. **J5: Memory Viewer GUI**
-   - Diary-style browser tab in dashboard
-   - Chronological view with emotion/category filters
-6. **J4: Proactive Low-Latency Voice**
-   - Audio/video cue → speak-or-not decision
-   - Requires perception + TTS integration
-7. **J7: Skills Auto-Install Hub**
-   - Local skill loader with hot-reload
-   - Opens extensibility without code changes
-8. **H3: Context Budget Manager**
-   - System prompt overflow — smart pruning needed
-9. **P29: Financial Awareness**
-   - Savings tracker, RTX 5080 countdown, expense categorization
-10. **GPU: Hardware Performance**
-    - Multi-model consensus, real STT/TTS, speculative decoding
+**Phase 0 is complete. All CPU-safe items shipped. Next meaningful work is GPU-gated.**
+
+1. **GPU hardware arrival** ⭐ GATE — RTX 5080: flip `OLLAMA_MODEL=qwen2.5:7b`, enable `FF_LETTA_TASKS=true`, validate STT/TTS/avatar, enter Phase 1.
+2. **Letta live smoke-test** — run `ollama show qwen2.5:0.5b --template | grep -i tools` on a live Ollama host to confirm tool-call support before enabling `FF_LETTA_TASKS=true`.
+3. **J6: SOUL.md + AGENTS.md** — identity persistence files read on startup, operator-editable. Natural follow-up once daily usage is established.
+4. **J1: Live Canvas Visualization** — mind-map/graph/timeline rendering in dashboard using existing goals + memories data.
+5. **J3: Auto-Redaction PII** — regex + OCR strip before any memorize/log. Security improvement for production.
+6. **J5: Memory Viewer GUI** — diary-style dashboard tab, chronological view with emotion/category filters.
+7. **J4: Proactive Low-Latency Voice** — audio/video cue → speak-or-not. Requires GPU + perception + TTS.
+8. **J7: Skills Auto-Install Hub** — local skill loader with hot-reload.
+9. **H3: Test coverage gate** — automated coverage measurement wired into CI (R3 open risk).
+10. **GPU: Phase 1** — multi-model consensus, real STT, speculative decoding.
 
 ---

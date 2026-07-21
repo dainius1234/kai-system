@@ -866,3 +866,196 @@ Follow-up the same session, after the user asked to actually try rather than jus
 - Finance tab JS never throws on unavailable backend — all code paths end gracefully.
 
 **Consequences:** LLM reliability improved for rate-limited cloud backends; weekly CI now includes LLM quality scoring; dashboard has a working Finance / CIS tracker surface; users have documented PWA install instructions for phone access.
+
+---
+
+## D60 — J6: SOUL.md / AGENTS.md Identity Infrastructure
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** Kai needs a live-editable identity layer — SOUL.md (personality, values, boundaries) and AGENTS.md (agent registry) — that operators can update at runtime without restarting the container. The agentic service already had `_load_soul()`, `_load_agents()`, and `/soul`/`/agents-registry` GET/POST endpoints, but five implementation gaps prevented the feature from working end-to-end.
+
+**Decisions / Changes:**
+
+*agentic/app.py (hot-reload bug fix):*
+- Added `_SYSTEM_PROMPTS_BASE = dict(_SYSTEM_PROMPTS)` to snapshot the undecorated prompts once.
+- Added `_rebuild_system_prompts()` that stamps the current `_soul_text` snippet into every mode's system prompt from the base snapshot, replacing a one-time import-time enrichment with a callable that re-runs on each soul reload.
+- Modified `_load_soul()` to call `_rebuild_system_prompts()` after updating `_soul_text`; the call is guarded with `if "_SYSTEM_PROMPTS_BASE" in globals()` to handle the startup call-order issue (`_load_soul()` executes before `_SYSTEM_PROMPTS_BASE` is defined).
+
+*agentic/Dockerfile:*
+- Added `COPY data/ ./data/` so `data/SOUL.md` and `data/AGENTS.md` are baked into the image as the default identity (overridable at runtime via the Docker volume).
+
+*docker-compose.full.yml:*
+- Added `SOUL_PATH: /data/soul/SOUL.md` and `AGENTS_PATH: /data/soul/AGENTS.md` env vars to the agentic service so the container reads/writes from the persistent volume, not the baked-in copy.
+- Added `soul_data:/data/soul` volume mount to the agentic service.
+- Added `soul_data:` to the top-level `volumes:` section so identity edits survive container restarts.
+
+*dashboard/app.py (proxy routes):*
+- Added module-level `AGENTIC_URL = os.getenv("LANGGRAPH_URL", "http://agentic:8007")` constant.
+- Added four proxy endpoints: `GET /api/soul`, `POST /api/soul`, `GET /api/agents-registry`, `POST /api/agents-registry` — each delegates to the agentic service using the existing `_proxy_get`/`_proxy_post` helpers with graceful `{"status": "unavailable"}` fallback.
+
+*dashboard/static/app.html (Soul Editor UI):*
+- Added collapsible Soul Editor panel to the EQ / Identity view with two textareas (SOUL.md, AGENTS.md) and Load/Save buttons.
+- Added five JS functions: `toggleSoulEditor()`, `loadSoulEditor()`, `saveSoulEditor()`, `loadAgentsEditor()`, `saveAgentsEditor()`. Save buttons provide inline success/error feedback with colour flash and auto-reset after 2.5 s.
+
+*scripts/test_soul_identity.py (new):*
+- Tests: soul file load, missing-file graceful degradation, `_rebuild_system_prompts` presence, route registration, Dockerfile `COPY data/` assertion, `data/SOUL.md` and `data/AGENTS.md` existence, docker-compose volume declarations, dashboard proxy route presence, data file content sanity.
+
+**Key invariants preserved:**
+- Hot-reload is safe: `_rebuild_system_prompts()` always reads from `_SYSTEM_PROMPTS_BASE`, never from the already-enriched `_SYSTEM_PROMPTS`, so repeated saves don't layer soul snippets.
+- Startup order is safe: the `globals()` guard prevents `NameError` when `_load_soul()` runs before `_SYSTEM_PROMPTS_BASE` is defined.
+- The baked-in `data/SOUL.md` image copy acts as a bootstrap default; the Docker volume gives operators a persistent override path without image rebuilds.
+- Dashboard proxy uses existing resilience helpers — no new HTTP client code introduced.
+
+**Consequences:** Operators can edit Kai's identity (values, personality, agent registry) through the EQ tab's Soul Editor panel without SSH, file editing, or container restarts. Changes take effect on the next `/soul` POST and propagate into all subsequent LLM system prompts within the same process.
+
+---
+
+## D61 — J1: Live Canvas with D3 v7
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** The existing Canvas tab used native `<canvas>` 2D API with hand-drawn nodes and lines. The operator confirmed D3.js for the upgrade. Three visualization modes were planned: Mind Map (goals + memory category clusters), Emotion Timeline (valence over time), and Plan Flow (recent thinking episodes with conviction scores). The canvas element was retained in the DOM but all rendering was to be migrated to D3 SVG.
+
+**Decisions / Changes:**
+
+*Static asset: `dashboard/static/d3.v7.min.js` (new, 280 KB):*
+- D3 v7 bundled as a local static file (installed via `npm install d3@7`, file copied from `node_modules/d3/dist/d3.min.js`). Served at `/static/d3.v7.min.js` — no CDN dependency at runtime.
+- `<script src="/static/d3.v7.min.js">` added to `<head>` alongside existing marked/dompurify CDN tags.
+
+*`dashboard/static/app.html` (canvas section upgraded):*
+- Replaced `<canvas id="liveCanvas">` with `<div id="canvasD3">` — D3 renders SVGs inside this container. Avoids the canvas pixel-scaling issues on HiDPI screens.
+- Rewrote `refreshCanvas()`: now fetches `/api/goals`, `/api/memory/stats`, `/api/emotion/timeline?limit=60`, and `/api/thinking` in parallel. Previous version only fetched goals, stats, and nudges.
+- Added `_canvasContainer()` helper: stops any running force simulation and clears the D3 div before each redraw.
+- Rewrote three drawing functions:
+  - `_drawMindMap(el, W, H)`: D3 force-directed simulation (forceLink + forceManyBody + forceCenter + forceCollide). Goals as coloured circles (green=complete, amber=in-progress, red=not-started), memory categories as purple nodes, KAI hub as cyan 44-px circle. Drag nodes + scroll-to-zoom via `d3.drag()` and `d3.zoom()`. Progress % and count shown as sub-labels.
+  - `_drawEmotionTimeline(el, W, H)`: D3 scaleTime/scaleLinear axes, monotone-X area chart with separate positive (green) and negative (red) area fills, cyan trend line, dot markers with `<title>` tooltips. Reads `/api/emotion/timeline` valence field.
+  - `_drawPlanFlow(el, W, H)`: Horizontal scrollable (via zoom) sequence of episode boxes. Each box shows input label, rethink count, failure class, timestamp, and a conviction-score badge circle (colored by threshold). Arrow markers between nodes. Reads `/api/thinking` pathways.
+- `canvasMode()` rewritten: uses `charAt(0).toUpperCase()` to build button IDs, cleanly handles the three modes without repetition.
+- Legend `#canvasLegend` updated per mode with colour-coded labels and interaction hints.
+
+*`scripts/test_j1_live_canvas.py` (new — 25 tests):*
+- Tests: D3 file presence and size, script tag placement in `<head>`, canvasD3 div, absence of old plain canvas element, mode buttons, nav item, JS function presence, D3 API usage (forceSimulation, zoom, drag, scaleTime, area, line, curveMonotoneX), correct data endpoints fetched, switchView canvas hook.
+
+**Key invariants preserved:**
+- D3 force simulation is torn down via `_canvasSim.stop()` before each redraw — no accumulation of stale simulation instances.
+- All three modes gracefully handle empty data (backend unavailable) with a centered placeholder message.
+- Zoom and drag are additive UX, not required — the chart is useful when static.
+- The local D3 file means the dashboard functions offline without CDN access.
+
+**Consequences:** Canvas tab now delivers an interactive, physics-based mind map of Kai's goal and memory landscape; a real valence-over-time emotion chart sourced from the memory system; and a conviction-flow view of recent thinking episodes — all using D3 v7 SVG with zoom/drag interactivity.
+
+---
+
+## D62 — J5: Memory Viewer / Diary Tab
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** The Diary tab existed as a skeleton (HTML + two stub JS functions) but was not functional as a diary-style viewer. It had hard-coded construction categories, no default content on tab open, no date grouping, no expand/collapse, no emotion/pin/trust badges, and no load-more. The existing `/api/memories` endpoint returned stats when called with no query or category, making "browse recent" impossible from the frontend without a dedicated endpoint.
+
+**Decisions / Changes:**
+
+*dashboard/app.py — new endpoint:*
+- `/api/memories/recent` (GET, `top_k` param default 30): calls memu-core `/memory/retrieve` with the broad query `"memories thoughts observations experiences"` and `user_id="keeper"`. Wraps the raw list response in `{"records": [...], "count": N}` for consistent consumption. Falls back to `{"records": [], "count": 0}` if memu is unavailable.
+
+*dashboard/static/app.html — diary section rework:*
+- **Stats bar**: added "Pinned" count alongside Total/Event Types/Showing. "Categories" counter now shows count of distinct event_types from stats rather than construction categories.
+- **Filters**: retained search + category select (construction categories), added `#diaryEventType` select (populated dynamically from `/api/memory/stats` event_types on tab open), `#diarySort` select (Most Recent / Highest Importance / Most Accessed / Pinned First), `#diaryPinnedOnly` checkbox, importance range slider. Browse Recent button triggers a clean reset + reload.
+- **Load More**: `#diaryLoadMore` button hidden until a full page is returned; clicking increments `_diaryTopK` by 20 and re-fetches.
+
+*Rewritten JS functions:*
+- `loadDiaryStats()`: fetches stats, populates event-type select, auto-loads 30 recent memories on tab open.
+- `diaryBrowseRecent()`: resets all filters and shows 30 most recent.
+- `searchDiary()`: delegates to `_fetchAndRenderDiary()` in search mode.
+- `loadMoreDiary()`: increments `_diaryTopK += 20` and re-fetches.
+- `_fetchAndRenderDiary()`: selects endpoint (`/api/memories/recent` vs `/api/memories?query=…` vs `/api/memories?category=…`) based on current state; applies client-side filters (event type, min importance, pinned-only); sorts records; calls `_renderDiaryCards()`.
+- `_diaryDateGroup(timestamp)`: groups timestamps into Today / Yesterday / This Week / This Month / month-year label.
+- `_renderDiaryCards(records, container)`: renders date-group separators and cards. Each card shows: construction-domain category badge, event-type badge, emotion badge (with colour from `_EMOTION_COLORS` map), trust-tier label (coloured by tier: PASS green / REPAIR amber / FAIL_CLOSED red), pinned indicator (📌 + left accent border), importance progress bar, access count, source ID, expand/collapse button for memories > 280 chars. All user-facing strings are DOMPurify sanitised.
+- `_diaryExpand()`: replaces truncated preview with full text inline; removes the expand button.
+
+*scripts/test_j5_diary.py (new — 44 tests):*
+- Tests: `/api/memories/recent` endpoint, HTML structure, all new filter controls, JS function presence, date grouping labels, sort logic, pinned filter, importance bar, emotion badge, trust badge, expand/collapse, event-type select population, load-more increment, DOMPurify usage.
+
+**Key invariants preserved:**
+- All user-content rendered via `DOMPurify.sanitize()` — no XSS vectors.
+- Backend unavailability degrades gracefully (fallback empty records, error message in UI).
+- The existing `/api/memories` endpoint is unchanged — no regression for existing callers.
+- `_diaryTopK` state is reset to 30 on each fresh search or Browse Recent, then incremented only by Load More.
+
+**Consequences:** The Diary tab now opens with live recent memories on first visit, groups them by day, shows emotion/pin/trust metadata per entry, supports expand-in-place for long records, and can page through the memory store 20 entries at a time.
+
+---
+
+## D63 — J3: PII Auto-Redaction
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** Memory content flowing through `memorize_event()` and `quick_note()` in memu-core could contain PII (email addresses, phone numbers, credit card numbers, UK NI numbers, API tokens/secrets, UK postcodes). Once stored in the vector store these records persist indefinitely and are surfaced in search results and the Diary view. The `redact_pii()` function and 6 regex patterns already existed in `common/runtime.py`; the `/redact` endpoint was already implemented in `verifier/app.py`. J3 wires both into the write path and adds a developer-facing scanner in the dashboard Settings tab.
+
+**Decisions / Changes:**
+
+*memu-core/app.py — write-path redaction:*
+- Added `redact_pii` to the `from common.runtime import …` line.
+- In `memorize_event()`: immediately after resolving `raw_text = update.result_raw or ""`, calls `redacted_text, pii_counts = redact_pii(raw_text)`. On any match, logs `"memorize pii_redacted counts=%s"` (counts only — never content). The `redacted_text` is used as the source for `text_for_classify`, `content["result"]`, embedding input, and graph ingest. Response dict now includes `"pii_redacted": sum(pii_counts.values())`.
+- In `quick_note()`: after `text = sanitize_string(note.text)` and the empty-check, calls `text, note_pii = redact_pii(text)` with the same audit-log pattern.
+
+*dashboard/app.py — new endpoint:*
+- Module-level `VERIFIER_URL = os.getenv("VERIFIER_URL", "http://verifier:8052")` constant (used for both the pre-existing verifier calls and the new endpoint).
+- `POST /api/pii/scan`: proxies `{"text": …, "auto_redact": …}` to `{VERIFIER_URL}/redact`. Fallback `{"status": "unavailable", "pii_found": {}, "total_pii": 0}` when verifier is offline.
+
+*dashboard/static/app.html — PII Scanner card in Settings tab:*
+- Card with `#piiInput` textarea, "Detect only" button (`piiScan(false)`), "Detect & Redact" button (`piiScan(true)`), "Clear" button (`piiClear()`).
+- Result area: `#piiResult` container (hidden until scan runs), `#piiSummary` div (shows count + type breakdown, green tick on no PII found, amber warning on finds), `#piiOutput` readonly textarea (shown only on Detect+Redact runs).
+- `piiScan(autoRedact)`: calls `/api/pii/scan`, reads `total_pii` and `pii_found` from response, DOMPurify-sanitises the type string before injecting into `summaryEl.innerHTML`.
+- `piiClear()`: resets input and hides result container.
+
+*scripts/test_j3_pii_redaction.py (new — 45 tests):*
+- `TestRuntimePiiPatterns` (12): all 6 pattern keys present, `detect_pii` and `redact_pii` function signatures, redaction tag format, return-value structure.
+- `TestMemuCorePiiWiring` (8): `redact_pii` in import line, `memorize_event` calls + uses `redacted_text` + returns `pii_redacted` count, audit log references counts not content, `quick_note` redaction present and ordered correctly.
+- `TestDashboardPiiEndpoint` (9): `VERIFIER_URL` constant, endpoint decorator, proxy target, `text`/`auto_redact` forwarding, fallback present, fallback contains `total_pii`, routes to `/redact`.
+- `TestHtmlPiiScanner` (8): card, input textarea, both action buttons, clear button, result/summary/output elements.
+- `TestHtmlPiiFunctions` (8): function signatures, API endpoint called, `pii_found`/`total_pii` fields read, DOMPurify sanitisation, clear function resets input and hides result.
+
+**Key invariants preserved:**
+- Audit logs never record PII content — only per-type counts. This satisfies the audit-without-exposure requirement: operators can confirm redaction happened without seeing what was redacted.
+- Redaction occurs before any downstream operation (classify, embed, graph ingest, store) so no PII reaches the vector index.
+- `common/runtime.py` is unchanged — all 6 patterns and both functions were pre-existing; J3 only consumes them.
+- The verifier `/redact` endpoint is unchanged.
+- Dashboard `/api/pii/scan` degrades gracefully when verifier is offline (fallback response, no 500).
+
+**Consequences:** Memory writes are now PII-clean at ingestion time. Developers and operators can use the Settings → PII Scanner to test arbitrary text before deploying or to audit clipboard contents without those strings entering the memory system.
+
+---
+
+## D64 — H3: Test Coverage Gate
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** RISKS.md R3 flagged "Test coverage % is unverified / not automated in CI gates" as Medium/High. CLEANUP_TODO and REPO_HEALTH_AUDIT both noted that `make coverage` and the `python-app.yml` pytest step measured `common/` coverage but imposed no enforcement threshold — a regression in coverage would pass CI silently. The previously measured baseline was 78% for `common/` as of 2026-06-01 (1,616 tests). The `python-app.yml` step already collected coverage but the `--cov-fail-under` flag was absent.
+
+**Decisions / Changes:**
+
+*`.github/workflows/python-app.yml`:*
+- Added `--cov-fail-under=65` to the existing pytest coverage step.
+- Renamed the step from "Test with pytest (with coverage)" → "Test with pytest (with coverage gate)" to make enforcement intent visible in CI UI.
+- Threshold 65%: conservatively below the measured 78% baseline to give headroom for newly-added uncovered code without triggering false-positive failures; meaningfully above 0% to catch major regressions.
+
+*`Makefile` — `coverage` target:*
+- Added `--cov-fail-under=65` to match the CI threshold exactly. Local developer runs (`make coverage`) now fail in the same way CI would.
+
+*`scripts/test_h3_coverage_gate.py` (new — 16 tests):*
+- `TestCIWorkflow` (8): workflow file exists, `pytest-cov` installed, `--cov=common` present, `--cov-fail-under` present, threshold ≥ 60, `--cov-report=term-missing` present, archive ignored, step is named.
+- `TestMakefileCoverageTarget` (6): target exists, `--cov=common` present, `--cov-fail-under` present, Makefile and CI thresholds are equal, HTML report requested, term-missing present.
+- `TestThresholdSanity` (2): threshold ≥ 60 (not trivially low), threshold ≤ 95 (not unrealistically high).
+
+**Key invariants:**
+- Makefile and CI thresholds are identical (both 65%) — they are cross-checked by `test_makefile_coverage_threshold_consistent`.
+- Only `common/` is gated, consistent with the existing measurement scope. Expanding coverage to `dashboard/`, `memu-core/`, or other modules is a separate decision when baseline measurements for those are established.
+- The threshold is documented here; future increases (e.g. to 75 or 80%) should be a new DECISIONS.md entry, not a silent edit.
+
+**Consequences:** CI now fails if the `common/` test coverage drops below 65%, closing RISKS.md R3 and the CLEANUP_TODO item. Developers running `make coverage` locally get the same enforcement as CI.

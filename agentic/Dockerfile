@@ -18,6 +18,7 @@ COPY agentic/router.py ./
 COPY agentic/security_audit.py ./
 COPY agentic/tree_search.py ./
 COPY common/ ./common/
+COPY data/ ./data/
 
 EXPOSE 8007
 

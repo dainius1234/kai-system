@@ -32,6 +32,7 @@ app = FastAPI(title="Sovereign Dashboard", version="0.4.0")
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
+VERIFIER_URL   = os.getenv("VERIFIER_URL", "http://verifier:8052")
 # Store-maintenance reads (stats/search-by-category/quarantine listing) live on
 # memu-core-introspect, split out from memu-core's hot path — see DECISIONS.md D21.
 MEMU_INTROSPECT_URL = os.getenv("MEMU_INTROSPECT_URL", "http://memu-core-introspect:8009")
@@ -647,6 +648,20 @@ async def api_memory_stats():
         return {"status": "unavailable"}
 
 
+@app.get("/api/memories/recent")
+async def api_memories_recent(top_k: int = 30):
+    """Browse recent memories for Diary tab (recency-weighted retrieve)."""
+    raw = await _proxy_get(
+        f"{MEMU_URL}/memory/retrieve",
+        params={"query": "memories thoughts observations experiences", "user_id": "keeper", "top_k": top_k},
+        fallback=[],
+    )
+    records = raw if isinstance(raw, list) else raw.get("records", raw.get("memories", []))
+    if not isinstance(records, list):
+        records = []
+    return {"records": records, "count": len(records)}
+
+
 @app.get("/api/finance/summary")
 async def api_finance_summary():
     """Proxy CIS/VAT/tax financial summary from the financial-awareness service (P29)."""
@@ -670,6 +685,46 @@ async def api_finance_cis_record(request: Request):
     """Proxy CIS payment record creation to the financial-awareness service."""
     body = await request.json()
     return await _proxy_post(f"{FINANCIAL_URL}/finance/cis/record", body=body, fallback={"status": "unavailable"})
+
+
+AGENTIC_URL = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
+
+
+@app.get("/api/soul")
+async def api_soul_get():
+    """Return current SOUL.md content from agentic."""
+    return await _proxy_get(f"{AGENTIC_URL}/soul", fallback={"status": "unavailable", "content": ""})
+
+
+@app.post("/api/soul")
+async def api_soul_post(request: Request):
+    """Update SOUL.md content via agentic."""
+    body = await request.json()
+    return await _proxy_post(f"{AGENTIC_URL}/soul", body=body, fallback={"status": "unavailable"})
+
+
+@app.get("/api/agents-registry")
+async def api_agents_registry_get():
+    """Return current AGENTS.md content from agentic."""
+    return await _proxy_get(f"{AGENTIC_URL}/agents-registry", fallback={"status": "unavailable", "content": ""})
+
+
+@app.post("/api/agents-registry")
+async def api_agents_registry_post(request: Request):
+    """Update AGENTS.md content via agentic."""
+    body = await request.json()
+    return await _proxy_post(f"{AGENTIC_URL}/agents-registry", body=body, fallback={"status": "unavailable"})
+
+
+@app.post("/api/pii/scan")
+async def api_pii_scan(request: Request):
+    """Scan text for PII (and optionally redact) via the verifier service."""
+    body = await request.json()
+    return await _proxy_post(
+        f"{VERIFIER_URL}/redact",
+        body={"text": body.get("text", ""), "auto_redact": body.get("auto_redact", True)},
+        fallback={"status": "unavailable", "pii_found": {}, "total_pii": 0},
+    )
 
 
 @app.get("/api/struggle")

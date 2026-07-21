@@ -26,7 +26,7 @@ from typing import Any, Deque, Dict, List, Optional, Protocol, runtime_checkable
 from fastapi import Body, FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
+from common.runtime import AuditStream, ErrorBudget, detect_device, redact_pii, sanitize_string, setup_json_logger
 
 try:
     from common.policy import POLICY
@@ -1552,8 +1552,15 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
     pin_default = os.getenv("PIN_KEEPER_DEFAULT", "false").lower() == "true"
     keeper_pin = user_id == "keeper" and (update.pin or pin_default)
     relevance = 1.0 if keeper_pin else update.relevance
+
+    # J3: PII auto-redaction — strip before classify/embed/store
+    raw_text = update.result_raw or ""
+    redacted_text, pii_counts = redact_pii(raw_text)
+    if pii_counts:
+        logger.info("memorize pii_redacted counts=%s", pii_counts)  # audit: counts only, no content
+
     # auto-classify into construction domain category if not provided
-    text_for_classify = f"{update.event_type} {update.result_raw or ''}"
+    text_for_classify = f"{update.event_type} {redacted_text}"
     category = update.category or classify_category(text_for_classify)
     # auto-score importance if not explicitly provided
     importance = update.importance if update.importance is not None else score_importance(
@@ -1565,13 +1572,13 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
         event_type=update.event_type,
         category=category,
         content={
-            "result": update.result_raw,
+            "result": redacted_text,
             "metrics": update.metrics or {},
             "state_changes": update.state_delta or {},
             "user_id": user_id,
             "pin": keeper_pin,
         },
-        embedding=generate_embedding(f"{update.event_type}: {update.result_raw}"),
+        embedding=generate_embedding(f"{update.event_type}: {redacted_text}"),
         relevance=relevance,
         importance=importance,
         access_count=0,
@@ -1581,7 +1588,7 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
     record_commit = store.insert(record)
     if _should_graph_ingest(category):
         asyncio.create_task(_graph_ingest_fire_and_forget(
-            text=f"{update.event_type}: {update.result_raw or ''}",
+            text=f"{update.event_type}: {redacted_text}",
             source_id=record.id,
             category=category,
             metadata={"event_type": update.event_type, "user_id": user_id},
@@ -1593,6 +1600,7 @@ async def memorize_event(update: MemoryUpdate) -> Dict[str, str]:
         "commit": record_commit.commit_id,
         "state_commit": commit.commit_id if commit else "none",
         "verdict": verdict,
+        "pii_redacted": sum(pii_counts.values()) if pii_counts else 0,
     }
 
 
@@ -2629,6 +2637,11 @@ async def quick_note(note: NoteRequest) -> Dict[str, str]:
     text = sanitize_string(note.text)
     if not text:
         raise HTTPException(status_code=400, detail="Note text cannot be empty")
+
+    # J3: PII auto-redaction
+    text, note_pii = redact_pii(text)
+    if note_pii:
+        logger.info("note pii_redacted counts=%s", note_pii)
 
     user_id = sanitize_string(note.user_id)
     category = note.category or classify_category(text)

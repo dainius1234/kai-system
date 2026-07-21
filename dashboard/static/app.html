@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/static/style.css">
   <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+  <script src="/static/d3.v7.min.js"></script>
 </head>
 <body>
   <div class="app">
@@ -302,6 +303,24 @@
                 <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>8</kbd><span>Soul Dashboard</span></div>
                 <div class="shortcut-row"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd><span>Toggle WORK/PUB</span></div>
                 <div class="shortcut-row"><kbd>Escape</kbd><span>Close dropdown / stop generation</span></div>
+              </div>
+            </div>
+
+            <!-- PII Scanner -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">🔍</span> PII Scanner</div>
+              <p style="font-size:13px;color:var(--text3);margin-bottom:var(--sp-3);">
+                Paste text to detect and redact personal information (email, phone, NI, postcodes, API tokens, card numbers) before sharing or storing.
+              </p>
+              <textarea id="piiInput" placeholder="Paste text here to scan for PII…" style="width:100%;height:120px;font-family:monospace;font-size:12px;background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:var(--sp-2);resize:vertical;box-sizing:border-box;"></textarea>
+              <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-2);align-items:center;">
+                <button class="refresh-btn" onclick="piiScan(false)" style="flex:none;">Detect only</button>
+                <button class="refresh-btn" onclick="piiScan(true)" style="flex:none;background:var(--accent);color:#000;">Detect &amp; Redact</button>
+                <button class="refresh-btn" onclick="piiClear()" style="flex:none;color:var(--text3);">Clear</button>
+              </div>
+              <div id="piiResult" style="margin-top:var(--sp-3);font-size:12px;display:none;">
+                <div id="piiSummary" style="color:var(--text3);margin-bottom:var(--sp-2);"></div>
+                <textarea id="piiOutput" readonly style="width:100%;height:100px;font-family:monospace;font-size:12px;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:6px;padding:var(--sp-2);resize:vertical;box-sizing:border-box;display:none;"></textarea>
               </div>
             </div>
 
@@ -725,6 +744,36 @@
             </div>
           </div>
 
+          <!-- ─── J6: Soul Editor ───────────────────────────────── -->
+          <div style="max-width:960px;margin:var(--sp-6) auto 0;padding:0 var(--sp-6) var(--sp-6);">
+            <div class="card" style="border-left:3px solid var(--accent);">
+              <div class="card-title" style="cursor:pointer;user-select:none;" onclick="toggleSoulEditor()">
+                <span class="icon">✍️</span> Identity Files
+                <span id="soulEditorChevron" style="float:right;font-size:12px;color:var(--text3);">▼ expand</span>
+              </div>
+              <div id="soulEditorPanel" style="display:none;margin-top:var(--sp-3);">
+                <p style="font-size:12px;color:var(--text3);margin-bottom:var(--sp-3);">
+                  Edit Kai's identity and agents registry. Changes take effect immediately — no restart needed.
+                </p>
+                <div style="display:flex;gap:var(--sp-2);margin-bottom:var(--sp-2);align-items:center;">
+                  <strong style="font-size:13px;">SOUL.md</strong>
+                  <button class="refresh-btn" style="font-size:11px;padding:2px 8px;" onclick="loadSoulEditor()">↻ Load</button>
+                  <button class="refresh-btn" style="font-size:11px;padding:2px 8px;background:var(--accent);color:#000;" onclick="saveSoulEditor()">💾 Save</button>
+                  <span id="soulSaveStatus" style="font-size:12px;color:var(--text3);"></span>
+                </div>
+                <textarea id="soulEditorText" style="width:100%;height:260px;font-family:monospace;font-size:12px;background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:var(--sp-2);resize:vertical;box-sizing:border-box;" placeholder="Loading SOUL.md…"></textarea>
+
+                <div style="display:flex;gap:var(--sp-2);margin:var(--sp-3) 0 var(--sp-2);align-items:center;">
+                  <strong style="font-size:13px;">AGENTS.md</strong>
+                  <button class="refresh-btn" style="font-size:11px;padding:2px 8px;" onclick="loadAgentsEditor()">↻ Load</button>
+                  <button class="refresh-btn" style="font-size:11px;padding:2px 8px;background:var(--accent);color:#000;" onclick="saveAgentsEditor()">💾 Save</button>
+                  <span id="agentsSaveStatus" style="font-size:12px;color:var(--text3);"></span>
+                </div>
+                <textarea id="agentsEditorText" style="width:100%;height:220px;font-family:monospace;font-size:12px;background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:var(--sp-2);resize:vertical;box-sizing:border-box;" placeholder="Loading AGENTS.md…"></textarea>
+              </div>
+            </div>
+          </div>
+
           </div>
         </section>
 
@@ -741,9 +790,9 @@
               <button class="refresh-btn" onclick="refreshCanvas()" style="margin-left:auto;">Refresh</button>
             </div>
 
-            <!-- Canvas -->
+            <!-- Canvas (D3 SVG) -->
             <div class="card" style="padding:0;overflow:hidden;position:relative;">
-              <canvas id="liveCanvas" width="1200" height="600" style="width:100%;height:auto;background:var(--bg2);display:block;"></canvas>
+              <div id="canvasD3" style="width:100%;min-height:600px;background:var(--bg2);display:block;overflow:hidden;"></div>
               <div id="canvasStatus" style="position:absolute;bottom:8px;right:12px;font-size:11px;color:var(--text3);"></div>
             </div>
 
@@ -757,11 +806,34 @@
         <!-- ═══════════════ J5: Diary / Memory Viewer ═══════════════ -->
         <section class="view" id="diaryView">
           <div style="max-width:1200px;margin:0 auto;padding:var(--sp-6);">
-            <h2 class="text-heading" style="margin-bottom:var(--sp-4);">Memory Diary</h2>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-4);">
+              <h2 class="text-heading">Memory Diary</h2>
+              <button class="refresh-btn" onclick="loadDiaryStats()">↻ Refresh</button>
+            </div>
+
+            <!-- Stats bar -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:var(--sp-3);margin-bottom:var(--sp-4);">
+              <div class="card" style="text-align:center;padding:var(--sp-3);">
+                <div style="font-size:22px;font-weight:700;" id="diaryTotal">—</div>
+                <div style="font-size:11px;color:var(--text3);">Total Memories</div>
+              </div>
+              <div class="card" style="text-align:center;padding:var(--sp-3);">
+                <div style="font-size:22px;font-weight:700;" id="diaryCategories">—</div>
+                <div style="font-size:11px;color:var(--text3);">Event Types</div>
+              </div>
+              <div class="card" style="text-align:center;padding:var(--sp-3);">
+                <div style="font-size:22px;font-weight:700;" id="diaryShown">—</div>
+                <div style="font-size:11px;color:var(--text3);">Showing</div>
+              </div>
+              <div class="card" style="text-align:center;padding:var(--sp-3);">
+                <div style="font-size:22px;font-weight:700;" id="diaryPinned">—</div>
+                <div style="font-size:11px;color:var(--text3);">Pinned</div>
+              </div>
+            </div>
 
             <!-- Filters -->
-            <div style="display:flex;gap:var(--sp-2);margin-bottom:var(--sp-4);flex-wrap:wrap;align-items:center;">
-              <input type="text" id="diarySearch" placeholder="Search memories..." style="flex:1;min-width:200px;background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;" onkeydown="if(event.key==='Enter')searchDiary()">
+            <div style="display:flex;gap:var(--sp-2);margin-bottom:var(--sp-3);flex-wrap:wrap;align-items:center;">
+              <input type="text" id="diarySearch" placeholder="Search memories…" style="flex:1;min-width:200px;background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;" onkeydown="if(event.key==='Enter')searchDiary()">
               <select id="diaryCat" style="background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;" onchange="searchDiary()">
                 <option value="">All categories</option>
                 <option value="setting-out">Setting Out</option>
@@ -772,31 +844,39 @@
                 <option value="hs-briefings">H&S Briefings</option>
                 <option value="client-ncrs">Client NCRs</option>
                 <option value="daily-logs">Daily Logs</option>
+                <option value="general">General</option>
               </select>
-              <input type="range" id="diaryImportance" min="0" max="100" value="0" style="width:120px;" title="Min importance" oninput="document.getElementById('impLabel').textContent=this.value+'%'" onchange="searchDiary()">
-              <span id="impLabel" style="font-size:11px;color:var(--text3);min-width:30px;">0%</span>
-              <button class="refresh-btn" onclick="searchDiary()">Search</button>
+              <select id="diaryEventType" style="background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;" onchange="searchDiary()">
+                <option value="">All event types</option>
+              </select>
+              <select id="diarySort" style="background:var(--bg2);color:var(--text1);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;" onchange="searchDiary()">
+                <option value="recent">Most Recent</option>
+                <option value="importance">Highest Importance</option>
+                <option value="accessed">Most Accessed</option>
+                <option value="pinned">Pinned First</option>
+              </select>
             </div>
-
-            <!-- Stats bar -->
-            <div style="display:flex;gap:var(--sp-3);margin-bottom:var(--sp-4);">
-              <div class="card" style="flex:1;text-align:center;padding:var(--sp-3);">
-                <div style="font-size:24px;font-weight:700;" id="diaryTotal">—</div>
-                <div style="font-size:11px;color:var(--text3);">Total Memories</div>
-              </div>
-              <div class="card" style="flex:1;text-align:center;padding:var(--sp-3);">
-                <div style="font-size:24px;font-weight:700;" id="diaryCategories">—</div>
-                <div style="font-size:11px;color:var(--text3);">Categories</div>
-              </div>
-              <div class="card" style="flex:1;text-align:center;padding:var(--sp-3);">
-                <div style="font-size:24px;font-weight:700;" id="diaryShown">—</div>
-                <div style="font-size:11px;color:var(--text3);">Showing</div>
-              </div>
+            <div style="display:flex;gap:var(--sp-2);margin-bottom:var(--sp-4);align-items:center;">
+              <label style="font-size:12px;color:var(--text3);">Min importance:</label>
+              <input type="range" id="diaryImportance" min="0" max="100" value="0" style="width:120px;" title="Min importance"
+                oninput="document.getElementById('impLabel').textContent=this.value+'%'"
+                onchange="searchDiary()">
+              <span id="impLabel" style="font-size:11px;color:var(--text3);min-width:30px;">0%</span>
+              <label style="font-size:12px;color:var(--text3);margin-left:var(--sp-2);">
+                <input type="checkbox" id="diaryPinnedOnly" onchange="searchDiary()"> Pinned only
+              </label>
+              <button class="refresh-btn" onclick="searchDiary()" style="margin-left:auto;">Search</button>
+              <button class="refresh-btn" onclick="diaryBrowseRecent()" style="background:var(--accent);color:#000;">Browse Recent</button>
             </div>
 
             <!-- Memory cards -->
             <div id="diaryCards" style="display:flex;flex-direction:column;gap:var(--sp-2);">
-              <div class="empty" style="padding:40px;text-align:center;">Search or browse memories above</div>
+              <div class="empty" style="padding:40px;text-align:center;color:var(--text3);">Loading recent memories…</div>
+            </div>
+
+            <!-- Load more -->
+            <div style="text-align:center;margin-top:var(--sp-4);">
+              <button class="refresh-btn" id="diaryLoadMore" onclick="loadMoreDiary()" style="display:none;padding:8px 24px;">Load more</button>
             </div>
           </div>
         </section>
@@ -1145,6 +1225,82 @@ async function logCisPayment() {
 }
 
 
+// ── Soul / Agents Editor ───────────────────────────────────────────
+
+function toggleSoulEditor() {
+  const panel = document.getElementById('soulEditorPanel');
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) loadSoulEditor();
+}
+
+async function loadSoulEditor() {
+  const ta = document.getElementById('soulEditorText');
+  ta.placeholder = 'Loading…';
+  try {
+    const r = await fetch('/api/soul').then(r => r.json());
+    ta.value = r.content || '';
+    ta.placeholder = 'SOUL.md content';
+  } catch (e) {
+    ta.placeholder = 'Failed to load: ' + e.message;
+  }
+}
+
+async function saveSoulEditor() {
+  const ta = document.getElementById('soulEditorText');
+  const btn = document.querySelector('[onclick="saveSoulEditor()"]');
+  const orig = btn.textContent;
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/soul', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: ta.value })
+    }).then(r => r.json());
+    btn.textContent = r.status === 'ok' ? '✓ Saved' : '✗ Error';
+    btn.style.background = r.status === 'ok' ? 'var(--success)' : 'var(--danger)';
+  } catch (e) {
+    btn.textContent = '✗ Failed';
+    btn.style.background = 'var(--danger)';
+  }
+  setTimeout(() => { btn.textContent = orig; btn.disabled = false; btn.style.background = ''; }, 2500);
+}
+
+async function loadAgentsEditor() {
+  const ta = document.getElementById('agentsEditorText');
+  ta.placeholder = 'Loading…';
+  try {
+    const r = await fetch('/api/agents-registry').then(r => r.json());
+    ta.value = r.content || '';
+    ta.placeholder = 'AGENTS.md content';
+  } catch (e) {
+    ta.placeholder = 'Failed to load: ' + e.message;
+  }
+}
+
+async function saveAgentsEditor() {
+  const ta = document.getElementById('agentsEditorText');
+  const btn = document.querySelector('[onclick="saveAgentsEditor()"]');
+  const orig = btn.textContent;
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/agents-registry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: ta.value })
+    }).then(r => r.json());
+    btn.textContent = r.status === 'ok' ? '✓ Saved' : '✗ Error';
+    btn.style.background = r.status === 'ok' ? 'var(--success)' : 'var(--danger)';
+  } catch (e) {
+    btn.textContent = '✗ Failed';
+    btn.style.background = 'var(--danger)';
+  }
+  setTimeout(() => { btn.textContent = orig; btn.disabled = false; btn.style.background = ''; }, 2500);
+}
+
+
 // ── Orb State ──────────────────────────────────────────────────────
 
 function setOrbState(state) {
@@ -1166,6 +1322,62 @@ function setMode(mode) {
 function loadMode() {
   const mode = localStorage.getItem('kai-mode') || 'WORK';
   setMode(mode);
+}
+
+
+// ── J3: PII Scanner (Settings tab) ────────────────────────────────
+
+async function piiScan(autoRedact) {
+  const text = document.getElementById('piiInput').value;
+  if (!text.trim()) return;
+  const resultEl  = document.getElementById('piiResult');
+  const summaryEl = document.getElementById('piiSummary');
+  const outputEl  = document.getElementById('piiOutput');
+  summaryEl.textContent = 'Scanning…';
+  resultEl.style.display = 'block';
+  outputEl.style.display = 'none';
+
+  try {
+    const r = await fetch('/api/pii/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, auto_redact: autoRedact }),
+    }).then(r => r.json());
+
+    const total  = r.total_pii || 0;
+    const found  = r.pii_found || {};
+    const status = r.status || 'unknown';
+
+    if (status === 'unavailable') {
+      summaryEl.textContent = 'PII scanner unavailable (verifier service offline)';
+      summaryEl.style.color = 'var(--danger)';
+      return;
+    }
+
+    if (total === 0) {
+      summaryEl.innerHTML = '<span style="color:var(--success);">✓ No PII detected</span>';
+    } else {
+      const types = Object.entries(found).map(([k, n]) => `${k.replace(/_/g,' ')} ×${n}`).join(', ');
+      const color = autoRedact ? 'var(--warn)' : 'var(--danger)';
+      summaryEl.innerHTML = `<span style="color:${color};">⚠ ${total} PII item${total > 1 ? 's' : ''} found: ${DOMPurify.sanitize(types)}</span>`;
+    }
+
+    if (autoRedact && r.redacted_text != null) {
+      outputEl.value = r.redacted_text;
+      outputEl.style.display = 'block';
+    }
+    summaryEl.style.color = '';
+  } catch (e) {
+    summaryEl.textContent = 'Error: ' + e.message;
+    summaryEl.style.color = 'var(--danger)';
+  }
+}
+
+function piiClear() {
+  document.getElementById('piiInput').value = '';
+  document.getElementById('piiResult').style.display = 'none';
+  document.getElementById('piiOutput').value = '';
+  document.getElementById('piiSummary').textContent = '';
 }
 
 
@@ -3402,37 +3614,39 @@ async function submitRating(msgIndex, rating, btn) {
 // J1: LIVE CANVAS VISUALIZATION
 // ═══════════════════════════════════════════════════════════════════
 
+// ── J1: Live Canvas (D3 v7) ────────────────────────────────────────
+
 let _canvasMode = 'mindmap';
 let _canvasData = {};
+let _canvasSim = null; // keep force sim reference for teardown
 
 function canvasMode(mode) {
   _canvasMode = mode;
-  document.getElementById('btnMindmap').style.background = mode === 'mindmap' ? 'var(--accent)' : '';
-  document.getElementById('btnMindmap').style.color = mode === 'mindmap' ? '#000' : '';
-  document.getElementById('btnEmotion').style.background = mode === 'emotion' ? 'var(--accent)' : '';
-  document.getElementById('btnEmotion').style.color = mode === 'emotion' ? '#000' : '';
-  document.getElementById('btnPlan').style.background = mode === 'plan' ? 'var(--accent)' : '';
-  document.getElementById('btnPlan').style.color = mode === 'plan' ? '#000' : '';
+  ['mindmap', 'emotion', 'plan'].forEach(m => {
+    const btn = document.getElementById('btn' + m.charAt(0).toUpperCase() + m.slice(1));
+    if (!btn) return;
+    btn.style.background = m === mode ? 'var(--accent)' : '';
+    btn.style.color = m === mode ? '#000' : '';
+  });
   drawCanvas();
 }
 
 async function refreshCanvas() {
   const status = document.getElementById('canvasStatus');
-  if (status) status.textContent = 'Loading...';
-
+  if (status) status.textContent = 'Loading…';
   try {
-    const [goalsResp, statsResp, nudgesResp] = await Promise.all([
+    const [goalsR, statsR, emotionR, thinkingR] = await Promise.all([
       fetch('/api/goals').then(r => r.json()).catch(() => ({ goals: [] })),
       fetch('/api/memory/stats').then(r => r.json()).catch(() => ({})),
-      fetch('/api/nudges').then(r => r.json()).catch(() => ({ nudges: [] })),
+      fetch('/api/emotion/timeline?limit=60').then(r => r.json()).catch(() => ({ entries: [] })),
+      fetch('/api/thinking').then(r => r.json()).catch(() => ({ pathways: [] })),
     ]);
-
     _canvasData = {
-      goals: goalsResp.goals || [],
-      stats: statsResp,
-      nudges: nudgesResp.nudges || [],
+      goals: goalsR.goals || [],
+      stats: statsR,
+      emotionTimeline: emotionR.entries || [],
+      pathways: thinkingR.pathways || [],
     };
-
     drawCanvas();
     if (status) status.textContent = 'Updated ' + new Date().toLocaleTimeString();
   } catch (e) {
@@ -3440,174 +3654,547 @@ async function refreshCanvas() {
   }
 }
 
+function _canvasContainer() {
+  // Tear down any running force simulation, then clear the D3 div
+  if (_canvasSim) { _canvasSim.stop(); _canvasSim = null; }
+  const el = document.getElementById('canvasD3');
+  if (!el) return null;
+  el.innerHTML = '';
+  return el;
+}
+
 function drawCanvas() {
-  const c = document.getElementById('liveCanvas');
-  if (!c) return;
-  const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
-
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg2') || '#1a1a2e';
-  ctx.fillRect(0, 0, W, H);
-
-  if (_canvasMode === 'mindmap') drawMindMap(ctx, W, H);
-  else if (_canvasMode === 'emotion') drawEmotionTimeline(ctx, W, H);
-  else if (_canvasMode === 'plan') drawPlanFlow(ctx, W, H);
+  const el = _canvasContainer();
+  if (!el) return;
+  const W = el.clientWidth || 900;
+  const H = 600;
+  if (_canvasMode === 'mindmap') _drawMindMap(el, W, H);
+  else if (_canvasMode === 'emotion') _drawEmotionTimeline(el, W, H);
+  else if (_canvasMode === 'plan') _drawPlanFlow(el, W, H);
 }
 
-function drawMindMap(ctx, W, H) {
-  const goals = (_canvasData.goals || []).slice(0, 12);
-  const cx = W / 2, cy = H / 2;
+// ── Mind Map ───────────────────────────────────────────────────────
 
-  ctx.fillStyle = '#00e5ff';
-  ctx.beginPath(); ctx.arc(cx, cy, 40, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#000'; ctx.font = 'bold 16px sans-serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('KAI', cx, cy);
+function _drawMindMap(container, W, H) {
+  const goals = (_canvasData.goals || []).slice(0, 14);
+  const cats  = Object.entries((_canvasData.stats || {}).categories || (_canvasData.stats || {}).by_category || {}).slice(0, 8);
 
-  const radius = Math.min(W, H) * 0.35;
+  const nodes = [{ id: '__kai__', type: 'center', label: 'KAI' }];
+  const links = [];
+
   goals.forEach((g, i) => {
-    const angle = (i / Math.max(goals.length, 1)) * Math.PI * 2 - Math.PI / 2;
-    const x = cx + Math.cos(angle) * radius, y = cy + Math.sin(angle) * radius;
-    ctx.strokeStyle = 'rgba(0,229,255,0.3)'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
-    const progress = (g.progress || 0) / 100;
-    ctx.fillStyle = progress >= 1.0 ? '#4caf50' : progress > 0.5 ? '#ffb74d' : '#ef5350';
-    ctx.beginPath(); ctx.arc(x, y, 24, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#e0e0e0'; ctx.font = '11px sans-serif';
-    ctx.fillText((g.title || g.goal || 'Goal').substring(0, 20), x, y + 36);
-    ctx.fillStyle = '#000'; ctx.font = 'bold 10px sans-serif';
-    ctx.fillText(Math.round(progress * 100) + '%', x, y);
+    const id = 'g:' + (g.id || g.title || i);
+    nodes.push({ id, type: 'goal', label: g.title || g.goal || 'Goal', progress: g.progress || 0, status: g.status });
+    links.push({ source: '__kai__', target: id });
   });
 
-  if (!goals.length) {
-    ctx.fillStyle = '#666'; ctx.font = '16px sans-serif';
-    ctx.fillText('No goals yet — create one in the Goals tab', cx, cy + 80);
-  }
-  const leg = document.getElementById('canvasLegend');
-  if (leg) leg.innerHTML = '<span style="color:#4caf50;">● Complete</span>&nbsp;&nbsp;<span style="color:#ffb74d;">● In Progress</span>&nbsp;&nbsp;<span style="color:#ef5350;">● Not Started</span>';
-}
-
-function drawEmotionTimeline(ctx, W, H) {
-  const nudges = (_canvasData.nudges || []).slice(-20);
-  const pad = 60, gW = W - pad * 2, gH = H - pad * 2;
-  ctx.strokeStyle = '#555'; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(pad, pad); ctx.lineTo(pad, H - pad); ctx.lineTo(W - pad, H - pad); ctx.stroke();
-  ctx.fillStyle = '#999'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
-  ctx.fillText('Time →', W / 2, H - 15);
-  ctx.save(); ctx.translate(15, H / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Urgency', 0, 0); ctx.restore();
-  if (!nudges.length) {
-    ctx.fillStyle = '#666'; ctx.font = '16px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('No emotion data yet — nudges will appear here', W / 2, H / 2);
-    return;
-  }
-  const colors = { stress: '#ef5350', fatigue: '#ffb74d', excitement: '#4caf50', uncertainty: '#42a5f5', calm: '#81c784' };
-  nudges.forEach((n, i) => {
-    const x = pad + (i / Math.max(nudges.length - 1, 1)) * gW;
-    const urgency = Math.min(Math.random() * 0.8 + 0.1, 1);
-    const y = (H - pad) - urgency * gH;
-    ctx.fillStyle = colors[(n.type || 'calm').toLowerCase()] || '#888';
-    ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2); ctx.fill();
+  cats.forEach(([cat, count]) => {
+    const id = 'c:' + cat;
+    nodes.push({ id, type: 'cat', label: cat, count: Number(count) });
+    links.push({ source: '__kai__', target: id });
   });
+
+  const svg = d3.select(container).append('svg')
+    .attr('width', W).attr('height', H)
+    .style('background', 'var(--bg2)');
+
+  // Arrow marker for links
+  svg.append('defs').append('marker')
+    .attr('id', 'mm-arrow').attr('markerWidth', 6).attr('markerHeight', 6)
+    .attr('refX', 5).attr('refY', 3).attr('orient', 'auto')
+    .append('path').attr('d', 'M0,0 L0,6 L6,3 z').attr('fill', 'rgba(0,229,255,0.4)');
+
+  const g = svg.append('g');
+
+  svg.call(d3.zoom()
+    .scaleExtent([0.3, 3])
+    .on('zoom', e => g.attr('transform', e.transform)));
+
+  const linkEl = g.append('g').selectAll('line').data(links).join('line')
+    .attr('stroke', 'rgba(0,229,255,0.25)').attr('stroke-width', 1.5);
+
+  const nodeEl = g.append('g').selectAll('g').data(nodes).join('g')
+    .style('cursor', 'grab')
+    .call(d3.drag()
+      .on('start', (ev, d) => { if (!ev.active) _canvasSim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag',  (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
+      .on('end',   (ev, d) => { if (!ev.active) _canvasSim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+  const radius = d => d.type === 'center' ? 44 : d.type === 'cat' ? 20 : 28;
+  const fill   = d => {
+    if (d.type === 'center') return '#00e5ff';
+    if (d.type === 'cat')    return 'rgba(120,120,220,0.8)';
+    const p = d.progress || 0;
+    return p >= 100 ? '#4caf50' : p > 50 ? '#ffb74d' : '#ef5350';
+  };
+
+  nodeEl.append('circle')
+    .attr('r', radius).attr('fill', fill)
+    .attr('stroke', '#ffffff22').attr('stroke-width', 1);
+
+  nodeEl.filter(d => d.type === 'center').append('text')
+    .text('KAI').attr('text-anchor', 'middle').attr('dy', '0.35em')
+    .attr('font-size', 17).attr('font-weight', 'bold').attr('fill', '#000');
+
+  nodeEl.filter(d => d.type !== 'center').append('text')
+    .text(d => (d.label || '').substring(0, 15))
+    .attr('text-anchor', 'middle').attr('dy', '-0.15em')
+    .attr('font-size', 10).attr('fill', '#e0e0e0');
+
+  nodeEl.filter(d => d.type === 'goal').append('text')
+    .text(d => Math.round(d.progress || 0) + '%')
+    .attr('text-anchor', 'middle').attr('dy', '1.1em')
+    .attr('font-size', 9).attr('fill', '#ccc');
+
+  nodeEl.filter(d => d.type === 'cat').append('text')
+    .text(d => d.count)
+    .attr('text-anchor', 'middle').attr('dy', '1.1em')
+    .attr('font-size', 9).attr('fill', '#ccc');
+
+  nodeEl.append('title').text(d => d.label || d.id);
+
+  if (!goals.length && !cats.length) {
+    g.append('text').text('No goals yet — create one in the Goals tab')
+      .attr('x', W / 2).attr('y', H / 2).attr('text-anchor', 'middle')
+      .attr('fill', '#666').attr('font-size', 16);
+  }
+
+  _canvasSim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(d => d.source.type === 'center' ? 140 : 80).strength(0.8))
+    .force('charge', d3.forceManyBody().strength(-280))
+    .force('center', d3.forceCenter(W / 2, H / 2))
+    .force('collide', d3.forceCollide(d => radius(d) + 10))
+    .on('tick', () => {
+      linkEl.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+             .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+      nodeEl.attr('transform', d => `translate(${d.x},${d.y})`);
+    });
+
   const leg = document.getElementById('canvasLegend');
-  if (leg) leg.innerHTML = Object.entries(colors).map(([k, v]) => `<span style="color:${v};">● ${k}</span>`).join('&nbsp;&nbsp;');
+  if (leg) leg.innerHTML =
+    '<span style="color:#4caf50;">● Complete</span>&nbsp;&nbsp;' +
+    '<span style="color:#ffb74d;">● In Progress</span>&nbsp;&nbsp;' +
+    '<span style="color:#ef5350;">● Not Started</span>&nbsp;&nbsp;' +
+    '<span style="color:rgba(120,120,220,0.9);">● Memory Category</span>&nbsp;&nbsp;' +
+    '<small style="color:var(--text3);">Drag nodes · Scroll to zoom</small>';
 }
 
-function drawPlanFlow(ctx, W, H) {
-  const goals = (_canvasData.goals || []).filter(g => (g.progress || 0) < 100).slice(0, 6);
-  const pad = 80, nW = 160, nH = 50;
-  if (!goals.length) {
-    ctx.fillStyle = '#666'; ctx.font = '16px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('No active plans — all goals complete or none set', W / 2, H / 2);
+// ── Emotion Timeline ───────────────────────────────────────────────
+
+function _drawEmotionTimeline(container, W, H) {
+  const raw = _canvasData.emotionTimeline || [];
+  const pad = { top: 40, right: 30, bottom: 55, left: 65 };
+  const gW  = W - pad.left - pad.right;
+  const gH  = H - pad.top  - pad.bottom;
+
+  const svg = d3.select(container).append('svg')
+    .attr('width', W).attr('height', H)
+    .style('background', 'var(--bg2)');
+
+  const g = svg.append('g').attr('transform', `translate(${pad.left},${pad.top})`);
+
+  if (!raw.length) {
+    g.append('text').text('No emotion data yet — start a conversation to generate entries')
+      .attr('x', gW / 2).attr('y', gH / 2).attr('text-anchor', 'middle')
+      .attr('fill', '#666').attr('font-size', 15);
+    const leg = document.getElementById('canvasLegend');
+    if (leg) leg.textContent = 'Emotion valence over time (-1 negative → +1 positive)';
     return;
   }
-  const startX = pad, gapX = (W - pad * 2 - nW) / Math.max(goals.length - 1, 1);
-  goals.forEach((g, i) => {
-    const x = startX + i * gapX, y = H / 2 - nH / 2;
-    if (i > 0) {
-      const px = startX + (i - 1) * gapX + nW;
-      ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(px, H / 2); ctx.lineTo(x, H / 2); ctx.stroke();
-      ctx.fillStyle = '#00e5ff'; ctx.beginPath();
-      ctx.moveTo(x, H / 2 - 6); ctx.lineTo(x, H / 2 + 6); ctx.lineTo(x + 8, H / 2); ctx.fill();
+
+  const entries = raw.map(e => ({
+    ...e,
+    date: new Date((e.ts > 1e10 ? e.ts : e.ts * 1000) || Date.now()),
+    v: typeof e.valence === 'number' ? e.valence : 0,
+  })).sort((a, b) => a.date - b.date);
+
+  const xScale = d3.scaleTime().domain(d3.extent(entries, d => d.date)).range([0, gW]);
+  const yScale = d3.scaleLinear().domain([-1, 1]).nice().range([gH, 0]);
+
+  // Grid lines
+  g.append('g').attr('class', 'grid')
+    .call(d3.axisLeft(yScale).ticks(5).tickSize(-gW).tickFormat(''))
+    .selectAll('line').attr('stroke', '#2a2a3a').attr('stroke-dasharray', '3,3');
+  g.select('.grid .domain').remove();
+
+  // Axes
+  const xAxis = g.append('g').attr('transform', `translate(0,${gH})`)
+    .call(d3.axisBottom(xScale).ticks(6));
+  xAxis.selectAll('text').attr('fill', '#888').attr('font-size', 10);
+  xAxis.select('.domain').attr('stroke', '#555');
+  xAxis.selectAll('.tick line').attr('stroke', '#555');
+
+  const yAxis = g.append('g').call(d3.axisLeft(yScale).ticks(5));
+  yAxis.selectAll('text').attr('fill', '#888').attr('font-size', 10);
+  yAxis.select('.domain').attr('stroke', '#555');
+  yAxis.selectAll('.tick line').attr('stroke', '#555');
+
+  // Zero baseline
+  g.append('line')
+    .attr('x1', 0).attr('x2', gW)
+    .attr('y1', yScale(0)).attr('y2', yScale(0))
+    .attr('stroke', '#444').attr('stroke-dasharray', '5,4').attr('stroke-width', 1);
+
+  // Area fill
+  const area = d3.area()
+    .x(d => xScale(d.date)).y0(yScale(0)).y1(d => yScale(d.v))
+    .curve(d3.curveMonotoneX);
+  g.append('path').datum(entries)
+    .attr('fill', 'rgba(0,229,255,0.12)').attr('d', area);
+
+  // Positive and negative area fills for clarity
+  const areaPos = d3.area().x(d => xScale(d.date)).y0(yScale(0))
+    .y1(d => yScale(Math.max(d.v, 0))).curve(d3.curveMonotoneX);
+  const areaNeg = d3.area().x(d => xScale(d.date)).y0(yScale(0))
+    .y1(d => yScale(Math.min(d.v, 0))).curve(d3.curveMonotoneX);
+  g.append('path').datum(entries).attr('fill', 'rgba(76,175,80,0.15)').attr('d', areaPos);
+  g.append('path').datum(entries).attr('fill', 'rgba(239,83,80,0.15)').attr('d', areaNeg);
+
+  // Line
+  const line = d3.line().x(d => xScale(d.date)).y(d => yScale(d.v)).curve(d3.curveMonotoneX);
+  g.append('path').datum(entries)
+    .attr('fill', 'none').attr('stroke', '#00e5ff').attr('stroke-width', 2).attr('d', line);
+
+  // Dots with tooltips
+  g.selectAll('.dot').data(entries).join('circle')
+    .attr('class', 'dot')
+    .attr('cx', d => xScale(d.date)).attr('cy', d => yScale(d.v)).attr('r', 4)
+    .attr('fill', d => d.v >= 0 ? '#4caf50' : '#ef5350')
+    .attr('stroke', 'var(--bg2)').attr('stroke-width', 1.5)
+    .append('title').text(d => `${d.emotion || 'emotion'}: ${d.v.toFixed(2)}\n${d.date.toLocaleString()}`);
+
+  // Axis labels
+  g.append('text').text('Valence')
+    .attr('transform', `translate(-50,${gH / 2})rotate(-90)`)
+    .attr('text-anchor', 'middle').attr('fill', '#888').attr('font-size', 11);
+  g.append('text').text('Time →')
+    .attr('x', gW / 2).attr('y', gH + 46)
+    .attr('text-anchor', 'middle').attr('fill', '#888').attr('font-size', 11);
+
+  const leg = document.getElementById('canvasLegend');
+  if (leg) leg.innerHTML =
+    `<span style="color:#4caf50;">● Positive valence</span>&nbsp;&nbsp;` +
+    `<span style="color:#ef5350;">● Negative valence</span>&nbsp;&nbsp;` +
+    `<span style="color:#00e5ff;">— Smoothed trend</span>&nbsp;&nbsp;` +
+    `<span style="color:var(--text3);">${entries.length} entries</span>`;
+}
+
+// ── Plan Flow ──────────────────────────────────────────────────────
+
+function _drawPlanFlow(container, W, H) {
+  const pathways = (_canvasData.pathways || []).slice(-10).reverse();
+  const svg = d3.select(container).append('svg')
+    .attr('width', W).attr('height', H).style('background', 'var(--bg2)');
+
+  if (!pathways.length) {
+    svg.append('text').text('No thinking episodes yet — have a conversation to generate plan data')
+      .attr('x', W / 2).attr('y', H / 2).attr('text-anchor', 'middle')
+      .attr('fill', '#666').attr('font-size', 15);
+    const leg = document.getElementById('canvasLegend');
+    if (leg) leg.textContent = 'Plan flow: recent thinking episodes in order of conviction';
+    return;
+  }
+
+  // Arrow marker
+  svg.append('defs').append('marker')
+    .attr('id', 'pf-arrow').attr('markerWidth', 8).attr('markerHeight', 8)
+    .attr('refX', 8).attr('refY', 4).attr('orient', 'auto')
+    .append('path').attr('d', 'M0,0 L0,8 L8,4 z').attr('fill', 'rgba(0,229,255,0.6)');
+
+  const g = svg.append('g');
+  svg.call(d3.zoom().scaleExtent([0.4, 2]).on('zoom', e => g.attr('transform', e.transform)));
+
+  const pad  = 50;
+  const nW   = Math.min(180, Math.max(100, (W - pad * 2) / pathways.length - 16));
+  const nH   = 90;
+  const gapX = (W - pad * 2 - nW) / Math.max(pathways.length - 1, 1);
+  const midY = H / 2 - nH / 2;
+
+  pathways.forEach((ep, i) => {
+    const x = pad + i * gapX;
+    const conviction = Math.min(1, Math.max(0, ep.conviction_score || ep.final_conviction || 0));
+    const color = conviction >= 0.7 ? '#4caf50' : conviction >= 0.4 ? '#ffb74d' : '#ef5350';
+
+    // Connector arrow to next node
+    if (i < pathways.length - 1) {
+      g.append('line')
+        .attr('x1', x + nW + 2).attr('y1', H / 2)
+        .attr('x2', pad + (i + 1) * gapX - 2).attr('y2', H / 2)
+        .attr('stroke', 'rgba(0,229,255,0.45)').attr('stroke-width', 1.5)
+        .attr('marker-end', 'url(#pf-arrow)');
     }
-    const progress = (g.progress || 0) / 100;
-    ctx.fillStyle = progress > 0.5 ? 'rgba(76,175,80,0.3)' : 'rgba(255,183,77,0.3)';
-    ctx.strokeStyle = progress > 0.5 ? '#4caf50' : '#ffb74d'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.roundRect(x, y, nW, nH, 8); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#e0e0e0'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText((g.title || g.goal || 'Goal').substring(0, 18), x + nW / 2, y + nH / 2 - 8);
-    ctx.fillStyle = '#aaa'; ctx.font = '10px sans-serif';
-    ctx.fillText(Math.round(progress * 100) + '% complete', x + nW / 2, y + nH / 2 + 10);
+
+    // Node box
+    const ng = g.append('g').attr('transform', `translate(${x},${midY})`);
+    ng.append('rect').attr('width', nW).attr('height', nH).attr('rx', 8)
+      .attr('fill', color + '22').attr('stroke', color).attr('stroke-width', 1.5);
+
+    // Conviction badge circle top-right
+    ng.append('circle').attr('cx', nW - 12).attr('cy', 12).attr('r', 11)
+      .attr('fill', color).attr('fill-opacity', 0.9);
+    ng.append('text').text(Math.round(conviction * 100))
+      .attr('x', nW - 12).attr('y', 16).attr('text-anchor', 'middle')
+      .attr('font-size', 9).attr('font-weight', 'bold').attr('fill', '#000');
+
+    // Input label
+    ng.append('text').text((ep.input || 'Episode').substring(0, nW / 7))
+      .attr('x', nW / 2).attr('y', 26)
+      .attr('text-anchor', 'middle').attr('fill', '#e0e0e0').attr('font-size', 10);
+
+    // Rethinks
+    if (ep.rethink_count) {
+      ng.append('text').text(`↺ ${ep.rethink_count} rethinks`)
+        .attr('x', nW / 2).attr('y', 44)
+        .attr('text-anchor', 'middle').attr('fill', '#ffb74d').attr('font-size', 9);
+    }
+
+    // Failure class if any
+    if (ep.failure_class) {
+      ng.append('text').text(`⚠ ${ep.failure_class}`.substring(0, 18))
+        .attr('x', nW / 2).attr('y', ep.rethink_count ? 60 : 44)
+        .attr('text-anchor', 'middle').attr('fill', '#ef5350').attr('font-size', 8);
+    }
+
+    // Timestamp
+    if (ep.ts) {
+      const dt = new Date(ep.ts * 1000);
+      ng.append('text').text(dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))
+        .attr('x', nW / 2).attr('y', nH - 8)
+        .attr('text-anchor', 'middle').attr('fill', '#666').attr('font-size', 8);
+    }
+
+    ng.append('title').text((ep.output || '').substring(0, 200));
   });
+
   const leg = document.getElementById('canvasLegend');
-  if (leg) leg.textContent = 'Active goals rendered as sequential plan flow';
+  if (leg) leg.innerHTML =
+    `<span style="color:#4caf50;">● High conviction ≥70%</span>&nbsp;&nbsp;` +
+    `<span style="color:#ffb74d;">● Medium 40–70%</span>&nbsp;&nbsp;` +
+    `<span style="color:#ef5350;">● Low &lt;40%</span>&nbsp;&nbsp;` +
+    `<span style="color:var(--text3);">${pathways.length} recent episodes · Scroll to zoom</span>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════
 // J5: MEMORY DIARY / VIEWER
 // ═══════════════════════════════════════════════════════════════════
 
+let _diaryTopK = 30;
+let _diaryMode = 'recent'; // 'recent' | 'search'
+
 async function loadDiaryStats() {
   try {
     const data = await fetch('/api/memory/stats').then(r => r.json());
     document.getElementById('diaryTotal').textContent = data.records || data.total || '—';
-    const cats = data.categories ? Object.keys(data.categories).length : '—';
-    document.getElementById('diaryCategories').textContent = cats;
-    document.getElementById('diaryShown').textContent = '0';
+    const etypes = data.event_types || {};
+    document.getElementById('diaryCategories').textContent = Object.keys(etypes).length || '—';
+
+    // Populate event-type select
+    const sel = document.getElementById('diaryEventType');
+    const current = sel.value;
+    while (sel.options.length > 1) sel.remove(1);
+    Object.entries(etypes).sort((a, b) => b[1] - a[1]).forEach(([et, cnt]) => {
+      const opt = document.createElement('option');
+      opt.value = et;
+      opt.textContent = `${et} (${cnt})`;
+      sel.appendChild(opt);
+    });
+    if (current) sel.value = current;
   } catch {
     document.getElementById('diaryTotal').textContent = '?';
   }
+  // Auto-load recent memories on first open
+  _diaryTopK = 30;
+  _diaryMode = 'recent';
+  await _fetchAndRenderDiary();
+}
+
+async function diaryBrowseRecent() {
+  _diaryMode = 'recent';
+  _diaryTopK = 30;
+  document.getElementById('diarySearch').value = '';
+  document.getElementById('diaryCat').value = '';
+  document.getElementById('diaryEventType').value = '';
+  document.getElementById('diaryImportance').value = 0;
+  document.getElementById('impLabel').textContent = '0%';
+  document.getElementById('diaryPinnedOnly').checked = false;
+  await _fetchAndRenderDiary();
 }
 
 async function searchDiary() {
-  const query = document.getElementById('diarySearch').value.trim();
-  const category = document.getElementById('diaryCat').value;
-  const minImportance = parseInt(document.getElementById('diaryImportance').value) / 100;
+  _diaryMode = 'search';
+  _diaryTopK = 30;
+  await _fetchAndRenderDiary();
+}
+
+async function loadMoreDiary() {
+  _diaryTopK += 20;
+  await _fetchAndRenderDiary();
+}
+
+async function _fetchAndRenderDiary() {
   const container = document.getElementById('diaryCards');
-  container.innerHTML = '<div class="empty" style="padding:20px;text-align:center;">Searching...</div>';
+  const loadMoreBtn = document.getElementById('diaryLoadMore');
+  container.innerHTML = '<div class="empty" style="padding:20px;text-align:center;color:var(--text3);">Loading…</div>';
+  if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+
+  const query    = document.getElementById('diarySearch').value.trim();
+  const category = document.getElementById('diaryCat').value;
+  const eventType = document.getElementById('diaryEventType').value;
+  const minImp   = parseInt(document.getElementById('diaryImportance').value) / 100;
+  const pinnedOnly = document.getElementById('diaryPinnedOnly').checked;
+  const sortBy   = document.getElementById('diarySort').value;
 
   try {
-    let url = '/api/memories?top_k=30';
-    if (query) url += '&query=' + encodeURIComponent(query);
-    if (category) url += '&category=' + encodeURIComponent(category);
+    let records = [];
 
-    const data = await fetch(url).then(r => r.json());
-    let records = data.records || data.memories || data.results || [];
+    if (_diaryMode === 'recent' && !query && !category) {
+      const data = await fetch(`/api/memories/recent?top_k=${_diaryTopK}`).then(r => r.json());
+      records = data.records || [];
+    } else if (query) {
+      const data = await fetch(`/api/memories?query=${encodeURIComponent(query)}&top_k=${_diaryTopK}`).then(r => r.json());
+      records = Array.isArray(data) ? data : (data.records || data.memories || []);
+    } else if (category) {
+      const data = await fetch(`/api/memories?category=${encodeURIComponent(category)}&top_k=${_diaryTopK}`).then(r => r.json());
+      records = Array.isArray(data) ? data : (data.records || data.memories || []);
+    } else {
+      const data = await fetch(`/api/memories/recent?top_k=${_diaryTopK}`).then(r => r.json());
+      records = data.records || [];
+    }
+
     if (!Array.isArray(records)) records = [];
-    if (minImportance > 0) records = records.filter(r => (r.importance || 0) >= minImportance);
+
+    // Client-side filters
+    if (eventType)   records = records.filter(r => (r.event_type || '') === eventType);
+    if (minImp > 0)  records = records.filter(r => (r.importance || 0) >= minImp);
+    if (pinnedOnly)  records = records.filter(r => r.pinned);
+
+    // Sort
+    if (sortBy === 'importance') {
+      records.sort((a, b) => (b.importance || 0) - (a.importance || 0));
+    } else if (sortBy === 'accessed') {
+      records.sort((a, b) => (b.access_count || 0) - (a.access_count || 0));
+    } else if (sortBy === 'pinned') {
+      records.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+    } else {
+      records.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+    }
+
+    // Update counts
     document.getElementById('diaryShown').textContent = records.length;
+    const pinnedCount = records.filter(r => r.pinned).length;
+    document.getElementById('diaryPinned').textContent = pinnedCount;
 
     if (!records.length) {
-      container.innerHTML = '<div class="empty" style="padding:40px;text-align:center;">No memories match your search</div>';
+      container.innerHTML = '<div class="empty" style="padding:40px;text-align:center;color:var(--text3);">No memories match — try broadening your filters</div>';
       return;
     }
-    container.innerHTML = '';
-    records.forEach(r => {
-      const content = r.content || {};
-      const text = content.text || content.result || content.query || content.result_raw || JSON.stringify(content).substring(0, 300);
-      const cat = r.category || 'general';
-      const importance = r.importance != null ? Math.round(r.importance * 100) + '%' : '—';
-      const ts = r.timestamp ? new Date(r.timestamp).toLocaleString() : '—';
-      const access = r.access_count || 0;
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.style.cssText = 'padding:var(--sp-3);';
-      card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:var(--sp-2);">
-          <div>
-            <span style="background:var(--accent);color:#000;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">${DOMPurify.sanitize(cat)}</span>
-            <span style="font-size:11px;color:var(--text3);margin-left:8px;">Importance: ${importance}</span>
-            <span style="font-size:11px;color:var(--text3);margin-left:8px;">Accessed: ${access}x</span>
-          </div>
-          <span style="font-size:11px;color:var(--text3);">${DOMPurify.sanitize(ts)}</span>
-        </div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.5;word-break:break-word;">${DOMPurify.sanitize(text.substring(0, 500))}</div>
-      `;
-      container.appendChild(card);
-    });
+
+    _renderDiaryCards(records, container);
+
+    if (loadMoreBtn) {
+      loadMoreBtn.style.display = records.length >= _diaryTopK ? 'inline-block' : 'none';
+    }
   } catch (e) {
-    container.innerHTML = `<div class="empty" style="padding:40px;text-align:center;">Error: ${DOMPurify.sanitize(e.message)}</div>`;
+    container.innerHTML = `<div class="empty" style="padding:40px;text-align:center;color:var(--danger);">Error: ${DOMPurify.sanitize(e.message)}</div>`;
   }
+}
+
+function _diaryDateGroup(timestamp) {
+  if (!timestamp) return 'Unknown';
+  const d = new Date(timestamp);
+  if (isNaN(d)) return 'Unknown';
+  const now = new Date();
+  const diffMs = now - d;
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays <= 6) return 'This Week';
+  if (diffDays <= 30) return 'This Month';
+  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long' });
+}
+
+function _diaryMemoryText(content) {
+  if (!content || typeof content !== 'object') return String(content || '').substring(0, 600);
+  return (content.text || content.result || content.query || content.message ||
+    content.result_raw || content.observation || JSON.stringify(content)).substring(0, 600);
+}
+
+const _EMOTION_COLORS = {
+  happy: '#4caf50', excited: '#69f0ae', calm: '#42a5f5',
+  curious: '#ce93d8', sad: '#90a4ae', anxious: '#ef5350',
+  frustrated: '#ff7043', grateful: '#ffca28', neutral: '#888',
+};
+
+function _renderDiaryCards(records, container) {
+  container.innerHTML = '';
+  let lastGroup = null;
+
+  records.forEach((r, idx) => {
+    const group = _diaryDateGroup(r.timestamp);
+    if (group !== lastGroup) {
+      lastGroup = group;
+      const sep = document.createElement('div');
+      sep.style.cssText = 'font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:var(--sp-2) 0 var(--sp-1);border-bottom:1px solid var(--border);margin-top:var(--sp-2);';
+      sep.textContent = group;
+      container.appendChild(sep);
+    }
+
+    const content  = r.content || {};
+    const text     = _diaryMemoryText(content);
+    const cat      = r.category || 'general';
+    const etype    = r.event_type || '';
+    const imp      = r.importance != null ? r.importance : 0.5;
+    const ts       = r.timestamp ? new Date(r.timestamp).toLocaleString() : '—';
+    const access   = r.access_count || 0;
+    const pinned   = r.pinned || false;
+    const trust    = r.trust_tier || '';
+    const emotion  = content.emotion || content.emotional_state || '';
+    const source   = r.source_id || '';
+    const impPct   = Math.round(imp * 100);
+
+    const trustColor = { 'PASS': '#4caf50', 'REPAIR': '#ffb74d', 'FAIL_CLOSED': '#ef5350', 'unverified': '#666' }[trust] || '#666';
+    const emotionColor = _EMOTION_COLORS[(emotion || '').toLowerCase()] || '';
+
+    const cardId = `diary-card-${idx}`;
+    const textId = `diary-text-${idx}`;
+    const isLong = text.length > 280;
+    const preview = isLong ? text.substring(0, 280) + '…' : text;
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.cssText = `padding:var(--sp-3);border-left:3px solid ${pinned ? 'var(--accent)' : 'transparent'};`;
+    card.id = cardId;
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:var(--sp-2);gap:var(--sp-2);">
+        <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
+          ${pinned ? '<span title="Pinned" style="font-size:13px;">📌</span>' : ''}
+          <span style="background:var(--accent);color:#000;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;">${DOMPurify.sanitize(cat)}</span>
+          ${etype ? `<span style="background:var(--bg3,var(--bg2));color:var(--text3);padding:2px 7px;border-radius:4px;font-size:10px;border:1px solid var(--border);">${DOMPurify.sanitize(etype)}</span>` : ''}
+          ${emotion ? `<span style="background:${emotionColor}22;color:${emotionColor || 'var(--text3)'};padding:2px 7px;border-radius:4px;font-size:10px;border:1px solid ${emotionColor || 'var(--border)'};">${DOMPurify.sanitize(emotion)}</span>` : ''}
+          ${trust && trust !== 'unverified' ? `<span style="color:${trustColor};font-size:10px;font-weight:600;">${DOMPurify.sanitize(trust)}</span>` : ''}
+        </div>
+        <span style="font-size:11px;color:var(--text3);white-space:nowrap;">${DOMPurify.sanitize(ts)}</span>
+      </div>
+      <div id="${textId}" style="font-size:13px;color:var(--text2);line-height:1.55;word-break:break-word;">${DOMPurify.sanitize(preview)}</div>
+      ${isLong ? `<button onclick="_diaryExpand('${textId}',${JSON.stringify(DOMPurify.sanitize(text))},this)" style="margin-top:6px;font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;">▼ Expand</button>` : ''}
+      <div style="display:flex;gap:var(--sp-3);margin-top:var(--sp-2);align-items:center;">
+        <div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;" title="Importance: ${impPct}%">
+          <div style="width:${impPct}%;height:100%;background:${imp > 0.7 ? 'var(--accent)' : imp > 0.4 ? 'var(--warn)' : 'var(--border)'};"></div>
+        </div>
+        <span style="font-size:10px;color:var(--text3);">${impPct}% imp</span>
+        <span style="font-size:10px;color:var(--text3);">↺ ${access}</span>
+        ${source ? `<span style="font-size:10px;color:var(--text3);">from ${DOMPurify.sanitize(source.substring(0,20))}</span>` : ''}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function _diaryExpand(textId, fullText, btn) {
+  const el = document.getElementById(textId);
+  if (!el) return;
+  el.textContent = fullText;
+  btn.remove();
 }
 
 </script>
