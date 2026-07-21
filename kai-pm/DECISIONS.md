@@ -1028,3 +1028,34 @@ Follow-up the same session, after the user asked to actually try rather than jus
 - Dashboard `/api/pii/scan` degrades gracefully when verifier is offline (fallback response, no 500).
 
 **Consequences:** Memory writes are now PII-clean at ingestion time. Developers and operators can use the Settings → PII Scanner to test arbitrary text before deploying or to audit clipboard contents without those strings entering the memory system.
+
+---
+
+## D64 — H3: Test Coverage Gate
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** RISKS.md R3 flagged "Test coverage % is unverified / not automated in CI gates" as Medium/High. CLEANUP_TODO and REPO_HEALTH_AUDIT both noted that `make coverage` and the `python-app.yml` pytest step measured `common/` coverage but imposed no enforcement threshold — a regression in coverage would pass CI silently. The previously measured baseline was 78% for `common/` as of 2026-06-01 (1,616 tests). The `python-app.yml` step already collected coverage but the `--cov-fail-under` flag was absent.
+
+**Decisions / Changes:**
+
+*`.github/workflows/python-app.yml`:*
+- Added `--cov-fail-under=65` to the existing pytest coverage step.
+- Renamed the step from "Test with pytest (with coverage)" → "Test with pytest (with coverage gate)" to make enforcement intent visible in CI UI.
+- Threshold 65%: conservatively below the measured 78% baseline to give headroom for newly-added uncovered code without triggering false-positive failures; meaningfully above 0% to catch major regressions.
+
+*`Makefile` — `coverage` target:*
+- Added `--cov-fail-under=65` to match the CI threshold exactly. Local developer runs (`make coverage`) now fail in the same way CI would.
+
+*`scripts/test_h3_coverage_gate.py` (new — 16 tests):*
+- `TestCIWorkflow` (8): workflow file exists, `pytest-cov` installed, `--cov=common` present, `--cov-fail-under` present, threshold ≥ 60, `--cov-report=term-missing` present, archive ignored, step is named.
+- `TestMakefileCoverageTarget` (6): target exists, `--cov=common` present, `--cov-fail-under` present, Makefile and CI thresholds are equal, HTML report requested, term-missing present.
+- `TestThresholdSanity` (2): threshold ≥ 60 (not trivially low), threshold ≤ 95 (not unrealistically high).
+
+**Key invariants:**
+- Makefile and CI thresholds are identical (both 65%) — they are cross-checked by `test_makefile_coverage_threshold_consistent`.
+- Only `common/` is gated, consistent with the existing measurement scope. Expanding coverage to `dashboard/`, `memu-core/`, or other modules is a separate decision when baseline measurements for those are established.
+- The threshold is documented here; future increases (e.g. to 75 or 80%) should be a new DECISIONS.md entry, not a silent edit.
+
+**Consequences:** CI now fails if the `common/` test coverage drops below 65%, closing RISKS.md R3 and the CLEANUP_TODO item. Developers running `make coverage` locally get the same enforcement as CI.
