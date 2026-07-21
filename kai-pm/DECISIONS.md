@@ -748,3 +748,44 @@ Follow-up the same session, after the user asked to actually try rather than jus
 **Deliberately not changed:** `docker-compose.minimal.yml` (Letta is a full-stack enhancement, not part of the minimal spine). `docker-compose.sovereign.yml` (sovereign stays on known stack until GPU validation). `agentic/` conviction loop (Letta is additive context, not a replacement).
 
 **Consequences:** With `FF_LETTA_TASKS=false` (default), there is zero runtime impact — `_get_letta_context()` returns `{}` immediately. When set to `true`, each `/chat` request fires a 30s-timeout POST to `letta-agent`; the result is injected as a system message before the conviction loop runs. Memory sync is a separate opt-in (`FF_LETTA_MEMORY_SYNC`). First live validation requires a running Ollama with `qwen2.5:0.5b` available.
+
+## D56 — 2026-07-21 — FF_GRAPH_INGEST flipped to true: memu-core → memu-graph fan-out now active by default
+
+**Context:** memu-graph (Cognee/Kuzu) was CI-verified across D41–D53 (PR #79) and merged to `main`. The write-side fan-out from `memu-core` to `memu-graph` was already fully implemented in `memu-core/app.py` (`_graph_ingest_fire_and_forget`, `_graph_forget_fire_and_forget`) and correctly gated behind `FF_GRAPH_INGEST`. However the compose default was still `false` — meaning the knowledge graph was never receiving live writes even though the full stack was running.
+
+**Decision:** Flip `FF_GRAPH_INGEST` default from `false` to `true` in `docker-compose.full.yml`. The fan-out is already best-effort (all errors swallowed with a `logger.warning`, never propagating to the synchronous `/memory/memorize` path), so there is zero risk of memu-core degradation if memu-graph is slow or unavailable. Also added `memu-graph` to memu-core's `depends_on` so the full stack starts in the right order. Documented `FF_GRAPH_INGEST=true` in `.env.example` with an inline comment.
+
+**What changed:**
+- `docker-compose.full.yml` — `FF_GRAPH_INGEST: "${FF_GRAPH_INGEST:-false}"` → `"${FF_GRAPH_INGEST:-true}"`. `memu-graph` added to memu-core `depends_on`.
+- `.env.example` — new `FF_GRAPH_INGEST=true` entry with comment.
+
+**Deliberately not changed:** `common/feature_flags.py` code-level default stays `False` — unit tests run outside Docker and don't have a memu-graph available, so keeping the code default off is correct. The compose override is the sole activation lever for the full stack.
+
+**Consequences:** On the next `docker compose -f docker-compose.full.yml up`, every `POST /memory/memorize` and triggered MARS forget will fan-out to `memu-graph /graph/ingest` and `/graph/forget` respectively, building the Cognee/Kuzu knowledge graph from live memory writes. The graph will start accumulating entity relationships immediately. `minimal.yml` and `sovereign.yml` are unaffected (no FF_GRAPH_INGEST entry there).
+
+## D57 — 2026-07-21 — P29 CIS Financial Awareness service implemented
+
+**Context:** Phase 0.5 backlog item 3 — UK construction-subcontractor finance tooling. The existing `common/self_emp_advisor.py` provides generic self-employment advice (MTD proximity alert, VAT threshold check) but has no CIS-specific logic. CIS (Construction Industry Scheme) deductions are the primary financial reality for a UK construction subcontractor: contractors deduct 20% (registered), 30% (unregistered), or 0% (gross status) from labour payments and remit directly to HMRC. These deductions create a tax credit against the annual Self Assessment bill and must be tracked carefully to avoid under-reserving.
+
+**Decision:** Build a new `financial-awareness/` FastAPI service (port 8063, IP 172.20.0.35) with pure-calculation endpoints — no LLM dependency, fast and reliable. Endpoints: `POST /finance/cis/record` (log a payment with deduction breakdown), `GET /finance/cis/summary` (YTD CIS totals + estimated tax/NI liability + CIS credit), `POST /finance/invoice/generate` (CIS-compliant invoice payload with text rendering), `GET /finance/vat` (rolling 12-month income vs VAT registration threshold), `GET /finance/tax` (estimated Income Tax + Class 4 NI with CIS credit applied), `GET /finance/summary` (full snapshot combining all three). Records persisted to `/data/finance/cis_records.json` on a named Docker volume.
+
+**What changed:**
+- `financial-awareness/app.py` (new): FastAPI service, all 7 endpoints, UK 2024/25 tax bands, CIS rates, rolling 12-month VAT logic, JSON persistence.
+- `financial-awareness/requirements.txt` (new): fastapi/starlette/uvicorn/pydantic at CVE-safe floors.
+- `financial-awareness/Dockerfile` (new): `python:3.11-slim`, non-root `app` user, `FINANCE_ROOT=/data/finance`.
+- `docker-compose.full.yml`: `financial-awareness` service at 172.20.0.35:8063; `finance_data` named volume.
+- `.env.example`: `FINANCE_ROOT` documented; `MTD_START`/`VAT_THRESHOLD`/`MILEAGE_RATE` already present.
+- `Makefile`: `test-financial` target added, wired into `test-core`.
+- `scripts/test_financial_awareness.py` (new): 18 unit tests across all endpoints — 18/18 passing.
+
+**Key UK rules encoded:**
+- CIS deduction rates: 20% registered, 30% unregistered, 0% gross status
+- CIS applies to labour portion only (materials exempt — deducted before applying rate)
+- Income Tax 2024/25: PA £12,570; basic 20% to £50,270; higher 40% to £125,140; additional 45% above
+- Class 4 NI 2024/25: 6% on £12,570–£50,270; 2% above
+- VAT: rolling 12-month income threshold (not tax-year) per HMRC rules
+- MTD trigger: £50,000 (configurable via env)
+
+**Deliberately not changed:** `common/self_emp_advisor.py` (kept as-is — it handles the generic MTD/mileage advice path in `agentic`). No LLM dependency introduced — this service is pure arithmetic and is a suitable foundation for future LLM-augmented advice.
+
+**Consequences:** `make test-financial` runs 18 unit tests. `docker compose -f docker-compose.full.yml up financial-awareness` starts the CIS tracker at http://localhost:8063. Records accumulate across restarts via the `finance_data` named volume.
