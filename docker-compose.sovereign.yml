@@ -174,7 +174,7 @@ services:
         ipv4_address: 172.20.0.5
     environment:
       DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/memu_db"
-      VECTOR_STORE: "pgvector"
+      VECTOR_STORE: "postgres"
       API_HOST: "0.0.0.0"
       API_PORT: "8001"
       AUDIT_REDIS_URL: "redis://redis:6379"
@@ -206,7 +206,7 @@ services:
         ipv4_address: 172.20.0.19
     environment:
       DATABASE_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/memu_db"
-      VECTOR_STORE: "pgvector"
+      VECTOR_STORE: "postgres"
       AUDIT_REDIS_URL: "redis://redis:6379"
       VAULT_ADDR: "${VAULT_ADDR:-http://vault:8200}"
       VAULT_TOKEN: "${VAULT_ROOT_TOKEN:-}"
