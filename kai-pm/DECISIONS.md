@@ -722,3 +722,29 @@ Follow-up the same session, after the user asked to actually try rather than jus
 **Deliberately left unchanged:** `memu-core/app.py` — `TurboVecStore` was already complete; no code changes needed. `memu-core/requirements.txt` — `turbovec>=0.1.0` was already listed. `scripts/test_memu_turbovec.py` — integration test already exists and wired into `make test-memu-turbovec`.
 
 **Consequences:** On the next dev/CI `docker compose up`, `memu-core` will boot with TurboVec ANN search active and a persisted `.tv` index file on the `turbovec_data` named volume. Vector similarity search no longer requires the `pgvector` extension. The `PGVectorStore` path (`VECTOR_STORE: postgres`) is still fully supported for environments that need it (sovereign, or any deployment with the pgvector extension available).
+
+## D55 — 2026-07-21 — Letta agent memory controller integrated (Steps 1–5)
+
+**Context:** Phase 3 memory architecture work — Letta (formerly MemGPT) provides tiered agent memory (in-context / external / archival) on top of an existing Ollama backend. The D33 spike confirmed `letta==0.16.8` installs cleanly on Python 3.11.15, well past the buggy 0.7.21–0.7.29 Ollama integration range (issues #2388/#2668). D34 established that the `qwen2.5:0.5b` model template very likely includes tool-call support (Step 0 pre-condition — live verification deferred to first GPU-available session; `LLMConfig` can be hand-constructed to bypass discovery if needed). The integration is additive: LangGraph in `agentic/` remains the conviction/planning engine; Letta adds a memory-management controller for long-running tasks.
+
+**Decision:** Implement Steps 1–5 of `kai-pm/LETTA_INTEGRATION_PLAN.md`:
+- Step 1: `letta-agent/` FastAPI service skeleton (port 8062) with `/health`, `POST /agent/run`, `GET /agent/memory/export`. Lazy Letta client init in `_client()`. SQLite store on `letta_data` named volume via `LETTA_BASE_PATH`.
+- Step 2: Wire into `agentic/app.py` — `LETTA_URL` env var, `_get_letta_context()` added to the 12-way parallel context gather alongside `_get_graph_context()`. Feature-flagged under `FF_LETTA_TASKS=false`.
+- Step 3: `_sync_letta_memories()` background coroutine — on `memories_updated=true` from `/agent/run`, exports archival memory and fans each entry into `memu-core /memory/memorize` with `category="letta_archival"`. Feature-flagged under `FF_LETTA_MEMORY_SYNC=false`.
+- Step 4: `letta-agent` service added to `docker-compose.full.yml` at `172.20.0.34` (port 8062), `letta_data` volume. `FF_LETTA_TASKS`, `FF_LETTA_MEMORY_SYNC`, `LETTA_URL` wired into the `agentic` service env block.
+- Step 5: `scripts/test_letta_agent.py` — 8 unit tests covering health, `/agent/run` happy path, context prepending, `memories_updated` detection, 502 on exception, memory export, and export-502. `make test-letta` target added and wired into `make test-core`.
+
+**What changed:**
+- `letta-agent/app.py` (new): FastAPI wrapper, lazy `_client()`, `RunRequest` model, three endpoints.
+- `letta-agent/requirements.txt` (new): `letta==0.16.8`, fastapi/starlette/uvicorn/pydantic at CVE-safe floors.
+- `letta-agent/Dockerfile` (new): `python:3.11-slim`, system `app` user, `LETTA_BASE_PATH=/data/letta`, `HOME=/data/home`.
+- `common/feature_flags.py`: added `LETTA_TASKS` (default false) and `LETTA_MEMORY_SYNC` (default false).
+- `agentic/app.py`: `LETTA_URL` env var; `_sync_letta_memories()` and `_get_letta_context()` functions; parallel gather expanded to 12-way; Letta context injected into system messages.
+- `docker-compose.full.yml`: `letta-agent` service block; `letta_data` named volume; `LETTA_URL`/`FF_LETTA_TASKS`/`FF_LETTA_MEMORY_SYNC` in agentic env.
+- `.env.example`: `LETTA_URL`, `FF_LETTA_TASKS`, `FF_LETTA_MEMORY_SYNC` documented.
+- `Makefile`: `test-letta` target; wired into `test-core`.
+- `scripts/test_letta_agent.py` (new): 8 mocked unit tests.
+
+**Deliberately not changed:** `docker-compose.minimal.yml` (Letta is a full-stack enhancement, not part of the minimal spine). `docker-compose.sovereign.yml` (sovereign stays on known stack until GPU validation). `agentic/` conviction loop (Letta is additive context, not a replacement).
+
+**Consequences:** With `FF_LETTA_TASKS=false` (default), there is zero runtime impact — `_get_letta_context()` returns `{}` immediately. When set to `true`, each `/chat` request fires a 30s-timeout POST to `letta-agent`; the result is injected as a system message before the conviction loop runs. Memory sync is a separate opt-in (`FF_LETTA_MEMORY_SYNC`). First live validation requires a running Ollama with `qwen2.5:0.5b` available.

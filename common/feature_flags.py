@@ -43,6 +43,8 @@ _REGISTRY: Dict[str, tuple] = {
     "SECURITY_AUDIT":        ("P9 automated security self-hacking", True),
     "WAKE_INTENT_ROUTING":   ("Pre-classify chat intent via wake-intent service before routing", False),
     "GRAPH_INGEST":          ("Phase B write-side fan-out from memu-core to memu-graph", False),
+    "LETTA_TASKS":           ("Delegate long-running tasks to letta-agent memory controller", False),
+    "LETTA_MEMORY_SYNC":     ("Sync letta-agent archival memories back to memu-core after each run", False),
 }
 
 

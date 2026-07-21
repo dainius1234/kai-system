@@ -42,6 +42,7 @@ MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 TELEGRAM_ALERT_URL = os.getenv("TELEGRAM_ALERT_URL", "http://perception-telegram:9000/alert")
 WAKE_URL = os.getenv("WAKE_URL", "http://wake-service:8022")
+LETTA_URL = os.getenv("LETTA_URL", "http://letta-agent:8062")
 WAKE_INTENT_COMMAND_THRESHOLD = float(os.getenv("WAKE_INTENT_COMMAND_THRESHOLD", "0.6"))
 WAKE_INTENT_OVERRIDE_CONFIDENCE = float(os.getenv("WAKE_INTENT_OVERRIDE_CONFIDENCE", "0.7"))
 budget = ErrorBudget(window_seconds=300)
@@ -700,6 +701,47 @@ async def _get_graph_context(query: str, top_k: int = 5) -> Dict[str, Any]:
     return {}
 
 
+async def _sync_letta_memories() -> None:
+    """Background: export Letta archival memory and fan into memu-core."""
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            export = await client.get(f"{LETTA_URL}/agent/memory/export")
+            if export.status_code != 200:
+                return
+            for mem in export.json().get("memories", [])[:50]:
+                await client.post(
+                    f"{MEMU_URL}/memory/memorize",
+                    json={"content": mem, "category": "letta_archival"},
+                )
+    except Exception:
+        pass
+
+
+async def _get_letta_context(user_msg: str) -> Dict[str, Any]:
+    """Run the Letta agent on the user message and return its response as context.
+
+    Feature-flagged off by default (FF_LETTA_TASKS). Adds latency on every
+    request when enabled — intended for long-running / research task classes.
+    Memory sync back to memu-core is a separate flag (FF_LETTA_MEMORY_SYNC).
+    """
+    if not is_enabled("LETTA_TASKS"):
+        return {}
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                f"{LETTA_URL}/agent/run",
+                json={"task": user_msg, "context": {}},
+            )
+            if resp.status_code == 200:
+                result = resp.json()
+                if is_enabled("LETTA_MEMORY_SYNC") and result.get("memories_updated"):
+                    asyncio.create_task(_sync_letta_memories())
+                return result
+    except Exception:
+        pass
+    return {}
+
+
 async def _get_session_messages(session_id: str) -> List[Dict[str, str]]:
     """Fetch recent session messages from memu-core."""
     try:
@@ -989,7 +1031,8 @@ async def chat_stream(req: ChatRequest):
             return default
 
     (memories, session_msgs, goals, topics, eq_context,
-     narrative, imagination, conscience, agent_ctx, operator_model, graph_context) = await asyncio.gather(
+     narrative, imagination, conscience, agent_ctx, operator_model,
+     graph_context, letta_context) = await asyncio.gather(
         _safe(_get_relevant_memories(user_msg), []),
         _safe(_get_session_messages(req.session_id), []),
         _safe(_get_active_goals(), []),
@@ -1001,6 +1044,7 @@ async def chat_stream(req: ChatRequest):
         _safe(_get_agent_context(), {}),
         _safe(_get_operator_model(user_msg, mode), {}),
         _safe(_get_graph_context(user_msg), {}),
+        _safe(_get_letta_context(user_msg), {}),
     )
 
     # build the message list
@@ -1021,6 +1065,14 @@ async def chat_stream(req: ChatRequest):
         messages.append({
             "role": "system",
             "content": f"Related entities/relationships from graph memory:\n{graph_results}",
+        })
+
+    # inject Letta agent memory context — only present when FF_LETTA_TASKS is on
+    letta_response = letta_context.get("response") if letta_context else None
+    if letta_response:
+        messages.append({
+            "role": "system",
+            "content": f"Agent memory context (Letta):\n{letta_response}",
         })
 
     if wake_intent.get("intent") != "unknown":
