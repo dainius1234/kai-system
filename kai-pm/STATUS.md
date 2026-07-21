@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-21
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** No active sprint. Next work is GPU-gated (Phase 1) or user-initiated.
+- **Current focus:** Cleanup sprint (CLEANUP_TODO.md). Week 1 done, Week 2 in progress.
 
 ## What's landed on main
 
@@ -41,5 +41,5 @@ Unlock condition: RTX 5080 procurement + provisioning + validation.
 ## Source of truth pointers
 
 - Resume layer: [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md)
-- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D71)
+- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D72)
 - Latest reality check: [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)

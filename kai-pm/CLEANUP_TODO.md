@@ -26,7 +26,7 @@
 - [x] `test-tempo` Makefile target deleted and removed from `.PHONY` and `test-core` deps (D70, 2026-07-21).
 
 ### 1.3 Fix correction-memory ranking test
-- [ ] Investigate `scripts/test_p3_organic_memory.py::test_correction_memory_gets_boost` after 1.2 lands.
+- [x] Investigated: test passes as-is (30/30 P3 tests green, 2026-07-21). Correction boost = +0.08 + importance advantage = sufficient to rank first with hash embeddings. No code change needed.
 
 ### 1.4 Rename `langgraph/` → `agentic/` ⭐ KEYSTONE
 - [x] Mechanical rename. ~30 file edits.
@@ -50,8 +50,8 @@
       decision in `REALITY_CHECK_2026-06-18.md` before #67/#69 are touched.
 
 ### 2.2 Reconcile docker-compose files
-- [~] Diff minimal vs sovereign vs full → `kai-pm/COMPOSE_DRIFT.md` (agent dispatched 2026-06-01, not yet landed).
-- [ ] Extract shared config to base.
+- [x] `kai-pm/COMPOSE_DRIFT.md` landed (D72, 2026-07-21) — 10 critical divergences documented, 11 inconsistencies, shared-block extraction candidates listed.
+- [ ] Extract shared config to base (deferred — divergences D1/D2 should be resolved first).
 
 ### 2.3 Prune Makefile 100 → ~25 targets
 - [x] Audit landed → [`MAKEFILE_AUDIT.md`](MAKEFILE_AUDIT.md) (2026-06-02).

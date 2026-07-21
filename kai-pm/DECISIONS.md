@@ -1175,3 +1175,21 @@ Individual test targets removed are fully covered by `test-core`; operational ta
 Removed the `orchestrator` service block (build, env, ports, healthcheck, network, depends_on). Port 8050 and IP 172.20.0.32 freed. The `orchestrator/` directory is kept as-is pending a future decision on whether to implement the risk-authority layer or delete the directory entirely.
 
 **Consequences:** `make merge-gate` now runs cleanly in CI and on a fresh checkout with no running services or external credentials. It covers the full 77-target test suite (`test-core`) plus integration smoke, coverage gate, dep-audit, and doc freshness — all in a single honest command. `make full-up` no longer starts the orchestrator stub.
+
+---
+
+## D72 — scripts/conftest.py redis stub + COMPOSE_DRIFT.md + §1.3 verified
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:**
+Three cleanup items resolved:
+
+**§1.3 (test_correction_memory_gets_boost):** Ran the full `test_p3_organic_memory.py` suite — all 30 tests pass. The `test_correction_memory_gets_boost` test already works: the correction_boost (+0.08) and importance advantage (+0.036) together add up to ~0.12 score lead over the normal record, which the hash-based fake embeddings cannot overcome. No code change needed; marked `[x]` in CLEANUP_TODO.
+
+**scripts/conftest.py (new file):** 12 test files failed during `pytest scripts/ --co` collection because `redis` is not installed in this environment (it is a service runtime dependency installed from per-service requirements.txt in CI, not from a top-level requirements file). Added `scripts/conftest.py` that stubs `redis` and `redis.asyncio` with a MagicMock where `from_url().ping()` raises `ConnectionError`. The `ConnectionError` is intentional: `kai_config.build_saver()` calls `saver.redis.ping()` and falls back to `ChecksummedSpoolSaver` on connection failure — the fallback test in `test_episode_saver.py` requires this. Also installed `python-multipart` (declared in `perception/audio/requirements.txt`, needed by FastAPI when registering `UploadFile` routes). Result: collection drops from 12 errors to 0; 1826 tests now collect cleanly.
+
+**kai-pm/COMPOSE_DRIFT.md (new file):** Full analysis of minimal vs sovereign vs full docker-compose files. 10 critical divergences (D1–D10), 11 structural inconsistencies (I1–I11), and a candidate extraction list for a future base file. Key findings: sovereign uses plain postgres (no pgvector) while setting VECTOR_STORE=postgres; tool-gate uses three completely different auth mechanisms across profiles; the agentic service in sovereign is a self-employment accounting app, not the LLM orchestrator. See §6 (Recommended Next Steps) for a prioritised fix list.
+
+**Consequences:** `pytest scripts/ --co` runs cleanly in offline/local environments without all service dependencies installed. Drift surface between compose profiles is now documented with a fix priority list. CLEANUP_TODO §2.2 progressed from `[~]` to `[x]` (COMPOSE_DRIFT.md landed).
