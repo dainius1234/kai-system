@@ -443,13 +443,16 @@ fusion-engine/       # Multi-signal consensus and conviction gating
 verifier/            # Semantic fact-checking (embedding + keyword), SAGE self-critique
 executor/            # Sandboxed execution bridge
 dashboard/           # 10-view operator console (FastAPI + Starlette)
-memu-core/           # Memory engine — the soul (~7,450 lines); hot-path memorize/retrieve
-                     # + introspect_app.py — store-maintenance process split off (D21)
+memu-core/           # Memory engine — hot-path memorize/retrieve/retrieve_ranked
+                     # + TurboVec ANN index (default) / pgvector (sovereign) / InMemory
+                     # + introspect_app.py — store-maintenance split into own process (D21)
+memu-graph/          # Cognee/Kuzu graph memory — entity/relation ingest→query→forget
+                     # feature-flagged off by default (FF_GRAPH_INGEST=false)
 tool-gate/           # HMAC auth, rate limit, policy enforcement
-agentic/           # Agentic brain (router, planner, adversary, conviction, config)
-langgraph/           # Pre-rename compatibility duplicate of agentic/'s core modules —
-                     # ~20 scripts/test_*.py files still `sys.path.insert` against this
-                     # path; kept in sync manually, not a symlink
+agentic/             # Agentic brain (router, planner, adversary, conviction, config)
+                     # + introspect_app.py — dream/evolve/security-audit split off (Phase B)
+langgraph/           # Pre-rename compatibility shim for agentic/ — ~20 test scripts still
+                     # sys.path.insert against this path; kept in sync, not a symlink
 kai-advisor/         # Self-employment advisor (offline, UK-focused)
 telegram-bot/        # Telegram bot (voice + text pipeline)
 heartbeat/           # System pulse and auto-sleep
@@ -472,6 +475,7 @@ sandboxes/           # Ephemeral sandbox environments
 common/              # Shared: auth, llm, policy, rate_limit, resilience, errors, feature_flags
 security/            # HMAC/auth hardening helpers
 scripts/             # Tests, validation, automation (~68 test files)
+kai-pm/              # PM brain: decisions log, session bootstrap, roadmap, tech watch
 data/                # Seed datasets and advisor inputs
 docs/                # Plans, runbooks, architecture, backlog
 ```
