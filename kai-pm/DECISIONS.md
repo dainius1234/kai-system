@@ -1059,3 +1059,91 @@ Follow-up the same session, after the user asked to actually try rather than jus
 - The threshold is documented here; future increases (e.g. to 75 or 80%) should be a new DECISIONS.md entry, not a silent edit.
 
 **Consequences:** CI now fails if the `common/` test coverage drops below 65%, closing RISKS.md R3 and the CLEANUP_TODO item. Developers running `make coverage` locally get the same enforcement as CI.
+
+---
+
+## D65 — CI fix: pii_redacted type + chassis httpx mock + financial-awareness sys.modules collision
+
+**Date:** 2026-07-21
+**Status:** Implemented (PR #87, merged)
+
+**Context:** PR #86 introduced three CI failures:
+1. `memu-core/app.py` `memorize_event` returned `int` for `pii_redacted` but the endpoint is typed `-> Dict[str, str]`, causing `ResponseValidationError`.
+2. `scripts/test_chassis.py` `FakeResponse` lacked a `status_code` attribute, causing `AttributeError` that was caught as an error path, flipping `response.source` to `"error"`.
+3. `scripts/test_financial_awareness.py` used bare `import app`, which resolved to `kai-advisor/app.py` after alphabetical test discovery loaded it into `sys.modules["app"]`.
+
+**Decisions / Changes:**
+- `memu-core/app.py`: `"pii_redacted": str(sum(...))` to coerce int → str.
+- `scripts/test_chassis.py`: added `status_code = 200` to `FakeResponse`; added `headers=None` to `FakeAsyncClient.__init__`; added `FakeConnectError` and `FakeTimeoutException` to `fake_httpx` SimpleNamespace.
+- `scripts/test_financial_awareness.py`: load app by file path with `importlib.util.spec_from_file_location("financial_awareness_app", ...)` to avoid `sys.modules` collision.
+
+**Consequences:** All four CI checks (Core Tests push + PR, Python application push + PR) green.
+
+---
+
+## D66 — H1/H2/H3: Parameterize hardcoded credentials in compose files and Makefile
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** `STUBS_AND_PLACEHOLDERS.md` H1/H2/H3 flagged three locations where `localdev` or `admin` credentials were hardcoded, ignoring any `DB_PASSWORD` / `GRAFANA_ADMIN_USER` env vars set by operators.
+
+**Decisions / Changes:**
+- `docker-compose.full.yml` lines 91, 122, 712: `postgresql://keeper:localdev@...` → `postgresql://keeper:${DB_PASSWORD:-localdev}@...`.
+- `docker-compose.sovereign.yml` line 132: `GF_SECURITY_ADMIN_USER: admin` → `GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}`.
+- `Makefile` `init-memu-db`: inline fallback updated to `${DB_PASSWORD:-localdev}`.
+
+**Consequences:** Operators can now override credentials via env var without editing compose files. Defaults remain `localdev` / `admin` so dev environments are unaffected.
+
+---
+
+## D67 — H4: Clear OPENAI_API_KEY placeholder in agentic integration test
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** `scripts/agentic_integration_test.py` set `OPENAI_API_KEY=sk-test-placeholder-not-real` to satisfy CrewAI object construction. The literal fake key could be mistaken for a real key or accidentally log to CI.
+
+**Decision:** Change to `os.environ.setdefault("OPENAI_API_KEY", "")`. CrewAI object construction still proceeds; tests that need a real key will fail fast with a clearer error.
+
+---
+
+## D68 — S9: Real ed25519 keypair generation in auto_rotate_ed25519.py
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** `scripts/auto_rotate_ed25519.py` `_new_keypair()` used `secrets.token_bytes(32)` for both private and public halves — producing two independent random blobs with no mathematical relationship, not a real ed25519 keypair. The `cryptography` library is already in `scripts/requirements-kai-control.txt`.
+
+**Decision:** Replace with `Ed25519PrivateKey.generate()` from `cryptography.hazmat.primitives.asymmetric.ed25519`, serializing with `Encoding.Raw` / `PrivateFormat.Raw` / `PublicFormat.Raw` to produce a properly-related keypair.
+
+**Consequences:** Rotated key material is now valid ed25519; the public key is cryptographically derived from the private key, enabling real signature verification.
+
+---
+
+## D69 — Cosmetic: Replace alert() in triggerBriefing with inline modal
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** `dashboard/static/app.html` `triggerBriefing()` called `alert(msg)` after `showToast(...)`. The native `alert()` is jarring, blocks the JS thread, and is inconsistent with the rest of the dashboard UI.
+
+**Decision:** Add `_showBriefingModal(text)` — a lightweight inline overlay with a close button and click-outside dismissal — and replace `alert(msg)` with it.
+
+---
+
+## D70 — Makefile cleanup: delete 10 dead/duplicate targets, create Makefile.archive
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** `kai-pm/MAKEFILE_AUDIT.md` identified 10 targets as DELETE candidates: `test-tempo` (orphaned service), `test-hmac-rotation-drill` (duplicate of `hmac-rotation-drill`), `test-j1-live-canvas` through `test-j7-skills-hub` (redundant filtered aliases of `test-j-series`), and `cache-test-core` (stale — covered only 50/74 test-core targets).
+
+**Decision:**
+- Deleted all 10 target definitions from `Makefile`.
+- Removed `test-tempo`, `test-hmac-rotation-drill`, and the 7 J-series aliases from `.PHONY`.
+- Removed `test-tempo` and `test-hmac-rotation-drill` from `test-core` dependency list.
+- Created `Makefile.archive` with the deleted definitions preserved for reference.
+- Archive targets (60+) flagged in the audit remain in the main Makefile for now, pending the `test-core` restructuring that would allow their definitions to be removed.
+
+**Consequences:** Makefile is 10 targets slimmer. `cache-test-core` (which produced misleading partial results) is gone. CI `test-core` is unaffected since only the two actually-dead targets (`test-tempo`, `test-hmac-rotation-drill`) were removed from its dependency list.

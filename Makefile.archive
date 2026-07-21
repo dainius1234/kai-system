@@ -1,0 +1,47 @@
+# Makefile.archive
+#
+# Targets removed from the live Makefile per MAKEFILE_AUDIT.md.
+# These are preserved here for historical reference only.
+# They are NOT included by the main Makefile and will not run via `make`.
+#
+# Deleted targets (do not restore without PM approval):
+#   test-tempo              — orphaned; tempo service removed
+#   test-hmac-rotation-drill — duplicate alias of hmac-rotation-drill
+#   test-j1-live-canvas     — filtered alias of test-j-series (J1)
+#   test-j2-wake-word       — filtered alias of test-j-series (J2)
+#   test-j3-pii-redact      — filtered alias of test-j-series (J3)
+#   test-j4-proactive-voice — filtered alias of test-j-series (J4)
+#   test-j5-memory-diary    — filtered alias of test-j-series (J5)
+#   test-j6-soul-agents     — filtered alias of test-j-series (J6)
+#   test-j7-skills-hub      — filtered alias of test-j-series (J7)
+#   cache-test-core         — stale; covered only 50/74 test-core targets
+
+test-tempo:
+	PYTHONPATH=. python scripts/test_tempo.py
+
+test-hmac-rotation-drill:
+	PYTHONPATH=. python scripts/hmac_rotation_drill.py
+
+test-j1-live-canvas:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J1"
+
+test-j2-wake-word:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J2"
+
+test-j3-pii-redact:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J3"
+
+test-j4-proactive-voice:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J4"
+
+test-j5-memory-diary:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J5"
+
+test-j6-soul-agents:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J6"
+
+test-j7-skills-hub:
+	PYTHONPATH=. python -m pytest scripts/test_j_series.py -v -k "J7"
+
+cache-test-core:
+	python3 scripts/cache_test_core.py

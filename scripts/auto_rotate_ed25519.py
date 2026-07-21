@@ -4,18 +4,24 @@ from __future__ import annotations
 import base64
 import json
 import os
-import secrets
 import time
 from pathlib import Path
+
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat, PrivateFormat, NoEncryption
 
 STATE_PATH = Path(os.getenv("ED25519_STATE_PATH", "security/ed25519_rotation_state.json"))
 ROTATE_SECONDS = int(os.getenv("ED25519_ROTATE_SECONDS", "604800"))
 
 
 def _new_keypair() -> dict:
-    # lightweight offline placeholder key material (ed25519-ready envelope)
-    priv = base64.b64encode(secrets.token_bytes(32)).decode("ascii")
-    pub = base64.b64encode(secrets.token_bytes(32)).decode("ascii")
+    private_key = Ed25519PrivateKey.generate()
+    priv = base64.b64encode(
+        private_key.private_bytes(Encoding.Raw, PrivateFormat.Raw, NoEncryption())
+    ).decode("ascii")
+    pub = base64.b64encode(
+        private_key.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
+    ).decode("ascii")
     kid = f"k{int(time.time())}"
     return {"key_id": kid, "private": priv, "public": pub}
 

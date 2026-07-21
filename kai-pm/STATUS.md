@@ -16,6 +16,8 @@
 | #83 | D56, D57 | FF_GRAPH_INGEST=true; P29 CIS Financial Awareness service |
 | #84 | D58 | Automation infra, cloud LLM backends, PWA service worker, agentic financial wiring |
 | #85 | D59 | C3 LLM retry/backoff, behavioral scoreboard, Finance dashboard tab, PHONE_SETUP.md |
+| #86 | D60–D64 | Phase 0 backlog: SOUL.md, Live Canvas D3 v7, Memory Diary, PII auto-redaction, coverage gate |
+| #87 | D65 | CI fix: pii_redacted type, chassis httpx mock, financial-awareness sys.modules collision |
 
 ## Open PRs
 
@@ -39,5 +41,5 @@ Unlock condition: RTX 5080 procurement + provisioning + validation.
 ## Source of truth pointers
 
 - Resume layer: [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md)
-- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D59)
+- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D70)
 - Latest reality check: [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)
