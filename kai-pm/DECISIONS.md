@@ -909,3 +909,40 @@ Follow-up the same session, after the user asked to actually try rather than jus
 - Dashboard proxy uses existing resilience helpers — no new HTTP client code introduced.
 
 **Consequences:** Operators can edit Kai's identity (values, personality, agent registry) through the EQ tab's Soul Editor panel without SSH, file editing, or container restarts. Changes take effect on the next `/soul` POST and propagate into all subsequent LLM system prompts within the same process.
+
+---
+
+## D61 — J1: Live Canvas with D3 v7
+
+**Date:** 2026-07-21
+**Status:** Implemented
+
+**Context:** The existing Canvas tab used native `<canvas>` 2D API with hand-drawn nodes and lines. The operator confirmed D3.js for the upgrade. Three visualization modes were planned: Mind Map (goals + memory category clusters), Emotion Timeline (valence over time), and Plan Flow (recent thinking episodes with conviction scores). The canvas element was retained in the DOM but all rendering was to be migrated to D3 SVG.
+
+**Decisions / Changes:**
+
+*Static asset: `dashboard/static/d3.v7.min.js` (new, 280 KB):*
+- D3 v7 bundled as a local static file (installed via `npm install d3@7`, file copied from `node_modules/d3/dist/d3.min.js`). Served at `/static/d3.v7.min.js` — no CDN dependency at runtime.
+- `<script src="/static/d3.v7.min.js">` added to `<head>` alongside existing marked/dompurify CDN tags.
+
+*`dashboard/static/app.html` (canvas section upgraded):*
+- Replaced `<canvas id="liveCanvas">` with `<div id="canvasD3">` — D3 renders SVGs inside this container. Avoids the canvas pixel-scaling issues on HiDPI screens.
+- Rewrote `refreshCanvas()`: now fetches `/api/goals`, `/api/memory/stats`, `/api/emotion/timeline?limit=60`, and `/api/thinking` in parallel. Previous version only fetched goals, stats, and nudges.
+- Added `_canvasContainer()` helper: stops any running force simulation and clears the D3 div before each redraw.
+- Rewrote three drawing functions:
+  - `_drawMindMap(el, W, H)`: D3 force-directed simulation (forceLink + forceManyBody + forceCenter + forceCollide). Goals as coloured circles (green=complete, amber=in-progress, red=not-started), memory categories as purple nodes, KAI hub as cyan 44-px circle. Drag nodes + scroll-to-zoom via `d3.drag()` and `d3.zoom()`. Progress % and count shown as sub-labels.
+  - `_drawEmotionTimeline(el, W, H)`: D3 scaleTime/scaleLinear axes, monotone-X area chart with separate positive (green) and negative (red) area fills, cyan trend line, dot markers with `<title>` tooltips. Reads `/api/emotion/timeline` valence field.
+  - `_drawPlanFlow(el, W, H)`: Horizontal scrollable (via zoom) sequence of episode boxes. Each box shows input label, rethink count, failure class, timestamp, and a conviction-score badge circle (colored by threshold). Arrow markers between nodes. Reads `/api/thinking` pathways.
+- `canvasMode()` rewritten: uses `charAt(0).toUpperCase()` to build button IDs, cleanly handles the three modes without repetition.
+- Legend `#canvasLegend` updated per mode with colour-coded labels and interaction hints.
+
+*`scripts/test_j1_live_canvas.py` (new — 25 tests):*
+- Tests: D3 file presence and size, script tag placement in `<head>`, canvasD3 div, absence of old plain canvas element, mode buttons, nav item, JS function presence, D3 API usage (forceSimulation, zoom, drag, scaleTime, area, line, curveMonotoneX), correct data endpoints fetched, switchView canvas hook.
+
+**Key invariants preserved:**
+- D3 force simulation is torn down via `_canvasSim.stop()` before each redraw — no accumulation of stale simulation instances.
+- All three modes gracefully handle empty data (backend unavailable) with a centered placeholder message.
+- Zoom and drag are additive UX, not required — the chart is useful when static.
+- The local D3 file means the dashboard functions offline without CDN access.
+
+**Consequences:** Canvas tab now delivers an interactive, physics-based mind map of Kai's goal and memory landscape; a real valence-over-time emotion chart sourced from the memory system; and a conviction-flow view of recent thinking episodes — all using D3 v7 SVG with zoom/drag interactivity.
