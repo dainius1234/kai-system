@@ -1,8 +1,8 @@
 # Kai PM Status Dashboard
 
-- **Last updated (UTC):** 2026-07-21
+- **Last updated (UTC):** 2026-07-22
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** Cleanup sprint (CLEANUP_TODO.md). Week 1 done, Week 2 in progress.
+- **Current focus:** Cleanup sprint (CLEANUP_TODO.md). Week 1–3 done. Feature branch rebased; pending PR to main.
 
 ## What's landed on main
 
@@ -21,7 +21,9 @@
 
 ## Open PRs
 
-None. All branches merged and cleaned up as of 2026-07-21.
+| Branch | Decisions | What | Status |
+|---|---|---|---|
+| `claude/project-rework-plan-pgvp35` | D71–D74 | Cleanup sprint Week 1–3: honest merge-gate, conftest redis stub, MAKEFILE_TARGETS.md, 10 CI test isolation fixes | Ready to PR — CI re-running after rebase |
 
 ## Blocked items (GPU)
 
@@ -41,5 +43,5 @@ Unlock condition: RTX 5080 procurement + provisioning + validation.
 ## Source of truth pointers
 
 - Resume layer: [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md)
-- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D73)
+- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D74)
 - Latest reality check: [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)

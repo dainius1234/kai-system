@@ -1225,3 +1225,22 @@ All ~110 Makefile targets categorised across four groups: Validation/CI Gate, Te
 - `test_github_models_eval::test_live_query_returns_real_response` — proxy 403 on `models.github.ai`; skip condition should also check reachability.
 - `test_prod_hardening::TestHMACRotation::test_ed25519_state` — pyo3 panic in distro cryptography package.
 - `test_camera::test_capture` — HTTP 503 without camera hardware; needs `@unittest.skip` decorator.
+
+## D74 — CI root-cause diagnosis + feature branch rebased onto main
+
+**Date:** 2026-07-22
+**Status:** Implemented
+
+**Context:**
+CI showed 4 failing checks on push and pull_request events after PR #86 was merged:
+`Core Tests / test` and `Python application / build` both red on main and the feature branch.
+
+**Root causes (10 failures in total):**
+1. `test_j_series.py::TestJ1LiveCanvas` × 2 — assertions written against stale HTML IDs/function names (`liveCanvas` / `drawMindMap`) before J1 canvas was updated. Real values: `canvasD3` / `_drawMindMap`. These were fixed in D73 (feature branch `edc1779`) but that commit was not on main.
+2. `test_letta_agent.py` × 8 — `import app` at module level hit `sys.modules["app"]` = memu-core/app (registered by `test_p3_organic_memory` earlier in the bulk run), giving `AttributeError` / `KeyError`. Fixed in D73 via `spec_from_file_location` + separate `sys.modules` key.
+
+**Why D73 fixes weren't on main:**
+PR #86 merged commits up through `edc1882`. Six further commits (D71–D73 + gitignore) accumulated on `claude/project-rework-plan-pgvp35` after that merge and have not yet been PR'd to main.
+
+**Action:**
+Merged `origin/main` (`2b17d5e`) into the feature branch — no content conflicts (feature branch already contained everything in that merge commit). Pushed updated feature branch. CI will re-run; once green, a PR to main will close all 10 CI failures.
