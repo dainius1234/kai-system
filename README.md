@@ -21,16 +21,16 @@
 
 ---
 
-## Project Status (21 July 2026)
+## Project Status (22 July 2026)
 
 | Metric | Value |
 |---|---|
-| **Services** | 32 Docker containers |
+| **Services** | 33 Docker containers |
 | **Test targets** | 77 (`make test-core`) |
-| **Individual tests** | 1,656 (`def test_` across 90 files) |
-| **Python LOC** | ~51,613 |
+| **Individual tests** | 1,825 (`def test_` across 98 files) |
+| **Python LOC** | ~54,937 |
 | **Compose files** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 36 |
+| **Milestones shipped** | 32 |
 | **Failures** | 0 |
 
 > **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.

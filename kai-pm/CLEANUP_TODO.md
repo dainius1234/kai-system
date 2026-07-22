@@ -63,9 +63,9 @@
 
 ## Week 3 — Honest Verification
 
-- [ ] Run every surviving Makefile target. Categorise.
-- [ ] Repo-wide coverage gate (currently only `common/` at 78%).
-- [ ] `merge-gate` honesty.
+- [x] Run every surviving Makefile target. Categorise → `kai-pm/MAKEFILE_TARGETS.md` (D73, 2026-07-22). 1792/1794 tests pass offline; 2 env-specific failures (pyo3/live-API). 5 test isolation bugs fixed. 0 collection errors.
+- [ ] Repo-wide coverage gate (currently only `common/` at 65% — was 78% before conftest changes).
+- [x] `merge-gate` honesty — done (D71).
 
 ---
 

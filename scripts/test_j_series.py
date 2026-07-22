@@ -502,7 +502,7 @@ class TestJ1LiveCanvas(unittest.TestCase):
         self.assertIn('id="canvasView"', self.html)
 
     def test_canvas_element_exists(self):
-        self.assertIn('id="liveCanvas"', self.html)
+        self.assertIn('id="canvasD3"', self.html)
 
     def test_canvas_mode_buttons_exist(self):
         self.assertIn('btnMindmap', self.html)
@@ -512,9 +512,9 @@ class TestJ1LiveCanvas(unittest.TestCase):
     def test_canvas_js_functions_exist(self):
         self.assertIn('function canvasMode(', self.html)
         self.assertIn('function refreshCanvas(', self.html)
-        self.assertIn('function drawMindMap(', self.html)
-        self.assertIn('function drawEmotionTimeline(', self.html)
-        self.assertIn('function drawPlanFlow(', self.html)
+        self.assertIn('function _drawMindMap(', self.html)
+        self.assertIn('function _drawEmotionTimeline(', self.html)
+        self.assertIn('function _drawPlanFlow(', self.html)
 
     def test_canvas_uses_dom_purify_for_xss(self):
         """Ensure DOMPurify is used for XSS protection."""
