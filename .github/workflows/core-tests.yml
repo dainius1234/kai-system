@@ -149,3 +149,48 @@ jobs:
         if: always()
         run: |
           docker compose -f docker-compose.full.yml down
+
+      - name: Boot sovereign profile (pgvector postgres + tool-gate + memu-core)
+        env:
+          MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
+          DB_PASSWORD: localdev
+        run: |
+          # S4: First CI verification that the sovereign compose boots correctly.
+          # Only start the three services that don't need Tailscale/Vault/Ollama.
+          # memu-core with VECTOR_STORE=postgres validates the D79 pgvector image fix.
+          docker compose -f docker-compose.sovereign.yml up -d postgres tool-gate memu-core
+          # Wait for postgres (needed by tool-gate and memu-core)
+          for i in {1..60}; do
+            if docker compose -f docker-compose.sovereign.yml exec -T postgres pg_isready -U keeper -d sovereign >/dev/null 2>&1; then
+              break
+            fi
+            sleep 2
+          done
+          # Wait for tool-gate health
+          for i in {1..30}; do
+            if curl -sf http://localhost:8000/health >/dev/null 2>&1; then
+              break
+            fi
+            sleep 2
+          done
+          # Wait for memu-core health (VECTOR_STORE=postgres — validates pgvector image)
+          for i in {1..60}; do
+            if curl -sf http://localhost:8001/health >/dev/null 2>&1; then
+              break
+            fi
+            sleep 2
+          done
+          echo "--- Sovereign boot health ---"
+          curl -sf http://localhost:8000/health || (echo "tool-gate unhealthy" && exit 1)
+          curl -sf http://localhost:8001/health || (echo "memu-core unhealthy" && exit 1)
+
+      - name: Dump sovereign logs on failure
+        if: failure()
+        run: |
+          docker compose -f docker-compose.sovereign.yml ps
+          docker compose -f docker-compose.sovereign.yml logs postgres tool-gate memu-core --no-color
+
+      - name: Tear down sovereign stack
+        if: always()
+        run: |
+          docker compose -f docker-compose.sovereign.yml down -v

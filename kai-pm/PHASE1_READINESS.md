@@ -141,7 +141,7 @@ or new `test-memu-routes` target, `make merge-gate` passes.
 
 ### S4 — Sovereign stack CI boot-test
 
-**Status:** [ ] not started  
+**Status:** [x] DONE — 2026-07-23 (CI step added to core-tests.yml after memu-graph teardown)  
 **Why:** D1 and D2 were real bugs (wrong postgres image, wrong env var name) that would crash
 the sovereign stack immediately on boot. They are now fixed, but sovereign has never had a live
 boot-test in CI. Minimal and full have been CI-verified (PRs #77, #79). Sovereign has nothing.
