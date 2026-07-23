@@ -112,7 +112,7 @@ target, `make merge-gate` passes.
 
 ### S3 — FastAPI route tests for memu-core/app.py (53% → 65%+)
 
-**Status:** [ ] not started  
+**Status:** [x] DONE — 2026-07-23 (91 tests, memu-core/app.py 53%→59%, 5-module total 63%)  
 **Why:** `memu-core/app.py` is 7,950 lines — the memory engine, TurboVecStore, PGVectorStore,
 MARS decay, PII redaction, graph fan-out, P17-P22 personality engine. At 53%, large sections of
 the actual HTTP endpoints are untested. This file will take the most load when Kai starts
