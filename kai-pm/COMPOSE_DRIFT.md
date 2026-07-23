@@ -232,11 +232,11 @@ These blocks are strong candidates for a `docker-compose.base.yml` (using YAML a
 
 Ordered by impact:
 
-1. **Fix D1** — Add `pgvector/pgvector:pg15` to sovereign postgres (or remove `VECTOR_STORE: postgres` if TurboVec is intended).
-2. **Fix D2** — Align sovereign's memu-core env var name (`DATABASE_URL` → `PG_URI`) and database name (`memu_db` → `sovereign`).
-3. **Fix D6** — Parameterize `OLLAMA_MODEL` in full to match minimal.
-4. **Fix D9** — Add embedding model pull to minimal's `ollama-pull` service.
-5. **Fix D10** — Align `depends_on` conditions (both to `service_healthy` or both to `service_started`).
-6. **Extract base** — Once D1–D5 divergences are resolved or documented as intentional, extract the shared blocks listed in §5 to reduce drift surface.
+1. ~~**Fix D1** — Add `pgvector/pgvector:pg15` to sovereign postgres.~~ **DONE** (D79, 2026-07-23)
+2. ~~**Fix D2** — Align sovereign's memu-core env var name (`DATABASE_URL` → `PG_URI`).~~ **DONE** (D79, 2026-07-23)
+3. ~~**Fix D6** — Parameterize `OLLAMA_MODEL` in full to match minimal.~~ **DONE** (D80, 2026-07-23)
+4. ~~**Fix D9** — Add embedding model pull to minimal's `ollama-pull` service.~~ **DONE** (D80, 2026-07-23)
+5. ~~**Fix D10** — Align `depends_on` conditions to `service_healthy`.~~ **DONE** (D80, 2026-07-23)
+6. **Extract base** — Extract shared blocks listed in §5 to reduce drift surface (deferred: D3–D8 divergences mean sovereign is fundamentally different from minimal/full; base extraction is minimal↔full only and adds complexity for limited gain at this stage).
 
 Items D3, D4, D5, D7, D8 are **intentional architectural differences** between profiles (not bugs) — document them as design decisions before changing.

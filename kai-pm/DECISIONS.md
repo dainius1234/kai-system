@@ -1296,3 +1296,147 @@ PR #86 merged commits up through `edc1882`. Six further commits (D71–D73 + git
 
 **Action:**
 Merged `origin/main` (`2b17d5e`) into the feature branch — no content conflicts (feature branch already contained everything in that merge commit). Pushed updated feature branch. CI will re-run; once green, a PR to main will close all 10 CI failures.
+
+## D77 — memu-core: TurboVecStore BIGSERIAL race on concurrent Docker startup
+
+**Date:** 2026-07-23
+**Status:** Implemented (PR #88, commit `fe935ac`)
+
+**Context:**
+`core-tests.yml` CI failed with `psycopg2.errors.UniqueViolation: duplicate key value violates unique
+constraint "pg_class_relname_nsp_index"` / `Key (relname, relnamespace)=(memories_int_id_seq, 2200)
+already exists`. Two Docker services (`sovereign-memu-core` and `sovereign-memu-core-introspect`) both
+run `TurboVecStore.__init__` on startup, which calls `_init_schema()`. The `CREATE TABLE IF NOT EXISTS
+memories` DDL includes `int_id BIGSERIAL UNIQUE`. Under concurrent startup, Postgres's `IF NOT EXISTS`
+guard is not atomic — both services pass the existence check before either commits, and the loser
+raises `UniqueViolation` when the sequence `memories_int_id_seq` is already registered in `pg_class`.
+
+`PGVectorStore._init_schema` already has an identical pattern for `CREATE EXTENSION IF NOT EXISTS
+vector` (added in D38/D39, PR #78), but `TurboVecStore._init_schema` did not.
+
+**Decision:**
+Wrap the `CREATE TABLE IF NOT EXISTS memories` statement in `TurboVecStore._init_schema` in a
+`try/except self._psycopg2.errors.UniqueViolation` block with `conn.rollback()`, matching the pattern
+already in `PGVectorStore._init_schema`. The table exists either way after the race; rolling back and
+continuing is correct.
+
+**Rationale:**
+Symmetric fix — same pattern as the already-proven `CREATE EXTENSION` race guard. The race is
+fundamental to concurrent Postgres init; retrying would not help and schema-init serialization would
+require external locking. The existing data path is safe after rollback because `IF NOT EXISTS` means
+the losing service's table creation was a no-op.
+
+**Consequences:**
+`TurboVecStore` startup is now race-safe when multiple services share one Postgres instance.
+`memu-core/app.py` is the only file changed. No schema or data-path changes.
+
+## D78 — memu-core: generate_embedding defined after TurboVecStore instantiation
+
+**Date:** 2026-07-23
+**Status:** Implemented (PR #88, commit `8c7324a`)
+
+**Context:**
+After D77 unblocked `_init_schema()`, CI failed with a new error: `NameError: name
+'generate_embedding' is not defined` at `memu-core/app.py:582` inside `TurboVecStore.__init__`.
+
+Root cause: `TurboVecStore.__init__` calls `generate_embedding("dimension probe")` to determine the
+embedding dimension for the TurboVec index. In module-level execution order, `store = TurboVecStore()`
+was at line 939 but `def generate_embedding(...)` was defined at line 944 — after the instantiation.
+`_embedding_backend` (which `generate_embedding` delegates to) was also defined after line 939 (lines
+964–989). Python executes module code top-to-bottom; when `TurboVecStore()` was called, neither
+`generate_embedding` nor `_embedding_backend` existed yet.
+
+This bug was latent: previously `_init_schema()` always raised `UniqueViolation` before reaching
+line 582, so the `NameError` was masked. D77 exposed it.
+
+**Decision:**
+Move the embedding backend setup block (`EMBEDDING_MODEL_NAME`, `_ALLOW_FAKE_EMBEDDINGS`, the
+`try/except` block that defines `_embedding_backend`, and `def generate_embedding`) to immediately
+before the store selection block. New order: `_embedding_backend` defined → `generate_embedding`
+defined → `store = TurboVecStore()` (which safely calls `generate_embedding`).
+
+A one-line comment was added above the block explaining why it must precede store selection.
+
+**Rationale:**
+Minimal, correct reorder. No logic changes — only execution ordering. The alternative of lazy
+initialization inside `TurboVecStore.__init__` (importing and calling on first use) was considered
+but rejected: it would hide the dependency, complicate the dimension-probe call site, and defer a
+startup-time error to the first embedding operation. Explicit ordering is preferable.
+
+**Consequences:**
+`memu-core/app.py` only. No interface, schema, or behavior changes. `sentence-transformers` model
+load (which logs `"sentence-transformers loaded — model=..."`) now happens before the store
+selection log line rather than after — visible in container startup logs.
+
+## D79 — sovereign compose: postgres image and env var name divergences (D1, D2)
+
+**Date:** 2026-07-23
+**Status:** Implemented
+
+**Context:**
+`kai-pm/COMPOSE_DRIFT.md` documented two critical bugs in `docker-compose.sovereign.yml`:
+
+**D1** — sovereign declares `image: postgres:15-alpine` but sets `VECTOR_STORE: postgres` for
+`memu-core` and `memu-core-introspect`. `memu-core/app.py`'s `PGVectorStore._init_schema()`
+runs `CREATE EXTENSION IF NOT EXISTS vector;`, which requires the `pgvector/pgvector:pg15` image
+(the `vector` extension is not bundled in the plain Alpine postgres image). The sovereign stack
+would crash on startup attempting to create the extension.
+
+**D2** — sovereign sets `DATABASE_URL` (three occurrences: `tool-gate`, `memu-core`,
+`memu-core-introspect`) but `memu-core/app.py` reads `PG_URI`. A mismatched env var means
+`memu-core` falls back to its default connection string (`postgresql://postgres:password@postgres:5432/memu_db`)
+rather than the parameterized sovereign credentials, silently using the wrong DB or failing to
+connect.
+
+**Decision:**
+- `docker-compose.sovereign.yml` line 24: `image: postgres:15-alpine` → `image: pgvector/pgvector:pg15`
+- `docker-compose.sovereign.yml` lines 151, 176, 208: `DATABASE_URL:` → `PG_URI:` (all three services)
+
+**Rationale:**
+Both are latent correctness bugs that would surface immediately on a real sovereign boot.
+`pgvector/pgvector:pg15` is the same version (Postgres 15) with the extension pre-installed.
+`PG_URI` matches the env var name already used by `memu-core/app.py` and consistent with all
+other compose profiles.
+
+**Consequences:**
+Sovereign stack can now boot successfully with `VECTOR_STORE=postgres` and correctly parameterized
+DB credentials. No data-path or logic changes — compose config only.
+
+## D80 — compose fixes: full/minimal divergences D6, D9, D10
+
+**Date:** 2026-07-23
+**Status:** Implemented
+
+**Context:**
+`kai-pm/COMPOSE_DRIFT.md` documented three additional fixable divergences:
+
+**D6** — `docker-compose.full.yml` hardcodes `OLLAMA_MODEL: qwen2.5:0.5b` in the `agentic`
+service environment block instead of using the parameterized form `"${OLLAMA_MODEL:-qwen2.5:0.5b}"`.
+Unlike `docker-compose.minimal.yml` which already uses the parameterized form, the full stack
+ignores any `OLLAMA_MODEL` override set in the environment — operators changing the model have
+to edit the compose file directly.
+
+**D9** — `docker-compose.minimal.yml`'s `ollama-pull` entrypoint only pulls the main model
+(`${OLLAMA_MODEL:-qwen2.5:0.5b}`) but not the embedding model (`${EMBEDDING_OLLAMA_MODEL:-all-minilm}`).
+`docker-compose.full.yml`'s `ollama-pull` correctly pulls both. The minimal stack's memu-core
+would fail to generate embeddings on first use if the embedding model had not been pre-pulled by
+some other means.
+
+**D10** — `docker-compose.full.yml`'s `agentic` and `agentic-introspect` services declare their
+`memu-core` and `redis` dependencies with `condition: service_started` instead of
+`condition: service_healthy`. `docker-compose.minimal.yml` correctly uses `service_healthy`.
+The weaker condition allows `agentic` to start before `memu-core` is actually ready to accept
+connections, causing connection-refused errors at boot.
+
+**Decisions:**
+- `docker-compose.full.yml` agentic environment: `OLLAMA_MODEL: qwen2.5:0.5b` →
+  `OLLAMA_MODEL: "${OLLAMA_MODEL:-qwen2.5:0.5b}"` (D6)
+- `docker-compose.minimal.yml` ollama-pull entrypoint: append
+  `&& OLLAMA_HOST=ollama:11434 ollama pull ${EMBEDDING_OLLAMA_MODEL:-all-minilm}` (D9)
+- `docker-compose.full.yml` agentic and agentic-introspect `depends_on` blocks:
+  `condition: service_started` → `condition: service_healthy` for both `memu-core` and `redis` (D10)
+
+**Consequences:**
+Full stack respects `OLLAMA_MODEL` overrides. Minimal stack pulls the embedding model on startup,
+preventing embedding failures. Full stack waits for healthy memu-core before starting agentic.
+Compose config only — no code or schema changes.

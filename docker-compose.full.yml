@@ -277,7 +277,7 @@ services:
       TOOL_GATE_URL: http://tool-gate:8000
       REDIS_URL: redis://redis:6379
       OLLAMA_URL: http://ollama:11434
-      OLLAMA_MODEL: qwen2.5:0.5b
+      OLLAMA_MODEL: "${OLLAMA_MODEL:-qwen2.5:0.5b}"
       LLM_TIMEOUT: "120"
       WAKE_URL: http://wake-service:8022
       FF_WAKE_INTENT_ROUTING: "${FF_WAKE_INTENT_ROUTING:-false}"
@@ -306,9 +306,9 @@ services:
         ipv4_address: 172.20.0.11
     depends_on:
       memu-core:
-        condition: service_started
+        condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
       ollama-pull:
         condition: service_completed_successfully
 
@@ -334,9 +334,9 @@ services:
         ipv4_address: 172.20.0.27
     depends_on:
       memu-core:
-        condition: service_started
+        condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
       agentic:
         condition: service_healthy
 
@@ -624,7 +624,7 @@ services:
         ipv4_address: 172.20.0.24
     depends_on:
       memu-core:
-        condition: service_started
+        condition: service_healthy
       ollama-pull:
         condition: service_completed_successfully
 
