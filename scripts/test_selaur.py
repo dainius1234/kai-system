@@ -12,7 +12,7 @@ import sys
 import os
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "langgraph"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
 
 from kai_config import compute_learning_value
 

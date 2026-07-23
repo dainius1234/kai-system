@@ -54,13 +54,13 @@ def make_request(tool: str, conviction: float, cosign: bool = False, nonce: str 
     n = nonce or f"n{now}"
     return {
         "tool": tool,
-        "actor_did": "langgraph",
+        "actor_did": "agentic",
         "session_id": AUTH_TOKEN,
         "conviction": conviction,
         "nonce": n,
         "ts": now,
         "signature": sign_gate_request(
-            actor_did="langgraph", session_id=AUTH_TOKEN, tool=tool, nonce=n, ts=now,
+            actor_did="agentic", session_id=AUTH_TOKEN, tool=tool, nonce=n, ts=now,
         ),
         "cosign": cosign,
     }

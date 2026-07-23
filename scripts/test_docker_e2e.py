@@ -28,7 +28,7 @@ CORE_SERVICES = [
     "tool-gate",
     "executor",
     "heartbeat",
-    "langgraph",
+    "agentic",
     "dashboard",
     "orchestrator",
     "fusion-engine",

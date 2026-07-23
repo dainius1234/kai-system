@@ -8,7 +8,7 @@ from common.auth import sign_gate_request, sign_gate_request_bundle, verify_gate
 
 
 def main() -> int:
-    actor = "langgraph"
+    actor = "agentic"
     session = "bootstrap-token-1"
     tool = "executor"
     nonce = "n-hardening"

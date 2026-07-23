@@ -55,13 +55,13 @@ def _make_request(conviction: float, idem_key: str | None = None, nonce: str | N
     n = nonce or f"n{now}"
     payload = {
         "tool": "executor",
-        "actor_did": "langgraph",
+        "actor_did": "agentic",
         "session_id": AUTH_TOKEN,
         "conviction": conviction,
         "nonce": n,
         "ts": now,
         "signature": sign_gate_request(
-            actor_did="langgraph",
+            actor_did="agentic",
             session_id=AUTH_TOKEN,
             tool="executor",
             nonce=n,

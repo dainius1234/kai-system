@@ -3,7 +3,7 @@ import sys
 import os
 import time
 import unittest
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "langgraph"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
 
 
 from planner import (

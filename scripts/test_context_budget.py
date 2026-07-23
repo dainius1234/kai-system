@@ -17,10 +17,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "langgraph"))
+sys.path.insert(0, str(ROOT / "agentic"))
 sys.modules.setdefault("redis", types.SimpleNamespace())
 
-spec = importlib.util.spec_from_file_location("langgraph_app", ROOT / "langgraph" / "app.py")
+spec = importlib.util.spec_from_file_location("agentic_app", ROOT / "agentic" / "app.py")
 assert spec and spec.loader
 mod = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = mod

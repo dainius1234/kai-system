@@ -10,8 +10,13 @@ their redis-unavailable fallback path (e.g. build_saver() in kai_config.py)
 still trigger their fallback to the in-memory/spool backend.
 """
 
+import os
 import sys
 from unittest.mock import MagicMock
+
+# Allow offline tests that don't depend on embedding quality to run without
+# sentence-transformers installed (mirrors CI's MEMU_ALLOW_FAKE_EMBEDDINGS).
+os.environ.setdefault("MEMU_ALLOW_FAKE_EMBEDDINGS", "true")
 
 if "redis" not in sys.modules:
     _ping_mock = MagicMock(side_effect=ConnectionError("redis stub — no real redis"))

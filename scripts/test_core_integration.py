@@ -29,7 +29,7 @@ def main():
         "heartbeat": "http://localhost:8010/health",
         "dashboard": "http://localhost:8080/health",
         "executor": "http://localhost:8002/health",
-        "langgraph": "http://localhost:8007/health",
+        "agentic": "http://localhost:8007/health",
         "audio": "http://localhost:8021/health",
         "camera": "http://localhost:8040/health",
         "kai-advisor": "http://localhost:8090/health",

@@ -12,7 +12,7 @@ from fastapi.testclient import TestClient
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "langgraph"))
+sys.path.insert(0, str(ROOT / "agentic"))
 
 
 def _load_wake_module():
@@ -24,11 +24,11 @@ def _load_wake_module():
     return mod
 
 
-def _load_langgraph_module():
+def _load_agentic_module():
     import types
 
     sys.modules.setdefault("redis", types.SimpleNamespace())
-    spec = importlib.util.spec_from_file_location("langgraph_app_wake_test", ROOT / "langgraph" / "app.py")
+    spec = importlib.util.spec_from_file_location("agentic_app_wake_test", ROOT / "agentic" / "app.py")
     assert spec and spec.loader
     mod = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = mod
@@ -228,14 +228,14 @@ def test_health_endpoint_smoke():
 
 
 def test_langgraph_feature_flag_disabled(monkeypatch):
-    lg_mod = _load_langgraph_module()
+    lg_mod = _load_agentic_module()
     monkeypatch.setattr(lg_mod, "is_enabled", lambda _name: False)
     result = asyncio.run(lg_mod._preclassify_wake_intent("hello there"))
     assert result["reasoning"] == "feature_flag_disabled"
 
 
 def test_langgraph_feature_flag_enabled_uses_service(monkeypatch):
-    lg_mod = _load_langgraph_module()
+    lg_mod = _load_agentic_module()
     monkeypatch.setattr(lg_mod, "is_enabled", lambda _name: True)
 
     class DummyResponse:
@@ -265,7 +265,7 @@ def test_langgraph_feature_flag_enabled_uses_service(monkeypatch):
 
 
 def test_langgraph_chat_route_override_from_wake_intent(monkeypatch):
-    lg_mod = _load_langgraph_module()
+    lg_mod = _load_agentic_module()
     lg_client = TestClient(lg_mod.app)
     decision_type = type(lg_mod.classify("hello"))
 

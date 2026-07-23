@@ -1440,3 +1440,58 @@ connections, causing connection-refused errors at boot.
 Full stack respects `OLLAMA_MODEL` overrides. Minimal stack pulls the embedding model on startup,
 preventing embedding failures. Full stack waits for healthy memu-core before starting agentic.
 Compose config only — no code or schema changes.
+
+## D81 — Phase 1 Readiness Plan adopted
+
+**Date:** 2026-07-23
+**Status:** Active
+
+**Context:**
+Full project retrospective (2026-07-23) identified five gaps that exist today and will compound
+when the 7B model arrives. None are blocking right now (0.5b masks them), but all become critical
+the moment Kai starts processing real conversations.
+
+**Key findings:**
+- 38 of ~97 test scripts still `sys.path.insert` against `langgraph/` (the renamed shim), not
+  `agentic/`. Nearly half the test suite imports dead-path code. Silent divergence risk.
+- `agentic/app.py` is 34% covered — the live chat routes that will take the most 7B load are
+  the least tested.
+- `memu-core/app.py` is 53% covered at 7,950 lines — same risk.
+- Sovereign stack has never had a live boot-test despite carrying the most production-critical config.
+- No GPU arrival runbook — day-of would be discovery rather than execution.
+
+**Decision:**
+Adopt `kai-pm/PHASE1_READINESS.md` as the canonical pre-GPU readiness plan. Five pre-GPU items
+(S1–S5), a GPU Day protocol (G1–G7), and six Phase 1 activation steps (F1–F6) must all complete
+before Phase 2 can be declared. Items are sequenced by dependency and risk.
+
+**Work authorized:**
+- S1: langgraph/ shim removal across 38 scripts
+- S2: FastAPI route tests for agentic/app.py (target ≥ 60%)
+- S3: FastAPI route tests for memu-core/app.py (target ≥ 65%)
+- S4: Sovereign stack CI boot-test step
+- S5: GPU Arrival Runbook (`kai-pm/GPU_ARRIVAL_RUNBOOK.md`)
+
+**Consequences:**
+`PHASE1_READINESS.md` is the single source of truth for "are we ready for Phase 1."
+All five pre-GPU items are CPU-safe and can be done in the current environment.
+S1 is highest priority — it affects the validity of nearly half the existing test suite.
+
+## D82 — 2026-07-23 — Pre-GPU sprint S1–S5 complete; awaiting GPU
+
+**Context:**
+S1–S5 from PHASE1_READINESS.md (D81) were executed in sequence on 2026-07-23:
+- S1: langgraph/ shim removed (12 files deleted), 38 test scripts redirected to agentic/ (commit 0e5d659)
+- S2: 57 agentic/app.py route tests added; coverage 34% → 43% (commit f4218cb)
+- S3: 91 memu-core/app.py route tests added; coverage 53% → 59% (commit b8cd86f)
+- S4: Sovereign CI boot-test step added to core-tests.yml (commit 05dd574)
+- S5: GPU_ARRIVAL_RUNBOOK.md written with G1–G8 verified shell commands
+
+**Decision:**
+Mark the pre-GPU sprint complete. 5-module combined coverage: 63% (gate: 60%).
+All CPU-safe readiness work is done. Next action is GPU hardware arrival.
+
+**Consequences:**
+- Branch `claude/project-rework-plan-pgvp35` carries all S1–S5 commits, pending PR + merge
+- GPU Day protocol (G1–G8) in `kai-pm/GPU_ARRIVAL_RUNBOOK.md` is the next executable step
+- Phase 1 entry gate: all G1–G7 green → append D82-GPU to DECISIONS.md, flip PHASE 1 ACTIVE

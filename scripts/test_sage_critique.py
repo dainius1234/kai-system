@@ -69,8 +69,8 @@ PASS_THRESHOLD = _verifier_app.PASS_THRESHOLD
 REPAIR_THRESHOLD = _verifier_app.REPAIR_THRESHOLD
 MIN_STRONG_CHUNKS = _verifier_app.MIN_STRONG_CHUNKS
 
-# Import adversary from langgraph directory
-sys.path.insert(0, os.path.join(ROOT, "langgraph"))
+# Import adversary from agentic directory
+sys.path.insert(0, os.path.join(ROOT, "agentic"))
 from adversary import ChallengeResult, challenge_self_review  # noqa: E402
 
 

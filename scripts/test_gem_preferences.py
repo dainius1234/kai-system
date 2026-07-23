@@ -10,7 +10,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "langgraph"))
+sys.path.insert(0, str(ROOT / "agentic"))
 
 # Redis is optional — stub if not available
 if "redis" not in sys.modules:
