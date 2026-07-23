@@ -38,8 +38,20 @@ class GitHubModelsResponse:
 
 
 def is_available() -> bool:
-    """True only when GITHUB_TOKEN is present. Makes no network call."""
-    return bool(os.getenv("GITHUB_TOKEN"))
+    """True only when a plausible GITHUB_TOKEN is present AND models.github.ai is reachable.
+
+    A token shorter than 20 chars is a sandbox stub (not a real PAT) and is treated
+    as absent. DNS resolution alone is not sufficient — a TCP handshake is required.
+    """
+    token = os.getenv("GITHUB_TOKEN", "")
+    if len(token) < 20:
+        return False
+    import socket
+    try:
+        socket.create_connection(("models.github.ai", 443), timeout=3).close()
+        return True
+    except OSError:
+        return False
 
 
 def query(

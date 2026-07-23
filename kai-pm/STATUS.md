@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-22
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** Cleanup sprint (CLEANUP_TODO.md). Weeks 1–3 complete. Week 4 in progress (LLM router, templates). Feature branch PR pending.
+- **Current focus:** Cleanup sprint COMPLETE (D71–D76). Feature branch PR pending; blocked on Phase 1 GPU.
 
 ## What's landed on main
 
@@ -23,7 +23,7 @@
 
 | Branch | Decisions | What | Status |
 |---|---|---|---|
-| `claude/project-rework-plan-pgvp35` | D71–D75 | Cleanup sprint Weeks 1–3: honest merge-gate, conftest redis stub, MAKEFILE_TARGETS.md, 10 CI test isolation fixes, repo-wide coverage gate (5 modules, 60%) | Ready to PR — CI re-running |
+| `claude/project-rework-plan-pgvp35` | D71–D76 | Cleanup sprint complete: merge-gate, redis stub, MAKEFILE_TARGETS, 10 CI isolation fixes, 5-module coverage gate (60%), 3 env-specific skip fixes, Week 4 confirmed done | Ready to PR |
 
 ## Blocked items (GPU)
 
@@ -43,5 +43,5 @@ Unlock condition: RTX 5080 procurement + provisioning + validation.
 ## Source of truth pointers
 
 - Resume layer: [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md)
-- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D75)
+- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D76)
 - Latest reality check: [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)

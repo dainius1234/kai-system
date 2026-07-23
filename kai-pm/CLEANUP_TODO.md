@@ -71,8 +71,8 @@
 
 ## Week 4 — Resume Features (only if 1-3 done)
 
-- [ ] Multi-backend LLM router (per Codex design).
-- [ ] Skills templates, journal templates, CIS P29.
+- [x] Multi-backend LLM router — already shipped in D58 (PR #84): `common/llm.py` with Ollama + Groq + OpenRouter backends, model registry, retry/backoff (D59). No further work needed.
+- [x] Skills templates, journal templates, CIS P29 — all shipped: `skills/_template.md` + 3 CIS starters (D58), `docs/operator-journal/_template.md` (D58), `financial-awareness/` service (D57). Content authoring is Dainius's domain-knowledge work.
 
 ---
 
