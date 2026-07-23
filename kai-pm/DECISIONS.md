@@ -1440,3 +1440,39 @@ connections, causing connection-refused errors at boot.
 Full stack respects `OLLAMA_MODEL` overrides. Minimal stack pulls the embedding model on startup,
 preventing embedding failures. Full stack waits for healthy memu-core before starting agentic.
 Compose config only — no code or schema changes.
+
+## D81 — Phase 1 Readiness Plan adopted
+
+**Date:** 2026-07-23
+**Status:** Active
+
+**Context:**
+Full project retrospective (2026-07-23) identified five gaps that exist today and will compound
+when the 7B model arrives. None are blocking right now (0.5b masks them), but all become critical
+the moment Kai starts processing real conversations.
+
+**Key findings:**
+- 38 of ~97 test scripts still `sys.path.insert` against `langgraph/` (the renamed shim), not
+  `agentic/`. Nearly half the test suite imports dead-path code. Silent divergence risk.
+- `agentic/app.py` is 34% covered — the live chat routes that will take the most 7B load are
+  the least tested.
+- `memu-core/app.py` is 53% covered at 7,950 lines — same risk.
+- Sovereign stack has never had a live boot-test despite carrying the most production-critical config.
+- No GPU arrival runbook — day-of would be discovery rather than execution.
+
+**Decision:**
+Adopt `kai-pm/PHASE1_READINESS.md` as the canonical pre-GPU readiness plan. Five pre-GPU items
+(S1–S5), a GPU Day protocol (G1–G7), and six Phase 1 activation steps (F1–F6) must all complete
+before Phase 2 can be declared. Items are sequenced by dependency and risk.
+
+**Work authorized:**
+- S1: langgraph/ shim removal across 38 scripts
+- S2: FastAPI route tests for agentic/app.py (target ≥ 60%)
+- S3: FastAPI route tests for memu-core/app.py (target ≥ 65%)
+- S4: Sovereign stack CI boot-test step
+- S5: GPU Arrival Runbook (`kai-pm/GPU_ARRIVAL_RUNBOOK.md`)
+
+**Consequences:**
+`PHASE1_READINESS.md` is the single source of truth for "are we ready for Phase 1."
+All five pre-GPU items are CPU-safe and can be done in the current environment.
+S1 is highest priority — it affects the validity of nearly half the existing test suite.

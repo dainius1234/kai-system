@@ -44,9 +44,14 @@ None. All work is on `main`. No open PRs.
 
 ## 3) Next priorities (in order)
 
-1. **GPU hardware arrival** — RTX 5080: enable `OLLAMA_MODEL=qwen2.5:7b`, STT/TTS/avatar, `FF_LETTA_TASKS=true`, real multi-model routing
-2. **Letta live smoke-test** — blocked on reachable Ollama with tool-call support: `ollama show qwen2.5:0.5b --template | grep -i tools`
-3. **Phase 1 planning** — once GPU provisioned: multi-model consensus, real STT, full graph quality
+1. **S1 (NOW) — langgraph/ shim removal** — 38 test scripts import dead-path code; remove shim, update all scripts, delete directory
+2. **S2 (NOW) — agentic route tests** — agentic/app.py 34% coverage → 60%+
+3. **S3 (NOW) — memu-core route tests** — memu-core/app.py 53% coverage → 65%+
+4. **S4 (NOW) — sovereign CI boot-test** — sovereign profile never boot-tested; add CI step
+5. **S5 (NOW) — GPU Arrival Runbook** — write `kai-pm/GPU_ARRIVAL_RUNBOOK.md` before hardware arrives
+6. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G7 in PHASE1_READINESS.md), declare Phase 1 (D82)
+
+Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
 ---
 
@@ -88,7 +93,7 @@ None. All work is on `main`. No open PRs.
 
 ## 6) PM operating rules
 
-- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D80**.
+- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D81**.
 - Reality checks → new file `REALITY_CHECK_<date>.md`, not silent rewrites.
 - No drift between docs, status, and delivered code.
 - `make sync-docs` after major changes; `make merge-gate` before every PR.
@@ -113,6 +118,7 @@ None. All work is on `main`. No open PRs.
 | `kai-pm/CLEANUP_TODO.md` | Cleanup sprint tracker (all items done except §2.1 merge-order decision) |
 | `kai-pm/COMPOSE_DRIFT.md` | Docker compose divergence audit (§2.2 shared-block extraction deferred) |
 | `kai-pm/MAKEFILE_TARGETS.md` | Full ~110-target catalogue with pass/fail per environment |
+| `kai-pm/PHASE1_READINESS.md` | Pre-GPU sprint (S1–S5) + GPU Day protocol (G1–G7) + Phase 1 activation (F1–F6) |
 | `kai-pm/LETTA_INTEGRATION_PLAN.md` | Letta integration plan (Steps 1–5 done; Step 0 live-verify pending GPU) |
 | `kai-pm/STRATEGIC_PLAN.md` | Canonical 5-phase roadmap |
 | `kai-pm/SEQUENCE.md` | Phase sequencing |
