@@ -402,6 +402,9 @@ weekly-key-rotate:
 weekly-ed25519-rotate:
 	bash scripts/weekly_ed25519_rotation.sh
 
+capture-baseline:
+	PYTHONPATH=. python scripts/capture_baseline_responses.py
+
 setup:
 	bash scripts/setup.sh
 
