@@ -74,7 +74,7 @@ services:
     image: ollama/ollama:latest
     container_name: sovereign-ollama-pull
     restart: "no"
-    entrypoint: ["sh", "-c", "OLLAMA_HOST=ollama:11434 ollama pull ${OLLAMA_MODEL:-qwen2.5:0.5b}"]
+    entrypoint: ["sh", "-c", "OLLAMA_HOST=ollama:11434 ollama pull ${OLLAMA_MODEL:-qwen2.5:0.5b} && OLLAMA_HOST=ollama:11434 ollama pull ${EMBEDDING_OLLAMA_MODEL:-all-minilm}"]
     depends_on:
       ollama:
         condition: service_healthy
