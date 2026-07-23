@@ -1495,3 +1495,28 @@ All CPU-safe readiness work is done. Next action is GPU hardware arrival.
 - Branch `claude/project-rework-plan-pgvp35` carries all S1–S5 commits, pending PR + merge
 - GPU Day protocol (G1–G8) in `kai-pm/GPU_ARRIVAL_RUNBOOK.md` is the next executable step
 - Phase 1 entry gate: all G1–G7 green → append D82-GPU to DECISIONS.md, flip PHASE 1 ACTIVE
+
+---
+
+## D83 — C10: A/B query logging (model name + response quality per query)
+
+**Date:** 2026-07-23
+
+**Context:** PROJECT_BACKLOG.md item C10: "No A/B testing framework for model comparison — Log model name + response quality per query for comparison."  The existing `test_context_enrichment_ab.py` (F4) compares enriched vs bare HTTP responses, but nothing records which model served each query or how the response quality metrics measured.
+
+**Decision:** Implemented `common/ab_log.py` — a lightweight JSONL logger that writes one structured record per `LLMRouter.query()` call:
+- `ts`, `specialist`, `model`, `source` (live/stub/error), `latency_ms`, `prompt_hash` (first 8 hex chars of sha256(prompt[:200])), `session_id`
+- Quality fields: `word_count`, `lexical_diversity`, `uncertainty_penalty`, `net_quality_signal` (computed inline, no conviction.py import cycle)
+- Token fields: `input_tokens`, `output_tokens` (from usage dict)
+
+Log path defaults to `logs/ab_query_log.jsonl` (configurable via `AB_LOG_PATH`).  Entirely disabled when `AB_LOG_ENABLED=false`.  Write is protected by a threading.Lock so concurrent async callers never interleave partial lines.
+
+Hook added to `LLMRouter.query()` (common/llm.py) — the single entry point for both live and stub paths.  The hook is wrapped in bare `except Exception: pass` so a disk-full or permission error can never affect the hot query path.
+
+`scripts/test_ab_log.py` (6 tests) verifies: row schema, append accumulation, disabled-writes-nothing, quality-field ranges, null session_id, prompt_hash stability.  Added `make test-ab-log` target.
+
+**Consequences:**
+- Every `LLMRouter.query()` call now appends one line to `logs/ab_query_log.jsonl`
+- Logs accumulate across restarts (append-only); operators can `tail -f` or `jq` the file for live A/B inspection
+- On GPU Day, real model names (deepseek-v4, kimi-2.5, dolphin-mistral) will appear in the log alongside quality scores — enabling model-vs-model comparison per specialist
+- `AB_LOG_ENABLED=false` disables it entirely with no performance overhead (checked before any I/O)

@@ -224,6 +224,7 @@ class LLMRouter:
         system: str = "You are a helpful assistant.",
         temperature: float = 0.3,
         max_tokens: int = 512,
+        session_id: Optional[str] = None,
     ) -> LLMResponse:
         """Send a prompt to a specialist and return the response.
 
@@ -234,9 +235,18 @@ class LLMRouter:
         start = time.monotonic()
 
         if url:
-            return await self._live_query(specialist, url, prompt, system, temperature, max_tokens, start)
+            resp = await self._live_query(specialist, url, prompt, system, temperature, max_tokens, start)
+        else:
+            resp = self._stub_response(specialist, prompt, start)
 
-        return self._stub_response(specialist, prompt, start)
+        # C10: log model name + response quality per query for A/B comparison
+        try:
+            from common.ab_log import log_ab_entry
+            log_ab_entry(resp, prompt, session_id=session_id)
+        except Exception:
+            pass
+
+        return resp
 
     async def query_multi(
         self,
