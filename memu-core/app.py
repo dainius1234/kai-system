@@ -5443,8 +5443,14 @@ async def get_identity_narrative() -> Dict[str, Any]:
         first_ts = min(r.timestamp for r in all_records)
     if autobiography:
         first_auto_ts = autobiography[0].get("timestamp", "")
-        if first_ts is None or (first_auto_ts and first_auto_ts < first_ts):
-            first_ts = first_auto_ts
+        # autobiography timestamps may be float (time.time()) — normalise to ISO string
+        if isinstance(first_auto_ts, (int, float)):
+            first_auto_ts = datetime.fromtimestamp(first_auto_ts, tz=timezone.utc).isoformat()
+        try:
+            if first_ts is None or (first_auto_ts and first_auto_ts < first_ts):
+                first_ts = first_auto_ts
+        except TypeError:
+            pass
     days_alive = 0
     if first_ts:
         try:
@@ -7193,7 +7199,7 @@ async def morning_briefing() -> Dict[str, Any]:
     due_today = []
     today_str = now.strftime("%Y-%m-%d")
     for t in _p21_hash_all(_P21_TASKS_KEY, _scheduled_tasks).values():
-        if t.get("active") and t.get("fire_at", "").startswith(today_str):
+        if t.get("active") and (t.get("fire_at") or "").startswith(today_str):
             due_today.append({"title": t["title"][:100], "fire_at": t.get("fire_at", "")})
     if due_today:
         briefing["sections"].append({
@@ -7250,7 +7256,7 @@ async def evening_checkin() -> Dict[str, Any]:
     tomorrow = now + timedelta(days=1)
     tomorrow_str = tomorrow.strftime("%Y-%m-%d")
     tomorrow_tasks = [t for t in _p21_hash_all(_P21_TASKS_KEY, _scheduled_tasks).values()
-                      if t.get("active") and t.get("fire_at", "").startswith(tomorrow_str)]
+                      if t.get("active") and (t.get("fire_at") or "").startswith(tomorrow_str)]
     if tomorrow_tasks:
         checkin["sections"].append({
             "type": "tomorrow",

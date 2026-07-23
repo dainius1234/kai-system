@@ -203,6 +203,178 @@ def classify(user_input: str, session_context: Optional[Dict[str, Any]] = None) 
     )
 
 
+# ═══════════════════════════════════════════════════════════════════════
+# C4: SEMANTIC ROUTE CLASSIFICATION
+#
+# When sentence-transformers is available and the active model is quality
+# tier >= 2 (7B+), use embedding cosine similarity to classify routes.
+# This handles paraphrases and natural language that keyword regex misses.
+#
+# Fallback: keyword-based classify() (unchanged, always works).
+#
+# Each route has a set of anchor queries representative of that intent.
+# classify_semantic() picks the route whose anchor set is closest in
+# embedding space to the user's input.
+# ═══════════════════════════════════════════════════════════════════════
+
+_ROUTE_ANCHORS: Dict[str, List[str]] = {
+    "MEMORY_RECALL": [
+        "what did I say last week about the contract",
+        "find my notes on the CIS payment",
+        "when did I last talk to the solicitor",
+        "search my history for scaffold quotes",
+        "have I dealt with this before",
+    ],
+    "TAX_ADVISORY": [
+        "how much VAT do I owe this quarter",
+        "can I deduct this as a business expense",
+        "what is the CIS deduction rate for labour",
+        "when is my next self assessment deadline",
+        "is my subcontractor registered for CIS",
+    ],
+    "FACT_CHECK": [
+        "is it true that the VAT threshold is 85000",
+        "verify that CIS applies to materials as well",
+        "double check this invoice amount is correct",
+        "confirm that the deadline is 31 January",
+        "is this regulation still current",
+    ],
+    "PROACTIVE_REVIEW": [
+        "what do I have coming up this week",
+        "any reminders I should know about",
+        "brief me on what's pending",
+        "anything urgent I need to deal with today",
+        "what's my status",
+    ],
+    "REFLECT": [
+        "summarise what I've been working on this week",
+        "give me a weekly digest of my activity",
+        "what were the main themes in our recent conversations",
+        "consolidate my recent progress",
+        "end of day review please",
+    ],
+    "EXECUTE_ACTION": [
+        "create a backup of the database now",
+        "send the invoice to the client",
+        "deploy the new configuration",
+        "run the weekly report script",
+        "start the reconciliation process",
+    ],
+    "MULTI_SIGNAL": [
+        "get multiple opinions on this approach",
+        "compare the pros and cons of these two options",
+        "I want a second opinion on this plan",
+        "triangulate from different angles",
+        "what would different perspectives say",
+    ],
+    "GENERAL_CHAT": [
+        "how are you today",
+        "tell me something interesting",
+        "what do you think about this",
+        "let's have a chat",
+        "can you help me with something",
+    ],
+}
+
+# ── Embedding backend for semantic routing ──────────────────────────
+try:
+    from sentence_transformers import SentenceTransformer as _ST
+    _SMODEL: Optional[Any] = None
+
+    def _get_smodel() -> Optional[Any]:
+        global _SMODEL
+        if _SMODEL is None:
+            try:
+                _SMODEL = _ST("all-MiniLM-L6-v2")
+            except Exception:
+                _SMODEL = None
+        return _SMODEL
+    _HAS_ST = True
+except ImportError:
+    _HAS_ST = False
+
+    def _get_smodel() -> None:  # type: ignore[misc]
+        return None
+
+
+def _cosine(a: List[float], b: List[float]) -> float:
+    """Dot-product cosine similarity (vectors already L2-normalised by ST)."""
+    dot = sum(x * y for x, y in zip(a, b))
+    na = sum(x * x for x in a) ** 0.5
+    nb = sum(x * x for x in b) ** 0.5
+    if na == 0 or nb == 0:
+        return 0.0
+    return dot / (na * nb)
+
+
+def classify_semantic(
+    user_input: str,
+    session_context: Optional[Dict[str, Any]] = None,
+    min_quality_tier: int = 2,
+) -> RouteDecision:
+    """Classify using embedding cosine similarity against route anchor sets.
+
+    Falls back to keyword-based classify() when:
+    - sentence-transformers is not installed, OR
+    - the active model quality_tier < min_quality_tier (default: tier 2 = 7B+)
+
+    Args:
+        user_input: Raw user message.
+        session_context: Optional session metadata (same as classify()).
+        min_quality_tier: Minimum model quality tier to use semantic routing.
+
+    Returns:
+        RouteDecision — same structure as classify().
+    """
+    # Import here to avoid circular dependency
+    try:
+        from common.model_registry import get_model_spec, active_model
+        spec = get_model_spec(active_model())
+        if spec.quality_tier < min_quality_tier:
+            return classify(user_input, session_context)
+    except Exception:
+        return classify(user_input, session_context)
+
+    if not _HAS_ST:
+        return classify(user_input, session_context)
+
+    model = _get_smodel()
+    if model is None:
+        return classify(user_input, session_context)
+
+    try:
+        input_vec = model.encode(user_input, normalize_embeddings=True).tolist()
+
+        best_route = "GENERAL_CHAT"
+        best_score = 0.0
+
+        for route, anchors in _ROUTE_ANCHORS.items():
+            anchor_vecs = model.encode(anchors, normalize_embeddings=True).tolist()
+            # route score = max similarity across all anchors
+            route_score = max(_cosine(input_vec, av) for av in anchor_vecs)
+            if route_score > best_score:
+                best_score = route_score
+                best_route = route
+
+        # Below 0.45 similarity → not confident — fall back to keyword
+        if best_score < 0.45:
+            return classify(user_input, session_context)
+
+        bypass = next(
+            (r["bypass_llm"] for r in _ROUTES if r["name"] == best_route),
+            False,
+        )
+        return RouteDecision(
+            route=best_route,
+            confidence=round(min(best_score, 0.99), 3),
+            reason=f"semantic similarity {best_score:.3f} to {best_route} anchor set",
+            bypass_llm=bypass,
+            matched_keywords=[],
+        )
+    except Exception:
+        return classify(user_input, session_context)
+
+
 # ── Service dispatch helpers ─────────────────────────────────────────
 # These map route decisions to actual service calls.  Used by app.py.
 

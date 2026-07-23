@@ -211,3 +211,117 @@ def model_timeout(model: Optional[str] = None) -> float:
 def list_models() -> Dict[str, ModelSpec]:
     """Return the full model registry."""
     return dict(_REGISTRY)
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# F1: SPECIALIST MODEL CONFIGURATION
+#
+# Three specialist paths: code, math, creative.  Each reads its model
+# from an env var so GPU Day is just setting 3 variables.
+#
+# Defaults to the active_model() so the system degrades gracefully
+# in single-model mode (0.5b) — specialists still work, just use the
+# same model.
+#
+# On GPU Day: set SPECIALIST_CODE_MODEL, SPECIALIST_MATH_MODEL,
+# SPECIALIST_CREATIVE_MODEL in .env to route to different instances.
+# ═══════════════════════════════════════════════════════════════════════
+
+# Recommended specialist models (GPU Day defaults)
+# Override per-specialist with env vars or swap for any registered model.
+_SPECIALIST_DEFAULTS: Dict[str, str] = {
+    "code":     "deepseek-coder-v2:6.7b",   # code: strong reasoning + JSON mode
+    "math":     "qwen2.5-math:7b",           # math: numerical accuracy
+    "creative": "dolphin-mistral",           # creative: less restricted, narrative-friendly
+}
+
+# Topic keywords that steer a message to a specialist path
+_SPECIALIST_KEYWORDS: Dict[str, List[str]] = {
+    "code": [
+        "code", "function", "class", "debug", "error", "script", "api",
+        "endpoint", "import", "variable", "loop", "algorithm", "refactor",
+        "deploy", "build", "lint", "test", "pytest", "docker", "yaml",
+    ],
+    "math": [
+        "calculate", "computation", "formula", "equation", "vat", "cis",
+        "percentage", "total", "sum", "deduct", "invoice", "tax", "rate",
+        "threshold", "£", "percent", "arithmetic", "number", "figure",
+    ],
+    "creative": [
+        "write", "story", "draft", "letter", "email", "explain", "describe",
+        "imagine", "create", "compose", "narrative", "summarise", "summarize",
+        "proposal", "plan", "idea", "suggestion", "recommend",
+    ],
+}
+
+
+def specialist_model(domain: str) -> str:
+    """Return the configured model name for a specialist domain.
+
+    Reads from env vars first, falls back to sensible defaults, then
+    falls back to active_model() for single-model setups.
+
+    Args:
+        domain: "code", "math", or "creative"
+
+    Returns:
+        Model name string (compatible with get_model_spec()).
+    """
+    env_key = f"SPECIALIST_{domain.upper()}_MODEL"
+    env_val = os.getenv(env_key, "").strip()
+    if env_val:
+        return env_val
+    return _SPECIALIST_DEFAULTS.get(domain.lower(), active_model())
+
+
+def detect_specialist(text: str) -> Optional[str]:
+    """Detect which specialist domain best matches a user message.
+
+    Uses keyword voting — domain with most hits wins.
+    Returns None when no domain has a clear lead (≥ 2 hits) so that
+    GENERAL_CHAT handling is preserved for ambiguous queries.
+
+    Args:
+        text: User message or query string.
+
+    Returns:
+        "code", "math", "creative", or None.
+    """
+    lower = text.lower()
+    scores: Dict[str, int] = {domain: 0 for domain in _SPECIALIST_KEYWORDS}
+    for domain, keywords in _SPECIALIST_KEYWORDS.items():
+        for kw in keywords:
+            if kw in lower:
+                scores[domain] += 1
+
+    best_domain = max(scores, key=lambda d: scores[d])
+    best_score = scores[best_domain]
+
+    if best_score < 2:
+        return None
+
+    # Require clear lead of ≥ 1 to avoid tie-breaking noise
+    sorted_scores = sorted(scores.values(), reverse=True)
+    if len(sorted_scores) > 1 and sorted_scores[0] - sorted_scores[1] < 1:
+        return None
+
+    return best_domain
+
+
+def specialist_config() -> Dict[str, Dict[str, Any]]:
+    """Return the full specialist configuration as a dict.
+
+    Useful for health endpoints and dashboard display.
+    """
+    config = {}
+    for domain in _SPECIALIST_KEYWORDS:
+        model_name = specialist_model(domain)
+        spec = get_model_spec(model_name)
+        config[domain] = {
+            "model": model_name,
+            "quality_tier": spec.quality_tier,
+            "context_window": spec.context_window,
+            "keywords": _SPECIALIST_KEYWORDS[domain],
+            "env_var": f"SPECIALIST_{domain.upper()}_MODEL",
+        }
+    return config

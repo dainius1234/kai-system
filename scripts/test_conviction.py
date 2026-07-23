@@ -148,3 +148,56 @@ assert with_ctx_score > no_ctx_score, (
 )
 
 print(f"conviction tests passed (avg={avg:.2f})")
+
+# ── C6: LLM response quality signal tests ─────────────────────────────
+
+# refine_conviction: rich response should raise, uncertain response lower
+rich_response = (
+    "The CIS deduction rate for verified subcontractors is 20 percent. "
+    "This applies to all construction payments where the contractor holds "
+    "CIS gross payment status. Verify against HMRC form CIS300 for monthly returns."
+)
+uncertain_response = (
+    "I'm not sure, but it might be around 20 percent, possibly more or less. "
+    "I think that's roughly correct but I'm not certain. Perhaps check HMRC."
+)
+empty_response = ""
+
+base = 6.0
+refined_rich = mod.refine_conviction(base, rich_response)
+refined_uncertain = mod.refine_conviction(base, uncertain_response)
+refined_empty = mod.refine_conviction(base, empty_response)
+
+assert refined_rich >= base, f"rich response should maintain or raise conviction: {refined_rich} vs {base}"
+assert refined_uncertain < base, f"uncertain response should lower conviction: {refined_uncertain} vs {base}"
+assert 0.0 <= refined_rich <= 10.0, f"refined score must be in [0,10]: {refined_rich}"
+assert 0.0 <= refined_uncertain <= 10.0, f"refined score must be in [0,10]: {refined_uncertain}"
+
+# bounds: adjustment capped at ±1.5
+high_base = 9.5
+low_base = 0.5
+assert mod.refine_conviction(high_base, rich_response) <= 10.0
+assert mod.refine_conviction(low_base, uncertain_response) >= 0.0
+
+# response_quality_summary: field presence and ranges
+summary = mod.response_quality_summary(rich_response)
+assert "lexical_diversity" in summary and "uncertainty_penalty" in summary
+assert 0.0 <= summary["lexical_diversity"] <= 1.0
+assert 0.0 <= summary["uncertainty_penalty"] <= 1.0
+assert summary["word_count"] > 0
+
+summary_empty = mod.response_quality_summary("")
+assert summary_empty["word_count"] == 0
+assert summary_empty["lexical_diversity"] == 0.0
+
+# self_deception detection still works (regression)
+sd = mod.detect_self_deception("test", {}, [], 0, 5.0)
+assert sd["deceived"] is False
+
+sd_high = mod.detect_self_deception(
+    "x " * 20, {}, [], 0, 8.5
+)
+assert sd_high["deceived"] is True
+assert len(sd_high["flags"]) > 0
+
+print("C6 response quality signal tests passed")

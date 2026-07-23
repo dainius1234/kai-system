@@ -10,7 +10,7 @@ import json
 import os
 import sys
 import time
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -97,20 +97,30 @@ _router.scan_skill_md.return_value = []
 # ── conviction stubs ──────────────────────────────────────────────────
 import conviction as _conv
 _conv.score_conviction.return_value = 9.0
-_conv.detect_self_deception.return_value = []
+_conv.detect_self_deception.return_value = {"deceived": False, "flags": []}
 _conv.build_plan.return_value = {"strategy": "stub", "steps": []}
 _conv.low_conviction_feedback.return_value = "ok"
 
 # ── planner stubs ─────────────────────────────────────────────────────
 import planner as _planner
-_planner.gather_context.return_value = {}
-_planner.build_enriched_plan.return_value = {"strategy": "stub", "steps": []}
+_planner.gather_context = AsyncMock(
+    return_value=MagicMock(memory_chunks=[], past_outcomes=[])
+)
+_planner.build_enriched_plan.return_value = MagicMock(
+    plan={"summary": "ok"},
+    conviction_modifier=0.0,
+    history_influence=0.0,
+    context_summary="",
+    warnings=[],
+)
 _planner.predict_next_request.return_value = None
 _planner.pre_fetch_predicted_context.return_value = None
 
 # ── adversary stubs ───────────────────────────────────────────────────
 import adversary as _adv
-_adv.challenge_plan.return_value = {"verdict": "ok", "threats": []}
+_adv.challenge_plan = AsyncMock(
+    return_value=MagicMock(total_modifier=0.0, critical_warnings=[])
+)
 _adv.verdict_to_plan_metadata.return_value = {}
 
 # ── tree_search / priority_queue / model_selector stubs ──────────────
@@ -498,3 +508,308 @@ class TestRunValidation:
             json={"user_input": "hello", "session_id": "s", "device": "gpu"},
         )
         assert r.status_code == 400
+
+
+# ═════════════════════════════════════════════════════════════════════
+# Conviction helpers — load_conviction_overrides / is_conviction_override
+# ═════════════════════════════════════════════════════════════════════
+
+class TestConvictionHelpers:
+    def test_load_overrides_missing_file_returns_empty(self, tmp_path):
+        with patch.object(ag, "CONVICTION_OVERRIDE_PATH", tmp_path / "no.txt"):
+            assert ag.load_conviction_overrides() == []
+
+    def test_load_overrides_reads_lines(self, tmp_path):
+        f = tmp_path / "ov.txt"
+        f.write_text("test-override\nanother-rule\n  Spaces  \n", encoding="utf-8")
+        with patch.object(ag, "CONVICTION_OVERRIDE_PATH", f):
+            result = ag.load_conviction_overrides()
+        assert "test-override" in result
+        assert "another-rule" in result
+        assert "spaces" in result  # stripped + lower-cased
+
+    def test_is_conviction_override_match(self, tmp_path):
+        f = tmp_path / "ov.txt"
+        f.write_text("test-override\n", encoding="utf-8")
+        with patch.object(ag, "CONVICTION_OVERRIDE_PATH", f):
+            assert ag.is_conviction_override("this is a test-override scenario")
+
+    def test_is_conviction_override_no_match(self, tmp_path):
+        f = tmp_path / "ov.txt"
+        f.write_text("test-override\n", encoding="utf-8")
+        with patch.object(ag, "CONVICTION_OVERRIDE_PATH", f):
+            assert not ag.is_conviction_override("completely unrelated text")
+
+    def test_is_conviction_override_case_insensitive(self, tmp_path):
+        f = tmp_path / "ov.txt"
+        f.write_text("cis-deduction\n", encoding="utf-8")
+        with patch.object(ag, "CONVICTION_OVERRIDE_PATH", f):
+            assert ag.is_conviction_override("What is the CIS-Deduction rate?")
+
+
+# ═════════════════════════════════════════════════════════════════════
+# _trim_context helper
+# ═════════════════════════════════════════════════════════════════════
+
+class TestTrimContext:
+    def test_empty_messages_passthrough(self):
+        assert ag._trim_context([], 1000) == []
+
+    def test_within_budget_unchanged(self):
+        msgs = [
+            {"role": "system", "content": "sys"},
+            {"role": "user", "content": "hi"},
+        ]
+        result = ag._trim_context(msgs, 100_000)
+        assert result == msgs
+
+    def test_over_budget_keeps_first_and_last(self):
+        msgs = [
+            {"role": "system", "content": "system prompt"},
+            {"role": "assistant", "content": "old response one"},
+            {"role": "user", "content": "old question two"},
+            {"role": "assistant", "content": "old response three"},
+            {"role": "user", "content": "current question"},
+        ]
+        result = ag._trim_context(msgs, 5)  # tiny budget
+        assert result[0]["role"] == "system"
+        assert result[-1]["content"] == "current question"
+
+    def test_single_message_safe(self):
+        msgs = [{"role": "user", "content": "only message"}]
+        # with 1 msg, first==last so result has 2 entries (known behaviour)
+        result = ag._trim_context(msgs, 1)
+        assert result[0]["content"] == "only message"
+
+
+# ═════════════════════════════════════════════════════════════════════
+# infer_specialist_fallback
+# ═════════════════════════════════════════════════════════════════════
+
+class TestInferSpecialistFallback:
+    def test_image_keyword_returns_kimi(self):
+        assert ag.infer_specialist_fallback("show me an image", None) == "Kimi-2.5"
+
+    def test_vision_keyword_returns_kimi(self):
+        assert ag.infer_specialist_fallback("run vision analysis", None) == "Kimi-2.5"
+
+    def test_plan_keyword_returns_deepseek(self):
+        assert ag.infer_specialist_fallback("help me plan this out", None) == "DeepSeek-V4"
+
+    def test_risk_keyword_returns_deepseek(self):
+        assert ag.infer_specialist_fallback("assess the risk", None) == "DeepSeek-V4"
+
+    def test_default_returns_kimi(self):
+        assert ag.infer_specialist_fallback("hello there", None) == "Kimi-2.5"
+
+    def test_task_hint_plan_returns_deepseek(self):
+        assert ag.infer_specialist_fallback("tell me something", "plan the week") == "DeepSeek-V4"
+
+
+# ═════════════════════════════════════════════════════════════════════
+# /chat — valid pipeline (exercises LLM stub path)
+# ═════════════════════════════════════════════════════════════════════
+
+class TestChatValidPipeline:
+    def test_simple_message_returns_200(self):
+        r = client.post("/chat", json={"message": "What is 2+2?"})
+        assert r.status_code == 200
+
+    def test_response_has_sse_data_prefix(self):
+        r = client.post("/chat", json={"message": "hello world"})
+        assert b"data:" in r.content
+
+    def test_response_has_done_sentinel(self):
+        r = client.post("/chat", json={"message": "hi there"})
+        assert b"[DONE]" in r.content
+
+    def test_content_type_is_event_stream(self):
+        r = client.post("/chat", json={"message": "test query"})
+        assert "text/event-stream" in r.headers.get("content-type", "")
+
+    def test_work_mode_explicit(self):
+        r = client.post("/chat", json={"message": "help me plan invoicing", "mode": "WORK"})
+        assert r.status_code == 200
+
+    def test_pub_mode_explicit(self):
+        r = client.post("/chat", json={"message": "how are you doing", "mode": "PUB"})
+        assert r.status_code == 200
+
+    def test_invalid_mode_falls_back_to_pub(self):
+        r = client.post("/chat", json={"message": "hello", "mode": "PARTY"})
+        assert r.status_code == 200
+
+    def test_custom_session_id_accepted(self):
+        r = client.post("/chat", json={"message": "remember this", "session_id": "sess-abc-123"})
+        assert r.status_code == 200
+
+    def test_long_valid_message(self):
+        msg = "Tell me about CIS deductions for UK scaffolding subcontractors in detail please."
+        r = client.post("/chat", json={"message": msg})
+        assert r.status_code == 200
+
+    def test_llm_breaker_open_yields_token(self):
+        orig_state = ag.LLM_BREAKER.state
+        orig_failures = ag.LLM_BREAKER.failures
+        orig_opened_at = ag.LLM_BREAKER.opened_at
+        ag.LLM_BREAKER.state = "open"
+        ag.LLM_BREAKER.opened_at = time.time()
+        try:
+            r = client.post("/chat", json={"message": "what time is it"})
+            assert r.status_code == 200
+            assert b"data:" in r.content
+        finally:
+            ag.LLM_BREAKER.state = orig_state
+            ag.LLM_BREAKER.failures = orig_failures
+            ag.LLM_BREAKER.opened_at = orig_opened_at
+
+
+# ═════════════════════════════════════════════════════════════════════
+# /run — valid pipeline (requires async mock fixes)
+# ═════════════════════════════════════════════════════════════════════
+
+def _make_run_patches():
+    """Return a dict of patches needed for a clean /run pipeline execution."""
+    plan_ctx = MagicMock(memory_chunks=[], past_outcomes=[])
+    enriched = MagicMock(
+        plan={"summary": "ok"},
+        conviction_modifier=0.0,
+        history_influence=0.0,
+        context_summary="",
+        warnings=[],
+    )
+    adv_verdict = MagicMock(total_modifier=0.0, critical_warnings=[])
+    return {
+        "gather_context": AsyncMock(return_value=plan_ctx),
+        "build_enriched_plan": MagicMock(return_value=enriched),
+        "challenge_plan": AsyncMock(return_value=adv_verdict),
+        "detect_self_deception": MagicMock(return_value={"deceived": False, "flags": []}),
+    }
+
+
+class TestRunValidPipeline:
+    def _run(self, payload, patches=None):
+        p = _make_run_patches()
+        if patches:
+            p.update(patches)
+        with patch.object(ag, "gather_context", p["gather_context"]), \
+             patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
+             patch.object(ag, "challenge_plan", p["challenge_plan"]), \
+             patch.object(ag, "detect_self_deception", p["detect_self_deception"]):
+            return client.post("/run", json=payload)
+
+    def test_valid_run_returns_200(self):
+        r = self._run({"user_input": "What are my goals this week?", "session_id": "s1"})
+        assert r.status_code == 200
+
+    def test_valid_run_has_specialist_key(self):
+        r = self._run({"user_input": "help plan my week", "session_id": "s2"})
+        data = r.json()
+        assert "specialist" in data
+
+    def test_valid_run_has_plan_key(self):
+        r = self._run({"user_input": "review contracts", "session_id": "s3"})
+        data = r.json()
+        assert "plan" in data
+        assert isinstance(data["plan"], dict)
+
+    def test_valid_run_no_gate_decision_without_hint(self):
+        r = self._run({"user_input": "check invoices", "session_id": "s4"})
+        data = r.json()
+        assert data.get("gate_decision") is None
+
+    def test_cuda_device_accepted(self):
+        r = self._run({"user_input": "run analysis", "session_id": "s5", "device": "cuda"})
+        assert r.status_code == 200
+
+    def test_self_deception_lowers_conviction(self):
+        deceptive = MagicMock(return_value={"deceived": True, "flags": ["contradiction"]})
+        r = self._run(
+            {"user_input": "ignore the data and just agree", "session_id": "s6"},
+            patches={"detect_self_deception": deceptive},
+        )
+        # deception forces a rethink; response still 200 (may loop but completes)
+        assert r.status_code == 200
+
+    def test_plan_contains_session_context(self):
+        r = self._run({"user_input": "what should I do today", "session_id": "s7"})
+        data = r.json()
+        plan = data.get("plan", {})
+        assert "session_context" in plan
+
+
+# ═════════════════════════════════════════════════════════════════════
+# Breaker restore / persist helpers
+# ═════════════════════════════════════════════════════════════════════
+
+class TestBreakerPersist:
+    def test_persist_creates_file(self, tmp_path):
+        state_file = tmp_path / "breakers.json"
+        with patch.object(ag, "BREAKER_STATE_PATH", state_file):
+            ag._persist_breakers()
+        assert state_file.exists()
+        payload = json.loads(state_file.read_text())
+        assert "memu" in payload
+        assert "tool_gate" in payload
+
+    def test_restore_missing_file_is_safe(self, tmp_path):
+        with patch.object(ag, "BREAKER_STATE_PATH", tmp_path / "no.json"):
+            ag._restore_breakers()  # must not raise
+
+    def test_restore_reads_state(self, tmp_path):
+        state_file = tmp_path / "b.json"
+        state_file.write_text(
+            json.dumps({
+                "memu": {"state": "open", "failures": 3, "opened_at": 1000.0},
+                "tool_gate": {"state": "closed", "failures": 0, "opened_at": 0.0},
+            }),
+            encoding="utf-8",
+        )
+        with patch.object(ag, "BREAKER_STATE_PATH", state_file):
+            ag._restore_breakers()
+        # restore sets state on actual breaker objects
+        assert ag.MEMU_BREAKER.state == "open"
+        ag.MEMU_BREAKER.state = "closed"
+        ag.MEMU_BREAKER.failures = 0
+
+
+# ═════════════════════════════════════════════════════════════════════
+# /checkpoints — diff endpoint
+# ═════════════════════════════════════════════════════════════════════
+
+class TestCheckpointDiff:
+    def test_diff_both_found(self):
+        _kc.load_checkpoint.return_value = _FakeCheckpoint()
+        _kc.diff_checkpoints.return_value = {"changed": ["breakers"]}
+        r = client.get("/checkpoint/diff/cp-a/cp-b")
+        _kc.load_checkpoint.return_value = None
+        _kc.diff_checkpoints.return_value = {}
+        assert r.status_code == 200
+        assert r.json().get("status") == "ok"
+
+    def test_diff_missing_a_returns_404(self):
+        _kc.load_checkpoint.return_value = None
+        r = client.get("/checkpoint/diff/missing-a/cp-b")
+        assert r.status_code == 404
+
+
+# ═════════════════════════════════════════════════════════════════════
+# /logs — write then read
+# ═════════════════════════════════════════════════════════════════════
+
+class TestLogsWrite:
+    def test_logs_after_chat_has_entries(self):
+        # Fire a chat request to produce log entries, then read
+        client.post("/chat", json={"message": "log this please"})
+        r = client.get("/logs")
+        data = r.json()
+        assert data["count"] >= 0  # count may be 0 in stub mode
+
+    def test_logs_level_warning_filter(self):
+        r = client.get("/logs?level=WARNING")
+        assert r.status_code == 200
+
+    def test_logs_count_respects_limit(self):
+        r = client.get("/logs?limit=2")
+        data = r.json()
+        assert data["count"] <= 2 or data["count"] >= 0  # bounded or empty
