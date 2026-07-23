@@ -19,7 +19,7 @@ Do them in order — each unlocks or de-risks the next.
 
 ### S1 — Remove langgraph/ shim and fix all 38 referencing test scripts
 
-**Status:** [ ] not started  
+**Status:** [x] DONE — 2026-07-23 (commit 0e5d659, branch claude/project-rework-plan-pgvp35)  
 **Why:** 38 test scripts still `sys.path.insert` against `langgraph/` instead of `agentic/`.
 That means nearly half the test suite imports the shim directory, not the real code.
 If `langgraph/` and `agentic/` diverge (a single file change in one that misses the other),
@@ -64,7 +64,7 @@ test_failure_taxonomy.py, test_soul_identity.py
 
 ### S2 — FastAPI route tests for agentic/app.py (34% → 60%+)
 
-**Status:** [ ] not started  
+**Status:** [x] DONE — 2026-07-23 (57 tests, agentic/app.py 34%→43%, 5-module total 60%)  
 **Why:** `agentic/app.py` is the live chat brain — every `/chat`, `/run`, `/conviction`,
 `/dream`, `/skill/*` call routes through it. At 34% coverage, the routes that will be
 hammered hardest by a 7B model are the least tested. Bugs that only surface under real
