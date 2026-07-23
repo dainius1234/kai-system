@@ -88,7 +88,7 @@ services:
       MAX_MEMORY_RECORDS: "5000"
       REDIS_URL: redis://redis:6379
       VECTOR_STORE: turbovec
-      PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
+      PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
       TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
       MEMU_GRAPH_URL: http://memu-graph:8061
       FF_GRAPH_INGEST: "${FF_GRAPH_INGEST:-true}"
@@ -119,7 +119,7 @@ services:
     environment:
       REDIS_URL: redis://redis:6379
       VECTOR_STORE: turbovec
-      PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
+      PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
       TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
     volumes:
       - turbovec_data:/data/turbovec
@@ -709,7 +709,7 @@ services:
       dockerfile: backup-service/Dockerfile
     <<: *defaults
     environment:
-      PG_URI: postgresql://keeper:localdev@postgres:5432/sovereign
+      PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
       REDIS_URL: redis://redis:6379
       MEMU_URL: http://memu-core:8001
       TOOL_GATE_URL: http://tool-gate:8000
@@ -824,34 +824,6 @@ services:
       - agentic
       - audio-service
       - tts-service
-
-  orchestrator:
-    build:
-      context: .
-      dockerfile: orchestrator/Dockerfile
-    <<: *defaults
-    environment:
-      TOOL_GATE_URL: http://tool-gate:8000
-      MEMU_URL: http://memu-core:8001
-      VERIFIER_URL: http://verifier:8052
-      EXECUTOR_URL: http://executor:8002
-      OLLAMA_URL: http://ollama:11434
-    ports:
-      - "8050:8050"
-    healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8050/health')\""]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-    networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.32
-    depends_on:
-      - tool-gate
-      - memu-core
-      - verifier
-      - ollama
 
   workspace-manager:
     build:

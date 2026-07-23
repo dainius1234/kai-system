@@ -1,8 +1,8 @@
 # Kai PM Status Dashboard
 
-- **Last updated (UTC):** 2026-07-21
+- **Last updated (UTC):** 2026-07-22
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** No active sprint. Next work is GPU-gated (Phase 1) or user-initiated.
+- **Current focus:** Cleanup sprint COMPLETE (D71–D76). Feature branch PR pending; blocked on Phase 1 GPU.
 
 ## What's landed on main
 
@@ -16,10 +16,14 @@
 | #83 | D56, D57 | FF_GRAPH_INGEST=true; P29 CIS Financial Awareness service |
 | #84 | D58 | Automation infra, cloud LLM backends, PWA service worker, agentic financial wiring |
 | #85 | D59 | C3 LLM retry/backoff, behavioral scoreboard, Finance dashboard tab, PHONE_SETUP.md |
+| #86 | D60–D64 | Phase 0 backlog: SOUL.md, Live Canvas D3 v7, Memory Diary, PII auto-redaction, coverage gate |
+| #87 | D65 | CI fix: pii_redacted type, chassis httpx mock, financial-awareness sys.modules collision |
 
 ## Open PRs
 
-None. All branches merged and cleaned up as of 2026-07-21.
+| Branch | Decisions | What | Status |
+|---|---|---|---|
+| `claude/project-rework-plan-pgvp35` | D71–D76 | Cleanup sprint complete: merge-gate, redis stub, MAKEFILE_TARGETS, 10 CI isolation fixes, 5-module coverage gate (60%), 3 env-specific skip fixes, Week 4 confirmed done | Ready to PR |
 
 ## Blocked items (GPU)
 
@@ -39,5 +43,5 @@ Unlock condition: RTX 5080 procurement + provisioning + validation.
 ## Source of truth pointers
 
 - Resume layer: [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md)
-- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D59)
+- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D76)
 - Latest reality check: [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)

@@ -66,21 +66,24 @@ class TestMakefileCoverageTarget:
     def test_coverage_target_exists(self):
         assert "coverage:" in _makefile()
 
-    def test_makefile_coverage_measures_common(self):
+    def _coverage_block(self):
         mk = _makefile()
-        block = mk[mk.find("coverage:"):][:200]
-        assert "--cov=common" in block
+        start = mk.find("coverage:")
+        # next target begins at the next non-indented line after start
+        rest = mk[start:]
+        end = re.search(r"\n\S", rest[len("coverage:"):])
+        return rest[:end.start() + len("coverage:")] if end else rest[:600]
+
+    def test_makefile_coverage_measures_common(self):
+        assert "--cov=common" in self._coverage_block()
 
     def test_makefile_coverage_has_fail_under(self):
-        mk = _makefile()
-        block = mk[mk.find("coverage:"):][:200]
-        assert "--cov-fail-under=" in block, (
+        assert "--cov-fail-under=" in self._coverage_block(), (
             "make coverage must enforce --cov-fail-under to match CI gate"
         )
 
     def test_makefile_coverage_threshold_consistent(self):
-        mk = _makefile()
-        block = mk[mk.find("coverage:"):][:200]
+        block = self._coverage_block()
         match = re.search(r"--cov-fail-under=(\d+)", block)
         assert match, "--cov-fail-under must include a numeric threshold in Makefile"
         mk_threshold = int(match.group(1))
@@ -95,14 +98,12 @@ class TestMakefileCoverageTarget:
         )
 
     def test_makefile_coverage_has_html_report(self):
-        mk = _makefile()
-        block = mk[mk.find("coverage:"):][:200]
-        assert "html" in block, "make coverage should emit an HTML report for developer use"
+        assert "html" in self._coverage_block(), (
+            "make coverage should emit an HTML report for developer use"
+        )
 
     def test_makefile_coverage_has_term_missing(self):
-        mk = _makefile()
-        block = mk[mk.find("coverage:"):][:200]
-        assert "term-missing" in block
+        assert "term-missing" in self._coverage_block()
 
 
 # ── Threshold sanity ──────────────────────────────────────────────────────────

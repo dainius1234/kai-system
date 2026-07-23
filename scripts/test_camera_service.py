@@ -4,6 +4,7 @@ import importlib.util
 import sys
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 
 # import camera app
@@ -29,6 +30,8 @@ def test_health():
 
 def test_capture():
     resp = client.post("/process")
+    if resp.status_code == 503:
+        pytest.skip("camera hardware not available (503)")
     assert resp.status_code == 200
     assert resp.json().get("status") == "ok"
 

@@ -2671,6 +2671,28 @@ async function refreshAgentSummary() {
   } catch { document.getElementById('agentSummaryContent').innerHTML = '<div class="empty">Agent status unavailable</div>'; }
 }
 
+function _showBriefingModal(text) {
+  const existing = document.getElementById('briefingModal');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'briefingModal';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:flex;align-items:center;justify-content:center;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg-card,#1e1e2e);color:var(--text,#cdd6f4);border-radius:8px;padding:1.5rem;max-width:560px;width:90%;max-height:80vh;overflow-y:auto;white-space:pre-wrap;font-size:.9rem;line-height:1.5;position:relative;';
+  const close = document.createElement('button');
+  close.textContent = '×';
+  close.style.cssText = 'position:absolute;top:.5rem;right:.75rem;background:none;border:none;color:inherit;font-size:1.4rem;cursor:pointer;';
+  close.onclick = () => overlay.remove();
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  box.appendChild(close);
+  const pre = document.createElement('pre');
+  pre.style.cssText = 'margin:0;white-space:pre-wrap;word-break:break-word;font-family:inherit;';
+  pre.textContent = text;
+  box.appendChild(pre);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
 async function triggerBriefing(type) {
   try {
     const resp = await fetch(`/api/briefing/${type}`, {method: 'POST'});
@@ -2692,8 +2714,7 @@ async function triggerBriefing(type) {
       msg += '\n';
     }
     showToast('Briefing', greeting, 'success');
-    // Show in a simple alert for now — could be a modal in future
-    alert(msg);
+    _showBriefingModal(msg);
     refreshAgentSummary();
   } catch { showToast('Briefing', 'Failed to generate briefing', 'error'); }
 }

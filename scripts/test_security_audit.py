@@ -4,6 +4,11 @@ import re
 import sys
 import unittest
 
+# Earlier test files (test_p16-p20) stub several langgraph modules in
+# sys.modules so that langgraph/app.py loads without them being installed.
+# Pop those stubs before importing so this file always gets the real modules.
+for _m in ("security_audit", "adversary"):
+    sys.modules.pop(_m, None)
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "langgraph"))
 
 from security_audit import (

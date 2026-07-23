@@ -27,13 +27,21 @@ def _make_letta_stubs() -> None:
 
 _make_letta_stubs()
 
-# Add letta-agent/ to path so we can import app.py directly
-_svc_dir = os.path.join(os.path.dirname(__file__), "..", "letta-agent")
-if _svc_dir not in sys.path:
-    sys.path.insert(0, _svc_dir)
+# Load letta-agent/app.py by path to avoid collision with sys.modules["app"]
+# which test_p3_organic_memory.py sets to memu-core/app.py.
+# Must register in sys.modules BEFORE exec so Pydantic forward-ref resolution
+# (TypeAdapter) can find the module when rebuilding models at request time.
+import importlib.util as _ilu  # noqa: E402
+
+_letta_spec = _ilu.spec_from_file_location(
+    "_letta_agent_app",
+    os.path.join(os.path.dirname(__file__), "..", "letta-agent", "app.py"),
+)
+letta_app = _ilu.module_from_spec(_letta_spec)
+sys.modules["_letta_agent_app"] = letta_app
+_letta_spec.loader.exec_module(letta_app)
 
 from fastapi.testclient import TestClient  # noqa: E402
-import app as letta_app  # noqa: E402  (letta-agent/app.py)
 
 
 class TestHealth(unittest.TestCase):

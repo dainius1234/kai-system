@@ -5,6 +5,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (Phase 0 backlog sweep — PRs #86–#87 + branch, D60–D70, 2026-07-21)
+
+- **SOUL.md / AGENTS.md identity editor** (D60, PR #86): `GET /soul` + `PUT /soul` in `agentic/app.py`; `GET /agents` + `PUT /agents` mirrored. Dashboard Soul tab renders both documents in side-by-side editors with live save. `security/SOUL.md` and `security/AGENTS.md` are the canonical on-disk files.
+- **Live Canvas D3 v7** (D61, PR #86): Canvas tab (`Ctrl+2`) renders a real D3 v7 force-directed memory graph — nodes are memories, edges are temporal/emotional links, hover shows full text. Replaces the placeholder SVG.
+- **Memory Diary tab** (D62, PR #86): Diary tab (`Ctrl+6`) shows full memu-core memory history grouped by date with rich cards (emotion badge, source tag, confidence bar, PII-redaction indicator). Lazy-loads 50-record pages.
+- **PII auto-redaction in write path** (D63, PR #86): `memu-core/app.py` `memorize_event` detects PII (email, phone, NI/UTR, postcode patterns) via regex before storing; redacts matches with `[REDACTED-<type>]`. Dashboard Scanner panel shows per-category counts. `pii_redacted` field returned in memorize response.
+- **H3: coverage gate** (D64, PR #86): `--cov-fail-under=65` added to `python-app.yml` pytest step and `make coverage` target. Closes RISKS.md R3.
+- **Real ed25519 keypair generation** (D68): `scripts/auto_rotate_ed25519.py` `_new_keypair()` now uses `Ed25519PrivateKey.generate()` from the `cryptography` library — produces a mathematically-related keypair instead of two random blobs.
+- **Makefile.archive** (D70): 10 dead/duplicate targets (`test-tempo`, `test-hmac-rotation-drill`, J-series filtered aliases, `cache-test-core`) deleted from main Makefile; preserved in `Makefile.archive` for reference.
+
+### Fixed (D65–D67, D69, 2026-07-21)
+
+- **CI: pii_redacted type error** (D65, PR #87): `memu-core/app.py` `memorize_event` returned `int` for `pii_redacted` inside a `Dict[str, str]` endpoint — `ResponseValidationError`. Fixed with `str(sum(...))`.
+- **CI: chassis httpx mock** (D65, PR #87): `FakeResponse` in `test_chassis.py` lacked `status_code = 200`, causing `AttributeError` caught by broad `except Exception` which flipped `response.source` to `"error"`. Fixed by adding `status_code`, `headers=None`, and mock exception classes to the `fake_httpx` namespace.
+- **CI: financial-awareness sys.modules collision** (D65, PR #87): bare `import app` in `test_financial_awareness.py` got `kai-advisor/app.py` due to alphabetical pytest discovery order. Fixed by loading via `importlib.util.spec_from_file_location` with a unique module name.
+- **Hardcoded credentials in compose files** (D66): `docker-compose.full.yml` PG_URI (3 occurrences) and `docker-compose.sovereign.yml` `GF_SECURITY_ADMIN_USER` now use `${DB_PASSWORD:-localdev}` / `${GRAFANA_ADMIN_USER:-admin}` respectively. Makefile `init-memu-db` fallback updated to match.
+- **OPENAI_API_KEY placeholder** (D67): `scripts/agentic_integration_test.py` placeholder changed from `"sk-test-placeholder-not-real"` to `""`.
+- **Dashboard `alert()` in briefing** (D69): `triggerBriefing()` replaced `alert(msg)` with `_showBriefingModal()` — lightweight overlay with close button, click-outside dismissal, and dark/light theme CSS variables.
+- **`test-tempo` orphan** (D70): `scripts/test_tempo.py` deleted; was testing a removed service and had no live references.
+
 ### Added (Phase 0.5 completion — PRs #82–#85, D55–D59, 2026-07-21)
 
 - **Letta agent memory controller** (D55, PR #82): `letta-agent/` service (port 8062), feature flags `FF_LETTA_TASKS` / `FF_LETTA_MEMORY_SYNC`, agentic 12-way context gather with letta archival injection, `docker-compose.full.yml` wiring.

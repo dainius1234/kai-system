@@ -21,16 +21,16 @@
 
 ---
 
-## Project Status (21 July 2026)
+## Project Status (23 July 2026)
 
 | Metric | Value |
 |---|---|
-| **Services** | 32 Docker containers |
+| **Services** | 33 Docker containers |
 | **Test targets** | 77 (`make test-core`) |
-| **Individual tests** | 1,656 (`def test_` across 90 files) |
-| **Python LOC** | ~51,613 |
+| **Individual tests** | 1,825 (`def test_` across 98 files) |
+| **Python LOC** | ~54,970 |
 | **Compose files** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 36 |
+| **Milestones shipped** | 32 |
 | **Failures** | 0 |
 
 > **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
@@ -547,13 +547,13 @@ here to avoid implying they run automatically.)
 ```bash
 # Service tests
 make test-phase-b-memu          make test-memu-pg              make test-memu-turbovec
-make test-dashboard-ui          make test-dashboard            make test-thinking-pathways
-make test-tool-gate             make test-tool-gate-security    make test-telegram
-make test-conviction            make test-audio                make test-camera
-make test-executor              make test-agentic-service       make test-agentic-introspect
-make test-kai-advisor           make test-tts                  make test-avatar
-make test-heartbeat             make test-self-emp              make test-auth-hmac
-make test-agentic
+make test-letta                 make test-financial             make test-dashboard-ui
+make test-dashboard             make test-thinking-pathways     make test-tool-gate
+make test-tool-gate-security    make test-telegram              make test-conviction
+make test-audio                 make test-camera                make test-executor
+make test-agentic-service       make test-agentic-introspect    make test-kai-advisor
+make test-tts                   make test-avatar                make test-heartbeat
+make test-self-emp              make test-auth-hmac             make test-agentic
 
 # Feature/subsystem tests
 make test-episode-saver         make test-episode-spool         make test-error-budget
@@ -561,8 +561,7 @@ make test-invoice               make test-memu-retrieval         make test-route
 make test-planner               make test-adversary             make test-failure-taxonomy
 make test-selaur                make test-contradiction         make test-gem
 make test-planner-prefs         make test-silence               make test-self-deception
-make test-temporal-self         make test-predictive            make test-tempo
-make test-improvement-gate
+make test-temporal-self         make test-predictive            make test-improvement-gate
 
 # Phase tests
 make test-p3-organic            make test-p4-personality        make test-p16-operational
@@ -573,7 +572,7 @@ make test-p21-proactive-agent           make test-p22-operator-model
 # Hardening tests
 make test-h1-hardening          make test-h2-self-healing        make test-mars-consolidation
 make test-sage-critique         make test-agent-evolver          make test-checkpoint
-make test-v7                    make test-prod-hardening         make test-hmac-rotation-drill
+make test-v7                    make test-prod-hardening
 make test-error-codes           make test-feature-flags
 
 # Specialised

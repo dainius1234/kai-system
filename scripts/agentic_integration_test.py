@@ -90,7 +90,7 @@ def test_crewai():
     pytest = __import__("pytest")
     # CrewAI requires OPENAI_API_KEY even for object construction;
     # set a placeholder so the smoke test can verify wiring.
-    os.environ.setdefault("OPENAI_API_KEY", "sk-test-placeholder-not-real")
+    os.environ.setdefault("OPENAI_API_KEY", "")
     try:
         from crewai import Agent, Task, Crew
     except ImportError:
