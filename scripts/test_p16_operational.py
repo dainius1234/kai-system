@@ -34,7 +34,7 @@ for mod_name in [
 # Ensure common package is on path
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "langgraph"))
+sys.path.insert(0, os.path.join(ROOT, "agentic"))
 
 # Set env vars before importing
 os.environ.setdefault("LEDGER_PATH", "/tmp/test-p16-ledger.jsonl")
@@ -57,20 +57,20 @@ def _load_memu():
 
 memu = _load_memu()
 
-# ── Load langgraph ───────────────────────────────────────────────────
+# ── Load agentic ─────────────────────────────────────────────────────
 
 
-def _load_langgraph():
+def _load_agentic():
     spec = importlib.util.spec_from_file_location(
-        "langgraph_app", os.path.join(ROOT, "langgraph", "app.py")
+        "agentic_app", os.path.join(ROOT, "agentic", "app.py")
     )
     mod = importlib.util.module_from_spec(spec)
-    sys.modules["langgraph_app"] = mod
+    sys.modules["agentic_app"] = mod
     spec.loader.exec_module(mod)
     return mod
 
 
-lg = _load_langgraph()
+ag = _load_agentic()
 
 # ── Load dashboard ───────────────────────────────────────────────────
 
@@ -291,8 +291,8 @@ class TestLogAggregation:
         routes = [r.path for r in memu.app.routes]
         assert "/logs" in routes
 
-    def test_langgraph_logs_endpoint_exists(self):
-        routes = [r.path for r in lg.app.routes]
+    def test_agentic_logs_endpoint_exists(self):
+        routes = [r.path for r in ag.app.routes]
         assert "/logs" in routes
 
     def test_memu_logs_returns_entries(self):
@@ -304,9 +304,9 @@ class TestLogAggregation:
         assert "entries" in data
         assert "count" in data
 
-    def test_langgraph_logs_returns_entries(self):
+    def test_agentic_logs_returns_entries(self):
         from fastapi.testclient import TestClient
-        client = TestClient(lg.app)
+        client = TestClient(ag.app)
         resp = client.get("/logs?limit=10")
         assert resp.status_code == 200
         data = resp.json()

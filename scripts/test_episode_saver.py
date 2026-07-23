@@ -7,8 +7,8 @@ import tempfile
 import time
 from pathlib import Path
 
-# Import our local kai_config, avoiding the installed langgraph package
-_mod_path = Path(__file__).resolve().parents[1] / "langgraph" / "kai_config.py"
+# Import our local kai_config from the agentic directory
+_mod_path = Path(__file__).resolve().parents[1] / "agentic" / "kai_config.py"
 _spec = importlib.util.spec_from_file_location("kai_config", _mod_path)
 assert _spec and _spec.loader
 _mod = importlib.util.module_from_spec(_spec)

@@ -32,7 +32,7 @@ for mod_name in [
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "langgraph"))
+sys.path.insert(0, os.path.join(ROOT, "agentic"))
 
 os.environ.setdefault("LEDGER_PATH", "/tmp/test-p17-ledger.jsonl")
 os.environ.setdefault("TRUSTED_TOKENS_PATH", "/tmp/test-p17-tokens.json")

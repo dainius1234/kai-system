@@ -47,7 +47,7 @@ def check(label: str, fn):
 
 
 # ── 1. LangGraph ────────────────────────────────────────────────────
-def test_langgraph():
+def test_langgraph_library():
     pytest = __import__("pytest")
     try:
         from langgraph.graph import StateGraph
@@ -121,7 +121,7 @@ def test_openagents():
 if __name__ == "__main__":
     print("Kai System — Agentic Framework Smoke Test")
     print("=" * 48)
-    check("LangGraph  — graph construction", test_langgraph)
+    check("LangGraph  — graph construction", test_langgraph_library)
     check("AutoGen    — agent instantiation", test_autogen)
     check("CrewAI     — crew/task wiring", test_crewai)
     check("OpenAgents — class loading", test_openagents)

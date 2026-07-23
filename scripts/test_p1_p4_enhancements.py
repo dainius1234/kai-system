@@ -14,7 +14,7 @@ from pathlib import Path
 
 # ── path setup ───────────────────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "langgraph"))
+sys.path.insert(0, str(ROOT / "agentic"))
 sys.path.insert(0, str(ROOT / "perception" / "camera"))
 sys.path.insert(0, str(ROOT / "heartbeat"))
 

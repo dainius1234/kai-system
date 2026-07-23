@@ -35,7 +35,7 @@ for mod_name in [
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "langgraph"))
+sys.path.insert(0, os.path.join(ROOT, "agentic"))
 
 os.environ.setdefault("LEDGER_PATH", "/tmp/test-p19-ledger.jsonl")
 os.environ.setdefault("TRUSTED_TOKENS_PATH", "/tmp/test-p19-tokens.json")
@@ -71,17 +71,17 @@ def _load_dashboard():
 dash = _load_dashboard()
 
 
-def _load_langgraph():
+def _load_agentic():
     spec = importlib.util.spec_from_file_location(
-        "langgraph_app_p19", os.path.join(ROOT, "langgraph", "app.py")
+        "agentic_app_p19", os.path.join(ROOT, "agentic", "app.py")
     )
     mod = importlib.util.module_from_spec(spec)
-    sys.modules["langgraph_app_p19"] = mod
+    sys.modules["agentic_app_p19"] = mod
     spec.loader.exec_module(mod)
     return mod
 
 
-lg = _load_langgraph()
+ag = _load_agentic()
 
 from starlette.testclient import TestClient
 
@@ -648,4 +648,4 @@ class TestLangGraphIntegration:
 
     def test_imagination_context_is_async(self):
         import asyncio
-        assert asyncio.iscoroutinefunction(lg._get_imagination_context)
+        assert asyncio.iscoroutinefunction(ag._get_imagination_context)

@@ -18,7 +18,7 @@ import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "langgraph"))
+sys.path.insert(0, os.path.join(ROOT, "agentic"))
 
 from kai_config import (  # noqa: E402
     FailureClass,

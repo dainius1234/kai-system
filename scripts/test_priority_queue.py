@@ -4,7 +4,7 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "langgraph"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from priority_queue import Priority, PriorityQueue, QueueEntry, QueueStats, get_queue

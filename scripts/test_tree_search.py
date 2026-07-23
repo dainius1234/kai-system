@@ -4,7 +4,7 @@ import sys
 import asyncio
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "langgraph"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from tree_search import tree_search, Branch, TreeSearchResult, _generate_variations, _branch_id
