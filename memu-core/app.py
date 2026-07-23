@@ -592,29 +592,37 @@ class TurboVecStore(PGVectorStore):
         conn = self._get_conn()
         try:
             with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    CREATE TABLE IF NOT EXISTS memories (
-                        id text PRIMARY KEY,
-                        int_id BIGSERIAL UNIQUE,
-                        timestamp text,
-                        event_type text,
-                        category text DEFAULT 'general',
-                        content jsonb,
-                        embedding_raw jsonb,
-                        relevance float DEFAULT 1.0,
-                        importance float DEFAULT 0.5,
-                        access_count int DEFAULT 0,
-                        last_accessed text,
-                        stability float DEFAULT 1.0,
-                        pinned bool DEFAULT false,
-                        trust_tier text DEFAULT 'unverified',
-                        source_id text,
-                        poisoned bool DEFAULT false,
-                        quarantine_reason text
-                    );
-                    """
-                )
+                try:
+                    cur.execute(
+                        """
+                        CREATE TABLE IF NOT EXISTS memories (
+                            id text PRIMARY KEY,
+                            int_id BIGSERIAL UNIQUE,
+                            timestamp text,
+                            event_type text,
+                            category text DEFAULT 'general',
+                            content jsonb,
+                            embedding_raw jsonb,
+                            relevance float DEFAULT 1.0,
+                            importance float DEFAULT 0.5,
+                            access_count int DEFAULT 0,
+                            last_accessed text,
+                            stability float DEFAULT 1.0,
+                            pinned bool DEFAULT false,
+                            trust_tier text DEFAULT 'unverified',
+                            source_id text,
+                            poisoned bool DEFAULT false,
+                            quarantine_reason text
+                        );
+                        """
+                    )
+                except self._psycopg2.errors.UniqueViolation:
+                    # Two services racing CREATE TABLE IF NOT EXISTS can both pass
+                    # the existence check before either commits — the BIGSERIAL
+                    # sequence memories_int_id_seq gets registered in pg_class by
+                    # the first committer, causing the second to fail. The table
+                    # exists either way; roll back and continue.
+                    conn.rollback()
                 # migrate: add TurboVec-specific columns if table existed from PGVectorStore's schema
                 for col, typ, default in [
                     ("int_id", "BIGSERIAL UNIQUE", None),
