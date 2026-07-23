@@ -22,11 +22,11 @@ These are the only targets that should appear in `merge-gate`.
 |---|---|---|
 | `go_no_go` | ✓ | py_compile + smoke check; warns "dashboard not running" but exits 0 |
 | `pypi-shadow-check` | ✓ | No shadowed PyPI folders found |
-| `check-docs` | ✓ | Required `sync-docs` first (test count was stale: 1656 → 1826) |
+| `check-docs` | ✓ | README + PROJECT_BACKLOG kept current via sync-docs |
 | `sync-docs` | ✓ | README + PROJECT_BACKLOG updated; run whenever pytest count changes |
 | `quality_gate` | ✓ | All scripts pass |
 | `dep-audit` | ✗ | `pip-audit` not installed in this env; installs from per-service requirements in CI |
-| `coverage` | ✓ | Requires `MEMU_ALLOW_FAKE_EMBEDDINGS=true`; measures `common/` at 65%+ |
+| `coverage` | ✓ | `MEMU_ALLOW_FAKE_EMBEDDINGS=true`; 5 modules (common/agentic/memu-core/letta-agent/financial-awareness); 62.67% combined; gate at 60% (D75) |
 | `phase1-closure` | ✓ | All patch sets closed |
 
 ---
@@ -39,7 +39,7 @@ These are the only targets that should appear in `merge-gate`.
 PYTHONPATH=. MEMU_ALLOW_FAKE_EMBEDDINGS=true make test-core
 ```
 
-### Confirmed passing (1792 tests, run 2026-07-22)
+### Confirmed passing (1825 tests, run 2026-07-22)
 
 All test targets except those listed below pass when run with `MEMU_ALLOW_FAKE_EMBEDDINGS=true`.
 
@@ -140,7 +140,7 @@ These must NOT appear in `merge-gate`. They are callable directly when needed.
 ## Test Collection Health
 
 After fixes:
-- `pytest scripts/ --co` collects **1826 tests** with **0 errors**
+- `pytest scripts/ --co` collects **1825 tests** with **0 errors**
 - Requires `scripts/conftest.py` (redis stub) to be present
 - Requires `MEMU_ALLOW_FAKE_EMBEDDINGS=true` env var for memu-core tests
 
@@ -150,8 +150,8 @@ After fixes:
 
 | Item | Where |
 |---|---|
-| `dep-audit` (`pip-audit`) not installable without service requirements | Week 3 — coverage gate |
+| `dep-audit` (`pip-audit`) not installable without service requirements | CI-only; not blocking |
 | `test_ed25519_state` pyo3 panic — cryptography env issue | Unblocks when using `pip install cryptography` from PyPI (not distro) |
 | `test_live_query_returns_real_response` skip condition should also check reachability | `scripts/test_github_models_eval.py` |
 | `test-camera` 503 when no hardware — add skip decorator | `scripts/test_camera_service.py` |
-| Repo-wide coverage gate (currently `common/` only at 65%) | Week 3 |
+| Repo-wide coverage gate | ✅ Done — D75 (5 modules, 60% floor, 62.67% measured) |

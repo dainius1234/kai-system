@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-22
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** Cleanup sprint (CLEANUP_TODO.md). Week 1–3 done. Feature branch rebased; pending PR to main.
+- **Current focus:** Cleanup sprint (CLEANUP_TODO.md). Weeks 1–3 complete. Week 4 in progress (LLM router, templates). Feature branch PR pending.
 
 ## What's landed on main
 
@@ -23,7 +23,7 @@
 
 | Branch | Decisions | What | Status |
 |---|---|---|---|
-| `claude/project-rework-plan-pgvp35` | D71–D74 | Cleanup sprint Week 1–3: honest merge-gate, conftest redis stub, MAKEFILE_TARGETS.md, 10 CI test isolation fixes | Ready to PR — CI re-running after rebase |
+| `claude/project-rework-plan-pgvp35` | D71–D75 | Cleanup sprint Weeks 1–3: honest merge-gate, conftest redis stub, MAKEFILE_TARGETS.md, 10 CI test isolation fixes, repo-wide coverage gate (5 modules, 60%) | Ready to PR — CI re-running |
 
 ## Blocked items (GPU)
 

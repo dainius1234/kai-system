@@ -247,6 +247,16 @@ Next: after housekeeping + keystone PRs merge, only §1.3 should remain red — 
 - docs: update README — 30 milestones, 1,518 tests, 40,453 LOC, J-Series + P1-P5 shipped
 - P1-P5: skill security scanner + unload/TTL, multi-modal LLM fusion, world anchor, debate branching, kill deprecation warnings
 
+
+---
+
+## 2026-07-23 — Auto-logged Session
+
+- D75: repo-wide coverage gate — 5 modules, 60% floor
+- D74: CI root-cause diagnosed, feature branch rebased onto main
+- gitignore: add output/self_audit_log.json and health_scorecard.json
+- D73: MAKEFILE_TARGETS.md + 5 test isolation fixes + J1 canvas assertions
+
 ## Open Items
 
 ### As of 2026-06-01 (evening)
