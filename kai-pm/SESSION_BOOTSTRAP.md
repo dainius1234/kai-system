@@ -34,11 +34,11 @@ All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. The cleanup 
 | #86 | Phase 0 backlog: SOUL.md, Live Canvas D3 v7, Memory Diary, PII auto-redaction, coverage gate | D60–D64 |
 | #87 | CI fix: pii_redacted type, chassis httpx mock, financial-awareness sys.modules collision | D65 |
 | #88 | Cleanup sprint: merge-gate, redis stub, MAKEFILE_TARGETS, CI isolation fixes, 5-module coverage gate (60%), env-specific skips; TurboVecStore BIGSERIAL race + generate_embedding ordering fix | D71–D78 |
+| #89 | COMPOSE_DRIFT fixes D1/D2/D6/D9/D10; README sync; SESSION_BOOTSTRAP + DECISIONS.md D77–D80 housekeeping | D79, D80 |
 
 ### In-flight work
 
-None. Branch `claude/project-rework-plan-pgvp35` has post-merge housekeeping commits
-(STATUS.md, DECISIONS.md D77/D78) that don't warrant a new PR.
+None. All work is on `main`. No open PRs.
 
 ---
 
@@ -88,7 +88,7 @@ None. Branch `claude/project-rework-plan-pgvp35` has post-merge housekeeping com
 
 ## 6) PM operating rules
 
-- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D78**.
+- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D80**.
 - Reality checks → new file `REALITY_CHECK_<date>.md`, not silent rewrites.
 - No drift between docs, status, and delivered code.
 - `make sync-docs` after major changes; `make merge-gate` before every PR.

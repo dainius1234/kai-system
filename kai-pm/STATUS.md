@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-23
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** Cleanup sprint MERGED (D71–D76, PR #88). Blocked on Phase 1 GPU.
+- **Current focus:** All CPU-safe backlog shipped. PR #89 merged (D79, D80 + README sync). Blocked on GPU.
 
 ## What's landed on main
 
@@ -19,6 +19,7 @@
 | #86 | D60–D64 | Phase 0 backlog: SOUL.md, Live Canvas D3 v7, Memory Diary, PII auto-redaction, coverage gate |
 | #87 | D65 | CI fix: pii_redacted type, chassis httpx mock, financial-awareness sys.modules collision |
 | #88 | D71–D76 | Cleanup sprint: merge-gate, redis stub, MAKEFILE_TARGETS, 10 CI isolation fixes, 5-module coverage gate (60%), 3 env-specific skip fixes; also fixed TurboVecStore BIGSERIAL race + generate_embedding ordering bug |
+| #89 | D79, D80 | COMPOSE_DRIFT fixes: sovereign pgvector image + PG_URI env var (D79); full/minimal OLLAMA_MODEL param + embedding model pull + service_healthy conditions (D80); README sync; SESSION_BOOTSTRAP + DECISIONS.md D77/D78 |
 
 ## Open PRs
 
@@ -42,5 +43,5 @@ Unlock condition: RTX 5080 procurement + provisioning + validation.
 ## Source of truth pointers
 
 - Resume layer: [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md)
-- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D78)
+- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D80)
 - Latest reality check: [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)
