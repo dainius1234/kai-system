@@ -22,6 +22,10 @@ if "redis" not in sys.modules:
     sys.modules["redis"] = _rs
     sys.modules["redis.asyncio"] = _rs.asyncio
 
+# Remove any prior lakefs_client stub so memu-core's built-in ImportError
+# fallback fires and returns real string commit_ids (not MagicMock).
+sys.modules.pop("lakefs_client", None)
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 

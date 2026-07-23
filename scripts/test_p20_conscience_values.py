@@ -556,7 +556,7 @@ class TestDashboardSoulView:
 
 class TestLangGraphIntegration:
     def test_get_conscience_context_exists(self):
-        assert hasattr(lg, "_get_conscience_context")
+        assert hasattr(ag, "_get_conscience_context")
 
     def test_conscience_context_is_async(self):
         import asyncio

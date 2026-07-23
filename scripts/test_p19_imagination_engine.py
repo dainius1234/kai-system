@@ -644,7 +644,7 @@ class TestDashboardSoulView:
 
 class TestLangGraphIntegration:
     def test_get_imagination_context_exists(self):
-        assert hasattr(lg, "_get_imagination_context")
+        assert hasattr(ag, "_get_imagination_context")
 
     def test_imagination_context_is_async(self):
         import asyncio
