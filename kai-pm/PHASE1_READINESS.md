@@ -178,7 +178,7 @@ state in a real Docker boot, and the step tears down cleanly.
 
 ### S5 — GPU Arrival Runbook
 
-**Status:** [ ] not started  
+**Status:** [x] DONE — 2026-07-23 (kai-pm/GPU_ARRIVAL_RUNBOOK.md created, G1–G8 with real commands)  
 **Why:** The GPU will arrive and there will be excitement. Without a written protocol, the
 first session becomes discovery instead of execution. This runbook exists so that GPU day
 is 2 hours of deliberate verification, not 2 days of debugging unexpected behavior.

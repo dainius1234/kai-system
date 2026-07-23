@@ -44,12 +44,12 @@ None. All work is on `main`. No open PRs.
 
 ## 3) Next priorities (in order)
 
-1. **S1 (NOW) — langgraph/ shim removal** — 38 test scripts import dead-path code; remove shim, update all scripts, delete directory
-2. **S2 (NOW) — agentic route tests** — agentic/app.py 34% coverage → 60%+
-3. **S3 (NOW) — memu-core route tests** — memu-core/app.py 53% coverage → 65%+
-4. **S4 (NOW) — sovereign CI boot-test** — sovereign profile never boot-tested; add CI step
-5. **S5 (NOW) — GPU Arrival Runbook** — write `kai-pm/GPU_ARRIVAL_RUNBOOK.md` before hardware arrives
-6. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G7 in PHASE1_READINESS.md), declare Phase 1 (D82)
+1. **S1 — DONE** — langgraph/ shim removed; 38 test scripts redirected to agentic/; langgraph/ deleted (commit 0e5d659)
+2. **S2 — DONE** — agentic/app.py route tests: 57 tests, 34%→43% coverage (commit f4218cb)
+3. **S3 — DONE** — memu-core/app.py route tests: 91 tests, 53%→59% coverage (commit b8cd86f); 5-module total 63%
+4. **S4 — DONE** — sovereign CI boot-test added to core-tests.yml (commit 05dd574)
+5. **S5 — DONE** — `kai-pm/GPU_ARRIVAL_RUNBOOK.md` written with G1–G8 real commands (this commit)
+6. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1 (D82)
 
 Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
@@ -93,7 +93,7 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
 ## 6) PM operating rules
 
-- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D81**.
+- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D82**.
 - Reality checks → new file `REALITY_CHECK_<date>.md`, not silent rewrites.
 - No drift between docs, status, and delivered code.
 - `make sync-docs` after major changes; `make merge-gate` before every PR.

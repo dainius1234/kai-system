@@ -1476,3 +1476,22 @@ before Phase 2 can be declared. Items are sequenced by dependency and risk.
 `PHASE1_READINESS.md` is the single source of truth for "are we ready for Phase 1."
 All five pre-GPU items are CPU-safe and can be done in the current environment.
 S1 is highest priority — it affects the validity of nearly half the existing test suite.
+
+## D82 — 2026-07-23 — Pre-GPU sprint S1–S5 complete; awaiting GPU
+
+**Context:**
+S1–S5 from PHASE1_READINESS.md (D81) were executed in sequence on 2026-07-23:
+- S1: langgraph/ shim removed (12 files deleted), 38 test scripts redirected to agentic/ (commit 0e5d659)
+- S2: 57 agentic/app.py route tests added; coverage 34% → 43% (commit f4218cb)
+- S3: 91 memu-core/app.py route tests added; coverage 53% → 59% (commit b8cd86f)
+- S4: Sovereign CI boot-test step added to core-tests.yml (commit 05dd574)
+- S5: GPU_ARRIVAL_RUNBOOK.md written with G1–G8 verified shell commands
+
+**Decision:**
+Mark the pre-GPU sprint complete. 5-module combined coverage: 63% (gate: 60%).
+All CPU-safe readiness work is done. Next action is GPU hardware arrival.
+
+**Consequences:**
+- Branch `claude/project-rework-plan-pgvp35` carries all S1–S5 commits, pending PR + merge
+- GPU Day protocol (G1–G8) in `kai-pm/GPU_ARRIVAL_RUNBOOK.md` is the next executable step
+- Phase 1 entry gate: all G1–G7 green → append D82-GPU to DECISIONS.md, flip PHASE 1 ACTIVE
