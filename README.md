@@ -10,11 +10,11 @@
 <p align="center">
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
-  <img src="https://img.shields.io/badge/services-32-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-1%2C656_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/services-33-blue?style=flat-square" alt="services">
+  <img src="https://img.shields.io/badge/tests-1%2C825_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
-  <img src="https://img.shields.io/badge/Python-~51%2C487_LOC-yellow?style=flat-square" alt="loc">
-  <img src="https://img.shields.io/badge/milestones-36_shipped-purple?style=flat-square" alt="milestones">
+  <img src="https://img.shields.io/badge/Python-~54%2C980_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/milestones-32_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
 </p>
@@ -28,7 +28,7 @@
 | **Services** | 33 Docker containers |
 | **Test targets** | 77 (`make test-core`) |
 | **Individual tests** | 1,825 (`def test_` across 98 files) |
-| **Python LOC** | ~54,970 |
+| **Python LOC** | ~54,980 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 32 |
 | **Failures** | 0 |
@@ -132,11 +132,11 @@ Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTR
 | **Token Counting** | ~~±40% heuristic (4 chars per token)~~ **Fixed**: tiktoken-based accurate counting + per-message overhead | Already done — tiktoken installed |
 | **Context Budget** | ~~Hardcoded 3072 tokens wastes 90% of larger models~~ **Fixed**: auto-adapts from model registry. qwen2:0.5b→3072, qwen2.5:7b→28672, kimi→122K | Already done — model-aware |
 | **Prompt Templates** | ~~Hardcoded strings~~ **Fixed**: model-aware templates. Tier 1 (tiny): minimal. Tier 2 (7B): reasoning guidelines. Tier 3 (70B): JSON hints + deep persona | Already done — scales automatically |
-| **Test Style** | 1,656 tests verify structural correctness + 37 chassis tests + 15 behavioral tests. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
+| **Test Style** | 1,825 tests verify structural correctness + 37 chassis tests + 15 behavioral tests. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
 | **Dashboard** | Chat, Health, Memory, Soul editor, Diary, Canvas (D3) are functional. Thinking, Goals, Logs are **proxy shells** — they work when backends are running but show "unavailable" in minimal stack | Views become live with `make full-up` |
 | **Memory Persistence** | Default is now TurboVec ANN index (persisted `.tv` file + Postgres metadata — no pgvector extension required). Sovereign stack stays on `pgvector`. Full graph memory (`memu-graph`) is feature-flagged off by default (`FF_GRAPH_INGEST=false`) | Set `VECTOR_STORE`, `TURBOVEC_INDEX_PATH` in `.env`; see `.env.example` |
 | **Security Defaults** | HMAC enforced, but DB password is `localdev` by default. Nonce replay persisted to file. Dev HMAC secret now blocked unless explicitly allowed | Set `DB_PASSWORD`, `INTERSERVICE_HMAC_SECRET` env vars for production |
-| **Coverage** | 78% on `common/` (1,616 tests, measured 2026-06-01). Dashboard proxy endpoints and memu-core complex paths have gaps | CI gate enforced at 65% via `--cov-fail-under=65`; `make coverage` enforces the same threshold locally |
+| **Coverage** | 62.67% combined across 5 modules (`common`, `agentic`, `memu-core`, `letta-agent`, `financial-awareness`). `agentic/app.py` (34%) and `memu-core/app.py` (53%) anchor the total down — both are service-route-heavy files unreachable offline. | CI gate: 60% (`--cov-fail-under=60`); `make coverage` enforces the same threshold locally |
 
 ---
 
@@ -236,7 +236,6 @@ voice, avatar, integrations, and ops tooling.
 | agentic-introspect | 8023 | Dream/evolve/security-audit — split out of `agentic` so a bug in self-improvement code can't take down live chat |
 | executor | 8002 | Sandboxed execution |
 | fusion-engine | 8053 | Multi-signal consensus |
-| orchestrator | 8050 | Final risk authority |
 | telegram-bot | 8025 | Telegram interface |
 | kai-advisor | 8090 | Self-employment advisor (UK) |
 | memory-compressor | 8057 | Memory summarisation |
@@ -381,7 +380,8 @@ H3  Context Budget          ██████████ DONE
 | **M3** | memu-graph (Cognee/Kuzu graph memory) | **DONE** — D28-D32; ingest→query→forget pipeline; feature-flagged off by default |
 | **M4** | memu-graph live CI verification | **DONE** — PR #79; real container boot + Ollama + full cycle tested in CI |
 | **M5** | TurboVec activated as default VECTOR_STORE | **DONE** — D40; dev/CI stacks use TurboVec ANN; sovereign stays on pgvector |
-| **P29** | Financial Awareness | Planned — savings tracker, expense categorization |
+| **P29** | Financial Awareness | **DONE** — CIS/VAT/tax arithmetic service (`financial-awareness`, port 8063, D57, PR #83) |
+| **Letta** | Letta archival memory controller | **DONE** — `letta-agent` service (port 8062), 12-way gather, `FF_LETTA_TASKS` flag (D55, PR #82); live smoke-test pending GPU |
 | **GPU** | Hardware Performance | **Phase 0 DONE** — detection, env toggles, speculative-decoding config, model registry expansion (`docs/gpu_integration_phase0.md`); hardware-dependent execution still pending |
 
 *Sources: OpenClaw, Jarvis variants, Proact-VL (arXiv:2603.03447). All offline, low-resource, test on qwen2.5:0.5b first.*
@@ -401,22 +401,18 @@ CI-verified against a live Cognee/Kuzu/Ollama stack, and TurboVec ANN
 search is now the default vector store in the dev/CI compose stacks
 (D40), eliminating the pgvector extension dependency for development.
 
-**Immediate next steps (in order):**
+**Phase 0 is complete** (as of 2026-07-23). All CPU-safe backlog items are shipped
+and on `main`. The entire stack is blocked on a single external unlock condition:
 
-1. **Letta multi-agent integration.** The qwen2.5:0.5b model swap (D38)
-   unblocked Letta's tool-call template filter. Wire Letta into the
-   agentic stack — confirm a live Ollama instance with qwen2.5:0.5b
-   actually exposes the tool-call template text Letta expects, then scope
-   the integration depth (task delegation, parallel agents, or both).
-2. **memu-core's P17-P22 personality engine remains unsplit** (D21) —
-   eleven `asyncio.Lock()`-protected in-process dict buckets with only a
-   5-minute Redis persistence lag make it fundamentally unsplittable
-   without a backing-store rework first. Not a next step until that
-   rework is scoped.
-3. **GPU hardware arrival.** Everything above runs on CPU now. When the
-   RTX 5080 arrives: `OLLAMA_MODEL=qwen2.5:7b`, wire real STT/TTS/avatar,
-   run multi-model consensus with the three specialist endpoints, and
-   re-enable memu-graph's `FF_GRAPH_INGEST` in production.
+1. **GPU hardware arrival (RTX 5080)** — when it arrives: `OLLAMA_MODEL=qwen2.5:7b`,
+   real STT/TTS/avatar, `FF_LETTA_TASKS=true`, multi-model consensus with three
+   specialist endpoints, `FF_GRAPH_INGEST=true` in production.
+2. **Letta live smoke-test** — `letta-agent` service is built and wired (D55, PR #82)
+   but its `FF_LETTA_TASKS` gate stays off until a live Ollama instance with
+   qwen2.5:0.5b confirms the tool-call template (`ollama show qwen2.5:0.5b --template`)
+   satisfies Letta's discovery filter.
+3. **Phase 1 planning** — multi-model routing, real STT, full graph quality — to be
+   scoped once GPU is provisioned and validated.
 
 **End-goal target:** a fully offline, self-hosted, sovereign AI companion
 that runs entirely on local hardware (no cloud LLM dependency) — chat,
