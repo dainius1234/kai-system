@@ -294,7 +294,10 @@ dep-audit:
 	pip-audit --strict --desc
 
 coverage:
-	PYTHONPATH=. python -m pytest scripts/ --cov=common --cov-report=term-missing --cov-report=html:output/coverage_html --cov-fail-under=65 -q
+	PYTHONPATH=. MEMU_ALLOW_FAKE_EMBEDDINGS=true python -m pytest scripts/ \
+	  --cov=common --cov=agentic --cov=memu-core --cov=letta-agent --cov=financial-awareness \
+	  --cov-report=term-missing --cov-report=html:output/coverage_html \
+	  --cov-fail-under=60 -q
 
 # v7 feature tests
 test-v7-verifier:

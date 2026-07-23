@@ -1,5 +1,5 @@
 [run]
-source = common/,agentic/,verifier/,executor/,heartbeat/,supervisor/,memu-core/,tool-gate/,dashboard/,fusion-engine/
+source = common/,agentic/,memu-core/,letta-agent/,financial-awareness/
 omit =
     */test_*
     */_archive/*
@@ -8,7 +8,7 @@ omit =
 
 [report]
 show_missing = true
-fail_under = 0
+fail_under = 60
 exclude_lines =
     pragma: no cover
     if __name__ == .__main__

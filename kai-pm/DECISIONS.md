@@ -1226,6 +1226,35 @@ All ~110 Makefile targets categorised across four groups: Validation/CI Gate, Te
 - `test_prod_hardening::TestHMACRotation::test_ed25519_state` — pyo3 panic in distro cryptography package.
 - `test_camera::test_capture` — HTTP 503 without camera hardware; needs `@unittest.skip` decorator.
 
+## D75 — Repo-wide coverage gate: 5 modules, 60% floor
+
+**Date:** 2026-07-22
+**Status:** Implemented
+
+**Context:**
+Week 3 remaining item: extend coverage gate beyond `common/` to the rest of the codebase.
+
+**Measurement (local, with D73 fixes, `MEMU_ALLOW_FAKE_EMBEDDINGS=true`):**
+
+| Module | Cover |
+|---|---|
+| `common/` | ~80% |
+| `agentic/` | ~70% weighted (adversary 85%, conviction 80%, kai_config 90%, model_selector 96%, planner 79%, priority_queue 100%, router 55%, security_audit 94%, tree_search 96%, app.py **34%**) |
+| `memu-core/` | ~53% weighted (app.py 53%, introspect_app 78%, lakefs_client 70%) |
+| `letta-agent/` | 83% |
+| `financial-awareness/` | 88% |
+| **TOTAL** | **62.67%** |
+
+`agentic/app.py` (995 stmts, 34%) and `memu-core/app.py` (3694 stmts, 53%) are large service-route files with many paths only reachable via live services — they anchor the combined number down.
+
+**Decision:** Set threshold at 60% (3 pp below measured 62.67% to allow normal fluctuation without brittleness).
+
+**Files changed:**
+- `.coveragerc`: `[run] source` updated to the 5-module list; `fail_under = 60`.
+- `Makefile` (`coverage` target): adds `--cov=agentic --cov=memu-core --cov=letta-agent --cov=financial-awareness`; threshold `65` → `60`; adds `MEMU_ALLOW_FAKE_EMBEDDINGS=true` for local use.
+- `.github/workflows/python-app.yml`: same `--cov` additions; threshold `65` → `60`; adds `MEMU_ALLOW_FAKE_EMBEDDINGS: "true"` env.
+- `scripts/test_h3_coverage_gate.py`: replaces fixed `[:200]` slice with a target-block extractor that stops at the next Makefile target, making it robust to multi-line commands.
+
 ## D74 — CI root-cause diagnosis + feature branch rebased onto main
 
 **Date:** 2026-07-22

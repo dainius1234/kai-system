@@ -42,8 +42,17 @@ jobs:
       run: |
         pip-audit --strict --desc 2>/dev/null || echo "::warning::pip-audit found vulnerabilities — review output above"
     - name: Test with pytest (with coverage gate)
+      env:
+        MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
       run: |
-        PYTHONPATH=. pytest --ignore=_archive --ignore=.venv --ignore=scripts/test_dashboard.py --ignore=scripts/test_dashboard_ui.py --cov=common --cov-report=term-missing --cov-fail-under=65 -q
+        PYTHONPATH=. pytest \
+          --ignore=_archive --ignore=.venv \
+          --ignore=scripts/test_dashboard.py \
+          --ignore=scripts/test_dashboard_ui.py \
+          --cov=common --cov=agentic --cov=memu-core --cov=letta-agent --cov=financial-awareness \
+          --cov-report=term-missing \
+          --cov-fail-under=60 \
+          -q
     - name: Test dashboard (needs CWD=dashboard/)
       run: |
         cd dashboard && PYTHONPATH=.. pytest ../scripts/test_dashboard.py ../scripts/test_dashboard_ui.py -q
