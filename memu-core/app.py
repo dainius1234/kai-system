@@ -928,30 +928,9 @@ class InMemoryVectorStore:
         self._state = dict(main["state"])
 
 
-# choose store implementation based on configuration
-store: VectorStore
-_vector_store_kind = os.getenv("VECTOR_STORE", "memory")
-if _vector_store_kind == "postgres":
-    logger.info("Using Postgres-backed vector store")
-    store = PGVectorStore()
-elif _vector_store_kind == "turbovec":
-    logger.info("Using TurboVec-backed vector store (Postgres metadata + compressed index)")
-    store = TurboVecStore()
-else:
-    store = InMemoryVectorStore()
-
-
-def generate_embedding(text: str) -> List[float]:
-    """Generate a semantic embedding for *text*.
-
-    Uses ``sentence-transformers`` (real 384-dim vectors with
-    ``all-MiniLM-L6-v2`` by default). See ``MEMU_ALLOW_FAKE_EMBEDDINGS``
-    below for the only sanctioned exception to that.
-    """
-    return _embedding_backend(text)
-
-
 # ── embedding backend (loaded once at import time) ──────────────────
+# Must be defined before the store selection block below — TurboVecStore.__init__
+# calls generate_embedding("dimension probe") to determine vector dimension.
 EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 
 # Hash-based pseudo-embeddings carry no semantic content — every memory
@@ -987,6 +966,29 @@ except Exception as _st_exc:
         # deterministic pseudo-embedding: SHA-256 → 8 floats in [0,1)
         h = hashlib.sha256(text.encode("utf-8")).digest()
         return [b / 255.0 for b in h[:8]]
+
+
+def generate_embedding(text: str) -> List[float]:
+    """Generate a semantic embedding for *text*.
+
+    Uses ``sentence-transformers`` (real 384-dim vectors with
+    ``all-MiniLM-L6-v2`` by default). See ``MEMU_ALLOW_FAKE_EMBEDDINGS``
+    below for the only sanctioned exception to that.
+    """
+    return _embedding_backend(text)
+
+
+# choose store implementation based on configuration
+store: VectorStore
+_vector_store_kind = os.getenv("VECTOR_STORE", "memory")
+if _vector_store_kind == "postgres":
+    logger.info("Using Postgres-backed vector store")
+    store = PGVectorStore()
+elif _vector_store_kind == "turbovec":
+    logger.info("Using TurboVec-backed vector store (Postgres metadata + compressed index)")
+    store = TurboVecStore()
+else:
+    store = InMemoryVectorStore()
 
 
 def select_specialist(query: str, mode: str = "WORK") -> str:
