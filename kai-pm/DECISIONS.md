@@ -1296,3 +1296,74 @@ PR #86 merged commits up through `edc1882`. Six further commits (D71–D73 + git
 
 **Action:**
 Merged `origin/main` (`2b17d5e`) into the feature branch — no content conflicts (feature branch already contained everything in that merge commit). Pushed updated feature branch. CI will re-run; once green, a PR to main will close all 10 CI failures.
+
+## D77 — memu-core: TurboVecStore BIGSERIAL race on concurrent Docker startup
+
+**Date:** 2026-07-23
+**Status:** Implemented (PR #88, commit `fe935ac`)
+
+**Context:**
+`core-tests.yml` CI failed with `psycopg2.errors.UniqueViolation: duplicate key value violates unique
+constraint "pg_class_relname_nsp_index"` / `Key (relname, relnamespace)=(memories_int_id_seq, 2200)
+already exists`. Two Docker services (`sovereign-memu-core` and `sovereign-memu-core-introspect`) both
+run `TurboVecStore.__init__` on startup, which calls `_init_schema()`. The `CREATE TABLE IF NOT EXISTS
+memories` DDL includes `int_id BIGSERIAL UNIQUE`. Under concurrent startup, Postgres's `IF NOT EXISTS`
+guard is not atomic — both services pass the existence check before either commits, and the loser
+raises `UniqueViolation` when the sequence `memories_int_id_seq` is already registered in `pg_class`.
+
+`PGVectorStore._init_schema` already has an identical pattern for `CREATE EXTENSION IF NOT EXISTS
+vector` (added in D38/D39, PR #78), but `TurboVecStore._init_schema` did not.
+
+**Decision:**
+Wrap the `CREATE TABLE IF NOT EXISTS memories` statement in `TurboVecStore._init_schema` in a
+`try/except self._psycopg2.errors.UniqueViolation` block with `conn.rollback()`, matching the pattern
+already in `PGVectorStore._init_schema`. The table exists either way after the race; rolling back and
+continuing is correct.
+
+**Rationale:**
+Symmetric fix — same pattern as the already-proven `CREATE EXTENSION` race guard. The race is
+fundamental to concurrent Postgres init; retrying would not help and schema-init serialization would
+require external locking. The existing data path is safe after rollback because `IF NOT EXISTS` means
+the losing service's table creation was a no-op.
+
+**Consequences:**
+`TurboVecStore` startup is now race-safe when multiple services share one Postgres instance.
+`memu-core/app.py` is the only file changed. No schema or data-path changes.
+
+## D78 — memu-core: generate_embedding defined after TurboVecStore instantiation
+
+**Date:** 2026-07-23
+**Status:** Implemented (PR #88, commit `8c7324a`)
+
+**Context:**
+After D77 unblocked `_init_schema()`, CI failed with a new error: `NameError: name
+'generate_embedding' is not defined` at `memu-core/app.py:582` inside `TurboVecStore.__init__`.
+
+Root cause: `TurboVecStore.__init__` calls `generate_embedding("dimension probe")` to determine the
+embedding dimension for the TurboVec index. In module-level execution order, `store = TurboVecStore()`
+was at line 939 but `def generate_embedding(...)` was defined at line 944 — after the instantiation.
+`_embedding_backend` (which `generate_embedding` delegates to) was also defined after line 939 (lines
+964–989). Python executes module code top-to-bottom; when `TurboVecStore()` was called, neither
+`generate_embedding` nor `_embedding_backend` existed yet.
+
+This bug was latent: previously `_init_schema()` always raised `UniqueViolation` before reaching
+line 582, so the `NameError` was masked. D77 exposed it.
+
+**Decision:**
+Move the embedding backend setup block (`EMBEDDING_MODEL_NAME`, `_ALLOW_FAKE_EMBEDDINGS`, the
+`try/except` block that defines `_embedding_backend`, and `def generate_embedding`) to immediately
+before the store selection block. New order: `_embedding_backend` defined → `generate_embedding`
+defined → `store = TurboVecStore()` (which safely calls `generate_embedding`).
+
+A one-line comment was added above the block explaining why it must precede store selection.
+
+**Rationale:**
+Minimal, correct reorder. No logic changes — only execution ordering. The alternative of lazy
+initialization inside `TurboVecStore.__init__` (importing and calling on first use) was considered
+but rejected: it would hide the dependency, complicate the dimension-probe call site, and defer a
+startup-time error to the first embedding operation. Explicit ordering is preferable.
+
+**Consequences:**
+`memu-core/app.py` only. No interface, schema, or behavior changes. `sentence-transformers` model
+load (which logs `"sentence-transformers loaded — model=..."`) now happens before the store
+selection log line rather than after — visible in container startup logs.
