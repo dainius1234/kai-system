@@ -11,9 +11,9 @@
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
   <img src="https://img.shields.io/badge/services-33-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-1%2C825_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-2%2C279_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
-  <img src="https://img.shields.io/badge/Python-~54%2C980_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/Python-~53%2C834_LOC-yellow?style=flat-square" alt="loc">
   <img src="https://img.shields.io/badge/milestones-32_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
@@ -21,14 +21,14 @@
 
 ---
 
-## Project Status (23 July 2026)
+## Project Status (24 July 2026)
 
 | Metric | Value |
 |---|---|
 | **Services** | 33 Docker containers |
 | **Test targets** | 77 (`make test-core`) |
-| **Individual tests** | 1,973 (`def test_` across 100 files) |
-| **Python LOC** | ~49,773 |
+| **Individual tests** | 2,279 (`def test_` across 105 files) |
+| **Python LOC** | ~53,834 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 32 |
 | **Failures** | 0 |
@@ -132,7 +132,7 @@ Kai PM operations now live in [`kai-pm/`](kai-pm), with [`kai-pm/SESSION_BOOTSTR
 | **Token Counting** | ~~±40% heuristic (4 chars per token)~~ **Fixed**: tiktoken-based accurate counting + per-message overhead | Already done — tiktoken installed |
 | **Context Budget** | ~~Hardcoded 3072 tokens wastes 90% of larger models~~ **Fixed**: auto-adapts from model registry. qwen2:0.5b→3072, qwen2.5:7b→28672, kimi→122K | Already done — model-aware |
 | **Prompt Templates** | ~~Hardcoded strings~~ **Fixed**: model-aware templates. Tier 1 (tiny): minimal. Tier 2 (7B): reasoning guidelines. Tier 3 (70B): JSON hints + deep persona | Already done — scales automatically |
-| **Test Style** | 1,825 tests verify structural correctness + 37 chassis tests + 15 behavioral tests. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
+| **Test Style** | 2,279 tests (105 files) verify structural correctness + chassis + behavioral. Most do NOT test whether the AI is actually smart — they test the plumbing | Add more behavioral tests as model quality improves |
 | **Dashboard** | Chat, Health, Memory, Soul editor, Diary, Canvas (D3) are functional. Thinking, Goals, Logs are **proxy shells** — they work when backends are running but show "unavailable" in minimal stack | Views become live with `make full-up` |
 | **Memory Persistence** | Default is now TurboVec ANN index (persisted `.tv` file + Postgres metadata — no pgvector extension required). Sovereign stack stays on `pgvector`. Full graph memory (`memu-graph`) is feature-flagged off by default (`FF_GRAPH_INGEST=false`) | Set `VECTOR_STORE`, `TURBOVEC_INDEX_PATH` in `.env`; see `.env.example` |
 | **Security Defaults** | HMAC enforced, but DB password is `localdev` by default. Nonce replay persisted to file. Dev HMAC secret now blocked unless explicitly allowed | Set `DB_PASSWORD`, `INTERSERVICE_HMAC_SECRET` env vars for production |
@@ -382,6 +382,9 @@ H3  Context Budget          ██████████ DONE
 | **M5** | TurboVec activated as default VECTOR_STORE | **DONE** — D40; dev/CI stacks use TurboVec ANN; sovereign stays on pgvector |
 | **P29** | Financial Awareness | **DONE** — CIS/VAT/tax arithmetic service (`financial-awareness`, port 8063, D57, PR #83) |
 | **Letta** | Letta archival memory controller | **DONE** — `letta-agent` service (port 8062), 12-way gather, `FF_LETTA_TASKS` flag (D55, PR #82); live smoke-test pending GPU |
+| **S7** | Shell Sandbox | **DONE** — `sandboxes/shell/app.py`; allowlisted read-only commands (cat/ls/ps/…), 64 KB output cap, no `shell=True`, explicit 400 on oversized input (PR #93, #95) |
+| **T3** | RAMS Generator | **DONE** — `scripts/hse_rams.py`; HSE-format Word doc from `site_data.csv` with colour-coded risk matrix, unified `_RISK_LEVELS` table, sign-off table (PR #93, #95) |
+| **U4** | File Upload (OCR) | **DONE** — dashboard `/api/upload`; text inject + image OCR via screen-capture; drag-and-drop + paste in frontend; split 4xx/5xx error handling (PR #94, #95) |
 | **GPU** | Hardware Performance | **Phase 0 DONE** — detection, env toggles, speculative-decoding config, model registry expansion (`docs/gpu_integration_phase0.md`); hardware-dependent execution still pending |
 
 *Sources: OpenClaw, Jarvis variants, Proact-VL (arXiv:2603.03447). All offline, low-resource, test on qwen2.5:0.5b first.*

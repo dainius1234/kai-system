@@ -12,12 +12,12 @@ process-level failure isolation between hot and cold paths.
 
 ---
 
-## 2) Current phase + current focus (23 July 2026)
+## 2) Current phase + current focus (24 July 2026)
 
 **Phase: Phase 0 — COMPLETE. Blocked on GPU hardware (RTX 5080) to enter Phase 1.**
 
-All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. The cleanup sprint
-(D71–D78) is fully merged (PR #88, 2026-07-23). No open PRs.
+All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Simplify sprint
+(D85) fully merged (PR #95/#96, 2026-07-24). No open PRs.
 
 ### What has shipped to `main` (merged PRs, in order)
 
@@ -35,6 +35,12 @@ All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. The cleanup 
 | #87 | CI fix: pii_redacted type, chassis httpx mock, financial-awareness sys.modules collision | D65 |
 | #88 | Cleanup sprint: merge-gate, redis stub, MAKEFILE_TARGETS, CI isolation fixes, 5-module coverage gate (60%), env-specific skips; TurboVecStore BIGSERIAL race + generate_embedding ordering fix | D71–D78 |
 | #89 | COMPOSE_DRIFT fixes D1/D2/D6/D9/D10; README sync; SESSION_BOOTSTRAP + DECISIONS.md D77–D80 housekeeping | D79, D80 |
+| #91 | Phase 1 readiness S1–S5: langgraph shim removed, agentic/memu-core route tests, sovereign CI boot, GPU runbook; C4/C10/P1 screen-capture; F4/F6 feature-flag tests; 2 bug fixes | D82, D83 |
+| #92 | CI test-isolation: tesseract binary probe, lakefs_client importlib isolation; 30 failures resolved; 2243 tests passing | D84 |
+| #93 | PM housekeeping; S7 shell sandbox (`sandboxes/shell/`); T3 RAMS generator (`scripts/hse_rams.py`) | — |
+| #94 | U4 file upload: dashboard text-inject + image OCR via screen-capture; `/api/upload`; drag-and-drop + paste | — |
+| #95 | Simplify sprint: unified `_RISK_LEVELS`, explicit 400 on oversized shell input, `raise_for_status()` split, JS closure hoist; sovereign compose `:?` → `:-`; CI disk-cleanup step | D85 |
+| #96 | PM docs: D85 + STATUS.md update for PRs #93–95 | — |
 
 ### In-flight work
 
@@ -44,12 +50,12 @@ None. All work is on `main`. No open PRs.
 
 ## 3) Next priorities (in order)
 
-1. **S1 — DONE** — langgraph/ shim removed; 38 test scripts redirected to agentic/; langgraph/ deleted (commit 0e5d659)
-2. **S2 — DONE** — agentic/app.py route tests: 57 tests, 34%→43% coverage (commit f4218cb)
-3. **S3 — DONE** — memu-core/app.py route tests: 91 tests, 53%→59% coverage (commit b8cd86f); 5-module total 63%
-4. **S4 — DONE** — sovereign CI boot-test added to core-tests.yml (commit 05dd574)
-5. **S5 — DONE** — `kai-pm/GPU_ARRIVAL_RUNBOOK.md` written with G1–G8 real commands (this commit)
-6. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1 (D82)
+1. **S1–S5 — DONE** (PR #91, D82) — langgraph shim removed, route tests, sovereign CI boot, GPU runbook
+2. **S7 — DONE** (PR #93) — shell sandbox service (`sandboxes/shell/`)
+3. **T3 — DONE** (PR #93) — HSE RAMS generator (`scripts/hse_rams.py`)
+4. **U4 — DONE** (PR #94) — file upload + OCR in dashboard
+5. **Simplify sprint — DONE** (PR #95, D85) — quality cleanup across 4 files + CI fixes
+6. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
 
 Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
@@ -86,14 +92,14 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 - **Model**: `qwen2.5:0.5b` (default). Embedding: `all-MiniLM-L6-v2` (384-dim).
 - **Embedding endpoint**: `/api/embed` (not deprecated `/api/embeddings`). Confirmed D47.
 - **TurboVecStore startup**: embedding backend (`_embedding_backend` / `generate_embedding`) must be defined before store selection block in `memu-core/app.py` — see D78.
-- **Tests**: 1825 collected, 0 errors. `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
-- **Coverage**: 5 modules (`common`, `agentic`, `memu-core`, `letta-agent`, `financial-awareness`), 62.67% measured, 60% gate.
+- **Tests**: 2,279 across 105 files; 2,243 passing in CI (D84). `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
+- **Coverage**: 5 modules (`common`, `agentic`, `memu-core`, `letta-agent`, `financial-awareness`), 60% gate.
 
 ---
 
 ## 6) PM operating rules
 
-- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D82**.
+- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D85**.
 - Reality checks → new file `REALITY_CHECK_<date>.md`, not silent rewrites.
 - No drift between docs, status, and delivered code.
 - `make sync-docs` after major changes; `make merge-gate` before every PR.
@@ -113,7 +119,7 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
 | File | What |
 |------|------|
-| `kai-pm/DECISIONS.md` | Append-only decision log (D1–D78) |
+| `kai-pm/DECISIONS.md` | Append-only decision log (D1–D85) |
 | `kai-pm/STATUS.md` | Sprint health + open PRs |
 | `kai-pm/CLEANUP_TODO.md` | Cleanup sprint tracker (all items done except §2.1 merge-order decision) |
 | `kai-pm/COMPOSE_DRIFT.md` | Docker compose divergence audit (§2.2 shared-block extraction deferred) |
