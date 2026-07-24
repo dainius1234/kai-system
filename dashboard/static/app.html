@@ -1181,6 +1181,39 @@
                 <div id="sysLoad" style="font-size:1.4rem;font-weight:600;">—</div>
               </div>
             </div>
+            <!-- Weather + Air Quality row -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin-bottom:var(--sp-4);">
+              <div class="card" style="padding:var(--sp-3);">
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">Weather</div>
+                <div id="sysWeatherMain" style="font-size:1.2rem;font-weight:600;">—</div>
+                <div id="sysWeatherDetail" style="font-size:0.75rem;color:var(--text-muted);"></div>
+              </div>
+              <div class="card" style="padding:var(--sp-3);">
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">Air Quality</div>
+                <div id="sysAqiMain" style="font-size:1.2rem;font-weight:600;">—</div>
+                <div id="sysAqiDetail" style="font-size:0.75rem;color:var(--text-muted);"></div>
+              </div>
+            </div>
+            <!-- Docker containers -->
+            <div class="card" style="padding:var(--sp-4);margin-bottom:var(--sp-4);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-3);">
+                <h3 style="font-size:0.9rem;color:var(--text-muted);">Docker Containers</h3>
+                <div id="dockerUnhealthyBadge" style="font-size:0.75rem;background:#ef4444;color:#fff;border-radius:9999px;padding:2px 7px;display:none;"></div>
+              </div>
+              <div id="dockerSummary" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:var(--sp-2);">Loading…</div>
+              <div style="overflow-x:auto;max-height:200px;overflow-y:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+                  <thead><tr style="border-bottom:1px solid var(--border);">
+                    <th style="text-align:left;padding:3px 6px;">Name</th>
+                    <th style="text-align:left;padding:3px 6px;">Image</th>
+                    <th style="text-align:left;padding:3px 6px;">Status</th>
+                    <th style="text-align:left;padding:3px 6px;">Health</th>
+                    <th style="text-align:right;padding:3px 6px;">Restarts</th>
+                  </tr></thead>
+                  <tbody id="dockerList"></tbody>
+                </table>
+              </div>
+            </div>
             <!-- Screen watcher -->
             <div class="card" style="padding:var(--sp-4);margin-bottom:var(--sp-4);">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-3);">
@@ -1219,6 +1252,15 @@
               <div style="display:flex;gap:var(--sp-2);">
                 <button class="refresh-btn" onclick="refreshFeeds()">Refresh</button>
               </div>
+            </div>
+            <!-- Calendar -->
+            <div class="card" style="padding:var(--sp-4);margin-bottom:var(--sp-4);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-3);">
+                <h3 style="font-size:0.9rem;color:var(--text-muted);">Calendar</h3>
+                <button class="refresh-btn" onclick="refreshCalendar()">Refresh</button>
+              </div>
+              <div id="calendarSummary" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:var(--sp-2);">Loading…</div>
+              <div id="calendarList" style="display:flex;flex-direction:column;gap:var(--sp-2);max-height:250px;overflow-y:auto;"></div>
             </div>
             <!-- Email -->
             <div class="card" style="padding:var(--sp-4);margin-bottom:var(--sp-4);">
@@ -5528,10 +5570,14 @@ let _systemInterval = null;
 
 async function refreshSystem() {
   try {
-    const [snap, procs, watcher] = await Promise.all([
+    const [snap, procs, watcher, weather, aqi, docker, dockerSumResp] = await Promise.all([
       fetch('/api/sysmetrics/snapshot').then(r => r.json()).catch(() => ({})),
       fetch('/api/sysmetrics/processes').then(r => r.json()).catch(() => ({processes:[]})),
       fetch('/api/screen-watcher/status').then(r => r.json()).catch(() => ({})),
+      fetch('/api/weather/current').then(r => r.json()).catch(() => ({})),
+      fetch('/api/airquality/current').then(r => r.json()).catch(() => ({})),
+      fetch('/api/docker/containers').then(r => r.json()).catch(() => ({containers:[], total:0})),
+      fetch('/api/docker/summary').then(r => r.json()).catch(() => ({summary:''})),
     ]);
     const cpu = snap.cpu || {};
     const mem = snap.memory || {};
@@ -5544,6 +5590,32 @@ async function refreshSystem() {
     document.getElementById('sysDisk').textContent = disk.percent != null ? disk.percent.toFixed(1) + '%' : '—';
     document.getElementById('sysDiskDetail').textContent = disk.used_gb ? `${disk.used_gb} / ${disk.total_gb} GB` : '';
     document.getElementById('sysLoad').textContent = load.length ? load[0].toFixed(2) : '—';
+    // Weather
+    if (weather.temp_c != null) {
+      document.getElementById('sysWeatherMain').textContent = `${weather.temp_c}°C — ${weather.description || ''}`;
+      document.getElementById('sysWeatherDetail').textContent = `${weather.location || ''} · Wind ${weather.wind_kph || 0} kph`;
+    }
+    // Air quality
+    if (aqi.aqi_category) {
+      document.getElementById('sysAqiMain').textContent = aqi.aqi_category;
+      document.getElementById('sysAqiDetail').textContent = aqi.pm2_5_ugm3 != null ? `PM2.5 ${aqi.pm2_5_ugm3} µg/m³ · UV ${aqi.uv_index ?? '—'}` : '';
+    }
+    // Docker
+    const unhealthyBadge = document.getElementById('dockerUnhealthyBadge');
+    const containers = docker.containers || [];
+    const unhealthyCount = containers.filter(c => c.health !== 'healthy' && c.health !== 'none').length;
+    unhealthyBadge.textContent = `${unhealthyCount} unhealthy`;
+    unhealthyBadge.style.display = unhealthyCount > 0 ? '' : 'none';
+    document.getElementById('dockerSummary').textContent = dockerSumResp.summary || `${docker.total || 0} containers`;
+    document.getElementById('dockerList').innerHTML = containers.map(c =>
+      `<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:3px 6px;">${c.name}</td>
+        <td style="padding:3px 6px;color:var(--text-muted);">${c.image}</td>
+        <td style="padding:3px 6px;">${c.status}</td>
+        <td style="padding:3px 6px;${c.health==='unhealthy'?'color:#ef4444;font-weight:600;':''}">${c.health}</td>
+        <td style="padding:3px 6px;text-align:right;${c.restarts>3?'color:#ef4444;':''}">${c.restarts}</td>
+      </tr>`
+    ).join('') || '<tr><td colspan="5" style="padding:8px;color:var(--text-muted);">No data</td></tr>';
     document.getElementById('sysStatus').textContent = `Updated ${new Date().toLocaleTimeString()}`;
     const tbody = document.getElementById('sysProcesses');
     tbody.innerHTML = (procs.processes || []).map(p =>
@@ -5584,8 +5656,31 @@ async function screenWatchStop() {
 let _feedsInterval = null;
 
 async function refreshFeeds() {
+  refreshCalendar();
   refreshEmail();
   refreshNews();
+}
+
+async function refreshCalendar() {
+  try {
+    const [today, summary] = await Promise.all([
+      fetch('/api/calendar/events/today').then(r => r.json()).catch(() => ({events:[]})),
+      fetch('/api/calendar/summary').then(r => r.json()).catch(() => ({summary:''})),
+    ]);
+    document.getElementById('calendarSummary').textContent = summary.summary || `${today.events.length} event(s) today`;
+    document.getElementById('calendarList').innerHTML = (today.events.length
+      ? today.events
+      : (fetch('/api/calendar/events/upcoming?days=3').then(r => r.json()).catch(() => ({events:[]})).then(u => u.events) || [])
+    );
+    // Simpler: just show today events, fallback message
+    const evts = today.events || [];
+    document.getElementById('calendarList').innerHTML = evts.length
+      ? evts.map(e => `<div style="padding:var(--sp-2);border:1px solid var(--border);border-radius:6px;background:var(--bg-2);">
+          <div style="font-weight:600;font-size:0.85rem;">${e.summary}</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);">${(e.start||'').slice(11,16)} · ${e.location || e.calendar}</div>
+        </div>`).join('')
+      : '<div style="color:var(--text-muted);font-size:0.82rem;">No events today</div>';
+  } catch {}
 }
 
 async function refreshEmail() {

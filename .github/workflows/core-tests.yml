@@ -109,6 +109,23 @@ jobs:
           pip install feedparser --quiet || true
           make test-news-feed
 
+      - name: Weather service tests (mocked httpx)
+        run: |
+          make test-weather-service
+
+      - name: Docker watcher service tests (mocked docker SDK)
+        run: |
+          make test-docker-watcher
+
+      - name: Air quality service tests (mocked httpx)
+        run: |
+          make test-airquality
+
+      - name: Calendar service tests (mocked caldav + icalendar)
+        run: |
+          pip install caldav icalendar --quiet || true
+          make test-calendar-service
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors

@@ -1268,6 +1268,10 @@ DOC_PARSER_URL = os.getenv("DOC_PARSER_URL", "http://document-parser:8032")
 MONITOR_URL = os.getenv("MONITOR_SERVICE_URL", "http://monitor-service:8033")
 BROKER_URL = os.getenv("BROKER_URL", "http://broker-bridge:8034")
 SYSMETRICS_URL = os.getenv("SYSMETRICS_URL", "http://sysmetrics:8035")
+WEATHER_SERVICE_URL = os.getenv("WEATHER_SERVICE_URL", "http://weather-service:8039")
+DOCKER_WATCHER_URL = os.getenv("DOCKER_WATCHER_URL", "http://docker-watcher:8041")
+AIRQUALITY_URL = os.getenv("AIRQUALITY_URL", "http://airquality-service:8042")
+CALENDAR_SERVICE_URL = os.getenv("CALENDAR_SERVICE_URL", "http://calendar-service:8043")
 SCREEN_WATCHER_URL = os.getenv("SCREEN_WATCHER_URL", "http://screen-watcher:8036")
 EMAIL_READER_URL = os.getenv("EMAIL_READER_URL", "http://email-reader:8037")
 NEWS_FEED_URL = os.getenv("NEWS_FEED_URL", "http://news-feed:8038")
@@ -1838,6 +1842,95 @@ async def api_broker_stats(symbol: str):
 @app.get("/api/broker/trades/{symbol}")
 async def api_broker_trades(symbol: str, limit: int = 20):
     return await _proxy_get(f"{BROKER_URL}/trades/{symbol}", params={"limit": limit}, fallback={"trades": []})
+
+
+# ── Weather service proxies ───────────────────────────────────────────────────
+
+@app.get("/api/weather/health")
+async def api_weather_health():
+    return await _proxy_get(f"{WEATHER_SERVICE_URL}/health", fallback={"status": "unavailable"})
+
+
+@app.get("/api/weather/current")
+async def api_weather_current():
+    return await _proxy_get(f"{WEATHER_SERVICE_URL}/current", fallback={})
+
+
+@app.get("/api/weather/forecast")
+async def api_weather_forecast():
+    return await _proxy_get(f"{WEATHER_SERVICE_URL}/forecast", fallback={"forecast": []})
+
+
+@app.get("/api/weather/summary")
+async def api_weather_summary():
+    return await _proxy_get(f"{WEATHER_SERVICE_URL}/summary", fallback={"summary": "Weather unavailable."})
+
+
+# ── Docker-watcher proxies ────────────────────────────────────────────────────
+
+@app.get("/api/docker/health")
+async def api_docker_health():
+    return await _proxy_get(f"{DOCKER_WATCHER_URL}/health", fallback={"status": "unavailable"})
+
+
+@app.get("/api/docker/containers")
+async def api_docker_containers():
+    return await _proxy_get(f"{DOCKER_WATCHER_URL}/containers", fallback={"containers": [], "total": 0})
+
+
+@app.get("/api/docker/unhealthy")
+async def api_docker_unhealthy():
+    return await _proxy_get(f"{DOCKER_WATCHER_URL}/unhealthy", fallback={"unhealthy": [], "count": 0})
+
+
+@app.get("/api/docker/summary")
+async def api_docker_summary():
+    return await _proxy_get(f"{DOCKER_WATCHER_URL}/summary", fallback={"summary": "Docker data unavailable."})
+
+
+# ── Air quality proxies ───────────────────────────────────────────────────────
+
+@app.get("/api/airquality/health")
+async def api_airquality_health():
+    return await _proxy_get(f"{AIRQUALITY_URL}/health", fallback={"status": "unavailable"})
+
+
+@app.get("/api/airquality/current")
+async def api_airquality_current():
+    return await _proxy_get(f"{AIRQUALITY_URL}/current", fallback={})
+
+
+@app.get("/api/airquality/summary")
+async def api_airquality_summary():
+    return await _proxy_get(f"{AIRQUALITY_URL}/summary", fallback={"summary": "Air quality unavailable."})
+
+
+# ── Calendar service proxies ──────────────────────────────────────────────────
+
+@app.get("/api/calendar/health")
+async def api_calendar_health():
+    return await _proxy_get(f"{CALENDAR_SERVICE_URL}/health", fallback={"status": "unavailable"})
+
+
+@app.get("/api/calendar/events/today")
+async def api_calendar_today():
+    return await _proxy_get(f"{CALENDAR_SERVICE_URL}/events/today", fallback={"events": []})
+
+
+@app.get("/api/calendar/events/upcoming")
+async def api_calendar_upcoming(days: int = 7):
+    return await _proxy_get(f"{CALENDAR_SERVICE_URL}/events/upcoming", params={"days": days},
+                            fallback={"events": []})
+
+
+@app.get("/api/calendar/summary")
+async def api_calendar_summary():
+    return await _proxy_get(f"{CALENDAR_SERVICE_URL}/summary", fallback={"summary": "Calendar not configured."})
+
+
+@app.post("/api/calendar/refresh")
+async def api_calendar_refresh():
+    return await _proxy_post(f"{CALENDAR_SERVICE_URL}/refresh", body={}, fallback={"ok": False})
 
 
 if __name__ == "__main__":

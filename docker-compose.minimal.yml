@@ -261,6 +261,10 @@ services:
       SCREEN_WATCHER_URL: http://screen-watcher:8036
       EMAIL_READER_URL: http://email-reader:8037
       NEWS_FEED_URL: http://news-feed:8038
+      WEATHER_SERVICE_URL: http://weather-service:8039
+      DOCKER_WATCHER_URL: http://docker-watcher:8041
+      AIRQUALITY_URL: http://airquality-service:8042
+      CALENDAR_SERVICE_URL: http://calendar-service:8043
       LANGGRAPH_URL: http://agentic:8007
     ports:
       - "8080:8080"
@@ -617,6 +621,98 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.28
+
+  weather-service:
+    build:
+      context: .
+      dockerfile: weather-service/Dockerfile
+    container_name: sovereign-weather-service
+    <<: *defaults
+    environment:
+      WEATHER_LAT: "${WEATHER_LAT:-51.5074}"
+      WEATHER_LON: "${WEATHER_LON:--0.1278}"
+      WEATHER_LOCATION: "${WEATHER_LOCATION:-London}"
+      WEATHER_REFRESH_SECONDS: "${WEATHER_REFRESH_SECONDS:-600}"
+    ports:
+      - "8039:8039"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8039/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.29
+
+  docker-watcher:
+    build:
+      context: .
+      dockerfile: docker-watcher/Dockerfile
+    container_name: sovereign-docker-watcher
+    <<: *defaults
+    environment:
+      DOCKER_REFRESH_SECONDS: "${DOCKER_REFRESH_SECONDS:-30}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "8041:8041"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8041/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.30
+
+  airquality-service:
+    build:
+      context: .
+      dockerfile: airquality-service/Dockerfile
+    container_name: sovereign-airquality-service
+    <<: *defaults
+    environment:
+      WEATHER_LAT: "${WEATHER_LAT:-51.5074}"
+      WEATHER_LON: "${WEATHER_LON:--0.1278}"
+      WEATHER_LOCATION: "${WEATHER_LOCATION:-London}"
+      AQ_REFRESH_SECONDS: "${AQ_REFRESH_SECONDS:-1800}"
+    ports:
+      - "8042:8042"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8042/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.31
+
+  calendar-service:
+    build:
+      context: .
+      dockerfile: calendar-service/Dockerfile
+    container_name: sovereign-calendar-service
+    <<: *defaults
+    environment:
+      CALDAV_URL: "${CALDAV_URL:-}"
+      CALDAV_USER: "${CALDAV_USER:-}"
+      CALDAV_PASS: "${CALDAV_PASS:-}"
+      CALDAV_REFRESH_SECONDS: "${CALDAV_REFRESH_SECONDS:-300}"
+      CALDAV_LOOK_AHEAD_DAYS: "${CALDAV_LOOK_AHEAD_DAYS:-14}"
+    ports:
+      - "8043:8043"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8043/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.32
 
   wake-service:
     build:

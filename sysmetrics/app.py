@@ -120,6 +120,42 @@ def processes():
     return {"processes": procs[:TOP_PROCESSES]}
 
 
+@app.get("/temperature")
+def temperature():
+    if not _PSUTIL_OK:
+        return {"error": "psutil not available", "sensors": {}}
+    if not hasattr(psutil, "sensors_temperatures"):
+        return {"sensors": {}, "note": "not supported on this OS"}
+    raw = psutil.sensors_temperatures() or {}
+    sensors: dict = {}
+    for name, entries in raw.items():
+        sensors[name] = [
+            {"label": e.label or name, "current_c": round(e.current, 1),
+             "high_c": round(e.high, 1) if e.high else None,
+             "critical_c": round(e.critical, 1) if e.critical else None}
+            for e in entries
+        ]
+    return {"sensors": sensors}
+
+
+@app.get("/battery")
+def battery():
+    if not _PSUTIL_OK:
+        return {"error": "psutil not available", "battery": None}
+    if not hasattr(psutil, "sensors_battery"):
+        return {"battery": None, "note": "not supported on this OS"}
+    b = psutil.sensors_battery()
+    if b is None:
+        return {"battery": None, "note": "no battery detected"}
+    return {
+        "battery": {
+            "percent": round(b.percent, 1),
+            "power_plugged": b.power_plugged,
+            "secs_left": b.secsleft if b.secsleft not in (psutil.POWER_TIME_UNLIMITED, psutil.POWER_TIME_UNKNOWN) else None,
+        }
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=PORT)
