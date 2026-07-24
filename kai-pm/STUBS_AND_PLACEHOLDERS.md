@@ -53,7 +53,6 @@ Views that render but show "unavailable" when their backend service isn't in the
 | U1 | **Thinking** (`Ctrl+3`) | `agentic-introspect` | `/api/thinking`, `/api/tempo`, `/api/boundaries`, `/api/silence`, `/api/dream` | `make full-up` |
 | U2 | **Goals** (`Ctrl+5`) | `agentic` | `/api/goals`, `/api/reminders`, `/api/tasks` | `make full-up` |
 | U3 | **Logs** (`Ctrl+7`) | `agentic-introspect` | `/api/logs`, `/api/security-audit` | `make full-up` |
-| U4 | **File attachment button** (`dashboard/static/app.html:1767`) | — | `handleFiles()` shows `"File attachments coming soon"` toast; no upload occurs | Implement `/api/upload` endpoint + file-to-chat routing |
 
 **Functional since last update (removed from shell list):**
 - Canvas → D3 v7 SVG (J1, 2026-07-21)
@@ -157,6 +156,4 @@ These are **intentional graceful-degradation paths** in `dashboard/app.py` — N
 
 ## Minor Cosmetic Stubs
 
-| Item | Location | Description |
-|---|---|---|
-| `alert()` call | `dashboard/static/app.html:2696` | Single `alert(msg)` — likely a confirmation modal stub; replace with an inline toast/modal |
+No open items.

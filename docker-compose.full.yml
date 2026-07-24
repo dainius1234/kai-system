@@ -177,6 +177,7 @@ services:
       HEARTBEAT_URL: http://heartbeat:8010
       SUPERVISOR_URL: http://supervisor:8051
       WAKE_URL: http://wake-service:8022
+      SCREEN_CAPTURE_URL: http://screen-capture:8059
     ports:
       - "8080:8080"
     healthcheck:
