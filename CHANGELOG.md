@@ -5,6 +5,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (PR #112, 2026-07-24)
+
+- **sysmetrics** (`sysmetrics/`, port 8035, `172.20.0.25`): system health snapshot via psutil; `GET /snapshot` → CPU/RAM/disk/network/load_avg; `GET /processes` → top-N by CPU; graceful stub when psutil absent. Dashboard proxies `/api/sysmetrics/{snapshot,processes}`. **System tab** shows live CPU/RAM/disk/load gauges + top-processes table (10s auto-refresh). 14 tests.
+- **screen-watcher** (`screen-watcher/`, port 8036, `172.20.0.26`): periodic screenshot diff + alerting; MD5 block-sample fingerprint (`_image_hash`); `_diff_score` compares consecutive hashes; fires notify-service + TTS when diff ≥ `CHANGE_THRESHOLD` (default 5%); `POST /watch/start|stop`; `GET /snapshot` returns cached PNG. Dashboard: start/stop buttons in System tab. 17 tests.
+- **email-reader** (`email-reader/`, port 8037, `172.20.0.27`): IMAP read-only polling (IMAP4_SSL, `readonly=True`); background poll loop via `run_in_executor`; stubs out gracefully when `MAIL_HOST`/`MAIL_USER`/`MAIL_PASS` absent; `GET /inbox`, `GET /unread`, `POST /refresh`. Dashboard: Feeds tab with inbox list + unread badge. 14 tests.
+- **news-feed** (`news-feed/`, port 8038, `172.20.0.28`): RSS aggregation via feedparser; three default feeds (BBC News, NYT Tech, Hacker News); background refresh loop (default 5 min); in-memory dedup/sort; `GET /feeds` CRUD, `GET /articles`, `GET /search`, `POST /refresh`. `SEED_FEEDS` env for extra feeds. Dashboard: Feeds tab with article list + live keyword search. 16 tests.
+- **Broker market depth** (5 new endpoints on `broker-bridge`): `GET /depth/{symbol}` (order book bids/asks), `GET /stats/24hr/{symbol}` (price change %, high/low/volume), `GET /trades/{symbol}` (recent trades), `GET /futures/funding/{symbol}` (funding rate + next funding time), `GET /futures/openinterest/{symbol}` (open interest). All use public Binance API — no API key required. Dashboard proxies `/api/broker/depth|stats|trades`.
+- **System tab** in dashboard: CPU/RAM/disk/load metric cards, screen-watcher start/stop + status, top-processes table (auto-refreshes every 10s).
+- **Feeds tab** in dashboard: email inbox + unread count badge (auto-refreshes every 60s), news article feed with tag/title/snippet, live news search.
+- CI: 4 new steps in `core-tests.yml` (sysmetrics, screen-watcher, email-reader, news-feed tests). 4 new Makefile targets.
+- Services: 43 → 47 in minimal stack. Tests: 2,404 → 2,465 (61 new).
+
+### Added (PR #111, 2026-07-24)
+
+- CI fix: removed spurious `global _browser, _playwright_inst` from `browser-agent/app.py:_lifespan` (flake8 F824); synced stale README metrics via `make sync-docs`.
+
 ### Added (PR #102, 2026-07-24)
 
 - **Browser Agent** (`browser-agent/`, port 8040, `172.20.0.17`): headless Playwright Chromium service; `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run` endpoints; persistent page with async lock; stub mode when playwright absent; `FF_BROWSER_AGENT` env flag. Dashboard proxies `/api/browser/{navigate,scrape,run,screenshot}`. Chat shortcut `browse: <url>` scrapes page and injects text as context before sending to Kai. 13 tests (`scripts/test_browser_agent.py`), all mocked.
