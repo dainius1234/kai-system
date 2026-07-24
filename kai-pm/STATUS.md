@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-24
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** PR #109 merged. Broker bridge live — Kai connects to Binance (spot/futures), shows positions and balance in the Broker tab, and creates monitor rules via Quick Watch. All CPU-safe pre-GPU work done. Blocked on GPU.
+- **Current focus:** PRs #109–#112 merged. Sensory expansion complete: 4 new services (sysmetrics, screen-watcher, email-reader, news-feed), broker market depth endpoints, System + Feeds dashboard tabs. All CPU-safe pre-GPU work done. Blocked on GPU.
 
 ## What's landed on main
 
@@ -28,6 +28,13 @@
 | #98 | D86 | Hardening sprint: shell sandbox `SAFE_DIRS` path restriction (11 tests); kill-isolation CI step; Trivy exit-code `'1'` + `ignore-unfixed`; per-module coverage floors (agentic ≥45%, memu-core ≥60%); `go_no_go` + `check-docs` as early CI gates; restart-persistence smoke test; upload endpoint security fuzz (14 tests) |
 | #99 | D86 | Memory Graph tab (D3 v7 force-directed, `/api/memory/graph-data`, category hubs, trust-tier colours, zoom/pan/drag, hover tooltip, detail card, filter); Whisper audio-service in minimal stack (172.20.0.15, WHISPER_BACKEND=stub); TTS service in minimal stack (172.20.0.16, edge-tts); `/api/audio/transcribe` + `/api/tts/synthesize` dashboard proxies; `toggleVoice()` MediaRecorder fallback; 🔊 speak button on all assistant messages |
 | #101 | — | Doc sweep: SESSION_BOOTSTRAP + CHANGELOG + README updated for PRs #97–#100 + D86 (milestones 32→35, services 33→35, tests 2,279→2,303) |
+| #102 | — | Browser agent (Playwright, 8040, .17) + Vision service (OpenCV+DeepFace, 8023, .18); `/api/browser/*` + `/api/vision/*` proxies; 📷 camera panel; 25 tests; services 35→37 |
+| #104 | — | clipboard-service (8024/.19), files-service (8025/.20), notify-service (8031/.21); browser `/search` + `search:` shortcut; 52 tests; services 37→40 |
+| #105 | — | document-parser (8032, .22): PDF/DOCX/XLSX/PPTX/DXF/DWG/ZIP/CSV; `/api/upload` extension routing; 22 tests; services 40→41 |
+| #107 | — | monitor-service (8033, .23): background rule engine, HTTP/scrape sources, notify+TTS, Monitor tab; 34 tests; services 41→42 |
+| #109 | — | broker-bridge (8034, .24): Binance REST, HMAC-SHA256, spot/futures, Broker tab, Quick Watch→monitor rules; 20 tests; services 42→43 |
+| #111 | — | CI fixes: flake8 F824 in browser-agent + stale README metrics |
+| #112 | — | Sensory expansion: sysmetrics (8035/.25), screen-watcher (8036/.26), email-reader (8037/.27), news-feed (8038/.28); broker market depth endpoints; System+Feeds dashboard tabs; 61 tests; services 43→47 |
 | #102 | — | Browser agent (`browser-agent/`, Playwright, port 8040, 172.20.0.17): `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run`, dashboard proxies, `browse:` chat shortcut, 13 tests. Vision service (`perception/vision/`, OpenCV+DeepFace, port 8023, 172.20.0.18): face detection, emotion, presence, 📷 camera panel in dashboard, 5 s frame sampling, 12 tests. 25 new tests total. |
 | #103 | — | Doc sweep: STATUS, SESSION_BOOTSTRAP, CHANGELOG, README for PR #102 (services 35→37) |
 | #104 | — | clipboard-service (8024/.19), files-service (8025/.20), notify-service (8031/.21), browser `/search`; `search:` chat shortcut; 📋 clipboard button; 52 tests; services 37→40 |
