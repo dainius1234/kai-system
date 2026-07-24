@@ -49,9 +49,10 @@ except ImportError:
 
 try:
     import pytesseract  # noqa: F401
+    pytesseract.get_tesseract_version()  # verify the binary is present, not just the Python package
     _tesseract_available = True
-except ImportError:
-    logger.info("pytesseract not available — OCR will be simulated")
+except Exception:
+    logger.info("pytesseract/tesseract not available — OCR will be simulated")
 
 try:
     from PIL import Image  # noqa: F401
@@ -72,10 +73,14 @@ class CaptureResult(BaseModel):
 def _ocr_image_bytes(img_bytes: bytes) -> str:
     """Run OCR on raw image bytes. Falls back to stub if dependencies missing."""
     if _tesseract_available and _pil_available:
-        from PIL import Image  # noqa: F811
-        import pytesseract  # noqa: F811
-        img = Image.open(io.BytesIO(img_bytes))
-        return pytesseract.image_to_string(img).strip()
+        try:
+            from PIL import Image  # noqa: F811
+            import pytesseract  # noqa: F811
+            img = Image.open(io.BytesIO(img_bytes))
+            return pytesseract.image_to_string(img).strip()
+        except Exception as e:
+            logger.warning("OCR failed: %s", e)
+            return "[OCR error]"
     return "[OCR unavailable — install pytesseract + Pillow + tesseract-ocr]"
 
 
