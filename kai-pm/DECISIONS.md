@@ -1560,3 +1560,36 @@ Items 1–4 remove redundant representations and silent failures that confuse fu
 - The upload endpoint returns the correct HTTP status on upstream 4xx errors and a distinct 503 (not 502) on connection failure.
 - The sovereign compose file parses cleanly in CI without Tailscale/Vault secrets; production deployments that set real secrets are unaffected.
 - CI no longer fails with disk exhaustion on full-stack builds; ~8–10 GB is recovered before Docker builds begin.
+
+## D86 — 2026-07-24 — Hardening sprint, Memory Graph, Whisper STT, edge-tts TTS
+
+**Context:**
+Two PRs merged to main on 2026-07-24 (PRs #98 and #99) completing the remaining pre-GPU CPU-safe work and adding the first multimodal perception/output loop to the minimal stack.
+
+**Decision — PR #98 (hardening sprint, 7 items):**
+1. **Shell sandbox path restriction** — `sandboxes/shell/app.py` v0.3.0: `_PATH_ARG_COMMANDS` frozenset (`cat`/`head`/`tail`/`wc`/`ls`/`du`); `SAFE_DIRS` tuple from `SANDBOX_SAFE_DIRS` env var (default `/tmp,/proc/self,/var/log/sovereign`); `_validate_path_args()` called in `/run` after allowlist check; `/allowlist` now reports `safe_dirs` and `path_restricted_commands`. 11 new tests in `TestShellSandboxPathRestriction`.
+2. **Kill-isolation CI step** — Stops `memu-core-introspect`, asserts `memu-core /health` still 200 and a memorize write still succeeds, restarts introspect and waits for recovery; validates the process-isolation guarantee on every push.
+3. **Trivy gate hardened** — `exit-code: '0'` → `'1'` plus `ignore-unfixed: true`; fixed-but-not-deployed vulns now break the build; unfixed noise suppressed.
+4. **Per-module coverage floors** — `make coverage-floors` checks `agentic ≥ 45%` and `memu-core ≥ 60%` via `coverage report --include`; new CI step after `test-core`.
+5. **`go_no_go` + `check-docs` as early CI gates** — both now run before `test-core` in `core-tests.yml`.
+6. **Restart-persistence smoke test** — `scripts/test_restart_persistence.py`: writes a marker memory, restarts the `memu-core` container via `docker compose restart`, waits for `/health`, retrieves the marker; confirms TurboVec index + SQLite survive restart through the mounted volume.
+7. **Upload endpoint security fuzz** — `scripts/security_fuzz_upload.py`: 14 tests covering size limits (413), empty filename (400/422), path traversal, null bytes, long filename, binary garbage, OCR 4xx passthrough, 5xx→502, unreachable→503; importlib isolation avoids module-cache collision.
+
+**Decision — PR #99 (Memory Graph + audio stack):**
+1. **Memory Graph tab** — D3 v7 force-directed graph in dashboard (`/api/memory/graph-data` backend, category hub nodes with count-scaled radius, memory leaf nodes with importance-scaled radius and trust-tier colour, `d3.zoom()` + `d3.drag()`, hover tooltip, click→detail card, category filter dropdown, topic query input, legend row, graceful empty-state when memu-core offline).
+2. **Whisper audio-service in minimal stack** — `perception/audio/` service added to `docker-compose.minimal.yml` at `172.20.0.15:8021`; `WHISPER_BACKEND=stub` default (safe for CI, override to `local` for real STT); `AUDIO_SERVICE_URL` wired into dashboard env.
+3. **TTS service in minimal stack** — `output/tts/` service (edge-tts, British Ryan voice) added to `docker-compose.minimal.yml` at `172.20.0.16:8030`; `TTS_SERVICE_URL` wired into dashboard env.
+4. **Dashboard audio proxies** — `POST /api/audio/transcribe` forwards browser audio blobs to `audio-service/capture/file` (60 s timeout); `POST /api/tts/synthesize` forwards to `tts-service/synthesize` and returns `audio/mpeg`; both map 4xx passthrough / 5xx→502 / unreachable→503.
+5. **MediaRecorder fallback in `toggleVoice()`** — When `SpeechRecognition` is unavailable (Firefox, privacy mode), uses `navigator.mediaDevices.getUserMedia` + `MediaRecorder` (webm/ogg), posts blob to `/api/audio/transcribe`, injects transcript into chatInput and fires `sendMessage()`. Orb state: listening→thinking→idle.
+6. **🔊 Speak button on assistant messages** — Each assistant bubble gets a Speak button that POSTs the message text to `/api/tts/synthesize` and plays the returned mp3 blob via `new Audio(url)`. Button toggles to ⏹ during playback; subsequent click stops. Degrades gracefully (toast) when TTS service offline.
+7. **Audio transcribe fuzz tests** — `scripts/test_audio_transcribe.py`: 13 tests covering path traversal, null bytes, long filename, empty file, binary garbage, ogg/wav content types, injection flag passthrough, unreachable→503, 4xx passthrough, 5xx→502. Added to `Makefile` (`test-audio-transcribe`) and CI (`core-tests.yml`).
+
+**Rationale:**
+The hardening items (PR #98) close seven concrete gaps identified in `docs/production_hardening_plan.md` that would compound under real 7B-model load. The audio stack (PR #99) completes the first end-to-end perception/output loop: browser microphone → Whisper STT → Kai chat → edge-tts TTS → browser speaker. This makes the voice button actually useful in all browsers without depending on the WebSpeech API or Chromium, and gives Kai a voice for the first time. Both PRs are CPU-safe and GPU-agnostic.
+
+**Consequences:**
+- Shell sandbox now enforces filesystem boundaries; any new path-arg command must be added to `_PATH_ARG_COMMANDS` and its allowed directories to `SAFE_DIRS`.
+- Minimal stack now runs 6 additional services beyond the core four (audio-service, tts-service, wake-service, supervisor, verifier, agentic-introspect). Resource footprint on CPU-only hardware increases accordingly.
+- TTS requires internet access for edge-tts (Microsoft endpoint); in air-gapped environments override `TTS_BACKEND=piper` when piper support is added.
+- The MediaRecorder path sends audio to the server (not the browser's speech API), giving complete privacy from browser vendors for voice input.
+- Last entry before GPU arrival. All CPU-safe pre-GPU items from `PHASE1_READINESS.md` S1–S5 are complete. Next major decision will be D87 on GPU Day (G1–G7 protocol from `GPU_ARRIVAL_RUNBOOK.md`).

@@ -1583,7 +1583,8 @@ function addMessage(role, content, skipSave) {
   if (role !== 'user') {
     const actions = document.createElement('div');
     actions.className = 'msg-actions';
-    actions.innerHTML = '<button onclick="copyMsg(this)">Copy</button>';
+    actions.innerHTML = '<button onclick="copyMsg(this)">Copy</button>'
+                      + '<button onclick="speakMsg(this)" title="Speak response">🔊</button>';
     contentDiv.appendChild(actions);
     // add feedback buttons
     const msgIdx = chatHistory.length;
@@ -1873,6 +1874,55 @@ function toggleVoice() {
     return;
   }
   _startMediaRecorder();
+}
+
+// TTS playback — speak an assistant message via the server Whisper/edge-tts pipeline
+let _ttsAudio = null;  // currently playing Audio element
+
+async function speakMsg(btn) {
+  // Stop any current playback
+  if (_ttsAudio) {
+    _ttsAudio.pause();
+    _ttsAudio = null;
+    btn.textContent = '🔊';
+    return;
+  }
+
+  // Grab the text from the message bubble (innerText strips HTML)
+  const msgContent = btn.closest('.msg-content');
+  const textEl = msgContent ? msgContent.querySelector('div') : null;
+  const text = textEl ? (textEl.innerText || textEl.textContent || '').trim() : '';
+  if (!text) { showToast('TTS', 'No text to speak', 'warning'); return; }
+
+  btn.textContent = '⏳';
+  btn.disabled = true;
+
+  try {
+    const resp = await fetch('/api/tts/synthesize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.slice(0, 5000), voice: 'kai-default' }),
+    });
+    if (!resp.ok) {
+      const detail = await resp.json().catch(() => ({}));
+      throw new Error(detail.detail || `HTTP ${resp.status}`);
+    }
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    _ttsAudio = new Audio(url);
+    btn.textContent = '⏹';
+    btn.disabled = false;
+    _ttsAudio.onended = () => {
+      btn.textContent = '🔊';
+      URL.revokeObjectURL(url);
+      _ttsAudio = null;
+    };
+    _ttsAudio.play();
+  } catch (err) {
+    btn.textContent = '🔊';
+    btn.disabled = false;
+    showToast('TTS', `Speech failed: ${err.message}`, 'error');
+  }
 }
 
 function attachFile() {

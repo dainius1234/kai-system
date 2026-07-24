@@ -55,6 +55,10 @@ jobs:
         run: |
           make test-upload-fuzz
 
+      - name: Audio transcribe endpoint fuzz (boundary + error-mapping)
+        run: |
+          make test-audio-transcribe
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors
