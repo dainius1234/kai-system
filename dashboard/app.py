@@ -1258,6 +1258,7 @@ async def api_chat_proxy(request: Request):
 
 SCREEN_CAPTURE_URL = os.getenv("SCREEN_CAPTURE_URL", "http://screen-capture:8059")
 AUDIO_URL = os.getenv("AUDIO_SERVICE_URL", "http://audio-service:8021")
+TTS_URL = os.getenv("TTS_SERVICE_URL", "http://tts-service:8030")
 _UPLOAD_MAX_BYTES = 10 * 1024 * 1024  # 10 MB — matches screen-capture service limit
 
 
@@ -1293,6 +1294,36 @@ async def api_upload(file: UploadFile = File(...)):
             status_code=503,
             detail=f"OCR service unreachable — start screen-capture or set SCREEN_CAPTURE_URL: {exc}",
         )
+
+
+@app.post("/api/tts/synthesize")
+async def api_tts_synthesize(request: Request):
+    """Proxy text-to-speech synthesis to the TTS service.
+
+    Accepts JSON: {text, voice?, rate?, volume?}
+    Returns audio/mpeg when TTS service is available, 503 when offline.
+    """
+    from fastapi.responses import Response as FastAPIResponse
+    body = await request.json()
+    text = str(body.get("text", "")).strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="Empty text")
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(f"{TTS_URL}/synthesize", json=body)
+            resp.raise_for_status()
+            return FastAPIResponse(
+                content=resp.content,
+                media_type="audio/mpeg",
+                headers={"X-Voice": resp.headers.get("X-Voice", "")},
+            )
+    except httpx.HTTPStatusError as exc:
+        status = exc.response.status_code
+        if 400 <= status < 500:
+            raise HTTPException(status_code=status, detail=f"TTS service rejected request: {exc}")
+        raise HTTPException(status_code=502, detail=f"TTS service error: {exc}")
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=503, detail=f"TTS service unreachable: {exc}")
 
 
 @app.post("/api/audio/transcribe")

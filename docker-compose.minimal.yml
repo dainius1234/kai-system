@@ -248,6 +248,7 @@ services:
       SUPERVISOR_URL: http://supervisor:8051
       WAKE_URL: http://wake-service:8022
       AUDIO_SERVICE_URL: http://audio-service:8021
+      TTS_SERVICE_URL: http://tts-service:8030
       LANGGRAPH_URL: http://agentic:8007
     ports:
       - "8080:8080"
@@ -274,6 +275,8 @@ services:
       wake-service:
         condition: service_started
       audio-service:
+        condition: service_started
+      tts-service:
         condition: service_started
       agentic:
         condition: service_started
@@ -302,6 +305,27 @@ services:
     depends_on:
       memu-core:
         condition: service_healthy
+
+  tts-service:
+    build:
+      context: .
+      dockerfile: output/tts/Dockerfile
+    container_name: sovereign-tts-service
+    <<: *defaults
+    environment:
+      TTS_BACKEND: "${TTS_BACKEND:-edge}"
+      TTS_VOICE: "${TTS_VOICE:-en-GB-RyanNeural}"
+    ports:
+      - "8030:8030"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8030/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.16
 
   wake-service:
     build:
