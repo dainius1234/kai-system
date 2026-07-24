@@ -1272,6 +1272,7 @@ WEATHER_SERVICE_URL = os.getenv("WEATHER_SERVICE_URL", "http://weather-service:8
 DOCKER_WATCHER_URL = os.getenv("DOCKER_WATCHER_URL", "http://docker-watcher:8041")
 AIRQUALITY_URL = os.getenv("AIRQUALITY_URL", "http://airquality-service:8042")
 CALENDAR_SERVICE_URL = os.getenv("CALENDAR_SERVICE_URL", "http://calendar-service:8043")
+GIT_WATCHER_URL = os.getenv("GIT_WATCHER_URL", "http://git-watcher:8044")
 SCREEN_WATCHER_URL = os.getenv("SCREEN_WATCHER_URL", "http://screen-watcher:8036")
 EMAIL_READER_URL = os.getenv("EMAIL_READER_URL", "http://email-reader:8037")
 NEWS_FEED_URL = os.getenv("NEWS_FEED_URL", "http://news-feed:8038")
@@ -1844,6 +1845,22 @@ async def api_broker_trades(symbol: str, limit: int = 20):
     return await _proxy_get(f"{BROKER_URL}/trades/{symbol}", params={"limit": limit}, fallback={"trades": []})
 
 
+@app.get("/api/broker/stocks/{symbol}")
+async def broker_stocks(symbol: str):
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        r = await client.get(f"{BROKER_URL}/stocks/{symbol}")
+        r.raise_for_status()
+        return r.json()
+
+
+@app.get("/api/broker/forex/{pair}")
+async def broker_forex(pair: str):
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        r = await client.get(f"{BROKER_URL}/forex/{pair}")
+        r.raise_for_status()
+        return r.json()
+
+
 # ── Weather service proxies ───────────────────────────────────────────────────
 
 @app.get("/api/weather/health")
@@ -1931,6 +1948,30 @@ async def api_calendar_summary():
 @app.post("/api/calendar/refresh")
 async def api_calendar_refresh():
     return await _proxy_post(f"{CALENDAR_SERVICE_URL}/refresh", body={}, fallback={"ok": False})
+
+
+# ── Git-watcher proxies ───────────────────────────────────────────────
+
+@app.get("/api/git/health")
+async def api_git_health():
+    return await _proxy_get(f"{GIT_WATCHER_URL}/health", fallback={"status": "unavailable"})
+
+
+@app.get("/api/git/repos")
+async def api_git_repos():
+    return await _proxy_get(f"{GIT_WATCHER_URL}/repos", fallback={"repos": [], "count": 0})
+
+
+@app.get("/api/git/dirty")
+async def api_git_dirty():
+    return await _proxy_get(f"{GIT_WATCHER_URL}/dirty", fallback={"repos": [], "count": 0})
+
+
+@app.get("/api/git/summary")
+async def api_git_summary():
+    return await _proxy_get(
+        f"{GIT_WATCHER_URL}/summary", fallback={"summary": "Git data unavailable."}
+    )
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import hmac
 import os
@@ -10,6 +11,12 @@ from typing import Any
 
 import httpx
 from fastapi import FastAPI, HTTPException, Query
+
+try:
+    import yfinance as yf
+    _YF_OK = True
+except ImportError:
+    _YF_OK = False
 
 app = FastAPI(title="Broker Bridge", version="0.1.0")
 
@@ -352,6 +359,66 @@ async def open_interest(symbol: str):
         "open_interest": float(data["openInterest"]),
         "time": data["time"],
     }
+
+
+# ── Stocks (yfinance — public data, no API key required) ─────────────────────
+
+@app.get("/stocks/{symbol}")
+async def stocks_symbol(symbol: str):
+    """Equity snapshot via yfinance."""
+    if not _YF_OK:
+        raise HTTPException(status_code=503, detail="yfinance not installed")
+    try:
+        loop = asyncio.get_running_loop()
+        fi = await loop.run_in_executor(None, lambda: yf.Ticker(symbol.upper()).fast_info)
+        return {
+            "symbol": symbol.upper(),
+            "currency": getattr(fi, "currency", None),
+            "last_price": getattr(fi, "last_price", None),
+            "previous_close": getattr(fi, "previous_close", None),
+            "day_high": getattr(fi, "day_high", None),
+            "day_low": getattr(fi, "day_low", None),
+            "fifty_two_week_high": getattr(fi, "fifty_two_week_high", None),
+            "fifty_two_week_low": getattr(fi, "fifty_two_week_low", None),
+            "volume": getattr(fi, "three_month_average_volume", None),
+            "market_cap": getattr(fi, "market_cap", None),
+            "exchange": getattr(fi, "exchange", None),
+        }
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"yfinance error: {exc}") from exc
+
+
+# ── Forex (yfinance — public data, no API key required) ──────────────────────
+
+@app.get("/forex/{pair}")
+async def forex_pair(pair: str):
+    """Forex rate via yfinance. Accepts 'EURUSD' or 'EURUSD=X'."""
+    if not _YF_OK:
+        raise HTTPException(status_code=503, detail="yfinance not installed")
+    normalized = pair.upper()
+    if normalized.endswith("=X"):
+        symbol = normalized
+        normalized = normalized[:-2]
+    else:
+        symbol = normalized + "=X"
+    try:
+        loop = asyncio.get_running_loop()
+        fi = await loop.run_in_executor(None, lambda: yf.Ticker(symbol).fast_info)
+        return {
+            "pair": normalized,
+            "symbol": symbol,
+            "rate": getattr(fi, "last_price", None),
+            "previous_close": getattr(fi, "previous_close", None),
+            "day_high": getattr(fi, "day_high", None),
+            "day_low": getattr(fi, "day_low", None),
+            "currency": getattr(fi, "currency", None),
+        }
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"yfinance error: {exc}") from exc
 
 
 if __name__ == "__main__":

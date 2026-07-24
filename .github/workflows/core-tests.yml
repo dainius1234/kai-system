@@ -126,6 +126,12 @@ jobs:
           pip install caldav icalendar --quiet || true
           make test-calendar-service
 
+      - name: Git watcher service tests
+        run: make test-git-watcher
+
+      - name: Stocks/forex yfinance tests (mocked yfinance)
+        run: pip install yfinance --quiet || true && make test-broker-bridge-yfinance
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors
