@@ -157,6 +157,7 @@
               <div class="input-actions">
                 <button class="action-btn" onclick="toggleVoice()" id="voiceBtn" title="Voice input">🎤</button>
                 <button class="action-btn" onclick="toggleCamera()" id="cameraBtn" title="Toggle camera (Kai sees you)">📷</button>
+                <button class="action-btn" onclick="pasteClipboard()" id="clipboardBtn" title="Paste last clipboard item into message">📋</button>
                 <button class="action-btn" onclick="attachFile()" title="Attach file">📎</button>
                 <button class="send-btn" onclick="sendMessage()" id="sendBtn" title="Send">↑</button>
                 <button class="stop-btn" onclick="stopGeneration()" id="stopBtn" style="display:none" title="Stop">■</button>
@@ -1512,6 +1513,56 @@ document.addEventListener('click', function(e) {
 });
 
 
+// ── Clipboard helpers ─────────────────────────────────────────────
+
+async function pasteClipboard() {
+  try {
+    const resp = await fetch('/api/clipboard/latest');
+    if (!resp.ok) { showToast('Clipboard', 'Nothing in clipboard yet', 'info', 2000); return; }
+    const data = await resp.json();
+    if (!data.content) { showToast('Clipboard', 'Clipboard is empty', 'info', 2000); return; }
+    const input = document.getElementById('chatInput');
+    input.value = (input.value ? input.value + '\n' : '') + data.content;
+    autoResize(input);
+    input.focus();
+  } catch (e) { showToast('Clipboard unavailable', String(e), 'warning'); }
+}
+
+// Intercept browser copy events and relay to clipboard service
+document.addEventListener('copy', function() {
+  setTimeout(async function() {
+    try {
+      const text = window.getSelection().toString();
+      if (!text.trim()) return;
+      await fetch('/api/clipboard/push', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: text, source: 'browser' })
+      });
+    } catch (_) {}
+  }, 50);
+});
+
+
+// ── Notify-service polling ─────────────────────────────────────────
+
+async function pollPendingNotifications() {
+  try {
+    const resp = await fetch('/api/notify/pending?unread_only=true');
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const notes = data.notifications || [];
+    for (const n of notes) {
+      addNotification('kai:notify', `${n.title}: ${n.body}`);
+      // dismiss so we don't re-show it
+      fetch(`/api/notify/dismiss/${n.id}`, { method: 'DELETE' }).catch(() => {});
+    }
+  } catch (_) {}
+}
+
+// Poll every 10 s
+setInterval(pollPendingNotifications, 10000);
+
+
 // ── SSE Event Stream ───────────────────────────────────────────────
 
 let sseRetryTimeout = null;
@@ -1652,6 +1703,31 @@ async function sendMessage() {
       input.value = `[Browsed: ${result.title} — ${browseMatch[1]}]\n\n${(result.result || '').slice(0, 3000)}`;
       autoResize(input);
     }
+    return;
+  }
+
+  // search:<query> → web search via browser-agent and inject top results
+  const searchMatch = text.match(/^search:\s*(.+)/i);
+  if (searchMatch) {
+    const query = searchMatch[1].trim();
+    input.value = '';
+    autoResize(input);
+    showToast('Searching…', query, 'info', 3000);
+    try {
+      const resp = await fetch('/api/browser/search', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, max_results: 8 })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        const results = (data.results || []).slice(0, 8);
+        const summary = results.map((r, i) =>
+          `${i + 1}. **${r.title}**\n   ${r.url}\n   ${r.snippet}`
+        ).join('\n\n');
+        input.value = `[Search: "${query}"]\n\n${summary}`;
+        autoResize(input);
+      }
+    } catch (e) { showToast('Search failed', String(e), 'warning'); }
     return;
   }
 

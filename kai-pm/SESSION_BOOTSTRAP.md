@@ -47,6 +47,8 @@ All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Audio/TTS st
 | #100 | TTS service in minimal stack (`172.20.0.16`, edge-tts, `en-GB-RyanNeural`); `/api/tts/synthesize` proxy; 🔊 speak button on all assistant messages; `speakMsg()` with ObjectURL playback; audio transcribe fuzz suite (13 tests); `make test-audio-transcribe` | D86 |
 | #101 | Doc sweep: SESSION_BOOTSTRAP + CHANGELOG + README for PRs #97–#100 + D86 | — |
 | #102 | Browser agent (`browser-agent/`, Playwright Chromium, port 8040, `172.20.0.17`): `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run`; `/api/browser/*` dashboard proxies; `browse: <url>` chat shortcut; 13 tests. Vision service (`perception/vision/`, OpenCV+DeepFace, port 8023, `172.20.0.18`): face detection + emotion; `/api/vision/{analyze,presence}` proxies; 📷 camera panel (5 s frame sampling, presence+emotion overlay); 12 tests | — |
+| #103 | Doc sweep: STATUS, SESSION_BOOTSTRAP, CHANGELOG, README for PR #102 (services 35→37) | — |
+| #104 | clipboard-service (8024/.19), files-service (8025/.20), notify-service (8031/.21); browser `/search` + `search:` chat shortcut; 📋 clipboard button; notify pending poll; 52 tests; services 37→40 | — |
 
 ### In-flight work
 

@@ -158,5 +158,41 @@ class TestRun(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
 
 
+class TestSearch(unittest.TestCase):
+    def test_search_returns_results(self):
+        page = _make_page_mock(title="DuckDuckGo", text="")
+        results = [
+            {"title": "Python.org", "url": "https://python.org", "snippet": "The Python site"},
+            {"title": "Docs", "url": "https://docs.python.org", "snippet": "Python docs"},
+        ]
+        page.evaluate = AsyncMock(return_value=results)
+        with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
+             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+            r = client.post("/search", json={"query": "python programming", "max_results": 8})
+        self.assertEqual(r.status_code, 200)
+        data = r.json()
+        self.assertEqual(data["query"], "python programming")
+        self.assertEqual(len(data["results"]), 2)
+        self.assertEqual(data["results"][0]["title"], "Python.org")
+
+    def test_search_empty_query(self):
+        with patch.object(_mod, "_PLAYWRIGHT_OK", True):
+            r = client.post("/search", json={"query": "  "})
+        self.assertEqual(r.status_code, 400)
+
+    def test_search_no_playwright(self):
+        with patch.object(_mod, "_PLAYWRIGHT_OK", False):
+            r = client.post("/search", json={"query": "test"})
+        self.assertEqual(r.status_code, 503)
+
+    def test_search_clamps_max_results(self):
+        page = _make_page_mock(title="DDG", text="")
+        page.evaluate = AsyncMock(return_value=[])
+        with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
+             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+            r = client.post("/search", json={"query": "test", "max_results": 200})
+        self.assertEqual(r.status_code, 200)
+
+
 if __name__ == "__main__":
     unittest.main()

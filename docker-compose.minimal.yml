@@ -251,6 +251,9 @@ services:
       TTS_SERVICE_URL: http://tts-service:8030
       BROWSER_AGENT_URL: http://browser-agent:8040
       VISION_SERVICE_URL: http://vision-service:8023
+      CLIPBOARD_SERVICE_URL: http://clipboard-service:8024
+      FILES_SERVICE_URL: http://files-service:8025
+      NOTIFY_SERVICE_URL: http://notify-service:8031
       LANGGRAPH_URL: http://agentic:8007
     ports:
       - "8080:8080"
@@ -283,6 +286,12 @@ services:
       browser-agent:
         condition: service_started
       vision-service:
+        condition: service_started
+      clipboard-service:
+        condition: service_started
+      files-service:
+        condition: service_started
+      notify-service:
         condition: service_started
       agentic:
         condition: service_started
@@ -376,6 +385,70 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.18
+
+  clipboard-service:
+    build:
+      context: .
+      dockerfile: perception/clipboard/Dockerfile
+    container_name: sovereign-clipboard-service
+    <<: *defaults
+    environment:
+      CLIPBOARD_MAX_HISTORY: "${CLIPBOARD_MAX_HISTORY:-50}"
+      CLIPBOARD_MAX_BYTES: "${CLIPBOARD_MAX_BYTES:-262144}"
+    ports:
+      - "8024:8024"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8024/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.19
+
+  files-service:
+    build:
+      context: .
+      dockerfile: perception/files/Dockerfile
+    container_name: sovereign-files-service
+    <<: *defaults
+    environment:
+      WATCH_DIRS: "${WATCH_DIRS:-}"
+      FILES_MAX_EVENTS: "${FILES_MAX_EVENTS:-200}"
+    volumes:
+      - "${WATCH_ROOT:-/tmp}:/watched:ro"
+    ports:
+      - "8025:8025"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8025/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.20
+
+  notify-service:
+    build:
+      context: .
+      dockerfile: output/notify/Dockerfile
+    container_name: sovereign-notify-service
+    <<: *defaults
+    environment:
+      NOTIFY_MAX_PENDING: "${NOTIFY_MAX_PENDING:-100}"
+    ports:
+      - "8031:8031"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8031/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.21
 
   wake-service:
     build:

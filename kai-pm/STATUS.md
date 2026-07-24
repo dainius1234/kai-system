@@ -29,6 +29,8 @@
 | #99 | D86 | Memory Graph tab (D3 v7 force-directed, `/api/memory/graph-data`, category hubs, trust-tier colours, zoom/pan/drag, hover tooltip, detail card, filter); Whisper audio-service in minimal stack (172.20.0.15, WHISPER_BACKEND=stub); TTS service in minimal stack (172.20.0.16, edge-tts); `/api/audio/transcribe` + `/api/tts/synthesize` dashboard proxies; `toggleVoice()` MediaRecorder fallback; 🔊 speak button on all assistant messages |
 | #101 | — | Doc sweep: SESSION_BOOTSTRAP + CHANGELOG + README updated for PRs #97–#100 + D86 (milestones 32→35, services 33→35, tests 2,279→2,303) |
 | #102 | — | Browser agent (`browser-agent/`, Playwright, port 8040, 172.20.0.17): `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run`, dashboard proxies, `browse:` chat shortcut, 13 tests. Vision service (`perception/vision/`, OpenCV+DeepFace, port 8023, 172.20.0.18): face detection, emotion, presence, 📷 camera panel in dashboard, 5 s frame sampling, 12 tests. 25 new tests total. |
+| #103 | — | Doc sweep: STATUS, SESSION_BOOTSTRAP, CHANGELOG, README for PR #102 (services 35→37) |
+| #104 | — | clipboard-service (8024/.19), files-service (8025/.20), notify-service (8031/.21), browser `/search`; `search:` chat shortcut; 📋 clipboard button; 52 tests; services 37→40 |
 
 ## Open PRs
 

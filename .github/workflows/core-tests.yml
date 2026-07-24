@@ -67,6 +67,18 @@ jobs:
         run: |
           make test-vision-service
 
+      - name: Clipboard service tests
+        run: |
+          make test-clipboard-service
+
+      - name: File watcher service tests
+        run: |
+          make test-files-service
+
+      - name: Notify service tests
+        run: |
+          make test-notify-service
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors
