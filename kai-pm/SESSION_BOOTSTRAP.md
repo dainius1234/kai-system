@@ -53,6 +53,8 @@ All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Audio/TTS st
 | #106 | Doc sweep: STATUS + SESSION_BOOTSTRAP for PR #105 | — |
 | #107 | monitor-service (8033, `172.20.0.23`): background rule engine; HTTP/scrape sources; 11 condition ops; notify + TTS actions; interval + cooldown; Monitor tab; RULES_FILE persistence; 34 tests; services 41→42 | — |
 | #109 | broker-bridge (8034, `172.20.0.24`): Binance REST wrapper; HMAC-SHA256 signing; spot + futures (USDM) modes via `BINANCE_MODE`; `/ticker`, `/balance`, `/positions`, `/orders`, `/pnl/summary`, `/templates`; Broker tab (status, tickers, balance, positions, orders, Quick Watch, template browser); 20 tests; services 43 | — |
+| #111 | CI fixes: flake8 F824 in browser-agent/app.py; stale README metrics synced | — |
+| #112 | Sensory expansion: sysmetrics (8035, `172.20.0.25`), screen-watcher (8036, `172.20.0.26`), email-reader (8037, `172.20.0.27`), news-feed (8038, `172.20.0.28`); broker `/depth`, `/stats/24hr`, `/trades`, `/futures/funding`, `/futures/openinterest`; System + Feeds dashboard tabs; 61 tests; services 43→47 | — |
 
 ### In-flight work
 
@@ -76,7 +78,8 @@ None. All work is on `main`. No open PRs.
 12. **Document parser — DONE** (PR #105) — PDF, Word, Excel, PowerPoint, DXF, DWG, ZIP, all formats
 13. **Monitor service — DONE** (PR #107) — background rule engine, HTTP/scrape sources, notify + TTS alerts
 14. **Broker bridge — DONE** (PR #109) — Binance REST, spot/futures, Broker tab, Quick Watch → monitor rules
-15. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
+15. **Sensory expansion — DONE** (PR #112) — sysmetrics, screen-watcher, email-reader, news-feed; broker market depth; System + Feeds tabs
+16. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
 
 Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
@@ -109,7 +112,11 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
   - `browser-agent` — Playwright Chromium (`browser-agent/`), port 8040, IP `172.20.0.17`. Headless browser; `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run`. Dashboard proxies `/api/browser/*`. Chat shortcut `browse: <url>`.
   - `document-parser` — multi-format text extraction (`document-parser/`), port 8032, IP `172.20.0.22`. PDF (PyMuPDF), DOCX (python-docx), XLSX (openpyxl), XLS (xlrd), PPTX (python-pptx), DXF/DWG (ezdxf + LibreDWG `dwg2dxf`), ZIP (recursive), CSV/JSON/XML/HTML. Dashboard routes `/api/upload` by extension: images→OCR, documents→doc-parser.
   - `monitor-service` — background rule-based alerting (`monitor-service/`), port 8033, IP `172.20.0.23`. Rules: HTTP/scrape source + condition (gt/lt/gte/lte/eq/ne/contains/changed/+%/-%) + actions (notify-service, TTS). Per-rule interval + cooldown. RULES_FILE env for persistence. Monitor tab in dashboard with Add Rule form, live table, alert feed.
-  - `broker-bridge` — Binance REST wrapper (`broker-bridge/`), port 8034, IP `172.20.0.24`. `BINANCE_MODE=spot|futures`. HMAC-SHA256 signing for authenticated endpoints. `/ticker`, `/balance`, `/positions`, `/orders`, `/pnl/summary` (futures), `/templates`. Dashboard proxies `/api/broker/*`; `/api/broker/watch` creates monitor rule per position. Credentials via `BINANCE_API_KEY` + `BINANCE_API_SECRET` env vars.
+  - `broker-bridge` — Binance REST wrapper (`broker-bridge/`), port 8034, IP `172.20.0.24`. `BINANCE_MODE=spot|futures`. HMAC-SHA256 signing for authenticated endpoints. `/ticker`, `/balance`, `/positions`, `/orders`, `/pnl/summary` (futures), `/templates`, `/depth/{symbol}`, `/stats/24hr/{symbol}`, `/trades/{symbol}`, `/futures/funding/{symbol}`, `/futures/openinterest/{symbol}`. Dashboard proxies `/api/broker/*`; `/api/broker/watch` creates monitor rule per position. Credentials via `BINANCE_API_KEY` + `BINANCE_API_SECRET` env vars.
+  - `sysmetrics` — system health snapshot (`sysmetrics/`), port 8035, IP `172.20.0.25`. CPU/RAM/disk/network/processes via psutil. `/snapshot`, `/processes`. Dashboard proxies `/api/sysmetrics/*`; System tab shows gauges + process table + screen-watcher controls.
+  - `screen-watcher` — periodic screenshot diff + alert (`screen-watcher/`), port 8036, IP `172.20.0.26`. Captures from screen-capture service, MD5-samples for change detection, fires notify+TTS when diff ≥ threshold. `POST /watch/start|stop`. `CHANGE_THRESHOLD` env (default 0.05).
+  - `email-reader` — IMAP read-only polling (`email-reader/`), port 8037, IP `172.20.0.27`. Polls every `EMAIL_POLL_INTERVAL_SECONDS` (default 120s). Starts in stub mode when `MAIL_HOST`/`MAIL_USER`/`MAIL_PASS` unset. `/inbox`, `/unread`, `/refresh`. Dashboard proxies `/api/email/*`; Feeds tab.
+  - `news-feed` — RSS aggregation + keyword search (`news-feed/`), port 8038, IP `172.20.0.28`. Default feeds: BBC News, NYT Tech, Hacker News. `/feeds` CRUD, `/articles`, `/search`, `/refresh`. `SEED_FEEDS` env (comma-separated URLs). Dashboard proxies `/api/news/*`; Feeds tab.
   - `vision-service` — webcam frame analysis (`perception/vision/`), port 8023, IP `172.20.0.18`. OpenCV haar cascade (face detect) + DeepFace emotion (CPU-safe). Dashboard proxies `/api/vision/{analyze,presence}`. 📷 camera panel in frontend.
 - **VECTOR_STORE env var** in `memu-core`: `turbovec` (default dev/CI) → TurboVec; `postgres` → pgvector; else → ephemeral InMemory. Sovereign uses `postgres`.
 - **`FF_GRAPH_INGEST=true`** (default in full compose): every memorize/forget fans out to memu-graph. Best-effort — never blocks memu-core.
@@ -122,7 +129,7 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 - **Model**: `qwen2.5:0.5b` (default). Embedding: `all-MiniLM-L6-v2` (384-dim).
 - **Embedding endpoint**: `/api/embed` (not deprecated `/api/embeddings`). Confirmed D47.
 - **TurboVecStore startup**: embedding backend (`_embedding_backend` / `generate_embedding`) must be defined before store selection block in `memu-core/app.py` — see D78.
-- **Tests**: 2,404 across 112 files; per-module floors: `agentic ≥ 45%`, `memu-core ≥ 60%`. `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
+- **Tests**: 2,465 across 116 files; per-module floors: `agentic ≥ 45%`, `memu-core ≥ 60%`. `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
 - **Coverage**: 5 modules (`common`, `agentic`, `memu-core`, `letta-agent`, `financial-awareness`), 60% gate.
 
 ---

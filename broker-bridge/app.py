@@ -280,6 +280,80 @@ async def templates():
     }
 
 
+@app.get("/depth/{symbol}")
+async def depth(symbol: str, limit: int = Query(default=20, ge=5, le=1000)):
+    """Order book depth (bids + asks)."""
+    data = await _public_get("/api/v3/depth", params={"symbol": symbol.upper(), "limit": limit})
+    bids = [[float(p), float(q)] for p, q in data.get("bids", [])]
+    asks = [[float(p), float(q)] for p, q in data.get("asks", [])]
+    return {"symbol": symbol.upper(), "bids": bids, "asks": asks, "last_update_id": data.get("lastUpdateId")}
+
+
+@app.get("/stats/24hr/{symbol}")
+async def stats_24hr(symbol: str):
+    """24-hour rolling window statistics."""
+    data = await _public_get("/api/v3/ticker/24hr", params={"symbol": symbol.upper()})
+    return {
+        "symbol": data["symbol"],
+        "price_change": float(data["priceChange"]),
+        "price_change_pct": float(data["priceChangePercent"]),
+        "high": float(data["highPrice"]),
+        "low": float(data["lowPrice"]),
+        "volume": float(data["volume"]),
+        "quote_volume": float(data["quoteVolume"]),
+        "open": float(data["openPrice"]),
+        "close": float(data["lastPrice"]),
+        "trades": int(data["count"]),
+    }
+
+
+@app.get("/trades/{symbol}")
+async def recent_trades(symbol: str, limit: int = Query(default=20, ge=1, le=500)):
+    """Most recent trades for a symbol."""
+    data = await _public_get("/api/v3/trades", params={"symbol": symbol.upper(), "limit": limit})
+    return {
+        "symbol": symbol.upper(),
+        "trades": [
+            {
+                "id": t["id"],
+                "price": float(t["price"]),
+                "qty": float(t["qty"]),
+                "side": "BUY" if t["isBuyerMaker"] is False else "SELL",
+                "time": t["time"],
+            }
+            for t in data
+        ],
+    }
+
+
+@app.get("/futures/funding/{symbol}")
+async def funding_rate(symbol: str):
+    """Current and predicted funding rate (futures mode only)."""
+    if MODE != "futures":
+        raise HTTPException(status_code=400, detail="Funding rate only available in futures mode")
+    data = await _public_get("/fapi/v1/premiumIndex", params={"symbol": symbol.upper()}, base=FAPI_URL)
+    return {
+        "symbol": data["symbol"],
+        "mark_price": float(data["markPrice"]),
+        "index_price": float(data["indexPrice"]),
+        "funding_rate": float(data["lastFundingRate"]),
+        "next_funding_time": data["nextFundingTime"],
+    }
+
+
+@app.get("/futures/openinterest/{symbol}")
+async def open_interest(symbol: str):
+    """Open interest for a futures symbol."""
+    if MODE != "futures":
+        raise HTTPException(status_code=400, detail="Open interest only available in futures mode")
+    data = await _public_get("/fapi/v1/openInterest", params={"symbol": symbol.upper()}, base=FAPI_URL)
+    return {
+        "symbol": data["symbol"],
+        "open_interest": float(data["openInterest"]),
+        "time": data["time"],
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", "8034")))

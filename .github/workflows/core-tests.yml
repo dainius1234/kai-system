@@ -91,6 +91,24 @@ jobs:
         run: |
           make test-broker-bridge
 
+      - name: Sysmetrics service tests (mocked psutil)
+        run: |
+          pip install psutil --quiet || true
+          make test-sysmetrics
+
+      - name: Screen watcher service tests (mocked screen-capture)
+        run: |
+          make test-screen-watcher
+
+      - name: Email reader service tests (mocked IMAP)
+        run: |
+          make test-email-reader
+
+      - name: News feed service tests (mocked feedparser + httpx)
+        run: |
+          pip install feedparser --quiet || true
+          make test-news-feed
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors
