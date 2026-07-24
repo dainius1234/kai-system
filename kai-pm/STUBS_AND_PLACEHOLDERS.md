@@ -31,7 +31,6 @@
 | S3 | `perception/audio/app.py` | 37, 167–168 | When `WHISPER_BACKEND=stub` (or `faster-whisper` not installed), `_transcribe()` returns the literal string `"[transcript: stub mode — set WHISPER_BACKEND=local for real STT]"`. This string propagates into memu-core as a memory record. | Install `faster-whisper`; set `WHISPER_BACKEND=local` |
 | S4 | `screen-capture/app.py` | 78 | `_ocr_image_bytes()` returns `"[OCR unavailable — install pytesseract + Pillow + tesseract-ocr]"` when OCR dependencies are missing. Ends up stored in memory if service runs without them. | Install `pytesseract`, `Pillow`, system `tesseract-ocr` |
 | S5 | `memu-core/app.py` | 56–84 | When `lakefs_client` pip package is absent, an in-memory `LakeFSClient` is substituted. `revert()` is a no-op (line 77: `# no-op stub`). All version history is lost on process restart. | Install `lakefs_client`; wire a real LakeFS server URL |
-| S7 | `sandboxes/shell/app.py` | 27 | `POST /run` always returns `{"status": "blocked", "message": "sandbox execution disabled in stub"}`. No shell command is ever executed. | Implement subprocess sandbox with timeout, resource limits, and command allowlist |
 | S8 | `kai-advisor/app.py` | 53 | When no knowledge chunk matches the query, advisor replies `"I heard: '{q}', but I'm just a simple KAI advisor stub."` — substring matching over markdown docs with no LLM inference. | Wire LLM-backed RAG using `MODEL` env var |
 
 ---
@@ -42,7 +41,6 @@
 |---|------|---------|-------------|--------|
 | T1 | `docker-compose.sovereign.yml` | 439–446 | Two blocks commented out with `# TODO: enable GPU when core is stable.` — the `ollama` container and the `tts-service` build. Neither is wired in the sovereign profile. | Uncomment when GPU hardware validated |
 | T2 | `verifier/app.py` | 16–17, 283–310 | Strategy 4 (`_keyword_plausibility`) docstring: _"placeholder for multi-LLM consensus when DeepSeek-V4 + Kimi-2.5 are wired"_. Body uses regex absolute-language detection only. | Wire DeepSeek-V4 + Kimi-2.5; implement cross-model agreement scoring |
-| T3 | `scripts/hse_rams.py` | 11–13 | `main()` raises `NotImplementedError("RAMS generation not yet implemented. Needs python-docx, data/site_data.csv, and RAMS template.")`. Deliberately tracked in `quality_gate.py`'s `KNOWN_STUBS`. | Implement `python-docx` RAMS/method-statement generator |
 
 ---
 
@@ -134,7 +132,6 @@ When `sentence-transformers` isn't installed and `MEMU_ALLOW_FAKE_EMBEDDINGS=tru
 | Real TTS (edge-tts) | No audio hardware in CI | `tts-service/` | Same as STT |
 | Avatar / video | GPU + camera gated | `avatar-service/` | GPU + camera hardware provisioned |
 | Multi-model consensus | All 3 specialists route to same endpoint | `common/llm.py`, `fusion-engine/` | Wire `LLM_DEEPSEEK_URL`, `LLM_KIMI_URL`, `LLM_DOLPHIN_URL` |
-| `agentic-introspect` in sovereign profile | Missing from `docker-compose.sovereign.yml` | Known gap — documented in DECISIONS.md | Add service to sovereign compose |
 
 ---
 

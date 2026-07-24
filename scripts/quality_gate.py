@@ -23,10 +23,7 @@ SCRIPTS = ROOT / "scripts"
 # Files with a known, intentionally-incomplete feature, tracked outside this
 # gate. Listing a file here only suppresses the stub/TODO check — it still
 # must have a module docstring explaining what's missing and why.
-KNOWN_STUBS = {
-    "hse_rams.py": "RAMS.docx generation not yet implemented; needs python-docx "
-    "and a RAMS template — tracked as a real feature gap, not an accident.",
-}
+KNOWN_STUBS: dict[str, str] = {}
 
 _TODO_MARKER = re.compile(r"^(TODO|FIXME)\b", re.IGNORECASE)
 
