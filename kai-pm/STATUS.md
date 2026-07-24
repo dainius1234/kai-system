@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-24
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** PRs #98–#102 merged. Full perception stack on main: audio-service (STT), tts-service (TTS), browser-agent (Playwright navigation), vision-service (webcam/face/emotion). All CPU-safe pre-GPU work done. Blocked on GPU.
+- **Current focus:** PR #105 merged. Full document sharing stack: PDF, Word, Excel, PowerPoint, DXF, DWG, ZIP, images (OCR), text — all handled by Kai. All CPU-safe pre-GPU work done. Blocked on GPU.
 
 ## What's landed on main
 
@@ -31,6 +31,7 @@
 | #102 | — | Browser agent (`browser-agent/`, Playwright, port 8040, 172.20.0.17): `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run`, dashboard proxies, `browse:` chat shortcut, 13 tests. Vision service (`perception/vision/`, OpenCV+DeepFace, port 8023, 172.20.0.18): face detection, emotion, presence, 📷 camera panel in dashboard, 5 s frame sampling, 12 tests. 25 new tests total. |
 | #103 | — | Doc sweep: STATUS, SESSION_BOOTSTRAP, CHANGELOG, README for PR #102 (services 35→37) |
 | #104 | — | clipboard-service (8024/.19), files-service (8025/.20), notify-service (8031/.21), browser `/search`; `search:` chat shortcut; 📋 clipboard button; 52 tests; services 37→40 |
+| #105 | — | document-parser service (8032/.22): PDF (PyMuPDF), DOCX (python-docx), XLSX (openpyxl), XLS (xlrd), PPTX (python-pptx), DXF/DWG (ezdxf + LibreDWG dwg2dxf), ZIP (recursive), CSV/JSON/XML/HTML; `/api/upload` routing by extension; `_DOC_EXTS` frontend branch; 22 tests; services 40→41 |
 
 ## Open PRs
 
