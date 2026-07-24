@@ -10,11 +10,11 @@
 <p align="center">
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
-  <img src="https://img.shields.io/badge/services-51-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-2%2C567_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/services-57-blue?style=flat-square" alt="services">
+  <img src="https://img.shields.io/badge/tests-2%2C603_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
-  <img src="https://img.shields.io/badge/Python-~62%2C099_LOC-yellow?style=flat-square" alt="loc">
-  <img src="https://img.shields.io/badge/milestones-37_shipped-purple?style=flat-square" alt="milestones">
+  <img src="https://img.shields.io/badge/Python-~63%2C298_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/milestones-38_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
 </p>
@@ -25,12 +25,12 @@
 
 | Metric | Value |
 |---|---|
-| **Services** | 51 Docker containers |
-| **Test targets** | 77 (`make test-core`) |
-| **Individual tests** | 2,567 (`def test_` across 123 files) |
-| **Python LOC** | ~62,099 |
+| **Services** | 57 Docker containers |
+| **Test targets** | 80 (`make test-core`) |
+| **Individual tests** | 2,603 (`def test_` across 126 files) |
+| **Python LOC** | ~63,298 |
 | **Compose files** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 37 |
+| **Milestones shipped** | 38 |
 | **Failures** | 0 |
 
 > **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
@@ -43,7 +43,7 @@
 make core-up          # Start minimal stack (12 services + 1 one-shot model pull)
 make core-down        # Stop it
 make full-up          # Start all 31 services
-make test-core        # Run all 77 test targets (~1,656 tests)
+make test-core        # Run all 80 test targets (~2,603 tests)
 make go_no_go         # Syntax check all entry points
 make merge-gate       # Full pre-merge validation
 make sync-docs        # Auto-update README + backlog metrics
@@ -355,6 +355,7 @@ P1–P5 Enhancements         ██████████ DONE   GC  Eng. Gap-
 H3  Context Budget          ██████████ DONE   H4  Hardening Sprint    ██████████ DONE
 STT Whisper Audio Input     ██████████ DONE   TTS Voice Synthesis     ██████████ DONE
 Browser Navigation          ██████████ DONE   Vision / Camera         ██████████ DONE
+D87 Cognitive Architecture  ██████████ DONE   (world ctx + proactive observer + skill match)
 ```
 
 ### What's Next
@@ -393,6 +394,7 @@ Browser Navigation          ██████████ DONE   Vision / Camer
 | **TTS** | Voice Synthesis | **DONE** — `tts-service` (`output/tts/`, port 8030, edge-tts `en-GB-RyanNeural`) in minimal stack; 🔊 speak button on assistant messages; `speakMsg()` ObjectURL playback with ⏹ toggle (PR #100, D86) |
 | **Browser** | Web Navigation | **DONE** — `browser-agent` (Playwright Chromium, port 8040); navigate/click/type/scrape/screenshot/run; dashboard proxies; `browse: <url>` chat shortcut; 13 tests (PR #102) |
 | **Vision** | Camera / Face / Emotion | **DONE** — `vision-service` (OpenCV + DeepFace CPU, port 8023); face detection + emotion (happy/sad/angry/neutral/…); 📷 camera panel with 5 s frame sampling + presence overlay; 12 tests (PR #102) |
+| **D87** | Cognitive Architecture | **DONE** — `_get_world_context()` (9 sensory services per /chat, 2 s timeout, trivial-state filter); `_proactive_observer()` (background anomaly loop → memu-core proactive_observation memories every 300 s); skill matching wired into /chat; ghost flag fixes for FF_CONTEXT_ENRICHMENT + FF_PROACTIVE_AGENT; 14-way context gather; 17 tests |
 
 *Sources: OpenClaw, Jarvis variants, Proact-VL (arXiv:2603.03447). All offline, low-resource, test on qwen2.5:0.5b first.*
 

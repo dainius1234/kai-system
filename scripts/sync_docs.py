@@ -65,26 +65,21 @@ def count_python_loc() -> int:
 
 
 def count_services() -> int:
-    """Count services in docker-compose.full.yml."""
-    full = ROOT / "docker-compose.full.yml"
-    if not full.exists():
-        return 0
-    text = full.read_text()
-    # Count top-level service keys under 'services:'
-    in_services = False
-    count = 0
-    for line in text.splitlines():
-        if line.strip() == "services:":
-            in_services = True
-            continue
-        if in_services:
-            # A top-level service is a non-blank line with exactly 2-space indent
-            if re.match(r"^  [a-zA-Z]", line) and not line.startswith("    "):
-                count += 1
-            # Stop at next top-level key
-            if re.match(r"^[a-z]", line) and line.strip() != "":
-                break
-    return count
+    """Count unique services across all docker-compose*.yml files."""
+    names: set = set()
+    for compose_file in ROOT.glob("docker-compose*.yml"):
+        text = compose_file.read_text()
+        in_services = False
+        for line in text.splitlines():
+            if line.strip() == "services:":
+                in_services = True
+                continue
+            if in_services:
+                if re.match(r"^  [a-zA-Z]", line) and not line.startswith("    "):
+                    names.add(line.strip().rstrip(":"))
+                if re.match(r"^[a-z]", line) and line.strip():
+                    break
+    return len(names)
 
 
 def count_milestones() -> int:

@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-24
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** PRs #109–#114 merged. Sensory expansion waves 1 & 2 complete: 8 new services, broker market depth, full environmental awareness (weather, air quality, calendar, docker health). All CPU-safe pre-GPU work done. Blocked on GPU.
+- **Current focus:** D87 Cognitive Architecture shipped. Kai is now genuinely aware and proactive: world context injection (9 sensory services per /chat), background anomaly observer (writes proactive_observation memories to memu-core every 5 min), skill matching wired into /chat. Ghost flags fixed. All CPU-safe pre-GPU work done. Blocked on GPU (RTX 5080).
 
 ## What's landed on main
 
@@ -36,13 +36,9 @@
 | #111 | — | CI fixes: flake8 F824 in browser-agent + stale README metrics |
 | #112 | — | Sensory expansion: sysmetrics (8035/.25), screen-watcher (8036/.26), email-reader (8037/.27), news-feed (8038/.28); broker market depth endpoints; System+Feeds dashboard tabs; 61 tests; services 43→47 |
 | #114 | — | Sensory expansion wave 2: weather-service (8039/.29), docker-watcher (8041/.30), airquality-service (8042/.31), calendar-service (8043/.32); sysmetrics /temperature + /battery; dashboard weather/AQ/docker/calendar widgets; 63 tests; services 47→51 |
-| #102 | — | Browser agent (`browser-agent/`, Playwright, port 8040, 172.20.0.17): `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run`, dashboard proxies, `browse:` chat shortcut, 13 tests. Vision service (`perception/vision/`, OpenCV+DeepFace, port 8023, 172.20.0.18): face detection, emotion, presence, 📷 camera panel in dashboard, 5 s frame sampling, 12 tests. 25 new tests total. |
-| #103 | — | Doc sweep: STATUS, SESSION_BOOTSTRAP, CHANGELOG, README for PR #102 (services 35→37) |
-| #104 | — | clipboard-service (8024/.19), files-service (8025/.20), notify-service (8031/.21), browser `/search`; `search:` chat shortcut; 📋 clipboard button; 52 tests; services 37→40 |
-| #105 | — | document-parser service (8032/.22): PDF (PyMuPDF), DOCX (python-docx), XLSX (openpyxl), XLS (xlrd), PPTX (python-pptx), DXF/DWG (ezdxf + LibreDWG dwg2dxf), ZIP (recursive), CSV/JSON/XML/HTML; `/api/upload` routing by extension; `_DOC_EXTS` frontend branch; 22 tests; services 40→41 |
-| #106 | — | Doc sweep: STATUS + SESSION_BOOTSTRAP for PR #105 |
-| #107 | — | monitor-service (8033/.23): background rule engine; HTTP/scrape sources; conditions gt/lt/gte/lte/eq/ne/contains/changed/+%/-%; notify + TTS actions; per-rule interval + cooldown; Monitor tab (Add Rule form, rules table, alert feed, 15s auto-refresh); RULES_FILE persistence; 34 tests; services 41→42 |
-| #109 | — | broker-bridge (8034/.24): Binance REST wrapper; HMAC-SHA256 signing; spot + futures (USDM) modes; /ticker, /balance, /positions, /orders, /pnl/summary, /templates; Broker dashboard tab (status, tickers, balance, positions, orders, Quick Watch, template browser); /api/broker/watch → monitor rule; 20 tests; services 42→43 |
+| #115 | — | Doc sweep for PR #114: CHANGELOG, SESSION_BOOTSTRAP, STATUS, README badges (services 33→51, tests 2,567, LOC ~62,099) |
+| #116 | — | yfinance stocks/forex on broker-bridge (`/stocks/{symbol}`, `/forex/{pair}`); git-watcher service (8044, 172.20.0.33); 19 tests; services 51→52 |
+| D87 | D87 | Cognitive Architecture: `_get_world_context()` (9 sensory services per /chat), `_proactive_observer()` (background anomaly loop → memu-core proactive_observation memories), skill matching wired into /chat, FF_CONTEXT_ENRICHMENT + FF_PROACTIVE_AGENT ghost flags fixed, 14-way gather; 17 tests |
 
 ## Open PRs
 
@@ -66,5 +62,5 @@ Unlock condition: RTX 5080 procurement + provisioning + validation.
 ## Source of truth pointers
 
 - Resume layer: [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md)
-- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D85)
+- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D87)
 - Latest reality check: [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)

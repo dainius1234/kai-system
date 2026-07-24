@@ -5,6 +5,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (D87 cognitive architecture, 2026-07-24)
+
+- **World Context Injection** (`_get_world_context()` in `agentic/app.py`): on every `/chat` call, 9 sensory services are polled in parallel (2 s timeout each) — weather, air quality, calendar, docker-watcher, sysmetrics, email-reader, news-feed, git-watcher, broker PnL. Non-trivial readings injected as "World state (live sensory awareness):" system block into the LLM prompt. Trivial/unconfigured/loading states filtered via `_SENSORY_SKIP` frozenset so only real, actionable data reaches the model.
+- **Proactive Observer** (`_proactive_observer()`, background asyncio task): launched at startup; initial 90 s grace period for services to come up; wakes every `PROACTIVE_INTERVAL_SECONDS` (default 300 s); probes docker health, email unread count, air quality category, git dirty state, CPU/RAM pressure; detects anomalies and writes `proactive_observation` category memories to memu-core so they surface in future context via normal vector-recall.
+- **Skill Matching wired into `/chat`**: `match_skill(user_msg)` now called before every LLM invocation (was loaded but never consulted — J7 fix); matched skill injected as system block before session history so Kai uses its own learned behaviours in responses.
+- **Ghost flag fixes**: `FF_CONTEXT_ENRICHMENT` and `FF_PROACTIVE_AGENT` were registered in `common/feature_flags.py` but their gate checks were never implemented in `agentic/app.py`; both now properly gate their respective code paths.
+- **14-way context gather**: extended from 13 to 14 channels (added `world_context`); entire gather gated behind `FF_CONTEXT_ENRICHMENT` (default on); bare `/chat` path when disabled for A/B quality comparison.
+- **10 sensory URL constants**: `WEATHER_URL`, `AIRQUALITY_URL`, `CALENDAR_URL`, `DOCKER_WATCHER_URL`, `SYSMETRICS_URL`, `EMAIL_READER_URL`, `NEWS_FEED_URL`, `GIT_WATCHER_URL`, `BROKER_URL`, `PROACTIVE_INTERVAL` — all env-overridable.
+- **D87 logged in `kai-pm/DECISIONS.md`**: Cognitive Architecture — 4 active layers (Perception, World Context Injection, Proactive Cognition, Skill Matching) + 8 future mechanisms (anomaly baselines, world model persistence, cross-service correlation, sensory learning, skill hunter service, self-capability map, proactive scheduling, reactive skill acquisition).
+- **17-test suite** (`scripts/test_kai_intelligence.py`): covers world-context filtering, feature flag behaviour, skill matching callable, sensory URL constants, D87 DECISIONS.md entry. Makefile target `test-kai-intelligence` + CI step.
+- Tests: 2,586 → 2,603 (+17). LOC: ~62,099 → ~63,303.
+
+### Added (PR #116, 2026-07-24)
+
+- **broker-bridge yfinance extension**: `GET /stocks/{symbol}` and `GET /forex/{pair}` endpoints via `yfinance` (public data, no API key). `_YF_OK` guard returns 503 if yfinance absent; executor pattern keeps blocking calls off the event loop; 502 on fetch error. 8 new tests (`scripts/test_broker_bridge_yfinance.py`).
+- **git-watcher service** (port 8044, `172.20.0.33`): polls local git repositories via subprocess; captures branch, commit hash/message/author/date, uncommitted changes, untracked files, ahead/behind upstream, stash count per repo. `GET /health`, `GET /metrics`, `GET /repos`, `GET /repos/{index}`, `GET /dirty`, `GET /summary`. Background 60 s poll loop. Mounts repo paths read-only. Dashboard proxies `/api/git/{repos,dirty,summary}`; Git Repos card added to System tab. 11 new tests (`scripts/test_git_watcher.py`).
+- CI: 2 new steps in `core-tests.yml`. 2 new Makefile targets. Tests: 2,567 → 2,586 (+19). Services: 51 → 52.
+
 ### Added (PR #114, 2026-07-24)
 
 - **weather-service** (`weather-service/`, port 8039, `172.20.0.29`): OpenMeteo current-weather + 7-day forecast poller; WMO code → human description via `_WMO_CODES` dict; background 10-min refresh loop; `GET /current` → temp/windspeed/description/is_day, `GET /forecast` → 7-day array with rain probability, `GET /summary` → one-sentence agentic context. 16 tests.

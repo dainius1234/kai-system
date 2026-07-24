@@ -16,8 +16,9 @@ process-level failure isolation between hot and cold paths.
 
 **Phase: Phase 0 — COMPLETE. Blocked on GPU hardware (RTX 5080) to enter Phase 1.**
 
-All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Audio/TTS stack
-(D86) fully merged (PRs #98–#100, 2026-07-24). No open PRs.
+All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. D87 Cognitive
+Architecture merged (2026-07-24): Kai is now genuinely aware and proactive — world
+context injection, background anomaly observer, skill matching all wired. No open PRs.
 
 ### What has shipped to `main` (merged PRs, in order)
 
@@ -56,6 +57,9 @@ All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Audio/TTS st
 | #111 | CI fixes: flake8 F824 in browser-agent/app.py; stale README metrics synced | — |
 | #112 | Sensory expansion: sysmetrics (8035, `172.20.0.25`), screen-watcher (8036, `172.20.0.26`), email-reader (8037, `172.20.0.27`), news-feed (8038, `172.20.0.28`); broker `/depth`, `/stats/24hr`, `/trades`, `/futures/funding`, `/futures/openinterest`; System + Feeds dashboard tabs; 61 tests; services 43→47 | — |
 | #114 | — | Sensory expansion wave 2: weather-service (8039, `.29`), docker-watcher (8041, `.30`), airquality-service (8042, `.31`), calendar-service (8043, `.32`); sysmetrics `/temperature` + `/battery`; dashboard weather/AQ/docker/calendar widgets; 63 tests; services 47→51 | — |
+| #115 | — | Doc sweep for PR #114: CHANGELOG, SESSION_BOOTSTRAP, STATUS, README badges (services 33→51, tests 2,328→2,567, LOC ~62,099) | — |
+| #116 | — | yfinance stocks/forex endpoints on broker-bridge; git-watcher service (8044, `.33`); 19 tests; services 51→52 | — |
+| D87 | D87 | Cognitive architecture: `_get_world_context()` (9 sensory services per /chat), `_proactive_observer()` (background anomaly loop → memu-core), skill matching wired into /chat, ghost flag fixes (FF_CONTEXT_ENRICHMENT + FF_PROACTIVE_AGENT), 14-way gather; 17 tests | — |
 
 ### In-flight work
 
