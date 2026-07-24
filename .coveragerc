@@ -1,5 +1,6 @@
 [run]
 source = common/,agentic/,memu-core/,letta-agent/,financial-awareness/
+concurrency = thread
 omit =
     */test_*
     */_archive/*

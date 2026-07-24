@@ -6,7 +6,7 @@ export MEMU_ALLOW_FAKE_EMBEDDINGS ?= true
 # Self-audit and feedback
 self-audit:
 	python3 scripts/self_audit.py
-.PHONY: go_no_go hardening_smoke pypi-shadow-check test-letta test-financial test-agentic-service test-agentic-introspect build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-agentic test-router test-planner test-adversary test-failure-taxonomy test-selaur test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-improvement-gate test-thinking-pathways test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-error-codes test-feature-flags dep-audit coverage sync-docs check-docs auto-changelog auto-session-log test-focus-compress test-context-budget test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-behavioral test-docker-e2e test-chassis test-wake
+.PHONY: go_no_go hardening_smoke pypi-shadow-check test-letta test-financial test-agentic-service test-agentic-introspect build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-memu-routes test-agentic-routes test-context-enrichment-ab test-ab-log test-screen-capture test-agentic test-router test-planner test-adversary test-failure-taxonomy test-selaur test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-improvement-gate test-thinking-pathways test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-error-codes test-feature-flags dep-audit coverage sync-docs check-docs auto-changelog auto-session-log test-focus-compress test-context-budget test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-behavioral test-docker-e2e test-chassis test-wake
 
 go_no_go:
 	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py agentic/app.py executor/app.py heartbeat/app.py supervisor/app.py verifier/app.py fusion-engine/app.py common/llm.py common/errors.py common/feature_flags.py memory-compressor/app.py ledger-worker/app.py metrics-gateway/app.py telegram-bot/app.py
@@ -141,6 +141,21 @@ test-memu-retrieval:
 
 test-router:
 	PYTHONPATH=. python scripts/test_router.py
+
+test-memu-routes:
+	PYTHONPATH=. python -m pytest scripts/test_memu_routes.py -v
+
+test-agentic-routes:
+	PYTHONPATH=. python -m pytest scripts/test_agentic_routes.py -v
+
+test-context-enrichment-ab:
+	PYTHONPATH=. python scripts/test_context_enrichment_ab.py
+
+test-ab-log:
+	PYTHONPATH=. python scripts/test_ab_log.py
+
+test-screen-capture:
+	PYTHONPATH=. python -m pytest scripts/test_screen_capture.py -v
 
 test-planner:
 	PYTHONPATH=. python scripts/test_planner.py
@@ -401,6 +416,9 @@ weekly-key-rotate:
 
 weekly-ed25519-rotate:
 	bash scripts/weekly_ed25519_rotation.sh
+
+capture-baseline:
+	PYTHONPATH=. python scripts/capture_baseline_responses.py
 
 setup:
 	bash scripts/setup.sh

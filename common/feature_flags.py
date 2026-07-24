@@ -46,6 +46,15 @@ _REGISTRY: Dict[str, tuple] = {
     "LETTA_TASKS":           ("Delegate long-running tasks to letta-agent memory controller", False),
     "LETTA_MEMORY_SYNC":     ("Sync letta-agent archival memories back to memu-core after each run", False),
     "FINANCIAL_CONTEXT":     ("P29 inject CIS/VAT/tax summary into agentic context on finance queries", True),
+    # F4: master toggle for the 10-way context enrichment gather
+    # Set FF_CONTEXT_ENRICHMENT=false to run a bare /chat (LLM only, no memory/personality
+    # injection) for A/B quality comparison.  All individual enrichment flags still
+    # respect their own env vars when CONTEXT_ENRICHMENT=true.
+    "CONTEXT_ENRICHMENT":    ("Master toggle: 10-way context gather (memory + personality + soul channels)", True),
+    # F6: self-improvement loops — off by default; activate after GPU Day validates quality
+    "DREAM_ENABLED":         ("Trigger dream cycle consolidation (6-phase memory integration)", False),
+    "EVOLVER_ENABLED":       ("Agent-Evolver: cluster failure patterns → proactive insights", False),
+    "SAGE_SELF_REVIEW":      ("SAGE critique on all plans before execution (not just high-stakes)", False),
 }
 
 

@@ -132,31 +132,29 @@ kai_chat "I need to plan a week to get my CIS returns up to date, chase 3 overdu
 
 **Record outputs in:** `kai-pm/BASELINE_RESPONSES_7B.md` (create it, include prompt + full response)
 
-**Comparison baseline (0.5b responses captured 2026-07-23):**
+**Comparison baseline:** `kai-pm/BASELINE_RESPONSES_0.5B.md` — captured before GPU arrived
+by running `make capture-baseline` against the local dev stack (qwen2.5:0.5b).
 
-### 0.5b Baseline Responses
+To run the same 5 prompts against the 7B stack and save for comparison:
 
-> **Note:** These were captured offline (no live Ollama in CI). The 0.5b model's actual
-> output quality can be verified by running the same prompts against the dev stack before
-> the GPU arrives. What matters is the delta — 7B should be noticeably better on
-> multi-step reasoning, numerical accuracy, and self-aware capability statements.
+```bash
+# After G3 stack is healthy:
+python scripts/capture_baseline_responses.py --host http://localhost:8007 --session gpu-day-7b
+# Then rename output to BASELINE_RESPONSES_7B.md and compare side-by-side
+```
 
-Expected 0.5b characteristics:
-- Short, often incomplete responses
-- Numerical calculations may be wrong or absent  
-- Tool-call routing may fail silently
-- Self-awareness statements are generic
-- Multi-step plans lack structure
+Score each of the 5 prompts on three axes (1 = worse/same, 2 = better):
 
-Expected 7B improvements:
-- Complete sentences and paragraphs
-- Correct arithmetic on CIS/VAT calculations
-- Tool routing works reliably
-- Capability statements are specific and honest
-- Plans have numbered steps with realistic timelines
+| Prompt | Completeness | Numerical accuracy | Structure |
+|--------|-------------|-------------------|-----------|
+| P1 — CIS deduction rate |  |  |  |
+| P2 — £45k contract calculation |  |  |  |
+| P3 — VAT threshold + CIS |  |  |  |
+| P4 — self-awareness |  |  |  |
+| P5 — week planning task |  |  |  |
 
-**Pass condition:** 7B responses are visibly better on at least 3 of 5 prompts. Document
-the delta in `DECISIONS.md D82`.
+**Pass condition:** ≥3/5 prompts score better on at least 2 of 3 axes. Document
+the delta in `DECISIONS.md D83` (Phase 1 entry declaration).
 
 ---
 

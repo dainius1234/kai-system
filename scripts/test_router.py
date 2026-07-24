@@ -97,9 +97,72 @@ d1 = classify("what should I know?")
 d2 = classify("what should I know?", session_context={"last_route": "PROACTIVE_REVIEW"})
 assert d2.confidence >= d1.confidence, "context boost should not decrease confidence"
 
+# ── C4: classify_semantic fallback tests ─────────────────────────────
+# classify_semantic() must fall back gracefully to classify() when:
+#   (a) sentence-transformers is not installed (_HAS_ST = False), OR
+#   (b) the active model quality_tier < min_quality_tier, OR
+#   (c) the embedding model returns None.
+#
+# In this test environment sentence-transformers is NOT installed,
+# so every call exercises the keyword-fallback path.  We verify that
+# the fallback returns identical RouteDecision objects to classify().
+
+classify_semantic = _mod.classify_semantic
+_HAS_ST = _mod._HAS_ST
+
+# 1. When sentence-transformers is absent, classify_semantic = classify
+_SEMANTIC_FALLBACK_CASES = [
+    "do you remember what I said about the car?",
+    "how much tax do I owe?",
+    "hello",
+    "is it true that the earth is flat?",
+    "run the deploy script",
+    "summarise my week",
+    "",
+]
+sem_fail = 0
+for text in _SEMANTIC_FALLBACK_CASES:
+    kw = classify(text)
+    sem = classify_semantic(text)
+    if kw.route != sem.route:
+        sem_fail += 1
+        print(f"  FAIL semantic-fallback: '{text}' → kw={kw.route}, sem={sem.route}")
+    if kw.bypass_llm != sem.bypass_llm:
+        sem_fail += 1
+        print(f"  FAIL bypass_llm mismatch for '{text}': kw={kw.bypass_llm}, sem={sem.bypass_llm}")
+
+assert sem_fail == 0, f"{sem_fail} semantic fallback mismatches"
+print(f"  ✓ classify_semantic fallback ({len(_SEMANTIC_FALLBACK_CASES)} cases, _HAS_ST={_HAS_ST})")
+
+# 2. Explicit min_quality_tier=99 forces fallback even when ST installed
+for text in ["remember the invoice", "any reminders?", "hello"]:
+    kw = classify(text)
+    sem_high_tier = classify_semantic(text, min_quality_tier=99)
+    assert kw.route == sem_high_tier.route, (
+        f"min_quality_tier=99 should always fall back: '{text}' kw={kw.route} sem={sem_high_tier.route}"
+    )
+print("  ✓ classify_semantic with min_quality_tier=99 always falls back")
+
+# 3. Return type is always RouteDecision
+for text in ["test message", "", "VAT return deadline"]:
+    result = classify_semantic(text)
+    assert isinstance(result, RouteDecision), f"Expected RouteDecision, got {type(result)}"
+    assert hasattr(result, "route"), "RouteDecision missing 'route'"
+    assert hasattr(result, "confidence"), "RouteDecision missing 'confidence'"
+    assert hasattr(result, "bypass_llm"), "RouteDecision missing 'bypass_llm'"
+    assert 0.0 <= result.confidence <= 1.0, f"confidence out of range: {result.confidence}"
+print("  ✓ classify_semantic always returns RouteDecision with valid fields")
+
+# 4. Session context is forwarded to the keyword fallback
+d_no_ctx = classify_semantic("what should I know?")
+d_ctx = classify_semantic("what should I know?", session_context={"last_route": "PROACTIVE_REVIEW"})
+assert d_ctx.confidence >= d_no_ctx.confidence, "session_context should not decrease confidence in fallback"
+print("  ✓ classify_semantic passes session_context through to keyword fallback")
+
 # ── Summary ──────────────────────────────────────────────────────────
 total = passed + failed
 print(f"\nRouter tests: {passed}/{total} passed, {failed} failed")
+print(f"Semantic fallback tests: {len(_SEMANTIC_FALLBACK_CASES)} cases all passed")
 if failed:
     raise SystemExit(1)
 print("router classification tests passed")

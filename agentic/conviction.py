@@ -16,7 +16,7 @@ the operator has filed a conviction override.
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 # ── specialist → expected keyword domains ────────────────────────────
@@ -245,3 +245,109 @@ def low_conviction_feedback(score: float, chunks: List[Dict[str, Any]]) -> str:
     if not reasons:
         reasons.append("overall signal quality is below threshold")
     return f"low conviction ({score}/10): {'; '.join(reasons)}"
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# C6: LLM RESPONSE QUALITY SIGNALS
+#
+# Refine conviction AFTER the LLM has responded using two signals:
+#   1. Uncertainty entropy — explicit hedging phrases lower the score
+#      ("I'm not sure", "I think", "might", "possibly", etc.)
+#   2. Lexical diversity — repetitive responses indicate low quality;
+#      a rich, varied response suggests the model engaged with the task.
+#
+# Applied via refine_conviction() after the LLM call, not before.
+# Does not change existing score_conviction() API.
+# ═══════════════════════════════════════════════════════════════════════
+
+_UNCERTAINTY_MARKERS = re.compile(
+    r"\b(i('m|\s+am)\s+not\s+(sure|certain|confident)"
+    r"|i\s+think\s+(?:that\s+)?(?:it'?s?\s+)?(?:likely|possible|maybe)"
+    r"|i\s+believe\s+(?:but|though|although)"
+    r"|(?:it\s+)?(?:might|may|could|would)\s+be\s+(?:that\s+)?"
+    r"|(?:probably|possibly|perhaps|maybe|approximately|roughly)\b"
+    r"|i('m|\s+am)\s+(?:a\s+bit\s+)?unsure"
+    r"|not\s+(?:entirely\s+)?(?:sure|certain|clear)"
+    r"|unclear\s+(?:to\s+me\s+)?(?:whether|if|how)"
+    r"|this\s+is\s+(?:just\s+)?(?:my\s+)?(?:guess|estimate|speculation))\b",
+    re.IGNORECASE,
+)
+
+
+def _response_uncertainty(llm_response: str) -> float:
+    """Penalty 0.0–1.0: more uncertainty markers → higher penalty.
+
+    Returns a PENALTY value (subtracted from conviction).
+    1 marker → 0.5, 2+ markers → 1.0.
+    """
+    if not llm_response:
+        return 0.5  # empty response is suspicious
+    count = len(_UNCERTAINTY_MARKERS.findall(llm_response))
+    return round(min(count / 2.0, 1.0), 3)
+
+
+def _response_lexical_diversity(llm_response: str) -> float:
+    """Reward 0.0–1.0: type-token ratio on responses ≥ 30 words.
+
+    Short responses (< 30 words) naturally have high TTR regardless of quality,
+    so diversity is suppressed below that length.  Rich, varied vocabulary on
+    longer responses suggests genuine engagement with the task.
+    """
+    if not llm_response:
+        return 0.0
+    words = re.findall(r"\w+", llm_response.lower())
+    if len(words) < 30:
+        return 0.0  # too short for TTR to be meaningful
+    ttr = len(set(words)) / len(words)
+    # TTR > 0.6 is good, < 0.3 is repetitive
+    return round(min(max((ttr - 0.3) / 0.3, 0.0), 1.0), 3)
+
+
+def refine_conviction(
+    base_score: float,
+    llm_response: str,
+    weight: float = 0.5,
+) -> float:
+    """Adjust a pre-response conviction score using LLM output quality signals.
+
+    Call this AFTER receiving the LLM response to refine the stored score.
+    Uncertainty markers dominate: even a lexically diverse response loses ground
+    if the model expressed heavy hedging.  The adjustment is bounded to ±1.0
+    so a bad response never completely overrides a well-supported plan.
+
+    Args:
+        base_score: The conviction score from score_conviction().
+        llm_response: The raw LLM response text.
+        weight: How much the response signals affect the final score (default 0.5).
+
+    Returns:
+        Refined score clamped to [0.0, 10.0].
+    """
+    diversity = _response_lexical_diversity(llm_response)
+    uncertainty_penalty = _response_uncertainty(llm_response)
+
+    # Uncertainty weighs 2× diversity: hedging is a stronger negative signal
+    # than lexical richness is a positive one.
+    adjustment = (diversity - uncertainty_penalty * 2.0) * weight
+    adjustment = max(min(adjustment, 1.0), -1.0)
+
+    refined = round(max(0.0, min(base_score + adjustment, 10.0)), 2)
+    return refined
+
+
+def response_quality_summary(llm_response: str) -> Dict[str, Any]:
+    """Return a diagnostic breakdown of LLM response quality signals.
+
+    Useful for logging and the Soul dashboard.
+    """
+    diversity = _response_lexical_diversity(llm_response)
+    uncertainty = _response_uncertainty(llm_response)
+    word_count = len(re.findall(r"\w+", llm_response)) if llm_response else 0
+    marker_count = len(_UNCERTAINTY_MARKERS.findall(llm_response)) if llm_response else 0
+    return {
+        "word_count": word_count,
+        "lexical_diversity": diversity,
+        "uncertainty_penalty": uncertainty,
+        "uncertainty_marker_count": marker_count,
+        "net_quality_signal": round(diversity - uncertainty, 3),
+    }
