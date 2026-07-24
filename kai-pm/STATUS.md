@@ -1,8 +1,8 @@
 # Kai PM Status Dashboard
 
-- **Last updated (UTC):** 2026-07-23
+- **Last updated (UTC):** 2026-07-24
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** Pre-GPU sprint S1–S5 complete (D82). Branch claude/project-rework-plan-pgvp35 ready for PR. Blocked on GPU.
+- **Current focus:** PR #91 merged. agentic/app.py 91%, memu-core/app.py 65%, C4/C10/P1 done. Blocked on GPU.
 
 ## What's landed on main
 
@@ -20,6 +20,7 @@
 | #87 | D65 | CI fix: pii_redacted type, chassis httpx mock, financial-awareness sys.modules collision |
 | #88 | D71–D76 | Cleanup sprint: merge-gate, redis stub, MAKEFILE_TARGETS, 10 CI isolation fixes, 5-module coverage gate (60%), 3 env-specific skip fixes; also fixed TurboVecStore BIGSERIAL race + generate_embedding ordering bug |
 | #89 | D79, D80 | COMPOSE_DRIFT fixes: sovereign pgvector image + PG_URI env var (D79); full/minimal OLLAMA_MODEL param + embedding model pull + service_healthy conditions (D80); README sync; SESSION_BOOTSTRAP + DECISIONS.md D77/D78 |
+| #91 | D82, D83 | Phase 1 readiness: S1–S5 pre-GPU sprint; agentic/app.py 91% (169 tests), memu-core/app.py 65% (230 tests); C4 classify_semantic fallback tests; C10 A/B query logger (common/ab_log.py); P1 screen-capture headless tests (20); F4/F6 feature flag tests; GPU Arrival Runbook; 5 new Makefile targets; 2 bug fixes (fire_at None crash, float/str timestamp) |
 
 ## Open PRs
 
