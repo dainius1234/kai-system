@@ -16,8 +16,8 @@ process-level failure isolation between hot and cold paths.
 
 **Phase: Phase 0 — COMPLETE. Blocked on GPU hardware (RTX 5080) to enter Phase 1.**
 
-All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Simplify sprint
-(D85) fully merged (PR #95/#96, 2026-07-24). No open PRs.
+All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Audio/TTS stack
+(D86) fully merged (PRs #98–#100, 2026-07-24). No open PRs.
 
 ### What has shipped to `main` (merged PRs, in order)
 
@@ -36,11 +36,15 @@ All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Simplify spr
 | #88 | Cleanup sprint: merge-gate, redis stub, MAKEFILE_TARGETS, CI isolation fixes, 5-module coverage gate (60%), env-specific skips; TurboVecStore BIGSERIAL race + generate_embedding ordering fix | D71–D78 |
 | #89 | COMPOSE_DRIFT fixes D1/D2/D6/D9/D10; README sync; SESSION_BOOTSTRAP + DECISIONS.md D77–D80 housekeeping | D79, D80 |
 | #91 | Phase 1 readiness S1–S5: langgraph shim removed, agentic/memu-core route tests, sovereign CI boot, GPU runbook; C4/C10/P1 screen-capture; F4/F6 feature-flag tests; 2 bug fixes | D82, D83 |
-| #92 | CI test-isolation: tesseract binary probe, lakefs_client importlib isolation; 30 failures resolved; 2243 tests passing | D84 |
+| #92 | CI test-isolation: tesseract binary probe, lakefs_client importlib isolation; 30 failures resolved; 2,243 tests passing | D84 |
 | #93 | PM housekeeping; S7 shell sandbox (`sandboxes/shell/`); T3 RAMS generator (`scripts/hse_rams.py`) | — |
 | #94 | U4 file upload: dashboard text-inject + image OCR via screen-capture; `/api/upload`; drag-and-drop + paste | — |
 | #95 | Simplify sprint: unified `_RISK_LEVELS`, explicit 400 on oversized shell input, `raise_for_status()` split, JS closure hoist; sovereign compose `:?` → `:-`; CI disk-cleanup step | D85 |
 | #96 | PM docs: D85 + STATUS.md update for PRs #93–95 | — |
+| #97 | README metrics sync + SESSION_BOOTSTRAP update to PRs #93–96 | — |
+| #98 | Hardening sprint: shell sandbox `SAFE_DIRS` path restriction (11 tests); kill-isolation CI step; Trivy exit-code `'1'` + `ignore-unfixed`; per-module coverage floors (`agentic ≥ 45%`, `memu-core ≥ 60%`); `go_no_go` + `check-docs` early CI gates; restart-persistence smoke test; upload fuzz (14 tests) | D86 |
+| #99 | Memory Graph tab (D3 v7 force-directed, category hubs, trust-tier colours, zoom/pan/drag, hover, filter); Whisper audio-service in minimal stack (`172.20.0.15`); `WHISPER_BACKEND=stub`; `/api/audio/transcribe` proxy; MediaRecorder fallback in `toggleVoice()` | D86 |
+| #100 | TTS service in minimal stack (`172.20.0.16`, edge-tts, `en-GB-RyanNeural`); `/api/tts/synthesize` proxy; 🔊 speak button on all assistant messages; `speakMsg()` with ObjectURL playback; audio transcribe fuzz suite (13 tests); `make test-audio-transcribe` | D86 |
 
 ### In-flight work
 
@@ -55,7 +59,11 @@ None. All work is on `main`. No open PRs.
 3. **T3 — DONE** (PR #93) — HSE RAMS generator (`scripts/hse_rams.py`)
 4. **U4 — DONE** (PR #94) — file upload + OCR in dashboard
 5. **Simplify sprint — DONE** (PR #95, D85) — quality cleanup across 4 files + CI fixes
-6. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
+6. **Hardening sprint — DONE** (PR #98, D86) — path restriction, CI gates, coverage floors, fuzz tests
+7. **Memory Graph tab — DONE** (PR #99, D86) — D3 v7 force-directed, trust-tier colours, hover/filter
+8. **Whisper STT — DONE** (PR #99, D86) — audio-service in minimal stack, MediaRecorder fallback
+9. **TTS voice synthesis — DONE** (PR #100, D86) — tts-service, edge-tts, 🔊 speak button
+10. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
 
 Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
@@ -81,6 +89,10 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
   - `memu-graph` — Cognee/Kuzu knowledge graph, port 8061. Fan-out active (`FF_GRAPH_INGEST=true`)
   - `letta-agent` — Letta archival memory controller, port 8062. Gated by `FF_LETTA_TASKS=false` (default)
   - `financial-awareness` — CIS/VAT/tax arithmetic service, port 8063. Pure Python, no LLM.
+- **Perception / output stack (minimal stack):**
+  - `audio-service` — Whisper STT (`perception/audio/`), port 8021, IP `172.20.0.15`. `WHISPER_BACKEND=stub` (CI/dev); `local` for real transcription. Dashboard proxy: `POST /api/audio/transcribe`.
+  - `tts-service` — edge-tts voice synthesis (`output/tts/`), port 8030, IP `172.20.0.16`. `en-GB-RyanNeural` default voice. Dashboard proxy: `POST /api/tts/synthesize`; returns `audio/mpeg`.
+  - `wake-service` — wake-word + intent detection (`perception/wake/`), port 8022, IP `172.20.0.10`.
 - **VECTOR_STORE env var** in `memu-core`: `turbovec` (default dev/CI) → TurboVec; `postgres` → pgvector; else → ephemeral InMemory. Sovereign uses `postgres`.
 - **`FF_GRAPH_INGEST=true`** (default in full compose): every memorize/forget fans out to memu-graph. Best-effort — never blocks memu-core.
 - **`FF_LETTA_TASKS=false`** (default): when `true`, each `/chat` fires a 30s POST to letta-agent and injects archival context into the system prompt.
@@ -92,14 +104,14 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 - **Model**: `qwen2.5:0.5b` (default). Embedding: `all-MiniLM-L6-v2` (384-dim).
 - **Embedding endpoint**: `/api/embed` (not deprecated `/api/embeddings`). Confirmed D47.
 - **TurboVecStore startup**: embedding backend (`_embedding_backend` / `generate_embedding`) must be defined before store selection block in `memu-core/app.py` — see D78.
-- **Tests**: 2,279 across 105 files; 2,243 passing in CI (D84). `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
+- **Tests**: 2,303 across 107 files; per-module floors: `agentic ≥ 45%`, `memu-core ≥ 60%`. `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
 - **Coverage**: 5 modules (`common`, `agentic`, `memu-core`, `letta-agent`, `financial-awareness`), 60% gate.
 
 ---
 
 ## 6) PM operating rules
 
-- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D85**.
+- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D86**.
 - Reality checks → new file `REALITY_CHECK_<date>.md`, not silent rewrites.
 - No drift between docs, status, and delivered code.
 - `make sync-docs` after major changes; `make merge-gate` before every PR.
@@ -119,7 +131,7 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
 | File | What |
 |------|------|
-| `kai-pm/DECISIONS.md` | Append-only decision log (D1–D85) |
+| `kai-pm/DECISIONS.md` | Append-only decision log (D1–D86) |
 | `kai-pm/STATUS.md` | Sprint health + open PRs |
 | `kai-pm/CLEANUP_TODO.md` | Cleanup sprint tracker (all items done except §2.1 merge-order decision) |
 | `kai-pm/COMPOSE_DRIFT.md` | Docker compose divergence audit (§2.2 shared-block extraction deferred) |
@@ -131,4 +143,6 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 | `kai-pm/TECH_WATCH.md` | External tool evaluations |
 | `docs/PROJECT_BACKLOG.md` | Living backlog |
 | `docs/PHONE_SETUP.md` | PWA phone install guide (Android + iOS) |
+| `perception/audio/` | Whisper STT service (`audio-service`, port 8021) |
+| `output/tts/` | edge-tts voice synthesis service (`tts-service`, port 8030) |
 | `CHANGELOG.md` | Full semver changelog |

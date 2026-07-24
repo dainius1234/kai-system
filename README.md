@@ -11,10 +11,10 @@
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
   <img src="https://img.shields.io/badge/services-33-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-2%2C279_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-2%2C303_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
-  <img src="https://img.shields.io/badge/Python-~53%2C834_LOC-yellow?style=flat-square" alt="loc">
-  <img src="https://img.shields.io/badge/milestones-32_shipped-purple?style=flat-square" alt="milestones">
+  <img src="https://img.shields.io/badge/Python-~54%2C553_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/milestones-35_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
 </p>
@@ -25,10 +25,10 @@
 
 | Metric | Value |
 |---|---|
-| **Services** | 33 Docker containers |
+| **Services** | 35 Docker containers |
 | **Test targets** | 77 (`make test-core`) |
-| **Individual tests** | 2,279 (`def test_` across 105 files) |
-| **Python LOC** | ~53,834 |
+| **Individual tests** | 2,303 (`def test_` across 107 files) |
+| **Python LOC** | ~54,553 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 32 |
 | **Failures** | 0 |
@@ -280,7 +280,7 @@ voice, avatar, integrations, and ops tooling.
 
 ## Known Issues & Honest State
 
-> We built 24 milestones fast. Now we're building them right.
+> We built 35 milestones. Now we're building them right.
 
 ### Fixed
 
@@ -333,7 +333,7 @@ voice, avatar, integrations, and ops tooling.
 
 ## Milestone History
 
-> 32 shipped. Zero skipped. Every milestone has tests. Quality of AI reasoning depends on model — see [Honest Limitations](#honest-limitations).
+> 35 shipped. Zero skipped. Every milestone has tests. Quality of AI reasoning depends on model — see [Honest Limitations](#honest-limitations).
 
 ```
 P0  Stack runs              ██████████ DONE   P14 Temporal Self       ██████████ DONE
@@ -352,7 +352,8 @@ P13 Improvement Gate        ██████████ DONE   MARS Memory Co
 ─── ─────────────────────── ────────── ────   P23 SAGE Critique       ██████████ DONE
 J1–J7 Jewels (7 features)  ██████████ DONE   P24 Agent-Evolver       ██████████ DONE
 P1–P5 Enhancements         ██████████ DONE   GC  Eng. Gap-Close      ██████████ DONE
-H3  Context Budget          ██████████ DONE
+H3  Context Budget          ██████████ DONE   H4  Hardening Sprint    ██████████ DONE
+STT Whisper Audio Input     ██████████ DONE   TTS Voice Synthesis     ██████████ DONE
 ```
 
 ### What's Next
@@ -386,6 +387,9 @@ H3  Context Budget          ██████████ DONE
 | **T3** | RAMS Generator | **DONE** — `scripts/hse_rams.py`; HSE-format Word doc from `site_data.csv` with colour-coded risk matrix, unified `_RISK_LEVELS` table, sign-off table (PR #93, #95) |
 | **U4** | File Upload (OCR) | **DONE** — dashboard `/api/upload`; text inject + image OCR via screen-capture; drag-and-drop + paste in frontend; split 4xx/5xx error handling (PR #94, #95) |
 | **GPU** | Hardware Performance | **Phase 0 DONE** — detection, env toggles, speculative-decoding config, model registry expansion (`docs/gpu_integration_phase0.md`); hardware-dependent execution still pending |
+| **H4** | Hardening Sprint | **DONE** — shell `SAFE_DIRS` path restriction, kill-isolation CI step, Trivy `'1'` exit gate, per-module coverage floors (`agentic ≥ 45%`, `memu-core ≥ 60%`), `go_no_go` + `check-docs` early gates, restart-persistence smoke test, upload fuzz (14 tests) (PR #98, D86) |
+| **STT** | Whisper Audio Input | **DONE** — `audio-service` (`perception/audio/`, port 8021) in minimal stack; `WHISPER_BACKEND=stub` for CI; browser MediaRecorder → `/api/audio/transcribe` → transcript in chat; audio fuzz suite 13 tests (PRs #99/#100, D86) |
+| **TTS** | Voice Synthesis | **DONE** — `tts-service` (`output/tts/`, port 8030, edge-tts `en-GB-RyanNeural`) in minimal stack; 🔊 speak button on assistant messages; `speakMsg()` ObjectURL playback with ⏹ toggle (PR #100, D86) |
 
 *Sources: OpenClaw, Jarvis variants, Proact-VL (arXiv:2603.03447). All offline, low-resource, test on qwen2.5:0.5b first.*
 
