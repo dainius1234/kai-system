@@ -1762,9 +1762,58 @@ function attachFile() {
   document.getElementById('fileInput').click();
 }
 
-function handleFiles(files) {
+const _TEXT_EXTS = new Set([
+  'txt','md','py','js','ts','json','csv','log','yaml','yml',
+  'sh','toml','ini','xml','html','css','sql','rst','env','conf',
+]);
+const _IMAGE_EXTS = new Set(['png','jpg','jpeg','gif','bmp','webp','tiff','tif']);
+const _MAX_TEXT_BYTES = 50 * 1024; // 50 KB — larger pastes overwhelm the context
+
+async function handleFiles(files) {
   if (!files || !files.length) return;
-  showToast('Attachment', 'File attachments coming soon', 'info');
+  const input = document.getElementById('chatInput');
+
+  for (const file of Array.from(files)) {
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+
+    if (_TEXT_EXTS.has(ext)) {
+      if (file.size > _MAX_TEXT_BYTES) {
+        showToast('Attachment', `${file.name} exceeds 50 KB limit for text files`, 'error');
+        continue;
+      }
+      const text = await file.text();
+      const prefix = input.value.trim() ? input.value.trimEnd() + '\n\n' : '';
+      input.value = prefix + `[File: ${file.name}]\n\`\`\`\n${text.trimEnd()}\n\`\`\`\n`;
+      autoResize(input);
+      showToast('Attachment', `${file.name} attached`, 'success');
+
+    } else if (_IMAGE_EXTS.has(ext)) {
+      showToast('Attachment', `Running OCR on ${file.name}…`, 'info');
+      const form = new FormData();
+      form.append('file', file);
+      try {
+        const resp = await fetch('/api/upload', { method: 'POST', body: form });
+        const data = await resp.json();
+        if (!resp.ok) {
+          showToast('Attachment', data.detail || 'OCR failed', 'error');
+          continue;
+        }
+        const ocrText = (data.text || '').trim() || '[no text extracted]';
+        const prefix = input.value.trim() ? input.value.trimEnd() + '\n\n' : '';
+        input.value = prefix + `[Image: ${file.name}]\n${ocrText}\n`;
+        autoResize(input);
+        showToast('Attachment', `${file.name} — OCR complete`, 'success');
+      } catch {
+        showToast('Attachment', `Upload failed for ${file.name}`, 'error');
+      }
+
+    } else {
+      showToast('Attachment', `${file.name}: unsupported type. Use text files or images.`, 'warn');
+    }
+  }
+
+  // reset so the same file can be re-selected
+  document.getElementById('fileInput').value = '';
 }
 
 

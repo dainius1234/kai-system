@@ -9,7 +9,7 @@ from typing import Any, Dict, List
 
 import httpx
 import redis.asyncio as aioredis
-from fastapi import Body, FastAPI, HTTPException, Request
+from fastapi import Body, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, StreamingResponse
 
@@ -1201,6 +1201,40 @@ async def api_chat_proxy(request: Request):
             "X-Accel-Buffering": "no",
         },
     )
+
+
+SCREEN_CAPTURE_URL = os.getenv("SCREEN_CAPTURE_URL", "http://screen-capture:8059")
+_UPLOAD_MAX_BYTES = 10 * 1024 * 1024  # 10 MB — matches screen-capture service limit
+
+
+@app.post("/api/upload")
+async def api_upload(file: UploadFile = File(...)):
+    """Receive an image file, forward to screen-capture for OCR, return extracted text.
+
+    Text files should be read client-side; this endpoint exists for image OCR.
+    Degrades gracefully when screen-capture service is unavailable.
+    """
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
+
+    data = await file.read()
+    if len(data) > _UPLOAD_MAX_BYTES:
+        raise HTTPException(status_code=413, detail="File too large (max 10 MB)")
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                f"{SCREEN_CAPTURE_URL}/capture/file",
+                files={"file": (file.filename, data, file.content_type or "image/png")},
+            )
+        if resp.status_code != 200:
+            raise HTTPException(status_code=502, detail="OCR service returned an error")
+        return resp.json()
+    except httpx.RequestError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"OCR service unreachable — start screen-capture or set SCREEN_CAPTURE_URL: {exc}",
+        )
 
 
 if __name__ == "__main__":
