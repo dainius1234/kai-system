@@ -81,6 +81,10 @@
           <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
           <span class="nav-label">Monitor</span>
         </a>
+        <a class="nav-item" data-view="broker" onclick="switchView('broker')">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+          <span class="nav-label">Broker</span>
+        </a>
       </nav>
 
       <div class="sidebar-divider"></div>
@@ -1091,6 +1095,55 @@
           </div>
         </section>
 
+        <!-- ═══ Broker View ═══ -->
+        <section class="view" id="brokerView">
+          <div style="max-width:1100px;margin:0 auto;padding:var(--sp-6);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-4);">
+              <h2 class="text-heading">Broker</h2>
+              <div style="display:flex;gap:var(--sp-2);">
+                <button class="refresh-btn" onclick="refreshBroker()">Refresh</button>
+              </div>
+            </div>
+
+            <!-- Status bar -->
+            <div id="brokerStatus" style="display:flex;gap:var(--sp-3);flex-wrap:wrap;margin-bottom:var(--sp-4);padding:var(--sp-3);background:var(--bg-surface);border-radius:8px;font-size:0.85rem;">
+              <span>Loading…</span>
+            </div>
+
+            <!-- Tickers -->
+            <div style="margin-bottom:var(--sp-5);">
+              <h3 style="margin-bottom:var(--sp-2);font-size:0.9rem;color:var(--text-muted);">Market Prices</h3>
+              <div id="brokerTickers" style="display:flex;gap:var(--sp-2);flex-wrap:wrap;"></div>
+            </div>
+
+            <!-- Balance -->
+            <div style="margin-bottom:var(--sp-5);">
+              <h3 style="margin-bottom:var(--sp-2);font-size:0.9rem;color:var(--text-muted);">Balance</h3>
+              <div id="brokerBalance"><div class="empty" style="color:var(--text-muted);font-size:0.85rem;">Configure BINANCE_API_KEY to see balance</div></div>
+            </div>
+
+            <!-- Positions -->
+            <div style="margin-bottom:var(--sp-5);">
+              <h3 style="margin-bottom:var(--sp-2);font-size:0.9rem;color:var(--text-muted);">Positions</h3>
+              <div id="brokerPositions"><div class="empty" style="color:var(--text-muted);font-size:0.85rem;">No positions</div></div>
+            </div>
+
+            <!-- Open Orders -->
+            <div style="margin-bottom:var(--sp-5);">
+              <h3 style="margin-bottom:var(--sp-2);font-size:0.9rem;color:var(--text-muted);">Open Orders</h3>
+              <div id="brokerOrders"><div class="empty" style="color:var(--text-muted);font-size:0.85rem;">No open orders</div></div>
+            </div>
+
+            <!-- Templates -->
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-2);">
+                <h3 style="font-size:0.9rem;color:var(--text-muted);">Monitor Templates</h3>
+              </div>
+              <div id="brokerTemplates" style="display:flex;flex-direction:column;gap:var(--sp-2);"></div>
+            </div>
+          </div>
+        </section>
+
       </div><!-- .content -->
     </main>
   </div><!-- .app -->
@@ -1225,7 +1278,7 @@ function switchView(name) {
   const navEl = document.querySelector(`.nav-item[data-view="${name}"]`);
   if (navEl) navEl.classList.add('active');
 
-  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard', canvas: 'Live Canvas', diary: 'Memory Diary', finance: 'CIS Finance', memgraph: 'Memory Graph', monitor: 'Monitor' };
+  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard', canvas: 'Live Canvas', diary: 'Memory Diary', finance: 'CIS Finance', memgraph: 'Memory Graph', monitor: 'Monitor', broker: 'Broker' };
   document.getElementById('viewTitle').textContent = titles[name] || name;
 
   currentView = name;
@@ -1273,6 +1326,13 @@ function switchView(name) {
   } else {
     clearInterval(_monitorInterval);
     _monitorInterval = null;
+  }
+  if (name === 'broker') {
+    refreshBroker();
+    _brokerInterval = setInterval(refreshBroker, 30000);
+  } else {
+    clearInterval(_brokerInterval);
+    _brokerInterval = null;
   }
 }
 
@@ -5168,6 +5228,179 @@ function _mgShowDetail(d) {
     `;
   }
   panel.style.display = 'block';
+}
+
+// ── Broker ─────────────────────────────────────────────────────────
+
+let _brokerInterval = null;
+
+async function refreshBroker() {
+  _brokerStatus();
+  _brokerTickers();
+  _brokerBalance();
+  _brokerPositions();
+  _brokerOrders();
+  _brokerTemplates();
+}
+
+async function _brokerStatus() {
+  const el = document.getElementById('brokerStatus');
+  if (!el) return;
+  try {
+    const d = await fetch('/api/broker/health').then(r => r.json());
+    const cfg = d.api_configured ? '✅ API configured' : '⚠️ No API key';
+    const mode = (d.mode || 'spot').toUpperCase();
+    el.innerHTML = `<span><strong>Mode:</strong> ${mode}</span><span>${cfg}</span><span><strong>Status:</strong> ${d.status || '—'}</span>`;
+  } catch {
+    el.innerHTML = '<span style="color:var(--red)">Broker service unreachable</span>';
+  }
+}
+
+async function _brokerTickers() {
+  const el = document.getElementById('brokerTickers');
+  if (!el) return;
+  try {
+    const d = await fetch('/api/broker/ticker').then(r => r.json());
+    el.innerHTML = (d.tickers || []).map(t =>
+      `<div style="background:var(--bg-surface);border-radius:6px;padding:var(--sp-2) var(--sp-3);font-size:0.85rem;">
+        <div style="font-weight:600;color:var(--text-muted);font-size:0.75rem;">${t.symbol}</div>
+        <div style="font-size:1rem;font-weight:700;">$${Number(t.price).toLocaleString(undefined,{maximumFractionDigits:2})}</div>
+      </div>`
+    ).join('') || '<div class="empty" style="color:var(--text-muted);font-size:0.85rem;">Unavailable</div>';
+  } catch { el.innerHTML = ''; }
+}
+
+async function _brokerBalance() {
+  const el = document.getElementById('brokerBalance');
+  if (!el) return;
+  try {
+    const d = await fetch('/api/broker/balance').then(r => r.json());
+    const assets = d.assets || [];
+    if (!assets.length) { el.innerHTML = '<div class="empty" style="color:var(--text-muted);font-size:0.85rem;">No assets or API key not set</div>'; return; }
+    el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+      <thead><tr style="color:var(--text-muted);border-bottom:1px solid var(--border);">
+        <th style="text-align:left;padding:var(--sp-1) var(--sp-2);">Asset</th>
+        <th style="text-align:right;padding:var(--sp-1) var(--sp-2);">Free</th>
+        <th style="text-align:right;padding:var(--sp-1) var(--sp-2);">Total</th>
+      </tr></thead>
+      <tbody>${assets.map(a => `<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:var(--sp-1) var(--sp-2);font-weight:600;">${a.asset}</td>
+        <td style="text-align:right;padding:var(--sp-1) var(--sp-2);">${Number(a.free).toFixed(6)}</td>
+        <td style="text-align:right;padding:var(--sp-1) var(--sp-2);">${Number(a.total).toFixed(6)}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  } catch { el.innerHTML = '<div class="empty" style="color:var(--text-muted);font-size:0.85rem;">Unavailable</div>'; }
+}
+
+async function _brokerPositions() {
+  const el = document.getElementById('brokerPositions');
+  if (!el) return;
+  try {
+    const d = await fetch('/api/broker/positions').then(r => r.json());
+    const pos = d.positions || [];
+    if (!pos.length) { el.innerHTML = '<div class="empty" style="color:var(--text-muted);font-size:0.85rem;">No open positions</div>'; return; }
+    const isFutures = pos[0].unrealized_pnl !== undefined;
+    el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+      <thead><tr style="color:var(--text-muted);border-bottom:1px solid var(--border);">
+        <th style="text-align:left;padding:var(--sp-1) var(--sp-2);">Symbol</th>
+        <th style="text-align:right;padding:var(--sp-1) var(--sp-2);">Size</th>
+        ${isFutures ? '<th style="text-align:right;">Entry</th><th style="text-align:right;">Mark</th><th style="text-align:right;">PnL</th>' : '<th style="text-align:right;">Price</th><th style="text-align:right;">Value (USDT)</th>'}
+        <th style="text-align:right;padding:var(--sp-1) var(--sp-2);">Watch</th>
+      </tr></thead>
+      <tbody>${pos.map(p => {
+        const sym = p.symbol;
+        const pnlColor = isFutures ? (p.unrealized_pnl >= 0 ? '#4caf50' : '#f44336') : '';
+        return `<tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:var(--sp-1) var(--sp-2);font-weight:600;">${sym}</td>
+          <td style="text-align:right;padding:var(--sp-1) var(--sp-2);">${Number(p.size).toFixed(4)}</td>
+          ${isFutures
+            ? `<td style="text-align:right;">$${Number(p.entry_price).toLocaleString(undefined,{maximumFractionDigits:2})}</td>
+               <td style="text-align:right;">$${Number(p.mark_price).toLocaleString(undefined,{maximumFractionDigits:2})}</td>
+               <td style="text-align:right;color:${pnlColor};">$${Number(p.unrealized_pnl).toFixed(2)}</td>`
+            : `<td style="text-align:right;">${p.price_usdt ? '$'+Number(p.price_usdt).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'}</td>
+               <td style="text-align:right;">${p.value_usdt != null ? '$'+Number(p.value_usdt).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'}</td>`
+          }
+          <td style="text-align:right;padding:var(--sp-1) var(--sp-2);">
+            <button class="refresh-btn" style="font-size:0.75rem;padding:2px 8px;" onclick="brokerQuickWatch('${sym}')">👁 Watch</button>
+          </td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+  } catch { el.innerHTML = '<div class="empty" style="color:var(--text-muted);font-size:0.85rem;">Unavailable</div>'; }
+}
+
+async function _brokerOrders() {
+  const el = document.getElementById('brokerOrders');
+  if (!el) return;
+  try {
+    const d = await fetch('/api/broker/orders').then(r => r.json());
+    const orders = d.orders || [];
+    if (!orders.length) { el.innerHTML = '<div class="empty" style="color:var(--text-muted);font-size:0.85rem;">No open orders</div>'; return; }
+    el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+      <thead><tr style="color:var(--text-muted);border-bottom:1px solid var(--border);">
+        <th style="text-align:left;padding:var(--sp-1) var(--sp-2);">Symbol</th>
+        <th style="text-align:left;">Side</th>
+        <th style="text-align:left;">Type</th>
+        <th style="text-align:right;">Price</th>
+        <th style="text-align:right;">Qty</th>
+        <th style="text-align:left;">Status</th>
+      </tr></thead>
+      <tbody>${orders.map(o => `<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:var(--sp-1) var(--sp-2);font-weight:600;">${o.symbol}</td>
+        <td style="color:${o.side==='BUY'?'#4caf50':'#f44336'}">${o.side}</td>
+        <td>${o.type}</td>
+        <td style="text-align:right;">$${Number(o.price).toLocaleString(undefined,{maximumFractionDigits:4})}</td>
+        <td style="text-align:right;">${Number(o.qty).toFixed(6)}</td>
+        <td>${o.status}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  } catch { el.innerHTML = '<div class="empty" style="color:var(--text-muted);font-size:0.85rem;">Unavailable</div>'; }
+}
+
+async function _brokerTemplates() {
+  const el = document.getElementById('brokerTemplates');
+  if (!el) return;
+  try {
+    const d = await fetch('/api/broker/templates').then(r => r.json());
+    el.innerHTML = (d.templates || []).map(t =>
+      `<div style="background:var(--bg-surface);border-radius:8px;padding:var(--sp-3);display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);">
+        <div>
+          <div style="font-weight:600;margin-bottom:2px;">${t.name}</div>
+          <div style="font-size:0.8rem;color:var(--text-muted);">${t.description}</div>
+        </div>
+        <button class="refresh-btn" style="white-space:nowrap;" onclick="brokerAddTemplate(${JSON.stringify(JSON.stringify(t.rule))})">+ Add Rule</button>
+      </div>`
+    ).join('') || '<div class="empty" style="color:var(--text-muted);font-size:0.85rem;">No templates</div>';
+  } catch { el.innerHTML = ''; }
+}
+
+async function brokerQuickWatch(symbol) {
+  try {
+    const r = await fetch('/api/broker/watch', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({symbol}),
+    });
+    const d = await r.json();
+    showToast('Watch', `Monitoring ${symbol} price changes`, 'ok');
+  } catch {
+    showToast('Watch', 'Failed to create monitor rule', 'error');
+  }
+}
+
+async function brokerAddTemplate(ruleJson) {
+  try {
+    const rule = JSON.parse(ruleJson);
+    const r = await fetch('/api/monitor/rules', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(rule),
+    });
+    const d = await r.json();
+    showToast('Monitor', 'Template rule added', 'ok');
+  } catch {
+    showToast('Monitor', 'Failed to add template rule', 'error');
+  }
 }
 
 </script>

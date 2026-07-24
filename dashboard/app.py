@@ -1266,6 +1266,7 @@ FILES_URL = os.getenv("FILES_SERVICE_URL", "http://files-service:8025")
 NOTIFY_URL = os.getenv("NOTIFY_SERVICE_URL", "http://notify-service:8031")
 DOC_PARSER_URL = os.getenv("DOC_PARSER_URL", "http://document-parser:8032")
 MONITOR_URL = os.getenv("MONITOR_SERVICE_URL", "http://monitor-service:8033")
+BROKER_URL = os.getenv("BROKER_URL", "http://broker-bridge:8034")
 _UPLOAD_MAX_BYTES = 10 * 1024 * 1024  # 10 MB
 
 _IMAGE_EXTS = frozenset({"png", "jpg", "jpeg", "gif", "bmp", "webp", "tiff", "tif"})
@@ -1647,6 +1648,79 @@ async def api_browser_search(request: Request):
         raise HTTPException(status_code=502, detail=f"Browser agent error: {exc}")
     except httpx.RequestError as exc:
         raise HTTPException(status_code=503, detail=f"Browser agent unreachable: {exc}")
+
+
+# ── Broker bridge proxies ─────────────────────────────────────────────────────
+
+@app.get("/api/broker/health")
+async def api_broker_health():
+    return await _proxy_get(f"{BROKER_URL}/health", fallback={"status": "unavailable"})
+
+
+@app.get("/api/broker/ticker/{symbol}")
+async def api_broker_ticker(symbol: str):
+    return await _proxy_get(f"{BROKER_URL}/ticker/{symbol}", fallback={})
+
+
+@app.get("/api/broker/ticker")
+async def api_broker_tickers(symbols: str = ""):
+    params = {"symbols": symbols} if symbols else {}
+    return await _proxy_get(f"{BROKER_URL}/ticker", params=params, fallback={"tickers": []})
+
+
+@app.get("/api/broker/balance")
+async def api_broker_balance():
+    return await _proxy_get(f"{BROKER_URL}/balance", fallback={"assets": []})
+
+
+@app.get("/api/broker/positions")
+async def api_broker_positions():
+    return await _proxy_get(f"{BROKER_URL}/positions", fallback={"positions": []})
+
+
+@app.get("/api/broker/orders")
+async def api_broker_orders(symbol: str = ""):
+    params = {"symbol": symbol} if symbol else {}
+    return await _proxy_get(f"{BROKER_URL}/orders", params=params, fallback={"orders": []})
+
+
+@app.get("/api/broker/pnl")
+async def api_broker_pnl():
+    return await _proxy_get(f"{BROKER_URL}/pnl/summary",
+                            fallback={"total_unrealized_pnl": None, "positions": []})
+
+
+@app.get("/api/broker/templates")
+async def api_broker_templates():
+    return await _proxy_get(f"{BROKER_URL}/templates", fallback={"templates": []})
+
+
+@app.post("/api/broker/watch")
+async def api_broker_watch(request: Request):
+    """Create a monitor rule for a position from the Broker tab Quick Watch button."""
+    body = await request.json()
+    symbol = body.get("symbol", "").upper()
+    threshold = body.get("threshold")
+    if not symbol:
+        raise HTTPException(status_code=400, detail="symbol required")
+    rule = {
+        "source": {
+            "type": "http",
+            "url": f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}USDT",
+            "field": "price",
+        },
+        "condition": {"op": "changed"},
+        "actions": [
+            {"type": "notify", "message": f"{symbol} price changed"},
+            {"type": "tts", "text": f"{symbol} price has changed"},
+        ],
+        "interval": 60,
+        "cooldown": 300,
+    }
+    if threshold is not None:
+        rule["condition"] = {"op": "lt", "threshold": float(threshold)}
+    monitor_url = os.getenv("MONITOR_SERVICE_URL", "http://monitor-service:8033")
+    return await _proxy_post(f"{monitor_url}/rules", body=rule, fallback={"ok": False})
 
 
 if __name__ == "__main__":
