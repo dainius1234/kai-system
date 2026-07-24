@@ -265,6 +265,7 @@ services:
       DOCKER_WATCHER_URL: http://docker-watcher:8041
       AIRQUALITY_URL: http://airquality-service:8042
       CALENDAR_SERVICE_URL: http://calendar-service:8043
+      GIT_WATCHER_URL: http://git-watcher:8044
       LANGGRAPH_URL: http://agentic:8007
     ports:
       - "8080:8080"
@@ -713,6 +714,26 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.32
+
+  git-watcher:
+    build:
+      context: .
+      dockerfile: git-watcher/Dockerfile
+    container_name: kai-git-watcher
+    restart: unless-stopped
+    ports:
+      - "8044:8044"
+    environment:
+      PORT: "8044"
+      GIT_WATCH_PATHS: "/workspace"
+      GIT_REFRESH_SECONDS: "60"
+    volumes:
+      - /home/user/kai-system:/workspace:ro
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.33
+    depends_on:
+      - dashboard
 
   wake-service:
     build:

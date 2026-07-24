@@ -1214,6 +1214,25 @@
                 </table>
               </div>
             </div>
+            <!-- Git repos -->
+            <div class="card" style="padding:var(--sp-4);margin-bottom:var(--sp-4);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-3);">
+                <h3 style="font-size:0.9rem;color:var(--text-muted);">Git Repos</h3>
+                <div id="gitDirtyBadge" style="font-size:0.75rem;background:#ef4444;color:#fff;border-radius:9999px;padding:2px 7px;display:none;"></div>
+              </div>
+              <div id="gitSummary" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:var(--sp-2);">Loading…</div>
+              <div style="overflow-x:auto;max-height:200px;overflow-y:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+                  <thead><tr style="border-bottom:1px solid var(--border);">
+                    <th style="text-align:left;padding:3px 6px;">Path</th>
+                    <th style="text-align:left;padding:3px 6px;">Branch</th>
+                    <th style="text-align:left;padding:3px 6px;">Commit</th>
+                    <th style="text-align:right;padding:3px 6px;">Uncommitted</th>
+                  </tr></thead>
+                  <tbody id="gitList"></tbody>
+                </table>
+              </div>
+            </div>
             <!-- Screen watcher -->
             <div class="card" style="padding:var(--sp-4);margin-bottom:var(--sp-4);">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-3);">
@@ -5570,7 +5589,7 @@ let _systemInterval = null;
 
 async function refreshSystem() {
   try {
-    const [snap, procs, watcher, weather, aqi, docker, dockerSumResp] = await Promise.all([
+    const [snap, procs, watcher, weather, aqi, docker, dockerSumResp, gitRepos, gitSumResp] = await Promise.all([
       fetch('/api/sysmetrics/snapshot').then(r => r.json()).catch(() => ({})),
       fetch('/api/sysmetrics/processes').then(r => r.json()).catch(() => ({processes:[]})),
       fetch('/api/screen-watcher/status').then(r => r.json()).catch(() => ({})),
@@ -5578,6 +5597,8 @@ async function refreshSystem() {
       fetch('/api/airquality/current').then(r => r.json()).catch(() => ({})),
       fetch('/api/docker/containers').then(r => r.json()).catch(() => ({containers:[], total:0})),
       fetch('/api/docker/summary').then(r => r.json()).catch(() => ({summary:''})),
+      fetch('/api/git/repos').then(r => r.json()).catch(() => ({repos:[], count:0})),
+      fetch('/api/git/summary').then(r => r.json()).catch(() => ({summary:''})),
     ]);
     const cpu = snap.cpu || {};
     const mem = snap.memory || {};
@@ -5616,6 +5637,21 @@ async function refreshSystem() {
         <td style="padding:3px 6px;text-align:right;${c.restarts>3?'color:#ef4444;':''}">${c.restarts}</td>
       </tr>`
     ).join('') || '<tr><td colspan="5" style="padding:8px;color:var(--text-muted);">No data</td></tr>';
+    // Git repos
+    const gitDirtyBadge = document.getElementById('gitDirtyBadge');
+    const gitRepoList = gitRepos.repos || [];
+    const gitDirtyCount = gitRepoList.filter(r => (r.uncommitted_changes || 0) > 0 || (r.untracked_files || 0) > 0).length;
+    gitDirtyBadge.textContent = `${gitDirtyCount} dirty`;
+    gitDirtyBadge.style.display = gitDirtyCount > 0 ? '' : 'none';
+    document.getElementById('gitSummary').textContent = gitSumResp.summary || `${gitRepos.count || 0} repos`;
+    document.getElementById('gitList').innerHTML = gitRepoList.map(r =>
+      `<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:3px 6px;font-family:monospace;font-size:0.75rem;">${r.path}</td>
+        <td style="padding:3px 6px;">${r.branch || '—'}</td>
+        <td style="padding:3px 6px;color:var(--text-muted);font-family:monospace;font-size:0.75rem;">${r.commit_hash || '—'}</td>
+        <td style="padding:3px 6px;text-align:right;${(r.uncommitted_changes||0)>0?'color:#ef4444;font-weight:600;':''}">${r.uncommitted_changes || 0}</td>
+      </tr>`
+    ).join('') || '<tr><td colspan="4" style="padding:8px;color:var(--text-muted);">No data</td></tr>';
     document.getElementById('sysStatus').textContent = `Updated ${new Date().toLocaleTimeString()}`;
     const tbody = document.getElementById('sysProcesses');
     tbody.innerHTML = (procs.processes || []).map(p =>
