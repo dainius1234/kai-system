@@ -30,10 +30,17 @@ os.environ.setdefault("SCREEN_WATCH_DIR", _tmp_watch)
 os.environ.setdefault("MEMU_URL", "http://localhost:9999")  # nothing listening
 os.environ.setdefault("AUTO_MEMORIZE", "false")
 
+import importlib.util as _ilu
+
 from fastapi.testclient import TestClient
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "screen-capture"))
-from app import app  # noqa: E402
+_sc_path = Path(__file__).resolve().parents[1] / "screen-capture" / "app.py"
+_sc_spec = _ilu.spec_from_file_location("screen_capture_app", _sc_path)
+_sc_mod = _ilu.module_from_spec(_sc_spec)
+sys.modules.pop("app", None)  # evict any previously cached 'app' module
+sys.modules["screen_capture_app"] = _sc_mod
+_sc_spec.loader.exec_module(_sc_mod)
+app = _sc_mod.app
 
 client = TestClient(app, raise_server_exceptions=False)
 

@@ -7,6 +7,15 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+# Evict any MagicMock stub injected by test_agentic_routes.py at collection time
+import importlib.util as _ilu
+sys.modules.pop("tree_search", None)
+_ts_path = os.path.join(os.path.dirname(__file__), "..", "agentic", "tree_search.py")
+_ts_spec = _ilu.spec_from_file_location("tree_search", _ts_path)
+_ts_mod = _ilu.module_from_spec(_ts_spec)
+sys.modules["tree_search"] = _ts_mod
+_ts_spec.loader.exec_module(_ts_mod)
+
 from tree_search import tree_search, Branch, TreeSearchResult, _generate_variations, _branch_id
 
 

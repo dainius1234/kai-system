@@ -6,6 +6,15 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+# Evict any MagicMock stub injected by test_agentic_routes.py at collection time
+import importlib.util as _ilu
+sys.modules.pop("model_selector", None)
+_ms_path = os.path.join(os.path.dirname(__file__), "..", "agentic", "model_selector.py")
+_ms_spec = _ilu.spec_from_file_location("model_selector", _ms_path)
+_ms_mod = _ilu.module_from_spec(_ms_spec)
+sys.modules["model_selector"] = _ms_mod
+_ms_spec.loader.exec_module(_ms_mod)
+
 from model_selector import (
     ModelProfile, estimate_complexity, select_model,
     get_profile, register_model, list_models, _PROFILES,
