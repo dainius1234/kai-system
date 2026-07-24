@@ -45,6 +45,8 @@ All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Audio/TTS st
 | #98 | Hardening sprint: shell sandbox `SAFE_DIRS` path restriction (11 tests); kill-isolation CI step; Trivy exit-code `'1'` + `ignore-unfixed`; per-module coverage floors (`agentic ≥ 45%`, `memu-core ≥ 60%`); `go_no_go` + `check-docs` early CI gates; restart-persistence smoke test; upload fuzz (14 tests) | D86 |
 | #99 | Memory Graph tab (D3 v7 force-directed, category hubs, trust-tier colours, zoom/pan/drag, hover, filter); Whisper audio-service in minimal stack (`172.20.0.15`); `WHISPER_BACKEND=stub`; `/api/audio/transcribe` proxy; MediaRecorder fallback in `toggleVoice()` | D86 |
 | #100 | TTS service in minimal stack (`172.20.0.16`, edge-tts, `en-GB-RyanNeural`); `/api/tts/synthesize` proxy; 🔊 speak button on all assistant messages; `speakMsg()` with ObjectURL playback; audio transcribe fuzz suite (13 tests); `make test-audio-transcribe` | D86 |
+| #101 | Doc sweep: SESSION_BOOTSTRAP + CHANGELOG + README for PRs #97–#100 + D86 | — |
+| #102 | Browser agent (`browser-agent/`, Playwright Chromium, port 8040, `172.20.0.17`): `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run`; `/api/browser/*` dashboard proxies; `browse: <url>` chat shortcut; 13 tests. Vision service (`perception/vision/`, OpenCV+DeepFace, port 8023, `172.20.0.18`): face detection + emotion; `/api/vision/{analyze,presence}` proxies; 📷 camera panel (5 s frame sampling, presence+emotion overlay); 12 tests | — |
 
 ### In-flight work
 
@@ -63,7 +65,9 @@ None. All work is on `main`. No open PRs.
 7. **Memory Graph tab — DONE** (PR #99, D86) — D3 v7 force-directed, trust-tier colours, hover/filter
 8. **Whisper STT — DONE** (PR #99, D86) — audio-service in minimal stack, MediaRecorder fallback
 9. **TTS voice synthesis — DONE** (PR #100, D86) — tts-service, edge-tts, 🔊 speak button
-10. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
+10. **Browser agent — DONE** (PR #102) — Playwright Chromium navigation, scrape, click, type
+11. **Vision/camera — DONE** (PR #102) — OpenCV face detect + DeepFace emotion, webcam panel
+12. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
 
 Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
@@ -93,6 +97,8 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
   - `audio-service` — Whisper STT (`perception/audio/`), port 8021, IP `172.20.0.15`. `WHISPER_BACKEND=stub` (CI/dev); `local` for real transcription. Dashboard proxy: `POST /api/audio/transcribe`.
   - `tts-service` — edge-tts voice synthesis (`output/tts/`), port 8030, IP `172.20.0.16`. `en-GB-RyanNeural` default voice. Dashboard proxy: `POST /api/tts/synthesize`; returns `audio/mpeg`.
   - `wake-service` — wake-word + intent detection (`perception/wake/`), port 8022, IP `172.20.0.10`.
+  - `browser-agent` — Playwright Chromium (`browser-agent/`), port 8040, IP `172.20.0.17`. Headless browser; `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run`. Dashboard proxies `/api/browser/*`. Chat shortcut `browse: <url>`.
+  - `vision-service` — webcam frame analysis (`perception/vision/`), port 8023, IP `172.20.0.18`. OpenCV haar cascade (face detect) + DeepFace emotion (CPU-safe). Dashboard proxies `/api/vision/{analyze,presence}`. 📷 camera panel in frontend.
 - **VECTOR_STORE env var** in `memu-core`: `turbovec` (default dev/CI) → TurboVec; `postgres` → pgvector; else → ephemeral InMemory. Sovereign uses `postgres`.
 - **`FF_GRAPH_INGEST=true`** (default in full compose): every memorize/forget fans out to memu-graph. Best-effort — never blocks memu-core.
 - **`FF_LETTA_TASKS=false`** (default): when `true`, each `/chat` fires a 30s POST to letta-agent and injects archival context into the system prompt.
@@ -104,7 +110,7 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 - **Model**: `qwen2.5:0.5b` (default). Embedding: `all-MiniLM-L6-v2` (384-dim).
 - **Embedding endpoint**: `/api/embed` (not deprecated `/api/embeddings`). Confirmed D47.
 - **TurboVecStore startup**: embedding backend (`_embedding_backend` / `generate_embedding`) must be defined before store selection block in `memu-core/app.py` — see D78.
-- **Tests**: 2,303 across 107 files; per-module floors: `agentic ≥ 45%`, `memu-core ≥ 60%`. `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
+- **Tests**: 2,328 across 109 files; per-module floors: `agentic ≥ 45%`, `memu-core ≥ 60%`. `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
 - **Coverage**: 5 modules (`common`, `agentic`, `memu-core`, `letta-agent`, `financial-awareness`), 60% gate.
 
 ---
@@ -145,4 +151,6 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 | `docs/PHONE_SETUP.md` | PWA phone install guide (Android + iOS) |
 | `perception/audio/` | Whisper STT service (`audio-service`, port 8021) |
 | `output/tts/` | edge-tts voice synthesis service (`tts-service`, port 8030) |
+| `browser-agent/` | Playwright Chromium navigation service (port 8040) |
+| `perception/vision/` | Webcam face/emotion analysis service (port 8023) |
 | `CHANGELOG.md` | Full semver changelog |

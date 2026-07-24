@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-24
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** PRs #98–#99 merged. Hardening sprint (7 items) + Memory Graph tab + Whisper audio input + TTS voice synthesis all on main. Minimal stack now includes audio-service (Whisper STT) and tts-service (edge-tts). All CPU-safe pre-GPU work done. Blocked on GPU.
+- **Current focus:** PRs #98–#102 merged. Full perception stack on main: audio-service (STT), tts-service (TTS), browser-agent (Playwright navigation), vision-service (webcam/face/emotion). All CPU-safe pre-GPU work done. Blocked on GPU.
 
 ## What's landed on main
 
@@ -27,6 +27,8 @@
 | #95 | D85 | Simplify sprint: unified `_RISK_LEVELS` table in hse_rams; explicit 400 on oversized shell commands; `raise_for_status()` split error handling in dashboard upload; `prefix` closure in JS; sovereign compose `:?` → `:-` CI fix; runner disk-cleanup step before heavy Docker builds |
 | #98 | D86 | Hardening sprint: shell sandbox `SAFE_DIRS` path restriction (11 tests); kill-isolation CI step; Trivy exit-code `'1'` + `ignore-unfixed`; per-module coverage floors (agentic ≥45%, memu-core ≥60%); `go_no_go` + `check-docs` as early CI gates; restart-persistence smoke test; upload endpoint security fuzz (14 tests) |
 | #99 | D86 | Memory Graph tab (D3 v7 force-directed, `/api/memory/graph-data`, category hubs, trust-tier colours, zoom/pan/drag, hover tooltip, detail card, filter); Whisper audio-service in minimal stack (172.20.0.15, WHISPER_BACKEND=stub); TTS service in minimal stack (172.20.0.16, edge-tts); `/api/audio/transcribe` + `/api/tts/synthesize` dashboard proxies; `toggleVoice()` MediaRecorder fallback; 🔊 speak button on all assistant messages |
+| #101 | — | Doc sweep: SESSION_BOOTSTRAP + CHANGELOG + README updated for PRs #97–#100 + D86 (milestones 32→35, services 33→35, tests 2,279→2,303) |
+| #102 | — | Browser agent (`browser-agent/`, Playwright, port 8040, 172.20.0.17): `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run`, dashboard proxies, `browse:` chat shortcut, 13 tests. Vision service (`perception/vision/`, OpenCV+DeepFace, port 8023, 172.20.0.18): face detection, emotion, presence, 📷 camera panel in dashboard, 5 s frame sampling, 12 tests. 25 new tests total. |
 
 ## Open PRs
 
