@@ -4,9 +4,10 @@ import asyncio
 import json
 import logging
 import os
+import re
 import time
 import uuid
-from collections import deque
+from collections import Counter, deque
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional
@@ -19,6 +20,10 @@ from pydantic import BaseModel
 from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.feature_flags import is_enabled
 from common.llm import LLMRouter, llm_warmup
+from system_fsm import KaiEvent as SysEvent, fire as fsm_fire, current_state as fsm_state, fsm_snapshot
+from teammates import load_teammates, list_teammates, build_teammate_context
+from counterfactual import rehearse as rehearse_counterfactual, can_rehearse
+from curiosity import idle_curiosity_tick, CURIOSITY_LOG
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, INJECTION_RE, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, create_checkpoint, list_checkpoints, load_checkpoint, diff_checkpoints, delete_checkpoint
@@ -54,7 +59,9 @@ NEWS_FEED_URL = os.getenv("NEWS_FEED_URL", "http://news-feed:8038")
 GIT_WATCHER_URL = os.getenv("GIT_WATCHER_URL", "http://git-watcher:8044")
 BROKER_URL = os.getenv("BROKER_URL", "http://broker-bridge:8034")
 SKILL_HUNTER_URL = os.getenv("SKILL_HUNTER_URL", "http://skill-hunter:8045")
+HOUSE_DOCTOR_URL = os.getenv("HOUSE_DOCTOR_URL", "http://house-doctor:8046")
 PROACTIVE_INTERVAL = int(os.getenv("PROACTIVE_INTERVAL_SECONDS", "300"))
+GAP_HUNT_THRESHOLD = int(os.getenv("GAP_HUNT_THRESHOLD", "3"))
 WAKE_INTENT_COMMAND_THRESHOLD = float(os.getenv("WAKE_INTENT_COMMAND_THRESHOLD", "0.6"))
 WAKE_INTENT_OVERRIDE_CONFIDENCE = float(os.getenv("WAKE_INTENT_OVERRIDE_CONFIDENCE", "0.7"))
 budget = ErrorBudget(window_seconds=300)
@@ -559,6 +566,12 @@ async def introspect_capabilities() -> Dict[str, Any]:
         "feature_flags": {f["flag"]: f["enabled"] for f in get_all_flags()},
         "baselines_tracked": list(_sensor_baselines.keys()),
         "observation_history_depth": len(_observation_history),
+        # D89 additions
+        "fsm": fsm_snapshot(),
+        "teammates": list_teammates(),
+        "counterfactual_available": await can_rehearse(),
+        "gap_log_top5": dict(_gap_log.most_common(5)),
+        "proposed_rituals": list(_proposed_rituals),
     }
 
 
@@ -573,6 +586,46 @@ async def queue_stats() -> Dict[str, Any]:
     q = get_queue()
     s = q.stats()
     return {"pending": s.pending, "active": s.active, "total_processed": s.total_processed, "avg_wait_ms": s.avg_wait_ms}
+
+
+@app.get("/teammates")
+async def get_teammates() -> Dict[str, Any]:
+    """D89: List all loaded persistent teammates."""
+    return {"teammates": list_teammates(), "count": len(list_teammates())}
+
+
+class TeammateRequest(BaseModel):
+    message: str
+    session_id: str = ""
+    world_context: bool = True
+
+
+@app.post("/chat/teammate/{name}")
+async def chat_with_teammate(name: str, req: TeammateRequest) -> Dict[str, Any]:
+    """D89: Route a query to a named teammate (Scout, Doctor, Sage, Oracle).
+
+    Injects the teammate's system prompt + current world state into the LLM call.
+    """
+    if not is_enabled("PERSISTENT_TEAMMATES"):
+        raise HTTPException(status_code=503, detail="FF_PERSISTENT_TEAMMATES is disabled")
+    teammate_ctx = build_teammate_context(name)
+    if teammate_ctx is None:
+        raise HTTPException(status_code=404, detail=f"Teammate '{name}' not found. Available: {[t['slug'] for t in list_teammates()]}")
+
+    world_state_block = ""
+    if req.world_context and _last_world_snapshot:
+        world_state_block = "\n\nCurrent world state:\n" + json.dumps(_last_world_snapshot, indent=2)[:800]
+
+    prompt = f"{teammate_ctx}{world_state_block}\n\n---\n\nQuery: {req.message}"
+    try:
+        response = await _llm.chat([{"role": "user", "content": prompt}])
+        return {
+            "teammate": name,
+            "response": response,
+            "message": req.message,
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Teammate invocation failed: {exc}")
 
 
 @app.get("/models")
@@ -907,6 +960,12 @@ _sensor_baselines: Dict[str, Deque[float]] = {}
 # ── D88 M5: observation history for pattern detection ───────────────
 _observation_history: Deque[List[str]] = deque(maxlen=10)
 
+# ── D89 C1: capability gap log — fire hunt only after N misses ───────
+_gap_log: Counter = Counter()
+
+# ── D89 C5: ritual discovery — track which patterns have been proposed ─
+_proposed_rituals: set = set()
+
 
 def _update_baseline(key: str, value: float) -> Optional[float]:
     """Update rolling baseline; return z-score against prior history, or None if window too small.
@@ -964,40 +1023,71 @@ def _correlate_observations(obs: List[str]) -> List[str]:
     return correlated
 
 
+def _classify_obs_type(o: str) -> str:
+    if "Docker:" in o and "unhealthy" in o:
+        return "docker_unhealthy"
+    if "Email:" in o:
+        return "email_backlog"
+    if "Air quality:" in o:
+        return "aq_degraded"
+    if "Git:" in o:
+        return "git_dirty"
+    if "CPU" in o:
+        return "cpu_high"
+    if "RAM" in o:
+        return "ram_high"
+    if "Anomaly" in o:
+        return "sensor_anomaly"
+    return "other"
+
+
 def _detect_sensor_patterns(current_obs: List[str]) -> List[str]:
-    """D88 M5: detect recurring sensor signal types across recent cycles."""
+    """D88 M5 / D89 C5: detect recurring sensor types; propose rituals at ≥7/10 cycles."""
     if not is_enabled("SENSORY_LEARNING"):
         return []
 
-    def _classify(o: str) -> str:
-        if "Docker:" in o and "unhealthy" in o:
-            return "docker_unhealthy"
-        if "Email:" in o:
-            return "email_backlog"
-        if "Air quality:" in o:
-            return "aq_degraded"
-        if "Git:" in o:
-            return "git_dirty"
-        if "CPU" in o:
-            return "cpu_high"
-        if "RAM" in o:
-            return "ram_high"
-        if "Anomaly" in o:
-            return "sensor_anomaly"
-        return "other"
-
-    current_types = {_classify(o) for o in current_obs}
+    current_types = {_classify_obs_type(o) for o in current_obs}
     patterns: List[str] = []
     for obs_type in current_types:
         count = sum(
             1 for hist in _observation_history
-            if any(obs_type == _classify(o) for o in hist)
+            if any(obs_type == _classify_obs_type(o) for o in hist)
         )
         if count >= 3:
             patterns.append(
                 f"Recurring pattern: {obs_type} has appeared in {count}/10 recent observation cycles — this is becoming a persistent issue"
             )
+        # D89 C5: ritual discovery — propose at ≥7/10 cycles
+        if count >= 7 and is_enabled("RITUAL_DISCOVERY") and obs_type not in _proposed_rituals:
+            _proposed_rituals.add(obs_type)
+            asyncio.create_task(_propose_ritual(obs_type, count))
     return patterns
+
+
+async def _propose_ritual(obs_type: str, count: int) -> None:
+    """Write a ritual proposal to RITUALS.md and notify the operator."""
+    ritual_path = Path("/data/RITUALS.md")
+    ts = datetime.utcnow().isoformat()
+    proposal = (
+        f"\n## [{ts}] Auto-detected: {obs_type}\n\n"
+        f"I've noticed **{obs_type}** has appeared in {count}/10 recent observation cycles. "
+        f"Would you like me to make this a standing routine — "
+        f"e.g. an automatic alert or scheduled check whenever this pattern appears? "
+        f"Edit this entry to confirm or adjust.\n\n"
+        f"- **Pattern:** {obs_type}\n"
+        f"- **Frequency:** {count}/10 cycles\n"
+        f"- **Proposed ritual:** _[operator to fill in]_\n"
+        f"- **Status:** pending approval\n"
+    )
+    try:
+        ritual_path.parent.mkdir(parents=True, exist_ok=True)
+        if not ritual_path.exists():
+            ritual_path.write_text("# Rituals\n\n_Co-authored by Kai and operator._\n")
+        with ritual_path.open("a", encoding="utf-8") as f:
+            f.write(proposal)
+        logger.info("Ritual proposal written for pattern: %s", obs_type)
+    except Exception as exc:
+        logger.debug("Could not write ritual proposal: %s", exc)
 
 
 async def _proactive_observer() -> None:
@@ -1156,17 +1246,28 @@ async def _proactive_observer() -> None:
                 except Exception:
                     pass
 
-            # ── D88 M4: world model persistence ──────────────────────
+            # ── D88 M4 / D89 C3: world model persistence with provenance ─
             if is_enabled("WORLD_MODEL_PERSISTENCE"):
+                ts_now = datetime.utcnow().isoformat()
+                def _prov(value: Any, source: str, confidence: float = 1.0) -> Dict[str, Any]:
+                    return {"value": value, "source": source, "timestamp": ts_now, "confidence": confidence}
                 world_model = {
-                    "timestamp": datetime.utcnow().isoformat(),
-                    "docker_unhealthy": unhealthy,
-                    "email_unread": unread_now,
-                    "cpu_percent": cpu,
-                    "ram_percent": ram,
-                    "aqi_category": aqi_cat,
-                    "git_dirty_count": dirty,
-                    "calendar_next": snapshot.get("cal", {}).get("next_event", ""),
+                    "timestamp": ts_now,
+                    "fsm_state": fsm_state().value,
+                    "docker_unhealthy": _prov(unhealthy, "docker-watcher"),
+                    "email_unread": _prov(unread_now, "email-reader"),
+                    "cpu_percent": _prov(cpu, "sysmetrics"),
+                    "ram_percent": _prov(ram, "sysmetrics"),
+                    "aqi_category": _prov(aqi_cat or "unknown", "airquality-service", 0.9 if aqi_cat else 0.3),
+                    "git_dirty_count": _prov(dirty, "git-watcher"),
+                    "calendar_next": _prov(snapshot.get("cal", {}).get("next_event", ""), "calendar-service", 0.8),
+                    # D89/D: predictive empathy foundation — populated by emotional memory in Phase 1
+                    "emotional_context": {
+                        "indicators": [],
+                        "predicted_mood": None,
+                        "confidence": 0.0,
+                        "note": "stub_pending_emotional_memory",
+                    },
                 }
                 try:
                     async with httpx.AsyncClient(timeout=5.0) as client:
@@ -1181,6 +1282,24 @@ async def _proactive_observer() -> None:
                 except Exception:
                     pass
 
+            # ── D89 E: House Doctor — differential diagnosis ──────────
+            if is_enabled("HOUSE_DOCTOR") and observations:
+                try:
+                    async with httpx.AsyncClient(timeout=5.0) as client:
+                        await client.post(
+                            f"{HOUSE_DOCTOR_URL}/diagnose",
+                            json={"observations": observations},
+                        )
+                except Exception:
+                    pass
+
+            # ── D89 F: curiosity idle tick ────────────────────────────
+            if is_enabled("CURIOSITY"):
+                from system_fsm import KaiState
+                asyncio.create_task(
+                    idle_curiosity_tick(_last_world_snapshot, is_gpu_available=False)
+                )
+
             _last_world_snapshot = snapshot
         except Exception as exc:
             logger.warning("Proactive observer error: %s", exc)
@@ -1188,9 +1307,23 @@ async def _proactive_observer() -> None:
 
 
 async def _hunt_skill_for_gap(gap_description: str) -> None:
-    """D88 M8: reactive skill acquisition — ask skill-hunter to fill a capability gap."""
+    """D88 M8 / D89 C1: reactive skill acquisition with gap logging.
+
+    Increments _gap_log for the normalised gap. Only calls skill-hunter
+    after GAP_HUNT_THRESHOLD misses (default 3) to avoid wasted hunts
+    on one-off unusual requests.
+    """
     if not is_enabled("SKILL_HUNTER"):
         return
+    gap_key = re.sub(r"\s+", " ", gap_description.lower().strip())[:80]
+    if is_enabled("GAP_LOGGING"):
+        _gap_log[gap_key] += 1
+        if _gap_log[gap_key] < GAP_HUNT_THRESHOLD:
+            logger.debug(
+                "Gap logged (%d/%d): '%s'",
+                _gap_log[gap_key], GAP_HUNT_THRESHOLD, gap_key,
+            )
+            return
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
             resp = await client.post(
@@ -1199,7 +1332,7 @@ async def _hunt_skill_for_gap(gap_description: str) -> None:
             )
             if resp.status_code == 200 and resp.json().get("skill_created"):
                 await asyncio.to_thread(load_skills)
-                logger.info("Skill hunter: new skill loaded for gap '%s'", gap_description[:80])
+                logger.info("Skill hunter: new skill loaded for gap '%s'", gap_key)
     except Exception as exc:
         logger.debug("Skill hunter request failed (non-critical): %s", exc)
 
@@ -1493,10 +1626,14 @@ async def chat_stream(req: ChatRequest):
     # Session messages always fetched (needed even when enrichment is off)
     session_msgs = await _safe(_get_session_messages(req.session_id), [])
 
+    # D89 FSM: fire USER_MESSAGE event (IDLE → ACTIVE or FOCUSED stays FOCUSED)
+    if is_enabled("FSM"):
+        asyncio.create_task(fsm_fire(SysEvent.USER_MESSAGE))
+
     # Match skill before LLM so the relevant skill doc reaches the prompt (J7 fix)
     matched_skill = match_skill(user_msg)
 
-    # D88 M8: reactive skill acquisition — fire-and-forget when no skill matches + low route confidence
+    # D88 M8 / D89 C1: reactive skill acquisition with gap logging
     if matched_skill is None and route_decision.confidence < 0.4:
         asyncio.create_task(_hunt_skill_for_gap(user_msg))
 
@@ -2294,6 +2431,9 @@ async def _startup_warmup() -> None:
     )
     # P21 / D87: proactive awareness loop — notices anomalies and writes them to memory
     asyncio.create_task(_proactive_observer())
+    # D89: load persistent teammates at startup
+    if is_enabled("PERSISTENT_TEAMMATES"):
+        load_teammates()
 
 
 # ── P16b: Log aggregation ───────────────────────────────────────────

@@ -10,10 +10,10 @@
 <p align="center">
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
-  <img src="https://img.shields.io/badge/services-58-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-2%2C644_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/services-59-blue?style=flat-square" alt="services">
+  <img src="https://img.shields.io/badge/tests-2%2C671_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
-  <img src="https://img.shields.io/badge/Python-~64%2C195_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/Python-~65%2C940_LOC-yellow?style=flat-square" alt="loc">
   <img src="https://img.shields.io/badge/milestones-39_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
@@ -25,10 +25,10 @@
 
 | Metric | Value |
 |---|---|
-| **Services** | 58 Docker containers |
-| **Test targets** | 81 (`make test-core`) |
-| **Individual tests** | 2,644 (`def test_` across 127 files) |
-| **Python LOC** | ~64,195 |
+| **Services** | 59 Docker containers |
+| **Test targets** | 82 (`make test-core`) |
+| **Individual tests** | 2,671 (`def test_` across 128 files) |
+| **Python LOC** | ~65,940 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 39 |
 | **Failures** | 0 |

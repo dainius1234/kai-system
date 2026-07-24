@@ -16,10 +16,12 @@ process-level failure isolation between hot and cold paths.
 
 **Phase: Phase 0 — COMPLETE. Blocked on GPU hardware (RTX 5080) to enter Phase 1.**
 
-All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. D88 Advanced Cognition
-merged (2026-07-24): Kai now has rolling anomaly baselines, cross-sensor correlation, world
-model persistence, pattern learning, a skill-hunter service, proactive scheduling, and
-reactive skill acquisition. No open PRs.
+All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. D89 Cognitive Depth
+merged (2026-07-24): Kai now has a deterministic cognitive reasoning pipeline FSM, operational
+system FSM, persistent named teammates, a house-doctor diagnostic service, skill provenance
+tracking, emergent ritual discovery, capability gap logging with threshold gating, and
+GPU-era foundations for counterfactual rehearsal, trust negotiation, predictive empathy,
+and resource-aware curiosity. No open PRs.
 
 ### What has shipped to `main` (merged PRs, in order)
 
@@ -62,6 +64,7 @@ reactive skill acquisition. No open PRs.
 | #116 | — | yfinance stocks/forex endpoints on broker-bridge; git-watcher service (8044, `.33`); 19 tests; services 51→52 | — |
 | D87 | D87 | Cognitive architecture: `_get_world_context()` (9 sensory services per /chat), `_proactive_observer()` (background anomaly loop → memu-core), skill matching wired into /chat, ghost flag fixes (FF_CONTEXT_ENRICHMENT + FF_PROACTIVE_AGENT), 14-way gather; 17 tests | — |
 | D88 | D88 | 8 advanced cognitive mechanisms: M1 anomaly detection with rolling baselines (2σ z-score); M2 `/introspect/capabilities` self-capability map; M3 cross-service correlation (`_correlate_observations()`); M4 world model persistence (JSON `world_state` to memu-core each cycle); M5 sensory learning (pattern history deque, `sensor_pattern` memories); M6 skill-hunter service (port 8045, `.34`); M7 proactive scheduling (calendar + sensors → `proactive_schedule` memories); M8 reactive skill acquisition (capability gap → skill hunter on-demand). 5 new feature flags. 44 tests. Services: 57 → 58 | — |
+| D89 | D89 | Cognitive Depth sprint: `agentic/system_fsm.py` (KaiFSM — 5 states, 9 events, 16 transitions, asyncio.Lock singleton); `agentic/cognitive_fsm.py` (CognitiveFSM reasoning pipeline — GATHER→DEBATE→FACT_CHECK→CAUSAL_CHECK→CONVICTION_GATE→PRESENT, HALT/ESCALATE_LOOP/RETHINK with bounded retries, schema-validated `AgentHandoff`, per-swarm `SwarmConfig` for trading/research/skill_forge/default); `agentic/teammates.py` (TeammateDef, markdown-based registry, `GET /teammates`, `POST /chat/teammate/{name}`); `data/teammates/` (Scout/Doctor/Sage/Oracle personas); `agentic/counterfactual.py` (stub: `can_rehearse()→False`, `rehearse()→stub_pending_gpu`); `agentic/curiosity.py` (idle curiosity tick, CURIOSITY.md, GPU-gated); `house-doctor/` service (port 8046, `.35`, 9 differential-diagnosis rules D001–D009, `/diagnose` + `/rules`, writes `medical_report` to memu-core); skill-hunter v0.2 (YAML front-matter provenance, `.meta.json` sidecars, auto-disable at ≥3 errors, `/skill/{name}/health` + `/skill/{name}/error`); tool-gate `POST /gate/autonomy/request` (trust negotiation stub); world model provenance layer (`{value,source,timestamp,confidence}` per field); capability gap logging (`GAP_HUNT_THRESHOLD=3`); emergent ritual discovery (≥7/10 pattern cycles → RITUALS.md); `emotional_context` world model key (predictive empathy foundation); 8 new feature flags; `scripts/test_d89_cognitive_depth.py` (47 tests). Services: 58 → 59 | — |
 
 ### In-flight work
 
@@ -143,7 +146,7 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
 ## 6) PM operating rules
 
-- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D86**.
+- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D89**.
 - Reality checks → new file `REALITY_CHECK_<date>.md`, not silent rewrites.
 - No drift between docs, status, and delivered code.
 - `make sync-docs` after major changes; `make merge-gate` before every PR.

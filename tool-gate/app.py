@@ -833,6 +833,56 @@ async def ledger_merkle() -> Dict[str, Any]:
     }
 
 
+# ── D89/B: Trust Negotiation Protocol — foundation ───────────────────
+
+class AutonomyRequest(BaseModel):
+    task: str
+    requested_level: int = Field(..., ge=1, le=5, description="1=minimal, 5=full autonomy")
+    rationale: str
+    time_limit_seconds: int = Field(default=300, ge=10, le=3600)
+
+
+@app.post("/gate/autonomy/request")
+async def autonomy_request(req: AutonomyRequest, request: Request) -> Dict[str, Any]:
+    """D89/B: Trust Negotiation — KAI requests temporary elevated autonomy for a specific task.
+
+    Currently all requests return pending_approval — human must explicitly grant.
+    Phase 2: calibrate against operator's historical approval rate and risk tolerance.
+    Gated by FF_TRUST_NEGOTIATION (default True).
+    """
+    from common.feature_flags import is_enabled
+    if not is_enabled("TRUST_NEGOTIATION"):
+        raise HTTPException(status_code=503, detail="Trust Negotiation Protocol is disabled (FF_TRUST_NEGOTIATION=false)")
+
+    safe_task = sanitize_string(req.task)
+    safe_rationale = sanitize_string(req.rationale)
+
+    ledger.append(
+        payload={
+            "type": "autonomy_request",
+            "task": safe_task,
+            "requested_level": req.requested_level,
+            "rationale": safe_rationale,
+            "time_limit_seconds": req.time_limit_seconds,
+        },
+        approved=False,
+        reason="pending_approval — all autonomy requests require explicit operator grant (Phase 2 will calibrate)",
+    )
+
+    return {
+        "status": "pending_approval",
+        "requested_level": req.requested_level,
+        "task": safe_task,
+        "message": (
+            f"Autonomy level {req.requested_level} requested for: {safe_task}. "
+            "All requests require explicit operator approval. "
+            "Rationale logged to ledger. "
+            "Phase 2 will introduce calibrated approval based on your historical patterns."
+        ),
+        "ledger_entry": "written",
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
 

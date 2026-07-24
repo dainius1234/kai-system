@@ -459,6 +459,29 @@ services:
       timeout: 5s
       retries: 3
 
+  house-doctor:
+    <<: *service_defaults
+    build:
+      context: .
+      dockerfile: house-doctor/Dockerfile
+    container_name: house-doctor
+    hostname: house-doctor
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.35
+    ports:
+      - "8046:8046"
+    environment:
+      MEMU_URL: http://memu-core:8001
+      NOTIFY_URL: http://notify-service:8031
+    volumes:
+      - memu_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8046/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   # TODO: enable GPU when core is stable.
   # ollama:
   #   image: ollama/ollama:latest
