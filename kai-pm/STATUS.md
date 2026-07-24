@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-24
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** PRs #109–#112 merged. Sensory expansion complete: 4 new services (sysmetrics, screen-watcher, email-reader, news-feed), broker market depth endpoints, System + Feeds dashboard tabs. All CPU-safe pre-GPU work done. Blocked on GPU.
+- **Current focus:** PRs #109–#114 merged. Sensory expansion waves 1 & 2 complete: 8 new services, broker market depth, full environmental awareness (weather, air quality, calendar, docker health). All CPU-safe pre-GPU work done. Blocked on GPU.
 
 ## What's landed on main
 
@@ -35,6 +35,7 @@
 | #109 | — | broker-bridge (8034, .24): Binance REST, HMAC-SHA256, spot/futures, Broker tab, Quick Watch→monitor rules; 20 tests; services 42→43 |
 | #111 | — | CI fixes: flake8 F824 in browser-agent + stale README metrics |
 | #112 | — | Sensory expansion: sysmetrics (8035/.25), screen-watcher (8036/.26), email-reader (8037/.27), news-feed (8038/.28); broker market depth endpoints; System+Feeds dashboard tabs; 61 tests; services 43→47 |
+| #114 | — | Sensory expansion wave 2: weather-service (8039/.29), docker-watcher (8041/.30), airquality-service (8042/.31), calendar-service (8043/.32); sysmetrics /temperature + /battery; dashboard weather/AQ/docker/calendar widgets; 63 tests; services 47→51 |
 | #102 | — | Browser agent (`browser-agent/`, Playwright, port 8040, 172.20.0.17): `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run`, dashboard proxies, `browse:` chat shortcut, 13 tests. Vision service (`perception/vision/`, OpenCV+DeepFace, port 8023, 172.20.0.18): face detection, emotion, presence, 📷 camera panel in dashboard, 5 s frame sampling, 12 tests. 25 new tests total. |
 | #103 | — | Doc sweep: STATUS, SESSION_BOOTSTRAP, CHANGELOG, README for PR #102 (services 35→37) |
 | #104 | — | clipboard-service (8024/.19), files-service (8025/.20), notify-service (8031/.21), browser `/search`; `search:` chat shortcut; 📋 clipboard button; 52 tests; services 37→40 |
