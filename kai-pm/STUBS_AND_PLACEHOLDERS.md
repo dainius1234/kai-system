@@ -134,7 +134,6 @@ When `sentence-transformers` isn't installed and `MEMU_ALLOW_FAKE_EMBEDDINGS=tru
 | Real TTS (edge-tts) | No audio hardware in CI | `tts-service/` | Same as STT |
 | Avatar / video | GPU + camera gated | `avatar-service/` | GPU + camera hardware provisioned |
 | Multi-model consensus | All 3 specialists route to same endpoint | `common/llm.py`, `fusion-engine/` | Wire `LLM_DEEPSEEK_URL`, `LLM_KIMI_URL`, `LLM_DOLPHIN_URL` |
-| `agentic-introspect` in sovereign profile | Missing from `docker-compose.sovereign.yml` | Known gap — documented in DECISIONS.md | Add service to sovereign compose |
 
 ---
 

@@ -6,7 +6,7 @@ Monthly review reminder is automated via `.github/workflows/tech-watch-reminder.
 
 | Tech | Verdict | Date assessed | Why | Re-evaluate |
 |---|---|---|---|---|
-| GitHub Actions workflows for PM guardrails | Adopt | 2026-04-21 | Native automation for drift prevention and repeatable PM checks | 2026-07-01 |
+| GitHub Actions workflows for PM guardrails | Adopt | 2026-04-21 | Native automation for drift prevention and repeatable PM checks. Reviewed 2026-07-24 — working well; weekly-report-card.yml + friday-cleanup.yml both active. No changes needed. | 2027-01-01 |
 | Keep a Changelog format | Adopt | 2026-04-21 | Consistent human-readable release history already in use | 2026-10-01 |
 | Mermaid for sequence dependency graph | Adopt | 2026-04-21 | Renders directly on GitHub and clarifies locked order | 2026-08-01 |
 
@@ -14,8 +14,8 @@ Monthly review reminder is automated via `.github/workflows/tech-watch-reminder.
 
 | Tech | Verdict | Date assessed | Why | Re-evaluate |
 |---|---|---|---|---|
-| qwen2.5:7b (target upgrade from qwen2:0.5b) | Trial | 2026-04-21 | Needed for stronger reasoning once GPU arrives; currently hardware-blocked | 2026-06-01 |
-| sentence-transformers for richer agreement scoring | Trial | 2026-04-21 | Improves semantic checks over lexical overlap where resources allow | 2026-06-15 |
+| qwen2.5:7b (target upgrade from qwen2:0.5b) | Trial | 2026-04-21 | Needed for stronger reasoning once GPU arrives; currently hardware-blocked. Reviewed 2026-07-24 — still GPU-blocked, no change in status. Remains the primary upgrade target for Phase 1. | 2026-10-01 |
+| sentence-transformers for richer agreement scoring | Trial | 2026-04-21 | Improves semantic checks over lexical overlap where resources allow. Reviewed 2026-07-24 — still GPU-blocked; hash-based fake embeddings active in CI (`MEMU_ALLOW_FAKE_EMBEDDINGS=true`). Unlock condition unchanged. | 2026-10-01 |
 | parakeet.cpp (GGML port of NVIDIA NeMo Parakeet, incl. Nemotron-3.5-ASR-streaming-0.6b) | Trial | 2026-06-19 | Verified real (429 stars, MIT, active releases). Correct serving path for Nemotron ASR — Ollama cannot serve NeMo/ASR models, but parakeet-server exposes an OpenAI-compatible HTTP transcription API. CPU-capable, fits audio-service's existing faster-whisper fallback pattern. **Implemented 2026-06-19 (D14):** `WHISPER_BACKEND=api` wired in `perception/audio/app.py`; opt-in `parakeet-server` sidecar added to `docker-compose.full.yml` (profile-gated, no healthcheck — upstream image's `/health` route unconfirmed). **Live-verified 2026-06-19 (D15), partially:** the real `httpx.Client` HTTP-client contract was exercised end-to-end (success path and connection-refused error path) against a local FastAPI server implementing the same documented `/v1/audio/transcriptions` contract — but the actual upstream `ghcr.io/mudler/parakeet.cpp-server` image itself is still unpullable in this sandbox (GHCR blob CDN, `pkg-containers.githubusercontent.com`, returns 403 — same class of block as Docker Hub's CDN, not Docker-Hub-specific). Stays at Trial, not Adopt, until the real image can be pulled and run somewhere | 2026-08-01 |
 | ASI-Evolve (GAIR-NLP/ASI-Evolve) | Trial | 2026-06-18 | Verified real (757 stars, Apache-2.0, active). Cloned and read `utils/llm.py`: LLM client is a plain `openai` SDK wrapper, no tool-calling/exotic params — confirmed Ollama-compatible via OpenAI-compatible `base_url`. Scoped narrowly to bounded, scored optimization loops (e.g. tuning conviction-scoring against logged outcomes), not a Skill Forge replacement. Must set `logging.wandb.enabled: false` before use — defaults to phoning home, violates zero-telemetry principle | 2026-08-01 |
 | Cognee (memory controller candidate) | Trial | 2026-06-18 | Verified real and substantial (17.9k stars, Apache-2.0, actively released v1.1.3 same day as assessment). Supports fully local/self-hosted deployment, Kuzu graph DB + vector storage. No corrections needed to existing "Unchanged" assumption | 2026-09-01 |
@@ -27,10 +27,10 @@ Monthly review reminder is automated via `.github/workflows/tech-watch-reminder.
 
 | Tech | Verdict | Date assessed | Why | Re-evaluate |
 |---|---|---|---|---|
-| MCP surface refactor approach | Assess | 2026-04-21 | Planned parallel scope after J2 sequencing; needs compatibility review | 2026-05-15 |
-| Nightly benchmark bot (Bench-Bot concept) | Assess | 2026-04-21 | Potential value, but currently deferred under D12 | 2026-07-01 |
+| MCP surface refactor approach | Assess | 2026-04-21 | Planned parallel scope after J2 sequencing; needs compatibility review. Reviewed 2026-07-24 — J2 done but MCP refactor not yet scheduled; GPU arrival is the next milestone gate. Defer until Phase 1 is active. | 2026-10-01 |
+| Nightly benchmark bot (Bench-Bot concept) | Assess | 2026-04-21 | Potential value, but currently deferred under D12. Reviewed 2026-07-24 — weekly-report-card.yml covers the same ground at lower cadence; nightly bot still not justified pre-GPU. Revisit when Phase 1 real model traffic begins. | 2026-10-01 |
 | OpenHands (All-Hands-AI, Skill Forge code-gen candidate) | Assess | 2026-06-18 | Verified real and mature (77.7k stars, beta). **Confirmed against OpenHands' own docs**: Docker sandboxing is opt-in, not default — the out-of-the-box install runs the agent-server directly on the host with full filesystem access. Standalone, always-on control plane (Node.js 22.12+, `uv`), not a lightweight embeddable call-out as first assumed. Needs full skill-security-gauntlet + irreversible-action review, with sandboxing made a hard requirement (not an assumption), before any adoption decision | 2026-08-01 |
-| NVIDIA LocateAnything-3B | Assess | 2026-06-18 | Still unverified — HuggingFace page returned HTTP 403 on every fetch attempt (5x across three sessions, including direct license-page checks). A third-party claim of "NVIDIA non-commercial license" has been reported but not independently confirmed. Do not treat as confirmed (existence, license, or runtime requirements) until a successful direct fetch or a pasted primary source | 2026-07-01 |
+| NVIDIA LocateAnything-3B | Assess | 2026-06-18 | Still unverified — HuggingFace page returned HTTP 403 on every fetch attempt (5x across three sessions, including direct license-page checks). A third-party claim of "NVIDIA non-commercial license" has been reported but not independently confirmed. Do not treat as confirmed (existence, license, or runtime requirements) until a successful direct fetch or a pasted primary source. Reviewed 2026-07-24 — status unchanged; still blocked by proxy CDN restrictions. | 2026-10-01 |
 
 ## Hold
 

@@ -1520,3 +1520,20 @@ Hook added to `LLMRouter.query()` (common/llm.py) — the single entry point for
 - Logs accumulate across restarts (append-only); operators can `tail -f` or `jq` the file for live A/B inspection
 - On GPU Day, real model names (deepseek-v4, kimi-2.5, dolphin-mistral) will appear in the log alongside quality scores — enabling model-vs-model comparison per specialist
 - `AB_LOG_ENABLED=false` disables it entirely with no performance overhead (checked before any I/O)
+
+## D84 — 2026-07-24 — CI test-isolation sprint: 30 failures resolved; 2243 tests passing
+
+**Context:**
+After PR #91 merged, CI still showed 30 test failures across two root causes:
+- **9 `test_screen_capture.py` `/capture/file` 500 errors**: `pytesseract==0.3.13` and `Pillow` are listed in `screen-capture/requirements.txt` and are installed in CI. `import pytesseract` succeeded → `_tesseract_available = True`. But the `tesseract-ocr` system binary is absent on GitHub Actions runners, so `pytesseract.image_to_string()` raised `TesseractNotFoundError` during request handling, propagating as a 500.
+- **1 `test_integration_chain.py::test_full_chain` `ResponseValidationError`**: `test_agentic_routes.py` stubs `"lakefs_client"` in `sys.modules` as a `MagicMock`. When `memu-core/app.py` runs `from lakefs_client import LakeFSClient, VersionCommit`, it gets MagicMock objects. The inline fallback stub is never reached. `put_branch_state().commit_id` returns a MagicMock, which fails FastAPI's Pydantic response validation (`Input should be a valid string`).
+
+**Decision:**
+1. Fixed `screen-capture/app.py`: replaced `import pytesseract` availability probe with `pytesseract.get_tesseract_version()` — this raises if the binary is absent, correctly setting `_tesseract_available = False` in CI. Added try-except in `_ocr_image_bytes` for defense-in-depth. Changed `/capture/file` to return `JSONResponse` directly (removes the `response_model=CaptureResult` layer that was a secondary failure surface).
+2. Fixed `scripts/test_integration_chain.py`: evict `sys.modules["lakefs_client"]` MagicMock and load the real `memu-core/lakefs_client.py` via `importlib.util.spec_from_file_location` before loading `memu-core/app.py`. Same isolation pattern already used by `test_model_selector.py`, `test_priority_queue.py`, `test_tree_search.py`.
+
+**Consequences:**
+- Full test suite: 2243 passed, 0 failed (local, fresh environment).
+- `_tesseract_available` now correctly reflects whether the `tesseract-ocr` binary is present, not just whether the Python package is importable.
+- The importlib isolation pattern for `sys.modules` contamination from `test_agentic_routes.py` is now consistently applied across all integration tests that load `memu-core/app.py`.
+- Two infrastructure CI failures (`VAULT_ROOT_TOKEN` missing, `TS_AUTHKEY` missing) are pre-existing repo-secret gaps, not code issues — tracked separately in STUBS_AND_PLACEHOLDERS.md P6/P8.
