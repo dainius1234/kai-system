@@ -5,6 +5,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (PR #114, 2026-07-24)
+
+- **weather-service** (`weather-service/`, port 8039, `172.20.0.29`): OpenMeteo current-weather + 7-day forecast poller; WMO code → human description via `_WMO_CODES` dict; background 10-min refresh loop; `GET /current` → temp/windspeed/description/is_day, `GET /forecast` → 7-day array with rain probability, `GET /summary` → one-sentence agentic context. 16 tests.
+- **docker-watcher** (`docker-watcher/`, port 8041, `172.20.0.30`): Docker SDK (`docker.from_env()`) + subprocess fallback; reads health status, restart count, exit code, started_at from container attrs; `GET /containers`, `GET /unhealthy` (flags health=unhealthy or restarts ≥ 5), `GET /summary`; Docker socket mounted read-only. 13 tests.
+- **airquality-service** (`airquality-service/`, port 8042, `172.20.0.31`): OpenMeteo Air Quality API; `_aqi_category(pm2_5)` with EPA thresholds (good/moderate/unhealthy-sensitive/unhealthy/very-unhealthy/hazardous); `_latest(data, key)` returns last non-None hourly value; shares `WEATHER_LAT`/`WEATHER_LON`/`WEATHER_LOCATION` env vars with weather-service; `GET /current`, `GET /summary`. 19 tests.
+- **calendar-service** (`calendar-service/`, port 8043, `172.20.0.32`): CalDAV + icalendar poller; graceful stub mode when `CALDAV_URL`/`CALDAV_USER`/`CALDAV_PASS` absent or `caldav` not installed; `GET /events/today`, `GET /events/upcoming?days=7`, `GET /summary`, `POST /refresh`; background poll loop (default 5 min). 15 tests.
+- **sysmetrics temperature/battery** (2 new endpoints): `GET /temperature` → per-sensor current/high/critical via `psutil.sensors_temperatures()`; `GET /battery` → percent/power_plugged/secs_left via `psutil.sensors_battery()`; both guarded for OS support and `psutil` availability.
+- **Dashboard**: weather card (temp, description, wind) + air-quality card (PM2.5, ozone, AQI category) in System tab; Docker containers table with health/restart indicators; Calendar widget with today's events list in Feeds tab.
+- **Dashboard proxies**: `/api/weather/{current,forecast,summary}`, `/api/docker/{containers,unhealthy,summary}`, `/api/airquality/{current,summary}`, `/api/calendar/{events/today,events/upcoming,summary}`, `POST /api/calendar/refresh`.
+- **CI**: 4 new steps in `core-tests.yml` (weather, docker-watcher, airquality, calendar tests). 4 new Makefile targets (`test-weather-service`, `test-docker-watcher`, `test-airquality`, `test-calendar-service`).
+- Services: 47 → 51. Tests: 2,465 → 2,528 (63 new).
+
 ### Added (PR #112, 2026-07-24)
 
 - **sysmetrics** (`sysmetrics/`, port 8035, `172.20.0.25`): system health snapshot via psutil; `GET /snapshot` → CPU/RAM/disk/network/load_avg; `GET /processes` → top-N by CPU; graceful stub when psutil absent. Dashboard proxies `/api/sysmetrics/{snapshot,processes}`. **System tab** shows live CPU/RAM/disk/load gauges + top-processes table (10s auto-refresh). 14 tests.

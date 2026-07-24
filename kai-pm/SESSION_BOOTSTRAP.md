@@ -55,6 +55,7 @@ All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Audio/TTS st
 | #109 | broker-bridge (8034, `172.20.0.24`): Binance REST wrapper; HMAC-SHA256 signing; spot + futures (USDM) modes via `BINANCE_MODE`; `/ticker`, `/balance`, `/positions`, `/orders`, `/pnl/summary`, `/templates`; Broker tab (status, tickers, balance, positions, orders, Quick Watch, template browser); 20 tests; services 43 | — |
 | #111 | CI fixes: flake8 F824 in browser-agent/app.py; stale README metrics synced | — |
 | #112 | Sensory expansion: sysmetrics (8035, `172.20.0.25`), screen-watcher (8036, `172.20.0.26`), email-reader (8037, `172.20.0.27`), news-feed (8038, `172.20.0.28`); broker `/depth`, `/stats/24hr`, `/trades`, `/futures/funding`, `/futures/openinterest`; System + Feeds dashboard tabs; 61 tests; services 43→47 | — |
+| #114 | — | Sensory expansion wave 2: weather-service (8039, `.29`), docker-watcher (8041, `.30`), airquality-service (8042, `.31`), calendar-service (8043, `.32`); sysmetrics `/temperature` + `/battery`; dashboard weather/AQ/docker/calendar widgets; 63 tests; services 47→51 | — |
 
 ### In-flight work
 
