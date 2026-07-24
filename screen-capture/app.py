@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, HTTPException, Request, UploadFile, File
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from common.runtime import ErrorBudget, detect_device, sanitize_string, setup_json_logger
@@ -164,8 +165,8 @@ async def capture() -> CaptureResult:
     )
 
 
-@app.post("/capture/file", response_model=CaptureResult)
-async def capture_file(file: UploadFile = File(...)) -> CaptureResult:
+@app.post("/capture/file")
+async def capture_file(file: UploadFile = File(...)):
     """OCR an uploaded image file."""
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file provided")
@@ -176,13 +177,13 @@ async def capture_file(file: UploadFile = File(...)) -> CaptureResult:
 
     text = _ocr_image_bytes(img_bytes) if OCR_ENABLED else "[OCR disabled]"
 
-    return CaptureResult(
-        status="ok",
-        text=sanitize_string(text[:5000]),
-        source=f"upload:{file.filename}",
-        timestamp=time.time(),
-        ocr_available=_tesseract_available,
-    )
+    return JSONResponse({
+        "status": "ok",
+        "text": sanitize_string(text[:5000]),
+        "source": f"upload:{file.filename}",
+        "timestamp": time.time(),
+        "ocr_available": _tesseract_available,
+    })
 
 
 @app.middleware("http")
