@@ -54,6 +54,23 @@ _REGISTRY: Dict[str, tuple] = {
     "DREAM_ENABLED":         ("Trigger dream cycle consolidation (6-phase memory integration)", False),
     "EVOLVER_ENABLED":       ("Agent-Evolver: cluster failure patterns → proactive insights", False),
     "SAGE_SELF_REVIEW":      ("SAGE critique on all plans before execution (not just high-stakes)", False),
+    # D88: 8 advanced cognition mechanisms
+    "ANOMALY_DETECTION":     ("D88/M1: track rolling baselines per sensor; alert on >2σ deviation", True),
+    "WORLD_MODEL_PERSISTENCE": ("D88/M4: write structured world_state JSON to memu-core each proactive cycle", True),
+    "SENSORY_LEARNING":      ("D88/M5: detect recurring sensor patterns across 10 recent cycles; write sensor_pattern memories", True),
+    "SKILL_HUNTER":          ("D88/M6+M8: skill-hunter service integration; reactive skill acquisition on capability gaps", True),
+    "PROACTIVE_SCHEDULING":  ("D88/M7: fuse calendar events + sensor state into proactive_schedule memories", True),
+    # D89: cognitive depth — FSM, teammates, foundations
+    "FSM":                   ("D89: Kai Finite State Machine — IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING state tracking", True),
+    "PERSISTENT_TEAMMATES":  ("D89: named cognitive teammates (Scout, Doctor, Sage, Oracle) with per-specialty system prompts", True),
+    "HOUSE_DOCTOR":          ("D89/E: House Doctor service — continuous differential diagnosis from cross-sensor correlation", True),
+    "RITUAL_DISCOVERY":      ("D89/C: emergent ritual detection at ≥7/10 cycles; writes RITUALS.md proposals", True),
+    "GAP_LOGGING":           ("D89/C1: log capability gaps before reactive acquisition; fire hunt only after GAP_HUNT_THRESHOLD misses", True),
+    "TRUST_NEGOTIATION":     ("D89/B: autonomy request protocol — KAI can request temporary elevated authority; currently pending_approval", True),
+    "PREDICTIVE_EMPATHY":    ("D89/D: emotional_context key in world model; full implementation pending emotional memory accumulation", True),
+    "CURIOSITY":             ("D89/F: resource-aware curiosity idle tick; no-ops in CPU phase; activates on GPU + IDLE state", True),
+    # D90: Swarm Assembly — full CognitiveFSM pipeline with real stage functions
+    "SWARM":                 ("D90: CognitiveFSM swarm pipeline — Scout/Sage/Doctor/Oracle stage functions, shared SwarmContext, reputation tracking, conflict resolution", True),
 }
 
 

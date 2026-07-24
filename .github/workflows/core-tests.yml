@@ -135,6 +135,15 @@ jobs:
       - name: Kai intelligence layer tests (D87 — world context, proactive observer, skill matching)
         run: make test-kai-intelligence
 
+      - name: Cognitive mechanisms tests (D88 — anomaly detection, correlation, skill hunter, scheduling)
+        run: pip install pytest-asyncio --quiet || true && make test-cognitive-mechanisms
+
+      - name: Cognitive depth tests (D89 — FSM, teammates, house-doctor, counterfactual, curiosity)
+        run: make test-d89-cognitive-depth
+
+      - name: Swarm assembly tests (D90 — SwarmContext, reputation, conflict resolution, 5 stage functions)
+        run: make test-d90-swarm
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors

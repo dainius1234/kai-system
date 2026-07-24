@@ -2,6 +2,83 @@
 
 > This file is append-only. Never edit past entries; supersede with a new numbered entry.
 
+## D89 — 2026-07-24 — Kai Cognitive Depth: FSM, Persistent Teammates, and Foundation Layer
+
+**Context:** D88 gave Kai 8 intelligence mechanisms — the ability to detect anomalies, correlate signals, learn patterns, hunt skills, and schedule proactively. DeepSeek's research assessment identified the right next layer: depth extensions to each mechanism, plus four architectural primitives (FSM, persistent teammates, counterfactual rehearsal, trust negotiation) that were in the original vision but never built. The user confirmed: "Yes I do and even prematurely but lay foundations to all ideas."
+
+**Decisions (grouped by type):**
+
+**FSM — Kai Finite State Machine:**
+New module `agentic/fsm.py`. States: IDLE (no active session), ACTIVE (user in conversation), FOCUSED (PUB/WORK mode, minimal interruptions), DEGRADED (≥1 critical service unreachable), RECOVERING (auto-heal in progress). Event-driven transitions via `KaiEvent` enum. Thread-safe with asyncio.Lock(). Singleton `fire(event)` + `current_state()` API. Wired into: `/chat` (USER_MESSAGE fires IDLE→ACTIVE), proactive observer (anomaly CRITICAL fires →DEGRADED, service restoration fires →RECOVERING), tool-gate mode changes (FOCUS_ENTER/FOCUS_EXIT). Exposed in `/introspect/capabilities`. Enables curiosity idle tick (fires only in IDLE state) and downstream FSM-aware swarm routing in Phase 2.
+
+**Persistent Teammates:**
+New module `agentic/teammates.py` + `data/teammates/` directory. Four named cognitive personas, each defined as a `.md` file with specialty, description, and system prompt: **Scout** (skill discovery), **Doctor** (system health + differential diagnosis, mirrors House Doctor), **Sage** (reflection + counterargument, complements existing debate engine / adversary.py), **Oracle** (prediction + trend extrapolation from world model + sensory history). Loaded at startup from `data/teammates/`. New endpoint `POST /chat/teammate/{name}` routes a query to a specific teammate: injects their system prompt + memory context + world state + teammate identity, returns response. `list_teammates()` utility for capability map.
+
+**D89/C1 — Capability Gap Logging (M8 extension):**
+Add `_gap_log: Counter[str]` in agentic. Each `/chat` miss (no skill match AND low confidence) increments the counter for the normalized user intent. Reactive hunt fires only when gap count reaches `GAP_HUNT_THRESHOLD` (default 3). First-time hunted skills are marked `probationary: true` in their metadata. Prevents wasted hunts on one-off unusual requests; focuses Skill Hunter effort on genuine repeated gaps.
+
+**D89/C2 — Skill Provenance + Probationary Period (M6 extension):**
+Skill Hunter now writes a YAML front-matter provenance block into every generated `.md` file: `hunted_at` (ISO timestamp), `pypi_package`, `pypi_verified: true`, `probationary: true`, `error_count: 0`. A sidecar `{name}.meta.json` tracks runtime error counts. New endpoints on skill-hunter: `POST /skill/{name}/error` (increments error count; at ≥3 sets `disabled: true`), `GET /skill/{name}/health`. Agentic skill loader skips files with `disabled: true`. Closes the trust loop on autonomous skill acquisition.
+
+**D89/C3 — World Model Provenance Layer (M4 extension):**
+Change world_state entries from flat `{key: value}` to `{key: {value, source, timestamp, confidence}}`. Each sensor reading carries its origin service, the ISO timestamp it was read, and a confidence score (1.0 for live data, 0.5 for stale/inferred). Enables temporal queries ("what was AQ at 3pm?") via memory retrieval. Adds `emotional_context` sub-key as the foundation for Idea D (Predictive Empathy) — currently contains `indicators: [], predicted_mood: null`.
+
+**D89/C4 — House Doctor Service (Idea E):**
+New Docker service `house-doctor` (port 8046, IP 172.20.0.35). FastAPI app with `POST /diagnose` endpoint. Accepts `{observations: List[str], world_state: dict}`. Classifies observations into symptom tags (cpu_high, ram_high, docker_unhealthy, aq_degraded, sensor_anomaly, calendar_soon). Matches against 8-rule differential diagnosis table (D001–D008). Returns diagnosis with severity (INFO/WARNING/CRITICAL), treatment recommendation, and writes `medical_report` category memory to memu-core. Calls notify-service for WARNING/CRITICAL cases. Proactive observer now calls House Doctor after each correlation pass. Gated by `FF_HOUSE_DOCTOR` (default True).
+
+**D89/C5 — Emergent Ritual Discovery (Idea C):**
+In `_detect_sensor_patterns()`, raise secondary threshold to 7/10 cycles for ritual detection (vs 3/10 for pattern memory). When a pattern crosses 7/10, write a ritual proposal to `RITUALS.md` (in /data) and send a one-time notification: "I've noticed X happens consistently — would you like me to make this a standing ritual?" RITUALS.md is co-authored: Kai proposes, operator edits/accepts. Gated by `FF_RITUAL_DISCOVERY` (default True).
+
+**D89/A — Counterfactual Rehearsal Foundation (Idea A):**
+New module `agentic/counterfactual.py`. `rehearse(decision, world_state)` → `{scenarios: [], recommendation: null, status: "stub_pending_gpu"}`. `can_rehearse()` → False until Phase 1. Wired into agentic imports and exposed as a capability in `/introspect/capabilities`. Clean slot for GPU-era LLM simulation — no placeholder logic, just the right interface.
+
+**D89/B — Trust Negotiation Foundation (Idea B):**
+New endpoint `POST /gate/autonomy/request` in tool-gate. `AutonomyRequest` model: `{task, requested_level (1–5), rationale, time_limit_seconds}`. Currently returns `{status: "pending_approval", message: "..."}` — all requests require human approval. Records request in ledger. Foundation for Phase 2 dynamic autonomy: once usage patterns are established, KAI will be able to calibrate these requests against the operator's historical approval rate. Gated by `FF_TRUST_NEGOTIATION` (default True).
+
+**D89/D — Predictive Empathy Foundation (Idea D):**
+`emotional_context` key added to world model provenance schema: `{indicators: [], predicted_mood: null, confidence: 0.0, note: "stub_pending_emotional_memory"}`. Indicators will be populated from emotional memory + sensory constellation when emotional memory accumulates. Active implementation in Phase 1 when sufficient emotional history exists. Foundation wired now so the memory schema is stable.
+
+**D89/F — Resource-Aware Curiosity Foundation (Idea F):**
+New module `agentic/curiosity.py`. `idle_curiosity_tick(world_state, is_gpu_available=False)` → None (stub). `CURIOSITY.md` created in /data. Curiosity tick called from proactive observer when `current_state() == IDLE` and `FF_CURIOSITY` enabled — no-ops in CPU phase. Slot for Phase 1: when GPU is available, tick picks an open question from knowledge gaps, researches it, and appends to CURIOSITY.md.
+
+**Rationale:** D88 gave Kai all 8 intelligence mechanisms. D89 gives those mechanisms depth and gives Kai a self-model. FSM means Kai knows what state he is in and can behave appropriately. Persistent teammates mean Kai has named cognitive partners rather than a monolithic voice. Provenance means Kai knows the reliability of every piece of information he holds. The foundations for GPU-era ideas (counterfactual, empathy, curiosity) are wired now so the architecture is stable before the hardware arrives. Building foundations early avoids retrofitting — the right schema decisions now prevent breaking changes later.
+
+**Consequences:** 8 new feature flags. 2 new services (house-doctor). 4 new agentic modules (fsm, teammates, counterfactual, curiosity). 4 new teammate data files. 35+ new tests. RITUALS.md and CURIOSITY.md created. `/introspect/capabilities` extended with FSM state, teammate list, counterfactual status. `/chat/teammate/{name}` new endpoint. Tool-gate gains autonomy request endpoint.
+
+## D88 — 2026-07-24 — Kai Advanced Cognition: 8 Intelligence Mechanisms
+
+**Context:** D87 wired Kai's sensory layer (world context injection, proactive observer, skill matching). That gave Kai eyes and awareness. D88 implements the next layer: genuine intelligence — the ability to detect trends, understand itself, correlate signals, maintain memory, learn from patterns, grow capabilities, anticipate events, and autonomously close skill gaps. These are the mechanisms that distinguish a brain from a sensor array.
+
+**Decisions (8 mechanisms, all implemented this entry):**
+
+**Mechanism 1 — Anomaly Detection with Baselines:**
+Track rolling windows (last 48 readings = ~4 hours at 5-min interval) per sensor metric using `_sensor_baselines: Dict[str, Deque[float]]`. Compute z-score on each new reading. Alert when |z| > 2.0 (i.e. more than 2 standard deviations from the rolling mean). Write anomaly observations to memu-core as `proactive_observation` category. Requires ≥6 readings before alerting to avoid false positives on startup. Gated by `FF_ANOMALY_DETECTION` (default True). Moves Kai from snapshot awareness to trend awareness.
+
+**Mechanism 2 — Self-Capability Map:**
+New `GET /introspect/capabilities` endpoint on agentic. Returns: all sensory service reachability (live health probe), loaded skill names, feature flag states, active baseline keys. Kai can know what he doesn't know. Used by dashboard and by mechanism 8 (reactive skill acquisition) to find gaps.
+
+**Mechanism 3 — Cross-Service Correlation:**
+After each observation cycle, `_correlate_observations()` reasons across the full observation set. Patterns: high CPU + docker unhealthy → resource-pressure cascade; RAM pressure + docker unhealthy → memory leak; CPU + RAM both high → runaway process; git dirty + email backlog → operator is mid-task (tread lightly). Correlations written as `proactive_observation` memories alongside individual observations. The LLM sees these in future context via memory retrieval.
+
+**Mechanism 4 — World Model Persistence:**
+In the proactive loop, after each successful probe cycle, write a structured JSON `world_state` document to memu-core. This gives Kai a continuously maintained mental map rather than stateless point-in-time snapshots. Fields: `timestamp`, `docker_unhealthy`, `email_unread`, `cpu_percent`, `ram_percent`, `aqi_category`, `git_dirty_count`, `calendar_next`. Gated by `FF_WORLD_MODEL_PERSISTENCE` (default True).
+
+**Mechanism 5 — Sensory Learning:**
+Track the last 10 proactive observation cycles in `_observation_history: Deque[List[str]]`. After each cycle, check each observed type against history. If a type appears in ≥3 of the last 10 cycles, write a `sensor_pattern` memory to memu-core: "Recurring pattern: X has appeared in N/10 recent cycles." This feeds the LLM memory retrieval path so Kai warns about predictable recurrences before they escalate. Gated by `FF_SENSORY_LEARNING` (default True).
+
+**Mechanism 6 — Skill Hunter Service:**
+New Docker service `skill-hunter` (port 8045, IP 172.20.0.34). `POST /hunt` accepts a gap description, extracts keywords, maps to candidate PyPI packages via heuristic keyword table, verifies existence via PyPI JSON API, generates a `.md` skill file in `/data/skills/`, returns `skill_created: bool`. `GET /skills` lists auto-generated skills. Gated by `FF_SKILL_HUNTER` (default True). Kai grows his own capability set without operator intervention. First version is heuristic; future version can use LLM-guided search.
+
+**Mechanism 7 — Proactive Scheduling:**
+In the proactive loop, probe `calendar-service /summary` for upcoming events. If an event is within 30 minutes, fuse calendar data with current sensor state and write `proactive_schedule` memory to memu-core. Examples: "Meeting in 20 min + AQ poor → consider indoor location", "Meeting in 15 min + CPU high → close heavy apps first", "Meeting in 25 min + dirty repos → commit first." This memory surfaces in the LLM's context retrieval so Kai volunteers suggestions naturally. Gated by `FF_PROACTIVE_SCHEDULING` (default True).
+
+**Mechanism 8 — Reactive Skill Acquisition:**
+In `/chat` handler, after `match_skill()` returns None and route confidence < 0.4, fire `asyncio.create_task(_hunt_skill_for_gap(user_msg))`. The async task calls skill hunter, waits for response, and if a skill was created calls `asyncio.to_thread(load_skills)` to hot-reload without blocking the chat response. Kai autonomously closes capability gaps during conversation. Gated by `FF_SKILL_HUNTER` (default True).
+
+**Rationale:** D87 gave Kai awareness. D88 gives Kai intelligence. The distinction: awareness notices what is happening; intelligence understands why, predicts what comes next, and acts to prepare for it. Every mechanism here closes a gap between "I can see X" (D87) and "I understand X, remember its patterns, and can grow my ability to handle it" (D88). Together these 8 mechanisms implement the core cognitive loop: perceive → correlate → remember → pattern-match → anticipate → act → grow.
+
+**Consequences:** Proactive observer gains baseline tracking, correlation reasoning, world model writes, pattern memory. New `/introspect/capabilities` endpoint enables self-diagnosis. New `skill-hunter` service enables autonomous capability growth. Reactive skill acquisition means Kai gets better at every novel request. Feature flags allow each mechanism to be independently toggled. All new test targets added to `test-core`.
+
 ## D87 — 2026-07-24 — Kai Cognitive Architecture: Sensory Integration + Proactive Intelligence
 
 **Context:** Kai has 10+ sensory services (weather, calendar, air quality, docker health, email, news, git, broker) each with a `/summary` endpoint explicitly labelled "for agentic context injection." Audit of `agentic/app.py` found that NONE of these were ever called during chat. Kai's LLM sees emotional state, goals, operator model, narrative identity — but is completely blind to his physical environment. Skills loaded from `/skills/` are never consulted during `/chat`. `FF_CONTEXT_ENRICHMENT` and `FF_PROACTIVE_AGENT` flags were registered but their gate checks were never implemented. The result: Kai has hands and legs (8 sensory services, skill files, shell sandbox, browser) but his brain is not wired to use them.
@@ -1622,3 +1699,37 @@ The hardening items (PR #98) close seven concrete gaps identified in `docs/produ
 - TTS requires internet access for edge-tts (Microsoft endpoint); in air-gapped environments override `TTS_BACKEND=piper` when piper support is added.
 - The MediaRecorder path sends audio to the server (not the browser's speech API), giving complete privacy from browser vendors for voice input.
 - Last entry before GPU arrival. All CPU-safe pre-GPU items from `PHASE1_READINESS.md` S1–S5 are complete. Next major decision will be D87 on GPU Day (G1–G7 protocol from `GPU_ARRIVAL_RUNBOOK.md`).
+
+## D90 — 2026-07-24 — Swarm Assembly: Real Stage Functions, Shared Context, Reputation Tracking
+
+**Context:** D89 built the CognitiveFSM orchestrator and the stage function type signature (`StageFunc = Callable[[AgentHandoff, SwarmConfig], Coroutine[AgentHandoff]]`), but the pipeline was never wired to real implementations — every stage was a placeholder. D90 fills that gap: five concrete stage function factories that route to the correct teammate, call real LLM/memory/adversary dependencies, and pass a shared `SwarmContext` through the pipeline so each stage can see what previous stages found.
+
+**Decision — D90/S1 — SwarmContext and Conflict Resolution (`agentic/swarm.py`):**
+New module. `SwarmContext` dataclass carries `evidence`, `claims`, `challenges`, `verdicts`, `causal_chains`, `teammate_votes`, `stage_log` across the full pipeline via `handoff.payload["_ctx"]`. `TeammateRep` tracks `total_calls`, `successful_handoffs`, `total_confidence`, `error_count` per teammate. `weight() = reliability × (avg_confidence / 10)` used in conflict resolution votes. Reputation persisted to `/data/teammate_reputation.json` (loaded at startup, saved after each swarm run). `resolve_conflict(ctx, cfg, adversary_modifier)` implements 5-signal priority hierarchy: evidence(0.30) + causal_chains(0.25) + verdict_fraction(0.20) + reputation-weighted vote(0.15) + adversary skeptic modifier(0.10). Returns final conviction score 0.0–10.0. Helper functions: `load_reputation()`, `save_reputation()`, `get_rep()`, `record_success()`, `record_error()`, `list_reputation()`.
+
+**Decision — D90/S2 — Stage Function Factories (`agentic/swarm_stages.py`):**
+Five factory functions, each taking injected dependencies (no circular imports) and returning a `StageFunc`:
+- `make_gather_stage(memories_fn, world_ctx_fn, teammate_ctx_fn, llm_chat_fn)` — Scout leads: parallel `memories_fn + world_ctx_fn`, appends to `ctx.evidence`, LLM extracts JSON array of claims into `ctx.claims`. Confidence = min(10, evidence_count×1.5 + claim_count×0.5).
+- `make_debate_stage(build_plan_fn, score_fn, teammate_ctx_fn, llm_chat_fn)` — Sage leads: `build_plan + score_conviction` for conviction, registers vote in `ctx.teammate_votes["sage"]`, LLM generates counterargument into `ctx.challenges`. Returns CONSENSUS if conviction ≥6.0, NO_CONSENSUS otherwise.
+- `make_fact_check_stage(memories_fn, teammate_ctx_fn, llm_chat_fn)` — Doctor leads: LLM returns JSON dict mapping claim→verdict (supported/unsupported/uncertain), writes to `ctx.verdicts`. Falls back to "uncertain" on parse failure. Returns PASS if confidence ≥4.0.
+- `make_causal_check_stage(teammate_ctx_fn, llm_chat_fn)` — Oracle leads: LLM traces consequence chains for supported claims, appends to `ctx.causal_chains`. Returns COMPLETE with confidence = min(10, 5+chains×1.5); gracefully degrades to confidence=5.0 on exception.
+- `make_conviction_gate_stage(adversary_fn, teammate_ctx_fn)` — calls `adversary.challenge_plan()` then `resolve_conflict()` to produce final score. Survives adversary failure by falling back to prior handoff confidence.
+- `build_swarm_pipeline(...)` — convenience function returning all five stage functions keyed for `CognitiveFSM.run()`.
+
+**Decision — D90/S3 — API Endpoints (`agentic/app.py`):**
+- `POST /chat/swarm` — gated by `FF_SWARM`. Accepts `{query, swarm_type, session_id}`. Creates `SwarmContext`, builds pipeline via `build_swarm_pipeline` with live dependencies (`_get_relevant_memories`, `_get_world_context`, `build_teammate_context`, `_llm.chat`, `build_plan`, `score_conviction`, `challenge_plan`), resolves `get_swarm_config(swarm_type)`, runs `CognitiveFSM.run()`, saves reputation. Returns `{conviction_score, passed, halted, transition_log, context_summary, adversary_recommendation}`.
+- `GET /swarm/reputation` — returns per-teammate reputation weights from `list_reputation()`.
+
+**Decision — D90/S4 — Feature Flag and Data:**
+- `FF_SWARM` added to `common/feature_flags.py` (default True). Startup loads reputation if flag enabled.
+- `data/teammate_reputation.json` initialized to `{}` — grows as swarm runs accumulate.
+
+**Tests:** 38 new tests in `scripts/test_d90_swarm.py`: SwarmContext accumulation, TeammateRep math, reputation save/load round-trip, `resolve_conflict` priority hierarchy, all 5 stage factories (happy path + parse failures + exception resilience), end-to-end pipeline via CognitiveFSM (reaches PRESENT), halt-on-gather-failure, feature flag on/off.
+
+**Rationale:** The pipeline was a skeleton. Real swarms need to be runnable. D90 makes `POST /chat/swarm` a live endpoint — no stubs, no placeholders. The dependency-injection pattern keeps every stage independently testable without live services. Reputation tracking closes the quality loop: teammates that produce high-confidence outputs get more weight in future conflict resolution.
+
+**Consequences:**
+- `POST /chat/swarm` now routes queries through the full cognitive pipeline: evidence gather → debate → fact-check → causal tracing → adversary challenge → conflict resolution. Response time dominated by LLM latency ×5 stages plus adversary network calls.
+- `FF_SWARM=false` skips the endpoint entirely for operators who want the lighter `/chat` path.
+- Reputation state is ephemeral until `/data/` is mounted. In docker-compose setups the data volume already persists this directory.
+- Each swarm run calls `_get_relevant_memories` twice (gather + fact_check). This is intentional — fact_check retrieves fresh supporting evidence for verification, not the same recall as gather.

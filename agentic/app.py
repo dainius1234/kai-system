@@ -4,9 +4,10 @@ import asyncio
 import json
 import logging
 import os
+import re
 import time
 import uuid
-from collections import deque
+from collections import Counter, deque
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional
@@ -19,6 +20,13 @@ from pydantic import BaseModel
 from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.feature_flags import is_enabled
 from common.llm import LLMRouter, llm_warmup
+from system_fsm import KaiEvent as SysEvent, fire as fsm_fire, current_state as fsm_state, fsm_snapshot
+from teammates import load_teammates, list_teammates, build_teammate_context
+from counterfactual import rehearse as rehearse_counterfactual, can_rehearse
+from cognitive_fsm import CognitiveFSM, get_config as get_swarm_config
+from swarm import SwarmContext, list_reputation, load_reputation, record_error as swarm_record_error, record_success as swarm_record_success, save_reputation
+from swarm_stages import build_swarm_pipeline
+from curiosity import idle_curiosity_tick, CURIOSITY_LOG
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, INJECTION_RE, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, create_checkpoint, list_checkpoints, load_checkpoint, diff_checkpoints, delete_checkpoint
@@ -53,7 +61,10 @@ EMAIL_READER_URL = os.getenv("EMAIL_READER_URL", "http://email-reader:8037")
 NEWS_FEED_URL = os.getenv("NEWS_FEED_URL", "http://news-feed:8038")
 GIT_WATCHER_URL = os.getenv("GIT_WATCHER_URL", "http://git-watcher:8044")
 BROKER_URL = os.getenv("BROKER_URL", "http://broker-bridge:8034")
+SKILL_HUNTER_URL = os.getenv("SKILL_HUNTER_URL", "http://skill-hunter:8045")
+HOUSE_DOCTOR_URL = os.getenv("HOUSE_DOCTOR_URL", "http://house-doctor:8046")
 PROACTIVE_INTERVAL = int(os.getenv("PROACTIVE_INTERVAL_SECONDS", "300"))
+GAP_HUNT_THRESHOLD = int(os.getenv("GAP_HUNT_THRESHOLD", "3"))
 WAKE_INTENT_COMMAND_THRESHOLD = float(os.getenv("WAKE_INTENT_COMMAND_THRESHOLD", "0.6"))
 WAKE_INTENT_OVERRIDE_CONFIDENCE = float(os.getenv("WAKE_INTENT_OVERRIDE_CONFIDENCE", "0.7"))
 budget = ErrorBudget(window_seconds=300)
@@ -520,6 +531,53 @@ async def prune_skills_endpoint(request: Request) -> Dict[str, Any]:
     return {"status": "ok", "pruned": pruned, "pruned_count": len(pruned)}
 
 
+@app.get("/introspect/capabilities")
+async def introspect_capabilities() -> Dict[str, Any]:
+    """D88 M2: self-capability map — live understanding of what Kai can perceive and do."""
+    from common.feature_flags import get_all_flags
+
+    sensory_services = [
+        ("weather", WEATHER_URL),
+        ("airquality", AIRQUALITY_URL),
+        ("calendar", CALENDAR_URL),
+        ("docker_watcher", DOCKER_WATCHER_URL),
+        ("sysmetrics", SYSMETRICS_URL),
+        ("email_reader", EMAIL_READER_URL),
+        ("news_feed", NEWS_FEED_URL),
+        ("git_watcher", GIT_WATCHER_URL),
+        ("broker", BROKER_URL),
+        ("skill_hunter", SKILL_HUNTER_URL),
+    ]
+
+    async def _ping(name: str, url: str) -> Dict[str, Any]:
+        try:
+            async with httpx.AsyncClient(timeout=2.0) as client:
+                r = await client.get(f"{url}/health")
+                return {"name": name, "reachable": r.status_code < 400, "http_status": r.status_code}
+        except Exception:
+            return {"name": name, "reachable": False, "http_status": 0}
+
+    pings = await asyncio.gather(*[_ping(n, u) for n, u in sensory_services])
+    skills = list_skills()
+    return {
+        "status": "ok",
+        "sensory_services": list(pings),
+        "reachable_count": sum(1 for p in pings if p["reachable"]),
+        "unreachable_count": sum(1 for p in pings if not p["reachable"]),
+        "skills": [{"name": s.name} for s in skills],
+        "skill_count": len(skills),
+        "feature_flags": {f["flag"]: f["enabled"] for f in get_all_flags()},
+        "baselines_tracked": list(_sensor_baselines.keys()),
+        "observation_history_depth": len(_observation_history),
+        # D89 additions
+        "fsm": fsm_snapshot(),
+        "teammates": list_teammates(),
+        "counterfactual_available": await can_rehearse(),
+        "gap_log_top5": dict(_gap_log.most_common(5)),
+        "proposed_rituals": list(_proposed_rituals),
+    }
+
+
 @app.get("/metrics")
 async def metrics() -> Dict[str, float]:
     return budget.snapshot()
@@ -531,6 +589,118 @@ async def queue_stats() -> Dict[str, Any]:
     q = get_queue()
     s = q.stats()
     return {"pending": s.pending, "active": s.active, "total_processed": s.total_processed, "avg_wait_ms": s.avg_wait_ms}
+
+
+@app.get("/teammates")
+async def get_teammates() -> Dict[str, Any]:
+    """D89: List all loaded persistent teammates."""
+    return {"teammates": list_teammates(), "count": len(list_teammates())}
+
+
+class TeammateRequest(BaseModel):
+    message: str
+    session_id: str = ""
+    world_context: bool = True
+
+
+@app.post("/chat/teammate/{name}")
+async def chat_with_teammate(name: str, req: TeammateRequest) -> Dict[str, Any]:
+    """D89: Route a query to a named teammate (Scout, Doctor, Sage, Oracle).
+
+    Injects the teammate's system prompt + current world state into the LLM call.
+    """
+    if not is_enabled("PERSISTENT_TEAMMATES"):
+        raise HTTPException(status_code=503, detail="FF_PERSISTENT_TEAMMATES is disabled")
+    teammate_ctx = build_teammate_context(name)
+    if teammate_ctx is None:
+        raise HTTPException(status_code=404, detail=f"Teammate '{name}' not found. Available: {[t['slug'] for t in list_teammates()]}")
+
+    world_state_block = ""
+    if req.world_context and _last_world_snapshot:
+        world_state_block = "\n\nCurrent world state:\n" + json.dumps(_last_world_snapshot, indent=2)[:800]
+
+    prompt = f"{teammate_ctx}{world_state_block}\n\n---\n\nQuery: {req.message}"
+    try:
+        response = await _llm.chat([{"role": "user", "content": prompt}])
+        return {
+            "teammate": name,
+            "response": response,
+            "message": req.message,
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Teammate invocation failed: {exc}")
+
+
+class SwarmRequest(BaseModel):
+    query: str
+    swarm_type: str = "default"
+    session_id: str = ""
+
+
+@app.post("/chat/swarm")
+async def chat_swarm(req: SwarmRequest) -> Dict[str, Any]:
+    """D90: Run a query through the full CognitiveFSM swarm pipeline.
+
+    Returns the final conviction score, pipeline transition log, swarm context
+    summary, and adversary recommendation.  Feature-flagged under FF_SWARM.
+    """
+    if not is_enabled("SWARM"):
+        raise HTTPException(status_code=503, detail="FF_SWARM is disabled")
+
+    session_id = req.session_id or str(uuid.uuid4())
+    ctx = SwarmContext(
+        query=req.query,
+        session_id=session_id,
+        swarm_type=req.swarm_type,
+    )
+
+    pipeline = build_swarm_pipeline(
+        memories_fn=_get_relevant_memories,
+        world_ctx_fn=_get_world_context,
+        teammate_ctx_fn=build_teammate_context,
+        llm_chat_fn=_llm.chat,
+        build_plan_fn=build_plan,
+        score_fn=score_conviction,
+        adversary_fn=challenge_plan,
+    )
+
+    cfg = get_swarm_config(req.swarm_type)
+    fsm = CognitiveFSM(config=cfg)
+
+    initial_payload: Dict[str, Any] = {"_ctx": ctx, "query": req.query}
+
+    result = await fsm.run(
+        gather_fn=pipeline["gather_fn"],
+        debate_fn=pipeline["debate_fn"],
+        fact_check_fn=pipeline["fact_check_fn"],
+        causal_check_fn=pipeline["causal_check_fn"],
+        conviction_gate_fn=pipeline["conviction_gate_fn"],
+        initial_payload=initial_payload,
+    )
+
+    save_reputation()
+
+    final_confidence = result.final_handoff.confidence if result.final_handoff else 0.0
+    return {
+        "session_id": session_id,
+        "swarm_type": req.swarm_type,
+        "halted": result.halted,
+        "halt_reason": result.halt_reason,
+        "final_state": result.final_state.value,
+        "conviction_score": final_confidence,
+        "conviction_threshold": cfg.conviction_threshold,
+        "passed": not result.halted and final_confidence >= cfg.conviction_threshold,
+        "total_elapsed_ms": round(result.total_elapsed_ms, 1),
+        "transition_log": result.transition_log,
+        "context_summary": ctx.summary(),
+        "adversary_recommendation": (result.final_handoff.payload or {}).get("adversary_recommendation", "unknown"),
+    }
+
+
+@app.get("/swarm/reputation")
+async def swarm_reputation() -> Dict[str, Any]:
+    """D90: Return per-teammate reputation weights."""
+    return {"teammates": list_reputation()}
 
 
 @app.get("/models")
@@ -858,15 +1028,154 @@ async def _get_world_context() -> str:
 
 _last_world_snapshot: Dict[str, Any] = {}
 
+# ── D88 M1: rolling baseline windows per sensor metric ──────────────
+_BASELINE_WINDOW = 48  # readings; at default 5-min interval ≈ 4 hours
+_sensor_baselines: Dict[str, Deque[float]] = {}
+
+# ── D88 M5: observation history for pattern detection ───────────────
+_observation_history: Deque[List[str]] = deque(maxlen=10)
+
+# ── D89 C1: capability gap log — fire hunt only after N misses ───────
+_gap_log: Counter = Counter()
+
+# ── D89 C5: ritual discovery — track which patterns have been proposed ─
+_proposed_rituals: set = set()
+
+
+def _update_baseline(key: str, value: float) -> Optional[float]:
+    """Update rolling baseline; return z-score against prior history, or None if window too small.
+
+    Z-score is computed BEFORE appending the new value so it measures
+    how much the current reading deviates from the established baseline,
+    not a self-referential average that includes the new point.
+    """
+    if key not in _sensor_baselines:
+        _sensor_baselines[key] = deque(maxlen=_BASELINE_WINDOW)
+    window = _sensor_baselines[key]
+    if len(window) < 6:
+        window.append(value)
+        return None
+    mean = sum(window) / len(window)
+    variance = sum((x - mean) ** 2 for x in window) / len(window)
+    std = variance ** 0.5
+    z = (value - mean) / std if std >= 0.01 else 0.0
+    window.append(value)
+    return z
+
+
+def _correlate_observations(obs: List[str]) -> List[str]:
+    """D88 M3: reason across multiple simultaneous sensor observations."""
+    if len(obs) < 2:
+        return []
+    correlated: List[str] = []
+    has_cpu = any("CPU" in o and "%" in o for o in obs)
+    has_docker_bad = any("Docker:" in o and "unhealthy" in o for o in obs)
+    has_ram = any("RAM" in o and "%" in o for o in obs)
+    has_git_dirty = any("Git:" in o and "uncommitted" in o for o in obs)
+    has_email = any("Email:" in o and "unread" in o for o in obs)
+    has_aq_bad = any("Air quality:" in o for o in obs)
+
+    if has_cpu and has_docker_bad:
+        correlated.append(
+            "Correlation: high CPU + unhealthy containers — resource pressure may be causing service failures; consider inspecting or restarting"
+        )
+    if has_ram and has_docker_bad:
+        correlated.append(
+            "Correlation: memory pressure + unhealthy containers — possible memory leak in a failing service"
+        )
+    if has_cpu and has_ram:
+        correlated.append(
+            "Correlation: CPU and RAM both elevated — possible runaway process or resource contention"
+        )
+    if has_git_dirty and has_email:
+        correlated.append(
+            "Correlation: uncommitted changes + email backlog — operator is mid-flow; avoid interrupting unless critical"
+        )
+    if has_aq_bad and has_email:
+        correlated.append(
+            "Correlation: poor air quality + email backlog — suggest outdoor break once clear to avoid cognitive fatigue"
+        )
+    return correlated
+
+
+def _classify_obs_type(o: str) -> str:
+    if "Docker:" in o and "unhealthy" in o:
+        return "docker_unhealthy"
+    if "Email:" in o:
+        return "email_backlog"
+    if "Air quality:" in o:
+        return "aq_degraded"
+    if "Git:" in o:
+        return "git_dirty"
+    if "CPU" in o:
+        return "cpu_high"
+    if "RAM" in o:
+        return "ram_high"
+    if "Anomaly" in o:
+        return "sensor_anomaly"
+    return "other"
+
+
+def _detect_sensor_patterns(current_obs: List[str]) -> List[str]:
+    """D88 M5 / D89 C5: detect recurring sensor types; propose rituals at ≥7/10 cycles."""
+    if not is_enabled("SENSORY_LEARNING"):
+        return []
+
+    current_types = {_classify_obs_type(o) for o in current_obs}
+    patterns: List[str] = []
+    for obs_type in current_types:
+        count = sum(
+            1 for hist in _observation_history
+            if any(obs_type == _classify_obs_type(o) for o in hist)
+        )
+        if count >= 3:
+            patterns.append(
+                f"Recurring pattern: {obs_type} has appeared in {count}/10 recent observation cycles — this is becoming a persistent issue"
+            )
+        # D89 C5: ritual discovery — propose at ≥7/10 cycles
+        if count >= 7 and is_enabled("RITUAL_DISCOVERY") and obs_type not in _proposed_rituals:
+            _proposed_rituals.add(obs_type)
+            asyncio.create_task(_propose_ritual(obs_type, count))
+    return patterns
+
+
+async def _propose_ritual(obs_type: str, count: int) -> None:
+    """Write a ritual proposal to RITUALS.md and notify the operator."""
+    ritual_path = Path("/data/RITUALS.md")
+    ts = datetime.utcnow().isoformat()
+    proposal = (
+        f"\n## [{ts}] Auto-detected: {obs_type}\n\n"
+        f"I've noticed **{obs_type}** has appeared in {count}/10 recent observation cycles. "
+        f"Would you like me to make this a standing routine — "
+        f"e.g. an automatic alert or scheduled check whenever this pattern appears? "
+        f"Edit this entry to confirm or adjust.\n\n"
+        f"- **Pattern:** {obs_type}\n"
+        f"- **Frequency:** {count}/10 cycles\n"
+        f"- **Proposed ritual:** _[operator to fill in]_\n"
+        f"- **Status:** pending approval\n"
+    )
+    try:
+        ritual_path.parent.mkdir(parents=True, exist_ok=True)
+        if not ritual_path.exists():
+            ritual_path.write_text("# Rituals\n\n_Co-authored by Kai and operator._\n")
+        with ritual_path.open("a", encoding="utf-8") as f:
+            f.write(proposal)
+        logger.info("Ritual proposal written for pattern: %s", obs_type)
+    except Exception as exc:
+        logger.debug("Could not write ritual proposal: %s", exc)
+
 
 async def _proactive_observer() -> None:
-    """Layer 3 (D87): proactive awareness loop — runs every PROACTIVE_INTERVAL seconds.
+    """Proactive awareness loop — D87 + D88 cognitive mechanisms.
 
-    Reads anomaly-relevant sensory endpoints, detects notable conditions
-    (changed email count, unhealthy containers, degraded air quality, dirty git repos),
-    and writes observations to memu-core as 'proactive_observation' memories
-    so they surface in future context via the normal vector-recall channel.
-    Only runs when FF_PROACTIVE_AGENT is enabled (default True).
+    Runs every PROACTIVE_INTERVAL seconds (default 300s). Implements:
+    - D87 Layer 3: baseline anomaly detection, docker/email/AQ/git/system probes
+    - D88 M1: rolling baseline z-score anomaly alerts
+    - D88 M3: cross-service correlation reasoning
+    - D88 M4: structured world_state persistence to memu-core
+    - D88 M5: sensory pattern detection across 10 recent cycles
+    - D88 M7: proactive scheduling (calendar + sensor fusion)
+    Gated by FF_PROACTIVE_AGENT (default True).
     """
     global _last_world_snapshot
     await asyncio.sleep(90)  # let services start up before first probe
@@ -893,6 +1202,7 @@ async def _proactive_observer() -> None:
                 _probe("aq", AIRQUALITY_URL, "/current"),
                 _probe("git", GIT_WATCHER_URL, "/dirty"),
                 _probe("sys", SYSMETRICS_URL, "/snapshot"),
+                _probe("cal", CALENDAR_URL, "/summary"),
             )
 
             # Docker health
@@ -926,13 +1236,56 @@ async def _proactive_observer() -> None:
 
             # System resources
             sys_data = snapshot.get("sys", {})
-            cpu = sys_data.get("cpu_percent", 0)
-            ram = (sys_data.get("memory") or {}).get("percent", 0)
+            cpu = float(sys_data.get("cpu_percent", 0))
+            ram = float((sys_data.get("memory") or {}).get("percent", 0))
             if cpu > 85:
                 observations.append(f"System: CPU at {cpu:.0f}% — possible runaway process")
             if ram > 90:
                 observations.append(f"System: RAM at {ram:.0f}% — memory pressure")
 
+            # ── D88 M1: anomaly detection with rolling baselines ─────
+            if is_enabled("ANOMALY_DETECTION"):
+                for metric_key, value in [("cpu", cpu), ("ram", ram), ("email_unread", float(unread_now)), ("docker_unhealthy", float(unhealthy))]:
+                    z = _update_baseline(metric_key, value)
+                    if z is not None and abs(z) > 2.0:
+                        observations.append(
+                            f"Anomaly ({metric_key}): current={value:.1f} deviates {z:+.1f}σ from recent baseline"
+                        )
+
+            # ── D88 M3: cross-service correlation ───────────────────
+            correlated = _correlate_observations(observations)
+            observations.extend(correlated)
+
+            # ── D88 M7: proactive scheduling ─────────────────────────
+            if is_enabled("PROACTIVE_SCHEDULING"):
+                cal_summary = snapshot.get("cal", {})
+                cal_text = str(cal_summary.get("summary", ""))
+                minutes_to_next = cal_summary.get("minutes_until_next")
+                next_event = cal_summary.get("next_event", "")
+                if next_event and minutes_to_next is not None and 0 < int(minutes_to_next) <= 30:
+                    schedule_parts = [f"Event in {minutes_to_next} min: {next_event}"]
+                    if aqi_cat in ("unhealthy", "very unhealthy", "hazardous"):
+                        schedule_parts.append("air quality is poor — consider indoor location")
+                    if cpu > 85:
+                        schedule_parts.append("CPU is high — close heavy apps before starting")
+                    if dirty > 0:
+                        schedule_parts.append("you have uncommitted changes — commit first if possible")
+                    sched_text = "Proactive schedule: " + "; ".join(schedule_parts)
+                    try:
+                        async with httpx.AsyncClient(timeout=5.0) as client:
+                            await client.post(
+                                f"{MEMU_URL}/memory/memorize",
+                                json={
+                                    "content": sched_text,
+                                    "category": "proactive_schedule",
+                                    "user_id": "keeper",
+                                },
+                            )
+                        logger.info("Proactive schedule: %s", sched_text)
+                    except Exception:
+                        pass
+
+            # ── Main observation write ────────────────────────────────
             if observations:
                 obs_text = "Proactive observation: " + "; ".join(observations)
                 try:
@@ -949,10 +1302,114 @@ async def _proactive_observer() -> None:
                 except Exception as exc:
                     logger.warning("Proactive memory write failed: %s", exc)
 
+            # ── D88 M5: update history + detect patterns ─────────────
+            _observation_history.append(list(observations))
+            patterns = _detect_sensor_patterns(observations)
+            if patterns:
+                pattern_text = "; ".join(patterns)
+                try:
+                    async with httpx.AsyncClient(timeout=5.0) as client:
+                        await client.post(
+                            f"{MEMU_URL}/memory/memorize",
+                            json={
+                                "content": pattern_text,
+                                "category": "sensor_pattern",
+                                "user_id": "keeper",
+                            },
+                        )
+                    logger.info("Sensor pattern detected: %s", pattern_text)
+                except Exception:
+                    pass
+
+            # ── D88 M4 / D89 C3: world model persistence with provenance ─
+            if is_enabled("WORLD_MODEL_PERSISTENCE"):
+                ts_now = datetime.utcnow().isoformat()
+                def _prov(value: Any, source: str, confidence: float = 1.0) -> Dict[str, Any]:
+                    return {"value": value, "source": source, "timestamp": ts_now, "confidence": confidence}
+                world_model = {
+                    "timestamp": ts_now,
+                    "fsm_state": fsm_state().value,
+                    "docker_unhealthy": _prov(unhealthy, "docker-watcher"),
+                    "email_unread": _prov(unread_now, "email-reader"),
+                    "cpu_percent": _prov(cpu, "sysmetrics"),
+                    "ram_percent": _prov(ram, "sysmetrics"),
+                    "aqi_category": _prov(aqi_cat or "unknown", "airquality-service", 0.9 if aqi_cat else 0.3),
+                    "git_dirty_count": _prov(dirty, "git-watcher"),
+                    "calendar_next": _prov(snapshot.get("cal", {}).get("next_event", ""), "calendar-service", 0.8),
+                    # D89/D: predictive empathy foundation — populated by emotional memory in Phase 1
+                    "emotional_context": {
+                        "indicators": [],
+                        "predicted_mood": None,
+                        "confidence": 0.0,
+                        "note": "stub_pending_emotional_memory",
+                    },
+                }
+                try:
+                    async with httpx.AsyncClient(timeout=5.0) as client:
+                        await client.post(
+                            f"{MEMU_URL}/memory/memorize",
+                            json={
+                                "content": json.dumps(world_model),
+                                "category": "world_state",
+                                "user_id": "keeper",
+                            },
+                        )
+                except Exception:
+                    pass
+
+            # ── D89 E: House Doctor — differential diagnosis ──────────
+            if is_enabled("HOUSE_DOCTOR") and observations:
+                try:
+                    async with httpx.AsyncClient(timeout=5.0) as client:
+                        await client.post(
+                            f"{HOUSE_DOCTOR_URL}/diagnose",
+                            json={"observations": observations},
+                        )
+                except Exception:
+                    pass
+
+            # ── D89 F: curiosity idle tick ────────────────────────────
+            if is_enabled("CURIOSITY"):
+                from system_fsm import KaiState
+                asyncio.create_task(
+                    idle_curiosity_tick(_last_world_snapshot, is_gpu_available=False)
+                )
+
             _last_world_snapshot = snapshot
         except Exception as exc:
             logger.warning("Proactive observer error: %s", exc)
         await asyncio.sleep(PROACTIVE_INTERVAL)
+
+
+async def _hunt_skill_for_gap(gap_description: str) -> None:
+    """D88 M8 / D89 C1: reactive skill acquisition with gap logging.
+
+    Increments _gap_log for the normalised gap. Only calls skill-hunter
+    after GAP_HUNT_THRESHOLD misses (default 3) to avoid wasted hunts
+    on one-off unusual requests.
+    """
+    if not is_enabled("SKILL_HUNTER"):
+        return
+    gap_key = re.sub(r"\s+", " ", gap_description.lower().strip())[:80]
+    if is_enabled("GAP_LOGGING"):
+        _gap_log[gap_key] += 1
+        if _gap_log[gap_key] < GAP_HUNT_THRESHOLD:
+            logger.debug(
+                "Gap logged (%d/%d): '%s'",
+                _gap_log[gap_key], GAP_HUNT_THRESHOLD, gap_key,
+            )
+            return
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.post(
+                f"{SKILL_HUNTER_URL}/hunt",
+                json={"gap": gap_description[:200]},
+            )
+            if resp.status_code == 200 and resp.json().get("skill_created"):
+                await asyncio.to_thread(load_skills)
+                logger.info("Skill hunter: new skill loaded for gap '%s'", gap_key)
+    except Exception as exc:
+        logger.debug("Skill hunter request failed (non-critical): %s", exc)
 
 
 async def _get_session_messages(session_id: str) -> List[Dict[str, str]]:
@@ -1244,8 +1701,16 @@ async def chat_stream(req: ChatRequest):
     # Session messages always fetched (needed even when enrichment is off)
     session_msgs = await _safe(_get_session_messages(req.session_id), [])
 
+    # D89 FSM: fire USER_MESSAGE event (IDLE → ACTIVE or FOCUSED stays FOCUSED)
+    if is_enabled("FSM"):
+        asyncio.create_task(fsm_fire(SysEvent.USER_MESSAGE))
+
     # Match skill before LLM so the relevant skill doc reaches the prompt (J7 fix)
     matched_skill = match_skill(user_msg)
+
+    # D88 M8 / D89 C1: reactive skill acquisition with gap logging
+    if matched_skill is None and route_decision.confidence < 0.4:
+        asyncio.create_task(_hunt_skill_for_gap(user_msg))
 
     if is_enabled("CONTEXT_ENRICHMENT"):
         (memories, goals, topics, eq_context,
@@ -2041,6 +2506,12 @@ async def _startup_warmup() -> None:
     )
     # P21 / D87: proactive awareness loop — notices anomalies and writes them to memory
     asyncio.create_task(_proactive_observer())
+    # D89: load persistent teammates at startup
+    if is_enabled("PERSISTENT_TEAMMATES"):
+        load_teammates()
+    # D90: load swarm reputation at startup
+    if is_enabled("SWARM"):
+        load_reputation()
 
 
 # ── P16b: Log aggregation ───────────────────────────────────────────
