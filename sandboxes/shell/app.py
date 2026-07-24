@@ -25,8 +25,8 @@ MAX_OUTPUT_BYTES = int(os.getenv("SANDBOX_MAX_OUTPUT", str(64 * 1024)))  # 64 KB
 
 # Read-only, information-gathering commands only. No write/network/exec commands.
 COMMAND_ALLOWLIST: frozenset[str] = frozenset({
-    "cat", "date", "df", "du", "echo", "env", "free",
-    "head", "ls", "printenv", "ps", "pwd", "tail", "uptime", "wc", "whoami",
+    "cat", "date", "df", "du", "echo", "free",
+    "head", "ls", "ps", "pwd", "tail", "uptime", "wc", "whoami",
 })
 
 

@@ -30,6 +30,8 @@ class TestShellSandboxHealth(unittest.TestCase):
         self.assertIn("ls", cmds)
         self.assertNotIn("rm", cmds)
         self.assertNotIn("curl", cmds)
+        self.assertNotIn("env", cmds)
+        self.assertNotIn("printenv", cmds)
 
 
 class TestShellSandboxAllowed(unittest.TestCase):
@@ -94,6 +96,14 @@ class TestShellSandboxBlocked(unittest.TestCase):
 
     def test_bash_blocked(self):
         r = client.post("/run", json={"command": "bash -c 'echo pwned'"})
+        self.assertEqual(r.status_code, 403)
+
+    def test_env_blocked(self):
+        r = client.post("/run", json={"command": "env"})
+        self.assertEqual(r.status_code, 403)
+
+    def test_printenv_blocked(self):
+        r = client.post("/run", json={"command": "printenv"})
         self.assertEqual(r.status_code, 403)
 
     def test_empty_command(self):
