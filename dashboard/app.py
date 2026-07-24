@@ -1257,6 +1257,7 @@ async def api_chat_proxy(request: Request):
 
 
 SCREEN_CAPTURE_URL = os.getenv("SCREEN_CAPTURE_URL", "http://screen-capture:8059")
+AUDIO_URL = os.getenv("AUDIO_SERVICE_URL", "http://audio-service:8021")
 _UPLOAD_MAX_BYTES = 10 * 1024 * 1024  # 10 MB — matches screen-capture service limit
 
 
@@ -1291,6 +1292,33 @@ async def api_upload(file: UploadFile = File(...)):
         raise HTTPException(
             status_code=503,
             detail=f"OCR service unreachable — start screen-capture or set SCREEN_CAPTURE_URL: {exc}",
+        )
+
+
+@app.post("/api/audio/transcribe")
+async def api_audio_transcribe(file: UploadFile = File(...)):
+    """Receive an audio blob from the browser MediaRecorder and return a transcript.
+
+    Proxies to the audio-service Whisper backend. Degrades to 503 when unavailable.
+    """
+    data = await file.read()
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(
+                f"{AUDIO_URL}/capture/file",
+                files={"file": (file.filename or "audio.webm", data, file.content_type or "audio/webm")},
+            )
+            resp.raise_for_status()
+            return resp.json()
+    except httpx.HTTPStatusError as exc:
+        status = exc.response.status_code
+        if 400 <= status < 500:
+            raise HTTPException(status_code=status, detail=f"Audio service rejected file: {exc}")
+        raise HTTPException(status_code=502, detail=f"Audio service error: {exc}")
+    except httpx.RequestError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Audio service unreachable: {exc}",
         )
 
 

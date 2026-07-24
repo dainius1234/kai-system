@@ -1758,46 +1758,121 @@ function autoResize(el) {
   el.style.height = Math.min(el.scrollHeight, 200) + 'px';
 }
 
-// Voice input
+// Voice input — WebSpeech API with MediaRecorder/Whisper fallback
 let voiceRecognition = null;
+let _mrRecorder = null;   // MediaRecorder instance (fallback path)
+let _mrChunks  = [];      // accumulated audio chunks
 
+function _voiceBtnActive(on) {
+  document.getElementById('voiceBtn').style.color = on ? 'var(--danger)' : '';
+}
+
+// ── MediaRecorder → Whisper path ────────────────────────────────────
+async function _stopMediaRecorder() {
+  if (!_mrRecorder) return;
+  _mrRecorder.stop();
+  // onStop handler sends the blob; clear immediately so toggleVoice() knows we're idle
+}
+
+async function _startMediaRecorder() {
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    showToast('Voice', 'Microphone access denied', 'warning');
+    return;
+  }
+
+  // Prefer formats the server (ffmpeg) can decode; fall back gracefully
+  const mimeType = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/ogg', '']
+    .find(m => !m || MediaRecorder.isTypeSupported(m)) || '';
+
+  _mrChunks = [];
+  _mrRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+
+  _mrRecorder.ondataavailable = e => { if (e.data.size > 0) _mrChunks.push(e.data); };
+
+  _mrRecorder.onstop = async () => {
+    stream.getTracks().forEach(t => t.stop());
+    _voiceBtnActive(false);
+    setOrbState('thinking');
+
+    const blob = new Blob(_mrChunks, { type: _mrRecorder.mimeType || 'audio/webm' });
+    _mrRecorder = null;
+    _mrChunks = [];
+
+    const ext = (blob.type.includes('ogg') ? 'ogg' : 'webm');
+    const fd = new FormData();
+    fd.append('file', blob, `audio.${ext}`);
+
+    try {
+      const resp = await fetch('/api/audio/transcribe', { method: 'POST', body: fd });
+      if (!resp.ok) throw new Error(`${resp.status}`);
+      const data = await resp.json();
+      const transcript = data.transcript || data.text || '';
+      if (transcript) {
+        document.getElementById('chatInput').value = transcript;
+        autoResize(document.getElementById('chatInput'));
+        sendMessage();
+      } else {
+        showToast('Voice', 'No speech detected', 'warning');
+      }
+    } catch (err) {
+      showToast('Voice', `Transcription failed: ${err.message}`, 'error');
+    }
+    setOrbState('idle');
+  };
+
+  _mrRecorder.start();
+  _voiceBtnActive(true);
+  setOrbState('listening');
+}
+
+// ── Main toggle — WebSpeech preferred, MediaRecorder fallback ────────
 function toggleVoice() {
+  // Stop MediaRecorder path if active
+  if (_mrRecorder) {
+    if (_mrRecorder.state !== 'inactive') _mrRecorder.stop();
+    else { _mrRecorder = null; _voiceBtnActive(false); setOrbState('idle'); }
+    return;
+  }
+
+  // Stop WebSpeech path if active
   if (voiceRecognition) {
     voiceRecognition.stop();
     voiceRecognition = null;
-    document.getElementById('voiceBtn').style.color = '';
+    _voiceBtnActive(false);
     setOrbState('idle');
     return;
   }
+
+  // Start WebSpeech if available
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { showToast('Voice', 'Speech recognition not supported', 'warning'); return; }
+  if (SR) {
+    voiceRecognition = new SR();
+    voiceRecognition.lang = 'en-GB';
+    voiceRecognition.continuous = false;
+    voiceRecognition.interimResults = false;
 
-  voiceRecognition = new SR();
-  voiceRecognition.lang = 'en-GB';
-  voiceRecognition.continuous = false;
-  voiceRecognition.interimResults = false;
+    voiceRecognition.onstart = () => { _voiceBtnActive(true); setOrbState('listening'); };
+    voiceRecognition.onresult = e => {
+      const transcript = e.results[0][0].transcript;
+      document.getElementById('chatInput').value = transcript;
+      sendMessage();
+    };
+    voiceRecognition.onend = () => { voiceRecognition = null; _voiceBtnActive(false); setOrbState('idle'); };
+    voiceRecognition.onerror = () => { voiceRecognition = null; _voiceBtnActive(false); setOrbState('idle'); };
 
-  voiceRecognition.onstart = function() {
-    document.getElementById('voiceBtn').style.color = 'var(--danger)';
-    setOrbState('listening');
-  };
-  voiceRecognition.onresult = function(e) {
-    const transcript = e.results[0][0].transcript;
-    document.getElementById('chatInput').value = transcript;
-    sendMessage();
-  };
-  voiceRecognition.onend = function() {
-    document.getElementById('voiceBtn').style.color = '';
-    voiceRecognition = null;
-    setOrbState('idle');
-  };
-  voiceRecognition.onerror = function() {
-    voiceRecognition = null;
-    document.getElementById('voiceBtn').style.color = '';
-    setOrbState('idle');
-  };
+    voiceRecognition.start();
+    return;
+  }
 
-  voiceRecognition.start();
+  // Fallback: MediaRecorder → server Whisper
+  if (!navigator.mediaDevices || !window.MediaRecorder) {
+    showToast('Voice', 'Audio recording not supported in this browser', 'warning');
+    return;
+  }
+  _startMediaRecorder();
 }
 
 function attachFile() {
