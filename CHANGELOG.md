@@ -5,6 +5,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (D88 — 8 advanced cognitive mechanisms, 2026-07-24)
+
+- **M1 — Anomaly Detection with Baselines** (`_update_baseline()` in `agentic/app.py`): rolling windows (deque, 48 readings = ~4 h at 5-min interval) per sensor metric. Z-score computed against prior baseline BEFORE appending the new value (avoids self-referential inflation). Alerts when |z| > 2.0. Integrated into `_proactive_observer()`. Gated by `FF_ANOMALY_DETECTION` (default True).
+- **M2 — Self-Capability Map** (`GET /introspect/capabilities` on agentic): live health probe of all 10 sensory services + skill hunter; returns reachable/unreachable count, loaded skills list, all feature flag states, baseline keys tracked, observation history depth. Kai can inspect what he can and cannot perceive.
+- **M3 — Cross-Service Correlation** (`_correlate_observations()` in `agentic/app.py`): reasons across simultaneous sensor observations. Patterns: CPU + docker unhealthy → resource-pressure cascade; RAM + docker → memory leak; CPU + RAM → runaway process; git dirty + email backlog → operator mid-flow; AQ bad + email → suggest outdoor break.
+- **M4 — World Model Persistence**: at the end of each proactive observer cycle, writes a structured JSON `world_state` document to memu-core (timestamp, docker_unhealthy, email_unread, cpu_percent, ram_percent, aqi_category, git_dirty_count, calendar_next). Kai maintains a persistent mental map of his environment. Gated by `FF_WORLD_MODEL_PERSISTENCE` (default True).
+- **M5 — Sensory Learning** (`_detect_sensor_patterns()` in `agentic/app.py`): tracks `_observation_history` deque (last 10 cycles). Detects when any observation type appears ≥ 3 times in 10 cycles; writes `sensor_pattern` memory to memu-core ("Recurring pattern: X appeared in N/10 recent cycles"). Gated by `FF_SENSORY_LEARNING` (default True).
+- **M6 — Skill Hunter Service** (`skill-hunter/`, port 8045, `172.20.0.34`): `POST /hunt` accepts a gap description → extract keywords → heuristic keyword→package map (60+ entries covering NLP, web, PDF, data, ML, crypto, scheduling, etc.) → PyPI existence check → write `.md` skill file to `/data/skills/` → return `skill_created: bool`. `GET /skills` lists auto-generated skills. Gated by `FF_SKILL_HUNTER` (default True).
+- **M7 — Proactive Scheduling**: in `_proactive_observer()`, probe `calendar-service /summary` each cycle; if an event is ≤ 30 min away, fuse calendar data + current sensor state into a `proactive_schedule` memory (e.g., "Meeting in 20 min + AQ poor → consider indoor location"). Gated by `FF_PROACTIVE_SCHEDULING` (default True).
+- **M8 — Reactive Skill Acquisition**: in `/chat` handler, if `match_skill()` returns None AND route confidence < 0.4 (capability gap), `asyncio.create_task(_hunt_skill_for_gap(user_msg))` fires skill-hunter asynchronously without blocking the chat response; on success calls `asyncio.to_thread(load_skills)` to hot-reload. Gated by `FF_SKILL_HUNTER`.
+- **5 new feature flags** in `common/feature_flags.py`: `ANOMALY_DETECTION`, `WORLD_MODEL_PERSISTENCE`, `SENSORY_LEARNING`, `SKILL_HUNTER`, `PROACTIVE_SCHEDULING` — all default True.
+- **D88 logged in `kai-pm/DECISIONS.md`**: full design rationale for all 8 mechanisms.
+- **44-test suite** (`scripts/test_cognitive_mechanisms.py`): M1 (7 tests), M2 (4 tests), M3 (6 tests), M4/flags (5 tests), M5 (6 tests), M6 (11 tests), M7 (2 tests), M8 (4 tests). Makefile target `test-cognitive-mechanisms` + CI step.
+- Tests: 2,603 → 2,647 (+44). Services: 57 → 58. LOC: ~63,303 → ~64,950.
+
 ### Added (D87 cognitive architecture, 2026-07-24)
 
 - **World Context Injection** (`_get_world_context()` in `agentic/app.py`): on every `/chat` call, 9 sensory services are polled in parallel (2 s timeout each) — weather, air quality, calendar, docker-watcher, sysmetrics, email-reader, news-feed, git-watcher, broker PnL. Non-trivial readings injected as "World state (live sensory awareness):" system block into the LLM prompt. Trivial/unconfigured/loading states filtered via `_SENSORY_SKIP` frozenset so only real, actionable data reaches the model.

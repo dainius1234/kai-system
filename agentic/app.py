@@ -53,6 +53,7 @@ EMAIL_READER_URL = os.getenv("EMAIL_READER_URL", "http://email-reader:8037")
 NEWS_FEED_URL = os.getenv("NEWS_FEED_URL", "http://news-feed:8038")
 GIT_WATCHER_URL = os.getenv("GIT_WATCHER_URL", "http://git-watcher:8044")
 BROKER_URL = os.getenv("BROKER_URL", "http://broker-bridge:8034")
+SKILL_HUNTER_URL = os.getenv("SKILL_HUNTER_URL", "http://skill-hunter:8045")
 PROACTIVE_INTERVAL = int(os.getenv("PROACTIVE_INTERVAL_SECONDS", "300"))
 WAKE_INTENT_COMMAND_THRESHOLD = float(os.getenv("WAKE_INTENT_COMMAND_THRESHOLD", "0.6"))
 WAKE_INTENT_OVERRIDE_CONFIDENCE = float(os.getenv("WAKE_INTENT_OVERRIDE_CONFIDENCE", "0.7"))
@@ -520,6 +521,47 @@ async def prune_skills_endpoint(request: Request) -> Dict[str, Any]:
     return {"status": "ok", "pruned": pruned, "pruned_count": len(pruned)}
 
 
+@app.get("/introspect/capabilities")
+async def introspect_capabilities() -> Dict[str, Any]:
+    """D88 M2: self-capability map — live understanding of what Kai can perceive and do."""
+    from common.feature_flags import get_all_flags
+
+    sensory_services = [
+        ("weather", WEATHER_URL),
+        ("airquality", AIRQUALITY_URL),
+        ("calendar", CALENDAR_URL),
+        ("docker_watcher", DOCKER_WATCHER_URL),
+        ("sysmetrics", SYSMETRICS_URL),
+        ("email_reader", EMAIL_READER_URL),
+        ("news_feed", NEWS_FEED_URL),
+        ("git_watcher", GIT_WATCHER_URL),
+        ("broker", BROKER_URL),
+        ("skill_hunter", SKILL_HUNTER_URL),
+    ]
+
+    async def _ping(name: str, url: str) -> Dict[str, Any]:
+        try:
+            async with httpx.AsyncClient(timeout=2.0) as client:
+                r = await client.get(f"{url}/health")
+                return {"name": name, "reachable": r.status_code < 400, "http_status": r.status_code}
+        except Exception:
+            return {"name": name, "reachable": False, "http_status": 0}
+
+    pings = await asyncio.gather(*[_ping(n, u) for n, u in sensory_services])
+    skills = list_skills()
+    return {
+        "status": "ok",
+        "sensory_services": list(pings),
+        "reachable_count": sum(1 for p in pings if p["reachable"]),
+        "unreachable_count": sum(1 for p in pings if not p["reachable"]),
+        "skills": [{"name": s.name} for s in skills],
+        "skill_count": len(skills),
+        "feature_flags": {f["flag"]: f["enabled"] for f in get_all_flags()},
+        "baselines_tracked": list(_sensor_baselines.keys()),
+        "observation_history_depth": len(_observation_history),
+    }
+
+
 @app.get("/metrics")
 async def metrics() -> Dict[str, float]:
     return budget.snapshot()
@@ -858,15 +900,117 @@ async def _get_world_context() -> str:
 
 _last_world_snapshot: Dict[str, Any] = {}
 
+# ── D88 M1: rolling baseline windows per sensor metric ──────────────
+_BASELINE_WINDOW = 48  # readings; at default 5-min interval ≈ 4 hours
+_sensor_baselines: Dict[str, Deque[float]] = {}
+
+# ── D88 M5: observation history for pattern detection ───────────────
+_observation_history: Deque[List[str]] = deque(maxlen=10)
+
+
+def _update_baseline(key: str, value: float) -> Optional[float]:
+    """Update rolling baseline; return z-score against prior history, or None if window too small.
+
+    Z-score is computed BEFORE appending the new value so it measures
+    how much the current reading deviates from the established baseline,
+    not a self-referential average that includes the new point.
+    """
+    if key not in _sensor_baselines:
+        _sensor_baselines[key] = deque(maxlen=_BASELINE_WINDOW)
+    window = _sensor_baselines[key]
+    if len(window) < 6:
+        window.append(value)
+        return None
+    mean = sum(window) / len(window)
+    variance = sum((x - mean) ** 2 for x in window) / len(window)
+    std = variance ** 0.5
+    z = (value - mean) / std if std >= 0.01 else 0.0
+    window.append(value)
+    return z
+
+
+def _correlate_observations(obs: List[str]) -> List[str]:
+    """D88 M3: reason across multiple simultaneous sensor observations."""
+    if len(obs) < 2:
+        return []
+    correlated: List[str] = []
+    has_cpu = any("CPU" in o and "%" in o for o in obs)
+    has_docker_bad = any("Docker:" in o and "unhealthy" in o for o in obs)
+    has_ram = any("RAM" in o and "%" in o for o in obs)
+    has_git_dirty = any("Git:" in o and "uncommitted" in o for o in obs)
+    has_email = any("Email:" in o and "unread" in o for o in obs)
+    has_aq_bad = any("Air quality:" in o for o in obs)
+
+    if has_cpu and has_docker_bad:
+        correlated.append(
+            "Correlation: high CPU + unhealthy containers — resource pressure may be causing service failures; consider inspecting or restarting"
+        )
+    if has_ram and has_docker_bad:
+        correlated.append(
+            "Correlation: memory pressure + unhealthy containers — possible memory leak in a failing service"
+        )
+    if has_cpu and has_ram:
+        correlated.append(
+            "Correlation: CPU and RAM both elevated — possible runaway process or resource contention"
+        )
+    if has_git_dirty and has_email:
+        correlated.append(
+            "Correlation: uncommitted changes + email backlog — operator is mid-flow; avoid interrupting unless critical"
+        )
+    if has_aq_bad and has_email:
+        correlated.append(
+            "Correlation: poor air quality + email backlog — suggest outdoor break once clear to avoid cognitive fatigue"
+        )
+    return correlated
+
+
+def _detect_sensor_patterns(current_obs: List[str]) -> List[str]:
+    """D88 M5: detect recurring sensor signal types across recent cycles."""
+    if not is_enabled("SENSORY_LEARNING"):
+        return []
+
+    def _classify(o: str) -> str:
+        if "Docker:" in o and "unhealthy" in o:
+            return "docker_unhealthy"
+        if "Email:" in o:
+            return "email_backlog"
+        if "Air quality:" in o:
+            return "aq_degraded"
+        if "Git:" in o:
+            return "git_dirty"
+        if "CPU" in o:
+            return "cpu_high"
+        if "RAM" in o:
+            return "ram_high"
+        if "Anomaly" in o:
+            return "sensor_anomaly"
+        return "other"
+
+    current_types = {_classify(o) for o in current_obs}
+    patterns: List[str] = []
+    for obs_type in current_types:
+        count = sum(
+            1 for hist in _observation_history
+            if any(obs_type == _classify(o) for o in hist)
+        )
+        if count >= 3:
+            patterns.append(
+                f"Recurring pattern: {obs_type} has appeared in {count}/10 recent observation cycles — this is becoming a persistent issue"
+            )
+    return patterns
+
 
 async def _proactive_observer() -> None:
-    """Layer 3 (D87): proactive awareness loop — runs every PROACTIVE_INTERVAL seconds.
+    """Proactive awareness loop — D87 + D88 cognitive mechanisms.
 
-    Reads anomaly-relevant sensory endpoints, detects notable conditions
-    (changed email count, unhealthy containers, degraded air quality, dirty git repos),
-    and writes observations to memu-core as 'proactive_observation' memories
-    so they surface in future context via the normal vector-recall channel.
-    Only runs when FF_PROACTIVE_AGENT is enabled (default True).
+    Runs every PROACTIVE_INTERVAL seconds (default 300s). Implements:
+    - D87 Layer 3: baseline anomaly detection, docker/email/AQ/git/system probes
+    - D88 M1: rolling baseline z-score anomaly alerts
+    - D88 M3: cross-service correlation reasoning
+    - D88 M4: structured world_state persistence to memu-core
+    - D88 M5: sensory pattern detection across 10 recent cycles
+    - D88 M7: proactive scheduling (calendar + sensor fusion)
+    Gated by FF_PROACTIVE_AGENT (default True).
     """
     global _last_world_snapshot
     await asyncio.sleep(90)  # let services start up before first probe
@@ -893,6 +1037,7 @@ async def _proactive_observer() -> None:
                 _probe("aq", AIRQUALITY_URL, "/current"),
                 _probe("git", GIT_WATCHER_URL, "/dirty"),
                 _probe("sys", SYSMETRICS_URL, "/snapshot"),
+                _probe("cal", CALENDAR_URL, "/summary"),
             )
 
             # Docker health
@@ -926,13 +1071,56 @@ async def _proactive_observer() -> None:
 
             # System resources
             sys_data = snapshot.get("sys", {})
-            cpu = sys_data.get("cpu_percent", 0)
-            ram = (sys_data.get("memory") or {}).get("percent", 0)
+            cpu = float(sys_data.get("cpu_percent", 0))
+            ram = float((sys_data.get("memory") or {}).get("percent", 0))
             if cpu > 85:
                 observations.append(f"System: CPU at {cpu:.0f}% — possible runaway process")
             if ram > 90:
                 observations.append(f"System: RAM at {ram:.0f}% — memory pressure")
 
+            # ── D88 M1: anomaly detection with rolling baselines ─────
+            if is_enabled("ANOMALY_DETECTION"):
+                for metric_key, value in [("cpu", cpu), ("ram", ram), ("email_unread", float(unread_now)), ("docker_unhealthy", float(unhealthy))]:
+                    z = _update_baseline(metric_key, value)
+                    if z is not None and abs(z) > 2.0:
+                        observations.append(
+                            f"Anomaly ({metric_key}): current={value:.1f} deviates {z:+.1f}σ from recent baseline"
+                        )
+
+            # ── D88 M3: cross-service correlation ───────────────────
+            correlated = _correlate_observations(observations)
+            observations.extend(correlated)
+
+            # ── D88 M7: proactive scheduling ─────────────────────────
+            if is_enabled("PROACTIVE_SCHEDULING"):
+                cal_summary = snapshot.get("cal", {})
+                cal_text = str(cal_summary.get("summary", ""))
+                minutes_to_next = cal_summary.get("minutes_until_next")
+                next_event = cal_summary.get("next_event", "")
+                if next_event and minutes_to_next is not None and 0 < int(minutes_to_next) <= 30:
+                    schedule_parts = [f"Event in {minutes_to_next} min: {next_event}"]
+                    if aqi_cat in ("unhealthy", "very unhealthy", "hazardous"):
+                        schedule_parts.append("air quality is poor — consider indoor location")
+                    if cpu > 85:
+                        schedule_parts.append("CPU is high — close heavy apps before starting")
+                    if dirty > 0:
+                        schedule_parts.append("you have uncommitted changes — commit first if possible")
+                    sched_text = "Proactive schedule: " + "; ".join(schedule_parts)
+                    try:
+                        async with httpx.AsyncClient(timeout=5.0) as client:
+                            await client.post(
+                                f"{MEMU_URL}/memory/memorize",
+                                json={
+                                    "content": sched_text,
+                                    "category": "proactive_schedule",
+                                    "user_id": "keeper",
+                                },
+                            )
+                        logger.info("Proactive schedule: %s", sched_text)
+                    except Exception:
+                        pass
+
+            # ── Main observation write ────────────────────────────────
             if observations:
                 obs_text = "Proactive observation: " + "; ".join(observations)
                 try:
@@ -949,10 +1137,71 @@ async def _proactive_observer() -> None:
                 except Exception as exc:
                     logger.warning("Proactive memory write failed: %s", exc)
 
+            # ── D88 M5: update history + detect patterns ─────────────
+            _observation_history.append(list(observations))
+            patterns = _detect_sensor_patterns(observations)
+            if patterns:
+                pattern_text = "; ".join(patterns)
+                try:
+                    async with httpx.AsyncClient(timeout=5.0) as client:
+                        await client.post(
+                            f"{MEMU_URL}/memory/memorize",
+                            json={
+                                "content": pattern_text,
+                                "category": "sensor_pattern",
+                                "user_id": "keeper",
+                            },
+                        )
+                    logger.info("Sensor pattern detected: %s", pattern_text)
+                except Exception:
+                    pass
+
+            # ── D88 M4: world model persistence ──────────────────────
+            if is_enabled("WORLD_MODEL_PERSISTENCE"):
+                world_model = {
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "docker_unhealthy": unhealthy,
+                    "email_unread": unread_now,
+                    "cpu_percent": cpu,
+                    "ram_percent": ram,
+                    "aqi_category": aqi_cat,
+                    "git_dirty_count": dirty,
+                    "calendar_next": snapshot.get("cal", {}).get("next_event", ""),
+                }
+                try:
+                    async with httpx.AsyncClient(timeout=5.0) as client:
+                        await client.post(
+                            f"{MEMU_URL}/memory/memorize",
+                            json={
+                                "content": json.dumps(world_model),
+                                "category": "world_state",
+                                "user_id": "keeper",
+                            },
+                        )
+                except Exception:
+                    pass
+
             _last_world_snapshot = snapshot
         except Exception as exc:
             logger.warning("Proactive observer error: %s", exc)
         await asyncio.sleep(PROACTIVE_INTERVAL)
+
+
+async def _hunt_skill_for_gap(gap_description: str) -> None:
+    """D88 M8: reactive skill acquisition — ask skill-hunter to fill a capability gap."""
+    if not is_enabled("SKILL_HUNTER"):
+        return
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.post(
+                f"{SKILL_HUNTER_URL}/hunt",
+                json={"gap": gap_description[:200]},
+            )
+            if resp.status_code == 200 and resp.json().get("skill_created"):
+                await asyncio.to_thread(load_skills)
+                logger.info("Skill hunter: new skill loaded for gap '%s'", gap_description[:80])
+    except Exception as exc:
+        logger.debug("Skill hunter request failed (non-critical): %s", exc)
 
 
 async def _get_session_messages(session_id: str) -> List[Dict[str, str]]:
@@ -1246,6 +1495,10 @@ async def chat_stream(req: ChatRequest):
 
     # Match skill before LLM so the relevant skill doc reaches the prompt (J7 fix)
     matched_skill = match_skill(user_msg)
+
+    # D88 M8: reactive skill acquisition — fire-and-forget when no skill matches + low route confidence
+    if matched_skill is None and route_decision.confidence < 0.4:
+        asyncio.create_task(_hunt_skill_for_gap(user_msg))
 
     if is_enabled("CONTEXT_ENRICHMENT"):
         (memories, goals, topics, eq_context,

@@ -2,6 +2,40 @@
 
 > This file is append-only. Never edit past entries; supersede with a new numbered entry.
 
+## D88 — 2026-07-24 — Kai Advanced Cognition: 8 Intelligence Mechanisms
+
+**Context:** D87 wired Kai's sensory layer (world context injection, proactive observer, skill matching). That gave Kai eyes and awareness. D88 implements the next layer: genuine intelligence — the ability to detect trends, understand itself, correlate signals, maintain memory, learn from patterns, grow capabilities, anticipate events, and autonomously close skill gaps. These are the mechanisms that distinguish a brain from a sensor array.
+
+**Decisions (8 mechanisms, all implemented this entry):**
+
+**Mechanism 1 — Anomaly Detection with Baselines:**
+Track rolling windows (last 48 readings = ~4 hours at 5-min interval) per sensor metric using `_sensor_baselines: Dict[str, Deque[float]]`. Compute z-score on each new reading. Alert when |z| > 2.0 (i.e. more than 2 standard deviations from the rolling mean). Write anomaly observations to memu-core as `proactive_observation` category. Requires ≥6 readings before alerting to avoid false positives on startup. Gated by `FF_ANOMALY_DETECTION` (default True). Moves Kai from snapshot awareness to trend awareness.
+
+**Mechanism 2 — Self-Capability Map:**
+New `GET /introspect/capabilities` endpoint on agentic. Returns: all sensory service reachability (live health probe), loaded skill names, feature flag states, active baseline keys. Kai can know what he doesn't know. Used by dashboard and by mechanism 8 (reactive skill acquisition) to find gaps.
+
+**Mechanism 3 — Cross-Service Correlation:**
+After each observation cycle, `_correlate_observations()` reasons across the full observation set. Patterns: high CPU + docker unhealthy → resource-pressure cascade; RAM pressure + docker unhealthy → memory leak; CPU + RAM both high → runaway process; git dirty + email backlog → operator is mid-task (tread lightly). Correlations written as `proactive_observation` memories alongside individual observations. The LLM sees these in future context via memory retrieval.
+
+**Mechanism 4 — World Model Persistence:**
+In the proactive loop, after each successful probe cycle, write a structured JSON `world_state` document to memu-core. This gives Kai a continuously maintained mental map rather than stateless point-in-time snapshots. Fields: `timestamp`, `docker_unhealthy`, `email_unread`, `cpu_percent`, `ram_percent`, `aqi_category`, `git_dirty_count`, `calendar_next`. Gated by `FF_WORLD_MODEL_PERSISTENCE` (default True).
+
+**Mechanism 5 — Sensory Learning:**
+Track the last 10 proactive observation cycles in `_observation_history: Deque[List[str]]`. After each cycle, check each observed type against history. If a type appears in ≥3 of the last 10 cycles, write a `sensor_pattern` memory to memu-core: "Recurring pattern: X has appeared in N/10 recent cycles." This feeds the LLM memory retrieval path so Kai warns about predictable recurrences before they escalate. Gated by `FF_SENSORY_LEARNING` (default True).
+
+**Mechanism 6 — Skill Hunter Service:**
+New Docker service `skill-hunter` (port 8045, IP 172.20.0.34). `POST /hunt` accepts a gap description, extracts keywords, maps to candidate PyPI packages via heuristic keyword table, verifies existence via PyPI JSON API, generates a `.md` skill file in `/data/skills/`, returns `skill_created: bool`. `GET /skills` lists auto-generated skills. Gated by `FF_SKILL_HUNTER` (default True). Kai grows his own capability set without operator intervention. First version is heuristic; future version can use LLM-guided search.
+
+**Mechanism 7 — Proactive Scheduling:**
+In the proactive loop, probe `calendar-service /summary` for upcoming events. If an event is within 30 minutes, fuse calendar data with current sensor state and write `proactive_schedule` memory to memu-core. Examples: "Meeting in 20 min + AQ poor → consider indoor location", "Meeting in 15 min + CPU high → close heavy apps first", "Meeting in 25 min + dirty repos → commit first." This memory surfaces in the LLM's context retrieval so Kai volunteers suggestions naturally. Gated by `FF_PROACTIVE_SCHEDULING` (default True).
+
+**Mechanism 8 — Reactive Skill Acquisition:**
+In `/chat` handler, after `match_skill()` returns None and route confidence < 0.4, fire `asyncio.create_task(_hunt_skill_for_gap(user_msg))`. The async task calls skill hunter, waits for response, and if a skill was created calls `asyncio.to_thread(load_skills)` to hot-reload without blocking the chat response. Kai autonomously closes capability gaps during conversation. Gated by `FF_SKILL_HUNTER` (default True).
+
+**Rationale:** D87 gave Kai awareness. D88 gives Kai intelligence. The distinction: awareness notices what is happening; intelligence understands why, predicts what comes next, and acts to prepare for it. Every mechanism here closes a gap between "I can see X" (D87) and "I understand X, remember its patterns, and can grow my ability to handle it" (D88). Together these 8 mechanisms implement the core cognitive loop: perceive → correlate → remember → pattern-match → anticipate → act → grow.
+
+**Consequences:** Proactive observer gains baseline tracking, correlation reasoning, world model writes, pattern memory. New `/introspect/capabilities` endpoint enables self-diagnosis. New `skill-hunter` service enables autonomous capability growth. Reactive skill acquisition means Kai gets better at every novel request. Feature flags allow each mechanism to be independently toggled. All new test targets added to `test-core`.
+
 ## D87 — 2026-07-24 — Kai Cognitive Architecture: Sensory Integration + Proactive Intelligence
 
 **Context:** Kai has 10+ sensory services (weather, calendar, air quality, docker health, email, news, git, broker) each with a `/summary` endpoint explicitly labelled "for agentic context injection." Audit of `agentic/app.py` found that NONE of these were ever called during chat. Kai's LLM sees emotional state, goals, operator model, narrative identity — but is completely blind to his physical environment. Skills loaded from `/skills/` are never consulted during `/chat`. `FF_CONTEXT_ENRICHMENT` and `FF_PROACTIVE_AGENT` flags were registered but their gate checks were never implemented. The result: Kai has hands and legs (8 sensory services, skill files, shell sandbox, browser) but his brain is not wired to use them.

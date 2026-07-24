@@ -10,11 +10,11 @@
 <p align="center">
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
-  <img src="https://img.shields.io/badge/services-57-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-2%2C603_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/services-58-blue?style=flat-square" alt="services">
+  <img src="https://img.shields.io/badge/tests-2%2C644_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
-  <img src="https://img.shields.io/badge/Python-~63%2C298_LOC-yellow?style=flat-square" alt="loc">
-  <img src="https://img.shields.io/badge/milestones-38_shipped-purple?style=flat-square" alt="milestones">
+  <img src="https://img.shields.io/badge/Python-~64%2C195_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/milestones-39_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
 </p>
@@ -25,12 +25,12 @@
 
 | Metric | Value |
 |---|---|
-| **Services** | 57 Docker containers |
-| **Test targets** | 80 (`make test-core`) |
-| **Individual tests** | 2,603 (`def test_` across 126 files) |
-| **Python LOC** | ~63,298 |
+| **Services** | 58 Docker containers |
+| **Test targets** | 81 (`make test-core`) |
+| **Individual tests** | 2,644 (`def test_` across 127 files) |
+| **Python LOC** | ~64,195 |
 | **Compose files** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 38 |
+| **Milestones shipped** | 39 |
 | **Failures** | 0 |
 
 > **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
@@ -356,6 +356,7 @@ H3  Context Budget          ██████████ DONE   H4  Hardening 
 STT Whisper Audio Input     ██████████ DONE   TTS Voice Synthesis     ██████████ DONE
 Browser Navigation          ██████████ DONE   Vision / Camera         ██████████ DONE
 D87 Cognitive Architecture  ██████████ DONE   (world ctx + proactive observer + skill match)
+D88 Advanced Cognition      ██████████ DONE   (anomaly baselines, correlation, skill-hunter, scheduling)
 ```
 
 ### What's Next
@@ -395,6 +396,7 @@ D87 Cognitive Architecture  ██████████ DONE   (world ctx + p
 | **Browser** | Web Navigation | **DONE** — `browser-agent` (Playwright Chromium, port 8040); navigate/click/type/scrape/screenshot/run; dashboard proxies; `browse: <url>` chat shortcut; 13 tests (PR #102) |
 | **Vision** | Camera / Face / Emotion | **DONE** — `vision-service` (OpenCV + DeepFace CPU, port 8023); face detection + emotion (happy/sad/angry/neutral/…); 📷 camera panel with 5 s frame sampling + presence overlay; 12 tests (PR #102) |
 | **D87** | Cognitive Architecture | **DONE** — `_get_world_context()` (9 sensory services per /chat, 2 s timeout, trivial-state filter); `_proactive_observer()` (background anomaly loop → memu-core proactive_observation memories every 300 s); skill matching wired into /chat; ghost flag fixes for FF_CONTEXT_ENRICHMENT + FF_PROACTIVE_AGENT; 14-way context gather; 17 tests |
+| **D88** | Advanced Cognition | **DONE** — M1 rolling anomaly baselines (z-score, 48-reading window); M2 `/introspect/capabilities` self-map; M3 cross-sensor correlation reasoning; M4 world_state JSON persistence; M5 sensory pattern learning (10-cycle history); M6 skill-hunter service (port 8045); M7 proactive scheduling (calendar+sensor fusion); M8 reactive skill acquisition (capability gap → auto-hunt). 5 new flags, 44 tests. Services 57→58 |
 
 *Sources: OpenClaw, Jarvis variants, Proact-VL (arXiv:2603.03447). All offline, low-resource, test on qwen2.5:0.5b first.*
 

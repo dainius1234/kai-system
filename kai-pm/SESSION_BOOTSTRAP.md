@@ -16,9 +16,10 @@ process-level failure isolation between hot and cold paths.
 
 **Phase: Phase 0 — COMPLETE. Blocked on GPU hardware (RTX 5080) to enter Phase 1.**
 
-All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. D87 Cognitive
-Architecture merged (2026-07-24): Kai is now genuinely aware and proactive — world
-context injection, background anomaly observer, skill matching all wired. No open PRs.
+All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. D88 Advanced Cognition
+merged (2026-07-24): Kai now has rolling anomaly baselines, cross-sensor correlation, world
+model persistence, pattern learning, a skill-hunter service, proactive scheduling, and
+reactive skill acquisition. No open PRs.
 
 ### What has shipped to `main` (merged PRs, in order)
 
@@ -60,6 +61,7 @@ context injection, background anomaly observer, skill matching all wired. No ope
 | #115 | — | Doc sweep for PR #114: CHANGELOG, SESSION_BOOTSTRAP, STATUS, README badges (services 33→51, tests 2,328→2,567, LOC ~62,099) | — |
 | #116 | — | yfinance stocks/forex endpoints on broker-bridge; git-watcher service (8044, `.33`); 19 tests; services 51→52 | — |
 | D87 | D87 | Cognitive architecture: `_get_world_context()` (9 sensory services per /chat), `_proactive_observer()` (background anomaly loop → memu-core), skill matching wired into /chat, ghost flag fixes (FF_CONTEXT_ENRICHMENT + FF_PROACTIVE_AGENT), 14-way gather; 17 tests | — |
+| D88 | D88 | 8 advanced cognitive mechanisms: M1 anomaly detection with rolling baselines (2σ z-score); M2 `/introspect/capabilities` self-capability map; M3 cross-service correlation (`_correlate_observations()`); M4 world model persistence (JSON `world_state` to memu-core each cycle); M5 sensory learning (pattern history deque, `sensor_pattern` memories); M6 skill-hunter service (port 8045, `.34`); M7 proactive scheduling (calendar + sensors → `proactive_schedule` memories); M8 reactive skill acquisition (capability gap → skill hunter on-demand). 5 new feature flags. 44 tests. Services: 57 → 58 | — |
 
 ### In-flight work
 

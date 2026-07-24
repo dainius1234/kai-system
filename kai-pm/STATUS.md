@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-24
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** D87 Cognitive Architecture shipped. Kai is now genuinely aware and proactive: world context injection (9 sensory services per /chat), background anomaly observer (writes proactive_observation memories to memu-core every 5 min), skill matching wired into /chat. Ghost flags fixed. All CPU-safe pre-GPU work done. Blocked on GPU (RTX 5080).
+- **Current focus:** D88 Advanced Cognition shipped. Kai now has all 8 intelligence mechanisms: anomaly baselines, self-capability map, cross-sensor correlation, world model persistence, sensory pattern learning, skill-hunter service (port 8045), proactive scheduling (calendar+sensors), reactive skill acquisition. 44 new tests. All CPU-safe pre-GPU work done. Blocked on GPU (RTX 5080).
 
 ## What's landed on main
 
@@ -39,6 +39,7 @@
 | #115 | — | Doc sweep for PR #114: CHANGELOG, SESSION_BOOTSTRAP, STATUS, README badges (services 33→51, tests 2,567, LOC ~62,099) |
 | #116 | — | yfinance stocks/forex on broker-bridge (`/stocks/{symbol}`, `/forex/{pair}`); git-watcher service (8044, 172.20.0.33); 19 tests; services 51→52 |
 | D87 | D87 | Cognitive Architecture: `_get_world_context()` (9 sensory services per /chat), `_proactive_observer()` (background anomaly loop → memu-core proactive_observation memories), skill matching wired into /chat, FF_CONTEXT_ENRICHMENT + FF_PROACTIVE_AGENT ghost flags fixed, 14-way gather; 17 tests |
+| D88 | D88 | Advanced Cognition: M1 rolling baselines + 2σ anomaly detection; M2 `/introspect/capabilities`; M3 cross-sensor correlation; M4 world_state persistence; M5 sensory pattern learning; M6 skill-hunter service (8045, .34); M7 proactive scheduling; M8 reactive skill acquisition. 5 new flags. 44 tests. Services 57→58 |
 
 ## Open PRs
 
@@ -62,5 +63,5 @@ Unlock condition: RTX 5080 procurement + provisioning + validation.
 ## Source of truth pointers
 
 - Resume layer: [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md)
-- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D87)
+- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D88)
 - Latest reality check: [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)

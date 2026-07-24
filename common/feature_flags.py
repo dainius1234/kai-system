@@ -54,6 +54,12 @@ _REGISTRY: Dict[str, tuple] = {
     "DREAM_ENABLED":         ("Trigger dream cycle consolidation (6-phase memory integration)", False),
     "EVOLVER_ENABLED":       ("Agent-Evolver: cluster failure patterns → proactive insights", False),
     "SAGE_SELF_REVIEW":      ("SAGE critique on all plans before execution (not just high-stakes)", False),
+    # D88: 8 advanced cognition mechanisms
+    "ANOMALY_DETECTION":     ("D88/M1: track rolling baselines per sensor; alert on >2σ deviation", True),
+    "WORLD_MODEL_PERSISTENCE": ("D88/M4: write structured world_state JSON to memu-core each proactive cycle", True),
+    "SENSORY_LEARNING":      ("D88/M5: detect recurring sensor patterns across 10 recent cycles; write sensor_pattern memories", True),
+    "SKILL_HUNTER":          ("D88/M6+M8: skill-hunter service integration; reactive skill acquisition on capability gaps", True),
+    "PROACTIVE_SCHEDULING":  ("D88/M7: fuse calendar events + sensor state into proactive_schedule memories", True),
 }
 
 

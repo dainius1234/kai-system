@@ -436,6 +436,29 @@ services:
       retries: 3
 
 
+  skill-hunter:
+    <<: *service_defaults
+    build:
+      context: .
+      dockerfile: skill-hunter/Dockerfile
+    container_name: skill-hunter
+    hostname: skill-hunter
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.34
+    ports:
+      - "8045:8045"
+    environment:
+      PORT: "8045"
+      SKILLS_DIR: "/data/skills"
+    volumes:
+      - memu_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8045/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   # TODO: enable GPU when core is stable.
   # ollama:
   #   image: ollama/ollama:latest

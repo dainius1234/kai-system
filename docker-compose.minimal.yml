@@ -188,6 +188,7 @@ services:
       WAKE_URL: http://wake-service:8022
       FF_WAKE_INTENT_ROUTING: "${FF_WAKE_INTENT_ROUTING:-false}"
       HMAC_ALLOW_DEV_SECRET: "true"
+      SKILL_HUNTER_URL: http://skill-hunter:8045
     ports:
       - "8007:8007"
     healthcheck:
@@ -732,6 +733,25 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.33
+    depends_on:
+      - dashboard
+
+  skill-hunter:
+    build:
+      context: .
+      dockerfile: skill-hunter/Dockerfile
+    container_name: kai-skill-hunter
+    restart: unless-stopped
+    ports:
+      - "8045:8045"
+    environment:
+      PORT: "8045"
+      SKILLS_DIR: "/data/skills"
+    volumes:
+      - soul_data:/data
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.34
     depends_on:
       - dashboard
 
