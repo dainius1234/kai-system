@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-24
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** PR #92 merged. CI green (2243 tests passing). All CPU-safe pre-GPU work done. Blocked on GPU.
+- **Current focus:** PR #95 merged. Simplify sprint complete. CI disk-exhaustion and sovereign compose `:?` issues fixed. All CPU-safe pre-GPU work done. Blocked on GPU.
 
 ## What's landed on main
 
@@ -22,6 +22,9 @@
 | #89 | D79, D80 | COMPOSE_DRIFT fixes: sovereign pgvector image + PG_URI env var (D79); full/minimal OLLAMA_MODEL param + embedding model pull + service_healthy conditions (D80); README sync; SESSION_BOOTSTRAP + DECISIONS.md D77/D78 |
 | #91 | D82, D83 | Phase 1 readiness: S1–S5 pre-GPU sprint; agentic/app.py 91% (169 tests), memu-core/app.py 65% (230 tests); C4 classify_semantic fallback tests; C10 A/B query logger (common/ab_log.py); P1 screen-capture headless tests (20); F4/F6 feature flag tests; GPU Arrival Runbook; 5 new Makefile targets; 2 bug fixes (fire_at None crash, float/str timestamp) |
 | #92 | D84 | CI test-isolation sprint: screen-capture tesseract binary detection (probe binary via `get_tesseract_version()`, not just Python package import); lakefs_client importlib isolation in integration chain test; 30 CI failures resolved; full suite 2243 tests passing |
+| #93 | — | PM housekeeping sweep; S7 shell sandbox service (`sandboxes/shell/app.py`, allowlisted read-only commands, 64 KB output cap); T3 RAMS generator (`scripts/hse_rams.py`, Word docx from site_data.csv with risk matrix colouring and sign-off table) |
+| #94 | — | U4 file upload: dashboard text-inject + image OCR via screen-capture service; `/api/upload` endpoint; drag-and-drop + paste in frontend |
+| #95 | D85 | Simplify sprint: unified `_RISK_LEVELS` table in hse_rams; explicit 400 on oversized shell commands; `raise_for_status()` split error handling in dashboard upload; `prefix` closure in JS; sovereign compose `:?` → `:-` CI fix; runner disk-cleanup step before heavy Docker builds |
 
 ## Open PRs
 
@@ -36,7 +39,7 @@ None.
 
 Unlock condition: RTX 5080 procurement + provisioning + validation.
 
-## Sprint health signals (2026-07-21)
+## Sprint health signals (2026-07-24)
 
 - Weekly CI: behavioral scoreboard + go/no-go + fast pytest subset (weekly-report-card.yml)
 - Friday cleanup: lint, pip-audit, stale-branch hygiene (friday-cleanup.yml)
@@ -45,5 +48,5 @@ Unlock condition: RTX 5080 procurement + provisioning + validation.
 ## Source of truth pointers
 
 - Resume layer: [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md)
-- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D82)
+- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D85)
 - Latest reality check: [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)
