@@ -5,6 +5,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (PR #102, 2026-07-24)
+
+- **Browser Agent** (`browser-agent/`, port 8040, `172.20.0.17`): headless Playwright Chromium service; `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run` endpoints; persistent page with async lock; stub mode when playwright absent; `FF_BROWSER_AGENT` env flag. Dashboard proxies `/api/browser/{navigate,scrape,run,screenshot}`. Chat shortcut `browse: <url>` scrapes page and injects text as context before sending to Kai. 13 tests (`scripts/test_browser_agent.py`), all mocked.
+- **Vision Service** (`perception/vision/`, port 8023, `172.20.0.18`): webcam frame analysis using OpenCV haar cascade (face detection) and optional DeepFace (emotion: happy/sad/angry/neutral/surprise/fear/disgust, CPU-safe `opencv` backend); graceful stub when cv2 absent. Endpoints: `POST /analyze/frame` → `{faces, presence, dominant_emotion, emotions}`, `POST /analyze/presence` → `{present, confidence}`. Dashboard proxies `/api/vision/{analyze,presence}`. Frontend: 📷 camera button opens live video panel; captures JPEG frame every 5 s via `getUserMedia` + canvas; overlays `👤 Present · <emotion>` or `👁 No face detected`. 12 tests (`scripts/test_vision_service.py`), no numpy/cv2 required in CI.
+- **CI**: `test-browser-agent` and `test-vision-service` steps in `core-tests.yml`; 25 new tests total.
+
 ### Added (PRs #98–#100, D86, 2026-07-24)
 
 - **Hardening sprint** (PR #98, D86): shell sandbox `SAFE_DIRS` path restriction with 11 tests; kill-isolation CI step; Trivy exit-code `'1'` + `ignore-unfixed`; per-module coverage floors (`agentic ≥ 45%`, `memu-core ≥ 60%`); `go_no_go` + `check-docs` as early CI gates; restart-persistence smoke test; upload endpoint security fuzz (14 tests).
