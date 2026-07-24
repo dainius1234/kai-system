@@ -662,6 +662,59 @@ async def api_memories_recent(top_k: int = 30):
     return {"records": records, "count": len(records)}
 
 
+@app.get("/api/memory/graph-data")
+async def api_memory_graph_data(top_k: int = 80, query: str = "memories experiences observations"):
+    """Return recent memories formatted as {nodes, links} for the D3 force-graph tab."""
+    raw = await _proxy_get(
+        f"{MEMU_URL}/memory/retrieve",
+        params={"query": query, "user_id": "keeper", "top_k": top_k},
+        fallback=[],
+    )
+    records = raw if isinstance(raw, list) else raw.get("records", raw.get("memories", []))
+    if not isinstance(records, list):
+        records = []
+
+    cat_counts: dict = {}
+    mem_nodes = []
+    links = []
+
+    for r in records:
+        cat = (r.get("category") or "general").lower().strip()
+        cat_counts[cat] = cat_counts.get(cat, 0) + 1
+
+        mem_id = f"mem:{r.get('id', str(id(r)))}"
+        content = r.get("content") or {}
+        if isinstance(content, dict):
+            snippet = content.get("text", content.get("result_raw", r.get("event_type", "")))
+        else:
+            snippet = str(content)
+
+        mem_nodes.append({
+            "id": mem_id,
+            "type": "memory",
+            "label": r.get("event_type", "memory"),
+            "snippet": str(snippet)[:100],
+            "category": cat,
+            "trust_tier": r.get("trust_tier", "unverified"),
+            "importance": float(r.get("importance") or r.get("relevance") or 0.5),
+            "timestamp": r.get("timestamp", ""),
+            "pinned": bool(r.get("pinned", False)),
+            "access_count": int(r.get("access_count", 0)),
+        })
+        links.append({"source": mem_id, "target": f"cat:{cat}"})
+
+    cat_nodes = [
+        {"id": f"cat:{cat}", "type": "category", "label": cat, "count": count}
+        for cat, count in sorted(cat_counts.items())
+    ]
+    return {
+        "nodes": cat_nodes + mem_nodes,
+        "links": links,
+        "categories": sorted(cat_counts.keys()),
+        "count": len(records),
+    }
+
+
 @app.get("/api/finance/summary")
 async def api_finance_summary():
     """Proxy CIS/VAT/tax financial summary from the financial-awareness service (P29)."""
