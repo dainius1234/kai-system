@@ -63,6 +63,7 @@ GIT_WATCHER_URL = os.getenv("GIT_WATCHER_URL", "http://git-watcher:8044")
 BROKER_URL = os.getenv("BROKER_URL", "http://broker-bridge:8034")
 SKILL_HUNTER_URL = os.getenv("SKILL_HUNTER_URL", "http://skill-hunter:8045")
 HOUSE_DOCTOR_URL = os.getenv("HOUSE_DOCTOR_URL", "http://house-doctor:8046")
+VAULT_SYNC_URL = os.getenv("VAULT_SYNC_URL", "http://vault-sync:8047")
 PROACTIVE_INTERVAL = int(os.getenv("PROACTIVE_INTERVAL_SECONDS", "300"))
 GAP_HUNT_THRESHOLD = int(os.getenv("GAP_HUNT_THRESHOLD", "3"))
 WAKE_INTENT_COMMAND_THRESHOLD = float(os.getenv("WAKE_INTENT_COMMAND_THRESHOLD", "0.6"))
@@ -1021,6 +1022,21 @@ async def _get_world_context() -> str:
     ]
     results = await asyncio.gather(*[_fetch_summary(b, p, l) for b, p, l in fetches])
     lines = [r for r in results if r]
+
+    # FF_VAULT_CONTEXT: inject a vault memory snippet into world context
+    if is_enabled("VAULT_CONTEXT"):
+        try:
+            async with httpx.AsyncClient(timeout=2.0) as client:
+                r = await client.get(f"{VAULT_SYNC_URL}/search", params={"query": "recent", "limit": 1})
+                if r.status_code == 200:
+                    results_data = r.json().get("results", [])
+                    if results_data:
+                        title = results_data[0].get("title", "")
+                        if title:
+                            lines.append(f"Vault (recent note): {title}")
+        except Exception:
+            pass
+
     if not lines:
         return ""
     return "World state (live sensory awareness):\n" + "\n".join(f"- {l}" for l in lines)
@@ -2548,6 +2564,48 @@ async def get_logs(limit: int = 100, level: str = "", since: float = 0):
     entries.reverse()
     entries = entries[:limit]
     return {"status": "ok", "count": len(entries), "entries": entries}
+
+
+# ── D91 Vault export proxy ────────────────────────────────────────────────────
+
+class VaultExportRequest(BaseModel):
+    filepath: str
+    content: str
+    conviction: float = 0.0
+    requester: str = "kai"
+
+
+@app.post("/vault/export")
+async def vault_export(req: VaultExportRequest):
+    """Proxy a vault write to vault-sync (conviction gate enforced there)."""
+    if not is_enabled("VAULT_SYNC"):
+        raise HTTPException(503, "FF_VAULT_SYNC is disabled")
+    async with httpx.AsyncClient(timeout=15) as client:
+        try:
+            resp = await client.post(f"{VAULT_SYNC_URL}/export", json=req.model_dump())
+            resp.raise_for_status()
+            return resp.json()
+        except httpx.HTTPStatusError as exc:
+            raise HTTPException(exc.response.status_code, exc.response.text)
+        except Exception as exc:
+            raise HTTPException(502, f"vault-sync unreachable: {exc}")
+
+
+@app.get("/vault/search")
+async def vault_search_proxy(query: str, limit: int = 10, folder_filter: str = ""):
+    """Proxy vault search to vault-sync."""
+    if not is_enabled("VAULT_SYNC"):
+        raise HTTPException(503, "FF_VAULT_SYNC is disabled")
+    async with httpx.AsyncClient(timeout=10) as client:
+        try:
+            resp = await client.get(
+                f"{VAULT_SYNC_URL}/search",
+                params={"query": query, "limit": limit, "folder_filter": folder_filter},
+            )
+            resp.raise_for_status()
+            return resp.json()
+        except Exception as exc:
+            raise HTTPException(502, f"vault-sync unreachable: {exc}")
 
 
 if __name__ == "__main__":

@@ -5,6 +5,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (D91 — Obsidian Brain: Bidirectional Vault ↔ Knowledge Graph Sync, 2026-07-24)
+
+- **`vault-sync/parser.py`**: `NoteData` dataclass + `parse_note()` — extracts frontmatter, wikilinks `[[target|alias]]`, `#tags`, and SHA256 checksum from `.md` files. Graceful fallback if `python-frontmatter` absent.
+- **`vault-sync/mapper.py`**: `VaultMapper` — thread-safe bidirectional filepath↔node-id mapping, persists to `.vault-sync/mapping.json` with versioned JSON schema. `get_by_filepath`, `get_by_node_id`, `upsert`, `remove`, `all_entries`, `__len__`.
+- **`vault-sync/watcher.py`**: `FileWatcher` + `_VaultHandler` — watchdog-based file watcher with 2s debounce per filepath. Ignores hidden files/dirs and non-`.md` files. Gracefully degrades if watchdog not installed.
+- **`vault-sync/app.py`**: FastAPI service at port 8047 / 172.20.0.36:
+  - `POST /ingest` — manual ingest trigger; skips on unchanged checksum.
+  - `POST /export` — conviction gate (default ≥9.0) + path traversal block; writes note to vault then re-ingests.
+  - `GET /search` — proxies `GET /memory/vault/search` on memu-core.
+  - `GET /mapping` — diagnostic filepath→node dump.
+  - Background asyncio queue workers for watcher events (ingest + delete).
+- **Memu-core vault endpoints** (`memu-core/app.py`):
+  - `POST /memory/vault/ingest` — stores note as `MemoryRecord(event_type="vault_note")` with embedding; maintains `_vault_notes` index.
+  - `DELETE /memory/vault/{note_node_id}` — removes from index and store.
+  - `GET /memory/vault/search` — hybrid keyword/tag/title search with optional `folder_filter`.
+- **Agentic vault proxy** (`agentic/app.py`): `POST /vault/export` + `GET /vault/search` endpoints; `VAULT_SYNC_URL` env var.
+- **FF_VAULT_CONTEXT** (`_get_world_context`): when enabled, appends most-recently synced vault note title to world-state context (2s timeout, silently skipped on failure).
+- **Feature flags** (`common/feature_flags.py`): `FF_VAULT_SYNC` (default True) + `FF_VAULT_CONTEXT` (default False).
+- **Jinja2 templates** (`vault-sync/templates/`): `daily-note.md`, `lesson-learned.md`, `kai-inbox.md`, `soul-mirror.md`.
+- **Dockerfile** (`vault-sync/Dockerfile`) + compose wiring: vault-sync at 172.20.0.36:8047, `vault_data:/vault` volume; `soul_data` + `vault_data` named volumes added to compose.
+- **~45 tests** (`scripts/test_d91_vault_sync.py`): parser (8), mapper (7), watcher (7), app endpoints (6), memu-core vault API (5), feature flags (4). `test-d91-vault-sync` Makefile target + CI step.
+- D91 logged in `kai-pm/DECISIONS.md` (D91/S1–S9) and `kai-pm/STATUS.md`.
+- Services: 59 → 60. Tests: ~2,709 → ~2,754.
+
 ### Added (D90 — Swarm Assembly: Real Stage Functions, Shared Context, Reputation Tracking, 2026-07-24)
 
 - **SwarmContext** (`agentic/swarm.py`): shared dataclass threading `evidence`, `claims`, `challenges`, `verdicts`, `causal_chains`, `teammate_votes`, `stage_log` across all CognitiveFSM pipeline stages via `handoff.payload["_ctx"]`.

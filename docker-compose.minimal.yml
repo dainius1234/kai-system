@@ -190,6 +190,7 @@ services:
       HMAC_ALLOW_DEV_SECRET: "true"
       SKILL_HUNTER_URL: http://skill-hunter:8045
       HOUSE_DOCTOR_URL: http://house-doctor:8046
+      VAULT_SYNC_URL: http://vault-sync:8047
     ports:
       - "8007:8007"
     healthcheck:
@@ -775,6 +776,28 @@ services:
     depends_on:
       - memu-core
 
+  vault-sync:
+    build:
+      context: .
+      dockerfile: vault-sync/Dockerfile
+    container_name: kai-vault-sync
+    restart: unless-stopped
+    ports:
+      - "8047:8047"
+    environment:
+      VAULT_PATH: /vault
+      MEMU_CORE_URL: http://memu-core:8001
+      TOOL_GATE_URL: http://tool-gate:8020
+      FF_VAULT_SYNC: "true"
+      VAULT_WRITE_CONVICTION_THRESHOLD: "9.0"
+    volumes:
+      - vault_data:/vault
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.36
+    depends_on:
+      - memu-core
+
   wake-service:
     build:
       context: .
@@ -862,3 +885,5 @@ volumes:
   postgres_data:
   ollama_data:
   turbovec_data:
+  soul_data:
+  vault_data:
