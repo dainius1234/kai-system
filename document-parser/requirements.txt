@@ -1,0 +1,11 @@
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.0.0
+pymupdf>=1.24.0
+python-docx>=1.1.0
+openpyxl>=3.1.0
+xlrd>=2.0.1
+python-pptx>=0.6.21
+ezdxf>=1.1.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0

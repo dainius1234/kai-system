@@ -79,6 +79,10 @@ jobs:
         run: |
           make test-notify-service
 
+      - name: Document parser service tests (mocked heavy libs)
+        run: |
+          make test-document-parser
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors

@@ -2116,6 +2116,7 @@ const _TEXT_EXTS = new Set([
   'sh','toml','ini','xml','html','css','sql','rst','env','conf',
 ]);
 const _IMAGE_EXTS = new Set(['png','jpg','jpeg','gif','bmp','webp','tiff','tif']);
+const _DOC_EXTS  = new Set(['pdf','docx','doc','xlsx','xls','pptx','ppt','dxf','dwg','zip']);
 const _MAX_TEXT_BYTES = 50 * 1024; // 50 KB — larger pastes overwhelm the context
 
 async function handleFiles(files) {
@@ -2156,8 +2157,28 @@ async function handleFiles(files) {
         showToast('Attachment', `Upload failed for ${file.name}`, 'error');
       }
 
+    } else if (_DOC_EXTS.has(ext)) {
+      showToast('Attachment', `Parsing ${file.name}…`, 'info');
+      const form = new FormData();
+      form.append('file', file);
+      try {
+        const resp = await fetch('/api/upload', { method: 'POST', body: form });
+        const data = await resp.json();
+        if (!resp.ok) {
+          showToast('Attachment', data.detail || 'Parse failed', 'error');
+          continue;
+        }
+        const docText = (data.text || '').trim() || '[no text extracted]';
+        input.value = prefix() + `[Document: ${file.name}]\n${docText}\n`;
+        autoResize(input);
+        showToast('Attachment', `${file.name} — parsed`, 'success');
+      } catch (e) {
+        console.error('upload error', e);
+        showToast('Attachment', `Upload failed for ${file.name}`, 'error');
+      }
+
     } else {
-      showToast('Attachment', `${file.name}: unsupported type. Use text files or images.`, 'warn');
+      showToast('Attachment', `${file.name}: unsupported type. Supported: text, image, PDF, Word, Excel, PowerPoint, DXF, DWG, ZIP.`, 'warn');
     }
   }
 
