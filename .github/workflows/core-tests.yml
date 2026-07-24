@@ -132,6 +132,9 @@ jobs:
       - name: Stocks/forex yfinance tests (mocked yfinance)
         run: pip install yfinance --quiet || true && make test-broker-bridge-yfinance
 
+      - name: Kai intelligence layer tests (D87 — world context, proactive observer, skill matching)
+        run: make test-kai-intelligence
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors

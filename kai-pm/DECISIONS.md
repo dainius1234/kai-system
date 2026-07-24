@@ -2,6 +2,35 @@
 
 > This file is append-only. Never edit past entries; supersede with a new numbered entry.
 
+## D87 — 2026-07-24 — Kai Cognitive Architecture: Sensory Integration + Proactive Intelligence
+
+**Context:** Kai has 10+ sensory services (weather, calendar, air quality, docker health, email, news, git, broker) each with a `/summary` endpoint explicitly labelled "for agentic context injection." Audit of `agentic/app.py` found that NONE of these were ever called during chat. Kai's LLM sees emotional state, goals, operator model, narrative identity — but is completely blind to his physical environment. Skills loaded from `/skills/` are never consulted during `/chat`. `FF_CONTEXT_ENRICHMENT` and `FF_PROACTIVE_AGENT` flags were registered but their gate checks were never implemented. The result: Kai has hands and legs (8 sensory services, skill files, shell sandbox, browser) but his brain is not wired to use them.
+
+**Decision:** Implement the Kai Cognitive Architecture across four layers:
+
+**Layer 1 — Perception (already done):** Sensory services with `/summary` endpoints. Foundation is complete.
+
+**Layer 2 — World Context Injection (D87, this PR):** Add `_get_world_context()` to `agentic/app.py`. Calls all sensory service `/summary` endpoints in parallel (2s timeout each, graceful skip on error/trivial state). Result injected as "World State" system block into every LLM prompt. Also correctly gates the gather behind `FF_CONTEXT_ENRICHMENT` for the first time — previously the flag was registered but unimplemented.
+
+**Layer 3 — Proactive Cognition (D87, this PR):** Add `_proactive_observer()` background asyncio task. Wakes every 5 minutes. Reads Docker unhealthy, unread email, air quality, git dirty repos. Detects notable conditions (changed unread count, AQ degraded, containers unhealthy). Writes observations to memu-core as `proactive_observation` category memories — so they surface in future context via the normal memory retrieve channel. `FF_PROACTIVE_AGENT` flag now actually gates this. Kai spontaneously notices things for the first time.
+
+**Layer 4 — Skill Matching in /chat (D87, this PR):** `match_skill()` is called after `classify()` in the `/chat` handler. If a skill matches the user input, its action+template is injected as a system block labelled "Applicable skill." Previously skills were loaded at startup and never consulted during conversations.
+
+**Additional intelligence mechanisms identified for future implementation:**
+
+- **Anomaly detection with baselines:** Track 7-day rolling averages for sensory readings (CPU, AQ, email volume). Alert when readings deviate >2σ. Moves from "snapshot" to "trend" awareness.
+- **World model persistence:** Structured JSON in memu-core (`world_state` category), updated by the proactive loop. Gives Kai a continuously maintained mental map of his environment rather than point-in-time snapshots.
+- **Cross-service correlation:** Reason across sensors (e.g., high CPU + docker crash → "something caused the spike; should I restart X?"). This requires the LLM to see all sensory data together — now possible since world context is injected.
+- **Sensory learning:** If AQ is consistently bad at certain times, pre-warn earlier. If email surges on Mondays, nudge user to block time. Pattern extraction from historical sensor readings written to memory.
+- **Skill hunter service:** A `skill-hunter` service that can search PyPI/GitHub repos, evaluate packages in the shell sandbox, auto-generate `.md` skill files, and hot-reload them into Kai's skill registry via `POST /skills/reload`. Kai grows his own capability set.
+- **Self-capability map:** `GET /introspect/capabilities` endpoint returning live map of what Kai can perceive, what skills he has, what tools he can use, and what's missing. Kai should know what he doesn't know.
+- **Proactive scheduling:** Kai proactively suggests tasks based on calendar + sensor state ("your 3pm meeting is in 30 minutes and AQ is poor — move it to a better-ventilated room?").
+- **Reactive skill acquisition:** When a user asks for something Kai can't do (capability gap detected), trigger skill-hunter to search for a package that fills that gap.
+
+**Rationale:** The whole point of Kai is sovereign intelligence — not a chatbot, not a dashboard proxy. Perception without cognition is just logging. The sensory layer was built; the cognitive layer must now be wired. Every future service or capability should be evaluated against: "Does Kai's LLM actually see and reason about this, or is it dashboard-only?"
+
+**Consequences:** Every chat message now includes a live "World State" block showing what Kai's sensors are reading. Kai will spontaneously write memory observations when notable conditions occur (unhealthy containers, email backlog, degraded AQ). Matched skills now actually reach the LLM. Latency impact of sensory gather: ~2s timeout per service, all parallel, adds ~200ms p99 in healthy conditions (services respond in ~50ms). In degraded conditions (services unreachable) adds ≤2s with graceful skip.
+
 ## D1 — 2026-04-21 — Adopt `kai-pm/` as PM brain
 **Context:** PR #48 merged `kai-pm/` and moved PM artifacts into a dedicated directory.
 **Decision:** Keep `kai-pm/` as the durable project-management home.

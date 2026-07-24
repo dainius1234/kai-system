@@ -4,7 +4,6 @@ import asyncio
 import json
 import logging
 import os
-import re
 import time
 import uuid
 from collections import deque
@@ -44,6 +43,17 @@ TELEGRAM_ALERT_URL = os.getenv("TELEGRAM_ALERT_URL", "http://perception-telegram
 WAKE_URL = os.getenv("WAKE_URL", "http://wake-service:8022")
 LETTA_URL = os.getenv("LETTA_URL", "http://letta-agent:8062")
 FINANCIAL_URL = os.getenv("FINANCIAL_URL", "http://financial-awareness:8063")
+# Sensory services — world awareness channels (Layer 2 / D87)
+WEATHER_URL = os.getenv("WEATHER_SERVICE_URL", "http://weather-service:8039")
+AIRQUALITY_URL = os.getenv("AIRQUALITY_URL", "http://airquality-service:8042")
+CALENDAR_URL = os.getenv("CALENDAR_SERVICE_URL", "http://calendar-service:8043")
+DOCKER_WATCHER_URL = os.getenv("DOCKER_WATCHER_URL", "http://docker-watcher:8041")
+SYSMETRICS_URL = os.getenv("SYSMETRICS_URL", "http://sysmetrics:8035")
+EMAIL_READER_URL = os.getenv("EMAIL_READER_URL", "http://email-reader:8037")
+NEWS_FEED_URL = os.getenv("NEWS_FEED_URL", "http://news-feed:8038")
+GIT_WATCHER_URL = os.getenv("GIT_WATCHER_URL", "http://git-watcher:8044")
+BROKER_URL = os.getenv("BROKER_URL", "http://broker-bridge:8034")
+PROACTIVE_INTERVAL = int(os.getenv("PROACTIVE_INTERVAL_SECONDS", "300"))
 WAKE_INTENT_COMMAND_THRESHOLD = float(os.getenv("WAKE_INTENT_COMMAND_THRESHOLD", "0.6"))
 WAKE_INTENT_OVERRIDE_CONFIDENCE = float(os.getenv("WAKE_INTENT_OVERRIDE_CONFIDENCE", "0.7"))
 budget = ErrorBudget(window_seconds=300)
@@ -785,6 +795,166 @@ async def _get_financial_context(user_msg: str) -> Dict[str, Any]:
     return {}
 
 
+_SENSORY_SKIP = frozenset({
+    "not configured", "loading", "not yet polled", "stub mode",
+    "no upcoming", "no battery", "not supported",
+})
+
+
+async def _get_world_context() -> str:
+    """Layer 2 (D87): gather one-sentence summaries from all sensory services in parallel.
+
+    Only fires when FF_CONTEXT_ENRICHMENT is enabled (default True).
+    Each service gets a 2-second timeout; failures are silently skipped.
+    Trivial/loading/error states are filtered out so only meaningful readings
+    reach the LLM prompt.
+    """
+    if not is_enabled("CONTEXT_ENRICHMENT"):
+        return ""
+
+    async def _fetch_summary(base: str, path: str, label: str) -> Optional[str]:
+        try:
+            async with httpx.AsyncClient(timeout=2.0) as client:
+                r = await client.get(f"{base}{path}")
+                if r.status_code != 200:
+                    return None
+                data = r.json()
+                text: Optional[str] = None
+                if "summary" in data:
+                    text = str(data["summary"]).strip()
+                elif path == "/unread":
+                    count = data.get("count", 0)
+                    if count > 0:
+                        text = f"{count} unread email(s) waiting"
+                elif path == "/snapshot":
+                    cpu = data.get("cpu_percent", 0)
+                    ram = (data.get("memory") or {}).get("percent", 0)
+                    text = f"CPU {cpu:.0f}%, RAM {ram:.0f}%"
+                if not text:
+                    return None
+                if any(s in text.lower() for s in _SENSORY_SKIP):
+                    return None
+                return f"{label}: {text}"
+        except Exception:
+            return None
+
+    fetches = [
+        (WEATHER_URL, "/summary", "Weather"),
+        (AIRQUALITY_URL, "/summary", "Air quality"),
+        (CALENDAR_URL, "/summary", "Calendar"),
+        (DOCKER_WATCHER_URL, "/summary", "Docker"),
+        (SYSMETRICS_URL, "/snapshot", "System"),
+        (EMAIL_READER_URL, "/unread", "Email"),
+        (NEWS_FEED_URL, "/summary", "News"),
+        (GIT_WATCHER_URL, "/summary", "Git"),
+        (BROKER_URL, "/pnl/summary", "Broker"),
+    ]
+    results = await asyncio.gather(*[_fetch_summary(b, p, l) for b, p, l in fetches])
+    lines = [r for r in results if r]
+    if not lines:
+        return ""
+    return "World state (live sensory awareness):\n" + "\n".join(f"- {l}" for l in lines)
+
+
+_last_world_snapshot: Dict[str, Any] = {}
+
+
+async def _proactive_observer() -> None:
+    """Layer 3 (D87): proactive awareness loop — runs every PROACTIVE_INTERVAL seconds.
+
+    Reads anomaly-relevant sensory endpoints, detects notable conditions
+    (changed email count, unhealthy containers, degraded air quality, dirty git repos),
+    and writes observations to memu-core as 'proactive_observation' memories
+    so they surface in future context via the normal vector-recall channel.
+    Only runs when FF_PROACTIVE_AGENT is enabled (default True).
+    """
+    global _last_world_snapshot
+    await asyncio.sleep(90)  # let services start up before first probe
+    while True:
+        if not is_enabled("PROACTIVE_AGENT"):
+            await asyncio.sleep(PROACTIVE_INTERVAL)
+            continue
+        try:
+            observations: List[str] = []
+            snapshot: Dict[str, Any] = {}
+
+            async def _probe(key: str, base: str, path: str) -> None:
+                try:
+                    async with httpx.AsyncClient(timeout=3.0) as client:
+                        r = await client.get(f"{base}{path}")
+                        if r.status_code == 200:
+                            snapshot[key] = r.json()
+                except Exception:
+                    pass
+
+            await asyncio.gather(
+                _probe("docker", DOCKER_WATCHER_URL, "/unhealthy"),
+                _probe("email", EMAIL_READER_URL, "/unread"),
+                _probe("aq", AIRQUALITY_URL, "/current"),
+                _probe("git", GIT_WATCHER_URL, "/dirty"),
+                _probe("sys", SYSMETRICS_URL, "/snapshot"),
+            )
+
+            # Docker health
+            docker = snapshot.get("docker", {})
+            unhealthy = docker.get("count", 0)
+            if unhealthy > 0:
+                names = [c.get("name", "?") for c in (docker.get("containers") or [])[:3]]
+                observations.append(
+                    f"Docker: {unhealthy} unhealthy container(s) — {', '.join(names)}"
+                )
+
+            # Email delta
+            email = snapshot.get("email", {})
+            unread_now = email.get("count", 0)
+            unread_prev = (_last_world_snapshot.get("email") or {}).get("count", 0)
+            if unread_now > 0 and unread_now != unread_prev:
+                observations.append(f"Email: {unread_now} unread message(s) (was {unread_prev})")
+
+            # Air quality warning
+            aq = snapshot.get("aq", {})
+            aqi_cat = aq.get("aqi_category", "")
+            if aqi_cat in ("unhealthy", "very unhealthy", "hazardous"):
+                pm = aq.get("pm2_5_ugm3")
+                observations.append(f"Air quality: {aqi_cat} (PM2.5 {pm} µg/m³)")
+
+            # Git dirty repos
+            git = snapshot.get("git", {})
+            dirty = git.get("count", 0)
+            if dirty > 0:
+                observations.append(f"Git: {dirty} repo(s) with uncommitted changes")
+
+            # System resources
+            sys_data = snapshot.get("sys", {})
+            cpu = sys_data.get("cpu_percent", 0)
+            ram = (sys_data.get("memory") or {}).get("percent", 0)
+            if cpu > 85:
+                observations.append(f"System: CPU at {cpu:.0f}% — possible runaway process")
+            if ram > 90:
+                observations.append(f"System: RAM at {ram:.0f}% — memory pressure")
+
+            if observations:
+                obs_text = "Proactive observation: " + "; ".join(observations)
+                try:
+                    async with httpx.AsyncClient(timeout=5.0) as client:
+                        await client.post(
+                            f"{MEMU_URL}/memory/memorize",
+                            json={
+                                "content": obs_text,
+                                "category": "proactive_observation",
+                                "user_id": "keeper",
+                            },
+                        )
+                    logger.info("Proactive observer wrote: %s", obs_text)
+                except Exception as exc:
+                    logger.warning("Proactive memory write failed: %s", exc)
+
+            _last_world_snapshot = snapshot
+        except Exception as exc:
+            logger.warning("Proactive observer error: %s", exc)
+        await asyncio.sleep(PROACTIVE_INTERVAL)
+
+
 async def _get_session_messages(session_id: str) -> List[Dict[str, str]]:
     """Fetch recent session messages from memu-core."""
     try:
@@ -1062,34 +1232,45 @@ async def chat_stream(req: ChatRequest):
     system_prompt = _SYSTEM_PROMPTS[mode]
 
     # fetch memories, session context, goals, active topics, and emotional context in parallel
-    import asyncio
-    # H1.3: 10-way parallel fetch with error handling — one failing task
-    # must not crash the entire /chat endpoint. Each gets a safe default.
+    # H1.3: parallel fetch with error handling — one failing task must not crash /chat.
 
     async def _safe(coro, default):
         try:
             return await coro
         except Exception as exc:
-            logger.warning("Context fetch failed (%s): %s", coro.__name__ if hasattr(coro, '__name__') else '?', exc)
+            logger.warning("Context fetch failed: %s", exc)
             return default
 
-    (memories, session_msgs, goals, topics, eq_context,
-     narrative, imagination, conscience, agent_ctx, operator_model,
-     graph_context, letta_context, financial_context) = await asyncio.gather(
-        _safe(_get_relevant_memories(user_msg), []),
-        _safe(_get_session_messages(req.session_id), []),
-        _safe(_get_active_goals(), []),
-        _safe(_get_active_topics(), {}),
-        _safe(_get_emotional_context(user_msg), {}),
-        _safe(_get_narrative_identity(), {}),
-        _safe(_get_imagination_context(user_msg), {}),
-        _safe(_get_conscience_context(), {}),
-        _safe(_get_agent_context(), {}),
-        _safe(_get_operator_model(user_msg, mode), {}),
-        _safe(_get_graph_context(user_msg), {}),
-        _safe(_get_letta_context(user_msg), {}),
-        _safe(_get_financial_context(user_msg), {}),
-    )
+    # Session messages always fetched (needed even when enrichment is off)
+    session_msgs = await _safe(_get_session_messages(req.session_id), [])
+
+    # Match skill before LLM so the relevant skill doc reaches the prompt (J7 fix)
+    matched_skill = match_skill(user_msg)
+
+    if is_enabled("CONTEXT_ENRICHMENT"):
+        (memories, goals, topics, eq_context,
+         narrative, imagination, conscience, agent_ctx, operator_model,
+         graph_context, letta_context, financial_context,
+         world_context) = await asyncio.gather(
+            _safe(_get_relevant_memories(user_msg), []),
+            _safe(_get_active_goals(), []),
+            _safe(_get_active_topics(), {}),
+            _safe(_get_emotional_context(user_msg), {}),
+            _safe(_get_narrative_identity(), {}),
+            _safe(_get_imagination_context(user_msg), {}),
+            _safe(_get_conscience_context(), {}),
+            _safe(_get_agent_context(), {}),
+            _safe(_get_operator_model(user_msg, mode), {}),
+            _safe(_get_graph_context(user_msg), {}),
+            _safe(_get_letta_context(user_msg), {}),
+            _safe(_get_financial_context(user_msg), {}),
+            _safe(_get_world_context(), ""),
+        )
+    else:
+        (memories, goals, topics, eq_context,
+         narrative, imagination, conscience, agent_ctx, operator_model,
+         graph_context, letta_context, financial_context,
+         world_context) = ([], [], {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, "")
 
     # build the message list
     messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
@@ -1286,6 +1467,22 @@ async def chat_stream(req: ChatRequest):
                 "role": "system",
                 "content": "Operator model (how I understand you right now):\n" + "\n".join(op_parts),
             })
+
+    # inject live world state — all sensory service summaries (Layer 2, D87)
+    if world_context:
+        messages.append({"role": "system", "content": world_context})
+
+    # inject matched skill knowledge (J7 fix — skills were loaded but never consulted)
+    if matched_skill:
+        messages.append({
+            "role": "system",
+            "content": (
+                f"Applicable skill ({matched_skill.name}):\n"
+                f"{matched_skill.action}"
+                + (f"\n\nResponse template:\n{matched_skill.response_template}"
+                   if matched_skill.response_template else "")
+            ),
+        })
 
     # add session history (last N turns)
     for msg in session_msgs[-10:]:
@@ -1838,10 +2035,12 @@ _restore_breakers()
 
 @app.on_event("startup")
 async def _startup_warmup() -> None:
-    """Schedule LLM warm-up as a background task so liveness is not gated on it."""
+    """Schedule LLM warm-up and proactive observer as background tasks."""
     asyncio.create_task(
         llm_warmup(router=_llm, specialist=_DEFAULT_SPECIALIST, ollama_base_url=_OLLAMA_URL)
     )
+    # P21 / D87: proactive awareness loop — notices anomalies and writes them to memory
+    asyncio.create_task(_proactive_observer())
 
 
 # ── P16b: Log aggregation ───────────────────────────────────────────

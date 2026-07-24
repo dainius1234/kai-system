@@ -34,7 +34,7 @@ _REGISTRY: Dict[str, tuple] = {
     "PRIORITY_QUEUE":        ("Latency-sensitive priority queue", True),
     "SAGE_CRITIQUE":         ("Verifier self-critique + adversary self-review", True),
     "IMAGINATION_ENGINE":    ("P19 imagination / scenario simulation", True),
-    "PROACTIVE_AGENT":       ("P21 proactive context pre-fetch", True),
+    "PROACTIVE_AGENT":       ("P21/D87: background observer — detects anomalies and writes proactive_observation memories every PROACTIVE_INTERVAL_SECONDS (default 300)", True),
     "OPERATOR_MODEL":        ("P22 operator preference learning", True),
     "NARRATIVE_IDENTITY":    ("P18 narrative identity context", True),
     "CONSCIENCE_FILTER":     ("P20 conscience value-gate on actions", True),
@@ -46,11 +46,10 @@ _REGISTRY: Dict[str, tuple] = {
     "LETTA_TASKS":           ("Delegate long-running tasks to letta-agent memory controller", False),
     "LETTA_MEMORY_SYNC":     ("Sync letta-agent archival memories back to memu-core after each run", False),
     "FINANCIAL_CONTEXT":     ("P29 inject CIS/VAT/tax summary into agentic context on finance queries", True),
-    # F4: master toggle for the 10-way context enrichment gather
-    # Set FF_CONTEXT_ENRICHMENT=false to run a bare /chat (LLM only, no memory/personality
-    # injection) for A/B quality comparison.  All individual enrichment flags still
-    # respect their own env vars when CONTEXT_ENRICHMENT=true.
-    "CONTEXT_ENRICHMENT":    ("Master toggle: 10-way context gather (memory + personality + soul channels)", True),
+    # F4/D87: master toggle for the context enrichment gather.
+    # Set FF_CONTEXT_ENRICHMENT=false to run a bare /chat (LLM only, no memory/personality/
+    # world-state injection) for A/B quality comparison.
+    "CONTEXT_ENRICHMENT":    ("Master toggle: 14-way context gather (memory + personality + soul + world-state channels). Also gates sensory world_context injection.", True),
     # F6: self-improvement loops — off by default; activate after GPU Day validates quality
     "DREAM_ENABLED":         ("Trigger dream cycle consolidation (6-phase memory integration)", False),
     "EVOLVER_ENABLED":       ("Agent-Evolver: cluster failure patterns → proactive insights", False),
