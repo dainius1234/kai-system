@@ -1264,15 +1264,18 @@ VISION_URL = os.getenv("VISION_SERVICE_URL", "http://vision-service:8023")
 CLIPBOARD_URL = os.getenv("CLIPBOARD_SERVICE_URL", "http://clipboard-service:8024")
 FILES_URL = os.getenv("FILES_SERVICE_URL", "http://files-service:8025")
 NOTIFY_URL = os.getenv("NOTIFY_SERVICE_URL", "http://notify-service:8031")
-_UPLOAD_MAX_BYTES = 10 * 1024 * 1024  # 10 MB — matches screen-capture service limit
+DOC_PARSER_URL = os.getenv("DOC_PARSER_URL", "http://document-parser:8032")
+_UPLOAD_MAX_BYTES = 10 * 1024 * 1024  # 10 MB
+
+_IMAGE_EXTS = frozenset({"png", "jpg", "jpeg", "gif", "bmp", "webp", "tiff", "tif"})
+_DOC_EXTS = frozenset({"pdf", "docx", "doc", "xlsx", "xls", "pptx", "ppt", "dxf", "dwg", "zip"})
 
 
 @app.post("/api/upload")
 async def api_upload(file: UploadFile = File(...)):
-    """Receive an image file, forward to screen-capture for OCR, return extracted text.
+    """Route uploaded file to OCR (images) or document parser (PDF, Office, CAD, ZIP).
 
-    Text files should be read client-side; this endpoint exists for image OCR.
-    Degrades gracefully when screen-capture service is unavailable.
+    Returns JSON with a 'text' field containing extracted content.
     """
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file provided")
@@ -1281,23 +1284,36 @@ async def api_upload(file: UploadFile = File(...)):
     if len(data) > _UPLOAD_MAX_BYTES:
         raise HTTPException(status_code=413, detail="File too large (max 10 MB)")
 
+    ext = (file.filename.rsplit(".", 1)[-1] if "." in file.filename else "").lower()
+
+    if ext in _IMAGE_EXTS:
+        target_url = f"{SCREEN_CAPTURE_URL}/capture/file"
+        service_name = "OCR"
+        content_type = file.content_type or "image/png"
+    elif ext in _DOC_EXTS:
+        target_url = f"{DOC_PARSER_URL}/parse"
+        service_name = "document parser"
+        content_type = file.content_type or "application/octet-stream"
+    else:
+        raise HTTPException(status_code=415, detail=f"Unsupported file type: .{ext or '(none)'}")
+
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=60.0) as client:
             resp = await client.post(
-                f"{SCREEN_CAPTURE_URL}/capture/file",
-                files={"file": (file.filename, data, file.content_type or "image/png")},
+                target_url,
+                files={"file": (file.filename, data, content_type)},
             )
         resp.raise_for_status()
         return resp.json()
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
         if 400 <= status < 500:
-            raise HTTPException(status_code=status, detail=f"OCR service rejected the file: {exc}")
-        raise HTTPException(status_code=502, detail=f"OCR service returned an error: {exc}")
+            raise HTTPException(status_code=status, detail=f"{service_name} service rejected the file: {exc}")
+        raise HTTPException(status_code=502, detail=f"{service_name} service error: {exc}")
     except httpx.RequestError as exc:
         raise HTTPException(
             status_code=503,
-            detail=f"OCR service unreachable — start screen-capture or set SCREEN_CAPTURE_URL: {exc}",
+            detail=f"{service_name} service unreachable: {exc}",
         )
 
 
