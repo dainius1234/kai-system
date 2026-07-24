@@ -16,12 +16,14 @@ process-level failure isolation between hot and cold paths.
 
 **Phase: Phase 0 — COMPLETE. Blocked on GPU hardware (RTX 5080) to enter Phase 1.**
 
-All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. D89 Cognitive Depth
-merged (2026-07-24): Kai now has a deterministic cognitive reasoning pipeline FSM, operational
-system FSM, persistent named teammates, a house-doctor diagnostic service, skill provenance
-tracking, emergent ritual discovery, capability gap logging with threshold gating, and
-GPU-era foundations for counterfactual rehearsal, trust negotiation, predictive empathy,
-and resource-aware curiosity. No open PRs.
+All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Last merged: D91 Obsidian
+Brain (2026-07-24) — bidirectional vault↔memu-core sync via vault-sync service (port 8047),
+SHA256 checksum deduplication, conviction ≥9.0 export gate, path-traversal block, 4 Jinja2
+templates, 3 memu-core vault endpoints, agentic vault proxy, FF_VAULT_SYNC (True) +
+FF_VAULT_CONTEXT (False). Before that: D90 Swarm Assembly — real CognitiveFSM stage functions
+(Scout→GATHER, Sage→DEBATE+CONVICTION_GATE, Doctor→FACT_CHECK, Oracle→CAUSAL_CHECK), shared
+SwarmContext, TeammateRep reputation tracking persisted to data/teammate_reputation.json,
+`POST /chat/swarm` live, resolve_conflict() 5-signal weighted average. No open PRs.
 
 ### What has shipped to `main` (merged PRs, in order)
 
@@ -65,6 +67,8 @@ and resource-aware curiosity. No open PRs.
 | D87 | D87 | Cognitive architecture: `_get_world_context()` (9 sensory services per /chat), `_proactive_observer()` (background anomaly loop → memu-core), skill matching wired into /chat, ghost flag fixes (FF_CONTEXT_ENRICHMENT + FF_PROACTIVE_AGENT), 14-way gather; 17 tests | — |
 | D88 | D88 | 8 advanced cognitive mechanisms: M1 anomaly detection with rolling baselines (2σ z-score); M2 `/introspect/capabilities` self-capability map; M3 cross-service correlation (`_correlate_observations()`); M4 world model persistence (JSON `world_state` to memu-core each cycle); M5 sensory learning (pattern history deque, `sensor_pattern` memories); M6 skill-hunter service (port 8045, `.34`); M7 proactive scheduling (calendar + sensors → `proactive_schedule` memories); M8 reactive skill acquisition (capability gap → skill hunter on-demand). 5 new feature flags. 44 tests. Services: 57 → 58 | — |
 | D89 | D89 | Cognitive Depth sprint: `agentic/system_fsm.py` (KaiFSM — 5 states, 9 events, 16 transitions, asyncio.Lock singleton); `agentic/cognitive_fsm.py` (CognitiveFSM reasoning pipeline — GATHER→DEBATE→FACT_CHECK→CAUSAL_CHECK→CONVICTION_GATE→PRESENT, HALT/ESCALATE_LOOP/RETHINK with bounded retries, schema-validated `AgentHandoff`, per-swarm `SwarmConfig` for trading/research/skill_forge/default); `agentic/teammates.py` (TeammateDef, markdown-based registry, `GET /teammates`, `POST /chat/teammate/{name}`); `data/teammates/` (Scout/Doctor/Sage/Oracle personas); `agentic/counterfactual.py` (stub: `can_rehearse()→False`, `rehearse()→stub_pending_gpu`); `agentic/curiosity.py` (idle curiosity tick, CURIOSITY.md, GPU-gated); `house-doctor/` service (port 8046, `.35`, 9 differential-diagnosis rules D001–D009, `/diagnose` + `/rules`, writes `medical_report` to memu-core); skill-hunter v0.2 (YAML front-matter provenance, `.meta.json` sidecars, auto-disable at ≥3 errors, `/skill/{name}/health` + `/skill/{name}/error`); tool-gate `POST /gate/autonomy/request` (trust negotiation stub); world model provenance layer (`{value,source,timestamp,confidence}` per field); capability gap logging (`GAP_HUNT_THRESHOLD=3`); emergent ritual discovery (≥7/10 pattern cycles → RITUALS.md); `emotional_context` world model key (predictive empathy foundation); 8 new feature flags; `scripts/test_d89_cognitive_depth.py` (47 tests). Services: 58 → 59 | — |
+| D90 | D90 | Swarm Assembly: `agentic/swarm.py` (SwarmContext shared state, TeammateRep reputation tracking, `resolve_conflict()` 5-signal weighted average: evidence 0.30 + causal 0.25 + verdict 0.20 + reputation_vote 0.15 + adversary_mod 0.10); `agentic/swarm_stages.py` (5 real stage function factories: make_gather_stage, make_debate_stage, make_fact_check_stage, make_causal_check_stage, make_conviction_gate_stage + `build_swarm_pipeline()`); `POST /chat/swarm` live endpoint; `GET /swarm/reputation` → per-teammate weights; `FF_SWARM=true` (default); `data/teammate_reputation.json` persists reputation across sessions; 38 tests. | — |
+| D91 | D91 | Obsidian Brain: `vault-sync/` service (port 8047, 172.20.0.36) — `parser.py` (NoteData dataclass: filepath, title, frontmatter, wikilinks, tags, SHA256 checksum; python-frontmatter + wikilink regex); `mapper.py` (VaultMapper: filepath↔node-id, thread-safe Lock, persists to .vault-sync/mapping.json); `watcher.py` (FileWatcher: watchdog Observer, _VaultHandler, 2s per-filepath debounce via threading.Timer, thread→asyncio bridge via loop.call_soon_threadsafe); `app.py` (FastAPI: GET /health, POST /ingest manual trigger, POST /export conviction≥9.0 gate + path-traversal block, GET /search, GET /mapping; asyncio ingest+delete queue workers; FF_VAULT_SYNC toggle). 3 new memu-core vault endpoints (POST /memory/vault/ingest, DELETE /memory/vault/{id}, GET /memory/vault/search). Agentic vault proxy (POST /vault/export, GET /vault/search) + FF_VAULT_CONTEXT world-context injection. FF_VAULT_SYNC=True (default) + FF_VAULT_CONTEXT=False (default). 4 Jinja2 templates (daily-note, lesson-learned, kai-inbox, soul-mirror). Dockerfile + compose wiring (172.20.0.36, vault_data volume). ~45 tests. Services: 59 → 60. | — |
 
 ### In-flight work
 
@@ -89,7 +93,9 @@ None. All work is on `main`. No open PRs.
 13. **Monitor service — DONE** (PR #107) — background rule engine, HTTP/scrape sources, notify + TTS alerts
 14. **Broker bridge — DONE** (PR #109) — Binance REST, spot/futures, Broker tab, Quick Watch → monitor rules
 15. **Sensory expansion — DONE** (PR #112) — sysmetrics, screen-watcher, email-reader, news-feed; broker market depth; System + Feeds tabs
-16. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
+16. **Swarm Assembly — DONE** (D90) — real stage functions wired, SwarmContext, reputation, `POST /chat/swarm` live
+17. **Obsidian Brain — DONE** (D91) — vault-sync service, SHA256 dedup, conviction gate, memu-core vault API, 4 templates
+18. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
 
 Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
@@ -114,6 +120,7 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
   - `memu-core` — vector store (TurboVec ANN by default in dev/CI; pgvector in sovereign)
   - `memu-graph` — Cognee/Kuzu knowledge graph, port 8061. Fan-out active (`FF_GRAPH_INGEST=true`)
   - `letta-agent` — Letta archival memory controller, port 8062. Gated by `FF_LETTA_TASKS=false` (default)
+  - `vault-sync` — Obsidian Brain, port 8047, IP `172.20.0.36`. Watchdog watcher + 2s debounce, SHA256 dedup, conviction ≥9.0 export gate, VaultMapper (filepath↔node-id), 4 Jinja2 templates. `FF_VAULT_SYNC=true` (default), `FF_VAULT_CONTEXT=false` (enable once vault is populated). Memu-core vault endpoints: `POST /memory/vault/ingest`, `DELETE /memory/vault/{id}`, `GET /memory/vault/search`.
   - `financial-awareness` — CIS/VAT/tax arithmetic service, port 8063. Pure Python, no LLM.
 - **Perception / output stack (minimal stack):**
   - `audio-service` — Whisper STT (`perception/audio/`), port 8021, IP `172.20.0.15`. `WHISPER_BACKEND=stub` (CI/dev); `local` for real transcription. Dashboard proxy: `POST /api/audio/transcribe`.
@@ -139,14 +146,14 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 - **Model**: `qwen2.5:0.5b` (default). Embedding: `all-MiniLM-L6-v2` (384-dim).
 - **Embedding endpoint**: `/api/embed` (not deprecated `/api/embeddings`). Confirmed D47.
 - **TurboVecStore startup**: embedding backend (`_embedding_backend` / `generate_embedding`) must be defined before store selection block in `memu-core/app.py` — see D78.
-- **Tests**: 2,504 across 119 files; per-module floors: `agentic ≥ 45%`, `memu-core ≥ 60%`. `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
+- **Tests**: ~2,754 across 130+ files (84 test targets in `make test-core`); per-module floors: `agentic ≥ 45%`, `memu-core ≥ 60%`. `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
 - **Coverage**: 5 modules (`common`, `agentic`, `memu-core`, `letta-agent`, `financial-awareness`), 60% gate.
 
 ---
 
 ## 6) PM operating rules
 
-- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D89**.
+- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D91**.
 - Reality checks → new file `REALITY_CHECK_<date>.md`, not silent rewrites.
 - No drift between docs, status, and delivered code.
 - `make sync-docs` after major changes; `make merge-gate` before every PR.
@@ -166,7 +173,7 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
 | File | What |
 |------|------|
-| `kai-pm/DECISIONS.md` | Append-only decision log (D1–D86) |
+| `kai-pm/DECISIONS.md` | Append-only decision log (D1–D91) |
 | `kai-pm/STATUS.md` | Sprint health + open PRs |
 | `kai-pm/CLEANUP_TODO.md` | Cleanup sprint tracker (all items done except §2.1 merge-order decision) |
 | `kai-pm/COMPOSE_DRIFT.md` | Docker compose divergence audit (§2.2 shared-block extraction deferred) |

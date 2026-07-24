@@ -11,10 +11,10 @@
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
   <img src="https://img.shields.io/badge/services-60-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-2%2C671_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-2%2C754_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
-  <img src="https://img.shields.io/badge/Python-~65%2C940_LOC-yellow?style=flat-square" alt="loc">
-  <img src="https://img.shields.io/badge/milestones-39_shipped-purple?style=flat-square" alt="milestones">
+  <img src="https://img.shields.io/badge/Python-~66%2C500_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/milestones-41_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
 </p>
@@ -25,14 +25,14 @@
 
 | Metric | Value |
 |---|---|
-| **Services** | 60 unique across 3 compose profiles |
-| **Test targets** | 82 (`make test-core`) |
-| **Individual tests** | 2,671 (`def test_` across 128+ files) |
-| **Python LOC** | ~65,940 |
-| **Feature flags** | 35 (`FF_*` env vars) |
-| **Dockerfiles** | 47 |
+| **Services** | 60 unique across 3 compose profiles (34 in minimal stack) |
+| **Test targets** | 84 (`make test-core`) |
+| **Individual tests** | ~2,754 (`def test_` across 130+ files) |
+| **Python LOC** | ~66,500 |
+| **Feature flags** | 38 (`FF_*` env vars) |
+| **Dockerfiles** | 48 |
 | **Compose profiles** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 39 |
+| **Milestones shipped** | 41 |
 | **Failures** | 0 |
 
 > **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
@@ -42,10 +42,10 @@
 ## Quick Reference
 
 ```bash
-make core-up          # Start minimal stack (33 services)
+make core-up          # Start minimal stack (34 services)
 make core-down        # Stop it
-make full-up          # Start full stack (35 services)
-make test-core        # Run all 82 test targets (2,671 tests)
+make full-up          # Start full stack
+make test-core        # Run all 84 test targets (~2,754 tests)
 make go_no_go         # Syntax-check all service entry points
 make merge-gate       # Full pre-merge validation
 make sync-docs        # Auto-update README + backlog metrics
@@ -59,7 +59,7 @@ GPU integration status: **Phase 0 complete** — see [`docs/gpu_integration_phas
 ## Project Management
 
 All PM operations live in [`kai-pm/`](kai-pm). Entry point for fast session re-hydration:
-[`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md). Decision log (append-only, D1–D89):
+[`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md). Decision log (append-only, D1–D91):
 [`kai-pm/DECISIONS.md`](kai-pm/DECISIONS.md). Known stubs and placeholders:
 [`kai-pm/STUBS_AND_PLACEHOLDERS.md`](kai-pm/STUBS_AND_PLACEHOLDERS.md).
 
@@ -81,12 +81,14 @@ All PM operations live in [`kai-pm/`](kai-pm). Entry point for fast session re-h
 | **Imagination Engine** | Counterfactual replay, theory of mind, creative synthesis, inner monologue, aspirational futures |
 | **Conscience & Values** | Emergent value formation, moral reasoning, integrity tracking, loyalty memory, gratitude engine |
 | **Dream State** | 6-phase offline consolidation — failure clustering, boundary recalibration, MARS memory decay |
+| **Obsidian Brain** | Bidirectional sync between the operator's Obsidian vault and the knowledge graph. Every markdown note becomes a memory node; Kai's high-conviction insights (≥9.0 gate) are exported back as structured notes. File watcher + SHA256 deduplication, wikilink extraction, 4 Jinja2 templates. |
 
 ### Intelligence & Reasoning
 
 | Capability | What It Does |
 |---|---|
 | **14-Way Context Gather** | Every response enriched with: memories + session + goals + topics + EQ + narrative + imagination + conscience + agent + operator model + world state + financial context + Letta archival + graph memory |
+| **Swarm Assembly** | Full cognitive pipeline executed by real stage functions: Scout gathers evidence, Sage debates, Doctor fact-checks, Oracle traces consequence chains, Sage scores conviction. Shared `SwarmContext`, per-teammate `TeammateRep` reputation tracking, 5-signal `resolve_conflict()`. |
 | **Specialist Router** | Classifies queries into 8 UK construction domains for category-aware retrieval |
 | **Memory-Driven Planner** | Gap-aware plans with preference constraints and history-informed conviction modifiers |
 | **Adversary Engine** | 7 challenge types (incl. SAGE self-review) test every plan before execution |
@@ -103,8 +105,8 @@ All PM operations live in [`kai-pm/`](kai-pm). Entry point for fast session re-h
 | **Cognitive Reasoning FSM** | Deterministic reasoning pipeline: GATHER → DEBATE → FACT_CHECK → CAUSAL_CHECK → CONVICTION_GATE → PRESENT. Bounded retry loops: RETHINK (max 3) → ESCALATE_LOOP (max 3) → HALT. Per-swarm configs (trading / research / skill_forge / default). Schema-validated `AgentHandoff` handoffs — never parses free text. |
 | **Persistent Teammates** | 4 named cognitive personas invokable via `POST /chat/teammate/{name}`: **Scout** (skill discovery + package evaluation), **Doctor** (system health differential diagnosis), **Sage** (reflection + counterargument, steward of quality thinking), **Oracle** (probabilistic trend extrapolation from world model). Each has a specialty, system prompt, and world-state injection. |
 | **House Doctor** | Continuous differential diagnosis service (port 8046). 9 rules (D001–D009) map symptom-tag constellations (cpu_high, ram_high, docker_unhealthy, aq_degraded, sensor_anomaly, calendar_soon) to severity/diagnosis/treatment. Fires `medical_report` memories to memu-core; notifies on WARNING/CRITICAL. |
-| **World Model Provenance** | Every field in world_state now carries `{value, source, timestamp, confidence}`. Origin service, read time, and reliability score travel with every sensor reading. Enables temporal queries and trust-weighted reasoning. |
-| **Emergent Ritual Discovery** | When a sensor pattern recurs in ≥7 of the last 10 cycles, Kai proposes a standing ritual and appends it to `RITUALS.md`. One-time notification to operator for co-authorship: "I've noticed X — shall we make this a ritual?" |
+| **World Model Provenance** | Every field in world_state carries `{value, source, timestamp, confidence}`. Origin service, read time, and reliability score travel with every sensor reading. Enables temporal queries and trust-weighted reasoning. |
+| **Emergent Ritual Discovery** | When a sensor pattern recurs in ≥7 of the last 10 cycles, Kai proposes a standing ritual and appends it to `RITUALS.md`. One-time notification to operator for co-authorship. |
 | **Capability Gap Logging** | Each missed skill match increments a counter. Reactive skill acquisition fires only after `GAP_HUNT_THRESHOLD` (default 3) consecutive misses for the same intent — prevents wasted hunts on one-off requests. |
 | **Skill Provenance** | Every auto-hunted skill file carries YAML front-matter (`hunted_at`, `pypi_package`, `pypi_verified`, `probationary: true`). Sidecar `.meta.json` tracks runtime error count. Auto-disables at ≥3 errors. |
 | **GPU-era Foundations** | Four slots wired and architected now, activating on GPU: **Counterfactual Rehearsal** (decision branch simulation, `can_rehearse()→False` until Phase 1), **Trust Negotiation** (`/gate/autonomy/request`, currently `pending_approval`), **Predictive Empathy** (`emotional_context` in world model, activates when emotional memory accumulates), **Resource-Aware Curiosity** (idle tick no-ops on CPU, `CURIOSITY.md` seed questions ready). |
@@ -146,7 +148,7 @@ All PM operations live in [`kai-pm/`](kai-pm). Entry point for fast session re-h
 | **Security Self-Hacking** | Fuzzes own APIs with 34 payloads, adversary challenges, SAGE self-review |
 | **HMAC Auth** | Inter-service HMAC signing, Ed25519, dual-sign rotation, nonce replay protection. Dev secret requires explicit `HMAC_ALLOW_DEV_SECRET=true` |
 | **Time-Travel Debug** | Checkpoint any state, diff between snapshots, rollback to any previous state |
-| **35 Feature Flags** | All capabilities independently toggleable via `FF_*` env vars — see [Feature Flags](#feature-flags) |
+| **38 Feature Flags** | All capabilities independently toggleable via `FF_*` env vars — see [Feature Flags](#feature-flags) |
 | **Structured Errors** | 20 enumerated codes (E1001–E4004) — no more "something broke" |
 | **Zero Telemetry** | No corporate control, no data exfiltration, no resets. Ever. |
 | **Skills Hub** | Hot-loadable .md skill files with security scanning, TTL pruning, unload, and provenance front-matter |
@@ -164,15 +166,18 @@ All PM operations live in [`kai-pm/`](kai-pm). Entry point for fast session re-h
 └────────────────────────────┬────────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────────┐
-│  COGNITIVE REASONING PIPELINE (D89)                                  │
+│  COGNITIVE REASONING PIPELINE (D89 / D90 Swarm Assembly)            │
 │                                                                      │
 │  GATHER → DEBATE → FACT_CHECK → CAUSAL_CHECK → CONVICTION_GATE      │
 │  → PRESENT                                                           │
 │                                                                      │
+│  Stage functions (D90): Scout→GATHER, Sage→DEBATE+CONVICTION_GATE   │
+│  Doctor→FACT_CHECK, Oracle→CAUSAL_CHECK                             │
 │  RETHINK (max 3) → ESCALATE_LOOP (max 3) → HALT → ask operator      │
 │  Per-swarm config: trading (≥8.0) / research (≥6.5) /               │
 │  skill_forge (≥6.0) / default                                        │
 │  Schema-validated AgentHandoff — never parses free text              │
+│  POST /chat/swarm → full pipeline; GET /swarm/reputation → weights  │
 └────────────────────────────┬────────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────────┐
@@ -203,17 +208,20 @@ All PM operations live in [`kai-pm/`](kai-pm). Entry point for fast session re-h
 └────────────────────────────┬────────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────────┐
-│  MEMORY & STATE                                                      │
+│  MEMORY & KNOWLEDGE                                                  │
 │  Memu-Core → TurboVec ANN index + PostgreSQL (hot path)             │
 │  Memu-Core-Introspect → compress / decay / quarantine (cold path)   │
 │  Memu-Graph → Cognee/Kuzu knowledge graph (entities + relations)    │
 │  Letta-Agent → archival memory controller (gated FF_LETTA_TASKS)    │
+│  Vault-Sync → Obsidian Brain: vault↔memu-core bidirectional sync    │
+│    (port 8047 — watchdog watcher, SHA256 dedup, conviction ≥9.0     │
+│    export gate, wikilink extraction, 4 Jinja2 note templates)       │
 │  Redis (session buffer) → Ledger-Worker (audit trail)                │
 │  Memory-Compressor → Backup-Service (pg/redis/memory)                │
 └────────────────────────────┬────────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────────┐
-│  SENSORY LAYER (33 probed services)                                  │
+│  SENSORY LAYER                                                       │
 │  sysmetrics│calendar│email│news│weather│airquality│docker-watcher   │
 │  git-watcher│broker-bridge│screen-watcher│vision│audio│clipboard    │
 │  files│document-parser│notify│browser-agent│monitor                 │
@@ -236,6 +244,21 @@ All PM operations live in [`kai-pm/`](kai-pm). Entry point for fast session re-h
 7. Tool-Gate: HMAC + rate limit + policy → Executor: sandboxed run
 8. Post-mortem: episode saved, corrections learned, emotion recorded, memory updated
 9. Response streamed back (SSE)
+```
+
+### How Swarm Mode Works (`POST /chat/swarm`)
+
+```
+1. SwarmContext created (shared memory for all stages)
+2. Scout (GATHER)   — parallel fetch from memory, world state, skills; LLM extracts claims
+3. Sage  (DEBATE)   — build_plan + score_conviction; LLM counterargument challenge
+4. Doctor(FACT_CHECK) — claim→verdict JSON dict; falls back to "uncertain" on timeout
+5. Oracle(CAUSAL_CHECK) — consequence chain JSON array per supported claim
+6. Sage  (CONVICTION_GATE) — adversary challenge + resolve_conflict() 5-signal score
+7. If conviction ≥ swarm threshold → PRESENT
+   else RETHINK (max retries) → ESCALATE_LOOP → HALT → notify operator
+8. TeammateRep updated: total_calls, successful_handoffs, avg_confidence, reliability
+9. reputation persisted to data/teammate_reputation.json
 ```
 
 ### Self-Healing Flow
@@ -267,11 +290,37 @@ _proactive_observer()
   9. Curiosity tick: if IDLE + GPU available → idle_curiosity_tick()
 ```
 
+### Vault-Sync Cycle (continuous, debounced)
+
+```
+_VaultHandler (watchdog thread)
+  on_modified / on_created:
+    1. Skip hidden paths (.vault-sync/) and non-.md files
+    2. Debounce: cancel existing 2s timer, start new one per filepath
+  on_deleted:
+    1. Loop bridge: call_soon_threadsafe → _delete_queue.put_nowait(filepath)
+  on_moved:
+    1. Delete old path + ingest new path
+
+_process_ingest_queue() (asyncio worker)
+  1. parse_note(filepath) → NoteData (title, frontmatter, content, wikilinks, tags, SHA256)
+  2. VaultMapper.get(filepath) → existing entry with last_synced_checksum
+  3. If checksum unchanged → skip (deduplication)
+  4. POST /memory/vault/ingest to memu-core → node_id returned
+  5. VaultMapper.upsert(filepath, node_id, checksum)
+
+POST /export (agentic proxy, conviction ≥ 9.0 gate)
+  1. Verify conviction_score ≥ VAULT_WRITE_CONVICTION_THRESHOLD (default 9.0)
+  2. Resolve target path; block if it escapes vault root (path traversal protection)
+  3. Render Jinja2 template or write raw content
+  4. Return {written: true, filepath}
+```
+
 ---
 
 ## Service Map
 
-### Minimal Stack (`docker-compose.minimal.yml`) — 33 services
+### Minimal Stack (`docker-compose.minimal.yml`) — 34 services
 
 The default daily driver. All sensory, perception, memory, and cognitive services. No heavy AI extras (graph memory, Letta, telegram, avatar).
 
@@ -284,7 +333,7 @@ The default daily driver. All sensory, perception, memory, and cognitive service
 | 5 | tool-gate | 8000 | .5 | Policy enforcement, HMAC auth, autonomy gate |
 | 6 | memu-core | 8001 | .6 | Memory engine hot path: memorize / retrieve / rank |
 | 7 | memu-core-introspect | 8009 | .7 | Store maintenance cold path: compress / decay / quarantine |
-| 8 | agentic | 8007 | .8 | Reasoning brain: chat / conviction / teammates / skills |
+| 8 | agentic | 8007 | .8 | Reasoning brain: chat / conviction / teammates / skills / swarm |
 | 9 | heartbeat | 8010 | .9 | System pulse, world anchor, auto-sleep |
 | 10 | dashboard | 8080 | .11 | 10-view operator console |
 | 11 | audio-service | 8021 | .15 | STT (faster-whisper) |
@@ -308,9 +357,10 @@ The default daily driver. All sensory, perception, memory, and cognitive service
 | 29 | git-watcher | 8044 | .33 | Git repo dirty/stash/branch status |
 | 30 | skill-hunter | 8045 | .34 | Autonomous skill discovery via PyPI |
 | 31 | house-doctor | 8046 | .35 | Differential system diagnosis (9 rules D001–D009) |
-| 32 | wake-service | 8022 | .10 | Wake-word + intent routing |
-| 33 | supervisor | 8051 | .12 | Watchdog, auto-heal, proactive checks |
-| 34 | verifier | 8052 | .13 | Semantic fact-checking (embedding + keyword), SAGE |
+| 32 | vault-sync | 8047 | .36 | Obsidian Brain — bidirectional vault↔memu-core sync |
+| 33 | wake-service | 8022 | .10 | Wake-word + intent routing |
+| 34 | supervisor | 8051 | .12 | Watchdog, auto-heal, proactive checks |
+| 35 | verifier | 8052 | .13 | Semantic fact-checking (embedding + keyword), SAGE |
 
 *ollama-pull is a one-shot init container — not counted as a long-running service.
 
@@ -423,6 +473,45 @@ API (D90)
 
 ---
 
+## Swarm Assembly (D90)
+
+`SwarmContext` is the shared state container that threads through every stage of the cognitive pipeline. `TeammateRep` tracks reputation per teammate and feeds into conflict resolution.
+
+```
+SwarmContext fields
+  query:          str          — original operator input
+  evidence:       List[str]    — claims/facts gathered by Scout
+  debate_points:  List[str]    — counterarguments raised by Sage
+  verdicts:       dict         — {claim: "supported"|"refuted"|"uncertain"} from Doctor
+  causal_chains:  List[dict]   — consequence chains from Oracle
+  conviction_score: float      — final weighted score from resolve_conflict()
+  transition_log: List[str]    — FSM stage transitions for audit trail
+  teammate_reps:  dict[str, TeammateRep] — live reputation snapshot
+
+TeammateRep fields
+  name:               str
+  total_calls:        int
+  successful_handoffs: int
+  avg_confidence:     float
+  reliability:        float    — successful_handoffs / total_calls
+
+resolve_conflict() — 5-signal weighted average
+  1. evidence_score    = min(len(evidence) * 1.5, 10)                  weight 0.30
+  2. causal_score      = min(len(causal_chains) * 2.0, 10)             weight 0.25
+  3. verdict_score     = supported/total * 10 (or 5.0 when empty)      weight 0.20
+  4. reputation_vote   = Σ(reliability × avg_confidence/10) / n × 10  weight 0.15
+  5. adversary_mod     = 5.0 + clamp(adversary_modifier, -3, +1)       weight 0.10
+
+Data
+  data/teammate_reputation.json  — persisted across sessions
+  data/teammates/*.md            — persona definitions (Scout/Doctor/Sage/Oracle)
+
+FF_SWARM=true (default) — gates the swarm pipeline. Disable to fall back to direct
+  conviction scoring without stage orchestration.
+```
+
+---
+
 ## System FSM (D89)
 
 Tracks Kai's operational state. Wired into proactive observer, `/chat`, and downstream autonomy/curiosity gating.
@@ -516,6 +605,97 @@ Side effects: writes medical_report memory to memu-core;
 
 ---
 
+## Vault-Sync / Obsidian Brain (D91)
+
+Bidirectional synchronisation between the operator's Obsidian vault and Kai's knowledge graph. The vault is a window into the operator's thinking; the knowledge graph is Kai's structured memory. Vault-Sync bridges them: notes flow in, high-conviction insights flow out.
+
+```
+Service:    vault-sync (port 8047, 172.20.0.36)
+            Dockerfile: vault-sync/Dockerfile
+            Volume: vault_data (persists mapping.json + vault files)
+
+Core components
+  parser.py   → parse_note(filepath) → NoteData
+                  NoteData: filepath, title, frontmatter, content,
+                             wikilinks (List[Tuple[alias,target]]), tags,
+                             modified_at, checksum (SHA256)
+                  python-frontmatter for YAML header; fallback title from
+                  first # heading or filename stem
+
+  mapper.py   → VaultMapper: filepath ↔ node_id mapping
+                  Persisted to {vault_path}/.vault-sync/mapping.json
+                  Thread-safe via threading.Lock
+                  Methods: upsert(filepath, node_id, checksum)
+                           get(filepath) → entry | None
+                           get_by_node_id(node_id) → filepath | None
+                           remove(filepath)
+                           all_entries() → dict
+
+  watcher.py  → FileWatcher: watchdog Observer bridge
+                  _VaultHandler.on_modified/on_created:
+                    - ignores hidden paths and non-.md files
+                    - per-filepath debounce via threading.Timer (2s)
+                  _VaultHandler.on_deleted → delete queue
+                  _VaultHandler.on_moved   → delete old + ingest new
+
+  app.py      → FastAPI service
+                  Config:
+                    VAULT_PATH            — path to Obsidian vault
+                    MEMU_CORE_URL         — memu-core HTTP base URL
+                    FF_VAULT_SYNC         — master toggle (default True)
+                    VAULT_WRITE_CONVICTION_THRESHOLD — export gate (default 9.0)
+                  Queue workers:
+                    _process_ingest_queue() — asyncio worker on ingest_queue
+                    _process_delete_queue() — asyncio worker on delete_queue
+                  Thread→asyncio bridge via loop.call_soon_threadsafe()
+
+Endpoints
+  GET  /health    → {status, vault_path, watching, ff_vault_sync}
+  POST /ingest    → {filepath} → {node_id, title, skipped}
+                    Manual trigger; auto-triggered by file watcher
+  POST /export    → {filepath, content, conviction_score, template?}
+                    Gate: conviction_score ≥ VAULT_WRITE_CONVICTION_THRESHOLD
+                    Guard: path must resolve inside vault root (traversal block)
+                    Returns: {written, filepath}
+  GET  /search    → ?query=&limit=&folder_filter= → {results: [{filepath, title, score}]}
+  GET  /mapping   → full VaultMapper state as JSON
+
+Memu-core vault endpoints (3 new routes)
+  POST   /memory/vault/ingest       → store note as MemoryRecord (category="vault")
+                                      returns node_id; idempotent on same filepath
+  DELETE /memory/vault/{node_id}    → remove vault note from memory store
+  GET    /memory/vault/search       → ?q=&folder_filter= keyword search over vault notes
+                                      scoring: title match +2, content match +1, tag match +1
+
+Agentic proxy endpoints
+  POST /vault/export                → forward to vault-sync with agentic context
+  GET  /vault/search                → proxy to vault-sync /search
+
+FF_VAULT_CONTEXT integration
+  When FF_VAULT_CONTEXT=true (default False), _get_world_context() adds:
+    r = GET /vault-sync:8047/search?query=recent&limit=1
+    → "Vault (recent note): {title}" injected into world state
+  Gated separately because vault search adds latency.
+
+Jinja2 templates (vault-sync/templates/)
+  daily-note.md      → {{date}}, observations, decisions, mood_note
+  lesson-learned.md  → title, context, lesson, concepts, conviction
+  kai-inbox.md       → minimal inbox note for quick capture
+  soul-mirror.md     → emotional_context, patterns, tensions, curiosity_spark
+
+Feature flags
+  FF_VAULT_SYNC=true    (default) — enable watcher, ingest queue, all endpoints
+  FF_VAULT_CONTEXT=false (default) — inject vault recent note into world context
+                                      (disable to save latency; enable once vault is populated)
+
+Security
+  Export requires conviction_score ≥ 9.0 — Kai must earn the right to write autonomously.
+  Path traversal blocked: target.resolve().relative_to(vault_root) must succeed.
+  Ingest is idempotent: same note ingested twice → single memu-core record, updated checksum.
+```
+
+---
+
 ## Key Service APIs
 
 ### Agentic (`agentic:8007`)
@@ -538,6 +718,10 @@ POST /skills/prune            Remove expired/stale skills
 GET  /introspect/capabilities Full self-model: services, skills, flags, FSM, teammates, gaps
 GET  /teammates               List teammate registry (slug, name, specialty, description)
 POST /chat/teammate/{name}    Route query to named teammate with world-state injection
+POST /chat/swarm              Run full D90 swarm pipeline (Scout→Sage→Doctor→Oracle→Sage)
+GET  /swarm/reputation        Per-teammate weights from data/teammate_reputation.json
+GET  /vault/search            Proxy → vault-sync /search
+POST /vault/export            Proxy → vault-sync /export (conviction gate applied)
 GET  /models                  Model registry info
 POST /episodes/recall         Retrieve recent episodes
 POST /checkpoint              Create named state checkpoint
@@ -579,6 +763,19 @@ POST /memory/self-reflect     Reflection pass
 GET  /health                  Deep health (DB + vector store + embedding backend)
 POST /recover                 Self-heal memory layer
 POST /api/embed               Generate embedding for text
+POST /memory/vault/ingest     Store vault note as MemoryRecord (category="vault")
+DELETE /memory/vault/{id}     Remove vault note from memory store
+GET  /memory/vault/search     Keyword search over vault notes (title/content/tag scoring)
+```
+
+### Vault-Sync (`vault-sync:8047`)
+
+```
+GET  /health                  Service status, vault path, watcher state, FF_VAULT_SYNC
+POST /ingest                  Manually ingest a vault note by filepath
+POST /export                  Write note to vault (conviction ≥ 9.0 gate, path traversal block)
+GET  /search                  Keyword search: ?query=&limit=&folder_filter=
+GET  /mapping                 Full filepath↔node_id mapping state
 ```
 
 ### Skill Hunter (`skill-hunter:8045`)
@@ -603,7 +800,7 @@ GET  /health
 
 ## Feature Flags
 
-All 35 flags are toggleable via `FF_{NAME}=true|false` env var. Defaults shown. Changing a flag requires a service restart.
+All 38 flags are toggleable via `FF_{NAME}=true|false` env var. Defaults shown. Changing a flag requires a service restart.
 
 | Flag | Default | What It Gates |
 |------|---------|---------------|
@@ -634,6 +831,8 @@ All 35 flags are toggleable via `FF_{NAME}=true|false` env var. Defaults shown. 
 | `FF_TRUST_NEGOTIATION` | ✓ | D89/B: autonomy request endpoint (always pending_approval) |
 | `FF_PREDICTIVE_EMPATHY` | ✓ | D89/D: emotional_context key in world model (stub) |
 | `FF_CURIOSITY` | ✓ | D89/F: idle curiosity tick (GPU-gated no-op in Phase 0) |
+| `FF_SWARM` | ✓ | D90: CognitiveFSM swarm pipeline — real stage functions, SwarmContext, reputation tracking |
+| `FF_VAULT_SYNC` | ✓ | D91: vault-sync service enabled — file watcher, ingest, export, mapper |
 | `FF_WAKE_INTENT_ROUTING` | ✗ | Pre-classify chat intent via wake-intent before routing |
 | `FF_GRAPH_INGEST` | ✗ | Fan-out memorize/forget to memu-graph |
 | `FF_LETTA_TASKS` | ✗ | Delegate tasks to letta-agent memory controller |
@@ -641,6 +840,7 @@ All 35 flags are toggleable via `FF_{NAME}=true|false` env var. Defaults shown. 
 | `FF_DREAM_ENABLED` | ✗ | 6-phase dream cycle consolidation |
 | `FF_EVOLVER_ENABLED` | ✗ | Agent-Evolver: cluster failures → proactive insights |
 | `FF_SAGE_SELF_REVIEW` | ✗ | SAGE critique on all plans (not just high-stakes) |
+| `FF_VAULT_CONTEXT` | ✗ | D91: inject vault recent note into world-context gather (adds latency — enable once vault is populated) |
 
 ---
 
@@ -695,6 +895,7 @@ Toggle: `Ctrl+Shift+M` in dashboard, or `POST /gate/mode`. Manual override lasts
 | **LLM Model** | Default `qwen2.5:0.5b` (~500M params) is a test placeholder — too small for meaningful reasoning, planning, or emotional intelligence | Upgrade to 7B+ model (`qwen2.5:7b`, `llama3:8b`). RTX 5080 = 3 env vars to switch. Model registry auto-adapts context, prompts, timeouts |
 | **Cognitive FSM wiring** | ~~Not wired~~ **DONE (D90)** — `POST /chat/swarm` runs the full pipeline. Scout→GATHER, Sage→DEBATE+CONVICTION_GATE, Doctor→FACT_CHECK, Oracle→CAUSAL_CHECK. All 5 stage functions are real implementations calling live memory/LLM/adversary dependencies. | — |
 | **Teammate reputation** | ~~No reputation tracking~~ **DONE (D90)** — per-teammate `TeammateRep` (total_calls, successful_handoffs, avg_confidence, reliability). Weights applied in `resolve_conflict()`. Persisted to `data/teammate_reputation.json`. | Add per-teammate memory slice (top-k retrieval scoped to teammate specialty) |
+| **Obsidian Brain** | ~~No external knowledge sync~~ **DONE (D91)** — vault-sync service live (port 8047). SHA256-deduped watchdog watcher, bidirectional ingest/export, conviction ≥9.0 export gate, 3 memu-core vault endpoints, FF_VAULT_CONTEXT injection. | Populate vault; enable FF_VAULT_CONTEXT once notes accumulate |
 | **Counterfactual Rehearsal** | `can_rehearse()→False`, `rehearse()→stub_pending_gpu`. Interface and schema are correct. | Activate in Phase 1 when GPU enables real decision-branch simulation |
 | **Predictive Empathy** | `emotional_context` key exists in world model with the right schema shape. No inference until emotional memory accumulates. | Implement after 30+ days of real emotional memory history |
 | **Resource-Aware Curiosity** | `idle_curiosity_tick()` is a no-op on CPU. CURIOSITY.md seed questions are ready. | Activate on GPU: pick open question → research → append finding |
@@ -708,7 +909,7 @@ Toggle: `Ctrl+Shift+M` in dashboard, or `POST /gate/mode`. Manual override lasts
 
 ## Milestone History
 
-> 39 shipped. Zero skipped. Every milestone has tests.
+> 41 shipped. Zero skipped. Every milestone has tests.
 
 ```
 P0  Stack runs              ██████████ DONE   P14 Temporal Self       ██████████ DONE
@@ -733,6 +934,8 @@ Browser Navigation          ██████████ DONE   Vision / Camer
 D87 Cognitive Architecture  ██████████ DONE   (world context + proactive observer + skill match)
 D88 Advanced Cognition      ██████████ DONE   (anomaly baselines, correlation, skill-hunter, scheduling)
 D89 Cognitive Depth         ██████████ DONE   (FSM, cognitive pipeline, teammates, house-doctor, foundations)
+D90 Swarm Assembly          ██████████ DONE   (real stage functions, SwarmContext, reputation, resolve_conflict)
+D91 Obsidian Brain          ██████████ DONE   (vault-sync, SHA256 dedup, conviction gate, memu-core vault API)
 ```
 
 ### Milestone Summary
@@ -742,12 +945,14 @@ D89 Cognitive Depth         ██████████ DONE   (FSM, cognitiv
 | **D87** | `_get_world_context()` (9-service parallel probe per /chat); `_proactive_observer()` background loop; skill matching wired into /chat; ghost flag fixes (FF_CONTEXT_ENRICHMENT, FF_PROACTIVE_AGENT); 14-way context gather; 17 tests |
 | **D88** | M1 rolling 2σ anomaly baselines (48-reading window); M2 `/introspect/capabilities` self-map; M3 cross-sensor correlation; M4 world_state JSON persistence; M5 10-cycle pattern learning; M6 skill-hunter service (port 8045); M7 calendar+sensor scheduling; M8 reactive gap-triggered skill acquisition; 5 flags; 44 tests |
 | **D89** | System FSM (5 states, 9 events, 16 transitions); Cognitive reasoning FSM (GATHER→DEBATE→FACT_CHECK→CAUSAL_CHECK→CONVICTION_GATE→PRESENT, HALT/ESCALATE/RETHINK, per-swarm configs, schema-validated handoffs); persistent teammates Scout/Doctor/Sage/Oracle; house-doctor service (9 rules D001–D009); skill provenance (YAML front-matter + `.meta.json` sidecars, auto-disable at 3 errors); gap logging (GAP_HUNT_THRESHOLD=3); world model provenance ({value,source,timestamp,confidence}); emergent ritual discovery (≥7/10 cycles); GPU-era foundations (counterfactual, trust negotiation, predictive empathy, curiosity); 8 flags; 47 tests |
+| **D90** | `agentic/swarm.py` (SwarmContext, TeammateRep, `resolve_conflict()` 5-signal weighted average, reputation load/save); `agentic/swarm_stages.py` (5 real stage function factories: make_gather/debate/fact_check/causal_check/conviction_gate_stage + build_swarm_pipeline); `POST /chat/swarm` live endpoint; `GET /swarm/reputation`; `FF_SWARM` flag (default True); `data/teammate_reputation.json`; 38 tests |
+| **D91** | `vault-sync/` service (port 8047, 172.20.0.36): parser (NoteData, SHA256 checksum), mapper (filepath↔node-id, .vault-sync/mapping.json), watcher (watchdog + 2s debounce), FastAPI app (POST /ingest, POST /export conviction gate + path-traversal block, GET /search, GET /mapping); 3 memu-core vault endpoints (POST /memory/vault/ingest, DELETE /memory/vault/{id}, GET /memory/vault/search); agentic vault proxy (POST /vault/export, GET /vault/search) + FF_VAULT_CONTEXT world-context injection; FF_VAULT_SYNC (True) + FF_VAULT_CONTEXT (False); 4 Jinja2 note templates (daily-note, lesson-learned, kai-inbox, soul-mirror); services 59→60; ~45 tests |
 
 ---
 
 ## Roadmap & End Goal
 
-**Where we are:** Phase 0 complete (as of 2026-07-24). All CPU-safe backlog is shipped and on `main`. The conviction/trust loop, minimal stack live CI boot, process-level failure isolation (hot vs cold paths), sensory world-context injection, proactive observer, 8 intelligence mechanisms, and D89 cognitive depth (FSM, teammates, house-doctor, GPU-era foundations) are all complete.
+**Where we are:** Phase 0 complete (as of 2026-07-24). All CPU-safe backlog is shipped and on `main`. D89 Cognitive Depth (FSM, teammates, house-doctor, GPU-era foundations), D90 Swarm Assembly (real stage functions wired to live teammates, reputation tracking, conflict resolution), and D91 Obsidian Brain (vault-sync bidirectional memory sync) are all complete and on `main`.
 
 **The single unlock condition:** GPU hardware arrival (RTX 5080).
 
@@ -758,16 +963,19 @@ When it arrives:
 4. Counterfactual rehearsal + curiosity tick activate automatically
 5. Multi-specialist routing with separate model endpoints
 6. Real STT (faster-whisper large), TTS with voice quality, avatar
+7. `FF_VAULT_CONTEXT=true` — Obsidian Brain active in every conversation
 
 **Phase 1 priorities after GPU:**
 - ~~Wire cognitive FSM stage functions~~ Done (D90) — `POST /chat/swarm` live
 - ~~Build teammate reputation scores~~ Done (D90) — per-teammate TeammateRep + resolve_conflict()
+- ~~Obsidian Brain vault sync~~ Done (D91) — vault-sync service live
 - Add per-teammate memory slices (top-k retrieval scoped to specialty)
 - Implement predictive empathy from accumulated emotional memory
 - Build trust negotiation approval UI (human-in-the-loop autonomy gate)
 - Real multi-model consensus (3 specialist endpoints, once GPU enables 7B+ models)
+- Enable FF_VAULT_CONTEXT — start injecting recent vault notes into every chat
 
-**End-goal:** a fully offline, self-hosted sovereign AI companion — chat, memory, perception, voice, avatar — all gated by the conviction/trust loop and circuit-breaker infrastructure already built. No cloud dependency. No single point of failure. The architectural principles established here (process-level isolation, reused circuit breakers, no split without checking shared state) are the template for the rest of the stack.
+**End-goal:** a fully offline, self-hosted sovereign AI companion — chat, memory, perception, voice, avatar — all gated by the conviction/trust loop and circuit-breaker infrastructure already built. No cloud dependency. No single point of failure. The Obsidian Brain closes the loop between the operator's thinking and Kai's knowledge graph — everything the operator writes becomes part of Kai's memory; everything Kai reasons through with high conviction can be written back as structured notes.
 
 ---
 
@@ -775,10 +983,12 @@ When it arrives:
 
 ```
 agentic/               # Reasoning brain
-  app.py               # 30 API endpoints — chat, skills, teammates, checkpoints, introspect
+  app.py               # 32 API endpoints — chat, skills, teammates, checkpoints, introspect, swarm, vault
   system_fsm.py        # D89: operational state machine (IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING)
   cognitive_fsm.py     # D89: reasoning pipeline FSM (GATHER→…→PRESENT, HALT/ESCALATE/RETHINK)
   teammates.py         # D89: named cognitive personas (Scout/Doctor/Sage/Oracle)
+  swarm.py             # D90: SwarmContext, TeammateRep, resolve_conflict() 5-signal weights
+  swarm_stages.py      # D90: 5 stage function factories + build_swarm_pipeline
   counterfactual.py    # D89/A: counterfactual rehearsal stub (GPU-era)
   curiosity.py         # D89/F: resource-aware curiosity (GPU-gated)
   conviction.py        # Conviction scoring (5-signal + modifiers)
@@ -787,11 +997,23 @@ agentic/               # Reasoning brain
   introspect_app.py    # Dream / evolve / security-audit (cold-path split)
   config.py            # Model registry, swarm configs, context budgets
 tool-gate/             # HMAC auth, rate limit, policy, autonomy request gate
-memu-core/             # Memory hot path: memorize / retrieve / rank / embed
+memu-core/             # Memory hot path: memorize / retrieve / rank / embed / vault API
   introspect_app.py    # Store maintenance cold path: compress / decay / quarantine
 memu-graph/            # Cognee/Kuzu knowledge graph — entity/relation ingest→query→forget
 house-doctor/          # D89: system health differential diagnosis (port 8046)
 skill-hunter/          # D88/D89: autonomous skill acquisition via PyPI (port 8045)
+vault-sync/            # D91: Obsidian Brain service (port 8047)
+  app.py               # FastAPI: /ingest, /export, /search, /mapping, /health
+  parser.py            # NoteData dataclass: frontmatter, wikilinks, tags, SHA256
+  mapper.py            # VaultMapper: filepath↔node-id, persists to .vault-sync/mapping.json
+  watcher.py           # FileWatcher: watchdog Observer + 2s debounce + thread→asyncio bridge
+  templates/           # Jinja2 note templates
+    daily-note.md      # Daily reflection: observations, decisions, mood
+    lesson-learned.md  # Structured lesson capture with conviction score
+    kai-inbox.md       # Quick inbox note for fast capture
+    soul-mirror.md     # Introspection: emotional_context, patterns, tensions, curiosity
+  requirements.txt     # fastapi, uvicorn, httpx, watchdog, python-frontmatter, Jinja2
+  Dockerfile           # python:3.11-slim, port 8047
 supervisor/            # Dual-layer watchdog, circuit breaker, self-heal
 verifier/              # Semantic fact-checking (embedding + keyword), SAGE self-critique
 executor/              # Sandboxed code execution (AST validation + allowlist)
@@ -805,10 +1027,11 @@ data/
     sage.md            # Reflection + counterargument
     oracle.md          # Probabilistic trend extrapolation
   skills/              # Hot-loadable skill files (*.md with YAML front-matter)
+  teammate_reputation.json  # D90: persisted TeammateRep stats across sessions
   RITUALS.md           # Operator-co-authored rituals (proposed by ritual discovery)
   CURIOSITY.md         # Open questions log (seed questions from D89, GPU fills it)
 common/                # Shared libraries
-  feature_flags.py     # 35 FF_* flags — runtime toggle without code changes
+  feature_flags.py     # 38 FF_* flags — runtime toggle without code changes
   llm.py               # LLM chassis with retry/backoff (LLM_MAX_RETRIES=3)
   resilience.py        # resilient_call() — circuit breaker + exponential backoff
   auth.py              # HMAC signing + verification
@@ -852,7 +1075,7 @@ metrics-gateway/       # Prometheus aggregation (port 8058)
 backup-service/        # pg / redis / memory backup (port 8054)
 calendar-sync/         # Calendar synchronisation (port 8055)
 workspace-manager/     # Workspace lifecycle (port 8060)
-scripts/               # 128+ test files, automation, integration scripts
+scripts/               # 130+ test files, automation, integration scripts
 kai-pm/                # PM brain: DECISIONS.md, SESSION_BOOTSTRAP.md, roadmap, tech watch
 docs/                  # Plans, runbooks, architecture, backlog
 security/              # HMAC/auth hardening helpers
@@ -879,9 +1102,9 @@ security/              # HMAC/auth hardening helpers
 
 ---
 
-## Test Targets (82)
+## Test Targets (84)
 
-`make test-core` runs all 82 targets. Each target maps to a `scripts/test_*.py` file.
+`make test-core` runs all 84 targets. Each target maps to a `scripts/test_*.py` file.
 
 <details>
 <summary>Click to expand full test target list</summary>
@@ -900,14 +1123,16 @@ make test-kai-advisor           make test-tts                   make test-avatar
 make test-heartbeat             make test-auth-hmac             make test-agentic
 make test-self-emp
 
-# Sensory services
+# Sensory services (offline subset — run as part of test-core)
+make test-git-watcher           make test-broker-bridge-yfinance
+
+# Sensory services (require running stack or network — run separately)
 make test-upload-fuzz           make test-audio-transcribe      make test-browser-agent
 make test-vision-service        make test-clipboard-service     make test-files-service
 make test-notify-service        make test-document-parser       make test-monitor-service
 make test-broker-bridge         make test-sysmetrics            make test-screen-watcher
 make test-email-reader          make test-news-feed             make test-weather-service
 make test-docker-watcher        make test-airquality            make test-calendar-service
-make test-git-watcher           make test-broker-bridge-yfinance
 
 # Reasoning & cognition
 make test-episode-saver         make test-episode-spool         make test-error-budget
@@ -939,8 +1164,9 @@ make test-multi-modal           make test-world-anchor          make test-self-h
 make test-j-series              make test-wake                  make test-behavioral
 make test-docker-e2e
 
-# Intelligence layers (D87–D89)
+# Intelligence layers (D87–D91)
 make test-kai-intelligence      make test-cognitive-mechanisms  make test-d89-cognitive-depth
+make test-d90-swarm             make test-d91-vault-sync
 ```
 
 </details>
@@ -951,18 +1177,18 @@ make test-kai-intelligence      make test-cognitive-mechanisms  make test-d89-co
 
 ```bash
 # Build
-docker compose -f docker-compose.minimal.yml build    # Core 33 services
-docker compose -f docker-compose.full.yml build        # Full 35 services
+docker compose -f docker-compose.minimal.yml build    # Core 34 services
+docker compose -f docker-compose.full.yml build        # Full stack
 
 # Run
-make core-up       # Start minimal stack (33 services)
+make core-up       # Start minimal stack (34 services)
 make core-down     # Stop minimal stack
 make full-up       # Start full stack
 make full-down     # Stop full stack
 
 # Validate
 make go_no_go      # Syntax check all entry points
-make test-core     # All 82 test targets (2,671 tests)
+make test-core     # All 84 test targets (~2,754 tests)
 make merge-gate    # Full pre-merge validation
 ```
 
@@ -977,6 +1203,11 @@ OLLAMA_BASE_URL=http://ollama:11434
 VECTOR_STORE=turbovec            # turbovec (default) | postgres | memory
 TURBOVEC_INDEX_PATH=/data/turbovec.tv
 MEMU_ALLOW_FAKE_EMBEDDINGS=true  # Required for offline CI runs
+
+# Obsidian Brain (vault-sync)
+VAULT_PATH=/vault                # Path to Obsidian vault (inside container)
+VAULT_SYNC_URL=http://vault-sync:8047
+VAULT_WRITE_CONVICTION_THRESHOLD=9.0  # Kai must score ≥9.0 to write to vault
 
 # Security
 HMAC_ALLOW_DEV_SECRET=true       # Dev only — never in production
@@ -1003,6 +1234,9 @@ FF_CONTEXT_ENRICHMENT=true       # 14-way context gather
 FF_HOUSE_DOCTOR=true             # System differential diagnosis
 FF_FSM=true                      # Operational state machine
 FF_PERSISTENT_TEAMMATES=true     # Named cognitive teammates
+FF_SWARM=true                    # D90: full swarm pipeline on /chat/swarm
+FF_VAULT_SYNC=true               # D91: Obsidian Brain file watcher + ingest/export
+FF_VAULT_CONTEXT=false           # D91: inject vault note into world context (enable post-populate)
 ```
 
 ---
@@ -1019,7 +1253,7 @@ FF_PERSISTENT_TEAMMATES=true     # Named cognitive teammates
 
 ### Key Docs (read in order)
 1. [`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md) — fast re-hydration, current state, next move
-2. [`kai-pm/DECISIONS.md`](kai-pm/DECISIONS.md) — append-only decision log (D1–D89)
+2. [`kai-pm/DECISIONS.md`](kai-pm/DECISIONS.md) — append-only decision log (D1–D91)
 3. [`kai-pm/STATUS.md`](kai-pm/STATUS.md) — sprint health, open PRs, blocked items
 4. [`CHANGELOG.md`](CHANGELOG.md) — full semver changelog
 5. [`docs/PROJECT_BACKLOG.md`](docs/PROJECT_BACKLOG.md) — living backlog
@@ -1027,13 +1261,13 @@ FF_PERSISTENT_TEAMMATES=true     # Named cognitive teammates
 ### Cross-Check: What's Real vs What Needs Hardware
 
 **Working now (CPU / Codespace):**
-- [x] 33 services in minimal stack, all health-checked, compose validated
+- [x] 34 services in minimal stack, all health-checked, compose validated
 - [x] TurboVec ANN persistence (default; no pgvector extension needed)
 - [x] pgvector persistence (sovereign stack; opt-in via `VECTOR_STORE=postgres`)
 - [x] HMAC auth enforced, dev secret blocked by default
 - [x] System FSM (IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING) — wired into /chat + observer
 - [x] Cognitive reasoning FSM framework (GATHER→PRESENT, HALT, per-swarm configs, schema-validated)
-- [x] Swarm Assembly (D90) — real stage functions wired; `POST /chat/swarm` live; reputation tracking
+- [x] Swarm Assembly (D90) — `POST /chat/swarm` live; Scout/Sage/Doctor/Oracle stage functions real; reputation tracking
 - [x] Persistent teammates (Scout/Doctor/Sage/Oracle) — loaded and invokable
 - [x] House Doctor service (port 8046) — 9 diagnostic rules, wired into proactive observer
 - [x] World model provenance ({value, source, timestamp, confidence} per field)
@@ -1046,19 +1280,20 @@ FF_PERSISTENT_TEAMMATES=true     # Named cognitive teammates
 - [x] Supervisor auto-healing loop (deep /health + /recover every 15s)
 - [x] Executor sandboxing (allowlist + AST validation + shell=False)
 - [x] memu-graph (Cognee/Kuzu) — CI-verified against live Ollama stack
-- [x] 82 test targets, 2,671 tests, zero failures
+- [x] Vault-Sync (D91) — port 8047; watchdog watcher, SHA256 dedup, conviction ≥9.0 export gate, 3 memu-core vault endpoints, agentic proxy
+- [x] 84 test targets, ~2,754 tests, zero failures
 - [x] Pre-commit, dep scanning, container scanning (Trivy)
 - [x] Circuit breakers, exponential backoff, resilient_call()
 - [x] MARS memory decay, spaced repetition
-- [x] Context budget trimming, structured errors, 35 feature flags
+- [x] Context budget trimming, structured errors, 38 feature flags
 - [x] Debate engine (`tree_search.py`, `conviction.py`, `adversary.py`)
 
 **Infrastructure ready, needs GPU to activate:**
-- [x] Cognitive FSM stage functions wired — `POST /chat/swarm` live (D90)
 - [ ] Counterfactual rehearsal — `can_rehearse()→False` until Phase 1
 - [ ] Predictive empathy — `emotional_context` stub; needs emotional memory history
 - [ ] Resource-aware curiosity — `idle_curiosity_tick()` no-ops on CPU
-- [ ] Teammate reputation scores + memory slices — not yet built
+- [ ] Per-teammate memory slices — top-k retrieval scoped to teammate specialty
+- [ ] `FF_VAULT_CONTEXT=true` — vault context injection (enable once vault is populated)
 - [ ] `FF_LETTA_TASKS=true` — pending live Ollama verification
 - [ ] `FF_GRAPH_INGEST=true` in production — pending GPU workload validation
 - [ ] Emotional intelligence quality — code works, qwen2.5:0.5b too small to detect emotions well
@@ -1077,6 +1312,7 @@ FF_PERSISTENT_TEAMMATES=true     # Named cognitive teammates
 - Never commit credentials — `.env` files only (see `.env.example`)
 - `make merge-gate` before every PR
 - `make sync-docs` after major changes
+- Vault conviction gate (`VAULT_WRITE_CONVICTION_THRESHOLD=9.0`) is intentional — Kai earns the right to write to the operator's knowledge base
 
 ---
 
