@@ -249,6 +249,8 @@ services:
       WAKE_URL: http://wake-service:8022
       AUDIO_SERVICE_URL: http://audio-service:8021
       TTS_SERVICE_URL: http://tts-service:8030
+      BROWSER_AGENT_URL: http://browser-agent:8040
+      VISION_SERVICE_URL: http://vision-service:8023
       LANGGRAPH_URL: http://agentic:8007
     ports:
       - "8080:8080"
@@ -277,6 +279,10 @@ services:
       audio-service:
         condition: service_started
       tts-service:
+        condition: service_started
+      browser-agent:
+        condition: service_started
+      vision-service:
         condition: service_started
       agentic:
         condition: service_started
@@ -326,6 +332,50 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.16
+
+  browser-agent:
+    build:
+      context: .
+      dockerfile: browser-agent/Dockerfile
+    container_name: sovereign-browser-agent
+    <<: *defaults
+    environment:
+      BROWSER_HEADLESS: "true"
+      NAV_TIMEOUT_MS: "${NAV_TIMEOUT_MS:-20000}"
+      MAX_SCRAPE_CHARS: "${MAX_SCRAPE_CHARS:-50000}"
+      FF_BROWSER_AGENT: "${FF_BROWSER_AGENT:-false}"
+    ports:
+      - "8040:8040"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8040/health')\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.17
+
+  vision-service:
+    build:
+      context: .
+      dockerfile: perception/vision/Dockerfile
+    container_name: sovereign-vision-service
+    <<: *defaults
+    environment:
+      MIN_FACE_SIZE: "${MIN_FACE_SIZE:-30}"
+      VISION_BACKEND: "${VISION_BACKEND:-opencv}"
+    ports:
+      - "8023:8023"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8023/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.18
 
   wake-service:
     build:

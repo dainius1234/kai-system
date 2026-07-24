@@ -1259,6 +1259,8 @@ async def api_chat_proxy(request: Request):
 SCREEN_CAPTURE_URL = os.getenv("SCREEN_CAPTURE_URL", "http://screen-capture:8059")
 AUDIO_URL = os.getenv("AUDIO_SERVICE_URL", "http://audio-service:8021")
 TTS_URL = os.getenv("TTS_SERVICE_URL", "http://tts-service:8030")
+BROWSER_AGENT_URL = os.getenv("BROWSER_AGENT_URL", "http://browser-agent:8040")
+VISION_URL = os.getenv("VISION_SERVICE_URL", "http://vision-service:8023")
 _UPLOAD_MAX_BYTES = 10 * 1024 * 1024  # 10 MB — matches screen-capture service limit
 
 
@@ -1351,6 +1353,115 @@ async def api_audio_transcribe(file: UploadFile = File(...)):
             status_code=503,
             detail=f"Audio service unreachable: {exc}",
         )
+
+
+# ── Browser Agent proxies ────────────────────────────────────────────────────
+
+@app.post("/api/browser/navigate")
+async def api_browser_navigate(request: Request):
+    body = await request.json()
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(f"{BROWSER_AGENT_URL}/navigate", json=body)
+            resp.raise_for_status()
+            return resp.json()
+    except httpx.HTTPStatusError as exc:
+        status = exc.response.status_code
+        if 400 <= status < 500:
+            raise HTTPException(status_code=status, detail=f"Browser agent rejected request: {exc}")
+        raise HTTPException(status_code=502, detail=f"Browser agent error: {exc}")
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=503, detail=f"Browser agent unreachable: {exc}")
+
+
+@app.post("/api/browser/scrape")
+async def api_browser_scrape(request: Request):
+    body = await request.json()
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(f"{BROWSER_AGENT_URL}/scrape", json=body)
+            resp.raise_for_status()
+            return resp.json()
+    except httpx.HTTPStatusError as exc:
+        status = exc.response.status_code
+        if 400 <= status < 500:
+            raise HTTPException(status_code=status, detail=f"Browser agent rejected request: {exc}")
+        raise HTTPException(status_code=502, detail=f"Browser agent error: {exc}")
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=503, detail=f"Browser agent unreachable: {exc}")
+
+
+@app.post("/api/browser/run")
+async def api_browser_run(request: Request):
+    body = await request.json()
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(f"{BROWSER_AGENT_URL}/run", json=body)
+            resp.raise_for_status()
+            return resp.json()
+    except httpx.HTTPStatusError as exc:
+        status = exc.response.status_code
+        if 400 <= status < 500:
+            raise HTTPException(status_code=status, detail=f"Browser agent rejected request: {exc}")
+        raise HTTPException(status_code=502, detail=f"Browser agent error: {exc}")
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=503, detail=f"Browser agent unreachable: {exc}")
+
+
+@app.get("/api/browser/screenshot")
+async def api_browser_screenshot():
+    from fastapi.responses import Response as FastAPIResponse
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.post(f"{BROWSER_AGENT_URL}/screenshot")
+            resp.raise_for_status()
+            return FastAPIResponse(content=resp.content, media_type="image/png")
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(status_code=502, detail=f"Browser agent error: {exc}")
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=503, detail=f"Browser agent unreachable: {exc}")
+
+
+# ── Vision / camera proxies ───────────────────────────────────────────────────
+
+@app.post("/api/vision/analyze")
+async def api_vision_analyze(file: UploadFile = File(...)):
+    data = await file.read()
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.post(
+                f"{VISION_URL}/analyze/frame",
+                files={"file": (file.filename or "frame.jpg", data, file.content_type or "image/jpeg")},
+            )
+            resp.raise_for_status()
+            return resp.json()
+    except httpx.HTTPStatusError as exc:
+        status = exc.response.status_code
+        if 400 <= status < 500:
+            raise HTTPException(status_code=status, detail=f"Vision service rejected frame: {exc}")
+        raise HTTPException(status_code=502, detail=f"Vision service error: {exc}")
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=503, detail=f"Vision service unreachable: {exc}")
+
+
+@app.post("/api/vision/presence")
+async def api_vision_presence(file: UploadFile = File(...)):
+    data = await file.read()
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.post(
+                f"{VISION_URL}/analyze/presence",
+                files={"file": (file.filename or "frame.jpg", data, file.content_type or "image/jpeg")},
+            )
+            resp.raise_for_status()
+            return resp.json()
+    except httpx.HTTPStatusError as exc:
+        status = exc.response.status_code
+        if 400 <= status < 500:
+            raise HTTPException(status_code=status, detail=f"Vision service rejected frame: {exc}")
+        raise HTTPException(status_code=502, detail=f"Vision service error: {exc}")
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=503, detail=f"Vision service unreachable: {exc}")
 
 
 if __name__ == "__main__":
