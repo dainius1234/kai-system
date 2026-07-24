@@ -1227,9 +1227,13 @@ async def api_upload(file: UploadFile = File(...)):
                 f"{SCREEN_CAPTURE_URL}/capture/file",
                 files={"file": (file.filename, data, file.content_type or "image/png")},
             )
-        if resp.status_code != 200:
-            raise HTTPException(status_code=502, detail="OCR service returned an error")
+        resp.raise_for_status()
         return resp.json()
+    except httpx.HTTPStatusError as exc:
+        status = exc.response.status_code
+        if 400 <= status < 500:
+            raise HTTPException(status_code=status, detail=f"OCR service rejected the file: {exc}")
+        raise HTTPException(status_code=502, detail=f"OCR service returned an error: {exc}")
     except httpx.RequestError as exc:
         raise HTTPException(
             status_code=503,

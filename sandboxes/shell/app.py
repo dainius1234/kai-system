@@ -31,7 +31,10 @@ COMMAND_ALLOWLIST: frozenset[str] = frozenset({
 
 
 def _sanitize(text: str, max_len: int = 4096) -> str:
-    return text[:max_len].replace("\x00", "").strip()
+    cleaned = text.replace("\x00", "").strip()
+    if len(cleaned) > max_len:
+        raise HTTPException(status_code=400, detail=f"Command too long (max {max_len} chars)")
+    return cleaned
 
 
 class ShellRequest(BaseModel):
