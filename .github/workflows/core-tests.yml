@@ -59,6 +59,14 @@ jobs:
         run: |
           make test-audio-transcribe
 
+      - name: Browser agent service tests (mocked playwright)
+        run: |
+          make test-browser-agent
+
+      - name: Vision service tests (mocked OpenCV)
+        run: |
+          make test-vision-service
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors

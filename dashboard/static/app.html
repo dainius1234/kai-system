@@ -156,9 +156,17 @@
                         onkeydown="handleInputKey(event)" oninput="autoResize(this)"></textarea>
               <div class="input-actions">
                 <button class="action-btn" onclick="toggleVoice()" id="voiceBtn" title="Voice input">🎤</button>
+                <button class="action-btn" onclick="toggleCamera()" id="cameraBtn" title="Toggle camera (Kai sees you)">📷</button>
                 <button class="action-btn" onclick="attachFile()" title="Attach file">📎</button>
                 <button class="send-btn" onclick="sendMessage()" id="sendBtn" title="Send">↑</button>
                 <button class="stop-btn" onclick="stopGeneration()" id="stopBtn" style="display:none" title="Stop">■</button>
+              </div>
+              <div id="cameraPanel" style="display:none;margin-top:6px;position:relative;">
+                <video id="cameraFeed" autoplay muted playsinline
+                  style="width:160px;height:120px;border-radius:8px;object-fit:cover;background:#000;"></video>
+                <canvas id="cameraCanvas" style="display:none;"></canvas>
+                <span id="cameraStatus" style="position:absolute;bottom:4px;left:4px;font-size:11px;
+                  background:rgba(0,0,0,.6);color:#fff;padding:2px 5px;border-radius:4px;">Connecting…</span>
               </div>
             </div>
             <input type="file" id="fileInput" style="display:none" multiple onchange="handleFiles(this.files)">
@@ -1634,6 +1642,19 @@ async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
 
+  // browse:<url> or browser:<url> → fetch page content and inject as context
+  const browseMatch = text.match(/^(?:browse|browser):\s*(https?:\/\/\S+)/i);
+  if (browseMatch) {
+    input.value = '';
+    autoResize(input);
+    const result = await browseUrl(browseMatch[1]);
+    if (result) {
+      input.value = `[Browsed: ${result.title} — ${browseMatch[1]}]\n\n${(result.result || '').slice(0, 3000)}`;
+      autoResize(input);
+    }
+    return;
+  }
+
   const welcome = document.getElementById('welcomeScreen');
   if (welcome) welcome.style.display = 'none';
 
@@ -1925,7 +1946,92 @@ async function speakMsg(btn) {
   }
 }
 
-function attachFile() {
+// ── Camera / Vision ──────────────────────────────────────────────────────────
+let _cameraStream = null;
+let _cameraInterval = null;
+
+async function toggleCamera() {
+  const btn = document.getElementById('cameraBtn');
+  const panel = document.getElementById('cameraPanel');
+  const video = document.getElementById('cameraFeed');
+  const status = document.getElementById('cameraStatus');
+
+  if (_cameraStream) {
+    // stop
+    _cameraStream.getTracks().forEach(t => t.stop());
+    _cameraStream = null;
+    clearInterval(_cameraInterval);
+    _cameraInterval = null;
+    panel.style.display = 'none';
+    btn.textContent = '📷';
+    return;
+  }
+
+  try {
+    _cameraStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } });
+    video.srcObject = _cameraStream;
+    panel.style.display = 'block';
+    btn.textContent = '🎥';
+    status.textContent = 'Starting…';
+    // Wait for video to be ready then start sampling
+    video.onloadedmetadata = () => {
+      status.textContent = '👁 Watching…';
+      _cameraInterval = setInterval(_sendFrame, 5000);
+    };
+  } catch (err) {
+    showToast('Camera', `Camera access denied: ${err.message}`, 'warning');
+  }
+}
+
+async function _sendFrame() {
+  const video = document.getElementById('cameraFeed');
+  const canvas = document.getElementById('cameraCanvas');
+  const status = document.getElementById('cameraStatus');
+  if (!_cameraStream || video.readyState < 2) return;
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  canvas.toBlob(async (blob) => {
+    if (!blob) return;
+    const fd = new FormData();
+    fd.append('file', blob, 'frame.jpg');
+    try {
+      const resp = await fetch('/api/vision/analyze', { method: 'POST', body: fd });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      if (data.presence) {
+        const emo = data.dominant_emotion ? ` · ${data.dominant_emotion}` : '';
+        status.textContent = `👤 Present${emo}`;
+      } else {
+        status.textContent = '👁 No face detected';
+      }
+    } catch (_) { /* vision service offline — silently skip */ }
+  }, 'image/jpeg', 0.7);
+}
+
+// ── Browser Agent ─────────────────────────────────────────────────────────────
+async function browseUrl(url) {
+  if (!url) return;
+  showToast('Browser', `Navigating to ${url}…`, 'info');
+  try {
+    const resp = await fetch('/api/browser/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ task: 'scrape page content', url }),
+    });
+    if (!resp.ok) {
+      const detail = await resp.json().catch(() => ({}));
+      showToast('Browser', `Failed: ${detail.detail || resp.status}`, 'error');
+      return null;
+    }
+    return await resp.json();
+  } catch (err) {
+    showToast('Browser', `Browser agent unreachable: ${err.message}`, 'error');
+    return null;
+  }
+}
+
+/function attachFile() {
   document.getElementById('fileInput').click();
 }
 
