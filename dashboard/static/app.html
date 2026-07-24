@@ -85,6 +85,14 @@
           <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
           <span class="nav-label">Broker</span>
         </a>
+        <a class="nav-item" data-view="system" onclick="switchView('system')">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <span class="nav-label">System</span>
+        </a>
+        <a class="nav-item" data-view="feeds" onclick="switchView('feeds')">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+          <span class="nav-label">Feeds</span>
+        </a>
       </nav>
 
       <div class="sidebar-divider"></div>
@@ -1144,6 +1152,103 @@
           </div>
         </section>
 
+        <!-- ═══ System View ═══ -->
+        <section class="view" id="systemView">
+          <div style="max-width:1100px;margin:0 auto;padding:var(--sp-6);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-4);">
+              <h2 class="text-heading">System Health</h2>
+              <button class="refresh-btn" onclick="refreshSystem()">Refresh</button>
+            </div>
+            <div id="sysStatus" style="margin-bottom:var(--sp-3);font-size:0.82rem;color:var(--text-muted);">Loading…</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--sp-4);margin-bottom:var(--sp-5);">
+              <div class="card" style="padding:var(--sp-3);">
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">CPU</div>
+                <div id="sysCpu" style="font-size:1.4rem;font-weight:600;">—</div>
+                <div id="sysCpuDetail" style="font-size:0.75rem;color:var(--text-muted);"></div>
+              </div>
+              <div class="card" style="padding:var(--sp-3);">
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">Memory</div>
+                <div id="sysMemory" style="font-size:1.4rem;font-weight:600;">—</div>
+                <div id="sysMemoryDetail" style="font-size:0.75rem;color:var(--text-muted);"></div>
+              </div>
+              <div class="card" style="padding:var(--sp-3);">
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">Disk (/)</div>
+                <div id="sysDisk" style="font-size:1.4rem;font-weight:600;">—</div>
+                <div id="sysDiskDetail" style="font-size:0.75rem;color:var(--text-muted);"></div>
+              </div>
+              <div class="card" style="padding:var(--sp-3);">
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">Load avg (1m)</div>
+                <div id="sysLoad" style="font-size:1.4rem;font-weight:600;">—</div>
+              </div>
+            </div>
+            <!-- Screen watcher -->
+            <div class="card" style="padding:var(--sp-4);margin-bottom:var(--sp-4);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-3);">
+                <h3 style="font-size:0.9rem;color:var(--text-muted);">Screen Watcher</h3>
+                <div style="display:flex;gap:var(--sp-2);">
+                  <button class="refresh-btn" onclick="screenWatchStart()">Start</button>
+                  <button class="refresh-btn" onclick="screenWatchStop()">Stop</button>
+                </div>
+              </div>
+              <div id="screenWatchStatus" style="font-size:0.82rem;color:var(--text-muted);">Loading…</div>
+            </div>
+            <!-- Top processes -->
+            <div>
+              <h3 style="font-size:0.9rem;color:var(--text-muted);margin-bottom:var(--sp-2);">Top Processes (by CPU)</h3>
+              <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+                  <thead><tr style="border-bottom:1px solid var(--border);">
+                    <th style="text-align:left;padding:4px 8px;">PID</th>
+                    <th style="text-align:left;padding:4px 8px;">Name</th>
+                    <th style="text-align:right;padding:4px 8px;">CPU %</th>
+                    <th style="text-align:right;padding:4px 8px;">RAM (MB)</th>
+                    <th style="text-align:left;padding:4px 8px;">Status</th>
+                  </tr></thead>
+                  <tbody id="sysProcesses"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ Feeds View ═══ -->
+        <section class="view" id="feedsView">
+          <div style="max-width:1100px;margin:0 auto;padding:var(--sp-6);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-4);">
+              <h2 class="text-heading">Feeds</h2>
+              <div style="display:flex;gap:var(--sp-2);">
+                <button class="refresh-btn" onclick="refreshFeeds()">Refresh</button>
+              </div>
+            </div>
+            <!-- Email -->
+            <div class="card" style="padding:var(--sp-4);margin-bottom:var(--sp-4);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-3);">
+                <h3 style="font-size:0.9rem;color:var(--text-muted);">Email Inbox</h3>
+                <div style="display:flex;gap:var(--sp-2);">
+                  <span id="emailUnreadBadge" style="font-size:0.75rem;background:var(--accent);color:#fff;border-radius:9999px;padding:2px 7px;display:none;"></span>
+                  <button class="refresh-btn" onclick="refreshEmail()">Poll</button>
+                </div>
+              </div>
+              <div id="emailStatus" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:var(--sp-2);">Loading…</div>
+              <div id="emailList" style="display:flex;flex-direction:column;gap:var(--sp-2);max-height:300px;overflow-y:auto;"></div>
+            </div>
+            <!-- News search -->
+            <div class="card" style="padding:var(--sp-4);margin-bottom:var(--sp-4);">
+              <div style="display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-3);">
+                <h3 style="font-size:0.9rem;color:var(--text-muted);flex:1;">News Search</h3>
+                <input id="newsSearchInput" type="text" placeholder="Search news…" style="flex:2;padding:4px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg-2);color:var(--text-1);font-size:0.82rem;" onkeydown="if(event.key==='Enter')newsSearch()">
+                <button class="refresh-btn" onclick="newsSearch()">Search</button>
+              </div>
+              <div id="newsSearchResults" style="display:flex;flex-direction:column;gap:var(--sp-2);"></div>
+            </div>
+            <!-- Latest articles -->
+            <div>
+              <h3 style="font-size:0.9rem;color:var(--text-muted);margin-bottom:var(--sp-2);">Latest Articles</h3>
+              <div id="newsList" style="display:flex;flex-direction:column;gap:var(--sp-2);"></div>
+            </div>
+          </div>
+        </section>
+
       </div><!-- .content -->
     </main>
   </div><!-- .app -->
@@ -1278,7 +1383,7 @@ function switchView(name) {
   const navEl = document.querySelector(`.nav-item[data-view="${name}"]`);
   if (navEl) navEl.classList.add('active');
 
-  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard', canvas: 'Live Canvas', diary: 'Memory Diary', finance: 'CIS Finance', memgraph: 'Memory Graph', monitor: 'Monitor', broker: 'Broker' };
+  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard', canvas: 'Live Canvas', diary: 'Memory Diary', finance: 'CIS Finance', memgraph: 'Memory Graph', monitor: 'Monitor', broker: 'Broker', system: 'System Health', feeds: 'Feeds' };
   document.getElementById('viewTitle').textContent = titles[name] || name;
 
   currentView = name;
@@ -1333,6 +1438,20 @@ function switchView(name) {
   } else {
     clearInterval(_brokerInterval);
     _brokerInterval = null;
+  }
+  if (name === 'system') {
+    refreshSystem();
+    _systemInterval = setInterval(refreshSystem, 10000);
+  } else {
+    clearInterval(_systemInterval);
+    _systemInterval = null;
+  }
+  if (name === 'feeds') {
+    refreshFeeds();
+    _feedsInterval = setInterval(refreshFeeds, 60000);
+  } else {
+    clearInterval(_feedsInterval);
+    _feedsInterval = null;
   }
 }
 
@@ -5401,6 +5520,131 @@ async function brokerAddTemplate(ruleJson) {
   } catch {
     showToast('Monitor', 'Failed to add template rule', 'error');
   }
+}
+
+// ── System View ─────────────────────────────────────────────────────
+
+let _systemInterval = null;
+
+async function refreshSystem() {
+  try {
+    const [snap, procs, watcher] = await Promise.all([
+      fetch('/api/sysmetrics/snapshot').then(r => r.json()).catch(() => ({})),
+      fetch('/api/sysmetrics/processes').then(r => r.json()).catch(() => ({processes:[]})),
+      fetch('/api/screen-watcher/status').then(r => r.json()).catch(() => ({})),
+    ]);
+    const cpu = snap.cpu || {};
+    const mem = snap.memory || {};
+    const disk = (snap.disk || [])[0] || {};
+    const load = snap.load_avg_1_5_15 || [];
+    document.getElementById('sysCpu').textContent = cpu.percent != null ? cpu.percent.toFixed(1) + '%' : '—';
+    document.getElementById('sysCpuDetail').textContent = cpu.count_logical ? `${cpu.count_logical} logical / ${cpu.count_physical} physical @ ${cpu.freq_mhz}MHz` : '';
+    document.getElementById('sysMemory').textContent = mem.percent != null ? mem.percent.toFixed(1) + '%' : '—';
+    document.getElementById('sysMemoryDetail').textContent = mem.used_mb ? `${(mem.used_mb/1024).toFixed(1)} / ${(mem.total_mb/1024).toFixed(1)} GB` : '';
+    document.getElementById('sysDisk').textContent = disk.percent != null ? disk.percent.toFixed(1) + '%' : '—';
+    document.getElementById('sysDiskDetail').textContent = disk.used_gb ? `${disk.used_gb} / ${disk.total_gb} GB` : '';
+    document.getElementById('sysLoad').textContent = load.length ? load[0].toFixed(2) : '—';
+    document.getElementById('sysStatus').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+    const tbody = document.getElementById('sysProcesses');
+    tbody.innerHTML = (procs.processes || []).map(p =>
+      `<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:3px 8px;">${p.pid}</td>
+        <td style="padding:3px 8px;">${p.name}</td>
+        <td style="padding:3px 8px;text-align:right;">${p.cpu_percent.toFixed(1)}</td>
+        <td style="padding:3px 8px;text-align:right;">${p.mem_mb.toFixed(1)}</td>
+        <td style="padding:3px 8px;">${p.status}</td>
+      </tr>`
+    ).join('') || '<tr><td colspan="5" style="padding:8px;color:var(--text-muted);">No processes</td></tr>';
+    const watchText = watcher.watching ? `Watching (every ${watcher.interval_seconds}s, threshold ${(watcher.threshold*100).toFixed(0)}%, last diff: ${(watcher.last_diff_score*100).toFixed(1)}%)`
+                                        : 'Stopped';
+    document.getElementById('screenWatchStatus').textContent = watchText;
+  } catch (e) {
+    document.getElementById('sysStatus').textContent = 'Error loading system metrics';
+  }
+}
+
+async function screenWatchStart() {
+  try {
+    await fetch('/api/screen-watcher/watch/start', {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    showToast('Screen Watcher', 'Started', 'ok');
+    refreshSystem();
+  } catch { showToast('Screen Watcher', 'Failed to start', 'error'); }
+}
+
+async function screenWatchStop() {
+  try {
+    await fetch('/api/screen-watcher/watch/stop', {method:'POST'});
+    showToast('Screen Watcher', 'Stopped', 'ok');
+    refreshSystem();
+  } catch { showToast('Screen Watcher', 'Failed to stop', 'error'); }
+}
+
+// ── Feeds View ──────────────────────────────────────────────────────
+
+let _feedsInterval = null;
+
+async function refreshFeeds() {
+  refreshEmail();
+  refreshNews();
+}
+
+async function refreshEmail() {
+  try {
+    const [inbox, unread] = await Promise.all([
+      fetch('/api/email/inbox?limit=20').then(r => r.json()).catch(() => ({messages:[]})),
+      fetch('/api/email/unread').then(r => r.json()).catch(() => ({unread_count:0})),
+    ]);
+    const count = unread.unread_count || 0;
+    const badge = document.getElementById('emailUnreadBadge');
+    badge.textContent = count + ' unread';
+    badge.style.display = count > 0 ? '' : 'none';
+    const configured = inbox.messages !== undefined;
+    document.getElementById('emailStatus').textContent = configured
+      ? `${inbox.total || 0} messages in inbox, ${count} unread — ${new Date().toLocaleTimeString()}`
+      : 'Email not configured (set MAIL_HOST, MAIL_USER, MAIL_PASS)';
+    document.getElementById('emailList').innerHTML = (inbox.messages || []).map(m =>
+      `<div style="padding:var(--sp-2);border:1px solid var(--border);border-radius:6px;background:var(--bg-2);">
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+          <span style="font-weight:600;font-size:0.85rem;">${m.subject || '(no subject)'}</span>
+          <span style="font-size:0.75rem;color:var(--text-muted);">${m.date || ''}</span>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-muted);">From: ${m.from || ''}</div>
+        ${m.snippet ? `<div style="font-size:0.82rem;margin-top:4px;color:var(--text-2);">${m.snippet.slice(0,200)}</div>` : ''}
+      </div>`
+    ).join('') || '<div style="color:var(--text-muted);font-size:0.82rem;">No messages</div>';
+  } catch {}
+}
+
+async function refreshNews() {
+  try {
+    const arts = await fetch('/api/news/articles?limit=20').then(r => r.json()).catch(() => ({articles:[]}));
+    document.getElementById('newsList').innerHTML = (arts.articles || []).map(a =>
+      `<div style="padding:var(--sp-2);border:1px solid var(--border);border-radius:6px;background:var(--bg-2);">
+        <div style="display:flex;align-items:flex-start;gap:var(--sp-2);">
+          <div style="flex:1;">
+            <a href="${a.url}" target="_blank" rel="noopener" style="font-weight:600;font-size:0.85rem;color:var(--accent);text-decoration:none;">${a.title}</a>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">${a.feed_name} · ${a.tags.join(', ')}</div>
+            ${a.summary ? `<div style="font-size:0.82rem;margin-top:4px;color:var(--text-2);">${a.summary.slice(0,200)}</div>` : ''}
+          </div>
+        </div>
+      </div>`
+    ).join('') || '<div style="color:var(--text-muted);font-size:0.82rem;">No articles yet — fetching…</div>';
+  } catch {}
+}
+
+async function newsSearch() {
+  const q = document.getElementById('newsSearchInput').value.trim();
+  if (!q) return;
+  try {
+    const res = await fetch(`/api/news/search?q=${encodeURIComponent(q)}&limit=10`).then(r => r.json());
+    document.getElementById('newsSearchResults').innerHTML = (res.results || []).map(a =>
+      `<div style="padding:var(--sp-2);border:1px solid var(--border);border-radius:6px;">
+        <a href="${a.url}" target="_blank" rel="noopener" style="font-weight:600;font-size:0.85rem;color:var(--accent);text-decoration:none;">${a.title}</a>
+        <div style="font-size:0.75rem;color:var(--text-muted);">${a.feed_name}</div>
+        ${a.summary ? `<div style="font-size:0.82rem;margin-top:4px;">${a.summary.slice(0,200)}</div>` : ''}
+      </div>`
+    ).join('') || '<div style="color:var(--text-muted);font-size:0.82rem;">No results</div>';
+  } catch {}
 }
 
 </script>

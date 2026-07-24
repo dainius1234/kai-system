@@ -257,6 +257,10 @@ services:
       DOC_PARSER_URL: http://document-parser:8032
       MONITOR_SERVICE_URL: http://monitor-service:8033
       BROKER_URL: http://broker-bridge:8034
+      SYSMETRICS_URL: http://sysmetrics:8035
+      SCREEN_WATCHER_URL: http://screen-watcher:8036
+      EMAIL_READER_URL: http://email-reader:8037
+      NEWS_FEED_URL: http://news-feed:8038
       LANGGRAPH_URL: http://agentic:8007
     ports:
       - "8080:8080"
@@ -524,6 +528,95 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.24
+
+  sysmetrics:
+    build:
+      context: .
+      dockerfile: sysmetrics/Dockerfile
+    container_name: sovereign-sysmetrics
+    <<: *defaults
+    environment:
+      TOP_PROCESSES: "${TOP_PROCESSES:-20}"
+    ports:
+      - "8035:8035"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8035/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.25
+
+  screen-watcher:
+    build:
+      context: .
+      dockerfile: screen-watcher/Dockerfile
+    container_name: sovereign-screen-watcher
+    <<: *defaults
+    environment:
+      SCREEN_CAPTURE_URL: http://screen-capture:8020
+      NOTIFY_SERVICE_URL: http://notify-service:8031
+      TTS_SERVICE_URL: http://tts-service:8030
+      WATCH_INTERVAL_SECONDS: "${WATCH_INTERVAL_SECONDS:-10}"
+      CHANGE_THRESHOLD: "${CHANGE_THRESHOLD:-0.05}"
+    ports:
+      - "8036:8036"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8036/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.26
+
+  email-reader:
+    build:
+      context: .
+      dockerfile: email-reader/Dockerfile
+    container_name: sovereign-email-reader
+    <<: *defaults
+    environment:
+      MAIL_HOST: "${MAIL_HOST:-}"
+      MAIL_PORT: "${MAIL_PORT:-993}"
+      MAIL_USER: "${MAIL_USER:-}"
+      MAIL_PASS: "${MAIL_PASS:-}"
+      EMAIL_POLL_INTERVAL_SECONDS: "${EMAIL_POLL_INTERVAL_SECONDS:-120}"
+    ports:
+      - "8037:8037"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8037/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.27
+
+  news-feed:
+    build:
+      context: .
+      dockerfile: news-feed/Dockerfile
+    container_name: sovereign-news-feed
+    <<: *defaults
+    environment:
+      REFRESH_INTERVAL_SECONDS: "${NEWS_REFRESH_INTERVAL:-300}"
+      SEED_FEEDS: "${SEED_FEEDS:-}"
+    ports:
+      - "8038:8038"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8038/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.28
 
   wake-service:
     build:

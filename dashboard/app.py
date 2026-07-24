@@ -1267,6 +1267,10 @@ NOTIFY_URL = os.getenv("NOTIFY_SERVICE_URL", "http://notify-service:8031")
 DOC_PARSER_URL = os.getenv("DOC_PARSER_URL", "http://document-parser:8032")
 MONITOR_URL = os.getenv("MONITOR_SERVICE_URL", "http://monitor-service:8033")
 BROKER_URL = os.getenv("BROKER_URL", "http://broker-bridge:8034")
+SYSMETRICS_URL = os.getenv("SYSMETRICS_URL", "http://sysmetrics:8035")
+SCREEN_WATCHER_URL = os.getenv("SCREEN_WATCHER_URL", "http://screen-watcher:8036")
+EMAIL_READER_URL = os.getenv("EMAIL_READER_URL", "http://email-reader:8037")
+NEWS_FEED_URL = os.getenv("NEWS_FEED_URL", "http://news-feed:8038")
 _UPLOAD_MAX_BYTES = 10 * 1024 * 1024  # 10 MB
 
 _IMAGE_EXTS = frozenset({"png", "jpg", "jpeg", "gif", "bmp", "webp", "tiff", "tif"})
@@ -1721,6 +1725,119 @@ async def api_broker_watch(request: Request):
         rule["condition"] = {"op": "lt", "threshold": float(threshold)}
     monitor_url = os.getenv("MONITOR_SERVICE_URL", "http://monitor-service:8033")
     return await _proxy_post(f"{monitor_url}/rules", body=rule, fallback={"ok": False})
+
+
+# ── Sysmetrics proxies ────────────────────────────────────────────────────────
+
+@app.get("/api/sysmetrics/health")
+async def api_sysmetrics_health():
+    return await _proxy_get(f"{SYSMETRICS_URL}/health", fallback={"status": "unavailable"})
+
+
+@app.get("/api/sysmetrics/snapshot")
+async def api_sysmetrics_snapshot():
+    return await _proxy_get(f"{SYSMETRICS_URL}/snapshot", fallback={})
+
+
+@app.get("/api/sysmetrics/processes")
+async def api_sysmetrics_processes():
+    return await _proxy_get(f"{SYSMETRICS_URL}/processes", fallback={"processes": []})
+
+
+# ── Screen-watcher proxies ────────────────────────────────────────────────────
+
+@app.get("/api/screen-watcher/health")
+async def api_screen_watcher_health():
+    return await _proxy_get(f"{SCREEN_WATCHER_URL}/health", fallback={"status": "unavailable"})
+
+
+@app.get("/api/screen-watcher/status")
+async def api_screen_watcher_status():
+    return await _proxy_get(f"{SCREEN_WATCHER_URL}/status", fallback={})
+
+
+@app.post("/api/screen-watcher/watch/start")
+async def api_screen_watcher_start(request: Request):
+    body = await request.json() if request.headers.get("content-type") == "application/json" else {}
+    return await _proxy_post(f"{SCREEN_WATCHER_URL}/watch/start", body=body, fallback={"ok": False})
+
+
+@app.post("/api/screen-watcher/watch/stop")
+async def api_screen_watcher_stop():
+    return await _proxy_post(f"{SCREEN_WATCHER_URL}/watch/stop", body={}, fallback={"ok": False})
+
+
+# ── Email-reader proxies ──────────────────────────────────────────────────────
+
+@app.get("/api/email/health")
+async def api_email_health():
+    return await _proxy_get(f"{EMAIL_READER_URL}/health", fallback={"status": "unavailable"})
+
+
+@app.get("/api/email/inbox")
+async def api_email_inbox(limit: int = 20):
+    return await _proxy_get(f"{EMAIL_READER_URL}/inbox", params={"limit": limit}, fallback={"messages": []})
+
+
+@app.get("/api/email/unread")
+async def api_email_unread():
+    return await _proxy_get(f"{EMAIL_READER_URL}/unread", fallback={"unread_count": 0, "sample": []})
+
+
+@app.post("/api/email/refresh")
+async def api_email_refresh():
+    return await _proxy_post(f"{EMAIL_READER_URL}/refresh", body={}, fallback={"ok": False})
+
+
+# ── News-feed proxies ─────────────────────────────────────────────────────────
+
+@app.get("/api/news/health")
+async def api_news_health():
+    return await _proxy_get(f"{NEWS_FEED_URL}/health", fallback={"status": "unavailable"})
+
+
+@app.get("/api/news/articles")
+async def api_news_articles(limit: int = 20, tag: str = "", since_minutes: int = 0):
+    params: dict = {"limit": limit}
+    if tag:
+        params["tag"] = tag
+    if since_minutes > 0:
+        params["since_minutes"] = since_minutes
+    return await _proxy_get(f"{NEWS_FEED_URL}/articles", params=params, fallback={"articles": []})
+
+
+@app.get("/api/news/search")
+async def api_news_search(q: str = "", limit: int = 10):
+    if not q:
+        raise HTTPException(status_code=400, detail="q is required")
+    return await _proxy_get(f"{NEWS_FEED_URL}/search", params={"q": q, "limit": limit}, fallback={"results": []})
+
+
+@app.post("/api/news/refresh")
+async def api_news_refresh():
+    return await _proxy_post(f"{NEWS_FEED_URL}/refresh", body={}, fallback={"ok": False})
+
+
+@app.get("/api/news/feeds")
+async def api_news_feeds():
+    return await _proxy_get(f"{NEWS_FEED_URL}/feeds", fallback={"feeds": []})
+
+
+# ── Broker market depth extensions ────────────────────────────────────────────
+
+@app.get("/api/broker/depth/{symbol}")
+async def api_broker_depth(symbol: str, limit: int = 20):
+    return await _proxy_get(f"{BROKER_URL}/depth/{symbol}", params={"limit": limit}, fallback={})
+
+
+@app.get("/api/broker/stats/{symbol}")
+async def api_broker_stats(symbol: str):
+    return await _proxy_get(f"{BROKER_URL}/stats/24hr/{symbol}", fallback={})
+
+
+@app.get("/api/broker/trades/{symbol}")
+async def api_broker_trades(symbol: str, limit: int = 20):
+    return await _proxy_get(f"{BROKER_URL}/trades/{symbol}", params={"limit": limit}, fallback={"trades": []})
 
 
 if __name__ == "__main__":
