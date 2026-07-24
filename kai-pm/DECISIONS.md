@@ -1537,3 +1537,26 @@ After PR #91 merged, CI still showed 30 test failures across two root causes:
 - `_tesseract_available` now correctly reflects whether the `tesseract-ocr` binary is present, not just whether the Python package is importable.
 - The importlib isolation pattern for `sys.modules` contamination from `test_agentic_routes.py` is now consistently applied across all integration tests that load `memu-core/app.py`.
 - Two infrastructure CI failures (`VAULT_ROOT_TOKEN` missing, `TS_AUTHKEY` missing) are pre-existing repo-secret gaps, not code issues — tracked separately in STUBS_AND_PLACEHOLDERS.md P6/P8.
+
+## D85 — 2026-07-24 — Simplify sprint: dedup risk table, tighten error handling, hoist JS closure; fix CI disk exhaustion
+
+**Context:**
+After PR #94 landed, a `/simplify` skill review was run over four recently changed files: `scripts/hse_rams.py`, `sandboxes/shell/app.py`, `dashboard/app.py`, and `dashboard/static/app.html`. Four parallel review agents (reuse, simplification, efficiency, altitude) produced deduped findings that were applied in PR #95. Two separate CI failures also surfaced and were fixed in the same PR.
+
+**Decision:**
+1. **`scripts/hse_rams.py`** — Replaced three parallel risk-level representations (`RISK_COLOURS` dict, dead `RISK_LABEL` dict, `_risk_colour()`, `_risk_label_from_score()`) with a single `_RISK_LEVELS` list of `(max_score, label, hex_colour)` tuples and one `_risk_info(score)` helper; all callers delegate to it. Fixed a midnight-straddle bug: `datetime.date.today()` was called in two places and could return different dates if the run crossed midnight — now called once at function entry and reused throughout `generate_rams()`.
+2. **`sandboxes/shell/app.py`** — `_sanitize()` now raises HTTP 400 on oversized input instead of silently truncating. Silent truncation means the caller has no way to detect that the stored command differs from what was sent; explicit rejection is semantically correct.
+3. **`dashboard/app.py`** — OCR upload error handling replaced manual `if resp.status_code != 200` with `resp.raise_for_status()`, splitting `httpx.HTTPStatusError` (4xx/5xx — relayed with their original status code) from `httpx.RequestError` (connection failure — returns 503 directing the operator to start screen-capture).
+4. **`dashboard/static/app.html`** — `handleFiles()` hoisted the repeated prefix expression into a single `const prefix = () => ...` closure; changed bare `catch {` to `catch (e) { console.error('upload error', e); }`.
+5. **`docker-compose.sovereign.yml`** — Changed `${TS_AUTHKEY:?set TS_AUTHKEY}` and `${VAULT_ROOT_TOKEN:?set VAULT_ROOT_TOKEN}` (×2) from `:?` (fail-hard-if-unset) to `:-` (empty/`localdev` defaults). Docker Compose interpolates these at parse time across all services, so the S4 CI step (`docker compose -f docker-compose.sovereign.yml up -d postgres tool-gate memu-core`) was aborting before any container started even though tailscale/vault are not in the requested service list.
+6. **`.github/workflows/core-tests.yml`** — Added a "Free up runner disk space" step before "Build full stack Docker images" that removes pre-installed toolchains (dotnet, Android SDK, GHC, CodeQL, cached node/go) and prunes the Docker layer cache. `memu-core` (PyTorch + CUDA) and `letta-agent` (full Letta stack) together exhausted the ubuntu-latest runner's ~14 GB, causing `[Errno 28] No space left on device` during pip install.
+
+**Rationale:**
+Items 1–4 remove redundant representations and silent failures that confuse future maintainers. Items 5–6 fix pre-existing CI infrastructure gaps that surfaced because PR #95 triggered the full CI pipeline. The `:?` sovereign-compose issue and the disk-exhaustion issue are both independent of the simplify changes and would have affected any PR that ran the same CI steps.
+
+**Consequences:**
+- `_risk_info(score)` is the single source of truth for risk label and colour; adding a risk tier requires editing exactly one place.
+- `_sanitize()` callers receive an explicit 400 on oversized input rather than a silently truncated result.
+- The upload endpoint returns the correct HTTP status on upstream 4xx errors and a distinct 503 (not 502) on connection failure.
+- The sovereign compose file parses cleanly in CI without Tailscale/Vault secrets; production deployments that set real secrets are unaffected.
+- CI no longer fails with disk exhaustion on full-stack builds; ~8–10 GB is recovered before Docker builds begin.
