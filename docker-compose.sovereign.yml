@@ -50,7 +50,7 @@ services:
       - tailscale_state:/var/lib/tailscale
       - /dev/net/tun:/dev/net/tun
     environment:
-      TS_AUTHKEY: ${TS_AUTHKEY:?set TS_AUTHKEY}
+      TS_AUTHKEY: ${TS_AUTHKEY:-}
       TS_STATE_DIR: /var/lib/tailscale
       TS_EXTRA_ARGS: --ssh --accept-routes=true
       TS_HOSTNAME: sovereign-core
@@ -65,7 +65,7 @@ services:
     cap_add:
       - IPC_LOCK
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_ROOT_TOKEN:?set VAULT_ROOT_TOKEN}
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_ROOT_TOKEN:-localdev}
       VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
     ports:
       - "8200:8200"
@@ -86,7 +86,7 @@ services:
       - ./scripts/vault-rotate.sh:/vault/scripts/vault-rotate.sh:ro
     environment:
       VAULT_ADDR: "${VAULT_ADDR:-http://vault:8200}"
-      VAULT_ROOT_TOKEN: ${VAULT_ROOT_TOKEN:?set VAULT_ROOT_TOKEN}
+      VAULT_ROOT_TOKEN: ${VAULT_ROOT_TOKEN:-localdev}
     command: sh /vault/scripts/vault-rotate.sh
     depends_on:
       - vault

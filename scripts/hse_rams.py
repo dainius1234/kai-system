@@ -25,34 +25,30 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CSV = ROOT / "data" / "site_data.csv"
 DEFAULT_OUT = ROOT / "RAMS.docx"
 
-RISK_LABEL = {
-    1: "Very Low", 2: "Low", 3: "Medium", 4: "High", 5: "Very High"
-}
-
-# RGB colours used for risk-level cells
-RISK_COLOURS: dict[int, str] = {
-    1: "00B050",  # green
-    2: "92D050",  # light green
-    3: "FFFF00",  # yellow
-    4: "FFC000",  # amber
-    5: "FF0000",  # red
-}
+# (max_score, label, hex_colour) — single source of truth for the risk matrix
+_RISK_LEVELS = [
+    (4,  "Very Low", "00B050"),
+    (8,  "Low",      "92D050"),
+    (12, "Medium",   "FFFF00"),
+    (16, "High",     "FFC000"),
+    (25, "Very High","FF0000"),
+]
 
 
 def _risk_score(severity: int, likelihood: int) -> int:
     return severity * likelihood
 
 
+def _risk_info(score: int) -> tuple[str, str]:
+    """Return (label, hex_colour) for a risk score."""
+    for max_score, label, colour in _RISK_LEVELS:
+        if score <= max_score:
+            return label, colour
+    return _RISK_LEVELS[-1][1], _RISK_LEVELS[-1][2]
+
+
 def _risk_colour(score: int) -> str:
-    if score <= 4:
-        return RISK_COLOURS[1]
-    if score <= 8:
-        return RISK_COLOURS[2]
-    if score <= 12:
-        return RISK_COLOURS[3]
-    if score <= 16:
-        return RISK_COLOURS[4]
-    return RISK_COLOURS[5]
+    return _risk_info(score)[1]
 
 
 def load_activities(csv_path: Path) -> List[Dict[str, Any]]:
@@ -88,8 +84,6 @@ def generate_rams(
         from docx.shared import Pt, RGBColor, Cm, Inches
         from docx.enum.text import WD_ALIGN_PARAGRAPH
         from docx.enum.table import WD_TABLE_ALIGNMENT
-        from docx.oxml.ns import qn
-        from docx.oxml import OxmlElement
     except ImportError as exc:
         raise ImportError("python-docx is required: pip install python-docx") from exc
 
@@ -100,8 +94,9 @@ def generate_rams(
     if not activities:
         raise ValueError("No rows found in site data CSV")
 
+    today = datetime.date.today()
     if review_date is None:
-        review_date = (datetime.date.today() + datetime.timedelta(days=90)).strftime("%d/%m/%Y")
+        review_date = (today + datetime.timedelta(days=90)).strftime("%d/%m/%Y")
 
     doc = Document()
 
@@ -120,7 +115,7 @@ def generate_rams(
     meta_table.style = "Table Grid"
     labels = [
         ("Project:", project_name, "Site Address:", site_address),
-        ("Prepared by:", prepared_by, "Date:", datetime.date.today().strftime("%d/%m/%Y")),
+        ("Prepared by:", prepared_by, "Date:", today.strftime("%d/%m/%Y")),
         ("Review date:", review_date, "Document ref:", f"RAMS-{datetime.date.today().strftime('%Y%m%d')}"),
         ("Issue:", "1.0", "Status:", "APPROVED FOR USE"),
     ]
@@ -254,21 +249,13 @@ def generate_rams(
 
 
 def _risk_label_from_score(score: int) -> str:
-    if score <= 4:
-        return "Very Low"
-    if score <= 8:
-        return "Low"
-    if score <= 12:
-        return "Medium"
-    if score <= 16:
-        return "High"
-    return "Very High"
+    return _risk_info(score)[0]
 
 
 def _shade_cell(cell: Any, hex_colour: str) -> None:
     """Apply a background fill to a table cell via direct XML manipulation."""
-    from docx.oxml.ns import qn
-    from docx.oxml import OxmlElement
+    from docx.oxml.ns import qn  # noqa: PLC0415 — deferred: docx may not be installed
+    from docx.oxml import OxmlElement  # noqa: PLC0415
 
     tc = cell._tc
     tcPr = tc.get_or_add_tcPr()
