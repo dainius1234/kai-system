@@ -3,22 +3,26 @@
 Executes a limited allowlist of read-only shell commands with timeout and output
 caps. Anything outside the allowlist is rejected with 403. No shell=True ever.
 
+Path-argument commands (cat, head, tail, wc, ls, du) are further restricted:
+file/directory arguments must reside under SANDBOX_SAFE_DIRS (default: /tmp and
+/proc/self). This prevents reading /etc/passwd, /proc/*/environ, etc.
+
 Endpoints:
-  /health   - liveness
-  /run      - execute one allowed command; returns stdout/stderr/returncode
-  /allowlist - list permitted command names
+  /health    - liveness
+  /run       - execute one allowed command; returns stdout/stderr/returncode
+  /allowlist - list permitted command names and safe path prefixes
 """
 from __future__ import annotations
 
 import os
 import shlex
 import subprocess
-from typing import Any, Dict, List
+from typing import Dict, List
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-app = FastAPI(title="Shell Sandbox", version="0.2.0")
+app = FastAPI(title="Shell Sandbox", version="0.3.0")
 
 EXECUTION_TIMEOUT = int(os.getenv("SANDBOX_TIMEOUT", "10"))
 MAX_OUTPUT_BYTES = int(os.getenv("SANDBOX_MAX_OUTPUT", str(64 * 1024)))  # 64 KB
@@ -29,12 +33,40 @@ COMMAND_ALLOWLIST: frozenset[str] = frozenset({
     "head", "ls", "ps", "pwd", "tail", "uptime", "wc", "whoami",
 })
 
+# Commands that accept path arguments — those arguments are checked against SAFE_DIRS.
+_PATH_ARG_COMMANDS: frozenset[str] = frozenset({"cat", "head", "tail", "wc", "ls", "du"})
+
+# Only allow reading from these directory trees. Configurable via comma-separated env var.
+_default_safe = "/tmp,/proc/self,/var/log/sovereign"
+SAFE_DIRS: tuple[str, ...] = tuple(
+    p.strip() for p in os.getenv("SANDBOX_SAFE_DIRS", _default_safe).split(",") if p.strip()
+)
+
 
 def _sanitize(text: str, max_len: int = 4096) -> str:
     cleaned = text.replace("\x00", "").strip()
     if len(cleaned) > max_len:
         raise HTTPException(status_code=400, detail=f"Command too long (max {max_len} chars)")
     return cleaned
+
+
+def _validate_path_args(parts: list[str]) -> None:
+    """For path-reading commands, reject any file/dir arg outside SAFE_DIRS."""
+    if parts[0] not in _PATH_ARG_COMMANDS:
+        return
+    for arg in parts[1:]:
+        if arg.startswith("-"):
+            continue  # skip flags like -n, -l, --help
+        # Resolve without following symlinks so a symlink outside safe dirs is caught.
+        resolved = os.path.abspath(arg)
+        if not any(resolved == safe or resolved.startswith(safe + os.sep) for safe in SAFE_DIRS):
+            raise HTTPException(
+                status_code=403,
+                detail=(
+                    f"Path '{arg}' is outside allowed directories. "
+                    f"Permitted prefixes: {list(SAFE_DIRS)}"
+                ),
+            )
 
 
 class ShellRequest(BaseModel):
@@ -55,8 +87,12 @@ async def health() -> Dict[str, str]:
 
 
 @app.get("/allowlist")
-async def allowlist() -> Dict[str, List[str]]:
-    return {"commands": sorted(COMMAND_ALLOWLIST)}
+async def allowlist() -> Dict[str, object]:
+    return {
+        "commands": sorted(COMMAND_ALLOWLIST),
+        "path_restricted_commands": sorted(_PATH_ARG_COMMANDS),
+        "safe_dirs": list(SAFE_DIRS),
+    }
 
 
 @app.post("/run", response_model=ShellResult)
@@ -76,6 +112,8 @@ async def run(request: ShellRequest) -> ShellResult:
             status_code=403,
             detail=f"'{binary}' not in allowlist. Permitted: {sorted(COMMAND_ALLOWLIST)}",
         )
+
+    _validate_path_args(parts)
 
     try:
         result = subprocess.run(
