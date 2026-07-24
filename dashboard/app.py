@@ -1261,6 +1261,9 @@ AUDIO_URL = os.getenv("AUDIO_SERVICE_URL", "http://audio-service:8021")
 TTS_URL = os.getenv("TTS_SERVICE_URL", "http://tts-service:8030")
 BROWSER_AGENT_URL = os.getenv("BROWSER_AGENT_URL", "http://browser-agent:8040")
 VISION_URL = os.getenv("VISION_SERVICE_URL", "http://vision-service:8023")
+CLIPBOARD_URL = os.getenv("CLIPBOARD_SERVICE_URL", "http://clipboard-service:8024")
+FILES_URL = os.getenv("FILES_SERVICE_URL", "http://files-service:8025")
+NOTIFY_URL = os.getenv("NOTIFY_SERVICE_URL", "http://notify-service:8031")
 _UPLOAD_MAX_BYTES = 10 * 1024 * 1024  # 10 MB — matches screen-capture service limit
 
 
@@ -1462,6 +1465,111 @@ async def api_vision_presence(file: UploadFile = File(...)):
         raise HTTPException(status_code=502, detail=f"Vision service error: {exc}")
     except httpx.RequestError as exc:
         raise HTTPException(status_code=503, detail=f"Vision service unreachable: {exc}")
+
+
+# ── Clipboard proxies ─────────────────────────────────────────────────────────
+
+@app.post("/api/clipboard/push")
+async def api_clipboard_push(request: Request):
+    body = await request.json()
+    return await _proxy_post(f"{CLIPBOARD_URL}/push", body=body, fallback={"ok": False})
+
+
+@app.get("/api/clipboard/latest")
+async def api_clipboard_latest():
+    return await _proxy_get(f"{CLIPBOARD_URL}/latest", fallback={"content": "", "id": None})
+
+
+@app.get("/api/clipboard/history")
+async def api_clipboard_history(limit: int = 20):
+    return await _proxy_get(f"{CLIPBOARD_URL}/history", params={"limit": limit}, fallback={"entries": []})
+
+
+@app.delete("/api/clipboard/history")
+async def api_clipboard_clear():
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.delete(f"{CLIPBOARD_URL}/history")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"cleared": False}
+
+
+# ── File Watcher proxies ───────────────────────────────────────────────────────
+
+@app.get("/api/files/events")
+async def api_files_events(limit: int = 50, event_type: str = ""):
+    params: dict = {"limit": limit}
+    if event_type:
+        params["event_type"] = event_type
+    return await _proxy_get(f"{FILES_URL}/events", params=params, fallback={"events": []})
+
+
+@app.get("/api/files/watching")
+async def api_files_watching():
+    return await _proxy_get(f"{FILES_URL}/watching", fallback={"directories": []})
+
+
+@app.post("/api/files/watch")
+async def api_files_watch(request: Request):
+    body = await request.json()
+    return await _proxy_post(f"{FILES_URL}/watch", body=body, fallback={"ok": False})
+
+
+# ── Notify proxies ─────────────────────────────────────────────────────────────
+
+@app.post("/api/notify/send")
+async def api_notify_send(request: Request):
+    body = await request.json()
+    return await _proxy_post(f"{NOTIFY_URL}/notify", body=body, fallback={"ok": False})
+
+
+@app.get("/api/notify/pending")
+async def api_notify_pending(unread_only: bool = True):
+    return await _proxy_get(f"{NOTIFY_URL}/pending", params={"unread_only": unread_only},
+                            fallback={"notifications": []})
+
+
+@app.delete("/api/notify/pending/{notification_id}")
+async def api_notify_dismiss(notification_id: int):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.delete(f"{NOTIFY_URL}/pending/{notification_id}")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"cleared": False}
+
+
+@app.delete("/api/notify/pending")
+async def api_notify_dismiss_all():
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.delete(f"{NOTIFY_URL}/pending")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"cleared": False}
+
+
+# ── Browser search proxy ───────────────────────────────────────────────────────
+
+@app.post("/api/browser/search")
+async def api_browser_search(request: Request):
+    body = await request.json()
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(f"{BROWSER_AGENT_URL}/search", json=body)
+            resp.raise_for_status()
+            return resp.json()
+    except httpx.HTTPStatusError as exc:
+        status = exc.response.status_code
+        if 400 <= status < 500:
+            raise HTTPException(status_code=status, detail=f"Browser agent rejected request: {exc}")
+        raise HTTPException(status_code=502, detail=f"Browser agent error: {exc}")
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=503, detail=f"Browser agent unreachable: {exc}")
 
 
 if __name__ == "__main__":

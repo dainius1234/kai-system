@@ -7,6 +7,7 @@ Endpoints:
   POST /scrape      {}                              → {title, url, text, links}
   POST /screenshot  {}                              → image/png
   POST /run         {task, url?}                    → {result, title, url, steps}
+  POST /search      {query, max_results?}           → {query, results: [{title, url, snippet}]}
   GET  /health
   GET  /metrics
 """
@@ -222,6 +223,42 @@ async def run_task(req: RunRequest):
             }
         except Exception as exc:
             raise HTTPException(502, f"Task failed: {exc}")
+
+
+class SearchRequest(BaseModel):
+    query: str
+    max_results: int = 10
+
+
+@app.post("/search")
+async def search(req: SearchRequest):
+    """Search DuckDuckGo and return structured results."""
+    if not _PLAYWRIGHT_OK:
+        raise HTTPException(503, "playwright not available")
+    if not req.query.strip():
+        raise HTTPException(400, "query is required")
+    max_r = max(1, min(req.max_results, 30))
+    async with _lock:
+        page = await _get_page()
+        try:
+            ddg_url = f"https://html.duckduckgo.com/html/?q={req.query.replace(' ', '+')}"
+            await page.goto(ddg_url, timeout=NAV_TIMEOUT, wait_until="domcontentloaded")
+            results = await page.evaluate(f"""
+                Array.from(document.querySelectorAll('.result')).slice(0, {max_r}).map(r => {{
+                    const a = r.querySelector('.result__a');
+                    const snip = r.querySelector('.result__snippet');
+                    const url_el = r.querySelector('.result__url');
+                    return {{
+                        title: a ? a.innerText.trim() : '',
+                        url: a ? a.href : (url_el ? url_el.innerText.trim() : ''),
+                        snippet: snip ? snip.innerText.trim() : ''
+                    }};
+                }}).filter(r => r.title)
+            """)
+            logger.info("search '%s' → %d results", req.query, len(results))
+            return {"query": req.query, "results": results}
+        except Exception as exc:
+            raise HTTPException(502, f"Search failed: {exc}")
 
 
 if __name__ == "__main__":
