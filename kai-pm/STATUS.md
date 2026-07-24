@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-24
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** D90 Swarm Assembly shipped. CognitiveFSM pipeline now has real stage function implementations: Scout→GATHER, Sage→DEBATE+CONVICTION_GATE, Doctor→FACT_CHECK, Oracle→CAUSAL_CHECK. SwarmContext threads evidence/claims/verdicts/causal_chains across all stages. TeammateRep reputation tracking with weight = reliability×(avg_confidence/10). `resolve_conflict()` 5-signal hierarchy. `POST /chat/swarm` live endpoint. 38 new tests. Blocked on GPU (RTX 5080).
+- **Current focus:** D91 Obsidian Brain shipped. Bidirectional vault ↔ knowledge graph sync: file watcher with 2s debounce (watchdog), SHA256 checksum-based change detection, VaultMapper (filepath↔node-id, persists to .vault-sync/mapping.json), FastAPI vault-sync service (port 8047 / 172.20.0.36) with POST /ingest + POST /export (conviction ≥9.0 gate + path-traversal block) + GET /search + GET /mapping. Three new memu-core endpoints (POST /memory/vault/ingest, DELETE /memory/vault/{id}, GET /memory/vault/search). Agentic vault export proxy + FF_VAULT_CONTEXT world-context injection. FF_VAULT_SYNC (default True) + FF_VAULT_CONTEXT (default False). 4 Jinja2 templates (daily-note, lesson-learned, kai-inbox, soul-mirror). ~45 tests. Services 59→60.
 
 ## What's landed on main
 
@@ -42,6 +42,7 @@
 | D88 | D88 | Advanced Cognition: M1 rolling baselines + 2σ anomaly detection; M2 `/introspect/capabilities`; M3 cross-sensor correlation; M4 world_state persistence; M5 sensory pattern learning; M6 skill-hunter service (8045, .34); M7 proactive scheduling; M8 reactive skill acquisition. 5 new flags. 44 tests. Services 57→58 |
 | D89 | D89 | Cognitive Depth: system FSM (IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING); cognitive reasoning FSM (GATHER→DEBATE→FACT_CHECK→CAUSAL_CHECK→CONVICTION_GATE→PRESENT, HALT/ESCALATE, per-swarm configs); persistent teammates (Scout/Doctor/Sage/Oracle via `/chat/teammate/{name}`); house-doctor service (port 8046, 9 diagnostic rules); skill provenance + probationary period (YAML front-matter + `.meta.json` sidecars, auto-disable at ≥3 errors); capability gap logging (GAP_HUNT_THRESHOLD=3); world model provenance layer (`{value, source, timestamp, confidence}`); emergent ritual discovery (≥7/10 cycles → RITUALS.md); GPU-era foundations: counterfactual (stub_pending_gpu), trust negotiation (`/gate/autonomy/request`), predictive empathy (`emotional_context` world key), resource-aware curiosity (idle tick, CURIOSITY.md). 8 new flags. 47 tests. Services 58→59 |
 | D90 | D90 | Swarm Assembly: `agentic/swarm.py` (SwarmContext, TeammateRep, reputation load/save, `resolve_conflict()` 5-signal hierarchy); `agentic/swarm_stages.py` (5 stage function factories: make_gather/debate/fact_check/causal_check/conviction_gate_stage + build_swarm_pipeline); `POST /chat/swarm` live endpoint; `GET /swarm/reputation`; `FF_SWARM` flag (default True); `data/teammate_reputation.json`. 38 tests. |
+| D91 | D91 | Obsidian Brain: `vault-sync/` service (port 8047, 172.20.0.36) — parser (NoteData, SHA256 checksum), mapper (filepath↔node-id, .vault-sync/mapping.json), watcher (watchdog + 2s debounce), FastAPI app (POST /ingest, POST /export conviction gate, GET /search, GET /mapping). 3 memu-core vault endpoints. Agentic vault proxy + FF_VAULT_CONTEXT. FF_VAULT_SYNC (True) + FF_VAULT_CONTEXT (False). 4 Jinja2 templates. Dockerfile + compose wiring (172.20.0.36, vault_data volume). ~45 tests. Services 59→60. |
 
 ## Open PRs
 
@@ -65,5 +66,5 @@ Unlock condition: RTX 5080 procurement + provisioning + validation.
 ## Source of truth pointers
 
 - Resume layer: [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md)
-- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D90)
+- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D91)
 - Latest reality check: [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)

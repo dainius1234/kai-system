@@ -1733,3 +1733,67 @@ Five factory functions, each taking injected dependencies (no circular imports) 
 - `FF_SWARM=false` skips the endpoint entirely for operators who want the lighter `/chat` path.
 - Reputation state is ephemeral until `/data/` is mounted. In docker-compose setups the data volume already persists this directory.
 - Each swarm run calls `_get_relevant_memories` twice (gather + fact_check). This is intentional — fact_check retrieves fresh supporting evidence for verification, not the same recall as gather.
+
+---
+
+## D91 — Obsidian Brain: Bidirectional Vault ↔ Knowledge Graph Sync
+
+**Date:** 2026-07-24
+
+**Decision — D91/S1 — Vault File Parser (`vault-sync/parser.py`):**
+`NoteData` dataclass with `filepath, title, frontmatter, content, wikilinks, tags, modified_at, checksum`. `parse_note(filepath)` uses `python-frontmatter` for YAML block extraction (graceful no-op if library absent), regex `\[\[([^\]]+)\]\]` for wikilinks (handles `[[target|alias]]` form), `#([\w/]+)` for tags. Title from `frontmatter.title` or filename stem. Checksum = SHA256 of raw file bytes — used for change detection to avoid redundant graph updates.
+
+**Decision — D91/S2 — Bidirectional Filepath ↔ Node ID Mapper (`vault-sync/mapper.py`):**
+`VaultMapper` persists to `{vault_path}/.vault-sync/mapping.json`. Thread-safe via `threading.Lock`. Schema: `{version: 1, entries: {filepath: {note_node_id, concept_ids, last_synced_checksum, last_synced_at}}}`. API: `get_by_filepath`, `get_by_node_id`, `upsert`, `remove`, `all_entries`, `__len__`. `get_by_node_id` is O(n) linear scan — acceptable because vault size is bounded (thousands, not millions).
+
+**Decision — D91/S3 — File Watcher with Debounce (`vault-sync/watcher.py`):**
+`_VaultHandler` wraps watchdog events with 2-second debounce per filepath using `threading.Timer`. Ignores: hidden files/dirs (any path component starting with `.`), non-`.md` files. `FileWatcher` bridges to `watchdog.observers.Observer` via `_Bridge` inner class; gracefully degrades to a logged warning if watchdog is not installed. Debounce deduplicates rapid editor saves (Obsidian writes multiple events per save).
+
+**Decision — D91/S4 — Vault-Sync Service (`vault-sync/app.py`):**
+FastAPI service on port 8047 / 172.20.0.36.
+- `GET /health` — watcher running status, mapped note count, queue depth.
+- `POST /ingest` — manually trigger or test ingest for a specific filepath. Skips if checksum unchanged (unless `force=true`). Calls `POST /memory/vault/ingest` on memu-core.
+- `POST /export` — Kai writes a note into the vault. Conviction gate: `conviction ≥ VAULT_WRITE_CONVICTION_THRESHOLD` (default 9.0) enforced; path traversal blocked via `resolve().relative_to()`. Immediately re-ingests the exported note so the graph reflects it.
+- `GET /search` — proxies `GET /memory/vault/search` on memu-core.
+- `GET /mapping` — diagnostic dump of all known filepath↔node mappings.
+- Background queue workers process watcher events asynchronously — one asyncio Task each for ingest and delete queues.
+- `VAULT_WRITE_CONVICTION_THRESHOLD` env var allows per-deployment tuning.
+
+**Decision — D91/S5 — Memu-Core Vault Endpoints (`memu-core/app.py`):**
+Three new endpoints appended:
+- `POST /memory/vault/ingest` — stores note as `MemoryRecord(event_type="vault_note", category="vault")` via `store.insert()`, generates embedding for semantic search. Maintains `_vault_notes` in-memory index for fast filepath→node lookups. Returns `{note_node_id, concept_ids}`.
+- `DELETE /memory/vault/{note_node_id}` — removes from `_vault_notes` and calls `store.delete_record()`. 
+- `GET /memory/vault/search` — hybrid keyword search over `_vault_notes` dict: title match (+2), content match (+1), tag match (+1), sorted by score. Accepts `folder_filter` for path-prefix scoping.
+
+**Decision — D91/S6 — Agentic Proxy + FF_VAULT_CONTEXT (`agentic/app.py`):**
+- `VAULT_SYNC_URL` env var (default `http://vault-sync:8047`).
+- `POST /vault/export` — proxy to vault-sync with FF_VAULT_SYNC gate. Conviction gate enforced inside vault-sync.
+- `GET /vault/search` — proxy to vault-sync search.
+- `FF_VAULT_CONTEXT=true` injects a vault memory snippet into `_get_world_context()` — one `GET /search?query=recent&limit=1` call with 2s timeout, silently skipped on failure.
+
+**Decision — D91/S7 — Feature Flags:**
+- `FF_VAULT_SYNC` (default True) — master toggle for vault-sync service integration.
+- `FF_VAULT_CONTEXT` (default False) — gated separately because it adds latency to every `/chat` call. Enable explicitly once the vault has enough notes to be useful as context.
+
+**Decision — D91/S8 — Jinja2 Templates:**
+Four note templates in `vault-sync/templates/`: `daily-note.md`, `lesson-learned.md`, `kai-inbox.md`, `soul-mirror.md`. Used by callers via `jinja2.Environment(loader=FileSystemLoader("templates"))` — the templates are not rendered by vault-sync itself; they are available for the agentic layer or external tooling to hydrate and then `POST /export`.
+
+**Decision — D91/S9 — Docker and Compose:**
+- `vault-sync/Dockerfile` — `python:3.11-slim`, deps: fastapi, uvicorn, httpx, watchdog, python-frontmatter, Jinja2, pydantic.
+- `docker-compose.minimal.yml`: vault-sync at 172.20.0.36:8047, `vault_data:/vault` volume, `depends_on: memu-core`. `soul_data` and `vault_data` named volumes added to top-level `volumes:` block.
+- `agentic` service gets `VAULT_SYNC_URL: http://vault-sync:8047` env var.
+
+**Tests:** ~45 tests in `scripts/test_d91_vault_sync.py`:
+- Parser: plain note, frontmatter title, wikilink alias, multiple tags, checksum consistency, checksum changes on edit, missing file, modified_at type.
+- Mapper: upsert+get, get_by_node_id, remove, len, persistence across reload, all_entries, mapping file JSON schema.
+- Watcher: hidden file filter, non-md filter, md acceptance, debounce dedup, on_deleted callback, on_moved triggers both callbacks, directory events ignored.
+- App: health OK, export conviction too low → 403, path traversal → 400, export writes file, FF off → 503, ingest skipped on unchanged checksum.
+- Memu-core: ingest returns node_id, search finds ingested note, delete removes note, folder_filter scoping, idempotent ingest.
+- Feature flags: VAULT_SYNC exists+enabled, VAULT_CONTEXT exists+disabled, env override both directions.
+
+**Rationale:** Obsidian as a human-readable "second brain" interface — notes flow both ways: human edits propagate to the knowledge graph (watcher→ingest), Kai's reasoning pushes lessons back as readable notes (export). The conviction gate (9.0/10) on `POST /export` implements the trust ladder principle: Kai earns the right to write autonomously by demonstrating high-confidence reasoning. Folder scoping (`folder_filter`) and trust ladder stages (Phase 1: Inbox/ only, Phase 2: Daily/+KAI/, Phase 3: autonomous) can be enforced by the caller.
+
+**Consequences:**
+- `POST /ingest` and the background watcher share the same `_ingest_note` coroutine — one code path for both trigger types.
+- `_vault_notes` in memu-core is in-memory only; it resets on service restart. The persistent truth is the vault files themselves + the mapping.json. A cold-start full-sync is achieved by calling `POST /ingest` for every .md file.
+- `obsidian-local-rest-api` plugin is the optional bridge for remote vaults (vault on a different machine than the server). vault-sync's watcher only works when the vault is locally mounted.

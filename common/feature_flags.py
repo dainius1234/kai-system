@@ -71,6 +71,9 @@ _REGISTRY: Dict[str, tuple] = {
     "CURIOSITY":             ("D89/F: resource-aware curiosity idle tick; no-ops in CPU phase; activates on GPU + IDLE state", True),
     # D90: Swarm Assembly — full CognitiveFSM pipeline with real stage functions
     "SWARM":                 ("D90: CognitiveFSM swarm pipeline — Scout/Sage/Doctor/Oracle stage functions, shared SwarmContext, reputation tracking, conflict resolution", True),
+    # D91: Obsidian Brain — bidirectional vault ↔ memu-core sync
+    "VAULT_SYNC":            ("D91: vault-sync service enabled — file watcher, ingest, export, mapper", True),
+    "VAULT_CONTEXT":         ("D91: inject vault memory snippet into world-context gather (gated separately because it adds latency)", False),
 }
 
 

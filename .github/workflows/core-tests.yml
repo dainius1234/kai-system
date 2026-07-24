@@ -144,6 +144,9 @@ jobs:
       - name: Swarm assembly tests (D90 — SwarmContext, reputation, conflict resolution, 5 stage functions)
         run: make test-d90-swarm
 
+      - name: Vault-sync tests (D91 — parser, mapper, watcher, app endpoints, memu-core vault API, feature flags)
+        run: make test-d91-vault-sync
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors

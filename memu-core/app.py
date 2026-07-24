@@ -7950,6 +7950,111 @@ async def operator_model_summary() -> Dict[str, Any]:
     }
 
 
+# ── D91 Vault-sync endpoints ──────────────────────────────────────────────────
+
+_vault_notes: dict = {}  # filepath → {note_node_id, title, content, tags, wikilinks, checksum, synced_at}
+
+
+class VaultIngestRequest(BaseModel):
+    filepath: str
+    title: str
+    content: str
+    frontmatter: dict = {}
+    wikilinks: list = []
+    tags: list = []
+    checksum: str = ""
+    modified_at: float = 0.0
+
+
+@app.post("/memory/vault/ingest")
+async def vault_ingest(req: VaultIngestRequest):
+    """Ingest an Obsidian note into the knowledge graph."""
+    import uuid
+    note_node_id = _vault_notes.get(req.filepath, {}).get("note_node_id") or f"cognee:note:{uuid.uuid4().hex[:12]}"
+
+    # Store as a memory record so semantic search can find it
+    memory_text = f"Vault note '{req.title}':\n{req.content[:2000]}"
+    tags_str = " ".join(req.tags) if req.tags else ""
+    if tags_str:
+        memory_text += f"\nTags: {tags_str}"
+
+    record = MemoryRecord(
+        id=note_node_id,
+        timestamp=datetime.now(timezone.utc).isoformat(),
+        event_type="vault_note",
+        category="vault",
+        content={
+            "result": memory_text,
+            "filepath": req.filepath,
+            "title": req.title,
+            "tags": req.tags,
+            "checksum": req.checksum,
+        },
+        embedding=generate_embedding(memory_text),
+        relevance=0.8,
+        importance=0.5,
+        access_count=0,
+        last_accessed=None,
+        pinned=False,
+    )
+    store.insert(record)
+
+    concept_ids = [f"cognee:concept:{t.replace('/', '-')}" for t in req.tags]
+
+    _vault_notes[req.filepath] = {
+        "note_node_id": note_node_id,
+        "title": req.title,
+        "content": req.content,
+        "tags": req.tags,
+        "wikilinks": req.wikilinks,
+        "checksum": req.checksum,
+        "synced_at": datetime.now(timezone.utc).isoformat(),
+    }
+    return {"note_node_id": note_node_id, "concept_ids": concept_ids}
+
+
+@app.delete("/memory/vault/{note_node_id}")
+async def vault_delete(note_node_id: str):
+    """Remove a vault note from the knowledge graph by its node ID."""
+    to_remove = [fp for fp, v in _vault_notes.items() if v.get("note_node_id") == note_node_id]
+    for fp in to_remove:
+        del _vault_notes[fp]
+    try:
+        store.delete_record(note_node_id)
+    except Exception:
+        pass
+    return {"status": "ok", "removed": len(to_remove)}
+
+
+@app.get("/memory/vault/search")
+async def vault_search(query: str, limit: int = 10, folder_filter: str = ""):
+    """Hybrid keyword search over vault notes."""
+    q_lower = query.lower()
+    results = []
+    for fp, v in _vault_notes.items():
+        if folder_filter and not fp.startswith(folder_filter):
+            continue
+        score = 0
+        if q_lower in v.get("title", "").lower():
+            score += 2
+        if q_lower in v.get("content", "").lower():
+            score += 1
+        for tag in v.get("tags", []):
+            if q_lower in tag.lower():
+                score += 1
+        if score > 0:
+            results.append({
+                "filepath": fp,
+                "title": v.get("title"),
+                "note_node_id": v.get("note_node_id"),
+                "tags": v.get("tags", []),
+                "score": score,
+                "synced_at": v.get("synced_at"),
+            })
+    results.sort(key=lambda x: x["score"], reverse=True)
+    return {"results": results[:limit], "total": len(results)}
+
+
 if __name__ == "__main__":
     import uvicorn
 
