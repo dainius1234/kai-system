@@ -73,6 +73,10 @@
           <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           <span class="nav-label">Finance</span>
         </a>
+        <a class="nav-item" data-view="memgraph" onclick="switchView('memgraph')">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><line x1="12" y1="8" x2="5" y2="16"/><line x1="12" y1="8" x2="19" y2="16"/></svg>
+          <span class="nav-label">Mem Graph</span>
+        </a>
       </nav>
 
       <div class="sidebar-divider"></div>
@@ -951,6 +955,41 @@
           </div>
         </section>
 
+        <!-- ═══ Memory Graph View ═══ -->
+        <section class="view" id="memgraphView">
+          <div style="max-width:1400px;margin:0 auto;padding:var(--sp-6);">
+            <h2 class="text-heading" style="margin-bottom:var(--sp-4);">Memory Graph</h2>
+
+            <!-- Controls -->
+            <div style="display:flex;gap:var(--sp-2);margin-bottom:var(--sp-4);flex-wrap:wrap;align-items:center;">
+              <input id="mgQuery" type="text" placeholder="Filter by topic…"
+                style="flex:1;min-width:160px;max-width:320px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text1);font-size:13px;"
+                onkeydown="if(event.key==='Enter') refreshMemoryGraph()">
+              <select id="mgCatFilter"
+                style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text1);font-size:13px;"
+                onchange="_mgApplyFilter()">
+                <option value="">All categories</option>
+              </select>
+              <button class="refresh-btn" onclick="refreshMemoryGraph()">↻ Refresh</button>
+              <span id="mgCount" style="font-size:12px;color:var(--text3);margin-left:auto;"></span>
+            </div>
+
+            <!-- D3 mount -->
+            <div class="card" style="padding:0;overflow:hidden;position:relative;">
+              <div id="memgraphD3" style="width:100%;min-height:600px;background:var(--bg2);display:block;overflow:hidden;"></div>
+              <div id="memgraphStatus" style="position:absolute;bottom:8px;right:12px;font-size:11px;color:var(--text3);pointer-events:none;"></div>
+            </div>
+
+            <!-- Node detail -->
+            <div id="memgraphDetail" class="card" style="display:none;margin-top:var(--sp-4);"></div>
+
+            <!-- Legend -->
+            <div style="display:flex;gap:var(--sp-3);margin-top:var(--sp-3);font-size:12px;color:var(--text3);flex-wrap:wrap;">
+              <span id="memgraphLegend"></span>
+            </div>
+          </div>
+        </section>
+
       </div><!-- .content -->
     </main>
   </div><!-- .app -->
@@ -1085,7 +1124,7 @@ function switchView(name) {
   const navEl = document.querySelector(`.nav-item[data-view="${name}"]`);
   if (navEl) navEl.classList.add('active');
 
-  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard', canvas: 'Live Canvas', diary: 'Memory Diary', finance: 'CIS Finance' };
+  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard', canvas: 'Live Canvas', diary: 'Memory Diary', finance: 'CIS Finance', memgraph: 'Memory Graph' };
   document.getElementById('viewTitle').textContent = titles[name] || name;
 
   currentView = name;
@@ -1123,6 +1162,9 @@ function switchView(name) {
   }
   if (name === 'finance') {
     refreshFinance();
+  }
+  if (name === 'memgraph') {
+    refreshMemoryGraph();
   }
 }
 
@@ -1716,46 +1758,121 @@ function autoResize(el) {
   el.style.height = Math.min(el.scrollHeight, 200) + 'px';
 }
 
-// Voice input
+// Voice input — WebSpeech API with MediaRecorder/Whisper fallback
 let voiceRecognition = null;
+let _mrRecorder = null;   // MediaRecorder instance (fallback path)
+let _mrChunks  = [];      // accumulated audio chunks
 
+function _voiceBtnActive(on) {
+  document.getElementById('voiceBtn').style.color = on ? 'var(--danger)' : '';
+}
+
+// ── MediaRecorder → Whisper path ────────────────────────────────────
+async function _stopMediaRecorder() {
+  if (!_mrRecorder) return;
+  _mrRecorder.stop();
+  // onStop handler sends the blob; clear immediately so toggleVoice() knows we're idle
+}
+
+async function _startMediaRecorder() {
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    showToast('Voice', 'Microphone access denied', 'warning');
+    return;
+  }
+
+  // Prefer formats the server (ffmpeg) can decode; fall back gracefully
+  const mimeType = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/ogg', '']
+    .find(m => !m || MediaRecorder.isTypeSupported(m)) || '';
+
+  _mrChunks = [];
+  _mrRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+
+  _mrRecorder.ondataavailable = e => { if (e.data.size > 0) _mrChunks.push(e.data); };
+
+  _mrRecorder.onstop = async () => {
+    stream.getTracks().forEach(t => t.stop());
+    _voiceBtnActive(false);
+    setOrbState('thinking');
+
+    const blob = new Blob(_mrChunks, { type: _mrRecorder.mimeType || 'audio/webm' });
+    _mrRecorder = null;
+    _mrChunks = [];
+
+    const ext = (blob.type.includes('ogg') ? 'ogg' : 'webm');
+    const fd = new FormData();
+    fd.append('file', blob, `audio.${ext}`);
+
+    try {
+      const resp = await fetch('/api/audio/transcribe', { method: 'POST', body: fd });
+      if (!resp.ok) throw new Error(`${resp.status}`);
+      const data = await resp.json();
+      const transcript = data.transcript || data.text || '';
+      if (transcript) {
+        document.getElementById('chatInput').value = transcript;
+        autoResize(document.getElementById('chatInput'));
+        sendMessage();
+      } else {
+        showToast('Voice', 'No speech detected', 'warning');
+      }
+    } catch (err) {
+      showToast('Voice', `Transcription failed: ${err.message}`, 'error');
+    }
+    setOrbState('idle');
+  };
+
+  _mrRecorder.start();
+  _voiceBtnActive(true);
+  setOrbState('listening');
+}
+
+// ── Main toggle — WebSpeech preferred, MediaRecorder fallback ────────
 function toggleVoice() {
+  // Stop MediaRecorder path if active
+  if (_mrRecorder) {
+    if (_mrRecorder.state !== 'inactive') _mrRecorder.stop();
+    else { _mrRecorder = null; _voiceBtnActive(false); setOrbState('idle'); }
+    return;
+  }
+
+  // Stop WebSpeech path if active
   if (voiceRecognition) {
     voiceRecognition.stop();
     voiceRecognition = null;
-    document.getElementById('voiceBtn').style.color = '';
+    _voiceBtnActive(false);
     setOrbState('idle');
     return;
   }
+
+  // Start WebSpeech if available
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { showToast('Voice', 'Speech recognition not supported', 'warning'); return; }
+  if (SR) {
+    voiceRecognition = new SR();
+    voiceRecognition.lang = 'en-GB';
+    voiceRecognition.continuous = false;
+    voiceRecognition.interimResults = false;
 
-  voiceRecognition = new SR();
-  voiceRecognition.lang = 'en-GB';
-  voiceRecognition.continuous = false;
-  voiceRecognition.interimResults = false;
+    voiceRecognition.onstart = () => { _voiceBtnActive(true); setOrbState('listening'); };
+    voiceRecognition.onresult = e => {
+      const transcript = e.results[0][0].transcript;
+      document.getElementById('chatInput').value = transcript;
+      sendMessage();
+    };
+    voiceRecognition.onend = () => { voiceRecognition = null; _voiceBtnActive(false); setOrbState('idle'); };
+    voiceRecognition.onerror = () => { voiceRecognition = null; _voiceBtnActive(false); setOrbState('idle'); };
 
-  voiceRecognition.onstart = function() {
-    document.getElementById('voiceBtn').style.color = 'var(--danger)';
-    setOrbState('listening');
-  };
-  voiceRecognition.onresult = function(e) {
-    const transcript = e.results[0][0].transcript;
-    document.getElementById('chatInput').value = transcript;
-    sendMessage();
-  };
-  voiceRecognition.onend = function() {
-    document.getElementById('voiceBtn').style.color = '';
-    voiceRecognition = null;
-    setOrbState('idle');
-  };
-  voiceRecognition.onerror = function() {
-    voiceRecognition = null;
-    document.getElementById('voiceBtn').style.color = '';
-    setOrbState('idle');
-  };
+    voiceRecognition.start();
+    return;
+  }
 
-  voiceRecognition.start();
+  // Fallback: MediaRecorder → server Whisper
+  if (!navigator.mediaDevices || !window.MediaRecorder) {
+    showToast('Voice', 'Audio recording not supported in this browser', 'warning');
+    return;
+  }
+  _startMediaRecorder();
 }
 
 function attachFile() {
@@ -4265,6 +4382,268 @@ function _diaryExpand(textId, fullText, btn) {
   if (!el) return;
   el.textContent = fullText;
   btn.remove();
+}
+
+// ── J2: Memory Graph (D3 v7 force-directed) ─────────────────────────
+
+let _mgSim  = null;   // running force simulation — stopped on teardown
+let _mgData = null;   // last fetched {nodes, links, categories}
+let _mgActiveFilter = '';  // category filter ('') = all
+
+// Colour palette for category hub nodes (cycles if > 10 categories)
+const _MG_CAT_COLORS = [
+  '#00e5ff','#7c4dff','#69f0ae','#ff6d00','#ea80fc',
+  '#40c4ff','#ccff90','#ff80ab','#ffd740','#80d8ff',
+];
+
+const _MG_TRUST_COLOR = {
+  'PASS':       '#4caf50',
+  'REPAIR':     '#ffb74d',
+  'FAIL_CLOSED':'#ef5350',
+  'unverified': 'rgba(120,120,220,0.85)',
+};
+
+function _mgTrustColor(tier) {
+  return _MG_TRUST_COLOR[tier] || _MG_TRUST_COLOR['unverified'];
+}
+
+// Map category name → stable color index
+const _mgCatColorMap = {};
+let _mgCatColorIdx = 0;
+function _mgCatColor(cat) {
+  if (!_mgCatColorMap[cat]) {
+    _mgCatColorMap[cat] = _MG_CAT_COLORS[_mgCatColorIdx % _MG_CAT_COLORS.length];
+    _mgCatColorIdx++;
+  }
+  return _mgCatColorMap[cat];
+}
+
+async function refreshMemoryGraph() {
+  const status = document.getElementById('memgraphStatus');
+  const countEl = document.getElementById('mgCount');
+  if (status) status.textContent = 'Loading…';
+
+  const q = (document.getElementById('mgQuery') || {}).value || 'memories experiences observations';
+  try {
+    const data = await fetch(`/api/memory/graph-data?top_k=80&query=${encodeURIComponent(q)}`)
+      .then(r => r.json());
+    _mgData = data;
+
+    // Populate category filter dropdown
+    const sel = document.getElementById('mgCatFilter');
+    if (sel) {
+      const prev = sel.value;
+      sel.innerHTML = '<option value="">All categories</option>';
+      (data.categories || []).forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat + ' (' + (data.nodes.find(n => n.id === 'cat:' + cat) || {}).count + ')';
+        if (cat === prev) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      _mgActiveFilter = sel.value;
+    }
+
+    if (countEl) countEl.textContent = data.count + ' memories · ' + (data.categories || []).length + ' categories';
+    _drawMemoryGraph(data);
+    if (status) status.textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch (e) {
+    if (status) status.textContent = 'Error: ' + e.message;
+  }
+}
+
+function _mgApplyFilter() {
+  const sel = document.getElementById('mgCatFilter');
+  _mgActiveFilter = sel ? sel.value : '';
+  if (_mgData) _drawMemoryGraph(_mgData);
+}
+
+function _drawMemoryGraph(data) {
+  // Teardown previous simulation
+  if (_mgSim) { _mgSim.stop(); _mgSim = null; }
+  const container = document.getElementById('memgraphD3');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const W = container.clientWidth || 960;
+  const H = 620;
+
+  // Filter nodes/links by active category
+  const filter = _mgActiveFilter;
+  let nodes, links;
+  if (filter) {
+    const catId = 'cat:' + filter;
+    nodes = data.nodes.filter(n => n.id === catId || n.category === filter);
+    links = data.links.filter(l => l.target === catId || l.source === catId ||
+                                   (l.source && l.source.id === catId) ||
+                                   (l.target && l.target.id === catId));
+  } else {
+    nodes = data.nodes.slice();
+    links = data.links.slice();
+  }
+
+  if (!nodes.length) {
+    const msg = document.createElement('div');
+    msg.style.cssText = 'padding:60px;text-align:center;color:var(--text3);font-size:15px;';
+    msg.textContent = 'No memories found. Chat with Kai to build up memory.';
+    container.appendChild(msg);
+    return;
+  }
+
+  // Deep-copy nodes/links so D3 can mutate x/y
+  const simNodes = nodes.map(n => Object.assign({}, n));
+  const nodeById = new Map(simNodes.map(n => [n.id, n]));
+  const simLinks = links
+    .map(l => ({ source: typeof l.source === 'string' ? l.source : l.source.id,
+                  target: typeof l.target === 'string' ? l.target : l.target.id }))
+    .filter(l => nodeById.has(l.source) && nodeById.has(l.target));
+
+  // SVG
+  const svg = d3.select(container).append('svg')
+    .attr('width', W).attr('height', H)
+    .style('background', 'var(--bg2)');
+
+  // Arrow marker
+  svg.append('defs').append('marker')
+    .attr('id', 'mg-arrow').attr('markerWidth', 5).attr('markerHeight', 5)
+    .attr('refX', 14).attr('refY', 2.5).attr('orient', 'auto')
+    .append('path').attr('d', 'M0,0 L0,5 L5,2.5 z')
+    .attr('fill', 'rgba(0,229,255,0.3)');
+
+  const g = svg.append('g');
+  svg.call(d3.zoom().scaleExtent([0.2, 4]).on('zoom', e => g.attr('transform', e.transform)));
+
+  // Links
+  const linkEl = g.append('g').attr('class', 'mg-links')
+    .selectAll('line').data(simLinks).join('line')
+    .attr('stroke', 'rgba(0,229,255,0.18)')
+    .attr('stroke-width', 1.2)
+    .attr('marker-end', 'url(#mg-arrow)');
+
+  // Node radius
+  const nodeR = d => {
+    if (d.type === 'category') return Math.max(22, Math.min(40, 18 + d.count * 1.8));
+    return Math.max(5, Math.min(16, 5 + (d.importance || 0.5) * 11));
+  };
+
+  // Node groups
+  const nodeEl = g.append('g').attr('class', 'mg-nodes')
+    .selectAll('g').data(simNodes).join('g')
+    .style('cursor', 'pointer')
+    .call(d3.drag()
+      .on('start', (ev, d) => { if (!ev.active) _mgSim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag',  (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
+      .on('end',   (ev, d) => { if (!ev.active) _mgSim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+  // Circles
+  nodeEl.append('circle')
+    .attr('r', nodeR)
+    .attr('fill', d => d.type === 'category' ? _mgCatColor(d.label) : _mgTrustColor(d.trust_tier))
+    .attr('fill-opacity', d => d.type === 'category' ? 0.9 : 0.75)
+    .attr('stroke', d => d.pinned ? '#ffd740' : (d.type === 'category' ? '#fff4' : '#fff2'))
+    .attr('stroke-width', d => d.pinned ? 2.5 : 1);
+
+  // Category labels (always visible)
+  nodeEl.filter(d => d.type === 'category').append('text')
+    .text(d => d.label)
+    .attr('text-anchor', 'middle').attr('dy', '0.35em')
+    .attr('font-size', 10).attr('font-weight', '600').attr('fill', '#000')
+    .attr('pointer-events', 'none');
+
+  // Memory event_type label (visible at larger radii)
+  nodeEl.filter(d => d.type === 'memory' && (d.importance || 0.5) > 0.65).append('text')
+    .text(d => (d.label || '').replace(/_/g, ' ').substring(0, 14))
+    .attr('text-anchor', 'middle').attr('dy', d => nodeR(d) + 10)
+    .attr('font-size', 8).attr('fill', 'var(--text3)')
+    .attr('pointer-events', 'none');
+
+  // Tooltip (floating)
+  const tip = d3.select(container).append('div')
+    .style('position','absolute').style('pointer-events','none')
+    .style('background','var(--bg3,#1e1e2e)').style('border','1px solid var(--border)')
+    .style('border-radius','6px').style('padding','8px 12px')
+    .style('font-size','12px').style('color','var(--text1)')
+    .style('max-width','260px').style('box-shadow','0 4px 16px #0006')
+    .style('display','none').style('z-index','10').style('line-height','1.5');
+
+  nodeEl
+    .on('mouseover', function(ev, d) {
+      const lines = d.type === 'category'
+        ? [`<b>${d.label}</b>`, `${d.count} memories`]
+        : [
+            `<b>${(d.label||'').replace(/_/g,' ')}</b>`,
+            `Cat: ${d.category}`,
+            `Trust: <span style="color:${_mgTrustColor(d.trust_tier)}">${d.trust_tier}</span>`,
+            `Importance: ${Math.round((d.importance||0.5)*100)}%`,
+            d.pinned ? '📌 Pinned' : '',
+            d.snippet ? `<i style="color:var(--text3)">${DOMPurify.sanitize(d.snippet.substring(0,80))}</i>` : '',
+          ].filter(Boolean);
+      tip.html(lines.join('<br>')).style('display','block');
+    })
+    .on('mousemove', ev => {
+      const box = container.getBoundingClientRect();
+      let x = ev.clientX - box.left + 12;
+      let y = ev.clientY - box.top - 8;
+      if (x + 270 > W) x = ev.clientX - box.left - 274;
+      tip.style('left', x + 'px').style('top', y + 'px');
+    })
+    .on('mouseleave', () => tip.style('display','none'))
+    .on('click', (ev, d) => _mgShowDetail(d));
+
+  // Accessible title
+  nodeEl.append('title').text(d => d.type === 'category'
+    ? `${d.label} (${d.count} memories)`
+    : `${d.label} · ${d.category} · ${d.trust_tier}`);
+
+  // Force simulation
+  _mgSim = d3.forceSimulation(simNodes)
+    .force('link', d3.forceLink(simLinks).id(d => d.id)
+      .distance(d => {
+        const tgt = typeof d.target === 'object' ? d.target : nodeById.get(d.target);
+        return tgt && tgt.type === 'category' ? 100 : 60;
+      }).strength(0.7))
+    .force('charge', d3.forceManyBody().strength(d => d.type === 'category' ? -350 : -60))
+    .force('center', d3.forceCenter(W / 2, H / 2))
+    .force('collide', d3.forceCollide(d => nodeR(d) + 5))
+    .on('tick', () => {
+      linkEl
+        .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+      nodeEl.attr('transform', d => `translate(${d.x},${d.y})`);
+    });
+
+  // Legend
+  const leg = document.getElementById('memgraphLegend');
+  if (leg) {
+    const trustLeg = Object.entries(_MG_TRUST_COLOR)
+      .map(([t, c]) => `<span style="color:${c}">● ${t}</span>`)
+      .join(' &nbsp; ');
+    leg.innerHTML = trustLeg +
+      ' &nbsp;&nbsp; <span style="color:#ffd740">● pinned</span>' +
+      ' &nbsp;&nbsp; <small style="color:var(--text3)">Larger node = higher importance · Drag · Scroll to zoom · Click for detail</small>';
+  }
+}
+
+function _mgShowDetail(d) {
+  const panel = document.getElementById('memgraphDetail');
+  if (!panel) return;
+  if (d.type === 'category') {
+    panel.innerHTML = `<div class="card-title">Category: ${DOMPurify.sanitize(d.label)}</div>
+      <div style="color:var(--text2)">${d.count} memories in this category.</div>`;
+  } else {
+    const ts = d.timestamp ? new Date(d.timestamp).toLocaleString() : '—';
+    const imp = Math.round((d.importance || 0.5) * 100);
+    panel.innerHTML = `
+      <div class="card-title" style="display:flex;gap:var(--sp-3);align-items:center;">
+        <span>${DOMPurify.sanitize((d.label||'').replace(/_/g,' '))}</span>
+        <span style="font-size:11px;font-weight:400;color:${_mgTrustColor(d.trust_tier)}">${d.trust_tier}</span>
+        ${d.pinned ? '<span style="color:#ffd740">📌</span>' : ''}
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">${ts} · ${DOMPurify.sanitize(d.category)} · importance ${imp}% · recalled ${d.access_count}×</div>
+      ${d.snippet ? `<div style="color:var(--text2);font-size:13px;line-height:1.6;">${DOMPurify.sanitize(d.snippet)}</div>` : ''}
+    `;
+  }
+  panel.style.display = 'block';
 }
 
 </script>

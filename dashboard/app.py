@@ -662,6 +662,59 @@ async def api_memories_recent(top_k: int = 30):
     return {"records": records, "count": len(records)}
 
 
+@app.get("/api/memory/graph-data")
+async def api_memory_graph_data(top_k: int = 80, query: str = "memories experiences observations"):
+    """Return recent memories formatted as {nodes, links} for the D3 force-graph tab."""
+    raw = await _proxy_get(
+        f"{MEMU_URL}/memory/retrieve",
+        params={"query": query, "user_id": "keeper", "top_k": top_k},
+        fallback=[],
+    )
+    records = raw if isinstance(raw, list) else raw.get("records", raw.get("memories", []))
+    if not isinstance(records, list):
+        records = []
+
+    cat_counts: dict = {}
+    mem_nodes = []
+    links = []
+
+    for r in records:
+        cat = (r.get("category") or "general").lower().strip()
+        cat_counts[cat] = cat_counts.get(cat, 0) + 1
+
+        mem_id = f"mem:{r.get('id', str(id(r)))}"
+        content = r.get("content") or {}
+        if isinstance(content, dict):
+            snippet = content.get("text", content.get("result_raw", r.get("event_type", "")))
+        else:
+            snippet = str(content)
+
+        mem_nodes.append({
+            "id": mem_id,
+            "type": "memory",
+            "label": r.get("event_type", "memory"),
+            "snippet": str(snippet)[:100],
+            "category": cat,
+            "trust_tier": r.get("trust_tier", "unverified"),
+            "importance": float(r.get("importance") or r.get("relevance") or 0.5),
+            "timestamp": r.get("timestamp", ""),
+            "pinned": bool(r.get("pinned", False)),
+            "access_count": int(r.get("access_count", 0)),
+        })
+        links.append({"source": mem_id, "target": f"cat:{cat}"})
+
+    cat_nodes = [
+        {"id": f"cat:{cat}", "type": "category", "label": cat, "count": count}
+        for cat, count in sorted(cat_counts.items())
+    ]
+    return {
+        "nodes": cat_nodes + mem_nodes,
+        "links": links,
+        "categories": sorted(cat_counts.keys()),
+        "count": len(records),
+    }
+
+
 @app.get("/api/finance/summary")
 async def api_finance_summary():
     """Proxy CIS/VAT/tax financial summary from the financial-awareness service (P29)."""
@@ -1204,6 +1257,7 @@ async def api_chat_proxy(request: Request):
 
 
 SCREEN_CAPTURE_URL = os.getenv("SCREEN_CAPTURE_URL", "http://screen-capture:8059")
+AUDIO_URL = os.getenv("AUDIO_SERVICE_URL", "http://audio-service:8021")
 _UPLOAD_MAX_BYTES = 10 * 1024 * 1024  # 10 MB — matches screen-capture service limit
 
 
@@ -1238,6 +1292,33 @@ async def api_upload(file: UploadFile = File(...)):
         raise HTTPException(
             status_code=503,
             detail=f"OCR service unreachable — start screen-capture or set SCREEN_CAPTURE_URL: {exc}",
+        )
+
+
+@app.post("/api/audio/transcribe")
+async def api_audio_transcribe(file: UploadFile = File(...)):
+    """Receive an audio blob from the browser MediaRecorder and return a transcript.
+
+    Proxies to the audio-service Whisper backend. Degrades to 503 when unavailable.
+    """
+    data = await file.read()
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(
+                f"{AUDIO_URL}/capture/file",
+                files={"file": (file.filename or "audio.webm", data, file.content_type or "audio/webm")},
+            )
+            resp.raise_for_status()
+            return resp.json()
+    except httpx.HTTPStatusError as exc:
+        status = exc.response.status_code
+        if 400 <= status < 500:
+            raise HTTPException(status_code=status, detail=f"Audio service rejected file: {exc}")
+        raise HTTPException(status_code=502, detail=f"Audio service error: {exc}")
+    except httpx.RequestError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Audio service unreachable: {exc}",
         )
 
 
