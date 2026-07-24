@@ -5,6 +5,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (D90 — Swarm Assembly: Real Stage Functions, Shared Context, Reputation Tracking, 2026-07-24)
+
+- **SwarmContext** (`agentic/swarm.py`): shared dataclass threading `evidence`, `claims`, `challenges`, `verdicts`, `causal_chains`, `teammate_votes`, `stage_log` across all CognitiveFSM pipeline stages via `handoff.payload["_ctx"]`.
+- **TeammateRep + reputation system** (`agentic/swarm.py`): per-teammate `total_calls`, `successful_handoffs`, `total_confidence`, `error_count`. `weight() = reliability × (avg_confidence/10)`. Persist to `/data/teammate_reputation.json`. `load_reputation()`, `save_reputation()`, `get_rep()`, `record_success()`, `record_error()`, `list_reputation()`.
+- **`resolve_conflict()`** (`agentic/swarm.py`): 5-signal conviction hierarchy — evidence(0.30) + causal_chains(0.25) + verdict_fraction(0.20) + reputation-weighted teammate vote(0.15) + adversary skeptic modifier(0.10). Returns 0.0–10.0 final conviction score.
+- **Five stage function factories** (`agentic/swarm_stages.py`):
+  - `make_gather_stage()` → Scout: parallel memory+world fetch, LLM extracts JSON claims array into `ctx.claims`.
+  - `make_debate_stage()` → Sage: `build_plan + score_conviction`, registers vote in `ctx.teammate_votes`, LLM generates counterargument.
+  - `make_fact_check_stage()` → Doctor: LLM returns JSON dict mapping claim→verdict (supported/unsupported/uncertain), writes `ctx.verdicts`.
+  - `make_causal_check_stage()` → Oracle: LLM traces consequence chains for supported claims, writes `ctx.causal_chains`.
+  - `make_conviction_gate_stage()` → Sage + adversary: `challenge_plan()` + `resolve_conflict()` → final conviction score.
+  - `build_swarm_pipeline()` convenience factory returning all five functions keyed for `CognitiveFSM.run()`.
+- **`POST /chat/swarm`** (`agentic/app.py`): live swarm endpoint gated by `FF_SWARM`. Wires live deps (`_get_relevant_memories`, `_get_world_context`, `build_teammate_context`, `_llm.chat`, `build_plan`, `score_conviction`, `challenge_plan`). Returns `{conviction_score, passed, halted, transition_log, context_summary, adversary_recommendation}`. Saves reputation on completion.
+- **`GET /swarm/reputation`** (`agentic/app.py`): per-teammate reputation weights from `list_reputation()`.
+- **`FF_SWARM`** flag in `common/feature_flags.py` (default True). Reputation loaded at startup when flag enabled.
+- **Initial reputation file** `data/teammate_reputation.json` — starts empty `{}`, grows with use.
+- **D90 logged in `kai-pm/DECISIONS.md`**: full design for SwarmContext, 5 stage factories, API endpoints, and consequences.
+- **38-test suite** (`scripts/test_d90_swarm.py`): SwarmContext (4), TeammateRep (5), reputation (6), resolve_conflict (5), gather stage (3), debate stage (3), fact_check stage (3), causal_check stage (3), conviction_gate stage (2), E2E pipeline via CognitiveFSM (2), feature flag (3). `test-d90-swarm` Makefile target + CI step.
+- Tests: 2,671 → 2,709 (+38). LOC: ~65,200 → ~65,650.
+
 ### Added (D89 — Cognitive Depth: FSM, Persistent Teammates, House Doctor, Foundations, 2026-07-24)
 
 - **System FSM** (`agentic/system_fsm.py`): `KaiFSM` with 5 states (IDLE, ACTIVE, FOCUSED, DEGRADED, RECOVERING) and 9 events. Thread-safe `asyncio.Lock`. Transition table, history capped at 100. Module-level `fire(event)`, `current_state()`, `fsm_snapshot()`. Fires `USER_MESSAGE` in `/chat`; wired into proactive observer for anomaly/service events. Exposed in `/introspect/capabilities`.

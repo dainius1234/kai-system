@@ -235,6 +235,9 @@ test-cognitive-mechanisms:
 test-d89-cognitive-depth:
 	python -m pytest scripts/test_d89_cognitive_depth.py -v
 
+test-d90-swarm:
+	python -m pytest scripts/test_d90_swarm.py -v
+
 test-planner:
 	PYTHONPATH=. python scripts/test_planner.py
 
@@ -435,7 +438,7 @@ test-integration-chain:
 test-v7: test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain
 
 # wrapper to run all core unit/smoke tests
-test-core: test-phase-b-memu test-memu-pg test-memu-turbovec test-letta test-financial test-dashboard-ui test-dashboard test-thinking-pathways test-tool-gate test-tool-gate-security test-telegram test-conviction test-audio test-camera test-executor test-agentic-service test-agentic-introspect test-kai-advisor test-tts test-avatar test-heartbeat test-episode-saver test-episode-spool test-error-budget test-invoice test-memu-retrieval test-router test-planner test-adversary test-failure-taxonomy test-selaur test-self-emp test-auth-hmac test-agentic test-v7 test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-improvement-gate test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-h1-hardening test-h2-self-healing test-mars-consolidation test-sage-critique test-agent-evolver test-checkpoint test-error-codes test-feature-flags test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-wake test-behavioral test-docker-e2e test-chassis test-chassis-runtime test-git-watcher test-broker-bridge-yfinance test-kai-intelligence test-cognitive-mechanisms test-d89-cognitive-depth
+test-core: test-phase-b-memu test-memu-pg test-memu-turbovec test-letta test-financial test-dashboard-ui test-dashboard test-thinking-pathways test-tool-gate test-tool-gate-security test-telegram test-conviction test-audio test-camera test-executor test-agentic-service test-agentic-introspect test-kai-advisor test-tts test-avatar test-heartbeat test-episode-saver test-episode-spool test-error-budget test-invoice test-memu-retrieval test-router test-planner test-adversary test-failure-taxonomy test-selaur test-self-emp test-auth-hmac test-agentic test-v7 test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-improvement-gate test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-h1-hardening test-h2-self-healing test-mars-consolidation test-sage-critique test-agent-evolver test-checkpoint test-error-codes test-feature-flags test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-wake test-behavioral test-docker-e2e test-chassis test-chassis-runtime test-git-watcher test-broker-bridge-yfinance test-kai-intelligence test-cognitive-mechanisms test-d89-cognitive-depth test-d90-swarm
 
 test-dashboard-ui:
 	PYTHONPATH=. python scripts/test_dashboard_ui.py

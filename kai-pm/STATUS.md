@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-07-24
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** D89 Cognitive Depth shipped. System FSM (IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING), Cognitive Reasoning FSM (GATHER→DEBATE→FACT_CHECK→CAUSAL_CHECK→CONVICTION_GATE→PRESENT with HALT/ESCALATE), persistent teammates (Scout/Doctor/Sage/Oracle), house-doctor service (port 8046), skill provenance + probationary period, capability gap logging, world model provenance layer, emergent ritual discovery, and GPU-era foundations (counterfactual, trust negotiation, predictive empathy, curiosity). 47 new tests. All CPU-safe pre-GPU work done. Blocked on GPU (RTX 5080).
+- **Current focus:** D90 Swarm Assembly shipped. CognitiveFSM pipeline now has real stage function implementations: Scout→GATHER, Sage→DEBATE+CONVICTION_GATE, Doctor→FACT_CHECK, Oracle→CAUSAL_CHECK. SwarmContext threads evidence/claims/verdicts/causal_chains across all stages. TeammateRep reputation tracking with weight = reliability×(avg_confidence/10). `resolve_conflict()` 5-signal hierarchy. `POST /chat/swarm` live endpoint. 38 new tests. Blocked on GPU (RTX 5080).
 
 ## What's landed on main
 
@@ -41,6 +41,7 @@
 | D87 | D87 | Cognitive Architecture: `_get_world_context()` (9 sensory services per /chat), `_proactive_observer()` (background anomaly loop → memu-core proactive_observation memories), skill matching wired into /chat, FF_CONTEXT_ENRICHMENT + FF_PROACTIVE_AGENT ghost flags fixed, 14-way gather; 17 tests |
 | D88 | D88 | Advanced Cognition: M1 rolling baselines + 2σ anomaly detection; M2 `/introspect/capabilities`; M3 cross-sensor correlation; M4 world_state persistence; M5 sensory pattern learning; M6 skill-hunter service (8045, .34); M7 proactive scheduling; M8 reactive skill acquisition. 5 new flags. 44 tests. Services 57→58 |
 | D89 | D89 | Cognitive Depth: system FSM (IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING); cognitive reasoning FSM (GATHER→DEBATE→FACT_CHECK→CAUSAL_CHECK→CONVICTION_GATE→PRESENT, HALT/ESCALATE, per-swarm configs); persistent teammates (Scout/Doctor/Sage/Oracle via `/chat/teammate/{name}`); house-doctor service (port 8046, 9 diagnostic rules); skill provenance + probationary period (YAML front-matter + `.meta.json` sidecars, auto-disable at ≥3 errors); capability gap logging (GAP_HUNT_THRESHOLD=3); world model provenance layer (`{value, source, timestamp, confidence}`); emergent ritual discovery (≥7/10 cycles → RITUALS.md); GPU-era foundations: counterfactual (stub_pending_gpu), trust negotiation (`/gate/autonomy/request`), predictive empathy (`emotional_context` world key), resource-aware curiosity (idle tick, CURIOSITY.md). 8 new flags. 47 tests. Services 58→59 |
+| D90 | D90 | Swarm Assembly: `agentic/swarm.py` (SwarmContext, TeammateRep, reputation load/save, `resolve_conflict()` 5-signal hierarchy); `agentic/swarm_stages.py` (5 stage function factories: make_gather/debate/fact_check/causal_check/conviction_gate_stage + build_swarm_pipeline); `POST /chat/swarm` live endpoint; `GET /swarm/reputation`; `FF_SWARM` flag (default True); `data/teammate_reputation.json`. 38 tests. |
 
 ## Open PRs
 
@@ -64,5 +65,5 @@ Unlock condition: RTX 5080 procurement + provisioning + validation.
 ## Source of truth pointers
 
 - Resume layer: [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md)
-- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D89)
+- Decision log: [`DECISIONS.md`](DECISIONS.md) (last entry: D90)
 - Latest reality check: [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md)

@@ -401,6 +401,24 @@ Per-swarm configs
   research        conviction_threshold=6.5, debate_retries=5, rethink_retries=3
   skill_forge     conviction_threshold=6.0, debate_retries=3, rethink_retries=3
   default         conviction_threshold=7.0, debate_retries=3, rethink_retries=3
+
+Stage function assignments (D90)
+  GATHER          → Scout    (parallel memory + world fetch; LLM extracts claims)
+  DEBATE          → Sage     (build_plan + score_conviction; LLM counterargument)
+  FACT_CHECK      → Doctor   (claim→verdict JSON dict; falls back to uncertain)
+  CAUSAL_CHECK    → Oracle   (consequence chain JSON array per supported claim)
+  CONVICTION_GATE → Sage     (adversary challenge + resolve_conflict())
+
+Conflict resolution signal weights (D90)
+  evidence weight         0.30  (evidence_count × 1.5, cap 10)
+  causal chain quality    0.25  (chain_count × 2.0, cap 10)
+  verdict fraction        0.20  (supported / total × 10; neutral 5.0 when empty)
+  reputation-weighted vote 0.15 (weight = reliability × avg_confidence/10)
+  adversary modifier      0.10  (0..10 centred at 5; modifier range −3..+1)
+
+API (D90)
+  POST /agentic:8007/chat/swarm    → run full pipeline; returns conviction_score, transition_log
+  GET  /agentic:8007/swarm/reputation → per-teammate weights from data/teammate_reputation.json
 ```
 
 ---
@@ -675,8 +693,8 @@ Toggle: `Ctrl+Shift+M` in dashboard, or `POST /gate/mode`. Manual override lasts
 | Area | Reality | What Fixes It |
 |---|---|---|
 | **LLM Model** | Default `qwen2.5:0.5b` (~500M params) is a test placeholder — too small for meaningful reasoning, planning, or emotional intelligence | Upgrade to 7B+ model (`qwen2.5:7b`, `llama3:8b`). RTX 5080 = 3 env vars to switch. Model registry auto-adapts context, prompts, timeouts |
-| **Cognitive FSM wiring** | `cognitive_fsm.py` framework is complete with full state machine, bounded retries, and schema-validated handoffs. The DEBATE and CONVICTION_GATE stage functions are NOT yet wired to the existing `tree_search.py` + `conviction.py` + `adversary.py` code — they are injected at call time | Wire the stage functions using the existing debate/conviction code in Phase 1 |
-| **Teammate reputation** | Teammates load personas and respond with world-state injection. No reputation score or memory slice per teammate yet | Add per-teammate memory retrieval + error rate tracking in a future sprint |
+| **Cognitive FSM wiring** | ~~Not wired~~ **DONE (D90)** — `POST /chat/swarm` runs the full pipeline. Scout→GATHER, Sage→DEBATE+CONVICTION_GATE, Doctor→FACT_CHECK, Oracle→CAUSAL_CHECK. All 5 stage functions are real implementations calling live memory/LLM/adversary dependencies. | — |
+| **Teammate reputation** | ~~No reputation tracking~~ **DONE (D90)** — per-teammate `TeammateRep` (total_calls, successful_handoffs, avg_confidence, reliability). Weights applied in `resolve_conflict()`. Persisted to `data/teammate_reputation.json`. | Add per-teammate memory slice (top-k retrieval scoped to teammate specialty) |
 | **Counterfactual Rehearsal** | `can_rehearse()→False`, `rehearse()→stub_pending_gpu`. Interface and schema are correct. | Activate in Phase 1 when GPU enables real decision-branch simulation |
 | **Predictive Empathy** | `emotional_context` key exists in world model with the right schema shape. No inference until emotional memory accumulates. | Implement after 30+ days of real emotional memory history |
 | **Resource-Aware Curiosity** | `idle_curiosity_tick()` is a no-op on CPU. CURIOSITY.md seed questions are ready. | Activate on GPU: pick open question → research → append finding |
@@ -742,11 +760,12 @@ When it arrives:
 6. Real STT (faster-whisper large), TTS with voice quality, avatar
 
 **Phase 1 priorities after GPU:**
-- Wire cognitive FSM stage functions to existing `tree_search.py` + `conviction.py` + `adversary.py`
-- Build teammate reputation scores + per-teammate memory slices
+- ~~Wire cognitive FSM stage functions~~ Done (D90) — `POST /chat/swarm` live
+- ~~Build teammate reputation scores~~ Done (D90) — per-teammate TeammateRep + resolve_conflict()
+- Add per-teammate memory slices (top-k retrieval scoped to specialty)
 - Implement predictive empathy from accumulated emotional memory
 - Build trust negotiation approval UI (human-in-the-loop autonomy gate)
-- Real multi-model consensus (3 specialist endpoints)
+- Real multi-model consensus (3 specialist endpoints, once GPU enables 7B+ models)
 
 **End-goal:** a fully offline, self-hosted sovereign AI companion — chat, memory, perception, voice, avatar — all gated by the conviction/trust loop and circuit-breaker infrastructure already built. No cloud dependency. No single point of failure. The architectural principles established here (process-level isolation, reused circuit breakers, no split without checking shared state) are the template for the rest of the stack.
 
@@ -1014,6 +1033,7 @@ FF_PERSISTENT_TEAMMATES=true     # Named cognitive teammates
 - [x] HMAC auth enforced, dev secret blocked by default
 - [x] System FSM (IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING) — wired into /chat + observer
 - [x] Cognitive reasoning FSM framework (GATHER→PRESENT, HALT, per-swarm configs, schema-validated)
+- [x] Swarm Assembly (D90) — real stage functions wired; `POST /chat/swarm` live; reputation tracking
 - [x] Persistent teammates (Scout/Doctor/Sage/Oracle) — loaded and invokable
 - [x] House Doctor service (port 8046) — 9 diagnostic rules, wired into proactive observer
 - [x] World model provenance ({value, source, timestamp, confidence} per field)
@@ -1034,7 +1054,7 @@ FF_PERSISTENT_TEAMMATES=true     # Named cognitive teammates
 - [x] Debate engine (`tree_search.py`, `conviction.py`, `adversary.py`)
 
 **Infrastructure ready, needs GPU to activate:**
-- [ ] Cognitive FSM stage functions — framework done; wiring to debate/conviction code pending
+- [x] Cognitive FSM stage functions wired — `POST /chat/swarm` live (D90)
 - [ ] Counterfactual rehearsal — `can_rehearse()→False` until Phase 1
 - [ ] Predictive empathy — `emotional_context` stub; needs emotional memory history
 - [ ] Resource-aware curiosity — `idle_curiosity_tick()` no-ops on CPU

@@ -1699,3 +1699,37 @@ The hardening items (PR #98) close seven concrete gaps identified in `docs/produ
 - TTS requires internet access for edge-tts (Microsoft endpoint); in air-gapped environments override `TTS_BACKEND=piper` when piper support is added.
 - The MediaRecorder path sends audio to the server (not the browser's speech API), giving complete privacy from browser vendors for voice input.
 - Last entry before GPU arrival. All CPU-safe pre-GPU items from `PHASE1_READINESS.md` S1–S5 are complete. Next major decision will be D87 on GPU Day (G1–G7 protocol from `GPU_ARRIVAL_RUNBOOK.md`).
+
+## D90 — 2026-07-24 — Swarm Assembly: Real Stage Functions, Shared Context, Reputation Tracking
+
+**Context:** D89 built the CognitiveFSM orchestrator and the stage function type signature (`StageFunc = Callable[[AgentHandoff, SwarmConfig], Coroutine[AgentHandoff]]`), but the pipeline was never wired to real implementations — every stage was a placeholder. D90 fills that gap: five concrete stage function factories that route to the correct teammate, call real LLM/memory/adversary dependencies, and pass a shared `SwarmContext` through the pipeline so each stage can see what previous stages found.
+
+**Decision — D90/S1 — SwarmContext and Conflict Resolution (`agentic/swarm.py`):**
+New module. `SwarmContext` dataclass carries `evidence`, `claims`, `challenges`, `verdicts`, `causal_chains`, `teammate_votes`, `stage_log` across the full pipeline via `handoff.payload["_ctx"]`. `TeammateRep` tracks `total_calls`, `successful_handoffs`, `total_confidence`, `error_count` per teammate. `weight() = reliability × (avg_confidence / 10)` used in conflict resolution votes. Reputation persisted to `/data/teammate_reputation.json` (loaded at startup, saved after each swarm run). `resolve_conflict(ctx, cfg, adversary_modifier)` implements 5-signal priority hierarchy: evidence(0.30) + causal_chains(0.25) + verdict_fraction(0.20) + reputation-weighted vote(0.15) + adversary skeptic modifier(0.10). Returns final conviction score 0.0–10.0. Helper functions: `load_reputation()`, `save_reputation()`, `get_rep()`, `record_success()`, `record_error()`, `list_reputation()`.
+
+**Decision — D90/S2 — Stage Function Factories (`agentic/swarm_stages.py`):**
+Five factory functions, each taking injected dependencies (no circular imports) and returning a `StageFunc`:
+- `make_gather_stage(memories_fn, world_ctx_fn, teammate_ctx_fn, llm_chat_fn)` — Scout leads: parallel `memories_fn + world_ctx_fn`, appends to `ctx.evidence`, LLM extracts JSON array of claims into `ctx.claims`. Confidence = min(10, evidence_count×1.5 + claim_count×0.5).
+- `make_debate_stage(build_plan_fn, score_fn, teammate_ctx_fn, llm_chat_fn)` — Sage leads: `build_plan + score_conviction` for conviction, registers vote in `ctx.teammate_votes["sage"]`, LLM generates counterargument into `ctx.challenges`. Returns CONSENSUS if conviction ≥6.0, NO_CONSENSUS otherwise.
+- `make_fact_check_stage(memories_fn, teammate_ctx_fn, llm_chat_fn)` — Doctor leads: LLM returns JSON dict mapping claim→verdict (supported/unsupported/uncertain), writes to `ctx.verdicts`. Falls back to "uncertain" on parse failure. Returns PASS if confidence ≥4.0.
+- `make_causal_check_stage(teammate_ctx_fn, llm_chat_fn)` — Oracle leads: LLM traces consequence chains for supported claims, appends to `ctx.causal_chains`. Returns COMPLETE with confidence = min(10, 5+chains×1.5); gracefully degrades to confidence=5.0 on exception.
+- `make_conviction_gate_stage(adversary_fn, teammate_ctx_fn)` — calls `adversary.challenge_plan()` then `resolve_conflict()` to produce final score. Survives adversary failure by falling back to prior handoff confidence.
+- `build_swarm_pipeline(...)` — convenience function returning all five stage functions keyed for `CognitiveFSM.run()`.
+
+**Decision — D90/S3 — API Endpoints (`agentic/app.py`):**
+- `POST /chat/swarm` — gated by `FF_SWARM`. Accepts `{query, swarm_type, session_id}`. Creates `SwarmContext`, builds pipeline via `build_swarm_pipeline` with live dependencies (`_get_relevant_memories`, `_get_world_context`, `build_teammate_context`, `_llm.chat`, `build_plan`, `score_conviction`, `challenge_plan`), resolves `get_swarm_config(swarm_type)`, runs `CognitiveFSM.run()`, saves reputation. Returns `{conviction_score, passed, halted, transition_log, context_summary, adversary_recommendation}`.
+- `GET /swarm/reputation` — returns per-teammate reputation weights from `list_reputation()`.
+
+**Decision — D90/S4 — Feature Flag and Data:**
+- `FF_SWARM` added to `common/feature_flags.py` (default True). Startup loads reputation if flag enabled.
+- `data/teammate_reputation.json` initialized to `{}` — grows as swarm runs accumulate.
+
+**Tests:** 38 new tests in `scripts/test_d90_swarm.py`: SwarmContext accumulation, TeammateRep math, reputation save/load round-trip, `resolve_conflict` priority hierarchy, all 5 stage factories (happy path + parse failures + exception resilience), end-to-end pipeline via CognitiveFSM (reaches PRESENT), halt-on-gather-failure, feature flag on/off.
+
+**Rationale:** The pipeline was a skeleton. Real swarms need to be runnable. D90 makes `POST /chat/swarm` a live endpoint — no stubs, no placeholders. The dependency-injection pattern keeps every stage independently testable without live services. Reputation tracking closes the quality loop: teammates that produce high-confidence outputs get more weight in future conflict resolution.
+
+**Consequences:**
+- `POST /chat/swarm` now routes queries through the full cognitive pipeline: evidence gather → debate → fact-check → causal tracing → adversary challenge → conflict resolution. Response time dominated by LLM latency ×5 stages plus adversary network calls.
+- `FF_SWARM=false` skips the endpoint entirely for operators who want the lighter `/chat` path.
+- Reputation state is ephemeral until `/data/` is mounted. In docker-compose setups the data volume already persists this directory.
+- Each swarm run calls `_get_relevant_memories` twice (gather + fact_check). This is intentional — fact_check retrieves fresh supporting evidence for verification, not the same recall as gather.

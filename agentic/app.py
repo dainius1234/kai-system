@@ -23,6 +23,9 @@ from common.llm import LLMRouter, llm_warmup
 from system_fsm import KaiEvent as SysEvent, fire as fsm_fire, current_state as fsm_state, fsm_snapshot
 from teammates import load_teammates, list_teammates, build_teammate_context
 from counterfactual import rehearse as rehearse_counterfactual, can_rehearse
+from cognitive_fsm import CognitiveFSM, get_config as get_swarm_config
+from swarm import SwarmContext, list_reputation, load_reputation, record_error as swarm_record_error, record_success as swarm_record_success, save_reputation
+from swarm_stages import build_swarm_pipeline
 from curiosity import idle_curiosity_tick, CURIOSITY_LOG
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, INJECTION_RE, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
@@ -626,6 +629,78 @@ async def chat_with_teammate(name: str, req: TeammateRequest) -> Dict[str, Any]:
         }
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Teammate invocation failed: {exc}")
+
+
+class SwarmRequest(BaseModel):
+    query: str
+    swarm_type: str = "default"
+    session_id: str = ""
+
+
+@app.post("/chat/swarm")
+async def chat_swarm(req: SwarmRequest) -> Dict[str, Any]:
+    """D90: Run a query through the full CognitiveFSM swarm pipeline.
+
+    Returns the final conviction score, pipeline transition log, swarm context
+    summary, and adversary recommendation.  Feature-flagged under FF_SWARM.
+    """
+    if not is_enabled("SWARM"):
+        raise HTTPException(status_code=503, detail="FF_SWARM is disabled")
+
+    session_id = req.session_id or str(uuid.uuid4())
+    ctx = SwarmContext(
+        query=req.query,
+        session_id=session_id,
+        swarm_type=req.swarm_type,
+    )
+
+    pipeline = build_swarm_pipeline(
+        memories_fn=_get_relevant_memories,
+        world_ctx_fn=_get_world_context,
+        teammate_ctx_fn=build_teammate_context,
+        llm_chat_fn=_llm.chat,
+        build_plan_fn=build_plan,
+        score_fn=score_conviction,
+        adversary_fn=challenge_plan,
+    )
+
+    cfg = get_swarm_config(req.swarm_type)
+    fsm = CognitiveFSM(config=cfg)
+
+    initial_payload: Dict[str, Any] = {"_ctx": ctx, "query": req.query}
+
+    result = await fsm.run(
+        gather_fn=pipeline["gather_fn"],
+        debate_fn=pipeline["debate_fn"],
+        fact_check_fn=pipeline["fact_check_fn"],
+        causal_check_fn=pipeline["causal_check_fn"],
+        conviction_gate_fn=pipeline["conviction_gate_fn"],
+        initial_payload=initial_payload,
+    )
+
+    save_reputation()
+
+    final_confidence = result.final_handoff.confidence if result.final_handoff else 0.0
+    return {
+        "session_id": session_id,
+        "swarm_type": req.swarm_type,
+        "halted": result.halted,
+        "halt_reason": result.halt_reason,
+        "final_state": result.final_state.value,
+        "conviction_score": final_confidence,
+        "conviction_threshold": cfg.conviction_threshold,
+        "passed": not result.halted and final_confidence >= cfg.conviction_threshold,
+        "total_elapsed_ms": round(result.total_elapsed_ms, 1),
+        "transition_log": result.transition_log,
+        "context_summary": ctx.summary(),
+        "adversary_recommendation": (result.final_handoff.payload or {}).get("adversary_recommendation", "unknown"),
+    }
+
+
+@app.get("/swarm/reputation")
+async def swarm_reputation() -> Dict[str, Any]:
+    """D90: Return per-teammate reputation weights."""
+    return {"teammates": list_reputation()}
 
 
 @app.get("/models")
@@ -2434,6 +2509,9 @@ async def _startup_warmup() -> None:
     # D89: load persistent teammates at startup
     if is_enabled("PERSISTENT_TEAMMATES"):
         load_teammates()
+    # D90: load swarm reputation at startup
+    if is_enabled("SWARM"):
+        load_reputation()
 
 
 # ── P16b: Log aggregation ───────────────────────────────────────────

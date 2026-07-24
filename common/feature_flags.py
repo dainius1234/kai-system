@@ -69,6 +69,8 @@ _REGISTRY: Dict[str, tuple] = {
     "TRUST_NEGOTIATION":     ("D89/B: autonomy request protocol — KAI can request temporary elevated authority; currently pending_approval", True),
     "PREDICTIVE_EMPATHY":    ("D89/D: emotional_context key in world model; full implementation pending emotional memory accumulation", True),
     "CURIOSITY":             ("D89/F: resource-aware curiosity idle tick; no-ops in CPU phase; activates on GPU + IDLE state", True),
+    # D90: Swarm Assembly — full CognitiveFSM pipeline with real stage functions
+    "SWARM":                 ("D90: CognitiveFSM swarm pipeline — Scout/Sage/Doctor/Oracle stage functions, shared SwarmContext, reputation tracking, conflict resolution", True),
 }
 
 
