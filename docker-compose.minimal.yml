@@ -255,6 +255,7 @@ services:
       FILES_SERVICE_URL: http://files-service:8025
       NOTIFY_SERVICE_URL: http://notify-service:8031
       DOC_PARSER_URL: http://document-parser:8032
+      MONITOR_SERVICE_URL: http://monitor-service:8033
       LANGGRAPH_URL: http://agentic:8007
     ports:
       - "8080:8080"
@@ -295,6 +296,8 @@ services:
       notify-service:
         condition: service_started
       document-parser:
+        condition: service_started
+      monitor-service:
         condition: service_started
       agentic:
         condition: service_started
@@ -470,6 +473,30 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.22
+
+  monitor-service:
+    build:
+      context: .
+      dockerfile: monitor-service/Dockerfile
+    container_name: sovereign-monitor-service
+    <<: *defaults
+    environment:
+      BROWSER_AGENT_URL: http://browser-agent:8040
+      NOTIFY_SERVICE_URL: http://notify-service:8031
+      TTS_SERVICE_URL: http://tts-service:8030
+      RULES_FILE: "${MONITOR_RULES_FILE:-}"
+      MONITOR_MAX_ALERTS: "${MONITOR_MAX_ALERTS:-200}"
+    ports:
+      - "8033:8033"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8033/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.23
 
   wake-service:
     build:

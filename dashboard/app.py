@@ -1265,6 +1265,7 @@ CLIPBOARD_URL = os.getenv("CLIPBOARD_SERVICE_URL", "http://clipboard-service:802
 FILES_URL = os.getenv("FILES_SERVICE_URL", "http://files-service:8025")
 NOTIFY_URL = os.getenv("NOTIFY_SERVICE_URL", "http://notify-service:8031")
 DOC_PARSER_URL = os.getenv("DOC_PARSER_URL", "http://document-parser:8032")
+MONITOR_URL = os.getenv("MONITOR_SERVICE_URL", "http://monitor-service:8033")
 _UPLOAD_MAX_BYTES = 10 * 1024 * 1024  # 10 MB
 
 _IMAGE_EXTS = frozenset({"png", "jpg", "jpeg", "gif", "bmp", "webp", "tiff", "tif"})
@@ -1567,6 +1568,66 @@ async def api_notify_dismiss_all():
             return resp.json()
     except Exception:
         return {"cleared": False}
+
+
+# ── Monitor proxies ───────────────────────────────────────────────────────────
+
+@app.get("/api/monitor/rules")
+async def api_monitor_rules():
+    return await _proxy_get(f"{MONITOR_URL}/rules", fallback={"rules": [], "total": 0})
+
+
+@app.post("/api/monitor/rules")
+async def api_monitor_add_rule(request: Request):
+    body = await request.json()
+    return await _proxy_post(f"{MONITOR_URL}/rules", body=body, fallback={"ok": False})
+
+
+@app.delete("/api/monitor/rules/{rule_id}")
+async def api_monitor_delete_rule(rule_id: str):
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.delete(f"{MONITOR_URL}/rules/{rule_id}")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"ok": False}
+
+
+@app.post("/api/monitor/rules/{rule_id}/enable")
+async def api_monitor_enable_rule(rule_id: str):
+    return await _proxy_post(f"{MONITOR_URL}/rules/{rule_id}/enable", fallback={"ok": False})
+
+
+@app.post("/api/monitor/rules/{rule_id}/disable")
+async def api_monitor_disable_rule(rule_id: str):
+    return await _proxy_post(f"{MONITOR_URL}/rules/{rule_id}/disable", fallback={"ok": False})
+
+
+@app.post("/api/monitor/rules/{rule_id}/check")
+async def api_monitor_check_rule(rule_id: str):
+    return await _proxy_post(f"{MONITOR_URL}/rules/{rule_id}/check", fallback={"ok": False})
+
+
+@app.get("/api/monitor/alerts")
+async def api_monitor_alerts(limit: int = 50):
+    return await _proxy_get(f"{MONITOR_URL}/alerts", params={"limit": limit}, fallback={"alerts": [], "total": 0})
+
+
+@app.delete("/api/monitor/alerts")
+async def api_monitor_clear_alerts():
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.delete(f"{MONITOR_URL}/alerts")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return {"ok": False}
+
+
+@app.get("/api/monitor/status")
+async def api_monitor_status():
+    return await _proxy_get(f"{MONITOR_URL}/status", fallback={})
 
 
 # ── Browser search proxy ───────────────────────────────────────────────────────
