@@ -52,6 +52,7 @@ All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Audio/TTS st
 | #105 | document-parser service (8032, `172.20.0.22`): PDF, DOCX, XLSX, XLS, PPTX, DXF, DWG, ZIP, CSV, JSON, XML, HTML; `/api/upload` extension-based routing; `_DOC_EXTS` frontend; 22 tests; services 40→41 | — |
 | #106 | Doc sweep: STATUS + SESSION_BOOTSTRAP for PR #105 | — |
 | #107 | monitor-service (8033, `172.20.0.23`): background rule engine; HTTP/scrape sources; 11 condition ops; notify + TTS actions; interval + cooldown; Monitor tab; RULES_FILE persistence; 34 tests; services 41→42 | — |
+| #109 | broker-bridge (8034, `172.20.0.24`): Binance REST wrapper; HMAC-SHA256 signing; spot + futures (USDM) modes via `BINANCE_MODE`; `/ticker`, `/balance`, `/positions`, `/orders`, `/pnl/summary`, `/templates`; Broker tab (status, tickers, balance, positions, orders, Quick Watch, template browser); 20 tests; services 43 | — |
 
 ### In-flight work
 
@@ -74,7 +75,8 @@ None. All work is on `main`. No open PRs.
 11. **Vision/camera — DONE** (PR #102) — OpenCV face detect + DeepFace emotion, webcam panel
 12. **Document parser — DONE** (PR #105) — PDF, Word, Excel, PowerPoint, DXF, DWG, ZIP, all formats
 13. **Monitor service — DONE** (PR #107) — background rule engine, HTTP/scrape sources, notify + TTS alerts
-14. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
+14. **Broker bridge — DONE** (PR #109) — Binance REST, spot/futures, Broker tab, Quick Watch → monitor rules
+15. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
 
 Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
@@ -107,6 +109,7 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
   - `browser-agent` — Playwright Chromium (`browser-agent/`), port 8040, IP `172.20.0.17`. Headless browser; `/navigate`, `/click`, `/type`, `/scrape`, `/screenshot`, `/run`. Dashboard proxies `/api/browser/*`. Chat shortcut `browse: <url>`.
   - `document-parser` — multi-format text extraction (`document-parser/`), port 8032, IP `172.20.0.22`. PDF (PyMuPDF), DOCX (python-docx), XLSX (openpyxl), XLS (xlrd), PPTX (python-pptx), DXF/DWG (ezdxf + LibreDWG `dwg2dxf`), ZIP (recursive), CSV/JSON/XML/HTML. Dashboard routes `/api/upload` by extension: images→OCR, documents→doc-parser.
   - `monitor-service` — background rule-based alerting (`monitor-service/`), port 8033, IP `172.20.0.23`. Rules: HTTP/scrape source + condition (gt/lt/gte/lte/eq/ne/contains/changed/+%/-%) + actions (notify-service, TTS). Per-rule interval + cooldown. RULES_FILE env for persistence. Monitor tab in dashboard with Add Rule form, live table, alert feed.
+  - `broker-bridge` — Binance REST wrapper (`broker-bridge/`), port 8034, IP `172.20.0.24`. `BINANCE_MODE=spot|futures`. HMAC-SHA256 signing for authenticated endpoints. `/ticker`, `/balance`, `/positions`, `/orders`, `/pnl/summary` (futures), `/templates`. Dashboard proxies `/api/broker/*`; `/api/broker/watch` creates monitor rule per position. Credentials via `BINANCE_API_KEY` + `BINANCE_API_SECRET` env vars.
   - `vision-service` — webcam frame analysis (`perception/vision/`), port 8023, IP `172.20.0.18`. OpenCV haar cascade (face detect) + DeepFace emotion (CPU-safe). Dashboard proxies `/api/vision/{analyze,presence}`. 📷 camera panel in frontend.
 - **VECTOR_STORE env var** in `memu-core`: `turbovec` (default dev/CI) → TurboVec; `postgres` → pgvector; else → ephemeral InMemory. Sovereign uses `postgres`.
 - **`FF_GRAPH_INGEST=true`** (default in full compose): every memorize/forget fans out to memu-graph. Best-effort — never blocks memu-core.
@@ -119,7 +122,7 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 - **Model**: `qwen2.5:0.5b` (default). Embedding: `all-MiniLM-L6-v2` (384-dim).
 - **Embedding endpoint**: `/api/embed` (not deprecated `/api/embeddings`). Confirmed D47.
 - **TurboVecStore startup**: embedding backend (`_embedding_backend` / `generate_embedding`) must be defined before store selection block in `memu-core/app.py` — see D78.
-- **Tests**: 2,384 across 111 files; per-module floors: `agentic ≥ 45%`, `memu-core ≥ 60%`. `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
+- **Tests**: 2,404 across 112 files; per-module floors: `agentic ≥ 45%`, `memu-core ≥ 60%`. `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
 - **Coverage**: 5 modules (`common`, `agentic`, `memu-core`, `letta-agent`, `financial-awareness`), 60% gate.
 
 ---
