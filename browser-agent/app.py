@@ -54,7 +54,6 @@ BROWSER_HEADLESS = os.getenv("BROWSER_HEADLESS", "true").lower() != "false"
 @asynccontextmanager
 async def _lifespan(application: FastAPI):
     yield
-    global _browser, _playwright_inst
     if _browser:
         await _browser.close()
     if _playwright_inst:

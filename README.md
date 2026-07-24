@@ -25,12 +25,12 @@
 
 | Metric | Value |
 |---|---|
-| **Services** | 37 Docker containers |
+| **Services** | 33 Docker containers |
 | **Test targets** | 77 (`make test-core`) |
-| **Individual tests** | 2,328 (`def test_` across 109 files) |
-| **Python LOC** | ~54,553 |
+| **Individual tests** | 2,443 (`def test_` across 115 files) |
+| **Python LOC** | ~58,549 |
 | **Compose files** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 32 |
+| **Milestones shipped** | 37 |
 | **Failures** | 0 |
 
 > **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
