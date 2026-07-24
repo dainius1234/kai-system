@@ -77,6 +77,10 @@
           <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><line x1="12" y1="8" x2="5" y2="16"/><line x1="12" y1="8" x2="19" y2="16"/></svg>
           <span class="nav-label">Mem Graph</span>
         </a>
+        <a class="nav-item" data-view="monitor" onclick="switchView('monitor')">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span class="nav-label">Monitor</span>
+        </a>
       </nav>
 
       <div class="sidebar-divider"></div>
@@ -999,6 +1003,94 @@
           </div>
         </section>
 
+        <!-- ═══ Monitor View ═══ -->
+        <section class="view" id="monitorView">
+          <div style="max-width:1000px;margin:0 auto;padding:var(--sp-6);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-4);">
+              <h2 class="text-heading">Monitor</h2>
+              <div style="display:flex;gap:var(--sp-2);">
+                <button class="refresh-btn" onclick="toggleAddRuleForm()">+ Add Rule</button>
+                <button class="refresh-btn" onclick="refreshMonitor()">↻ Refresh</button>
+              </div>
+            </div>
+
+            <!-- Status bar -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--sp-3);margin-bottom:var(--sp-4);">
+              <div class="stat-card">
+                <div class="stat-label">Active Rules</div>
+                <div class="stat-value accent" id="monRulesEnabled">—</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Total Rules</div>
+                <div class="stat-value" id="monRulesTotal">—</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Alerts Fired</div>
+                <div class="stat-value" id="monAlertsTotal">—</div>
+              </div>
+            </div>
+
+            <!-- Add Rule form (hidden by default) -->
+            <div class="card" id="addRuleCard" style="display:none;margin-bottom:var(--sp-4);border-left:3px solid var(--accent);">
+              <div class="card-title"><span class="icon">📡</span> New Watch Rule</div>
+              <div style="display:grid;gap:var(--sp-3);margin-top:var(--sp-2);">
+                <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;">
+                  <input id="monRuleName" placeholder="Rule name (e.g. BTC > 70k)" class="input-field" style="flex:2;min-width:200px;">
+                  <input id="monRuleUrl" placeholder="Data URL (e.g. https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT)" class="input-field" style="flex:3;min-width:260px;">
+                  <input id="monRuleExtract" placeholder="JSON field (e.g. price)" class="input-field" style="flex:1;min-width:120px;">
+                </div>
+                <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center;">
+                  <select id="monRuleOp" class="input-field" style="min-width:160px;">
+                    <option value="gt">&gt; greater than</option>
+                    <option value="lt">&lt; less than</option>
+                    <option value="gte">≥ greater or equal</option>
+                    <option value="lte">≤ less or equal</option>
+                    <option value="eq">= equals</option>
+                    <option value="ne">≠ not equals</option>
+                    <option value="contains">contains text</option>
+                    <option value="not_contains">does not contain</option>
+                    <option value="changed">changed (any)</option>
+                    <option value="increased_pct">increased by %</option>
+                    <option value="decreased_pct">decreased by %</option>
+                  </select>
+                  <input id="monRuleValue" placeholder="Threshold value" type="number" class="input-field" style="flex:1;min-width:140px;">
+                  <input id="monRuleText" placeholder="Text to match (contains ops)" class="input-field" style="flex:1;min-width:160px;">
+                  <input id="monRulePct" placeholder="Percent (% ops)" type="number" class="input-field" style="flex:1;min-width:120px;" step="0.1">
+                </div>
+                <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center;">
+                  <label style="font-size:13px;color:var(--text2);">Every</label>
+                  <input id="monRuleInterval" type="number" value="60" min="5" class="input-field" style="width:80px;">
+                  <label style="font-size:13px;color:var(--text2);">s · cooldown</label>
+                  <input id="monRuleCooldown" type="number" value="300" min="0" class="input-field" style="width:80px;">
+                  <label style="font-size:13px;color:var(--text2);">s · actions:</label>
+                  <label style="font-size:13px;display:flex;gap:4px;align-items:center;"><input type="checkbox" id="monActNotify" checked> Notify</label>
+                  <label style="font-size:13px;display:flex;gap:4px;align-items:center;"><input type="checkbox" id="monActTts"> Speak</label>
+                </div>
+                <div style="display:flex;gap:var(--sp-2);">
+                  <input id="monRuleMessage" placeholder='Alert message template: {name}: {value}' class="input-field" style="flex:1;">
+                  <button class="refresh-btn" onclick="submitAddRule()">Add Rule</button>
+                  <button class="refresh-btn" onclick="toggleAddRuleForm()" style="background:var(--bg3);">Cancel</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rules list -->
+            <div class="card" style="margin-bottom:var(--sp-4);">
+              <div class="card-title"><span class="icon">📋</span> Watch Rules</div>
+              <div id="monRulesList"><div class="skeleton" style="height:60px"></div></div>
+            </div>
+
+            <!-- Recent alerts -->
+            <div class="card">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-2);">
+                <div class="card-title" style="margin:0"><span class="icon">🔔</span> Recent Alerts</div>
+                <button class="refresh-btn" onclick="clearMonitorAlerts()" style="font-size:11px;padding:2px 8px;">Clear</button>
+              </div>
+              <div id="monAlertsList"><div class="empty">No alerts yet</div></div>
+            </div>
+          </div>
+        </section>
+
       </div><!-- .content -->
     </main>
   </div><!-- .app -->
@@ -1133,7 +1225,7 @@ function switchView(name) {
   const navEl = document.querySelector(`.nav-item[data-view="${name}"]`);
   if (navEl) navEl.classList.add('active');
 
-  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard', canvas: 'Live Canvas', diary: 'Memory Diary', finance: 'CIS Finance', memgraph: 'Memory Graph' };
+  const titles = { chat: 'Chat', dashboard: 'Dashboard', thinking: 'Thinking Pathways', settings: 'Settings', goals: 'Ohana Goals', memory: 'Memory Browser', logs: 'System Logs', eq: 'Soul Dashboard', canvas: 'Live Canvas', diary: 'Memory Diary', finance: 'CIS Finance', memgraph: 'Memory Graph', monitor: 'Monitor' };
   document.getElementById('viewTitle').textContent = titles[name] || name;
 
   currentView = name;
@@ -1174,6 +1266,13 @@ function switchView(name) {
   }
   if (name === 'memgraph') {
     refreshMemoryGraph();
+  }
+  if (name === 'monitor') {
+    refreshMonitor();
+    _monitorInterval = setInterval(refreshMonitor, 15000);
+  } else {
+    clearInterval(_monitorInterval);
+    _monitorInterval = null;
   }
 }
 
@@ -2186,6 +2285,178 @@ async function handleFiles(files) {
   document.getElementById('fileInput').value = '';
 }
 
+
+// ── Monitor ────────────────────────────────────────────────────────
+
+let _monitorInterval = null;
+
+async function refreshMonitor() {
+  try {
+    const [statusResp, rulesResp, alertsResp] = await Promise.all([
+      fetch('/api/monitor/status'),
+      fetch('/api/monitor/rules'),
+      fetch('/api/monitor/alerts?limit=30'),
+    ]);
+    const st = await statusResp.json();
+    const ru = await rulesResp.json();
+    const al = await alertsResp.json();
+
+    document.getElementById('monRulesEnabled').textContent = st.rules_enabled ?? '—';
+    document.getElementById('monRulesTotal').textContent = st.rules_total ?? '—';
+    document.getElementById('monAlertsTotal').textContent = al.total ?? '—';
+
+    _renderRules(ru.rules || [], st);
+    _renderAlerts(al.alerts || []);
+  } catch (e) {
+    console.error('Monitor refresh failed', e);
+  }
+}
+
+function _renderRules(rules, st) {
+  const el = document.getElementById('monRulesList');
+  if (!rules.length) {
+    el.innerHTML = '<div class="empty">No rules yet — add one above.</div>';
+    return;
+  }
+  const lastValues = st.last_value || {};
+  const lastChecks = st.last_check || {};
+  const fireCounts = st.fire_counts || {};
+  const errors = st.errors || {};
+
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px;">
+    <thead><tr style="color:var(--text3);text-align:left;">
+      <th style="padding:6px 8px;">Name</th>
+      <th style="padding:6px 8px;">Condition</th>
+      <th style="padding:6px 8px;">Last Value</th>
+      <th style="padding:6px 8px;">Fires</th>
+      <th style="padding:6px 8px;">Status</th>
+      <th style="padding:6px 8px;">Actions</th>
+    </tr></thead>
+    <tbody>
+    ${rules.map(r => {
+      const lv = lastValues[r.id] ?? '—';
+      const lc = lastChecks[r.id] ? new Date(lastChecks[r.id] * 1000).toLocaleTimeString() : '—';
+      const fc = fireCounts[r.id] ?? 0;
+      const err = errors[r.id];
+      const cond = _condLabel(r.condition);
+      return `<tr style="border-top:1px solid var(--bg3);">
+        <td style="padding:7px 8px;font-weight:500;">${_esc(r.name)}</td>
+        <td style="padding:7px 8px;color:var(--text3);font-size:12px;">${_esc(cond)}</td>
+        <td style="padding:7px 8px;font-family:monospace;">${_esc(String(lv))}</td>
+        <td style="padding:7px 8px;">${fc}</td>
+        <td style="padding:7px 8px;">
+          ${err ? `<span style="color:var(--danger);font-size:11px;" title="${_esc(err)}">⚠ error</span>` :
+            r.enabled ? '<span style="color:var(--success);">● on</span>' : '<span style="color:var(--text3);">○ off</span>'}
+          <br><span style="font-size:11px;color:var(--text3);">${lc}</span>
+        </td>
+        <td style="padding:7px 8px;">
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <button onclick="monCheck('${r.id}')" class="refresh-btn" style="font-size:11px;padding:2px 6px;" title="Check now">▶</button>
+            <button onclick="monToggle('${r.id}', ${r.enabled})" class="refresh-btn" style="font-size:11px;padding:2px 6px;">${r.enabled ? 'Pause' : 'Resume'}</button>
+            <button onclick="monDelete('${r.id}')" class="refresh-btn" style="font-size:11px;padding:2px 6px;background:var(--danger);color:#fff;">✕</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('')}
+    </tbody></table>`;
+}
+
+function _renderAlerts(alerts) {
+  const el = document.getElementById('monAlertsList');
+  if (!alerts.length) {
+    el.innerHTML = '<div class="empty">No alerts yet</div>';
+    return;
+  }
+  el.innerHTML = alerts.map(a => {
+    const t = new Date(a.timestamp * 1000).toLocaleTimeString();
+    return `<div style="display:flex;gap:var(--sp-3);padding:6px 0;border-top:1px solid var(--bg3);align-items:baseline;">
+      <span style="font-size:11px;color:var(--text3);min-width:60px;">${t}</span>
+      <span style="font-size:12px;font-weight:500;color:var(--warn);">🔔 ${_esc(a.rule_name)}</span>
+      <span style="font-size:12px;color:var(--text2);">${_esc(a.message)}</span>
+    </div>`;
+  }).join('');
+}
+
+function _condLabel(cond) {
+  const ops = { gt: '>', lt: '<', gte: '≥', lte: '≤', eq: '=', ne: '≠',
+    contains: 'contains', not_contains: '!contains', changed: 'changed',
+    increased_pct: '+%', decreased_pct: '-%' };
+  const op = ops[cond.op] || cond.op;
+  if (cond.op === 'contains' || cond.op === 'not_contains') return `${op} "${cond.text || ''}"`;
+  if (cond.op === 'increased_pct' || cond.op === 'decreased_pct') return `${op} ${cond.percent ?? '?'}%`;
+  if (cond.op === 'changed') return 'changed';
+  return `${op} ${cond.value ?? '?'}`;
+}
+
+function _esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function toggleAddRuleForm() {
+  const card = document.getElementById('addRuleCard');
+  card.style.display = card.style.display === 'none' ? '' : 'none';
+}
+
+async function submitAddRule() {
+  const name = document.getElementById('monRuleName').value.trim();
+  const url = document.getElementById('monRuleUrl').value.trim();
+  const extract = document.getElementById('monRuleExtract').value.trim();
+  const op = document.getElementById('monRuleOp').value;
+  const rawVal = document.getElementById('monRuleValue').value.trim();
+  const rawText = document.getElementById('monRuleText').value.trim();
+  const rawPct = document.getElementById('monRulePct').value.trim();
+  const interval = parseInt(document.getElementById('monRuleInterval').value) || 60;
+  const cooldown = parseInt(document.getElementById('monRuleCooldown').value) || 300;
+  const message = document.getElementById('monRuleMessage').value.trim() || '{name}: {value}';
+  const actions = [];
+  if (document.getElementById('monActNotify').checked) actions.push('notify');
+  if (document.getElementById('monActTts').checked) actions.push('tts');
+
+  if (!name || !url) { showToast('Monitor', 'Name and URL are required', 'error'); return; }
+
+  const condition = { op };
+  if (rawVal) condition.value = parseFloat(rawVal);
+  if (rawText) condition.text = rawText;
+  if (rawPct) condition.percent = parseFloat(rawPct);
+
+  const rule = { name, source: { type: 'http', url, extract }, condition,
+    actions: actions.length ? actions : ['notify'], interval_seconds: interval,
+    cooldown_seconds: cooldown, message };
+
+  try {
+    const resp = await fetch('/api/monitor/rules', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(rule),
+    });
+    const data = await resp.json();
+    if (!resp.ok) { showToast('Monitor', data.detail || 'Failed to add rule', 'error'); return; }
+    showToast('Monitor', `Rule "${name}" added`, 'success');
+    toggleAddRuleForm();
+    refreshMonitor();
+  } catch (e) { showToast('Monitor', String(e), 'error'); }
+}
+
+async function monCheck(id) {
+  await fetch(`/api/monitor/rules/${id}/check`, { method: 'POST' });
+  showToast('Monitor', 'Check triggered', 'info', 2000);
+  setTimeout(refreshMonitor, 1500);
+}
+
+async function monToggle(id, enabled) {
+  const path = enabled ? 'disable' : 'enable';
+  await fetch(`/api/monitor/rules/${id}/${path}`, { method: 'POST' });
+  refreshMonitor();
+}
+
+async function monDelete(id) {
+  await fetch(`/api/monitor/rules/${id}`, { method: 'DELETE' });
+  refreshMonitor();
+}
+
+async function clearMonitorAlerts() {
+  await fetch('/api/monitor/alerts', { method: 'DELETE' });
+  refreshMonitor();
+}
 
 // ── Dashboard ──────────────────────────────────────────────────────
 
