@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (PRs #98–#100, D86, 2026-07-24)
+
+- **Hardening sprint** (PR #98, D86): shell sandbox `SAFE_DIRS` path restriction with 11 tests; kill-isolation CI step; Trivy exit-code `'1'` + `ignore-unfixed`; per-module coverage floors (`agentic ≥ 45%`, `memu-core ≥ 60%`); `go_no_go` + `check-docs` as early CI gates; restart-persistence smoke test; upload endpoint security fuzz (14 tests).
+- **Memory Graph tab** (PR #99, D86): D3 v7 force-directed graph (`/api/memory/graph-data`), category hub nodes, trust-tier colour coding (`PASS=#4caf50`, `REPAIR=#ffb74d`, `FAIL_CLOSED=#ef5350`), zoom/pan/drag, hover tooltip, detail card, filter controls.
+- **Whisper STT audio-service in minimal stack** (PR #99, D86): `perception/audio` at `172.20.0.15:8021`; `WHISPER_BACKEND=stub` safe default for CI; `/api/audio/transcribe` dashboard proxy; browser MediaRecorder fallback in `toggleVoice()` (webm/ogg blob → POST → transcript injected into chat input).
+- **TTS voice synthesis** (PR #100, D86): `output/tts` edge-tts service at `172.20.0.16:8030`, `en-GB-RyanNeural` voice; `/api/tts/synthesize` dashboard proxy; 🔊 speak button on all assistant messages with `speakMsg()` (ObjectURL playback, ⏹ toggle, `revokeObjectURL` on end); text capped at 5,000 chars.
+- **Audio transcribe fuzz suite** (PR #100): `scripts/test_audio_transcribe.py` — 13 tests covering path traversal, null bytes, 4,096-char filename, empty file, binary garbage, 503/502/4xx service-error mapping, OGG/WAV content-type forwarding. `make test-audio-transcribe` Makefile target wired into `core-tests.yml`.
+
 ### Fixed (PR #92, 2026-07-24)
 
 - **flake8 F821 in model_registry.py** (PR #92): `List` and `Any` were used in type annotations but missing from `from typing import ...`. Caused CI `Python application` check to fail after PR #91 merge.
