@@ -7,6 +7,15 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+# Evict any MagicMock stub injected by test_agentic_routes.py at collection time
+import importlib.util as _ilu
+sys.modules.pop("priority_queue", None)
+_pq_path = os.path.join(os.path.dirname(__file__), "..", "agentic", "priority_queue.py")
+_pq_spec = _ilu.spec_from_file_location("priority_queue", _pq_path)
+_pq_mod = _ilu.module_from_spec(_pq_spec)
+sys.modules["priority_queue"] = _pq_mod
+_pq_spec.loader.exec_module(_pq_mod)
+
 from priority_queue import Priority, PriorityQueue, QueueEntry, QueueStats, get_queue
 
 

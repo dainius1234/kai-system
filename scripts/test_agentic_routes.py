@@ -431,20 +431,20 @@ class TestCheckpoints:
         assert r.status_code == 404
 
     def test_delete_checkpoint_200(self):
-        r = client.delete("/checkpoint/some-id")
+        with patch("agentic_app_routes.delete_checkpoint", return_value=True):
+            r = client.delete("/checkpoint/some-id")
         assert r.status_code == 200
 
     def test_get_checkpoint_found(self):
-        _kc.load_checkpoint.return_value = _FakeCheckpoint()
-        r = client.get("/checkpoint/cp-test-001")
-        _kc.load_checkpoint.return_value = None
+        with patch("agentic_app_routes.load_checkpoint", return_value=_FakeCheckpoint()):
+            r = client.get("/checkpoint/cp-test-001")
         assert r.status_code == 200
         assert r.json()["status"] == "ok"
 
     def test_restore_checkpoint_found(self):
-        _kc.load_checkpoint.return_value = _FakeCheckpoint()
-        r = client.post("/checkpoint/cp-test-001/restore")
-        _kc.load_checkpoint.return_value = None
+        with patch("agentic_app_routes.load_checkpoint", return_value=_FakeCheckpoint()), \
+             patch("agentic_app_routes.create_checkpoint", return_value=_FakeCheckpoint()):
+            r = client.post("/checkpoint/cp-test-001/restore")
         assert r.status_code == 200
 
 
@@ -779,11 +779,9 @@ class TestBreakerPersist:
 
 class TestCheckpointDiff:
     def test_diff_both_found(self):
-        _kc.load_checkpoint.return_value = _FakeCheckpoint()
-        _kc.diff_checkpoints.return_value = {"changed": ["breakers"]}
-        r = client.get("/checkpoint/diff/cp-a/cp-b")
-        _kc.load_checkpoint.return_value = None
-        _kc.diff_checkpoints.return_value = {}
+        with patch("agentic_app_routes.load_checkpoint", return_value=_FakeCheckpoint()), \
+             patch("agentic_app_routes.diff_checkpoints", return_value={"changed": ["breakers"]}):
+            r = client.get("/checkpoint/diff/cp-a/cp-b")
         assert r.status_code == 200
         assert r.json().get("status") == "ok"
 

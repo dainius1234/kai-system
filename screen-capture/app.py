@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, HTTPException, Request, UploadFile, File
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from common.runtime import ErrorBudget, detect_device, sanitize_string, setup_json_logger
@@ -48,9 +49,10 @@ except ImportError:
 
 try:
     import pytesseract  # noqa: F401
+    pytesseract.get_tesseract_version()  # verify the binary is present, not just the Python package
     _tesseract_available = True
-except ImportError:
-    logger.info("pytesseract not available — OCR will be simulated")
+except Exception:
+    logger.info("pytesseract/tesseract not available — OCR will be simulated")
 
 try:
     from PIL import Image  # noqa: F401
@@ -71,10 +73,14 @@ class CaptureResult(BaseModel):
 def _ocr_image_bytes(img_bytes: bytes) -> str:
     """Run OCR on raw image bytes. Falls back to stub if dependencies missing."""
     if _tesseract_available and _pil_available:
-        from PIL import Image  # noqa: F811
-        import pytesseract  # noqa: F811
-        img = Image.open(io.BytesIO(img_bytes))
-        return pytesseract.image_to_string(img).strip()
+        try:
+            from PIL import Image  # noqa: F811
+            import pytesseract  # noqa: F811
+            img = Image.open(io.BytesIO(img_bytes))
+            return pytesseract.image_to_string(img).strip()
+        except Exception as e:
+            logger.warning("OCR failed: %s", e)
+            return "[OCR error]"
     return "[OCR unavailable — install pytesseract + Pillow + tesseract-ocr]"
 
 
@@ -164,8 +170,8 @@ async def capture() -> CaptureResult:
     )
 
 
-@app.post("/capture/file", response_model=CaptureResult)
-async def capture_file(file: UploadFile = File(...)) -> CaptureResult:
+@app.post("/capture/file")
+async def capture_file(file: UploadFile = File(...)):
     """OCR an uploaded image file."""
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file provided")
@@ -176,13 +182,13 @@ async def capture_file(file: UploadFile = File(...)) -> CaptureResult:
 
     text = _ocr_image_bytes(img_bytes) if OCR_ENABLED else "[OCR disabled]"
 
-    return CaptureResult(
-        status="ok",
-        text=sanitize_string(text[:5000]),
-        source=f"upload:{file.filename}",
-        timestamp=time.time(),
-        ocr_available=_tesseract_available,
-    )
+    return JSONResponse({
+        "status": "ok",
+        "text": sanitize_string(text[:5000]),
+        "source": f"upload:{file.filename}",
+        "timestamp": time.time(),
+        "ocr_available": _tesseract_available,
+    })
 
 
 @app.middleware("http")

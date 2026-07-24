@@ -32,6 +32,14 @@ def _load_module(name: str, path: Path):
     return mod
 
 
+# Evict any MagicMock stub injected by test_agentic_routes.py and load the
+# real local lakefs_client so memu-core/app.py gets proper LakeFSClient/VersionCommit.
+sys.modules.pop("lakefs_client", None)
+_lc_spec = importlib.util.spec_from_file_location("lakefs_client", ROOT / "memu-core" / "lakefs_client.py")
+_lc_mod = importlib.util.module_from_spec(_lc_spec)
+sys.modules["lakefs_client"] = _lc_mod
+_lc_spec.loader.exec_module(_lc_mod)
+
 memu = _load_module("app", ROOT / "memu-core" / "app.py")
 verifier = _load_module("verifier_integ", ROOT / "verifier" / "app.py")
 # Quarantine endpoints moved to memu-core-introspect (see DECISIONS.md D21).

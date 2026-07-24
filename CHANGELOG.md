@@ -5,6 +5,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed (PR #92, 2026-07-24)
+
+- **flake8 F821 in model_registry.py** (PR #92): `List` and `Any` were used in type annotations but missing from `from typing import ...`. Caused CI `Python application` check to fail after PR #91 merge.
+
+### Added (PR #91, D82–D83, 2026-07-24)
+
+- **C10 A/B query logger** (D83): `common/ab_log.py` — JSONL log per `LLMRouter.query()` call recording model name, latency, and response quality metrics (lexical diversity, uncertainty penalty). Enabled by default; disable via `AB_LOG_ENABLED=false`.
+- **P1 screen-capture headless tests** (PR #91): 20 pytest tests for `screen-capture/app.py` — `/health`, `/metrics`, `/capture/file` (PNG/JPEG upload, 413, 422), `/capture` watchdir fallback. No X11/Tesseract required.
+- **C4 classify_semantic fallback tests** (PR #91): 4 test groups verifying `classify_semantic()` falls back to keyword routing when `sentence-transformers` absent or `min_quality_tier` too high.
+- **F4/F6 feature flag tests** (PR #91): Offline verification that CONTEXT_ENRICHMENT defaults True and DREAM_ENABLED/EVOLVER_ENABLED/SAGE_SELF_REVIEW default False; env override round-trip tested.
+- **5 new Makefile targets** (PR #91): `test-memu-routes`, `test-agentic-routes`, `test-context-enrichment-ab`, `test-ab-log`, `test-screen-capture`.
+- **GPU Arrival Runbook** (D82, PR #91): `kai-pm/GPU_ARRIVAL_RUNBOOK.md` with G1–G8 verified shell commands for RTX 5080 onboarding day.
+
+### Fixed (PR #91, 2026-07-24)
+
+- **morning/evening briefing crash** (PR #91): `(t.get("fire_at") or "").startswith(...)` — `.get(key, "")` returns `None` when key exists with value `None`, causing `AttributeError`. Fixed in `memu-core/app.py`.
+- **identity narrative float/str timestamp crash** (PR #91): `get_identity_narrative()` compared autobiography `timestamp` (float from `time.time()`) with ISO string using `<`, raising `TypeError`. Fixed by normalising float to ISO before comparison.
+
 ### Added (Phase 0 backlog sweep — PRs #86–#87 + branch, D60–D70, 2026-07-21)
 
 - **SOUL.md / AGENTS.md identity editor** (D60, PR #86): `GET /soul` + `PUT /soul` in `agentic/app.py`; `GET /agents` + `PUT /agents` mirrored. Dashboard Soul tab renders both documents in side-by-side editors with live save. `security/SOUL.md` and `security/AGENTS.md` are the canonical on-disk files.
