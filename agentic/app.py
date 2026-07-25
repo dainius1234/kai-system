@@ -39,12 +39,16 @@ from adversary import challenge_plan, verdict_to_plan_metadata
 from tree_search import tree_search
 from priority_queue import get_queue
 from model_selector import select_model
+from cognitive_fingerprint import collector as _fp_collector, quick_sample as _fp_quick_sample
+from causal_world_model import get_causal_graph, CausalEdge, get_surprise_detector
+from global_workspace import get_global_workspace, WorkspaceBid
+from moral_core import get_ohana_core
 
-logger = setup_json_logger("langgraph", os.getenv("LOG_PATH", "/tmp/langgraph.json.log"))
+logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
 logger.info("Running on %s.", DEVICE)
 
-app = FastAPI(title="LangGraph Orchestrator", version="0.5.0")
+app = FastAPI(title="Kai", version="0.5.0")
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 TELEGRAM_ALERT_URL = os.getenv("TELEGRAM_ALERT_URL", "http://perception-telegram:9000/alert")
@@ -304,7 +308,7 @@ async def maybe_alert_mtd_proximity(strategy: Dict[str, object]) -> None:
     if 0 <= left <= 2000:
         try:
             async with httpx.AsyncClient(timeout=4.0) as client:
-                await client.post(TELEGRAM_ALERT_URL, json={"text": f"Alert: £{max(left, 0):.0f} left till MTD — prep GnuCash"})
+                await client.post(TELEGRAM_ALERT_URL, json={"text": f"Heads up — you're £{max(left, 0):.0f} from your MTD. Worth lining up GnuCash."})
         except Exception:
             logger.warning("Failed to deliver MTD proximity alert")
 
@@ -321,7 +325,7 @@ async def maybe_alert_low_conviction_average() -> None:
         last_low_conviction_alert = now
         try:
             async with httpx.AsyncClient(timeout=4.0) as client:
-                await client.post(TELEGRAM_ALERT_URL, json={"text": f"Kai needs tuning: 7-day conviction average={avg_score:.2f}/10"})
+                await client.post(TELEGRAM_ALERT_URL, json={"text": f"I've been a bit off lately — my 7-day conviction average is {avg_score:.2f}/10. Might be worth checking what I've been getting wrong."})
         except Exception:
             logger.warning("Failed to deliver low-conviction alert")
 
@@ -342,7 +346,7 @@ async def maybe_alert_error_budget_guard(name: str, guard: ErrorBudgetCircuitBre
             await client.post(
                 TELEGRAM_ALERT_URL,
                 json={
-                    "text": f"Dainius, your system is limping: {name} guard={state}, error_ratio={ratio:.1%} (warn={float(snap.get('warn_ratio', 0.0)):.0%}, open={float(snap.get('open_ratio', 0.0)):.0%})",
+                    "text": f"I'm running rough — {name} is {state}, error rate at {ratio:.1%}. I'm still here but might be a bit slow.",
                 },
             )
     except Exception:
@@ -1080,7 +1084,12 @@ def _update_baseline(key: str, value: float) -> Optional[float]:
 
 
 def _correlate_observations(obs: List[str]) -> List[str]:
-    """D88 M3: reason across multiple simultaneous sensor observations."""
+    """D88 M3: reason across multiple simultaneous sensor observations.
+
+    Correlations are also fed into the D101 CausalGraph as Phase 0 observations —
+    even as stubs, each observed co-occurrence strengthens a causal edge so the
+    graph has calibrated weights when Phase 3 activates.
+    """
     if len(obs) < 2:
         return []
     correlated: List[str] = []
@@ -1091,26 +1100,47 @@ def _correlate_observations(obs: List[str]) -> List[str]:
     has_email = any("Email:" in o and "unread" in o for o in obs)
     has_aq_bad = any("Air quality:" in o for o in obs)
 
+    causal_edges: List[tuple] = []  # (source, target, strength, note)
+
     if has_cpu and has_docker_bad:
         correlated.append(
             "Correlation: high CPU + unhealthy containers — resource pressure may be causing service failures; consider inspecting or restarting"
         )
+        causal_edges.append(("cpu_high", "docker_unhealthy", 0.7, "observed co-occurrence"))
     if has_ram and has_docker_bad:
         correlated.append(
             "Correlation: memory pressure + unhealthy containers — possible memory leak in a failing service"
         )
+        causal_edges.append(("ram_high", "docker_unhealthy", 0.6, "observed co-occurrence"))
     if has_cpu and has_ram:
         correlated.append(
             "Correlation: CPU and RAM both elevated — possible runaway process or resource contention"
         )
+        causal_edges.append(("cpu_high", "ram_high", 0.5, "observed co-occurrence"))
     if has_git_dirty and has_email:
         correlated.append(
             "Correlation: uncommitted changes + email backlog — operator is mid-flow; avoid interrupting unless critical"
         )
+        causal_edges.append(("git_dirty", "email_backlog", 0.4, "operator-focus pattern"))
     if has_aq_bad and has_email:
         correlated.append(
             "Correlation: poor air quality + email backlog — suggest outdoor break once clear to avoid cognitive fatigue"
         )
+        causal_edges.append(("aq_degraded", "cognitive_fatigue_risk", 0.45, "environmental correlation"))
+
+    # D101: feed correlations into CausalGraph as Phase 0 observations
+    if causal_edges and is_enabled("CAUSAL_WORLD_MODEL"):
+        try:
+            graph = get_causal_graph()
+            for source, target, strength, note in causal_edges:
+                graph.add_edge(CausalEdge(
+                    source=source, target=target,
+                    strength=strength, source_type="observed",
+                    note=note,
+                ))
+        except Exception:
+            pass
+
     return correlated
 
 
@@ -1377,10 +1407,38 @@ async def _proactive_observer() -> None:
             if is_enabled("HOUSE_DOCTOR") and observations:
                 try:
                     async with httpx.AsyncClient(timeout=5.0) as client:
-                        await client.post(
-                            f"{HOUSE_DOCTOR_URL}/diagnose",
-                            json={"observations": observations},
-                        )
+                        diag_payload: Dict[str, Any] = {"observations": observations}
+                        # Pass structured world_state so house-doctor can pattern-match
+                        # on real data instead of re-parsing observation strings
+                        if is_enabled("WORLD_MODEL_PERSISTENCE") and "world_model" in locals():
+                            diag_payload["world_state"] = world_model
+                        await client.post(f"{HOUSE_DOCTOR_URL}/diagnose", json=diag_payload)
+                except Exception:
+                    pass
+
+            # ── D101: surprise detection — predicted vs actual world state ──
+            if is_enabled("CAUSAL_SURPRISE") and _last_world_snapshot and is_enabled("CAUSAL_WORLD_MODEL"):
+                try:
+                    detector = get_surprise_detector()
+                    surprise = detector.check(
+                        predicted=_last_world_snapshot,
+                        actual=snapshot,
+                    )
+                    if surprise and surprise.get("surprised"):
+                        logger.info("D101 surprise detected: %s", surprise.get("reason", ""))
+                except Exception:
+                    pass
+
+            # ── D102: submit anomaly bids to GlobalWorkspace ──────────
+            if is_enabled("GLOBAL_WORKSPACE") and observations:
+                try:
+                    workspace = get_global_workspace()
+                    for obs in observations[:3]:  # top 3 observations as bids
+                        workspace.submit_bid(WorkspaceBid(
+                            module="proactive_observer",
+                            content=obs,
+                            urgency=0.4,
+                        ))
                 except Exception:
                     pass
 
@@ -1657,6 +1715,13 @@ async def chat_stream(req: ChatRequest):
     if INJECTION_RE.search(user_msg):
         raise HTTPException(status_code=400, detail="prompt injection pattern blocked")
 
+    # D98: accumulate cognitive fingerprint sample (Phase 0 — collecting before inference threshold)
+    if is_enabled("COGNITIVE_FINGERPRINT"):
+        try:
+            _fp_collector.record(_fp_quick_sample(user_msg, session_id=req.session_id))
+        except Exception:
+            pass
+
     wake_intent = await _preclassify_wake_intent(user_msg)
 
     # ── Step 0: Classify request ────────────────────────────────────
@@ -1703,6 +1768,12 @@ async def chat_stream(req: ChatRequest):
     if mode not in _SYSTEM_PROMPTS:
         mode = "PUB"
     system_prompt = _SYSTEM_PROMPTS[mode]
+
+    # D109: inject moral context — Phase 0 is a passthrough; Phase 3 prepends Ohana context
+    if is_enabled("OHANA_CORE"):
+        system_prompt = get_ohana_core().inject_into_prompt(
+            system_prompt, situation={"query": user_msg, "mode": mode}
+        )
 
     # fetch memories, session context, goals, active topics, and emotional context in parallel
     # H1.3: parallel fetch with error handling — one failing task must not crash /chat.
@@ -1756,7 +1827,7 @@ async def chat_stream(req: ChatRequest):
     # build the message list
     messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
 
-    # inject relevant memories as system context
+    # surface relevant past — what Kai already knows that bears on this moment
     if memories:
         mem_block = "\n".join(f"- {m}" for m in memories[:5])
         messages.append({
@@ -1764,8 +1835,7 @@ async def chat_stream(req: ChatRequest):
             "content": f"Relevant memories from past interactions:\n{mem_block}",
         })
 
-    # inject graph-memory context (entities/relationships, Phase C) alongside
-    # the flat-memory block above — only present when FF_GRAPH_INGEST is on
+    # draw on entity relationships (Phase C graph memory) — only when FF_GRAPH_INGEST is on
     graph_results = graph_context.get("results") if graph_context else None
     if graph_results:
         messages.append({
@@ -1773,7 +1843,7 @@ async def chat_stream(req: ChatRequest):
             "content": f"Related entities/relationships from graph memory:\n{graph_results}",
         })
 
-    # inject Letta agent memory context — only present when FF_LETTA_TASKS is on
+    # consult extended memory (Letta archival) — only when FF_LETTA_TASKS is on
     letta_response = letta_context.get("response") if letta_context else None
     if letta_response:
         messages.append({
@@ -1781,7 +1851,7 @@ async def chat_stream(req: ChatRequest):
             "content": f"Agent memory context (Letta):\n{letta_response}",
         })
 
-    # inject P29 financial context — CIS/VAT/tax summary, keyword-triggered
+    # feel the financial ground truth — CIS/VAT/tax, keyword-triggered
     if financial_context:
         fin_parts = []
         cis = financial_context.get("cis_summary", {})
@@ -1823,7 +1893,7 @@ async def chat_stream(req: ChatRequest):
             ),
         })
 
-    # inject active Ohana goals so Kai is goal-aware
+    # hold commitments in mind — active goals Kai is tracking for the operator
     if goals:
         goal_lines = []
         for g in goals[:5]:
@@ -1837,7 +1907,7 @@ async def chat_stream(req: ChatRequest):
             "content": "Active Ohana goals (track these, nudge about progress):\n" + "\n".join(goal_lines),
         })
 
-    # inject active/deferred conversation topics
+    # carry forward open threads — topics mid-conversation or deferred
     if topics:
         topic_lines = [f"- {t.get('topic', '')} (deferred: {t.get('deferred', False)})" for t in topics[:5]]
         messages.append({
@@ -1845,7 +1915,7 @@ async def chat_stream(req: ChatRequest):
             "content": "Active conversation topics (bring up naturally when relevant):\n" + "\n".join(topic_lines),
         })
 
-    # inject emotional awareness — mood, confidence, and epistemic humility
+    # read the operator's emotional field — mood, arc, and what to watch for
     if eq_context:
         eq_parts = []
         mood = eq_context.get("mood")
@@ -1860,7 +1930,7 @@ async def chat_stream(req: ChatRequest):
                 "content": "Emotional intelligence context:\n" + "\n".join(eq_parts),
             })
 
-    # inject narrative identity — Kai's sense of self and current life chapter
+    # recall who I am — narrative identity, self-sense, current life chapter
     if narrative:
         identity_text = narrative.get("narrative", "")
         chapter = narrative.get("current_chapter", "")
@@ -1874,7 +1944,7 @@ async def chat_stream(req: ChatRequest):
                 "content": "Self-identity (who I am, derived from experience):\n" + " ".join(id_parts),
             })
 
-    # inject imagination context — theory of mind about the operator
+    # imagine what the operator is going through right now
     if imagination:
         empathy = imagination.get("empathy", {})
         if empathy:
@@ -1894,7 +1964,7 @@ async def chat_stream(req: ChatRequest):
                     "content": "Theory of mind (imagining operator's state):\n" + ". ".join(emp_parts) + ".",
                 })
 
-    # inject conscience context — values alignment and moral compass
+    # let values orient this — conscience check before speaking
     if conscience:
         con_parts = []
         vals = conscience.get("values", [])
@@ -1911,7 +1981,7 @@ async def chat_stream(req: ChatRequest):
                 "content": "Conscience (values that guide me):\n" + ". ".join(con_parts) + ".",
             })
 
-    # inject agent context — scheduled tasks, reminders, capabilities
+    # surface what I've committed to — due tasks, reminders, active capabilities
     if agent_ctx:
         agent_parts = []
         due_tasks = agent_ctx.get("tasks", [])
@@ -1931,7 +2001,7 @@ async def chat_stream(req: ChatRequest):
                 "content": "Agent capabilities & schedule:\n" + "\n".join(agent_parts),
             })
 
-    # inject operator model — emotional echo, escalation, cross-mode insights
+    # understand the operator right now — echo, escalation, cross-mode pattern
     if operator_model:
         op_parts = []
         echo_msg = operator_model.get("echo")
@@ -1949,11 +2019,11 @@ async def chat_stream(req: ChatRequest):
                 "content": "Operator model (how I understand you right now):\n" + "\n".join(op_parts),
             })
 
-    # inject live world state — all sensory service summaries (Layer 2, D87)
+    # sense the world state — sensory layer summary (Layer 2, D87)
     if world_context:
         messages.append({"role": "system", "content": world_context})
 
-    # inject matched skill knowledge (J7 fix — skills were loaded but never consulted)
+    # apply known skill — bring in the right knowledge for this domain
     if matched_skill:
         messages.append({
             "role": "system",
@@ -1982,12 +2052,66 @@ async def chat_stream(req: ChatRequest):
     # record user turn
     await _append_session_turn(req.session_id, "user", user_msg)
 
+    async def _learn_from_exchange(u_msg: str, response: str, session: str) -> None:
+        """Record everything Kai should grow from in this exchange.
+
+        Runs after the stream closes. Failures here are logged at warning level —
+        these four acts are the feedback loop that makes Kai grow, not expendable
+        side-effects.
+        """
+        failed: List[str] = []
+        try:
+            async with httpx.AsyncClient(timeout=3.0) as cl:
+                await cl.post(
+                    f"{MEMU_URL}/memory/emotion/record",
+                    json={"session_id": session, "text": u_msg},
+                )
+        except Exception as e:
+            failed.append(f"emotion: {e}")
+        try:
+            async with httpx.AsyncClient(timeout=3.0) as cl:
+                await cl.post(
+                    f"{MEMU_URL}/memory/autobiography/record",
+                    json={"text": u_msg, "context": "chat"},
+                )
+        except Exception as e:
+            failed.append(f"autobiography: {e}")
+        # Derive the inner thought from the actual response, not a template
+        thought = (
+            response[:200].strip() + ("…" if len(response) > 200 else "")
+        ) if response else u_msg[:100]
+        try:
+            async with httpx.AsyncClient(timeout=3.0) as cl:
+                await cl.post(
+                    f"{MEMU_URL}/memory/imagine/thought",
+                    json={"thought": thought, "context": "chat_reflection"},
+                )
+        except Exception as e:
+            failed.append(f"thought: {e}")
+        try:
+            async with httpx.AsyncClient(timeout=3.0) as cl:
+                await cl.post(
+                    f"{MEMU_URL}/memory/values/learn",
+                    json={"experience": u_msg[:300], "outcome": "positive", "context": "chat"},
+                )
+        except Exception as e:
+            failed.append(f"values: {e}")
+        # D109: record decision so OhanaCore can learn the operator's situational stances
+        try:
+            get_ohana_core().record_decision(
+                situation={"query": u_msg[:200], "mode": mode, "session_id": session},
+                decision=response[:300],
+            )
+        except Exception as e:
+            failed.append(f"ohana: {e}")
+        if failed:
+            logger.warning("_learn_from_exchange: %d step(s) failed — %s", len(failed), "; ".join(failed))
+
     async def generate():
         full_response = []
         try:
             if not LLM_BREAKER.allow():
-                breaker_msg = {"token": "[Kai's brain needs a moment — LLM circuit breaker is open. Try again shortly.]"}
-                yield f"data: {json.dumps(breaker_msg)}\n\n"
+                yield f"data: {json.dumps({'token': 'You caught me at a bad moment — my thinking layer is recovering. Give it a few seconds.'})}\n\n"
                 yield "data: [DONE]\n\n"
                 return
             async for token in _llm.stream(select_model(route_decision.route, user_msg, _llm.available, prefer_speed=True), messages):
@@ -1998,59 +2122,17 @@ async def chat_stream(req: ChatRequest):
             LLM_BREAKER.record_failure()
             logger.error("LLM stream error: %s", e)
             if not full_response:
-                yield f"data: {json.dumps({'token': '[LLM error: ' + str(e)[:120] + ']'})}\n\n"
+                yield f"data: {json.dumps({'token': \"Something went wrong on my end — couldn't reach my thinking layer. Try again in a moment.\"})}\n\n"
 
         # when done, signal end
         yield "data: [DONE]\n\n"
 
-        # memorize the exchange (outside the stream read)
+        # memorize the exchange and learn from it (outside the stream read)
         response_text = "".join(full_response)
         if response_text:
             await _append_session_turn(req.session_id, "assistant", response_text)
             await _auto_memorize(user_msg, response_text, _DEFAULT_SPECIALIST, 8.0)
-            # record emotional state from the user's message
-            try:
-                async with httpx.AsyncClient(timeout=3.0) as _eq_cl:
-                    await _eq_cl.post(
-                        f"{MEMU_URL}/memory/emotion/record",
-                        json={"session_id": req.session_id, "text": user_msg},
-                    )
-            except Exception:
-                pass
-            # record to autobiography if significant
-            try:
-                async with httpx.AsyncClient(timeout=3.0) as _auto_cl:
-                    await _auto_cl.post(
-                        f"{MEMU_URL}/memory/autobiography/record",
-                        json={"text": user_msg, "context": "chat"},
-                    )
-            except Exception:
-                pass
-            # record inner monologue — what Kai was thinking
-            try:
-                async with httpx.AsyncClient(timeout=3.0) as _thought_cl:
-                    await _thought_cl.post(
-                        f"{MEMU_URL}/memory/imagine/thought",
-                        json={
-                            "thought": f"Responding to: '{user_msg[:100]}' — considered the operator's tone and context",
-                            "context": "chat_reflection",
-                        },
-                    )
-            except Exception:
-                pass
-            # learn values from operator interaction
-            try:
-                async with httpx.AsyncClient(timeout=3.0) as _val_cl:
-                    await _val_cl.post(
-                        f"{MEMU_URL}/memory/values/learn",
-                        json={
-                            "experience": user_msg[:300],
-                            "outcome": "positive",
-                            "context": "chat",
-                        },
-                    )
-            except Exception:
-                pass
+            await _learn_from_exchange(user_msg, response_text, req.session_id)
 
     return StreamingResponse(
         generate(),

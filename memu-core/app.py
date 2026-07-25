@@ -1026,6 +1026,7 @@ def score_importance(text: str, is_keeper: bool = False, is_pinned: bool = False
       - specificity (length / detail)
       - keeper flag (keeper's own notes are boosted)
       - pinned flag (explicit pin = max importance)
+      - emotional intensity at encoding time (arousal strengthens memory formation)
     """
     if is_pinned:
         return 1.0
@@ -1048,6 +1049,15 @@ def score_importance(text: str, is_keeper: bool = False, is_pinned: bool = False
     # keeper boost
     if is_keeper:
         score += 0.1
+
+    # emotional encoding: memories formed during high-arousal moments stick harder.
+    # Read the most recent emotional state — if it's intense, encode this memory stronger.
+    try:
+        recent_emotion = _emotional_timeline[-1] if _emotional_timeline else None
+        if recent_emotion and recent_emotion.get("intensity", 0.0) > 0.3:
+            score += recent_emotion["intensity"] * 0.15
+    except Exception:
+        pass
 
     return round(min(score, 1.0), 3)
 
@@ -1132,6 +1142,19 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
     candidates = store.search(top_k=MEMU_MAX_CANDIDATES, query=query)
     now_iso = datetime.now(tz=timezone.utc).isoformat()
 
+    # session emotional state: emotionally heightened sessions recall important memories more readily.
+    # Average the last 5 emotional intensities — when the operator is in a charged state,
+    # importance-weighted memories rise to the surface (mirrors human emotional memory bias).
+    try:
+        _recent_emo = _emotional_timeline[-5:] if _emotional_timeline else []
+        _avg_intensity = (
+            sum(e.get("intensity", 0.0) for e in _recent_emo) / len(_recent_emo)
+            if _recent_emo else 0.0
+        )
+        _session_emotion_boost = _avg_intensity * 0.07  # max +0.07 at full intensity
+    except Exception:
+        _session_emotion_boost = 0.0
+
     for record in candidates:
         # skip quarantined records — they never surface in retrieval
         if getattr(record, "poisoned", False):
@@ -1161,7 +1184,9 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
         if evt in ("correction", "metacognitive_rule"):
             correction_boost = 0.08
 
-        # weighted combination — tuned so recent + relevant + important = top
+        # weighted combination — tuned so recent + relevant + important = top.
+        # emotional bias: importance weight scales up with session emotional intensity —
+        # when Kai is in a charged emotional state, the most important memories surface first.
         score = (
             sim * 0.30
             + float(record.relevance) * 0.18
@@ -1171,6 +1196,7 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
             + category_boost
             + correction_boost
             + _trust_weight(getattr(record, "trust_tier", "unverified"))
+            + importance * _session_emotion_boost
         )
 
         ranked.append((score, record))

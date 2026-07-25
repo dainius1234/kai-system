@@ -30,7 +30,7 @@ app = FastAPI(title="vault-sync", version="1.0.0")
 
 VAULT_PATH = os.getenv("VAULT_PATH", "/vault")
 MEMU_CORE_URL = os.getenv("MEMU_CORE_URL", "http://memu-core:8001")
-TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8020")
+TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 FF_VAULT_SYNC = os.getenv("FF_VAULT_SYNC", "true").lower() == "true"
 
 # Gate conviction threshold for autonomous writes
