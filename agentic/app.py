@@ -48,6 +48,7 @@ from cortex import get_cortex
 from trust_integration import gate_autonomous_action, get_trust_status, record_chat_response
 from model_council import get_model_council
 from web_scout import fetch as web_fetch, search as web_search, summarize as web_summarize
+from service_watchdog import get_watchdog
 
 logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
@@ -602,6 +603,7 @@ async def introspect_capabilities() -> Dict[str, Any]:
         "trust": get_trust_status(),
         "model_council": get_model_council().status() if is_enabled("MODEL_COUNCIL") else None,
         "web_scout": is_enabled("WEB_SCOUT"),
+        "service_watchdog": get_watchdog().status() if is_enabled("SERVICE_WATCHDOG") else None,
     }
 
 
@@ -819,6 +821,33 @@ async def web_scout_summarize(req: WebScoutFetchRequest) -> Dict[str, Any]:
     if not is_enabled("WEB_SCOUT"):
         raise HTTPException(status_code=503, detail="FF_WEB_SCOUT is disabled")
     return await asyncio.to_thread(web_summarize, req.url, req.max_chars)
+
+
+@app.get("/watchdog/status")
+async def watchdog_status() -> Dict[str, Any]:
+    """D124: Service Watchdog — last health check results for all services."""
+    if not is_enabled("SERVICE_WATCHDOG"):
+        raise HTTPException(status_code=503, detail="FF_SERVICE_WATCHDOG is disabled")
+    return {"status": "ok", **get_watchdog().status()}
+
+
+@app.post("/watchdog/check")
+async def watchdog_check() -> Dict[str, Any]:
+    """D124: Trigger an immediate health check of all services."""
+    if not is_enabled("SERVICE_WATCHDOG"):
+        raise HTTPException(status_code=503, detail="FF_SERVICE_WATCHDOG is disabled")
+    results, fsm_events = await asyncio.to_thread(get_watchdog().check_all)
+    for evt_name in fsm_events:
+        try:
+            await fsm_fire(SysEvent(evt_name))
+        except Exception:
+            pass
+    return {
+        "checked": len(results),
+        "healthy": sum(1 for r in results if r.healthy),
+        "fsm_events_fired": fsm_events,
+        "services": [r.to_dict() for r in results],
+    }
 
 
 # ── LLM router (Kai's brain) ────────────────────────────────────────
@@ -1622,6 +1651,18 @@ async def _proactive_observer() -> None:
                 _cleanup_mgr.submit(
                     idle_curiosity_tick(_last_world_snapshot, is_gpu_available=False)
                 )
+
+            # ── D124: Service Watchdog — fire FSM events on critical failures ──
+            if is_enabled("SERVICE_WATCHDOG"):
+                try:
+                    _, fsm_events = await asyncio.to_thread(get_watchdog().check_all)
+                    for evt_name in fsm_events:
+                        try:
+                            await fsm_fire(SysEvent(evt_name))
+                        except Exception:
+                            pass
+                except Exception as exc:
+                    logger.debug("Service watchdog check failed (non-critical): %s", exc)
 
             _last_world_snapshot = snapshot
         except Exception as exc:

@@ -2543,3 +2543,37 @@ The Auditor knows the full factor model: operator_approval_history (30%), value_
 **Tests:** `scripts/test_web_scout.py` — 29 tests covering: safe URL validation, HTML text extraction (tags, script/style skip, entity decoding, max_chars cap), fetch (success, network failure, trust denial, unsafe URL, content-type handling, elapsed_ms), search (abstract, topics, max_results cap, network failure, trust denial), summarize (success, error propagation). All 29 pass.
 
 **Consequences:** Kai can now gather information independently — it does not need the operator to provide world context if sensors are down. The autonomous gate (PARTNER) ensures this capability is earned, not assumed. Cumulative: 221 tests across D118–D123, all green in isolation. Phase 2: Self-Preservation now covers model independence (D122) and information independence (D123).
+
+
+## D124 — 2026-07-25 — Service Watchdog: Persistent Health Monitoring & FSM Integration (Phase 2: Self-Preservation)
+
+**Context:** Model Council (D122) covers LLM backend failure. Web Scout (D123) covers information scarcity. The remaining self-preservation gap: Kai has no persistent memory of which services are currently down, no history of failure streaks, and no mechanism to update its operational FSM state based on service health. The existing `/introspect/capabilities` ping is fire-and-forget — it doesn't accumulate state or trigger transitions. Service Watchdog closes that gap.
+
+**Decisions:**
+
+**New module — `agentic/service_watchdog.py`:**
+- `ServiceProfile` dataclass: name, url, health_path, critical flag, consecutive_failures, last_healthy_at, was_down (tracks previous state for restored-event detection).
+- `CheckResult` dataclass: name, url, healthy, status_code, latency_ms, consecutive_failures, critical, error.
+- Built-in service registry matching app.py's sensory services — URLs resolved from environment at check time; `critical=True` for broker and skill_hunter (failure of either should trigger DEGRADED).
+
+**`ServiceWatchdog` class (singleton):**
+- `ping(name, url, health_path, critical, timeout_s)` → `CheckResult`: single HTTP health check via httpx; fail-open, never raises.
+- `check_all(timeout_s, services)` → `(List[CheckResult], List[str])`: parallel checks via `concurrent.futures.ThreadPoolExecutor`; accumulates consecutive_failures across calls; returns `(results, fsm_events)` where fsm_events is a list of event names ("service_down", "service_restored") for the async caller to fire.
+- `_recommend_fsm_events(profiles, results)`: `service_down` fires when a critical service has ≥ `_FAILURE_THRESHOLD` (2) consecutive failures; `service_restored` fires when a previously-down critical service returns healthy. Single failure below threshold is silent — avoids FSM churn on transient blips.
+- `status()` → summary dict with last_checked_at, healthy/unhealthy counts, critical_down list, full service list.
+- Atomic persistence to `data/watchdog/status.json`.
+
+**FSM integration (system_fsm.py already has SERVICE_DOWN / SERVICE_RESTORED):**
+- Watchdog is sync (can be called via `asyncio.to_thread()`). It returns event names; the async context (proactive loop or /watchdog/check endpoint) fires the FSM transitions.
+- Design principle: watchdog doesn't own FSM state — it observes and recommends; the orchestration layer decides when to fire.
+
+**Proactive observer loop (app.py):** When `FF_SERVICE_WATCHDOG` is enabled, each observer cycle runs `check_all()` and fires any recommended FSM events. Fail-open: watchdog exceptions are logged but never block the observer loop.
+
+**New endpoints in `agentic/app.py` (FF_SERVICE_WATCHDOG gate):**
+- `GET /watchdog/status` — last check results, healthy/unhealthy counts, critical_down list.
+- `POST /watchdog/check` — immediate check, fires FSM events, returns per-service results.
+- `/introspect/capabilities` updated with `"service_watchdog": watchdog.status()`.
+
+**Tests:** `scripts/test_service_watchdog.py` — 24 tests covering: health URL construction, ping (200/301/500/network-error/latency/critical flag), check_all (results, no-event-below-threshold, service_down-at-threshold, no-down-for-non-critical, service_restored-after-recovery, persistence, empty-input, last_checked_at), status (structure, counts, critical_down, None-before-first-check), to_dict, singleton lifecycle. All 24 pass.
+
+**Consequences:** Phase 2: Self-Preservation is now complete at the infrastructure layer — Kai survives model failure (D122), information scarcity (D123), and service degradation (D124). The DEGRADED/RECOVERING FSM arc is now fully wired end-to-end. Cumulative: 210 tests across D118–D124, all green in isolation.
