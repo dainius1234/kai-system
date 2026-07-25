@@ -1,7 +1,7 @@
 """Tests for Kai's cognitive intelligence layer (D87).
 
 Verifies:
-- _get_world_context() calls sensory services and filters trivial responses
+- _sense_world() calls sensory services and filters trivial responses
 - _proactive_observer() detects notable conditions and writes to memu-core
 - matched_skill is injected into /chat message list
 - FF_CONTEXT_ENRICHMENT gates the 14-way gather
@@ -56,7 +56,7 @@ def _install_common_stubs():
 
 
 class TestWorldContextFiltering(unittest.TestCase):
-    """_get_world_context() should skip trivial/error states."""
+    """_sense_world() should skip trivial/error states."""
 
     def test_trivial_summary_skipped(self):
         """Summaries containing 'not configured' or 'loading' must not reach the LLM."""
@@ -182,7 +182,7 @@ class TestSensoryURLConstants(unittest.TestCase):
 
     def test_world_context_function_exists(self):
         src = open("/home/user/kai-system/agentic/app.py").read()
-        self.assertIn("async def _get_world_context(", src)
+        self.assertIn("async def _sense_world(", src)
 
     def test_proactive_observer_function_exists(self):
         src = open("/home/user/kai-system/agentic/app.py").read()
@@ -194,7 +194,7 @@ class TestSensoryURLConstants(unittest.TestCase):
 
     def test_world_context_in_gather(self):
         src = open("/home/user/kai-system/agentic/app.py").read()
-        self.assertIn("_get_world_context()", src)
+        self.assertIn("_sense_world()", src)
 
     def test_enrichment_gate_implemented(self):
         src = open("/home/user/kai-system/agentic/app.py").read()

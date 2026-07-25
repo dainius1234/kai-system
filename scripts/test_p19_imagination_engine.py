@@ -643,9 +643,9 @@ class TestDashboardSoulView:
 # ═════════════════════════════════════════════════════════════════════
 
 class TestLangGraphIntegration:
-    def test_get_imagination_context_exists(self):
-        assert hasattr(ag, "_get_imagination_context")
+    def test_imagine_context_exists(self):
+        assert hasattr(ag, "_imagine_context")
 
     def test_imagination_context_is_async(self):
         import asyncio
-        assert asyncio.iscoroutinefunction(ag._get_imagination_context)
+        assert asyncio.iscoroutinefunction(ag._imagine_context)

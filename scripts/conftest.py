@@ -10,9 +10,37 @@ their redis-unavailable fallback path (e.g. build_saver() in kai_config.py)
 still trigger their fallback to the in-memory/spool backend.
 """
 
+import importlib.util
 import os
 import sys
+from pathlib import Path
 from unittest.mock import MagicMock
+
+# ── Vault-sync: load service modules under importable aliases ─────────────────
+# pytest_configure defined inside a test file is not called as a plugin hook;
+# this conftest.py is the correct place for session-wide path/module setup.
+_ROOT = Path(__file__).parent.parent
+for _sub in ("vault-sync", "common", "memu-core"):
+    _p = str(_ROOT / _sub)
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+_VAULT_ALIASES = {
+    "vault_sync_parser": _ROOT / "vault-sync" / "parser.py",
+    "vault_sync_mapper": _ROOT / "vault-sync" / "mapper.py",
+    "vault_sync_watcher": _ROOT / "vault-sync" / "watcher.py",
+    "vault_sync_app": _ROOT / "vault-sync" / "app.py",
+}
+for _alias, _src in _VAULT_ALIASES.items():
+    if _alias not in sys.modules:
+        _spec = importlib.util.spec_from_file_location(_alias, _src)
+        if _spec:
+            _mod = importlib.util.module_from_spec(_spec)
+            sys.modules[_alias] = _mod
+            try:
+                _spec.loader.exec_module(_mod)
+            except Exception:
+                pass
 
 # Allow offline tests that don't depend on embedding quality to run without
 # sentence-transformers installed (mirrors CI's MEMU_ALLOW_FAKE_EMBEDDINGS).

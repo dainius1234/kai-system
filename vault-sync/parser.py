@@ -43,10 +43,13 @@ def parse_note(filepath: str) -> Optional[NoteData]:
     content = raw
     if raw.startswith("---"):
         try:
-            import frontmatter as _fm
-            post = _fm.loads(raw)
-            fm = dict(post.metadata)
-            content = post.content
+            end = raw.find("\n---", 3)
+            if end > 0:
+                import yaml
+                fm = yaml.safe_load(raw[3:end]) or {}
+                if not isinstance(fm, dict):
+                    fm = {}
+                content = raw[end + 4:].lstrip("\n")
         except Exception:
             pass
 

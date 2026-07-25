@@ -45,6 +45,7 @@ class HandoffStatus(str, Enum):
     COMPLETE = "complete"
     PARTIAL = "partial"
     FAILED = "failed"
+    DEGRADED = "degraded"  # oracle/reasoning step failed — epistemic absence, not hard failure
     NEEDS_INPUT = "needs_input"
     CONSENSUS = "consensus"
     NO_CONSENSUS = "no_consensus"

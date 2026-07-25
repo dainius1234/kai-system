@@ -311,7 +311,9 @@ class TestCounterfactualStub:
 
 class TestCuriosityStub:
     @pytest.mark.anyio
-    async def test_no_gpu_returns_none(self):
+    async def test_no_gpu_returns_none(self, monkeypatch):
+        import common.feature_flags as _ff
+        monkeypatch.setattr(_ff, "is_enabled", lambda _name: False)
         from curiosity import idle_curiosity_tick
         result = await idle_curiosity_tick({}, is_gpu_available=False)
         assert result is None
@@ -532,7 +534,11 @@ class TestD89FeatureFlags:
 
     def test_all_d89_flags_default_true(self):
         flags = self._flags()
-        d89 = ["FSM", "PERSISTENT_TEAMMATES", "HOUSE_DOCTOR", "RITUAL_DISCOVERY",
-               "GAP_LOGGING", "TRUST_NEGOTIATION", "PREDICTIVE_EMPATHY", "CURIOSITY"]
-        for flag in d89:
+        # TRUST_NEGOTIATION and PREDICTIVE_EMPATHY intentionally default to False
+        # (stub implementations — enabling them would silently mislead capability consumers)
+        d89_true = ["FSM", "PERSISTENT_TEAMMATES", "HOUSE_DOCTOR", "RITUAL_DISCOVERY",
+                    "GAP_LOGGING", "CURIOSITY"]
+        for flag in d89_true:
             assert flags[flag]["default"] is True, f"{flag} should default to True"
+        assert flags["TRUST_NEGOTIATION"]["default"] is False
+        assert flags["PREDICTIVE_EMPATHY"]["default"] is False

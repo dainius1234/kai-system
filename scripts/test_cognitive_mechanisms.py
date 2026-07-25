@@ -53,14 +53,27 @@ def _load_agentic():
         "tree_search": _stub_module("tree_search", tree_search=AsyncMock()),
         "priority_queue": _stub_module("priority_queue", get_queue=MagicMock(return_value=MagicMock(stats=MagicMock(return_value=MagicMock(pending=0, active=0, total_processed=0, avg_wait_ms=0.0))))),
         "model_selector": _stub_module("model_selector", select_model=MagicMock(return_value="Ollama"), list_models=MagicMock(return_value=[]), get_profile=MagicMock(return_value=None)),
-        "conviction": _stub_module("conviction", build_plan=MagicMock(), detect_self_deception=MagicMock(), low_conviction_feedback=MagicMock(), score_conviction=MagicMock(return_value=8.0)),
+        "conviction": _stub_module("conviction", build_plan=MagicMock(), detect_self_deception=MagicMock(), low_conviction_feedback=MagicMock(), score_conviction=MagicMock(return_value=8.0), update_domain_confidence=MagicMock()),
         "kai_config": _stub_module("kai_config", build_saver=MagicMock(return_value=MagicMock(recall=MagicMock(return_value=[]))), classify_failure=MagicMock(), extract_metacognitive_rule=MagicMock(), extract_preference=MagicMock(), FailureClass=MagicMock(), compute_learning_value=MagicMock(), capture_snapshot=MagicMock(), save_snapshot=MagicMock(), create_checkpoint=MagicMock(), list_checkpoints=MagicMock(return_value=[]), load_checkpoint=MagicMock(), diff_checkpoints=MagicMock(), delete_checkpoint=MagicMock()),
         "common.auth": _stub_module("common.auth", sign_gate_request=MagicMock(), sign_gate_request_bundle=MagicMock()),
         "common.feature_flags": _stub_module("common.feature_flags", is_enabled=MagicMock(return_value=True), get_all_flags=MagicMock(return_value=[])),
         "common.llm": _stub_module("common.llm", LLMRouter=MagicMock(return_value=MagicMock(available=[], stream=AsyncMock())), llm_warmup=AsyncMock()),
+        "common.resilience": _stub_module("common.resilience", resilient_call=AsyncMock()),
         "common.runtime": _stub_module("common.runtime", AuditStream=MagicMock(return_value=MagicMock(log=MagicMock())), CircuitBreaker=MagicMock(return_value=MagicMock(allow=MagicMock(return_value=True), record_success=MagicMock(), record_failure=MagicMock(), snapshot=MagicMock(return_value={}), failures=0, state="closed", opened_at=0.0)), ErrorBudget=MagicMock(return_value=MagicMock(record=MagicMock(), snapshot=MagicMock(return_value={}))), ErrorBudgetCircuitBreaker=MagicMock(return_value=MagicMock(allow=MagicMock(return_value=True), record=MagicMock(), snapshot=MagicMock(return_value={}))), INJECTION_RE=MagicMock(search=MagicMock(return_value=None)), detect_device=MagicMock(return_value="cpu"), sanitize_string=lambda x: x, setup_json_logger=MagicMock(return_value=MagicMock(info=MagicMock(), warning=MagicMock(), debug=MagicMock(), error=MagicMock()))),
         "common.self_emp_advisor": _stub_module("common.self_emp_advisor", advise=MagicMock(return_value=[]), load_expenses=MagicMock(return_value=[]), load_income_total=MagicMock(return_value=0.0), thresholds=MagicMock(return_value={})),
         "common.model_registry": _stub_module("common.model_registry", context_budget=MagicMock(return_value=3072), count_tokens=MagicMock(return_value=1)),
+        "system_fsm": _stub_module("system_fsm", KaiEvent=MagicMock(), fire=AsyncMock(return_value=None), current_state=MagicMock(return_value="IDLE"), fsm_snapshot=MagicMock(return_value={})),
+        "teammates": _stub_module("teammates", load_teammates=MagicMock(return_value=[]), list_teammates=MagicMock(return_value=[]), build_teammate_context=AsyncMock(return_value={})),
+        "counterfactual": _stub_module("counterfactual", rehearse=AsyncMock(return_value={}), can_rehearse=MagicMock(return_value=False)),
+        "cognitive_fsm": _stub_module("cognitive_fsm", CognitiveFSM=MagicMock(return_value=MagicMock()), get_config=MagicMock(return_value={})),
+        "swarm": _stub_module("swarm", SwarmContext=MagicMock(), list_reputation=MagicMock(return_value=[]), load_reputation=MagicMock(return_value={}), record_error=MagicMock(), record_success=MagicMock(), save_reputation=MagicMock()),
+        "swarm_stages": _stub_module("swarm_stages", build_swarm_pipeline=MagicMock(return_value=[])),
+        "curiosity": _stub_module("curiosity", idle_curiosity_tick=AsyncMock(), CURIOSITY_LOG=[]),
+        "cognitive_fingerprint": _stub_module("cognitive_fingerprint", collector=MagicMock(), quick_sample=MagicMock(return_value={})),
+        "causal_world_model": _stub_module("causal_world_model", get_causal_graph=MagicMock(return_value=MagicMock()), CausalEdge=MagicMock(), get_surprise_detector=MagicMock(return_value=MagicMock())),
+        "global_workspace": _stub_module("global_workspace", get_global_workspace=MagicMock(return_value=MagicMock()), WorkspaceBid=MagicMock()),
+        "moral_core": _stub_module("moral_core", get_ohana_core=MagicMock(return_value=MagicMock())),
+        "cortex": _stub_module("cortex", get_cortex=MagicMock(return_value=MagicMock())),
         "fastapi": _stub_module("fastapi", FastAPI=MagicMock(return_value=MagicMock(middleware=MagicMock(return_value=lambda f: f), get=MagicMock(return_value=lambda f: f), post=MagicMock(return_value=lambda f: f))), HTTPException=Exception, Request=MagicMock()),
         "fastapi.responses": _stub_module("fastapi.responses", StreamingResponse=MagicMock()),
         "pydantic": _stub_module("pydantic", BaseModel=object),
@@ -335,7 +348,7 @@ class TestSkillHunterService:
 
     def test_generate_skill_md_contains_package(self):
         mod = self._load_hunter()
-        md = mod._generate_skill_md("parse pdf files", "pypdf2")
+        md = mod._generate_skill_md("parse pdf files", "pypdf2", "parse_pdf_files")
         assert "pypdf2" in md
         assert "parse pdf files" in md
 
@@ -367,7 +380,7 @@ class TestSkillHunterService:
         (tmp_path / "hunted_test_skill.md").write_text("# test", encoding="utf-8")
         result = await mod.list_hunted_skills()
         assert result["count"] == 1
-        assert "hunted_test_skill" in result["skills"]
+        assert any(s["name"] == "test_skill" for s in result["skills"])
 
 
 import re  # needed inside class methods above

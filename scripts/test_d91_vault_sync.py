@@ -197,14 +197,16 @@ class TestWatcher:
         time.sleep(_DEBOUNCE_SECONDS + 0.5)
         assert "/vault/Knowledge/BTC.md" in received
 
-    def test_debounce_deduplicates_rapid_saves(self):
-        from vault_sync_watcher import _VaultHandler, _DEBOUNCE_SECONDS
+    def test_debounce_deduplicates_rapid_saves(self, monkeypatch):
+        import vault_sync_watcher as watcher_mod
+        monkeypatch.setattr(watcher_mod, "_DEBOUNCE_SECONDS", 0.2)
+        from vault_sync_watcher import _VaultHandler
         received = []
         h = _VaultHandler(on_change=received.append, on_delete=lambda x: None)
         for _ in range(5):
             h._schedule("/vault/KAI/note.md")
-            time.sleep(0.05)
-        time.sleep(_DEBOUNCE_SECONDS + 0.5)
+            time.sleep(0.02)
+        time.sleep(0.5)
         assert received.count("/vault/KAI/note.md") == 1
 
     def test_on_deleted_triggers_delete_callback(self):
@@ -293,10 +295,11 @@ class TestVaultSyncApp:
             assert r.status_code == 400
 
     def test_export_writes_file_with_high_conviction(self, tmp_path, monkeypatch):
-        monkeypatch.setenv("VAULT_PATH", str(tmp_path))
-        monkeypatch.setenv("FF_VAULT_SYNC", "true")
         from fastapi.testclient import TestClient
         import vault_sync_app as app_mod
+
+        monkeypatch.setattr(app_mod, "VAULT_PATH", str(tmp_path))
+        monkeypatch.setattr(app_mod, "FF_VAULT_SYNC", True)
 
         async def _mock_ingest(fp):
             pass
@@ -312,10 +315,9 @@ class TestVaultSyncApp:
             assert (tmp_path / "KAI" / "lesson.md").exists()
 
     def test_export_disabled_when_ff_off(self, tmp_path, monkeypatch):
-        monkeypatch.setenv("VAULT_PATH", str(tmp_path))
-        monkeypatch.setenv("FF_VAULT_SYNC", "false")
         from fastapi.testclient import TestClient
         import vault_sync_app as app_mod
+        monkeypatch.setattr(app_mod, "FF_VAULT_SYNC", False)
         with TestClient(app_mod.app) as c:
             r = c.post("/export", json={
                 "filepath": "KAI/test.md",
@@ -325,10 +327,11 @@ class TestVaultSyncApp:
             assert r.status_code == 503
 
     def test_ingest_returns_skipped_on_unchanged_checksum(self, tmp_path, monkeypatch):
-        monkeypatch.setenv("VAULT_PATH", str(tmp_path))
-        monkeypatch.setenv("FF_VAULT_SYNC", "true")
         from fastapi.testclient import TestClient
         import vault_sync_app as app_mod
+
+        monkeypatch.setattr(app_mod, "VAULT_PATH", str(tmp_path))
+        monkeypatch.setattr(app_mod, "FF_VAULT_SYNC", True)
 
         note_path = tmp_path / "KAI" / "note.md"
         _write(note_path, "# Same content")

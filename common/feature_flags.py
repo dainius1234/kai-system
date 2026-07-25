@@ -133,3 +133,6 @@ def get_all_flags() -> List[Dict[str, Any]]:
 def register_flag(name: str, description: str, default: bool = False) -> None:
     """Register a new flag at runtime (e.g. from a service plugin)."""
     _REGISTRY[name.upper()] = (description, default)
+
+# Public alias for external access
+FLAGS = _REGISTRY

@@ -421,8 +421,8 @@ class TestCausalCheckStage:
             AsyncMock(side_effect=RuntimeError("network")),
         )
         result = await stage(_make_handoff(), SWARM_CONFIGS["default"])
-        assert result.status == HandoffStatus.COMPLETE
-        assert result.confidence == 5.0  # fallback
+        assert result.status == HandoffStatus.DEGRADED
+        assert result.confidence == 3.5  # degraded fallback
 
     @pytest.mark.anyio
     async def test_causal_confidence_scales_with_chain_count(self):
