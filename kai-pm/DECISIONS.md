@@ -1797,3 +1797,156 @@ Four note templates in `vault-sync/templates/`: `daily-note.md`, `lesson-learned
 - `POST /ingest` and the background watcher share the same `_ingest_note` coroutine — one code path for both trigger types.
 - `_vault_notes` in memu-core is in-memory only; it resets on service restart. The persistent truth is the vault files themselves + the mapping.json. A cold-start full-sync is achieved by calling `POST /ingest` for every .md file.
 - `obsidian-local-rest-api` plugin is the optional bridge for remote vaults (vault on a different machine than the server). vault-sync's watcher only works when the vault is locally mounted.
+
+---
+
+## D92 — Socratic Self-Questioning
+
+**Date:** 2026-07-25
+
+**Decision — D92 — Pre-GATHER Socratic Decomposition:**
+`SocraticQuestioner` runs before Scout in the swarm pipeline. It generates 3–5 precision decomposition questions that reframe the original query. These questions are stored in `SwarmContext.decomposition_questions` and the combined text lands in `SwarmContext.enriched_query` — injected as the working query for every downstream stage.
+
+**Architecture:**
+- `agentic/questioner.py` — `SocraticQuestioner`, `SocraticResult`, `_parse_question_list()`, `_build_enriched_query()`.
+- `_SOCRATIC_SYSTEM` prompt: 5 question archetypes (hidden assumption, disproof evidence, simplest explanation, second-order consequence, surface clarification).
+- Graceful degradation: LLM failure → `FALLBACK_QUESTIONS[:3]` (static hardcoded fallback, still structurally useful).
+- `agentic/swarm.py` — `SwarmContext` gains `decomposition_questions: List[str]` and `enriched_query: str`.
+- `agentic/swarm_stages.py` — `make_questioner_stage(questioner)` factory; `build_swarm_pipeline()` accepts optional `questioner` kwarg and adds `questioner_fn` to the returned dict.
+- Feature flag: `FF_SOCRATIC` (default True).
+
+**Why structural improvement matters:** Even a tiny LLM benefits from a well-decomposed problem statement. The Socratic stage costs one cheap LLM call and returns a richer query — every subsequent stage (Scout, Sage, Doctor, Oracle) reasons against a deeper problem representation. The improvement compounds.
+
+**Tests:** 25 tests in `scripts/test_d92_socratic.py` covering: numbered/bulleted/paren parse formats, non-question filtering, short-line skipping, LLM success, LLM cap-at-5, LLM failure→fallback, empty-parse→fallback, `can_question()` with and without feature_flags module.
+
+**Consequences:**
+- `build_swarm_pipeline()` is backwards-compatible: `questioner=None` (default) omits the stage, existing callers unchanged.
+- The stage is non-fatal: any Questioner exception logs at DEBUG and passes through to GATHER with the original query.
+
+---
+
+## D93 — Autonomous Hypothesis Engine
+
+**Date:** 2026-07-25
+
+**Decision — D93 — Idle-Cycle Gap Scanning:**
+`HypothesisEngine` in `agentic/hypothesis.py` scans low-confidence or contradicted memories (passed as `seed_topics`), forms a testable hypothesis ("If X is true, then Y should follow"), tests it against memory evidence via the LLM, and logs results to `/data/CURIOSITY.md`.
+
+**Architecture:**
+- `Hypothesis` dataclass: `statement, basis_memory, test_predicate, result (SUPPORTED|REFUTED|INCONCLUSIVE|untested), rationale, confidence`.
+- `run_cycle(seed_topics)` — caps at `MAX_HYPOTHESES_PER_CYCLE = 3` per tick.
+- Two-step: `_form_hypothesis(topic)` → `_test_hypothesis(hyp)`.
+- Fallback (no LLM): generates a structural hypothesis from the topic string without LLM.
+- `agentic/curiosity.py` `idle_curiosity_tick()` wired: runs `HypothesisEngine.run_cycle()` when `FF_HYPOTHESIS_ENGINE=True`, CPU-safe (no GPU required).
+- Feature flag: `FF_HYPOTHESIS_ENGINE` (default True).
+
+**Tests:** 20 tests in `scripts/test_d93_hypothesis.py` covering: empty seeds, no-LLM fallback, MAX_HYPOTHESES_PER_CYCLE cap, LLM formation, empty-response skip, LLM failure grace, SUPPORTED/REFUTED verdicts, CURIOSITY.md append.
+
+**Consequences:**
+- Kai gains an inner research loop: every idle tick may produce 1–3 tested beliefs about the world.
+- CURIOSITY.md is append-only; pruning/compaction is a Phase 1 task.
+
+---
+
+## D94 — Temporal Projection
+
+**Date:** 2026-07-25
+
+**Decision — D94 — Fan-of-Futures Forecasting:**
+`TemporalForecaster` in `agentic/forecaster.py` extends Oracle's causal tracing into explicit multi-branch scenario planning. From supported claims, it produces a `ForecastFan` with four `ScenarioBranch` objects (base, optimistic, pessimistic, wild_card), each with probability, narrative, and key assumptions.
+
+**Architecture:**
+- `ScenarioBranch`: `label, narrative, probability, key_assumptions, confidence_modifier`.
+- `ForecastFan`: `query, base_claim, branches, elapsed_ms, used_llm`. Property `consensus_probability` returns the base branch probability.
+- `_FORECAST_SYSTEM` prompt requests JSON array of 4 scenario objects.
+- `_parse_branches(raw)` — robust JSON extraction, skips unknown labels.
+- Fallback: `_FALLBACK_BRANCHES` (base=0.50, opt=0.25, pess=0.20, wild=0.05).
+- CPU-safe: works with any LLM. GPU accelerates quality, not structural correctness.
+- Feature flag: `FF_TEMPORAL_PROJECTION` (default True).
+
+**Tests:** 15 tests in `scripts/test_d94_forecaster.py` covering: ScenarioBranch defaults, ForecastFan consensus_probability, to_dict(), parse valid JSON, skip bad labels, malformed JSON, preamble handling, no-LLM fallback, no-claims fallback, elapsed_ms, LLM success, LLM bad-parse fallback, LLM exception fallback.
+
+**Consequences:**
+- `ForecastFan.to_dict()` is the interface for API exposure — `POST /forecast` endpoint can be added in a future sprint.
+- `wild_card` branch probability (0.05) captures tail-risk scenarios that consensus forecasting systematically underweights.
+
+---
+
+## D95 — Dialectical Synthesis (GPU-era stub)
+
+**Date:** 2026-07-25
+
+**Decision — D95 — Hegelian Triad Reasoner:**
+`DialecticalReasoner` in `agentic/dialectic.py`. Given thesis and antithesis claims, produces a `DialecticalTriad` that resolves the contradiction at a higher level of abstraction. `can_synthesize()` returns False until dual-model GPU is provisioned and `FF_DIALECTICAL_SYNTHESIS=True`. Stub synthesis is logged with `resolution_level="stub_pending_gpu"`.
+
+**Rationale for laying foundation:** The dual-model architecture (OLLAMA_MODEL argues thesis, OLLAMA_MODEL_B argues antithesis, third arbitrates) is the correct implementation but requires hardware not yet provisioned. The interface is fixed now so Phase 1 activation is parameter flip + implementation, not a redesign.
+
+---
+
+## D96 — Analogical Reasoning Engine (GPU-era stub)
+
+**Date:** 2026-07-25
+
+**Decision — D96 — Cross-Domain Isomorphic Pattern Search:**
+`AnalogyEngine` in `agentic/analogy.py`. Finds structural similarities between domains via embedding-based graph traversal. `Analogy` dataclass: `source_domain, target_domain, structural_mappings: List[AnalogyMapping], proposed_solution, confidence, graph_path`. `can_find()` returns False until memu-graph has ≥1000 concept nodes and GPU embedding search is available.
+
+---
+
+## D97 — Concept Blending (GPU-era stub)
+
+**Date:** 2026-07-25
+
+**Decision — D97 — Novel Emergent Concept Synthesis:**
+`ConceptBlender` in `agentic/concept_blend.py`. Based on Fauconnier & Turner's conceptual blending theory. `BlendedConcept` dataclass: `concept_a, concept_b, blended_name, emergent_properties, inherited_from_a, inherited_from_b, suppressed_properties, novelty_score, confidence`. `can_blend()` returns False until concept graph and GPU generative capacity are ready.
+
+---
+
+## D98 — Cognitive Fingerprinting
+
+**Date:** 2026-07-25
+
+**Decision — D98 — Operator Thinking-Style Model:**
+`CognitiveFingerprintCollector` in `agentic/cognitive_fingerprint.py`. Two-phase design:
+
+**Phase 0 (NOW):** Collect `InteractionSample` records from every chat interaction. Each sample captures: `query, response_length_preference, decision_made, abstraction_level, time_horizon, risk_signal, query_type`. Written to `/data/cognitive_fingerprint.jsonl` (JSONL, append-only). `quick_sample(query)` heuristic inference from surface query features — no LLM needed.
+
+**Phase 1 (GPU):** Once ≥90 samples are collected, `can_infer()` returns True and k-means clustering reveals stable thinking-style dimensions → `CognitiveFingerprint` with `dominant_style, risk_tolerance, preferred_abstraction, typical_time_horizon, decision_velocity`.
+
+**Integration point:** Import `collector` singleton from `cognitive_fingerprint` and call `collector.record(quick_sample(query))` from the `/chat` handler.
+
+`FF_COGNITIVE_FINGERPRINT` defaults True (collecting now). `progress()` reports samples collected vs threshold.
+
+---
+
+## D99 — Synthetic Experience Generator (GPU-era stub)
+
+**Date:** 2026-07-25
+
+**Decision — D99 — Fictional Scenario Generation During Dream Cycles:**
+`SyntheticExperienceGenerator` in `agentic/synthetic_experience.py`. Generates fictional but internally consistent scenarios during dream phases to exercise reasoning pathways rarely stimulated by real interactions. `SyntheticScenario` dataclass: `premise, narrative, entities, emotional_valence, reasoning_pathways_exercised, experience_type, insight, confidence`. Experience types: counterfactual, perspective_shift, edge_case, stress_test. `can_generate()` returns False until `FF_SYNTHETIC_EXPERIENCE=True` (GPU dream cycles active).
+
+---
+
+## D100 — Transitive Reasoning (GPU-era stub)
+
+**Date:** 2026-07-25
+
+**Decision — D100 — Graph-Theoretic Inference over memu-graph:**
+`TransitiveReasoner` in `memu-graph/transitive.py`. Four reasoning modes:
+1. **Shortest path** — k-shortest connection chains between concept nodes.
+2. **PageRank** — most influential nodes in the knowledge graph.
+3. **Community detection** — topic clusters the query touches.
+4. **Rule mining** — transitive association rules: "A→B + B→C ⟹ A→C with p=0.8".
+
+`Connection`: `source, target, relation, weight, evidence_count`. `GraphInsight`: `claim, support_path, relation_chain, confidence, insight_type`. `ReasoningResult`: `query, insights, top_nodes, communities, rules_mined, edge_count, used_graph`.
+
+`can_reason()` returns False until memu-graph has ≥500 edges and `FF_TRANSITIVE_REASONING=True`. `MIN_EDGES_FOR_REASONING = 500`.
+
+**Rationale:** The graph is the long-term substrate of Kai's knowledge. Once populated, transitive reasoning turns passive storage into active inference — finding non-obvious connections that neither lookup nor LLM generation alone would surface. The 500-edge threshold ensures enough structure for meaningful community detection (sparse graphs have trivial topology).
+
+**Tests:** 30 tests in `scripts/test_d95_d100_foundations.py` covering all six stubs: importability, `can_*()` returns False, stub return value types and schema fields, D98 sample recording/counting/progress, `quick_sample()` heuristics.
+
+**Consequences:**
+- All GPU-era stubs follow the same activation pattern: flag check → hardware check → return stub with `confidence=0.0`. Phase 1 activation = set flag True + implement the body.
+- D98 is the only stub that does real work NOW (collecting samples). Every chat interaction is a free data point.
+- Feature flags added: `FF_SOCRATIC` (T), `FF_HYPOTHESIS_ENGINE` (T), `FF_TEMPORAL_PROJECTION` (T), `FF_DIALECTICAL_SYNTHESIS` (F), `FF_ANALOGICAL_REASONING` (F), `FF_CONCEPT_BLENDING` (F), `FF_COGNITIVE_FINGERPRINT` (T), `FF_SYNTHETIC_EXPERIENCE` (F), `FF_TRANSITIVE_REASONING` (F). Total flags: 47.

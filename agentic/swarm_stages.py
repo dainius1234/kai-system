@@ -20,6 +20,7 @@ import time
 from typing import Any, Awaitable, Callable, Dict, List, Optional
 
 from cognitive_fsm import AgentHandoff, HandoffStatus, SwarmConfig
+from questioner import SocraticQuestioner
 from swarm import (
     SwarmContext,
     get_rep,
@@ -47,6 +48,46 @@ def _ctx_from(handoff: AgentHandoff) -> SwarmContext:
     if not isinstance(ctx, SwarmContext):
         raise ValueError("handoff.payload['_ctx'] must be a SwarmContext")
     return ctx
+
+
+# ── QUESTIONER stage (D92: Socratic pre-GATHER) ─────────────────────
+
+def make_questioner_stage(
+    questioner: SocraticQuestioner,
+) -> Callable[[AgentHandoff, SwarmConfig], Awaitable[AgentHandoff]]:
+    """Run SocraticQuestioner before Scout; injects enriched_query into SwarmContext."""
+
+    async def questioner_stage(handoff: AgentHandoff, cfg: SwarmConfig) -> AgentHandoff:
+        t0 = time.monotonic()
+        ctx = _ctx_from(handoff)
+
+        try:
+            result = await questioner.decompose(ctx.query)
+            ctx.decomposition_questions = result.questions
+            ctx.enriched_query = result.enriched_query
+            ctx.log_stage(
+                "questioner", "socratic", "complete",
+                (time.monotonic() - t0) * 1000, 8.0,
+            )
+        except Exception as exc:
+            ctx.log_stage(
+                "questioner", "socratic", "failed",
+                (time.monotonic() - t0) * 1000, 0.0,
+            )
+            # non-fatal: GATHER proceeds with the original query
+            import logging
+            logging.getLogger("kai.swarm_stages").debug("Questioner failed, continuing: %s", exc)
+
+        return AgentHandoff(
+            from_stage="questioner",
+            to_stage="gather",
+            status=HandoffStatus.COMPLETE,
+            confidence=handoff.confidence,
+            payload={**handoff.payload, "_ctx": ctx},
+            claims=handoff.claims,
+        )
+
+    return questioner_stage
 
 
 # ── GATHER stage (Scout) ─────────────────────────────────────────────
@@ -433,12 +474,16 @@ def build_swarm_pipeline(
     build_plan_fn: BuildPlanFn,
     score_fn: ScoreFn,
     adversary_fn: AdversaryFn,
+    questioner: Optional[SocraticQuestioner] = None,
 ) -> Dict[str, Any]:
-    """Return all five stage functions ready to pass to CognitiveFSM.run()."""
-    return {
+    """Return all stage functions ready to pass to CognitiveFSM.run()."""
+    pipeline: Dict[str, Any] = {
         "gather_fn": make_gather_stage(memories_fn, world_ctx_fn, teammate_ctx_fn, llm_chat_fn),
         "debate_fn": make_debate_stage(build_plan_fn, score_fn, teammate_ctx_fn, llm_chat_fn),
         "fact_check_fn": make_fact_check_stage(memories_fn, teammate_ctx_fn, llm_chat_fn),
         "causal_check_fn": make_causal_check_stage(teammate_ctx_fn, llm_chat_fn),
         "conviction_gate_fn": make_conviction_gate_stage(adversary_fn, teammate_ctx_fn),
     }
+    if questioner is not None:
+        pipeline["questioner_fn"] = make_questioner_stage(questioner)
+    return pipeline

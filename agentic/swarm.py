@@ -32,6 +32,10 @@ class SwarmContext:
     verdicts: Dict[str, str] = field(default_factory=dict)   # claim → supported|unsupported|uncertain
     causal_chains: List[str] = field(default_factory=list)
 
+    # D92: Socratic pre-GATHER enrichment
+    decomposition_questions: List[str] = field(default_factory=list)
+    enriched_query: str = ""
+
     # Reputation-weighted voting: teammate_slug → confidence score
     teammate_votes: Dict[str, float] = field(default_factory=dict)
 
@@ -56,6 +60,8 @@ class SwarmContext:
             "causal_chain_count": len(self.causal_chains),
             "teammate_votes": dict(self.teammate_votes),
             "stages_completed": len(self.stage_log),
+            "decomposition_questions": len(self.decomposition_questions),
+            "query_enriched": bool(self.enriched_query),
         }
 
 
