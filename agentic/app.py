@@ -639,7 +639,10 @@ async def chat_with_teammate(name: str, req: TeammateRequest) -> Dict[str, Any]:
         raise HTTPException(status_code=404, detail=f"Teammate '{name}' not found. Available: {[t['slug'] for t in list_teammates()]}")
 
     world_state_block = ""
-    if req.world_context and _last_world_snapshot:
+    if name == "auditor":
+        trust_data = get_trust_status()
+        world_state_block = "\n\nCurrent trust state:\n" + json.dumps(trust_data, indent=2)
+    elif req.world_context and _last_world_snapshot:
         world_state_block = "\n\nCurrent world state:\n" + json.dumps(_last_world_snapshot, indent=2)[:800]
 
     prompt = f"{teammate_ctx}{world_state_block}\n\n---\n\nQuery: {req.message}"

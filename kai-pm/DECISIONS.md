@@ -2446,3 +2446,15 @@ Key dataclasses (following D101/D102/D109 pattern):
 - `nodes_by_type(type)` — filter by VALUE/PRINCIPLE/BOUNDARY/STANCE
 
 **Consequences:** `agentic/wisdom_graph.py` (new). `agentic/wisdom_ingestion.py` (confirm writes to graph). `agentic/moral_core.py` (alignment uses graph + fingerprint). `agentic/trust_integration.py` (status includes graph stats). `scripts/test_wisdom_graph.py` — 33 tests, all passing. All prior suites: 76 tests, all passing. The moral evaluation system now reasons relationally — "expose api key" hits the BOUNDARY node and returns 0.0, "family financial decision" hits the VALUE node and gets a boost above 0.5. Values are no longer isolated strings; they are a connected web that grows with every conversation.
+
+## D120 — 2026-07-25 — Trust Auditor Teammate
+
+**Context:** The trust stack (D115–D119) is now fully operational — ladder, ledger, integration gateway, wisdom graph — but nothing inside Kai can read it and reason about it conversationally. The score exists but there's no voice that interprets what it means, what's limiting it, and what specific actions move it. The Trust Auditor fills that gap: a persistent teammate persona that speaks plainly about Kai's governance record.
+
+**Decision:** New teammate file `data/teammates/auditor.md`. Specialty: `trust_governance`. The Auditor is the voice that keeps the principle "trust is earned, not declared" alive inside Kai's cognitive stack. Its system prompt defines a precise output format for trust audits: current standing, largest gap factor, path to next tier (specific actions and approximate interaction counts), wisdom graph health (flags if node count < 5 or BOUNDARY nodes are missing), and one concrete next action.
+
+The Auditor knows the full factor model: operator_approval_history (30%), value_alignment (25%), conviction_alignment (20%), predictive_empathy (10%), system_reliability (10%), challenge_response (5%). It can calculate: "You need X operator-acked events to move operator_approval_history from Y to Z — worth N points." No vague advice.
+
+**Endpoint wiring (`agentic/app.py`):** The `/chat/teammate/{name}` endpoint now special-cases `name == "auditor"`: instead of injecting the proactive observer's world snapshot, it injects `get_trust_status()` — the full trust state JSON (level, score, tier, factors, wisdom_graph stats, progress_to_next). Other teammates are unaffected. This keeps the endpoint generic while giving the Auditor the data it actually needs.
+
+**Consequences:** `data/teammates/auditor.md` (new). `agentic/app.py` (4-line wiring change for auditor context injection). `scripts/test_trust_auditor.py` — 11 tests, all passing. Cumulative: 120 tests across all Phase 0+1 suites, all green. Kai can now be asked directly: "Auditor, what's blocking my next level?" and receive a structured, data-driven answer grounded in the actual trust record rather than vague encouragement.
