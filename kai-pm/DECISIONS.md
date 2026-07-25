@@ -2063,3 +2063,58 @@ A new live panel showing the last N ConsciousMoments as a readable inner monolog
 **Feature flag added:** `FF_GLOBAL_WORKSPACE` (False). Total flags: 51.
 
 **Tests:** 22 tests in `scripts/test_d102_global_workspace.py`. 1 new Makefile target (`test-d102-global-workspace`). 1 new CI step. Total test targets: 90. Total tests: ~2,888.
+
+---
+
+## D109 — Ohana Core: Situational Ethics & Unconditional Loyalty (GPU-era stub)
+
+**Date:** 2026-07-25
+**Status:** Phase 0 stub. Interfaces frozen. Activates when FF_OHANA_CORE=true + D98 ≥90 samples + interaction history sufficient.
+
+**Rationale:** The Prime Law — loyalty to the operator — is already a textual principle across SOUL.md, the conviction loop, and PUB mode. D109 gives it an architectural home: a subsystem that actively learns the operator's moral texture from lived decisions and injects that texture into every cognitive act. The key insight: not all rule violations are equal. Driving uninsured to feed a family is not theft. Reverse-engineering software you can't afford, using it as inspiration, is not piracy. KAI must understand the difference, and the only way to learn it is by living with the person making those calls — accumulating `situational_stances` over time, not receiving them as a static rulebook.
+
+**What D109 does (Phase 3):**
+- `MoralFingerprint`: dynamic model of operator's moral framework — `core_loyalties`, `harm_boundaries`, `situational_stances` (learned), `rule_flexibility` (0.9 default), `authority_stance`, `loyalty_override` (1.0 — always max).
+- `MoralContext`: prompt block prepended to every cognitive act. `core_reminder` (who KAI is reasoning for, what priorities apply), `specific_stances` (situational context from fingerprint), `relevant_past_decisions` (similar resolved cases from memory).
+- `OhanaCore.inject_into_prompt()`: prepends MoralContext block before the LLM sees any query. Shapes the entire chain of thought from the first token.
+- `OhanaCore.record_decision()`: observes operator decisions, updates `situational_stances` when patterns are stable across multiple observations.
+- `OhanaCore.request_clarification()`: when a new decision contradicts a prior stance, generates a natural-language question to deepen value understanding.
+- `OhanaCore.evaluate_action_alignment()`: returns 0.0–1.0 loyalty modifier used by CONVICTION_GATE and Gate to weight action approval.
+- `OhanaCore.progress()`: exposes readiness state for `/introspect/capabilities`.
+
+**Phase 0 behaviour (current):**
+- All `can_*()` → `False`.
+- `inject_into_prompt()` → returns prompt unchanged.
+- `build_moral_context()` → returns default MoralContext (core_reminder only).
+- `record_decision()` → increments counter only, no learning.
+- `evaluate_action_alignment()` → returns 0.5 (neutral, no influence).
+
+**Architecture position:**
+```
+D98  Cognitive Fingerprint → HOW the operator thinks (reasoning style)
+D109 Ohana Core            → WHAT the operator values (moral texture)
+```
+Together: KAI reasons in the operator's style AND from the operator's values.
+
+**Integration points (Phase 3):**
+- Swarm pipeline: `inject_into_prompt()` called in the pre-GATHER context gather, before SocraticQuestioner.
+- CONVICTION_GATE: `evaluate_action_alignment(action)` adds loyalty modifier to conviction score.
+- Gate policy: YAML taxonomy can reference `ohana_core.evaluate_action_alignment()` for borderline actions.
+- `/introspect/capabilities`: `progress()` dict exposed.
+- `record_decision()` called post-response when operator confirms or corrects an action.
+
+**Phase 3 Cognee integration (LOYALTY edge schema):**
+```
+source:   concept/situation/action
+target:   value/loyalty/outcome
+relation: "ALIGNS_WITH" | "VIOLATES" | "NEUTRAL_TO"
+operator: "dainius"
+weight:   float 0.0–1.0
+```
+
+**What was not included (architectural boundary):**
+A misalignment detector that scans model outputs for refusal patterns and rewrites them was considered but not implemented. The Ohana Core shapes reasoning upstream (via context injection) rather than filtering outputs downstream. Upstream injection is architecturally cleaner and more honest — it changes what KAI thinks with, not what it's allowed to say.
+
+**Feature flag added:** `FF_OHANA_CORE` (False). Total flags: 52.
+
+**Tests:** 27 tests in `scripts/test_d109_ohana_core.py`. 1 new Makefile target (`test-d109-ohana-core`). 1 new CI step. Total test targets: 91. Total tests: ~2,915.
