@@ -44,6 +44,7 @@ from cognitive_fingerprint import collector as _fp_collector, quick_sample as _f
 from causal_world_model import get_causal_graph, CausalEdge, get_surprise_detector
 from global_workspace import get_global_workspace, WorkspaceBid
 from moral_core import get_ohana_core
+from cortex import get_cortex
 
 logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
@@ -1071,6 +1072,8 @@ async def _sense_world() -> str:
                     if cs.get("bridge_active") and cs.get("bridge_note"):
                         cortex_lines.append(f"[Cortex] {cs['bridge_note']}")
                     lines = cortex_lines + lines
+                # Feed cognitive module so it can bid to GlobalWorkspace
+                get_cortex().feed_service_state(cs)
     except Exception:
         pass
 
@@ -1488,6 +1491,15 @@ async def _proactive_observer() -> None:
                             content=obs,
                             urgency=0.4,
                         ))
+                except Exception:
+                    pass
+
+            # ── D114: Cortex ambient baseline bid ─────────────────────
+            if is_enabled("GLOBAL_WORKSPACE"):
+                try:
+                    cortex_bid = get_cortex().bid_to_workspace()
+                    if cortex_bid is not None:
+                        get_global_workspace().submit_bid(cortex_bid)
                 except Exception:
                     pass
 
