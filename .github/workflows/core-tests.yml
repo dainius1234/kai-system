@@ -165,6 +165,9 @@ jobs:
       - name: Global workspace consciousness tests (D102 — WorkspaceBid, ConsciousMoment, GlobalWorkspace, singleton)
         run: make test-d102-global-workspace
 
+      - name: Ohana Core tests (D109 — MoralFingerprint, MoralContext, OhanaCore, singleton)
+        run: make test-d109-ohana-core
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors

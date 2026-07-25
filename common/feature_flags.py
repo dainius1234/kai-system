@@ -91,6 +91,8 @@ _REGISTRY: Dict[str, tuple] = {
     "CAUSAL_SURPRISE":       ("D101: prediction-error detection — fires hypothesis cycle on divergence; requires FF_CAUSAL_WORLD_MODEL", False),
     "POLICY_MEMORY":         ("D101: auto-distillation of simulation outcomes into ranked strategies — requires FF_CAUSAL_WORLD_MODEL", False),
     "GLOBAL_WORKSPACE":      ("D102: Global Workspace Consciousness — serial stream of unified awareness via module bidding; requires GPU + D101 + D98 + ≥3 bidders", False),
+    # D109: Ohana Core — situational ethics and loyalty alignment
+    "OHANA_CORE":            ("D109: Ohana Core — learns operator moral fingerprint; injects loyalty context into every cognitive act; evaluates action alignment; requires D98 ≥90 samples + interaction history", False),
 }
 
 
