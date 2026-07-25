@@ -11,28 +11,28 @@
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
   <img src="https://img.shields.io/badge/services-60-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-2%2C754_passing-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-2%2C829_passing-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
-  <img src="https://img.shields.io/badge/Python-~66%2C500_LOC-yellow?style=flat-square" alt="loc">
-  <img src="https://img.shields.io/badge/milestones-41_shipped-purple?style=flat-square" alt="milestones">
+  <img src="https://img.shields.io/badge/Python-~67%2C500_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/milestones-50_shipped-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
 </p>
 
 ---
 
-## Project Status (24 July 2026)
+## Project Status (25 July 2026)
 
 | Metric | Value |
 |---|---|
 | **Services** | 60 unique across 3 compose profiles (34 in minimal stack) |
-| **Test targets** | 84 (`make test-core`) |
-| **Individual tests** | ~2,754 (`def test_` across 130+ files) |
-| **Python LOC** | ~66,500 |
-| **Feature flags** | 38 (`FF_*` env vars) |
+| **Test targets** | 88 (`make test-core`) |
+| **Individual tests** | ~2,829 (`def test_` across 134+ files) |
+| **Python LOC** | ~67,500 |
+| **Feature flags** | 47 (`FF_*` env vars) |
 | **Dockerfiles** | 48 |
 | **Compose profiles** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 41 |
+| **Milestones shipped** | 50 |
 | **Failures** | 0 |
 
 > **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
@@ -45,7 +45,7 @@
 make core-up          # Start minimal stack (34 services)
 make core-down        # Stop it
 make full-up          # Start full stack
-make test-core        # Run all 84 test targets (~2,754 tests)
+make test-core        # Run all 88 test targets (~2,829 tests)
 make go_no_go         # Syntax-check all service entry points
 make merge-gate       # Full pre-merge validation
 make sync-docs        # Auto-update README + backlog metrics
@@ -59,7 +59,7 @@ GPU integration status: **Phase 0 complete** — see [`docs/gpu_integration_phas
 ## Project Management
 
 All PM operations live in [`kai-pm/`](kai-pm). Entry point for fast session re-hydration:
-[`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md). Decision log (append-only, D1–D91):
+[`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md). Decision log (append-only, D1–D100):
 [`kai-pm/DECISIONS.md`](kai-pm/DECISIONS.md). Known stubs and placeholders:
 [`kai-pm/STUBS_AND_PLACEHOLDERS.md`](kai-pm/STUBS_AND_PLACEHOLDERS.md).
 
@@ -96,6 +96,20 @@ All PM operations live in [`kai-pm/`](kai-pm). Entry point for fast session re-h
 | **SAGE Critique** | Verifier self-critique + adversary self-review — AI arguing with itself for quality |
 | **Agent-Evolver** | Learns from failure clusters during dream cycles, generates proactive fix insights |
 | **Tree Search** | Chain-of-thought pruning with priority queue + counterargument debate gating |
+
+### Intelligence Sprint (D92–D100)
+
+| Capability | Status | What It Does |
+|---|---|---|
+| **Socratic Self-Questioning** | ✅ Live | Pre-GATHER stage decomposes every query into 3–5 precision questions (hidden assumptions, disproof evidence, simplest explanation, second-order consequences, surface clarification). Injected into `SwarmContext.enriched_query` — every downstream stage reasons against a richer problem statement. CPU-safe. FF_SOCRATIC=True. |
+| **Hypothesis Engine** | ✅ Live | Idle-cycle gap scanner. Scans seed topics, forms "If X is true, Y should follow" hypotheses, tests them against memory evidence via LLM, logs SUPPORTED/REFUTED/INCONCLUSIVE verdicts to `/data/CURIOSITY.md`. Wired into `idle_curiosity_tick()`. CPU-safe. FF_HYPOTHESIS_ENGINE=True. |
+| **Temporal Projection** | ✅ Live | Fan-of-futures forecasting. From supported claims, produces a `ForecastFan` with four scenario branches: base (most likely), optimistic (best-case assumptions hold), pessimistic (tail risks materialise), wild\_card (low-probability high-impact discontinuity). Each branch has probability + key assumptions. CPU-safe. FF_TEMPORAL_PROJECTION=True. |
+| **Dialectical Synthesis** | 🔜 GPU stub | Hegelian thesis/antithesis/synthesis reasoner. Resolves competing claims at a higher level of abstraction. `can_synthesize()→False` until dual-model GPU is provisioned. FF_DIALECTICAL_SYNTHESIS=False. |
+| **Analogical Reasoning** | 🔜 GPU stub | Cross-domain isomorphic pattern search. Finds structural similarities between a known problem and a new one, maps the solution pattern across domains. `can_find()→False` until memu-graph has ≥1000 concept nodes + GPU embedding search. FF_ANALOGICAL_REASONING=False. |
+| **Concept Blending** | 🔜 GPU stub | Two distant knowledge graph nodes → novel emergent concept (Fauconnier & Turner). Emergent properties not present in either parent. `can_blend()→False` until graph + GPU. FF_CONCEPT_BLENDING=False. |
+| **Cognitive Fingerprinting** | ✅ Collecting | Operator thinking-style model. Phase 0: collecting `InteractionSample` records to `/data/cognitive_fingerprint.jsonl` on every chat interaction. Phase 1: k-means clustering → `dominant_style, risk_tolerance, preferred_abstraction, decision_velocity` dimensions. `can_infer()→True` at 90+ samples. FF_COGNITIVE_FINGERPRINT=True. |
+| **Synthetic Experience** | 🔜 GPU stub | Fictional scenario generation during dream cycles. Exercises reasoning pathways rarely stimulated by real interactions: counterfactual, perspective\_shift, edge\_case, stress\_test. `can_generate()→False` until GPU dream cycles active. FF_SYNTHETIC_EXPERIENCE=False. |
+| **Transitive Reasoning** | 🔜 Graph stub | PageRank + community detection + shortest-path + association rule mining on memu-graph. Turns the knowledge graph from passive storage into active inference. `can_reason()→False` until ≥500 graph edges. FF_TRANSITIVE_REASONING=False. |
 
 ### Cognitive Depth (D89)
 
@@ -166,12 +180,14 @@ All PM operations live in [`kai-pm/`](kai-pm). Entry point for fast session re-h
 └────────────────────────────┬────────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────────┐
-│  COGNITIVE REASONING PIPELINE (D89 / D90 Swarm Assembly)            │
+│  COGNITIVE REASONING PIPELINE (D89 / D90 / D92)                     │
 │                                                                      │
-│  GATHER → DEBATE → FACT_CHECK → CAUSAL_CHECK → CONVICTION_GATE      │
-│  → PRESENT                                                           │
+│  QUESTIONER → GATHER → DEBATE → FACT_CHECK → CAUSAL_CHECK           │
+│  → CONVICTION_GATE → PRESENT                                        │
 │                                                                      │
-│  Stage functions (D90): Scout→GATHER, Sage→DEBATE+CONVICTION_GATE   │
+│  D92: SocraticQuestioner runs first — decomposes query into 3-5     │
+│  precision questions, injects enriched_query into SwarmContext      │
+│  Stage functions: Scout→GATHER, Sage→DEBATE+CONVICTION_GATE         │
 │  Doctor→FACT_CHECK, Oracle→CAUSAL_CHECK                             │
 │  RETHINK (max 3) → ESCALATE_LOOP (max 3) → HALT → ask operator      │
 │  Per-swarm config: trading (≥8.0) / research (≥6.5) /               │
@@ -238,27 +254,32 @@ All PM operations live in [`kai-pm/`](kai-pm). Entry point for fast session re-h
 1. Operator sends message (Telegram / Dashboard / API)
 2. System FSM: fire USER_MESSAGE (IDLE → ACTIVE)
 3. Agentic: 14-way parallel context gather + world context injection
-4. Skill matching → if no match + conf < 0.4: async gap log → hunt after 3 misses
-5. Cognitive pipeline: GATHER → DEBATE → FACT_CHECK → CAUSAL_CHECK
-6. CONVICTION_GATE: ≥ threshold → PRESENT; else RETHINK (max 3) → ESCALATE → HALT
-7. Tool-Gate: HMAC + rate limit + policy → Executor: sandboxed run
-8. Post-mortem: episode saved, corrections learned, emotion recorded, memory updated
-9. Response streamed back (SSE)
+4. D92: SocraticQuestioner decomposes query → 3-5 precision questions → enriched_query
+5. Skill matching → if no match + conf < 0.4: async gap log → hunt after 3 misses
+6. Cognitive pipeline: GATHER → DEBATE → FACT_CHECK → CAUSAL_CHECK
+7. CONVICTION_GATE: ≥ threshold → PRESENT; else RETHINK (max 3) → ESCALATE → HALT
+8. Tool-Gate: HMAC + rate limit + policy → Executor: sandboxed run
+9. Post-mortem: episode saved, corrections learned, emotion recorded, memory updated
+10. D98: InteractionSample recorded → cognitive_fingerprint.jsonl (background)
+11. Response streamed back (SSE)
 ```
 
 ### How Swarm Mode Works (`POST /chat/swarm`)
 
 ```
+0. D92: SocraticQuestioner decomposes query → 3-5 questions → SwarmContext.enriched_query
 1. SwarmContext created (shared memory for all stages)
 2. Scout (GATHER)   — parallel fetch from memory, world state, skills; LLM extracts claims
+                      Uses enriched_query for richer evidence targeting
 3. Sage  (DEBATE)   — build_plan + score_conviction; LLM counterargument challenge
 4. Doctor(FACT_CHECK) — claim→verdict JSON dict; falls back to "uncertain" on timeout
 5. Oracle(CAUSAL_CHECK) — consequence chain JSON array per supported claim
-6. Sage  (CONVICTION_GATE) — adversary challenge + resolve_conflict() 5-signal score
-7. If conviction ≥ swarm threshold → PRESENT
+6. D94: TemporalForecaster — ForecastFan (base/optimistic/pessimistic/wild_card branches)
+7. Sage  (CONVICTION_GATE) — adversary challenge + resolve_conflict() 5-signal score
+8. If conviction ≥ swarm threshold → PRESENT
    else RETHINK (max retries) → ESCALATE_LOOP → HALT → notify operator
-8. TeammateRep updated: total_calls, successful_handoffs, avg_confidence, reliability
-9. reputation persisted to data/teammate_reputation.json
+9. TeammateRep updated: total_calls, successful_handoffs, avg_confidence, reliability
+10. reputation persisted to data/teammate_reputation.json
 ```
 
 ### Self-Healing Flow
@@ -287,7 +308,9 @@ _proactive_observer()
   6. Pattern learning: check 10-cycle history → sensor_pattern memories
   7. Ritual discovery: ≥7/10 cycles → _propose_ritual() → RITUALS.md
   8. Proactive scheduling: calendar ≤30 min → fuse with sensor state → memory
-  9. Curiosity tick: if IDLE + GPU available → idle_curiosity_tick()
+  9. D93: Hypothesis tick: idle_curiosity_tick() runs HypothesisEngine.run_cycle()
+          (CPU-safe — tests hypotheses from seed topics, logs to CURIOSITY.md)
+ 10. Curiosity research: if IDLE + GPU available → research open question → CURIOSITY.md
 ```
 
 ### Vault-Sync Cycle (continuous, debounced)
@@ -479,14 +502,16 @@ API (D90)
 
 ```
 SwarmContext fields
-  query:          str          — original operator input
-  evidence:       List[str]    — claims/facts gathered by Scout
-  debate_points:  List[str]    — counterarguments raised by Sage
-  verdicts:       dict         — {claim: "supported"|"refuted"|"uncertain"} from Doctor
-  causal_chains:  List[dict]   — consequence chains from Oracle
-  conviction_score: float      — final weighted score from resolve_conflict()
-  transition_log: List[str]    — FSM stage transitions for audit trail
-  teammate_reps:  dict[str, TeammateRep] — live reputation snapshot
+  query:                   str          — original operator input
+  decomposition_questions: List[str]    — D92: Socratic questions injected pre-GATHER
+  enriched_query:          str          — D92: query + decomposition block (used by all stages)
+  evidence:                List[str]    — claims/facts gathered by Scout
+  claims:                  List[str]    — falsifiable claims extracted by Scout
+  challenges:              List[str]    — counterarguments raised by Sage
+  verdicts:                dict         — {claim: "supported"|"refuted"|"uncertain"} from Doctor
+  causal_chains:           List[str]    — consequence chains from Oracle
+  teammate_votes:          dict[str, float] — per-teammate confidence scores
+  stage_log:               List[dict]   — FSM stage transitions for audit trail
 
 TeammateRep fields
   name:               str
@@ -696,6 +721,135 @@ Security
 
 ---
 
+## Intelligence Sprint (D92–D100)
+
+### D92 — Socratic Self-Questioning
+
+```
+Module:  agentic/questioner.py
+Flag:    FF_SOCRATIC=true (default)
+Stage:   Runs before GATHER in the swarm pipeline (questioner_fn in build_swarm_pipeline)
+
+SocraticQuestioner
+  decompose(query) → SocraticResult
+    SocraticResult: original_query, questions (3-5), enriched_query, elapsed_ms, used_llm
+
+Question archetypes (LLM system prompt)
+  - Surface a hidden assumption
+  - Identify evidence that would disprove the obvious answer
+  - Find the simplest explanation
+  - Trace second-order consequences
+  - Clarify what is actually being asked beneath the surface
+
+Fallback (no LLM or parse failure): 3 hardcoded questions from FALLBACK_QUESTIONS
+SwarmContext updated: decomposition_questions, enriched_query
+```
+
+### D93 — Autonomous Hypothesis Engine
+
+```
+Module:  agentic/hypothesis.py
+Flag:    FF_HYPOTHESIS_ENGINE=true (default)
+Wired:   agentic/curiosity.py → idle_curiosity_tick() → run_cycle()
+
+HypothesisEngine
+  run_cycle(seed_topics) → List[Hypothesis]
+  MAX_HYPOTHESES_PER_CYCLE = 3
+
+Hypothesis dataclass
+  statement:     str   — "If X is true, then Y should be the case."
+  basis_memory:  str   — source topic/memory
+  test_predicate: str  — testable consequence
+  result:        str   — SUPPORTED | REFUTED | INCONCLUSIVE | untested
+  rationale:     str
+  confidence:    float (0-10)
+
+Pipeline per topic
+  1. _form_hypothesis(topic)  — LLM generates "If X then Y" statement
+  2. _test_hypothesis(hyp)    — retrieve memories → LLM adjudicates
+  3. _append_to_log(hyp)      — append verdict to /data/CURIOSITY.md
+
+CPU-safe: LLM failure → fallback structural hypothesis
+```
+
+### D94 — Temporal Projection
+
+```
+Module:  agentic/forecaster.py
+Flag:    FF_TEMPORAL_PROJECTION=true (default)
+
+TemporalForecaster
+  project(query, supported_claims, causal_chains?) → ForecastFan
+
+ScenarioBranch
+  label:            base | optimistic | pessimistic | wild_card
+  narrative:        str   — 1-2 sentence unfolding
+  probability:      float — all four sum to ≈1.0
+  key_assumptions:  List[str]
+  confidence_modifier: float
+
+ForecastFan
+  query, base_claim, branches: List[ScenarioBranch]
+  consensus_probability → base branch probability
+  to_dict() → API-ready dict
+
+Fallback: base=0.50, optimistic=0.25, pessimistic=0.20, wild_card=0.05
+```
+
+### D95–D100 — GPU-Era Foundations
+
+```
+All stubs follow the same activation pattern:
+  can_*() → False          Phase 0: gate returns False
+  stub return value        correct schema, confidence=0.0, stub message
+  Phase 1 activation       set FF_*=True + implement body; interface unchanged
+
+D95 DialecticalReasoner   agentic/dialectic.py
+  synthesize(thesis, antithesis) → DialecticalTriad
+  DialecticalTriad: thesis, antithesis, synthesis, preserved_from_*, resolution_level
+  Requires: dual-model GPU (one argues thesis, one antithesis, third arbitrates)
+
+D96 AnalogyEngine         agentic/analogy.py
+  find_analogy(source_domain, target_domain) → Analogy
+  Analogy: structural_mappings: List[AnalogyMapping], proposed_solution, graph_path
+  Requires: memu-graph ≥1000 concept nodes + GPU embedding search
+
+D97 ConceptBlender        agentic/concept_blend.py
+  blend(concept_a, concept_b) → BlendedConcept
+  BlendedConcept: blended_name, emergent_properties, inherited_from_*, novelty_score
+  Based on Fauconnier & Turner conceptual blending theory
+  Requires: concept graph + GPU generative synthesis
+
+D98 CognitiveFingerprintCollector   agentic/cognitive_fingerprint.py
+  *** COLLECTING NOW — Phase 0 active ***
+  collector.record(quick_sample(query)) from /chat handler
+  InteractionSample: query, response_length_preference, decision_made,
+                     abstraction_level, time_horizon, risk_signal, query_type
+  Persisted to /data/cognitive_fingerprint.jsonl (JSONL, append-only)
+  can_infer() → True when sample_count ≥ 90
+  progress() → {samples_collected, inference_threshold, ready_for_inference, progress_pct}
+  Phase 1: k-means clustering → CognitiveFingerprint (dominant_style, risk_tolerance,
+           preferred_abstraction, typical_time_horizon, decision_velocity)
+
+D99 SyntheticExperienceGenerator   agentic/synthetic_experience.py
+  generate(seed_concept, experience_type) → SyntheticScenario
+  SyntheticScenario: premise, narrative, entities, emotional_valence,
+                     reasoning_pathways_exercised, experience_type, insight
+  Experience types: counterfactual | perspective_shift | edge_case | stress_test
+  Requires: GPU dream cycles (FF_DREAM_ENABLED=True)
+
+D100 TransitiveReasoner   memu-graph/transitive.py
+  reason(query) → ReasoningResult
+  shortest_path(source, target) → List[Connection]
+  pagerank(top_k) → List[Tuple[node_id, rank]]
+  mine_rules(min_confidence) → List[str]
+  Connection: source, target, relation, weight, evidence_count
+  GraphInsight: claim, support_path, relation_chain, confidence, insight_type
+  Requires: memu-graph ≥500 edges (MIN_EDGES_FOR_REASONING)
+```
+
+---
+
 ## Key Service APIs
 
 ### Agentic (`agentic:8007`)
@@ -800,7 +954,7 @@ GET  /health
 
 ## Feature Flags
 
-All 38 flags are toggleable via `FF_{NAME}=true|false` env var. Defaults shown. Changing a flag requires a service restart.
+All 47 flags are toggleable via `FF_{NAME}=true|false` env var. Defaults shown. Changing a flag requires a service restart.
 
 | Flag | Default | What It Gates |
 |------|---------|---------------|
@@ -841,6 +995,15 @@ All 38 flags are toggleable via `FF_{NAME}=true|false` env var. Defaults shown. 
 | `FF_EVOLVER_ENABLED` | ✗ | Agent-Evolver: cluster failures → proactive insights |
 | `FF_SAGE_SELF_REVIEW` | ✗ | SAGE critique on all plans (not just high-stakes) |
 | `FF_VAULT_CONTEXT` | ✗ | D91: inject vault recent note into world-context gather (adds latency — enable once vault is populated) |
+| `FF_SOCRATIC` | ✓ | D92: pre-GATHER Socratic decomposition — 3-5 questions reframe the query before Scout gathers evidence |
+| `FF_HYPOTHESIS_ENGINE` | ✓ | D93: idle-cycle gap scanner — forms testable hypotheses from seed topics, tests against memory evidence |
+| `FF_TEMPORAL_PROJECTION` | ✓ | D94: ForecastFan — base/optimistic/pessimistic/wild-card scenario branches from supported claims |
+| `FF_COGNITIVE_FINGERPRINT` | ✓ | D98: operator thinking-style model — collecting interaction samples now; inference at 90+ samples |
+| `FF_DIALECTICAL_SYNTHESIS` | ✗ | D95: Hegelian thesis/antithesis/synthesis — pending dual-model GPU |
+| `FF_ANALOGICAL_REASONING` | ✗ | D96: cross-domain isomorphic pattern search — pending populated knowledge graph (≥1000 nodes) |
+| `FF_CONCEPT_BLENDING` | ✗ | D97: two distant graph nodes → novel emergent concept — pending graph + GPU |
+| `FF_SYNTHETIC_EXPERIENCE` | ✗ | D99: fictional scenario generation during dream cycles — pending GPU |
+| `FF_TRANSITIVE_REASONING` | ✗ | D100: PageRank + community detection + shortest-path on memu-graph — pending ≥500 graph edges |
 
 ---
 
@@ -896,9 +1059,18 @@ Toggle: `Ctrl+Shift+M` in dashboard, or `POST /gate/mode`. Manual override lasts
 | **Cognitive FSM wiring** | ~~Not wired~~ **DONE (D90)** — `POST /chat/swarm` runs the full pipeline. Scout→GATHER, Sage→DEBATE+CONVICTION_GATE, Doctor→FACT_CHECK, Oracle→CAUSAL_CHECK. All 5 stage functions are real implementations calling live memory/LLM/adversary dependencies. | — |
 | **Teammate reputation** | ~~No reputation tracking~~ **DONE (D90)** — per-teammate `TeammateRep` (total_calls, successful_handoffs, avg_confidence, reliability). Weights applied in `resolve_conflict()`. Persisted to `data/teammate_reputation.json`. | Add per-teammate memory slice (top-k retrieval scoped to teammate specialty) |
 | **Obsidian Brain** | ~~No external knowledge sync~~ **DONE (D91)** — vault-sync service live (port 8047). SHA256-deduped watchdog watcher, bidirectional ingest/export, conviction ≥9.0 export gate, 3 memu-core vault endpoints, FF_VAULT_CONTEXT injection. | Populate vault; enable FF_VAULT_CONTEXT once notes accumulate |
+| **Socratic Questioning** | ~~Pre-GATHER decomposition~~ **DONE (D92)** — `SocraticQuestioner` wired into swarm pipeline. Every query decomposed into 3-5 precision questions before Scout gathers evidence. `SwarmContext.enriched_query` carries the richer problem statement to all stages. | — |
+| **Hypothesis Engine** | ~~Idle-cycle learning~~ **DONE (D93)** — `HypothesisEngine.run_cycle()` wired into `idle_curiosity_tick()`. CPU-safe: forms + tests hypotheses from seed topics, logs to `/data/CURIOSITY.md`. | Accumulate enough memories for hypothesis quality to improve |
+| **Temporal Projection** | ~~Fan-of-futures forecasting~~ **DONE (D94)** — `TemporalForecaster` produces `ForecastFan` with four scenario branches (base/optimistic/pessimistic/wild_card). `POST /forecast` endpoint can expose it. | Wire ForecastFan into swarm CONVICTION_GATE output |
+| **Cognitive Fingerprinting** | **Collecting now (D98)** — `InteractionSample` records written to `cognitive_fingerprint.jsonl` on every chat. Phase 1 inference gates at 90+ samples. `collector.progress()` tracks readiness. | Reach 90+ samples; implement k-means clustering on GPU |
+| **Dialectical Synthesis** | `can_synthesize()→False`. Interface and DialecticalTriad schema defined. | Dual-model GPU: thesis model vs antithesis model, third arbitrates |
+| **Analogical Reasoning** | `can_find()→False`. AnalogyEngine and AnalogyMapping schema defined. | memu-graph ≥1000 concept nodes + GPU embedding similarity search |
+| **Concept Blending** | `can_blend()→False`. BlendedConcept schema defined. novelty_score and emergent_properties fields ready. | Concept graph with property annotations + GPU generative model |
+| **Synthetic Experience** | `can_generate()→False`. SyntheticScenario schema defined. Four experience types ready. | GPU dream cycles (FF_DREAM_ENABLED=True) |
+| **Transitive Reasoning** | `can_reason()→False`. TransitiveReasoner with 4 inference modes (shortest-path, PageRank, community, rule-mining) defined. | memu-graph ≥500 edges (MIN_EDGES_FOR_REASONING) |
 | **Counterfactual Rehearsal** | `can_rehearse()→False`, `rehearse()→stub_pending_gpu`. Interface and schema are correct. | Activate in Phase 1 when GPU enables real decision-branch simulation |
 | **Predictive Empathy** | `emotional_context` key exists in world model with the right schema shape. No inference until emotional memory accumulates. | Implement after 30+ days of real emotional memory history |
-| **Resource-Aware Curiosity** | `idle_curiosity_tick()` is a no-op on CPU. CURIOSITY.md seed questions are ready. | Activate on GPU: pick open question → research → append finding |
+| **Resource-Aware Curiosity** | `idle_curiosity_tick()` now runs D93 HypothesisEngine on CPU. Full research cycle (pick question → research → append) needs GPU. | Activate GPU research on Phase 1 |
 | **Specialist Routing** | Keyword regex classification, not ML-based. All 3 specialists currently route to the same Ollama endpoint | Wire separate model endpoints when GPU arrives |
 | **Trust Negotiation** | `POST /gate/autonomy/request` always returns `pending_approval`. Human-approval flow not built yet. | Build approval UI + operator feedback loop in Phase 2 |
 | **Coverage** | ~63% combined across 5 modules. `agentic/app.py` (34%) and `memu-core/app.py` (53%) anchor the total down — service-route-heavy files unreachable offline | CI gate: 60% (`--cov-fail-under=60`). `make coverage` enforces locally |
@@ -909,7 +1081,7 @@ Toggle: `Ctrl+Shift+M` in dashboard, or `POST /gate/mode`. Manual override lasts
 
 ## Milestone History
 
-> 41 shipped. Zero skipped. Every milestone has tests.
+> 50 shipped. Zero skipped. Every milestone has tests.
 
 ```
 P0  Stack runs              ██████████ DONE   P14 Temporal Self       ██████████ DONE
@@ -936,6 +1108,15 @@ D88 Advanced Cognition      ██████████ DONE   (anomaly basel
 D89 Cognitive Depth         ██████████ DONE   (FSM, cognitive pipeline, teammates, house-doctor, foundations)
 D90 Swarm Assembly          ██████████ DONE   (real stage functions, SwarmContext, reputation, resolve_conflict)
 D91 Obsidian Brain          ██████████ DONE   (vault-sync, SHA256 dedup, conviction gate, memu-core vault API)
+D92 Socratic Questioning    ██████████ DONE   (pre-GATHER decomposition, enriched_query, SocraticQuestioner)
+D93 Hypothesis Engine       ██████████ DONE   (idle-cycle gap scanner, LLM formation+test, CURIOSITY.md log)
+D94 Temporal Projection     ██████████ DONE   (ForecastFan 4-branch, probability-weighted, causal-chain input)
+D95 Dialectical Synthesis   ████░░░░░░ STUB   (Hegelian triad — pending dual-model GPU)
+D96 Analogical Reasoning    ████░░░░░░ STUB   (cross-domain isomorphism — pending concept graph ≥1000 nodes)
+D97 Concept Blending        ████░░░░░░ STUB   (Fauconnier-Turner blend — pending graph + GPU)
+D98 Cognitive Fingerprint   ██████████ LIVE   (collecting InteractionSample NOW → infers at 90 samples)
+D99 Synthetic Experience    ████░░░░░░ STUB   (dream-cycle scenario gen — pending GPU dream cycles)
+D100 Transitive Reasoning   ████░░░░░░ STUB   (PageRank+community+shortest-path — pending ≥500 graph edges)
 ```
 
 ### Milestone Summary
@@ -947,12 +1128,13 @@ D91 Obsidian Brain          ██████████ DONE   (vault-sync, S
 | **D89** | System FSM (5 states, 9 events, 16 transitions); Cognitive reasoning FSM (GATHER→DEBATE→FACT_CHECK→CAUSAL_CHECK→CONVICTION_GATE→PRESENT, HALT/ESCALATE/RETHINK, per-swarm configs, schema-validated handoffs); persistent teammates Scout/Doctor/Sage/Oracle; house-doctor service (9 rules D001–D009); skill provenance (YAML front-matter + `.meta.json` sidecars, auto-disable at 3 errors); gap logging (GAP_HUNT_THRESHOLD=3); world model provenance ({value,source,timestamp,confidence}); emergent ritual discovery (≥7/10 cycles); GPU-era foundations (counterfactual, trust negotiation, predictive empathy, curiosity); 8 flags; 47 tests |
 | **D90** | `agentic/swarm.py` (SwarmContext, TeammateRep, `resolve_conflict()` 5-signal weighted average, reputation load/save); `agentic/swarm_stages.py` (5 real stage function factories: make_gather/debate/fact_check/causal_check/conviction_gate_stage + build_swarm_pipeline); `POST /chat/swarm` live endpoint; `GET /swarm/reputation`; `FF_SWARM` flag (default True); `data/teammate_reputation.json`; 38 tests |
 | **D91** | `vault-sync/` service (port 8047, 172.20.0.36): parser (NoteData, SHA256 checksum), mapper (filepath↔node-id, .vault-sync/mapping.json), watcher (watchdog + 2s debounce), FastAPI app (POST /ingest, POST /export conviction gate + path-traversal block, GET /search, GET /mapping); 3 memu-core vault endpoints (POST /memory/vault/ingest, DELETE /memory/vault/{id}, GET /memory/vault/search); agentic vault proxy (POST /vault/export, GET /vault/search) + FF_VAULT_CONTEXT world-context injection; FF_VAULT_SYNC (True) + FF_VAULT_CONTEXT (False); 4 Jinja2 note templates (daily-note, lesson-learned, kai-inbox, soul-mirror); services 59→60; ~45 tests |
+| **D92–D100** | **Intelligence Sprint** — 9 capabilities in one push. CPU-safe (live now): D92 Socratic Questioning (`agentic/questioner.py` — SocraticQuestioner, 3-5 decomposition Qs, enriched_query, non-fatal pre-GATHER stage wired into `build_swarm_pipeline()`); D93 Hypothesis Engine (`agentic/hypothesis.py` — idle-cycle "If X then Y" gap formation + LLM test + SUPPORTED/REFUTED/INCONCLUSIVE → CURIOSITY.md, wired into `idle_curiosity_tick()`); D94 Temporal Projection (`agentic/forecaster.py` — ForecastFan: 4 ScenarioBranch objects base/optimistic/pessimistic/wild_card, probability-weighted, robust JSON parse, static fallback). D98 Cognitive Fingerprint (`agentic/cognitive_fingerprint.py`) collecting InteractionSample records NOW to `/data/cognitive_fingerprint.jsonl`; inference gates at 90+ samples; module-level `collector` singleton + `quick_sample()` helper. GPU-era stubs (interfaces fixed, `can_*()→False`): D95 Dialectical Synthesis (`dialectic.py`), D96 Analogical Reasoning (`analogy.py`), D97 Concept Blending (`concept_blend.py`), D99 Synthetic Experience (`synthetic_experience.py`), D100 Transitive Reasoning (`memu-graph/transitive.py` — PageRank + community detection + shortest-path + rule mining, gates at MIN_EDGES=500). SwarmContext gained `decomposition_questions: List[str]` + `enriched_query: str`. 9 new FF_* flags. 4 new test targets. 75 new tests (total ~2,829). |
 
 ---
 
 ## Roadmap & End Goal
 
-**Where we are:** Phase 0 complete (as of 2026-07-24). All CPU-safe backlog is shipped and on `main`. D89 Cognitive Depth (FSM, teammates, house-doctor, GPU-era foundations), D90 Swarm Assembly (real stage functions wired to live teammates, reputation tracking, conflict resolution), and D91 Obsidian Brain (vault-sync bidirectional memory sync) are all complete and on `main`.
+**Where we are:** Phase 0 complete (as of 2026-07-25). All CPU-safe backlog is shipped and on `main`. The D92–D100 Intelligence Sprint delivered 9 new capabilities: Socratic Questioning, Hypothesis Engine, and Temporal Projection are live now; Cognitive Fingerprinting (D98) is actively collecting interaction samples; Dialectical Synthesis, Analogical Reasoning, Concept Blending, Synthetic Experience, and Transitive Reasoning are complete GPU-era stubs with fixed interfaces — they activate when hardware arrives.
 
 **The single unlock condition:** GPU hardware arrival (RTX 5080).
 
@@ -964,16 +1146,27 @@ When it arrives:
 5. Multi-specialist routing with separate model endpoints
 6. Real STT (faster-whisper large), TTS with voice quality, avatar
 7. `FF_VAULT_CONTEXT=true` — Obsidian Brain active in every conversation
+8. D95 Dialectical Synthesis — `can_synthesize()` unlocks with dual-model GPU
+9. D96 Analogical Reasoning — `can_find()` unlocks when concept graph ≥1000 nodes
+10. D97 Concept Blending — `can_blend()` unlocks with populated graph + GPU
+11. D98 Cognitive Fingerprint — inference unlocks at 90 collected samples (collecting now)
+12. D99 Synthetic Experience — `can_generate()` unlocks with GPU dream cycles
+13. D100 Transitive Reasoning — `can_reason()` unlocks when graph ≥500 edges
 
 **Phase 1 priorities after GPU:**
 - ~~Wire cognitive FSM stage functions~~ Done (D90) — `POST /chat/swarm` live
 - ~~Build teammate reputation scores~~ Done (D90) — per-teammate TeammateRep + resolve_conflict()
 - ~~Obsidian Brain vault sync~~ Done (D91) — vault-sync service live
+- ~~Socratic pre-GATHER decomposition~~ Done (D92) — enriched_query wired into swarm pipeline
+- ~~Autonomous hypothesis formation~~ Done (D93) — idle-cycle gap scanner writing to CURIOSITY.md
+- ~~Temporal projection fan-of-futures~~ Done (D94) — ForecastFan 4-branch live
+- ~~Cognitive fingerprint collection~~ Done (D98) — InteractionSample collector live
 - Add per-teammate memory slices (top-k retrieval scoped to specialty)
 - Implement predictive empathy from accumulated emotional memory
 - Build trust negotiation approval UI (human-in-the-loop autonomy gate)
 - Real multi-model consensus (3 specialist endpoints, once GPU enables 7B+ models)
 - Enable FF_VAULT_CONTEXT — start injecting recent vault notes into every chat
+- Activate D95–D97, D99–D100 GPU-era stubs once hardware arrives
 
 **End-goal:** a fully offline, self-hosted sovereign AI companion — chat, memory, perception, voice, avatar — all gated by the conviction/trust loop and circuit-breaker infrastructure already built. No cloud dependency. No single point of failure. The Obsidian Brain closes the loop between the operator's thinking and Kai's knowledge graph — everything the operator writes becomes part of Kai's memory; everything Kai reasons through with high conviction can be written back as structured notes.
 
@@ -990,7 +1183,15 @@ agentic/               # Reasoning brain
   swarm.py             # D90: SwarmContext, TeammateRep, resolve_conflict() 5-signal weights
   swarm_stages.py      # D90: 5 stage function factories + build_swarm_pipeline
   counterfactual.py    # D89/A: counterfactual rehearsal stub (GPU-era)
-  curiosity.py         # D89/F: resource-aware curiosity (GPU-gated)
+  curiosity.py         # D89/F: resource-aware curiosity (GPU-gated); wires D93 hypothesis cycle
+  questioner.py        # D92: SocraticQuestioner — 3-5 decomposition Qs, enriched_query
+  hypothesis.py        # D93: HypothesisEngine — idle "If X then Y" formation + LLM test
+  forecaster.py        # D94: TemporalForecaster — ForecastFan 4-branch probability fan
+  dialectic.py         # D95: DialecticalReasoner — Hegelian triad stub (GPU-era)
+  analogy.py           # D96: AnalogyEngine — cross-domain isomorphism stub (GPU-era)
+  concept_blend.py     # D97: ConceptBlender — Fauconnier-Turner blend stub (GPU-era)
+  cognitive_fingerprint.py  # D98: CognitiveFingerprintCollector — collecting NOW, infers at 90 samples
+  synthetic_experience.py   # D99: SyntheticExperienceGenerator — dream-cycle scenario stub (GPU-era)
   conviction.py        # Conviction scoring (5-signal + modifiers)
   adversary.py         # Adversary challenge engine (7 types)
   tree_search.py       # CoT tree search with counterargument debate
@@ -1000,6 +1201,7 @@ tool-gate/             # HMAC auth, rate limit, policy, autonomy request gate
 memu-core/             # Memory hot path: memorize / retrieve / rank / embed / vault API
   introspect_app.py    # Store maintenance cold path: compress / decay / quarantine
 memu-graph/            # Cognee/Kuzu knowledge graph — entity/relation ingest→query→forget
+  transitive.py        # D100: TransitiveReasoner — PageRank+community+shortest-path stub (GPU-era, gates at ≥500 edges)
 house-doctor/          # D89: system health differential diagnosis (port 8046)
 skill-hunter/          # D88/D89: autonomous skill acquisition via PyPI (port 8045)
 vault-sync/            # D91: Obsidian Brain service (port 8047)
@@ -1031,7 +1233,7 @@ data/
   RITUALS.md           # Operator-co-authored rituals (proposed by ritual discovery)
   CURIOSITY.md         # Open questions log (seed questions from D89, GPU fills it)
 common/                # Shared libraries
-  feature_flags.py     # 38 FF_* flags — runtime toggle without code changes
+  feature_flags.py     # 47 FF_* flags — runtime toggle without code changes
   llm.py               # LLM chassis with retry/backoff (LLM_MAX_RETRIES=3)
   resilience.py        # resilient_call() — circuit breaker + exponential backoff
   auth.py              # HMAC signing + verification
@@ -1102,9 +1304,9 @@ security/              # HMAC/auth hardening helpers
 
 ---
 
-## Test Targets (84)
+## Test Targets (88)
 
-`make test-core` runs all 84 targets. Each target maps to a `scripts/test_*.py` file.
+`make test-core` runs all 88 targets. Each target maps to a `scripts/test_*.py` file.
 
 <details>
 <summary>Click to expand full test target list</summary>
@@ -1164,9 +1366,11 @@ make test-multi-modal           make test-world-anchor          make test-self-h
 make test-j-series              make test-wake                  make test-behavioral
 make test-docker-e2e
 
-# Intelligence layers (D87–D91)
+# Intelligence layers (D87–D100)
 make test-kai-intelligence      make test-cognitive-mechanisms  make test-d89-cognitive-depth
 make test-d90-swarm             make test-d91-vault-sync
+make test-d92-socratic          make test-d93-hypothesis        make test-d94-forecaster
+make test-d95-d100-foundations
 ```
 
 </details>
@@ -1188,7 +1392,7 @@ make full-down     # Stop full stack
 
 # Validate
 make go_no_go      # Syntax check all entry points
-make test-core     # All 84 test targets (~2,754 tests)
+make test-core     # All 88 test targets (~2,829 tests)
 make merge-gate    # Full pre-merge validation
 ```
 
@@ -1237,6 +1441,15 @@ FF_PERSISTENT_TEAMMATES=true     # Named cognitive teammates
 FF_SWARM=true                    # D90: full swarm pipeline on /chat/swarm
 FF_VAULT_SYNC=true               # D91: Obsidian Brain file watcher + ingest/export
 FF_VAULT_CONTEXT=false           # D91: inject vault note into world context (enable post-populate)
+FF_SOCRATIC=true                 # D92: pre-GATHER Socratic decomposition (3-5 questions → enriched_query)
+FF_HYPOTHESIS_ENGINE=true        # D93: idle-cycle gap scanner (forms + tests "If X then Y" hypotheses)
+FF_TEMPORAL_PROJECTION=true      # D94: ForecastFan 4-branch probability fan (base/opt/pess/wild_card)
+FF_DIALECTICAL_SYNTHESIS=false   # D95: Hegelian triad — pending dual-model GPU
+FF_ANALOGICAL_REASONING=false    # D96: cross-domain isomorphism — pending concept graph ≥1000 nodes
+FF_CONCEPT_BLENDING=false        # D97: Fauconnier-Turner blend — pending graph + GPU
+FF_COGNITIVE_FINGERPRINT=true    # D98: operator thinking-style model (collecting now; infers at 90 samples)
+FF_SYNTHETIC_EXPERIENCE=false    # D99: dream-cycle scenario generation — pending GPU dream cycles
+FF_TRANSITIVE_REASONING=false    # D100: PageRank+community+rules — pending graph ≥500 edges
 ```
 
 ---
@@ -1253,7 +1466,7 @@ FF_VAULT_CONTEXT=false           # D91: inject vault note into world context (en
 
 ### Key Docs (read in order)
 1. [`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md) — fast re-hydration, current state, next move
-2. [`kai-pm/DECISIONS.md`](kai-pm/DECISIONS.md) — append-only decision log (D1–D91)
+2. [`kai-pm/DECISIONS.md`](kai-pm/DECISIONS.md) — append-only decision log (D1–D100)
 3. [`kai-pm/STATUS.md`](kai-pm/STATUS.md) — sprint health, open PRs, blocked items
 4. [`CHANGELOG.md`](CHANGELOG.md) — full semver changelog
 5. [`docs/PROJECT_BACKLOG.md`](docs/PROJECT_BACKLOG.md) — living backlog
@@ -1281,11 +1494,16 @@ FF_VAULT_CONTEXT=false           # D91: inject vault note into world context (en
 - [x] Executor sandboxing (allowlist + AST validation + shell=False)
 - [x] memu-graph (Cognee/Kuzu) — CI-verified against live Ollama stack
 - [x] Vault-Sync (D91) — port 8047; watchdog watcher, SHA256 dedup, conviction ≥9.0 export gate, 3 memu-core vault endpoints, agentic proxy
-- [x] 84 test targets, ~2,754 tests, zero failures
+- [x] Socratic Questioning (D92) — SocraticQuestioner, 3-5 decomposition Qs, enriched_query, non-fatal pre-GATHER stage wired into `build_swarm_pipeline()`
+- [x] Hypothesis Engine (D93) — idle-cycle "If X then Y" gap formation + LLM test + verdict log to CURIOSITY.md, wired into `idle_curiosity_tick()`
+- [x] Temporal Projection (D94) — ForecastFan: 4-branch probability fan (base/optimistic/pessimistic/wild_card), causal-chain input, robust JSON parse with static fallback
+- [x] Cognitive Fingerprint collecting (D98) — `InteractionSample` records appending to `/data/cognitive_fingerprint.jsonl` now; `quick_sample()` helper ready to wire into chat handler
+- [x] GPU-era stub interfaces fixed (D95–D97, D99–D100) — `can_*()→False` in Phase 0; interfaces frozen, ready to implement once GPU arrives
+- [x] 88 test targets, ~2,829 tests, zero failures
 - [x] Pre-commit, dep scanning, container scanning (Trivy)
 - [x] Circuit breakers, exponential backoff, resilient_call()
 - [x] MARS memory decay, spaced repetition
-- [x] Context budget trimming, structured errors, 38 feature flags
+- [x] Context budget trimming, structured errors, 47 feature flags
 - [x] Debate engine (`tree_search.py`, `conviction.py`, `adversary.py`)
 
 **Infrastructure ready, needs GPU to activate:**
@@ -1298,6 +1516,12 @@ FF_VAULT_CONTEXT=false           # D91: inject vault note into world context (en
 - [ ] `FF_GRAPH_INGEST=true` in production — pending GPU workload validation
 - [ ] Emotional intelligence quality — code works, qwen2.5:0.5b too small to detect emotions well
 - [ ] Multi-model consensus — architecture ready, all 3 specialists route to same model
+- [ ] D95 Dialectical Synthesis — `can_synthesize()→False`; needs dual-model GPU (thesis model ≠ antithesis model)
+- [ ] D96 Analogical Reasoning — `can_find()→False`; needs memu-graph populated with ≥1000 concept nodes
+- [ ] D97 Concept Blending — `can_blend()→False`; needs populated graph + divergent-synthesis GPU model
+- [ ] D98 Cognitive Fingerprint inference — `can_infer()→False` until 90 InteractionSample records collected (collecting now)
+- [ ] D99 Synthetic Experience — `can_generate()→False`; needs GPU dream cycles active (FF_DREAM_ENABLED=True)
+- [ ] D100 Transitive Reasoning — `can_reason()→False`; needs memu-graph ≥500 edges for PageRank to be meaningful
 
 ---
 
