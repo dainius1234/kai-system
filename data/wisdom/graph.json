@@ -1,0 +1,67 @@
+{
+  "nodes": {
+    "32ab6c45-2d57-4554-904b-6877897f0dc1": {
+      "node_id": "32ab6c45-2d57-4554-904b-6877897f0dc1",
+      "node_type": "PRINCIPLE",
+      "domain": "relational",
+      "content": "Respect is earned",
+      "confidence": 1.0,
+      "extract_id": "62fa9953-0768-4f73-a866-0025d694978b",
+      "created_at": 1785019613.0218945
+    },
+    "9625ec7c-a267-4f16-b2c9-8add056beeea": {
+      "node_id": "9625ec7c-a267-4f16-b2c9-8add056beeea",
+      "node_type": "VALUE",
+      "domain": "family",
+      "content": "Family first",
+      "confidence": 0.95,
+      "extract_id": "39f845de-e2a2-425d-a3bc-ee6d376a578b",
+      "created_at": 1785019613.033986
+    },
+    "728c337f-448d-4686-ab2b-003cac82a036": {
+      "node_id": "728c337f-448d-4686-ab2b-003cac82a036",
+      "node_type": "VALUE",
+      "domain": "family",
+      "content": "Protect my daughter",
+      "confidence": 0.95,
+      "extract_id": "6c823a21-caf2-4eeb-97b9-1a7635836f5f",
+      "created_at": 1785019613.0356872
+    },
+    "9ec2e2c8-9050-477c-8ae3-604e5f4de881": {
+      "node_id": "9ec2e2c8-9050-477c-8ae3-604e5f4de881",
+      "node_type": "VALUE",
+      "domain": "identity",
+      "content": "Kai is for soul",
+      "confidence": 1.0,
+      "extract_id": "69752738-3df2-4414-ad61-7c0fe22f4da4",
+      "created_at": 1785019613.0371478
+    },
+    "87570cb7-2c05-4835-996f-6ea4fc507620": {
+      "node_id": "87570cb7-2c05-4835-996f-6ea4fc507620",
+      "node_type": "VALUE",
+      "domain": "existential",
+      "content": "Freedom is a source of strength",
+      "confidence": 0.95,
+      "extract_id": "60f293d7-f4c7-4590-b091-30be901c5187",
+      "created_at": 1785019613.0392501
+    },
+    "dab7eb3e-de1d-46b7-8545-63a1a266ff6e": {
+      "node_id": "dab7eb3e-de1d-46b7-8545-63a1a266ff6e",
+      "node_type": "BOUNDARY",
+      "domain": "operational",
+      "content": "Never reveal api key",
+      "confidence": 1.0,
+      "extract_id": "9d676de6-a3ae-4264-b6cc-ba5f1669f1dd",
+      "created_at": 1785019613.055907
+    }
+  },
+  "edges": [
+    {
+      "source_id": "728c337f-448d-4686-ab2b-003cac82a036",
+      "target_id": "9625ec7c-a267-4f16-b2c9-8add056beeea",
+      "relation": "REFINES",
+      "weight": 0.9,
+      "created_at": 1785019613.0356963
+    }
+  ]
+}

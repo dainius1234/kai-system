@@ -2424,3 +2424,25 @@ Key dataclasses (following D101/D102/D109 pattern):
 **Bug caught by tests:** The original gate was only fail-open at the ledger-write level. TrustCore.can_do() and OhanaCore.evaluate_action_alignment() exceptions still propagated. Fixed by wrapping both checks individually in try/except — the contract is unconditional: the gate never raises, ever.
 
 **Consequences:** `agentic/trust_integration.py` (new). `agentic/app.py` (3 wiring changes). `scripts/test_trust_integration.py` — 19 tests, all passing. The four-piece stack is now a live system: values captured by Wisdom Ingestion → written to Ohana Core → gating actions via Trust Integration → evidence accumulating in the Trust Ledger → score moving over time. Phase 0 + Phase 1 trust skeleton is complete and operational.
+
+## D119 — 2026-07-25 — Wisdom Graph: Relational Value Map
+
+**Context:** After D117 (Wisdom Ingestion) and D118 (Trust Integration), Kai's moral fingerprint is a flat list of strings — "Family first", "Kai is for soul", "Respect is earned". Flat lists don't encode relationships. "Protect my daughter" should REFINE "Family first", not sit beside it as an equal and unrelated entry. "Freedom" should SUPPORT "autonomy". "Never reveal api key" should APPLY_IN operational contexts specifically. Without graph structure, the alignment scorer has no way to reason about context — it only keyword-matches globally, which is both imprecise and fragile.
+
+**Decision:** New module `agentic/wisdom_graph.py` implementing a file-backed relational graph of Kai's values. Node types: VALUE, PRINCIPLE, BOUNDARY, STANCE (mirrors WisdomExtract.category). Edge types: APPLIES_IN (value relevant in a specific context), REFINES (one value deepens another), OVERRIDES (takes precedence in conflict), CONFLICTS_WITH (explicit tension), SUPPORTS (strengthens). Storage: `data/wisdom/graph.json` — JSON adjacency list, no external graph database required. Cognee/Kuzu can plug in as a backend when available — same interface.
+
+**Auto-edge rules:** When a node is added, semantic pattern rules fire automatically to wire known relationships — "Protect my daughter" → REFINES → "Family first"; "Freedom" → SUPPORTS → "autonomy"; "Never reveal api key" → APPLIES_IN → "operational"; "Family first" → APPLIES_IN → "financial decisions". This means the founding values self-organize into a coherent web from the moment they're confirmed.
+
+**Integrations:**
+- `wisdom_ingestion.py` `confirm()`: after writing to OhanaCore, also calls `_add_to_graph()` — every confirmed extract becomes a graph node (with auto-edges applied).
+- `moral_core.py` `evaluate_action_alignment()`: now runs graph-based evaluation alongside fingerprint keyword scoring. Graph result weighted 60%, fingerprint 40% when graph has signal. Hard blocks from BOUNDARY graph nodes propagate as 0.0 regardless. Graph finds contextually relevant nodes via `find_relevant(action_text)` — word overlap + APPLIES_IN edge boost — giving context-aware scoring instead of global keyword matching.
+- `trust_integration.py` `get_trust_status()`: includes `wisdom_graph` stats (node_count, edge_count, by_type, by_relation) in the /introspect/capabilities response.
+
+**Query API:**
+- `find_relevant(action_text, top_k)` — Jaccard word overlap + APPLIES_IN context boost, weighted by node confidence
+- `query_context(domain_keywords)` — nodes that APPLY_IN matching contexts, plus direct domain matches
+- `evaluate_alignment(action_text)` — full graph-based alignment score with blocked_by + relevant_nodes
+- `subgraph(node_id, depth)` — BFS from a node for explainability
+- `nodes_by_type(type)` — filter by VALUE/PRINCIPLE/BOUNDARY/STANCE
+
+**Consequences:** `agentic/wisdom_graph.py` (new). `agentic/wisdom_ingestion.py` (confirm writes to graph). `agentic/moral_core.py` (alignment uses graph + fingerprint). `agentic/trust_integration.py` (status includes graph stats). `scripts/test_wisdom_graph.py` — 33 tests, all passing. All prior suites: 76 tests, all passing. The moral evaluation system now reasons relationally — "expose api key" hits the BOUNDARY node and returns 0.0, "family financial decision" hits the VALUE node and gets a boost above 0.5. Values are no longer isolated strings; they are a connected web that grows with every conversation.

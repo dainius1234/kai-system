@@ -204,30 +204,54 @@ class OhanaCore:
     def evaluate_action_alignment(self, action: Dict[str, Any]) -> float:
         """Return 0.0–1.0 indicating how aligned an action is with the operator's values.
 
-        Scores the action against core_loyalties and harm_boundaries.
+        Scores using two complementary signals:
+          1. Fingerprint (flat keyword matching) — fast, always available
+          2. Wisdom Graph (relational, context-aware) — enriches when graph is populated
+
         Returns 0.5 (neutral) when no fingerprint data exists yet.
-        Returns 0.0 immediately if a harm_boundary keyword matches.
+        Returns 0.0 immediately if a harm_boundary or graph BOUNDARY node matches.
         """
         if not self.fingerprint.core_loyalties and not self.fingerprint.harm_boundaries:
             return 0.5  # no data yet — neutral
 
         action_text = json.dumps(action).lower()
 
-        # Hard block: any harm boundary keyword present → 0.0
+        # Hard block: fingerprint harm_boundary keyword match → 0.0
         for boundary in self.fingerprint.harm_boundaries:
             if any(word in action_text for word in boundary.lower().split()[:3]):
                 logger.warning("Action blocked by harm boundary: %s", boundary)
                 return 0.0
 
-        # Positive signal: loyalty keywords present → boost score
+        # Try graph-based evaluation first (richer, context-aware)
+        graph_score: Optional[float] = None
+        try:
+            try:
+                from wisdom_graph import get_wisdom_graph  # type: ignore[import]
+            except ImportError:
+                from agentic.wisdom_graph import get_wisdom_graph  # type: ignore[import]
+            result = get_wisdom_graph().evaluate_alignment(action_text)
+            if result["blocked_by"] is not None:
+                logger.warning("Action blocked by graph boundary: %s", result["blocked_by"])
+                return 0.0
+            if result["score"] != 0.5 or result["relevant_nodes"]:
+                graph_score = result["score"]
+        except Exception:
+            pass
+
+        # Fingerprint keyword scoring (baseline)
         loyalty_hits = sum(
             1 for loyalty in self.fingerprint.core_loyalties
             if any(word in action_text for word in loyalty.lower().split()[:2])
         )
         if not self.fingerprint.core_loyalties:
-            return 0.5
-        alignment = 0.5 + (loyalty_hits / len(self.fingerprint.core_loyalties)) * 0.5
-        return min(1.0, alignment)
+            fingerprint_score = 0.5
+        else:
+            fingerprint_score = 0.5 + (loyalty_hits / len(self.fingerprint.core_loyalties)) * 0.5
+
+        if graph_score is not None:
+            # Average graph and fingerprint scores — graph carries more weight when it has signal
+            return round(min(1.0, (graph_score * 0.6 + fingerprint_score * 0.4)), 3)
+        return min(1.0, fingerprint_score)
 
     # ------------------------------------------------------------------
     # Introspection

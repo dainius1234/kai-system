@@ -234,6 +234,12 @@ def get_trust_status() -> Dict[str, Any]:
                 "progress_to_next": ts["progress_to_next"],
             })
 
+        try:
+            from wisdom_graph import get_wisdom_graph  # type: ignore[import]
+            status["wisdom_graph"] = get_wisdom_graph().stats()
+        except Exception:
+            pass
+
         return status
     except Exception as exc:
         logger.debug("Trust status unavailable: %s", exc)

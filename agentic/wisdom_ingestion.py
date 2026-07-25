@@ -228,6 +228,7 @@ class WisdomIngestor:
                 self._save(self._confirmed, self._confirmed_path())
                 self._write_to_ohana(e)
                 self._record_audit_event(e)
+                self._add_to_graph(e)
                 logger.info("Wisdom confirmed: [%s/%s] %s", e.category, e.domain, e.content)
                 return True
         return False
@@ -319,6 +320,24 @@ class WisdomIngestor:
             )
         except Exception as exc:
             logger.debug("Trust ledger not available for audit event: %s", exc)
+
+    def _add_to_graph(self, extract: WisdomExtract) -> None:
+        """Write confirmed extract as a node into the Wisdom Graph."""
+        try:
+            try:
+                from wisdom_graph import get_wisdom_graph  # type: ignore[import]
+            except ImportError:
+                from agentic.wisdom_graph import get_wisdom_graph  # type: ignore[import]
+            graph = get_wisdom_graph(self._dir)
+            graph.add_node(
+                content=extract.content,
+                node_type=extract.category.upper(),
+                domain=extract.domain,
+                confidence=extract.confidence,
+                extract_id=extract.extract_id,
+            )
+        except Exception as exc:
+            logger.debug("Wisdom graph write failed (non-critical): %s", exc)
 
     def stats(self) -> Dict[str, Any]:
         confirmed_by_domain: Dict[str, int] = {}
