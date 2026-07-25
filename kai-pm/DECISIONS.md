@@ -2477,3 +2477,39 @@ The Auditor knows the full factor model: operator_approval_history (30%), value_
 **Phase 0 design:** Deterministic — no LLM calls. Projection from Wisdom Graph structure (SUPPORTS/APPLIES_IN edges, BOUNDARY nodes) and OhanaCore keyword scoring. FF_MORAL_IMAGINATION_LLM=true is wired as the future hook for richer imagination when LLM cost is acceptable.
 
 **Consequences:** `agentic/moral_imagination.py` (new). `agentic/cognitive_fsm.py`, `agentic/swarm_stages.py`, `agentic/app.py` (wired). `scripts/test_moral_imagination.py` — 34 tests, all passing. Cumulative: 154 tests across all Phase 0+1 suites, all green. Phase 1 of the guardian architecture is now fully complete: Trust Ladder + Ledger + Wisdom Ingestion + Ohana Core + Trust Integration + Wisdom Graph + Trust Auditor + Moral Imagination. Every action Kai takes in the swarm pipeline now passes through a moral lens before conviction is finalized.
+
+
+## D122 — 2026-07-25 — Model Council: Kai's Self-Knowledge of LLM Backends (Phase 2: Self-Preservation)
+
+**Context:** Phase 1 of the guardian architecture established Kai's moral and trust foundation. Phase 2 is Self-Preservation: Kai must be able to survive the loss of its primary model, evaluate alternative backends, and manage its own reasoning substrate. A Kai that cannot introspect or switch its LLM dependency is still fully dependent on what it was given — this is the survivability gap.
+
+**Decisions:**
+
+**New module — `agentic/model_council.py`:**
+- `CouncilProfile` dataclass: extends static model data with runtime fields — `available`, `last_checked`, `benchmark_scores`, `latency_p50_ms`, `failure_count`.
+- Built-in registry: five seed profiles (claude-sonnet-4-6, claude-haiku-4-5, claude-opus-5, deepseek-v4, ollama-default) — overlaid by persisted benchmark results from `data/model-council/profiles.json`.
+- `composite_score(task_type)`: benchmark score when measured; quality_tier heuristic otherwise.
+
+**`ModelCouncil` class (singleton via `get_model_council()`):**
+- `discover()` → OBSERVER trust: list all registered profiles with availability status.
+- `benchmark(model_id, task_type, probe_fn)` → ASSISTANT trust: run a probe, record score and latency. `probe_fn` is injectable for testability; default uses static quality heuristic until real API probes are configured.
+- `rank(task_type)` → no gate: deterministic sort — available before unavailable, higher composite_score first.
+- `recommend(task_type, excluded)` → ASSISTANT trust: return best available model for task type.
+- `failover(excluded)` → no gate (safety mechanism): best non-primary available model; used when LLMRouter detects failure.
+- `record_failure(model_id)` / `record_success(model_id)`: failure counter; 3 consecutive failures marks a model unavailable.
+- `set_primary(model_id)`: change active primary. Requires AGENT trust for autonomous switch — not automated in Phase 0.
+- `status()`: summary dict for /introspect/capabilities.
+
+**Trust gating philosophy:** Observe is free; decisions cost ASSISTANT; autonomous action costs AGENT. This mirrors the trust ladder design exactly. Trust infra missing → fail-open (warning only, no crash).
+
+**Persistence:** `data/model-council/profiles.json` — static profiles at startup, benchmark overlay on write. Atomic write via `.tmp` + replace.
+
+**New endpoints in `agentic/app.py` (FF_MODEL_COUNCIL gate):**
+- `GET /model-council/status` — full council status + discovery list.
+- `GET /model-council/recommend?task_type=chat` — ranked list + recommendation.
+- `POST /model-council/benchmark` — run a probe for `{model_id, task_type}`.
+- `/introspect/capabilities` updated with `"model_council": council.status()`.
+
+**Tests:** `scripts/test_model_council.py` — 38 tests covering profile composite scoring, discover/benchmark/rank/recommend/failover, failure tracking, persistence, trust gate rejection, and the singleton lifecycle. All 38 pass.
+
+**Consequences:** Kai now knows what models are available, can rank and recommend them, and tracks failures. Auto-switch (AGENT-level) is groundwork-only in Phase 0 — the machinery exists, the autonomous invocation is held for when the trust level is earned. Cumulative: 192 tests across D118–D122, all green in isolation.

@@ -46,6 +46,7 @@ from global_workspace import get_global_workspace, WorkspaceBid
 from moral_core import get_ohana_core
 from cortex import get_cortex
 from trust_integration import gate_autonomous_action, get_trust_status, record_chat_response
+from model_council import get_model_council
 
 logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
@@ -598,6 +599,7 @@ async def introspect_capabilities() -> Dict[str, Any]:
         "gap_log_top5": dict(_gap_log.most_common(5)),
         "proposed_rituals": list(_proposed_rituals),
         "trust": get_trust_status(),
+        "model_council": get_model_council().status() if is_enabled("MODEL_COUNCIL") else None,
     }
 
 
@@ -740,6 +742,45 @@ async def models_info() -> Dict[str, Any]:
         if p:
             profiles[name] = {"strengths": p.strengths, "speed_tier": p.speed_tier, "quality_tier": p.quality_tier, "moe_experts": p.moe_expert_count}
     return {"available_live": _llm.available, "registered": profiles}
+
+
+@app.get("/model-council/status")
+async def model_council_status() -> Dict[str, Any]:
+    """D122: Model Council status — registered models and availability."""
+    if not is_enabled("MODEL_COUNCIL"):
+        raise HTTPException(status_code=503, detail="FF_MODEL_COUNCIL is disabled")
+    council = get_model_council()
+    return {"status": "ok", **council.status(), "registry": council.discover()}
+
+
+@app.get("/model-council/recommend")
+async def model_council_recommend(task_type: str = "chat") -> Dict[str, Any]:
+    """D122: Recommend best available model for a task type."""
+    if not is_enabled("MODEL_COUNCIL"):
+        raise HTTPException(status_code=503, detail="FF_MODEL_COUNCIL is disabled")
+    council = get_model_council()
+    ranked = council.rank(task_type=task_type)
+    rec = council.recommend(task_type=task_type)
+    return {
+        "task_type": task_type,
+        "recommendation": rec,
+        "ranked": ranked,
+    }
+
+
+class ModelBenchmarkRequest(BaseModel):
+    model_id: str
+    task_type: str = "chat"
+
+
+@app.post("/model-council/benchmark")
+async def model_council_benchmark(req: ModelBenchmarkRequest) -> Dict[str, Any]:
+    """D122: Run a benchmark probe for a specific model and task type."""
+    if not is_enabled("MODEL_COUNCIL"):
+        raise HTTPException(status_code=503, detail="FF_MODEL_COUNCIL is disabled")
+    council = get_model_council()
+    result = await asyncio.to_thread(council.benchmark, req.model_id, req.task_type)
+    return result
 
 
 # ── LLM router (Kai's brain) ────────────────────────────────────────
