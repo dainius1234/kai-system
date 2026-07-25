@@ -49,6 +49,7 @@ from trust_integration import gate_autonomous_action, get_trust_status, record_c
 from model_council import get_model_council
 from web_scout import fetch as web_fetch, search as web_search, summarize as web_summarize
 from service_watchdog import get_watchdog
+from paper_trader import get_paper_trader
 
 logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
@@ -604,6 +605,7 @@ async def introspect_capabilities() -> Dict[str, Any]:
         "model_council": get_model_council().status() if is_enabled("MODEL_COUNCIL") else None,
         "web_scout": is_enabled("WEB_SCOUT"),
         "service_watchdog": get_watchdog().status() if is_enabled("SERVICE_WATCHDOG") else None,
+        "paper_trading": get_paper_trader().status() if is_enabled("PAPER_TRADING") else None,
     }
 
 
@@ -848,6 +850,78 @@ async def watchdog_check() -> Dict[str, Any]:
         "fsm_events_fired": fsm_events,
         "services": [r.to_dict() for r in results],
     }
+
+
+class PaperOpenRequest(BaseModel):
+    symbol: str
+    side: str           # "long" | "short"
+    quantity: float
+    price: float
+    strategy_tag: str = ""
+
+
+class PaperCloseRequest(BaseModel):
+    position_id: str
+    price: float
+
+
+@app.get("/paper-trading/status")
+async def paper_trading_status() -> Dict[str, Any]:
+    """D125: Paper trading overall P&L and win-rate summary."""
+    if not is_enabled("PAPER_TRADING"):
+        raise HTTPException(status_code=503, detail="FF_PAPER_TRADING is disabled")
+    return {"status": "ok", **get_paper_trader().status()}
+
+
+@app.get("/paper-trading/positions")
+async def paper_trading_positions() -> Dict[str, Any]:
+    """D125: List all open simulated positions."""
+    if not is_enabled("PAPER_TRADING"):
+        raise HTTPException(status_code=503, detail="FF_PAPER_TRADING is disabled")
+    return {"positions": get_paper_trader().get_positions()}
+
+
+@app.get("/paper-trading/trades")
+async def paper_trading_trades(limit: int = 50) -> Dict[str, Any]:
+    """D125: List recent closed simulated trades."""
+    if not is_enabled("PAPER_TRADING"):
+        raise HTTPException(status_code=503, detail="FF_PAPER_TRADING is disabled")
+    return {"trades": get_paper_trader().get_trades(limit=limit)}
+
+
+@app.post("/paper-trading/open")
+async def paper_trading_open(req: PaperOpenRequest) -> Dict[str, Any]:
+    """D125: Open a simulated position. Trust: PARTNER (4)."""
+    if not is_enabled("PAPER_TRADING"):
+        raise HTTPException(status_code=503, detail="FF_PAPER_TRADING is disabled")
+    try:
+        pos = await asyncio.to_thread(
+            get_paper_trader().open_position,
+            req.symbol, req.side, req.quantity, req.price, req.strategy_tag,
+        )
+        return {"position": pos.to_dict()}
+    except PermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
+
+@app.post("/paper-trading/close")
+async def paper_trading_close(req: PaperCloseRequest) -> Dict[str, Any]:
+    """D125: Close a simulated position and record realised P&L. Trust: PARTNER (4)."""
+    if not is_enabled("PAPER_TRADING"):
+        raise HTTPException(status_code=503, detail="FF_PAPER_TRADING is disabled")
+    try:
+        trade = await asyncio.to_thread(
+            get_paper_trader().close_position, req.position_id, req.price,
+        )
+        return {"trade": trade.to_dict()}
+    except PermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc))
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
 
 
 # ── LLM router (Kai's brain) ────────────────────────────────────────

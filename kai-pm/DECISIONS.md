@@ -2577,3 +2577,41 @@ The Auditor knows the full factor model: operator_approval_history (30%), value_
 **Tests:** `scripts/test_service_watchdog.py` — 24 tests covering: health URL construction, ping (200/301/500/network-error/latency/critical flag), check_all (results, no-event-below-threshold, service_down-at-threshold, no-down-for-non-critical, service_restored-after-recovery, persistence, empty-input, last_checked_at), status (structure, counts, critical_down, None-before-first-check), to_dict, singleton lifecycle. All 24 pass.
 
 **Consequences:** Phase 2: Self-Preservation is now complete at the infrastructure layer — Kai survives model failure (D122), information scarcity (D123), and service degradation (D124). The DEGRADED/RECOVERING FSM arc is now fully wired end-to-end. Cumulative: 210 tests across D118–D124, all green in isolation.
+
+
+## D125 — 2026-07-25 — Paper Trading Engine: Kai's First Financial Autonomy Layer (Phase 3: Sustainability)
+
+**Context:** Phase 2 gave Kai survivability — it can outlast model failure, information scarcity, and service degradation. Phase 3 is sustainability: Kai needs to be able to generate and track value, starting with zero real-money risk. Paper trading is the proving ground — a clean ledger that demonstrates Kai can think about financial decisions before real capital is ever involved.
+
+**Decisions:**
+
+**New module — `agentic/paper_trader.py`:**
+- `Position` dataclass: position_id (UUID), symbol (normalised upper), side (long/short), quantity, entry_price, opened_at, strategy_tag, unrealised_pnl.
+- `Position.mark(current_price)` — computes unrealised P&L inline for both long and short sides.
+- `Trade` dataclass: trade_id, position_id, full entry/exit, realised pnl, pnl_pct, opened_at, closed_at, strategy_tag, duration_s.
+
+**`PaperTrader` class (singleton):**
+- `open_position(symbol, side, quantity, price, strategy_tag)` → Position — validates side/quantity/price/symbol before trust check; normalises symbol to uppercase. Trust: PARTNER (4).
+- `close_position(position_id, price)` → Trade — computes realised P&L correctly for both long (exit−entry) and short (entry−exit). Removes from open positions, appends to trades.jsonl. Trust: PARTNER (4).
+- `mark_to_market(prices: Dict[str, float])` → Dict[position_id, unrealised_pnl] — trust-free; skips positions with no price data or zero price.
+- `get_positions()` / `get_trades(limit)` — trust-free read-only.
+- `status()` — total_pnl, win_rate, avg_pnl_per_trade, best/worst trade summary, open_positions count.
+
+**Storage:**
+- `data/paper-trading/positions.json` — open positions; atomic write via `.tmp` + replace.
+- `data/paper-trading/trades.jsonl` — closed trade log, append-only.
+- Both survive restart: positions loaded on init, trades loaded on demand.
+
+**Trust gating:** PARTNER (4) for open/close (financial actions). Trust infra missing → fail-open. PermissionError surfaces to the caller (HTTP 403 from the endpoint).
+
+**New endpoints in `agentic/app.py` (FF_PAPER_TRADING gate):**
+- `GET /paper-trading/status` — P&L summary.
+- `GET /paper-trading/positions` — open positions list.
+- `GET /paper-trading/trades?limit=N` — recent closed trades.
+- `POST /paper-trading/open` — open a position (PARTNER trust required).
+- `POST /paper-trading/close` — close a position, record P&L (PARTNER trust required).
+- `/introspect/capabilities` updated with `"paper_trading": trader.status()`.
+
+**Tests:** `scripts/test_paper_trader.py` — 35 tests covering: input validation (bad side/qty/price/symbol), open (returns Position, normalises symbol, unique IDs, strategy tag, appends to list), close (long profit/loss, short profit/loss, removes from positions, records duration), mark_to_market (long/short unrealised, missing symbols, zero price), status (empty, after mixed trades, open_positions count), persistence (positions survive reload, trades in jsonl), singleton lifecycle. All 35 pass.
+
+**Consequences:** Kai now has a paper trading ledger. The PARTNER trust gate means Kai cannot open positions autonomously until trust level 4 is granted — the module is fully built and waiting for the trust to be earned. Cumulative: 245 tests across D118–D125, all green in isolation. Phase 3: Sustainability has opened.
