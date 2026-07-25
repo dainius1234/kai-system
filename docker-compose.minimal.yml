@@ -191,6 +191,7 @@ services:
       SKILL_HUNTER_URL: http://skill-hunter:8045
       HOUSE_DOCTOR_URL: http://house-doctor:8046
       VAULT_SYNC_URL: http://vault-sync:8047
+      CORTEX_URL: http://cortex:8048
     ports:
       - "8007:8007"
     healthcheck:
@@ -797,6 +798,37 @@ services:
         ipv4_address: 172.20.0.36
     depends_on:
       - memu-core
+
+  cortex:
+    build:
+      context: .
+      dockerfile: cortex/Dockerfile
+    container_name: kai-cortex
+    restart: unless-stopped
+    ports:
+      - "8048:8048"
+    environment:
+      FF_CORTEX: "true"
+      FF_CORTEX_VERBOSE: "false"
+      CORTEX_REFRESH_INTERVAL: "60"
+      WEATHER_SERVICE_URL: http://weather-service:8039
+      AIRQUALITY_URL: http://airquality-service:8042
+      CALENDAR_SERVICE_URL: http://calendar-service:8043
+      DOCKER_WATCHER_URL: http://docker-watcher:8041
+      SYSMETRICS_URL: http://sysmetrics:8035
+      GIT_WATCHER_URL: http://git-watcher:8044
+      SCREEN_WATCHER_URL: http://screen-watcher:8036
+      CLIPBOARD_SERVICE_URL: http://clipboard-service:8024
+      HOUSE_DOCTOR_URL: http://house-doctor:8046
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8048/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      sovereign-net:
+        ipv4_address: 172.20.0.37
 
   wake-service:
     build:

@@ -71,6 +71,7 @@ HOUSE_DOCTOR_URL = os.getenv("HOUSE_DOCTOR_URL", "http://house-doctor:8046")
 VAULT_SYNC_URL = os.getenv("VAULT_SYNC_URL", "http://vault-sync:8047")
 SCREEN_WATCHER_URL = os.getenv("SCREEN_WATCHER_URL", "http://screen-watcher:8036")
 CLIPBOARD_SERVICE_URL = os.getenv("CLIPBOARD_SERVICE_URL", "http://clipboard-service:8024")
+CORTEX_URL = os.getenv("CORTEX_URL", "http://cortex:8048")
 
 
 async def _memu_get(path: str, params: dict | None = None, fallback: Any = None, timeout: float = 5.0) -> Any:
@@ -1046,6 +1047,30 @@ async def _sense_world() -> str:
                 content = r.json().get("content", "").strip()
                 if content:
                     lines.append(f"Clipboard: {content[:120]}")
+    except Exception:
+        pass
+
+    # Cortex — pre-interpreted situational awareness (prepended so it reads first)
+    try:
+        async with httpx.AsyncClient(timeout=1.5) as client:
+            r = await client.get(f"{CORTEX_URL}/state")
+            if r.status_code == 200:
+                cs = r.json()
+                l2 = cs.get("level2_summary", "")
+                l3 = cs.get("level3_implication", "")
+                if l2 and l2 not in ("Calibrating…", ""):
+                    cortex_lines = [f"[Cortex] {l2}"]
+                    if l3:
+                        cortex_lines.append(f"[Cortex] → {l3}")
+                    fan = cs.get("intent_fan", [])
+                    if fan:
+                        top = fan[0]
+                        cortex_lines.append(
+                            f"[Cortex] Likely intent: {top['label']} ({int(top['confidence'] * 100)}%)"
+                        )
+                    if cs.get("bridge_active") and cs.get("bridge_note"):
+                        cortex_lines.append(f"[Cortex] {cs['bridge_note']}")
+                    lines = cortex_lines + lines
     except Exception:
         pass
 
@@ -2084,6 +2109,16 @@ async def chat_stream(req: ChatRequest):
             )
         except Exception as e:
             failed.append(f"ohana: {e}")
+        # Cortex observe_turn — feeds context bridge and tacit knowledge accumulator
+        try:
+            async with httpx.AsyncClient(timeout=1.0) as client:
+                await client.post(
+                    f"{CORTEX_URL}/observe_turn",
+                    json={"session_id": session, "user_message": u_msg[:500]},
+                )
+        except Exception:
+            pass
+
         if failed:
             logger.warning("_learn_from_exchange: %d step(s) failed — %s", len(failed), "; ".join(failed))
 
