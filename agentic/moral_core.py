@@ -31,12 +31,16 @@ Phase 3 Cognee integration (LOYALTY edge schema):
 
 from __future__ import annotations
 
+import json
 import logging
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
+
+_FINGERPRINT_PATH = Path("data/ohana/fingerprint.json")
 
 
 # ---------------------------------------------------------------------------
@@ -107,10 +111,24 @@ class OhanaCore:
     Phase 3: learns from observed decisions; injects context; evaluates alignment.
     """
 
-    def __init__(self) -> None:
-        self.fingerprint = MoralFingerprint()
+    def __init__(self, fingerprint_path: Optional[Path] = None) -> None:
+        self._fingerprint_path = fingerprint_path or _FINGERPRINT_PATH
+        self.fingerprint = self._load_fingerprint()
         self._interaction_count: int = 0
         self._decision_log: List[Dict[str, Any]] = []
+
+    def _load_fingerprint(self) -> MoralFingerprint:
+        if self._fingerprint_path.exists():
+            try:
+                data = json.loads(self._fingerprint_path.read_text())
+                return MoralFingerprint(**{k: v for k, v in data.items() if k in MoralFingerprint.__dataclass_fields__})
+            except Exception as exc:
+                logger.warning("Could not load fingerprint: %s", exc)
+        return MoralFingerprint()
+
+    def _save_fingerprint(self) -> None:
+        self._fingerprint_path.parent.mkdir(parents=True, exist_ok=True)
+        self._fingerprint_path.write_text(json.dumps(asdict(self.fingerprint), indent=2))
 
     # ------------------------------------------------------------------
     # Moral context injection (stub)
@@ -121,12 +139,21 @@ class OhanaCore:
     ) -> MoralContext:
         """Build the moral context block for the current situation.
 
-        Phase 0: returns default MoralContext (core_reminder only).
-        Phase 3: populates specific_stances and relevant_past_decisions
-                 from fingerprint.situational_stances + memory retrieval.
+        Populates specific_stances from the fingerprint when data exists.
         """
-        _ = situation
-        return MoralContext()
+        stances_text = ""
+        if self.fingerprint.situational_stances:
+            lines = [f"- {k}: {v}" for k, v in list(self.fingerprint.situational_stances.items())[:5]]
+            stances_text = "\n".join(lines)
+
+        loyalties_text = ""
+        if self.fingerprint.core_loyalties:
+            loyalties_text = "; ".join(self.fingerprint.core_loyalties[:5])
+            loyalties_text = f"Core loyalties: {loyalties_text}"
+
+        return MoralContext(
+            specific_stances="\n".join(filter(None, [loyalties_text, stances_text])),
+        )
 
     def inject_into_prompt(
         self, base_prompt: str, situation: Optional[Dict[str, Any]] = None
@@ -149,13 +176,15 @@ class OhanaCore:
         decision: str,
         outcome: Optional[str] = None,
     ) -> None:
-        """Learn from the operator's real-world decisions.
-
-        Updates fingerprint.situational_stances when a pattern is stable
-        across multiple observations. Stub: increments counter only.
-        """
-        _ = situation, decision, outcome
+        """Learn from the operator's real-world decisions."""
         self._interaction_count += 1
+        entry = {"situation": situation, "decision": decision, "outcome": outcome, "ts": time.time()}
+        self._decision_log.append(entry)
+        # Derive a stance key from the situation type and store the decision
+        situation_type = situation.get("type", situation.get("domain", "general"))
+        self.fingerprint.situational_stances[str(situation_type)] = decision
+        self.fingerprint.last_updated = str(time.time())
+        self._save_fingerprint()
 
     def request_clarification(
         self, contradiction_context: Dict[str, Any]
@@ -175,12 +204,30 @@ class OhanaCore:
     def evaluate_action_alignment(self, action: Dict[str, Any]) -> float:
         """Return 0.0–1.0 indicating how aligned an action is with the operator's values.
 
-        Used by the Gate and CONVICTION_GATE to apply a loyalty-weighted modifier.
-        Phase 0: returns 0.5 (neutral — no influence on conviction).
-        Phase 3: scores against fingerprint.core_loyalties and situational_stances.
+        Scores the action against core_loyalties and harm_boundaries.
+        Returns 0.5 (neutral) when no fingerprint data exists yet.
+        Returns 0.0 immediately if a harm_boundary keyword matches.
         """
-        _ = action
-        return 0.5
+        if not self.fingerprint.core_loyalties and not self.fingerprint.harm_boundaries:
+            return 0.5  # no data yet — neutral
+
+        action_text = json.dumps(action).lower()
+
+        # Hard block: any harm boundary keyword present → 0.0
+        for boundary in self.fingerprint.harm_boundaries:
+            if any(word in action_text for word in boundary.lower().split()[:3]):
+                logger.warning("Action blocked by harm boundary: %s", boundary)
+                return 0.0
+
+        # Positive signal: loyalty keywords present → boost score
+        loyalty_hits = sum(
+            1 for loyalty in self.fingerprint.core_loyalties
+            if any(word in action_text for word in loyalty.lower().split()[:2])
+        )
+        if not self.fingerprint.core_loyalties:
+            return 0.5
+        alignment = 0.5 + (loyalty_hits / len(self.fingerprint.core_loyalties)) * 0.5
+        return min(1.0, alignment)
 
     # ------------------------------------------------------------------
     # Introspection
