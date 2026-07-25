@@ -159,6 +159,9 @@ jobs:
       - name: GPU-era foundation stubs (D95–D100 — dialectic, analogy, blend, fingerprint, synthetic, transitive)
         run: make test-d95-d100-foundations
 
+      - name: Causal world model + policy memory tests (D101 — CausalGraph, WorldModelSimulator, PolicyMemory, CausalSurpriseDetector, PolicyLibrary)
+        run: make test-d101-causal-world-model
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors

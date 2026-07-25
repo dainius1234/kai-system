@@ -87,6 +87,9 @@ _REGISTRY: Dict[str, tuple] = {
     "COGNITIVE_FINGERPRINT": ("D98: operator thinking-style model — collecting interaction samples now; inference pending 90+ samples", True),
     "SYNTHETIC_EXPERIENCE":  ("D99: fictional scenario generation during dream cycles — pending GPU", False),
     "TRANSITIVE_REASONING":  ("D100: PageRank + community detection + shortest-path on memu-graph — pending populated graph", False),
+    "CAUSAL_WORLD_MODEL":    ("D101: persistent causal graph + GPU mental simulations + policy distillation — pending GPU + 30d data", False),
+    "CAUSAL_SURPRISE":       ("D101: prediction-error detection — fires hypothesis cycle on divergence; requires FF_CAUSAL_WORLD_MODEL", False),
+    "POLICY_MEMORY":         ("D101: auto-distillation of simulation outcomes into ranked strategies — requires FF_CAUSAL_WORLD_MODEL", False),
 }
 
 
