@@ -16,20 +16,16 @@ process-level failure isolation between hot and cold paths.
 
 **Phase: Phase 0 — COMPLETE. Blocked on GPU hardware (RTX 5080) to enter Phase 1.**
 
-All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Last merged: D92–D100
-Intelligence Sprint (2026-07-25) — 9 new capabilities in one push. CPU-safe live: D92 Socratic
-Questioning (SocraticQuestioner, pre-GATHER 3-5 decomposition questions, enriched_query wired into
-`build_swarm_pipeline()`), D93 Hypothesis Engine (idle-cycle "If X then Y" formation + LLM test +
-SUPPORTED/REFUTED/INCONCLUSIVE verdict → CURIOSITY.md, wired into `idle_curiosity_tick()`), D94
-Temporal Projection (ForecastFan 4-branch probability fan: base/optimistic/pessimistic/wild_card,
-causal-chain input, robust JSON parse with static fallback). D98 Cognitive Fingerprint collecting
-InteractionSample records NOW to `/data/cognitive_fingerprint.jsonl`; infers at 90 samples.
-GPU-era stubs with fixed interfaces: D95 Dialectical Synthesis (`dialectic.py`), D96 Analogical
-Reasoning (`analogy.py`), D97 Concept Blending (`concept_blend.py`), D99 Synthetic Experience
-(`synthetic_experience.py`), D100 Transitive Reasoning (`memu-graph/transitive.py`, PageRank +
-community detection + shortest-path + rule mining, MIN_EDGES=500). SwarmContext gained
-`decomposition_questions: List[str]` + `enriched_query: str`. 9 new FF_* flags (47 total). 4
-new test targets (88 total). 75 new tests (~2,829 total). No open PRs.
+All Phase 0 / 0.5 CPU-safe backlog items are shipped and on `main`. Last merged: D101 + D102
+(2026-07-25). D101 Causal World Model: `agentic/causal_world_model.py` (CausalGraph, WorldModelSimulator,
+PolicyMemory, CausalSurpriseDetector stubs) + `agentic/policy_memory.py` (PolicyLibrary JSONL-persisted
+to `/data/policies.jsonl`, `store()` works NOW). D102 Global Workspace Consciousness: `agentic/global_workspace.py`
+(WorkspaceBid, ConsciousMoment, GlobalWorkspace — 100ms bidding cycle, salience-weighted winner,
+pub/sub broadcast; `can_operate()→False` Phase 0, interfaces frozen). Prior sprint: D92–D100
+Intelligence Sprint — CPU-safe live: D92 Socratic Questioning, D93 Hypothesis Engine, D94 Temporal
+Projection, D98 Cognitive Fingerprint (collecting NOW). GPU-era stubs with fixed interfaces: D95–D97,
+D99–D100. 11 new FF_* flags across D92–D102 (51 total). 6 new test targets (90 total). ~59 new
+tests (~2,888 total). No open PRs.
 
 ### What has shipped to `main` (merged PRs, in order)
 
@@ -76,6 +72,8 @@ new test targets (88 total). 75 new tests (~2,829 total). No open PRs.
 | D90 | D90 | Swarm Assembly: `agentic/swarm.py` (SwarmContext shared state, TeammateRep reputation tracking, `resolve_conflict()` 5-signal weighted average: evidence 0.30 + causal 0.25 + verdict 0.20 + reputation_vote 0.15 + adversary_mod 0.10); `agentic/swarm_stages.py` (5 real stage function factories: make_gather_stage, make_debate_stage, make_fact_check_stage, make_causal_check_stage, make_conviction_gate_stage + `build_swarm_pipeline()`); `POST /chat/swarm` live endpoint; `GET /swarm/reputation` → per-teammate weights; `FF_SWARM=true` (default); `data/teammate_reputation.json` persists reputation across sessions; 38 tests. | — |
 | D91 | D91 | Obsidian Brain: `vault-sync/` service (port 8047, 172.20.0.36) — `parser.py` (NoteData dataclass: filepath, title, frontmatter, wikilinks, tags, SHA256 checksum; python-frontmatter + wikilink regex); `mapper.py` (VaultMapper: filepath↔node-id, thread-safe Lock, persists to .vault-sync/mapping.json); `watcher.py` (FileWatcher: watchdog Observer, _VaultHandler, 2s per-filepath debounce via threading.Timer, thread→asyncio bridge via loop.call_soon_threadsafe); `app.py` (FastAPI: GET /health, POST /ingest manual trigger, POST /export conviction≥9.0 gate + path-traversal block, GET /search, GET /mapping; asyncio ingest+delete queue workers; FF_VAULT_SYNC toggle). 3 new memu-core vault endpoints (POST /memory/vault/ingest, DELETE /memory/vault/{id}, GET /memory/vault/search). Agentic vault proxy (POST /vault/export, GET /vault/search) + FF_VAULT_CONTEXT world-context injection. FF_VAULT_SYNC=True (default) + FF_VAULT_CONTEXT=False (default). 4 Jinja2 templates (daily-note, lesson-learned, kai-inbox, soul-mirror). Dockerfile + compose wiring (172.20.0.36, vault_data volume). ~45 tests. Services: 59 → 60. | — |
 | D92–D100 | D92–D100 | Intelligence Sprint: D92 `agentic/questioner.py` — SocraticQuestioner: `decompose(query)→SocraticResult`, 3-5 decomposition questions + enriched_query, LLM-driven with 5-question FALLBACK, `can_question()` checks FF_SOCRATIC; non-fatal `questioner_stage` wired into `build_swarm_pipeline()` (optional kwarg, backwards-compatible); SwarmContext gained `decomposition_questions: List[str]` + `enriched_query: str`; 25 tests. D93 `agentic/hypothesis.py` — HypothesisEngine: idle-cycle "If X then Y" gap formation from memory evidence, LLM tests hypotheses → SUPPORTED/REFUTED/INCONCLUSIVE verdict, appends to CURIOSITY_LOG (`/data/CURIOSITY.md`); wired into `idle_curiosity_tick()` (CPU-safe, before GPU check); MIN_MEMORIES_TO_SCAN=3, MAX_HYPOTHESES_PER_CYCLE=3; 20 tests. D94 `agentic/forecaster.py` — TemporalForecaster: ForecastFan with 4 ScenarioBranch objects (base/optimistic/pessimistic/wild_card), probability-weighted, causal_chains input, `consensus_probability` property, robust JSON extraction, `_FALLBACK_BRANCHES` static fallback; 15 tests. GPU-era stubs (all `can_*()→False` in Phase 0, interfaces frozen): D95 `dialectic.py` (DialecticalTriad: thesis/antithesis/synthesis, `resolution_level`, stub pending dual-model GPU); D96 `analogy.py` (AnalogyMapping + Analogy, `can_find()→False`, stub pending ≥1000 concept graph nodes); D97 `concept_blend.py` (BlendedConcept: emergent_properties/novelty_score/suppressed, `can_blend()→False`, stub pending graph+GPU); D98 `cognitive_fingerprint.py` (InteractionSample + CognitiveFingerprintCollector collecting NOW to `/data/cognitive_fingerprint.jsonl`; `can_infer()→False` until 90 samples; module-level `collector` singleton + `quick_sample()` heuristics); D99 `synthetic_experience.py` (SyntheticScenario + SyntheticExperienceGenerator, `can_generate()→False`, pending GPU dream cycles); D100 `memu-graph/transitive.py` (TransitiveReasoner: PageRank, community detection, shortest_path, mine_rules; `can_reason()→False` until MIN_EDGES_FOR_REASONING=500). 9 new FF_* flags (total: 47). 4 new test targets (total: 88). 75 new tests (total: ~2,829). | — |
+| D101 | D101 | Causal World Model & Policy Distillation: `agentic/causal_world_model.py` — CausalGraph (directed CAUSES edges with source/target/strength/confidence/temporal_lag/direction/context_modifiers/source_type/evidence_count; `add_edge()` + `get_edge()` work NOW); WorldModelSimulator (N=50 GPU scenario variants per idle cycle, utility-ranked, `can_simulate()→False`); PolicyMemory in-memory stub (`can_learn_policies()→False`); CausalSurpriseDetector (divergence ≥0.3 → fires D93 hypothesis cycle, `can_detect_surprise()→False`). Factory singletons: `get_causal_graph()`, `get_policy_memory()`, `get_simulator()`, `get_surprise_detector()`. Phase 3 Cognee CAUSES edge schema documented in module docstring. Separate `agentic/policy_memory.py` — PolicyLibrary JSONL-persisted to `/data/policies.jsonl`; `store()` + `retrieve_relevant()` work NOW for seed policies; `can_distill()→False`. 3 new FF_* flags (FF_CAUSAL_WORLD_MODEL, FF_CAUSAL_SURPRISE, FF_POLICY_MEMORY — all False). 2 new test targets (total: 89→note: one more added by D102). 37 tests. | — |
+| D102 | D102 | Global Workspace Consciousness: `agentic/global_workspace.py` — Based on Global Workspace Theory (Baars 1988, Dehaene 2014). WorkspaceBid (module/content/urgency/relevance/surprise/confidence/emotional_salience/timestamp). ConsciousMoment (timestamp/content/source_module/salience_score/broadcast_id/context/emotional_valence). GlobalWorkspace: 100ms bidding cycle; salience function weighted by D98 cognitive fingerprint dimensions; `submit_bid()` (no-op P0); `select_winner()→None P0`; `broadcast()` (no-op P0); `subscribe()`, `unsubscribe()`, `subscriber_count()`; `get_stream()→[] P0`; `get_latest_moment()→None P0`; `stream_length()→0 P0`; `can_operate()→False P0`; `progress()→dict`. `get_global_workspace()` singleton factory. Stream will log to `/data/conscious_stream.jsonl` in Phase 3; Dashboard "Stream" view planned. `FF_GLOBAL_WORKSPACE=False` (1 flag). 22 tests. Test targets: 90 total. Tests: ~2,888 total. | — |
 
 ### In-flight work
 
@@ -103,7 +101,9 @@ None. All work is on `main`. No open PRs.
 16. **Swarm Assembly — DONE** (D90) — real stage functions wired, SwarmContext, reputation, `POST /chat/swarm` live
 17. **Obsidian Brain — DONE** (D91) — vault-sync service, SHA256 dedup, conviction gate, memu-core vault API, 4 templates
 18. **Intelligence Sprint D92–D100 — DONE** — Socratic Questioning, Hypothesis Engine, Temporal Projection live; D98 Cognitive Fingerprint collecting; D95/D96/D97/D99/D100 GPU-era stubs with fixed interfaces; 9 flags, 88 test targets, ~2,829 tests
-19. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
+19. **Causal World Model D101 — DONE** — CausalGraph + WorldModelSimulator + PolicyMemory stubs; PolicyLibrary JSONL-persisted `store()` works NOW; CausalSurpriseDetector stub; 3 flags, 37 tests
+20. **Global Workspace Consciousness D102 — DONE** — GWT bidding cycle, ConsciousMoment stream, pub/sub interfaces frozen; `can_operate()→False` Phase 0; 1 flag, 22 tests; 90 test targets, ~2,888 tests total
+21. **GPU hardware arrival** — RTX 5080: execute GPU Day protocol (G1–G8 in GPU_ARRIVAL_RUNBOOK.md), declare Phase 1
 
 Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
@@ -160,14 +160,17 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
   - `agentic/forecaster.py` — TemporalForecaster → ForecastFan(4×ScenarioBranch: base/optimistic/pessimistic/wild_card). `consensus_probability` property. Causal-chain input. Static fallback if LLM unavailable.
   - `agentic/cognitive_fingerprint.py` — `collector` singleton, `record(InteractionSample)` appending to `/data/cognitive_fingerprint.jsonl` NOW. `quick_sample(query)` helper. `can_infer()→False` until 90 samples.
   - GPU-era stubs (interface frozen, `can_*()→False`): `dialectic.py` (D95), `analogy.py` (D96), `concept_blend.py` (D97), `synthetic_experience.py` (D99), `memu-graph/transitive.py` (D100, MIN_EDGES=500).
-- **Tests**: ~2,829 across 134+ files (88 test targets in `make test-core`); per-module floors: `agentic ≥ 45%`, `memu-core ≥ 60%`. `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
+  - `agentic/causal_world_model.py` — D101: CausalGraph (`add_edge`/`get_edge` work NOW, traversal stubs return []/{}); WorldModelSimulator (`can_simulate()→False`); PolicyMemory in-memory stub; CausalSurpriseDetector (`can_detect_surprise()→False`). Factory singletons.
+  - `agentic/policy_memory.py` — D101: PolicyLibrary JSONL to `/data/policies.jsonl`. `store()`/`retrieve_relevant()` work NOW. `can_distill()→False`. Module-level `library` singleton.
+  - `agentic/global_workspace.py` — D102: WorkspaceBid/ConsciousMoment/GlobalWorkspace. GWT 100ms bidding cycle, salience-weighted winner, pub/sub callbacks. `can_operate()→False`. `get_global_workspace()` singleton. Stream → `/data/conscious_stream.jsonl` in Phase 3.
+- **Tests**: ~2,888 across 136+ files (90 test targets in `make test-core`); per-module floors: `agentic ≥ 45%`, `memu-core ≥ 60%`. `MEMU_ALLOW_FAKE_EMBEDDINGS=true` required for offline runs. `scripts/conftest.py` redis stub required for collection.
 - **Coverage**: 5 modules (`common`, `agentic`, `memu-core`, `letta-agent`, `financial-awareness`), 60% gate.
 
 ---
 
 ## 6) PM operating rules
 
-- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D100**.
+- **`kai-pm/DECISIONS.md`** is append-only — never edit past entries, supersede with new numbered entry. Last entry: **D102**.
 - Reality checks → new file `REALITY_CHECK_<date>.md`, not silent rewrites.
 - No drift between docs, status, and delivered code.
 - `make sync-docs` after major changes; `make merge-gate` before every PR.
@@ -187,7 +190,7 @@ Full plan: [`kai-pm/PHASE1_READINESS.md`](PHASE1_READINESS.md)
 
 | File | What |
 |------|------|
-| `kai-pm/DECISIONS.md` | Append-only decision log (D1–D100) |
+| `kai-pm/DECISIONS.md` | Append-only decision log (D1–D102) |
 | `kai-pm/STATUS.md` | Sprint health + open PRs |
 | `kai-pm/CLEANUP_TODO.md` | Cleanup sprint tracker (all items done except §2.1 merge-order decision) |
 | `kai-pm/COMPOSE_DRIFT.md` | Docker compose divergence audit (§2.2 shared-block extraction deferred) |
