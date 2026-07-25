@@ -388,11 +388,14 @@ def make_causal_check_stage(
         except Exception as exc:
             record_error(slug)
             ctx.log_stage("causal_check", slug, "failed", (time.monotonic() - t0) * 1000, 0.0)
+            # Oracle failing is an epistemic absence, not neutral success.
+            # CONVICTION_GATE should know we didn't reason about consequences — we skipped.
+            ctx.stages_silent = getattr(ctx, "stages_silent", []) + ["causal_check"]
             return AgentHandoff(
                 from_stage="causal_check",
                 to_stage="conviction_gate",
-                status=HandoffStatus.COMPLETE,
-                confidence=5.0,
+                status=HandoffStatus.DEGRADED,
+                confidence=3.5,
                 payload={**handoff.payload, "_ctx": ctx},
             )
 

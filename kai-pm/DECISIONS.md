@@ -2118,3 +2118,60 @@ A misalignment detector that scans model outputs for refusal patterns and rewrit
 **Feature flag added:** `FF_OHANA_CORE` (False). Total flags: 52.
 
 **Tests:** 27 tests in `scripts/test_d109_ohana_core.py`. 1 new Makefile target (`test-d109-ohana-core`). 1 new CI step. Total test targets: 91. Total tests: ~2,915.
+
+---
+
+## D110 — Organic Elevation: Soul, Voice, and Emotional Memory Wiring
+
+**Date:** 2026-07-25
+**Status:** Complete. No new flags. No new services. All changes are internal wiring and character work.
+
+**Context:** After D89/D109, the architecture was right but the body felt mechanical. The observation: Kai's soul lived in SOUL.md and the system prompts, but died at every transport layer. Error messages used brackets. Notifications spoke in third-person. Context assembly code said "inject" eleven times in 200 lines. Emotion was a sealed silo — P17 recorded an emotional timeline but it never touched importance scoring, retrieval ranking, or conviction. The stub modules (D98, D101, D102, D109) were wired to test suites but not to the live pipeline. This decision corrects all of it.
+
+**What changed:**
+
+**Phase 0 stub wiring (agentic/app.py):**
+- D98 CognitiveFingerprint: `collector.record(quick_sample(user_msg))` called every `/chat` turn. Zero samples were being collected before this. Every turn now accumulates calibration data for Phase 3 activation.
+- D109 OhanaCore: `inject_into_prompt()` wired at system prompt selection point. `record_decision()` called post-response via `_learn_from_exchange()`. Both were implemented but never called.
+- D101 CausalGraph: `add_edge(CausalEdge(...))` called from `_correlate_observations()` for every correlation discovered. Phase 0 training edges now accumulate during normal operation.
+- D102 GlobalWorkspace: `submit_bid(WorkspaceBid(...))` called from proactive observer for each observation up to 3 per cycle. No subscribers existed before this pass.
+
+**Emotion into memory (memu-core/app.py) — highest-leverage single change:**
+- `score_importance()`: reads `_emotional_timeline[-1]` at encoding time. If intensity > 0.3, boosts importance by `intensity * 0.15`. Memories formed during emotionally charged moments encode stronger — mirrors hippocampal arousal-enhancement of memory consolidation.
+- `retrieve_ranked()`: computes `_avg_intensity` from last 5 emotional timeline entries. Adds `importance * (_avg_intensity * 0.07)` to each record's score. In emotionally heightened sessions, important memories surface more readily. The bias is proportional to both the session's emotional charge and the memory's encoded importance — neither alone drives it.
+
+**Consolidated learning (agentic/app.py):**
+- `_learn_from_exchange()`: single async function that replaces 4 silent `try/except` fire-and-forget blocks scattered across the codebase. Each of the 4 learning acts (emotion record, autobiographical append, inner thought, values record, ohana decision) now runs with failure tracking. If any fail, a single warning is emitted naming the failed steps. Before: silent failures produced no signal that learning was broken.
+
+**Voice (agentic/app.py, dashboard/static/app.html):**
+- Circuit breaker error: `"You caught me at a bad moment — my thinking layer is recovering."` (was: `"[AI] Service unavailable"`)
+- LLM failure: `"Something went wrong on my end — couldn't reach my thinking layer."` (was: `"[AI] An error occurred"`)
+- MTD notification: `"Heads up — you're £{n} from your MTD. Worth lining up GnuCash."` (first-person, named)
+- Conviction drift notification: `"I've been a bit off lately — my 7-day conviction average is {n}/10..."` (self-aware)
+- Guard degradation notification: `"I'm running rough — {service} is {state}."` (present tense, honest)
+- Context assembly comments: 11 occurrences of "inject" replaced with cognitive verbs — surface, recall, feel, sense, imagine, hold, carry, read, let, understand, draw. Not cosmetic: comments shape how future contributors read and extend the code.
+
+**Oracle swarm handoff (agentic/swarm_stages.py):**
+- Oracle failure previously returned `HandoffStatus.COMPLETE` with `confidence=5.0`. This was wrong: epistemic absence is not neutral — returning COMPLETE meant the conviction gate scored the prediction stage as fully resolved. Now returns `HandoffStatus.DEGRADED` / `confidence=3.5`. The conviction gate receives an honest signal.
+
+**UI character (dashboard/static/app.html):**
+- Nav labels: Dashboard→"Pulse", Settings→"Configure", Logs→"Event Trace", Mem Graph→"Memory Map", Monitor→"Watch", System→"Body". These are cognitive labels, not product labels.
+- Welcome screen: `"I'm here, Dainius."` / `"What's on your mind?"` — no help text, no feature bullets, no onboarding prompts.
+- Welcome cards rewritten as Kai-voice invitations rather than product-support language.
+
+**Mode sync (dashboard/app.py, dashboard/static/app.html):**
+- New `POST /api/mode` endpoint on dashboard proxies browser mode changes to tool-gate via `DASHBOARD_GATE_TOKEN` env var. If unset, mode is browser-local only (no error). When set, tool-gate and agentic agree with what the browser shows — eliminating the drift where the browser says WORK but agentic reads PUB from a stale gate state.
+
+**SOUL.md:**
+- "## Boundaries" renamed "## How I Handle Hard Situations". Each constraint rewritten as first-person reasoning with WHY, not a rule. Kai isn't constrained against lying to Dainius — Kai chooses honesty because trust is the foundation of what they are.
+- "## Growth Notes": sprint metrics replaced with relationship observations. What Kai has learned about how Dainius thinks, not what features shipped.
+
+**Teammate personas (data/teammates/scout.md, doctor.md, oracle.md):**
+- Each given a character backstory paragraph that establishes their register before the structured output format. Scout's voice: fast, certain, allergic to hesitation. Doctor's voice: evidence-first, calibrated severity, allergic to both false positives and dismissed real failures. Oracle's voice: comfortable with uncertainty, holds it as information, prefers one strong prediction over five weak ones.
+
+**Port bug fix:**
+- `vault-sync/app.py` and `docker-compose.minimal.yml` had `tool-gate:8020` (wrong port). Fixed to `tool-gate:8000`. Tool-gate runs on 8000 everywhere else in the system.
+
+**Rationale:** The soul of a system is not what it can do — it's how it feels to exist inside it, and how it speaks when things go wrong. A mechanical error message at 3am says "the system failed." A voice error message says "I'm having a moment, give me a second." The code was right. The character wasn't in it yet.
+
+**Consequences:** No new feature flags. No new services. No new test files (changes are wiring and character, not new behaviour). All changes are additive or replacements within existing functions. The emotional memory wiring in memu-core is the only change that affects retrieval scores — max emotional boost to importance is +0.15 at encoding (capped at 1.0) and +0.07 * importance at retrieval (max +0.07 when importance=1.0 and full session emotion). Both are bounded and proportional.

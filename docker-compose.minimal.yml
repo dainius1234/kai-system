@@ -787,7 +787,7 @@ services:
     environment:
       VAULT_PATH: /vault
       MEMU_CORE_URL: http://memu-core:8001
-      TOOL_GATE_URL: http://tool-gate:8020
+      TOOL_GATE_URL: http://tool-gate:8000
       FF_VAULT_SYNC: "true"
       VAULT_WRITE_CONVICTION_THRESHOLD: "9.0"
     volumes:
