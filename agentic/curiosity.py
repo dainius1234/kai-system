@@ -75,7 +75,7 @@ async def idle_curiosity_tick(
 
     # D93: run hypothesis engine on CPU regardless of GPU availability
     try:
-        from feature_flags import is_enabled
+        from common.feature_flags import is_enabled
         if is_enabled("HYPOTHESIS_ENGINE"):
             from hypothesis import HypothesisEngine
             engine = HypothesisEngine(llm_chat_fn=llm_chat_fn, memories_fn=memories_fn)

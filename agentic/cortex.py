@@ -196,7 +196,13 @@ class Cortex:
         Phase 1: calls _npu_synthesize().
         """
         if is_enabled("CORTEX_NPU") and raw_sensor_data:
-            return self._npu_synthesize(list(raw_sensor_data.values()))
+            try:
+                return self._npu_synthesize(list(raw_sensor_data.values()))
+            except NotImplementedError:
+                logger.error(
+                    "FF_CORTEX_NPU=true but NPU runtime not validated — "
+                    "returning cached Phase 0 situation"
+                )
         return self.situation
 
     def get_current_situation(self) -> SituationModel:
@@ -319,12 +325,20 @@ class Cortex:
     def can_operate(self) -> bool:
         """
         Phase 0: True when D113 service state was received within the last 120s.
-        Phase 1 (Strix Halo NPU): True when FF_CORTEX_NPU=true.
+        Phase 1 (Strix Halo NPU): True when FF_CORTEX_NPU=true AND onnxruntime installed.
 
         Both phases can be active simultaneously — NPU synthesises while the
         service runs as a fallback and sensor aggregator.
         """
         if is_enabled("CORTEX_NPU"):
+            try:
+                import onnxruntime  # noqa: F401
+            except ImportError:
+                logger.error(
+                    "FF_CORTEX_NPU=true but onnxruntime is not installed — "
+                    "falling back to Phase 0 service delegation"
+                )
+                return (time.time() - self._service_last_ok) < 120
             return True
         return (time.time() - self._service_last_ok) < 120
 

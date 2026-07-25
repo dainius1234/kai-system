@@ -289,6 +289,7 @@ class VectorStore(Protocol):
 # persistent vector store using PostgreSQL + pgvector
 class PGVectorStore:
     def __init__(self) -> None:
+        import threading
         import psycopg2
         import psycopg2.pool
         from psycopg2.extras import Json as _Json, RealDictCursor as _RDC
@@ -299,32 +300,48 @@ class PGVectorStore:
         self._pg_uri = os.getenv("PG_URI", "postgresql://keeper:localdev@postgres:5432/sovereign")
         # min 1, max 5 connections — enough for a single-instance service
         self._pool = psycopg2.pool.SimpleConnectionPool(1, 5, self._pg_uri)
+        # Serialises pool recreation so concurrent requests can't race and leak slots
+        self._pool_lock = threading.Lock()
         self._init_schema()
         self.vc = LakeFSClient()
         self._state: Dict[str, Any] = {}
 
     def _get_conn(self):
-        """Get a connection from the pool, reconnect if stale."""
-        conn = self._pool.getconn()
+        """Get a connection from the pool, replacing only the dead slot if stale."""
+        with self._pool_lock:
+            conn = self._pool.getconn()
         try:
             conn.isolation_level  # quick liveness check
             with conn.cursor() as cur:
                 cur.execute("SELECT 1")
+            return conn
+        except Exception:
+            # Connection is dead — close it and open a fresh one directly,
+            # without replacing the pool object (preserving all other slots).
+            try:
+                conn.close()
+            except Exception:
+                pass
+            try:
+                return self._psycopg2.connect(self._pg_uri)
+            except Exception:
+                # Last resort: recreate pool under lock
+                with self._pool_lock:
+                    self._pool = self._psycopg2.pool.SimpleConnectionPool(
+                        1, 5, self._pg_uri
+                    )
+                    return self._pool.getconn()
+
+    def _put_conn(self, conn):
+        """Return a connection to the pool (silently drops if pool was replaced)."""
+        try:
+            with self._pool_lock:
+                self._pool.putconn(conn)
         except Exception:
             try:
                 conn.close()
             except Exception:
                 pass
-            self._pool = self._psycopg2.pool.SimpleConnectionPool(1, 5, self._pg_uri)
-            conn = self._pool.getconn()
-        return conn
-
-    def _put_conn(self, conn):
-        """Return a connection to the pool."""
-        try:
-            self._pool.putconn(conn)
-        except Exception:
-            pass
 
     def _init_schema(self) -> None:
         conn = self._get_conn()
