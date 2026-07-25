@@ -90,6 +90,7 @@ _REGISTRY: Dict[str, tuple] = {
     "CAUSAL_WORLD_MODEL":    ("D101: persistent causal graph + GPU mental simulations + policy distillation — pending GPU + 30d data", False),
     "CAUSAL_SURPRISE":       ("D101: prediction-error detection — fires hypothesis cycle on divergence; requires FF_CAUSAL_WORLD_MODEL", False),
     "POLICY_MEMORY":         ("D101: auto-distillation of simulation outcomes into ranked strategies — requires FF_CAUSAL_WORLD_MODEL", False),
+    "GLOBAL_WORKSPACE":      ("D102: Global Workspace Consciousness — serial stream of unified awareness via module bidding; requires GPU + D101 + D98 + ≥3 bidders", False),
 }
 
 

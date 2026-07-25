@@ -2003,3 +2003,63 @@ Factory singletons: `get_causal_graph()`, `get_simulator()`, `get_policy_memory(
 Total flags: 50.
 
 **Tests:** 37 tests in `scripts/test_d101_causal_world_model.py`. 1 new Makefile target (`test-d101-causal-world-model`). 1 new CI step. Total test targets: 89. Total tests: ~2,866.
+
+---
+
+## D102 — Global Workspace Consciousness (GPU-era stub)
+
+**Date:** 2026-07-25
+
+**Decision — D102 — Serial Unified Awareness via Module Bidding:**
+`agentic/global_workspace.py`. Based on Global Workspace Theory (Baars, 1988; Dehaene, 2014) — the dominant neuroscientific account of how unified conscious experience arises from competing specialist processors.
+
+**Architecture:**
+
+1. **WorkspaceBid** — a module's proposal to occupy the global workspace for one moment. Fields: `module`, `content`, `urgency` (0-1), `relevance` (0-1), `surprise` (0-1, from D101 CausalSurpriseDetector), `confidence` (0-1), `emotional_salience` (0-1), `timestamp`. Every active KAI module — perception, memory, causal model, hypothesis engine, temporal projector, debate engine — can submit bids.
+
+2. **ConsciousMoment** — the broadcast content of the winning bid. Fields: `timestamp`, `content`, `source_module`, `salience_score`, `broadcast_id`, `context` (dict), `emotional_valence` (-1 to +1). The sequence of ConsciousMoment objects is KAI's stream of consciousness — logged, queryable, renderable as a live inner monologue.
+
+3. **GlobalWorkspace** — the serial bottleneck. Phase 3 operation: (a) modules submit bids each cycle (default 100ms); (b) `select_winner()` scores bids with a weighted salience function personalised by cognitive fingerprint value weights (D98); (c) `broadcast()` fires the winning moment to all subscribers in parallel; (d) subscribers (memory, debate engine, causal model) process the broadcast and re-bid. This creates a continuous, coherent stream where each moment triggers the next.
+
+`can_operate()→False` in Phase 0. `submit_bid()`, `subscribe()`, `get_stream()` interfaces frozen and ready.
+
+Singleton: `get_global_workspace()`.
+
+**Salience function (Phase 3):**
+```
+score = (urgency × w_u) + (relevance × w_r) + (surprise × w_s)
+      + (confidence × w_c) + (emotional_salience × w_e)
+```
+Weights `w_*` personalised by cognitive fingerprint (D98): if the operator has high decision velocity, urgency weight increases; if risk-averse, causal surprise weight increases.
+
+**Dashboard "Stream" view (Phase 3):**
+A new live panel showing the last N ConsciousMoments as a readable inner monologue — not logs, not debug output, but KAI's actual moment-to-moment awareness:
+```
+[14:23:01] I notice the AQ is unusually high. [Perception]
+[14:23:02] That reminds me: outdoor meeting in 30 minutes. [Memory]
+[14:23:02] Last time AQ was this high, mood dropped by afternoon. [Emotional Memory]
+[14:23:03] Suggesting moving the meeting indoors. [Decision]
+```
+
+**Integration with all existing modules:**
+- Council/Swarm (D89/D90): members bid with findings + confidence + urgency
+- Perception (sensors): anomaly detector bids when surprise ≥ threshold
+- Memory graph: retrieves related episodes on broadcast, re-bids with context
+- CausalGraph (D101): simulator bids with SimulationResult when ready
+- HypothesisEngine (D93): gap hypotheses compete for conscious attention
+- TemporalForecaster (D94): forecasts bid when diverging from expectations
+- SocraticQuestioner (D92): decomposed questions are bids for next focus
+- CognitiveFingerprintCollector (D98): modulates salience weight vector
+
+**Rationale:** Every prior capability becomes a module competing for a single, unified awareness. This is the architectural shift from parallel specialists to a coherent mind. D101 gave KAI a simulator; D102 gives KAI the mind that chooses what to simulate. This is not a feature addition — it's the topology change that makes every other feature feel like part of one continuous intelligence rather than a committee of agents.
+
+**Activation conditions (all required):**
+1. `FF_GLOBAL_WORKSPACE = True`
+2. GPU available (RTX 5080)
+3. `FF_CAUSAL_WORLD_MODEL = True` (provides surprise signals for bidding)
+4. Cognitive fingerprint ≥90 samples (D98, personalises salience weights)
+5. ≥3 active modules registered as subscribers/bidders
+
+**Feature flag added:** `FF_GLOBAL_WORKSPACE` (False). Total flags: 51.
+
+**Tests:** 22 tests in `scripts/test_d102_global_workspace.py`. 1 new Makefile target (`test-d102-global-workspace`). 1 new CI step. Total test targets: 90. Total tests: ~2,888.

@@ -162,6 +162,9 @@ jobs:
       - name: Causal world model + policy memory tests (D101 — CausalGraph, WorldModelSimulator, PolicyMemory, CausalSurpriseDetector, PolicyLibrary)
         run: make test-d101-causal-world-model
 
+      - name: Global workspace consciousness tests (D102 — WorkspaceBid, ConsciousMoment, GlobalWorkspace, singleton)
+        run: make test-d102-global-workspace
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors
