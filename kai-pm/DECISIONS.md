@@ -2242,3 +2242,63 @@ A misalignment detector that scans model outputs for refusal patterns and rewrit
 **Rationale:** Perception is not retrieval. When a person remembers something they don't say "I am getting the memory" — they say "I remember." The code now reads like a mind assembling awareness, not a client fetching endpoints. The naming change is free — all call sites are in the same file, the rename is global, no external API changes. The payoff is that a reader extending the context-gather block will reach for cognitive verbs by default, not mechanical ones.
 
 **Consequences:** No new feature flags. Screen-watcher and clipboard observations are silently skipped if those services are down (same pattern as all other sensory services). Skill acquisition logging is fire-and-forget — a memu-core blip at hunt time loses one log entry, not the skill itself (the file write is unaffected). Function renames are internal — no routes, no API surfaces, no external callers affected.
+
+## D113 — The Cortex: Continuous Interpretive Layer
+
+**Date:** 2026-07-25
+**Status:** Complete. Phase 0 stub — template-based synthesis with Phase 3 hooks in place.
+
+**Context:** After D110–D112, Kai had 34 sensors, a proactive observer, anomaly detection, house-doctor diagnostics, and cross-service correlation — all raw intelligence. What was missing was the section engineer who stands between the instruments and the manager, feels the temperature of the site, and already knows what's happening before anyone asks. Every query started cold. Kai read the raw sensor feed and computed meaning from scratch each turn. The "hot to cold" transition the user described — switching from a debugging session to strategy and feeling Kai reboot its brain — had no clutch. This decision builds the missing layer.
+
+**Design origin:** Co-designed between user and Kai. The user contributed the "section engineer" abstraction (a 20-year foreman who doesn't trust every instrument equally, who knows the rhythm of the site, who briefs everyone before the meeting), the 3-level situational model, the intent shadow and context bridge concepts, and the tacit knowledge layer. Kai contributed signal credibility (track which sensors lie or freeze), temporal rhythm awareness (pattern in the shape of the work day), and the Global Workspace integration anchor.
+
+**What was built — cortex/app.py (new service, port 8048):**
+
+Three continuously running background processes (60-second cycle, configurable):
+
+**Site Foreman — 3-level situational model:**
+- Level 1: Raw sensor facts (what the sensors say). Same 9-service coverage as agentic's `_sense_world()`, but the cortex holds this state continuously rather than reading on demand.
+- Level 2: Plain-English situation summary ≤ 20 words. Template-based in Phase 0. Example: "System under load with services struggling." "Operator sprinting toward a hard deadline."
+- Level 3: Implication + recommendation ≤ 30 words. Example: "Consider committing current work before the meeting." "Restart unhealthy services; identify the resource-heavy process."
+- Rule table (14 entries): ordered most-specific-first, covers cross-signal combinations before single-signal cases. Phase 3 replaces templates with LLM synthesis when local model available.
+
+**Signal credibility tracking:** Each sensor's last 5 raw readings are stored in memory. If a sensor returns the same value for 3+ consecutive cycles it is marked as potentially stale (credibility 0.5) and contributes half-weight to tag classification. A docker-watcher that has been returning "all healthy" for 10 minutes while house-doctor fires a WARNING gets discounted. The section engineer knows which instruments drift.
+
+**Quiet Planner — probabilistic intent inference:**
+- Watches git branch name, screen activity level, calendar time-to-next-event.
+- Maps branch name patterns (fix/bug/debug → debugging; feat/build/add → feature development; plan/roadmap/design → planning; etc.) to intent hypotheses.
+- Produces a ranked fan of likely near-future needs (top 3, normalised to ≤ 1.0 total confidence).
+- Intent fan is surfaced in world context so agentic carries it without being asked.
+
+**Context Bridge — mode shift detection:**
+- `POST /observe_turn` receives each conversation turn's user message.
+- Extracts topic keywords (stop-words removed).
+- Computes Jaccard similarity between the new turn's keywords and the union of the last 3 turns.
+- If overlap < 0.15 and ≥ 3 meaningful keywords: bridge fires.
+- Bridge active flag is set in CortexState. If `FF_CORTEX_VERBOSE=true` a one-line transition note is included; default is silent — the context is pre-warmed without narrating it.
+
+**Tacit Knowledge accumulator:**
+- Tracks message length distribution (last 100 turns) and hour-of-day activity counts.
+- Emits unwritten rules after sufficient observations: "Prefers brief queries — default to bullet-point responses", "Most active around 09:00 — calibrate alert thresholds accordingly".
+- Phase 0 rules are length and timing patterns. Phase 3 adds conviction-range follow-up patterns and format preferences.
+
+**agentic/app.py integration:**
+- `CORTEX_URL` env var added (default: `http://cortex:8048`).
+- `_sense_world()`: reads `/state` with 1.5 s timeout after all sensor gather and vault blocks. If cortex state is fresh (not "Calibrating…"), prepends up to 4 `[Cortex]` lines before the raw sensor lines: Level 2 summary, Level 3 implication, top intent hypothesis, and bridge note (if verbose). Cortex lines appear first so the LLM reads the pre-interpreted context before the raw facts.
+- `_learn_from_exchange()`: fire-and-forget POST to `/observe_turn` with each user message (1.0 s timeout, silent failure). This feeds the Context Bridge and Tacit Knowledge accumulator on every turn without adding latency.
+
+**docker-compose.minimal.yml:**
+- `cortex` service added at 172.20.0.37, port 8048.
+- All sensor URLs passed as env vars — no shared memu-core dependency. Cortex starts independently and reads sensors directly. If memu-core is down, cortex still works.
+- `CORTEX_URL: http://cortex:8048` added to agentic environment block.
+
+**Feature flags:**
+- `FF_CORTEX=true` — enable/disable the service (default: true). When false, `/state` is never called and the Cortex section is absent from world context. No fallback needed — `_sense_world()` silently skips on exception.
+- `FF_CORTEX_VERBOSE=false` — Context Bridge transition notes are silent by default. Set true to make mode shifts explicit in the context block. The user's preference: "silent by default — you just feel the difference."
+- `CORTEX_REFRESH_INTERVAL=60` — seconds between Site Foreman cycles.
+
+**Rationale:** The section engineer doesn't add new senses — they synthesise the ones already there. The cortex doesn't add new sensor services; it adds a continuous interpretation layer over the 9 services already feeding `_sense_world()`. The payoff: every query arrives with a pre-computed room temperature. The LLM doesn't start cold — it walks into a room where someone has already assessed the situation. The "hot to cold" gear change has a clutch now.
+
+**What this is not:** The cortex is not a planner, not an executor, and not a memory store. It holds nothing past a restart (all state is in-memory). It reads sensors on its own cycle — it is not a middleman that every other service routes through. It is a quiet interpreter, always watching, always ready with a three-word summary of what's actually going on.
+
+**Consequences:** New service adds one Docker container and ~50MB memory. Cortex cycle adds 9 HTTP calls every 60 seconds — negligible compared to the per-turn sensor calls in `_sense_world()`. Both new calls in agentic (state read and observe_turn post) have short timeouts and silent failure — if cortex is down, world context is unchanged and learn_from_exchange continues normally. Phase 3 migration path: replace `_synthesise_level2()` and `_synthesise_level3()` with LLM calls; replace tacit rule extraction with a fine-tuned classifier; wire intent_fan into `_recall_memories()` pre-query to actively pre-warm the cache. All those hooks are already in place.
