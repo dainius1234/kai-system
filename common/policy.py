@@ -56,9 +56,25 @@ _POLICY_PATH = Path(
     )
 )
 
+import logging as _logging
+_policy_logger = _logging.getLogger("kai.policy")
+
 POLICY: Dict[str, Any] = {}
 if _POLICY_PATH.exists():
-    POLICY = _load_yaml(_POLICY_PATH)
+    try:
+        _loaded = _load_yaml(_POLICY_PATH)
+        if not isinstance(_loaded, dict) or not _loaded:
+            raise ValueError("policy file parsed to empty or non-dict")
+        POLICY = _loaded
+    except Exception as _exc:
+        _policy_logger.critical(
+            "POLICY FILE CORRUPT OR UNREADABLE (%s) — failing closed: "
+            "all permissions will use their most restrictive defaults. "
+            "Fix %s and restart.",
+            _exc,
+            _POLICY_PATH,
+        )
+        # POLICY stays {} — all accessors fall back to hardcoded safe defaults
 
 # SHA-256 of the raw file — displayed on dashboard, logged on startup
 _raw = _POLICY_PATH.read_bytes() if _POLICY_PATH.exists() else b""

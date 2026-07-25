@@ -50,6 +50,27 @@ logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
 logger.info("Running on %s.", DEVICE)
 
+
+class _CleanupTaskManager:
+    """Tracks fire-and-forget background tasks so they survive client disconnect
+    and SIGTERM.  Keeps strong references; tasks self-remove when done."""
+
+    def __init__(self) -> None:
+        self._tasks: set = set()
+
+    def submit(self, coro) -> asyncio.Task:
+        task = asyncio.create_task(coro)
+        self._tasks.add(task)
+        task.add_done_callback(self._tasks.discard)
+        return task
+
+    async def drain(self, timeout: float = 30.0) -> None:
+        if self._tasks:
+            await asyncio.wait(list(self._tasks), timeout=timeout)
+
+
+_cleanup_mgr = _CleanupTaskManager()
+
 app = FastAPI(title="Kai", version="0.5.0")
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
@@ -95,7 +116,7 @@ async def _memu_post(path: str, body: dict | None = None, fallback: Any = None, 
     )
 
 
-PROACTIVE_INTERVAL = int(os.getenv("PROACTIVE_INTERVAL_SECONDS", "300"))
+PROACTIVE_INTERVAL = max(int(os.getenv("PROACTIVE_INTERVAL_SECONDS", "300")), 10)
 GAP_HUNT_THRESHOLD = int(os.getenv("GAP_HUNT_THRESHOLD", "3"))
 WAKE_INTENT_COMMAND_THRESHOLD = float(os.getenv("WAKE_INTENT_COMMAND_THRESHOLD", "0.6"))
 WAKE_INTENT_OVERRIDE_CONFIDENCE = float(os.getenv("WAKE_INTENT_OVERRIDE_CONFIDENCE", "0.7"))
@@ -125,7 +146,7 @@ EXPENSES_LOG = os.getenv("EXPENSES_LOG", f"{SELF_EMP_ROOT}/Accounting/expenses.l
 MEMU_BREAKER = CircuitBreaker(failure_threshold=int(os.getenv("MEMU_BREAKER_THRESHOLD", "3")), recovery_seconds=int(os.getenv("MEMU_BREAKER_RECOVERY", "30")))
 TOOL_GATE_BREAKER = CircuitBreaker(failure_threshold=int(os.getenv("TOOL_BREAKER_THRESHOLD", "3")), recovery_seconds=int(os.getenv("TOOL_BREAKER_RECOVERY", "30")))
 LLM_BREAKER = CircuitBreaker(failure_threshold=int(os.getenv("LLM_BREAKER_THRESHOLD", "3")), recovery_seconds=int(os.getenv("LLM_BREAKER_RECOVERY", "60")))
-BREAKER_STATE_PATH = Path(os.getenv("BREAKER_STATE_PATH", "/tmp/langgraph_breakers.json"))
+BREAKER_STATE_PATH = Path(os.getenv("BREAKER_STATE_PATH", "/data/langgraph_breakers.json"))
 CONVICTION_OVERRIDE_PATH = Path(os.getenv("CONVICTION_OVERRIDE_PATH", "/tmp/conviction_overrides.txt"))
 MEMU_ERROR_GUARD = ErrorBudgetCircuitBreaker(warn_ratio=float(os.getenv("MEMU_WARN_RATIO", "0.05")), open_ratio=float(os.getenv("MEMU_OPEN_RATIO", "0.10")), window_seconds=300, recovery_seconds=int(os.getenv("MEMU_GUARD_RECOVERY", "60")))
 TOOL_ERROR_GUARD = ErrorBudgetCircuitBreaker(warn_ratio=float(os.getenv("TOOL_WARN_RATIO", "0.05")), open_ratio=float(os.getenv("TOOL_OPEN_RATIO", "0.10")), window_seconds=300, recovery_seconds=int(os.getenv("TOOL_GUARD_RECOVERY", "60")))
@@ -921,7 +942,7 @@ async def _surface_letta_context(user_msg: str) -> Dict[str, Any]:
             if resp.status_code == 200:
                 result = resp.json()
                 if is_enabled("LETTA_MEMORY_SYNC") and result.get("memories_updated"):
-                    asyncio.create_task(_sync_letta_memories())
+                    _cleanup_mgr.submit(_sync_letta_memories())
                 return result
     except Exception:
         pass
@@ -1217,7 +1238,7 @@ def _detect_sensor_patterns(current_obs: List[str]) -> List[str]:
         # D89 C5: ritual discovery — propose at ≥7/10 cycles
         if count >= 7 and is_enabled("RITUAL_DISCOVERY") and obs_type not in _proposed_rituals:
             _proposed_rituals.add(obs_type)
-            asyncio.create_task(_propose_ritual(obs_type, count))
+            _cleanup_mgr.submit(_propose_ritual(obs_type, count))
     return patterns
 
 
@@ -1506,7 +1527,7 @@ async def _proactive_observer() -> None:
             # ── D89 F: curiosity idle tick ────────────────────────────
             if is_enabled("CURIOSITY"):
                 from system_fsm import KaiState
-                asyncio.create_task(
+                _cleanup_mgr.submit(
                     idle_curiosity_tick(_last_world_snapshot, is_gpu_available=False)
                 )
 
@@ -1826,14 +1847,14 @@ async def chat_stream(req: ChatRequest):
 
     # D89 FSM: fire USER_MESSAGE event (IDLE → ACTIVE or FOCUSED stays FOCUSED)
     if is_enabled("FSM"):
-        asyncio.create_task(fsm_fire(SysEvent.USER_MESSAGE))
+        _cleanup_mgr.submit(fsm_fire(SysEvent.USER_MESSAGE))
 
     # Match skill before LLM so the relevant skill doc reaches the prompt (J7 fix)
     matched_skill = match_skill(user_msg)
 
     # D88 M8 / D89 C1: reactive skill acquisition with gap logging
     if matched_skill is None and route_decision.confidence < 0.4:
-        asyncio.create_task(_hunt_skill_for_gap(user_msg))
+        _cleanup_mgr.submit(_hunt_skill_for_gap(user_msg))
 
     if is_enabled("CONTEXT_ENRICHMENT"):
         (memories, goals, topics, eq_context,
@@ -2134,6 +2155,12 @@ async def chat_stream(req: ChatRequest):
         if failed:
             logger.warning("_learn_from_exchange: %d step(s) failed — %s", len(failed), "; ".join(failed))
 
+    async def _finalize_exchange(response_text: str) -> None:
+        """Persists the exchange — runs even if the client disconnected mid-stream."""
+        await _append_session_turn(req.session_id, "assistant", response_text)
+        await _auto_memorize(user_msg, response_text, _DEFAULT_SPECIALIST, 8.0)
+        await _learn_from_exchange(user_msg, response_text, req.session_id)
+
     async def generate():
         full_response = []
         try:
@@ -2151,16 +2178,18 @@ async def chat_stream(req: ChatRequest):
             if not full_response:
                 _err_msg = "Something went wrong on my end — couldn't reach my thinking layer. Try again in a moment."
                 yield f"data: {json.dumps({'token': _err_msg})}\n\n"
+        finally:
+            # Submit finalization as a tracked task — survives client disconnect and
+            # GeneratorExit. asyncio.create_task() is synchronous so this is safe
+            # inside finally even if the generator was torn down by a disconnect.
+            response_text = "".join(full_response)
+            if response_text:
+                _cleanup_mgr.submit(_finalize_exchange(response_text))
 
-        # when done, signal end
+        # Signal end to the client — only reached on normal generator completion.
+        # If the client disconnected (aclose called), this line is never reached
+        # but finalization is already scheduled above.
         yield "data: [DONE]\n\n"
-
-        # memorize the exchange and learn from it (outside the stream read)
-        response_text = "".join(full_response)
-        if response_text:
-            await _append_session_turn(req.session_id, "assistant", response_text)
-            await _auto_memorize(user_msg, response_text, _DEFAULT_SPECIALIST, 8.0)
-            await _learn_from_exchange(user_msg, response_text, req.session_id)
 
     return StreamingResponse(
         generate(),
@@ -2458,7 +2487,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     # Fired off-loop so a slow/failing disk write can never add latency
     # to (or block) the hot /run response path.
     if len(recent_episodes) % 10 == 0 and recent_episodes:
-        asyncio.create_task(_capture_snapshot_background(recent_episodes))
+        _cleanup_mgr.submit(_capture_snapshot_background(recent_episodes))
 
     # ── P10: Predictive pre-computation ─────────────────────────────
     # Mine sequential patterns to predict what the operator will ask
@@ -2638,6 +2667,12 @@ async def _startup_warmup() -> None:
     # D90: load swarm reputation at startup
     if is_enabled("SWARM"):
         load_reputation()
+
+
+@app.on_event("shutdown")
+async def _shutdown_drain() -> None:
+    """On SIGTERM, wait up to 30s for in-flight cleanup tasks to finish."""
+    await _cleanup_mgr.drain(timeout=30.0)
 
 
 # ── P16b: Log aggregation ───────────────────────────────────────────

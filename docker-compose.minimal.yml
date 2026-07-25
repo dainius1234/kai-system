@@ -736,8 +736,7 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.33
-    depends_on:
-      - dashboard
+
 
   skill-hunter:
     build:
@@ -775,7 +774,8 @@ services:
       sovereign-net:
         ipv4_address: 172.20.0.35
     depends_on:
-      - memu-core
+      memu-core:
+        condition: service_healthy
 
   vault-sync:
     build:
@@ -797,7 +797,8 @@ services:
       sovereign-net:
         ipv4_address: 172.20.0.36
     depends_on:
-      - memu-core
+      memu-core:
+        condition: service_healthy
 
   cortex:
     build:
@@ -826,6 +827,15 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+    depends_on:
+      sysmetrics:
+        condition: service_healthy
+      docker-watcher:
+        condition: service_healthy
+      screen-watcher:
+        condition: service_healthy
+      clipboard-service:
+        condition: service_healthy
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.37

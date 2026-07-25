@@ -66,8 +66,8 @@ _REGISTRY: Dict[str, tuple] = {
     "HOUSE_DOCTOR":          ("D89/E: House Doctor service — continuous differential diagnosis from cross-sensor correlation", True),
     "RITUAL_DISCOVERY":      ("D89/C: emergent ritual detection at ≥7/10 cycles; writes RITUALS.md proposals", True),
     "GAP_LOGGING":           ("D89/C1: log capability gaps before reactive acquisition; fire hunt only after GAP_HUNT_THRESHOLD misses", True),
-    "TRUST_NEGOTIATION":     ("D89/B: autonomy request protocol — KAI can request temporary elevated authority; currently pending_approval", True),
-    "PREDICTIVE_EMPATHY":    ("D89/D: emotional_context key in world model; full implementation pending emotional memory accumulation", True),
+    "TRUST_NEGOTIATION":     ("D89/B: autonomy request protocol — KAI can request temporary elevated authority; currently pending_approval", False),
+    "PREDICTIVE_EMPATHY":    ("D89/D: emotional_context key in world model; full implementation pending emotional memory accumulation", False),
     "CURIOSITY":             ("D89/F: resource-aware curiosity idle tick; no-ops in CPU phase; activates on GPU + IDLE state", True),
     # D90: Swarm Assembly — full CognitiveFSM pipeline with real stage functions
     "SWARM":                 ("D90: CognitiveFSM swarm pipeline — Scout/Sage/Doctor/Oracle stage functions, shared SwarmContext, reputation tracking, conflict resolution", True),
