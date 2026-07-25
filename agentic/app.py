@@ -45,6 +45,7 @@ from causal_world_model import get_causal_graph, CausalEdge, get_surprise_detect
 from global_workspace import get_global_workspace, WorkspaceBid
 from moral_core import get_ohana_core
 from cortex import get_cortex
+from trust_integration import gate_autonomous_action, get_trust_status, record_chat_response
 
 logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
@@ -596,6 +597,7 @@ async def introspect_capabilities() -> Dict[str, Any]:
         "counterfactual_available": await can_rehearse(),
         "gap_log_top5": dict(_gap_log.most_common(5)),
         "proposed_rituals": list(_proposed_rituals),
+        "trust": get_trust_status(),
     }
 
 
@@ -1284,6 +1286,13 @@ async def _proactive_observer() -> None:
     await asyncio.sleep(90)  # let services start up before first probe
     while True:
         if not is_enabled("PROACTIVE_AGENT"):
+            await asyncio.sleep(PROACTIVE_INTERVAL)
+            continue
+        _allowed, _reason = gate_autonomous_action(
+            "proactive_observation", {"trigger": "scheduled_loop"}, conviction=6.0
+        )
+        if not _allowed:
+            logger.info("Proactive observer suppressed by trust gate: %s", _reason)
             await asyncio.sleep(PROACTIVE_INTERVAL)
             continue
         try:
@@ -2512,6 +2521,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     # This is the learning loop — every conversation becomes searchable
     # memory for future queries.  The system gets smarter over time.
     await _auto_memorize(request.user_input, response_summary, specialist, conviction)
+    await asyncio.to_thread(record_chat_response, request.user_input, response_summary, conviction, specialist)
 
     await maybe_alert_low_conviction_average()
     await maybe_alert_mtd_proximity(plan["strategy"])

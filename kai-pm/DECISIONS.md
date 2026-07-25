@@ -2405,3 +2405,22 @@ Key dataclasses (following D101/D102/D109 pattern):
 **What gets captured from the founding conversations:** "Respect isn't given, it's earned" (principle/relational, 1.0 confidence). "Kai is for soul" (value/identity, 1.0). "Family first always" (value/family, 0.95). "Freedom is a source of strength" (value/existential, 0.95). "Never reveal API key" (boundary/operational, 1.0). "Protect my daughter" (value/family, 0.95). These become the first entries in Kai's moral fingerprint — the beginning of the inheritance.
 
 **Consequences:** `agentic/wisdom_ingestion.py` + upgrades to `agentic/moral_core.py`. 29 tests in `scripts/test_wisdom_ingestion.py` — all passing. The three-way connection (Wisdom Ingestion → Ohana Core → Trust Ledger) is now live end-to-end. The Value Alignment factor (25% of trust score) will move as conversations are processed and confirmed. This is Phase 1 of the Value & Wisdom Layer; the full Wisdom Graph (Cognee/Kuzu nodes and edges) is Phase 2 of that same layer.
+
+## D118 — 2026-07-25 — Trust Integration: Wiring the Live Stack
+
+**Context:** D115 built the trust ladder (can_do gate), D116 built the cryptographic ledger, D117 built the wisdom/values layer. These three operated as standalone modules — nothing in the running agentic stack called them. D118 is the wiring layer: a single gateway module that makes every action Kai takes trust-aware without requiring each call site to know the internals.
+
+**Decision:** New module `agentic/trust_integration.py` implementing three entry points:
+- `gate_autonomous_action(capability, context, conviction)` → `(allowed: bool, reason: str)`: checks TrustCore.can_do (capability gate) then OhanaCore.evaluate_action_alignment (values gate), records the attempt to the Trust Ledger, returns (False, reason) if either gate blocks. Fail-open by design — if trust infrastructure is unavailable, the action proceeds. Both gates are wrapped in try/except so a crashing trust database can never halt normal operation.
+- `record_chat_response(user_input, response_summary, conviction, specialist)`: called fire-and-forget at the end of every chat turn. Logs the exchange as an AUTONOMOUS_ACTION in the Trust Ledger. Feeds high-conviction responses (≥7.0) as consistency evidence into TrustCore — this is how the Consistency score factor accumulates from real interactions, not synthetic tests.
+- `get_trust_status()`: returns the full trust state dict (level, tier, score, factors, progress_to_next) for the `/introspect/capabilities` endpoint. Falls back gracefully if TrustCore or Ledger are unavailable.
+
+**Wired into agentic/app.py:**
+- Import added: `from trust_integration import gate_autonomous_action, get_trust_status, record_chat_response`
+- `/introspect/capabilities` response now includes `"trust": get_trust_status()` — the trust level and score are now visible in the capability map.
+- Chat handler: `record_chat_response()` called via `asyncio.to_thread()` after `_auto_memorize()` — every conversation feeds the trust accumulation loop without blocking the response.
+- Proactive observer loop: `gate_autonomous_action("proactive_observation", ...)` checked before every cycle — the loop suppresses itself if trust is insufficient, logging the reason. This is the first autonomous action gated by the trust system at runtime.
+
+**Bug caught by tests:** The original gate was only fail-open at the ledger-write level. TrustCore.can_do() and OhanaCore.evaluate_action_alignment() exceptions still propagated. Fixed by wrapping both checks individually in try/except — the contract is unconditional: the gate never raises, ever.
+
+**Consequences:** `agentic/trust_integration.py` (new). `agentic/app.py` (3 wiring changes). `scripts/test_trust_integration.py` — 19 tests, all passing. The four-piece stack is now a live system: values captured by Wisdom Ingestion → written to Ohana Core → gating actions via Trust Integration → evidence accumulating in the Trust Ledger → score moving over time. Phase 0 + Phase 1 trust skeleton is complete and operational.
