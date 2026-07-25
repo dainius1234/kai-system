@@ -469,6 +469,28 @@ def make_conviction_gate_stage(
 
 # ── Convenience: build all five stages at once ───────────────────────
 
+def make_moral_imagination_stage() -> Callable[[AgentHandoff, SwarmConfig], Awaitable[AgentHandoff]]:
+    """Return the MORAL_IMAGINATION stage function (D121).
+
+    Wraps moral_imagination.run_moral_imagination as a StageFunc.
+    Fail-open: if the module is unavailable the handoff passes through unchanged.
+    """
+    async def moral_imagination_stage(handoff: AgentHandoff, cfg: SwarmConfig) -> AgentHandoff:
+        try:
+            try:
+                from moral_imagination import run_moral_imagination  # type: ignore[import]
+            except ImportError:
+                from agentic.moral_imagination import run_moral_imagination  # type: ignore[import]
+            return await run_moral_imagination(handoff, cfg)
+        except Exception as exc:
+            import logging
+            logging.getLogger("kai.swarm_stages").debug(
+                "Moral imagination stage error (fail-open): %s", exc
+            )
+            return handoff
+    return moral_imagination_stage
+
+
 def build_swarm_pipeline(
     memories_fn: MemoriesFn,
     world_ctx_fn: WorldCtxFn,
@@ -486,6 +508,7 @@ def build_swarm_pipeline(
         "fact_check_fn": make_fact_check_stage(memories_fn, teammate_ctx_fn, llm_chat_fn),
         "causal_check_fn": make_causal_check_stage(teammate_ctx_fn, llm_chat_fn),
         "conviction_gate_fn": make_conviction_gate_stage(adversary_fn, teammate_ctx_fn),
+        "moral_imagination_fn": make_moral_imagination_stage(),
     }
     if questioner is not None:
         pipeline["questioner_fn"] = make_questioner_stage(questioner)

@@ -34,6 +34,7 @@ class CogState(str, Enum):
     DEBATE = "debate"
     FACT_CHECK = "fact_check"
     CAUSAL_CHECK = "causal_check"
+    MORAL_IMAGINATION = "moral_imagination"
     CONVICTION_GATE = "conviction_gate"
     RETHINK = "rethink"
     ESCALATE_LOOP = "escalate_loop"
@@ -83,6 +84,7 @@ class SwarmConfig:
     debate_timeout_s: float = 20.0
     fact_check_timeout_s: float = 10.0
     causal_check_timeout_s: float = 8.0
+    moral_imagination_timeout_s: float = 3.0
     conviction_gate_timeout_s: float = 5.0
     conviction_threshold: float = 7.0     # out of 10
     max_debate_retries: int = 3
@@ -210,6 +212,7 @@ class CognitiveFSM:
         fact_check_fn: StageFunc,
         causal_check_fn: StageFunc,
         conviction_gate_fn: StageFunc,
+        moral_imagination_fn: Optional[StageFunc] = None,
         initial_payload: Optional[Dict[str, Any]] = None,
     ) -> PipelineResult:
         """Run the full cognitive pipeline. Returns PipelineResult with final state."""
@@ -262,7 +265,17 @@ class CognitiveFSM:
         # ── CAUSAL_CHECK ─────────────────────────────────────────────
         state = CogState.CAUSAL_CHECK
         handoff = await self._run_stage(state, causal_check_fn, handoff, cfg.causal_check_timeout_s)
-        self._log_transition(CogState.CAUSAL_CHECK, CogState.CONVICTION_GATE, handoff)
+
+        # ── MORAL_IMAGINATION (optional, FF-gated) ────────────────────
+        if moral_imagination_fn is not None:
+            self._log_transition(CogState.CAUSAL_CHECK, CogState.MORAL_IMAGINATION, handoff)
+            state = CogState.MORAL_IMAGINATION
+            handoff = await self._run_stage(
+                state, moral_imagination_fn, handoff, cfg.moral_imagination_timeout_s
+            )
+            self._log_transition(CogState.MORAL_IMAGINATION, CogState.CONVICTION_GATE, handoff)
+        else:
+            self._log_transition(CogState.CAUSAL_CHECK, CogState.CONVICTION_GATE, handoff)
 
         # ── CONVICTION_GATE (with RETHINK retry) ─────────────────────
         rethink_retries = 0

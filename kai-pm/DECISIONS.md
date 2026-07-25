@@ -2458,3 +2458,22 @@ The Auditor knows the full factor model: operator_approval_history (30%), value_
 **Endpoint wiring (`agentic/app.py`):** The `/chat/teammate/{name}` endpoint now special-cases `name == "auditor"`: instead of injecting the proactive observer's world snapshot, it injects `get_trust_status()` — the full trust state JSON (level, score, tier, factors, wisdom_graph stats, progress_to_next). Other teammates are unaffected. This keeps the endpoint generic while giving the Auditor the data it actually needs.
 
 **Consequences:** `data/teammates/auditor.md` (new). `agentic/app.py` (4-line wiring change for auditor context injection). `scripts/test_trust_auditor.py` — 11 tests, all passing. Cumulative: 120 tests across all Phase 0+1 suites, all green. Kai can now be asked directly: "Auditor, what's blocking my next level?" and receive a structured, data-driven answer grounded in the actual trust record rather than vague encouragement.
+
+## D121 — 2026-07-25 — Moral Imagination: Values-Aware Conviction Stage
+
+**Context:** The cognitive pipeline (GATHER → DEBATE → FACT_CHECK → CAUSAL_CHECK → CONVICTION_GATE) had no mechanism for Kai to pause and consider moral consequences before committing. CAUSAL_CHECK traces what will happen; Moral Imagination asks whether it should. The distinction matters: a causally sound plan that conflicts with core values should reduce conviction and trigger a rethink, not pass through unchanged. This stage completes Phase 1 of the guardian architecture by embedding values into the reasoning loop itself.
+
+**Decision:** New module `agentic/moral_imagination.py` implementing the MORAL_IMAGINATION cognitive stage — the pause between knowing the consequences and deciding to act. The stage: (1) extracts action text from the handoff payload (query + plan summary); (2) queries the Wisdom Graph for relevant value/principle/boundary nodes; (3) gets OhanaCore's alignment score; (4) projects imagined goods (values served) and harms (boundary risks); (5) computes a conviction_modifier (+0.8 to -1.5) based on alignment and harm count; (6) writes a MoralImagination dataclass into `handoff.payload["moral_imagination"]`; (7) returns the handoff with adjusted confidence.
+
+**Conviction modifier logic:** alignment ≥ 0.75 + no harms → +0.8 (strong values match, increase certainty). alignment ≥ 0.5 → +0.2 (moderate, small boost). alignment ≥ 0.3 → -0.5 (values tension, reduce conviction). alignment < 0.3 → -1.5 (near-conflict, likely triggers rethink). Each harm detected: additional -0.5 penalty. Recommendation: "proceed" | "proceed_with_caution" | "reconsider" | "halt" (halt at alignment=0.0 or ≥2 harms). Fail-open: if wisdom infrastructure is unavailable, passes through with modifier=0.0.
+
+**Recommendation logic:** "halt" on alignment=0.0 or ≥2 detected harms; "proceed" on alignment≥0.6 with no harms; "proceed_with_caution" on alignment≥0.4; "reconsider" otherwise.
+
+**Pipeline wiring:**
+- `cognitive_fsm.py`: Added `MORAL_IMAGINATION` to `CogState`, `moral_imagination_timeout_s=3.0` to `SwarmConfig`, and optional `moral_imagination_fn` parameter to `CognitiveFSM.run()`. The stage inserts between CAUSAL_CHECK and CONVICTION_GATE with proper transition logging; absent fn → pipeline is unchanged (backward compatible).
+- `swarm_stages.py`: `make_moral_imagination_stage()` factory returns the stage function. `build_swarm_pipeline()` now includes `"moral_imagination_fn"` in the returned dict.
+- `agentic/app.py`: `fsm.run()` passes `moral_imagination_fn` when `is_enabled("MORAL_IMAGINATION")` (FF_MORAL_IMAGINATION); None otherwise — the gate is a feature flag, not hardwired.
+
+**Phase 0 design:** Deterministic — no LLM calls. Projection from Wisdom Graph structure (SUPPORTS/APPLIES_IN edges, BOUNDARY nodes) and OhanaCore keyword scoring. FF_MORAL_IMAGINATION_LLM=true is wired as the future hook for richer imagination when LLM cost is acceptable.
+
+**Consequences:** `agentic/moral_imagination.py` (new). `agentic/cognitive_fsm.py`, `agentic/swarm_stages.py`, `agentic/app.py` (wired). `scripts/test_moral_imagination.py` — 34 tests, all passing. Cumulative: 154 tests across all Phase 0+1 suites, all green. Phase 1 of the guardian architecture is now fully complete: Trust Ladder + Ledger + Wisdom Ingestion + Ohana Core + Trust Integration + Wisdom Graph + Trust Auditor + Moral Imagination. Every action Kai takes in the swarm pipeline now passes through a moral lens before conviction is finalized.

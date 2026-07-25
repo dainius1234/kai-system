@@ -701,6 +701,7 @@ async def chat_swarm(req: SwarmRequest) -> Dict[str, Any]:
         fact_check_fn=pipeline["fact_check_fn"],
         causal_check_fn=pipeline["causal_check_fn"],
         conviction_gate_fn=pipeline["conviction_gate_fn"],
+        moral_imagination_fn=pipeline["moral_imagination_fn"] if is_enabled("MORAL_IMAGINATION") else None,
         initial_payload=initial_payload,
     )
 
