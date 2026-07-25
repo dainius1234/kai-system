@@ -2175,3 +2175,70 @@ A misalignment detector that scans model outputs for refusal patterns and rewrit
 **Rationale:** The soul of a system is not what it can do — it's how it feels to exist inside it, and how it speaks when things go wrong. A mechanical error message at 3am says "the system failed." A voice error message says "I'm having a moment, give me a second." The code was right. The character wasn't in it yet.
 
 **Consequences:** No new feature flags. No new services. No new test files (changes are wiring and character, not new behaviour). All changes are additive or replacements within existing functions. The emotional memory wiring in memu-core is the only change that affects retrieval scores — max emotional boost to importance is +0.15 at encoding (capped at 1.0) and +0.07 * importance at retrieval (max +0.07 when importance=1.0 and full session emotion). Both are bounded and proportional.
+
+## D111 — Resilience, Health Feedback Loop, and Domain Conviction
+
+**Date:** 2026-07-25
+**Status:** Complete.
+
+**Context:** D110 wired the soul into the pipeline. D111 wired in reliability and closed two open feedback loops that had been broken since D89: (1) every httpx call in agentic/app.py was bare with no retry or circuit protection — a single memu-core blip would lose learning, context, or session history silently; (2) house-doctor was diagnosing the system but those diagnoses never fed back into the proactive observer cycle, so Kai could observe CPU spikes without awareness that they'd already been diagnosed as a memory leak three minutes ago; (3) domain confidence from P17d was computed and stored in memu-core but never reached the conviction gate — Kai was equally confident in domains where it had been right 95% of the time and domains where it had been corrected repeatedly.
+
+**What changed:**
+
+**Resilient transport (agentic/app.py, common/resilience.py):**
+- `_memu_get()` and `_memu_post()` wrapper functions route all 44+ memu-core call sites through `_resilient_call()` with retry×2 and circuit-breaker. Before: a 50ms blip at memu-core silently lost an emotion record, session turn, or memory retrieval with no log entry. After: two retries at 400ms backoff; if the circuit opens, the fallback value is returned and a single warning is logged.
+- All critical hot-path call sites updated: `_recall_memories`, `_append_session_turn`, `_recall_session`, `_auto_memorize`, `_read_active_goals`, `_read_active_topics`, `_feel_emotional_context`, and all learning-loop posts in `_learn_from_exchange()`.
+
+**Health feedback loop (house-doctor/app.py, agentic/app.py):**
+- `house-doctor`: added `deque(maxlen=20)` ring buffer `_recent_diagnoses`. Every `_write_medical_report()` call pushes to the buffer before the memu-core write — zero added latency.
+- New `GET /diagnoses/recent` endpoint: returns the last N diagnoses from the buffer, no round-trip to memu-core required.
+- Proactive observer startup: reads `HOUSE_DOCTOR_URL/diagnoses/recent`, prepends any WARNING or CRITICAL diagnoses to the current observation list. The observer now enters each cycle already aware of recent health events — it can correlate "CPU high" with "we already diagnosed this as a memory leak in container X" instead of treating it as a fresh signal.
+
+**Domain confidence in conviction (agentic/conviction.py, agentic/app.py):**
+- New 6th signal in `score_conviction()`: `_domain_confidence_signal()` contributes 0–2 points based on Kai's historical accuracy in the current query domain.
+- `update_domain_confidence(float)` called in the context-gather block after `_feel_emotional_context()` — the P17d confidence score flows directly into the conviction gate as a modulating signal.
+- Mapping: neutral (0.5) → 1.0 pts; high confidence (1.0) → 2.0 pts; low confidence (0.0) → 0.0 pts. Domains where Kai has been corrected repeatedly now lower conviction before the system proceeds, rather than after.
+
+**Rationale:** Reliability isn't a feature you add later — it's the floor. Every silent httpx failure was a lie: the system appeared to learn, but didn't. Closing the health feedback loop means Kai doesn't repeat a diagnostic observation it already resolved. Wiring domain confidence into conviction means epistemic humility is computational, not aspirational.
+
+**Consequences:** No new feature flags. The conviction scale expands from 5 signals (max 10.0 from 10-theoretical) to 6 signals (max 12-theoretical, capped at 10.0). For neutral domain confidence the score is unchanged. The health ring buffer adds 1 dict per diagnosis cycle in memory (max 20 entries, ~2KB). All transport changes are drop-in replacements — callers see the same return type with added resilience.
+
+## D112 — Sensory Completeness, Skill Memory, and Perception Vocabulary
+
+**Date:** 2026-07-25
+**Status:** Complete.
+
+**Context:** After D111 the system's feedback loops were closed. D112 addresses three remaining gaps: (1) `_sense_world()` gathered weather, air quality, calendar, docker, system metrics, email, news, git, and broker state — but was blind to what the operator was looking at on-screen and what they had just copied; (2) when skill-hunter acquired a new skill it wrote a file to disk but never told Kai's memory about it — Kai could grow new capabilities without any autobiographical record of the growth; (3) all 15 context-gathering functions in agentic/app.py were named `_get_*` — technically correct, mechanically inert; a reader extending the code saw "get" everywhere and thought "data retrieval" not "perception".
+
+**What changed:**
+
+**Sensory completeness (agentic/app.py):**
+- Added `SCREEN_WATCHER_URL` and `CLIPBOARD_SERVICE_URL` env vars (defaults: `http://screen-watcher:8036`, `http://clipboard-service:8024`).
+- `_sense_world()` now appends two additional readings after the vault block: screen activity from `screen-watcher/status` (only if `watching=true` and `last_diff_score > 0.1` — avoids spamming "screen: active" when nothing changed) and clipboard content from `clipboard-service/latest` (first 120 chars, skipped if empty). Both use 2-second timeouts and silent failure. The operator's on-screen focus and clipboard are now ambient signals Kai carries into every response.
+
+**Skill acquisition memory (skill-hunter/app.py):**
+- Added `MEMU_URL` env var (default: `http://memu-core:8001`).
+- After `_save_meta(name, meta)` in `POST /hunt`: fire-and-forget `asyncio.create_task(_log_to_memory())` posts to `/memory/memorize` with category `skill_acquisition`. Before: Kai acquired new skills in silence. After: every successful hunt is an autobiographical event — "Acquired new skill 'nlp_textblob' using package 'textblob' to address gap: sentiment analysis." This feeds the knowledge graph so `_recall_memories()` can surface skill history in relevant queries.
+
+**Perception vocabulary (agentic/app.py):**
+- 15 context functions renamed from `_get_*` to cognitive perception verbs:
+  - `_get_mode` → `_read_mode`
+  - `_get_relevant_memories` → `_recall_memories`
+  - `_get_graph_context` → `_surface_graph_context`
+  - `_get_letta_context` → `_surface_letta_context`
+  - `_get_financial_context` → `_read_financial_context`
+  - `_get_world_context` → `_sense_world`
+  - `_get_session_messages` → `_recall_session`
+  - `_get_active_goals` → `_read_active_goals`
+  - `_get_active_topics` → `_read_active_topics`
+  - `_get_emotional_context` → `_feel_emotional_context`
+  - `_get_narrative_identity` → `_hold_narrative`
+  - `_get_imagination_context` → `_imagine_context`
+  - `_get_conscience_context` → `_hold_conscience`
+  - `_get_agent_context` → `_surface_agent_context`
+  - `_get_operator_model` → `_understand_operator`
+- `eqView` section ID in dashboard/static/app.html renamed to `bodyView` — aligns with the "Body" nav label from D110.
+
+**Rationale:** Perception is not retrieval. When a person remembers something they don't say "I am getting the memory" — they say "I remember." The code now reads like a mind assembling awareness, not a client fetching endpoints. The naming change is free — all call sites are in the same file, the rename is global, no external API changes. The payoff is that a reader extending the context-gather block will reach for cognitive verbs by default, not mechanical ones.
+
+**Consequences:** No new feature flags. Screen-watcher and clipboard observations are silently skipped if those services are down (same pattern as all other sensory services). Skill acquisition logging is fire-and-forget — a memu-core blip at hunt time loses one log entry, not the skill itself (the file write is unaffected). Function renames are internal — no routes, no API surfaces, no external callers affected.

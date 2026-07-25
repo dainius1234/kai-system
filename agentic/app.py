@@ -69,6 +69,8 @@ BROKER_URL = os.getenv("BROKER_URL", "http://broker-bridge:8034")
 SKILL_HUNTER_URL = os.getenv("SKILL_HUNTER_URL", "http://skill-hunter:8045")
 HOUSE_DOCTOR_URL = os.getenv("HOUSE_DOCTOR_URL", "http://house-doctor:8046")
 VAULT_SYNC_URL = os.getenv("VAULT_SYNC_URL", "http://vault-sync:8047")
+SCREEN_WATCHER_URL = os.getenv("SCREEN_WATCHER_URL", "http://screen-watcher:8036")
+CLIPBOARD_SERVICE_URL = os.getenv("CLIPBOARD_SERVICE_URL", "http://clipboard-service:8024")
 
 
 async def _memu_get(path: str, params: dict | None = None, fallback: Any = None, timeout: float = 5.0) -> Any:
@@ -651,8 +653,8 @@ async def chat_swarm(req: SwarmRequest) -> Dict[str, Any]:
     )
 
     pipeline = build_swarm_pipeline(
-        memories_fn=_get_relevant_memories,
-        world_ctx_fn=_get_world_context,
+        memories_fn=_recall_memories,
+        world_ctx_fn=_sense_world,
         teammate_ctx_fn=build_teammate_context,
         llm_chat_fn=_llm.chat,
         build_plan_fn=build_plan,
@@ -834,7 +836,7 @@ class ChatMessage(BaseModel):
     content: str
 
 
-async def _get_mode() -> str:
+async def _read_mode() -> str:
     """Fetch current effective mode from tool-gate (schedule-aware)."""
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
@@ -846,7 +848,7 @@ async def _get_mode() -> str:
     return "PUB"
 
 
-async def _get_relevant_memories(query: str, top_k: int = 5) -> List[str]:
+async def _recall_memories(query: str, top_k: int = 5) -> List[str]:
     """Fetch relevant memories from memu-core for context injection."""
     records = await _memu_get("/memory/retrieve", params={"query": query, "user_id": "keeper", "top_k": top_k}, fallback=[])
     if not isinstance(records, list):
@@ -860,7 +862,7 @@ async def _get_relevant_memories(query: str, top_k: int = 5) -> List[str]:
     return memories
 
 
-async def _get_graph_context(query: str, top_k: int = 5) -> Dict[str, Any]:
+async def _surface_graph_context(query: str, top_k: int = 5) -> Dict[str, Any]:
     """Phase C (MEMORY_GRAPH_DESIGN.md §5): fetch entity/relationship context
     from memu-core's /memory/graph/query proxy, alongside the flat-memory
     fetch above. Feature-flagged off by default — same flag that gates
@@ -899,7 +901,7 @@ async def _sync_letta_memories() -> None:
         pass
 
 
-async def _get_letta_context(user_msg: str) -> Dict[str, Any]:
+async def _surface_letta_context(user_msg: str) -> Dict[str, Any]:
     """Run the Letta agent on the user message and return its response as context.
 
     Feature-flagged off by default (FF_LETTA_TASKS). Adds latency on every
@@ -931,7 +933,7 @@ _FINANCE_KEYWORDS = frozenset({
 })
 
 
-async def _get_financial_context(user_msg: str) -> Dict[str, Any]:
+async def _read_financial_context(user_msg: str) -> Dict[str, Any]:
     """P29: Fetch CIS/VAT/tax summary from financial-awareness service.
 
     Only fires when the user message contains finance-related keywords and
@@ -959,7 +961,7 @@ _SENSORY_SKIP = frozenset({
 })
 
 
-async def _get_world_context() -> str:
+async def _sense_world() -> str:
     """Layer 2 (D87): gather one-sentence summaries from all sensory services in parallel.
 
     Only fires when FF_CONTEXT_ENRICHMENT is enabled (default True).
@@ -1023,6 +1025,29 @@ async def _get_world_context() -> str:
                             lines.append(f"Vault (recent note): {title}")
         except Exception:
             pass
+
+    # Screen activity — sense what the operator is looking at
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            r = await client.get(f"{SCREEN_WATCHER_URL}/status")
+            if r.status_code == 200:
+                data = r.json()
+                diff = data.get("last_diff_score", 0)
+                if data.get("watching") and diff > 0.1:
+                    lines.append(f"Screen: active, change score {diff:.2f}")
+    except Exception:
+        pass
+
+    # Clipboard — sense what the operator just copied
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            r = await client.get(f"{CLIPBOARD_SERVICE_URL}/latest")
+            if r.status_code == 200:
+                content = r.json().get("content", "").strip()
+                if content:
+                    lines.append(f"Clipboard: {content[:120]}")
+    except Exception:
+        pass
 
     if not lines:
         return ""
@@ -1485,25 +1510,25 @@ async def _hunt_skill_for_gap(gap_description: str) -> None:
         logger.debug("Skill hunter request failed (non-critical): %s", exc)
 
 
-async def _get_session_messages(session_id: str) -> List[Dict[str, str]]:
+async def _recall_session(session_id: str) -> List[Dict[str, str]]:
     """Fetch recent session messages from memu-core."""
     data = await _memu_get(f"/session/{session_id}/context", params={"query": "", "top_k": 10}, fallback={})
     return data.get("session_messages", []) if isinstance(data, dict) else []
 
 
-async def _get_active_goals() -> List[Dict[str, Any]]:
+async def _read_active_goals() -> List[Dict[str, Any]]:
     """Fetch active Ohana goals for context injection."""
     data = await _memu_get("/memory/goals", params={"status": "active"}, fallback={})
     return data.get("goals", []) if isinstance(data, dict) else []
 
 
-async def _get_active_topics() -> List[Dict[str, Any]]:
+async def _read_active_topics() -> List[Dict[str, Any]]:
     """Fetch active conversation topics (deferred + active)."""
     data = await _memu_get("/memory/topics/active", fallback={})
     return data.get("topics", []) if isinstance(data, dict) else []
 
 
-async def _get_emotional_context(query: str) -> Dict[str, Any]:
+async def _feel_emotional_context(query: str) -> Dict[str, Any]:
     """Fetch emotional state + epistemic confidence for the query's domain."""
     result: Dict[str, Any] = {}
     try:
@@ -1526,7 +1551,7 @@ async def _get_emotional_context(query: str) -> Dict[str, Any]:
     return result
 
 
-async def _get_narrative_identity() -> Dict[str, Any]:
+async def _hold_narrative() -> Dict[str, Any]:
     """Fetch Kai's evolving identity narrative + story arc."""
     result: Dict[str, Any] = {}
     try:
@@ -1547,7 +1572,7 @@ async def _get_narrative_identity() -> Dict[str, Any]:
     return result
 
 
-async def _get_imagination_context(user_msg: str) -> Dict[str, Any]:
+async def _imagine_context(user_msg: str) -> Dict[str, Any]:
     """Run empathetic simulation and fetch inner thought state."""
     result: Dict[str, Any] = {}
     try:
@@ -1569,7 +1594,7 @@ async def _get_imagination_context(user_msg: str) -> Dict[str, Any]:
     return result
 
 
-async def _get_conscience_context() -> Dict[str, Any]:
+async def _hold_conscience() -> Dict[str, Any]:
     """Fetch Kai's formed values and conscience state for moral awareness."""
     result: Dict[str, Any] = {}
     try:
@@ -1588,7 +1613,7 @@ async def _get_conscience_context() -> Dict[str, Any]:
     return result
 
 
-async def _get_agent_context() -> Dict[str, Any]:
+async def _surface_agent_context() -> Dict[str, Any]:
     """P21: Fetch scheduled tasks, reminders, and action capabilities."""
     result: Dict[str, Any] = {"tasks": [], "reminders": [], "capabilities": 0}
     try:
@@ -1610,7 +1635,7 @@ async def _get_agent_context() -> Dict[str, Any]:
     return result
 
 
-async def _get_operator_model(query: str, mode: str) -> Dict[str, Any]:
+async def _understand_operator(query: str, mode: str) -> Dict[str, Any]:
     """P22: Fetch the unified operator model — echo state, escalation,
     cross-mode insights, oracle predictions."""
     result: Dict[str, Any] = {
@@ -1738,7 +1763,7 @@ async def chat_stream(req: ChatRequest):
 
     # ── Step 2+: LLM pipeline for GENERAL_CHAT / EXECUTE / MULTI ──
     # determine mode
-    mode = (req.mode or await _get_mode()).upper()
+    mode = (req.mode or await _read_mode()).upper()
     if mode not in _SYSTEM_PROMPTS:
         mode = "PUB"
     system_prompt = _SYSTEM_PROMPTS[mode]
@@ -1760,7 +1785,7 @@ async def chat_stream(req: ChatRequest):
             return default
 
     # Session messages always fetched (needed even when enrichment is off)
-    session_msgs = await _safe(_get_session_messages(req.session_id), [])
+    session_msgs = await _safe(_recall_session(req.session_id), [])
 
     # D89 FSM: fire USER_MESSAGE event (IDLE → ACTIVE or FOCUSED stays FOCUSED)
     if is_enabled("FSM"):
@@ -1778,19 +1803,19 @@ async def chat_stream(req: ChatRequest):
          narrative, imagination, conscience, agent_ctx, operator_model,
          graph_context, letta_context, financial_context,
          world_context) = await asyncio.gather(
-            _safe(_get_relevant_memories(user_msg), []),
-            _safe(_get_active_goals(), []),
-            _safe(_get_active_topics(), {}),
-            _safe(_get_emotional_context(user_msg), {}),
-            _safe(_get_narrative_identity(), {}),
-            _safe(_get_imagination_context(user_msg), {}),
-            _safe(_get_conscience_context(), {}),
-            _safe(_get_agent_context(), {}),
-            _safe(_get_operator_model(user_msg, mode), {}),
-            _safe(_get_graph_context(user_msg), {}),
-            _safe(_get_letta_context(user_msg), {}),
-            _safe(_get_financial_context(user_msg), {}),
-            _safe(_get_world_context(), ""),
+            _safe(_recall_memories(user_msg), []),
+            _safe(_read_active_goals(), []),
+            _safe(_read_active_topics(), {}),
+            _safe(_feel_emotional_context(user_msg), {}),
+            _safe(_hold_narrative(), {}),
+            _safe(_imagine_context(user_msg), {}),
+            _safe(_hold_conscience(), {}),
+            _safe(_surface_agent_context(), {}),
+            _safe(_understand_operator(user_msg, mode), {}),
+            _safe(_surface_graph_context(user_msg), {}),
+            _safe(_surface_letta_context(user_msg), {}),
+            _safe(_read_financial_context(user_msg), {}),
+            _safe(_sense_world(), ""),
         )
     else:
         (memories, goals, topics, eq_context,

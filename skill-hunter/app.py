@@ -28,6 +28,7 @@ SKILLS_DIR = Path(os.getenv("SKILLS_DIR", "/data/skills"))
 PYPI_BASE = "https://pypi.org/pypi"
 PORT = int(os.getenv("PORT", "8045"))
 DISABLE_THRESHOLD = int(os.getenv("SKILL_DISABLE_THRESHOLD", "3"))
+MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 
 # Heuristic keyword → candidate package map
 _KW_PACKAGES: Dict[str, List[str]] = {
@@ -239,6 +240,25 @@ async def hunt(req: HuntRequest) -> Dict[str, Any]:
         "disabled": False,
     }
     _save_meta(name, meta)
+
+    # Log skill acquisition to memory so Kai knows what it learned and when
+    async def _log_to_memory() -> None:
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                await client.post(
+                    f"{MEMU_URL}/memory/memorize",
+                    json={
+                        "content": f"Acquired new skill '{name}' using package '{found}' to address gap: {gap}",
+                        "metadata": meta,
+                        "category": "skill_acquisition",
+                        "user_id": "keeper",
+                    },
+                )
+        except Exception:
+            pass
+
+    import asyncio as _asyncio
+    _asyncio.create_task(_log_to_memory())
 
     return {
         "skill_created": True,
