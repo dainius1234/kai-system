@@ -402,7 +402,7 @@ class TestDashboardEQView:
         assert 'data-view="eq"' in self.html
 
     def test_eq_view_section(self):
-        assert 'id="eqView"' in self.html
+        assert 'id="bodyView"' in self.html
 
     def test_eq_mood_card(self):
         assert 'id="eqMood"' in self.html

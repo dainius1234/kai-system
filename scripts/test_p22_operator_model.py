@@ -489,14 +489,14 @@ class TestDashboardUI(unittest.TestCase):
 class TestLangGraphIntegration(unittest.TestCase):
     """P22 operator model integration in agentic/app.py."""
 
-    def test_get_operator_model_function(self):
-        self.assertIn("_get_operator_model", _langgraph())
+    def test_understand_operator_function(self):
+        self.assertIn("_understand_operator", _langgraph())
 
-    def test_get_operator_model_is_async(self):
-        self.assertIn("async def _get_operator_model", _langgraph())
+    def test_understand_operator_is_async(self):
+        self.assertIn("async def _understand_operator", _langgraph())
 
     def test_operator_task_created(self):
-        self.assertIn("_get_operator_model(", _langgraph())
+        self.assertIn("_understand_operator(", _langgraph())
 
     def test_operator_model_awaited(self):
         self.assertIn("operator_model", _langgraph())

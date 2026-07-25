@@ -879,76 +879,76 @@ class TestAsyncHelpers:
             result = _asyncio.run(ag._get_relevant_memories("anything"))
         assert result == []
 
-    def test_get_graph_context_skipped_when_flag_off(self):
+    def test_surface_graph_context_skipped_when_flag_off(self):
         # FF_GRAPH_INGEST defaults to False — should return {} without an HTTP call
-        result = _asyncio.run(ag._get_graph_context("some query"))
+        result = _asyncio.run(ag._surface_graph_context("some query"))
         assert result == {}
 
-    def test_get_graph_context_fetches_when_flag_on(self):
+    def test_surface_graph_context_fetches_when_flag_on(self):
         graph_data = {"status": "ok", "results": [{"entity": "HMRC", "type": "org"}]}
         mc, _ = _make_http_mock(200, graph_data)
         os.environ["FF_GRAPH_INGEST"] = "true"
         try:
             with patch("httpx.AsyncClient", return_value=mc):
-                result = _asyncio.run(ag._get_graph_context("tax query"))
+                result = _asyncio.run(ag._surface_graph_context("tax query"))
         finally:
             del os.environ["FF_GRAPH_INGEST"]
         assert result.get("results") is not None
 
-    def test_get_graph_context_returns_empty_on_graph_disabled(self):
+    def test_surface_graph_context_returns_empty_on_graph_disabled(self):
         mc, _ = _make_http_mock(200, {"status": "graph_disabled"})
         os.environ["FF_GRAPH_INGEST"] = "true"
         try:
             with patch("httpx.AsyncClient", return_value=mc):
-                result = _asyncio.run(ag._get_graph_context("tax query"))
+                result = _asyncio.run(ag._surface_graph_context("tax query"))
         finally:
             del os.environ["FF_GRAPH_INGEST"]
         assert result == {}
 
-    def test_get_financial_context_skipped_non_finance_message(self):
-        result = _asyncio.run(ag._get_financial_context("what is the weather today"))
+    def test_read_financial_context_skipped_non_finance_message(self):
+        result = _asyncio.run(ag._read_financial_context("what is the weather today"))
         assert result == {}
 
-    def test_get_financial_context_fetches_on_vat_keyword(self):
+    def test_read_financial_context_fetches_on_vat_keyword(self):
         fin = {"cis_summary": {"total_gross": 10000, "total_deductions": 200,
                                "total_net": 9800, "record_count": 5}}
         mc, _ = _make_http_mock(200, fin)
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_financial_context("my VAT invoice this quarter"))
+            result = _asyncio.run(ag._read_financial_context("my VAT invoice this quarter"))
         assert result.get("cis_summary") is not None
 
-    def test_get_financial_context_empty_on_non_200(self):
+    def test_read_financial_context_empty_on_non_200(self):
         mc, _ = _make_http_mock(503, {})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_financial_context("my tax invoice"))
+            result = _asyncio.run(ag._read_financial_context("my tax invoice"))
         assert result == {}
 
-    def test_get_session_messages_returns_list_on_200(self):
+    def test_recall_session_returns_list_on_200(self):
         msgs = [{"role": "user", "content": "hello"}, {"role": "assistant", "content": "hi"}]
         mc, _ = _make_http_mock(200, {"session_messages": msgs})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_session_messages("sess-xyz"))
+            result = _asyncio.run(ag._recall_session("sess-xyz"))
         assert len(result) == 2
         assert result[0]["role"] == "user"
 
-    def test_get_session_messages_empty_on_non_200(self):
+    def test_recall_session_empty_on_non_200(self):
         mc, _ = _make_http_mock(404, {})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_session_messages("sess-xyz"))
+            result = _asyncio.run(ag._recall_session("sess-xyz"))
         assert result == []
 
-    def test_get_active_goals_returns_list_on_200(self):
+    def test_read_active_goals_returns_list_on_200(self):
         goals = [{"id": "g1", "title": "Launch MVP", "progress": 80, "priority": "high"}]
         mc, _ = _make_http_mock(200, {"goals": goals})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_active_goals())
+            result = _asyncio.run(ag._read_active_goals())
         assert len(result) == 1
         assert result[0]["title"] == "Launch MVP"
 
-    def test_get_active_goals_empty_on_non_200(self):
+    def test_read_active_goals_empty_on_non_200(self):
         mc, _ = _make_http_mock(500, {})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_active_goals())
+            result = _asyncio.run(ag._read_active_goals())
         assert result == []
 
     def test_get_active_topics_returns_list_on_200(self):
@@ -964,26 +964,26 @@ class TestAsyncHelpers:
             result = _asyncio.run(ag._get_active_topics())
         assert result == []
 
-    def test_get_emotional_context_returns_mood_on_200(self):
+    def test_feel_emotional_context_returns_mood_on_200(self):
         data = {
             "dominant_emotion": "focused", "arc": "rising",
             "confidence": 0.85, "should_warn": True, "warning": "high stress noted",
         }
         mc, _ = _make_http_mock(200, data)
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_emotional_context("help me focus today"))
+            result = _asyncio.run(ag._feel_emotional_context("help me focus today"))
         assert result.get("mood") == "focused"
         assert result.get("arc") == "rising"
         assert result.get("confidence") == 0.85
         assert result.get("should_warn") is True
 
-    def test_get_emotional_context_empty_on_exception(self):
+    def test_feel_emotional_context_empty_on_exception(self):
         mc = MagicMock()
         mc.get = AsyncMock(side_effect=Exception("network error"))
         mc.__aenter__ = AsyncMock(return_value=mc)
         mc.__aexit__ = AsyncMock(return_value=False)
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_emotional_context("anything"))
+            result = _asyncio.run(ag._feel_emotional_context("anything"))
         assert result == {}
 
     def test_get_narrative_identity_returns_narrative_on_200(self):
@@ -1027,20 +1027,20 @@ class TestAsyncHelpers:
             result = _asyncio.run(ag._get_imagination_context("anything"))
         assert isinstance(result, dict)
 
-    def test_get_conscience_context_returns_values_on_200(self):
+    def test_hold_conscience_returns_values_on_200(self):
         vals_data = {"values": [{"value": "honesty", "strength": 0.9},
                                 {"value": "care", "strength": 0.8}],
                      "integrity_score": 0.75}
         mc, _ = _make_http_mock(200, vals_data)
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_conscience_context())
+            result = _asyncio.run(ag._hold_conscience())
         assert result.get("values", [{}])[0].get("value") == "honesty"
         assert result.get("integrity_score") == 0.75
 
-    def test_get_conscience_context_empty_on_non_200(self):
+    def test_hold_conscience_empty_on_non_200(self):
         mc, _ = _make_http_mock(503, {})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_conscience_context())
+            result = _asyncio.run(ag._hold_conscience())
         assert isinstance(result, dict)
 
     def test_get_agent_context_returns_tasks_on_200(self):
@@ -1064,7 +1064,7 @@ class TestAsyncHelpers:
         assert result["reminders"] == []
         assert result["capabilities"] == 0
 
-    def test_get_operator_model_returns_echo_on_200(self):
+    def test_understand_operator_returns_echo_on_200(self):
         data = {
             "echo_message": "You seem rushed today",
             "echo_type": "empathy",
@@ -1076,15 +1076,15 @@ class TestAsyncHelpers:
         }
         mc, _ = _make_http_mock(200, data)
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_operator_model("I'm stressed about VAT", "WORK"))
+            result = _asyncio.run(ag._understand_operator("I'm stressed about VAT", "WORK"))
         assert result.get("echo") == "You seem rushed today"
         assert result.get("escalation_level") == 2
         assert result.get("cross_mode") == "Carry WORK focus into next session"
 
-    def test_get_operator_model_defaults_on_non_200(self):
+    def test_understand_operator_defaults_on_non_200(self):
         mc, _ = _make_http_mock(503, {})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_operator_model("hello", "PUB"))
+            result = _asyncio.run(ag._understand_operator("hello", "PUB"))
         assert result["echo"] is None
         assert result["escalation_level"] == 1
 
@@ -1148,23 +1148,23 @@ class TestAsyncHelpers:
         # post should not be called when export fails
         mc.post.assert_not_called()
 
-    def test_get_letta_context_returns_empty_when_flag_off(self):
+    def test_surface_letta_context_returns_empty_when_flag_off(self):
         # FF_LETTA_TASKS defaults to False — no HTTP call, returns {}
-        result = _asyncio.run(ag._get_letta_context("what do you know about taxes"))
+        result = _asyncio.run(ag._surface_letta_context("what do you know about taxes"))
         assert result == {}
 
-    def test_get_letta_context_fetches_when_flag_on(self):
+    def test_surface_letta_context_fetches_when_flag_on(self):
         letta_data = {"response": "context from archival memory", "memories_updated": False}
         mc, _ = _make_http_mock(200, letta_data)
         os.environ["FF_LETTA_TASKS"] = "true"
         try:
             with patch("httpx.AsyncClient", return_value=mc):
-                result = _asyncio.run(ag._get_letta_context("what do you know about my income"))
+                result = _asyncio.run(ag._surface_letta_context("what do you know about my income"))
         finally:
             del os.environ["FF_LETTA_TASKS"]
         assert result.get("response") == "context from archival memory"
 
-    def test_get_letta_context_syncs_memories_when_both_flags_on(self):
+    def test_surface_letta_context_syncs_memories_when_both_flags_on(self):
         # FF_LETTA_TASKS + FF_LETTA_MEMORY_SYNC + memories_updated=True triggers sync task
         letta_data = {"response": "archival context", "memories_updated": True}
         mc, _ = _make_http_mock(200, letta_data)
@@ -1172,7 +1172,7 @@ class TestAsyncHelpers:
         os.environ["FF_LETTA_MEMORY_SYNC"] = "true"
         try:
             with patch("httpx.AsyncClient", return_value=mc):
-                result = _asyncio.run(ag._get_letta_context("what do you know"))
+                result = _asyncio.run(ag._surface_letta_context("what do you know"))
         finally:
             del os.environ["FF_LETTA_TASKS"]
             del os.environ["FF_LETTA_MEMORY_SYNC"]
@@ -1198,7 +1198,7 @@ class TestChatContextInjection:
     def test_goals_block_executes(self):
         goals = [{"title": "Launch product by Q3", "progress": 60,
                   "priority": "high", "deadline": "end of Q3"}]
-        with patch.object(ag, "_get_active_goals", AsyncMock(return_value=goals)):
+        with patch.object(ag, "_read_active_goals", AsyncMock(return_value=goals)):
             r = client.post("/chat", json={"message": "help me with my goals"})
         assert r.status_code == 200
 
@@ -1212,14 +1212,14 @@ class TestChatContextInjection:
     def test_emotional_context_block_executes_with_warning(self):
         eq = {"mood": "anxious", "arc": "declining", "confidence": 0.6,
               "should_warn": True, "warning": "User appears stressed — proceed carefully"}
-        with patch.object(ag, "_get_emotional_context", AsyncMock(return_value=eq)):
+        with patch.object(ag, "_feel_emotional_context", AsyncMock(return_value=eq)):
             r = client.post("/chat", json={"message": "I feel overwhelmed by everything"})
         assert r.status_code == 200
 
     def test_emotional_context_non_neutral_mood_block_executes(self):
         eq = {"mood": "excited", "arc": "rising", "confidence": 0.9,
               "should_warn": False, "warning": ""}
-        with patch.object(ag, "_get_emotional_context", AsyncMock(return_value=eq)):
+        with patch.object(ag, "_feel_emotional_context", AsyncMock(return_value=eq)):
             r = client.post("/chat", json={"message": "great news about the contract"})
         assert r.status_code == 200
 
@@ -1245,7 +1245,7 @@ class TestChatContextInjection:
                        {"value": "care", "strength": 0.80}],
             "integrity_score": 0.65,
         }
-        with patch.object(ag, "_get_conscience_context", AsyncMock(return_value=conscience)):
+        with patch.object(ag, "_hold_conscience", AsyncMock(return_value=conscience)):
             r = client.post("/chat", json={"message": "what do you value most"})
         assert r.status_code == 200
 
@@ -1263,7 +1263,7 @@ class TestChatContextInjection:
         op = {"echo": "You seem to be under pressure today",
               "escalation_level": 3, "cross_mode": "Carry this urgency forward",
               "cross_mode_count": 2, "model_completeness": 0.8}
-        with patch.object(ag, "_get_operator_model", AsyncMock(return_value=op)):
+        with patch.object(ag, "_understand_operator", AsyncMock(return_value=op)):
             r = client.post("/chat", json={"message": "let's get this sorted quickly"})
         assert r.status_code == 200
 
@@ -1272,7 +1272,7 @@ class TestChatContextInjection:
             {"role": "user", "content": "what is CIS?"},
             {"role": "assistant", "content": "CIS is Construction Industry Scheme"},
         ]
-        with patch.object(ag, "_get_session_messages", AsyncMock(return_value=msgs)):
+        with patch.object(ag, "_recall_session", AsyncMock(return_value=msgs)):
             r = client.post("/chat", json={"message": "continue our conversation",
                                            "session_id": "sess-inject-001"})
         assert r.status_code == 200
@@ -1286,19 +1286,19 @@ class TestChatContextInjection:
             "tax_estimate": {"income_tax": 8500.0, "class4_ni": 1800.0,
                              "total_liability": 10300.0},
         }
-        with patch.object(ag, "_get_financial_context", AsyncMock(return_value=fin)):
+        with patch.object(ag, "_read_financial_context", AsyncMock(return_value=fin)):
             r = client.post("/chat", json={"message": "give me my VAT and CIS summary"})
         assert r.status_code == 200
 
     def test_graph_context_block_executes(self):
         graph = {"results": [{"entity": "HMRC", "type": "organisation", "relation": "regulates"}]}
-        with patch.object(ag, "_get_graph_context", AsyncMock(return_value=graph)):
+        with patch.object(ag, "_surface_graph_context", AsyncMock(return_value=graph)):
             r = client.post("/chat", json={"message": "what entities are in the knowledge graph"})
         assert r.status_code == 200
 
     def test_letta_context_block_executes(self):
         letta = {"response": "Based on archival memory: your Q2 income was £34,200"}
-        with patch.object(ag, "_get_letta_context", AsyncMock(return_value=letta)):
+        with patch.object(ag, "_surface_letta_context", AsyncMock(return_value=letta)):
             r = client.post("/chat", json={"message": "what do you remember about my income"})
         assert r.status_code == 200
 

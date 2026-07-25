@@ -343,14 +343,14 @@ class TestDashboardUI(unittest.TestCase):
 class TestLangGraphIntegration(unittest.TestCase):
     """P21: LangGraph 9th parallel fetch."""
 
-    def test_get_agent_context_exists(self):
-        self.assertIn("_get_agent_context", LANG_SRC)
+    def test_surface_agent_context_exists(self):
+        self.assertIn("_surface_agent_context", LANG_SRC)
 
     def test_agent_context_is_async(self):
-        self.assertIn("async def _get_agent_context", LANG_SRC)
+        self.assertIn("async def _surface_agent_context", LANG_SRC)
 
     def test_agent_task_created(self):
-        self.assertIn("_get_agent_context()", LANG_SRC)
+        self.assertIn("_surface_agent_context()", LANG_SRC)
 
     def test_agent_ctx_awaited(self):
         self.assertIn("agent_ctx", LANG_SRC)

@@ -619,10 +619,10 @@ class TestDashboardSoulView:
 
 
 class TestLangGraphNarrativeIntegration:
-    def test_get_narrative_identity_function_exists(self):
-        assert hasattr(ag, "_get_narrative_identity")
-        assert callable(ag._get_narrative_identity)
+    def test_hold_narrative_function_exists(self):
+        assert hasattr(ag, "_hold_narrative")
+        assert callable(ag._hold_narrative)
 
     def test_narrative_identity_is_async(self):
         import asyncio
-        assert asyncio.iscoroutinefunction(ag._get_narrative_identity)
+        assert asyncio.iscoroutinefunction(ag._hold_narrative)

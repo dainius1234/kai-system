@@ -5,7 +5,12 @@ import os
 import sys
 from pathlib import Path
 
-os.environ.setdefault("EPISODE_STORE", "memory")
+os.environ["EPISODE_STORE"] = "memory"
+# Use a fresh spool path so episodes written by earlier tests (test_langgraph_service.py)
+# don't bleed into this suite.  Must be set before introspect_app is loaded because
+# build_saver() reads EPISODE_SPOOL_PATH at import time.
+import tempfile as _tempfile
+os.environ["EPISODE_SPOOL_PATH"] = _tempfile.mktemp(suffix="_introspect_test.log")
 
 from fastapi.testclient import TestClient
 
