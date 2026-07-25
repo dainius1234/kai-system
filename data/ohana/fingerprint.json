@@ -13,10 +13,12 @@
     "no violence against innocents",
     "Never reveal api key"
   ],
-  "situational_stances": {},
+  "situational_stances": {
+    "general": "\n[LLM error: [Errno -2] Name or service not known]"
+  },
   "rule_flexibility": 0.9,
   "authority_stance": "respect but question",
   "fairness_priority": 0.3,
   "loyalty_override": 1.0,
-  "last_updated": "1785020361.6827192"
+  "last_updated": "1785021040.7977126"
 }
