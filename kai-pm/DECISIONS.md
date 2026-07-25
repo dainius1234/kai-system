@@ -1950,3 +1950,56 @@ Four note templates in `vault-sync/templates/`: `daily-note.md`, `lesson-learned
 - All GPU-era stubs follow the same activation pattern: flag check → hardware check → return stub with `confidence=0.0`. Phase 1 activation = set flag True + implement the body.
 - D98 is the only stub that does real work NOW (collecting samples). Every chat interaction is a free data point.
 - Feature flags added: `FF_SOCRATIC` (T), `FF_HYPOTHESIS_ENGINE` (T), `FF_TEMPORAL_PROJECTION` (T), `FF_DIALECTICAL_SYNTHESIS` (F), `FF_ANALOGICAL_REASONING` (F), `FF_CONCEPT_BLENDING` (F), `FF_COGNITIVE_FINGERPRINT` (T), `FF_SYNTHETIC_EXPERIENCE` (F), `FF_TRANSITIVE_REASONING` (F). Total flags: 47.
+
+---
+
+## D101 — Causal World Model & Counterfactual Policy Learning (GPU-era stub)
+
+**Date:** 2026-07-25
+
+**Decision — D101 — Persistent Causal Graph + Mental Simulation + Policy Distillation:**
+`agentic/causal_world_model.py` + `agentic/policy_memory.py`. Four integrated components:
+
+1. **CausalGraph** — typed, directed cause-effect edges stored in-memory (Phase 0) and eventually as Cognee/Kuzu CAUSES relationships (Phase 3). Each `CausalEdge` carries: `source`, `target`, `strength` (0.0–1.0), `confidence`, `temporal_lag_seconds`, `direction` (direct/inverse), `context_modifiers` (dict), `source_type` (observed/simulated/inferred/user_stated), `evidence_count`. Methods: `add_edge()`, `get_edge()`, `query_causal_path()`, `get_downstream_effects()`, `get_upstream_causes()`, `predict_outcome()`. `can_reason()→False` in Phase 0.
+
+2. **WorldModelSimulator** — runs `SIMULATIONS_PER_CYCLE=50` action variants per idle GPU cycle, scores by expected utility (weighted by cognitive fingerprint values from D98), stores top insights as `simulated_experience` memories. `can_simulate()→False` in Phase 0. `SimulationScenario` carries: `goal`, `initial_state`, `actions`, `horizon_steps`, `variations_per_action`. `SimulationResult` carries: `scenario_id`, `action`, `outcome_path`, `final_utility`, `key_causal_edges_triggered`, `confidence`.
+
+3. **PolicyMemory** (in-memory stub in `causal_world_model.py`) + **PolicyLibrary** (JSONL-persisted in `policy_memory.py`) — distilled strategies: `Policy` with `name`, `condition`, `action`, `expected_outcome`, `confidence`, `evidence_type`, `supporting_edges`, `success_rate`, `version`. `can_learn_policies()→False`/`can_distill()→False` in Phase 0. `PolicyLibrary.store()` + `retrieve_relevant()` work NOW — seed policies can be recorded today.
+
+4. **CausalSurpriseDetector** — compares world model predictions against actual observations; when `divergence_score ≥ surprise_threshold` (default 0.3), returns a surprise description and triggers hypothesis formation (D93 `HypothesisEngine`). `can_detect_surprise()→False` in Phase 0. Feature flag: `FF_CAUSAL_SURPRISE`.
+
+Factory singletons: `get_causal_graph()`, `get_simulator()`, `get_policy_memory()`, `get_surprise_detector()` — lazy-constructed, shared across callers.
+
+**Cognee CAUSES edge schema (Phase 3):**
+```
+(:Concept)-[:CAUSES { strength, confidence, temporal_lag_seconds, direction,
+    context_modifiers (json), source_type, evidence_count }]->(:Concept)
+```
+
+**Integration points:**
+- Proactive observer: when `can_simulate()`, calls `run_background_simulations(active_goals)` in idle GPU cycles.
+- Swarm CAUSAL_CHECK stage: when `can_reason()`, Oracle queries causal graph for deep consequence chains.
+- Cognitive Fingerprinting (D98): simulation utility function personalized by operator value weights from fingerprint.
+- Hypothesis Engine (D93): hypotheses tested against causal world model (stronger verdicts than memory-only).
+- Counterfactual Rehearsal (D89/A): Phase 3 switches from LLM generation to full causal simulation.
+- CausalSurprise → triggers D93 HypothesisEngine cycle with surprise as seed topic.
+
+**Rationale:** Every other cognitive capability becomes stronger with a causal backbone. Temporal Projection (D94) shifts from static forecast to dynamic simulation with feedback loops. Hypothesis Engine (D93) gets a structured graph to test against. Dialectical Synthesis (D95) pits two causal models against each other. This is the capability that shifts KAI from reactive advisor to strategic partner — one that has already run a thousand versions of tomorrow before the operator wakes up.
+
+**Phase 0 stub pattern:** `can_*()→False` gates all computation-heavy paths. Interfaces frozen. Only `CausalGraph.add_edge()` and `PolicyLibrary.store()/retrieve_relevant()` do real work now, allowing early data accumulation before GPU arrives.
+
+**Activation conditions (all required):**
+1. `FF_CAUSAL_WORLD_MODEL=True`
+2. GPU available (RTX 5080)
+3. Cognitive fingerprint collected (≥90 samples — D98)
+4. Knowledge graph ≥1000 nodes
+5. Historical sensor data ≥30 days
+
+**Feature flags added:**
+- `FF_CAUSAL_WORLD_MODEL` (False) — activates simulation loop + graph reasoning
+- `FF_CAUSAL_SURPRISE` (False) — activates prediction-error detection (requires FF_CAUSAL_WORLD_MODEL)
+- `FF_POLICY_MEMORY` (False) — activates auto-distillation of simulation outcomes (requires FF_CAUSAL_WORLD_MODEL)
+
+Total flags: 50.
+
+**Tests:** 37 tests in `scripts/test_d101_causal_world_model.py`. 1 new Makefile target (`test-d101-causal-world-model`). 1 new CI step. Total test targets: 89. Total tests: ~2,866.
