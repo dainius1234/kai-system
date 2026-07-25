@@ -50,6 +50,7 @@ from model_council import get_model_council
 from web_scout import fetch as web_fetch, search as web_search, summarize as web_summarize
 from service_watchdog import get_watchdog
 from paper_trader import get_paper_trader
+from trust_core import get_trust_core, TrustLevel
 
 logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
@@ -922,6 +923,57 @@ async def paper_trading_close(req: PaperCloseRequest) -> Dict[str, Any]:
         raise HTTPException(status_code=404, detail=str(exc))
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+
+
+# ── D126: Trust Promotion Gate ───────────────────────────────────────
+
+class TrustPromoteRequest(BaseModel):
+    level: int          # TrustLevel int value (0–6)
+    reason: str = ""
+
+class TrustDemoteRequest(BaseModel):
+    level: int
+    reason: str
+
+
+@app.get("/trust/status")
+async def trust_status_endpoint() -> Dict[str, Any]:
+    """D126: Full trust status with scores and progress to next level."""
+    return get_trust_core().status()
+
+
+@app.get("/trust/readiness")
+async def trust_readiness() -> Dict[str, Any]:
+    """D126: Promotion readiness report — gaps and auto-eligibility for next level."""
+    return get_trust_core().promotion_readiness()
+
+
+@app.post("/trust/promote")
+async def trust_promote(req: TrustPromoteRequest) -> Dict[str, Any]:
+    """D126: Operator grants a trust level. Dainius's word is final."""
+    try:
+        level = TrustLevel(req.level)
+    except ValueError:
+        raise HTTPException(status_code=422, detail=f"Invalid trust level: {req.level}")
+    await asyncio.to_thread(get_trust_core().grant, level, "dainius")
+    return {"granted": level.name, "level": level.value}
+
+
+@app.post("/trust/demote")
+async def trust_demote(req: TrustDemoteRequest) -> Dict[str, Any]:
+    """D126: Operator revokes trust to a specific level."""
+    try:
+        level = TrustLevel(req.level)
+    except ValueError:
+        raise HTTPException(status_code=422, detail=f"Invalid trust level: {req.level}")
+    await asyncio.to_thread(get_trust_core().revoke, level, req.reason, "dainius")
+    return {"revoked_to": level.name, "level": level.value, "reason": req.reason}
+
+
+@app.get("/trust/audit")
+async def trust_audit(limit: int = 20) -> Dict[str, Any]:
+    """D126: Recent trust audit log entries."""
+    return {"events": get_trust_core().audit_tail(limit)}
 
 
 # ── LLM router (Kai's brain) ────────────────────────────────────────

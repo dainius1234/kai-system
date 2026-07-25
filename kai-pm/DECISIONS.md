@@ -2615,3 +2615,40 @@ The Auditor knows the full factor model: operator_approval_history (30%), value_
 **Tests:** `scripts/test_paper_trader.py` — 35 tests covering: input validation (bad side/qty/price/symbol), open (returns Position, normalises symbol, unique IDs, strategy tag, appends to list), close (long profit/loss, short profit/loss, removes from positions, records duration), mark_to_market (long/short unrealised, missing symbols, zero price), status (empty, after mixed trades, open_positions count), persistence (positions survive reload, trades in jsonl), singleton lifecycle. All 35 pass.
 
 **Consequences:** Kai now has a paper trading ledger. The PARTNER trust gate means Kai cannot open positions autonomously until trust level 4 is granted — the module is fully built and waiting for the trust to be earned. Cumulative: 245 tests across D118–D125, all green in isolation. Phase 3: Sustainability has opened.
+
+---
+
+## D126 — 2026-07-25 — Trust Promotion Gate: Operator Control Over Earned Autonomy
+
+**Context:** D115 built TrustCore with the full trust ladder (DORMANT→GUARDIAN), capability gates, evidence scoring, and auto-promotion thresholds. Operators had no HTTP interface to inspect readiness or grant/revoke levels. D126 closes that gap: an operator-facing API for trust governance, plus a `promotion_readiness()` method that gives an at-a-glance picture of where Kai stands.
+
+**Decisions:**
+
+**`promotion_readiness()` added to `TrustCore`:**
+- Returns current level, next level, per-dimension scores vs. thresholds, gap to each threshold (never negative), `auto_eligible` flag (True when all gaps = 0), and a plain-English summary.
+- At GUARDIAN ceiling: returns `next_level=None`, `auto_eligible=False`, summary confirming max level reached.
+- At any other level: reports gaps for each dimension required by `PROMOTION_THRESHOLDS[next_level]`.
+- Complements the existing `status()` (which shows progress percentages) with a decision-ready eligibility report.
+
+**New HTTP endpoints in `agentic/app.py` (no feature flag — trust is always on):**
+- `GET /trust/status` — full trust status: level, level_name, scores, total_actions, refused_actions, next_level progress.
+- `GET /trust/readiness` — promotion readiness report with gaps, auto_eligible, and summary.
+- `POST /trust/promote` — body: `{level: int, reason?: str}` — grants a trust level; `granted_by="dainius"`. Returns `{granted, level}`.
+- `POST /trust/demote` — body: `{level: int, reason: str}` — revokes trust to specified level; `granted_by="dainius"`. Returns `{revoked_to, level, reason}`. Reason is required (enforced by schema).
+- `GET /trust/audit?limit=N` — last N audit log entries.
+
+**Trust request models:** `TrustPromoteRequest(level: int, reason: str = "")`, `TrustDemoteRequest(level: int, reason: str)`.
+
+**Invalid level handling:** `TrustLevel(req.level)` raises `ValueError` for out-of-range int → HTTP 422 with detail message.
+
+**Tests:** `scripts/test_trust_promotion.py` — 21 tests covering:
+- `promotion_readiness()` at GUARDIAN ceiling (no next level, no gaps).
+- DORMANT readiness (correct next_level=OBSERVER, gap present for consistency).
+- Auto-promotion side-effect: recording enough evidence fires `_check_promotion()` and advances the level; subsequent `promotion_readiness()` reports the new next hop.
+- Gaps are never negative (overshot dimensions clamp to 0).
+- Scores included in readiness response.
+- level_int fields correct for both current and next level.
+- HTTP endpoints: status 200 shape, readiness shape, promote valid/invalid levels, demote valid/invalid/missing-reason, audit shape and limit param, promote-then-status consistency, readiness-after-promote shows next hop.
+- All 21 pass.
+
+**Consequences:** Dainius can now inspect Kai's trust position and act on it via HTTP — no need to edit JSON files directly. The gap report makes promotion decisions explicit: if `auto_eligible` is True, the evidence threshold is met and a `POST /trust/promote` makes it official. All prior TrustCore behaviour (grant/revoke/evidence/auto-promotion) is unchanged; this D only adds the readiness method and the HTTP surface. Cumulative: 266 tests across D118–D126, all green in isolation.
