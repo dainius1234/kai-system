@@ -12,11 +12,12 @@ from __future__ import annotations
 
 import logging
 import os
+from collections import deque
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Deque, Dict, List, Optional
 
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from pydantic import BaseModel
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -26,6 +27,10 @@ app = FastAPI(title="House Doctor", version="0.1.0")
 
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 NOTIFY_URL = os.getenv("NOTIFY_URL", "http://notify-service:8031")
+
+# In-memory ring buffer: last 20 diagnoses available without a memu-core round-trip.
+# Agentic reads this at the start of each proactive cycle to carry forward recent health history.
+_recent_diagnoses: Deque[Dict[str, Any]] = deque(maxlen=20)
 
 
 class DiagnosisRequest(BaseModel):
@@ -183,6 +188,7 @@ async def _write_medical_report(
         "source_observations": observations[:10],
     }
     summary = f"[House Doctor/{primary.severity}] {primary.diagnosis}"
+    _recent_diagnoses.append(report)  # local ring buffer — zero-latency reads
 
     async with httpx.AsyncClient(timeout=5.0) as client:
         try:
@@ -220,6 +226,21 @@ async def diagnose(req: DiagnosisRequest) -> Dict[str, Any]:
     }
 
 
+@app.get("/diagnoses/recent")
+async def recent_diagnoses(limit: int = Query(default=10, ge=1, le=20)) -> Dict[str, Any]:
+    """Return the most recent diagnoses from the in-memory ring buffer.
+
+    Agentic reads this at the start of each proactive cycle to carry forward
+    recent health history without re-sending observations.
+    """
+    entries = list(_recent_diagnoses)[-limit:]
+    return {
+        "diagnoses": entries,
+        "count": len(entries),
+        "buffer_size": len(_recent_diagnoses),
+    }
+
+
 @app.get("/rules")
 async def list_rules() -> Dict[str, Any]:
     return {"rules": [r.to_dict() for r in _RULES], "count": len(_RULES)}
@@ -227,4 +248,4 @@ async def list_rules() -> Dict[str, Any]:
 
 @app.get("/health")
 async def health() -> Dict[str, Any]:
-    return {"status": "ok", "service": "house-doctor", "rules": len(_RULES)}
+    return {"status": "ok", "service": "house-doctor", "rules": len(_RULES), "recent_diagnoses": len(_recent_diagnoses)}

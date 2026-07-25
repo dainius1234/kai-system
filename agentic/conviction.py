@@ -1,14 +1,15 @@
 """Conviction scoring — multi-signal plan confidence gate.
 
 Conviction is a 0–10 score measuring how confident the system should be
-before proceeding with plan execution.  It combines five independent
+before proceeding with plan execution.  It combines six independent
 signals:
 
-  1. Context coverage    — how well does stored memory support the plan?
-  2. Plan specificity    — does the plan have concrete, actionable steps?
-  3. Query clarity       — is the user input well-formed and specific?
-  4. Rethink improvement — did reflection loops produce better plans?
-  5. Specialist fit      — is the chosen specialist appropriate?
+  1. Context coverage      — how well does stored memory support the plan?
+  2. Plan specificity      — does the plan have concrete, actionable steps?
+  3. Query clarity         — is the user input well-formed and specific?
+  4. Rethink improvement   — did reflection loops produce better plans?
+  5. Specialist fit        — is the chosen specialist appropriate?
+  6. Domain confidence     — how accurate is Kai's memory in this domain?
 
 The system refuses to execute below MIN_CONVICTION (default 8.0) unless
 the operator has filed a conviction override.
@@ -145,11 +146,40 @@ def _specialist_fit(specialist: str, user_input: str) -> float:
     return 0.5  # no keyword match — might still be right but unconfirmed
 
 
+# ── domain confidence signal ─────────────────────────────────────────
+# P17d epistemic humility: how accurate is Kai's memory in this domain?
+# A domain with many corrections and low positive feedback lowers conviction
+# so Kai doesn't over-commit in areas where it knows it has been wrong before.
+# Set each turn via update_domain_confidence(); defaults to neutral (0.5).
+
+_active_domain_confidence: float = 0.5
+
+
+def update_domain_confidence(confidence: float) -> None:
+    """Update the live domain confidence before calling score_conviction()."""
+    global _active_domain_confidence
+    _active_domain_confidence = max(0.0, min(float(confidence), 1.0))
+
+
+def _domain_confidence_signal() -> float:
+    """Score 0–2 based on Kai's track record in the current query domain.
+
+    0.5 → 1.0 confidence range maps to 1.0 → 2.0 (Kai is accurate here).
+    0.0 → 0.5 confidence range maps to 0.0 → 1.0 (Kai has struggled here).
+    Neutral (0.5) returns 1.0 — no penalty, no bonus.
+    """
+    c = _active_domain_confidence
+    if c >= 0.5:
+        return 1.0 + (c - 0.5) * 2.0  # 0.5 → 1.0, 1.0 → 2.0
+    return c * 2.0  # 0.0 → 0.0, 0.5 → 1.0
+
+
 def score_conviction(user_input: str, plan: Dict[str, Any], context_chunks: List[Dict[str, Any]], rethink_count: int) -> float:
     """Combined conviction score on a 0–10 scale.
 
-    Each signal contributes 0–2 points.  The sum maps directly to the
-    0–10 range the rest of the system expects.
+    Each signal contributes 0–2 points. Signal 6 (domain confidence) uses
+    Kai's actual error rate in the relevant memory domain — so domains where
+    Kai has been corrected repeatedly contribute less to conviction.
     """
     signals = [
         _context_coverage(context_chunks, user_input),
@@ -157,7 +187,9 @@ def score_conviction(user_input: str, plan: Dict[str, Any], context_chunks: List
         _query_clarity(user_input),
         _rethink_improvement(rethink_count),
         _specialist_fit(plan.get("specialist", ""), user_input),
+        _domain_confidence_signal(),
     ]
+    # 6 signals × 2 max = 12 theoretical max; cap at 10 as before
     return round(min(sum(signals), 10.0), 2)
 
 

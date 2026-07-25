@@ -20,6 +20,7 @@ from pydantic import BaseModel
 from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.feature_flags import is_enabled
 from common.llm import LLMRouter, llm_warmup
+from common.resilience import resilient_call as _resilient_call
 from system_fsm import KaiEvent as SysEvent, fire as fsm_fire, current_state as fsm_state, fsm_snapshot
 from teammates import load_teammates, list_teammates, build_teammate_context
 from counterfactual import rehearse as rehearse_counterfactual, can_rehearse
@@ -30,7 +31,7 @@ from curiosity import idle_curiosity_tick, CURIOSITY_LOG
 from common.runtime import AuditStream, CircuitBreaker, ErrorBudget, ErrorBudgetCircuitBreaker, INJECTION_RE, detect_device, sanitize_string, setup_json_logger
 from common.self_emp_advisor import advise, load_expenses, load_income_total, thresholds
 from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, create_checkpoint, list_checkpoints, load_checkpoint, diff_checkpoints, delete_checkpoint
-from conviction import build_plan, detect_self_deception, low_conviction_feedback, score_conviction
+from conviction import build_plan, detect_self_deception, low_conviction_feedback, score_conviction, update_domain_confidence
 from router import (RouteDecision, classify, dispatch_route, load_skills, list_skills,
                      match_skill, unload_skill, prune_stale_skills,
                      scan_skill_md)
@@ -68,6 +69,28 @@ BROKER_URL = os.getenv("BROKER_URL", "http://broker-bridge:8034")
 SKILL_HUNTER_URL = os.getenv("SKILL_HUNTER_URL", "http://skill-hunter:8045")
 HOUSE_DOCTOR_URL = os.getenv("HOUSE_DOCTOR_URL", "http://house-doctor:8046")
 VAULT_SYNC_URL = os.getenv("VAULT_SYNC_URL", "http://vault-sync:8047")
+
+
+async def _memu_get(path: str, params: dict | None = None, fallback: Any = None, timeout: float = 5.0) -> Any:
+    """GET from memu-core with retry and circuit-breaker via resilient_call."""
+    return await _resilient_call(
+        "GET", f"{MEMU_URL}{path}",
+        params=params, timeout=timeout, retries=2, backoff=0.4,
+        fallback=fallback if fallback is not None else {},
+        logger=logger,
+    )
+
+
+async def _memu_post(path: str, body: dict | None = None, fallback: Any = None, timeout: float = 5.0) -> Any:
+    """POST to memu-core with retry and circuit-breaker via resilient_call."""
+    return await _resilient_call(
+        "POST", f"{MEMU_URL}{path}",
+        json=body or {}, timeout=timeout, retries=2, backoff=0.4,
+        fallback=fallback if fallback is not None else {},
+        logger=logger,
+    )
+
+
 PROACTIVE_INTERVAL = int(os.getenv("PROACTIVE_INTERVAL_SECONDS", "300"))
 GAP_HUNT_THRESHOLD = int(os.getenv("GAP_HUNT_THRESHOLD", "3"))
 WAKE_INTENT_COMMAND_THRESHOLD = float(os.getenv("WAKE_INTENT_COMMAND_THRESHOLD", "0.6"))
@@ -218,73 +241,41 @@ def infer_specialist_fallback(user_input: str, task_hint: Optional[str]) -> str:
 
 
 async def fetch_offline_chunks(query: str, user_id: str, top_k: int = 5) -> List[Dict[str, Any]]:
-    try:
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(
-                f"{MEMU_URL}/memory/retrieve",
-                params={"query": query, "user_id": user_id, "top_k": top_k},
-                timeout=5.0,
-            )
-        resp.raise_for_status()
-        payload = resp.json()
-        return payload if isinstance(payload, list) else []
-    except Exception:
-        return []
+    payload = await _memu_get("/memory/retrieve", params={"query": query, "user_id": user_id, "top_k": top_k}, fallback=[])
+    return payload if isinstance(payload, list) else []
 
 
 # ── session buffer + auto-memorize helpers ──────────────────────────
 
 async def _append_session_turn(session_id: str, role: str, content: str) -> None:
     """Push a turn into memu-core's working memory (session buffer)."""
-    try:
-        async with httpx.AsyncClient() as client:
-            await client.post(
-                f"{MEMU_URL}/session/{session_id}/append",
-                json={"role": role, "content": content},
-                timeout=3.0,
-            )
-    except Exception:
-        logger.debug("Session append failed (memu-core may be down)")
+    await _memu_post(f"/session/{session_id}/append", {"role": role, "content": content}, timeout=3.0)
 
 
 async def _fetch_session_context(session_id: str, query: str, top_k: int = 5) -> Dict[str, Any]:
     """Fetch combined working + long-term memory context from memu-core."""
-    try:
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(
-                f"{MEMU_URL}/session/{session_id}/context",
-                params={"query": query, "top_k": top_k},
-                timeout=5.0,
-            )
-        resp.raise_for_status()
-        return resp.json()
-    except Exception:
-        return {"long_term_memories": [], "session_messages": [], "query": query}
+    return await _memu_get(
+        f"/session/{session_id}/context",
+        params={"query": query, "top_k": top_k},
+        fallback={"long_term_memories": [], "session_messages": [], "query": query},
+    )
 
 
 async def _auto_memorize(user_input: str, response_summary: str, specialist: str, conviction: float) -> None:
     """Write the Q&A exchange back to memu-core so vector search learns.
 
     This is the key feedback loop — every conversation becomes a memory
-    that future queries can find.  The system literally gets smarter
+    that future queries can find. The system literally gets smarter
     with every interaction.
     """
-    try:
-        async with httpx.AsyncClient() as client:
-            await client.post(
-                f"{MEMU_URL}/memory/memorize",
-                json={
-                    "timestamp": datetime.utcnow().isoformat(),
-                    "event_type": "conversation",
-                    "result_raw": f"Q: {user_input[:500]}\nA: {response_summary[:1000]}",
-                    "metrics": {"specialist": specialist, "conviction": conviction},
-                    "relevance": min(conviction / 10.0, 1.0),
-                    "user_id": "keeper",
-                },
-                timeout=5.0,
-            )
-    except Exception:
-        logger.debug("Auto-memorize failed (memu-core may be down)")
+    await _memu_post("/memory/memorize", {
+        "timestamp": datetime.utcnow().isoformat(),
+        "event_type": "conversation",
+        "result_raw": f"Q: {user_input[:500]}\nA: {response_summary[:1000]}",
+        "metrics": {"specialist": specialist, "conviction": conviction},
+        "relevance": min(conviction / 10.0, 1.0),
+        "user_id": "keeper",
+    })
 
 
 def strategy_node(user_input: str) -> Dict[str, object]:
@@ -857,24 +848,16 @@ async def _get_mode() -> str:
 
 async def _get_relevant_memories(query: str, top_k: int = 5) -> List[str]:
     """Fetch relevant memories from memu-core for context injection."""
-    try:
-        async with httpx.AsyncClient(timeout=8.0) as client:
-            resp = await client.get(
-                f"{MEMU_URL}/memory/retrieve",
-                params={"query": query, "user_id": "keeper", "top_k": top_k},
-            )
-            if resp.status_code == 200:
-                records = resp.json()
-                memories = []
-                for r in records:
-                    content = r.get("content", {})
-                    text = content.get("text", "") or content.get("query", "")
-                    if text:
-                        memories.append(text)
-                return memories
-    except Exception:
-        pass
-    return []
+    records = await _memu_get("/memory/retrieve", params={"query": query, "user_id": "keeper", "top_k": top_k}, fallback=[])
+    if not isinstance(records, list):
+        return []
+    memories = []
+    for r in records:
+        content = r.get("content", {})
+        text = content.get("text", "") or content.get("query", "")
+        if text:
+            memories.append(text)
+    return memories
 
 
 async def _get_graph_context(query: str, top_k: int = 5) -> Dict[str, Any]:
@@ -1233,6 +1216,22 @@ async def _proactive_observer() -> None:
             observations: List[str] = []
             snapshot: Dict[str, Any] = {}
 
+            # Pull recent health history from house-doctor ring buffer so the
+            # observer carries forward diagnoses without re-sending observations.
+            if is_enabled("HOUSE_DOCTOR"):
+                try:
+                    async with httpx.AsyncClient(timeout=3.0) as client:
+                        hd_resp = await client.get(f"{HOUSE_DOCTOR_URL}/diagnoses/recent", params={"limit": 3})
+                        if hd_resp.status_code == 200:
+                            recent_dx = hd_resp.json().get("diagnoses", [])
+                            for dx in recent_dx:
+                                sev = dx.get("severity", "")
+                                diag = dx.get("primary_diagnosis", "")
+                                if sev in ("WARNING", "CRITICAL") and diag:
+                                    observations.append(f"[recent dx/{sev}] {diag}")
+                except Exception:
+                    pass
+
             async def _probe(key: str, base: str, path: str) -> None:
                 try:
                     async with httpx.AsyncClient(timeout=3.0) as client:
@@ -1488,45 +1487,20 @@ async def _hunt_skill_for_gap(gap_description: str) -> None:
 
 async def _get_session_messages(session_id: str) -> List[Dict[str, str]]:
     """Fetch recent session messages from memu-core."""
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.get(
-                f"{MEMU_URL}/session/{session_id}/context",
-                params={"query": "", "top_k": 10},
-            )
-            if resp.status_code == 200:
-                data = resp.json()
-                return data.get("session_messages", [])
-    except Exception:
-        pass
-    return []
+    data = await _memu_get(f"/session/{session_id}/context", params={"query": "", "top_k": 10}, fallback={})
+    return data.get("session_messages", []) if isinstance(data, dict) else []
 
 
 async def _get_active_goals() -> List[Dict[str, Any]]:
     """Fetch active Ohana goals for context injection."""
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.get(
-                f"{MEMU_URL}/memory/goals",
-                params={"status": "active"},
-            )
-            if resp.status_code == 200:
-                return resp.json().get("goals", [])
-    except Exception:
-        pass
-    return []
+    data = await _memu_get("/memory/goals", params={"status": "active"}, fallback={})
+    return data.get("goals", []) if isinstance(data, dict) else []
 
 
 async def _get_active_topics() -> List[Dict[str, Any]]:
     """Fetch active conversation topics (deferred + active)."""
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.get(f"{MEMU_URL}/memory/topics/active")
-            if resp.status_code == 200:
-                return resp.json().get("topics", [])
-    except Exception:
-        pass
-    return []
+    data = await _memu_get("/memory/topics/active", fallback={})
+    return data.get("topics", []) if isinstance(data, dict) else []
 
 
 async def _get_emotional_context(query: str) -> Dict[str, Any]:
@@ -1824,6 +1798,11 @@ async def chat_stream(req: ChatRequest):
          graph_context, letta_context, financial_context,
          world_context) = ([], [], {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, "")
 
+    # wire domain confidence into the conviction gate — Kai's epistemic humility:
+    # domains where Kai has been corrected before lower conviction before the gate fires.
+    if eq_context:
+        update_domain_confidence(eq_context.get("confidence", 0.5))
+
     # build the message list
     messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
 
@@ -2056,46 +2035,22 @@ async def chat_stream(req: ChatRequest):
         """Record everything Kai should grow from in this exchange.
 
         Runs after the stream closes. Failures here are logged at warning level —
-        these four acts are the feedback loop that makes Kai grow, not expendable
-        side-effects.
+        these acts are the feedback loop that makes Kai grow, not expendable side-effects.
         """
         failed: List[str] = []
-        try:
-            async with httpx.AsyncClient(timeout=3.0) as cl:
-                await cl.post(
-                    f"{MEMU_URL}/memory/emotion/record",
-                    json={"session_id": session, "text": u_msg},
-                )
-        except Exception as e:
-            failed.append(f"emotion: {e}")
-        try:
-            async with httpx.AsyncClient(timeout=3.0) as cl:
-                await cl.post(
-                    f"{MEMU_URL}/memory/autobiography/record",
-                    json={"text": u_msg, "context": "chat"},
-                )
-        except Exception as e:
-            failed.append(f"autobiography: {e}")
-        # Derive the inner thought from the actual response, not a template
         thought = (
             response[:200].strip() + ("…" if len(response) > 200 else "")
         ) if response else u_msg[:100]
-        try:
-            async with httpx.AsyncClient(timeout=3.0) as cl:
-                await cl.post(
-                    f"{MEMU_URL}/memory/imagine/thought",
-                    json={"thought": thought, "context": "chat_reflection"},
-                )
-        except Exception as e:
-            failed.append(f"thought: {e}")
-        try:
-            async with httpx.AsyncClient(timeout=3.0) as cl:
-                await cl.post(
-                    f"{MEMU_URL}/memory/values/learn",
-                    json={"experience": u_msg[:300], "outcome": "positive", "context": "chat"},
-                )
-        except Exception as e:
-            failed.append(f"values: {e}")
+        for label, path, body in [
+            ("emotion",       "/memory/emotion/record",       {"session_id": session, "text": u_msg}),
+            ("autobiography", "/memory/autobiography/record",  {"text": u_msg, "context": "chat"}),
+            ("thought",       "/memory/imagine/thought",       {"thought": thought, "context": "chat_reflection"}),
+            ("values",        "/memory/values/learn",          {"experience": u_msg[:300], "outcome": "positive", "context": "chat"}),
+        ]:
+            try:
+                await _memu_post(path, body, timeout=3.0)
+            except Exception as e:
+                failed.append(f"{label}: {e}")
         # D109: record decision so OhanaCore can learn the operator's situational stances
         try:
             get_ohana_core().record_decision(
@@ -2122,7 +2077,8 @@ async def chat_stream(req: ChatRequest):
             LLM_BREAKER.record_failure()
             logger.error("LLM stream error: %s", e)
             if not full_response:
-                yield f"data: {json.dumps({'token': \"Something went wrong on my end — couldn't reach my thinking layer. Try again in a moment.\"})}\n\n"
+                _err_msg = "Something went wrong on my end — couldn't reach my thinking layer. Try again in a moment."
+                yield f"data: {json.dumps({'token': _err_msg})}\n\n"
 
         # when done, signal end
         yield "data: [DONE]\n\n"
