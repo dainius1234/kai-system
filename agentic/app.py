@@ -47,6 +47,7 @@ from moral_core import get_ohana_core
 from cortex import get_cortex
 from trust_integration import gate_autonomous_action, get_trust_status, record_chat_response
 from model_council import get_model_council
+from web_scout import fetch as web_fetch, search as web_search, summarize as web_summarize
 
 logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
@@ -600,6 +601,7 @@ async def introspect_capabilities() -> Dict[str, Any]:
         "proposed_rituals": list(_proposed_rituals),
         "trust": get_trust_status(),
         "model_council": get_model_council().status() if is_enabled("MODEL_COUNCIL") else None,
+        "web_scout": is_enabled("WEB_SCOUT"),
     }
 
 
@@ -781,6 +783,42 @@ async def model_council_benchmark(req: ModelBenchmarkRequest) -> Dict[str, Any]:
     council = get_model_council()
     result = await asyncio.to_thread(council.benchmark, req.model_id, req.task_type)
     return result
+
+
+class WebScoutFetchRequest(BaseModel):
+    url: str
+    max_chars: int = 4000
+
+
+class WebScoutSearchRequest(BaseModel):
+    query: str
+    max_results: int = 5
+
+
+@app.post("/web-scout/fetch")
+async def web_scout_fetch(req: WebScoutFetchRequest) -> Dict[str, Any]:
+    """D123: Fetch a URL and return extracted visible text."""
+    if not is_enabled("WEB_SCOUT"):
+        raise HTTPException(status_code=503, detail="FF_WEB_SCOUT is disabled")
+    result = await asyncio.to_thread(web_fetch, req.url, max_chars=req.max_chars)
+    return result.to_dict()
+
+
+@app.post("/web-scout/search")
+async def web_scout_search(req: WebScoutSearchRequest) -> Dict[str, Any]:
+    """D123: Search via DuckDuckGo Instant Answers and return results."""
+    if not is_enabled("WEB_SCOUT"):
+        raise HTTPException(status_code=503, detail="FF_WEB_SCOUT is disabled")
+    result = await asyncio.to_thread(web_search, req.query, req.max_results)
+    return result.to_dict()
+
+
+@app.post("/web-scout/summarize")
+async def web_scout_summarize(req: WebScoutFetchRequest) -> Dict[str, Any]:
+    """D123: Fetch a URL and return a trimmed summary."""
+    if not is_enabled("WEB_SCOUT"):
+        raise HTTPException(status_code=503, detail="FF_WEB_SCOUT is disabled")
+    return await asyncio.to_thread(web_summarize, req.url, req.max_chars)
 
 
 # ── LLM router (Kai's brain) ────────────────────────────────────────

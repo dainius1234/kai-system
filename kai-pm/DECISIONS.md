@@ -2513,3 +2513,33 @@ The Auditor knows the full factor model: operator_approval_history (30%), value_
 **Tests:** `scripts/test_model_council.py` — 38 tests covering profile composite scoring, discover/benchmark/rank/recommend/failover, failure tracking, persistence, trust gate rejection, and the singleton lifecycle. All 38 pass.
 
 **Consequences:** Kai now knows what models are available, can rank and recommend them, and tracks failures. Auto-switch (AGENT-level) is groundwork-only in Phase 0 — the machinery exists, the autonomous invocation is held for when the trust level is earned. Cumulative: 192 tests across D118–D122, all green in isolation.
+
+
+## D123 — 2026-07-25 — Web Scout: Kai's Independent Information Gathering (Phase 2: Self-Preservation)
+
+**Context:** Model Council (D122) removed Kai's dependency on a single LLM backend. The next survivability dependency is information: Kai currently relies on the operator to supply world context (weather, news, calendar). If those sensors are down or the operator doesn't provide context, Kai is blind. Web Scout breaks that dependency — Kai can fetch information directly from the public web.
+
+**Decisions:**
+
+**New module — `agentic/web_scout.py`:**
+- No extra dependencies — uses stdlib `html.parser` + `httpx` (already in the stack).
+- `_TextExtractor(HTMLParser)`: strips script/style/svg/iframe tags, decodes HTML entities, collapses whitespace. Returns clean visible text.
+- `_safe_url()`: rejects non-http/https schemes (ftp, file, javascript, etc.) before any request. Hard safety rule, not configurable.
+- `fetch(url, timeout_s, max_chars, autonomous)` → `FetchResult`: HTTP GET with UA header, follow redirects; extracts visible text from HTML, raw text for JSON/plain-text responses. Fail-open.
+- `search(query, max_results, timeout_s, autonomous)` → `SearchResult`: DuckDuckGo Instant Answers API (`api.duckduckgo.com`) — no API key required; returns abstract + related topic links.
+- `summarize(url, max_chars, autonomous)` → dict: thin wrapper over fetch with shorter max_chars default.
+
+**Trust gating per `autonomous` flag:**
+- Operator-directed (`autonomous=False`): ASSISTANT (2) — user explicitly called the endpoint.
+- Autonomous use (`autonomous=True`): PARTNER (4) — Kai initiates the fetch itself. The PARTNER gate ensures Kai can't browse autonomously until it has earned that trust level.
+- Trust infra missing → fail-open (log warning, allow).
+
+**New endpoints in `agentic/app.py` (FF_WEB_SCOUT gate):**
+- `POST /web-scout/fetch` — fetch URL, return extracted text.
+- `POST /web-scout/search` — DuckDuckGo search, return abstract + topics.
+- `POST /web-scout/summarize` — fetch + trim to compact summary.
+- `/introspect/capabilities` updated with `"web_scout": is_enabled("WEB_SCOUT")`.
+
+**Tests:** `scripts/test_web_scout.py` — 29 tests covering: safe URL validation, HTML text extraction (tags, script/style skip, entity decoding, max_chars cap), fetch (success, network failure, trust denial, unsafe URL, content-type handling, elapsed_ms), search (abstract, topics, max_results cap, network failure, trust denial), summarize (success, error propagation). All 29 pass.
+
+**Consequences:** Kai can now gather information independently — it does not need the operator to provide world context if sensors are down. The autonomous gate (PARTNER) ensures this capability is earned, not assumed. Cumulative: 221 tests across D118–D123, all green in isolation. Phase 2: Self-Preservation now covers model independence (D122) and information independence (D123).
