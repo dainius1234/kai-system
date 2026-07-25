@@ -93,6 +93,9 @@ _REGISTRY: Dict[str, tuple] = {
     "GLOBAL_WORKSPACE":      ("D102: Global Workspace Consciousness — serial stream of unified awareness via module bidding; requires GPU + D101 + D98 + ≥3 bidders", False),
     # D109: Ohana Core — situational ethics and loyalty alignment
     "OHANA_CORE":            ("D109: Ohana Core — learns operator moral fingerprint; injects loyalty context into every cognitive act; evaluates action alignment; requires D98 ≥90 samples + interaction history", False),
+    # D114: Cortex cognitive module — phase flags
+    # FF_CORTEX (service): controlled inside cortex/app.py independently
+    "CORTEX_NPU":            ("D114: Cortex Phase 1 — NPU inference on Strix Halo (AMD XDNA 2); upgrades Level 2/3 synthesis from HTTP delegation to on-device ONNX/QNN; requires Flow Z13 + onnxruntime-directml or QNN SDK", False),
 }
 
 
