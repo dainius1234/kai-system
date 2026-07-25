@@ -147,6 +147,18 @@ jobs:
       - name: Vault-sync tests (D91 — parser, mapper, watcher, app endpoints, memu-core vault API, feature flags)
         run: make test-d91-vault-sync
 
+      - name: Socratic self-questioning tests (D92 — SocraticQuestioner, parse, enrich, fallback, FF gate)
+        run: make test-d92-socratic
+
+      - name: Hypothesis engine tests (D93 — HypothesisEngine, form, test, CURIOSITY.md logging)
+        run: make test-d93-hypothesis
+
+      - name: Temporal projection tests (D94 — TemporalForecaster, ForecastFan, four scenario branches)
+        run: make test-d94-forecaster
+
+      - name: GPU-era foundation stubs (D95–D100 — dialectic, analogy, blend, fingerprint, synthetic, transitive)
+        run: make test-d95-d100-foundations
+
       - name: Per-module coverage floors (agentic ≥45 %, memu-core ≥60 %, combined ≥60 %)
         run: |
           make coverage-floors

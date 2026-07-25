@@ -74,6 +74,19 @@ _REGISTRY: Dict[str, tuple] = {
     # D91: Obsidian Brain — bidirectional vault ↔ memu-core sync
     "VAULT_SYNC":            ("D91: vault-sync service enabled — file watcher, ingest, export, mapper", True),
     "VAULT_CONTEXT":         ("D91: inject vault memory snippet into world-context gather (gated separately because it adds latency)", False),
+    # D92: Socratic Self-Questioning — pre-GATHER query decomposition
+    "SOCRATIC":              ("D92: pre-GATHER Socratic decomposition — 3-5 questions reframe the query before Scout gathers evidence", True),
+    # D93: Autonomous Hypothesis Engine — idle-cycle knowledge gap scanning
+    "HYPOTHESIS_ENGINE":     ("D93: idle-cycle gap scanner — forms testable hypotheses from low-confidence memories and tests them", True),
+    # D94: Temporal Projection — fan-of-futures forecasting from supported claims
+    "TEMPORAL_PROJECTION":   ("D94: ForecastFan — base/optimistic/pessimistic/wild-card scenario branches from supported claims", True),
+    # D95–D100: GPU-era stubs — interfaces fixed now, activated when hardware/data arrives
+    "DIALECTICAL_SYNTHESIS": ("D95: Hegelian thesis/antithesis/synthesis reasoner — pending dual-model GPU", False),
+    "ANALOGICAL_REASONING":  ("D96: cross-domain isomorphic pattern search — pending populated knowledge graph", False),
+    "CONCEPT_BLENDING":      ("D97: two distant graph nodes → novel emergent concept — pending graph + GPU", False),
+    "COGNITIVE_FINGERPRINT": ("D98: operator thinking-style model — collecting interaction samples now; inference pending 90+ samples", True),
+    "SYNTHETIC_EXPERIENCE":  ("D99: fictional scenario generation during dream cycles — pending GPU", False),
+    "TRANSITIVE_REASONING":  ("D100: PageRank + community detection + shortest-path on memu-graph — pending populated graph", False),
 }
 
 
