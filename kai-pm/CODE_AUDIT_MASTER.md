@@ -190,16 +190,110 @@ The complete Issue / Risk / Recommendation evidence for findings 1–63 is retai
 
 ---
 
+## Executor: `executor/app.py`
+
+### KAI-EXEC-001 — CRITICAL — Shell allowlist permits arbitrary code and host-control operations
+
+**Issue:** The shell allowlist includes general-purpose execution and control tools: `python3`, `pip`, `git`, `make`, `docker` and `curl`. Checking only the first executable and using `shell=False` does not constrain what those programs can do.
+
+**Risk:** A caller can execute arbitrary Python through `python3 -c`, install or run packages, invoke Makefile targets, use Git helper/config features, control Docker workloads or exfiltrate data over HTTP. If the container has a Docker socket or sensitive mounts, this can become host compromise.
+
+**Recommendation:** Remove interpreters, package managers, build systems, container clients and unrestricted network clients from the generic command allowlist. Implement per-tool typed operations with fixed argument schemas, isolated containers, read-only filesystems, seccomp/AppArmor, no Docker socket and explicit egress policy.
+
+**Status:** OPEN — immediate remediation required
+
+### KAI-EXEC-002 — CRITICAL — Python expression sandbox can reach imported module state
+
+**Issue:** The generated wrapper imports `sys`, `math`, `json` and `datetime`, then evaluates the caller expression in the module global namespace. AST checks block selected names and private attributes but permit ordinary attribute and subscript access such as `sys.modules[...]` and calls on retrieved module objects.
+
+**Risk:** A crafted expression can access already-loaded modules and invoke dangerous functionality outside the intended restricted namespace. The mechanism is not a security sandbox.
+
+**Recommendation:** Remove arbitrary Python evaluation. For mathematical expressions, parse and interpret a strict AST allowlist without `eval`, names, attributes, subscripts or calls except explicitly implemented pure functions. Run any broader code in a disposable hardened sandbox with no secrets, network or host mounts.
+
+**Status:** OPEN — immediate remediation required
+
+### KAI-EXEC-003 — CRITICAL — Execution endpoint lacks visible authentication and proof of Tool Gate approval
+
+**Issue:** `/execute` accepts `tool`, `params`, `task_id` and `device` directly. It does not validate an authenticated caller, signed gate decision, immutable request digest, nonce, expiry or policy verdict.
+
+**Risk:** Any network caller able to reach Executor can bypass Tool Gate and invoke shell, script or Python execution directly.
+
+**Recommendation:** Require mutually authenticated service identity and a short-lived, replay-protected execution capability signed by Tool Gate over the complete canonical request. Bind tool, parameters, task, device, policy version and expiry.
+
+**Status:** OPEN — immediate remediation required
+
+### KAI-EXEC-004 — HIGH — Subprocess output is fully buffered before truncation
+
+**Issue:** Shell, script and Python handlers use `subprocess.run(..., capture_output=True, text=True)`. `MAX_OUTPUT_SIZE` is applied only after the process exits and only to stdout.
+
+**Risk:** A process can emit unbounded stdout or stderr and exhaust executor memory despite the configured output limit.
+
+**Recommendation:** Stream stdout and stderr through bounded pipes, terminate the process when either or combined output exceeds the cap, and enforce OS-level memory, CPU, process and file-size limits.
+
+**Status:** OPEN
+
+### KAI-EXEC-005 — HIGH — Malware scanning fails open when unavailable or errored
+
+**Issue:** If ClamAV is absent, `malware_scan()` returns code `0`. The execution path blocks only scan code `1`; scanner errors such as code `2`, timeouts or malformed scanner output are not treated as unsafe.
+
+**Risk:** Production may claim malware scanning while executing payloads with no active scanner or after scan failure.
+
+**Recommendation:** Expose scanner state in readiness and policy context. For tools requiring scanning, fail closed on unavailable, timeout or error outcomes; record scanner version and signature age.
+
+**Status:** OPEN
+
+### KAI-EXEC-006 — HIGH — State rollback does not roll back execution effects
+
+**Issue:** `StateStore` records only request metadata in a process-local list. `revert_last_state()` merely pops that metadata and does not reverse filesystem, network, container, repository or script side effects.
+
+**Risk:** Documentation and error paths imply rollback protection that does not exist. Failed or malicious commands can leave persistent changes while the system reports that state was reverted.
+
+**Recommendation:** Rename this to execution-history bookkeeping and remove rollback claims. For reversible operations, use explicit transactional adapters, snapshots or disposable environments, with independently verified rollback results.
+
+**Status:** OPEN
+
+### KAI-EXEC-007 — MEDIUM — Execution history exposes raw parameters and is process-local
+
+**Issue:** `/history` returns stored request parameters, including arbitrary command lines, script arguments and expressions, without visible authentication. History exists only in process memory and has no concurrency control.
+
+**Risk:** Sensitive values embedded in commands or arguments may be disclosed, while restarts and multiple workers produce incomplete or divergent records.
+
+**Recommendation:** Restrict history to authorised operators, redact secrets structurally, store immutable audit records centrally and return references rather than raw payloads by default.
+
+**Status:** OPEN
+
+### KAI-EXEC-008 — MEDIUM — Internal execution errors and subprocess stderr leak to callers
+
+**Issue:** Generic exceptions are returned through `detail=f"execution failed: {exc}"`, and non-zero subprocess responses expose up to 1,000 characters of raw stderr.
+
+**Risk:** Callers may learn filesystem paths, dependency versions, repository state, environment details and command behaviour useful for further exploitation.
+
+**Recommendation:** Return stable public error codes and a trace ID. Keep full exceptions and stderr in access-controlled internal logs with redaction.
+
+**Status:** OPEN
+
+### KAI-EXEC-009 — MEDIUM — Request models and history limits lack bounded validation
+
+**Issue:** `tool`, `params`, `task_id`, `device`, script arguments, shell commands, Python expressions and `/history?limit=` do not have consistent size, depth or numerical bounds.
+
+**Risk:** Oversized nested parameters, extremely long commands or expressions and pathological history limits can increase memory, parsing and logging load.
+
+**Recommendation:** Add strict Pydantic constraints, nested payload limits, finite positive configuration validation and an application-wide request-body cap.
+
+**Status:** OPEN
+
+---
+
 ## Current totals
 
-- Findings logged: **72**
-- Critical: **10**
-- High: **31**
-- Medium: **30**
+- Findings logged: **81**
+- Critical: **13**
+- High: **34**
+- Medium: **33**
 - Low: **1**
 - Current security posture: **HIGH RISK / NOT READY FOR EXTERNAL EXPOSURE**
 - Audit state: **IN PROGRESS**
 
 ## Files materially reviewed
 
-`agentic/app.py`, `agentic/web_scout.py`, `common/auth.py`, `tool-gate/app.py`, `common/runtime.py`, `common/resilience.py`, `common/llm.py`, `agentic/swarm.py`, `agentic/swarm_stages.py`, `agentic/cognitive_fsm.py`, `agentic/trust_integration.py`, `agentic/trust_core.py`, `agentic/router.py`, `supervisor/app.py`, `memu-core/app.py`, `verifier/app.py`.
+`agentic/app.py`, `agentic/web_scout.py`, `common/auth.py`, `tool-gate/app.py`, `common/runtime.py`, `common/resilience.py`, `common/llm.py`, `agentic/swarm.py`, `agentic/swarm_stages.py`, `agentic/cognitive_fsm.py`, `agentic/trust_integration.py`, `agentic/trust_core.py`, `agentic/router.py`, `supervisor/app.py`, `memu-core/app.py`, `verifier/app.py`, `executor/app.py`.
