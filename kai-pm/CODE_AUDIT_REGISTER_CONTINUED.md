@@ -97,17 +97,71 @@ This file continues the numbered master audit register from finding 39. It will 
 
 ---
 
+## Specialist router: `agentic/router.py`
+
+### KAI-ROUTE-001 — HIGH — Rule priority can misroute consequential actions as non-executing requests
+
+**Issue:** Route selection chooses whichever regex route has the highest calculated confidence, not the most safety-critical intent. Memory, tax, fact-check or proactive keywords can outrank `EXECUTE_ACTION` in mixed requests because those routes have higher minimum confidence and memory receives an additional priority boost.
+
+**Risk:** A request containing both retrieval language and an imperative action can bypass the intended planning and conviction-gate path, or be sent to a non-action service that returns misleading content rather than enforcing action controls.
+
+**Recommendation:** Detect consequential action intent first and apply a safety precedence rule. Mixed-intent requests should route through action planning whenever any requested effect changes external state.
+
+**Status:** OPEN
+
+### KAI-ROUTE-002 — HIGH — Semantic model may download and initialise synchronously on a live request
+
+**Issue:** `_get_smodel()` constructs `SentenceTransformer("all-MiniLM-L6-v2")` lazily inside classification. Depending on local cache state, this may perform model loading or network retrieval synchronously on the request path.
+
+**Risk:** First-use requests can block for an unbounded period, unexpectedly access the network, consume substantial memory or fail under restricted production egress. Concurrent first calls can also race model initialisation.
+
+**Recommendation:** Pin and pre-provision the model during image build or controlled startup, verify its checksum, initialise once under a lock and expose readiness separately. Never permit implicit model downloads during request handling.
+
+**Status:** OPEN
+
+### KAI-ROUTE-003 — MEDIUM — Route-anchor embeddings are recomputed on every semantic classification
+
+**Issue:** `classify_semantic()` re-encodes every anchor sentence for every request instead of caching the static anchor vectors.
+
+**Risk:** CPU use and latency scale unnecessarily with traffic, reducing throughput and increasing event-loop or worker contention.
+
+**Recommendation:** Precompute and cache normalised anchor embeddings once per model version. Invalidate only when anchors or model identity change.
+
+**Status:** OPEN
+
+### KAI-ROUTE-004 — MEDIUM — Blocking embedding inference is executed synchronously
+
+**Issue:** `model.encode()` is called synchronously. When semantic classification is invoked from an asynchronous API path, embedding inference occupies the serving thread or event-loop worker until completion.
+
+**Risk:** Concurrent requests can experience head-of-line blocking and degraded latency, especially on CPU-only deployments.
+
+**Recommendation:** Move CPU-bound inference to a bounded worker pool or dedicated routing service, apply a deadline and fall back deterministically when capacity is exhausted.
+
+**Status:** OPEN
+
+### KAI-ROUTE-005 — MEDIUM — Silent semantic-classifier failures hide sustained degradation
+
+**Issue:** All model, encoding and classification exceptions silently fall back to keyword routing without structured logging, counters or health status.
+
+**Risk:** The semantic router can remain broken indefinitely while appearing healthy, invalidating claimed routing quality and making regressions difficult to detect.
+
+**Recommendation:** Emit rate-limited structured errors and metrics for model-load, encode and classification failures; expose whether semantic routing is active, degraded or disabled.
+
+**Status:** OPEN
+
+---
+
 ## Continuation summary
 
-- New findings in this continuation: 8
+- New findings in this continuation: 13
 - Critical: 2
-- High: 4
-- Medium: 2
-- Cumulative findings across both registers: 47
+- High: 6
+- Medium: 5
+- Cumulative findings across both registers: 52
 - Cumulative Critical: 8
-- Cumulative High: 23
-- Cumulative Medium: 15
+- Cumulative High: 25
+- Cumulative Medium: 18
 - Cumulative Low: 1
-- Additional files materially reviewed: `agentic/trust_integration.py`, `agentic/trust_core.py`
+- Additional files materially reviewed: `agentic/trust_integration.py`, `agentic/trust_core.py`, `agentic/router.py`
 - Current security posture: HIGH RISK / NOT READY FOR EXTERNAL EXPOSURE
 - Audit state: IN PROGRESS
