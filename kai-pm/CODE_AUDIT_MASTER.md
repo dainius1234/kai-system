@@ -22,7 +22,7 @@ All future findings, status changes and remediation notes must be recorded here.
 
 ---
 
-## Consolidated findings index — 1 to 91
+## Consolidated findings index — 1 to 104
 
 | ID | Severity | Finding |
 |---|---|---|
@@ -115,51 +115,48 @@ All future findings, status changes and remediation notes must be recorded here.
 | KAI-LWORK-001 | HIGH | Ledger archives silently contain only the latest 10,000 entries |
 | KAI-LWORK-002 | MEDIUM | Ledger-worker operational endpoints lack visible authentication |
 | KAI-LWORK-003 | MEDIUM | Heartbeat notifications ignore unsuccessful HTTP responses |
+| KAI-DASH-001 | CRITICAL | Dashboard is an unauthenticated privileged mutation proxy |
+| KAI-DASH-002 | HIGH | Dashboard exposes sensitive personal, financial and operational data |
+| KAI-DASH-003 | HIGH | Dashboard permits unauthenticated identity and memory mutations |
+| KAI-DASH-004 | HIGH | Readiness can report ready while go/no-go is NO_GO |
+| KAI-DASH-005 | HIGH | Internal Redis event stream is exposed without access control |
+| KAI-DASH-006 | MEDIUM | Proxy inputs and pagination lack consistent bounds |
+| KAI-DASH-007 | MEDIUM | Sequential fleet polling creates avoidable latency and false cascades |
+| KAI-DEP-001 | CRITICAL | Network service receives Docker socket access |
+| KAI-DEP-002 | HIGH | Internal services are broadly published on host interfaces |
+| KAI-DEP-003 | HIGH | Development HMAC mode is enabled by default |
+| KAI-DEP-004 | HIGH | Database credentials have a predictable deployment default |
+| KAI-DEP-005 | HIGH | One flat bridge network collapses service trust boundaries |
+| KAI-DEP-006 | MEDIUM | Runtime images are not pinned by immutable digest |
 
-The detailed Issue / Risk / Recommendation evidence for findings 1–63 remains in the three historical registers and will be migrated into this master during the final editorial pass. Findings 64 onward are detailed below.
+The detailed evidence for findings 1–63 remains in the historical registers and will be migrated during the final editorial pass. Findings 64 onward are summarised below with Issue / Risk / Recommendation evidence.
 
 ---
 
 ## Memory core: `memu-core/app.py`
 
 ### KAI-MEMU-001 — HIGH — Memory verification policy fails open when policy loading fails
-
-**Issue:** Importing or reading `common.policy` is wrapped in a broad exception handler that sets `REQUIRE_VERDICT_PASS = False` and `LOG_ONLY_MODE = False`.
-
-**Risk:** A missing module, malformed policy, configuration error or startup defect silently disables mandatory verifier gating. Unverified or poisoned information can enter persistent memory precisely when the control is unavailable.
-
-**Recommendation:** Fail closed when verification policy cannot be loaded. Expose a not-ready state, emit a critical configuration event and require a separately controlled emergency override.
-
+**Issue:** Policy import/read failures disable mandatory verifier gating.  
+**Risk:** Unverified information can enter persistent memory when governance is unavailable.  
+**Recommendation:** Fail readiness closed and require a separately controlled emergency override.  
 **Status:** OPEN
 
 ### KAI-MEMU-002 — HIGH — Missing LakeFS dependency silently replaces durable versioning with a non-durable stub
-
-**Issue:** Any exception importing the LakeFS client installs an in-memory replacement. The stub stores commits only in a process list and implements `revert()` as a no-op.
-
-**Risk:** The service may report commit identifiers and rollback behaviour while providing no durable history or actual rollback.
-
-**Recommendation:** Treat the durable version-store dependency as required whenever versioning is enabled. Fail readiness or explicitly expose versioning as disabled; never emulate successful rollback with a no-op.
-
+**Issue:** Import failure installs an in-memory implementation whose rollback is a no-op.  
+**Risk:** Commit and rollback behaviour may be reported without durable history or recovery.  
+**Recommendation:** Require the durable store when versioning is enabled and expose an explicit disabled state otherwise.  
 **Status:** OPEN
 
 ### KAI-MEMU-003 — MEDIUM — Graph ingest and forget fan-out ignore unsuccessful HTTP responses
-
-**Issue:** Graph fan-out awaits POST requests but does not inspect status codes or call `raise_for_status()`.
-
-**Risk:** HTTP 4xx and 5xx responses are treated as completed operations, allowing vector and graph memory to diverge silently.
-
-**Recommendation:** Validate accepted status codes, emit structured failure metrics and use a durable idempotent retry/outbox mechanism.
-
+**Issue:** Fan-out requests do not validate status codes.  
+**Risk:** Vector and graph stores can silently diverge.  
+**Recommendation:** Validate responses and use an idempotent durable outbox.  
 **Status:** OPEN
 
 ### KAI-MEMU-004 — MEDIUM — Core memory request models lack bounded validation
-
-**Issue:** Queries, session IDs, notes, event data, scores and embeddings use unconstrained fields.
-
-**Risk:** Oversized or malformed payloads can consume resources or corrupt ranking and persistence logic.
-
-**Recommendation:** Add strict lengths, finite numeric ranges, timestamp parsing, nested-object limits and an application-wide body cap.
-
+**Issue:** Text, identifiers, nested objects, scores and embeddings are substantially unconstrained.  
+**Risk:** Oversized or malformed payloads can consume resources or corrupt persistence and ranking.  
+**Recommendation:** Add strict lengths, finite ranges, depth limits and a request-body cap.  
 **Status:** OPEN
 
 ---
@@ -167,53 +164,33 @@ The detailed Issue / Risk / Recommendation evidence for findings 1–63 remains 
 ## Verifier: `verifier/app.py`
 
 ### KAI-VER-001 — CRITICAL — Caller-supplied evidence can forge a PASS verdict
-
-**Issue:** `/verify` accepts an arbitrary `evidence_pack` and uses caller-controlled rank, relevance and importance scores directly.
-
-**Risk:** A caller can fabricate high-scoring evidence and obtain a PASS verdict from the service intended to authorise memory promotion and tool execution.
-
-**Recommendation:** Resolve immutable evidence IDs server-side or require signed evidence packs with issuer, digest, freshness and chain-of-custody validation.
-
+**Issue:** `/verify` accepts caller-controlled evidence and scores.  
+**Risk:** Fabricated evidence can produce a PASS from the authority used for promotion and execution.  
+**Recommendation:** Resolve immutable evidence server-side or require signed provenance-checked packs.  
 **Status:** OPEN — immediate remediation required
 
-### KAI-VER-002 — HIGH — Evidence quantity and duplicates can inflate verification confidence
-
-**Issue:** Support and strong-chunk counts do not check semantic duplication, source independence or circular provenance.
-
-**Risk:** Repeated copies of one assertion can satisfy corroboration thresholds without independent evidence.
-
-**Recommendation:** Deduplicate semantically, group by source lineage and count corroboration only across independent trusted sources.
-
+### KAI-VER-002 — HIGH — Evidence quantity and duplicates can inflate confidence
+**Issue:** Strong chunks are counted without semantic deduplication or source-independence checks.  
+**Risk:** Repeated copies can masquerade as corroboration.  
+**Recommendation:** Deduplicate by lineage and count only independent trusted sources.  
 **Status:** OPEN
 
-### KAI-VER-003 — MEDIUM — Any sufficiently long context automatically improves plausibility
-
-**Issue:** Plausibility increases whenever context exceeds 20 characters, regardless of relevance or contradiction.
-
-**Risk:** Irrelevant filler can increase the aggregate score.
-
-**Recommendation:** Remove unconditional bonuses and score context only through evidence-grounded entailment and contradiction analysis.
-
+### KAI-VER-003 — MEDIUM — Long context automatically improves plausibility
+**Issue:** Context over 20 characters receives an unconditional score bonus.  
+**Risk:** Irrelevant filler can shift verdicts upward.  
+**Recommendation:** Replace with grounded entailment and contradiction analysis.  
 **Status:** OPEN
 
-### KAI-VER-004 — MEDIUM — Health endpoint reports healthy without checking verification dependencies
-
-**Issue:** `/health` does not test Memu availability or policy coherence.
-
-**Risk:** Safety-critical traffic may be routed to an instance unable to verify evidence.
-
-**Recommendation:** Separate liveness and readiness and validate required dependencies with bounded deadlines.
-
+### KAI-VER-004 — MEDIUM — Health does not check verification dependencies
+**Issue:** Health omits Memu availability and policy coherence.  
+**Risk:** Traffic can be routed to an incapable verifier.  
+**Recommendation:** Separate liveness and dependency-aware readiness.  
 **Status:** OPEN
 
 ### KAI-VER-005 — MEDIUM — Verdict counters are process-local and concurrency-unsafe
-
-**Issue:** Verdict telemetry uses an unsynchronised process dictionary.
-
-**Risk:** Multi-worker metrics are incomplete and divergent.
-
-**Recommendation:** Use atomic counters in a proper metrics backend.
-
+**Issue:** Metrics use an unsynchronised process dictionary.  
+**Risk:** Multi-worker telemetry is incomplete.  
+**Recommendation:** Use atomic shared metrics.  
 **Status:** OPEN
 
 ---
@@ -221,215 +198,225 @@ The detailed Issue / Risk / Recommendation evidence for findings 1–63 remains 
 ## Executor: `executor/app.py`
 
 ### KAI-EXEC-001 — CRITICAL — Shell allowlist permits arbitrary code and host-control operations
-
-**Issue:** The allowlist includes `python3`, `pip`, `git`, `make`, `docker` and `curl`. Checking only the first executable and using `shell=False` does not constrain these programs.
-
-**Risk:** A caller can execute arbitrary code, install packages, control containers or exfiltrate data. Docker socket or sensitive mounts could turn this into host compromise.
-
-**Recommendation:** Remove general-purpose interpreters and control clients. Implement typed operations in disposable hardened sandboxes with read-only filesystems and explicit egress controls.
-
+**Issue:** Allowed commands include interpreters, package managers, Docker and unrestricted HTTP clients.  
+**Risk:** Callers can run code, control containers or exfiltrate data.  
+**Recommendation:** Replace generic commands with fixed-schema operations in hardened disposable sandboxes.  
 **Status:** OPEN — immediate remediation required
 
 ### KAI-EXEC-002 — CRITICAL — Python expression sandbox can reach imported module state
-
-**Issue:** The wrapper imports modules and evaluates the caller expression in its global namespace. AST checks permit ordinary attribute and subscript access to imported module state.
-
-**Risk:** Crafted expressions can escape the intended restricted namespace. This is not a security sandbox.
-
-**Recommendation:** Remove arbitrary Python evaluation. Interpret a strict pure-expression AST or use a disposable hardened code sandbox.
-
+**Issue:** Caller expressions are evaluated in a wrapper with imported modules; AST filtering is not a security boundary.  
+**Risk:** Crafted expressions can escape the intended namespace.  
+**Recommendation:** Remove arbitrary `eval`; interpret a strict pure-expression AST or use hardened isolation.  
 **Status:** OPEN — immediate remediation required
 
-### KAI-EXEC-003 — CRITICAL — Execution endpoint lacks authentication and proof of Tool Gate approval
-
-**Issue:** `/execute` accepts execution requests without validating caller identity, a signed gate decision, request digest, nonce, expiry or policy verdict.
-
-**Risk:** Any reachable caller can bypass Tool Gate and invoke execution directly.
-
-**Recommendation:** Require mutual service authentication and a short-lived replay-protected capability signed over the complete canonical request.
-
+### KAI-EXEC-003 — CRITICAL — Execution endpoint lacks authentication and Tool Gate proof
+**Issue:** `/execute` accepts requests without an authenticated immutable approval.  
+**Risk:** Reachable callers can bypass Tool Gate.  
+**Recommendation:** Require mTLS and a replay-protected capability signed over the canonical request.  
 **Status:** OPEN — immediate remediation required
 
 ### KAI-EXEC-004 — HIGH — Subprocess output is fully buffered before truncation
-
-**Issue:** `capture_output=True` buffers stdout and stderr completely; the configured cap is applied only after process completion and only to stdout.
-
-**Risk:** A subprocess can exhaust executor memory.
-
-**Recommendation:** Stream through bounded pipes and enforce OS-level CPU, memory, process and file-size limits.
-
+**Issue:** stdout and stderr are buffered before output limits are applied.  
+**Risk:** Output can exhaust memory.  
+**Recommendation:** Stream through bounded pipes and apply OS resource limits.  
 **Status:** OPEN
 
-### KAI-EXEC-005 — HIGH — Malware scanning fails open when unavailable or errored
-
-**Issue:** Missing ClamAV is represented as clean, while only scanner return code 1 blocks execution.
-
-**Risk:** Production may claim scanning while executing with no scanner or after scanner failure.
-
-**Recommendation:** Fail closed where scanning is required and expose scanner state, version and signature age in readiness and policy context.
-
+### KAI-EXEC-005 — HIGH — Malware scanning fails open
+**Issue:** Missing or errored scanning does not block execution.  
+**Risk:** Payloads execute without a functioning scanner.  
+**Recommendation:** Fail closed where scanning is required and expose scanner readiness.  
 **Status:** OPEN
 
-### KAI-EXEC-006 — HIGH — State rollback does not roll back execution effects
-
-**Issue:** Rollback merely pops request metadata from a process list and does not reverse filesystem, network, container or repository effects.
-
-**Risk:** Failed actions can leave persistent changes while the system implies rollback occurred.
-
-**Recommendation:** Rename this as history bookkeeping. Use transactional adapters, snapshots or disposable environments for genuinely reversible actions.
-
+### KAI-EXEC-006 — HIGH — State rollback does not reverse execution effects
+**Issue:** Rollback only removes request metadata.  
+**Risk:** Persistent side effects remain while recovery is implied.  
+**Recommendation:** Remove rollback claims or implement transactional adapters and verified snapshots.  
 **Status:** OPEN
 
 ### KAI-EXEC-007 — MEDIUM — Execution history exposes raw parameters and is process-local
-
-**Issue:** `/history` returns raw commands, arguments and expressions without visible authentication.
-
-**Risk:** Secrets may be disclosed and history is incomplete across workers or restarts.
-
-**Recommendation:** Restrict access, redact structurally and store immutable records centrally.
-
+**Issue:** Raw commands and arguments are returned without visible authentication.  
+**Risk:** Secrets may leak and history is incomplete.  
+**Recommendation:** Restrict access, redact structurally and centralise immutable records.  
 **Status:** OPEN
 
-### KAI-EXEC-008 — MEDIUM — Internal execution errors and subprocess stderr leak to callers
-
-**Issue:** Generic exceptions and raw stderr are included in API responses.
-
-**Risk:** Filesystem paths, versions and internal behaviour may be exposed.
-
-**Recommendation:** Return stable error codes and trace IDs; retain details only in access-controlled logs.
-
+### KAI-EXEC-008 — MEDIUM — Internal errors and stderr leak to callers
+**Issue:** Raw exceptions and stderr are returned in API responses.  
+**Risk:** Internal paths, versions and behaviour are disclosed.  
+**Recommendation:** Return stable codes and trace IDs; keep details in protected logs.  
 **Status:** OPEN
 
-### KAI-EXEC-009 — MEDIUM — Executor inputs and history limits lack bounded validation
-
-**Issue:** Tool fields, nested parameters, commands, expressions and history limits are not consistently bounded.
-
-**Risk:** Oversized payloads can increase parsing, memory and logging load.
-
-**Recommendation:** Add strict schema constraints and application-wide body limits.
-
+### KAI-EXEC-009 — MEDIUM — Executor inputs lack bounded validation
+**Issue:** Commands, expressions, arguments, nested params and history limits lack consistent bounds.  
+**Risk:** Pathological inputs can increase memory and parsing load.  
+**Recommendation:** Add strict schemas and application-wide body limits.  
 **Status:** OPEN
 
 ---
 
-## Trust ledger: `trust-ledger/app.py` and `trust-ledger/ledger.py`
+## Trust ledger: `trust-ledger/app.py`, `trust-ledger/ledger.py`
 
-### KAI-TLED-001 — CRITICAL — Trust-ledger mutation and acknowledgement endpoints are unauthenticated
-
-**Issue:** Despite the module header describing HMAC-authenticated writes and operator reads, no authentication middleware or dependency protects `POST /trust/event`, `POST /trust/alignment-audit` or `PATCH /trust/events/{event_id}/ack`.
-
-**Risk:** Any reachable caller can create GRANT, REVOKE, OVERRIDE, autonomous-action or alignment events and can falsely acknowledge them as the operator. Trust scores and governance decisions can be manipulated directly.
-
-**Recommendation:** Require mutually authenticated service identities and role-scoped authorisation. Bind each write to a canonical signed request with timestamp, nonce, expiry and idempotency key. Require a separate operator credential for acknowledgements.
-
+### KAI-TLED-001 — CRITICAL — Mutation and acknowledgement endpoints are unauthenticated
+**Issue:** Trust writes and operator acknowledgements have no effective authentication.  
+**Risk:** Reachable callers can fabricate governance records and endorsements.  
+**Recommendation:** Require authenticated service identity and separate operator authorisation.  
 **Status:** OPEN — immediate remediation required
 
-### KAI-TLED-002 — CRITICAL — Trust ledger uses a predictable default HMAC secret
-
-**Issue:** `TRUST_LEDGER_HMAC_SECRET` defaults to the literal `trust-dev-secret` when unset.
-
-**Risk:** Any deployment missing the environment variable uses a publicly knowable signing key. An attacker with file access can forge events and recompute a valid chain.
-
-**Recommendation:** Refuse startup without a strong secret supplied by a secret manager. Support key identifiers and rotation, and alert if a development key is detected.
-
+### KAI-TLED-002 — CRITICAL — Predictable default HMAC secret
+**Issue:** The signing key defaults to `trust-dev-secret`.  
+**Risk:** Misconfigured deployments produce forgeable records.  
+**Recommendation:** Refuse startup without a strong managed secret and support rotation.  
 **Status:** OPEN — immediate remediation required
 
-### KAI-TLED-003 — HIGH — Trust-critical event fields are excluded from the signature
-
-**Issue:** Event HMACs cover only event ID, timestamp, event type, initiator and `event_data`. They exclude `capability`, `trust_tier`, `previous_hash`, `operator_ack` and `operator_note`.
-
-**Risk:** Capability and trust-tier values can be altered in the JSONL file without invalidating the event signature. A record can therefore retain a valid cryptographic appearance while changing its governance meaning.
-
-**Recommendation:** Sign a canonical serialisation of every immutable field, including chain predecessor and schema version. Represent acknowledgements as separate signed events rather than mutable fields.
-
+### KAI-TLED-003 — HIGH — Trust-critical fields are excluded from signatures
+**Issue:** Capability, trust tier, predecessor and acknowledgement fields are outside the HMAC.  
+**Risk:** Governance meaning can be changed without invalidating signatures.  
+**Recommendation:** Sign a canonical encoding of every immutable field and append acknowledgements as new events.  
 **Status:** OPEN
 
-### KAI-TLED-004 — CRITICAL — Replay skips corrupt events and can report the filtered chain as intact
-
-**Issue:** `_replay()` skips malformed or integrity-mismatched lines and continues from the last accepted signature. `verify_chain()` then checks only the filtered in-memory event list.
-
-**Risk:** Deleted, altered or corrupt records can disappear from the reconstructed ledger, after which health and integrity endpoints may report the remaining chain as intact. This defeats detection of omission and truncation attacks.
-
-**Recommendation:** Halt replay at the first malformed or mismatched record, preserve forensic details and mark readiness failed. Verify the physical record sequence, line count and an externally anchored checkpoint before accepting new writes.
-
+### KAI-TLED-004 — CRITICAL — Replay skips corruption and verifies the filtered subset
+**Issue:** Invalid physical records are skipped during replay.  
+**Risk:** Removed or changed events can disappear while the remaining list reports intact.  
+**Recommendation:** Halt at the first invalid record and enter forensic read-only mode.  
 **Status:** OPEN — immediate remediation required
 
-### KAI-TLED-005 — HIGH — Operator acknowledgements are neither persisted nor cryptographically bound
-
-**Issue:** `ack()` mutates only the in-memory event object. It does not append a new record, rewrite durable storage or update a signature.
-
-**Risk:** Acknowledgements disappear after restart and cannot be independently verified. Runtime responses and trust-score calculations may differ from the durable ledger.
-
-**Recommendation:** Model acknowledgement as a new append-only signed event referencing the original event ID, authenticated operator and note digest.
-
+### KAI-TLED-005 — HIGH — Acknowledgements are not durable or cryptographically bound
+**Issue:** Acknowledgement mutates only in-memory fields.  
+**Risk:** It disappears after restart and cannot be independently verified.  
+**Recommendation:** Append a signed acknowledgement event.  
 **Status:** OPEN
 
-### KAI-TLED-006 — HIGH — File-ledger append is non-atomic and concurrency-unsafe
-
-**Issue:** The service derives the predecessor from a mutable list, appends to that list and writes one JSON line without a lock, file lock, transaction, flush or `fsync`.
-
-**Risk:** Concurrent requests or multiple workers can create sibling chain entries, interleave writes, lose records or acknowledge success before durable storage.
-
-**Recommendation:** Use a transactional database with a unique predecessor/sequence constraint. For temporary file mode, enforce one writer, lock the append, flush and `fsync`, and verify the committed record before returning success.
-
+### KAI-TLED-006 — HIGH — File append is non-atomic and concurrency-unsafe
+**Issue:** Chain-head selection and JSONL append have no transactional lock or fsync.  
+**Risk:** Concurrent writers can create sibling records or data loss.  
+**Recommendation:** Use a serialised database transaction or a rigorously locked single-writer mode.  
 **Status:** OPEN
 
 ### KAI-TLED-007 — MEDIUM — Merkle publication is mutable, local and non-atomic
-
-**Issue:** Merkle manifests are read, extended and rewritten as an ordinary JSON array without locking, atomic replacement, signature or external timestamping.
-
-**Risk:** The publication history can be edited or lost together with the ledger and concurrent publications can overwrite one another. It does not provide an independent integrity anchor.
-
-**Recommendation:** Publish signed checkpoints to append-only external storage or transparency infrastructure. Use atomic writes and include ledger sequence, key ID and prior checkpoint.
-
+**Issue:** Checkpoints are ordinary rewritten local JSON without signature or external anchoring.  
+**Risk:** Ledger and proof history can be rewritten together.  
+**Recommendation:** Sign and publish checkpoints to independent append-only storage.  
 **Status:** OPEN
 
 ---
 
 ## Ledger worker: `ledger-worker/app.py`
 
-### KAI-LWORK-001 — HIGH — Ledger archives silently contain only the latest 10,000 entries
-
-**Issue:** `archive_snapshot()` calls `/ledger/tail?limit=10000` and writes the result as the current ledger snapshot without recording that earlier entries may be omitted.
-
-**Risk:** Once the ledger exceeds 10,000 records, archives are incomplete while appearing to be full backups. Recovery and forensic reconstruction may permanently lose older events.
-
-**Recommendation:** Export by immutable sequence ranges with pagination and checkpoint verification. Record first/last sequence, total source count, completeness and content digest in the archive manifest.
-
+### KAI-LWORK-001 — HIGH — Archives silently contain only the latest 10,000 entries
+**Issue:** A tail query is written as though it were a complete snapshot.  
+**Risk:** Older records disappear from backups once the ledger grows.  
+**Recommendation:** Export immutable ranges with completeness metadata and checkpoint verification.  
 **Status:** OPEN
 
-### KAI-LWORK-002 — MEDIUM — Ledger-worker operational endpoints lack visible authentication
-
-**Issue:** Manual verification, stats refresh, archive creation, archive listing and verification history are exposed without route-level authentication.
-
-**Risk:** Reachable callers can trigger expensive full-chain operations, force archive creation and inspect internal integrity status, paths and errors.
-
-**Recommendation:** Require operator authentication and scopes for mutation endpoints; restrict read endpoints and rate-limit expensive operations.
-
+### KAI-LWORK-002 — MEDIUM — Operational endpoints lack authentication
+**Issue:** Verification, refresh, archive and history routes are unprotected.  
+**Risk:** Reachable callers can trigger expensive work and inspect integrity metadata.  
+**Recommendation:** Require operator scopes and rate limits.  
 **Status:** OPEN
 
-### KAI-LWORK-003 — MEDIUM — Heartbeat notifications ignore unsuccessful HTTP responses
+### KAI-LWORK-003 — MEDIUM — Heartbeat notifications ignore unsuccessful responses
+**Issue:** Alert POST status codes are not validated.  
+**Risk:** Critical alerts can be rejected while delivery appears complete.  
+**Recommendation:** Validate delivery and use a durable retry queue.  
+**Status:** OPEN
 
-**Issue:** `_notify_heartbeat()` awaits the POST but does not inspect status codes.
+---
 
-**Risk:** Ledger integrity alerts can be rejected with 4xx or 5xx responses while the worker treats notification as completed.
+## Dashboard and API exposure: `dashboard/app.py`
 
-**Recommendation:** Validate accepted status codes, record delivery failure metrics and place critical integrity alerts in a durable retry queue.
+### KAI-DASH-001 — CRITICAL — Dashboard is an unauthenticated privileged mutation proxy
+**Issue:** Dashboard routes establish no browser-user identity or authorisation before forwarding state-changing calls. `/api/mode` uses a server-held Tool Gate token, allowing an unauthenticated browser request to exercise the dashboard's trusted identity. Other mutation routes similarly forward directly to internal services.  
+**Risk:** Any caller reaching port 8080 can exercise privileged internal capabilities through the dashboard and bypass intended service-boundary controls.  
+**Recommendation:** Put the dashboard behind strong operator authentication, enforce CSRF protection, apply route-level scopes and propagate a verified end-user identity rather than a universal server credential.  
+**Status:** OPEN — immediate remediation required
 
+### KAI-DASH-002 — HIGH — Sensitive personal, financial and operational data is exposed
+**Issue:** Unauthenticated routes return memories, thinking episodes, autobiographical and relationship data, identity state, emotional records, financial summaries, email/calendar-adjacent feeds, logs, fleet details, policy hashes and service errors.  
+**Risk:** A reachable caller can obtain highly sensitive operator information and internal architecture intelligence.  
+**Recommendation:** Classify data, require least-privilege read scopes, redact by default and expose only the minimum UI projection.  
+**Status:** OPEN
+
+### KAI-DASH-003 — HIGH — Unauthenticated identity and memory mutations are available
+**Issue:** Routes can create/update goals, edit SOUL and AGENTS content, record finance/CIS entries, submit feedback, emotional records, reflections, relationship milestones, confessions, autobiography and legacy content, and trigger dream/introspection actions.  
+**Risk:** Attackers can poison durable memory, alter identity/governance material and initiate consequential backend work.  
+**Recommendation:** Require explicit operator authentication, per-operation authorisation, immutable audit linkage and confirmation for high-impact identity changes.  
+**Status:** OPEN
+
+### KAI-DASH-004 — HIGH — Readiness can report ready while go/no-go is NO_GO
+**Issue:** `core_ready` checks only selected node liveness and tests `ledger_size >= 0` and `memory_count >= 0`. Failed dependency reads default both values to zero, which satisfies the test. `/readiness` ignores the separate go/no-go decision.  
+**Risk:** Orchestration can mark the dashboard ready despite failed evidence stores, insufficient gate proof or other explicit NO_GO blockers.  
+**Recommendation:** Derive readiness from mandatory dependency checks and require the go/no-go decision to be GO; distinguish unknown from zero.  
+**Status:** OPEN
+
+### KAI-DASH-005 — HIGH — Internal Redis event stream is exposed without access control
+**Issue:** `/api/events` subscribes to health, episode, breaker and memory channels and streams their payloads to any connected client.  
+**Risk:** Internal events and potentially sensitive memory/episode metadata can be monitored continuously; connection floods can also consume Redis and application resources.  
+**Recommendation:** Authenticate SSE clients, authorise channels, redact event payloads, cap concurrent streams and enforce idle/lifetime limits.  
+**Status:** OPEN
+
+### KAI-DASH-006 — MEDIUM — Proxy inputs and pagination lack consistent bounds
+**Issue:** Raw JSON bodies and query parameters such as `top_k`, `limit`, query text, category and session IDs are forwarded without strict size/range schemas.  
+**Risk:** Oversized requests and extreme fan-out/result sizes can pressure the dashboard and backend services.  
+**Recommendation:** Use typed Pydantic models, global body limits, finite pagination caps and allowlisted fields.  
+**Status:** OPEN
+
+### KAI-DASH-007 — MEDIUM — Sequential fleet polling creates latency and false cascades
+**Issue:** `fetch_status()` requests every node sequentially with a per-node timeout. Index and go/no-go paths repeat additional backend calls.  
+**Risk:** A few slow services can multiply response time and make healthy systems appear unavailable under load.  
+**Recommendation:** Poll concurrently with a total deadline, cache briefly and avoid duplicate dependency calls within one report.  
+**Status:** OPEN
+
+---
+
+## Deployment and runtime: `docker-compose.minimal.yml`, representative Dockerfiles
+
+### KAI-DEP-001 — CRITICAL — Network service receives Docker socket access
+**Issue:** `docker-watcher` mounts `/var/run/docker.sock` while publishing port 8041. Marking the socket mount read-only does not make Docker API operations read-only; the Unix socket remains a control channel.  
+**Risk:** A compromise of the service or its dependencies can generally create privileged containers, mount the host filesystem and obtain host-level control.  
+**Recommendation:** Remove direct socket access. Use a narrowly scoped authenticated proxy exposing only required read operations, or collect metrics through a separate hardened host agent.  
+**Status:** OPEN — immediate remediation required
+
+### KAI-DEP-002 — HIGH — Internal services are broadly published on host interfaces
+**Issue:** Tool Gate, Memu, introspection, agentic, heartbeat, dashboard, sensory services, broker, Docker watcher, calendar, supervisor, verifier and numerous other internal components use host mappings such as `"8000:8000"`, which bind to all host interfaces by default.  
+**Risk:** Controls designed as internal service boundaries become directly reachable from the host network and potentially the wider LAN, magnifying every unauthenticated endpoint finding.  
+**Recommendation:** Publish only the intended ingress, bind local-only development ports to `127.0.0.1`, and keep internal services on non-published segmented networks.  
+**Status:** OPEN
+
+### KAI-DEP-003 — HIGH — Development HMAC mode is enabled by default
+**Issue:** Tool Gate and agentic are launched with `HMAC_ALLOW_DEV_SECRET: "true"`.  
+**Risk:** Development signing behaviour can remain active in real deployments, weakening service authentication and making predictable credentials operationally acceptable.  
+**Recommendation:** Default development-secret support to false, refuse it outside an explicit development profile and fail startup when production key material is absent.  
+**Status:** OPEN
+
+### KAI-DEP-004 — HIGH — Database credentials have a predictable deployment default
+**Issue:** PostgreSQL and service connection strings fall back to password `localdev`.  
+**Risk:** Any deployment that omits `DB_PASSWORD` runs with a source-known credential. The flat internal network and exposed services increase the chance of lateral access.  
+**Recommendation:** Require a generated secret, reject known development values and use a secret manager or Compose secrets rather than ordinary environment interpolation.  
+**Status:** OPEN
+
+### KAI-DEP-005 — HIGH — One flat bridge network collapses service trust boundaries
+**Issue:** Database, Redis, LLM, governance, execution-adjacent, dashboard, personal-data and sensory services share the same `/16` bridge network with no network-level segmentation.  
+**Risk:** Compromise of a low-trust feed or UI service provides direct network reachability to high-trust stores and control services.  
+**Recommendation:** Segment ingress/UI, data, governance/execution, observability and external-fetch services; permit only explicit service-to-service flows.  
+**Status:** OPEN
+
+### KAI-DEP-006 — MEDIUM — Runtime images are not pinned by immutable digest
+**Issue:** Images include mutable references such as `ollama/ollama:latest`, `python:3.11-slim`, `redis:7-alpine` and `pgvector/pgvector:pg15` rather than immutable digests.  
+**Risk:** Rebuilds can silently consume different upstream content, weakening reproducibility, rollback and supply-chain review.  
+**Recommendation:** Pin production images by digest, automate reviewed updates and generate an SBOM/provenance record for each release.  
 **Status:** OPEN
 
 ---
 
 ## Current totals
 
-- Findings logged: **91**
-- Critical: **16**
-- High: **38**
-- Medium: **36**
+- Findings logged: **104**
+- Critical: **18**
+- High: **46**
+- Medium: **39**
 - Low: **1**
 - Current security posture: **HIGH RISK / NOT READY FOR EXTERNAL EXPOSURE**
 - Audit state: **IN PROGRESS**
 
 ## Files materially reviewed
 
-`agentic/app.py`, `agentic/web_scout.py`, `common/auth.py`, `tool-gate/app.py`, `common/runtime.py`, `common/resilience.py`, `common/llm.py`, `agentic/swarm.py`, `agentic/swarm_stages.py`, `agentic/cognitive_fsm.py`, `agentic/trust_integration.py`, `agentic/trust_core.py`, `agentic/router.py`, `supervisor/app.py`, `memu-core/app.py`, `verifier/app.py`, `executor/app.py`, `trust-ledger/app.py`, `trust-ledger/ledger.py`, `ledger-worker/app.py`.
+`agentic/app.py`, `agentic/web_scout.py`, `common/auth.py`, `tool-gate/app.py`, `common/runtime.py`, `common/resilience.py`, `common/llm.py`, `agentic/swarm.py`, `agentic/swarm_stages.py`, `agentic/cognitive_fsm.py`, `agentic/trust_integration.py`, `agentic/trust_core.py`, `agentic/router.py`, `supervisor/app.py`, `memu-core/app.py`, `verifier/app.py`, `executor/app.py`, `trust-ledger/app.py`, `trust-ledger/ledger.py`, `ledger-worker/app.py`, `dashboard/app.py`, `docker-compose.minimal.yml`, `dashboard/Dockerfile`, `docker-watcher/Dockerfile`.
