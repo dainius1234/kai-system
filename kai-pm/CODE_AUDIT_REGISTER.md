@@ -309,13 +309,125 @@ Last updated: 26 July 2026
 
 ---
 
+## Swarm state and scoring: `agentic/swarm.py`
+
+### KAI-SWARM-001 — HIGH — Reputation persistence is non-atomic and multi-worker unsafe
+
+**Issue:** Teammate reputation is maintained in a process-global dictionary and saved by replacing the JSON file directly with `Path.write_text()`, without locking, revision control, atomic replacement or a shared transactional store.
+
+**Risk:** Concurrent swarm requests or multiple workers can lose updates, overwrite each other, partially corrupt the file, or maintain divergent reputations. A corrupted load silently resets all reputation to an empty state.
+
+**Recommendation:** Store reputation in Redis or a transactional database with atomic increments and versioning. If file persistence remains temporarily, use a lock, temporary file, `fsync`, atomic replacement and explicit corruption alerts.
+
+**Status:** OPEN
+
+### KAI-SWARM-002 — HIGH — Conviction score rewards evidence quantity rather than evidence quality
+
+**Issue:** Conflict resolution assigns evidence score solely from the number of evidence items and causal score solely from the number of generated causal chains. It does not assess source independence, provenance, duplication, recency, contradiction, verification strength or chain validity.
+
+**Risk:** Duplicate, low-quality, poisoned or model-generated material can increase conviction merely by increasing item count. The system can become more confident without becoming more correct.
+
+**Recommendation:** Score evidence by provenance, independence, source reliability, freshness, relevance and corroboration. Deduplicate semantically and require causal chains to be linked to supported evidence before contributing to conviction.
+
+**Status:** OPEN
+
+### KAI-SWARM-003 — MEDIUM — Reputation is trained from self-reported confidence rather than verified outcomes
+
+**Issue:** Successful handoffs add the stage's own confidence to reputation, while success is defined by pipeline completion rather than external correctness or later validation.
+
+**Risk:** An overconfident but inaccurate teammate can gain influence, creating a positive feedback loop in which self-confidence increases future voting weight.
+
+**Recommendation:** Separate operational reliability from epistemic accuracy. Update accuracy reputation only from verified outcomes, operator review, benchmark results or later contradiction resolution; apply decay and minimum-sample confidence intervals.
+
+**Status:** OPEN
+
+---
+
+## Swarm stages: `agentic/swarm_stages.py`
+
+### KAI-STAGE-001 — HIGH — Untrusted retrieved content is inserted directly into agent prompts
+
+**Issue:** Memory and world-state content are concatenated directly into LLM prompts without provenance boundaries, quoting, instruction stripping or a rule that retrieved text is data rather than instructions.
+
+**Risk:** Prompt injection stored in memory or obtained from external sources can manipulate claim extraction, debate, fact-checking and causal analysis across the entire swarm.
+
+**Recommendation:** Wrap retrieved content in strongly delimited data blocks, add explicit non-execution instructions, label provenance, run injection detection/classification and isolate external content from privileged system instructions.
+
+**Status:** OPEN
+
+### KAI-STAGE-002 — HIGH — Adversary failure is converted into successful conviction-gate completion
+
+**Issue:** Any exception in `conviction_gate()` returns `HandoffStatus.COMPLETE` with the incoming confidence unchanged. The FSM may therefore present the result when prior confidence already exceeds the threshold, despite the adversary stage not running successfully.
+
+**Risk:** A safety-critical challenge step can disappear without lowering conviction or blocking presentation, creating false assurance precisely when the adversary dependency is unavailable or malformed.
+
+**Recommendation:** Return a typed degraded or failed status, apply a defined confidence penalty and require operator escalation for high-impact swarm types when the adversary stage is unavailable.
+
+**Status:** OPEN
+
+### KAI-STAGE-003 — HIGH — Moral-imagination safety stage fails open without signalling degradation
+
+**Issue:** Any import or execution failure in the moral-imagination stage returns the original handoff unchanged. No degraded status, penalty or user-visible provenance is added.
+
+**Risk:** The pipeline can silently bypass an intended ethical/safety analysis while producing an output indistinguishable from one that passed the stage.
+
+**Recommendation:** Mark the handoff degraded, record the missing control in structured output, reduce conviction and fail closed or escalate for actions with financial, physical, legal or autonomy impact.
+
+**Status:** OPEN
+
+### KAI-STAGE-004 — MEDIUM — JSON parse failure can be recorded as a successful stage
+
+**Issue:** Gather and causal stages convert malformed model JSON to empty lists but still call `record_success()` and return `COMPLETE`; causal analysis receives a baseline confidence of 5.0 even when no chain was parsed.
+
+**Risk:** Model-format failures improve teammate reliability statistics and permit weak or absent reasoning to appear operationally successful.
+
+**Recommendation:** Distinguish valid-empty results from parse failures. Return degraded status for malformed structured output, record a format error and exclude failed parses from successful reputation updates.
+
+**Status:** OPEN
+
+---
+
+## Cognitive FSM: `agentic/cognitive_fsm.py`
+
+### KAI-FSM-001 — HIGH — Failed fact-check reruns gathering but skips fact-check revalidation
+
+**Issue:** When fact-check returns `FAIL`, the FSM reruns the gather stage once and then proceeds directly to causal checking. The newly gathered claims and evidence are not passed through fact-check again.
+
+**Risk:** Unverified or previously failed claims can advance to causal analysis and conviction scoring. The retry path does not actually satisfy the failed validation gate.
+
+**Recommendation:** Loop back through `GATHER → DEBATE or FACT_CHECK` with a bounded retry counter, and only proceed when the new evidence has been explicitly revalidated.
+
+**Status:** OPEN
+
+### KAI-FSM-002 — HIGH — Unexpected stage exceptions escape the FSM
+
+**Issue:** `_run_stage()` catches only `asyncio.TimeoutError`. Any other exception raised outside a stage's own local handler propagates out of `run()` and bypasses the FSM's HALT result and transition logging.
+
+**Risk:** A malformed dependency, programmer error or cancellation edge case can crash the request path without a structured halt reason, violating the stated guarantee that failures transition to HALT.
+
+**Recommendation:** Catch expected operational exceptions at the FSM boundary, preserve cancellation semantics, emit a failed handoff and transition to HALT with a stable error code and trace ID.
+
+**Status:** OPEN
+
+### KAI-FSM-003 — MEDIUM — AgentHandoff claims schema is not runtime validated
+
+**Issue:** `AgentHandoff` is a plain dataclass; confidence ranges, stage names, payload shape and claim dictionary contents are not validated despite documentation calling the handoffs schema-validated.
+
+**Risk:** Invalid confidence values, malformed claims or inconsistent stage transitions can enter the pipeline and affect threshold logic or cause downstream errors.
+
+**Recommendation:** Use Pydantic or explicit `__post_init__` validation, clamp or reject non-finite confidence values and validate legal state transitions centrally.
+
+**Status:** OPEN
+
+---
+
 ## Audit summary
 
-- Findings logged: 27
+- Findings logged: 39
 - Critical: 6
-- High: 11
-- Medium: 9
+- High: 19
+- Medium: 13
 - Low: 1
-- Files materially reviewed: `agentic/app.py`, `agentic/web_scout.py`, `common/auth.py`, `tool-gate/app.py`, `common/runtime.py`, `common/resilience.py`, `common/llm.py`
+- Files materially reviewed: `agentic/app.py`, `agentic/web_scout.py`, `common/auth.py`, `tool-gate/app.py`, `common/runtime.py`, `common/resilience.py`, `common/llm.py`, `agentic/swarm.py`, `agentic/swarm_stages.py`, `agentic/cognitive_fsm.py`
 - Current security posture: HIGH RISK / NOT READY FOR EXTERNAL EXPOSURE
 - Audit state: IN PROGRESS
