@@ -297,6 +297,60 @@ class TrustCore:
             "progress_to_next": progress,
         }
 
+    def promotion_readiness(self) -> Dict[str, Any]:
+        """Return a structured readiness report for the next trust level.
+
+        Includes gap analysis, auto-eligibility flag, and a plain-English summary
+        so the operator can make an informed promotion decision at a glance.
+        """
+        if self.level >= TrustLevel.GUARDIAN:
+            return {
+                "current_level": self.level_name,
+                "current_level_int": self._record.level,
+                "next_level": None,
+                "auto_eligible": False,
+                "gaps": {},
+                "scores": self.scores(),
+                "thresholds": {},
+                "summary": "Kai is already at GUARDIAN — the highest trust level.",
+            }
+
+        next_level = TrustLevel(self._record.level + 1)
+        thresholds = PROMOTION_THRESHOLDS.get(next_level, {})
+        sc = self.scores()
+        gaps: Dict[str, float] = {}
+        all_met = True
+        for dim, target in thresholds.items():
+            gap = max(0.0, target - sc.get(dim, 0.0))
+            gaps[dim] = round(gap, 2)
+            if gap > 0:
+                all_met = False
+
+        if all_met and thresholds:
+            summary = (
+                f"All thresholds met for {next_level.name}. "
+                "Auto-promotion criteria satisfied — promotion can be granted."
+            )
+        elif all_met and not thresholds:
+            summary = f"No evidence required for {next_level.name}. Ready to promote."
+        else:
+            parts = [
+                f"{dim}: {gaps[dim]:.1f} more needed" for dim in gaps if gaps[dim] > 0
+            ]
+            summary = f"Not yet eligible for {next_level.name}. Gaps: {'; '.join(parts)}."
+
+        return {
+            "current_level": self.level_name,
+            "current_level_int": self._record.level,
+            "next_level": next_level.name,
+            "next_level_int": next_level.value,
+            "scores": sc,
+            "thresholds": thresholds,
+            "gaps": gaps,
+            "auto_eligible": all_met,
+            "summary": summary,
+        }
+
     def audit_tail(self, n: int = 20) -> List[Dict[str, Any]]:
         """Return the last n audit events."""
         if not self._audit_path.exists():
