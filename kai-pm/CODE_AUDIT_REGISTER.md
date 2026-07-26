@@ -25,17 +25,17 @@ Last updated: 26 July 2026
 
 **Recommendation:** Add central authentication and route-level scopes: `read`, `operate`, `admin`, `trust_admin`, and `trading`. Sign internal service calls with timestamp, nonce, and replay protection.
 
-**Status:** OPEN
+**Status:** OPEN — confirmed that `common.auth.verify_gate_signature` is used by Tool Gate only, not as general Agentic API middleware.
 
-### KAI-CORE-002 — CRITICAL — Possible SSRF through Web Scout
+### KAI-CORE-002 — CRITICAL — SSRF through Web Scout
 
-**Issue:** Caller-supplied URLs reach Web Scout fetch and summarise operations without visible validation at the API boundary.
+**Issue:** `agentic/web_scout.py` validates only that the URL scheme is HTTP or HTTPS. It does not block loopback, private, link-local, reserved, multicast, metadata, Docker-internal or credential-bearing targets. Redirects are followed automatically without target revalidation.
 
-**Risk:** Requests may reach loopback, Docker-internal services, private networks, link-local addresses, metadata services, or credential-bearing endpoints.
+**Risk:** A caller may use Kai to query internal services, localhost, host-network resources, cloud metadata endpoints or other non-public systems.
 
-**Recommendation:** Validate HTTP/HTTPS URLs after DNS resolution; block private, loopback, link-local, multicast, reserved and credential-bearing targets; revalidate every redirect.
+**Recommendation:** Resolve and validate every destination IP before connection and after every redirect. Block private, loopback, link-local, multicast, unspecified and reserved ranges; reject embedded credentials; constrain ports and redirect count; use a dedicated egress proxy where possible.
 
-**Status:** OPEN — requires inspection of `agentic/web_scout.py`
+**Status:** OPEN — CONFIRMED
 
 ### KAI-CORE-003 — HIGH — Context-budget enforcement can exceed its own limit
 
@@ -109,7 +109,7 @@ Last updated: 26 July 2026
 
 ### KAI-CORE-010 — LOW — Timezone-naive UTC timestamps
 
-**Issue:** Conversation memory uses `datetime.utcnow().isoformat()`.
+**Issue:** Conversation memory and world-state persistence use `datetime.utcnow().isoformat()`.
 
 **Risk:** Ambiguous timestamps during exchange, ordering, migration, or cross-system analysis.
 
@@ -119,12 +119,91 @@ Last updated: 26 July 2026
 
 ---
 
+## Web access: `agentic/web_scout.py`
+
+### KAI-WEB-001 — CRITICAL — Trust control fails open
+
+**Issue:** `_check_trust()` permits Web Scout operations when trust infrastructure raises any unexpected exception.
+
+**Risk:** A broken import, corrupted trust state, programming error or unavailable trust dependency silently removes the intended trust boundary.
+
+**Recommendation:** Fail closed for autonomous and externally directed network access. Return a distinct `trust_unavailable` result and emit a high-severity audit event.
+
+**Status:** OPEN
+
+### KAI-WEB-002 — HIGH — Response body is downloaded without a byte limit
+
+**Issue:** `httpx.Client.get()` buffers the complete response before text is truncated to `max_chars`. `content_length` is measured only after the full body has been received.
+
+**Risk:** A large or endless response can consume excessive memory, bandwidth and worker time despite a small configured output limit.
+
+**Recommendation:** Stream responses, enforce a strict maximum byte count, reject excessive declared content lengths, and stop reading once the cap is reached.
+
+**Status:** OPEN
+
+### KAI-WEB-003 — MEDIUM — Error responses expose raw network exception text
+
+**Issue:** Web Scout returns `str(exc)` in public result objects.
+
+**Risk:** DNS details, proxy configuration, internal addresses, certificate information or connection behaviour may be disclosed.
+
+**Recommendation:** Return stable error codes externally and retain full exception details only in structured internal logs.
+
+**Status:** OPEN
+
+---
+
+## Authentication: `common/auth.py` and `tool-gate/app.py`
+
+### KAI-AUTH-001 — CRITICAL — HMAC does not bind the full request
+
+**Issue:** The signature payload contains only `actor_did`, `session_id`, `tool`, `nonce` and integer timestamp. It excludes `params`, `conviction`, `cosign`, `rationale`, `device`, `request_source`, `trace_id` and `idempotency_key`.
+
+**Risk:** A valid signed request can be modified after signing. In particular, conviction can be raised, `cosign` can be changed to `true`, and tool parameters can be replaced while the signature remains valid.
+
+**Recommendation:** Sign a canonical serialization of every security-relevant field, including method, route, body digest, actor, session, nonce, timestamp and key ID. Reject duplicate JSON keys and non-canonical numerical forms.
+
+**Status:** OPEN — immediate remediation required
+
+### KAI-AUTH-002 — CRITICAL — Idempotency lookup occurs before authentication and request validation
+
+**Issue:** `/gate/request` checks the caller-supplied idempotency key and returns a cached `GateDecision` before token validation, signature verification, nonce validation, tool allowlisting or comparison with the current request body.
+
+**Risk:** Anyone who obtains or guesses a key may retrieve a previous decision. More seriously, an approved decision can be replayed for a different request carrying the same idempotency key, because the cache is not bound to a request digest or identity.
+
+**Recommendation:** Authenticate and validate first. Namespace idempotency keys by authenticated principal and route, store a canonical request hash with the decision, and reject reuse with non-identical content.
+
+**Status:** OPEN — immediate remediation required
+
+### KAI-AUTH-003 — HIGH — Nonce persistence is non-atomic and concurrency-unsafe
+
+**Issue:** The nonce cache is a process-global dictionary written wholesale with `Path.write_text()` on every accepted request, without a lock, atomic replacement or shared store.
+
+**Risk:** Concurrent requests may race; multi-worker instances maintain different replay caches; a crash during write can corrupt persistence; replay protection can be bypassed across workers or restarts.
+
+**Recommendation:** Use Redis `SET NX EX` or a transactional database uniqueness constraint for nonce consumption. Do not use a JSON file as the primary replay-control mechanism.
+
+**Status:** OPEN
+
+### KAI-AUTH-004 — HIGH — Co-sign is represented as an untrusted boolean in the request
+
+**Issue:** `cosign: bool` is accepted in `GateRequest`, and policy evaluation treats `cosign=True` as operator approval. The field is not cryptographically bound by the current HMAC.
+
+**Risk:** A caller able to submit a validly signed base request can elevate it to operator-approved status by changing one boolean.
+
+**Recommendation:** Remove direct co-sign assertion from ordinary gate requests. Represent approval as a separate, authenticated operator action referencing an immutable request hash and one-time challenge.
+
+**Status:** OPEN
+
+---
+
 ## Audit summary
 
-- Findings logged: 10
-- Critical: 2
-- High: 4
+- Findings logged: 17
+- Critical: 6
+- High: 7
 - Medium: 3
 - Low: 1
-- Current reviewed file risk: HIGH
+- Files materially reviewed: `agentic/app.py`, `agentic/web_scout.py`, `common/auth.py`, `tool-gate/app.py`
+- Current security posture: HIGH RISK / NOT READY FOR EXTERNAL EXPOSURE
 - Audit state: IN PROGRESS
