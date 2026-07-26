@@ -136,16 +136,70 @@ The complete Issue / Risk / Recommendation evidence for findings 1–63 is retai
 
 ---
 
+## Verifier: `verifier/app.py`
+
+### KAI-VER-001 — CRITICAL — Caller-supplied evidence can forge a PASS verdict
+
+**Issue:** `/verify` accepts an arbitrary `evidence_pack` from the caller and `_memory_cross_ref()` uses it directly instead of retrieving trusted evidence. Caller-controlled `rank_score`, `relevance`, `importance` and content are converted into support scores with no provenance, signature or source validation.
+
+**Risk:** A caller can fabricate duplicate high-scoring evidence records and obtain strong chunks and a PASS verdict from the service described as the single authority for memory promotion and tool execution.
+
+**Recommendation:** Never trust evidence scores supplied by ordinary callers. Accept only immutable evidence IDs resolved server-side from an authenticated store, or require signed evidence packs with issuer, digest, freshness and chain-of-custody validation.
+
+**Status:** OPEN — immediate remediation required
+
+### KAI-VER-002 — HIGH — Evidence quantity and duplicates can inflate verification confidence
+
+**Issue:** Memory support is calculated from the ratio of records above a threshold, and strong chunks are counted independently. There is no semantic deduplication, source independence check or cap per originating memory/source.
+
+**Risk:** Repeated copies of the same claim can create apparent corroboration and satisfy the minimum strong-chunk requirement without independent evidence.
+
+**Recommendation:** Deduplicate semantically, group by source lineage and count corroboration only across independent trusted sources. Penalise circular or self-referential evidence.
+
+**Status:** OPEN
+
+### KAI-VER-003 — MEDIUM — Any sufficiently long context automatically improves plausibility
+
+**Issue:** `_keyword_plausibility()` adds `0.1` whenever context exists and is longer than 20 characters, regardless of whether the context supports, contradicts or is unrelated to the claim.
+
+**Risk:** Irrelevant or adversarial filler can increase the aggregate verification score and shift a verdict from FAIL_CLOSED toward REPAIR or PASS.
+
+**Recommendation:** Remove unconditional context bonuses. Score context only through evidence-grounded entailment and contradiction analysis with explicit provenance.
+
+**Status:** OPEN
+
+### KAI-VER-004 — MEDIUM — Health endpoint reports healthy without checking verification dependencies
+
+**Issue:** `/health` always returns `status: ok` and policy metadata. It does not test Memu availability, policy validity or whether required thresholds are coherent.
+
+**Risk:** Orchestration can route safety-critical verification traffic to an instance unable to obtain evidence, while dashboards report it as healthy.
+
+**Recommendation:** Separate liveness and readiness. Readiness should validate policy configuration and required dependency connectivity with bounded deadlines.
+
+**Status:** OPEN
+
+### KAI-VER-005 — MEDIUM — Verdict counters are process-local and concurrency-unsafe
+
+**Issue:** `_verdict_counts` is a mutable process dictionary incremented without synchronisation or shared persistence.
+
+**Risk:** Multi-worker deployments expose incomplete and divergent metrics; concurrent increments may be lost, weakening alerting and audit reconstruction.
+
+**Recommendation:** Use a proper metrics backend with atomic counters and labels for verdict, policy version and source. Do not treat process-local dictionaries as fleet-wide telemetry.
+
+**Status:** OPEN
+
+---
+
 ## Current totals
 
-- Findings logged: **67**
-- Critical: **9**
-- High: **30**
-- Medium: **27**
+- Findings logged: **72**
+- Critical: **10**
+- High: **31**
+- Medium: **30**
 - Low: **1**
 - Current security posture: **HIGH RISK / NOT READY FOR EXTERNAL EXPOSURE**
 - Audit state: **IN PROGRESS**
 
 ## Files materially reviewed
 
-`agentic/app.py`, `agentic/web_scout.py`, `common/auth.py`, `tool-gate/app.py`, `common/runtime.py`, `common/resilience.py`, `common/llm.py`, `agentic/swarm.py`, `agentic/swarm_stages.py`, `agentic/cognitive_fsm.py`, `agentic/trust_integration.py`, `agentic/trust_core.py`, `agentic/router.py`, `supervisor/app.py`, `memu-core/app.py`.
+`agentic/app.py`, `agentic/web_scout.py`, `common/auth.py`, `tool-gate/app.py`, `common/runtime.py`, `common/resilience.py`, `common/llm.py`, `agentic/swarm.py`, `agentic/swarm_stages.py`, `agentic/cognitive_fsm.py`, `agentic/trust_integration.py`, `agentic/trust_core.py`, `agentic/router.py`, `supervisor/app.py`, `memu-core/app.py`, `verifier/app.py`.
