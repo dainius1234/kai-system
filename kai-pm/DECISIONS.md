@@ -2687,3 +2687,40 @@ The Auditor knows the full factor model: operator_approval_history (30%), value_
 **Tests:** `scripts/test_market_data.py` — 25 tests covering: known_symbols (sorted, uppercase), get_price unknown/case-insensitive, get_prices (basic fetch, unknown skipped, case-insensitive), cache (fresh hit skips network, stale triggers fetch, cache updated after fetch, mix of fresh+stale uses one network call), fail-open (ConnectionError, HTTP 429, malformed response all return {}), PriceQuote.to_dict(), status (empty, after fetch, fresh flag false when stale), mark_positions (no positions → {}, calls mark_to_market correctly, fail-open when paper_trader unavailable, no prices → {}), singleton lifecycle. All 25 pass.
 
 **Consequences:** Kai's paper ledger is now live: open positions carry automatically-updated unrealised P&L against real CoinGecko prices, refreshed every proactive cycle. The paper trading loop is complete — open → track → close with real price data. Real trading remains gated behind PARTNER trust; this D adds only the price information layer. Cumulative: 291 tests across D118–D127, all green in isolation.
+
+---
+
+## D128 — 2026-07-26 — Strategy Engine: Rule-Based Trading Signals
+
+**Context:** D125 gave Kai a paper ledger; D127 gave it live prices. The missing piece is a brain for deciding when to trade. D128 adds a pluggable strategy engine with three concrete strategies and a majority-vote consensus aggregator. The `auto_trade()` method closes the loop from signal → paper position, gated at AGENT (3) trust.
+
+**Decisions:**
+
+**New module — `agentic/strategy_engine.py`:**
+
+**`Signal` dataclass:** symbol, action ("buy"/"sell"/"hold"), confidence (0–1), strategy_name, reason, price, timestamp; `to_dict()`.
+
+**Three concrete strategies:**
+- `MomentumStrategy(lookback, threshold_pct)`: compares current price to price N periods ago. Up ≥ threshold → BUY; down ≥ threshold → SELL. Confidence scales linearly with magnitude (capped at 1.0). Requires `lookback + 1` prices.
+- `MovingAverageCrossStrategy(short, long)`: BUY on short MA crossing above long MA; SELL on cross below. Confidence = spread % / 2, capped at 1.0. `short >= long` raises ValueError. Requires `long + 1` prices.
+- `RSIStrategy(period, oversold, overbought)`: standard non-smoothed RSI. RSI < oversold → BUY; RSI > overbought → SELL. All gains → RSI=100 (sell). Requires `period + 1` prices.
+
+**`StrategyEngine` class:**
+- `evaluate(symbol, prices)` → `List[Signal]` — runs all strategies; individual failures return HOLD (fail-open). Trust: OBSERVER.
+- `consensus(symbol, prices)` → `Signal` — majority vote across strategies (strictly >50% for buy/sell, tie → hold). Confidence = fraction agreeing. Trust: OBSERVER.
+- `auto_trade(symbol, prices, quantity, strategy_tag)` — calls `_check_trust()` (AGENT/3) before acting. hold/low-confidence → no trade. buy → `open_position("long")`. sell → closes all open long positions for the symbol. PermissionError → `{"action": "denied"}`. Any other exception → `{"action": "error"}` (fail-open).
+- Default strategies: MomentumStrategy(lookback=10, threshold_pct=2), MovingAverageCrossStrategy(5, 20), RSIStrategy(14).
+
+**Trust gating:** `evaluate()/consensus()` = OBSERVER (just signals). `auto_trade()` = AGENT (3) via `trust_integration.gate_autonomous_action("decide_autonomously")`. Fail-open when trust infra missing.
+
+**New HTTP endpoints (FF_STRATEGY_ENGINE gate):**
+- `GET /strategy/status` — active strategy list.
+- `POST /strategy/evaluate` — body: `{symbol, prices}` → all strategy signals.
+- `POST /strategy/consensus` — body: `{symbol, prices}` → majority-vote signal.
+- `POST /strategy/auto-trade` — body: `{symbol, prices, quantity?, strategy_tag?}` → trade action. HTTP 403 on trust denial.
+
+**`/introspect/capabilities`:** Updated with `"strategy_engine": engine.status()`.
+
+**Tests:** `scripts/test_strategy_engine.py` — 38 tests covering: Signal.to_dict, Momentum (not enough data, rising→buy, falling→sell, flat→hold, confidence scaling, confidence cap, zero reference price), MACross (invalid short≥long, not enough data, verified bullish cross, verified bearish cross, no cross→hold, strategy name), RSI (not enough data, oversold→buy, overbought→sell, neutral→hold, all gains→RSI100→sell, strategy name), evaluate (one signal per strategy, fail-open on error, 3 default strategies), consensus (no strategies→hold, unanimous buy, majority wins, tie→hold, strategy_name=consensus), auto_trade (hold, low confidence→hold, buy opens long, sell closes long, sell with no positions, trust denied→denied dict, paper_trader error→error dict), status, singleton lifecycle. All 38 pass.
+
+**Consequences:** Kai now has a complete paper trading loop with a real brain: market prices → strategy signals → consensus → paper position → track P&L. Real autonomous trading remains gated at AGENT (3) trust — the machinery is ready, the trust must be earned. Cumulative: 329 tests across D118–D128, all green in isolation.
