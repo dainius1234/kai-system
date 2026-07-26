@@ -54,6 +54,8 @@ from trust_core import get_trust_core, TrustLevel
 from market_data import get_market_data
 from strategy_engine import get_strategy_engine
 from market_intel import get_market_intel
+from alpha_signals import get_alpha_signals
+from opportunity_intel import get_opportunity_intel
 
 logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
@@ -613,6 +615,8 @@ async def introspect_capabilities() -> Dict[str, Any]:
         "market_data": get_market_data().status() if is_enabled("MARKET_DATA") else None,
         "strategy_engine": get_strategy_engine().status() if is_enabled("STRATEGY_ENGINE") else None,
         "market_intel": get_market_intel().status() if is_enabled("MARKET_INTEL") else None,
+        "alpha_signals": get_alpha_signals().status() if is_enabled("ALPHA_SIGNALS") else None,
+        "opportunity_intel": get_opportunity_intel().status() if is_enabled("OPPORTUNITY_INTEL") else None,
     }
 
 
@@ -1140,6 +1144,116 @@ async def market_intel_status() -> Dict[str, Any]:
     if not is_enabled("MARKET_INTEL"):
         raise HTTPException(status_code=503, detail="FF_MARKET_INTEL is disabled")
     return get_market_intel().status()
+
+
+# ── Alpha Signals (D130) ─────────────────────────────────────────────
+
+@app.get("/alpha/{symbol}/funding")
+async def alpha_funding(symbol: str) -> Dict[str, Any]:
+    """D130: Funding rate — cost of leverage and crowd positioning."""
+    if not is_enabled("ALPHA_SIGNALS"):
+        raise HTTPException(status_code=503, detail="FF_ALPHA_SIGNALS is disabled")
+    result = await asyncio.to_thread(get_alpha_signals().get_funding_rate, symbol.upper())
+    return result.to_dict() if result else {"symbol": symbol.upper(), "data": None}
+
+
+@app.get("/alpha/{symbol}/open-interest")
+async def alpha_open_interest(symbol: str) -> Dict[str, Any]:
+    """D130: Open interest — total leverage magnitude in the market."""
+    if not is_enabled("ALPHA_SIGNALS"):
+        raise HTTPException(status_code=503, detail="FF_ALPHA_SIGNALS is disabled")
+    result = await asyncio.to_thread(get_alpha_signals().get_open_interest, symbol.upper())
+    return result.to_dict() if result else {"symbol": symbol.upper(), "data": None}
+
+
+@app.get("/alpha/{symbol}/long-short")
+async def alpha_long_short(symbol: str, period: str = "1h") -> Dict[str, Any]:
+    """D130: Long/short account ratio — retail crowd positioning."""
+    if not is_enabled("ALPHA_SIGNALS"):
+        raise HTTPException(status_code=503, detail="FF_ALPHA_SIGNALS is disabled")
+    result = await asyncio.to_thread(
+        get_alpha_signals().get_long_short_ratio, symbol.upper(), period
+    )
+    return result.to_dict() if result else {"symbol": symbol.upper(), "data": None}
+
+
+@app.get("/alpha/{symbol}/mark-premium")
+async def alpha_mark_premium(symbol: str) -> Dict[str, Any]:
+    """D130: Mark price vs spot index — basis / carry signal."""
+    if not is_enabled("ALPHA_SIGNALS"):
+        raise HTTPException(status_code=503, detail="FF_ALPHA_SIGNALS is disabled")
+    result = await asyncio.to_thread(get_alpha_signals().get_mark_premium, symbol.upper())
+    return result.to_dict() if result else {"symbol": symbol.upper(), "data": None}
+
+
+@app.get("/alpha/{symbol}/composite")
+async def alpha_composite(symbol: str) -> Dict[str, Any]:
+    """D130: All four alpha signals combined — full professional context."""
+    if not is_enabled("ALPHA_SIGNALS"):
+        raise HTTPException(status_code=503, detail="FF_ALPHA_SIGNALS is disabled")
+    return await asyncio.to_thread(get_alpha_signals().composite, symbol.upper())
+
+
+@app.get("/alpha/status")
+async def alpha_status() -> Dict[str, Any]:
+    """D130: Alpha signal feed cache status."""
+    if not is_enabled("ALPHA_SIGNALS"):
+        raise HTTPException(status_code=503, detail="FF_ALPHA_SIGNALS is disabled")
+    return get_alpha_signals().status()
+
+
+# ── Opportunity Intelligence (D130) ─────────────────────────────────
+
+@app.get("/opportunity/{symbol}/financial")
+async def opportunity_financial(symbol: str) -> Dict[str, Any]:
+    """D130: Financial opportunity score — conviction, direction, evidence."""
+    if not is_enabled("OPPORTUNITY_INTEL"):
+        raise HTTPException(status_code=503, detail="FF_OPPORTUNITY_INTEL is disabled")
+    result = await asyncio.to_thread(get_opportunity_intel().scan_financial, symbol.upper())
+    return result.to_dict()
+
+
+@app.get("/opportunity/{symbol}/trend-arb")
+async def opportunity_trend_arb(symbol: str) -> Dict[str, Any]:
+    """D130: Cross-market trend arbitrage — macro alignment score."""
+    if not is_enabled("OPPORTUNITY_INTEL"):
+        raise HTTPException(status_code=503, detail="FF_OPPORTUNITY_INTEL is disabled")
+    result = await asyncio.to_thread(get_opportunity_intel().scan_trend_arb, symbol.upper())
+    return result.to_dict()
+
+
+@app.get("/opportunity/content")
+async def opportunity_content(topic: str) -> Dict[str, Any]:
+    """D130: Content creation opportunity — topic conviction and recommended angle."""
+    if not is_enabled("OPPORTUNITY_INTEL"):
+        raise HTTPException(status_code=503, detail="FF_OPPORTUNITY_INTEL is disabled")
+    result = await asyncio.to_thread(get_opportunity_intel().scan_content, topic)
+    return result.to_dict()
+
+
+@app.get("/opportunity/affiliate")
+async def opportunity_affiliate(category: str) -> Dict[str, Any]:
+    """D130: Affiliate marketing opportunity — category commission tier and trend."""
+    if not is_enabled("OPPORTUNITY_INTEL"):
+        raise HTTPException(status_code=503, detail="FF_OPPORTUNITY_INTEL is disabled")
+    result = await asyncio.to_thread(get_opportunity_intel().scan_affiliate, category)
+    return result.to_dict()
+
+
+@app.get("/opportunity/{symbol}/full-scan")
+async def opportunity_full_scan(symbol: str) -> Dict[str, Any]:
+    """D130: Full cross-domain opportunity scan — ranked signal report."""
+    if not is_enabled("OPPORTUNITY_INTEL"):
+        raise HTTPException(status_code=503, detail="FF_OPPORTUNITY_INTEL is disabled")
+    return await asyncio.to_thread(get_opportunity_intel().full_scan, symbol.upper())
+
+
+@app.get("/opportunity/status")
+async def opportunity_status() -> Dict[str, Any]:
+    """D130: Opportunity intelligence cache status."""
+    if not is_enabled("OPPORTUNITY_INTEL"):
+        raise HTTPException(status_code=503, detail="FF_OPPORTUNITY_INTEL is disabled")
+    return get_opportunity_intel().status()
 
 
 # ── LLM router (Kai's brain) ────────────────────────────────────────

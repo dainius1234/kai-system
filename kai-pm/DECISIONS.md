@@ -2764,3 +2764,51 @@ The Auditor knows the full factor model: operator_approval_history (30%), value_
 **Tests:** `scripts/test_market_intel.py` — 49 tests covering: `_fng_label` (10 parametrized values), `_classify_tone` (bullish, bearish, neutral empty, neutral mixed), FearGreedReading.to_dict + regime, GlobalStats trend_24h direction, TrendingCoin symbol uppercase, get_fear_greed (success, HTTP error→None, network error→None, cached, empty data→None), get_global_stats (success, HTTP error, cached), get_trending (success, HTTP error→[], cached), get_news_sentiment (bullish tone, bearish tone, fail-open, cached, separate caching per symbol), get_macro_context (all 5 topics present, overall tone bullish, overall tone bearish, fail-open→neutral, cached across 5 queries), context (all keys incl. macro, is_trending detected, not_trending), status (empty, after fetch), singleton lifecycle. All 49 pass.
 
 **Consequences:** The strategy engine now has access to regime context. A SELL signal from RSI means more when fear/greed = 85 (extreme greed) + macro_tone = bearish + gold/oil rising. These feeds are available as context dicts — the next step is wiring context weights into strategy signal scoring (D130+). Cumulative: 378 tests across D118–D129, all green in isolation.
+
+---
+
+## D130 — Alpha Signal Engine + Opportunity Intelligence
+**Date:** 2026-07-26
+**Status:** merged
+
+**Context:** D129 gave regime awareness (emotion, dominance, macro tone). The next level — what professionals actually watch — is quantitative derivatives positioning: funding rates, open interest, long/short ratio, mark premium. Beyond pure financial signals, the system must scan opportunity across all domains: content creation, affiliate marketing, trend arbitrage. The operator's vision: "able to see opportunities everywhere like videos or shots, affiliate marketing, etc." Systems of this quality are what the best operators run.
+
+**Decision:** Build two modules:
+
+1. **`agentic/alpha_signals.py`** — Binance Futures public API (zero auth). All endpoints are unauthenticated — this module NEVER touches API keys.
+   - `_bnb_symbol(s)` normalises `BTCUSD → BTCUSDT` safely (handles already-USDT inputs).
+   - `FundingRate` — 7-tier sentiment: `extremely_long / crowded_long / mild_long / neutral / mild_short / crowded_short / extremely_short`. Annualised = rate × 3 × 365 × 100.
+   - `OpenInterest` — contracts + estimated USD value via mark price.
+   - `LongShortRatio` — 5-tier: `extremely_crowded_long / crowded_long / balanced / crowded_short / extremely_crowded_short`. Extreme longs = exit liquidity, not signal to follow.
+   - `MarkPremium` — `contango` (mark > spot) vs `backwardation` (mark < spot).
+   - `AlphaSignalFeed.composite(symbol)` — all four in one dict.
+   - TTLs: funding=300s, OI=60s, L/S=60s, premium=60s.
+
+2. **`agentic/opportunity_intel.py`** — Cross-domain scanner synthesising all feeds.
+   - `OpportunitySignal` dataclass: domain / subject / conviction (0–10) / time_horizon / headline / signals / recommended_action / evidence.
+   - Conviction labels: 0–2=noise, 3–4=watch, 5–6=speculative, 7–8=confident, 9–10=conviction.
+   - `scan_financial(symbol)` — combines funding sentiment (contrarian), L/S ratio (contrarian), Fear & Greed (contrarian at extremes), macro alignment, mark premium. Returns direction (long/short) + conviction score.
+   - `scan_content(topic)` — DuckDuckGo search via web_scout; boosts for finance/crypto crossover keywords and abstract richness.
+   - `scan_affiliate(category)` — phrase + keyword match for high-commission tiers (hardware wallet, exchange, broker, VPN, SaaS, trading, crypto, DeFi, course, wallet, AI tool).
+   - `scan_trend_arb(symbol)` — macro cross-market: bullish gold + crypto = rare confluence; oil direction → mining economics; Fed tone → risk-on/off.
+   - `full_scan(symbol)` — all domains, ranked by conviction. `top_opportunities` = conviction ≥ 5; `watchlist` = 3–4.
+
+**HTTP endpoints added:**
+- `GET /alpha/{symbol}/funding` — funding rate + 7-tier sentiment.
+- `GET /alpha/{symbol}/open-interest` — OI contracts + USD estimate.
+- `GET /alpha/{symbol}/long-short?period=1h` — L/S ratio + crowd positioning.
+- `GET /alpha/{symbol}/mark-premium` — basis signal (contango/backwardation).
+- `GET /alpha/{symbol}/composite` — all four combined.
+- `GET /alpha/status` — cache status.
+- `GET /opportunity/{symbol}/financial` — financial conviction score.
+- `GET /opportunity/{symbol}/trend-arb` — cross-market macro alignment.
+- `GET /opportunity/content?topic=X` — content creation opportunity.
+- `GET /opportunity/affiliate?category=X` — affiliate tier + conviction.
+- `GET /opportunity/{symbol}/full-scan` — ranked cross-domain report.
+- `GET /opportunity/status` — cache status.
+
+**Feature flags:** `FF_ALPHA_SIGNALS`, `FF_OPPORTUNITY_INTEL`. All endpoints gate on their respective flag; both modules report in `/introspect/capabilities`.
+
+**Tests:** `scripts/test_alpha_signals.py` — 49 tests; `scripts/test_opportunity_intel.py` — 38 tests. All 87 pass. Covers: `_bnb_symbol` normalisation (5 parametrized cases), FundingRate sentiment (8 tiers), OpenInterest cache/fail-open, LongShortRatio sentiment (5 tiers), MarkPremium contango/backwardation, all fetch methods (success, HTTP error→None, network error→None, cached, empty list→None), batch funding (partial failure), `_score_financial` (all dimensions, neutral=0, capped at 10), `_score_content` (finance keyword boost, controversy, cap), `_score_affiliate` (hardware wallet high tier, generic low, exchange), scan_financial cached, scan_content cached, scan_affiliate cached, scan_trend_arb bullish alignment + cached, full_scan ranking (sorted desc, max_conviction, watchlist threshold), status, singleton lifecycle.
+
+**Consequences:** Kai now sees what prop desks see. Financial signals from the derivatives layer (funding/OI/L/S/basis) feed into opportunity scoring alongside crowd emotion, macro alignment, and cross-domain opportunities (content, affiliate, trend-arb). The `full_scan` endpoint is the entry point for a single ranked view across all domains. Cumulative: 465 tests across D118–D130, all green.
