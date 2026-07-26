@@ -197,13 +197,125 @@ Last updated: 26 July 2026
 
 ---
 
+## Runtime primitives: `common/runtime.py`
+
+### KAI-RUN-001 — HIGH — Redis audit hash-chain append is non-atomic
+
+**Issue:** `AuditStream.log()` reads `audit:last_hash`, calculates the next hash, appends the stream entry and updates `audit:last_hash` as separate Redis operations.
+
+**Risk:** Concurrent writers can read the same prior hash and create sibling entries. The stored linear chain then becomes invalid, causing later integrity verification to halt or disable auditing even though no malicious tampering occurred.
+
+**Recommendation:** Perform compare-and-append atomically with a Lua script or Redis transaction using optimistic locking. Include the predecessor hash in each entry and define deterministic multi-writer ordering.
+
+**Status:** OPEN
+
+### KAI-RUN-002 — MEDIUM — Structured logger does not emit reliably valid JSON
+
+**Issue:** The formatter interpolates `%(message)s` directly inside a JSON string without JSON escaping.
+
+**Risk:** Quotes, backslashes, control characters or multiline exception messages can corrupt log records, break ingestion and undermine incident investigation.
+
+**Recommendation:** Use a real JSON logging formatter that serialises a dictionary with `json.dumps`; include exception, correlation and trace fields separately.
+
+**Status:** OPEN
+
+### KAI-RUN-003 — MEDIUM — Audit verification performs an unbounded full-stream scan at startup
+
+**Issue:** `verify_or_halt()` calls `XRANGE` across the complete `audit:logs` stream and recomputes every historical hash during construction.
+
+**Risk:** Startup latency and memory consumption grow indefinitely with audit history; large streams may cause readiness failures or restart loops.
+
+**Recommendation:** Use periodic signed checkpoints, bounded incremental verification and retention/archival policy. Persist the last verified stream ID and checkpoint hash.
+
+**Status:** OPEN
+
+### KAI-RUN-004 — MEDIUM — Error-budget calculation omits most server and client failures
+
+**Issue:** `ErrorBudget.snapshot()` counts only status codes 429, 500 and 408 as errors.
+
+**Risk:** Failures such as 502, 503, 504, 401 and 403 can be recorded as successful samples, materially understating the error ratio and delaying circuit opening.
+
+**Recommendation:** Make success/error classification explicit per dependency. Default to 2xx/3xx success, classify all 5xx and selected 4xx as failures, and track categories separately.
+
+**Status:** OPEN
+
+---
+
+## Resilience layer: `common/resilience.py`
+
+### KAI-RES-001 — HIGH — All HTTP responses below 500 are treated as successful
+
+**Issue:** `resilient_call()` resets the circuit breaker and returns `resp.json()` for every response with status `<500`, including 400, 401, 403, 404, 408 and 429.
+
+**Risk:** Authentication failures, rate limits, malformed requests and missing resources are represented as successful dependency calls. Error payloads can flow into business logic while the circuit breaker is incorrectly marked healthy.
+
+**Recommendation:** Call `raise_for_status()` or implement an explicit accepted-status set. Treat 408, 425, 429 and appropriate 5xx responses as retryable; treat other 4xx responses as non-retryable failures without resetting the breaker.
+
+**Status:** OPEN
+
+### KAI-RES-002 — MEDIUM — Deep health checks run sequentially without per-check deadlines
+
+**Issue:** `ServiceHealth.probe()` awaits each registered dependency check one after another and applies no timeout.
+
+**Risk:** One hanging dependency can block the entire health endpoint; total probe latency grows as the sum of all dependency latencies, potentially causing orchestrator timeouts and cascading restarts.
+
+**Recommendation:** Execute checks concurrently with individual deadlines and a bounded overall deadline. Distinguish timeout, failure and degraded results.
+
+**Status:** OPEN
+
+### KAI-RES-003 — MEDIUM — Circuit-breaker state is concurrency-unsafe
+
+**Issue:** Shared breaker objects mutate counters and state without synchronisation. An `_breaker_lock` exists but is unused, and half-open state allows any number of concurrent probe calls.
+
+**Risk:** Concurrent requests can lose failure increments, prematurely close a breaker, or create a thundering herd against a recovering dependency.
+
+**Recommendation:** Guard state transitions, permit only one or a bounded number of half-open probes, and make breaker storage worker-shared when multiple processes are supported.
+
+**Status:** OPEN
+
+### KAI-RES-004 — HIGH — Healing engine records unverified `auto_recovery` as a known fix
+
+**Issue:** Reaching the knowledge phase without a caller-supplied confirmed fix automatically records `auto_recovery` for the current error. No health check or successful remediation is required.
+
+**Risk:** The knowledge base can learn fictitious remedies and later claim that a known fix exists, creating false assurance and potentially suppressing appropriate escalation.
+
+**Recommendation:** Record knowledge only after an explicit remediation action and independent post-fix verification. Store evidence, outcome, version, expiry and failure recurrence data.
+
+**Status:** OPEN
+
+---
+
+## LLM routing: `common/llm.py`
+
+### KAI-LLM-001 — MEDIUM — Streaming and non-streaming model availability behaviour diverges
+
+**Issue:** Non-streaming `_live_query()` checks Ollama model availability and falls back to the default model, while `stream()` sends the requested model directly without the same pre-flight and fallback logic.
+
+**Risk:** The same specialist can succeed in ordinary mode but fail in streaming mode, creating inconsistent user-visible behaviour and operational diagnostics.
+
+**Recommendation:** Centralise backend/model resolution and availability checks so query and stream paths use identical routing, fallback and timeout policy.
+
+**Status:** OPEN
+
+### KAI-LLM-002 — HIGH — Transport failures are converted into model-like text
+
+**Issue:** Failed non-streaming calls return an `LLMResponse` whose `text` contains `[error: ...]`; streaming failures yield `[LLM error: ...]` as text tokens rather than raising or emitting a typed failure event.
+
+**Risk:** Downstream agents may treat infrastructure errors as genuine model output, store them in memory, score them as evidence or include them in final reasoning. This contaminates AI state and obscures failure provenance.
+
+**Recommendation:** Use a typed result/error channel and require callers to branch on failure before consuming content. Never mix diagnostic messages into the model token stream or prompt-visible response body.
+
+**Status:** OPEN
+
+---
+
 ## Audit summary
 
-- Findings logged: 17
+- Findings logged: 27
 - Critical: 6
-- High: 7
-- Medium: 3
+- High: 11
+- Medium: 9
 - Low: 1
-- Files materially reviewed: `agentic/app.py`, `agentic/web_scout.py`, `common/auth.py`, `tool-gate/app.py`
+- Files materially reviewed: `agentic/app.py`, `agentic/web_scout.py`, `common/auth.py`, `tool-gate/app.py`, `common/runtime.py`, `common/resilience.py`, `common/llm.py`
 - Current security posture: HIGH RISK / NOT READY FOR EXTERNAL EXPOSURE
 - Audit state: IN PROGRESS
