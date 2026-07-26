@@ -52,6 +52,7 @@ from service_watchdog import get_watchdog
 from paper_trader import get_paper_trader
 from trust_core import get_trust_core, TrustLevel
 from market_data import get_market_data
+from strategy_engine import get_strategy_engine
 
 logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
@@ -609,6 +610,7 @@ async def introspect_capabilities() -> Dict[str, Any]:
         "service_watchdog": get_watchdog().status() if is_enabled("SERVICE_WATCHDOG") else None,
         "paper_trading": get_paper_trader().status() if is_enabled("PAPER_TRADING") else None,
         "market_data": get_market_data().status() if is_enabled("MARKET_DATA") else None,
+        "strategy_engine": get_strategy_engine().status() if is_enabled("STRATEGY_ENGINE") else None,
     }
 
 
@@ -1015,6 +1017,70 @@ async def market_data_mark() -> Dict[str, Any]:
         raise HTTPException(status_code=503, detail="FF_MARKET_DATA is disabled")
     result = await asyncio.to_thread(get_market_data().mark_positions)
     return {"marked": result}
+
+
+# ── D128: Strategy Engine ─────────────────────────────────────────────
+
+class StrategyEvalRequest(BaseModel):
+    symbol: str
+    prices: List[float]
+
+class StrategyAutoTradeRequest(BaseModel):
+    symbol: str
+    prices: List[float]
+    quantity: float = 1.0
+    strategy_tag: str = "auto"
+
+
+@app.get("/strategy/status")
+async def strategy_status() -> Dict[str, Any]:
+    """D128: Strategy engine status — active strategy names."""
+    if not is_enabled("STRATEGY_ENGINE"):
+        raise HTTPException(status_code=503, detail="FF_STRATEGY_ENGINE is disabled")
+    return get_strategy_engine().status()
+
+
+@app.post("/strategy/evaluate")
+async def strategy_evaluate(req: StrategyEvalRequest) -> Dict[str, Any]:
+    """D128: Run all strategies against a price series. Trust: OBSERVER."""
+    if not is_enabled("STRATEGY_ENGINE"):
+        raise HTTPException(status_code=503, detail="FF_STRATEGY_ENGINE is disabled")
+    if len(req.prices) < 2:
+        raise HTTPException(status_code=422, detail="prices must have at least 2 values")
+    signals = await asyncio.to_thread(
+        get_strategy_engine().evaluate, req.symbol, req.prices
+    )
+    return {"signals": [s.to_dict() for s in signals]}
+
+
+@app.post("/strategy/consensus")
+async def strategy_consensus(req: StrategyEvalRequest) -> Dict[str, Any]:
+    """D128: Return the majority-vote consensus signal. Trust: OBSERVER."""
+    if not is_enabled("STRATEGY_ENGINE"):
+        raise HTTPException(status_code=503, detail="FF_STRATEGY_ENGINE is disabled")
+    if len(req.prices) < 2:
+        raise HTTPException(status_code=422, detail="prices must have at least 2 values")
+    signal = await asyncio.to_thread(
+        get_strategy_engine().consensus, req.symbol, req.prices
+    )
+    return {"signal": signal.to_dict()}
+
+
+@app.post("/strategy/auto-trade")
+async def strategy_auto_trade(req: StrategyAutoTradeRequest) -> Dict[str, Any]:
+    """D128: Consensus → paper trade action. Trust: AGENT (3)."""
+    if not is_enabled("STRATEGY_ENGINE"):
+        raise HTTPException(status_code=503, detail="FF_STRATEGY_ENGINE is disabled")
+    if len(req.prices) < 2:
+        raise HTTPException(status_code=422, detail="prices must have at least 2 values")
+    try:
+        result = await asyncio.to_thread(
+            get_strategy_engine().auto_trade,
+            req.symbol, req.prices, req.quantity, req.strategy_tag,
+        )
+        return result
+    except PermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc))
 
 
 # ── LLM router (Kai's brain) ────────────────────────────────────────
