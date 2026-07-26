@@ -51,6 +51,7 @@ from web_scout import fetch as web_fetch, search as web_search, summarize as web
 from service_watchdog import get_watchdog
 from paper_trader import get_paper_trader
 from trust_core import get_trust_core, TrustLevel
+from market_data import get_market_data
 
 logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
@@ -607,6 +608,7 @@ async def introspect_capabilities() -> Dict[str, Any]:
         "web_scout": is_enabled("WEB_SCOUT"),
         "service_watchdog": get_watchdog().status() if is_enabled("SERVICE_WATCHDOG") else None,
         "paper_trading": get_paper_trader().status() if is_enabled("PAPER_TRADING") else None,
+        "market_data": get_market_data().status() if is_enabled("MARKET_DATA") else None,
     }
 
 
@@ -974,6 +976,45 @@ async def trust_demote(req: TrustDemoteRequest) -> Dict[str, Any]:
 async def trust_audit(limit: int = 20) -> Dict[str, Any]:
     """D126: Recent trust audit log entries."""
     return {"events": get_trust_core().audit_tail(limit)}
+
+
+# ── D127: Market Data Feed ────────────────────────────────────────────
+
+@app.get("/market-data/symbols")
+async def market_data_symbols() -> Dict[str, Any]:
+    """D127: List symbols Kai can fetch prices for."""
+    if not is_enabled("MARKET_DATA"):
+        raise HTTPException(status_code=503, detail="FF_MARKET_DATA is disabled")
+    return {"symbols": get_market_data().known_symbols()}
+
+
+@app.get("/market-data/prices")
+async def market_data_prices(symbols: str = "") -> Dict[str, Any]:
+    """D127: Fetch current USD prices for comma-separated symbols."""
+    if not is_enabled("MARKET_DATA"):
+        raise HTTPException(status_code=503, detail="FF_MARKET_DATA is disabled")
+    sym_list = [s.strip() for s in symbols.split(",") if s.strip()]
+    if not sym_list:
+        raise HTTPException(status_code=422, detail="symbols query param required")
+    prices = await asyncio.to_thread(get_market_data().get_prices, sym_list)
+    return {"prices": prices}
+
+
+@app.get("/market-data/status")
+async def market_data_status() -> Dict[str, Any]:
+    """D127: Market data cache status."""
+    if not is_enabled("MARKET_DATA"):
+        raise HTTPException(status_code=503, detail="FF_MARKET_DATA is disabled")
+    return get_market_data().status()
+
+
+@app.post("/market-data/mark")
+async def market_data_mark() -> Dict[str, Any]:
+    """D127: Mark all open paper positions to market. Returns {position_id: unrealised_pnl}."""
+    if not is_enabled("MARKET_DATA"):
+        raise HTTPException(status_code=503, detail="FF_MARKET_DATA is disabled")
+    result = await asyncio.to_thread(get_market_data().mark_positions)
+    return {"marked": result}
 
 
 # ── LLM router (Kai's brain) ────────────────────────────────────────
@@ -1789,6 +1830,12 @@ async def _proactive_observer() -> None:
                             pass
                 except Exception as exc:
                     logger.debug("Service watchdog check failed (non-critical): %s", exc)
+
+            if is_enabled("MARKET_DATA"):
+                try:
+                    await asyncio.to_thread(get_market_data().mark_positions)
+                except Exception as exc:
+                    logger.debug("Market data mark_positions failed (non-critical): %s", exc)
 
             _last_world_snapshot = snapshot
         except Exception as exc:

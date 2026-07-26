@@ -2652,3 +2652,38 @@ The Auditor knows the full factor model: operator_approval_history (30%), value_
 - All 21 pass.
 
 **Consequences:** Dainius can now inspect Kai's trust position and act on it via HTTP — no need to edit JSON files directly. The gap report makes promotion decisions explicit: if `auto_eligible` is True, the evidence threshold is met and a `POST /trust/promote` makes it official. All prior TrustCore behaviour (grant/revoke/evidence/auto-promotion) is unchanged; this D only adds the readiness method and the HTTP surface. Cumulative: 266 tests across D118–D126, all green in isolation.
+
+---
+
+## D127 — 2026-07-26 — Market Data Feed: Live Price Discovery for Paper Trading
+
+**Context:** D125 (Paper Trading Engine) gave Kai a full position ledger but required the operator to supply prices manually for every mark-to-market call. That breaks the Phase 3 sustainability goal — Kai needs to be able to track P&L against real prices autonomously. D127 closes the loop: a price feed that pulls cryptocurrency prices from the public CoinGecko API (free, no key) and marks open positions automatically.
+
+**Decisions:**
+
+**New module — `agentic/market_data.py`:**
+- `PriceQuote` dataclass: symbol, price_usd, fetched_at, source ("coingecko"); `to_dict()` includes computed `age_s`.
+- `MarketDataFeed` class (singleton): in-memory TTL cache (default 60 s); fail-open on every network/parse error.
+- `_SYMBOL_MAP`: 15 USD-quoted symbols (BTCUSD→bitcoin, ETHUSD→ethereum, SOLUSD→solana, … DOGEUSD→dogecoin).
+- `get_price(symbol)` → `Optional[float]` — cache hit or single-symbol fetch.
+- `get_prices(symbols)` → `Dict[str, float]` — serves fresh cache entries without network; batches the rest into one CoinGecko `/simple/price` call; unknown symbols silently skipped.
+- `mark_positions()` → `Dict[position_id, unrealised_pnl]` — fetches prices for all open paper symbols, calls `paper_trader.mark_to_market()`; fail-open when paper_trader unavailable or no prices returned.
+- `status()` — cached_symbols count, ttl_s, per-symbol quote list with `fresh` flag.
+- `known_symbols()` — sorted list of all supported symbols.
+- `_fetch_coingecko(symbols)` — batch CoinGecko call; reverse-maps coin_id → symbol; updates cache; logs summary; fail-open on HTTP ≠ 200 or exception.
+
+**Trust gating:** OBSERVER (1) — prices are information, not financial actions. No trust check required in the module itself.
+
+**Proactive observer loop (FF_MARKET_DATA gate):** Each proactive cycle calls `mark_positions()` via `asyncio.to_thread()` so open paper positions carry live unrealised P&L without operator input. Fail-open.
+
+**New HTTP endpoints (FF_MARKET_DATA gate):**
+- `GET /market-data/symbols` — list of supported trading symbols.
+- `GET /market-data/prices?symbols=BTCUSD,ETHUSD` — fetch current USD prices (returns `{prices: {symbol: price}}`).
+- `GET /market-data/status` — cache summary (symbol count, TTL, per-symbol quote + freshness).
+- `POST /market-data/mark` — mark all open paper positions to market now (returns `{marked: {position_id: pnl}}`).
+
+**`/introspect/capabilities`:** Updated with `"market_data": feed.status()`.
+
+**Tests:** `scripts/test_market_data.py` — 25 tests covering: known_symbols (sorted, uppercase), get_price unknown/case-insensitive, get_prices (basic fetch, unknown skipped, case-insensitive), cache (fresh hit skips network, stale triggers fetch, cache updated after fetch, mix of fresh+stale uses one network call), fail-open (ConnectionError, HTTP 429, malformed response all return {}), PriceQuote.to_dict(), status (empty, after fetch, fresh flag false when stale), mark_positions (no positions → {}, calls mark_to_market correctly, fail-open when paper_trader unavailable, no prices → {}), singleton lifecycle. All 25 pass.
+
+**Consequences:** Kai's paper ledger is now live: open positions carry automatically-updated unrealised P&L against real CoinGecko prices, refreshed every proactive cycle. The paper trading loop is complete — open → track → close with real price data. Real trading remains gated behind PARTNER trust; this D adds only the price information layer. Cumulative: 291 tests across D118–D127, all green in isolation.
