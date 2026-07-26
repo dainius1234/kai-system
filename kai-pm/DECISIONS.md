@@ -2724,3 +2724,43 @@ The Auditor knows the full factor model: operator_approval_history (30%), value_
 **Tests:** `scripts/test_strategy_engine.py` — 38 tests covering: Signal.to_dict, Momentum (not enough data, rising→buy, falling→sell, flat→hold, confidence scaling, confidence cap, zero reference price), MACross (invalid short≥long, not enough data, verified bullish cross, verified bearish cross, no cross→hold, strategy name), RSI (not enough data, oversold→buy, overbought→sell, neutral→hold, all gains→RSI100→sell, strategy name), evaluate (one signal per strategy, fail-open on error, 3 default strategies), consensus (no strategies→hold, unanimous buy, majority wins, tie→hold, strategy_name=consensus), auto_trade (hold, low confidence→hold, buy opens long, sell closes long, sell with no positions, trust denied→denied dict, paper_trader error→error dict), status, singleton lifecycle. All 38 pass.
 
 **Consequences:** Kai now has a complete paper trading loop with a real brain: market prices → strategy signals → consensus → paper position → track P&L. Real autonomous trading remains gated at AGENT (3) trust — the machinery is ready, the trust must be earned. Cumulative: 329 tests across D118–D128, all green in isolation.
+
+---
+
+## D129 — 2026-07-26 — Market Intelligence Module: Regime-Aware Context
+
+**Context:** Basic RSI/MA/momentum signals alone are sheep-following — the same RSI reading means different things in a capitulation crash vs euphoric bull top. Real edge requires knowing the macro regime: fear/greed index, BTC dominance shifts, trending crowd momentum (contra or with), coin-level news sentiment, and macro factors that drive all risk assets — gold, oil, DXY, Fed policy, geopolitical events. D129 builds the intelligence aggregation layer that feeds this context to the strategy engine.
+
+**Decisions:**
+
+**New module — `agentic/market_intel.py`:**
+
+**Data sources (all free, no API key required):**
+- **Alternative.me Fear & Greed Index** — single most-cited crypto sentiment gauge (0=extreme fear, 100=extreme greed). TTL 3600 s (daily updates). `FearGreedReading.regime` maps to: extreme_fear / fear / neutral / greed / extreme_greed.
+- **CoinGecko `/global`** — total market cap + 24h change, BTC dominance %, ETH dominance %, active cryptocurrencies, 24h volume. `GlobalStats.trend_24h` = "up"/"down". TTL 300 s.
+- **CoinGecko `/search/trending`** — top 10 trending coins. Used as crowd momentum / contra-indicator signal. `TrendingCoin.symbol` normalised upper. TTL 300 s.
+- **News sentiment** — per-symbol DuckDuckGo search via existing `web_scout` module. Query: "{coin} crypto news sentiment today". Tone classified by keyword bag (bullish/bearish/neutral). TTL 1800 s.
+- **Macro context** — 5 targeted DuckDuckGo searches: gold, oil, USD/DXY, Federal Reserve rates, geopolitical risk. Per-topic tone + overall majority-vote tone. TTL 1800 s. All via web_scout — no new network dependency.
+
+**Tone classifier `_classify_tone(text)`:** simple bag-of-words intersect against `_BULLISH_WORDS` / `_BEARISH_WORDS` sets. Majority → tone label. Equal → neutral.
+
+**`MarketIntelligence` class (singleton):**
+- `get_fear_greed()` → `Optional[FearGreedReading]` — fail-open (None on error).
+- `get_global_stats()` → `Optional[GlobalStats]` — fail-open.
+- `get_trending()` → `List[TrendingCoin]` — fail-open ([] on error).
+- `get_news_sentiment(symbol)` → `Dict` — always returns a dict with at least `{symbol, tone, timestamp}`.
+- `get_macro_context()` → `Dict` — always returns `{overall_tone, topics: {gold, oil, dollar_dxy, fed_rates, geopolitical}, timestamp}`. Each topic has query, abstract (200 chars), tone.
+- `context(symbol)` → combined dict for strategy engine consumption: fear_greed + global + is_trending + trending_coins[:5] + news_sentiment + macro.
+- `status()` — cached key list + per-key age_s.
+
+**New HTTP endpoints (FF_MARKET_INTEL gate):**
+- `GET /market-intel/fear-greed` — current F&G reading (503 if unavailable).
+- `GET /market-intel/global` — global market stats (503 if unavailable).
+- `GET /market-intel/trending` — top trending coins list.
+- `GET /market-intel/macro` — macro context: gold/oil/DXY/Fed/geopolitical tone.
+- `GET /market-intel/context/{symbol}` — full combined intelligence dict.
+- `GET /market-intel/status` — cache status.
+
+**Tests:** `scripts/test_market_intel.py` — 49 tests covering: `_fng_label` (10 parametrized values), `_classify_tone` (bullish, bearish, neutral empty, neutral mixed), FearGreedReading.to_dict + regime, GlobalStats trend_24h direction, TrendingCoin symbol uppercase, get_fear_greed (success, HTTP error→None, network error→None, cached, empty data→None), get_global_stats (success, HTTP error, cached), get_trending (success, HTTP error→[], cached), get_news_sentiment (bullish tone, bearish tone, fail-open, cached, separate caching per symbol), get_macro_context (all 5 topics present, overall tone bullish, overall tone bearish, fail-open→neutral, cached across 5 queries), context (all keys incl. macro, is_trending detected, not_trending), status (empty, after fetch), singleton lifecycle. All 49 pass.
+
+**Consequences:** The strategy engine now has access to regime context. A SELL signal from RSI means more when fear/greed = 85 (extreme greed) + macro_tone = bearish + gold/oil rising. These feeds are available as context dicts — the next step is wiring context weights into strategy signal scoring (D130+). Cumulative: 378 tests across D118–D129, all green in isolation.

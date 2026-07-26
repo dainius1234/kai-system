@@ -53,6 +53,7 @@ from paper_trader import get_paper_trader
 from trust_core import get_trust_core, TrustLevel
 from market_data import get_market_data
 from strategy_engine import get_strategy_engine
+from market_intel import get_market_intel
 
 logger = setup_json_logger("kai", os.getenv("LOG_PATH", "/tmp/kai.json.log"))
 DEVICE = detect_device()
@@ -611,6 +612,7 @@ async def introspect_capabilities() -> Dict[str, Any]:
         "paper_trading": get_paper_trader().status() if is_enabled("PAPER_TRADING") else None,
         "market_data": get_market_data().status() if is_enabled("MARKET_DATA") else None,
         "strategy_engine": get_strategy_engine().status() if is_enabled("STRATEGY_ENGINE") else None,
+        "market_intel": get_market_intel().status() if is_enabled("MARKET_INTEL") else None,
     }
 
 
@@ -1081,6 +1083,63 @@ async def strategy_auto_trade(req: StrategyAutoTradeRequest) -> Dict[str, Any]:
         return result
     except PermissionError as exc:
         raise HTTPException(status_code=403, detail=str(exc))
+
+
+# ── D129: Market Intelligence ─────────────────────────────────────────
+
+@app.get("/market-intel/fear-greed")
+async def market_intel_fear_greed() -> Dict[str, Any]:
+    """D129: Crypto Fear & Greed Index (Alternative.me)."""
+    if not is_enabled("MARKET_INTEL"):
+        raise HTTPException(status_code=503, detail="FF_MARKET_INTEL is disabled")
+    reading = await asyncio.to_thread(get_market_intel().get_fear_greed)
+    if reading is None:
+        raise HTTPException(status_code=503, detail="Fear & Greed data unavailable")
+    return reading.to_dict()
+
+
+@app.get("/market-intel/global")
+async def market_intel_global() -> Dict[str, Any]:
+    """D129: Global crypto market stats — BTC dominance, cap, trend (CoinGecko)."""
+    if not is_enabled("MARKET_INTEL"):
+        raise HTTPException(status_code=503, detail="FF_MARKET_INTEL is disabled")
+    stats = await asyncio.to_thread(get_market_intel().get_global_stats)
+    if stats is None:
+        raise HTTPException(status_code=503, detail="Global stats unavailable")
+    return stats.to_dict()
+
+
+@app.get("/market-intel/trending")
+async def market_intel_trending() -> Dict[str, Any]:
+    """D129: Top trending coins on CoinGecko."""
+    if not is_enabled("MARKET_INTEL"):
+        raise HTTPException(status_code=503, detail="FF_MARKET_INTEL is disabled")
+    coins = await asyncio.to_thread(get_market_intel().get_trending)
+    return {"trending": [c.to_dict() for c in coins]}
+
+
+@app.get("/market-intel/macro")
+async def market_intel_macro() -> Dict[str, Any]:
+    """D129: Macro context — gold, oil, DXY, Fed, geopolitical sentiment."""
+    if not is_enabled("MARKET_INTEL"):
+        raise HTTPException(status_code=503, detail="FF_MARKET_INTEL is disabled")
+    return await asyncio.to_thread(get_market_intel().get_macro_context)
+
+
+@app.get("/market-intel/context/{symbol}")
+async def market_intel_context(symbol: str) -> Dict[str, Any]:
+    """D129: Full intelligence context for a symbol — all feeds combined."""
+    if not is_enabled("MARKET_INTEL"):
+        raise HTTPException(status_code=503, detail="FF_MARKET_INTEL is disabled")
+    return await asyncio.to_thread(get_market_intel().context, symbol.upper())
+
+
+@app.get("/market-intel/status")
+async def market_intel_status() -> Dict[str, Any]:
+    """D129: Market intelligence cache status."""
+    if not is_enabled("MARKET_INTEL"):
+        raise HTTPException(status_code=503, detail="FF_MARKET_INTEL is disabled")
+    return get_market_intel().status()
 
 
 # ── LLM router (Kai's brain) ────────────────────────────────────────
