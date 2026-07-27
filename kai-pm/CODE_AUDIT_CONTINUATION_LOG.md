@@ -28,8 +28,9 @@ No remediation is considered implemented unless explicitly stated in this log an
 4. `kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md` — source-specific Phase 0 implementation sequence.
 5. `kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md` — source-specific identity, operation and enforcement design.
 6. `kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md` — source-specific execution, browser, parser, egress and data-integrity design.
-7. `kai-pm/CODE_AUDIT_BATCH_*.md` — finding-level evidence.
-8. This log — chronology after consolidation.
+7. `kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md` — source-specific distributed reliability, audit, privacy, recovery and backup design.
+8. `kai-pm/CODE_AUDIT_BATCH_*.md` — finding-level evidence.
+9. This log — chronology after consolidation.
 
 ---
 
@@ -289,28 +290,92 @@ No runtime code, configuration or infrastructure changed. No findings were close
 
 ---
 
+## 27 July 2026 — Phase 3 reliability, audit, privacy and recovery plan added
+
+### Deliverable
+
+- `kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md`
+- Commit: `dd4f22c9cdd25031991ec237502c44f4b36899f8`
+
+### Source basis
+
+The plan was grounded directly in:
+
+- `common/resilience.py` and the Common Resilience audit.
+- `common/runtime.py` and the Shared Runtime Controls audit.
+- `supervisor/app.py` and the Live Supervisor audit.
+- Tool Gate policy/ledger findings.
+- Trust Ledger application, file ledger, scoring and extension audit.
+- Backup Service implementation/deployment and backup extension audit.
+- Cross-service findings involving retries, process-local control state, false health, unauthorised recovery, mutable audit and unverified backup/restore.
+- Architecture findings for transactions, event envelopes, health semantics, single-writer ownership, audit authority, privacy lifecycle and recovery separation.
+
+### Result
+
+Defined ten mandatory Phase 3 reliability/governance invariants and twenty-one ordered implementation PRs covering:
+
+1. Reliability and lifecycle contract freeze.
+2. Retry/fallback semantic replacement.
+3. Standard liveness/readiness/capability health library.
+4. Durable operation and idempotency authority.
+5. Transactional outbox/inbox foundation.
+6. Shared breaker and dependency-state authority.
+7. Leader election and scheduler fencing.
+8. Supervisor observation-only rebuild.
+9. Recovery policy and incident authority.
+10. Removal of fabricated healing knowledge.
+11. Authoritative audit sequencer.
+12. Signed audit segments and external checkpoints.
+13. Tool Gate and Trust Ledger migration.
+14. Data classification and schema annotations.
+15. Encryption and key-management foundation.
+16. Retention, deletion and legal-hold engine.
+17. Structured operational logging.
+18. Backup job and immutable manifest rebuild.
+19. Isolated restore and qualification pipeline.
+20. Incident-response and evidence-preservation workflow.
+21. Integrated chaos, restore and operational release gate.
+
+The plan also defines:
+
+- one versioned service-state/error vocabulary;
+- endpoint safety classes and retry rules;
+- durable operation/saga and outbox/inbox models;
+- shared transactional state, leases and fencing tokens;
+- signed, segmented, externally anchored audit architecture;
+- data classification, purpose, consent/basis, encryption and retention controls;
+- authorised service-specific recovery with independent postconditions;
+- coherent signed backups and isolated restore qualification;
+- fourteen adversarial/failure closure tests;
+- Phase 3 exit criteria.
+
+No runtime code, configuration or infrastructure changed. No findings were closed.
+
+---
+
 ## Current continuation point
 
 Next planned deliverable:
 
-- `kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md`
+- `kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md`
 
 Planned scope:
 
-- Standard liveness/readiness/degraded/failure contracts.
-- Idempotent distributed mutation and durable saga semantics.
-- Transactional shared security state.
-- Leader election and worker ownership.
-- Signed append-only audit authority and external checkpoints.
-- Data classification, consent, retention and encryption.
-- Authorised recovery separated from health observation.
-- Backup integrity, restore qualification and deletion preservation.
-- Failure injection, incident response and operational release evidence.
+- Authoritative service/model/tool/capability registry.
+- Verified immutable model and backend identity.
+- Evidence independence, provenance and proposition-level verification.
+- Remove style/wording/heuristic conviction as execution authority.
+- Rebuild Fusion consensus and Verifier enforcement.
+- Separate prediction, action, observation and independently verified outcome.
+- Trust/autonomy scoring based only on linked external outcomes.
+- Model/stub/degraded capability truthfulness.
+- Financial, public, destructive and self-modifying action qualification.
+- Staged autonomy levels, rollback and complete attack-chain release tests.
 
 Status at this entry:
 
 - Audit: complete for reviewed snapshot.
 - Final confirmed findings: **4,580**.
-- Remediation planning: Phase 0, Phase 1 and Phase 2 source-specific plans complete.
+- Remediation planning: Phase 0, Phase 1, Phase 2 and Phase 3 source-specific plans complete.
 - Runtime remediation: **none**.
 - Findings closed: **zero by this continuation work**.
