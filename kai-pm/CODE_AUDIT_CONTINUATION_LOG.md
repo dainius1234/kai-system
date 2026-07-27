@@ -26,8 +26,9 @@ No remediation is considered implemented unless explicitly stated in this log an
 2. `kai-pm/CODE_AUDIT_FINAL_REPORT.md` — executive judgement, architecture and attack paths.
 3. `kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md` — prioritised programme and release gates.
 4. `kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md` — source-specific Phase 0 implementation sequence.
-5. `kai-pm/CODE_AUDIT_BATCH_*.md` — finding-level evidence.
-6. This log — chronology after consolidation.
+5. `kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md` — source-specific identity, operation and enforcement design.
+6. `kai-pm/CODE_AUDIT_BATCH_*.md` — finding-level evidence.
+7. This log — chronology after consolidation.
 
 ---
 
@@ -162,18 +163,71 @@ The master register is the single source of truth and supersedes the earlier 2,5
 
 ---
 
-## 27 July 2026 — Continuation log created and corrected
+## 27 July 2026 — Continuation log created and reconciled
 
 ### Deliverables
 
 - Initial log commit: `16217e2156efea88cb976c5e7100625148fb9571`
-- This reconciliation update: current commit
+- 4,580-total reconciliation commit: `f98c4ef0107629d5c4ee24f2b1ea61e8d7a2e9c4`
 
 ### Result
 
 - The initial log was created before the parallel 4,580-finding consolidation became visible.
-- This update corrects the authoritative totals and records the 2,529 figure only as an intermediate baseline.
-- No findings are closed by this documentation work.
+- The reconciliation corrected authoritative totals and retained 2,529 only as an intermediate baseline.
+- No findings were closed.
+
+---
+
+## 27 July 2026 — Phase 1 security foundation plan added
+
+### Deliverable
+
+- `kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md`
+- Commit: `dda613a17aa92aaeb1e6e5f790295a36d06e603d`
+
+### Source basis
+
+The plan was grounded directly in:
+
+- `common/auth.py`.
+- `tool-gate/app.py`.
+- `agentic/app.py`.
+- `dashboard/app.py`.
+- `executor/app.py`.
+- Common Auth, Tool Gate Extension, Agentic API, Executor, architecture and cross-service batches.
+- Expanded CI/workflow findings included in the 4,580 total.
+
+### Result
+
+Defined eight mandatory Phase 1 security invariants and fifteen ordered implementation PRs covering:
+
+1. Security contracts and threat-model freeze.
+2. Immutable identity/keyring runtime.
+3. Human principal authentication.
+4. Workload mTLS identity.
+5. Canonical operation envelope and digest.
+6. Explicit delegation authority.
+7. Tool Gate decision-API rebuild.
+8. Protected operator approval.
+9. Single-use capability issue and transactional consumption.
+10. Executor enforcement pilot.
+11. Dashboard confused-deputy removal.
+12. Agentic caller/delegation migration.
+13. Remaining side-effect service migration.
+14. Legacy HMAC/body-token/cosign removal.
+15. Integrated security CI and release evidence.
+
+The plan also defines:
+
+- canonical-operation fields and serialisation requirements;
+- asymmetric, audience-bound, short-lived capabilities;
+- exact operator-approval semantics;
+- a machine-readable side-effect endpoint registry;
+- migration states and rollback restrictions;
+- ten adversarial Phase 1 closure tests;
+- Phase 1 exit criteria.
+
+No runtime code, configuration or infrastructure changed. No findings were closed.
 
 ---
 
@@ -181,24 +235,25 @@ The master register is the single source of truth and supersedes the earlier 2,5
 
 Next planned deliverable:
 
-- `kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md`
+- `kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md`
 
 Planned scope:
 
-- Human principal identity.
-- Workload identity and authenticated service transport.
-- Delegation and scope authority.
-- Canonical operation schema and digest.
-- Single-use, digest-bound execution capabilities.
-- Final side-effect enforcement inventory.
-- Separation of runtime, operator and approval credentials.
-- Migration order and adversarial closure tests.
-- CI and runtime assurance requirements from the expanded 4,580-finding audit.
+- Replace generic command execution.
+- Disposable execution sandboxes.
+- Browser principal isolation.
+- Controlled egress and SSRF prevention.
+- Parser/upload isolation.
+- Principal-partitioned data model.
+- Memory/evidence provenance and poisoning controls.
+- Transactional memory/vector/graph updates.
+- Derivative deletion and supersession.
+- Phase 2 attack-chain closure and runtime assurance.
 
 Status at this entry:
 
 - Audit: complete for reviewed snapshot.
 - Final confirmed findings: **4,580**.
-- Remediation planning: active.
+- Remediation planning: Phase 0 and Phase 1 source-specific plans complete.
 - Runtime remediation: **none**.
 - Findings closed: **zero by this continuation work**.
