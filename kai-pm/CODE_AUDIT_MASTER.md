@@ -14,6 +14,10 @@ The prioritised planning backlog is:
 
 - `kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md`
 
+The authoritative target architecture and cross-phase migration addendum is:
+
+- `kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md`
+
 Detailed source evidence remains in:
 
 - `kai-pm/CODE_AUDIT_BATCH_*.md`
@@ -153,6 +157,7 @@ The dominant risks are architectural and reinforcing:
 10. **Health, release and assurance tooling often certifies shallow reachability or known stubs.**
 11. **Sensitive personal, financial, biometric and operational data lacks consistent partitioning and lifecycle controls.**
 12. **Audit evidence is incomplete, optional, mutable or disconnected from the exact action performed.**
+13. **Specialist modules can behave as separate decision-makers instead of contributing to one governed perception-to-outcome path.**
 
 ---
 
@@ -170,6 +175,7 @@ The detailed chain evidence is in the committed cross-service and architecture b
 - Tampered backup/vault/ledger files → destructive restore/delete or policy/audit corruption.
 - Stored Dashboard XSS → same-origin access to every privileged proxy route.
 - Fake/stub assurance paths → green CI/go-no-go → deployment of known-unready controls.
+- Specialist signal/conviction → local decision → direct actuator call → action outside one shared World State, approval and outcome-verification chain.
 
 ---
 
@@ -193,16 +199,17 @@ Use must remain limited to an isolated disposable development laboratory until t
 
 1. Remove direct host exposure and disable consequential services by default.
 2. Establish authenticated user, workload and service identity.
-3. Define one canonical operation/capability model.
-4. Bind approval to the exact immutable request and enforce it at the final side-effect boundary.
-5. Isolate Executor, browser, parser and egress workloads.
-6. Rebuild memory/evidence provenance, user partitioning and poisoning controls.
-7. Standardise typed failure, readiness and degraded-state contracts.
-8. Move security-critical state to transactional shared stores with integrity controls.
-9. Create immutable action/audit chains and tested backup/restore semantics.
-10. Requalify verification, model routing, confidence, trust and autonomy only after the preceding foundations pass adversarial tests.
+3. Define one canonical perception, World State, proposal, operation and capability contract set.
+4. Reassign specialist modules as perception/proposal providers and prohibit direct self-authorised actuation.
+5. Bind approval to the exact immutable request and enforce it at the final side-effect boundary.
+6. Isolate Executor, browser, parser and egress workloads.
+7. Rebuild memory/evidence provenance, user partitioning and poisoning controls.
+8. Standardise typed failure, readiness and degraded-state contracts.
+9. Move security-critical state and action workflows to transactional shared stores with integrity controls.
+10. Create immutable action/audit chains, independent outcome verification and tested backup/restore semantics.
+11. Requalify verification, model routing, confidence, trust and autonomy only after the preceding foundations pass adversarial tests.
 
-No item is considered fixed by this report.
+No item is considered fixed by this report or by the target-architecture planning addendum.
 
 ---
 
@@ -210,9 +217,12 @@ No item is considered fixed by this report.
 
 1. **This file** — exact totals and master register.
 2. `CODE_AUDIT_FINAL_REPORT.md` — executive, architecture and release assessment.
-3. `CODE_AUDIT_REMEDIATION_BACKLOG.md` — planning sequence and closure gates.
-4. `CODE_AUDIT_BATCH_*.md` — detailed source-confirmed evidence.
-5. Historical registers — chronology only.
+3. `CODE_AUDIT_REMEDIATION_BACKLOG.md` — prioritised planning sequence and closure gates.
+4. `KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` — authoritative target architecture and cross-phase migration design.
+5. `CODE_AUDIT_IMPLEMENTATION_SEQUENCE_AND_CLOSURE_MATRIX.md` — integrated dependencies, attack-chain closure and programme controls.
+6. `CODE_AUDIT_P0_*` through `CODE_AUDIT_P4_*` — source-specific implementation plans.
+7. `CODE_AUDIT_BATCH_*.md` — detailed source-confirmed evidence.
+8. Historical registers and continuation logs — chronology only.
 
 ---
 
@@ -220,5 +230,7 @@ No item is considered fixed by this report.
 
 Repository source review, deployment review, cross-service analysis, orchestration review, architecture review and numerical reconciliation are complete for the audited snapshot.
 
+The Unified Hunter document adds a researched target architecture and migration roadmap. It does not change the audited snapshot, finding totals, remediation state or release decision.
+
 **Confirmed final count: 4,580 findings.**  
-**No remediation was implemented during the audit.**
+**No remediation was implemented during the audit or planning work.**
