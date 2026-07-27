@@ -2,11 +2,11 @@
 
 Repository: `dainius1234/kai-system`  
 Log started: 27 July 2026  
-Status: **ACTIVE CONTINUATION LOG**
+Status: **ACTIVE CONTINUATION LOG — PLANNING PACKAGE COMPLETE**
 
 This file records work performed after the audit entered final consolidation and remediation planning. It is chronological and does not replace the final master register, final report or finding-level evidence batches.
 
-Authoritative audit totals are now:
+Authoritative audit totals are:
 
 - Critical: **252**
 - High: **2,440**
@@ -25,12 +25,14 @@ No remediation is considered implemented unless explicitly stated in this log an
 1. `kai-pm/CODE_AUDIT_MASTER.md` — final totals and audit status.
 2. `kai-pm/CODE_AUDIT_FINAL_REPORT.md` — executive judgement, architecture and attack paths.
 3. `kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md` — prioritised programme and release gates.
-4. `kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md` — source-specific Phase 0 implementation sequence.
-5. `kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md` — source-specific identity, operation and enforcement design.
-6. `kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md` — source-specific execution, browser, parser, egress and data-integrity design.
-7. `kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md` — source-specific distributed reliability, audit, privacy, recovery and backup design.
-8. `kai-pm/CODE_AUDIT_BATCH_*.md` — finding-level evidence.
-9. This log — chronology after consolidation.
+4. `kai-pm/CODE_AUDIT_IMPLEMENTATION_SEQUENCE_AND_CLOSURE_MATRIX.md` — integrated wave order, dependencies, attack chains and closure rules.
+5. `kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md` — source-specific Phase 0 implementation sequence.
+6. `kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md` — identity, operation binding and final enforcement.
+7. `kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md` — execution, browser, parser, egress and data integrity.
+8. `kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md` — distributed reliability, audit, privacy, recovery and backup.
+9. `kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md` — model, verification, trust and autonomy requalification.
+10. `kai-pm/CODE_AUDIT_BATCH_*.md` — finding-level evidence.
+11. This log — chronology after consolidation.
 
 ---
 
@@ -187,18 +189,6 @@ The master register is the single source of truth and supersedes the earlier 2,5
 - `kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md`
 - Commit: `dda613a17aa92aaeb1e6e5f790295a36d06e603d`
 
-### Source basis
-
-The plan was grounded directly in:
-
-- `common/auth.py`.
-- `tool-gate/app.py`.
-- `agentic/app.py`.
-- `dashboard/app.py`.
-- `executor/app.py`.
-- Common Auth, Tool Gate Extension, Agentic API, Executor, architecture and cross-service batches.
-- Expanded CI/workflow findings included in the 4,580 total.
-
 ### Result
 
 Defined eight mandatory Phase 1 security invariants and fifteen ordered implementation PRs covering:
@@ -219,7 +209,7 @@ Defined eight mandatory Phase 1 security invariants and fifteen ordered implemen
 14. Legacy HMAC/body-token/cosign removal.
 15. Integrated security CI and release evidence.
 
-The plan also defines canonical-operation fields and serialisation, asymmetric audience-bound capabilities, exact operator approval, a machine-readable side-effect registry, migration states, adversarial tests and Phase 1 exit criteria.
+The plan also defines canonical-operation serialisation, asymmetric audience-bound capabilities, exact operator approval, a machine-readable side-effect registry, migration states, adversarial tests and Phase 1 exit criteria.
 
 No runtime code, configuration or infrastructure changed. No findings were closed.
 
@@ -231,19 +221,6 @@ No runtime code, configuration or infrastructure changed. No findings were close
 
 - `kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md`
 - Commit: `1bc936f53fad7b4c20c943b1bd79237e4fc79727`
-
-### Source basis
-
-The plan was grounded directly in:
-
-- `executor/app.py` and the Executor audit.
-- Browser Agent source/deployment/tests and both Browser Agent audits.
-- Monitor source and Monitor extension audit.
-- Document Parser, upload, OCR and CAD/converter findings.
-- Vault Sync application, mapper, parser and watcher audit.
-- memU Core hot-path, introspection and personality/autonomy audits.
-- Memory Graph audit and extension.
-- Cross-service attack chains involving arbitrary execution, browser-state leakage, hostile content, persistent memory poisoning and undeletable derivatives.
 
 ### Result
 
@@ -271,20 +248,7 @@ Defined ten mandatory Phase 2 security invariants and twenty-one ordered impleme
 20. End-to-end derivative deletion.
 21. Integrated Phase 2 CI and runtime assurance.
 
-The plan also defines:
-
-- fixed-schema execution operation registry;
-- disposable worker security profile;
-- per-principal browser contexts and exact action fingerprints;
-- destination-level egress/SSRF policy;
-- hostile archive and converter controls;
-- immutable evidence classes and records;
-- principal/tenant/purpose/data-class partitioning;
-- durable source/vector/graph state machines;
-- single-writer generations;
-- lineage-driven supersession and deletion;
-- twelve adversarial closure tests;
-- Phase 2 exit criteria.
+The plan also defines fixed-schema operations, disposable worker profiles, per-principal browser contexts, destination-level egress policy, hostile archive controls, immutable evidence, durable multi-store state, lineage-driven supersession/deletion, adversarial tests and exit criteria.
 
 No runtime code, configuration or infrastructure changed. No findings were closed.
 
@@ -296,19 +260,6 @@ No runtime code, configuration or infrastructure changed. No findings were close
 
 - `kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md`
 - Commit: `dd4f22c9cdd25031991ec237502c44f4b36899f8`
-
-### Source basis
-
-The plan was grounded directly in:
-
-- `common/resilience.py` and the Common Resilience audit.
-- `common/runtime.py` and the Shared Runtime Controls audit.
-- `supervisor/app.py` and the Live Supervisor audit.
-- Tool Gate policy/ledger findings.
-- Trust Ledger application, file ledger, scoring and extension audit.
-- Backup Service implementation/deployment and backup extension audit.
-- Cross-service findings involving retries, process-local control state, false health, unauthorised recovery, mutable audit and unverified backup/restore.
-- Architecture findings for transactions, event envelopes, health semantics, single-writer ownership, audit authority, privacy lifecycle and recovery separation.
 
 ### Result
 
@@ -336,46 +287,123 @@ Defined ten mandatory Phase 3 reliability/governance invariants and twenty-one o
 20. Incident-response and evidence-preservation workflow.
 21. Integrated chaos, restore and operational release gate.
 
-The plan also defines:
-
-- one versioned service-state/error vocabulary;
-- endpoint safety classes and retry rules;
-- durable operation/saga and outbox/inbox models;
-- shared transactional state, leases and fencing tokens;
-- signed, segmented, externally anchored audit architecture;
-- data classification, purpose, consent/basis, encryption and retention controls;
-- authorised service-specific recovery with independent postconditions;
-- coherent signed backups and isolated restore qualification;
-- fourteen adversarial/failure closure tests;
-- Phase 3 exit criteria.
+The plan also defines one service-state/error vocabulary, durable saga/outbox semantics, shared control state, leases/fencing, signed external audit anchoring, privacy lifecycle, authorised recovery, verified backup/restore, fourteen adversarial tests and exit criteria.
 
 No runtime code, configuration or infrastructure changed. No findings were closed.
 
 ---
 
-## Current continuation point
+## 27 July 2026 — Phase 4 capability requalification plan added
 
-Next planned deliverable:
+### Deliverable
 
 - `kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md`
+- Commit: `a8badf74e8b062569e88216a31dff1cd08b5162a`
 
-Planned scope:
+### Source basis
 
-- Authoritative service/model/tool/capability registry.
-- Verified immutable model and backend identity.
-- Evidence independence, provenance and proposition-level verification.
-- Remove style/wording/heuristic conviction as execution authority.
-- Rebuild Fusion consensus and Verifier enforcement.
-- Separate prediction, action, observation and independently verified outcome.
-- Trust/autonomy scoring based only on linked external outcomes.
-- Model/stub/degraded capability truthfulness.
-- Financial, public, destructive and self-modifying action qualification.
-- Staged autonomy levels, rollback and complete attack-chain release tests.
+The plan was grounded directly in:
+
+- Model selector, Model Council and common model-runtime findings.
+- Conviction, adversary, tree-search, planning and cognitive-control findings.
+- Verifier service audit.
+- Fusion Engine and extension audits.
+- Trust Governance, Trust Ledger, behavioural-feedback and autonomy-state findings.
+- Financial Autonomy/Market Intelligence, Broker, public communication and self-modification control findings.
+- Architecture findings for registry fragmentation, correlated checks, recursive self-certification and unverified model identity.
+
+### Result
+
+Defined ten mandatory capability/autonomy invariants and twenty-one ordered implementation PRs covering:
+
+1. Capability and autonomy contract freeze.
+2. Authoritative signed registry.
+3. Model/backend attestation.
+4. Reproducible benchmark authority.
+5. Model selection and failover rebuild.
+6. Removal of heuristic execution conviction.
+7. Immutable claim/evidence service.
+8. Proposition-level Verifier rebuild.
+9. Verifier enforcement integration.
+10. Specialist and Fusion registry.
+11. Structured fusion and contradiction handling.
+12. Prediction/outcome separation.
+13. Calibration service.
+14. Trust Ledger/scoring replacement.
+15. Staged autonomy authority.
+16. Financial-domain qualification.
+17. Public-communication qualification.
+18. Destructive/admin/recovery qualification.
+19. Self-modification review pipeline.
+20. Stub/fallback truthfulness migration.
+21. Integrated capability requalification gate.
+
+The plan also defines:
+
+- exact model/backend attestation and fresh readiness;
+- signed reproducible benchmark records;
+- typed claims, immutable evidence and independence groups;
+- claim-level entailment/contradiction outcomes;
+- qualified specialist identity and structured Fusion;
+- task-specific calibration and abstention;
+- outcome-only scoped trust;
+- A0–A4 narrow autonomy levels;
+- separate high-consequence domain gates;
+- sixteen adversarial closure tests;
+- signed expiring capability release bundles.
+
+No runtime code, configuration or infrastructure changed. No findings were closed.
+
+---
+
+## 27 July 2026 — Integrated implementation sequence and closure matrix added
+
+### Deliverable
+
+- `kai-pm/CODE_AUDIT_IMPLEMENTATION_SEQUENCE_AND_CLOSURE_MATRIX.md`
+- Commit: `15fb0558084a405af3bb6c3c102eb0acb2e03b9b`
+
+### Result
+
+Consolidated all P0–P4 plans into one programme control artefact containing:
+
+- five ordered implementation waves;
+- wave-specific release gates and permitted states;
+- a critical dependency matrix;
+- thirteen highest-impact attack-chain closure rows;
+- finding closure evidence requirements and closure states;
+- explicit closure rules for the ten Critical architecture findings;
+- implementation branch/PR discipline;
+- capability-specific release states;
+- current programme status;
+- the first authorised implementation step.
+
+The matrix records that:
+
+- final audit baseline remains **4,580 findings**;
+- all five source-specific planning phases are complete;
+- runtime remediation remains unstarted by this work;
+- formal finding closures remain zero by planning work;
+- overall release decision remains **NO_GO**.
+
+---
+
+## Current continuation point
+
+The source audit and full P0–P4 remediation-planning package are complete for the reviewed snapshot.
+
+Under the standing no-remediation instruction, the next implementation action is not executed.
+
+When runtime implementation is explicitly authorised, the first action is:
+
+- `P0-PR-01` — preserve evidence and create the immutable acquisition manifest before secrets, volumes, networks, indexes, logs, ledgers or deployment behaviour are altered.
 
 Status at this entry:
 
-- Audit: complete for reviewed snapshot.
+- Audit: **complete for reviewed snapshot**.
 - Final confirmed findings: **4,580**.
-- Remediation planning: Phase 0, Phase 1, Phase 2 and Phase 3 source-specific plans complete.
+- P0–P4 source-specific planning: **complete**.
+- Integrated sequence and closure matrix: **complete**.
 - Runtime remediation: **none**.
-- Findings closed: **zero by this continuation work**.
+- Findings closed by planning work: **zero**.
+- Overall release decision: **NO_GO**.
