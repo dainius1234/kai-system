@@ -27,8 +27,9 @@ No remediation is considered implemented unless explicitly stated in this log an
 3. `kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md` — prioritised programme and release gates.
 4. `kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md` — source-specific Phase 0 implementation sequence.
 5. `kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md` — source-specific identity, operation and enforcement design.
-6. `kai-pm/CODE_AUDIT_BATCH_*.md` — finding-level evidence.
-7. This log — chronology after consolidation.
+6. `kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md` — source-specific execution, browser, parser, egress and data-integrity design.
+7. `kai-pm/CODE_AUDIT_BATCH_*.md` — finding-level evidence.
+8. This log — chronology after consolidation.
 
 ---
 
@@ -217,15 +218,72 @@ Defined eight mandatory Phase 1 security invariants and fifteen ordered implemen
 14. Legacy HMAC/body-token/cosign removal.
 15. Integrated security CI and release evidence.
 
+The plan also defines canonical-operation fields and serialisation, asymmetric audience-bound capabilities, exact operator approval, a machine-readable side-effect registry, migration states, adversarial tests and Phase 1 exit criteria.
+
+No runtime code, configuration or infrastructure changed. No findings were closed.
+
+---
+
+## 27 July 2026 — Phase 2 isolation and integrity plan added
+
+### Deliverable
+
+- `kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md`
+- Commit: `1bc936f53fad7b4c20c943b1bd79237e4fc79727`
+
+### Source basis
+
+The plan was grounded directly in:
+
+- `executor/app.py` and the Executor audit.
+- Browser Agent source/deployment/tests and both Browser Agent audits.
+- Monitor source and Monitor extension audit.
+- Document Parser, upload, OCR and CAD/converter findings.
+- Vault Sync application, mapper, parser and watcher audit.
+- memU Core hot-path, introspection and personality/autonomy audits.
+- Memory Graph audit and extension.
+- Cross-service attack chains involving arbitrary execution, browser-state leakage, hostile content, persistent memory poisoning and undeletable derivatives.
+
+### Result
+
+Defined ten mandatory Phase 2 security invariants and twenty-one ordered implementation PRs covering:
+
+1. Isolation and data-integrity contracts.
+2. Removal of generic Executor operations.
+3. Disposable execution workers.
+4. Execution postcondition/outcome authority.
+5. Hardened egress proxy.
+6. Browser context isolation.
+7. Exact browser actions and postconditions.
+8. Monitor isolated-rule execution.
+9. Upload quarantine and format detection.
+10. Archive/OOXML preflight.
+11. Disposable parser/converter workers.
+12. Provenance-rich parser results.
+13. Vault secure object/path model.
+14. Principal-partitioned memory/session storage.
+15. Evidence/provenance and promotion policy.
+16. Safe context assembly and prompt-injection boundary.
+17. Durable memory/vector/graph outbox.
+18. Graph partitioning and lineage.
+19. Atomic supersession/contradiction state.
+20. End-to-end derivative deletion.
+21. Integrated Phase 2 CI and runtime assurance.
+
 The plan also defines:
 
-- canonical-operation fields and serialisation requirements;
-- asymmetric, audience-bound, short-lived capabilities;
-- exact operator-approval semantics;
-- a machine-readable side-effect endpoint registry;
-- migration states and rollback restrictions;
-- ten adversarial Phase 1 closure tests;
-- Phase 1 exit criteria.
+- fixed-schema execution operation registry;
+- disposable worker security profile;
+- per-principal browser contexts and exact action fingerprints;
+- destination-level egress/SSRF policy;
+- hostile archive and converter controls;
+- immutable evidence classes and records;
+- principal/tenant/purpose/data-class partitioning;
+- durable source/vector/graph state machines;
+- single-writer generations;
+- lineage-driven supersession and deletion;
+- twelve adversarial closure tests;
+- Phase 2 exit criteria.
 
 No runtime code, configuration or infrastructure changed. No findings were closed.
 
@@ -235,25 +293,24 @@ No runtime code, configuration or infrastructure changed. No findings were close
 
 Next planned deliverable:
 
-- `kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md`
+- `kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md`
 
 Planned scope:
 
-- Replace generic command execution.
-- Disposable execution sandboxes.
-- Browser principal isolation.
-- Controlled egress and SSRF prevention.
-- Parser/upload isolation.
-- Principal-partitioned data model.
-- Memory/evidence provenance and poisoning controls.
-- Transactional memory/vector/graph updates.
-- Derivative deletion and supersession.
-- Phase 2 attack-chain closure and runtime assurance.
+- Standard liveness/readiness/degraded/failure contracts.
+- Idempotent distributed mutation and durable saga semantics.
+- Transactional shared security state.
+- Leader election and worker ownership.
+- Signed append-only audit authority and external checkpoints.
+- Data classification, consent, retention and encryption.
+- Authorised recovery separated from health observation.
+- Backup integrity, restore qualification and deletion preservation.
+- Failure injection, incident response and operational release evidence.
 
 Status at this entry:
 
 - Audit: complete for reviewed snapshot.
 - Final confirmed findings: **4,580**.
-- Remediation planning: Phase 0 and Phase 1 source-specific plans complete.
+- Remediation planning: Phase 0, Phase 1 and Phase 2 source-specific plans complete.
 - Runtime remediation: **none**.
 - Findings closed: **zero by this continuation work**.
