@@ -4,15 +4,17 @@ Repository: `dainius1234/kai-system`
 Log started: 27 July 2026  
 Status: **ACTIVE CONTINUATION LOG**
 
-This file records work performed after the source audit reached its final reconciled state. It is chronological and does not replace the final master register, final report or finding-level evidence batches.
+This file records work performed after the audit entered final consolidation and remediation planning. It is chronological and does not replace the final master register, final report or finding-level evidence batches.
 
-Authoritative audit totals remain:
+Authoritative audit totals are now:
 
-- Critical: **221**
-- High: **1,284**
-- Medium: **1,021**
+- Critical: **252**
+- High: **2,440**
+- Medium: **1,885**
 - Low: **3**
-- Total: **2,529**
+- Total: **4,580**
+
+The earlier **2,529** total remains an intermediate reconciled baseline through Wake Service commit `3112c21f8258d5749e632b7cbf45d12b970b0eaf`. It is not the final repository total.
 
 No remediation is considered implemented unless explicitly stated in this log and supported by code/configuration changes plus closure evidence. Planning and documentation commits do not close findings.
 
@@ -25,38 +27,25 @@ No remediation is considered implemented unless explicitly stated in this log an
 3. `kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md` — prioritised programme and release gates.
 4. `kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md` — source-specific Phase 0 implementation sequence.
 5. `kai-pm/CODE_AUDIT_BATCH_*.md` — finding-level evidence.
-6. This log — chronology after final audit consolidation.
+6. This log — chronology after consolidation.
 
 ---
 
-## 27 July 2026 — Final source audit consolidated
+## 27 July 2026 — Intermediate 2,529-finding consolidation
 
-### Deliverable
+### Deliverables
 
 - `kai-pm/CODE_AUDIT_FINAL_REPORT.md`
 - Commit: `e026b6b7520049fd1151866ada590579e2600a21`
-
-### Result
-
-- Final static source/configuration audit completed.
-- Confirmed minimum: **2,529 findings**.
-- Deployment judgement: not safe for production, LAN/Internet exposure, sensitive data, autonomous execution or financial decision-making.
-- No remediation performed.
-
----
-
-## 27 July 2026 — Final master register reconciled
-
-### Deliverable
-
 - `kai-pm/CODE_AUDIT_MASTER.md`
-- Initial final-register commit: `a93528a24bb2e85b2f8788f7fce3024560ecef45`
+- Commit: `a93528a24bb2e85b2f8788f7fce3024560ecef45`
 
 ### Result
 
-- Replaced historical provisional master totals.
-- Established one final numerical source of truth.
-- Preserved component batches as authoritative finding evidence.
+- Reconciled the source audit through Wake Service commit `3112c21f8258d5749e632b7cbf45d12b970b0eaf`.
+- Intermediate baseline: **2,529 findings — 221 Critical, 1,284 High, 1,021 Medium, 3 Low**.
+- This baseline was later superseded after additional findings-bearing batches were committed.
+- No remediation performed.
 
 ---
 
@@ -71,7 +60,7 @@ No remediation is considered implemented unless explicitly stated in this log an
 
 - Converted the finding inventory into P0–P4 architectural work packages.
 - Added dependencies, owner roles, closure evidence and release gates.
-- Defined ten cross-service attack-chain closure tests.
+- Defined cross-service attack-chain closure tests.
 - Preserved status as planning only; no findings closed.
 
 ---
@@ -85,9 +74,8 @@ No remediation is considered implemented unless explicitly stated in this log an
 
 ### Result
 
-- Linked final report, master totals and remediation backlog.
-- Updated evidence hierarchy.
-- Recorded that remediation planning exists but implementation remains zero.
+- Linked final report, master totals and remediation backlog at the then-current 2,529 baseline.
+- This content was later superseded by the 4,580-finding reconciliation.
 
 ---
 
@@ -112,7 +100,80 @@ Mapped immediate containment to concrete repository files and nine ordered imple
 8. Restart, health and recovery containment.
 9. Compose convergence and policy-as-code checks.
 
-No runtime code or configuration changed.
+The plan remains applicable after the expanded audit because the additional batches reinforce, rather than remove, the need for containment. No runtime code or configuration changed.
+
+---
+
+## 27 July 2026 — Additional findings-bearing batches completed
+
+### Reviewed findings snapshot
+
+- Final findings-bearing commit: `2d830f25d569baa5ce955dd8d17e8f0744239876`
+- Commit message: `audit: log uncovered CI workflow assurance findings`
+
+### Result
+
+After the Wake Service baseline, a further **2,051 findings** were logged:
+
+- Critical: **31**
+- High: **1,156**
+- Medium: **864**
+- Low: **0**
+
+The additional scope included host watchers, model runtime, Trust Ledger, camera, operational assurance, test harnesses, shell sandbox, clipboard, screen services, document parsing, browser, Monitor, Broker, Letta, backup, calendar, HMAC rotation, financial awareness, common resilience/authentication, CI, release/bootstrap, operator drills, business-safety advisors, chaos/go-no-go tooling, test stubs, GPU utilities and workflow extensions.
+
+---
+
+## 27 July 2026 — Final master reconciled to 4,580 findings
+
+### Deliverable
+
+- `kai-pm/CODE_AUDIT_MASTER.md`
+- Commit: `f25dd1d12775d69eabe14e14fd7e9d42d9196f44`
+
+### Result
+
+Final arithmetic:
+
+- Findings: `2,529 + 2,051 = 4,580`
+- Critical: `221 + 31 = 252`
+- High: `1,284 + 1,156 = 2,440`
+- Medium: `1,021 + 864 = 1,885`
+- Low: `3`
+
+The master register is the single source of truth and supersedes the earlier 2,529 total and every batch-local provisional total.
+
+---
+
+## 27 July 2026 — Final report republished at 4,580 findings
+
+### Deliverable
+
+- `kai-pm/CODE_AUDIT_FINAL_REPORT.md`
+- Commit: `00b375e31fe25b1fd5183e39bb630a1a0dcc9867`
+
+### Result
+
+- Final source, deployment and system consolidation completed.
+- Release decision recorded as **NO_GO**.
+- Audited findings snapshot fixed through commit `2d830f25d569baa5ce955dd8d17e8f0744239876`.
+- Deployment remains restricted to an isolated disposable development laboratory.
+- No remediation performed.
+
+---
+
+## 27 July 2026 — Continuation log created and corrected
+
+### Deliverables
+
+- Initial log commit: `16217e2156efea88cb976c5e7100625148fb9571`
+- This reconciliation update: current commit
+
+### Result
+
+- The initial log was created before the parallel 4,580-finding consolidation became visible.
+- This update corrects the authoritative totals and records the 2,529 figure only as an intermediate baseline.
+- No findings are closed by this documentation work.
 
 ---
 
@@ -132,10 +193,12 @@ Planned scope:
 - Final side-effect enforcement inventory.
 - Separation of runtime, operator and approval credentials.
 - Migration order and adversarial closure tests.
+- CI and runtime assurance requirements from the expanded 4,580-finding audit.
 
 Status at this entry:
 
-- Audit: complete.
+- Audit: complete for reviewed snapshot.
+- Final confirmed findings: **4,580**.
 - Remediation planning: active.
 - Runtime remediation: **none**.
 - Findings closed: **zero by this continuation work**.
