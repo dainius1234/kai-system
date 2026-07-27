@@ -1,518 +1,413 @@
-# Kai System — Final Code and Architecture Audit Report
+# Kai System — Final Code, Security and Architecture Audit Report
 
 Repository: `dainius1234/kai-system`  
-Audited snapshot: default branch through commit `3112c21f8258d5749e632b7cbf45d12b970b0eaf`  
+Audited snapshot: default branch through findings commit `2d830f25d569baa5ce955dd8d17e8f0744239876`  
 Finalised: 27 July 2026  
-Audit status: **SOURCE REVIEW AND SYSTEM CONSOLIDATION COMPLETE**  
+Audit status: **SOURCE, DEPLOYMENT AND SYSTEM CONSOLIDATION COMPLETE**  
 Remediation status: **NO REMEDIATION PERFORMED**
+
+The exact numerical register is:
+
+- `kai-pm/CODE_AUDIT_MASTER.md`
+
+The prioritised remediation programme is:
+
+- `kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md`
+
+Detailed source-confirmed evidence is retained in:
+
+- `kai-pm/CODE_AUDIT_BATCH_*.md`
 
 ---
 
 ## 1. Executive conclusion
 
-The current Kai System architecture is **not safe for production deployment, Internet/LAN exposure, autonomous execution, financial decision-making or storage of sensitive personal data**.
+The current Kai System architecture is **not safe for production deployment, Internet or shared-LAN exposure, autonomous execution, financial decision-making, operational recovery authority or storage of sensitive personal data**.
 
-The audit identified **2,529 confirmed findings**:
+The completed audit identified **4,580 confirmed findings**:
 
 | Severity | Count | Share |
 |---|---:|---:|
-| Critical | **221** | 8.7% |
-| High | **1,284** | 50.8% |
-| Medium | **1,021** | 40.4% |
-| Low | **3** | 0.1% |
-| **Total** | **2,529** | **100%** |
+| Critical | **252** | **5.5%** |
+| High | **2,440** | **53.3%** |
+| Medium | **1,885** | **41.2%** |
+| Low | **3** | **0.1%** |
+| **Total** | **4,580** | **100%** |
 
-The dominant risk is not one isolated coding error. It is the interaction of several architectural conditions:
+The dominant risk is not a single isolated defect. It is the interaction of insecure trust boundaries, broadly reachable privileged services, failure-shaped success, mutable evidence and side-effect systems that bypass the policy authority intended to govern them.
 
-1. Privileged services are broadly host-published and generally unauthenticated.
-2. The system lacks one authoritative principal, delegation and service-identity plane.
-3. Tool Gate decisions are not enforced at every final side-effect boundary.
-4. Executor and browser/egress services provide compromise pivots across a flat internal network.
-5. Memory, evidence, confidence, trust and operator-personality records can be supplied or influenced by unauthenticated callers.
-6. Self-generated assessments recursively become evidence for future autonomy.
-7. Failure, degraded, stub and rejected states frequently use success-shaped HTTP or JSON contracts.
-8. Security-critical state is commonly process-local, file-backed, unsigned and concurrency-unsafe.
-9. Cross-service mutations lack atomic operations, durable sagas or reliable compensating recovery.
-10. Audit evidence is incomplete, optional, mutable and insufficient for incident reconstruction.
+**Overall judgement:** a reachable attacker, malicious browser payload, poisoned document, compromised internal service or unauthorised local caller can plausibly progress from data injection or reconnaissance to persistent memory poisoning, identity modification, policy-mode changes, sensitive-data extraction, external messaging, browser action, destructive recovery or arbitrary code execution. Several credible paths require no credentials.
 
-**Overall judgement:** a reachable attacker or malicious same-origin script can plausibly move from data injection to persistent prompt poisoning, identity modification, policy-mode alteration, private-data access and arbitrary execution. Several such paths require no credentials.
+### Final release decision
+
+# **NO_GO**
+
+The reviewed snapshot must remain an isolated disposable development laboratory.
 
 ---
 
-## 2. Audit scope and method
+## 2. What was audited
 
-The review proceeded from source files and deployed service definitions, not product claims or documentation alone.
+The audit reviewed source and deployed configuration rather than relying on feature names or documentation claims.
 
-### 2.1 Scope
+Material scope included:
 
-The audit covered:
+- All identified FastAPI services and host-published APIs.
+- Dashboard backend, browser client, SSE and privileged proxy behaviour.
+- Tool Gate, Executor, Verifier, Fusion, Trust Core and Trust Ledger.
+- Agentic planning, conviction, model routing, adversary, forecasting and cognitive modules.
+- memU Core, introspection, graph, compression, vault, sessions, operator memory and P17–P22 autonomy/personality systems.
+- Browser Agent, Web Scout, Monitor and network-egress paths.
+- File, document, OCR, clipboard, camera, audio, vision, screen, wake and sensor services.
+- Financial Awareness, Broker Bridge, market intelligence, calendar, weather, news, email and advisory tools.
+- Supervisor, Heartbeat, Metrics, backup, archival, ledger and recovery workers.
+- Dockerfiles, Compose profiles, host ports, volumes, secrets, networks, health checks and startup ordering.
+- CI workflows, test bootstrap, fake/stub paths, release checks, smoke tests, chaos drills, rotation scripts and host-hardening tooling.
+- Cross-service attack chains, orchestration behaviour and architecture-level trust invariants.
 
-- FastAPI services and direct HTTP trust boundaries.
-- Agentic planning, conviction, routing, verification and model-selection modules.
-- Tool Gate, Executor, Trust and ledger controls.
-- memU Core, introspection, graph, compression and P17–P22 personality/autonomy features.
-- Dashboard backend and browser client.
-- Perception, browser, file, clipboard, audio, vision, wake and screen services.
-- Financial, broker, market, weather, air-quality, news and email integrations.
-- Supervisor, Heartbeat, Metrics Gateway, backup and operational workers.
-- Dockerfiles, Compose topology, secrets, volumes, health checks and startup ordering.
-- Cross-service attack chains and architectural invariants.
-
-### 2.2 Method
-
-For each source area, the audit:
-
-1. Read the implementation and relevant deployment definitions.
-2. Confirmed active integrations and downstream consumers.
-3. Logged only source-supported findings.
-4. Avoided remediation changes.
-5. Reconciled against existing batches to prevent duplicate counting.
-6. Committed each completed batch under `kai-pm/`.
-7. Performed separate cross-service, orchestration and architecture phases.
-
-### 2.3 Counting rule
-
-A finding is counted once in its owning batch. Extension batches contain only non-overlapping additions. Cross-service and architecture findings are counted separately because they describe emergent end-to-end failures or missing system invariants, not repetitions of a component defect.
+The audit is a static/source and configuration assessment. It does not claim live penetration testing of every third-party provider, account, hardware device or external network.
 
 ---
 
-## 3. Final numerical reconciliation
+## 3. Principal architectural failures
 
-Concurrent audit work caused several batch-local “provisional totals” to use stale baselines. The final total was therefore reconstructed mechanically from the repository history.
+### 3.1 No authoritative identity plane
 
-### 3.1 Reconciled baseline
+Many privileged services accept anonymous network callers. Where tokens or HMACs exist, they are frequently:
 
-`CODE_AUDIT_BATCH_EMAIL_READER_EXTENSION.md` established the last coherent baseline before the final consolidation sequence:
+- Shared between multiple services.
+- Supplied inside business payloads.
+- Not bound to one actor or workload.
+- Not bound to every consequential request field.
+- Not protected by consistent nonce, expiry, revocation and rotation semantics.
+- Reused by gateways on behalf of unauthenticated callers.
 
-- Findings: 2,183
-- Critical: 189
-- High: 1,086
-- Medium: 905
-- Low: 3
+Consequences include anonymous privilege borrowing, false audit attribution and inability to prove who authorised an operation.
 
-### 3.2 Subsequent committed deltas
+### 3.2 Policy is not enforced at the final side-effect boundary
 
-| Batch | Findings | Critical | High | Medium |
-|---|---:|---:|---:|---:|
-| TTS Service Extension | 24 | 0 | 12 | 12 |
-| Notify Build Extension | 4 | 0 | 3 | 1 |
-| Audio Perception Extension | 40 | 0 | 24 | 16 |
-| Environmental Sensors Extension | 34 | 0 | 18 | 16 |
-| Files Service Extension | 26 | 0 | 13 | 13 |
-| News Feed Integration Extension | 12 | 0 | 6 | 6 |
-| Sysmetrics Extension | 26 | 0 | 12 | 14 |
-| Memory Graph Extension | 35 | 2 | 18 | 15 |
-| Cross-Service Attack Chains | 32 | 13 | 19 | 0 |
-| Orchestration and Deployment | 35 | 5 | 21 | 9 |
-| Architecture Interaction | 30 | 10 | 20 | 0 |
-| Wake Intent Service | 48 | 2 | 32 | 14 |
-| **Post-baseline delta** | **346** | **32** | **198** | **116** |
+Tool Gate exists, but numerous final action services do not require a valid one-time Gate decision:
 
-Final reconciliation:
+- Executor.
+- Browser and web operations.
+- Memory and preference mutation.
+- File/vault operations.
+- Notification and TTS delivery.
+- Recovery and circuit-breaker reset.
+- Monitoring actions.
+- Financial and paper-trading mutations.
+- Camera/sensor-triggered actions.
 
-- **2,183 + 346 = 2,529 findings**
-- **189 + 32 = 221 Critical**
-- **1,086 + 198 = 1,284 High**
-- **905 + 116 = 1,021 Medium**
+A decision can be denied centrally and still be invoked directly at the service that performs the action.
+
+### 3.3 Dashboard is a privileged confused deputy
+
+The host-published Dashboard aggregates internal control and data services onto one origin. Anonymous callers can use Dashboard-held authority to:
+
+- Change Tool Gate mode.
+- Rewrite Agentic identity and agent-registry files.
+- Access private memory, finance, email, logs and operator models.
+- Trigger browser, monitor, file, notification and self-improvement operations.
+- Stream internal Redis events.
+- Reach services that would otherwise be container-internal.
+
+The browser client also contains a deterministic JavaScript parse failure and multiple stored same-origin XSS paths.
+
+### 3.4 Executor is not a sandbox
+
+Executor accepts requests directly without Gate proof. The command allowlist includes multiple arbitrary-code routes, including Python, Find, Make, Pip, Git and Curl functionality. Timeout and rollback semantics do not contain descendants or reverse actual side effects.
+
+### 3.5 Memory and evidence are not trustworthy
+
+Unauthenticated callers can influence or create:
+
+- Memories and pinned preferences.
+- Feedback and corrections.
+- Operator values, conscience and loyalty state.
+- Historical episode outcomes.
+- Verifier evidence packs.
+- Model confidence and trust signals.
+- World/calendar context.
+- Reflection, identity and future-self records.
+
+Retrieval itself often mutates ranking, access counts and stability, allowing repeated queries to strengthen selected records. Generated assessments can then be stored and reused as evidence, creating self-reinforcing loops.
+
+### 3.6 Verification and consensus are forgeable
+
+Verifier permits caller-provided evidence and uses retrieval rank, overlap and formatting heuristics rather than proposition-level entailment and contradiction. Fusion can produce consensus from one specialist, one failed specialist, duplicates or deterministic stubs. Verifier rejection does not consistently block Fusion output.
+
+### 3.7 Egress, browser and parser services are compromise pivots
+
+Web Scout, Browser Agent, Monitor, Document Parser, OCR, Screen Capture, Vault Sync and Executor contain combinations of:
+
+- SSRF or arbitrary destinations.
+- Shared authenticated browser state.
+- Unbounded response or archive processing.
+- External parser/converter execution.
+- Unsafe files and symlinks.
+- Prompt-injection propagation.
+- Missing egress policy.
+- Broad access to internal service networks.
+
+### 3.8 Failure frequently looks like success
+
+Common patterns include:
+
+- HTTP 200 with error-shaped bodies.
+- Health returning `ok` when capabilities are absent.
+- Stubs represented as completed reasoning.
+- Missing dependencies represented as neutral evidence.
+- Recovery reported successful without verified postconditions.
+- Backup components reported successful without artefacts.
+- Release checks passing when dependencies are unavailable.
+- CI using fake embeddings, known dev secrets and mocked services while reporting green.
+
+### 3.9 Critical state is not transactional
+
+Security and autonomy state is frequently:
+
+- Process-local.
+- Unsynchronised across workers.
+- Stored in unsigned JSON/JSONL.
+- Rewritten non-atomically.
+- Split between database, vector index, graph and local cache.
+- Updated through multi-service operations without a saga or rollback.
+- Restored from incomplete or unverified checkpoints.
+
+### 3.10 Audit and recovery evidence is insufficient
+
+Logs and ledgers often omit:
+
+- Authenticated actor.
+- Canonical request/body digest.
+- Exact policy revision.
+- Before/after state revision.
+- Source evidence identity.
+- Tool/model/backend digest.
+- Delivery or execution postcondition.
+- Durable signature or external integrity anchor.
+
+Some ledgers also retain credentials and signatures, while others acknowledge writes after persistence failure.
+
+---
+
+## 4. Highest-impact cross-service attack chains
+
+### Chain A — Dashboard to arbitrary execution
+
+1. Reach host-published Dashboard.
+2. Use anonymous privileged proxy routes.
+3. Change mode or reach Executor directly.
+4. Invoke an allowlisted command escape.
+5. Read files, call internal services, access network destinations or persist code.
+
+### Chain B — Stored XSS to fleet authority
+
+1. Poison finance, email, news, broker, system or operator-model content.
+2. Dashboard renders the value through unsafe `innerHTML`.
+3. Script executes in the Dashboard origin.
+4. Same-origin calls invoke every privileged Dashboard proxy and read local chat/history state.
+
+### Chain C — Memory poisoning to autonomous action
+
+1. Create a pinned preference, correction, feedback or episode as `keeper`.
+2. memU ranks and repeatedly strengthens the record.
+3. Agentic injects it as privileged context.
+4. Conviction heuristics cross the action threshold.
+5. Gate or direct side-effect service executes the poisoned instruction.
+
+### Chain D — Fabricated evidence to false consensus
+
+1. Supply two duplicated high-rank evidence records to Verifier.
+2. Verifier reports PASS without proposition-level support.
+3. Fusion duplicates or stubs specialist responses.
+4. Consensus is reported.
+5. Downstream consumers treat the result as independently verified.
+
+### Chain E — Browser/Monitor cross-session data exfiltration
+
+1. One workflow authenticates the shared Browser Agent context.
+2. Another caller creates or triggers a Monitor scrape rule.
+3. Monitor scrapes whichever shared page is currently open, not the configured URL.
+4. Private page text enters alerts, logs or Agentic prompts.
+
+### Chain F — Sensor/document prompt poisoning
+
+1. Submit or trigger OCR, clipboard, audio, screen, camera, calendar or document content.
+2. Extracted text lacks a strict untrusted-data boundary.
+3. Dashboard or Agentic promotes it into user/system/memory context.
+4. Stored prompt injection influences later planning and decisions.
+
+### Chain G — Supervisor recovery defeats containment
+
+1. Trigger repeated sweeps or manipulate shallow health responses.
+2. Supervisor opens breakers and calls generic `/recover` routes.
+3. Agentic, memU, Tool Gate or Executor resets containment/security state.
+4. Recovery success is assumed without verified postconditions.
+
+### Chain H — Backup/vault file tampering to destructive action
+
+1. Modify a writable mapping, ledger, checkpoint or backup file.
+2. Invoke unauthenticated delete/restore/recovery.
+3. Service trusts filename or local JSON as authority.
+4. Arbitrary memory deletion, SQL/meta-command execution or state rollback occurs.
+
+### Chain I — Assurance-layer false green
+
+1. CI globally enables dev-secret or fake-embedding modes.
+2. Dependencies are mocked or installed into one shared environment.
+3. Go/no-go passes when Dashboard is unavailable.
+4. Stubs and shallow health keys satisfy release checks.
+5. Known-unready services are released under a green result.
+
+---
+
+## 5. Risk by domain
+
+| Domain | Final assessment |
+|---|---|
+| Authentication and authorisation | **Critical failure** |
+| Final-boundary action enforcement | **Critical failure** |
+| Arbitrary execution containment | **Critical failure** |
+| Dashboard/browser security | **Critical failure** |
+| Memory/evidence integrity | **Critical failure** |
+| Verification and consensus | **Critical failure** |
+| Financial correctness and governance | **High/Critical risk** |
+| Privacy and biometric data | **High/Critical risk** |
+| Service isolation and egress | **Critical failure** |
+| Distributed-state consistency | **High/Critical risk** |
+| Backup and recovery | **High/Critical risk** |
+| Auditability and non-repudiation | **High/Critical risk** |
+| Health, CI and release assurance | **Critical failure** |
+| Production readiness | **NO_GO** |
+
+---
+
+## 6. Immediate containment requirements
+
+Before any connected development use:
+
+1. Remove direct host publication from privileged services.
+2. Bind the only user-facing entry point to loopback or authenticated ingress.
+3. Disable Executor, browser, web egress, monitor actions, vault writes, recovery mutations, finance actions and surveillance services.
+4. Rotate known/default/shared secrets and revoke committed/predictable tokens.
+5. Preserve current audit files, volumes and logs before destructive cleanup.
+6. Do not load real personal, financial, credential, biometric or operational data.
+7. Treat every existing memory, preference, trust, confidence and personality record as untrusted.
+8. Treat current backups, ledgers and checkpoints as unverified evidence, not recovery authority.
+
+---
+
+## 7. Required remediation programme
+
+### P0 — Containment
+
+- Remove exposure.
+- Disable side effects.
+- Rotate credentials.
+- Preserve evidence.
+- Establish safe development profiles.
+
+### P1 — Identity and canonical operations
+
+- Authenticate users, services and workloads.
+- Use scoped short-lived credentials.
+- Define one canonical operation schema.
+- Bind approvals to exact request digests.
+- Enforce approval at the final side-effect service.
+
+### P2 — Isolation and evidence integrity
+
+- Sandbox Executor and parser workloads.
+- Enforce browser/session isolation.
+- Restrict egress.
+- Partition all data by authenticated principal and purpose.
+- Rebuild memory provenance and poisoning controls.
+
+### P3 — Transactional state, audit and recovery
+
+- Move critical state to shared transactional stores.
+- Implement versioned mutation/saga semantics.
+- Create immutable audit chains.
+- Build verified backups and restore drills.
+- Standardise readiness, failure and degraded contracts.
+
+### P4 — Capability requalification
+
+Only after P0–P3:
+
+- Recalibrate conviction.
+- Rebuild Verifier around authoritative evidence.
+- Require independent live Fusion sources.
+- Requalify model routing and GPU recommendations.
+- Re-enable autonomy one capability at a time under adversarial release gates.
+
+---
+
+## 8. Release gates
+
+No consequential capability may be re-enabled until all applicable gates pass:
+
+- External/LAN scan proves no unintended privileged port.
+- Every final side-effect rejects requests lacking a valid exact-action capability.
+- Executor cannot escape its sandbox or survive cancellation.
+- Browser contexts are principal-isolated and egress-controlled.
+- Memory writes require authenticated provenance and cannot self-certify.
+- Verifier rejects caller-fabricated/duplicate evidence.
+- Fusion requires independent live sources and authoritative PASS.
+- Recovery is service-specific, idempotent and postcondition-verified.
+- Backups pass isolated restoration and integrity checks.
+- CI uses production-equivalent authentication/model/storage profiles.
+- Go/no-go fails closed and produces a signed tested-revision report.
+- Multi-worker, restart, clock-change and concurrent-maintenance tests pass.
+
+---
+
+## 9. Numerical reconciliation
+
+The exact arithmetic is maintained in `CODE_AUDIT_MASTER.md`.
+
+- Coherent pre-extension baseline: **2,529 findings**
+- Later findings-bearing batch delta: **2,051 findings**
+- Final total: **4,580 findings**
+
+Severity delta:
+
+- Critical: `221 + 31 = 252`
+- High: `1,284 + 1,156 = 2,440`
+- Medium: `1,021 + 864 = 1,885`
+- Low: `3 + 0 = 3`
+
+Every individual batch’s “provisional repository total” is historical only.
+
+---
+
+## 10. Limitations and confidence
+
+High confidence applies to findings directly supported by source and deployment configuration.
+
+The report does not claim:
+
+- Live exploitation of every path.
+- Runtime verification of external provider permissions/accounts.
+- Hardware-specific behaviour on devices not available during source review.
+- That every third-party dependency vulnerability was enumerated.
+- That all issues have equal exploitability in every deployment profile.
+
+These limitations do not change the NO_GO result because multiple independent critical paths are directly present in source and deployed topology.
+
+---
+
+## 11. Final statement
+
+The repository audit is complete for the reviewed snapshot.
+
+- **4,580 confirmed findings**
+- **252 Critical**
+- **2,440 High**
+- **1,885 Medium**
 - **3 Low**
+- **No remediation performed**
+- **Final release decision: NO_GO**
 
----
-
-## 4. Highest-risk compromise paths
-
-### 4.1 Dashboard stored XSS to complete control-plane compromise
-
-Untrusted content from finance, email, news, Docker, Git, broker and operator-model records is inserted into Dashboard `innerHTML` or inline JavaScript contexts. The Dashboard has no effective authentication or restrictive CSP and proxies privileged services.
-
-A successful same-origin script can:
-
-- Rewrite `SOUL.md` and `AGENTS.md`.
-- Change Tool Gate mode through Dashboard’s server credential.
-- Read or poison memories and preferences.
-- Access finance, email, clipboard, camera, screen and logs.
-- Trigger browser, monitoring, notification and model operations.
-
-This is a complete-control path from ordinary data ingestion to privileged system mutation.
-
-### 4.2 Direct Executor bypass and fleet pivot
-
-Executor is host-published and does not require a valid Tool Gate decision. Its allowlist includes multiple arbitrary-code or command-execution primitives:
-
-- `python3 -c` and module execution.
-- `find -exec` / `-execdir`.
-- Make recipes and evaluation.
-- Pip package build/install code.
-- Git shell aliases, hooks and SSH commands.
-- Curl network/file read and write capabilities.
-- Python-expression access through `__builtins__` subscripting.
-
-The container has broad network reachability to the flat service network. Executor compromise therefore provides a practical pivot to memory, identity, finance, policy and recovery APIs.
-
-### 4.3 Persistent memory-to-system-prompt poisoning
-
-Unauthenticated callers can create records as `keeper`, including pinned preferences and correction-like memories. Agentic and Planner consume these records and place them into privileged prompt roles or plan constraints.
-
-The result is durable cross-session prompt injection with operator authority.
-
-### 4.4 Forged verification and consensus
-
-Verifier accepts caller-supplied evidence scores and duplicate records, measures word overlap rather than entailment and allows superficial plan structure to raise confidence.
-
-Fusion can then report consensus from:
-
-- One specialist.
-- One failed specialist.
-- Repeated duplicate specialist names.
-- Shared deterministic stubs.
-- A caller-selected zero agreement threshold.
-
-Verifier FAIL_CLOSED, REPAIR or unavailability does not reliably invalidate Fusion’s positive result.
-
-### 4.5 Anonymous input transformed into trusted Gate identity
-
-Agentic `/run` accepts anonymous input and caller-selected `task_hint`, then signs a Tool Gate request as trusted actor `langgraph`. The signature omits consequential parameters and conviction. Low conviction and adversary block recommendations do not consistently prevent submission.
-
-This converts untrusted external intent into trusted internal authority.
-
-### 4.6 Tool Gate ledger disclosure to lateral privilege expansion
-
-Any trusted token can access ledger records regardless of configured tool scope. Ledger payloads include tokens/session identifiers, signatures, nonces, parameters and rationale.
-
-A low-purpose credential can therefore expose stronger credentials or signed material.
-
-### 4.7 Vault file ingestion to long-term data exfiltration
-
-Vault Sync can ingest any container-readable path. File content is sent to memU, where it can be searched, returned through Dashboard and injected into Agentic context. Restart and deletion defects can leave duplicate or orphaned copies.
-
-### 4.8 Health manipulation to recovery-state reset
-
-Supervisor accepts public sweeps and shallow health evidence. Repeated failure can trigger `/recover` calls across Agentic, memU, Tool Gate and Executor.
-
-Recovery can reset breakers, pools, tokens, nonces or files without authenticated diagnosis. During an attack, this can remove containment rather than restore safety.
-
-### 4.9 Personal/moral evidence poisoning to autonomy inflation
-
-Unauthenticated feedback, values, conscience actions, loyalty, gratitude and wisdom records can become high-importance memories, alignment results or Trust Ledger evidence. These synthetic states then influence prompts, trust scoring and autonomous decision readiness.
-
-### 4.10 Weak market signal to autonomous financial mutation
-
-One heuristic signal can produce 10/10 conviction. Correlated indicators are counted as independent votes, market source failures become neutral evidence and governance errors fail open. One SELL signal may close every matching long position.
-
----
-
-## 5. Critical architectural root causes
-
-### 5.1 No principal and delegation plane
-
-The system routinely trusts body fields such as `user_id`, `session_id`, `requester`, `actor_did`, `role` and `keeper`. It has no universal, authenticated actor chain.
-
-Required end state:
-
-- Strong user authentication.
-- mTLS or equivalent workload identity.
-- Explicit delegation scopes.
-- Principal-bound session and data ownership.
-- Actor identity included in every audit and operation record.
-
-### 5.2 Policy is not enforced at the side-effect boundary
-
-Tool Gate can make a decision, but Executor and many other services remain directly callable. Advisory outputs—Verifier, Fusion, conviction, go/no-go and moral checks—do not reliably block effects.
-
-Required end state:
-
-- Every consequential side-effect endpoint must require a short-lived, single-use capability.
-- The capability must be bound to the canonical request digest, actor, policy version, expiry and intended executor.
-- No direct bypass route may remain.
-
-### 5.3 No canonical operation identity
-
-Authentication, HMAC, idempotency, co-sign, execution, ledger and outcome records frequently describe different subsets of an operation.
-
-Required end state:
-
-- One canonical serialisation and digest for every security-relevant field.
-- The same digest used by approval, idempotency, execution and audit.
-
-### 5.4 No trustworthy evidence/provenance model
-
-The architecture does not reliably distinguish:
-
-- External observation.
-- User assertion.
-- Model inference.
-- System-generated reflection.
-- Operator approval.
-- Independently observed outcome.
-
-Required end state:
-
-- Immutable typed evidence records.
-- Source identity and content digest.
-- Event time and source clock.
-- Trust class, freshness and independence.
-- Supersession and contradiction links.
-
-### 5.5 No cross-service transaction model
-
-Multi-step operations commit partially:
-
-- Gate → ledger → execute.
-- File → memU → mapping → graph.
-- Memory → vector → graph.
-- Task → notification → acknowledgement.
-- Add → cognify → source mapping.
-
-Required end state:
-
-- Durable operation state machine or saga.
-- Idempotent steps and outbox/inbox processing.
-- Verified terminal state and compensating actions.
-
-### 5.6 No real sandbox or egress boundary
-
-Execution, browser, RSS and Web Scout paths can access internal services and broad external destinations.
-
-Required end state:
-
-- Disposable per-operation worker.
-- Read-only minimal filesystem.
-- Explicit input/output mounts.
-- Default-deny network policy and controlled egress proxy.
-- CPU, memory, process, syscall and time limits.
-
-### 5.7 Self-certifying autonomy
-
-System-generated confidence, reflections, outcomes and alignment become future evidence. This permits fabricated success to compound.
-
-Required end state:
-
-- Separate predictions/actions from outcomes.
-- Outcomes accepted only from independent authenticated observers or explicit operator review.
-- Generated content may never certify its own correctness.
-
-### 5.8 Global personal-state namespace
-
-Hard-coded `keeper` and shared state merge all users, sessions and devices into one identity.
-
-Required end state:
-
-- Principal, tenant, session and purpose partition on every record and derived model.
-- Explicit consent and deletion controls.
-
-### 5.9 No enforceable data lifecycle
-
-Sensitive data appears in local files, JSONL, Redis, Postgres, vector indexes, graphs, localStorage, logs, archives and backups without one retention/deletion model.
-
-Required end state:
-
-- Data classification and purpose registry.
-- Encryption at rest and in transit.
-- Retention classes and expiry.
-- Derivative lineage.
-- Verified deletion across all stores and backups.
-
-### 5.10 Audit evidence is not authoritative
-
-Logs and ledgers are often optional, local, plaintext, concurrency-unsafe and allowed to fail silently.
-
-Required end state:
-
-- Append-only transactional audit service.
-- Signed entries and external checkpoint/transparency anchoring.
-- Complete actor, operation digest, policy, outcome and evidence references.
-- Retention protected from ordinary service rotation.
-
----
-
-## 6. Orchestration and deployment assessment
-
-The deployed topology compounds application risks:
-
-- Nearly every service is bound to a host port.
-- All services share one flat `/16` bridge network.
-- Internal traffic is plaintext HTTP and mostly unauthenticated.
-- Tool Gate starts in WORK mode.
-- Database password falls back to `localdev`.
-- Redis has no authentication or TLS.
-- memU Core and Introspection write the same TurboVec index.
-- Dangerous services are not opt-in deployment profiles.
-- Health checks generally validate HTTP reachability only.
-- Several services report healthy in stub or non-functional states.
-- Startup ordering often waits for container start rather than readiness.
-- Minimal and full Compose definitions disagree on service inventory and ports.
-- Recovery ownership is split among Compose restart policy, Supervisor and service endpoints.
-- Images and model tags are not consistently pinned by digest.
-
-The deployment should be treated as a development laboratory only, on an isolated machine with no sensitive data and no trusted credentials, until the containment actions below are complete.
-
----
-
-## 7. Remediation programme
-
-No remediation was performed during this audit. The following sequence is recommended because fixing individual endpoint bugs before the architectural boundaries will leave equivalent bypasses elsewhere.
-
-### Phase 0 — Immediate containment
-
-1. Stop Internet/LAN exposure; bind all service ports to loopback or remove host publishing.
-2. Stop Dashboard, Executor, Browser Agent, Monitor, Vault Sync, introspection and autonomous financial services unless actively required in an isolated environment.
-3. Set Tool Gate to a locked/restricted mode; remove automatic WORK activation.
-4. Disable graph ingest, financial context and other default-on consequential feature flags.
-5. Rotate database, HMAC, bridge, broker, Telegram, email and external-provider credentials.
-6. Remove known fallback secrets and fail startup when secrets are absent.
-7. Block service-to-service traffic by default and introduce temporary firewall allowlists.
-8. Preserve current logs/volumes as evidence before cleanup or restart.
-
-### Phase 1 — Identity and enforcement foundation
-
-1. Implement one principal and workload-identity authority.
-2. Use mTLS or authenticated service mesh identities internally.
-3. Define delegated endpoint scopes.
-4. Create canonical operation serialisation and digest.
-5. Make Tool Gate issue single-use, digest-bound execution capabilities.
-6. Require that capability at every final side-effect endpoint.
-7. Separate operator administration/co-sign credentials from service tokens.
-8. Remove direct Dashboard and Agentic privilege borrowing.
-
-### Phase 2 — Execution and egress isolation
-
-1. Replace generic Executor commands with fixed-schema operations.
-2. Run actions in disposable sandboxed workers.
-3. Default-deny filesystem and network access.
-4. Route Web Scout, RSS, browser and other egress through a hardened proxy.
-5. Validate DNS/IP on every connection and redirect.
-6. Add global and per-principal workload budgets.
-
-### Phase 3 — Evidence, memory and data integrity
-
-1. Define immutable evidence/provenance schemas.
-2. Partition every store by principal and purpose.
-3. Make memory writes require authenticated source identity.
-4. Exclude unverified/generated records from authority and trust scoring.
-5. Implement transactional memory/vector/graph updates through a durable outbox.
-6. Assign one writer to TurboVec and other mutable indexes.
-7. Implement supersession, contradiction and verified derivative deletion.
-8. Remove recursive self-certification from trust and autonomy.
-
-### Phase 4 — Reliable distributed operation
-
-1. Standardise liveness, readiness, degraded, stale and unavailable schemas.
-2. Use non-200 statuses for failed/blocked operations.
-3. Define idempotency and operation-state contracts for every mutation.
-4. Introduce leader election for schedulers and maintenance workers.
-5. Replace process-local security state with transactional shared stores.
-6. Implement graceful shutdown, task ownership and resource drains.
-7. Add strict schema, byte, depth, numeric and cardinality validation.
-
-### Phase 5 — Audit, privacy and recovery
-
-1. Create one signed append-only audit authority.
-2. Protect audit retention from application rotation and deletion.
-3. Add data classification, consent, retention and deletion policies.
-4. Encrypt sensitive stores and backups.
-5. Test backups through verified restore exercises.
-6. Separate recovery authority from health observation.
-7. Require diagnosed, authorised, idempotent recovery with postcondition verification.
-
-### Phase 6 — Model and autonomy requalification
-
-1. Establish a single model/capability registry with artefact digests.
-2. Replace style-based conviction with calibrated evidence-specific measures.
-3. Require independent sources and account for correlation.
-4. Remove stubs from decision evidence.
-5. Require Verifier PASS at consequential boundaries only after Verifier itself is rebuilt around trusted evidence.
-6. Re-enable autonomous actions only through staged simulations, formal limits and independently measured outcomes.
-
----
-
-## 8. Required release gates
-
-Production or sensitive-data use should remain blocked until all of the following are demonstrated:
-
-- No privileged service is directly host-published.
-- Every request has authenticated principal/workload identity.
-- Every side effect requires an exact digest-bound policy capability.
-- Executor/browser/egress isolation is independently penetration-tested.
-- Memory and personal state are principal-partitioned.
-- Tool, model, service and policy registries are canonical and versioned.
-- All mutation workflows are idempotent and transactionally recoverable.
-- Liveness/readiness/degraded semantics are enforced consistently.
-- Audit records are signed, complete and externally anchored.
-- Secrets have no development fallback and are rotated.
-- Data retention and derivative deletion are verified end to end.
-- Backup restore is successfully tested.
-- Critical and High findings have assigned owners, evidence and closure tests.
-- Cross-service attack chains are retested and demonstrably broken.
-
----
-
-## 9. Positive design elements observed
-
-The audit also found useful foundations that can support remediation:
-
-- The repository already separates many capabilities into service processes.
-- Several services use non-root container users and `no-new-privileges`.
-- Some requests have Pydantic schemas and explicit timeouts.
-- Feature flags exist for staged capability rollout.
-- There is an explicit Tool Gate concept and ledger intent.
-- The project documents risks, decisions and operational plans extensively.
-- Audit batches now provide a detailed defect inventory and source references.
-
-These foundations are valuable, but they are not effective security boundaries in their current implementation.
-
----
-
-## 10. Coverage and evidence index
-
-Detailed evidence is retained in the committed files under:
-
-- `kai-pm/CODE_AUDIT_BATCH_*.md`
-- `kai-pm/CODE_AUDIT_REGISTER*.md` for historical working records
-- `kai-pm/CODE_AUDIT_MASTER.md` for final reconciliation and status
-
-The most important consolidation batches are:
-
-- `CODE_AUDIT_BATCH_AGENTIC_API.md`
-- `CODE_AUDIT_BATCH_MEMU_CORE_HOT_PATH.md`
-- `CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY.md`
-- `CODE_AUDIT_BATCH_TOOL_GATE_EXTENSION.md`
-- `CODE_AUDIT_BATCH_EXECUTOR.md`
-- `CODE_AUDIT_BATCH_VERIFIER.md`
-- `CODE_AUDIT_BATCH_FUSION_ENGINE.md`
-- `CODE_AUDIT_BATCH_FUSION_ENGINE_EXTENSION.md`
-- `CODE_AUDIT_BATCH_DASHBOARD_GATEWAY.md`
-- `CODE_AUDIT_BATCH_DASHBOARD_FRONTEND.md`
-- `CODE_AUDIT_BATCH_LIVE_SUPERVISOR.md`
-- `CODE_AUDIT_BATCH_MEMORY_GRAPH_EXTENSION.md`
-- `CODE_AUDIT_BATCH_CROSS_SERVICE_ATTACK_CHAINS.md`
-- `CODE_AUDIT_BATCH_ORCHESTRATION_ARCHITECTURE.md`
-- `CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md`
-
-All component batches remain the authoritative evidence for individual finding IDs.
-
----
-
-## 11. Residual uncertainty
-
-This was a static source and configuration audit. It did not include:
-
-- Live penetration testing against a deployed stack.
-- Dynamic network capture or container runtime inspection.
-- Fuzzing every endpoint and parser.
-- Dependency CVE enumeration or software-composition analysis.
-- Cloud/IaC outside the reviewed repository.
-- Secret scanning of historical Git objects.
-- Formal verification of cryptographic or concurrency properties.
-
-These activities are likely to identify additional issues. Therefore, **2,529 is a confirmed minimum, not a maximum possible defect count**.
-
----
-
-## 12. Final statement
-
-The repository contains ambitious capability separation and extensive product logic, but its current trust boundaries are largely descriptive rather than enforceable. Authentication, policy, evidence, execution, memory, audit and recovery do not share one authoritative operation model. As a result, individually modest defects combine into direct compromise chains.
-
-The safest path is not to patch findings one at a time while leaving the architecture live. First contain exposure; then establish identity, operation binding and final-boundary enforcement; then rebuild data/evidence integrity and distributed-state semantics. Only after those foundations pass adversarial testing should autonomous, financial, surveillance or execution capabilities be re-enabled.
-
-**Final confirmed total: 2,529 findings — 221 Critical, 1,284 High, 1,021 Medium and 3 Low.**
-
-**No remediation changes were made during this audit.**
+The detailed evidence is preserved in the committed audit batches. The next authorised phase is remediation under the prioritised backlog, not deployment or autonomous operation.
