@@ -4,11 +4,15 @@ Repository: `dainius1234/kai-system`
 Status: **FINAL — SINGLE SOURCE OF TRUTH**  
 Finalised: 27 July 2026  
 Audited snapshot: default branch through commit `3112c21f8258d5749e632b7cbf45d12b970b0eaf`  
-Remediation status: **NO REMEDIATION PERFORMED**
+Remediation status: **NO REMEDIATION PERFORMED — PRIORITISED PLANNING BACKLOG COMMITTED**
 
 The full executive and architectural assessment is:
 
 - `kai-pm/CODE_AUDIT_FINAL_REPORT.md`
+
+The executable remediation plan and release-gate backlog is:
+
+- `kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md`
 
 Detailed source evidence remains in:
 
@@ -103,7 +107,7 @@ The most important system-wide conclusions are:
 9. Cross-service mutations lack atomic transactions or durable saga semantics.
 10. Audit evidence is insufficiently complete and protected for reliable incident reconstruction.
 
-The detailed reasoning and remediation sequence are in `CODE_AUDIT_FINAL_REPORT.md`.
+The detailed reasoning is in `CODE_AUDIT_FINAL_REPORT.md`; the ordered implementation and closure programme is in `CODE_AUDIT_REMEDIATION_BACKLOG.md`.
 
 ---
 
@@ -187,7 +191,7 @@ Before any ordinary remediation sprint:
 7. Apply temporary default-deny service network rules.
 8. Preserve current logs and volumes as audit evidence before cleanup or restart.
 
-The complete staged programme is in the final report.
+The complete staged programme, dependencies, closure tests and release gates are in `CODE_AUDIT_REMEDIATION_BACKLOG.md`.
 
 ---
 
@@ -195,11 +199,12 @@ The complete staged programme is in the final report.
 
 When records disagree, use this order:
 
-1. This final master register for totals and status.
-2. `CODE_AUDIT_FINAL_REPORT.md` for final judgement, attack paths and remediation programme.
-3. The owning `CODE_AUDIT_BATCH_*.md` file for finding-level evidence.
-4. Historical registers only for chronology.
-5. Batch-local provisional totals must not override this register.
+1. This final master register for totals and audit status.
+2. `CODE_AUDIT_FINAL_REPORT.md` for final judgement and confirmed attack paths.
+3. `CODE_AUDIT_REMEDIATION_BACKLOG.md` for remediation sequence, work packages, closure evidence and release gates.
+4. The owning `CODE_AUDIT_BATCH_*.md` file for finding-level evidence.
+5. Historical registers only for chronology.
+6. Batch-local provisional totals must not override this register.
 
 ---
 
@@ -213,8 +218,9 @@ Completed phases:
 - Architecture interaction and invariant review.
 - Final numerical reconciliation.
 - Final executive report.
+- Prioritised remediation backlog and release-gate plan.
 
-No code, configuration, infrastructure or policy remediation was made during the audit.
+No code, configuration, infrastructure or policy remediation was made during the audit or backlog-planning work.
 
 ---
 
@@ -232,4 +238,4 @@ Therefore **2,529 is a confirmed minimum, not an upper bound**.
 
 **Deployment judgement: NOT SAFE FOR PRODUCTION OR SENSITIVE USE.**
 
-**Remediation performed: NONE.**
+**Remediation implemented: NONE. Remediation planning backlog: COMMITTED.**
