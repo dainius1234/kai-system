@@ -56,7 +56,7 @@ services:
       dockerfile: tool-gate/Dockerfile
     <<: *defaults
     environment:
-      MODE: "WORK"
+      MODE: "PUB"
       REQUIRED_CONVICTION: "7.0"
       REDIS_URL: redis://redis:6379
       INTERSERVICE_HMAC_SECRET: /run/secrets/hmac_secret

@@ -87,7 +87,7 @@ services:
     container_name: sovereign-tool-gate
     <<: *defaults
     environment:
-      MODE: "WORK"
+      MODE: "PUB"
       REQUIRED_CONVICTION: "7.0"
       NONCE_TTL_SECONDS: "300"
       HMAC_ALLOW_DEV_SECRET: "true"

@@ -33,11 +33,6 @@ app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__
 
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 VERIFIER_URL   = os.getenv("VERIFIER_URL", "http://verifier:8052")
-# Token that lets the dashboard write mode changes to tool-gate.
-# Set DASHBOARD_GATE_TOKEN in the environment to the same value as one of
-# the trusted tokens in tool-gate's /config/trusted_tokens.txt.
-# If unset the browser mode is still saved locally; server-side mode won't sync.
-DASHBOARD_GATE_TOKEN = os.getenv("DASHBOARD_GATE_TOKEN", "")
 # Store-maintenance reads (stats/search-by-category/quarantine listing) live on
 # memu-core-introspect, split out from memu-core's hot path — see DECISIONS.md D21.
 MEMU_INTROSPECT_URL = os.getenv("MEMU_INTROSPECT_URL", "http://memu-core-introspect:8009")
@@ -69,25 +64,11 @@ async def _proxy_post(url: str, body: dict | None = None,
 
 @app.post("/api/mode")
 async def api_set_mode(body: Dict[str, Any] = Body(...)):
-    """Proxy mode changes from the browser to tool-gate so server and UI agree."""
+    """Accept browser personality mode. Display-state only — does not mutate Tool Gate."""
     mode = str(body.get("mode", "")).upper()
     if mode not in ("WORK", "PUB"):
         raise HTTPException(status_code=400, detail="mode must be WORK or PUB")
-    if not DASHBOARD_GATE_TOKEN:
-        # No token configured — mode is browser-local only. Not an error.
-        return {"status": "local_only", "mode": mode}
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.post(
-                f"{TOOL_GATE_URL}/gate/mode",
-                json={"mode": mode},
-                headers={"Authorization": f"Bearer {DASHBOARD_GATE_TOKEN}"},
-            )
-            resp.raise_for_status()
-            return {"status": "synced", "mode": mode}
-    except Exception as exc:
-        logger.warning("mode sync to tool-gate failed: %s", exc)
-        return {"status": "sync_failed", "mode": mode}
+    return {"status": "local_only", "mode": mode}
 
 
 @app.get("/api/nudges")

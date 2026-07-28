@@ -1701,22 +1701,17 @@ function setOrbState(state) {
 // ── Mode Toggle ────────────────────────────────────────────────────
 
 function setMode(mode) {
+  if (mode !== 'WORK' && mode !== 'PUB') mode = 'PUB';
   localStorage.setItem('kai-mode', mode);
   document.querySelectorAll('.mode-btn').forEach(btn => {
     const m = btn.getAttribute('data-mode');
     btn.classList.toggle('active', m === mode);
     btn.classList.toggle('work', m === 'WORK' && mode === 'WORK');
   });
-  // Sync to server so tool-gate and agentic agree with what the browser sees.
-  fetch('/api/mode', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mode }),
-  }).catch(() => {}); // fire-and-forget; local state is authoritative for this session
 }
 
 function loadMode() {
-  const mode = localStorage.getItem('kai-mode') || 'WORK';
+  const mode = localStorage.getItem('kai-mode') || 'PUB';
   setMode(mode);
 }
 
@@ -2094,7 +2089,7 @@ async function sendMessage() {
 
   try {
     chatAbortController = new AbortController();
-    const mode = localStorage.getItem('kai-mode') || 'WORK';
+    const mode = localStorage.getItem('kai-mode') || 'PUB';
     const resp = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -3299,7 +3294,7 @@ document.addEventListener('keydown', function(e) {
   // Ctrl+Shift+M — toggle mode
   if (e.ctrlKey && e.shiftKey && e.key === 'M') {
     e.preventDefault();
-    const cur = localStorage.getItem('kai-mode') || 'WORK';
+    const cur = localStorage.getItem('kai-mode') || 'PUB';
     setMode(cur === 'WORK' ? 'PUB' : 'WORK');
     showToast('Mode', 'Switched to ' + (cur === 'WORK' ? 'PUB' : 'WORK'), 'info', 2000);
     return;

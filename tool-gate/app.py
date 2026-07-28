@@ -445,9 +445,17 @@ def _is_tool_allowed(token: str, tool: str) -> bool:
     return "*" in scopes or tool in scopes
 
 
+_VALID_MODES = frozenset({"PUB", "WORK"})
+
+
 class GatePolicy:
     def __init__(self) -> None:
         self.mode = os.getenv("MODE", "PUB").upper()
+        if self.mode not in _VALID_MODES:
+            raise ValueError(
+                f"MODE={self.mode!r} is not recognised. "
+                f"Valid modes: {sorted(_VALID_MODES)}"
+            )
         self.required_conviction = float(os.getenv("REQUIRED_CONVICTION", "7.0"))
         self.policy_version = os.getenv("POLICY_VERSION", "phase1-v1")
         self.allowed_tools = {"shell", "qgis", "n8n", "noop", "speak"}
