@@ -67,8 +67,6 @@ services:
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_ROOT_TOKEN:-localdev}
       VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
-    ports:
-      - "8200:8200"
     volumes:
       - ./vault-data:/vault/file
       - ./scripts/vault-init.sh:/vault/scripts/vault-init.sh:ro
@@ -103,8 +101,6 @@ services:
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--web.enable-lifecycle"
-    ports:
-      - "9090:9090"
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.15
@@ -117,8 +113,6 @@ services:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
-    ports:
-      - "9093:9093"
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.17
@@ -126,8 +120,6 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: sovereign-grafana
-    ports:
-      - "3000:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
@@ -143,8 +135,6 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.3
-    ports:
-      - "8000:8000"
     volumes:
       - ./security/trusted_tokens.txt:/config/trusted_tokens.txt:ro
     environment:
@@ -210,8 +200,6 @@ services:
       AUDIT_REDIS_URL: "redis://redis:6379"
       VAULT_ADDR: "${VAULT_ADDR:-http://vault:8200}"
       VAULT_TOKEN: "${VAULT_ROOT_TOKEN:-}"
-    ports:
-      - "8009:8009"
     depends_on:
       - postgres
     healthcheck:
@@ -275,7 +263,7 @@ services:
       sovereign-net:
         ipv4_address: 172.20.0.4
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     environment:
       TOOL_GATE_URL: "http://tool-gate:8000"
       LEDGER_URL: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
@@ -340,8 +328,6 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.6
-    ports:
-      - "8023:8023"
     environment:
       MEMU_URL: "http://memu-core:8001"
       REDIS_URL: "redis://redis:6379"
@@ -446,8 +432,6 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.34
-    ports:
-      - "8045:8045"
     environment:
       PORT: "8045"
       SKILLS_DIR: "/data/skills"
@@ -469,8 +453,6 @@ services:
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.35
-    ports:
-      - "8046:8046"
     environment:
       MEMU_URL: http://memu-core:8001
       NOTIFY_URL: http://notify-service:8031

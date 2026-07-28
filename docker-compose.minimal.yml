@@ -56,8 +56,6 @@ services:
     image: ollama/ollama:latest
     container_name: sovereign-ollama
     <<: *defaults
-    ports:
-      - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
     healthcheck:
@@ -93,8 +91,6 @@ services:
       REQUIRED_CONVICTION: "7.0"
       NONCE_TTL_SECONDS: "300"
       HMAC_ALLOW_DEV_SECRET: "true"
-    ports:
-      - "8000:8000"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
       interval: 30s
@@ -125,8 +121,6 @@ services:
       MEMU_ALLOW_FAKE_EMBEDDINGS: "${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}"
     volumes:
       - turbovec_data:/data/turbovec
-    ports:
-      - "8001:8001"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\""]
       interval: 30s
@@ -155,8 +149,6 @@ services:
       MEMU_ALLOW_FAKE_EMBEDDINGS: "${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}"
     volumes:
       - turbovec_data:/data/turbovec
-    ports:
-      - "8009:8009"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8009/health')\""]
       interval: 30s
@@ -192,8 +184,6 @@ services:
       HOUSE_DOCTOR_URL: http://house-doctor:8046
       VAULT_SYNC_URL: http://vault-sync:8047
       CORTEX_URL: http://cortex:8048
-    ports:
-      - "8007:8007"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8007/health')\""]
       interval: 30s
@@ -221,8 +211,6 @@ services:
       MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
       CHECK_INTERVAL: "60"
       ALERT_WINDOW: "300"
-    ports:
-      - "8010:8010"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8010/health')\""]
       interval: 30s
@@ -272,7 +260,7 @@ services:
       GIT_WATCHER_URL: http://git-watcher:8044
       LANGGRAPH_URL: http://agentic:8007
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/health')\""]
       interval: 30s
@@ -328,8 +316,6 @@ services:
       WHISPER_BACKEND: "${WHISPER_BACKEND:-stub}"
       WHISPER_MODEL: "${WHISPER_MODEL:-tiny}"
       MEMU_URL: http://memu-core:8001
-    ports:
-      - "8021:8021"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8021/health')\""]
       interval: 30s
@@ -352,8 +338,6 @@ services:
     environment:
       TTS_BACKEND: "${TTS_BACKEND:-edge}"
       TTS_VOICE: "${TTS_VOICE:-en-GB-RyanNeural}"
-    ports:
-      - "8030:8030"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8030/health')\""]
       interval: 30s
@@ -375,8 +359,6 @@ services:
       NAV_TIMEOUT_MS: "${NAV_TIMEOUT_MS:-20000}"
       MAX_SCRAPE_CHARS: "${MAX_SCRAPE_CHARS:-50000}"
       FF_BROWSER_AGENT: "${FF_BROWSER_AGENT:-false}"
-    ports:
-      - "8040:8040"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8040/health')\""]
       interval: 30s
@@ -396,8 +378,6 @@ services:
     environment:
       MIN_FACE_SIZE: "${MIN_FACE_SIZE:-30}"
       VISION_BACKEND: "${VISION_BACKEND:-opencv}"
-    ports:
-      - "8023:8023"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8023/health')\""]
       interval: 30s
@@ -417,8 +397,6 @@ services:
     environment:
       CLIPBOARD_MAX_HISTORY: "${CLIPBOARD_MAX_HISTORY:-50}"
       CLIPBOARD_MAX_BYTES: "${CLIPBOARD_MAX_BYTES:-262144}"
-    ports:
-      - "8024:8024"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8024/health')\""]
       interval: 30s
@@ -440,8 +418,6 @@ services:
       FILES_MAX_EVENTS: "${FILES_MAX_EVENTS:-200}"
     volumes:
       - "${WATCH_ROOT:-/tmp}:/watched:ro"
-    ports:
-      - "8025:8025"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8025/health')\""]
       interval: 30s
@@ -460,8 +436,6 @@ services:
     <<: *defaults
     environment:
       NOTIFY_MAX_PENDING: "${NOTIFY_MAX_PENDING:-100}"
-    ports:
-      - "8031:8031"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8031/health')\""]
       interval: 30s
@@ -478,8 +452,6 @@ services:
       dockerfile: document-parser/Dockerfile
     container_name: sovereign-document-parser
     <<: *defaults
-    ports:
-      - "8032:8032"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8032/health')\""]
       interval: 30s
@@ -502,8 +474,6 @@ services:
       TTS_SERVICE_URL: http://tts-service:8030
       RULES_FILE: "${MONITOR_RULES_FILE:-}"
       MONITOR_MAX_ALERTS: "${MONITOR_MAX_ALERTS:-200}"
-    ports:
-      - "8033:8033"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8033/health')\""]
       interval: 30s
@@ -526,8 +496,6 @@ services:
       BINANCE_MODE: "${BINANCE_MODE:-spot}"
       BINANCE_BASE_URL: "${BINANCE_BASE_URL:-https://api.binance.com}"
       BINANCE_FAPI_URL: "${BINANCE_FAPI_URL:-https://fapi.binance.com}"
-    ports:
-      - "8034:8034"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8034/health')\""]
       interval: 30s
@@ -546,8 +514,6 @@ services:
     <<: *defaults
     environment:
       TOP_PROCESSES: "${TOP_PROCESSES:-20}"
-    ports:
-      - "8035:8035"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8035/health')\""]
       interval: 30s
@@ -570,8 +536,6 @@ services:
       TTS_SERVICE_URL: http://tts-service:8030
       WATCH_INTERVAL_SECONDS: "${WATCH_INTERVAL_SECONDS:-10}"
       CHANGE_THRESHOLD: "${CHANGE_THRESHOLD:-0.05}"
-    ports:
-      - "8036:8036"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8036/health')\""]
       interval: 30s
@@ -594,8 +558,6 @@ services:
       MAIL_USER: "${MAIL_USER:-}"
       MAIL_PASS: "${MAIL_PASS:-}"
       EMAIL_POLL_INTERVAL_SECONDS: "${EMAIL_POLL_INTERVAL_SECONDS:-120}"
-    ports:
-      - "8037:8037"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8037/health')\""]
       interval: 30s
@@ -615,8 +577,6 @@ services:
     environment:
       REFRESH_INTERVAL_SECONDS: "${NEWS_REFRESH_INTERVAL:-300}"
       SEED_FEEDS: "${SEED_FEEDS:-}"
-    ports:
-      - "8038:8038"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8038/health')\""]
       interval: 30s
@@ -638,8 +598,6 @@ services:
       WEATHER_LON: "${WEATHER_LON:--0.1278}"
       WEATHER_LOCATION: "${WEATHER_LOCATION:-London}"
       WEATHER_REFRESH_SECONDS: "${WEATHER_REFRESH_SECONDS:-600}"
-    ports:
-      - "8039:8039"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8039/health')\""]
       interval: 30s
@@ -660,8 +618,6 @@ services:
       DOCKER_REFRESH_SECONDS: "${DOCKER_REFRESH_SECONDS:-30}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    ports:
-      - "8041:8041"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8041/health')\""]
       interval: 30s
@@ -683,8 +639,6 @@ services:
       WEATHER_LON: "${WEATHER_LON:--0.1278}"
       WEATHER_LOCATION: "${WEATHER_LOCATION:-London}"
       AQ_REFRESH_SECONDS: "${AQ_REFRESH_SECONDS:-1800}"
-    ports:
-      - "8042:8042"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8042/health')\""]
       interval: 30s
@@ -707,8 +661,6 @@ services:
       CALDAV_PASS: "${CALDAV_PASS:-}"
       CALDAV_REFRESH_SECONDS: "${CALDAV_REFRESH_SECONDS:-300}"
       CALDAV_LOOK_AHEAD_DAYS: "${CALDAV_LOOK_AHEAD_DAYS:-14}"
-    ports:
-      - "8043:8043"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8043/health')\""]
       interval: 30s
@@ -725,8 +677,6 @@ services:
       dockerfile: git-watcher/Dockerfile
     container_name: kai-git-watcher
     restart: unless-stopped
-    ports:
-      - "8044:8044"
     environment:
       PORT: "8044"
       GIT_WATCH_PATHS: "/workspace"
@@ -744,8 +694,6 @@ services:
       dockerfile: skill-hunter/Dockerfile
     container_name: kai-skill-hunter
     restart: unless-stopped
-    ports:
-      - "8045:8045"
     environment:
       PORT: "8045"
       SKILLS_DIR: "/data/skills"
@@ -763,8 +711,6 @@ services:
       dockerfile: house-doctor/Dockerfile
     container_name: kai-house-doctor
     restart: unless-stopped
-    ports:
-      - "8046:8046"
     environment:
       MEMU_URL: http://memu-core:8001
       NOTIFY_URL: http://notify-service:8031
@@ -783,8 +729,6 @@ services:
       dockerfile: vault-sync/Dockerfile
     container_name: kai-vault-sync
     restart: unless-stopped
-    ports:
-      - "8047:8047"
     environment:
       VAULT_PATH: /vault
       MEMU_CORE_URL: http://memu-core:8001
@@ -806,8 +750,6 @@ services:
       dockerfile: cortex/Dockerfile
     container_name: kai-cortex
     restart: unless-stopped
-    ports:
-      - "8048:8048"
     environment:
       FF_CORTEX: "true"
       FF_CORTEX_VERBOSE: "false"
@@ -852,8 +794,6 @@ services:
       WAKE_COOLDOWN_SECONDS: "${WAKE_COOLDOWN_SECONDS:-2}"
       WAKE_INTENT_MODEL: "${WAKE_INTENT_MODEL:-qwen2:0.5b}"
       WAKE_CONFIDENCE_THRESHOLD: "${WAKE_CONFIDENCE_THRESHOLD:-0.6}"
-    ports:
-      - "8022:8022"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8022/health')\""]
       interval: 30s
@@ -881,8 +821,6 @@ services:
       HEARTBEAT_URL: http://heartbeat:8010
       DASHBOARD_URL: http://dashboard:8080
       SUPERVISOR_CHECK_INTERVAL: "15"
-    ports:
-      - "8051:8051"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8051/health')\""]
       interval: 30s
@@ -908,8 +846,6 @@ services:
     <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
-    ports:
-      - "8052:8052"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8052/health')\""]
       interval: 30s

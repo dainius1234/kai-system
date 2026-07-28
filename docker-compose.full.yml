@@ -63,8 +63,6 @@ services:
     secrets:
       - hmac_secret
       - bridge_secret
-    ports:
-      - "8000:8000"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
       interval: 30s
@@ -94,8 +92,6 @@ services:
       FF_GRAPH_INGEST: "${FF_GRAPH_INGEST:-true}"
     volumes:
       - turbovec_data:/data/turbovec
-    ports:
-      - "8001:8001"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\""]
       interval: 30s
@@ -123,8 +119,6 @@ services:
       TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
     volumes:
       - turbovec_data:/data/turbovec
-    ports:
-      - "8009:8009"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8009/health')\""]
       interval: 30s
@@ -147,8 +141,6 @@ services:
       MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
       CHECK_INTERVAL: "60"
       ALERT_WINDOW: "300"
-    ports:
-      - "8010:8010"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8010/health')\""]
       interval: 30s
@@ -179,7 +171,7 @@ services:
       WAKE_URL: http://wake-service:8022
       SCREEN_CAPTURE_URL: http://screen-capture:8059
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/health')\""]
       interval: 30s
@@ -209,8 +201,6 @@ services:
       CAMERA_URL: http://camera-service:8020
       TELEGRAM_ALERT_URL: http://telegram-bot:8025/alert
       PROACTIVE_INTERVAL: "900"
-    ports:
-      - "8051:8051"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8051/health')\""]
       interval: 30s
@@ -233,8 +223,6 @@ services:
     <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
-    ports:
-      - "8052:8052"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8052/health')\""]
       interval: 30s
@@ -254,8 +242,6 @@ services:
     <<: *defaults
     environment:
       VERIFIER_URL: http://verifier:8052
-    ports:
-      - "8053:8053"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8053/health')\""]
       interval: 30s
@@ -296,8 +282,6 @@ services:
       - hmac_secret
     volumes:
       - soul_data:/data/soul
-    ports:
-      - "8007:8007"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8007/health')\""]
       interval: 30s
@@ -324,8 +308,6 @@ services:
       MEMU_URL: http://memu-core:8001
       REDIS_URL: redis://redis:6379
       AGENTIC_CORE_URL: http://agentic:8007
-    ports:
-      - "8023:8023"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8023/health')\""]
       interval: 30s
@@ -351,8 +333,6 @@ services:
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
       HEARTBEAT_URL: http://heartbeat:8010
-    ports:
-      - "8002:8002"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8002/health')\""]
       interval: 30s
@@ -375,8 +355,6 @@ services:
       MEMU_URL: http://memu-core:8001
       MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
       COMPRESSOR_INTERVAL_HOURS: "24"
-    ports:
-      - "8057:8057"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8057/health')\""]
       interval: 30s
@@ -439,8 +417,6 @@ services:
       # Bypass the probe; the ingest/query/forget cycle still exercises the
       # real LLM end-to-end.
       COGNEE_SKIP_CONNECTION_TEST: "true"
-    ports:
-      - "8061:8061"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8061/health')\""]
       interval: 30s
@@ -466,8 +442,6 @@ services:
       LETTA_EMBEDDING_DIM: "384"
       LETTA_CONTEXT_WINDOW: "32768"
       LETTA_BASE_PATH: /data/letta
-    ports:
-      - "8062:8062"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8062/health')\""]
       interval: 30s
@@ -493,8 +467,6 @@ services:
       MTD_START: "${MTD_START:-50000}"
       VAT_THRESHOLD: "${VAT_THRESHOLD:-85000}"
       MILEAGE_RATE: "${MILEAGE_RATE:-0.45}"
-    ports:
-      - "8063:8063"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8063/health')\""]
       interval: 30s
@@ -516,8 +488,6 @@ services:
       TOOL_GATE_URL: http://tool-gate:8000
       HEARTBEAT_URL: http://heartbeat:8010
       LEDGER_VERIFY_INTERVAL: "60"
-    ports:
-      - "8056:8056"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8056/health')\""]
       interval: 30s
@@ -538,8 +508,6 @@ services:
     <<: *defaults
     environment:
       METRICS_SCRAPE_INTERVAL: "30"
-    ports:
-      - "8058:8058"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8058/health')\""]
       interval: 30s
@@ -564,8 +532,6 @@ services:
       WHISPER_MODEL: "tiny"
       WHISPER_API_URL: http://parakeet-server:8080
       AUTO_MEMORIZE_AUDIO: "true"
-    ports:
-      - "8021:8021"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8021/health')\""]
       interval: 30s
@@ -591,8 +557,6 @@ services:
       INTERSERVICE_HMAC_SECRET: /run/secrets/hmac_secret
     secrets:
       - hmac_secret
-    ports:
-      - "8020:8020"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8020/health')\""]
       interval: 30s
@@ -614,8 +578,6 @@ services:
       WAKE_COOLDOWN_SECONDS: "${WAKE_COOLDOWN_SECONDS:-2}"
       WAKE_INTENT_MODEL: "${WAKE_INTENT_MODEL:-qwen2:0.5b}"
       WAKE_CONFIDENCE_THRESHOLD: "${WAKE_CONFIDENCE_THRESHOLD:-0.6}"
-    ports:
-      - "8022:8022"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8022/health')\""]
       interval: 30s
@@ -636,8 +598,6 @@ services:
       context: .
       dockerfile: kai-advisor/Dockerfile
     <<: *defaults
-    ports:
-      - "8090:8090"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8090/health')\""]
       interval: 30s
@@ -656,8 +616,6 @@ services:
     environment:
       TTS_BACKEND: "edge"
       TTS_VOICE: "en-GB-RyanNeural"
-    ports:
-      - "8030:8030"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8030/health')\""]
       interval: 30s
@@ -673,8 +631,6 @@ services:
       context: .
       dockerfile: output/avatar/Dockerfile
     <<: *defaults
-    ports:
-      - "8081:8081"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8081/health')\""]
       interval: 30s
@@ -692,8 +648,6 @@ services:
     <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
-    ports:
-      - "8059:8059"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8059/health')\""]
       interval: 30s
@@ -718,8 +672,6 @@ services:
       TOOL_GATE_URL: http://tool-gate:8000
     secrets:
       - db_password
-    ports:
-      - "8054:8054"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8054/health')\""]
       interval: 30s
@@ -738,8 +690,6 @@ services:
       context: .
       dockerfile: calendar-sync/Dockerfile
     <<: *defaults
-    ports:
-      - "8055:8055"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8055/health')\""]
       interval: 30s
@@ -753,8 +703,6 @@ services:
   ollama:
     image: ollama/ollama:latest
     <<: *defaults
-    ports:
-      - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
     healthcheck:
@@ -812,8 +760,6 @@ services:
       TTS_ENABLED: "true"
       DEFAULT_MODE: "PUB"
       ALLOWED_CHAT_IDS: "${ALLOWED_CHAT_IDS:-}"
-    ports:
-      - "8025:8025"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8025/health')\""]
       interval: 30s
@@ -833,8 +779,6 @@ services:
       context: .
       dockerfile: workspace-manager/Dockerfile
     <<: *defaults
-    ports:
-      - "8060:8060"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8060/health')\""]
       interval: 30s
@@ -850,8 +794,6 @@ services:
       context: .
       dockerfile: skill-hunter/Dockerfile
     <<: *defaults
-    ports:
-      - "8045:8045"
     environment:
       PORT: "8045"
       SKILLS_DIR: "/data/soul/skills"
@@ -872,8 +814,6 @@ services:
       context: .
       dockerfile: house-doctor/Dockerfile
     <<: *defaults
-    ports:
-      - "8046:8046"
     environment:
       MEMU_URL: http://memu-core:8001
       NOTIFY_URL: http://notify-service:8031
