@@ -105,7 +105,6 @@ services:
       - redis
       - tool-gate
       - postgres
-      - memu-graph
 
   memu-core-introspect:
     build:
@@ -187,9 +186,9 @@ services:
       - memu-core-introspect
       - agentic
       - heartbeat
-      - wake-service
 
   supervisor:
+    profiles: ["recovery"]
     build:
       context: .
       dockerfile: supervisor/Dockerfile
@@ -213,10 +212,9 @@ services:
     depends_on:
       - memu-core
       - tool-gate
-      - telegram-bot
-      - camera-service
 
   verifier:
+    profiles: ["recovery"]
     build:
       context: .
       dockerfile: verifier/Dockerfile
@@ -236,6 +234,7 @@ services:
       - memu-core
 
   fusion-engine:
+    profiles: ["recovery"]
     build:
       context: .
       dockerfile: fusion-engine/Dockerfile
@@ -300,6 +299,7 @@ services:
         condition: service_completed_successfully
 
   agentic-introspect:
+    profiles: ["introspection"]
     build:
       context: .
       dockerfile: agentic/Dockerfile.introspect
@@ -326,6 +326,7 @@ services:
         condition: service_healthy
 
   executor:
+    profiles: ["execution"]
     build:
       context: .
       dockerfile: executor/Dockerfile
@@ -369,6 +370,7 @@ services:
       - memu-core-introspect
 
   memu-graph:
+    profiles: ["introspection"]
     build:
       context: .
       dockerfile: memu-graph/Dockerfile
@@ -431,6 +433,7 @@ services:
         condition: service_completed_successfully
 
   letta-agent:
+    profiles: ["introspection"]
     build:
       context: .
       dockerfile: letta-agent/Dockerfile
@@ -458,6 +461,7 @@ services:
         condition: service_completed_successfully
 
   financial-awareness:
+    profiles: ["finance"]
     build:
       context: .
       dockerfile: financial-awareness/Dockerfile
@@ -522,6 +526,7 @@ services:
       - tool-gate
 
   audio-service:
+    profiles: ["sensors"]
     build:
       context: .
       dockerfile: perception/audio/Dockerfile
@@ -547,6 +552,7 @@ services:
       # when WHISPER_BACKEND=api is set. Run with --profile parakeet to include it.
 
   camera-service:
+    profiles: ["sensors"]
     build:
       context: .
       dockerfile: perception/camera/Dockerfile
@@ -568,6 +574,7 @@ services:
         ipv4_address: 172.20.0.14
 
   wake-service:
+    profiles: ["sensors"]
     build:
       context: .
       dockerfile: perception/wake/Dockerfile
@@ -642,6 +649,7 @@ services:
         ipv4_address: 172.20.0.17
 
   screen-capture:
+    profiles: ["sensors"]
     build:
       context: .
       dockerfile: screen-capture/Dockerfile
@@ -748,6 +756,7 @@ services:
         ipv4_address: 172.20.0.28
 
   telegram-bot:
+    profiles: ["external-egress"]
     build:
       context: .
       dockerfile: telegram-bot/Dockerfile
@@ -771,7 +780,6 @@ services:
         ipv4_address: 172.20.0.26
     depends_on:
       - agentic
-      - audio-service
       - tts-service
 
   workspace-manager:

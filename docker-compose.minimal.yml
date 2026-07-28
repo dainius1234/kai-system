@@ -279,34 +279,17 @@ services:
         condition: service_healthy
       heartbeat:
         condition: service_healthy
-      supervisor:
-        condition: service_started
-      wake-service:
-        condition: service_started
-      audio-service:
-        condition: service_started
       tts-service:
-        condition: service_started
-      browser-agent:
-        condition: service_started
-      vision-service:
-        condition: service_started
-      clipboard-service:
-        condition: service_started
-      files-service:
         condition: service_started
       notify-service:
         condition: service_started
       document-parser:
         condition: service_started
-      monitor-service:
-        condition: service_started
-      broker-bridge:
-        condition: service_started
       agentic:
         condition: service_started
 
   audio-service:
+    profiles: ["sensors"]
     build:
       context: .
       dockerfile: perception/audio/Dockerfile
@@ -349,6 +332,7 @@ services:
         ipv4_address: 172.20.0.16
 
   browser-agent:
+    profiles: ["external-egress"]
     build:
       context: .
       dockerfile: browser-agent/Dockerfile
@@ -370,6 +354,7 @@ services:
         ipv4_address: 172.20.0.17
 
   vision-service:
+    profiles: ["sensors"]
     build:
       context: .
       dockerfile: perception/vision/Dockerfile
@@ -389,6 +374,7 @@ services:
         ipv4_address: 172.20.0.18
 
   clipboard-service:
+    profiles: ["sensors"]
     build:
       context: .
       dockerfile: perception/clipboard/Dockerfile
@@ -408,6 +394,7 @@ services:
         ipv4_address: 172.20.0.19
 
   files-service:
+    profiles: ["sensors"]
     build:
       context: .
       dockerfile: perception/files/Dockerfile
@@ -463,6 +450,7 @@ services:
         ipv4_address: 172.20.0.22
 
   monitor-service:
+    profiles: ["watchers"]
     build:
       context: .
       dockerfile: monitor-service/Dockerfile
@@ -485,6 +473,7 @@ services:
         ipv4_address: 172.20.0.23
 
   broker-bridge:
+    profiles: ["finance"]
     build:
       context: .
       dockerfile: broker-bridge/Dockerfile
@@ -507,6 +496,7 @@ services:
         ipv4_address: 172.20.0.24
 
   sysmetrics:
+    profiles: ["watchers"]
     build:
       context: .
       dockerfile: sysmetrics/Dockerfile
@@ -525,6 +515,7 @@ services:
         ipv4_address: 172.20.0.25
 
   screen-watcher:
+    profiles: ["sensors"]
     build:
       context: .
       dockerfile: screen-watcher/Dockerfile
@@ -547,6 +538,7 @@ services:
         ipv4_address: 172.20.0.26
 
   email-reader:
+    profiles: ["external-egress"]
     build:
       context: .
       dockerfile: email-reader/Dockerfile
@@ -569,6 +561,7 @@ services:
         ipv4_address: 172.20.0.27
 
   news-feed:
+    profiles: ["external-egress"]
     build:
       context: .
       dockerfile: news-feed/Dockerfile
@@ -609,6 +602,7 @@ services:
         ipv4_address: 172.20.0.29
 
   docker-watcher:
+    profiles: ["watchers"]
     build:
       context: .
       dockerfile: docker-watcher/Dockerfile
@@ -672,6 +666,7 @@ services:
         ipv4_address: 172.20.0.32
 
   git-watcher:
+    profiles: ["watchers"]
     build:
       context: .
       dockerfile: git-watcher/Dockerfile
@@ -724,6 +719,7 @@ services:
         condition: service_healthy
 
   vault-sync:
+    profiles: ["vault"]
     build:
       context: .
       dockerfile: vault-sync/Dockerfile
@@ -745,6 +741,7 @@ services:
         condition: service_healthy
 
   cortex:
+    profiles: ["introspection"]
     build:
       context: .
       dockerfile: cortex/Dockerfile
@@ -769,20 +766,12 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
-    depends_on:
-      sysmetrics:
-        condition: service_healthy
-      docker-watcher:
-        condition: service_healthy
-      screen-watcher:
-        condition: service_healthy
-      clipboard-service:
-        condition: service_healthy
     networks:
       sovereign-net:
         ipv4_address: 172.20.0.37
 
   wake-service:
+    profiles: ["sensors"]
     build:
       context: .
       dockerfile: perception/wake/Dockerfile
@@ -810,6 +799,7 @@ services:
         condition: service_completed_successfully
 
   supervisor:
+    profiles: ["recovery"]
     build:
       context: .
       dockerfile: supervisor/Dockerfile
@@ -839,6 +829,7 @@ services:
         condition: service_healthy
 
   verifier:
+    profiles: ["recovery"]
     build:
       context: .
       dockerfile: verifier/Dockerfile

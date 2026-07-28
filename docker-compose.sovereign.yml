@@ -40,6 +40,7 @@ services:
       retries: 5
 
   tailscale:
+    profiles: ["external-egress"]
     image: tailscale/tailscale:latest
     container_name: sovereign-tailscale
     hostname: sovereign-tailscale
@@ -210,6 +211,7 @@ services:
 
 
   executor:
+    profiles: ["execution"]
     build: ./executor
     runtime: gvisor
     restart: always
@@ -277,7 +279,6 @@ services:
     depends_on:
       - tool-gate
       - memu-core
-      - executor
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
       interval: 30s
@@ -319,6 +320,7 @@ services:
 
 
   agentic-introspect:
+    profiles: ["introspection"]
     <<: *service_defaults
     build:
       context: .
@@ -354,6 +356,7 @@ services:
 
 
   perception-telegram:
+    profiles: ["external-egress"]
     image: python:3.11-slim
     container_name: perception-telegram
     command: sh -c "pip install --no-cache-dir httpx && python /app/telegram.py"
@@ -399,6 +402,7 @@ services:
 
 
   camera-service:
+    profiles: ["sensors"]
     <<: *service_defaults
     build: ./perception/camera
     container_name: camera-service
@@ -408,6 +412,7 @@ services:
         ipv4_address: 172.20.0.10
 
   audio-service:
+    profiles: ["sensors"]
     <<: *service_defaults
     build: ./perception/audio
     container_name: audio-service
