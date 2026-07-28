@@ -341,9 +341,14 @@ async def health() -> Dict[str, Any]:
     return {"status": "degraded" if degraded else "ok", "device": DEVICE, "checks": checks}
 
 
+_RECOVERY_ENABLED = os.getenv("RECOVERY_ENABLED", "false").lower() == "true"
+
+
 @app.post("/recover")
 async def recover() -> Dict[str, str]:
     """Self-heal — clear temp files, reset state."""
+    if not _RECOVERY_ENABLED:
+        return {"status": "disabled", "reason": "RECOVERY_ENABLED=false"}
     import glob
     for f in glob.glob("/tmp/sovereign_exec_*"):
         try:

@@ -421,6 +421,9 @@ async def health() -> Dict[str, Any]:
     }
 
 
+_RECOVERY_ENABLED = os.getenv("RECOVERY_ENABLED", "false").lower() == "true"
+
+
 @app.post("/recover")
 async def recover() -> Dict[str, Any]:
     """Self-heal — reset circuit breakers to allow retry.
@@ -428,6 +431,8 @@ async def recover() -> Dict[str, Any]:
     Automatically creates a pre-recovery checkpoint so the previous
     state can be inspected or restored via time-travel.
     """
+    if not _RECOVERY_ENABLED:
+        return {"status": "disabled", "reason": "RECOVERY_ENABLED=false"}
     # H3b: snapshot state before resetting anything
     try:
         create_checkpoint(

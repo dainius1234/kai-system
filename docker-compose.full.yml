@@ -34,6 +34,11 @@ x-service-defaults: &defaults
         memory: 2G
   security_opt:
     - no-new-privileges:true
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
 
 services:
   postgres:
@@ -62,6 +67,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 5s
     networks:
       - agent-net
       - data-net
@@ -220,6 +226,7 @@ services:
       CAMERA_URL: http://camera-service:8020
       TELEGRAM_ALERT_URL: http://telegram-bot:8025/alert
       PROACTIVE_INTERVAL: "900"
+      SUPERVISOR_RECOVERY_ENABLED: "false"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8051/health')\""]
       interval: 30s

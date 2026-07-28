@@ -594,14 +594,21 @@ async def health() -> Dict[str, Any]:
     # Tokens loaded
     checks["tokens"] = "ok" if len(TRUSTED_TOKENS) > 0 else "warn: no tokens"
     degraded = any(v.startswith("fail") for v in checks.values())
+    execution_ready = not degraded and policy.mode == "WORK"
     return {"status": "degraded" if degraded else "ok", "mode": policy.mode,
+            "execution_ready": execution_ready,
             "device": DEVICE, "trusted_tokens": str(len(TRUSTED_TOKENS)),
             "checks": checks}
+
+
+_RECOVERY_ENABLED = os.getenv("RECOVERY_ENABLED", "false").lower() == "true"
 
 
 @app.post("/recover")
 async def recover() -> Dict[str, Any]:
     """Self-heal — reconnect Redis, reload tokens, prune nonces."""
+    if not _RECOVERY_ENABLED:
+        return {"status": "disabled", "reason": "RECOVERY_ENABLED=false"}
     global _redis_client
     recovered: list[str] = []
     # Reconnect Redis

@@ -165,9 +165,14 @@ async def health() -> Dict[str, Any]:
     return {"status": "degraded" if degraded else "ok", "device": DEVICE, "checks": checks}
 
 
+_RECOVERY_ENABLED = os.getenv("RECOVERY_ENABLED", "false").lower() == "true"
+
+
 @app.post("/recover")
 async def recover() -> Dict[str, str]:
     """Self-heal — reset tick timer to prevent false stale alerts."""
+    if not _RECOVERY_ENABLED:
+        return {"status": "disabled", "reason": "RECOVERY_ENABLED=false"}
     global last_tick
     last_tick = time.time()
     return {"status": "ok", "action": "tick_reset"}

@@ -1364,9 +1364,14 @@ async def health() -> Dict[str, Any]:
     return {"status": status, "storage": storage_type, "device": DEVICE, "checks": checks}
 
 
+_RECOVERY_ENABLED = os.getenv("RECOVERY_ENABLED", "false").lower() == "true"
+
+
 @app.post("/recover")
 async def recover() -> Dict[str, Any]:
     """Self-heal endpoint — reconnect DB pool, clear stale caches."""
+    if not _RECOVERY_ENABLED:
+        return {"status": "disabled", "reason": "RECOVERY_ENABLED=false"}
     recovered: list[str] = []
     try:
         if hasattr(store, "_pool") and hasattr(store, "_psycopg2"):

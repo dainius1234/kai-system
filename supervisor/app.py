@@ -95,6 +95,7 @@ for svc in SERVICES:
 # Track recovery attempts to avoid infinite loops
 _recovery_attempts: Dict[str, float] = {}
 RECOVERY_COOLDOWN = int(os.getenv("RECOVERY_COOLDOWN", "120"))  # 2min between retries
+RECOVERY_ENABLED = os.getenv("SUPERVISOR_RECOVERY_ENABLED", "false").lower() == "true"
 
 # ── fleet health history (rolling window for trend detection) ───────
 _fleet_history: List[Dict[str, Any]] = []  # last N sweep summaries
@@ -155,6 +156,10 @@ async def _check_service(client: httpx.AsyncClient, svc: Dict[str, str]) -> Dict
 
 async def _attempt_recovery(client: httpx.AsyncClient, name: str) -> bool:
     """Layer 2: attempt to self-heal a service via its /recover endpoint."""
+    if not RECOVERY_ENABLED:
+        logger.info("Recovery skipped for %s (SUPERVISOR_RECOVERY_ENABLED=false)", name)
+        return False
+
     now = time.time()
     last_attempt = _recovery_attempts.get(name, 0.0)
     if now - last_attempt < RECOVERY_COOLDOWN:
@@ -513,7 +518,7 @@ async def health() -> Dict[str, Any]:
     if frozen:
         return {"status": "degraded", "device": DEVICE,
                 "frozen_tasks": frozen, "watchdog": _watchdog.snapshot()}
-    return {"status": "ok", "device": DEVICE}
+    return {"status": "ok", "device": DEVICE, "recovery_enabled": RECOVERY_ENABLED}
 
 
 @app.get("/metrics")
@@ -743,6 +748,8 @@ async def watchdog_status() -> Dict[str, Any]:
 @app.post("/recover/{service_name}")
 async def manual_recover(service_name: str) -> Dict[str, Any]:
     """Manually trigger recovery for a named service."""
+    if not RECOVERY_ENABLED:
+        return {"ok": False, "error": "recovery disabled (SUPERVISOR_RECOVERY_ENABLED=false)"}
     if service_name not in RECOVERY_ACTIONS:
         return {"ok": False, "error": f"unknown service: {service_name}"}
     async with httpx.AsyncClient(timeout=10.0) as client:

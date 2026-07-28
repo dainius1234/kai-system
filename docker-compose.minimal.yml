@@ -31,6 +31,11 @@ x-service-defaults: &defaults
         memory: 2G
   security_opt:
     - no-new-privileges:true
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
 
 services:
   postgres:
@@ -61,6 +66,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 5s
     networks:
       - agent-net
       - data-net
@@ -804,6 +810,7 @@ services:
       HEARTBEAT_URL: http://heartbeat:8010
       DASHBOARD_URL: http://dashboard:8080
       SUPERVISOR_CHECK_INTERVAL: "15"
+      SUPERVISOR_RECOVERY_ENABLED: "false"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8051/health')\""]
       interval: 30s

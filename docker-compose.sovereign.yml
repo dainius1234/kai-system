@@ -15,6 +15,11 @@ x-service-defaults: &service_defaults
       limits:
         cpus: '1.0'
         memory: 2G
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
 
 # Profiles:
 # - dev: local development with Vault dev server
@@ -37,6 +42,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   tailscale:
     profiles: ["external-egress"]
@@ -149,6 +155,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
 
 
   memu-core:
@@ -179,6 +186,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
 
 
   memu-core-introspect:
@@ -205,13 +213,14 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
 
 
   executor:
     profiles: ["execution"]
     build: ./executor
     runtime: gvisor
-    restart: always
+    restart: on-failure
     container_name: executor
     hostname: executor
     user: "1000:1000"
@@ -244,6 +253,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
     deploy:
       restart_policy:
         condition: on-failure
@@ -282,6 +292,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
 
 
   agentic:
@@ -315,6 +326,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
 
 
   agentic-introspect:
@@ -340,6 +352,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
 
 
   redis:
@@ -397,6 +410,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
 
 
   camera-service:
@@ -421,6 +435,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
 
 
   skill-hunter:
@@ -442,6 +457,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
 
   house-doctor:
     <<: *service_defaults
@@ -462,6 +478,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
 
   # TODO: enable GPU when core is stable.
   # ollama:
