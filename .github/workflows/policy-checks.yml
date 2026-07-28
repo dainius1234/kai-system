@@ -1,0 +1,49 @@
+name: Policy-as-Code Checks
+
+on:
+  push:
+    paths:
+      - 'docker-compose*.yml'
+      - 'scripts/security/**'
+      - '.github/workflows/policy-checks.yml'
+  pull_request:
+    paths:
+      - 'docker-compose*.yml'
+      - 'scripts/security/**'
+
+jobs:
+  policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Port binding check
+        run: python scripts/security/check_port_bindings.py
+
+      - name: Default profile check
+        run: python scripts/security/check_default_profiles.py
+
+      - name: Secret fallback check
+        run: python scripts/security/check_secret_fallbacks.py
+
+      - name: Network zone segmentation
+        run: python scripts/security/check_network_zones.py
+
+      - name: TurboVec single-writer
+        run: python scripts/security/check_turbovec_writers.py
+
+      - name: Restart and recovery containment
+        run: python scripts/security/check_restart_recovery.py
+
+      - name: Image tag mutability
+        run: python scripts/security/check_image_tags.py
+
+      - name: Compose drift detection
+        run: python scripts/security/check_compose_drift.py

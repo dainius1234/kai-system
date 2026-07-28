@@ -722,7 +722,7 @@ services:
       - agent-net
 
   ollama:
-    image: ollama/ollama:latest
+    image: ollama/ollama:0.6
     <<: *defaults
     volumes:
       - ollama_data:/root/.ollama
@@ -736,7 +736,7 @@ services:
       - agent-net
 
   ollama-pull:
-    image: ollama/ollama:latest
+    image: ollama/ollama:0.6
     restart: "no"
     # Also pulls EMBEDDING_OLLAMA_MODEL (default all-minilm) — qwen2.5:0.5b is
     # a chat model with no "embedding" capability declared in its Modelfile,
@@ -754,7 +754,7 @@ services:
   # Optional CPU ASR sidecar (parakeet.cpp). Not started by default — opt in by
   # setting WHISPER_BACKEND=api on audio-service and uncommenting depends_on below.
   parakeet-server:
-    image: ghcr.io/mudler/parakeet.cpp-server:latest
+    image: ghcr.io/mudler/parakeet.cpp-server:v0.1.0
     <<: *defaults
     profiles: ["parakeet"]
     command: ["--model", "${PARAKEET_MODEL:-tdt_ctc-110m}", "--port", "8080"]

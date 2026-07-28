@@ -72,7 +72,7 @@ services:
       - data-net
 
   ollama:
-    image: ollama/ollama:latest
+    image: ollama/ollama:0.6
     container_name: sovereign-ollama
     <<: *defaults
     volumes:
@@ -87,7 +87,7 @@ services:
       - agent-net
 
   ollama-pull:
-    image: ollama/ollama:latest
+    image: ollama/ollama:0.6
     container_name: sovereign-ollama-pull
     restart: "no"
     entrypoint: ["sh", "-c", "OLLAMA_HOST=ollama:11434 ollama pull ${OLLAMA_MODEL:-qwen2.5:0.5b} && OLLAMA_HOST=ollama:11434 ollama pull ${EMBEDDING_OLLAMA_MODEL:-all-minilm}"]
@@ -674,7 +674,7 @@ services:
       context: .
       dockerfile: git-watcher/Dockerfile
     container_name: kai-git-watcher
-    restart: unless-stopped
+    <<: *defaults
     environment:
       PORT: "8044"
       GIT_WATCH_PATHS: "/workspace"
@@ -690,7 +690,7 @@ services:
       context: .
       dockerfile: skill-hunter/Dockerfile
     container_name: kai-skill-hunter
-    restart: unless-stopped
+    <<: *defaults
     environment:
       PORT: "8045"
       SKILLS_DIR: "/data/skills"
@@ -706,7 +706,7 @@ services:
       context: .
       dockerfile: house-doctor/Dockerfile
     container_name: kai-house-doctor
-    restart: unless-stopped
+    <<: *defaults
     environment:
       MEMU_URL: http://memu-core:8001
       NOTIFY_URL: http://notify-service:8031
@@ -724,7 +724,7 @@ services:
       context: .
       dockerfile: vault-sync/Dockerfile
     container_name: kai-vault-sync
-    restart: unless-stopped
+    <<: *defaults
     environment:
       VAULT_PATH: /vault
       MEMU_CORE_URL: http://memu-core:8001
@@ -746,7 +746,7 @@ services:
       context: .
       dockerfile: cortex/Dockerfile
     container_name: kai-cortex
-    restart: unless-stopped
+    <<: *defaults
     environment:
       FF_CORTEX: "true"
       FF_CORTEX_VERBOSE: "false"
