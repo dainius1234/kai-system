@@ -26,7 +26,7 @@ services:
     environment:
       POSTGRES_DB: sovereign
       POSTGRES_USER: keeper
-      POSTGRES_PASSWORD: "${DB_PASSWORD:-localdev}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
     volumes:
       - postgres_data:/var/lib/postgresql/data:rw
     healthcheck:
@@ -90,7 +90,6 @@ services:
       MODE: "PUB"
       REQUIRED_CONVICTION: "7.0"
       NONCE_TTL_SECONDS: "300"
-      HMAC_ALLOW_DEV_SECRET: "true"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
       interval: 30s
@@ -114,7 +113,7 @@ services:
       MEMU_URL: http://memu-core:8001
       MAX_MEMORY_RECORDS: "5000"
       VECTOR_STORE: turbovec
-      PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      PG_URI: "postgresql://keeper:${DB_PASSWORD}@postgres:5432/sovereign"
       TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
       # default false (real model or crash, per DECISIONS.md) — CI overrides
       # to true since it's exercising spine/gate logic, not embedding quality
@@ -144,7 +143,7 @@ services:
     <<: *defaults
     environment:
       VECTOR_STORE: turbovec
-      PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      PG_URI: "postgresql://keeper:${DB_PASSWORD}@postgres:5432/sovereign"
       TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
       MEMU_ALLOW_FAKE_EMBEDDINGS: "${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}"
     volumes:
@@ -179,7 +178,6 @@ services:
       LLM_TIMEOUT: "120"
       WAKE_URL: http://wake-service:8022
       FF_WAKE_INTENT_ROUTING: "${FF_WAKE_INTENT_ROUTING:-false}"
-      HMAC_ALLOW_DEV_SECRET: "true"
       SKILL_HUNTER_URL: http://skill-hunter:8045
       HOUSE_DOCTOR_URL: http://house-doctor:8046
       VAULT_SYNC_URL: http://vault-sync:8047

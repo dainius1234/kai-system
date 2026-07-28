@@ -25,7 +25,7 @@ services:
     environment:
       POSTGRES_DB: sovereign
       POSTGRES_USER: keeper
-      POSTGRES_PASSWORD: "${DB_PASSWORD:-localdev}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
     volumes:
       - postgres_data:/var/lib/postgresql/data:rw
     healthcheck:
@@ -86,7 +86,7 @@ services:
       MAX_MEMORY_RECORDS: "5000"
       REDIS_URL: redis://redis:6379
       VECTOR_STORE: turbovec
-      PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      PG_URI: "postgresql://keeper:${DB_PASSWORD}@postgres:5432/sovereign"
       TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
       MEMU_GRAPH_URL: http://memu-graph:8061
       FF_GRAPH_INGEST: "${FF_GRAPH_INGEST:-true}"
@@ -114,7 +114,7 @@ services:
     environment:
       REDIS_URL: redis://redis:6379
       VECTOR_STORE: turbovec
-      PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      PG_URI: "postgresql://keeper:${DB_PASSWORD}@postgres:5432/sovereign"
       TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
     volumes:
       - turbovec_data:/data/turbovec
@@ -674,7 +674,7 @@ services:
       dockerfile: backup-service/Dockerfile
     <<: *defaults
     environment:
-      PG_URI: "postgresql://keeper:${DB_PASSWORD:-localdev}@postgres:5432/sovereign"
+      PG_URI: "postgresql://keeper:${DB_PASSWORD}@postgres:5432/sovereign"
       REDIS_URL: redis://redis:6379
       MEMU_URL: http://memu-core:8001
       TOOL_GATE_URL: http://tool-gate:8000
