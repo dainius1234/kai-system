@@ -25,8 +25,7 @@ services:
     container_name: sovereign-postgres
     hostname: ledger-db
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.2
+      - data-net
     environment:
       POSTGRES_DB: sovereign
       POSTGRES_USER: keeper
@@ -56,6 +55,8 @@ services:
       TS_EXTRA_ARGS: --ssh --accept-routes=true
       TS_HOSTNAME: sovereign-core
     command: sh -c "tailscaled --state=/var/lib/tailscale/tailscaled.state & sleep 2 && tailscale up --authkey=${TS_AUTHKEY} --hostname=${TS_HOSTNAME} --ssh --accept-routes=true && wait"
+    networks:
+      - egress-net
 
 
   vault:
@@ -73,8 +74,7 @@ services:
       - ./scripts/vault-init.sh:/vault/scripts/vault-init.sh:ro
     command: sh -c "vault server -dev -dev-root-token-id=${VAULT_ROOT_TOKEN} & sleep 3 && sh /vault/scripts/vault-init.sh && wait"
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.14
+      - control-net
 
 
   vault-rotator:
@@ -90,8 +90,7 @@ services:
     depends_on:
       - vault
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.18
+      - control-net
 
   prometheus:
     image: prom/prometheus:latest
@@ -103,8 +102,7 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--web.enable-lifecycle"
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.15
+      - observability-net
 
 
   alertmanager:
@@ -115,8 +113,7 @@ services:
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.17
+      - observability-net
 
   grafana:
     image: grafana/grafana:latest
@@ -125,8 +122,7 @@ services:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.16
+      - observability-net
 
   tool-gate:
     <<: *service_defaults
@@ -134,8 +130,9 @@ services:
     container_name: sovereign-tool-gate
     hostname: tool-gate
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.3
+      - control-net
+      - data-net
+      - execution-net
     volumes:
       - ./security/trusted_tokens.txt:/config/trusted_tokens.txt:ro
     environment:
@@ -161,8 +158,8 @@ services:
     container_name: sovereign-memu-core
     hostname: memu-core
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.5
+      - agent-net
+      - data-net
     environment:
       PG_URI: "postgresql://keeper:${DB_PASSWORD}@postgres:5432/memu_db"
       VECTOR_STORE: "postgres"
@@ -193,8 +190,8 @@ services:
     container_name: memu-core-introspect
     hostname: memu-core-introspect
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.19
+      - data-net
+      - observability-net
     environment:
       PG_URI: "postgresql://keeper:${DB_PASSWORD}@postgres:5432/memu_db"
       VECTOR_STORE: "postgres"
@@ -227,8 +224,7 @@ services:
     tmpfs:
       - /tmp:size=64M,noexec,nosuid
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.9
+      - execution-net
     environment:
       BACKOFF_SCHEDULE: "10 60 300"
       TOOL_GATE_URL: "http://tool-gate:8000"
@@ -262,8 +258,10 @@ services:
     container_name: sovereign-dashboard
     hostname: dashboard
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.4
+      - agent-net
+      - control-net
+      - edge-net
+      - observability-net
     ports:
       - "127.0.0.1:8080:8080"
     environment:
@@ -292,8 +290,8 @@ services:
     container_name: agentic
     hostname: agentic
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.7
+      - agent-net
+      - control-net
     volumes:
       - ./data/self-emp:/data/self-emp:ro
     environment:
@@ -328,8 +326,7 @@ services:
     container_name: agentic-introspect
     hostname: agentic-introspect
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.6
+      - agent-net
     environment:
       MEMU_URL: "http://memu-core:8001"
       REDIS_URL: "redis://redis:6379"
@@ -351,8 +348,9 @@ services:
     container_name: sovereign-redis
     hostname: redis
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.8
+      - agent-net
+      - data-net
+      - observability-net
 
 
   perception-telegram:
@@ -367,8 +365,8 @@ services:
       TELEGRAM_API: "http://telegram-bridge:9000"
       BRIDGE_SHARED_SECRET: "${BRIDGE_SHARED_SECRET:-}"
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.12
+      - agent-net
+      - egress-net
     depends_on:
       - agentic
 
@@ -378,8 +376,8 @@ services:
     container_name: sovereign-heartbeat
     hostname: heartbeat
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.13
+      - execution-net
+      - observability-net
     volumes:
       - /var/log/sovereign:/var/log/sovereign:ro
     environment:
@@ -408,8 +406,7 @@ services:
     container_name: camera-service
     hostname: camera-service
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.10
+      - sensor-net
 
   audio-service:
     profiles: ["sensors"]
@@ -418,8 +415,7 @@ services:
     container_name: audio-service
     hostname: audio-service
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.11
+      - sensor-net
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8021/health || exit 1"]
       interval: 30s
@@ -435,8 +431,7 @@ services:
     container_name: skill-hunter
     hostname: skill-hunter
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.34
+      - agent-net
     environment:
       PORT: "8045"
       SKILLS_DIR: "/data/skills"
@@ -456,8 +451,7 @@ services:
     container_name: house-doctor
     hostname: house-doctor
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.35
+      - agent-net
     environment:
       MEMU_URL: http://memu-core:8001
       NOTIFY_URL: http://notify-service:8031
@@ -484,10 +478,26 @@ volumes:
   memu_data:
 
 networks:
-  sovereign-net:
+  agent-net:
     internal: true
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
-          gateway: 172.20.0.1
+  control-net:
+    internal: true
+    driver: bridge
+  data-net:
+    internal: true
+    driver: bridge
+  edge-net:
+    driver: bridge
+  egress-net:
+    driver: bridge
+  execution-net:
+    internal: true
+    driver: bridge
+  observability-net:
+    internal: true
+    driver: bridge
+  sensor-net:
+    internal: true
+    driver: bridge
+

@@ -1,11 +1,28 @@
 version: '3.8'
 
 networks:
-  sovereign-net:
+  agent-net:
+    internal: true
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
+  control-net:
+    internal: true
+    driver: bridge
+  data-net:
+    internal: true
+    driver: bridge
+  edge-net:
+    driver: bridge
+  egress-net:
+    driver: bridge
+  execution-net:
+    internal: true
+    driver: bridge
+  observability-net:
+    internal: true
+    driver: bridge
+  sensor-net:
+    internal: true
+    driver: bridge
 
 # ── Shared defaults ─────────────────────────────────────────────────
 x-service-defaults: &defaults
@@ -35,8 +52,7 @@ services:
       retries: 5
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.2
+      - data-net
 
   redis:
     image: redis:7-alpine
@@ -47,8 +63,8 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.4
+      - agent-net
+      - data-net
 
   tool-gate:
     build:
@@ -70,8 +86,9 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.3
+      - control-net
+      - data-net
+      - execution-net
     depends_on:
       - postgres
       - redis
@@ -99,8 +116,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.5
+      - agent-net
+      - data-net
     depends_on:
       - redis
       - tool-gate
@@ -125,8 +142,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.33
+      - data-net
+      - observability-net
     depends_on:
       - redis
       - postgres
@@ -147,8 +164,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.6
+      - execution-net
+      - observability-net
     depends_on:
       - memu-core
       - memu-core-introspect
@@ -178,8 +195,10 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.7
+      - agent-net
+      - control-net
+      - edge-net
+      - observability-net
     depends_on:
       - tool-gate
       - memu-core
@@ -207,8 +226,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.8
+      - agent-net
+      - control-net
     depends_on:
       - memu-core
       - tool-gate
@@ -228,8 +247,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.9
+      - agent-net
     depends_on:
       - memu-core
 
@@ -248,8 +266,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.10
+      - agent-net
     depends_on:
       - verifier
 
@@ -288,8 +305,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.11
+      - agent-net
+      - control-net
     depends_on:
       memu-core:
         condition: service_healthy
@@ -315,8 +332,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.27
+      - agent-net
     depends_on:
       memu-core:
         condition: service_healthy
@@ -341,8 +357,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.12
+      - execution-net
     depends_on:
       - tool-gate
       - heartbeat
@@ -363,8 +378,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.18
+      - agent-net
+      - observability-net
     depends_on:
       - memu-core
       - memu-core-introspect
@@ -426,8 +441,7 @@ services:
       retries: 3
       start_period: 15s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.29
+      - agent-net
     depends_on:
       ollama-pull:
         condition: service_completed_successfully
@@ -452,8 +466,7 @@ services:
       retries: 3
       start_period: 15s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.34
+      - agent-net
     volumes:
       - letta_data:/data/letta
     depends_on:
@@ -478,8 +491,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.35
+      - agent-net
     volumes:
       - finance_data:/data/finance
 
@@ -499,8 +511,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.19
+      - control-net
+      - observability-net
     depends_on:
       - tool-gate
       - heartbeat
@@ -519,8 +531,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.20
+      - observability-net
     depends_on:
       - memu-core
       - tool-gate
@@ -544,8 +555,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.13
+      - sensor-net
     depends_on:
       - memu-core
       # parakeet-server isn't depended on by default — it's only started/needed
@@ -570,8 +580,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.14
+      - sensor-net
 
   wake-service:
     profiles: ["sensors"]
@@ -592,8 +601,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.24
+      - sensor-net
     depends_on:
       memu-core:
         condition: service_healthy
@@ -612,8 +620,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.15
+      - agent-net
 
   tts-service:
     build:
@@ -630,8 +637,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.16
+      - agent-net
+      - egress-net
 
   avatar-service:
     build:
@@ -645,8 +652,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.17
+      - agent-net
 
   screen-capture:
     profiles: ["sensors"]
@@ -663,8 +669,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.21
+      - sensor-net
     depends_on:
       - memu-core
 
@@ -687,8 +692,9 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.22
+      - agent-net
+      - control-net
+      - data-net
     depends_on:
       - postgres
       - redis
@@ -705,8 +711,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.23
+      - agent-net
 
   ollama:
     image: ollama/ollama:latest
@@ -720,8 +725,7 @@ services:
       retries: 5
       start_period: 15s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.30
+      - agent-net
 
   ollama-pull:
     image: ollama/ollama:latest
@@ -737,8 +741,7 @@ services:
       ollama:
         condition: service_healthy
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.31
+      - agent-net
 
   # Optional CPU ASR sidecar (parakeet.cpp). Not started by default — opt in by
   # setting WHISPER_BACKEND=api on audio-service and uncommenting depends_on below.
@@ -752,8 +755,7 @@ services:
     # Don't gate other services' depends_on on this until verified against a real
     # container — see kai-pm/SHOPPING_LIST_PLAN.md open items.
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.28
+      - sensor-net
 
   telegram-bot:
     profiles: ["external-egress"]
@@ -776,8 +778,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.26
+      - agent-net
+      - egress-net
     depends_on:
       - agentic
       - tts-service
@@ -794,8 +796,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.25
+      - agent-net
 
   skill-hunter:
     build:
@@ -814,8 +815,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.34
+      - agent-net
 
   house-doctor:
     build:
@@ -834,8 +834,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.35
+      - agent-net
 
 volumes:
   postgres_data:

@@ -1,11 +1,25 @@
 version: '3.8'
 
 networks:
-  sovereign-net:
+  agent-net:
+    internal: true
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
+  control-net:
+    internal: true
+    driver: bridge
+  data-net:
+    internal: true
+    driver: bridge
+  edge-net:
+    driver: bridge
+  egress-net:
+    driver: bridge
+  observability-net:
+    internal: true
+    driver: bridge
+  sensor-net:
+    internal: true
+    driver: bridge
 
 # ── Shared defaults ─────────────────────────────────────────────────
 x-service-defaults: &defaults
@@ -36,8 +50,7 @@ services:
       retries: 5
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.2
+      - data-net
 
   redis:
     image: redis:7-alpine
@@ -49,8 +62,8 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.4
+      - agent-net
+      - data-net
 
   ollama:
     image: ollama/ollama:latest
@@ -65,8 +78,7 @@ services:
       retries: 5
       start_period: 15s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.11
+      - agent-net
 
   ollama-pull:
     image: ollama/ollama:latest
@@ -77,8 +89,7 @@ services:
       ollama:
         condition: service_healthy
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.13
+      - agent-net
 
   tool-gate:
     build:
@@ -97,8 +108,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.3
+      - control-net
+      - data-net
     depends_on:
       postgres:
         condition: service_healthy
@@ -127,8 +138,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.5
+      - agent-net
+      - data-net
     depends_on:
       redis:
         condition: service_healthy
@@ -155,8 +166,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.14
+      - data-net
+      - observability-net
     depends_on:
       redis:
         condition: service_healthy
@@ -189,8 +200,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.12
+      - agent-net
+      - control-net
     depends_on:
       memu-core:
         condition: service_healthy
@@ -216,8 +227,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.6
+      - observability-net
     depends_on:
       memu-core:
         condition: service_healthy
@@ -266,8 +276,10 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.7
+      - agent-net
+      - control-net
+      - edge-net
+      - observability-net
     depends_on:
       tool-gate:
         condition: service_healthy
@@ -304,8 +316,7 @@ services:
       retries: 3
       start_period: 15s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.15
+      - sensor-net
     depends_on:
       memu-core:
         condition: service_healthy
@@ -326,8 +337,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.16
+      - agent-net
+      - egress-net
 
   browser-agent:
     profiles: ["external-egress"]
@@ -348,8 +359,7 @@ services:
       retries: 3
       start_period: 30s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.17
+      - egress-net
 
   vision-service:
     profiles: ["sensors"]
@@ -368,8 +378,7 @@ services:
       retries: 3
       start_period: 20s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.18
+      - sensor-net
 
   clipboard-service:
     profiles: ["sensors"]
@@ -388,8 +397,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.19
+      - sensor-net
 
   files-service:
     profiles: ["sensors"]
@@ -410,8 +418,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.20
+      - sensor-net
 
   notify-service:
     build:
@@ -428,8 +435,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.21
+      - agent-net
 
   document-parser:
     build:
@@ -444,8 +450,7 @@ services:
       retries: 3
       start_period: 20s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.22
+      - agent-net
 
   monitor-service:
     profiles: ["watchers"]
@@ -467,8 +472,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.23
+      - observability-net
 
   broker-bridge:
     profiles: ["finance"]
@@ -490,8 +494,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.24
+      - egress-net
 
   sysmetrics:
     profiles: ["watchers"]
@@ -509,8 +512,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.25
+      - observability-net
 
   screen-watcher:
     profiles: ["sensors"]
@@ -532,8 +534,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.26
+      - sensor-net
 
   email-reader:
     profiles: ["external-egress"]
@@ -555,8 +556,7 @@ services:
       retries: 3
       start_period: 15s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.27
+      - egress-net
 
   news-feed:
     profiles: ["external-egress"]
@@ -575,8 +575,7 @@ services:
       retries: 3
       start_period: 20s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.28
+      - egress-net
 
   weather-service:
     build:
@@ -596,8 +595,8 @@ services:
       retries: 3
       start_period: 15s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.29
+      - agent-net
+      - egress-net
 
   docker-watcher:
     profiles: ["watchers"]
@@ -617,8 +616,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.30
+      - observability-net
 
   airquality-service:
     build:
@@ -638,8 +636,8 @@ services:
       retries: 3
       start_period: 15s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.31
+      - agent-net
+      - egress-net
 
   calendar-service:
     build:
@@ -660,8 +658,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.32
+      - agent-net
+      - egress-net
 
   git-watcher:
     profiles: ["watchers"]
@@ -677,8 +675,7 @@ services:
     volumes:
       - /home/user/kai-system:/workspace:ro
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.33
+      - observability-net
 
 
   skill-hunter:
@@ -693,8 +690,7 @@ services:
     volumes:
       - soul_data:/data
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.34
+      - agent-net
     depends_on:
       - dashboard
 
@@ -710,8 +706,7 @@ services:
     volumes:
       - soul_data:/data
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.35
+      - agent-net
     depends_on:
       memu-core:
         condition: service_healthy
@@ -732,8 +727,8 @@ services:
     volumes:
       - vault_data:/vault
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.36
+      - agent-net
+      - control-net
     depends_on:
       memu-core:
         condition: service_healthy
@@ -765,8 +760,8 @@ services:
       retries: 3
       start_period: 15s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.37
+      - agent-net
+      - observability-net
 
   wake-service:
     profiles: ["sensors"]
@@ -788,8 +783,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.10
+      - sensor-net
     depends_on:
       memu-core:
         condition: service_healthy
@@ -816,8 +810,8 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.8
+      - agent-net
+      - control-net
     depends_on:
       tool-gate:
         condition: service_healthy
@@ -842,8 +836,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      sovereign-net:
-        ipv4_address: 172.20.0.9
+      - agent-net
     depends_on:
       memu-core:
         condition: service_healthy
