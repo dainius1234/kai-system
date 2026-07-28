@@ -2812,3 +2812,30 @@ The Auditor knows the full factor model: operator_approval_history (30%), value_
 **Tests:** `scripts/test_alpha_signals.py` — 49 tests; `scripts/test_opportunity_intel.py` — 38 tests. All 87 pass. Covers: `_bnb_symbol` normalisation (5 parametrized cases), FundingRate sentiment (8 tiers), OpenInterest cache/fail-open, LongShortRatio sentiment (5 tiers), MarkPremium contango/backwardation, all fetch methods (success, HTTP error→None, network error→None, cached, empty list→None), batch funding (partial failure), `_score_financial` (all dimensions, neutral=0, capped at 10), `_score_content` (finance keyword boost, controversy, cap), `_score_affiliate` (hardware wallet high tier, generic low, exchange), scan_financial cached, scan_content cached, scan_affiliate cached, scan_trend_arb bullish alignment + cached, full_scan ranking (sorted desc, max_conviction, watchlist threshold), status, singleton lifecycle.
 
 **Consequences:** Kai now sees what prop desks see. Financial signals from the derivatives layer (funding/OI/L/S/basis) feed into opportunity scoring alongside crowd emotion, macro alignment, and cross-domain opportunities (content, affiliate, trend-arb). The `full_scan` endpoint is the entry point for a single ranked view across all domains. Cumulative: 465 tests across D118–D130, all green.
+
+---
+
+## D131 — 2026-07-28 — UH-0 Evidence Manifest (P0-PR-01 Deliverable)
+
+**Context:** After convergence on the Unified Hunter Architecture (one organism, one canonical decision path), the architecture roadmap (`KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md`) mandates UH-0 as the first implementation step: evidence preservation and mapping before any migration begins. P0-PR-01 = immutable acquisition manifest at commit `7adab8d291011f7dddd92a7702ce8236ddb01ea9`.
+
+**Decisions:**
+
+1. **P0-PR-01 executed.** `kai-pm/UH0_EVIDENCE_MANIFEST.md` is the immutable baseline. It records: module-role inventory (44 modules across 6 roles), direct decision-to-action call graph (5 bypass paths), side-effect endpoint registry (20 endpoints), process-local stores (7 writable files/dirs), data/source/consumer lineage map, and classification violations.
+
+2. **Critical violations confirmed:**
+   - `strategy_engine.auto_trade()` — dual role (proposal specialist + actuator), bypasses Workspace/Proposal/Approval/Capability chain entirely. Violates UH-INV-02.
+   - `trust_integration.gate_autonomous_action()` — documented fail-open: any exception → allowed. Violates UH-INV-06 (enforcement must occur at the hand, not merely be attempted).
+   - `global_workspace.py` — confirmed stub: `submit_bid()` discards bids, `select_winner()` no-op, `broadcast()` no-op, `can_operate()` returns False.
+   - **Outcome Verifier role does not exist** in the current codebase. `paper_trader` self-reports success.
+
+3. **Immediate remediations authorised (pre-UH-1, no contracts required):**
+   - `strategy_engine.py`: Remove `auto_trade()`; replace with `generate_proposal()` returning a plain data object with no execution path.
+   - `opportunity_intel.py`: Rename `recommended_action` field to `analyst_note` in `OpportunitySignal`.
+   - `trust_integration.py`: Fail-open for paper trading capability must become fail-closed.
+
+4. **Gate established:** No new direct decision-to-action endpoint may be created until UH-1 canonical contracts are frozen. The 7 LAB-ONLY paths in §7 of the manifest must not become network-accessible.
+
+5. **Next authorised step: UH-1.** Freeze versioned schemas for PerceptionEvent, WorldStateSnapshot, ActionProposal, ConstraintAssessment, ApprovalRecord, ActionCapability, ActionWorkflow, VerifiedOutcome. No D131 sub-component implementation begins before UH-1 exit gate is passed.
+
+**Files produced:** `kai-pm/UH0_EVIDENCE_MANIFEST.md`

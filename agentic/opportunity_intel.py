@@ -51,7 +51,7 @@ class OpportunitySignal:
     time_horizon: str    # "immediate" | "hours" | "days" | "weeks"
     headline: str        # one-sentence human-readable rationale
     signals: List[str]   # contributing evidence bullets
-    recommended_action: str   # verb phrase: "enter long", "create video", "promote X"
+    analyst_note: str   # analyst interpretation; NOT an execution directive (UH-INV-13)
     evidence: Dict[str, Any]  # raw supporting data
     timestamp: float = field(default_factory=time.time)
 
@@ -64,7 +64,7 @@ class OpportunitySignal:
             "time_horizon": self.time_horizon,
             "headline": self.headline,
             "signals": self.signals,
-            "recommended_action": self.recommended_action,
+            "analyst_note": self.analyst_note,
             "evidence": self.evidence,
             "timestamp": self.timestamp,
         }
@@ -340,7 +340,7 @@ class OpportunityIntelligence:
             time_horizon=time_horizon,
             headline=headline,
             signals=signals,
-            recommended_action=action,
+            analyst_note=action,
             evidence=evidence,
         )
         self._store(cache_key, result)
@@ -396,7 +396,7 @@ class OpportunityIntelligence:
             time_horizon=time_horizon,
             headline=headline,
             signals=signals,
-            recommended_action=action,
+            analyst_note=action,
             evidence=evidence,
         )
         self._store(cache_key, result)
@@ -454,7 +454,7 @@ class OpportunityIntelligence:
             time_horizon=time_horizon,
             headline=headline,
             signals=signals,
-            recommended_action=action,
+            analyst_note=action,
             evidence=evidence,
         )
         self._store(cache_key, result)
@@ -552,7 +552,7 @@ class OpportunityIntelligence:
             time_horizon=time_horizon,
             headline=headline,
             signals=signals,
-            recommended_action=action,
+            analyst_note=action,
             evidence=evidence,
         )
         self._store(cache_key, result)

@@ -68,13 +68,14 @@ def test_signal_to_dict_keys():
     sig = OpportunitySignal(
         domain="financial", subject="BTCUSD", conviction=7,
         time_horizon="hours", headline="test", signals=["a"],
-        recommended_action="do something", evidence={}
+        analyst_note="momentum building", evidence={}
     )
     d = sig.to_dict()
     for key in ("domain", "subject", "conviction", "conviction_label",
-                "time_horizon", "headline", "signals", "recommended_action",
+                "time_horizon", "headline", "signals", "analyst_note",
                 "evidence", "timestamp"):
         assert key in d
+    assert "recommended_action" not in d  # removed: UH-INV-13
 
 
 @pytest.mark.parametrize("conviction,label", [

@@ -238,76 +238,58 @@ class TestConsensus:
         assert sig.strategy_name == "consensus"
 
 
-# ── StrategyEngine.auto_trade ─────────────────────────────────────────────────
+# ── StrategyEngine.generate_proposal ──────────────────────────────────────────
+# auto_trade() was removed in UH-0 remediation (UH-INV-02: proposal specialists
+# must not self-execute). generate_proposal() returns a proposal dict only.
 
-class TestAutoTrade:
+class TestGenerateProposal:
     def _engine_with_signal(self, action: str, confidence: float = 0.8) -> StrategyEngine:
         engine = StrategyEngine(strategies=[])
         engine.consensus = MagicMock(return_value=Signal(  # type: ignore[method-assign]
             "BTCUSD", action, confidence, "mock", "mock reason", 50000.0
         ))
-        engine._check_trust = MagicMock()  # type: ignore[method-assign]
         return engine
 
-    def test_auto_trade_hold_returns_hold(self):
+    def test_hold_returns_no_action(self):
         engine = self._engine_with_signal("hold")
-        result = engine.auto_trade("BTCUSD", [50000.0])
-        assert result["action"] == "hold"
+        result = engine.generate_proposal("BTCUSD", [50000.0])
+        assert result["proposal_type"] == "no_action"
+        assert result["requires_approval"] is False
 
-    def test_auto_trade_low_confidence_returns_hold(self):
+    def test_low_confidence_returns_no_action(self):
         engine = self._engine_with_signal("buy", confidence=0.3)
-        result = engine.auto_trade("BTCUSD", [50000.0])
-        assert result["action"] == "hold"
+        result = engine.generate_proposal("BTCUSD", [50000.0])
+        assert result["proposal_type"] == "no_action"
 
-    def test_auto_trade_buy_opens_long(self):
+    def test_buy_returns_open_long_proposal(self):
         engine = self._engine_with_signal("buy")
-        mock_trader = MagicMock()
-        mock_pos = MagicMock()
-        mock_pos.position_id = "pos-123"
-        mock_trader.open_position.return_value = mock_pos
-        with patch("paper_trader.get_paper_trader", return_value=mock_trader):
-            result = engine.auto_trade("BTCUSD", [50000.0])
-        assert result["action"] == "opened"
-        assert result["position_id"] == "pos-123"
-        mock_trader.open_position.assert_called_once_with("BTCUSD", "long", 1.0, 50000.0, "auto")
+        result = engine.generate_proposal("BTCUSD", [50000.0])
+        assert result["proposal_type"] == "open_long"
+        assert result["requires_approval"] is True
+        assert result["symbol"] == "BTCUSD"
+        assert "signal" in result
 
-    def test_auto_trade_sell_closes_long(self):
+    def test_sell_returns_close_long_proposal(self):
         engine = self._engine_with_signal("sell")
-        mock_trader = MagicMock()
-        mock_trader.get_positions.return_value = [
-            {"position_id": "pos-abc", "symbol": "BTCUSD", "side": "long"}
-        ]
-        mock_trade = MagicMock()
-        mock_trade.trade_id = "trade-xyz"
-        mock_trade.pnl = 500.0
-        mock_trader.close_position.return_value = mock_trade
-        with patch("paper_trader.get_paper_trader", return_value=mock_trader):
-            result = engine.auto_trade("BTCUSD", [50000.0])
-        assert result["action"] == "closed"
-        assert "trade-xyz" in result["trade_ids"]
+        result = engine.generate_proposal("BTCUSD", [50000.0])
+        assert result["proposal_type"] == "close_long"
+        assert result["requires_approval"] is True
 
-    def test_auto_trade_sell_no_open_positions(self):
-        engine = self._engine_with_signal("sell")
-        mock_trader = MagicMock()
-        mock_trader.get_positions.return_value = []
-        with patch("paper_trader.get_paper_trader", return_value=mock_trader):
-            result = engine.auto_trade("BTCUSD", [50000.0])
-        assert result["action"] == "no_position"
-
-    def test_auto_trade_trust_denied(self):
-        engine = StrategyEngine(strategies=[])
-        engine.consensus = MagicMock(return_value=Signal(  # type: ignore[method-assign]
-            "BTCUSD", "buy", 0.9, "mock", "mock", 50000.0
-        ))
-        engine._check_trust = MagicMock(side_effect=PermissionError("denied"))  # type: ignore[method-assign]
-        result = engine.auto_trade("BTCUSD", [50000.0])
-        assert result["action"] == "denied"
-
-    def test_auto_trade_paper_trader_error_fail_open(self):
+    def test_no_paper_trader_import_needed(self):
+        # generate_proposal must not import or call paper_trader
         engine = self._engine_with_signal("buy")
-        with patch("paper_trader.get_paper_trader", side_effect=RuntimeError("boom")):
-            result = engine.auto_trade("BTCUSD", [50000.0])
-        assert result["action"] == "error"
+        with patch("paper_trader.get_paper_trader", side_effect=RuntimeError("must not call")):
+            result = engine.generate_proposal("BTCUSD", [50000.0])
+        assert result["proposal_type"] == "open_long"   # no exception raised
+
+    def test_proposal_keys_present(self):
+        engine = self._engine_with_signal("buy")
+        result = engine.generate_proposal("BTCUSD", [50000.0], quantity=2.0, strategy_tag="test")
+        for key in ("proposal_type", "symbol", "quantity", "strategy_tag",
+                    "signal", "requires_approval"):
+            assert key in result
+        assert result["quantity"] == 2.0
+        assert result["strategy_tag"] == "test"
 
 
 # ── StrategyEngine.status ─────────────────────────────────────────────────────

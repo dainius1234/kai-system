@@ -1072,21 +1072,22 @@ async def strategy_consensus(req: StrategyEvalRequest) -> Dict[str, Any]:
     return {"signal": signal.to_dict()}
 
 
-@app.post("/strategy/auto-trade")
-async def strategy_auto_trade(req: StrategyAutoTradeRequest) -> Dict[str, Any]:
-    """D128: Consensus → paper trade action. Trust: AGENT (3)."""
+@app.post("/strategy/propose")
+async def strategy_propose(req: StrategyAutoTradeRequest) -> Dict[str, Any]:
+    """D128: Consensus → ActionProposal (no execution). Trust: OBSERVER (1).
+
+    Returns a proposal dict. The caller must route through Workspace →
+    Policy → Capability before any execution. UH-INV-02 compliant.
+    """
     if not is_enabled("STRATEGY_ENGINE"):
         raise HTTPException(status_code=503, detail="FF_STRATEGY_ENGINE is disabled")
     if len(req.prices) < 2:
         raise HTTPException(status_code=422, detail="prices must have at least 2 values")
-    try:
-        result = await asyncio.to_thread(
-            get_strategy_engine().auto_trade,
-            req.symbol, req.prices, req.quantity, req.strategy_tag,
-        )
-        return result
-    except PermissionError as exc:
-        raise HTTPException(status_code=403, detail=str(exc))
+    result = await asyncio.to_thread(
+        get_strategy_engine().generate_proposal,
+        req.symbol, req.prices, req.quantity, req.strategy_tag,
+    )
+    return result
 
 
 # ── D129: Market Intelligence ─────────────────────────────────────────

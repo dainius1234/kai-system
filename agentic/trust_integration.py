@@ -86,6 +86,14 @@ def _get_ohana():
 
 # ── Gate ─────────────────────────────────────────────────────────────────────
 
+# Capabilities that must fail-closed (denied) when the trust gate is unavailable.
+# UH-INV-06: enforcement occurs at the hand. A gate that fails open is not enforcement.
+_FAIL_CLOSED_CAPABILITIES = frozenset({
+    "paper_trade_open",
+    "paper_trade_close",
+})
+
+
 def gate_autonomous_action(
     capability: str,
     context: Dict[str, Any],
@@ -93,12 +101,16 @@ def gate_autonomous_action(
 ) -> Tuple[bool, str]:
     """Synchronous gate check before any autonomous action.
 
-    Returns (allowed, reason). Never raises — fails open with a warning.
+    Returns (allowed, reason). Never raises.
+    Fail-open for advisory capabilities; fail-closed for execution capabilities
+    listed in _FAIL_CLOSED_CAPABILITIES (UH-INV-06).
+
     Order of checks:
       1. Trust level gate (TrustCore.can_do)
       2. Ohana Core alignment check
       3. Log attempt to Trust Ledger (fire-and-forget)
     """
+    fail_closed = capability in _FAIL_CLOSED_CAPABILITIES
     allowed = True
     reason = "allowed"
 
@@ -110,7 +122,12 @@ def gate_autonomous_action(
                 allowed = False
                 reason = f"trust level {trust.level_name} insufficient for {capability}"
     except Exception as exc:
-        logger.warning("Trust level check failed (fail-open): %s", exc)
+        if fail_closed:
+            allowed = False
+            reason = f"trust gate unavailable (fail-closed for {capability}): {exc}"
+            logger.warning("Trust level check failed, denying %s: %s", capability, exc)
+        else:
+            logger.warning("Trust level check failed (fail-open): %s", exc)
 
     # ── 2. Ohana alignment check ─────────────────────────────────────────────
     if allowed:
@@ -127,7 +144,12 @@ def gate_autonomous_action(
                         alignment, capability,
                     )
         except Exception as exc:
-            logger.warning("Ohana alignment check failed (fail-open): %s", exc)
+            if fail_closed:
+                allowed = False
+                reason = f"Ohana check unavailable (fail-closed for {capability}): {exc}"
+                logger.warning("Ohana alignment check failed, denying %s: %s", capability, exc)
+            else:
+                logger.warning("Ohana alignment check failed (fail-open): %s", exc)
 
     # ── 3. Record in Trust Ledger ─────────────────────────────────────────────
     _record_nonblocking(

@@ -217,7 +217,11 @@ _DEFAULT_STRATEGIES: List[Strategy] = [
 class StrategyEngine:
     """Runs multiple strategies and aggregates their signals.
 
-    Trust: evaluate/consensus = OBSERVER (1); auto_trade = AGENT (3).
+    Trust: evaluate/consensus = OBSERVER (1).
+
+    UH-INV-02: this class is a Proposal Specialist only. It produces
+    an ActionProposal dict; it does not execute trades. Execution is the
+    paper_trader's (Actuator) responsibility, gated by the approval path.
     """
 
     def __init__(self, strategies: Optional[List[Strategy]] = None) -> None:
@@ -270,67 +274,37 @@ class StrategyEngine:
                       reason=f"{winner.upper()} ({counts[winner]}/{total}): " + "; ".join(reasons[:2]),
                       price=price)
 
-    def auto_trade(
+    def generate_proposal(
         self,
         symbol: str,
         prices: List[float],
         quantity: float = 1.0,
         strategy_tag: str = "auto",
     ) -> Dict[str, Any]:
-        """Act on the consensus signal by opening/closing a paper position.
+        """Produce an ActionProposal from the consensus signal.
 
-        Trust: AGENT (3) — autonomous financial decision.
-        Returns a dict describing what was done (or why nothing was done).
+        Returns a proposal dict. Does NOT execute any trade — that is the
+        Actuator's (paper_trader) responsibility after the approval path.
+        The caller must route this through the Workspace → Policy → Capability
+        chain before any execution occurs.
+
+        Trust: OBSERVER (1) — read-only signal production.
         """
         signal = self.consensus(symbol, prices)
+        proposal_type = "no_action"
+        if signal.action == "buy" and signal.confidence >= 0.5:
+            proposal_type = "open_long"
+        elif signal.action == "sell" and signal.confidence >= 0.5:
+            proposal_type = "close_long"
 
-        if signal.action == "hold" or signal.confidence < 0.5:
-            logger.info(
-                "StrategyEngine.auto_trade: HOLD for %s (confidence=%.2f)",
-                symbol, signal.confidence,
-            )
-            return {"action": "hold", "symbol": symbol, "signal": signal.to_dict()}
-
-        try:
-            self._check_trust()
-
-            try:
-                from paper_trader import get_paper_trader
-            except ImportError:
-                from agentic.paper_trader import get_paper_trader  # type: ignore
-
-            trader = get_paper_trader()
-            price = signal.price
-
-            if signal.action == "buy":
-                pos = trader.open_position(symbol, "long", quantity, price, strategy_tag)
-                logger.info("auto_trade: OPEN long %s %.4f @ %.4f", symbol, quantity, price)
-                return {"action": "opened", "symbol": symbol,
-                        "signal": signal.to_dict(), "position_id": pos.position_id}
-
-            if signal.action == "sell":
-                # Close any open long position for this symbol
-                positions = [p for p in trader.get_positions()
-                             if p["symbol"] == symbol and p["side"] == "long"]
-                closed = []
-                for p in positions:
-                    trade = trader.close_position(p["position_id"], price)
-                    closed.append(trade.trade_id)
-                    logger.info("auto_trade: CLOSE long %s @ %.4f pnl=%.4f",
-                                symbol, price, trade.pnl)
-                return {"action": "closed" if closed else "no_position",
-                        "symbol": symbol, "signal": signal.to_dict(), "trade_ids": closed}
-
-        except PermissionError as exc:
-            logger.warning("auto_trade trust denied for %s: %s", symbol, exc)
-            return {"action": "denied", "symbol": symbol,
-                    "signal": signal.to_dict(), "reason": str(exc)}
-        except Exception as exc:
-            logger.debug("auto_trade failed for %s (fail-open): %s", symbol, exc)
-            return {"action": "error", "symbol": symbol,
-                    "signal": signal.to_dict(), "reason": str(exc)}
-
-        return {"action": "hold", "symbol": symbol, "signal": signal.to_dict()}
+        return {
+            "proposal_type": proposal_type,
+            "symbol": symbol,
+            "quantity": quantity,
+            "strategy_tag": strategy_tag,
+            "signal": signal.to_dict(),
+            "requires_approval": proposal_type != "no_action",
+        }
 
     def status(self) -> Dict[str, Any]:
         return {
@@ -338,23 +312,6 @@ class StrategyEngine:
             "strategy_count": len(self._strategies),
         }
 
-    # ── Trust gate ─────────────────────────────────────────────────────
-
-    def _check_trust(self) -> None:
-        try:
-            try:
-                from trust_integration import gate_autonomous_action
-            except ImportError:
-                from agentic.trust_integration import gate_autonomous_action  # type: ignore
-            allowed, reason = gate_autonomous_action(
-                "decide_autonomously", {"context": "strategy_engine"}, conviction=7.0
-            )
-            if not allowed:
-                raise PermissionError(f"StrategyEngine auto_trade denied: {reason}")
-        except PermissionError:
-            raise
-        except Exception as exc:
-            logger.debug("Trust gate unavailable (fail-open for strategy_engine): %s", exc)
 
 
 # ── Singleton ──────────────────────────────────────────────────────────────────
