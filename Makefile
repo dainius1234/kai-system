@@ -18,6 +18,9 @@ policy-check:
 	python3 scripts/security/check_image_tags.py
 	python3 scripts/security/check_compose_drift.py
 
+test-contracts:
+	PYTHONPATH=. python scripts/test_contracts.py
+
 go_no_go:
 	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py agentic/app.py executor/app.py heartbeat/app.py supervisor/app.py verifier/app.py fusion-engine/app.py common/llm.py common/errors.py common/feature_flags.py memory-compressor/app.py ledger-worker/app.py metrics-gateway/app.py telegram-bot/app.py
 	python scripts/go_no_go_check.py
