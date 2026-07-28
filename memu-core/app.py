@@ -598,12 +598,39 @@ class TurboVecStore(PGVectorStore):
         self._tv_bits = int(os.getenv("TURBOVEC_BITS", "4"))
         self._tv_dim = len(generate_embedding("dimension probe"))
         self._tv_path = Path(os.getenv("TURBOVEC_INDEX_PATH", "/data/turbovec/memories.tv"))
-        self._tv_path.parent.mkdir(parents=True, exist_ok=True)
-        if self._tv_path.exists():
-            self._index = self._IdMapIndex.load(str(self._tv_path))
+        self._tv_read_only = os.getenv("TURBOVEC_READ_ONLY", "false").lower() == "true"
+        self._tv_lock_path = self._tv_path.parent / ".writer.lock"
+
+        if self._tv_read_only:
+            if self._tv_path.exists():
+                self._index = self._IdMapIndex.load(str(self._tv_path))
+            else:
+                self._index = self._IdMapIndex(self._tv_dim, self._tv_bits)
         else:
-            self._index = self._IdMapIndex(self._tv_dim, self._tv_bits)
-            self._rebuild_index_from_postgres()
+            self._tv_path.parent.mkdir(parents=True, exist_ok=True)
+            if self._tv_lock_path.exists():
+                import socket
+                existing = self._tv_lock_path.read_text().strip()
+                raise RuntimeError(
+                    f"TurboVec writer lock held by {existing} — "
+                    f"only one writer process is allowed. "
+                    f"Set TURBOVEC_READ_ONLY=true for read-only access."
+                )
+            self._tv_lock_path.write_text(f"{socket.gethostname()}:{os.getpid()}")
+            import atexit
+            atexit.register(self._release_lock)
+            if self._tv_path.exists():
+                self._index = self._IdMapIndex.load(str(self._tv_path))
+            else:
+                self._index = self._IdMapIndex(self._tv_dim, self._tv_bits)
+                self._rebuild_index_from_postgres()
+
+    def _release_lock(self) -> None:
+        try:
+            if self._tv_lock_path.exists():
+                self._tv_lock_path.unlink()
+        except OSError:
+            pass
 
     def _init_schema(self) -> None:
         conn = self._get_conn()
@@ -674,6 +701,8 @@ class TurboVecStore(PGVectorStore):
         self._save_index()
 
     def _save_index(self) -> None:
+        if self._tv_read_only:
+            return
         self._index.write(str(self._tv_path))
 
     _SELECT_COLS = ("id, timestamp, event_type, category, content, embedding_raw, "

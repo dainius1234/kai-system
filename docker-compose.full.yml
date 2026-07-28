@@ -133,8 +133,9 @@ services:
       VECTOR_STORE: turbovec
       PG_URI: "postgresql://keeper:${DB_PASSWORD}@postgres:5432/sovereign"
       TURBOVEC_INDEX_PATH: /data/turbovec/memories.tv
+      TURBOVEC_READ_ONLY: "true"
     volumes:
-      - turbovec_data:/data/turbovec
+      - turbovec_data:/data/turbovec:ro
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8009/health')\""]
       interval: 30s
