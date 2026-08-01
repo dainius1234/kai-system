@@ -27,8 +27,8 @@
 |---|---|
 | **Services** | 61 Docker containers |
 | **Test targets** | 91 (`make test-core`) |
-| **Individual tests** | 3,634 (`def test_` across 166 files) |
-| **Python LOC** | ~97,693 |
+| **Individual tests** | 3,740 (`def test_` across 171 files) |
+| **Python LOC** | ~101,758 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 45 |
 | **Failures** | 0 |
@@ -72,12 +72,15 @@ It is the source of truth for UH work — including an honest open-gaps list. Ve
 workstream with a single command:
 
 ```bash
-make test-uh          # all 11 UH suites, 896 tests
+make test-uh          # all 16 UH suites, 1,226 tests
 ```
 
-> **Not yet cut over.** All 33 catalogued actuators remain at `LEGACY` and the perception
-> spine runs in shadow mode. The enforcement machinery is proven by tests; it is not yet
-> carrying live traffic. See §5 of the tracker for the open-gaps list.
+> **Partially cut over.** Tier 1 (11 read-only actuators) is migrated with real dispatch
+> handlers; tiers 2–8 remain at `LEGACY`. The perception spine has an active mode but
+> defaults to shadow. See §5 of the tracker for the open-gaps list.
+>
+> **Deploying?** Six services now authenticate their side-effecting endpoints and
+> **fail closed**. Set `KAI_SERVICE_TOKEN` or they return 503.
 
 ---
 

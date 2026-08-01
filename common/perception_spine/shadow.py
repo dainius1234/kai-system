@@ -31,6 +31,26 @@ from common.perception_spine.journal import EventJournal
 
 logger = logging.getLogger("perception-spine")
 
+# Perception spine mode (UH tracker gap G-02).
+#
+# ``shadow``  — events are validated and journalled, but nothing
+#               downstream consumes them.  Existing data paths are
+#               untouched.  This is the default and the safe state.
+# ``active``  — accepted events are additionally reduced into the world
+#               state, so the spine becomes a real source rather than an
+#               observer.
+#
+# Active mode is *additive*: it does not disable the legacy point-to-point
+# polling that Cortex still performs.  Retiring that is a separate step,
+# gated on the actuator migration, so a fault in the spine cannot take
+# perception offline.
+MODE_ENV = "KAI_PERCEPTION_MODE"
+
+
+def perception_mode() -> str:
+    mode = os.getenv(MODE_ENV, "shadow").strip().lower()
+    return mode if mode in {"shadow", "active"} else "shadow"
+
 
 SENSOR_ENDPOINTS: Dict[str, Tuple[str, str]] = {
     "weather":   ("WEATHER_SERVICE_URL",  "http://weather-service:8039/summary"),
@@ -52,6 +72,8 @@ class ShadowPerceptionRunner:
         principal_identity: str = "kai",
         principal_role: str = "system",
         refresh_interval: int = 60,
+        world_state=None,
+        mode: Optional[str] = None,
     ) -> None:
         self._principal = Principal(identity=principal_identity, role=principal_role)
         self._journal = EventJournal(journal_path)
@@ -61,6 +83,10 @@ class ShadowPerceptionRunner:
             freshness_seconds=int(os.getenv("PERCEPTION_FRESHNESS_SECONDS", "600")),
         )
         self._interval = refresh_interval
+        self._world_state = world_state
+        self._mode = (mode or perception_mode())
+        self._reduced_count = 0
+        self._reduce_failures = 0
         self._cycle_count = 0
         self._cycle_stats: List[Dict[str, Any]] = []
         self._running = False
@@ -129,6 +155,7 @@ class ShadowPerceptionRunner:
 
             if ingress_result.verdict == IngressVerdict.ACCEPTED:
                 results["events_accepted"] += 1
+                self._maybe_reduce(ingress_result.event, results)
             elif ingress_result.verdict == IngressVerdict.ACCEPTED_STALE:
                 results["events_stale"] += 1
             elif ingress_result.verdict == IngressVerdict.REJECTED_DUPLICATE:
@@ -136,6 +163,8 @@ class ShadowPerceptionRunner:
             else:
                 results["events_rejected"] += 1
 
+        results["mode"] = self._mode
+        results["events_reduced"] = self._reduced_count
         results["duration_ms"] = round((time.monotonic() - cycle_start) * 1000, 1)
         self._cycle_stats.append(results)
 
@@ -152,11 +181,48 @@ class ShadowPerceptionRunner:
         )
         return results
 
+    def _maybe_reduce(self, event, results: Dict[str, Any]) -> None:
+        """Feed an accepted event into the world state, in active mode only.
+
+        A reducer fault must not stop ingestion: the event is already
+        journalled and durable, so a failure here is recorded and the
+        cycle continues.  Losing a reduction is recoverable by replay;
+        losing the poll loop is not.
+        """
+        if self._mode != "active" or self._world_state is None:
+            return
+        try:
+            self._world_state.ingest_event(event)
+            self._reduced_count += 1
+        except Exception as exc:
+            self._reduce_failures += 1
+            results.setdefault("reduce_errors", []).append(
+                f"{type(exc).__name__}: {exc}"
+            )
+            logger.warning("world-state reduction failed: %s", exc)
+
+    @property
+    def mode(self) -> str:
+        return self._mode
+
+    @property
+    def reduced_count(self) -> int:
+        return self._reduced_count
+
+    @property
+    def reduce_failures(self) -> int:
+        return self._reduce_failures
+
+    def set_mode(self, mode: str) -> None:
+        """Switch mode at runtime. Unknown values fall back to shadow."""
+        self._mode = mode if mode in {"shadow", "active"} else "shadow"
+
     async def run_loop(self) -> None:
         """Run polling loop until stopped."""
         self._running = True
         logger.info(
-            "shadow perception runner starting (interval=%ds, sensors=%d)",
+            "perception runner starting (mode=%s, interval=%ds, sensors=%d)",
+            self._mode,
             self._interval,
             len(self._endpoints),
         )

@@ -13,6 +13,18 @@ from common.actuator_registry.registry import (
     MigrationTier,
 )
 from common.actuator_registry.catalog import ALL_ACTUATORS, build_catalog
+from common.actuator_registry.handlers import (
+    READ_ONLY_ENDPOINTS,
+    HandlerError,
+    attach_read_handlers,
+    build_read_handler,
+)
+from common.actuator_registry.migration import (
+    MigrationError,
+    MigrationResult,
+    migrate_tier,
+    migration_plan,
+)
 
 __all__ = [
     "ActuatorDispatchError",
@@ -22,4 +34,12 @@ __all__ = [
     "MigrationTier",
     "ALL_ACTUATORS",
     "build_catalog",
+    "READ_ONLY_ENDPOINTS",
+    "HandlerError",
+    "attach_read_handlers",
+    "build_read_handler",
+    "MigrationError",
+    "MigrationResult",
+    "migrate_tier",
+    "migration_plan",
 ]

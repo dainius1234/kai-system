@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-08-01
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** Unified Hunter migration. UH-1…UH-8 built and tested (896 tests, `make test-uh`). Canonical decision path exists behind the live system; **not yet cut over** — all 33 catalogued actuators remain at `LEGACY` and the perception spine is shadow-mode only. **Status source of truth: [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md)** (includes open-gaps list G-01…G-06).
+- **Current focus:** Unified Hunter migration. UH-1…UH-8 plus a gap-closure pass (1,226 tests, `make test-uh`). Six services now authenticate side-effecting endpoints and **fail closed** — set `KAI_SERVICE_TOKEN` before deploying. Tier-1 actuators (11 read-only) migrated; tiers 2–8 pending. Perception spine has an active mode, defaulting to shadow. **Status source of truth: [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md)** (open gaps G-01, G-01b, G-02, G-02b, G-07, G-08).
 
 ## What's landed on main
 

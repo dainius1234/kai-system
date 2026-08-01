@@ -164,7 +164,7 @@ Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
 
 | Target | Status | What it covers |
 |---|---|---|
-| `test-uh` | ✓ | **Aggregate — run this one.** All 11 suites, 896 tests |
+| `test-uh` | ✓ | **Aggregate — run this one.** All 16 suites, 1,226 tests |
 | `test-contracts` | ✓ | UH-1 frozen canonical contracts (126) |
 | `test-perception-spine` | ✓ | UH-2 shadow-mode event ingress (166) |
 | `test-world-state` | ✓ | UH-3 reducers and immutable snapshots (71) |
@@ -175,6 +175,11 @@ Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
 | `test-autonomy` | ✓ | UH-8 evidence grading and scoped grants (174) |
 | `test-payload-bounds` | ✓ | §16.4 oversized/deep/high-cardinality payloads (24) |
 | `test-assessment` | ✓ | §16.13 Ohana unavailable / poisoned values (56) |
-| `test-invariant-guards` | ✓ | §16.26 rollback to fail-open or legacy authority (17) |
+| `test-invariant-guards` | ✓ | §16.26 rollback to fail-open or legacy authority (18) |
+| `test-concurrency-clock` | ✓ | §16.27 multi-worker, restart, clock-change, leader fencing (51) |
+| `test-service-auth` | ✓ | G-03 fail-closed auth on side-effecting endpoints (55) |
+| `test-erasure` | ✓ | §16.30 subject erasure across all five layers (75) |
+| `test-legacy-bridge` | ✓ | G-04 legacy trust scalar may only deny, never grant (58) |
+| `test-migration` | ✓ | G-01/G-02 tier-1 migration and perception active mode (91) |
 
 All run offline with no services, Docker or GPU.

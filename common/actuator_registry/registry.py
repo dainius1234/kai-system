@@ -276,6 +276,16 @@ class ActuatorRegistry:
     def get(self, actuator_identity: str) -> Optional[ActuatorRegistration]:
         return self._actuators.get(actuator_identity)
 
+    def handler_for(
+        self, actuator_identity: str
+    ) -> Optional[Callable[..., Dict[str, Any]]]:
+        """The dispatch handler, or None when the actuator has none.
+
+        An actuator without a handler falls back to a simulated result,
+        so migration tooling checks this before calling anything ACTIVE.
+        """
+        return self._handlers.get(actuator_identity)
+
     def get_by_action_type(self, action_type: str) -> Optional[ActuatorRegistration]:
         identity = self._action_type_map.get(action_type)
         if identity is None:

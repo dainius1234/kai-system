@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-01
+**Last updated:** 2026-08-01 (gap-closure pass)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -39,10 +39,15 @@
 | UH-8 Autonomy requalification | ✅ Done | `07d3614` | `make test-autonomy` | 174 |
 | §16.4 Payload bounds | ✅ Done | this commit | `make test-payload-bounds` | 24 |
 | §16.13 Ohana / assessments | ✅ Done | this commit | `make test-assessment` | 56 |
-| §16.26 Rollback guards | ✅ Done | this commit | `make test-invariant-guards` | 17 |
-| | | | **Total** | **896** |
+| §16.26 Rollback guards | ✅ Done | `5b882a4` | `make test-invariant-guards` | 18 |
+| §16.27 Concurrency/clock/fencing (G-05) | ✅ Done | `99c1ee9` | `make test-concurrency-clock` | 51 |
+| G-03 Service authentication | ✅ Done | `99c1ee9` | `make test-service-auth` | 55 |
+| §16.30 Erasure lineage (G-06) | ✅ Done | `ebae38d` | `make test-erasure` | 75 |
+| G-04 Legacy trust bridge | ✅ Done | `51e0934` | `make test-legacy-bridge` | 58 |
+| G-01/G-02 Tier-1 migration + active mode | ✅ Done | this commit | `make test-migration` | 91 |
+| | | | **Total** | **1,226** |
 
-**UH-7 is marked ⚠️ deliberately.** The registry, migration state machine and legacy-path gate are built and tested, but **every actuator is still at `LEGACY`** — nothing has been migrated against a live service. See §5.
+**UH-7 is marked ⚠️ deliberately.** Tier 1 (11 read-only actuators) now has real dispatch handlers and migrates to ACTIVE, verified by `make test-migration`. **Tiers 2–8 (22 actuators) remain at `LEGACY`.** Handlers are exercised against an injected HTTP client, not live services — see G-01 in §5.
 
 ---
 
@@ -62,7 +67,8 @@
 |---|---|
 | Old path disabled before new path verified | ✅ enforced by state machine — `advance_migration()` to VERIFIED raises while `legacy_path` is enabled |
 | Migration proceeds in ascending risk order | ✅ `next_migration_candidates()` gates on lower tiers |
-| Actuators actually migrated | ❌ **0 of 33** — see §5 |
+| Actuators actually migrated | ⚠️ **11 of 33** (tier 1 complete; tiers 2–8 pending) |
+| Activation requires a dispatch handler | ✅ `migrate_tier()` refuses to activate a handler-less actuator |
 
 ### UH-8 — autonomy
 | Gate | Status |
@@ -103,10 +109,10 @@
 | 24 | Self-generated prediction as outcome evidence | `test_autonomy` |
 | 25 | Old direct path callable after migration | `test_actuator_registry` |
 | 26 | Rollback restores fail-open/legacy authority | `test_invariant_guards` |
-| 27 | Multi-worker, restart, clock-change, fencing | `test_perception_spine` (partial — see §6) |
+| 27 | Multi-worker, restart, clock-change, fencing | `test_concurrency_clock` ✅ full |
 | 28 | Audit persistence failure before protected effect | `test_perception_spine` |
 | 29 | Event/trace context tampering | `test_contracts` |
-| 30 | End-to-end data deletion across derivatives | `test_world_state` (partial — see §6) |
+| 30 | End-to-end data deletion across derivatives | `test_erasure` ✅ full (5 layers) |
 
 ---
 
@@ -114,25 +120,40 @@
 
 These are **open**, not hidden. Do not mark UH complete while this section is non-empty.
 
+### Closed in the gap-closure pass
+
+| ID | Gap | Closed by | Verified by |
+|---|---|---|---|
+| ~~G-03~~ | Six unauthenticated side-effecting endpoints | `common/service_auth.py`, 21 routes across 6 services, fail-closed | `make test-service-auth` |
+| ~~G-04~~ | Legacy `TrustLevel` coexisting as a second authority | `common/autonomy/legacy_bridge.py` — legacy may only deny, never grant | `make test-legacy-bridge` |
+| ~~G-05~~ | §16.27 concurrency/clock/fencing partial | `FencedLease` + concurrency suite | `make test-concurrency-clock` |
+| ~~G-06~~ | §16.30 deletion lineage partial | `common/erasure/` across all 5 layers | `make test-erasure` |
+
+### Still open
+
 | ID | Gap | Impact | Where |
 |---|---|---|---|
-| G-01 | **0 of 33 actuators migrated.** All at `LEGACY` | The new path is enforced but unused; old paths still serve traffic | `common/actuator_registry/catalog.py` |
-| G-02 | Perception spine runs in **shadow mode only** | Cortex still polls sensors point-to-point | `common/perception_spine/shadow.py` |
-| G-03 | Six **unauthenticated side-effecting endpoints** still live | `backup-service /restore/postgres` can overwrite the DB with no auth | see table below |
-| G-04 | Legacy `TrustLevel` scalar still referenced by `gate_autonomous_action()` | Two authority systems coexist | `agentic/trust_core.py` |
-| G-05 | §16.27 multi-worker/clock-change coverage is **partial** | Leader-fencing untested under real concurrency | `test_perception_spine` |
-| G-06 | §16.30 deletion-lineage coverage is **partial** | End-to-end erasure across learning derivatives untested | `test_world_state` |
+| G-01 | **22 of 33 actuators still at `LEGACY`** (tiers 2–8). Tier 1 is migrated | Higher-risk actuators still served only by legacy paths | `common/actuator_registry/catalog.py` |
+| G-01b | Tier-1 handlers are verified against an **injected HTTP client**, not live services | Endpoint paths in `READ_ONLY_ENDPOINTS` are unverified against running services | `common/actuator_registry/handlers.py` |
+| G-02 | Perception spine active mode exists but **defaults to shadow** and is not enabled anywhere | The spine still does not carry live perception | `KAI_PERCEPTION_MODE` |
+| G-02b | Active mode is **additive** — legacy Cortex polling is not retired | Two perception paths coexist by design during migration | `agentic/cortex.py` |
+| G-07 | `KAI_SERVICE_TOKEN` is **not yet set in any compose profile** | Protected endpoints will 503 until the token is configured | `docker-compose.*.yml` |
+| G-08 | `agentic-routes` has **22 pre-existing test failures** unrelated to UH work | Pre-dates this workstream; not investigated | `scripts/test_agentic_routes.py` |
 
-### G-03 — unauthenticated endpoints awaiting disablement
+### G-03 — endpoints now protected (was: unauthenticated)
 
-| Service | Endpoint | Risk |
+| Service | Endpoint | Status |
 |---|---|---|
-| backup-service | `POST /restore/postgres` | Database overwrite |
-| browser-agent | `POST /click`, `POST /type` | Arbitrary web interaction |
-| telegram-bot | `POST /alert` | Unauthenticated operator messaging |
-| monitor-service | `/rules` CRUD | Alert-rule tampering |
-| agentic | `POST /checkpoint/{id}/restore` | Breaker-state modification |
-| notify-service | `POST /notify` | Notification spam |
+| backup-service | `POST /restore/postgres` + 6 backup routes | ✅ authenticated |
+| browser-agent | `POST /click`, `/type`, `/navigate`, `/run` | ✅ authenticated |
+| telegram-bot | `POST /alert` | ✅ authenticated |
+| monitor-service | `/rules` CRUD (6 routes) | ✅ authenticated |
+| agentic | `POST /checkpoint/{id}/restore`, `DELETE /checkpoint/{id}` | ✅ authenticated |
+| notify-service | `POST /notify` | ✅ authenticated |
+
+**Deployment note (G-07):** these endpoints now **fail closed**. Set `KAI_SERVICE_TOKEN`
+before deploying, or they return 503. Local development uses
+`KAI_ALLOW_UNAUTHENTICATED=true`, which logs a warning on every request.
 
 ---
 
@@ -140,15 +161,21 @@ These are **open**, not hidden. Do not mark UH complete while this section is no
 
 **Nothing is authorised to change live behaviour without an explicit operator decision.**
 
-Recommended order when cutover is approved:
+Recommended order:
 
-1. **G-03 first** — close the six unauthenticated endpoints. Highest risk, independent of UH migration.
-2. **Tier 1 actuators** (11 read-only) — `disable_legacy_path()` → `MIGRATING` → `VERIFIED` → `ACTIVE`.
-3. Re-run `make test-uh` after each tier; update §2 and §5 here.
-4. Only then consider tier 2.
+1. **G-07 — set `KAI_SERVICE_TOKEN`** in each compose profile. Protected endpoints
+   fail closed, so this must land before or with the next deploy.
+2. **G-01b — verify tier-1 endpoint paths** against running services. The paths in
+   `READ_ONLY_ENDPOINTS` are asserted to be reads, but were never called for real.
+3. **G-02 — enable `KAI_PERCEPTION_MODE=active`** in a single environment and watch
+   `events_reduced` against `events_accepted` before going wider.
+4. **G-04 enforcement** — run advisory mode until `migration_report()` reports
+   `ready_to_enforce: true`, then set `KAI_AUTONOMY_ENFORCE=true`. It currently
+   reports `false`, correctly: `paper_trade_open` has no scoped grant yet.
+5. **Tier 2 actuators** — `migrate_tier(registry, MigrationTier.LOCAL_TEST, ...)`.
+   Blocked automatically until tier 1 is complete, which it now is.
 
-Do **not** advance a tier while any actuator in a lower tier is unmigrated —
-`next_migration_candidates()` enforces this, and bypassing it is an §17 anti-pattern.
+Re-run `make test-uh` after each step and update §2 and §5 here.
 
 ---
 

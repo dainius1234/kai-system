@@ -2906,3 +2906,44 @@ Total: 799 tests, all green. All 8 CI policy gates pass.
 **Files produced:** `common/contracts/assessment.py`, `common/policy_bridge/assessment.py`, `scripts/test_payload_bounds.py`, `scripts/test_assessment.py`, `scripts/test_invariant_guards.py`, `kai-pm/UH_PROGRESS_TRACKER.md`.
 
 **Files modified:** `common/perception_spine/ingress.py` (payload bounds), `common/policy_bridge/policy_engine.py` (assessor wiring, tighten-only), `common/policy_bridge/__init__.py`, `Makefile` (4 targets incl. `test-uh`), `README.md`, `kai-pm/NAVIGATION.md`, `kai-pm/STATUS.md`, `kai-pm/MAKEFILE_TARGETS.md`.
+
+---
+
+## D134 — 2026-08-01 — Gap Closure Pass (G-01…G-06)
+
+**Context:** D133 recorded six open gaps in `UH_PROGRESS_TRACKER.md`. The operator directed closing all of them systematically before moving on. This entry records what closed, what did not, and what the closure surfaced.
+
+**Decisions:**
+
+1. **G-03 (highest severity) — six unauthenticated side-effecting endpoints are now authenticated.** `common/service_auth.py` protects 21 routes across six services. The design decision is **fail closed**: an endpoint with no token configured returns 503, not 200. There is deliberately no "allow when the secret happens to be empty" path, because that is how a destructive endpoint like `POST /restore/postgres` ends up exposed. The only bypass is `KAI_ALLOW_UNAUTHENTICATED=true`, which logs a warning on every request. Token comparison is constant-time. **Deployment consequence:** `KAI_SERVICE_TOKEN` must be set or these endpoints refuse service — recorded as open gap G-07.
+
+2. **G-04 — the two authority systems are unified under "legacy may only deny, never grant."** A capability is permitted only if the scoped authority permits it; the legacy `TrustLevel` scalar can subtract from that, never add. An invariant guard asserts this directly, so a future change that lets a legacy allow override a scoped denial fails a test. Migration runs advisory-first: disagreements are recorded while the legacy verdict still stands, and `migration_report()` refuses to report `ready_to_enforce` until it has seen actual traffic — zero observations is not evidence of safety. It currently reports `false`, correctly, because `paper_trade_open` has no scoped grant.
+
+3. **G-05 — leader fencing needed a mechanism before it could be tested.** Added `FencedLease` with monotonic fencing tokens: a stalled leader that wakes up presents a lower token and is refused. Lease expiry reads a monotonic clock, so moving the wall clock backwards cannot extend it.
+
+4. **G-06 — erasure removes rather than marks.** Both the evidence service and the world-state store delete outright, because a state flag or supersession chain would leave the original content readable — precisely what erasure must prevent. Audit is the exception: entries are redacted in place and tombstoned, and a tombstone carries a digest of what was removed, never the data, so it cannot become a backdoor copy. Verification is independent of execution: a handler that reports success without deleting is caught by re-query and downgrades the receipt to PARTIAL.
+
+5. **G-01 — "migrated" now has to mean something.** `migrate_tier()` refuses to activate an actuator with no dispatch handler. Without that rule the registry would happily mark a handler-less actuator ACTIVE, producing a green migration report describing nothing. Tier 1 (11 read-only actuators) has real HTTP handlers and is migrated; tiers 2–8 remain at `LEGACY`.
+
+6. **G-02 — active mode is additive, not a switchover.** The perception spine can feed the world state, but does not disable the legacy Cortex polling path, so a fault in the spine cannot take perception offline. It defaults to shadow and is enabled per-environment via `KAI_PERCEPTION_MODE=active`. A reducer fault is recorded and the poll loop continues: the event is already journalled, so a lost reduction is recoverable by replay while a lost poll loop is not.
+
+**Two real bugs found while closing gaps, both pre-existing:**
+
+- **Journal torn-write corruption.** A crash mid-append leaves a line with no terminator, and the next append concatenated onto it — corrupting the *new* record as well as the torn one. Appends now close off a torn line first. The torn line survives for audit and is skipped on replay.
+- **Path bootstrap depth assumption.** `output/notify/app.py` sits two levels deep, so a `dirname(dirname(...))` bootstrap resolved to `output/` rather than the repo root. Bootstrap is now depth-independent.
+
+**Corrections to earlier entries:**
+
+- D132's §16 coverage claim was already corrected in D133. Items 27 and 30, recorded there as *partial*, are now full (`test_concurrency_clock`, `test_erasure`).
+- D133 listed G-01 as "0 of 33 actuators migrated". It is now 11 of 33. The remaining 22 are tiers 2–8.
+
+**What did not close, and why:**
+
+- **G-01b** — tier-1 handlers are verified against an injected HTTP client, not live services. The endpoint paths in `READ_ONLY_ENDPOINTS` are asserted to be reads but have never been called for real.
+- **G-02b** — legacy Cortex polling is not retired. This is deliberate during migration, not an oversight.
+- **G-07** — `KAI_SERVICE_TOKEN` is not yet set in any compose profile. Must land before or with the next deploy.
+- **G-08** — `agentic-routes` carries 22 pre-existing test failures unrelated to this workstream. Verified as pre-existing by baselining against the un-modified file; not investigated.
+
+**Verification:** 1,226 tests via `make test-uh` (16 suites). 8/8 CI policy gates. Docs gate current. `agentic-routes` holds at its 22 pre-existing failures — the 3 regressions this work introduced were fixed.
+
+**Files produced:** `common/service_auth.py`, `common/perception_spine/lease.py`, `common/erasure/` (coordinator, handlers), `common/contracts/erasure.py`, `common/autonomy/legacy_bridge.py`, `common/actuator_registry/handlers.py`, `common/actuator_registry/migration.py`, and five test suites.
