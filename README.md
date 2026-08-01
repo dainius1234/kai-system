@@ -27,8 +27,8 @@
 |---|---|
 | **Services** | 61 Docker containers |
 | **Test targets** | 91 (`make test-core`) |
-| **Individual tests** | 3,740 (`def test_` across 171 files) |
-| **Python LOC** | ~101,758 |
+| **Individual tests** | 3,755 (`def test_` across 171 files) |
+| **Python LOC** | ~102,180 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 45 |
 | **Failures** | 0 |
@@ -72,15 +72,17 @@ It is the source of truth for UH work — including an honest open-gaps list. Ve
 workstream with a single command:
 
 ```bash
-make test-uh          # all 16 UH suites, 1,226 tests
+make test-uh          # all 16 UH suites, 1,261 tests
 ```
 
 > **Partially cut over.** Tier 1 (11 read-only actuators) is migrated with real dispatch
-> handlers; tiers 2–8 remain at `LEGACY`. The perception spine has an active mode but
-> defaults to shadow. See §5 of the tracker for the open-gaps list.
+> handlers, and every endpoint path is verified against the routes its service declares.
+> Tiers 2–8 remain at `LEGACY`. Every migration flag defaults to the legacy path.
+> See §5 of the tracker for the open-gaps list.
 >
-> **Deploying?** Six services now authenticate their side-effecting endpoints and
-> **fail closed**. Set `KAI_SERVICE_TOKEN` or they return 503.
+> **Deploying?** Six services authenticate their side-effecting endpoints and
+> **fail closed**. `KAI_SERVICE_TOKEN` is wired into all compose profiles but ships
+> empty — generate one (`openssl rand -hex 32`) or those endpoints return 503.
 
 ---
 

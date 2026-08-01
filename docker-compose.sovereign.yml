@@ -306,6 +306,7 @@ services:
     volumes:
       - ./data/self-emp:/data/self-emp:ro
     environment:
+      KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       REDIS_URL: "redis://redis:6379"
       MEMU_URL: "http://memu-core:8001"
       TOOL_GATE_URL: "http://tool-gate:8000"

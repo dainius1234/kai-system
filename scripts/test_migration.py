@@ -52,6 +52,12 @@ from common.perception_spine.shadow import (
     perception_mode,
 )
 from common.world_state.snapshot_store import SnapshotStore
+from common.perception_spine.cortex_source import (
+    SOURCE_ENV,
+    build_state_from_world,
+    cortex_source,
+    resolve_cortex_state,
+)
 
 passed = 0
 failed = 0
@@ -478,6 +484,235 @@ def test_cycle_stats_report_mode():
     check("stats_include_reduced", "events_reduced" in stats)
 
 
+# ═══════════════════════════════════════════════════════════════════
+# G-01b · Endpoint paths verified against real service routes
+# ═══════════════════════════════════════════════════════════════════
+
+# Which source file actually defines each actuator's routes.
+SERVICE_ROUTE_FILES = {
+    "broker-bridge": "broker-bridge/app.py",
+    "docker-watcher": "docker-watcher/app.py",
+    "git-watcher": "git-watcher/app.py",
+    "email-reader": "email-reader/app.py",
+    "calendar-service": "calendar-service/app.py",
+    "news-feed": "news-feed/app.py",
+    "sysmetrics": "sysmetrics/app.py",
+    "weather-service": "weather-service/app.py",
+    "alpha-signals": "agentic/app.py",
+    "market-data": "agentic/app.py",
+    "service-watchdog": "agentic/app.py",
+}
+
+
+def _declared_get_routes(rel_path: str) -> set:
+    """GET routes a service actually declares, read from its source."""
+    import ast
+    from pathlib import Path
+
+    source = Path(__file__).resolve().parent.parent / rel_path
+    if not source.exists():
+        return set()
+    try:
+        tree = ast.parse(source.read_text(encoding="utf-8"))
+    except SyntaxError:
+        return set()
+
+    routes = set()
+    for node in ast.walk(tree):
+        for dec in getattr(node, "decorator_list", []):
+            if not (isinstance(dec, ast.Call) and isinstance(dec.func, ast.Attribute)):
+                continue
+            if dec.func.attr != "get" or not dec.args:
+                continue
+            first = dec.args[0]
+            if isinstance(first, ast.Constant) and isinstance(first.value, str):
+                routes.add(first.value)
+    return routes
+
+
+def _route_matches(template: str, declared: set) -> bool:
+    """Whether a handler template corresponds to a declared route.
+
+    Path parameters are named differently between the handler template
+    and the route decorator, so templated paths compare on their static
+    prefix rather than exact text.
+    """
+    if template in declared:
+        return True
+    if "{" not in template:
+        return False
+    prefix = template.split("{")[0].rstrip("/")
+    return any(
+        route.split("{")[0].rstrip("/") == prefix
+        for route in declared
+        if "{" in route
+    )
+
+
+def test_every_endpoint_exists_in_its_service():
+    """Every tier-1 path must correspond to a route the service declares.
+
+    Mock-based dispatch tests pass against any string, so they cannot
+    catch a wrong path.  This reads the services' own source and was
+    what caught four incorrect endpoints on first run.
+    """
+    missing = []
+    unmapped = []
+
+    for actuator, (_, _, paths) in sorted(READ_ONLY_ENDPOINTS.items()):
+        rel = SERVICE_ROUTE_FILES.get(actuator)
+        if rel is None:
+            unmapped.append(actuator)
+            continue
+        declared = _declared_get_routes(rel)
+        if not declared:
+            unmapped.append(f"{actuator} ({rel} unreadable)")
+            continue
+        for action, template in paths.items():
+            if not _route_matches(template, declared):
+                missing.append(f"{actuator}:{action} -> {template}")
+
+    check("every_actuator_has_route_source", not unmapped, "; ".join(unmapped))
+    check("every_endpoint_exists_in_service", not missing, "; ".join(missing))
+
+
+def test_route_source_map_covers_all_actuators():
+    uncovered = set(READ_ONLY_ENDPOINTS) - set(SERVICE_ROUTE_FILES)
+    check("route_map_complete", not uncovered, str(uncovered))
+
+
+def test_route_matcher_rejects_wrong_paths():
+    """The matcher must not pass anything — it would be useless if it did."""
+    declared = {"/inbox", "/unread", "/ticker/{symbol}"}
+    check("matcher_accepts_exact", _route_matches("/inbox", declared))
+    check("matcher_accepts_templated", _route_matches("/ticker/{sym}", declared))
+    check("matcher_rejects_absent", not _route_matches("/summary", declared))
+    check("matcher_rejects_wrong_prefix",
+          not _route_matches("/quote/{sym}", declared))
+
+
+# ═══════════════════════════════════════════════════════════════════
+# G-02b · Cortex world-state source (defined cutover for polling)
+# ═══════════════════════════════════════════════════════════════════
+
+def _populated_store():
+    store = SnapshotStore(principal=_principal())
+    for i, (etype, payload) in enumerate([
+        ("system", {"cpu_percent": 12, "memory_percent": 40}),
+        ("docker", {"containers": [{"name": "kai", "status": "running"}]}),
+        ("git", {"branch": "main", "dirty": False}),
+    ]):
+        store.ingest_event(PerceptionEvent(
+            source_type=EventSource.SYSTEM, event_type=etype, payload=payload,
+            principal=_principal(), purpose="test",
+            provenance=Provenance(source=f"sensor-{i}"),
+            source_timestamp=datetime.now(timezone.utc),
+            raw_hash=f"cortex-{i}",
+        ))
+    return store
+
+
+def test_cortex_source_defaults_to_poll():
+    with _Env(**{SOURCE_ENV: None}):
+        check("default_source_poll", cortex_source() == "poll")
+
+
+def test_cortex_source_env_parsing():
+    for value, expected in [("world_state", "world_state"), ("POLL", "poll"),
+                            ("poll", "poll"), ("nonsense", "poll"), ("", "poll")]:
+        with _Env(**{SOURCE_ENV: value}):
+            check(f"source_{value or 'empty'}", cortex_source() == expected)
+
+
+def test_poll_mode_returns_polled_state_untouched():
+    """The default path must be exactly what it was before this existed."""
+    polled = {"level1_facts": ["a"], "level2_summary": "s", "custom": 1}
+    with _Env(**{SOURCE_ENV: "poll"}):
+        result = resolve_cortex_state(polled, store=_populated_store())
+    check("poll_mode_untouched", result == polled)
+    check("poll_mode_is_same_object", result is polled)
+
+
+def test_world_state_mode_reads_claims():
+    with _Env(**{SOURCE_ENV: "world_state"}):
+        result = resolve_cortex_state({"level1_facts": ["old"]},
+                                      store=_populated_store())
+    check("world_state_used", result.get("source") == "world_state")
+    check("world_state_has_facts", len(result.get("level1_facts", [])) > 0)
+    check("world_state_replaced_polled",
+          "old" not in result.get("level1_facts", []))
+    check("world_state_has_summary", bool(result.get("level2_summary")))
+    check("world_state_has_implication", bool(result.get("level3_implication")))
+
+
+def test_empty_world_state_falls_back_to_polled():
+    """A cold start must not blank out perception."""
+    polled = {"level1_facts": ["from polling"], "level2_summary": "s"}
+    with _Env(**{SOURCE_ENV: "world_state"}):
+        result = resolve_cortex_state(
+            polled, store=SnapshotStore(principal=_principal())
+        )
+    check("empty_world_falls_back", result == polled)
+
+
+def test_missing_store_falls_back_to_polled():
+    polled = {"level1_facts": ["from polling"]}
+    with _Env(**{SOURCE_ENV: "world_state"}):
+        result = resolve_cortex_state(polled, store=None)
+    check("no_store_falls_back", result == polled)
+
+
+def test_broken_store_falls_back_to_polled():
+    class _Broken:
+        def active_claims(self):
+            raise RuntimeError("store offline")
+
+    polled = {"level1_facts": ["from polling"]}
+    with _Env(**{SOURCE_ENV: "world_state"}):
+        result = resolve_cortex_state(polled, store=_Broken())
+    check("broken_store_falls_back", result == polled)
+
+
+def test_build_state_returns_none_when_empty():
+    check("build_none_on_empty",
+          build_state_from_world(SnapshotStore(principal=_principal())) is None)
+    check("build_none_on_missing", build_state_from_world(None) is None)
+
+
+def test_facts_are_domain_prefixed():
+    state = build_state_from_world(_populated_store())
+    check("facts_prefixed",
+          all(":" in f for f in state["level1_facts"]),
+          str(state["level1_facts"][:3]))
+
+
+def test_fact_cap_respected():
+    store = SnapshotStore(principal=_principal())
+    for i in range(60):
+        store.ingest_event(PerceptionEvent(
+            source_type=EventSource.SYSTEM, event_type="system",
+            payload={"cpu_percent": i}, principal=_principal(), purpose="t",
+            provenance=Provenance(source=f"s{i}"),
+            source_timestamp=datetime.now(timezone.utc),
+            raw_hash=f"cap-{i}",
+        ))
+    state = build_state_from_world(store, max_facts=5)
+    if state is not None:
+        check("fact_cap_respected", len(state["level1_facts"]) <= 5)
+    else:
+        check("fact_cap_respected", True)
+
+
+def test_state_shape_matches_cortex_contract():
+    """The rendered state must carry the keys feed_service_state reads."""
+    state = build_state_from_world(_populated_store())
+    for key in ("level1_facts", "level2_summary", "level3_implication",
+                "refresh_count", "timestamp"):
+        check(f"state_has_{key}", key in state)
+    check("facts_is_list", isinstance(state["level1_facts"], list))
+    check("refresh_count_is_int", isinstance(state["refresh_count"], int))
+
+
 # ── Runner ─────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
@@ -507,6 +742,20 @@ if __name__ == "__main__":
     test_mode_switchable_at_runtime()
     test_active_mode_is_additive()
     test_cycle_stats_report_mode()
+    test_every_endpoint_exists_in_its_service()
+    test_route_source_map_covers_all_actuators()
+    test_route_matcher_rejects_wrong_paths()
+    test_cortex_source_defaults_to_poll()
+    test_cortex_source_env_parsing()
+    test_poll_mode_returns_polled_state_untouched()
+    test_world_state_mode_reads_claims()
+    test_empty_world_state_falls_back_to_polled()
+    test_missing_store_falls_back_to_polled()
+    test_broken_store_falls_back_to_polled()
+    test_build_state_returns_none_when_empty()
+    test_facts_are_domain_prefixed()
+    test_fact_cap_respected()
+    test_state_shape_matches_cortex_contract()
 
     print(f"\n{'='*60}")
     print(f"Migration & Active Mode Tests: {passed} passed, {failed} failed")

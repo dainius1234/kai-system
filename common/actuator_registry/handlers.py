@@ -30,11 +30,11 @@ READ_ONLY_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, str]]] = {
     ),
     "alpha-signals": (
         "ALPHA_SIGNALS_URL", "http://agentic:8001",
-        {"alpha_signal_read": "/alpha/signals"},
+        {"alpha_signal_read": "/alpha/{symbol}/composite"},
     ),
     "market-data": (
         "MARKET_DATA_URL", "http://agentic:8001",
-        {"market_data_read": "/market/data"},
+        {"market_data_read": "/market-data/prices"},
     ),
     "docker-watcher": (
         "DOCKER_WATCHER_URL", "http://docker-watcher:8041",
@@ -46,7 +46,7 @@ READ_ONLY_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, str]]] = {
     ),
     "email-reader": (
         "EMAIL_READER_URL", "http://email-reader:8037",
-        {"email_read": "/summary"},
+        {"email_read": "/inbox"},
     ),
     "calendar-service": (
         "CALENDAR_SERVICE_URL", "http://calendar-service:8043",
@@ -54,7 +54,7 @@ READ_ONLY_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, str]]] = {
     ),
     "news-feed": (
         "NEWS_FEED_URL", "http://news-feed:8038",
-        {"news_read": "/summary"},
+        {"news_read": "/articles"},
     ),
     "sysmetrics": (
         "SYSMETRICS_URL", "http://sysmetrics:8035",

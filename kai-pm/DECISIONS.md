@@ -2947,3 +2947,34 @@ Total: 799 tests, all green. All 8 CI policy gates pass.
 **Verification:** 1,226 tests via `make test-uh` (16 suites). 8/8 CI policy gates. Docs gate current. `agentic-routes` holds at its 22 pre-existing failures — the 3 regressions this work introduced were fixed.
 
 **Files produced:** `common/service_auth.py`, `common/perception_spine/lease.py`, `common/erasure/` (coordinator, handlers), `common/contracts/erasure.py`, `common/autonomy/legacy_bridge.py`, `common/actuator_registry/handlers.py`, `common/actuator_registry/migration.py`, and five test suites.
+
+---
+
+## D135 — 2026-08-01 — Second Gap-Closure Pass (G-01b, G-02b, G-07, G-08)
+
+**Context:** D134 closed G-01…G-06 and recorded four new gaps in the process. The operator directed closing those before moving on. All four are now closed; three genuinely-remaining limits are recorded as G-09…G-11.
+
+**Decisions:**
+
+1. **G-01b — verifying paths against real routes caught four wrong endpoints.** Mock-based dispatch tests pass against any string, so they can never catch a wrong path. `test_every_endpoint_exists_in_its_service` parses each service's own source and checks that every path in `READ_ONLY_ENDPOINTS` corresponds to a route the service actually declares. On first run it found four incorrect paths: `alpha-signals` (`/alpha/signals` → `/alpha/{symbol}/composite`), `market-data` (`/market/data` → `/market-data/prices`), `email-reader` (`/summary` → `/inbox`), and `news-feed` (`/summary` → `/articles`). All four would have failed at runtime. The check is now permanent, so paths cannot drift again.
+
+2. **G-08 — the 22 failures had two distinct causes, both test-side.** First, `agentic/app.py` renamed six context helpers (`_get_mode` → `_read_mode`, `_get_relevant_memories` → `_recall_memories`, `_get_agent_context` → `_surface_agent_context`, and three others) and the tests were never updated. Each rename was verified to resolve to a real function with a matching signature before rewriting. Second — and more interesting — `common/resilience` keeps circuit breakers in a **module-global dict**, so a breaker tripped by one test stayed open for every test after it. Once `memu-core` opened, `_memu_get` returned its fallback without ever calling httpx, and any later test patching httpx to assert on a 200 saw an empty result. That is why those tests passed individually and failed as a suite. Fixed with an autouse fixture that clears breaker state around every test. `agentic-routes`: 22 failures → 0, 170 passing.
+
+3. **G-07 — the token ships empty, deliberately.** `KAI_SERVICE_TOKEN` is wired into 8 service blocks across all three compose profiles using the `"${VAR:-}"` empty-default pattern that the secret-fallback CI gate permits. Empty means "not configured", which the code treats as fail-closed — so a deploy that forgets the token gets 503s, not silently open endpoints. Documented in `.env.example` with a generation command.
+
+4. **G-02b — the cutover off legacy polling is now a config change, not a code change.** `common/perception_spine/cortex_source.py` renders world-state claims into the shape `Cortex.feed_service_state()` consumes, selected by `KAI_CORTEX_SOURCE` (default `poll`). Two properties are tested explicitly: in `poll` mode the polled state is returned as the *same object*, so the default path is unchanged; and when world-state mode is selected but the store is empty, broken, or absent, it falls back to the polled state. A perception layer that goes blank because a migration flag was set early is worse than one that quietly keeps working.
+
+**Correction to D134:** D134 listed G-01b as "handlers verified against an injected HTTP client, not live services". That was accurate but understated the risk — the paths were not merely unverified against live services, four of them were simply wrong. Verification against route declarations closes most of that gap; what remains is G-10.
+
+**What remains, and why it cannot close here:**
+
+- **G-09** — 22 of 33 actuators (tiers 2–8) still at `LEGACY`. Tier 2 is unblocked and ready.
+- **G-10** — no handler has been called against a *running* service. Paths are verified against route declarations, not live responses. Needs a running stack.
+- **G-11** — every migration flag (`KAI_PERCEPTION_MODE`, `KAI_CORTEX_SOURCE`, `KAI_AUTONOMY_ENFORCE`) defaults to the legacy path and is enabled nowhere. Each is one config change away, and each has a tested fallback.
+
+G-10 and G-11 are honest limits of an offline environment rather than unfinished work.
+
+**Verification:** 1,261 tests across 16 suites via `make test-uh`. 8/8 CI policy gates. Docs gate current. `agentic-routes` 170/170. No regressions in browser-agent, notify, monitor or telegram.
+
+**Files produced:** `common/perception_spine/cortex_source.py`.
+**Files modified:** `common/actuator_registry/handlers.py` (4 path corrections), `scripts/test_agentic_routes.py` (renames + breaker isolation fixture + recover-flag patch), `scripts/test_migration.py` (route verification + Cortex source tests), `docker-compose.{minimal,full,sovereign}.yml`, `.env.example`.

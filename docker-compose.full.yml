@@ -284,6 +284,7 @@ services:
       dockerfile: agentic/Dockerfile
     <<: *defaults
     environment:
+      KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       MEMU_URL: http://memu-core:8001
       TOOL_GATE_URL: http://tool-gate:8000
       REDIS_URL: redis://redis:6379
@@ -687,6 +688,7 @@ services:
       dockerfile: backup-service/Dockerfile
     <<: *defaults
     environment:
+      KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       PG_URI: "postgresql://keeper:${DB_PASSWORD}@postgres:5432/sovereign"
       REDIS_URL: redis://redis:6379
       MEMU_URL: http://memu-core:8001
@@ -772,6 +774,7 @@ services:
       dockerfile: telegram-bot/Dockerfile
     <<: *defaults
     environment:
+      KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
       LANGGRAPH_URL: http://agentic:8007
       AUDIO_SERVICE_URL: http://audio-service:8021

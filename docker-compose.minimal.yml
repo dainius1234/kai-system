@@ -188,6 +188,7 @@ services:
     container_name: sovereign-agentic
     <<: *defaults
     environment:
+      KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       MEMU_URL: http://memu-core:8001
       TOOL_GATE_URL: http://tool-gate:8000
       REDIS_URL: redis://redis:6379
@@ -355,6 +356,7 @@ services:
     container_name: sovereign-browser-agent
     <<: *defaults
     environment:
+      KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       BROWSER_HEADLESS: "true"
       NAV_TIMEOUT_MS: "${NAV_TIMEOUT_MS:-20000}"
       MAX_SCRAPE_CHARS: "${MAX_SCRAPE_CHARS:-50000}"
@@ -434,6 +436,7 @@ services:
     container_name: sovereign-notify-service
     <<: *defaults
     environment:
+      KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       NOTIFY_MAX_PENDING: "${NOTIFY_MAX_PENDING:-100}"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8031/health')\""]
@@ -467,6 +470,7 @@ services:
     container_name: sovereign-monitor-service
     <<: *defaults
     environment:
+      KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       BROWSER_AGENT_URL: http://browser-agent:8040
       NOTIFY_SERVICE_URL: http://notify-service:8031
       TTS_SERVICE_URL: http://tts-service:8030

@@ -44,10 +44,11 @@
 | G-03 Service authentication | ✅ Done | `99c1ee9` | `make test-service-auth` | 55 |
 | §16.30 Erasure lineage (G-06) | ✅ Done | `ebae38d` | `make test-erasure` | 75 |
 | G-04 Legacy trust bridge | ✅ Done | `51e0934` | `make test-legacy-bridge` | 58 |
-| G-01/G-02 Tier-1 migration + active mode | ✅ Done | this commit | `make test-migration` | 91 |
-| | | | **Total** | **1,226** |
+| G-01/G-02 Tier-1 migration + active mode | ✅ Done | `4795b7d` | `make test-migration` | 125 |
+| G-01b/G-02b/G-07/G-08 second closure pass | ✅ Done | this commit | (folded into suites above) | — |
+| | | | **Total** | **1,261** |
 
-**UH-7 is marked ⚠️ deliberately.** Tier 1 (11 read-only actuators) now has real dispatch handlers and migrates to ACTIVE, verified by `make test-migration`. **Tiers 2–8 (22 actuators) remain at `LEGACY`.** Handlers are exercised against an injected HTTP client, not live services — see G-01 in §5.
+**UH-7 is marked ⚠️ deliberately.** Tier 1 (11 read-only actuators) has real dispatch handlers and migrates to ACTIVE. Every tier-1 endpoint path is now verified against the routes its service actually declares — that check found and fixed four wrong paths. **Tiers 2–8 (22 actuators) remain at `LEGACY`.**
 
 ---
 
@@ -118,29 +119,35 @@
 
 ## 5. Known gaps — honest list
 
-These are **open**, not hidden. Do not mark UH complete while this section is non-empty.
+These are **open**, not hidden. Do not mark UH complete while "Still open" is non-empty.
 
-### Closed in the gap-closure pass
+### Closed
 
 | ID | Gap | Closed by | Verified by |
 |---|---|---|---|
-| ~~G-03~~ | Six unauthenticated side-effecting endpoints | `common/service_auth.py`, 21 routes across 6 services, fail-closed | `make test-service-auth` |
-| ~~G-04~~ | Legacy `TrustLevel` coexisting as a second authority | `common/autonomy/legacy_bridge.py` — legacy may only deny, never grant | `make test-legacy-bridge` |
+| ~~G-01~~ | Tier-1 actuators un-migrated | Real HTTP handlers + `migrate_tier()` | `make test-migration` |
+| ~~G-01b~~ | Endpoint paths never checked against real routes | Source-level route verification (**found 4 wrong paths**) | `make test-migration` |
+| ~~G-02~~ | Perception spine shadow-only | Active mode, additive, defaults to shadow | `make test-migration` |
+| ~~G-02b~~ | No cutover path off legacy Cortex polling | `cortex_source.py` — `KAI_CORTEX_SOURCE`, defaults to `poll` | `make test-migration` |
+| ~~G-03~~ | Six unauthenticated side-effecting endpoints | `common/service_auth.py`, 21 routes, fail-closed | `make test-service-auth` |
+| ~~G-04~~ | Legacy `TrustLevel` as a second authority | Legacy may only deny, never grant | `make test-legacy-bridge` |
 | ~~G-05~~ | §16.27 concurrency/clock/fencing partial | `FencedLease` + concurrency suite | `make test-concurrency-clock` |
 | ~~G-06~~ | §16.30 deletion lineage partial | `common/erasure/` across all 5 layers | `make test-erasure` |
+| ~~G-07~~ | `KAI_SERVICE_TOKEN` unset in compose | Added to 8 service blocks across 3 profiles + `.env.example` | `docker-compose*.yml` |
+| ~~G-08~~ | 22 pre-existing `agentic-routes` failures | Helper renames + breaker-leak isolation fixture | `make test-agentic-routes` (170 pass) |
 
 ### Still open
 
 | ID | Gap | Impact | Where |
 |---|---|---|---|
-| G-01 | **22 of 33 actuators still at `LEGACY`** (tiers 2–8). Tier 1 is migrated | Higher-risk actuators still served only by legacy paths | `common/actuator_registry/catalog.py` |
-| G-01b | Tier-1 handlers are verified against an **injected HTTP client**, not live services | Endpoint paths in `READ_ONLY_ENDPOINTS` are unverified against running services | `common/actuator_registry/handlers.py` |
-| G-02 | Perception spine active mode exists but **defaults to shadow** and is not enabled anywhere | The spine still does not carry live perception | `KAI_PERCEPTION_MODE` |
-| G-02b | Active mode is **additive** — legacy Cortex polling is not retired | Two perception paths coexist by design during migration | `agentic/cortex.py` |
-| G-07 | `KAI_SERVICE_TOKEN` is **not yet set in any compose profile** | Protected endpoints will 503 until the token is configured | `docker-compose.*.yml` |
-| G-08 | `agentic-routes` has **22 pre-existing test failures** unrelated to UH work | Pre-dates this workstream; not investigated | `scripts/test_agentic_routes.py` |
+| G-09 | **22 of 33 actuators still at `LEGACY`** (tiers 2–8) | Higher-risk actuators served only by legacy paths | `common/actuator_registry/catalog.py` |
+| G-10 | No handler has been called against a **running service** | Paths are verified against route *declarations*, not live responses | `common/actuator_registry/handlers.py` |
+| G-11 | Migration flags all **default to the legacy path** and are not enabled anywhere | `KAI_PERCEPTION_MODE`, `KAI_CORTEX_SOURCE`, `KAI_AUTONOMY_ENFORCE` are all off | `.env.example` |
 
-### G-03 — endpoints now protected (was: unauthenticated)
+G-10 and G-11 are honest limits of an offline environment, not oversights.
+Both need a running stack to close, and both are one config change away.
+
+### Endpoints now protected (was G-03)
 
 | Service | Endpoint | Status |
 |---|---|---|
@@ -151,9 +158,9 @@ These are **open**, not hidden. Do not mark UH complete while this section is no
 | agentic | `POST /checkpoint/{id}/restore`, `DELETE /checkpoint/{id}` | ✅ authenticated |
 | notify-service | `POST /notify` | ✅ authenticated |
 
-**Deployment note (G-07):** these endpoints now **fail closed**. Set `KAI_SERVICE_TOKEN`
-before deploying, or they return 503. Local development uses
-`KAI_ALLOW_UNAUTHENTICATED=true`, which logs a warning on every request.
+**These fail closed.** `KAI_SERVICE_TOKEN` is wired into all three compose
+profiles but ships empty — set it or the endpoints return 503. Local
+development uses `KAI_ALLOW_UNAUTHENTICATED=true`.
 
 ---
 
@@ -161,19 +168,20 @@ before deploying, or they return 503. Local development uses
 
 **Nothing is authorised to change live behaviour without an explicit operator decision.**
 
-Recommended order:
+All remaining work needs a running stack:
 
-1. **G-07 — set `KAI_SERVICE_TOKEN`** in each compose profile. Protected endpoints
-   fail closed, so this must land before or with the next deploy.
-2. **G-01b — verify tier-1 endpoint paths** against running services. The paths in
-   `READ_ONLY_ENDPOINTS` are asserted to be reads, but were never called for real.
-3. **G-02 — enable `KAI_PERCEPTION_MODE=active`** in a single environment and watch
+1. **Generate and set `KAI_SERVICE_TOKEN`** (`openssl rand -hex 32`). Protected
+   endpoints return 503 until this is set.
+2. **G-10 — call each tier-1 handler against the running service.** Paths are
+   verified against route declarations; responses are not. Compare
+   `receipt.result["data"]` against what the reducers expect.
+3. **G-11a — `KAI_PERCEPTION_MODE=active`** in one environment. Watch
    `events_reduced` against `events_accepted` before going wider.
-4. **G-04 enforcement** — run advisory mode until `migration_report()` reports
-   `ready_to_enforce: true`, then set `KAI_AUTONOMY_ENFORCE=true`. It currently
-   reports `false`, correctly: `paper_trade_open` has no scoped grant yet.
-5. **Tier 2 actuators** — `migrate_tier(registry, MigrationTier.LOCAL_TEST, ...)`.
-   Blocked automatically until tier 1 is complete, which it now is.
+4. **G-11b — `KAI_CORTEX_SOURCE=world_state`** once (3) looks healthy. It falls
+   back to polled state on an empty world, so the blast radius is small.
+5. **G-11c — `KAI_AUTONOMY_ENFORCE=true`** only once `migration_report()` reports
+   `ready_to_enforce: true`. It reports `false` today, correctly.
+6. **G-09 — tier 2** via `migrate_tier(registry, MigrationTier.LOCAL_TEST, ...)`.
 
 Re-run `make test-uh` after each step and update §2 and §5 here.
 

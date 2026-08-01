@@ -157,6 +157,28 @@ def _load_agentic():
 
 ag = _load_agentic()
 
+
+# ── Test isolation ────────────────────────────────────────────────────
+# common.resilience keeps circuit breakers in a module-global dict, so a
+# breaker tripped by one test stays open for every test that follows.
+# Once `memu-core` opens, _memu_get returns its fallback without ever
+# calling httpx — and any later test that patches httpx to assert on a
+# 200 response sees an empty result instead.  That is why these tests
+# passed individually and failed as a suite.
+#
+# Reset breaker state around every test so each one starts closed.
+@pytest.fixture(autouse=True)
+def _reset_circuit_breakers():
+    try:
+        import common.resilience as _res
+    except Exception:
+        yield
+        return
+    _res._breakers.clear()
+    yield
+    _res._breakers.clear()
+
+
 from fastapi.testclient import TestClient
 
 client = TestClient(ag.app, raise_server_exceptions=True)
@@ -200,8 +222,19 @@ class TestRecover:
         assert r.status_code == 200
 
     def test_response_has_status(self):
-        r = client.post("/recover")
+        # /recover is gated behind RECOVERY_ENABLED, which defaults to
+        # false. Patch the flag so this exercises the real recovery path
+        # rather than asserting on the disabled short-circuit.
+        with patch.object(ag, "_RECOVERY_ENABLED", True):
+            r = client.post("/recover")
         assert r.json().get("status") == "ok"
+
+    def test_recover_disabled_by_default(self):
+        with patch.object(ag, "_RECOVERY_ENABLED", False):
+            r = client.post("/recover")
+        body = r.json()
+        assert body.get("status") == "disabled"
+        assert "RECOVERY_ENABLED" in body.get("reason", "")
 
 
 # ═════════════════════════════════════════════════════════════════════
@@ -841,13 +874,13 @@ class TestAsyncHelpers:
     def test_get_mode_returns_mode_on_200(self):
         mc, _ = _make_http_mock(200, {"mode": "WORK"})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_mode())
+            result = _asyncio.run(ag._read_mode())
         assert result == "WORK"
 
     def test_get_mode_defaults_pub_on_non_200(self):
         mc, _ = _make_http_mock(500, {})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_mode())
+            result = _asyncio.run(ag._read_mode())
         assert result == "PUB"
 
     def test_get_mode_defaults_pub_on_exception(self):
@@ -856,7 +889,7 @@ class TestAsyncHelpers:
         mc.__aenter__ = AsyncMock(return_value=mc)
         mc.__aexit__ = AsyncMock(return_value=False)
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_mode())
+            result = _asyncio.run(ag._read_mode())
         assert result == "PUB"
 
     def test_get_relevant_memories_returns_texts_on_200(self):
@@ -868,7 +901,7 @@ class TestAsyncHelpers:
         ]
         mc, _ = _make_http_mock(200, records)
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_relevant_memories("invoice question"))
+            result = _asyncio.run(ag._recall_memories("invoice question"))
         assert "past invoice discussion" in result
         assert "VAT filing query" in result
         assert len(result) == 2
@@ -876,7 +909,7 @@ class TestAsyncHelpers:
     def test_get_relevant_memories_empty_on_non_200(self):
         mc, _ = _make_http_mock(404, {})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_relevant_memories("anything"))
+            result = _asyncio.run(ag._recall_memories("anything"))
         assert result == []
 
     def test_surface_graph_context_skipped_when_flag_off(self):
@@ -955,13 +988,13 @@ class TestAsyncHelpers:
         topics = [{"topic": "invoicing", "deferred": False}, {"topic": "MTD", "deferred": True}]
         mc, _ = _make_http_mock(200, {"topics": topics})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_active_topics())
+            result = _asyncio.run(ag._read_active_topics())
         assert result[0]["topic"] == "invoicing"
 
     def test_get_active_topics_empty_on_non_200(self):
         mc, _ = _make_http_mock(404, {})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_active_topics())
+            result = _asyncio.run(ag._read_active_topics())
         assert result == []
 
     def test_feel_emotional_context_returns_mood_on_200(self):
@@ -1001,14 +1034,14 @@ class TestAsyncHelpers:
         mc.__aenter__ = AsyncMock(return_value=mc)
         mc.__aexit__ = AsyncMock(return_value=False)
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_narrative_identity())
+            result = _asyncio.run(ag._hold_narrative())
         assert result.get("narrative") == "I am Kai, a sovereign AI"
         assert result.get("current_chapter") == "Growth Phase"
 
     def test_get_narrative_identity_handles_non_200(self):
         mc, _ = _make_http_mock(503, {})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_narrative_identity())
+            result = _asyncio.run(ag._hold_narrative())
         assert isinstance(result, dict)
 
     def test_get_imagination_context_returns_empathy_on_200(self):
@@ -1017,14 +1050,14 @@ class TestAsyncHelpers:
                 "empathy_map": {"feelings": "stressed"}}
         mc, _ = _make_http_mock(200, data)
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_imagination_context("I have so much to do today"))
+            result = _asyncio.run(ag._imagine_context("I have so much to do today"))
         assert result.get("empathy", {}).get("energy_level") == "high"
         assert result.get("empathy_map") == {"feelings": "stressed"}
 
     def test_get_imagination_context_empty_on_non_200(self):
         mc, _ = _make_http_mock(503, {})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_imagination_context("anything"))
+            result = _asyncio.run(ag._imagine_context("anything"))
         assert isinstance(result, dict)
 
     def test_hold_conscience_returns_values_on_200(self):
@@ -1051,7 +1084,7 @@ class TestAsyncHelpers:
         }
         mc, _ = _make_http_mock(200, data)
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_agent_context())
+            result = _asyncio.run(ag._surface_agent_context())
         assert result["tasks"][0]["title"] == "Pay VAT return"
         assert result["reminders"][0]["text"] == "Call accountant Monday"
         assert result["capabilities"] == 12
@@ -1059,7 +1092,7 @@ class TestAsyncHelpers:
     def test_get_agent_context_defaults_on_non_200(self):
         mc, _ = _make_http_mock(503, {})
         with patch("httpx.AsyncClient", return_value=mc):
-            result = _asyncio.run(ag._get_agent_context())
+            result = _asyncio.run(ag._surface_agent_context())
         assert result["tasks"] == []
         assert result["reminders"] == []
         assert result["capabilities"] == 0
@@ -1191,7 +1224,7 @@ class TestChatContextInjection:
 
     def test_memories_block_executes(self):
         memories = ["we discussed VAT filing last week", "you prefer bullet summaries"]
-        with patch.object(ag, "_get_relevant_memories", AsyncMock(return_value=memories)):
+        with patch.object(ag, "_recall_memories", AsyncMock(return_value=memories)):
             r = client.post("/chat", json={"message": "what did we discuss before?"})
         assert r.status_code == 200
 
@@ -1205,7 +1238,7 @@ class TestChatContextInjection:
     def test_topics_block_executes(self):
         topics = [{"topic": "invoicing automation", "deferred": False},
                   {"topic": "MTD registration", "deferred": True}]
-        with patch.object(ag, "_get_active_topics", AsyncMock(return_value=topics)):
+        with patch.object(ag, "_read_active_topics", AsyncMock(return_value=topics)):
             r = client.post("/chat", json={"message": "what topics are we tracking"})
         assert r.status_code == 200
 
@@ -1226,7 +1259,7 @@ class TestChatContextInjection:
     def test_narrative_identity_block_executes(self):
         narrative = {"narrative": "I am Kai, a sovereign AI assistant focused on growth.",
                      "current_chapter": "Independence Phase", "chapter_number": 5, "days_alive": 120}
-        with patch.object(ag, "_get_narrative_identity", AsyncMock(return_value=narrative)):
+        with patch.object(ag, "_hold_narrative", AsyncMock(return_value=narrative)):
             r = client.post("/chat", json={"message": "who are you and what drives you"})
         assert r.status_code == 200
 
@@ -1234,7 +1267,7 @@ class TestChatContextInjection:
         emp = {"energy_level": "low", "focus": "urgent deadlines",
                "communication_style": "direct", "unspoken_needs": ["reassurance", "clarity"]}
         imagination = {"empathy": emp, "empathy_map": {"feelings": "pressured"}}
-        with patch.object(ag, "_get_imagination_context", AsyncMock(return_value=imagination)):
+        with patch.object(ag, "_imagine_context", AsyncMock(return_value=imagination)):
             r = client.post("/chat", json={"message": "help me plan my week"})
         assert r.status_code == 200
 
@@ -1255,7 +1288,7 @@ class TestChatContextInjection:
             "reminders": [{"text": "Call accountant on Tuesday"}],
             "capabilities": 8,
         }
-        with patch.object(ag, "_get_agent_context", AsyncMock(return_value=agent)):
+        with patch.object(ag, "_surface_agent_context", AsyncMock(return_value=agent)):
             r = client.post("/chat", json={"message": "what is on my schedule"})
         assert r.status_code == 200
 
@@ -1304,7 +1337,7 @@ class TestChatContextInjection:
 
     def test_safe_exception_handler_covered(self):
         # Make one helper raise an exception so the _safe() except block runs
-        with patch.object(ag, "_get_relevant_memories",
+        with patch.object(ag, "_recall_memories",
                           AsyncMock(side_effect=Exception("memu down"))):
             r = client.post("/chat", json={"message": "test safe handler"})
         assert r.status_code == 200  # _safe() catches the exception gracefully
