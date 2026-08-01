@@ -33,6 +33,93 @@ class IngressVerdict(str, Enum):
     REJECTED_DUPLICATE = "rejected_duplicate"
     ACCEPTED_STALE = "accepted_stale"
     REJECTED_CROSS_PRINCIPAL = "rejected_cross_principal"
+    REJECTED_OVERSIZED = "rejected_oversized"
+
+
+# Payload bounds (roadmap §16.4: oversized/deep/high-cardinality events).
+# A compromised or faulty source must not be able to exhaust memory in the
+# reducers by sending one enormous event.
+MAX_PAYLOAD_BYTES = 256 * 1024
+MAX_PAYLOAD_DEPTH = 16
+MAX_PAYLOAD_KEYS = 1_000
+MAX_STRING_LENGTH = 64 * 1024
+
+
+def _payload_depth(obj: Any, _depth: int = 0) -> int:
+    """Maximum nesting depth, short-circuiting past the limit.
+
+    Stops descending once the cap is exceeded so a maliciously deep
+    payload cannot blow the Python stack during the check itself.
+    """
+    if _depth > MAX_PAYLOAD_DEPTH:
+        return _depth
+    if isinstance(obj, dict):
+        if not obj:
+            return _depth
+        return max(_payload_depth(v, _depth + 1) for v in obj.values())
+    if isinstance(obj, (list, tuple)):
+        if not obj:
+            return _depth
+        return max(_payload_depth(v, _depth + 1) for v in obj)
+    return _depth
+
+
+def _payload_cardinality(obj: Any, _budget: int = MAX_PAYLOAD_KEYS) -> int:
+    """Total key/element count, stopping once the budget is spent."""
+    count = 0
+    stack = [obj]
+    while stack and count <= _budget:
+        current = stack.pop()
+        if isinstance(current, dict):
+            count += len(current)
+            stack.extend(current.values())
+        elif isinstance(current, (list, tuple)):
+            count += len(current)
+            stack.extend(current)
+    return count
+
+
+def _longest_string(obj: Any) -> int:
+    longest = 0
+    stack = [obj]
+    while stack:
+        current = stack.pop()
+        if isinstance(current, str):
+            longest = max(longest, len(current))
+        elif isinstance(current, dict):
+            stack.extend(current.keys())
+            stack.extend(current.values())
+        elif isinstance(current, (list, tuple)):
+            stack.extend(current)
+    return longest
+
+
+def check_payload_bounds(payload: Any) -> Optional[str]:
+    """Return a rejection reason, or None when the payload is within bounds.
+
+    Ordered cheapest-check-first: depth and cardinality are bounded walks,
+    so they run before the full serialisation needed for a byte count.
+    """
+    depth = _payload_depth(payload)
+    if depth > MAX_PAYLOAD_DEPTH:
+        return f"payload too deep: {depth} > {MAX_PAYLOAD_DEPTH}"
+
+    cardinality = _payload_cardinality(payload)
+    if cardinality > MAX_PAYLOAD_KEYS:
+        return f"payload too high-cardinality: {cardinality} > {MAX_PAYLOAD_KEYS}"
+
+    longest = _longest_string(payload)
+    if longest > MAX_STRING_LENGTH:
+        return f"payload string too long: {longest} > {MAX_STRING_LENGTH}"
+
+    try:
+        size = len(json.dumps(payload, default=str).encode("utf-8"))
+    except (TypeError, ValueError) as exc:
+        return f"payload not serialisable: {exc}"
+    if size > MAX_PAYLOAD_BYTES:
+        return f"payload too large: {size} > {MAX_PAYLOAD_BYTES} bytes"
+
+    return None
 
 
 class IngressResult:
@@ -112,6 +199,15 @@ class PerceptionIngress:
                     f"principal mismatch: event={event.principal.identity} "
                     f"ingress={self._principal.identity}"
                 ),
+            )
+
+        bounds_error = check_payload_bounds(event.payload)
+        if bounds_error is not None:
+            self._stats[IngressVerdict.REJECTED_OVERSIZED.value] += 1
+            return IngressResult(
+                IngressVerdict.REJECTED_OVERSIZED,
+                event=event,
+                reason=bounds_error,
             )
 
         dedup_key = event.raw_hash or event.id

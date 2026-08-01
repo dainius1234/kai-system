@@ -2878,3 +2878,31 @@ Total: 799 tests, all green. All 8 CI policy gates pass.
 **Status:** The UH roadmap list is exhausted. What exists is the enforcement machinery with full test coverage; no actuator has yet been advanced past `LEGACY` against live services, and the perception spine still runs in shadow mode. Cutover is a separate, operator-authorised step.
 
 **Files produced:** `common/perception_spine/`, `common/world_state/`, `common/proposal_workspace/`, `common/policy_bridge/`, `common/vertical_slice/`, `common/actuator_registry/`, `common/autonomy/`, `common/contracts/autonomy.py`, and eight test suites under `scripts/`.
+
+---
+
+## D133 — 2026-08-01 — Adversarial Gap Closure + Single-Source Progress Tracking
+
+**Context:** After D132 recorded UH-1…UH-8 as delivered, a verification pass against roadmap §16 (30-item adversarial suite) found three genuinely uncovered scenarios. Two were missing *tests*; one (§16.4) was a missing *control* — the perception ingress had no payload bounds at all, so a faulty or compromised sensor could exhaust reducer memory with a single event. The operator also directed that audit files and recommendations be tracked in one authoritative place going forward.
+
+**Correction to D132:** D132's summary table implied §16 coverage was complete. It was not — 27 of 30 by keyword presence, and keyword presence is weak evidence. This entry supersedes that implication. Coverage is now 30/30, with two items (§16.27 multi-worker/clock, §16.30 deletion lineage) explicitly recorded as *partial* in the tracker rather than claimed as done.
+
+**Decisions:**
+
+1. **§16.4 payload bounds are a control, not just a test.** `common/perception_spine/ingress.py` now enforces four caps before an event reaches the journal: 256 KB serialised, depth 16, 1,000 keys/elements, 64 KB per string. Depth and cardinality checks are bounded walks that short-circuit past the limit, so the check itself cannot be used as the attack. New verdict `REJECTED_OVERSIZED`. A rejected event does **not** consume its dedup key — otherwise one oversized event could permanently block the legitimate event sharing its hash.
+
+2. **§16.13 required a real assessment layer, not a mock.** Built `common/contracts/assessment.py` and `common/policy_bridge/assessment.py` to the roadmap §7.4 contract shape. The structural decision: **the assessment layer has no way to express permission.** `AssessmentResult` offers `allow_advisory`, never `allow`, and `AggregateAssessment` exposes `blocked`, never `allowed`. An assessor therefore cannot manufacture a security allow — it can only tighten an outcome. This satisfies §7.4 ("Ohana never creates a security allow by itself") by construction rather than by convention.
+
+3. **Unavailable and crashing assessors fail closed.** A required assessor that is unavailable blocks. An assessor that raises is treated as unavailable, never as approval. An assessor returning a non-`AssessmentResult` value (`"allow"`, `True`, `1`, `None`, a dict) is treated as unavailable — a poisoned values store cannot smuggle a permission through a type confusion.
+
+4. **§16.26 is enforced by source-level guards.** `scripts/test_invariant_guards.py` asserts properties a revert would break: no `except: pass` on protected paths, no bypass methods on `CapabilityBridge` or `ActuatorRegistry`, the legacy-path verification gate still raises, evidence grading still disqualifies model/simulated output, the assessment layer still cannot express allow, and the legacy `TrustLevel` scalar is not imported into the new path. Behavioural tests prove today's behaviour; these prove tomorrow's rollback cannot silently restore the old one.
+
+5. **`make test-uh` is the single verification command.** Eleven suites, 896 tests, offline, no services required. Rule: green before any commit.
+
+6. **`kai-pm/UH_PROGRESS_TRACKER.md` is the single source of truth for UH status.** It carries the work-package table, per-gate status, the full §16 coverage map, and an explicit open-gaps list (G-01…G-06). Rules recorded there: update it in the same commit as the code; ✅ means a named suite proves it, never that the machinery merely exists; never mark UH complete while the gaps section is non-empty. Referenced from `NAVIGATION.md`, `README.md`, `STATUS.md` and `MAKEFILE_TARGETS.md` so no session can miss it.
+
+7. **Open gaps recorded rather than closed.** G-01 (0 of 33 actuators migrated), G-02 (perception spine shadow-only), G-03 (six unauthenticated side-effecting endpoints), G-04 (legacy `TrustLevel` still referenced by `gate_autonomous_action()`), G-05/G-06 (partial §16.27/§16.30 coverage). Recommended cutover order puts G-03 first — `backup-service /restore/postgres` can overwrite the database with no authentication and is independent of UH migration.
+
+**Files produced:** `common/contracts/assessment.py`, `common/policy_bridge/assessment.py`, `scripts/test_payload_bounds.py`, `scripts/test_assessment.py`, `scripts/test_invariant_guards.py`, `kai-pm/UH_PROGRESS_TRACKER.md`.
+
+**Files modified:** `common/perception_spine/ingress.py` (payload bounds), `common/policy_bridge/policy_engine.py` (assessor wiring, tighten-only), `common/policy_bridge/__init__.py`, `Makefile` (4 targets incl. `test-uh`), `README.md`, `kai-pm/NAVIGATION.md`, `kai-pm/STATUS.md`, `kai-pm/MAKEFILE_TARGETS.md`.

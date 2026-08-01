@@ -49,10 +49,12 @@ class PolicyEngine:
         self,
         principal: Principal,
         policy_version: str = POLICY_VERSION,
+        assessors: Optional["AssessorRegistry"] = None,
     ) -> None:
         self._principal = principal
         self._version = policy_version
         self._available = True
+        self._assessors = assessors
 
     def set_available(self, available: bool) -> None:
         self._available = available
@@ -111,11 +113,30 @@ class PolicyEngine:
             result = "deny"
             rules.append("invalid_digest")
 
+        # Constraint assessments are consulted last and can only ever
+        # tighten the outcome.  An assessor cannot turn a deny into an
+        # allow — it has no way to express permission (roadmap §7.4).
+        assessment_reason = ""
+        if self._assessors is not None:
+            rules.append("constraint_assessment_check")
+            aggregate = self._assessors.aggregate(proposal)
+            if aggregate.blocked:
+                assessment_reason = aggregate.reason
+                if aggregate.blocking_assessors:
+                    result = "deny"
+                    rules.append("assessor_block")
+                elif result != "deny":
+                    result = "requires_approval"
+                    rules.append("assessor_requires_human")
+
         decision = self._make_decision(proposal, result, rules=rules)
+        reason = f"policy evaluation: {result}"
+        if assessment_reason:
+            reason += f" — {assessment_reason}"
         return PolicyEvaluation(
             decision=decision,
             rules_evaluated=rules,
-            reason=f"policy evaluation: {result}",
+            reason=reason,
         )
 
     def _make_decision(

@@ -14,6 +14,11 @@ from common.policy_bridge.policy_engine import (
 )
 from common.policy_bridge.approval import ApprovalError, ApprovalGate
 from common.policy_bridge.capability import CapabilityBridge, CapabilityError
+from common.policy_bridge.assessment import (
+    AggregateAssessment,
+    AssessmentError,
+    AssessorRegistry,
+)
 
 __all__ = [
     "POLICY_VERSION",
@@ -23,4 +28,7 @@ __all__ = [
     "ApprovalGate",
     "CapabilityBridge",
     "CapabilityError",
+    "AggregateAssessment",
+    "AssessmentError",
+    "AssessorRegistry",
 ]

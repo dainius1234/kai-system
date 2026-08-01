@@ -1,8 +1,8 @@
 # Kai PM Status Dashboard
 
-- **Last updated (UTC):** 2026-07-24
+- **Last updated (UTC):** 2026-08-01
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** D91 Obsidian Brain shipped. Bidirectional vault ↔ knowledge graph sync: file watcher with 2s debounce (watchdog), SHA256 checksum-based change detection, VaultMapper (filepath↔node-id, persists to .vault-sync/mapping.json), FastAPI vault-sync service (port 8047 / 172.20.0.36) with POST /ingest + POST /export (conviction ≥9.0 gate + path-traversal block) + GET /search + GET /mapping. Three new memu-core endpoints (POST /memory/vault/ingest, DELETE /memory/vault/{id}, GET /memory/vault/search). Agentic vault export proxy + FF_VAULT_CONTEXT world-context injection. FF_VAULT_SYNC (default True) + FF_VAULT_CONTEXT (default False). 4 Jinja2 templates (daily-note, lesson-learned, kai-inbox, soul-mirror). ~45 tests. Services 59→60.
+- **Current focus:** Unified Hunter migration. UH-1…UH-8 built and tested (896 tests, `make test-uh`). Canonical decision path exists behind the live system; **not yet cut over** — all 33 catalogued actuators remain at `LEGACY` and the perception spine is shadow-mode only. **Status source of truth: [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md)** (includes open-gaps list G-01…G-06).
 
 ## What's landed on main
 

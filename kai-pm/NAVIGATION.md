@@ -3,7 +3,7 @@
 > **If you are lost, start here.** This file tells you which doc to open for which question.
 > All other PM docs are *referenced from here*, not the other way around.
 
-**Last updated:** 2026-06-18
+**Last updated:** 2026-08-01
 
 ---
 
@@ -17,6 +17,8 @@
 | What metrics are real today? | [`METRICS.md`](METRICS.md) + [`REALITY_CHECK_2026-06-18.md`](REALITY_CHECK_2026-06-18.md) |
 | What's risky right now? | [`RISKS.md`](RISKS.md) |
 | Should we adopt tech X? | [`TECH_WATCH.md`](TECH_WATCH.md) |
+| **What's the Unified Hunter status?** | [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md) ← **source of truth for UH work** |
+| What does the UH architecture mandate? | [`KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md`](KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md) |
 | Why did we decide X? | [`DECISIONS.md`](DECISIONS.md) |
 | I'm a new session/agent — bootstrap me | [`SESSION_BOOTSTRAP.md`](SESSION_BOOTSTRAP.md) |
 | What does the README *actually* mean? | [`../README.md`](../README.md) + the "Honest Limitations" section |

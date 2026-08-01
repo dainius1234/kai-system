@@ -155,3 +155,26 @@ After fixes:
 | `test_live_query_returns_real_response` skip condition | ✅ Fixed D76 — `is_available()` now checks token length ≥ 20 chars + TCP handshake |
 | `test-camera` 503 when no hardware | ✅ Fixed D76 — `pytest.skip()` on 503 response |
 | Repo-wide coverage gate | ✅ Done — D75 (5 modules, 60% floor, 62.67% measured) |
+
+---
+
+## Unified Hunter Targets (UH-1 … UH-8 + adversarial guards)
+
+Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
+
+| Target | Status | What it covers |
+|---|---|---|
+| `test-uh` | ✓ | **Aggregate — run this one.** All 11 suites, 896 tests |
+| `test-contracts` | ✓ | UH-1 frozen canonical contracts (126) |
+| `test-perception-spine` | ✓ | UH-2 shadow-mode event ingress (166) |
+| `test-world-state` | ✓ | UH-3 reducers and immutable snapshots (71) |
+| `test-proposal-workspace` | ✓ | UH-4 proposal-only deliberation (52) |
+| `test-policy-bridge` | ✓ | UH-5 policy / approval / capability (49) |
+| `test-vertical-slice` | ✓ | UH-6 paper-trade end-to-end (86) |
+| `test-actuator-registry` | ✓ | UH-7 actuator migration state machine (75) |
+| `test-autonomy` | ✓ | UH-8 evidence grading and scoped grants (174) |
+| `test-payload-bounds` | ✓ | §16.4 oversized/deep/high-cardinality payloads (24) |
+| `test-assessment` | ✓ | §16.13 Ohana unavailable / poisoned values (56) |
+| `test-invariant-guards` | ✓ | §16.26 rollback to fail-open or legacy authority (17) |
+
+All run offline with no services, Docker or GPU.

@@ -21,18 +21,16 @@
 
 ---
 
-## Project Status (25 July 2026)
+## Project Status (1 August 2026)
 
 | Metric | Value |
 |---|---|
-| **Services** | 60 unique across 3 compose profiles (34 in minimal stack) |
-| **Test targets** | 90 (`make test-core`) |
-| **Individual tests** | ~2,888 (`def test_` across 136+ files) |
-| **Python LOC** | ~67,500 |
-| **Feature flags** | 51 (`FF_*` env vars) |
-| **Dockerfiles** | 48 |
-| **Compose profiles** | 3 (minimal / full / sovereign) |
-| **Milestones shipped** | 52 |
+| **Services** | 61 Docker containers |
+| **Test targets** | 91 (`make test-core`) |
+| **Individual tests** | 3,634 (`def test_` across 166 files) |
+| **Python LOC** | ~97,693 |
+| **Compose files** | 3 (minimal / full / sovereign) |
+| **Milestones shipped** | 45 |
 | **Failures** | 0 |
 
 > **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
@@ -59,9 +57,27 @@ GPU integration status: **Phase 0 complete** — see [`docs/gpu_integration_phas
 ## Project Management
 
 All PM operations live in [`kai-pm/`](kai-pm). Entry point for fast session re-hydration:
-[`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md). Decision log (append-only, D1–D102):
+[`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md). Decision log (append-only):
 [`kai-pm/DECISIONS.md`](kai-pm/DECISIONS.md). Known stubs and placeholders:
 [`kai-pm/STUBS_AND_PLACEHOLDERS.md`](kai-pm/STUBS_AND_PLACEHOLDERS.md).
+
+### Unified Hunter migration
+
+The canonical decision path (perception → world state → proposal → policy → approval →
+capability → actuator → verification → bounded autonomy) is built and tested behind the
+existing system.
+
+**Status lives in one place:** [`kai-pm/UH_PROGRESS_TRACKER.md`](kai-pm/UH_PROGRESS_TRACKER.md).
+It is the source of truth for UH work — including an honest open-gaps list. Verify the whole
+workstream with a single command:
+
+```bash
+make test-uh          # all 11 UH suites, 896 tests
+```
+
+> **Not yet cut over.** All 33 catalogued actuators remain at `LEGACY` and the perception
+> spine runs in shadow mode. The enforcement machinery is proven by tests; it is not yet
+> carrying live traffic. See §5 of the tracker for the open-gaps list.
 
 ---
 
