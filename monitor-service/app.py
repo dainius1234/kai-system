@@ -16,7 +16,15 @@ from contextlib import asynccontextmanager, suppress
 from typing import Any, Dict, List, Optional
 
 import httpx
-from fastapi import Body, FastAPI, HTTPException
+from fastapi import Body, Depends, FastAPI, HTTPException
+
+import sys as _sys, os as _os
+_repo = _os.path.dirname(_os.path.abspath(__file__))
+while _repo != _os.path.dirname(_repo) and not _os.path.isdir(_os.path.join(_repo, 'common')):
+    _repo = _os.path.dirname(_repo)
+if _repo not in _sys.path:
+    _sys.path.insert(0, _repo)
+from common.service_auth import require_service_auth
 from pydantic import BaseModel, Field
 
 try:
@@ -250,7 +258,8 @@ async def list_rules():
     return {"rules": list(_rules.values()), "total": len(_rules)}
 
 
-@app.post("/rules", status_code=201)
+@app.post("/rules", status_code=201,
+          dependencies=[Depends(require_service_auth("monitor_rule_create"))])
 async def add_rule(rule_in: RuleIn):
     rule = rule_in.model_dump()
     if not rule.get("id"):
@@ -262,7 +271,8 @@ async def add_rule(rule_in: RuleIn):
     return {"ok": True, "id": rule["id"]}
 
 
-@app.put("/rules/{rule_id}")
+@app.put("/rules/{rule_id}",
+          dependencies=[Depends(require_service_auth("monitor_rule_update"))])
 async def update_rule(rule_id: str, updates: dict = Body(...)):
     if rule_id not in _rules:
         raise HTTPException(404, f"Rule not found: {rule_id}")
@@ -271,7 +281,8 @@ async def update_rule(rule_id: str, updates: dict = Body(...)):
     return {"ok": True}
 
 
-@app.delete("/rules/{rule_id}")
+@app.delete("/rules/{rule_id}",
+          dependencies=[Depends(require_service_auth("monitor_rule_delete"))])
 async def delete_rule(rule_id: str):
     _rules.pop(rule_id, None)
     _last_check.pop(rule_id, None)
@@ -283,7 +294,8 @@ async def delete_rule(rule_id: str):
     return {"ok": True}
 
 
-@app.post("/rules/{rule_id}/enable")
+@app.post("/rules/{rule_id}/enable",
+          dependencies=[Depends(require_service_auth("monitor_rule_enable"))])
 async def enable_rule(rule_id: str):
     if rule_id not in _rules:
         raise HTTPException(404, f"Rule not found: {rule_id}")
@@ -292,7 +304,8 @@ async def enable_rule(rule_id: str):
     return {"ok": True}
 
 
-@app.post("/rules/{rule_id}/disable")
+@app.post("/rules/{rule_id}/disable",
+          dependencies=[Depends(require_service_auth("monitor_rule_disable"))])
 async def disable_rule(rule_id: str):
     if rule_id not in _rules:
         raise HTTPException(404, f"Rule not found: {rule_id}")
@@ -317,7 +330,8 @@ async def get_alerts(limit: int = 50):
     return {"alerts": alerts, "total": len(_alert_history)}
 
 
-@app.delete("/alerts")
+@app.delete("/alerts",
+          dependencies=[Depends(require_service_auth("monitor_alerts_clear"))])
 async def clear_alerts():
     _alert_history.clear()
     return {"ok": True}

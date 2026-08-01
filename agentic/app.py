@@ -13,11 +13,12 @@ from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional
 
 import httpx
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from common.auth import sign_gate_request, sign_gate_request_bundle
+from common.service_auth import require_service_auth
 from common.feature_flags import is_enabled
 from common.llm import LLMRouter, llm_warmup
 from common.resilience import resilient_call as _resilient_call
@@ -3136,7 +3137,8 @@ async def checkpoint_detail(checkpoint_id: str) -> Dict[str, Any]:
     return {"status": "ok", "checkpoint": cp.to_dict()}
 
 
-@app.post("/checkpoint/{checkpoint_id}/restore")
+@app.post("/checkpoint/{checkpoint_id}/restore",
+          dependencies=[Depends(require_service_auth("checkpoint_restore"))])
 async def checkpoint_restore(checkpoint_id: str) -> Dict[str, Any]:
     """Restore LangGraph state from a checkpoint (time-travel rollback).
 
@@ -3188,7 +3190,8 @@ async def checkpoint_diff(id_a: str, id_b: str) -> Dict[str, Any]:
     return {"status": "ok", "diff": diff_checkpoints(cp_a, cp_b)}
 
 
-@app.delete("/checkpoint/{checkpoint_id}")
+@app.delete("/checkpoint/{checkpoint_id}",
+          dependencies=[Depends(require_service_auth("checkpoint_delete"))])
 async def checkpoint_delete(checkpoint_id: str) -> Dict[str, Any]:
     """Delete a single checkpoint."""
     if delete_checkpoint(checkpoint_id):

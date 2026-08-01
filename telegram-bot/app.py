@@ -24,7 +24,16 @@ from contextlib import asynccontextmanager
 from typing import Any, Dict, Optional
 
 import httpx
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+
+import sys as _sys, os as _os
+_repo = _os.path.dirname(_os.path.abspath(__file__))
+while _repo != _os.path.dirname(_repo) and not _os.path.isdir(_os.path.join(_repo, 'common')):
+    _repo = _os.path.dirname(_repo)
+if _repo not in _sys.path:
+    _sys.path.insert(0, _repo)
+from common.service_auth import require_service_auth
+
 from pydantic import BaseModel
 
 from common.runtime import detect_device, sanitize_string, setup_json_logger
@@ -373,7 +382,8 @@ class AlertPayload(BaseModel):
     chat_id: Optional[int] = None  # if omitted, sends to first allowed chat
 
 
-@app.post("/alert")
+@app.post("/alert",
+          dependencies=[Depends(require_service_auth("telegram_alert"))])
 async def send_alert(payload: AlertPayload) -> Dict[str, Any]:
     """Push a proactive message to the operator via Telegram."""
     if not BOT_TOKEN:

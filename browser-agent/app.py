@@ -23,7 +23,16 @@ from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
+
+import sys as _sys, os as _os
+_repo = _os.path.dirname(_os.path.abspath(__file__))
+while _repo != _os.path.dirname(_repo) and not _os.path.isdir(_os.path.join(_repo, 'common')):
+    _repo = _os.path.dirname(_repo)
+if _repo not in _sys.path:
+    _sys.path.insert(0, _repo)
+from common.service_auth import require_service_auth
+
 from fastapi.responses import Response
 from pydantic import BaseModel
 
@@ -109,7 +118,8 @@ class NavigateRequest(BaseModel):
     wait_until: str = "domcontentloaded"
 
 
-@app.post("/navigate")
+@app.post("/navigate",
+          dependencies=[Depends(require_service_auth("browser_navigate"))])
 async def navigate(req: NavigateRequest):
     if not _PLAYWRIGHT_OK:
         raise HTTPException(503, "playwright not available")
@@ -127,7 +137,8 @@ class ClickRequest(BaseModel):
     text: Optional[str] = None
 
 
-@app.post("/click")
+@app.post("/click",
+          dependencies=[Depends(require_service_auth("browser_click"))])
 async def click(req: ClickRequest):
     if not _PLAYWRIGHT_OK:
         raise HTTPException(503, "playwright not available")
@@ -150,7 +161,8 @@ class TypeRequest(BaseModel):
     text: str
 
 
-@app.post("/type")
+@app.post("/type",
+          dependencies=[Depends(require_service_auth("browser_type"))])
 async def type_text(req: TypeRequest):
     if not _PLAYWRIGHT_OK:
         raise HTTPException(503, "playwright not available")
@@ -199,7 +211,8 @@ class RunRequest(BaseModel):
     url: Optional[str] = None
 
 
-@app.post("/run")
+@app.post("/run",
+          dependencies=[Depends(require_service_auth("browser_run"))])
 async def run_task(req: RunRequest):
     """Navigate to URL (if given) then scrape — returns page text as task result."""
     if not _PLAYWRIGHT_OK:

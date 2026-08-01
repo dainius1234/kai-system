@@ -18,6 +18,12 @@ def _load():
         return_value=MagicMock(snapshot=MagicMock(return_value={}))
     )
     sys.modules.setdefault("common", MagicMock())
+    # The service now imports common.service_auth; because `common` is
+    # stubbed above, the submodule must be stubbed too.  Auth itself is
+    # covered by scripts/test_service_auth.py.
+    _auth_stub = MagicMock()
+    _auth_stub.require_service_auth = lambda operation: (lambda: None)
+    sys.modules["common.service_auth"] = _auth_stub
     sys.modules["common.runtime"] = common_stub
 
     spec = importlib.util.spec_from_file_location("monitor_app", _SVC)

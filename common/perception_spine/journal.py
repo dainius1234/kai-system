@@ -61,6 +61,22 @@ class EventJournal:
     def next_offset(self) -> int:
         return self._next_offset
 
+    def _ends_with_newline(self) -> bool:
+        """Whether the journal's last byte is a newline.
+
+        A crash mid-append leaves a partial line with no terminator.
+        Appending straight onto it would concatenate the two records and
+        corrupt the *new* one as well as the torn one.
+        """
+        if not self._path.exists():
+            return True
+        size = self._path.stat().st_size
+        if size == 0:
+            return True
+        with open(self._path, "rb") as fh:
+            fh.seek(-1, os.SEEK_END)
+            return fh.read(1) == b"\n"
+
     def append(self, event: PerceptionEvent) -> int:
         with self._lock:
             offset = self._next_offset
@@ -69,7 +85,13 @@ class EventJournal:
                 "journaled_at": datetime.now(timezone.utc).isoformat(),
                 "event": json.loads(event.model_dump_json()),
             }
+            needs_terminator = not self._ends_with_newline()
             with open(self._path, "a", encoding="utf-8") as fh:
+                if needs_terminator:
+                    # Close off a torn line so this record starts clean.
+                    # The torn line stays in the file and is skipped on
+                    # replay — recoverable, and visible for audit.
+                    fh.write("\n")
                 fh.write(json.dumps(record, separators=(",", ":"), ensure_ascii=False))
                 fh.write("\n")
                 fh.flush()

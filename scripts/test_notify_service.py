@@ -17,6 +17,12 @@ def _load():
     runtime_stub.setup_json_logger.return_value = MagicMock()
     runtime_stub.ErrorBudget = MagicMock(return_value=MagicMock(record=MagicMock(), snapshot=MagicMock(return_value={})))
     sys.modules.setdefault("common", MagicMock())
+    # The service now imports common.service_auth; because `common` is
+    # stubbed above, the submodule must be stubbed too.  Auth itself is
+    # covered by scripts/test_service_auth.py.
+    _auth_stub = MagicMock()
+    _auth_stub.require_service_auth = lambda operation: (lambda: None)
+    sys.modules["common.service_auth"] = _auth_stub
     sys.modules["common.runtime"] = runtime_stub
     spec.loader.exec_module(mod)
     return mod

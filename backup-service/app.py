@@ -9,7 +9,15 @@ from datetime import datetime, timezone
 from typing import Any, Dict
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
+
+import sys as _sys, os as _os
+_repo = _os.path.dirname(_os.path.abspath(__file__))
+while _repo != _os.path.dirname(_repo) and not _os.path.isdir(_os.path.join(_repo, 'common')):
+    _repo = _os.path.dirname(_repo)
+if _repo not in _sys.path:
+    _sys.path.insert(0, _repo)
+from common.service_auth import require_service_auth
 
 app = FastAPI(title=os.getenv("SERVICE_NAME", "backup-service"), version="0.2.0")
 BACKUP_DIR = os.getenv("BACKUP_DIR", "/data/backup/")
@@ -35,7 +43,8 @@ async def health() -> Dict[str, str]:
 
 # ── PostgreSQL backup ────────────────────────────────────────────────
 
-@app.post("/backup/postgres")
+@app.post("/backup/postgres",
+          dependencies=[Depends(require_service_auth("backup_postgres"))])
 async def backup_postgres() -> Dict[str, Any]:
     """Dump PostgreSQL database to a SQL file."""
     os.makedirs(BACKUP_DIR, exist_ok=True)
@@ -60,7 +69,8 @@ async def backup_postgres() -> Dict[str, Any]:
 
 # ── Redis backup ─────────────────────────────────────────────────────
 
-@app.post("/backup/redis")
+@app.post("/backup/redis",
+          dependencies=[Depends(require_service_auth("backup_redis"))])
 async def backup_redis() -> Dict[str, Any]:
     """Trigger Redis BGSAVE and copy the RDB dump."""
     os.makedirs(BACKUP_DIR, exist_ok=True)
@@ -97,7 +107,8 @@ async def backup_redis() -> Dict[str, Any]:
 
 # ── Memory export ────────────────────────────────────────────────────
 
-@app.post("/backup/memory")
+@app.post("/backup/memory",
+          dependencies=[Depends(require_service_auth("backup_memory"))])
 async def backup_memory() -> Dict[str, Any]:
     """Export memories from memu-core to a JSON file."""
     os.makedirs(BACKUP_DIR, exist_ok=True)
@@ -128,7 +139,8 @@ async def backup_memory() -> Dict[str, Any]:
 
 # ── Ledger export ────────────────────────────────────────────────────
 
-@app.post("/backup/ledger")
+@app.post("/backup/ledger",
+          dependencies=[Depends(require_service_auth("backup_ledger"))])
 async def backup_ledger() -> Dict[str, Any]:
     """Export tool-gate ledger to a JSON file."""
     os.makedirs(BACKUP_DIR, exist_ok=True)
@@ -152,8 +164,10 @@ async def backup_ledger() -> Dict[str, Any]:
 
 # ── Full backup orchestration ────────────────────────────────────────
 
-@app.post("/backup")
-@app.post("/backup/full")
+@app.post("/backup",
+          dependencies=[Depends(require_service_auth("backup_full"))])
+@app.post("/backup/full",
+          dependencies=[Depends(require_service_auth("backup_full"))])
 async def backup_full() -> Dict[str, Any]:
     """Run all backup components and return a manifest."""
     results = {}
@@ -197,7 +211,8 @@ async def list_backups() -> Dict[str, Any]:
 
 # ── Restore (PostgreSQL only — safe, reversible) ─────────────────────
 
-@app.post("/restore/postgres")
+@app.post("/restore/postgres",
+          dependencies=[Depends(require_service_auth("postgres_restore"))])
 async def restore_postgres(backup_file: str = "") -> Dict[str, Any]:
     """Restore PostgreSQL from a backup SQL file.
 

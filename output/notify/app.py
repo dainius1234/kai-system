@@ -24,7 +24,16 @@ from typing import Deque, Dict, List, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
+
+import sys as _sys, os as _os
+_repo = _os.path.dirname(_os.path.abspath(__file__))
+while _repo != _os.path.dirname(_repo) and not _os.path.isdir(_os.path.join(_repo, 'common')):
+    _repo = _os.path.dirname(_repo)
+if _repo not in _sys.path:
+    _sys.path.insert(0, _repo)
+from common.service_auth import require_service_auth
+
 from pydantic import BaseModel
 
 try:
@@ -95,7 +104,8 @@ class NotifyRequest(BaseModel):
     timeout_ms: Optional[int] = 5000
 
 
-@app.post("/notify")
+@app.post("/notify",
+          dependencies=[Depends(require_service_auth("desktop_notify"))])
 async def notify(req: NotifyRequest):
     global _counter
     if not req.title.strip():
