@@ -533,15 +533,18 @@ def _declared_get_routes(rel_path: str) -> set:
 def _route_matches(template: str, declared: set) -> bool:
     """Whether a handler template corresponds to a declared route.
 
-    Path parameters are named differently between the handler template
-    and the route decorator, so templated paths compare on their static
-    prefix rather than exact text.
+    Two shapes have to be normalised away first:
+      - a query string, which is not part of the route path at all;
+      - path parameters, whose names differ between the handler template
+        and the route decorator.
     """
-    if template in declared:
+    path = template.split("?", 1)[0]
+
+    if path in declared:
         return True
-    if "{" not in template:
+    if "{" not in path:
         return False
-    prefix = template.split("{")[0].rstrip("/")
+    prefix = path.split("{")[0].rstrip("/")
     return any(
         route.split("{")[0].rstrip("/") == prefix
         for route in declared
@@ -589,6 +592,10 @@ def test_route_matcher_rejects_wrong_paths():
     check("matcher_rejects_absent", not _route_matches("/summary", declared))
     check("matcher_rejects_wrong_prefix",
           not _route_matches("/quote/{sym}", declared))
+    check("matcher_ignores_query_string",
+          _route_matches("/inbox?limit={n}", declared))
+    check("matcher_rejects_wrong_path_with_query",
+          not _route_matches("/nope?limit={n}", declared))
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -713,6 +720,58 @@ def test_state_shape_matches_cortex_contract():
     check("refresh_count_is_int", isinstance(state["refresh_count"], int))
 
 
+# ═══════════════════════════════════════════════════════════════════
+# G-10 · Query-string parameters (found by live verification)
+# ═══════════════════════════════════════════════════════════════════
+
+def test_query_string_template_resolves():
+    """Live verification found /market-data/prices 422s without `symbols`."""
+    calls = []
+    handler = build_read_handler(
+        "market-data", http_get=lambda u: calls.append(u) or {"prices": {}}
+    )
+    handler({}, "market_data_read")
+    check("query_param_default_applied",
+          calls and "symbols=" in calls[0], str(calls))
+    check("query_param_uses_default",
+          calls and "symbols=BTC,ETH" in calls[0], str(calls))
+
+
+def test_query_string_parameter_override():
+    calls = []
+    handler = build_read_handler(
+        "market-data", http_get=lambda u: calls.append(u) or {}
+    )
+    handler({"symbols": "SOL,ADA"}, "market_data_read")
+    check("query_param_overridable",
+          calls and "symbols=SOL,ADA" in calls[0], str(calls))
+
+
+def test_parameter_defaults_do_not_mask_required_path_params():
+    """A default must not silently paper over a genuinely missing param."""
+    handler = build_read_handler("broker-bridge", http_get=lambda u: {})
+    try:
+        handler({}, "market_ticker_read")
+        check("missing_path_param_still_raises", False, "should have raised")
+    except HandlerError as e:
+        check("missing_path_param_still_raises", "requires parameter" in str(e))
+
+
+def test_live_verification_classifier():
+    """The live script must call a 404 WRONG and everything else UPSTREAM."""
+    from scripts.verify_live_endpoints import classify
+
+    check("classify_ok", classify({"ok": True}) == "OK")
+    check("classify_404_is_wrong",
+          classify({"ok": False, "error": "HTTPStatusError: 404 Not Found"}) == "WRONG")
+    check("classify_503_is_upstream",
+          classify({"ok": False, "error": "503 Service Unavailable"}) == "UPSTREAM")
+    check("classify_502_is_upstream",
+          classify({"ok": False, "error": "502 Bad Gateway"}) == "UPSTREAM")
+    check("classify_connect_error_is_upstream",
+          classify({"ok": False, "error": "ConnectError: refused"}) == "UPSTREAM")
+
+
 # ── Runner ─────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
@@ -756,6 +815,10 @@ if __name__ == "__main__":
     test_facts_are_domain_prefixed()
     test_fact_cap_respected()
     test_state_shape_matches_cortex_contract()
+    test_query_string_template_resolves()
+    test_query_string_parameter_override()
+    test_parameter_defaults_do_not_mask_required_path_params()
+    test_live_verification_classifier()
 
     print(f"\n{'='*60}")
     print(f"Migration & Active Mode Tests: {passed} passed, {failed} failed")

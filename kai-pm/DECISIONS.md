@@ -2978,3 +2978,40 @@ G-10 and G-11 are honest limits of an offline environment rather than unfinished
 
 **Files produced:** `common/perception_spine/cortex_source.py`.
 **Files modified:** `common/actuator_registry/handlers.py` (4 path corrections), `scripts/test_agentic_routes.py` (renames + breaker isolation fixture + recover-flag patch), `scripts/test_migration.py` (route verification + Cortex source tests), `docker-compose.{minimal,full,sovereign}.yml`, `.env.example`.
+
+---
+
+## D136 — 2026-08-01 — Third Gap-Closure Pass: All Gaps Closed (G-09, G-10, G-11)
+
+**Context:** D135 closed G-01b/G-02b/G-07/G-08 and recorded three remaining limits. The operator directed closing everything — "no stone unturned". All three are now closed. What remains are three environmental limits (E-01…E-03) that a production environment retires, not code defects.
+
+**Decisions:**
+
+1. **G-10 — services were actually started and the handlers actually called.** Nine services were launched locally with uvicorn and every tier-1 handler dispatched against them through the real capability pipeline. Result: **10 of 13 endpoints returned live data; zero wrong paths.** The three exceptions are `broker-bridge`, which needs Binance credentials and outbound access this environment does not have.
+
+   The classification that makes this readable: **a wrong path returns 404; an existing route with an unavailable dependency returns 502/503.** A control test confirmed a nonsense path returns 404 from both services, so the distinction is real rather than assumed. `scripts/verify_live_endpoints.py` makes the check repeatable and exits non-zero only on a genuine 404.
+
+   Live testing immediately found something no mock could: `/market-data/prices` returns 422 without its `symbols` query parameter. Handler templates now support query strings, and the route matcher normalises them away when comparing against declared routes.
+
+2. **G-09 — all 34 actuators migrated, with legacy closure verified rather than asserted.** The important change is `common/actuator_registry/legacy_verification.py`. `disable_legacy_path()` on its own is bookkeeping — it sets a flag and believes the caller. Retaining old and new paths "temporarily" is an explicitly rejected anti-pattern, and a flag is easy to set optimistically. Each legacy path is now a checkable condition evaluated against the source tree, and `migrate_tier()` refuses to disable a path it cannot prove closed.
+
+   Most recorded legacy paths were the **unauthenticated** versions of endpoints that still exist, so "closed" means the endpoint now requires authentication — deleting a route the dashboard depends on would be a regression, not progress. The exception is `paper-trader`, where closure genuinely means `auto_trade()` is gone. The two paths still open at the start of this pass (`vault-sync /export`, `executor /execute`) were authenticated here, bringing all 11 to verified-closed.
+
+   Mutating handlers declare their `side_effects`, and a POST that errors sets `effect_uncertain` — because a failed request may still have caused its effect, and recording that is what makes reconciliation possible rather than assumed away.
+
+3. **G-11 — every flag on, together, in one pass.** Each flag was already tested in isolation, but flags that work alone can still interact badly. `test_flags_enabled.py` runs perception → world state → Cortex → proposal → policy → approval → capability → actuator → verification with all four enabled, then asserts that clearing them restores legacy behaviour exactly.
+
+**Correction:** the catalogue holds **34** actuators, not 33. D134 and D135 both said 33. That was a miscount (11+2+4+4+3+2+4+4 = 34), corrected in the tracker.
+
+**Regressions introduced and fixed:** authenticating `executor /execute` and `vault-sync /export` broke their existing suites, exactly as the earlier six did. Both Makefile targets now run in the documented dev mode; auth itself is covered by `test_service_auth.py`. Verified against baseline that no other failures were introduced.
+
+**What remains — environmental limits, not defects:**
+
+- **E-01** — 3 of 13 tier-1 endpoints unverified live (`broker-bridge` needs credentials and network). The routes are confirmed to exist.
+- **E-02** — tier 2–8 handlers verified against an injected client. Calling them for real causes real side effects; a database restore is not a test.
+- **E-03** — all four migration flags default to the legacy path. This is the intended default, and each is proven to work when enabled.
+
+**Verification:** 1,384 tests across 18 suites via `make test-uh`. 8/8 CI policy gates. Docs gate current. `agentic-routes` 170/170. No regressions in browser-agent, notify, monitor, telegram, executor or vault-sync.
+
+**Files produced:** `common/actuator_registry/mutating_handlers.py`, `common/actuator_registry/legacy_verification.py`, `scripts/verify_live_endpoints.py`, `scripts/test_full_migration.py`, `scripts/test_flags_enabled.py`.
+**Files modified:** `common/actuator_registry/handlers.py` (query-string support), `common/actuator_registry/migration.py` (legacy verification), `vault-sync/app.py`, `executor/app.py` (authentication), `scripts/test_migration.py`, `Makefile`.

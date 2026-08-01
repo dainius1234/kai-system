@@ -180,6 +180,9 @@ Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
 | `test-service-auth` | ✓ | G-03 fail-closed auth on side-effecting endpoints (55) |
 | `test-erasure` | ✓ | §16.30 subject erasure across all five layers (75) |
 | `test-legacy-bridge` | ✓ | G-04 legacy trust scalar may only deny, never grant (58) |
-| `test-migration` | ✓ | G-01/G-02 tier-1 migration and perception active mode (91) |
+| `test-migration` | ✓ | G-01/G-02 tier-1 migration, active mode, route verification (136) |
+| `test-full-migration` | ✓ | G-09 all 34 actuators, verified legacy closure (75) |
+| `test-flags-enabled` | ✓ | G-11 full pipeline with every migration flag ON (37) |
+| `verify-live-endpoints` | — | G-10 live check; needs a running stack |
 
 All run offline with no services, Docker or GPU.

@@ -29,7 +29,15 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
+
+import sys as _sys, os as _os
+_repo = _os.path.dirname(_os.path.abspath(__file__))
+while _repo != _os.path.dirname(_repo) and not _os.path.isdir(_os.path.join(_repo, 'common')):
+    _repo = _os.path.dirname(_repo)
+if _repo not in _sys.path:
+    _sys.path.insert(0, _repo)
+from common.service_auth import require_service_auth
 from pydantic import BaseModel
 
 from common.resilience import resilient_call
@@ -403,7 +411,8 @@ async def execution_history(limit: int = 20) -> List[Dict[str, Any]]:
     return store.history(limit)
 
 
-@app.post("/execute", response_model=ExecutionResult)
+@app.post("/execute", response_model=ExecutionResult,
+          dependencies=[Depends(require_service_auth("tool_execute"))])
 async def execute(request: ExecutionRequest) -> ExecutionResult:
     tool = sanitize_string(request.tool)
     if not tool:

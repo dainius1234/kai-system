@@ -34,7 +34,7 @@ READ_ONLY_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, str]]] = {
     ),
     "market-data": (
         "MARKET_DATA_URL", "http://agentic:8001",
-        {"market_data_read": "/market-data/prices"},
+        {"market_data_read": "/market-data/prices?symbols={symbols}"},
     ),
     "docker-watcher": (
         "DOCKER_WATCHER_URL", "http://docker-watcher:8041",
@@ -80,15 +80,33 @@ def _base_url(actuator: str) -> str:
     return os.getenv(env_key, default).rstrip("/")
 
 
+# Parameters a route requires but that have a sensible read-only default,
+# so a caller need not know each service's query-string conventions.
+PARAMETER_DEFAULTS: Dict[str, Dict[str, Any]] = {
+    "market_data_read": {"symbols": "BTC,ETH"},
+}
+
+
 def _resolve_path(actuator: str, action_type: str, parameters: Dict[str, Any]) -> str:
+    """Render an endpoint template, including any query string.
+
+    Templates may carry query parameters (`/x?symbols={symbols}`) as well
+    as path parameters. Live verification found `/market-data/prices`
+    returns 422 without its `symbols` query param — a wrong-shaped call
+    that a mocked HTTP client cannot detect.
+    """
     _, _, paths = READ_ONLY_ENDPOINTS[actuator]
     template = paths.get(action_type)
     if template is None:
         raise HandlerError(
             f"'{actuator}' has no endpoint for action '{action_type}'"
         )
+
+    resolved = dict(PARAMETER_DEFAULTS.get(action_type, {}))
+    resolved.update(parameters or {})
+
     try:
-        return template.format(**parameters)
+        return template.format(**resolved)
     except KeyError as exc:
         raise HandlerError(
             f"'{action_type}' requires parameter {exc} for '{actuator}'"

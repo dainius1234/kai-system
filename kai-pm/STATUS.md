@@ -2,7 +2,7 @@
 
 - **Last updated (UTC):** 2026-08-01
 - **Current phase:** Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1.
-- **Current focus:** Unified Hunter migration. UH-1…UH-8 plus two gap-closure passes (1,261 tests, `make test-uh`). All ten tracked gaps closed; three honest limits remain (G-09 tiers 2–8 un-migrated, G-10 no handler called against a running service, G-11 all migration flags default to the legacy path). Six services fail closed on side-effecting endpoints — generate `KAI_SERVICE_TOKEN` before deploying. `agentic-routes` went from 22 failures to 0. **Status source of truth: [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md)**.
+- **Current focus:** Unified Hunter migration **complete in code** (1,384 tests across 18 suites, `make test-uh`). All 13 tracked gaps closed: 34/34 actuators migrated with verified legacy closure, 8 services fail closed on side-effecting endpoints, 10/13 tier-1 endpoints live-verified against running services. **Not cut over** — every migration flag defaults to the legacy path, so deploying changes nothing until a flag is set. Generate `KAI_SERVICE_TOKEN` before deploying. **Source of truth: [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md)**.
 
 ## What's landed on main
 

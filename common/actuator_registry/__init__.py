@@ -19,6 +19,20 @@ from common.actuator_registry.handlers import (
     attach_read_handlers,
     build_read_handler,
 )
+from common.actuator_registry.mutating_handlers import (
+    MUTATING_ENDPOINTS,
+    MutatingHandlerError,
+    attach_all_handlers,
+    attach_mutating_handlers,
+    build_mutating_handler,
+    side_effects_for,
+)
+from common.actuator_registry.legacy_verification import (
+    LegacyVerificationError,
+    open_legacy_paths,
+    verify_all,
+    verify_legacy_closed,
+)
 from common.actuator_registry.migration import (
     MigrationError,
     MigrationResult,
@@ -42,4 +56,14 @@ __all__ = [
     "MigrationResult",
     "migrate_tier",
     "migration_plan",
+    "MUTATING_ENDPOINTS",
+    "MutatingHandlerError",
+    "attach_all_handlers",
+    "attach_mutating_handlers",
+    "build_mutating_handler",
+    "side_effects_for",
+    "LegacyVerificationError",
+    "open_legacy_paths",
+    "verify_all",
+    "verify_legacy_closed",
 ]

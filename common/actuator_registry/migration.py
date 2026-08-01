@@ -24,6 +24,7 @@ from common.actuator_registry.registry import (
     MigrationStatus,
     MigrationTier,
 )
+from common.actuator_registry.legacy_verification import verify_legacy_closed
 
 
 class MigrationError(Exception):
@@ -77,6 +78,7 @@ def migrate_tier(
     principal: Principal,
     require_handler: bool = True,
     activate: bool = True,
+    verify_legacy: bool = True,
 ) -> MigrationResult:
     """Advance every actuator in one tier.
 
@@ -86,6 +88,9 @@ def migrate_tier(
             mean something.
         activate: advance to ACTIVE.  Set False to stop at VERIFIED when
             a supervised soak is wanted first.
+        verify_legacy: require the legacy path to be *provably* closed
+            before disabling it.  Without this the flag is a promise;
+            with it, it is a checked fact.
     """
     result = MigrationResult(tier)
 
@@ -117,6 +122,14 @@ def migrate_tier(
                 )
 
             if not entry.legacy_disabled:
+                if verify_legacy:
+                    closed, reason = verify_legacy_closed(identity)
+                    if not closed:
+                        result.blocked.append(identity)
+                        result.errors[identity] = (
+                            f"legacy path still open: {reason}"
+                        )
+                        continue
                 registry.disable_legacy_path(identity, principal)
 
             if entry.migration_status == MigrationStatus.MIGRATING:

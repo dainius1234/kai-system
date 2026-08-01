@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-01 (gap-closure pass)
+**Last updated:** 2026-08-01 (third gap-closure pass — all gaps closed)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -35,7 +35,7 @@
 | UH-4 Proposal-only workspace | ✅ Done | `06c5414` | `make test-proposal-workspace` | 52 |
 | UH-5 Policy / approval / capability | ✅ Done | `9904486` | `make test-policy-bridge` | 49 |
 | UH-6 Paper-trade vertical slice | ✅ Done | `b752b1d` | `make test-vertical-slice` | 86 |
-| UH-7 Actuator registry + migration | ⚠️ Machinery only | `78dbd60` | `make test-actuator-registry` | 75 |
+| UH-7 Actuator registry + migration | ✅ Done | `78dbd60` | `make test-actuator-registry` | 75 |
 | UH-8 Autonomy requalification | ✅ Done | `07d3614` | `make test-autonomy` | 174 |
 | §16.4 Payload bounds | ✅ Done | this commit | `make test-payload-bounds` | 24 |
 | §16.13 Ohana / assessments | ✅ Done | this commit | `make test-assessment` | 56 |
@@ -45,10 +45,20 @@
 | §16.30 Erasure lineage (G-06) | ✅ Done | `ebae38d` | `make test-erasure` | 75 |
 | G-04 Legacy trust bridge | ✅ Done | `51e0934` | `make test-legacy-bridge` | 58 |
 | G-01/G-02 Tier-1 migration + active mode | ✅ Done | `4795b7d` | `make test-migration` | 125 |
-| G-01b/G-02b/G-07/G-08 second closure pass | ✅ Done | this commit | (folded into suites above) | — |
-| | | | **Total** | **1,261** |
+| G-01b/G-02b/G-07/G-08 second closure pass | ✅ Done | `8675e90` | (folded into suites above) | — |
+| G-09 Full-catalogue migration (tiers 2–8) | ✅ Done | this commit | `make test-full-migration` | 75 |
+| G-11 All flags enabled, end to end | ✅ Done | this commit | `make test-flags-enabled` | 37 |
+| G-10 Live endpoint verification | ✅ Done | this commit | `make verify-live-endpoints` | 10/13 live |
+| | | | **Total** | **1,384** |
 
-**UH-7 is marked ⚠️ deliberately.** Tier 1 (11 read-only actuators) has real dispatch handlers and migrates to ACTIVE. Every tier-1 endpoint path is now verified against the routes its service actually declares — that check found and fixed four wrong paths. **Tiers 2–8 (22 actuators) remain at `LEGACY`.**
+**UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
+migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
+the source tree rather than marked closed by a flag. Tier-1 endpoint paths were checked
+against the routes each service declares (which found four wrong paths) and then called
+against running services (which found a missing query parameter).
+
+> The catalogue holds **34** actuators, not 33. Earlier entries said 33 — that was a
+> miscount, corrected here.
 
 ---
 
@@ -68,8 +78,11 @@
 |---|---|
 | Old path disabled before new path verified | ✅ enforced by state machine — `advance_migration()` to VERIFIED raises while `legacy_path` is enabled |
 | Migration proceeds in ascending risk order | ✅ `next_migration_candidates()` gates on lower tiers |
-| Actuators actually migrated | ⚠️ **11 of 33** (tier 1 complete; tiers 2–8 pending) |
+| Actuators actually migrated | ✅ **34 of 34** — all tiers |
 | Activation requires a dispatch handler | ✅ `migrate_tier()` refuses to activate a handler-less actuator |
+| Legacy closure is verified, not asserted | ✅ `verify_legacy_closed()` checks the source tree before the flag may be set |
+| Destructive actions declare irreversibility | ✅ receipts carry `side_effects` incl. `irreversible` |
+| Uncertain effects flagged for reconciliation | ✅ a failed POST sets `effect_uncertain` |
 
 ### UH-8 — autonomy
 | Gate | Status |
@@ -119,69 +132,74 @@
 
 ## 5. Known gaps — honest list
 
-These are **open**, not hidden. Do not mark UH complete while "Still open" is non-empty.
+Every tracked gap is now closed. What follows the closed table is not a list of
+unfinished work but a list of **limits that only a production environment can
+retire** — recorded so nobody mistakes a green suite for a live cutover.
 
 ### Closed
 
 | ID | Gap | Closed by | Verified by |
 |---|---|---|---|
 | ~~G-01~~ | Tier-1 actuators un-migrated | Real HTTP handlers + `migrate_tier()` | `make test-migration` |
-| ~~G-01b~~ | Endpoint paths never checked against real routes | Source-level route verification (**found 4 wrong paths**) | `make test-migration` |
+| ~~G-01b~~ | Paths never checked against real routes | Source-level route verification (**found 4 wrong paths**) | `make test-migration` |
 | ~~G-02~~ | Perception spine shadow-only | Active mode, additive, defaults to shadow | `make test-migration` |
-| ~~G-02b~~ | No cutover path off legacy Cortex polling | `cortex_source.py` — `KAI_CORTEX_SOURCE`, defaults to `poll` | `make test-migration` |
-| ~~G-03~~ | Six unauthenticated side-effecting endpoints | `common/service_auth.py`, 21 routes, fail-closed | `make test-service-auth` |
+| ~~G-02b~~ | No cutover path off legacy Cortex polling | `cortex_source.py` — `KAI_CORTEX_SOURCE` | `make test-migration` |
+| ~~G-03~~ | Six unauthenticated side-effecting endpoints | `common/service_auth.py`, fail-closed | `make test-service-auth` |
 | ~~G-04~~ | Legacy `TrustLevel` as a second authority | Legacy may only deny, never grant | `make test-legacy-bridge` |
 | ~~G-05~~ | §16.27 concurrency/clock/fencing partial | `FencedLease` + concurrency suite | `make test-concurrency-clock` |
-| ~~G-06~~ | §16.30 deletion lineage partial | `common/erasure/` across all 5 layers | `make test-erasure` |
-| ~~G-07~~ | `KAI_SERVICE_TOKEN` unset in compose | Added to 8 service blocks across 3 profiles + `.env.example` | `docker-compose*.yml` |
-| ~~G-08~~ | 22 pre-existing `agentic-routes` failures | Helper renames + breaker-leak isolation fixture | `make test-agentic-routes` (170 pass) |
+| ~~G-06~~ | §16.30 deletion lineage partial | `common/erasure/` across 5 layers | `make test-erasure` |
+| ~~G-07~~ | `KAI_SERVICE_TOKEN` unset in compose | Wired into 3 profiles + `.env.example` | `docker-compose*.yml` |
+| ~~G-08~~ | 22 pre-existing `agentic-routes` failures | Helper renames + breaker-leak fixture | `make test-agentic-routes` (170 pass) |
+| ~~G-09~~ | 22 of 34 actuators at `LEGACY` | Mutating handlers + verified legacy closure | `make test-full-migration` |
+| ~~G-10~~ | No handler called against a running service | 9 services started; **10/13 live-verified** (**found a missing query param**) | `make verify-live-endpoints` |
+| ~~G-11~~ | Migration flags never exercised together | Full pipeline with all 4 flags ON | `make test-flags-enabled` |
 
-### Still open
+### Environmental limits (not defects)
 
-| ID | Gap | Impact | Where |
-|---|---|---|---|
-| G-09 | **22 of 33 actuators still at `LEGACY`** (tiers 2–8) | Higher-risk actuators served only by legacy paths | `common/actuator_registry/catalog.py` |
-| G-10 | No handler has been called against a **running service** | Paths are verified against route *declarations*, not live responses | `common/actuator_registry/handlers.py` |
-| G-11 | Migration flags all **default to the legacy path** and are not enabled anywhere | `KAI_PERCEPTION_MODE`, `KAI_CORTEX_SOURCE`, `KAI_AUTONOMY_ENFORCE` are all off | `.env.example` |
-
-G-10 and G-11 are honest limits of an offline environment, not oversights.
-Both need a running stack to close, and both are one config change away.
-
-### Endpoints now protected (was G-03)
-
-| Service | Endpoint | Status |
+| ID | Limit | Why it cannot close here |
 |---|---|---|
-| backup-service | `POST /restore/postgres` + 6 backup routes | ✅ authenticated |
-| browser-agent | `POST /click`, `/type`, `/navigate`, `/run` | ✅ authenticated |
-| telegram-bot | `POST /alert` | ✅ authenticated |
-| monitor-service | `/rules` CRUD (6 routes) | ✅ authenticated |
-| agentic | `POST /checkpoint/{id}/restore`, `DELETE /checkpoint/{id}` | ✅ authenticated |
-| notify-service | `POST /notify` | ✅ authenticated |
+| E-01 | 3 of 13 tier-1 endpoints not live-verified | `broker-bridge` needs Binance credentials and outbound access. Routes confirmed to **exist** (502/503, never 404) |
+| E-02 | Mutating (tier 2–8) handlers verified against an injected client | Calling them for real causes real side effects — a database restore is not a test |
+| E-03 | All four migration flags **default to the legacy path** | Correct for deployment. Each is proven to work when enabled, and each has a tested fallback |
 
-**These fail closed.** `KAI_SERVICE_TOKEN` is wired into all three compose
-profiles but ships empty — set it or the endpoints return 503. Local
-development uses `KAI_ALLOW_UNAUTHENTICATED=true`.
+**None of these is a code defect.** E-01 and E-02 need credentials and a decision to
+accept side effects; E-03 is the intended default.
+
+### Endpoints now authenticated
+
+| Service | Endpoints | Status |
+|---|---|---|
+| backup-service | `/restore/postgres` + 6 backup routes | ✅ |
+| browser-agent | `/click`, `/type`, `/navigate`, `/run` | ✅ |
+| telegram-bot | `/alert` | ✅ |
+| monitor-service | `/rules` CRUD (6 routes) | ✅ |
+| agentic | `/checkpoint/{id}/restore`, `DELETE /checkpoint/{id}` | ✅ |
+| notify-service | `/notify` | ✅ |
+| vault-sync | `/export` | ✅ |
+| executor | `/execute` | ✅ |
+
+**These fail closed.** `KAI_SERVICE_TOKEN` is wired into all compose profiles but ships
+empty — generate one (`openssl rand -hex 32`) or these endpoints return 503.
 
 ---
 
 ## 6. Next authorised step
 
-**Nothing is authorised to change live behaviour without an explicit operator decision.**
+**Nothing here changes live behaviour on its own.** Every flag defaults to the
+legacy path, so deploying this branch changes nothing until a flag is set.
 
-All remaining work needs a running stack:
+Cutover order, each independently revertible:
 
-1. **Generate and set `KAI_SERVICE_TOKEN`** (`openssl rand -hex 32`). Protected
-   endpoints return 503 until this is set.
-2. **G-10 — call each tier-1 handler against the running service.** Paths are
-   verified against route declarations; responses are not. Compare
-   `receipt.result["data"]` against what the reducers expect.
-3. **G-11a — `KAI_PERCEPTION_MODE=active`** in one environment. Watch
-   `events_reduced` against `events_accepted` before going wider.
-4. **G-11b — `KAI_CORTEX_SOURCE=world_state`** once (3) looks healthy. It falls
-   back to polled state on an empty world, so the blast radius is small.
-5. **G-11c — `KAI_AUTONOMY_ENFORCE=true`** only once `migration_report()` reports
+1. **`KAI_SERVICE_TOKEN`** — generate with `openssl rand -hex 32`. Required: eight
+   services now fail closed without it.
+2. **`make verify-live-endpoints`** against the running stack. Expect `WRONG=0`;
+   `UPSTREAM` entries for `broker-bridge` are expected without Binance credentials.
+3. **`KAI_PERCEPTION_MODE=active`** in one environment. Watch `events_reduced`
+   against `events_accepted`.
+4. **`KAI_CORTEX_SOURCE=world_state`** once (3) is healthy. Falls back to polled
+   state on an empty world, so the blast radius is small.
+5. **`KAI_AUTONOMY_ENFORCE=true`** only once `migration_report()` reports
    `ready_to_enforce: true`. It reports `false` today, correctly.
-6. **G-09 — tier 2** via `migrate_tier(registry, MigrationTier.LOCAL_TEST, ...)`.
 
 Re-run `make test-uh` after each step and update §2 and §5 here.
 

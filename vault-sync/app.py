@@ -13,7 +13,16 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
+
+import sys as _sys, os as _os
+_repo = _os.path.dirname(_os.path.abspath(__file__))
+while _repo != _os.path.dirname(_repo) and not _os.path.isdir(_os.path.join(_repo, 'common')):
+    _repo = _os.path.dirname(_repo)
+if _repo not in _sys.path:
+    _sys.path.insert(0, _repo)
+from common.service_auth import require_service_auth
+
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -249,7 +258,8 @@ async def ingest(req: IngestRequest) -> Dict:
     return {"status": "ok", "filepath": req.filepath, "note_node_id": result.get("note_node_id")}
 
 
-@app.post("/export")
+@app.post("/export",
+          dependencies=[Depends(require_service_auth("vault_export"))])
 async def export(req: ExportRequest) -> Dict:
     """Write a note from Kai into the vault (gate-checked, conviction ≥ threshold)."""
     if not FF_VAULT_SYNC:
