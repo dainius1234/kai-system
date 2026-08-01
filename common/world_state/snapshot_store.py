@@ -72,6 +72,7 @@ class SnapshotStore:
         self._evidence: Dict[str, EvidenceRecord] = OrderedDict()
         self._snapshots: List[WorldStateSnapshot] = []
         self._deleted_snapshot_ids: List[str] = []
+        self._erased_claim_ids: List[str] = []
         self._superseded_claim_ids: Set[str] = set()
         self._ingested_event_ids: List[str] = []
         self._event_offset: int = 0
@@ -148,6 +149,35 @@ class SnapshotStore:
             )
             self._claims[cid].digest = self._claims[cid]._make_digest()
             self._superseded_claim_ids.add(cid)
+
+    def erase_claims(self, claim_ids: List[str]) -> int:
+        """Permanently remove claims and their evidence (roadmap §16.30).
+
+        Erasure removes rather than marking a state: a state flag would
+        leave ``claim_text`` and the evidence payload readable, which is
+        exactly what erasure must prevent.  Erased ids are retained as
+        deletion lineage so the removal itself stays auditable.
+        """
+        removed = 0
+        for claim_id in claim_ids:
+            claim = self._claims.pop(claim_id, None)
+            if claim is None:
+                continue
+            for evidence_id in claim.provenance.upstream_ids:
+                self._evidence.pop(evidence_id, None)
+            self._superseded_claim_ids.discard(claim_id)
+            self._erased_claim_ids.append(claim_id)
+            removed += 1
+        return removed
+
+    @property
+    def erased_claim_ids(self) -> List[str]:
+        return list(self._erased_claim_ids)
+
+    @property
+    def evidence_by_id(self) -> Dict[str, EvidenceRecord]:
+        """Evidence records keyed by id, for lineage resolution."""
+        return dict(self._evidence)
 
     def active_claims(self) -> List[Claim]:
         return [

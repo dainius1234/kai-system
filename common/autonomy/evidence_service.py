@@ -217,6 +217,23 @@ class EvidenceService:
             counts[record.grade.value] = counts.get(record.grade.value, 0) + 1
         return counts
 
+    def erase_subject(self, principal_identity: str) -> int:
+        """Remove every record belonging to one principal (roadmap §16.30).
+
+        Erasure is the one operation that genuinely removes rather than
+        supersedes: a supersession chain would keep the original content
+        readable, which is precisely what erasure must prevent.
+        """
+        doomed = [
+            rid for rid, record in self._records.items()
+            if record.principal.identity == principal_identity
+        ]
+        for rid in doomed:
+            del self._records[rid]
+            self._superseded.discard(rid)
+        self._order = [rid for rid in self._order if rid not in set(doomed)]
+        return len(doomed)
+
     @property
     def count(self) -> int:
         return len(self._records)

@@ -128,6 +128,54 @@ class EventJournal:
                     journaled_at=rec.get("journaled_at", ""),
                 )
 
+    def erase_subject(self, principal_identity: str) -> int:
+        """Remove every event belonging to one principal (roadmap §16.30).
+
+        Rewrites the journal without the subject's events.  Offsets of
+        surviving records are preserved so downstream references stay
+        valid — an erasure must not silently renumber the audit trail.
+
+        Returns the number of events removed.
+        """
+        if not self._path.exists():
+            return 0
+
+        with self._lock:
+            surviving: list[str] = []
+            removed = 0
+            with open(self._path, "r", encoding="utf-8") as fh:
+                for line in fh:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        rec = json.loads(line)
+                    except json.JSONDecodeError:
+                        # Torn line — drop it, it is unreadable anyway.
+                        continue
+                    identity = (
+                        rec.get("event", {})
+                        .get("principal", {})
+                        .get("identity")
+                    )
+                    if identity == principal_identity:
+                        removed += 1
+                        continue
+                    surviving.append(json.dumps(
+                        rec, separators=(",", ":"), ensure_ascii=False
+                    ))
+
+            tmp = self._path.with_suffix(self._path.suffix + ".erasing")
+            with open(tmp, "w", encoding="utf-8") as fh:
+                for line in surviving:
+                    fh.write(line)
+                    fh.write("\n")
+                fh.flush()
+                os.fsync(fh.fileno())
+            os.replace(tmp, self._path)
+
+            return removed
+
     def count(self) -> int:
         return self._next_offset
 
