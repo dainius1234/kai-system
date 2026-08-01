@@ -94,6 +94,50 @@ _FAIL_CLOSED_CAPABILITIES = frozenset({
 })
 
 
+_LEGACY_BRIDGE = None
+_BRIDGE_INIT_FAILED = False
+
+
+def get_legacy_bridge():
+    """The scoped-autonomy bridge, or None when unavailable.
+
+    Built lazily and cached.  Returning None is safe: the caller keeps
+    the legacy verdict, which the bridge could only have tightened.
+    """
+    global _LEGACY_BRIDGE, _BRIDGE_INIT_FAILED
+    if _LEGACY_BRIDGE is not None or _BRIDGE_INIT_FAILED:
+        return _LEGACY_BRIDGE
+
+    try:
+        _repo = Path(__file__).resolve().parent.parent
+        if str(_repo) not in sys.path:
+            sys.path.insert(0, str(_repo))
+        from common.contracts.base import Principal
+        from common.autonomy.authority import AutonomyAuthority
+        from common.autonomy.calibration import CalibrationTracker
+        from common.autonomy.evidence_service import EvidenceService
+        from common.autonomy.legacy_bridge import LegacyTrustBridge
+
+        principal = Principal(identity="kai", role="system")
+        evidence = EvidenceService(principal=principal)
+        calibration = CalibrationTracker(principal=principal)
+        authority = AutonomyAuthority(principal, evidence, calibration)
+        _LEGACY_BRIDGE = LegacyTrustBridge(authority, principal)
+    except Exception as exc:
+        _BRIDGE_INIT_FAILED = True
+        logger.warning("Scoped autonomy bridge unavailable: %s", exc)
+        return None
+
+    return _LEGACY_BRIDGE
+
+
+def set_legacy_bridge(bridge) -> None:
+    """Inject a bridge (used by tests and by the runtime wiring)."""
+    global _LEGACY_BRIDGE, _BRIDGE_INIT_FAILED
+    _LEGACY_BRIDGE = bridge
+    _BRIDGE_INIT_FAILED = False
+
+
 def gate_autonomous_action(
     capability: str,
     context: Dict[str, Any],
@@ -151,7 +195,34 @@ def gate_autonomous_action(
             else:
                 logger.warning("Ohana alignment check failed (fail-open): %s", exc)
 
-    # ── 3. Record in Trust Ledger ─────────────────────────────────────────────
+    # ── 3. Scoped autonomy bridge (UH-8 / G-04) ──────────────────────────────
+    # The legacy scalar above may only *subtract* from what the scoped
+    # authority permits.  In advisory mode (default) the legacy verdict
+    # stands and disagreements are recorded; in enforcing mode the scoped
+    # authority binds.  Either way this cannot widen `allowed`.
+    scoped_note = ""
+    try:
+        bridge = get_legacy_bridge()
+        if bridge is not None:
+            bridged_allowed, bridged_reason = bridge.gate(
+                capability=capability,
+                legacy_allowed=allowed,
+                legacy_reason=reason,
+            )
+            if bridged_allowed != allowed or bridged_reason != reason:
+                scoped_note = bridged_reason
+            allowed, reason = bridged_allowed, bridged_reason
+    except Exception as exc:
+        # The bridge is observational in advisory mode.  A bridge fault
+        # must not grant anything, so it can only tighten a fail-closed
+        # capability and is otherwise ignored.
+        if fail_closed:
+            allowed = False
+            reason = f"autonomy bridge unavailable (fail-closed): {exc}"
+        else:
+            logger.warning("Autonomy bridge failed (advisory, ignored): %s", exc)
+
+    # ── 4. Record in Trust Ledger ─────────────────────────────────────────────
     _record_nonblocking(
         event_type="AUTONOMOUS_ACTION",
         initiator="kai",
@@ -162,6 +233,7 @@ def gate_autonomous_action(
             "conviction_score": conviction,
             "allowed": allowed,
             "gate_reason": reason,
+            "scoped_note": scoped_note,
             "timestamp": time.time(),
         },
     )

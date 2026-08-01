@@ -199,17 +199,66 @@ def test_assessor_cannot_express_permission():
 
 
 def test_trust_scalar_not_reintroduced_into_new_path():
-    """The new autonomy path must not import the legacy TrustLevel."""
+    """The new autonomy path must not depend on the legacy TrustLevel.
+
+    Matches real coupling — imports of ``trust_core`` and uses of
+    ``TrustLevel`` as a value — rather than any textual mention, so
+    documentation that *names* the legacy system while explaining the
+    migration away from it does not trip the guard.
+    """
     offenders: list[str] = []
-    pattern = re.compile(r"\bfrom\s+trust_core\b|\bimport\s+trust_core\b|\bTrustLevel\b")
+    coupling = re.compile(
+        r"^\s*(from\s+\S*trust_core\s+import|import\s+\S*trust_core)"
+        r"|TrustLevel\s*[.(\[]",
+        re.MULTILINE,
+    )
 
     for path in _protected_files():
         text = path.read_text(encoding="utf-8")
-        if pattern.search(text):
+        if coupling.search(text):
             offenders.append(str(path.relative_to(REPO)))
 
     check("legacy_trust_level_not_in_new_path", not offenders,
           "; ".join(offenders))
+
+
+def test_bridge_cannot_widen_authority():
+    """The legacy bridge must be able to deny, never to grant.
+
+    A bridge that could turn a scoped denial into an allow would restore
+    the "two authorities, most permissive wins" problem it exists to
+    remove.
+    """
+    import os as _os
+    from common.autonomy.legacy_bridge import ENFORCE_ENV, LegacyTrustBridge
+    from common.autonomy.authority import AutonomyAuthority
+    from common.autonomy.calibration import CalibrationTracker
+    from common.autonomy.evidence_service import EvidenceService
+    from common.contracts.base import Principal
+
+    principal = Principal(identity="kai", role="system")
+    bridge = LegacyTrustBridge(
+        AutonomyAuthority(
+            principal,
+            EvidenceService(principal=principal),
+            CalibrationTracker(principal=principal),
+        ),
+        principal,
+    )
+
+    saved = _os.environ.get(ENFORCE_ENV)
+    _os.environ[ENFORCE_ENV] = "true"
+    try:
+        allowed, _ = bridge.gate(
+            "paper_trade_open", legacy_allowed=True, legacy_reason="trusted",
+        )
+        check("bridge_cannot_widen", not allowed,
+              "legacy allow overrode a scoped denial")
+    finally:
+        if saved is None:
+            _os.environ.pop(ENFORCE_ENV, None)
+        else:
+            _os.environ[ENFORCE_ENV] = saved
 
 
 # ── 4. Ingress bounds cannot be silently removed ────────────────────
@@ -246,6 +295,7 @@ if __name__ == "__main__":
     test_evidence_grading_gate_intact()
     test_assessor_cannot_express_permission()
     test_trust_scalar_not_reintroduced_into_new_path()
+    test_bridge_cannot_widen_authority()
     test_payload_bounds_present()
 
     print(f"\n{'='*60}")
