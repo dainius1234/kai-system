@@ -2839,3 +2839,42 @@ The Auditor knows the full factor model: operator_approval_history (30%), value_
 5. **Next authorised step: UH-1.** Freeze versioned schemas for PerceptionEvent, WorldStateSnapshot, ActionProposal, ConstraintAssessment, ApprovalRecord, ActionCapability, ActionWorkflow, VerifiedOutcome. No D131 sub-component implementation begins before UH-1 exit gate is passed.
 
 **Files produced:** `kai-pm/UH0_EVIDENCE_MANIFEST.md`
+
+---
+
+## D132 — 2026-08-01 — Unified Hunter UH-1…UH-8 Complete
+
+**Context:** D131 authorised UH-1 as the next step after the UH-0 evidence manifest. This entry records the completion of the full Unified Hunter roadmap (UH-1 through UH-8) on branch `claude/project-rework-plan-pgvp35`. The canonical decision path now exists end to end: perception → world state → proposal → policy → approval → capability → actuator → verification → bounded autonomy.
+
+**Work packages delivered:**
+
+| Item | Commit | Deliverable | Tests |
+|---|---|---|---|
+| UH-1 | `4ac5187` | Frozen canonical contracts | 126 |
+| UH-2 | `2f53d16` | Perception spine, shadow mode | 166 |
+| UH-3 | `ca136cd` | Scoped world state, immutable snapshots | 71 |
+| UH-4 | `06c5414` | D102 rebuilt as proposal-only workspace | 52 |
+| UH-5 | `9904486` | Policy / approval / capability bridge | 49 |
+| UH-6 | `b752b1d` | Paper-trading vertical slice | 86 |
+| UH-7 | `78dbd60` | Actuator registry, risk-ordered migration | 75 |
+| UH-8 | `07d3614` | Outcome-based learning, autonomy requalification | 174 |
+
+Total: 799 tests, all green. All 8 CI policy gates pass.
+
+**Decisions:**
+
+1. **The three UH-0 critical violations are structurally addressed.** `auto_trade()`'s bypass is closed by UH-7's actuator registry, which refuses dispatch without a consumed, audience-matched capability. `gate_autonomous_action()`'s fail-open is superseded by UH-5's fail-closed policy engine and UH-8's grant checks, where revocation and expiry beat every other condition. The missing Outcome Verifier role now exists as UH-8's verifier registry, and `paper_trader` can no longer self-report success — a verifier sharing the actuator's independence group does not count.
+
+2. **Self-generated text and simulation cannot grant trust — enforced structurally.** `EvidenceGrade.qualifies()` is the single decision point. The evidence service downgrades any record whose provenance names a model or simulation, so relabelling model output as `EXTERNAL_OBSERVED` does not get it past the gate. This holds transitively: a wisdom-graph node whose support chain bottoms out in simulation carries zero confidence regardless of chain length.
+
+3. **The Trust Ladder's scalar level is replaced, not extended.** `TrustLevel` (DORMANT…GUARDIAN) applied everywhere and never expired. `AutonomyGrant` is scoped to one (capability, domain) pair, bounded by invocation count, expiring at a per-level cap, and revocable. The old `TrustLevel` remains in `agentic/trust_core.py` and is now legacy — UH-7 tracks its retirement.
+
+4. **Calibration is keyed on code revision.** Shipping new code starts uncalibrated rather than inheriting the previous revision's record. Release bundles bind the same way: a rebuild must be signed again.
+
+5. **Migration ordering is enforced, not merely documented.** `advance_migration()` to VERIFIED raises while a legacy path is still enabled, making "retain both paths temporarily" — an explicitly rejected anti-pattern — unreachable rather than discouraged. `next_migration_candidates()` surfaces an actuator only once every lower risk tier is fully migrated.
+
+6. **33 actuators catalogued across 8 risk tiers.** All start at `LEGACY`. The audit found six unauthenticated side-effecting surfaces, recorded as legacy paths requiring disablement: `backup-service /restore/postgres`, `browser-agent /click` and `/type`, `telegram-bot /alert`, `monitor-service /rules`, `agentic /checkpoint/{id}/restore`.
+
+**Status:** The UH roadmap list is exhausted. What exists is the enforcement machinery with full test coverage; no actuator has yet been advanced past `LEGACY` against live services, and the perception spine still runs in shadow mode. Cutover is a separate, operator-authorised step.
+
+**Files produced:** `common/perception_spine/`, `common/world_state/`, `common/proposal_workspace/`, `common/policy_bridge/`, `common/vertical_slice/`, `common/actuator_registry/`, `common/autonomy/`, `common/contracts/autonomy.py`, and eight test suites under `scripts/`.
