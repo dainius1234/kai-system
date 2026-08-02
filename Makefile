@@ -6,7 +6,7 @@ export MEMU_ALLOW_FAKE_EMBEDDINGS ?= true
 # Self-audit and feedback
 self-audit:
 	python3 scripts/self_audit.py
-.PHONY: test-d109-ohana-core test-d92-socratic test-d93-hypothesis test-d94-forecaster test-d95-d100-foundations test-d101-causal-world-model test-d102-global-workspace test-d89-cognitive-depth go_no_go hardening_smoke pypi-shadow-check test-letta test-financial test-agentic-service test-agentic-introspect build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-memu-routes test-agentic-routes test-context-enrichment-ab test-ab-log test-screen-capture test-shell-sandbox test-hse-rams test-agentic test-router test-planner test-adversary test-failure-taxonomy test-selaur test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-improvement-gate test-thinking-pathways test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-error-codes test-feature-flags dep-audit coverage coverage-floors test-restart-persistence test-upload-fuzz test-audio-transcribe test-browser-agent test-vision-service test-clipboard-service test-files-service test-notify-service test-document-parser test-monitor-service test-broker-bridge test-sysmetrics test-screen-watcher test-email-reader test-news-feed test-weather-service test-docker-watcher test-airquality test-calendar-service test-git-watcher test-kai-intelligence test-cognitive-mechanisms sync-docs check-docs auto-changelog auto-session-log test-focus-compress test-context-budget test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-behavioral test-docker-e2e test-chassis test-wake test-broker-bridge-yfinance test-perception-spine test-world-state test-proposal-workspace test-policy-bridge test-vertical-slice test-actuator-registry test-autonomy test-payload-bounds test-assessment test-invariant-guards test-concurrency-clock test-service-auth test-erasure test-legacy-bridge test-migration test-full-migration test-flags-enabled verify-live-endpoints test-uh
+.PHONY: test-d109-ohana-core test-d92-socratic test-d93-hypothesis test-d94-forecaster test-d95-d100-foundations test-d101-causal-world-model test-d102-global-workspace test-d89-cognitive-depth go_no_go hardening_smoke pypi-shadow-check test-letta test-financial test-agentic-service test-agentic-introspect build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-memu-routes test-agentic-routes test-context-enrichment-ab test-ab-log test-screen-capture test-shell-sandbox test-hse-rams test-agentic test-router test-planner test-adversary test-failure-taxonomy test-selaur test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-improvement-gate test-thinking-pathways test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-error-codes test-feature-flags dep-audit coverage coverage-floors test-restart-persistence test-upload-fuzz test-audio-transcribe test-browser-agent test-vision-service test-clipboard-service test-files-service test-notify-service test-document-parser test-monitor-service test-broker-bridge test-sysmetrics test-screen-watcher test-email-reader test-news-feed test-weather-service test-docker-watcher test-airquality test-calendar-service test-git-watcher test-kai-intelligence test-cognitive-mechanisms sync-docs check-docs auto-changelog auto-session-log test-focus-compress test-context-budget test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-behavioral test-docker-e2e test-chassis test-wake test-broker-bridge-yfinance test-perception-spine test-world-state test-proposal-workspace test-policy-bridge test-vertical-slice test-actuator-registry test-autonomy test-payload-bounds test-assessment test-invariant-guards test-concurrency-clock test-service-auth test-erasure test-legacy-bridge test-migration test-full-migration test-flags-enabled test-preflight verify-live-endpoints verify-live-mutating setup-service-token preflight test-uh
 
 policy-check:
 	python3 scripts/security/check_port_bindings.py
@@ -72,9 +72,24 @@ test-full-migration:
 test-flags-enabled:
 	PYTHONPATH=. python scripts/test_flags_enabled.py
 
-# Requires a running stack. Verifies handlers against live services (G-10).
+test-preflight:
+	PYTHONPATH=. python scripts/test_preflight.py
+
+# Requires a running stack. Verifies handlers against live services (G-10/E-01).
 verify-live-endpoints:
 	PYTHONPATH=. python scripts/verify_live_endpoints.py
+
+# Requires a running stack + KAI_SERVICE_TOKEN. Mutating actuators (E-02).
+verify-live-mutating:
+	PYTHONPATH=. python scripts/verify_live_mutating.py
+
+# Generate KAI_SERVICE_TOKEN into the gitignored .env (E-03).
+setup-service-token:
+	./scripts/setup_service_token.sh $(FORCE)
+
+# Check deployment readiness before shipping (E-03).
+preflight:
+	PYTHONPATH=. python scripts/preflight_deploy.py
 
 # Aggregate: every Unified Hunter work package + adversarial guards.
 test-uh: test-contracts test-perception-spine test-world-state \
@@ -82,7 +97,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-actuator-registry test-autonomy test-payload-bounds \
 	test-assessment test-invariant-guards test-concurrency-clock \
 	test-service-auth test-erasure test-legacy-bridge test-migration \
-	test-full-migration test-flags-enabled
+	test-full-migration test-flags-enabled test-preflight
 	@echo "All Unified Hunter suites passed."
 
 go_no_go:

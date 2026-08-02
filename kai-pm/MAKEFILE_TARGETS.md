@@ -164,7 +164,7 @@ Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
 
 | Target | Status | What it covers |
 |---|---|---|
-| `test-uh` | ✓ | **Aggregate — run this one.** All 16 suites, 1,226 tests |
+| `test-uh` | ✓ | **Aggregate — run this one.** All 19 suites, 1,421 tests |
 | `test-contracts` | ✓ | UH-1 frozen canonical contracts (126) |
 | `test-perception-spine` | ✓ | UH-2 shadow-mode event ingress (166) |
 | `test-world-state` | ✓ | UH-3 reducers and immutable snapshots (71) |
@@ -183,6 +183,10 @@ Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
 | `test-migration` | ✓ | G-01/G-02 tier-1 migration, active mode, route verification (136) |
 | `test-full-migration` | ✓ | G-09 all 34 actuators, verified legacy closure (75) |
 | `test-flags-enabled` | ✓ | G-11 full pipeline with every migration flag ON (37) |
-| `verify-live-endpoints` | — | G-10 live check; needs a running stack |
+| `test-preflight` | ✓ | E-03 deployment readiness checks (37) |
+| `verify-live-endpoints` | — | G-10/E-01 live read check; needs a running stack |
+| `verify-live-mutating` | — | E-02 live mutating check; needs a stack + token |
+| `setup-service-token` | ✓ | Generates `KAI_SERVICE_TOKEN` into gitignored `.env` |
+| `preflight` | ✓ | Deployment readiness gate — run before shipping |
 
 All run offline with no services, Docker or GPU.

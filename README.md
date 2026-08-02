@@ -21,14 +21,14 @@
 
 ---
 
-## Project Status (1 August 2026)
+## Project Status (2 August 2026)
 
 | Metric | Value |
 |---|---|
 | **Services** | 61 Docker containers |
 | **Test targets** | 91 (`make test-core`) |
-| **Individual tests** | 3,795 (`def test_` across 173 files) |
-| **Python LOC** | ~103,781 |
+| **Individual tests** | 3,811 (`def test_` across 174 files) |
+| **Python LOC** | ~104,539 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 45 |
 | **Failures** | 0 |
@@ -72,7 +72,7 @@ It is the source of truth for UH work — including an honest open-gaps list. Ve
 workstream with a single command:
 
 ```bash
-make test-uh          # all 18 UH suites, 1,384 tests
+make test-uh          # all 19 UH suites, 1,421 tests
 ```
 
 > **Built, not cut over.** All 34 actuators across 8 risk tiers are migrated with real

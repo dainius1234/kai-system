@@ -3015,3 +3015,34 @@ G-10 and G-11 are honest limits of an offline environment rather than unfinished
 
 **Files produced:** `common/actuator_registry/mutating_handlers.py`, `common/actuator_registry/legacy_verification.py`, `scripts/verify_live_endpoints.py`, `scripts/test_full_migration.py`, `scripts/test_flags_enabled.py`.
 **Files modified:** `common/actuator_registry/handlers.py` (query-string support), `common/actuator_registry/migration.py` (legacy verification), `vault-sync/app.py`, `executor/app.py` (authentication), `scripts/test_migration.py`, `Makefile`.
+
+---
+
+## D137 — 2026-08-01 — Environmental Limits Closed (E-01, E-02, E-03)
+
+**Context:** D136 recorded three environmental limits as "not defects — a production environment retires them". The operator directed closing those too. All three are now closed, and the doc set was audited claim-by-claim against reality.
+
+**Decisions:**
+
+1. **E-01 — broker-bridge verified by controlling the upstream, not by faking the client.** `BINANCE_BASE_URL` and `BINANCE_FAPI_URL` are env-configurable, so a Binance-shaped stub was stood up and broker-bridge pointed at it. All three routes now return 200 — including the **signed** `/balance`, where the stub asserts a `signature` query parameter is present. That proves broker-bridge's own signing path, not just our handler. Live verification is now **13/13, WRONG=0**. The real Binance API remains third-party and out of scope; what was unverified was *our* code, and that is now covered. No real credentials were used or needed: the stub accepts test values.
+
+2. **E-02 — mutating handlers invoked for real, with a classification that does not overclaim.** Seven services were started with authentication enabled and nine actions invoked through the full capability pipeline. Actions are classified SAFE (invoked fully), CONTAINED (invoked with arguments chosen so the effect cannot land — a restore pointed at a nonexistent file still proves route, auth and parameter plumbing), or SKIPPED (never invoked).
+
+   **Five actions were deliberately skipped**: `browser_click`, `browser_type`, `service_recover`, `auto_sleep`, `paper_trade_open`. Clicking an arbitrary web element, restarting live services and triggering memory decay are precisely the irreversible operations the capability system exists to gate. Invoking them so a test could report green would be the wrong trade. They are reported as skipped, never as passed — "we could not test it" and "we tested it safely" are different claims and the output distinguishes them.
+
+   Live invocation immediately found three wrong parameter shapes (executor expects `params`/`task_id`/`device`, vault-sync expects `filepath`), all of which returned 422. A mocked client accepts any shape, so only real calls surface this.
+
+3. **E-03 — deployment readiness is a gate, not a checklist.** `make preflight` blocks a deploy that is missing `KAI_SERVICE_TOKEN`, has the dev auth bypass enabled, or has `KAI_AUTONOMY_ENFORCE=true` with no grants issued. That last check matters most: enforcing scoped autonomy before any grant exists denies every gated capability at once — a self-inflicted outage. The preflight refuses it and names the readiness signal (`ready_to_enforce`) rather than just saying no.
+
+   `make setup-service-token` generates the token into `.env`, which is gitignored and confirmed untracked. **No secret enters the repository.**
+
+4. **`KAI_AUTONOMY_ENFORCE` was deliberately left at `false`.** The instruction was to close everything, and this is the one flag that must not be flipped: no grants exist yet, so enabling it would deny every scoped capability. Flipping it to look complete would break the running system. It is recorded as operational step O-03, gated by the preflight.
+
+**Doc audit — one stale claim found and fixed.** Every `make` target, script path and module path referenced in the tracker was checked to resolve (0 missing), and every claimed per-suite test count was checked by running the suite. `test-migration` was recorded as 125; it is 136. Corrected, and the row sum now equals the stated total (1,421) exactly. `MAKEFILE_TARGETS.md` was two passes stale (1,226/16 suites) and is now current. Historical counts inside `DECISIONS.md` were left untouched — it is append-only, and those entries were accurate when written.
+
+**What remains — operational steps, not defects:** O-01 (`KAI_PERCEPTION_MODE=active`), O-02 (`KAI_CORTEX_SOURCE=world_state`), O-03 (`KAI_AUTONOMY_ENFORCE=true`, blocked until grants exist), O-04 (retire legacy Cortex polling). Each has a tested fallback and is independently revertible. Deploying this branch changes nothing until a flag is set.
+
+**Verification:** 1,421 tests across 19 suites. 8/8 CI policy gates. Docs gate current. `make preflight` reports READY TO DEPLOY. Live: 13/13 read endpoints, 9 mutating actions invoked with 0 failures.
+
+**Files produced:** `scripts/preflight_deploy.py`, `scripts/test_preflight.py`, `scripts/setup_service_token.sh`, `scripts/verify_live_mutating.py`.
+**Files modified:** `Makefile` (5 targets), `kai-pm/UH_PROGRESS_TRACKER.md`, `kai-pm/MAKEFILE_TARGETS.md`, `kai-pm/STATUS.md`, `README.md`.

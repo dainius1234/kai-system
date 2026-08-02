@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-01 (third gap-closure pass — all gaps closed)
+**Last updated:** 2026-08-01 (fourth pass — environmental limits closed)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -44,12 +44,15 @@
 | G-03 Service authentication | ✅ Done | `99c1ee9` | `make test-service-auth` | 55 |
 | §16.30 Erasure lineage (G-06) | ✅ Done | `ebae38d` | `make test-erasure` | 75 |
 | G-04 Legacy trust bridge | ✅ Done | `51e0934` | `make test-legacy-bridge` | 58 |
-| G-01/G-02 Tier-1 migration + active mode | ✅ Done | `4795b7d` | `make test-migration` | 125 |
+| G-01/G-02 Tier-1 migration + active mode | ✅ Done | `4795b7d` | `make test-migration` | 136 |
 | G-01b/G-02b/G-07/G-08 second closure pass | ✅ Done | `8675e90` | (folded into suites above) | — |
-| G-09 Full-catalogue migration (tiers 2–8) | ✅ Done | this commit | `make test-full-migration` | 75 |
-| G-11 All flags enabled, end to end | ✅ Done | this commit | `make test-flags-enabled` | 37 |
-| G-10 Live endpoint verification | ✅ Done | this commit | `make verify-live-endpoints` | 10/13 live |
-| | | | **Total** | **1,384** |
+| G-09 Full-catalogue migration (tiers 2–8) | ✅ Done | `8d2ea09` | `make test-full-migration` | 75 |
+| G-11 All flags enabled, end to end | ✅ Done | `8d2ea09` | `make test-flags-enabled` | 37 |
+| G-10 Live endpoint verification | ✅ Done | `8d2ea09` | `make verify-live-endpoints` | 13/13 live |
+| E-01 broker-bridge live-verified | ✅ Done | this commit | `make verify-live-endpoints` | 13/13 live |
+| E-02 Mutating handlers live-verified | ✅ Done | this commit | `make verify-live-mutating` | 9 invoked, 5 skipped |
+| E-03 Deployment preflight | ✅ Done | this commit | `make test-preflight` | 37 |
+| | | | **Total** | **1,421** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
@@ -154,16 +157,33 @@ retire** — recorded so nobody mistakes a green suite for a live cutover.
 | ~~G-10~~ | No handler called against a running service | 9 services started; **10/13 live-verified** (**found a missing query param**) | `make verify-live-endpoints` |
 | ~~G-11~~ | Migration flags never exercised together | Full pipeline with all 4 flags ON | `make test-flags-enabled` |
 
-### Environmental limits (not defects)
+### Environmental limits — now closed
 
-| ID | Limit | Why it cannot close here |
+| ID | Limit | How it was closed |
 |---|---|---|
-| E-01 | 3 of 13 tier-1 endpoints not live-verified | `broker-bridge` needs Binance credentials and outbound access. Routes confirmed to **exist** (502/503, never 404) |
-| E-02 | Mutating (tier 2–8) handlers verified against an injected client | Calling them for real causes real side effects — a database restore is not a test |
-| E-03 | All four migration flags **default to the legacy path** | Correct for deployment. Each is proven to work when enabled, and each has a tested fallback |
+| ~~E-01~~ | broker-bridge unverifiable without Binance credentials | A Binance-shaped upstream stub was stood up and broker-bridge pointed at it via `BINANCE_BASE_URL`. All three routes verified, including the **signed** `/balance` — which proves the signing path. **13/13 live.** |
+| ~~E-02~~ | Mutating handlers never called for real | 7 services started with auth on; **9 actions invoked** (7 fully, 2 contained), **5 deliberately skipped**. Skipped actions are reported as skipped, never as passed. |
+| ~~E-03~~ | Migration flags never exercised in a real deploy | `make preflight` gates deployment readiness; `make setup-service-token` generates the token into gitignored `.env`. |
 
-**None of these is a code defect.** E-01 and E-02 need credentials and a decision to
-accept side effects; E-03 is the intended default.
+**On E-02's skipped five:** `browser_click`, `browser_type`, `service_recover`,
+`auto_sleep` and `paper_trade_open` were **not invoked**. Clicking an arbitrary web
+element, restarting live services, and triggering memory decay are exactly the
+irreversible operations the capability system exists to gate — invoking them to prove
+a test passes would be the wrong trade. They are recorded as skipped with the reason.
+
+### Remaining operational steps
+
+Not defects — decisions that belong to the operator, each with a tested fallback.
+
+| ID | Step | Why it is not done here |
+|---|---|---|
+| O-01 | Enable `KAI_PERCEPTION_MODE=active` in a real environment | Proven to work; enabling it is an operational decision |
+| O-02 | Enable `KAI_CORTEX_SOURCE=world_state` | Depends on O-01 being healthy first |
+| O-03 | Enable `KAI_AUTONOMY_ENFORCE=true` | **Must not be enabled yet.** No grants exist, so enforcement would deny every gated capability. `make preflight` blocks this |
+| O-04 | Retire the legacy Cortex polling path | Deliberately additive during migration; retiring it is a later step |
+
+`make preflight` is the gate for all four: it blocks O-03 until grants exist, and
+refuses a deploy missing `KAI_SERVICE_TOKEN` or running with the dev auth bypass on.
 
 ### Endpoints now authenticated
 
@@ -185,23 +205,34 @@ empty — generate one (`openssl rand -hex 32`) or these endpoints return 503.
 
 ## 6. Next authorised step
 
-**Nothing here changes live behaviour on its own.** Every flag defaults to the
-legacy path, so deploying this branch changes nothing until a flag is set.
+**Deploying this branch changes nothing on its own.** Every migration flag defaults
+to the legacy path, so the new machinery sits behind the existing system until a
+flag is set.
 
-Cutover order, each independently revertible:
+```bash
+make setup-service-token   # writes KAI_SERVICE_TOKEN into gitignored .env
+make preflight             # must print READY TO DEPLOY
+make test-uh               # 1,421 tests, must be green
+```
 
-1. **`KAI_SERVICE_TOKEN`** — generate with `openssl rand -hex 32`. Required: eight
-   services now fail closed without it.
-2. **`make verify-live-endpoints`** against the running stack. Expect `WRONG=0`;
-   `UPSTREAM` entries for `broker-bridge` are expected without Binance credentials.
-3. **`KAI_PERCEPTION_MODE=active`** in one environment. Watch `events_reduced`
-   against `events_accepted`.
-4. **`KAI_CORTEX_SOURCE=world_state`** once (3) is healthy. Falls back to polled
-   state on an empty world, so the blast radius is small.
-5. **`KAI_AUTONOMY_ENFORCE=true`** only once `migration_report()` reports
-   `ready_to_enforce: true`. It reports `false` today, correctly.
+Then, against a running stack:
 
-Re-run `make test-uh` after each step and update §2 and §5 here.
+```bash
+make verify-live-endpoints   # expect OK=13 WRONG=0
+make verify-live-mutating    # expect FAILED=0
+```
+
+Operational steps, in order, each independently revertible:
+
+1. **O-01** `KAI_PERCEPTION_MODE=active` — watch `events_reduced` vs `events_accepted`.
+2. **O-02** `KAI_CORTEX_SOURCE=world_state` — falls back to polled state on an empty
+   world, so the blast radius is small.
+3. **O-03** `KAI_AUTONOMY_ENFORCE=true` — **only** once grants exist and
+   `migration_report()` reports `ready_to_enforce: true`. `make preflight` blocks it
+   until then, deliberately.
+4. **O-04** retire legacy Cortex polling, once O-02 has soaked.
+
+Re-run `make test-uh` and `make preflight` after each step, and update §2 and §5 here.
 
 ---
 
