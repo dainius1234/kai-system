@@ -3131,3 +3131,38 @@ This means `KAI_PERCEPTION_MODE` and `KAI_CORTEX_SOURCE` controlled code paths t
 **Verification:** 1,494 tests across 20 suites. 9/9 CI policy gates. Docs current, tracker rows sum to the stated total. No regressions in browser-agent, notify, monitor, executor or vault-sync.
 
 **Files modified:** `scripts/security/check_architecture_rules.py` (6 rules + self-audit), `scripts/test_architecture_rules.py` (+29 tests), `browser-agent/app.py`, `executor/app.py`, `monitor-service/app.py`, `output/notify/app.py`, `vault-sync/app.py`, `scripts/test_service_auth.py`.
+
+---
+
+## D141 — 2026-08-02 — W1-DASH: Revalidate All 96 Dashboard Findings Before Remediating
+
+**Context:** Wave 1 moves to the Dashboard privileged gateway — 96 `KAI-DASH-*` findings, 10 CRITICAL, 58 HIGH, 28 MEDIUM. The operator's instruction was explicit: *"align with findings, no point building on old or something not right."*
+
+**The problem with building straight from the finding list.** The findings were captured at commit `7adab8d`. P0 containment and the whole Unified Hunter programme have changed the tree since. Some findings are already resolved, some moved, some had their premise removed by an unrelated fix. Working the list as written would have meant fixing what was already fixed and missing what had moved.
+
+**Decisions:**
+
+1. **Revalidate mechanically before planning, not by reading.** `scripts/security/check_dashboard_findings.py` re-checks all 96 findings against the current tree and reports `LIVE` / `PARTIAL` / `REMEDIATED` / `MANUAL`. It is re-runnable, so "aligned with findings" is a command rather than a claim in a document that decays the moment code changes.
+
+2. **`MANUAL` is a visible gap, not a pass.** 37 findings are not statically decidable. Each records *what* needs human review rather than being quietly omitted. `manual()` placeholders are tagged and a test asserts they can only ever report `MANUAL`, so an unreviewed finding cannot drift into looking resolved.
+
+3. **The tracker audits its own coverage.** All 96 IDs must appear in the table; a missing or unknown one fails the run. This is a direct consequence of D140, where the architecture gate reported a clean pass while silently omitting 6 of its 15 rules. A coverage table that does not check its own coverage is not evidence.
+
+4. **The tracker has its own test suite — 43 tests.** Each check is made to flip against a synthetic dashboard with the remediation applied: `LIVE` when the defect is present, `REMEDIATED` when it is not. A check that cannot fail proves nothing. This is the third time in this programme that discipline has been necessary.
+
+5. **Authentication is counted per-route, deliberately.** A route only counts as authenticated when it declares its own dependency. Blanket middleware would satisfy `KAI-DASH-001` while leaving `KAI-DASH-018` (least privilege) untouched and making a new unauthenticated route invisible. Per-route declaration keeps authority reviewable and makes the default visibly unsafe.
+
+**Revalidated baseline at `cb3f142`: LIVE 54, PARTIAL 2, REMEDIATED 3, MANUAL 37.** 185 routes, 66 mutating, all 66 unauthenticated.
+
+**What had already changed:** `KAI-DASH-002` (anonymous Tool Gate mode change via the server-held token) no longer holds — no `DASHBOARD_GATE_TOKEN` exists anywhere and `/api/mode` is display-state only. That also removes the premise of `KAI-DASH-013` (mode-sync failure masked as 200 — there is no sync left to fail) and `KAI-DASH-081`. `KAI-DASH-001` is `PARTIAL`: all three compose files bind `127.0.0.1:8080:8080` from P0 containment, but inbound auth is still zero. **8 of the 10 CRITICALs remain fully live.**
+
+**Standing operator directive verified, not assumed.** The dashboard reads neither `BINANCE_API_KEY` nor `BINANCE_API_SECRET`. `dashboard/static/app.html:1130` names `BINANCE_API_KEY` in help text; the check distinguishes naming a variable from reading its value, and runs on every invocation because this directive outranks the finding list.
+
+**Nothing is closed.** Programme Rule 7 stands: `REMEDIATED` is evidence for a future closure review, not the review. Findings formally closed by this entry: **0**.
+
+**Sequencing decided:** 96 findings partitioned into 9 tracks, the partition enforced by the coverage audit. Track A (inbound identity — 001, 002, 011, 012, 018) is the hard prerequisite for Tracks B and C, which together hold 33 findings including 8 of the 10 live CRITICALs and all reduce to the same sentence: *anonymous callers can do X*. Fixing those route-by-route would be the wrong altitude; the fix is a principal model plus per-route authority. Tracks D–I are independent and follow.
+
+**Verification:** 43 new tests, all green. Full `make test-uh` green. The tracker's own failure modes are exercised: removing a finding, adding an unknown one, an unknown track, and a credential read all correctly fail.
+
+**Files produced:** `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md`.
+**Files modified:** `Makefile`, `kai-pm/UH_PROGRESS_TRACKER.md`.

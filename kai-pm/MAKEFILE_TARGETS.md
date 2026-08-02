@@ -164,7 +164,7 @@ Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
 
 | Target | Status | What it covers |
 |---|---|---|
-| `test-uh` | ✓ | **Aggregate — run this one.** All 20 suites, 1,494 tests |
+| `test-uh` | ✓ | **Aggregate — run this one.** All 21 suites, 1,537 tests |
 | `test-contracts` | ✓ | UH-1 frozen canonical contracts (126) |
 | `test-perception-spine` | ✓ | UH-2 shadow-mode event ingress (166) |
 | `test-world-state` | ✓ | UH-3 reducers and immutable snapshots (71) |
@@ -175,15 +175,18 @@ Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
 | `test-autonomy` | ✓ | UH-8 evidence grading and scoped grants (174) |
 | `test-payload-bounds` | ✓ | §16.4 oversized/deep/high-cardinality payloads (24) |
 | `test-assessment` | ✓ | §16.13 Ohana unavailable / poisoned values (56) |
-| `test-invariant-guards` | ✓ | §16.26 rollback to fail-open or legacy authority (18) |
+| `test-invariant-guards` | ✓ | §16.26 rollback to fail-open or legacy authority (26) |
 | `test-concurrency-clock` | ✓ | §16.27 multi-worker, restart, clock-change, leader fencing (51) |
-| `test-service-auth` | ✓ | G-03 fail-closed auth on side-effecting endpoints (55) |
+| `test-service-auth` | ✓ | G-03 fail-closed auth on side-effecting endpoints (59) |
 | `test-erasure` | ✓ | §16.30 subject erasure across all five layers (75) |
 | `test-legacy-bridge` | ✓ | G-04 legacy trust scalar may only deny, never grant (58) |
 | `test-migration` | ✓ | G-01/G-02 tier-1 migration, active mode, route verification (136) |
 | `test-full-migration` | ✓ | G-09 all 34 actuators, verified legacy closure (75) |
 | `test-flags-enabled` | ✓ | G-11 full pipeline with every migration flag ON (37) |
 | `test-preflight` | ✓ | E-03 deployment readiness checks (37) |
+| `test-architecture-rules` | ✓ | A-01 all 15 §15 architecture rules (61) |
+| `test-dashboard-findings` | ✓ | W1-DASH tracker self-tests — proves each check can fail (43) |
+| `dashboard-findings` | — | Wave 1 status report: revalidates all 96 `KAI-DASH` findings. Not a gate |
 | `verify-live-endpoints` | — | G-10/E-01 live read check; needs a running stack |
 | `verify-live-mutating` | — | E-02 live mutating check; needs a stack + token |
 | `setup-service-token` | ✓ | Generates `KAI_SERVICE_TOKEN` into gitignored `.env` |

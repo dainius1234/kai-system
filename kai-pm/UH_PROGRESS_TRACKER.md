@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-02 (sixth pass — §15 architecture rules enforced in CI)
+**Last updated:** 2026-08-02 (seventh pass — Wave 1 dashboard findings revalidated, tracker built)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -53,8 +53,9 @@
 | E-02 Mutating handlers live-verified | ✅ Done | this commit | `make verify-live-mutating` | 9 invoked, 5 skipped |
 | E-03 Deployment preflight | ✅ Done | this commit | `make test-preflight` | 37 |
 | W-01 Modules wired into the running app | ✅ Done | this commit | `make test-invariant-guards` | (guards) |
-| A-01 Architecture dependency CI gate — all 15 rules | ✅ Done | this commit | `make test-architecture-rules` | 61 |
-| | | | **Total** | **1,494** |
+| A-01 Architecture dependency CI gate — all 15 rules | ✅ Done | `cb3f142` | `make test-architecture-rules` | 61 |
+| W1-DASH Dashboard finding tracker (96 findings) | ✅ Done | this commit | `make test-dashboard-findings` | 43 |
+| | | | **Total** | **1,537** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
@@ -223,6 +224,46 @@ empty — generate one (`openssl rand -hex 32`) or these endpoints return 503.
 
 ---
 
+## 5b. Wave 1 — Dashboard privileged gateway
+
+The UH work packages are complete. Wave 1 of the code-audit programme is now
+in progress, starting with the Dashboard gateway batch.
+
+**Plan:** [`W1_DASHBOARD_REMEDIATION_PLAN.md`](W1_DASHBOARD_REMEDIATION_PLAN.md)
+— the single source of truth for dashboard remediation status.
+
+All 96 `KAI-DASH-*` findings were revalidated against the current tree
+before any remediation was planned, because the findings were captured at
+`7adab8d` and the tree has moved since.
+
+| Status | Count |
+|---|---|
+| LIVE | 54 |
+| PARTIAL | 2 |
+| REMEDIATED (pending closure review) | 3 |
+| MANUAL (needs human review) | 37 |
+| **Total** | **96** |
+
+- **8 of 10 CRITICALs are still live** — `KAI-DASH-003`…`010`
+- **185 routes, 66 mutating, all 66 unauthenticated**
+- `KAI-DASH-002`, `013`, `081` no longer hold: no `DASHBOARD_GATE_TOKEN`
+  exists and `/api/mode` is display-state only
+- `KAI-DASH-001` is PARTIAL: loopback-bound by P0 containment, but zero
+  inbound auth
+- **Operator directive verified:** the dashboard reads neither
+  `BINANCE_API_KEY` nor `BINANCE_API_SECRET`. Checked on every tool run
+
+| Command | Purpose |
+|---|---|
+| `make dashboard-findings` | Live status of all 96 findings |
+| `make test-dashboard-findings` | 43 tests proving the tracker can fail |
+
+**Findings formally closed: 0.** Programme Rule 7 — closure is a separate
+evidence-backed register action, and `REMEDIATED` here is evidence for that
+review, not the review itself.
+
+---
+
 ## 6. Next authorised step
 
 **Deploying this branch changes nothing on its own.** Every migration flag defaults
@@ -232,7 +273,7 @@ flag is set.
 ```bash
 make setup-service-token   # writes KAI_SERVICE_TOKEN into gitignored .env
 make preflight             # must print READY TO DEPLOY
-make test-uh               # 1,421 tests, must be green
+make test-uh               # all suites, must be green
 ```
 
 Then, against a running stack:
