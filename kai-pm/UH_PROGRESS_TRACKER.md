@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-02 (seventh pass — Wave 1 dashboard findings revalidated, tracker built)
+**Last updated:** 2026-08-02 (eighth pass — Wave 1 Track A: dashboard inbound identity)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -51,11 +51,12 @@
 | G-10 Live endpoint verification | ✅ Done | `8d2ea09` | `make verify-live-endpoints` | 13/13 live |
 | E-01 broker-bridge live-verified | ✅ Done | this commit | `make verify-live-endpoints` | 13/13 live |
 | E-02 Mutating handlers live-verified | ✅ Done | this commit | `make verify-live-mutating` | 9 invoked, 5 skipped |
-| E-03 Deployment preflight | ✅ Done | this commit | `make test-preflight` | 37 |
+| E-03 Deployment preflight | ✅ Done | `8d2ea09` | `make test-preflight` | 57 |
 | W-01 Modules wired into the running app | ✅ Done | this commit | `make test-invariant-guards` | (guards) |
 | A-01 Architecture dependency CI gate — all 15 rules | ✅ Done | `cb3f142` | `make test-architecture-rules` | 61 |
-| W1-DASH Dashboard finding tracker (96 findings) | ✅ Done | this commit | `make test-dashboard-findings` | 43 |
-| | | | **Total** | **1,537** |
+| W1-DASH Dashboard finding tracker (96 findings) | ✅ Done | `dff418d` | `make test-dashboard-findings` | 81 |
+| W1-DASH-A Dashboard inbound identity | ✅ Done | this commit | `make test-dashboard-auth` | 89 |
+| | | | **Total** | **1,684** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
@@ -226,8 +227,8 @@ empty — generate one (`openssl rand -hex 32`) or these endpoints return 503.
 
 ## 5b. Wave 1 — Dashboard privileged gateway
 
-The UH work packages are complete. Wave 1 of the code-audit programme is now
-in progress, starting with the Dashboard gateway batch.
+The UH work packages are complete. Wave 1 of the code-audit programme is in
+progress, starting with the Dashboard gateway batch.
 
 **Plan:** [`W1_DASHBOARD_REMEDIATION_PLAN.md`](W1_DASHBOARD_REMEDIATION_PLAN.md)
 — the single source of truth for dashboard remediation status.
@@ -236,27 +237,46 @@ All 96 `KAI-DASH-*` findings were revalidated against the current tree
 before any remediation was planned, because the findings were captured at
 `7adab8d` and the tree has moved since.
 
-| Status | Count |
-|---|---|
-| LIVE | 54 |
-| PARTIAL | 2 |
-| REMEDIATED (pending closure review) | 3 |
-| MANUAL (needs human review) | 37 |
-| **Total** | **96** |
+| Status | Baseline `cb3f142` | Now |
+|---|---|---|
+| LIVE | 54 | **22** |
+| PARTIAL | 2 | **0** |
+| REMEDIATED (pending closure review) | 3 | **37** |
+| MANUAL (needs human review) | 37 | **37** |
+| **Total** | **96** | **96** |
 
-- **8 of 10 CRITICALs are still live** — `KAI-DASH-003`…`010`
-- **185 routes, 66 mutating, all 66 unauthenticated**
-- `KAI-DASH-002`, `013`, `081` no longer hold: no `DASHBOARD_GATE_TOKEN`
-  exists and `/api/mode` is display-state only
-- `KAI-DASH-001` is PARTIAL: loopback-bound by P0 containment, but zero
-  inbound auth
+**Track A (inbound identity) is complete.** `common/dashboard_auth.py`
+gives every route a verified principal — identity, role, session — and a
+declared scope.
+
+- **All 10 CRITICALs remediated.** The 22 still LIVE are 12 HIGH, 10 MEDIUM
+- **185 routes: 179 authenticated, 66 of 66 mutating routes authenticated**
+- The 6 unauthenticated routes are the declared public list — `/health`,
+  `/metrics`, and the four HTML shells the browser loads before it can
+  authenticate. None mutating. The list lives in the checker, so widening
+  it is a deliberate edit
+- **5 scopes, 3 roles.** `viewer` reads operational status; `operator`
+  adds sensitive reads and routine writes; `keeper` alone may rewrite
+  identity state or drive external action
 - **Operator directive verified:** the dashboard reads neither
   `BINANCE_API_KEY` nor `BINANCE_API_SECRET`. Checked on every tool run
+
+**Track B** is complete bar `KAI-DASH-014` (per-backend idempotency
+review). **Track C** has one finding outstanding — `KAI-DASH-023`, the
+hard-coded global `keeper` identity, which is the next step: authenticating
+the caller does not help while every request still executes as `keeper`.
+**Tracks D–I** are not started.
 
 | Command | Purpose |
 |---|---|
 | `make dashboard-findings` | Live status of all 96 findings |
-| `make test-dashboard-findings` | 43 tests proving the tracker can fail |
+| `make test-dashboard-findings` | 81 tests proving the tracker can fail |
+| `make test-dashboard-auth` | 89 tests on the auth module itself |
+
+**Deployment:** the gateway fails closed. `KAI_DASHBOARD_TOKEN` must be set
+or every protected route answers 503. `make setup-service-token` generates
+it as a **separate** secret from `KAI_SERVICE_TOKEN`, `make preflight`
+blocks a deploy without it, and all three compose profiles pass it through.
 
 **Findings formally closed: 0.** Programme Rule 7 — closure is a separate
 evidence-backed register action, and `REMEDIATED` here is evidence for that

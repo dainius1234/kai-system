@@ -193,6 +193,11 @@ services:
       SUPERVISOR_URL: http://supervisor:8051
       WAKE_URL: http://wake-service:8022
       SCREEN_CAPTURE_URL: http://screen-capture:8059
+      # Inbound gateway credentials (Wave 1 Track A). The dashboard
+      # fails closed: without these it answers 503 on every route.
+      KAI_DASHBOARD_TOKEN: "${KAI_DASHBOARD_TOKEN:-}"
+      KAI_DASHBOARD_IDENTITY: "${KAI_DASHBOARD_IDENTITY:-operator}"
+      KAI_DASHBOARD_ROLE: "${KAI_DASHBOARD_ROLE:-keeper}"
     ports:
       - "127.0.0.1:8080:8080"
     healthcheck:

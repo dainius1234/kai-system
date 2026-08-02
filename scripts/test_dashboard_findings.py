@@ -282,11 +282,108 @@ def test_dash_057_flips_on_concurrent_fanout():
     check("DASH-057 LIVE while sequential", live == dash.LIVE, live)
 
 
-def test_dash_001_escalates_when_published_publicly():
-    """The compose bind is read from the real tree, so assert on its shape."""
-    status, detail = dash.dash_001()
-    check("DASH-001 is not silently REMEDIATED while routes are open",
-          status in (dash.LIVE, dash.PARTIAL), f"{status}: {detail}")
+def test_dash_001_is_live_while_a_mutating_route_is_open():
+    with _Dashboard(UNAUTH_SOURCE):
+        status, detail = dash.dash_001()
+    check("DASH-001 LIVE while any mutating route is unauthenticated",
+          status == dash.LIVE, f"{status}: {detail}")
+
+
+def test_dash_001_flags_an_undeclared_public_route():
+    """A new anonymous GET must not be absorbed into the public allowlist."""
+    src = REMEDIATED_SOURCE + '''
+@app.get("/api/secrets")
+async def api_secrets():
+    return {}
+'''
+    with _Dashboard(src):
+        status, detail = dash.dash_001()
+    check("DASH-001 refuses to pass an undeclared unauthenticated route",
+          status in (dash.LIVE, dash.PARTIAL) and "/api/secrets" in detail,
+          f"{status}: {detail}")
+
+
+def test_dash_001_accepts_only_the_declared_public_list():
+    src = '''
+from fastapi import Depends
+from common.dashboard_auth import require_dashboard_auth, Scope
+
+@app.get("/health")
+async def health():
+    return {}
+
+@app.get("/api/thing", dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+async def api_thing():
+    return {}
+'''
+    with _Dashboard(src):
+        status, detail = dash.dash_001()
+    check("DASH-001 REMEDIATED when the only open route is declared public",
+          status == dash.REMEDIATED, f"{status}: {detail}")
+    check("the public list holds nothing mutating",
+          all(m == "get" for m, _ in dash.PUBLIC_ROUTES), str(dash.PUBLIC_ROUTES))
+
+
+def test_dash_018_rejects_a_uniform_scope():
+    """One scope everywhere is a shared authority, not least privilege."""
+    src = '''
+from fastapi import Depends
+from common.dashboard_auth import require_dashboard_auth, Scope
+
+@app.post("/api/a", dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
+async def a():
+    return {}
+
+@app.get("/api/b", dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
+async def b():
+    return {}
+'''
+    with _Dashboard(src):
+        status, detail = dash.dash_018()
+    check("DASH-018 LIVE when every route declares the same scope",
+          status == dash.LIVE, f"{status}: {detail}")
+
+
+def test_dash_018_reports_partial_when_a_guarded_route_has_no_scope():
+    src = '''
+from fastapi import Depends
+from common.dashboard_auth import require_dashboard_auth, Scope, require_service_auth
+
+@app.post("/api/a", dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
+async def a():
+    return {}
+
+@app.get("/api/b", dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+async def b():
+    return {}
+
+@app.get("/api/c", dependencies=[Depends(require_service_auth("c"))])
+async def c():
+    return {}
+'''
+    with _Dashboard(src):
+        status, detail = dash.dash_018()
+    check("DASH-018 PARTIAL when an authenticated route declares no scope",
+          status == dash.PARTIAL and "/api/c" in detail, f"{status}: {detail}")
+
+
+def test_dash_018_remediated_with_a_real_distribution():
+    src = '''
+from fastapi import Depends
+from common.dashboard_auth import require_dashboard_auth, Scope
+
+@app.post("/api/a", dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
+async def a():
+    return {}
+
+@app.get("/api/b", dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+async def b():
+    return {}
+'''
+    with _Dashboard(src):
+        status, detail = dash.dash_018()
+    check("DASH-018 REMEDIATED with distinct scopes on every route",
+          status == dash.REMEDIATED, f"{status}: {detail}")
 
 
 # ── Standing operator directive ──────────────────────────────────────
@@ -377,7 +474,12 @@ def run() -> None:
     test_dash_069_flips_on_health_payload()
     test_dash_088_reports_partial_then_remediated()
     test_dash_057_flips_on_concurrent_fanout()
-    test_dash_001_escalates_when_published_publicly()
+    test_dash_001_is_live_while_a_mutating_route_is_open()
+    test_dash_001_flags_an_undeclared_public_route()
+    test_dash_001_accepts_only_the_declared_public_list()
+    test_dash_018_rejects_a_uniform_scope()
+    test_dash_018_reports_partial_when_a_guarded_route_has_no_scope()
+    test_dash_018_remediated_with_a_real_distribution()
     test_operator_directive_detects_credential_read()
     test_operator_directive_allows_help_text()
     test_operator_directive_clean_on_real_tree()

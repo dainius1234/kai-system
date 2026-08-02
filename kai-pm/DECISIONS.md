@@ -3166,3 +3166,46 @@ This means `KAI_PERCEPTION_MODE` and `KAI_CORTEX_SOURCE` controlled code paths t
 
 **Files produced:** `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md`.
 **Files modified:** `Makefile`, `kai-pm/UH_PROGRESS_TRACKER.md`.
+
+---
+
+## D142 — 2026-08-02 — W1-DASH Track A: Dashboard Inbound Identity
+
+**Context:** D141 revalidated all 96 dashboard findings and partitioned them into 9 tracks. Track A (`KAI-DASH-001`, `002`, `011`, `012`, `018`) is the hard prerequisite for Tracks B and C — 33 findings including 8 of the 10 live CRITICALs, every one of which reduced to the same sentence: *anonymous callers can do X*.
+
+**The problem.** The dashboard had zero inbound authentication references across 185 routes while proxying to Agentic, memU, Supervisor, Tool Gate, Financial Awareness, Browser Agent, Monitor, Files, Notify, Email and Broker. It was a single unified control plane for the whole stack, answering to anyone who could reach the port.
+
+**Decisions:**
+
+1. **A principal, not a shared token.** A single bearer token would have satisfied `KAI-DASH-001` and left `011` and `012` exactly as they were. `common/dashboard_auth.py` resolves every request to a `DashboardPrincipal` carrying identity, role and session, so a backend call can eventually carry *who asked* instead of borrowing the dashboard's own privilege — which is the confused-deputy shape `KAI-DASH-002` described.
+
+2. **Scopes declared at the route, not middleware.** Five scopes (`read:operational`, `read:sensitive`, `write:routine`, `write:identity`, `write:external`) and three roles. Blanket middleware would have closed `001` while leaving `018` untouched and, worse, made a newly added unauthenticated route invisible. Declaring at the route keeps authority reviewable and keeps the unsafe default *visible*.
+
+3. **Identity rewrite and external action stay with the keeper.** `viewer` reads operational status; `operator` adds sensitive reads and routine writes; `keeper` alone may rewrite `SOUL.md`, values, conscience and narrative state, or drive the browser agent, schedulers and monitors. An operator who can rewrite `SOUL.md` can rewrite what the system is.
+
+4. **Fail closed, with the same single greppable escape hatch.** No credentials means 503, never 200, matching `common/service_auth.py` and roadmap §15.14. `KAI_ALLOW_UNAUTHENTICATED=true` remains the only bypass and logs a warning per operation.
+
+5. **No CSRF token — deliberate, and recorded as such.** Credentials travel in the `Authorization` header, which browsers never attach automatically, so cross-site requests cannot borrow them. Adding a CSRF token would be ceremony implying protection it is not providing. This reasoning changes the moment any credential moves to a cookie.
+
+6. **The dashboard credential is a separate secret from `KAI_SERVICE_TOKEN`.** A browser-held credential must not also authorise service-to-service calls; leaking one would otherwise hand over the other. `make preflight` blocks a deploy where the two are equal.
+
+7. **Two checks were rewritten because their markers predated the implementation.** `dash_018` originally looked for a `DashboardScope` string. That would have passed on any scope model, including one that assigned the *same* scope everywhere — which is a shared authority wearing a scope's name. It now checks the distribution and reports `PARTIAL` when an authenticated route declares no scope. `dash_001` now accepts unauthenticated routes only when they are on an explicit public list held in the checker, and reports LIVE unconditionally if any mutating route is open.
+
+**Results.** LIVE 54 → **22**; PARTIAL 2 → **0**; REMEDIATED 3 → **37**. **All 10 CRITICALs remediated.** The 22 remaining are 12 HIGH and 10 MEDIUM across Tracks C–I. 179 of 185 routes authenticated; **66 of 66 mutating routes authenticated**. The 6 open routes are `/health`, `/metrics` and four HTML shells the browser must load before it can authenticate — none mutating.
+
+**Gaps found and closed while doing this, rather than deferred:**
+
+- Three test files (`security_fuzz_upload`, `test_audio_transcribe`, `test_thinking_pathways`) broke because they called dashboard routes anonymously. Correct behaviour; the tests now present credentials.
+- `test_prod_hardening` had **three pre-existing failures** unrelated to this change: G-03 authenticated the backup-service restore endpoints back in `99c1ee9` but never updated the tests, which had been asserting against a 503 ever since. Closed here.
+- The compose edit for `docker-compose.sovereign.yml` initially landed in the wrong service. The new preflight compose-wiring check caught it, which is the reason that check exists.
+
+**Deployment consequence, made unforgettable rather than documented.** The gateway fails closed, so a deploy without `KAI_DASHBOARD_TOKEN` ships a dashboard that answers 503 everywhere. `make setup-service-token` now generates it, `make preflight` blocks without it, and all three compose profiles pass it through with preflight verifying the wiring.
+
+**Nothing is closed.** Rule 7 stands: `REMEDIATED` is evidence for a closure review, not the review. Findings formally closed by this entry: **0**.
+
+**Next:** `KAI-DASH-023` — the hard-coded global `keeper` identity. Authenticating the caller achieves little while every request still executes as `keeper` regardless of who asked.
+
+**Verification:** 1,684 tests across 22 suites, all green. 9/9 CI policy gates. 18 dashboard-touching test files all pass. Doc tables reconcile to 1,684.
+
+**Files produced:** `common/dashboard_auth.py`, `scripts/test_dashboard_auth.py`.
+**Files modified:** `dashboard/app.py` (179 routes), `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `scripts/preflight_deploy.py`, `scripts/test_preflight.py`, `scripts/setup_service_token.sh`, `scripts/test_dashboard.py`, `scripts/test_prod_hardening.py`, `scripts/security_fuzz_upload.py`, `scripts/test_audio_transcribe.py`, `scripts/test_thinking_pathways.py`, three compose profiles, `Makefile`, tracker/plan/README/STATUS/MAKEFILE_TARGETS.

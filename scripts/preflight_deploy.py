@@ -1,17 +1,21 @@
 """Deployment preflight for the Unified Hunter migration (UH tracker E-03).
 
-Eight services now fail closed on their side-effecting endpoints. That is
+Eight services now fail closed on their side-effecting endpoints, and the
+dashboard gateway fails closed on all 179 of its protected routes. That is
 the right default, but it means a deploy that forgets ``KAI_SERVICE_TOKEN``
-gets 503s from things like the database restore. This catches that before
-it ships rather than after.
+gets 503s from things like the database restore, and one that forgets
+``KAI_DASHBOARD_TOKEN`` ships a dashboard that answers nothing. This
+catches both before they ship rather than after.
 
 Checks, in order of consequence:
 
   1. ``KAI_SERVICE_TOKEN`` is set, and is not a placeholder or too short
-  2. ``KAI_ALLOW_UNAUTHENTICATED`` is not enabled outside development
-  3. every migration flag holds a recognised value
-  4. ``KAI_AUTONOMY_ENFORCE`` is only on when grants actually exist
-  5. the token is wired into every compose profile that needs it
+  2. ``KAI_DASHBOARD_TOKEN`` is set, distinct from the service token, and
+     names a known role
+  3. ``KAI_ALLOW_UNAUTHENTICATED`` is not enabled outside development
+  4. every migration flag holds a recognised value
+  5. ``KAI_AUTONOMY_ENFORCE`` is only on when grants actually exist
+  6. both tokens are wired into every compose profile that needs them
 
 Check 4 is the one worth understanding: enforcing scoped autonomy with no
 grants issued denies everything, so turning it on early is a self-inflicted
@@ -22,6 +26,7 @@ Exit codes: 0 ready, 1 blocking problem, 2 warnings only.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from pathlib import Path
@@ -96,6 +101,88 @@ def check_service_token() -> list[Finding]:
         "ok", "service_token",
         f"set, {len(token)} chars",
     ))
+    return findings
+
+
+def check_dashboard_credentials() -> list[Finding]:
+    """The dashboard gateway fails closed (Wave 1 Track A).
+
+    Without credentials it answers 503 on all 179 protected routes, so a
+    deploy that forgets them ships a dashboard that cannot be used at all.
+    """
+    principals = os.getenv("KAI_DASHBOARD_PRINCIPALS", "").strip()
+    token = os.getenv("KAI_DASHBOARD_TOKEN", "").strip()
+
+    if principals:
+        try:
+            entries = json.loads(principals)
+        except json.JSONDecodeError as exc:
+            return [Finding(
+                "block", "dashboard_creds",
+                f"KAI_DASHBOARD_PRINCIPALS is not valid JSON: {exc}",
+                "make setup-service-token, or fix the JSON",
+            )]
+        if not isinstance(entries, list) or not entries:
+            return [Finding(
+                "block", "dashboard_creds",
+                "KAI_DASHBOARD_PRINCIPALS must be a non-empty JSON list",
+                "make setup-service-token",
+            )]
+        weak = [e.get("identity", "?") for e in entries
+                if isinstance(e, dict)
+                and len(str(e.get("token", ""))) < MIN_TOKEN_LENGTH]
+        if weak:
+            return [Finding(
+                "block", "dashboard_creds",
+                f"principal token(s) shorter than {MIN_TOKEN_LENGTH} chars: "
+                f"{', '.join(weak)}",
+                "openssl rand -hex 32",
+            )]
+        return [Finding("ok", "dashboard_creds",
+                        f"{len(entries)} principal(s) configured")]
+
+    if not token:
+        return [Finding(
+            "block", "dashboard_creds",
+            "KAI_DASHBOARD_TOKEN is not set — the dashboard will return 503 "
+            "on every protected route",
+            "make setup-service-token",
+        )]
+
+    if token.lower() in PLACEHOLDER_TOKENS:
+        return [Finding(
+            "block", "dashboard_creds",
+            f"KAI_DASHBOARD_TOKEN is the placeholder value {token!r}",
+            "make setup-service-token",
+        )]
+
+    if len(token) < MIN_TOKEN_LENGTH:
+        return [Finding(
+            "block", "dashboard_creds",
+            f"KAI_DASHBOARD_TOKEN is {len(token)} chars; minimum is "
+            f"{MIN_TOKEN_LENGTH}",
+            "openssl rand -hex 32",
+        )]
+
+    findings = [Finding("ok", "dashboard_creds", f"set, {len(token)} chars")]
+
+    # A browser-held credential must not also authorise service-to-service
+    # calls: leaking one would then hand over the other.
+    if token == os.getenv("KAI_SERVICE_TOKEN", "").strip():
+        findings = [Finding(
+            "block", "dashboard_creds",
+            "KAI_DASHBOARD_TOKEN and KAI_SERVICE_TOKEN are the same value — "
+            "a browser-held credential must not also authorise service calls",
+            "make setup-service-token FORCE=--force",
+        )]
+
+    role = os.getenv("KAI_DASHBOARD_ROLE", "keeper").strip().lower()
+    if role not in {"viewer", "operator", "keeper"}:
+        findings.append(Finding(
+            "block", "dashboard_role",
+            f"KAI_DASHBOARD_ROLE={role!r} is not a known role",
+            "set viewer, operator or keeper",
+        ))
     return findings
 
 
@@ -224,6 +311,21 @@ def check_compose_wiring() -> list[Finding]:
             if "KAI_SERVICE_TOKEN" not in keys:
                 missing.append(service)
 
+        # The dashboard fails closed on its own credential, not the
+        # shared service token, so it is checked separately.
+        dashboard_env = services.get("dashboard", {}).get("environment") or {}
+        if isinstance(dashboard_env, list):
+            dashboard_keys = {e.split("=", 1)[0] for e in dashboard_env}
+        else:
+            dashboard_keys = set(dashboard_env)
+        if "dashboard" in services and "KAI_DASHBOARD_TOKEN" not in dashboard_keys:
+            findings.append(Finding(
+                "block", "compose_wiring",
+                f"{filename}: KAI_DASHBOARD_TOKEN missing from the dashboard "
+                f"service — every protected route would answer 503",
+                "add KAI_DASHBOARD_TOKEN to the dashboard environment",
+            ))
+
         if missing:
             findings.append(Finding(
                 "block", "compose_wiring",
@@ -241,6 +343,7 @@ def check_compose_wiring() -> list[Finding]:
 def run_all() -> list[Finding]:
     findings = []
     findings += check_service_token()
+    findings += check_dashboard_credentials()
     findings += check_unauthenticated_bypass()
     findings += check_flag_values()
     findings += check_autonomy_enforcement()

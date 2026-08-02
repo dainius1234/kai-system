@@ -130,15 +130,27 @@ class TestBackupService(unittest.TestCase):
         # Use a temp dir to avoid /data/backup permission errors
         cls._tmp = tempfile.mkdtemp(prefix="kai-backup-test-")
         cls._mod.BACKUP_DIR = cls._tmp
+        # Restore endpoints fail closed (G-03), so without a token every
+        # request answers 503 and the assertions below test nothing.
+        cls._token = "test-service-token"
+        cls._saved_token = os.environ.get("KAI_SERVICE_TOKEN")
+        os.environ["KAI_SERVICE_TOKEN"] = cls._token
 
     @classmethod
     def tearDownClass(cls):
         import shutil
         shutil.rmtree(cls._tmp, ignore_errors=True)
+        if cls._saved_token is None:
+            os.environ.pop("KAI_SERVICE_TOKEN", None)
+        else:
+            os.environ["KAI_SERVICE_TOKEN"] = cls._saved_token
 
     def _client(self):
         from fastapi.testclient import TestClient
-        return TestClient(self._app)
+        return TestClient(
+            self._app,
+            headers={"Authorization": f"Bearer {self._token}"},
+        )
 
     def test_health(self):
         resp = self._client().get("/health")

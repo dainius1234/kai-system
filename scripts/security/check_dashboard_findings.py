@@ -150,6 +150,15 @@ def _routes_matching(pattern: str, methods: Optional[set] = None) -> List[Route]
 
 MUTATING = {"post", "put", "delete", "patch"}
 
+# Routes that may legitimately serve without a principal: container
+# liveness probes, and the HTML shells the browser must load *before* it
+# can authenticate. Nothing mutating, and nothing that reads private
+# state, may ever appear here.
+PUBLIC_ROUTES = frozenset({
+    ("get", "/health"), ("get", "/metrics"),
+    ("get", "/ui"), ("get", "/app"), ("get", "/chat"), ("get", "/thinking"),
+})
+
 
 def _unauthed(routes: List[Route]) -> List[str]:
     return [f"{r.method.upper()} {r.path}" for r in routes if not r.authed]
@@ -227,15 +236,33 @@ def dash_001() -> Result:
                     published_publicly = True
 
     routes = _routes()
-    bad = [r for r in routes if not r.authed]
-    if published_publicly and bad:
-        return LIVE, f"published beyond loopback and {len(bad)} routes unauthenticated"
-    if bad:
-        return PARTIAL, (f"loopback-bound (P0 containment) but {len(bad)} of "
-                         f"{len(routes)} routes have no inbound auth")
+    open_routes = [r for r in routes if not r.authed]
+    # An unauthenticated route is only acceptable if it is on the declared
+    # public list. The list is held here rather than read from the app so
+    # that widening it is a deliberate edit to the checker, not a silent
+    # side effect of editing the app.
+    unexpected = [f"{r.method.upper()} {r.path}" for r in open_routes
+                  if (r.method, r.path) not in PUBLIC_ROUTES]
+    mutating_open = [f"{r.method.upper()} {r.path}" for r in open_routes
+                     if r.method in MUTATING]
+
+    if mutating_open:
+        return LIVE, (f"{len(mutating_open)} mutating route(s) unauthenticated: "
+                      f"{', '.join(mutating_open[:3])}")
+    if published_publicly and unexpected:
+        return LIVE, (f"published beyond loopback and {len(unexpected)} "
+                      f"undeclared route(s) unauthenticated")
+    if unexpected:
+        return PARTIAL, (f"loopback-bound (P0 containment) but {len(unexpected)} "
+                         f"route(s) outside the public list have no auth: "
+                         f"{', '.join(unexpected[:3])}")
     if published_publicly:
         return PARTIAL, "all routes authenticated but still published beyond loopback"
-    return REMEDIATED, f"loopback-bound and all {len(routes)} routes authenticated"
+    return REMEDIATED, (
+        f"loopback-bound; {len(routes) - len(open_routes)} of {len(routes)} routes "
+        f"authenticated, the other {len(open_routes)} are declared public "
+        f"(liveness and HTML shells, none mutating)"
+    )
 
 
 def dash_002() -> Result:
@@ -273,10 +300,57 @@ def dash_012() -> Result:
 
 
 def dash_018() -> Result:
-    """No route-specific scopes or least-privilege backend credentials."""
-    if "DashboardScope" in _text() or "required_scope" in _text():
-        return REMEDIATED, "per-route scope model present"
-    return LIVE, "no route-specific authorisation scopes; every route has full backend reach"
+    """No route-specific scopes or least-privilege backend credentials.
+
+    A scope model that assigns the *same* scope everywhere is not least
+    privilege — it is a single shared authority wearing a scope's name.
+    So this checks the distribution, not merely the presence.
+    """
+    scopes = _declared_scopes()
+    if not scopes:
+        return LIVE, ("no route-specific authorisation scopes; "
+                      "every route has full backend reach")
+    if len(scopes) == 1:
+        return LIVE, (f"every route declares the same scope "
+                      f"({next(iter(scopes))}); that is not least privilege")
+
+    unscoped = [f"{r.method.upper()} {r.path}" for r in _routes()
+                if r.authed and not _route_scope(r)]
+    if unscoped:
+        return PARTIAL, (f"{len(scopes)} distinct scopes, but {len(unscoped)} "
+                         f"authenticated route(s) declare none, e.g. {unscoped[0]}")
+    return REMEDIATED, (f"{len(scopes)} distinct scopes declared across routes: "
+                        f"{', '.join(sorted(scopes))}")
+
+
+_SCOPE_RX = re.compile(r"Scope\.([A-Z_]+)")
+
+
+def _route_scope(route: Route) -> Optional[str]:
+    """The scope a route declares, if any."""
+    tree = _tree()
+    if tree is None:
+        return None
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if node.name != route.handler:
+            continue
+        for dec in node.decorator_list:
+            match = _SCOPE_RX.search(ast.unparse(dec))
+            if match:
+                return match.group(1)
+        try:
+            match = _SCOPE_RX.search(ast.unparse(node.args))
+        except Exception:
+            return None
+        if match:
+            return match.group(1)
+    return None
+
+
+def _declared_scopes() -> set:
+    return {s for s in (_route_scope(r) for r in _routes()) if s}
 
 
 # ── Track D — failure semantics ──────────────────────────────────────

@@ -25,6 +25,7 @@ from scripts.preflight_deploy import (
     check_compose_wiring,
     check_flag_values,
     check_service_token,
+    check_dashboard_credentials,
     check_unauthenticated_bypass,
     run_all,
 )
@@ -69,6 +70,7 @@ class _Env:
 
 
 GOOD_TOKEN = "a" * 64
+DASHBOARD_TOKEN = "d" * 64  # distinct from GOOD_TOKEN by construction
 
 
 def _levels(findings, check_name):
@@ -108,6 +110,101 @@ def test_good_token_passes():
         findings = check_service_token()
         check("good_token_ok", findings[0].level == "ok")
 
+
+
+# ═══════════════════════════════════════════════════════════════════
+# 1b. Dashboard credentials (Wave 1 Track A)
+# ═══════════════════════════════════════════════════════════════════
+
+def test_missing_dashboard_token_blocks():
+    with _Env(KAI_DASHBOARD_TOKEN=None, KAI_DASHBOARD_PRINCIPALS=None):
+        findings = check_dashboard_credentials()
+        check("missing_dashboard_token_blocks", findings[0].level == "block")
+        check("missing_dashboard_token_explains_503", "503" in findings[0].message)
+        check("missing_dashboard_token_offers_fix", bool(findings[0].fix))
+
+
+def test_short_dashboard_token_blocks():
+    with _Env(KAI_DASHBOARD_TOKEN="a" * (MIN_TOKEN_LENGTH - 1),
+              KAI_DASHBOARD_PRINCIPALS=None):
+        findings = check_dashboard_credentials()
+        check("short_dashboard_token_blocks", findings[0].level == "block")
+
+
+def test_placeholder_dashboard_token_blocks():
+    for placeholder in ("changeme", "secret", "test"):
+        with _Env(KAI_DASHBOARD_TOKEN=placeholder, KAI_DASHBOARD_PRINCIPALS=None):
+            findings = check_dashboard_credentials()
+            check(f"placeholder_dashboard_{placeholder}_blocks",
+                  findings[0].level == "block", placeholder)
+
+
+def test_dashboard_token_must_differ_from_service_token():
+    """A browser-held credential must not also authorise service calls."""
+    with _Env(KAI_DASHBOARD_TOKEN=GOOD_TOKEN, KAI_SERVICE_TOKEN=GOOD_TOKEN,
+              KAI_DASHBOARD_PRINCIPALS=None):
+        findings = check_dashboard_credentials()
+        check("shared_token_blocks", findings[0].level == "block")
+        check("shared_token_explains_why",
+              "service calls" in findings[0].message, findings[0].message)
+
+
+def test_distinct_dashboard_token_passes():
+    with _Env(KAI_DASHBOARD_TOKEN="b" * 64, KAI_SERVICE_TOKEN=GOOD_TOKEN,
+              KAI_DASHBOARD_PRINCIPALS=None, KAI_DASHBOARD_ROLE=None):
+        findings = check_dashboard_credentials()
+        check("distinct_dashboard_token_ok", findings[0].level == "ok",
+              findings[0].message)
+
+
+def test_unknown_dashboard_role_blocks():
+    with _Env(KAI_DASHBOARD_TOKEN="b" * 64, KAI_SERVICE_TOKEN=GOOD_TOKEN,
+              KAI_DASHBOARD_PRINCIPALS=None, KAI_DASHBOARD_ROLE="superuser"):
+        findings = check_dashboard_credentials()
+        check("unknown_role_blocks",
+              any(f.level == "block" for f in findings),
+              "; ".join(f.message for f in findings))
+
+
+def test_malformed_principals_block():
+    for bad, label in [("{not json", "invalid JSON"), ("[]", "empty list"),
+                       ('{"identity": "a"}', "not a list")]:
+        with _Env(KAI_DASHBOARD_PRINCIPALS=bad, KAI_DASHBOARD_TOKEN=None):
+            findings = check_dashboard_credentials()
+            check(f"principals_{label}_blocks", findings[0].level == "block", label)
+
+
+def test_weak_principal_token_blocks():
+    weak = '[{"identity": "a", "role": "keeper", "token": "short"}]'
+    with _Env(KAI_DASHBOARD_PRINCIPALS=weak, KAI_DASHBOARD_TOKEN=None):
+        findings = check_dashboard_credentials()
+        check("weak_principal_token_blocks", findings[0].level == "block")
+
+
+def test_valid_principals_pass():
+    good = '[{"identity": "a", "role": "keeper", "token": "%s"}]' % ("c" * 64)
+    with _Env(KAI_DASHBOARD_PRINCIPALS=good, KAI_DASHBOARD_TOKEN=None):
+        findings = check_dashboard_credentials()
+        check("valid_principals_ok", findings[0].level == "ok", findings[0].message)
+
+
+def test_compose_wires_dashboard_credentials():
+    """Every compose profile must pass the dashboard its credential."""
+    import yaml
+    from scripts.preflight_deploy import COMPOSE_FILES, REPO
+    for filename in COMPOSE_FILES:
+        path = REPO / filename
+        if not path.exists():
+            continue
+        document = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        services = document.get("services", {}) or {}
+        if "dashboard" not in services:
+            continue
+        env = services["dashboard"].get("environment") or {}
+        keys = ({e.split("=", 1)[0] for e in env} if isinstance(env, list)
+                else set(env))
+        check(f"{filename}_wires_dashboard_token",
+              "KAI_DASHBOARD_TOKEN" in keys, filename)
 
 # ═══════════════════════════════════════════════════════════════════
 # 2. Auth bypass
@@ -176,7 +273,9 @@ def test_invalid_flag_values_warn():
 def test_invalid_flag_is_warn_not_block():
     """An unrecognised value falls back safely, so it must not block."""
     with _Env(KAI_PERCEPTION_MODE="nonsense", KAI_SERVICE_TOKEN=GOOD_TOKEN,
-              KAI_ALLOW_UNAUTHENTICATED=None, KAI_AUTONOMY_ENFORCE=None):
+              KAI_ALLOW_UNAUTHENTICATED=None, KAI_AUTONOMY_ENFORCE=None,
+              KAI_DASHBOARD_TOKEN=DASHBOARD_TOKEN,
+              KAI_DASHBOARD_PRINCIPALS=None, KAI_DASHBOARD_ROLE=None):
         findings = run_all()
         blocks = [f for f in findings if f.level == "block"]
         check("bad_flag_does_not_block", not blocks, str([f.check for f in blocks]))
@@ -205,7 +304,8 @@ def test_every_protected_service_listed():
 def test_clean_config_is_ready():
     with _Env(KAI_SERVICE_TOKEN=GOOD_TOKEN, KAI_ALLOW_UNAUTHENTICATED=None,
               KAI_AUTONOMY_ENFORCE=None, KAI_PERCEPTION_MODE=None,
-              KAI_CORTEX_SOURCE=None):
+              KAI_CORTEX_SOURCE=None, KAI_DASHBOARD_TOKEN=DASHBOARD_TOKEN,
+              KAI_DASHBOARD_PRINCIPALS=None, KAI_DASHBOARD_ROLE=None):
         findings = run_all()
         blocks = [f for f in findings if f.level == "block"]
         warns = [f for f in findings if f.level == "warn"]
@@ -217,10 +317,12 @@ def test_clean_config_is_ready():
 
 def test_worst_config_blocks_everything():
     with _Env(KAI_SERVICE_TOKEN=None, KAI_ALLOW_UNAUTHENTICATED="true",
-              KAI_AUTONOMY_ENFORCE="true"):
+              KAI_AUTONOMY_ENFORCE="true", KAI_DASHBOARD_TOKEN=None,
+              KAI_DASHBOARD_PRINCIPALS=None):
         findings = run_all()
         blocked = {f.check for f in findings if f.level == "block"}
         check("worst_blocks_token", "service_token" in blocked)
+        check("worst_blocks_dashboard_creds", "dashboard_creds" in blocked)
         check("worst_blocks_bypass", "auth_bypass" in blocked)
         check("worst_blocks_enforcement", "autonomy_enforce" in blocked)
 
@@ -240,6 +342,16 @@ if __name__ == "__main__":
     test_placeholder_token_blocks()
     test_short_token_blocks()
     test_good_token_passes()
+    test_missing_dashboard_token_blocks()
+    test_short_dashboard_token_blocks()
+    test_placeholder_dashboard_token_blocks()
+    test_dashboard_token_must_differ_from_service_token()
+    test_distinct_dashboard_token_passes()
+    test_unknown_dashboard_role_blocks()
+    test_malformed_principals_block()
+    test_weak_principal_token_blocks()
+    test_valid_principals_pass()
+    test_compose_wires_dashboard_credentials()
     test_bypass_enabled_blocks()
     test_bypass_disabled_passes()
     test_enforcement_without_grants_blocks()

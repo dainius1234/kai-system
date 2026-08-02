@@ -44,22 +44,47 @@ evidence for a future closure review, not the review itself.
 
 ---
 
-## 2. Revalidated baseline
+## 2. Revalidated baseline, and where it stands now
 
-Produced by `scripts/security/check_dashboard_findings.py` against `cb3f142`:
+Produced by `scripts/security/check_dashboard_findings.py`:
 
-| Status | Count | Meaning |
-|---|---|---|
-| **LIVE** | 54 | the condition still holds |
-| **PARTIAL** | 2 | materially reduced, not resolved |
-| **REMEDIATED** | 3 | condition no longer holds (pending closure review) |
-| **MANUAL** | 37 | not statically decidable; named for human review |
-| **Total** | **96** | coverage self-audit enforces this |
+| Status | At `cb3f142` (baseline) | Now (Track A done) | Meaning |
+|---|---|---|---|
+| **LIVE** | 54 | **22** | the condition still holds |
+| **PARTIAL** | 2 | **0** | materially reduced, not resolved |
+| **REMEDIATED** | 3 | **37** | condition no longer holds (pending closure review) |
+| **MANUAL** | 37 | **37** | not statically decidable; named for human review |
+| **Total** | 96 | **96** | coverage self-audit enforces this |
+
+Of the 22 still LIVE: **0 CRITICAL, 12 HIGH, 10 MEDIUM.** Every one of the
+10 CRITICALs is remediated.
 
 **Route surface:** 185 routes — 119 GET, 61 POST, 5 DELETE.
-**66 mutating routes, all 66 currently unauthenticated.**
+**66 mutating routes, all 66 now authenticated.** The 6 that serve without
+a principal are the declared public list: `/health`, `/metrics` (liveness)
+and the four HTML shells the browser must load *before* it can
+authenticate. None is mutating, and the list lives in the checker, so
+widening it is a deliberate edit rather than a side effect.
 
-### What has already changed since `7adab8d`
+### Per-track status
+
+| Track | LIVE | REMEDIATED | MANUAL | State |
+|---|---|---|---|---|
+| **A** Inbound identity | 0 | 5 | 0 | **Done** |
+| **B** Mutating authority | 0 | 20 | 1 | **Done** bar one manual review |
+| **C** Sensitive reads | 1 | 10 | 1 | `DASH-023` (hard-coded `keeper`) outstanding |
+| **D** Failure semantics | 9 | 1 | 3 | Not started |
+| **E** Bounds | 3 | 0 | 9 | Not started |
+| **F** Media trust | 2 | 0 | 3 | Not started |
+| **G** Disclosure | 1 | 0 | 4 | Not started |
+| **H** Fan-out | 3 | 0 | 6 | Not started |
+| **I** Hygiene | 3 | 1 | 10 | Not started |
+
+### What the baseline revalidation found (historical — before Track A)
+
+This is the snapshot that shaped the plan. It is kept as the record of why
+the tracks are ordered the way they are; for current state, read the table
+above or run `make dashboard-findings`.
 
 | Finding | Was | Now | Evidence |
 |---|---|---|---|
@@ -69,8 +94,9 @@ Produced by `scripts/security/check_dashboard_findings.py` against `cb3f142`:
 | `KAI-DASH-001` | CRITICAL — open privileged gateway | **PARTIAL** | All three compose files bind `127.0.0.1:8080:8080` (P0 containment) — `full.yml:197`, `minimal.yml:279`, `sovereign.yml:276`. Loopback only, but still zero inbound auth |
 | `KAI-DASH-012` | HIGH — token lacks delegation evidence | **PARTIAL** | The static token is gone, but with no inbound principal there is nothing to delegate *from*. Re-opens when backend credentials return |
 
-**Everything else is LIVE or MANUAL.** In particular **8 of the 10
-CRITICALs remain fully live** — `KAI-DASH-003` through `KAI-DASH-010`.
+At that point everything else was LIVE or MANUAL, and **8 of the 10
+CRITICALs were fully live** — `KAI-DASH-003` through `KAI-DASH-010`. Track A
+closed all eight, and moved `001` and `012` from PARTIAL to REMEDIATED.
 
 ### Standing operator directive — checked on every run
 
@@ -148,19 +174,26 @@ stack, reachable by anyone who can reach the port.
    principal with role and session ownership. A shared bearer token alone
    satisfies 001 but leaves 011 and 012 live. Build the principal now.
 
-### Definition of done for Track A
+### Definition of done for Track A — all met
 
-- [ ] `common/dashboard_auth.py` with a fail-closed `require_dashboard_auth`
+- [x] `common/dashboard_auth.py` with a fail-closed `require_dashboard_auth`
       returning a `DashboardPrincipal` (identity, role, session)
-- [ ] Scope model so each route declares the authority it needs (018)
-- [ ] Every route declares auth or is explicitly listed as public
-      (`/health`, `/metrics` liveness only)
-- [ ] Test suite proving: missing config → 503; absent header → 401; wrong
-      token → 403; valid → principal populated; **and** that an
-      unauthenticated route cannot be added without the gate noticing
-- [ ] `make dashboard-findings` shows Track A at zero LIVE
-- [ ] Architecture rule 6 (unprotected side-effect route) still passes
-- [ ] `DECISIONS.md` entry recording the principal model chosen and why
+- [x] Scope model so each route declares the authority it needs (018) —
+      5 scopes, 3 roles, distribution verified rather than merely present
+- [x] Every route declares auth or is on the explicit public list
+- [x] `make test-dashboard-auth` — 89 tests: missing config → 503; absent
+      header → 401; wrong token → 401; insufficient role → 403; valid →
+      principal populated. Prefix and suffix token variants are refused,
+      a duplicate token across identities fails closed, and a session
+      header carries into the audit trail without conferring authority
+- [x] `make dashboard-findings` shows Track A at zero LIVE
+- [x] Architecture rule 6 still passes; 15/15 rules accounted for
+- [x] `DECISIONS.md` D142 records the principal model and why
+
+**Roles:** `viewer` reads operational status only; `operator` adds
+sensitive reads and routine writes; `keeper` alone may rewrite identity
+state or drive external action. An operator who can rewrite `SOUL.md` can
+rewrite what the system is, so that stays with the keeper.
 
 ---
 
@@ -235,10 +268,32 @@ resolved.
 
 ## 8. Current position
 
-- **Track A:** not started — next authorised step
-- **Tracks B–I:** blocked or not started
-- **Findings formally closed:** **0** (Rule 7 — closure is a separate
-  evidence-backed register action)
+- **Track A: complete.** `common/dashboard_auth.py` gives every route a
+  verified principal with identity, role and session, and a declared
+  scope. 179 of 185 routes are authenticated; the other 6 are the
+  declared public list. 89 tests.
+- **Track B: complete** bar `KAI-DASH-014`, which needs a per-backend
+  idempotency review rather than a code change here.
+- **Track C: one finding outstanding** — `KAI-DASH-023`, the hard-coded
+  global `keeper` identity. Authenticating the caller does not help while
+  every request still executes as `keeper`, so this is the next step.
+- **Tracks D–I:** not started.
+- **Findings formally closed: 0** (Rule 7 — closure is a separate
+  evidence-backed register action).
+
+### Deployment consequence
+
+The gateway now fails closed, so `KAI_DASHBOARD_TOKEN` must be provisioned
+or the dashboard answers 503 on every protected route. Three things enforce
+that rather than leaving it to memory:
+
+- `make setup-service-token` generates it alongside `KAI_SERVICE_TOKEN`,
+  as a **separate** secret — a browser-held credential must not also
+  authorise service-to-service calls
+- `make preflight` blocks a deploy that is missing it, uses a placeholder,
+  reuses the service token, or names an unknown role
+- all three compose profiles pass it to the dashboard service, and
+  preflight verifies that wiring
 
 Progress is read from `make dashboard-findings`, not from this section.
 This file records the plan; the tool records the state.

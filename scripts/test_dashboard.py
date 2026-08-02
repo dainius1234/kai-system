@@ -1,10 +1,23 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import sys
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+
+# Credentials must exist before any request: the gateway fails closed, so
+# without them every route answers 503 and the tests below would be
+# asserting against a refusal rather than against the handler.
+TOKEN = "test-dashboard-token"
+os.environ["KAI_DASHBOARD_TOKEN"] = TOKEN
+os.environ["KAI_DASHBOARD_IDENTITY"] = "test-operator"
+os.environ["KAI_DASHBOARD_ROLE"] = "keeper"
+os.environ.pop("KAI_DASHBOARD_PRINCIPALS", None)
+os.environ.pop("KAI_ALLOW_UNAUTHENTICATED", None)
+
+AUTH = {"Authorization": f"Bearer {TOKEN}"}
 
 # import dashboard app
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,6 +36,7 @@ client = TestClient(mod.app)
 
 
 def test_health():
+    """Liveness stays public — orchestrators probe it before credentials exist."""
     resp = client.get("/health")
     assert resp.status_code == 200
     assert "status" in resp.json()
@@ -34,7 +48,7 @@ def test_index_minimal():
         return {}
     mod.fetch_status = fake_status  # type: ignore
     try:
-        resp = client.get("/")
+        resp = client.get("/", headers=AUTH)
     except Exception:
         # external dependencies may be unreachable; nothing to check here
         return
@@ -42,6 +56,57 @@ def test_index_minimal():
     if resp.status_code == 200:
         jsonp = resp.json()
         assert "service" in jsonp and jsonp["service"] == "dashboard"
+
+
+# ── Inbound authentication (KAI-DASH-001, 011, 018) ──────────────────
+
+def test_anonymous_request_is_refused():
+    """The gateway no longer answers to anonymous callers."""
+    for method, path in [
+        ("get", "/"),
+        ("post", "/api/soul"),
+        ("post", "/api/browser/navigate"),
+        ("get", "/api/memories"),
+        ("get", "/api/broker/balance"),
+    ]:
+        resp = getattr(client, method)(path)
+        assert resp.status_code == 401, f"{method.upper()} {path} → {resp.status_code}"
+
+
+def test_bad_token_is_refused():
+    resp = client.post("/api/soul", headers={"Authorization": "Bearer wrong"})
+    assert resp.status_code == 401
+
+
+def test_public_routes_stay_reachable():
+    """The browser must load the shell before it can authenticate."""
+    for path in ("/health", "/metrics", "/ui", "/app", "/chat", "/thinking"):
+        resp = client.get(path)
+        assert resp.status_code == 200, f"{path} → {resp.status_code}"
+
+
+def test_viewer_cannot_reach_privileged_routes():
+    """Least privilege is enforced per route, not merely declared."""
+    os.environ["KAI_DASHBOARD_ROLE"] = "viewer"
+    try:
+        denied = client.post("/api/browser/navigate", headers=AUTH, json={})
+        sensitive = client.get("/api/broker/balance", headers=AUTH)
+        allowed = client.get("/api/weather/health", headers=AUTH)
+    finally:
+        os.environ["KAI_DASHBOARD_ROLE"] = "keeper"
+    assert denied.status_code == 403, denied.status_code
+    assert sensitive.status_code == 403, sensitive.status_code
+    assert allowed.status_code in (200, 500, 503), allowed.status_code
+
+
+def test_unconfigured_gateway_fails_closed():
+    saved = os.environ.pop("KAI_DASHBOARD_TOKEN")
+    try:
+        resp = client.get("/api/memories", headers=AUTH)
+    finally:
+        os.environ["KAI_DASHBOARD_TOKEN"] = saved
+    assert resp.status_code == 503, resp.status_code
+    assert "fails closed" in resp.json()["detail"]
 
 
 # ── /api/upload tests ────────────────────────────────────────────────
@@ -57,14 +122,15 @@ def _tiny_png() -> bytes:
 
 def test_upload_no_file():
     """POST /api/upload with no file → 422 (FastAPI validation)."""
-    resp = client.post("/api/upload")
+    resp = client.post("/api/upload", headers=AUTH)
     assert resp.status_code == 422
 
 
 def test_upload_too_large():
     """POST /api/upload with a file exceeding 10 MB → 413."""
     big = b"x" * (10 * 1024 * 1024 + 1)
-    resp = client.post("/api/upload", files={"file": ("big.png", big, "image/png")})
+    resp = client.post("/api/upload", headers=AUTH,
+                       files={"file": ("big.png", big, "image/png")})
     assert resp.status_code == 413
 
 
@@ -85,6 +151,7 @@ def test_upload_image_ocr_success(monkeypatch=None):
     with mock.patch.object(httpx.AsyncClient, "post", new=fake_post):
         resp = client.post(
             "/api/upload",
+            headers=AUTH,
             files={"file": ("test.png", _tiny_png(), "image/png")},
         )
     assert resp.status_code == 200
@@ -102,6 +169,7 @@ def test_upload_service_unreachable():
     with mock.patch.object(httpx.AsyncClient, "post", new=fail):
         resp = client.post(
             "/api/upload",
+            headers=AUTH,
             files={"file": ("test.png", _tiny_png(), "image/png")},
         )
     assert resp.status_code == 503
@@ -110,6 +178,11 @@ def test_upload_service_unreachable():
 if __name__ == "__main__":
     test_health()
     test_index_minimal()
+    test_anonymous_request_is_refused()
+    test_bad_token_is_refused()
+    test_public_routes_stay_reachable()
+    test_viewer_cannot_reach_privileged_routes()
+    test_unconfigured_gateway_fails_closed()
     test_upload_no_file()
     test_upload_too_large()
     test_upload_image_ocr_success()

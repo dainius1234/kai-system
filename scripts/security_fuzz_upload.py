@@ -30,7 +30,16 @@ _mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_mod)
 app = _mod.app
 
-client = TestClient(app)
+# The dashboard gateway fails closed (Wave 1 Track A), so tests must
+# present credentials or every route answers 503 instead of exercising
+# the handler under test.
+import os as _os
+_os.environ.setdefault("KAI_DASHBOARD_TOKEN", "test-dashboard-token")
+_os.environ.setdefault("KAI_DASHBOARD_IDENTITY", "test-operator")
+_os.environ.setdefault("KAI_DASHBOARD_ROLE", "keeper")
+_DASH_AUTH = {"Authorization": f"Bearer {_os.environ['KAI_DASHBOARD_TOKEN']}"}
+
+client = TestClient(app, headers=_DASH_AUTH)
 
 _MAX_BYTES = 10 * 1024 * 1024  # must match _UPLOAD_MAX_BYTES in dashboard/app.py
 
