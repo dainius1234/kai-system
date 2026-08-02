@@ -3209,3 +3209,34 @@ This means `KAI_PERCEPTION_MODE` and `KAI_CORTEX_SOURCE` controlled code paths t
 
 **Files produced:** `common/dashboard_auth.py`, `scripts/test_dashboard_auth.py`.
 **Files modified:** `dashboard/app.py` (179 routes), `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `scripts/preflight_deploy.py`, `scripts/test_preflight.py`, `scripts/setup_service_token.sh`, `scripts/test_dashboard.py`, `scripts/test_prod_hardening.py`, `scripts/security_fuzz_upload.py`, `scripts/test_audio_transcribe.py`, `scripts/test_thinking_pathways.py`, three compose profiles, `Makefile`, tracker/plan/README/STATUS/MAKEFILE_TARGETS.
+
+---
+
+## D143 — 2026-08-02 — W1-DASH-D01: Closing the Gateway Also Closed It to the UI
+
+**Context:** The operator observed that remediation would surface findings the original audit never saw, and asked that the plan account for them. Checking what Track A might have broken that it did not own found one immediately — a regression I had introduced and not noticed.
+
+**Finding.** Track A authenticated 179 routes. The shipped UI makes **121 `fetch()` calls across four HTML pages, none of which carried a credential**, and opens an `EventSource` on `/api/events`, which cannot send headers at all. The gateway was closed to anonymous callers and, in the same stroke, to its only real client. `make test-dashboard` passed throughout, because it exercises the API directly and never loads the UI.
+
+**Decisions:**
+
+1. **A register for discovered findings, deliberately separate.** The tracker held exactly `KAI-DASH-001`…`096` and its coverage audit failed on any other id, so a new defect had two bad homes: untracked, or weakening the audit. `DISCOVERED` uses `KAI-DASH-D##` ids and is reported and counted **alongside** the 96, never inside them. A register that lets new work dilute the original count is worse than no register, so the audit rejects a malformed id and rejects any collision with the audit table, and `evaluate()` excludes discovered findings by default so every existing caller keeps measuring the original 96.
+
+2. **One credential shim, not 121 edits.** `dashboard/static/auth.js` wraps `window.fetch` and is loaded before any other script on every page that calls the API.
+
+3. **Same-origin only.** A blanket wrapper attaching the token to every request would hand the operator's full authority to any third-party URL the page fetches — and these pages do load scripts from jsdelivr. The shim checks origin before attaching. This is the single most important line in the file, and the mutation test for it is the one that matters.
+
+4. **`sessionStorage`, not `localStorage`.** The token is the operator's whole authority over the stack. Session scope costs one re-entry per session and removes a persistent theft target. With no CSP on these pages yet (`KAI-DASH-088`, Track I), script injection would reach either store, so the shorter lifetime is the only real mitigation available today.
+
+5. **401 re-prompts, 403 does not.** A 401 means the credential is wrong, so the shim clears it, asks again and retries exactly once. A 403 means the credential is valid but the role is too narrow — asking for the password again would be a lie, so it is surfaced to the caller unchanged and the valid token is kept.
+
+6. **SSE over `fetch`, not a cookie.** `EventSource` cannot send headers. The alternatives were a token in the query string (credentials into URLs and logs) or a cookie (which browsers attach automatically on cross-site requests, reintroducing exactly the CSRF exposure D142 recorded as avoided). Instead the stream is read over `fetch` and re-emits the same `message`/`error` events, so callers keep the `EventSource` shape they already use.
+
+**A flaw in my own test suite, found by mutation testing.** Three mutations were injected to prove the 42 tests could fail. Leaking the token to third parties and dropping the header were both caught. **Making the shim re-prompt on 403 produced no output at all and exit code 0.** The unresolved prompt promise emptied node's event loop, the process exited silently, and a silent exit reads exactly like a pass on CI. The suite now carries a watchdog and a completion flag, so a hang and an early exit both fail loudly. This is the same class as D140 and D141 — a check that appears to pass while checking nothing — arriving for the third time, in the test harness itself rather than the code.
+
+**Verification:** 1,738 tests across 23 suites, all green. 9/9 CI gates. All three mutations now fail the suite. `KAI-DASH-D01` reports REMEDIATED, and its check flips through all four states (no shim → LIVE, page not wired → LIVE, raw `EventSource` → PARTIAL, both wired → REMEDIATED).
+
+**Nothing is closed.** Rule 7. Findings formally closed by this entry: **0**.
+
+**Files produced:** `dashboard/static/auth.js`, `scripts/test_dashboard_ui_auth.js`.
+**Files modified:** `dashboard/static/app.html`, `chat.html`, `index.html`, `thinking.html`, `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `Makefile`, tracker/plan/README/STATUS/MAKEFILE_TARGETS.

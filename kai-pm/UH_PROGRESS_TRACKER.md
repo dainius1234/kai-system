@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-02 (eighth pass — Wave 1 Track A: dashboard inbound identity)
+**Last updated:** 2026-08-02 (ninth pass — Track A credential shim for the UI; discovered-findings register)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -54,9 +54,10 @@
 | E-03 Deployment preflight | ✅ Done | `8d2ea09` | `make test-preflight` | 57 |
 | W-01 Modules wired into the running app | ✅ Done | this commit | `make test-invariant-guards` | (guards) |
 | A-01 Architecture dependency CI gate — all 15 rules | ✅ Done | `cb3f142` | `make test-architecture-rules` | 61 |
-| W1-DASH Dashboard finding tracker (96 findings) | ✅ Done | `dff418d` | `make test-dashboard-findings` | 81 |
-| W1-DASH-A Dashboard inbound identity | ✅ Done | this commit | `make test-dashboard-auth` | 89 |
-| | | | **Total** | **1,684** |
+| W1-DASH Dashboard finding tracker (96 findings) | ✅ Done | `dff418d` | `make test-dashboard-findings` | 93 |
+| W1-DASH-A Dashboard inbound identity | ✅ Done | `9fb0e26` | `make test-dashboard-auth` | 89 |
+| W1-DASH-D01 Browser credential shim | ✅ Done | this commit | `make test-dashboard-ui-auth` | 42 |
+| | | | **Total** | **1,738** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
@@ -270,13 +271,25 @@ the caller does not help while every request still executes as `keeper`.
 | Command | Purpose |
 |---|---|
 | `make dashboard-findings` | Live status of all 96 findings |
-| `make test-dashboard-findings` | 81 tests proving the tracker can fail |
+| `make test-dashboard-findings` | 93 tests proving the tracker can fail |
 | `make test-dashboard-auth` | 89 tests on the auth module itself |
+| `make test-dashboard-ui-auth` | 42 tests on the browser credential shim |
 
 **Deployment:** the gateway fails closed. `KAI_DASHBOARD_TOKEN` must be set
 or every protected route answers 503. `make setup-service-token` generates
 it as a **separate** secret from `KAI_SERVICE_TOKEN`, `make preflight`
 blocks a deploy without it, and all three compose profiles pass it through.
+
+### Findings discovered during remediation
+
+Remediation surfaces defects the original audit never saw. They are held in
+a **separate register** (`KAI-DASH-D##`) that is reported and counted but
+can never stand in for one of the 96 — a register that lets new work dilute
+the original count is worse than none.
+
+| ID | Severity | Finding | Status |
+|---|---|---|---|
+| `KAI-DASH-D01` | HIGH | Track A closed the gateway to the UI as well: 121 `fetch()` calls carried no credential, and `EventSource` cannot send headers at all | **REMEDIATED** |
 
 **Findings formally closed: 0.** Programme Rule 7 — closure is a separate
 evidence-backed register action, and `REMEDIATED` here is evidence for that

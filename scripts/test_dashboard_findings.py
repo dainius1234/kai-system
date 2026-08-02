@@ -455,6 +455,85 @@ def test_manual_placeholders_can_never_report_closed():
           tagged == reported, f"tagged={tagged} reported={reported}")
 
 
+
+# ── Discovered-findings register ─────────────────────────────────────
+
+def test_discovered_register_is_separate_from_the_96():
+    """New findings must never stand in for one of the original 96."""
+    check("discovered register does not overlap the audit table",
+          not (set(dash.DISCOVERED) & set(dash.FINDINGS)),
+          str(set(dash.DISCOVERED) & set(dash.FINDINGS)))
+    check("audit table is still exactly 96",
+          len(dash.FINDINGS) == dash.TOTAL_DASH_FINDINGS, str(len(dash.FINDINGS)))
+    check("evaluate() excludes discovered findings by default",
+          len(dash.evaluate()) == dash.TOTAL_DASH_FINDINGS)
+    check("evaluate(include_discovered=True) adds them",
+          len(dash.evaluate(include_discovered=True))
+          == dash.TOTAL_DASH_FINDINGS + len(dash.DISCOVERED))
+
+
+def test_discovered_ids_must_be_well_formed():
+    dash.DISCOVERED["KAI-DASH-BOGUS"] = dash.Finding(
+        "HIGH", "A", "bad id", dash.manual("synthetic"))
+    try:
+        gaps = dash.coverage_gaps()
+        check("register rejects a malformed discovered id",
+              any("KAI-DASH-BOGUS" in g for g in gaps), str(gaps))
+    finally:
+        del dash.DISCOVERED["KAI-DASH-BOGUS"]
+    check("register clean after malformed-id test", dash.coverage_gaps() == [])
+
+
+def test_discovered_cannot_collide_with_an_audit_finding():
+    original = dash.FINDINGS["KAI-DASH-001"]
+    dash.DISCOVERED["KAI-DASH-001"] = original
+    try:
+        gaps = dash.coverage_gaps()
+        check("register rejects an id that collides with the audit table",
+              any("collides" in g for g in gaps), str(gaps))
+    finally:
+        del dash.DISCOVERED["KAI-DASH-001"]
+
+
+def test_d01_flips_on_the_ui_shim():
+    """D01 is LIVE until the UI actually carries credentials."""
+    import tempfile, pathlib
+    real = dash.REPO
+    with tempfile.TemporaryDirectory() as tmp:
+        static = pathlib.Path(tmp) / "dashboard" / "static"
+        static.mkdir(parents=True)
+        page = static / "app.html"
+        page.write_text("<script>fetch('/api/x')</script>", encoding="utf-8")
+        dash.REPO = pathlib.Path(tmp)
+        try:
+            no_shim, d1 = dash.dash_d01()
+            (static / "auth.js").write_text("// shim", encoding="utf-8")
+            unwired, d2 = dash.dash_d01()
+            page.write_text(
+                '<script src="/static/auth.js"></script>'
+                "<script>fetch('/api/x'); new EventSource('/api/events')</script>",
+                encoding="utf-8")
+            raw_sse, d3 = dash.dash_d01()
+            page.write_text(
+                '<script src="/static/auth.js"></script>'
+                "<script>fetch('/api/x'); KaiAuth.eventStream('/api/events')</script>",
+                encoding="utf-8")
+            fixed, d4 = dash.dash_d01()
+        finally:
+            dash.REPO = real
+    check("D01 LIVE with no shim present", no_shim == dash.LIVE, d1)
+    check("D01 LIVE when a page does not load the shim", unwired == dash.LIVE, d2)
+    check("D01 PARTIAL while raw EventSource remains", raw_sse == dash.PARTIAL, d3)
+    check("D01 REMEDIATED once fetch and SSE both authenticate",
+          fixed == dash.REMEDIATED, d4)
+
+
+def test_d01_is_remediated_on_the_real_tree():
+    status, detail = dash.dash_d01()
+    check("the shipped UI carries credentials",
+          status == dash.REMEDIATED, f"{status}: {detail}")
+
+
 def run() -> None:
     test_coverage_clean_on_real_table()
     test_coverage_detects_missing_finding()
@@ -488,6 +567,11 @@ def run() -> None:
     test_manual_findings_name_what_to_review()
     test_no_finding_is_remediated_without_evidence()
     test_manual_placeholders_can_never_report_closed()
+    test_discovered_register_is_separate_from_the_96()
+    test_discovered_ids_must_be_well_formed()
+    test_discovered_cannot_collide_with_an_audit_finding()
+    test_d01_flips_on_the_ui_shim()
+    test_d01_is_remediated_on_the_real_tree()
 
 
 if __name__ == "__main__":

@@ -808,6 +808,49 @@ def _rel(path: Path) -> str:
         return str(path)
 
 
+def dash_d01() -> Result:
+    """The browser UI must send the credentials the gateway now demands.
+
+    Track A authenticated 179 routes. The shipped UI makes 121 `fetch()`
+    calls and opens an `EventSource`, none of which carried a credential,
+    so closing the gateway also closed it to its only real client. Found
+    while checking whether Track A had broken anything it did not own.
+    """
+    static = REPO / "dashboard" / "static"
+    if not (static / "auth.js").exists():
+        return LIVE, "no dashboard/static/auth.js; the UI sends no credentials"
+
+    unwired = []
+    for page in sorted(static.glob("*.html")):
+        text = page.read_text(encoding="utf-8")
+        if "fetch(" not in text and "EventSource" not in text:
+            continue
+        if "/static/auth.js" not in text:
+            unwired.append(page.name)
+
+    if unwired:
+        return LIVE, f"pages calling the API without auth.js: {', '.join(unwired)}"
+
+    # EventSource cannot send headers at all, so a page still using it is
+    # unauthenticated however well the fetch path is wired.
+    raw_sse = [p.name for p in sorted(static.glob("*.html"))
+               if "new EventSource(" in p.read_text(encoding="utf-8")]
+    if raw_sse:
+        return PARTIAL, (f"fetch is wired but raw EventSource remains in "
+                         f"{', '.join(raw_sse)}; it cannot send credentials")
+    return REMEDIATED, "UI attaches credentials on fetch and streams SSE authenticated"
+
+
+# Findings discovered while remediating, which the original audit never
+# saw. Numbered separately so they can never stand in for one of the 96.
+DISCOVERED_ID_RX = re.compile(r"KAI-DASH-D\d{2}")
+
+DISCOVERED: Dict[str, "Finding"] = {
+    "KAI-DASH-D01": Finding(
+        H, "A", "UI sends no credentials (regression from Track A)", dash_d01),
+}
+
+
 def operator_directive() -> Result:
     """Standing operator directive: broker secrets stay in broker-bridge.
 
@@ -842,6 +885,11 @@ def coverage_gaps() -> List[str]:
     The architecture-rules gate once reported a clean pass while silently
     omitting 6 of its 15 rules. A coverage table that does not audit its
     own coverage is not evidence, so this runs on every invocation.
+
+    ``DISCOVERED`` is audited separately and on purpose. Remediation turns
+    up defects the original audit never saw, and they need somewhere to
+    live that cannot quietly stand in for one of the 96 — a register that
+    lets new work dilute the original count is worse than no register.
     """
     expected = {f"KAI-DASH-{n:03d}" for n in range(1, TOTAL_DASH_FINDINGS + 1)}
     missing = sorted(expected - set(FINDINGS))
@@ -851,12 +899,29 @@ def coverage_gaps() -> List[str]:
     for fid, finding in sorted(FINDINGS.items()):
         if finding.track not in TRACK_NAMES:
             gaps.append(f"{fid}: unknown track {finding.track!r}")
+
+    for fid, finding in sorted(DISCOVERED.items()):
+        if not DISCOVERED_ID_RX.fullmatch(fid):
+            gaps.append(f"discovered finding {fid} must match KAI-DASH-D##")
+        if fid in FINDINGS:
+            gaps.append(f"discovered finding {fid} collides with an audit finding")
+        if finding.track not in TRACK_NAMES:
+            gaps.append(f"{fid}: unknown track {finding.track!r}")
     return gaps
 
 
-def evaluate() -> List[Dict[str, str]]:
+def evaluate(include_discovered: bool = False) -> List[Dict[str, str]]:
+    """Evaluate the audit table, optionally with the discovered register.
+
+    Discovered findings are excluded by default so that every existing
+    caller keeps measuring the original 96 and nothing else. Counts for
+    the two sets are reported separately for the same reason.
+    """
+    table = dict(FINDINGS)
+    if include_discovered:
+        table.update(DISCOVERED)
     results = []
-    for fid, finding in sorted(FINDINGS.items()):
+    for fid, finding in sorted(table.items()):
         try:
             status, detail = finding.check()
         except Exception as exc:
@@ -882,10 +947,14 @@ def main() -> int:
 
     gaps = coverage_gaps()
     results = evaluate()
+    discovered = [r for r in evaluate(include_discovered=True)
+                  if r["finding"] in DISCOVERED]
     directive_status, directive_detail = operator_directive()
 
     if args.track:
-        results = [r for r in results if r["track"] == args.track.upper()]
+        track = args.track.upper()
+        results = [r for r in results if r["track"] == track]
+        discovered = [r for r in discovered if r["track"] == track]
 
     counts = {s: sum(1 for r in results if r["status"] == s)
               for s in (LIVE, PARTIAL, REMEDIATED, MANUAL)}
@@ -898,6 +967,11 @@ def main() -> int:
             "coverage_gaps": gaps,
             "results": results,
             "counts": counts,
+            "discovered": discovered,
+            "discovered_counts": {
+                s: sum(1 for r in discovered if r["status"] == s)
+                for s in (LIVE, PARTIAL, REMEDIATED, MANUAL)
+            },
             "operator_directive": {
                 "status": directive_status, "detail": directive_detail,
             },
@@ -908,7 +982,9 @@ def main() -> int:
                 "unauthenticated": sum(1 for r in routes if not r.authed),
             },
         }, indent=2))
-        return 1 if gaps or (args.gate and counts[LIVE]) else 0
+        live_total = counts[LIVE] + sum(
+            1 for r in discovered if r["status"] == LIVE)
+        return 1 if gaps or (args.gate and live_total) else 0
 
     print("Dashboard finding revalidation — Wave 1\n")
     for track in sorted({r["track"] for r in results}):
@@ -918,12 +994,25 @@ def main() -> int:
             print(f"      └─ {r['detail']}")
         print()
 
+    if discovered:
+        print("── Discovered during remediation (not in the original 96) "
+              + "─" * 12)
+        for r in discovered:
+            print(f"  {r['status']:<11}{r['severity']:<9}{r['finding']}  {r['title']}")
+            print(f"      └─ {r['detail']}")
+        print()
+
     print(f"OPERATOR DIRECTIVE — broker credentials never reach the dashboard")
     print(f"  {directive_status}: {directive_detail}\n")
 
     print(f"  LIVE={counts[LIVE]}  PARTIAL={counts[PARTIAL]}  "
           f"REMEDIATED={counts[REMEDIATED]}  MANUAL={counts[MANUAL]}"
-          f"   (of {len(results)} reported)")
+          f"   (of {len(results)} audit findings reported)")
+    if discovered:
+        d_live = sum(1 for r in discovered if r["status"] == LIVE)
+        print(f"  Discovered during remediation: {len(discovered)} "
+              f"({d_live} LIVE). Counted separately — they never reduce "
+              f"the {TOTAL_DASH_FINDINGS}.")
     print(f"  Routes: {len(routes)} total, {len(mutating)} mutating, "
           f"{len(unauth_mutating)} mutating without auth")
 
@@ -937,8 +1026,10 @@ def main() -> int:
           f"({counts[MANUAL]} need manual review).")
     print("  This tool reports state; it does not close findings (Rule 7).")
 
-    if args.gate and counts[LIVE]:
-        print(f"\n  GATE FAILED: {counts[LIVE]} findings still LIVE.")
+    live_total = counts[LIVE] + sum(1 for r in discovered if r["status"] == LIVE)
+    if args.gate and live_total:
+        print(f"\n  GATE FAILED: {live_total} findings still LIVE "
+              f"({counts[LIVE]} audit, {live_total - counts[LIVE]} discovered).")
         return 1
     return 0
 
