@@ -131,30 +131,17 @@ class MarketDataFeed:
             result.update(fetched)
         return result
 
-    def mark_positions(self) -> Dict[str, float]:
-        """Mark all open paper positions to market.
+    def prices_for_positions(self, symbols: List[str]) -> Dict[str, float]:
+        """Prices for the symbols an open-position set refers to.
 
-        Convenience wrapper: fetches prices for all open symbols, then
-        calls paper_trader.mark_to_market(). Returns {position_id: unrealised_pnl}.
-        Trust: OBSERVER — prices are read-only.
+        This provider supplies prices and nothing else.  Composing them
+        with the paper trader lives in the orchestration layer — a
+        Perception Provider that reached into an Actuator would violate
+        roadmap §15 rule 1, which is what `mark_positions()` used to do.
         """
-        try:
-            try:
-                from paper_trader import get_paper_trader
-            except ImportError:
-                from agentic.paper_trader import get_paper_trader  # type: ignore
-            trader = get_paper_trader()
-            positions = trader.get_positions()
-            if not positions:
-                return {}
-            symbols = list({p["symbol"] for p in positions})
-            prices = self.get_prices(symbols)
-            if not prices:
-                return {}
-            return trader.mark_to_market(prices)
-        except Exception as exc:
-            logger.debug("mark_positions failed (fail-open): %s", exc)
+        if not symbols:
             return {}
+        return self.get_prices(symbols)
 
     def status(self) -> Dict[str, Any]:
         """Return cache summary."""

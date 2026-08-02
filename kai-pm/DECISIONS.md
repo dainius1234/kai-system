@@ -3078,3 +3078,34 @@ This means `KAI_PERCEPTION_MODE` and `KAI_CORTEX_SOURCE` controlled code paths t
 **Verification:** 1,433 tests across 19 suites. 8/8 CI gates. Docs current, and the tracker's per-suite rows sum to the stated total. Live: spine active inside the app, all four `/uh/*` endpoints working, full paper-trade slice returning `confirmed`. No regressions in agentic-routes (170), browser-agent, notify, monitor, telegram, executor or vault-sync.
 
 **Files modified:** `agentic/app.py` (spine runtime, Cortex routing, startup loop, four endpoints), `common/vertical_slice/paper_trade_slice.py` (assessors), `scripts/test_invariant_guards.py` (wiring guards), `scripts/test_service_auth.py`.
+
+---
+
+## D139 — 2026-08-02 — A-01: Architecture Dependency Rules Enforced in CI (§15)
+
+**Context:** With the UH workstream's own gaps closed, the next audit item is the Wave 1 requirement "add architecture dependency rules prohibiting provider/planner imports or calls into actuators". Roadmap §15 closes with "A CI dependency rule should enforce forbidden imports/calls, supported by the side-effect registry and architecture tests." No such rule existed. The fifteen invariants the entire UH design rests on were enforced by convention.
+
+**Findings on first run — two real violations:**
+
+1. **`agentic/market_data.py` imported `paper_trader`.** A Perception Provider reaching into an Actuator, which §15 rule 1 forbids outright. The method `mark_positions()` fetched prices then called `trader.mark_to_market()` — a composition living inside the provider. Fixed by making the provider price-only (`prices_for_positions()`) and moving the composition to `agentic.app._mark_paper_positions()`, where orchestrating a provider and an actuator legitimately belongs.
+
+2. **`agentic/adversary.py` POSTs to a verifier** — flagged, then determined to be a **false positive**. A POST to a read-only verification service is a request body, not a side effect. Rather than allowlisting the file, rule 2 was made **registry-backed**: it now derives side-effecting service names and paths from `MUTATING_ENDPOINTS` and flags only calls that target them. That is what §15 actually asks for, and it matters — a gate that flags legitimate code trains people to ignore it.
+
+**Decisions:**
+
+1. **Module roles are declared, not inferred.** The six-role taxonomy comes from the UH-0 evidence manifest §6. Inferring a module's role from its contents is exactly the ambiguity these rules exist to remove, so the checker states the classification and a test asserts the roles are disjoint — a module in two roles is the dual-role bug UH-0 flagged in `strategy_engine`.
+
+2. **Unenforceable rules are declared, not omitted.** Rules 9, 13 and 15 need runtime behaviour and cannot be decided from source. They are printed as `n/a — not statically checkable` on every run. An unenforced rule that looks enforced is worse than an acknowledged gap.
+
+3. **The gate must be able to fail.** `scripts/test_architecture_rules.py` injects real violations into the tree and asserts each rule catches its own. This was not academic: the **first negative test appeared to pass while the injected violation had never been written to the file** — `alpha_signals.py` contains no `import os`, so the string replacement was a silent no-op and the test was checking nothing. The permanent version parses the file after injection to prove the violation is real before asserting detection.
+
+4. **Rule 3 double-reported.** `API_SECRET` matched inside `BINANCE_API_SECRET`, reporting one occurrence twice. Now word-bounded.
+
+**Wired in as the 9th CI gate** — `.github/workflows/policy-checks.yml`, `make policy-check`, and `make test-uh`.
+
+**Verification:** 1,465 tests across 20 suites. 9/9 CI policy gates. Docs current, tracker rows sum to the stated total. `agentic-routes` 170/170; `test_market_data` 25/25 after its four `mark_positions` tests were relocated to the new provider API, plus a new test asserting the §15 rule-1 fix stays fixed.
+
+**Next in the audit:** the larger Wave 1 items remain untouched — P1 human principal authentication, unique workload identity and authenticated transport, explicit narrow delegation, Tool Gate decision rebuild, Dashboard confused-deputy removal, and legacy shared-HMAC/body-token/cosign removal.
+
+**Files produced:** `scripts/security/check_architecture_rules.py`, `scripts/test_architecture_rules.py`.
+**Files modified:** `agentic/market_data.py`, `agentic/app.py`, `scripts/test_market_data.py`, `.github/workflows/policy-checks.yml`, `Makefile`, tracker/README/STATUS/MAKEFILE_TARGETS.

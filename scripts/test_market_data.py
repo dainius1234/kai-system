@@ -216,48 +216,48 @@ def test_status_fresh_flag_false_when_stale():
     assert s["quotes"][0]["fresh"] is False
 
 
-# ── mark_positions ────────────────────────────────────────────────────────────
+# ── prices_for_positions ──────────────────────────────────────────────────────
+#
+# `mark_positions()` used to live here and imported the paper trader, which
+# made this Perception Provider reach into an Actuator — roadmap §15 rule 1.
+# The composition now lives in agentic.app._mark_paper_positions(); this
+# provider supplies prices and nothing else.
 
-def test_mark_positions_no_positions():
+def test_prices_for_positions_returns_prices():
     f = _feed()
-    mock_trader = MagicMock()
-    mock_trader.get_positions.return_value = []
-    with patch("paper_trader.get_paper_trader", return_value=mock_trader):
-        result = f.mark_positions()
-    assert result == {}
+    with patch("httpx.Client", return_value=_mock_coingecko({"bitcoin": 51000.0})):
+        result = f.prices_for_positions(["BTCUSD"])
+    assert result.get("BTCUSD") == 51000.0
 
 
-def test_mark_positions_calls_mark_to_market():
+def test_prices_for_positions_empty_symbols():
     f = _feed()
-    mock_trader = MagicMock()
-    mock_trader.get_positions.return_value = [
-        {"position_id": "p1", "symbol": "BTCUSD", "side": "long"}
-    ]
-    mock_trader.mark_to_market.return_value = {"p1": 1000.0}
-    with patch("paper_trader.get_paper_trader", return_value=mock_trader):
-        with patch("httpx.Client", return_value=_mock_coingecko({"bitcoin": 51000.0})):
-            result = f.mark_positions()
-    assert result == {"p1": 1000.0}
-    mock_trader.mark_to_market.assert_called_once()
+    assert f.prices_for_positions([]) == {}
 
 
-def test_mark_positions_fail_open():
+def test_prices_for_positions_unknown_symbol():
     f = _feed()
-    with patch("paper_trader.get_paper_trader", side_effect=RuntimeError("unavailable")):
-        result = f.mark_positions()
-    assert result == {}
+    with patch("httpx.Client", return_value=_mock_coingecko({})):
+        assert f.prices_for_positions(["FAKEUSD"]) == {}
 
 
-def test_mark_positions_no_prices_returns_empty():
-    f = _feed()
-    mock_trader = MagicMock()
-    mock_trader.get_positions.return_value = [
-        {"position_id": "p1", "symbol": "FAKEUSD"}
-    ]
-    with patch("paper_trader.get_paper_trader", return_value=mock_trader):
-        result = f.mark_positions()
-    assert result == {}
-    mock_trader.mark_to_market.assert_not_called()
+def test_provider_does_not_import_actuator():
+    """The §15 rule-1 fix must stay fixed."""
+    import ast
+    from pathlib import Path
+
+    source = Path(__file__).resolve().parent.parent / "agentic" / "market_data.py"
+    tree = ast.parse(source.read_text(encoding="utf-8"))
+    imported = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported.update(a.name.split(".")[0] for a in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported.add(node.module.split(".")[-1])
+    assert "paper_trader" not in imported, (
+        "market_data (Perception Provider) must not import paper_trader "
+        "(Actuator) — roadmap §15 rule 1"
+    )
 
 
 # ── Singleton ─────────────────────────────────────────────────────────────────

@@ -47,3 +47,5 @@ jobs:
 
       - name: Compose drift detection
         run: python scripts/security/check_compose_drift.py
+      - name: Architecture dependency rules
+        run: python scripts/security/check_architecture_rules.py

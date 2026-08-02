@@ -1177,7 +1177,7 @@ async def market_data_mark() -> Dict[str, Any]:
     """D127: Mark all open paper positions to market. Returns {position_id: unrealised_pnl}."""
     if not is_enabled("MARKET_DATA"):
         raise HTTPException(status_code=503, detail="FF_MARKET_DATA is disabled")
-    result = await asyncio.to_thread(get_market_data().mark_positions)
+    result = await asyncio.to_thread(_mark_paper_positions)
     return {"marked": result}
 
 
@@ -1659,6 +1659,29 @@ _SENSORY_SKIP = frozenset({
     "not configured", "loading", "not yet polled", "stub mode",
     "no upcoming", "no battery", "not supported",
 })
+
+
+def _mark_paper_positions() -> Dict[str, float]:
+    """Mark open paper positions to market.
+
+    Composes a Perception Provider (prices) with an Actuator (the paper
+    ledger).  That composition belongs here, in the orchestration layer:
+    roadmap §15 rule 1 forbids a provider importing an actuator, so
+    `market_data` supplies prices only and never reaches across.
+    """
+    try:
+        trader = get_paper_trader()
+        positions = trader.get_positions()
+        if not positions:
+            return {}
+        symbols = list({p["symbol"] for p in positions})
+        prices = get_market_data().prices_for_positions(symbols)
+        if not prices:
+            return {}
+        return trader.mark_to_market(prices)
+    except Exception as exc:
+        logger.debug("mark paper positions failed (non-critical): %s", exc)
+        return {}
 
 
 async def _sense_world() -> str:
@@ -2241,9 +2264,9 @@ async def _proactive_observer() -> None:
 
             if is_enabled("MARKET_DATA"):
                 try:
-                    await asyncio.to_thread(get_market_data().mark_positions)
+                    await asyncio.to_thread(_mark_paper_positions)
                 except Exception as exc:
-                    logger.debug("Market data mark_positions failed (non-critical): %s", exc)
+                    logger.debug("Paper position marking failed (non-critical): %s", exc)
 
             _last_world_snapshot = snapshot
         except Exception as exc:

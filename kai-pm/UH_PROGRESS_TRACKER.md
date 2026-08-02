@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-02 (fifth pass — modules wired into the running system)
+**Last updated:** 2026-08-02 (sixth pass — §15 architecture rules enforced in CI)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -53,7 +53,8 @@
 | E-02 Mutating handlers live-verified | ✅ Done | this commit | `make verify-live-mutating` | 9 invoked, 5 skipped |
 | E-03 Deployment preflight | ✅ Done | this commit | `make test-preflight` | 37 |
 | W-01 Modules wired into the running app | ✅ Done | this commit | `make test-invariant-guards` | (guards) |
-| | | | **Total** | **1,433** |
+| A-01 Architecture dependency CI gate (§15) | ✅ Done | this commit | `make test-architecture-rules` | 32 |
+| | | | **Total** | **1,465** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against

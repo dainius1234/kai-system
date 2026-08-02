@@ -164,7 +164,7 @@ Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
 
 | Target | Status | What it covers |
 |---|---|---|
-| `test-uh` | ✓ | **Aggregate — run this one.** All 19 suites, 1,433 tests |
+| `test-uh` | ✓ | **Aggregate — run this one.** All 20 suites, 1,465 tests |
 | `test-contracts` | ✓ | UH-1 frozen canonical contracts (126) |
 | `test-perception-spine` | ✓ | UH-2 shadow-mode event ingress (166) |
 | `test-world-state` | ✓ | UH-3 reducers and immutable snapshots (71) |
