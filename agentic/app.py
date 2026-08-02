@@ -46,7 +46,7 @@ from causal_world_model import get_causal_graph, CausalEdge, get_surprise_detect
 from global_workspace import get_global_workspace, WorkspaceBid
 from moral_core import get_ohana_core
 from cortex import get_cortex
-from trust_integration import gate_autonomous_action, get_trust_status, record_chat_response
+from trust_integration import gate_autonomous_action, get_legacy_bridge, get_trust_status, record_chat_response
 from model_council import get_model_council
 from web_scout import fetch as web_fetch, search as web_search, summarize as web_summarize
 from service_watchdog import get_watchdog
@@ -567,6 +567,156 @@ async def prune_skills_endpoint(request: Request) -> Dict[str, Any]:
     max_age = body.get("max_age_days", 30)
     pruned = prune_stale_skills(max_age)
     return {"status": "ok", "pruned": pruned, "pruned_count": len(pruned)}
+
+
+# ── Unified Hunter observability and erasure ─────────────────────────────────
+
+@app.get("/uh/status")
+async def uh_status() -> Dict[str, Any]:
+    """Live state of the Unified Hunter migration.
+
+    Read-only. Surfaces what the flags are actually doing so a cutover can
+    be watched rather than guessed at.
+    """
+    from common.perception_spine.cortex_source import cortex_source
+    from common.autonomy.legacy_bridge import enforcing
+
+    spine, world = get_uh_runtime()
+    status: Dict[str, Any] = {
+        "perception": {
+            "available": spine is not None,
+            "mode": spine.mode if spine else "unavailable",
+            "events_journalled": spine.journal.count() if spine else 0,
+            "events_reduced": spine.reduced_count if spine else 0,
+            "reduce_failures": spine.reduce_failures if spine else 0,
+        },
+        "cortex_source": cortex_source(),
+        "autonomy": {"enforcing": enforcing()},
+        "world_state": {
+            "active_claims": len(world.active_claims()) if world else 0,
+            "conflicts": len(world.conflicts()) if world else 0,
+        },
+    }
+
+    try:
+        bridge = get_legacy_bridge()
+        if bridge is not None:
+            status["autonomy"]["migration_report"] = bridge.migration_report()
+    except Exception as exc:
+        status["autonomy"]["migration_report_error"] = str(exc)
+
+    return status
+
+
+@app.get("/uh/actuators")
+async def uh_actuators() -> Dict[str, Any]:
+    """Actuator migration state across all tiers."""
+    try:
+        from common.contracts.base import Principal
+        from common.actuator_registry import build_catalog
+        from common.actuator_registry.legacy_verification import open_legacy_paths
+
+        catalog = build_catalog(Principal(identity="kai", role="system"))
+        report = catalog.migration_report()
+        report["legacy_paths_still_open"] = open_legacy_paths()
+        return report
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"registry unavailable: {exc}")
+
+
+class PaperTradeSliceBody(BaseModel):
+    symbol: str
+    price: float
+    volume_24h: float = 0.0
+    change_24h: float = 0.0
+    auto_approve: bool = False
+
+
+@app.post("/uh/paper-trade",
+          dependencies=[Depends(require_service_auth("paper_trade_slice"))])
+async def uh_paper_trade(body: PaperTradeSliceBody) -> Dict[str, Any]:
+    """Run the UH-6 vertical slice: perception → … → verified outcome.
+
+    Simulated throughout — no capital moves.  Authenticated because it
+    exercises the full action pipeline, and because a trade endpoint left
+    open is a trade endpoint someone will call.
+    """
+    try:
+        from common.contracts.base import Principal, RiskTier
+        from common.perception_spine.journal import EventJournal
+        from common.vertical_slice.paper_trade_slice import PaperTradeSlice
+
+        principal = Principal(identity="kai", role="system")
+        journal = EventJournal(
+            os.getenv("PAPER_SLICE_JOURNAL", "/tmp/kai-paper-slice.jsonl")
+        )
+        slice_runner = PaperTradeSlice(journal=journal, principal=principal)
+        result = slice_runner.execute_slice(
+            market_data={
+                "symbol": body.symbol,
+                "price": body.price,
+                "volume_24h": body.volume_24h,
+                "change_24h": body.change_24h,
+            },
+            risk_tier=RiskTier.ACT_SUPERVISED,
+            auto_approve=body.auto_approve,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"slice failed: {exc}")
+
+    return {
+        "stage": result.stage.value,
+        "success": result.success,
+        "reason": result.reason,
+        "proposal_id": result.proposal.id if result.proposal else None,
+        "capability_id": result.capability.id if result.capability else None,
+        "outcome_verdict": (
+            result.outcome.verdict.value if result.outcome else None
+        ),
+    }
+
+
+class ErasureRequestBody(BaseModel):
+    subject_identity: str
+    reason: str
+    requested_by: str
+
+
+@app.post("/uh/erasure",
+          dependencies=[Depends(require_service_auth("subject_erasure"))])
+async def uh_erasure(body: ErasureRequestBody) -> Dict[str, Any]:
+    """Erase every trace of one subject across all data layers.
+
+    Authenticated because it is irreversible.  Audit references survive as
+    tombstones carrying a digest of what was removed, never the content.
+    """
+    try:
+        from common.contracts.base import Principal
+        from common.erasure.handlers import build_full_coordinator
+
+        spine, world = get_uh_runtime()
+        coordinator = build_full_coordinator(
+            principal=Principal(identity="kai", role="system"),
+            journal=spine.journal if spine else None,
+            world_state=world,
+        )
+        receipt = coordinator.erase(
+            subject_identity=body.subject_identity,
+            reason=body.reason,
+            requested_by=body.requested_by,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"erasure failed: {exc}")
+
+    return {
+        "request_id": receipt.request_id,
+        "subject": receipt.subject_identity,
+        "status": receipt.status.value,
+        "verified": receipt.verified,
+        "total_erased": receipt.total_erased,
+        "total_tombstones": receipt.total_tombstones,
+        "residue": receipt.verification_residue,
+    }
 
 
 @app.get("/introspect/capabilities")
@@ -1620,6 +1770,18 @@ async def _sense_world() -> str:
                     if cs.get("bridge_active") and cs.get("bridge_note"):
                         cortex_lines.append(f"[Cortex] {cs['bridge_note']}")
                     lines = cortex_lines + lines
+                # UH O-02: when KAI_CORTEX_SOURCE=world_state, Cortex reads the
+                # perception spine's world state instead of this polled document.
+                # resolve_cortex_state() returns `cs` unchanged in the default
+                # poll mode, and falls back to it if the world state is empty.
+                try:
+                    from common.perception_spine.cortex_source import (
+                        resolve_cortex_state,
+                    )
+                    _, _world = get_uh_runtime()
+                    cs = resolve_cortex_state(cs, store=_world)
+                except Exception as exc:
+                    logger.debug("cortex source resolution failed: %s", exc)
                 # Feed cognitive module so it can bid to GlobalWorkspace
                 get_cortex().feed_service_state(cs)
     except Exception:
@@ -3208,6 +3370,56 @@ _restore_breakers()
 
 # ── C9: Model warm-up — non-blocking async task on startup ──────────
 
+
+# ── Unified Hunter runtime wiring (UH tracker O-01/O-02) ─────────────────────
+# The perception spine and world state are constructed lazily and only do
+# anything when KAI_PERCEPTION_MODE=active.  In the default shadow mode the
+# runner still validates and journals events, but nothing downstream consumes
+# them, so existing behaviour is unchanged.
+_UH_SPINE = None
+_UH_WORLD_STATE = None
+_UH_INIT_FAILED = False
+
+
+def get_uh_runtime():
+    """The perception spine and world state, or (None, None) if unavailable.
+
+    Returning None is safe: every call site falls back to the legacy path,
+    so a fault here cannot take perception offline.
+    """
+    global _UH_SPINE, _UH_WORLD_STATE, _UH_INIT_FAILED
+    if _UH_INIT_FAILED:
+        return None, None
+    if _UH_SPINE is not None:
+        return _UH_SPINE, _UH_WORLD_STATE
+
+    try:
+        import sys as _sys
+        _repo = Path(__file__).resolve().parent.parent
+        if str(_repo) not in _sys.path:
+            _sys.path.insert(0, str(_repo))
+        from common.contracts.base import Principal
+        from common.perception_spine.shadow import ShadowPerceptionRunner
+        from common.world_state.snapshot_store import SnapshotStore
+
+        principal = Principal(identity="kai", role="system")
+        _UH_WORLD_STATE = SnapshotStore(principal=principal)
+        _UH_SPINE = ShadowPerceptionRunner(
+            journal_path=os.getenv(
+                "PERCEPTION_JOURNAL_PATH", "/tmp/kai-perception-journal.jsonl"
+            ),
+            world_state=_UH_WORLD_STATE,
+            refresh_interval=int(os.getenv("PERCEPTION_INTERVAL_SECONDS", "60")),
+        )
+        logger.info("UH perception spine ready (mode=%s)", _UH_SPINE.mode)
+    except Exception as exc:
+        _UH_INIT_FAILED = True
+        logger.warning("UH perception spine unavailable: %s", exc)
+        return None, None
+
+    return _UH_SPINE, _UH_WORLD_STATE
+
+
 @app.on_event("startup")
 async def _startup_warmup() -> None:
     """Schedule LLM warm-up and proactive observer as background tasks."""
@@ -3222,6 +3434,13 @@ async def _startup_warmup() -> None:
     # D90: load swarm reputation at startup
     if is_enabled("SWARM"):
         load_reputation()
+    # UH O-01: perception spine poll loop. Runs in shadow mode by default —
+    # it validates and journals sensor events without feeding anything
+    # downstream until KAI_PERCEPTION_MODE=active.
+    _spine, _ = get_uh_runtime()
+    if _spine is not None:
+        asyncio.create_task(_spine.run_loop())
+        logger.info("UH perception spine loop started (mode=%s)", _spine.mode)
 
 
 @app.on_event("shutdown")

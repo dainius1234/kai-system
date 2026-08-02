@@ -194,6 +194,10 @@ AUDITED_ENDPOINTS = [
     ("output/notify/app.py", "post", "/notify"),
     ("agentic/app.py", "post", "/checkpoint/{checkpoint_id}/restore"),
     ("agentic/app.py", "delete", "/checkpoint/{checkpoint_id}"),
+    ("agentic/app.py", "post", "/uh/erasure"),
+    ("agentic/app.py", "post", "/uh/paper-trade"),
+    ("vault-sync/app.py", "post", "/export"),
+    ("executor/app.py", "post", "/execute"),
 ]
 
 
@@ -253,7 +257,10 @@ def test_protection_count():
         "telegram-bot/app.py": 1,
         "monitor-service/app.py": 6,
         "output/notify/app.py": 1,
-        "agentic/app.py": 2,
+        "vault-sync/app.py": 1,
+        "executor/app.py": 1,
+        # 2 checkpoint routes + /uh/erasure + /uh/paper-trade
+        "agentic/app.py": 4,
     }
     for rel, want in expected.items():
         text = (REPO / rel).read_text(encoding="utf-8")
@@ -265,7 +272,8 @@ def test_protection_count():
 def test_services_import_helper():
     for rel in ["backup-service/app.py", "browser-agent/app.py",
                 "telegram-bot/app.py", "monitor-service/app.py",
-                "output/notify/app.py", "agentic/app.py"]:
+                "output/notify/app.py", "agentic/app.py",
+                "vault-sync/app.py", "executor/app.py"]:
         text = (REPO / rel).read_text(encoding="utf-8")
         check(f"imports_helper_{rel.split('/')[0]}",
               "from common.service_auth import require_service_auth" in text)

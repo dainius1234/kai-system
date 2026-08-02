@@ -284,6 +284,108 @@ def test_payload_bounds_present():
           check_payload_bounds(deep) is not None)
 
 
+# ── 5. UH modules must be wired into the running system ─────────────
+
+# Module → a running-code file that must reference it.  Tests calling a
+# module directly prove it works; they do not prove anything *uses* it.
+REQUIRED_WIRING = {
+    "common.perception_spine.shadow": ["agentic/app.py"],
+    "common.perception_spine.cortex_source": ["agentic/app.py"],
+    "common.actuator_registry": ["agentic/app.py"],
+    "common.erasure": ["agentic/app.py"],
+    "common.vertical_slice": ["agentic/app.py"],
+    "common.autonomy.legacy_bridge": ["agentic/trust_integration.py"],
+    "common.service_auth": [
+        "agentic/app.py", "browser-agent/app.py", "monitor-service/app.py",
+        "backup-service/app.py", "telegram-bot/app.py", "output/notify/app.py",
+        "vault-sync/app.py", "executor/app.py",
+    ],
+    "common.policy_bridge.assessment": [
+        "common/vertical_slice/paper_trade_slice.py"
+    ],
+}
+
+
+def test_uh_modules_are_wired_in():
+    """Every UH module must be referenced by code that actually runs.
+
+    A module with passing tests and no caller is dead weight that reads
+    as delivered. This caught six orphaned modules once already — the
+    flags existed, the code existed, and nothing invoked either.
+    """
+    orphaned = []
+    for module, callers in REQUIRED_WIRING.items():
+        leaf = module.split(".")[-1]
+        found = False
+        for caller in callers:
+            path = REPO / caller
+            if not path.exists():
+                continue
+            text = path.read_text(encoding="utf-8")
+            if module in text or f"common.{leaf}" in text or leaf in text:
+                found = True
+                break
+        if not found:
+            orphaned.append(f"{module} (expected in {callers[0]})")
+
+    check("no_orphaned_uh_modules", not orphaned, "; ".join(orphaned))
+
+
+def test_uh_endpoints_exist():
+    """The observability and erasure endpoints must stay registered."""
+    import ast
+
+    text = (REPO / "agentic/app.py").read_text(encoding="utf-8")
+    tree = ast.parse(text)
+    routes = set()
+    for node in ast.walk(tree):
+        for dec in getattr(node, "decorator_list", []):
+            if isinstance(dec, ast.Call) and isinstance(dec.func, ast.Attribute):
+                if dec.args and isinstance(dec.args[0], ast.Constant):
+                    routes.add((dec.func.attr, dec.args[0].value))
+
+    for method, route in [
+        ("get", "/uh/status"),
+        ("get", "/uh/actuators"),
+        ("post", "/uh/erasure"),
+        ("post", "/uh/paper-trade"),
+    ]:
+        check(f"endpoint_{route}", (method, route) in routes)
+
+
+def test_destructive_uh_endpoints_authenticated():
+    """/uh/erasure and /uh/paper-trade must require a service token."""
+    import ast
+
+    tree = ast.parse((REPO / "agentic/app.py").read_text(encoding="utf-8"))
+    for target in ("/uh/erasure", "/uh/paper-trade"):
+        guarded = False
+        for node in ast.walk(tree):
+            for dec in getattr(node, "decorator_list", []):
+                if not (isinstance(dec, ast.Call)
+                        and isinstance(dec.func, ast.Attribute)):
+                    continue
+                if not dec.args or not isinstance(dec.args[0], ast.Constant):
+                    continue
+                if dec.args[0].value == target:
+                    guarded = "require_service_auth" in ast.unparse(dec)
+        check(f"authenticated_{target}", guarded)
+
+
+def test_status_endpoint_is_read_only():
+    """/uh/status must not require auth — it is how a cutover is watched."""
+    import ast
+
+    tree = ast.parse((REPO / "agentic/app.py").read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        for dec in getattr(node, "decorator_list", []):
+            if not (isinstance(dec, ast.Call)
+                    and isinstance(dec.func, ast.Attribute)):
+                continue
+            if dec.args and getattr(dec.args[0], "value", None) == "/uh/status":
+                check("status_is_get", dec.func.attr == "get")
+
+
 # ── Runner ─────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
@@ -297,6 +399,10 @@ if __name__ == "__main__":
     test_trust_scalar_not_reintroduced_into_new_path()
     test_bridge_cannot_widen_authority()
     test_payload_bounds_present()
+    test_uh_modules_are_wired_in()
+    test_uh_endpoints_exist()
+    test_destructive_uh_endpoints_authenticated()
+    test_status_endpoint_is_read_only()
 
     print(f"\n{'='*60}")
     print(f"Invariant Guard Tests: {passed} passed, {failed} failed")

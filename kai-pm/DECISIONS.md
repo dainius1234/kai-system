@@ -3046,3 +3046,35 @@ G-10 and G-11 are honest limits of an offline environment rather than unfinished
 
 **Files produced:** `scripts/preflight_deploy.py`, `scripts/test_preflight.py`, `scripts/setup_service_token.sh`, `scripts/verify_live_mutating.py`.
 **Files modified:** `Makefile` (5 targets), `kai-pm/UH_PROGRESS_TRACKER.md`, `kai-pm/MAKEFILE_TARGETS.md`, `kai-pm/STATUS.md`, `README.md`.
+
+---
+
+## D138 — 2026-08-02 — W-01: Six of Eight UH Modules Were Orphaned
+
+**Context:** D137 closed E-01…E-03 and left four operational steps. Before enabling flags, a check of whether the new modules were actually *called* by running code found something that invalidates part of how "closed" had been reported.
+
+**The finding:** **six of eight UH modules were orphaned** — built, fully tested, and invoked by nothing outside their own test files. `cortex_source`, `perception_spine.shadow`, `actuator_registry`, `policy_bridge.assessment`, `erasure` and `vertical_slice` had no caller in the running application. Only `service_auth` and `legacy_bridge` were genuinely wired in.
+
+This means `KAI_PERCEPTION_MODE` and `KAI_CORTEX_SOURCE` controlled code paths the application never reached. Setting them would have changed nothing. Every test passed because tests import the modules directly; passing tests proved the modules worked, not that anything used them.
+
+**Correction to D136/D137:** those entries described O-01 and O-02 as "proven to work; enabling is an operational decision". That was true of the modules and false of the system — there was no path from the flag to a running code path. Corrected here.
+
+**Decisions:**
+
+1. **The perception spine now runs inside `agentic`.** A lazily-constructed runtime holds the spine and world state, and the poll loop starts at application startup. It runs in shadow mode by default, so it validates and journals sensor events while nothing downstream consumes them. Verified live: the spine polled real sensors, journalled 6 events and reduced all 6 into the world state, with `KAI_PERCEPTION_MODE=active` and `KAI_CORTEX_SOURCE=world_state` set on a running app.
+
+2. **Cortex now routes through `resolve_cortex_state()`.** In the default poll mode it returns the polled document unchanged, so existing behaviour is byte-identical. The world-state path activates only on the flag, and falls back to polled state when the world is empty.
+
+3. **Three endpoints make the machinery observable and invocable.** `GET /uh/status` reports spine mode, events journalled and reduced, cortex source, world-state size and the autonomy migration report — a cutover can now be watched rather than guessed at. `GET /uh/actuators` reports migration state. `POST /uh/erasure` and `POST /uh/paper-trade` are **authenticated**, because an erasure endpoint and a trade endpoint left open are endpoints someone will call. Verified: 401 without a token, correct receipt with one.
+
+4. **The assessment layer is now consulted in the one real pipeline.** `PaperTradeSlice` constructs its policy engine with Ohana and safety registered as **required** assessors, so if the values layer is unavailable the slice fails closed rather than proceeding without it.
+
+5. **A guard now prevents this class of regression.** `test_uh_modules_are_wired_in` asserts every UH module is referenced by running code, and further guards assert the four `/uh/*` endpoints stay registered and that the two destructive ones stay authenticated. A module that loses its caller now fails a test instead of quietly becoming dead weight.
+
+**Regression fixed:** adding two authenticated endpoints changed agentic's guard count from 2 to 4 and broke `test_service_auth`. Expectations updated, and the audited-endpoint list extended to cover `/uh/erasure`, `/uh/paper-trade`, `vault-sync /export` and `executor /execute` — eight services now, not six.
+
+**`KAI_AUTONOMY_ENFORCE` remains false.** It is still the one flag that must not be flipped: no grants exist, so enabling it would deny every gated capability. `make preflight` blocks it.
+
+**Verification:** 1,433 tests across 19 suites. 8/8 CI gates. Docs current, and the tracker's per-suite rows sum to the stated total. Live: spine active inside the app, all four `/uh/*` endpoints working, full paper-trade slice returning `confirmed`. No regressions in agentic-routes (170), browser-agent, notify, monitor, telegram, executor or vault-sync.
+
+**Files modified:** `agentic/app.py` (spine runtime, Cortex routing, startup loop, four endpoints), `common/vertical_slice/paper_trade_slice.py` (assessors), `scripts/test_invariant_guards.py` (wiring guards), `scripts/test_service_auth.py`.

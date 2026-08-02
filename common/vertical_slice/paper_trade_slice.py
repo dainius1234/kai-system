@@ -54,6 +54,8 @@ from common.proposal_workspace.workspace import (
 )
 
 from common.policy_bridge.policy_engine import PolicyEngine
+from common.policy_bridge.assessment import AssessorRegistry
+from common.contracts.assessment import AssessmentType
 from common.policy_bridge.approval import ApprovalGate, ApprovalError
 from common.policy_bridge.capability import CapabilityBridge, CapabilityError
 
@@ -123,7 +125,18 @@ class PaperTradeSlice:
             independence_group="strategy",
         ))
 
-        self._policy_engine = PolicyEngine(principal=principal)
+        # Constraint assessors are consulted before policy decides.  Ohana is
+        # registered as *required*, so if the values layer is unavailable the
+        # slice fails closed rather than proceeding without it.
+        self._assessors = AssessorRegistry(principal=principal)
+        self._assessors.register(
+            "ohana", AssessmentType.VALUES, required=True,
+        )
+        self._assessors.register("safety", AssessmentType.SAFETY, required=True)
+
+        self._policy_engine = PolicyEngine(
+            principal=principal, assessors=self._assessors,
+        )
         self._approval_gate = ApprovalGate(default_expiry_seconds=300)
         self._capability_bridge = CapabilityBridge(default_timeout=60)
 

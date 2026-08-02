@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-01 (fourth pass — environmental limits closed)
+**Last updated:** 2026-08-02 (fifth pass — modules wired into the running system)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -39,9 +39,9 @@
 | UH-8 Autonomy requalification | ✅ Done | `07d3614` | `make test-autonomy` | 174 |
 | §16.4 Payload bounds | ✅ Done | this commit | `make test-payload-bounds` | 24 |
 | §16.13 Ohana / assessments | ✅ Done | this commit | `make test-assessment` | 56 |
-| §16.26 Rollback guards | ✅ Done | `5b882a4` | `make test-invariant-guards` | 18 |
+| §16.26 Rollback guards | ✅ Done | `5b882a4` | `make test-invariant-guards` | 26 |
 | §16.27 Concurrency/clock/fencing (G-05) | ✅ Done | `99c1ee9` | `make test-concurrency-clock` | 51 |
-| G-03 Service authentication | ✅ Done | `99c1ee9` | `make test-service-auth` | 55 |
+| G-03 Service authentication | ✅ Done | `99c1ee9` | `make test-service-auth` | 59 |
 | §16.30 Erasure lineage (G-06) | ✅ Done | `ebae38d` | `make test-erasure` | 75 |
 | G-04 Legacy trust bridge | ✅ Done | `51e0934` | `make test-legacy-bridge` | 58 |
 | G-01/G-02 Tier-1 migration + active mode | ✅ Done | `4795b7d` | `make test-migration` | 136 |
@@ -52,7 +52,8 @@
 | E-01 broker-bridge live-verified | ✅ Done | this commit | `make verify-live-endpoints` | 13/13 live |
 | E-02 Mutating handlers live-verified | ✅ Done | this commit | `make verify-live-mutating` | 9 invoked, 5 skipped |
 | E-03 Deployment preflight | ✅ Done | this commit | `make test-preflight` | 37 |
-| | | | **Total** | **1,421** |
+| W-01 Modules wired into the running app | ✅ Done | this commit | `make test-invariant-guards` | (guards) |
+| | | | **Total** | **1,433** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
@@ -171,19 +172,37 @@ element, restarting live services, and triggering memory decay are exactly the
 irreversible operations the capability system exists to gate — invoking them to prove
 a test passes would be the wrong trade. They are recorded as skipped with the reason.
 
+### W-01 — the orphaned-module finding
+
+An audit of whether the new modules were actually *called* by running code found
+**six of eight were orphaned**: built, tested, and invoked by nothing. The flags
+existed and the code existed, but `KAI_PERCEPTION_MODE` and `KAI_CORTEX_SOURCE`
+controlled paths the application never reached.
+
+All are now wired and verified against a running app:
+
+| Module | Wired into | Verified live |
+|---|---|---|
+| `perception_spine.shadow` | `agentic` startup poll loop | 6 events journalled, 6 reduced |
+| `perception_spine.cortex_source` | `agentic._sense_world()` | `cortex_source=world_state` |
+| `actuator_registry` | `GET /uh/actuators` | 34 actuators reported |
+| `erasure` | `POST /uh/erasure` (authenticated) | 401 without token, receipt with |
+| `vertical_slice` | `POST /uh/paper-trade` (authenticated) | full slice → `confirmed` |
+| `policy_bridge.assessment` | `PaperTradeSlice` policy engine | Ohana required, fails closed |
+
+`test_uh_modules_are_wired_in` now guards this — a module that loses its caller
+fails a test rather than quietly becoming dead weight.
+
 ### Remaining operational steps
 
 Not defects — decisions that belong to the operator, each with a tested fallback.
 
-| ID | Step | Why it is not done here |
+| ID | Step | Status |
 |---|---|---|
-| O-01 | Enable `KAI_PERCEPTION_MODE=active` in a real environment | Proven to work; enabling it is an operational decision |
-| O-02 | Enable `KAI_CORTEX_SOURCE=world_state` | Depends on O-01 being healthy first |
-| O-03 | Enable `KAI_AUTONOMY_ENFORCE=true` | **Must not be enabled yet.** No grants exist, so enforcement would deny every gated capability. `make preflight` blocks this |
-| O-04 | Retire the legacy Cortex polling path | Deliberately additive during migration; retiring it is a later step |
-
-`make preflight` is the gate for all four: it blocks O-03 until grants exist, and
-refuses a deploy missing `KAI_SERVICE_TOKEN` or running with the dev auth bypass on.
+| O-01 | `KAI_PERCEPTION_MODE=active` | **Proven live** — spine polled real sensors, journalled and reduced 6 events inside the running app. Enabling it in a deployment is the operator's call |
+| O-02 | `KAI_CORTEX_SOURCE=world_state` | **Proven live** alongside O-01. Falls back to polled state on an empty world |
+| O-03 | `KAI_AUTONOMY_ENFORCE=true` | **Must not be enabled yet.** No grants exist, so enforcement would deny every gated capability. `make preflight` blocks it |
+| O-04 | Retire legacy Cortex polling | Deliberately additive during migration |
 
 ### Endpoints now authenticated
 
