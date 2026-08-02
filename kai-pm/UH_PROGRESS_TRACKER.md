@@ -53,8 +53,8 @@
 | E-02 Mutating handlers live-verified | ✅ Done | this commit | `make verify-live-mutating` | 9 invoked, 5 skipped |
 | E-03 Deployment preflight | ✅ Done | this commit | `make test-preflight` | 37 |
 | W-01 Modules wired into the running app | ✅ Done | this commit | `make test-invariant-guards` | (guards) |
-| A-01 Architecture dependency CI gate (§15) | ✅ Done | this commit | `make test-architecture-rules` | 32 |
-| | | | **Total** | **1,465** |
+| A-01 Architecture dependency CI gate — all 15 rules | ✅ Done | this commit | `make test-architecture-rules` | 61 |
+| | | | **Total** | **1,494** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against

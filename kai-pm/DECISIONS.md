@@ -3109,3 +3109,25 @@ This means `KAI_PERCEPTION_MODE` and `KAI_CORTEX_SOURCE` controlled code paths t
 
 **Files produced:** `scripts/security/check_architecture_rules.py`, `scripts/test_architecture_rules.py`.
 **Files modified:** `agentic/market_data.py`, `agentic/app.py`, `scripts/test_market_data.py`, `.github/workflows/policy-checks.yml`, `Makefile`, tracker/README/STATUS/MAKEFILE_TARGETS.
+
+---
+
+## D140 — 2026-08-02 — A-01 Completion: All 15 §15 Rules Enforced or Declared
+
+**Context:** D139 shipped the architecture gate claiming "6 of 15 rules are enforced; the gate says so out loud". Checking that claim before moving to the next Wave 1 item showed it was false.
+
+**Finding — the gate had the exact defect it was written to prevent.** It enforced rules 1, 2, 3, 4, 12, 14 and declared 9, 13, 15 uncheckable: **nine of fifteen accounted for. Rules 5, 6, 7, 8, 10 and 11 were neither enforced nor declared — silently absent.** The gate's own docstring says "an unenforced rule that looks enforced is worse than an acknowledged gap", and that is precisely what shipped.
+
+**Decisions:**
+
+1. **All six missing rules are now implemented.** Rule 5 checks the legacy trust bridge short-circuits on a scoped denial and that policy paths do not gate on conviction. Rule 6 checks every mutating route in a side-effecting service is boundary-enforced. Rule 7 reads the legacy verifier so it tracks real closure state rather than a copy. Rule 8 flags literal success-shaped dict returns on protected paths, while ignoring dicts assembled from real values — a payload is not a success shape. Rule 10 verifies `ContractBase` carries principal, purpose, classification, provenance and revision, and that no persistent contract subclasses bare `BaseModel`. Rule 11 verifies the evidence grading distinguishes model output and that `MODEL_GENERATED`/`SIMULATED` cannot qualify to grant trust.
+
+2. **The gate now audits itself.** `accounted_rules()` compares enforced plus declared against all fifteen, and reports a `GAP` violation if any rule is unaccounted for. `test_all_fifteen_rules_accounted_for` makes the regression impossible to repeat silently, and a companion test asserts no rule is both enforced and declared uncheckable.
+
+3. **Rule 6 immediately found eight more unprotected side-effecting routes** that the six-endpoint audit had missed entirely: `browser-agent /scrape`, `/screenshot`, `/search`; `executor /recover`; `monitor-service /rules/{id}/check`; `notify DELETE /pending` and `/pending/{id}`; `vault-sync /ingest`. Every one causes a real effect — outbound web requests, state resets, notification deletion, knowledge-graph writes. All eight are now authenticated, bringing the protected surface from 24 routes to 32 across eight services.
+
+**Correction to D139:** it stated "6 of 15 rules are enforced; the gate says so out loud." The count was right; the claim that the gate disclosed it was wrong — six rules were invisible rather than disclosed. Coverage is now 15/15: twelve enforced, three declared uncheckable, with the split verified by test.
+
+**Verification:** 1,494 tests across 20 suites. 9/9 CI policy gates. Docs current, tracker rows sum to the stated total. No regressions in browser-agent, notify, monitor, executor or vault-sync.
+
+**Files modified:** `scripts/security/check_architecture_rules.py` (6 rules + self-audit), `scripts/test_architecture_rules.py` (+29 tests), `browser-agent/app.py`, `executor/app.py`, `monitor-service/app.py`, `output/notify/app.py`, `vault-sync/app.py`, `scripts/test_service_auth.py`.

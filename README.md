@@ -27,8 +27,8 @@
 |---|---|
 | **Services** | 61 Docker containers |
 | **Test targets** | 91 (`make test-core`) |
-| **Individual tests** | 3,828 (`def test_` across 175 files) |
-| **Python LOC** | ~105,506 |
+| **Individual tests** | 3,839 (`def test_` across 175 files) |
+| **Python LOC** | ~105,957 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 45 |
 | **Failures** | 0 |
@@ -72,7 +72,7 @@ It is the source of truth for UH work — including an honest open-gaps list. Ve
 workstream with a single command:
 
 ```bash
-make test-uh          # all 20 UH suites, 1,465 tests
+make test-uh          # all 20 UH suites, 1,494 tests
 ```
 
 > **Built, not cut over.** All 34 actuators across 8 risk tiers are migrated with real

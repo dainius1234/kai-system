@@ -228,7 +228,8 @@ async def health() -> Dict:
     }
 
 
-@app.post("/ingest")
+@app.post("/ingest",
+          dependencies=[Depends(require_service_auth("vault_ingest"))])
 async def ingest(req: IngestRequest) -> Dict:
     """Manually trigger ingest for a specific filepath."""
     if not FF_VAULT_SYNC:

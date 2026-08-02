@@ -222,6 +222,143 @@ def test_all_checks_return_lists():
         check(f"returns_list_{label.split()[0]}", isinstance(result, list))
 
 
+# ═══════════════════════════════════════════════════════════════════
+# 4. Every §15 rule is accounted for
+# ═══════════════════════════════════════════════════════════════════
+
+def test_all_fifteen_rules_accounted_for():
+    """No rule may be silently absent.
+
+    This gate shipped once with rules 5, 6, 7, 8, 10 and 11 neither
+    enforced nor declared uncheckable — invisible, which is the exact
+    failure the gate exists to prevent. This test makes that
+    impossible to repeat.
+    """
+    unaccounted = sorted(arch.ALL_RULES - arch.accounted_rules())
+    check("all_15_rules_accounted", not unaccounted,
+          f"silently missing: {unaccounted}")
+    check("accounted_is_15", len(arch.accounted_rules()) == 15,
+          str(len(arch.accounted_rules())))
+
+
+def test_enforced_and_declared_are_disjoint():
+    """A rule cannot be both enforced and declared uncheckable."""
+    import re
+    enforced = {int(re.match(r"(\d+)", label).group(1))
+                for label, _ in arch.CHECKS}
+    overlap = enforced & set(arch.NOT_STATICALLY_CHECKABLE)
+    check("no_rule_both_ways", not overlap, str(sorted(overlap)))
+
+
+# ═══════════════════════════════════════════════════════════════════
+# 5. The six previously-missing rules can each fail
+# ═══════════════════════════════════════════════════════════════════
+
+def test_rule_6_detects_unprotected_side_effect_route():
+    snippet = (
+        '\n\n@app.post("/uh-test-unprotected")\n'
+        "async def _test_unprotected():\n"
+        "    return {}\n"
+    )
+    with _Injected("output/notify/app.py", snippet):
+        violations = arch.rule_6_action_routes_registered()
+        check("rule6_detects", len(violations) >= 1)
+        if violations:
+            check("rule6_names_route",
+                  any("uh-test-unprotected" in v.message for v in violations))
+
+
+def test_rule_6_ignores_health_routes():
+    snippet = (
+        '\n\n@app.post("/health")\n'
+        "async def _test_health():\n"
+        "    return {}\n"
+    )
+    with _Injected("vault-sync/app.py", snippet):
+        violations = arch.rule_6_action_routes_registered()
+        check("rule6_ignores_health",
+              not any("/health" in v.message for v in violations))
+
+
+def test_rule_7_reports_open_legacy_path():
+    """Rule 7 reads the legacy verifier, so it tracks real closure state."""
+    violations = arch.rule_7_legacy_paths_closed()
+    check("rule7_clean_now", not violations,
+          "; ".join(v.message for v in violations[:2]))
+
+    import common.actuator_registry.legacy_verification as lv
+    original = lv.open_legacy_paths
+    lv.open_legacy_paths = lambda: {"fake-actuator": "still unauthenticated"}
+    try:
+        import importlib
+        importlib.reload(arch)
+        found = arch.rule_7_legacy_paths_closed()
+        check("rule7_detects_open", len(found) >= 1)
+    finally:
+        lv.open_legacy_paths = original
+        importlib.reload(arch)
+
+
+def test_rule_8_detects_success_shaped_dict():
+    snippet = (
+        "\n\ndef _test_success_shape():\n"
+        "    return {'success': True}\n"
+    )
+    with _Injected("common/erasure/coordinator.py", snippet):
+        violations = arch.rule_8_typed_operation_state()
+        check("rule8_detects", len(violations) >= 1)
+        if violations:
+            check("rule8_explains",
+                  "typed operation state" in violations[0].message)
+
+
+def test_rule_8_ignores_real_payloads():
+    """A dict built from real values is a payload, not a success shape."""
+    snippet = (
+        "\n\ndef _test_real_payload(count):\n"
+        "    return {'status': count, 'extra': count}\n"
+    )
+    with _Injected("common/erasure/coordinator.py", snippet):
+        violations = arch.rule_8_typed_operation_state()
+        check("rule8_ignores_payload",
+              not any("_test_real_payload" in str(v.line) for v in violations))
+
+
+def test_rule_10_requires_context_fields():
+    violations = arch.rule_10_records_carry_context()
+    check("rule10_clean_now", not violations,
+          "; ".join(v.message for v in violations[:3]))
+
+
+def test_rule_10_detects_bare_basemodel_contract():
+    snippet = (
+        "\n\nclass _TestBareContract(BaseModel):\n"
+        "    value: str\n"
+    )
+    with _Injected("common/contracts/action.py", snippet):
+        violations = arch.rule_10_records_carry_context()
+        check("rule10_detects_bare",
+              any("_TestBareContract" in v.message for v in violations))
+
+
+def test_rule_11_model_output_cannot_grant_trust():
+    violations = arch.rule_11_model_output_labelled()
+    check("rule11_clean_now", not violations,
+          "; ".join(v.message for v in violations[:2]))
+
+    from common.contracts.autonomy import EvidenceGrade
+    check("rule11_model_generated_disqualified",
+          not EvidenceGrade.MODEL_GENERATED.qualifies())
+    check("rule11_simulated_disqualified",
+          not EvidenceGrade.SIMULATED.qualifies())
+
+
+def test_rule_5_requires_short_circuit():
+    violations = arch.rule_5_trust_cannot_bypass()
+    check("rule5_clean_now", not violations,
+          "; ".join(v.message for v in violations[:2]))
+
+
 # ── Runner ─────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
@@ -238,6 +375,17 @@ if __name__ == "__main__":
     test_every_classified_module_exists()
     test_uncheckable_rules_are_declared()
     test_all_checks_return_lists()
+    test_all_fifteen_rules_accounted_for()
+    test_enforced_and_declared_are_disjoint()
+    test_rule_6_detects_unprotected_side_effect_route()
+    test_rule_6_ignores_health_routes()
+    test_rule_7_reports_open_legacy_path()
+    test_rule_8_detects_success_shaped_dict()
+    test_rule_8_ignores_real_payloads()
+    test_rule_10_requires_context_fields()
+    test_rule_10_detects_bare_basemodel_contract()
+    test_rule_11_model_output_cannot_grant_trust()
+    test_rule_5_requires_short_circuit()
 
     print(f"\n{'='*60}")
     print(f"Architecture Rule Tests: {passed} passed, {failed} failed")

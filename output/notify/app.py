@@ -142,7 +142,8 @@ async def pending(unread_only: bool = True):
     return {"notifications": list(reversed(entries)), "total": len(entries)}
 
 
-@app.delete("/pending/{notification_id}")
+@app.delete("/pending/{notification_id}",
+          dependencies=[Depends(require_service_auth("notify_dismiss_one"))])
 async def dismiss(notification_id: int):
     for entry in _pending:
         if entry["id"] == notification_id:
@@ -151,7 +152,8 @@ async def dismiss(notification_id: int):
     raise HTTPException(404, f"notification {notification_id} not found")
 
 
-@app.delete("/pending")
+@app.delete("/pending",
+          dependencies=[Depends(require_service_auth("notify_dismiss_all"))])
 async def dismiss_all():
     for entry in _pending:
         entry["read"] = True

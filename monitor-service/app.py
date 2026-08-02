@@ -314,7 +314,8 @@ async def disable_rule(rule_id: str):
     return {"ok": True}
 
 
-@app.post("/rules/{rule_id}/check")
+@app.post("/rules/{rule_id}/check",
+          dependencies=[Depends(require_service_auth("monitor_rule_check"))])
 async def manual_check(rule_id: str):
     if rule_id not in _rules:
         raise HTTPException(404, f"Rule not found: {rule_id}")

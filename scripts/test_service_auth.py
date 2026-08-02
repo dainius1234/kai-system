@@ -198,6 +198,13 @@ AUDITED_ENDPOINTS = [
     ("agentic/app.py", "post", "/uh/paper-trade"),
     ("vault-sync/app.py", "post", "/export"),
     ("executor/app.py", "post", "/execute"),
+    ("executor/app.py", "post", "/recover"),
+    ("browser-agent/app.py", "post", "/scrape"),
+    ("browser-agent/app.py", "post", "/screenshot"),
+    ("browser-agent/app.py", "post", "/search"),
+    ("monitor-service/app.py", "post", "/rules/{rule_id}/check"),
+    ("output/notify/app.py", "delete", "/pending"),
+    ("vault-sync/app.py", "post", "/ingest"),
 ]
 
 
@@ -253,12 +260,12 @@ def test_protection_count():
     """Sanity: each service carries the expected number of guards."""
     expected = {
         "backup-service/app.py": 7,
-        "browser-agent/app.py": 4,
+        "browser-agent/app.py": 7,
         "telegram-bot/app.py": 1,
-        "monitor-service/app.py": 6,
-        "output/notify/app.py": 1,
-        "vault-sync/app.py": 1,
-        "executor/app.py": 1,
+        "monitor-service/app.py": 7,
+        "output/notify/app.py": 3,
+        "vault-sync/app.py": 2,
+        "executor/app.py": 2,
         # 2 checkpoint routes + /uh/erasure + /uh/paper-trade
         "agentic/app.py": 4,
     }

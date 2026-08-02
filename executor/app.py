@@ -352,7 +352,8 @@ async def health() -> Dict[str, Any]:
 _RECOVERY_ENABLED = os.getenv("RECOVERY_ENABLED", "false").lower() == "true"
 
 
-@app.post("/recover")
+@app.post("/recover",
+          dependencies=[Depends(require_service_auth("executor_recover"))])
 async def recover() -> Dict[str, str]:
     """Self-heal — clear temp files, reset state."""
     if not _RECOVERY_ENABLED:

@@ -175,7 +175,8 @@ async def type_text(req: TypeRequest):
             raise HTTPException(502, f"Type failed: {exc}")
 
 
-@app.post("/scrape")
+@app.post("/scrape",
+          dependencies=[Depends(require_service_auth("browser_scrape"))])
 async def scrape():
     if not _PLAYWRIGHT_OK:
         raise HTTPException(503, "playwright not available")
@@ -193,7 +194,8 @@ async def scrape():
             raise HTTPException(502, f"Scrape failed: {exc}")
 
 
-@app.post("/screenshot")
+@app.post("/screenshot",
+          dependencies=[Depends(require_service_auth("browser_screenshot"))])
 async def screenshot():
     if not _PLAYWRIGHT_OK:
         raise HTTPException(503, "playwright not available")
@@ -242,7 +244,8 @@ class SearchRequest(BaseModel):
     max_results: int = 10
 
 
-@app.post("/search")
+@app.post("/search",
+          dependencies=[Depends(require_service_auth("browser_search"))])
 async def search(req: SearchRequest):
     """Search DuckDuckGo and return structured results."""
     if not _PLAYWRIGHT_OK:

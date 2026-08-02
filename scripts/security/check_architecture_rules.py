@@ -318,6 +318,257 @@ def rule_14_no_fail_open() -> List[Violation]:
     return violations
 
 
+# ── Rule 5: trust/conviction may not bypass policy or approval ───────
+
+def rule_5_trust_cannot_bypass() -> List[Violation]:
+    """The legacy trust scalar must only be able to deny, never grant.
+
+    Checked structurally: the bridge that unifies legacy trust with
+    scoped grants must have no path that turns a scoped denial into an
+    allow.  A grant-shaped return from the legacy side would recreate the
+    "two authorities, most permissive wins" problem.
+    """
+    violations = []
+    bridge = REPO / "common" / "autonomy" / "legacy_bridge.py"
+    if not bridge.exists():
+        return [Violation(5, "common/autonomy/legacy_bridge.py", 0,
+                          "legacy trust bridge missing — trust is ungoverned")]
+
+    text = bridge.read_text(encoding="utf-8")
+    # In enforcing mode a scoped denial must short-circuit to False before
+    # the legacy verdict is consulted.
+    if "if not scoped_allowed:" not in text:
+        violations.append(Violation(
+            5, "common/autonomy/legacy_bridge.py", 0,
+            "bridge does not short-circuit on a scoped denial",
+        ))
+
+    # Conviction must not appear as a standalone gate in policy paths.
+    for rel in ("common/policy_bridge/policy_engine.py",
+                "common/policy_bridge/approval.py"):
+        path = REPO / rel
+        if not path.exists():
+            continue
+        tree = _parse(path)
+        if tree is None:
+            continue
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Compare):
+                continue
+            source = ast.unparse(node)
+            if ("conviction" in source or "trust_level" in source) and \
+                    "result" not in source:
+                violations.append(Violation(
+                    5, rel, node.lineno,
+                    f"policy path gates on a trust/conviction value: {source}",
+                ))
+    return violations
+
+
+# ── Rule 6: every action route is registered and boundary-enforced ───
+
+def rule_6_action_routes_registered() -> List[Violation]:
+    """A side-effecting route must be authenticated at its own boundary.
+
+    §15 rule 6 pairs registration with *final-boundary* enforcement: a
+    central policy that a service does not itself enforce is advisory.
+    """
+    violations = []
+    services = {
+        "backup-service/app.py", "browser-agent/app.py",
+        "telegram-bot/app.py", "monitor-service/app.py",
+        "output/notify/app.py", "vault-sync/app.py", "executor/app.py",
+    }
+    # Routes that legitimately mutate nothing.
+    READ_ONLY_ROUTES = {"/health", "/metrics", "/status", "/ready"}
+
+    for rel in sorted(services):
+        path = REPO / rel
+        tree = _parse(path)
+        if tree is None:
+            continue
+        for node in ast.walk(tree):
+            for dec in getattr(node, "decorator_list", []):
+                if not (isinstance(dec, ast.Call)
+                        and isinstance(dec.func, ast.Attribute)):
+                    continue
+                if dec.func.attr not in {"post", "put", "delete", "patch"}:
+                    continue
+                if not dec.args or not isinstance(dec.args[0], ast.Constant):
+                    continue
+                route = dec.args[0].value
+                if route in READ_ONLY_ROUTES:
+                    continue
+                if "require_service_auth" not in ast.unparse(dec):
+                    violations.append(Violation(
+                        6, rel, dec.lineno,
+                        f"{dec.func.attr.upper()} {route} is not "
+                        f"boundary-enforced",
+                    ))
+    return violations
+
+
+# ── Rule 7: legacy action APIs are disabled ──────────────────────────
+
+def rule_7_legacy_paths_closed() -> List[Violation]:
+    violations = []
+    try:
+        sys.path.insert(0, str(REPO))
+        from common.actuator_registry.legacy_verification import (
+            open_legacy_paths,
+        )
+    except Exception as exc:
+        return [Violation(7, "common/actuator_registry", 0,
+                          f"legacy verification unavailable: {exc}")]
+
+    for actuator, reason in sorted(open_legacy_paths().items()):
+        violations.append(Violation(
+            7, f"actuator:{actuator}", 0, f"legacy path still open — {reason}",
+        ))
+    return violations
+
+
+# ── Rule 8: state-changing methods return typed state ────────────────
+
+_SUCCESS_SHAPED_KEYS = {"success", "ok", "status"}
+
+
+def rule_8_typed_operation_state() -> List[Violation]:
+    """A success-shaped dict hides failure; a typed state cannot.
+
+    Only flags *literal* returns of a bare success dict on protected
+    paths.  A dict assembled from real values is a payload, not a
+    success shape.
+    """
+    violations = []
+    for rel in PROTECTED_DIRS:
+        base = REPO / rel
+        if not base.exists():
+            continue
+        for path in sorted(base.rglob("*.py")):
+            if "__pycache__" in str(path):
+                continue
+            tree = _parse(path)
+            if tree is None:
+                continue
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Return) or node.value is None:
+                    continue
+                if not isinstance(node.value, ast.Dict):
+                    continue
+                keys = {
+                    k.value for k in node.value.keys
+                    if isinstance(k, ast.Constant) and isinstance(k.value, str)
+                }
+                if not keys or not keys <= _SUCCESS_SHAPED_KEYS:
+                    continue
+                values_are_literals = all(
+                    isinstance(v, ast.Constant) for v in node.value.values
+                )
+                if values_are_literals:
+                    violations.append(Violation(
+                        8, str(path.relative_to(REPO)), node.lineno,
+                        f"returns a success-shaped dict {sorted(keys)} "
+                        f"instead of a typed operation state",
+                    ))
+    return violations
+
+
+# ── Rule 10: persistent records carry principal/purpose/provenance ───
+
+_REQUIRED_RECORD_FIELDS = {
+    "principal", "purpose", "classification", "provenance", "revision",
+}
+
+
+def rule_10_records_carry_context() -> List[Violation]:
+    violations = []
+    base_path = REPO / "common" / "contracts" / "base.py"
+    tree = _parse(base_path)
+    if tree is None:
+        return [Violation(10, "common/contracts/base.py", 0,
+                          "contract base unreadable")]
+
+    contract_base = next(
+        (n for n in ast.walk(tree)
+         if isinstance(n, ast.ClassDef) and n.name == "ContractBase"), None,
+    )
+    if contract_base is None:
+        return [Violation(10, "common/contracts/base.py", 0,
+                          "ContractBase not found")]
+
+    declared = {
+        t.target.id for t in contract_base.body
+        if isinstance(t, ast.AnnAssign) and isinstance(t.target, ast.Name)
+    }
+    for field in sorted(_REQUIRED_RECORD_FIELDS - declared):
+        violations.append(Violation(
+            10, "common/contracts/base.py", contract_base.lineno,
+            f"ContractBase does not carry '{field}'",
+        ))
+
+    # Persistent contracts must inherit it rather than bare BaseModel.
+    contracts_dir = REPO / "common" / "contracts"
+    for path in sorted(contracts_dir.glob("*.py")):
+        if path.name in {"__init__.py", "base.py"}:
+            continue
+        sub = _parse(path)
+        if sub is None:
+            continue
+        for node in ast.walk(sub):
+            if not isinstance(node, ast.ClassDef):
+                continue
+            bases = {ast.unparse(b) for b in node.bases}
+            if bases == {"BaseModel"}:
+                violations.append(Violation(
+                    10, f"common/contracts/{path.name}", node.lineno,
+                    f"'{node.name}' subclasses BaseModel directly, so it "
+                    f"carries no principal/purpose/provenance",
+                ))
+    return violations
+
+
+# ── Rule 11: model-generated fields are labelled ─────────────────────
+
+def rule_11_model_output_labelled() -> List[Violation]:
+    """Model output must be distinguishable from observation.
+
+    Enforced through the evidence grading system: MODEL_GENERATED and
+    SIMULATED must exist and must not qualify to grant trust.  Without
+    that distinction, a model's own text can be laundered into evidence.
+    """
+    violations = []
+    path = REPO / "common" / "contracts" / "autonomy.py"
+    if not path.exists():
+        return [Violation(11, "common/contracts/autonomy.py", 0,
+                          "evidence grading missing — model output "
+                          "indistinguishable from observation")]
+
+    text = path.read_text(encoding="utf-8")
+    for required in ("MODEL_GENERATED", "SIMULATED", "def qualifies"):
+        if required not in text:
+            violations.append(Violation(
+                11, "common/contracts/autonomy.py", 0,
+                f"evidence grading lacks '{required}'",
+            ))
+
+    try:
+        sys.path.insert(0, str(REPO))
+        from common.contracts.autonomy import EvidenceGrade
+        for grade in (EvidenceGrade.MODEL_GENERATED, EvidenceGrade.SIMULATED):
+            if grade.qualifies():
+                violations.append(Violation(
+                    11, "common/contracts/autonomy.py", 0,
+                    f"{grade.name} qualifies to grant trust",
+                ))
+    except Exception as exc:
+        violations.append(Violation(
+            11, "common/contracts/autonomy.py", 0,
+            f"evidence grading not importable: {exc}",
+        ))
+    return violations
+
+
 # ── Runner ───────────────────────────────────────────────────────────
 
 CHECKS = [
@@ -329,11 +580,31 @@ CHECKS = [
      rule_3_d102_credentials),
     ("4  Ohana cannot issue security permission",
      rule_4_ohana_cannot_permit),
+    ("5  trust/conviction cannot bypass policy or approval",
+     rule_5_trust_cannot_bypass),
+    ("6  every action route is boundary-enforced",
+     rule_6_action_routes_registered),
+    ("7  legacy action APIs are disabled",
+     rule_7_legacy_paths_closed),
+    ("8  state-changing methods return typed state",
+     rule_8_typed_operation_state),
+    ("10 persistent records carry principal/purpose/provenance",
+     rule_10_records_carry_context),
+    ("11 model-generated output is labelled and cannot grant trust",
+     rule_11_model_output_labelled),
     ("12 privileged schemas reject unknown fields",
      rule_12_privileged_schemas_forbid_extra),
     ("14 no fail-open on protected paths",
      rule_14_no_fail_open),
 ]
+
+ALL_RULES = set(range(1, 16))
+
+
+def accounted_rules() -> Set[int]:
+    """Every §15 rule this gate either enforces or declares uncheckable."""
+    enforced = {int(re.match(r"(\d+)", label).group(1)) for label, _ in CHECKS}
+    return enforced | set(NOT_STATICALLY_CHECKABLE)
 
 
 def main() -> int:
@@ -351,6 +622,23 @@ def main() -> int:
     print()
     for rule, why in sorted(NOT_STATICALLY_CHECKABLE.items()):
         print(f"  n/a   rule {rule:<2} {why} — not statically checkable")
+
+    # A rule that is neither enforced nor declared is invisible, which is
+    # the failure this gate exists to prevent.  It must not happen to the
+    # gate itself.
+    unaccounted = sorted(ALL_RULES - accounted_rules())
+    print()
+    if unaccounted:
+        print(f"  GAP   §15 rules neither enforced nor declared: {unaccounted}")
+        all_violations.append(Violation(
+            0, "check_architecture_rules.py", 0,
+            f"rules {unaccounted} are silently unaccounted for",
+        ))
+    else:
+        print(f"  cover §15 rules accounted for: "
+              f"{len(accounted_rules())}/15 "
+              f"({len(CHECKS)} enforced, "
+              f"{len(NOT_STATICALLY_CHECKABLE)} declared uncheckable)")
 
     print()
     if all_violations:
