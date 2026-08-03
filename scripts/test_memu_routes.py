@@ -580,14 +580,72 @@ class TestValuesConscience:
 # /memory/persist + /route
 # ═════════════════════════════════════════════════════════════════════
 
-class TestPersistAndRoute:
-    def test_persist_200(self):
-        r = client.post("/memory/persist")
-        assert r.status_code == 200
 
-    def test_persist_has_status(self):
-        data = client.post("/memory/persist").json()
-        assert data.get("status") in ("ok", "error")
+class TestPayloadBounds:
+    """H-2: memu-core is the memory store, so a pathological body lands
+    on persistent state. These reads were unbounded."""
+
+    def test_oversized_body_is_refused(self):
+        big = {"text": "x" * (300 * 1024)}
+        r = client.post("/memory/autobiography/record", json=big)
+        assert r.status_code == 413, r.status_code
+
+    def test_deeply_nested_body_is_refused(self):
+        payload = current = {}
+        for _ in range(40):
+            current["next"] = {}
+            current = current["next"]
+        r = client.post("/memory/values/learn", json=payload)
+        assert r.status_code == 413, r.status_code
+
+    def test_high_cardinality_body_is_refused(self):
+        r = client.post("/memory/emotion/record",
+                        json={f"k{i}": i for i in range(2000)})
+        assert r.status_code == 413, r.status_code
+
+    def test_a_normal_body_still_works(self):
+        """The bound must not be so tight it blocks ordinary recording."""
+        r = client.post("/memory/autobiography/record",
+                        json={"text": "A significant thing happened today.",
+                              "context": "testing"})
+        assert r.status_code != 413, r.status_code
+
+    def test_every_recording_route_is_bounded(self):
+        """A route that slipped the sweep would be silently unbounded."""
+        big = {"text": "x" * (300 * 1024)}
+        routes = [
+            "/memory/emotion/record", "/memory/relationship/milestone",
+            "/memory/confess", "/memory/autobiography/record",
+            "/memory/legacy/write", "/memory/imagine/counterfactual",
+            "/memory/imagine/empathize", "/memory/imagine/synthesize",
+            "/memory/imagine/thought", "/memory/imagine/aspire",
+            "/memory/values/learn", "/memory/conscience/check",
+            "/memory/loyalty/record", "/memory/gratitude/record",
+        ]
+        unbounded = [p for p in routes
+                     if client.post(p, json=big).status_code != 413]
+        assert not unbounded, f"unbounded: {unbounded}"
+
+
+class TestPersistAndRoute:
+    def test_persist_reports_success_as_200(self):
+        r = client.post("/memory/persist")
+        # A failure must NOT be 200. This previously asserted 200
+        # unconditionally, which encoded the defect: a persistence failure
+        # in the memory store answered success.
+        assert r.status_code in (200, 503), r.status_code
+        if r.status_code == 200:
+            assert not r.json().get("degraded")
+
+    def test_persist_failure_is_not_a_success_status(self):
+        import unittest.mock as mock
+        with mock.patch.object(memu, "_persist_p17_p22_to_redis",
+                               side_effect=RuntimeError("disk gone")):
+            r = client.post("/memory/persist")
+        assert r.status_code == 503, r.status_code
+        body = r.json()
+        assert body.get("degraded") is True, body
+        assert body.get("source") == "memu-core-persistence", body
 
     def test_route_200(self):
         r = client.post("/route", json={

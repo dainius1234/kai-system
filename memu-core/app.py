@@ -26,6 +26,8 @@ from typing import Any, Deque, Dict, List, Optional, Protocol, runtime_checkable
 from fastapi import Body, FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel
 
+from common.degraded import degraded_response
+from common.http_hygiene import bounded_json
 from common.runtime import AuditStream, ErrorBudget, detect_device, redact_pii, sanitize_string, setup_json_logger
 
 try:
@@ -1416,8 +1418,12 @@ async def persist_memory() -> Dict[str, Any]:
             "failed": failed,
         }
     except Exception as e:
+        # Persistence failing is a server-side failure, and this is the
+        # memory store: a caller that checks only the status code would
+        # have seen 200 and believed the write landed.
         logger.warning("Manual /memory/persist failed: %s", e)
-        return {"status": "error", "detail": "persistence unavailable"}
+        return degraded_response("memu-core-persistence", str(e),
+                                 {"persisted_count": 0, "failed_count": 0})
 
 
 @app.get("/metrics")
@@ -1716,9 +1722,14 @@ async def graph_query_proxy(q: str, top_k: int = 10) -> Dict[str, Any]:
             )
             resp.raise_for_status()
             return resp.json()
-    except Exception as exc:  # noqa: BLE001 — best-effort, caller treats this as "graph unavailable"
+    except Exception as exc:  # noqa: BLE001 — the graph is optional enrichment
+        # The body already said `graph_unavailable`, which callers honour.
+        # The status line now says it too, so a caller that checks only
+        # one of the two channels reaches the same conclusion.
         logger.warning("memu-graph query proxy failed for q=%r: %s", query, exc)
-        return {"query": query, "results": None, "status": "graph_unavailable"}
+        return degraded_response(
+            "memu-graph", str(exc),
+            {"query": query, "results": None, "status": "graph_unavailable"})
 
 
 @app.get("/memory/evidence-pack")
@@ -4921,7 +4932,7 @@ def _record_emotion(session_id: str, text: str) -> Dict[str, Any]:
 @app.post("/memory/emotion/record")
 async def record_emotion(request: Request) -> Dict[str, Any]:
     """Record current emotional state from a message."""
-    body = await request.json()
+    body = await bounded_json(request)
     session_id = sanitize_string(body.get("session_id", "default"))
     text = sanitize_string(body.get("text", ""))
     if not text:
@@ -5123,7 +5134,7 @@ async def relationship_timeline() -> Dict[str, Any]:
 @app.post("/memory/relationship/milestone")
 async def add_milestone(request: Request) -> Dict[str, Any]:
     """Record a relationship milestone."""
-    body = await request.json()
+    body = await bounded_json(request)
     title = sanitize_string(body.get("title", ""))
     if not title:
         raise HTTPException(status_code=400, detail="title is required")
@@ -5260,7 +5271,7 @@ async def check_confessions(request: Request) -> Dict[str, Any]:
     memories to find potentially wrong advice. Returns confession
     messages if any.
     """
-    body = await request.json()
+    body = await bounded_json(request)
     correction_text = sanitize_string(body.get("correction", ""))
     category = sanitize_string(body.get("category", ""))
     if not correction_text:
@@ -5449,7 +5460,7 @@ def _generate_journal_entry(text: str, significance: float,
 @app.post("/memory/autobiography/record")
 async def record_autobiography(request: Request) -> Dict[str, Any]:
     """Record a significant life event in Kai's autobiography."""
-    body = await request.json()
+    body = await bounded_json(request)
     text = body.get("text", "").strip()
     if not text:
         raise HTTPException(status_code=400, detail="text is required")
@@ -5834,7 +5845,7 @@ _LEGACY_CAP = 100
 @app.post("/memory/legacy/write")
 async def write_legacy(request: Request) -> Dict[str, Any]:
     """Write a message to the future — either to self or to the operator."""
-    body = await request.json()
+    body = await bounded_json(request)
     message = body.get("message", "").strip()
     if not message:
         raise HTTPException(status_code=400, detail="message is required")
@@ -5954,7 +5965,7 @@ _COUNTERFACTUAL_CAP = 100
 @app.post("/memory/imagine/counterfactual")
 async def generate_counterfactual(request: Request) -> Dict[str, Any]:
     """Imagine an alternative to a past interaction."""
-    body = await request.json()
+    body = await bounded_json(request)
     original_text = body.get("original", "").strip()
     if not original_text:
         raise HTTPException(status_code=400, detail="original text is required")
@@ -6072,7 +6083,7 @@ _FOCUS_KEYWORDS = {
 @app.post("/memory/imagine/empathize")
 async def empathetic_simulation(request: Request) -> Dict[str, Any]:
     """Model what the operator might be feeling and needing."""
-    body = await request.json()
+    body = await bounded_json(request)
     text = body.get("text", "").strip()
     if not text:
         raise HTTPException(status_code=400, detail="text is required")
@@ -6180,7 +6191,7 @@ _CREATIVE_CAP = 100
 @app.post("/memory/imagine/synthesize")
 async def creative_synthesis(request: Request) -> Dict[str, Any]:
     """Generate a novel idea by cross-pollinating between domains."""
-    body = await request.json()
+    body = await bounded_json(request)
     seed = body.get("seed", "").strip()
 
     now = time.time()
@@ -6292,7 +6303,7 @@ _THOUGHT_TYPES = {
 @app.post("/memory/imagine/thought")
 async def record_inner_thought(request: Request) -> Dict[str, Any]:
     """Record an inner thought — what Kai is really thinking."""
-    body = await request.json()
+    body = await bounded_json(request)
     thought = body.get("thought", "").strip()
     if not thought:
         raise HTTPException(status_code=400, detail="thought is required")
@@ -6363,7 +6374,7 @@ _ASPIRATION_CAP = 50
 @app.post("/memory/imagine/aspire")
 async def create_aspiration(request: Request) -> Dict[str, Any]:
     """Imagine a specific future scenario Kai aspires to."""
-    body = await request.json()
+    body = await bounded_json(request)
     vision = body.get("vision", "").strip()
     if not vision:
         raise HTTPException(status_code=400, detail="vision is required")
@@ -6529,7 +6540,7 @@ async def learn_value(request: Request):
     The system observes operator feedback (corrections, praise, stories)
     and extracts what matters — forming values organically.
     """
-    body = await request.json()
+    body = await bounded_json(request)
     experience = sanitize_string(body.get("experience", ""))
     outcome = sanitize_string(body.get("outcome", ""))  # positive / negative / neutral
     sanitize_string(body.get("context", ""))
@@ -6604,7 +6615,7 @@ async def conscience_check(request: Request):
 
     Before acting, Kai asks: does this align with what I've learned matters?
     """
-    body = await request.json()
+    body = await bounded_json(request)
     action = sanitize_string(body.get("action", ""))
     if not action:
         raise HTTPException(status_code=400, detail="action is required")
@@ -6707,7 +6718,7 @@ async def record_loyalty(request: Request):
 
     Kai should NEVER forget what people gave up for this project.
     """
-    body = await request.json()
+    body = await bounded_json(request)
     act = sanitize_string(body.get("act", ""))
     person = sanitize_string(body.get("person", "operator"))
     act_type = sanitize_string(body.get("type", "commitment"))  # sacrifice/promise/commitment
@@ -6764,7 +6775,7 @@ async def record_gratitude(request: Request):
 
     Records genuine gratitude for specific acts, sacrifices, and gifts.
     """
-    body = await request.json()
+    body = await bounded_json(request)
     recipient = sanitize_string(body.get("recipient", "operator"))
     reason = sanitize_string(body.get("reason", ""))
     if not reason:

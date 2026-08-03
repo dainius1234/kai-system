@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-03 (fifteenth pass — H-1 aware timestamps; hygiene debt 136 → 121)
+**Last updated:** 2026-08-03 (sixteenth pass — H-2 memu-core hardened; hygiene debt 136 → 105)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -62,7 +62,8 @@
 | W1-DASH-E–I Bounds, media, disclosure, fan-out, hygiene | ✅ Done | `a48b78d` | `make test-dashboard` | (folded in) |
 | W1-SEC-1 Keeper is an explicit grant, not the default | ✅ Done | this commit | `make test-dashboard-auth` | (folded in) |
 | H-5 Repo-wide hygiene ratchet (10th CI gate) | ✅ Done | `e5fd4de` | `make test-hygiene-gate` | 29 |
-| H-1 Timezone-aware timestamps (17 sites, 7 services) | ✅ Done | this commit | `make hygiene-gate` | 0 naive remain |
+| H-1 Timezone-aware timestamps (17 sites, 7 services) | ✅ Done | `bd1e449` | `make hygiene-gate` | 0 naive remain |
+| H-2 memu-core bounded reads + honest failures | ✅ Done | this commit | `make hygiene-gate` | memu-core clear |
 | | | | **Total** | **1,897** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and

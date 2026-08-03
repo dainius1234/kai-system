@@ -1,6 +1,6 @@
 # Sub-plan — Repository-wide HTTP and Time Hygiene
 
-**Status:** in progress. H-5 and H-1 complete; H-2 next.
+**Status:** in progress. H-5, H-1 and H-2 complete; H-3 next.
 **Parent:** [`W1_DASHBOARD_REMEDIATION_PLAN.md`](W1_DASHBOARD_REMEDIATION_PLAN.md)
 **Survey command:** `make hygiene-survey`
 
@@ -42,7 +42,7 @@ Counted from each service's `app.py`. Reproduce with `make hygiene-survey`.
 | Service | Per-request HTTP clients | Unbounded `request.json()` | Naive `utcnow()` | 200-on-failure |
 |---|---:|---:|---:|---:|
 | `agentic` | **37** | 6 | 0 | 1 |
-| `memu-core` | 0 | **14** | 0 | 2 |
+| `memu-core` | 0 | 0 | 0 | 0 |
 | `supervisor` | 12 | 0 | 0 | 0 |
 | `telegram-bot` | 6 | 0 | 0 | 1 |
 | `heartbeat` | 4 | 0 | 0 | 0 |
@@ -59,9 +59,9 @@ Counted from each service's `app.py`. Reproduce with `make hygiene-survey`.
 | `verifier` | 2 | 0 | 0 | 0 |
 | `memu-graph` | 0 | 0 | 0 | 1 |
 | 10 others (1 client each) | 10 | 0 | 0 | 0 |
-| **Total** | **96** | **20** | **0** | **5** |
+| **Total** | **96** | **6** | **0** | **3** |
 
-**Grand total: 121**, down from 136.
+**Grand total: 105**, down from 136.
 
 ### Progress
 
@@ -69,8 +69,8 @@ Counted from each service's `app.py`. Reproduce with `make hygiene-survey`.
 |---|---|---|
 | **H-5** Ratchet gate | **Done** — 10th CI gate | The debt can no longer grow |
 | **H-1** Aware timestamps | **Done** — 17 sites across 7 services | `naive_utcnow` is **0** |
-| **H-2** `memu-core` | Next | 14 unbounded reads, 2 success-shaped failures |
-| **H-3** `agentic` | After H-2 | 37 clients, 6 reads, 1 failure |
+| **H-2** `memu-core` | **Done** | 14 reads bounded, 2 failures now 503. `memu-core` is **clear** |
+| **H-3** `agentic` | **Next** | 37 clients, 6 reads, 1 failure |
 | **H-4** Remaining services | Last | 44 clients, one line each |
 
 > **The survey was undercounting.** It scanned only `*/app.py`, so
@@ -132,7 +132,7 @@ should land with the affected service's tests green.
 | Step | Scope | Why this order |
 |---|---|---|
 | ~~**H-1**~~ | ~~`datetime.utcnow()` → aware~~ | **Done.** 17 sites, 7 services. `.isoformat()` now carries `+00:00`; `.strftime()` output is byte-identical. Verified safe first: memU coerces naive→aware defensively, and `calendar-sync` is self-contained and naive-consistent |
-| **H-2** | `memu-core` — 14 unbounded reads, 2 success-shaped fallbacks | Highest consequence per defect: pathological bodies reach persistent state |
+| ~~**H-2**~~ | ~~`memu-core`~~ | **Done.** All 14 recording routes bounded; `/memory/persist` and the graph proxy now answer 503 on failure. A test asserted the defect — that a persistence failure returns 200 — and was corrected |
 | **H-3** | `agentic` — 37 clients, 6 reads, 5 timestamps, 1 fallback | Largest single concentration (49 of 136); do it once the pattern is proven on a smaller service |
 | **H-4** | Remaining 24 services — pooling | Mechanical, one line each |
 | ~~**H-5**~~ | ~~A repo-wide gate~~ | **Done.** Ratchet, not a threshold — see D148 |

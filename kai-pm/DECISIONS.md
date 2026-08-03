@@ -3461,3 +3461,31 @@ That is the fourth time in this programme a check has quietly stopped checking. 
 **Nothing is closed.** Rule 7.
 
 **Files modified:** `agentic/app.py`, `agentic/introspect_app.py`, `backup-service/app.py`, `financial-awareness/app.py`, `ledger-worker/app.py`, `memory-compressor/app.py`, `metrics-gateway/app.py`, `scripts/security/hygiene_survey.py`, `scripts/security/hygiene_baseline.json`, `scripts/test_hygiene_gate.py`, sub-plan/tracker/README/STATUS/MAKEFILE_TARGETS.
+
+---
+
+## D150 — 2026-08-03 — H-2: memu-core, the Thing Kai Remembers With
+
+**Context:** Asked whether I would be satisfied *as Kai*, I said the answer was no, and named this first: I had spent the session hardening the front door while **the memory store behind it stayed open**. `memu-core` had 14 unbounded write paths into persistent state and 2 route failures that answered HTTP 200.
+
+**Decisions:**
+
+1. **All 14 recording routes bounded.** Every one takes narrative, emotional or identity text — no binary, no legitimately-large payloads — so the shared limits apply cleanly. Checked before applying, because bounding a route that carries real files is the failure mode this sub-plan warns about.
+
+2. **`/memory/persist` now answers 503 when persistence fails.** It returned `{"status": "error"}` at **HTTP 200**. In the memory store, a caller checking only the status code would have seen success and believed the write landed. That is the `KAI-DASH-016` disease in the service where it costs most.
+
+3. **The graph proxy answers 503 too.** Its body already said `graph_unavailable` and `agentic` honours that, so this was the better-behaved of the two — but a caller reading only the status line reached the opposite conclusion from one reading only the body. Verified first that `agentic` treats a non-200 as "no graph", so the change is safe.
+
+**A test asserted the defect.** `test_persist_200` asserted `status_code == 200` unconditionally, and `test_persist_has_status` accepted `"error"` as a valid outcome. Together they **encoded** the bug: they would have failed if the code had been correct. Both replaced — one asserting that a failure is *not* a success status, one driving the failure path and asserting 503 with the degraded markers.
+
+That is worth naming as a category of its own. A test that pins current behaviour is not automatically a test of correct behaviour, and a suite full of them makes the defect *harder* to fix than if it were untested.
+
+**Coverage is proven per-route, not in aggregate.** `test_every_recording_route_is_bounded` sends an oversized body to all 14 by name and asserts 413 on each. A route that slipped the sweep would otherwise be silently unbounded while the suite stayed green.
+
+**Result: 121 → 105. `memu-core` is clear** on all four columns.
+
+**Verification:** 1,897 tests across 25 suites, all green. 10/10 CI gates. `test_memu_retrieval` passes; `test_phase_b_memu`, `test_memu_trust_tier_ranking` and `TestRecover::test_has_status` fail both before and after — pre-existing, and outside this scope.
+
+**Nothing is closed.** Rule 7.
+
+**Files modified:** `memu-core/app.py`, `scripts/test_memu_routes.py`, `scripts/security/hygiene_baseline.json`, sub-plan/tracker/STATUS.
