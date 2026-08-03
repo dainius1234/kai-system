@@ -583,7 +583,7 @@ services:
     <<: *defaults
     environment:
       TOOL_GATE_URL: http://tool-gate:8000
-      GATE_SESSION_ID: "${CAMERA_GATE_TOKEN:-camera-gate-token-1}"
+      GATE_SESSION_ID: "${CAMERA_GATE_TOKEN:-}"
       INTERSERVICE_HMAC_SECRET: /run/secrets/hmac_secret
     secrets:
       - hmac_secret

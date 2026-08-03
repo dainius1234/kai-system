@@ -131,6 +131,7 @@ SUITE_TARGETS = {
     "Assertion Floor Tests": "test-assertion-floors",
     "Gate Registry Tests": "test-gate-registry",
     "Compose Drift Tests": "test-compose-drift",
+    "Secret & Restart Gate Tests": "test-secret-gates",
 }
 
 

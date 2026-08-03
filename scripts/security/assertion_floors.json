@@ -20,6 +20,7 @@
     "Legacy Bridge Tests": 58,
     "Migration & Active Mode Tests": 136,
     "Payload Bounds Tests": 24,
+    "Secret & Restart Gate Tests": 28,
     "Service Auth Tests": 59,
     "UH-1 Contract Tests": 126,
     "UH-2 Perception Spine Tests": 166,
@@ -30,5 +31,5 @@
     "UH-7 Actuator Registry Tests": 75,
     "UH-8 Autonomy Tests": 174
   },
-  "total": 2019
+  "total": 2047
 }

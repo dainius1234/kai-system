@@ -164,7 +164,7 @@ Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
 
 | Target | Status | What it covers |
 |---|---|---|
-| `test-uh` | ✓ | **Aggregate — run this one.** All 28 suites, 1,998 tests |
+| `test-uh` | ✓ | **Aggregate — run this one.** All 29 suites, 2,047 tests |
 | `test-contracts` | ✓ | UH-1 frozen canonical contracts (126) |
 | `test-perception-spine` | ✓ | UH-2 shadow-mode event ingress (166) |
 | `test-world-state` | ✓ | UH-3 reducers and immutable snapshots (71) |
@@ -193,6 +193,7 @@ Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
 | `test-assertion-floors` | ✓ | A-02 the assertion ratchet must be able to fail; synthetic inputs only (40) |
 | `test-gate-registry` | ✓ | A-04 the instrumentation meta-check must be able to fail; synthetic registries only (30) |
 | `test-compose-drift` | ✓ | A-04b the drift ratchet must fire on a weaker profile and stay silent on a stricter one (21) |
+| `test-secret-gates` | ✓ | A-04b the secret rule and restart allowlist, neither previously able to fail (28) |
 | `dashboard-findings` | — | Wave 1 status report: revalidates all 96 `KAI-DASH` findings. Not a gate |
 | `hygiene-survey` | — | Repo-wide HTTP/time hygiene scale across all services |
 | `hygiene-gate` | ✓ | **10th CI gate.** Ratchet: fails if any hygiene count rises |

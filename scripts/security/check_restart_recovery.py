@@ -63,11 +63,18 @@ def check_file(path: Path) -> list[str]:
         if svc_cfg is None:
             continue
 
+        # `ALLOWED_RESTART` was declared and never referenced: the
+        # docstring promised an allowlist ("must use unless-stopped or
+        # on-failure") while the code denied exactly one string, so
+        # `restart: nonsense-value` passed. A declared-but-unwired
+        # constant is the same defect as the `if ...: pass` dead branch
+        # found in `check_compose_drift` — an implementation simpler than
+        # it reads. The allowlist it declares is the one enforced now.
         restart = svc_cfg.get("restart")
-        if restart == "always":
+        if restart is not None and str(restart) not in ALLOWED_RESTART:
             violations.append(
-                f"{path}: service '{svc_name}' uses restart: always — "
-                f"must use on-failure or unless-stopped"
+                f"{path}: service '{svc_name}' uses restart: {restart!r} — "
+                f"must be one of {sorted(ALLOWED_RESTART)}"
             )
 
         if svc_name == "supervisor":

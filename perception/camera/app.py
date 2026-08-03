@@ -222,7 +222,13 @@ PROACTIVE_COOLDOWN = int(os.getenv("PROACTIVE_COOLDOWN_SECONDS", "120"))
 TTS_URL = os.getenv("TTS_URL", "http://tts:8022")
 MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
 TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
-GATE_SESSION_ID = os.getenv("GATE_SESSION_ID", "camera-gate-token-1")
+# No default. This is the camera's identity to the tool-gate, and the
+# previous fallback (`camera-gate-token-1`) shipped in docker-compose and
+# again here — so the literal *was* the session ID in any deployment
+# where nobody set the variable, and it sat in a file anyone can read.
+# Unset means the camera cannot speak unprompted, which is the safe half
+# of the failure.
+GATE_SESSION_ID = os.getenv("GATE_SESSION_ID", "")
 _last_proactive_ts: float = 0.0
 
 
@@ -233,6 +239,12 @@ async def _gate_allows_speak(urgency: float) -> bool:
     Maps the 0-1 speak urgency onto the system's single 0-10 conviction
     scale. Fails closed: if the gate is unreachable, KAI stays quiet.
     """
+    if not GATE_SESSION_ID:
+        # Refuse explicitly rather than by accident. Without an identity
+        # the gate cannot authorise anything, and the request below would
+        # fail anyway — but silently, and only at the far end.
+        return False
+
     try:
         import httpx
         nonce = str(uuid.uuid4())

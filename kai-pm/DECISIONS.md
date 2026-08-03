@@ -3761,3 +3761,56 @@ A mechanical retrofit would have given this a confident denominator and a fail-c
 **Nothing is closed.** Rule 7. `KAI-GATE-005` moves to REMEDIATED; `007` opens; `001`–`004` remain OPEN.
 
 **Files modified:** `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `scripts/security/assertion_floors.json`, sub-plan/tracker/STATUS.
+
+---
+
+## D156 — 2026-08-03 — Reading Seven Gates Before Hardening Them: Two Were Lying
+
+**Context:** The operator's ruling on the retrofit order was unambiguous — *"A denominator on a broken check is architectural lipstick."* Add fail-closed inputs and a confident count to a check with wrong semantics and you have made it **look** more trustworthy while it is still wrong. So: read first, harden second. They also asked for two cheap measurements before the deep read.
+
+### Measurement 1 — the `${SECRET:-default}` population
+
+111 occurrences of `${VAR:-default}`; 26 with secret-shaped names; **22 of those already defaulted to empty.** The convention was right almost everywhere and nothing enforced it. Three were `SECRETS_DIR`, a path caught by name — my own heuristic's false positive.
+
+**Exactly one carried a real value**, so this landed in the operator's bottom bucket: *just fix it, it's a gate fix not a programme.* The tiered gate they offered for a high count was not built, because the count did not call for it.
+
+### Measurement 2 — the docstring/implementation sweep
+
+**No unused imports in any of the seven** — that smell is absent here. Of four gates with enumerated claims, `check_network_zones` (6) and `check_turbovec_writers` (3) implement everything they advertise.
+
+One apparent gap was **my own sweep being wrong**: `check_restart_recovery`'s "Executor does not use restart: always" is a redundant restatement, because the loop applies the rule to every service. Verified before reporting rather than after.
+
+But verifying it found something the sweep was not looking for, and the operator's smell generalises one level down from imports: **`ALLOWED_RESTART` was declared and never referenced.** The docstring promised an allowlist while the code denied exactly one string:
+
+```
+REJECTED  restart: always
+accepted  restart: nonsense-value      <- allowlist declared, denylist implemented
+```
+
+A declared-but-unwired *constant* is the same defect as the `if ...: pass` dead branch found in `check_compose_drift`. Worth adding to the sweep permanently.
+
+### KAI-GATE-007 — the secret gate was the wrong shape entirely
+
+It matched a denylist of nine guessable words. Measured against synthetic inputs it caught `${DB_PASSWORD:-localdev}` and missed `${DB_PASSWORD:-hunter2}`, `${JWT_SECRET:-a8f3c9d1e7b2}`, and a hardcoded `BINANCE_API_SECRET`.
+
+**The danger is not that a default is weak. It is that a default exists.** This programme's own principle is *missing secret → 503, never open*; any default defeats it, and a strong-looking one defeats it while looking responsible. The rule now: **a secret may be referenced (`${VAR}`) or explicitly empty (`${VAR:-}`), never valued.** The missing third scan — hardcoded secrets in environment blocks — is implemented.
+
+Two design points earned by the measurement, not guessed:
+
+- **Whole-word matching.** `HUGGINGFACE_TOKENIZER` contains "TOKEN" and is a model name. Substring matching would flag working configuration, which invites someone to "fix" it — defect 7's shape.
+- **The key alone is not enough.** The one dangerous default hid under a *non-secret* key: `GATE_SESSION_ID: "${CAMERA_GATE_TOKEN:-camera-gate-token-1}"`. A rule inspecting only the key would have missed the finding that motivated the rewrite. Interpolated variable names are inspected too.
+
+The single genuine exception (`memu-graph.LLM_API_KEY` — Ollama needs no key but its OpenAI-compatible client needs a non-empty string) is **encoded per (service, key) with a stated reason and printed on every run**, per the operator's rubric. A test asserts the same key in another service still fails, so one real exception cannot generalise.
+
+### KAI-GATE-009 — the camera's identity was a public constant
+
+`camera-gate-token-1` appeared in `docker-compose.full.yml` **and again** as the fallback in `perception/camera/app.py:225`. With no `.env.example` entry and no other reference, that literal *was* the camera's tool-gate session ID in any deployment where nobody set the variable — sitting in a file anyone can read.
+
+Fixing only the compose file would have been cosmetic; the code fallback would have supplied the same string. Both are now empty, and `_gate_allows_speak` refuses explicitly rather than by accident: without an identity the camera cannot speak unprompted, which is the safe half of the failure.
+
+**Verification:** 2,047 tests across 29 suites, all green — 28 in the new `test_secret_gates.py`, which proves both gates fail on a weak default, a strong default, a hardcoded secret, a secret hidden under a non-secret key, a dev HMAC switch, an invalid restart value, and a missing input; and proves they do **not** fire on a tokenizer, a secret path, a `_PATH` suffix, a header name, or a legitimately different restart value. 11/11 policy gates. The meta-check fell **29 → 26**: I-2 from 7 to 6, I-3 from 7 to 5.
+
+**Nothing is closed.** Rule 7. `KAI-GATE-007`, `008` and `009` are REMEDIATED; `001`–`004` remain OPEN, and five of the seven gates are still unread.
+
+**Files added:** `scripts/test_secret_gates.py`.
+**Files modified:** `scripts/security/check_secret_fallbacks.py` (rewritten), `scripts/security/check_restart_recovery.py`, `perception/camera/app.py`, `docker-compose.full.yml`, `scripts/security/gate_registry.py`, `scripts/security/check_assertion_floors.py`, `scripts/security/assertion_floors.json`, `Makefile`, sub-plan/tracker/STATUS.
