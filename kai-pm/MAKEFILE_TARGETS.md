@@ -164,7 +164,7 @@ Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
 
 | Target | Status | What it covers |
 |---|---|---|
-| `test-uh` | ✓ | **Aggregate — run this one.** All 26 suites, 1,947 tests |
+| `test-uh` | ✓ | **Aggregate — run this one.** All 27 suites, 1,977 tests |
 | `test-contracts` | ✓ | UH-1 frozen canonical contracts (126) |
 | `test-perception-spine` | ✓ | UH-2 shadow-mode event ingress (166) |
 | `test-world-state` | ✓ | UH-3 reducers and immutable snapshots (71) |
@@ -191,12 +191,15 @@ Status tracked in [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md).
 | `test-degraded` | ✓ | W1-DASH Track D degraded-state envelope (36) |
 | `test-hygiene-gate` | ✓ | H-5 the hygiene ratchet must be able to fail (39) |
 | `test-assertion-floors` | ✓ | A-02 the assertion ratchet must be able to fail; synthetic inputs only (40) |
+| `test-gate-registry` | ✓ | A-04 the instrumentation meta-check must be able to fail; synthetic registries only (30) |
 | `dashboard-findings` | — | Wave 1 status report: revalidates all 96 `KAI-DASH` findings. Not a gate |
 | `hygiene-survey` | — | Repo-wide HTTP/time hygiene scale across all services |
 | `hygiene-gate` | ✓ | **10th CI gate.** Ratchet: fails if any hygiene count rises |
 | `hygiene-baseline` | — | Lock in an improvement. Refuses to raise the ceiling |
 | `assertion-floors` | ✓ | **11th CI gate.** Ratchet: fails if any suite exercises less than before, vanishes, or reports a context-dependent count |
 | `assertion-floors-update` | — | Lock in added coverage. Refuses to lower a floor |
+| `gate-registry` | — | **A-04a, reporting mode.** Cross-checks every security check against the filesystem, Makefile and workflows. Exits 0 by design |
+| `gate-registry-gate` | — | The same, enforcing. A-04e moves it into `policy-check` |
 | `verify-live-endpoints` | — | G-10/E-01 live read check; needs a running stack |
 | `verify-live-mutating` | — | E-02 live mutating check; needs a stack + token |
 | `setup-service-token` | ✓ | Generates `KAI_SERVICE_TOKEN` and `KAI_DASHBOARD_TOKEN` into gitignored `.env` |

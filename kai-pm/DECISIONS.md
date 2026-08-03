@@ -3587,3 +3587,50 @@ Two dependencies of that workflow are load-bearing and easy to lose: **node** (w
 
 **Files added:** `scripts/security/check_assertion_floors.py`, `scripts/security/assertion_floors.json`, `scripts/test_assertion_floors.py`, `.github/workflows/unified-hunter.yml`.
 **Files modified:** `Makefile`, `README.md`, `kai-pm/MAKEFILE_TARGETS.md`, `kai-pm/STATUS.md`, `kai-pm/UH_PROGRESS_TRACKER.md`.
+
+---
+
+## D153 — 2026-08-03 — A-04a: The Watching Layer Declares Itself, and Fails Its Own Rule on the First Run
+
+**Context:** Nine defects in this programme were in the instrumentation, not the system, and all nine were found by luck. `kai-pm/INSTRUMENTATION_ARCHITECTURE.md` measured the watching layer and sketched four invariants; the operator approved the shape without changes and added three things adopted here verbatim.
+
+### The operator's three additions
+
+**1. A name for the class: boundary blindness.** *A check that cannot distinguish "the system is correct" from "the system is absent."* Their diagnosis of why is sharper than mine was: the script answers *"of the things I looked at, were any wrong?"* while claiming to answer *"are the things correct?"* — and "I looked at nothing" is a valid answer to the first and a silent failure on the second. It is the self-consuming guard moved from the state boundary to the input boundary. One erodes because the thing it guards succeeded; the other because its input moved.
+
+**2. The termination criterion: does the watcher survive the same scrutiny it applies?** If yes, stop. That is a fixed point, not a regress, and it is why there is no seventh gate.
+
+**3. The rubric, which settled a design question I was about to get wrong:**
+
+> If it can't be encoded so the system enforces it, it's not an exception — it's debt.
+
+I had been about to give `Gate` a free-text `notes` field for "this one is intentionally not in CI". That field is now absent by design. Every departure is a typed field the meta-check reads and reports: `kind=REPORT` records *why* something is absent from `policy-check`; `optional_inputs` is per-path so "this may be missing" never generalises into "absence is fine"; `probe=False` **requires** `probe_skip_reason`; `pending_wiring` names the step that will enforce a gate and is printed on every run until it does. None can be satisfied by someone knowing why.
+
+### What it found
+
+33 findings across 13 checks: 16 boundary-blindness sites, 8 checks with no denominator, 9 never observed failing. No wiring disagreements — my declarations matched discovery, which is why the *suite* has to prove I-4 fires rather than the repository.
+
+### It failed its own rule on the first execution
+
+**The first run spawned itself by subprocess and recursed until the process tree had to be killed.** The registry lists every check including `check_gate_registry`; the denominator probe runs each listed check.
+
+Depth-one recursion was a property of the **design** — argued in the sub-plan, agreed with the operator, and enforced by nothing. That is precisely the class of defect this file exists to find, found inside the fix for it, within a minute of writing it.
+
+**A design property that the code does not enforce is not a property.** That belongs next to boundary blindness and the self-consuming guard.
+
+The terminus is now explicit rather than assumed: `probe_denominator` refuses to spawn itself and returns a `self` status; `test_the_meta_check_never_probes_itself` traps `subprocess.run` and asserts no child is launched; and the meta-check's own denominator is verified from *outside*, by driving `main()` in-process and matching its real printed output against the pattern the registry declares. Not circular — the assertion comes from elsewhere, against real output.
+
+### Reporting mode, deliberately
+
+`make gate-registry` exits 0 by design, the same way H-5 landed. Gating before fixing means a gate that starts red and gets ignored — defect 9's shape. A-04e flips it once the register is clear, and `pending_wiring` keeps that promise visible on every run rather than in someone's memory.
+
+The operator's warning about A-04a is the thing to watch: *the reporting mode is going to generate a list of "exceptions," and every exception is a future defect if it's not structural rather than ambient.* The rubric above is the answer, and the absence of a `notes` field is how it is enforced.
+
+**Also of note:** `cross_check()` was split out as a pure function of four injectable sources, so all 21 scenarios drive it from synthetic registries and synthetic filesystems. A meta-check testable only against the real repository would be guarded on state its own tests modify — the self-consuming shape, inside the file written to detect it.
+
+**Verification:** 1,977 tests across 27 suites, all green — 30 of them this meta-check's own. `make assertion-floors` passes both detectors at 27 suites. `make gate-registry` reports 33 findings and exits 0; `--gate` exits 1 on the same input. Proven to fail on: an unregistered check, a phantom declaration, a Makefile disagreement, a workflow disagreement, a REPORT wired as a gate, a gate nothing invokes, a missing failure suite, a `proven_by` pointing at nothing, a boundary-blind skip, a missing required input, a missing denominator, an empty registry, and a self-probe attempt.
+
+**Nothing is closed.** Rule 7. KAI-GATE-001..005 remain OPEN — A-04a measures them, it does not fix them.
+
+**Files added:** `scripts/security/gate_registry.py`, `scripts/security/check_gate_registry.py`, `scripts/test_gate_registry.py`.
+**Files modified:** `Makefile`, `scripts/security/check_assertion_floors.py`, `scripts/security/assertion_floors.json`, `kai-pm/INSTRUMENTATION_ARCHITECTURE.md`, `kai-pm/UH_PROGRESS_TRACKER.md`, `kai-pm/STATUS.md`, `kai-pm/MAKEFILE_TARGETS.md`.

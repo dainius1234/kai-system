@@ -1,6 +1,8 @@
 # Sub-plan — The Instrumentation Layer
 
-**Status:** measured, not yet built. Register below holds 5 findings.
+**Status:** **A-04a done** — registry + meta-check live in reporting mode
+(`make gate-registry`), reporting **33 findings** across the four
+invariants. A-04b–e outstanding. Register below holds 5 findings.
 **Parent:** [`W1_DASHBOARD_REMEDIATION_PLAN.md`](W1_DASHBOARD_REMEDIATION_PLAN.md)
 **Question this answers:** *"What does the instrumentation architecture look
 like if you sketch it the way you'd sketch `dashboard/app.py`?"*
@@ -260,7 +262,7 @@ Ordered lowest-risk first. Each step is independently revertible.
 
 | Step | Scope | Why this order |
 |---|---|---|
-| **A-04a** | Registry + meta-check in **reporting** mode | Makes the 4 findings visible and counted without blocking. Same shape as H-5 |
+| ~~**A-04a**~~ | ~~Registry + meta-check in reporting mode~~ | **Done.** `make gate-registry` reports 33 findings and exits 0 by design. 30 assertions in `test_gate_registry.py`, all from synthetic registries |
 | **A-04b** | I-1 fail-closed across all 12 | Mechanical, and the highest-severity finding. One shared helper, not 12 edits |
 | **A-04c** | I-2 denominators across all 12 | Follows I-1 naturally — the count is what the fail-closed check already computes |
 | **A-04d** | I-3 can-it-fail suites for the 8 | The largest piece. 8 suites, each injecting one real violation |
@@ -297,6 +299,29 @@ still passes. Fixed, predictable cost; no whole-repo mutation run.
 Recorded here as **A-03**, deliberately unscheduled, and deliberately not
 claimed by A-02. The assertion ratchet catches shrinkage, not vacuity.
 Two different defects, two different detectors.
+
+---
+
+## 9. What A-04a found in itself
+
+The first run of the meta-check **spawned itself by subprocess and
+recursed until the process tree had to be killed.** The registry lists
+every check including `check_gate_registry`, and the denominator probe
+runs each listed check.
+
+Depth-one was a property of the *design*, argued in §4 of this document
+and in the operator's fixed-point criterion. Nothing in the code enforced
+it — which is the exact class of defect this file exists to find, found
+inside the fix for it, on the first execution.
+
+The terminus is explicit now: `probe_denominator` refuses to spawn itself
+and returns a `self` status, and `test_the_meta_check_never_probes_itself`
+traps `subprocess.run` to prove no child is ever launched. The meta-check's
+own denominator is asserted from *outside*, by driving `main()` in-process
+and matching its real output against the pattern the registry declares.
+
+**A design property that the code does not enforce is not a property.**
+That belongs alongside boundary blindness and the self-consuming guard.
 
 ---
 

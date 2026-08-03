@@ -129,6 +129,7 @@ SUITE_TARGETS = {
     "Architecture Rule Tests": "test-architecture-rules",
     "Deployment Preflight Tests": "test-preflight",
     "Assertion Floor Tests": "test-assertion-floors",
+    "Gate Registry Tests": "test-gate-registry",
 }
 
 

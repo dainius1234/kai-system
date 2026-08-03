@@ -65,8 +65,9 @@
 | H-1 Timezone-aware timestamps (17 sites, 7 services) | ✅ Done | `bd1e449` | `make hygiene-gate` | 0 naive remain |
 | H-2 memu-core bounded reads + honest failures | ✅ Done | `a195a3e` | `make hygiene-gate` | memu-core clear |
 | H-3/H-4 agentic + 23 services pooled and bounded | ✅ Done | `4c45398` | `make hygiene-gate` | **0 across 50 services** |
-| A-02 Assertion-count ratchet (11th CI gate) | ✅ Done | this commit | `make test-assertion-floors` | 40 |
-| | | | **Total** | **1,947** |
+| A-02 Assertion-count ratchet (11th CI gate) | ✅ Done | `47d2243` | `make test-assertion-floors` | 40 |
+| A-04a Instrumentation registry + meta-check (reporting) | ✅ Done | this commit | `make test-gate-registry` | 30 |
+| | | | **Total** | **1,977** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
