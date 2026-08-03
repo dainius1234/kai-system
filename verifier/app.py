@@ -33,6 +33,7 @@ import httpx
 from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
 
+from common.http_hygiene import pooled_client
 from common.policy import policy_hash, policy_version, verifier_thresholds
 from common.runtime import ErrorBudget, detect_device, setup_json_logger
 
@@ -176,7 +177,7 @@ async def _memory_cross_ref(claim: str, top_k: int,
     else:
         # try the richer /memory/evidence-pack first; fall back to /memory/retrieve
         try:
-            async with httpx.AsyncClient(timeout=5.0) as client:
+            async with pooled_client(timeout=5.0) as client:
                 resp = await client.get(
                     f"{MEMU_URL}/memory/evidence-pack",
                     params={"query": claim, "user_id": "keeper", "top_k": top_k},
@@ -187,7 +188,7 @@ async def _memory_cross_ref(claim: str, top_k: int,
         except Exception:
             # fall back to basic retrieve
             try:
-                async with httpx.AsyncClient(timeout=5.0) as client:
+                async with pooled_client(timeout=5.0) as client:
                     resp = await client.get(
                         f"{MEMU_URL}/memory/retrieve",
                         params={"query": claim, "user_id": "keeper", "top_k": top_k},

@@ -16,6 +16,8 @@ from contextlib import asynccontextmanager
 from typing import Optional
 
 import httpx
+
+from common.http_hygiene import pooled_client
 from fastapi import FastAPI, HTTPException
 
 try:
@@ -70,7 +72,7 @@ async def _fetch_weather() -> dict:
         "timezone": "auto",
         "forecast_days": 7,
     }
-    async with httpx.AsyncClient(timeout=15) as client:
+    async with pooled_client(timeout=15) as client:
         resp = await client.get(BASE_URL, params=params)
         resp.raise_for_status()
         return resp.json()

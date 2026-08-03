@@ -22,6 +22,7 @@ from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+from common.http_hygiene import pooled_client
 from common.runtime import ErrorBudget, detect_device, sanitize_string, setup_json_logger
 
 logger = setup_json_logger("screen-capture", os.getenv("LOG_PATH", "/tmp/screen-capture.json.log"))
@@ -143,7 +144,7 @@ async def capture() -> CaptureResult:
     if os.getenv("AUTO_MEMORIZE", "false").lower() == "true" and text.strip():
         try:
             import httpx
-            async with httpx.AsyncClient(timeout=5.0) as client:
+            async with pooled_client(timeout=5.0) as client:
                 await client.post(f"{MEMU_URL}/memory/memorize", json={
                     "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                     "event_type": "screen_capture",

@@ -51,6 +51,8 @@ from datetime import datetime, timezone
 from typing import Any, Deque, Dict, List, Optional, Tuple
 
 import httpx
+
+from common.http_hygiene import pooled_client
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -146,7 +148,7 @@ def _update_credibility(label: str, raw: str) -> float:
 
 async def _fetch(url: str, path: str, timeout: float = 2.0) -> Optional[Dict]:
     try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
+        async with pooled_client(timeout=timeout) as client:
             r = await client.get(f"{url}{path}")
             if r.status_code == 200:
                 return r.json()

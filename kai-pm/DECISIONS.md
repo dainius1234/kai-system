@@ -3489,3 +3489,39 @@ That is worth naming as a category of its own. A test that pins current behaviou
 **Nothing is closed.** Rule 7.
 
 **Files modified:** `memu-core/app.py`, `scripts/test_memu_routes.py`, `scripts/security/hygiene_baseline.json`, sub-plan/tracker/STATUS.
+
+---
+
+## D151 — 2026-08-03 — H-3/H-4: Hygiene Debt to Zero, and Three Faults in My Own Tooling
+
+**Context:** Final steps of the global hygiene sub-plan — `agentic` (44 of the remaining 105) and the last 23 services. The operator's standing instruction applies throughout: *address the cause and the root, not just one file.*
+
+**Result: 136 → 0. All 50 services clear** on all four columns. 146 pooled call sites, 54 bounded body reads. The ratchet now sits at **zero** and was proven to fail on a single reintroduced client.
+
+### Three faults were in my tooling and my shared module, not in the services
+
+**1. The survey undercounted.** It scanned only `*/app.py`, so `agentic/introspect_app.py` was invisible — 2 naive timestamps and 3 per-request clients that no number in any document had ever included. It now scans `*_app.py` too and **aggregates** per service rather than letting the last file scanned overwrite the others.
+
+**2. The survey had a false positive.** It counted except-handlers anywhere inside a routed function, including *nested* helpers. `agentic`'s per-node `_ping()` correctly returns `{"reachable": False}` while the route around it succeeds and reports which nodes are down — correct code, flagged as a defect. `_own_except_handlers()` is scope-aware now, skipping nested functions, lambdas and classes. **A survey with false positives invites someone to "fix" working code**, which is a worse outcome than the debt it was measuring.
+
+**3. `common/http_hygiene.py` imposed import-time requirements — and this was the root cause behind four broken suites.** It subclassed `httpx.AsyncHTTPTransport` and imported the perception spine at module level. Several service tests stub `httpx` with a partial module, or replace `common` entirely; every service that adopted `pooled_client` then failed to import, surfacing as unrelated errors far from the cause — `test_temporal_self` reported `module has no attribute '_trend'` because its `except Exception: pass` around `exec_module` **swallowed the real ImportError**.
+
+Both dependencies are lazy now: the transport is built on first use and degrades to per-client transports under a stubbed httpx; the limits resolve through a module `__getattr__`. **A shared utility must not impose import-time requirements on everything that touches it.**
+
+I had first patched three test files individually with a `common.http_hygiene` stub. That was three fixes for one cause, and the fourth service to adopt the module would have broken a fourth suite. The correct fix was in the module, plus giving the `common` stub a real `__path__` so *any* future shared module resolves — one change instead of N, and N shrinks to zero.
+
+### A test pattern that keeps going vacuous
+
+`test_every_column_is_ratcheted` decremented a named column's baseline to prove the gate fires. That assumes the column is non-zero — so as each column was driven to zero (`naive_timestamps` by H-1, `clients` by H-4) the test **silently stopped testing it**. The same shape appeared again in the baseline-raise tests, whose early-returns meant the suite reported 34 checks standalone and 31 under `make test-uh`.
+
+All of it now runs against synthetic counts through `ratchet()` and an in-process `main()`, so every guarantee holds regardless of how much real debt remains. The count is stable at **39** in both contexts.
+
+**This is the fifth time in this programme a check has quietly stopped checking, and the pattern is always the same: a guard that was reasonable when written, made vacuous by the very success it was measuring.** Tests that only work while the system is broken are not a safety net; they are a countdown.
+
+### Also fixed
+
+`memu-graph`'s `graph_forget` returned HTTP 200 when **erasure failed** — a caller would believe the data was gone, which is precisely what the §16.30 lineage work exists to prevent. `telegram-bot`'s `send_alert` returned 200 when the alert did not send. Both now answer 503, and both stopped putting exception text in the response.
+
+**Verification:** 1,907 tests across 25 suites, all green. 10/10 CI gates. Every one of the 23 changed services verified by **import**, not just compile — a bad import anchor is a runtime `NameError`, not a syntax error. Ten suites fail both before and after; they need a running stack.
+
+**Nothing is closed.** Rule 7.

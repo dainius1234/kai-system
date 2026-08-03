@@ -20,6 +20,7 @@ from typing import Any, Dict, List
 import httpx
 from fastapi import FastAPI
 
+from common.http_hygiene import pooled_client
 from common.resilience import TaskWatchdog
 from common.runtime import (
     CircuitBreaker,
@@ -191,7 +192,7 @@ async def _sweep() -> List[Dict[str, Any]]:
       - Records fleet health history for trend detection
       - Reports frozen background tasks via TaskWatchdog
     """
-    async with httpx.AsyncClient(timeout=5.0) as client:
+    async with pooled_client(timeout=5.0) as client:
         results = await asyncio.gather(*[_check_service(client, svc) for svc in SERVICES])
 
     unhealthy_count = 0
@@ -207,7 +208,7 @@ async def _sweep() -> List[Dict[str, Any]]:
             _send_notification(f"[supervisor] circuit OPEN for {name}")
             logger.warning("Circuit breaker OPEN: %s", name)
             # Layer 2: attempt self-heal
-            async with httpx.AsyncClient(timeout=10.0) as rclient:
+            async with pooled_client(timeout=10.0) as rclient:
                 ok = await _attempt_recovery(rclient, name)
                 if ok:
                     recovered.append(name)
@@ -236,7 +237,7 @@ TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
 async def _get_current_mode() -> str:
     """Fetch effective mode from tool-gate (schedule-aware)."""
     try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
+        async with pooled_client(timeout=3.0) as client:
             resp = await client.get(f"{TOOL_GATE_URL}/gate/mode")
             if resp.status_code == 200:
                 return str(resp.json().get("mode", "PUB")).upper()
@@ -261,7 +262,7 @@ async def _proactive_check() -> None:
     mode = await _get_current_mode()
 
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0) as client:
             # P4d: use mode-filtered proactive (includes anti-annoyance)
             resp = await client.get(f"{memu_url}/memory/proactive/filtered", params={"mode": mode})
             if resp.status_code != 200:
@@ -316,7 +317,7 @@ async def _proactive_check() -> None:
     message = "\n".join(lines)
 
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0) as client:
             resp = await client.post(
                 TELEGRAM_ALERT_URL,
                 json={"text": message},
@@ -345,7 +346,7 @@ async def _signal_proactive_check() -> None:
     mode/conviction rules — this function adds no new throttling of its own.
     """
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0) as client:
             resp = await client.post(f"{CAMERA_URL}/proactive/auto")
             if resp.status_code == 200:
                 data = resp.json()
@@ -362,7 +363,7 @@ async def _greeting_check() -> None:
     """P4f: Check if Kai should send a proactive greeting or check-in."""
     memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             # try greeting first
             resp = await client.get(f"{memu_url}/memory/greeting")
             if resp.status_code == 200:
@@ -395,7 +396,7 @@ async def _fire_due_items() -> None:
     """P21: Fire due reminders and scheduled tasks via Telegram."""
     memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0) as client:
             # fire due reminders
             resp = await client.get(f"{memu_url}/memory/reminders/due")
             if resp.status_code == 200:
@@ -439,7 +440,7 @@ async def _check_escalations() -> None:
     """P22: Check nudge escalation ladder and send escalated nudges via Telegram."""
     memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0) as client:
             resp = await client.get(f"{memu_url}/memory/nudge/ladder")
             if resp.status_code == 200:
                 targets = resp.json().get("targets", [])
@@ -549,7 +550,7 @@ async def status() -> Dict[str, Any]:
     verifier_verdicts: Dict[str, Any] = {}
     try:
         memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
-        async with httpx.AsyncClient(timeout=2.0) as client:
+        async with pooled_client(timeout=2.0) as client:
             q_resp = await client.get(f"{memu_url}/memory/quarantine/list")
             if q_resp.status_code == 200:
                 quarantine_count = q_resp.json().get("count", 0)
@@ -557,7 +558,7 @@ async def status() -> Dict[str, Any]:
         pass
     try:
         verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8052")
-        async with httpx.AsyncClient(timeout=2.0) as client:
+        async with pooled_client(timeout=2.0) as client:
             v_resp = await client.get(f"{verifier_url}/metrics")
             if v_resp.status_code == 200:
                 verifier_verdicts = v_resp.json().get("verdicts", {})
@@ -752,7 +753,7 @@ async def manual_recover(service_name: str) -> Dict[str, Any]:
         return {"ok": False, "error": "recovery disabled (SUPERVISOR_RECOVERY_ENABLED=false)"}
     if service_name not in RECOVERY_ACTIONS:
         return {"ok": False, "error": f"unknown service: {service_name}"}
-    async with httpx.AsyncClient(timeout=10.0) as client:
+    async with pooled_client(timeout=10.0) as client:
         ok = await _attempt_recovery(client, service_name)
     return {"ok": ok, "service": service_name}
 

@@ -17,6 +17,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
+from common.http_hygiene import bounded_json, pooled_client
 from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.service_auth import require_service_auth
 from common.feature_flags import is_enabled
@@ -335,7 +336,7 @@ async def maybe_alert_mtd_proximity(strategy: Dict[str, object]) -> None:
     left = mtd - income
     if 0 <= left <= 2000:
         try:
-            async with httpx.AsyncClient(timeout=4.0) as client:
+            async with pooled_client(timeout=4.0) as client:
                 await client.post(TELEGRAM_ALERT_URL, json={"text": f"Heads up — you're £{max(left, 0):.0f} from your MTD. Worth lining up GnuCash."})
         except Exception:
             logger.warning("Failed to deliver MTD proximity alert")
@@ -352,7 +353,7 @@ async def maybe_alert_low_conviction_average() -> None:
     if avg_score < 7.0 and (now - last_low_conviction_alert) > 24 * 3600:
         last_low_conviction_alert = now
         try:
-            async with httpx.AsyncClient(timeout=4.0) as client:
+            async with pooled_client(timeout=4.0) as client:
                 await client.post(TELEGRAM_ALERT_URL, json={"text": f"I've been a bit off lately — my 7-day conviction average is {avg_score:.2f}/10. Might be worth checking what I've been getting wrong."})
         except Exception:
             logger.warning("Failed to deliver low-conviction alert")
@@ -370,7 +371,7 @@ async def maybe_alert_error_budget_guard(name: str, guard: ErrorBudgetCircuitBre
     last_guard_alerts[name] = now
     ratio = float(snap.get("error_ratio", 0.0))
     try:
-        async with httpx.AsyncClient(timeout=4.0) as client:
+        async with pooled_client(timeout=4.0) as client:
             await client.post(
                 TELEGRAM_ALERT_URL,
                 json={
@@ -468,7 +469,7 @@ async def get_soul() -> Dict[str, Any]:
 @app.post("/soul")
 async def update_soul(request: Request) -> Dict[str, Any]:
     """Update SOUL.md content. Takes effect on next startup or reload."""
-    body = await request.json()
+    body = await bounded_json(request)
     content = body.get("content", "")
     if not content.strip():
         raise HTTPException(status_code=400, detail="Content cannot be empty")
@@ -493,7 +494,7 @@ async def get_agents_registry() -> Dict[str, Any]:
 @app.post("/agents-registry")
 async def update_agents_registry(request: Request) -> Dict[str, Any]:
     """Update AGENTS.md content."""
-    body = await request.json()
+    body = await bounded_json(request)
     content = body.get("content", "")
     if not content.strip():
         raise HTTPException(status_code=400, detail="Content cannot be empty")
@@ -526,7 +527,7 @@ async def reload_skills() -> Dict[str, Any]:
 @app.post("/skills/match")
 async def test_skill_match(request: Request) -> Dict[str, Any]:
     """Test whether a message matches any loaded skill."""
-    body = await request.json()
+    body = await bounded_json(request)
     text = body.get("text", "")
     skill = match_skill(text)
     if skill:
@@ -542,7 +543,7 @@ async def test_skill_match(request: Request) -> Dict[str, Any]:
 @app.post("/skills/unload")
 async def unload_skill_endpoint(request: Request) -> Dict[str, Any]:
     """Unload a skill by name."""
-    body = await request.json()
+    body = await bounded_json(request)
     name = body.get("name", "")
     if not name:
         raise HTTPException(status_code=400, detail="name is required")
@@ -553,7 +554,7 @@ async def unload_skill_endpoint(request: Request) -> Dict[str, Any]:
 @app.post("/skills/scan")
 async def scan_skill_endpoint(request: Request) -> Dict[str, Any]:
     """Scan raw skill markdown text for security red flags."""
-    body = await request.json()
+    body = await bounded_json(request)
     text = body.get("text", "")
     if not text:
         raise HTTPException(status_code=400, detail="text is required")
@@ -563,7 +564,7 @@ async def scan_skill_endpoint(request: Request) -> Dict[str, Any]:
 @app.post("/skills/prune")
 async def prune_skills_endpoint(request: Request) -> Dict[str, Any]:
     """Prune skills not used within max_age_days (default 30)."""
-    body = await request.json()
+    body = await bounded_json(request)
     max_age = body.get("max_age_days", 30)
     pruned = prune_stale_skills(max_age)
     return {"status": "ok", "pruned": pruned, "pruned_count": len(pruned)}
@@ -739,7 +740,7 @@ async def introspect_capabilities() -> Dict[str, Any]:
 
     async def _ping(name: str, url: str) -> Dict[str, Any]:
         try:
-            async with httpx.AsyncClient(timeout=2.0) as client:
+            async with pooled_client(timeout=2.0) as client:
                 r = await client.get(f"{url}/health")
                 return {"name": name, "reachable": r.status_code < 400, "http_status": r.status_code}
         except Exception:
@@ -1539,7 +1540,7 @@ class ChatMessage(BaseModel):
 async def _read_mode() -> str:
     """Fetch current effective mode from tool-gate (schedule-aware)."""
     try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
+        async with pooled_client(timeout=3.0) as client:
             resp = await client.get(f"{TOOL_GATE_URL}/gate/mode")
             if resp.status_code == 200:
                 return str(resp.json().get("mode", "PUB")).upper()
@@ -1571,7 +1572,7 @@ async def _surface_graph_context(query: str, top_k: int = 5) -> Dict[str, Any]:
     if not is_enabled("GRAPH_INGEST"):
         return {}
     try:
-        async with httpx.AsyncClient(timeout=8.0) as client:
+        async with pooled_client(timeout=8.0) as client:
             resp = await client.get(
                 f"{MEMU_URL}/memory/graph/query",
                 params={"q": query, "top_k": top_k},
@@ -1588,7 +1589,7 @@ async def _surface_graph_context(query: str, top_k: int = 5) -> Dict[str, Any]:
 async def _sync_letta_memories() -> None:
     """Background: export Letta archival memory and fan into memu-core."""
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0) as client:
             export = await client.get(f"{LETTA_URL}/agent/memory/export")
             if export.status_code != 200:
                 return
@@ -1611,7 +1612,7 @@ async def _surface_letta_context(user_msg: str) -> Dict[str, Any]:
     if not is_enabled("LETTA_TASKS"):
         return {}
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0) as client:
             resp = await client.post(
                 f"{LETTA_URL}/agent/run",
                 json={"task": user_msg, "context": {}},
@@ -1646,7 +1647,7 @@ async def _read_financial_context(user_msg: str) -> Dict[str, Any]:
     if not any(kw in lower for kw in _FINANCE_KEYWORDS):
         return {}
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{FINANCIAL_URL}/finance/summary")
             if resp.status_code == 200:
                 return resp.json()
@@ -1697,7 +1698,7 @@ async def _sense_world() -> str:
 
     async def _fetch_summary(base: str, path: str, label: str) -> Optional[str]:
         try:
-            async with httpx.AsyncClient(timeout=2.0) as client:
+            async with pooled_client(timeout=2.0) as client:
                 r = await client.get(f"{base}{path}")
                 if r.status_code != 200:
                     return None
@@ -1738,7 +1739,7 @@ async def _sense_world() -> str:
     # FF_VAULT_CONTEXT: inject a vault memory snippet into world context
     if is_enabled("VAULT_CONTEXT"):
         try:
-            async with httpx.AsyncClient(timeout=2.0) as client:
+            async with pooled_client(timeout=2.0) as client:
                 r = await client.get(f"{VAULT_SYNC_URL}/search", params={"query": "recent", "limit": 1})
                 if r.status_code == 200:
                     results_data = r.json().get("results", [])
@@ -1751,7 +1752,7 @@ async def _sense_world() -> str:
 
     # Screen activity — sense what the operator is looking at
     try:
-        async with httpx.AsyncClient(timeout=2.0) as client:
+        async with pooled_client(timeout=2.0) as client:
             r = await client.get(f"{SCREEN_WATCHER_URL}/status")
             if r.status_code == 200:
                 data = r.json()
@@ -1763,7 +1764,7 @@ async def _sense_world() -> str:
 
     # Clipboard — sense what the operator just copied
     try:
-        async with httpx.AsyncClient(timeout=2.0) as client:
+        async with pooled_client(timeout=2.0) as client:
             r = await client.get(f"{CLIPBOARD_SERVICE_URL}/latest")
             if r.status_code == 200:
                 content = r.json().get("content", "").strip()
@@ -1774,7 +1775,7 @@ async def _sense_world() -> str:
 
     # Cortex — pre-interpreted situational awareness (prepended so it reads first)
     try:
-        async with httpx.AsyncClient(timeout=1.5) as client:
+        async with pooled_client(timeout=1.5) as client:
             r = await client.get(f"{CORTEX_URL}/state")
             if r.status_code == 200:
                 cs = r.json()
@@ -2013,7 +2014,7 @@ async def _proactive_observer() -> None:
             # observer carries forward diagnoses without re-sending observations.
             if is_enabled("HOUSE_DOCTOR"):
                 try:
-                    async with httpx.AsyncClient(timeout=3.0) as client:
+                    async with pooled_client(timeout=3.0) as client:
                         hd_resp = await client.get(f"{HOUSE_DOCTOR_URL}/diagnoses/recent", params={"limit": 3})
                         if hd_resp.status_code == 200:
                             recent_dx = hd_resp.json().get("diagnoses", [])
@@ -2027,7 +2028,7 @@ async def _proactive_observer() -> None:
 
             async def _probe(key: str, base: str, path: str) -> None:
                 try:
-                    async with httpx.AsyncClient(timeout=3.0) as client:
+                    async with pooled_client(timeout=3.0) as client:
                         r = await client.get(f"{base}{path}")
                         if r.status_code == 200:
                             snapshot[key] = r.json()
@@ -2110,7 +2111,7 @@ async def _proactive_observer() -> None:
                         schedule_parts.append("you have uncommitted changes — commit first if possible")
                     sched_text = "Proactive schedule: " + "; ".join(schedule_parts)
                     try:
-                        async with httpx.AsyncClient(timeout=5.0) as client:
+                        async with pooled_client(timeout=5.0) as client:
                             await client.post(
                                 f"{MEMU_URL}/memory/memorize",
                                 json={
@@ -2127,7 +2128,7 @@ async def _proactive_observer() -> None:
             if observations:
                 obs_text = "Proactive observation: " + "; ".join(observations)
                 try:
-                    async with httpx.AsyncClient(timeout=5.0) as client:
+                    async with pooled_client(timeout=5.0) as client:
                         await client.post(
                             f"{MEMU_URL}/memory/memorize",
                             json={
@@ -2146,7 +2147,7 @@ async def _proactive_observer() -> None:
             if patterns:
                 pattern_text = "; ".join(patterns)
                 try:
-                    async with httpx.AsyncClient(timeout=5.0) as client:
+                    async with pooled_client(timeout=5.0) as client:
                         await client.post(
                             f"{MEMU_URL}/memory/memorize",
                             json={
@@ -2183,7 +2184,7 @@ async def _proactive_observer() -> None:
                     },
                 }
                 try:
-                    async with httpx.AsyncClient(timeout=5.0) as client:
+                    async with pooled_client(timeout=5.0) as client:
                         await client.post(
                             f"{MEMU_URL}/memory/memorize",
                             json={
@@ -2198,7 +2199,7 @@ async def _proactive_observer() -> None:
             # ── D89 E: House Doctor — differential diagnosis ──────────
             if is_enabled("HOUSE_DOCTOR") and observations:
                 try:
-                    async with httpx.AsyncClient(timeout=5.0) as client:
+                    async with pooled_client(timeout=5.0) as client:
                         diag_payload: Dict[str, Any] = {"observations": observations}
                         # Pass structured world_state so house-doctor can pattern-match
                         # on real data instead of re-parsing observation strings
@@ -2293,7 +2294,7 @@ async def _hunt_skill_for_gap(gap_description: str) -> None:
             )
             return
     try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        async with pooled_client(timeout=15.0) as client:
             resp = await client.post(
                 f"{SKILL_HUNTER_URL}/hunt",
                 json={"gap": gap_description[:200]},
@@ -2327,7 +2328,7 @@ async def _feel_emotional_context(query: str) -> Dict[str, Any]:
     """Fetch emotional state + epistemic confidence for the query's domain."""
     result: Dict[str, Any] = {}
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             # parallel: emotion timeline + confidence check
             emo_task = client.get(f"{MEMU_URL}/memory/emotion/timeline", params={"limit": 5})
             conf_task = client.get(f"{MEMU_URL}/memory/confidence/check", params={"query": query[:200]})
@@ -2350,7 +2351,7 @@ async def _hold_narrative() -> Dict[str, Any]:
     """Fetch Kai's evolving identity narrative + story arc."""
     result: Dict[str, Any] = {}
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             id_task = client.get(f"{MEMU_URL}/memory/identity")
             arc_task = client.get(f"{MEMU_URL}/memory/story-arcs")
             id_resp, arc_resp = await asyncio.gather(id_task, arc_task, return_exceptions=True)
@@ -2371,7 +2372,7 @@ async def _imagine_context(user_msg: str) -> Dict[str, Any]:
     """Run empathetic simulation and fetch inner thought state."""
     result: Dict[str, Any] = {}
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             emp_task = client.post(
                 f"{MEMU_URL}/memory/imagine/empathize",
                 json={"text": user_msg},
@@ -2393,7 +2394,7 @@ async def _hold_conscience() -> Dict[str, Any]:
     """Fetch Kai's formed values and conscience state for moral awareness."""
     result: Dict[str, Any] = {}
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             vals_task = client.get(f"{MEMU_URL}/memory/values")
             audit_task = client.get(f"{MEMU_URL}/memory/conscience/audit")
             vals_resp, audit_resp = await asyncio.gather(vals_task, audit_task, return_exceptions=True)
@@ -2412,7 +2413,7 @@ async def _surface_agent_context() -> Dict[str, Any]:
     """P21: Fetch scheduled tasks, reminders, and action capabilities."""
     result: Dict[str, Any] = {"tasks": [], "reminders": [], "capabilities": 0}
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             tasks_req = client.get(f"{MEMU_URL}/memory/schedule/due")
             reminders_req = client.get(f"{MEMU_URL}/memory/reminders/due")
             summary_req = client.get(f"{MEMU_URL}/memory/agent/summary")
@@ -2437,7 +2438,7 @@ async def _understand_operator(query: str, mode: str) -> Dict[str, Any]:
         "echo": None, "escalation_level": 1, "cross_mode": None, "model_completeness": 0
     }
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             echo_req = client.post(
                 f"{MEMU_URL}/memory/echo/analyse",
                 json={"text": query[:500], "session_id": "chat"},
@@ -2473,7 +2474,7 @@ async def _preclassify_wake_intent(text: str) -> Dict[str, Any]:
     if not is_enabled("WAKE_INTENT_ROUTING"):
         return {"intent": "unknown", "confidence": 0.0, "reasoning": "feature_flag_disabled"}
     try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
+        async with pooled_client(timeout=3.0) as client:
             resp = await client.post(f"{WAKE_URL}/wake/intent", json={"text": text})
             if resp.status_code == 200:
                 payload = resp.json()
@@ -2881,7 +2882,7 @@ async def chat_stream(req: ChatRequest):
             failed.append(f"ohana: {e}")
         # Cortex observe_turn — feeds context bridge and tacit knowledge accumulator
         try:
-            async with httpx.AsyncClient(timeout=1.0) as client:
+            async with pooled_client(timeout=1.0) as client:
                 await client.post(
                     f"{CORTEX_URL}/observe_turn",
                     json={"session_id": session, "user_message": u_msg[:500]},
@@ -2962,7 +2963,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     specialist = select_model("EXECUTE_ACTION", request.user_input, _llm.available)
     if MEMU_BREAKER.allow() and MEMU_ERROR_GUARD.allow():
         try:
-            async with httpx.AsyncClient() as client:
+            async with pooled_client() as client:
                 route_response = await client.post(
                     f"{MEMU_URL}/route",
                     json={"query": request.user_input, "session_id": request.session_id, "timestamp": "now"},
@@ -3105,7 +3106,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
             dual_sign = os.getenv("TOOL_GATE_DUAL_SIGN", "false").lower() in {"1", "true", "yes"}
             signatures = sign_gate_request_bundle(actor_did="langgraph", session_id=request.session_id, tool=request.task_hint, nonce=nonce, ts=ts) if dual_sign else []
             try:
-                async with httpx.AsyncClient() as client:
+                async with pooled_client() as client:
                     gate_resp = await client.post(
                         f"{TOOL_GATE_URL}/gate/request",
                         json={
@@ -3143,7 +3144,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
     try:
         if plan.get("verifier_verdict") in ("REPAIR", "FAIL_CLOSED"):
             correction = plan.get("evidence_summary") or plan.get("summary") or "Correction required."
-            async with httpx.AsyncClient() as client:
+            async with pooled_client() as client:
                 await client.post(
                     f"{MEMU_URL}/memory/memorize",
                     json={
@@ -3165,7 +3166,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
             )
             if pref:
                 try:
-                    async with httpx.AsyncClient() as pref_client:
+                    async with pooled_client() as pref_client:
                         await pref_client.post(
                             f"{MEMU_URL}/memory/preferences",
                             json={"preference": pref, "context": "auto-extracted from correction", "user_id": "keeper"},
@@ -3198,7 +3199,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
             episode["metacognitive_rule"] = rule
             # Store rule as a correction memory so planner can find it
             try:
-                async with httpx.AsyncClient() as client:
+                async with pooled_client() as client:
                     await client.post(
                         f"{MEMU_URL}/memory/memorize",
                         json={
@@ -3522,7 +3523,7 @@ async def vault_export(req: VaultExportRequest):
     """Proxy a vault write to vault-sync (conviction gate enforced there)."""
     if not is_enabled("VAULT_SYNC"):
         raise HTTPException(503, "FF_VAULT_SYNC is disabled")
-    async with httpx.AsyncClient(timeout=15) as client:
+    async with pooled_client(timeout=15) as client:
         try:
             resp = await client.post(f"{VAULT_SYNC_URL}/export", json=req.model_dump())
             resp.raise_for_status()
@@ -3538,7 +3539,7 @@ async def vault_search_proxy(query: str, limit: int = 10, folder_filter: str = "
     """Proxy vault search to vault-sync."""
     if not is_enabled("VAULT_SYNC"):
         raise HTTPException(503, "FF_VAULT_SYNC is disabled")
-    async with httpx.AsyncClient(timeout=10) as client:
+    async with pooled_client(timeout=10) as client:
         try:
             resp = await client.get(
                 f"{VAULT_SYNC_URL}/search",

@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
 
+from common.http_hygiene import pooled_client
 from common.auth import sign_gate_request
 
 
@@ -240,7 +241,7 @@ async def _gate_allows_speak(urgency: float) -> bool:
             actor_did="perception-camera", session_id=GATE_SESSION_ID,
             tool="speak", nonce=nonce, ts=ts,
         )
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.post(
                 f"{TOOL_GATE_URL}/gate/request",
                 json={
@@ -364,7 +365,7 @@ async def interpret_multi(
     )
     try:
         import httpx
-        async with httpx.AsyncClient(timeout=8.0) as client:
+        async with pooled_client(timeout=8.0) as client:
             resp = await client.post(
                 f"{LANGGRAPH_URL}/run",
                 json={"message": f"[SENSOR FUSION] {summary} Should I speak? Why?"},
@@ -429,7 +430,7 @@ async def proactive_auto() -> Dict[str, Any]:
     try:
         import httpx
         audio_url = os.getenv("AUDIO_URL", "http://perception-audio:8021")
-        async with httpx.AsyncClient(timeout=3.0) as client:
+        async with pooled_client(timeout=3.0) as client:
             resp = await client.get(f"{audio_url}/transcripts", params={"limit": 1})
             if resp.status_code == 200:
                 data = resp.json()
@@ -449,7 +450,7 @@ async def proactive_auto() -> Dict[str, Any]:
         if gate_approved:
             try:
                 import httpx
-                async with httpx.AsyncClient(timeout=10.0) as client:
+                async with pooled_client(timeout=10.0) as client:
                     await client.post(f"{TTS_URL}/synthesize", json={
                         "text": decision["suggested_message"],
                         "voice": "kai-default",

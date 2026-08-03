@@ -23,6 +23,7 @@ import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 
+from common.http_hygiene import pooled_client
 from common.runtime import ErrorBudget, setup_json_logger
 
 logger = setup_json_logger("metrics-gateway", os.getenv("LOG_PATH", "/tmp/metrics-gateway.json.log"))
@@ -109,7 +110,7 @@ async def scrape_all() -> Dict[str, Any]:
     global _last_scrape
     started = time.time()
 
-    async with httpx.AsyncClient(timeout=SCRAPE_TIMEOUT) as client:
+    async with pooled_client(timeout=SCRAPE_TIMEOUT) as client:
         tasks = [
             _scrape_one(client, name, url, mp, hp)
             for name, url, mp, hp in SERVICES

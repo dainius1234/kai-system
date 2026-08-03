@@ -21,6 +21,7 @@ while _repo != _os.path.dirname(_repo) and not _os.path.isdir(_os.path.join(_rep
     _repo = _os.path.dirname(_repo)
 if _repo not in _sys.path:
     _sys.path.insert(0, _repo)
+from common.http_hygiene import pooled_client
 from common.service_auth import require_service_auth
 
 from fastapi.responses import JSONResponse
@@ -183,7 +184,7 @@ async def _handle_delete(filepath: str) -> None:
     note_node_id = entry.get("note_node_id", "")
     if note_node_id:
         try:
-            async with httpx.AsyncClient(timeout=10) as client:
+            async with pooled_client(timeout=10) as client:
                 await client.delete(f"{MEMU_CORE_URL}/memory/vault/{note_node_id}")
         except Exception as exc:
             logger.error("Failed to delete node %s from memu-core: %s", note_node_id, exc)
@@ -205,7 +206,7 @@ async def _push_to_memu_core(note: NoteData) -> Optional[Dict]:
         "modified_at": note.modified_at,
     }
     try:
-        async with httpx.AsyncClient(timeout=30) as client:
+        async with pooled_client(timeout=30) as client:
             resp = await client.post(f"{MEMU_CORE_URL}/memory/vault/ingest", json=payload)
             resp.raise_for_status()
             return resp.json()
@@ -302,7 +303,7 @@ async def search(query: str, limit: int = 10, folder_filter: Optional[str] = Non
         params["folder_filter"] = folder_filter
 
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
+        async with pooled_client(timeout=15) as client:
             resp = await client.get(f"{MEMU_CORE_URL}/memory/vault/search", params=params)
             resp.raise_for_status()
             return resp.json()

@@ -32,6 +32,8 @@ while _repo != _os.path.dirname(_repo) and not _os.path.isdir(_os.path.join(_rep
     _repo = _os.path.dirname(_repo)
 if _repo not in _sys.path:
     _sys.path.insert(0, _repo)
+from common.degraded import degraded_response
+from common.http_hygiene import pooled_client
 from common.service_auth import require_service_auth
 
 from pydantic import BaseModel
@@ -78,7 +80,7 @@ def _is_allowed(chat_id: int) -> bool:
 
 async def _tg(method: str, **kwargs) -> Dict[str, Any]:
     """Call Telegram Bot API."""
-    async with httpx.AsyncClient(timeout=30.0) as c:
+    async with pooled_client(timeout=30.0) as c:
         r = await c.post(f"{TG_API}/{method}", **kwargs)
         r.raise_for_status()
         return r.json()
@@ -126,7 +128,7 @@ async def _download_file(file_id: str) -> bytes:
     # H1.6: validate file path doesn't escape expected directory
     if ".." in fpath or fpath.startswith("/"):
         raise ValueError(f"Suspicious file path: {fpath}")
-    async with httpx.AsyncClient(timeout=30.0) as c:
+    async with pooled_client(timeout=30.0) as c:
         r = await c.get(f"{TG_FILE}/{fpath}")
         r.raise_for_status()
         if len(r.content) > MAX_VOICE_BYTES:
@@ -139,7 +141,7 @@ async def _chat_kai(text: str, session_id: str, mode: str) -> str:
     """Stream /chat and collect full response."""
     try:
         timeout = httpx.Timeout(120.0, connect=10.0, pool=180.0)
-        async with httpx.AsyncClient(timeout=timeout) as c:
+        async with pooled_client(timeout=timeout) as c:
             async with c.stream(
                 "POST",
                 f"{LANGGRAPH_URL}/chat",
@@ -167,7 +169,7 @@ async def _chat_kai(text: str, session_id: str, mode: str) -> str:
 async def _transcribe(audio_bytes: bytes, filename: str) -> str:
     """Send audio to audio-service for STT."""
     try:
-        async with httpx.AsyncClient(timeout=60.0) as c:
+        async with pooled_client(timeout=60.0) as c:
             files = {"file": (filename, audio_bytes, "audio/ogg")}
             r = await c.post(f"{AUDIO_SERVICE_URL}/capture/file", files=files)
             r.raise_for_status()
@@ -182,7 +184,7 @@ async def _synthesize(text: str) -> Optional[bytes]:
     if not TTS_ENABLED:
         return None
     try:
-        async with httpx.AsyncClient(timeout=30.0) as c:
+        async with pooled_client(timeout=30.0) as c:
             r = await c.post(
                 f"{TTS_SERVICE_URL}/synthesize",
                 json={"text": text[:2000], "voice": "kai-default"},
@@ -308,7 +310,7 @@ async def _poll():
 
     while _bot_running:
         try:
-            async with httpx.AsyncClient(timeout=45.0) as c:
+            async with pooled_client(timeout=45.0) as c:
                 r = await c.get(
                     f"{TG_API}/getUpdates",
                     params={
@@ -408,8 +410,12 @@ async def send_alert(payload: AlertPayload) -> Dict[str, Any]:
         await _send_text(chat_id, payload.text)
         return {"status": "sent", "chat_id": chat_id}
     except Exception as e:
+        # "status: error" at HTTP 200 means a caller that checks the
+        # status code believes the alert reached the operator. For an
+        # alerting path that is the worst possible place to be optimistic.
         logger.error("alert send failed: %s", e)
-        return {"status": "error", "detail": str(e)[:200]}
+        return degraded_response("telegram", str(e),
+                                 {"chat_id": chat_id, "sent": False})
 
 
 if __name__ == "__main__":

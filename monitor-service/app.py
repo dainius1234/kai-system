@@ -24,6 +24,7 @@ while _repo != _os.path.dirname(_repo) and not _os.path.isdir(_os.path.join(_rep
     _repo = _os.path.dirname(_repo)
 if _repo not in _sys.path:
     _sys.path.insert(0, _repo)
+from common.http_hygiene import pooled_client
 from common.service_auth import require_service_auth
 from pydantic import BaseModel, Field
 
@@ -155,13 +156,13 @@ def _save_rules() -> None:
 async def _fetch_value(source: dict) -> Any:
     stype = source.get("type", "http")
     if stype == "http":
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0) as client:
             resp = await client.get(source["url"])
             resp.raise_for_status()
             data = resp.json()
             return _extract_field(data, source.get("extract", ""))
     elif stype == "scrape":
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0) as client:
             resp = await client.post(
                 f"{BROWSER_AGENT_URL}/scrape",
                 json={"url": source["url"], "selector": source.get("selector", "body")},
@@ -175,7 +176,7 @@ async def _fetch_value(source: dict) -> Any:
 async def _fire_actions(rule: dict, value: Any) -> None:
     message = _format_message(rule, value)
     actions = rule.get("actions", ["notify"])
-    async with httpx.AsyncClient(timeout=10.0) as client:
+    async with pooled_client(timeout=10.0) as client:
         if "notify" in actions:
             with suppress(Exception):
                 await client.post(f"{NOTIFY_URL}/notify", json={

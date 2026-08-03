@@ -22,6 +22,8 @@ from contextlib import asynccontextmanager, suppress
 from typing import Optional
 
 import httpx
+
+from common.http_hygiene import pooled_client
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel
@@ -77,7 +79,7 @@ def _diff_score(h1: str, h2: str) -> float:
 
 async def _capture_screen() -> Optional[bytes]:
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with pooled_client(timeout=10) as client:
             resp = await client.post(f"{SCREEN_CAPTURE_URL}/screenshot")
             resp.raise_for_status()
             return resp.content
@@ -88,13 +90,13 @@ async def _capture_screen() -> Optional[bytes]:
 
 async def _send_notify(title: str, body: str):
     with suppress(Exception):
-        async with httpx.AsyncClient(timeout=5) as client:
+        async with pooled_client(timeout=5) as client:
             await client.post(f"{NOTIFY_URL}/notify", json={"title": title, "body": body})
 
 
 async def _send_tts(text: str):
     with suppress(Exception):
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with pooled_client(timeout=10) as client:
             await client.post(f"{TTS_URL}/synthesize", json={"text": text})
 
 

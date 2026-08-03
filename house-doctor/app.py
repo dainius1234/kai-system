@@ -17,6 +17,8 @@ from datetime import datetime, timezone
 from typing import Any, Deque, Dict, List, Optional
 
 import httpx
+
+from common.http_hygiene import pooled_client
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
 
@@ -190,7 +192,7 @@ async def _write_medical_report(
     summary = f"[House Doctor/{primary.severity}] {primary.diagnosis}"
     _recent_diagnoses.append(report)  # local ring buffer — zero-latency reads
 
-    async with httpx.AsyncClient(timeout=5.0) as client:
+    async with pooled_client(timeout=5.0) as client:
         try:
             await client.post(
                 f"{MEMU_URL}/memory/memorize",

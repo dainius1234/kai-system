@@ -14,6 +14,7 @@ import httpx
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, model_validator
 
+from common.http_hygiene import pooled_client
 from common.llm import _validate_llm_response, query_specialist
 from common.prompt_templates import wake_intent_prompt
 from common.runtime import sanitize_string, setup_json_logger
@@ -222,7 +223,7 @@ async def wake_process(req: WakeDetectRequest) -> Dict[str, Any]:
 async def health() -> Dict[str, Any]:
     llm_ok = True
     try:
-        async with httpx.AsyncClient(timeout=2.0) as client:
+        async with pooled_client(timeout=2.0) as client:
             resp = await client.get(f"{OLLAMA_URL}/api/tags")
             llm_ok = resp.status_code < 500
     except Exception:

@@ -20,6 +20,8 @@ from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Optional
 
 import httpx
+
+from common.http_hygiene import pooled_client
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 
@@ -71,7 +73,7 @@ async def _fetch_feed(feed_id: str, feed: dict) -> List[dict]:
         return []
     url = feed["url"]
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
+        async with pooled_client(timeout=15) as client:
             resp = await client.get(url, follow_redirects=True)
             resp.raise_for_status()
             content = resp.content

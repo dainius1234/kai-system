@@ -19,6 +19,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import httpx
+
+from common.http_hygiene import pooled_client
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
@@ -192,7 +194,7 @@ def _candidate_packages(keywords: List[str]) -> List[str]:
 
 async def _pypi_exists(package: str) -> bool:
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             r = await client.get(f"{PYPI_BASE}/{package}/json")
             return r.status_code == 200
     except Exception:
@@ -244,7 +246,7 @@ async def hunt(req: HuntRequest) -> Dict[str, Any]:
     # Log skill acquisition to memory so Kai knows what it learned and when
     async def _log_to_memory() -> None:
         try:
-            async with httpx.AsyncClient(timeout=5.0) as client:
+            async with pooled_client(timeout=5.0) as client:
                 await client.post(
                     f"{MEMU_URL}/memory/memorize",
                     json={

@@ -1,6 +1,7 @@
 """Tests for weather-service."""
 import importlib.util
 import sys
+from pathlib import Path
 import types
 import unittest
 
@@ -61,7 +62,15 @@ def _load_module():
         "record": lambda self, *a, **k: None,
         "snapshot": lambda self: {},
     })
-    sys.modules.setdefault("common", types.ModuleType("common"))
+    # The `common` stub must remain a *package*: without `__path__`,
+    # Python cannot resolve any `common.X` submodule, so every service
+    # that imports a new shared module fails to load under this test —
+    # which is how `common.http_hygiene` broke three suites at once.
+    # Giving it the real package path means only what is explicitly
+    # replaced below is stubbed; everything else resolves normally.
+    _common = sys.modules.setdefault("common", types.ModuleType("common"))
+    if not hasattr(_common, "__path__"):
+        _common.__path__ = [str(Path(__file__).resolve().parents[1] / "common")]
     sys.modules["common.runtime"] = runtime
 
     spec = importlib.util.spec_from_file_location(

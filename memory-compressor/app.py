@@ -19,6 +19,7 @@ from typing import Any, Dict, List
 import httpx
 from fastapi import FastAPI, HTTPException
 
+from common.http_hygiene import pooled_client
 from common.runtime import AuditStream, ErrorBudget, setup_json_logger
 
 logger = setup_json_logger("memory-compressor", os.getenv("LOG_PATH", "/tmp/memory-compressor.json.log"))
@@ -53,7 +54,7 @@ async def _call_memu(path: str, method: str = "POST", timeout: float = 60.0, bas
     last_err: Exception | None = None
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            async with httpx.AsyncClient(timeout=timeout) as client:
+            async with pooled_client(timeout=timeout) as client:
                 if method == "POST":
                     resp = await client.post(f"{base_url}{path}")
                 else:

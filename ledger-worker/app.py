@@ -24,6 +24,7 @@ from typing import Any, Dict, List
 import httpx
 from fastapi import FastAPI, HTTPException
 
+from common.http_hygiene import pooled_client
 from common.runtime import AuditStream, ErrorBudget, setup_json_logger
 
 logger = setup_json_logger("ledger-worker", os.getenv("LOG_PATH", "/tmp/ledger-worker.json.log"))
@@ -59,7 +60,7 @@ async def _call_tool_gate(path: str, method: str = "GET", timeout: float = 30.0)
     last_err: Exception | None = None
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            async with httpx.AsyncClient(timeout=timeout) as client:
+            async with pooled_client(timeout=timeout) as client:
                 if method == "POST":
                     resp = await client.post(f"{TOOL_GATE_URL}{path}", headers=_auth_headers())
                 else:
@@ -76,7 +77,7 @@ async def _call_tool_gate(path: str, method: str = "GET", timeout: float = 30.0)
 async def _notify_heartbeat(event: str, details: Dict[str, Any]) -> None:
     """Send alert to heartbeat service."""
     try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
+        async with pooled_client(timeout=3.0) as client:
             await client.post(f"{HEARTBEAT_URL}/event", json={"status": event, **details})
     except Exception:
         logger.warning("Heartbeat notification failed for event=%s", event)

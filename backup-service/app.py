@@ -17,6 +17,7 @@ while _repo != _os.path.dirname(_repo) and not _os.path.isdir(_os.path.join(_rep
     _repo = _os.path.dirname(_repo)
 if _repo not in _sys.path:
     _sys.path.insert(0, _repo)
+from common.http_hygiene import pooled_client
 from common.service_auth import require_service_auth
 
 app = FastAPI(title=os.getenv("SERVICE_NAME", "backup-service"), version="0.2.0")
@@ -116,7 +117,7 @@ async def backup_memory() -> Dict[str, Any]:
     fname = f"memory-{ts}.json"
     path = os.path.join(BACKUP_DIR, fname)
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0) as client:
             resp = await client.get(f"{MEMU_URL}/memory/stats")
             resp.raise_for_status()
             stats = resp.json()
@@ -148,7 +149,7 @@ async def backup_ledger() -> Dict[str, Any]:
     fname = f"ledger-{ts}.json"
     path = os.path.join(BACKUP_DIR, fname)
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0) as client:
             resp = await client.get(f"{TOOL_GATE_URL}/ledger/stats")
             resp.raise_for_status()
             stats = resp.json()

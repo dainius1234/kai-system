@@ -35,13 +35,30 @@ from typing import Any
 
 import httpx
 
-from common.perception_spine.ingress import (
-    MAX_PAYLOAD_BYTES,
-    MAX_PAYLOAD_DEPTH,
-    MAX_PAYLOAD_KEYS,
-    MAX_STRING_LENGTH,
-    check_payload_bounds,
-)
+# The payload limits live in `common.perception_spine.ingress`, which
+# already owns them. They are resolved lazily rather than imported here,
+# for the same reason the transport is built lazily: importing a shared
+# utility must not drag in the perception spine. Several service tests
+# replace the whole `common` package with a bare stub, and a module-level
+# import made every service that adopted this module fail to load under
+# them — surfacing as unrelated errors far from the cause.
+_LIMIT_NAMES = frozenset({
+    "MAX_PAYLOAD_BYTES", "MAX_PAYLOAD_DEPTH",
+    "MAX_PAYLOAD_KEYS", "MAX_STRING_LENGTH",
+})
+
+
+def _ingress():
+    from common.perception_spine import ingress
+    return ingress
+
+
+def __getattr__(name: str) -> Any:
+    """Resolve the shared limits on first access (PEP 562)."""
+    if name in _LIMIT_NAMES:
+        return getattr(_ingress(), name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 __all__ = [
     "MAX_PAYLOAD_BYTES", "MAX_PAYLOAD_DEPTH", "MAX_PAYLOAD_KEYS",
@@ -69,11 +86,12 @@ async def bounded_json(request: Any) -> Any:
 
     from fastapi import HTTPException
 
+    ingress = _ingress()
     raw = await request.body()
-    if len(raw) > MAX_PAYLOAD_BYTES:
+    if len(raw) > ingress.MAX_PAYLOAD_BYTES:
         raise HTTPException(
             status_code=413,
-            detail=f"request body exceeds {MAX_PAYLOAD_BYTES} bytes",
+            detail=f"request body exceeds {ingress.MAX_PAYLOAD_BYTES} bytes",
         )
     if not raw:
         return {}
@@ -82,7 +100,7 @@ async def bounded_json(request: Any) -> Any:
     except ValueError:
         raise HTTPException(status_code=400, detail="body is not valid JSON")
 
-    violation = check_payload_bounds(payload)
+    violation = ingress.check_payload_bounds(payload)
     if violation:
         raise HTTPException(status_code=413, detail=violation)
     return payload
@@ -144,13 +162,24 @@ def bounded_response(content: bytes, source: str,
 
 # ── Pooled connections ───────────────────────────────────────────────
 
-class _SharedTransport(httpx.AsyncHTTPTransport):
-    """A transport that outlives the clients borrowing it.
+# The shared transport is built on first use, not at import.
+#
+# Subclassing `httpx.AsyncHTTPTransport` at module level made importing
+# this module require a *complete* httpx. Several service tests stub
+# `httpx` with a partial module — enough for their own use — and every
+# service that adopted `pooled_client` then failed to import, surfacing
+# as unrelated AttributeErrors elsewhere. A shared utility must not
+# impose import-time requirements on everything that touches it.
+_TRANSPORT: Any = None
+
+
+def _shared_transport() -> Any:
+    """Build (once) a transport that outlives the clients borrowing it.
 
     ``AsyncClient.aclose()`` closes whatever transport it was handed, so
     a naively shared transport would be closed by the first request and
-    found dead by the second. This ignores ``aclose()``; the process that
-    actually owns the pool closes it on shutdown.
+    found dead by the second. This one ignores ``aclose()``; the process
+    that actually owns the pool closes it on shutdown.
 
     A module-global *client* was tried first and rejected: it outlives
     the event loop it was created on, and silently survives test patching
@@ -158,29 +187,47 @@ class _SharedTransport(httpx.AsyncHTTPTransport):
     the client per-request and sharing only the pool avoids both, and
     leaves every existing call site and test working unchanged.
     """
+    global _TRANSPORT
+    if _TRANSPORT is not None:
+        return _TRANSPORT
 
-    async def aclose(self) -> None:  # noqa: D102 - deliberate no-op
+    base = getattr(httpx, "AsyncHTTPTransport", None)
+    if base is None:
+        # A stubbed or minimal httpx. Pooling is an optimisation, not a
+        # correctness property, so degrade to per-client transports
+        # rather than refusing to import.
         return None
 
-    async def shutdown(self) -> None:
-        await super().aclose()
+    class _SharedTransport(base):  # type: ignore[misc]
+        async def aclose(self) -> None:  # noqa: D102 - deliberate no-op
+            return None
+
+        async def shutdown(self) -> None:
+            await base.aclose(self)
+
+    limits = getattr(httpx, "Limits", None)
+    _TRANSPORT = _SharedTransport(
+        limits=limits(max_connections=100, max_keepalive_connections=20)
+    ) if limits else _SharedTransport()
+    return _TRANSPORT
 
 
-_TRANSPORT = _SharedTransport(
-    limits=httpx.Limits(max_connections=100, max_keepalive_connections=20),
-)
-
-
-def pooled_client(**kwargs: Any) -> httpx.AsyncClient:
+def pooled_client(**kwargs: Any) -> Any:
     """Drop-in for ``httpx.AsyncClient(...)`` that reuses connections.
 
     An explicit ``transport=`` is honoured, so a caller that genuinely
     needs its own pool can still say so.
     """
-    kwargs.setdefault("transport", _TRANSPORT)
+    if "transport" not in kwargs:
+        transport = _shared_transport()
+        if transport is not None:
+            kwargs["transport"] = transport
     return httpx.AsyncClient(**kwargs)
 
 
 async def shutdown_pool() -> None:
     """Close the shared pool. Call once, from an app shutdown hook."""
-    await _TRANSPORT.shutdown()
+    global _TRANSPORT
+    if _TRANSPORT is not None:
+        await _TRANSPORT.shutdown()
+        _TRANSPORT = None

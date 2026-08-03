@@ -25,6 +25,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from pydantic import BaseModel
 
+from common.http_hygiene import pooled_client
 from common.runtime import ErrorBudget, detect_device, sanitize_string, setup_json_logger
 
 logger = setup_json_logger("perception-audio", os.getenv("LOG_PATH", "/tmp/perception-audio.json.log"))
@@ -195,7 +196,7 @@ async def _auto_memorize(transcript: str, source: str) -> None:
         return
     try:
         import httpx
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             await client.post(f"{MEMU_URL}/memory/memorize", json={
                 "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                 "event_type": "audio_transcript",
@@ -507,7 +508,7 @@ async def _send_wake_nudge(transcript: str, intent: str) -> None:
         return  # only nudge for direct commands
     try:
         import httpx
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             await client.post(f"{MEMU_URL}/memory/memorize", json={
                 "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                 "event_type": "wake_word_activation",

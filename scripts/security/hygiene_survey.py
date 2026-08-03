@@ -85,9 +85,7 @@ def _success_on_failure(text: str) -> int:
             continue
         if node.name not in routed:
             continue
-        for handler in ast.walk(node):
-            if not isinstance(handler, ast.ExceptHandler):
-                continue
+        for handler in _own_except_handlers(node):
             body = ast.unparse(handler)
             if any(m in body for m in ("raise", "status_code", "degraded_response",
                                        "JSONResponse", "HTTPException", "_sse_error")):
@@ -96,6 +94,30 @@ def _success_on_failure(text: str) -> int:
                 count += 1
                 break
     return count
+
+
+def _own_except_handlers(node) -> List[ast.ExceptHandler]:
+    """Except-handlers belonging to this function, not to nested ones.
+
+    A nested helper returning a dict is not an HTTP 200 — `agentic`'s
+    per-node `_ping()` legitimately returns ``{"reachable": False}`` and
+    the route around it succeeds while reporting which nodes are down.
+    Counting that as a success-shaped failure was a false positive, and a
+    survey with false positives invites someone to "fix" correct code.
+    """
+    found: List[ast.ExceptHandler] = []
+
+    def walk(current) -> None:
+        for child in ast.iter_child_nodes(current):
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef,
+                                  ast.Lambda, ast.ClassDef)):
+                continue  # a different scope owns this
+            if isinstance(child, ast.ExceptHandler):
+                found.append(child)
+            walk(child)
+
+    walk(node)
+    return found
 
 
 def survey() -> Dict[str, Dict[str, int]]:

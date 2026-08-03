@@ -10,6 +10,8 @@ from contextlib import suppress
 from typing import Any
 
 import httpx
+
+from common.http_hygiene import pooled_client
 from fastapi import FastAPI, HTTPException, Query
 
 try:
@@ -46,7 +48,7 @@ async def _public_get(path: str, params: dict | None = None, base: str = "") -> 
     url = (base or BASE_URL) + path
     _req_count += 1
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0) as client:
             resp = await client.get(url, params=params or {})
             resp.raise_for_status()
             return resp.json()
@@ -66,7 +68,7 @@ async def _signed_get(path: str, params: dict | None = None, base: str = "") -> 
     signed = _sign_params(p, API_SECRET)
     _req_count += 1
     try:
-        async with httpx.AsyncClient(timeout=10.0, headers={"X-MBX-APIKEY": API_KEY}) as client:
+        async with pooled_client(timeout=10.0, headers={"X-MBX-APIKEY": API_KEY}) as client:
             resp = await client.get(url, params=signed)
             resp.raise_for_status()
             return resp.json()

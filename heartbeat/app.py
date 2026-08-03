@@ -11,6 +11,7 @@ import httpx
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 
+from common.http_hygiene import pooled_client
 from common.runtime import ErrorBudget, detect_device, setup_json_logger
 
 logger = setup_json_logger("heartbeat", os.getenv("LOG_PATH", "/tmp/heartbeat.json.log"))
@@ -125,7 +126,7 @@ async def _auto_sleep_check() -> None:
     if now - last_sleep_action <= SLEEP_COOLDOWN_SECONDS:
         return
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             await client.post(f"{MEMU_INTROSPECT_URL}/memory/compress")
             # Active context compression — merge non-focus memories
             try:
@@ -233,7 +234,7 @@ def _trend(current: float, previous: float) -> str:
 async def _fetch_memu_stats(days: int, offset_days: int = 0) -> Dict[str, Any]:
     """Fetch memory stats from memu-core for a given window."""
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with pooled_client(timeout=10) as client:
             r = await client.get(f"{MEMU_INTROSPECT_URL}/memory/stats")
             if r.status_code == 200:
                 return r.json()
@@ -245,7 +246,7 @@ async def _fetch_memu_stats(days: int, offset_days: int = 0) -> Dict[str, Any]:
 async def _fetch_recent_episodes(days: int) -> Dict[str, Any]:
     """Fetch recent episode data for self-assessment metrics."""
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with pooled_client(timeout=10) as client:
             r = await client.get(f"{MEMU_INTROSPECT_URL}/memory/diagnostics")
             if r.status_code == 200:
                 return r.json()
@@ -396,7 +397,7 @@ async def fetch_world() -> Dict[str, Any]:
     }
 
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0) as client:
             resp = await client.get(f"{CALENDAR_SYNC_URL}/context")
             if resp.status_code == 200:
                 anchor.update(resp.json())

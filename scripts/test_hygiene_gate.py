@@ -67,6 +67,39 @@ class _Baseline:
         return False
 
 
+class _Survey:
+    """Replace the survey with synthetic counts.
+
+    Lets the gate's guarantees be asserted independently of how much real
+    debt happens to remain. Tests that only work while the tree is dirty
+    lose coverage exactly as the system gets healthier — which is how the
+    `naive_timestamps` and `clients` ratchets each went quietly untested.
+    """
+
+    def __init__(self, totals):
+        self.totals = totals
+        self._saved = None
+
+    def __enter__(self):
+        self._saved = hs.survey
+        hs.survey = lambda: {"synthetic": {**self.totals, "pooled": 0, "bounded": 0}}
+        return self
+
+    def __exit__(self, *exc):
+        hs.survey = self._saved
+        return False
+
+
+def _main(*argv) -> int:
+    """Run the survey's own main() in-process, capturing its exit code."""
+    saved = sys.argv
+    sys.argv = ["hygiene_survey.py", *argv]
+    try:
+        return hs.main()
+    finally:
+        sys.argv = saved
+
+
 # ── The ratchet ──────────────────────────────────────────────────────
 
 def test_current_tree_passes_its_own_baseline():
@@ -75,22 +108,42 @@ def test_current_tree_passes_its_own_baseline():
           result.returncode == 0, result.stdout[-400:])
 
 
+def _actual_totals():
+    surveyed = hs.survey()
+    return {c: sum(r[c] for r in surveyed.values()) for c in hs.COLUMNS}
+
+
 def test_a_risen_count_fails_the_gate():
-    totals = hs.survey()
-    actual = {c: sum(r[c] for r in totals.values()) for c in hs.COLUMNS}
-    lowered = dict(actual)
-    lowered["clients"] = max(0, actual["clients"] - 1)
-    with _Baseline(lowered):
+    """Driven from an all-zero baseline rather than by decrementing a
+    named column.
+
+    Picking a column by name and lowering it assumes that column is
+    non-zero — and as the debt is paid down, such a test silently stops
+    testing. That has now happened twice in this suite (`naive_timestamps`
+    after H-1, `clients` after H-4). An all-zero baseline fails whenever
+    *any* debt remains, and when none does, `ratchet()` is exercised
+    directly instead.
+    """
+    actual = _actual_totals()
+    with _Baseline({c: 0 for c in hs.COLUMNS}):
         result = _run("--gate")
-    check("a count above the baseline fails the gate",
-          result.returncode == 1, str(result.returncode))
-    check("the failure names the column that rose",
-          "clients:" in result.stdout, result.stdout[-300:])
+    if any(actual.values()):
+        check("a count above the baseline fails the gate",
+              result.returncode == 1, str(result.returncode))
+        risen = [c for c, v in actual.items() if v]
+        check("the failure names a column that rose",
+              any(f"{c}:" in result.stdout for c in risen),
+              result.stdout[-300:])
+    else:
+        check("with no debt left, the gate passes an all-zero baseline",
+              result.returncode == 0, result.stdout[-200:])
+        reported = hs.ratchet({**{c: 0 for c in hs.COLUMNS},
+                               hs.COLUMNS[0]: 1})
+        check("and ratchet() still reports a synthetic rise", bool(reported))
 
 
 def test_an_improved_count_passes():
-    totals = hs.survey()
-    actual = {c: sum(r[c] for r in totals.values()) for c in hs.COLUMNS}
+    actual = _actual_totals()
     generous = {c: v + 5 for c, v in actual.items()}
     with _Baseline(generous):
         result = _run("--gate")
@@ -147,25 +200,56 @@ def test_a_zeroed_column_is_still_ratcheted():
 
 
 def test_the_baseline_cannot_be_raised():
-    """Otherwise the change that breaks the gate can also silence it."""
-    totals = hs.survey()
-    actual = {c: sum(r[c] for r in totals.values()) for c in hs.COLUMNS}
-    lowered = dict(actual)
-    lowered["clients"] = max(0, actual["clients"] - 1)
-    with _Baseline(lowered):
-        result = _run("--update-baseline")
+    """Otherwise the change that breaks the gate can also silence it.
+
+    Driven from synthetic counts so the guarantee holds whether the tree
+    is clean or filthy.
+    """
+    baseline = {c: 1 for c in hs.COLUMNS}
+    risen = {c: 2 for c in hs.COLUMNS}
+    with _Baseline(baseline), _Survey(risen):
+        code = _main("--update-baseline")
         after = json.loads(hs.BASELINE.read_text(encoding="utf-8"))["totals"]
-    check("raising the ceiling is refused", result.returncode == 1,
-          result.stdout[-200:])
-    check("the refusal says why", "only be lowered" in result.stdout,
-          result.stdout[-200:])
-    check("the baseline file is left unchanged",
-          after["clients"] == lowered["clients"], str(after))
+    check("raising the ceiling is refused", code == 1, str(code))
+    check("the baseline file is left unchanged", after == baseline, str(after))
+
+
+def test_the_baseline_can_be_lowered_synthetically():
+    baseline = {c: 5 for c in hs.COLUMNS}
+    improved = {c: 2 for c in hs.COLUMNS}
+    with _Baseline(baseline), _Survey(improved):
+        code = _main("--update-baseline")
+        after = json.loads(hs.BASELINE.read_text(encoding="utf-8"))["totals"]
+    check("an improvement is accepted", code == 0, str(code))
+    check("the new ceiling is the improved count", after == improved, str(after))
+
+
+def test_a_rise_in_any_single_column_is_refused():
+    """One column rising while the others fall must still be refused."""
+    baseline = {c: 5 for c in hs.COLUMNS}
+    for column in hs.COLUMNS:
+        mixed = {c: 1 for c in hs.COLUMNS}
+        mixed[column] = 6
+        with _Baseline(baseline), _Survey(mixed):
+            code = _main("--update-baseline")
+        check(f"a rise in {column} is refused even as others improve",
+              code == 1, f"{column} accepted")
+
+
+def test_the_gate_fails_on_synthetic_debt():
+    """Independent of the real tree, so it keeps working at zero."""
+    with _Baseline({c: 0 for c in hs.COLUMNS}), _Survey({c: 1 for c in hs.COLUMNS}):
+        code = _main("--gate")
+    check("the gate fails when synthetic counts exceed the baseline",
+          code == 1, str(code))
+    with _Baseline({c: 5 for c in hs.COLUMNS}), _Survey({c: 1 for c in hs.COLUMNS}):
+        code = _main("--gate")
+    check("the gate passes when synthetic counts are below the baseline",
+          code == 0, str(code))
 
 
 def test_the_baseline_can_be_lowered():
-    totals = hs.survey()
-    actual = {c: sum(r[c] for r in totals.values()) for c in hs.COLUMNS}
+    actual = _actual_totals()
     generous = {c: v + 5 for c, v in actual.items()}
     with _Baseline(generous):
         result = _run("--update-baseline")
@@ -219,6 +303,49 @@ def test_adoption_is_reported_not_just_debt():
     check("adoption of the shared pool is visible", adopted > 0, str(adopted))
 
 
+def test_a_nested_helper_is_not_counted_as_a_route_failure():
+    """A helper returning a dict is not the route's HTTP 200.
+
+    `agentic`'s per-node `_ping()` returns {"reachable": False} and the
+    route around it succeeds while reporting which nodes are down. That
+    is correct code, and counting it invited someone to "fix" it.
+    """
+    nested = ("@app.get('/x')\n"
+              "async def x():\n"
+              "    async def _ping(u):\n"
+              "        try:\n"
+              "            return await get(u)\n"
+              "        except Exception:\n"
+              "            return {'reachable': False}\n"
+              "    return {'pings': await _ping('u')}\n")
+    own = ("@app.get('/y')\n"
+           "async def y():\n"
+           "    try:\n"
+           "        return await get('u')\n"
+           "    except Exception:\n"
+           "        return {'status': 'unavailable'}\n")
+    check("a nested helper's dict return is not counted",
+          hs._success_on_failure(nested) == 0,
+          str(hs._success_on_failure(nested)))
+    check("the route's own dict return is still counted",
+          hs._success_on_failure(own) == 1,
+          str(hs._success_on_failure(own)))
+
+
+def test_lambdas_and_classes_are_separate_scopes():
+    src = ("@app.get('/z')\n"
+           "async def z():\n"
+           "    class Inner:\n"
+           "        def go(self):\n"
+           "            try:\n"
+           "                pass\n"
+           "            except Exception:\n"
+           "                return {'a': 1}\n"
+           "    return Inner().go()\n")
+    check("a nested class body is a separate scope",
+          hs._success_on_failure(src) == 0, str(hs._success_on_failure(src)))
+
+
 def run() -> None:
     test_current_tree_passes_its_own_baseline()
     test_a_risen_count_fails_the_gate()
@@ -227,10 +354,15 @@ def run() -> None:
     test_a_column_missing_from_the_baseline_fails()
     test_a_zeroed_column_is_still_ratcheted()
     test_the_baseline_cannot_be_raised()
+    test_the_baseline_can_be_lowered_synthetically()
+    test_a_rise_in_any_single_column_is_refused()
+    test_the_gate_fails_on_synthetic_debt()
     test_the_baseline_can_be_lowered()
     test_a_missing_baseline_fails_rather_than_passes()
     test_survey_counts_only_route_handlers_for_success_on_failure()
     test_survey_ignores_remediated_failure_paths()
+    test_a_nested_helper_is_not_counted_as_a_route_failure()
+    test_lambdas_and_classes_are_separate_scopes()
     test_survey_reaches_nested_services()
     test_adoption_is_reported_not_just_debt()
 

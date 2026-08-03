@@ -22,6 +22,7 @@ import httpx
 from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
 
+from common.http_hygiene import pooled_client
 from common.runtime import (
     CircuitBreaker,
     ErrorBudget,
@@ -252,7 +253,7 @@ async def fuse(req: FusionRequest) -> FusionResult:
     3. Optionally verify the merged result through the verifier service
     4. Return consensus verdict
     """
-    async with httpx.AsyncClient() as client:
+    async with pooled_client() as client:
         import asyncio
         tasks = [_query_specialist(client, name, req.prompt, req.context) for name in req.specialists]
         responses = await asyncio.gather(*tasks)
@@ -265,7 +266,7 @@ async def fuse(req: FusionRequest) -> FusionResult:
     verification = None
     if req.require_consensus and VERIFIER_BREAKER.allow():
         try:
-            async with httpx.AsyncClient(timeout=5.0) as client:
+            async with pooled_client(timeout=5.0) as client:
                 v_resp = await client.post(
                     f"{VERIFIER_URL}/verify",
                     json={"claim": merged[:500], "context": req.context, "source": "fusion-engine"},
@@ -296,7 +297,7 @@ async def fuse(req: FusionRequest) -> FusionResult:
 async def list_backends() -> Dict[str, Any]:
     """Show configured LLM backends and their reachability."""
     status: Dict[str, str] = {}
-    async with httpx.AsyncClient(timeout=3.0) as client:
+    async with pooled_client(timeout=3.0) as client:
         for name, url in LLM_BACKENDS.items():
             try:
                 r = await client.get(f"{url}/health")

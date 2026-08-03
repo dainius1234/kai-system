@@ -22,6 +22,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from common.degraded import degraded_response
 from common.runtime import setup_json_logger
 
 logger = setup_json_logger("memu-graph", os.getenv("LOG_PATH", "/tmp/memu-graph.json.log"))
@@ -150,9 +151,16 @@ async def graph_forget(req: ForgetRequest) -> Dict[str, Any]:
             data_id=_uuid.UUID(entry["data_id"]),
             dataset_id=_uuid.UUID(entry["dataset_id"]) if entry.get("dataset_id") else _uuid.UUID(int=0),
         )
-    except Exception as exc:  # noqa: BLE001 — best-effort, MARS pruning should not fail on this
+    except Exception as exc:  # noqa: BLE001
+        # A failed erasure answering 200 is worse than most success-shaped
+        # failures: the caller believes the data is gone. Erasure that
+        # reports success without being verified is exactly what the
+        # roadmap's §16.30 lineage work exists to prevent. The exception
+        # text stays in the log rather than the response.
         logger.warning("graph_forget failed for source_id=%s: %s", req.source_id, exc)
-        return {"status": "error", "source_id": req.source_id, "detail": str(exc)}
+        return degraded_response("memu-graph-erasure", str(exc),
+                                 {"source_id": req.source_id,
+                                  "forgotten": False})
 
     return {"status": "forgotten", "source_id": req.source_id}
 

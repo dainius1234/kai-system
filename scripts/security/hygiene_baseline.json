@@ -1,10 +1,10 @@
 {
   "note": "Ceiling for scripts/security/hygiene_survey.py --gate. Lower only; see kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md.",
   "totals": {
-    "clients": 96,
-    "unbounded_bodies": 6,
+    "clients": 0,
+    "unbounded_bodies": 0,
     "naive_timestamps": 0,
-    "success_on_failure": 3
+    "success_on_failure": 0
   },
-  "grand_total": 105
+  "grand_total": 0
 }

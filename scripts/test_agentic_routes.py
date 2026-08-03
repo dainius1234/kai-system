@@ -1654,3 +1654,37 @@ class TestRunGraphDirect:
         finally:
             ag.saver.recall = orig_recall
         assert hasattr(result, "specialist")
+
+
+# ── H-3: payload bounds on identity-writing routes ───────────────────
+
+class TestPayloadBounds:
+    """`/soul` and `/agents-registry` rewrite files that define what Kai
+    is. An unbounded body there is the sharpest version of KAI-DASH-017."""
+
+    BOUNDED_ROUTES = [
+        "/soul", "/agents-registry", "/skills/match",
+        "/skills/unload", "/skills/scan", "/skills/prune",
+    ]
+
+    def test_oversized_body_is_refused_on_every_route(self):
+        big = {"content": "x" * (300 * 1024)}
+        unbounded = [p for p in self.BOUNDED_ROUTES
+                     if client.post(p, json=big).status_code != 413]
+        assert not unbounded, f"unbounded: {unbounded}"
+
+    def test_deeply_nested_body_is_refused(self):
+        payload = current = {}
+        for _ in range(40):
+            current["next"] = {}
+            current = current["next"]
+        assert client.post("/soul", json=payload).status_code == 413
+
+    def test_high_cardinality_body_is_refused(self):
+        payload = {f"k{i}": i for i in range(2000)}
+        assert client.post("/soul", json=payload).status_code == 413
+
+    def test_a_normal_soul_update_is_not_refused(self):
+        """The bound must not block a legitimate identity edit."""
+        r = client.post("/soul", json={"content": "# SOUL\n\nA short edit."})
+        assert r.status_code != 413, r.status_code
