@@ -3920,3 +3920,54 @@ The proxy exposes no control endpoint (405 on everything but `status`), and its 
 
 **Files added:** `scripts/security/closure_register.py`.
 **Files modified:** `scripts/security/check_gate_registry.py`, `scripts/test_gate_registry.py`, `scripts/security/assertion_floors.json`, sub-plan/tracker/STATUS.
+
+---
+
+## D159 — 2026-08-03 — Judging the Fifteen: Four Were Not Defects At All
+
+**Context:** The operator's ruling was to judge each of the 15 boundary-blind sites rather than sweep them. *"The shared function is the last step, not the first."*
+
+### The count was wrong, and the sweep would have made things worse
+
+Triaging the 15 before touching anything: **four were not skips.** They were refusals — exactly the behaviour I-1 exists to produce:
+
+```
+return AnchorFailure("absent", f"{_rel(DASHBOARD)} does not exist")
+return [Violation(5, "common/autonomy/legacy_bridge...")]
+return (LIVE, "no dashboard/static/auth.js; the UI ...")
+```
+
+My detector treated **every** `return` inside an absence test as a skip, and so over-counted by **4 of 15 — a 27% false-positive rate**. A mechanical sweep would have replaced four correct fail-closed returns with `require()` calls and recorded it as a fix.
+
+That is the operator's warning arriving from an unexpected direction: not "a mechanical fix on a broken gate", but "a mechanical fix on a gate that was already right". `_is_skip()` now distinguishes them — a bare `return`, `None`, an empty literal or a lone name (an accumulator, empty at that point) is a skip; anything *constructed* is a refusal. **Real count: 11.**
+
+### Six hardened, and the original proof case inverted
+
+The six compose gates share one `main()` shape and their semantics were already read, so `require()` was the right last step for each. All six now refuse a missing input, and the case that opened this whole line of work has inverted:
+
+```
+before   exit=0   PASS: No disallowed port bindings found.     (zero files inspected)
+after    exit=1   REFUSED: this check cannot find what it audits.
+```
+
+The denominator unit is **service definitions, not compose files** — "3 files" is 3 whatever happens, and a number that cannot move cannot reveal a scanner that has gone blind. All six now print `inspected: 92 service definitions`.
+
+### The ratchet advanced itself a third time
+
+I-2 reached zero when the last six gates got denominators, and `policy-check` **failed** until I-2 was added to `ENFORCED`. That is now the third unattended advance — I-5 when the inert-rule detector cleared, I-6 on its first run, I-2 here. Nobody remembered to flip anything; the gate refused to pass without it.
+
+**Four of six invariants now enforce: I-2, I-4, I-5, I-6.** I-1 is down to 5 and I-3 to 2.
+
+### And a test that required its own bug to survive
+
+`test_the_ast_detector_finds_the_real_shape` asserted *"exactly one fail-open site in `check_port_bindings`"*. Fixing that site broke the test. The previous version had pinned `== [70]` and broke when an edit moved the line.
+
+Both are the same error in different clothes, and the second is the purer specimen: **a test that required the defect to persist is a self-consuming guard in its most literal form.** It is driven from a synthetic module now. The detector's behaviour is the invariant; the repository's current defect count is not.
+
+**Verification:** 2,097 tests across 30 suites, all green — 62 in the meta-check's own suite. 11/11 policy gates. All six hardened gates proven to refuse when pointed at filenames that do not exist. 6 findings closed and re-verified.
+
+**Remaining under I-1: 5** — four in `check_architecture_rules`, the one gate whose semantics are still unread, and one in the dashboard tracker. Those get judged next, not swept.
+
+**Nothing further closed.** Rule 7.
+
+**Files modified:** `gate_inputs.py` (added `count_services`), `check_gate_registry.py`, `gate_registry.py`, six compose gates, `scripts/test_gate_registry.py`, `assertion_floors.json`, sub-plan/tracker/STATUS.

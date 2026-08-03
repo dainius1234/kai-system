@@ -50,6 +50,8 @@ below with the commands in §6.
 | **Fails closed** when its input is missing | **1** | 11 |
 | Declared in **one** place rather than three | **0** | 12 |
 
+**Now (after A-04b):** I-2 and I-4 at zero and enforced, I-5 and I-6 at zero and enforced, I-1 down to 5, I-3 down to 2. Four of six invariants enforce.
+
 The first two columns hold *exactly the same four scripts*:
 `check_architecture_rules`, `check_dashboard_findings`,
 `check_assertion_floors`, `hygiene_survey`. Those are precisely the four

@@ -9,7 +9,13 @@ Exit 0 = clean.  Exit 1 = violations found.
 from __future__ import annotations
 
 import sys
+
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+from scripts.security.gate_inputs import (count_services, inspected,  # noqa: E402
+                                          require)
 
 try:
     import yaml
@@ -137,12 +143,15 @@ def main() -> int:
     repo_root = Path(__file__).resolve().parent.parent.parent
     all_violations: list[str] = []
 
-    for name in COMPOSE_FILES:
-        path = repo_root / name
-        if not path.exists():
-            continue
+    # A missing compose file is not a clean bill of health: this gate
+    # would inspect nothing and print PASS, byte-identical to a real one.
+    paths = require(COMPOSE_FILES)
+    for path in paths:
         all_violations.extend(check_file(path))
         all_violations.extend(check_cross_profile_deps(path))
+
+    print(inspected(count_services(paths), "service definitions",
+                    f"across {len(paths)} compose files"))
 
     if all_violations:
         print(f"FAIL: {len(all_violations)} profile violation(s):\n")

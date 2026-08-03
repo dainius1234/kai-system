@@ -100,6 +100,24 @@ def require(paths: Iterable[str], optional: Iterable[str] = (),
         raise SystemExit(1)
 
 
+def count_services(paths: Iterable[Path]) -> int:
+    """Total service definitions across the given compose files.
+
+    A denominator of "3 compose files" is nearly useless — it is 3
+    whatever happens. The number that moves, and that reveals a scanner
+    which has gone blind, is how many services were actually examined.
+    """
+    import yaml
+    total = 0
+    for path in paths:
+        try:
+            data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        except Exception:
+            continue
+        total += len(data.get("services") or {})
+    return total
+
+
 def inspected(count: int, unit: str, extra: str = "") -> str:
     """The denominator line. Say what was examined, every time.
 

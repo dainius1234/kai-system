@@ -81,9 +81,15 @@ class Gate:
     findings: Tuple[str, ...] = field(default_factory=tuple)
 
 
+# All six now fail closed on a missing input and report the same
+# denominator, via `gate_inputs.require` / `count_services`. The unit is
+# service definitions rather than compose files: "3 files" is 3 whatever
+# happens, and a denominator that cannot move cannot reveal a scanner
+# that has gone blind.
 _COMPOSE_GATE = dict(
     kind=GATE,
     inputs=COMPOSE_FILES,
+    denominator=r"inspected: \d+ service definitions",
     in_policy_check=True,
     in_workflows=("policy-checks.yml",),
     findings=("KAI-GATE-001", "KAI-GATE-002", "KAI-GATE-003"),

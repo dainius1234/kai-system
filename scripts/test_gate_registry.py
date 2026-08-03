@@ -46,7 +46,7 @@ from scripts.security import gate_registry as registry_module  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 32
+EXPECTED_SCENARIOS = 33
 executed: list[str] = []
 
 
@@ -222,14 +222,56 @@ def test_an_optional_input_may_be_absent():
 
 def test_the_ast_detector_finds_the_real_shape():
     scenario("ast-positive")
-    # Asserted as a count, not a line number. The first version pinned
-    # `== [70]`, and an unrelated edit to the gate moved the site to 112
-    # — a test guarded on state it does not control, which is the shape
-    # this whole programme keeps correcting. The invariant is "there is
-    # exactly one such site", not "it lives on line 70".
-    lines = meta.skips_absent_input("check_port_bindings")
-    check("exactly one fail-open site is found", len(lines) == 1, str(lines))
-    check("it is inside the file", lines and lines[0] > 0, str(lines))
+    # Driven from a synthetic module, not from a real gate.
+    #
+    # Two earlier versions of this assertion were wrong in the two ways
+    # this programme keeps correcting. The first pinned `== [70]` and
+    # broke when an edit moved the site to 112 — guarded on state it did
+    # not control. The second asserted "exactly one site in
+    # check_port_bindings", and broke the moment that site was **fixed**
+    # — a test that required the defect to persist, which is a
+    # self-consuming guard in its purest form.
+    #
+    # The detector's behaviour is the invariant. The repository's current
+    # defect count is not.
+    import tempfile, pathlib as _p
+    tmp = _p.Path(tempfile.mkdtemp())
+    (tmp / "check_synth.py").write_text(
+        "from pathlib import Path\n"
+        "def f(paths):\n"
+        "    for p in paths:\n"
+        "        if not p.exists():\n"
+        "            continue\n"
+        "        yield p\n")
+    original, meta.SECURITY = meta.SECURITY, tmp
+    try:
+        lines = meta.skips_absent_input("check_synth")
+    finally:
+        meta.SECURITY = original
+    check("the skip shape is detected", len(lines) == 1, str(lines))
+    check("the line is reported", lines and lines[0] > 0, str(lines))
+
+
+def test_a_return_that_refuses_is_not_counted_as_a_skip():
+    """The detector over-counted by 4 of 15 before this distinction.
+
+    A mechanical sweep would have replaced four correct fail-closed
+    returns with `require()` calls and called it a fix.
+    """
+    scenario("ast-refusal")
+    import ast
+    def first_stmt(src):
+        return ast.parse(src).body[0]
+    skips = ["continue" if False else "return", "return None", "return []",
+             "return violations", "pass"]
+    for src in skips:
+        node = first_stmt(f"def f():\n    {src}\n").body[0]
+        check(f"`{src}` is a skip", meta._is_skip(node), src)
+    for src in ["return AnchorFailure('absent', 'gone')",
+                "return [Violation(5, 'x')]",
+                "return (LIVE, 'no auth.js')"]:
+        node = first_stmt(f"def f():\n    {src}\n").body[0]
+        check(f"`{src[:28]}...` is a refusal", not meta._is_skip(node), src)
 
 
 def test_the_ast_detector_does_not_flag_a_positive_guard():
@@ -470,6 +512,7 @@ def test_the_enforced_set_never_shrinks():
     check("I-4 is enforced", "I-4" in meta.ENFORCED, str(meta.ENFORCED))
     check("I-5 is enforced", "I-5" in meta.ENFORCED, str(meta.ENFORCED))
     check("I-6 is enforced", "I-6" in meta.ENFORCED, str(meta.ENFORCED))
+    check("I-2 is enforced", "I-2" in meta.ENFORCED, str(meta.ENFORCED))
     check("every enforced name is a real invariant",
           all(n in meta.INVARIANTS for n in meta.ENFORCED), str(meta.ENFORCED))
 
@@ -500,6 +543,7 @@ def run_all() -> None:
     test_a_missing_required_input_is_caught()
     test_an_optional_input_may_be_absent()
     test_the_ast_detector_finds_the_real_shape()
+    test_a_return_that_refuses_is_not_counted_as_a_skip()
     test_the_ast_detector_does_not_flag_a_positive_guard()
     test_a_check_with_no_denominator_is_caught()
     test_a_declared_expensive_probe_is_not_a_failure()

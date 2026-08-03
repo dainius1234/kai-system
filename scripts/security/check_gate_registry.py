@@ -135,6 +135,42 @@ def _is_absence_test(node: ast.expr) -> bool:
     )
 
 
+def _is_skip(stmt: ast.stmt) -> bool:
+    """True when this statement shrugs off a missing input.
+
+    `continue` and `pass` always shrug. A `return` depends entirely on
+    what it returns, and the first version of this detector did not look
+    — it treated every `return` as a skip and over-counted by **4 of 15
+    (27%)**. Those four were the opposite of the defect:
+
+        return AnchorFailure("absent", ...)      # refuses to judge
+        return [Violation(5, "legacy_bridge")]   # reports the violation
+        return (LIVE, "no auth.js; the UI ...")  # reports the finding
+
+    Sweeping mechanically would have replaced four correct fail-closed
+    returns with `require()` calls and called it a fix. A survey with
+    false positives invites exactly that.
+
+    So: a bare `return`, `None`, an empty literal, or a lone name (the
+    accumulator, empty at that point) is a skip. Anything constructed —
+    a call, a populated list or tuple — is a refusal.
+    """
+    if isinstance(stmt, (ast.Continue, ast.Pass)):
+        return True
+    if not isinstance(stmt, ast.Return):
+        return False
+    value = stmt.value
+    if value is None:
+        return True
+    if isinstance(value, ast.Constant) and value.value is None:
+        return True
+    if isinstance(value, (ast.List, ast.Tuple, ast.Set)) and not value.elts:
+        return True
+    if isinstance(value, ast.Dict) and not value.keys:
+        return True
+    return isinstance(value, ast.Name)
+
+
 def skips_absent_input(module: str) -> List[int]:
     """Lines where a missing input is skipped rather than refused.
 
@@ -156,8 +192,7 @@ def skips_absent_input(module: str) -> List[int]:
     for node in ast.walk(tree):
         if not isinstance(node, ast.If) or not _is_absence_test(node.test):
             continue
-        if all(isinstance(stmt, (ast.Continue, ast.Pass, ast.Return))
-               for stmt in node.body):
+        if all(_is_skip(stmt) for stmt in node.body):
             lines.append(node.lineno)
     return sorted(lines)
 
@@ -433,7 +468,11 @@ INVARIANTS = {
 # `test_gate_registry.py` asserts the set never shrinks.
 # I-5 joined here because it reached zero and the gate refused to pass
 # until it did — the ratchet advancing itself, on its own author.
-ENFORCED = ("I-4", "I-5", "I-6")
+# Each name here was added because the gate refused to pass without it:
+# I-5 when the inert-rule detector cleared, I-6 on its first run, I-2
+# when the last six compose gates got a denominator. The ratchet has
+# advanced itself three times; nobody remembered to flip anything.
+ENFORCED = ("I-2", "I-4", "I-5", "I-6")
 
 
 def invariant_counts(problems: Dict[str, List[str]]) -> Dict[str, int]:

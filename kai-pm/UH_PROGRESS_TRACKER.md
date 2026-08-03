@@ -72,8 +72,9 @@
 | KAI-GATE-005 Anchor pre-scan (category confusion) | ✅ Done | `bd80129` | `make test-dashboard-findings` | 189 |
 | KAI-GATE-007/008/009 Secret rule, restart allowlist, camera identity | ✅ Done | `dd772c4` | `make test-secret-gates` | 28 |
 | KAI-GATE-010/011/012 + I-5 inert-rule detector | ✅ Done | `d222c45` | `make test-compose-gates` | 27 |
-| Closure register — first 6 findings closed, I-6 re-verifies | ✅ Done | this commit | `make test-gate-registry` | 53 |
-| | | | **Total** | **2,088** |
+| Closure register — first 6 findings closed, I-6 re-verifies | ✅ Done | `fe1f222` | `make test-gate-registry` | 53 |
+| A-04b six compose gates fail closed + denominators; I-2 enforced | ✅ Done | this commit | `make gate-registry` | 62 |
+| | | | **Total** | **2,096** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
