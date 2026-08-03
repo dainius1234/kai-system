@@ -50,14 +50,14 @@ Produced by `scripts/security/check_dashboard_findings.py`:
 
 | Status | At `cb3f142` (baseline) | Now (Track A done) | Meaning |
 |---|---|---|---|
-| **LIVE** | 54 | **21** | the condition still holds |
+| **LIVE** | 54 | **11** | the condition still holds |
 | **PARTIAL** | 2 | **0** | materially reduced, not resolved |
-| **REMEDIATED** | 3 | **38** | condition no longer holds (pending closure review) |
-| **MANUAL** | 37 | **37** | not statically decidable; named for human review |
+| **REMEDIATED** | 3 | **51** | condition no longer holds (pending closure review) |
+| **MANUAL** | 37 | **34** | not statically decidable; named for human review |
 | **Total** | 96 | **96** | coverage self-audit enforces this |
 
-Of the 21 still LIVE: **0 CRITICAL, 11 HIGH, 10 MEDIUM.** Every one of the
-10 CRITICALs is remediated.
+Of the 11 still LIVE: **0 CRITICAL, 3 HIGH, 8 MEDIUM**, all in Tracks E–I.
+Every one of the 10 CRITICALs is remediated.
 
 **Route surface:** 185 routes — 119 GET, 61 POST, 5 DELETE.
 **66 mutating routes, all 66 now authenticated.** The 6 that serve without
@@ -73,11 +73,11 @@ widening it is a deliberate edit rather than a side effect.
 | **A** Inbound identity | 0 | 5 | 0 | **Done** |
 | **B** Mutating authority | 0 | 20 | 1 | **Done** bar one manual review |
 | **C** Sensitive reads | 0 | 11 | 1 | **Done** bar one manual review |
-| **D** Failure semantics | 9 | 1 | 3 | Not started |
-| **E** Bounds | 3 | 0 | 9 | Not started |
+| **D** Failure semantics | 0 | 11 | 2 | **Done** bar two manual reviews |
+| **E** Bounds | 3 | 1 | 8 | Next |
 | **F** Media trust | 2 | 0 | 3 | Not started |
-| **G** Disclosure | 1 | 0 | 4 | Not started |
-| **H** Fan-out | 3 | 0 | 6 | Not started |
+| **G** Disclosure | 1 | 1 | 3 | Not started |
+| **H** Fan-out | 2 | 1 | 6 | Not started |
 | **I** Hygiene | 3 | 1 | 10 | Not started |
 
 ### What the baseline revalidation found (historical — before Track A)
@@ -280,7 +280,16 @@ resolved.
   hard-coded `keeper`. `KAI_DASHBOARD_IDENTITY` defaults to `keeper` so
   the stack's existing records stay reachable — any other default would
   silently return an empty Diary rather than fail visibly.
-- **Tracks D–I:** not started. 21 findings LIVE, 11 HIGH and 10 MEDIUM.
+- **Track D: complete** bar two manual reviews. `common/degraded.py` gives
+  an outage an explicit envelope: **HTTP 503 plus a `degraded` marker in
+  the body**, two independent channels, with the caller's expected shape
+  preserved so adopting it could not break a panel. Where the evidence
+  genuinely does not exist — proving recent approved decisions needs a
+  privileged ledger credential the dashboard deliberately does not hold —
+  the metric is reported **unavailable rather than substituted**.
+  `/go-no-go` is now three-valued (GO / NO_GO / INDETERMINATE) and
+  anything that is not a proven GO answers 503.
+- **Tracks E–I:** not started. 11 findings LIVE (3 HIGH, 8 MEDIUM).
 - **Findings formally closed: 0** (Rule 7 — closure is a separate
   evidence-backed register action).
 

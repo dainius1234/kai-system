@@ -5,17 +5,20 @@ import asyncio
 from datetime import datetime
 import json as _json
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 import httpx
 import redis.asyncio as aioredis
 from fastapi import (Body, Depends, FastAPI, File, HTTPException, Request,
                      UploadFile)
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import (HTMLResponse, JSONResponse,
+                               StreamingResponse)
 
 from common.dashboard_auth import (DashboardPrincipal, Scope,
                                    require_dashboard_auth)
+from common.degraded import (degraded_response, is_degraded,
+                             unavailable_metric)
 from common.resilience import resilient_call
 from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
 
@@ -85,24 +88,48 @@ async def api_nudges():
             resp.raise_for_status()
             payload = resp.json()
             return {"nudges": payload.get("nudges", [])}
-    except Exception:
-        return {"nudges": []}
+    except Exception as exc:
+        # An unreachable memU is not "no nudges" (KAI-DASH-067, 082).
+        return degraded_response("memu", str(exc), {"nudges": []})
 
 
 @app.get("/api/backup-status",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_backup_status():
+    """Report the most recent backup that actually exists.
+
+    Previously this probed ``/health`` and, if the service answered,
+    printed the *current* time with the words "service healthy" — a fresh
+    timestamp that proved only that a process was running, and read as
+    proof that a backup had just been taken (KAI-DASH-065).
+    """
     backup_url = os.getenv("BACKUP_SERVICE_URL", "http://backup-service:8054")
+    empty = {"status": "unknown", "latest_backup": None, "total_backups": 0}
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.get(f"{backup_url}/health")
+            resp = await client.get(f"{backup_url}/backup/list")
             resp.raise_for_status()
-            # Optionally, fetch latest backup file info
-            # For now, just return timestamp
-            now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
-            return {"status": f"{now} (service healthy)"}
-    except Exception:
-        return {"status": "Backup service unreachable"}
+            payload = resp.json()
+    except Exception as exc:
+        return degraded_response("backup-service", str(exc), empty)
+
+    backups = payload.get("backups") or []
+    if not backups:
+        # A reachable service with no backups is a real, reportable state —
+        # and it is not healthy.
+        return {
+            "status": "no backups found",
+            "latest_backup": None,
+            "total_backups": 0,
+            "verified": True,
+        }
+    latest = backups[0]
+    return {
+        "status": f"{latest.get('modified', 'unknown')} ({latest.get('filename', 'backup')})",
+        "latest_backup": latest,
+        "total_backups": payload.get("total", len(backups)),
+        "verified": True,
+    }
 
 
 @app.get("/api/corrections",
@@ -115,17 +142,25 @@ async def api_corrections():
             resp.raise_for_status()
             payload = resp.json()
             verdicts = payload.get("verdicts", {})
-            # Build correction history from REPAIR/FAIL_CLOSED
-            corrections = []
-            for verdict, count in verdicts.items():
-                if verdict in ("REPAIR", "FAIL_CLOSED"):
-                    corrections.append({
-                        "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
-                        "summary": f"{verdict}: {count} recent corrections"
-                    })
-            return {"corrections": corrections}
-    except Exception:
-        return {"corrections": []}
+            # These are running totals from the verifier's metrics
+            # endpoint, not dated events. Stamping each with now() made
+            # aggregates look like a chronology of corrections that had
+            # just happened (KAI-DASH-066). They carry no timestamp
+            # because none is known.
+            corrections = [
+                {
+                    "verdict": verdict,
+                    "count": count,
+                    "kind": "aggregate",
+                    "timestamp": None,
+                    "summary": f"{verdict}: {count} total",
+                }
+                for verdict, count in verdicts.items()
+                if verdict in ("REPAIR", "FAIL_CLOSED")
+            ]
+            return {"corrections": corrections, "kind": "aggregate_counts"}
+    except Exception as exc:
+        return degraded_response("verifier", str(exc), {"corrections": []})
 
 audit = AuditStream("dashboard", required=os.getenv("AUDIT_REQUIRED", "false").lower() == "true")
 
@@ -169,16 +204,62 @@ async def metrics_middleware(request: Request, call_next):
         raise
 
 
+# A backend that answers 200 while reporting its own trouble is not
+# healthy. These are the self-reported values that mean "not ok".
+UNHEALTHY_REPORTED = {"error", "unhealthy", "down", "fail", "failed",
+                      "unavailable", "degraded", "critical"}
+
+
+def _classify_node(payload: Any) -> Tuple[str, str]:
+    """Judge a node by what it says about itself, not by its HTTP code.
+
+    Treating any 2xx as healthy (KAI-DASH-061) meant a service reporting
+    ``{"status": "degraded"}`` counted towards readiness.
+    """
+    if not isinstance(payload, dict):
+        return "ok", ""
+    reported = str(payload.get("status", "")).strip().lower()
+    if not reported:
+        return "ok", ""
+    for bad in UNHEALTHY_REPORTED:
+        if bad in reported:
+            return "degraded", f"backend reports status={payload.get('status')!r}"
+    return "ok", ""
+
+
 async def fetch_status() -> Dict[str, Dict[str, Any]]:
-    results: Dict[str, Dict[str, Any]] = {}
+    """Probe every node concurrently and honour its self-report.
+
+    Sequential probing (KAI-DASH-057) meant the worst case was the sum of
+    every timeout; ``asyncio.gather`` bounds it to the slowest single node.
+    """
+    async def probe(client, name: str, url: str) -> Tuple[str, Dict[str, Any]]:
+        try:
+            resp = await client.get(url, timeout=2.0)
+            resp.raise_for_status()
+            payload = resp.json()
+        except Exception as exc:  # noqa: BLE001
+            return name, {"status": "down", "error": str(exc)}
+        status, note = _classify_node(payload)
+        entry: Dict[str, Any] = {"status": status, "details": payload}
+        if note:
+            entry["error"] = note
+        return name, entry
+
     async with httpx.AsyncClient() as client:
-        for name, url in NODES.items():
-            try:
-                resp = await client.get(url, timeout=2.0)
-                resp.raise_for_status()
-                results[name] = {"status": "ok", "details": resp.json()}
-            except Exception as exc:  # noqa: BLE001
-                results[name] = {"status": "down", "error": str(exc)}
+        settled = await asyncio.gather(
+            *(probe(client, name, url) for name, url in NODES.items()),
+            return_exceptions=True,
+        )
+    results: Dict[str, Dict[str, Any]] = {}
+    for item in settled:
+        if isinstance(item, BaseException):
+            continue
+        name, entry = item
+        results[name] = entry
+    # A probe that vanished is not a healthy probe.
+    for name in NODES:
+        results.setdefault(name, {"status": "down", "error": "probe did not complete"})
     return results
 
 
@@ -209,30 +290,74 @@ async def build_go_no_go_report() -> Dict[str, Any]:
     if mode != "WORK":
         reasons.append("Tool Gate is not in WORK mode.")
 
-    ledger_count = int(ledger_stats.get("count", 0))
-    if ledger_count < NO_GO_GRACE_REQUESTS:
+    # KAI-DASH-063 — the proof metric.
+    #
+    # `/ledger/stats` returns only a total count. Proof of safe operation
+    # is *recent, approved, successful* decisions, and that detail lives
+    # in `/ledger/tail`, which requires a privileged Tool Gate token.
+    # Giving the dashboard one would recreate exactly the confused deputy
+    # that KAI-DASH-002 and 012 describe, so the metric is reported as
+    # unavailable rather than substituted. A total count standing in for
+    # proof is not a weaker measurement — it is a different one wearing
+    # the same name.
+    proof = unavailable_metric(
+        "recent_approved_decisions",
+        "requires privileged ledger access; the dashboard deliberately "
+        "holds no Tool Gate credential (KAI-DASH-002)",
+    )
+    proof["total_ledger_entries"] = (
+        int(ledger_stats.get("count", 0)) if ledger_stats else None
+    )
+    unprovable = [
+        "Recent approved decisions cannot be proven from here: the "
+        "dashboard holds no ledger credential by design."
+    ]
+
+    # KAI-DASH-064 — the reliability metric.
+    #
+    # This used the dashboard's own HTTP error ratio, which measures how
+    # often *callers* got errors from the dashboard, not whether the
+    # system executes reliably. Fleet health is the closest honest signal
+    # the dashboard can observe first-hand.
+    total_nodes = len(statuses) or 1
+    healthy_nodes = sum(1 for p in statuses.values() if p.get("status") == "ok")
+    fleet_unhealthy_ratio = 1.0 - (healthy_nodes / total_nodes)
+    if fleet_unhealthy_ratio > MAX_ERROR_RATIO:
         reasons.append(
-            f"Not enough proof yet ({ledger_count}/{NO_GO_GRACE_REQUESTS} gate decisions observed)."
+            f"Fleet reliability is too low "
+            f"({healthy_nodes}/{total_nodes} nodes healthy)."
         )
 
-    error_ratio = float(metrics.get("error_ratio", 0.0))
-    if error_ratio > MAX_ERROR_RATIO:
-        reasons.append(
-            f"Recent API error ratio is too high ({error_ratio:.1%} > {MAX_ERROR_RATIO:.1%})."
-        )
+    # Three-valued on purpose. "I cannot tell" is not "no", and it is
+    # certainly not "yes" — collapsing either way is how a dashboard ends
+    # up asserting something it has not established. Only a clean GO is a
+    # success; both other states fail closed (KAI-DASH-080).
+    if reasons:
+        decision, trust = "NO_GO", "prove-first"
+        summary = "Hold execution until blockers are fixed."
+    elif unprovable:
+        decision, trust = "INDETERMINATE", "unproven"
+        summary = "No blockers found, but readiness could not be proven."
+    else:
+        decision, trust = "GO", "trusted"
+        summary = "System looks stable enough to proceed."
 
-    go = len(reasons) == 0
     return {
-        "decision": "GO" if go else "NO_GO",
-        "trust_status": "trusted" if go else "prove-first",
-        "summary": "System looks stable enough to proceed." if go else "Hold execution until blockers are fixed.",
+        "decision": decision,
+        "trust_status": trust,
+        "summary": summary,
+        "unprovable": unprovable,
         "checks": {
             "required_mode": "WORK",
             "current_mode": mode,
-            "minimum_gate_decisions": NO_GO_GRACE_REQUESTS,
-            "current_gate_decisions": ledger_count,
-            "max_error_ratio": MAX_ERROR_RATIO,
-            "current_error_ratio": error_ratio,
+            "proof_of_safe_operation": proof,
+            "max_unhealthy_ratio": MAX_ERROR_RATIO,
+            "fleet_unhealthy_ratio": round(fleet_unhealthy_ratio, 4),
+            "healthy_nodes": healthy_nodes,
+            "total_nodes": total_nodes,
+            # Kept for the UI, explicitly labelled as what it is: a
+            # measure of this process, not of the system.
+            "dashboard_caller_error_ratio": float(metrics.get("error_ratio", 0.0)),
             "down_nodes": down_nodes,
         },
         "reasons": reasons,
@@ -326,8 +451,17 @@ async def index() -> Dict[str, object]:
 
 @app.get("/go-no-go",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
-async def go_no_go() -> Dict[str, Any]:
-    return await build_go_no_go_report()
+async def go_no_go():
+    """Return the go/no-go report, with a status a machine can enforce.
+
+    This answered 200 for NO_GO (KAI-DASH-080), so anything consuming it
+    programmatically saw a successful response and had to know to read
+    the body to discover it had been told to stop.
+    """
+    report = await build_go_no_go_report()
+    if report.get("decision") == "GO":
+        return report
+    return JSONResponse(status_code=503, content=report)
 
 
 @app.get("/ui")
@@ -368,8 +502,8 @@ async def fleet() -> Dict[str, Any]:
             resp = await client.get(f"{SUPERVISOR_URL}/status")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"fleet": "unknown", "error": "supervisor unreachable"}
+    except Exception as exc:
+        return degraded_response('supervisor', str(exc), {"fleet": "unknown", "error": "supervisor unreachable"})
 
 
 @app.get("/readiness",
@@ -430,8 +564,8 @@ async def api_thinking(
                 "total_episodes": data.get("count", 0),
                 "pathways": pathways,
             }
-    except Exception:
-        return {"status": "unavailable", "total_episodes": 0, "pathways": []}
+    except Exception as exc:
+        return degraded_response('agentic', str(exc), {"status": "unavailable", "total_episodes": 0, "pathways": []})
 
 
 @app.get("/api/tempo",
@@ -443,8 +577,8 @@ async def api_tempo():
             resp = await client.get(f"{MEMU_URL}/memory/tempo")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable", "tempo": "unknown"}
+    except Exception as exc:
+        return degraded_response('memu', str(exc), {"status": "unavailable", "tempo": "unknown"})
 
 
 @app.get("/api/boundary",
@@ -456,8 +590,8 @@ async def api_boundary():
             resp = await client.get(f"{MEMU_URL}/memory/boundary")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable", "zones": []}
+    except Exception as exc:
+        return degraded_response('memu', str(exc), {"status": "unavailable", "zones": []})
 
 
 @app.get("/api/silence",
@@ -469,8 +603,8 @@ async def api_silence():
             resp = await client.get(f"{MEMU_URL}/memory/silence")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable", "silence_topics": []}
+    except Exception as exc:
+        return degraded_response('memu', str(exc), {"status": "unavailable", "silence_topics": []})
 
 
 @app.get("/api/self-assessment",
@@ -482,8 +616,8 @@ async def api_self_assessment():
             resp = await client.get(f"{HEARTBEAT_URL}/self-assessment")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable"}
+    except Exception as exc:
+        return degraded_response('backend', str(exc), {"status": "unavailable"})
 
 
 @app.post("/api/dream",
@@ -496,8 +630,8 @@ async def api_dream():
             resp = await client.post(f"{introspect_url}/dream")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable", "message": "Cannot reach agentic-introspect for dream cycle"}
+    except Exception as exc:
+        return degraded_response('agentic-introspect', str(exc), {"status": "unavailable", "message": "Cannot reach agentic-introspect for dream cycle"})
 
 
 @app.get("/api/ledger-stats",
@@ -510,11 +644,23 @@ async def api_ledger_stats():
             resp = await client.get(f"{ledger_url}/stats")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable", "total_entries": 0}
+    except Exception as exc:
+        return degraded_response('backend', str(exc), {"status": "unavailable", "total_entries": 0})
 
 
 # ── Redis pub/sub — real-time event streaming ────────────────────────
+# An event stream commits its status line before anything is known to
+# have failed, so a mid-stream failure cannot be signalled with an HTTP
+# code. It is signalled in-band instead — as an explicit error event, not
+# as content that reads like a normal answer (KAI-DASH-016).
+def _sse_error(message: str) -> str:
+    payload = _json.dumps({"event": "error", "degraded": True,
+                           "error": message})
+    return f"data: {payload}\n\ndata: [DONE]\n\n"
+
+
+MAX_CHAT_BODY_BYTES = int(os.getenv("MAX_CHAT_BODY_BYTES", str(256 * 1024)))
+
 REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
 
 # Channels that the dashboard subscribes to
@@ -549,8 +695,9 @@ async def sse_events(request: Request):
             r = aioredis.from_url(REDIS_URL, decode_responses=True)
             pubsub = r.pubsub()
             await pubsub.subscribe(*_EVENT_CHANNELS)
-        except Exception:
-            yield f"data: {_json.dumps({'channel': 'error', 'error': 'redis unavailable'})}\n\n"
+        except Exception as exc:
+            logger.warning("event stream failed: %s", exc)
+            yield _sse_error("the event stream is unavailable")
             return
 
         try:
@@ -594,8 +741,8 @@ async def api_security_audit():
             resp = await client.get(f"{introspect_url}/security/audit")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable", "findings": [], "risk_score": -1}
+    except Exception as exc:
+        return degraded_response('agentic-introspect', str(exc), {"status": "unavailable", "findings": [], "risk_score": -1})
 
 
 # ── P16 API proxies ─────────────────────────────────────────────────
@@ -609,8 +756,8 @@ async def api_goals():
             resp = await client.get(f"{MEMU_URL}/memory/goals")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable", "goals": []}
+    except Exception as exc:
+        return degraded_response('memu', str(exc), {"status": "unavailable", "goals": []})
 
 
 @app.post("/api/goals",
@@ -623,8 +770,8 @@ async def api_goals_create(request: Request):
             resp = await client.post(f"{MEMU_URL}/memory/goals", json=body)
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "error", "detail": "Cannot reach memu-core"}
+    except Exception as exc:
+        return degraded_response('memu', str(exc), {"status": "error", "detail": "Cannot reach memu-core"})
 
 
 @app.post("/api/goals/update",
@@ -637,8 +784,8 @@ async def api_goals_update(request: Request):
             resp = await client.post(f"{MEMU_URL}/memory/goals/update", json=body)
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "error", "detail": "Cannot reach memu-core"}
+    except Exception as exc:
+        return degraded_response('memu', str(exc), {"status": "error", "detail": "Cannot reach memu-core"})
 
 
 @app.get("/api/drift",
@@ -650,8 +797,8 @@ async def api_drift():
             resp = await client.get(f"{MEMU_URL}/memory/drift")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable"}
+    except Exception as exc:
+        return degraded_response('memu', str(exc), {"status": "unavailable"})
 
 
 @app.get("/api/memories")
@@ -680,8 +827,8 @@ async def api_memories(
                 resp = await client.get(f"{MEMU_INTROSPECT_URL}/memory/stats")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable", "memories": []}
+    except Exception as exc:
+        return degraded_response('memu-introspect', str(exc), {"status": "unavailable", "memories": []})
 
 
 @app.get("/api/memory/stats",
@@ -693,8 +840,8 @@ async def api_memory_stats():
             resp = await client.get(f"{MEMU_INTROSPECT_URL}/memory/stats")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable"}
+    except Exception as exc:
+        return degraded_response('memu-introspect', str(exc), {"status": "unavailable"})
 
 
 @app.get("/api/memories/recent")
@@ -855,8 +1002,8 @@ async def api_struggle(session_id: str = "default"):
             resp = await client.get(f"{MEMU_URL}/memory/struggle", params={"session_id": session_id})
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable", "struggle_score": 0}
+    except Exception as exc:
+        return degraded_response('memu', str(exc), {"status": "unavailable", "struggle_score": 0})
 
 
 @app.post("/api/feedback",
@@ -869,8 +1016,8 @@ async def api_feedback(request: Request):
             resp = await client.post(f"{MEMU_URL}/memory/feedback", json=body)
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "error", "detail": "Cannot reach memu-core"}
+    except Exception as exc:
+        return degraded_response('memu', str(exc), {"status": "error", "detail": "Cannot reach memu-core"})
 
 
 @app.get("/api/feedback/stats",
@@ -882,8 +1029,8 @@ async def api_feedback_stats():
             resp = await client.get(f"{MEMU_URL}/memory/feedback/stats")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"status": "unavailable"}
+    except Exception as exc:
+        return degraded_response('memu', str(exc), {"status": "unavailable"})
 
 
 @app.get("/api/logs",
@@ -1361,7 +1508,17 @@ async def api_chat_proxy(request: Request):
     This keeps the browser talking only to dashboard:8080.
     The agentic service does the actual LLM inference.
     """
-    body = await request.json()
+    # KAI-DASH-053 — the request body was unbounded.
+    raw = await request.body()
+    if len(raw) > MAX_CHAT_BODY_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"chat body exceeds {MAX_CHAT_BODY_BYTES} bytes",
+        )
+    try:
+        body = _json.loads(raw or b"{}")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="chat body is not valid JSON")
 
     async def stream_proxy():
         try:
@@ -1372,11 +1529,25 @@ async def api_chat_proxy(request: Request):
                     json=body,
                     headers={"Content-Type": "application/json"},
                 ) as resp:
+                    # KAI-DASH-054 — the backend's status was never
+                    # checked, so a 500 body was streamed to the browser
+                    # as if it were model output.
+                    if resp.status_code >= 400:
+                        await resp.aread()
+                        logger.warning(
+                            "chat backend returned %s", resp.status_code)
+                        yield _sse_error(
+                            f"the assistant service returned "
+                            f"{resp.status_code}")
+                        return
                     async for chunk in resp.aiter_bytes():
                         yield chunk
         except Exception as exc:
-            yield f"data: {_json.dumps({'token': f'[connection error: {str(exc)[:200]}]'})}\n\n"
-            yield "data: [DONE]\n\n"
+            # KAI-DASH-055 — the exception text went to the browser and
+            # disclosed internal hosts and transport detail. It belongs
+            # in the log, not the response.
+            logger.warning("chat proxy connection failed: %s", exc)
+            yield _sse_error("the assistant service is unavailable")
 
     return StreamingResponse(
         stream_proxy(),
@@ -1664,8 +1835,8 @@ async def api_clipboard_clear():
             resp = await client.delete(f"{CLIPBOARD_URL}/history")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"cleared": False}
+    except Exception as exc:
+        return degraded_response('clipboard-service', str(exc), {"cleared": False})
 
 
 # ── File Watcher proxies ───────────────────────────────────────────────────────
@@ -1716,8 +1887,8 @@ async def api_notify_dismiss(notification_id: int):
             resp = await client.delete(f"{NOTIFY_URL}/pending/{notification_id}")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"cleared": False}
+    except Exception as exc:
+        return degraded_response('notify-service', str(exc), {"cleared": False})
 
 
 @app.delete("/api/notify/pending",
@@ -1728,8 +1899,8 @@ async def api_notify_dismiss_all():
             resp = await client.delete(f"{NOTIFY_URL}/pending")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"cleared": False}
+    except Exception as exc:
+        return degraded_response('notify-service', str(exc), {"cleared": False})
 
 
 # ── Monitor proxies ───────────────────────────────────────────────────────────
@@ -1755,8 +1926,8 @@ async def api_monitor_delete_rule(rule_id: str):
             resp = await client.delete(f"{MONITOR_URL}/rules/{rule_id}")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"ok": False}
+    except Exception as exc:
+        return degraded_response('monitor-service', str(exc), {"ok": False})
 
 
 @app.post("/api/monitor/rules/{rule_id}/enable",
@@ -1791,8 +1962,8 @@ async def api_monitor_clear_alerts():
             resp = await client.delete(f"{MONITOR_URL}/alerts")
             resp.raise_for_status()
             return resp.json()
-    except Exception:
-        return {"ok": False}
+    except Exception as exc:
+        return degraded_response('monitor-service', str(exc), {"ok": False})
 
 
 @app.get("/api/monitor/status",

@@ -192,8 +192,17 @@ class TestLedgerStatsEndpoint(unittest.TestCase):
             result = asyncio.run(
                 dashboard.api_ledger_stats()
             )
-            self.assertEqual(result["status"], "unavailable")
-            self.assertEqual(result["total_entries"], 0)
+            # An outage now answers 503 as well as saying so in the body
+            # (KAI-DASH-016/067): a caller must be able to tell without
+            # parsing, and the empty shape is preserved so panels that
+            # already read `total_entries` keep working.
+            import json as _json
+            self.assertEqual(result.status_code, 503)
+            payload = _json.loads(bytes(result.body).decode())
+            self.assertEqual(payload["status"], "unavailable")
+            self.assertTrue(payload["degraded"])
+            self.assertEqual(payload["total_entries"], 0)
+            self.assertIn("source", payload)
 
 
 if __name__ == "__main__":

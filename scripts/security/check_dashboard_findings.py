@@ -368,26 +368,49 @@ def dash_013() -> Result:
     )
 
 
-def dash_016() -> Result:
-    """Backend failures returned as HTTP-200 fallback objects."""
+# Ways a failure path can answer without claiming success. A bare
+# ``return {...}`` is not one of them: FastAPI serialises it as 200.
+NON_SUCCESS_MARKERS = ("raise", "status_code", "degraded_response",
+                       "JSONResponse", "HTTPException", "_sse_error")
+
+
+def _swallowing_handlers() -> List[str]:
+    """Route handlers whose except-path returns a 200 body."""
     tree = _tree()
     if tree is None:
-        return MANUAL, "dashboard source did not parse"
+        return []
     offenders = []
+    routed = {r.handler for r in _routes()}
     for node in ast.walk(tree):
         if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        # Only routes matter: a helper returning a dict is not an HTTP 200.
+        if node.name not in routed:
             continue
         for handler in ast.walk(node):
             if not isinstance(handler, ast.ExceptHandler):
                 continue
             body = ast.unparse(handler)
-            if "return" in body and "raise" not in body and "status_code" not in body:
-                offenders.append(node.name)
-                break
+            if "return" not in body and "yield" not in body:
+                continue
+            if any(m in body for m in NON_SUCCESS_MARKERS):
+                continue
+            offenders.append(node.name)
+            break
+    return sorted(set(offenders))
+
+
+def dash_016() -> Result:
+    """Backend failures returned as HTTP-200 fallback objects."""
+    if _tree() is None:
+        return MANUAL, "dashboard source did not parse"
+    offenders = _swallowing_handlers()
     if offenders:
-        return LIVE, (f"{len(offenders)} handlers swallow backend failure into a "
-                      f"200 body, e.g. {', '.join(sorted(set(offenders))[:3])}")
-    return REMEDIATED, "no exception handler returns a success-shaped body"
+        return LIVE, (f"{len(offenders)} route handler(s) swallow backend failure "
+                      f"into a 200 body: {', '.join(offenders[:4])}")
+    return REMEDIATED, (
+        "every route's failure path answers with a non-success status"
+    )
 
 
 def dash_061() -> Result:
@@ -403,22 +426,46 @@ def dash_061() -> Result:
 
 
 def dash_063() -> Result:
-    """Go/no-go counts all ledger entries, not recent approved successes."""
+    """Go/no-go counts all ledger entries, not recent approved successes.
+
+    Remediated either by measuring the right thing, or by reporting the
+    metric as unavailable. Substituting a total count and calling it
+    proof is the defect; declining to measure is not.
+    """
     src = _handler_src("build_go_no_go_report")
     if not src:
         return MANUAL, "build_go_no_go_report() not found"
-    if "ledger_stats.get('count'" in src or 'ledger_stats.get("count"' in src:
+    declared_unavailable = "unavailable_metric" in src
+    uses_total_as_proof = re.search(
+        r"(minimum_gate_decisions|NO_GO_GRACE_REQUESTS)", src)
+    if uses_total_as_proof and not declared_unavailable:
         return LIVE, "uses total ledger count as proof metric"
+    if declared_unavailable:
+        return REMEDIATED, (
+            "the proof metric is declared unavailable rather than "
+            "substituted with a total count"
+        )
     return REMEDIATED, "proof metric no longer a raw total count"
 
 
 def dash_064() -> Result:
-    """Go/no-go uses dashboard caller error ratio, not system reliability."""
+    """Go/no-go uses dashboard caller error ratio, not system reliability.
+
+    The dashboard's own error ratio may still be *reported* — it is a
+    real number about a real thing. The defect is it being the value the
+    GO/NO_GO decision turns on.
+    """
     src = _handler_src("build_go_no_go_report")
     if not src:
         return MANUAL, "build_go_no_go_report() not found"
-    if "budget.snapshot()" in src and "error_ratio" in src:
+    decides_on_fleet = "fleet_unhealthy_ratio" in src or "healthy_nodes" in src
+    # Does a caller-error comparison still gate the decision?
+    gates_on_caller_error = re.search(
+        r"error_ratio\s*>\s*MAX_ERROR_RATIO", src)
+    if gates_on_caller_error and not decides_on_fleet:
         return LIVE, "reliability judged by the dashboard's own HTTP error ratio"
+    if decides_on_fleet:
+        return REMEDIATED, "the decision turns on observed fleet health"
     return REMEDIATED, "reliability metric sourced from execution/fleet data"
 
 
@@ -452,6 +499,8 @@ def dash_067() -> Result:
         if not isinstance(node, ast.ExceptHandler):
             continue
         body = ast.unparse(node)
+        if any(m in body for m in NON_SUCCESS_MARKERS):
+            continue
         if re.search(r"return \{[^}]*: (\[\]|\{\}|0|None)", body):
             empties += 1
     if empties:
@@ -623,6 +672,55 @@ def dash_d02() -> Result:
     return LIVE, "api_memories calls /memory/retrieve without required user_id"
 
 
+def dash_053() -> Result:
+    """Chat request bodies are unbounded."""
+    src = _handler_src("api_chat_proxy")
+    if not src:
+        return REMEDIATED, "chat proxy removed"
+    if "MAX_CHAT_BODY_BYTES" in src or "413" in src:
+        return REMEDIATED, "chat body is size-bounded before parsing"
+    return LIVE, "await request.json() with no size bound"
+
+
+def dash_054() -> Result:
+    """Chat proxy streams backend 4xx/5xx bodies without checking status."""
+    src = _handler_src("api_chat_proxy")
+    if not src:
+        return REMEDIATED, "chat proxy removed"
+    if "status_code" not in src:
+        return LIVE, "backend status is never inspected before streaming"
+    # The check must come before the body is forwarded, not after.
+    guard = re.search(r"resp\.status_code\s*>=?\s*[45]\d\d", src)
+    if not guard:
+        return PARTIAL, "status_code appears but no >=400 guard was found"
+    stream_at = src.find("aiter_bytes")
+    if stream_at != -1 and guard.start() > stream_at:
+        return LIVE, "the status guard runs after streaming has begun"
+    return REMEDIATED, "backend status is validated before any chunk is forwarded"
+
+
+def dash_055() -> Result:
+    """Chat connection exceptions are sent to the browser as diagnostics."""
+    src = _handler_src("api_chat_proxy")
+    if not src:
+        return REMEDIATED, "chat proxy removed"
+    for handler in ast.walk(ast.parse(src)):
+        if not isinstance(handler, ast.ExceptHandler):
+            continue
+        name = handler.name
+        if not name:
+            continue
+        body = ast.unparse(handler)
+        # The exception may be logged; it must not be yielded or returned.
+        for stmt in handler.body:
+            emitted = ast.unparse(stmt)
+            if not isinstance(stmt, (ast.Expr, ast.Return)):
+                continue
+            if ("yield" in emitted or "return" in emitted) and name in emitted:
+                return LIVE, f"exception text reaches the client: {emitted[:80]}"
+    return REMEDIATED, "internal exception detail is logged, not returned"
+
+
 # ── The finding table ────────────────────────────────────────────────
 
 class Finding(NamedTuple):
@@ -724,9 +822,7 @@ FINDINGS: Dict[str, Finding] = {
                             manual("classification lives in common resilience helper "
                                    "resilient_call(), not in dashboard/app.py")),
     "KAI-DASH-016": Finding(H, "D", "Success-shaped fallbacks", dash_016),
-    "KAI-DASH-054": Finding(H, "D", "Chat status not validated",
-                            manual("streaming status validation in api_chat_proxy() needs "
-                                   "behavioural review, not a source marker")),
+    "KAI-DASH-054": Finding(H, "D", "Chat status not validated", dash_054),
     "KAI-DASH-061": Finding(H, "D", "HTTP success equals node health", dash_061),
     "KAI-DASH-062": Finding(H, "D", "False core readiness",
                             manual("readiness() consumes fallback zeros; needs a live "
@@ -758,8 +854,7 @@ FINDINGS: Dict[str, Finding] = {
                             manual("api_tts_synthesize() input and response bounds")),
     "KAI-DASH-049": Finding(H, "E", "Unlimited screenshot response",
                             manual("api_browser_screenshot() response bound")),
-    "KAI-DASH-053": Finding(H, "E", "Unbounded chat body",
-                            manual("api_chat_proxy() request body bound")),
+    "KAI-DASH-053": Finding(H, "E", "Unbounded chat body", dash_053),
     "KAI-DASH-056": Finding(H, "E", "No gateway workload controls", dash_056),
     "KAI-DASH-076": Finding(M, "E", "Unbounded backend responses",
                             manual("backend response bounds apply in the shared proxy helper")),
@@ -787,8 +882,7 @@ FINDINGS: Dict[str, Finding] = {
     # ── Track G — disclosure minimisation ──
     "KAI-DASH-052": Finding(H, "G", "Internal error disclosure",
                             manual("proxy error detail content across many handlers")),
-    "KAI-DASH-055": Finding(H, "G", "Chat diagnostics leak",
-                            manual("api_chat_proxy() exception text sent to browser")),
+    "KAI-DASH-055": Finding(H, "G", "Chat diagnostics leak", dash_055),
     "KAI-DASH-068": Finding(H, "G", "Root operational disclosure",
                             manual("index() aggregate payload; needs field-level review")),
     "KAI-DASH-069": Finding(M, "G", "Health topology disclosure", dash_069),

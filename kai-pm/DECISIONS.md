@@ -3266,3 +3266,44 @@ This means `KAI_PERCEPTION_MODE` and `KAI_CORTEX_SOURCE` controlled code paths t
 **Nothing is closed.** Rule 7. Findings formally closed by this entry: **0**.
 
 **Files modified:** `dashboard/app.py`, `common/dashboard_auth.py`, `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `scripts/test_dashboard.py`, `scripts/setup_service_token.sh`, three compose profiles, tracker/plan/README/STATUS/MAKEFILE_TARGETS.
+
+---
+
+## D145 — 2026-08-03 — W1-DASH Track D: An Outage Must Not Look Like an Answer
+
+**Context:** Track D held nine LIVE findings (`016`, `061`, `063`–`067`, `080`, `082`). They read as nine separate bugs and are one: the dashboard could not distinguish *"there is no data"* from *"I could not get the data"*, and reported the second as the first.
+
+Concretely — a dead memU produced `{"nudges": []}` with HTTP 200, indistinguishable from a healthy memU with nothing to say. An unreachable backup service produced a **fresh timestamp and the words "service healthy"**. In a system whose entire purpose is deciding what is safe to act on, absence of evidence was being rendered as evidence of absence.
+
+**Decisions:**
+
+1. **One mechanism, not 28 patches.** `common/degraded.py` carries the whole track. A degraded read answers **HTTP 503** *and* sets `degraded: true` with a source and reason in the body — two independent channels, so a machine can tell without parsing and a human can tell why.
+
+2. **The envelope preserves the caller's expected shape.** `{"nudges": []}` becomes `{"nudges": [], "degraded": true, …}`. That is not politeness to the UI: it means adopting this could not silently break a panel into throwing, which would have been a second outage dressed as a fix.
+
+3. **The markers win over the shape.** A backend that returns its own `degraded: false` or `status: "ok"` cannot talk its way out of being reported as degraded.
+
+4. **There is deliberately no `degraded_ok()` returning 200,** and a test asserts none appears. A 200 shortcut would quietly undo the entire track.
+
+5. **Where the evidence does not exist, decline to measure.** `KAI-DASH-063` wants proof of *recent approved successful* decisions. `/ledger/stats` returns only a total; the detail lives behind `/ledger/tail`, which needs a privileged Tool Gate token. **Giving the dashboard one would recreate exactly the confused deputy of `KAI-DASH-002` and `012`.** So the metric is reported `unavailable` with the reason, rather than substituted. A total count standing in for proof is not a weaker measurement — it is a different one wearing the same name.
+
+6. **`/go-no-go` is now three-valued.** GO / NO_GO / **INDETERMINATE**. "I cannot tell" is not "no", and it is certainly not "yes"; collapsing either way is how a dashboard ends up asserting something it never established. Only a clean GO answers 200 — both other states answer 503 (`KAI-DASH-080`), so a machine consumer can enforce the verdict without knowing to read the body.
+
+7. **Reliability now turns on observed fleet health,** not the dashboard's own HTTP error ratio (`064`). The caller-error ratio is still *reported*, explicitly relabelled `dashboard_caller_error_ratio` — it is a real number about a real thing; it was simply never a measure of whether the system executes reliably.
+
+8. **Backup status reads `/backup/list`** and reports the newest backup that actually exists (`065`). A reachable service with no backups is now a reported state, and it is not "healthy".
+
+9. **Correction counters carry no timestamp** (`066`). They are running totals from the verifier's metrics endpoint, not dated events; stamping each with `now()` made aggregates look like a chronology of corrections that had just happened. They are labelled `kind: aggregate` with `timestamp: None`, because none is known.
+
+10. **Node health honours the backend's self-report** (`061`). Any 2xx counted as healthy, so a service answering `{"status": "degraded"}` counted towards readiness. Fixing this also closed `KAI-DASH-057`: the probes now run under `asyncio.gather`, bounding the worst case to the slowest node instead of the sum of every timeout.
+
+**Three checks were rewritten because their markers predated the mechanism.** `dash_016` counted any except-handler containing `return`, so converting handlers to `degraded_response()` made the count *rise from 27 to 30*; it now knows the non-success markers and only counts **route** handlers, since a helper returning a dict is not an HTTP 200. `dash_063` and `dash_064` tested for the old implementation and would have reported LIVE forever.
+
+**Three findings were promoted from MANUAL to real checks** now that there is something to check: `053` (chat body bound), `054` (backend status validated *before* streaming begins — the check fails a guard placed after `aiter_bytes`), and `055` (exception text logged, not yielded to the browser).
+
+**Verification:** 1,814 tests across 24 suites, all green. 9/9 CI gates. **Tracks A, B, C and D now report zero LIVE findings** — 51 REMEDIATED, 11 LIVE (3 HIGH, 8 MEDIUM) across E–I. All 10 CRITICALs remediated. `test_gaps_sprint` was updated: it asserted on a dict where the handler now returns a 503 response, and now asserts the status code too.
+
+**Nothing is closed.** Rule 7. Findings formally closed by this entry: **0**.
+
+**Files produced:** `common/degraded.py`, `scripts/test_degraded.py`.
+**Files modified:** `dashboard/app.py`, `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `scripts/test_gaps_sprint.py`, `Makefile`, tracker/plan/README/STATUS/MAKEFILE_TARGETS.

@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-02 (ninth pass — Track A credential shim for the UI; discovered-findings register)
+**Last updated:** 2026-08-03 (tenth pass — Wave 1 Track D: failure semantics)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -54,11 +54,12 @@
 | E-03 Deployment preflight | ✅ Done | `8d2ea09` | `make test-preflight` | 57 |
 | W-01 Modules wired into the running app | ✅ Done | this commit | `make test-invariant-guards` | (guards) |
 | A-01 Architecture dependency CI gate — all 15 rules | ✅ Done | `cb3f142` | `make test-architecture-rules` | 61 |
-| W1-DASH Dashboard finding tracker (96 findings) | ✅ Done | `dff418d` | `make test-dashboard-findings` | 101 |
+| W1-DASH Dashboard finding tracker (96 findings) | ✅ Done | `dff418d` | `make test-dashboard-findings` | 133 |
 | W1-DASH-A Dashboard inbound identity | ✅ Done | `9fb0e26` | `make test-dashboard-auth` | 89 |
 | W1-DASH-D01 Browser credential shim | ✅ Done | `eb5b084` | `make test-dashboard-ui-auth` | 42 |
-| W1-DASH-C Caller-scoped memory reads | ✅ Done | this commit | `make test-dashboard` | (folded in) |
-| | | | **Total** | **1,746** |
+| W1-DASH-C Caller-scoped memory reads | ✅ Done | `d18a089` | `make test-dashboard` | (folded in) |
+| W1-DASH-D Failure semantics (degraded envelope) | ✅ Done | this commit | `make test-degraded` | 36 |
+| | | | **Total** | **1,814** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
@@ -241,17 +242,17 @@ before any remediation was planned, because the findings were captured at
 
 | Status | Baseline `cb3f142` | Now |
 |---|---|---|
-| LIVE | 54 | **21** |
+| LIVE | 54 | **11** |
 | PARTIAL | 2 | **0** |
-| REMEDIATED (pending closure review) | 3 | **38** |
-| MANUAL (needs human review) | 37 | **37** |
+| REMEDIATED (pending closure review) | 3 | **51** |
+| MANUAL (needs human review) | 37 | **34** |
 | **Total** | **96** | **96** |
 
-**Tracks A, B and C are complete.** `common/dashboard_auth.py`
+**Tracks A, B, C and D are complete.** `common/dashboard_auth.py`
 gives every route a verified principal — identity, role, session — and a
 declared scope.
 
-- **All 10 CRITICALs remediated.** The 21 still LIVE are 11 HIGH, 10 MEDIUM
+- **All 10 CRITICALs remediated.** The 11 still LIVE are 3 HIGH, 8 MEDIUM, all in Tracks E–I
 - **185 routes: 179 authenticated, 66 of 66 mutating routes authenticated**
 - The 6 unauthenticated routes are the declared public list — `/health`,
   `/metrics`, and the four HTML shells the browser loads before it can
@@ -263,17 +264,20 @@ declared scope.
 - **Operator directive verified:** the dashboard reads neither
   `BINANCE_API_KEY` nor `BINANCE_API_SECRET`. Checked on every tool run
 
-**Tracks B and C are complete** bar two manual reviews (`KAI-DASH-014`
-per-backend idempotency, `KAI-DASH-044` SSE event isolation). `KAI-DASH-023`
-is closed: memory reads now carry the calling principal's identity instead
-of a hard-coded `keeper`. **Tracks D–I** are not started.
+**Tracks B, C and D are complete** bar four manual reviews. `KAI-DASH-023`
+is closed: memory reads carry the calling principal's identity instead of a
+hard-coded `keeper`. Track D introduced `common/degraded.py` — an outage now
+answers **503 with an explicit `degraded` marker**, on two independent
+channels, instead of a 200 that looked like an answer. **Tracks E–I** are not
+started: 11 findings LIVE (3 HIGH, 8 MEDIUM).
 
 | Command | Purpose |
 |---|---|
 | `make dashboard-findings` | Live status of all 96 findings |
-| `make test-dashboard-findings` | 101 tests proving the tracker can fail |
+| `make test-dashboard-findings` | 133 tests proving the tracker can fail |
 | `make test-dashboard-auth` | 89 tests on the auth module itself |
 | `make test-dashboard-ui-auth` | 42 tests on the browser credential shim |
+| `make test-degraded` | 36 tests that an outage cannot look like an answer |
 
 **Deployment:** the gateway fails closed. `KAI_DASHBOARD_TOKEN` must be set
 or every protected route answers 503. `make setup-service-token` generates

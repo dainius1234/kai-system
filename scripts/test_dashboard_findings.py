@@ -224,6 +224,7 @@ def test_dash_011_flips_with_principal_model():
 
 def test_dash_016_flips_when_failures_are_raised():
     good = '''
+@app.get("/api/thing")
 async def api_thing():
     try:
         return await call()
@@ -231,6 +232,7 @@ async def api_thing():
         raise HTTPException(status_code=503, detail="upstream unavailable")
 '''
     bad = '''
+@app.get("/api/thing")
 async def api_thing():
     try:
         return await call()
@@ -590,6 +592,218 @@ def test_track_c_has_no_live_findings():
     check("Track C is clear of LIVE findings", not live, str(live))
 
 
+
+# ── Track D — failure semantics ──────────────────────────────────────
+
+def test_dash_016_ignores_helpers_and_catches_routes():
+    """Only a route's failure path becomes an HTTP 200."""
+    helper_only = """
+def _helper():
+    try:
+        return call()
+    except Exception:
+        return {'status': 'down'}
+"""
+    routed = """
+@app.get("/api/thing")
+async def api_thing():
+    try:
+        return await call()
+    except Exception:
+        return {'status': 'unavailable'}
+"""
+    fixed_src = """
+from common.degraded import degraded_response
+
+@app.get("/api/thing")
+async def api_thing():
+    try:
+        return await call()
+    except Exception as exc:
+        return degraded_response('memu', str(exc), {'status': 'unavailable'})
+"""
+    with _Dashboard(helper_only):
+        helper, d0 = dash.dash_016()
+    with _Dashboard(routed):
+        live, d1 = dash.dash_016()
+    with _Dashboard(fixed_src):
+        fixed, d2 = dash.dash_016()
+    check("DASH-016 ignores a non-route helper", helper == dash.REMEDIATED, d0)
+    check("DASH-016 LIVE for a route returning a 200 fallback",
+          live == dash.LIVE, d1)
+    check("DASH-016 REMEDIATED once the route answers degraded",
+          fixed == dash.REMEDIATED, d2)
+
+
+def test_dash_061_requires_reading_the_backend_status():
+    naive = """
+async def fetch_status():
+    resp.raise_for_status()
+    results[name] = {'status': 'ok', 'details': resp.json()}
+"""
+    honest = """
+async def fetch_status():
+    status, note = _classify_node(payload)
+    return await asyncio.gather(*probes)
+"""
+    with _Dashboard(naive):
+        live, d1 = dash.dash_061()
+    with _Dashboard(honest):
+        fixed, d2 = dash.dash_061()
+    check("DASH-061 LIVE while any 2xx counts as healthy", live == dash.LIVE, d1)
+    check("DASH-061 REMEDIATED once the self-report is read",
+          fixed == dash.REMEDIATED, d2)
+
+
+def test_dash_063_accepts_declining_to_measure_but_not_substituting():
+    substituted = """
+async def build_go_no_go_report():
+    if ledger_count < NO_GO_GRACE_REQUESTS:
+        reasons.append('not enough proof')
+    return {'checks': {'minimum_gate_decisions': NO_GO_GRACE_REQUESTS}}
+"""
+    declared = """
+async def build_go_no_go_report():
+    proof = unavailable_metric('recent_approved_decisions', 'no ledger credential')
+    return {'checks': {'proof_of_safe_operation': proof}}
+"""
+    with _Dashboard(substituted):
+        live, d1 = dash.dash_063()
+    with _Dashboard(declared):
+        fixed, d2 = dash.dash_063()
+    check("DASH-063 LIVE while a total count stands in for proof",
+          live == dash.LIVE, d1)
+    check("DASH-063 REMEDIATED when the metric is declared unavailable",
+          fixed == dash.REMEDIATED, d2)
+
+
+def test_dash_064_requires_the_decision_to_turn_on_fleet_health():
+    wrong = """
+async def build_go_no_go_report():
+    error_ratio = float(metrics.get('error_ratio', 0.0))
+    if error_ratio > MAX_ERROR_RATIO:
+        reasons.append('too many errors')
+"""
+    right = """
+async def build_go_no_go_report():
+    fleet_unhealthy_ratio = 1.0 - healthy_nodes / total_nodes
+    if fleet_unhealthy_ratio > MAX_ERROR_RATIO:
+        reasons.append('fleet unhealthy')
+"""
+    with _Dashboard(wrong):
+        live, d1 = dash.dash_064()
+    with _Dashboard(right):
+        fixed, d2 = dash.dash_064()
+    check("DASH-064 LIVE while caller error ratio gates the decision",
+          live == dash.LIVE, d1)
+    check("DASH-064 REMEDIATED once fleet health gates it",
+          fixed == dash.REMEDIATED, d2)
+
+
+def test_dash_065_rejects_a_liveness_probe_as_backup_proof():
+    fake = """
+async def api_backup_status():
+    now = datetime.utcnow().strftime('%Y')
+    return {'status': f'{now} (service healthy)'}
+"""
+    real = """
+async def api_backup_status():
+    resp = await client.get(f'{backup_url}/backup/list')
+    return {'status': latest['modified'], 'verified': True}
+"""
+    with _Dashboard(fake):
+        live, d1 = dash.dash_065()
+    with _Dashboard(real):
+        fixed, d2 = dash.dash_065()
+    check("DASH-065 LIVE while a liveness probe stands in for a backup",
+          live == dash.LIVE, d1)
+    check("DASH-065 REMEDIATED once a real backup is read",
+          fixed == dash.REMEDIATED, d2)
+
+
+def test_dash_080_requires_an_enforcing_status():
+    advisory = """
+async def go_no_go():
+    return await build_go_no_go_report()
+"""
+    enforcing = """
+async def go_no_go():
+    report = await build_go_no_go_report()
+    if report.get('decision') == 'GO':
+        return report
+    return JSONResponse(status_code=503, content=report)
+"""
+    with _Dashboard(advisory):
+        live, d1 = dash.dash_080()
+    with _Dashboard(enforcing):
+        fixed, d2 = dash.dash_080()
+    check("DASH-080 LIVE while NO_GO answers 200", live == dash.LIVE, d1)
+    check("DASH-080 REMEDIATED once it carries a status",
+          fixed == dash.REMEDIATED, d2)
+
+
+def test_dash_054_catches_a_guard_that_runs_too_late():
+    """A status check after streaming has begun is not a status check."""
+    too_late = """
+async def api_chat_proxy(request):
+    async for chunk in resp.aiter_bytes():
+        yield chunk
+    if resp.status_code >= 400:
+        return
+"""
+    in_time = """
+async def api_chat_proxy(request):
+    if resp.status_code >= 400:
+        return
+    async for chunk in resp.aiter_bytes():
+        yield chunk
+"""
+    absent = """
+async def api_chat_proxy(request):
+    async for chunk in resp.aiter_bytes():
+        yield chunk
+"""
+    with _Dashboard(too_late):
+        late, d1 = dash.dash_054()
+    with _Dashboard(in_time):
+        good, d2 = dash.dash_054()
+    with _Dashboard(absent):
+        none, d3 = dash.dash_054()
+    check("DASH-054 LIVE when the guard runs after streaming", late == dash.LIVE, d1)
+    check("DASH-054 REMEDIATED when the guard runs first", good == dash.REMEDIATED, d2)
+    check("DASH-054 LIVE when there is no guard at all", none == dash.LIVE, d3)
+
+
+def test_dash_055_catches_exception_text_reaching_the_client():
+    leaky = """
+async def api_chat_proxy(request):
+    try:
+        pass
+    except Exception as exc:
+        yield f'error: {exc}'
+"""
+    quiet = """
+async def api_chat_proxy(request):
+    try:
+        pass
+    except Exception as exc:
+        logger.warning('failed: %s', exc)
+        yield _sse_error('unavailable')
+"""
+    with _Dashboard(leaky):
+        live, d1 = dash.dash_055()
+    with _Dashboard(quiet):
+        fixed, d2 = dash.dash_055()
+    check("DASH-055 LIVE while exception text is yielded", live == dash.LIVE, d1)
+    check("DASH-055 REMEDIATED when it is only logged", fixed == dash.REMEDIATED, d2)
+
+
+def test_track_d_has_no_live_findings():
+    live = [r["finding"] for r in dash.evaluate()
+            if r["track"] == "D" and r["status"] == dash.LIVE]
+    check("Track D is clear of LIVE findings", not live, str(live))
+
+
 def run() -> None:
     test_coverage_clean_on_real_table()
     test_coverage_detects_missing_finding()
@@ -632,6 +846,15 @@ def run() -> None:
     test_dash_023_catches_any_literal_not_just_keeper()
     test_dash_d02_flips_on_the_missing_parameter()
     test_track_c_has_no_live_findings()
+    test_dash_016_ignores_helpers_and_catches_routes()
+    test_dash_061_requires_reading_the_backend_status()
+    test_dash_063_accepts_declining_to_measure_but_not_substituting()
+    test_dash_064_requires_the_decision_to_turn_on_fleet_health()
+    test_dash_065_rejects_a_liveness_probe_as_backup_proof()
+    test_dash_080_requires_an_enforcing_status()
+    test_dash_054_catches_a_guard_that_runs_too_late()
+    test_dash_055_catches_exception_text_reaching_the_client()
+    test_track_d_has_no_live_findings()
 
 
 if __name__ == "__main__":
