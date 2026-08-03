@@ -13,7 +13,7 @@ from __future__ import annotations
 import asyncio
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 import httpx
@@ -84,7 +84,7 @@ async def run_compression_cycle() -> Dict[str, Any]:
       6. GET /memory/stats — record post-cycle state
     """
     started = time.time()
-    result: Dict[str, Any] = {"started_at": datetime.utcnow().isoformat(), "steps": {}}
+    result: Dict[str, Any] = {"started_at": datetime.now(timezone.utc).isoformat(), "steps": {}}
 
     try:
         # 1. Pre-cycle stats

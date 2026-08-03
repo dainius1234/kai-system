@@ -8,7 +8,7 @@ import re
 import time
 import uuid
 from collections import Counter, deque
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional
 
@@ -306,7 +306,7 @@ async def _auto_memorize(user_input: str, response_summary: str, specialist: str
     with every interaction.
     """
     await _memu_post("/memory/memorize", {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "event_type": "conversation",
         "result_raw": f"Q: {user_input[:500]}\nA: {response_summary[:1000]}",
         "metrics": {"specialist": specialist, "conviction": conviction},
@@ -1957,7 +1957,7 @@ def _detect_sensor_patterns(current_obs: List[str]) -> List[str]:
 async def _propose_ritual(obs_type: str, count: int) -> None:
     """Write a ritual proposal to RITUALS.md and notify the operator."""
     ritual_path = Path("/data/RITUALS.md")
-    ts = datetime.utcnow().isoformat()
+    ts = datetime.now(timezone.utc).isoformat()
     proposal = (
         f"\n## [{ts}] Auto-detected: {obs_type}\n\n"
         f"I've noticed **{obs_type}** has appeared in {count}/10 recent observation cycles. "
@@ -2161,7 +2161,7 @@ async def _proactive_observer() -> None:
 
             # ── D88 M4 / D89 C3: world model persistence with provenance ─
             if is_enabled("WORLD_MODEL_PERSISTENCE"):
-                ts_now = datetime.utcnow().isoformat()
+                ts_now = datetime.now(timezone.utc).isoformat()
                 def _prov(value: Any, source: str, confidence: float = 1.0) -> Dict[str, Any]:
                     return {"value": value, "source": source, "timestamp": ts_now, "confidence": confidence}
                 world_model = {
@@ -3147,7 +3147,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
                 await client.post(
                     f"{MEMU_URL}/memory/memorize",
                     json={
-                        "timestamp": datetime.utcnow().isoformat(),
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
                         "event_type": "correction",
                         "result_raw": f"Correction for: {request.user_input[:500]}\nReason: {correction[:1000]}",
                         "metrics": {"verdict": plan.get("verifier_verdict", "")},
@@ -3202,7 +3202,7 @@ async def run_graph(request: GraphRequest) -> GraphResponse:
                     await client.post(
                         f"{MEMU_URL}/memory/memorize",
                         json={
-                            "timestamp": datetime.utcnow().isoformat(),
+                            "timestamp": datetime.now(timezone.utc).isoformat(),
                             "event_type": "metacognitive_rule",
                             "result_raw": rule,
                             "metrics": {"failure_class": failure_class.value},

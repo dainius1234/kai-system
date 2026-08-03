@@ -17,7 +17,7 @@ import asyncio
 import json
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -85,7 +85,7 @@ async def _notify_heartbeat(event: str, details: Dict[str, Any]) -> None:
 async def verify_chain() -> Dict[str, Any]:
     """Verify the entire ledger hash chain via tool-gate's /ledger/verify."""
     started = time.time()
-    result: Dict[str, Any] = {"timestamp": datetime.utcnow().isoformat()}
+    result: Dict[str, Any] = {"timestamp": datetime.now(timezone.utc).isoformat()}
 
     try:
         verify = await _call_tool_gate("/ledger/verify")
@@ -141,7 +141,7 @@ async def collect_stats() -> Dict[str, Any]:
                 tools_used[tool] = tools_used.get(tool, 0) + 1
 
         _last_stats = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "total_entries": stats.get("count", 0),
             "recent_sample": len(tail),
             "approved": approved,
@@ -161,7 +161,7 @@ async def archive_snapshot() -> Dict[str, Any]:
         tail = await _call_tool_gate("/ledger/tail?limit=10000")
         merkle = await _call_tool_gate("/ledger/merkle")
 
-        ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         archive_path = ARCHIVE_DIR / f"ledger_snapshot_{ts}.jsonl"
 
         with archive_path.open("w", encoding="utf-8") as fh:

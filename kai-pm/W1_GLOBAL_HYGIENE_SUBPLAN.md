@@ -1,6 +1,6 @@
 # Sub-plan — Repository-wide HTTP and Time Hygiene
 
-**Status:** proposed, **not started**. No code outside `dashboard/` has been changed.
+**Status:** in progress. H-5 and H-1 complete; H-2 next.
 **Parent:** [`W1_DASHBOARD_REMEDIATION_PLAN.md`](W1_DASHBOARD_REMEDIATION_PLAN.md)
 **Survey command:** `make hygiene-survey`
 
@@ -41,7 +41,7 @@ Counted from each service's `app.py`. Reproduce with `make hygiene-survey`.
 
 | Service | Per-request HTTP clients | Unbounded `request.json()` | Naive `utcnow()` | 200-on-failure |
 |---|---:|---:|---:|---:|
-| `agentic` | **37** | 6 | 5 | 1 |
+| `agentic` | **37** | 6 | 0 | 1 |
 | `memu-core` | 0 | **14** | 0 | 2 |
 | `supervisor` | 12 | 0 | 0 | 0 |
 | `telegram-bot` | 6 | 0 | 0 | 1 |
@@ -51,29 +51,39 @@ Counted from each service's `app.py`. Reproduce with `make hygiene-survey`.
 | `monitor-service` | 3 | 0 | 0 | 0 |
 | `screen-watcher` | 3 | 0 | 0 | 0 |
 | `vault-sync` | 3 | 0 | 0 | 0 |
-| `backup-service` | 2 | 0 | 3 | 0 |
-| `ledger-worker` | 2 | 0 | 3 | 0 |
+| `backup-service` | 2 | 0 | 0 | 0 |
 | `broker-bridge` | 2 | 0 | 0 | 0 |
+| `ledger-worker` | 2 | 0 | 0 | 0 |
 | `perception/audio` | 2 | 0 | 0 | 0 |
 | `skill-hunter` | 2 | 0 | 0 | 0 |
 | `verifier` | 2 | 0 | 0 | 0 |
-| `financial-awareness` | 0 | 0 | 2 | 0 |
-| `memory-compressor` | 1 | 0 | 1 | 0 |
-| `metrics-gateway` | 1 | 0 | 1 | 0 |
 | `memu-graph` | 0 | 0 | 0 | 1 |
-| 8 others (1 client each) | 8 | 0 | 0 | 0 |
-| **Total** | **96** | **20** | **15** | **5** |
+| 10 others (1 client each) | 10 | 0 | 0 | 0 |
+| **Total** | **96** | **20** | **0** | **5** |
 
-**Grand total: 136**, across 27 of 50 services. The other 23 carry none of
-these.
+**Grand total: 121**, down from 136.
 
-Two services carry most of it: **`agentic` (49 of 136)** and
-**`memu-core` (16)** — together **48%**.
+### Progress
 
-> The `200-on-failure` count is 5, not the 1 an initial `grep` suggested.
-> The survey parses the AST and only counts *route* handlers, because a
-> helper returning a dict is not an HTTP 200. The table above is generated
-> from the tool, not typed by hand — which is the point.
+| Step | State | Effect |
+|---|---|---|
+| **H-5** Ratchet gate | **Done** — 10th CI gate | The debt can no longer grow |
+| **H-1** Aware timestamps | **Done** — 17 sites across 7 services | `naive_utcnow` is **0** |
+| **H-2** `memu-core` | Next | 14 unbounded reads, 2 success-shaped failures |
+| **H-3** `agentic` | After H-2 | 37 clients, 6 reads, 1 failure |
+| **H-4** Remaining services | Last | 44 clients, one line each |
+
+> **The survey was undercounting.** It scanned only `*/app.py`, so
+> `agentic/introspect_app.py` was invisible — 2 naive timestamps and 3
+> per-request clients that no number in this document had ever included.
+> H-1 therefore changed **17** sites, not the 15 first reported, and the
+> true client count was 99 rather than 96.
+>
+> Widening the scan made the gate fail, which is what a gate is for. The
+> 3 newly visible clients were **fixed rather than re-baselined** — a
+> ratchet that gets relaxed the moment it becomes inconvenient is not a
+> ratchet. The baseline was lowered afterwards, which is the only
+> direction it moves.
 
 ### What each column costs
 
@@ -121,11 +131,11 @@ should land with the affected service's tests green.
 
 | Step | Scope | Why this order |
 |---|---|---|
-| **H-1** | `datetime.utcnow()` → aware, all 15 sites | Mechanical, no behaviour change, no API change |
+| ~~**H-1**~~ | ~~`datetime.utcnow()` → aware~~ | **Done.** 17 sites, 7 services. `.isoformat()` now carries `+00:00`; `.strftime()` output is byte-identical. Verified safe first: memU coerces naive→aware defensively, and `calendar-sync` is self-contained and naive-consistent |
 | **H-2** | `memu-core` — 14 unbounded reads, 2 success-shaped fallbacks | Highest consequence per defect: pathological bodies reach persistent state |
 | **H-3** | `agentic` — 37 clients, 6 reads, 5 timestamps, 1 fallback | Largest single concentration (49 of 136); do it once the pattern is proven on a smaller service |
 | **H-4** | Remaining 24 services — pooling | Mechanical, one line each |
-| **H-5** | A repo-wide gate | Prevents reintroduction; without it the sweep is a snapshot, not a guarantee |
+| ~~**H-5**~~ | ~~A repo-wide gate~~ | **Done.** Ratchet, not a threshold — see D148 |
 
 **H-5 matters most.** Without a gate this is a one-time cleanup that
 decays. With one, the count can only go down. The gate belongs alongside

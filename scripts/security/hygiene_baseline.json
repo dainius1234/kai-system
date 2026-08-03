@@ -3,8 +3,8 @@
   "totals": {
     "clients": 96,
     "unbounded_bodies": 20,
-    "naive_timestamps": 15,
+    "naive_timestamps": 0,
     "success_on_failure": 5
   },
-  "grand_total": 136
+  "grand_total": 121
 }

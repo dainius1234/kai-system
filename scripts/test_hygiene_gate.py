@@ -99,18 +99,51 @@ def test_an_improved_count_passes():
 
 
 def test_every_column_is_ratcheted():
-    """A column absent from the ratchet is a column that can rise freely."""
-    totals = hs.survey()
-    actual = {c: sum(r[c] for r in totals.values()) for c in hs.COLUMNS}
-    for column in hs.COLUMNS:
-        lowered = dict(actual)
-        lowered[column] = max(0, actual[column] - 1)
-        if actual[column] == 0:
-            continue  # cannot lower below zero; nothing to prove
-        with _Baseline(lowered):
-            result = _run("--gate")
-        check(f"{column} is ratcheted", result.returncode == 1,
-              f"{column} rose without failing the gate")
+    """A column absent from the ratchet is a column that can rise freely.
+
+    Driven against `ratchet()` with synthetic totals rather than the real
+    tree. Subprocess runs can only exercise columns whose current count is
+    above zero — and once a column is driven to zero (as
+    `naive_timestamps` now is by H-1) that test silently stops testing it,
+    which is precisely the failure mode this suite exists to prevent.
+    """
+    baseline = {c: 10 for c in hs.COLUMNS}
+    with _Baseline(baseline):
+        for column in hs.COLUMNS:
+            risen = dict(baseline)
+            risen[column] = 11
+            reported = hs.ratchet(risen)
+            check(f"{column} is ratcheted",
+                  any(column in line for line in reported),
+                  f"a rise in {column} was not reported: {reported}")
+
+            unchanged = dict(baseline)
+            check(f"{column} does not false-positive when unchanged",
+                  not hs.ratchet(unchanged),
+                  str(hs.ratchet(unchanged)))
+
+            improved = dict(baseline)
+            improved[column] = 9
+            check(f"{column} does not fail when improved",
+                  not hs.ratchet(improved), str(hs.ratchet(improved)))
+
+
+def test_a_column_missing_from_the_baseline_fails():
+    """An unrecorded column would otherwise be unratcheted and invisible."""
+    partial = {c: 10 for c in hs.COLUMNS if c != "naive_timestamps"}
+    with _Baseline(partial):
+        reported = hs.ratchet({c: 10 for c in hs.COLUMNS})
+    check("a column absent from the baseline is reported",
+          any("naive_timestamps" in line for line in reported), str(reported))
+
+
+def test_a_zeroed_column_is_still_ratcheted():
+    """H-1 drove naive_timestamps to zero; it must not become free to rise."""
+    baseline = {c: 0 for c in hs.COLUMNS}
+    with _Baseline(baseline):
+        reported = hs.ratchet({**baseline, "naive_timestamps": 1})
+    check("a column at zero still fails when it rises",
+          any("naive_timestamps" in line for line in reported), str(reported))
 
 
 def test_the_baseline_cannot_be_raised():
@@ -191,6 +224,8 @@ def run() -> None:
     test_a_risen_count_fails_the_gate()
     test_an_improved_count_passes()
     test_every_column_is_ratcheted()
+    test_a_column_missing_from_the_baseline_fails()
+    test_a_zeroed_column_is_still_ratcheted()
     test_the_baseline_cannot_be_raised()
     test_the_baseline_can_be_lowered()
     test_a_missing_baseline_fails_rather_than_passes()

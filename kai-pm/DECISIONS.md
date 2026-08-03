@@ -3429,3 +3429,35 @@ Wired as the **10th CI policy gate**. Nineteen tests prove it can fail: every co
 
 **Files produced:** `scripts/security/hygiene_baseline.json`, `scripts/test_hygiene_gate.py`.
 **Files modified:** `common/dashboard_auth.py`, `scripts/setup_service_token.sh`, `scripts/security/hygiene_survey.py`, `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_auth.py`, three compose profiles, `.github/workflows/policy-checks.yml`, `Makefile`, tracker/README/STATUS/MAKEFILE_TARGETS.
+
+---
+
+## D149 — 2026-08-03 — H-1 Aware Timestamps, and a Survey That Was Undercounting
+
+**Context:** First step of the global hygiene sub-plan. Ostensibly mechanical: replace `datetime.utcnow()` with `datetime.now(timezone.utc)`. It was not entirely mechanical, and the interesting part is what it exposed.
+
+**Verified safe before changing anything.** `.isoformat()` output changes from `…T09:00:00` to `…T09:00:00+00:00`, which is a wire-format change, so consumers were checked first:
+
+- **memU** parses these and compares them against aware datetimes. It already coerces naive → aware defensively at every site, so it accepts both. Aware is what it actually wants.
+- **`calendar-sync`** uses naive `datetime.now()` against its own naive event dates — self-contained and internally consistent, and it consumes none of the 17 sites.
+- **`.strftime()` sites** are filename and ID labels, not instants. Output is **byte-identical** either way; the change is to intent, not to bytes.
+
+Had memU compared naively, this change would have produced `TypeError: can't compare offset-naive and offset-aware datetimes` at runtime, in the memory store, on a path that only fires during cleanup. That is the kind of thing a mechanical sweep ships.
+
+**The survey was undercounting.** It scanned only `*/app.py`. `agentic/introspect_app.py` was invisible: **2 naive timestamps and 3 per-request clients that no number in any of these documents had ever included.** H-1 therefore changed **17** sites, not the 15 reported, and the true client count was **99, not 96**.
+
+A survey that undercounts is worse than no survey, because the number looks authoritative. `_service_files()` now scans `*_app.py` as well and **aggregates** per service rather than letting the last file scanned overwrite the others.
+
+**The gate then failed, which is what it is for.** Widening the scan pushed `clients` above the recorded baseline. The three newly visible clients were **fixed, not re-baselined** — a ratchet relaxed the moment it becomes inconvenient is not a ratchet. The baseline was lowered afterwards, which is the only direction it moves.
+
+**A test stopped testing, and was caught.** `test_every_column_is_ratcheted` drove each column above its baseline via subprocess — but skipped any column already at zero. H-1 drove `naive_timestamps` to zero, so that column's ratchet silently became unproven. It now exercises `ratchet()` directly with synthetic totals, so every column is proven regardless of its current value, plus two new cases: a column **missing** from the baseline is reported, and a column **at zero** still fails when it rises.
+
+That is the fourth time in this programme a check has quietly stopped checking. It is always the same shape: a guard that was reasonable when written, made vacuous by the very success it was measuring.
+
+**Result: 136 → 121.** `naive_timestamps` is **0** across every service.
+
+**Verification:** 1,897 tests across 25 suites, all green. 10/10 CI gates. `test_agentic` and `test_financial` fail both before and after this change — pre-existing, and outside its scope.
+
+**Nothing is closed.** Rule 7.
+
+**Files modified:** `agentic/app.py`, `agentic/introspect_app.py`, `backup-service/app.py`, `financial-awareness/app.py`, `ledger-worker/app.py`, `memory-compressor/app.py`, `metrics-gateway/app.py`, `scripts/security/hygiene_survey.py`, `scripts/security/hygiene_baseline.json`, `scripts/test_hygiene_gate.py`, sub-plan/tracker/README/STATUS/MAKEFILE_TARGETS.

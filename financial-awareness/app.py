@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import os
 from contextlib import asynccontextmanager
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
@@ -178,7 +178,7 @@ async def cis_record(req: CISRecordRequest) -> Dict[str, Any]:
     payment_date = req.payment_date or date.today().isoformat()
 
     record: Dict[str, Any] = {
-        "id": f"cis-{datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}",
+        "id": f"cis-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')}",
         "date": payment_date,
         "contractor_name": req.contractor_name,
         "contractor_utr": req.contractor_utr,
@@ -266,7 +266,7 @@ async def invoice_generate(req: InvoiceRequest) -> Dict[str, Any]:
     total_gross = round(req.labour_amount + req.materials_amount, 2)
     total_net   = round(total_gross - deduction, 2)
     inv_date    = req.invoice_date or date.today().isoformat()
-    inv_ref     = req.invoice_ref or f"INV-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
+    inv_ref     = req.invoice_ref or f"INV-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M')}"
 
     lines = [
         f"INVOICE {inv_ref}",

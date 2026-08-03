@@ -43,15 +43,26 @@ BOUNDED = "bounded_json("
 COLUMNS = ("clients", "unbounded_bodies", "naive_timestamps", "success_on_failure")
 
 
+# Service entry points are not all called `app.py`: `agentic` also ships
+# `introspect_app.py`, and scanning only `app.py` missed 2 of its naive
+# timestamps entirely. A survey that undercounts is worse than no survey,
+# because the number looks authoritative.
+ENTRY_POINT_GLOBS = ("*/app.py", "*/*/app.py", "*/*_app.py", "*/*/*_app.py")
+_EXCLUDED_DIRS = {"node_modules", ".venv", "venv", "site-packages",
+                  "scripts", "tests", "kai-pm"}
+
+
 def _service_files() -> List[Path]:
     """Every service entry point, excluding tests and vendored code."""
-    found = []
-    for path in sorted(REPO.glob("*/app.py")) + sorted(REPO.glob("*/*/app.py")):
-        parts = path.parts
-        if any(p in {"node_modules", ".venv", "venv", "site-packages"} for p in parts):
-            continue
-        found.append(path)
-    return found
+    found = set()
+    for pattern in ENTRY_POINT_GLOBS:
+        for path in REPO.glob(pattern):
+            if any(p in _EXCLUDED_DIRS for p in path.parts):
+                continue
+            if path.name.startswith("test_"):
+                continue
+            found.add(path)
+    return sorted(found)
 
 
 def _success_on_failure(text: str) -> int:
@@ -95,7 +106,7 @@ def survey() -> Dict[str, Dict[str, int]]:
         except OSError:
             continue
         service = str(path.parent.relative_to(REPO))
-        results[service] = {
+        counts = {
             "clients": text.count("async with httpx.AsyncClient("),
             "unbounded_bodies": text.count("await request.json()"),
             "naive_timestamps": text.count("datetime.utcnow()"),
@@ -105,6 +116,14 @@ def survey() -> Dict[str, Dict[str, int]]:
             "pooled": text.count(POOLED),
             "bounded": text.count(BOUNDED),
         }
+        # A service may ship more than one entry point; sum them rather
+        # than letting the last file scanned overwrite the others.
+        existing = results.get(service)
+        if existing is None:
+            results[service] = counts
+        else:
+            for key, value in counts.items():
+                existing[key] += value
     return results
 
 

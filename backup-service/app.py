@@ -112,7 +112,7 @@ async def backup_redis() -> Dict[str, Any]:
 async def backup_memory() -> Dict[str, Any]:
     """Export memories from memu-core to a JSON file."""
     os.makedirs(BACKUP_DIR, exist_ok=True)
-    ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     fname = f"memory-{ts}.json"
     path = os.path.join(BACKUP_DIR, fname)
     try:
@@ -144,7 +144,7 @@ async def backup_memory() -> Dict[str, Any]:
 async def backup_ledger() -> Dict[str, Any]:
     """Export tool-gate ledger to a JSON file."""
     os.makedirs(BACKUP_DIR, exist_ok=True)
-    ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     fname = f"ledger-{ts}.json"
     path = os.path.join(BACKUP_DIR, fname)
     try:
@@ -179,7 +179,7 @@ async def backup_full() -> Dict[str, Any]:
             results[component] = {"status": "failed", "error": e.detail}
         except Exception as e:
             results[component] = {"status": "failed", "error": str(e)[:200]}
-    ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     succeeded = sum(1 for r in results.values() if r.get("status") == "ok")
     return {
         "status": "ok" if succeeded == len(results) else "partial",

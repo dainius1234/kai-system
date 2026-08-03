@@ -16,7 +16,7 @@ import asyncio
 import os
 import time
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
@@ -143,7 +143,7 @@ async def scrape_all() -> Dict[str, Any]:
         "reachable": reachable,
         "total": total,
         "duration_ms": duration_ms,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
 

@@ -16,12 +16,13 @@ over HTTP, best-effort, same as every other non-critical side effect here.
 from __future__ import annotations
 
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict
 
 import httpx
 from fastapi import FastAPI
 
+from common.http_hygiene import pooled_client
 from common.runtime import AuditStream, INJECTION_RE, detect_device, sanitize_string, setup_json_logger
 from kai_config import build_saver, run_dream_cycle, analyze_failures, load_evolver_reports
 from security_audit import run_security_audit
@@ -70,11 +71,11 @@ async def trigger_dream() -> Dict[str, Any]:
     stored = 0
     for insight in actionable[:5]:
         try:
-            async with httpx.AsyncClient(timeout=5.0) as client:
+            async with pooled_client(timeout=5.0) as client:
                 await client.post(
                     f"{MEMU_URL}/memory/memorize",
                     json={
-                        "timestamp": datetime.utcnow().isoformat(),
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
                         "event_type": "dream_insight",
                         "result_raw": insight.description,
                         "metrics": {"insight_type": insight.insight_type, "confidence": insight.confidence},
@@ -90,7 +91,7 @@ async def trigger_dream() -> Dict[str, Any]:
     # H3b: post-dream checkpoint — core owns live breaker/budget state,
     # so ask it to snapshot itself rather than capturing state here.
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             await client.post(
                 f"{AGENTIC_CORE_URL}/checkpoint",
                 json={"label": f"post-dream-{cycle.cycle_id[:8]}"},
@@ -125,11 +126,11 @@ async def evolve_analyze() -> Dict[str, Any]:
     for s in report.suggestions:
         if s.priority in ("critical", "high"):
             try:
-                async with httpx.AsyncClient(timeout=5.0) as client:
+                async with pooled_client(timeout=5.0) as client:
                     await client.post(
                         f"{MEMU_URL}/memory/memorize",
                         json={
-                            "timestamp": datetime.utcnow().isoformat(),
+                            "timestamp": datetime.now(timezone.utc).isoformat(),
                             "event_type": "evolution_suggestion",
                             "result_raw": f"[{s.priority}] {s.fix}",
                             "metrics": {
