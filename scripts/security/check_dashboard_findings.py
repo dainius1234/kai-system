@@ -348,7 +348,10 @@ def dash_002() -> Result:
         return LIVE, "dashboard still holds a Tool Gate bearer token"
     src = _handler_src("api_set_mode")
     if not src:
-        return REMEDIATED, "no gate token held; /api/mode removed"
+        return MANUAL, (
+            f"api_set_mode() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "TOOL_GATE" in src or "_proxy_post" in src:
         return LIVE, "/api/mode still calls Tool Gate"
     return REMEDIATED, "no gate token held; /api/mode is display-state only"
@@ -435,7 +438,10 @@ def dash_013() -> Result:
     """Mode-sync failure returns 200 and permits mode divergence."""
     src = _handler_src("api_set_mode")
     if not src:
-        return REMEDIATED, "/api/mode removed"
+        return MANUAL, (
+            f"api_set_mode() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "TOOL_GATE" in src or "_proxy_post" in src:
         return LIVE, "/api/mode still syncs to Tool Gate; check failure status"
     return REMEDIATED, (
@@ -559,7 +565,10 @@ def dash_065() -> Result:
     """Backup status reports a fresh healthy timestamp without a backup."""
     src = _handler_src("api_backup_status")
     if not src:
-        return REMEDIATED, "backup status route removed"
+        return MANUAL, (
+            f"api_backup_status() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "service healthy" in src and "utcnow" in src:
         return LIVE, "synthesises 'now (service healthy)' from a liveness probe only"
     return REMEDIATED, "backup status reflects a verified backup"
@@ -569,7 +578,10 @@ def dash_066() -> Result:
     """Corrections API fabricates the current time for aggregate counters."""
     src = _handler_src("api_corrections")
     if not src:
-        return REMEDIATED, "corrections route removed"
+        return MANUAL, (
+            f"api_corrections() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "utcnow" in src and "timestamp" in src:
         return LIVE, "stamps aggregate counters with now() as if they were events"
     return REMEDIATED, "correction timestamps come from the source records"
@@ -778,7 +790,10 @@ def dash_d02() -> Result:
         return LIVE, "api_memories calls /memory/retrieve without required user_id"
     src = _handler_src("api_memories")
     if not src:
-        return REMEDIATED, "api_memories no longer exists"
+        return MANUAL, (
+            f"api_memories() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "memory/retrieve" not in src:
         return REMEDIATED, "api_memories no longer calls /memory/retrieve"
     return LIVE, "api_memories calls /memory/retrieve without required user_id"
@@ -788,7 +803,10 @@ def dash_053() -> Result:
     """Chat request bodies are unbounded."""
     src = _handler_src("api_chat_proxy")
     if not src:
-        return REMEDIATED, "chat proxy removed"
+        return MANUAL, (
+            f"api_chat_proxy() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "bounded_json" in src:
         return REMEDIATED, "chat body goes through the shared bounded reader"
     return LIVE, "chat body is read without a size bound"
@@ -798,7 +816,10 @@ def dash_054() -> Result:
     """Chat proxy streams backend 4xx/5xx bodies without checking status."""
     src = _handler_src("api_chat_proxy")
     if not src:
-        return REMEDIATED, "chat proxy removed"
+        return MANUAL, (
+            f"api_chat_proxy() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "status_code" not in src:
         return LIVE, "backend status is never inspected before streaming"
     # The check must come before the body is forwarded, not after.
@@ -815,7 +836,10 @@ def dash_055() -> Result:
     """Chat connection exceptions are sent to the browser as diagnostics."""
     src = _handler_src("api_chat_proxy")
     if not src:
-        return REMEDIATED, "chat proxy removed"
+        return MANUAL, (
+            f"api_chat_proxy() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     for handler in ast.walk(ast.parse(src)):
         if not isinstance(handler, ast.ExceptHandler):
             continue
@@ -843,7 +867,9 @@ def forced_media_type(handler: str, label: str) -> Callable[[], Result]:
     def check() -> Result:
         src = _handler_src(handler)
         if not src:
-            return REMEDIATED, f"{label} proxy removed"
+            return MANUAL, (f"{handler}() not found — confirm the "
+                            f"{label} proxy was removed deliberately "
+                            f"rather than renamed")
         forced = []
         for node in ast.walk(ast.parse(src)):
             if not isinstance(node, ast.Call):
@@ -909,7 +935,9 @@ def unbounded_binary_response(handler: str, label: str) -> Callable[[], Result]:
     def check() -> Result:
         src = _handler_src(handler)
         if not src:
-            return REMEDIATED, f"{label} route removed"
+            return MANUAL, (f"{handler}() not found — confirm the "
+                            f"{label} route was removed deliberately "
+                            f"rather than renamed")
         if "bounded_response" in src:
             return REMEDIATED, f"{label} response is size-bounded before forwarding"
         if "resp.content" in src or "aread()" in src:
@@ -946,7 +974,10 @@ def dash_084() -> Result:
     """SSE keepalive timestamps are naive UTC strings."""
     src = _handler_src("sse_events")
     if not src:
-        return REMEDIATED, "event stream removed"
+        return MANUAL, (
+            f"sse_events() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "utcnow" in src:
         return LIVE, "SSE heartbeat uses naive datetime.utcnow()"
     if "heartbeat" not in src:
@@ -977,7 +1008,10 @@ def dash_050() -> Result:
     """Upload routing trusts filename extension and caller content type."""
     src = _handler_src("api_upload")
     if not src:
-        return REMEDIATED, "upload route removed"
+        return MANUAL, (
+            f"api_upload() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "safe_filename" not in src:
         return LIVE, "routing trusts an uncanonicalised filename"
     # The extension still selects the backend; that is a routing hint, not
@@ -1018,7 +1052,10 @@ def dash_043() -> Result:
     """One malformed event payload terminates the client stream."""
     src = _handler_src("sse_events")
     if not src:
-        return REMEDIATED, "event stream removed"
+        return MANUAL, (
+            f"sse_events() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "json.loads" not in src and "_json.loads" not in src:
         return MANUAL, "no event parsing found in sse_events()"
     # The parse must be individually guarded, not merely inside the
@@ -1043,7 +1080,10 @@ def dash_060() -> Result:
     """Readiness calls the full root fan-out."""
     src = _handler_src("readiness")
     if not src:
-        return REMEDIATED, "readiness route removed"
+        return MANUAL, (
+            f"readiness() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "await index()" in src:
         return LIVE, "readiness rebuilds the entire root payload"
     if "fetch_status" not in src:
@@ -1148,7 +1188,10 @@ def dash_086() -> Result:
     """`_publish_event()` is fire-and-forget with silent delivery loss."""
     src = _handler_src("_publish_event")
     if not src:
-        return REMEDIATED, "event publishing removed"
+        return MANUAL, (
+            f"_publish_event() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "logger.debug" in src and "return" not in src:
         return LIVE, "publish failures are swallowed at debug level"
     if "-> bool" not in src and "return True" not in src:
@@ -1185,7 +1228,10 @@ def dash_095() -> Result:
     """Broker-watch symbol and threshold validation permits malformed rules."""
     src = _handler_src("api_broker_watch")
     if not src:
-        return REMEDIATED, "broker-watch route removed"
+        return MANUAL, (
+            f"api_broker_watch() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "safe_symbol" not in src:
         return LIVE, "the symbol reaches an outbound URL unvalidated"
     if "_as_number" not in src:
@@ -1273,7 +1319,10 @@ def dash_044() -> Result:
     """Event channels have no per-subscriber filtering."""
     src = _handler_src("sse_events")
     if not src:
-        return REMEDIATED, "event stream removed"
+        return MANUAL, (
+            f"sse_events() not found — confirm it was removed "
+            f"deliberately rather than renamed; this finding "
+            f"cannot be judged without its subject")
     if "DashboardPrincipal" not in src:
         return LIVE, "the stream has no subscriber identity to filter on"
     if "_event_visible_to" not in src:

@@ -4024,3 +4024,55 @@ Same error three times, each caught by the suite rather than by luck. All three 
 **A-04 is complete.** The watching layer is no longer the work.
 
 **Files modified:** `check_architecture_rules.py`, `check_dashboard_findings.py`, `check_gate_registry.py`, `gate_registry.py`, `closure_register.py`, `scripts/test_architecture_rules.py`, `scripts/test_compose_gates.py`, `scripts/test_gate_registry.py`, `assertion_floors.json`, sub-plan/tracker/STATUS.
+
+---
+
+## D161 — 2026-08-04 — The MANUAL Audit: 15 Checks Read "Gone" as "Fixed"
+
+**Context:** The operator's framing was precise. *"A check capable of saying 'I can't verify this' instead saying 'it's fine'"* — thirty checks that can report MANUAL but don't, resolving uncertainty silently in the safe direction.
+
+### Static analysis got me two wrong answers before it got me the right one
+
+**First attempt:** classify each MANUAL branch by its guard condition. 26 of 42 landed in "other", which is not an answer.
+
+**Second attempt:** count checks whose REMEDIATED is a bare fallthrough — 35 of 50. Reading a sample showed the heuristic was wrong: `dash_017`, `dash_074`, `dash_051`, `dash_085` and `dash_092` all *do* confirm positively (`if 'bounded_json' not in text: return PARTIAL`), they simply express it as guard-then-fallthrough rather than a return inside the `if`. Five of six sampled were fine.
+
+Both attempts were structure standing in for behaviour. The third worked because it stopped guessing.
+
+### Mutation found it in one pass
+
+Blind one subject handler at a time and see which checks react. Of the 17 handlers the tracker names, **8 could be made invisible and not a single check noticed**: `api_upload`, `api_chat_proxy`, `api_memories`, `sse_events`, `_publish_event`, `api_set_mode`, `api_broker_watch`, `api_corrections`, `api_backup_status`.
+
+The shape was identical every time:
+
+```python
+src = _handler_src("api_upload")
+if not src:
+    return REMEDIATED, "upload route removed"
+```
+
+**"The route is gone" was being read as "the defect is fixed."** That is correct if the route was removed deliberately, and wrong if it was renamed or if `_handler_src` broke — and the check cannot tell the two apart.
+
+This is not covered by the anchor pre-scan. The tree is real; one route vanished. It is exactly the limit recorded when that pre-scan was built — *"it does not catch one specific route being missed by the scan"* — and the limit turned out to be occupied.
+
+### The tracker disagreed with itself, which is what makes it a defect
+
+Ten branches called a missing handler **MANUAL**. Fifteen called it **REMEDIATED**. Same situation, two verdicts, depending only on which check you happened to be in. A design choice does not contradict itself fifteen times.
+
+All 32 answer MANUAL now, and say what a human must confirm: *"…not found — confirm it was removed deliberately rather than renamed; this finding cannot be judged without its subject."*
+
+### The counts did not move, and that is the point
+
+**Today: 0 LIVE, 95 REMEDIATED, 1 MANUAL — unchanged.** Every one of the 17 handlers exists, so no verdict flips. This fix buys nothing today and everything the day someone renames a route.
+
+That is worth stating plainly rather than dressing up as an improvement to the headline. The headline was not wrong; it was **less load-bearing than it looked**, and now it is worth what it says.
+
+### Both tests, because they catch different things
+
+`test_a_vanished_handler_is_never_reported_remediated` blinds ten handlers and asserts no finding is ever *upgraded* to REMEDIATED by its subject disappearing — behavioural, and the method that found the defect. `test_every_missing_handler_branch_answers_manual` asserts the structural rule across all 32 branches, so a sixteenth written next month is caught without needing to be in the mutation list.
+
+**Verification:** 2,127 tests across 30 suites, all green — 201 in the dashboard tracker, up 12. 11/11 policy gates, all six invariants enforced, 9 findings closed and re-verified.
+
+**`KAI-GATE-014` opens and is REMEDIATED.** Not closed: the structural prevention here is a test, not an enforced invariant, and by the operator's own criterion that is remediated rather than prevented.
+
+**Files modified:** `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `assertion_floors.json`, sub-plan/tracker/STATUS.

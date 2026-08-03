@@ -1051,7 +1051,70 @@ def test_every_anchor_symbol_is_actually_present():
     check("no anchor symbol is invented", not missing, str(missing))
 
 
+# ── A missing subject is "cannot judge", never "fixed" (KAI-GATE-014) ─
+
+def _blind(handler: str):
+    """Run the tracker with one handler invisible to the scanner."""
+    import io, contextlib, importlib
+    from scripts.security import check_dashboard_findings as tracker
+    original = tracker._handler_src
+    tracker._handler_src = lambda name, _o=original: (
+        "" if name == handler else _o(name))
+    try:
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            results = tracker.evaluate()
+    finally:
+        tracker._handler_src = original
+    return {r["finding"]: r["status"] for r in results}
+
+
+def test_a_vanished_handler_is_never_reported_remediated():
+    """Found by mutation, not by reading.
+
+    Blinding each of the 17 subject handlers in turn showed 8 where *no*
+    check reacted at all: they read "the route is gone" as "the defect is
+    fixed". That is right if the route was deliberately removed and wrong
+    if it was renamed — and the check cannot tell the difference. The
+    anchor pre-scan does not cover it, because the tree is real; it is one
+    route that disappeared.
+
+    The tracker was also inconsistent with itself: 10 branches called a
+    missing handler MANUAL and 15 called it REMEDIATED. That
+    disagreement is what makes it a defect rather than a design choice.
+    """
+    baseline = _blind("__nothing__")
+    for handler in ("api_upload", "api_chat_proxy", "api_memories",
+                    "sse_events", "_publish_event", "api_set_mode",
+                    "api_broker_watch", "api_corrections",
+                    "api_backup_status", "readiness"):
+        after = _blind(handler)
+        upgraded_to_fixed = [
+            f for f in baseline
+            if baseline[f] != "REMEDIATED" and after.get(f) == "REMEDIATED"]
+        check(f"blinding {handler} never upgrades a finding to REMEDIATED",
+              not upgraded_to_fixed, str(upgraded_to_fixed))
+
+
+def test_every_missing_handler_branch_answers_manual():
+    """Structural companion to the mutation test above: no branch may
+    conclude the defect is gone from the absence of its own subject."""
+    import re as _re
+    from pathlib import Path as _P
+    source = (_P(__file__).resolve().parent.parent
+              / "scripts" / "security"
+              / "check_dashboard_findings.py").read_text(encoding="utf-8")
+    verdicts = _re.findall(r"if not src:\s*\n\s*return (\w+)", source)
+    wrong = [v for v in verdicts if v != "MANUAL"]
+    check("every missing-handler branch answers MANUAL", not wrong,
+          f"{len(wrong)} branch(es) still conclude {set(wrong)}")
+    check("and there are branches to check", len(verdicts) > 20,
+          str(len(verdicts)))
+
+
 def run() -> None:
+    test_a_vanished_handler_is_never_reported_remediated()
+    test_every_missing_handler_branch_answers_manual()
     test_an_absent_tree_is_refused_not_reported_remediated()
     test_an_unrecognisable_tree_fails_differently_from_an_absent_one()
     test_a_thin_tree_is_refused_even_with_every_symbol_present()
