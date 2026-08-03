@@ -236,7 +236,8 @@ instrumentation, and letting them dilute or stand in for one of the 96
 | ID | Severity | Finding | Status |
 |---|---|---|---|
 | `KAI-GATE-001` | HIGH | 11 of 12 gates fail **open** when their input is missing: `if not path.exists(): continue` → `PASS`. Proven on three; the rest share the shape by inspection | **OPEN** |
-| `KAI-GATE-005` | HIGH | `check_dashboard_findings` reports **`REMEDIATED=52`** against a source tree that does not exist. For half the checks, *"the code is not there"* is indistinguishable from *"the code is correct"* | **OPEN** |
+| `KAI-GATE-005` | HIGH | `check_dashboard_findings` reports **`REMEDIATED=52`** against a source tree that does not exist. For half the checks, *"the code is not there"* is indistinguishable from *"the code is correct"* | **REMEDIATED** — anchor pre-scan: exit 2 absent, exit 3 unrecognisable, no verdict rendered either way |
+| `KAI-GATE-007` | HIGH | `check_secret_fallbacks` catches only a **denylist of nine weak words**. `${DB_PASSWORD:-hunter2}`, `${JWT_SECRET:-a8f3c9d1e7b2}` and `${API_KEY:-}` all pass, as does a hardcoded `BINANCE_API_SECRET`. Its docstring advertises a third scan — hardcoded secrets in environment blocks — that **has no implementing pattern** | **OPEN** |
 | `KAI-GATE-002` | MEDIUM | 8 of 12 gates print `PASS` with **no denominator**. A gate that inspected nothing is indistinguishable from one that inspected everything | **OPEN** |
 | `KAI-GATE-003` | MEDIUM | 8 of 12 gates have **never been observed failing**. No suite injects a violation and asserts they fire | **OPEN** |
 | `KAI-GATE-004` | MEDIUM | A gate is declared in up to three places with **nothing cross-checking them**. Two of twelve are already inconsistent | **OPEN** |
@@ -282,7 +283,7 @@ Ordered lowest-risk first. Each step is independently revertible.
 | Step | Scope | Why this order |
 |---|---|---|
 | ~~**A-04a**~~ | ~~Registry + meta-check in reporting mode~~ | **Done.** `make gate-registry` reports 29 findings and exits 0 by design. 30 assertions in `test_gate_registry.py`, all from synthetic registries |
-| **A-04b** | Fail-closed across all 12 | **Started.** `gate_inputs.require()` is the shared helper; `check_compose_drift` is the first adopter and now has all four invariants. 7 compose gates remain |
+| **A-04b** | Fail-closed across all 12 | **Started.** `gate_inputs.require()` is the shared helper; `check_compose_drift` is the first adopter and now has all four invariants. 7 compose gates remain — **semantics first**, per the operator: a denominator on a broken check is architectural lipstick. The first one read (`check_secret_fallbacks`) had two semantic defects — see `KAI-GATE-007` |
 | **A-04b** | I-1 fail-closed across all 12 | Mechanical, and the highest-severity finding. One shared helper, not 12 edits |
 | **A-04c** | I-2 denominators across all 12 | Follows I-1 naturally — the count is what the fail-closed check already computes |
 | **A-04d** | I-3 can-it-fail suites for the 8 | The largest piece. 8 suites, each injecting one real violation |

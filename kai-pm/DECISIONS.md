@@ -3691,3 +3691,73 @@ The second one is worth keeping: a loose match on structured text is the config-
 
 **Files added:** `scripts/security/gate_inputs.py`, `scripts/test_compose_drift.py`.
 **Files modified:** `scripts/security/check_compose_drift.py` (rewritten), `docker-compose.{full,minimal,sovereign}.yml`, `scripts/security/gate_registry.py`, `scripts/security/check_gate_registry.py`, `scripts/security/check_assertion_floors.py`, `scripts/security/assertion_floors.json`, `Makefile`, sub-plan/tracker/STATUS/MAKEFILE_TARGETS.
+
+---
+
+## D155 — 2026-08-03 — The Anchor Pre-scan, and Why Reading Semantics First Was the Right Call
+
+**Context:** The operator answered five open questions. Three are implemented here; two changed what I know about the environment.
+
+### The anchor pre-scan — their design, not mine
+
+I proposed converting all 96 dashboard checks to positive assertions. The operator pushed for the cheaper correct answer instead: **one pre-scan, not 96 anchors.** Establish that the tree is real before any verdict is rendered, and accept the narrower claim it buys.
+
+> A check like "no route reads broker credentials" still means "among the routes we found, none read broker credentials" — but now you know routes were found.
+
+Implemented with their nuance about failure modes kept distinct:
+
+| Condition | Exit | Meaning |
+|---|---|---|
+| `dashboard/app.py` absent | **2** | the file moved; this tracker has been inspecting nothing |
+| present, anchors missing, or <100 routes parsed | **3** | present, but not the file these 96 findings were written against |
+| 5 anchors present, 185 routes parsed | 0 | judged |
+
+*"You don't want 'file not found' to be the same exit code as 'DashboardAuth not in tree'."* They are different problems and a single code sends whoever is debugging in the wrong direction.
+
+**The known limit is recorded rather than implied:** the pre-scan catches an empty or unrecognisable tree. It does **not** catch one specific route being missed by the scan. That still needs a per-check anchor, to be added surgically if a check is ever found systematically missing its subject.
+
+### It caught its own author, twice
+
+**The anchors were guessed.** My first draft named `require_principal` and `PUBLIC_ROUTES`. Neither exists — the real names are `require_dashboard_auth` and `Scope`. The pre-scan refused on its first run *against the healthy tree* and named both. A guessed anchor is worse than none, because it fires against a correct system; `test_every_anchor_symbol_is_actually_present` now asserts against the real source.
+
+**An assertion matched its own prose.** `check("no verdict rendered", "REMEDIATED" not in out)` failed because the refusal message *explains* what a REMEDIATED-against-nothing would mean. Identical to `dash_015`, whose grep once matched its own docstring. Now asserts on verdict lines (`KAI-DASH-0`), not on a word that appears in the explanation.
+
+### Category confusion is its own entry now
+
+The operator separated three mechanisms that I had been treating as one family:
+
+- **self-consuming guard** — a precondition shrinks because the operation it guards succeeded
+- **boundary blindness** — cannot distinguish *correct* from *absent*
+- **category confusion** — a check for the **absence of something bad** passes because *everything* is absent
+
+`KAI-GATE-005` is the third. `gate_inputs.require()` fixes the second and does nothing for it, which is exactly why the distinction earns its place.
+
+### Reading semantics before retrofitting — vindicated on the first file
+
+The operator's ruling was unambiguous: *"A denominator on a broken check is architectural lipstick."* The first of the seven read, `check_secret_fallbacks` (84 lines), has two semantic defects, both measured:
+
+```
+CAUGHT   ${DB_PASSWORD:-localdev}
+MISSED   ${DB_PASSWORD:-hunter2}
+MISSED   ${JWT_SECRET:-a8f3c9d1e7b2}
+MISSED   ${API_KEY:-}
+MISSED   BINANCE_API_SECRET: "sk_live_abc123def456"
+MISSED   POSTGRES_PASSWORD: SuperSecret99
+```
+
+1. **It is a denylist of nine words, not a rule.** Any default outside that list passes. This programme's own principle is *missing secret → 503, never open*, so **any** default defeats it, not merely a guessable one.
+2. **The docstring advertises a scan that does not exist.** Three are claimed; two are implemented. "Hardcoded passwords/tokens in environment blocks" has no implementing pattern — defect 2's shape, inside the gate that guards secrets.
+
+A mechanical retrofit would have given this a confident denominator and a fail-closed guard while it still missed a hardcoded `BINANCE_API_SECRET`. Filed as `KAI-GATE-007`, **not fixed here** — fixing it properly means flagging every `${SECRET:-default}`, and I do not yet know how many legitimate ones exist. That measurement comes first.
+
+### Two environment facts, corrected
+
+**Docker: I was wrong about the cause.** A daemon *is* startable here — `sudo` works, capabilities are near-full, `dockerd` runs and `docker network create` succeeds. The block is the **network policy**: `registry-1.docker.io` answers (401, normal), but `production.cloudfront.docker.com`, which serves the image blobs, returns `CONNECT tunnel failed, 403` from the agent proxy. Allowing that one host would give this programme live stack verification. That is a much smaller ask than "no daemon", and I had reported the wrong blocker.
+
+**CI can report green while a live step does nothing.** Answering the operator's question with evidence: nine such patterns in `core-tests.yml`, the sharpest being `python3 scripts/test_graph_live.py || echo "::warning::..."`. A warning is not a failure, so live verification can fail every run forever and the build stays green. Not yet touched — several are legitimately best-effort against rate-limited external APIs, and separating those from the ones that should break the build is a judgement call, not a sweep.
+
+**Verification:** 2,019 tests across 28 suites, all green — 189 in the dashboard tracker, up 12 for the pre-scan. 11/11 policy gates. The three anchor failure modes proven distinct by driving `main()` against an absent tree, an unrecognisable tree, a symbol-complete but route-less tree, and the real one.
+
+**Nothing is closed.** Rule 7. `KAI-GATE-005` moves to REMEDIATED; `007` opens; `001`–`004` remain OPEN.
+
+**Files modified:** `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `scripts/security/assertion_floors.json`, sub-plan/tracker/STATUS.

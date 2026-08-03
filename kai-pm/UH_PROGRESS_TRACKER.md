@@ -67,8 +67,10 @@
 | H-3/H-4 agentic + 23 services pooled and bounded | ✅ Done | `4c45398` | `make hygiene-gate` | **0 across 50 services** |
 | A-02 Assertion-count ratchet (11th CI gate) | ✅ Done | `47d2243` | `make test-assertion-floors` | 40 |
 | A-04a Instrumentation registry + meta-check (reporting) | ✅ Done | `b9286f1` | `make test-gate-registry` | 30 |
-| A-04b Directional compose drift + sovereign hardening | ✅ Done | this commit | `make test-compose-drift` | 21 |
-| | | | **Total** | **1,998** |
+| A-04b Directional compose drift + sovereign hardening | ✅ Done | `51032a3` | `make test-compose-drift` | 21 |
+| A-04e Partial enforcement — I-4 enforced, ratchet self-advancing | ✅ Done | `e332a02` | `make test-gate-registry` | 39 |
+| KAI-GATE-005 Anchor pre-scan (category confusion) | ✅ Done | this commit | `make test-dashboard-findings` | 189 |
+| | | | **Total** | **2,019** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against

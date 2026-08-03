@@ -962,7 +962,101 @@ def test_dash_044_needs_both_a_principal_and_a_filter():
           fixed == dash.REMEDIATED, d3)
 
 
+# ── The anchor pre-scan (KAI-GATE-005 — category confusion) ──────────
+
+def _anchor_probe(mutate):
+    """Run main() against a mutated tree and return (exit_code, output)."""
+    import importlib, io, contextlib
+    for name in list(sys.modules):
+        if "check_dashboard_findings" in name:
+            del sys.modules[name]
+    mod = importlib.import_module("scripts.security.check_dashboard_findings")
+    mutate(mod)
+    argv, sys.argv = sys.argv, ["check_dashboard_findings.py"]
+    buffer = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(buffer):
+            code = mod.main()
+    except SystemExit as exc:
+        code = exc.code
+    finally:
+        sys.argv = argv
+    return code, buffer.getvalue()
+
+
+def test_an_absent_tree_is_refused_not_reported_remediated():
+    """The finding itself: this reported REMEDIATED=52 for a missing tree.
+
+    Not one of those 52 checks was wrong in isolation — "the dashboard
+    never reads broker credentials" is correctly true when there is no
+    dashboard. A check for the absence of something bad passes when
+    everything is absent. The operator named it category confusion.
+    """
+    import tempfile
+    from pathlib import Path as _P
+    with tempfile.TemporaryDirectory() as tmp:
+        code, out = _anchor_probe(
+            lambda m: setattr(m, "DASHBOARD", _P(tmp) / "gone.py"))
+    check("an absent tree is refused", code == 2, f"exit={code}")
+    # Assert on verdict *lines*, not the word: the refusal message
+    # itself explains what a REMEDIATED-against-nothing would mean, so
+    # a substring test matches its own prose — the same self-matching
+    # mistake `dash_015` made when its grep hit its own docstring.
+    check("no finding verdict is rendered",
+          "KAI-DASH-0" not in out, out[:200])
+    check("the refusal explains why", "not there is not evidence" in out,
+          out[:300])
+
+
+def test_an_unrecognisable_tree_fails_differently_from_an_absent_one():
+    """The operator's nuance: 'file not found' and 'symbol not in tree'
+    are different problems, so they must not share an exit code."""
+    import tempfile
+    from pathlib import Path as _P
+    with tempfile.TemporaryDirectory() as tmp:
+        wrong = _P(tmp) / "wrong.py"
+        wrong.write_text("app = 1\n")
+        code, out = _anchor_probe(lambda m: setattr(m, "DASHBOARD", wrong))
+    check("an unrecognisable tree is refused", code == 3, f"exit={code}")
+    check("its exit code differs from absent", code != 2, f"exit={code}")
+    check("it names the missing anchors", "missing" in out, out[:200])
+
+
+def test_a_thin_tree_is_refused_even_with_every_symbol_present():
+    """Symbols alone are not enough — the scan must actually see routes."""
+    import tempfile
+    from pathlib import Path as _P
+    import scripts.security.check_dashboard_findings as live
+    with tempfile.TemporaryDirectory() as tmp:
+        thin = _P(tmp) / "thin.py"
+        thin.write_text("\n".join(live.ANCHOR_SYMBOLS) + "\n")
+        code, out = _anchor_probe(lambda m: setattr(m, "DASHBOARD", thin))
+    check("a tree with no routes is refused", code == 3, f"exit={code}")
+    check("the route count is named", "routes parsed" in out, out[:300])
+
+
+def test_the_real_tree_anchors_and_reports_its_denominator():
+    code, out = _anchor_probe(lambda m: None)
+    check("the real tree is judged", code == 0, f"exit={code}")
+    check("the anchor is stated in the output", "anchored:" in out, out[:200])
+    check("the route count is stated", "routes parsed" in out, out[:200])
+
+
+def test_every_anchor_symbol_is_actually_present():
+    """A guessed anchor is worse than none — it fails against a healthy
+    tree. My first draft named two symbols that do not exist."""
+    import scripts.security.check_dashboard_findings as live
+    source = live.DASHBOARD.read_text(encoding="utf-8")
+    missing = [s for s in live.ANCHOR_SYMBOLS if s not in source]
+    check("no anchor symbol is invented", not missing, str(missing))
+
+
 def run() -> None:
+    test_an_absent_tree_is_refused_not_reported_remediated()
+    test_an_unrecognisable_tree_fails_differently_from_an_absent_one()
+    test_a_thin_tree_is_refused_even_with_every_symbol_present()
+    test_the_real_tree_anchors_and_reports_its_denominator()
+    test_every_anchor_symbol_is_actually_present()
     test_coverage_clean_on_real_table()
     test_coverage_detects_missing_finding()
     test_coverage_detects_unknown_finding()

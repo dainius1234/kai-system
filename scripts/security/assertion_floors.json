@@ -7,7 +7,7 @@
     "Concurrency & Clock Tests": 51,
     "Constraint Assessment Tests": 56,
     "Dashboard Auth Tests": 99,
-    "Dashboard Finding Tracker Tests": 177,
+    "Dashboard Finding Tracker Tests": 189,
     "Dashboard UI Auth Tests": 42,
     "Degraded State Tests": 36,
     "Deployment Preflight Tests": 57,
@@ -30,5 +30,5 @@
     "UH-7 Actuator Registry Tests": 75,
     "UH-8 Autonomy Tests": 174
   },
-  "total": 2007
+  "total": 2019
 }

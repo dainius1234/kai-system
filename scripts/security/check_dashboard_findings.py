@@ -47,6 +47,82 @@ MANUAL = "MANUAL"
 
 TOTAL_DASH_FINDINGS = 96
 
+# ── The anchor pre-scan (KAI-GATE-005) ───────────────────────────────
+#
+# Pointed at an empty tree, this tracker reported **`REMEDIATED=52`**.
+# Not one of those 52 checks is wrong in isolation: *"the dashboard never
+# reads broker credentials"* is correctly true when there is no
+# dashboard. The defect is that the check does not know it is making a
+# far weaker claim than it appears to.
+#
+# The operator named this **category confusion**, and separated it from
+# boundary blindness deliberately — different mechanism, different fix.
+# Boundary blindness is *"I cannot tell correct from absent"*, and
+# `gate_inputs.require()` fixes it. Category confusion is *"a check for
+# the absence of something bad passes because everything is absent"*, and
+# fail-closed inputs do nothing for it: the file can be present and still
+# not contain the routes a check believes it is judging.
+#
+# Their design, taken as-is: **one pre-scan, not 96 per-check anchors.**
+# It establishes that the tree is real before any verdict is rendered. It
+# does not convert every absence check into a positive assertion — "no
+# route reads broker credentials" still means "among the routes we found,
+# none did" — but now it is known that routes *were* found.
+#
+# What it deliberately does not catch: one specific route being absent
+# from the scan. That needs a per-check anchor, and is worth adding
+# surgically if a check is ever found systematically missing its subject.
+# Recorded as a known limit rather than left implied.
+# Verified present, not guessed. My first draft named `require_principal`
+# and `PUBLIC_ROUTES`; neither exists — the real names are
+# `require_dashboard_auth` and `Scope`. The pre-scan caught that on its
+# first run, against itself, which is the argument for having it.
+ANCHOR_SYMBOLS = (
+    "require_dashboard_auth",  # Track A's per-route identity dependency
+    "Scope.",                  # the scope taxonomy every route declares
+    "safe_symbol",             # Track G input validation
+    "backend_url",             # Track H backend destination validation
+    "degraded_response",       # Track D failure semantics
+)
+ANCHOR_MIN_ROUTES = 100       # 185 today; a tenth of that is not this file
+
+
+class AnchorFailure(NamedTuple):
+    """Why the tree could not be judged. Kinds fail differently on purpose.
+
+    The operator's nuance: *"you don't want 'file not found' to be the
+    same exit code as 'DashboardAuth not in tree'."* They are different
+    problems — one is a moved file, the other is a file that is no longer
+    what this tracker believes it is judging — and a single exit code
+    would send whoever is debugging in the wrong direction.
+    """
+    kind: str      # "absent" | "unrecognisable"
+    detail: str
+    exit_code: int
+
+
+def anchor_scan() -> Optional[AnchorFailure]:
+    """Prove the tree is real before any finding is judged."""
+    if not DASHBOARD.exists():
+        return AnchorFailure(
+            "absent", f"{_rel(DASHBOARD)} does not exist", 2)
+
+    source = DASHBOARD.read_text(encoding="utf-8")
+    missing = [s for s in ANCHOR_SYMBOLS if s not in source]
+    if missing:
+        return AnchorFailure(
+            "unrecognisable",
+            f"present, but missing {missing} — this is not the file "
+            f"these 96 findings were written against", 3)
+
+    found = len(_routes())
+    if found < ANCHOR_MIN_ROUTES:
+        return AnchorFailure(
+            "unrecognisable",
+            f"only {found} routes parsed, expected at least "
+            f"{ANCHOR_MIN_ROUTES} — the scan is not seeing the app", 3)
+    return None
+
 Result = Tuple[str, str]
 
 
@@ -1697,6 +1773,25 @@ def main() -> int:
                         help="exit non-zero while any finding is LIVE")
     args = parser.parse_args()
 
+    # Nothing is judged until the tree is proven real. Every verdict
+    # below is a claim *about the dashboard*; rendering one against a
+    # tree that is absent or unrecognisable is how this reported
+    # REMEDIATED=52 for a directory that did not exist.
+    anchor = anchor_scan()
+    if anchor:
+        print("REFUSED: cannot judge these 96 findings.\n")
+        print(f"  {anchor.detail}\n")
+        if anchor.kind == "absent":
+            print("  A finding that reports REMEDIATED against a tree that is")
+            print("  not there is not evidence of anything. Most of these")
+            print("  checks look for the *absence* of a defect, and absence")
+            print("  of everything satisfies them all.")
+        else:
+            print("  The file is present but is not what these findings were")
+            print("  written against. Re-anchor the tracker before trusting")
+            print("  any verdict it produces.")
+        return anchor.exit_code
+
     gaps = coverage_gaps()
     results = evaluate()
     discovered = [r for r in evaluate(include_discovered=True)
@@ -1738,7 +1833,9 @@ def main() -> int:
             1 for r in discovered if r["status"] == LIVE)
         return 1 if gaps or (args.gate and live_total) else 0
 
-    print("Dashboard finding revalidation — Wave 1\n")
+    print("Dashboard finding revalidation — Wave 1")
+    print(f"  anchored: {len(ANCHOR_SYMBOLS)} symbols present, "
+          f"{len(routes)} routes parsed\n")
     for track in sorted({r["track"] for r in results}):
         print(f"── Track {track}: {TRACK_NAMES[track]} " + "─" * 24)
         for r in (x for x in results if x["track"] == track):
