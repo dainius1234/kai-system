@@ -469,16 +469,24 @@ def test_removing_a_prevention_reopens_its_findings():
     """Closure that nobody re-checks decays into a rubber stamp."""
     scenario("closure-lapses")
     from scripts.security import closure_register as cr
+    # Drop exactly one invariant and expect exactly the closures that
+    # depend on it. An earlier version set ENFORCED to ("I-4",) and
+    # asserted `len(out) == 2` — then closing 001-003 made it 5, because
+    # the assertion was pinned to how many findings happened to exist
+    # rather than to the behaviour. Third time this file has been guarded
+    # on state it does not control; the rule is the same every time.
+    depends_on_i5 = {c.finding for c in cr.CLOSED
+                     if "I-5" in c.prevention}
     original = meta.ENFORCED
-    meta.ENFORCED = ("I-4",)
+    meta.ENFORCED = tuple(n for n in original if n != "I-5")
     try:
         out = cr.lapsed()
     finally:
         meta.ENFORCED = original
-    check("dropping I-5 re-opens the findings it prevents",
-          len(out) == 2, str(out))
-    check("each names its finding",
-          all("KAI-GATE-" in line for line in out), str(out))
+    reopened = {line.split(":")[0] for line in out}
+    check("dropping I-5 re-opens exactly the closures that name it",
+          reopened == depends_on_i5, f"{reopened} vs {depends_on_i5}")
+    check("at least one closure depends on it", depends_on_i5, "none")
     check("and they close again when restored", not cr.lapsed())
 
 
@@ -494,9 +502,21 @@ def test_every_closure_records_the_full_template():
     ]
     check("every closure carries defect, fix, prevention, proof and date",
           not incomplete, str(incomplete))
-    missing = [c.finding for c in CLOSED
-               if not pathlib_exists(c.proven_by.split(" ")[0])]
+    # `proven_by` may name several suites. Check every path it mentions,
+    # not just the first token — the first version split on " " and took
+    # element zero, which for a comma-separated list is a filename with a
+    # trailing comma that exists nowhere.
+    import re as _re
+    missing = []
+    for closure in CLOSED:
+        for rel in _re.findall(r"scripts/[\w/]+\.py", closure.proven_by):
+            if not pathlib_exists(rel):
+                missing.append(f"{closure.finding}: {rel}")
     check("every named proof file exists", not missing, str(missing))
+    check("every closure names at least one proof file",
+          all(_re.search(r"scripts/[\w/]+\.py", c.proven_by) for c in CLOSED),
+          str([c.finding for c in CLOSED
+               if not _re.search(r"scripts/[\w/]+\.py", c.proven_by)]))
 
 
 def pathlib_exists(rel: str) -> bool:
@@ -513,6 +533,10 @@ def test_the_enforced_set_never_shrinks():
     check("I-5 is enforced", "I-5" in meta.ENFORCED, str(meta.ENFORCED))
     check("I-6 is enforced", "I-6" in meta.ENFORCED, str(meta.ENFORCED))
     check("I-2 is enforced", "I-2" in meta.ENFORCED, str(meta.ENFORCED))
+    check("all six invariants enforce", len(meta.ENFORCED) == 6,
+          str(meta.ENFORCED))
+    check("every enforced name is real",
+          set(meta.ENFORCED) == set(meta.INVARIANTS), str(meta.ENFORCED))
     check("every enforced name is a real invariant",
           all(n in meta.INVARIANTS for n in meta.ENFORCED), str(meta.ENFORCED))
 

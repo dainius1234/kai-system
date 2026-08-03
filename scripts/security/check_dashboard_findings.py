@@ -1405,11 +1405,17 @@ def dash_d04() -> Result:
         return MANUAL, "default role could not be determined"
 
     offenders = []
-    for name in ("docker-compose.full.yml", "docker-compose.minimal.yml",
-                 "docker-compose.sovereign.yml"):
+    composes = ("docker-compose.full.yml", "docker-compose.minimal.yml",
+                "docker-compose.sovereign.yml")
+    # A compose file that is not there has not been cleared of a keeper
+    # default — it has not been read. Say so rather than concluding the
+    # finding is remediated on the strength of files that are missing.
+    absent = [n for n in composes if not (REPO / n).exists()]
+    if absent:
+        return MANUAL, (f"cannot judge: {', '.join(absent)} not found, so "
+                        f"the keeper default was never checked there")
+    for name in composes:
         compose = REPO / name
-        if not compose.exists():
-            continue
         if "KAI_DASHBOARD_ROLE:-keeper" in compose.read_text(encoding="utf-8"):
             offenders.append(name)
     setup = REPO / "scripts" / "setup_service_token.sh"

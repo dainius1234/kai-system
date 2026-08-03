@@ -472,7 +472,11 @@ INVARIANTS = {
 # I-5 when the inert-rule detector cleared, I-6 on its first run, I-2
 # when the last six compose gates got a denominator. The ratchet has
 # advanced itself three times; nobody remembered to flip anything.
-ENFORCED = ("I-2", "I-4", "I-5", "I-6")
+# All six. Every one was added because the gate refused to pass without
+# it — I-5 when the inert-rule detector cleared, I-6 on its first run,
+# I-2 when the last compose gates got denominators, I-1 and I-3 when the
+# retrofit finished. Nobody ever remembered to flip one.
+ENFORCED = ("I-1", "I-2", "I-3", "I-4", "I-5", "I-6")
 
 
 def invariant_counts(problems: Dict[str, List[str]]) -> Dict[str, int]:

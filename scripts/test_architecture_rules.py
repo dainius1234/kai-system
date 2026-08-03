@@ -361,6 +361,58 @@ def test_rule_5_requires_short_circuit():
 
 # ── Runner ─────────────────────────────────────────────────────────
 
+# ── A-04b: this gate must not go blind (KAI-GATE-013) ────────────────
+
+def test_an_unparseable_file_fails_the_gate():
+    """It used to be invisible to all twelve rules, and the gate said
+    `15/15 rules accounted for` and PASS."""
+    import io, contextlib
+    from scripts.security import check_architecture_rules as arch
+    victim = arch.REPO / "common" / "policy_bridge" / "_probe_unreadable.py"
+    victim.write_text("def f(:\n")
+    try:
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            code = arch.main()
+        out = buf.getvalue()
+    finally:
+        victim.unlink()
+    check("an unparseable file fails the gate", code == 1, f"exit={code}")
+    check("it is named", "_probe_unreadable" in out, out[-300:])
+    check("and said to have been checked by no rule",
+          "checked by no rule" in out, out[-300:])
+
+
+def test_the_gate_counts_files_not_only_rules():
+    """`15/15 rules` says every rule ran. It says nothing about whether
+    every file was readable by them — a denominator only falsifies a pass
+    along the dimension it measures."""
+    import io, contextlib
+    from scripts.security import check_architecture_rules as arch
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        arch.main()
+    out = buf.getvalue()
+    check("a file denominator is reported", "python files" in out, out[-200:])
+    check("the rule denominator is still reported",
+          "rules accounted for" in out, out[-200:])
+
+
+def test_a_rule_invoked_directly_refuses_a_missing_input():
+    """`main()` requires the inputs, but a rule called on its own must
+    not answer 'no violations' because it found nothing to inspect."""
+    from scripts.security import check_architecture_rules as arch
+    original = arch.PROTECTED_DIRS
+    arch.PROTECTED_DIRS = ("common/definitely-not-here",)
+    try:
+        found = arch.rule_14_no_fail_open()
+    finally:
+        arch.PROTECTED_DIRS = original
+    check("a missing protected directory is reported", found, str(found))
+    check("the reason is that nothing was inspected",
+          found and "inspected nothing" in str(found[0]), str(found))
+
+
 if __name__ == "__main__":
     test_current_tree_is_clean()
     test_rule_1_detects_provider_importing_actuator()
@@ -386,6 +438,9 @@ if __name__ == "__main__":
     test_rule_10_detects_bare_basemodel_contract()
     test_rule_11_model_output_cannot_grant_trust()
     test_rule_5_requires_short_circuit()
+    test_an_unparseable_file_fails_the_gate()
+    test_the_gate_counts_files_not_only_rules()
+    test_a_rule_invoked_directly_refuses_a_missing_input()
 
     print(f"\n{'='*60}")
     print(f"Architecture Rule Tests: {passed} passed, {failed} failed")

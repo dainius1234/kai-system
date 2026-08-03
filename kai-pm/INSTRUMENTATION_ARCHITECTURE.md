@@ -50,7 +50,7 @@ below with the commands in §6.
 | **Fails closed** when its input is missing | **1** | 11 |
 | Declared in **one** place rather than three | **0** | 12 |
 
-**Now (after A-04b):** I-2 and I-4 at zero and enforced, I-5 and I-6 at zero and enforced, I-1 down to 5, I-3 down to 2. Four of six invariants enforce.
+**Now (A-04 complete):** **all six invariants at zero and all six enforced.** The 12 checks that had 4/4/1/0 of the properties now have all of them. Each invariant was added to `ENFORCED` because the gate *refused to pass without it* — never because someone remembered.
 
 The first two columns hold *exactly the same four scripts*:
 `check_architecture_rules`, `check_dashboard_findings`,
@@ -438,11 +438,12 @@ The operator set the bar, and it is higher than "we fixed it":
 > **and that the finding's category of defect has a structural prevention
 > in place** so it won't recur.
 
-**Closed (6):** `KAI-GATE-004`, `005`, `006`, `008`, `009`, `012`.
+**Closed (9):** `KAI-GATE-001`–`006`, `008`, `009`, `012`.
 
-**Declined, though offered:** `001`, `002`, `003` — the structural
-prevention is incomplete while 15, 6 and 2 sites remain. Closing them
-would dilute the register.
+`001`, `002` and `003` were **declined in the first batch** — 15, 6 and 2
+sites remained, and a prevention covering most sites is not a prevention.
+All three reached zero and are enforced now, so they close on the
+criterion's own terms rather than by relaxing it.
 
 **Deliberately excluded:** `010` (misleading messages) and `011` (the
 image-tag denylist). Both are fixed and tested. Nothing structurally

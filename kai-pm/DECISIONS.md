@@ -3971,3 +3971,56 @@ Both are the same error in different clothes, and the second is the purer specim
 **Nothing further closed.** Rule 7.
 
 **Files modified:** `gate_inputs.py` (added `count_services`), `check_gate_registry.py`, `gate_registry.py`, six compose gates, `scripts/test_gate_registry.py`, `assertion_floors.json`, sub-plan/tracker/STATUS.
+
+---
+
+## D160 — 2026-08-04 — A-04 Complete: All Six Invariants Enforced, Nine Findings Closed
+
+**Context:** The last five I-1 sites, judged rather than swept, per the operator's ruling.
+
+### The last unread gate had the sharpest defect of the eight
+
+`check_architecture_rules` — the one I built for A-01 — skips any file it cannot parse. `_parse()` returned `None` and every caller wrote `continue`, so a file with a syntax error was **invisible to all twelve enforced rules**.
+
+Proven by planting a syntax error in `common/policy_bridge`:
+
+```
+exit=0   cover §15 rules accounted for: 15/15 (12 enforced, 3 declared uncheckable)
+         PASS: no architecture violations
+```
+
+The gate never mentioned the file.
+
+**And note what that says about denominators.** This gate *had* one — it is why it satisfied I-2. But it counted **rules**, not **files**, so it could not reveal a scanner blind to half its inputs. *A denominator only falsifies a pass along the dimension it measures.* It now reports both: `inspected: 48 python files` alongside `15/15 rules`, and an unreadable file fails the gate by name.
+
+### The four remaining skips became refusals, not deletions
+
+`main()` now calls `require(DECLARED_INPUTS)`, which makes the inner `if not base.exists(): continue` unreachable there. Deleting them would have been tidier and wrong: these rules are also invoked **directly** by the test suite, where a missing directory would again mean "no violations found" from a rule that inspected nothing. Each now appends a `Violation` naming what it failed to inspect.
+
+**I-1 is at zero.** So are the other five.
+
+### All six invariants now enforce, and not one was flipped by hand
+
+`ENFORCED = ("I-1", "I-2", "I-3", "I-4", "I-5", "I-6")`. Every name arrived the same way: the invariant reached zero, and `policy-check` **refused to pass** until it was added. I-5 when the inert-rule detector cleared, I-6 on its first run, I-2 when the compose gates got denominators, I-1 and I-3 when the retrofit finished. The self-advancing rule from A-04e did all four; nobody remembered to flip anything.
+
+The twelve checks that began with **4 / 4 / 1 / 0** of the four properties now have all of them, plus two the design did not originally have.
+
+### Nine findings closed — including the three I declined
+
+`001`, `002` and `003` were offered in the first batch and refused, because 15, 6 and 2 sites remained and a prevention covering most sites is not a prevention. All three reached zero and are enforced, so they close **on the criterion's own terms** rather than by relaxing it.
+
+`010` and `011` remain deliberately open: fixed and tested, but nothing structurally prevents the *next* misleading message or the *next* wrong tag rule. Remediated is not prevented.
+
+### Three of my own tests were wrong, all in the same way
+
+1. `test_the_ast_detector_finds_the_real_shape` pinned `== [70]`; an edit moved the line.
+2. Rewritten to assert "exactly one fail-open site in `check_port_bindings`" — which **broke when that site was fixed**. A test that requires the defect to persist is a self-consuming guard in its purest form.
+3. `test_removing_a_prevention_reopens_its_findings` asserted `len(out) == 2`; closing three more findings made it 5.
+
+Same error three times, each caught by the suite rather than by luck. All three now assert **behaviour** against synthetic input or derived sets, never a count of what the repository currently happens to contain. A fourth was a plain bug: the proof-file check split `proven_by` on spaces and took the first token, which for a comma-separated list is a filename with a trailing comma that exists nowhere.
+
+**Verification:** 2,115 tests across 30 suites, all green — 65 in the meta-check's own suite, 68 in architecture rules, 35 in compose gates. 11/11 policy gates. `make gate-registry --gate` passes with **all six invariants at zero and enforced** and **9 findings closed and re-verified** on every run. Dropping any one invariant re-opens exactly the closures that name it, and they close again when it is restored.
+
+**A-04 is complete.** The watching layer is no longer the work.
+
+**Files modified:** `check_architecture_rules.py`, `check_dashboard_findings.py`, `check_gate_registry.py`, `gate_registry.py`, `closure_register.py`, `scripts/test_architecture_rules.py`, `scripts/test_compose_gates.py`, `scripts/test_gate_registry.py`, `assertion_floors.json`, sub-plan/tracker/STATUS.

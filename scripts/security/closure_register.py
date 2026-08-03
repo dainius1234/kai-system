@@ -182,6 +182,72 @@ CLOSED: Tuple[Closure, ...] = (
     ),
 )
 
+# ── Second batch: the three declined in the first round ──────────────
+#
+# `001`, `002` and `003` were offered for closure and declined, because
+# 15, 6 and 2 sites remained and a prevention covering most sites is not
+# a prevention. All three reached zero and are enforced now, so the
+# criterion is met on its own terms rather than by relaxing it.
+
+CLOSED = CLOSED + (
+    Closure(
+        finding="KAI-GATE-001",
+        defect="11 of 12 checks answered `continue` when an input was "
+               "missing, so a renamed file was indistinguishable from a "
+               "clean bill of health. Proven on `check_port_bindings`: "
+               "pointed at filenames that did not exist it printed PASS "
+               "and exited 0.",
+        fix="`gate_inputs.require()` refuses and exits 1, naming the "
+            "missing input. Adopted by every compose gate; the four "
+            "architecture rules that skip a missing directory now report "
+            "it as a violation instead.",
+        prevention="I-1 is at zero and **enforced**. The AST detector "
+                   "distinguishes a skip from a refusal, so a new "
+                   "`if not X.exists(): continue` fails the build while a "
+                   "`return <failure>` correctly does not.",
+        proven_by="scripts/test_compose_gates.py, scripts/test_secret_gates.py, "
+                  "scripts/test_architecture_rules.py, scripts/test_gate_registry.py",
+        verified_on="2026-08-03",
+        still_holds=_enforced("I-1"),
+    ),
+    Closure(
+        finding="KAI-GATE-002",
+        defect="8 of 12 checks printed PASS with no statement of how much "
+               "they inspected — unfalsifiable, reading identically "
+               "whether they examined fifty services or zero.",
+        fix="`gate_inputs.inspected()` on every gate. The unit is service "
+            "definitions, not compose files: '3 files' is 3 whatever "
+            "happens. `check_architecture_rules` gained a *second* "
+            "denominator in python files, because its existing "
+            "`15/15 rules` counted the wrong dimension and could not "
+            "reveal a scanner blind to half its inputs.",
+        prevention="I-2 is at zero and **enforced**. Each gate declares a "
+                   "denominator pattern in the registry and the meta-check "
+                   "runs it and matches the output.",
+        proven_by="scripts/test_gate_registry.py (a gate with no "
+                  "denominator, and a declared-expensive probe) and "
+                  "scripts/test_architecture_rules.py (files as well as rules)",
+        verified_on="2026-08-03",
+        still_holds=_enforced("I-2"),
+    ),
+    Closure(
+        finding="KAI-GATE-003",
+        defect="8 of 12 checks had never been observed failing. They may "
+               "have been vacuous; nothing would have said so.",
+        fix="Five new suites — compose drift, secret and restart, compose "
+            "gates, gate registry, plus architecture additions — each "
+            "injecting a real violation and asserting the gate fires, and "
+            "asserting it does *not* fire on correct configuration.",
+        prevention="I-3 is at zero and **enforced**. Every registered gate "
+                   "declares a `proven_by` suite and the meta-check fails "
+                   "if the file is absent.",
+        proven_by="scripts/test_gate_registry.py — a gate with no "
+                  "proven_by, and a proven_by pointing at nothing",
+        verified_on="2026-08-03",
+        still_holds=_enforced("I-3"),
+    ),
+)
+
 BY_FINDING = {c.finding: c for c in CLOSED}
 
 

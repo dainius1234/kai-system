@@ -34,12 +34,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from scripts.security import check_image_tags as tags  # noqa: E402
 from scripts.security import check_network_zones as zones  # noqa: E402
+from scripts.security import check_default_profiles as profiles  # noqa: E402
 from scripts.security import check_port_bindings as ports  # noqa: E402
+from scripts.security import check_turbovec_writers as turbovec  # noqa: E402
 
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 14
+EXPECTED_SCENARIOS = 20
 executed: list[str] = []
 
 
@@ -187,6 +189,66 @@ def test_an_image_with_no_tag_fails():
     check("an untagged image is implicitly latest", v, str(v))
 
 
+# ── check_default_profiles ───────────────────────────────────────────
+#
+# This gate and the next were found *correct* on every probe. They are
+# here because "correct today" and "proven able to fail" are different
+# claims, and only the second survives someone editing it later.
+
+def test_a_dangerous_service_with_no_profile_fails():
+    scenario("profile-unprofiled")
+    v = profiles.check_file(yml('services:\n  executor:\n    image: x\n'))
+    check("an unprofiled dangerous service is caught", v, str(v))
+    check("the consequence is named",
+          v and "default" in str(v[0]), str(v))
+
+
+def test_a_correctly_profiled_service_passes():
+    scenario("profile-ok")
+    v = profiles.check_file(yml('services:\n  executor:\n    image: x\n'
+                                '    profiles: ["execution"]\n'))
+    check("a profiled dangerous service passes", not v, str(v))
+
+
+def test_an_empty_profile_list_fails():
+    """`profiles: []` reads as configured and behaves as unconfigured."""
+    scenario("profile-empty")
+    v = profiles.check_file(yml('services:\n  executor:\n    image: x\n'
+                                '    profiles: []\n'))
+    check("an empty profile list is caught", v, str(v))
+
+
+# ── check_turbovec_writers ───────────────────────────────────────────
+
+def test_a_second_turbovec_writer_fails():
+    scenario("turbovec-second-writer")
+    v = turbovec.check_file(yml('services:\n  other:\n    image: x\n'
+                                '    environment:\n'
+                                '      VECTOR_STORE: turbovec\n'))
+    check("a second writer is caught", v, str(v))
+    check("the primary is named",
+          v and turbovec.PRIMARY_WRITER in str(v[0]), str(v))
+
+
+def test_a_reader_mounting_read_write_fails():
+    scenario("turbovec-rw-mount")
+    v = turbovec.check_file(yml(
+        'services:\n  reader:\n    image: x\n    environment:\n'
+        '      VECTOR_STORE: turbovec\n      TURBOVEC_READ_ONLY: "true"\n'
+        '    volumes:\n      - turbovec:/data\n'))
+    check("a read-write mount by a reader is caught", v, str(v))
+
+
+def test_the_primary_writer_may_not_be_read_only():
+    """If the only writer is read-only, nothing can write at all."""
+    scenario("turbovec-primary-ro")
+    v = turbovec.check_file(yml(
+        f'services:\n  {turbovec.PRIMARY_WRITER}:\n    image: x\n'
+        '    environment:\n      VECTOR_STORE: turbovec\n'
+        '      TURBOVEC_READ_ONLY: "true"\n'))
+    check("a read-only primary writer is caught", v, str(v))
+
+
 def run_all() -> None:
     test_a_non_dashboard_publisher_fails()
     test_the_dashboard_may_publish_on_loopback()
@@ -202,6 +264,12 @@ def run_all() -> None:
     test_versioned_tags_pass()
     test_a_digest_passes()
     test_an_image_with_no_tag_fails()
+    test_a_dangerous_service_with_no_profile_fails()
+    test_a_correctly_profiled_service_passes()
+    test_an_empty_profile_list_fails()
+    test_a_second_turbovec_writer_fails()
+    test_a_reader_mounting_read_write_fails()
+    test_the_primary_writer_may_not_be_read_only()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,

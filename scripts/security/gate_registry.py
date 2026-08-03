@@ -105,6 +105,7 @@ REGISTRY: Tuple[Gate, ...] = (
          proven_by="scripts/test_compose_gates.py",
          **_COMPOSE_GATE),
     Gate(module="check_default_profiles",
+         proven_by="scripts/test_compose_gates.py",
          summary="no dangerous service in the default profile",
          **_COMPOSE_GATE),
     # Rewritten from a denylist of nine guessable words into a rule:
@@ -124,6 +125,7 @@ REGISTRY: Tuple[Gate, ...] = (
          proven_by="scripts/test_compose_gates.py",
          **_COMPOSE_GATE),
     Gate(module="check_turbovec_writers",
+         proven_by="scripts/test_compose_gates.py",
          summary="TurboVec has a single writer",
          **_COMPOSE_GATE),
     # `ALLOWED_RESTART` was declared and never referenced. KAI-GATE-008.

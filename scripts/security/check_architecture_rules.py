@@ -32,6 +32,10 @@ from typing import Dict, List, Set, Tuple
 REPO = Path(__file__).resolve().parent.parent.parent
 AGENTIC = REPO / "agentic"
 
+sys.path.insert(0, str(REPO))
+
+from scripts.security.gate_inputs import inspected, require  # noqa: E402
+
 # ── Role taxonomy (UH-0 evidence manifest §6) ────────────────────────
 
 PERCEPTION_PROVIDERS = {
@@ -82,10 +86,27 @@ class Violation:
         return f"  RULE {self.rule:<2} {loc:<44} {self.message}"
 
 
+# Files this gate could not read. Emptied at the start of every run.
+#
+# `_parse` used to answer `None` and every caller wrote `continue`, so a
+# file that failed to parse was invisible to **all twelve** enforced
+# rules — and the gate still printed `15/15 rules accounted for` and
+# PASS. Proven by planting a syntax error in `common/policy_bridge`:
+# exit 0, no mention of the file, clean bill of health.
+#
+# Note what that says about denominators. This gate *had* one, which is
+# why it satisfied I-2. But it counted **rules**, not **files** — so it
+# could not reveal a scanner that had gone blind to half its inputs. A
+# denominator only falsifies a pass along the dimension it measures.
+UNREADABLE: List[str] = []
+
+
 def _parse(path: Path):
     try:
         return ast.parse(path.read_text(encoding="utf-8"))
-    except (SyntaxError, OSError):
+    except (SyntaxError, OSError) as exc:
+        rel = str(path.relative_to(REPO)) if REPO in path.parents else str(path)
+        UNREADABLE.append(f"{rel}: {type(exc).__name__}")
         return None
 
 
@@ -253,7 +274,13 @@ def rule_12_privileged_schemas_forbid_extra() -> List[Violation]:
     violations = []
     contracts = REPO / "common" / "contracts"
     if not contracts.exists():
-        return violations
+        # `main()` calls `require(DECLARED_INPUTS)` first, so this cannot
+        # be reached there. It can be reached when a rule is invoked
+        # directly — by the test suite, or by a future caller — and a
+        # rule that answers "no violations" because it found nothing to
+        # inspect is the defect this gate exists to enforce against.
+        return [Violation(12, "common/contracts", 0,
+                          "directory not found — rule 12 inspected nothing")]
 
     for path in sorted(contracts.glob("*.py")):
         if path.name == "__init__.py":
@@ -295,6 +322,8 @@ def rule_14_no_fail_open() -> List[Violation]:
     for rel in PROTECTED_DIRS:
         base = REPO / rel
         if not base.exists():
+            violations.append(Violation(14, rel, 0, "protected directory "
+                                        "not found — inspected nothing"))
             continue
         for path in sorted(base.rglob("*.py")):
             if "__pycache__" in str(path):
@@ -348,6 +377,9 @@ def rule_5_trust_cannot_bypass() -> List[Violation]:
                 "common/policy_bridge/approval.py"):
         path = REPO / rel
         if not path.exists():
+            violations.append(Violation(5, rel, 0, "file not found — the "
+                                        "conviction check inspected nothing "
+                                        "here"))
             continue
         tree = _parse(path)
         if tree is None:
@@ -444,6 +476,8 @@ def rule_8_typed_operation_state() -> List[Violation]:
     for rel in PROTECTED_DIRS:
         base = REPO / rel
         if not base.exists():
+            violations.append(Violation(14, rel, 0, "protected directory "
+                                        "not found — inspected nothing"))
             continue
         for path in sorted(base.rglob("*.py")):
             if "__pycache__" in str(path):
@@ -607,7 +641,30 @@ def accounted_rules() -> Set[int]:
     return enforced | set(NOT_STATICALLY_CHECKABLE)
 
 
+# Everything these rules read. A missing protected directory means the
+# rules over it inspected nothing, which is not a clean bill of health.
+DECLARED_INPUTS = tuple(PROTECTED_DIRS) + (
+    "common/contracts",
+    "common/policy_bridge/policy_engine.py",
+    "common/policy_bridge/approval.py",
+)
+
+
+def _python_files() -> int:
+    total = 0
+    for rel in DECLARED_INPUTS:
+        base = REPO / rel
+        if base.is_file():
+            total += 1
+        elif base.is_dir():
+            total += sum(1 for p in base.rglob("*.py")
+                         if "__pycache__" not in str(p))
+    return total
+
+
 def main() -> int:
+    UNREADABLE.clear()
+    require(DECLARED_INPUTS)
     all_violations: List[Violation] = []
 
     print("Architecture dependency rules (roadmap §15)\n")
@@ -618,6 +675,22 @@ def main() -> int:
         print(f"  {mark}  rule {label}")
         for violation in found:
             print(str(violation))
+
+    # A second denominator, along the dimension the first one misses.
+    # `15/15 rules` says every rule ran; it says nothing about whether
+    # every file was readable by them.
+    print()
+    print(inspected(_python_files(), "python files",
+                    f"across {len(DECLARED_INPUTS)} declared inputs"))
+    unreadable = sorted(set(UNREADABLE))   # one entry per file, not per rule
+    if unreadable:
+        print(f"\n  UNREADABLE ({len(unreadable)}) — these files were "
+              f"invisible to every rule above:")
+        for entry in unreadable:
+            print(f"    - {entry}")
+        print("  A file the parser cannot read has not been checked. "
+              "Declining to\n  report that would make every verdict above "
+              "narrower than it looks.")
 
     print()
     for rule, why in sorted(NOT_STATICALLY_CHECKABLE.items()):
@@ -641,6 +714,11 @@ def main() -> int:
               f"{len(NOT_STATICALLY_CHECKABLE)} declared uncheckable)")
 
     print()
+    if unreadable:
+        print(f"\nFAIL: {len(unreadable)} file(s) could not be parsed and "
+              f"were checked by no rule.")
+        return 1
+
     if all_violations:
         print(f"FAIL: {len(all_violations)} architecture violation(s)")
         return 1
