@@ -11,6 +11,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parents[1]))
+from scripts.ci.declining import declined, report, reset  # noqa: E402
+
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 SOUL_CONTENT = "# KAI SOUL\nI am Kai, a sovereign AI.\nValues: honesty, curiosity."
@@ -94,7 +97,9 @@ class TestSoulEndpoints:
         """Check that /soul and /agents-registry routes are registered."""
         mod = _fresh_agentic_app()
         if not hasattr(mod, "app"):
-            pytest.skip("Module did not fully load (missing deps)")
+            declined("agentic route registration",
+                     "module did not fully load (missing deps)")
+            return
         routes = {r.path for r in mod.app.routes}
         assert "/soul" in routes, f"Missing /soul route. Found: {routes}"
         assert "/agents-registry" in routes, f"Missing /agents-registry route. Found: {routes}"

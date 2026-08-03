@@ -25,6 +25,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parents[1]))
+from scripts.ci.declining import declined, report, reset  # noqa: E402
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _write(path: Path, content: str) -> None:
@@ -363,7 +366,9 @@ class TestMemuCoreVaultEndpoints:
             importlib.reload(memu_core_app)
             return TestClient(memu_core_app.app)
         except Exception:
-            pytest.skip("memu-core import not available in test env")
+            declined("memu-core vault API",
+                     "memu-core could not be imported in this environment")
+            return None
 
     def test_vault_ingest_returns_node_id(self, client):
         r = client.post("/memory/vault/ingest", json={

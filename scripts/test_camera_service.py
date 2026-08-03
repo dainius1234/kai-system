@@ -7,6 +7,9 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parents[1]))
+from scripts.ci.declining import declined, report, reset  # noqa: E402
+
 # import camera app
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -31,12 +34,15 @@ def test_health():
 def test_capture():
     resp = client.post("/process")
     if resp.status_code == 503:
-        pytest.skip("camera hardware not available (503)")
+        declined("camera capture", "hardware not available (503)")
+        return
     assert resp.status_code == 200
     assert resp.json().get("status") == "ok"
 
 
+_ran = 0
+
 if __name__ == "__main__":
     test_health()
     test_capture()
-    print("camera service tests passed")
+    sys.exit(report("Camera Service Tests", passed=_ran, failed=0))

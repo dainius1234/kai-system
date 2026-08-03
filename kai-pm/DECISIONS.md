@@ -4127,3 +4127,60 @@ Fixed without changing behaviour: the Python moved to `scripts/ci/assert_memoriz
 
 **Files added:** `scripts/security/check_ci_tolerations.py`, `scripts/test_ci_tolerations.py`, `scripts/ci/assert_memorize_ok.py`.
 **Files modified:** `check_gate_registry.py`, `gate_registry.py`, `check_assertion_floors.py`, `assertion_floors.json`, `Makefile`, 6 workflows, sub-plan/tracker/STATUS/MAKEFILE_TARGETS.
+
+---
+
+## D163 — 2026-08-04 — "Pre-existing" Was Doing the Work of an Investigation
+
+**Context:** The operator's correction, in full: *"Pre-existing doesn't mean ok, all to be investigated, analysed and fixed."*
+
+They were right, and the phrase had been load-bearing. I had used "pre-existing failures that need a running stack" repeatedly across this programme — in status reports, in DECISIONS entries, as a reason to move on. I had never once run them and read the errors.
+
+### The count was wrong and so was the reason
+
+Running all **184** test scripts: **6 failed, not the ~10 I had been quoting.** And of those six, only three actually need a running stack.
+
+| Suite | What I said | What it was |
+|---|---|---|
+| `test_smoke_core` | needs a stack | needs a stack — and is invoked **nowhere** |
+| `test_restart_persistence` | needs a stack | needs a stack; CI provides one |
+| `test_graph_live` | needs a stack | needs a stack; CI provides one |
+| `test_executor_service` | needs a stack | **runs in-process against `TestClient`** |
+| `test_cross_session_context` | needs a stack | **`pytest.skip` outside pytest** |
+| `test_camera_service` | needs a stack | **`pytest.skip` outside pytest** |
+
+### The executor suite was asserting the pre-hardening behaviour
+
+`POST /execute` returns **503** without `KAI_SERVICE_TOKEN` — the fail-closed behaviour G-03 introduced, and correct. The suite asserted `200`, so it has been failing since the hardening landed, in-process, needing nothing.
+
+Identical in shape to `test_memu_routes`, which once asserted that a persistence failure returns 200: **a test that would fail if the code were right.** It now asserts both halves — refuses without a token, executes with one, and rejects a wrong one — because testing only the second would let fail-closed regress silently, and only the first would let the endpoint stop working.
+
+### `pytest.skip` is two different lies
+
+Run as a script it raises `Skipped`, the process exits non-zero, and it looks like a crash. **Run under pytest it is green** — a test that verified nothing counted as one that passed.
+
+Four scripts used it. `test_camera_service` printed *"camera service tests passed"* while verifying **nothing at all** in this environment.
+
+`scripts/ci/declining.py` gives the honest third option, the same shape this programme already applies to services (`unavailable_metric`) and to CI (`# ci-toleration:`): **say you did not verify, name what was missing, and count it apart from passes** so the total can never be read as coverage.
+
+```
+Camera Service Tests: 0 passed, 0 failed, 1 not verified
+
+  Not verified (preconditions absent):
+    - camera capture: hardware not available (503)
+  These assert nothing. They are counted apart from passes
+  so the total cannot be read as coverage.
+```
+
+### What this says about the rest of the programme
+
+Every number I have reported is from suites that *ran*. That remains true. But "pre-existing" was a category I had been placing things into instead of looking at them, and it had absorbed a real defect, two silent-skips, and an orphaned suite for an unknown length of time.
+
+The three that genuinely need a stack are unchanged, and one of them — `test_smoke_core` — **is invoked by nothing**: not the Makefile, not any workflow. It has been neither running nor missed.
+
+**Verification:** 2,142 tests across 31 suites, all green. 12/12 policy gates, six invariants enforced, 9 findings closed. The three stack-dependent suites still fail here and are labelled as needing a stack rather than as pre-existing. The other three pass, and two of those now report honestly that they verified nothing.
+
+**`KAI-GATE-017` opens, REMEDIATED.**
+
+**Files added:** `scripts/ci/declining.py`.
+**Files modified:** `scripts/test_executor_service.py` (rewritten), `scripts/test_camera_service.py`, `scripts/test_cross_session_context.py`, `scripts/test_d91_vault_sync.py`, `scripts/test_soul_identity.py`, sub-plan/tracker.
