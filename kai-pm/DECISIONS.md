@@ -3307,3 +3307,40 @@ Concretely — a dead memU produced `{"nudges": []}` with HTTP 200, indistinguis
 
 **Files produced:** `common/degraded.py`, `scripts/test_degraded.py`.
 **Files modified:** `dashboard/app.py`, `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `scripts/test_gaps_sprint.py`, `Makefile`, tracker/plan/README/STATUS/MAKEFILE_TARGETS.
+
+---
+
+## D146 — 2026-08-03 — "Zero LIVE" Was Not "No Bugs Left": 11 Real Defects Behind MANUAL Labels
+
+**Context:** D145 reported all 96 dashboard findings at zero LIVE. The operator then asked to move to the global hygiene work *"if you happy that you fixed and closed all, so we don't leave errors and bugs behind"*. Checking that before answering found the honest answer was **no**.
+
+**The problem with the previous report.** "Zero LIVE" meant *zero findings my checks could currently detect*. **34 findings had no check at all** — they were `MANUAL`, which the tool is careful to call "not a pass". But a status report where a third of the rows say "unknown" reads, at a glance, like a clean bill of health. Three spot-checks were enough to disprove it:
+
+- **`KAI-DASH-045` was live.** `api_upload` read the *entire* file into memory and *then* checked the 10 MB limit. A caller sending 2 GB got 2 GB buffered and a polite 413. The limit protected nothing that mattered.
+- **`046`/`047` were worse.** Audio and vision uploads had **no size check at all**.
+- **`093` was live.** Zero `Query()` constraints, so `top_k=-1` and `top_k=999999` went straight through to the backend.
+- **`084` was the opposite error:** already fixed in D145, still labelled `MANUAL`. Mislabelled as unverified rather than unverified.
+
+**Decisions:**
+
+1. **Eleven findings moved from `MANUAL` to a real check *and* a real fix.** `045`, `046`, `047`, `048`, `049`, `050`, `051`, `052`, `084`, `091`, `093`. REMEDIATED went 62 → **73**; MANUAL fell 34 → **23**.
+
+2. **`bounded_upload()` refuses during the read.** Chunked, giving up as soon as the total exceeds the limit, so a refusal costs one chunk beyond the bound rather than the whole body. The pattern the audit named — read then measure — is not a weaker limit, it is a limit that runs after the harm.
+
+3. **Uploads get their own bound.** `MAX_UPLOAD_BYTES` (10 MB) rather than `MAX_PAYLOAD_BYTES` (256 KB): a photo or voice note is legitimately megabytes, and squeezing them under the event-payload limit would have broken real use to satisfy a checker.
+
+4. **`bounded_response()` raises 502, not 413.** The oversized thing came from upstream; blaming the client would send whoever is debugging in exactly the wrong direction.
+
+5. **Filenames are canonicalised before forwarding** (`051`). The name arrives from a browser and reaches parser and OCR services that may write it to disk. Path separators, traversal segments and control characters are stripped once, here, rather than being every downstream service's problem.
+
+6. **Exception text no longer reaches callers** (`052`). 29 error paths interpolated `{exc}` into the response detail, disclosing internal service URLs and transport diagnostics to anyone who could trigger a failure. `client_error()` logs the cause and returns the shape of the problem.
+
+7. **Caller-declared content types are constrained, not trusted** (`091`). The browser's declared type is a hint. Forwarding it unchecked let a caller tell the parser to treat a file as something it is not.
+
+**The lesson, recorded because it will recur.** A tracker that reports `LIVE`, `REMEDIATED` and `MANUAL` is honest about its own coverage — and still lets a summary line read as reassurance. The fix is not to soften `MANUAL`; it is to keep converting it. **23 findings still have no automated check, and I am not claiming they are fine.** They are named, with what a human must review.
+
+**Verification:** 1,836 tests across 24 suites, all green. 9/9 CI gates. All 18 dashboard-touching test files pass. Six new behavioural tests assert on outcomes rather than markers: an 11 MB upload is refused on every upload route, `../../etc/passwd.png` arrives canonicalised, a connection error to `http://screen-capture:8059` does not appear in the response body, and out-of-range query limits return 422.
+
+**Nothing is closed.** Rule 7. Findings formally closed by this entry: **0**.
+
+**Files modified:** `common/http_hygiene.py` (`bounded_upload`, `bounded_response`), `dashboard/app.py`, `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard.py`, tracker/plan/README/STATUS/MAKEFILE_TARGETS.

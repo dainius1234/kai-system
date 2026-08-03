@@ -72,7 +72,7 @@ It is the source of truth for UH work — including an honest open-gaps list. Ve
 workstream with a single command:
 
 ```bash
-make test-uh          # all 24 UH suites, 1,825 tests
+make test-uh          # all 24 UH suites, 1,836 tests
 ```
 
 > **Built, not cut over.** All 34 actuators across 8 risk tiers are migrated with real

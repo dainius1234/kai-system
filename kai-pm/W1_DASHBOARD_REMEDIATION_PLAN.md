@@ -52,11 +52,11 @@ Produced by `scripts/security/check_dashboard_findings.py`:
 |---|---|---|---|
 | **LIVE** | 54 | **0** | the condition still holds |
 | **PARTIAL** | 2 | **0** | materially reduced, not resolved |
-| **REMEDIATED** | 3 | **62** | condition no longer holds (pending closure review) |
-| **MANUAL** | 37 | **34** | not statically decidable; named for human review |
+| **REMEDIATED** | 3 | **73** | condition no longer holds (pending closure review) |
+| **MANUAL** | 37 | **23** | not statically decidable; named for human review |
 | **Total** | 96 | **96** | coverage self-audit enforces this |
 
-**No finding of any severity reports LIVE.** 62 REMEDIATED, 34 MANUAL.
+**No finding of any severity reports LIVE.** 73 REMEDIATED, 23 MANUAL.
 MANUAL is not a pass — each names what a human must review.
 
 **Route surface:** 185 routes — 119 GET, 61 POST, 5 DELETE.

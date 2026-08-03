@@ -3,6 +3,7 @@
 from __future__ import annotations
 import asyncio
 import hashlib
+import re
 from functools import lru_cache
 from datetime import datetime, timezone
 import json as _json
@@ -11,8 +12,8 @@ from typing import Any, Dict, List, Tuple
 
 import httpx
 import redis.asyncio as aioredis
-from fastapi import (Body, Depends, FastAPI, File, HTTPException, Request,
-                     UploadFile)
+from fastapi import (Body, Depends, FastAPI, File, HTTPException, Query,
+                     Request, UploadFile)
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import (HTMLResponse, JSONResponse,
                                StreamingResponse)
@@ -22,6 +23,7 @@ from common.dashboard_auth import (DashboardPrincipal, Scope,
 from common.degraded import (degraded_response, is_degraded,
                              unavailable_metric)
 from common.http_hygiene import (MAX_PAYLOAD_BYTES, bounded_json,
+                                 bounded_response, bounded_upload,
                                  pooled_client, shutdown_pool)
 from common.resilience import resilient_call
 from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
@@ -61,6 +63,13 @@ ALLOWED_AUDIO_TYPES = frozenset({
 ALLOWED_IMAGE_TYPES = frozenset({
     "image/png", "image/jpeg", "image/webp", "image/gif",
 })
+ALLOWED_DOC_TYPES = frozenset({
+    "application/pdf", "application/octet-stream", "text/plain", "text/csv",
+    "application/zip", "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel",
+})
 
 
 def _safe_media_type(reported: str | None, allowed: frozenset,
@@ -98,6 +107,53 @@ def _audit_actor(request: Request) -> str:
 @app.on_event("shutdown")
 async def _close_shared_transport() -> None:
     await shutdown_pool()
+
+
+# ── Outbound safety for uploads and errors ───────────────────────────
+
+_SAFE_FILENAME = re.compile(r"[^A-Za-z0-9._-]")
+
+
+def safe_filename(name: str | None, fallback: str = "upload") -> str:
+    """Canonicalise a caller-supplied filename before forwarding it.
+
+    The name arrived from a browser and is passed to parser and OCR
+    services that may write it to disk (`KAI-DASH-051`). Path separators,
+    traversal segments and control characters are removed here rather
+    than being every downstream service's problem.
+    """
+    if not name:
+        return fallback
+    base = os.path.basename(name.replace("\\", "/")).strip()
+    base = base.lstrip(".") or fallback
+    cleaned = _SAFE_FILENAME.sub("_", base)[:120]
+    return cleaned or fallback
+
+
+def safe_content_type(reported: str | None, allowed: frozenset,
+                      fallback: str) -> str:
+    """Constrain a caller-declared content type to what we expect.
+
+    The browser's declared type is a hint, not a fact (`KAI-DASH-091`).
+    Forwarding it unchecked lets a caller tell the parser or vision
+    service to treat a file as something it is not.
+    """
+    if not reported:
+        return fallback
+    base = reported.split(";", 1)[0].strip().lower()
+    return base if base in allowed else fallback
+
+
+def client_error(exc: Exception, message: str) -> str:
+    """Log the real cause, return something safe to show a caller.
+
+    Proxy errors were formatted straight into the response detail, which
+    disclosed internal service URLs and transport diagnostics to anyone
+    who could trigger a failure (`KAI-DASH-052`). The detail belongs in
+    the log; the caller gets the shape of the problem, not its innards.
+    """
+    logger.warning("%s: %s", message, exc)
+    return message
 
 
 async def _proxy_get(url: str, params: dict | None = None,
@@ -961,7 +1017,7 @@ async def api_drift():
 
 @app.get("/api/memories")
 async def api_memories(
-    query: str = "", category: str = "", top_k: int = 20,
+    query: str = "", category: str = "", top_k: int = Query(20, ge=1, le=200),
     principal: DashboardPrincipal = Depends(
         require_dashboard_auth(Scope.READ_SENSITIVE)),
 ):
@@ -1004,7 +1060,7 @@ async def api_memory_stats():
 
 @app.get("/api/memories/recent")
 async def api_memories_recent(
-    top_k: int = 30,
+    top_k: int = Query(30, ge=1, le=200),
     principal: DashboardPrincipal = Depends(
         require_dashboard_auth(Scope.READ_SENSITIVE)),
 ):
@@ -1023,7 +1079,7 @@ async def api_memories_recent(
 
 @app.get("/api/memory/graph-data")
 async def api_memory_graph_data(
-    top_k: int = 80, query: str = "memories experiences observations",
+    top_k: int = Query(80, ge=1, le=200), query: str = "memories experiences observations",
     principal: DashboardPrincipal = Depends(
         require_dashboard_auth(Scope.READ_SENSITIVE)),
 ):
@@ -1193,7 +1249,7 @@ async def api_feedback_stats():
 
 @app.get("/api/logs",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
-async def api_logs(limit: int = 100, level: str = "", since: float = 0):
+async def api_logs(limit: int = Query(100, ge=1, le=500), level: str = "", since: float = Query(0, ge=0)):
     """Aggregate logs from memu-core (and potentially other services)."""
     all_logs: list = []
     params: dict = {"limit": limit}
@@ -1246,7 +1302,7 @@ async def proxy_emotion_record(request: Request):
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_emotion_timeline(
     session_id: str | None = None,
-    limit: int = 50,
+    limit: int = Query(50, ge=1, le=500),
 ):
     params: dict = {"limit": limit}
     if session_id:
@@ -1264,7 +1320,7 @@ async def proxy_reflect(request: Request):
 
 @app.get("/api/reflections",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
-async def proxy_reflections(limit: int = 10):
+async def proxy_reflections(limit: int = Query(10, ge=1, le=500)):
     return await _proxy_get(f"{MEMU_URL}/memory/self-reflections", params={"limit": limit},
                             fallback={"entries": [], "count": 0})
 
@@ -1755,20 +1811,22 @@ async def api_upload(file: UploadFile = File(...)):
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file provided")
 
-    data = await file.read()
-    if len(data) > _UPLOAD_MAX_BYTES:
-        raise HTTPException(status_code=413, detail="File too large (max 10 MB)")
+    # KAI-DASH-045 — the limit used to be checked after the whole body
+    # was already in memory, which protected nothing.
+    data = await bounded_upload(file, _UPLOAD_MAX_BYTES)
 
     ext = (file.filename.rsplit(".", 1)[-1] if "." in file.filename else "").lower()
 
     if ext in _IMAGE_EXTS:
         target_url = f"{SCREEN_CAPTURE_URL}/capture/file"
         service_name = "OCR"
-        content_type = file.content_type or "image/png"
+        content_type = safe_content_type(file.content_type,
+                                         ALLOWED_IMAGE_TYPES, "image/png")
     elif ext in _DOC_EXTS:
         target_url = f"{DOC_PARSER_URL}/parse"
         service_name = "document parser"
-        content_type = file.content_type or "application/octet-stream"
+        content_type = safe_content_type(file.content_type, ALLOWED_DOC_TYPES,
+                                         "application/octet-stream")
     else:
         raise HTTPException(status_code=415, detail=f"Unsupported file type: .{ext or '(none)'}")
 
@@ -1776,19 +1834,21 @@ async def api_upload(file: UploadFile = File(...)):
         async with pooled_client(timeout=60.0) as client:
             resp = await client.post(
                 target_url,
-                files={"file": (file.filename, data, content_type)},
+                files={"file": (safe_filename(file.filename), data, content_type)},
             )
         resp.raise_for_status()
         return resp.json()
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
         if 400 <= status < 500:
-            raise HTTPException(status_code=status, detail=f"{service_name} service rejected the file: {exc}")
-        raise HTTPException(status_code=502, detail=f"{service_name} service error: {exc}")
+            raise HTTPException(status_code=status,
+                                detail=client_error(exc, f"{service_name} service rejected the file"))
+        raise HTTPException(status_code=502,
+                            detail=client_error(exc, f"{service_name} service error"))
     except httpx.RequestError as exc:
         raise HTTPException(
             status_code=503,
-            detail=f"{service_name} service unreachable: {exc}",
+            detail=client_error(exc, f"{service_name} service unreachable"),
         )
 
 
@@ -1813,7 +1873,7 @@ async def api_tts_synthesize(request: Request):
             # sent (KAI-DASH-089) mislabels any other format and hands the
             # browser a file its type does not describe.
             return FastAPIResponse(
-                content=resp.content,
+                content=bounded_response(resp.content, "tts-service"),
                 media_type=_safe_media_type(
                     resp.headers.get("content-type"), ALLOWED_AUDIO_TYPES,
                     "application/octet-stream"),
@@ -1822,10 +1882,10 @@ async def api_tts_synthesize(request: Request):
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
         if 400 <= status < 500:
-            raise HTTPException(status_code=status, detail=f"TTS service rejected request: {exc}")
-        raise HTTPException(status_code=502, detail=f"TTS service error: {exc}")
+            raise HTTPException(status_code=status, detail=client_error(exc, "TTS service rejected request:"))
+        raise HTTPException(status_code=502, detail=client_error(exc, "TTS service error:"))
     except httpx.RequestError as exc:
-        raise HTTPException(status_code=503, detail=f"TTS service unreachable: {exc}")
+        raise HTTPException(status_code=503, detail=client_error(exc, "TTS service unreachable:"))
 
 
 @app.post("/api/audio/transcribe",
@@ -1835,24 +1895,26 @@ async def api_audio_transcribe(file: UploadFile = File(...)):
 
     Proxies to the audio-service Whisper backend. Degrades to 503 when unavailable.
     """
-    data = await file.read()
+    data = await bounded_upload(file)  # KAI-DASH-046
     try:
         async with pooled_client(timeout=60.0) as client:
             resp = await client.post(
                 f"{AUDIO_URL}/capture/file",
-                files={"file": (file.filename or "audio.webm", data, file.content_type or "audio/webm")},
+                files={"file": (safe_filename(file.filename, "audio.webm"), data,
+                       safe_content_type(file.content_type,
+                                         ALLOWED_AUDIO_TYPES, "audio/webm"))},
             )
             resp.raise_for_status()
             return resp.json()
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
         if 400 <= status < 500:
-            raise HTTPException(status_code=status, detail=f"Audio service rejected file: {exc}")
-        raise HTTPException(status_code=502, detail=f"Audio service error: {exc}")
+            raise HTTPException(status_code=status, detail=client_error(exc, "Audio service rejected file:"))
+        raise HTTPException(status_code=502, detail=client_error(exc, "Audio service error:"))
     except httpx.RequestError as exc:
         raise HTTPException(
             status_code=503,
-            detail=f"Audio service unreachable: {exc}",
+            detail=client_error(exc, "Audio service unreachable:"),
         )
 
 
@@ -1870,10 +1932,10 @@ async def api_browser_navigate(request: Request):
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
         if 400 <= status < 500:
-            raise HTTPException(status_code=status, detail=f"Browser agent rejected request: {exc}")
-        raise HTTPException(status_code=502, detail=f"Browser agent error: {exc}")
+            raise HTTPException(status_code=status, detail=client_error(exc, "Browser agent rejected request:"))
+        raise HTTPException(status_code=502, detail=client_error(exc, "Browser agent error:"))
     except httpx.RequestError as exc:
-        raise HTTPException(status_code=503, detail=f"Browser agent unreachable: {exc}")
+        raise HTTPException(status_code=503, detail=client_error(exc, "Browser agent unreachable:"))
 
 
 @app.post("/api/browser/scrape",
@@ -1888,10 +1950,10 @@ async def api_browser_scrape(request: Request):
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
         if 400 <= status < 500:
-            raise HTTPException(status_code=status, detail=f"Browser agent rejected request: {exc}")
-        raise HTTPException(status_code=502, detail=f"Browser agent error: {exc}")
+            raise HTTPException(status_code=status, detail=client_error(exc, "Browser agent rejected request:"))
+        raise HTTPException(status_code=502, detail=client_error(exc, "Browser agent error:"))
     except httpx.RequestError as exc:
-        raise HTTPException(status_code=503, detail=f"Browser agent unreachable: {exc}")
+        raise HTTPException(status_code=503, detail=client_error(exc, "Browser agent unreachable:"))
 
 
 @app.post("/api/browser/run",
@@ -1906,10 +1968,10 @@ async def api_browser_run(request: Request):
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
         if 400 <= status < 500:
-            raise HTTPException(status_code=status, detail=f"Browser agent rejected request: {exc}")
-        raise HTTPException(status_code=502, detail=f"Browser agent error: {exc}")
+            raise HTTPException(status_code=status, detail=client_error(exc, "Browser agent rejected request:"))
+        raise HTTPException(status_code=502, detail=client_error(exc, "Browser agent error:"))
     except httpx.RequestError as exc:
-        raise HTTPException(status_code=503, detail=f"Browser agent unreachable: {exc}")
+        raise HTTPException(status_code=503, detail=client_error(exc, "Browser agent unreachable:"))
 
 
 @app.get("/api/browser/screenshot",
@@ -1921,15 +1983,15 @@ async def api_browser_screenshot():
             resp = await client.post(f"{BROWSER_AGENT_URL}/screenshot")
             resp.raise_for_status()
             return FastAPIResponse(
-                content=resp.content,
+                content=bounded_response(resp.content, "browser-agent"),
                 media_type=_safe_media_type(
                     resp.headers.get("content-type"), ALLOWED_IMAGE_TYPES,
                     "application/octet-stream"),
             )
     except httpx.HTTPStatusError as exc:
-        raise HTTPException(status_code=502, detail=f"Browser agent error: {exc}")
+        raise HTTPException(status_code=502, detail=client_error(exc, "Browser agent error:"))
     except httpx.RequestError as exc:
-        raise HTTPException(status_code=503, detail=f"Browser agent unreachable: {exc}")
+        raise HTTPException(status_code=503, detail=client_error(exc, "Browser agent unreachable:"))
 
 
 # ── Vision / camera proxies ───────────────────────────────────────────────────
@@ -1937,43 +1999,47 @@ async def api_browser_screenshot():
 @app.post("/api/vision/analyze",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_vision_analyze(file: UploadFile = File(...)):
-    data = await file.read()
+    data = await bounded_upload(file)  # KAI-DASH-047
     try:
         async with pooled_client(timeout=10.0) as client:
             resp = await client.post(
                 f"{VISION_URL}/analyze/frame",
-                files={"file": (file.filename or "frame.jpg", data, file.content_type or "image/jpeg")},
+                files={"file": (safe_filename(file.filename, "frame.jpg"), data,
+                       safe_content_type(file.content_type,
+                                         ALLOWED_IMAGE_TYPES, "image/jpeg"))},
             )
             resp.raise_for_status()
             return resp.json()
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
         if 400 <= status < 500:
-            raise HTTPException(status_code=status, detail=f"Vision service rejected frame: {exc}")
-        raise HTTPException(status_code=502, detail=f"Vision service error: {exc}")
+            raise HTTPException(status_code=status, detail=client_error(exc, "Vision service rejected frame:"))
+        raise HTTPException(status_code=502, detail=client_error(exc, "Vision service error:"))
     except httpx.RequestError as exc:
-        raise HTTPException(status_code=503, detail=f"Vision service unreachable: {exc}")
+        raise HTTPException(status_code=503, detail=client_error(exc, "Vision service unreachable:"))
 
 
 @app.post("/api/vision/presence",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_vision_presence(file: UploadFile = File(...)):
-    data = await file.read()
+    data = await bounded_upload(file)  # KAI-DASH-047
     try:
         async with pooled_client(timeout=5.0) as client:
             resp = await client.post(
                 f"{VISION_URL}/analyze/presence",
-                files={"file": (file.filename or "frame.jpg", data, file.content_type or "image/jpeg")},
+                files={"file": (safe_filename(file.filename, "frame.jpg"), data,
+                       safe_content_type(file.content_type,
+                                         ALLOWED_IMAGE_TYPES, "image/jpeg"))},
             )
             resp.raise_for_status()
             return resp.json()
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
         if 400 <= status < 500:
-            raise HTTPException(status_code=status, detail=f"Vision service rejected frame: {exc}")
-        raise HTTPException(status_code=502, detail=f"Vision service error: {exc}")
+            raise HTTPException(status_code=status, detail=client_error(exc, "Vision service rejected frame:"))
+        raise HTTPException(status_code=502, detail=client_error(exc, "Vision service error:"))
     except httpx.RequestError as exc:
-        raise HTTPException(status_code=503, detail=f"Vision service unreachable: {exc}")
+        raise HTTPException(status_code=503, detail=client_error(exc, "Vision service unreachable:"))
 
 
 # ── Clipboard proxies ─────────────────────────────────────────────────────────
@@ -1993,7 +2059,7 @@ async def api_clipboard_latest():
 
 @app.get("/api/clipboard/history",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
-async def api_clipboard_history(limit: int = 20):
+async def api_clipboard_history(limit: int = Query(20, ge=1, le=500)):
     return await _proxy_get(f"{CLIPBOARD_URL}/history", params={"limit": limit}, fallback={"entries": []})
 
 
@@ -2013,7 +2079,7 @@ async def api_clipboard_clear():
 
 @app.get("/api/files/events",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
-async def api_files_events(limit: int = 50, event_type: str = ""):
+async def api_files_events(limit: int = Query(50, ge=1, le=500), event_type: str = ""):
     params: dict = {"limit": limit}
     if event_type:
         params["event_type"] = event_type
@@ -2120,7 +2186,7 @@ async def api_monitor_check_rule(rule_id: str):
 
 @app.get("/api/monitor/alerts",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
-async def api_monitor_alerts(limit: int = 50):
+async def api_monitor_alerts(limit: int = Query(50, ge=1, le=500)):
     return await _proxy_get(f"{MONITOR_URL}/alerts", params={"limit": limit}, fallback={"alerts": [], "total": 0})
 
 
@@ -2156,10 +2222,10 @@ async def api_browser_search(request: Request):
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
         if 400 <= status < 500:
-            raise HTTPException(status_code=status, detail=f"Browser agent rejected request: {exc}")
-        raise HTTPException(status_code=502, detail=f"Browser agent error: {exc}")
+            raise HTTPException(status_code=status, detail=client_error(exc, "Browser agent rejected request:"))
+        raise HTTPException(status_code=502, detail=client_error(exc, "Browser agent error:"))
     except httpx.RequestError as exc:
-        raise HTTPException(status_code=503, detail=f"Browser agent unreachable: {exc}")
+        raise HTTPException(status_code=503, detail=client_error(exc, "Browser agent unreachable:"))
 
 
 # ── Broker bridge proxies ─────────────────────────────────────────────────────
@@ -2301,7 +2367,7 @@ async def api_email_health():
 
 @app.get("/api/email/inbox",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
-async def api_email_inbox(limit: int = 20):
+async def api_email_inbox(limit: int = Query(20, ge=1, le=500)):
     return await _proxy_get(f"{EMAIL_READER_URL}/inbox", params={"limit": limit}, fallback={"messages": []})
 
 
@@ -2327,7 +2393,7 @@ async def api_news_health():
 
 @app.get("/api/news/articles",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
-async def api_news_articles(limit: int = 20, tag: str = "", since_minutes: int = 0):
+async def api_news_articles(limit: int = Query(20, ge=1, le=500), tag: str = "", since_minutes: int = 0):
     params: dict = {"limit": limit}
     if tag:
         params["tag"] = tag
@@ -2338,7 +2404,7 @@ async def api_news_articles(limit: int = 20, tag: str = "", since_minutes: int =
 
 @app.get("/api/news/search",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
-async def api_news_search(q: str = "", limit: int = 10):
+async def api_news_search(q: str = "", limit: int = Query(10, ge=1, le=500)):
     if not q:
         raise HTTPException(status_code=400, detail="q is required")
     return await _proxy_get(f"{NEWS_FEED_URL}/search", params={"q": q, "limit": limit}, fallback={"results": []})
@@ -2360,7 +2426,7 @@ async def api_news_feeds():
 
 @app.get("/api/broker/depth/{symbol}",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
-async def api_broker_depth(symbol: str, limit: int = 20):
+async def api_broker_depth(symbol: str, limit: int = Query(20, ge=1, le=500)):
     return await _proxy_get(f"{BROKER_URL}/depth/{symbol}", params={"limit": limit}, fallback={})
 
 
@@ -2372,7 +2438,7 @@ async def api_broker_stats(symbol: str):
 
 @app.get("/api/broker/trades/{symbol}",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
-async def api_broker_trades(symbol: str, limit: int = 20):
+async def api_broker_trades(symbol: str, limit: int = Query(20, ge=1, le=500)):
     return await _proxy_get(f"{BROKER_URL}/trades/{symbol}", params={"limit": limit}, fallback={"trades": []})
 
 
@@ -2482,7 +2548,7 @@ async def api_calendar_today():
 
 @app.get("/api/calendar/events/upcoming",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
-async def api_calendar_upcoming(days: int = 7):
+async def api_calendar_upcoming(days: int = Query(7, ge=1, le=365)):
     return await _proxy_get(f"{CALENDAR_SERVICE_URL}/events/upcoming", params={"days": days},
                             fallback={"events": []})
 

@@ -326,6 +326,80 @@ def test_audit_records_a_credential_derived_actor():
     assert not any(TOKEN in line for line in seen), "token leaked into audit"
 
 
+
+def test_oversized_upload_is_refused_during_the_read():
+    """KAI-DASH-045: the limit used to fire after the body was buffered."""
+    big = b"x" * (11 * 1024 * 1024)
+    resp = client.post("/api/upload", headers=AUTH,
+                       files={"file": ("big.png", big, "image/png")})
+    assert resp.status_code == 413, resp.status_code
+
+
+def test_audio_and_vision_uploads_are_bounded():
+    """KAI-DASH-046/047: these had no size check at all."""
+    big = b"x" * (11 * 1024 * 1024)
+    for path, name, mime in [
+        ("/api/audio/transcribe", "big.webm", "audio/webm"),
+        ("/api/vision/analyze", "big.jpg", "image/jpeg"),
+        ("/api/vision/presence", "big.jpg", "image/jpeg"),
+    ]:
+        resp = client.post(path, headers=AUTH,
+                           files={"file": (name, big, mime)})
+        assert resp.status_code == 413, f"{path} -> {resp.status_code}"
+
+
+def test_traversal_filename_is_canonicalised():
+    """KAI-DASH-051: the raw name reached services that write to disk."""
+    import unittest.mock as mock
+    import httpx
+
+    seen = {}
+
+    async def fake_post(self, url, **kwargs):
+        seen.update(kwargs.get("files") or {})
+        r = mock.MagicMock()
+        r.status_code = 200
+        r.raise_for_status = mock.MagicMock()
+        r.json.return_value = {"text": "ok"}
+        return r
+
+    with mock.patch.object(httpx.AsyncClient, "post", new=fake_post):
+        client.post("/api/upload", headers=AUTH,
+                    files={"file": ("../../etc/passwd.png", b"x", "image/png")})
+    assert seen, "no upload was forwarded"
+    forwarded = seen["file"][0]
+    assert "/" not in forwarded and ".." not in forwarded, forwarded
+
+
+def test_error_details_do_not_leak_internal_hosts():
+    """KAI-DASH-052: exception text carried internal URLs to the caller."""
+    import unittest.mock as mock
+    import httpx
+
+    async def fail(*args, **kwargs):
+        raise httpx.ConnectError("connection to http://screen-capture:8059 refused")
+
+    with mock.patch.object(httpx.AsyncClient, "post", new=fail):
+        resp = client.post("/api/upload", headers=AUTH,
+                           files={"file": ("a.png", b"x", "image/png")})
+    body = resp.text
+    assert "screen-capture:8059" not in body, body
+    assert "http://" not in body, body
+
+
+def test_query_limits_reject_out_of_range_values():
+    """KAI-DASH-093: negative and extreme values sailed through."""
+    for path in ("/api/memories/recent?top_k=-1",
+                 "/api/memories/recent?top_k=999999",
+                 "/api/logs?limit=0"):
+        resp = client.get(path, headers=AUTH)
+        assert resp.status_code == 422, f"{path} -> {resp.status_code}"
+
+
+def test_valid_query_limits_still_work():
+    resp = client.get("/api/memories/recent?top_k=5", headers=AUTH)
+    assert resp.status_code != 422, resp.status_code
+
 if __name__ == "__main__":
     test_health()
     test_index_minimal()
@@ -345,6 +419,12 @@ if __name__ == "__main__":
     test_health_discloses_no_topology()
     test_go_no_go_is_not_a_200_when_not_go()
     test_audit_records_a_credential_derived_actor()
+    test_oversized_upload_is_refused_during_the_read()
+    test_audio_and_vision_uploads_are_bounded()
+    test_traversal_filename_is_canonicalised()
+    test_error_details_do_not_leak_internal_hosts()
+    test_query_limits_reject_out_of_range_values()
+    test_valid_query_limits_still_work()
     test_upload_no_file()
     test_upload_too_large()
     test_upload_image_ocr_success()

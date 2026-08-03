@@ -774,6 +774,160 @@ def forced_media_type(handler: str, label: str) -> Callable[[], Result]:
     return check
 
 
+def _upload_handlers() -> List[str]:
+    tree = _tree()
+    if tree is None:
+        return []
+    found = []
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        try:
+            sig = ast.unparse(node.args)
+        except Exception:
+            continue
+        if "UploadFile" in sig:
+            found.append(node.name)
+    return found
+
+
+def unbounded_upload(*handlers: str) -> Callable[[], Result]:
+    """An upload limit enforced after the read is not a limit.
+
+    Reading the whole body and then checking its length still buffers
+    whatever was sent, so this requires the bounded reader specifically —
+    a `len(...)` guard after `await file.read()` does not count.
+    """
+    def check() -> Result:
+        offenders = []
+        for name in handlers:
+            src = _handler_src(name)
+            if not src:
+                continue
+            if "bounded_upload" in src:
+                continue
+            if "await file.read()" in src or ".read()" in src:
+                offenders.append(f"{name} reads the whole upload first")
+            else:
+                offenders.append(f"{name} has no size bound")
+        if offenders:
+            return LIVE, "; ".join(offenders[:3])
+        return REMEDIATED, (
+            f"{len(handlers)} upload handler(s) refuse during the read"
+        )
+    return check
+
+
+def unbounded_binary_response(handler: str, label: str) -> Callable[[], Result]:
+    """A proxy that materialises any backend response inherits its size."""
+    def check() -> Result:
+        src = _handler_src(handler)
+        if not src:
+            return REMEDIATED, f"{label} route removed"
+        if "bounded_response" in src:
+            return REMEDIATED, f"{label} response is size-bounded before forwarding"
+        if "resp.content" in src or "aread()" in src:
+            return LIVE, f"{label} forwards the backend response unbounded"
+        return MANUAL, f"{label} response handling needs review"
+    return check
+
+
+def dash_093() -> Result:
+    """List/search limits accept negative or extreme values."""
+    tree = _tree()
+    if tree is None:
+        return MANUAL, "dashboard source did not parse"
+    unconstrained = []
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        for arg, default in zip(
+            node.args.args[-len(node.args.defaults):] if node.args.defaults else [],
+            node.args.defaults,
+        ):
+            if arg.arg not in {"top_k", "limit", "since", "days", "offset"}:
+                continue
+            rendered = ast.unparse(default)
+            if "Query(" not in rendered:
+                unconstrained.append(f"{node.name}({arg.arg}={rendered})")
+    if unconstrained:
+        return LIVE, (f"{len(unconstrained)} unconstrained limit param(s): "
+                      f"{', '.join(unconstrained[:3])}")
+    return REMEDIATED, "every list/search limit declares a safe range"
+
+
+def dash_084() -> Result:
+    """SSE keepalive timestamps are naive UTC strings."""
+    src = _handler_src("sse_events")
+    if not src:
+        return REMEDIATED, "event stream removed"
+    if "utcnow" in src:
+        return LIVE, "SSE heartbeat uses naive datetime.utcnow()"
+    if "heartbeat" not in src:
+        return MANUAL, "no heartbeat found in sse_events(); verify by hand"
+    if "timezone.utc" not in src:
+        return PARTIAL, "heartbeat present but no timezone-aware stamp found"
+    return REMEDIATED, "SSE heartbeat carries a timezone-aware timestamp"
+
+
+def dash_051() -> Result:
+    """Uploaded filenames are forwarded without canonicalisation."""
+    text = _text()
+    raw = re.findall(r"file\.filename or ", text)
+    if raw:
+        return LIVE, f"{len(raw)} filename(s) forwarded without canonicalisation"
+    if "safe_filename" not in text:
+        return LIVE, "no filename canonicalisation before forwarding"
+    forwarded = re.findall(r'files=\{"file": \(([^,]+),', text)
+    unsafe = [f for f in forwarded if "safe_filename" not in f]
+    if unsafe:
+        return LIVE, f"raw filename forwarded: {', '.join(unsafe[:3])}"
+    return REMEDIATED, (
+        f"{len(forwarded)} forwarded filename(s) canonicalised"
+    )
+
+
+def dash_050() -> Result:
+    """Upload routing trusts filename extension and caller content type."""
+    src = _handler_src("api_upload")
+    if not src:
+        return REMEDIATED, "upload route removed"
+    if "safe_filename" not in src:
+        return LIVE, "routing trusts an uncanonicalised filename"
+    # The extension still selects the backend; that is a routing hint, not
+    # a trust decision, provided the name it comes from is sanitised and
+    # unknown types are refused.
+    if "415" not in src:
+        return PARTIAL, "unknown extensions are not refused"
+    return REMEDIATED, (
+        "routing uses a canonicalised name and refuses unknown types"
+    )
+
+
+def dash_052() -> Result:
+    """Proxy error details disclose internal URLs and transport diagnostics."""
+    text = _text()
+    leaks = re.findall(r"detail=f[\"']([^\"']*)\{exc\}", text)
+    if leaks:
+        return LIVE, f"{len(leaks)} error detail(s) interpolate the exception"
+    if "client_error" not in text:
+        return MANUAL, "no exception interpolation found; verify by hand"
+    return REMEDIATED, (
+        f"{text.count('client_error(')} error path(s) log the cause and "
+        f"return a safe message"
+    )
+
+
+def dash_091() -> Result:
+    """Audio and vision proxies trust caller-supplied media types."""
+    text = _text()
+    trusted = re.findall(r"file\.content_type or ", text)
+    if trusted:
+        return LIVE, (f"{len(trusted)} proxy call(s) forward the caller's "
+                      f"declared content type unchecked")
+    return REMEDIATED, "caller media types are not forwarded unchecked"
+
+
 # ── The finding table ────────────────────────────────────────────────
 
 class Finding(NamedTuple):
@@ -896,41 +1050,36 @@ FINDINGS: Dict[str, Finding] = {
                                           "SSE admission limit present",
                                           present_means_live=False)),
     "KAI-DASH-045": Finding(H, "E", "Post-read upload limit",
-                            manual("ordering of read() vs size check inside api_upload() "
-                                   "needs statement-order review")),
+                            unbounded_upload("api_upload")),
     "KAI-DASH-046": Finding(H, "E", "Unlimited audio upload",
-                            manual("api_audio_transcribe() has no size guard; confirm no "
-                                   "ASGI-level limit before treating as closed")),
+                            unbounded_upload("api_audio_transcribe")),
     "KAI-DASH-047": Finding(H, "E", "Unlimited vision upload",
-                            manual("api_vision_analyze()/presence() size guards")),
+                            unbounded_upload("api_vision_analyze",
+                                             "api_vision_presence")),
     "KAI-DASH-048": Finding(H, "E", "Unlimited TTS work/response",
-                            manual("api_tts_synthesize() input and response bounds")),
+                            unbounded_binary_response("api_tts_synthesize", "TTS")),
     "KAI-DASH-049": Finding(H, "E", "Unlimited screenshot response",
-                            manual("api_browser_screenshot() response bound")),
+                            unbounded_binary_response("api_browser_screenshot",
+                                                      "screenshot")),
     "KAI-DASH-053": Finding(H, "E", "Unbounded chat body", dash_053),
     "KAI-DASH-056": Finding(H, "E", "No gateway workload controls", dash_056),
     "KAI-DASH-076": Finding(M, "E", "Unbounded backend responses",
                             manual("backend response bounds apply in the shared proxy helper")),
     "KAI-DASH-092": Finding(M, "E", "Binary response buffering",
                             manual("streaming vs materialising binary responses")),
-    "KAI-DASH-093": Finding(M, "E", "Weak query limits",
-                            manual("per-route Query(ge=, le=) constraints across 24 limit params")),
+    "KAI-DASH-093": Finding(M, "E", "Weak query limits", dash_093),
 
     # ── Track F — media and filename trust ──
-    "KAI-DASH-050": Finding(H, "F", "Extension/MIME trust",
-                            manual("upload routing decision in api_upload()")),
-    "KAI-DASH-051": Finding(H, "F", "Filename propagation",
-                            manual("filename canonicalisation before backend forwarding")),
+    "KAI-DASH-050": Finding(H, "F", "Extension/MIME trust", dash_050),
+    "KAI-DASH-051": Finding(H, "F", "Filename propagation", dash_051),
     "KAI-DASH-089": Finding(M, "F", "Forced TTS media type",
                             forced_media_type("api_tts_synthesize", "TTS")),
     "KAI-DASH-090": Finding(M, "F", "Forced screenshot media type",
                             forced_media_type("api_browser_screenshot", "screenshot")),
-    "KAI-DASH-091": Finding(M, "F", "Caller media metadata trusted",
-                            manual("audio/vision proxies trust caller content-type")),
+    "KAI-DASH-091": Finding(M, "F", "Caller media metadata trusted", dash_091),
 
     # ── Track G — disclosure minimisation ──
-    "KAI-DASH-052": Finding(H, "G", "Internal error disclosure",
-                            manual("proxy error detail content across many handlers")),
+    "KAI-DASH-052": Finding(H, "G", "Internal error disclosure", dash_052),
     "KAI-DASH-055": Finding(H, "G", "Chat diagnostics leak", dash_055),
     "KAI-DASH-068": Finding(H, "G", "Root operational disclosure",
                             manual("index() aggregate payload; needs field-level review")),
@@ -971,8 +1120,7 @@ FINDINGS: Dict[str, Finding] = {
     "KAI-DASH-081": Finding(M, "I", "Deliberate mode split",
                             dash_002),  # same condition: resolved with the token removal
     "KAI-DASH-083": Finding(M, "I", "Naive synthetic times", dash_083),
-    "KAI-DASH-084": Finding(M, "I", "Naive SSE heartbeat time",
-                            manual("SSE keepalive timestamp construction in sse_events()")),
+    "KAI-DASH-084": Finding(M, "I", "Naive SSE heartbeat time", dash_084),
     "KAI-DASH-086": Finding(M, "I", "Silent event loss",
                             manual("_publish_event() delivery accounting")),
     "KAI-DASH-088": Finding(M, "I", "Missing browser security headers", dash_088),

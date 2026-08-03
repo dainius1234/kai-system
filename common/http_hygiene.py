@@ -45,8 +45,14 @@ from common.perception_spine.ingress import (
 
 __all__ = [
     "MAX_PAYLOAD_BYTES", "MAX_PAYLOAD_DEPTH", "MAX_PAYLOAD_KEYS",
-    "MAX_STRING_LENGTH", "bounded_json", "pooled_client", "shutdown_pool",
+    "MAX_STRING_LENGTH", "MAX_UPLOAD_BYTES", "bounded_json",
+    "bounded_upload", "bounded_response", "pooled_client", "shutdown_pool",
 ]
+
+# Uploads are a different order of magnitude from event payloads — a
+# photo or a voice note is legitimately megabytes — so they get their own
+# limit rather than being squeezed under MAX_PAYLOAD_BYTES.
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
 
 # ── Bounded request bodies ───────────────────────────────────────────
@@ -80,6 +86,60 @@ async def bounded_json(request: Any) -> Any:
     if violation:
         raise HTTPException(status_code=413, detail=violation)
     return payload
+
+
+async def bounded_upload(upload: Any, limit: int = MAX_UPLOAD_BYTES) -> bytes:
+    """Read an uploaded file, refusing it *during* the read.
+
+    The obvious version — ``data = await file.read()`` then check
+    ``len(data)`` — is `KAI-DASH-045`: by the time the limit is enforced
+    the whole body is already in memory, so the limit protects nothing
+    that matters. A caller sending 2 GB gets 2 GB buffered and *then* a
+    polite 413.
+
+    This reads in chunks and gives up as soon as the total exceeds the
+    limit, so the refusal costs one chunk beyond it rather than the whole
+    body.
+    """
+    from fastapi import HTTPException
+
+    chunks: list[bytes] = []
+    total = 0
+    while True:
+        chunk = await upload.read(64 * 1024)
+        if not chunk:
+            break
+        total += len(chunk)
+        if total > limit:
+            raise HTTPException(
+                status_code=413,
+                detail=f"upload exceeds {limit} bytes",
+            )
+        chunks.append(chunk)
+    return b"".join(chunks)
+
+
+def bounded_response(content: bytes, source: str,
+                     limit: int = MAX_UPLOAD_BYTES) -> bytes:
+    """Refuse a backend response that is too large to forward.
+
+    A proxy that materialises whatever a backend sends inherits that
+    backend's memory profile (`KAI-DASH-048`, `049`). The bound is here
+    rather than in the caller so the answer is the same everywhere.
+
+    Raises ``502``, not ``413``: the oversized thing came from upstream,
+    and blaming the client for it would send whoever is debugging in
+    precisely the wrong direction.
+    """
+    from fastapi import HTTPException
+
+    if len(content) > limit:
+        raise HTTPException(
+            status_code=502,
+            detail=f"{source} returned {len(content)} bytes, over the "
+                   f"{limit} byte limit",
+        )
+    return content
 
 
 # ── Pooled connections ───────────────────────────────────────────────
