@@ -58,6 +58,13 @@ from typing import Dict, List, Optional, Tuple
 REPO = Path(__file__).resolve().parent.parent.parent
 SECURITY = REPO / "scripts" / "security"
 
+# Invocation means *running* the script. A bare path match counted a
+# comment explaining a gate, and an `echo` naming it in a log message, as
+# though they configured it — so this file reported a gate as invoked by
+# two workflows that only talked about it. A gate is invoked when a
+# python interpreter is pointed at it, and not otherwise.
+_INVOCATION = re.compile(r"python3?\s+(?:-\S+\s+)*scripts/security/([a-z_]+)\.py")
+
 # Mirrored from the registry so `cross_check` stays a pure function that
 # the suite can call without importing the real registry.
 GATE_KIND = "gate"
@@ -106,16 +113,22 @@ def discover_policy_check() -> List[str]:
             if line and not line.startswith(("\t", " ")):
                 break
             block.append(line)
-    return sorted(set(re.findall(r"scripts/security/([a-z_]+)\.py",
-                                 "\n".join(block))))
+    # Comments mention scripts; they do not run them. Without this, a
+    # line explaining *why* a gate is configured a certain way counts as
+    # configuring it — which is how this file first reported a gate as
+    # invoked by two workflows that only named it in a comment.
+    body = "\n".join(l for l in block if not l.lstrip().startswith("#"))
+    return sorted(set(_INVOCATION.findall(body)))
 
 
 def discover_workflows() -> Dict[str, List[str]]:
     """Map module -> the workflow files that invoke it."""
     found: Dict[str, List[str]] = {}
     for path in sorted((REPO / ".github" / "workflows").glob("*.yml")):
-        text = path.read_text(encoding="utf-8")
-        for module in re.findall(r"scripts/security/([a-z_]+)\.py", text):
+        text = "\n".join(
+            l for l in path.read_text(encoding="utf-8").splitlines()
+            if not l.lstrip().startswith("#"))
+        for module in _INVOCATION.findall(text):
             found.setdefault(module, []).append(path.name)
     return {m: sorted(set(v)) for m, v in found.items()}
 

@@ -4076,3 +4076,54 @@ That is worth stating plainly rather than dressing up as an improvement to the h
 **`KAI-GATE-014` opens and is REMEDIATED.** Not closed: the structural prevention here is a test, not an enforced invariant, and by the operator's own criterion that is remediated rather than prevented.
 
 **Files modified:** `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `assertion_floors.json`, sub-plan/tracker/STATUS.
+
+---
+
+## D162 — 2026-08-04 — Sorting the CI Steps, and Finding Three Workflows That Do Not Parse
+
+**Context:** The operator's rule, applied to the tolerant patterns in CI: *"Zero tolerance for silent failure. High tolerance for documented skips with a reason and an owner."*
+
+### The survey found 24 patterns and 7 defects
+
+Saying what is **not** a defect matters as much as the findings, and my earlier count of "9 in core-tests" was wrong:
+
+- **6 are icon ternaries** — `[ "$C" = "0" ] && echo "✅" || echo "⚠️"`. Report formatting.
+- **8 are install tolerance** — `pip install psutil || true`. Checked empirically rather than assumed: **none of the five suites behind those installs skips on a missing import**, so the dep going absent makes the *test* fail. The tolerance is on the install; the test is still the gate.
+- **3 are legitimate absence handling** — `grep … || true` where no match is a valid outcome, and a GNU/BSD `date` fallback.
+
+Seven remain, all declared in `check_ci_tolerations.py` with a bucket, a reason, an owner and a **review date**. **None landed in the `defect` bucket** — every one has a real external blocker or is genuinely informational.
+
+### pip-audit was reporting the wrong cause while hiding real findings
+
+`pip-audit --strict --desc 2>/dev/null || echo "::warning::pip-audit found vulnerabilities"`.
+
+Measured: `--strict` exits 1 because **`python-apt` cannot be audited** — a system package, not a vulnerability — and `2>/dev/null` hid the line that said so. Meanwhile the scan does find real CVEs: `urllib3` PYSEC-2026-141 and 142, `wheel` CVE-2026-24049.
+
+So the step named the wrong cause *and* buried genuine findings. It now prints them and says plainly that enforcement is skipped, with an owner and a date. It cannot enforce yet: those CVEs are in transitive dependencies we do not pin, and a permanently red gate is an ignored gate.
+
+### KAI-GATE-016 — three workflows do not parse as YAML
+
+Found by adding a parse check to the new gate, which is not what I was looking for.
+
+`core-tests.yml`, `friday-cleanup.yml` and `weekly-report-card.yml` all terminate a `run: |` block early because embedded content begins at **column 0** — a `python3 -c "` heredoc in one, a multi-line `body="…"` shell string in the other two.
+
+**A workflow that does not parse runs nothing, and running nothing is indistinguishable from having no failures.** This is the whole thesis of the programme, sitting in the file that runs the core test suite.
+
+Fixed without changing behaviour: the Python moved to `scripts/ci/assert_memorize_ok.py` (it cannot simply be indented — the whitespace would land inside the Python string), and the two shell bodies were indented to the block's own level, which YAML then strips. Verified by parsing the result and reading back what the shell receives: **column 0, byte-identical**.
+
+**This needs the operator's eyes.** If GitHub's parser rejected these files, `core-tests.yml` has not been running, and I cannot check the Actions tab from here.
+
+### Three defects in the gate while writing it
+
+1. **Its suppression pattern matched every shell conditional.** Adding `if …; then` to catch the `if/else` form flagged ordinary conditionals across the repository — a false-positive machine, the defect this file exists to avoid producing. Structural guessing was replaced by an explicit `# ci-toleration:` marker in the workflow, cross-checked against the register **in both directions**, so neither can drift.
+
+2. **A comment counted as an invocation.** `discover_workflows()` matched any path mention, so a comment explaining a gate — and an `echo` naming it in a log line — registered as running it. I-4 caught this immediately and correctly. Invocation now requires a python interpreter pointed at the script.
+
+3. My first rewrite of the tolerated steps into `if/else` form made three declared tolerations **invisible to the very detector that declared them**. Caught by the gate's own stale-declaration check.
+
+**Verification:** 2,142 tests across 31 suites, all green — 15 in the new `test_ci_tolerations.py`. 12/12 policy gates. All six invariants at zero and enforced; 9 findings closed and re-verified.
+
+**`KAI-GATE-015` and `016` open, both REMEDIATED.** Neither closes: 015's prevention is enforced (the register runs in `policy-check`) but the *review dates* are unmet promises, and 016 needs confirmation that GitHub was accepting the files.
+
+**Files added:** `scripts/security/check_ci_tolerations.py`, `scripts/test_ci_tolerations.py`, `scripts/ci/assert_memorize_ok.py`.
+**Files modified:** `check_gate_registry.py`, `gate_registry.py`, `check_assertion_floors.py`, `assertion_floors.json`, `Makefile`, 6 workflows, sub-plan/tracker/STATUS/MAKEFILE_TARGETS.

@@ -133,6 +133,7 @@ SUITE_TARGETS = {
     "Compose Drift Tests": "test-compose-drift",
     "Secret & Restart Gate Tests": "test-secret-gates",
     "Compose Gate Tests": "test-compose-gates",
+    "CI Toleration Tests": "test-ci-tolerations",
 }
 
 

@@ -194,6 +194,20 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=False,
          in_workflows=("unified-hunter.yml",)),
 
+    # A-04c: every CI step that can pass without doing its job must be
+    # declared with a reason, an owner and a review date. Also refuses a
+    # workflow that does not parse — running nothing is indistinguishable
+    # from having no failures.
+    Gate(module="check_ci_tolerations",
+         kind=GATE,
+         summary="no undeclared CI suppression; every workflow parses",
+         inputs=(".github/workflows",),
+         denominator=r"inspected: \d+ workflow lines",
+         proven_by="scripts/test_ci_tolerations.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-015", "KAI-GATE-016")),
+
     # ── The meta-check, bound by the rules it enforces ───────────────
     # It appears in its own registry on purpose. The recursion is
     # depth-one and closed: it declares a denominator, fails closed on an

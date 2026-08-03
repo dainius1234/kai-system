@@ -75,8 +75,9 @@
 | Closure register — first 6 findings closed, I-6 re-verifies | ✅ Done | `fe1f222` | `make test-gate-registry` | 53 |
 | A-04b six compose gates fail closed + denominators; I-2 enforced | ✅ Done | `76dbba4` | `make gate-registry` | 62 |
 | A-04 complete — all six invariants enforced, 9 findings closed | ✅ Done | `dcabc73` | `make gate-registry` | 64 |
-| KAI-GATE-014 MANUAL-branch audit — absence is not remediation | ✅ Done | this commit | `make test-dashboard-findings` | 201 |
-| | | | **Total** | **2,127** |
+| KAI-GATE-014 MANUAL-branch audit — absence is not remediation | ✅ Done | `e3d718c` | `make test-dashboard-findings` | 201 |
+| KAI-GATE-015/016 CI toleration register; 3 workflows did not parse | ✅ Done | this commit | `make test-ci-tolerations` | 15 |
+| | | | **Total** | **2,142** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against

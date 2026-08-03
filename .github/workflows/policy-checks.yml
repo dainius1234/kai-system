@@ -60,5 +60,9 @@ jobs:
       # while the retrofit proceeds. An invariant that reaches zero and
       # is not added to ENFORCED fails this gate — the ratchet advances
       # itself rather than waiting to be remembered.
+      # A CI step that can pass without doing its job must be declared.
+      - name: CI toleration register
+        run: python scripts/security/check_ci_tolerations.py
+
       - name: Instrumentation invariants (I-4 enforced)
         run: python scripts/security/check_gate_registry.py --gate

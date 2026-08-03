@@ -53,6 +53,7 @@ jobs:
           python3 scripts/security/check_assertion_floors.py \
             --from-log /tmp/test-uh.log --determinism
 
+      # ci-toleration: documented-skip
       - name: Report the surface that was exercised
         if: always()
         run: |
