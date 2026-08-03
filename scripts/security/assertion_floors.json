@@ -1,0 +1,32 @@
+{
+  "note": "Minimum assertions per suite. Raise only; see scripts/security/check_assertion_floors.py.",
+  "floors": {
+    "Architecture Rule Tests": 61,
+    "Assertion Floor Tests": 40,
+    "Concurrency & Clock Tests": 51,
+    "Constraint Assessment Tests": 56,
+    "Dashboard Auth Tests": 99,
+    "Dashboard Finding Tracker Tests": 177,
+    "Dashboard UI Auth Tests": 42,
+    "Degraded State Tests": 36,
+    "Deployment Preflight Tests": 57,
+    "Erasure Tests": 75,
+    "Flags-Enabled Integration Tests": 37,
+    "Full Migration Tests": 75,
+    "Hygiene Gate Tests": 39,
+    "Invariant Guard Tests": 26,
+    "Legacy Bridge Tests": 58,
+    "Migration & Active Mode Tests": 136,
+    "Payload Bounds Tests": 24,
+    "Service Auth Tests": 59,
+    "UH-1 Contract Tests": 126,
+    "UH-2 Perception Spine Tests": 166,
+    "UH-3 World State Tests": 71,
+    "UH-4 Proposal Workspace Tests": 52,
+    "UH-5 Policy Bridge Tests": 49,
+    "UH-6 Vertical Slice Tests": 86,
+    "UH-7 Actuator Registry Tests": 75,
+    "UH-8 Autonomy Tests": 174
+  },
+  "total": 1947
+}

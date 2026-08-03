@@ -3525,3 +3525,65 @@ All of it now runs against synthetic counts through `ratchet()` and an in-proces
 **Verification:** 1,907 tests across 25 suites, all green. 10/10 CI gates. Every one of the 23 changed services verified by **import**, not just compile — a bad import anchor is a runtime `NameError`, not a syntax error. Ten suites fail both before and after; they need a running stack.
 
 **Nothing is closed.** Rule 7.
+
+---
+
+## D152 — 2026-08-03 — A-02: Naming and Gating the Self-Consuming Guard
+
+**Context:** D151 recorded the fifth time a check in this programme quietly stopped checking, and I closed it with a description of the shape but no mechanism. The operator's question was the right one — *"what you gonna do about it?"* — and then they did the more useful thing and named it:
+
+> **A self-consuming guard** — a precondition that shrinks in scope because of the success of the operation it guards, until the test silently tests nothing.
+
+That name is adopted here and in the module docstring. It earns its place because it is *diagnostic*: it tells you where to look. Any guard whose condition reads state the guarded operation improves is suspect, before you know whether it has broken yet.
+
+The operator proposed four fixes. All four are implemented:
+
+| | Proposed | Where it landed |
+|---|---|---|
+| 1 | Test against synthetic data, not production state | Every case in `scripts/test_assertion_floors.py` is driven from a hand-written log string and a temporary floors file. Nothing reads the repository's real counts |
+| 2 | Guard on invariants, not current state | The four `test_*_invariant_*` cases assert structural facts — every sampled suite is floored, every sampled target exists in the `Makefile`, every floor is a positive integer, the stated total is the sum — which stay true as the counts change |
+| 3 | Name the pattern | Adopted verbatim in the docstring of `scripts/security/check_assertion_floors.py` and here |
+| 4 | Add a meta-assertion — `assert len(active_tests) == EXPECTED_COUNT` | `EXPECTED_SCENARIOS = 20`, checked against the cases that actually reported having run, plus a second check that none ran twice |
+
+### One correction to the record
+
+The operator read the hygiene suite's 39 as *"a stable fixed point — the number of checks remaining after all the zero-column guards silently dropped out."* It is the opposite: 39 is the **repaired** count. The verified sequence is `19 → 29 → 34 standalone / 31 under make test-uh → 39 after the synthetic-data fix`.
+
+The distinction matters because it changes what a detector must look for. The erosion signature was never a falling number — nobody would have missed that. It was **state-dependence**: the same suite reporting 34 alone and 31 in the aggregate, because early-returns fired differently depending on what had already run. A floor alone would have sat at 31 and stayed green forever.
+
+### So the gate has two detectors
+
+**Floors** catch erosion *over time*. `scripts/security/assertion_floors.json` records a minimum per suite; the gate fails when one is not met. Floors move in one direction — up. `--update-floors` refuses to lower one:
+
+> *If a suite genuinely lost coverage, lower its floor in a separate commit that says why. That is the conversation this gate exists to force.*
+
+Same ratchet shape as `hygiene_survey.py` (D148), inverted: there the debt may only fall, here the coverage may only rise. A ratchet has no number to argue about, only a direction.
+
+**Determinism** catches erosion *at a point in time*. Eight sampled suites are re-run alone via `make` and compared to their aggregate count. A count that varies with what else has run is a count guarded on state the suite does not control — the pattern caught in the act, rather than a year later.
+
+### Three rules exist so this gate does not become case 6
+
+- A floored suite that produces **no count** fails. Vanishing is the most complete way to stop checking, and it looks exactly like silence. (Case 4 — a node suite exited 0 with no output.)
+- A suite in the output that is **not floored** fails. An unfloored suite is unwatched, and unwatched coverage drifts down.
+- A determinism sample naming a suite that no longer reports **fails**. The obvious `if label not in aggregate: continue` would make this file sample fewer suites every time one was renamed — silently, and green. That is case 5 rewritten inside the fix for case 5, and the test for it is `test_a_renamed_sample_fails_rather_than_being_skipped`.
+
+The invariant test caught its own author immediately: adding `Assertion Floor Tests` to the determinism sample without a floor failed the first run, by design.
+
+### The gap this exposed: none of it ran in CI
+
+Wiring the gate up meant finding where `make test-uh` runs in CI. It does not. **All 26 suites — 1,947 assertions, including every Wave 1 dashboard guard, the degraded envelope, the hygiene ratchet and the architecture rules — ran nowhere but a developer's laptop.**
+
+That is the same defect at the level above: a check that is never invoked is a check that has stopped checking, and it had been true for the entire programme. `.github/workflows/unified-hunter.yml` now runs `make test-uh` on every push and pull request to `main`, then the assertion ratchet against that run's output. `merge-gate` runs it too.
+
+Two dependencies of that workflow are load-bearing and easy to lose: **node** (without it `test-dashboard-ui-auth` vanishes — which the gate now reports rather than skipping) and `set -o pipefail` before the `tee` (without it a red test run exits 0).
+
+**A-02 is the 11th CI gate.**
+
+**What this does not do.** The floors count assertions, and a count is a proxy. A suite can hold its number while its assertions hollow out — `check("x", True)` counts the same as a real one. This catches *shrinkage*, not *vacuity*. That is a narrower claim than "tests cannot go vacuous", and it is the honest one.
+
+**Verification:** 1,947 tests across 26 suites, all green — 40 of them this gate's own. 10/10 CI gates plus the new one. `make assertion-floors` passes both detectors: every suite meets its floor, and all eight sampled suites report identical counts alone and in aggregate. Proven to fail on a shrinking suite (named, with the delta), a vanished suite, an unfloored suite, an empty run, a context-dependent count, a renamed sample, and a red aggregate run — the last reported as *itself* rather than disguised as erosion.
+
+**Nothing is closed.** Rule 7.
+
+**Files added:** `scripts/security/check_assertion_floors.py`, `scripts/security/assertion_floors.json`, `scripts/test_assertion_floors.py`, `.github/workflows/unified-hunter.yml`.
+**Files modified:** `Makefile`, `README.md`, `kai-pm/MAKEFILE_TARGETS.md`, `kai-pm/STATUS.md`, `kai-pm/UH_PROGRESS_TRACKER.md`.

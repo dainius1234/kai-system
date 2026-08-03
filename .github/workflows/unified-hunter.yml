@@ -1,0 +1,60 @@
+name: Unified Hunter Suites
+
+# The 26 suites behind `make test-uh` — contracts, perception spine, world
+# state, autonomy, migration, and every Wave 1 remediation guard — ran
+# nowhere in CI until this file existed. They were enforced only when
+# somebody remembered to run them locally, which is the same defect the
+# assertion-floor gate below exists to catch, one level up: a check that
+# is never invoked is a check that has stopped checking.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unified-hunter:
+    runs-on: ubuntu-latest
+    env:
+      MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
+      HMAC_ALLOW_DEV_SECRET: "true"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # `test-dashboard-ui-auth` drives the browser credential shim under
+      # node; without it that suite vanishes, which the floor gate then
+      # reports as a vanished suite rather than passing quietly.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml fastapi 'httpx<1' starlette pydantic
+
+      - name: Unified Hunter suites
+        run: |
+          set -o pipefail
+          make test-uh 2>&1 | tee /tmp/test-uh.log
+
+      # Ratchet, not a threshold: fails when a suite exercises *less* than
+      # its recorded floor, vanishes from the output, or reports a
+      # different count depending on what else has run.
+      # See kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md (A-02).
+      - name: Assertion-count ratchet
+        run: |
+          python3 scripts/security/check_assertion_floors.py \
+            --from-log /tmp/test-uh.log --determinism
+
+      - name: Report the surface that was exercised
+        if: always()
+        run: |
+          python3 scripts/security/check_assertion_floors.py \
+            --from-log /tmp/test-uh.log --json || true
