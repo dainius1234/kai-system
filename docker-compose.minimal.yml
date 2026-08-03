@@ -254,7 +254,7 @@ services:
       # fails closed: without these it answers 503 on every route.
       KAI_DASHBOARD_TOKEN: "${KAI_DASHBOARD_TOKEN:-}"
       KAI_DASHBOARD_IDENTITY: "${KAI_DASHBOARD_IDENTITY:-keeper}"
-      KAI_DASHBOARD_ROLE: "${KAI_DASHBOARD_ROLE:-keeper}"
+      KAI_DASHBOARD_ROLE: "${KAI_DASHBOARD_ROLE:-operator}"
       MEMU_URL: http://memu-core:8001
       MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
       HEARTBEAT_URL: http://heartbeat:8010

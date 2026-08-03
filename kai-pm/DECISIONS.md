@@ -3396,3 +3396,36 @@ Concretely — a dead memU produced `{"nudges": []}` with HTTP 200, indistinguis
 **Nothing is closed.** Rule 7. Findings formally closed by this entry: **0**. 95 of 96 now carry mechanical evidence for a future closure review.
 
 **Files modified:** `common/resilience.py`, `common/http_hygiene.py`, `dashboard/app.py`, `dashboard/static/app.html`, `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `scripts/test_browser_agent.py`, tracker/plan/README/STATUS/MAKEFILE_TARGETS.
+
+---
+
+## D148 — 2026-08-03 — Keeper Is Not the Default; the Hygiene Debt Now Ratchets
+
+**Context:** Asked whether I would be satisfied with the remediation *as Kai* rather than as a metric, I named two weaknesses of my own making. This closes both.
+
+### The default credential carried keeper authority
+
+**D142 built five scopes and three roles, then made the default deployment a single token with `keeper` role.** One leaked string carried authority to rewrite `SOUL.md`, values and conscience, and to drive the browser agent and schedulers. A role model whose default is the top role is decorative.
+
+The default is now **`operator`**: reads everything, makes routine changes, cannot touch identity state or drive external action. **Keeper must be asked for by name** — in `common/dashboard_auth.py`, all three compose profiles, and `setup_service_token.sh`, which now prints how to grant it deliberately.
+
+**Writing the test for that found a worse bug.** `KAI_ALLOW_UNAUTHENTICATED=true` is meant to skip *authentication* for local development. It returned a principal and HTTP 200 **before the scope check ran** — so setting one development flag granted more authority than any configured credential ever could, including identity rewrite. The escape-hatch principal is now an `operator` *and* goes through the same `may(scope)` check as a real one. Recorded as `KAI-DASH-D03`; the keeper default as `KAI-DASH-D04`. Both flip under test.
+
+That bug existed because I wrote the escape hatch as an early return. The early return was the whole defect, and it looked like an obvious simplification.
+
+### The hygiene debt now ratchets rather than decaying
+
+136 instances across 27 services cannot be fixed in one change, and a gate that starts red is a gate people learn to ignore.
+
+**`hygiene_survey.py --gate` compares against a recorded baseline and fails only if a count has *risen*.** Weaker than "must be zero" on purpose: it is honest about existing debt while making it impossible to add more. `--update-baseline` locks in every improvement and **refuses to raise the ceiling** — otherwise the change that breaks the gate could silence it in the same commit.
+
+Wired as the **10th CI policy gate**. Nineteen tests prove it can fail: every column is ratcheted independently, a missing baseline is a failure rather than a free pass, and raising the ceiling is refused with the reason.
+
+**Why a ratchet and not a threshold.** A threshold invites arguing about the number. A ratchet has no number to argue about: the only permitted direction is down. It also means the gate is useful from the first commit rather than after the cleanup it is supposed to protect.
+
+**Verification:** 1,887 tests across 25 suites, all green. 10/10 CI gates. The ratchet was proven by injecting a real regression into `weather-service` — it failed with the column named, and refused to be silenced by `--update-baseline`.
+
+**Nothing is closed.** Rule 7.
+
+**Files produced:** `scripts/security/hygiene_baseline.json`, `scripts/test_hygiene_gate.py`.
+**Files modified:** `common/dashboard_auth.py`, `scripts/setup_service_token.sh`, `scripts/security/hygiene_survey.py`, `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_auth.py`, three compose profiles, `.github/workflows/policy-checks.yml`, `Makefile`, tracker/README/STATUS/MAKEFILE_TARGETS.

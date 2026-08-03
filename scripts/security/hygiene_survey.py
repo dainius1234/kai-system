@@ -12,9 +12,17 @@ a command rather than a number somebody typed into a document once.
 See `kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md`. The totals should only ever
 fall; this is the measurement that makes that checkable.
 
+**The ratchet.** With ``--gate`` the current totals are compared against
+`scripts/security/hygiene_baseline.json`. The run fails if any count has
+*risen*. That is deliberately weaker than "must be zero": a gate that
+starts red is a gate people learn to ignore, and 136 pre-existing
+instances cannot be fixed in one change. A ratchet is honest about the
+debt while making it impossible to add more — and every time the debt
+falls, ``--update-baseline`` locks the improvement in.
+
 Exit codes:
-  0  always by default — this is a survey, not a gate
-  1  with --max-total N, when the total exceeds N
+  0  survey clean, or counts unchanged/improved under --gate
+  1  --gate and a count has risen, or --max-total exceeded
 """
 from __future__ import annotations
 
@@ -24,7 +32,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 REPO = Path(__file__).resolve().parent.parent.parent
 
@@ -100,11 +108,40 @@ def survey() -> Dict[str, Dict[str, int]]:
     return results
 
 
+BASELINE = Path(__file__).resolve().parent / "hygiene_baseline.json"
+
+
+def load_baseline() -> Optional[Dict[str, int]]:
+    try:
+        return json.loads(BASELINE.read_text(encoding="utf-8"))["totals"]
+    except (OSError, KeyError, ValueError):
+        return None
+
+
+def ratchet(totals: Dict[str, int]) -> List[str]:
+    """Report any count that has risen above the recorded baseline."""
+    baseline = load_baseline()
+    if baseline is None:
+        return ["no baseline recorded; run with --update-baseline"]
+    risen = []
+    for column in COLUMNS:
+        was = baseline.get(column)
+        if was is None:
+            risen.append(f"{column}: absent from the baseline")
+        elif totals[column] > was:
+            risen.append(f"{column}: {was} → {totals[column]} (+{totals[column] - was})")
+    return risen
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Survey HTTP/time hygiene")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--max-total", type=int, default=None,
                         help="exit non-zero if the total exceeds this")
+    parser.add_argument("--gate", action="store_true",
+                        help="fail if any count has risen above the baseline")
+    parser.add_argument("--update-baseline", action="store_true",
+                        help="record the current counts as the new ceiling")
     args = parser.parse_args()
 
     results = survey()
@@ -115,9 +152,34 @@ def main() -> int:
     }
     grand = sum(totals.values())
 
+    risen = ratchet(totals) if args.gate else []
+
+    if args.update_baseline:
+        baseline = load_baseline() or {}
+        worse = [c for c in COLUMNS if totals[c] > baseline.get(c, totals[c])]
+        if worse:
+            print("REFUSED: the baseline may only be lowered. Risen: "
+                  + ", ".join(worse))
+            return 1
+        BASELINE.write_text(
+            json.dumps({
+                "note": "Ceiling for scripts/security/hygiene_survey.py --gate. "
+                        "Lower only; see kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md.",
+                "totals": totals,
+                "grand_total": grand,
+            }, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        print(f"Baseline updated: {totals} (total {grand})")
+        return 0
+
     if args.json:
         print(json.dumps({"services": results, "totals": totals,
-                          "adopted": adopted, "grand_total": grand}, indent=2))
+                          "adopted": adopted, "grand_total": grand,
+                          "baseline": load_baseline(), "risen": risen},
+                         indent=2))
+        if risen:
+            return 1
         return 1 if args.max_total is not None and grand > args.max_total else 0
 
     print("Repository-wide HTTP and time hygiene survey\n")
@@ -146,6 +208,24 @@ def main() -> int:
     print(f"\n  Grand total: {grand}. This number should only ever fall.")
     print("  Plan: kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md")
     print("  This is a survey, not a gate. It closes no findings (Rule 7).")
+
+    baseline = load_baseline()
+    if baseline is not None:
+        recorded = sum(baseline.get(c, 0) for c in COLUMNS)
+        delta = grand - recorded
+        arrow = "unchanged" if delta == 0 else (f"+{delta}" if delta > 0 else str(delta))
+        print(f"  Baseline: {recorded} ({arrow}).")
+
+    if risen:
+        print("\n  GATE FAILED — these counts have risen:")
+        for line in risen:
+            print(f"    - {line}")
+        print("\n  Use common/http_hygiene.py and common/degraded.py rather "
+              "than adding\n  new instances. If a rise is genuinely correct, "
+              "say why in the commit.")
+        return 1
+    if args.gate:
+        print("\n  GATE PASSED: nothing has got worse.")
 
     if args.max_total is not None and grand > args.max_total:
         print(f"\n  OVER BUDGET: {grand} > {args.max_total}")

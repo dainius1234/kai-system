@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-03 (thirteenth pass — MANUAL converted 34 → 1; 95 of 96 mechanically verified)
+**Last updated:** 2026-08-03 (fourteenth pass — keeper no longer the default; hygiene ratchet is the 10th CI gate)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -55,12 +55,14 @@
 | W-01 Modules wired into the running app | ✅ Done | this commit | `make test-invariant-guards` | (guards) |
 | A-01 Architecture dependency CI gate — all 15 rules | ✅ Done | `cb3f142` | `make test-architecture-rules` | 61 |
 | W1-DASH Dashboard finding tracker (96 findings) | ✅ Done | `dff418d` | `make test-dashboard-findings` | 177 |
-| W1-DASH-A Dashboard inbound identity | ✅ Done | `9fb0e26` | `make test-dashboard-auth` | 89 |
+| W1-DASH-A Dashboard inbound identity | ✅ Done | `9fb0e26` | `make test-dashboard-auth` | 99 |
 | W1-DASH-D01 Browser credential shim | ✅ Done | `eb5b084` | `make test-dashboard-ui-auth` | 42 |
 | W1-DASH-C Caller-scoped memory reads | ✅ Done | `d18a089` | `make test-dashboard` | (folded in) |
 | W1-DASH-D Failure semantics (degraded envelope) | ✅ Done | `dc95692` | `make test-degraded` | 36 |
-| W1-DASH-E–I Bounds, media, disclosure, fan-out, hygiene | ✅ Done | this commit | `make test-dashboard` | (folded in) |
-| | | | **Total** | **1,858** |
+| W1-DASH-E–I Bounds, media, disclosure, fan-out, hygiene | ✅ Done | `a48b78d` | `make test-dashboard` | (folded in) |
+| W1-SEC-1 Keeper is an explicit grant, not the default | ✅ Done | this commit | `make test-dashboard-auth` | (folded in) |
+| H-5 Repo-wide hygiene ratchet (10th CI gate) | ✅ Done | this commit | `make test-hygiene-gate` | 19 |
+| | | | **Total** | **1,887** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
@@ -287,6 +289,7 @@ a human must review. MANUAL is not a pass.
 | `make test-dashboard-auth` | 89 tests on the auth module itself |
 | `make test-dashboard-ui-auth` | 42 tests on the browser credential shim |
 | `make test-degraded` | 36 tests that an outage cannot look like an answer |
+| `make hygiene-gate` | Ratchet: fails if repo-wide hygiene debt rises |
 
 **Deployment:** the gateway fails closed. `KAI_DASHBOARD_TOKEN` must be set
 or every protected route answers 503. `make setup-service-token` generates

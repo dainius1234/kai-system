@@ -101,12 +101,28 @@ def test_unconfigured_refuses_even_with_no_header():
 
 def test_escape_hatch_is_explicit_and_single():
     with _Env(**{ALLOW_UNAUTH_ENV: "true"}):
-        principal, status, detail = authenticate(None, Scope.WRITE_EXTERNAL, "op")
+        principal, status, detail = authenticate(
+            None, Scope.READ_OPERATIONAL, "op")
     check("explicit escape hatch allows unauthenticated", status == 200, detail)
     check("escape hatch issues a named local principal",
           principal is not None and principal.identity == "local-development")
     check("escape hatch is labelled in the detail",
           "explicitly allowed" in detail, detail)
+
+
+def test_escape_hatch_is_still_subject_to_scopes():
+    """The bypass is for authentication, not for authorisation.
+
+    Returning early on this path would have made setting one development
+    flag grant more authority than any configured credential ever could.
+    """
+    with _Env(**{ALLOW_UNAUTH_ENV: "true"}):
+        _, external, d1 = authenticate(None, Scope.WRITE_EXTERNAL, "browser")
+        _, identity, d2 = authenticate(None, Scope.WRITE_IDENTITY, "soul")
+        _, allowed, _ = authenticate(None, Scope.READ_SENSITIVE, "memory")
+    check("unauthenticated cannot drive external action", external == 403, d1)
+    check("unauthenticated cannot rewrite identity state", identity == 403, d2)
+    check("unauthenticated retains operator-level reads", allowed == 200)
 
 
 def test_empty_token_is_not_a_bypass():
@@ -226,14 +242,48 @@ def test_unknown_role_in_single_token_form_fails_closed():
           status == 503, f"{status}: {detail}")
 
 
-def test_single_token_defaults_to_keeper_with_named_identity():
+def test_the_default_role_is_not_keeper():
+    """The role model is decorative if the default hands out the top role.
+
+    A single leaked token defaulting to `keeper` would carry authority to
+    rewrite SOUL.md and drive the browser agent. Granting that must be a
+    conscious act, so it has to be asked for by name.
+    """
     with _Env(**{TOKEN_ENV: GOOD}):
         pairs = load_principals()
     check("single-token form yields exactly one principal", len(pairs) == 1)
-    check("single-token form defaults to keeper",
-          pairs and pairs[0][1].role is Role.KEEPER)
+    check("the default role is NOT keeper",
+          pairs and pairs[0][1].role is not Role.KEEPER,
+          pairs[0][1].role.value if pairs else "none")
+    check("the default role is operator",
+          pairs and pairs[0][1].role is Role.OPERATOR,
+          pairs[0][1].role.value if pairs else "none")
+    check("the default cannot rewrite identity state",
+          pairs and not pairs[0][1].may(Scope.WRITE_IDENTITY))
+    check("the default cannot drive external action",
+          pairs and not pairs[0][1].may(Scope.WRITE_EXTERNAL))
     check("single-token form has a non-empty identity",
           pairs and bool(pairs[0][1].identity))
+
+
+def test_keeper_must_be_asked_for_by_name():
+    with _Env(**{TOKEN_ENV: GOOD, ROLE_ENV: "keeper"}):
+        pairs = load_principals()
+    check("keeper is granted when explicitly configured",
+          pairs and pairs[0][1].role is Role.KEEPER)
+
+
+def test_the_escape_hatch_does_not_confer_keeper():
+    """Development convenience must not also be privilege escalation."""
+    with _Env(**{ALLOW_UNAUTH_ENV: "true"}):
+        principal, status, _ = authenticate(None, Scope.READ_OPERATIONAL, "op")
+        _, identity_status, _ = authenticate(None, Scope.WRITE_IDENTITY, "soul")
+    check("the escape hatch still authenticates", status == 200)
+    check("the escape hatch does not confer keeper",
+          principal is not None and principal.role is not Role.KEEPER,
+          principal.role.value if principal else "none")
+    check("an unauthenticated caller still cannot rewrite identity",
+          identity_status == 403, str(identity_status))
 
 
 # ── Authorisation — least privilege (KAI-DASH-018) ───────────────────
@@ -386,6 +436,7 @@ def run() -> None:
     test_unconfigured_fails_closed()
     test_unconfigured_refuses_even_with_no_header()
     test_escape_hatch_is_explicit_and_single()
+    test_escape_hatch_is_still_subject_to_scopes()
     test_empty_token_is_not_a_bypass()
     test_misconfiguration_fails_closed_not_open()
     test_valid_token_authenticates()
@@ -398,7 +449,9 @@ def run() -> None:
     test_duplicate_tokens_are_a_configuration_error()
     test_principal_entries_require_identity_and_token()
     test_unknown_role_in_single_token_form_fails_closed()
-    test_single_token_defaults_to_keeper_with_named_identity()
+    test_the_default_role_is_not_keeper()
+    test_keeper_must_be_asked_for_by_name()
+    test_the_escape_hatch_does_not_confer_keeper()
     test_viewer_cannot_write()
     test_viewer_can_read_operational()
     test_operator_cannot_rewrite_identity_or_act_externally()

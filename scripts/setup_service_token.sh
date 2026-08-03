@@ -48,8 +48,16 @@ if ! grep -qE '^KAI_DASHBOARD_ROLE=' "$ENV_FILE"; then
   # The identity is also the memory subject (KAI-DASH-023): memory reads
   # are scoped to it, and the stack's existing records are under "keeper".
   printf 'KAI_DASHBOARD_IDENTITY=%s\n' "keeper" >> "$ENV_FILE"
-  printf 'KAI_DASHBOARD_ROLE=%s\n' "keeper" >> "$ENV_FILE"
-  echo "Set KAI_DASHBOARD_IDENTITY=keeper, KAI_DASHBOARD_ROLE=keeper."
+  # The ROLE is deliberately `operator`, not `keeper`. An operator can
+  # read everything and make routine changes; only a keeper can rewrite
+  # SOUL.md, values and conscience, or drive the browser agent and
+  # schedulers. Handing that out by default would make the role model
+  # decorative.
+  printf 'KAI_DASHBOARD_ROLE=%s\n' "operator" >> "$ENV_FILE"
+  echo "Set KAI_DASHBOARD_IDENTITY=keeper, KAI_DASHBOARD_ROLE=operator."
+  echo
+  echo "To grant identity-rewrite and external-action authority, change"
+  echo "KAI_DASHBOARD_ROLE to 'keeper' in $ENV_FILE deliberately."
 fi
 
 chmod 600 "$ENV_FILE" 2>/dev/null || true

@@ -49,3 +49,8 @@ jobs:
         run: python scripts/security/check_compose_drift.py
       - name: Architecture dependency rules
         run: python scripts/security/check_architecture_rules.py
+
+      # Ratchet, not a threshold: fails only if the debt has grown. See
+      # kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md for why it starts non-zero.
+      - name: HTTP and time hygiene ratchet
+        run: python scripts/security/hygiene_survey.py --gate

@@ -99,6 +99,10 @@ class Role(str, Enum):
     KEEPER = "keeper"
 
 
+# The default when a deployment does not say otherwise. Deliberately not
+# KEEPER — see `load_principals`.
+DEFAULT_ROLE = Role.OPERATOR
+
 ROLE_SCOPES: Dict[Role, frozenset] = {
     Role.VIEWER: frozenset({Scope.READ_OPERATIONAL}),
     Role.OPERATOR: frozenset({
@@ -215,7 +219,12 @@ def load_principals() -> List[Tuple[str, DashboardPrincipal]]:
     # "keeper", so any other default would silently return an empty
     # Diary rather than fail visibly.
     identity = _read_env(IDENTITY_ENV, "keeper").strip() or "keeper"
-    role_name = _read_env(ROLE_ENV, Role.KEEPER.value).strip().lower()
+    # Default to `operator`, not `keeper`. The scopes and roles above are
+    # worth nothing if the default deployment hands out the top one: a
+    # single leaked token would carry authority to rewrite SOUL.md and
+    # drive the browser agent. Granting keeper should be a conscious act,
+    # so it must be asked for by name.
+    role_name = _read_env(ROLE_ENV, Role.OPERATOR.value).strip().lower()
     try:
         role = Role(role_name)
     except ValueError:
@@ -262,11 +271,24 @@ def authenticate(
                     "because %s=true. Never set this outside local development.",
                     operation, ALLOW_UNAUTH_ENV,
                 )
-            return (
-                DashboardPrincipal("local-development", Role.KEEPER, session),
-                200,
-                "unauthenticated (explicitly allowed)",
-            )
+            # Development convenience must not also be a privilege
+            # escalation. The escape-hatch principal is an `operator`,
+            # and — critically — it goes through the *same* scope check
+            # as a real one. Returning early here would have bypassed
+            # authorisation entirely, so setting the flag would have
+            # granted more than any configured credential ever could.
+            local = DashboardPrincipal("local-development", Role.OPERATOR, session)
+            if not local.may(scope):
+                logger.warning(
+                    "SECURITY: unauthenticated caller denied '%s' — %s lacks %s",
+                    operation, local.role.value, scope.value,
+                )
+                return None, 403, (
+                    f"{local.role.value} is not permitted to {scope.value}; "
+                    f"'{operation}' requires it. Unauthenticated access is "
+                    f"limited to {local.role.value} authority."
+                )
+            return local, 200, "unauthenticated (explicitly allowed)"
         logger.error(
             "SECURITY: dashboard route '%s' refused — neither %s nor %s is "
             "configured. Set credentials, or set %s=true for local development only.",

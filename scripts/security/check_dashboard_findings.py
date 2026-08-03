@@ -1266,6 +1266,74 @@ def dash_092() -> Result:
     )
 
 
+def dash_d03() -> Result:
+    """The unauthenticated escape hatch bypassed authorisation entirely.
+
+    `KAI_ALLOW_UNAUTHENTICATED=true` is meant to skip *authentication*
+    for local development. It returned a principal and status 200 before
+    the scope check ran, so setting one development flag granted more
+    authority than any configured credential could — including identity
+    rewrite. Found by a test written to assert the opposite.
+    """
+    path = REPO / "common" / "dashboard_auth.py"
+    try:
+        src = path.read_text(encoding="utf-8")
+    except OSError:
+        return MANUAL, "common/dashboard_auth.py not readable"
+    if "unauthenticated_allowed" not in src:
+        return REMEDIATED, "no escape hatch exists"
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return MANUAL, "dashboard_auth.py did not parse"
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if node.name != "authenticate":
+            continue
+        body = ast.unparse(node)
+        head = body[:body.find("if not authorization")] if "if not authorization" in body else body
+        if "local-development" not in head:
+            return MANUAL, "escape-hatch branch not located"
+        if ".may(" not in head:
+            return LIVE, "the escape hatch returns before the scope check"
+        return REMEDIATED, "the escape hatch is still subject to scope checks"
+    return MANUAL, "authenticate() not found"
+
+
+def dash_d04() -> Result:
+    """A single default credential carried keeper authority.
+
+    Five scopes and three roles are decorative if the default deployment
+    hands out the top one: one leaked token would carry authority to
+    rewrite SOUL.md and drive the browser agent.
+    """
+    path = REPO / "common" / "dashboard_auth.py"
+    try:
+        src = path.read_text(encoding="utf-8")
+    except OSError:
+        return MANUAL, "common/dashboard_auth.py not readable"
+    if "ROLE_ENV, Role.KEEPER.value" in src:
+        return LIVE, "the default role is keeper"
+    if "ROLE_ENV, Role.OPERATOR.value" not in src:
+        return MANUAL, "default role could not be determined"
+
+    offenders = []
+    for name in ("docker-compose.full.yml", "docker-compose.minimal.yml",
+                 "docker-compose.sovereign.yml"):
+        compose = REPO / name
+        if not compose.exists():
+            continue
+        if "KAI_DASHBOARD_ROLE:-keeper" in compose.read_text(encoding="utf-8"):
+            offenders.append(name)
+    setup = REPO / "scripts" / "setup_service_token.sh"
+    if setup.exists() and "KAI_DASHBOARD_ROLE=%s\\n' \"keeper\"" in setup.read_text(encoding="utf-8"):
+        offenders.append("setup_service_token.sh")
+    if offenders:
+        return LIVE, f"keeper is still the default in: {', '.join(offenders)}"
+    return REMEDIATED, "the default is operator; keeper must be asked for by name"
+
+
 # ── The finding table ────────────────────────────────────────────────
 
 class Finding(NamedTuple):
@@ -1527,6 +1595,11 @@ DISCOVERED: Dict[str, "Finding"] = {
         H, "A", "UI sends no credentials (regression from Track A)", dash_d01),
     "KAI-DASH-D02": Finding(
         H, "C", "Memory search omitted a required parameter (422)", dash_d02),
+    "KAI-DASH-D03": Finding(
+        H, "A", "Escape hatch bypassed authorisation, not just authentication",
+        dash_d03),
+    "KAI-DASH-D04": Finding(
+        H, "A", "Default credential carried keeper authority", dash_d04),
 }
 
 

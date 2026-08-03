@@ -197,7 +197,7 @@ services:
       # fails closed: without these it answers 503 on every route.
       KAI_DASHBOARD_TOKEN: "${KAI_DASHBOARD_TOKEN:-}"
       KAI_DASHBOARD_IDENTITY: "${KAI_DASHBOARD_IDENTITY:-keeper}"
-      KAI_DASHBOARD_ROLE: "${KAI_DASHBOARD_ROLE:-keeper}"
+      KAI_DASHBOARD_ROLE: "${KAI_DASHBOARD_ROLE:-operator}"
     ports:
       - "127.0.0.1:8080:8080"
     healthcheck:
