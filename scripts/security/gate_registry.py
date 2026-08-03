@@ -174,17 +174,18 @@ REGISTRY: Tuple[Gate, ...] = (
     # It appears in its own registry on purpose. The recursion is
     # depth-one and closed: it declares a denominator, fails closed on an
     # unreadable registry, and is proven by a synthetic-registry suite.
-    # `pending_wiring` is the encoded form of "not enforced yet" — it is
-    # reported on every run until A-04e flips it.
+    # A-04e landed as *partial* enforcement: I-4 is at zero and enforced,
+    # I-1/I-2/I-3 are reported while the retrofit proceeds. A big-bang
+    # flip would have meant a permanently red gate, which is an ignored
+    # gate — defect 9 wearing a fix's clothes.
     Gate(module="check_gate_registry",
          kind=GATE,
          summary="the four instrumentation invariants (A-04)",
          inputs=("scripts/security/gate_registry.py", "Makefile"),
          denominator=r"\d+ checks cross-checked",
          proven_by="scripts/test_gate_registry.py",
-         in_policy_check=False,
-         in_workflows=(),
-         pending_wiring="A-04e — flips to enforcing once the register is clear"),
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",)),
 )
 
 BY_MODULE = {gate.module: gate for gate in REGISTRY}

@@ -103,6 +103,23 @@ guard shrinks because the system got healthier. This one shrinks because
 a file moved. Both end at "the check passes while checking nothing," and
 both are invisible.
 
+### The taxonomy has three members, not two
+
+The operator drew a distinction worth keeping, because the three have
+different mechanisms and therefore different fixes:
+
+| Name | Mechanism | Fix |
+|---|---|---|
+| **Self-consuming guard** | A precondition shrinks because the operation it guards succeeded | Drive the test from synthetic state, not live state |
+| **Boundary blindness** | A check cannot distinguish *the system is correct* from *the system is absent* | Fail closed on a missing input (`gate_inputs.require`) |
+| **Category confusion** | A check for the **absence of something bad** passes because *everything* is absent | Assert a positive anchor first — prove the thing exists before judging it |
+
+The third is `KAI-GATE-005`. *"The dashboard never reads broker
+credentials"* is **correctly true** when there is no dashboard. The
+check's logic is not wrong; it does not know it is making a far weaker
+claim than it appears to. Fail-closed inputs fix the first case and not
+the second, which is why they are listed apart.
+
 ---
 
 ## 3. The sketch
@@ -269,7 +286,7 @@ Ordered lowest-risk first. Each step is independently revertible.
 | **A-04b** | I-1 fail-closed across all 12 | Mechanical, and the highest-severity finding. One shared helper, not 12 edits |
 | **A-04c** | I-2 denominators across all 12 | Follows I-1 naturally — the count is what the fail-closed check already computes |
 | **A-04d** | I-3 can-it-fail suites for the 8 | The largest piece. 8 suites, each injecting one real violation |
-| **A-04e** | Flip the meta-check to **gate** | Only once the four above are clean, so it never starts red-and-ignored |
+| ~~**A-04e**~~ | ~~Flip the meta-check to gate~~ | **Done, partially and by design.** I-4 is at zero and **enforced** in `policy-check` and CI; I-1/I-2/I-3 are reported while the retrofit proceeds. A ratchet does not need to cover the whole surface to be useful — it needs to never go backwards on the surface it covers. **And it advances itself:** an invariant that reaches zero without being added to `ENFORCED` *fails* the gate, because zero that nothing enforces will not stay zero |
 
 ### What would make this go wrong
 

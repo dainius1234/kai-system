@@ -46,7 +46,7 @@ from scripts.security import gate_registry as registry_module  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 21
+EXPECTED_SCENARIOS = 26
 executed: list[str] = []
 
 
@@ -325,7 +325,65 @@ def test_the_real_registry_passes_its_own_structural_rules():
           not problems["wiring"], str(problems["wiring"]))
 
 
+# ── A-04e: partial enforcement, and a ratchet on the ratchet ─────────
+
+def test_invariants_are_counted_per_dimension():
+    scenario("invariant-counts")
+    problems = {"unregistered": ["a"], "phantom": [], "wiring": ["b"],
+                "blind": ["c", "d"], "denominator": [], "unproven": ["e"],
+                "pending": []}
+    counts = meta.invariant_counts(problems)
+    check("I-4 sums its three keys", counts["I-4"] == 2, str(counts))
+    check("I-1 counts blindness", counts["I-1"] == 2, str(counts))
+    check("I-2 at zero", counts["I-2"] == 0, str(counts))
+
+
+def test_an_enforced_invariant_with_breaches_fails():
+    scenario("enforced-breach")
+    breaches, _ = meta.verdict({"I-1": 5, "I-2": 3, "I-3": 1, "I-4": 2},
+                               enforced=("I-4",))
+    check("breaches of an enforced invariant are counted", breaches == 2,
+          str(breaches))
+
+
+def test_a_reported_invariant_with_breaches_does_not_fail():
+    scenario("reported-breach")
+    breaches, _ = meta.verdict({"I-1": 15, "I-2": 7, "I-3": 7, "I-4": 0},
+                               enforced=("I-4",))
+    check("reported debt does not fail the gate", breaches == 0,
+          str(breaches))
+
+
+def test_an_invariant_at_zero_must_be_enforced():
+    """The ratchet advances itself. Zero without enforcement is debt —
+    nothing stops it drifting back."""
+    scenario("ready-to-enforce")
+    _, ready = meta.verdict({"I-1": 0, "I-2": 7, "I-3": 7, "I-4": 0},
+                            enforced=("I-4",))
+    check("an invariant at zero and unenforced is flagged", ready == ["I-1"],
+          str(ready))
+    _, none_ready = meta.verdict({"I-1": 1, "I-2": 7, "I-3": 7, "I-4": 0},
+                                 enforced=("I-4",))
+    check("a non-zero invariant is not flagged", none_ready == [],
+          str(none_ready))
+
+
+def test_the_enforced_set_never_shrinks():
+    """A floor on the ratchet itself. Removing an invariant from ENFORCED
+    is the regression this whole file exists to prevent, so it is asserted
+    against a literal rather than against the current value."""
+    scenario("enforced-floor")
+    check("I-4 is enforced", "I-4" in meta.ENFORCED, str(meta.ENFORCED))
+    check("every enforced name is a real invariant",
+          all(n in meta.INVARIANTS for n in meta.ENFORCED), str(meta.ENFORCED))
+
+
 def run_all() -> None:
+    test_invariants_are_counted_per_dimension()
+    test_an_enforced_invariant_with_breaches_fails()
+    test_a_reported_invariant_with_breaches_does_not_fail()
+    test_an_invariant_at_zero_must_be_enforced()
+    test_the_enforced_set_never_shrinks()
     test_a_matching_world_is_clean()
     test_an_unregistered_check_fails()
     test_a_registered_check_with_no_file_fails()

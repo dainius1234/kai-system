@@ -54,3 +54,11 @@ jobs:
       # kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md for why it starts non-zero.
       - name: HTTP and time hygiene ratchet
         run: python scripts/security/hygiene_survey.py --gate
+
+      # A-04e: partial enforcement by design. I-4 (declaration
+      # consistency) is at zero and enforced; I-1/I-2/I-3 are reported
+      # while the retrofit proceeds. An invariant that reaches zero and
+      # is not added to ENFORCED fails this gate — the ratchet advances
+      # itself rather than waiting to be remembered.
+      - name: Instrumentation invariants (I-4 enforced)
+        run: python scripts/security/check_gate_registry.py --gate

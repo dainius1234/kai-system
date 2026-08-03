@@ -317,6 +317,48 @@ _HEADINGS = [
     ("unproven", "NEVER OBSERVED FAILING (I-3)"),
 ]
 
+# ── Per-invariant enforcement ────────────────────────────────────────
+#
+# A big-bang flip would make CI red for as long as the retrofit takes,
+# and a permanently red gate is an ignored gate — which is defect 9
+# again, wearing a fix's clothes. Waiting until all four are clean means
+# no enforcement at all in the meantime.
+#
+# So the ratchet has teeth that harden one at a time. An invariant is
+# enforced once it reaches zero, and from then on it can never regress.
+# It does not need to cover the whole surface to be useful; it needs to
+# never go backwards on the surface it covers.
+
+INVARIANTS = {
+    "I-1": ("fail closed on a missing input", ("blind",)),
+    "I-2": ("report a denominator", ("denominator",)),
+    "I-3": ("prove it can fail", ("unproven",)),
+    "I-4": ("declare in one place", ("unregistered", "phantom", "wiring")),
+}
+
+# Enforced invariants fail the build. Adding one here is the ratchet
+# turning; removing one is the thing this file exists to prevent, and
+# `test_gate_registry.py` asserts the set never shrinks.
+ENFORCED = ("I-4",)
+
+
+def invariant_counts(problems: Dict[str, List[str]]) -> Dict[str, int]:
+    return {name: sum(len(problems[k]) for k in keys)
+            for name, (_, keys) in INVARIANTS.items()}
+
+
+def verdict(counts: Dict[str, int], enforced=ENFORCED):
+    """Return (breaches, ready_to_enforce).
+
+    ``ready`` is the self-advancing half: an invariant that has reached
+    zero but is not enforced is debt, because nothing stops it drifting
+    back. Reaching zero obliges the flip.
+    """
+    breaches = sum(counts[n] for n in enforced)
+    ready = [n for n in INVARIANTS
+             if counts.get(n) == 0 and n not in enforced]
+    return breaches, ready
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -334,9 +376,19 @@ def main() -> int:
                          indent=2))
         return 1 if (args.gate and total) else 0
 
-    mode = "ENFORCING" if args.gate else "reporting"
+    counts = invariant_counts(problems)
     print(f"Instrumentation invariants — {len(REGISTRY)} checks "
-          f"cross-checked ({mode})\n")
+          f"cross-checked\n")
+
+    # Say which teeth are engaged, so "partially on" reads as a design
+    # decision rather than an accident.
+    for tier, names in (("Enforcing", ENFORCED),
+                        ("Reporting ", tuple(n for n in INVARIANTS
+                                             if n not in ENFORCED))):
+        if names:
+            print(f"  {tier}: " + ", ".join(
+                f"{n} ({INVARIANTS[n][0]}, {counts[n]})" for n in names))
+    print()
 
     for key, heading in _HEADINGS:
         if problems[key]:
@@ -357,14 +409,32 @@ def main() -> int:
     print("  the explicit `if not X.exists(): continue` shape, because a")
     print("  survey with false positives invites fixes to working code.")
 
+    # The ratchet advances itself. An invariant that has reached zero but
+    # is not yet in ENFORCED is debt, not an achievement — leaving it
+    # unenforced lets it silently regress, which is the whole defect
+    # class. So reaching zero *obliges* the flip, and says so.
+    breaches, ready = verdict(counts)
+    if ready:
+        print("  READY TO ENFORCE — at zero, so add to ENFORCED now:")
+        for name in ready:
+            print(f"    - {name} ({INVARIANTS[name][0]})")
+        print("  An invariant at zero that nothing enforces will not stay "
+              "at zero.\n")
+
     if not args.gate:
-        print("\n  Reporting mode: this exits 0 by design. A-04e flips it.")
+        print(f"  Reporting mode: exits 0 by design. Under --gate this "
+              f"would {'FAIL' if breaches or ready else 'PASS'}.")
         return 0
 
-    if total:
-        print("\n  GATE FAILED.")
+    if breaches:
+        print(f"  GATE FAILED: {breaches} breach(es) of "
+              f"{', '.join(ENFORCED)}.")
         return 1
-    print("\n  GATE PASSED: the watching layer obeys its own rules.")
+    if ready:
+        print("  GATE FAILED: an invariant reached zero and is not enforced.")
+        return 1
+    print(f"  GATE PASSED: {', '.join(ENFORCED)} hold. The rest is "
+          f"reported debt, not silence.")
     return 0
 
 

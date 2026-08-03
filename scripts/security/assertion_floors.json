@@ -14,7 +14,7 @@
     "Erasure Tests": 75,
     "Flags-Enabled Integration Tests": 37,
     "Full Migration Tests": 75,
-    "Gate Registry Tests": 30,
+    "Gate Registry Tests": 39,
     "Hygiene Gate Tests": 39,
     "Invariant Guard Tests": 26,
     "Legacy Bridge Tests": 58,
@@ -30,5 +30,5 @@
     "UH-7 Actuator Registry Tests": 75,
     "UH-8 Autonomy Tests": 174
   },
-  "total": 1998
+  "total": 2007
 }

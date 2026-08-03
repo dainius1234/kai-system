@@ -19,6 +19,7 @@ policy-check:
 	python3 scripts/security/check_compose_drift.py
 	python3 scripts/security/check_architecture_rules.py
 	python3 scripts/security/hygiene_survey.py --gate
+	python3 scripts/security/check_gate_registry.py --gate
 
 test-contracts:
 	PYTHONPATH=. python scripts/test_contracts.py
