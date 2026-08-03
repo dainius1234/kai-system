@@ -86,7 +86,7 @@ def discover_modules() -> List[str]:
     """Every check script that exists, whatever anyone declared."""
     return sorted(
         p.stem for p in SECURITY.glob("*.py")
-        if p.stem not in {"__init__", "gate_registry"}
+        if p.stem not in {"__init__", "gate_registry", "gate_inputs"}
     )
 
 

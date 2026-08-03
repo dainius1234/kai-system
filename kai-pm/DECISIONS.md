@@ -3634,3 +3634,60 @@ The operator's warning about A-04a is the thing to watch: *the reporting mode is
 
 **Files added:** `scripts/security/gate_registry.py`, `scripts/security/check_gate_registry.py`, `scripts/test_gate_registry.py`.
 **Files modified:** `Makefile`, `scripts/security/check_assertion_floors.py`, `scripts/security/assertion_floors.json`, `kai-pm/INSTRUMENTATION_ARCHITECTURE.md`, `kai-pm/UH_PROGRESS_TRACKER.md`, `kai-pm/STATUS.md`, `kai-pm/MAKEFILE_TARGETS.md`.
+
+---
+
+## D154 — 2026-08-03 — A-04b: Drift Is Directional, and the Sovereign Profile Was the Least Guarded
+
+**Context:** The operator approved extending the compose drift check to `docker-compose.sovereign.yml`, then set the standard for the whole step: *"don't build half-baked crap — if it takes 3 times as long, so be it, but the outcome will be correct."*
+
+### The check compared two of three profiles, and had for a long time
+
+`check_compose_drift` compared `full` against `minimal`. A third profile was added later; nobody revisited the comparison. So the profile named **sovereign** was the only one never drift-checked — and it turned out to be the least guarded:
+
+**9 of its 21 services carried neither `restart` nor `security_opt`:** Vault, `vault-rotator`, Postgres, Redis, Tailscale, Prometheus, Grafana, Alertmanager, `perception-telegram`. Full and minimal had one such service each.
+
+Now fixed, using the exact form `full` already uses for Postgres and Redis — a pattern CI boots today, rather than one invented here.
+
+### Equality was the wrong test, and would have made things worse
+
+Six differences existed on shared services. **Two of them are sovereign being stricter** — `runtime: gvisor`, `read_only`, `cap_drop`, `apparmor:executor-aa` on the executor. An equality-based check reports those as drift, and the cheapest way to make the build green is to *weaken sovereign*.
+
+**A gate that pushes toward less security is worse than no gate.**
+
+So drift is **directional**, the same ratchet used everywhere else in this programme — hygiene debt may only fall, assertion counts may only rise, hardening may only increase:
+
+- **stricter** → allowed, and *recorded*, so it cannot silently regress later
+- **weaker** → violation
+- **absent** → violation, in every direction; an unset `security_opt` is not *different* from the baseline, it is **unguarded**
+
+`restart` is deliberately presence-required but value-free: `on-failure` versus `unless-stopped` is a containment-versus-availability choice a profile is entitled to make. Having no policy is not a choice.
+
+### Two defects that had to be kept apart
+
+Sovereign's own anchor is far stricter than the baseline's — `cap_drop: [ALL]`, `read_only`, `user`, `tmpfs`. Treating that as a floor for every sovereign service would have demanded `cap_drop: ALL` on **Postgres**, which needs SETUID/SETGID to drop from root at startup. The gate would have been pushing a change that breaks the profile it protects.
+
+So the floor is the *baseline's* anchor, and "skips its own profile's stricter anchor" is reported as a **separate category** — 9 services, left for per-service capability analysis rather than a blanket edit. Two different defects, two different fixes, named apart.
+
+### Two false starts, both caught before landing
+
+1. **A false positive in my own new rule.** The first network check flagged `minimal` for having no `execution-net`. Minimal runs no executor, so that absence is correct, and flagging it would have invited someone to declare a network nothing attaches to — defect 7's exact shape. The rule now compares only networks declared in *both* places, and separately requires that a network a service actually attaches to is declared at all.
+
+2. **A remediation script that broke the file.** Matching service names as "two-space indent, ends with a colon" also matched `postgres:` nested inside a `depends_on:` block, so `restart:` was injected into a dependency mapping. Restored from git, redone with an exact indent match, and now asserts that the service set is unchanged and **no pre-existing key was modified** before writing.
+
+The second one is worth keeping: a loose match on structured text is the config-file version of a survey with false positives, and the fix is the same — be exact, then assert you changed only what you meant to.
+
+### A-04b's shared helper
+
+`scripts/security/gate_inputs.py` provides `require()` (fail closed, I-1) and `inspected()` (denominator, I-2), so adopting both is an import rather than twelve independent edits. `check_compose_drift` is the first adopter and now satisfies all four invariants; the meta-check's count fell **33 → 29**.
+
+`require()` takes an explicit per-path `optional=` list. As measured, **no check has any optional input** — all three compose files are git-tracked, so "absent in some checkout" cannot happen. I had been about to design that escape hatch for a case with zero instances, which would have left a hatch for someone to reach for later.
+
+**Verification:** 1,998 tests across 28 suites, all green — 21 of them this gate's own, every one from a synthetic compose tree in a temp directory. 10/10 policy gates plus the drift rewrite inside `policy-check`. `make assertion-floors` passes both detectors at 28 suites. Proven to fail on: a weaker profile, an absent setting, a missing `restart`, an isolation downgrade, an undeclared network attachment, an unshared service, and a missing profile file — and proven **not** to fire on a stricter profile, a different `restart` value, or a network a profile legitimately does not use.
+
+**Not verified here:** the sovereign profile is not booted in this environment. CI boots `postgres`, `tool-gate` and `memu-core` from it, which covers the two data-tier services changed; the other seven are profile-gated and unbooted anywhere. The change is additive and uses full's proven pattern, but that is reasoning, not a boot test, and it is recorded as such.
+
+**Nothing is closed.** Rule 7. `KAI-GATE-006` is added to the register as REMEDIATED; 001–005 remain OPEN.
+
+**Files added:** `scripts/security/gate_inputs.py`, `scripts/test_compose_drift.py`.
+**Files modified:** `scripts/security/check_compose_drift.py` (rewritten), `docker-compose.{full,minimal,sovereign}.yml`, `scripts/security/gate_registry.py`, `scripts/security/check_gate_registry.py`, `scripts/security/check_assertion_floors.py`, `scripts/security/assertion_floors.json`, `Makefile`, sub-plan/tracker/STATUS/MAKEFILE_TARGETS.

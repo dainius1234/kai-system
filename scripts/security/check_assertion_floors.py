@@ -130,6 +130,7 @@ SUITE_TARGETS = {
     "Deployment Preflight Tests": "test-preflight",
     "Assertion Floor Tests": "test-assertion-floors",
     "Gate Registry Tests": "test-gate-registry",
+    "Compose Drift Tests": "test-compose-drift",
 }
 
 

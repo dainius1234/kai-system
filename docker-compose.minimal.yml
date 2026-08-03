@@ -87,6 +87,8 @@ services:
       - agent-net
 
   ollama-pull:
+    security_opt:
+      - no-new-privileges:true
     image: ollama/ollama:0.6
     container_name: sovereign-ollama-pull
     restart: "no"

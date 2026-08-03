@@ -26,6 +26,9 @@ x-service-defaults: &service_defaults
 # - default/no-profile: expects external Vault via VAULT_ADDR
 services:
   postgres:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     image: pgvector/pgvector:pg15
     container_name: sovereign-postgres
     hostname: ledger-db
@@ -45,6 +48,9 @@ services:
       start_period: 10s
 
   tailscale:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     profiles: ["external-egress"]
     image: tailscale/tailscale:v1.78
     container_name: sovereign-tailscale
@@ -66,6 +72,9 @@ services:
 
 
   vault:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     profiles: ["dev"]
     image: hashicorp/vault:1.18
     container_name: sovereign-vault
@@ -84,6 +93,9 @@ services:
 
 
   vault-rotator:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     profiles: ["dev"]
     image: hashicorp/vault:1.18
     container_name: sovereign-vault-rotator
@@ -99,6 +111,9 @@ services:
       - control-net
 
   prometheus:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     image: prom/prometheus:v3.2
     container_name: sovereign-prometheus
     volumes:
@@ -112,6 +127,9 @@ services:
 
 
   alertmanager:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     image: prom/alertmanager:v0.28
     container_name: sovereign-alertmanager
     volumes:
@@ -122,6 +140,9 @@ services:
       - observability-net
 
   grafana:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     image: grafana/grafana:11.5
     container_name: sovereign-grafana
     environment:
@@ -362,6 +383,9 @@ services:
 
 
   redis:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     image: redis:7-alpine
     command: redis-server --appendonly yes --save ""
     container_name: sovereign-redis
@@ -373,6 +397,9 @@ services:
 
 
   perception-telegram:
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     profiles: ["external-egress"]
     image: python:3.11-slim
     container_name: perception-telegram

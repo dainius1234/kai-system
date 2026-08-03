@@ -743,6 +743,8 @@ services:
       - agent-net
 
   ollama-pull:
+    security_opt:
+      - no-new-privileges:true
     image: ollama/ollama:0.6
     restart: "no"
     # Also pulls EMBEDDING_OLLAMA_MODEL (default all-minilm) — qwen2.5:0.5b is

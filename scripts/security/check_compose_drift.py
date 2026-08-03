@@ -1,129 +1,241 @@
 #!/usr/bin/env python3
-"""P0-PR-09 CI gate: detect structural drift between compose files.
+"""P0-PR-09 CI gate: hardening may differ between profiles, but only upward.
 
-Checks that services shared between docker-compose.full.yml and
-docker-compose.minimal.yml use consistent x-defaults anchors,
-network assignments, and security-critical settings.
+Originally this compared `docker-compose.full.yml` against
+`docker-compose.minimal.yml` and nothing else. A third profile —
+`docker-compose.sovereign.yml` — was added later and the comparison was
+never revisited, so the profile named *sovereign* was the only one never
+drift-checked.
 
-Exit 0 = clean.  Exit 1 = violations found.
+Extending it exposed why that mattered, and also why a naive extension
+would have been worse than none: **equality is the wrong test.**
+
+    executor (sovereign):  runtime: gvisor, read_only, cap_drop,
+                           security_opt += apparmor:executor-aa
+                           restart: on-failure
+
+Sovereign deliberately hardens its executor beyond what `full` does. An
+equality-based drift check reports that as a violation, and the cheapest
+way to make it green is to *weaken sovereign*. A gate that pushes toward
+less security is worse than no gate at all.
+
+So drift here is **directional**, the same ratchet shape used everywhere
+else in this programme — hygiene debt may only fall, assertion counts may
+only rise, hardening may only increase:
+
+  - **stricter**  a superset of the baseline → allowed, and recorded, so
+                  it cannot silently regress later
+  - **weaker**    missing something the baseline has → violation
+  - **absent**    not set at all → violation, in every direction
+
+The third is the important one, and it is the same defect as boundary
+blindness one layer down: an unset `security_opt` is not *different* from
+the baseline, it is *unguarded*, and comparing it as a difference invites
+the reading "well, profiles differ".
+
+`restart` is deliberately **presence-required but value-free**.
+`on-failure` versus `unless-stopped` is a containment-versus-availability
+choice a profile is entitled to make; having no policy at all is not.
+
+Exit 0 = clean.  Exit 1 = violations found, or an input is missing.
 """
 from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Dict, List, Tuple
 
 import yaml
 
-COMPOSE_FULL = "docker-compose.full.yml"
-COMPOSE_MINIMAL = "docker-compose.minimal.yml"
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+from scripts.security.gate_inputs import inspected, require  # noqa: E402
+
+# `full` is the baseline: the superset profile every other one is a
+# subset of. Comparisons run against it, and against each profile's own
+# declared x-defaults.
+BASELINE = "docker-compose.full.yml"
+PROFILES = (
+    BASELINE,
+    "docker-compose.minimal.yml",
+    "docker-compose.sovereign.yml",
+)
+
+# Settings whose values form a strength ordering: more is stricter.
+ORDERED_SECURITY = ("security_opt", "cap_drop")
+
+# Settings that must be *set*, whose value is the profile's own call.
+PRESENCE_REQUIRED = ("restart",)
 
 
-def _get_defaults(data: dict) -> dict:
+def _defaults(data: dict) -> dict:
     for key in data:
         if key.startswith("x-") and isinstance(data[key], dict):
             return data[key]
     return {}
 
 
-def check_drift(repo_root: Path) -> list[str]:
-    violations: list[str] = []
+def _as_set(value) -> frozenset:
+    if value is None:
+        return frozenset()
+    if isinstance(value, str):
+        return frozenset({value})
+    return frozenset(value)
 
-    full_path = repo_root / COMPOSE_FULL
-    min_path = repo_root / COMPOSE_MINIMAL
 
-    if not full_path.exists() or not min_path.exists():
-        return violations
+def check_drift(root: Path = None) -> Tuple[List[str], List[str], List[str], int]:
+    """Return (violations, hardening, anchor_bypasses, services_compared)."""
+    paths = require(PROFILES, root=root) if root else require(PROFILES)
+    data: Dict[str, dict] = {}
+    for path in paths:
+        try:
+            data[path.name] = yaml.safe_load(path.read_text()) or {}
+        except Exception as exc:
+            return [f"{path.name}: failed to parse: {exc}"], [], [], 0
 
-    try:
-        full_data = yaml.safe_load(full_path.read_text()) or {}
-        min_data = yaml.safe_load(min_path.read_text()) or {}
-    except Exception as exc:
-        violations.append(f"Failed to parse compose files: {exc}")
-        return violations
+    violations: List[str] = []
+    hardening: List[str] = []
+    bypassed: List[str] = []
+    compared = 0
 
-    full_defaults = _get_defaults(full_data)
-    min_defaults = _get_defaults(min_data)
-
-    if full_defaults.get("restart") != min_defaults.get("restart"):
-        violations.append(
-            f"x-defaults restart policy differs: "
-            f"full={full_defaults.get('restart')!r}, "
-            f"minimal={min_defaults.get('restart')!r}"
-        )
-
-    full_logging = full_defaults.get("logging", {})
-    min_logging = min_defaults.get("logging", {})
-    if full_logging != min_logging:
-        violations.append(
-            f"x-defaults logging config differs between full and minimal"
-        )
-
-    full_security = full_defaults.get("security_opt", [])
-    min_security = min_defaults.get("security_opt", [])
-    if full_security != min_security:
-        violations.append(
-            f"x-defaults security_opt differs: "
-            f"full={full_security!r}, minimal={min_security!r}"
-        )
-
-    full_svcs = full_data.get("services", {})
-    min_svcs = min_data.get("services", {})
-
-    shared = set(full_svcs.keys()) & set(min_svcs.keys())
-
-    for svc in sorted(shared):
-        full_cfg = full_svcs[svc] or {}
-        min_cfg = min_svcs[svc] or {}
-
-        full_uses_defaults = "<<" in str(full_cfg)
-        min_uses_defaults = "<<" in str(min_cfg)
-
-        full_restart = full_cfg.get("restart")
-        min_restart = min_cfg.get("restart")
-        if full_restart != min_restart:
+    # ── The x-defaults anchors must themselves agree ─────────────────
+    base_defaults = _defaults(data[BASELINE])
+    for name in PROFILES[1:]:
+        other = _defaults(data[name])
+        if other.get("restart") != base_defaults.get("restart"):
             violations.append(
-                f"service '{svc}' restart policy differs: "
-                f"full={full_restart!r}, minimal={min_restart!r}"
-            )
+                f"{name}: x-defaults restart differs — "
+                f"{other.get('restart')!r} vs baseline "
+                f"{base_defaults.get('restart')!r}")
+        if other.get("logging") != base_defaults.get("logging"):
+            violations.append(f"{name}: x-defaults logging differs from baseline")
+        for setting in ORDERED_SECURITY:
+            base_val = _as_set(base_defaults.get(setting))
+            weaker = base_val - _as_set(other.get(setting))
+            if weaker:
+                violations.append(
+                    f"{name}: x-defaults {setting} is weaker than baseline — "
+                    f"missing {sorted(weaker)}")
 
-        full_sec = full_cfg.get("security_opt")
-        min_sec = min_cfg.get("security_opt")
-        if full_sec != min_sec:
-            violations.append(
-                f"service '{svc}' security_opt differs between full and minimal"
-            )
+    # ── Every service, in every profile, must be guarded ─────────────
+    #
+    # Not just shared ones. The old shared-only comparison never looked
+    # at the 7 services sovereign has and full does not, so a service
+    # present in exactly one profile was guaranteed unchecked.
+    floor = {s: _as_set(base_defaults.get(s)) for s in ORDERED_SECURITY}
 
-    full_nets = set(full_data.get("networks", {}).keys())
-    min_nets = set(min_data.get("networks", {}).keys())
-    only_full = full_nets - min_nets
-    only_min = min_nets - full_nets
+    for name in PROFILES:
+        services = data[name].get("services") or {}
+        profile_defaults = _defaults(data[name])
+        for svc in sorted(services):
+            cfg = services[svc] or {}
+            compared += 1
 
-    for net in sorted(only_full):
-        full_net_cfg = full_data["networks"][net] or {}
-        if full_net_cfg.get("internal"):
-            pass
+            for setting in PRESENCE_REQUIRED:
+                if cfg.get(setting) is None:
+                    violations.append(
+                        f"{name}: service '{svc}' has no {setting} policy — "
+                        f"unset is not a profile choice")
 
-    for net in sorted(only_min):
-        min_net_cfg = min_data["networks"][net] or {}
-        if min_net_cfg.get("internal"):
-            violations.append(
-                f"network '{net}' only in minimal — internal networks should be consistent"
-            )
+            # The floor is the **baseline's** x-defaults, not each
+            # profile's own. Sovereign's anchor is far stricter
+            # (`cap_drop: [ALL]`, `read_only`, `user`, `tmpfs`), and
+            # imposing that as a hard requirement on a service that does
+            # not use the anchor would demand `cap_drop: ALL` on
+            # Postgres — which needs SETUID/SETGID to drop from root at
+            # startup. The gate would then be pushing a change that
+            # breaks the profile it is meant to protect.
+            #
+            # So a profile choosing to be stricter is *hardening*, and a
+            # service skipping that profile's anchor is reported in its
+            # own category rather than folded in with the floor breaches.
+            # Two different defects, two different fixes, named apart.
+            for setting in ORDERED_SECURITY:
+                actual = _as_set(cfg.get(setting))
+                required = floor[setting]
+                if required:
+                    if not actual:
+                        violations.append(
+                            f"{name}: service '{svc}' has no {setting} — "
+                            f"absent is unguarded, not merely different")
+                    elif required - actual:
+                        violations.append(
+                            f"{name}: service '{svc}' {setting} is weaker "
+                            f"than the baseline floor — missing "
+                            f"{sorted(required - actual)}")
+                    elif actual - required:
+                        hardening.append(
+                            f"{name}: service '{svc}' {setting} adds "
+                            f"{sorted(actual - required)}")
 
-    return violations
+                own = _as_set(profile_defaults.get(setting))
+                if own - required and not (own - required) & actual:
+                    bypassed.append(
+                        f"{name}: service '{svc}' does not inherit this "
+                        f"profile's own {setting}={sorted(own - required)}")
+
+    # ── An internal network must not stop being internal ─────────────
+    #
+    # The old version looped over networks-only-in-full and did nothing
+    # at all — `if cfg.get("internal"): pass`. A rule that looks present
+    # and does nothing is how a gate silently omits part of itself.
+    #
+    # The fix is *not* "every network must exist everywhere". `minimal`
+    # legitimately has no `execution-net` because it runs no executor,
+    # and flagging that would be a false positive of exactly the kind
+    # that invites someone to add a network nothing uses. Absence is a
+    # profile's business; **downgrade is not.** So the rule compares only
+    # networks declared in both places, and additionally requires that a
+    # network a service actually attaches to is declared at all.
+    base_nets = data[BASELINE].get("networks") or {}
+    for name in PROFILES[1:]:
+        nets = data[name].get("networks") or {}
+        for net in sorted(set(base_nets) & set(nets)):
+            if (base_nets[net] or {}).get("internal") and not (nets[net] or {}).get("internal"):
+                violations.append(
+                    f"{name}: network '{net}' is internal in the baseline "
+                    f"but not here — isolation downgraded")
+
+    for name in PROFILES:
+        nets = set((data[name].get("networks") or {}))
+        for svc, cfg in sorted((data[name].get("services") or {}).items()):
+            for net in (cfg or {}).get("networks") or []:
+                if isinstance(net, str) and net not in nets:
+                    violations.append(
+                        f"{name}: service '{svc}' attaches to undeclared "
+                        f"network '{net}'")
+
+    return violations, hardening, bypassed, compared
 
 
 def main() -> int:
-    repo_root = Path(__file__).resolve().parent.parent.parent
-    violations = check_drift(repo_root)
+    violations, hardening, bypassed, compared = check_drift()
+
+    print(inspected(compared, "service definitions",
+                    f"across {len(PROFILES)} profiles"))
+
+    if hardening:
+        print(f"\n  Hardening above the floor ({len(hardening)}) — allowed, "
+              f"recorded so it cannot regress:")
+        for line in hardening:
+            print(f"    + {line}")
+
+    if bypassed:
+        print(f"\n  Services skipping their own profile's stricter anchor "
+              f"({len(bypassed)}) — reported, not failed: fixing these needs "
+              f"per-service\n  capability analysis, not a blanket edit.")
+        for line in bypassed:
+            print(f"    ~ {line}")
 
     if violations:
-        print(f"FAIL: {len(violations)} compose drift issue(s) found:\n")
+        print(f"\nFAIL: {len(violations)} compose drift issue(s):\n")
         for v in violations:
             print(f"  - {v}")
+        print("\n  Hardening may differ between profiles, but only upward.")
         return 1
 
-    print("PASS: Compose files are structurally consistent.")
+    print("\nPASS: no profile is weaker than the baseline, and every "
+          "service is guarded.")
     return 0
 
 

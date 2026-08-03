@@ -1,8 +1,9 @@
 # Sub-plan — The Instrumentation Layer
 
-**Status:** **A-04a done** — registry + meta-check live in reporting mode
-(`make gate-registry`), reporting **33 findings** across the four
-invariants. A-04b–e outstanding. Register below holds 5 findings.
+**Status:** **A-04a done**, **A-04b started** — registry + meta-check live in
+reporting mode (`make gate-registry`), now reporting **29 findings** (was 33).
+`check_compose_drift` is the first of the eight fully retrofitted. Register
+below holds 6 findings.
 **Parent:** [`W1_DASHBOARD_REMEDIATION_PLAN.md`](W1_DASHBOARD_REMEDIATION_PLAN.md)
 **Question this answers:** *"What does the instrumentation architecture look
 like if you sketch it the way you'd sketch `dashboard/app.py`?"*
@@ -222,6 +223,7 @@ instrumentation, and letting them dilute or stand in for one of the 96
 | `KAI-GATE-002` | MEDIUM | 8 of 12 gates print `PASS` with **no denominator**. A gate that inspected nothing is indistinguishable from one that inspected everything | **OPEN** |
 | `KAI-GATE-003` | MEDIUM | 8 of 12 gates have **never been observed failing**. No suite injects a violation and asserts they fire | **OPEN** |
 | `KAI-GATE-004` | MEDIUM | A gate is declared in up to three places with **nothing cross-checking them**. Two of twelve are already inconsistent | **OPEN** |
+| `KAI-GATE-006` | HIGH | **9 of 21 `sovereign` services had no `restart` and no `security_opt`** — including Vault, the rotator, Postgres and Redis. The profile named for being hardened was the least guarded, because the drift check only ever compared `full` against `minimal` | **REMEDIATED** |
 
 **Findings formally closed: 0.** Programme Rule 7.
 
@@ -262,7 +264,8 @@ Ordered lowest-risk first. Each step is independently revertible.
 
 | Step | Scope | Why this order |
 |---|---|---|
-| ~~**A-04a**~~ | ~~Registry + meta-check in reporting mode~~ | **Done.** `make gate-registry` reports 33 findings and exits 0 by design. 30 assertions in `test_gate_registry.py`, all from synthetic registries |
+| ~~**A-04a**~~ | ~~Registry + meta-check in reporting mode~~ | **Done.** `make gate-registry` reports 29 findings and exits 0 by design. 30 assertions in `test_gate_registry.py`, all from synthetic registries |
+| **A-04b** | Fail-closed across all 12 | **Started.** `gate_inputs.require()` is the shared helper; `check_compose_drift` is the first adopter and now has all four invariants. 7 compose gates remain |
 | **A-04b** | I-1 fail-closed across all 12 | Mechanical, and the highest-severity finding. One shared helper, not 12 edits |
 | **A-04c** | I-2 denominators across all 12 | Follows I-1 naturally — the count is what the fail-closed check already computes |
 | **A-04d** | I-3 can-it-fail suites for the 8 | The largest piece. 8 suites, each injecting one real violation |
@@ -299,6 +302,58 @@ still passes. Fixed, predictable cost; no whole-repo mutation run.
 Recorded here as **A-03**, deliberately unscheduled, and deliberately not
 claimed by A-02. The assertion ratchet catches shrinkage, not vacuity.
 Two different defects, two different detectors.
+
+---
+
+## 10. What extending the drift check found
+
+The drift gate compared `full` against `minimal` and nothing else. A third
+profile was added later and the comparison was never revisited, so
+`docker-compose.sovereign.yml` was the only profile never checked.
+
+**9 of its 21 services carried neither `restart` nor `security_opt`** —
+Vault, `vault-rotator`, Postgres, Redis, Tailscale, Prometheus, Grafana,
+Alertmanager and `perception-telegram`. The profile named for being
+hardened was, by this measure, the least guarded of the three. Now fixed,
+using the exact form `full` already uses for Postgres and Redis — a
+pattern CI boots, rather than one invented here.
+
+### Equality would have been the wrong test
+
+A naive extension reports all six shared-service differences, and two of
+them are sovereign being **stricter** (`runtime: gvisor`,
+`apparmor:executor-aa`, `read_only`). The cheapest way to make that green
+is to weaken sovereign. **A gate that pushes toward less security is
+worse than no gate.**
+
+So drift is directional — the same ratchet shape as everywhere else here.
+Stricter is allowed *and recorded*, weaker fails, absent fails in every
+direction. `restart` is presence-required but value-free, because
+`on-failure` versus `unless-stopped` is a containment-versus-availability
+choice a profile is entitled to make.
+
+### Two defects that had to stay apart
+
+Sovereign's own anchor is much stricter than the baseline's
+(`cap_drop: [ALL]`, `read_only`, `user`, `tmpfs`). Folding "bypasses its
+own anchor" together with "below the baseline floor" would have demanded
+`cap_drop: ALL` on Postgres — which needs SETUID/SETGID to drop from root
+at startup. The gate would have been pushing a change that breaks the
+profile it protects. The 9 anchor bypasses are reported in their own
+category and left for per-service capability analysis.
+
+### Two false starts, both caught before landing
+
+1. The first network rule flagged `minimal` for having no `execution-net`
+   — but minimal runs no executor, so the absence is correct. Flagging it
+   would have invited someone to declare a network nothing attaches to:
+   defect 7's shape. The rule now compares only networks declared in both
+   places, and separately requires that a network a service *attaches to*
+   is declared.
+2. The first remediation script matched service names too loosely and
+   injected `restart:` into a `depends_on:` mapping, breaking the file.
+   Restored from git and redone with an exact two-space indent match,
+   plus assertions that no pre-existing key changed.
 
 ---
 

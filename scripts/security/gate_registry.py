@@ -114,9 +114,17 @@ REGISTRY: Tuple[Gate, ...] = (
     Gate(module="check_image_tags",
          summary="pre-built images use pinned tags",
          **_COMPOSE_GATE),
+    # Rewritten directionally and given a denominator, a failure suite
+    # and fail-closed inputs — the first of the eight to be retrofitted.
     Gate(module="check_compose_drift",
-         summary="compose files stay structurally consistent",
-         **_COMPOSE_GATE),
+         kind=GATE,
+         summary="hardening may differ between profiles, but only upward",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ service definitions",
+         proven_by="scripts/test_compose_drift.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-002", "KAI-GATE-003")),
 
     # ── The four built or repaired after an incident ─────────────────
     Gate(module="check_architecture_rules",
