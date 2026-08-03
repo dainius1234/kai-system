@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-03 (tenth pass — Wave 1 Track D: failure semantics)
+**Last updated:** 2026-08-03 (eleventh pass — Wave 1 Tracks E–I; all 96 dashboard findings at zero LIVE)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -54,12 +54,13 @@
 | E-03 Deployment preflight | ✅ Done | `8d2ea09` | `make test-preflight` | 57 |
 | W-01 Modules wired into the running app | ✅ Done | this commit | `make test-invariant-guards` | (guards) |
 | A-01 Architecture dependency CI gate — all 15 rules | ✅ Done | `cb3f142` | `make test-architecture-rules` | 61 |
-| W1-DASH Dashboard finding tracker (96 findings) | ✅ Done | `dff418d` | `make test-dashboard-findings` | 133 |
+| W1-DASH Dashboard finding tracker (96 findings) | ✅ Done | `dff418d` | `make test-dashboard-findings` | 144 |
 | W1-DASH-A Dashboard inbound identity | ✅ Done | `9fb0e26` | `make test-dashboard-auth` | 89 |
 | W1-DASH-D01 Browser credential shim | ✅ Done | `eb5b084` | `make test-dashboard-ui-auth` | 42 |
 | W1-DASH-C Caller-scoped memory reads | ✅ Done | `d18a089` | `make test-dashboard` | (folded in) |
-| W1-DASH-D Failure semantics (degraded envelope) | ✅ Done | this commit | `make test-degraded` | 36 |
-| | | | **Total** | **1,814** |
+| W1-DASH-D Failure semantics (degraded envelope) | ✅ Done | `dc95692` | `make test-degraded` | 36 |
+| W1-DASH-E–I Bounds, media, disclosure, fan-out, hygiene | ✅ Done | this commit | `make test-dashboard` | (folded in) |
+| | | | **Total** | **1,825** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
@@ -242,17 +243,17 @@ before any remediation was planned, because the findings were captured at
 
 | Status | Baseline `cb3f142` | Now |
 |---|---|---|
-| LIVE | 54 | **11** |
+| LIVE | 54 | **0** |
 | PARTIAL | 2 | **0** |
-| REMEDIATED (pending closure review) | 3 | **51** |
+| REMEDIATED (pending closure review) | 3 | **62** |
 | MANUAL (needs human review) | 37 | **34** |
 | **Total** | **96** | **96** |
 
-**Tracks A, B, C and D are complete.** `common/dashboard_auth.py`
+**All nine tracks are complete: every one of the 96 findings reports zero LIVE.** `common/dashboard_auth.py`
 gives every route a verified principal — identity, role, session — and a
 declared scope.
 
-- **All 10 CRITICALs remediated.** The 11 still LIVE are 3 HIGH, 8 MEDIUM, all in Tracks E–I
+- **All 10 CRITICALs remediated, and no finding of any severity reports LIVE.** 62 REMEDIATED, 34 MANUAL (needing human review, never auto-claimed)
 - **185 routes: 179 authenticated, 66 of 66 mutating routes authenticated**
 - The 6 unauthenticated routes are the declared public list — `/health`,
   `/metrics`, and the four HTML shells the browser loads before it can
@@ -264,17 +265,25 @@ declared scope.
 - **Operator directive verified:** the dashboard reads neither
   `BINANCE_API_KEY` nor `BINANCE_API_SECRET`. Checked on every tool run
 
-**Tracks B, C and D are complete** bar four manual reviews. `KAI-DASH-023`
-is closed: memory reads carry the calling principal's identity instead of a
-hard-coded `keeper`. Track D introduced `common/degraded.py` — an outage now
-answers **503 with an explicit `degraded` marker**, on two independent
-channels, instead of a 200 that looked like an answer. **Tracks E–I** are not
-started: 11 findings LIVE (3 HIGH, 8 MEDIUM).
+**All nine tracks are complete.** `common/degraded.py` gives an outage an
+explicit envelope (503 + `degraded` marker). `common/http_hygiene.py`
+carries bounded request bodies and a shared connection pool. Payload limits
+are **not** re-declared: they come from
+`common/perception_spine/ingress.py`, which already owned them.
+
+**34 findings remain MANUAL** — not statically decidable, each naming what
+a human must review. MANUAL is not a pass.
+
+> **The same defects exist outside the dashboard.** A repo-wide sweep found
+> 96 per-request HTTP clients, 20 unbounded `request.json()` reads and 15
+> naive `datetime.utcnow()` calls across 26 services. Those belong to their
+> own audit batches, not to this plan — see
+> [`W1_GLOBAL_HYGIENE_SUBPLAN.md`](W1_GLOBAL_HYGIENE_SUBPLAN.md).
 
 | Command | Purpose |
 |---|---|
 | `make dashboard-findings` | Live status of all 96 findings |
-| `make test-dashboard-findings` | 133 tests proving the tracker can fail |
+| `make test-dashboard-findings` | 144 tests proving the tracker can fail |
 | `make test-dashboard-auth` | 89 tests on the auth module itself |
 | `make test-dashboard-ui-auth` | 42 tests on the browser credential shim |
 | `make test-degraded` | 36 tests that an outage cannot look like an answer |

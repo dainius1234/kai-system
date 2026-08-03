@@ -231,6 +231,101 @@ def test_memory_search_sends_the_required_parameter():
         assert required in retrieve[0], f"{required} missing from {retrieve[0]}"
 
 
+
+# ── Tracks E-I: bounds, headers, media types, audit ──────────────────
+
+def test_oversized_body_is_refused():
+    """KAI-DASH-017: an unbounded proxy body makes this an amplifier."""
+    big = {"payload": "x" * (300 * 1024)}
+    resp = client.post("/api/soul", headers=AUTH, json=big)
+    assert resp.status_code == 413, resp.status_code
+
+
+def test_deeply_nested_body_is_refused():
+    payload = current = {}
+    for _ in range(40):
+        current["next"] = {}
+        current = current["next"]
+    resp = client.post("/api/soul", headers=AUTH, json=payload)
+    assert resp.status_code == 413, resp.status_code
+
+
+def test_high_cardinality_body_is_refused():
+    payload = {f"k{i}": i for i in range(2000)}
+    resp = client.post("/api/soul", headers=AUTH, json=payload)
+    assert resp.status_code == 413, resp.status_code
+
+
+def test_normal_body_is_not_refused():
+    """The bound must not be so tight it blocks ordinary use."""
+    import unittest.mock as mock
+    import httpx
+
+    async def fake_post(self, url, **kwargs):
+        r = mock.MagicMock()
+        r.status_code = 200
+        r.raise_for_status = mock.MagicMock()
+        r.json.return_value = {"ok": True}
+        return r
+
+    with mock.patch.object(httpx.AsyncClient, "post", new=fake_post):
+        resp = client.post("/api/soul", headers=AUTH,
+                           json={"content": "a reasonable soul edit"})
+    assert resp.status_code != 413, resp.status_code
+
+
+def test_html_carries_browser_security_headers():
+    """KAI-DASH-088: no CSP, frame or referrer protections."""
+    resp = client.get("/app")
+    assert resp.status_code == 200
+    for header in ("Content-Security-Policy", "X-Frame-Options",
+                   "Referrer-Policy", "X-Content-Type-Options"):
+        assert header in resp.headers, f"{header} missing"
+    csp = resp.headers["Content-Security-Policy"]
+    assert "frame-ancestors 'none'" in csp, csp
+    # An inline-script escape hatch would defeat the policy's main job.
+    assert "'unsafe-inline'" not in csp.split("script-src")[1].split(";")[0], csp
+
+
+def test_json_responses_do_not_carry_html_headers():
+    """The policy belongs on documents, not on every API payload."""
+    resp = client.get("/health")
+    assert resp.status_code == 200
+    assert "Content-Security-Policy" not in resp.headers
+
+
+def test_health_discloses_no_topology():
+    """KAI-DASH-069: health leaked the gate URL and policy hash."""
+    payload = client.get("/health").json()
+    for leaked in ("tool_gate_url", "policy_version", "policy_hash"):
+        assert leaked not in payload, f"{leaked} still disclosed"
+
+
+def test_go_no_go_is_not_a_200_when_not_go():
+    """KAI-DASH-080: nothing downstream could enforce an advisory NO_GO."""
+    resp = client.get("/go-no-go", headers=AUTH)
+    payload = resp.json()
+    if payload.get("decision") == "GO":
+        assert resp.status_code == 200
+    else:
+        assert resp.status_code == 503, (resp.status_code, payload.get("decision"))
+
+
+def test_audit_records_a_credential_derived_actor():
+    """KAI-DASH-096: audit recorded only method, path and status."""
+    seen = []
+    original = mod.audit.log
+    mod.audit.log = lambda level, message: seen.append(message)
+    try:
+        client.get("/health", headers=AUTH)
+    finally:
+        mod.audit.log = original
+    assert seen, "nothing was audited"
+    assert any("actor=" in line for line in seen), seen
+    # The credential itself must never reach the log.
+    assert not any(TOKEN in line for line in seen), "token leaked into audit"
+
+
 if __name__ == "__main__":
     test_health()
     test_index_minimal()
@@ -241,6 +336,15 @@ if __name__ == "__main__":
     test_unconfigured_gateway_fails_closed()
     test_memory_reads_are_scoped_to_the_caller()
     test_memory_search_sends_the_required_parameter()
+    test_oversized_body_is_refused()
+    test_deeply_nested_body_is_refused()
+    test_high_cardinality_body_is_refused()
+    test_normal_body_is_not_refused()
+    test_html_carries_browser_security_headers()
+    test_json_responses_do_not_carry_html_headers()
+    test_health_discloses_no_topology()
+    test_go_no_go_is_not_a_200_when_not_go()
+    test_audit_records_a_credential_derived_actor()
     test_upload_no_file()
     test_upload_too_large()
     test_upload_image_ocr_success()

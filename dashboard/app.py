@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 import asyncio
-from datetime import datetime
+import hashlib
+from functools import lru_cache
+from datetime import datetime, timezone
 import json as _json
 import os
 from typing import Any, Dict, List, Tuple
@@ -19,6 +21,8 @@ from common.dashboard_auth import (DashboardPrincipal, Scope,
                                    require_dashboard_auth)
 from common.degraded import (degraded_response, is_degraded,
                              unavailable_metric)
+from common.http_hygiene import (MAX_PAYLOAD_BYTES, bounded_json,
+                                 pooled_client, shutdown_pool)
 from common.resilience import resilient_call
 from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
 
@@ -46,6 +50,56 @@ budget = ErrorBudget(window_seconds=300)
 
 
 # ── H1.7 + H2: Safe proxy helpers with retry + circuit breaker ──────
+# A backend's content type is echoed only if it is one we expect. Trusting
+# it outright would let a compromised backend pick the type the browser
+# renders with; forcing a constant (KAI-DASH-089/090) mislabels everything
+# that is not that constant. Neither is safe on its own.
+ALLOWED_AUDIO_TYPES = frozenset({
+    "audio/mpeg", "audio/mp3", "audio/wav", "audio/x-wav",
+    "audio/ogg", "audio/webm", "audio/aac", "audio/flac",
+})
+ALLOWED_IMAGE_TYPES = frozenset({
+    "image/png", "image/jpeg", "image/webp", "image/gif",
+})
+
+
+def _safe_media_type(reported: str | None, allowed: frozenset,
+                     fallback: str) -> str:
+    """Echo the backend's type when recognised, else a neutral default."""
+    if not reported:
+        return fallback
+    base = reported.split(";", 1)[0].strip().lower()
+    return base if base in allowed else fallback
+
+
+def _audit_actor(request: Request) -> str:
+    """Identify the caller for the audit line (KAI-DASH-096).
+
+    Derived from the credential presented, never from a caller-supplied
+    name — an actor a client can choose is not an actor. The token itself
+    is never logged; only a short digest, so two entries can be told
+    apart without the log becoming a place credentials live.
+    """
+    header = request.headers.get("authorization", "")
+    _, _, credential = header.partition(" ")
+    credential = credential.strip()
+    if not credential:
+        return "actor=anonymous"
+    digest = hashlib.sha256(credential.encode("utf-8")).hexdigest()[:12]
+    session = request.headers.get("x-kai-session", "")
+    suffix = f" session={session[:32]}" if session else ""
+    return f"actor={digest}{suffix}"
+
+
+# Connection pooling and payload bounds are repository-wide concerns, not
+# dashboard ones — see `common/http_hygiene.py`. They were first written
+# here, which produced a second copy of limits that
+# `common/perception_spine/ingress.py` already owned.
+@app.on_event("shutdown")
+async def _close_shared_transport() -> None:
+    await shutdown_pool()
+
+
 async def _proxy_get(url: str, params: dict | None = None,
                      fallback: Any = None, timeout: float = 10.0) -> Any:
     """GET from a backend with retry, circuit breaker, and fallback."""
@@ -83,7 +137,7 @@ async def api_set_mode(body: Dict[str, Any] = Body(...)):
 async def api_nudges():
     memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{memu_url}/memory/proactive")
             resp.raise_for_status()
             payload = resp.json()
@@ -106,7 +160,7 @@ async def api_backup_status():
     backup_url = os.getenv("BACKUP_SERVICE_URL", "http://backup-service:8054")
     empty = {"status": "unknown", "latest_backup": None, "total_backups": 0}
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{backup_url}/backup/list")
             resp.raise_for_status()
             payload = resp.json()
@@ -137,7 +191,7 @@ async def api_backup_status():
 async def api_corrections():
     verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8052")
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{verifier_url}/metrics")
             resp.raise_for_status()
             payload = resp.json()
@@ -162,7 +216,13 @@ async def api_corrections():
     except Exception as exc:
         return degraded_response("verifier", str(exc), {"corrections": []})
 
-audit = AuditStream("dashboard", required=os.getenv("AUDIT_REQUIRED", "false").lower() == "true")
+# Audit defaults to *required* (KAI-DASH-096). An audit trail that is
+# optional is not an audit trail: the one deployment that forgets to set
+# the flag is exactly the one whose history you will later want.
+audit = AuditStream(
+    "dashboard",
+    required=os.getenv("AUDIT_REQUIRED", "true").lower() == "true",
+)
 
 SUPERVISOR_URL = os.getenv("SUPERVISOR_URL", "http://supervisor:8051")
 
@@ -191,16 +251,81 @@ NO_GO_GRACE_REQUESTS = int(os.getenv("NO_GO_GRACE_REQUESTS", "20"))
 MAX_ERROR_RATIO = float(os.getenv("MAX_ERROR_RATIO", "0.05"))
 
 
+# ── Gateway workload controls (KAI-DASH-056) ─────────────────────────
+#
+# The gateway had no rate limit, concurrency cap or caller quota, so a
+# single client could fan every request out across a dozen backends. The
+# cap is on *concurrent in-flight requests* rather than a rolling rate:
+# it bounds the work actually happening at once, which is what protects
+# the backends, and it needs no per-caller bookkeeping to do it.
+MAX_CONCURRENT_REQUESTS = int(os.getenv("DASHBOARD_MAX_CONCURRENCY", "64"))
+_REQUEST_SLOTS = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+
+# Applied to HTML and static responses. There is no inline script in the
+# shell, so 'unsafe-inline' is deliberately absent from script-src; the
+# CDN origins the shell loads from are named explicitly rather than
+# opened up with a wildcard.
+SECURITY_HEADERS = {
+    "Content-Security-Policy": (
+        "default-src 'self'; "
+        "script-src 'self' https://cdn.jsdelivr.net; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: blob:; "
+        "media-src 'self' blob:; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'"
+    ),
+    "X-Frame-Options": "DENY",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer",
+}
+
+
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    """Apply browser protections and bound concurrent work.
+
+    Both live here because both must hold for every route, including any
+    added later. Unlike authentication — which is declared per route so
+    that a new unprotected route is *visible* — these are properties no
+    route should be able to opt out of by omission.
+    """
+    try:
+        await asyncio.wait_for(_REQUEST_SLOTS.acquire(), timeout=5.0)
+    except asyncio.TimeoutError:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "unavailable", "degraded": True,
+                     "source": "dashboard",
+                     "reason": "gateway is at its concurrency limit"},
+            headers={"Retry-After": "1"},
+        )
+    try:
+        response = await call_next(request)
+    finally:
+        _REQUEST_SLOTS.release()
+
+    content_type = response.headers.get("content-type", "")
+    if content_type.startswith("text/html"):
+        for header, value in SECURITY_HEADERS.items():
+            response.headers.setdefault(header, value)
+    return response
+
+
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
     try:
         response = await call_next(request)
         budget.record(response.status_code)
-        audit.log("info", f"{request.method} {request.url.path} -> {response.status_code}")
+        audit.log("info", f"{_audit_actor(request)} {request.method} "
+                          f"{request.url.path} -> {response.status_code}")
         return response
     except Exception:
         budget.record(500)
-        audit.log("error", f"{request.method} {request.url.path} -> 500")
+        audit.log("error", f"{_audit_actor(request)} {request.method} "
+                           f"{request.url.path} -> 500")
         raise
 
 
@@ -246,7 +371,7 @@ async def fetch_status() -> Dict[str, Dict[str, Any]]:
             entry["error"] = note
         return name, entry
 
-    async with httpx.AsyncClient() as client:
+    async with pooled_client() as client:
         settled = await asyncio.gather(
             *(probe(client, name, url) for name, url in NODES.items()),
             return_exceptions=True,
@@ -271,7 +396,7 @@ async def build_go_no_go_report() -> Dict[str, Any]:
         reasons.append(f"Critical services are down: {', '.join(down_nodes)}")
 
     try:
-        async with httpx.AsyncClient() as client:
+        async with pooled_client() as client:
             tool_health_resp = await client.get(f"{TOOL_GATE_URL}/health", timeout=2.0)
             tool_health_resp.raise_for_status()
             tool_health = tool_health_resp.json()
@@ -366,12 +491,15 @@ async def build_go_no_go_report() -> Dict[str, Any]:
 
 @app.get("/health")
 async def health() -> Dict[str, str]:
-    return {
-        "status": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
-        "tool_gate_url": TOOL_GATE_URL,
-        "policy_version": policy_version,
-        "policy_hash": policy_hash,
-    }
+    """Liveness only.
+
+    This is one of six routes that answer without a principal, so it must
+    disclose nothing an anonymous caller should not have. It previously
+    returned the Tool Gate URL, policy version and policy hash — internal
+    topology and policy state, handed to anyone who could reach the port
+    (KAI-DASH-069).
+    """
+    return {"status": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)"}
 
 
 @app.get("/metrics")
@@ -387,7 +515,7 @@ async def index() -> Dict[str, object]:
     ledger_size = 0
     memory_count = 0
     try:
-        async with httpx.AsyncClient() as client:
+        async with pooled_client() as client:
             ledger_size = int((await client.get(f"{TOOL_GATE_URL}/ledger/stats", timeout=2.0)).json().get("count", 0))
             memory_count = int((await client.get(f"{MEMU_INTROSPECT_URL}/memory/stats", timeout=2.0)).json().get("records", 0))
     except Exception:
@@ -402,7 +530,7 @@ async def index() -> Dict[str, object]:
     quarantine_count = 0
     verifier_stats: Dict[str, Any] = {}
     try:
-        async with httpx.AsyncClient(timeout=2.0) as client:
+        async with pooled_client(timeout=2.0) as client:
             # breakers from supervisor
             br_resp = await client.get(f"{SUPERVISOR_URL}/breakers")
             if br_resp.status_code == 200:
@@ -410,7 +538,7 @@ async def index() -> Dict[str, object]:
     except Exception:
         pass
     try:
-        async with httpx.AsyncClient(timeout=2.0) as client:
+        async with pooled_client(timeout=2.0) as client:
             # quarantine count
             q_resp = await client.get(f"{MEMU_INTROSPECT_URL}/memory/quarantine/list")
             if q_resp.status_code == 200:
@@ -419,7 +547,7 @@ async def index() -> Dict[str, object]:
         pass
     try:
         verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8052")
-        async with httpx.AsyncClient(timeout=2.0) as client:
+        async with pooled_client(timeout=2.0) as client:
             v_resp = await client.get(f"{verifier_url}/metrics")
             if v_resp.status_code == 200:
                 verifier_stats = v_resp.json()
@@ -498,7 +626,7 @@ refresh();
 async def fleet() -> Dict[str, Any]:
     """Proxy the supervisor's fleet health view into the dashboard."""
     try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
+        async with pooled_client(timeout=3.0) as client:
             resp = await client.get(f"{SUPERVISOR_URL}/status")
             resp.raise_for_status()
             return resp.json()
@@ -536,7 +664,7 @@ async def api_thinking(
     """Fetch latest episode data from agentic for thinking pathway visualization."""
     agentic_url = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.post(
                 f"{agentic_url}/episodes/recall",
                 json={"user_id": principal.identity, "days": 7},
@@ -573,7 +701,7 @@ async def api_thinking(
 async def api_tempo():
     """Proxy operator tempo from memu-core."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{MEMU_URL}/memory/tempo")
             resp.raise_for_status()
             return resp.json()
@@ -586,7 +714,7 @@ async def api_tempo():
 async def api_boundary():
     """Proxy knowledge boundary map from memu-core."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{MEMU_URL}/memory/boundary")
             resp.raise_for_status()
             return resp.json()
@@ -599,7 +727,7 @@ async def api_boundary():
 async def api_silence():
     """Proxy silence-as-signal data from memu-core."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{MEMU_URL}/memory/silence")
             resp.raise_for_status()
             return resp.json()
@@ -612,7 +740,7 @@ async def api_silence():
 async def api_self_assessment():
     """Proxy temporal self-model from heartbeat."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{HEARTBEAT_URL}/self-assessment")
             resp.raise_for_status()
             return resp.json()
@@ -626,7 +754,7 @@ async def api_dream():
     """Trigger a dream consolidation cycle via agentic-introspect."""
     introspect_url = os.getenv("AGENTIC_INTROSPECT_URL", "http://agentic-introspect:8023")
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0) as client:
             resp = await client.post(f"{introspect_url}/dream")
             resp.raise_for_status()
             return resp.json()
@@ -640,7 +768,7 @@ async def api_ledger_stats():
     """Proxy ledger statistics from ledger-worker."""
     ledger_url = os.getenv("LEDGER_WORKER_URL", "http://ledger-worker:8056")
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{ledger_url}/stats")
             resp.raise_for_status()
             return resp.json()
@@ -659,7 +787,13 @@ def _sse_error(message: str) -> str:
     return f"data: {payload}\n\ndata: [DONE]\n\n"
 
 
-MAX_CHAT_BODY_BYTES = int(os.getenv("MAX_CHAT_BODY_BYTES", str(256 * 1024)))
+# Every subscriber holds a Redis connection for the life of the stream,
+# so this is a connection cap as much as a client cap (KAI-DASH-042).
+# A plain counter rather than a Semaphore: admission must be *refused*
+# when full, not awaited, and asyncio gives us the single-threaded
+# guarantee that makes the check-then-increment safe.
+MAX_SSE_CLIENTS = int(os.getenv("DASHBOARD_MAX_SSE_CLIENTS", "32"))
+_sse_clients = 0
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
 
@@ -687,15 +821,34 @@ async def _publish_event(channel: str, data: dict) -> None:
 async def sse_events(request: Request):
     """Server-Sent Events stream backed by Redis pub/sub.
 
-    The dashboard JS connects via EventSource('/api/events') and receives
-    real-time updates instead of polling.
+    The dashboard JS streams this and receives real-time updates instead
+    of polling.
+
+    Each subscriber holds a dedicated Redis connection and pubsub for as
+    long as it stays connected, so an unbounded client count is an
+    unbounded Redis connection count (KAI-DASH-042). Admission is capped,
+    and a refused client is told so rather than being quietly starved.
     """
+    global _sse_clients
+    if _sse_clients >= MAX_SSE_CLIENTS:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "unavailable", "degraded": True,
+                     "source": "dashboard",
+                     "reason": f"event stream is at its limit "
+                               f"({MAX_SSE_CLIENTS} concurrent subscribers)"},
+            headers={"Retry-After": "5"},
+        )
+    _sse_clients += 1
+
     async def event_generator():
+        global _sse_clients
         try:
             r = aioredis.from_url(REDIS_URL, decode_responses=True)
             pubsub = r.pubsub()
             await pubsub.subscribe(*_EVENT_CHANNELS)
         except Exception as exc:
+            _sse_clients = max(0, _sse_clients - 1)
             logger.warning("event stream failed: %s", exc)
             yield _sse_error("the event stream is unavailable")
             return
@@ -716,10 +869,15 @@ async def sse_events(request: Request):
                     yield f"data: {_json.dumps(payload)}\n\n"
                 else:
                     # keepalive heartbeat every 15s
-                    yield f"data: {_json.dumps({'channel': 'heartbeat', 'ts': datetime.utcnow().isoformat()})}\n\n"
+                    heartbeat = {"channel": "heartbeat",
+                                 "ts": datetime.now(timezone.utc).isoformat()}
+                    yield f"data: {_json.dumps(heartbeat)}\n\n"
         except asyncio.CancelledError:
             pass
         finally:
+            # The slot must come back however the stream ended, or the
+            # cap becomes a slow leak towards permanent refusal.
+            _sse_clients = max(0, _sse_clients - 1)
             await pubsub.unsubscribe(*_EVENT_CHANNELS)
             await pubsub.aclose()
             await r.aclose()
@@ -737,7 +895,7 @@ async def api_security_audit():
     """Proxy security self-hacking audit from agentic-introspect."""
     introspect_url = os.getenv("AGENTIC_INTROSPECT_URL", "http://agentic-introspect:8023")
     try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        async with pooled_client(timeout=15.0) as client:
             resp = await client.get(f"{introspect_url}/security/audit")
             resp.raise_for_status()
             return resp.json()
@@ -752,7 +910,7 @@ async def api_security_audit():
 async def api_goals():
     """Proxy Ohana goals from memu-core."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{MEMU_URL}/memory/goals")
             resp.raise_for_status()
             return resp.json()
@@ -764,9 +922,9 @@ async def api_goals():
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_ROUTINE))])
 async def api_goals_create(request: Request):
     """Proxy create goal to memu-core."""
-    body = await request.json()
+    body = await bounded_json(request)
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.post(f"{MEMU_URL}/memory/goals", json=body)
             resp.raise_for_status()
             return resp.json()
@@ -778,9 +936,9 @@ async def api_goals_create(request: Request):
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_ROUTINE))])
 async def api_goals_update(request: Request):
     """Proxy update goal progress to memu-core."""
-    body = await request.json()
+    body = await bounded_json(request)
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.post(f"{MEMU_URL}/memory/goals/update", json=body)
             resp.raise_for_status()
             return resp.json()
@@ -793,7 +951,7 @@ async def api_goals_update(request: Request):
 async def api_drift():
     """Proxy drift detection from memu-core."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{MEMU_URL}/memory/drift")
             resp.raise_for_status()
             return resp.json()
@@ -814,7 +972,7 @@ async def api_memories(
     never worked from here.
     """
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             if query:
                 resp = await client.get(
                     f"{MEMU_URL}/memory/retrieve",
@@ -836,7 +994,7 @@ async def api_memories(
 async def api_memory_stats():
     """Proxy memory statistics from memu-core-introspect."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{MEMU_INTROSPECT_URL}/memory/stats")
             resp.raise_for_status()
             return resp.json()
@@ -944,7 +1102,7 @@ async def api_finance_cis():
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_finance_cis_record(request: Request):
     """Proxy CIS payment record creation to the financial-awareness service."""
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{FINANCIAL_URL}/finance/cis/record", body=body, fallback={"status": "unavailable"})
 
 
@@ -962,7 +1120,7 @@ async def api_soul_get():
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def api_soul_post(request: Request):
     """Update SOUL.md content via agentic."""
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{AGENTIC_URL}/soul", body=body, fallback={"status": "unavailable"})
 
 
@@ -977,7 +1135,7 @@ async def api_agents_registry_get():
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def api_agents_registry_post(request: Request):
     """Update AGENTS.md content via agentic."""
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{AGENTIC_URL}/agents-registry", body=body, fallback={"status": "unavailable"})
 
 
@@ -985,7 +1143,7 @@ async def api_agents_registry_post(request: Request):
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_pii_scan(request: Request):
     """Scan text for PII (and optionally redact) via the verifier service."""
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(
         f"{VERIFIER_URL}/redact",
         body={"text": body.get("text", ""), "auto_redact": body.get("auto_redact", True)},
@@ -998,7 +1156,7 @@ async def api_pii_scan(request: Request):
 async def api_struggle(session_id: str = "default"):
     """Proxy struggle detection from memu-core."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{MEMU_URL}/memory/struggle", params={"session_id": session_id})
             resp.raise_for_status()
             return resp.json()
@@ -1010,9 +1168,9 @@ async def api_struggle(session_id: str = "default"):
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def api_feedback(request: Request):
     """Proxy feedback rating to memu-core."""
-    body = await request.json()
+    body = await bounded_json(request)
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.post(f"{MEMU_URL}/memory/feedback", json=body)
             resp.raise_for_status()
             return resp.json()
@@ -1025,7 +1183,7 @@ async def api_feedback(request: Request):
 async def api_feedback_stats():
     """Proxy feedback stats from memu-core."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{MEMU_URL}/memory/feedback/stats")
             resp.raise_for_status()
             return resp.json()
@@ -1046,7 +1204,7 @@ async def api_logs(limit: int = 100, level: str = "", since: float = 0):
 
     # Collect from memu-core
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{MEMU_URL}/logs", params=params)
             if resp.status_code == 200:
                 data = resp.json()
@@ -1057,7 +1215,7 @@ async def api_logs(limit: int = 100, level: str = "", since: float = 0):
     # Collect from agentic
     agentic_url = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{agentic_url}/logs", params=params)
             if resp.status_code == 200:
                 data = resp.json()
@@ -1080,7 +1238,7 @@ async def api_logs(limit: int = 100, level: str = "", since: float = 0):
 @app.post("/api/emotion/record",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_emotion_record(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/emotion/record", body)
 
 
@@ -1100,7 +1258,7 @@ async def proxy_emotion_timeline(
 @app.post("/api/reflect",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_reflect(request: Request):
-    body = await request.json() if (await request.body()) else {}
+    body = await bounded_json(request) if (await request.body()) else {}
     return await _proxy_post(f"{MEMU_URL}/memory/self-reflect", body, timeout=15.0)
 
 
@@ -1120,7 +1278,7 @@ async def proxy_relationship():
 @app.post("/api/relationship/milestone",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_milestone(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/relationship/milestone", body)
 
 
@@ -1139,7 +1297,7 @@ async def proxy_eq_summary():
 @app.post("/api/confess",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_confess(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/confess", body)
 
 
@@ -1148,7 +1306,7 @@ async def proxy_confess(request: Request):
 @app.post("/api/autobiography/record",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_autobiography_record(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/autobiography/record", body)
 
 
@@ -1180,7 +1338,7 @@ async def proxy_future_self():
 @app.post("/api/legacy/write",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_legacy_write(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/legacy/write", body)
 
 
@@ -1202,7 +1360,7 @@ async def proxy_narrative_summary():
 @app.post("/api/imagine/counterfactual",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_counterfactual(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/imagine/counterfactual", body)
 
 
@@ -1215,7 +1373,7 @@ async def proxy_counterfactuals():
 @app.post("/api/imagine/empathize",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_empathize(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/imagine/empathize", body)
 
 
@@ -1228,7 +1386,7 @@ async def proxy_empathy_map():
 @app.post("/api/imagine/synthesize",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_synthesize(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/imagine/synthesize", body)
 
 
@@ -1241,7 +1399,7 @@ async def proxy_ideas():
 @app.post("/api/imagine/thought",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_thought(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/imagine/thought", body)
 
 
@@ -1254,7 +1412,7 @@ async def proxy_inner_monologue():
 @app.post("/api/imagine/aspire",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_aspire(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/imagine/aspire", body)
 
 
@@ -1275,7 +1433,7 @@ async def proxy_imagination_summary():
 @app.post("/api/values/learn",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_values_learn(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/values/learn", body)
 
 
@@ -1288,7 +1446,7 @@ async def proxy_values():
 @app.post("/api/conscience/check",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_conscience_check(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/conscience/check", body)
 
 
@@ -1301,7 +1459,7 @@ async def proxy_conscience_audit():
 @app.post("/api/loyalty/record",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_loyalty_record(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/loyalty/record", body)
 
 
@@ -1314,7 +1472,7 @@ async def proxy_loyalty():
 @app.post("/api/gratitude/record",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def proxy_gratitude_record(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MEMU_URL}/memory/gratitude/record", body)
 
 
@@ -1482,12 +1640,22 @@ async def proxy_wake_process(body: Dict[str, Any] = Body(...)):
 
 # ── Unified App Shell ────────────────────────────────────────────────
 
+@lru_cache(maxsize=1)
+def _app_shell_html() -> str:
+    """Read the shell once. It is a build artefact, not live data."""
+    html_path = os.path.join(os.path.dirname(__file__), "static", "app.html")
+    with open(html_path, "r", encoding="utf-8") as handle:
+        return handle.read()
+
+
 @app.get("/app")
 async def app_shell() -> HTMLResponse:
-    """Serve the unified single-page app shell."""
-    html_path = os.path.join(os.path.dirname(__file__), "static", "app.html")
-    with open(html_path, "r") as f:
-        return HTMLResponse(f.read())
+    """Serve the unified single-page app shell.
+
+    Previously re-read from disk on every request (KAI-DASH-087) — a
+    blocking read on the hot path of a page the UI polls.
+    """
+    return HTMLResponse(_app_shell_html())
 
 
 # ── Chat proxy — Kai's face ─────────────────────────────────────────
@@ -1509,20 +1677,12 @@ async def api_chat_proxy(request: Request):
     The agentic service does the actual LLM inference.
     """
     # KAI-DASH-053 — the request body was unbounded.
-    raw = await request.body()
-    if len(raw) > MAX_CHAT_BODY_BYTES:
-        raise HTTPException(
-            status_code=413,
-            detail=f"chat body exceeds {MAX_CHAT_BODY_BYTES} bytes",
-        )
-    try:
-        body = _json.loads(raw or b"{}")
-    except ValueError:
-        raise HTTPException(status_code=400, detail="chat body is not valid JSON")
+    # KAI-DASH-053 — the request body was unbounded.
+    body = await bounded_json(request)
 
     async def stream_proxy():
         try:
-            async with httpx.AsyncClient(timeout=httpx.Timeout(180.0, connect=10.0, read=120.0)) as client:
+            async with pooled_client(timeout=httpx.Timeout(180.0, connect=10.0, read=120.0)) as client:
                 async with client.stream(
                     "POST",
                     f"{LANGGRAPH_URL}/chat",
@@ -1613,7 +1773,7 @@ async def api_upload(file: UploadFile = File(...)):
         raise HTTPException(status_code=415, detail=f"Unsupported file type: .{ext or '(none)'}")
 
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with pooled_client(timeout=60.0) as client:
             resp = await client.post(
                 target_url,
                 files={"file": (file.filename, data, content_type)},
@@ -1641,17 +1801,22 @@ async def api_tts_synthesize(request: Request):
     Returns audio/mpeg when TTS service is available, 503 when offline.
     """
     from fastapi.responses import Response as FastAPIResponse
-    body = await request.json()
+    body = await bounded_json(request)
     text = str(body.get("text", "")).strip()
     if not text:
         raise HTTPException(status_code=400, detail="Empty text")
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0) as client:
             resp = await client.post(f"{TTS_URL}/synthesize", json=body)
             resp.raise_for_status()
+            # Forcing audio/mpeg regardless of what the backend actually
+            # sent (KAI-DASH-089) mislabels any other format and hands the
+            # browser a file its type does not describe.
             return FastAPIResponse(
                 content=resp.content,
-                media_type="audio/mpeg",
+                media_type=_safe_media_type(
+                    resp.headers.get("content-type"), ALLOWED_AUDIO_TYPES,
+                    "application/octet-stream"),
                 headers={"X-Voice": resp.headers.get("X-Voice", "")},
             )
     except httpx.HTTPStatusError as exc:
@@ -1672,7 +1837,7 @@ async def api_audio_transcribe(file: UploadFile = File(...)):
     """
     data = await file.read()
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with pooled_client(timeout=60.0) as client:
             resp = await client.post(
                 f"{AUDIO_URL}/capture/file",
                 files={"file": (file.filename or "audio.webm", data, file.content_type or "audio/webm")},
@@ -1696,9 +1861,9 @@ async def api_audio_transcribe(file: UploadFile = File(...)):
 @app.post("/api/browser/navigate",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_browser_navigate(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0) as client:
             resp = await client.post(f"{BROWSER_AGENT_URL}/navigate", json=body)
             resp.raise_for_status()
             return resp.json()
@@ -1714,9 +1879,9 @@ async def api_browser_navigate(request: Request):
 @app.post("/api/browser/scrape",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_browser_scrape(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0) as client:
             resp = await client.post(f"{BROWSER_AGENT_URL}/scrape", json=body)
             resp.raise_for_status()
             return resp.json()
@@ -1732,9 +1897,9 @@ async def api_browser_scrape(request: Request):
 @app.post("/api/browser/run",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_browser_run(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with pooled_client(timeout=60.0) as client:
             resp = await client.post(f"{BROWSER_AGENT_URL}/run", json=body)
             resp.raise_for_status()
             return resp.json()
@@ -1752,10 +1917,15 @@ async def api_browser_run(request: Request):
 async def api_browser_screenshot():
     from fastapi.responses import Response as FastAPIResponse
     try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        async with pooled_client(timeout=15.0) as client:
             resp = await client.post(f"{BROWSER_AGENT_URL}/screenshot")
             resp.raise_for_status()
-            return FastAPIResponse(content=resp.content, media_type="image/png")
+            return FastAPIResponse(
+                content=resp.content,
+                media_type=_safe_media_type(
+                    resp.headers.get("content-type"), ALLOWED_IMAGE_TYPES,
+                    "application/octet-stream"),
+            )
     except httpx.HTTPStatusError as exc:
         raise HTTPException(status_code=502, detail=f"Browser agent error: {exc}")
     except httpx.RequestError as exc:
@@ -1769,7 +1939,7 @@ async def api_browser_screenshot():
 async def api_vision_analyze(file: UploadFile = File(...)):
     data = await file.read()
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0) as client:
             resp = await client.post(
                 f"{VISION_URL}/analyze/frame",
                 files={"file": (file.filename or "frame.jpg", data, file.content_type or "image/jpeg")},
@@ -1790,7 +1960,7 @@ async def api_vision_analyze(file: UploadFile = File(...)):
 async def api_vision_presence(file: UploadFile = File(...)):
     data = await file.read()
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.post(
                 f"{VISION_URL}/analyze/presence",
                 files={"file": (file.filename or "frame.jpg", data, file.content_type or "image/jpeg")},
@@ -1811,7 +1981,7 @@ async def api_vision_presence(file: UploadFile = File(...)):
 @app.post("/api/clipboard/push",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_clipboard_push(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{CLIPBOARD_URL}/push", body=body, fallback={"ok": False})
 
 
@@ -1831,7 +2001,7 @@ async def api_clipboard_history(limit: int = 20):
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_clipboard_clear():
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.delete(f"{CLIPBOARD_URL}/history")
             resp.raise_for_status()
             return resp.json()
@@ -1859,7 +2029,7 @@ async def api_files_watching():
 @app.post("/api/files/watch",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_files_watch(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{FILES_URL}/watch", body=body, fallback={"ok": False})
 
 
@@ -1868,7 +2038,7 @@ async def api_files_watch(request: Request):
 @app.post("/api/notify/send",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_notify_send(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{NOTIFY_URL}/notify", body=body, fallback={"ok": False})
 
 
@@ -1883,7 +2053,7 @@ async def api_notify_pending(unread_only: bool = True):
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_notify_dismiss(notification_id: int):
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.delete(f"{NOTIFY_URL}/pending/{notification_id}")
             resp.raise_for_status()
             return resp.json()
@@ -1895,7 +2065,7 @@ async def api_notify_dismiss(notification_id: int):
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_notify_dismiss_all():
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.delete(f"{NOTIFY_URL}/pending")
             resp.raise_for_status()
             return resp.json()
@@ -1914,7 +2084,7 @@ async def api_monitor_rules():
 @app.post("/api/monitor/rules",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_monitor_add_rule(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     return await _proxy_post(f"{MONITOR_URL}/rules", body=body, fallback={"ok": False})
 
 
@@ -1922,7 +2092,7 @@ async def api_monitor_add_rule(request: Request):
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_monitor_delete_rule(rule_id: str):
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0) as client:
             resp = await client.delete(f"{MONITOR_URL}/rules/{rule_id}")
             resp.raise_for_status()
             return resp.json()
@@ -1958,7 +2128,7 @@ async def api_monitor_alerts(limit: int = 50):
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_monitor_clear_alerts():
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0) as client:
             resp = await client.delete(f"{MONITOR_URL}/alerts")
             resp.raise_for_status()
             return resp.json()
@@ -1977,9 +2147,9 @@ async def api_monitor_status():
 @app.post("/api/browser/search",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_browser_search(request: Request):
-    body = await request.json()
+    body = await bounded_json(request)
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0) as client:
             resp = await client.post(f"{BROWSER_AGENT_URL}/search", json=body)
             resp.raise_for_status()
             return resp.json()
@@ -2049,7 +2219,7 @@ async def api_broker_templates():
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_broker_watch(request: Request):
     """Create a monitor rule for a position from the Broker tab Quick Watch button."""
-    body = await request.json()
+    body = await bounded_json(request)
     symbol = body.get("symbol", "").upper()
     threshold = body.get("threshold")
     if not symbol:
@@ -2111,7 +2281,7 @@ async def api_screen_watcher_status():
 @app.post("/api/screen-watcher/watch/start",
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_screen_watcher_start(request: Request):
-    body = await request.json() if request.headers.get("content-type") == "application/json" else {}
+    body = await bounded_json(request) if request.headers.get("content-type") == "application/json" else {}
     return await _proxy_post(f"{SCREEN_WATCHER_URL}/watch/start", body=body, fallback={"ok": False})
 
 
@@ -2209,7 +2379,7 @@ async def api_broker_trades(symbol: str, limit: int = 20):
 @app.get("/api/broker/stocks/{symbol}",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def broker_stocks(symbol: str):
-    async with httpx.AsyncClient(timeout=15.0) as client:
+    async with pooled_client(timeout=15.0) as client:
         r = await client.get(f"{BROKER_URL}/stocks/{symbol}")
         r.raise_for_status()
         return r.json()
@@ -2218,7 +2388,7 @@ async def broker_stocks(symbol: str):
 @app.get("/api/broker/forex/{pair}",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def broker_forex(pair: str):
-    async with httpx.AsyncClient(timeout=15.0) as client:
+    async with pooled_client(timeout=15.0) as client:
         r = await client.get(f"{BROKER_URL}/forex/{pair}")
         r.raise_for_status()
         return r.json()

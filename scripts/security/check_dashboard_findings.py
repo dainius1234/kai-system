@@ -542,9 +542,16 @@ def dash_083() -> Result:
 
 def dash_017() -> Result:
     """Raw JSON proxy bodies have no byte, nesting or field-count limits."""
-    if "MAX_PAYLOAD_BYTES" in _text() or "bound_payload" in _text():
-        return REMEDIATED, "aggregate payload bounds applied to proxy bodies"
-    return LIVE, "await request.json() with no byte, depth or key bounds"
+    text = _text()
+    unbounded = text.count("await request.json()")
+    if unbounded:
+        return LIVE, f"{unbounded} raw request.json() read(s) with no bounds"
+    if "bounded_json" not in text:
+        return PARTIAL, "no bounded reader is in use"
+    return REMEDIATED, (
+        f"{text.count('await bounded_json(request)')} body read(s) bounded "
+        f"by bytes, depth and key count"
+    )
 
 
 def dash_056() -> Result:
@@ -590,10 +597,17 @@ def dash_057() -> Result:
 
 def dash_074() -> Result:
     """Many proxy routes create a new HTTP client per request."""
-    n = _text().count("httpx.AsyncClient(")
-    if n > 3:
-        return LIVE, f"{n} per-request httpx.AsyncClient() constructions"
-    return REMEDIATED, f"only {n} client construction site(s); pooling in use"
+    text = _text()
+    per_request = text.count("async with httpx.AsyncClient(")
+    if per_request:
+        return LIVE, f"{per_request} per-request httpx.AsyncClient() constructions"
+    if "pooled_client" not in text:
+        return PARTIAL, "no per-request clients, but no shared pool either"
+    borrowed = text.count("async with pooled_client(")
+    return REMEDIATED, (
+        f"{borrowed} call site(s) borrow one pooled client; connections "
+        f"are reused rather than rebuilt per request"
+    )
 
 
 def dash_087() -> Result:
@@ -610,10 +624,22 @@ def dash_096() -> Result:
     """Audit logging optional and records only method/path/status."""
     text = _text()
     if 'AUDIT_REQUIRED", "false"' in text or "AUDIT_REQUIRED', 'false'" in text:
-        return LIVE, "audit stream defaults to not-required; no actor or operation digest"
-    if "actor" in text and "AuditStream" in text:
-        return REMEDIATED, "audit records actor and operation"
-    return PARTIAL, "audit required by default but actor/digest coverage unverified"
+        return LIVE, "audit stream defaults to not-required"
+    if "AuditStream" not in text:
+        return MANUAL, "no AuditStream found; verify auditing exists"
+    if "_audit_actor" not in text:
+        return PARTIAL, "audit required by default but records no actor"
+    src = _handler_src("_audit_actor")
+    # The actor must come from the credential, not from a header a caller
+    # can set to whatever it likes.
+    if "authorization" not in src.lower():
+        return PARTIAL, "an actor is recorded but not derived from the credential"
+    if "sha256" not in src:
+        return PARTIAL, "the actor appears to be logged without digesting"
+    return REMEDIATED, (
+        "audit is required by default and records a credential-derived "
+        "actor digest, never the credential itself"
+    )
 
 
 def _identity_call_sites() -> List[Tuple[str, str]]:
@@ -677,9 +703,9 @@ def dash_053() -> Result:
     src = _handler_src("api_chat_proxy")
     if not src:
         return REMEDIATED, "chat proxy removed"
-    if "MAX_CHAT_BODY_BYTES" in src or "413" in src:
-        return REMEDIATED, "chat body is size-bounded before parsing"
-    return LIVE, "await request.json() with no size bound"
+    if "bounded_json" in src:
+        return REMEDIATED, "chat body goes through the shared bounded reader"
+    return LIVE, "chat body is read without a size bound"
 
 
 def dash_054() -> Result:
@@ -719,6 +745,33 @@ def dash_055() -> Result:
             if ("yield" in emitted or "return" in emitted) and name in emitted:
                 return LIVE, f"exception text reaches the client: {emitted[:80]}"
     return REMEDIATED, "internal exception detail is logged, not returned"
+
+
+def forced_media_type(handler: str, label: str) -> Callable[[], Result]:
+    """The response type must derive from the backend, not a constant.
+
+    Checked on the ``media_type=`` argument specifically. Searching the
+    handler for the literal string would now match the allow-list of
+    recognised types, which is the opposite of the defect.
+    """
+    def check() -> Result:
+        src = _handler_src(handler)
+        if not src:
+            return REMEDIATED, f"{label} proxy removed"
+        forced = []
+        for node in ast.walk(ast.parse(src)):
+            if not isinstance(node, ast.Call):
+                continue
+            for kw in node.keywords:
+                if kw.arg != "media_type":
+                    continue
+                if isinstance(kw.value, ast.Constant):
+                    forced.append(str(kw.value.value))
+        if forced:
+            return LIVE, (f"{label} response type is forced to "
+                          f"{', '.join(forced)} regardless of the backend")
+        return REMEDIATED, f"{label} media type derives from the backend response"
+    return check
 
 
 # ── The finding table ────────────────────────────────────────────────
@@ -869,13 +922,9 @@ FINDINGS: Dict[str, Finding] = {
     "KAI-DASH-051": Finding(H, "F", "Filename propagation",
                             manual("filename canonicalisation before backend forwarding")),
     "KAI-DASH-089": Finding(M, "F", "Forced TTS media type",
-                            source_marker('"audio/mpeg"',
-                                          "TTS response media type forced regardless of backend",
-                                          "TTS media type derived from backend response")),
+                            forced_media_type("api_tts_synthesize", "TTS")),
     "KAI-DASH-090": Finding(M, "F", "Forced screenshot media type",
-                            source_marker('"image/png"',
-                                          "screenshot media type forced regardless of backend",
-                                          "screenshot media type derived from backend response")),
+                            forced_media_type("api_browser_screenshot", "screenshot")),
     "KAI-DASH-091": Finding(M, "F", "Caller media metadata trusted",
                             manual("audio/vision proxies trust caller content-type")),
 

@@ -50,14 +50,14 @@ Produced by `scripts/security/check_dashboard_findings.py`:
 
 | Status | At `cb3f142` (baseline) | Now (Track A done) | Meaning |
 |---|---|---|---|
-| **LIVE** | 54 | **11** | the condition still holds |
+| **LIVE** | 54 | **0** | the condition still holds |
 | **PARTIAL** | 2 | **0** | materially reduced, not resolved |
-| **REMEDIATED** | 3 | **51** | condition no longer holds (pending closure review) |
+| **REMEDIATED** | 3 | **62** | condition no longer holds (pending closure review) |
 | **MANUAL** | 37 | **34** | not statically decidable; named for human review |
 | **Total** | 96 | **96** | coverage self-audit enforces this |
 
-Of the 11 still LIVE: **0 CRITICAL, 3 HIGH, 8 MEDIUM**, all in Tracks E–I.
-Every one of the 10 CRITICALs is remediated.
+**No finding of any severity reports LIVE.** 62 REMEDIATED, 34 MANUAL.
+MANUAL is not a pass — each names what a human must review.
 
 **Route surface:** 185 routes — 119 GET, 61 POST, 5 DELETE.
 **66 mutating routes, all 66 now authenticated.** The 6 that serve without
@@ -74,11 +74,11 @@ widening it is a deliberate edit rather than a side effect.
 | **B** Mutating authority | 0 | 20 | 1 | **Done** bar one manual review |
 | **C** Sensitive reads | 0 | 11 | 1 | **Done** bar one manual review |
 | **D** Failure semantics | 0 | 11 | 2 | **Done** bar two manual reviews |
-| **E** Bounds | 3 | 1 | 8 | Next |
-| **F** Media trust | 2 | 0 | 3 | Not started |
-| **G** Disclosure | 1 | 1 | 3 | Not started |
-| **H** Fan-out | 2 | 1 | 6 | Not started |
-| **I** Hygiene | 3 | 1 | 10 | Not started |
+| **E** Bounds | 0 | 4 | 8 | **Done** |
+| **F** Media trust | 0 | 2 | 3 | **Done** |
+| **G** Disclosure | 0 | 2 | 3 | **Done** |
+| **H** Fan-out | 0 | 3 | 6 | **Done** |
+| **I** Hygiene | 0 | 4 | 10 | **Done** |
 
 ### What the baseline revalidation found (historical — before Track A)
 
@@ -289,7 +289,18 @@ resolved.
   the metric is reported **unavailable rather than substituted**.
   `/go-no-go` is now three-valued (GO / NO_GO / INDETERMINATE) and
   anything that is not a proven GO answers 503.
-- **Tracks E–I:** not started. 11 findings LIVE (3 HIGH, 8 MEDIUM).
+- **Tracks E–I: complete.** Bounded bodies, an SSE admission cap and a
+  gateway concurrency limit; media types derived from the backend rather
+  than forced; `/health` reduced to liveness; a shared connection pool and
+  a cached app shell; timezone-aware timestamps, browser security headers,
+  and audit required by default recording a credential-derived actor
+  digest — never the credential.
+- **A correction worth recording:** bounds and pooling were first written
+  inside `dashboard/app.py`, which created a *second* payload-limit
+  implementation while `common/perception_spine/ingress.py` already owned
+  one. They now live in `common/http_hygiene.py` and reuse those limits.
+  See [`W1_GLOBAL_HYGIENE_SUBPLAN.md`](W1_GLOBAL_HYGIENE_SUBPLAN.md) for
+  the same defects elsewhere in the repository.
 - **Findings formally closed: 0** (Rule 7 — closure is a separate
   evidence-backed register action).
 
