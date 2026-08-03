@@ -567,6 +567,62 @@ def dash_096() -> Result:
     return PARTIAL, "audit required by default but actor/digest coverage unverified"
 
 
+def _identity_call_sites() -> List[Tuple[str, str]]:
+    """(handler, snippet) for every backend call passing a user identity."""
+    tree = _tree()
+    if tree is None:
+        return []
+    sites = []
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        src = ast.unparse(node)
+        if "user_id" in src:
+            sites.append((node.name, src))
+    return sites
+
+
+def dash_023() -> Result:
+    """Endpoints hard-code the global `keeper` identity.
+
+    Checked by behaviour rather than by the string "keeper": a literal
+    identity passed to a backend is the defect, whatever it is named.
+    """
+    hard_coded = []
+    for handler, src in _identity_call_sites():
+        for match in re.finditer(r"'user_id':\s*'([^']+)'", src):
+            hard_coded.append(f"{handler} sends user_id={match.group(1)!r}")
+    if hard_coded:
+        return LIVE, "; ".join(hard_coded[:3])
+    if not _identity_call_sites():
+        return MANUAL, "no user_id is sent at all; verify memory reads are scoped"
+    return REMEDIATED, (
+        f"{len(_identity_call_sites())} handler(s) pass the caller's identity, "
+        f"none hard-coded"
+    )
+
+
+def dash_d02() -> Result:
+    """`/memory/retrieve` requires user_id; omitting it returned 422.
+
+    Found while fixing KAI-DASH-023. The search path of `/api/memories`
+    called the backend without a required parameter, so memory search had
+    never worked from the dashboard — it answered 422 every time.
+    """
+    for handler, src in _identity_call_sites():
+        if handler != "api_memories":
+            continue
+        if "memory/retrieve" in src and "user_id" in src:
+            return REMEDIATED, "api_memories passes the required user_id"
+        return LIVE, "api_memories calls /memory/retrieve without required user_id"
+    src = _handler_src("api_memories")
+    if not src:
+        return REMEDIATED, "api_memories no longer exists"
+    if "memory/retrieve" not in src:
+        return REMEDIATED, "api_memories no longer calls /memory/retrieve"
+    return LIVE, "api_memories calls /memory/retrieve without required user_id"
+
+
 # ── The finding table ────────────────────────────────────────────────
 
 class Finding(NamedTuple):
@@ -642,10 +698,7 @@ FINDINGS: Dict[str, Finding] = {
                             route_auth(("get", "/api/thinking"))),
     "KAI-DASH-022": Finding(H, "C", "Memory browsing disclosure",
                             prefix_auth(r"^/api/(memories|memory)")),
-    "KAI-DASH-023": Finding(H, "C", "Hard-coded keeper scope",
-                            source_marker('"keeper"',
-                                          "global 'keeper' identity hard-coded in proxy calls",
-                                          "no hard-coded global identity")),
+    "KAI-DASH-023": Finding(H, "C", "Hard-coded keeper scope", dash_023),
     "KAI-DASH-024": Finding(H, "C", "Graph view leaks security/ranking metadata",
                             route_auth(("get", "/api/memory/graph-data"))),
     "KAI-DASH-025": Finding(H, "C", "Personal-model disclosure",
@@ -848,6 +901,8 @@ DISCOVERED_ID_RX = re.compile(r"KAI-DASH-D\d{2}")
 DISCOVERED: Dict[str, "Finding"] = {
     "KAI-DASH-D01": Finding(
         H, "A", "UI sends no credentials (regression from Track A)", dash_d01),
+    "KAI-DASH-D02": Finding(
+        H, "C", "Memory search omitted a required parameter (422)", dash_d02),
 }
 
 

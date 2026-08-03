@@ -3240,3 +3240,29 @@ This means `KAI_PERCEPTION_MODE` and `KAI_CORTEX_SOURCE` controlled code paths t
 
 **Files produced:** `dashboard/static/auth.js`, `scripts/test_dashboard_ui_auth.js`.
 **Files modified:** `dashboard/static/app.html`, `chat.html`, `index.html`, `thinking.html`, `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `Makefile`, tracker/plan/README/STATUS/MAKEFILE_TARGETS.
+
+---
+
+## D144 — 2026-08-02 — W1-DASH Track C: Memory Reads Scoped to the Caller
+
+**Context:** `KAI-DASH-023` was the last LIVE finding in Track C. The dashboard asked memU for `user_id="keeper"` on every memory and episode read, regardless of who had authenticated — so Track A's principal model changed who could *reach* the routes but nothing about *whose data* came back.
+
+**Decisions:**
+
+1. **The principal's identity is the memory subject.** Four handlers (`/api/thinking`, `/api/memories`, `/api/memories/recent`, `/api/memory/graph-data`) now depend on `DashboardPrincipal` directly and pass `principal.identity` upstream. A second principal reading memory gets their own scope and sees nothing of the keeper's, which is the behaviour the finding asks for.
+
+2. **`KAI_DASHBOARD_IDENTITY` defaults to `keeper`, not `operator`.** D142 set it to `operator`, which was fine while identity was only an audit label. Now that it selects the memory subject, an `operator` default would point every read at a namespace with no records — **a silently empty Diary rather than a visible failure**. The stack's existing memU records are stored under `keeper`, so that is the correct default. Changed in `common/dashboard_auth.py`, all three compose profiles and `setup_service_token.sh`.
+
+3. **The check tests behaviour, not the string `"keeper"`.** The original `KAI-DASH-023` check was a `source_marker` looking for the literal `"keeper"`, which would have passed the moment someone hard-coded `"admin"` instead. `dash_023()` now flags *any* literal identity passed to a backend, and a test proves it catches `"admin"` as readily as `"keeper"`.
+
+4. **The static check is not sufficient on its own,** so `test_dashboard.py` asserts on the outbound request: set `KAI_DASHBOARD_IDENTITY=dainius`, call `/api/memories?query=…`, and assert the backend received `user_id=dainius`. Reverting the handler to a literal makes that test fail — verified by mutation.
+
+**Discovered while fixing this — `KAI-DASH-D02`.** `/memory/retrieve` declares `user_id` as a **required** parameter. The search branch of `/api/memories` never sent it, so dashboard memory search had been answering **422 every time it was used**. Not in the original 96 — the audit read the dashboard in isolation and could not see the upstream signature. Recorded in the discovered register and fixed in the same change.
+
+**Correction to D142:** it recorded `KAI_DASHBOARD_IDENTITY` defaulting to `operator`. That default is now `keeper`, for the reason in decision 2. The role default is unchanged.
+
+**Verification:** 1,746 tests across 23 suites, all green. 9/9 CI gates. Tracks A, B and C now report **zero LIVE findings**; 21 remain across D–I (11 HIGH, 10 MEDIUM). All 10 CRITICALs remediated.
+
+**Nothing is closed.** Rule 7. Findings formally closed by this entry: **0**.
+
+**Files modified:** `dashboard/app.py`, `common/dashboard_auth.py`, `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `scripts/test_dashboard.py`, `scripts/setup_service_token.sh`, three compose profiles, tracker/plan/README/STATUS/MAKEFILE_TARGETS.

@@ -45,9 +45,11 @@ ensure_token KAI_SERVICE_TOKEN "shared by every service calling a protected endp
 ensure_token KAI_DASHBOARD_TOKEN "the operator's inbound dashboard credential"
 
 if ! grep -qE '^KAI_DASHBOARD_ROLE=' "$ENV_FILE"; then
-  printf 'KAI_DASHBOARD_IDENTITY=%s\n' "operator" >> "$ENV_FILE"
+  # The identity is also the memory subject (KAI-DASH-023): memory reads
+  # are scoped to it, and the stack's existing records are under "keeper".
+  printf 'KAI_DASHBOARD_IDENTITY=%s\n' "keeper" >> "$ENV_FILE"
   printf 'KAI_DASHBOARD_ROLE=%s\n' "keeper" >> "$ENV_FILE"
-  echo "Set KAI_DASHBOARD_IDENTITY=operator, KAI_DASHBOARD_ROLE=keeper."
+  echo "Set KAI_DASHBOARD_IDENTITY=keeper, KAI_DASHBOARD_ROLE=keeper."
 fi
 
 chmod 600 "$ENV_FILE" 2>/dev/null || true

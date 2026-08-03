@@ -175,6 +175,62 @@ def test_upload_service_unreachable():
     assert resp.status_code == 503
 
 
+
+def test_memory_reads_are_scoped_to_the_caller():
+    """KAI-DASH-023: the caller's identity must reach the backend.
+
+    Static absence of the string "keeper" is not evidence that the right
+    identity is sent, so this asserts on the outbound request.
+    """
+    import unittest.mock as mock
+    import httpx
+
+    seen = []
+
+    async def fake_get(self, url, **kwargs):
+        seen.append((str(url), kwargs.get("params") or {}))
+        r = mock.MagicMock()
+        r.status_code = 200
+        r.raise_for_status = mock.MagicMock()
+        r.json.return_value = []
+        return r
+
+    os.environ["KAI_DASHBOARD_IDENTITY"] = "dainius"
+    try:
+        with mock.patch.object(httpx.AsyncClient, "get", new=fake_get):
+            client.get("/api/memories?query=anything", headers=AUTH)
+    finally:
+        os.environ["KAI_DASHBOARD_IDENTITY"] = "test-operator"
+
+    retrieve = [p for url, p in seen if "memory/retrieve" in url]
+    assert retrieve, f"no /memory/retrieve call was made: {seen}"
+    assert retrieve[0].get("user_id") == "dainius", retrieve[0]
+
+
+def test_memory_search_sends_the_required_parameter():
+    """KAI-DASH-D02: user_id is required upstream; omitting it was a 422."""
+    import unittest.mock as mock
+    import httpx
+
+    seen = []
+
+    async def fake_get(self, url, **kwargs):
+        seen.append((str(url), kwargs.get("params") or {}))
+        r = mock.MagicMock()
+        r.status_code = 200
+        r.raise_for_status = mock.MagicMock()
+        r.json.return_value = []
+        return r
+
+    with mock.patch.object(httpx.AsyncClient, "get", new=fake_get):
+        client.get("/api/memories?query=test", headers=AUTH)
+
+    retrieve = [p for url, p in seen if "memory/retrieve" in url]
+    assert retrieve, f"no /memory/retrieve call was made: {seen}"
+    for required in ("query", "user_id", "top_k"):
+        assert required in retrieve[0], f"{required} missing from {retrieve[0]}"
+
+
 if __name__ == "__main__":
     test_health()
     test_index_minimal()
@@ -183,6 +239,8 @@ if __name__ == "__main__":
     test_public_routes_stay_reachable()
     test_viewer_cannot_reach_privileged_routes()
     test_unconfigured_gateway_fails_closed()
+    test_memory_reads_are_scoped_to_the_caller()
+    test_memory_search_sends_the_required_parameter()
     test_upload_no_file()
     test_upload_too_large()
     test_upload_image_ocr_success()

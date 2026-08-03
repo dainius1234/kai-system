@@ -50,13 +50,13 @@ Produced by `scripts/security/check_dashboard_findings.py`:
 
 | Status | At `cb3f142` (baseline) | Now (Track A done) | Meaning |
 |---|---|---|---|
-| **LIVE** | 54 | **22** | the condition still holds |
+| **LIVE** | 54 | **21** | the condition still holds |
 | **PARTIAL** | 2 | **0** | materially reduced, not resolved |
-| **REMEDIATED** | 3 | **37** | condition no longer holds (pending closure review) |
+| **REMEDIATED** | 3 | **38** | condition no longer holds (pending closure review) |
 | **MANUAL** | 37 | **37** | not statically decidable; named for human review |
 | **Total** | 96 | **96** | coverage self-audit enforces this |
 
-Of the 22 still LIVE: **0 CRITICAL, 12 HIGH, 10 MEDIUM.** Every one of the
+Of the 21 still LIVE: **0 CRITICAL, 11 HIGH, 10 MEDIUM.** Every one of the
 10 CRITICALs is remediated.
 
 **Route surface:** 185 routes — 119 GET, 61 POST, 5 DELETE.
@@ -72,7 +72,7 @@ widening it is a deliberate edit rather than a side effect.
 |---|---|---|---|---|
 | **A** Inbound identity | 0 | 5 | 0 | **Done** |
 | **B** Mutating authority | 0 | 20 | 1 | **Done** bar one manual review |
-| **C** Sensitive reads | 1 | 10 | 1 | `DASH-023` (hard-coded `keeper`) outstanding |
+| **C** Sensitive reads | 0 | 11 | 1 | **Done** bar one manual review |
 | **D** Failure semantics | 9 | 1 | 3 | Not started |
 | **E** Bounds | 3 | 0 | 9 | Not started |
 | **F** Media trust | 2 | 0 | 3 | Not started |
@@ -274,10 +274,13 @@ resolved.
   declared public list. 89 tests.
 - **Track B: complete** bar `KAI-DASH-014`, which needs a per-backend
   idempotency review rather than a code change here.
-- **Track C: one finding outstanding** — `KAI-DASH-023`, the hard-coded
-  global `keeper` identity. Authenticating the caller does not help while
-  every request still executes as `keeper`, so this is the next step.
-- **Tracks D–I:** not started.
+- **Track C: complete** bar `KAI-DASH-044` (SSE per-event isolation, a
+  manual review). `KAI-DASH-023` is closed: the four memory and episode
+  reads now carry the calling principal's identity instead of a
+  hard-coded `keeper`. `KAI_DASHBOARD_IDENTITY` defaults to `keeper` so
+  the stack's existing records stay reachable — any other default would
+  silently return an empty Diary rather than fail visibly.
+- **Tracks D–I:** not started. 21 findings LIVE, 11 HIGH and 10 MEDIUM.
 - **Findings formally closed: 0** (Rule 7 — closure is a separate
   evidence-backed register action).
 

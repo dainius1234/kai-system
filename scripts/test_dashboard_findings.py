@@ -534,6 +534,62 @@ def test_d01_is_remediated_on_the_real_tree():
           status == dash.REMEDIATED, f"{status}: {detail}")
 
 
+
+def test_dash_023_flips_on_hard_coded_identity():
+    hard = """
+async def api_memories_recent(top_k):
+    return await get(url, params={'query': 'x', 'user_id': 'keeper', 'top_k': top_k})
+"""
+    scoped = """
+async def api_memories_recent(top_k, principal):
+    return await get(url, params={'query': 'x', 'user_id': principal.identity})
+"""
+    with _Dashboard(hard):
+        live, d1 = dash.dash_023()
+    with _Dashboard(scoped):
+        fixed, d2 = dash.dash_023()
+    check("DASH-023 LIVE with a literal identity", live == dash.LIVE, d1)
+    check("DASH-023 names the literal it found", "keeper" in d1, d1)
+    check("DASH-023 REMEDIATED once the caller's identity is used",
+          fixed == dash.REMEDIATED, d2)
+
+
+def test_dash_023_catches_any_literal_not_just_keeper():
+    """The defect is a hard-coded identity, whatever it is called."""
+    other = """
+async def api_thing(principal):
+    return await get(url, params={'user_id': 'admin'})
+"""
+    with _Dashboard(other):
+        status, detail = dash.dash_023()
+    check("DASH-023 catches a hard-coded identity other than 'keeper'",
+          status == dash.LIVE and "admin" in detail, f"{status}: {detail}")
+
+
+def test_dash_d02_flips_on_the_missing_parameter():
+    broken = """
+async def api_memories(query, principal):
+    return await get(f'{MEMU_URL}/memory/retrieve', params={'query': query})
+"""
+    fixed_src = """
+async def api_memories(query, principal):
+    return await get(f'{MEMU_URL}/memory/retrieve',
+                     params={'query': query, 'user_id': principal.identity})
+"""
+    with _Dashboard(broken):
+        live, d1 = dash.dash_d02()
+    with _Dashboard(fixed_src):
+        fixed, d2 = dash.dash_d02()
+    check("D02 LIVE while the required user_id is missing", live == dash.LIVE, d1)
+    check("D02 REMEDIATED once it is passed", fixed == dash.REMEDIATED, d2)
+
+
+def test_track_c_has_no_live_findings():
+    live = [r["finding"] for r in dash.evaluate()
+            if r["track"] == "C" and r["status"] == dash.LIVE]
+    check("Track C is clear of LIVE findings", not live, str(live))
+
+
 def run() -> None:
     test_coverage_clean_on_real_table()
     test_coverage_detects_missing_finding()
@@ -572,6 +628,10 @@ def run() -> None:
     test_discovered_cannot_collide_with_an_audit_finding()
     test_d01_flips_on_the_ui_shim()
     test_d01_is_remediated_on_the_real_tree()
+    test_dash_023_flips_on_hard_coded_identity()
+    test_dash_023_catches_any_literal_not_just_keeper()
+    test_dash_d02_flips_on_the_missing_parameter()
+    test_track_c_has_no_live_findings()
 
 
 if __name__ == "__main__":

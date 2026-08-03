@@ -14,7 +14,8 @@ from fastapi import (Body, Depends, FastAPI, File, HTTPException, Request,
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, StreamingResponse
 
-from common.dashboard_auth import Scope, require_dashboard_auth
+from common.dashboard_auth import (DashboardPrincipal, Scope,
+                                   require_dashboard_auth)
 from common.resilience import resilient_call
 from common.runtime import AuditStream, ErrorBudget, detect_device, setup_json_logger
 
@@ -393,16 +394,18 @@ async def thinking_page() -> HTMLResponse:
     return HTMLResponse('<meta http-equiv="refresh" content="0;url=/app">')
 
 
-@app.get("/api/thinking",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
-async def api_thinking():
+@app.get("/api/thinking")
+async def api_thinking(
+    principal: DashboardPrincipal = Depends(
+        require_dashboard_auth(Scope.READ_SENSITIVE)),
+):
     """Fetch latest episode data from agentic for thinking pathway visualization."""
     agentic_url = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             resp = await client.post(
                 f"{agentic_url}/episodes/recall",
-                json={"user_id": "keeper", "days": 7},
+                json={"user_id": principal.identity, "days": 7},
             )
             resp.raise_for_status()
             data = resp.json()
@@ -651,14 +654,26 @@ async def api_drift():
         return {"status": "unavailable"}
 
 
-@app.get("/api/memories",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
-async def api_memories(query: str = "", category: str = "", top_k: int = 20):
-    """Browse memories — search or list by category."""
+@app.get("/api/memories")
+async def api_memories(
+    query: str = "", category: str = "", top_k: int = 20,
+    principal: DashboardPrincipal = Depends(
+        require_dashboard_auth(Scope.READ_SENSITIVE)),
+):
+    """Browse memories — search or list by category.
+
+    Memory reads are scoped to the calling principal. ``user_id`` is
+    required by ``/memory/retrieve``; omitting it returned 422, so search
+    never worked from here.
+    """
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             if query:
-                resp = await client.get(f"{MEMU_URL}/memory/retrieve", params={"query": query, "top_k": top_k})
+                resp = await client.get(
+                    f"{MEMU_URL}/memory/retrieve",
+                    params={"query": query, "user_id": principal.identity,
+                            "top_k": top_k},
+                )
             elif category:
                 resp = await client.get(f"{MEMU_INTROSPECT_URL}/memory/search-by-category", params={"category": category, "top_k": top_k})
             else:
@@ -682,13 +697,17 @@ async def api_memory_stats():
         return {"status": "unavailable"}
 
 
-@app.get("/api/memories/recent",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
-async def api_memories_recent(top_k: int = 30):
+@app.get("/api/memories/recent")
+async def api_memories_recent(
+    top_k: int = 30,
+    principal: DashboardPrincipal = Depends(
+        require_dashboard_auth(Scope.READ_SENSITIVE)),
+):
     """Browse recent memories for Diary tab (recency-weighted retrieve)."""
     raw = await _proxy_get(
         f"{MEMU_URL}/memory/retrieve",
-        params={"query": "memories thoughts observations experiences", "user_id": "keeper", "top_k": top_k},
+        params={"query": "memories thoughts observations experiences",
+                "user_id": principal.identity, "top_k": top_k},
         fallback=[],
     )
     records = raw if isinstance(raw, list) else raw.get("records", raw.get("memories", []))
@@ -697,13 +716,16 @@ async def api_memories_recent(top_k: int = 30):
     return {"records": records, "count": len(records)}
 
 
-@app.get("/api/memory/graph-data",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
-async def api_memory_graph_data(top_k: int = 80, query: str = "memories experiences observations"):
+@app.get("/api/memory/graph-data")
+async def api_memory_graph_data(
+    top_k: int = 80, query: str = "memories experiences observations",
+    principal: DashboardPrincipal = Depends(
+        require_dashboard_auth(Scope.READ_SENSITIVE)),
+):
     """Return recent memories formatted as {nodes, links} for the D3 force-graph tab."""
     raw = await _proxy_get(
         f"{MEMU_URL}/memory/retrieve",
-        params={"query": query, "user_id": "keeper", "top_k": top_k},
+        params={"query": query, "user_id": principal.identity, "top_k": top_k},
         fallback=[],
     )
     records = raw if isinstance(raw, list) else raw.get("records", raw.get("memories", []))

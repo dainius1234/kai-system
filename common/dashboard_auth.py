@@ -119,6 +119,11 @@ class DashboardPrincipal:
     ``session`` is caller-supplied and therefore *not* an authorisation
     input — it exists so an action can be correlated across requests in
     the audit trail. Authority comes from ``role`` alone.
+
+    ``identity`` is both who the caller is and, for memory reads, *whose*
+    data they see. Before KAI-DASH-023 the dashboard asked memU for
+    ``user_id=keeper`` no matter who called, so authenticating the caller
+    changed nothing about what they could read.
     """
 
     identity: str
@@ -204,7 +209,12 @@ def load_principals() -> List[Tuple[str, DashboardPrincipal]]:
     if not token:
         return []
 
-    identity = _read_env(IDENTITY_ENV, "operator").strip() or "operator"
+    # Defaults to "keeper" because the principal's identity is also the
+    # memory subject: `/api/memories` and friends scope reads to it
+    # (KAI-DASH-023). The stack's existing memU records are stored under
+    # "keeper", so any other default would silently return an empty
+    # Diary rather than fail visibly.
+    identity = _read_env(IDENTITY_ENV, "keeper").strip() or "keeper"
     role_name = _read_env(ROLE_ENV, Role.KEEPER.value).strip().lower()
     try:
         role = Role(role_name)
