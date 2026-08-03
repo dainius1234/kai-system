@@ -495,9 +495,19 @@ def dash_061() -> Result:
     if not src:
         return MANUAL, "fetch_status() not found"
     if '"status": "ok"' in src or "'status': 'ok'" in src:
-        if "json()" in src and "get(" in src and "status" in src.split("raise_for_status")[-1]:
-            pass
-        return LIVE, "fetch_status() marks any non-raising response 'ok' without reading backend status"
+        # This condition was computed and then discarded — `pass`, and
+        # the verdict below fired regardless. So a handler that *does*
+        # read the backend's own status would still have been reported
+        # LIVE, purely for containing the literal `"status": "ok"`
+        # somewhere. Found by the I-5 inert-rule detector; wiring it up
+        # is what the shape of the code always intended.
+        reads_backend_status = (
+            "json()" in src and "get(" in src
+            and "status" in src.split("raise_for_status")[-1]
+        )
+        if not reads_backend_status:
+            return LIVE, ("fetch_status() marks any non-raising response "
+                          "'ok' without reading backend status")
     return REMEDIATED, "node health derived from backend-reported status"
 
 

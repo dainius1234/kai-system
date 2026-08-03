@@ -46,7 +46,7 @@ from scripts.security import gate_registry as registry_module  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 26
+EXPECTED_SCENARIOS = 29
 executed: list[str] = []
 
 
@@ -222,8 +222,14 @@ def test_an_optional_input_may_be_absent():
 
 def test_the_ast_detector_finds_the_real_shape():
     scenario("ast-positive")
+    # Asserted as a count, not a line number. The first version pinned
+    # `== [70]`, and an unrelated edit to the gate moved the site to 112
+    # — a test guarded on state it does not control, which is the shape
+    # this whole programme keeps correcting. The invariant is "there is
+    # exactly one such site", not "it lives on line 70".
     lines = meta.skips_absent_input("check_port_bindings")
-    check("the known fail-open site is found", lines == [70], str(lines))
+    check("exactly one fail-open site is found", len(lines) == 1, str(lines))
+    check("it is inside the file", lines and lines[0] > 0, str(lines))
 
 
 def test_the_ast_detector_does_not_flag_a_positive_guard():
@@ -331,7 +337,7 @@ def test_invariants_are_counted_per_dimension():
     scenario("invariant-counts")
     problems = {"unregistered": ["a"], "phantom": [], "wiring": ["b"],
                 "blind": ["c", "d"], "denominator": [], "unproven": ["e"],
-                "pending": []}
+                "inert": [], "pending": []}
     counts = meta.invariant_counts(problems)
     check("I-4 sums its three keys", counts["I-4"] == 2, str(counts))
     check("I-1 counts blindness", counts["I-1"] == 2, str(counts))
@@ -368,12 +374,53 @@ def test_an_invariant_at_zero_must_be_enforced():
           str(none_ready))
 
 
+def test_an_inert_constant_is_detected():
+    """A policy-shaped constant nobody reads is a lapsed assertion."""
+    scenario("inert-constant")
+    found = meta.inert_rules("check_restart_recovery")
+    check("the now-wired allowlist is not reported", not found, str(found))
+
+
+def test_an_inert_pass_branch_is_detected():
+    scenario("inert-branch")
+    import tempfile, pathlib as _p
+    src = "X = 1\ndef f(a):\n    if a:\n        pass\n    return a\n"
+    tmp = _p.Path(tempfile.mkdtemp())
+    (tmp / "check_fake.py").write_text(src)
+    original, meta.SECURITY = meta.SECURITY, tmp
+    try:
+        found = meta.inert_rules("check_fake")
+    finally:
+        meta.SECURITY = original
+    check("a `pass`-bodied condition is caught", len(found) == 1, str(found))
+    check("it is named as doing nothing",
+          found and "does nothing" in found[0], str(found))
+
+
+def test_a_non_policy_constant_is_not_reported():
+    """An unused URL constant is cruft; an unused ALLOWED_ is a lapse."""
+    scenario("inert-nonpolicy")
+    import tempfile, pathlib as _p
+    tmp = _p.Path(tempfile.mkdtemp())
+    (tmp / "check_fake2.py").write_text("SOME_URL = 'x'\nALLOWED_THINGS = {1}\n")
+    original, meta.SECURITY = meta.SECURITY, tmp
+    try:
+        found = meta.inert_rules("check_fake2")
+    finally:
+        meta.SECURITY = original
+    check("only the policy-shaped name is reported", len(found) == 1,
+          str(found))
+    check("and it is the ALLOWED_ one",
+          found and "ALLOWED_THINGS" in found[0], str(found))
+
+
 def test_the_enforced_set_never_shrinks():
     """A floor on the ratchet itself. Removing an invariant from ENFORCED
     is the regression this whole file exists to prevent, so it is asserted
     against a literal rather than against the current value."""
     scenario("enforced-floor")
     check("I-4 is enforced", "I-4" in meta.ENFORCED, str(meta.ENFORCED))
+    check("I-5 is enforced", "I-5" in meta.ENFORCED, str(meta.ENFORCED))
     check("every enforced name is a real invariant",
           all(n in meta.INVARIANTS for n in meta.ENFORCED), str(meta.ENFORCED))
 
@@ -383,6 +430,9 @@ def run_all() -> None:
     test_an_enforced_invariant_with_breaches_fails()
     test_a_reported_invariant_with_breaches_does_not_fail()
     test_an_invariant_at_zero_must_be_enforced()
+    test_an_inert_constant_is_detected()
+    test_an_inert_pass_branch_is_detected()
+    test_a_non_policy_constant_is_not_reported()
     test_the_enforced_set_never_shrinks()
     test_a_matching_world_is_clean()
     test_an_unregistered_check_fails()

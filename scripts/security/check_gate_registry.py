@@ -161,6 +161,77 @@ def skips_absent_input(module: str) -> List[int]:
     return sorted(lines)
 
 
+# ── I-5: rules that exist in syntax but have no effect ───────────────
+
+def inert_rules(module: str) -> List[str]:
+    """Named rules the code declares and never consults.
+
+    Three instances of this appeared while reading the gates, all with
+    the same signature — the code's self-description and its behaviour
+    had diverged:
+
+      - `check_compose_drift`: `if net_cfg.get("internal"): pass`
+      - `check_restart_recovery`: `ALLOWED_RESTART` declared, never read,
+        so `restart: nonsense-value` passed while the docstring promised
+        an allowlist
+      - `check_network_zones`: `if svc_nets is None: pass`, under a
+        docstring claiming "every service has an explicit networks
+        assignment"
+
+    The operator's framing is the sharp one: an unused import can be
+    cruft, but **a declared-but-unreferenced constant with a
+    security-shaped name is a claim the code makes about itself that
+    is not true.** The docstring says "we allowlist"; the constant exists
+    to prove it; the constant is wired to nothing.
+
+    Both shapes are detected: a policy-shaped constant nobody reads, and
+    a conditional whose body is exactly `pass`.
+    """
+    path = SECURITY / f"{module}.py"
+    try:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+    except (OSError, SyntaxError):
+        return []
+
+    findings: List[str] = []
+
+    declared = {}
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        for target in node.targets:
+            if isinstance(target, ast.Name) and target.id.isupper():
+                declared[target.id] = node.lineno
+
+    referenced = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load):
+            referenced.add(node.id)
+
+    # Only policy-shaped names. A leftover URL constant is cruft; an
+    # unread ALLOWED_/REQUIRED_/BANNED_ constant is a lapsed assertion.
+    policy = ("ALLOW", "DENY", "BANNED", "REQUIRED", "FORBIDDEN",
+              "MUTABLE", "DANGEROUS", "PROTECTED", "ISOLATED", "INSECURE",
+              "TRUSTED", "PRIMARY", "SECRET", "INTERNAL", "EXTERNAL")
+    for name, lineno in sorted(declared.items()):
+        if name in referenced or not any(p in name for p in policy):
+            continue
+        findings.append(
+            f"{module}.py:{lineno}: {name} is declared and never read — "
+            f"a rule the code claims and does not apply")
+
+    for node in ast.walk(tree):
+        if (isinstance(node, ast.If)
+                and len(node.body) == 1
+                and isinstance(node.body[0], ast.Pass)
+                and not node.orelse):
+            findings.append(
+                f"{module}.py:{node.lineno}: a condition whose body is "
+                f"`pass` — a rule that looks present and does nothing")
+
+    return findings
+
+
 # ── I-2: does it say how much it inspected? ──────────────────────────
 
 def probe_denominator(gate) -> Tuple[str, str]:
@@ -206,7 +277,7 @@ def probe_denominator(gate) -> Tuple[str, str]:
 # ── The cross-check ──────────────────────────────────────────────────
 
 def cross_check(registry, on_disk, in_policy, in_flows,
-                blind=None, probe=None, repo_has=None,
+                blind=None, probe=None, repo_has=None, inert=None,
                 kinds=(GATE_KIND, REPORT_KIND)) -> Dict[str, List[str]]:
     """The rules, as a pure function of the four sources.
 
@@ -218,6 +289,7 @@ def cross_check(registry, on_disk, in_policy, in_flows,
     """
     GATE, REPORT = kinds
     blind = blind or (lambda module: [])
+    inert = inert or (lambda module: [])
     probe = probe or (lambda gate: ("ok", ""))
     repo_has = repo_has or (lambda rel: True)
 
@@ -229,6 +301,7 @@ def cross_check(registry, on_disk, in_policy, in_flows,
     problems: Dict[str, List[str]] = {
         "unregistered": [], "phantom": [], "wiring": [],
         "unproven": [], "blind": [], "denominator": [], "pending": [],
+        "inert": [],
     }
 
     # I-4 — three sources must agree.
@@ -285,6 +358,9 @@ def cross_check(registry, on_disk, in_policy, in_flows,
                     f"{module}: required input {rel} is missing — this "
                     f"check cannot answer its question right now")
 
+        # I-5 — rules declared and never applied.
+        problems["inert"] += inert(module)
+
         # I-2 — a denominator, or an explicit decline.
         status, detail = probe(gate)
         if status in ("missing", "absent"):
@@ -303,6 +379,7 @@ def evaluate() -> Dict[str, List[str]]:
         in_flows=discover_workflows(),
         blind=skips_absent_input,
         probe=probe_denominator,
+        inert=inert_rules,
         repo_has=lambda rel: (REPO / rel).exists(),
         kinds=(GATE, REPORT),
     )
@@ -315,6 +392,7 @@ _HEADINGS = [
     ("blind", "BOUNDARY BLINDNESS — absence reads as correctness (I-1)"),
     ("denominator", "NO DENOMINATOR — a pass that cannot be falsified (I-2)"),
     ("unproven", "NEVER OBSERVED FAILING (I-3)"),
+    ("inert", "INERT RULES — declared, never applied (I-5)"),
 ]
 
 # ── Per-invariant enforcement ────────────────────────────────────────
@@ -334,12 +412,15 @@ INVARIANTS = {
     "I-2": ("report a denominator", ("denominator",)),
     "I-3": ("prove it can fail", ("unproven",)),
     "I-4": ("declare in one place", ("unregistered", "phantom", "wiring")),
+    "I-5": ("no inert rules", ("inert",)),
 }
 
 # Enforced invariants fail the build. Adding one here is the ratchet
 # turning; removing one is the thing this file exists to prevent, and
 # `test_gate_registry.py` asserts the set never shrinks.
-ENFORCED = ("I-4",)
+# I-5 joined here because it reached zero and the gate refused to pass
+# until it did — the ratchet advancing itself, on its own author.
+ENFORCED = ("I-4", "I-5")
 
 
 def invariant_counts(problems: Dict[str, List[str]]) -> Dict[str, int]:

@@ -93,8 +93,10 @@ REGISTRY: Tuple[Gate, ...] = (
     # ── The eight pre-incident compose gates ─────────────────────────
     # None reports a denominator; none has ever been observed failing.
     # All eight skip absent inputs. They are the retrofit backlog.
+    # Long-form port syntax and malformed shapes both handled. GATE-010.
     Gate(module="check_port_bindings",
          summary="only the dashboard may publish a port, on 127.0.0.1",
+         proven_by="scripts/test_compose_gates.py",
          **_COMPOSE_GATE),
     Gate(module="check_default_profiles",
          summary="no dangerous service in the default profile",
@@ -110,8 +112,10 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-007",)),
+    # The "explicit networks assignment" rule was `pass`. GATE-012.
     Gate(module="check_network_zones",
          summary="network zone segmentation holds",
+         proven_by="scripts/test_compose_gates.py",
          **_COMPOSE_GATE),
     Gate(module="check_turbovec_writers",
          summary="TurboVec has a single writer",
@@ -121,8 +125,10 @@ REGISTRY: Tuple[Gate, ...] = (
          summary="restart and recovery stay contained",
          proven_by="scripts/test_secret_gates.py",
          **_COMPOSE_GATE),
+    # Denylist of four words became a rule: versioned or digest. GATE-011.
     Gate(module="check_image_tags",
-         summary="pre-built images use pinned tags",
+         summary="every image tag is versioned or a digest",
+         proven_by="scripts/test_compose_gates.py",
          **_COMPOSE_GATE),
     # Rewritten directionally and given a denominator, a failure suite
     # and fail-closed inputs — the first of the eight to be retrofitted.

@@ -9,6 +9,7 @@ Exit 0 = clean.  Exit 1 = violations found.
 """
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -20,7 +21,31 @@ COMPOSE_FILES = [
     "docker-compose.sovereign.yml",
 ]
 
-MUTABLE_TAGS = frozenset({"latest", "stable", "edge", "nightly"})
+# Named mutable tags, kept only so the message can say *why* a tag is
+# known-bad rather than merely unversioned.
+MUTABLE_TAGS = frozenset({
+    "latest", "stable", "edge", "nightly", "main", "master", "dev",
+    "develop", "test", "prod", "production", "release", "current",
+})
+
+# The rule, rather than a list. A denylist of four words let `myimg:main`
+# through, and every future mutable name would need adding by hand — the
+# same shape as the secret gate's nine-word denylist.
+#
+# A pinned tag either is a digest, or contains a version number. Measured
+# before adopting: every one of the 18 image tags in this repository
+# contains a digit (`7-alpine`, `pg15`, `v1.78`, `3.11-slim`), so the
+# rule costs nothing today and catches every unversioned name.
+_VERSIONED = re.compile(r"\d")
+
+
+def tag_is_pinned(image: str, tag: str) -> bool:
+    """True when this tag identifies one immutable image."""
+    if "@sha256:" in image:
+        return True                     # a digest is the strongest pin
+    if tag in MUTABLE_TAGS:
+        return False
+    return bool(_VERSIONED.search(tag))
 
 
 def check_file(path: Path) -> list[str]:
@@ -49,10 +74,12 @@ def check_file(path: Path) -> list[str]:
         else:
             tag = "latest"
 
-        if tag in MUTABLE_TAGS:
+        if not tag_is_pinned(image, tag):
+            why = ("a known-mutable name" if tag in MUTABLE_TAGS
+                   else "carries no version")
             violations.append(
-                f"{path}: service '{svc_name}' uses mutable image tag "
-                f"'{image}' — pin to a specific version"
+                f"{path}: service '{svc_name}' uses image '{image}' — tag "
+                f"'{tag}' is {why}; pin to a version or a @sha256 digest"
             )
 
     return violations

@@ -132,6 +132,7 @@ SUITE_TARGETS = {
     "Gate Registry Tests": "test-gate-registry",
     "Compose Drift Tests": "test-compose-drift",
     "Secret & Restart Gate Tests": "test-secret-gates",
+    "Compose Gate Tests": "test-compose-gates",
 }
 
 

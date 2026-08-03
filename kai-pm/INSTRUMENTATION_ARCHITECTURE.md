@@ -152,6 +152,27 @@ whether it inspected fifty services or zero.
 The "declared uncheckable" half matters as much as the count: it is how a
 gate says *I am not measuring this* instead of quietly not measuring it.
 
+### I-5. No inert rules
+
+A rule that exists in syntax and has no effect. Four instances were found
+while reading the gates, all with the same signature — **the code's
+self-description and its behaviour had diverged**:
+
+- `check_compose_drift`: `if net_cfg.get("internal"): pass`
+- `check_restart_recovery`: `ALLOWED_RESTART` declared, never read
+- `check_network_zones`: `if svc_nets is None: pass`
+- `check_dashboard_findings`: a condition computed, `pass`-ed, discarded
+
+The operator's framing is the sharp one: *an unused import can be cruft,
+but a declared-but-unreferenced constant with a security-shaped name is a
+claim the code makes about itself that isn't true.* The docstring says
+"we allowlist"; the constant exists to prove it; the constant is wired to
+nothing.
+
+**I-5 is enforced.** It reached zero, and the gate refused to pass until
+it was added to `ENFORCED` — the self-advancing ratchet firing on its own
+author.
+
 ### I-3. Prove it can fail
 
 Four gates have a suite that injects a violation and asserts the gate
@@ -239,6 +260,9 @@ instrumentation, and letting them dilute or stand in for one of the 96
 | `KAI-GATE-005` | HIGH | `check_dashboard_findings` reports **`REMEDIATED=52`** against a source tree that does not exist. For half the checks, *"the code is not there"* is indistinguishable from *"the code is correct"* | **REMEDIATED** — anchor pre-scan: exit 2 absent, exit 3 unrecognisable, no verdict rendered either way |
 | `KAI-GATE-007` | HIGH | `check_secret_fallbacks` catches only a **denylist of nine weak words**. `${DB_PASSWORD:-hunter2}`, `${JWT_SECRET:-a8f3c9d1e7b2}` and a hardcoded `BINANCE_API_SECRET` all pass. Its docstring advertises a third scan — hardcoded secrets in environment blocks — that **has no implementing pattern** | **REMEDIATED** — rewritten as a rule: a secret may be referenced, never valued |
 | `KAI-GATE-008` | MEDIUM | `check_restart_recovery` declares `ALLOWED_RESTART` and **never references it**, denying exactly one string instead, so `restart: nonsense-value` passed. Same shape as the `if ...: pass` dead branch in `check_compose_drift` | **REMEDIATED** — the declared allowlist is the one enforced |
+| `KAI-GATE-010` | MEDIUM | `check_port_bindings` reported a **correctly** loopback-bound dashboard as a violation (Compose long-form `host_ip:` was unparsed), and turned a malformed `ports:` string into nine violations about ports named `'8'`, `'0'` and `':'` — the misleading-message failure mode | **REMEDIATED** |
+| `KAI-GATE-011` | MEDIUM | `check_image_tags` used a **denylist of four words**, so `myimg:main` and `node:alpine` passed | **REMEDIATED** — a rule: versioned or digest. All 18 tags in use already comply |
+| `KAI-GATE-012` | MEDIUM | `check_network_zones` claimed *"every service has an explicit networks assignment"* and implemented it as `if svc_nets is None: pass`. A service with no `networks:` key joins the implicit default bridge, outside every trust zone. Latent — 0 services affected today | **REMEDIATED** |
 | `KAI-GATE-009` | HIGH | `CAMERA_GATE_TOKEN` defaulted to the literal `camera-gate-token-1` in **both** `docker-compose.full.yml` and `perception/camera/app.py:225`, so that string *was* the camera's tool-gate session ID in any deployment where nobody set the variable | **REMEDIATED** — no default in either place; the camera refuses to speak unprompted without an identity |
 | `KAI-GATE-002` | MEDIUM | 8 of 12 gates print `PASS` with **no denominator**. A gate that inspected nothing is indistinguishable from one that inspected everything | **OPEN** |
 | `KAI-GATE-003` | MEDIUM | 8 of 12 gates have **never been observed failing**. No suite injects a violation and asserts they fire | **OPEN** |

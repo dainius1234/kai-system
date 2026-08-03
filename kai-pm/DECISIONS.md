@@ -3814,3 +3814,60 @@ Fixing only the compose file would have been cosmetic; the code fallback would h
 
 **Files added:** `scripts/test_secret_gates.py`.
 **Files modified:** `scripts/security/check_secret_fallbacks.py` (rewritten), `scripts/security/check_restart_recovery.py`, `perception/camera/app.py`, `docker-compose.full.yml`, `scripts/security/gate_registry.py`, `scripts/security/check_assertion_floors.py`, `scripts/security/assertion_floors.json`, `Makefile`, sub-plan/tracker/STATUS.
+
+---
+
+## D157 — 2026-08-03 — The Remaining Five: Three Defective, Two Clean, and a Fifth Invariant
+
+**Context:** The operator's steer was to read all five with the same dispassionate scrutiny and **not** to assume the pattern holds — *"that expectation will make you see defects that aren't there, or over-rotate on minor issues."* They also predicted a failure mode I had not probed for: a gate that fails **noisily but misleadingly**, sending the operator to fix the wrong thing.
+
+**Result: three defective, two clean.** `check_default_profiles` and `check_turbovec_writers` were correct on every probe, with accurate messages. Reporting that plainly matters as much as the findings — it is the evidence I was not pattern-matching.
+
+### KAI-GATE-010 — the operator's predicted failure mode, twice
+
+Not misses. **Misleading messages.**
+
+A correctly loopback-bound dashboard was reported as a violation. Compose's long-form port syntax is a mapping:
+
+```yaml
+ports:
+  - target: 8080
+    host_ip: 127.0.0.1
+    published: 8080
+```
+
+`str(port)` on that produced a dict repr, which cannot start with `127.0.0.1:` — so the gate told the operator to *"bind to 127.0.0.1 only"* when they already had.
+
+And a `ports:` value that was a string rather than a list was iterated character by character, producing **nine violations about ports named `'8'`, `'0'` and `':'`**. The operator's scenario verbatim: *a gate that says "port 443 is exposed" when the scanner couldn't parse the compose file is sending you to check the port when you should be checking the parser.* A malformed shape now reports itself as a malformed shape, once, and says the ports could not be checked.
+
+### KAI-GATE-011 — another denylist that should be a rule
+
+`MUTABLE_TAGS` held four words, so `myimg:main` and `node:alpine` passed. Measured before changing anything: **all 18 image tags in this repository contain a digit** (`7-alpine`, `pg15`, `v1.78`, `3.11-slim`). So the rule — *versioned, or a `@sha256` digest* — costs nothing today and catches every unversioned name, present and future. Same shape as the secret-gate rewrite, and the same discipline: measure, then decide.
+
+### KAI-GATE-012 — a rule that existed only in prose
+
+```python
+if svc_nets is None:
+    pass          # docstring: "Every service has an explicit networks assignment"
+```
+
+A service with no `networks:` key joins Compose's implicit `default` bridge, which is not a trust zone and is not internal — bypassing the entire segmentation model the gate exists to enforce. **Latent, not active: 0 services affected today**, and recorded as MEDIUM rather than inflated to match the severity of its subject.
+
+### I-5 — a fifth invariant, and the ratchet firing on its author
+
+Three instances of the same shape appeared while reading (`check_compose_drift`'s `pass` branch, `ALLOWED_RESTART` unread, `check_network_zones`' `pass`). The operator sharpened the smell they had already suggested for imports:
+
+> An unused import can be cruft. **A declared-but-unreferenced constant with a security-shaped name is a claim the code makes about itself that isn't true.** The docstring says "we allowlist"; the constant exists to prove it; the constant is wired to nothing.
+
+`inert_rules()` detects both shapes — a policy-shaped constant nobody reads, and a conditional whose body is exactly `pass`. It immediately found a **fourth** instance in `check_dashboard_findings.dash_061`, where a condition was computed, `pass`-ed and discarded, so a handler that *did* read backend status would still have been reported LIVE. Wired up; the real verdict is unchanged.
+
+Then the self-advancing rule from A-04e fired on its own author: I-5 reached zero, and `--gate` **refused to pass** until I-5 was added to `ENFORCED`. That is the mechanism working exactly as intended, against the person who wrote it.
+
+**One more correction to my own work.** `test_the_ast_detector_finds_the_real_shape` asserted `lines == [70]`. An unrelated edit moved the site to 112 and the test failed — a test guarded on state it does not control, which is the shape this whole programme keeps correcting. It asserts a count now, not a line number.
+
+**Verification:** 2,081 tests across 30 suites, all green — 27 in the new `test_compose_gates.py`, 46 in the meta-check's own suite. 11/11 policy gates, now with **two** invariants enforced (I-4, I-5) and three reported. All eight compose-family gates have been read; five were defective and two were not.
+
+**Nothing is closed.** Rule 7. `KAI-GATE-010`, `011`, `012` REMEDIATED; `001`–`004` remain OPEN, and I-1 is still the largest at 15.
+
+**Files added:** `scripts/test_compose_gates.py`.
+**Files modified:** `check_port_bindings.py`, `check_network_zones.py`, `check_image_tags.py`, `check_dashboard_findings.py`, `check_gate_registry.py`, `gate_registry.py`, `check_assertion_floors.py`, `assertion_floors.json`, `scripts/test_gate_registry.py`, `Makefile`, sub-plan/tracker/STATUS/MAKEFILE_TARGETS.

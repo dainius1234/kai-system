@@ -70,8 +70,9 @@
 | A-04b Directional compose drift + sovereign hardening | ✅ Done | `51032a3` | `make test-compose-drift` | 21 |
 | A-04e Partial enforcement — I-4 enforced, ratchet self-advancing | ✅ Done | `e332a02` | `make test-gate-registry` | 39 |
 | KAI-GATE-005 Anchor pre-scan (category confusion) | ✅ Done | `bd80129` | `make test-dashboard-findings` | 189 |
-| KAI-GATE-007/008/009 Secret rule, restart allowlist, camera identity | ✅ Done | this commit | `make test-secret-gates` | 28 |
-| | | | **Total** | **2,047** |
+| KAI-GATE-007/008/009 Secret rule, restart allowlist, camera identity | ✅ Done | `dd772c4` | `make test-secret-gates` | 28 |
+| KAI-GATE-010/011/012 + I-5 inert-rule detector | ✅ Done | this commit | `make test-compose-gates` | 27 |
+| | | | **Total** | **2,081** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against

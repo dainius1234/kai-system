@@ -106,7 +106,17 @@ def check_file(path: Path) -> list[str]:
         svc_nets = svc_cfg.get("networks")
 
         if svc_nets is None:
-            pass
+            # The docstring has always claimed "every service has an
+            # explicit networks assignment"; this branch was `pass`, so
+            # the rule existed in prose only. A service with no
+            # `networks:` key joins Compose's implicit `default` bridge,
+            # which is not a trust zone and is not internal — it bypasses
+            # the entire segmentation model this gate exists to enforce.
+            violations.append(
+                f"{path}: service '{svc_name}' has no networks assignment "
+                f"— it would join the implicit default bridge, outside "
+                f"every trust zone"
+            )
         elif isinstance(svc_nets, dict):
             if "sovereign-net" in svc_nets:
                 violations.append(
