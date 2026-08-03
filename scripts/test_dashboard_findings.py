@@ -804,6 +804,164 @@ def test_track_d_has_no_live_findings():
     check("Track D is clear of LIVE findings", not live, str(live))
 
 
+
+# ── Shared-resilience findings (014, 015, 075, 076) ──────────────────
+
+class _Resilience:
+    """Point the resilience-backed checks at synthetic source."""
+
+    def __init__(self, source):
+        self.source = source
+        self._orig = dash._resilience_src
+
+    def __enter__(self):
+        dash._resilience_src = lambda: self.source
+        assert dash._resilience_src() == self.source
+        return self
+
+    def __exit__(self, *exc):
+        dash._resilience_src = self._orig
+        return False
+
+
+def test_dash_015_reads_the_success_guard_not_the_string():
+    """The module's own docstring mentions the old test; that must not count."""
+    old = """
+async def resilient_call(method, url):
+    if resp.status_code < 500:
+        cb.record_success()
+        return resp.json()
+"""
+    new = """
+async def resilient_call(method, url):
+    '''Success was status_code < 500, so a 404 recorded a success.'''
+    if 200 <= resp.status_code < 300:
+        cb.record_success()
+        return resp.json()
+    if 400 <= resp.status_code < 500:
+        return fallback
+"""
+    with _Resilience(old):
+        live, d1 = dash.dash_015()
+    with _Resilience(new):
+        fixed, d2 = dash.dash_015()
+    check("DASH-015 LIVE while <500 records success", live == dash.LIVE, d1)
+    check("DASH-015 REMEDIATED with a 2xx guard, despite the docstring "
+          "still naming the old test", fixed == dash.REMEDIATED, d2)
+
+
+def test_dash_014_requires_idempotence_to_gate_retries():
+    naive = "async def resilient_call(m, u):\n    for attempt in range(retries):\n        pass\n"
+    flagged = "async def resilient_call(m, u, idempotent=None):\n    pass\n"
+    gated = ("async def resilient_call(m, u, idempotent=None):\n"
+             "    attempts = retries if idempotent else 1\n")
+    with _Resilience(naive):
+        live, d1 = dash.dash_014()
+    with _Resilience(flagged):
+        part, d2 = dash.dash_014()
+    with _Resilience(gated):
+        fixed, d3 = dash.dash_014()
+    check("DASH-014 LIVE with unconditional retries", live == dash.LIVE, d1)
+    check("DASH-014 PARTIAL when a flag exists but gates nothing",
+          part == dash.PARTIAL, d2)
+    check("DASH-014 REMEDIATED once the flag gates retries",
+          fixed == dash.REMEDIATED, d3)
+
+
+def test_dash_075_catches_a_client_inside_the_loop():
+    inside = ("async def resilient_call(m, u):\n"
+              "    for attempt in range(2):\n"
+              "        async with pooled_client(timeout=1) as c:\n            pass\n")
+    outside = ("async def resilient_call(m, u):\n"
+               "    async with pooled_client(timeout=1) as c:\n"
+               "        for attempt in range(2):\n            pass\n")
+    with _Resilience(inside):
+        live, d1 = dash.dash_075()
+    with _Resilience(outside):
+        fixed, d2 = dash.dash_075()
+    check("DASH-075 LIVE when the client is built inside the loop",
+          live == dash.LIVE, d1)
+    check("DASH-075 REMEDIATED when it is built outside",
+          fixed == dash.REMEDIATED, d2)
+
+
+# ── Dashboard-side conversions ───────────────────────────────────────
+
+def test_dash_062_catches_the_always_true_readiness_test():
+    always_true = """
+@app.get("/")
+async def index():
+    ledger_size = 0
+    return {"core_ready": ledger_size >= 0}
+"""
+    observed = """
+@app.get("/")
+async def index():
+    ledger_size = None
+    return {"core_ready": ledger_size is not None}
+"""
+    with _Dashboard(always_true):
+        live, d1 = dash.dash_062()
+    with _Dashboard(observed):
+        fixed, d2 = dash.dash_062()
+    check("DASH-062 LIVE while a fallback zero satisfies readiness",
+          live == dash.LIVE, d1)
+    check("DASH-062 REMEDIATED once observation is required",
+          fixed == dash.REMEDIATED, d2)
+
+
+def test_dash_072_flips_on_url_validation():
+    raw = 'TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")\n'
+    validated = 'TOOL_GATE_URL = backend_url("TOOL_GATE_URL", "http://tool-gate:8000")\n'
+    with _Dashboard(raw):
+        live, d1 = dash.dash_072()
+    with _Dashboard(validated):
+        fixed, d2 = dash.dash_072()
+    check("DASH-072 LIVE with a raw getenv URL", live == dash.LIVE, d1)
+    check("DASH-072 REMEDIATED once validated", fixed == dash.REMEDIATED, d2)
+
+
+def test_dash_094_only_flags_routes_that_interpolate():
+    unguarded = """
+@app.get("/api/broker/ticker/{symbol}")
+async def api_broker_ticker(symbol: str):
+    return await _proxy_get(f"{BROKER_URL}/ticker/{symbol}")
+"""
+    guarded = """
+@app.get("/api/broker/ticker/{symbol}")
+async def api_broker_ticker(symbol: str):
+    symbol = safe_symbol(symbol)
+    return await _proxy_get(f"{BROKER_URL}/ticker/{symbol}")
+"""
+    with _Dashboard(unguarded):
+        live, d1 = dash.dash_094()
+    with _Dashboard(guarded):
+        fixed, d2 = dash.dash_094()
+    check("DASH-094 LIVE with unvalidated path interpolation",
+          live == dash.LIVE, d1)
+    check("DASH-094 REMEDIATED once the parameter is validated",
+          fixed == dash.REMEDIATED, d2)
+
+
+def test_dash_044_needs_both_a_principal_and_a_filter():
+    none = "async def sse_events(request):\n    pass\n"
+    principal_only = ("async def sse_events(request, principal: DashboardPrincipal = 1):\n"
+                      "    pass\n")
+    filtered = ("async def sse_events(request, principal: DashboardPrincipal = 1):\n"
+                "    if not _event_visible_to(data, principal):\n        pass\n")
+    with _Dashboard(none):
+        live, d1 = dash.dash_044()
+    with _Dashboard(principal_only):
+        half, d2 = dash.dash_044()
+    with _Dashboard(filtered):
+        fixed, d3 = dash.dash_044()
+    check("DASH-044 LIVE with no subscriber identity", live == dash.LIVE, d1)
+    check("DASH-044 still LIVE with an identity but no filter",
+          half == dash.LIVE, d2)
+    check("DASH-044 REMEDIATED once events are filtered",
+          fixed == dash.REMEDIATED, d3)
+
+
 def run() -> None:
     test_coverage_clean_on_real_table()
     test_coverage_detects_missing_finding()

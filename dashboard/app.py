@@ -3,12 +3,13 @@
 from __future__ import annotations
 import asyncio
 import hashlib
+import time
 import re
 from functools import lru_cache
 from datetime import datetime, timezone
 import json as _json
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
 import redis.asyncio as aioredis
@@ -18,7 +19,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import (HTMLResponse, JSONResponse,
                                StreamingResponse)
 
-from common.dashboard_auth import (DashboardPrincipal, Scope,
+from common.dashboard_auth import (DashboardPrincipal, Role, Scope,
                                    require_dashboard_auth)
 from common.degraded import (degraded_response, is_degraded,
                              unavailable_metric)
@@ -35,6 +36,49 @@ except Exception:
     policy_version = "unknown"
 
 logger = setup_json_logger("dashboard", os.getenv("LOG_PATH", "/tmp/dashboard.json.log"))
+
+# ── Backend destinations (KAI-DASH-072) ──────────────────────────────
+#
+# Every backend address comes from the environment. Unvalidated, a typo or
+# a tampered variable silently redirects the dashboard's whole authority
+# at an attacker-chosen host — and because the dashboard proxies dozens of
+# private services, that is the single highest-leverage variable in the
+# deployment. Validated once, at import, so a bad value fails the
+# container start rather than the first request that needs it.
+_ALLOWED_SCHEMES = {"http", "https"}
+
+
+def backend_url(name: str, default: str, optional: bool = False,
+                schemes: Optional[set] = None) -> str:
+    """Read a backend base URL, refusing anything that is not one.
+
+    ``optional`` allows an empty value, for backends that are only wired
+    up in some profiles — but an empty value is the *only* thing it
+    allows. A half-written URL is still refused.
+    """
+    from urllib.parse import urlsplit
+
+    allowed = schemes or _ALLOWED_SCHEMES
+    raw = os.getenv(name, default).strip()
+    if not raw:
+        if optional:
+            return ""
+        raise RuntimeError(f"{name} is required but empty")
+    parts = urlsplit(raw)
+    if parts.scheme not in allowed:
+        raise RuntimeError(
+            f"{name}={raw!r} must use {' or '.join(sorted(allowed))}, "
+            f"not {parts.scheme!r}"
+        )
+    if not parts.hostname:
+        raise RuntimeError(f"{name}={raw!r} has no host")
+    if parts.query or parts.fragment:
+        raise RuntimeError(
+            f"{name}={raw!r} must be a base URL, not a full request"
+        )
+    return raw.rstrip("/")
+
+
 DEVICE = detect_device()
 logger.info("Running on %s.", DEVICE)
 
@@ -43,11 +87,11 @@ app = FastAPI(title="Sovereign Dashboard", version="0.4.0")
 # mount static UI stub
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
-TOOL_GATE_URL = os.getenv("TOOL_GATE_URL", "http://tool-gate:8000")
-VERIFIER_URL   = os.getenv("VERIFIER_URL", "http://verifier:8052")
+TOOL_GATE_URL = backend_url("TOOL_GATE_URL", "http://tool-gate:8000")
+VERIFIER_URL   = backend_url("VERIFIER_URL", "http://verifier:8052")
 # Store-maintenance reads (stats/search-by-category/quarantine listing) live on
 # memu-core-introspect, split out from memu-core's hot path — see DECISIONS.md D21.
-MEMU_INTROSPECT_URL = os.getenv("MEMU_INTROSPECT_URL", "http://memu-core-introspect:8009")
+MEMU_INTROSPECT_URL = backend_url("MEMU_INTROSPECT_URL", "http://memu-core-introspect:8009")
 budget = ErrorBudget(window_seconds=300)
 
 
@@ -107,6 +151,29 @@ def _audit_actor(request: Request) -> str:
 @app.on_event("shutdown")
 async def _close_shared_transport() -> None:
     await shutdown_pool()
+
+
+# ── Outbound safety for uploads, errors and path parameters ──────────
+
+_SYMBOL = re.compile(r"^[A-Za-z0-9._-]{1,20}$")
+
+
+def safe_symbol(value: str, label: str = "symbol") -> str:
+    """Validate a path parameter before it is interpolated into a URL.
+
+    Symbols and pairs are pasted straight into backend URLs — including
+    an outbound Binance query (KAI-DASH-094). Without a character class
+    a caller controls part of the request the dashboard makes on its
+    behalf, which is a request-forgery primitive, not a formatting bug.
+    """
+    candidate = (value or "").strip()
+    if not _SYMBOL.match(candidate):
+        raise HTTPException(
+            status_code=400,
+            detail=f"{label} must be 1-20 characters of A-Z, 0-9, dot, dash "
+                   f"or underscore",
+        )
+    return candidate.upper()
 
 
 # ── Outbound safety for uploads and errors ───────────────────────────
@@ -191,7 +258,7 @@ async def api_set_mode(body: Dict[str, Any] = Body(...)):
 @app.get("/api/nudges",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_nudges():
-    memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
+    memu_url = backend_url("MEMU_URL", "http://memu-core:8001")
     try:
         async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{memu_url}/memory/proactive")
@@ -213,7 +280,7 @@ async def api_backup_status():
     timestamp that proved only that a process was running, and read as
     proof that a backup had just been taken (KAI-DASH-065).
     """
-    backup_url = os.getenv("BACKUP_SERVICE_URL", "http://backup-service:8054")
+    backup_url = backend_url("BACKUP_SERVICE_URL", "http://backup-service:8054")
     empty = {"status": "unknown", "latest_backup": None, "total_backups": 0}
     try:
         async with pooled_client(timeout=5.0) as client:
@@ -245,7 +312,7 @@ async def api_backup_status():
 @app.get("/api/corrections",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_corrections():
-    verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8052")
+    verifier_url = backend_url("VERIFIER_URL", "http://verifier:8052")
     try:
         async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{verifier_url}/metrics")
@@ -280,31 +347,72 @@ audit = AuditStream(
     required=os.getenv("AUDIT_REQUIRED", "true").lower() == "true",
 )
 
-SUPERVISOR_URL = os.getenv("SUPERVISOR_URL", "http://supervisor:8051")
+SUPERVISOR_URL = backend_url("SUPERVISOR_URL", "http://supervisor:8051")
 
 NODES: Dict[str, str] = {
     "tool-gate": f"{TOOL_GATE_URL}/health",
-    "memu-core": os.getenv("MEMU_URL", "http://memu-core:8001") + "/health",
-    "heartbeat": os.getenv("HEARTBEAT_URL", "http://heartbeat:8010") + "/status",
+    "memu-core": backend_url("MEMU_URL", "http://memu-core:8001") + "/health",
+    "heartbeat": backend_url("HEARTBEAT_URL", "http://heartbeat:8010") + "/status",
     "supervisor": f"{SUPERVISOR_URL}/health",
-    "verifier": os.getenv("VERIFIER_URL", "http://verifier:8052") + "/health",
-    "fusion-engine": os.getenv("FUSION_URL", "http://fusion-engine:8053") + "/health",
-    "memory-compressor": os.getenv("MEMORY_COMPRESSOR_URL", "http://memory-compressor:8057") + "/health",
-    "ledger-worker": os.getenv("LEDGER_WORKER_URL", "http://ledger-worker:8056") + "/health",
-    "metrics-gateway": os.getenv("METRICS_GATEWAY_URL", "http://metrics-gateway:8058") + "/health",
+    "verifier": backend_url("VERIFIER_URL", "http://verifier:8052") + "/health",
+    "fusion-engine": backend_url("FUSION_URL", "http://fusion-engine:8053") + "/health",
+    "memory-compressor": backend_url("MEMORY_COMPRESSOR_URL", "http://memory-compressor:8057") + "/health",
+    "ledger-worker": backend_url("LEDGER_WORKER_URL", "http://ledger-worker:8056") + "/health",
+    "metrics-gateway": backend_url("METRICS_GATEWAY_URL", "http://metrics-gateway:8058") + "/health",
 }
-_agentic_url = os.getenv("LANGGRAPH_URL", "")
+_agentic_url = backend_url("LANGGRAPH_URL", "", optional=True)
 if _agentic_url:
     NODES["agentic"] = _agentic_url + "/health"
-_executor_url = os.getenv("EXECUTOR_URL", "")
+_executor_url = backend_url("EXECUTOR_URL", "", optional=True)
 if _executor_url:
     NODES["executor"] = _executor_url + "/health"
-_wake_url = os.getenv("WAKE_URL", "")
+_wake_url = backend_url("WAKE_URL", "", optional=True)
 if _wake_url:
     NODES["wake-service"] = _wake_url + "/health"
 
-NO_GO_GRACE_REQUESTS = int(os.getenv("NO_GO_GRACE_REQUESTS", "20"))
-MAX_ERROR_RATIO = float(os.getenv("MAX_ERROR_RATIO", "0.05"))
+def _as_number(value: Any, cast=float, default: Any = None) -> Any:
+    """Coerce a backend-supplied number, returning `default` if it is not.
+
+    Backend fields are not trusted to be well-formed (KAI-DASH-079);
+    a malformed one should degrade a single field, not the response.
+    """
+    if value is None:
+        return default
+    try:
+        result = cast(value)
+    except (TypeError, ValueError):
+        return default
+    if isinstance(result, float) and (result != result or result in (
+            float("inf"), float("-inf"))):
+        return default
+    return result
+
+
+def _bounded_setting(name: str, default: str, low: float, high: float,
+                     cast=float):
+    """Read a threshold, refusing values outside a safe range.
+
+    These decide whether the system is judged fit to act. Parsed with a
+    bare `int()`/`float()` (KAI-DASH-078), a typo could set the error
+    tolerance to 5000% and the gate would agree with it forever. A
+    misconfiguration must fail loudly at import, not silently at the
+    moment it matters.
+    """
+    raw = os.getenv(name, default)
+    try:
+        value = cast(raw)
+    except (TypeError, ValueError):
+        raise RuntimeError(
+            f"{name}={raw!r} is not a number; expected {low}..{high}"
+        ) from None
+    if not (low <= value <= high):
+        raise RuntimeError(f"{name}={value} is outside the safe range {low}..{high}")
+    return value
+
+
+NO_GO_GRACE_REQUESTS = _bounded_setting(
+    "NO_GO_GRACE_REQUESTS", "20", 1, 100_000, int)
+MAX_ERROR_RATIO = _bounded_setting("MAX_ERROR_RATIO", "0.05", 0.0, 1.0)
 
 
 # ── Gateway workload controls (KAI-DASH-056) ─────────────────────────
@@ -408,12 +516,37 @@ def _classify_node(payload: Any) -> Tuple[str, str]:
     return "ok", ""
 
 
-async def fetch_status() -> Dict[str, Dict[str, Any]]:
+# A single request can ask for node status more than once — `/` builds
+# the go/no-go report *and* its own summary (KAI-DASH-058), and readiness
+# used to call the whole of `/` (KAI-DASH-060). A short TTL collapses
+# those into one fan-out without making the data meaningfully staler than
+# the probes themselves.
+STATUS_CACHE_TTL = float(os.getenv("DASHBOARD_STATUS_TTL", "2.0"))
+
+# The nodes without which nothing else is meaningful. Named once so
+# readiness and the root summary cannot drift apart.
+CORE_NODES = ("tool-gate", "memu-core")
+
+# Internal topology and policy state on the root payload (KAI-DASH-068).
+# Off by default: useful when debugging a deployment, not something a
+# status page should hand out as a matter of course.
+EXPOSE_TOPOLOGY = os.getenv("DASHBOARD_EXPOSE_TOPOLOGY", "false").lower() in {
+    "1", "true", "yes"}
+_status_cache: Dict[str, Any] = {"at": 0.0, "value": None}
+
+
+async def fetch_status(force: bool = False) -> Dict[str, Dict[str, Any]]:
     """Probe every node concurrently and honour its self-report.
 
     Sequential probing (KAI-DASH-057) meant the worst case was the sum of
     every timeout; ``asyncio.gather`` bounds it to the slowest single node.
     """
+    now = time.monotonic()
+    cached = _status_cache["value"]
+    if (not force and cached is not None
+            and now - _status_cache["at"] < STATUS_CACHE_TTL):
+        return cached
+
     async def probe(client, name: str, url: str) -> Tuple[str, Dict[str, Any]]:
         try:
             resp = await client.get(url, timeout=2.0)
@@ -441,6 +574,8 @@ async def fetch_status() -> Dict[str, Dict[str, Any]]:
     # A probe that vanished is not a healthy probe.
     for name in NODES:
         results.setdefault(name, {"status": "down", "error": "probe did not complete"})
+    _status_cache["at"] = time.monotonic()
+    _status_cache["value"] = results
     return results
 
 
@@ -486,9 +621,10 @@ async def build_go_no_go_report() -> Dict[str, Any]:
         "requires privileged ledger access; the dashboard deliberately "
         "holds no Tool Gate credential (KAI-DASH-002)",
     )
-    proof["total_ledger_entries"] = (
-        int(ledger_stats.get("count", 0)) if ledger_stats else None
-    )
+    # KAI-DASH-079 — a backend returning "many" for a count should not
+    # take the whole report down with a ValueError.
+    proof["total_ledger_entries"] = _as_number(
+        ledger_stats.get("count") if ledger_stats else None, int)
     unprovable = [
         "Recent approved decisions cannot be proven from here: the "
         "dashboard holds no ledger credential by design."
@@ -538,7 +674,8 @@ async def build_go_no_go_report() -> Dict[str, Any]:
             "total_nodes": total_nodes,
             # Kept for the UI, explicitly labelled as what it is: a
             # measure of this process, not of the system.
-            "dashboard_caller_error_ratio": float(metrics.get("error_ratio", 0.0)),
+            "dashboard_caller_error_ratio": _as_number(
+                metrics.get("error_ratio"), float, 0.0),
             "down_nodes": down_nodes,
         },
         "reasons": reasons,
@@ -568,14 +705,22 @@ async def metrics() -> Dict[str, float]:
 async def index() -> Dict[str, object]:
     statuses = await fetch_status()
     alive_nodes = [name for name, payload in statuses.items() if payload.get("status") == "ok"]
-    ledger_size = 0
-    memory_count = 0
+    # KAI-DASH-062 — these used to default to 0 and then be checked with
+    # `>= 0`, which is true of the default. An unreachable Tool Gate and a
+    # healthy empty one were indistinguishable, and both counted as ready.
+    # None means "not observed"; readiness now requires observation.
+    ledger_size = None
+    memory_count = None
     try:
         async with pooled_client() as client:
-            ledger_size = int((await client.get(f"{TOOL_GATE_URL}/ledger/stats", timeout=2.0)).json().get("count", 0))
-            memory_count = int((await client.get(f"{MEMU_INTROSPECT_URL}/memory/stats", timeout=2.0)).json().get("records", 0))
-    except Exception:
-        logger.warning("Failed to fetch ledger/memory stats for index")
+            ledger_size = _as_number(
+                (await client.get(f"{TOOL_GATE_URL}/ledger/stats",
+                                  timeout=2.0)).json().get("count"), int)
+            memory_count = _as_number(
+                (await client.get(f"{MEMU_INTROSPECT_URL}/memory/stats",
+                                  timeout=2.0)).json().get("records"), int)
+    except Exception as exc:
+        logger.warning("Failed to fetch ledger/memory stats for index: %s", exc)
 
     go_no_go = await build_go_no_go_report()
     tool_gate_health = statuses.get("tool-gate", {}).get("details", {})
@@ -602,31 +747,50 @@ async def index() -> Dict[str, object]:
     except Exception:
         pass
     try:
-        verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8052")
+        verifier_url = backend_url("VERIFIER_URL", "http://verifier:8052")
         async with pooled_client(timeout=2.0) as client:
             v_resp = await client.get(f"{verifier_url}/metrics")
             if v_resp.status_code == 200:
                 verifier_stats = v_resp.json()
     except Exception:
         pass
-    core_nodes = ["tool-gate", "memu-core"]
+    core_nodes = CORE_NODES
     if _executor_url:
         core_nodes.append("executor")
-    core_ready = all(node in alive_nodes for node in core_nodes) and ledger_size >= 0 and memory_count >= 0
+    core_ready = (
+        all(node in alive_nodes for node in core_nodes)
+        and ledger_size is not None
+        and memory_count is not None
+    )
     return {
         "service": "dashboard",
         "status": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
-        "tool_gate_url": TOOL_GATE_URL,
         "core_ready": core_ready,
         "alive_nodes": alive_nodes,
-        "node_status": statuses,
+        # KAI-DASH-077 — this used to carry each backend's full health
+        # document. A status page needs to know *whether* a node is well,
+        # not everything the node chose to say about itself.
+        "node_status": {
+            name: {k: v for k, v in payload.items() if k != "details"}
+            for name, payload in statuses.items()
+        },
         "ledger_size": ledger_size,
         "memory_count": memory_count,
         "policy_mode": policy_mode,
         "device_summary": "running (CPU)" if DEVICE == "cpu" else "running (CUDA)",
         "go_no_go": go_no_go,
-        "policy_version": policy_version,
-        "policy_hash": policy_hash,
+        # KAI-DASH-068 — `tool_gate_url`, `policy_version` and
+        # `policy_hash` described the deployment's internal topology and
+        # policy state. They are operator diagnostics, not status, so they
+        # are behind an explicit flag rather than on by default.
+        **(
+            {
+                "tool_gate_url": TOOL_GATE_URL,
+                "policy_version": policy_version,
+                "policy_hash": policy_hash,
+            }
+            if EXPOSE_TOPOLOGY else {}
+        ),
         "breaker_states": breaker_states,
         "quarantine_count": quarantine_count,
         "verifier_stats": verifier_stats,
@@ -693,17 +857,30 @@ async def fleet() -> Dict[str, Any]:
 @app.get("/readiness",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def readiness() -> Dict[str, Any]:
-    payload = await index()
-    if not payload["core_ready"]:
-        raise HTTPException(status_code=503, detail={"status": "not_ready", "core_ready": False, "reasons": payload["go_no_go"]["reasons"]})
-    return {"status": "ready", "core_ready": True}
+    """Bounded readiness check.
+
+    This used to call `index()` — the entire root fan-out, including the
+    go/no-go report and every widget (KAI-DASH-060). A readiness probe
+    that costs as much as the dashboard's most expensive page is a probe
+    that makes the thing it measures worse.
+    """
+    statuses = await fetch_status()
+    down = sorted(name for name in CORE_NODES
+                  if statuses.get(name, {}).get("status") != "ok")
+    if down:
+        raise HTTPException(
+            status_code=503,
+            detail={"status": "not_ready", "core_ready": False,
+                    "down_nodes": down},
+        )
+    return {"status": "ready", "core_ready": True, "checked": sorted(CORE_NODES)}
 
 
 # ── P8: Thinking Pathways — intelligence proxy endpoints ─────────────
-MEMU_URL = os.getenv("MEMU_URL", "http://memu-core:8001")
-HEARTBEAT_URL = os.getenv("HEARTBEAT_URL", "http://heartbeat:8010")
-FINANCIAL_URL = os.getenv("FINANCIAL_URL", "http://financial-awareness:8063")
-WAKE_URL = os.getenv("WAKE_URL", "http://wake-service:8022")
+MEMU_URL = backend_url("MEMU_URL", "http://memu-core:8001")
+HEARTBEAT_URL = backend_url("HEARTBEAT_URL", "http://heartbeat:8010")
+FINANCIAL_URL = backend_url("FINANCIAL_URL", "http://financial-awareness:8063")
+WAKE_URL = backend_url("WAKE_URL", "http://wake-service:8022")
 
 
 @app.get("/thinking")
@@ -718,7 +895,7 @@ async def api_thinking(
         require_dashboard_auth(Scope.READ_SENSITIVE)),
 ):
     """Fetch latest episode data from agentic for thinking pathway visualization."""
-    agentic_url = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
+    agentic_url = backend_url("LANGGRAPH_URL", "http://agentic:8007")
     try:
         async with pooled_client(timeout=5.0) as client:
             resp = await client.post(
@@ -808,7 +985,7 @@ async def api_self_assessment():
           dependencies=[Depends(require_dashboard_auth(Scope.WRITE_IDENTITY))])
 async def api_dream():
     """Trigger a dream consolidation cycle via agentic-introspect."""
-    introspect_url = os.getenv("AGENTIC_INTROSPECT_URL", "http://agentic-introspect:8023")
+    introspect_url = backend_url("AGENTIC_INTROSPECT_URL", "http://agentic-introspect:8023")
     try:
         async with pooled_client(timeout=30.0) as client:
             resp = await client.post(f"{introspect_url}/dream")
@@ -822,7 +999,7 @@ async def api_dream():
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_ledger_stats():
     """Proxy ledger statistics from ledger-worker."""
-    ledger_url = os.getenv("LEDGER_WORKER_URL", "http://ledger-worker:8056")
+    ledger_url = backend_url("LEDGER_WORKER_URL", "http://ledger-worker:8056")
     try:
         async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{ledger_url}/stats")
@@ -851,7 +1028,8 @@ def _sse_error(message: str) -> str:
 MAX_SSE_CLIENTS = int(os.getenv("DASHBOARD_MAX_SSE_CLIENTS", "32"))
 _sse_clients = 0
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
+REDIS_URL = backend_url("REDIS_URL", "redis://redis:6379/0",
+                        schemes={"redis", "rediss"})
 
 # Channels that the dashboard subscribes to
 _EVENT_CHANNELS = [
@@ -862,19 +1040,77 @@ _EVENT_CHANNELS = [
 ]
 
 
-async def _publish_event(channel: str, data: dict) -> None:
-    """Publish a JSON event to a Redis channel (fire-and-forget)."""
+# KAI-DASH-085 — a Redis client was constructed and closed per publish.
+# One lazily-created client, closed on shutdown, like the HTTP pool.
+_REDIS_CLIENT: Any = None
+
+
+def _redis():
+    global _REDIS_CLIENT
+    if _REDIS_CLIENT is None:
+        _REDIS_CLIENT = aioredis.from_url(REDIS_URL, decode_responses=True)
+    return _REDIS_CLIENT
+
+
+@app.on_event("shutdown")
+async def _close_redis() -> None:
+    global _REDIS_CLIENT
+    if _REDIS_CLIENT is not None:
+        await _REDIS_CLIENT.aclose()
+        _REDIS_CLIENT = None
+
+
+def _event_visible_to(data: Any, principal: DashboardPrincipal) -> bool:
+    """Whether a subscriber should receive an event (KAI-DASH-044).
+
+    Events that name a subject belong to that subject. Events that do
+    not are system-level and visible to any authenticated subscriber.
+    Defaulting an unlabelled event to *visible* is deliberate: the event
+    bus carries operational signal that a status page needs, and silently
+    dropping it would trade a disclosure bug for a blindness bug. The
+    keeper sees everything either way.
+    """
+    if principal.role is Role.KEEPER:
+        return True
+    if not isinstance(data, dict):
+        return True
+    subject = data.get("user_id") or data.get("subject") or data.get("principal")
+    if not subject:
+        return True
+    return str(subject) == principal.identity
+
+
+_event_publish_failures: Dict[str, int] = {}
+
+
+async def _publish_event(channel: str, data: dict) -> bool:
+    """Publish a JSON event to a Redis channel.
+
+    Returns whether it was delivered. Previously the failure path logged
+    at DEBUG and returned nothing (KAI-DASH-086), so an event bus that
+    had stopped delivering looked exactly like one with nothing to say —
+    the same confusion as KAI-DASH-067, one layer down. Failures are
+    counted and surfaced on `/metrics`.
+    """
     try:
-        r = aioredis.from_url(REDIS_URL, decode_responses=True)
-        await r.publish(channel, _json.dumps(data))
-        await r.aclose()
-    except Exception:
-        logger.debug("Redis publish to %s failed (non-critical)", channel)
+        await _redis().publish(channel, _json.dumps(data))
+        return True
+    except Exception as exc:
+        _event_publish_failures[channel] = (
+            _event_publish_failures.get(channel, 0) + 1
+        )
+        logger.warning("event publish to %s failed (%d so far): %s",
+                       channel, _event_publish_failures[channel], exc)
+        return False
 
 
 @app.get("/api/events",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
-async def sse_events(request: Request):
+async def sse_events(
+    request: Request,
+    principal: DashboardPrincipal = Depends(
+        require_dashboard_auth(Scope.READ_SENSITIVE)),
+):
     """Server-Sent Events stream backed by Redis pub/sub.
 
     The dashboard JS streams this and receives real-time updates instead
@@ -918,10 +1154,24 @@ async def sse_events(request: Request):
                     timeout=15.0,
                 )
                 if msg and msg["type"] == "message":
-                    payload = {
-                        "channel": msg["channel"],
-                        "data": _json.loads(msg["data"]) if isinstance(msg["data"], str) else msg["data"],
-                    }
+                    # KAI-DASH-043 — a single unparseable payload used to
+                    # raise out of the loop and terminate the client's
+                    # stream. One bad publisher must not disconnect every
+                    # subscriber.
+                    raw = msg.get("data")
+                    try:
+                        data = _json.loads(raw) if isinstance(raw, str) else raw
+                    except ValueError:
+                        logger.warning("dropping malformed event on %s",
+                                       msg.get("channel"))
+                        continue
+                    # KAI-DASH-044 — every subscriber received every
+                    # event on every channel. An event carrying a subject
+                    # is now delivered only to that subject; events with
+                    # no subject are system-wide and go to everyone.
+                    if not _event_visible_to(data, principal):
+                        continue
+                    payload = {"channel": msg.get("channel"), "data": data}
                     yield f"data: {_json.dumps(payload)}\n\n"
                 else:
                     # keepalive heartbeat every 15s
@@ -949,7 +1199,7 @@ async def sse_events(request: Request):
           dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_security_audit():
     """Proxy security self-hacking audit from agentic-introspect."""
-    introspect_url = os.getenv("AGENTIC_INTROSPECT_URL", "http://agentic-introspect:8023")
+    introspect_url = backend_url("AGENTIC_INTROSPECT_URL", "http://agentic-introspect:8023")
     try:
         async with pooled_client(timeout=15.0) as client:
             resp = await client.get(f"{introspect_url}/security/audit")
@@ -1162,7 +1412,7 @@ async def api_finance_cis_record(request: Request):
     return await _proxy_post(f"{FINANCIAL_URL}/finance/cis/record", body=body, fallback={"status": "unavailable"})
 
 
-AGENTIC_URL = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
+AGENTIC_URL = backend_url("LANGGRAPH_URL", "http://agentic:8007")
 
 
 @app.get("/api/soul",
@@ -1269,7 +1519,7 @@ async def api_logs(limit: int = Query(100, ge=1, le=500), level: str = "", since
         pass
 
     # Collect from agentic
-    agentic_url = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
+    agentic_url = backend_url("LANGGRAPH_URL", "http://agentic:8007")
     try:
         async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{agentic_url}/logs", params=params)
@@ -1715,7 +1965,7 @@ async def app_shell() -> HTMLResponse:
 
 
 # ── Chat proxy — Kai's face ─────────────────────────────────────────
-LANGGRAPH_URL = os.getenv("LANGGRAPH_URL", "http://agentic:8007")
+LANGGRAPH_URL = backend_url("LANGGRAPH_URL", "http://agentic:8007")
 
 
 @app.get("/chat")
@@ -1775,26 +2025,26 @@ async def api_chat_proxy(request: Request):
     )
 
 
-SCREEN_CAPTURE_URL = os.getenv("SCREEN_CAPTURE_URL", "http://screen-capture:8059")
-AUDIO_URL = os.getenv("AUDIO_SERVICE_URL", "http://audio-service:8021")
-TTS_URL = os.getenv("TTS_SERVICE_URL", "http://tts-service:8030")
-BROWSER_AGENT_URL = os.getenv("BROWSER_AGENT_URL", "http://browser-agent:8040")
-VISION_URL = os.getenv("VISION_SERVICE_URL", "http://vision-service:8023")
-CLIPBOARD_URL = os.getenv("CLIPBOARD_SERVICE_URL", "http://clipboard-service:8024")
-FILES_URL = os.getenv("FILES_SERVICE_URL", "http://files-service:8025")
-NOTIFY_URL = os.getenv("NOTIFY_SERVICE_URL", "http://notify-service:8031")
-DOC_PARSER_URL = os.getenv("DOC_PARSER_URL", "http://document-parser:8032")
-MONITOR_URL = os.getenv("MONITOR_SERVICE_URL", "http://monitor-service:8033")
-BROKER_URL = os.getenv("BROKER_URL", "http://broker-bridge:8034")
-SYSMETRICS_URL = os.getenv("SYSMETRICS_URL", "http://sysmetrics:8035")
-WEATHER_SERVICE_URL = os.getenv("WEATHER_SERVICE_URL", "http://weather-service:8039")
-DOCKER_WATCHER_URL = os.getenv("DOCKER_WATCHER_URL", "http://docker-watcher:8041")
-AIRQUALITY_URL = os.getenv("AIRQUALITY_URL", "http://airquality-service:8042")
-CALENDAR_SERVICE_URL = os.getenv("CALENDAR_SERVICE_URL", "http://calendar-service:8043")
-GIT_WATCHER_URL = os.getenv("GIT_WATCHER_URL", "http://git-watcher:8044")
-SCREEN_WATCHER_URL = os.getenv("SCREEN_WATCHER_URL", "http://screen-watcher:8036")
-EMAIL_READER_URL = os.getenv("EMAIL_READER_URL", "http://email-reader:8037")
-NEWS_FEED_URL = os.getenv("NEWS_FEED_URL", "http://news-feed:8038")
+SCREEN_CAPTURE_URL = backend_url("SCREEN_CAPTURE_URL", "http://screen-capture:8059")
+AUDIO_URL = backend_url("AUDIO_SERVICE_URL", "http://audio-service:8021")
+TTS_URL = backend_url("TTS_SERVICE_URL", "http://tts-service:8030")
+BROWSER_AGENT_URL = backend_url("BROWSER_AGENT_URL", "http://browser-agent:8040")
+VISION_URL = backend_url("VISION_SERVICE_URL", "http://vision-service:8023")
+CLIPBOARD_URL = backend_url("CLIPBOARD_SERVICE_URL", "http://clipboard-service:8024")
+FILES_URL = backend_url("FILES_SERVICE_URL", "http://files-service:8025")
+NOTIFY_URL = backend_url("NOTIFY_SERVICE_URL", "http://notify-service:8031")
+DOC_PARSER_URL = backend_url("DOC_PARSER_URL", "http://document-parser:8032")
+MONITOR_URL = backend_url("MONITOR_SERVICE_URL", "http://monitor-service:8033")
+BROKER_URL = backend_url("BROKER_URL", "http://broker-bridge:8034")
+SYSMETRICS_URL = backend_url("SYSMETRICS_URL", "http://sysmetrics:8035")
+WEATHER_SERVICE_URL = backend_url("WEATHER_SERVICE_URL", "http://weather-service:8039")
+DOCKER_WATCHER_URL = backend_url("DOCKER_WATCHER_URL", "http://docker-watcher:8041")
+AIRQUALITY_URL = backend_url("AIRQUALITY_URL", "http://airquality-service:8042")
+CALENDAR_SERVICE_URL = backend_url("CALENDAR_SERVICE_URL", "http://calendar-service:8043")
+GIT_WATCHER_URL = backend_url("GIT_WATCHER_URL", "http://git-watcher:8044")
+SCREEN_WATCHER_URL = backend_url("SCREEN_WATCHER_URL", "http://screen-watcher:8036")
+EMAIL_READER_URL = backend_url("EMAIL_READER_URL", "http://email-reader:8037")
+NEWS_FEED_URL = backend_url("NEWS_FEED_URL", "http://news-feed:8038")
 _UPLOAD_MAX_BYTES = 10 * 1024 * 1024  # 10 MB
 
 _IMAGE_EXTS = frozenset({"png", "jpg", "jpeg", "gif", "bmp", "webp", "tiff", "tif"})
@@ -2239,6 +2489,7 @@ async def api_broker_health():
 @app.get("/api/broker/ticker/{symbol}",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_broker_ticker(symbol: str):
+    symbol = safe_symbol(symbol)
     return await _proxy_get(f"{BROKER_URL}/ticker/{symbol}", fallback={})
 
 
@@ -2286,10 +2537,16 @@ async def api_broker_templates():
 async def api_broker_watch(request: Request):
     """Create a monitor rule for a position from the Broker tab Quick Watch button."""
     body = await bounded_json(request)
-    symbol = body.get("symbol", "").upper()
-    threshold = body.get("threshold")
-    if not symbol:
-        raise HTTPException(status_code=400, detail="symbol required")
+    # KAI-DASH-095 — the symbol reached an outbound URL unvalidated and
+    # the threshold was never checked at all, so NaN or a string became a
+    # monitor rule that could never fire meaningfully.
+    symbol = safe_symbol(body.get("symbol", ""))
+    threshold = _as_number(body.get("threshold"), float)
+    if threshold is None:
+        raise HTTPException(
+            status_code=400,
+            detail="threshold must be a finite number",
+        )
     rule = {
         "source": {
             "type": "http",
@@ -2306,7 +2563,7 @@ async def api_broker_watch(request: Request):
     }
     if threshold is not None:
         rule["condition"] = {"op": "lt", "threshold": float(threshold)}
-    monitor_url = os.getenv("MONITOR_SERVICE_URL", "http://monitor-service:8033")
+    monitor_url = backend_url("MONITOR_SERVICE_URL", "http://monitor-service:8033")
     return await _proxy_post(f"{monitor_url}/rules", body=rule, fallback={"ok": False})
 
 
@@ -2427,24 +2684,28 @@ async def api_news_feeds():
 @app.get("/api/broker/depth/{symbol}",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_broker_depth(symbol: str, limit: int = Query(20, ge=1, le=500)):
+    symbol = safe_symbol(symbol)
     return await _proxy_get(f"{BROKER_URL}/depth/{symbol}", params={"limit": limit}, fallback={})
 
 
 @app.get("/api/broker/stats/{symbol}",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_broker_stats(symbol: str):
+    symbol = safe_symbol(symbol)
     return await _proxy_get(f"{BROKER_URL}/stats/24hr/{symbol}", fallback={})
 
 
 @app.get("/api/broker/trades/{symbol}",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_broker_trades(symbol: str, limit: int = Query(20, ge=1, le=500)):
+    symbol = safe_symbol(symbol)
     return await _proxy_get(f"{BROKER_URL}/trades/{symbol}", params={"limit": limit}, fallback={"trades": []})
 
 
 @app.get("/api/broker/stocks/{symbol}",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def broker_stocks(symbol: str):
+    symbol = safe_symbol(symbol)
     async with pooled_client(timeout=15.0) as client:
         r = await client.get(f"{BROKER_URL}/stocks/{symbol}")
         r.raise_for_status()
@@ -2454,6 +2715,7 @@ async def broker_stocks(symbol: str):
 @app.get("/api/broker/forex/{pair}",
           dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def broker_forex(pair: str):
+    pair = safe_symbol(pair, "pair")
     async with pooled_client(timeout=15.0) as client:
         r = await client.get(f"{BROKER_URL}/forex/{pair}")
         r.raise_for_status()

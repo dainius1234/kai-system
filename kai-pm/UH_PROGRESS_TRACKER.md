@@ -4,7 +4,7 @@
 > If this file and any other doc disagree, **this file wins** for UH status.
 > Every UH change must update this file in the same commit.
 
-**Last updated:** 2026-08-03 (twelfth pass — 11 more real defects found behind MANUAL labels)
+**Last updated:** 2026-08-03 (thirteenth pass — MANUAL converted 34 → 1; 95 of 96 mechanically verified)
 **Branch:** `claude/project-rework-plan-pgvp35`
 **Verify everything:** `make test-uh` (one command, all suites)
 
@@ -54,13 +54,13 @@
 | E-03 Deployment preflight | ✅ Done | `8d2ea09` | `make test-preflight` | 57 |
 | W-01 Modules wired into the running app | ✅ Done | this commit | `make test-invariant-guards` | (guards) |
 | A-01 Architecture dependency CI gate — all 15 rules | ✅ Done | `cb3f142` | `make test-architecture-rules` | 61 |
-| W1-DASH Dashboard finding tracker (96 findings) | ✅ Done | `dff418d` | `make test-dashboard-findings` | 155 |
+| W1-DASH Dashboard finding tracker (96 findings) | ✅ Done | `dff418d` | `make test-dashboard-findings` | 177 |
 | W1-DASH-A Dashboard inbound identity | ✅ Done | `9fb0e26` | `make test-dashboard-auth` | 89 |
 | W1-DASH-D01 Browser credential shim | ✅ Done | `eb5b084` | `make test-dashboard-ui-auth` | 42 |
 | W1-DASH-C Caller-scoped memory reads | ✅ Done | `d18a089` | `make test-dashboard` | (folded in) |
 | W1-DASH-D Failure semantics (degraded envelope) | ✅ Done | `dc95692` | `make test-degraded` | 36 |
 | W1-DASH-E–I Bounds, media, disclosure, fan-out, hygiene | ✅ Done | this commit | `make test-dashboard` | (folded in) |
-| | | | **Total** | **1,836** |
+| | | | **Total** | **1,858** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
@@ -245,15 +245,15 @@ before any remediation was planned, because the findings were captured at
 |---|---|---|
 | LIVE | 54 | **0** |
 | PARTIAL | 2 | **0** |
-| REMEDIATED (pending closure review) | 3 | **73** |
-| MANUAL (needs human review) | 37 | **23** |
+| REMEDIATED (pending closure review) | 3 | **95** |
+| MANUAL (needs human review) | 37 | **1** |
 | **Total** | **96** | **96** |
 
 **All nine tracks are complete: every one of the 96 findings reports zero LIVE.** `common/dashboard_auth.py`
 gives every route a verified principal — identity, role, session — and a
 declared scope.
 
-- **All 10 CRITICALs remediated, and no finding of any severity reports LIVE.** 73 REMEDIATED, 23 MANUAL (needing human review, never auto-claimed)
+- **All 10 CRITICALs remediated, and no finding of any severity reports LIVE.** 95 REMEDIATED, 1 MANUAL (needing human review, never auto-claimed)
 - **185 routes: 179 authenticated, 66 of 66 mutating routes authenticated**
 - The 6 unauthenticated routes are the declared public list — `/health`,
   `/metrics`, and the four HTML shells the browser loads before it can
@@ -271,7 +271,7 @@ carries bounded request bodies and a shared connection pool. Payload limits
 are **not** re-declared: they come from
 `common/perception_spine/ingress.py`, which already owned them.
 
-**23 findings remain MANUAL** — not statically decidable, each naming what
+**One finding remains MANUAL** — `KAI-DASH-073` (backend identity proof), which needs a transport-layer change (mTLS or signed service identity), not a code edit. It — not statically decidable, each naming what
 a human must review. MANUAL is not a pass.
 
 > **The same defects exist outside the dashboard.** A repo-wide sweep found
@@ -283,7 +283,7 @@ a human must review. MANUAL is not a pass.
 | Command | Purpose |
 |---|---|
 | `make dashboard-findings` | Live status of all 96 findings |
-| `make test-dashboard-findings` | 155 tests proving the tracker can fail |
+| `make test-dashboard-findings` | 177 tests proving the tracker can fail |
 | `make test-dashboard-auth` | 89 tests on the auth module itself |
 | `make test-dashboard-ui-auth` | 42 tests on the browser credential shim |
 | `make test-degraded` | 36 tests that an outage cannot look like an answer |

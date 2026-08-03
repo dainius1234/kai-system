@@ -1452,7 +1452,11 @@ function switchView(name) {
 
   if (name === 'dashboard') {
     refreshDashboard();
-    dashboardInterval = setInterval(refreshDashboard, 3000);
+    // KAI-DASH-059 — this polled the root fan-out every 3s per open tab,
+    // and `/` probes every node plus the go/no-go report. The server now
+    // caches node status briefly, but the amplification was the client's
+    // to fix: 10s is well inside the useful freshness of a status page.
+    dashboardInterval = setInterval(refreshDashboard, 10000);
   }
   if (name === 'thinking') {
     refreshThinking();

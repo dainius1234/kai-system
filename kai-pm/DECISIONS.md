@@ -3344,3 +3344,55 @@ Concretely — a dead memU produced `{"nudges": []}` with HTTP 200, indistinguis
 **Nothing is closed.** Rule 7. Findings formally closed by this entry: **0**.
 
 **Files modified:** `common/http_hygiene.py` (`bounded_upload`, `bounded_response`), `dashboard/app.py`, `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard.py`, tracker/plan/README/STATUS/MAKEFILE_TARGETS.
+
+---
+
+## D147 — 2026-08-03 — MANUAL 34 → 1: 22 More Findings Converted to Evidence
+
+**Context:** D146 converted 11 `MANUAL` findings and left 23. Asked to keep going until satisfied, the remaining 23 were worked through. **22 of them were real defects.** MANUAL now stands at **1**.
+
+**What the remaining "unknowns" actually were.** Every one of these was sitting behind a label that said "needs human review":
+
+| Finding | What was actually wrong |
+|---|---|
+| `015` | `status_code < 500` recorded a **circuit-breaker success**. A dependency rejecting every request with 404 looked perfectly healthy. |
+| `014` | `resilient_call` retried **POSTs** unconditionally — a mutation that reached the backend was applied twice. |
+| `062` | `core_ready = … and ledger_size >= 0` where `ledger_size` **defaults to 0**. Always true. An unreachable Tool Gate read as ready. |
+| `072` | 47 backend addresses read from the environment with **no scheme or host validation** — the highest-leverage variable in the deployment. |
+| `094` | `{symbol}` interpolated straight into an **outbound Binance URL**: a request-forgery primitive, not a formatting bug. |
+| `095` | Broker-watch threshold never validated — `NaN` or a string became a monitor rule that could never fire. |
+| `078` | Go/no-go thresholds parsed with a bare `float()`; a typo could set error tolerance to 5000% and the gate would agree forever. |
+| `075` | A new HTTP client, and therefore a new connection pool, **per retry attempt**. |
+| `060` | `readiness()` called `index()` — a probe costing as much as the most expensive page, making the thing it measured worse. |
+| `058` | `/` fanned out to every node **twice**: once for its summary, once inside the go/no-go report. |
+| `059` | The UI polled that fan-out **every 3 seconds per open tab**. |
+| `043` | One unparseable event **terminated the subscriber's stream**. |
+| `044` | Every subscriber received every event on every channel. |
+| `068`/`077` | The root payload carried internal topology and each backend's full health document. |
+| `085` | A Redis client constructed and closed **per publish**. |
+| `086` | Publish failures logged at DEBUG and swallowed — the event-bus twin of `067`. |
+| `076`/`092` | Backend and binary responses materialised without a size bound. |
+| `079` | Bare `int()` on backend fields: a malformed count took the whole report down. |
+| `070`/`071` | Liveness/readiness contract and node-inventory drift. |
+
+**Decisions:**
+
+1. **Four fixes went into `common/resilience.py`, which every service uses.** `014`, `015`, `075` and `076` were never dashboard defects — they were in the shared helper. Success is now strictly 2xx; 4xx returns to the caller **without** retry, because a malformed request will be just as malformed the second time and calling it a dependency success hid a backend rejecting everything. Retries are limited to methods idempotent by definition, with `idempotent=True` available as an **explicit, greppable** claim rather than an assumption.
+
+2. **Backend addresses are validated at import** (`072`). A bad value fails the container start rather than the first request that needs it. Optional backends may be empty — but *only* empty; a half-written URL is still refused. Redis carries its own scheme allow-list rather than being exempted.
+
+3. **`/` no longer discloses topology by default** (`068`). `tool_gate_url`, `policy_version` and `policy_hash` sit behind `DASHBOARD_EXPOSE_TOPOLOGY`, off by default: operator diagnostics, not status.
+
+4. **Unlabelled events default to visible** (`044`). Deliberate. The bus carries operational signal a status page needs, and silently dropping unlabelled events would trade a disclosure bug for a blindness bug. Events that *name* a subject go only to that subject; the keeper sees everything.
+
+5. **One check was wrong, not the code.** `dash_015` grepped for `resp.status_code < 500` and matched **its own docstring** plus the legitimate 4xx branch. It now parses the AST and inspects what actually guards `record_success()`. A test asserts the docstring case specifically.
+
+**`KAI-DASH-073` remains MANUAL, and I am not claiming otherwise.** Proving backend identity needs mTLS or signed service identity — a transport-layer change, not a code edit. It is the one finding of 96 with no mechanical check.
+
+**A pre-existing gap closed on the way:** `test_browser_agent` had **13 failing tests** — G-03 authenticated those routes in `99c1ee9` and never updated the suite, which had been asserting against 503 ever since. Same class as the `test_prod_hardening` gap in D142. Ten other suites fail both before and after this change; they need a running stack and are outside this scope.
+
+**Verification:** 1,858 tests across 24 suites, all green. 9/9 CI gates. 177 tracker tests, including flip tests proving each new check reports LIVE on the defect and REMEDIATED on the fix. Every dashboard-touching suite and every `common/resilience.py` consumer passes.
+
+**Nothing is closed.** Rule 7. Findings formally closed by this entry: **0**. 95 of 96 now carry mechanical evidence for a future closure review.
+
+**Files modified:** `common/resilience.py`, `common/http_hygiene.py`, `dashboard/app.py`, `dashboard/static/app.html`, `scripts/security/check_dashboard_findings.py`, `scripts/test_dashboard_findings.py`, `scripts/test_browser_agent.py`, tracker/plan/README/STATUS/MAKEFILE_TARGETS.

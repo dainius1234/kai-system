@@ -44,12 +44,38 @@ async def resilient_call(
     backoff: float = 0.5,
     fallback: Any = None,
     logger: Any = None,
+    idempotent: Optional[bool] = None,
+    max_response_bytes: int = 8 * 1024 * 1024,
 ) -> Any:
     """HTTP call with retry, exponential backoff, and circuit breaker.
 
     Returns the parsed JSON response on success, or *fallback* when all
     attempts fail or the circuit is open.
+
+    Three audit findings live in this function, and all three are shared
+    by every service that calls it:
+
+    **`KAI-DASH-014` — retried mutations duplicate.** Retrying a POST
+    that already reached the backend applies it twice. Retries are now
+    limited to methods that are idempotent by definition; a caller who
+    knows their POST is safe to repeat can say so with
+    ``idempotent=True``, which makes the claim explicit and greppable
+    rather than assumed.
+
+    **`KAI-DASH-015` — 4xx counted as a healthy dependency.** Success
+    was ``status_code < 500``, so a 404 or a 400 recorded a circuit
+    breaker *success*. A dependency that rejects everything looked
+    perfectly well. Only 2xx is success now; 4xx is returned to the
+    caller without being retried, because a malformed request will be
+    just as malformed the second time.
+
+    **`KAI-DASH-075` — a client per retry attempt.** The client was
+    constructed inside the loop, so each attempt built a new connection
+    pool. It is built once, outside.
     """
+    if idempotent is None:
+        idempotent = method.upper() in {"GET", "HEAD", "OPTIONS", "PUT", "DELETE"}
+    attempts = retries if idempotent else 1
     name = service_name or url.split("//")[-1].split("/")[0].split(":")[0]
     cb = _get_breaker(name)
 
@@ -59,27 +85,50 @@ async def resilient_call(
         return fallback
 
     last_exc: Optional[Exception] = None
-    for attempt in range(1, retries + 1):
-        try:
-            async with httpx.AsyncClient(timeout=timeout) as client:
+    # One client for every attempt (KAI-DASH-075), and a shared pool
+    # underneath it (KAI-DASH-074).
+    from common.http_hygiene import pooled_client
+
+    async with pooled_client(timeout=timeout) as client:
+        for attempt in range(1, attempts + 1):
+            try:
                 if method.upper() == "GET":
                     resp = await client.get(url, params=params)
                 else:
                     resp = await client.post(url, json=json)
-            if resp.status_code < 500:
-                cb.record_success()
-                return resp.json()
-            last_exc = Exception(f"HTTP {resp.status_code}")
-        except Exception as exc:
-            last_exc = exc
-        # backoff before retry (skip sleep on last attempt)
-        if attempt < retries:
-            await asyncio.sleep(backoff * (2 ** (attempt - 1)))
+
+                if 200 <= resp.status_code < 300:
+                    cb.record_success()
+                    # KAI-DASH-076 — a backend response is not trusted to
+                    # be a size this process can afford to parse.
+                    body = resp.content
+                    if len(body) > max_response_bytes:
+                        last_exc = Exception(
+                            f"response {len(body)} bytes over "
+                            f"{max_response_bytes} limit")
+                        break
+                    return resp.json()
+
+                if 400 <= resp.status_code < 500:
+                    # The request is wrong, not the dependency. Retrying
+                    # will not help, and calling it a success would hide
+                    # a backend rejecting everything.
+                    if logger:
+                        logger.warning("resilient_call %s %s -> %s (not retried)",
+                                       method, url, resp.status_code)
+                    return fallback
+
+                last_exc = Exception(f"HTTP {resp.status_code}")
+            except Exception as exc:
+                last_exc = exc
+            # backoff before retry (skip sleep on last attempt)
+            if attempt < attempts:
+                await asyncio.sleep(backoff * (2 ** (attempt - 1)))
 
     cb.record_failure()
     if logger:
-        logger.warning("resilient_call %s %s failed after %d attempts: %s",
-                        method, url, retries, last_exc)
+        logger.warning("resilient_call %s %s failed after %d attempt(s): %s",
+                        method, url, attempts, last_exc)
     return fallback
 
 

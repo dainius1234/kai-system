@@ -928,6 +928,344 @@ def dash_091() -> Result:
     return REMEDIATED, "caller media types are not forwarded unchecked"
 
 
+def dash_043() -> Result:
+    """One malformed event payload terminates the client stream."""
+    src = _handler_src("sse_events")
+    if not src:
+        return REMEDIATED, "event stream removed"
+    if "json.loads" not in src and "_json.loads" not in src:
+        return MANUAL, "no event parsing found in sse_events()"
+    # The parse must be individually guarded, not merely inside the
+    # outer try that also owns the loop.
+    if "ValueError" in src or "JSONDecodeError" in src:
+        return REMEDIATED, "a malformed event is dropped, not fatal to the stream"
+    return LIVE, "an unparseable event payload ends the subscriber's stream"
+
+
+def dash_058() -> Result:
+    """Root status duplicates fleet probes."""
+    text = _text()
+    if "_status_cache" in text or "lru_cache" in _handler_src("fetch_status"):
+        return REMEDIATED, "repeated status calls in one cycle reuse one fan-out"
+    calls = text.count("await fetch_status()")
+    if calls > 1:
+        return LIVE, f"{calls} independent fan-outs per request cycle"
+    return REMEDIATED, "a single fan-out per request"
+
+
+def dash_060() -> Result:
+    """Readiness calls the full root fan-out."""
+    src = _handler_src("readiness")
+    if not src:
+        return REMEDIATED, "readiness route removed"
+    if "await index()" in src:
+        return LIVE, "readiness rebuilds the entire root payload"
+    if "fetch_status" not in src:
+        return PARTIAL, "readiness no longer calls index(), but checks nothing"
+    return REMEDIATED, "readiness performs a bounded core-node check"
+
+
+def dash_062() -> Result:
+    """Go/no-go accepts fallback zero counts as readiness evidence."""
+    src = _handler_src("index")
+    if not src:
+        return MANUAL, "index() not found"
+    if re.search(r"(ledger_size|memory_count)\s*>=\s*0", src):
+        return LIVE, "a fallback zero count satisfies the readiness test"
+    if "is not None" not in src:
+        return PARTIAL, "readiness no longer uses >= 0, but observation is unclear"
+    return REMEDIATED, "readiness requires the counts to have been observed"
+
+
+def dash_059() -> Result:
+    """The built-in UI polls the expensive root fan-out too often."""
+    page = REPO / "dashboard" / "static" / "app.html"
+    try:
+        text = page.read_text(encoding="utf-8")
+    except OSError:
+        return MANUAL, "app.html not readable"
+    match = re.search(r"setInterval\(\s*refreshDashboard\s*,\s*(\d+)\s*\)", text)
+    if not match:
+        return MANUAL, "no refreshDashboard interval found"
+    interval = int(match.group(1))
+    if interval < 10_000:
+        return LIVE, f"root fan-out polled every {interval}ms per browser"
+    return REMEDIATED, f"root fan-out polled every {interval}ms per browser"
+
+
+def dash_068() -> Result:
+    """Root response exposes internal topology and policy state."""
+    src = _handler_src("index")
+    if not src:
+        return MANUAL, "index() not found"
+    leaked = [k for k in ("tool_gate_url", "policy_version", "policy_hash")
+              if f'"{k}"' in src]
+    if not leaked:
+        return REMEDIATED, "root payload carries no topology or policy state"
+    if "EXPOSE_TOPOLOGY" in src:
+        return REMEDIATED, (
+            f"{', '.join(leaked)} only present behind an explicit flag"
+        )
+    return LIVE, f"root payload always discloses {', '.join(leaked)}"
+
+
+def dash_077() -> Result:
+    """Root returns complete nested backend health rather than minimised."""
+    src = _handler_src("index")
+    if not src:
+        return MANUAL, "index() not found"
+    if '"node_status": statuses' in src:
+        return LIVE, "every backend's full health document is forwarded"
+    if "details" not in src:
+        return PARTIAL, "node_status is transformed but the shape is unclear"
+    return REMEDIATED, "per-node detail is stripped from the root payload"
+
+
+def dash_072() -> Result:
+    """Backend URLs are environment-controlled without validation."""
+    text = _text()
+    raw = re.findall(r'os\.getenv\("[A-Z0-9_]*URL"', text)
+    if raw:
+        return LIVE, f"{len(raw)} backend URL(s) read without validation"
+    if "backend_url" not in text:
+        return MANUAL, "no backend URLs found; verify by hand"
+    return REMEDIATED, (
+        f"{text.count('backend_url(')} backend URL(s) validated for scheme "
+        f"and host at import"
+    )
+
+
+def dash_078() -> Result:
+    """Go/no-go thresholds parsed without safe-range validation."""
+    text = _text()
+    if re.search(r"(int|float)\(os\.getenv\(\"(NO_GO_GRACE_REQUESTS|MAX_ERROR_RATIO)", text):
+        return LIVE, "thresholds parsed with a bare int()/float()"
+    if "_bounded_setting" not in text:
+        return MANUAL, "threshold parsing not found"
+    return REMEDIATED, "thresholds are range-checked at import and fail loudly"
+
+
+def dash_079() -> Result:
+    """Malformed backend numeric fields can raise during conversion."""
+    src = _handler_src("build_go_no_go_report") + _handler_src("index")
+    if not src:
+        return MANUAL, "go/no-go and index not found"
+    bare = re.findall(r"(?<!_as_number\()\b(?:int|float)\(\s*\w+(?:_stats|metrics)\.get", src)
+    if bare:
+        return LIVE, f"{len(bare)} bare numeric conversion(s) on backend fields"
+    if "_as_number" not in src:
+        return PARTIAL, "no bare conversions found, but no coercion helper either"
+    return REMEDIATED, "backend numerics are coerced, degrading one field not the response"
+
+
+def dash_086() -> Result:
+    """`_publish_event()` is fire-and-forget with silent delivery loss."""
+    src = _handler_src("_publish_event")
+    if not src:
+        return REMEDIATED, "event publishing removed"
+    if "logger.debug" in src and "return" not in src:
+        return LIVE, "publish failures are swallowed at debug level"
+    if "-> bool" not in src and "return True" not in src:
+        return PARTIAL, "publish failures are logged but delivery is not reported"
+    return REMEDIATED, "delivery is reported and failures are counted"
+
+
+def dash_094() -> Result:
+    """Path parameters are interpolated into backend URLs unvalidated."""
+    text = _text()
+    if "safe_symbol" not in text:
+        return LIVE, "no path-parameter validation before URL interpolation"
+    tree = _tree()
+    if tree is None:
+        return MANUAL, "dashboard source did not parse"
+    unguarded = []
+    for route in _routes():
+        if "{" not in route.path:
+            continue
+        src = _handler_src(route.handler)
+        if not src:
+            continue
+        # Only routes that interpolate the parameter into a URL matter.
+        if not re.search(r"f\"\{[A-Z_]+URL\}[^\"]*\{", src):
+            continue
+        if "safe_symbol" not in src:
+            unguarded.append(f"{route.method.upper()} {route.path}")
+    if unguarded:
+        return LIVE, f"unvalidated path interpolation: {', '.join(unguarded[:3])}"
+    return REMEDIATED, "path parameters are validated before URL interpolation"
+
+
+def dash_095() -> Result:
+    """Broker-watch symbol and threshold validation permits malformed rules."""
+    src = _handler_src("api_broker_watch")
+    if not src:
+        return REMEDIATED, "broker-watch route removed"
+    if "safe_symbol" not in src:
+        return LIVE, "the symbol reaches an outbound URL unvalidated"
+    if "_as_number" not in src:
+        return LIVE, "the threshold is never validated as a finite number"
+    return REMEDIATED, "symbol and threshold are both validated"
+
+
+def _resilience_src() -> str:
+    try:
+        return (REPO / "common" / "resilience.py").read_text(encoding="utf-8")
+    except OSError:
+        return ""
+
+
+def dash_014() -> Result:
+    """Retried POSTs can duplicate non-idempotent operations."""
+    src = _resilience_src()
+    if not src:
+        return MANUAL, "common/resilience.py not readable"
+    if "idempotent" not in src:
+        return LIVE, "resilient_call retries every method, including POST"
+    if "attempts = retries if idempotent else 1" not in src:
+        return PARTIAL, "an idempotent flag exists but does not gate retries"
+    return REMEDIATED, "retries are limited to idempotent methods unless declared"
+
+
+def dash_015() -> Result:
+    """Every 4xx response counted as a successful dependency call."""
+    src = _resilience_src()
+    if not src:
+        return MANUAL, "common/resilience.py not readable"
+    # Look at what actually guards record_success(), not at any mention
+    # of a status code: this module's own docstring names the old test,
+    # and the 4xx branch legitimately compares against 500.
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return MANUAL, "common/resilience.py did not parse"
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.If):
+            continue
+        body = ast.unparse(node.body)
+        if "record_success" not in body:
+            continue
+        test = ast.unparse(node.test)
+        if "500" in test:
+            return LIVE, f"success is recorded when {test}"
+        if "300" in test and "200" in test:
+            return REMEDIATED, (
+                f"success requires {test}; 4xx returns without retry"
+            )
+        return PARTIAL, f"success is guarded by an unclear test: {test}"
+    return MANUAL, "no record_success() guard found"
+
+
+def dash_075() -> Result:
+    """A new client is built for every retry attempt."""
+    src = _resilience_src()
+    if not src:
+        return MANUAL, "common/resilience.py not readable"
+    body = src[src.find("async def resilient_call"):]
+    body = body[:body.find("\ndef ")] if "\ndef " in body else body
+    loop_at = body.find("for attempt in range")
+    client_at = body.find("pooled_client(")
+    if "httpx.AsyncClient(" in body:
+        return LIVE, "a client is constructed inside resilient_call"
+    if client_at == -1:
+        return MANUAL, "no client construction found"
+    if loop_at != -1 and client_at > loop_at:
+        return LIVE, "the client is created inside the retry loop"
+    return REMEDIATED, "one pooled client is reused across every attempt"
+
+
+def dash_076() -> Result:
+    """Backend response bodies are not byte-bounded."""
+    src = _resilience_src()
+    if not src:
+        return MANUAL, "common/resilience.py not readable"
+    if "max_response_bytes" not in src:
+        return LIVE, "resilient_call parses any response size"
+    return REMEDIATED, "backend responses are size-bounded before parsing"
+
+
+def dash_044() -> Result:
+    """Event channels have no per-subscriber filtering."""
+    src = _handler_src("sse_events")
+    if not src:
+        return REMEDIATED, "event stream removed"
+    if "DashboardPrincipal" not in src:
+        return LIVE, "the stream has no subscriber identity to filter on"
+    if "_event_visible_to" not in src:
+        return LIVE, "every subscriber receives every event"
+    return REMEDIATED, "events carrying a subject reach only that subject"
+
+
+def dash_070() -> Result:
+    """Health always reports running and is not a readiness contract."""
+    health = _handler_src("health")
+    ready = _handler_src("readiness")
+    if not health:
+        return MANUAL, "health route not found"
+    if not ready:
+        return LIVE, "there is no readiness endpoint distinct from health"
+    # Health must be cheap and unconditional; readiness must actually check.
+    if "fetch_status" in health or "await" in health.replace("async def", ""):
+        return PARTIAL, "/health performs work; it should be liveness only"
+    if "fetch_status" not in ready:
+        return PARTIAL, "/readiness exists but checks nothing"
+    return REMEDIATED, (
+        "/health is liveness only; /readiness checks core nodes and 503s"
+    )
+
+
+def dash_071() -> Result:
+    """The node inventory can drift from deployed services."""
+    text = _text()
+    tree = _tree()
+    if tree is None:
+        return MANUAL, "dashboard source did not parse"
+    if "NODES" not in text:
+        return MANUAL, "no NODES map found"
+
+    # Every node URL must come from the validated reader, so a service
+    # that is renamed or removed fails at import rather than silently
+    # probing a host that no longer exists.
+    node_block = text[text.find("NODES: Dict[str, str] = {"):]
+    node_block = node_block[:node_block.find("\n}")]
+    if not node_block:
+        return MANUAL, "could not isolate the NODES map"
+    raw = re.findall(r'os\.getenv\(', node_block)
+    if raw:
+        return LIVE, f"{len(raw)} node URL(s) bypass validation and can drift"
+    if "backend_url(" not in node_block:
+        return PARTIAL, "node URLs are neither validated nor obviously static"
+    return REMEDIATED, (
+        "every node address is validated at import, so a bad or removed "
+        "backend fails the container start"
+    )
+
+
+def dash_085() -> Result:
+    """Redis clients are constructed per publisher rather than reused."""
+    text = _text()
+    constructions = text.count("aioredis.from_url(")
+    if constructions > 2:
+        return LIVE, f"{constructions} Redis client construction sites"
+    if "_REDIS_CLIENT" not in text:
+        return PARTIAL, "few construction sites but no lifecycle-managed client"
+    return REMEDIATED, "one lazily-created Redis client, closed on shutdown"
+
+
+def dash_092() -> Result:
+    """Binary responses are fully materialised before forwarding."""
+    text = _text()
+    if "bounded_response" not in text:
+        return LIVE, "binary responses are forwarded without a size bound"
+    unbounded = re.findall(r"content=resp\.content(?!\s*\))", text)
+    bare = text.count("content=resp.content,")
+    if bare:
+        return LIVE, f"{bare} binary response(s) forwarded unbounded"
+    return REMEDIATED, (
+        "binary responses are size-checked before being materialised into "
+        "a reply"
+    )
+
+
 # ── The finding table ────────────────────────────────────────────────
 
 class Finding(NamedTuple):
@@ -969,8 +1307,7 @@ FINDINGS: Dict[str, Finding] = {
     "KAI-DASH-010": Finding(C, "B", "File-watcher path gateway",
                             route_auth(("post", "/api/files/watch"))),
     "KAI-DASH-014": Finding(H, "B", "Retried mutation duplication",
-                            manual("resilient_call retries POSTs; whether a given backend "
-                                   "route is idempotent is a per-backend property")),
+                            dash_014),
     "KAI-DASH-019": Finding(H, "B", "Dream mutation exposure",
                             route_auth(("post", "/api/dream"))),
     "KAI-DASH-026": Finding(H, "B", "Goal mutation exposure",
@@ -1019,21 +1356,17 @@ FINDINGS: Dict[str, Finding] = {
     "KAI-DASH-041": Finding(H, "C", "Public internal event bus",
                             route_auth(("get", "/api/events"))),
     "KAI-DASH-044": Finding(H, "C", "No event-level isolation",
-                            manual("per-event tenant filtering cannot be proven absent by "
-                                   "route inspection; review sse_events() channel fan-out "
-                                   "once a principal exists")),
+                            dash_044),
 
     # ── Track D — failure semantics ──
     "KAI-DASH-013": Finding(H, "D", "Mode failure appears as normal success", dash_013),
     "KAI-DASH-015": Finding(H, "D", "4xx treated as dependency success",
-                            manual("classification lives in common resilience helper "
-                                   "resilient_call(), not in dashboard/app.py")),
+                            dash_015),
     "KAI-DASH-016": Finding(H, "D", "Success-shaped fallbacks", dash_016),
     "KAI-DASH-054": Finding(H, "D", "Chat status not validated", dash_054),
     "KAI-DASH-061": Finding(H, "D", "HTTP success equals node health", dash_061),
     "KAI-DASH-062": Finding(H, "D", "False core readiness",
-                            manual("readiness() consumes fallback zeros; needs a live "
-                                   "backend-down test to demonstrate")),
+                            dash_062),
     "KAI-DASH-063": Finding(H, "D", "Invalid proof metric", dash_063),
     "KAI-DASH-064": Finding(H, "D", "Wrong reliability metric", dash_064),
     "KAI-DASH-065": Finding(H, "D", "False backup status", dash_065),
@@ -1064,9 +1397,9 @@ FINDINGS: Dict[str, Finding] = {
     "KAI-DASH-053": Finding(H, "E", "Unbounded chat body", dash_053),
     "KAI-DASH-056": Finding(H, "E", "No gateway workload controls", dash_056),
     "KAI-DASH-076": Finding(M, "E", "Unbounded backend responses",
-                            manual("backend response bounds apply in the shared proxy helper")),
+                            dash_076),
     "KAI-DASH-092": Finding(M, "E", "Binary response buffering",
-                            manual("streaming vs materialising binary responses")),
+                            dash_092),
     "KAI-DASH-093": Finding(M, "E", "Weak query limits", dash_093),
 
     # ── Track F — media and filename trust ──
@@ -1082,52 +1415,52 @@ FINDINGS: Dict[str, Finding] = {
     "KAI-DASH-052": Finding(H, "G", "Internal error disclosure", dash_052),
     "KAI-DASH-055": Finding(H, "G", "Chat diagnostics leak", dash_055),
     "KAI-DASH-068": Finding(H, "G", "Root operational disclosure",
-                            manual("index() aggregate payload; needs field-level review")),
+                            dash_068),
     "KAI-DASH-069": Finding(M, "G", "Health topology disclosure", dash_069),
     "KAI-DASH-077": Finding(M, "G", "Excess health detail",
-                            manual("index() nested backend health minimisation")),
+                            dash_077),
 
     # ── Track H — fan-out and lifecycle ──
     "KAI-DASH-043": Finding(H, "H", "Malformed event denial",
-                            manual("sse_events() per-event error isolation")),
+                            dash_043),
     "KAI-DASH-057": Finding(H, "H", "Sequential health fan-out", dash_057),
     "KAI-DASH-058": Finding(H, "H", "Duplicate root fan-out",
-                            manual("index() vs build_go_no_go_report() probe overlap")),
+                            dash_058),
     "KAI-DASH-059": Finding(H, "H", "UI amplification loop",
-                            manual("poll interval lives in dashboard/static/app.html")),
+                            dash_059),
     "KAI-DASH-060": Finding(H, "H", "Readiness amplification",
-                            manual("readiness() reuse of the root fan-out")),
+                            dash_060),
     "KAI-DASH-074": Finding(M, "H", "Direct-client churn", dash_074),
     "KAI-DASH-075": Finding(M, "H", "Retry-client churn",
-                            manual("client reuse across retries lives in resilient_call()")),
+                            dash_075),
     "KAI-DASH-085": Finding(M, "H", "Redis lifecycle churn",
-                            manual("Redis client construction per publisher/stream")),
+                            dash_085),
     "KAI-DASH-087": Finding(M, "H", "Blocking app-shell read", dash_087),
 
     # ── Track I — configuration, validation and hygiene ──
     "KAI-DASH-070": Finding(M, "I", "Liveness mislabeled as health",
-                            manual("/health semantics are a contract decision")),
+                            dash_070),
     "KAI-DASH-071": Finding(M, "I", "Inventory drift",
-                            manual("NODES map vs deployed compose services")),
+                            dash_071),
     "KAI-DASH-072": Finding(M, "I", "Unvalidated backend destinations",
-                            manual("scheme/host validation of *_URL environment values")),
+                            dash_072),
     "KAI-DASH-073": Finding(M, "I", "No backend identity proof",
                             manual("backend identity verification is a transport-layer change")),
     "KAI-DASH-078": Finding(M, "I", "Unsafe go/no-go configuration",
-                            manual("safe-range validation of NO_GO_GRACE_REQUESTS / MAX_ERROR_RATIO")),
+                            dash_078),
     "KAI-DASH-079": Finding(M, "I", "Malformed numeric backend data",
-                            manual("int()/float() conversions on backend fields in go/no-go")),
+                            dash_079),
     "KAI-DASH-081": Finding(M, "I", "Deliberate mode split",
                             dash_002),  # same condition: resolved with the token removal
     "KAI-DASH-083": Finding(M, "I", "Naive synthetic times", dash_083),
     "KAI-DASH-084": Finding(M, "I", "Naive SSE heartbeat time", dash_084),
     "KAI-DASH-086": Finding(M, "I", "Silent event loss",
-                            manual("_publish_event() delivery accounting")),
+                            dash_086),
     "KAI-DASH-088": Finding(M, "I", "Missing browser security headers", dash_088),
     "KAI-DASH-094": Finding(M, "I", "Path interpolation",
-                            manual("path parameter canonicalisation across symbol routes")),
+                            dash_094),
     "KAI-DASH-095": Finding(M, "I", "Weak broker-watch rule validation",
-                            manual("api_broker_watch() symbol/threshold validation")),
+                            dash_095),
     "KAI-DASH-096": Finding(M, "I", "Weak optional audit", dash_096),
 }
 
