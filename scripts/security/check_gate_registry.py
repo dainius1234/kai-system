@@ -86,7 +86,8 @@ def discover_modules() -> List[str]:
     """Every check script that exists, whatever anyone declared."""
     return sorted(
         p.stem for p in SECURITY.glob("*.py")
-        if p.stem not in {"__init__", "gate_registry", "gate_inputs"}
+        if p.stem not in {"__init__", "gate_registry", "gate_inputs",
+                          "closure_register"}
     )
 
 
@@ -301,7 +302,7 @@ def cross_check(registry, on_disk, in_policy, in_flows,
     problems: Dict[str, List[str]] = {
         "unregistered": [], "phantom": [], "wiring": [],
         "unproven": [], "blind": [], "denominator": [], "pending": [],
-        "inert": [],
+        "inert": [], "lapsed": [],
     }
 
     # I-4 — three sources must agree.
@@ -370,9 +371,16 @@ def cross_check(registry, on_disk, in_policy, in_flows,
 
 
 def evaluate() -> Dict[str, List[str]]:
-    """`cross_check` wired to the real repository."""
+    """`cross_check` wired to the real repository, plus closure review.
+
+    A closed finding is a claim that a defect cannot recur. If the thing
+    preventing it is removed — I-5 dropped from `ENFORCED`, a gate lifted
+    out of `policy-check` — then the claim is no longer true and the
+    finding **re-opens**. Closure that nobody re-checks is exactly the
+    kind of label that decays into a rubber stamp.
+    """
     GATE, REPORT, REGISTRY = _load_registry()
-    return cross_check(
+    problems = cross_check(
         REGISTRY,
         on_disk=discover_modules(),
         in_policy=discover_policy_check(),
@@ -383,6 +391,9 @@ def evaluate() -> Dict[str, List[str]]:
         repo_has=lambda rel: (REPO / rel).exists(),
         kinds=(GATE, REPORT),
     )
+    from scripts.security.closure_register import lapsed
+    problems["lapsed"] += lapsed()
+    return problems
 
 
 _HEADINGS = [
@@ -393,6 +404,7 @@ _HEADINGS = [
     ("denominator", "NO DENOMINATOR — a pass that cannot be falsified (I-2)"),
     ("unproven", "NEVER OBSERVED FAILING (I-3)"),
     ("inert", "INERT RULES — declared, never applied (I-5)"),
+    ("lapsed", "CLOSURES RE-OPENED — the prevention no longer holds (I-6)"),
 ]
 
 # ── Per-invariant enforcement ────────────────────────────────────────
@@ -413,6 +425,7 @@ INVARIANTS = {
     "I-3": ("prove it can fail", ("unproven",)),
     "I-4": ("declare in one place", ("unregistered", "phantom", "wiring")),
     "I-5": ("no inert rules", ("inert",)),
+    "I-6": ("closures still hold", ("lapsed",)),
 }
 
 # Enforced invariants fail the build. Adding one here is the ratchet
@@ -420,7 +433,7 @@ INVARIANTS = {
 # `test_gate_registry.py` asserts the set never shrinks.
 # I-5 joined here because it reached zero and the gate refused to pass
 # until it did — the ratchet advancing itself, on its own author.
-ENFORCED = ("I-4", "I-5")
+ENFORCED = ("I-4", "I-5", "I-6")
 
 
 def invariant_counts(problems: Dict[str, List[str]]) -> Dict[str, int]:
@@ -458,8 +471,9 @@ def main() -> int:
         return 1 if (args.gate and total) else 0
 
     counts = invariant_counts(problems)
+    from scripts.security.closure_register import CLOSED
     print(f"Instrumentation invariants — {len(REGISTRY)} checks "
-          f"cross-checked\n")
+          f"cross-checked, {len(CLOSED)} finding(s) closed and re-verified\n")
 
     # Say which teeth are engaged, so "partially on" reads as a design
     # decision rather than an accident.

@@ -71,8 +71,9 @@
 | A-04e Partial enforcement — I-4 enforced, ratchet self-advancing | ✅ Done | `e332a02` | `make test-gate-registry` | 39 |
 | KAI-GATE-005 Anchor pre-scan (category confusion) | ✅ Done | `bd80129` | `make test-dashboard-findings` | 189 |
 | KAI-GATE-007/008/009 Secret rule, restart allowlist, camera identity | ✅ Done | `dd772c4` | `make test-secret-gates` | 28 |
-| KAI-GATE-010/011/012 + I-5 inert-rule detector | ✅ Done | this commit | `make test-compose-gates` | 27 |
-| | | | **Total** | **2,081** |
+| KAI-GATE-010/011/012 + I-5 inert-rule detector | ✅ Done | `d222c45` | `make test-compose-gates` | 27 |
+| Closure register — first 6 findings closed, I-6 re-verifies | ✅ Done | this commit | `make test-gate-registry` | 53 |
+| | | | **Total** | **2,088** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and
 migrate to ACTIVE in ascending risk order. Every legacy path is **verified** closed against
@@ -317,6 +318,7 @@ the original count is worse than none.
 |---|---|---|---|
 | `KAI-DASH-D01` | HIGH | Track A closed the gateway to the UI as well: 121 `fetch()` calls carried no credential, and `EventSource` cannot send headers at all | **REMEDIATED** |
 | `KAI-DASH-D02` | HIGH | `/api/memories?query=` omitted `user_id`, which `/memory/retrieve` requires — memory search had been answering 422 all along | **REMEDIATED** |
+| `KAI-DASH-D03` | HIGH | **`KAI_SERVICE_TOKEN` is one shared secret across all 8 authenticated services.** `common/service_auth.py` calls it "the shared service token" — it proves *possession of a secret*, not *identity*, so any service holding it can impersonate any other. Immediate remediation for the parent `KAI-DASH-073`; mTLS is the escalation path if the threat model still demands cryptographic proof afterwards | **OPEN** |
 
 **Findings formally closed: 0.** Programme Rule 7 — closure is a separate
 evidence-backed register action, and `REMEDIATED` here is evidence for that

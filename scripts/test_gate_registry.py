@@ -46,7 +46,7 @@ from scripts.security import gate_registry as registry_module  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 29
+EXPECTED_SCENARIOS = 32
 executed: list[str] = []
 
 
@@ -337,7 +337,7 @@ def test_invariants_are_counted_per_dimension():
     scenario("invariant-counts")
     problems = {"unregistered": ["a"], "phantom": [], "wiring": ["b"],
                 "blind": ["c", "d"], "denominator": [], "unproven": ["e"],
-                "inert": [], "pending": []}
+                "inert": [], "lapsed": [], "pending": []}
     counts = meta.invariant_counts(problems)
     check("I-4 sums its three keys", counts["I-4"] == 2, str(counts))
     check("I-1 counts blindness", counts["I-1"] == 2, str(counts))
@@ -414,6 +414,54 @@ def test_a_non_policy_constant_is_not_reported():
           found and "ALLOWED_THINGS" in found[0], str(found))
 
 
+# ── I-6: closure is a claim the system re-checks ─────────────────────
+
+def test_every_closure_currently_holds():
+    scenario("closure-holds")
+    from scripts.security.closure_register import lapsed
+    out = lapsed()
+    check("no closed finding has silently re-opened", not out, str(out))
+
+
+def test_removing_a_prevention_reopens_its_findings():
+    """Closure that nobody re-checks decays into a rubber stamp."""
+    scenario("closure-lapses")
+    from scripts.security import closure_register as cr
+    original = meta.ENFORCED
+    meta.ENFORCED = ("I-4",)
+    try:
+        out = cr.lapsed()
+    finally:
+        meta.ENFORCED = original
+    check("dropping I-5 re-opens the findings it prevents",
+          len(out) == 2, str(out))
+    check("each names its finding",
+          all("KAI-GATE-" in line for line in out), str(out))
+    check("and they close again when restored", not cr.lapsed())
+
+
+def test_every_closure_records_the_full_template():
+    """The operator set the template; a closure missing evidence is a
+    note, not a review."""
+    scenario("closure-template")
+    from scripts.security.closure_register import CLOSED
+    incomplete = [
+        c.finding for c in CLOSED
+        if not (c.defect and c.fix and c.prevention
+                and c.proven_by and c.verified_on)
+    ]
+    check("every closure carries defect, fix, prevention, proof and date",
+          not incomplete, str(incomplete))
+    missing = [c.finding for c in CLOSED
+               if not pathlib_exists(c.proven_by.split(" ")[0])]
+    check("every named proof file exists", not missing, str(missing))
+
+
+def pathlib_exists(rel: str) -> bool:
+    import pathlib
+    return (pathlib.Path(__file__).resolve().parent.parent / rel).exists()
+
+
 def test_the_enforced_set_never_shrinks():
     """A floor on the ratchet itself. Removing an invariant from ENFORCED
     is the regression this whole file exists to prevent, so it is asserted
@@ -421,6 +469,7 @@ def test_the_enforced_set_never_shrinks():
     scenario("enforced-floor")
     check("I-4 is enforced", "I-4" in meta.ENFORCED, str(meta.ENFORCED))
     check("I-5 is enforced", "I-5" in meta.ENFORCED, str(meta.ENFORCED))
+    check("I-6 is enforced", "I-6" in meta.ENFORCED, str(meta.ENFORCED))
     check("every enforced name is a real invariant",
           all(n in meta.INVARIANTS for n in meta.ENFORCED), str(meta.ENFORCED))
 
@@ -430,6 +479,9 @@ def run_all() -> None:
     test_an_enforced_invariant_with_breaches_fails()
     test_a_reported_invariant_with_breaches_does_not_fail()
     test_an_invariant_at_zero_must_be_enforced()
+    test_every_closure_currently_holds()
+    test_removing_a_prevention_reopens_its_findings()
+    test_every_closure_records_the_full_template()
     test_an_inert_constant_is_detected()
     test_an_inert_pass_branch_is_detected()
     test_a_non_policy_constant_is_not_reported()

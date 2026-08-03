@@ -424,4 +424,43 @@ That belongs alongside boundary blindness and the self-consuming guard.
 
 ---
 
-**Findings formally closed by this sub-plan: 0.** Rule 7.
+## 11. Closure register — the first six
+
+Rule 7 held for the whole programme: nothing closed. That was right while
+the work was in flight, but a register where nothing ever closes stops
+carrying information.
+
+The operator set the bar, and it is higher than "we fixed it":
+
+> a confirmation that the remediation actually addressed the finding,
+> **and that the finding's category of defect has a structural prevention
+> in place** so it won't recur.
+
+**Closed (6):** `KAI-GATE-004`, `005`, `006`, `008`, `009`, `012`.
+
+**Declined, though offered:** `001`, `002`, `003` — the structural
+prevention is incomplete while 15, 6 and 2 sites remain. Closing them
+would dilute the register.
+
+**Deliberately excluded:** `010` (misleading messages) and `011` (the
+image-tag denylist). Both are fixed and tested. Nothing structurally
+prevents the *next* misleading message, so they are **remediated, not
+prevented** — which is the distinction the whole register turns on.
+
+### Closure is falsifiable, not asserted
+
+Each record in `scripts/security/closure_register.py` carries a
+`still_holds` predicate, re-evaluated on every run as **I-6**. A closure
+whose prevention is removed — I-5 dropped from `ENFORCED`, a gate lifted
+out of `policy-check` — **re-opens itself and fails the gate.**
+
+Proven: removing I-5 from `ENFORCED` re-opens `KAI-GATE-008` and `012`
+by name, and both close again when it is restored.
+
+That matters because "closed" is precisely the kind of label that decays
+into a rubber stamp. Here it is a claim the system re-checks.
+
+---
+
+**Findings closed by this sub-plan: 6, each with its prevention
+re-verified on every run.** Rule 7 satisfied, not bypassed.

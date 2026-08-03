@@ -3871,3 +3871,52 @@ Then the self-advancing rule from A-04e fired on its own author: I-5 reached zer
 
 **Files added:** `scripts/test_compose_gates.py`.
 **Files modified:** `check_port_bindings.py`, `check_network_zones.py`, `check_image_tags.py`, `check_dashboard_findings.py`, `check_gate_registry.py`, `gate_registry.py`, `check_assertion_floors.py`, `assertion_floors.json`, `scripts/test_gate_registry.py`, `Makefile`, sub-plan/tracker/STATUS/MAKEFILE_TARGETS.
+
+---
+
+## D158 — 2026-08-03 — The First Six Closures, Made Falsifiable; and Tailscale Struck Out
+
+**Context:** The operator, explicitly wearing the project-manager hat, approved a closure batch and set the template. They also invited me to close `KAI-GATE-001` through `005` — *"you've earned it."*
+
+### I declined three of the five
+
+`001` (fail-open on missing input), `002` (no denominator) and `003` (never observed failing) each still have sites outstanding — **15, 6 and 2**. By the operator's own criterion, closure requires the *category* to have a structural prevention, and a prevention that covers most of the sites is not a prevention. Accepting the offer would have diluted the first entries in a column that has been empty for the whole programme.
+
+Countered with six that do qualify: **`004`, `005`, `006`, `008`, `009`, `012`** — each with a fix, an *enforced* structural prevention, and a test proving the prevention fires. Approved.
+
+**`010` and `011` were deliberately excluded and remain remediated-not-closed.** Both are fixed and tested; nothing structurally prevents the *next* misleading message or the *next* wrong tag rule. That distinction is the register's whole point.
+
+### Closure is a claim the system re-checks
+
+The template the operator specified — defect, fix, prevention, proof, date — is recorded per finding in `scripts/security/closure_register.py`. But a written record decays, and "closed" is precisely the label that decays into a rubber stamp.
+
+So each record also carries a **`still_holds` predicate**, evaluated on every run as a sixth invariant, **I-6**. A closure whose prevention is removed re-opens itself and fails the build.
+
+Proven, not asserted: dropping `I-5` from `ENFORCED` re-opens `KAI-GATE-008` and `012` **by name**, and both close again when it is restored. `test_removing_a_prevention_reopens_its_findings` holds that behaviour.
+
+I-6 was at zero on its first run, so the self-advancing rule from A-04e immediately required it be enforced. Three invariants now enforce: I-4, I-5, I-6.
+
+### Tailscale is struck out, and it was the most expensive option
+
+Scoped as instructed. The answer is neither per-workload *nor* per-node in any useful sense: **Tailscale is a single container** — `sovereign-tailscale`, hostname `sovereign-core`, on `egress-net` only, under the `external-egress` profile. One node for twenty-one services, and it is not on the paths where services talk to each other; those run over `agent-net` and `data-net`, which Tailscale never sees.
+
+Making it serve identity would need a node per service — 21+ nodes, per-service auth keys, displacing the Docker network segmentation that `check_network_zones` enforces. **Larger than mTLS, not cheaper.** Struck from consideration.
+
+### But scoping it found the real next step
+
+`KAI_SERVICE_TOKEN` is **one shared secret across all 8 authenticated services** — `common/service_auth.py` names it "the shared service token". That is exactly what `KAI-DASH-073` objects to: it proves possession of a secret, not identity, so any service holding it can impersonate any other.
+
+The cheap step is neither mTLS nor SPIFFE but **per-service tokens instead of one shared one** — same mechanism, same code path, a map instead of a scalar, giving real caller identity and per-service revocation. Opened as **`KAI-DASH-D03`** under parent `KAI-DASH-073`. mTLS remains the escalation path if the threat model still demands cryptographic proof against a stolen token; `073` does not close until the split is done and that decision is made.
+
+### The Docker daemon: reported, not worked around
+
+The operator pushed hard — *"stop finding ways to work around its absence."* Fair as motivation, but the lever is not on this side. A daemon **does** start here; `docker network create` works. Exactly one hostname is blocked: `production.cloudfront.docker.com`, which serves Docker Hub's image blobs. Auth, manifests and `ghcr.io` all resolve. **17 of 18 images are Docker Hub**, so that one entry is the whole gap.
+
+The proxy exposes no control endpoint (405 on everything but `status`), and its own README is explicit: *"Do not retry or route around it — report the blocked host."* Reported, with the hostname, the cause (the agent proxy's egress allowlist, chosen with the environment's network policy) and the documentation link. That is the complete set of actions available from inside.
+
+**Verification:** 2,088 tests across 30 suites, all green — 53 in the meta-check's own suite. 11/11 policy gates. `make gate-registry` reports 13 checks cross-checked and **6 findings closed and re-verified**; I-4, I-5 and I-6 enforce at zero, I-1/I-2/I-3 report 15/6/2.
+
+**Findings closed: 6.** The first in this programme. Rule 7 satisfied rather than bypassed — the review happened, the evidence is recorded, and the prevention is re-checked on every run.
+
+**Files added:** `scripts/security/closure_register.py`.
+**Files modified:** `scripts/security/check_gate_registry.py`, `scripts/test_gate_registry.py`, `scripts/security/assertion_floors.json`, sub-plan/tracker/STATUS.
