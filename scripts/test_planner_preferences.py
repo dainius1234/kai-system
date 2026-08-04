@@ -97,11 +97,22 @@ class TestGatherContextIncludesPreferences(unittest.TestCase):
         fake_prefs = [{"content": {"text": "keeper prefers X"}}]
 
         async def _run():
-            with patch("planner._fetch_memory_chunks", new_callable=AsyncMock, return_value=[]), \
-                 patch("planner._fetch_correction_memories", new_callable=AsyncMock, return_value=[]), \
-                 patch("planner._fetch_nudges", new_callable=AsyncMock, return_value=[]), \
-                 patch("planner._fetch_preferences", new_callable=AsyncMock, return_value=fake_prefs):
-                ctx = await gather_context("test input", "s1", [])
+            # patch.object on the imported module, not patch("planner.X") by
+            # name. This file puts both agentic/ and common/ on sys.path, so
+            # in a full run "planner" can resolve to a different object than
+            # the one `gather_context` was bound from — the patch then lands
+            # on one module while the code under test calls the other, and
+            # ctx.preferences comes back empty.
+            import planner as _planner
+            with patch.object(_planner, "_fetch_memory_chunks",
+                              new_callable=AsyncMock, return_value=[]), \
+                 patch.object(_planner, "_fetch_correction_memories",
+                              new_callable=AsyncMock, return_value=[]), \
+                 patch.object(_planner, "_fetch_nudges",
+                              new_callable=AsyncMock, return_value=[]), \
+                 patch.object(_planner, "_fetch_preferences",
+                              new_callable=AsyncMock, return_value=fake_prefs):
+                ctx = await _planner.gather_context("test input", "s1", [])
                 return ctx
 
         ctx = asyncio.run(_run())

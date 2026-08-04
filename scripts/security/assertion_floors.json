@@ -24,6 +24,7 @@
     "Payload Bounds Tests": 24,
     "Secret & Restart Gate Tests": 28,
     "Service Auth Tests": 59,
+    "Suite Floor Tests": 18,
     "Test Isolation Tests": 19,
     "Test Wiring Tests": 13,
     "UH-1 Contract Tests": 126,
@@ -35,5 +36,5 @@
     "UH-7 Actuator Registry Tests": 75,
     "UH-8 Autonomy Tests": 174
   },
-  "total": 2190
+  "total": 2208
 }

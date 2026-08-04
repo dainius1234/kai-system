@@ -125,21 +125,53 @@ def test_readiness_level_ints_correct(tmp_path):
 
 # ── HTTP endpoints via TestClient ─────────────────────────────────────────────
 
+
+# ── Load agentic/app.py under a name of its own ──────────────────────
+# `import app` is a coin toss in a full run. `sys.modules["app"]` is a
+# generic name, and test_p3_organic_memory.py claims it for
+# memu-core/app.py. Whichever suite imports first wins, and this one sorts
+# later — so `import app` returned memu-core, `patch("app.get_trust_core")`
+# raised AttributeError, and 11 tests errored at setup while passing
+# perfectly when the file ran alone.
+#
+# test_letta_agent.py already carried a comment about this exact collision.
+# It was a known hazard that nothing enforced.
+_APP_NAME = "agentic_app_trust"
+
+
+def _agentic_app():
+    """agentic/app.py, loaded once, under an unambiguous name."""
+    if _APP_NAME in sys.modules:
+        return sys.modules[_APP_NAME]
+    import importlib.util
+    path = Path(__file__).resolve().parents[1] / "agentic" / "app.py"
+    assert path.is_file(), f"agentic application missing at {path}"
+    spec = importlib.util.spec_from_file_location(_APP_NAME, path)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[_APP_NAME] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
 @pytest.fixture()
-def client(tmp_path):
-    """TestClient with trust_core reset to a fresh tmp_path instance."""
-    import os
-    os.environ["FF_MODEL_COUNCIL"] = "false"
-    os.environ["FF_WEB_SCOUT"] = "false"
-    os.environ["FF_SERVICE_WATCHDOG"] = "false"
-    os.environ["FF_PAPER_TRADING"] = "false"
+def client(tmp_path, monkeypatch):
+    """TestClient with trust_core reset to a fresh tmp_path instance.
+
+    The flags go through monkeypatch rather than os.environ: set directly
+    they stayed set for every suite collected after this one, which is the
+    same class of defect as the module stubs and is why these four names
+    appear in scripts/security/test_isolation_baseline.json.
+    """
+    for flag in ("FF_MODEL_COUNCIL", "FF_WEB_SCOUT",
+                 "FF_SERVICE_WATCHDOG", "FF_PAPER_TRADING"):
+        monkeypatch.setenv(flag, "false")
 
     reset_trust_core()
     # Patch get_trust_core to return an isolated instance
     fresh = TrustCore(data_dir=tmp_path / "trust")
 
-    with patch("app.get_trust_core", return_value=fresh):
-        import app as app_module
+    app_module = _agentic_app()
+    with patch(f"{_APP_NAME}.get_trust_core", return_value=fresh):
         with TestClient(app_module.app) as c:
             yield c
 

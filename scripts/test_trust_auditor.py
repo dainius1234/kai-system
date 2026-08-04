@@ -122,7 +122,33 @@ def test_auditor_endpoint_injects_trust_data():
         captured_prompts.append(messages[0]["content"])
         return "Trust audit complete."
 
-    import app as app_module
+# ── Load agentic/app.py under a name of its own ──────────────────────
+# `import app` is a coin toss in a full run. `sys.modules["app"]` is a
+# generic name, and test_p3_organic_memory.py claims it for
+# memu-core/app.py. Whichever suite imports first wins, and this one sorts
+# later — so `import app` returned memu-core, `patch("app.get_trust_core")`
+# raised AttributeError, and 11 tests errored at setup while passing
+# perfectly when the file ran alone.
+#
+# test_letta_agent.py already carried a comment about this exact collision.
+# It was a known hazard that nothing enforced.
+_APP_NAME = "agentic_app_trust"
+
+
+def _agentic_app():
+    """agentic/app.py, loaded once, under an unambiguous name."""
+    if _APP_NAME in sys.modules:
+        return sys.modules[_APP_NAME]
+    import importlib.util
+    path = Path(__file__).resolve().parents[1] / "agentic" / "app.py"
+    assert path.is_file(), f"agentic application missing at {path}"
+    spec = importlib.util.spec_from_file_location(_APP_NAME, path)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[_APP_NAME] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+    app_module = _agentic_app()
     orig_llm = app_module._llm
     orig_trust = app_module.get_trust_status
 
@@ -137,7 +163,7 @@ def test_auditor_endpoint_injects_trust_data():
         from fastapi.testclient import TestClient
         client = TestClient(app_module.app)
 
-        with patch("app.is_enabled", return_value=True):
+        with patch("agentic_app_trust.is_enabled", return_value=True):
             resp = client.post(
                 "/chat/teammate/auditor",
                 json={"message": "What is my current trust level?"},
@@ -164,7 +190,7 @@ def test_auditor_endpoint_does_not_inject_world_state():
         captured_prompts.append(messages[0]["content"])
         return "ok"
 
-    import app as app_module
+    app_module = _agentic_app()
     orig_llm = app_module._llm
     orig_snapshot = app_module._last_world_snapshot
     orig_trust = app_module.get_trust_status
@@ -180,7 +206,7 @@ def test_auditor_endpoint_does_not_inject_world_state():
         from fastapi.testclient import TestClient
         client = TestClient(app_module.app)
 
-        with patch("app.is_enabled", return_value=True):
+        with patch("agentic_app_trust.is_enabled", return_value=True):
             resp = client.post(
                 "/chat/teammate/auditor",
                 json={"message": "audit", "world_context": True},

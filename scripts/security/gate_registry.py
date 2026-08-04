@@ -243,6 +243,24 @@ REGISTRY: Tuple[Gate, ...] = (
          in_workflows=("python-app.yml",),
          findings=("KAI-GATE-019",)),
 
+    # KAI-GATE-020: the repo-wide result itself, as a ratchet. Recorded at
+    # 4,208 passed / 0 failed / 0 errors — from zero tests running at all.
+    # The pass count is a floor as well, because otherwise deleting a test
+    # would be a way to satisfy this gate.
+    Gate(module="check_suite_floor",
+         kind=GATE,
+         summary="the repo-wide pytest result may not regress (KAI-GATE-020)",
+         inputs=("scripts/security/suite_floor.json",),
+         denominator=r"inspected: \d+ tests passed",
+         probe=False,
+         probe_skip_reason="reads a captured run; producing one takes minutes "
+                           "and CI already has it. Probed by "
+                           "scripts/test_suite_floor.py against synthetic logs",
+         proven_by="scripts/test_suite_floor.py",
+         in_policy_check=False,
+         in_workflows=("python-app.yml",),
+         findings=("KAI-GATE-020",)),
+
     # ── The meta-check, bound by the rules it enforces ───────────────
     # It appears in its own registry on purpose. The recursion is
     # depth-one and closed: it declares a denominator, fails closed on an

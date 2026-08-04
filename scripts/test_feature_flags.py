@@ -9,6 +9,13 @@ import pytest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
+# Imported as a module, not as names. `common/` ends up on sys.path in a
+# full run (test_planner_preferences and test_self_deception both insert
+# it), so `feature_flags` can exist twice — once as a top-level module
+# and once as `common.feature_flags` — each with its own _REGISTRY dict.
+# Binding _REGISTRY by name at import then checks one dict while
+# register_flag writes to the other, and the test fails alone-passing.
+import common.feature_flags as ff  # noqa: E402
 from common.feature_flags import (
     _REGISTRY,
     get_all_flags,
@@ -100,15 +107,15 @@ class TestGetAllFlags:
 
 class TestRegisterFlag:
     def test_register_new_flag(self):
-        register_flag("TEST_TEMP_FLAG_1234", description="temp", default=False)
-        assert "TEST_TEMP_FLAG_1234" in _REGISTRY
+        ff.register_flag("TEST_TEMP_FLAG_1234", description="temp", default=False)
+        assert "TEST_TEMP_FLAG_1234" in ff._REGISTRY
         assert is_enabled("TEST_TEMP_FLAG_1234") is False
         # cleanup
-        del _REGISTRY["TEST_TEMP_FLAG_1234"]
+        del ff._REGISTRY["TEST_TEMP_FLAG_1234"]
 
     def test_register_does_not_overwrite(self):
-        original = _REGISTRY.get("SAGE_CRITIQUE")
-        register_flag("SAGE_CRITIQUE", description="dup", default=False)
+        original = ff._REGISTRY.get("SAGE_CRITIQUE")
+        ff.register_flag("SAGE_CRITIQUE", description="dup", default=False)
         # register_flag overwrites (by design), restore original
         _REGISTRY["SAGE_CRITIQUE"] = original
 

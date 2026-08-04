@@ -4404,3 +4404,133 @@ Actions tab; that is operator-side, along with `KAI-GATE-016`.
 `gate_registry.py`, `assertion_floors.json`, `Makefile`,
 `python-app.yml`, `INSTRUMENTATION_ARCHITECTURE.md`,
 `TEST_WRITING_REVIEW.md`.
+
+---
+
+## 2026-08-04 — KAI-GATE-020 closed: 0 → 4,208 passing, nothing failing
+
+**Prompt:** *"Ok try and fix all as you have enough info for it."*
+
+Start of the day: the repo-wide pytest executed **zero** tests. End of it:
+4,208 passed, 0 failed, 0 errors, with three ratchets defending the number.
+
+### A third thing hiding the tests, found in the CI log
+
+After routing `python-app.yml` onto `claude/**` I reported that CI was
+"failing for the right reason now — real test failures". **It was not.**
+The job dies at the `flake8` step and everything after it is skipped. The
+pytest step had never executed on this branch. My own isolation gate
+appeared in the log only because it carries `if: always()`, and it refused
+correctly: *"no report at .isolation-report.json. A missing report is not
+an absence of leaks."*
+
+Three layers, each hiding the next. Collection aborted, so "tests pass"
+meant nothing. The trigger was `main`-only, so nobody saw the result. And
+a lint step ran ahead of the tests, so "CI is red" still said nothing
+about them. Eight flake8 errors: three real (annotation-only names never
+imported; a redundant `global`), one where the checker was wrong and the
+code was right (`common/http_hygiene` resolves four `__all__` names
+through a PEP 562 `__getattr__` — verified both still resolve, suppressed
+narrowly on that line).
+
+### The 63, by mechanism — and none of them was `sys.modules`
+
+**44 — `asyncio.get_event_loop()`.** Five suites shared one line:
+`asyncio.get_event_loop().run_until_complete(coro)`. That reuses whatever
+loop the thread has, and FastAPI's TestClient closes it. Every suite
+sorting after one that uses TestClient died with *"There is no current
+event loop"*, naming itself rather than the file that closed the loop.
+`asyncio.run()` fixes it. A rule for this **already existed** — its
+denominator was a hand-written list of seven filenames with an
+`if path.exists()` skip, so it could not see any of the five. Widened to
+every test file, read by AST rather than substring (a substring matches
+its own assertion text — class C), with the scanned count asserted.
+
+**12 — endpoints that fail closed without a service token.** vault-sync's
+`/export` and `/ingest`, agentic's `/checkpoint/{id}/restore` and DELETE.
+Tests written before G-03. Authenticated rather than waived: setting
+`KAI_ALLOW_UNAUTHENTICATED` would go green while removing the auth
+dependency from the exercised path. This also uncovered a **false pass** —
+`test_export_disabled_when_ff_off` asserts 503 and was passing on the auth
+refusal, not on the feature flag it exists to check.
+
+**5 — a module that has never existed.** `import memu_core_app`; memu-core's
+application is `memu-core/app.py`, in a directory whose name is not an
+identifier. A bare `except Exception` reported it as *"could not be
+imported in this environment"* — a true sentence about a false cause —
+then returned `None`, and five tests died on `'NoneType' object has no
+attribute 'post'`.
+
+**2 — greps that could not tell "hardened" from "removed."**
+`'@app.get("/api/goals")' in source` stopped matching when the route
+gained `dependencies=[Depends(require_dashboard_auth(...))]`. An assertion
+that breaks when a route is made safer is a tax on doing the right thing.
+
+**13 — module identity.** `patch("app.get_trust_core")` targets the generic
+name `app`, and `test_p3_organic_memory.py` claims `sys.modules["app"]`
+for memu-core. Whoever imports first wins. `test_letta_agent.py` already
+carried a *comment* about this exact collision — a known hazard that
+nothing enforced. The trust suites now load `agentic/app.py` under a name
+of their own. Two more (`test_feature_flags`, `test_planner_preferences`)
+bound names at import from modules that exist twice, because `common/` and
+`agentic/` both end up on `sys.path`; they now resolve through the module
+object at call time.
+
+### Where I was wrong, and how it was caught
+
+Twice in one session I built a bisector that gave a confident wrong
+answer, both times by measuring a proxy:
+
+  1. *"Did the combined run report any failure?"* — `test_agentic_routes`
+     carried three of its own, so every subset containing it looked
+     positive. It converged on that file for that reason alone.
+  2. Corrected to count failures in the target file only — and then
+     returned **0** for a run whose collection had been *interrupted*, a
+     fail-open in the tool built to find fail-opens.
+
+Both were caught by checking the answer against a known case rather than
+believing the first number. That is the rule from the last review, and it
+earned its place again.
+
+I also broke `test_agentic_routes` twice trying to scope its stubs to the
+import (3 failures became 54 both times, measured and reverted). Its stubs
+must live from import through its last test; that is now a module-scoped
+fixture, and it is the one declared entry in the isolation baseline.
+
+### The ratchets
+
+Three now defend this, each falsifiable along a different axis:
+
+  - `check_assertion_floors.py` — per-suite assertion counts (2,208 across
+    34 suites) may only rise.
+  - `check_test_isolation.py` — no real module may be left replaced (zero,
+    enforced); `added`/`env_set` ratchet down. Now 13 and 11, from 13 and 15.
+  - `check_suite_floor.py` — **new.** The repo-wide result: failures and
+    errors may not rise, and **the pass count may not fall**, because
+    without that last rule deleting a test would be a way to go green. It
+    keeps the history, including the run that executed nothing.
+
+### Verified
+
+policy-check 14/14 · test-uh 34 suites / 2,208 assertions · assertion
+floors pass with determinism · six invariants at zero · isolation gate
+passes · suite floor proven against seven synthetic logs including an
+aborted collection and an empty file · **4,208 passed, 0 failed, 0
+errors** on the exact command CI runs.
+
+### Register
+
+**`KAI-GATE-020` CLOSED.** Evidence above; prevention enforced.
+
+**`KAI-GATE-019` stays REMEDIATED, not closed.** Its claim is that CI runs
+the tests and reports on them, and CI has not yet done that once — the
+flake8 fix in this batch is what makes the next run the first real test of
+it. Closing it before that would be closing on an expectation.
+
+**Files added:** `scripts/security/check_suite_floor.py`,
+`scripts/security/suite_floor.json`, `scripts/test_suite_floor.py`.
+**Files modified:** 11 test scripts, `common/http_hygiene.py`,
+`agentic/moral_imagination.py`, `common/policy_bridge/policy_engine.py`,
+`cortex/app.py`, `gate_registry.py`, `assertion_floors.json`,
+`test_isolation_baseline.json`, `Makefile`, `python-app.yml`,
+`INSTRUMENTATION_ARCHITECTURE.md`.
