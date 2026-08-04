@@ -77,7 +77,8 @@
 | A-04 complete — all six invariants enforced, 9 findings closed | ✅ Done | `dcabc73` | `make gate-registry` | 64 |
 | KAI-GATE-014 MANUAL-branch audit — absence is not remediation | ✅ Done | `e3d718c` | `make test-dashboard-findings` | 201 |
 | KAI-GATE-015/016 CI toleration register; 3 workflows did not parse | ✅ Done | `e8e1c2a` | `make test-ci-tolerations` | 15 |
-| KAI-GATE-017 The six "pre-existing" failures — only 3 needed a stack | ✅ Done | this commit | `make test-executor` | 9 |
+| KAI-GATE-017 The six "pre-existing" failures — only 3 needed a stack | ✅ Done | `936a9b0` | `make test-executor` | 9 |
+| KAI-GATE-018 Test-writing review + dead-test gate | ✅ Done | this commit | `make test-test-wiring` | 13 |
 | | | | **Total** | **2,142** |
 
 **UH-7 is complete.** All **34** actuators across all 8 tiers have dispatch handlers and

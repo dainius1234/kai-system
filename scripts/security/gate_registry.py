@@ -208,6 +208,20 @@ REGISTRY: Tuple[Gate, ...] = (
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-015", "KAI-GATE-016")),
 
+    # A test that is never called asserts nothing, and nothing fails to
+    # draw attention to it. Calibrated against known-good suites before
+    # it reports — three earlier versions of this detector produced
+    # 1,555, 1,813 and 54 confident wrong answers.
+    Gate(module="check_test_wiring",
+         kind=GATE,
+         summary="every test in a self-run suite is dispatched",
+         inputs=("Makefile", "scripts"),
+         denominator=r"inspected: \d+ self-run suites",
+         proven_by="scripts/test_test_wiring.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-018",)),
+
     # ── The meta-check, bound by the rules it enforces ───────────────
     # It appears in its own registry on purpose. The recursion is
     # depth-one and closed: it declares a denominator, fails closed on an

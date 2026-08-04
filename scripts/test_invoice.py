@@ -38,4 +38,8 @@ def test_main_defaults(monkeypatch, tmp_path, capsys):
     assert outfile.exists()
 
 
-print("invoice tests passed")
+# This file has no `__main__` block: running it as a script defined
+# three test functions, printed the line below, and exited 0 — verifying
+# nothing while claiming to pass. The tests use pytest fixtures
+# (monkeypatch, capsys, tmp_path) and can only run under pytest, so the
+# Makefile invokes them that way now and this line is gone.

@@ -64,5 +64,8 @@ jobs:
       - name: CI toleration register
         run: python scripts/security/check_ci_tolerations.py
 
+      - name: Test wiring — no test defined and never called
+        run: python scripts/security/check_test_wiring.py
+
       - name: Instrumentation invariants (I-4 enforced)
         run: python scripts/security/check_gate_registry.py --gate

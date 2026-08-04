@@ -134,6 +134,7 @@ SUITE_TARGETS = {
     "Secret & Restart Gate Tests": "test-secret-gates",
     "Compose Gate Tests": "test-compose-gates",
     "CI Toleration Tests": "test-ci-tolerations",
+    "Test Wiring Tests": "test-test-wiring",
 }
 
 

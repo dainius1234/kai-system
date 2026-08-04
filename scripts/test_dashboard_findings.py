@@ -1115,6 +1115,15 @@ def test_every_missing_handler_branch_answers_manual():
 def run() -> None:
     test_a_vanished_handler_is_never_reported_remediated()
     test_every_missing_handler_branch_answers_manual()
+    # Seven cases sat here defined and never called — 16 assertions that
+    # ran nowhere. Found by a dead-test sweep, not by anything failing.
+    test_dash_014_requires_idempotence_to_gate_retries()
+    test_dash_015_reads_the_success_guard_not_the_string()
+    test_dash_044_needs_both_a_principal_and_a_filter()
+    test_dash_062_catches_the_always_true_readiness_test()
+    test_dash_072_flips_on_url_validation()
+    test_dash_075_catches_a_client_inside_the_loop()
+    test_dash_094_only_flags_routes_that_interpolate()
     test_an_absent_tree_is_refused_not_reported_remediated()
     test_an_unrecognisable_tree_fails_differently_from_an_absent_one()
     test_a_thin_tree_is_refused_even_with_every_symbol_present()

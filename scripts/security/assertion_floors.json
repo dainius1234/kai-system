@@ -9,7 +9,7 @@
     "Concurrency & Clock Tests": 51,
     "Constraint Assessment Tests": 56,
     "Dashboard Auth Tests": 99,
-    "Dashboard Finding Tracker Tests": 201,
+    "Dashboard Finding Tracker Tests": 217,
     "Dashboard UI Auth Tests": 42,
     "Degraded State Tests": 36,
     "Deployment Preflight Tests": 57,
@@ -24,6 +24,7 @@
     "Payload Bounds Tests": 24,
     "Secret & Restart Gate Tests": 28,
     "Service Auth Tests": 59,
+    "Test Wiring Tests": 13,
     "UH-1 Contract Tests": 126,
     "UH-2 Perception Spine Tests": 166,
     "UH-3 World State Tests": 71,
@@ -33,5 +34,5 @@
     "UH-7 Actuator Registry Tests": 75,
     "UH-8 Autonomy Tests": 174
   },
-  "total": 2142
+  "total": 2171
 }

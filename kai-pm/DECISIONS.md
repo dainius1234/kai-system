@@ -4184,3 +4184,59 @@ The three that genuinely need a stack are unchanged, and one of them — `test_s
 
 **Files added:** `scripts/ci/declining.py`.
 **Files modified:** `scripts/test_executor_service.py` (rewritten), `scripts/test_camera_service.py`, `scripts/test_cross_session_context.py`, `scripts/test_d91_vault_sync.py`, `scripts/test_soul_identity.py`, sub-plan/tracker.
+
+---
+
+## D164 — 2026-08-04 — Reviewing My Own Test Defects: 16 of Them, and What They Have in Common
+
+**Context:** *"Review your code writing and logic for test as we lost mostly time fixing tests and how they were getting wrong readings and giving out false results."*
+
+A fair charge. The count is in `kai-pm/TEST_WRITING_REVIEW.md`: **16 defects in my own test and detector code**, every one producing a *confident wrong reading* rather than an error.
+
+### The review reproduced the defect it was reviewing
+
+Building the dead-test detector took four attempts, three wrong, each wrong the same way:
+
+```
+attempt 1  "any test_ never called is dead"            1,555
+attempt 2  "...unless the file has unittest.main()"    1,813
+attempt 3  "look inside the file's run()"                 54
+attempt 4  ask the Makefile how the file is invoked       10
+```
+
+The first three read a **proxy** — the file's contents — for the fact that actually decides the answer: `python -m pytest x.py` collects every test in it, `python x.py` runs only what the file calls. That lives in the *Makefile*, not the file.
+
+**Attempt 3 is the sharpest.** It looked for a dispatch function named `run` or `run_all` and took the first match — which in two of my own suites is a *helper* named `run(...)`. It reported 54 orphans in files where every test runs.
+
+### So the detector calibrates before it reports
+
+`check_test_wiring.py` is pointed at five suites whose dispatch is known-good **before** it looks at anything else. If it disagrees with a known answer it **refuses** rather than reporting an unknown one. All three earlier versions would have been stopped there.
+
+That is the generalisable lesson, and it is not about tests: **a new detector should be pointed at a case whose answer is already known before it is pointed at the repository.** Three times in this review I believed a detector for one command before checking it.
+
+### What it found
+
+**7 tests in `test_dashboard_findings.py`, defined and never called — 16 assertions running nowhere.** All seven pass. Nothing failed, so nothing drew attention to them. Wired in; the suite went 201 → 217.
+
+**`test_invoice.py` had no `__main__` block at all.** Running it as `python scripts/test_invoice.py` defined three test functions, printed `"invoice tests passed"`, and exited 0 — **verifying nothing while claiming to pass.** Its tests use pytest fixtures and can only run under pytest, which the Makefile now does.
+
+### The two worst classes
+
+**A proxy standing in for the mechanism** (4 defects, all four detectors). Find the fact that actually decides the answer and read *that*.
+
+**A test guarded on state the repository owns** (3 defects). `== [70]`, `"exactly one fail-open site"`, `len(out) == 2`. The middle one is the purest specimen in this whole programme: **the test broke because the bug was fixed.** A test that requires its own defect to persist is a self-consuming guard in its most literal form.
+
+### The honest accounting
+
+Of the 16, **10 were caught by a test or a gate and 6 by reading**. The harness works. The recurring failure is not that defects get through — it is that I trust the first number a new detector produces.
+
+**And the new gate caught its own author on its first run**: `check_test_wiring.py` skipped a Makefile target naming a missing script, which I-1 reported immediately. A broken target now fails rather than being stepped over.
+
+**Deliberately not enforced:** `EXPECTED_SCENARIOS` stays an equality despite four off-by-one corrections. A floor would notice removals but not a scenario added and never dispatched, and noticing that is what the operator asked the meta-assertion for. The friction is the feature.
+
+**Verification:** 2,171 tests across 32 suites, all green. 13/13 policy gates. Six invariants at zero and enforced; 9 findings closed and re-verified.
+
+**`KAI-GATE-018` opens, REMEDIATED.**
+
+**Files added:** `scripts/security/check_test_wiring.py`, `scripts/test_test_wiring.py`, `kai-pm/TEST_WRITING_REVIEW.md`.
+**Files modified:** `scripts/test_dashboard_findings.py`, `scripts/test_invoice.py`, `gate_registry.py`, `check_assertion_floors.py`, `assertion_floors.json`, `Makefile`, `policy-checks.yml`, tracker/STATUS.
