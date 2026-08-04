@@ -7,6 +7,10 @@ from unittest.mock import patch, MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from scripts.module_stubs import stubbed  # noqa: E402
+
 _SVC = Path(__file__).resolve().parents[1] / "perception" / "files" / "app.py"
 
 
@@ -16,14 +20,19 @@ def _load():
     runtime_stub = MagicMock()
     runtime_stub.setup_json_logger.return_value = MagicMock()
     runtime_stub.ErrorBudget = MagicMock(return_value=MagicMock(record=MagicMock(), snapshot=MagicMock(return_value={})))
-    sys.modules.setdefault("common", MagicMock())
-    sys.modules["common.runtime"] = runtime_stub
-    # Stub watchdog so tests run without it installed
+    # Stub watchdog so tests run without it installed. Scoped to the
+    # import: see scripts/module_stubs.py.
     watchdog_stub = MagicMock()
-    sys.modules["watchdog"] = watchdog_stub
-    sys.modules["watchdog.observers"] = watchdog_stub
-    sys.modules["watchdog.events"] = watchdog_stub
-    spec.loader.exec_module(mod)
+    stubs = {
+        "common.runtime": runtime_stub,
+        "watchdog": watchdog_stub,
+        "watchdog.observers": watchdog_stub,
+        "watchdog.events": watchdog_stub,
+    }
+    if "common" not in sys.modules:
+        stubs["common"] = MagicMock()
+    with stubbed(stubs):
+        spec.loader.exec_module(mod)
     return mod
 
 

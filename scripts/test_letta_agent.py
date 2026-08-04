@@ -1,18 +1,21 @@
 """Unit tests for letta-agent FastAPI service (Letta client mocked)."""
 from __future__ import annotations
 
-import sys
 import os
+import sys
 import types
 import unittest
 from unittest.mock import MagicMock, patch
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 # ── Stub letta before importing app ──────────────────────────────────
 # Build minimal stubs so importing letta-agent/app.py succeeds without
 # the real package being installed in the test environment.
-def _make_letta_stubs() -> None:
+def _letta_stubs() -> dict:
+    """Stubs for the real letta package, or {} if it is installed."""
     if "letta" in sys.modules:
-        return
+        return {}
     stub = types.ModuleType("letta")
     stub.create_client = MagicMock()
     schemas = types.ModuleType("letta.schemas")
@@ -20,12 +23,12 @@ def _make_letta_stubs() -> None:
     llm_cfg.LLMConfig = MagicMock()
     emb_cfg = types.ModuleType("letta.schemas.embedding_config")
     emb_cfg.EmbeddingConfig = MagicMock()
-    sys.modules["letta"] = stub
-    sys.modules["letta.schemas"] = schemas
-    sys.modules["letta.schemas.llm_config"] = llm_cfg
-    sys.modules["letta.schemas.embedding_config"] = emb_cfg
-
-_make_letta_stubs()
+    return {
+        "letta": stub,
+        "letta.schemas": schemas,
+        "letta.schemas.llm_config": llm_cfg,
+        "letta.schemas.embedding_config": emb_cfg,
+    }
 
 # Load letta-agent/app.py by path to avoid collision with sys.modules["app"]
 # which test_p3_organic_memory.py sets to memu-core/app.py.
@@ -33,13 +36,17 @@ _make_letta_stubs()
 # (TypeAdapter) can find the module when rebuilding models at request time.
 import importlib.util as _ilu  # noqa: E402
 
+from scripts.module_stubs import stubbed  # noqa: E402
+
 _letta_spec = _ilu.spec_from_file_location(
     "_letta_agent_app",
     os.path.join(os.path.dirname(__file__), "..", "letta-agent", "app.py"),
 )
 letta_app = _ilu.module_from_spec(_letta_spec)
 sys.modules["_letta_agent_app"] = letta_app
-_letta_spec.loader.exec_module(letta_app)
+# The letta stubs last only as long as this import.
+with stubbed(_letta_stubs()):
+    _letta_spec.loader.exec_module(letta_app)
 
 from fastapi.testclient import TestClient  # noqa: E402
 

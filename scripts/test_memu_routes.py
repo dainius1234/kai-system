@@ -13,14 +13,20 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from scripts.module_stubs import stubbed  # noqa: E402
+
 # ── Bootstrap: ensure redis stub is present before module load ────────
 # (conftest.py does this globally but re-guard for isolated runs)
-if "redis" not in sys.modules:
+def _redis_stubs() -> dict:
+    if "redis" in sys.modules:
+        return {}
     _rs = MagicMock()
-    _rs.from_url.return_value = MagicMock(ping=MagicMock(side_effect=ConnectionError("stub")))
+    _rs.from_url.return_value = MagicMock(
+        ping=MagicMock(side_effect=ConnectionError("stub")))
     _rs.asyncio = MagicMock()
-    sys.modules["redis"] = _rs
-    sys.modules["redis.asyncio"] = _rs.asyncio
+    return {"redis": _rs, "redis.asyncio": _rs.asyncio}
 
 # Remove any prior lakefs_client stub so memu-core's built-in ImportError
 # fallback fires and returns real string commit_ids (not MagicMock).
@@ -44,7 +50,9 @@ def _load_memu():
     )
     mod = importlib.util.module_from_spec(spec)
     sys.modules["memu_app_routes"] = mod
-    spec.loader.exec_module(mod)
+    # The redis stub lasts only as long as this import.
+    with stubbed(_redis_stubs()):
+        spec.loader.exec_module(mod)
     mod._redis_client = None  # force in-memory session path
     return mod
 

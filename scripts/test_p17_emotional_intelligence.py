@@ -18,17 +18,17 @@ from unittest.mock import MagicMock
 
 import pytest
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from scripts.module_stubs import (  # noqa: E402
+    AGENTIC_HEAVY_DEPS, absent_stubs, stubbed,
+)
+
 # ── Bootstrap stubs ──────────────────────────────────────────────────
 
-for mod_name in [
-    "sentence_transformers", "psutil", "redis", "redis.asyncio",
-    "psycopg2", "psycopg2.extras", "psycopg2.pool", "lakefs_client",
-    "kai_config", "conviction", "router", "planner", "adversary",
-    "security_audit", "tree_search", "priority_queue", "model_selector",
-    "aioredis",
-]:
-    if mod_name not in sys.modules:
-        sys.modules[mod_name] = MagicMock()
+# Declared once in scripts/module_stubs.py rather than copied into five
+# suites, and scoped to the imports below rather than left installed.
+_STUBS = absent_stubs(AGENTIC_HEAVY_DEPS)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -46,7 +46,8 @@ def _load_memu():
     )
     mod = importlib.util.module_from_spec(spec)
     sys.modules["memu_app_p17"] = mod
-    spec.loader.exec_module(mod)
+    with stubbed(_STUBS):
+        spec.loader.exec_module(mod)
     mod._redis_client = None
     return mod
 
@@ -61,7 +62,8 @@ def _load_dashboard():
     )
     mod = importlib.util.module_from_spec(spec)
     sys.modules["dashboard_app_p17"] = mod
-    spec.loader.exec_module(mod)
+    with stubbed(_STUBS):
+        spec.loader.exec_module(mod)
     return mod
 
 

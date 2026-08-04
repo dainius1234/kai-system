@@ -7,7 +7,11 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+# `hse_rams` lives in scripts/, not at the repo root. Because scripts/ is
+# a package, pytest imports this file as `scripts.test_hse_rams` and does
+# *not* put scripts/ on sys.path, so inserting ROOT alone raised
+# ModuleNotFoundError at collection.
+sys.path.insert(0, str(ROOT / "scripts"))
 
 from hse_rams import (  # noqa: E402
     DEFAULT_CSV,

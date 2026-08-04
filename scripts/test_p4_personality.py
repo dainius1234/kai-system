@@ -16,18 +16,17 @@ import time
 import unittest
 from unittest.mock import MagicMock
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from scripts.module_stubs import absent_stubs, stubbed  # noqa: E402
+
 # ---------------------------------------------------------------------------
 # bootstrap: stub heavy deps so memu-core/app.py can import in test
 # ---------------------------------------------------------------------------
-for mod_name in [
-    "sentence_transformers",
-    "psutil",
-    "redis", "redis.asyncio",
-    "psycopg2",
-    "lakefs_client",
-]:
-    if mod_name not in sys.modules:
-        sys.modules[mod_name] = MagicMock()
+_STUBS = absent_stubs((
+    "sentence_transformers", "psutil", "redis", "redis.asyncio",
+    "psycopg2", "lakefs_client",
+))
 
 os.environ.setdefault("MEMU_HMAC_KEY", "test-key")
 os.environ.setdefault("VECTOR_STORE", "memory")
@@ -39,7 +38,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 spec = importlib.util.spec_from_file_location("memu_app", "memu-core/app.py")
 memu = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(memu)
+with stubbed(_STUBS):
+    spec.loader.exec_module(memu)
 
 # rebuild pydantic models
 from typing import Any, Dict, List, Optional
@@ -68,7 +68,8 @@ store = memu.store
 tg_spec = importlib.util.spec_from_file_location("toolgate_app", "tool-gate/app.py")
 tg = importlib.util.module_from_spec(tg_spec)
 sys.modules["toolgate_app"] = tg
-tg_spec.loader.exec_module(tg)
+with stubbed(_STUBS):
+    tg_spec.loader.exec_module(tg)
 
 # ---------------------------------------------------------------------------
 # import agentic system prompts (extract without loading full app)
@@ -76,15 +77,16 @@ tg_spec.loader.exec_module(tg)
 # we only need the prompt constants, so we parse them from source
 # ---------------------------------------------------------------------------
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
-for _stub in ["kai_config", "conviction", "router", "planner", "adversary",
-              "security_audit", "tree_search", "priority_queue", "model_selector"]:
-    if _stub not in sys.modules:
-        sys.modules[_stub] = MagicMock()
+_AGENTIC_LOCAL = absent_stubs((
+    "kai_config", "conviction", "router", "planner", "adversary",
+    "security_audit", "tree_search", "priority_queue", "model_selector",
+))
 
 lg_spec = importlib.util.spec_from_file_location("lg_app", "agentic/app.py")
 lg = importlib.util.module_from_spec(lg_spec)
 sys.modules["lg_app"] = lg
-lg_spec.loader.exec_module(lg)
+with stubbed({**_STUBS, **_AGENTIC_LOCAL}):
+    lg_spec.loader.exec_module(lg)
 
 
 def _clear_store():

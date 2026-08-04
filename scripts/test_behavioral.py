@@ -20,6 +20,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "agentic"))
 
+sys.path.insert(0, str(ROOT))
+
+from scripts.module_stubs import fake_redis, stubbed  # noqa: E402
+
 # ── Load conviction module ────────────────────────────────────────────
 _conv_spec = importlib.util.spec_from_file_location(
     "conviction", ROOT / "agentic" / "conviction.py"
@@ -45,13 +49,14 @@ sys.modules["adversary"] = _adv
 _adv_spec.loader.exec_module(_adv)
 
 # ── Load context budget from agentic/app.py ─────────────────────────
-sys.modules.setdefault("redis", types.SimpleNamespace())
 _app_spec = importlib.util.spec_from_file_location(
     "agentic_app", ROOT / "agentic" / "app.py"
 )
 _app = importlib.util.module_from_spec(_app_spec)
 sys.modules[_app_spec.name] = _app
-_app_spec.loader.exec_module(_app)
+# redis is optional; the stub lasts only as long as the import.
+with stubbed({} if "redis" in sys.modules else {"redis": fake_redis()}):
+    _app_spec.loader.exec_module(_app)
 
 
 class TestConvictionMeaningfulScoring(unittest.TestCase):

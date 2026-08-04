@@ -7,19 +7,27 @@ from unittest.mock import patch, MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from scripts.module_stubs import stubbed  # noqa: E402
+
 _SVC = Path(__file__).resolve().parents[1] / "perception" / "clipboard" / "app.py"
 
 
 def _load():
     spec = importlib.util.spec_from_file_location("clipboard_app", _SVC)
     mod = importlib.util.module_from_spec(spec)
-    # Stub common.runtime before import
+    # Stub common.runtime for the length of the import only. Leaving it
+    # installed edits the interpreter for every test collected after
+    # this one — see scripts/module_stubs.py.
     runtime_stub = MagicMock()
     runtime_stub.setup_json_logger.return_value = MagicMock()
     runtime_stub.ErrorBudget = MagicMock(return_value=MagicMock(record=MagicMock(), snapshot=MagicMock(return_value={})))
-    sys.modules.setdefault("common", MagicMock())
-    sys.modules["common.runtime"] = runtime_stub
-    spec.loader.exec_module(mod)
+    stubs = {"common.runtime": runtime_stub}
+    if "common" not in sys.modules:
+        stubs["common"] = MagicMock()
+    with stubbed(stubs):
+        spec.loader.exec_module(mod)
     return mod
 
 

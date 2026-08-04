@@ -14,6 +14,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from scripts.module_stubs import absent_stubs  # noqa: E402
+
 # ── Bootstrap: stub heavy deps not present in offline CI ─────────────
 _STUB_MODULES = [
     "sentence_transformers",
@@ -33,9 +37,12 @@ _STUB_MODULES = [
     "priority_queue",
     "model_selector",
 ]
-for _mod in _STUB_MODULES:
-    if _mod not in sys.modules:
-        sys.modules[_mod] = MagicMock()
+# DECLARED SESSION-LONG. Scoping these to the import alone was tried
+# and measured: 3 failures became 56, because agentic/app.py reaches
+# into these modules while the tests run, not only while it imports.
+# Registered in scripts/security/check_test_isolation.py so it is
+# reported on every run instead of being an invisible exception.
+sys.modules.update(absent_stubs(_STUB_MODULES))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)

@@ -18,13 +18,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "agentic"))
-sys.modules.setdefault("redis", types.SimpleNamespace())
 
+sys.path.insert(0, str(ROOT))
+
+from scripts.module_stubs import fake_redis, stubbed  # noqa: E402
 spec = importlib.util.spec_from_file_location("agentic_app", ROOT / "agentic" / "app.py")
 assert spec and spec.loader
 mod = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = mod
-spec.loader.exec_module(mod)
+# redis is optional; the stub lasts only as long as the import.
+with stubbed({} if "redis" in sys.modules else {"redis": fake_redis()}):
+    spec.loader.exec_module(mod)
 
 
 class TestEstimateTokens(unittest.TestCase):

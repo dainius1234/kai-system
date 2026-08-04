@@ -21,6 +21,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "agentic"))
+
+from scripts.module_stubs import stubbed  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -33,9 +38,12 @@ def _stub_module(name: str, **attrs) -> types.ModuleType:
     return mod
 
 
-def _load_agentic():
-    """Load agentic/app.py with all heavy dependencies stubbed."""
-    stubs = {
+def _agentic_stubs() -> dict:
+    # fastapi, pydantic and httpx are NOT stubbed. They are installed,
+    # and the two-attribute fakes that used to stand in for them were
+    # both the cause of 34 errors in this file and, once leaked, the
+    # cause of 223 more across the rest of the run.
+    return {
         "router": _stub_module(
             "router",
             RouteDecision=MagicMock(route="GENERAL_CHAT", confidence=0.5, bypass_llm=False, matched_keywords=[], reason=""),
@@ -74,14 +82,29 @@ def _load_agentic():
         "global_workspace": _stub_module("global_workspace", get_global_workspace=MagicMock(return_value=MagicMock()), WorkspaceBid=MagicMock()),
         "moral_core": _stub_module("moral_core", get_ohana_core=MagicMock(return_value=MagicMock())),
         "cortex": _stub_module("cortex", get_cortex=MagicMock(return_value=MagicMock())),
-        "fastapi": _stub_module("fastapi", FastAPI=MagicMock(return_value=MagicMock(middleware=MagicMock(return_value=lambda f: f), get=MagicMock(return_value=lambda f: f), post=MagicMock(return_value=lambda f: f))), HTTPException=Exception, Request=MagicMock()),
-        "fastapi.responses": _stub_module("fastapi.responses", StreamingResponse=MagicMock()),
-        "pydantic": _stub_module("pydantic", BaseModel=object),
-        "httpx": _stub_module("httpx", AsyncClient=MagicMock(), HTTPError=Exception),
     }
-    for name, mod in stubs.items():
-        sys.modules[name] = mod
 
+
+# agentic/app.py reaches into these modules while the tests run, not only
+# while it imports, so the stubs must outlive the import. They must not
+# outlive the *file*: the previous version installed them permanently
+# from setup_method, once per test, and among them were `fastapi`,
+# `pydantic` and `httpx` as bare ModuleType objects carrying two
+# attributes each. Every suite collected after this one then failed with
+# "cannot import name 'Depends' from 'fastapi' (unknown location)" — a
+# real, installed library, replaced for the rest of the session.
+#
+# A module-scoped autouse fixture is the correct scope: pytest sets it up
+# before any test in this file and tears it down after the last one, so
+# `sys.modules` is exactly as it was for whatever runs next.
+@pytest.fixture(scope="module", autouse=True)
+def _isolated_stubs():
+    with stubbed(_agentic_stubs()):
+        yield
+
+
+def _load_agentic():
+    """Load agentic/app.py. Stubs are installed by `_isolated_stubs`."""
     spec = importlib.util.spec_from_file_location("agentic_app", ROOT / "agentic" / "app.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
@@ -300,13 +323,7 @@ class TestSkillHunterService:
         for mod_name in list(sys.modules.keys()):
             if "skill_hunter" in mod_name:
                 del sys.modules[mod_name]
-        stubs = {
-            "fastapi": _stub_module("fastapi", FastAPI=MagicMock(return_value=MagicMock(get=MagicMock(return_value=lambda f: f), post=MagicMock(return_value=lambda f: f))), HTTPException=Exception),
-            "pydantic": _stub_module("pydantic", BaseModel=object),
-            "httpx": _stub_module("httpx", AsyncClient=MagicMock()),
-        }
-        for name, mod in stubs.items():
-            sys.modules.setdefault(name, mod)
+        # fastapi/pydantic/httpx are already stubbed by _isolated_stubs.
         spec = importlib.util.spec_from_file_location("skill_hunter", ROOT / "skill-hunter" / "app.py")
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)

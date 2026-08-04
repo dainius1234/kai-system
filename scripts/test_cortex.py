@@ -20,13 +20,14 @@ import time
 # Allow direct run from repo root
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "common"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+from scripts.module_stubs import stubbed  # noqa: E402
 
 # Stub feature flags for the test environment
 import types
 _ff_stub = types.ModuleType("common.feature_flags")
 _ff_stub.is_enabled = lambda flag: False
-sys.modules["common.feature_flags"] = _ff_stub
-sys.modules["common"] = types.ModuleType("common")
 
 # Stub global_workspace so WorkspaceBid import works
 import dataclasses
@@ -45,10 +46,23 @@ class _WorkspaceBid:
 _gw_stub = types.ModuleType("global_workspace")
 _gw_stub.WorkspaceBid = _WorkspaceBid
 _gw_stub.get_global_workspace = lambda: None
-sys.modules["global_workspace"] = _gw_stub
 
-import cortex as cortex_mod
-from cortex import get_cortex, Cortex, SituationModel
+# Every stub above is installed for the length of the `cortex` import and
+# no longer. The previous version replaced `sys.modules["common"]` with
+# an empty module permanently; because this file sorts before
+# test_erasure, test_error_codes, test_feature_flags, test_flags_enabled
+# and test_migration, all five failed to import `common.<anything>` and
+# the repo-wide pytest aborted at collection — so none of its 4,187 tests
+# ran, on any run, for at least a week. See scripts/module_stubs.py.
+_STUBS = {
+    "common": types.ModuleType("common"),
+    "common.feature_flags": _ff_stub,
+    "global_workspace": _gw_stub,
+}
+
+with stubbed(_STUBS):
+    import cortex as cortex_mod
+    from cortex import get_cortex, Cortex, SituationModel
 
 
 def _reset_singleton() -> None:

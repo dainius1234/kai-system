@@ -15,27 +15,19 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "agentic"))
 sys.path.insert(0, str(ROOT / "common"))
 
-# Stub redis for kai_config import
-if "redis" not in sys.modules:
-    from types import ModuleType
-    _r = ModuleType("redis")
+sys.path.insert(0, str(ROOT))
 
-    class _FakeRedis:
-        @classmethod
-        def from_url(cls, *a, **kw):
-            return cls()
+from scripts.module_stubs import fake_redis, stubbed  # noqa: E402
 
-        def ping(self):
-            return True
-    _r.Redis = _FakeRedis
-    sys.modules["redis"] = _r
-
-from planner import (
-    PlanContext,
-    build_enriched_plan,
-    gather_context,
-    _fetch_preferences,
-)
+# redis is pulled in by the kai_config import chain; the stub lasts
+# only as long as that import.
+with stubbed({} if "redis" in sys.modules else {"redis": fake_redis()}):
+    from planner import (  # noqa: E402
+        PlanContext,
+        build_enriched_plan,
+        gather_context,
+        _fetch_preferences,
+    )
 
 
 class TestPlanContextPreferences(unittest.TestCase):

@@ -11,6 +11,10 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from scripts.module_stubs import stubbed  # noqa: E402
+
 _SVC = Path(__file__).resolve().parents[1] / "document-parser" / "app.py"
 
 
@@ -20,33 +24,30 @@ def _load():
     common_stub.ErrorBudget = MagicMock(
         return_value=MagicMock(snapshot=MagicMock(return_value={}))
     )
-    sys.modules.setdefault("common", MagicMock())
-    sys.modules["common.runtime"] = common_stub
 
-    # Stub all heavy optional deps so _*_OK flags are True and we can control calls
-    fitz_stub = MagicMock()
-    docx_stub = MagicMock()
-    openpyxl_stub = MagicMock()
-    xlrd_stub = MagicMock()
-    pptx_stub = MagicMock()
-    pptx_util_stub = MagicMock()
-    ezdxf_stub = MagicMock()
-    ezdxf_recover_stub = MagicMock()
-    bs4_stub = MagicMock()
-
-    sys.modules["fitz"] = fitz_stub
-    sys.modules["docx"] = docx_stub
-    sys.modules["openpyxl"] = openpyxl_stub
-    sys.modules["xlrd"] = xlrd_stub
-    sys.modules["pptx"] = pptx_stub
-    sys.modules["pptx.util"] = pptx_util_stub
-    sys.modules["ezdxf"] = ezdxf_stub
-    sys.modules["ezdxf.recover"] = ezdxf_recover_stub
-    sys.modules["bs4"] = bs4_stub
+    # Stub all heavy optional deps so _*_OK flags are True and we can
+    # control calls. Every one is scoped to the import: a stub left in
+    # `sys.modules` is not a stub, it is an edit to the interpreter for
+    # every test collected after this file. See scripts/module_stubs.py.
+    stubs = {
+        "common.runtime": common_stub,
+        "fitz": MagicMock(),
+        "docx": MagicMock(),
+        "openpyxl": MagicMock(),
+        "xlrd": MagicMock(),
+        "pptx": MagicMock(),
+        "pptx.util": MagicMock(),
+        "ezdxf": MagicMock(),
+        "ezdxf.recover": MagicMock(),
+        "bs4": MagicMock(),
+    }
+    if "common" not in sys.modules:
+        stubs["common"] = MagicMock()
 
     spec = importlib.util.spec_from_file_location("doc_parser_app", _SVC)
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    with stubbed(stubs):
+        spec.loader.exec_module(mod)
     return mod
 
 

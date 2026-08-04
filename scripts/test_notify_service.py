@@ -7,6 +7,10 @@ from unittest.mock import patch, MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from scripts.module_stubs import stubbed  # noqa: E402
+
 _SVC = Path(__file__).resolve().parents[1] / "output" / "notify" / "app.py"
 
 
@@ -16,15 +20,20 @@ def _load():
     runtime_stub = MagicMock()
     runtime_stub.setup_json_logger.return_value = MagicMock()
     runtime_stub.ErrorBudget = MagicMock(return_value=MagicMock(record=MagicMock(), snapshot=MagicMock(return_value={})))
-    sys.modules.setdefault("common", MagicMock())
-    # The service now imports common.service_auth; because `common` is
-    # stubbed above, the submodule must be stubbed too.  Auth itself is
-    # covered by scripts/test_service_auth.py.
+    # The service imports common.service_auth; auth itself is covered by
+    # scripts/test_service_auth.py. Scoped to the import — a stub left in
+    # `sys.modules` edits the interpreter for every later test. See
+    # scripts/module_stubs.py.
     _auth_stub = MagicMock()
     _auth_stub.require_service_auth = lambda operation: (lambda: None)
-    sys.modules["common.service_auth"] = _auth_stub
-    sys.modules["common.runtime"] = runtime_stub
-    spec.loader.exec_module(mod)
+    stubs = {
+        "common.service_auth": _auth_stub,
+        "common.runtime": runtime_stub,
+    }
+    if "common" not in sys.modules:
+        stubs["common"] = MagicMock()
+    with stubbed(stubs):
+        spec.loader.exec_module(mod)
     return mod
 
 

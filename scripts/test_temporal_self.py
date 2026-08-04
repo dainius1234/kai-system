@@ -20,30 +20,45 @@ os.environ.setdefault("MEMU_URL", "http://localhost:8002")
 _tmp = tempfile.mkdtemp()
 os.environ["ASSESSMENT_FILE"] = os.path.join(_tmp, "test_assess.json")
 
-# Stub heavy modules
-for mod_name in ("redis", "httpx"):
-    if mod_name not in sys.modules:
-        from types import ModuleType
-        _stub = ModuleType(mod_name)
-        if mod_name == "httpx":
-            class _AsyncClient:
-                def __init__(self, **kw): pass
-                async def __aenter__(self): return self
-                async def __aexit__(self, *a): pass
+sys.path.insert(0, str(ROOT))
 
-                async def get(self, *a, **kw):
-                    class _Resp:
-                        status_code = 200
-                        def json(self): return {}
-                    return _Resp()
-            _stub.AsyncClient = _AsyncClient
-        elif mod_name == "redis":
-            class _FakeRedis:
-                @classmethod
-                def from_url(cls, *a, **kw): return cls()
-                def ping(self): return True
-            _stub.Redis = _FakeRedis
-        sys.modules[mod_name] = _stub
+from scripts.module_stubs import stubbed  # noqa: E402
+from types import ModuleType  # noqa: E402
+
+# Stub heavy modules — for the length of the heartbeat import only. The
+# `httpx` stub in particular used to stay installed for the whole
+# session: every FastAPI TestClient in every suite collected after this
+# one was then talking to a two-method fake. See scripts/module_stubs.py.
+_httpx = ModuleType("httpx")
+
+
+class _AsyncClient:
+    def __init__(self, **kw): pass
+    async def __aenter__(self): return self
+    async def __aexit__(self, *a): pass
+
+    async def get(self, *a, **kw):
+        class _Resp:
+            status_code = 200
+            def json(self): return {}
+        return _Resp()
+
+
+_httpx.AsyncClient = _AsyncClient
+
+_redis = ModuleType("redis")
+
+
+class _FakeRedis:
+    @classmethod
+    def from_url(cls, *a, **kw): return cls()
+    def ping(self): return True
+
+
+_redis.Redis = _FakeRedis
+
+_STUBS = {name: stub for name, stub in (("redis", _redis), ("httpx", _httpx))
+          if name not in sys.modules}
 
 # Now import the heartbeat module
 import importlib.util
@@ -51,7 +66,8 @@ _spec = importlib.util.spec_from_file_location("heartbeat_app", ROOT / "heartbea
 _mod = importlib.util.module_from_spec(_spec)
 sys.modules["heartbeat_app"] = _mod
 try:
-    _spec.loader.exec_module(_mod)
+    with stubbed(_STUBS):
+        _spec.loader.exec_module(_mod)
 except Exception:
     pass  # app startup may fail in test env; we only need pure functions
 

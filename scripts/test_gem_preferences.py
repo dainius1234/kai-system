@@ -12,22 +12,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "agentic"))
 
-# Redis is optional — stub if not available
-if "redis" not in sys.modules:
-    from types import ModuleType
-    _r = ModuleType("redis")
+sys.path.insert(0, str(ROOT))
 
-    class _FakeRedis:
-        @classmethod
-        def from_url(cls, *a, **kw):
-            return cls()
+from scripts.module_stubs import fake_redis, stubbed  # noqa: E402
 
-        def ping(self):
-            return True
-    _r.Redis = _FakeRedis
-    sys.modules["redis"] = _r
-
-from kai_config import extract_preference, TopicBoundary, build_knowledge_boundary
+# Redis is optional; the stub lasts only as long as the import.
+with stubbed({} if "redis" in sys.modules else {"redis": fake_redis()}):
+    from kai_config import (  # noqa: E402
+        extract_preference, TopicBoundary, build_knowledge_boundary,
+    )
 
 
 class TestPreferenceExtraction(unittest.TestCase):

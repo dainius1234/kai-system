@@ -28,7 +28,7 @@ _policy.verifier_thresholds = lambda: {
     "min_strong_chunks": 2,
     "strong_chunk_threshold": 0.60,
 }
-sys.modules.setdefault("common.policy", _policy)
+from scripts.module_stubs import stubbed  # noqa: E402
 
 _runtime = ModuleType("common.runtime")
 
@@ -49,7 +49,11 @@ class _FakeBudget:
 _runtime.setup_json_logger = lambda *a, **kw: _FakeLogger()
 _runtime.detect_device = lambda: "cpu"
 _runtime.ErrorBudget = _FakeBudget
-sys.modules.setdefault("common.runtime", _runtime)
+
+# `setdefault` was not enough: when this file ran first, the fakes stayed
+# in `sys.modules` for every test collected after it. Scoped to the
+# import — see scripts/module_stubs.py.
+_STUBS = {"common.policy": _policy, "common.runtime": _runtime}
 
 # Import verifier code explicitly from its directory
 import importlib.util
@@ -59,7 +63,8 @@ _verifier_spec = importlib.util.spec_from_file_location(
 )
 _verifier_app = importlib.util.module_from_spec(_verifier_spec)
 sys.modules["verifier_app"] = _verifier_app
-_verifier_spec.loader.exec_module(_verifier_app)
+with stubbed(_STUBS):
+    _verifier_spec.loader.exec_module(_verifier_app)
 
 Signal = _verifier_app.Signal
 MaterialClaim = _verifier_app.MaterialClaim

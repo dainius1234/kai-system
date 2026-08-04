@@ -9,6 +9,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from scripts.module_stubs import stubbed  # noqa: E402
+
 _SVC = Path(__file__).resolve().parents[1] / "monitor-service" / "app.py"
 
 
@@ -18,24 +22,27 @@ def _load():
     common_stub.ErrorBudget = MagicMock(
         return_value=MagicMock(snapshot=MagicMock(return_value={}))
     )
-    # Keep `common` a real package: a MagicMock has no `__path__`, so no
-    # `common.X` submodule can resolve, and every service that adopts a
-    # new shared module fails to import under this test. Only what is
-    # explicitly replaced below is stubbed.
-    _common = sys.modules.setdefault("common", types.ModuleType("common"))
-    if not hasattr(_common, "__path__"):
-        _common.__path__ = [str(Path(__file__).resolve().parents[1] / "common")]
-    # The service now imports common.service_auth; because `common` is
-    # stubbed above, the submodule must be stubbed too.  Auth itself is
-    # covered by scripts/test_service_auth.py.
+    # The service imports common.service_auth; auth itself is covered by
+    # scripts/test_service_auth.py. Every stub is scoped to the import —
+    # see scripts/module_stubs.py.
     _auth_stub = MagicMock()
     _auth_stub.require_service_auth = lambda operation: (lambda: None)
-    sys.modules["common.service_auth"] = _auth_stub
-    sys.modules["common.runtime"] = common_stub
+    stubs = {
+        "common.service_auth": _auth_stub,
+        "common.runtime": common_stub,
+    }
+    if "common" not in sys.modules:
+        # Keep `common` a real package: a MagicMock has no `__path__`, so
+        # no `common.X` submodule can resolve, and every service that
+        # adopts a new shared module fails to import under this test.
+        _common = types.ModuleType("common")
+        _common.__path__ = [str(Path(__file__).resolve().parents[1] / "common")]
+        stubs["common"] = _common
 
     spec = importlib.util.spec_from_file_location("monitor_app", _SVC)
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    with stubbed(stubs):
+        spec.loader.exec_module(mod)
     return mod
 
 
