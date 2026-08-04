@@ -37,12 +37,36 @@ _STUB_MODULES = [
     "priority_queue",
     "model_selector",
 ]
-# DECLARED SESSION-LONG. Scoping these to the import alone was tried
-# and measured: 3 failures became 56, because agentic/app.py reaches
-# into these modules while the tests run, not only while it imports.
-# Registered in scripts/security/check_test_isolation.py so it is
-# reported on every run instead of being an invisible exception.
-sys.modules.update(absent_stubs(_STUB_MODULES))
+# These must be installed at *import*, because `ag = _load_agentic()`
+# below runs at module scope, and they must stay installed while the
+# tests run, because agentic/app.py reaches into them at request time —
+# scoping them to the import alone was tried and measured: 3 failures
+# became 56.
+#
+# What they must not do is outlive this file, and for one commit they
+# did, declared as an exception in the isolation baseline. A bisect over
+# the collection order then named this file as the single culprit behind
+# `test_d95_d100_foundations`, and it was not alone. The exception was
+# doing real damage while looking like a decision.
+#
+# `absent_stubs` returns only names that were *absent*, so popping
+# exactly those at module teardown is an exact restore.
+_STUBS = absent_stubs(_STUB_MODULES)
+sys.modules.update(_STUBS)
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _stubs_do_not_outlive_this_file():
+    """Remove the bootstrap stubs after this file's last test.
+
+    Module scope, not function scope: the stubs have to survive between
+    tests in this file, and pytest tears a module-scoped fixture down
+    once the file is finished — which is exactly the boundary that
+    matters. See scripts/module_stubs.py.
+    """
+    yield
+    for name in _STUBS:
+        sys.modules.pop(name, None)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
