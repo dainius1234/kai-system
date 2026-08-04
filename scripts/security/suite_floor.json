@@ -2,7 +2,7 @@
   "note": "The repo-wide pytest result. Failures and errors may fall, never rise. See scripts/security/check_suite_floor.py.",
   "max_failed": 0,
   "max_errors": 0,
-  "min_passed": 4220,
+  "min_passed": 4228,
   "recorded": "2026-08-04",
   "history": [
     {
@@ -60,6 +60,13 @@
       "failed": 0,
       "errors": 0,
       "note": "vision-service degrades on a partial OpenCV; +1 is its restored test"
+    },
+    {
+      "date": "2026-08-04",
+      "passed": 4228,
+      "failed": 0,
+      "errors": 0,
+      "note": "ML stack blocked in conftest (CI segfaulted importing it); +8 is test_conftest_guards"
     }
   ]
 }

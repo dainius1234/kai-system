@@ -1,7 +1,61 @@
 """Global test configuration — runs before any test imports."""
 
 import os
+import sys
 
 # Allow dev HMAC secret in test environment to avoid RuntimeError
 # in common.auth._secret() when INTERSERVICE_HMAC_SECRET is not set.
 os.environ.setdefault("HMAC_ALLOW_DEV_SECRET", "true")
+
+
+# ── The ML stack is blocked during tests ─────────────────────────────
+# `memu-core/app.py` loads an embedding model at *module* scope:
+#
+#     from sentence_transformers import SentenceTransformer as _ST
+#     _st_model = _ST(EMBEDDING_MODEL_NAME)
+#
+# On a machine without sentence-transformers that raises ImportError and
+# the fallback runs — which is what MEMU_ALLOW_FAKE_EMBEDDINGS exists for.
+# On a machine *with* it, GitHub's runner, the import succeeds and drags in
+# transformers, then torch, then the CUDA bindings, on a box with no GPU.
+# On 2026-08-04 that took pytest down with **SIGSEGV (exit 139)** during
+# collection: not a failed test, a dead process — so no summary line, no
+# isolation report, and nothing naming the file responsible.
+#
+# Blocking the import makes CI behave exactly as every developer machine
+# already does, which is the environment the suite is green in. That this
+# is safe is not an opinion: these packages are absent locally and 4,220
+# tests pass, so nothing in the suite can depend on them.
+#
+# A *test* decision, not a production one. That memu-core cannot be
+# imported without loading a model stays true and stays visible; it is
+# simply not something a unit test should pay for. Set
+# KAI_TESTS_USE_REAL_ML=true to lift the block.
+_BLOCKED = {"sentence_transformers", "transformers", "torch", "deepface"}
+
+
+class _BlockHeavyML:
+    """A meta-path finder that refuses the ML stack, as if uninstalled.
+
+    Raising ModuleNotFoundError rather than substituting a mock is
+    deliberate: every call site already has an `except ImportError`
+    fallback written for exactly this case and exercised constantly. A
+    mock would take a *different* branch — one no developer machine runs —
+    and two environments disagreeing is the whole problem here.
+    """
+
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split(".")[0] in _BLOCKED:
+            raise ModuleNotFoundError(
+                f"{fullname} is blocked during tests (conftest.py). "
+                "Set KAI_TESTS_USE_REAL_ML=true to allow it."
+            )
+        return None
+
+
+if os.getenv("KAI_TESTS_USE_REAL_ML", "false").lower() not in {"1", "true", "yes"}:
+    # Only block what has not already been imported: pretending otherwise
+    # would be a third behaviour rather than a second.
+    _BLOCKED -= {name for name in _BLOCKED if name in sys.modules}
+    if _BLOCKED:
+        sys.meta_path.insert(0, _BlockHeavyML())
