@@ -31,15 +31,42 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-BLOCKED = ("sentence_transformers", "transformers", "torch", "deepface")
+# Derived from conftest, never retyped. A second copy of this list is a
+# second definition, and the one that is not the source of truth drifts —
+# which is how fixture dicts in this repo twice went stale against a
+# structure that had grown (class D in TEST_WRITING_REVIEW.md).
+sys.path.insert(0, str(ROOT))
+import conftest  # noqa: E402
+
+BLOCKED = tuple(sorted(conftest._BLOCKED))
 
 
 @pytest.mark.parametrize("name", BLOCKED)
-def test_the_ml_stack_is_not_importable(name: str):
-    """Whether or not it is installed, a test may not import it."""
+def test_a_stubbed_dependency_is_not_importable(name: str):
+    """Whether or not it is installed, a test may not import it.
+
+    Every name here is stubbed somewhere in scripts/test_*.py and absent on
+    developer machines, so the suite has only ever run the stubbed branch.
+    Blocking it means CI runs that branch too, instead of silently taking
+    one nobody has tested.
+    """
     with pytest.raises(ModuleNotFoundError) as excinfo:
         importlib.import_module(name)
     assert "blocked during tests" in str(excinfo.value), str(excinfo.value)
+
+
+def test_the_block_covers_the_known_divergences():
+    """The two that actually bit, and the datastore clients."""
+    for name in ("cv2", "sentence_transformers", "torch", "psycopg2"):
+        assert name in conftest._BLOCKED, f"{name} must stay blocked"
+
+
+def test_locally_installed_packages_are_not_blocked():
+    """Blocking these would change the local answer, not fix a divergence."""
+    for name in ("psutil", "redis", "docx", "feedparser"):
+        assert name not in conftest._BLOCKED, (
+            f"{name} is installed on developer machines; the suite exercises "
+            f"it for real and blocking it would remove coverage")
 
 
 def test_the_block_names_its_escape_hatch():

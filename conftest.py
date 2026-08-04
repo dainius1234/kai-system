@@ -31,7 +31,33 @@ os.environ.setdefault("HMAC_ALLOW_DEV_SECRET", "true")
 # imported without loading a model stays true and stays visible; it is
 # simply not something a unit test should pay for. Set
 # KAI_TESTS_USE_REAL_ML=true to lift the block.
-_BLOCKED = {"sentence_transformers", "transformers", "torch", "deepface"}
+# The same argument extends past the ML stack. A dependency that the tests
+# *stub* and that no developer machine has is one where the suite has only
+# ever exercised the stubbed branch. If CI has it installed, CI silently
+# runs different code — which is how both the OpenCV crash and the segfault
+# happened, an hour apart, from opposite ends of the dependency list.
+#
+# So: everything below is stubbed somewhere in scripts/test_*.py AND absent
+# on developer machines. Blocking it cannot change the local result (it is
+# already unimportable here) and makes CI's result identical. Verified, not
+# assumed — the full suite is run with a landmine module for every name
+# here, each raising SystemExit if imported.
+#
+# `psutil`, `redis`, `docx` and `feedparser` are deliberately NOT here.
+# They are installed locally, so the suite genuinely exercises them, and
+# blocking them would change the answer rather than fix a divergence.
+_BLOCKED = {
+    # ML stack — memu-core loads a model at import; CI segfaulted on it.
+    "sentence_transformers", "transformers", "torch", "deepface",
+    # OpenCV — CI's build imports but has no CascadeClassifier.
+    "cv2",
+    # Datastores and clients the tests always fake.
+    "psycopg2", "lakefs_client", "aioredis",
+    # Service-specific optional dependencies.
+    "caldav", "icalendar", "docker", "watchdog", "letta", "yfinance",
+    # document-parser's optional format readers.
+    "fitz", "ezdxf", "xlrd", "pptx", "openpyxl", "bs4",
+}
 
 
 class _BlockHeavyML:
