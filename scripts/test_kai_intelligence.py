@@ -8,6 +8,13 @@ Verifies:
 """
 import importlib.util
 import sys
+from pathlib import Path as _Path
+
+# Derived from this file's location, never written out. Three test
+# files carried the literal path of one developer's machine, so they
+# raised FileNotFoundError on every other machine — 26 failures on
+# CI's first complete run, in files that pass here.
+_REPO = _Path(__file__).resolve().parents[1]
 from pathlib import Path
 import types
 import unittest
@@ -173,11 +180,11 @@ class TestSensoryURLConstants(unittest.TestCase):
         import importlib.util
         spec = importlib.util.spec_from_file_location(
             "agentic_const_check",
-            "/home/user/kai-system/agentic/app.py",
+            str(_REPO / "agentic" / "app.py"),
         )
         # We can't actually load the full module (too many deps),
         # so just grep the source file for the constants.
-        src = open("/home/user/kai-system/agentic/app.py").read()
+        src = open(str(_REPO / "agentic" / "app.py")).read()
         for name in [
             "WEATHER_URL", "AIRQUALITY_URL", "CALENDAR_URL",
             "DOCKER_WATCHER_URL", "EMAIL_READER_URL", "GIT_WATCHER_URL",
@@ -186,31 +193,31 @@ class TestSensoryURLConstants(unittest.TestCase):
             self.assertIn(name, src, f"Missing constant: {name}")
 
     def test_world_context_function_exists(self):
-        src = open("/home/user/kai-system/agentic/app.py").read()
+        src = open(str(_REPO / "agentic" / "app.py")).read()
         self.assertIn("async def _sense_world(", src)
 
     def test_proactive_observer_function_exists(self):
-        src = open("/home/user/kai-system/agentic/app.py").read()
+        src = open(str(_REPO / "agentic" / "app.py")).read()
         self.assertIn("async def _proactive_observer(", src)
 
     def test_skill_matching_in_chat(self):
-        src = open("/home/user/kai-system/agentic/app.py").read()
+        src = open(str(_REPO / "agentic" / "app.py")).read()
         self.assertIn("matched_skill = match_skill(", src)
 
     def test_world_context_in_gather(self):
-        src = open("/home/user/kai-system/agentic/app.py").read()
+        src = open(str(_REPO / "agentic" / "app.py")).read()
         self.assertIn("_sense_world()", src)
 
     def test_enrichment_gate_implemented(self):
-        src = open("/home/user/kai-system/agentic/app.py").read()
+        src = open(str(_REPO / "agentic" / "app.py")).read()
         self.assertIn('is_enabled("CONTEXT_ENRICHMENT")', src)
 
     def test_proactive_agent_gate_implemented(self):
-        src = open("/home/user/kai-system/agentic/app.py").read()
+        src = open(str(_REPO / "agentic" / "app.py")).read()
         self.assertIn('is_enabled("PROACTIVE_AGENT")', src)
 
     def test_startup_launches_proactive_observer(self):
-        src = open("/home/user/kai-system/agentic/app.py").read()
+        src = open(str(_REPO / "agentic" / "app.py")).read()
         # The startup event must call create_task(_proactive_observer())
         self.assertIn("create_task(_proactive_observer())", src)
         # And the startup event handler must exist
@@ -221,7 +228,7 @@ class TestDecisionLogEntry(unittest.TestCase):
     """D87 must be present in DECISIONS.md."""
 
     def test_d87_entry_exists(self):
-        text = open("/home/user/kai-system/kai-pm/DECISIONS.md").read()
+        text = open(str(_REPO / "kai-pm" / "DECISIONS.md")).read()
         self.assertIn("D87", text)
         self.assertIn("Cognitive Architecture", text)
         self.assertIn("World Context Injection", text)

@@ -50,8 +50,17 @@ def test_a_stubbed_dependency_is_not_importable(name: str):
     Blocking it means CI runs that branch too, instead of silently taking
     one nobody has tested.
     """
+    # Ask the finder, not `import_module`. An earlier suite that left a
+    # stub in sys.modules — test_broker_bridge_yfinance does exactly that,
+    # and it is declared in the isolation baseline — short-circuits the
+    # import before any finder is consulted, so this asserted "DID NOT
+    # RAISE" about a block that was working perfectly. Order-dependence in
+    # the test written to prove determinism.
+    finder = next((f for f in sys.meta_path
+                   if type(f).__name__ == "_BlockHeavyML"), None)
+    assert finder is not None, "the block is not installed"
     with pytest.raises(ModuleNotFoundError) as excinfo:
-        importlib.import_module(name)
+        finder.find_spec(name)
     assert "blocked during tests" in str(excinfo.value), str(excinfo.value)
 
 
@@ -71,15 +80,19 @@ def test_locally_installed_packages_are_not_blocked():
 
 def test_the_block_names_its_escape_hatch():
     """A refusal that does not say how to proceed is a dead end."""
+    finder = next(f for f in sys.meta_path
+                  if type(f).__name__ == "_BlockHeavyML")
     with pytest.raises(ModuleNotFoundError) as excinfo:
-        importlib.import_module("torch")
+        finder.find_spec("torch")
     assert "KAI_TESTS_USE_REAL_ML" in str(excinfo.value)
 
 
 def test_a_submodule_is_blocked_too():
     """`import torch.nn` must not slip past a root-name check."""
+    finder = next(f for f in sys.meta_path
+                  if type(f).__name__ == "_BlockHeavyML")
     with pytest.raises(ModuleNotFoundError):
-        importlib.import_module("torch.nn")
+        finder.find_spec("torch.nn")
 
 
 def test_the_block_can_be_lifted():

@@ -8,6 +8,24 @@ import sys
 os.environ.setdefault("HMAC_ALLOW_DEV_SECRET", "true")
 
 
+# agentic/app.py writes the soul document to
+# `Path(os.getenv("SOUL_PATH", "/data/SOUL.md"))`, and falls back to the
+# *relative* `data/SOUL.md` — which, with pytest's cwd at the repo root, is
+# the repository's own copy. A test that exercises that endpoint therefore
+# rewrites a tracked file, and the tests that assert on its contents then
+# depend on whether they ran before or after it.
+#
+# Invisible here only because `git checkout -- data/` had become a reflex
+# between local runs. CI has no such reflex: on its first complete run
+# `test_j_series` failed on "Core Values" missing and `test_soul_identity`
+# on the file being under 100 bytes — both reading a document another test
+# had replaced.
+import tempfile as _tempfile
+
+_soul_home = _tempfile.mkdtemp(prefix="kai-soul-")
+os.environ.setdefault("SOUL_PATH", os.path.join(_soul_home, "SOUL.md"))
+
+
 # ── The ML stack is blocked during tests ─────────────────────────────
 # `memu-core/app.py` loads an embedding model at *module* scope:
 #

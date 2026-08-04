@@ -28,9 +28,9 @@
     },
     "scripts/test_soul_identity.py": {
       "env_set": 0,
-      "added": 6
+      "added": 13
     }
   },
   "total_env_set": 11,
-  "total_added": 13
+  "total_added": 20
 }

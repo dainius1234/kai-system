@@ -37,6 +37,20 @@ def _fresh_agentic_app(soul_text: str = "", agents_text: str = ""):
         "anthropic": MagicMock(),
         "openai": MagicMock(),
     }
+    # agentic/app.py also needs the heavy deps this repo always fakes.
+    # Without them the load failed, `except Exception: pass` swallowed the
+    # reason, and the caller got a half-built module — so the tests below
+    # asserted `False` with nothing to say why. They passed only because an
+    # earlier file in a full run had already loaded the app; alone, they
+    # failed. Declared once in scripts/module_stubs.py.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    # agentic/ too: app.py imports its neighbours (system_fsm, teammates,
+    # ...) by bare name. Without this the load stopped at the first one,
+    # which is what the swallowed exception was hiding.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'agentic'))
+    from scripts.module_stubs import AGENTIC_HEAVY_DEPS, absent_stubs
+    stubs = {**absent_stubs(AGENTIC_HEAVY_DEPS), **stubs}
+
     for name, stub in stubs.items():
         sys.modules.setdefault(name, stub)
 
@@ -47,8 +61,13 @@ def _fresh_agentic_app(soul_text: str = "", agents_text: str = ""):
     module = importlib.util.module_from_spec(spec)
     try:
         spec.loader.exec_module(module)
-    except Exception:
-        pass  # partial-load is fine; we only test specific functions
+    except Exception as exc:
+        # Recorded, not discarded. A partial load is tolerable — these tests
+        # only need specific functions — but a test that then fails should
+        # be able to say the module never finished importing, instead of
+        # reporting `assert False` about an attribute that was never
+        # going to exist.
+        module._load_error = exc
     return module
 
 
@@ -62,13 +81,17 @@ class TestSoulLoad:
         with patch.dict("os.environ", {"SOUL_PATH": str(soul_file)}):
             mod = _fresh_agentic_app()
             # _soul_text should be populated on module load
-            assert hasattr(mod, "_soul_text")
+            assert hasattr(mod, "_soul_text"), (
+                f"agentic/app.py did not finish loading: "
+                f"{getattr(mod, '_load_error', 'no error recorded')}")
 
     def test_load_soul_returns_empty_when_missing(self, tmp_path):
         missing = tmp_path / "no_such_file.md"
         with patch.dict("os.environ", {"SOUL_PATH": str(missing)}):
             mod = _fresh_agentic_app()
-            assert hasattr(mod, "_soul_text")
+            assert hasattr(mod, "_soul_text"), (
+                f"agentic/app.py did not finish loading: "
+                f"{getattr(mod, '_load_error', 'no error recorded')}")
 
     def test_soul_path_env_respected(self, tmp_path):
         soul_file = tmp_path / "mysoul.md"

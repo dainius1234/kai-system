@@ -283,10 +283,17 @@ class TestVaultSyncApp:
         return TestClient(app_mod.app)
 
     def test_health_returns_ok(self, tmp_path, monkeypatch):
-        monkeypatch.setenv("VAULT_PATH", str(tmp_path))
-        monkeypatch.setenv("FF_VAULT_SYNC", "true")
         from fastapi.testclient import TestClient
         import vault_sync_app as app_mod
+
+        # setattr, not setenv. vault-sync reads VAULT_PATH once at import
+        # into a module constant, so setting the variable afterwards changes
+        # nothing and the service kept using its default of "/vault". That
+        # is creatable by root — which is what this container runs as — and
+        # a PermissionError anywhere else, so three tests passed here and
+        # failed on CI. Every other test in this class already used setattr.
+        monkeypatch.setattr(app_mod, "VAULT_PATH", str(tmp_path))
+        monkeypatch.setattr(app_mod, "FF_VAULT_SYNC", True)
         with TestClient(app_mod.app) as c:
             r = c.get("/health")
             assert r.status_code == 200

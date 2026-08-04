@@ -1,6 +1,13 @@
 """Tests for git-watcher service."""
 import importlib.util
 import sys
+from pathlib import Path as _Path
+
+# Derived from this file's location, never written out. Three test
+# files carried the literal path of one developer's machine, so they
+# raised FileNotFoundError on every other machine — 26 failures on
+# CI's first complete run, in files that pass here.
+_REPO = _Path(__file__).resolve().parents[1]
 from pathlib import Path as _P
 sys.path.insert(0, str(_P(__file__).resolve().parents[1]))
 from scripts.module_stubs import stubbed  # noqa: E402
@@ -28,7 +35,7 @@ def _load_module():
 
     spec = importlib.util.spec_from_file_location(
         "git_watcher",
-        "/home/user/kai-system/git-watcher/app.py",
+        str(_REPO / "git-watcher" / "app.py"),
     )
     mod = importlib.util.module_from_spec(spec)
     with stubbed(_stubs):
@@ -217,7 +224,7 @@ class TestInspectRepo(unittest.TestCase):
 
     def test_valid_repo(self):
         inspect = self._get_inspect()
-        result = inspect("/home/user/kai-system")
+        result = inspect(str(_REPO))
         self.assertIsNone(result["error"], f"Unexpected error: {result['error']}")
         self.assertTrue(result["branch"], "branch should be non-empty")
         self.assertTrue(result["commit_hash"], "commit_hash should be non-empty")

@@ -2,6 +2,13 @@
 import importlib.util
 import os
 import sys
+from pathlib import Path as _Path
+
+# Derived from this file's location, never written out. Three test
+# files carried the literal path of one developer's machine, so they
+# raised FileNotFoundError on every other machine — 26 failures on
+# CI's first complete run, in files that pass here.
+_REPO = _Path(__file__).resolve().parents[1]
 from pathlib import Path as _P
 sys.path.insert(0, str(_P(__file__).resolve().parents[1]))
 from scripts.module_stubs import stubbed  # noqa: E402
@@ -48,7 +55,7 @@ def _load_module(configured=False):
 
     spec = importlib.util.spec_from_file_location(
         "calendar_service",
-        "/home/user/kai-system/calendar-service/app.py",
+        str(_REPO / "calendar-service" / "app.py"),
     )
     mod = importlib.util.module_from_spec(spec)
     with stubbed(_stubs):
