@@ -534,7 +534,7 @@ async def observe_turn(obs: TurnObservation) -> Dict[str, Any]:
     bridge_active, bridge_note = _detect_bridge(keywords)
     _topic_history.append(keywords)
 
-    global _state
+    # No `global` needed: _state is mutated, never rebound.
     _state.bridge_active = bridge_active
     _state.bridge_note = bridge_note
 

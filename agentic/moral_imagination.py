@@ -26,6 +26,10 @@ import logging
 import time
 from dataclasses import dataclass, asdict, field
 from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # annotation-only; the real import is inside
+    from cognitive_fsm import AgentHandoff  # the stage function
 
 logger = logging.getLogger("kai.moral_imagination")
 

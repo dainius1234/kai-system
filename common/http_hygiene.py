@@ -60,7 +60,14 @@ def __getattr__(name: str) -> Any:
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-__all__ = [
+# The first four resolve through the PEP 562 `__getattr__` above rather
+# than existing as module-level assignments, which is deliberate: the
+# limits live in one place and are read on first access. flake8 cannot
+# see that and reports F822 "undefined name in __all__" for each — the
+# one place in this file where the checker is wrong and the code is
+# right. Suppressed narrowly, with the reason, rather than by widening
+# the lint's ignore list.
+__all__ = [  # noqa: F822 — resolved lazily by __getattr__ (PEP 562)
     "MAX_PAYLOAD_BYTES", "MAX_PAYLOAD_DEPTH", "MAX_PAYLOAD_KEYS",
     "MAX_STRING_LENGTH", "MAX_UPLOAD_BYTES", "bounded_json",
     "bounded_upload", "bounded_response", "pooled_client", "shutdown_pool",

@@ -12,6 +12,10 @@ import hashlib
 import json
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # annotation-only, avoids a circular import
+    from .assessment import AssessorRegistry
 
 from common.contracts.base import (
     APPROVAL_MATRIX,
