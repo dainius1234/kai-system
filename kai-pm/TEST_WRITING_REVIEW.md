@@ -96,6 +96,41 @@ called in a self-run suite. It immediately found **7 more in
 `test_dashboard_findings.py` — 16 assertions running nowhere, all
 passing**, so nothing ever drew attention to them.
 
+### A′ — The proxy was the *right kind* of thing, at the wrong *time* — added 2026-08-04
+
+The first detector for cross-file leakage imported each test file in a
+subprocess and asked what it left behind in `sys.modules`. That is not
+class A: it reads the real mechanism, not a proxy for it. It still gave
+a wrong answer, because it read the mechanism **at the wrong moment**.
+
+`test_cognitive_mechanisms.py` replaces `fastapi` — an installed,
+working library — with a two-attribute stub, from `setup_method`, once
+per test. At *import* it leaves nothing behind. The probe reported it
+clean. It was the single worst offender in the repository, responsible
+for 223 errors in other files.
+
+**The rule: when the question is "what does this do when it runs", the
+detector has to watch it run.** `isolation_plugin.py` hooks
+`pytest_runtest_protocol` and diffs global state across file boundaries
+in the real session.
+
+**Enforced:** `check_test_isolation.py`, in `python-app.yml`, calibrated
+against a synthetic leaky/clean pair before being pointed at the repo.
+
+Two things this cost, worth recording because both were avoidable:
+
+- The leaks were **chained**. Fixing the first file that replaced
+  `common.runtime` made a second one appear — until then it had been
+  replacing something already replaced. Six iterations to reach zero. A
+  single measurement would have said "one offender" and been wrong every
+  time. *Re-measure after every fix; a detector's first number is a
+  lower bound when the defects mask each other.*
+- I broke two suites by scoping stubs that genuinely needed to outlive
+  the import (`test_agentic_routes`: 3 failures became 56). Both were
+  caught because I baselined each file **before** changing it. That
+  habit is the only reason the numbers in the commit message can be
+  trusted, and it is cheap: `git stash`, run, `git stash pop`.
+
 ### F — Ordinary coding errors *(9, 10, 15)*
 
 Wrong arity, bad parsing, guessed symbols. Not a pattern; just wrong.

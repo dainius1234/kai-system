@@ -3,9 +3,11 @@
 
 name: Python application
 
+# `main` only was how a week of red went unseen: the branch the work
+# happens on could not observe the one job that runs the test suite.
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "claude/**" ]
   pull_request:
     branches: [ "main" ]
 
@@ -50,8 +52,10 @@ jobs:
     - name: Test with pytest (with coverage gate)
       env:
         MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
+        KAI_ISOLATION_REPORT: .isolation-report.json
       run: |
         PYTHONPATH=. pytest \
+          -p scripts.security.isolation_plugin \
           --ignore=_archive --ignore=.venv \
           --ignore=scripts/test_dashboard.py \
           --ignore=scripts/test_dashboard_ui.py \
@@ -59,6 +63,15 @@ jobs:
           --cov-report=term-missing \
           --cov-fail-under=60 \
           -q
+    # A-05. Reads the report the run above produced rather than running
+    # the suite twice. `if: always()` because a red suite is exactly when
+    # a cross-file leak is most likely to be the reason.
+    - name: Cross-file test isolation (A-05)
+      if: always()
+      run: |
+        python3 scripts/security/check_test_isolation.py \
+          --from-report .isolation-report.json
+
     - name: Test dashboard (needs CWD=dashboard/)
       run: |
         cd dashboard && PYTHONPATH=.. pytest ../scripts/test_dashboard.py ../scripts/test_dashboard_ui.py -q

@@ -1,0 +1,16 @@
+{
+  "note": "Declared cross-file leakage. `replaced` must stay empty — see scripts/security/check_test_isolation.py. The rest is a ratchet: it may fall, never rise.",
+  "replaced_allowed": 0,
+  "leaky_files": {
+    "scripts/agentic_integration_test.py": {"env_set": 1, "added": 0},
+    "scripts/test_ab_log.py": {"env_set": 2, "added": 0},
+    "scripts/test_broker_bridge_yfinance.py": {"env_set": 3, "added": 1},
+    "scripts/test_hse_rams.py": {"env_set": 0, "added": 1},
+    "scripts/test_j_series.py": {"env_set": 2, "added": 4},
+    "scripts/test_prod_hardening.py": {"env_set": 3, "added": 1},
+    "scripts/test_soul_identity.py": {"env_set": 0, "added": 6},
+    "scripts/test_trust_promotion.py": {"env_set": 4, "added": 0}
+  },
+  "total_env_set": 15,
+  "total_added": 13
+}

@@ -90,11 +90,19 @@ def _load_registry():
 # ── Source 1: the filesystem ─────────────────────────────────────────
 
 def discover_modules() -> List[str]:
-    """Every check script that exists, whatever anyone declared."""
+    """Every check script that exists, whatever anyone declared.
+
+    A check is a module with a `main()`; a support module is one without.
+    That was a hand-maintained list of four names until `isolation_plugin`
+    became the fifth and I-4 fired on it — correctly, since a name-based
+    exclusion is a second declaration of the same fact and drifts from the
+    first. The rule reads the property that actually distinguishes them,
+    so a new helper needs no edit here and a new *check* cannot hide as
+    one.
+    """
     return sorted(
         p.stem for p in SECURITY.glob("*.py")
-        if p.stem not in {"__init__", "gate_registry", "gate_inputs",
-                          "closure_register"}
+        if re.search(r"^def main\(", p.read_text(encoding="utf-8"), re.M)
     )
 
 

@@ -222,6 +222,27 @@ REGISTRY: Tuple[Gate, ...] = (
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-018",)),
 
+    # A-05: no test file may change the interpreter for the files after
+    # it. Found because the repo-wide pytest had been executing zero
+    # tests for a week: it aborted at collection, and the six errors all
+    # named files that passed when run alone. `replaced` is at zero and
+    # enforced; `added`/`env_set` ratchet down from a declared baseline.
+    Gate(module="check_test_isolation",
+         kind=GATE,
+         summary="no test leaves a real module replaced for the next file",
+         inputs=("scripts/security/isolation_plugin.py",
+                 "scripts/security/test_isolation_baseline.json"),
+         denominator=r"inspected: \d+ test files that alter global state",
+         probe=False,
+         probe_skip_reason="runs the full pytest suite to observe the real "
+                           "session — minutes, not seconds; probed by "
+                           "scripts/test_test_isolation.py against synthetic "
+                           "reports instead",
+         proven_by="scripts/test_test_isolation.py",
+         in_policy_check=False,
+         in_workflows=("python-app.yml",),
+         findings=("KAI-GATE-019",)),
+
     # ── The meta-check, bound by the rules it enforces ───────────────
     # It appears in its own registry on purpose. The recursion is
     # depth-one and closed: it declares a denominator, fails closed on an

@@ -6,7 +6,7 @@ export MEMU_ALLOW_FAKE_EMBEDDINGS ?= true
 # Self-audit and feedback
 self-audit:
 	python3 scripts/self_audit.py
-.PHONY: test-d109-ohana-core test-d92-socratic test-d93-hypothesis test-d94-forecaster test-d95-d100-foundations test-d101-causal-world-model test-d102-global-workspace test-d89-cognitive-depth go_no_go hardening_smoke pypi-shadow-check test-letta test-financial test-agentic-service test-agentic-introspect build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-memu-routes test-agentic-routes test-context-enrichment-ab test-ab-log test-screen-capture test-shell-sandbox test-hse-rams test-agentic test-router test-planner test-adversary test-failure-taxonomy test-selaur test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-improvement-gate test-thinking-pathways test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-error-codes test-feature-flags dep-audit coverage coverage-floors test-restart-persistence test-upload-fuzz test-audio-transcribe test-browser-agent test-vision-service test-clipboard-service test-files-service test-notify-service test-document-parser test-monitor-service test-broker-bridge test-sysmetrics test-screen-watcher test-email-reader test-news-feed test-weather-service test-docker-watcher test-airquality test-calendar-service test-git-watcher test-kai-intelligence test-cognitive-mechanisms sync-docs check-docs auto-changelog auto-session-log test-focus-compress test-context-budget test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-behavioral test-docker-e2e test-chassis test-wake test-broker-bridge-yfinance test-perception-spine test-world-state test-proposal-workspace test-policy-bridge test-vertical-slice test-actuator-registry test-autonomy test-payload-bounds test-assessment test-invariant-guards test-concurrency-clock test-service-auth test-erasure test-legacy-bridge test-migration test-full-migration test-flags-enabled test-preflight test-architecture-rules test-dashboard-findings test-dashboard-auth test-dashboard-ui-auth test-degraded test-hygiene-gate test-assertion-floors test-gate-registry test-compose-drift test-secret-gates test-compose-gates test-ci-tolerations test-test-wiring dashboard-findings hygiene-survey hygiene-gate hygiene-baseline verify-live-endpoints verify-live-mutating setup-service-token preflight test-uh assertion-floors assertion-floors-update gate-registry gate-registry-gate
+.PHONY: test-d109-ohana-core test-d92-socratic test-d93-hypothesis test-d94-forecaster test-d95-d100-foundations test-d101-causal-world-model test-d102-global-workspace test-d89-cognitive-depth go_no_go hardening_smoke pypi-shadow-check test-letta test-financial test-agentic-service test-agentic-introspect build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-memu-routes test-agentic-routes test-context-enrichment-ab test-ab-log test-screen-capture test-shell-sandbox test-hse-rams test-agentic test-router test-planner test-adversary test-failure-taxonomy test-selaur test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-improvement-gate test-thinking-pathways test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-error-codes test-feature-flags dep-audit coverage coverage-floors test-restart-persistence test-upload-fuzz test-audio-transcribe test-browser-agent test-vision-service test-clipboard-service test-files-service test-notify-service test-document-parser test-monitor-service test-broker-bridge test-sysmetrics test-screen-watcher test-email-reader test-news-feed test-weather-service test-docker-watcher test-airquality test-calendar-service test-git-watcher test-kai-intelligence test-cognitive-mechanisms sync-docs check-docs auto-changelog auto-session-log test-focus-compress test-context-budget test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-behavioral test-docker-e2e test-chassis test-wake test-broker-bridge-yfinance test-perception-spine test-world-state test-proposal-workspace test-policy-bridge test-vertical-slice test-actuator-registry test-autonomy test-payload-bounds test-assessment test-invariant-guards test-concurrency-clock test-service-auth test-erasure test-legacy-bridge test-migration test-full-migration test-flags-enabled test-preflight test-architecture-rules test-dashboard-findings test-dashboard-auth test-dashboard-ui-auth test-degraded test-hygiene-gate test-assertion-floors test-gate-registry test-compose-drift test-secret-gates test-compose-gates test-ci-tolerations test-test-wiring test-test-isolation test-isolation test-isolation-report test-isolation-baseline test-trust-ladder test-market test-cognition test-j-features test-perception-misc test-hmac-advisor test-untargeted test-smoke-core test-graph-live dashboard-findings hygiene-survey hygiene-gate hygiene-baseline verify-live-endpoints verify-live-mutating setup-service-token preflight test-uh assertion-floors assertion-floors-update gate-registry gate-registry-gate
 
 policy-check:
 	python3 scripts/security/check_port_bindings.py
@@ -132,6 +132,75 @@ test-ci-tolerations:
 test-test-wiring:
 	PYTHONPATH=. python scripts/test_test_wiring.py
 
+# A-05: no test file may change the interpreter for the files after it.
+test-test-isolation:
+	PYTHONPATH=. python scripts/test_test_isolation.py
+
+# The gate itself. Runs the whole pytest suite with the isolation plugin
+# attached, because the question "does this file affect the next one?" is
+# only answerable in a real session. Minutes, not seconds.
+test-isolation:
+	python3 scripts/security/check_test_isolation.py
+
+# Consume a report the test run already produced, rather than running the
+# suite twice. This is what CI uses.
+test-isolation-report:
+	python3 scripts/security/check_test_isolation.py --from-report .isolation-report.json
+
+# Record current leakage. Refuses to record a replaced module.
+test-isolation-baseline:
+	python3 scripts/security/check_test_isolation.py --write-baseline
+
+# ── A-05: the 32 scripts that no target named ────────────────────────
+# They were collected by the repo-wide pytest, which is how they ran at
+# all — but that run was aborting, so in practice they ran nowhere, and
+# none of them could be run on its own to find out. Grouped by subject so
+# the list stays legible; `test-untargeted` runs every one.
+test-trust-ladder:
+	PYTHONPATH=. python -m pytest scripts/test_trust_core.py scripts/test_trust_ledger.py \
+	  scripts/test_trust_integration.py scripts/test_trust_promotion.py \
+	  scripts/test_trust_auditor.py scripts/test_memu_trust_tier_ranking.py -q
+
+test-market:
+	PYTHONPATH=. python -m pytest scripts/test_alpha_signals.py scripts/test_market_data.py \
+	  scripts/test_market_intel.py scripts/test_opportunity_intel.py \
+	  scripts/test_paper_trader.py scripts/test_strategy_engine.py -q
+
+test-cognition:
+	PYTHONPATH=. python -m pytest scripts/test_cortex.py scripts/test_model_council.py \
+	  scripts/test_moral_imagination.py scripts/test_soul_identity.py \
+	  scripts/test_wisdom_graph.py scripts/test_wisdom_ingestion.py \
+	  scripts/test_cross_session_context.py -q
+
+test-j-features:
+	PYTHONPATH=. python -m pytest scripts/test_j1_live_canvas.py scripts/test_j3_pii_redaction.py \
+	  scripts/test_j5_diary.py scripts/test_h3_coverage_gate.py -q
+
+test-perception-misc:
+	PYTHONPATH=. python -m pytest scripts/test_camera_proactive_gate.py \
+	  scripts/test_supervisor_signal_proactive.py scripts/test_service_watchdog.py \
+	  scripts/test_web_scout.py scripts/test_tool_gate_taxonomy.py \
+	  scripts/test_p1_p4_enhancements.py -q
+
+# Pure, needs nothing running. It was the only one of the 32 that ran in
+# no way at all: no target, and pytest collects nothing from it because
+# everything is behind `if __name__ == "__main__"`.
+test-hmac-advisor:
+	PYTHONPATH=. python scripts/test_hmac_migration_advisor.py
+
+test-untargeted: test-trust-ladder test-market test-cognition test-j-features \
+	test-perception-misc test-hmac-advisor test-smoke-core
+	@echo "All previously untargeted suites ran."
+
+# scripts/test_smoke_core.py needs no stack: it asserts that the probe
+# reports failure when nothing answers, which is the property that
+# matters and the one its old comment described without asserting.
+test-smoke-core:
+	PYTHONPATH=. python -m pytest scripts/test_smoke_core.py -q
+
+test-graph-live:
+	PYTHONPATH=. python scripts/test_graph_live.py
+
 # Wave 1 status report: revalidates all 96 KAI-DASH findings (not a gate).
 dashboard-findings:
 	python3 scripts/security/check_dashboard_findings.py
@@ -175,7 +244,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-dashboard-ui-auth test-degraded test-hygiene-gate \
 	test-assertion-floors test-gate-registry test-compose-drift \
 	test-secret-gates test-compose-gates test-ci-tolerations \
-	test-test-wiring
+	test-test-wiring test-test-isolation
 	@echo "All Unified Hunter suites passed."
 
 # A-02 ratchet: runs `test-uh` and fails if any suite exercises less than

@@ -4240,3 +4240,167 @@ Of the 16, **10 were caught by a test or a gate and 6 by reading**. The harness 
 
 **Files added:** `scripts/security/check_test_wiring.py`, `scripts/test_test_wiring.py`, `kai-pm/TEST_WRITING_REVIEW.md`.
 **Files modified:** `scripts/test_dashboard_findings.py`, `scripts/test_invoice.py`, `gate_registry.py`, `check_assertion_floors.py`, `assertion_floors.json`, `Makefile`, `policy-checks.yml`, tracker/STATUS.
+
+---
+
+## 2026-08-04 — A-05: the test suite had not run at all, and nothing said so
+
+**Prompt:** *"Ok are you fixing all you can before we move on"*. A-05 was
+opened as a housekeeping item — 32 test scripts with no Makefile target.
+Checking whether they ran anywhere found something else.
+
+### What was true
+
+`python-app.yml` is the only job that executes this repository's ~4,200
+pytest tests. Every run of it had failed since at least **27 July**. It
+was not failing tests; it was aborting during **collection**, so the
+number of tests that ran was zero. The workflow triggers on `main` only,
+so `claude/project-rework-plan-pgvp35` — the branch all this work happens
+on — could not observe it either way.
+
+Six collection errors. Five came from one line:
+
+```python
+sys.modules["common"] = types.ModuleType("common")     # test_cortex.py
+```
+
+`test_cortex` sorts before `test_erasure`, `test_error_codes`,
+`test_feature_flags`, `test_flags_enabled` and `test_migration`. All five
+import `common.<something>` at module scope. All five failed with
+`'common' is not a package`. **Every one of them passed when run alone.**
+The errors named five innocent files; nothing named the cause.
+
+This is the inverse of the failure mode the programme has been chasing. A
+self-consuming guard stops checking and looks like a pass. This stopped
+checking and looked like a failure *somewhere else*, which is worse: the
+obvious response is to go and change the file that is not broken.
+
+### The cause, and the route
+
+Not that line — seventeen places, editing a process-global structure with
+nothing scoping the edit. `scripts/module_stubs.py` gives them a scope:
+
+```python
+with stubbed({"common.runtime": fake}):
+    spec.loader.exec_module(mod)
+```
+
+Restoration is exact. A name absent before is **deleted**, not set to
+`None`, because a `None` entry in `sys.modules` is a cached import
+failure and breaks the next importer just as thoroughly.
+
+Also deduplicated on the way: an 18-module stub list copied verbatim into
+five suites, and four byte-identical copies of the same `_FakeRedis`.
+
+The worst offender was **`test_cognitive_mechanisms.py`**, which replaced
+`fastapi`, `pydantic` and `httpx` — installed, working libraries — with
+bare two-attribute stubs, from `setup_method`, once per test,
+permanently. 223 errors elsewhere and 34 in the file itself. It does not
+stub libraries it has; both sets are gone and it now passes 44.
+
+### How the detector was built, because that is the transferable part
+
+The first version imported each file in a subprocess and asked what it
+left in `sys.modules`. It found seven offenders and it was **wrong** —
+not about those seven, but about the worst one, which does its damage
+from `setup_method`, long after import. An import-time probe cannot
+observe a run-time edit.
+
+`scripts/security/isolation_plugin.py` hooks `pytest_runtest_protocol`
+and diffs `sys.modules`, `os.environ` and `sys.path` across file
+boundaries in the real session. Calibrated against a synthetic leaky/clean
+pair before being pointed at the repository, per the rule written after
+the last review.
+
+It also showed the leaks were **chained**: fixing the first file to
+replace `common.runtime` made a second appear, because until then it was
+replacing something already replaced. Six iterations to zero.
+
+### The gate
+
+`scripts/security/check_test_isolation.py`, wired into `python-app.yml`,
+reading the report that run produces rather than running the suite twice.
+Two rules, because the two kinds of leak are not the same:
+
+- **`replaced`** — a real module swapped for a stub and left swapped. At
+  **zero and enforced**. No baseline, no ratchet, no way to declare it
+  away; `test_a_replacement_fails_even_when_declared` asserts that.
+- **`added` / `env_set`** — ratchet down from a declared baseline. 13 and
+  15 today, including `BINANCE_API_KEY`, `INTERSERVICE_HMAC_SECRET` and
+  four `FF_*` flags. Debt, and declared as debt.
+
+The meta-check earned its keep here: registering the new gate made I-4
+fire on `isolation_plugin.py` (on disk, undeclared). The fix replaced a
+hand-maintained list of four excluded names with the rule that actually
+distinguishes them — **a check has a `main()`, a support module does
+not** — so the next helper needs no edit and a new check cannot hide as
+one.
+
+### Measured, on the exact command CI runs
+
+| | tests run | passed | failed | errors |
+|---|---|---|---|---|
+| before | **0** | 0 | 0 | 6 (collection aborted) |
+| after commit 1 | 4,186 | 4,060 | 119 | 11 |
+| after commit 2 | 4,191 | 4,117 | 63 | 11 |
+
+Every suite touched was baselined **before** being changed. That caught
+two of my own mistakes: scoping `test_agentic_routes`' stubs turned 3
+failures into 56, and the same for `test_cognitive_mechanisms`. Both were
+reverted to session-long stubs, and `test_agentic_routes` carries that as
+a declared, measured exception rather than a comment.
+
+### A-05 as originally scoped
+
+Grouped Makefile targets for all 32 previously untargeted scripts
+(`test-trust-ladder`, `test-market`, `test-cognition`, `test-j-features`,
+`test-perception-misc`, `test-hmac-advisor`, `test-smoke-core`, and
+`test-untargeted` for all of them).
+
+Two of those scripts ran in **no** way at all — no target, and pytest
+collects nothing from a file whose code is all behind `if __name__ ==
+"__main__"`:
+
+- `test_hmac_migration_advisor.py` — pure, needs nothing, now runs.
+- `test_smoke_core.py` — three lines that returned `smoke_core.py`'s exit
+  status. Its comment said *"when core services are not running, the
+  script should exit nonzero"* — a real property, checkable with no
+  stack, that the file never asserted. It does now, and asserts the probe
+  reports failure when nothing answers, which is the boundary blindness
+  this programme removes everywhere else. It would be worse here than
+  most: `smoke_core` is what says the core came up.
+
+`test_hse_rams.py` inserted the repo root to import `hse_rams`, which
+lives in `scripts/`. Because `scripts/` is a package, pytest never put it
+on `sys.path`, so that file raised at collection too.
+
+### Routing
+
+`python-app.yml` now runs on `claude/**` as well as `main`. `main`-only
+is how a week of red went unseen.
+
+### Register
+
+**`KAI-GATE-019` opens, REMEDIATED** — the collection abort and its
+cause; prevention enforced, `replaced` at zero.
+
+**`KAI-GATE-020` opens, OPEN** — 63 failures and 11 errors, all but ~13
+of which pass when their file runs alone. `sys.modules` is clean, so the
+remaining mechanism is `os.environ` left set and repo `data/` files
+written by the trust suites. `make test-trust-ladder` reproduces it in
+seconds. Measured and bounded, not fixed. Per Programme Rule 7 the count
+stands until a closure review.
+
+**Not claimed:** the 63 are not a regression — they were never visible,
+because nothing ran. Whether CI is green on `claude/**` now needs the
+Actions tab; that is operator-side, along with `KAI-GATE-016`.
+
+**Files added:** `scripts/module_stubs.py`,
+`scripts/security/isolation_plugin.py`,
+`scripts/security/check_test_isolation.py`,
+`scripts/security/test_isolation_baseline.json`,
+`scripts/test_test_isolation.py`.
+**Files modified:** 22 test scripts, `check_gate_registry.py`,
+`gate_registry.py`, `assertion_floors.json`, `Makefile`,
+`python-app.yml`, `INSTRUMENTATION_ARCHITECTURE.md`,
+`TEST_WRITING_REVIEW.md`.
