@@ -356,6 +356,45 @@ class TestNoDeprecatedCalls(unittest.TestCase):
                     offenders.append(f"{path.name}:{node.lineno}")
         return offenders, scanned
 
+    def test_no_developer_home_paths(self):
+        """No file may name one machine's checkout.
+
+        Thirteen occurrences of one contributor's checkout root, across
+        three test
+        files cost **26 of the 42 failures** on CI's first complete run.
+        They cannot fail here, by construction: this *is* that machine. So
+        the rule has to be structural rather than behavioural — a path that
+        only works in one checkout is wrong even when it works.
+
+        Scans every .py in the repository, not a list of files, because the
+        list would only ever have caught what someone already knew about —
+        which is exactly how the get_event_loop rule below missed five
+        files. `Path(__file__).resolve().parents[N]` is the fix and costs
+        nothing.
+        """
+        import re
+        offenders, scanned = [], 0
+        skip = {"_archive", ".venv", "__pycache__", "node_modules", ".git"}
+        # Built, not written out — and the docstring above says "one
+        # contributor's checkout root" rather than quoting it, because the
+        # first version of this rule flagged *itself*: the literal was in
+        # its own explanation. Third time today that an assertion matched
+        # its own prose (class C in TEST_WRITING_REVIEW.md).
+        needle = "/" + "home/user/" + "kai-system"
+        for path in sorted(ROOT.rglob("*.py")):
+            if any(part in skip for part in path.parts):
+                continue
+            scanned += 1
+            text = path.read_text(encoding="utf-8", errors="replace")
+            for num, line in enumerate(text.splitlines(), 1):
+                if needle in line and "needle" not in line:
+                    offenders.append(f"{path.relative_to(ROOT)}:{num}")
+        self.assertGreater(scanned, 200, "scanned implausibly few files")
+        self.assertEqual(
+            offenders, [],
+            f"{len(offenders)} absolute path(s) to one developer's checkout. "
+            f"Use Path(__file__).resolve().parents[N]. Found: {offenders[:6]}")
+
     def test_no_utcnow_in_tests(self):
         offenders, scanned = self._calls("datetime.utcnow")
         self.assertGreater(scanned, 100, "scanned implausibly few test files")

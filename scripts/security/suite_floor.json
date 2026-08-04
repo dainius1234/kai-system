@@ -2,7 +2,7 @@
   "note": "The repo-wide pytest result. Failures and errors may fall, never rise. See scripts/security/check_suite_floor.py.",
   "max_failed": 0,
   "max_errors": 0,
-  "min_passed": 4246,
+  "min_passed": 4247,
   "recorded": "2026-08-04",
   "history": [
     {
@@ -67,6 +67,13 @@
       "failed": 0,
       "errors": 0,
       "note": "ML stack blocked in conftest (CI segfaulted importing it); +8 is test_conftest_guards"
+    },
+    {
+      "date": "2026-08-04",
+      "passed": 4247,
+      "failed": 0,
+      "errors": 0,
+      "note": "merged to main; +1 is the developer-path rule carried over from the 26 failures it would have caught"
     }
   ]
 }

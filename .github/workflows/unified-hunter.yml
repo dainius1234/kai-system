@@ -7,9 +7,12 @@ name: Unified Hunter Suites
 # assertion-floor gate below exists to catch, one level up: a check that
 # is never invoked is a check that has stopped checking.
 
+# `main`-only was how a week of red went unseen in python-app.yml: the
+# branch the work happens on could not observe the result. Same trigger,
+# same blind spot, so the same fix. PRs still target main only.
 on:
   push:
-    branches: [main]
+    branches: ["main", "claude/**"]
   pull_request:
     branches: [main]
 
