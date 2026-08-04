@@ -318,22 +318,69 @@ class TestNoDeprecatedCalls(unittest.TestCase):
         content = (ROOT / "memu-core" / "app.py").read_text()
         self.assertNotIn("datetime.utcnow()", content)
 
+    @staticmethod
+    def _calls(attribute: str):
+        """Every scripts/test_*.py containing a call to `<mod>.<attr>()`.
+
+        Read by AST, not by substring, for two reasons. A substring search
+        matches this file's own assertion text — the same self-matching
+        defect that once made a dashboard check pass against its own
+        docstring. And it matches comments, which is how a rule ends up
+        firing on a file that documents the problem rather than has it.
+
+        The denominator is returned with the hits: a scan that inspected
+        nothing must not read the same as a scan that found nothing.
+        """
+        import ast
+
+        module, attr = attribute.split(".")
+        directory = ROOT / "scripts"
+        # Fail closed. If the directory is missing this check cannot
+        # answer its question, and "no hits" would be a lie.
+        assert directory.is_dir(), f"cannot scan: {directory} is not a directory"
+
+        offenders, scanned = [], 0
+        for path in sorted(directory.glob("test_*.py")):
+            try:
+                tree = ast.parse(path.read_text(encoding="utf-8"))
+            except SyntaxError:
+                offenders.append(f"{path.name} (does not parse)")
+                continue
+            scanned += 1
+            for node in ast.walk(tree):
+                if (isinstance(node, ast.Call)
+                        and isinstance(node.func, ast.Attribute)
+                        and node.func.attr == attr
+                        and isinstance(node.func.value, ast.Name)
+                        and node.func.value.id == module):
+                    offenders.append(f"{path.name}:{node.lineno}")
+        return offenders, scanned
+
     def test_no_utcnow_in_tests(self):
-        for name in ["test_p3_organic_memory.py", "test_silence_signal.py", "test_tempo.py"]:
-            path = ROOT / "scripts" / name
-            if path.exists():
-                content = path.read_text()
-                self.assertNotIn("datetime.utcnow()", content, f"Found in {name}")
+        offenders, scanned = self._calls("datetime.utcnow")
+        self.assertGreater(scanned, 100, "scanned implausibly few test files")
+        self.assertEqual(offenders, [], f"datetime.utcnow() in {len(offenders)} place(s)")
 
     def test_no_get_event_loop_in_tests(self):
-        for name in ["test_gaps_sprint.py", "test_h2_self_healing.py",
-                      "test_j_series.py", "test_p3_organic_memory.py",
-                      "test_planner_preferences.py", "test_priority_queue.py",
-                      "test_tree_search.py"]:
-            path = ROOT / "scripts" / name
-            if path.exists():
-                content = path.read_text()
-                self.assertNotIn("get_event_loop()", content, f"Found in {name}")
+        """Widened from a list of seven filenames to every test file.
+
+        The list was hand-maintained, so it could only ever catch what
+        someone had already thought to add. Five files it did not name —
+        test_d92_socratic, test_d93_hypothesis, test_d94_forecaster,
+        test_d95_d100_foundations and test_moral_imagination — each held
+        one `asyncio.get_event_loop().run_until_complete(...)`, and
+        between them accounted for **44 of the 63 order-dependent
+        failures** in the repo-wide run. They pass alone: the loop is only
+        closed once a suite using FastAPI's TestClient has run first, so
+        the failure names the wrong file.
+        """
+        offenders, scanned = self._calls("asyncio.get_event_loop")
+        self.assertGreater(scanned, 100, "scanned implausibly few test files")
+        self.assertEqual(
+            offenders, [],
+            "asyncio.get_event_loop() reuses whatever loop the thread has, "
+            "which an earlier TestClient may have closed. Use asyncio.run(). "
+            f"Found: {offenders}")
 
 
 if __name__ == "__main__":

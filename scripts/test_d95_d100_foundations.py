@@ -18,7 +18,13 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "common"))
 
 
 def run(coro):
-    return asyncio.get_event_loop().run_until_complete(coro)
+    # `asyncio.run` creates and closes its own loop. The previous
+    # `get_event_loop().run_until_complete()` reused whatever loop the
+    # thread happened to have — and FastAPI's TestClient, used by
+    # suites that sort earlier, closes it on the way out. These tests
+    # then failed with 'There is no current event loop', naming this
+    # file rather than the one that closed the loop.
+    return asyncio.run(coro)
 
 
 # ── D95: DialecticalReasoner ──────────────────────────────────────────
