@@ -155,6 +155,26 @@ def main() -> int:
                     f"{totals['replaced']} replaced, {totals['added']} added, "
                     f"{totals['env_set']} env"))
 
+    # An empty report against a baseline that names seven files is not a
+    # clean repository — it is a run that did not happen. CI proved this on
+    # 2026-08-04: the suite aborted during collection, the plugin wrote an
+    # empty report, and this gate printed "WARNING: zero inputs inspected —
+    # this is not a pass" and then **passed**.
+    #
+    # That is boundary blindness in the file written to prevent boundary
+    # blindness. The warning was doing the work of a rule, and a warning is
+    # not a rule. `--write-baseline` is exempt: recording zero is how the
+    # last declared leak would legitimately be removed.
+    declared = baseline.get("leaky_files", {})
+    if declared and not report and not args.write_baseline:
+        print(f"\nFAIL: the report is empty, but {len(declared)} file(s) are "
+              f"declared as leaking.\n")
+        print("  Either every declared leak was fixed in one commit — in which")
+        print("  case run `make test-isolation-baseline` and say so — or the")
+        print("  run this report came from never executed. The second is far")
+        print("  more likely, and reads identically to the first.")
+        return 1
+
     if args.write_baseline:
         if replacements:
             print("\nREFUSED: a replacement cannot be baselined.")

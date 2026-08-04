@@ -42,6 +42,22 @@ try:
 except ImportError:
     _OPENCV_OK = False
     logger.info("OpenCV not available — vision in stub mode")
+except Exception as exc:
+    # A *partial* OpenCV is not the same as an absent one, and only the
+    # second was handled. `opencv-python-headless` and several slim wheels
+    # import fine and then have no `CascadeClassifier` or no `cv2.data`,
+    # which raises AttributeError here — outside the guard, so the whole
+    # service died at import rather than degrading. The message says
+    # "stub mode"; the code could not deliver it.
+    #
+    # Found by CI, which installs such a build. It cannot be found on a
+    # box where OpenCV is simply absent, because there the ImportError
+    # branch is correct.
+    _OPENCV_OK = False
+    logger.warning(
+        "OpenCV present but unusable (%s: %s) — vision in stub mode",
+        type(exc).__name__, exc,
+    )
 
 try:
     from deepface import DeepFace

@@ -38,7 +38,7 @@ from scripts.security import isolation_plugin as plugin  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 12
+EXPECTED_SCENARIOS = 13
 executed: list[str] = []
 
 
@@ -168,6 +168,27 @@ def test_a_missing_report_is_a_failure_not_a_pass() -> None:
     check("a missing report exits nonzero", status == 1, f"exit={status}")
 
 
+def test_an_empty_report_against_a_declared_baseline_fails() -> None:
+    """CI's own finding: the gate warned "this is not a pass", then passed.
+
+    On 2026-08-04 the suite aborted during collection, the plugin wrote an
+    empty report, and this check printed a warning and exited 0 — boundary
+    blindness in the file written to prevent boundary blindness. A warning
+    was doing the work of a rule.
+    """
+    scenario("empty report fails")
+    report = Path(tempfile.mkdtemp()) / "empty.json"
+    report.write_text("{}", encoding="utf-8")
+    argv = sys.argv
+    sys.argv = ["check_test_isolation.py", "--from-report", str(report)]
+    try:
+        status = gate.main()
+    finally:
+        sys.argv = argv
+    check("an empty report is not a clean repository", status == 1,
+          f"exit={status}")
+
+
 def test_write_baseline_refuses_to_record_a_replacement() -> None:
     scenario("baseline refuses a replacement")
     report = Path(tempfile.mkdtemp()) / "report.json"
@@ -224,6 +245,7 @@ def run_all() -> None:
     test_an_undeclared_leaky_file_fails()
     test_a_clean_file_is_not_reported()
     test_a_missing_report_is_a_failure_not_a_pass()
+    test_an_empty_report_against_a_declared_baseline_fails()
     test_write_baseline_refuses_to_record_a_replacement()
     test_the_plugin_tells_a_swap_from_an_import()
     test_the_real_repository_replaces_nothing()

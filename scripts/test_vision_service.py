@@ -17,11 +17,23 @@ from unittest.mock import MagicMock, patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from scripts.module_stubs import stubbed  # noqa: E402
+
 _spec = importlib.util.spec_from_file_location(
     "vision_service_app", ROOT / "perception" / "vision" / "app.py"
 )
 _mod = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_mod)
+
+# This file's docstring says OpenCV and DeepFace are mocked, and every test
+# below does mock them — but the *load* used whatever cv2 the machine had.
+# So the result depended on the environment: absent locally (the app's
+# ImportError branch, fine), present-but-partial in CI (AttributeError on
+# cv2.CascadeClassifier, collection aborted, nothing ran).
+#
+# Stubbing the load makes the two agree. Scoped, so nothing downstream sees
+# a fake cv2 — see scripts/module_stubs.py.
+with stubbed({} if "cv2" in sys.modules else {"cv2": MagicMock()}):
+    _spec.loader.exec_module(_mod)
 app = _mod.app
 
 from fastapi.testclient import TestClient
