@@ -2,20 +2,57 @@
   "note": "The repo-wide pytest result. Failures and errors may fall, never rise. See scripts/security/check_suite_floor.py.",
   "max_failed": 0,
   "max_errors": 0,
-  "min_passed": 4208,
+  "min_passed": 4219,
   "recorded": "2026-08-04",
   "history": [
-    {"date": "2026-08-04", "passed": 0, "failed": 0, "errors": 6,
-     "note": "collection aborted; no test ran, and had not for at least a week"},
-    {"date": "2026-08-04", "passed": 4060, "failed": 119, "errors": 11,
-     "note": "sys.modules scoping (A-05 commit 1)"},
-    {"date": "2026-08-04", "passed": 4117, "failed": 63, "errors": 11,
-     "note": "no real module left replaced (A-05 commit 2)"},
-    {"date": "2026-08-04", "passed": 4176, "failed": 20, "errors": 11,
-     "note": "asyncio.get_event_loop -> asyncio.run, 5 suites"},
-    {"date": "2026-08-04", "passed": 4193, "failed": 4, "errors": 11,
-     "note": "the 15 genuine failures: auth, a typo'd import, brittle greps"},
-    {"date": "2026-08-04", "passed": 4208, "failed": 0, "errors": 0,
-     "note": "module-identity fixes; green"}
+    {
+      "date": "2026-08-04",
+      "passed": 0,
+      "failed": 0,
+      "errors": 6,
+      "note": "collection aborted; no test ran, and had not for at least a week"
+    },
+    {
+      "date": "2026-08-04",
+      "passed": 4060,
+      "failed": 119,
+      "errors": 11,
+      "note": "sys.modules scoping (A-05 commit 1)"
+    },
+    {
+      "date": "2026-08-04",
+      "passed": 4117,
+      "failed": 63,
+      "errors": 11,
+      "note": "no real module left replaced (A-05 commit 2)"
+    },
+    {
+      "date": "2026-08-04",
+      "passed": 4176,
+      "failed": 20,
+      "errors": 11,
+      "note": "asyncio.get_event_loop -> asyncio.run, 5 suites"
+    },
+    {
+      "date": "2026-08-04",
+      "passed": 4193,
+      "failed": 4,
+      "errors": 11,
+      "note": "the 15 genuine failures: auth, a typo'd import, brittle greps"
+    },
+    {
+      "date": "2026-08-04",
+      "passed": 4208,
+      "failed": 0,
+      "errors": 0,
+      "note": "module-identity fixes; green"
+    },
+    {
+      "date": "2026-08-04",
+      "passed": 4219,
+      "failed": 0,
+      "errors": 0,
+      "note": "test_trust_auditor repaired; +11 is test_suite_floor's own pytest-collected tests"
+    }
   ]
 }
