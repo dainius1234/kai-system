@@ -119,7 +119,13 @@ class TestJavaScriptFunctions:
 
 class TestDashboardEndpoints:
     def test_goals_endpoint_exists(self):
-        assert '@app.get("/api/goals")' in DASH_PY.read_text()
+        # Matches the decorator opening, not the whole call. The route
+        # gained `dependencies=[Depends(require_dashboard_auth(...))]`, so
+        # `@app.get("/api/goals")` — with its closing paren — stopped
+        # matching a route that had not moved and had only become safer.
+        # An assertion that breaks when a route is *hardened* is a tax on
+        # doing the right thing.
+        assert '@app.get("/api/goals"' in DASH_PY.read_text()
 
     def test_emotion_timeline_endpoint_exists(self):
         assert '/api/emotion/timeline' in DASH_PY.read_text()

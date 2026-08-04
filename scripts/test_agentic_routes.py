@@ -461,7 +461,24 @@ class TestEpisodes:
 # /checkpoint
 # ═════════════════════════════════════════════════════════════════════
 
+# /checkpoint/{id}/restore and DELETE /checkpoint/{id} are the two
+# checkpoint routes carrying `Depends(require_service_auth(...))` — added by
+# G-03, after these tests were written. Without a token they answered 503
+# rather than the 404/200 being asserted.
+#
+# Authenticated rather than waived: setting KAI_ALLOW_UNAUTHENTICATED would
+# make the tests pass while taking the auth dependency out of the exercised
+# path, so its removal would go unnoticed. monkeypatch restores the variable
+# per test.
+_CP_TOKEN = "test-token-agentic-checkpoints"
+_CP_AUTH = {"Authorization": f"Bearer {_CP_TOKEN}"}
+
+
 class TestCheckpoints:
+    @pytest.fixture(autouse=True)
+    def _service_token(self, monkeypatch):
+        monkeypatch.setenv("KAI_SERVICE_TOKEN", _CP_TOKEN)
+
     def test_list_checkpoints_200(self):
         r = client.get("/checkpoints")
         assert r.status_code == 200
@@ -491,12 +508,12 @@ class TestCheckpoints:
 
     def test_restore_checkpoint_not_found_404(self):
         _kc.load_checkpoint.return_value = None
-        r = client.post("/checkpoint/nonexistent-id/restore")
+        r = client.post("/checkpoint/nonexistent-id/restore", headers=_CP_AUTH)
         assert r.status_code == 404
 
     def test_delete_checkpoint_200(self):
         with patch("agentic_app_routes.delete_checkpoint", return_value=True):
-            r = client.delete("/checkpoint/some-id")
+            r = client.delete("/checkpoint/some-id", headers=_CP_AUTH)
         assert r.status_code == 200
 
     def test_get_checkpoint_found(self):
@@ -508,7 +525,7 @@ class TestCheckpoints:
     def test_restore_checkpoint_found(self):
         with patch("agentic_app_routes.load_checkpoint", return_value=_FakeCheckpoint()), \
              patch("agentic_app_routes.create_checkpoint", return_value=_FakeCheckpoint()):
-            r = client.post("/checkpoint/cp-test-001/restore")
+            r = client.post("/checkpoint/cp-test-001/restore", headers=_CP_AUTH)
         assert r.status_code == 200
 
 

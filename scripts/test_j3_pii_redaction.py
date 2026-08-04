@@ -143,7 +143,10 @@ class TestDashboardPiiEndpoint:
         assert "verifier:8052" in src
 
     def test_pii_scan_endpoint_defined(self):
-        assert '@app.post("/api/pii/scan")' in _dash()
+        # See test_j1_live_canvas: the route acquired an auth dependency, so
+        # the decorator spans two lines and the closing paren no longer
+        # follows the path.
+        assert '@app.post("/api/pii/scan"' in _dash()
 
     def test_pii_scan_proxies_to_verifier(self):
         src = _dash()

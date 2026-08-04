@@ -124,11 +124,24 @@ class TestInfra:
 # ═════════════════════════════════════════════════════════════════════
 
 class TestRecover:
-    def test_post_200(self):
-        r = client.post("/recover")
-        assert r.status_code == 200
+    """`/recover` is gated on RECOVERY_ENABLED, which memu-core reads once at
+    import into `_RECOVERY_ENABLED`. Unset, the endpoint answers 200 with
+    `{"status": "disabled"}` — so `test_post_200` passed while the recovery
+    path it names was never entered, and `test_has_status` failed asking for
+    "ok". Both now say which mode they are testing.
+    """
 
-    def test_has_status(self):
+    def test_post_200_when_disabled(self):
+        assert client.post("/recover").status_code == 200
+
+    def test_reports_disabled_when_not_enabled(self, monkeypatch):
+        monkeypatch.setattr(memu, "_RECOVERY_ENABLED", False)
+        body = client.post("/recover").json()
+        assert body["status"] == "disabled"
+        assert "RECOVERY_ENABLED" in body["reason"]
+
+    def test_has_status_ok_when_enabled(self, monkeypatch):
+        monkeypatch.setattr(memu, "_RECOVERY_ENABLED", True)
         assert client.post("/recover").json().get("status") == "ok"
 
 

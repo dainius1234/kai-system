@@ -248,7 +248,29 @@ class TestWatcher:
 
 # ── App endpoint tests ────────────────────────────────────────────────────────
 
+# vault-sync/app.py guards /export and /ingest with
+# `Depends(require_service_auth(...))`. These tests were written before that
+# landed (G-03) and posted without a token, so every one of them got a 503
+# "service authentication is not configured" instead of the status it was
+# asserting.
+#
+# Worth noting what that hid: `test_export_disabled_when_ff_off` asserts 503
+# and was PASSING — on the auth refusal, not on the feature flag it exists to
+# check. A test can fail for the right reason and pass for the wrong one.
+#
+# Authenticating properly (rather than setting KAI_ALLOW_UNAUTHENTICATED)
+# keeps the auth dependency in the exercised path, so these tests would also
+# notice if it were removed. monkeypatch restores the env per test, so nothing
+# leaks into the suites that follow.
+_TOKEN = "test-token-d91-vault-sync"
+_AUTH = {"Authorization": f"Bearer {_TOKEN}"}
+
+
 class TestVaultSyncApp:
+    @pytest.fixture(autouse=True)
+    def _service_token(self, monkeypatch):
+        monkeypatch.setenv("KAI_SERVICE_TOKEN", _TOKEN)
+
     @pytest.fixture
     def client(self, tmp_path, monkeypatch):
         monkeypatch.setenv("VAULT_PATH", str(tmp_path))
@@ -277,7 +299,7 @@ class TestVaultSyncApp:
         from fastapi.testclient import TestClient
         import vault_sync_app as app_mod
         with TestClient(app_mod.app) as c:
-            r = c.post("/export", json={
+            r = c.post("/export", headers=_AUTH, json={
                 "filepath": "KAI/test.md",
                 "content": "# Test",
                 "conviction": 5.0,
@@ -290,7 +312,7 @@ class TestVaultSyncApp:
         from fastapi.testclient import TestClient
         import vault_sync_app as app_mod
         with TestClient(app_mod.app) as c:
-            r = c.post("/export", json={
+            r = c.post("/export", headers=_AUTH, json={
                 "filepath": "../../../etc/passwd",
                 "content": "evil",
                 "conviction": 9.5,
@@ -309,7 +331,7 @@ class TestVaultSyncApp:
 
         monkeypatch.setattr(app_mod, "_ingest_note", _mock_ingest)
         with TestClient(app_mod.app) as c:
-            r = c.post("/export", json={
+            r = c.post("/export", headers=_AUTH, json={
                 "filepath": "KAI/lesson.md",
                 "content": "# Lesson\n\nContent.",
                 "conviction": 9.5,
@@ -322,12 +344,16 @@ class TestVaultSyncApp:
         import vault_sync_app as app_mod
         monkeypatch.setattr(app_mod, "FF_VAULT_SYNC", False)
         with TestClient(app_mod.app) as c:
-            r = c.post("/export", json={
+            r = c.post("/export", headers=_AUTH, json={
                 "filepath": "KAI/test.md",
                 "content": "x",
                 "conviction": 9.9,
             })
             assert r.status_code == 503
+            # Assert the *reason*, not just the code. Before the header was
+            # added this assertion passed on an auth refusal that also
+            # returns 503, so it proved nothing about the feature flag.
+            assert "vault" in r.json()["detail"].lower()
 
     def test_ingest_returns_skipped_on_unchanged_checksum(self, tmp_path, monkeypatch):
         from fastapi.testclient import TestClient
@@ -346,7 +372,8 @@ class TestVaultSyncApp:
         app_mod._mapper.upsert(str(note_path), "node1", [], checksum, "2026-01-01")
 
         with TestClient(app_mod.app) as c:
-            r = c.post("/ingest", json={"filepath": str(note_path), "force": False})
+            r = c.post("/ingest", headers=_AUTH,
+                       json={"filepath": str(note_path), "force": False})
             assert r.status_code == 200
             assert r.json()["status"] == "skipped"
 
@@ -358,17 +385,23 @@ class TestMemuCoreVaultEndpoints:
     def client(self):
         # Lightweight import using importlib to avoid memu-core's heavy deps
         pytest.importorskip("httpx")
-        try:
-            from fastapi.testclient import TestClient
-            sys.path.insert(0, str(Path(__file__).parent.parent / "memu-core"))
-            import importlib
-            import memu_core_app
-            importlib.reload(memu_core_app)
-            return TestClient(memu_core_app.app)
-        except Exception:
-            declined("memu-core vault API",
-                     "memu-core could not be imported in this environment")
-            return None
+        from fastapi.testclient import TestClient
+        import importlib.util
+
+        # There is no module named `memu_core_app`; memu-core's application
+        # is memu-core/app.py, whose directory name is not a valid
+        # identifier. The old `import memu_core_app` could therefore never
+        # succeed, and the bare `except Exception` reported it as "could not
+        # be imported in this environment" — a true sentence about a false
+        # cause — then returned None, so five tests died on
+        # `'NoneType' object has no attribute 'post'`.
+        path = Path(__file__).resolve().parents[1] / "memu-core" / "app.py"
+        assert path.is_file(), f"memu-core application missing at {path}"
+        spec = importlib.util.spec_from_file_location("memu_core_vault_app", path)
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules["memu_core_vault_app"] = mod
+        spec.loader.exec_module(mod)
+        return TestClient(mod.app)
 
     def test_vault_ingest_returns_node_id(self, client):
         r = client.post("/memory/vault/ingest", json={
