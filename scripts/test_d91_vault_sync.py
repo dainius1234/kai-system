@@ -301,10 +301,16 @@ class TestVaultSyncApp:
             assert data["ff_vault_sync"] is True
 
     def test_export_conviction_too_low(self, tmp_path, monkeypatch):
-        monkeypatch.setenv("VAULT_PATH", str(tmp_path))
-        monkeypatch.setenv("FF_VAULT_SYNC", "true")
         from fastapi.testclient import TestClient
         import vault_sync_app as app_mod
+
+        # setattr, not setenv — vault-sync reads VAULT_PATH once at import.
+        # The `client` fixture above gets away with setenv because it calls
+        # importlib.reload afterwards; these two never did, so the service
+        # kept its default of "/vault" and they failed on CI with
+        # PermissionError while passing as root in this container.
+        monkeypatch.setattr(app_mod, "VAULT_PATH", str(tmp_path))
+        monkeypatch.setattr(app_mod, "FF_VAULT_SYNC", True)
         with TestClient(app_mod.app) as c:
             r = c.post("/export", headers=_AUTH, json={
                 "filepath": "KAI/test.md",
@@ -314,10 +320,16 @@ class TestVaultSyncApp:
             assert r.status_code == 403
 
     def test_export_path_traversal_blocked(self, tmp_path, monkeypatch):
-        monkeypatch.setenv("VAULT_PATH", str(tmp_path))
-        monkeypatch.setenv("FF_VAULT_SYNC", "true")
         from fastapi.testclient import TestClient
         import vault_sync_app as app_mod
+
+        # setattr, not setenv — vault-sync reads VAULT_PATH once at import.
+        # The `client` fixture above gets away with setenv because it calls
+        # importlib.reload afterwards; these two never did, so the service
+        # kept its default of "/vault" and they failed on CI with
+        # PermissionError while passing as root in this container.
+        monkeypatch.setattr(app_mod, "VAULT_PATH", str(tmp_path))
+        monkeypatch.setattr(app_mod, "FF_VAULT_SYNC", True)
         with TestClient(app_mod.app) as c:
             r = c.post("/export", headers=_AUTH, json={
                 "filepath": "../../../etc/passwd",
