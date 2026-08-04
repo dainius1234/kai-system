@@ -40,7 +40,18 @@ REPO = Path(__file__).resolve().parent.parent.parent
 POOLED = "pooled_client("
 BOUNDED = "bounded_json("
 
-COLUMNS = ("clients", "unbounded_bodies", "naive_timestamps", "success_on_failure")
+# Declared once. `COLUMNS` is derived from the detectors rather than typed
+# beside them, because the two drifted the moment a fifth detector was
+# added: `silent_swallows` landed in survey() and this survey reported
+# **zero** across a repository holding 156 of them, purely because the
+# tuple here had not been updated. Identical in shape to a deprecation
+# rule, fixed the same afternoon, whose seven hand-written filenames could
+# not see the five files that actually had the defect.
+#
+# Populated below, once the detector functions exist.
+DETECTORS = {}
+ADOPTION_DETECTORS = {}
+COLUMNS: tuple = ()
 
 
 # Service entry points are not all called `app.py`: `agentic` also ships
@@ -120,6 +131,65 @@ def _own_except_handlers(node) -> List[ast.ExceptHandler]:
     return found
 
 
+def _silent_swallows(text: str) -> int:
+    """`except ...: pass` — a handler that discards the reason.
+
+    A fifth column rather than a fifth gate: this repository already has
+    three ratchets, and a fourth watching the same kind of thing would be
+    the "declared in three places" problem the meta-check exists to stop.
+
+    Distinct from `success_on_failure`, which is at zero. That one catches
+    a handler that *returns a success shape*; this one catches a handler
+    that returns nothing at all and simply forgets what went wrong. Both
+    end with the operator learning nothing, by different routes.
+
+    Not hypothetical, and not a style preference. `test_soul_identity`
+    carried exactly this. The moment it was changed to *record* the
+    exception rather than discard it, the message named the cause in a
+    single line — "No module named 'system_fsm'" — and four failures
+    became zero. In a service the same shape means it degrades quietly and
+    nobody is told.
+
+    Counts only broad handlers (bare, `Exception`, `BaseException`). A
+    narrow `except FileNotFoundError: pass` is a decision about a named
+    condition; a broad one is a decision not to look.
+    """
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return 0
+    count = 0
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.ExceptHandler):
+            continue
+        body = [n for n in node.body
+                if not (isinstance(n, ast.Expr)
+                        and isinstance(n.value, ast.Constant))]
+        if len(body) != 1 or not isinstance(body[0], ast.Pass):
+            continue
+        if node.type is None or (isinstance(node.type, ast.Name)
+                                 and node.type.id in {"Exception",
+                                                      "BaseException"}):
+            count += 1
+    return count
+
+
+DETECTORS.update({
+    "clients": lambda t: t.count("async with httpx.AsyncClient("),
+    "unbounded_bodies": lambda t: t.count("await request.json()"),
+    "naive_timestamps": lambda t: t.count("datetime.utcnow()"),
+    "success_on_failure": _success_on_failure,
+    "silent_swallows": _silent_swallows,
+})
+# Evidence of adoption, reported so progress is visible rather than only
+# the remaining debt. Never part of the ratchet: these should *rise*.
+ADOPTION_DETECTORS.update({
+    "pooled": lambda t: t.count(POOLED),
+    "bounded": lambda t: t.count(BOUNDED),
+})
+COLUMNS = tuple(DETECTORS)
+
+
 def survey() -> Dict[str, Dict[str, int]]:
     results: Dict[str, Dict[str, int]] = {}
     for path in _service_files():
@@ -128,16 +198,8 @@ def survey() -> Dict[str, Dict[str, int]]:
         except OSError:
             continue
         service = str(path.parent.relative_to(REPO))
-        counts = {
-            "clients": text.count("async with httpx.AsyncClient("),
-            "unbounded_bodies": text.count("await request.json()"),
-            "naive_timestamps": text.count("datetime.utcnow()"),
-            "success_on_failure": _success_on_failure(text),
-            # Evidence of adoption, reported so progress is visible rather
-            # than only the remaining debt.
-            "pooled": text.count(POOLED),
-            "bounded": text.count(BOUNDED),
-        }
+        counts = {name: fn(text) for name, fn
+                  in {**DETECTORS, **ADOPTION_DETECTORS}.items()}
         # A service may ship more than one entry point; sum them rather
         # than letting the last file scanned overwrite the others.
         existing = results.get(service)
@@ -224,23 +286,29 @@ def main() -> int:
         return 1 if args.max_total is not None and grand > args.max_total else 0
 
     print("Repository-wide HTTP and time hygiene survey\n")
-    print(f"  {'service':<26}{'clients':>9}{'raw body':>10}"
-          f"{'utcnow':>8}{'200-fail':>10}")
-    print("  " + "─" * 63)
+    # Header and rows both derive from COLUMNS. Written out by hand, the
+    # table printed four columns while the grand total summed five — so
+    # every one of the 120 findings in the new column was invisible in the
+    # place a reader actually looks. A table that omits the column holding
+    # the debt is a denominator problem wearing a different hat.
+    _LABELS = {"clients": "clients", "unbounded_bodies": "raw body",
+               "naive_timestamps": "utcnow", "success_on_failure": "200-fail",
+               "silent_swallows": "swallowed"}
+    width = 11
+    header = "".join(f"{_LABELS.get(c, c):>{width}}" for c in COLUMNS)
+    rule = "  " + "─" * (26 + width * len(COLUMNS))
+    print(f"  {'service':<26}{header}")
+    print(rule)
     ranked = sorted(results.items(),
                     key=lambda kv: -sum(kv[1][c] for c in COLUMNS))
     for service, counts in ranked:
         if not sum(counts[c] for c in COLUMNS):
             continue
-        print(f"  {service:<26}{counts['clients']:>9}"
-              f"{counts['unbounded_bodies']:>10}"
-              f"{counts['naive_timestamps']:>8}"
-              f"{counts['success_on_failure']:>10}")
-    print("  " + "─" * 63)
-    print(f"  {'TOTAL':<26}{totals['clients']:>9}"
-          f"{totals['unbounded_bodies']:>10}"
-          f"{totals['naive_timestamps']:>8}"
-          f"{totals['success_on_failure']:>10}")
+        print(f"  {service:<26}"
+              + "".join(f"{counts[c]:>{width}}" for c in COLUMNS))
+    print(rule)
+    print(f"  {'TOTAL':<26}"
+          + "".join(f"{totals[c]:>{width}}" for c in COLUMNS))
 
     clean = [s for s, c in results.items() if not sum(c[x] for x in COLUMNS)]
     print(f"\n  {len(clean)} of {len(results)} services carry none of these.")

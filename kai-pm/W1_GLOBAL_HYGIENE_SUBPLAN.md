@@ -183,3 +183,97 @@ service's own batch. Progress is measured by `make hygiene-survey`, whose
 totals should only ever fall.
 
 **Findings formally closed by this sub-plan: 0.** Rule 7.
+
+---
+
+## H-6 — `except Exception: pass` (KAI-GATE-021)
+
+**Status:** OPEN, ratcheted at **120**. Added 2026-08-04.
+**Prompt:** *"I know it's large but we'll need to fix it… we'll manage it."*
+
+156 handlers discard the reason repo-wide; 120 of them in service entry
+points, which is what the survey scans and therefore what the ratchet
+holds.
+
+### Why this is not a style preference
+
+`scripts/test_soul_identity.py` carried exactly this shape. It loaded
+`agentic/app.py`, swallowed the failure with `except Exception: pass`, and
+returned a half-built module — so four tests asserted `False` with nothing
+to say why. The moment the handler was changed to **record** the exception
+instead of discarding it, the message named the cause in one line:
+
+```
+AssertionError: agentic/app.py did not finish loading: No module named 'system_fsm'
+```
+
+Four failures became zero, and the fix took a minute. In a service the
+same shape means it degrades quietly and the operator is told nothing.
+
+### Classified, because 156 undifferentiated handlers is not a work item
+
+| bucket | n | the risk |
+|---|---:|---|
+| **network call** | 64 | a dependency fails, the caller reports success — the *success-shaped failure* H-2/H-3 already named |
+| other | 45 | needs reading; no shared shape |
+| parse/convert | 17 | malformed input silently becomes a default |
+| filesystem | 14 | a write that did not happen, reported as though it did |
+| optional-import | 11 | the OpenCV class — a guard that is right for an *absent* package and wrong for a *partial* one |
+| cleanup/teardown | 5 | defensible; a close that fails during shutdown is usually noise |
+
+**84 of 156 sit in two files** — `memu-core/app.py` (53) and
+`agentic/app.py` (31). The concentration is the good news: two careful
+reads cover half of it.
+
+### The phases
+
+**Phase 0 — done.** The ratchet. `hygiene_survey`'s fifth column,
+`silent_swallows`, baseline 120, may only fall. Proven by planting one
+handler and watching the gate name the delta. Nothing can grow while the
+rest is worked, which is what makes it safe to work slowly.
+
+**Phase 1 — the 11 optional-imports.** Smallest bucket, sharpest lesson,
+already has a precedent: `perception/vision/app.py` was fixed today after
+CI died on a partial OpenCV. Each needs the same question — *is this guard
+correct when the package is present but incomplete?*
+
+**Phase 2 — the 64 network calls.** The highest value, and the bucket with
+a shared answer: a failed call should log at warning with the exception,
+and the caller should return a degraded envelope rather than a success.
+`common/degraded.py` already exists for this; the work is applying it, not
+inventing it.
+
+**Phase 3 — 17 parse + 14 filesystem.** Both have a shared shape too: a
+default substituted for a failure needs to be *labelled* as a default.
+
+**Phase 4 — the 45 "other".** Read individually. No shortcut, and the
+smallest bucket per unit of risk, so it goes last.
+
+**Phase 5 — the 5 cleanup handlers.** Likely to end as a documented
+exclusion rather than a change. If so it is encoded as a rule ("handlers
+whose try block only closes or cancels"), never a list of line numbers.
+
+### The rule this must not break
+
+Per the operator's rubric, none of these may be waived by a comment. A
+handler that genuinely should discard its exception says so by *catching
+the named condition* — `except FileNotFoundError: pass` is a decision
+about a specific thing, and the detector already ignores it. A broad
+`except Exception: pass` is a decision not to look, and that is what the
+count measures.
+
+### One thing found while building the ratchet
+
+Adding the column exposed the same defect in the survey itself.
+`COLUMNS` was a hand-typed tuple beside the detectors, so `silent_swallows`
+was computed and then **excluded from every total** — the survey reported
+0 across a repository holding 156. The table had four hard-coded columns
+while the grand total summed five, so the entire finding was invisible in
+the place a reader looks.
+
+Both are now derived from the detectors, so a sixth column cannot repeat
+it. That is the third hand-maintained list to fail this way in one day,
+after the dead-test detector's file list and the deprecation rule's seven
+filenames. **The pattern is worth stating plainly: a list of what to check,
+maintained next to the thing that does the checking, will drift — and the
+drift is silent, because the list is what defines "everything".**
