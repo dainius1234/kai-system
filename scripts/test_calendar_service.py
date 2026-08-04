@@ -2,6 +2,9 @@
 import importlib.util
 import os
 import sys
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parents[1]))
+from scripts.module_stubs import stubbed  # noqa: E402
 import types
 import unittest
 from datetime import date, timedelta
@@ -10,6 +13,7 @@ from fastapi.testclient import TestClient  # must be imported before any stubs
 
 
 def _load_module(configured=False):
+    _stubs = {}
     for key in list(sys.modules.keys()):
         if "calendar_service" in key:
             del sys.modules[key]
@@ -17,11 +21,11 @@ def _load_module(configured=False):
     # Stub caldav + icalendar so the module loads without real deps
     caldav_stub = types.ModuleType("caldav")
     caldav_stub.DAVClient = object
-    sys.modules["caldav"] = caldav_stub
+    _stubs["caldav"] = caldav_stub
 
     ical_stub = types.ModuleType("icalendar")
     ical_stub.Calendar = object
-    sys.modules["icalendar"] = ical_stub
+    _stubs["icalendar"] = ical_stub
 
     runtime = types.ModuleType("common.runtime")
     runtime.setup_json_logger = lambda *_, **__: __import__("logging").getLogger("cal-test")
@@ -31,7 +35,7 @@ def _load_module(configured=False):
         "snapshot": lambda self: {},
     })
     sys.modules.setdefault("common", types.ModuleType("common"))
-    sys.modules["common.runtime"] = runtime
+    _stubs["common.runtime"] = runtime
 
     if configured:
         os.environ["CALDAV_URL"] = "https://caldav.example.com"
@@ -47,7 +51,8 @@ def _load_module(configured=False):
         "/home/user/kai-system/calendar-service/app.py",
     )
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    with stubbed(_stubs):
+        spec.loader.exec_module(mod)
     return mod
 
 

@@ -1,6 +1,9 @@
 """Tests for git-watcher service."""
 import importlib.util
 import sys
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parents[1]))
+from scripts.module_stubs import stubbed  # noqa: E402
 import types
 import unittest
 
@@ -8,6 +11,7 @@ from fastapi.testclient import TestClient  # must be imported before any stubs
 
 
 def _load_module():
+    _stubs = {}
     for key in list(sys.modules.keys()):
         if "git_watcher" in key:
             del sys.modules[key]
@@ -20,14 +24,15 @@ def _load_module():
         "snapshot": lambda self: {},
     })
     sys.modules.setdefault("common", types.ModuleType("common"))
-    sys.modules["common.runtime"] = runtime
+    _stubs["common.runtime"] = runtime
 
     spec = importlib.util.spec_from_file_location(
         "git_watcher",
         "/home/user/kai-system/git-watcher/app.py",
     )
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    with stubbed(_stubs):
+        spec.loader.exec_module(mod)
     return mod
 
 

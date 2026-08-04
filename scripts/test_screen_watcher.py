@@ -3,6 +3,9 @@ from __future__ import annotations
 
 import importlib.util
 import sys
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parents[1]))
+from scripts.module_stubs import stubbed  # noqa: E402
 import types
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
@@ -44,11 +47,12 @@ def _make_httpx_stub(screenshot_bytes=b"\x89PNG\r\n" + b"\x00" * 100):
 
 
 def _load_module(monkeypatch):
+    _stubs = {}
     mod_name = "screen_watcher_app"
     if mod_name in sys.modules:
         del sys.modules[mod_name]
 
-    sys.modules["httpx"] = _make_httpx_stub()
+    _stubs["httpx"] = _make_httpx_stub()
 
     monkeypatch.setenv("PORT", "8036")
     monkeypatch.setenv("WATCH_INTERVAL_SECONDS", "10")
@@ -59,7 +63,8 @@ def _load_module(monkeypatch):
         Path(__file__).parent.parent / "screen-watcher" / "app.py",
     )
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    with stubbed(_stubs):
+        spec.loader.exec_module(mod)
     return mod
 
 

@@ -1,6 +1,9 @@
 """Tests for weather-service."""
 import importlib.util
 import sys
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parents[1]))
+from scripts.module_stubs import stubbed  # noqa: E402
 from pathlib import Path
 import types
 import unittest
@@ -53,8 +56,6 @@ def _load_module():
                 setattr(httpx_stub, attr, getattr(real_httpx, attr))
     httpx_stub.AsyncClient = _AsyncClient
 
-    sys.modules["httpx"] = httpx_stub
-
     runtime = types.ModuleType("common.runtime")
     runtime.setup_json_logger = lambda *_, **__: __import__("logging").getLogger("weather-test")
     runtime.ErrorBudget = type("ErrorBudget", (), {
@@ -68,21 +69,22 @@ def _load_module():
     # which is how `common.http_hygiene` broke three suites at once.
     # Giving it the real package path means only what is explicitly
     # replaced below is stubbed; everything else resolves normally.
-    _common = sys.modules.setdefault("common", types.ModuleType("common"))
-    if not hasattr(_common, "__path__"):
+    _stubs = {"httpx": httpx_stub, "common.runtime": runtime}
+    if "common" not in sys.modules:
+        # The `common` stub must remain a *package*: without `__path__`,
+        # Python cannot resolve any `common.X` submodule.
+        _common = types.ModuleType("common")
         _common.__path__ = [str(Path(__file__).resolve().parents[1] / "common")]
-    sys.modules["common.runtime"] = runtime
+        _stubs["common"] = _common
 
     spec = importlib.util.spec_from_file_location(
         "weather_service",
-        "/home/user/kai-system/weather-service/app.py",
+        str(Path(__file__).resolve().parents[1] / "weather-service" / "app.py"),
     )
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-
-    # Restore real httpx for TestClient
-    if real_httpx:
-        sys.modules["httpx"] = real_httpx
+    # httpx was already restored by hand here; common.runtime was not.
+    with stubbed(_stubs):
+        spec.loader.exec_module(mod)
 
     return mod
 

@@ -8,6 +8,7 @@ Verifies:
 """
 import importlib.util
 import sys
+from pathlib import Path
 import types
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -28,7 +29,7 @@ def _make_httpx_stub():
     return stub, real_httpx
 
 
-def _install_common_stubs():
+def _common_stubs() -> dict:
     runtime = types.ModuleType("common.runtime")
     runtime.setup_json_logger = lambda *_, **__: __import__("logging").getLogger("test")
     runtime.ErrorBudget = type("ErrorBudget", (), {
@@ -50,9 +51,13 @@ def _install_common_stubs():
     runtime.INJECTION_RE = __import__("re").compile(r"(?!)")
     runtime.detect_device = lambda: "cpu"
     runtime.sanitize_string = lambda s: s
-    sys.modules.setdefault("common", types.ModuleType("common"))
-    sys.modules["common.runtime"] = runtime
-    return runtime
+    # Returns the stubs rather than installing them. Nothing calls this
+    # today; when something does, it must pass the result to
+    # scripts/module_stubs.stubbed() so the edit has an end.
+    stubs = {"common.runtime": runtime}
+    if "common" not in sys.modules:
+        stubs["common"] = types.ModuleType("common")
+    return stubs
 
 
 class TestWorldContextFiltering(unittest.TestCase):
@@ -141,7 +146,7 @@ class TestSkillMatchingRegistered(unittest.TestCase):
 
     def _import_router(self):
         spec = importlib.util.spec_from_file_location(
-            "router", "/home/user/kai-system/agentic/router.py"
+            "router", str(Path(__file__).resolve().parents[1] / "agentic" / "router.py")
         )
         mod = importlib.util.module_from_spec(spec)
         sys.modules["router"] = mod  # required for dataclass __module__ resolution

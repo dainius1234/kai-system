@@ -3,6 +3,9 @@ from __future__ import annotations
 
 import importlib.util
 import sys
+from pathlib import Path as _P
+sys.path.insert(0, str(_P(__file__).resolve().parents[1]))
+from scripts.module_stubs import stubbed  # noqa: E402
 import time
 import types
 import uuid
@@ -79,10 +82,9 @@ def _load_module(monkeypatch, with_feedparser=True):
     if mod_name in sys.modules:
         del sys.modules[mod_name]
 
-    sys.modules["httpx"] = _make_httpx_stub()
-
+    stubs = {"httpx": _make_httpx_stub()}
     if with_feedparser:
-        sys.modules["feedparser"] = _make_feedparser_stub()
+        stubs["feedparser"] = _make_feedparser_stub()
     elif "feedparser" in sys.modules:
         del sys.modules["feedparser"]
 
@@ -94,7 +96,11 @@ def _load_module(monkeypatch, with_feedparser=True):
         Path(__file__).parent.parent / "news-feed" / "app.py",
     )
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    # `httpx` is a real, installed library. Replacing it permanently
+    # here broke every TestClient in every suite collected after this
+    # one. See scripts/module_stubs.py.
+    with stubbed(stubs):
+        spec.loader.exec_module(mod)
     return mod
 
 
