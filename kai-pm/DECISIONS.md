@@ -4534,3 +4534,100 @@ it. Closing it before that would be closing on an expectation.
 `cortex/app.py`, `gate_registry.py`, `assertion_floors.json`,
 `test_isolation_baseline.json`, `Makefile`, `python-app.yml`,
 `INSTRUMENTATION_ARCHITECTURE.md`.
+
+---
+
+## 2026-08-04 — CI is green. KAI-GATE-019 closed on evidence.
+
+**Run 30939788411, commit `e17bc46`. All ten steps success:**
+
+```
+ 5. Lint with flake8                       success
+ 6. Dependency vulnerability scan          success
+ 7. Test with pytest (coverage gate)       success   3m 08s
+ 8. Repo-wide suite floor (KAI-GATE-020)   success
+ 9. Cross-file test isolation (A-05)       success
+10. Test dashboard (CWD=dashboard/)        success
+```
+
+4,246 passed, 0 failed, 0 errors, coverage 81.6% against a 60% gate.
+
+This morning that job executed **zero** tests, and had done for at least a
+week. Steps 8, 9 and 10 had never run at all.
+
+### Nine layers, in the order they surfaced
+
+Each was found only because the one beneath it was fixed. None of them
+was noise, and — this is the point — **not one was reproducible on the
+machine that produced it.**
+
+| | | |
+|---|---|---|
+| 1 | Collection aborted | `sys.modules["common"]` replaced by one file; five later files failed to import, all passing alone |
+| 2 | `main`-only trigger | the branch the work happens on could not observe the result |
+| 3 | flake8 ahead of the tests | the job died at lint, so "CI is red" said nothing about the suite |
+| 4 | my own broken edit | a loader inserted inside a function body; two endpoint tests became vacuous passes |
+| 5 | partial OpenCV | `except ImportError` survives an absent package, not an incomplete one; the vision service died at import |
+| 6 | **SIGSEGV** | memu-core loads an embedding model at module scope; CI has sentence-transformers, and torch + CUDA bindings on a GPU-less runner killed the process |
+| 7 | `yfinance` replaced | installed in CI, absent here, so the same code *replaced* a real module there and merely *added* a stub here |
+| 8 | 42 failures | `/home/user/kai-system` hardcoded 13 times; `/vault` creatable only by root; a test rewriting the repo's own `data/SOUL.md` |
+| 9 | a single-environment baseline | the isolation ratchet could not describe two machines at once |
+
+### What that says about the day
+
+The through-line is not "tests were broken". It is that **every one of
+these was invisible from here by construction.** The absolute paths only
+fail elsewhere. The `ImportError` guard is correct when the package is
+absent, which it is here. The segfault needs a package this machine does
+not have. `/vault` is creatable because this container runs as root. The
+`SOUL.md` corruption was masked by `git checkout -- data/` having become
+a reflex between local runs.
+
+A test suite that is green on one machine and has never run anywhere else
+is not evidence about the software. It is evidence about the machine.
+
+### What now holds it
+
+Three ratchets, each falsifiable along a different axis:
+
+  - **`check_assertion_floors.py`** — per-suite assertion counts (2,209
+    across 34 suites) may only rise.
+  - **`check_test_isolation.py`** — no real module may be left replaced
+    (zero, enforced, undeclarable); `added`/`env_set` ratchet down from a
+    baseline that records the highest value seen on *any* machine.
+  - **`check_suite_floor.py`** — the repo-wide result: failures and
+    errors may not rise, and the pass count may not fall, because
+    otherwise deleting a test would be a way to go green.
+
+Plus `lint-blocking` in `policy-check`, so the step CI runs *first* is
+also the step I run first; and the twenty-module import block in
+`conftest.py`, verified by running the whole suite with a landmine module
+for each.
+
+### Corrections made along the way
+
+Three things I stated and later had to withdraw, recorded because the
+withdrawals were the useful part:
+
+  - *"CI is failing for the right reason now — real test failures."*
+    Wrong twice. It was dying at lint; the test step had never run.
+  - *"`common/service_auth.py` may cache the token at import."* Checked:
+    it does not. The 503s were the event loop, not auth.
+  - A delta-debugger that named `test_agentic_routes` as a culprit on a
+    predicate that could not distinguish "the target failed" from "the run
+    reported a failure" — and a corrected version that then read an
+    *interrupted* collection as zero failures. A fail-open in the tool
+    built to find fail-opens.
+
+### Register
+
+**`KAI-GATE-019` CLOSED** — evidence above; the claim was that CI runs the
+tests and reports on them, and it now has.
+
+**`KAI-GATE-020` remains CLOSED** — 0 failed, 0 errors, defended by the
+suite floor.
+
+**Still open, unchanged:** `KAI-GATE-016` is answered as a side effect —
+the workflows parse and run. `KAI-GATE-002/003/004` remain OPEN as
+recorded. Programme Rule 7 applies: no other count moves without its own
+evidence-backed closure review.
