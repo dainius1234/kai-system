@@ -18,10 +18,15 @@ from typing import Any, Dict
 try:
     import yaml  # type: ignore[import-untyped]
 
-    def _load_yaml(path: Path) -> Dict[str, Any]:
-        return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    # Resolved here, not inside the function: an incomplete pyyaml would
+    # otherwise import fine, let `_load_yaml` be defined, and fail at the
+    # first call — long after the fallback below could have been chosen.
+    _safe_load = yaml.safe_load
 
-except ImportError:
+    def _load_yaml(path: Path) -> Dict[str, Any]:
+        return _safe_load(path.read_text(encoding="utf-8")) or {}
+
+except Exception:
     import json
 
     def _load_yaml(path: Path) -> Dict[str, Any]:  # type: ignore[misc]

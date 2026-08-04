@@ -55,7 +55,13 @@ def has_cuda() -> bool:
     try:
         import torch
         return torch.cuda.is_available()
-    except ImportError:
+    except Exception:
+        # Not just ImportError. A capability *probe* must never raise: a
+        # torch build without `.cuda`, or one that raises while
+        # initialising a driver, would otherwise propagate out of a
+        # function whose whole contract is to answer True or False.
+        # Same shape as the OpenCV guard in perception/vision/app.py,
+        # which CI found by dying at import.
         pass
 
     return False
