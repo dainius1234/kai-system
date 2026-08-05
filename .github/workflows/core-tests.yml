@@ -242,13 +242,15 @@ jobs:
       - name: Build the images the bring-up needs
         run: |
           set -o pipefail
-          docker compose -f docker-compose.minimal.yml build 2>&1 | tail -40
+          docker compose -f docker-compose.minimal.yml build 2>&1 \
+            | tee /tmp/build-minimal.log | tail -40
           df -h / | tail -1
 
       - name: Build full stack Docker images
         run: |
           set -o pipefail
-          docker compose -f docker-compose.full.yml build 2>&1 | tail -40
+          docker compose -f docker-compose.full.yml build 2>&1 \
+            | tee /tmp/build-full.log | tail -40
           df -h / | tail -1
 
       # ci-toleration: needs-owner
@@ -499,8 +501,12 @@ jobs:
           echo "── minimal compose config parses? ──"
           docker compose -f docker-compose.minimal.yml config -q 2>&1 \
             && echo "config: VALID" || echo "config: INVALID"
+          echo "── the minimal image build (its real output) ──"
+          tail -25 /tmp/build-minimal.log 2>/dev/null || echo "(did not run)"
+          echo "── the full image build (its real output) ──"
+          tail -8 /tmp/build-full.log 2>/dev/null || echo "(did not run)"
           echo "── what the bring-up itself said (its real output) ──"
-          tail -30 /tmp/bringup.log 2>/dev/null || echo "(no bring-up log)"
+          tail -20 /tmp/bringup.log 2>/dev/null || echo "(did not run)"
           echo "── containers (all states) ──"
           docker compose -f docker-compose.minimal.yml ps -a 2>/dev/null \
             | head -12 || true
