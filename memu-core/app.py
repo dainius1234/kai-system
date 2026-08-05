@@ -26,7 +26,8 @@ from typing import Any, Deque, Dict, List, Optional, Protocol, runtime_checkable
 from fastapi import Body, FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from common.degraded import degradation_report, degraded_response, record_degradation
+from common.degraded import (degradation_report, degraded_partial,
+                            degraded_response, record_degradation)
 from common.http_hygiene import bounded_json
 from common.runtime import AuditStream, ErrorBudget, detect_device, redact_pii, sanitize_string, setup_json_logger
 
@@ -4353,16 +4354,16 @@ async def full_proactive_scan() -> Dict[str, Any]:
     all_nudges.sort(key=lambda x: -x.get("urgency", 0))
 
     result: Dict[str, Any] = {
-        "status": "degraded" if degraded_sources else "ok",
+        "status": "ok",
         "nudge_count": len(all_nudges),
         "nudges": all_nudges[:10],
     }
     if degraded_sources:
-        # Partial, not total: the sources that answered are still here.
-        # 200 is deliberate — four working sources are a usable answer —
-        # but no consumer can now read this as a complete scan.
-        result["degraded"] = True
-        result["degraded_sources"] = degraded_sources
+        # Partial, not total: the sources that answered are still here,
+        # and 200 is deliberate because four working sources are a usable
+        # answer. `degraded_partial` will not let this be marked degraded
+        # without naming what failed.
+        return degraded_partial(result, missing=degraded_sources)
     return result
 
 
@@ -4705,13 +4706,10 @@ async def proactive_greeting() -> Dict[str, Any]:
     _last_greeting = now
     _last_nudge_by_type["greeting"] = now
 
-    return {
-        "status": "degraded" if degraded_sources else "ok",
-        "greeting": " ".join(parts),
-        "timestamp": now,
-        **({"degraded": True, "degraded_sources": degraded_sources}
-           if degraded_sources else {}),
-    }
+    greeting = {"status": "ok", "greeting": " ".join(parts), "timestamp": now}
+    if degraded_sources:
+        return degraded_partial(greeting, missing=degraded_sources)
+    return greeting
 
 
 @app.get("/memory/check-in")
@@ -4753,13 +4751,11 @@ async def proactive_check_in() -> Dict[str, Any]:
     if not messages:
         # "nothing_to_say" is a claim about the operator. If a source
         # failed, the truthful claim is "nothing could be read".
-        return {
-            "status": "degraded" if degraded_sources else "ok",
-            "check_in": None,
-            "reason": "source_unavailable" if degraded_sources else "nothing_to_say",
-            **({"degraded": True, "degraded_sources": degraded_sources}
-               if degraded_sources else {}),
-        }
+        if degraded_sources:
+            return degraded_partial(
+                {"status": "ok", "check_in": None, "reason": "source_unavailable"},
+                missing=degraded_sources)
+        return {"status": "ok", "check_in": None, "reason": "nothing_to_say"}
 
     _last_check_in = now
     _last_nudge_by_type["check_in"] = now
@@ -4970,14 +4966,16 @@ async def submit_feedback(req: FeedbackRequest) -> Dict[str, Any]:
         # The rating was accepted but the durable signal it was supposed
         # to create did not land. Saying "boost" here would be a lie the
         # caller has no way to detect.
-        return {
-            "status": "degraded",
-            "degraded": True,
-            "rating": req.rating,
-            "effect": "not_persisted",
-            "reason": "feedback recorded in memory but the durable write failed",
-            "total_feedback": len(_feedback_store),
-        }
+        return degraded_partial(
+            {
+                "status": "ok",
+                "rating": req.rating,
+                "effect": "not_persisted",
+                "reason": "feedback recorded in memory but the durable write failed",
+                "total_feedback": len(_feedback_store),
+            },
+            missing=["memory_store"],
+        )
     return {
         "status": "ok",
         "rating": req.rating,
@@ -7436,9 +7434,7 @@ async def morning_briefing() -> Dict[str, Any]:
 
     _p21_append_capped(briefing, _briefing_log.maxlen or 50)
     if degraded_sources:
-        briefing["status"] = "degraded"
-        briefing["degraded"] = True
-        briefing["degraded_sources"] = degraded_sources
+        return degraded_partial(briefing, missing=degraded_sources)
     return briefing
 
 

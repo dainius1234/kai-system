@@ -145,3 +145,138 @@ class TestIdempotency(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestParkingIsIdempotent(unittest.TestCase):
+    """H-6: a retry must not park a second co-sign entry.
+
+    The gate executes nothing — it decides and parks. So a duplicate
+    *decision* is cheap, and a duplicate *park* is not: two entries for
+    one intent means the operator can confirm the same destructive
+    action twice, and neither confirmation looks wrong from the inside.
+
+    Both park sites used to write `_pending_cosign[entry.request_id]`
+    directly, so a retry landed a second entry under a new request_id.
+    """
+
+    def setUp(self):
+        mod._idempotency_cache.clear()
+        mod._pending_cosign.clear()
+        mod._pending_by_idem.clear()
+        mod.SEEN_NONCES.clear()
+        mod._idem_mark(True)
+
+    def _park(self, idem, nonce):
+        """Force the co-sign path with a conviction below the threshold."""
+        payload = _make_request(0.5, idem_key=idem, nonce=nonce)
+        return client.post("/gate/request", json=payload, headers=AUTH_HEADER)
+
+    def test_a_retry_reuses_the_existing_park(self):
+        self._park("park-idem-1", "nonce-p1")
+        first = dict(mod._pending_cosign)
+        assert len(first) == 1, first
+
+        # Same idempotency key, fresh nonce — a genuine retry. The
+        # decision cache is cleared so the request is re-evaluated, which
+        # is what a retry landing on another replica would do.
+        mod._idempotency_cache.clear()
+        self._park("park-idem-1", "nonce-p2")
+        assert len(mod._pending_cosign) == 1, mod._pending_cosign
+        assert set(mod._pending_cosign) == set(first), (mod._pending_cosign, first)
+
+    def test_distinct_intents_still_park_separately(self):
+        """The fix must not collapse two genuinely different requests."""
+        self._park("park-idem-a", "nonce-pa")
+        mod._idempotency_cache.clear()
+        self._park("park-idem-b", "nonce-pb")
+        assert len(mod._pending_cosign) == 2, mod._pending_cosign
+
+    def test_a_request_without_a_key_is_unaffected(self):
+        """No idempotency key means no claim of sameness — park each."""
+        self._park(None, "nonce-n1")
+        self._park(None, "nonce-n2")
+        assert len(mod._pending_cosign) == 2, mod._pending_cosign
+
+    def test_confirming_drops_the_reverse_index(self):
+        """Otherwise a later retry resolves to an already-confirmed park —
+        the double-approval arriving by the back door."""
+        self._park("park-idem-c", "nonce-pc")
+        rid = next(iter(mod._pending_cosign))
+        resp = client.post("/gate/cosign",
+                           json={"request_id": rid, "approved": True, "reason": "ok"},
+                           headers=AUTH_HEADER)
+        assert resp.status_code == 200, resp.text
+        assert "park-idem-c" not in mod._pending_by_idem, mod._pending_by_idem
+
+
+class TestIrreversibleNeedsSharedIdempotency(unittest.TestCase):
+    """H-6: scoped by blast radius, not applied to everything.
+
+    A reversible tool has no park to duplicate, so a Redis blip costs it
+    nothing and it keeps working. An irreversible one is refused, but
+    only after the grace window — a 200ms blip must not reject a call
+    that would have succeeded.
+    """
+
+    def setUp(self):
+        mod._idempotency_cache.clear()
+        mod._pending_cosign.clear()
+        mod._pending_by_idem.clear()
+        mod.SEEN_NONCES.clear()
+        mod._idem_mark(True)
+
+    def tearDown(self):
+        mod._idem_mark(True)
+
+    def _shell_request(self, nonce):
+        now = time.time()
+        return {
+            "tool": "shell", "actor_did": "agentic", "session_id": AUTH_TOKEN,
+            "conviction": 9.9, "nonce": nonce, "ts": now,
+            "signature": sign_gate_request(
+                actor_did="agentic", session_id=AUTH_TOKEN, tool="shell",
+                nonce=nonce, ts=now),
+        }
+
+    def test_healthy_store_permits_an_irreversible_request(self):
+        mod.TOKEN_SCOPES[AUTH_TOKEN] = {"executor", "shell"}
+        resp = client.post("/gate/request", json=self._shell_request("nonce-s0"),
+                           headers=AUTH_HEADER)
+        assert resp.status_code == 200, resp.text
+
+    def test_a_brief_blip_does_not_refuse(self):
+        """Inside the grace window the call proceeds."""
+        mod.TOKEN_SCOPES[AUTH_TOKEN] = {"executor", "shell"}
+        mod._idem_mark(False)  # failed just now
+        resp = client.post("/gate/request", json=self._shell_request("nonce-s1"),
+                           headers=AUTH_HEADER)
+        assert resp.status_code == 200, resp.text
+
+    def test_a_sustained_outage_refuses_the_irreversible_action(self):
+        mod.TOKEN_SCOPES[AUTH_TOKEN] = {"executor", "shell"}
+        mod._idem_mark(False)
+        mod._idem_shared_failed_at = time.time() - (mod._IDEM_GRACE_SECONDS + 1)
+        resp = client.post("/gate/request", json=self._shell_request("nonce-s2"),
+                           headers=AUTH_HEADER)
+        assert resp.status_code == 503, resp.text
+        assert resp.json()["detail"]["reason_code"] == "IDEMPOTENCY_STORE_UNAVAILABLE"
+
+    def test_a_reversible_tool_is_unaffected_by_the_same_outage(self):
+        """The whole point of scoping this by blast radius."""
+        mod._idem_mark(False)
+        mod._idem_shared_failed_at = time.time() - (mod._IDEM_GRACE_SECONDS + 1)
+        resp = client.post("/gate/request",
+                           json=_make_request(9.5, nonce="nonce-r1"),
+                           headers=AUTH_HEADER)
+        assert resp.status_code == 200, resp.text
+
+    def test_recovery_lifts_the_refusal(self):
+        mod.TOKEN_SCOPES[AUTH_TOKEN] = {"executor", "shell"}
+        mod._idem_mark(False)
+        mod._idem_shared_failed_at = time.time() - (mod._IDEM_GRACE_SECONDS + 1)
+        assert mod._shared_idem_unavailable()
+        mod._idem_mark(True)
+        assert not mod._shared_idem_unavailable()
+        resp = client.post("/gate/request", json=self._shell_request("nonce-s3"),
+                           headers=AUTH_HEADER)
+        assert resp.status_code == 200, resp.text

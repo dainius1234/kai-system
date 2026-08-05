@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from common.degraded import (
     DEGRADED_STATUS_CODE,
+    degraded_partial,
     STATUS_UNAVAILABLE,
     degradation_report,
     degraded_body,
@@ -340,6 +341,62 @@ def test_concurrent_records_do_not_lose_counts():
     reset_degradations()
 
 
+# ── Partial degradation (H-6) ────────────────────────────────────────
+#
+# The 503 rule governs a read with no usable data. A read that got four
+# of five sources is different: 503 would throw the four away. This is
+# the deliberate exception, and the guard below is what stops it being
+# the `degraded_ok()` this module refuses to have.
+
+
+def test_partial_keeps_the_usable_data():
+    body = degraded_partial({"nudges": [1, 2, 3], "count": 3}, missing=["drift"])
+    check("real data survives", body["nudges"] == [1, 2, 3], str(body))
+    check("and its shape", body["count"] == 3, str(body))
+
+
+def test_partial_names_what_failed():
+    body = degraded_partial({"x": 1}, missing=["drift", "goals"])
+    check("marked degraded", body["degraded"] is True, str(body))
+    check("sources named", body["degraded_sources"] == ["drift", "goals"], str(body))
+    check("timestamped", body["observed_at"].endswith("+00:00"), str(body))
+
+
+def test_partial_refuses_to_hide_an_unnamed_failure():
+    """The whole reason this helper is allowed to exist.
+
+    `degraded_ok()` was refused because a helper that marks a response
+    degraded without saying what failed is a way to stop thinking. An
+    empty `missing` raises rather than producing a vague envelope.
+    """
+    raised = False
+    try:
+        degraded_partial({"x": 1}, missing=[])
+    except ValueError:
+        raised = True
+    check("an empty missing-list is refused", raised)
+
+    raised = False
+    try:
+        degraded_partial({"x": 1})  # type: ignore[call-arg]
+    except TypeError:
+        raised = True
+    check("missing is required, not optional", raised)
+
+
+def test_partial_is_detected_by_is_degraded():
+    """A partial result must not be folded into an aggregate as if whole
+    — the KAI-DASH-062 failure mode."""
+    check("is_degraded sees it",
+          is_degraded(degraded_partial({"x": 1}, missing=["y"])))
+
+
+def test_partial_does_not_mutate_the_caller_body():
+    original = {"nudges": []}
+    degraded_partial(original, missing=["drift"])
+    check("caller's dict is untouched", original == {"nudges": []}, str(original))
+
+
 def run() -> None:
     test_body_carries_every_marker()
     test_shape_is_preserved_so_adopting_this_breaks_nothing()
@@ -366,6 +423,11 @@ def run() -> None:
     test_logging_is_rate_limited()
     test_the_log_line_is_machine_parseable()
     test_concurrent_records_do_not_lose_counts()
+    test_partial_keeps_the_usable_data()
+    test_partial_names_what_failed()
+    test_partial_refuses_to_hide_an_unnamed_failure()
+    test_partial_is_detected_by_is_degraded()
+    test_partial_does_not_mutate_the_caller_body()
     reset_degradations()
 
 

@@ -47,6 +47,17 @@ mechanism that actually decides the answer.
 
 Exit 0 = nothing replaced, and the declared leakage has not grown.
 Exit 1 = something replaced, leakage grew, or the report is unreadable.
+
+**A limitation, accepted deliberately.** `added` and `env_set` are
+baselined at the per-file maximum across environments, so the ratchet on
+those two is only as tight as the loosest environment: a file leaking 0
+locally and 5 in CI is recorded at 5, and a genuine new local leak of
+1..5 passes. `replaced` is the invariant that matters — it is 0 and
+enforced everywhere, and it is the class that took the whole suite down.
+Tightening `added` would need per-environment baselines keyed on a
+package fingerprint, where a new fingerprint silently creates a new
+un-ratcheted environment: the same hole wearing a hat. The real fix is
+to make the environments match so the baselines converge.
 """
 from __future__ import annotations
 

@@ -1708,8 +1708,19 @@ async def _sense_world() -> str:
         return ""
 
     blind: List[str] = []
+    attempted: List[str] = []
+
+    def _attempt(label: str) -> None:
+        """Count a source at the point it is read.
+
+        The denominator is derived, never typed. A count written beside
+        the list it describes drifts the moment a source is added — the
+        defect that has cost this repository four detectors this week.
+        """
+        attempted.append(label)
 
     async def _fetch_summary(base: str, path: str, label: str) -> Optional[str]:
+        _attempt(label)
         try:
             async with pooled_client(timeout=2.0) as client:
                 r = await client.get(f"{base}{path}")
@@ -1753,6 +1764,7 @@ async def _sense_world() -> str:
 
     # FF_VAULT_CONTEXT: inject a vault memory snippet into world context
     if is_enabled("VAULT_CONTEXT"):
+        _attempt("Vault")
         try:
             async with pooled_client(timeout=2.0) as client:
                 r = await client.get(f"{VAULT_SYNC_URL}/search", params={"query": "recent", "limit": 1})
@@ -1764,8 +1776,10 @@ async def _sense_world() -> str:
                             lines.append(f"Vault (recent note): {title}")
         except Exception as _exc:
             record_degradation("vault_sync", "sense_world", _exc)
+            blind.append("Vault")
 
     # Screen activity — sense what the operator is looking at
+    _attempt("Screen")
     try:
         async with pooled_client(timeout=2.0) as client:
             r = await client.get(f"{SCREEN_WATCHER_URL}/status")
@@ -1776,8 +1790,10 @@ async def _sense_world() -> str:
                     lines.append(f"Screen: active, change score {diff:.2f}")
     except Exception as _exc:
         record_degradation("screen_watcher", "sense_world", _exc)
+        blind.append("Screen")
 
     # Clipboard — sense what the operator just copied
+    _attempt("Clipboard")
     try:
         async with pooled_client(timeout=2.0) as client:
             r = await client.get(f"{CLIPBOARD_SERVICE_URL}/latest")
@@ -1787,8 +1803,10 @@ async def _sense_world() -> str:
                     lines.append(f"Clipboard: {content[:120]}")
     except Exception as _exc:
         record_degradation("clipboard_service", "sense_world", _exc)
+        blind.append("Clipboard")
 
     # Cortex — pre-interpreted situational awareness (prepended so it reads first)
+    _attempt("Cortex")
     try:
         async with pooled_client(timeout=1.5) as client:
             r = await client.get(f"{CORTEX_URL}/state")
@@ -1825,13 +1843,33 @@ async def _sense_world() -> str:
                 get_cortex().feed_service_state(cs)
     except Exception as _exc:
         record_degradation("cortex", "sense_world", _exc)
+        blind.append("Cortex")
 
     if blind:
-        # Named, not counted, and phrased so the model cannot read it as
-        # an observation. "Weather could not be read" and "the weather is
-        # unremarkable" must not arrive as the same prompt.
-        lines.append("UNAVAILABLE — could not be read this turn, do not "
-                     "assume quiet: " + ", ".join(sorted(set(blind))))
+        # Stated as an observation, never as an instruction.
+        #
+        # The first version ended "...do not assume quiet". That is a
+        # directive to the model sitting inside an otherwise factual
+        # list, and with one sensor down among nine it would have made
+        # Kai hedge about the eight that answered: "the weather is
+        # sunny, but I shouldn't assume it's quiet". Hedging on good
+        # data is a worse failure than the silence this replaced.
+        #
+        # "unavailable" and "status is unknown" carry the uncertainty on
+        # their own. The model does not need to be told what to conclude.
+        #
+        # Count *and* names: the count gives the magnitude at a glance —
+        # 9 of 9 means the world is entirely unobserved, 1 of 9 means
+        # carry on with the other eight — and the names say which.
+        #
+        # No threshold. Any failed read is reported, every time. The
+        # question is not "is this worth mentioning" but "was the read
+        # successful", and the answer is always given truthfully.
+        missing = sorted(set(blind))
+        lines.append(
+            f"{len(missing)} of {len(attempted)} sources unavailable: "
+            f"{', '.join(missing)}. Their status is unknown."
+        )
 
     if not lines:
         return ""

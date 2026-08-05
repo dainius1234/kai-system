@@ -24,8 +24,24 @@ stays `{"nudges": [], "degraded": true, ...}`). That is not politeness to
 the UI: it means adopting this cannot silently break a panel into
 throwing, which would have been a second outage dressed as a fix.
 
-There is deliberately no `degraded_ok()` helper returning 200. Every use
-site should have to think about it.
+**Full versus partial.** The 503 rule above governs a read with *no
+usable data*. A read that got four of five sources is a different
+animal: throwing the four away because the fifth is down destroys real
+value, and answering 503 would do exactly that.
+
+So `degraded_partial()` returns **200** with `degraded: true` and an
+explicit `degraded_sources` list. What keeps that from becoming the
+`degraded_ok()` this module refuses to have is that it *cannot be called
+without naming what is missing* — an empty list raises. There is no way
+to spell "something went wrong but I would rather not say" with it.
+
+  - no usable data          -> `degraded_response()`, 503
+  - some sources answered   -> `degraded_partial()`, 200 + named sources
+
+Added in H-6 after four endpoints in `memu-core` were found combining
+several sources behind `except Exception: pass` and returning
+`{"status": "ok", "nudge_count": 0}` with every one of them down —
+character-identical to a healthy system with nothing to say.
 """
 from __future__ import annotations
 
@@ -83,6 +99,40 @@ def degraded_response(
         status_code=status_code,
         content=degraded_body(source, reason, shape),
     )
+
+
+def degraded_partial(
+    body: Mapping[str, Any],
+    *,
+    missing: Any,
+    status: str = "degraded",
+) -> Dict[str, Any]:
+    """A 200-shaped body that admits which sources it could not read.
+
+    For an aggregate whose remaining sources produced a real answer. The
+    caller keeps everything that worked and learns, in a machine-readable
+    field, what it is missing.
+
+    `missing` is required and may not be empty. That is the entire reason
+    this is safe to have: `degraded_ok()` was refused because a helper
+    that lets you mark a response degraded without saying what failed is
+    a way to stop thinking. This one makes you name it, or it raises.
+    """
+    names = [str(m) for m in missing]
+    if not names:
+        raise ValueError(
+            "degraded_partial() requires the sources that failed. If you "
+            "cannot name one, nothing is degraded — return the normal "
+            "body. If nothing usable was read, use degraded_response()."
+        )
+    out: Dict[str, Any] = dict(body)
+    out.update({
+        "status": status,
+        "degraded": True,
+        "degraded_sources": names,
+        "observed_at": _now_iso(),
+    })
+    return out
 
 
 def is_degraded(payload: Any) -> bool:

@@ -67,6 +67,51 @@ IRREVERSIBLE_CATEGORIES: Dict[str, Set[str]] = {
 IRREVERSIBLE_MIN_CONVICTION = float(os.getenv("IRREVERSIBLE_MIN_CONVICTION", "9.0"))
 
 
+def _forget_idem(info) -> None:
+    """Drop a park's reverse-index entry. Safe on None and on absence."""
+    if not info:
+        return
+    key = info.get("idempotency_key")
+    if key:
+        _pending_by_idem.pop(key, None)
+
+
+def _park_for_cosign(request, entry) -> str:
+    """Park a request for operator confirmation, once per idempotency key.
+
+    Returns the request_id that is now parked — the existing one if this
+    idempotency key already has a live park.
+
+    Both call sites used to write `_pending_cosign[entry.request_id]`
+    directly, so a retried request parked a *second* entry with a
+    different request_id. Two parked entries for one intent means the
+    operator can confirm the same destructive action twice, and the gate
+    has no way to know they were the same request. That is the actual
+    cost of losing idempotency here: the gate executes nothing, it
+    decides and parks, so a duplicate decision is cheap and a duplicate
+    park is not.
+
+    Within one process this is now exact. Across replicas it depends on
+    the shared store, which is why `gate_request` refuses irreversible
+    actions outright once that store has been unreachable past the grace
+    window.
+    """
+    idem = getattr(request, "idempotency_key", None)
+    if idem:
+        existing = _pending_by_idem.get(idem)
+        if existing and existing in _pending_cosign:
+            return existing
+    _pending_cosign[entry.request_id] = {
+        "request": request.model_dump(),
+        "entry": entry,
+        "parked_at": time.time(),
+        "idempotency_key": idem,
+    }
+    if idem:
+        _pending_by_idem[idem] = entry.request_id
+    return entry.request_id
+
+
 def _classify_irreversibility(tool: str) -> Optional[str]:
     """Return the irreversible category a tool belongs to, or None."""
     for category, tools in IRREVERSIBLE_CATEGORIES.items():
@@ -89,6 +134,41 @@ def _mode_conviction_offset(mode: str) -> float:
 
 # pending co-sign requests waiting for operator approval
 _pending_cosign: Dict[str, Dict[str, Any]] = {}
+
+# idempotency_key -> request_id, so a retried request finds the co-sign
+# entry it already parked instead of parking a second one. Two parked
+# entries for one intent means one destructive action can be confirmed
+# twice, which is the real cost of losing idempotency here — the gate
+# itself executes nothing, it decides and parks.
+_pending_by_idem: Dict[str, str] = {}
+
+# Whether the *shared* idempotency store answered last time it was asked.
+# The in-process fallback keeps a single replica correct; it cannot make
+# two replicas agree, and it is across replicas that a retry parks twice.
+_idem_shared_ok = True
+_idem_shared_failed_at = 0.0
+
+# How long the shared store may be unreachable before irreversible
+# actions are refused outright. Reversible tools are unaffected: they
+# carry no cosign park to duplicate, so the local cache is enough.
+_IDEM_GRACE_SECONDS = float(os.getenv("IDEM_GRACE_SECONDS", "5"))
+
+
+def _idem_mark(ok: bool) -> None:
+    global _idem_shared_ok, _idem_shared_failed_at
+    if ok:
+        _idem_shared_ok = True
+        _idem_shared_failed_at = 0.0
+    elif _idem_shared_ok:
+        _idem_shared_ok = False
+        _idem_shared_failed_at = time.time()
+
+
+def _shared_idem_unavailable() -> bool:
+    """True once the shared store has been down past the grace window."""
+    if _idem_shared_ok:
+        return False
+    return (time.time() - _idem_shared_failed_at) >= _IDEM_GRACE_SECONDS
 
 # idempotency cache — maps key → (GateDecision, expiry_timestamp)
 _IDEMPOTENCY_TTL = int(os.getenv("IDEMPOTENCY_TTL_SECONDS", "300"))
@@ -125,9 +205,11 @@ def _idem_get(key: str):
     if _redis_client:
         try:
             raw = _redis_client.get(f"idem:{key}")
+            _idem_mark(True)
             if raw:
                 return json.loads(raw)
         except Exception as _exc:
+            _idem_mark(False)
             record_degradation("redis", "idempotency_get", _exc)
     cached = _idempotency_cache.get(key)
     if cached:
@@ -143,7 +225,9 @@ def _idem_set(key: str, decision_dict: dict):
     if _redis_client:
         try:
             _redis_client.setex(f"idem:{key}", _IDEMPOTENCY_TTL, json.dumps(decision_dict))
+            _idem_mark(True)
         except Exception as _exc:
+            _idem_mark(False)
             record_degradation("redis", "idempotency_set", _exc)
     _idempotency_cache[key] = (decision_dict, time.time() + _IDEMPOTENCY_TTL)
     # prune stale in-memory entries
@@ -158,7 +242,9 @@ def _idem_evict(key: str):
     if _redis_client:
         try:
             _redis_client.delete(f"idem:{key}")
+            _idem_mark(True)
         except Exception as _exc:
+            _idem_mark(False)
             record_degradation("redis", "idempotency_evict", _exc)
     _idempotency_cache.pop(key, None)
 
@@ -496,11 +582,7 @@ class GatePolicy:
                     f"Irreversible ({category}) action requires conviction >= "
                     f"{IRREVERSIBLE_MIN_CONVICTION} and explicit confirmation.",
                 )
-                _pending_cosign[entry.request_id] = {
-                    "request": request.model_dump(),
-                    "entry": entry,
-                    "parked_at": time.time(),
-                }
+                _park_for_cosign(request, entry)
                 _cleanup_pending()
                 _send_notification(
                     f"[tool-gate] Irreversible action needs confirmation: tool={request.tool} "
@@ -526,11 +608,7 @@ class GatePolicy:
         elif request.tool in COSIGN_REQUIRED_TOOLS or request.conviction < COSIGN_CONVICTION_THRESHOLD:
             # high-risk tool or low conviction → park for human co-sign
             entry = ledger.append(request.model_dump(), False, "Pending human co-sign")
-            _pending_cosign[entry.request_id] = {
-                "request": request.model_dump(),
-                "entry": entry,
-                "parked_at": time.time(),
-            }
+            _park_for_cosign(request, entry)
             # clean up expired pending requests
             _cleanup_pending()
             # notify operator
@@ -571,7 +649,8 @@ def _cleanup_pending() -> None:
     expired = [rid for rid, info in _pending_cosign.items()
                if now - info.get("parked_at", 0) > COSIGN_TTL_SECONDS]
     for rid in expired:
-        _pending_cosign.pop(rid, None)
+        info = _pending_cosign.pop(rid, None)
+        _forget_idem(info)
         ledger.append({"request_id": rid}, False, "Co-sign request expired (TTL)")
         logger.info("Co-sign request expired: %s", rid[:12])
 
@@ -681,6 +760,37 @@ async def gate_request(request: GateRequest) -> GateDecision:
     if not _is_tool_allowed(request.session_id, request.tool):
         raise HTTPException(status_code=403, detail="Token not authorized for this tool")
     _validate_nonce_and_sig(request)
+
+    # H-6: an irreversible action needs a shared idempotency store.
+    #
+    # Losing it degrades this gate from cluster-wide idempotency to
+    # per-process. Within one replica a retry now reuses its parked
+    # co-sign entry; across replicas it cannot, so the same destructive
+    # intent parks twice under two request_ids and the operator can
+    # confirm it twice without either confirmation looking wrong.
+    #
+    # Scoped by blast radius rather than applied to everything, per the
+    # operator's rule. A reversible tool has no park to duplicate, so it
+    # keeps working on the local cache and a Redis blip costs nothing.
+    # Only the irreversible set is refused, and only after the grace
+    # window — a 200ms blip must not reject a call that would have
+    # succeeded.
+    if _classify_irreversibility(request.tool) is not None and _shared_idem_unavailable():
+        record_degradation("redis", "irreversible_refused_no_shared_idem",
+                           "shared idempotency store unreachable")
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "reason_code": "IDEMPOTENCY_STORE_UNAVAILABLE",
+                "message": (
+                    "Irreversible actions are refused while the shared "
+                    "idempotency store is unreachable: a retry could park "
+                    "a second confirmation for the same intent on another "
+                    "replica. Reversible tools are unaffected."
+                ),
+            },
+        )
+
     if request.device is None:
         request = request.model_copy(update={"device": DEVICE})
     decision = policy.evaluate(request)
@@ -781,6 +891,11 @@ async def cosign(action: CosignAction, request: Request) -> Dict[str, Any]:
     pending = _pending_cosign.pop(action.request_id, None)
     if pending is None:
         raise HTTPException(status_code=404, detail="Request not found or expired.")
+    # Drop the reverse index with the park, so a later retry of the same
+    # idempotency key does not resolve to a request that has already been
+    # confirmed — which would be the double-approval this exists to stop,
+    # arriving by the back door.
+    _forget_idem(pending)
 
     reason = f"Operator {'approved' if action.approved else 'denied'}: {sanitize_string(action.reason)}" if action.reason else (
         "Operator approved" if action.approved else "Operator denied"

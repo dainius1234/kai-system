@@ -1766,12 +1766,31 @@ class TestBlindSensesAreNamed:
             with patch.object(ag, "is_enabled", lambda name: name == "CONTEXT_ENRICHMENT"):
                 text = asyncio.run(ag._sense_world())
 
-        assert "UNAVAILABLE" in text, text
-        assert "do not" in text.lower(), text
-        # Named individually, so an operator (and the model) can tell
-        # which sense is missing rather than only that something is.
+        # Named individually, so the model can tell which sense is
+        # missing rather than only that something is...
         for label in ("Weather", "Calendar", "Docker"):
             assert label in text, f"{label} missing from: {text}"
+        # ...and counted, so it can tell one dead sensor from a wholly
+        # unobserved world without reading the list.
+        assert "sources unavailable" in text, text
+        assert "status is unknown" in text.lower(), text
+
+        # The denominator is derived from the sources actually attempted,
+        # so it can never be smaller than the number reported missing.
+        # A hand-written "of 9" beside a list of 13 is the drift this
+        # repository has paid for four times this week.
+        import re as _re
+        m = _re.search(r"(\d+) of (\d+) sources unavailable", text)
+        assert m, text
+        missing, total = int(m.group(1)), int(m.group(2))
+        assert 0 < missing <= total, text
+
+        # No instruction to the model. "do not assume quiet" told it what
+        # to conclude, and with one sensor down among nine that made it
+        # hedge about the eight that answered. "unavailable" and "status
+        # is unknown" carry the uncertainty without directing the answer.
+        assert "do not" not in text.lower(), text
+        assert "assume" not in text.lower(), text
 
     def test_a_blind_sense_is_recorded_for_the_operator_too(self):
         """Per-turn honesty in the prompt is not the same as an operator

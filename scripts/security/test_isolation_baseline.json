@@ -88,5 +88,6 @@
     }
   },
   "total_env_set": 36,
-  "total_added": 51
+  "total_added": 51,
+  "known_limitation": "The `added` and `env_set` ratchets are only as tight as the LOOSEST environment. A file that leaks 0 here and 5 in CI is baselined at 5, so a genuine new local leak of 1..5 in that file passes unnoticed. This is accepted, not overlooked. `replaced` is the load-bearing invariant \u2014 it is 0 and enforced everywhere, and it is the class that took the whole suite down. `added` is declared debt, and the marginal value of tightening it does not justify per-environment baselines keyed on a package fingerprint: a new fingerprint would silently create a new un-ratcheted environment, which is the same hole wearing a hat. The right way to close it is to make the environments match so the baselines converge, not to add machinery here. Revisit if a local-only leak is ever observed causing a problem."
 }

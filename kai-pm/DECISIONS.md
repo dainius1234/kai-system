@@ -5045,3 +5045,130 @@ the ones that do were written today by the same author as the fix. The
 `_sense_world` and `submit_feedback` paths have real failure-path tests;
 the other hundred-odd have a recorded call and a reviewer's eye. That is
 an improvement on `pass` and it is not proof.
+
+---
+
+## 2026-08-05 (part 5) — the five answers, applied
+
+Operator + second opinion answered all five. What changed, and where I
+was wrong.
+
+### Q1 — the sensory prompt: the imperative came out
+
+Verdict: the hedge-instruction was worse than the bug. "do not assume
+quiet" is a directive sitting inside an otherwise factual list, and with
+one sensor down among thirteen it would have made Kai hedge about the
+twelve that answered — "the weather is sunny, but I shouldn't assume
+it's quiet". Hedging on good data is a new defect, not a fix.
+
+Now, with everything down:
+
+    - 13 of 13 sources unavailable: Air quality, Broker, Calendar,
+      Clipboard, Cortex, Docker, Email, Git, News, Screen, System,
+      Vault, Weather. Their status is unknown.
+
+Count **and** names, per the answer: the count gives magnitude at a
+glance, the names say which. No instruction — "unavailable" and "status
+is unknown" carry the uncertainty without telling the model what to
+conclude. No threshold: every failed read is reported, because the
+question is not "is this worth mentioning" but "was the read
+successful".
+
+**A defect found while implementing it.** The line was going to read "of
+9" — the nine parallel `_fetch_summary` calls — while four further
+sources (Vault, Screen, Clipboard, Cortex) were read below and appended
+to the same `blind` list. Nine down and all four extra failing would
+have printed "13 of 9". The denominator is now built by an `_attempt()`
+call at each read site, so it cannot drift from the sources. Fifth
+instance this week of a count written beside the list it describes.
+
+### Q2 — tool-gate: my claim was wrong, and the fix changed
+
+I had written that losing the shared idempotency store means "a retried
+tool call fires the actuator twice". The operator asked what the
+worst-case double-fire actually was, which made me read the gate instead
+of my own summary.
+
+**The gate executes nothing.** `/gate/request` returns a `GateDecision`;
+the caller executes. A duplicate decision is cheap. What is not cheap is
+`evaluate()`'s side effects — `ledger.append`, `_send_notification`, and
+`_pending_cosign[entry.request_id] = ...`.
+
+So the real harm is a **duplicate co-sign park**: a retry lands a second
+parked entry under a different `request_id` for the same intent, and the
+operator can confirm the same destructive action twice with neither
+confirmation looking wrong from the inside.
+
+Blast radius, measured rather than assumed: `IRREVERSIBLE_TOOLS_JSON` is
+**never set anywhere in this repository** — not in compose, not in any
+env file, not in the Makefile — so the defaults stand:
+`{"destructive": ["shell"], "financial": [], "public": []}`. The
+allowlist is `{shell, qgis, n8n, noop, speak}`. **The financial category
+is empty and no financial tool is allowlisted**, so the financial
+exposure through this gate is currently zero. Worst case today is a
+duplicate `shell` confirmation.
+
+Two fixes, because they cover different failures:
+
+  - **`_park_for_cosign()`** — parking is now idempotent on the
+    idempotency key. Exact within a process, always, Redis or no Redis.
+  - **Irreversible actions refused past a grace window** when the shared
+    store is unreachable, because the per-process index cannot make two
+    replicas agree and it is across replicas that the second park
+    happens. Scoped by blast radius as the operator directed: a
+    reversible tool has no park to duplicate, so it keeps working and a
+    Redis blip costs it nothing. Grace default 5s, `IDEM_GRACE_SECONDS`.
+
+Both mutation-tested: reverting either makes exactly one test fail.
+
+**Raised, not fixed:** `n8n` is allowlisted and classified as neither
+destructive nor financial. It can run arbitrary workflows. Whether it
+belongs in `IRREVERSIBLE_TOOLS_JSON` is the operator's call, and the
+fact that the file is never set at all may itself be the finding.
+
+### Q3 — the isolation ratchet: leave it, and say so
+
+Verdict: option 1. `replaced` is the load-bearing invariant, at zero and
+enforced everywhere; `added` is declared debt. Per-environment baselines
+keyed on a package fingerprint would let a new fingerprint silently
+create a new un-ratcheted environment — the same hole wearing a hat —
+and the real fix is to make the environments match so the baselines
+converge.
+
+The limitation is now written into both the baseline file and the
+checker's docstring rather than left as something I happened to know:
+the `added`/`env_set` ratchet is only as tight as the loosest
+environment, and a local-only leak below CI's level passes.
+
+### Q4 — partial degradation: correct, and now has a helper
+
+Verdict: 200 with `degraded: true` and named sources is right. Full
+degradation stays 503. The prohibition was against a helper that lets
+you mark a response degraded *without saying what failed*.
+
+So `degraded_partial()` exists now, and the property that makes it safe
+is that **it raises on an empty `missing` list**. There is no way to
+spell "something went wrong but I would rather not say" with it. Five
+sites migrated off hand-rolled markers onto it. The module docstring
+states the full-versus-partial rule explicitly instead of leaving the
+503 rule to be read as absolute.
+
+### Q5 — closure survives a scope change
+
+Verdict: `KAI-GATE-022` stands as new debt; **H-2 and H-3 do not
+reopen**. Closure means "within the stated scope, remediated and
+structurally prevented from recurring within that scope". Reopening
+closed findings whenever measurement improves would make every future
+improvement retroactively invalidate past work, which is perverse.
+
+On `KAI-GATE-021`: closeable. The structural prevention is the ratchet
+that cannot rise, the survey that counts on every run, and the written
+rule for what makes a handler legitimate. Not every handler needs its
+own failure test — the handlers follow one shared pattern, and the
+pattern is what prevents the class. The closure record must say
+explicitly that prevention is *ratchet + rubric*, and that ~100 handlers
+carry reviewer-verified compliance rather than individual tests.
+
+I have not closed it in this entry. Rule 7 makes closure a separate
+evidence-backed action, and writing "closeable" in the same breath as
+doing the work is exactly the shortcut the rule exists to prevent.
