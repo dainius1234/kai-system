@@ -31,12 +31,28 @@ generated at run time, so it cannot collide with content produced after
 it. `$RANDOM`, `uuidgen` and `openssl rand` all qualify; a literal does
 not.
 
+**There is a second way to lose the delimiter, and the first version of
+this gate missed it.** With the random delimiter in place,
+`friday-cleanup.yml` failed again:
+
+    Matching delimiter not found 'EOF_60842258526385'
+
+The content was written with `printf "%b" "$list"`. `printf` appends no
+trailing newline, so the closing delimiter was glued onto the last line
+of content and never appeared as a line of its own. The delimiter was
+unique and still unfindable.
+
+Two distinct failure modes, one error message — and this gate passed the
+file while the workflow kept failing. So it now checks both: the
+delimiter must vary, **and** anything writing content into the block must
+end with a newline.
+
 Only `$GITHUB_OUTPUT` and `$GITHUB_ENV` are in scope. A heredoc feeding
 a command (`cat <<EOF`, `python - <<'PY'`) is a different construct with
 a different failure mode, and flagging it here would produce noise in
 exactly the files this gate is meant to keep readable.
 
-Exit 0 = every delimiter is generated.  Exit 1 = one is a constant.
+Exit 0 = every heredoc can close.  Exit 1 = one cannot.
 """
 from __future__ import annotations
 
@@ -60,6 +76,11 @@ _HEREDOC = re.compile(
 #: run time cannot have been present in output generated afterwards.
 _GENERATED = re.compile(r"\$")
 
+#: `printf` into a GitHub file command. Unlike `echo` it adds no trailing
+#: newline, so its format string has to carry one.
+_PRINTF = re.compile(
+    r"printf\s+(['\"])(.*?)\1[^>]*>>\s*\"?\$(?:GITHUB_OUTPUT|GITHUB_ENV)")
+
 
 def findings_in(text: str, filename: str) -> List[str]:
     out: List[str] = []
@@ -75,6 +96,19 @@ def findings_in(text: str, filename: str) -> List[str]:
             f"'{delimiter}'. Command output containing a line '{delimiter}' "
             f"leaves the block unclosed and the runner rejects the file. "
             f"Use a delimiter generated at run time.")
+
+    for line_no, line in enumerate(text.splitlines(), 1):
+        match = _PRINTF.search(line)
+        if not match:
+            continue
+        fmt = match.group(2)
+        if "\\n" in fmt:
+            continue
+        out.append(
+            f"{filename}:{line_no}: printf writes into a GitHub file "
+            f"command with format '{fmt}', which appends no trailing "
+            f"newline. The closing delimiter is then glued onto the last "
+            f"line of content and never found. Add \\n to the format.")
     return out
 
 
@@ -98,18 +132,19 @@ def main() -> int:
                     f"across {workflows} workflows"))
     print()
     if findings:
-        print(f"FAIL: {len(findings)} constant delimiter(s):\n")
+        print(f"FAIL: {len(findings)} unclosable heredoc(s):\n")
         for line in findings:
             print(f"  - {line}")
-        print("\n  The content is unbounded and the delimiter is a constant "
-              "— the same\n  shape as an unbounded read. `friday-cleanup.yml` "
-              "failed on exactly\n  this, and both YAML and bash accept it, so "
-              "nothing else can see it.")
+        print("\n  A delimiter is lost two ways: content can contain it, or "
+              "the\n  terminator can fail to start a line. `friday-cleanup.yml` "
+              "hit both,\n  one after the other, with the same error message — "
+              "and YAML and\n  bash accept either, so nothing else can see them.")
         return 1
     if seen == 0:
         print("PASS: no $GITHUB_OUTPUT heredocs found — nothing to check.")
         return 0
-    print(f"PASS: all {seen} heredoc delimiter(s) are generated at run time.")
+    print(f"PASS: all {seen} heredoc(s) use a generated delimiter and "
+          f"a terminator that starts its own line.")
     return 0
 
 

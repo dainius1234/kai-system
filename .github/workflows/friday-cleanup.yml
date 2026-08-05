@@ -109,7 +109,14 @@ jobs:
           # cannot collide with content it was generated after.
           d="EOF_$RANDOM$RANDOM$RANDOM"
           echo "output<<$d" >> "$GITHUB_OUTPUT"
-          printf "%b" "$stale_list" >> "$GITHUB_OUTPUT"
+          # `%b\n`, not `%b`. printf appends no trailing newline, so the
+          # closing delimiter was being glued onto the last line of
+          # content and never appeared as a line of its own:
+          #     Matching delimiter not found 'EOF_60842258526385'
+          # The random delimiter fixed collision; it could not fix a
+          # terminator that never starts a line. Two failure modes, one
+          # error message.
+          printf "%b\n" "$stale_list" >> "$GITHUB_OUTPUT"
           echo "$d" >> "$GITHUB_OUTPUT"
           exit 0
 

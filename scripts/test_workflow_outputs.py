@@ -25,7 +25,7 @@ from scripts.security import check_workflow_outputs as gate  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 9
+EXPECTED_SCENARIOS = 13
 executed: list = []
 
 
@@ -127,6 +127,47 @@ def test_the_denominator_matches_the_known_count() -> None:
           seen >= 7, str(seen))
 
 
+# ── the second failure mode, which the first gate missed ─────────────
+
+def test_printf_without_a_newline_is_reported() -> None:
+    """The gate passed friday-cleanup while it was still failing.
+
+    With a unique delimiter in place it failed again on
+    `printf "%b" "$list"` — printf appends no trailing newline, so the
+    closing delimiter was glued onto the last line of content. Unique and
+    still unfindable. Two failure modes, one error message.
+    """
+    scenario("printf without newline fails")
+    text = 'printf "%b" "$stale_list" >> "$GITHUB_OUTPUT"\n'
+    found = gate.findings_in(text, "w.yml")
+    check("it is reported", len(found) == 1, str(found))
+    check("names printf", found and "printf" in found[0], str(found))
+    check("and says what to add", found and "\\n" in found[0], str(found))
+
+
+def test_printf_with_a_newline_passes() -> None:
+    scenario("printf with newline passes")
+    for fmt in ('%b\\n', '%s\\n', '%b\\n%b\\n'):
+        text = f'printf "{fmt}" "$x" >> "$GITHUB_OUTPUT"\n'
+        check(f"{fmt} accepted", gate.findings_in(text, "w.yml") == [],
+              str(gate.findings_in(text, "w.yml")))
+
+
+def test_printf_elsewhere_is_not_flagged() -> None:
+    """Only writes into a GitHub file command matter; printf to stdout or
+    to an ordinary file has no delimiter to lose."""
+    scenario("printf elsewhere ignored")
+    for text in ('printf "%b" "$x"\n', 'printf "%b" "$x" >> /tmp/log\n'):
+        check("not flagged", gate.findings_in(text, "w.yml") == [], text)
+
+
+def test_echo_is_not_flagged() -> None:
+    """`echo` appends a newline, so it cannot cause this."""
+    scenario("echo not flagged")
+    text = 'echo "$out" >> "$GITHUB_OUTPUT"\n'
+    check("not flagged", gate.findings_in(text, "w.yml") == [], "")
+
+
 def run_all() -> None:
     test_a_literal_delimiter_is_reported()
     test_a_generated_delimiter_passes()
@@ -137,6 +178,10 @@ def run_all() -> None:
     test_a_line_with_no_heredoc_is_ignored()
     test_the_repository_passes_today()
     test_the_denominator_matches_the_known_count()
+    test_printf_without_a_newline_is_reported()
+    test_printf_with_a_newline_passes()
+    test_printf_elsewhere_is_not_flagged()
+    test_echo_is_not_flagged()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,
