@@ -4,7 +4,7 @@
     "Architecture Rule Tests": 68,
     "Assertion Floor Tests": 40,
     "CI Toleration Tests": 15,
-    "Compose Drift Tests": 21,
+    "Compose Drift Tests": 28,
     "Compose Gate Tests": 54,
     "Compose Probe Tests": 27,
     "Concurrency & Clock Tests": 51,
@@ -38,5 +38,5 @@
     "UH-7 Actuator Registry Tests": 75,
     "UH-8 Autonomy Tests": 174
   },
-  "total": 2366
+  "total": 2373
 }

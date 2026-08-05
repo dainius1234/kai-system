@@ -208,11 +208,79 @@ def check_drift(root: Path = None) -> Tuple[List[str], List[str], List[str], int
     return violations, hardening, bypassed, compared
 
 
+
+def shared_container_names(root: Path = None) -> List[str]:
+    """`container_name` values claimed by more than one profile.
+
+    Docker container names are **global to the daemon**, not scoped to a
+    compose project. Two profiles that both declare
+    `container_name: sovereign-memu-core` cannot both be up: the second
+    `docker compose up` fails with
+
+        Conflict. The container name "/sovereign-memu-core" is already
+        in use
+
+    Six such names are shared between `docker-compose.minimal.yml` and
+    `docker-compose.sovereign.yml`, which is survivable only because CI
+    happens to tear each stack down before starting the next, and every
+    teardown is `if: always()`. That is a property of the workflow, not
+    of the compose files, and it is one edit away from not being true.
+
+    Not hypothetical: `DECISIONS.md` line 1414 records this exact class
+    biting before, with `sovereign-memu-core` and
+    `sovereign-memu-core-introspect` colliding inside a single profile.
+
+    Reported, not failed. Renaming a container is a change with reach —
+    `docs/sovereign_ai_spec.md` and `kai-pm/PHASE1_READINESS.md` both
+    name these containers — and a gate that turns red before anyone has
+    decided what the names should be is a gate people learn to ignore.
+    """
+    import yaml
+    root = root or Path(__file__).resolve().parent.parent.parent
+    claimed: dict = {}
+    # dict.fromkeys, not a set: BASELINE is also listed in PROFILES, and
+    # iterating the same file twice made it collide with itself — a false
+    # finding caught by this function's own tests before it was ever run
+    # against the tree. Order is kept so the message is stable.
+    unsurveyed: List[str] = []
+    for profile in dict.fromkeys((BASELINE,) + tuple(PROFILES)):
+        path = root / profile
+        try:
+            doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        except OSError as exc:
+            # I-1, flagged by the meta-check's boundary-blindness scan the
+            # first time this ran: skipping an unreadable profile would
+            # make the survey cover less than it claims to, and say
+            # nothing about it. Unreachable in practice — `check_drift`
+            # calls `require(PROFILES)` before this — but "unreachable
+            # today" is the argument that ages worst.
+            unsurveyed.append(
+                f"{profile}: not surveyed for container names ({exc.strerror or exc}) "
+                f"— this list is therefore incomplete")
+            continue
+        for service, cfg in sorted((doc.get("services") or {}).items()):
+            name = (cfg or {}).get("container_name")
+            if name:
+                claimed.setdefault(name, []).append(f"{profile}:{service}")
+    return unsurveyed + [f"{name} claimed by {', '.join(owners)}"
+                         for name, owners in sorted(claimed.items())
+                         if len(owners) > 1]
+
+
 def main() -> int:
     violations, hardening, bypassed, compared = check_drift()
+    shared = shared_container_names()
 
     print(inspected(compared, "service definitions",
                     f"across {len(PROFILES)} profiles"))
+
+    if shared:
+        print(f"\n  Container names claimed by more than one profile "
+              f"({len(shared)}) — reported, not failed. Docker container "
+              f"names are global to\n  the daemon, so these profiles cannot "
+              f"both be up. KAI-GATE-031:")
+        for line in shared:
+            print(f"    ! {line}")
 
     if hardening:
         print(f"\n  Hardening above the floor ({len(hardening)}) — allowed, "

@@ -39,7 +39,7 @@ from scripts.security.gate_inputs import MissingInputs, resolve  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 14
+EXPECTED_SCENARIOS = 18
 executed: list[str] = []
 
 
@@ -254,6 +254,74 @@ def test_the_baseline_itself_is_checked():
           str(violations))
 
 
+
+# ── shared container names (KAI-GATE-031) ────────────────────────────
+# Docker container names are global to the daemon, not scoped to a
+# compose project, so two profiles that claim the same one cannot both be
+# up. Six are shared between minimal and sovereign today. That is
+# survivable only because CI tears each stack down before the next, which
+# is a property of the workflow rather than of these files.
+
+def test_a_name_claimed_by_two_profiles_is_reported():
+    scenario("container-name-shared")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "docker-compose.full.yml").write_text(
+            "services:\n  a:\n    container_name: shared-one\n", encoding="utf-8")
+        (root / "docker-compose.minimal.yml").write_text(
+            "services:\n  a:\n    container_name: shared-one\n", encoding="utf-8")
+        (root / "docker-compose.sovereign.yml").write_text(
+            "services:\n  b:\n    container_name: its-own\n", encoding="utf-8")
+        shared = drift.shared_container_names(root)
+        check("the collision is reported", len(shared) == 1, str(shared))
+        check("and names both claimants",
+              shared and "minimal" in shared[0] and "full" in shared[0],
+              str(shared))
+        check("the unique name is not reported",
+              all("its-own" not in line for line in shared), str(shared))
+
+
+def test_distinct_names_are_not_reported():
+    scenario("container-name-distinct")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        for i, f in enumerate(("docker-compose.full.yml",
+                               "docker-compose.minimal.yml",
+                               "docker-compose.sovereign.yml")):
+            (root / f).write_text(
+                f"services:\n  a:\n    container_name: name-{i}\n",
+                encoding="utf-8")
+        check("nothing is reported", drift.shared_container_names(root) == [],
+              str(drift.shared_container_names(root)))
+
+
+def test_services_without_a_container_name_are_ignored():
+    """Most services have none; compose derives one per project, which
+    does not collide. Flagging those would bury the six that matter."""
+    scenario("container-name-absent")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        for f in ("docker-compose.full.yml", "docker-compose.minimal.yml",
+                  "docker-compose.sovereign.yml"):
+            (root / f).write_text("services:\n  a:\n    image: x:1\n",
+                                  encoding="utf-8")
+        check("no false positives", drift.shared_container_names(root) == [],
+              str(drift.shared_container_names(root)))
+
+
+def test_the_real_tree_reports_the_six_that_are_known():
+    """Calibration against the repository. Reads it, and can only ever
+    get stronger: if these six are renamed the count falls, and the
+    assertion is a ceiling, not an equality."""
+    scenario("container-name-real-tree")
+    shared = drift.shared_container_names()
+    check("the known collisions are still visible", len(shared) >= 1,
+          str(shared))
+    check("and they are the minimal/sovereign pair",
+          all("minimal" in line and "sovereign" in line for line in shared),
+          str(shared))
+
+
 def run_all() -> None:
     test_stricter_is_not_a_violation()
     test_weaker_is_a_violation()
@@ -269,6 +337,11 @@ def run_all() -> None:
     test_the_denominator_counts_every_service_definition()
     test_zero_inputs_is_reported_as_not_a_pass()
     test_the_baseline_itself_is_checked()
+
+    test_a_name_claimed_by_two_profiles_is_reported()
+    test_distinct_names_are_not_reported()
+    test_services_without_a_container_name_are_ignored()
+    test_the_real_tree_reports_the_six_that_are_known()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,

@@ -6273,3 +6273,40 @@ is two variables at once.
 **`KAI-GATE-028`** — still open. The bring-up now reaches 32 seconds and
 fails for a reason I do not yet have, because the instrument was wrong.
 Fixed instrument pushed; the next run reports the real output.
+
+---
+
+## 2026-08-05 (part 20) — KAI-GATE-031 gets a detector, which finds its own bug first
+
+`check_compose_drift` now surveys `container_name` across all three
+profiles and reports any claimed by more than one. Six are, all shared
+between `minimal` and `sovereign`.
+
+**Reported, not failed.** Renaming a container has reach —
+`docs/sovereign_ai_spec.md` and `kai-pm/PHASE1_READINESS.md` both name
+these containers — and a gate that turns red before anybody has decided
+what the names should be is a gate people learn to ignore. That is the
+H-5 shape: make the debt visible, ratchet later.
+
+Two things caught it before the tree did:
+
+  1. **Its own test found a false positive.** `PROFILES` already
+     contains `BASELINE`, so iterating `(BASELINE,) + PROFILES` read
+     `docker-compose.full.yml` **twice** and reported it colliding with
+     itself. A synthetic three-profile fixture with three distinct names
+     failed immediately. Fixed with `dict.fromkeys`, which dedupes and
+     keeps order so the message stays stable.
+
+  2. **The meta-check's I-1 scanner found the boundary blindness.** The
+     survey skipped an absent profile with a bare `continue`, so a
+     missing file would have shrunk the survey silently and the list
+     would have looked clean. Unreachable in practice — `check_drift`
+     calls `require(PROFILES)` first — but "unreachable today" is the
+     argument that ages worst. An unreadable profile is now a line in
+     the output saying the list is incomplete.
+
+Both are the ordinary case now: the instrument is checked against known
+input before it is pointed at the repository, and the meta-check reads
+the instrument. Neither of those existed this morning.
+
+Floors: 36 suites, 2,373 assertions.
