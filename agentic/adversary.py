@@ -33,7 +33,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-import httpx
+from common.http_hygiene import pooled_client
 
 # ── Data structures ──────────────────────────────────────────────────
 
@@ -191,7 +191,7 @@ async def challenge_verifier(
     ]
 
     try:
-        async with httpx.AsyncClient(timeout=8.0) as client:
+        async with pooled_client(timeout=8.0) as client:
             resp = await client.post(
                 f"{verifier_url}/verify",
                 json={
@@ -262,7 +262,7 @@ async def challenge_policy(
     mode = "WORK"  # default assumption
 
     try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
+        async with pooled_client(timeout=3.0) as client:
             resp = await client.get(f"{tool_gate_url}/health")
             resp.raise_for_status()
             health = resp.json()

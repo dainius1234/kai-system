@@ -5261,3 +5261,80 @@ Labelled destructive rather than financial: all three categories get
 identical treatment in `evaluate()`, and "can mutate anything it can
 reach" is what destructive means here. A workflow that genuinely is safe
 under degradation should be a narrower tool of its own.
+
+---
+
+## 2026-08-05 (part 7) — KAI-GATE-022, and the failure a ratchet cannot see
+
+### The finding was 17, and one of them was not real
+
+The "1 unbounded body" was the string `await request.json()` in the
+docstring of `common/http_hygiene.py` — **the module that fixes unbounded
+bodies**, describing the pattern it replaces. The remediation appeared in
+the survey as debt. Seventh instance of a check matching itself, after an
+edit script that counted the comment it was adding, a developer-path rule
+that flagged its own docstring, and a constants scan fooled by the words
+"# Import _SENSORY_SKIP".
+
+Fixed in the detector, not the docstring. A survey that makes you edit
+correct prose to satisfy a counter has taught you the wrong lesson.
+
+### Then I blinded the survey, and the gate said PASS
+
+The first `_code_only()` rebuilt the source by joining tokens with
+newlines. `clients` went **16 → 0**. Adoption went **149 → 0**. Every
+count improved.
+
+**The ratchet passed.** It was working exactly as designed: a ratchet
+catches a count that *rises*. A detector that stops detecting takes
+everything to zero, which reads as total success. That is the one failure
+mode a ratchet is structurally incapable of seeing, and I introduced it
+while fixing a false positive in the same function.
+
+Caught only because the number 0 was implausible and I looked. That is
+not a control.
+
+So `test_hygiene_gate.py` now **calibrates every detector on every run**:
+each is pointed at synthetic input whose answer is known, and at prose
+that mentions every pattern without being any of them. The denominator is
+`DETECTORS`, so a new detector without a calibration sample fails rather
+than going unchecked. Verified by reintroducing the exact bug — six
+calibration assertions fail and name the blinded detectors, while the
+ratchet still reports PASS.
+
+The general rule, which applies to every ratchet in this repository:
+**a ratchet needs a companion that proves the measurement still measures.**
+Monotonic gates are blind in the improving direction, and "improving" is
+what a broken instrument looks like.
+
+`_code_only()` now blanks the *contents* of comments and strings in
+place, preserving layout exactly, so every detector pattern and every
+line offset stays true.
+
+### The migration
+
+16 per-request clients → `pooled_client`: `agentic/planner.py` 5,
+`agentic/router.py` 4, `agentic/adversary.py` 2, `common/llm.py` 4,
+`common/perception_spine/shadow.py` 1. Nine orphaned `import httpx`
+lines removed — only the ones flake8 attributed to my change; the
+pre-existing F401s in `shadow.py` were left alone rather than swept up
+into an unrelated commit.
+
+    hygiene total   24 -> 7   (the 7 are the documented swallows)
+    clients         16 -> 0
+    adoption        148 -> 164 pooled call sites
+
+### A test that asserted through a seam the fix removed
+
+`test_chassis.py::test_live_query_uses_model_aware_timeout` failed. It
+faked `sys.modules["httpx"]` and relied on `common/llm.py` doing a
+function-local `import httpx`; `pooled_client` resolves httpx inside
+`common/http_hygiene`, so the fake no longer reached the client.
+
+Not a defect in the fix and not a defect in the test's intent — the test
+was coupled to an implementation detail. Repointed at
+`llm.pooled_client`, which is the seam actually used, and then
+**mutation-tested in two directions** before being trusted: breaking the
+model-aware timeout fails it, and dropping the timeout on the way to the
+client fails it. A test repaired after a refactor is exactly where a
+vacuous pass hides.

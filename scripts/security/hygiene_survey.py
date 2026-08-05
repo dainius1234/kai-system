@@ -76,6 +76,53 @@ _EXCLUDED_DIRS = {"node_modules", ".venv", "venv", "site-packages",
                   ".git", "_migrations"}
 
 
+def _code_only(text: str) -> str:
+    """The source with comment and string *contents* blanked in place.
+
+    Layout is preserved exactly — only the characters inside comments
+    and string literals are replaced with spaces — so every detector
+    pattern keeps working unchanged and line/column offsets stay true.
+
+    Why at all: the textual detectors count occurrences, and prose
+    describing a defect is not the defect. `common/http_hygiene.py`, the
+    module that *fixes* unbounded bodies, documents the pattern it
+    replaces, and its docstring was counted as one unbounded body — the
+    remediation showing up in the survey as debt. Seventh instance of a
+    check matching itself.
+
+    The first attempt at this rebuilt the source by joining tokens with
+    newlines, which silently took `clients` from 16 to 0 and adoption
+    from 149 to 0. **The ratchet passed**, because a ratchet only catches
+    counts that rise. A detector that stops detecting is invisible to it,
+    which is why `test_hygiene_gate.py` now calibrates every detector
+    against synthetic known-positive input on each run.
+
+    Falls back to the raw text when tokenising fails: a file this cannot
+    parse should be over-counted, never silently skipped.
+    """
+    import io
+    import tokenize
+    lines = text.splitlines(keepends=True)
+    try:
+        toks = list(tokenize.generate_tokens(io.StringIO(text).readline))
+    except (tokenize.TokenError, IndentationError, SyntaxError):
+        return text
+    for tok in toks:
+        if tok.type not in (tokenize.COMMENT, tokenize.STRING):
+            continue
+        (srow, scol), (erow, ecol) = tok.start, tok.end
+        for row in range(srow, erow + 1):
+            idx = row - 1
+            if idx >= len(lines):
+                break
+            line = lines[idx]
+            begin = scol if row == srow else 0
+            finish = ecol if row == erow else len(line.rstrip("\n"))
+            keep_nl = line[finish:] if row == erow else line[len(line.rstrip("\n")):]
+            lines[idx] = line[:begin] + " " * max(0, finish - begin) + keep_nl
+    return "".join(lines)
+
+
 def _service_files() -> List[Path]:
     """Every first-party module, excluding tests, tooling and vendored code."""
     found = set()
@@ -187,17 +234,19 @@ def _silent_swallows(text: str) -> int:
 
 
 DETECTORS.update({
-    "clients": lambda t: t.count("async with httpx.AsyncClient("),
-    "unbounded_bodies": lambda t: t.count("await request.json()"),
-    "naive_timestamps": lambda t: t.count("datetime.utcnow()"),
+    # Textual detectors read code only — see `_code_only`. The AST-based
+    # ones below already ignore prose by construction.
+    "clients": lambda t: _code_only(t).count("async with httpx.AsyncClient("),
+    "unbounded_bodies": lambda t: _code_only(t).count("await request.json()"),
+    "naive_timestamps": lambda t: _code_only(t).count("datetime.utcnow()"),
     "success_on_failure": _success_on_failure,
     "silent_swallows": _silent_swallows,
 })
 # Evidence of adoption, reported so progress is visible rather than only
 # the remaining debt. Never part of the ratchet: these should *rise*.
 ADOPTION_DETECTORS.update({
-    "pooled": lambda t: t.count(POOLED),
-    "bounded": lambda t: t.count(BOUNDED),
+    "pooled": lambda t: _code_only(t).count(POOLED),
+    "bounded": lambda t: _code_only(t).count(BOUNDED),
 })
 COLUMNS = tuple(DETECTORS)
 

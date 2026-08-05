@@ -274,6 +274,7 @@ class TestLLMResponseValidation(unittest.TestCase):
         )
         original_httpx = sys.modules.get("httpx")
         original_model_timeout = llm._model_timeout
+        original_pooled = llm.pooled_client
 
         def _fake_model_timeout(model_name=None):
             calls["model"] = model_name
@@ -282,6 +283,14 @@ class TestLLMResponseValidation(unittest.TestCase):
         try:
             llm._model_timeout = _fake_model_timeout
             sys.modules["httpx"] = fake_httpx
+            # The client is built by `pooled_client()` now, not by a
+            # function-local `import httpx`, so faking sys.modules no
+            # longer reaches it — `pooled_client` resolves httpx inside
+            # `common/http_hygiene`. Stub the seam actually used. Every
+            # assertion below still holds: the timeout object is captured
+            # from the real call, so "does a live query use a model-aware
+            # timeout" is still the question being answered.
+            llm.pooled_client = lambda **kwargs: FakeAsyncClient(**kwargs)
             router = llm.LLMRouter(backends={"DeepSeek-V4": "http://llm:11434"})
             response = asyncio.run(
                 router._live_query("DeepSeek-V4", "http://llm:11434", "hello", "system", 0.3, 32, 0.0)
@@ -294,6 +303,7 @@ class TestLLMResponseValidation(unittest.TestCase):
             self.assertEqual(calls["timeout"].connect, llm.LLM_CONNECT_TIMEOUT)
         finally:
             llm._model_timeout = original_model_timeout
+            llm.pooled_client = original_pooled
             if original_httpx is not None:
                 sys.modules["httpx"] = original_httpx
             else:

@@ -33,6 +33,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 from common.degraded import record_degradation
+from common.http_hygiene import pooled_client
 
 logger = logging.getLogger(__name__)
 
@@ -170,9 +171,8 @@ async def ensure_model_available(model_name: str) -> bool:
     if _model_tags_cache is not None and (now - _model_tags_cache_ts) < cache_ttl:
         return _check_model_in_tags(_model_tags_cache, model_name)
 
-    import httpx
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{ollama_base}/api/tags")
             resp.raise_for_status()
             data = resp.json()
@@ -313,7 +313,7 @@ class LLMRouter:
                 model_name = _MODEL_MAP.get(specialist, specialist)
                 query_timeout = _model_timeout(model_name)
                 timeout = httpx.Timeout(query_timeout, connect=LLM_CONNECT_TIMEOUT, read=query_timeout)
-                async with httpx.AsyncClient(timeout=timeout, headers=headers) as client:
+                async with pooled_client(timeout=timeout, headers=headers) as client:
                     resp = await client.post(f"{url}/v1/chat/completions", json=payload)
 
                 # Retry before raise_for_status so we can log and sleep first
@@ -435,7 +435,7 @@ class LLMRouter:
 
         try:
             timeout = httpx.Timeout(LLM_TIMEOUT, connect=LLM_CONNECT_TIMEOUT, read=LLM_READ_TIMEOUT)
-            async with httpx.AsyncClient(timeout=timeout, headers=stream_headers) as client:
+            async with pooled_client(timeout=timeout, headers=stream_headers) as client:
                 async with client.stream("POST", f"{url}/v1/chat/completions", json=payload) as resp:
                     resp.raise_for_status()
                     aiter = resp.aiter_lines()
@@ -493,10 +493,9 @@ async def query_multi(specialists: List[str], prompt: str, **kwargs: Any) -> Lis
 
 async def _pull_model(model: str, ollama_base_url: str) -> None:
     """Stream an Ollama /api/pull for *model*, logging progress at INFO."""
-    import httpx
     import json as _json
     try:
-        async with httpx.AsyncClient(timeout=300.0) as client:
+        async with pooled_client(timeout=300.0) as client:
             async with client.stream(
                 "POST", f"{ollama_base_url}/api/pull", json={"name": model}
             ) as resp:

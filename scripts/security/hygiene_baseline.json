@@ -1,28 +1,11 @@
 {
-  "note": "Ceiling for scripts/security/hygiene_survey.py --gate. Lower only; see kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md.",
+  "note": "Ceiling for scripts/security/hygiene_survey.py --gate. Lower only; see kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md.\n\n2026-08-05: 24 -> 7. KAI-GATE-022's 16 per-request clients migrated to pooled_client (agentic/planner 5, router 4, adversary 2, common/llm 4, perception_spine/shadow 1). The 1 'unbounded body' was a FALSE POSITIVE \u2014 the string in common/http_hygiene.py's own docstring, the module that fixes unbounded bodies, counted as debt. The textual detectors now read code only. The 7 remaining are the documented silent swallows (KAI-GATE-021, closed): two conn.close() teardowns, two logging handlers where the recorder would recurse, vault-sync's teardown, the recorder's own guard, and one security probe where raising is the hoped-for behaviour.",
   "totals": {
-    "clients": 16,
-    "unbounded_bodies": 1,
+    "clients": 0,
+    "unbounded_bodies": 0,
     "naive_timestamps": 0,
     "success_on_failure": 0,
     "silent_swallows": 7
   },
-  "grand_total": 24,
-  "scope_widened": {
-    "reason": "Survey scope grew from service entry points (*/app.py and friends) to every first-party module: +117 files. A defect in common/llm.py reaches every service, so the least-covered files had the widest blast radius. silent_swallows were fixed in the same change (34 -> 7 repo-wide, all 7 documented); the 16 clients and 1 unbounded body are pre-existing H-2/H-3-class debt made visible, registered as KAI-GATE-022 rather than absorbed.",
-    "raised": {
-      "clients": [
-        0,
-        16
-      ],
-      "unbounded_bodies": [
-        0,
-        1
-      ],
-      "silent_swallows": [
-        4,
-        7
-      ]
-    }
-  }
+  "grand_total": 7
 }

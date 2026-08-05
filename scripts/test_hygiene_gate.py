@@ -297,6 +297,111 @@ def test_survey_reaches_nested_services():
           any("/" in s for s in services), str(sorted(services)[:5]))
 
 
+# ── Calibration: every detector must still detect ────────────────────
+#
+# A ratchet only catches a count that RISES. A detector that quietly
+# stops detecting takes every count to zero and the gate reports
+# improvement — the one failure a ratchet is structurally incapable of
+# seeing.
+#
+# Not hypothetical. On 2026-08-05, routing the textual detectors through
+# a tokeniser to stop `common/http_hygiene.py`'s docstring being counted
+# as an unbounded body took `clients` from 16 to 0 and adoption from 149
+# to 0, because that first tokeniser rebuilt the source with newlines
+# between tokens. **The gate passed.** Nothing was wrong with the
+# ratchet; it was doing exactly what a ratchet does.
+#
+# So each detector is pointed at input whose answer is known before it is
+# pointed at the repository. The denominator is `DETECTORS`, so adding a
+# detector without a sample fails rather than going uncalibrated.
+
+_CALIBRATION = {
+    "clients": (
+        "async def f():\n"
+        "    async with httpx.AsyncClient(timeout=1.0) as c:\n"
+        "        await c.get('http://x')\n"
+    ),
+    "unbounded_bodies": (
+        "async def f(request):\n"
+        "    body = await request.json()\n"
+        "    return body\n"
+    ),
+    "naive_timestamps": "def f():\n    return datetime.utcnow()\n",
+    "success_on_failure": (
+        "@app.get('/x')\n"
+        "async def handler():\n"
+        "    try:\n"
+        "        return {'ok': True}\n"
+        "    except Exception:\n"
+        "        return {'ok': True}\n"
+    ),
+    "silent_swallows": (
+        "def f():\n"
+        "    try:\n"
+        "        g()\n"
+        "    except Exception:\n"
+        "        pass\n"
+    ),
+}
+
+# Prose that mentions every pattern without being any of them. A detector
+# that fires on this has the false-positive problem the tokeniser exists
+# to prevent — and the module that fixes a defect necessarily describes
+# it, which is how `http_hygiene.py` came to be counted as debt.
+_PROSE_ONLY = "\n".join([
+    'MODULE_DOC = """A module documenting what it replaces.',
+    '',
+    'Avoid `async with httpx.AsyncClient(` inside a handler; avoid an',
+    'unbounded `await request.json()`; never use `datetime.utcnow()`.',
+    'Do not write `except Exception:` followed by `pass`.',
+    '"""',
+    '',
+    '# async with httpx.AsyncClient( in a comment is also not a client.',
+    'def f():',
+    '    return 1',
+    '',
+])
+
+
+def test_every_detector_has_a_calibration_sample():
+    """The denominator is DETECTORS, so a new detector needs a sample."""
+    missing = sorted(set(hs.DETECTORS) - set(_CALIBRATION))
+    check("no detector lacks a known-positive sample", not missing, str(missing))
+
+
+def test_every_detector_fires_on_its_known_positive():
+    """The check a ratchet cannot make: does this still detect anything?"""
+    for name, sample in sorted(_CALIBRATION.items()):
+        detector = hs.DETECTORS.get(name)
+        if detector is None:
+            check(f"{name} still exists", False, "detector removed")
+            continue
+        found = detector(sample)
+        check(f"{name} fires on a known positive", found >= 1,
+              f"returned {found} for:\n{sample}")
+
+
+def test_no_detector_fires_on_prose_alone():
+    """The other half. A survey with false positives invites someone to
+    'fix' correct code, and a module that fixes a defect has to describe
+    it."""
+    for name, detector in sorted(hs.DETECTORS.items()):
+        found = detector(_PROSE_ONLY)
+        check(f"{name} ignores a docstring describing the pattern",
+              found == 0, f"returned {found}")
+
+
+def test_adoption_detectors_are_calibrated_too():
+    """Adoption is how progress is reported. Silently zeroing it would
+    read as 'nobody has adopted the fix'."""
+    pooled = "async def f():\n    async with pooled_client() as c:\n        pass\n"
+    check("pooled fires", hs.ADOPTION_DETECTORS["pooled"](pooled) >= 1,
+          str(hs.ADOPTION_DETECTORS["pooled"](pooled)))
+    bounded = "async def f(request):\n    body = await bounded_json(request)\n"
+    check("bounded fires", hs.ADOPTION_DETECTORS["bounded"](bounded) >= 1,
+          str(hs.ADOPTION_DETECTORS["bounded"](bounded)))
+
+
 def test_the_survey_covers_library_modules_not_only_entry_points():
     """The scope was twice a hand-written list, and twice too narrow.
 
@@ -412,6 +517,10 @@ def run() -> None:
     test_a_nested_helper_is_not_counted_as_a_route_failure()
     test_lambdas_and_classes_are_separate_scopes()
     test_survey_reaches_nested_services()
+    test_every_detector_has_a_calibration_sample()
+    test_every_detector_fires_on_its_known_positive()
+    test_no_detector_fires_on_prose_alone()
+    test_adoption_detectors_are_calibrated_too()
     test_the_survey_covers_library_modules_not_only_entry_points()
     test_widening_the_scope_needs_a_written_reason()
     test_adoption_is_reported_not_just_debt()

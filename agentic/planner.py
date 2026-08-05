@@ -21,8 +21,8 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
-import httpx
 from common.degraded import record_degradation
+from common.http_hygiene import pooled_client
 
 
 @dataclass
@@ -120,7 +120,7 @@ async def _fetch_memory_chunks(
 ) -> List[Dict[str, Any]]:
     """Fetch relevant memory chunks from Memu-Core."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(
                 f"{memu_url}/memory/retrieve",
                 params={"query": query, "user_id": user_id, "top_k": top_k},
@@ -137,7 +137,7 @@ async def _fetch_correction_memories(
 ) -> List[Dict[str, Any]]:
     """Fetch correction-type memories that match the query."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(
                 f"{memu_url}/memory/search-by-category",
                 params={"category": "general", "query": query, "top_k": top_k},
@@ -161,7 +161,7 @@ async def _fetch_correction_memories(
 async def _fetch_nudges(memu_url: str) -> List[Dict[str, Any]]:
     """Fetch proactive nudges that might be relevant."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{memu_url}/memory/proactive")
             resp.raise_for_status()
             data = resp.json()
@@ -173,7 +173,7 @@ async def _fetch_nudges(memu_url: str) -> List[Dict[str, Any]]:
 async def _fetch_preferences(memu_url: str) -> List[Dict[str, Any]]:
     """Fetch operator preferences for plan constraint injection (P5 GEM)."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0) as client:
             resp = await client.get(f"{memu_url}/memory/preferences")
             resp.raise_for_status()
             data = resp.json()
@@ -454,7 +454,7 @@ async def pre_fetch_predicted_context(
     if not predictions:
         return predictions
 
-    async with httpx.AsyncClient(timeout=3.0) as client:
+    async with pooled_client(timeout=3.0) as client:
         for pred in predictions[:3]:  # cap at 3 pre-fetches
             query = pred.predicted_topic.replace("+", " ")
             try:

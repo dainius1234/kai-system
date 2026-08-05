@@ -380,11 +380,10 @@ def classify_semantic(
 
 async def dispatch_memory_recall(query: str, user_id: str = "keeper", top_k: int = 5) -> str:
     """Dispatch to Memu-Core /memory/retrieve — zero LLM cost."""
-    import httpx
     import os
     memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
     try:
-        async with httpx.AsyncClient(timeout=8.0) as client:
+        async with pooled_client(timeout=8.0) as client:
             resp = await client.get(
                 f"{memu_url}/memory/retrieve",
                 params={"query": query, "user_id": user_id, "top_k": top_k},
@@ -443,11 +442,10 @@ async def dispatch_tax_advisory(query: str) -> str:
 
 async def dispatch_fact_check(claim: str) -> str:
     """Dispatch to Verifier /verify — zero LLM cost."""
-    import httpx
     import os
     verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8003")
     try:
-        async with httpx.AsyncClient(timeout=8.0) as client:
+        async with pooled_client(timeout=8.0) as client:
             resp = await client.post(
                 f"{verifier_url}/verify",
                 json={"claim": claim, "source": "router-fact-check"},
@@ -465,11 +463,10 @@ async def dispatch_fact_check(claim: str) -> str:
 
 async def dispatch_proactive_review() -> str:
     """Dispatch to Memu-Core /memory/proactive — zero LLM cost."""
-    import httpx
     import os
     memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
     try:
-        async with httpx.AsyncClient(timeout=8.0) as client:
+        async with pooled_client(timeout=8.0) as client:
             resp = await client.get(f"{memu_url}/memory/proactive")
             resp.raise_for_status()
             data = resp.json()
@@ -494,11 +491,10 @@ async def dispatch_proactive_review() -> str:
 
 async def dispatch_reflect() -> str:
     """Dispatch to Memu-Core /memory/reflect — zero LLM cost."""
-    import httpx
     import os
     memu_url = os.getenv("MEMU_URL", "http://memu-core:8001")
     try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        async with pooled_client(timeout=15.0) as client:
             resp = await client.post(f"{memu_url}/memory/reflect")
             resp.raise_for_status()
             data = resp.json()
@@ -572,6 +568,7 @@ async def dispatch_route(decision: RouteDecision, user_input: str, session_id: s
 import os  # noqa: E402
 import time as _time  # noqa: E402
 from pathlib import Path as _Path  # noqa: E402
+from common.http_hygiene import pooled_client
 
 # ── Skill security scanner ──────────────────────────────────────────
 _SKILL_RED_FLAGS = re.compile(

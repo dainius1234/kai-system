@@ -20,7 +20,6 @@ import time
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-import httpx
 
 from common.contracts.base import Principal, Provenance
 from common.contracts.perception import EventSource, PerceptionEvent
@@ -28,6 +27,7 @@ from common.contracts.perception import EventSource, PerceptionEvent
 from common.perception_spine.adapters import ADAPTER_REGISTRY
 from common.perception_spine.ingress import IngressVerdict, PerceptionIngress
 from common.perception_spine.journal import EventJournal
+from common.http_hygiene import pooled_client
 
 logger = logging.getLogger("perception-spine")
 
@@ -99,7 +99,7 @@ class ShadowPerceptionRunner:
 
     async def _fetch(self, url: str, timeout: float = 3.0) -> Optional[Dict]:
         try:
-            async with httpx.AsyncClient(timeout=timeout) as client:
+            async with pooled_client(timeout=timeout) as client:
                 r = await client.get(url)
                 if r.status_code == 200:
                     return r.json()
