@@ -87,6 +87,9 @@ jobs:
       - name: Every jq filter embedded in a workflow compiles
         run: python scripts/security/check_workflow_filters.py
 
+      - name: No $GITHUB_OUTPUT heredoc is bounded by a constant
+        run: python scripts/security/check_workflow_outputs.py
+
         run: python scripts/security/check_test_wiring.py
 
       - name: Instrumentation invariants (I-4 enforced)

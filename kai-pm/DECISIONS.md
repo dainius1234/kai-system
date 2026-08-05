@@ -6469,3 +6469,70 @@ pushes rather than to push on every green local check.
 gated, and **CLOSED**: `drift-detector` observed green on run
 `31033089621`, which is the first evidence in this repository that the
 detector, the fix and the workflow all work together.
+
+---
+
+## 2026-08-05 (part 23) — the dispatch paid for itself in ninety seconds
+
+`friday-cleanup` **failed** on the very first authorised dispatch. Its
+thirty-failure record was therefore **not** purely historical, and part
+21 came within one sentence of recording it as such. The operator's
+instruction — *"Better to have the evidence than to wonder whether
+they'd pass"* — is the only reason that guess did not become a fact.
+
+    ##[error]Unable to process file command 'output' successfully.
+    ##[error]Invalid value. Matching delimiter not found 'EOF'
+
+Seven steps across `friday-cleanup.yml` and `weekly-report-card.yml`
+capture arbitrary command output — flake8, pip-audit, pytest, the
+behavioural scoreboard — and write it into `$GITHUB_OUTPUT` inside a
+heredoc bounded by a literal `EOF`:
+
+    echo "output<<EOF" >> "$GITHUB_OUTPUT"
+    echo "$out"       >> "$GITHUB_OUTPUT"
+    echo "EOF"        >> "$GITHUB_OUTPUT"
+
+If the captured text contains a line that is exactly `EOF`, the block
+never closes and the runner rejects the whole file.
+
+**The content is unbounded and the delimiter is a constant.** That is
+the same shape as every unbounded-read finding in H-2 and H-3 — a
+container sized for what someone expected rather than for what can
+arrive — and it appears here in a place nobody thought of as a buffer.
+
+All seven use a per-step random delimiter now, which cannot collide with
+content produced after it.
+
+### The third layer of workflow that no parser reads
+
+Today has found three defects that live *inside* a `run:` block, where
+neither YAML nor bash can see them:
+
+  1. a heredoc starting at column 0, which truncates the block  (A-04c)
+  2. a jq filter with shell-escaped quotes                       (032)
+  3. a heredoc delimiter that the content can contain            (034)
+
+Each was invisible to every gate here until the workflow actually ran,
+and two of the three were in schedule-only workflows that run where
+nobody is looking. `check_workflow_filters` closed the second;
+`check_workflow_outputs` closes the third. The first is closed by
+`check_ci_tolerations.unparseable()`.
+
+Calibrated against the real defect before being trusted: reintroducing
+the literal `EOF` makes the gate name the file, the line, the key and
+the delimiter.
+
+A heredoc feeding a *command* (`cat <<EOF`, `python - <<'PY'`) is
+deliberately not flagged. It is a different construct with a different
+failure mode, and a gate with false positives gets somebody to "fix"
+working code — which is the failure mode this repository works hardest
+to avoid.
+
+Floors: 38 suites, 2,415 assertions.
+
+### Register
+
+**`KAI-GATE-034`** — arbitrary command output bounded by a constant
+heredoc delimiter in `$GITHUB_OUTPUT`. Seven instances fixed, class
+gated. **OPEN** until `friday-cleanup` and `weekly-report-card` are both
+observed green.

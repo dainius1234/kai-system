@@ -290,6 +290,17 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-032",)),
+    # Unbounded content, constant delimiter. `friday-cleanup.yml` failed
+    # on it, and both YAML and bash accept it. KAI-GATE-034.
+    Gate(module="check_workflow_outputs",
+         kind=GATE,
+         summary="no $GITHUB_OUTPUT heredoc is bounded by a constant",
+         inputs=(".github/workflows",),
+         denominator=r"inspected: \d+ \$GITHUB_OUTPUT",
+         proven_by="scripts/test_workflow_outputs.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-034",)),
     Gate(module="check_test_wiring",
          kind=GATE,
          summary="every test in a self-run suite is dispatched",

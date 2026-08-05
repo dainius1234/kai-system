@@ -32,6 +32,7 @@ policy-check: lint-blocking
 	python3 scripts/security/hygiene_survey.py --gate
 	python3 scripts/security/check_ci_tolerations.py
 	python3 scripts/security/check_workflow_filters.py
+	python3 scripts/security/check_workflow_outputs.py
 	python3 scripts/security/check_test_wiring.py
 	python3 scripts/security/check_gate_registry.py --gate
 	@# Doc-drift last: it fails on every commit that adds a test, so it
@@ -301,7 +302,8 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-assertion-floors test-gate-registry test-compose-drift \
 	test-secret-gates test-compose-gates test-ci-tolerations \
 	test-test-wiring test-test-isolation test-live-smoke \
-	test-compose-probe test-workflow-filters test-suite-floor
+	test-compose-probe test-workflow-filters test-workflow-outputs \
+	test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
 # A-02 ratchet: runs `test-uh` and fails if any suite exercises less than
@@ -804,6 +806,9 @@ test-compose-probe:
 
 test-workflow-filters:
 	python3 scripts/test_workflow_filters.py
+
+test-workflow-outputs:
+	python3 scripts/test_workflow_outputs.py
 
 # bring up full-stack composition
 full-up:
