@@ -14,6 +14,7 @@
     "Dashboard UI Auth Tests": 42,
     "Degraded State Tests": 71,
     "Deployment Preflight Tests": 57,
+    "Dockerfile Flag Tests": 21,
     "Erasure Tests": 75,
     "Flags-Enabled Integration Tests": 37,
     "Full Migration Tests": 75,
@@ -40,5 +41,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2424
+  "total": 2445
 }

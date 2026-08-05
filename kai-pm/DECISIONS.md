@@ -6536,3 +6536,75 @@ Floors: 38 suites, 2,415 assertions.
 heredoc delimiter in `$GITHUB_OUTPUT`. Seven instances fixed, class
 gated. **OPEN** until `friday-cleanup` and `weekly-report-card` are both
 observed green.
+
+---
+
+## 2026-08-05 (part 24) — the build failure: one character
+
+The post-mortem put the build's own output in frame and it is one line:
+
+    target document-parser: failed to solve: dockerfile parse error on
+    line 20: unknown flag: --start_period (did you mean start-period?)
+
+    HEALTHCHECK --interval=30s --timeout=5s --start_period=20s --retries=3
+
+An underscore where Docker requires a hyphen. It stopped every image
+build, which stopped the bring-up, the live smoke, kill-isolation,
+restart-persistence, the memu-graph cycle and the sovereign boot —
+**thirteen steps reporting nothing at all** because of one character in
+one file.
+
+### Why it was invisible, structurally
+
+`document-parser` is one of the **nineteen services declared in
+`docker-compose.minimal.yml` and not in `docker-compose.full.yml`**, and
+the only build step in CI built `full.yml`. Nothing ever built that
+image, so nothing ever parsed that Dockerfile. It could have sat there
+for as long as the repository existed.
+
+That is the same finding as part 19 — "full" is a name that lies — now
+with its consequence attached. Splitting the build step is what
+surfaced it: the failure moved from a mysterious 32-second `up` into a
+named build step with a parse error and a line number.
+
+### The gate
+
+`check_dockerfile_flags.py`. The rule is exact rather than a list:
+**every flag Docker accepts on an instruction uses hyphens** —
+`--platform`, `--from`, `--chown`, `--chmod`, `--mount`, `--interval`,
+`--timeout`, `--start-period`, `--start-interval`, `--retries`,
+`--link`, `--parents`, `--exclude`. Not one contains an underscore.
+Measured before adopting: 34 of the 35 period-flags in this repository
+were already correct, so the rule costs nothing and catches the one that
+was not.
+
+A list of *valid* flag names was the alternative, and it is the shape
+this repository keeps finding broken — true of what someone remembered,
+false of everything Docker adds later.
+
+**The file list comes from a tree walk, not from a compose profile.**
+That is the whole lesson of this finding: a gate that took its inputs
+from `full.yml` would have missed `document-parser` exactly as the build
+did. 314 flags across **52 Dockerfiles** — more than any single profile
+builds.
+
+Calibrated against the real defect: reintroducing the underscore makes
+it name the file, line, instruction and correction.
+
+Flags after `CMD` in a `HEALTHCHECK` are deliberately not checked. They
+belong to the program being run, Docker never sees them, and reporting
+them would be a finding against working code.
+
+Floors: 39 suites, 2,445 assertions.
+
+### Register
+
+**`KAI-GATE-035`** — a Dockerfile instruction flag spelled with an
+underscore stopped every image build and the thirteen steps behind it,
+in a file no CI step had ever parsed. Instance fixed, class gated.
+**OPEN** until `core-tests` builds.
+
+**`KAI-GATE-028`** — bring-up failure. Cause chain complete: withdrawn
+image tag (fixed), then the build never reaching the nineteen
+minimal-only services (fixed by splitting the step), then this parse
+error (fixed). **OPEN** until the bring-up is observed succeeding.

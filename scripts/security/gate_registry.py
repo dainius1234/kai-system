@@ -301,6 +301,17 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-034",)),
+    # One character stopped every image build and thirteen steps after
+    # it, in a Dockerfile nothing had ever parsed. KAI-GATE-035.
+    Gate(module="check_dockerfile_flags",
+         kind=GATE,
+         summary="Dockerfile instruction flags are hyphenated, not underscored",
+         inputs=("document-parser/Dockerfile",),
+         denominator=r"inspected: \d+ instruction flag",
+         proven_by="scripts/test_dockerfile_flags.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-035",)),
     Gate(module="check_test_wiring",
          kind=GATE,
          summary="every test in a self-run suite is dispatched",

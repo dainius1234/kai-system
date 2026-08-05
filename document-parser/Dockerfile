@@ -17,7 +17,7 @@ RUN addgroup --system app && adduser --system --ingroup app app
 
 EXPOSE 8032
 
-HEALTHCHECK --interval=30s --timeout=5s --start_period=20s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8032/health')"
 
 USER app
