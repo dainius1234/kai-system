@@ -5001,3 +5001,47 @@ until this morning**, because every line of it runs at import time. The
 plugin found all three within an hour of learning to watch collection,
 and CI found the one local runs cannot see. Neither would have found it
 alone.
+
+---
+
+## 2026-08-05 (part 4) — CI green, all eleven steps
+
+Run **30978763877**, commit `5252a56`, branch
+`claude/project-rework-plan-pgvp35`.
+
+    Set up job                              success
+    Checkout                                success
+    Set up Python 3.11                      success
+    Install dependencies                    success
+    Lint with flake8                        success
+    Dependency vulnerability scan           success
+    Test with pytest (coverage gate)        success
+    Repo-wide suite floor (KAI-GATE-020)    success
+    Cross-file test isolation (A-05)        success
+    Test dashboard (CWD=dashboard/)         success   29 passed
+    Complete job                            success
+
+The dashboard step had been *skipped* in the three preceding runs, held
+behind the earlier failures, so this is the first run in which it has
+actually executed since the suite started aborting.
+
+Both gates that failed on `476d7fe` now pass, and each failure was real:
+
+  - the floor was comparing two different commands, fixed by making
+    `make suite-run` the single definition of the suite's population;
+  - the isolation gate found a third `sys.modules["app"]` leak that no
+    local run can see, because locally nothing had claimed the name
+    first. `replaced` is 0 in both environments.
+
+Neither was a defect in the code under test. Both were defects in how
+the code was being measured, which is the theme of the week.
+
+### What is verified, and what is merely green
+
+Green means: the suite runs, on two machines, and the three ratchets hold
+on both. It does not mean the 120 handlers now behave correctly in
+production — most of them have no test exercising the failure path, and
+the ones that do were written today by the same author as the fix. The
+`_sense_world` and `submit_feedback` paths have real failure-path tests;
+the other hundred-odd have a recorded call and a reviewer's eye. That is
+an improvement on `pass` and it is not proof.
