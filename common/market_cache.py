@@ -6,6 +6,7 @@ import time
 import urllib.request
 from pathlib import Path
 from typing import Any, Dict
+from common.degraded import record_degradation
 
 CACHE_PATH = Path(os.getenv("MARKET_CACHE_PATH", "data/self-emp/Accounting/market_price_cache.json"))
 PETROL_URL = os.getenv("PETROL_API_URL", "https://example.invalid/petrol")
@@ -31,12 +32,12 @@ def refresh_cache() -> Dict[str, Any]:
     payload = _default_cache()
     try:
         payload["petrol"] = _fetch_json(PETROL_URL)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("market", "refresh_petrol", _exc)
     try:
         payload["grocery"] = _fetch_json(GROCERY_URL)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("market", "refresh_grocery", _exc)
     payload["updated_at"] = int(time.time())
     CACHE_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return payload

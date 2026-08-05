@@ -9,6 +9,7 @@ import json
 import threading
 from pathlib import Path
 from typing import Dict, List, Optional
+from common.degraded import record_degradation
 
 
 _MAPPING_VERSION = 1
@@ -36,8 +37,8 @@ class VaultMapper:
         try:
             payload = {"version": _MAPPING_VERSION, "entries": self._data}
             self._path.write_text(json.dumps(payload, indent=2))
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("filesystem", "save_vault_mapping", _exc)
 
     # ── public API ────────────────────────────────────────────────────
 

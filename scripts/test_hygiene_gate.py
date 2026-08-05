@@ -297,6 +297,54 @@ def test_survey_reaches_nested_services():
           any("/" in s for s in services), str(sorted(services)[:5]))
 
 
+def test_the_survey_covers_library_modules_not_only_entry_points():
+    """The scope was twice a hand-written list, and twice too narrow.
+
+    It began as `*/app.py`, which missed `agentic/introspect_app.py`.
+    Widened to four globs, it then missed all 117 library modules — and a
+    defect in `common/llm.py` reaches every service, so the least-covered
+    files had the widest blast radius. Widening surfaced 16 per-request
+    clients and 30 silent swallows the ratchet had never been able to
+    see.
+
+    This pins the property that matters: the denominator is derived from
+    the tree, so adding a module cannot leave it unscanned.
+    """
+    scanned = {str(p.relative_to(REPO)) for p in hs._service_files()}
+    for library in ("common/llm.py", "common/policy.py", "agentic/kai_config.py"):
+        check(f"{library} is surveyed", library in scanned, str(len(scanned)))
+    check("tests are still excluded",
+          not any(f.startswith("scripts/") for f in scanned), "")
+    check("vendored code is still excluded",
+          not any("site-packages" in f or "node_modules" in f for f in scanned), "")
+
+
+def test_widening_the_scope_needs_a_written_reason():
+    """A rise is either a regression or a change of denominator, and the
+    two must not be spelled the same way.
+
+    `--update-baseline` refuses a rise, which is what makes the ratchet a
+    ratchet. `--widen-scope` allows one and records why, so the rise
+    shows up in review as a deliberate act rather than as a number that
+    quietly went the wrong way.
+    """
+    import subprocess
+    proc = subprocess.run(
+        [sys.executable, str(REPO / "scripts/security/hygiene_survey.py"), "--help"],
+        capture_output=True, text=True, timeout=60)
+    check("--widen-scope exists", "--widen-scope" in proc.stdout, proc.stdout[-200:])
+    check("it takes a reason rather than being a bare flag",
+          "REASON" in proc.stdout, proc.stdout[-200:])
+
+    baseline = json.loads(hs.BASELINE.read_text(encoding="utf-8"))
+    widened = baseline.get("scope_widened")
+    if widened is not None:
+        check("a recorded widening carries its reason",
+              bool(widened.get("reason", "").strip()), str(widened))
+        check("and names which columns it raised",
+              bool(widened.get("raised")), str(widened))
+
+
 def test_adoption_is_reported_not_just_debt():
     results = hs.survey()
     adopted = sum(r["pooled"] for r in results.values())
@@ -364,6 +412,8 @@ def run() -> None:
     test_a_nested_helper_is_not_counted_as_a_route_failure()
     test_lambdas_and_classes_are_separate_scopes()
     test_survey_reaches_nested_services()
+    test_the_survey_covers_library_modules_not_only_entry_points()
+    test_widening_the_scope_needs_a_written_reason()
     test_adoption_is_reported_not_just_debt()
 
 

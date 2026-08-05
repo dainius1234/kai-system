@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Protocol
 
 import redis
+from common.degraded import record_degradation
 
 
 # ── Failure Taxonomy ─────────────────────────────────────────────────
@@ -575,8 +576,8 @@ def save_snapshot(snapshot: PerformanceSnapshot) -> None:
         IMPROVEMENT_SNAPSHOT_PATH.write_text(
             json.dumps(existing, indent=2), encoding="utf-8"
         )
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("filesystem", "save_improvement_snapshot", _exc)
 
 
 def load_latest_snapshot() -> Optional[PerformanceSnapshot]:
@@ -983,8 +984,8 @@ def save_dream_cycle(cycle: DreamCycle) -> None:
         # Keep last 20 cycles
         data["cycles"] = data["cycles"][-20:]
         DREAM_INSIGHT_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("filesystem", "save_dream_cycle", _exc)
 
 
 def load_dream_cycles() -> List[Dict[str, Any]]:
@@ -993,8 +994,8 @@ def load_dream_cycles() -> List[Dict[str, Any]]:
         if DREAM_INSIGHT_PATH.exists():
             data = json.loads(DREAM_INSIGHT_PATH.read_text(encoding="utf-8"))
             return data.get("cycles", [])
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("filesystem", "load_dream_cycles", _exc)
     return []
 
 
@@ -1236,8 +1237,8 @@ def save_evolver_report(report: EvolutionReport) -> None:
         EVOLVER_INSIGHT_PATH.write_text(
             json.dumps(data, indent=2), encoding="utf-8",
         )
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("filesystem", "save_evolver_report", _exc)
 
 
 def load_evolver_reports() -> List[Dict[str, Any]]:
@@ -1246,8 +1247,8 @@ def load_evolver_reports() -> List[Dict[str, Any]]:
         if EVOLVER_INSIGHT_PATH.exists():
             data = json.loads(EVOLVER_INSIGHT_PATH.read_text(encoding="utf-8"))
             return data.get("reports", [])
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("filesystem", "load_evolver_reports", _exc)
     return []
 
 

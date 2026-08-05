@@ -16,6 +16,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
+from common.degraded import record_degradation
 
 # ── tiktoken with graceful fallback ──────────────────────────────────
 try:
@@ -174,8 +175,8 @@ def count_tokens(text: str, model: Optional[str] = None) -> int:
     if _HAS_TIKTOKEN:
         try:
             return len(_ENC.encode(text))
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("tokenizer", "encode", _exc)
     # Fallback: ~3.5 chars per token (slightly conservative for safety)
     return max(len(text) * 10 // 35, 1)
 

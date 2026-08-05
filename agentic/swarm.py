@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from cognitive_fsm import SwarmConfig
+from common.degraded import record_degradation
 
 REPUTATION_PATH = Path("/data/teammate_reputation.json")
 
@@ -118,8 +119,8 @@ def save_reputation() -> None:
             for slug, rep in _REPUTATION.items()
         }
         REPUTATION_PATH.write_text(json.dumps(data, indent=2))
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("filesystem", "save_swarm_reputation", _exc)
 
 
 def get_rep(slug: str) -> TeammateRep:

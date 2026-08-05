@@ -37,6 +37,7 @@ import time
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from common.degraded import record_degradation
 
 logger = logging.getLogger(__name__)
 
@@ -235,8 +236,8 @@ class OhanaCore:
                 return 0.0
             if result["score"] != 0.5 or result["relevant_nodes"]:
                 graph_score = result["score"]
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("cognition", "wisdom_graph_eval", _exc)
 
         # Fingerprint keyword scoring (baseline)
         loyalty_hits = sum(

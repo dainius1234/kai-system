@@ -24,6 +24,7 @@ import uuid
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from common.degraded import record_degradation
 
 logger = logging.getLogger("kai.paper_trader")
 
@@ -108,8 +109,8 @@ class PaperTrader:
                     p = Position(**{k: v for k, v in entry.items()
                                     if k in Position.__dataclass_fields__})  # type: ignore
                     self._positions[p.position_id] = p
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation("filesystem", "load_paper_position", _exc)
         except Exception as exc:
             logger.debug("Paper trader position load failed: %s", exc)
 
@@ -144,8 +145,8 @@ class PaperTrader:
                     d = json.loads(line)
                     trades.append(Trade(**{k: v for k, v in d.items()
                                            if k in Trade.__dataclass_fields__}))  # type: ignore
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation("filesystem", "load_paper_trade", _exc)
         except Exception as exc:
             logger.debug("Paper trader trade load failed: %s", exc)
         return trades

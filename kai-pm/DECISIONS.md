@@ -4842,3 +4842,97 @@ than from the backup copy I had made for the other, and discarded my own
 uncommitted work on it. Reapplied from the exact content. No repository
 history was touched, but the reflex was wrong: with uncommitted work in
 the tree, restore from the copy, never from the index.
+
+---
+
+## 2026-08-05 (part 2) — the survey's own scope was the third narrow list
+
+Having fixed 120 swallows in service entry points, I asked what the
+number would be repo-wide. **49.** The ratchet was watching 4 of them.
+
+`hygiene_survey._service_files()` scanned `*/app.py`, `*/*/app.py`,
+`*/*_app.py`, `*/*/*_app.py` — a hand-written list of where to look. It
+missed all **117** library modules. And a defect in `common/llm.py` or
+`common/policy.py` reaches every service, so the files with the widest
+blast radius were the ones with no coverage at all.
+
+That glob had already been widened once, for exactly this reason —
+`agentic/introspect_app.py` was outside the original `*/app.py` and took
+2 naive timestamps with it. Widening a hand-written list produces a
+slightly less wrong hand-written list. It is derived from the tree now:
+everything first-party that is not a test, tooling or vendored.
+
+### What the widening found
+
+    +117 files
+    +30  silent swallows      (fixed in the same change)
+    +16  per-request clients   (registered, KAI-GATE-022)
+    +1   unbounded body        (registered, KAI-GATE-022)
+
+Repo-wide swallows: **34 → 7**, and the seven are named:
+
+  - two `conn.close()` in memu-core's pool — the operator's Q4 rule
+  - two logging handlers (`memu-core`, `agentic`) — the recorder emits a
+    warning, which re-enters the handler that just failed
+  - `vault-sync/watcher.stop()` — pure teardown
+  - `common/degraded.py`'s own recorder — a failure in the failure
+    recorder must not become the outage
+  - `security_audit`'s empty-nonce probe, where refusing to sign is the
+    hoped-for behaviour and there is no separate setup step to confuse
+    it with
+
+### The one that was a fail-open in a security check
+
+`agentic/security_audit.py` tested HMAC tamper-resistance like this:
+
+    try:
+        sig = sign_fn(**base_params)
+        tampered = sig[:-4] + "0000"
+        verified = verify_fn(**base_params, signature=tampered)
+        if verified:
+            findings.append(...)   # critical
+    except Exception:
+        pass  # Expected to fail or return False
+
+The comment is true of `verify_fn` — rejecting a tampered signature by
+raising is correct. It is false of `sign_fn`. If *signing* raised, the
+check never ran, no finding was appended, and the audit reported HMAC as
+sound. **A security audit that could not execute was indistinguishable
+from one that passed.** Setup and assertion are now separate statements,
+and a setup failure produces an `audit_incomplete` finding that says in
+words that this is not evidence of soundness.
+
+### A ratchet that can be widened without being weakened
+
+`--update-baseline` refused to record the higher numbers, which is
+exactly right and is the property that makes it a ratchet. But a rise has
+two possible causes — a regression, or a change of denominator — and they
+must not be spelled the same way.
+
+So there is now `--widen-scope "reason"`, which permits a rise, requires
+a written reason, stores it in the baseline alongside a per-column
+before/after, and prints it. The rise shows up in review as a deliberate
+act. `--update-baseline` still refuses, so the only way to raise a count
+is to say why in a diff someone reads.
+
+### Register
+
+**`KAI-GATE-022` OPEN** — 16 per-request `httpx.AsyncClient` sites and 1
+unbounded body in library code (`agentic/planner.py` 5,
+`common/llm.py` 4, `agentic/router.py` 4, `agentic/adversary.py` 2,
+`common/perception_spine/shadow.py` 1).
+
+This deserves stating plainly: **H-2 and H-3 were closed against the
+narrow scope.** Their closures were true of what was measured and not
+true of the repository. Nothing was mis-stated at the time — the survey
+said "service entry points" — but the number read as repo-wide, and I
+treated it as repo-wide. Rule 7 says a count moves only on evidence; this
+is evidence moving one the other way, and it is registered rather than
+folded quietly into a new baseline.
+
+**`KAI-GATE-021` still OPEN**, per the earlier entry: 4 → 7 repo-wide is a
+scope change, not a regression, and closure remains a separate review.
+
+    suite floor   4,287 → 4,290 passed, 0 failed, 0 errors
+    hygiene       24 total, baseline recorded with its widening reason
+    isolation     replaced 0, no declared leak grew

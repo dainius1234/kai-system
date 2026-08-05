@@ -22,6 +22,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
+from common.degraded import record_degradation
 
 
 @dataclass
@@ -464,7 +465,7 @@ async def pre_fetch_predicted_context(
                 if resp.status_code == 200:
                     data = resp.json()
                     pred.pre_fetched_context = data if isinstance(data, list) else []
-            except Exception:
-                pass  # pre-fetch is best-effort
+            except Exception as _exc:
+                record_degradation("memu", "prefetch_context", _exc)  # pre-fetch is best-effort
 
     return predictions

@@ -169,7 +169,14 @@ REGISTRY: Tuple[Gate, ...] = (
          proven_by="scripts/test_hygiene_gate.py",
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
-         findings=("KAI-GATE-001",)),
+         # KAI-GATE-022 opened 2026-08-05: widening the survey from
+         # service entry points to every first-party module made 16
+         # per-request httpx clients and 1 unbounded body visible in
+         # library code. Same class as H-2/H-3, which were closed at the
+         # narrower scope — so those closures were true of what was
+         # measured and not of the repository. Registered rather than
+         # absorbed into the baseline silently (Rule 7).
+         findings=("KAI-GATE-001", "KAI-GATE-022")),
 
     Gate(module="check_dashboard_findings",
          kind=REPORT,

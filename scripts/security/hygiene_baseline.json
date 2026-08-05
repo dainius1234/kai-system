@@ -1,11 +1,28 @@
 {
   "note": "Ceiling for scripts/security/hygiene_survey.py --gate. Lower only; see kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md.",
   "totals": {
-    "clients": 0,
-    "unbounded_bodies": 0,
+    "clients": 16,
+    "unbounded_bodies": 1,
     "naive_timestamps": 0,
     "success_on_failure": 0,
-    "silent_swallows": 4
+    "silent_swallows": 7
   },
-  "grand_total": 4
+  "grand_total": 24,
+  "scope_widened": {
+    "reason": "Survey scope grew from service entry points (*/app.py and friends) to every first-party module: +117 files. A defect in common/llm.py reaches every service, so the least-covered files had the widest blast radius. silent_swallows were fixed in the same change (34 -> 7 repo-wide, all 7 documented); the 16 clients and 1 unbounded body are pre-existing H-2/H-3-class debt made visible, registered as KAI-GATE-022 rather than absorbed.",
+    "raised": {
+      "clients": [
+        0,
+        16
+      ],
+      "unbounded_bodies": [
+        0,
+        1
+      ],
+      "silent_swallows": [
+        4,
+        7
+      ]
+    }
+  }
 }

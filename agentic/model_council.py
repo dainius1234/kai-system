@@ -22,6 +22,7 @@ import time
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set
+from common.degraded import record_degradation
 
 logger = logging.getLogger("kai.model_council")
 
@@ -165,8 +166,8 @@ class ModelCouncil:
                     # Custom operator-added profile
                     try:
                         self._profiles[mid] = CouncilProfile.from_dict(entry)
-                    except Exception:
-                        pass
+                    except Exception as _exc:
+                        record_degradation("filesystem", "load_council_profile", _exc)
             self._primary = data.get("primary", self._primary)
         except Exception as exc:
             logger.debug("Model council profile load failed (non-critical): %s", exc)

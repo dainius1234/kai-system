@@ -273,10 +273,31 @@ def audit_hmac_auth(sign_fn, verify_fn) -> List[SecurityFinding]:
         ))
 
     # Test 2: Tampered signature should NOT verify
+    #
+    # H-6: the whole test used to sit inside one `except Exception: pass`
+    # commented "Expected to fail or return False". True of `verify_fn` —
+    # a rejection may legitimately raise — and false of `sign_fn`. If
+    # *signing* raised, the tamper check never ran, and this function
+    # returned no finding, which reads as "HMAC is sound". A security
+    # audit that could not execute must never be indistinguishable from
+    # one that passed. Setup and assertion are separated so the two
+    # failures cannot be confused.
     try:
         sig = sign_fn(**base_params)
         tampered = sig[:-4] + "0000"
-        verified = verify_fn(**base_params, signature=tampered)
+    except Exception as exc:
+        findings.append(SecurityFinding(
+            category="audit_incomplete",
+            severity="medium",
+            description=f"Tamper check could NOT be performed: signing raised {exc!s:.100}.",
+            payload="base_params",
+            recommendation="This is not evidence of soundness. Fix signing, then re-audit.",
+        ))
+    else:
+        try:
+            verified = verify_fn(**base_params, signature=tampered)
+        except Exception:
+            verified = False  # rejecting a tampered signature by raising is correct
         if verified:
             findings.append(SecurityFinding(
                 category="hmac_weakness",
@@ -285,14 +306,24 @@ def audit_hmac_auth(sign_fn, verify_fn) -> List[SecurityFinding]:
                 payload=f"original={sig[:20]}... tampered={tampered[:20]}...",
                 recommendation="Use timing-safe comparison (hmac.compare_digest).",
             ))
-    except Exception:
-        pass  # Expected to fail or return False
 
     # Test 3: Modified field should NOT verify with original signature
     try:
         sig = sign_fn(**base_params)
         modified_params = {**base_params, "tool": "EVIL-tool"}
-        verified = verify_fn(**modified_params, signature=sig)
+    except Exception as exc:
+        findings.append(SecurityFinding(
+            category="audit_incomplete",
+            severity="medium",
+            description=f"Field-tamper check could NOT be performed: signing raised {exc!s:.100}.",
+            payload="base_params",
+            recommendation="This is not evidence of soundness. Fix signing, then re-audit.",
+        ))
+    else:
+        try:
+            verified = verify_fn(**modified_params, signature=sig)
+        except Exception:
+            verified = False  # rejecting a modified payload by raising is correct
         if verified:
             findings.append(SecurityFinding(
                 category="hmac_weakness",
@@ -301,8 +332,6 @@ def audit_hmac_auth(sign_fn, verify_fn) -> List[SecurityFinding]:
                 payload="tool changed from 'test-tool' to 'EVIL-tool'",
                 recommendation="Ensure all fields are included in HMAC payload.",
             ))
-    except Exception:
-        pass
 
     # Test 4: Empty nonce handling
     try:
@@ -318,7 +347,10 @@ def audit_hmac_auth(sign_fn, verify_fn) -> List[SecurityFinding]:
                 recommendation="Validate nonce is non-empty before signing.",
             ))
     except Exception:
-        pass  # Raising on empty nonce is acceptable
+        # Genuinely expected: refusing to sign an empty nonce is the
+        # behaviour this test hopes for, and there is no separate setup
+        # step here that could fail instead.
+        pass
 
     return findings
 

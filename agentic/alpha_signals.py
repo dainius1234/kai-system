@@ -28,6 +28,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 import httpx
+from common.degraded import record_degradation
 
 logger = logging.getLogger("kai.alpha_signals")
 
@@ -261,8 +262,8 @@ class AlphaSignalFeed:
             if mark_data:
                 try:
                     mark_price = float(mark_data.get("markPrice", 0)) or None
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation("market", "mark_price_parse", _exc)
 
         try:
             oi_contracts = float(data.get("openInterest", 0))

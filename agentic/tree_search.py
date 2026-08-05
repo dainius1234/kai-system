@@ -14,6 +14,7 @@ import hashlib
 import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional
+from common.degraded import record_degradation
 
 
 @dataclass
@@ -164,8 +165,8 @@ async def tree_search(
                                 {"content": c} if isinstance(c, str) else c
                                 for c in extra
                             ]
-                    except Exception:
-                        pass
+                    except Exception as _exc:
+                        record_degradation("retrieval", "tree_search_chunks", _exc)
 
             active_prompts = next_prompts
 

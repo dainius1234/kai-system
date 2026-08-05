@@ -54,25 +54,37 @@ ADOPTION_DETECTORS = {}
 COLUMNS: tuple = ()
 
 
-# Service entry points are not all called `app.py`: `agentic` also ships
-# `introspect_app.py`, and scanning only `app.py` missed 2 of its naive
-# timestamps entirely. A survey that undercounts is worse than no survey,
-# because the number looks authoritative.
-ENTRY_POINT_GLOBS = ("*/app.py", "*/*/app.py", "*/*_app.py", "*/*/*_app.py")
+# Every first-party module, not only the entry points.
+#
+# This started as `*/app.py`, which missed `agentic/introspect_app.py`
+# and 2 of its naive timestamps. Widened to the four globs below, which
+# then missed all 117 library modules — and a defect in `common/llm.py`
+# or `common/market_cache.py` reaches *every* service, so the files least
+# covered were the ones with the widest blast radius. Widening again
+# added 16 per-request clients and 30 silent swallows the ratchet had
+# never been able to see.
+#
+# Twice now the scope has been a hand-written list of where to look, and
+# twice it has been narrower than the problem. It is derived from the
+# tree now: everything first-party that is not a test, a tool, or
+# vendored. Adding a service or a module cannot leave it unscanned,
+# which is the property that matters — the previous versions failed open,
+# and a survey that undercounts is worse than none because the number
+# still looks authoritative.
 _EXCLUDED_DIRS = {"node_modules", ".venv", "venv", "site-packages",
-                  "scripts", "tests", "kai-pm"}
+                  "scripts", "tests", "kai-pm", "_archive", "__pycache__",
+                  ".git", "_migrations"}
 
 
 def _service_files() -> List[Path]:
-    """Every service entry point, excluding tests and vendored code."""
+    """Every first-party module, excluding tests, tooling and vendored code."""
     found = set()
-    for pattern in ENTRY_POINT_GLOBS:
-        for path in REPO.glob(pattern):
-            if any(p in _EXCLUDED_DIRS for p in path.parts):
-                continue
-            if path.name.startswith("test_"):
-                continue
-            found.add(path)
+    for path in REPO.rglob("*.py"):
+        if any(part in _EXCLUDED_DIRS for part in path.parts):
+            continue
+        if path.name.startswith("test_") or path.name == "conftest.py":
+            continue
+        found.add(path)
     return sorted(found)
 
 
@@ -245,6 +257,10 @@ def main() -> int:
                         help="fail if any count has risen above the baseline")
     parser.add_argument("--update-baseline", action="store_true",
                         help="record the current counts as the new ceiling")
+    parser.add_argument("--widen-scope", metavar="REASON",
+                        help="record a HIGHER ceiling because the survey now "
+                             "looks at more files. Requires a written reason, "
+                             "which is stored in the baseline.")
     args = parser.parse_args()
 
     results = survey()
@@ -257,23 +273,34 @@ def main() -> int:
 
     risen = ratchet(totals) if args.gate else []
 
-    if args.update_baseline:
+    if args.update_baseline or args.widen_scope:
         baseline = load_baseline() or {}
         worse = [c for c in COLUMNS if totals[c] > baseline.get(c, totals[c])]
-        if worse:
+        if worse and not args.widen_scope:
+            # The ratchet defends itself. A count that has risen is
+            # either a regression or a change of denominator, and those
+            # must not be spelled the same way — the second is legitimate
+            # and the first is the thing this file exists to catch.
             print("REFUSED: the baseline may only be lowered. Risen: "
                   + ", ".join(worse))
+            print("  If the survey now scans MORE files, that is a scope "
+                  "change, not a regression: re-run with\n"
+                  '  --widen-scope "why the scope grew". The reason is '
+                  "stored in the baseline and shows up in review.")
             return 1
-        BASELINE.write_text(
-            json.dumps({
-                "note": "Ceiling for scripts/security/hygiene_survey.py --gate. "
-                        "Lower only; see kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md.",
-                "totals": totals,
-                "grand_total": grand,
-            }, indent=2) + "\n",
-            encoding="utf-8",
-        )
+        note = ("Ceiling for scripts/security/hygiene_survey.py --gate. "
+                "Lower only; see kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md.")
+        payload = {"note": note, "totals": totals, "grand_total": grand}
+        if args.widen_scope:
+            payload["scope_widened"] = {
+                "reason": args.widen_scope,
+                "raised": {c: [baseline.get(c), totals[c]]
+                           for c in COLUMNS if totals[c] > baseline.get(c, totals[c])},
+            }
+        BASELINE.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
         print(f"Baseline updated: {totals} (total {grand})")
+        if args.widen_scope:
+            print(f"  scope widened: {args.widen_scope}")
         return 0
 
     if args.json:

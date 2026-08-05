@@ -27,6 +27,7 @@ from html.parser import HTMLParser
 from typing import Any, Dict, List, Optional
 
 import httpx
+from common.degraded import record_degradation
 
 logger = logging.getLogger("kai.web_scout")
 
@@ -73,8 +74,8 @@ def _extract_text(html: str, max_chars: int = _MAX_CONTENT_CHARS) -> str:
     ex = _TextExtractor()
     try:
         ex.feed(html)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("parser", "html_extract", _exc)
     return ex.text(max_chars)
 
 

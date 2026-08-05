@@ -29,6 +29,7 @@ import sys
 import time
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
+from common.degraded import record_degradation
 
 logger = logging.getLogger("kai.trust_integration")
 
@@ -277,8 +278,8 @@ def record_chat_response(
                 f"High-conviction response (c={conviction:.1f}) via {specialist}",
                 capability="chat",
             )
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("trust", "record_chat_evidence", _exc)
 
 
 # ── Alignment audit reporter ──────────────────────────────────────────────────
@@ -331,8 +332,8 @@ def get_trust_status() -> Dict[str, Any]:
         try:
             from wisdom_graph import get_wisdom_graph  # type: ignore[import]
             status["wisdom_graph"] = get_wisdom_graph().stats()
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("cognition", "wisdom_graph_stats", _exc)
 
         return status
     except Exception as exc:

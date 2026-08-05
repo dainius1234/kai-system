@@ -2,7 +2,7 @@
   "note": "The repo-wide pytest result. Failures and errors may fall, never rise. See scripts/security/check_suite_floor.py.",
   "max_failed": 0,
   "max_errors": 0,
-  "min_passed": 4287,
+  "min_passed": 4290,
   "recorded": "2026-08-05",
   "history": [
     {
@@ -81,6 +81,13 @@
       "failed": 0,
       "errors": 0,
       "note": "H-6 complete: 120 silent swallows -> 4 across 16 services. The 4 left are two conn.close() cleanups and two log handlers, where recording would recurse through the logger."
+    },
+    {
+      "date": "2026-08-05",
+      "passed": 4290,
+      "failed": 0,
+      "errors": 0,
+      "note": "H-6 extended to library modules; the hygiene survey's scope widened from entry points to all first-party code"
     }
   ]
 }

@@ -47,8 +47,8 @@ except Exception:
         clean = "\n".join(lines)
         try:
             return json.loads(clean)
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("policy", "parse_policy_document", _exc)
         # Fallback: return empty dict (services use .get() with defaults)
         return {}
 
@@ -62,6 +62,7 @@ _POLICY_PATH = Path(
 )
 
 import logging as _logging
+from common.degraded import record_degradation
 _policy_logger = _logging.getLogger("kai.policy")
 
 POLICY: Dict[str, Any] = {}

@@ -32,6 +32,7 @@ import os
 import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
+from common.degraded import record_degradation
 
 logger = logging.getLogger(__name__)
 
@@ -243,8 +244,8 @@ class LLMRouter:
         try:
             from common.ab_log import log_ab_entry
             log_ab_entry(resp, prompt, session_id=session_id)
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("ab_log", "log_entry", _exc)
 
         return resp
 

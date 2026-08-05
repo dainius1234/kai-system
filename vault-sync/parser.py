@@ -9,6 +9,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+from common.degraded import record_degradation
 
 
 _WIKILINK_RE = re.compile(r"\[\[([^\]]+)\]\]")
@@ -50,8 +51,8 @@ def parse_note(filepath: str) -> Optional[NoteData]:
                 if not isinstance(fm, dict):
                     fm = {}
                 content = raw[end + 4:].lstrip("\n")
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("parser", "vault_frontmatter", _exc)
 
     # Extract wikilinks: [[target]] or [[target|alias]]
     wikilinks: List[Tuple[str, str]] = []

@@ -17,6 +17,7 @@ import os
 import subprocess
 from dataclasses import dataclass
 from typing import Optional
+from common.degraded import record_degradation
 
 
 @dataclass
@@ -55,14 +56,14 @@ def has_cuda() -> bool:
     try:
         import torch
         return torch.cuda.is_available()
-    except Exception:
+    except Exception as _exc:
         # Not just ImportError. A capability *probe* must never raise: a
         # torch build without `.cuda`, or one that raises while
         # initialising a driver, would otherwise propagate out of a
         # function whose whole contract is to answer True or False.
         # Same shape as the OpenCV guard in perception/vision/app.py,
         # which CI found by dying at import.
-        pass
+        record_degradation("gpu", "cuda_probe", _exc)
 
     return False
 
@@ -114,8 +115,8 @@ def get_gpu_info() -> GPUInfo:
                 total_memory_gb=round(memory_mb / 1024, 1),
                 driver_version=driver
             )
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("gpu", "nvidia_smi", _exc)
 
     return GPUInfo(available=True)
 
