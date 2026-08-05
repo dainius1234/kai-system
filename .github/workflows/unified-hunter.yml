@@ -40,7 +40,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          # Same install as the other workflows, not a hand-written
+          # subset. `pip install pyyaml` in policy-checks.yml was exactly
+          # this shape and left that workflow red for 30 consecutive
+          # runs, because a hand-listed set is true of what someone
+          # remembered and false of everything added since.
           pip install pyyaml fastapi 'httpx<1' starlette pydantic
+          find . -maxdepth 3 -name requirements.txt -not -path './.venv/*' -not -path './_archive/*' -print0 | while IFS= read -r -d '' req; do
+            echo "Installing $req"
+            pip install -r "$req" || true
+          done
 
       - name: Unified Hunter suites
         run: |

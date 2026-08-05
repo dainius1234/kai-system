@@ -33,6 +33,12 @@ policy-check: lint-blocking
 	python3 scripts/security/check_ci_tolerations.py
 	python3 scripts/security/check_test_wiring.py
 	python3 scripts/security/check_gate_registry.py --gate
+	@# Doc-drift last: it fails on every commit that adds a test, so it
+	@# must be enforced HERE rather than remembered. core-tests.yml
+	@# failed 30 consecutive runs on this check and skipped its other 50
+	@# steps — every service test and the whole Docker stack — because
+	@# nothing made it visible before the push.
+	$(MAKE) --no-print-directory check-docs
 
 test-contracts:
 	PYTHONPATH=. python scripts/test_contracts.py

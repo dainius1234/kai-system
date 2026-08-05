@@ -5664,3 +5664,79 @@ because a resolution I hold privately is worth nothing.
 failed closed on rules 7 and 11. Instance fixed by mirroring the main
 workflow's install. **OPEN** until a green run on this workflow proves
 it, which is the whole point of not closing on a local result.
+
+---
+
+## 2026-08-05 (part 12) — there are nine workflows. I was watching one.
+
+Asked whether everything was green. It was not, and finding out required
+questioning the assumption underneath the previous entry.
+
+Part 11 recorded that I had been watching `python-app.yml` and calling it
+"CI", with `policy-checks.yml` red for 30 runs. I then wrote the control:
+*every CI report names every workflow.* The first thing that rule
+demanded was checking how many workflows there are.
+
+**Nine.** Four run on push to this branch:
+
+    python-app.yml     green
+    policy-checks.yml  green on 2d3cba0 — first success in its history
+    core-tests.yml     FAILED 30 of 30
+    unified-hunter.yml FAILED 13 of 15
+
+So the honest count is that I had been reporting "CI green" from **one of
+four**, and fixing the second only revealed the other two. Assuming there
+were two was the same error as assuming there was one, one layer up.
+
+### core-tests: 50 steps skipped behind a stale number
+
+It fails at step 7, `make check-docs`, and **every one of the following
+50 steps is skipped** — all the service suites, the coverage floors, the
+Docker stack build, the sovereign-profile boot, the restart-persistence
+smoke test. None of that has run for 30 commits.
+
+The cause is that the README records a test count, and I have added
+tests all day:
+
+    | **Individual tests** | 4,138 |   ->  4,226
+    | **Python LOC**       | ~117,738 | -> ~122,508
+
+Nothing was broken. A number in a document went stale, a gate correctly
+said so, and fifty steps of real verification stopped running behind it.
+
+That gate cannot be "fixed" — it is right. What was missing is that
+**nothing made it visible before the push**, so `make check-docs` now
+runs as the last step of `policy-check`. A check that fails on every
+commit which adds a test has to be enforced locally or it will be red
+permanently, and a permanently red gate is an ignored one.
+
+### unified-hunter: the same hand-written dependency list
+
+`make test-uh` passes locally, and so does the assertion ratchet, so the
+failure is environmental. Its install was
+`pip install pyyaml fastapi 'httpx<1' starlette pydantic` — the identical
+shape to the `pip install pyyaml` that left `policy-checks.yml` red for
+thirty runs: a hand-listed set, true of what someone remembered and
+false of everything added since. All three now also install every
+`requirements.txt` in the tree.
+
+**Seventh venue for the list-beside-the-thing pattern**, and the second
+one today in CI dependency installs alone.
+
+### The operator's directive, encoded rather than agreed to
+
+> *"From now on enforce and log, assume nothing, trust no one."*
+
+  - **enforce** — `check-docs` is in `policy-check` now, so the drift
+    that cost 50 skipped steps fails on my machine before a push.
+  - **assume nothing** — the workflow count was an assumption, and it
+    was wrong. The tree is the source: `ls .github/workflows/`.
+  - **trust no one** — including the previous entry in this file, which
+    said "two workflows" with confidence twenty minutes ago.
+
+### Register
+
+**`KAI-GATE-025` extended** — not one workflow under-provisioned but
+three, and the reporting failure was mine rather than the repository's.
+Stays **OPEN** until `core-tests` and `unified-hunter` are observed green;
+`policy-checks` has been.
