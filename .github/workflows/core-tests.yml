@@ -228,9 +228,28 @@ jobs:
           docker system prune -af --volumes
           df -h
 
+      # "Full" is a name that lies: `docker-compose.full.yml` declares 30
+      # built services, `docker-compose.minimal.yml` declares 32, and
+      # **19 of minimal's are not in full at all** — calendar-service,
+      # broker-bridge, vault-sync, cortex and fifteen others. So this
+      # step never built most of what the bring-up below actually needs,
+      # and a Dockerfile fault in any of those nineteen surfaced as a
+      # mysterious `up` failure rather than as a build failure with the
+      # build's own error message.
+      #
+      # Both profiles are built, minimal first, because minimal is the
+      # one that then gets started.
+      - name: Build the images the bring-up needs
+        run: |
+          set -o pipefail
+          docker compose -f docker-compose.minimal.yml build 2>&1 | tail -40
+          df -h / | tail -1
+
       - name: Build full stack Docker images
         run: |
-          docker compose -f docker-compose.full.yml build
+          set -o pipefail
+          docker compose -f docker-compose.full.yml build 2>&1 | tail -40
+          df -h / | tail -1
 
       # ci-toleration: needs-owner
       - name: Scan container images for vulnerabilities
@@ -284,7 +303,17 @@ jobs:
           # quality, and can't rely on the HF model download succeeding.
           MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
         run: |
-          docker compose -f docker-compose.minimal.yml up -d --build
+          set -o pipefail
+          # Captured, because the post-mortem used to *re-run* the
+          # bring-up to get its error into the readable tail — with
+          # `--no-build`, which is a different command and produced a
+          # different failure ("No such image"). A diagnostic that
+          # changes the thing it measures reports the wrong cause; that
+          # is the defect this whole programme is about, and it was in
+          # the tool I built to find it. The real output is kept instead.
+          docker compose -f docker-compose.minimal.yml up -d --build \
+            2>&1 | tee /tmp/bringup.log
+          df -h / | tail -1
           # Waits on Docker's verdict of each service's own healthcheck.
           # These three used to be `curl http://localhost:8000|8007|8009`,
           # which addressed nothing: tool-gate, agentic and
@@ -470,9 +499,8 @@ jobs:
           echo "── minimal compose config parses? ──"
           docker compose -f docker-compose.minimal.yml config -q 2>&1 \
             && echo "config: VALID" || echo "config: INVALID"
-          echo "── the bring-up, re-run so its error is in frame ──"
-          docker compose -f docker-compose.minimal.yml up -d --no-build 2>&1 \
-            | tail -25 || true
+          echo "── what the bring-up itself said (its real output) ──"
+          tail -30 /tmp/bringup.log 2>/dev/null || echo "(no bring-up log)"
           echo "── containers (all states) ──"
           docker compose -f docker-compose.minimal.yml ps -a 2>/dev/null \
             | head -12 || true

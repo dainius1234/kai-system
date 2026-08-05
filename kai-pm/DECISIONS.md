@@ -6205,3 +6205,71 @@ removed; the map is deleted rather than corrected. Suites:
 `test_live_smoke.py` (23 assertions, 11 scenarios), both entirely
 synthetic. Floors: 36 suites, 2,366 assertions. **OPEN** until observed
 in CI, because local green has meant nothing three times today.
+
+---
+
+## 2026-08-05 (part 19) — my own post-mortem reported the wrong cause
+
+`e0f2c20` got further than anything before it: the registry check passed,
+the build passed, and the bring-up ran for **32 seconds** instead of one.
+Then it failed, and the post-mortem told me the cause was
+
+    No such image: kai-system-calendar-service:latest
+
+which is not the cause. It is the post-mortem's own artefact.
+
+To get the error into the readable tail, the post-mortem **re-ran** the
+bring-up — with `--no-build`. That is a different command. It cannot
+build, so it reports missing images; the real step builds, and fails for
+some other reason entirely.
+
+**A diagnostic that changes the thing it measures reports the wrong
+cause.** That is the defect this entire programme is about, and I built
+it into the instrument I made to find it, about an hour after writing
+that unreadable failures are the defect. It is now the second time today
+that a tool of mine answered a different question than the one asked —
+the first was `check_image_tags` measuring pinned-ness instead of
+existence.
+
+The real output is captured with `tee` and printed instead. No re-run,
+no second command, no chance of a different answer.
+
+### "Full" is a name that lies
+
+Checked while waiting, and it is worth more than the naming:
+
+    docker-compose.full.yml     30 built services
+    docker-compose.minimal.yml  32 built services
+    in minimal but NOT in full: 19
+
+`calendar-service`, `broker-bridge`, `vault-sync`, `cortex`,
+`document-parser`, `email-reader`, `news-feed`, `notify-service`,
+`weather-service` and ten more. The **minimal** profile is a superset of
+the **full** one for anything built from this tree.
+
+So `docker compose -f docker-compose.full.yml build` — the step named
+"Build full stack Docker images", sitting immediately above the bring-up
+— never built most of what the bring-up needs. A Dockerfile fault in any
+of those nineteen could only ever appear as a failure of `up`, thirty
+seconds in, with no build log.
+
+Both profiles are now built, minimal first, so a build failure is
+reported by a build step with the build's own error.
+
+### Register
+
+**`KAI-GATE-031`** — six `container_name` values are shared between
+`docker-compose.minimal.yml` and `docker-compose.sovereign.yml`:
+`sovereign-dashboard`, `-heartbeat`, `-memu-core`, `-postgres`,
+`-redis`, `-tool-gate`. Docker container names are **global**, not
+scoped to a compose project, so the two profiles cannot both be up. CI
+happens to tear down between them, and every teardown is `if: always()`,
+so this is latent rather than active — but `DECISIONS.md` line 1414
+records this exact class biting before, with `sovereign-memu-core` and
+`sovereign-memu-core-introspect`. **OPEN**, gate to follow; not fixed in
+this commit because renaming containers while chasing a live CI failure
+is two variables at once.
+
+**`KAI-GATE-028`** — still open. The bring-up now reaches 32 seconds and
+fails for a reason I do not yet have, because the instrument was wrong.
+Fixed instrument pushed; the next run reports the real output.
