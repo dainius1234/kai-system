@@ -52,12 +52,15 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import subprocess
 import sys
 from pathlib import Path
-from typing import Callable, Dict, List, Sequence, Tuple
+from typing import List, Sequence, Tuple
 
-REPO = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+from scripts.ci.compose_probe import (  # noqa: E402
+    REPO, Runner, compose_health, exec_http, health_ports, run as _run)
+
 
 # (service, method, path, body) — the endpoints that prove the spine is
 # wired, not merely listening. Kept short on purpose: this is a smoke
@@ -73,100 +76,6 @@ EXERCISES: Tuple[Tuple[str, str, str, dict], ...] = (
     }),
     ("dashboard", "GET", "/go-no-go", {}),
 )
-
-Runner = Callable[[Sequence[str]], Tuple[int, str, str]]
-
-
-def _run(argv: Sequence[str]) -> Tuple[int, str, str]:
-    proc = subprocess.run(list(argv), capture_output=True, text=True, timeout=120)
-    return proc.returncode, proc.stdout, proc.stderr
-
-
-def health_ports(doc: dict) -> Dict[str, int]:
-    """service -> the port its own healthcheck probes.
-
-    Derived, never typed. A service whose healthcheck names no port
-    (`redis`, `postgres`, `ollama` use their own CLI probes) is simply
-    absent here rather than guessed at.
-    """
-    out: Dict[str, int] = {}
-    for name, cfg in sorted((doc.get("services") or {}).items()):
-        test = ((cfg or {}).get("healthcheck") or {}).get("test")
-        if not test:
-            continue
-        text = " ".join(test) if isinstance(test, list) else str(test)
-        match = re.search(r"localhost:(\d+)", text)
-        if match:
-            out[name] = int(match.group(1))
-    return out
-
-
-def compose_health(compose_file: str, runner: Runner) -> Dict[str, str]:
-    """service -> health as Docker itself reports it.
-
-    `docker compose ps` answers with the verdict of the healthcheck the
-    compose file already declares, so the port lives in exactly one
-    place. A service with no healthcheck reports an empty string, which
-    is reported as `no-healthcheck` and never silently read as healthy.
-    """
-    code, out, err = runner(["docker", "compose", "-f", compose_file,
-                             "ps", "--format", "json"])
-    if code != 0:
-        raise RuntimeError(f"docker compose ps failed ({code}): {err.strip()[:300]}")
-    states: Dict[str, str] = {}
-    for line in out.splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            row = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        rows = row if isinstance(row, list) else [row]
-        for entry in rows:
-            name = entry.get("Service") or entry.get("Name")
-            if not name:
-                continue
-            states[name] = (entry.get("Health") or "").strip() or "no-healthcheck"
-    return states
-
-
-def exec_http(compose_file: str, service: str, port: int, method: str,
-              path: str, body: dict, runner: Runner) -> Tuple[bool, str]:
-    """Call an endpoint from inside the container, the only place it exists.
-
-    stdlib only, because the service images carry no HTTP client beyond
-    what their own healthchecks use — which is `urllib.request`.
-    """
-    payload = json.dumps(body)
-    program = (
-        "import json,sys,urllib.request,urllib.error\n"
-        f"body={payload!r}\n"
-        f"req=urllib.request.Request('http://localhost:{port}{path}',"
-        f"method='{method}')\n"
-        "req.add_header('Content-Type','application/json')\n"
-        f"data=body.encode() if '{method}'!='GET' else None\n"
-        "try:\n"
-        "    r=urllib.request.urlopen(req,data=data,timeout=15)\n"
-        "    print('STATUS', r.status)\n"
-        "except urllib.error.HTTPError as e:\n"
-        "    print('STATUS', e.code)\n"
-        "except Exception as e:\n"
-        "    print('ERROR', type(e).__name__, e); sys.exit(1)\n"
-    )
-    code, out, err = runner(["docker", "compose", "-f", compose_file,
-                             "exec", "-T", service, "python", "-c", program])
-    text = (out + err).strip()
-    if code != 0:
-        return False, text[:300] or f"exit {code}"
-    match = re.search(r"STATUS (\d+)", out)
-    if not match:
-        return False, text[:300] or "no status line"
-    status = int(match.group(1))
-    # 4xx is an answer: the service is up and enforcing something. 5xx and
-    # no-answer are not.
-    return status < 500, f"HTTP {status}"
-
 
 def audit(compose_file: str, runner: Runner = _run) -> Tuple[List[str], int, int]:
     """Return (failures, services probed, exercises run)."""
@@ -205,8 +114,8 @@ def audit(compose_file: str, runner: Runner = _run) -> Tuple[List[str], int, int
         if states.get(service) != "healthy":
             continue        # already reported above; do not double-count
         exercised += 1
-        ok, detail = exec_http(compose_file, service, ports[service],
-                               method, endpoint, body, runner)
+        ok, detail, _ = exec_http(compose_file, service, ports[service],
+                                  method, endpoint, body, runner)
         if not ok:
             failures.append(f"{service} {method} {endpoint}: {detail}")
 

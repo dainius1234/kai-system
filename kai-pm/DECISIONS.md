@@ -6126,3 +6126,82 @@ one of which stopped every compose bring-up in CI. Instance fixed; class
 enforced by `check_image_tags --verify-exists`, wired into
 `core-tests.yml` ahead of the Docker section. **OPEN** until the
 bring-up is observed succeeding.
+
+---
+
+## 2026-08-05 (part 18) — KAI-GATE-029: the port map is deleted, not corrected
+
+Nine `curl http://localhost:PORT` probes across five steps of
+`core-tests.yml`, all addressing ports that stopped existing at
+`e4655bc`. `tool-gate`, `memu-core`, `memu-core-introspect`, `agentic`
+and `memu-graph` are on networks declared `internal: true`: **no port to
+restore and no address to route to.** The map could not be repaired.
+
+It also did not need to exist. Every service already declares how to
+check itself, beside itself:
+
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;
+             urllib.request.urlopen('http://localhost:8001/health')\""]
+
+And one line in the sovereign boot step had been doing it right the
+whole time, for exactly one service:
+
+    docker compose exec -T postgres pg_isready -U keeper -d sovereign
+
+Correct, and never generalised. `scripts/ci/compose_probe.py` is the
+generalisation. Two primitives replace all nine sites:
+
+  `wait_healthy`  polls `docker compose ps` for Docker's own verdict on
+                  the healthcheck. No port, no endpoint, no opinion about
+                  what healthy means for that service — it already said.
+  `exec_http`     one HTTP call from inside the container, port read from
+                  that service's healthcheck rather than typed again.
+
+Both healthcheck spellings in this tree are matched, because the pattern
+looked for is the **address**, not the tool: matching on `python -c`
+would have silently skipped every sovereign service, which uses
+`wget -qO-`.
+
+Rewritten with it: the bring-up waits, kill-isolation, restart-
+persistence, the memu-graph wait, the memu-graph live cycle, and the
+sovereign boot. `scripts/test_graph_live.py` moved from `requests` to
+stdlib so it can run *inside* memu-graph — and the `pip install requests`
+in CI went with it.
+
+### Two defects in the new code, found by its own tests
+
+  1. **A Docker failure was reported as "not running".** `wait_healthy`
+     set the reason and the loop below then overwrote it. A broken daemon
+     would have been reported as a service nobody started — a *wrong*
+     diagnosis, which is worse than none, because it sends the next
+     person after the wrong problem.
+  2. A reply with no recognisable status line returned the raw output and
+     left the reader to work out that the shape was the problem.
+
+Both were written by me an hour after writing that unreadable failures
+are the defect. The tests caught them before CI did, which is the first
+time today that sequence has run in the right order.
+
+`wait_healthy` takes its clock and its sleep as arguments, so the timeout
+path is asserted in microseconds instead of waiting five real minutes to
+prove it waits five minutes.
+
+### The heredoc I nearly shipped
+
+The kill-isolation step was first written as `python3 - <<'PROBE'`
+inside an indented `run:` block. That is the exact shape recorded in
+`check_ci_tolerations.unparseable()`: an embedded heredoc starting at
+column 0 has already terminated a `run: |` block early in three
+workflows here, and a workflow that does not parse runs nothing —
+indistinguishable from having no failures. Replaced with
+`scripts/ci/kill_isolation.py` before it was committed.
+
+### Register
+
+**`KAI-GATE-029`** — nine host-port probes addressing nothing. All nine
+removed; the map is deleted rather than corrected. Suites:
+`test_compose_probe.py` (27 assertions, 13 scenarios) and
+`test_live_smoke.py` (23 assertions, 11 scenarios), both entirely
+synthetic. Floors: 36 suites, 2,366 assertions. **OPEN** until observed
+in CI, because local green has meant nothing three times today.

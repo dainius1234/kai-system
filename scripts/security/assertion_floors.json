@@ -6,6 +6,7 @@
     "CI Toleration Tests": 15,
     "Compose Drift Tests": 21,
     "Compose Gate Tests": 54,
+    "Compose Probe Tests": 27,
     "Concurrency & Clock Tests": 51,
     "Constraint Assessment Tests": 56,
     "Dashboard Auth Tests": 99,
@@ -37,5 +38,5 @@
     "UH-7 Actuator Registry Tests": 75,
     "UH-8 Autonomy Tests": 174
   },
-  "total": 2339
+  "total": 2366
 }

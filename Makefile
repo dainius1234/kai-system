@@ -299,7 +299,8 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-dashboard-ui-auth test-degraded test-hygiene-gate \
 	test-assertion-floors test-gate-registry test-compose-drift \
 	test-secret-gates test-compose-gates test-ci-tolerations \
-	test-test-wiring test-test-isolation test-live-smoke test-suite-floor
+	test-test-wiring test-test-isolation test-live-smoke \
+	test-compose-probe test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
 # A-02 ratchet: runs `test-uh` and fails if any suite exercises less than
@@ -796,6 +797,9 @@ test-integration:
 
 test-live-smoke:
 	python3 scripts/test_live_smoke.py
+
+test-compose-probe:
+	python3 scripts/test_compose_probe.py
 
 # bring up full-stack composition
 full-up:

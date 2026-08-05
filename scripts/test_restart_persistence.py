@@ -6,9 +6,21 @@ SQLite DB survive restart via the mounted volume.
 
 Usage (called from CI after memu-core is running):
     python3 scripts/test_restart_persistence.py \
-        --url http://localhost:8001 \
         --compose-file docker-compose.minimal.yml \
         --service memu-core
+
+The restart is a *host* operation and the HTTP calls are a *container*
+operation, and since `e4655bc` those are not the same place. memu-core
+sits on `agent-net` and `data-net`, both declared `internal: true`, so
+`http://localhost:8001` from the runner reaches nothing — there is no
+published port and no routable address. The step had been aimed at a
+closed door since that commit, and nobody noticed because the workflow
+was dying forty steps earlier.
+
+So `docker compose restart` stays on the host, where it belongs, and
+every HTTP call goes through `docker compose exec` into the container,
+with the port read from the service's own healthcheck rather than passed
+in. `--url` is still accepted for a stack that does publish ports.
 
 Exit 0 on success, 1 on failure.
 """
@@ -21,56 +33,97 @@ import time
 import urllib.request
 import urllib.error
 import json
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from scripts.ci.compose_probe import exec_http, load_ports  # noqa: E402
 
 
-def _post(url: str, payload: dict) -> dict:
-    data = json.dumps(payload).encode()
-    req = urllib.request.Request(
-        url, data=data, headers={"Content-Type": "application/json"}, method="POST"
-    )
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        return json.loads(resp.read())
+class _Caller:
+    """Makes an HTTP call to the service, wherever the service can be reached.
+
+    Two modes, because a stack with published ports and a stack behind
+    `internal: true` networks are genuinely different situations and
+    pretending otherwise is what broke this script.
+    """
+
+    def __init__(self, compose_file: str, service: str, url: str | None):
+        self.compose_file = compose_file
+        self.service = service
+        self.base = url.rstrip("/") if url else None
+        self.port = None
+        if not self.base:
+            ports = load_ports(compose_file)
+            if service not in ports:
+                raise RuntimeError(
+                    f"{service} declares no health port in {compose_file}, so "
+                    f"there is no address to call it on. Give it a healthcheck "
+                    f"or pass --url.")
+            self.port = ports[service]
+
+    def where(self) -> str:
+        return self.base or f"{self.service} (via docker compose exec, port {self.port})"
+
+    def call(self, method: str, path: str, body: dict | None = None):
+        if self.base:
+            data = json.dumps(body or {}).encode() if method != "GET" else None
+            req = urllib.request.Request(
+                f"{self.base}{path}", data=data, method=method,
+                headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return json.loads(resp.read())
+        ok, detail, payload = exec_http(
+            self.compose_file, self.service, self.port, method, path, body)
+        if not ok:
+            raise RuntimeError(detail)
+        try:
+            return json.loads(payload)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"{detail}: response was not JSON ({exc})")
 
 
-def _get(url: str, params: dict | None = None) -> dict | list:
-    if params:
-        qs = "&".join(f"{k}={urllib.parse.quote(str(v))}" for k, v in params.items())
-        url = f"{url}?{qs}"
-    with urllib.request.urlopen(url, timeout=10) as resp:
-        return json.loads(resp.read())
+def _query(path: str, params: dict) -> str:
+    import urllib.parse
+    qs = "&".join(f"{k}={urllib.parse.quote(str(v))}" for k, v in params.items())
+    return f"{path}?{qs}"
 
 
-def _wait_healthy(base_url: str, timeout: int = 60) -> None:
+def _wait_healthy(caller: "_Caller", timeout: int = 60) -> None:
     deadline = time.time() + timeout
     while time.time() < deadline:
         try:
-            with urllib.request.urlopen(f"{base_url}/health", timeout=3) as resp:
-                if json.loads(resp.read()).get("status") == "ok":
-                    return
+            if caller.call("GET", "/health").get("status") == "ok":
+                return
         except Exception:
             pass
         time.sleep(2)
-    raise RuntimeError(f"memu-core at {base_url} not healthy after {timeout}s")
+    raise RuntimeError(f"{caller.where()} not healthy after {timeout}s")
 
 
 def main() -> int:
-    import urllib.parse
-
     parser = argparse.ArgumentParser()
-    parser.add_argument("--url", default="http://localhost:8001")
+    parser.add_argument("--url", default=None,
+                        help="only for a stack that publishes host ports; "
+                             "otherwise calls go through docker compose exec")
     parser.add_argument("--compose-file", default="docker-compose.minimal.yml")
     parser.add_argument("--service", default="memu-core")
     args = parser.parse_args()
 
-    base = args.url.rstrip("/")
+    try:
+        caller = _Caller(args.compose_file, args.service, args.url)
+    except Exception as exc:
+        print(f"FAIL: cannot address {args.service}: {exc}")
+        return 1
+    base = caller.where()
     compose_cmd = ["docker", "compose", "-f", args.compose_file]
     marker_event = "ci-restart-persistence-test"
     marker_user = "ci-restart-persist"
 
-    print(f"[1/4] Writing marker memory to {base}/memory/memorize ...")
+    print(f"[1/4] Writing marker memory via {base} ...")
     try:
-        result = _post(
-            f"{base}/memory/memorize",
+        result = caller.call(
+            "POST", "/memory/memorize",
             {
                 "timestamp": "2026-01-01T00:00:00Z",
                 "event_type": marker_event,
@@ -98,9 +151,9 @@ def main() -> int:
         print(f"FAIL: docker compose restart failed: {exc.stderr.decode()}")
         return 1
 
-    print(f"[3/4] Waiting for {base}/health ...")
+    print(f"[3/4] Waiting for health via {base} ...")
     try:
-        _wait_healthy(base, timeout=90)
+        _wait_healthy(caller, timeout=90)
     except RuntimeError as exc:
         print(f"FAIL: {exc}")
         return 1
@@ -108,10 +161,9 @@ def main() -> int:
 
     print(f"[4/4] Retrieving memories for user '{marker_user}' ...")
     try:
-        records = _get(
-            f"{base}/memory/retrieve",
-            {"query": marker_event, "user_id": marker_user, "top_k": 50},
-        )
+        records = caller.call("GET", _query(
+            "/memory/retrieve",
+            {"query": marker_event, "user_id": marker_user, "top_k": 50}))
     except Exception as exc:
         print(f"FAIL: retrieve request failed: {exc}")
         return 1

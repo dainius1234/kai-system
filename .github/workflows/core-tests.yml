@@ -285,42 +285,21 @@ jobs:
           MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
         run: |
           docker compose -f docker-compose.minimal.yml up -d --build
-          # wait for tool-gate (fast) and agentic (waits on the ollama model
-          # pull, so give it longer) to respond
-          for i in {1..30}; do
-            if curl -s http://localhost:8000/health >/dev/null 2>&1; then
-              break
-            fi
-            sleep 1
-          done
-          for i in {1..180}; do
-            if curl -s http://localhost:8007/health >/dev/null 2>&1; then
-              break
-            fi
-            sleep 1
-          done
-          # memu-core-introspect — store-maintenance process split off memu-core
-          # (see DECISIONS.md D21), independent of the ollama pull above
-          for i in {1..30}; do
-            if curl -s http://localhost:8009/health >/dev/null 2>&1; then
-              break
-            fi
-            sleep 1
-          done
-      # This step has never run in a passing job: `core-tests.yml` died at
-      # `make check-docs`, step 7 of 59, on 30 consecutive runs, so the
-      # bring-up above executed for the first time on 2026-08-05 — and
-      # failed in one second with nothing created. Diagnosing it needed
-      # the step's own stderr, which the log API only serves as a tail,
-      # so the questions are asked *here*, after the failure, where the
-      # answers land in the part of the log that can be read.
-      #
-      # Every command tolerates its own exit code, because this step
-      # exists to describe a failure and a diagnostic that aborts before
-      # printing the next fact is worse than no diagnostic. It runs only
-      # `if: failure()`, so the job is already red and nothing here can
-      # make it green. Declared as a documented-skip for that reason.
-      # ci-toleration: documented-skip
+          # Waits on Docker's verdict of each service's own healthcheck.
+          # These three used to be `curl http://localhost:8000|8007|8009`,
+          # which addressed nothing: tool-gate, agentic and
+          # memu-core-introspect are on networks declared `internal: true`
+          # and publish no host port. agentic waits on the ollama model
+          # pull, hence the longer budget.
+          python3 scripts/ci/compose_probe.py \
+            --compose-file docker-compose.minimal.yml \
+            --services tool-gate memu-core memu-core-introspect \
+            --timeout 120
+          python3 scripts/ci/compose_probe.py \
+            --compose-file docker-compose.minimal.yml \
+            --services agentic \
+            --timeout 300
+
       - name: Dump container logs on failure
         if: failure()
         run: |
@@ -355,33 +334,23 @@ jobs:
             --compose-file docker-compose.minimal.yml
       - name: Kill-isolation — introspect crash must not affect hot path
         run: |
-          # Stop the cold-maintenance process (memu-core-introspect, port 8009)
-          docker compose -f docker-compose.minimal.yml stop memu-core-introspect
-          # Hot path (memu-core, port 8001) must still be healthy
-          curl -sf http://localhost:8001/health \
-            || (echo "FAIL: memu-core unhealthy after introspect stop" && exit 1)
-          # Hot memorize write must still succeed
-          RESULT=$(curl -sf -X POST http://localhost:8001/memory/memorize \
-            -H "Content-Type: application/json" \
-            -d '{"timestamp":"2026-01-01T00:00:00Z","event_type":"ci-kill-isolation","result_raw":"kill isolation smoke test","user_id":"ci"}')
-          echo "$RESULT" | python3 scripts/ci/assert_memorize_ok.py
-          # Restart introspect and confirm it recovers
-          docker compose -f docker-compose.minimal.yml start memu-core-introspect
-          for i in {1..30}; do
-            if curl -s http://localhost:8009/health >/dev/null 2>&1; then
-              echo "OK: memu-core-introspect recovered"; break
-            fi
-            sleep 2
-          done
-          curl -sf http://localhost:8009/health \
-            || (echo "FAIL: memu-core-introspect did not recover" && exit 1)
+          # Every probe here used to be `curl http://localhost:8001|8009`,
+          # aimed at host ports that have not existed since the edge
+          # lockdown. The calls now run inside the containers, with the
+          # port read from each service's own healthcheck.
+          C=docker-compose.minimal.yml
+          docker compose -f $C stop memu-core-introspect
+          python3 scripts/ci/kill_isolation.py --compose-file $C
+          docker compose -f $C start memu-core-introspect
+          python3 scripts/ci/compose_probe.py \
+            --compose-file $C --services memu-core-introspect --timeout 90
+          echo "OK: memu-core-introspect recovered"
 
       - name: Restart-persistence smoke test — memory survives memu-core restart
         env:
           MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
         run: |
           python3 scripts/test_restart_persistence.py \
-            --url http://localhost:8001 \
             --compose-file docker-compose.minimal.yml \
             --service memu-core
 
@@ -407,21 +376,27 @@ jobs:
           OLLAMA_MODEL: qwen2.5:3b
         run: |
           docker compose -f docker-compose.full.yml up -d ollama ollama-pull memu-graph
-          for i in {1..120}; do
-            if curl -s http://localhost:8061/health >/dev/null 2>&1; then
-              break
-            fi
-            sleep 1
-          done
+          # Was `curl http://localhost:8061`. memu-graph is on agent-net,
+          # declared `internal: true`, so that address reached nothing.
+          # ollama-pull is a one-shot job with no healthcheck, so it is
+          # not waited on — only the two that declare one.
+          python3 scripts/ci/compose_probe.py \
+            --compose-file docker-compose.full.yml \
+            --services ollama memu-graph \
+            --timeout 300
 
       # ci-toleration: needs-owner
       - name: Run memu-graph live ingest/query/forget cycle (best-effort)
         run: |
-          pip install requests
+          # Runs inside the container: memu-graph publishes no host port.
+          # The script is stdlib-only now, so no pip install is needed in
+          # an image that only has to answer HTTP to itself.
+          #
           # This is live verification, which this programme is shortest
           # of, and it is currently allowed to fail every run. Declared
           # needs-owner so the skip is dated rather than permanent.
-          if python3 scripts/test_graph_live.py; then
+          if docker compose -f docker-compose.full.yml exec -T \
+               memu-graph python - < scripts/test_graph_live.py; then
             echo "memu-graph live verification: PASSED"
             echo "### memu-graph live verification: PASSED" >> "$GITHUB_STEP_SUMMARY"
           else
@@ -450,30 +425,17 @@ jobs:
           # Only start the three services that don't need Tailscale/Vault/Ollama.
           # memu-core with VECTOR_STORE=postgres validates the D79 pgvector image fix.
           docker compose -f docker-compose.sovereign.yml up -d postgres tool-gate memu-core
-          # Wait for postgres (needed by tool-gate and memu-core)
-          for i in {1..60}; do
-            if docker compose -f docker-compose.sovereign.yml exec -T postgres pg_isready -U keeper -d sovereign >/dev/null 2>&1; then
-              break
-            fi
-            sleep 2
-          done
-          # Wait for tool-gate health
-          for i in {1..30}; do
-            if curl -sf http://localhost:8000/health >/dev/null 2>&1; then
-              break
-            fi
-            sleep 2
-          done
-          # Wait for memu-core health (VECTOR_STORE=postgres — validates pgvector image)
-          for i in {1..60}; do
-            if curl -sf http://localhost:8001/health >/dev/null 2>&1; then
-              break
-            fi
-            sleep 2
-          done
-          echo "--- Sovereign boot health ---"
-          curl -sf http://localhost:8000/health || (echo "tool-gate unhealthy" && exit 1)
-          curl -sf http://localhost:8001/health || (echo "memu-core unhealthy" && exit 1)
+          # One wait for all three, on the healthchecks they already
+          # declare. postgres has always been checked correctly here —
+          # `exec -T postgres pg_isready` — and the other two were curled
+          # on host ports this profile does not publish. Same treatment
+          # for all three now, which is what that first line was already
+          # showing the way to.
+          python3 scripts/ci/compose_probe.py \
+            --compose-file docker-compose.sovereign.yml \
+            --services postgres tool-gate memu-core \
+            --timeout 180
+          echo "--- Sovereign boot health: all three healthy ---"
 
       - name: Dump sovereign logs on failure
         if: failure()
