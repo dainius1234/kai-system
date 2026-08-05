@@ -6785,3 +6785,69 @@ profile declares: 10 in `minimal`, 39 in `sovereign`, 0 in `full`. The
 sovereign profile could not build at all and appeared healthy because
 its boot step reused another profile's images. Instances fixed, class
 gated. **OPEN** until a build of all three profiles is observed.
+
+---
+
+## 2026-08-05 (part 27) — sweeping the rest of the shadow
+
+The pattern is now explicit: **everything `full.yml` touched worked;
+everything it did not was never checked by anything.** So the remaining
+question is what else lived in that shadow. Swept the compose profiles
+for the classes that only surface when a profile is actually used:
+
+    depends_on -> a service absent from the same profile   0
+    env_file -> a file not in the tree                     0
+    named volume used but not declared                     0
+    network used but not declared                          0
+
+Clean, and worth recording as a result rather than a non-event: those
+four are the failures that would have appeared next, and they are not
+there.
+
+Two volume hits, both examined before reporting:
+
+  - `minimal: files-service` — `${WATCH_ROOT:-/tmp}:/watched:ro`. **A
+    false positive from my probe**, which split on `:` and read the
+    default-value separator inside `${...}`. **Fifth time today my own
+    instrumentation was wrong and the code was right.**
+  - `sovereign: vault` — `./vault-data:/vault/file`, a bind mount to a
+    directory that does not exist. Docker creates it, as root. Real but
+    minor; noted, not fixed, because the sovereign profile has larger
+    problems and churning it now would mix two changes.
+
+### What the sweep did find: no `.dockerignore`
+
+With ~50 services building from `context: .`, **every build shipped the
+entire repository to the Docker daemon**, including 63 MB of `.git`.
+
+Two costs. Time and disk, on a CI job that already needs an explicit
+`docker system prune --volumes` to fit at all. And a supply-chain
+surface: everything in the context is reachable by a `COPY`, and
+`vault-sync/Dockerfile` was doing exactly `COPY . .` until an hour ago —
+which would have baked the whole repository, `.git` included, into a
+shipped image.
+
+A `.dockerignore` now excludes version control, kai-pm, docs, scripts,
+tests, caches, and `.env*` (with `!.env.example`).
+
+### Adding it created a new way to break every build at once
+
+An excluded path does not fail at parse time. It fails at `COPY`, twenty
+minutes into a run — the same place this whole class always surfaces. So
+the file was verified against **all 110 COPY sources under `context: .`
+before being committed**, and `check_dockerfile_context` gained a third
+rule so it stays verified: *a COPY source must not be excluded by
+`.dockerignore`.*
+
+Calibrated: adding `common` to the ignore file produces 69 findings,
+which is the number of services that COPY it.
+
+Floors: 41 suites, 2,490 assertions.
+
+### Register
+
+**`KAI-GATE-038`** — no `.dockerignore` with ~50 builds from
+`context: .`: every build shipped the whole repository, and a `COPY . .`
+would have shipped it into an image. Added, verified against every COPY
+source, and the verification is now a permanent rule rather than a
+one-time check.

@@ -1,0 +1,51 @@
+# Every service builds with `context: .`, so without this file each of the
+# ~50 image builds ships the entire repository to the Docker daemon —
+# including 63 MB of `.git`. That is waste on a CI job that already needs
+# an explicit `docker system prune` to fit, and it is a supply-chain
+# surface: anything in the context is reachable by a `COPY`, and
+# `vault-sync/Dockerfile` was doing exactly `COPY . .` until 2026-08-05.
+#
+# Every entry here was checked against the set of paths the Dockerfiles
+# actually COPY (43 top-level paths). `check_dockerfile_context.py`
+# enforces that permanently: a COPY source excluded by this file is a
+# build that fails at `COPY`, and the gate reports it before the build
+# does.
+
+# Version control — the largest single item and the one that carries
+# history, including anything ever committed and later removed.
+.git
+.gitignore
+.github
+
+# Project management, docs and tests: never COPYed by any Dockerfile.
+kai-pm
+docs
+scripts
+tests
+_archive
+
+# Local environments and caches.
+.venv
+venv
+node_modules
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.mypy_cache
+.ruff_cache
+htmlcov
+.coverage
+.coverage.*
+
+# Secrets and local configuration. Not COPYed, and must never be.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editor and OS noise.
+.idea
+.vscode
+.DS_Store

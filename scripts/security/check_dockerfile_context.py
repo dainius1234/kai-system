@@ -35,10 +35,19 @@ Three Dockerfiles were worse than context-mismatched: `COPY ../../common`
 escapes the context, which Docker rejects under **any** context. Those
 images could not build in any configuration at all.
 
-Two rules, both exact:
+Three rules, all exact:
 
   - a `COPY` source must exist under the declared context;
-  - a `COPY` source must not begin with `../`, ever.
+  - a `COPY` source must not begin with `../`, ever;
+  - a `COPY` source must not be excluded by `.dockerignore`.
+
+The third exists because the second fix created the risk. With ~50
+services building from `context: .` and no `.dockerignore`, every build
+shipped the whole repository — 63 MB of `.git` included — to the daemon.
+Adding one is a large win and a new way to break every build at once: an
+excluded path fails at `COPY`, not at parse, so it would surface exactly
+where this class always surfaces, twenty minutes into a run. Checked
+here instead, against all 110 COPY sources.
 
 Globs are skipped rather than guessed at — resolving them needs the same
 matching Docker does, and a wrong answer here would report a defect
@@ -48,6 +57,7 @@ Exit 0 = every COPY resolves.  Exit 1 = one does not.
 """
 from __future__ import annotations
 
+import fnmatch
 import sys
 from pathlib import Path
 from typing import List, Tuple
@@ -93,6 +103,33 @@ def copy_sources(text: str) -> List[Tuple[int, str]]:
     return out
 
 
+def dockerignore_patterns(base: Path) -> Tuple[List[str], set]:
+    """(exclusions, negations) from `.dockerignore`, or empty if absent.
+
+    Absence is not a finding — a repository may legitimately have none.
+    It only becomes one when a COPY source collides with a pattern.
+    """
+    path = base / ".dockerignore"
+    if not path.exists():
+        return [], set()
+    lines = [line.strip() for line in path.read_text(encoding="utf-8").splitlines()
+             if line.strip() and not line.startswith("#")]
+    return ([p for p in lines if not p.startswith("!")],
+            {p[1:] for p in lines if p.startswith("!")})
+
+
+def excluded_by(source: str, excludes: List[str], negations: set) -> str:
+    """The pattern that would drop this source from the context, or ''."""
+    if source in negations:
+        return ""
+    head = source.rstrip("/").split("/")[0]
+    for pattern in excludes:
+        if (head == pattern or fnmatch.fnmatch(source, pattern)
+                or fnmatch.fnmatch(head, pattern)):
+            return pattern
+    return ""
+
+
 def audit(root: Path = None) -> Tuple[List[str], int, int]:
     """Return (findings, COPY sources checked, build definitions read).
 
@@ -110,6 +147,7 @@ def audit(root: Path = None) -> Tuple[List[str], int, int]:
     checked = 0
     builds = 0
     unreadable: List[str] = []
+    excludes, negations = dockerignore_patterns(base)
     for path in paths:
         doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         for service, cfg in sorted((doc.get("services") or {}).items()):
@@ -141,6 +179,14 @@ def audit(root: Path = None) -> Tuple[List[str], int, int]:
                         f"COPY {source} escapes the build context. Docker "
                         f"rejects this under any context, so this image "
                         f"cannot build at all.")
+                elif context == "." and excluded_by(source, excludes, negations):
+                    findings.append(
+                        f"{path.name}: {service} — {dockerfile}:{line_no} "
+                        f"COPY {source} is excluded from the context by "
+                        f"`.dockerignore` pattern "
+                        f"'{excluded_by(source, excludes, negations)}'. The "
+                        f"file exists; the build will still fail at COPY, "
+                        f"because Docker never receives it.")
                 elif not (ctx_root / source).exists():
                     findings.append(
                         f"{path.name}: {service} — {dockerfile}:{line_no} "

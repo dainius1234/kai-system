@@ -29,7 +29,7 @@ from scripts.security import check_dockerfile_context as gate  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 10
+EXPECTED_SCENARIOS = 14
 executed: list = []
 
 
@@ -175,6 +175,67 @@ def test_the_repository_passes_today() -> None:
     check("across every profile's builds", builds > 60, str(builds))
 
 
+# ── the third rule: .dockerignore ────────────────────────────────────
+
+def test_a_copy_source_excluded_by_dockerignore_is_reported() -> None:
+    """Adding a `.dockerignore` is a large win and a new way to break
+    every build at once. An excluded path fails at COPY, not at parse,
+    so it would surface twenty minutes into a run — which is exactly
+    where this class always surfaces."""
+    scenario("dockerignore exclusion")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        _tree(root, ["svc/Dockerfile", "common/x.py"],
+              "services:\n  s:\n    build:\n      context: .\n"
+              "      dockerfile: svc/Dockerfile\n")
+        (root / "svc/Dockerfile").write_text(
+            "FROM x\nCOPY common/ ./common/\n", encoding="utf-8")
+        (root / ".dockerignore").write_text("common\n", encoding="utf-8")
+        findings, _, _ = _run(root)
+        check("it is reported", len(findings) == 1, str(findings))
+        check("and names the pattern",
+              findings and "'common'" in findings[0], str(findings))
+
+
+def test_a_negation_rescues_the_source() -> None:
+    scenario("dockerignore negation")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        _tree(root, ["svc/Dockerfile", ".env.example"],
+              "services:\n  s:\n    build:\n      context: .\n"
+              "      dockerfile: svc/Dockerfile\n")
+        (root / "svc/Dockerfile").write_text(
+            "FROM x\nCOPY .env.example ./\n", encoding="utf-8")
+        (root / ".dockerignore").write_text(
+            ".env.*\n!.env.example\n", encoding="utf-8")
+        findings, _, _ = _run(root)
+        check("the negation is honoured", findings == [], str(findings))
+
+
+def test_no_dockerignore_is_not_a_finding() -> None:
+    """A repository may legitimately have none; absence only matters when
+    a COPY collides with a pattern."""
+    scenario("no dockerignore")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        _tree(root, ["svc/Dockerfile", "common/x.py"],
+              "services:\n  s:\n    build:\n      context: .\n"
+              "      dockerfile: svc/Dockerfile\n")
+        (root / "svc/Dockerfile").write_text(
+            "FROM x\nCOPY common/ ./common/\n", encoding="utf-8")
+        findings, _, _ = _run(root)
+        check("nothing reported", findings == [], str(findings))
+
+
+def test_the_repository_dockerignore_excludes_nothing_it_copies() -> None:
+    """110 COPY sources under `context: .`, checked against the real
+    `.dockerignore`. This is what makes that file safe to keep."""
+    scenario("real dockerignore is safe")
+    findings, _, _ = gate.audit()
+    clashes = [f for f in findings if "excluded from the context" in f]
+    check("no COPY source is excluded", clashes == [], str(clashes))
+
+
 def run_all() -> None:
     test_the_short_form_makes_the_directory_the_context()
     test_the_long_form_keeps_the_declared_context()
@@ -186,6 +247,10 @@ def run_all() -> None:
     test_a_parent_escape_is_reported_under_any_context()
     test_a_glob_is_skipped_rather_than_guessed()
     test_the_repository_passes_today()
+    test_a_copy_source_excluded_by_dockerignore_is_reported()
+    test_a_negation_rescues_the_source()
+    test_no_dockerignore_is_not_a_finding()
+    test_the_repository_dockerignore_excludes_nothing_it_copies()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,
