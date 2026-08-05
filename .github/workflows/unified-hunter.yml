@@ -45,7 +45,15 @@ jobs:
           # this shape and left that workflow red for 30 consecutive
           # runs, because a hand-listed set is true of what someone
           # remembered and false of everything added since.
-          pip install pyyaml fastapi 'httpx<1' starlette pydantic
+          # `pytest` is here because `test-test-isolation` spawns a real
+          # pytest subprocess to calibrate the isolation plugin against
+          # pytest's own hook ordering. It was absent for one run, and
+          # the symptom was seven assertions about the contents of a
+          # report that was never written — none of which said "pytest
+          # is not installed". No requirements.txt in the tree carries
+          # it; core-tests.yml and python-app.yml install it explicitly
+          # and this file did not.
+          pip install pyyaml fastapi 'httpx<1' starlette pydantic pytest
           find . -maxdepth 3 -name requirements.txt -not -path './.venv/*' -not -path './_archive/*' -print0 | while IFS= read -r -d '' req; do
             echo "Installing $req"
             pip install -r "$req" || true

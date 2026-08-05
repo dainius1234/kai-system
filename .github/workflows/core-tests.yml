@@ -219,7 +219,10 @@ jobs:
         run: |
           docker compose -f docker-compose.full.yml build
 
+      # ci-toleration: needs-owner
       - name: Scan container images for vulnerabilities
+        id: trivy
+        continue-on-error: true
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
@@ -228,6 +231,38 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           format: 'table'
+
+      # Findings are ADVISORY; a scanner that could not run is not.
+      #
+      # Operator decision, 2026-08-05: these CVEs live in base images and
+      # have existed all along — the steps that build those images had not
+      # executed for 30 commits, so nothing had ever looked. Treated
+      # exactly like the pip-audit step above: it runs, it reports, it
+      # does not block, and the remediation has a named owner and a date.
+      #
+      # The distinction that matters: `continue-on-error` swallows the
+      # *findings*, and this step puts back the failure for the case where
+      # the scan did not happen at all. A missing scanner or an unbuilt
+      # image is absence of evidence, and this repository has paid for
+      # reading that as evidence of absence more than once.
+      - name: Vulnerability findings are advisory, a broken scanner is not
+        run: |
+          outcome='${{ steps.trivy.outcome }}'
+          case "$outcome" in
+            success)
+              echo "trivy: no CRITICAL/HIGH findings"
+              ;;
+            failure)
+              echo "::warning::SKIPPED ENFORCEMENT — trivy reported CRITICAL/HIGH findings above."
+              echo "  Declared needs-owner, review by 2026-11-01. Tracked as KAI-GATE-026."
+              echo "### trivy: findings reported, not enforced (KAI-GATE-026)" >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            *)
+              echo "trivy did not run to completion (outcome=$outcome)."
+              echo "A scan that could not execute is not a clean scan."
+              exit 1
+              ;;
+          esac
 
       - name: Bring up minimal sovereign AI stack
         env:

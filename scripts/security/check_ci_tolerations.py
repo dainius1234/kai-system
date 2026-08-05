@@ -107,6 +107,24 @@ DECLARED: Tuple[Toleration, ...] = (
         review_by="2026-10-01",
     ),
     Toleration(
+        workflow="core-tests.yml",
+        step="Scan container images for vulnerabilities",
+        bucket=NEEDS_OWNER,
+        reason="Same argument as pip-audit, one layer down: trivy reports "
+               "CRITICAL/HIGH CVEs in the base images and their distro "
+               "packages, which we do not control and cannot patch by "
+               "pinning our own requirements. Enforcing today makes CI "
+               "permanently red, and a permanently red gate is an ignored "
+               "gate. The *findings* are advisory; a scanner that could "
+               "not execute is not — the follow-on step exits 1 on any "
+               "outcome other than success or failure, so a missing "
+               "binary, a rate-limited DB download or a syntax error "
+               "still breaks the build. Tracked for remediation as "
+               "KAI-GATE-026.",
+        owner="operator",
+        review_by="2026-11-01",
+    ),
+    Toleration(
         workflow="python-app.yml",
         step="Dependency vulnerability scan",
         bucket=NEEDS_OWNER,

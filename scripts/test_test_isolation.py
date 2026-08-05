@@ -68,6 +68,61 @@ def _entry(**kwargs) -> dict:
     return entry
 
 
+def _run_pytest(root: Path, report: Path):
+    """Run the plugin against a fixture tree in a real pytest subprocess.
+
+    Both calibration cases below need this, and both were wrong about the
+    environment in the same way, so it is written once.
+
+    `pytest` is probed by name before it is spawned. On 2026-08-05 this
+    suite failed 7 assertions in `unified-hunter.yml` and passed locally,
+    because that workflow installs `pyyaml fastapi httpx starlette
+    pydantic` and never installs pytest — no `requirements.txt` in the
+    tree carries it either, and every other suite in `make test-uh` is a
+    plain script that never needed it. The seven failures were all
+    assertions about the *contents* of a report that was never written;
+    not one of them said "pytest is not installed". A missing tool has to
+    name itself, or the next person debugs the detector instead of the
+    environment.
+
+    It fails rather than skips. A calibration that cannot run has not
+    calibrated anything, and "could not check" must not read as "checked".
+    """
+    import importlib.util
+    import subprocess
+
+    try:
+        # None, not an exception, is what a genuinely absent top-level
+        # module produces — verified rather than assumed. The guard is
+        # for the environments where it is neither.
+        available = importlib.util.find_spec("pytest") is not None
+    except Exception:
+        available = False
+    check("pytest is importable, so this calibration can actually run",
+          available,
+          f"no pytest in {sys.executable}: the two subprocess calibrations "
+          f"below cannot run, and a calibration that did not run has not "
+          f"proved anything")
+
+    env = dict(os.environ)
+    env["KAI_ISOLATION_REPORT"] = str(report)
+    # PREPENDED, not replaced. Locally PYTHONPATH is unset so a bare
+    # assignment worked; CI sets it, and overwriting it can take the
+    # plugin off the path — the subprocess then dies before pytest
+    # starts and the only evidence is an assertion about a report that
+    # was never written. Hence stdout and stderr are surfaced too.
+    existing = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = (str(REPO) + os.pathsep + existing) if existing else str(REPO)
+    proc = subprocess.run(
+        [sys.executable, "-m", "pytest", str(root), "-q",
+         "-p", "scripts.security.isolation_plugin", "-p", "no:cacheprovider"],
+        capture_output=True, text=True, env=env, cwd=str(root), timeout=180)
+    check("the fixture suite itself passes", proc.returncode == 0,
+          f"exit={proc.returncode}\nstdout:{proc.stdout[-500:]}"
+          f"\nstderr:{proc.stderr[-500:]}")
+    return proc
+
+
 def _report(**files) -> dict:
     """A synthetic plugin report, keyed by absolute path as pytest emits."""
     return {str(gate.REPO / "scripts" / name): entry
@@ -259,7 +314,6 @@ def test_every_reported_category_still_detects() -> None:
     pytest rather than on pytest.
     """
     scenario("every reported category still detects")
-    import subprocess
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         # A real module for the leaker to replace, so `replaced` has
@@ -287,15 +341,7 @@ def test_every_reported_category_still_detects() -> None:
         (root / "test_bbb_clean.py").write_text(
             "def test_ok():\n    assert True\n", encoding="utf-8")
         report = root / "report.json"
-        env = dict(os.environ)
-        env["KAI_ISOLATION_REPORT"] = str(report)
-        env["PYTHONPATH"] = str(REPO)
-        proc = subprocess.run(
-            [sys.executable, "-m", "pytest", str(root), "-q",
-             "-p", "scripts.security.isolation_plugin", "-p", "no:cacheprovider"],
-            capture_output=True, text=True, env=env, cwd=str(root), timeout=180)
-        check("the fixture suite itself passes", proc.returncode == 0,
-              proc.stdout[-400:])
+        _run_pytest(root, report)
         found = json.loads(report.read_text(encoding="utf-8")) if report.exists() else {}
         leaker = next((v for k, v in found.items() if "aaa_leaker" in k), None)
         check("the leaking file is reported", leaker is not None, str(found))
@@ -341,7 +387,6 @@ def test_a_collection_time_leak_is_seen() -> None:
     on pytest.
     """
     scenario("collection-time leak is seen")
-    import subprocess
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         (root / "test_aaa_leaker.py").write_text(
@@ -353,15 +398,7 @@ def test_a_collection_time_leak_is_seen() -> None:
         (root / "test_bbb_clean.py").write_text(
             "def test_ok():\n    assert True\n", encoding="utf-8")
         report = root / "report.json"
-        env = dict(os.environ)
-        env["KAI_ISOLATION_REPORT"] = str(report)
-        env["PYTHONPATH"] = str(REPO)
-        proc = subprocess.run(
-            [sys.executable, "-m", "pytest", str(root), "-q",
-             "-p", "scripts.security.isolation_plugin", "-p", "no:cacheprovider"],
-            capture_output=True, text=True, env=env, cwd=str(root), timeout=180)
-        check("the fixture suite itself passes", proc.returncode == 0,
-              proc.stdout[-400:])
+        proc = _run_pytest(root, report)
         check("a report was written", report.exists(), proc.stdout[-400:])
         found = json.loads(report.read_text(encoding="utf-8")) if report.exists() else {}
         leaker = next((v for k, v in found.items() if "aaa_leaker" in k), None)
