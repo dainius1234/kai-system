@@ -3,7 +3,7 @@
   "floors": {
     "Architecture Rule Tests": 68,
     "Assertion Floor Tests": 40,
-    "CI Toleration Tests": 15,
+    "CI Toleration Tests": 20,
     "Compose Drift Tests": 28,
     "Compose Env Tests": 18,
     "Compose Gate Tests": 54,
@@ -45,5 +45,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2534
+  "total": 2539
 }

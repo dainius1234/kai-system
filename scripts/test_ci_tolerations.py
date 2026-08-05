@@ -31,7 +31,7 @@ from scripts.security import check_ci_tolerations as ci  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 9
+EXPECTED_SCENARIOS = 12
 executed: list[str] = []
 
 
@@ -160,6 +160,50 @@ def test_the_real_repository_agrees_in_both_directions():
           str([d.step for d in ci.DECLARED if d.bucket == ci.DEFECT]))
 
 
+# ── the third directive: nothing repeats unexplained ─────────────────
+
+def test_every_warning_emitter_is_declared():
+    """A step that prints `::warning::` and carries on has decided
+    something is not worth failing over — the same decision as swallowing
+    an exit code, needing the same reason, owner and date.
+
+    Added after `The "DB_PASSWORD" variable is not set` printed on
+    every
+    compose invocation in every log for a day and was read past, while
+    postgres refused to start because of it. On its first run this rule
+    found one undeclared emitter, written earlier the same day.
+    """
+    scenario("warnings declared")
+    check("no step warns without an owner", ci.undeclared_warnings() == [],
+          str(ci.undeclared_warnings()))
+
+
+def test_the_warning_detector_finds_the_emitters():
+    """A denominator. If this ever returns nothing the rule has gone
+    blind rather than the workflows having gone quiet."""
+    scenario("warning denominator")
+    emitters = ci.warning_emitters()
+    check("emitters are found", len(emitters) >= 5, str(len(emitters)))
+    check("each is (workflow, step)",
+          all(len(e) == 2 and e[0].endswith(".yml") for e in emitters),
+          str(emitters[:3]))
+
+
+def test_an_undeclared_emitter_is_reported():
+    """Calibration: the rule must be able to fail."""
+    scenario("undeclared emitter fails")
+    original = ci.DECLARED
+    try:
+        ci.DECLARED = ()
+        found = ci.undeclared_warnings()
+        check("with nothing declared, every emitter is reported",
+              len(found) >= 5, str(len(found)))
+        check("and each says why",
+              all("nobody reads" in f for f in found), str(found[:1]))
+    finally:
+        ci.DECLARED = original
+
+
 def run_all() -> None:
     test_a_swallowed_exit_code_is_found()
     test_continue_on_error_is_found()
@@ -170,6 +214,10 @@ def run_all() -> None:
     test_a_valid_workflow_parses()
     test_a_marker_is_read_from_the_workflow()
     test_the_real_repository_agrees_in_both_directions()
+
+    test_every_warning_emitter_is_declared()
+    test_the_warning_detector_finds_the_emitters()
+    test_an_undeclared_emitter_is_reported()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,

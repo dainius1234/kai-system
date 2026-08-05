@@ -7068,3 +7068,69 @@ defect this evening. That is the watching layer working on the person who
 built it, which is the only test of it that counts.
 
 Floors: 43 suites, 2,534 assertions.
+
+---
+
+## 2026-08-05 (part 31) — the third standing directive
+
+The operator asked for a rule that stops this recurring, in the shape of
+the two that already stand. Here it is, and here is the mechanism,
+because a rule without one is the wallpaper it warns about — and
+part 11 of this file already says a resolution held privately is worth
+nothing.
+
+### The three directives
+
+    1. Assume nothing.        — about inference. Do not extrapolate from
+                                a sample to a population. "Thirty runs
+                                failed" is not "it has never worked".
+
+    2. Trust no one.          — about sources. Including this file, the
+                                architecture doc, a closure record, and
+                                my own instruments. Calibrate before
+                                believing.
+
+    3. Nothing repeats        — about ATTENTION. A recurring signal is
+       unexplained.             fixed, made to fail, or declared with a
+                                name against it and a date on it.
+                                Printing forever is the middle ground,
+                                and the middle ground is what teaches
+                                everyone to ignore it.
+
+The third is not covered by the first two, which is why today happened.
+I assumed nothing about `The "DB_PASSWORD" variable is not set` — I did
+not infer it was harmless. I trusted no one about it — I did not take
+anyone's word. **I simply did not read it**, in three reports, having
+quoted it aloud each time. Neither existing directive addresses a signal
+that is present, correct, and unprocessed.
+
+### The mechanism
+
+`check_ci_tolerations` already encodes directive 2's corollary: a step
+that swallows an exit code must be declared with a reason, an owner and
+a date. The insight is that **a warning is a suppression too**. A step
+that prints `::warning::` and carries on has decided something is not
+worth failing over — the same decision, needing the same three things.
+
+So the gate now fails on any step emitting `::warning::` that is not
+declared. It found one on its first run: *"Vulnerability findings are
+advisory, a broken scanner is not"* — the trivy reporting step, written
+by me earlier the same day, warning on every run with nobody answerable
+for it. Declared now, owner and date.
+
+Calibrated in both directions: removing the declaration makes it name
+the step; emptying `DECLARED` makes it report all seven emitters.
+
+### Why this shape and not a checklist
+
+A checklist item — *"read the warnings"* — is exactly the intervention
+that fails, because it asks a person to do reliably the thing they have
+just proved they do not do reliably. The mechanism instead makes the
+population finite and bounded: **every recurring signal in CI is now
+either absent, fatal, or in a list with a name and a date on it.** There
+is nothing left that merely prints.
+
+That is the same move as every gate today — replace a hand-written list
+with a derived denominator — applied to output rather than to code.
+
+Floors: 43 suites, 2,539 assertions.

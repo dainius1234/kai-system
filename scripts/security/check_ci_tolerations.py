@@ -26,6 +26,23 @@ this gate fails on any tolerant pattern in a workflow that is **not**
 declared — so a tenth added next month is visibly undeclared rather than
 quietly absorbed.
 
+**A warning is a suppression too.** Added 2026-08-05, after
+`The "DB_PASSWORD" variable is not set` printed on every compose
+invocation in every log for a day and was read past — by me, in three
+reports, aloud — while postgres refused to start because of it.
+
+A step that prints `::warning::` and carries on has decided that
+something is not worth failing over. That is the same decision as
+swallowing an exit code, and it needs the same three things: a reason, an
+owner, and a date. Otherwise it recurs forever, and a signal that recurs
+forever is one nobody reads.
+
+The operator's rule, which this encodes:
+
+> **Nothing repeats unexplained.** A recurring signal is fixed, made to
+> fail, or declared — with a name against it and a date on it. The middle
+> ground, printing forever, is what teaches everyone to ignore it.
+
 Three buckets, per the operator:
 
   ``DOCUMENTED_SKIP``  best-effort by design. Must print an explicit
@@ -133,6 +150,21 @@ DECLARED: Tuple[Toleration, ...] = (
                "other.",
         owner="operator",
         review_by="2026-10-01",
+    ),
+    Toleration(
+        workflow="core-tests.yml",
+        step="Vulnerability findings are advisory",
+        bucket=NEEDS_OWNER,
+        reason="The reporting half of the trivy toleration: it turns the "
+               "scan's outcome into a visible line and warns when "
+               "CRITICAL/HIGH findings exist. It emits `::warning::` on "
+               "every run where they do, which under the rule above needs "
+               "an owner and a date of its own — the scan step's "
+               "declaration does not cover a differently-named step. "
+               "Found by the warning rule on its first run, on a step "
+               "written earlier the same day.",
+        owner="operator",
+        review_by="2026-11-01",
     ),
     Toleration(
         workflow="core-tests.yml",
@@ -256,6 +288,42 @@ def markers() -> List[Tuple[str, str]]:
     return out
 
 
+_WARNING = re.compile(r"::warning::")
+
+
+def warning_emitters() -> List[Tuple[str, str]]:
+    """(workflow, step name) for every step that prints `::warning::`.
+
+    Read from the parsed workflow rather than by line, because a warning
+    belongs to the step that emits it and only the parse knows which step
+    a line is in.
+    """
+    import yaml
+    out: List[Tuple[str, str]] = []
+    for path in sorted(WORKFLOWS.glob("*.yml")):
+        try:
+            doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        except Exception:
+            continue            # `unparseable()` owns that finding
+        for job in (doc.get("jobs") or {}).values():
+            for step in (job.get("steps") or []):
+                if _WARNING.search(step.get("run") or ""):
+                    out.append((path.name, step.get("name") or "<unnamed>"))
+    return out
+
+
+def undeclared_warnings() -> List[str]:
+    """Steps that warn on every run without an owner or a date."""
+    out = []
+    for workflow, step in warning_emitters():
+        if not any(d.workflow == workflow and d.step in step
+                   for d in DECLARED):
+            out.append(f"{workflow}: '{step}' emits ::warning:: but is not "
+                       f"declared. A warning that recurs with nobody "
+                       f"answerable for it is a signal nobody reads.")
+    return out
+
+
 def unparseable() -> List[str]:
     """Workflows a YAML parser rejects.
 
@@ -289,6 +357,7 @@ def main() -> int:
 
     # Both directions, so neither a marker nor a declaration can drift
     # away from the other unnoticed.
+    unowned = undeclared_warnings()
     marked = markers()
     unmarked = [f"{d.workflow}: {d.step}" for d in DECLARED
                 if (d.workflow, d.bucket) not in marked]
@@ -323,6 +392,16 @@ def main() -> int:
         print("\n  A CI step that can pass without doing its job must be "
               "declared\n  with a reason, an owner and a review date. Silence "
               "is the defect.")
+        return 1
+
+    if unowned:
+        print(f"\nFAIL: {len(unowned)} step(s) warn on every run without an "
+              f"owner:\n")
+        for line in unowned:
+            print(f"  - {line}")
+        print("\n  Nothing repeats unexplained. A recurring signal is "
+              "fixed, made to\n  fail, or declared with a name against it "
+              "and a date on it.")
         return 1
 
     if orphan_markers:
