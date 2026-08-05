@@ -26,6 +26,30 @@ _soul_home = _tempfile.mkdtemp(prefix="kai-soul-")
 os.environ.setdefault("SOUL_PATH", os.path.join(_soul_home, "SOUL.md"))
 
 
+# ── The same defect, three more paths, and the general form ──────────
+# The SOUL_PATH redirect above was per-path, and a per-path redirect is
+# a list beside the thing: true of what someone remembered on the day.
+# Measured on 2026-08-05 rather than assumed — a full `pytest scripts/`
+# run (4,324 passing) also mutated four *other* tracked files:
+#
+#     data/ohana/fingerprint.json
+#     data/trust-ledger/events.jsonl
+#     data/trust/audit_log.jsonl
+#     data/trust/trust_record.json
+#
+# Two of those are a signed, hash-chained ledger, so the repository's
+# copy was a mixture of real events and whatever the tests had last
+# done, and every run diverged it further. Noticed because a commit
+# meant to touch six files carried a seventh.
+#
+# `KAI_DATA_ROOT` moves every adopting store at once — see
+# `common/data_paths.py`. New state under the data root is covered by
+# this line without anybody having to remember it, which is the
+# difference between this and the redirect above.
+_data_home = _tempfile.mkdtemp(prefix="kai-data-")
+os.environ.setdefault("KAI_DATA_ROOT", _data_home)
+
+
 # ── The ML stack is blocked during tests ─────────────────────────────
 # `memu-core/app.py` loads an embedding model at *module* scope:
 #

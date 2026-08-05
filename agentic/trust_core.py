@@ -37,11 +37,20 @@ from enum import IntEnum
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from common.data_paths import data_path
+
 logger = logging.getLogger("kai.trust_core")
 
-_DATA_DIR = Path("data/trust")
-_RECORD_FILE = _DATA_DIR / "trust_record.json"
-_AUDIT_FILE = _DATA_DIR / "audit_log.jsonl"
+def _data_dir() -> Path:
+    """`data/trust`, unless KAI_DATA_ROOT says otherwise.
+
+    A function, not a constant: a value captured at import cannot be
+    redirected by a test that imports this module, and until 2026-08-05
+    a full test run appended real trust events to the repository's own
+    `trust_record.json` and `audit_log.jsonl` for that reason.
+    See `common/data_paths.py`.
+    """
+    return data_path("trust")
 
 
 # ── Trust levels ──────────────────────────────────────────────────────────────
@@ -146,7 +155,7 @@ class TrustCore:
     """The trust governance layer. All autonomy flows through here."""
 
     def __init__(self, data_dir: Optional[Path] = None) -> None:
-        self._dir = data_dir or _DATA_DIR
+        self._dir = data_dir or _data_dir()
         self._record_path = self._dir / "trust_record.json"
         self._audit_path = self._dir / "audit_log.jsonl"
         self._dir.mkdir(parents=True, exist_ok=True)

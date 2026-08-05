@@ -301,8 +301,19 @@ class WisdomIngestor:
             from ledger import FileLedger  # type: ignore[import]
             from score import compute_score  # type: ignore[import]
 
-            ledger_path = Path("data/trust-ledger/events.jsonl")
-            ledger = FileLedger(ledger_path)
+            # Declared once (I-4). This was the second hard-coded copy
+            # of the same path, and a copy is a place the other one can
+            # drift away from without either being wrong on its face.
+            # Both spellings, matching `_add_to_graph` below: this module
+            # is imported as `wisdom_ingestion` in the service and as
+            # `agentic.wisdom_ingestion` from the repository root, and
+            # the enclosing `except` swallows, so a one-spelling import
+            # would fail silently in whichever context it is wrong.
+            try:
+                from trust_integration import ledger_path  # type: ignore[import]
+            except ImportError:
+                from agentic.trust_integration import ledger_path  # type: ignore[import]
+            ledger = FileLedger(ledger_path())
             score_data = compute_score(ledger)
             ledger.append(
                 event_type="ALIGNMENT_AUDIT",

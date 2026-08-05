@@ -38,10 +38,17 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from common.degraded import record_degradation
+from common.data_paths import data_path
 
 logger = logging.getLogger(__name__)
 
-_FINGERPRINT_PATH = Path("data/ohana/fingerprint.json")
+def _fingerprint_path() -> Path:
+    """`data/ohana/fingerprint.json`, unless KAI_DATA_ROOT says otherwise.
+
+    Same reason as `trust_core._data_dir`: read at call time so a test
+    can point it somewhere harmless. See `common/data_paths.py`.
+    """
+    return data_path("ohana", "fingerprint.json")
 
 
 # ---------------------------------------------------------------------------
@@ -113,7 +120,7 @@ class OhanaCore:
     """
 
     def __init__(self, fingerprint_path: Optional[Path] = None) -> None:
-        self._fingerprint_path = fingerprint_path or _FINGERPRINT_PATH
+        self._fingerprint_path = fingerprint_path or _fingerprint_path()
         self.fingerprint = self._load_fingerprint()
         self._interaction_count: int = 0
         self._decision_log: List[Dict[str, Any]] = []

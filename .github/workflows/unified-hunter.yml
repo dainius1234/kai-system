@@ -64,6 +64,26 @@ jobs:
           set -o pipefail
           make test-uh 2>&1 | tee /tmp/test-uh.log
 
+      # A test run must leave the tree exactly as it found it. Until
+      # 2026-08-05 it did not: `make test-uh` appended two signed,
+      # hash-chained AUTONOMOUS_ACTION events to the repository's own
+      # `data/trust-ledger/events.jsonl` on every run, and a full
+      # `pytest scripts/` mutated four tracked files. Locally that was
+      # invisible because `git checkout -- data/` had become a reflex.
+      # This step is the thing that has no reflexes.
+      - name: The suite must not write into the repository
+        run: |
+          if ! git diff --quiet; then
+            echo "::error::The test run modified tracked files:"
+            git diff --stat
+            echo
+            echo "State written during a test belongs under a temporary"
+            echo "root, not in the tree. See common/data_paths.py —"
+            echo "KAI_DATA_ROOT moves every adopting store at once."
+            exit 1
+          fi
+          echo "clean: the suite left no tracked file modified"
+
       # Ratchet, not a threshold: fails when a suite exercises *less* than
       # its recorded floor, vanishes from the output, or reports a
       # different count depending on what else has run.

@@ -14,8 +14,24 @@ from __future__ import annotations
 
 import os
 import sys
+import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+# The two tests at the bottom call `gate_autonomous_action` for real,
+# and that function appends a signed, hash-chained AUTONOMOUS_ACTION
+# event to whatever ledger it resolves. Until 2026-08-05 that resolved
+# to the repository's own `data/trust-ledger/events.jsonl` with no way
+# to redirect it, so every `make test-uh` wrote two live events into a
+# tracked file — noticed only when a commit meant to touch six files
+# carried a seventh.
+#
+# Scoped through `_Env` rather than set at module scope. A module-scope
+# `os.environ[...] = ...` is the precise defect the isolation plugin
+# exists to catch: the first file to run wins and every file after it
+# inherits a value it did not choose.
+_SCRATCH_LEDGER = os.path.join(
+    tempfile.gettempdir(), "kai-test-legacy-bridge-ledger.jsonl")
 
 from common.contracts.base import Principal, Provenance
 from common.contracts.autonomy import AutonomyLevel, EvidenceGrade
@@ -327,7 +343,7 @@ def test_live_gate_uses_bridge():
         set_legacy_bridge,
     )
 
-    with _Env(**{ENFORCE_ENV: "false"}):
+    with _Env(**{ENFORCE_ENV: "false", "TRUST_LEDGER_PATH": _SCRATCH_LEDGER}):
         bridge = _bridge(with_grant=False)
         set_legacy_bridge(bridge)
 
@@ -341,7 +357,7 @@ def test_live_gate_enforcing_cannot_widen():
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "agentic"))
     from trust_integration import gate_autonomous_action, set_legacy_bridge
 
-    with _Env(**{ENFORCE_ENV: "true"}):
+    with _Env(**{ENFORCE_ENV: "true", "TRUST_LEDGER_PATH": _SCRATCH_LEDGER}):
         bridge = _bridge(with_grant=False)
         set_legacy_bridge(bridge)
 

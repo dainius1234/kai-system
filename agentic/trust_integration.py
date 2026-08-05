@@ -25,17 +25,40 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import sys
 import time
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 from common.degraded import record_degradation
+from common.data_paths import data_path
 
 logger = logging.getLogger("kai.trust_integration")
 
-# Trust-ledger path (mirrors trust-ledger/app.py default)
-_LEDGER_PATH = Path("data/trust-ledger/events.jsonl")
 _TL_DIR = Path(__file__).parent.parent / "trust-ledger"
+
+
+def ledger_path() -> Path:
+    """Where this process appends trust events.
+
+    Read at call time. `TRUST_LEDGER_PATH` — the variable
+    `trust-ledger/app.py` reads — wins if set; otherwise the path comes
+    from the shared data root, so one variable moves every store at
+    once. It used to be a module constant hard-coded to the relative
+    path, in two files, and neither could be redirected.
+
+    That is not a style point. `scripts/test_legacy_bridge.py` calls
+    `gate_autonomous_action` for real, so every `make test-uh` appended
+    two live AUTONOMOUS_ACTION events — signed, hash-chained — to the
+    repository's tracked ledger. Found on 2026-08-05 when a commit
+    intended to touch six files carried a seventh: two events the test
+    run had just written. Every other ledger in the tree
+    (`tool-gate`, `trust-ledger`) already took its path from the
+    environment; this was the one that did not, so it was the one the
+    tests could not point somewhere harmless.
+    """
+    explicit = os.getenv("TRUST_LEDGER_PATH")
+    return Path(explicit) if explicit else data_path("trust-ledger", "events.jsonl")
 
 
 def _get_ledger():
@@ -44,7 +67,7 @@ def _get_ledger():
         if str(_TL_DIR) not in sys.path:
             sys.path.insert(0, str(_TL_DIR))
         from ledger import FileLedger  # type: ignore[import]
-        return FileLedger(_LEDGER_PATH)
+        return FileLedger(ledger_path())
     except Exception as exc:
         logger.debug("Trust ledger unavailable: %s", exc)
         return None

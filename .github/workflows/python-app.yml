@@ -88,3 +88,24 @@ jobs:
     - name: Test dashboard (needs CWD=dashboard/)
       run: |
         cd dashboard && PYTHONPATH=.. pytest ../scripts/test_dashboard.py ../scripts/test_dashboard_ui.py -q
+
+    # A test run must leave the tree exactly as it found it. This run did
+    # not: measured on 2026-08-05, a full `pytest scripts/` mutated four
+    # tracked files, two of them a signed hash-chained ledger, so the
+    # repository's copy was a mixture of real events and whatever the
+    # tests last did. Locally it stayed invisible because
+    # `git checkout -- data/` had become a reflex. This step has no
+    # reflexes. Last, so it covers every suite above it.
+    - name: The suite must not write into the repository
+      if: always()
+      run: |
+        if ! git diff --quiet; then
+          echo "::error::The test run modified tracked files:"
+          git diff --stat
+          echo
+          echo "State written during a test belongs under a temporary"
+          echo "root, not in the tree. See common/data_paths.py —"
+          echo "KAI_DATA_ROOT moves every adopting store at once."
+          exit 1
+        fi
+        echo "clean: the suite left no tracked file modified"

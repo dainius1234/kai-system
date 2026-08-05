@@ -5740,3 +5740,103 @@ one today in CI dependency installs alone.
 three, and the reporting failure was mine rather than the repository's.
 Stays **OPEN** until `core-tests` and `unified-hunter` are observed green;
 `policy-checks` has been.
+
+---
+
+## 2026-08-05 (part 13) — the test suite was writing into the repository
+
+Two things closed and one found, in that order.
+
+### unified-hunter: pytest was never installed
+
+`test-test-isolation` failed 7 assertions in CI and passed locally on
+every run. I had called it a "test-harness discrepancy" and could not
+reproduce it, which was the tell: I was theorising instead of measuring.
+
+The cause is that `unified-hunter.yml` installs
+`pyyaml fastapi httpx starlette pydantic`, no `requirements.txt` in the
+tree carries pytest, and the two calibration cases I added that morning
+spawn `sys.executable -m pytest` to measure the isolation plugin against
+pytest's own hook ordering. Every other suite in `make test-uh` is a
+plain script, so nothing had ever needed it.
+
+Reproduced before fixing: shadowing pytest on `PYTHONPATH` gives
+`22 passed, 7 failed` — the same seven lines, in the same order, as the
+CI log for `c5ac7f9`.
+
+**What cost the afternoon was not the missing package.** All seven
+assertions were about the *contents* of a report that was never written
+— `None`, `None`, `{}`, `{}` — and not one of them said "pytest is not
+installed". A missing tool has to name itself or the next person debugs
+the detector instead of the environment. So the subprocess helper is now
+shared by both cases, probes for pytest by name first and **fails rather
+than skips** — a calibration that could not run has not calibrated
+anything — and surfaces the subprocess's stdout and stderr.
+
+### The container scan, per the operator's decision
+
+Treated exactly like pip-audit: findings advisory, scanner failure
+fatal. `continue-on-error: true` on the trivy step, then a follow-on
+step that warns on `failure` and **exits 1 on any other outcome**, so a
+missing binary or a rate-limited DB download still breaks the build. A
+scan that could not execute is not a clean scan. Declared `needs-owner`,
+owner operator, review by 2026-11-01.
+
+### The one that was found on the way
+
+`git status` after a routine commit showed a seventh file I had not
+touched: `data/trust-ledger/events.jsonl`, two new events. They were
+real — signed, hash-chained, `AUTONOMOUS_ACTION`, capability
+`paper_trade_open` — written by `scripts/test_legacy_bridge.py`, which
+calls `gate_autonomous_action` for real.
+
+I measured the extent rather than assuming it was one file. A full
+`pytest scripts/` (4,324 passing) mutated **four** tracked files:
+
+    data/ohana/fingerprint.json
+    data/trust-ledger/events.jsonl
+    data/trust/audit_log.jsonl
+    data/trust/trust_record.json
+
+So the repository's committed ledger is a mixture of real events and
+whatever the tests last did, and every run diverged it further.
+
+**This had been found before.** `conftest.py` already redirects
+`SOUL_PATH`, and the comment above that line says `git checkout --
+data/` "had become a reflex between local runs". That is the whole
+defect in one sentence: it stayed invisible because somebody kept paying
+for it by hand. And the fix was per-path, so it protected the one path
+whoever wrote it was thinking about.
+
+Eighth venue for the list-beside-the-thing pattern.
+
+The general form is `common/data_paths.py`: one `KAI_DATA_ROOT`, read at
+**call time** rather than captured at import — a module constant
+computed during import cannot be redirected by a test that imports the
+module, which is exactly what made the originals untestable.
+`conftest.py` points it at a scratch directory for the whole session, so
+a suite cannot write into the tree whether or not anybody remembered.
+
+Enforced rather than trusted: `python-app.yml` and `unified-hunter.yml`
+now end with `git diff --quiet`, which fails with the file list if a run
+leaves any tracked file modified. Verified locally — before, four files;
+after, none, across both the pytest suite and `make test-uh`.
+
+### Register
+
+**`KAI-GATE-027`** — the test suite wrote into the repository's own
+persistent state: 4 tracked files per full run, including a signed
+hash-chained ledger. Instance fixed (`KAI_DATA_ROOT`, adopted by
+`trust_core`, `moral_core`, `trust_integration`); class enforced by a
+`git diff --quiet` step in two workflows. **OPEN** until that step is
+observed passing in CI, for the same reason 025 is.
+
+**`KAI-GATE-026`** — CRITICAL/HIGH CVEs in container base images.
+Advisory by decision, not by accident: owner operator, review by
+2026-11-01. **OPEN.**
+
+**`KAI-GATE-025`** — `unified-hunter` cause found and fixed;
+`core-tests` fixed by `check-docs` moving into `policy-check` and the
+trivy declaration. Stays **OPEN** until all four workflows are observed
+green on one commit. I have reported green from a local result twice
+today; the third time it will be from the run.
