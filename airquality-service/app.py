@@ -27,6 +27,7 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("airquality-service")
+
     class ErrorBudget:
         def __init__(self, **_): pass
         def record(self, *_, **__): pass
@@ -34,8 +35,8 @@ except ImportError:
     budget = ErrorBudget()
 
 PORT = int(os.getenv("PORT", "8042"))
-LAT  = float(os.getenv("WEATHER_LAT", "51.5074"))
-LON  = float(os.getenv("WEATHER_LON", "-0.1278"))
+LAT = float(os.getenv("WEATHER_LAT", "51.5074"))
+LON = float(os.getenv("WEATHER_LON", "-0.1278"))
 LOCATION_NAME = os.getenv("WEATHER_LOCATION", "London")
 REFRESH_INTERVAL = int(os.getenv("AQ_REFRESH_SECONDS", "1800"))  # 30 min
 

@@ -12,6 +12,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # ── Stub letta before importing app ──────────────────────────────────
 # Build minimal stubs so importing letta-agent/app.py succeeds without
 # the real package being installed in the test environment.
+
+
 def _letta_stubs() -> dict:
     """Stubs for the real letta package, or {} if it is installed."""
     if "letta" in sys.modules:
@@ -29,6 +31,7 @@ def _letta_stubs() -> dict:
         "letta.schemas.llm_config": llm_cfg,
         "letta.schemas.embedding_config": emb_cfg,
     }
+
 
 # Load letta-agent/app.py by path to avoid collision with sys.modules["app"]
 # which test_p3_organic_memory.py sets to memu-core/app.py.
@@ -84,7 +87,7 @@ class TestAgentRun(unittest.TestCase):
 
     def test_agent_run_returns_response(self):
         with patch.object(letta_app, "_letta_client", self.mock_lc), \
-             patch.object(letta_app, "_agent_id", "test-agent-id"):
+                patch.object(letta_app, "_agent_id", "test-agent-id"):
             resp = self.client.post("/agent/run", json={"task": "What is 2+2?"})
         self.assertEqual(resp.status_code, 200)
         data = resp.json()
@@ -94,7 +97,7 @@ class TestAgentRun(unittest.TestCase):
 
     def test_agent_run_with_context_prepends_context(self):
         with patch.object(letta_app, "_letta_client", self.mock_lc), \
-             patch.object(letta_app, "_agent_id", "test-agent-id"):
+                patch.object(letta_app, "_agent_id", "test-agent-id"):
             resp = self.client.post(
                 "/agent/run",
                 json={"task": "Summarise.", "context": {"user": "alice", "lang": "en"}},
@@ -118,7 +121,7 @@ class TestAgentRun(unittest.TestCase):
         self.mock_lc.send_message.return_value = mock_response
 
         with patch.object(letta_app, "_letta_client", self.mock_lc), \
-             patch.object(letta_app, "_agent_id", "test-agent-id"):
+                patch.object(letta_app, "_agent_id", "test-agent-id"):
             resp = self.client.post("/agent/run", json={"task": "Remember this."})
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(resp.json()["memories_updated"])
@@ -126,7 +129,7 @@ class TestAgentRun(unittest.TestCase):
     def test_agent_run_502_on_exception(self):
         self.mock_lc.send_message.side_effect = RuntimeError("Ollama down")
         with patch.object(letta_app, "_letta_client", self.mock_lc), \
-             patch.object(letta_app, "_agent_id", "test-agent-id"):
+                patch.object(letta_app, "_agent_id", "test-agent-id"):
             resp = self.client.post("/agent/run", json={"task": "hello"})
         self.assertEqual(resp.status_code, 502)
         self.assertIn("agent/run failed", resp.json()["detail"])
@@ -143,7 +146,7 @@ class TestMemoryExport(unittest.TestCase):
 
     def test_export_returns_memories_list(self):
         with patch.object(letta_app, "_letta_client", self.mock_lc), \
-             patch.object(letta_app, "_agent_id", "test-agent-id"):
+                patch.object(letta_app, "_agent_id", "test-agent-id"):
             resp = self.client.get("/agent/memory/export")
         self.assertEqual(resp.status_code, 200)
         data = resp.json()
@@ -153,7 +156,7 @@ class TestMemoryExport(unittest.TestCase):
     def test_export_502_on_exception(self):
         self.mock_lc.get_archival_memory.side_effect = RuntimeError("DB error")
         with patch.object(letta_app, "_letta_client", self.mock_lc), \
-             patch.object(letta_app, "_agent_id", "test-agent-id"):
+                patch.object(letta_app, "_agent_id", "test-agent-id"):
             resp = self.client.get("/agent/memory/export")
         self.assertEqual(resp.status_code, 502)
 

@@ -226,17 +226,17 @@ def test_quest_result_improves_challenge_score(ledger):
 # ── Tier mapping ──────────────────────────────────────────────────────────────
 
 @pytest.mark.parametrize("score,expected_tier", [
-    (0,   "Neophyte"),
-    (20,  "Neophyte"),
-    (21,  "Apprentice"),
-    (40,  "Apprentice"),
-    (41,  "Journeyman"),
-    (60,  "Journeyman"),
-    (61,  "Adept"),
-    (80,  "Adept"),
-    (81,  "Master"),
-    (95,  "Master"),
-    (96,  "Ohana"),
+    (0, "Neophyte"),
+    (20, "Neophyte"),
+    (21, "Apprentice"),
+    (40, "Apprentice"),
+    (41, "Journeyman"),
+    (60, "Journeyman"),
+    (61, "Adept"),
+    (80, "Adept"),
+    (81, "Master"),
+    (95, "Master"),
+    (96, "Ohana"),
     (100, "Ohana"),
 ])
 def test_tier_for_score(score, expected_tier):

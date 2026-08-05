@@ -231,8 +231,8 @@ def list_models() -> Dict[str, ModelSpec]:
 # Recommended specialist models (GPU Day defaults)
 # Override per-specialist with env vars or swap for any registered model.
 _SPECIALIST_DEFAULTS: Dict[str, str] = {
-    "code":     "deepseek-coder-v2:6.7b",   # code: strong reasoning + JSON mode
-    "math":     "qwen2.5-math:7b",           # math: numerical accuracy
+    "code": "deepseek-coder-v2:6.7b",   # code: strong reasoning + JSON mode
+    "math": "qwen2.5-math:7b",           # math: numerical accuracy
     "creative": "dolphin-mistral",           # creative: less restricted, narrative-friendly
 }
 

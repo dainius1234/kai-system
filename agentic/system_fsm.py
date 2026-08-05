@@ -42,22 +42,22 @@ class KaiEvent(str, Enum):
 
 # (current_state, event) → next_state
 _TRANSITIONS: dict[tuple[KaiState, KaiEvent], KaiState] = {
-    (KaiState.IDLE,       KaiEvent.USER_MESSAGE):    KaiState.ACTIVE,
-    (KaiState.ACTIVE,     KaiEvent.SESSION_END):     KaiState.IDLE,
-    (KaiState.IDLE,       KaiEvent.SERVICE_DOWN):    KaiState.DEGRADED,
-    (KaiState.ACTIVE,     KaiEvent.SERVICE_DOWN):    KaiState.DEGRADED,
-    (KaiState.FOCUSED,    KaiEvent.SERVICE_DOWN):    KaiState.DEGRADED,
-    (KaiState.DEGRADED,   KaiEvent.HEAL_STARTED):    KaiState.RECOVERING,
-    (KaiState.RECOVERING, KaiEvent.HEAL_COMPLETE):   KaiState.IDLE,
-    (KaiState.RECOVERING, KaiEvent.SERVICE_RESTORED):KaiState.IDLE,
-    (KaiState.DEGRADED,   KaiEvent.SERVICE_RESTORED):KaiState.IDLE,
-    (KaiState.IDLE,       KaiEvent.ANOMALY_CRITICAL):KaiState.DEGRADED,
-    (KaiState.ACTIVE,     KaiEvent.ANOMALY_CRITICAL):KaiState.DEGRADED,
-    (KaiState.IDLE,       KaiEvent.FOCUS_ENTER):     KaiState.FOCUSED,
-    (KaiState.ACTIVE,     KaiEvent.FOCUS_ENTER):     KaiState.FOCUSED,
-    (KaiState.FOCUSED,    KaiEvent.FOCUS_EXIT):      KaiState.IDLE,
+    (KaiState.IDLE, KaiEvent.USER_MESSAGE): KaiState.ACTIVE,
+    (KaiState.ACTIVE, KaiEvent.SESSION_END): KaiState.IDLE,
+    (KaiState.IDLE, KaiEvent.SERVICE_DOWN): KaiState.DEGRADED,
+    (KaiState.ACTIVE, KaiEvent.SERVICE_DOWN): KaiState.DEGRADED,
+    (KaiState.FOCUSED, KaiEvent.SERVICE_DOWN): KaiState.DEGRADED,
+    (KaiState.DEGRADED, KaiEvent.HEAL_STARTED): KaiState.RECOVERING,
+    (KaiState.RECOVERING, KaiEvent.HEAL_COMPLETE): KaiState.IDLE,
+    (KaiState.RECOVERING, KaiEvent.SERVICE_RESTORED): KaiState.IDLE,
+    (KaiState.DEGRADED, KaiEvent.SERVICE_RESTORED): KaiState.IDLE,
+    (KaiState.IDLE, KaiEvent.ANOMALY_CRITICAL): KaiState.DEGRADED,
+    (KaiState.ACTIVE, KaiEvent.ANOMALY_CRITICAL): KaiState.DEGRADED,
+    (KaiState.IDLE, KaiEvent.FOCUS_ENTER): KaiState.FOCUSED,
+    (KaiState.ACTIVE, KaiEvent.FOCUS_ENTER): KaiState.FOCUSED,
+    (KaiState.FOCUSED, KaiEvent.FOCUS_EXIT): KaiState.IDLE,
     # Stay in FOCUSED during messages — PUB mode does not break focus
-    (KaiState.FOCUSED,    KaiEvent.USER_MESSAGE):    KaiState.FOCUSED,
+    (KaiState.FOCUSED, KaiEvent.USER_MESSAGE): KaiState.FOCUSED,
 }
 
 

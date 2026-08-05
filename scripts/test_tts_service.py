@@ -64,6 +64,7 @@ def test_synthesize_network_failure_returns_503():
 
     class _ErrorStream:
         """Async iterable that immediately raises a network-style exception."""
+
         def __aiter__(self):
             return self
 

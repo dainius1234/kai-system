@@ -73,16 +73,16 @@ class CheckResult:
 # Matches the sensory services list in app.py; URLs resolved from env at check time.
 
 _DEFAULT_SERVICES: List[Dict[str, Any]] = [
-    {"name": "broker",        "env": "BROKER_URL",        "critical": True},
-    {"name": "skill_hunter",  "env": "SKILL_HUNTER_URL",  "critical": True},
-    {"name": "calendar",      "env": "CALENDAR_URL",      "critical": False},
-    {"name": "email_reader",  "env": "EMAIL_READER_URL",  "critical": False},
-    {"name": "docker_watcher","env": "DOCKER_WATCHER_URL","critical": False},
-    {"name": "sysmetrics",    "env": "SYSMETRICS_URL",    "critical": False},
-    {"name": "weather",       "env": "WEATHER_URL",       "critical": False},
-    {"name": "airquality",    "env": "AIRQUALITY_URL",    "critical": False},
-    {"name": "news_feed",     "env": "NEWS_FEED_URL",     "critical": False},
-    {"name": "git_watcher",   "env": "GIT_WATCHER_URL",  "critical": False},
+    {"name": "broker", "env": "BROKER_URL", "critical": True},
+    {"name": "skill_hunter", "env": "SKILL_HUNTER_URL", "critical": True},
+    {"name": "calendar", "env": "CALENDAR_URL", "critical": False},
+    {"name": "email_reader", "env": "EMAIL_READER_URL", "critical": False},
+    {"name": "docker_watcher", "env": "DOCKER_WATCHER_URL", "critical": False},
+    {"name": "sysmetrics", "env": "SYSMETRICS_URL", "critical": False},
+    {"name": "weather", "env": "WEATHER_URL", "critical": False},
+    {"name": "airquality", "env": "AIRQUALITY_URL", "critical": False},
+    {"name": "news_feed", "env": "NEWS_FEED_URL", "critical": False},
+    {"name": "git_watcher", "env": "GIT_WATCHER_URL", "critical": False},
 ]
 
 
@@ -297,7 +297,7 @@ class ServiceWatchdog:
         return {
             "last_checked_at": self._last_checked_at,
             "seconds_since_check": round(time.time() - self._last_checked_at)
-                                   if self._last_checked_at else None,
+            if self._last_checked_at else None,
             "total": len(results),
             "healthy_count": len(healthy),
             "unhealthy_count": len(results) - len(healthy),

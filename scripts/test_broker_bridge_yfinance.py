@@ -21,6 +21,7 @@ _SENTINEL = object()
 
 # ── Fake fast_info ────────────────────────────────────────────────────────────
 
+
 class _FakeFastInfo:
     """Attribute-access wrapper around a plain dict."""
 

@@ -31,6 +31,7 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("calendar-service")
+
     class ErrorBudget:
         def __init__(self, **_): pass
         def record(self, *_, **__): pass
@@ -46,7 +47,7 @@ except ImportError:
     logger.info("caldav/icalendar not available — calendar-service in stub mode")
 
 PORT = int(os.getenv("PORT", "8043"))
-CALDAV_URL  = os.getenv("CALDAV_URL", "")
+CALDAV_URL = os.getenv("CALDAV_URL", "")
 CALDAV_USER = os.getenv("CALDAV_USER", "")
 CALDAV_PASS = os.getenv("CALDAV_PASS", "")
 REFRESH_INTERVAL = int(os.getenv("CALDAV_REFRESH_SECONDS", "300"))

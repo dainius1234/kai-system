@@ -27,7 +27,7 @@ from fastapi import Body, FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from common.degraded import (degradation_report, degraded_partial,
-                            degraded_response, record_degradation)
+                             degraded_response, record_degradation)
 from common.http_hygiene import bounded_json
 from common.runtime import AuditStream, ErrorBudget, detect_device, redact_pii, sanitize_string, setup_json_logger
 
@@ -185,14 +185,14 @@ class MemoryRecord(BaseModel):
 # everything relevant.
 
 CONSTRUCTION_CATEGORIES: Dict[str, List[str]] = {
-    "setting-out":   ["setting out", "set out", "peg", "grid", "baseline", "offset", "coord", "station", "benchmark", "control point"],
-    "survey-data":   ["survey", "level", "total station", "gps", "rtk", "theodolite", "traverse", "elevation", "datum", "topographic"],
-    "rams":          ["rams", "risk assessment", "method statement", "hazard", "coshh", "ppe", "permit to work", "safe system"],
-    "itp":           ["itp", "inspection", "test plan", "hold point", "witness point", "quality check", "ncr", "snag", "defect"],
-    "drawings":      ["drawing", "cad", "autocad", "lisp", "dwg", "revision", "rfi", "design", "detail", "section", "elevation drawing"],
-    "hs-briefings":  ["briefing", "toolbox talk", "safety", "h&s", "health and safety", "induction", "near miss", "accident", "incident"],
-    "client-ncrs":   ["ncr", "non-conformance", "non conformance", "client complaint", "deficiency", "remedial", "corrective action"],
-    "daily-logs":    ["daily log", "daily report", "site diary", "progress", "weather", "labour", "plant", "material delivery"],
+    "setting-out": ["setting out", "set out", "peg", "grid", "baseline", "offset", "coord", "station", "benchmark", "control point"],
+    "survey-data": ["survey", "level", "total station", "gps", "rtk", "theodolite", "traverse", "elevation", "datum", "topographic"],
+    "rams": ["rams", "risk assessment", "method statement", "hazard", "coshh", "ppe", "permit to work", "safe system"],
+    "itp": ["itp", "inspection", "test plan", "hold point", "witness point", "quality check", "ncr", "snag", "defect"],
+    "drawings": ["drawing", "cad", "autocad", "lisp", "dwg", "revision", "rfi", "design", "detail", "section", "elevation drawing"],
+    "hs-briefings": ["briefing", "toolbox talk", "safety", "h&s", "health and safety", "induction", "near miss", "accident", "incident"],
+    "client-ncrs": ["ncr", "non-conformance", "non conformance", "client complaint", "deficiency", "remedial", "corrective action"],
+    "daily-logs": ["daily log", "daily report", "site diary", "progress", "weather", "labour", "plant", "material delivery"],
 }
 DEFAULT_CATEGORY = "general"
 
@@ -503,8 +503,8 @@ class PGVectorStore:
         if not kwargs:
             return False
         allowed = {"relevance", "importance", "access_count", "last_accessed",
-                    "stability", "pinned", "trust_tier", "source_id", "poisoned",
-                    "quarantine_reason", "category"}
+                   "stability", "pinned", "trust_tier", "source_id", "poisoned",
+                   "quarantine_reason", "category"}
         fields = {k: v for k, v in kwargs.items() if k in allowed}
         if not fields:
             return False
@@ -1302,7 +1302,7 @@ def retrieve_ranked(query: str, user_id: str, top_k: int) -> List[MemoryRecord]:
             # no running event loop (e.g. called outside a request, in tests)
             for u in pending_updates:
                 store.update_record(u["id"], access_count=u["access_count"],
-                                     last_accessed=u["last_accessed"], stability=u["stability"])
+                                    last_accessed=u["last_accessed"], stability=u["stability"])
 
     return results
 
@@ -1312,7 +1312,7 @@ async def _persist_retrieval_updates_background(updates: List[Dict[str, Any]]) -
     def _write_all() -> None:
         for u in updates:
             store.update_record(u["id"], access_count=u["access_count"],
-                                 last_accessed=u["last_accessed"], stability=u["stability"])
+                                last_accessed=u["last_accessed"], stability=u["stability"])
     try:
         await asyncio.to_thread(_write_all)
     except Exception:
@@ -2903,7 +2903,7 @@ async def assert_memory(req: AssertRequest) -> Dict[str, Any]:
                 quarantine_reason=f"superseded by {record.id}: {conflict.explanation}",
             )
         logger.info("Contradiction resolved: %s superseded by %s (%s)",
-                     conflict.conflicting_memory_id, record.id, conflict.conflict_type)
+                    conflict.conflicting_memory_id, record.id, conflict.conflict_type)
 
     if _should_graph_ingest(category):
         asyncio.create_task(_graph_ingest_fire_and_forget(
@@ -6018,7 +6018,7 @@ async def get_legacy_messages(
                 msg["surfaced"] = True
                 msg["surfaced_at"] = now
                 _p18_update_entry(_P18_LEGACY_KEY, _legacy_messages, msg["id"],
-                                   {"surfaced": True, "surfaced_at": now})
+                                  {"surfaced": True, "surfaced_at": now})
             results.append(msg)
         elif include_unsurfaced:
             results.append(msg)
@@ -6390,8 +6390,7 @@ async def creative_synthesis(request: Request) -> Dict[str, Any]:
             1.0 - (len(set(domain_memories.get(domain_a, [])) &
                        set(domain_memories.get(domain_b, []))) /
                    max(1, len(set(domain_memories.get(domain_a, [])) |
-                              set(domain_memories.get(domain_b, [])))))
-        , 2),
+                              set(domain_memories.get(domain_b, []))))), 2),
     }
 
     _p19_append_capped(_P19_CREATIVE_KEY, _creative_ideas, idea, _CREATIVE_CAP)

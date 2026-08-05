@@ -32,7 +32,7 @@ _HMAC_KEY = os.getenv("TRUST_LEDGER_HMAC_SECRET", "trust-dev-secret").encode()
 class TrustEvent:
     event_id: str
     event_type: str       # GRANT | REVOKE | AUTONOMOUS_ACTION | OVERRIDE |
-                          # ALIGNMENT_AUDIT | QUEST_RESULT | MERKLE_PUBLISH
+    # ALIGNMENT_AUDIT | QUEST_RESULT | MERKLE_PUBLISH
     timestamp: float
     initiator: str        # 'operator' | 'kai' | 'system'
     capability: Optional[str]

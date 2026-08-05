@@ -826,8 +826,8 @@ def synthesize_patterns(episodes: List[Dict[str, Any]]) -> List[DreamInsight]:
         # Learning trend: conviction improving over time
         if len(eps) >= 3:
             sorted_eps = sorted(eps, key=lambda e: e.get("ts", 0))
-            early = [float(e.get("final_conviction", 0)) for e in sorted_eps[:len(sorted_eps)//2]]
-            late = [float(e.get("final_conviction", 0)) for e in sorted_eps[len(sorted_eps)//2:]]
+            early = [float(e.get("final_conviction", 0)) for e in sorted_eps[:len(sorted_eps) // 2]]
+            late = [float(e.get("final_conviction", 0)) for e in sorted_eps[len(sorted_eps) // 2:]]
             if early and late:
                 early_avg = sum(early) / len(early)
                 late_avg = sum(late) / len(late)

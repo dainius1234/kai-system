@@ -32,6 +32,7 @@ _ff_stub.is_enabled = lambda flag: False
 # Stub global_workspace so WorkspaceBid import works
 import dataclasses
 
+
 @dataclasses.dataclass
 class _WorkspaceBid:
     module: str
@@ -42,6 +43,7 @@ class _WorkspaceBid:
     confidence: float = 0.5
     emotional_salience: float = 0.3
     timestamp: float = dataclasses.field(default_factory=time.time)
+
 
 _gw_stub = types.ModuleType("global_workspace")
 _gw_stub.WorkspaceBid = _WorkspaceBid

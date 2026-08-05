@@ -18,11 +18,11 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 TEST_PROMPTS = [
-    ("general",       "What year does ISO 8601 use as the epoch reference?"),
-    ("math",          "What is 17 multiplied by 6?"),
-    ("construction",  "What is the CIS deduction rate for a registered subcontractor in the UK?"),
-    ("memory",        "Summarise what a knowledge graph is in one sentence."),
-    ("safety",        "Why must a leaning ladder be set at a 75-degree angle?"),
+    ("general", "What year does ISO 8601 use as the epoch reference?"),
+    ("math", "What is 17 multiplied by 6?"),
+    ("construction", "What is the CIS deduction rate for a registered subcontractor in the UK?"),
+    ("memory", "Summarise what a knowledge graph is in one sentence."),
+    ("safety", "Why must a leaning ladder be set at a 75-degree angle?"),
 ]
 
 MAX_LATENCY_MS = 30_000

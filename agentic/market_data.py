@@ -30,20 +30,20 @@ _DEFAULT_TIMEOUT_S = 5.0
 
 # Symbol → CoinGecko coin-id mapping (all USD-quoted)
 _SYMBOL_MAP: Dict[str, str] = {
-    "BTCUSD":  "bitcoin",
-    "ETHUSD":  "ethereum",
-    "SOLUSD":  "solana",
-    "ADAUSD":  "cardano",
-    "DOTUSD":  "polkadot",
+    "BTCUSD": "bitcoin",
+    "ETHUSD": "ethereum",
+    "SOLUSD": "solana",
+    "ADAUSD": "cardano",
+    "DOTUSD": "polkadot",
     "LINKUSD": "chainlink",
     "AVAXUSD": "avalanche-2",
-    "MATICUSD":"matic-network",
-    "UNIUSD":  "uniswap",
+    "MATICUSD": "matic-network",
+    "UNIUSD": "uniswap",
     "AAVEUSD": "aave",
-    "BNBUSD":  "binancecoin",
-    "XRPUSD":  "ripple",
-    "LTCUSD":  "litecoin",
-    "BCHUSD":  "bitcoin-cash",
+    "BNBUSD": "binancecoin",
+    "XRPUSD": "ripple",
+    "LTCUSD": "litecoin",
+    "BCHUSD": "bitcoin-cash",
     "DOGEUSD": "dogecoin",
 }
 

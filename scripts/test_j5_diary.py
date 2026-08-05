@@ -5,9 +5,9 @@ Run: pytest scripts/test_j5_diary.py -v
 """
 from pathlib import Path
 
-ROOT     = Path(__file__).parent.parent
+ROOT = Path(__file__).parent.parent
 APP_HTML = ROOT / "dashboard" / "static" / "app.html"
-DASH_PY  = ROOT / "dashboard" / "app.py"
+DASH_PY = ROOT / "dashboard" / "app.py"
 
 
 def _html():

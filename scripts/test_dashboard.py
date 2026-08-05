@@ -175,7 +175,6 @@ def test_upload_service_unreachable():
     assert resp.status_code == 503
 
 
-
 def test_memory_reads_are_scoped_to_the_caller():
     """KAI-DASH-023: the caller's identity must reach the backend.
 
@@ -229,7 +228,6 @@ def test_memory_search_sends_the_required_parameter():
     assert retrieve, f"no /memory/retrieve call was made: {seen}"
     for required in ("query", "user_id", "top_k"):
         assert required in retrieve[0], f"{required} missing from {retrieve[0]}"
-
 
 
 # ── Tracks E-I: bounds, headers, media types, audit ──────────────────
@@ -326,7 +324,6 @@ def test_audit_records_a_credential_derived_actor():
     assert not any(TOKEN in line for line in seen), "token leaked into audit"
 
 
-
 def test_oversized_upload_is_refused_during_the_read():
     """KAI-DASH-045: the limit used to fire after the body was buffered."""
     big = b"x" * (11 * 1024 * 1024)
@@ -399,6 +396,7 @@ def test_query_limits_reject_out_of_range_values():
 def test_valid_query_limits_still_work():
     resp = client.get("/api/memories/recent?top_k=5", headers=AUTH)
     assert resp.status_code != 422, resp.status_code
+
 
 if __name__ == "__main__":
     test_health()

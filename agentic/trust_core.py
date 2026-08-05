@@ -41,6 +41,7 @@ from common.data_paths import data_path
 
 logger = logging.getLogger("kai.trust_core")
 
+
 def _data_dir() -> Path:
     """`data/trust`, unless KAI_DATA_ROOT says otherwise.
 
@@ -56,56 +57,56 @@ def _data_dir() -> Path:
 # ── Trust levels ──────────────────────────────────────────────────────────────
 
 class TrustLevel(IntEnum):
-    DORMANT   = 0
-    OBSERVER  = 1
+    DORMANT = 0
+    OBSERVER = 1
     ASSISTANT = 2
-    AGENT     = 3
-    PARTNER   = 4
-    OPERATOR  = 5
-    GUARDIAN  = 6
+    AGENT = 3
+    PARTNER = 4
+    OPERATOR = 5
+    GUARDIAN = 6
 
 
 # ── Capability → minimum required trust level ─────────────────────────────────
 
 CAPABILITY_GATES: Dict[str, TrustLevel] = {
     # OBSERVER
-    "chat":                 TrustLevel.OBSERVER,
-    "advise":               TrustLevel.OBSERVER,
-    "introspect":           TrustLevel.OBSERVER,
+    "chat": TrustLevel.OBSERVER,
+    "advise": TrustLevel.OBSERVER,
+    "introspect": TrustLevel.OBSERVER,
     # ASSISTANT
-    "execute_task":         TrustLevel.ASSISTANT,
-    "read_web":             TrustLevel.ASSISTANT,
-    "send_notification":    TrustLevel.ASSISTANT,
+    "execute_task": TrustLevel.ASSISTANT,
+    "read_web": TrustLevel.ASSISTANT,
+    "send_notification": TrustLevel.ASSISTANT,
     # AGENT
-    "decide_autonomously":  TrustLevel.AGENT,
-    "interact_web":         TrustLevel.AGENT,
-    "manage_schedule":      TrustLevel.AGENT,
+    "decide_autonomously": TrustLevel.AGENT,
+    "interact_web": TrustLevel.AGENT,
+    "manage_schedule": TrustLevel.AGENT,
     # PARTNER
-    "financial_micro":      TrustLevel.PARTNER,   # small amounts (< £50)
-    "proactive_care":       TrustLevel.PARTNER,
-    "solve_captcha":        TrustLevel.PARTNER,
+    "financial_micro": TrustLevel.PARTNER,   # small amounts (< £50)
+    "proactive_care": TrustLevel.PARTNER,
+    "solve_captcha": TrustLevel.PARTNER,
     # OPERATOR
-    "income_generation":    TrustLevel.OPERATOR,
-    "model_management":     TrustLevel.OPERATOR,
-    "financial_standard":   TrustLevel.OPERATOR,  # up to £500
-    "self_host_manage":     TrustLevel.OPERATOR,
+    "income_generation": TrustLevel.OPERATOR,
+    "model_management": TrustLevel.OPERATOR,
+    "financial_standard": TrustLevel.OPERATOR,  # up to £500
+    "self_host_manage": TrustLevel.OPERATOR,
     # GUARDIAN
-    "guardian_mode":        TrustLevel.GUARDIAN,
-    "daughter_profile":     TrustLevel.GUARDIAN,
-    "legacy_activation":    TrustLevel.GUARDIAN,
-    "financial_full":       TrustLevel.GUARDIAN,
+    "guardian_mode": TrustLevel.GUARDIAN,
+    "daughter_profile": TrustLevel.GUARDIAN,
+    "legacy_activation": TrustLevel.GUARDIAN,
+    "financial_full": TrustLevel.GUARDIAN,
 }
 
 
 # ── Promotion thresholds (evidence scores required to auto-qualify) ───────────
 
 PROMOTION_THRESHOLDS: Dict[TrustLevel, Dict[str, float]] = {
-    TrustLevel.OBSERVER:  {"consistency": 1.0, "judgment": 0.0, "values": 0.0},
+    TrustLevel.OBSERVER: {"consistency": 1.0, "judgment": 0.0, "values": 0.0},
     TrustLevel.ASSISTANT: {"consistency": 5.0, "judgment": 3.0, "values": 2.0},
-    TrustLevel.AGENT:     {"consistency": 15.0, "judgment": 10.0, "values": 8.0},
-    TrustLevel.PARTNER:   {"consistency": 30.0, "judgment": 25.0, "values": 20.0},
-    TrustLevel.OPERATOR:  {"consistency": 60.0, "judgment": 50.0, "values": 45.0},
-    TrustLevel.GUARDIAN:  {"consistency": 100.0, "judgment": 90.0, "values": 85.0},
+    TrustLevel.AGENT: {"consistency": 15.0, "judgment": 10.0, "values": 8.0},
+    TrustLevel.PARTNER: {"consistency": 30.0, "judgment": 25.0, "values": 20.0},
+    TrustLevel.OPERATOR: {"consistency": 60.0, "judgment": 50.0, "values": 45.0},
+    TrustLevel.GUARDIAN: {"consistency": 100.0, "judgment": 90.0, "values": 85.0},
 }
 
 
@@ -141,7 +142,7 @@ class TrustRecord:
 class AuditEvent:
     timestamp: float
     event_type: str     # "action_attempt" | "action_allowed" | "action_refused"
-                        # | "level_granted" | "level_revoked" | "evidence_added"
+    # | "level_granted" | "level_revoked" | "evidence_added"
     level_at_time: int
     capability: Optional[str]
     description: str

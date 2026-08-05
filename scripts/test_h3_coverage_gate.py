@@ -6,8 +6,8 @@ Run: pytest scripts/test_h3_coverage_gate.py -v
 from pathlib import Path
 import re
 
-ROOT      = Path(__file__).parent.parent
-MAKEFILE  = ROOT / "Makefile"
+ROOT = Path(__file__).parent.parent
+MAKEFILE = ROOT / "Makefile"
 PYAPP_YML = ROOT / ".github" / "workflows" / "python-app.yml"
 
 

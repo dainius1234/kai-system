@@ -249,7 +249,6 @@ def test_the_primary_writer_may_not_be_read_only():
     check("a read-only primary writer is caught", v, str(v))
 
 
-
 # ── check_image_tags --verify-exists ─────────────────────────────────
 # A tag can be perfectly pinned and simply not be there. On 2026-08-05
 # `ollama/ollama:0.6` passed every rule above and had been withdrawn from
@@ -344,7 +343,6 @@ def test_a_resolvable_tag_is_not_reported():
         check("one image checked", checked == 1, str(checked))
     finally:
         tags.tag_resolves = original
-
 
 
 def test_tag_resolves_itself_reports_an_error_as_absence():

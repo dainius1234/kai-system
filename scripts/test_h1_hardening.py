@@ -257,10 +257,10 @@ class TestH1_7_DashboardProxyGuards(unittest.TestCase):
         p17_section = DASH_SRC.split("P17:")[1].split("Unified App Shell")[0]
         # Allow httpx in _proxy_get/_proxy_post helpers, block in endpoint functions
         proxy_endpoints = [line for line in p17_section.split("\n")
-                          if "async def proxy_" in line]
+                           if "async def proxy_" in line]
         # Verify we have many proxy endpoints
         self.assertGreaterEqual(len(proxy_endpoints), 20,
-                               f"Expected 20+ proxy endpoints, found {len(proxy_endpoints)}")
+                                f"Expected 20+ proxy endpoints, found {len(proxy_endpoints)}")
 
     def test_values_uses_proxy(self):
         section = DASH_SRC.split("proxy_values_learn")[1].split("@app.")[0]

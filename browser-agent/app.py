@@ -60,6 +60,7 @@ NAV_TIMEOUT = int(os.getenv("NAV_TIMEOUT_MS", "20000"))
 MAX_SCRAPE_CHARS = int(os.getenv("MAX_SCRAPE_CHARS", "50000"))
 BROWSER_HEADLESS = os.getenv("BROWSER_HEADLESS", "true").lower() != "false"
 
+
 @asynccontextmanager
 async def _lifespan(application: FastAPI):
     yield

@@ -44,7 +44,7 @@ class MoralImagination:
     imagined_harms: List[str]           # projected risks / boundary conflicts
     conviction_modifier: float          # applied to handoff.confidence
     recommendation: str                 # "proceed" | "proceed_with_caution" |
-                                        # "reconsider" | "halt"
+    # "reconsider" | "halt"
     elapsed_ms: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:

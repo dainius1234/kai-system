@@ -227,7 +227,7 @@ def test_positions_spot(spot_client):
     }
     mock_price = {"symbol": "BTCUSDT", "price": "95000.00"}
     with patch.object(mod, "_signed_get", new=AsyncMock(return_value=mock_account)), \
-         patch.object(mod, "_public_get", new=AsyncMock(return_value=mock_price)):
+            patch.object(mod, "_public_get", new=AsyncMock(return_value=mock_price)):
         r = client.get("/positions")
     assert r.status_code == 200
     data = r.json()

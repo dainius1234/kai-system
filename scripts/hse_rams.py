@@ -27,11 +27,11 @@ DEFAULT_OUT = ROOT / "RAMS.docx"
 
 # (max_score, label, hex_colour) — single source of truth for the risk matrix
 _RISK_LEVELS = [
-    (4,  "Very Low", "00B050"),
-    (8,  "Low",      "92D050"),
-    (12, "Medium",   "FFFF00"),
-    (16, "High",     "FFC000"),
-    (25, "Very High","FF0000"),
+    (4, "Very Low", "00B050"),
+    (8, "Low", "92D050"),
+    (12, "Medium", "FFFF00"),
+    (16, "High", "FFC000"),
+    (25, "Very High", "FF0000"),
 ]
 
 

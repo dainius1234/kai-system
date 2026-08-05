@@ -64,19 +64,19 @@ app = FastAPI(title="Cortex", version="0.1.0")
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-FF_CORTEX         = os.getenv("FF_CORTEX", "true").lower() == "true"
+FF_CORTEX = os.getenv("FF_CORTEX", "true").lower() == "true"
 FF_CORTEX_VERBOSE = os.getenv("FF_CORTEX_VERBOSE", "false").lower() == "true"
-REFRESH_INTERVAL  = int(os.getenv("CORTEX_REFRESH_INTERVAL", "60"))
+REFRESH_INTERVAL = int(os.getenv("CORTEX_REFRESH_INTERVAL", "60"))
 
-WEATHER_URL      = os.getenv("WEATHER_SERVICE_URL",  "http://weather-service:8039")
-AIRQUALITY_URL   = os.getenv("AIRQUALITY_URL",        "http://airquality-service:8042")
-CALENDAR_URL     = os.getenv("CALENDAR_SERVICE_URL",  "http://calendar-service:8043")
-DOCKER_URL       = os.getenv("DOCKER_WATCHER_URL",    "http://docker-watcher:8041")
-SYSMETRICS_URL   = os.getenv("SYSMETRICS_URL",        "http://sysmetrics:8035")
-GIT_URL          = os.getenv("GIT_WATCHER_URL",       "http://git-watcher:8044")
-SCREEN_URL       = os.getenv("SCREEN_WATCHER_URL",    "http://screen-watcher:8036")
-CLIPBOARD_URL    = os.getenv("CLIPBOARD_SERVICE_URL", "http://clipboard-service:8024")
-HOUSE_DOCTOR_URL = os.getenv("HOUSE_DOCTOR_URL",      "http://house-doctor:8046")
+WEATHER_URL = os.getenv("WEATHER_SERVICE_URL", "http://weather-service:8039")
+AIRQUALITY_URL = os.getenv("AIRQUALITY_URL", "http://airquality-service:8042")
+CALENDAR_URL = os.getenv("CALENDAR_SERVICE_URL", "http://calendar-service:8043")
+DOCKER_URL = os.getenv("DOCKER_WATCHER_URL", "http://docker-watcher:8041")
+SYSMETRICS_URL = os.getenv("SYSMETRICS_URL", "http://sysmetrics:8035")
+GIT_URL = os.getenv("GIT_WATCHER_URL", "http://git-watcher:8044")
+SCREEN_URL = os.getenv("SCREEN_WATCHER_URL", "http://screen-watcher:8036")
+CLIPBOARD_URL = os.getenv("CLIPBOARD_SERVICE_URL", "http://clipboard-service:8024")
+HOUSE_DOCTOR_URL = os.getenv("HOUSE_DOCTOR_URL", "http://house-doctor:8046")
 
 
 # ── Data structures ───────────────────────────────────────────────────────────
@@ -163,14 +163,14 @@ async def _gather_raw_facts() -> List[Tuple[str, str, float]]:
     keys = ["Weather", "Air quality", "Calendar", "Docker", "System",
             "Git", "Screen", "Clipboard", "HouseDoctor"]
     coros = [
-        _fetch(WEATHER_URL,      "/summary"),
-        _fetch(AIRQUALITY_URL,   "/summary"),
-        _fetch(CALENDAR_URL,     "/summary"),
-        _fetch(DOCKER_URL,       "/summary"),
-        _fetch(SYSMETRICS_URL,   "/snapshot"),
-        _fetch(GIT_URL,          "/summary"),
-        _fetch(SCREEN_URL,       "/status"),
-        _fetch(CLIPBOARD_URL,    "/latest"),
+        _fetch(WEATHER_URL, "/summary"),
+        _fetch(AIRQUALITY_URL, "/summary"),
+        _fetch(CALENDAR_URL, "/summary"),
+        _fetch(DOCKER_URL, "/summary"),
+        _fetch(SYSMETRICS_URL, "/snapshot"),
+        _fetch(GIT_URL, "/summary"),
+        _fetch(SCREEN_URL, "/status"),
+        _fetch(CLIPBOARD_URL, "/latest"),
         _fetch(HOUSE_DOCTOR_URL, "/diagnoses/recent"),
     ]
     raw = await asyncio.gather(*coros, return_exceptions=True)
@@ -262,15 +262,15 @@ def _classify_tags(facts: List[Tuple[str, str, float]]) -> Dict[str, bool]:
         aqi_val = int(aqi_m.group(1))
 
     return {
-        "system_critical":       "critical" in hd_text,
-        "system_strained":       (cpu_val >= 70 or ram_val >= 80) and sys_cred >= 0.5,
-        "services_struggling":   ("unhealthy" in docker_text or "restart" in docker_text) and docker_cred >= 0.5,
-        "operator_sprinting":    screen_diff >= 0.3 or any(w in git_text for w in ("dirty", "uncommitted", "untracked")),
+        "system_critical": "critical" in hd_text,
+        "system_strained": (cpu_val >= 70 or ram_val >= 80) and sys_cred >= 0.5,
+        "services_struggling": ("unhealthy" in docker_text or "restart" in docker_text) and docker_cred >= 0.5,
+        "operator_sprinting": screen_diff >= 0.3 or any(w in git_text for w in ("dirty", "uncommitted", "untracked")),
         "hard_stop_approaching": cal_minutes is not None and cal_minutes <= 15,
-        "meeting_soon":          cal_minutes is not None and cal_minutes <= 60,
-        "git_dirty":             any(w in git_text for w in ("dirty", "uncommitted", "untracked")),
-        "air_heavy":             aqi_val > 100 or any(w in aq_text for w in ("poor", "unhealthy", "hazardous")),
-        "quiet":                 cpu_val < 40 and ram_val < 60 and "unhealthy" not in docker_text and "critical" not in hd_text,
+        "meeting_soon": cal_minutes is not None and cal_minutes <= 60,
+        "git_dirty": any(w in git_text for w in ("dirty", "uncommitted", "untracked")),
+        "air_heavy": aqi_val > 100 or any(w in aq_text for w in ("poor", "unhealthy", "hazardous")),
+        "quiet": cpu_val < 40 and ram_val < 60 and "unhealthy" not in docker_text and "critical" not in hd_text,
     }
 
 
@@ -278,20 +278,20 @@ def _classify_tags(facts: List[Tuple[str, str, float]]) -> Dict[str, bool]:
 
 _L2_RULES: List[Tuple[List[str], str]] = [
     (["system_critical", "hard_stop_approaching"], "Critical system issue with a hard deadline closing in"),
-    (["system_critical", "operator_sprinting"],    "Critical system issue while operator is deep in work"),
-    (["system_critical"],                          "System in a critical state — needs immediate attention"),
+    (["system_critical", "operator_sprinting"], "Critical system issue while operator is deep in work"),
+    (["system_critical"], "System in a critical state — needs immediate attention"),
     (["system_strained", "services_struggling", "hard_stop_approaching"],
-                                                   "System strained, services struggling, hard stop approaching"),
-    (["system_strained", "services_struggling"],   "System under load with services struggling"),
+     "System strained, services struggling, hard stop approaching"),
+    (["system_strained", "services_struggling"], "System under load with services struggling"),
     (["operator_sprinting", "hard_stop_approaching"], "Operator sprinting toward a hard deadline"),
-    (["system_strained", "operator_sprinting"],    "Heavy load — system and operator both pushing hard"),
+    (["system_strained", "operator_sprinting"], "Heavy load — system and operator both pushing hard"),
     (["services_struggling", "hard_stop_approaching"], "Services struggling with a meeting on the horizon"),
-    (["hard_stop_approaching"],                    "Hard stop approaching — time pressure building"),
-    (["operator_sprinting"],                       "Operator in an active work session"),
-    (["system_strained"],                          "System under moderate load"),
-    (["services_struggling"],                      "Some services need attention"),
-    (["air_heavy"],                                "Air quality degraded — cognitive load risk"),
-    (["quiet"],                                    "Calm — no significant pressure signals"),
+    (["hard_stop_approaching"], "Hard stop approaching — time pressure building"),
+    (["operator_sprinting"], "Operator in an active work session"),
+    (["system_strained"], "System under moderate load"),
+    (["services_struggling"], "Some services need attention"),
+    (["air_heavy"], "Air quality degraded — cognitive load risk"),
+    (["quiet"], "Calm — no significant pressure signals"),
 ]
 
 
@@ -332,15 +332,15 @@ def _synthesise_level3(tags: Dict[str, bool]) -> str:
 # ── Quiet Planner — intent inference ──────────────────────────────────────────
 
 _BRANCH_PATTERNS: List[Tuple[str, str, List[str]]] = [
-    (r"(fix|bug|debug|hotfix|patch|error)",   "debugging",
+    (r"(fix|bug|debug|hotfix|patch|error)", "debugging",
      ["error logs", "recent fix history", "related memories"]),
-    (r"(feat|feature|add|new|build|impl)",    "feature development",
+    (r"(feat|feature|add|new|build|impl)", "feature development",
      ["related requirements", "active goals", "existing patterns"]),
     (r"(plan|doc|milestone|roadmap|design|arch)", "planning / design",
      ["project decisions", "long-term goals", "active milestones"]),
     (r"(refactor|clean|improve|debt|rename)", "refactoring",
      ["architecture decisions", "code patterns"]),
-    (r"(release|deploy|ship|prod|merge)",     "deployment",
+    (r"(release|deploy|ship|prod|merge)", "deployment",
      ["deployment checklist", "recent changes", "system health"]),
 ]
 
@@ -512,19 +512,19 @@ async def get_state() -> Dict[str, Any]:
     """Return the current CortexState for agentic context assembly."""
     s = _state
     return {
-        "timestamp":          s.timestamp,
-        "level1_facts":       s.level1_facts,
-        "level2_summary":     s.level2_summary,
+        "timestamp": s.timestamp,
+        "level1_facts": s.level1_facts,
+        "level2_summary": s.level2_summary,
         "level3_implication": s.level3_implication,
         "intent_fan": [
             {"label": h.label, "confidence": h.confidence, "context_hints": h.context_hints}
             for h in s.intent_fan
         ],
-        "bridge_active":      s.bridge_active,
-        "bridge_note":        s.bridge_note,
-        "tacit_rules":        s.tacit_rules,
+        "bridge_active": s.bridge_active,
+        "bridge_note": s.bridge_note,
+        "tacit_rules": s.tacit_rules,
         "sensor_credibility": s.sensor_credibility,
-        "refresh_count":      s.refresh_count,
+        "refresh_count": s.refresh_count,
     }
 
 
@@ -549,10 +549,10 @@ async def observe_turn(obs: TurnObservation) -> Dict[str, Any]:
 @app.get("/health")
 async def health() -> Dict[str, Any]:
     return {
-        "status":        "ok",
-        "service":       "cortex",
-        "ff_cortex":     FF_CORTEX,
+        "status": "ok",
+        "service": "cortex",
+        "ff_cortex": FF_CORTEX,
         "refresh_count": _state.refresh_count,
-        "last_refresh":  _state.timestamp,
-        "level2":        _state.level2_summary,
+        "last_refresh": _state.timestamp,
+        "level2": _state.level2_summary,
     }

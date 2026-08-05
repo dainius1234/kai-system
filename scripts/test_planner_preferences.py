@@ -106,12 +106,12 @@ class TestGatherContextIncludesPreferences(unittest.TestCase):
             import planner as _planner
             with patch.object(_planner, "_fetch_memory_chunks",
                               new_callable=AsyncMock, return_value=[]), \
-                 patch.object(_planner, "_fetch_correction_memories",
-                              new_callable=AsyncMock, return_value=[]), \
-                 patch.object(_planner, "_fetch_nudges",
-                              new_callable=AsyncMock, return_value=[]), \
-                 patch.object(_planner, "_fetch_preferences",
-                              new_callable=AsyncMock, return_value=fake_prefs):
+                patch.object(_planner, "_fetch_correction_memories",
+                             new_callable=AsyncMock, return_value=[]), \
+                patch.object(_planner, "_fetch_nudges",
+                             new_callable=AsyncMock, return_value=[]), \
+                patch.object(_planner, "_fetch_preferences",
+                             new_callable=AsyncMock, return_value=fake_prefs):
                 ctx = await _planner.gather_context("test input", "s1", [])
                 return ctx
 

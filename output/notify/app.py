@@ -143,7 +143,7 @@ async def pending(unread_only: bool = True):
 
 
 @app.delete("/pending/{notification_id}",
-          dependencies=[Depends(require_service_auth("notify_dismiss_one"))])
+            dependencies=[Depends(require_service_auth("notify_dismiss_one"))])
 async def dismiss(notification_id: int):
     for entry in _pending:
         if entry["id"] == notification_id:
@@ -153,7 +153,7 @@ async def dismiss(notification_id: int):
 
 
 @app.delete("/pending",
-          dependencies=[Depends(require_service_auth("notify_dismiss_all"))])
+            dependencies=[Depends(require_service_auth("notify_dismiss_all"))])
 async def dismiss_all():
     for entry in _pending:
         entry["read"] = True

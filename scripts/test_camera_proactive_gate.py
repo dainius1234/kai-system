@@ -40,11 +40,11 @@ def _force_high_urgency():
 def test_speak_blocked_when_gate_denies():
     p1, p2 = _force_high_urgency()
     with p1, p2, \
-         patch.object(mod, "_speak_or_not", return_value={
-             "should_speak": True, "suggested_message": "test message", "urgency": 0.9,
-         }), \
-         patch.object(mod, "_gate_allows_speak", new=AsyncMock(return_value=False)) as gate_mock, \
-         patch("httpx.AsyncClient") as client_cls:
+            patch.object(mod, "_speak_or_not", return_value={
+                "should_speak": True, "suggested_message": "test message", "urgency": 0.9,
+            }), \
+            patch.object(mod, "_gate_allows_speak", new=AsyncMock(return_value=False)) as gate_mock, \
+            patch("httpx.AsyncClient") as client_cls:
         client_instance = AsyncMock()
         client_cls.return_value.__aenter__.return_value = client_instance
         result = _run(mod.proactive_auto())
@@ -61,11 +61,11 @@ def test_speak_blocked_when_gate_denies():
 def test_speak_allowed_when_gate_approves():
     p1, p2 = _force_high_urgency()
     with p1, p2, \
-         patch.object(mod, "_speak_or_not", return_value={
-             "should_speak": True, "suggested_message": "test message", "urgency": 0.9,
-         }), \
-         patch.object(mod, "_gate_allows_speak", new=AsyncMock(return_value=True)) as gate_mock, \
-         patch("httpx.AsyncClient") as client_cls:
+            patch.object(mod, "_speak_or_not", return_value={
+                "should_speak": True, "suggested_message": "test message", "urgency": 0.9,
+            }), \
+            patch.object(mod, "_gate_allows_speak", new=AsyncMock(return_value=True)) as gate_mock, \
+            patch("httpx.AsyncClient") as client_cls:
         client_instance = AsyncMock()
         client_cls.return_value.__aenter__.return_value = client_instance
         result = _run(mod.proactive_auto())

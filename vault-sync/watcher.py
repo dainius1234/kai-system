@@ -105,6 +105,7 @@ class FileWatcher:
             class _Bridge(FileSystemEventHandler):
                 def __init__(self, h):
                     self._h = h
+
                 def on_created(self, e): self._h.on_created(e)
                 def on_modified(self, e): self._h.on_modified(e)
                 def on_moved(self, e): self._h.on_moved(e)

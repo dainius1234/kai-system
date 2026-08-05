@@ -7,11 +7,11 @@ Run: pytest scripts/test_j3_pii_redaction.py -v
 from pathlib import Path
 import re
 
-ROOT       = Path(__file__).parent.parent
+ROOT = Path(__file__).parent.parent
 RUNTIME_PY = ROOT / "common" / "runtime.py"
-MEMU_PY    = ROOT / "memu-core" / "app.py"
-DASH_PY    = ROOT / "dashboard" / "app.py"
-APP_HTML   = ROOT / "dashboard" / "static" / "app.html"
+MEMU_PY = ROOT / "memu-core" / "app.py"
+DASH_PY = ROOT / "dashboard" / "app.py"
+APP_HTML = ROOT / "dashboard" / "static" / "app.html"
 
 
 def _runtime():

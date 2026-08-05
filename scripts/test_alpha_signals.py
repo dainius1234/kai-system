@@ -67,9 +67,9 @@ _LS_BODY = [
 # ── _bnb_symbol ────────────────────────────────────────────────────────────────
 
 @pytest.mark.parametrize("inp,expected", [
-    ("BTCUSD",  "BTCUSDT"),
-    ("ETHUSD",  "ETHUSDT"),
-    ("btcusd",  "BTCUSDT"),
+    ("BTCUSD", "BTCUSDT"),
+    ("ETHUSD", "ETHUSDT"),
+    ("btcusd", "BTCUSDT"),
     ("BTCUSDT", "BTCUSDT"),   # already correct
     ("SOLUSDT", "SOLUSDT"),   # already correct
 ])
@@ -80,14 +80,14 @@ def test_bnb_symbol_normalises(inp, expected):
 # ── FundingRate ────────────────────────────────────────────────────────────────
 
 @pytest.mark.parametrize("rate,expected", [
-    ( 0.0015,  "extremely_long"),
-    ( 0.0005,  "crowded_long"),
-    ( 0.0002,  "mild_long"),
-    ( 0.00005, "neutral"),
+    (0.0015, "extremely_long"),
+    (0.0005, "crowded_long"),
+    (0.0002, "mild_long"),
+    (0.00005, "neutral"),
     (-0.00005, "neutral"),
-    (-0.0002,  "mild_short"),
-    (-0.0005,  "crowded_short"),
-    (-0.0015,  "extremely_short"),
+    (-0.0002, "mild_short"),
+    (-0.0005, "crowded_short"),
+    (-0.0015, "extremely_short"),
 ])
 def test_funding_rate_sentiment(rate, expected):
     fr = FundingRate("BTCUSD", rate, rate * 3 * 365 * 100, 0, time.time())
@@ -346,10 +346,10 @@ def test_get_mark_premium_http_error_returns_none():
 
 def test_composite_returns_all_keys():
     feed = _feed()
-    feed.get_funding_rate  = MagicMock(return_value=None)  # type: ignore[method-assign]
+    feed.get_funding_rate = MagicMock(return_value=None)  # type: ignore[method-assign]
     feed.get_open_interest = MagicMock(return_value=None)  # type: ignore[method-assign]
     feed.get_long_short_ratio = MagicMock(return_value=None)  # type: ignore[method-assign]
-    feed.get_mark_premium  = MagicMock(return_value=None)  # type: ignore[method-assign]
+    feed.get_mark_premium = MagicMock(return_value=None)  # type: ignore[method-assign]
     result = feed.composite("BTCUSD")
     for key in ("symbol", "funding", "open_interest", "long_short_ratio",
                 "mark_premium", "timestamp"):
@@ -358,10 +358,10 @@ def test_composite_returns_all_keys():
 
 def test_composite_none_signals_present_as_none():
     feed = _feed()
-    feed.get_funding_rate  = MagicMock(return_value=None)  # type: ignore[method-assign]
+    feed.get_funding_rate = MagicMock(return_value=None)  # type: ignore[method-assign]
     feed.get_open_interest = MagicMock(return_value=None)  # type: ignore[method-assign]
     feed.get_long_short_ratio = MagicMock(return_value=None)  # type: ignore[method-assign]
-    feed.get_mark_premium  = MagicMock(return_value=None)  # type: ignore[method-assign]
+    feed.get_mark_premium = MagicMock(return_value=None)  # type: ignore[method-assign]
     result = feed.composite("BTCUSD")
     assert result["funding"] is None
     assert result["open_interest"] is None

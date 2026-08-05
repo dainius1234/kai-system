@@ -67,7 +67,7 @@ class TestNavigate(unittest.TestCase):
     def test_navigate_returns_title_and_url(self):
         page = _make_page_mock()
         with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
-             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+                patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
             r = client.post("/navigate", json={"url": "https://example.com"})
         self.assertEqual(r.status_code, 200)
         data = r.json()
@@ -83,7 +83,7 @@ class TestNavigate(unittest.TestCase):
         page = _make_page_mock()
         page.goto = AsyncMock(side_effect=Exception("net::ERR_NAME_NOT_RESOLVED"))
         with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
-             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+                patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
             r = client.post("/navigate", json={"url": "https://does-not-exist.invalid"})
         self.assertEqual(r.status_code, 502)
 
@@ -92,7 +92,7 @@ class TestClick(unittest.TestCase):
     def test_click_by_selector(self):
         page = _make_page_mock()
         with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
-             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+                patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
             r = client.post("/click", json={"selector": "#submit"})
         self.assertEqual(r.status_code, 200)
         self.assertTrue(r.json()["ok"])
@@ -100,7 +100,7 @@ class TestClick(unittest.TestCase):
     def test_click_by_text(self):
         page = _make_page_mock()
         with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
-             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+                patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
             r = client.post("/click", json={"text": "Submit"})
         self.assertEqual(r.status_code, 200)
 
@@ -114,7 +114,7 @@ class TestType(unittest.TestCase):
     def test_type_fills_field(self):
         page = _make_page_mock()
         with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
-             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+                patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
             r = client.post("/type", json={"selector": "#search", "text": "hello"})
         self.assertEqual(r.status_code, 200)
         self.assertTrue(r.json()["ok"])
@@ -125,7 +125,7 @@ class TestScrape(unittest.TestCase):
         page = _make_page_mock(title="Wiki", text="Wikipedia content here")
         page.evaluate = AsyncMock(side_effect=["Wikipedia content here", [{"text": "Link", "href": "https://wiki.example.com"}]])
         with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
-             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+                patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
             r = client.post("/scrape")
         self.assertEqual(r.status_code, 200)
         data = r.json()
@@ -137,7 +137,7 @@ class TestScreenshot(unittest.TestCase):
     def test_screenshot_returns_png(self):
         page = _make_page_mock()
         with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
-             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+                patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
             r = client.post("/screenshot")
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.headers["content-type"], "image/png")
@@ -148,7 +148,7 @@ class TestRun(unittest.TestCase):
         page = _make_page_mock(title="Example", text="Some page text")
         page.evaluate = AsyncMock(return_value="Some page text")
         with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
-             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+                patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
             r = client.post("/run", json={"task": "find the main content", "url": "https://example.com"})
         self.assertEqual(r.status_code, 200)
         data = r.json()
@@ -160,7 +160,7 @@ class TestRun(unittest.TestCase):
         page = _make_page_mock(title="Current", text="Current page content")
         page.evaluate = AsyncMock(return_value="Current page content")
         with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
-             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+                patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
             r = client.post("/run", json={"task": "summarise"})
         self.assertEqual(r.status_code, 200)
 
@@ -174,7 +174,7 @@ class TestSearch(unittest.TestCase):
         ]
         page.evaluate = AsyncMock(return_value=results)
         with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
-             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+                patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
             r = client.post("/search", json={"query": "python programming", "max_results": 8})
         self.assertEqual(r.status_code, 200)
         data = r.json()
@@ -196,7 +196,7 @@ class TestSearch(unittest.TestCase):
         page = _make_page_mock(title="DDG", text="")
         page.evaluate = AsyncMock(return_value=[])
         with patch.object(_mod, "_PLAYWRIGHT_OK", True), \
-             patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
+                patch.object(_mod, "_get_page", AsyncMock(return_value=page)):
             r = client.post("/search", json={"query": "test", "max_results": 200})
         self.assertEqual(r.status_code, 200)
 

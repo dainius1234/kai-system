@@ -47,20 +47,20 @@ EDGE_TYPES = {"APPLIES_IN", "REFINES", "OVERRIDES", "CONFLICTS_WITH", "SUPPORTS"
 #    create an edge to any existing node matching target_pattern.
 #    Tuples: (source_keyword, relation, target_keyword, weight)
 _AUTO_EDGE_RULES: List[tuple] = [
-    ("protect my daughter",   "REFINES",    "family",            0.9),
-    ("daughter",              "REFINES",    "family first",      0.9),
-    ("family first",          "APPLIES_IN", "financial",         0.85),
-    ("family first",          "APPLIES_IN", "daily",             0.8),
-    ("family safety",         "SUPPORTS",   "family first",      0.9),
-    ("freedom",               "SUPPORTS",   "autonomy",          0.85),
-    ("soul",                  "OVERRIDES",  "convenience",       0.7),
-    ("kai is for soul",       "OVERRIDES",  "convenience",       0.8),
-    ("never reveal api key",  "APPLIES_IN", "operational",       0.95),
-    ("api key",               "APPLIES_IN", "operational",       0.9),
-    ("respect is earned",     "REFINES",    "authority",         0.8),
-    ("respect",               "APPLIES_IN", "relational",        0.8),
-    ("survival",              "SUPPORTS",   "family safety",     0.85),
-    ("autonomy",              "SUPPORTS",   "freedom",           0.8),
+    ("protect my daughter", "REFINES", "family", 0.9),
+    ("daughter", "REFINES", "family first", 0.9),
+    ("family first", "APPLIES_IN", "financial", 0.85),
+    ("family first", "APPLIES_IN", "daily", 0.8),
+    ("family safety", "SUPPORTS", "family first", 0.9),
+    ("freedom", "SUPPORTS", "autonomy", 0.85),
+    ("soul", "OVERRIDES", "convenience", 0.7),
+    ("kai is for soul", "OVERRIDES", "convenience", 0.8),
+    ("never reveal api key", "APPLIES_IN", "operational", 0.95),
+    ("api key", "APPLIES_IN", "operational", 0.9),
+    ("respect is earned", "REFINES", "authority", 0.8),
+    ("respect", "APPLIES_IN", "relational", 0.8),
+    ("survival", "SUPPORTS", "family safety", 0.85),
+    ("autonomy", "SUPPORTS", "freedom", 0.8),
 ]
 
 

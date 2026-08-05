@@ -452,7 +452,7 @@ class TestDriftDetection(unittest.TestCase):
         now = datetime.now(timezone.utc)
         for i in range(5):
             rec = _make_record(f"drainage check {i}", category="drainage",
-                               timestamp=(now - timedelta(minutes=i*10)).isoformat())
+                               timestamp=(now - timedelta(minutes=i * 10)).isoformat())
             store.insert(rec)
 
         result = loop.run_until_complete(memu.detect_operator_drift(hours=4))
@@ -470,7 +470,7 @@ class TestDriftDetection(unittest.TestCase):
         for i in range(5):
             rec = _make_record(f"browsing internet thing {i}",
                                category="general",
-                               timestamp=(now - timedelta(minutes=i*10)).isoformat())
+                               timestamp=(now - timedelta(minutes=i * 10)).isoformat())
             store.insert(rec)
 
         result = loop.run_until_complete(memu.detect_operator_drift(hours=4))
@@ -520,7 +520,7 @@ class TestProactiveEngine(unittest.TestCase):
 
         result = loop.run_until_complete(memu.full_proactive_scan())
         deadline_nudges = [n for n in result["nudges"]
-                          if n.get("type") == "goal_deadline"]
+                           if n.get("type") == "goal_deadline"]
         self.assertGreater(len(deadline_nudges), 0)
         self.assertIn("Submit tender", deadline_nudges[0]["message"])
 

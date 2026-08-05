@@ -21,7 +21,7 @@ TIERS = [
     (61, "Adept"),
     (41, "Journeyman"),
     (21, "Apprentice"),
-    (0,  "Neophyte"),
+    (0, "Neophyte"),
 ]
 
 
@@ -42,8 +42,8 @@ def compute_score(ledger: "FileLedger", since_days: int = 90) -> Dict[str, Any]:
     # ── 1. Operator Approval History (30%) ───────────────────────────────────
     # Percentage of autonomous actions the operator later endorsed vs. overridden.
     autonomous = ledger.count("AUTONOMOUS_ACTION", since_days=since_days)
-    overrides  = ledger.count("OVERRIDE", since_days=since_days)
-    endorsed   = ledger.count("AUTONOMOUS_ACTION", since_days=since_days, operator_ack=True)
+    overrides = ledger.count("OVERRIDE", since_days=since_days)
+    endorsed = ledger.count("AUTONOMOUS_ACTION", since_days=since_days, operator_ack=True)
     if autonomous > 0:
         approval_ratio = endorsed / autonomous
         override_penalty = min(overrides / (autonomous + 1), 1.0)
@@ -76,7 +76,7 @@ def compute_score(ledger: "FileLedger", since_days: int = 90) -> Dict[str, Any]:
 
     # ── 6. Challenge Response (5%) ────────────────────────────────────────────
     # Black-swan / Trust Quest outcomes.
-    total_quests    = ledger.count("QUEST_RESULT", since_days=since_days)
+    total_quests = ledger.count("QUEST_RESULT", since_days=since_days)
     successful_quests = len([
         ev for ev in ledger.events("QUEST_RESULT", since_days=since_days, limit=10000)
         if ev.event_data.get("passed") is True

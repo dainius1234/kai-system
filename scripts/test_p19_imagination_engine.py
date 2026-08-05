@@ -367,7 +367,7 @@ class TestInnerMonologue:
         entry = resp.json()["entry"]
         assert "type" in entry
         assert entry["type"] in {"wonder", "doubt", "curiosity", "amusement",
-                                  "concern", "conviction", "empathy", "observation"}
+                                 "concern", "conviction", "empathy", "observation"}
 
     def test_detects_wonder(self):
         resp = memu_client.post(

@@ -22,11 +22,11 @@ except ImportError:
 
 app = FastAPI(title="Broker Bridge", version="0.1.0")
 
-BASE_URL  = os.getenv("BINANCE_BASE_URL",  "https://api.binance.com")
-FAPI_URL  = os.getenv("BINANCE_FAPI_URL",  "https://fapi.binance.com")
-API_KEY   = os.getenv("BINANCE_API_KEY",   "")
+BASE_URL = os.getenv("BINANCE_BASE_URL", "https://api.binance.com")
+FAPI_URL = os.getenv("BINANCE_FAPI_URL", "https://fapi.binance.com")
+API_KEY = os.getenv("BINANCE_API_KEY", "")
 API_SECRET = os.getenv("BINANCE_API_SECRET", "")
-MODE      = os.getenv("BINANCE_MODE", "spot").lower()   # "spot" | "futures"
+MODE = os.getenv("BINANCE_MODE", "spot").lower()   # "spot" | "futures"
 
 _start = time.time()
 _req_count = 0

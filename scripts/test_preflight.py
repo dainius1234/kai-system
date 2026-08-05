@@ -111,7 +111,6 @@ def test_good_token_passes():
         check("good_token_ok", findings[0].level == "ok")
 
 
-
 # ═══════════════════════════════════════════════════════════════════
 # 1b. Dashboard credentials (Wave 1 Track A)
 # ═══════════════════════════════════════════════════════════════════
@@ -209,6 +208,7 @@ def test_compose_wires_dashboard_credentials():
 # ═══════════════════════════════════════════════════════════════════
 # 2. Auth bypass
 # ═══════════════════════════════════════════════════════════════════
+
 
 def test_bypass_enabled_blocks():
     for value in ("true", "1", "yes"):

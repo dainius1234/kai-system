@@ -36,7 +36,7 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger("kai.opportunity_intel")
 
 _TTL_FINANCIAL = 120.0    # alpha signals update frequently
-_TTL_CONTENT   = 1800.0   # trend searches can be cached longer
+_TTL_CONTENT = 1800.0   # trend searches can be cached longer
 _TTL_AFFILIATE = 3600.0   # affiliate trends are slow-moving
 _TTL_TREND_ARB = 300.0    # macro cross-market 5-min refresh
 
@@ -70,10 +70,10 @@ class OpportunitySignal:
         }
 
     def _conviction_label(self) -> str:
-        if self.conviction <= 2:  return "noise"
-        if self.conviction <= 4:  return "watch"
-        if self.conviction <= 6:  return "speculative"
-        if self.conviction <= 8:  return "confident"
+        if self.conviction <= 2: return "noise"
+        if self.conviction <= 4: return "watch"
+        if self.conviction <= 6: return "speculative"
+        if self.conviction <= 8: return "confident"
         return "conviction"
 
 
@@ -264,9 +264,9 @@ class OpportunityIntelligence:
             return cached
 
         funding_sent = ls_sent = None
-        fng_value    = None
-        macro_tone   = "neutral"
-        premium_pct  = None
+        fng_value = None
+        macro_tone = "neutral"
+        premium_pct = None
         evidence: Dict[str, Any] = {}
 
         try:
@@ -584,10 +584,10 @@ class OpportunityIntelligence:
             "crypto exchange",
         ]
 
-        financial  = self.scan_financial(symbol)
-        trend_arb  = self.scan_trend_arb(symbol)
-        content    = [self.scan_content(t) for t in default_topics]
-        affiliate  = [self.scan_affiliate(c) for c in default_categories]
+        financial = self.scan_financial(symbol)
+        trend_arb = self.scan_trend_arb(symbol)
+        content = [self.scan_content(t) for t in default_topics]
+        affiliate = [self.scan_affiliate(c) for c in default_categories]
 
         all_signals: List[OpportunitySignal] = (
             [financial, trend_arb] + content + affiliate

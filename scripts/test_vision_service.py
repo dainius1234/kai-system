@@ -115,9 +115,9 @@ class TestAnalyzeFrameWithOpenCV(unittest.TestCase):
     def test_no_face_detected(self):
         fake_img = object()  # opaque sentinel — _detect_faces is mocked anyway
         with patch.object(_mod, "_OPENCV_OK", True), \
-             patch.object(_mod, "_DEEPFACE_OK", False), \
-             patch.object(_mod, "_decode_image", return_value=fake_img), \
-             patch.object(_mod, "_detect_faces", return_value=[]):
+                patch.object(_mod, "_DEEPFACE_OK", False), \
+                patch.object(_mod, "_decode_image", return_value=fake_img), \
+                patch.object(_mod, "_detect_faces", return_value=[]):
             r = _upload_frame()
         self.assertEqual(r.status_code, 200)
         data = r.json()
@@ -129,9 +129,9 @@ class TestAnalyzeFrameWithOpenCV(unittest.TestCase):
         fake_img = object()
         fake_face = {"x": 10, "y": 10, "w": 50, "h": 50}
         with patch.object(_mod, "_OPENCV_OK", True), \
-             patch.object(_mod, "_DEEPFACE_OK", False), \
-             patch.object(_mod, "_decode_image", return_value=fake_img), \
-             patch.object(_mod, "_detect_faces", return_value=[fake_face]):
+                patch.object(_mod, "_DEEPFACE_OK", False), \
+                patch.object(_mod, "_decode_image", return_value=fake_img), \
+                patch.object(_mod, "_detect_faces", return_value=[fake_face]):
             r = _upload_frame()
         self.assertEqual(r.status_code, 200)
         data = r.json()
@@ -144,10 +144,10 @@ class TestAnalyzeFrameWithOpenCV(unittest.TestCase):
         fake_face = {"x": 10, "y": 10, "w": 50, "h": 50}
         mock_emotion = {"dominant": "happy", "scores": {"happy": 0.9, "neutral": 0.1}}
         with patch.object(_mod, "_OPENCV_OK", True), \
-             patch.object(_mod, "_DEEPFACE_OK", True), \
-             patch.object(_mod, "_decode_image", return_value=fake_img), \
-             patch.object(_mod, "_detect_faces", return_value=[fake_face]), \
-             patch.object(_mod, "_detect_emotion", return_value=mock_emotion):
+                patch.object(_mod, "_DEEPFACE_OK", True), \
+                patch.object(_mod, "_decode_image", return_value=fake_img), \
+                patch.object(_mod, "_detect_faces", return_value=[fake_face]), \
+                patch.object(_mod, "_detect_emotion", return_value=mock_emotion):
             r = _upload_frame()
         self.assertEqual(r.status_code, 200)
         data = r.json()
@@ -167,8 +167,8 @@ class TestAnalyzePresence(unittest.TestCase):
     def test_presence_true_when_face_found(self):
         fake_img = object()
         with patch.object(_mod, "_OPENCV_OK", True), \
-             patch.object(_mod, "_decode_image", return_value=fake_img), \
-             patch.object(_mod, "_detect_faces", return_value=[{"x": 0, "y": 0, "w": 40, "h": 40}]):
+                patch.object(_mod, "_decode_image", return_value=fake_img), \
+                patch.object(_mod, "_detect_faces", return_value=[{"x": 0, "y": 0, "w": 40, "h": 40}]):
             r = _upload_presence()
         self.assertEqual(r.status_code, 200)
         data = r.json()

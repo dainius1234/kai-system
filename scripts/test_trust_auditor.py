@@ -71,7 +71,7 @@ def test_trust_status_has_auditor_required_keys():
     """get_trust_status() returns the keys auditor.md promises to interpret."""
     from trust_integration import get_trust_status
     with patch("trust_integration._get_trust_core", return_value=None), \
-         patch("trust_integration._get_ledger", return_value=None):
+            patch("trust_integration._get_ledger", return_value=None):
         status = get_trust_status()
     # Auditor needs at least score and tier — even in degraded mode
     assert "score" in status
@@ -90,7 +90,7 @@ def test_trust_status_with_full_core_has_all_auditor_fields():
         "progress_to_next": 0.4,
     }
     with patch("trust_integration._get_trust_core", return_value=trust), \
-         patch("trust_integration._get_ledger", return_value=None):
+            patch("trust_integration._get_ledger", return_value=None):
         status = get_trust_status()
     assert status["level_name"] == "AGENT"
     assert status["next_level"] == "PARTNER"
@@ -100,7 +100,7 @@ def test_trust_status_with_full_core_has_all_auditor_fields():
 def test_trust_status_includes_wisdom_graph_stats():
     from trust_integration import get_trust_status
     with patch("trust_integration._get_trust_core", return_value=None), \
-         patch("trust_integration._get_ledger", return_value=None):
+            patch("trust_integration._get_ledger", return_value=None):
         status = get_trust_status()
     # wisdom_graph key is present (may be absent if import fails, that's ok)
     # Just confirm the function doesn't crash — it's fail-open

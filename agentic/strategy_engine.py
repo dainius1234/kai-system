@@ -126,16 +126,16 @@ class MovingAverageCrossStrategy(Strategy):
                               f"not enough data (need {self.long + 1})")
         price = prices[-1]
         short_now = self._ma(prices, self.short)
-        long_now  = self._ma(prices, self.long)
+        long_now = self._ma(prices, self.long)
         # Previous bar — use prices[:-1]
         prev = prices[:-1]
         short_prev = self._ma(prev, self.short)
-        long_prev  = self._ma(prev, self.long)
+        long_prev = self._ma(prev, self.long)
 
         if None in (short_now, long_now, short_prev, long_prev):
             return self._hold(symbol, price, "insufficient history for MA")
 
-        cross_up   = short_prev <= long_prev and short_now > long_now  # type: ignore[operator]
+        cross_up = short_prev <= long_prev and short_now > long_now  # type: ignore[operator]
         cross_down = short_prev >= long_prev and short_now < long_now  # type: ignore[operator]
 
         spread_pct = abs(short_now - long_now) / long_now * 100  # type: ignore[operator]
@@ -313,9 +313,7 @@ class StrategyEngine:
         }
 
 
-
 # ── Singleton ──────────────────────────────────────────────────────────────────
-
 _engine: Optional[StrategyEngine] = None
 
 

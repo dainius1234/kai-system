@@ -61,7 +61,7 @@ class TestLoadSecret(unittest.TestCase):
             # Simulate Docker secret: patch check so our temp file is read
             os.environ["_TEST_LS_FILE"] = "/run/secrets/test_ls_file"
             with patch("pathlib.Path.is_file", return_value=True), \
-                 patch("pathlib.Path.read_text", return_value="  secret-from-file  \n"):
+                    patch("pathlib.Path.read_text", return_value="  secret-from-file  \n"):
                 val = self._load("_TEST_LS_FILE")
                 self.assertEqual(val, "secret-from-file")
         finally:
@@ -79,7 +79,7 @@ class TestLoadSecret(unittest.TestCase):
     def test_convention_file_by_env_name(self):
         """If /run/secrets/<env_name_lower> exists, read it."""
         with patch("pathlib.Path.is_file", return_value=True), \
-             patch("pathlib.Path.read_text", return_value="conv-secret"):
+                patch("pathlib.Path.read_text", return_value="conv-secret"):
             os.environ.pop("_TEST_CONV_SECRET", None)
             val = self._load("_TEST_CONV_SECRET", "")
             # Since env is empty, it checks convention path
@@ -215,8 +215,8 @@ class TestHMACRotation(unittest.TestCase):
 
     def setUp(self):
         for key in ["INTERSERVICE_HMAC_SECRET", "INTERSERVICE_HMAC_SECRET_PREV",
-                     "INTERSERVICE_HMAC_KEY_ID", "INTERSERVICE_HMAC_KEY_ID_PREV",
-                     "INTERSERVICE_HMAC_REVOKED_IDS", "INTERSERVICE_HMAC_STRICT_KEY_ID"]:
+                    "INTERSERVICE_HMAC_KEY_ID", "INTERSERVICE_HMAC_KEY_ID_PREV",
+                    "INTERSERVICE_HMAC_REVOKED_IDS", "INTERSERVICE_HMAC_STRICT_KEY_ID"]:
             os.environ.pop(key, None)
         import common.auth as auth
         auth._WARNED_DEFAULT_SECRET = False

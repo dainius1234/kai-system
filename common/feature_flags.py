@@ -28,74 +28,74 @@ from typing import Any, Dict, List
 # name → (description, default)
 # Add new flags here.  Environment variable is ``FF_<NAME>``.
 _REGISTRY: Dict[str, tuple] = {
-    "DREAM_PHASE_7":         ("Agent-Evolver insight generation during dream cycle", True),
-    "CHECKPOINT_AUTO":       ("Auto-checkpoint on /recover and /dream", True),
-    "TREE_SEARCH":           ("CoT tree search with conviction pruning", True),
-    "PRIORITY_QUEUE":        ("Latency-sensitive priority queue", True),
-    "SAGE_CRITIQUE":         ("Verifier self-critique + adversary self-review", True),
-    "IMAGINATION_ENGINE":    ("P19 imagination / scenario simulation", True),
-    "PROACTIVE_AGENT":       ("P21/D87: background observer — detects anomalies and writes proactive_observation memories every PROACTIVE_INTERVAL_SECONDS (default 300)", True),
-    "OPERATOR_MODEL":        ("P22 operator preference learning", True),
-    "NARRATIVE_IDENTITY":    ("P18 narrative identity context", True),
-    "CONSCIENCE_FILTER":     ("P20 conscience value-gate on actions", True),
-    "MARS_CONSOLIDATION":    ("MARS memory decay + consolidation", True),
-    "SELF_ASSESSMENT":       ("P14 temporal self-model", True),
-    "SECURITY_AUDIT":        ("P9 automated security self-hacking", True),
-    "WAKE_INTENT_ROUTING":   ("Pre-classify chat intent via wake-intent service before routing", False),
-    "GRAPH_INGEST":          ("Phase B write-side fan-out from memu-core to memu-graph", False),
-    "LETTA_TASKS":           ("Delegate long-running tasks to letta-agent memory controller", False),
-    "LETTA_MEMORY_SYNC":     ("Sync letta-agent archival memories back to memu-core after each run", False),
-    "FINANCIAL_CONTEXT":     ("P29 inject CIS/VAT/tax summary into agentic context on finance queries", True),
+    "DREAM_PHASE_7": ("Agent-Evolver insight generation during dream cycle", True),
+    "CHECKPOINT_AUTO": ("Auto-checkpoint on /recover and /dream", True),
+    "TREE_SEARCH": ("CoT tree search with conviction pruning", True),
+    "PRIORITY_QUEUE": ("Latency-sensitive priority queue", True),
+    "SAGE_CRITIQUE": ("Verifier self-critique + adversary self-review", True),
+    "IMAGINATION_ENGINE": ("P19 imagination / scenario simulation", True),
+    "PROACTIVE_AGENT": ("P21/D87: background observer — detects anomalies and writes proactive_observation memories every PROACTIVE_INTERVAL_SECONDS (default 300)", True),
+    "OPERATOR_MODEL": ("P22 operator preference learning", True),
+    "NARRATIVE_IDENTITY": ("P18 narrative identity context", True),
+    "CONSCIENCE_FILTER": ("P20 conscience value-gate on actions", True),
+    "MARS_CONSOLIDATION": ("MARS memory decay + consolidation", True),
+    "SELF_ASSESSMENT": ("P14 temporal self-model", True),
+    "SECURITY_AUDIT": ("P9 automated security self-hacking", True),
+    "WAKE_INTENT_ROUTING": ("Pre-classify chat intent via wake-intent service before routing", False),
+    "GRAPH_INGEST": ("Phase B write-side fan-out from memu-core to memu-graph", False),
+    "LETTA_TASKS": ("Delegate long-running tasks to letta-agent memory controller", False),
+    "LETTA_MEMORY_SYNC": ("Sync letta-agent archival memories back to memu-core after each run", False),
+    "FINANCIAL_CONTEXT": ("P29 inject CIS/VAT/tax summary into agentic context on finance queries", True),
     # F4/D87: master toggle for the context enrichment gather.
     # Set FF_CONTEXT_ENRICHMENT=false to run a bare /chat (LLM only, no memory/personality/
     # world-state injection) for A/B quality comparison.
-    "CONTEXT_ENRICHMENT":    ("Master toggle: 14-way context gather (memory + personality + soul + world-state channels). Also gates sensory world_context injection.", True),
+    "CONTEXT_ENRICHMENT": ("Master toggle: 14-way context gather (memory + personality + soul + world-state channels). Also gates sensory world_context injection.", True),
     # F6: self-improvement loops — off by default; activate after GPU Day validates quality
-    "DREAM_ENABLED":         ("Trigger dream cycle consolidation (6-phase memory integration)", False),
-    "EVOLVER_ENABLED":       ("Agent-Evolver: cluster failure patterns → proactive insights", False),
-    "SAGE_SELF_REVIEW":      ("SAGE critique on all plans before execution (not just high-stakes)", False),
+    "DREAM_ENABLED": ("Trigger dream cycle consolidation (6-phase memory integration)", False),
+    "EVOLVER_ENABLED": ("Agent-Evolver: cluster failure patterns → proactive insights", False),
+    "SAGE_SELF_REVIEW": ("SAGE critique on all plans before execution (not just high-stakes)", False),
     # D88: 8 advanced cognition mechanisms
-    "ANOMALY_DETECTION":     ("D88/M1: track rolling baselines per sensor; alert on >2σ deviation", True),
+    "ANOMALY_DETECTION": ("D88/M1: track rolling baselines per sensor; alert on >2σ deviation", True),
     "WORLD_MODEL_PERSISTENCE": ("D88/M4: write structured world_state JSON to memu-core each proactive cycle", True),
-    "SENSORY_LEARNING":      ("D88/M5: detect recurring sensor patterns across 10 recent cycles; write sensor_pattern memories", True),
-    "SKILL_HUNTER":          ("D88/M6+M8: skill-hunter service integration; reactive skill acquisition on capability gaps", True),
-    "PROACTIVE_SCHEDULING":  ("D88/M7: fuse calendar events + sensor state into proactive_schedule memories", True),
+    "SENSORY_LEARNING": ("D88/M5: detect recurring sensor patterns across 10 recent cycles; write sensor_pattern memories", True),
+    "SKILL_HUNTER": ("D88/M6+M8: skill-hunter service integration; reactive skill acquisition on capability gaps", True),
+    "PROACTIVE_SCHEDULING": ("D88/M7: fuse calendar events + sensor state into proactive_schedule memories", True),
     # D89: cognitive depth — FSM, teammates, foundations
-    "FSM":                   ("D89: Kai Finite State Machine — IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING state tracking", True),
-    "PERSISTENT_TEAMMATES":  ("D89: named cognitive teammates (Scout, Doctor, Sage, Oracle) with per-specialty system prompts", True),
-    "HOUSE_DOCTOR":          ("D89/E: House Doctor service — continuous differential diagnosis from cross-sensor correlation", True),
-    "RITUAL_DISCOVERY":      ("D89/C: emergent ritual detection at ≥7/10 cycles; writes RITUALS.md proposals", True),
-    "GAP_LOGGING":           ("D89/C1: log capability gaps before reactive acquisition; fire hunt only after GAP_HUNT_THRESHOLD misses", True),
-    "TRUST_NEGOTIATION":     ("D89/B: autonomy request protocol — KAI can request temporary elevated authority; currently pending_approval", False),
-    "PREDICTIVE_EMPATHY":    ("D89/D: emotional_context key in world model; full implementation pending emotional memory accumulation", False),
-    "CURIOSITY":             ("D89/F: resource-aware curiosity idle tick; no-ops in CPU phase; activates on GPU + IDLE state", True),
+    "FSM": ("D89: Kai Finite State Machine — IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING state tracking", True),
+    "PERSISTENT_TEAMMATES": ("D89: named cognitive teammates (Scout, Doctor, Sage, Oracle) with per-specialty system prompts", True),
+    "HOUSE_DOCTOR": ("D89/E: House Doctor service — continuous differential diagnosis from cross-sensor correlation", True),
+    "RITUAL_DISCOVERY": ("D89/C: emergent ritual detection at ≥7/10 cycles; writes RITUALS.md proposals", True),
+    "GAP_LOGGING": ("D89/C1: log capability gaps before reactive acquisition; fire hunt only after GAP_HUNT_THRESHOLD misses", True),
+    "TRUST_NEGOTIATION": ("D89/B: autonomy request protocol — KAI can request temporary elevated authority; currently pending_approval", False),
+    "PREDICTIVE_EMPATHY": ("D89/D: emotional_context key in world model; full implementation pending emotional memory accumulation", False),
+    "CURIOSITY": ("D89/F: resource-aware curiosity idle tick; no-ops in CPU phase; activates on GPU + IDLE state", True),
     # D90: Swarm Assembly — full CognitiveFSM pipeline with real stage functions
-    "SWARM":                 ("D90: CognitiveFSM swarm pipeline — Scout/Sage/Doctor/Oracle stage functions, shared SwarmContext, reputation tracking, conflict resolution", True),
+    "SWARM": ("D90: CognitiveFSM swarm pipeline — Scout/Sage/Doctor/Oracle stage functions, shared SwarmContext, reputation tracking, conflict resolution", True),
     # D91: Obsidian Brain — bidirectional vault ↔ memu-core sync
-    "VAULT_SYNC":            ("D91: vault-sync service enabled — file watcher, ingest, export, mapper", True),
-    "VAULT_CONTEXT":         ("D91: inject vault memory snippet into world-context gather (gated separately because it adds latency)", False),
+    "VAULT_SYNC": ("D91: vault-sync service enabled — file watcher, ingest, export, mapper", True),
+    "VAULT_CONTEXT": ("D91: inject vault memory snippet into world-context gather (gated separately because it adds latency)", False),
     # D92: Socratic Self-Questioning — pre-GATHER query decomposition
-    "SOCRATIC":              ("D92: pre-GATHER Socratic decomposition — 3-5 questions reframe the query before Scout gathers evidence", True),
+    "SOCRATIC": ("D92: pre-GATHER Socratic decomposition — 3-5 questions reframe the query before Scout gathers evidence", True),
     # D93: Autonomous Hypothesis Engine — idle-cycle knowledge gap scanning
-    "HYPOTHESIS_ENGINE":     ("D93: idle-cycle gap scanner — forms testable hypotheses from low-confidence memories and tests them", True),
+    "HYPOTHESIS_ENGINE": ("D93: idle-cycle gap scanner — forms testable hypotheses from low-confidence memories and tests them", True),
     # D94: Temporal Projection — fan-of-futures forecasting from supported claims
-    "TEMPORAL_PROJECTION":   ("D94: ForecastFan — base/optimistic/pessimistic/wild-card scenario branches from supported claims", True),
+    "TEMPORAL_PROJECTION": ("D94: ForecastFan — base/optimistic/pessimistic/wild-card scenario branches from supported claims", True),
     # D95–D100: GPU-era stubs — interfaces fixed now, activated when hardware/data arrives
     "DIALECTICAL_SYNTHESIS": ("D95: Hegelian thesis/antithesis/synthesis reasoner — pending dual-model GPU", False),
-    "ANALOGICAL_REASONING":  ("D96: cross-domain isomorphic pattern search — pending populated knowledge graph", False),
-    "CONCEPT_BLENDING":      ("D97: two distant graph nodes → novel emergent concept — pending graph + GPU", False),
+    "ANALOGICAL_REASONING": ("D96: cross-domain isomorphic pattern search — pending populated knowledge graph", False),
+    "CONCEPT_BLENDING": ("D97: two distant graph nodes → novel emergent concept — pending graph + GPU", False),
     "COGNITIVE_FINGERPRINT": ("D98: operator thinking-style model — collecting interaction samples now; inference pending 90+ samples", True),
-    "SYNTHETIC_EXPERIENCE":  ("D99: fictional scenario generation during dream cycles — pending GPU", False),
-    "TRANSITIVE_REASONING":  ("D100: PageRank + community detection + shortest-path on memu-graph — pending populated graph", False),
-    "CAUSAL_WORLD_MODEL":    ("D101: persistent causal graph + GPU mental simulations + policy distillation — pending GPU + 30d data", False),
-    "CAUSAL_SURPRISE":       ("D101: prediction-error detection — fires hypothesis cycle on divergence; requires FF_CAUSAL_WORLD_MODEL", False),
-    "POLICY_MEMORY":         ("D101: auto-distillation of simulation outcomes into ranked strategies — requires FF_CAUSAL_WORLD_MODEL", False),
-    "GLOBAL_WORKSPACE":      ("D102: Global Workspace Consciousness — serial stream of unified awareness via module bidding; requires GPU + D101 + D98 + ≥3 bidders", False),
+    "SYNTHETIC_EXPERIENCE": ("D99: fictional scenario generation during dream cycles — pending GPU", False),
+    "TRANSITIVE_REASONING": ("D100: PageRank + community detection + shortest-path on memu-graph — pending populated graph", False),
+    "CAUSAL_WORLD_MODEL": ("D101: persistent causal graph + GPU mental simulations + policy distillation — pending GPU + 30d data", False),
+    "CAUSAL_SURPRISE": ("D101: prediction-error detection — fires hypothesis cycle on divergence; requires FF_CAUSAL_WORLD_MODEL", False),
+    "POLICY_MEMORY": ("D101: auto-distillation of simulation outcomes into ranked strategies — requires FF_CAUSAL_WORLD_MODEL", False),
+    "GLOBAL_WORKSPACE": ("D102: Global Workspace Consciousness — serial stream of unified awareness via module bidding; requires GPU + D101 + D98 + ≥3 bidders", False),
     # D109: Ohana Core — situational ethics and loyalty alignment
-    "OHANA_CORE":            ("D109: Ohana Core — learns operator moral fingerprint; injects loyalty context into every cognitive act; evaluates action alignment; requires D98 ≥90 samples + interaction history", False),
+    "OHANA_CORE": ("D109: Ohana Core — learns operator moral fingerprint; injects loyalty context into every cognitive act; evaluates action alignment; requires D98 ≥90 samples + interaction history", False),
     # D114: Cortex cognitive module — phase flags
     # FF_CORTEX (service): controlled inside cortex/app.py independently
-    "CORTEX_NPU":            ("D114: Cortex Phase 1 — NPU inference on Strix Halo (AMD XDNA 2); upgrades Level 2/3 synthesis from HTTP delegation to on-device ONNX/QNN; requires Flow Z13 + onnxruntime-directml or QNN SDK", False),
+    "CORTEX_NPU": ("D114: Cortex Phase 1 — NPU inference on Strix Halo (AMD XDNA 2); upgrades Level 2/3 synthesis from HTTP delegation to on-device ONNX/QNN; requires Flow Z13 + onnxruntime-directml or QNN SDK", False),
 }
 
 
@@ -133,6 +133,7 @@ def get_all_flags() -> List[Dict[str, Any]]:
 def register_flag(name: str, description: str, default: bool = False) -> None:
     """Register a new flag at runtime (e.g. from a service plugin)."""
     _REGISTRY[name.upper()] = (description, default)
+
 
 # Public alias for external access
 FLAGS = _REGISTRY

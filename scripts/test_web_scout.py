@@ -137,7 +137,7 @@ def test_fetch_returns_content(tmp_path):
     html = "<html><body><p>Test content</p></body></html>"
     client = _mock_httpx_get(html)
     with patch("web_scout._check_trust", _allow_trust), \
-         patch("web_scout.httpx.Client", return_value=client):
+            patch("web_scout.httpx.Client", return_value=client):
         result = fetch("https://example.com")
     assert isinstance(result, FetchResult)
     assert result.status_code == 200
@@ -147,7 +147,7 @@ def test_fetch_returns_content(tmp_path):
 
 def test_fetch_returns_error_on_network_failure():
     with patch("web_scout._check_trust", _allow_trust), \
-         patch("web_scout.httpx.Client", side_effect=Exception("connection refused")):
+            patch("web_scout.httpx.Client", side_effect=Exception("connection refused")):
         result = fetch("https://example.com")
     assert result.error is not None
     assert result.content == ""
@@ -172,7 +172,7 @@ def test_fetch_caps_content_at_max_chars():
     html = "<p>" + "a" * 10000 + "</p>"
     client = _mock_httpx_get(html)
     with patch("web_scout._check_trust", _allow_trust), \
-         patch("web_scout.httpx.Client", return_value=client):
+            patch("web_scout.httpx.Client", return_value=client):
         result = fetch("https://example.com", max_chars=200)
     assert len(result.content) <= 200
 
@@ -189,7 +189,7 @@ def test_fetch_non_html_content_returned_as_text():
     client.__exit__ = MagicMock(return_value=False)
     client.get = MagicMock(return_value=resp)
     with patch("web_scout._check_trust", _allow_trust), \
-         patch("web_scout.httpx.Client", return_value=client):
+            patch("web_scout.httpx.Client", return_value=client):
         result = fetch("https://api.example.com/data")
     assert '"key"' in result.content
 
@@ -197,7 +197,7 @@ def test_fetch_non_html_content_returned_as_text():
 def test_fetch_records_elapsed_ms():
     client = _mock_httpx_get()
     with patch("web_scout._check_trust", _allow_trust), \
-         patch("web_scout.httpx.Client", return_value=client):
+            patch("web_scout.httpx.Client", return_value=client):
         result = fetch("https://example.com")
     assert result.elapsed_ms >= 0.0
 
@@ -238,7 +238,7 @@ def _mock_ddg_response(abstract="Test abstract", topics=None):
 def test_search_returns_abstract():
     client = _mock_ddg_response(abstract="Python is a programming language.")
     with patch("web_scout._check_trust", _allow_trust), \
-         patch("web_scout.httpx.Client", return_value=client):
+            patch("web_scout.httpx.Client", return_value=client):
         result = search("python programming")
     assert isinstance(result, SearchResult)
     assert "Python" in result.abstract
@@ -248,7 +248,7 @@ def test_search_returns_abstract():
 def test_search_returns_topics():
     client = _mock_ddg_response()
     with patch("web_scout._check_trust", _allow_trust), \
-         patch("web_scout.httpx.Client", return_value=client):
+            patch("web_scout.httpx.Client", return_value=client):
         result = search("test query")
     assert len(result.topics) > 0
     assert "title" in result.topics[0]
@@ -259,14 +259,14 @@ def test_search_max_results_caps_topics():
     topics = [{"Text": f"Topic {i}", "FirstURL": f"https://x.com/{i}"} for i in range(10)]
     client = _mock_ddg_response(topics=topics)
     with patch("web_scout._check_trust", _allow_trust), \
-         patch("web_scout.httpx.Client", return_value=client):
+            patch("web_scout.httpx.Client", return_value=client):
         result = search("test", max_results=3)
     assert len(result.topics) <= 3
 
 
 def test_search_error_on_network_failure():
     with patch("web_scout._check_trust", _allow_trust), \
-         patch("web_scout.httpx.Client", side_effect=Exception("timeout")):
+            patch("web_scout.httpx.Client", side_effect=Exception("timeout")):
         result = search("test query")
     assert result.error is not None
     assert result.abstract == ""
@@ -291,7 +291,7 @@ def test_summarize_returns_dict_with_summary():
     html = "<p>Summary content here</p>"
     client = _mock_httpx_get(html)
     with patch("web_scout._check_trust", _allow_trust), \
-         patch("web_scout.httpx.Client", return_value=client):
+            patch("web_scout.httpx.Client", return_value=client):
         result = summarize("https://example.com", max_chars=500)
     assert "summary" in result
     assert "Summary content here" in result["summary"]
@@ -299,7 +299,7 @@ def test_summarize_returns_dict_with_summary():
 
 def test_summarize_returns_error_key_on_failure():
     with patch("web_scout._check_trust", _allow_trust), \
-         patch("web_scout.httpx.Client", side_effect=Exception("err")):
+            patch("web_scout.httpx.Client", side_effect=Exception("err")):
         result = summarize("https://example.com")
     assert "error" in result
     assert result["error"] is not None

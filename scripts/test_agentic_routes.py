@@ -68,6 +68,7 @@ def _stubs_do_not_outlive_this_file():
     for name in _STUBS:
         sys.modules.pop(name, None)
 
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "agentic"))
@@ -88,14 +89,17 @@ _kc.build_saver.return_value = MagicMock(
 
 import dataclasses
 
+
 @dataclasses.dataclass
 class _FakeCheckpoint:
     checkpoint_id: str = "cp-test-001"
     iso_time: str = "2026-07-23T00:00:00Z"
     label: str = "manual"
     breakers: dict = dataclasses.field(default_factory=dict)
+
     def to_dict(self):
         return {"checkpoint_id": self.checkpoint_id, "iso_time": self.iso_time, "label": self.label}
+
 
 _kc.create_checkpoint.return_value = _FakeCheckpoint()
 _kc.list_checkpoints.return_value = []
@@ -108,12 +112,14 @@ _kc.save_snapshot.return_value = None
 # ── router stubs ──────────────────────────────────────────────────────
 import router as _router
 
+
 class _FakeRouteDecision:
     route = "GENERAL_CHAT"
     confidence = 0.5
     bypass_llm = False
     matched_keywords = []
     reason = "stub"
+
 
 _router.RouteDecision = _FakeRouteDecision
 _router.classify.return_value = _FakeRouteDecision()
@@ -524,7 +530,7 @@ class TestCheckpoints:
 
     def test_restore_checkpoint_found(self):
         with patch("agentic_app_routes.load_checkpoint", return_value=_FakeCheckpoint()), \
-             patch("agentic_app_routes.create_checkpoint", return_value=_FakeCheckpoint()):
+                patch("agentic_app_routes.create_checkpoint", return_value=_FakeCheckpoint()):
             r = client.post("/checkpoint/cp-test-001/restore", headers=_CP_AUTH)
         assert r.status_code == 200
 
@@ -774,9 +780,9 @@ class TestRunValidPipeline:
         if patches:
             p.update(patches)
         with patch.object(ag, "gather_context", p["gather_context"]), \
-             patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
-             patch.object(ag, "challenge_plan", p["challenge_plan"]), \
-             patch.object(ag, "detect_self_deception", p["detect_self_deception"]):
+                patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
+                patch.object(ag, "challenge_plan", p["challenge_plan"]), \
+                patch.object(ag, "detect_self_deception", p["detect_self_deception"]):
             return client.post("/run", json=payload)
 
     def test_valid_run_returns_200(self):
@@ -861,7 +867,7 @@ class TestBreakerPersist:
 class TestCheckpointDiff:
     def test_diff_both_found(self):
         with patch("agentic_app_routes.load_checkpoint", return_value=_FakeCheckpoint()), \
-             patch("agentic_app_routes.diff_checkpoints", return_value={"changed": ["breakers"]}):
+                patch("agentic_app_routes.diff_checkpoints", return_value={"changed": ["breakers"]}):
             r = client.get("/checkpoint/diff/cp-a/cp-b")
         assert r.status_code == 200
         assert r.json().get("status") == "ok"
@@ -1071,6 +1077,7 @@ class TestAsyncHelpers:
         id_data = {"narrative": "I am Kai, a sovereign AI", "stats": {"days_alive": 42}}
         arc_data = {"current_chapter": "Growth Phase", "chapter_number": 3}
         call_count = {"n": 0}
+
         async def _multi_get(*args, **kwargs):
             call_count["n"] += 1
             resp = MagicMock()
@@ -1435,12 +1442,12 @@ class TestRunGraphDirect:
             p.update(extra_patches)
         mc = self._make_noop_http()
         with patch.object(ag, "gather_context", p["gather_context"]), \
-             patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
-             patch.object(ag, "challenge_plan", p["challenge_plan"]), \
-             patch.object(ag, "detect_self_deception", p["detect_self_deception"]), \
-             patch.object(ag, "score_conviction", p["score_conviction"]), \
-             patch.object(ag, "verdict_to_plan_metadata", p["verdict_to_plan_metadata"]), \
-             patch("httpx.AsyncClient", return_value=mc):
+                patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
+                patch.object(ag, "challenge_plan", p["challenge_plan"]), \
+                patch.object(ag, "detect_self_deception", p["detect_self_deception"]), \
+                patch.object(ag, "score_conviction", p["score_conviction"]), \
+                patch.object(ag, "verdict_to_plan_metadata", p["verdict_to_plan_metadata"]), \
+                patch("httpx.AsyncClient", return_value=mc):
             return _asyncio.run(ag.run_graph(req))
 
     def test_direct_returns_graph_response(self):
@@ -1521,14 +1528,14 @@ class TestRunGraphDirect:
         ))
         mc = self._make_noop_http()
         with patch.object(ag, "gather_context", p["gather_context"]), \
-             patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
-             patch.object(ag, "challenge_plan", p["challenge_plan"]), \
-             patch.object(ag, "detect_self_deception", deceptive), \
-             patch.object(ag, "score_conviction", MagicMock(return_value=5.0)), \
-             patch.object(ag, "verdict_to_plan_metadata", MagicMock(return_value={})), \
-             patch.object(ag, "tree_search", tree_mock), \
-             patch.object(ag, "build_plan", MagicMock(return_value={"summary": "rethink plan"})), \
-             patch("httpx.AsyncClient", return_value=mc):
+                patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
+                patch.object(ag, "challenge_plan", p["challenge_plan"]), \
+                patch.object(ag, "detect_self_deception", deceptive), \
+                patch.object(ag, "score_conviction", MagicMock(return_value=5.0)), \
+                patch.object(ag, "verdict_to_plan_metadata", MagicMock(return_value={})), \
+                patch.object(ag, "tree_search", tree_mock), \
+                patch.object(ag, "build_plan", MagicMock(return_value={"summary": "rethink plan"})), \
+                patch("httpx.AsyncClient", return_value=mc):
             result = _asyncio.run(ag.run_graph(req))
         # Should complete and return a response (rethink loop + tree search ran)
         assert hasattr(result, "specialist")
@@ -1618,12 +1625,12 @@ class TestRunGraphDirect:
         p["score_conviction"] = MagicMock(return_value=9.0)
         p["verdict_to_plan_metadata"] = MagicMock(return_value={})
         with patch.object(ag, "gather_context", p["gather_context"]), \
-             patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
-             patch.object(ag, "challenge_plan", p["challenge_plan"]), \
-             patch.object(ag, "detect_self_deception", p["detect_self_deception"]), \
-             patch.object(ag, "score_conviction", p["score_conviction"]), \
-             patch.object(ag, "verdict_to_plan_metadata", p["verdict_to_plan_metadata"]), \
-             patch("httpx.AsyncClient", return_value=mc):
+                patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
+                patch.object(ag, "challenge_plan", p["challenge_plan"]), \
+                patch.object(ag, "detect_self_deception", p["detect_self_deception"]), \
+                patch.object(ag, "score_conviction", p["score_conviction"]), \
+                patch.object(ag, "verdict_to_plan_metadata", p["verdict_to_plan_metadata"]), \
+                patch("httpx.AsyncClient", return_value=mc):
             result = _asyncio.run(ag.run_graph(
                 ag.GraphRequest(
                     user_input="test gate http status error",
@@ -1643,12 +1650,12 @@ class TestRunGraphDirect:
         p["score_conviction"] = MagicMock(return_value=9.0)
         p["verdict_to_plan_metadata"] = MagicMock(return_value={})
         with patch.object(ag, "gather_context", p["gather_context"]), \
-             patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
-             patch.object(ag, "challenge_plan", p["challenge_plan"]), \
-             patch.object(ag, "detect_self_deception", p["detect_self_deception"]), \
-             patch.object(ag, "score_conviction", p["score_conviction"]), \
-             patch.object(ag, "verdict_to_plan_metadata", p["verdict_to_plan_metadata"]), \
-             patch("httpx.AsyncClient", return_value=mc):
+                patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
+                patch.object(ag, "challenge_plan", p["challenge_plan"]), \
+                patch.object(ag, "detect_self_deception", p["detect_self_deception"]), \
+                patch.object(ag, "score_conviction", p["score_conviction"]), \
+                patch.object(ag, "verdict_to_plan_metadata", p["verdict_to_plan_metadata"]), \
+                patch("httpx.AsyncClient", return_value=mc):
             result = _asyncio.run(ag.run_graph(
                 ag.GraphRequest(
                     user_input="test gate http error",
@@ -1672,14 +1679,14 @@ class TestRunGraphDirect:
         p["verdict_to_plan_metadata"] = MagicMock(return_value={})
         mc = self._make_noop_http()
         with patch.object(ag, "gather_context", p["gather_context"]), \
-             patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
-             patch.object(ag, "challenge_plan", p["challenge_plan"]), \
-             patch.object(ag, "detect_self_deception", p["detect_self_deception"]), \
-             patch.object(ag, "score_conviction", p["score_conviction"]), \
-             patch.object(ag, "verdict_to_plan_metadata", p["verdict_to_plan_metadata"]), \
-             patch.object(ag, "predict_next_request", MagicMock(return_value=[MagicMock()])), \
-             patch.object(ag, "pre_fetch_predicted_context", AsyncMock(return_value=predicted)), \
-             patch("httpx.AsyncClient", return_value=mc):
+                patch.object(ag, "build_enriched_plan", p["build_enriched_plan"]), \
+                patch.object(ag, "challenge_plan", p["challenge_plan"]), \
+                patch.object(ag, "detect_self_deception", p["detect_self_deception"]), \
+                patch.object(ag, "score_conviction", p["score_conviction"]), \
+                patch.object(ag, "verdict_to_plan_metadata", p["verdict_to_plan_metadata"]), \
+                patch.object(ag, "predict_next_request", MagicMock(return_value=[MagicMock()])), \
+                patch.object(ag, "pre_fetch_predicted_context", AsyncMock(return_value=predicted)), \
+                patch("httpx.AsyncClient", return_value=mc):
             result = _asyncio.run(ag.run_graph(
                 ag.GraphRequest(user_input="what are my priorities", session_id="p10-s1")
             ))

@@ -123,6 +123,7 @@ def anchor_scan() -> Optional[AnchorFailure]:
             f"{ANCHOR_MIN_ROUTES} — the scan is not seeing the app", 3)
     return None
 
+
 Result = Tuple[str, str]
 
 

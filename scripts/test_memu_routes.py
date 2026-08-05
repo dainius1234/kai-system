@@ -19,6 +19,8 @@ from scripts.module_stubs import stubbed  # noqa: E402
 
 # ── Bootstrap: ensure redis stub is present before module load ────────
 # (conftest.py does this globally but re-guard for isolated runs)
+
+
 def _redis_stubs() -> dict:
     if "redis" in sys.modules:
         return {}
@@ -27,6 +29,7 @@ def _redis_stubs() -> dict:
         ping=MagicMock(side_effect=ConnectionError("stub")))
     _rs.asyncio = MagicMock()
     return {"redis": _rs, "redis.asyncio": _rs.asyncio}
+
 
 # Remove any prior lakefs_client stub so memu-core's built-in ImportError
 # fallback fires and returns real string commit_ids (not MagicMock).

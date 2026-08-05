@@ -108,12 +108,12 @@ def _evaluate(condition: dict, current: Any, previous: Any) -> bool:
     # Numeric ops
     try:
         fval = float(current)
-        if op == "gt"  and threshold is not None: return fval > float(threshold)
-        if op == "lt"  and threshold is not None: return fval < float(threshold)
+        if op == "gt" and threshold is not None: return fval > float(threshold)
+        if op == "lt" and threshold is not None: return fval < float(threshold)
         if op == "gte" and threshold is not None: return fval >= float(threshold)
         if op == "lte" and threshold is not None: return fval <= float(threshold)
-        if op == "eq"  and threshold is not None: return fval == float(threshold)
-        if op == "ne"  and threshold is not None: return fval != float(threshold)
+        if op == "eq" and threshold is not None: return fval == float(threshold)
+        if op == "ne" and threshold is not None: return fval != float(threshold)
         if op == "increased_pct" and previous is not None:
             fprev = float(previous)
             return fprev != 0 and ((fval - fprev) / abs(fprev) * 100) >= float(percent or 0)
@@ -126,9 +126,9 @@ def _evaluate(condition: dict, current: Any, previous: Any) -> bool:
     # String / existence ops
     sval = str(current).lower()
     smatch = str(text_match).lower()
-    if op == "contains":     return smatch in sval
+    if op == "contains": return smatch in sval
     if op == "not_contains": return smatch not in sval
-    if op == "changed":      return previous is not None and str(current) != str(previous)
+    if op == "changed": return previous is not None and str(current) != str(previous)
     return False
 
 
@@ -273,7 +273,7 @@ async def add_rule(rule_in: RuleIn):
 
 
 @app.put("/rules/{rule_id}",
-          dependencies=[Depends(require_service_auth("monitor_rule_update"))])
+         dependencies=[Depends(require_service_auth("monitor_rule_update"))])
 async def update_rule(rule_id: str, updates: dict = Body(...)):
     if rule_id not in _rules:
         raise HTTPException(404, f"Rule not found: {rule_id}")
@@ -283,7 +283,7 @@ async def update_rule(rule_id: str, updates: dict = Body(...)):
 
 
 @app.delete("/rules/{rule_id}",
-          dependencies=[Depends(require_service_auth("monitor_rule_delete"))])
+            dependencies=[Depends(require_service_auth("monitor_rule_delete"))])
 async def delete_rule(rule_id: str):
     _rules.pop(rule_id, None)
     _last_check.pop(rule_id, None)
@@ -333,7 +333,7 @@ async def get_alerts(limit: int = 50):
 
 
 @app.delete("/alerts",
-          dependencies=[Depends(require_service_auth("monitor_alerts_clear"))])
+            dependencies=[Depends(require_service_auth("monitor_alerts_clear"))])
 async def clear_alerts():
     _alert_history.clear()
     return {"ok": True}

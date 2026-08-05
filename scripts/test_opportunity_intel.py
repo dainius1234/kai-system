@@ -28,7 +28,7 @@ def _intel() -> OpportunityIntelligence:
 
 
 def _mock_alpha_composite(funding_sent="neutral", ls_sent="balanced",
-                           premium_pct=0.1) -> dict:
+                          premium_pct=0.1) -> dict:
     return {
         "symbol": "BTCUSD",
         "funding": {"sentiment": funding_sent, "rate": 0.0001},
@@ -43,7 +43,7 @@ def _mock_fng(value: int) -> MagicMock:
     fng = MagicMock()
     fng.value = value
     fng.to_dict.return_value = {"value": value, "label": "Fear", "regime": "fear",
-                                 "timestamp": time.time(), "age_s": 0}
+                                "timestamp": time.time(), "age_s": 0}
     return fng
 
 
@@ -295,7 +295,7 @@ def test_scan_trend_arb_bullish_alignment():
 
     with patch.dict("sys.modules", {
         "market_intel": MagicMock(get_market_intel=lambda: mock_mi,
-                                   _classify_tone=lambda t: "bullish"),
+                                  _classify_tone=lambda t: "bullish"),
     }):
         try:
             result = intel.scan_trend_arb("BTCUSD")
@@ -320,18 +320,18 @@ def test_scan_trend_arb_cached():
 def test_full_scan_returns_all_keys():
     intel = _intel()
     # Mock all sub-scans
-    sig_hi  = OpportunitySignal("financial", "BTCUSD", 8, "hours", "h", [], "a", {})
-    sig_mid = OpportunitySignal("content",   "topic",  5, "days",  "h", [], "a", {})
-    sig_lo  = OpportunitySignal("affiliate", "cat",    2, "weeks", "h", [], "a", {})
+    sig_hi = OpportunitySignal("financial", "BTCUSD", 8, "hours", "h", [], "a", {})
+    sig_mid = OpportunitySignal("content", "topic", 5, "days", "h", [], "a", {})
+    sig_lo = OpportunitySignal("affiliate", "cat", 2, "weeks", "h", [], "a", {})
 
-    intel.scan_financial  = MagicMock(return_value=sig_hi)   # type: ignore[method-assign]
-    intel.scan_trend_arb  = MagicMock(return_value=sig_mid)  # type: ignore[method-assign]
-    intel.scan_content    = MagicMock(return_value=sig_lo)   # type: ignore[method-assign]
-    intel.scan_affiliate  = MagicMock(return_value=sig_lo)   # type: ignore[method-assign]
+    intel.scan_financial = MagicMock(return_value=sig_hi)   # type: ignore[method-assign]
+    intel.scan_trend_arb = MagicMock(return_value=sig_mid)  # type: ignore[method-assign]
+    intel.scan_content = MagicMock(return_value=sig_lo)   # type: ignore[method-assign]
+    intel.scan_affiliate = MagicMock(return_value=sig_lo)   # type: ignore[method-assign]
 
     result = intel.full_scan("BTCUSD",
-                              content_topics=["bitcoin guide"],
-                              affiliate_categories=["hardware wallet"])
+                             content_topics=["bitcoin guide"],
+                             affiliate_categories=["hardware wallet"])
     for key in ("symbol", "timestamp", "top_opportunities", "watchlist",
                 "all_signals", "max_conviction"):
         assert key in result
@@ -340,18 +340,18 @@ def test_full_scan_returns_all_keys():
 def test_full_scan_top_opportunities_sorted_by_conviction():
     intel = _intel()
     sig_a = OpportunitySignal("financial", "BTC", 9, "hours", "h", [], "a", {})
-    sig_b = OpportunitySignal("content",   "BTC", 4, "days",  "h", [], "a", {})
+    sig_b = OpportunitySignal("content", "BTC", 4, "days", "h", [], "a", {})
     sig_c = OpportunitySignal("affiliate", "BTC", 6, "weeks", "h", [], "a", {})
     sig_d = OpportunitySignal("trend_arb", "BTC", 7, "hours", "h", [], "a", {})
 
     intel.scan_financial = MagicMock(return_value=sig_a)  # type: ignore[method-assign]
     intel.scan_trend_arb = MagicMock(return_value=sig_d)  # type: ignore[method-assign]
-    intel.scan_content   = MagicMock(return_value=sig_b)  # type: ignore[method-assign]
+    intel.scan_content = MagicMock(return_value=sig_b)  # type: ignore[method-assign]
     intel.scan_affiliate = MagicMock(return_value=sig_c)  # type: ignore[method-assign]
 
     result = intel.full_scan("BTCUSD",
-                              content_topics=["t"],
-                              affiliate_categories=["c"])
+                             content_topics=["t"],
+                             affiliate_categories=["c"])
 
     convictions = [s["conviction"] for s in result["all_signals"]]
     assert convictions == sorted(convictions, reverse=True)
@@ -364,18 +364,18 @@ def test_full_scan_top_opportunities_sorted_by_conviction():
 def test_full_scan_watchlist_threshold():
     intel = _intel()
     sig_a = OpportunitySignal("financial", "BTC", 3, "days", "h", [], "a", {})
-    sig_b = OpportunitySignal("content",   "BTC", 4, "days", "h", [], "a", {})
-    sig_c = OpportunitySignal("affiliate", "BTC", 2, "weeks","h", [], "a", {})
-    sig_d = OpportunitySignal("trend_arb", "BTC", 1, "weeks","h", [], "a", {})
+    sig_b = OpportunitySignal("content", "BTC", 4, "days", "h", [], "a", {})
+    sig_c = OpportunitySignal("affiliate", "BTC", 2, "weeks", "h", [], "a", {})
+    sig_d = OpportunitySignal("trend_arb", "BTC", 1, "weeks", "h", [], "a", {})
 
     intel.scan_financial = MagicMock(return_value=sig_a)  # type: ignore[method-assign]
     intel.scan_trend_arb = MagicMock(return_value=sig_d)  # type: ignore[method-assign]
-    intel.scan_content   = MagicMock(return_value=sig_b)  # type: ignore[method-assign]
+    intel.scan_content = MagicMock(return_value=sig_b)  # type: ignore[method-assign]
     intel.scan_affiliate = MagicMock(return_value=sig_c)  # type: ignore[method-assign]
 
     result = intel.full_scan("BTCUSD",
-                              content_topics=["t"],
-                              affiliate_categories=["c"])
+                             content_topics=["t"],
+                             affiliate_categories=["c"])
     assert result["top_opportunities"] == []   # none >= 5
     watch_convictions = [s["conviction"] for s in result["watchlist"]]
     assert all(3 <= c < 5 for c in watch_convictions)

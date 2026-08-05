@@ -53,13 +53,13 @@ def perception_mode() -> str:
 
 
 SENSOR_ENDPOINTS: Dict[str, Tuple[str, str]] = {
-    "weather":   ("WEATHER_SERVICE_URL",  "http://weather-service:8039/summary"),
-    "calendar":  ("CALENDAR_SERVICE_URL", "http://calendar-service:8043/summary"),
-    "docker":    ("DOCKER_WATCHER_URL",   "http://docker-watcher:8041/summary"),
-    "git":       ("GIT_WATCHER_URL",      "http://git-watcher:8044/summary"),
-    "system":    ("SYSMETRICS_URL",       "http://sysmetrics:8035/snapshot"),
-    "screen":    ("SCREEN_WATCHER_URL",   "http://screen-watcher:8036/status"),
-    "clipboard": ("CLIPBOARD_SERVICE_URL","http://clipboard-service:8024/latest"),
+    "weather": ("WEATHER_SERVICE_URL", "http://weather-service:8039/summary"),
+    "calendar": ("CALENDAR_SERVICE_URL", "http://calendar-service:8043/summary"),
+    "docker": ("DOCKER_WATCHER_URL", "http://docker-watcher:8041/summary"),
+    "git": ("GIT_WATCHER_URL", "http://git-watcher:8044/summary"),
+    "system": ("SYSMETRICS_URL", "http://sysmetrics:8035/snapshot"),
+    "screen": ("SCREEN_WATCHER_URL", "http://screen-watcher:8036/status"),
+    "clipboard": ("CLIPBOARD_SERVICE_URL", "http://clipboard-service:8024/latest"),
 }
 
 

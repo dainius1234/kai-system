@@ -128,9 +128,9 @@ def check_file(path: Path) -> list[str]:
 _REGISTRIES = {
     "ghcr.io": ("https://ghcr.io/token?scope=repository:{repo}:pull",
                 "https://ghcr.io/v2/{repo}/manifests/{tag}"),
-    None:      ("https://auth.docker.io/token?service=registry.docker.io"
-                "&scope=repository:{repo}:pull",
-                "https://registry-1.docker.io/v2/{repo}/manifests/{tag}"),
+    None: ("https://auth.docker.io/token?service=registry.docker.io"
+           "&scope=repository:{repo}:pull",
+           "https://registry-1.docker.io/v2/{repo}/manifests/{tag}"),
 }
 
 _ACCEPT = ", ".join((

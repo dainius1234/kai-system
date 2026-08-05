@@ -76,9 +76,9 @@ class TestMomentum:
         s = MomentumStrategy(lookback=5, threshold_pct=2.0)
         # Small move: barely over threshold
         small = [100.0] * 5 + [102.5]   # 2.5% gain
-        big   = [100.0] * 5 + [110.0]   # 10% gain
+        big = [100.0] * 5 + [110.0]   # 10% gain
         sig_small = s.evaluate("BTCUSD", small)
-        sig_big   = s.evaluate("BTCUSD", big)
+        sig_big = s.evaluate("BTCUSD", big)
         assert sig_big.confidence > sig_small.confidence
 
     def test_confidence_capped_at_one(self):
@@ -216,7 +216,7 @@ class TestConsensus:
         assert sig.confidence == pytest.approx(1.0)
 
     def test_consensus_majority_wins(self):
-        s_buy  = MomentumStrategy(lookback=2, threshold_pct=0.1)
+        s_buy = MomentumStrategy(lookback=2, threshold_pct=0.1)
         s_hold = RSIStrategy(period=14)  # needs 15 prices — returns hold with short list
         engine = StrategyEngine(strategies=[s_buy, s_buy, s_hold])
         prices = [100.0, 100.0, 105.0]
@@ -224,7 +224,7 @@ class TestConsensus:
         assert sig.action == "buy"
 
     def test_consensus_tie_returns_hold(self):
-        s_buy  = MomentumStrategy(lookback=2, threshold_pct=0.1)
+        s_buy = MomentumStrategy(lookback=2, threshold_pct=0.1)
         s_sell = MomentumStrategy(lookback=2, threshold_pct=0.1)
         s_sell.evaluate = MagicMock(return_value=Signal("X", "sell", 0.8, "x", "x", 100.0))
         engine = StrategyEngine(strategies=[s_buy, s_sell])

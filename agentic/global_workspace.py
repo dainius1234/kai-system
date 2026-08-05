@@ -67,7 +67,7 @@ class WorkspaceBid:
     relevance: float          # 0.0–1.0 goal-relevance
     surprise: float           # 0.0–1.0 prediction error from causal world model
     confidence: float         # 0.0–1.0 certainty of the module
-    emotional_salience: float # 0.0–1.0 from emotional memory
+    emotional_salience: float  # 0.0–1.0 from emotional memory
     timestamp: float = field(default_factory=time.time)
 
 

@@ -128,7 +128,7 @@ async def resilient_call(
     cb.record_failure()
     if logger:
         logger.warning("resilient_call %s %s failed after %d attempt(s): %s",
-                        method, url, attempts, last_exc)
+                       method, url, attempts, last_exc)
     return fallback
 
 

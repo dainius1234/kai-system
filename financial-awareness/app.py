@@ -29,12 +29,12 @@ CIS_RECORDS_FILE = FINANCE_ROOT / "cis_records.json"
 PORT = int(os.getenv("PORT", "8063"))
 
 # UK tax thresholds (overridable via env for future-proofing)
-PERSONAL_ALLOWANCE   = float(os.getenv("UK_PERSONAL_ALLOWANCE",   "12570"))
-BASIC_RATE_LIMIT     = float(os.getenv("UK_BASIC_RATE_LIMIT",      "50270"))
-HIGHER_RATE_LIMIT    = float(os.getenv("UK_HIGHER_RATE_LIMIT",    "125140"))
-MTD_THRESHOLD        = float(os.getenv("MTD_START",                "50000"))
-VAT_THRESHOLD        = float(os.getenv("VAT_THRESHOLD",            "85000"))
-MILEAGE_RATE         = float(os.getenv("MILEAGE_RATE",             "0.45"))
+PERSONAL_ALLOWANCE = float(os.getenv("UK_PERSONAL_ALLOWANCE", "12570"))
+BASIC_RATE_LIMIT = float(os.getenv("UK_BASIC_RATE_LIMIT", "50270"))
+HIGHER_RATE_LIMIT = float(os.getenv("UK_HIGHER_RATE_LIMIT", "125140"))
+MTD_THRESHOLD = float(os.getenv("MTD_START", "50000"))
+VAT_THRESHOLD = float(os.getenv("VAT_THRESHOLD", "85000"))
+MILEAGE_RATE = float(os.getenv("MILEAGE_RATE", "0.45"))
 
 # CIS deduction rates
 CIS_RATES: Dict[str, float] = {"registered": 0.20, "unregistered": 0.30, "gross": 0.00}
@@ -61,9 +61,9 @@ def _save_records(records: List[Dict[str, Any]]) -> None:
 def _income_tax(profit: float) -> float:
     """Estimate Income Tax on self-employment profit (England/Wales/NI rates 2024/25)."""
     taxable = max(profit - PERSONAL_ALLOWANCE, 0.0)
-    basic   = min(taxable, BASIC_RATE_LIMIT - PERSONAL_ALLOWANCE)
-    higher  = min(max(taxable - (BASIC_RATE_LIMIT - PERSONAL_ALLOWANCE), 0.0),
-                  HIGHER_RATE_LIMIT - BASIC_RATE_LIMIT)
+    basic = min(taxable, BASIC_RATE_LIMIT - PERSONAL_ALLOWANCE)
+    higher = min(max(taxable - (BASIC_RATE_LIMIT - PERSONAL_ALLOWANCE), 0.0),
+                 HIGHER_RATE_LIMIT - BASIC_RATE_LIMIT)
     additional = max(taxable - (HIGHER_RATE_LIMIT - PERSONAL_ALLOWANCE), 0.0)
     return round(basic * 0.20 + higher * 0.40 + additional * 0.45, 2)
 
@@ -216,16 +216,16 @@ async def cis_summary() -> Dict[str, Any]:
         if _in_tax_year(r.get("date", ""), tax_year_start)
     ]
 
-    gross_ytd      = round(sum(r.get("gross_amount",    0) for r in ytd_records), 2)
-    deducted_ytd   = round(sum(r.get("deduction_amount", 0) for r in ytd_records), 2)
-    net_ytd        = round(sum(r.get("net_payment",      0) for r in ytd_records), 2)
-    materials_ytd  = round(sum(r.get("materials_amount", 0) for r in ytd_records), 2)
+    gross_ytd = round(sum(r.get("gross_amount", 0) for r in ytd_records), 2)
+    deducted_ytd = round(sum(r.get("deduction_amount", 0) for r in ytd_records), 2)
+    net_ytd = round(sum(r.get("net_payment", 0) for r in ytd_records), 2)
+    materials_ytd = round(sum(r.get("materials_amount", 0) for r in ytd_records), 2)
 
-    estimated_tax  = _income_tax(gross_ytd)
-    estimated_ni   = _class4_ni(gross_ytd)
+    estimated_tax = _income_tax(gross_ytd)
+    estimated_ni = _class4_ni(gross_ytd)
     # CIS already deducted counts against the tax bill — show the credit
-    cis_credit     = deducted_ytd
-    net_tax_due    = max(round(estimated_tax + estimated_ni - cis_credit, 2), 0.0)
+    cis_credit = deducted_ytd
+    net_tax_due = max(round(estimated_tax + estimated_ni - cis_credit, 2), 0.0)
 
     alerts: List[str] = []
     if gross_ytd >= MTD_THRESHOLD - 2000:
@@ -264,9 +264,9 @@ async def invoice_generate(req: InvoiceRequest) -> Dict[str, Any]:
     rate = CIS_RATES[req.deduction_status]
     deduction = round(req.labour_amount * rate, 2)
     total_gross = round(req.labour_amount + req.materials_amount, 2)
-    total_net   = round(total_gross - deduction, 2)
-    inv_date    = req.invoice_date or date.today().isoformat()
-    inv_ref     = req.invoice_ref or f"INV-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M')}"
+    total_net = round(total_gross - deduction, 2)
+    inv_date = req.invoice_date or date.today().isoformat()
+    inv_ref = req.invoice_ref or f"INV-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M')}"
 
     lines = [
         f"INVOICE {inv_ref}",
@@ -367,12 +367,12 @@ def _in_rolling_year(date_str: str, lookback_start: date) -> bool:
 async def tax_estimate() -> Dict[str, Any]:
     """Estimated Income Tax + NI liability for current tax year."""
     records = _load_records()
-    gross_ytd    = _ytd_income_from_records(records)
+    gross_ytd = _ytd_income_from_records(records)
     deducted_ytd = _ytd_deductions_from_records(records)
-    inc_tax      = _income_tax(gross_ytd)
-    class4_ni    = _class4_ni(gross_ytd)
-    total_bill   = round(inc_tax + class4_ni, 2)
-    net_due      = max(round(total_bill - deducted_ytd, 2), 0.0)
+    inc_tax = _income_tax(gross_ytd)
+    class4_ni = _class4_ni(gross_ytd)
+    total_bill = round(inc_tax + class4_ni, 2)
+    net_due = max(round(total_bill - deducted_ytd, 2), 0.0)
 
     return {
         "gross_income_ytd": gross_ytd,

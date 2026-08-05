@@ -36,8 +36,8 @@ from common.self_emp_advisor import advise, load_expenses, load_income_total, th
 from kai_config import build_saver, classify_failure, extract_metacognitive_rule, extract_preference, FailureClass, compute_learning_value, capture_snapshot, save_snapshot, create_checkpoint, list_checkpoints, load_checkpoint, diff_checkpoints, delete_checkpoint
 from conviction import build_plan, detect_self_deception, low_conviction_feedback, score_conviction, update_domain_confidence
 from router import (RouteDecision, classify, dispatch_route, load_skills, list_skills,
-                     match_skill, unload_skill, prune_stale_skills,
-                     scan_skill_md)
+                    match_skill, unload_skill, prune_stale_skills,
+                    scan_skill_md)
 from planner import gather_context, build_enriched_plan, predict_next_request, pre_fetch_predicted_context
 from adversary import challenge_plan, verdict_to_plan_metadata
 from tree_search import tree_search
@@ -1099,6 +1099,7 @@ class TrustPromoteRequest(BaseModel):
     level: int          # TrustLevel int value (0–6)
     reason: str = ""
 
+
 class TrustDemoteRequest(BaseModel):
     level: int
     reason: str
@@ -1188,6 +1189,7 @@ async def market_data_mark() -> Dict[str, Any]:
 class StrategyEvalRequest(BaseModel):
     symbol: str
     prices: List[float]
+
 
 class StrategyAutoTradeRequest(BaseModel):
     symbol: str
@@ -2223,6 +2225,7 @@ async def _proactive_observer() -> None:
             # ── D88 M4 / D89 C3: world model persistence with provenance ─
             if is_enabled("WORLD_MODEL_PERSISTENCE"):
                 ts_now = datetime.now(timezone.utc).isoformat()
+
                 def _prov(value: Any, source: str, confidence: float = 1.0) -> Dict[str, Any]:
                     return {"value": value, "source": source, "timestamp": ts_now, "confidence": confidence}
                 world_model = {
@@ -2923,10 +2926,10 @@ async def chat_stream(req: ChatRequest):
             response[:200].strip() + ("…" if len(response) > 200 else "")
         ) if response else u_msg[:100]
         for label, path, body in [
-            ("emotion",       "/memory/emotion/record",       {"session_id": session, "text": u_msg}),
-            ("autobiography", "/memory/autobiography/record",  {"text": u_msg, "context": "chat"}),
-            ("thought",       "/memory/imagine/thought",       {"thought": thought, "context": "chat_reflection"}),
-            ("values",        "/memory/values/learn",          {"experience": u_msg[:300], "outcome": "positive", "context": "chat"}),
+            ("emotion", "/memory/emotion/record", {"session_id": session, "text": u_msg}),
+            ("autobiography", "/memory/autobiography/record", {"text": u_msg, "context": "chat"}),
+            ("thought", "/memory/imagine/thought", {"thought": thought, "context": "chat_reflection"}),
+            ("values", "/memory/values/learn", {"experience": u_msg[:300], "outcome": "positive", "context": "chat"}),
         ]:
             try:
                 await _memu_post(path, body, timeout=3.0)
@@ -3437,7 +3440,7 @@ async def checkpoint_diff(id_a: str, id_b: str) -> Dict[str, Any]:
 
 
 @app.delete("/checkpoint/{checkpoint_id}",
-          dependencies=[Depends(require_service_auth("checkpoint_delete"))])
+            dependencies=[Depends(require_service_auth("checkpoint_delete"))])
 async def checkpoint_delete(checkpoint_id: str) -> Dict[str, Any]:
     """Delete a single checkpoint."""
     if delete_checkpoint(checkpoint_id):

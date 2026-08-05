@@ -197,6 +197,7 @@ def test_subject_data_actually_gone():
     # Claims carry the *store's* principal, not the source event's, so
     # subject-scoping must follow lineage: claim → evidence → event.
     evidence = fx.store.evidence_by_id
+
     def _from_subject(claim) -> bool:
         for ev_id in claim.provenance.upstream_ids:
             record = evidence.get(ev_id)

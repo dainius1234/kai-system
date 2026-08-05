@@ -42,6 +42,7 @@ from common.data_paths import data_path
 
 logger = logging.getLogger(__name__)
 
+
 def _fingerprint_path() -> Path:
     """`data/ohana/fingerprint.json`, unless KAI_DATA_ROOT says otherwise.
 

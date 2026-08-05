@@ -35,12 +35,14 @@ logger = logging.getLogger("kai.alpha_signals")
 _BASE = "https://fapi.binance.com"
 _TIMEOUT_S = 5.0
 
-_TTL_FUNDING  = 300.0   # updates every 8h, checking every 5 min is fine
-_TTL_OI       = 60.0
+_TTL_FUNDING = 300.0   # updates every 8h, checking every 5 min is fine
+_TTL_OI = 60.0
 _TTL_LS_RATIO = 60.0
-_TTL_PREMIUM  = 60.0
+_TTL_PREMIUM = 60.0
 
 # Binance uses BTCUSDT format; we accept BTCUSD and normalise
+
+
 def _bnb_symbol(symbol: str) -> str:
     s = symbol.upper()
     if s.endswith("USDT"):
@@ -56,18 +58,18 @@ def _bnb_symbol(symbol: str) -> str:
 class FundingRate:
     symbol: str
     rate: float           # current 8h rate (0.0001 = 0.01%)
-    annualised_pct: float # rate * 3 * 365 * 100
+    annualised_pct: float  # rate * 3 * 365 * 100
     next_funding_time: int
     timestamp: float
 
     def sentiment(self) -> str:
         """Interpret funding rate as market sentiment."""
-        if self.rate > 0.001:    return "extremely_long"    # longs paying > 0.1%/8h
-        if self.rate > 0.0003:   return "crowded_long"
-        if self.rate > 0.0001:   return "mild_long"
-        if self.rate < -0.001:   return "extremely_short"   # shorts paying > 0.1%/8h
-        if self.rate < -0.0003:  return "crowded_short"
-        if self.rate < -0.0001:  return "mild_short"
+        if self.rate > 0.001: return "extremely_long"    # longs paying > 0.1%/8h
+        if self.rate > 0.0003: return "crowded_long"
+        if self.rate > 0.0001: return "mild_long"
+        if self.rate < -0.001: return "extremely_short"   # shorts paying > 0.1%/8h
+        if self.rate < -0.0003: return "crowded_short"
+        if self.rate < -0.0001: return "mild_short"
         return "neutral"
 
     def to_dict(self) -> Dict[str, Any]:
@@ -86,7 +88,7 @@ class FundingRate:
 class OpenInterest:
     symbol: str
     oi_contracts: float     # notional in contracts
-    oi_usd: Optional[float] # estimated USD value (requires mark price)
+    oi_usd: Optional[float]  # estimated USD value (requires mark price)
     timestamp: float
 
     def to_dict(self) -> Dict[str, Any]:
@@ -108,10 +110,10 @@ class LongShortRatio:
     timestamp: float
 
     def sentiment(self) -> str:
-        if self.long_pct > 75:  return "extremely_crowded_long"
-        if self.long_pct > 60:  return "crowded_long"
-        if self.long_pct < 25:  return "extremely_crowded_short"
-        if self.long_pct < 40:  return "crowded_short"
+        if self.long_pct > 75: return "extremely_crowded_long"
+        if self.long_pct > 60: return "crowded_long"
+        if self.long_pct < 25: return "extremely_crowded_short"
+        if self.long_pct < 40: return "crowded_short"
         return "balanced"
 
     def to_dict(self) -> Dict[str, Any]:
@@ -310,9 +312,9 @@ class AlphaSignalFeed:
 
         try:
             entry = data[0]
-            long_pct  = float(entry.get("longAccount", 0)) * 100
+            long_pct = float(entry.get("longAccount", 0)) * 100
             short_pct = float(entry.get("shortAccount", 0)) * 100
-            ls_ratio  = float(entry.get("longShortRatio", 0))
+            ls_ratio = float(entry.get("longShortRatio", 0))
             lsr = LongShortRatio(
                 symbol=symbol.upper(),
                 long_pct=long_pct,
@@ -352,7 +354,7 @@ class AlphaSignalFeed:
             return None
 
         try:
-            mark  = float(data.get("markPrice", 0))
+            mark = float(data.get("markPrice", 0))
             index = float(data.get("indexPrice", 0))
             if index <= 0:
                 return None
@@ -381,10 +383,10 @@ class AlphaSignalFeed:
         positioning, and basis — the four dimensions pros look at before
         taking a view.
         """
-        fr  = self.get_funding_rate(symbol)
-        oi  = self.get_open_interest(symbol)
+        fr = self.get_funding_rate(symbol)
+        oi = self.get_open_interest(symbol)
         lsr = self.get_long_short_ratio(symbol)
-        mp  = self.get_mark_premium(symbol)
+        mp = self.get_mark_premium(symbol)
 
         return {
             "symbol": symbol.upper(),

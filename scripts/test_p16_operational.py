@@ -161,8 +161,8 @@ class TestStruggleDetection:
         client = TestClient(memu.app)
 
         for msg in ["how do I fix the database connection error",
-                     "how do I fix the database connection error",
-                     "still the same error with database"]:
+                    "how do I fix the database connection error",
+                    "still the same error with database"]:
             client.post(f"/session/{sid}/append", json={"role": "user", "content": msg})
             client.post(f"/session/{sid}/append", json={"role": "assistant", "content": "Here's a suggestion."})
 
@@ -180,8 +180,8 @@ class TestStruggleDetection:
         client = TestClient(memu.app)
 
         for msg in ["What's the weather like today in London?",
-                     "Tell me about quantum physics and entanglement",
-                     "That's really interesting, can you tell me more about it"]:
+                    "Tell me about quantum physics and entanglement",
+                    "That's really interesting, can you tell me more about it"]:
             client.post(f"/session/{sid}/append", json={"role": "user", "content": msg})
             client.post(f"/session/{sid}/append", json={"role": "assistant", "content": "Here's the info."})
 

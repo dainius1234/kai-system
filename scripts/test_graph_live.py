@@ -81,7 +81,6 @@ def _post(url: str, payload: dict, timeout: int = 30) -> _Response:
     return _request("POST", url, payload, timeout)
 
 
-
 def main() -> int:
     health = _get(f"{BASE_URL}/health", timeout=10)
     health.raise_for_status()
@@ -91,8 +90,8 @@ def main() -> int:
         f"{BASE_URL}/graph/ingest",
         {
             "text": "Kai is a sovereign AI system. Kai's memory subsystem uses "
-                     "Postgres with pgvector for vector search and Cognee for "
-                     "graph-structured entity relationships.",
+            "Postgres with pgvector for vector search and Cognee for "
+            "graph-structured entity relationships.",
             "source_id": SOURCE_ID,
             "category": "test",
         },

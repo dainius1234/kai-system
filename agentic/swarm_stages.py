@@ -31,12 +31,12 @@ from swarm import (
 
 # ── Type aliases for injected dependencies ──────────────────────────
 
-MemoriesFn  = Callable[[str], Awaitable[List[str]]]
-WorldCtxFn  = Callable[[], Awaitable[str]]
+MemoriesFn = Callable[[str], Awaitable[List[str]]]
+WorldCtxFn = Callable[[], Awaitable[str]]
 TeammateCtxFn = Callable[[str], Optional[str]]          # slug → system-prompt block or None
-LLMChatFn   = Callable[[List[Dict[str, str]]], Awaitable[str]]
+LLMChatFn = Callable[[List[Dict[str, str]]], Awaitable[str]]
 BuildPlanFn = Callable[[str, str, List[Dict[str, Any]]], Dict[str, Any]]
-ScoreFn     = Callable[[str, Dict[str, Any], List[Dict[str, Any]], int], float]
+ScoreFn = Callable[[str, Dict[str, Any], List[Dict[str, Any]], int], float]
 AdversaryFn = Callable[..., Awaitable[Any]]             # challenge_plan signature
 
 

@@ -173,7 +173,7 @@ async def backup_full() -> Dict[str, Any]:
     """Run all backup components and return a manifest."""
     results = {}
     for component, func in [("postgres", backup_postgres), ("redis", backup_redis),
-                             ("memory", backup_memory), ("ledger", backup_ledger)]:
+                            ("memory", backup_memory), ("ledger", backup_ledger)]:
         try:
             results[component] = await func()
         except HTTPException as e:

@@ -32,25 +32,26 @@ import httpx
 
 logger = logging.getLogger("kai.market_intel")
 
-_FNG_URL    = "https://api.alternative.me/fng/"
-_CG_BASE    = "https://api.coingecko.com/api/v3"
-_TIMEOUT_S  = 5.0
+_FNG_URL = "https://api.alternative.me/fng/"
+_CG_BASE = "https://api.coingecko.com/api/v3"
+_TIMEOUT_S = 5.0
 
-_TTL_FNG      = 3600.0   # Fear & Greed changes once a day
-_TTL_GLOBAL   = 300.0    # Global stats every 5 min is plenty
+_TTL_FNG = 3600.0   # Fear & Greed changes once a day
+_TTL_GLOBAL = 300.0    # Global stats every 5 min is plenty
 _TTL_TRENDING = 300.0
-_TTL_SENTIMENT= 1800.0   # News sentiment; DuckDuckGo caches well
+_TTL_SENTIMENT = 1800.0   # News sentiment; DuckDuckGo caches well
 
 
 # ── Fear & Greed ───────────────────────────────────────────────────────────────
 
 FNG_LABELS = {
-    range(0,  26): "Extreme Fear",
+    range(0, 26): "Extreme Fear",
     range(26, 47): "Fear",
     range(47, 54): "Neutral",
     range(54, 75): "Greed",
-    range(75,101): "Extreme Greed",
+    range(75, 101): "Extreme Greed",
 }
+
 
 def _fng_label(value: int) -> str:
     for r, label in FNG_LABELS.items():
@@ -76,10 +77,10 @@ class FearGreedReading:
         }
 
     def _regime(self) -> str:
-        if self.value < 26:   return "extreme_fear"
-        if self.value < 47:   return "fear"
-        if self.value < 54:   return "neutral"
-        if self.value < 75:   return "greed"
+        if self.value < 26: return "extreme_fear"
+        if self.value < 47: return "fear"
+        if self.value < 54: return "neutral"
+        if self.value < 75: return "greed"
         return "extreme_greed"
 
 
@@ -267,8 +268,8 @@ class MarketIntelligence:
         coin_name = symbol.replace("USD", "").lower()
         query = f"{coin_name} crypto news sentiment today"
         result: Dict[str, Any] = {"symbol": symbol, "query": query,
-                                   "abstract": "", "topics": [], "tone": "neutral",
-                                   "timestamp": time.time()}
+                                  "abstract": "", "topics": [], "tone": "neutral",
+                                  "timestamp": time.time()}
         try:
             try:
                 from web_scout import search as ws_search
@@ -305,11 +306,11 @@ class MarketIntelligence:
             return cached
 
         _MACRO_QUERIES: Dict[str, str] = {
-            "gold":        "gold price today crypto impact",
-            "oil":         "oil price today market impact crypto",
-            "dollar_dxy":  "US dollar DXY index crypto bitcoin impact today",
-            "fed_rates":   "Federal Reserve interest rates crypto market today",
-            "geopolitical":"geopolitical risk crypto market impact today",
+            "gold": "gold price today crypto impact",
+            "oil": "oil price today market impact crypto",
+            "dollar_dxy": "US dollar DXY index crypto bitcoin impact today",
+            "fed_rates": "Federal Reserve interest rates crypto market today",
+            "geopolitical": "geopolitical risk crypto market impact today",
         }
 
         result: Dict[str, Any] = {
@@ -368,10 +369,10 @@ class MarketIntelligence:
         Includes coin-level news sentiment + macro context (gold, oil,
         DXY, Fed rates, geopolitical) so signals can be regime-aware.
         """
-        fng   = self.get_fear_greed()
-        glbl  = self.get_global_stats()
+        fng = self.get_fear_greed()
+        glbl = self.get_global_stats()
         trend = self.get_trending()
-        news  = self.get_news_sentiment(symbol)
+        news = self.get_news_sentiment(symbol)
         macro = self.get_macro_context()
 
         trending_symbols = {c.symbol.upper() for c in trend}
@@ -410,6 +411,7 @@ _BULLISH_WORDS = {
     "adoption", "partnership", "launch", "upgrade", "breakout", "all-time",
     "institutional", "etf", "approval", "positive", "growth", "profit",
 }
+
 
 def _classify_tone(text: str) -> str:
     """Simple bag-of-words tone classifier. Returns 'bullish', 'bearish', or 'neutral'."""

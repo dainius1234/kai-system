@@ -8,8 +8,8 @@ import re
 
 ROOT = Path(__file__).parent.parent
 APP_HTML = ROOT / "dashboard" / "static" / "app.html"
-STATIC   = ROOT / "dashboard" / "static"
-DASH_PY  = ROOT / "dashboard" / "app.py"
+STATIC = ROOT / "dashboard" / "static"
+DASH_PY = ROOT / "dashboard" / "app.py"
 
 
 def _html():
@@ -33,7 +33,7 @@ class TestStaticAssets:
     def test_d3_loaded_before_body(self):
         html = _html()
         script_pos = html.find("d3.v7.min.js")
-        body_pos   = html.find("<body")
+        body_pos = html.find("<body")
         assert script_pos < body_pos, "D3 script tag must be in <head>, before <body>"
 
 
@@ -53,9 +53,9 @@ class TestHtmlStructure:
 
     def test_mode_buttons_present(self):
         html = _html()
-        assert 'id="btnMindmap"'  in html
-        assert 'id="btnEmotion"'  in html
-        assert 'id="btnPlan"'     in html
+        assert 'id="btnMindmap"' in html
+        assert 'id="btnEmotion"' in html
+        assert 'id="btnPlan"' in html
 
     def test_canvas_nav_item(self):
         assert 'data-view="canvas"' in _html()

@@ -63,7 +63,7 @@ _TRENDING_BODY = {
 # ── _fng_label ────────────────────────────────────────────────────────────────
 
 @pytest.mark.parametrize("value,expected", [
-    (0,  "Extreme Fear"),
+    (0, "Extreme Fear"),
     (10, "Extreme Fear"),
     (25, "Extreme Fear"),
     (26, "Fear"),
@@ -73,7 +73,7 @@ _TRENDING_BODY = {
     (54, "Greed"),
     (74, "Greed"),
     (75, "Extreme Greed"),
-    (100,"Extreme Greed"),
+    (100, "Extreme Greed"),
 ])
 def test_fng_label(value, expected):
     assert _fng_label(value) == expected
@@ -84,11 +84,14 @@ def test_fng_label(value, expected):
 def test_classify_tone_bullish():
     assert _classify_tone("Bitcoin rally surge adoption bull market") == "bullish"
 
+
 def test_classify_tone_bearish():
     assert _classify_tone("crash dump fear panic sell regulation ban") == "bearish"
 
+
 def test_classify_tone_neutral_empty():
     assert _classify_tone("") == "neutral"
+
 
 def test_classify_tone_neutral_mixed():
     # Equal bullish and bearish words → neutral
@@ -101,9 +104,11 @@ def test_fear_greed_regime_extreme_fear():
     r = FearGreedReading(value=10, label="Extreme Fear", timestamp=time.time())
     assert r.to_dict()["regime"] == "extreme_fear"
 
+
 def test_fear_greed_regime_greed():
     r = FearGreedReading(value=70, label="Greed", timestamp=time.time())
     assert r.to_dict()["regime"] == "greed"
+
 
 def test_fear_greed_to_dict_keys():
     r = FearGreedReading(value=50, label="Neutral", timestamp=time.time())
@@ -116,6 +121,7 @@ def test_fear_greed_to_dict_keys():
 def test_global_stats_trend_down():
     s = GlobalStats(1e12, 5e10, 52.0, 17.0, -2.1, 10000, time.time())
     assert s.to_dict()["trend_24h"] == "down"
+
 
 def test_global_stats_trend_up():
     s = GlobalStats(1e12, 5e10, 52.0, 17.0, 1.5, 10000, time.time())
@@ -139,11 +145,13 @@ def test_fear_greed_success():
     assert r.value == 25
     assert r.label == "Extreme Fear"
 
+
 def test_fear_greed_http_error_returns_none():
     mi = _intel()
     with patch("httpx.Client", return_value=_mock_resp(503, {})):
         r = mi.get_fear_greed()
     assert r is None
+
 
 def test_fear_greed_network_error_returns_none():
     mi = _intel()
@@ -155,12 +163,14 @@ def test_fear_greed_network_error_returns_none():
         r = mi.get_fear_greed()
     assert r is None
 
+
 def test_fear_greed_cached():
     mi = _intel()
     with patch("httpx.Client", return_value=_mock_resp(200, _FNG_BODY)) as mock_cls:
         mi.get_fear_greed()
         mi.get_fear_greed()   # second call should hit cache
     assert mock_cls.call_count == 1
+
 
 def test_fear_greed_empty_data_returns_none():
     mi = _intel()
@@ -179,11 +189,13 @@ def test_global_stats_success():
     assert s.btc_dominance_pct == pytest.approx(52.5)
     assert s.market_cap_change_pct_24h == pytest.approx(-2.1)
 
+
 def test_global_stats_http_error_returns_none():
     mi = _intel()
     with patch("httpx.Client", return_value=_mock_resp(429, {})):
         s = mi.get_global_stats()
     assert s is None
+
 
 def test_global_stats_cached():
     mi = _intel()
@@ -203,11 +215,13 @@ def test_trending_success():
     assert coins[0].symbol == "BTC"
     assert coins[0].rank == 1
 
+
 def test_trending_http_error_returns_empty():
     mi = _intel()
     with patch("httpx.Client", return_value=_mock_resp(500, {})):
         coins = mi.get_trending()
     assert coins == []
+
 
 def test_trending_cached():
     mi = _intel()
@@ -239,12 +253,14 @@ def test_news_sentiment_success():
     assert result["symbol"] == "BTCUSD"
     assert result["tone"] == "bullish"
 
+
 def test_news_sentiment_bearish():
     mi = _intel()
     sr = _mock_search_result(abstract="crash dump panic fear sell regulation ban")
     with patch("web_scout.search", return_value=sr):
         result = mi.get_news_sentiment("BTCUSD")
     assert result["tone"] == "bearish"
+
 
 def test_news_sentiment_fail_open():
     mi = _intel()
@@ -253,6 +269,7 @@ def test_news_sentiment_fail_open():
     assert result["symbol"] == "BTCUSD"
     assert result["tone"] == "neutral"
 
+
 def test_news_sentiment_cached():
     mi = _intel()
     sr = _mock_search_result()
@@ -260,6 +277,7 @@ def test_news_sentiment_cached():
         mi.get_news_sentiment("BTCUSD")
         mi.get_news_sentiment("BTCUSD")
     assert mock_search.call_count == 1
+
 
 def test_news_sentiment_different_symbols_cached_separately():
     mi = _intel()
@@ -330,11 +348,11 @@ def test_macro_context_cached():
 
 def test_context_returns_all_keys():
     mi = _intel()
-    mi.get_fear_greed     = MagicMock(return_value=None)               # type: ignore[method-assign]
-    mi.get_global_stats   = MagicMock(return_value=None)               # type: ignore[method-assign]
-    mi.get_trending       = MagicMock(return_value=[])                 # type: ignore[method-assign]
-    mi.get_news_sentiment = MagicMock(return_value={"tone": "neutral"})# type: ignore[method-assign]
-    mi.get_macro_context  = MagicMock(return_value={"overall_tone": "neutral", "topics": {}})  # type: ignore[method-assign]
+    mi.get_fear_greed = MagicMock(return_value=None)               # type: ignore[method-assign]
+    mi.get_global_stats = MagicMock(return_value=None)               # type: ignore[method-assign]
+    mi.get_trending = MagicMock(return_value=[])                 # type: ignore[method-assign]
+    mi.get_news_sentiment = MagicMock(return_value={"tone": "neutral"})  # type: ignore[method-assign]
+    mi.get_macro_context = MagicMock(return_value={"overall_tone": "neutral", "topics": {}})  # type: ignore[method-assign]
     ctx = mi.context("BTCUSD")
     assert "symbol" in ctx
     assert "fear_greed" in ctx
@@ -344,27 +362,29 @@ def test_context_returns_all_keys():
     assert "news_sentiment" in ctx
     assert "macro" in ctx
 
+
 def _stub_macro():
     return MagicMock(return_value={"overall_tone": "neutral", "topics": {}})
 
 
 def test_context_is_trending_detected():
     mi = _intel()
-    mi.get_fear_greed     = MagicMock(return_value=None)                # type: ignore[method-assign]
-    mi.get_global_stats   = MagicMock(return_value=None)                # type: ignore[method-assign]
-    mi.get_trending       = MagicMock(return_value=[TrendingCoin(1, "Bitcoin", "BTC", 1)])  # type: ignore[method-assign]
+    mi.get_fear_greed = MagicMock(return_value=None)                # type: ignore[method-assign]
+    mi.get_global_stats = MagicMock(return_value=None)                # type: ignore[method-assign]
+    mi.get_trending = MagicMock(return_value=[TrendingCoin(1, "Bitcoin", "BTC", 1)])  # type: ignore[method-assign]
     mi.get_news_sentiment = MagicMock(return_value={})                  # type: ignore[method-assign]
-    mi.get_macro_context  = _stub_macro()                               # type: ignore[method-assign]
+    mi.get_macro_context = _stub_macro()                               # type: ignore[method-assign]
     ctx = mi.context("BTCUSD")
     assert ctx["is_trending"] is True
 
+
 def test_context_not_trending():
     mi = _intel()
-    mi.get_fear_greed     = MagicMock(return_value=None)                # type: ignore[method-assign]
-    mi.get_global_stats   = MagicMock(return_value=None)                # type: ignore[method-assign]
-    mi.get_trending       = MagicMock(return_value=[TrendingCoin(1, "Pepe", "PEPE", 50)])  # type: ignore[method-assign]
+    mi.get_fear_greed = MagicMock(return_value=None)                # type: ignore[method-assign]
+    mi.get_global_stats = MagicMock(return_value=None)                # type: ignore[method-assign]
+    mi.get_trending = MagicMock(return_value=[TrendingCoin(1, "Pepe", "PEPE", 50)])  # type: ignore[method-assign]
     mi.get_news_sentiment = MagicMock(return_value={})                  # type: ignore[method-assign]
-    mi.get_macro_context  = _stub_macro()                               # type: ignore[method-assign]
+    mi.get_macro_context = _stub_macro()                               # type: ignore[method-assign]
     ctx = mi.context("BTCUSD")
     assert ctx["is_trending"] is False
 
@@ -375,6 +395,7 @@ def test_status_empty():
     mi = _intel()
     s = mi.status()
     assert s["cached_keys"] == []
+
 
 def test_status_after_fetch():
     mi = _intel()
@@ -392,6 +413,7 @@ def test_singleton_same_instance():
     m2 = get_market_intel()
     assert m1 is m2
     reset_market_intel()
+
 
 def test_reset_clears_singleton():
     reset_market_intel()

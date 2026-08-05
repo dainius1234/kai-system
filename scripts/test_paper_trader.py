@@ -175,6 +175,7 @@ def test_close_records_duration(tmp_path):
 def test_close_trust_denied_raises(tmp_path):
     t = PaperTrader(data_dir=tmp_path)
     call_count = [0]
+
     def _trust(*a, **kw):
         call_count[0] += 1
         if call_count[0] > 1:   # allow open, deny close

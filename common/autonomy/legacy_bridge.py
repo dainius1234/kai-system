@@ -41,14 +41,14 @@ ENFORCE_ENV = "KAI_AUTONOMY_ENFORCE"
 # A capability absent from this map has no scoped equivalent yet and is
 # treated as un-migrated.
 CAPABILITY_DOMAINS: Dict[str, Tuple[str, str]] = {
-    "paper_trade_open":  ("paper_trade_open", "trading"),
+    "paper_trade_open": ("paper_trade_open", "trading"),
     "paper_trade_close": ("paper_trade_close", "trading"),
-    "auto_trade":        ("auto_trade", "trading"),
-    "web_scout":         ("web_fetch", "research"),
-    "web_search":        ("web_search", "research"),
-    "model_council":     ("model_council", "reasoning"),
-    "chat":              ("chat", "conversation"),
-    "advise":            ("advise", "conversation"),
+    "auto_trade": ("auto_trade", "trading"),
+    "web_scout": ("web_fetch", "research"),
+    "web_search": ("web_search", "research"),
+    "model_council": ("model_council", "reasoning"),
+    "chat": ("chat", "conversation"),
+    "advise": ("advise", "conversation"),
 }
 
 

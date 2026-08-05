@@ -21,6 +21,7 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("sysmetrics")
+
     class ErrorBudget:
         def __init__(self, **_): pass
         def record(self, *_, **__): pass

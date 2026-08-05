@@ -35,9 +35,9 @@ from typing import Any, Dict, List, Optional, Tuple
 logger = logging.getLogger("kai.wisdom_ingestion")
 
 _DATA_DIR = Path("data/wisdom")
-_PENDING_FILE  = _DATA_DIR / "pending.json"
+_PENDING_FILE = _DATA_DIR / "pending.json"
 _CONFIRMED_FILE = _DATA_DIR / "confirmed.json"
-_REJECTED_FILE  = _DATA_DIR / "rejected.json"
+_REJECTED_FILE = _DATA_DIR / "rejected.json"
 
 
 # ── Wisdom extract unit ───────────────────────────────────────────────────────
@@ -47,7 +47,7 @@ class WisdomExtract:
     extract_id: str
     category: str      # "value" | "principle" | "boundary" | "stance"
     domain: str        # "family" | "financial" | "ethical" | "relational" |
-                       # "existential" | "identity" | "operational"
+    # "existential" | "identity" | "operational"
     content: str       # the extracted, normalised statement
     source_quote: str  # the original text it was derived from
     confidence: float  # 0.0–1.0
@@ -139,7 +139,7 @@ def _extract_from_text(text: str) -> List[WisdomExtract]:
             continue
         # Use a small context window around the match as source_quote
         start = max(0, m.start() - 30)
-        end   = min(len(text), m.end() + 30)
+        end = min(len(text), m.end() + 30)
         source_quote = text[start:end].strip()
         content = _clean(m.group(0))
         if content in seen_content:
@@ -165,13 +165,13 @@ class WisdomIngestor:
     def __init__(self, data_dir: Optional[Path] = None) -> None:
         self._dir = data_dir or _DATA_DIR
         self._dir.mkdir(parents=True, exist_ok=True)
-        self._pending:   List[WisdomExtract] = self._load(_PENDING_FILE if data_dir is None else data_dir / "pending.json")
+        self._pending: List[WisdomExtract] = self._load(_PENDING_FILE if data_dir is None else data_dir / "pending.json")
         self._confirmed: List[WisdomExtract] = self._load(_CONFIRMED_FILE if data_dir is None else data_dir / "confirmed.json")
-        self._rejected:  List[WisdomExtract] = self._load(_REJECTED_FILE if data_dir is None else data_dir / "rejected.json")
+        self._rejected: List[WisdomExtract] = self._load(_REJECTED_FILE if data_dir is None else data_dir / "rejected.json")
 
-    def _pending_path(self) -> Path:    return self._dir / "pending.json"
-    def _confirmed_path(self) -> Path:  return self._dir / "confirmed.json"
-    def _rejected_path(self) -> Path:   return self._dir / "rejected.json"
+    def _pending_path(self) -> Path: return self._dir / "pending.json"
+    def _confirmed_path(self) -> Path: return self._dir / "confirmed.json"
+    def _rejected_path(self) -> Path: return self._dir / "rejected.json"
 
     def _load(self, path: Path) -> List[WisdomExtract]:
         if path.exists():

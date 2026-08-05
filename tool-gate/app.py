@@ -163,6 +163,7 @@ def _mode_conviction_offset(mode: str) -> float:
     """Extra conviction a mode demands on top of the base requirement."""
     return {"PUB": _PUB_CONVICTION_OFFSET, "WORK": _WORK_CONVICTION_OFFSET}.get(mode, 0.0)
 
+
 # pending co-sign requests waiting for operator approval
 _pending_cosign: Dict[str, Dict[str, Any]] = {}
 
@@ -200,6 +201,7 @@ def _shared_idem_unavailable() -> bool:
     if _idem_shared_ok:
         return False
     return (time.time() - _idem_shared_failed_at) >= _IDEM_GRACE_SECONDS
+
 
 # idempotency cache — maps key → (GateDecision, expiry_timestamp)
 _IDEMPOTENCY_TTL = int(os.getenv("IDEMPOTENCY_TTL_SECONDS", "300"))

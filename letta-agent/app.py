@@ -12,11 +12,11 @@ from common.runtime import setup_json_logger
 
 # ── ENV ──────────────────────────────────────────────────────────────
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://ollama:11434")
-LETTA_MODEL     = os.getenv("LETTA_MODEL", "qwen2.5:0.5b")
+LETTA_MODEL = os.getenv("LETTA_MODEL", "qwen2.5:0.5b")
 EMBEDDING_MODEL = os.getenv("LETTA_EMBEDDING_MODEL", "all-minilm")
-EMBEDDING_DIM   = int(os.getenv("LETTA_EMBEDDING_DIM", "384"))
-CONTEXT_WINDOW  = int(os.getenv("LETTA_CONTEXT_WINDOW", "32768"))
-PORT            = int(os.getenv("PORT", "8062"))
+EMBEDDING_DIM = int(os.getenv("LETTA_EMBEDDING_DIM", "384"))
+CONTEXT_WINDOW = int(os.getenv("LETTA_CONTEXT_WINDOW", "32768"))
+PORT = int(os.getenv("PORT", "8062"))
 
 # Letta reads LETTA_BASE_PATH at import time to locate its SQLite store.
 # Set it before any letta import so the agent's working memory lands in our

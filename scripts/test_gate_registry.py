@@ -262,6 +262,7 @@ def test_a_return_that_refuses_is_not_counted_as_a_skip():
     """
     scenario("ast-refusal")
     import ast
+
     def first_stmt(src):
         return ast.parse(src).body[0]
     skips = ["continue" if False else "return", "return None", "return []",

@@ -145,7 +145,7 @@ class TestShellSandboxBlocked(unittest.TestCase):
 
     def test_python_blocked(self):
         r = client.post("/run", json={"command": "python3 -c 'import os; os.system(\"id\")'"}
-)
+                        )
         self.assertEqual(r.status_code, 403)
 
     def test_sudo_blocked(self):

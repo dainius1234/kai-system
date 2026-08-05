@@ -62,7 +62,7 @@ def _service(root: Path, directory: str, entry: str, enforces: bool) -> None:
     body = ("from fastapi import Depends\n"
             "@app.post('/x', dependencies=[Depends(require_service_auth('x'))])\n"
             "def handler():\n    return {}\n") if enforces else (
-            "@app.post('/x')\ndef handler():\n    return {}\n")
+        "@app.post('/x')\ndef handler():\n    return {}\n")
     (d / entry).write_text(body, encoding="utf-8")
     (d / "Dockerfile").write_text(
         f'FROM python:3.11\nCMD ["python", "{entry}"]\n', encoding="utf-8")

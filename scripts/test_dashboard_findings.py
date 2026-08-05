@@ -457,7 +457,6 @@ def test_manual_placeholders_can_never_report_closed():
           tagged == reported, f"tagged={tagged} reported={reported}")
 
 
-
 # ── Discovered-findings register ─────────────────────────────────────
 
 def test_discovered_register_is_separate_from_the_96():
@@ -536,7 +535,6 @@ def test_d01_is_remediated_on_the_real_tree():
           status == dash.REMEDIATED, f"{status}: {detail}")
 
 
-
 def test_dash_023_flips_on_hard_coded_identity():
     hard = """
 async def api_memories_recent(top_k):
@@ -590,7 +588,6 @@ def test_track_c_has_no_live_findings():
     live = [r["finding"] for r in dash.evaluate()
             if r["track"] == "C" and r["status"] == dash.LIVE]
     check("Track C is clear of LIVE findings", not live, str(live))
-
 
 
 # ── Track D — failure semantics ──────────────────────────────────────
@@ -802,7 +799,6 @@ def test_track_d_has_no_live_findings():
     live = [r["finding"] for r in dash.evaluate()
             if r["track"] == "D" and r["status"] == dash.LIVE]
     check("Track D is clear of LIVE findings", not live, str(live))
-
 
 
 # ── Shared-resilience findings (014, 015, 075, 076) ──────────────────

@@ -30,7 +30,7 @@ def _make_psutil_stub():
 
     vm = MagicMock()
     vm.total = 16_000_000_000
-    vm.used  = 4_000_000_000
+    vm.used = 4_000_000_000
     vm.available = 12_000_000_000
     vm.percent = 25.0
 
@@ -46,8 +46,8 @@ def _make_psutil_stub():
 
     usage = MagicMock()
     usage.total = 500_000_000_000
-    usage.used  = 100_000_000_000
-    usage.free  = 400_000_000_000
+    usage.used = 100_000_000_000
+    usage.free = 400_000_000_000
     usage.percent = 20.0
 
     def disk_usage(path):

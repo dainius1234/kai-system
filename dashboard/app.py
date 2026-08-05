@@ -88,7 +88,7 @@ app = FastAPI(title="Sovereign Dashboard", version="0.4.0")
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
 TOOL_GATE_URL = backend_url("TOOL_GATE_URL", "http://tool-gate:8000")
-VERIFIER_URL   = backend_url("VERIFIER_URL", "http://verifier:8052")
+VERIFIER_URL = backend_url("VERIFIER_URL", "http://verifier:8052")
 # Store-maintenance reads (stats/search-by-category/quarantine listing) live on
 # memu-core-introspect, split out from memu-core's hot path — see DECISIONS.md D21.
 MEMU_INTROSPECT_URL = backend_url("MEMU_INTROSPECT_URL", "http://memu-core-introspect:8009")
@@ -256,7 +256,7 @@ async def api_set_mode(body: Dict[str, Any] = Body(...)):
 
 
 @app.get("/api/nudges",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_nudges():
     memu_url = backend_url("MEMU_URL", "http://memu-core:8001")
     try:
@@ -271,7 +271,7 @@ async def api_nudges():
 
 
 @app.get("/api/backup-status",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_backup_status():
     """Report the most recent backup that actually exists.
 
@@ -310,7 +310,7 @@ async def api_backup_status():
 
 
 @app.get("/api/corrections",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_corrections():
     verifier_url = backend_url("VERIFIER_URL", "http://verifier:8052")
     try:
@@ -369,6 +369,7 @@ if _executor_url:
 _wake_url = backend_url("WAKE_URL", "", optional=True)
 if _wake_url:
     NODES["wake-service"] = _wake_url + "/health"
+
 
 def _as_number(value: Any, cast=float, default: Any = None) -> Any:
     """Coerce a backend-supplied number, returning `default` if it is not.
@@ -701,7 +702,7 @@ async def metrics() -> Dict[str, float]:
 
 
 @app.get("/",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def index() -> Dict[str, object]:
     statuses = await fetch_status()
     alive_nodes = [name for name, payload in statuses.items() if payload.get("status") == "ok"]
@@ -798,7 +799,7 @@ async def index() -> Dict[str, object]:
 
 
 @app.get("/go-no-go",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def go_no_go():
     """Return the go/no-go report, with a status a machine can enforce.
 
@@ -842,7 +843,7 @@ refresh();
 
 
 @app.get("/fleet",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def fleet() -> Dict[str, Any]:
     """Proxy the supervisor's fleet health view into the dashboard."""
     try:
@@ -855,7 +856,7 @@ async def fleet() -> Dict[str, Any]:
 
 
 @app.get("/readiness",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def readiness() -> Dict[str, Any]:
     """Bounded readiness check.
 
@@ -930,7 +931,7 @@ async def api_thinking(
 
 
 @app.get("/api/tempo",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_tempo():
     """Proxy operator tempo from memu-core."""
     try:
@@ -943,7 +944,7 @@ async def api_tempo():
 
 
 @app.get("/api/boundary",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_boundary():
     """Proxy knowledge boundary map from memu-core."""
     try:
@@ -956,7 +957,7 @@ async def api_boundary():
 
 
 @app.get("/api/silence",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_silence():
     """Proxy silence-as-signal data from memu-core."""
     try:
@@ -969,7 +970,7 @@ async def api_silence():
 
 
 @app.get("/api/self-assessment",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_self_assessment():
     """Proxy temporal self-model from heartbeat."""
     try:
@@ -996,7 +997,7 @@ async def api_dream():
 
 
 @app.get("/api/ledger-stats",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_ledger_stats():
     """Proxy ledger statistics from ledger-worker."""
     ledger_url = backend_url("LEDGER_WORKER_URL", "http://ledger-worker:8056")
@@ -1105,7 +1106,7 @@ async def _publish_event(channel: str, data: dict) -> bool:
 
 
 @app.get("/api/events",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def sse_events(
     request: Request,
     principal: DashboardPrincipal = Depends(
@@ -1196,7 +1197,7 @@ async def sse_events(
 
 
 @app.get("/api/security-audit",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_security_audit():
     """Proxy security self-hacking audit from agentic-introspect."""
     introspect_url = backend_url("AGENTIC_INTROSPECT_URL", "http://agentic-introspect:8023")
@@ -1212,7 +1213,7 @@ async def api_security_audit():
 # ── P16 API proxies ─────────────────────────────────────────────────
 
 @app.get("/api/goals",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_goals():
     """Proxy Ohana goals from memu-core."""
     try:
@@ -1253,7 +1254,7 @@ async def api_goals_update(request: Request):
 
 
 @app.get("/api/drift",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_drift():
     """Proxy drift detection from memu-core."""
     try:
@@ -1296,7 +1297,7 @@ async def api_memories(
 
 
 @app.get("/api/memory/stats",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_memory_stats():
     """Proxy memory statistics from memu-core-introspect."""
     try:
@@ -1385,7 +1386,7 @@ async def api_memory_graph_data(
 
 
 @app.get("/api/finance/summary",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_finance_summary():
     """Proxy CIS/VAT/tax financial summary from the financial-awareness service (P29)."""
     return await _proxy_get(f"{FINANCIAL_URL}/finance/summary", fallback={
@@ -1398,7 +1399,7 @@ async def api_finance_summary():
 
 
 @app.get("/api/finance/cis",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_finance_cis():
     """Proxy CIS YTD summary from the financial-awareness service."""
     return await _proxy_get(f"{FINANCIAL_URL}/finance/cis/summary", fallback={"status": "unavailable"})
@@ -1416,7 +1417,7 @@ AGENTIC_URL = backend_url("LANGGRAPH_URL", "http://agentic:8007")
 
 
 @app.get("/api/soul",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_soul_get():
     """Return current SOUL.md content from agentic."""
     return await _proxy_get(f"{AGENTIC_URL}/soul", fallback={"status": "unavailable", "content": ""})
@@ -1431,7 +1432,7 @@ async def api_soul_post(request: Request):
 
 
 @app.get("/api/agents-registry",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_agents_registry_get():
     """Return current AGENTS.md content from agentic."""
     return await _proxy_get(f"{AGENTIC_URL}/agents-registry", fallback={"status": "unavailable", "content": ""})
@@ -1458,7 +1459,7 @@ async def api_pii_scan(request: Request):
 
 
 @app.get("/api/struggle",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_struggle(session_id: str = "default"):
     """Proxy struggle detection from memu-core."""
     try:
@@ -1485,7 +1486,7 @@ async def api_feedback(request: Request):
 
 
 @app.get("/api/feedback/stats",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_feedback_stats():
     """Proxy feedback stats from memu-core."""
     try:
@@ -1498,7 +1499,7 @@ async def api_feedback_stats():
 
 
 @app.get("/api/logs",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_logs(limit: int = Query(100, ge=1, le=500), level: str = "", since: float = Query(0, ge=0)):
     """Aggregate logs from memu-core (and potentially other services)."""
     all_logs: list = []
@@ -1549,7 +1550,7 @@ async def proxy_emotion_record(request: Request):
 
 
 @app.get("/api/emotion/timeline",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_emotion_timeline(
     session_id: str | None = None,
     limit: int = Query(50, ge=1, le=500),
@@ -1569,14 +1570,14 @@ async def proxy_reflect(request: Request):
 
 
 @app.get("/api/reflections",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_reflections(limit: int = Query(10, ge=1, le=500)):
     return await _proxy_get(f"{MEMU_URL}/memory/self-reflections", params={"limit": limit},
                             fallback={"entries": [], "count": 0})
 
 
 @app.get("/api/relationship",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_relationship():
     return await _proxy_get(f"{MEMU_URL}/memory/relationship")
 
@@ -1589,13 +1590,13 @@ async def proxy_milestone(request: Request):
 
 
 @app.get("/api/confidence",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_confidence():
     return await _proxy_get(f"{MEMU_URL}/memory/confidence")
 
 
 @app.get("/api/eq/summary",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_eq_summary():
     return await _proxy_get(f"{MEMU_URL}/memory/eq/summary")
 
@@ -1617,26 +1618,26 @@ async def proxy_autobiography_record(request: Request):
 
 
 @app.get("/api/autobiography",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_autobiography(request: Request):
     return await _proxy_get(f"{MEMU_URL}/memory/autobiography", params=dict(request.query_params),
                             fallback={"entries": [], "count": 0})
 
 
 @app.get("/api/identity",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_identity():
     return await _proxy_get(f"{MEMU_URL}/memory/identity")
 
 
 @app.get("/api/story-arcs",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_story_arcs():
     return await _proxy_get(f"{MEMU_URL}/memory/story-arcs", fallback={"arcs": []})
 
 
 @app.get("/api/future-self",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_future_self():
     return await _proxy_get(f"{MEMU_URL}/memory/future-self")
 
@@ -1649,14 +1650,14 @@ async def proxy_legacy_write(request: Request):
 
 
 @app.get("/api/legacy",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_legacy(request: Request):
     return await _proxy_get(f"{MEMU_URL}/memory/legacy", params=dict(request.query_params),
                             fallback={"messages": []})
 
 
 @app.get("/api/narrative/summary",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_narrative_summary():
     return await _proxy_get(f"{MEMU_URL}/memory/narrative/summary")
 
@@ -1671,7 +1672,7 @@ async def proxy_counterfactual(request: Request):
 
 
 @app.get("/api/imagine/counterfactuals",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_counterfactuals():
     return await _proxy_get(f"{MEMU_URL}/memory/imagine/counterfactuals", fallback={"entries": []})
 
@@ -1684,7 +1685,7 @@ async def proxy_empathize(request: Request):
 
 
 @app.get("/api/imagine/empathy-map",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_empathy_map():
     return await _proxy_get(f"{MEMU_URL}/memory/imagine/empathy-map")
 
@@ -1697,7 +1698,7 @@ async def proxy_synthesize(request: Request):
 
 
 @app.get("/api/imagine/ideas",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_ideas():
     return await _proxy_get(f"{MEMU_URL}/memory/imagine/ideas", fallback={"ideas": []})
 
@@ -1710,7 +1711,7 @@ async def proxy_thought(request: Request):
 
 
 @app.get("/api/imagine/inner-monologue",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_inner_monologue():
     return await _proxy_get(f"{MEMU_URL}/memory/imagine/inner-monologue", fallback={"entries": []})
 
@@ -1723,13 +1724,13 @@ async def proxy_aspire(request: Request):
 
 
 @app.get("/api/imagine/aspirations",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_aspirations():
     return await _proxy_get(f"{MEMU_URL}/memory/imagine/aspirations", fallback={"entries": []})
 
 
 @app.get("/api/imagine/summary",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_imagination_summary():
     return await _proxy_get(f"{MEMU_URL}/memory/imagine/summary")
 
@@ -1744,7 +1745,7 @@ async def proxy_values_learn(request: Request):
 
 
 @app.get("/api/values",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_values():
     return await _proxy_get(f"{MEMU_URL}/memory/values", fallback={"values": []})
 
@@ -1757,7 +1758,7 @@ async def proxy_conscience_check(request: Request):
 
 
 @app.get("/api/conscience/audit",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_conscience_audit():
     return await _proxy_get(f"{MEMU_URL}/memory/conscience/audit")
 
@@ -1770,7 +1771,7 @@ async def proxy_loyalty_record(request: Request):
 
 
 @app.get("/api/loyalty",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_loyalty():
     return await _proxy_get(f"{MEMU_URL}/memory/loyalty", fallback={"entries": []})
 
@@ -1783,13 +1784,13 @@ async def proxy_gratitude_record(request: Request):
 
 
 @app.get("/api/gratitude",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_gratitude():
     return await _proxy_get(f"{MEMU_URL}/memory/gratitude", fallback={"entries": []})
 
 
 @app.get("/api/conscience/summary",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_conscience_summary():
     return await _proxy_get(f"{MEMU_URL}/memory/conscience/summary")
 
@@ -1797,7 +1798,7 @@ async def proxy_conscience_summary():
 # ── P21: Proactive Agent Loop proxies (H1.7: all wrapped) ───────────
 
 @app.get("/api/actions",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_actions():
     return await _proxy_get(f"{MEMU_URL}/memory/actions", fallback={"actions": []})
 
@@ -1809,7 +1810,7 @@ async def proxy_schedule_task(body: dict):
 
 
 @app.get("/api/schedule/tasks",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_schedule_tasks():
     return await _proxy_get(f"{MEMU_URL}/memory/schedule/tasks", fallback={"tasks": []})
 
@@ -1827,7 +1828,7 @@ async def proxy_set_reminder(body: dict):
 
 
 @app.get("/api/reminders",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_reminders():
     return await _proxy_get(f"{MEMU_URL}/memory/reminders", fallback={"reminders": []})
 
@@ -1851,7 +1852,7 @@ async def proxy_evening_checkin():
 
 
 @app.get("/api/agent/summary",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_agent_summary():
     return await _proxy_get(f"{MEMU_URL}/memory/agent/summary")
 
@@ -1865,7 +1866,7 @@ async def proxy_echo_analyse(body: Dict[str, Any] = Body(...)):
 
 
 @app.get("/api/echo/history",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_echo_history():
     return await _proxy_get(f"{MEMU_URL}/memory/echo/history", fallback={"entries": []})
 
@@ -1877,7 +1878,7 @@ async def proxy_nudge_escalate(body: Dict[str, Any] = Body(...)):
 
 
 @app.get("/api/nudge/ladder",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_nudge_ladder():
     return await _proxy_get(f"{MEMU_URL}/memory/nudge/ladder", fallback={"ladder": {}})
 
@@ -1889,7 +1890,7 @@ async def proxy_cross_mode_scan(body: Dict[str, Any] = Body(...)):
 
 
 @app.get("/api/cross-mode",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_cross_mode():
     return await _proxy_get(f"{MEMU_URL}/memory/cross-mode", fallback={"insights": []})
 
@@ -1901,7 +1902,7 @@ async def proxy_oracle_predict(body: Dict[str, Any] = Body(...)):
 
 
 @app.get("/api/oracle/chains",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_oracle_chains():
     return await _proxy_get(f"{MEMU_URL}/memory/oracle/chains", fallback={"chains": []})
 
@@ -1913,13 +1914,13 @@ async def proxy_shadow_branch(body: Dict[str, Any] = Body(...)):
 
 
 @app.get("/api/shadow/branches",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_shadow_branches():
     return await _proxy_get(f"{MEMU_URL}/memory/shadow/branches", fallback={"branches": []})
 
 
 @app.get("/api/operator-model",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def proxy_operator_model():
     return await _proxy_get(f"{MEMU_URL}/memory/operator-model")
 
@@ -2225,7 +2226,7 @@ async def api_browser_run(request: Request):
 
 
 @app.get("/api/browser/screenshot",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_browser_screenshot():
     from fastapi.responses import Response as FastAPIResponse
     try:
@@ -2302,19 +2303,19 @@ async def api_clipboard_push(request: Request):
 
 
 @app.get("/api/clipboard/latest",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_clipboard_latest():
     return await _proxy_get(f"{CLIPBOARD_URL}/latest", fallback={"content": "", "id": None})
 
 
 @app.get("/api/clipboard/history",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_clipboard_history(limit: int = Query(20, ge=1, le=500)):
     return await _proxy_get(f"{CLIPBOARD_URL}/history", params={"limit": limit}, fallback={"entries": []})
 
 
 @app.delete("/api/clipboard/history",
-          dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
+            dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_clipboard_clear():
     try:
         async with pooled_client(timeout=5.0) as client:
@@ -2328,7 +2329,7 @@ async def api_clipboard_clear():
 # ── File Watcher proxies ───────────────────────────────────────────────────────
 
 @app.get("/api/files/events",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_files_events(limit: int = Query(50, ge=1, le=500), event_type: str = ""):
     params: dict = {"limit": limit}
     if event_type:
@@ -2337,7 +2338,7 @@ async def api_files_events(limit: int = Query(50, ge=1, le=500), event_type: str
 
 
 @app.get("/api/files/watching",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_files_watching():
     return await _proxy_get(f"{FILES_URL}/watching", fallback={"directories": []})
 
@@ -2359,14 +2360,14 @@ async def api_notify_send(request: Request):
 
 
 @app.get("/api/notify/pending",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_notify_pending(unread_only: bool = True):
     return await _proxy_get(f"{NOTIFY_URL}/pending", params={"unread_only": unread_only},
                             fallback={"notifications": []})
 
 
 @app.delete("/api/notify/pending/{notification_id}",
-          dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
+            dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_notify_dismiss(notification_id: int):
     try:
         async with pooled_client(timeout=5.0) as client:
@@ -2378,7 +2379,7 @@ async def api_notify_dismiss(notification_id: int):
 
 
 @app.delete("/api/notify/pending",
-          dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
+            dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_notify_dismiss_all():
     try:
         async with pooled_client(timeout=5.0) as client:
@@ -2392,7 +2393,7 @@ async def api_notify_dismiss_all():
 # ── Monitor proxies ───────────────────────────────────────────────────────────
 
 @app.get("/api/monitor/rules",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_monitor_rules():
     return await _proxy_get(f"{MONITOR_URL}/rules", fallback={"rules": [], "total": 0})
 
@@ -2405,7 +2406,7 @@ async def api_monitor_add_rule(request: Request):
 
 
 @app.delete("/api/monitor/rules/{rule_id}",
-          dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
+            dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_monitor_delete_rule(rule_id: str):
     try:
         async with pooled_client(timeout=10.0) as client:
@@ -2435,13 +2436,13 @@ async def api_monitor_check_rule(rule_id: str):
 
 
 @app.get("/api/monitor/alerts",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_monitor_alerts(limit: int = Query(50, ge=1, le=500)):
     return await _proxy_get(f"{MONITOR_URL}/alerts", params={"limit": limit}, fallback={"alerts": [], "total": 0})
 
 
 @app.delete("/api/monitor/alerts",
-          dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
+            dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_monitor_clear_alerts():
     try:
         async with pooled_client(timeout=10.0) as client:
@@ -2453,7 +2454,7 @@ async def api_monitor_clear_alerts():
 
 
 @app.get("/api/monitor/status",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_monitor_status():
     return await _proxy_get(f"{MONITOR_URL}/status", fallback={})
 
@@ -2481,53 +2482,53 @@ async def api_browser_search(request: Request):
 # ── Broker bridge proxies ─────────────────────────────────────────────────────
 
 @app.get("/api/broker/health",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_broker_health():
     return await _proxy_get(f"{BROKER_URL}/health", fallback={"status": "unavailable"})
 
 
 @app.get("/api/broker/ticker/{symbol}",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_broker_ticker(symbol: str):
     symbol = safe_symbol(symbol)
     return await _proxy_get(f"{BROKER_URL}/ticker/{symbol}", fallback={})
 
 
 @app.get("/api/broker/ticker",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_broker_tickers(symbols: str = ""):
     params = {"symbols": symbols} if symbols else {}
     return await _proxy_get(f"{BROKER_URL}/ticker", params=params, fallback={"tickers": []})
 
 
 @app.get("/api/broker/balance",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_broker_balance():
     return await _proxy_get(f"{BROKER_URL}/balance", fallback={"assets": []})
 
 
 @app.get("/api/broker/positions",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_broker_positions():
     return await _proxy_get(f"{BROKER_URL}/positions", fallback={"positions": []})
 
 
 @app.get("/api/broker/orders",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_broker_orders(symbol: str = ""):
     params = {"symbol": symbol} if symbol else {}
     return await _proxy_get(f"{BROKER_URL}/orders", params=params, fallback={"orders": []})
 
 
 @app.get("/api/broker/pnl",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_broker_pnl():
     return await _proxy_get(f"{BROKER_URL}/pnl/summary",
                             fallback={"total_unrealized_pnl": None, "positions": []})
 
 
 @app.get("/api/broker/templates",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_broker_templates():
     return await _proxy_get(f"{BROKER_URL}/templates", fallback={"templates": []})
 
@@ -2570,19 +2571,19 @@ async def api_broker_watch(request: Request):
 # ── Sysmetrics proxies ────────────────────────────────────────────────────────
 
 @app.get("/api/sysmetrics/health",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_sysmetrics_health():
     return await _proxy_get(f"{SYSMETRICS_URL}/health", fallback={"status": "unavailable"})
 
 
 @app.get("/api/sysmetrics/snapshot",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_sysmetrics_snapshot():
     return await _proxy_get(f"{SYSMETRICS_URL}/snapshot", fallback={})
 
 
 @app.get("/api/sysmetrics/processes",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_sysmetrics_processes():
     return await _proxy_get(f"{SYSMETRICS_URL}/processes", fallback={"processes": []})
 
@@ -2590,13 +2591,13 @@ async def api_sysmetrics_processes():
 # ── Screen-watcher proxies ────────────────────────────────────────────────────
 
 @app.get("/api/screen-watcher/health",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_screen_watcher_health():
     return await _proxy_get(f"{SCREEN_WATCHER_URL}/health", fallback={"status": "unavailable"})
 
 
 @app.get("/api/screen-watcher/status",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_screen_watcher_status():
     return await _proxy_get(f"{SCREEN_WATCHER_URL}/status", fallback={})
 
@@ -2617,19 +2618,19 @@ async def api_screen_watcher_stop():
 # ── Email-reader proxies ──────────────────────────────────────────────────────
 
 @app.get("/api/email/health",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_email_health():
     return await _proxy_get(f"{EMAIL_READER_URL}/health", fallback={"status": "unavailable"})
 
 
 @app.get("/api/email/inbox",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_email_inbox(limit: int = Query(20, ge=1, le=500)):
     return await _proxy_get(f"{EMAIL_READER_URL}/inbox", params={"limit": limit}, fallback={"messages": []})
 
 
 @app.get("/api/email/unread",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_SENSITIVE))])
 async def api_email_unread():
     return await _proxy_get(f"{EMAIL_READER_URL}/unread", fallback={"unread_count": 0, "sample": []})
 
@@ -2643,13 +2644,13 @@ async def api_email_refresh():
 # ── News-feed proxies ─────────────────────────────────────────────────────────
 
 @app.get("/api/news/health",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_news_health():
     return await _proxy_get(f"{NEWS_FEED_URL}/health", fallback={"status": "unavailable"})
 
 
 @app.get("/api/news/articles",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_news_articles(limit: int = Query(20, ge=1, le=500), tag: str = "", since_minutes: int = 0):
     params: dict = {"limit": limit}
     if tag:
@@ -2660,7 +2661,7 @@ async def api_news_articles(limit: int = Query(20, ge=1, le=500), tag: str = "",
 
 
 @app.get("/api/news/search",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_news_search(q: str = "", limit: int = Query(10, ge=1, le=500)):
     if not q:
         raise HTTPException(status_code=400, detail="q is required")
@@ -2674,7 +2675,7 @@ async def api_news_refresh():
 
 
 @app.get("/api/news/feeds",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_news_feeds():
     return await _proxy_get(f"{NEWS_FEED_URL}/feeds", fallback={"feeds": []})
 
@@ -2682,28 +2683,28 @@ async def api_news_feeds():
 # ── Broker market depth extensions ────────────────────────────────────────────
 
 @app.get("/api/broker/depth/{symbol}",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_broker_depth(symbol: str, limit: int = Query(20, ge=1, le=500)):
     symbol = safe_symbol(symbol)
     return await _proxy_get(f"{BROKER_URL}/depth/{symbol}", params={"limit": limit}, fallback={})
 
 
 @app.get("/api/broker/stats/{symbol}",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_broker_stats(symbol: str):
     symbol = safe_symbol(symbol)
     return await _proxy_get(f"{BROKER_URL}/stats/24hr/{symbol}", fallback={})
 
 
 @app.get("/api/broker/trades/{symbol}",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_broker_trades(symbol: str, limit: int = Query(20, ge=1, le=500)):
     symbol = safe_symbol(symbol)
     return await _proxy_get(f"{BROKER_URL}/trades/{symbol}", params={"limit": limit}, fallback={"trades": []})
 
 
 @app.get("/api/broker/stocks/{symbol}",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def broker_stocks(symbol: str):
     symbol = safe_symbol(symbol)
     async with pooled_client(timeout=15.0) as client:
@@ -2713,7 +2714,7 @@ async def broker_stocks(symbol: str):
 
 
 @app.get("/api/broker/forex/{pair}",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def broker_forex(pair: str):
     pair = safe_symbol(pair, "pair")
     async with pooled_client(timeout=15.0) as client:
@@ -2725,25 +2726,25 @@ async def broker_forex(pair: str):
 # ── Weather service proxies ───────────────────────────────────────────────────
 
 @app.get("/api/weather/health",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_weather_health():
     return await _proxy_get(f"{WEATHER_SERVICE_URL}/health", fallback={"status": "unavailable"})
 
 
 @app.get("/api/weather/current",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_weather_current():
     return await _proxy_get(f"{WEATHER_SERVICE_URL}/current", fallback={})
 
 
 @app.get("/api/weather/forecast",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_weather_forecast():
     return await _proxy_get(f"{WEATHER_SERVICE_URL}/forecast", fallback={"forecast": []})
 
 
 @app.get("/api/weather/summary",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_weather_summary():
     return await _proxy_get(f"{WEATHER_SERVICE_URL}/summary", fallback={"summary": "Weather unavailable."})
 
@@ -2751,25 +2752,25 @@ async def api_weather_summary():
 # ── Docker-watcher proxies ────────────────────────────────────────────────────
 
 @app.get("/api/docker/health",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_docker_health():
     return await _proxy_get(f"{DOCKER_WATCHER_URL}/health", fallback={"status": "unavailable"})
 
 
 @app.get("/api/docker/containers",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_docker_containers():
     return await _proxy_get(f"{DOCKER_WATCHER_URL}/containers", fallback={"containers": [], "total": 0})
 
 
 @app.get("/api/docker/unhealthy",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_docker_unhealthy():
     return await _proxy_get(f"{DOCKER_WATCHER_URL}/unhealthy", fallback={"unhealthy": [], "count": 0})
 
 
 @app.get("/api/docker/summary",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_docker_summary():
     return await _proxy_get(f"{DOCKER_WATCHER_URL}/summary", fallback={"summary": "Docker data unavailable."})
 
@@ -2777,19 +2778,19 @@ async def api_docker_summary():
 # ── Air quality proxies ───────────────────────────────────────────────────────
 
 @app.get("/api/airquality/health",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_airquality_health():
     return await _proxy_get(f"{AIRQUALITY_URL}/health", fallback={"status": "unavailable"})
 
 
 @app.get("/api/airquality/current",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_airquality_current():
     return await _proxy_get(f"{AIRQUALITY_URL}/current", fallback={})
 
 
 @app.get("/api/airquality/summary",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_airquality_summary():
     return await _proxy_get(f"{AIRQUALITY_URL}/summary", fallback={"summary": "Air quality unavailable."})
 
@@ -2797,26 +2798,26 @@ async def api_airquality_summary():
 # ── Calendar service proxies ──────────────────────────────────────────────────
 
 @app.get("/api/calendar/health",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_calendar_health():
     return await _proxy_get(f"{CALENDAR_SERVICE_URL}/health", fallback={"status": "unavailable"})
 
 
 @app.get("/api/calendar/events/today",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_calendar_today():
     return await _proxy_get(f"{CALENDAR_SERVICE_URL}/events/today", fallback={"events": []})
 
 
 @app.get("/api/calendar/events/upcoming",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_calendar_upcoming(days: int = Query(7, ge=1, le=365)):
     return await _proxy_get(f"{CALENDAR_SERVICE_URL}/events/upcoming", params={"days": days},
                             fallback={"events": []})
 
 
 @app.get("/api/calendar/summary",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_calendar_summary():
     return await _proxy_get(f"{CALENDAR_SERVICE_URL}/summary", fallback={"summary": "Calendar not configured."})
 
@@ -2830,25 +2831,25 @@ async def api_calendar_refresh():
 # ── Git-watcher proxies ───────────────────────────────────────────────
 
 @app.get("/api/git/health",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_git_health():
     return await _proxy_get(f"{GIT_WATCHER_URL}/health", fallback={"status": "unavailable"})
 
 
 @app.get("/api/git/repos",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_git_repos():
     return await _proxy_get(f"{GIT_WATCHER_URL}/repos", fallback={"repos": [], "count": 0})
 
 
 @app.get("/api/git/dirty",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_git_dirty():
     return await _proxy_get(f"{GIT_WATCHER_URL}/dirty", fallback={"repos": [], "count": 0})
 
 
 @app.get("/api/git/summary",
-          dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
+         dependencies=[Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))])
 async def api_git_summary():
     return await _proxy_get(
         f"{GIT_WATCHER_URL}/summary", fallback={"summary": "Git data unavailable."}

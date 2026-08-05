@@ -254,7 +254,6 @@ def test_the_baseline_itself_is_checked():
           str(violations))
 
 
-
 # ── shared container names (KAI-GATE-031) ────────────────────────────
 # Docker container names are global to the daemon, not scoped to a
 # compose project, so two profiles that claim the same one cannot both be
