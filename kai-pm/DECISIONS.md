@@ -4791,3 +4791,54 @@ unscheduled by agreement.
 
 **Raised for the operator, not decided here:** whether `tool-gate` should
 fail closed when its shared idempotency store is unreachable.
+
+---
+
+## 2026-08-05 (addendum) — the fifth instance, and a detector that did not earn a gate
+
+Hunting for more of *"a list of what to check, maintained next to the
+thing that checks"*, per the operator's standing note.
+
+Wrote a scan for production constants that a test re-declares as a
+literal instead of importing. It reported five candidates. **Four were
+false positives** — the strings coincided because those tests exercise
+the values individually (`assert result["intent"] == "chat"`), not
+because they copy the set. One in five is not a gate; it is the same
+argument I applied to the isolation fingerprint an hour earlier, so the
+scan stays a one-off tool and is not wired into `make policy-check`.
+
+The first version of that scan also missed the one real instance,
+because the test file mentions `_SENSORY_SKIP` **in a comment** —
+"# Import _SENSORY_SKIP directly to verify membership" — and my guard
+read prose as a reference. Self-matching, class C, for the fourth time.
+Fixed by tokenising and discarding comments and string bodies before
+looking for the name.
+
+### The real one, and why fixing it once was not enough
+
+`scripts/test_kai_intelligence.py` carried a hand-typed copy of
+`agentic/app.py`'s `_SENSORY_SKIP`, twice. Pointed both at the real set,
+read by AST.
+
+Then mutation-tested it, and **it still passed with a phrase deleted from
+production**. Two of the seven phrases — `"no upcoming"` and
+`"not supported"` — were exercised by no sample, so the sample list was
+itself an unchecked hand-maintained list one layer down. The fix was not
+"import the constant", it was "make the constant the denominator": a
+third test now fails if any phrase in `_SENSORY_SKIP` has no sample
+covering it.
+
+Verified in both directions before committing — production growing a
+phrase fails it, and a sample ceasing to cover one fails it.
+
+The general shape, worth keeping: **pointing a test at the real thing
+does not make it a real test.** It has to be able to fail, and the only
+way to know is to make it fail on purpose.
+
+### A mistake of my own
+
+While mutation-testing I restored one file with `git checkout --` rather
+than from the backup copy I had made for the other, and discarded my own
+uncommitted work on it. Reapplied from the exact content. No repository
+history was touched, but the reflex was wrong: with uncommitted work in
+the tree, restore from the copy, never from the index.

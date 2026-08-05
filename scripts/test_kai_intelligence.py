@@ -6,6 +6,7 @@ Verifies:
 - matched_skill is injected into /chat message list
 - FF_CONTEXT_ENRICHMENT gates the 14-way gather
 """
+import ast
 import importlib.util
 import sys
 from pathlib import Path as _Path
@@ -67,6 +68,38 @@ def _common_stubs() -> dict:
     return stubs
 
 
+def _sensory_skip_set() -> set:
+    """The *real* `_SENSORY_SKIP`, read from agentic/app.py.
+
+    Both tests below used to carry a hand-typed copy of this set. They
+    agreed with production on the day they were written and would agree
+    forever after, because what they compared against was themselves: add
+    a phrase to `agentic/app.py` and these still passed; delete one and
+    these still passed.
+
+    Same defect in miniature as the dead-test detector's file list, the
+    deprecation rule's seven filenames and `hygiene_survey`'s COLUMNS
+    tuple — a list of what to check, kept next to the thing that checks,
+    drifting in silence.
+
+    Read by AST rather than imported because importing `agentic/app.py`
+    costs the whole dependency tree, and the tests further down this file
+    already read it as source.
+    """
+    tree = ast.parse((_REPO / "agentic" / "app.py").read_text(encoding="utf-8"))
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        target = node.targets[0]
+        if not (isinstance(target, ast.Name) and target.id == "_SENSORY_SKIP"):
+            continue
+        value = node.value
+        if isinstance(value, ast.Call) and value.args:
+            value = value.args[0]
+        return {e.value for e in value.elts if isinstance(e, ast.Constant)}
+    raise AssertionError("_SENSORY_SKIP no longer exists in agentic/app.py")
+
+
 class TestWorldContextFiltering(unittest.TestCase):
     """_sense_world() should skip trivial/error states."""
 
@@ -79,15 +112,44 @@ class TestWorldContextFiltering(unittest.TestCase):
             "stub mode active",
             "No battery detected",
         ]
-        # Import _SENSORY_SKIP directly to verify membership
-        skip_phrases = {
-            "not configured", "loading", "not yet polled", "stub mode",
-            "no upcoming", "no battery", "not supported",
-        }
+        skip_phrases = _sensory_skip_set()
         for text in trivial:
             low = text.lower()
             matched = any(s in low for s in skip_phrases)
             self.assertTrue(matched, f"Expected '{text}' to be filtered but it wasn't")
+
+    def test_every_skip_phrase_is_actually_exercised(self):
+        """The sample list is a hand-maintained list too.
+
+        Pointing the tests at the real `_SENSORY_SKIP` was not enough.
+        Two of its seven phrases — "no upcoming" and "not supported" —
+        were matched by no sample above, so deleting either from
+        production changed nothing here and the suite stayed green.
+        Verified by deleting one and watching it pass.
+
+        The denominator has to be the constant, not the samples. This
+        fails if production grows a phrase nothing exercises, or if a
+        sample stops covering the phrase it was written for — both
+        checked by mutation before this was committed.
+        """
+        samples = [
+            "Calendar not configured (set CALDAV_URL, CALDAV_USER, CALDAV_PASS).",
+            "Air quality loading...",
+            "Not yet polled.",
+            "stub mode active",
+            "No battery detected",
+            "No upcoming events in the next 7 days.",
+            "Screen capture not supported on this platform.",
+        ]
+        uncovered = [
+            phrase for phrase in _sensory_skip_set()
+            if not any(phrase in s.lower() for s in samples)
+        ]
+        self.assertFalse(
+            uncovered,
+            f"_SENSORY_SKIP phrases with no sample exercising them: {uncovered}. "
+            "Add a sample here, or remove the phrase from agentic/app.py.",
+        )
 
     def test_non_trivial_summary_passes(self):
         """Summaries with real content should NOT match the skip set."""
@@ -97,10 +159,7 @@ class TestWorldContextFiltering(unittest.TestCase):
             "Calendar: Today: Daily Standup. Next: Sprint Planning on 2026-07-25.",
             "Email: 3 unread email(s) waiting",
         ]
-        skip_phrases = {
-            "not configured", "loading", "not yet polled", "stub mode",
-            "no upcoming", "no battery", "not supported",
-        }
+        skip_phrases = _sensory_skip_set()
         for text in non_trivial:
             low = text.lower()
             matched = any(s in low for s in skip_phrases)
