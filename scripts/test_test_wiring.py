@@ -33,7 +33,7 @@ from scripts.security import check_test_wiring as wiring  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 8
+EXPECTED_SCENARIOS = 10
 executed: list[str] = []
 
 
@@ -143,6 +143,39 @@ def test_calibration_catches_a_broken_detector():
     check("and the real one still passes", wiring.calibrate() == [], "")
 
 
+def test_an_exit_gate_suite_that_nothing_runs_is_reported():
+    """The other half of "a test that is never called is not a test".
+
+    A `check()`/`EXIT GATE` suite counts failures in a module global and
+    only exits non-zero under `__main__`. Collected by pytest instead,
+    every test function returns normally whatever check() recorded, so
+    pytest reports pass while the suite is failing. Proven on
+    2026-08-05 by breaking one assertion in test_service_tokens.py:
+
+        python -m pytest scripts/test_service_tokens.py -> 10 passed
+        python    scripts/test_service_tokens.py        -> 1 failed,
+                                                           EXIT GATE: FAIL
+
+    That suite was in no Makefile recipe, so its 24 assertions could not
+    fail anything.
+    """
+    scenario("unrun exit-gate suite")
+    unrun = wiring.unrun_exit_gates()
+    check("every EXIT GATE suite is run as a script today", unrun == [],
+          str(unrun))
+
+
+def test_the_rule_covers_the_suites_that_carry_the_marker():
+    """Measured before enforcing: 42 suites carry `EXIT GATE` and 41 were
+    already wired, so the rule costs nothing and caught the one that was
+    not. A floor, so new suites of this shape are covered too."""
+    scenario("exit-gate denominator")
+    marked = [f for f in (wiring.REPO / "scripts").glob("test_*.py")
+              if "EXIT GATE" in f.read_text(encoding="utf-8", errors="replace")]
+    check("a real number of suites use this pattern", len(marked) >= 40,
+          str(len(marked)))
+
+
 def run_all() -> None:
     test_an_undispatched_test_is_found()
     test_a_fully_dispatched_suite_is_clean()
@@ -152,6 +185,9 @@ def run_all() -> None:
     test_the_real_repository_is_clean()
     test_calibration_passes_on_the_real_detector()
     test_calibration_catches_a_broken_detector()
+
+    test_an_exit_gate_suite_that_nothing_runs_is_reported()
+    test_the_rule_covers_the_suites_that_carry_the_marker()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,

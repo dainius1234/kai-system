@@ -307,7 +307,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-test-wiring test-test-isolation test-live-smoke \
 	test-compose-probe test-workflow-filters test-workflow-outputs \
 	test-dockerfile-flags test-dockerfile-coverage \
-	test-dockerfile-context test-suite-floor
+	test-dockerfile-context test-service-tokens test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
 # A-02 ratchet: runs `test-uh` and fails if any suite exercises less than
@@ -822,6 +822,9 @@ test-dockerfile-coverage:
 
 test-dockerfile-context:
 	python3 scripts/test_dockerfile_context.py
+
+test-service-tokens:
+	python3 scripts/test_service_tokens.py
 
 # bring up full-stack composition
 full-up:

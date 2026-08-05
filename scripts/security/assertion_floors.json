@@ -29,9 +29,10 @@
     "Payload Bounds Tests": 24,
     "Secret & Restart Gate Tests": 28,
     "Service Auth Tests": 59,
+    "Service Token Tests": 24,
     "Suite Floor Tests": 18,
     "Test Isolation Tests": 38,
-    "Test Wiring Tests": 13,
+    "Test Wiring Tests": 15,
     "UH-1 Contract Tests": 126,
     "UH-2 Perception Spine Tests": 166,
     "UH-3 World State Tests": 71,
@@ -43,5 +44,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2490
+  "total": 2516
 }

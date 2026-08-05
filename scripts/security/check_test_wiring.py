@@ -106,6 +106,51 @@ def calibrate() -> List[str]:
     return wrong
 
 
+def unrun_exit_gates() -> List[str]:
+    """`EXIT GATE` suites that no Makefile recipe runs as a plain script.
+
+    These suites report through a `check()` helper that counts failures
+    in a module global and only calls `sys.exit(1)` under
+    `if __name__ == "__main__"`. Collected by pytest instead, every
+    `test_*` function returns normally whatever `check()` recorded, so
+    **pytest reports pass while the suite is failing.**
+
+    Proven rather than reasoned: breaking one assertion in
+    `scripts/test_service_tokens.py` and running it both ways gives
+
+        python -m pytest scripts/test_service_tokens.py  ->  10 passed
+        python    scripts/test_service_tokens.py         ->  23 passed,
+                                                            1 failed
+                                                            EXIT GATE: FAIL
+
+    So a suite of this shape that no recipe runs as a script has
+    assertions that cannot fail anything. `test_service_tokens.py` was
+    exactly that on 2026-08-05 — 24 assertions, written that morning,
+    guarding KAI-GATE-024, running nowhere that could hear them.
+
+    The existing check above asks whether a suite dispatches its own
+    tests. This asks whether anything dispatches the suite. Both are
+    "a test that is never called is not a test", one level apart.
+
+    Measured before enforcing: 42 suites carry the marker and 41 were
+    already wired, so the rule costs nothing and catches the one that
+    was not.
+    """
+    _, self_run = invocations()
+    missing = []
+    for path in sorted((REPO / "scripts").glob("test_*.py")):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        if "EXIT GATE" not in text:
+            continue            # ordinary pytest suite: pytest does assert
+        if path.name not in self_run:
+            missing.append(
+                f"{path.name}: reports through `check()` and `EXIT GATE`, "
+                f"but no Makefile recipe runs it as a script. Under pytest "
+                f"its failures are invisible — every test function returns "
+                f"normally whatever check() recorded.")
+    return missing
+
+
 def main() -> int:
     require(("Makefile", "scripts"))
     miscalibrated = calibrate()
@@ -135,9 +180,22 @@ def main() -> int:
         if found:
             dead[name] = found
 
+    unrun = unrun_exit_gates()
+
     print(inspected(len(self_run), "self-run suites",
                     f"{len(collected)} more are collected by pytest"))
     print(f"  calibrated against {len(CALIBRATION)} known-good suites")
+
+    if unrun:
+        print(f"\nFAIL: {len(unrun)} EXIT GATE suite(s) that no recipe runs "
+              f"as a script:\n")
+        for line in unrun:
+            print(f"  - {line}")
+        print("\n  Proven by running one both ways with a broken assertion: "
+              "pytest\n  reported `10 passed`, the script reported "
+              "`23 passed, 1 failed`.\n  A suite of this shape that nothing "
+              "invokes has assertions that\n  cannot fail anything.")
+        return 1
 
     if phantom:
         print(f"\nFAIL: {len(phantom)} Makefile target(s) name a script "

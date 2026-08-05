@@ -6851,3 +6851,80 @@ Floors: 41 suites, 2,490 assertions.
 would have shipped it into an image. Added, verified against every COPY
 source, and the verification is now a permanent rule rather than a
 one-time check.
+
+---
+
+## 2026-08-05 (part 28) — the same shape, in a suite I wrote this morning
+
+Swept for test files nothing runs. Two candidates, and the first was
+mine to get wrong:
+
+`kai-advisor/test_kai_advisor.py` sits outside `scripts/`, which looked
+like an orphan. It is not: `make test-kai-advisor` runs it and it is
+inside `test-core`. **Checked before filing** — this is the sixth time
+today that looking first prevented a phantom finding.
+
+The second is real.
+
+### A suite whose assertions cannot fail anything
+
+`scripts/test_service_tokens.py` — 24 assertions, written this morning,
+guarding KAI-GATE-024 (the executor answering 503 to every tool
+execution) — is named by **no Makefile recipe and no workflow**.
+
+These suites report through a `check()` helper that counts failures in a
+module global and only calls `sys.exit(1)` under `__main__`. Collected by
+pytest instead, every `test_*` function returns normally whatever
+`check()` recorded.
+
+Proven rather than reasoned. One assertion deliberately broken:
+
+    python -m pytest scripts/test_service_tokens.py  ->  10 passed
+    python    scripts/test_service_tokens.py         ->  23 passed,
+                                                         1 failed
+                                                         EXIT GATE: FAIL
+
+The only thing that ran it was `suite-run`'s repo-wide pytest, where it
+always passes. **Twenty-four assertions running nowhere that could hear
+them**, guarding a gate I had recorded as closed.
+
+### Measured before enforcing
+
+    suites carrying the `EXIT GATE` marker              42
+    invoked as a script by a Makefile recipe            41
+    invoked by nothing                                   1
+
+One instance. The rule costs nothing and catches it.
+
+`check_test_wiring` gains it, because this is precisely that gate's
+sentence — *a test that is never called is not a test* — one level up.
+The existing rule asks whether a suite dispatches its own tests; the new
+one asks whether anything dispatches the suite. Calibrated: unwiring the
+recipe again makes it name the file and say why.
+
+### The systematic statement, now that there is enough evidence for one
+
+Every defect found today was **a check whose scope was smaller than its
+name implied**, and in every case the gap was invisible because the
+check reported success over the part it did reach:
+
+    "full" profile          built 30 of 52 Dockerfiles
+    "core-tests"            ran 7 of 59 steps for 30 commits
+    "integration smoke"     could not return non-zero
+    "CI green"              named 1 of 9 workflows
+    "assertion floors"      could not see a blinded detector (I-7)
+    "EXIT GATE" suite       could not fail under the runner that ran it
+
+The remedy has been the same shape every time: **state the denominator,
+and derive it from the tree rather than from a list.** Six of today's
+gates do exactly that, and the seventh — this one — counts 42 suites and
+says how many are wired.
+
+Floors: 42 suites, 2,516 assertions.
+
+### Register
+
+**`KAI-GATE-039`** — a `check()`/`EXIT GATE` suite that no recipe runs as
+a script has assertions that cannot fail anything, and one such suite was
+guarding KAI-GATE-024. Instance wired, class gated, proven by running the
+suite both ways.
