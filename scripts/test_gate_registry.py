@@ -35,6 +35,8 @@ import io
 import os
 import re
 import sys
+import tempfile
+from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Optional, Tuple
 
@@ -46,7 +48,7 @@ from scripts.security import gate_registry as registry_module  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 33
+EXPECTED_SCENARIOS = 35
 executed: list[str] = []
 
 
@@ -377,9 +379,12 @@ def test_the_real_registry_passes_its_own_structural_rules():
 
 def test_invariants_are_counted_per_dimension():
     scenario("invariant-counts")
-    problems = {"unregistered": ["a"], "phantom": [], "wiring": ["b"],
-                "blind": ["c", "d"], "denominator": [], "unproven": ["e"],
-                "inert": [], "lapsed": [], "pending": []}
+    # Buckets derived from the real category list, so a new category
+    # cannot make this test raise KeyError instead of asserting. It did
+    # exactly that when "misreported" was added.
+    problems = meta.empty_problems()
+    problems.update({"unregistered": ["a"], "wiring": ["b"],
+                     "blind": ["c", "d"], "unproven": ["e"]})
     counts = meta.invariant_counts(problems)
     check("I-4 sums its three keys", counts["I-4"] == 2, str(counts))
     check("I-1 counts blindness", counts["I-1"] == 2, str(counts))
@@ -541,6 +546,66 @@ def test_the_enforced_set_never_shrinks():
           all(n in meta.INVARIANTS for n in meta.ENFORCED), str(meta.ENFORCED))
 
 
+def test_the_human_summary_agrees_with_the_register():
+    """I-4, pointed at the documentation layer.
+
+    The closure register is enforced — every record carries a
+    `still_holds` predicate re-evaluated on each run. The status table in
+    `INSTRUMENTATION_ARCHITECTURE.md` is a *second* declaration of the
+    same state, hand-maintained, and on 2026-08-05 **all ten** closures
+    were misreported there: the machine said CLOSED, the document a human
+    reads said OPEN or REMEDIATED. Nothing was cross-checking them, which
+    is the exact defect KAI-GATE-004 describes, surviving in the one
+    place the invariant had never been aimed.
+    """
+    scenario("human summary agrees with the register")
+    from scripts.security.check_gate_registry import misreported_closures
+    check("the doc table matches the register today",
+          misreported_closures() == [], str(misreported_closures()))
+
+
+def test_a_misreported_closure_is_detected():
+    """Synthetic, so the assertion does not depend on the repo being wrong."""
+    scenario("a misreported closure is caught")
+    import re as _re
+    from scripts.security import check_gate_registry as meta
+    from scripts.security.closure_register import CLOSED
+
+    with tempfile.TemporaryDirectory() as tmp:
+        doc = Path(tmp) / "doc.md"
+        rows = [f"| `{c.finding}` | HIGH | whatever | **CLOSED** |" for c in CLOSED]
+        original = meta.ARCHITECTURE_DOC
+        try:
+            doc.write_text("\n".join(rows), encoding="utf-8")
+            meta.ARCHITECTURE_DOC = doc
+            check("a table that agrees reports nothing",
+                  meta.misreported_closures() == [], str(meta.misreported_closures()))
+
+            first = CLOSED[0].finding
+            doc.write_text("\n".join(rows).replace(
+                f"| `{first}` | HIGH | whatever | **CLOSED** |",
+                f"| `{first}` | HIGH | whatever | **OPEN** |"), encoding="utf-8")
+            found = meta.misreported_closures()
+            check("a row that disagrees is reported", len(found) == 1, str(found))
+            check("and it names the finding", first in found[0], str(found))
+
+            # Fails closed: no table at all is a finding, not a pass. A
+            # cross-check that silently passes when it has nothing to
+            # compare against is the category confusion this programme
+            # has paid for repeatedly.
+            doc.write_text("no table here at all\n", encoding="utf-8")
+            check("a document with no table is a finding",
+                  len(meta.misreported_closures()) == 1,
+                  str(meta.misreported_closures()))
+
+            doc.unlink()
+            check("an unreadable document is a finding",
+                  len(meta.misreported_closures()) == 1,
+                  str(meta.misreported_closures()))
+        finally:
+            meta.ARCHITECTURE_DOC = original
+
+
 def run_all() -> None:
     test_invariants_are_counted_per_dimension()
     test_an_enforced_invariant_with_breaches_fails()
@@ -553,6 +618,8 @@ def run_all() -> None:
     test_an_inert_pass_branch_is_detected()
     test_a_non_policy_constant_is_not_reported()
     test_the_enforced_set_never_shrinks()
+    test_the_human_summary_agrees_with_the_register()
+    test_a_misreported_closure_is_detected()
     test_a_matching_world_is_clean()
     test_an_unregistered_check_fails()
     test_a_registered_check_with_no_file_fails()

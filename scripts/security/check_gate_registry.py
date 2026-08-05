@@ -355,11 +355,13 @@ def cross_check(registry, on_disk, in_policy, in_flows,
     on_disk = set(on_disk)
     in_policy = set(in_policy)
 
-    problems: Dict[str, List[str]] = {
-        "unregistered": [], "phantom": [], "wiring": [],
-        "unproven": [], "blind": [], "denominator": [], "pending": [],
-        "inert": [], "lapsed": [],
-    }
+    # Derived from `_HEADINGS`, not typed beside it. The literal list
+    # this replaces was missing "misreported" the moment that category
+    # was added, and a second copy in `test_gate_registry.py` raised a
+    # KeyError instead of a finding — a hand-written list of what to
+    # collect, drifting from the thing that collects. Same defect, fifth
+    # venue.
+    problems: Dict[str, List[str]] = empty_problems()
 
     # I-4 — three sources must agree.
     for module in sorted(on_disk - declared):
@@ -449,7 +451,58 @@ def evaluate() -> Dict[str, List[str]]:
     )
     from scripts.security.closure_register import lapsed
     problems["lapsed"] += lapsed()
+    problems["misreported"] += misreported_closures()
     return problems
+
+
+ARCHITECTURE_DOC = REPO / "kai-pm" / "INSTRUMENTATION_ARCHITECTURE.md"
+
+
+def misreported_closures() -> List[str]:
+    """Findings the register calls CLOSED that the doc summary does not.
+
+    The closure register is enforced — every record carries a
+    `still_holds` predicate re-evaluated on each run. The status table in
+    `INSTRUMENTATION_ARCHITECTURE.md` is a *second* declaration of the
+    same state, hand-maintained, and on 2026-08-05 **all ten** closures
+    were misreported there: the machine-checked source said CLOSED and
+    the document a human reads said OPEN or REMEDIATED. A reader would
+    have concluded nothing had ever closed.
+
+    That is I-4 — declared in more than one place with nothing
+    cross-checking them — surviving in the documentation layer, which is
+    the one place the invariant had not been pointed at. Fails closed:
+    an unreadable or table-less document is a finding, not a pass.
+    """
+    from scripts.security.closure_register import CLOSED
+    try:
+        doc = ARCHITECTURE_DOC.read_text(encoding="utf-8")
+    except OSError as exc:
+        return [f"{ARCHITECTURE_DOC.name}: unreadable ({exc})"]
+    rows = dict(re.findall(r"^\| `(KAI-GATE-\d+)` \|.*?\| \*\*([A-Z]+)",
+                           doc, re.M))
+    if not rows:
+        return [f"{ARCHITECTURE_DOC.name}: no finding table found — the "
+                f"cross-check has nothing to compare against"]
+    out = []
+    for closure in CLOSED:
+        stated = rows.get(closure.finding, "ABSENT")
+        if stated != "CLOSED":
+            out.append(f"{closure.finding}: register=CLOSED, "
+                       f"{ARCHITECTURE_DOC.name}={stated}")
+    return out
+
+
+def empty_problems() -> Dict[str, List[str]]:
+    """One empty bucket per reported category, derived from `_HEADINGS`.
+
+    The single source of truth for what a problems-dict contains. Adding
+    a heading adds its bucket everywhere, including in tests, so a new
+    category cannot be half-wired.
+    """
+    buckets = {key: [] for key, _ in _HEADINGS}
+    buckets.setdefault("pending", [])   # reported, but not a finding
+    return buckets
 
 
 _HEADINGS = [
@@ -461,6 +514,8 @@ _HEADINGS = [
     ("unproven", "NEVER OBSERVED FAILING (I-3)"),
     ("inert", "INERT RULES — declared, never applied (I-5)"),
     ("lapsed", "CLOSURES RE-OPENED — the prevention no longer holds (I-6)"),
+    ("misreported", "CLOSURE STATE MISREPORTED — the summary a human "
+                    "reads disagrees with the register (I-4)"),
 ]
 
 # ── Per-invariant enforcement ────────────────────────────────────────
@@ -479,7 +534,8 @@ INVARIANTS = {
     "I-1": ("fail closed on a missing input", ("blind",)),
     "I-2": ("report a denominator", ("denominator",)),
     "I-3": ("prove it can fail", ("unproven",)),
-    "I-4": ("declare in one place", ("unregistered", "phantom", "wiring")),
+    "I-4": ("declare in one place",
+            ("unregistered", "phantom", "wiring", "misreported")),
     "I-5": ("no inert rules", ("inert",)),
     "I-6": ("closures still hold", ("lapsed",)),
 }

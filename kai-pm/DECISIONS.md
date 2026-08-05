@@ -5172,3 +5172,92 @@ carry reviewer-verified compliance rather than individual tests.
 I have not closed it in this entry. Rule 7 makes closure a separate
 evidence-backed action, and writing "closeable" in the same breath as
 doing the work is exactly the shortcut the rule exists to prevent.
+
+---
+
+## 2026-08-05 (part 6) — merged to main; and the closure state was already wrong
+
+Operator authorised the merge on green CI. `main` fast-forwarded
+`758d62f -> 7d5dfd8`, ten commits, no merge commit.
+
+### The closure records were already written. The document was lying.
+
+Asked to verify that the meta-check's 17 cross-checked items cover the
+12 gates `KAI-GATE-002/003/004` were found against. They do:
+
+    original checks (git, at the commit that introduced the finding): 12
+    registry today: 17
+    original checks not cross-checked today: none
+    added since: check_ci_tolerations, check_gate_registry,
+                 check_suite_floor, check_test_isolation, check_test_wiring
+
+and every one of the 12 now carries both a denominator and a `proven_by`.
+
+Then, while assembling the closure records, I found they already
+existed. `002`, `003` and `004` were closed on **2026-08-03**, with
+`still_holds` predicates the meta-check re-evaluates on every run.
+
+**All ten closures in the register were misreported in
+`INSTRUMENTATION_ARCHITECTURE.md`.** The machine-checked source said
+CLOSED; the table a human reads said OPEN or REMEDIATED. Ten of ten. A
+reader — including me, an hour ago, reporting to the operator that
+002/003/004 were "recorded OPEN" — would conclude nothing had ever
+closed.
+
+That is `KAI-GATE-004` itself: *declared in more than one place with
+nothing cross-checking them*. The invariant was enforced across the gate
+surface and never aimed at the documentation, which is where the only
+human-readable copy lives.
+
+`misreported_closures()` now cross-checks the doc table against the
+register on every run, under I-4. Fails closed: an unreadable document,
+or one with no table, is a finding rather than a pass — otherwise
+deleting the table would "fix" the check. Mutation-tested in three
+directions.
+
+Fixing it also flushed out a *sixth* hand-written list: the problems
+dict in `check_gate_registry` was a literal of ten keys, and a second
+copy in its test raised `KeyError` instead of a finding the moment a
+category was added. Both now derive from `_HEADINGS` via
+`empty_problems()`.
+
+### KAI-GATE-021 CLOSED
+
+Recorded with prevention = the ratchet plus the rubric, per the
+operator's ruling: the `silent_swallows` column is baselined and gated in
+`policy-check`, the survey's scope is derived from the tree so a new
+module cannot fall outside it, and the handlers follow one documented
+pattern. The known limitation is written into the record: ~100 handlers
+carry reviewer-verified compliance rather than individual failure tests.
+The operator's argument for accepting that is in the record too — a
+ratchet catches any future deviation, where individual tests only catch
+regressions in the ones someone wrote.
+
+Proven to be able to lapse before being trusted: deleting
+`silent_swallows` from the baseline flips `still_holds` to False.
+
+### n8n is irreversible
+
+The answer to "is this config or code" is **both, and only the code fix
+is safe**. `IRREVERSIBLE_TOOLS_JSON` appears in no compose file, no env
+file and no Makefile target, so the code default *was* the configuration
+everywhere. A deployment that forgets to set it must not be the unsafe
+one.
+
+  - default now `{"destructive": ["shell", "n8n"], ...}`
+  - set explicitly in all three compose files as well, so a reader can
+    see which tools need confirmation without reading the service
+  - `REVERSIBLE_TOOLS` added, and `unclassified_tools()` reports any
+    allowlisted tool on neither list
+
+That last part is the structural prevention, and it is the point:
+**"unclassified" and "safe" were the same state**, which is why n8n —
+able to fire any actuator, reach any external service and mutate any
+state this system can reach — needed conviction and no confirmation for
+the life of this gate. They are different states now, and an
+unclassified tool fails the build.
+
+Labelled destructive rather than financial: all three categories get
+identical treatment in `evaluate()`, and "can mutate anything it can
+reach" is what destructive means here. A workflow that genuinely is safe
+under degradation should be a narrower tool of its own.

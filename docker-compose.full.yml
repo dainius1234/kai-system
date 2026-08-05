@@ -78,6 +78,11 @@ services:
       dockerfile: tool-gate/Dockerfile
     <<: *defaults
     environment:
+      # Set explicitly rather than left to the code default. The
+      # default is safe, but a reader of this file should be able
+      # to see which tools require operator confirmation without
+      # reading the service. n8n runs arbitrary workflows.
+      IRREVERSIBLE_TOOLS_JSON: '{"destructive": ["shell", "n8n"], "financial": [], "public": []}'
       MODE: "PUB"
       REQUIRED_CONVICTION: "7.0"
       REDIS_URL: redis://redis:6379

@@ -60,6 +60,26 @@ def _in_policy_check(module: str) -> Callable[[], bool]:
     return predicate
 
 
+def _swallows_ratcheted() -> bool:
+    """The silent-swallow count is baselined and the survey still gates.
+
+    Both halves matter. A baseline nothing runs is a number in a file,
+    and a survey with no ceiling is a report. The closure depends on the
+    pair, so the predicate checks the pair.
+    """
+    import json
+    from pathlib import Path as _Path
+    from scripts.security.check_gate_registry import discover_policy_check
+    if "hygiene_survey" not in discover_policy_check():
+        return False
+    baseline = _Path(__file__).resolve().parent / "hygiene_baseline.json"
+    try:
+        totals = json.loads(baseline.read_text(encoding="utf-8"))["totals"]
+    except (OSError, KeyError, ValueError):
+        return False
+    return "silent_swallows" in totals
+
+
 def _tracker_anchors() -> bool:
     """The dashboard tracker refuses to judge a tree it cannot recognise."""
     from scripts.security import check_dashboard_findings as tracker
@@ -245,6 +265,46 @@ CLOSED = CLOSED + (
                   "proven_by, and a proven_by pointing at nothing",
         verified_on="2026-08-03",
         still_holds=_enforced("I-3"),
+    ),
+    Closure(
+        finding="KAI-GATE-021",
+        defect="120 `except Exception: pass` handlers across the service "
+               "entry points, 34 repo-wide. A dependency failed and the "
+               "caller reported nothing: memU degraded from a shared "
+               "durable store to twelve divergent in-memory lists with "
+               "every health check green; `vault_delete` answered "
+               "`{\"status\": \"ok\"}` whether or not the graph delete "
+               "happened; `_sense_world` returned the empty string with "
+               "the whole sensory tier down — byte-identical to a calm, "
+               "fully-observed world — and Kai spoke about a world it had "
+               "not seen.",
+        fix="120 -> 4 at the entry points, 34 -> 7 repo-wide, against the "
+            "operator's rubric: read/observe degrades visibly, "
+            "mutate/act propagates, an aggregate names the source it "
+            "lost. `common/degraded.record_degradation()` records a "
+            "survived failure with a count and an age and surfaces it at "
+            "/health; `degraded_partial()` carries a partial result and "
+            "*raises* on an unnamed failure. The 7 survivors are two "
+            "conn.close() teardowns, two logging handlers where the "
+            "recorder would recurse, vault-sync's teardown, the "
+            "recorder's own guard, and one security probe where raising "
+            "is the hoped-for behaviour — each documented in place.",
+        prevention="`hygiene_survey`'s `silent_swallows` column is "
+                   "baselined and ratcheted in `policy-check`: the count "
+                   "may fall and may not rise, so a new bare handler "
+                   "fails the build. The survey's scope is derived from "
+                   "the tree rather than a glob list, so a new module "
+                   "cannot be added outside it.",
+        proven_by="scripts/test_hygiene_gate.py (the ratchet refuses a "
+                  "rise, every column is ratcheted, the scope covers "
+                  "library modules); scripts/test_degraded.py (the "
+                  "recorder aggregates, is bounded, survives contention, "
+                  "and degraded_partial refuses an unnamed failure); "
+                  "scripts/test_agentic_routes.py and "
+                  "scripts/test_p16_operational.py (failure paths for "
+                  "_sense_world and submit_feedback)",
+        verified_on="2026-08-05",
+        still_holds=_swallows_ratcheted,
     ),
 )
 

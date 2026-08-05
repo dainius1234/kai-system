@@ -56,8 +56,23 @@ NOTIFY_URL = os.getenv("NOTIFY_URL", "")
 # e.g. IRREVERSIBLE_TOOLS_JSON='{"destructive": ["shell"], "financial": [],
 # "public": []}'. Category is derived from the tool name server-side —
 # a caller cannot self-declare a lower-risk category.
+# The DEFAULT must be safe, because this variable is set nowhere.
+#
+# Until 2026-08-05 the default was `{"destructive": ["shell"], "financial":
+# [], "public": []}` and `IRREVERSIBLE_TOOLS_JSON` appeared in no compose
+# file, no env file and no Makefile target. So the default *was* the
+# configuration everywhere, and `n8n` — which runs arbitrary workflows,
+# and can therefore fire any actuator, call any external service and
+# mutate any state this system can reach — was classified as reversible
+# by omission. It needed conviction and no confirmation.
+#
+# Labelled destructive rather than financial: all three categories get
+# identical treatment in `evaluate()`, and "can mutate anything it can
+# reach" is what destructive means here. A workflow that genuinely is
+# safe under degradation should be exposed as its own narrower tool
+# rather than by widening this one.
 _IRREVERSIBLE_RAW = json.loads(os.getenv("IRREVERSIBLE_TOOLS_JSON", "{}")) or {
-    "destructive": ["shell"],
+    "destructive": ["shell", "n8n"],
     "financial": [],
     "public": [],
 }
@@ -110,6 +125,22 @@ def _park_for_cosign(request, entry) -> str:
     if idem:
         _pending_by_idem[idem] = entry.request_id
     return entry.request_id
+
+
+# Tools deliberately judged reversible. Being on this list is a decision;
+# being on neither list is an oversight, and `check_tool_classification`
+# fails the build on it. `n8n` sat in that gap for the life of this gate
+# precisely because "unclassified" and "safe" were the same state.
+REVERSIBLE_TOOLS: Set[str] = set(
+    json.loads(os.getenv("REVERSIBLE_TOOLS_JSON", "[]"))
+    or ["qgis", "noop", "speak"]
+)
+
+
+def unclassified_tools() -> Set[str]:
+    """Allowlisted tools that are on neither classification list."""
+    classified = set().union(*IRREVERSIBLE_CATEGORIES.values()) if IRREVERSIBLE_CATEGORIES else set()
+    return set(GatePolicy().allowed_tools) - classified - REVERSIBLE_TOOLS
 
 
 def _classify_irreversibility(tool: str) -> Optional[str]:
