@@ -50,8 +50,6 @@ Exit 1 = one did not, or nothing was inspected.
 from __future__ import annotations
 
 import argparse
-import json
-import re
 import sys
 from pathlib import Path
 from typing import List, Sequence, Tuple
@@ -66,6 +64,7 @@ from scripts.ci.compose_probe import (  # noqa: E402
 # wired, not merely listening. Kept short on purpose: this is a smoke
 # test, and a long one that nobody reads is how the old file grew to
 # eleven probes of which five addressed nothing.
+
 EXERCISES: Tuple[Tuple[str, str, str, dict], ...] = (
     ("heartbeat", "POST", "/tick", {}),
     ("memu-core", "POST", "/memory/memorize", {
@@ -76,6 +75,7 @@ EXERCISES: Tuple[Tuple[str, str, str, dict], ...] = (
     }),
     ("dashboard", "GET", "/go-no-go", {}),
 )
+
 
 def audit(compose_file: str, runner: Runner = _run) -> Tuple[List[str], int, int]:
     """Return (failures, services probed, exercises run)."""

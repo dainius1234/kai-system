@@ -119,7 +119,6 @@ def check_file(path: Path) -> list[str]:
     return violations
 
 
-
 # ── Does the tag actually resolve? ───────────────────────────────────
 # The registry v2 API, which both Docker Hub and ghcr.io speak: ask the
 # auth endpoint for an anonymous pull token, then HEAD the manifest.

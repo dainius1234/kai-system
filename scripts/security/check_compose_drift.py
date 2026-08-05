@@ -208,7 +208,6 @@ def check_drift(root: Path = None) -> Tuple[List[str], List[str], List[str], int
     return violations, hardening, bypassed, compared
 
 
-
 def shared_container_names(root: Path = None) -> List[str]:
     """`container_name` values claimed by more than one profile.
 
