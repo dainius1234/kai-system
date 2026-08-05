@@ -152,6 +152,21 @@ DECLARED: Tuple[Toleration, ...] = (
         review_by="2027-01-01",
     ),
     Toleration(
+        workflow="core-tests.yml",
+        step="Post-mortem",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same argument as the dump step, and it exists because that "
+               "one was unreadable: the log API serves a fixed-size tail "
+               "and the eleven teardown steps after it push forty warning "
+               "lines each into the window. This one is last in the file, "
+               "so nothing can displace it. Runs only `if: failure()`; it "
+               "has no enforcement to skip, and every command tolerates "
+               "its own exit code so one missing tool cannot stop the "
+               "next fact from printing.",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
         workflow="friday-cleanup.yml",
         step="Post Friday cleanup issue",
         bucket=DOCUMENTED_SKIP,

@@ -5887,3 +5887,65 @@ Cause **unknown**, and recorded as unknown. First observation
 `core-tests` advanced 40 steps and now fails on 028. Stays **OPEN**:
 the gate was "all four in their final intentional states", and one is
 not.
+
+---
+
+## 2026-08-05 (part 15) — the diagnostic was unreadable, and what I found while waiting for it
+
+### The log tail is a boundary, and I walked into it twice
+
+The `if: failure()` dump step ran and printed exactly what it was asked
+to. It was still unreadable. The GitHub log API serves a **fixed-size
+tail** — about 14,000 characters — and the eleven teardown steps that
+run after the failure emit forty `variable is not set` warnings each.
+The answers were pushed out of the window.
+
+A diagnostic nobody can read is the same as no diagnostic. What decides
+that here is not what the step prints but **where it sits in the file**,
+which is not a thing I would have predicted and is now written down.
+The post-mortem is the last step in the job; nothing runs after it but
+the runner's own cleanup, so its output is the tail by construction.
+
+### Found while waiting: the live-verification steps have been aimed at nothing since `e4655bc`
+
+`core-tests.yml` waits on `http://localhost:8000/health`,
+`:8001`, `:8007`, `:8009`, `:8061` — nine sites in total.
+`docker-compose.minimal.yml` publishes **one** host port:
+`127.0.0.1:8080:8080`, the dashboard.
+
+Commit `e4655bc`, *"Edge lockdown — remove all host-port bindings except
+dashboard loopback"*, removed every other binding. That was correct and
+deliberate. What nobody noticed is that it silently invalidated every
+live-verification step in this workflow, because those steps had not run
+since — the doc-drift gate had been killing the job at step 7 for thirty
+commits, and the ports had been wrong underneath it the whole time.
+
+So even with the bring-up fixed, steps 48–59 cannot pass as written.
+This is not new breakage; it is the same thirty-commit blind spot,
+one layer deeper.
+
+Ninth venue for the list-beside-the-thing pattern, and the sharpest yet:
+the compose file already declares the correct probe for every service —
+
+    healthcheck: python -c "import urllib.request;
+                 urllib.request.urlopen('http://localhost:8001/health')"
+
+— so CI is maintaining a second, independent copy of a port map that
+already exists beside the thing it describes. The fix is not to update
+the copy. It is to read the healthcheck's own verdict and delete the
+copy.
+
+Not attempted yet, deliberately. The bring-up fails before any of those
+steps run, so fixing them now would be fixing code I cannot observe.
+One layer at a time, each confirmed in CI before the next.
+
+### Register
+
+**`KAI-GATE-029`** — nine host-port health probes in `core-tests.yml`
+address ports that no compose profile has published since `e4655bc`.
+Blocks steps 48–59. **OPEN**, and deliberately untouched until 028 is
+resolved.
+
+**`KAI-GATE-028`** — bring-up failure. Cause still unknown; the first
+two attempts to read it were defeated by log truncation rather than by
+the failure being subtle. Post-mortem moved to the last step. **OPEN.**

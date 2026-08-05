@@ -458,3 +458,36 @@ jobs:
         if: always()
         run: |
           docker compose -f docker-compose.sovereign.yml down -v
+
+      # Last on purpose. The dump step beside the bring-up ran and printed
+      # exactly what was asked of it — and it was unreadable, because the
+      # log API serves a fixed-size tail and the eleven teardown steps
+      # after it emit forty "variable is not set" warnings each, which
+      # pushed the answers out of the window. Twice.
+      #
+      # A diagnostic nobody can read is the same as no diagnostic, and
+      # position in the file is what decides that here. Nothing runs after
+      # this step but the runner's own cleanup, so this output is the tail.
+      # stderr is dropped on the compose calls whose *stdout* is the
+      # answer — that is the warning spam, not the error, and the error
+      # has its own line below.
+      # ci-toleration: documented-skip
+      - name: Post-mortem (last, so it survives log truncation)
+        if: failure()
+        run: |
+          echo "══════════ POST-MORTEM ══════════"
+          echo "── disk ──"
+          df -h / /var/lib/docker 2>&1 | head -5 || true
+          echo "── minimal compose config parses? ──"
+          docker compose -f docker-compose.minimal.yml config -q 2>&1 \
+            && echo "config: VALID" || echo "config: INVALID"
+          echo "── the bring-up, re-run so its error is in frame ──"
+          docker compose -f docker-compose.minimal.yml up -d --no-build 2>&1 \
+            | tail -25 || true
+          echo "── containers (all states) ──"
+          docker compose -f docker-compose.minimal.yml ps -a 2>/dev/null \
+            | head -12 || true
+          echo "── images built ──"
+          docker images --format '{{.Repository}}:{{.Tag}}' 2>/dev/null \
+            | head -8 || true
+          echo "══════════ END POST-MORTEM ══════════"
