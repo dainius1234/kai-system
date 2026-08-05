@@ -367,6 +367,8 @@ services:
       dockerfile: executor/Dockerfile
     <<: *defaults
     environment:
+      # Required: its protected routes fail closed without it.
+      KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       TOOL_GATE_URL: http://tool-gate:8000
       HEARTBEAT_URL: http://heartbeat:8010
     healthcheck:

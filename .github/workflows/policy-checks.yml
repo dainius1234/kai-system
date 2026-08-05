@@ -32,6 +32,8 @@ jobs:
 
       - name: Secret fallback check
         run: python scripts/security/check_secret_fallbacks.py
+      - name: Every auth-enforcing service has its token
+        run: python scripts/security/check_service_tokens.py
 
       - name: Network zone segmentation
         run: python scripts/security/check_network_zones.py

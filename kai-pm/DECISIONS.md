@@ -5480,3 +5480,113 @@ one and watching the gate pass; prevented by I-7 at zero and enforced.
     suite floor  4,288 passed, 0 failed, 0 errors
     policy-check 11 PASS lines, no failures
     meta-check   I-1..I-7 hold; 10 closures re-verified
+
+---
+
+## 2026-08-05 (part 10) — auditing G-03…G-11, and a stack whose executor answered 503
+
+The operator's instruction into the auth phase: verify what those
+closures actually cover rather than assuming their titles tell the full
+story. Two of today's misreads were in that exact shape.
+
+### G-03 — the closure is accurate; the residual is architectural
+
+G-03 authenticated "six unauthenticated side-effecting endpoints" and
+`common/service_auth.py` protects 21 routes. The question was whether
+six was the population.
+
+    mutating routes repo-wide        243
+      with an auth dependency         99
+      without                        144
+
+`144` is **not a finding**, and it took two corrections to see that.
+First pass reported 210 because the detector knew only
+`require_service_auth` and the dashboard uses `require_dashboard_auth` —
+so it counted 66 authenticated dashboard routes as bare. Calibrated
+against routes whose answer I knew (`/uh/paper-trade` guarded, dashboard
+66/66) before believing any total.
+
+The 144 sit behind network isolation. **Exactly one service publishes a
+host port** — `dashboard`, on `127.0.0.1:8080`, and it is 66/66
+authenticated. Everything else is reachable only from inside the compose
+network, and `check_port_bindings` (enforced in `policy-check` and CI,
+with a proving suite) is what holds that.
+
+So the security model is perimeter-shaped: strong at the edge, no
+lateral-movement defence. A compromised service inside the network can
+call all 144. That is not a defect in G-03 — it is precisely the ground
+the per-service-token phase is meant to cover, and it is worth having
+measured before starting rather than discovering halfway through.
+
+### G-07 — the closure was a count of edits, not a rule
+
+D135: *"`KAI_SERVICE_TOKEN` is wired into 8 service blocks across all
+three compose profiles."* Reality: 8 blocks **in total**, split 3/1/4.
+The sentence is not false, but it reads as 8 per profile, and what
+matters is neither number — it is *which* services need one.
+
+Three did not have it:
+
+  - **`executor`** in `full` and `sovereign`. It runs `POST /execute`
+    (`tool_execute`) and `POST /recover`. `require_service_auth` fails
+    closed, so both profiles ship a stack **whose tool execution answers
+    503 to every call** — and the symptom surfaces at the caller, which
+    reads it as the executor being broken rather than unconfigured.
+  - **`vault-sync`** in `minimal`.
+
+Fixed, and the class is now a gate: `check_service_tokens.py` — a
+service whose entry point calls `Depends(require_service_auth(...))`
+must declare `KAI_SERVICE_TOKEN` in every profile that runs it.
+
+### The new gate found its own defects twice before it was trusted
+
+**Denominator, first.** It reported `inspected: 2` across three compose
+files and PASSED the profile holding the defect, because `_context_of`
+understood `build: ./x` and `{context: ./x}` but not
+`{context: ., dockerfile: x/Dockerfile}` — which is what `full.yml`
+uses. Caught by its own denominator (I-2), not by anyone reading it.
+That is the whole argument for printing one.
+
+**Granularity, second.** With the denominator fixed it reported **8
+findings, four of them false**: directory-level matching flagged
+`agentic-introspect` (runs `introspect_app.py`, no protected routes,
+while `agentic/app.py` has them) and `avatar-service` / `tts-service`
+(build from `output/avatar` and `output/tts`, while the only file in
+`output/` with a protected route is `output/notify/app.py`). A gate that
+flags three innocent services is a gate people learn to ignore. It now
+resolves the actual entry point from each Dockerfile's `CMD` —
+`["python", "app.py"]` and `["uvicorn", "app:app", …]` both name a
+module beside it — and reports **3 findings, no false positives**.
+
+**And the meta-check found a third.** `enforces_auth` returned `None`
+for "could not tell", beside a `.exists()` check — the I-1 shape where
+*could not tell* and *no* collapse into each other. The caller did
+report it, so the flag was a shape-match rather than a live defect, but
+the scanner is right that it is where the class hides. Replaced with a
+named `UNDECIDABLE` sentinel, which cannot be misread by the next person
+or silently treated as `False` by a later edit.
+
+Three defects in one new check, each caught by a different invariant
+that already existed. That is the watching layer paying for itself.
+
+### Register
+
+**`KAI-GATE-024`** — `executor` and `vault-sync` deployed without
+`KAI_SERVICE_TOKEN`, so their protected routes answered 503 in three
+profile/service combinations. Instances fixed; class prevented by
+`check_service_tokens`, in `policy-check` and `policy-checks.yml`,
+proven by `scripts/test_service_tokens.py` (24 assertions, including
+every build spelling, sibling entry points, and failing closed on an
+unresolvable entry point). Mutation-tested: removing the token again
+fails the gate.
+
+    suite floor   4,298 passed, 0 failed, 0 errors
+    policy-check  12 PASS lines, exit 0
+    meta-check    I-1..I-7 hold; 11 closures re-verified
+
+### Still to audit
+
+G-04, G-05, G-06, G-09, G-10, G-11 have not been re-verified in this
+pass. G-11's flag defaults in particular are worth checking — the grep
+for them returned nothing, which means the pattern was wrong, not that
+the flags are absent.

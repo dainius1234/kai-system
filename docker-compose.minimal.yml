@@ -742,6 +742,8 @@ services:
     container_name: kai-vault-sync
     <<: *defaults
     environment:
+      # Required: its protected routes fail closed without it.
+      KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       VAULT_PATH: /vault
       MEMU_CORE_URL: http://memu-core:8001
       TOOL_GATE_URL: http://tool-gate:8000

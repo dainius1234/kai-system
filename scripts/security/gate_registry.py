@@ -133,6 +133,23 @@ REGISTRY: Tuple[Gate, ...] = (
          **_COMPOSE_GATE),
     # Rewritten from a denylist of nine guessable words into a rule:
     # a secret may be referenced, never valued. KAI-GATE-007.
+    # Found auditing G-07's closure: the record said the token was
+    # "wired into 8 service blocks across all three compose profiles";
+    # it was 8 in total, split 3/1/4, and `executor` — which runs
+    # POST /execute — had none in `full` or `sovereign`. Fail-closed, so
+    # not an open endpoint: a stack whose tool execution answers 503 to
+    # every call, with the symptom appearing at the caller.
+    Gate(module="check_service_tokens",
+         kind=GATE,
+         summary="every auth-enforcing service is given KAI_SERVICE_TOKEN",
+         inputs=("docker-compose.full.yml", "docker-compose.sovereign.yml",
+                 "docker-compose.minimal.yml"),
+         denominator=r"inspected: \d+ auth-enforcing service definitions",
+         proven_by="scripts/test_service_tokens.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-024",)),
+
     Gate(module="check_secret_fallbacks",
          kind=GATE,
          summary="a secret may be referenced, never given a value here",

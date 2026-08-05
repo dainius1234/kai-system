@@ -22,6 +22,7 @@ policy-check: lint-blocking
 	python3 scripts/security/check_port_bindings.py
 	python3 scripts/security/check_default_profiles.py
 	python3 scripts/security/check_secret_fallbacks.py
+	python3 scripts/security/check_service_tokens.py
 	python3 scripts/security/check_network_zones.py
 	python3 scripts/security/check_turbovec_writers.py
 	python3 scripts/security/check_restart_recovery.py

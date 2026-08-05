@@ -261,6 +261,8 @@ services:
     networks:
       - execution-net
     environment:
+      # Required: its protected routes fail closed without it.
+      KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       BACKOFF_SCHEDULE: "10 60 300"
       TOOL_GATE_URL: "http://tool-gate:8000"
       MEMU_URL: "http://memu-core:8001"
