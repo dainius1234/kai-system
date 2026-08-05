@@ -11,21 +11,22 @@
     "Dashboard Auth Tests": 99,
     "Dashboard Finding Tracker Tests": 217,
     "Dashboard UI Auth Tests": 42,
-    "Degraded State Tests": 36,
+    "Degraded State Tests": 71,
     "Deployment Preflight Tests": 57,
     "Erasure Tests": 75,
     "Flags-Enabled Integration Tests": 37,
     "Full Migration Tests": 75,
-    "Gate Registry Tests": 65,
-    "Hygiene Gate Tests": 39,
+    "Gate Registry Tests": 76,
+    "Hygiene Gate Tests": 63,
     "Invariant Guard Tests": 26,
     "Legacy Bridge Tests": 58,
+    "Live Smoke Tests": 23,
     "Migration & Active Mode Tests": 136,
     "Payload Bounds Tests": 24,
     "Secret & Restart Gate Tests": 28,
     "Service Auth Tests": 59,
     "Suite Floor Tests": 18,
-    "Test Isolation Tests": 20,
+    "Test Isolation Tests": 38,
     "Test Wiring Tests": 13,
     "UH-1 Contract Tests": 126,
     "UH-2 Perception Spine Tests": 166,
@@ -36,5 +37,5 @@
     "UH-7 Actuator Registry Tests": 75,
     "UH-8 Autonomy Tests": 174
   },
-  "total": 2209
+  "total": 2320
 }

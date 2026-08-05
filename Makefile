@@ -299,7 +299,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-dashboard-ui-auth test-degraded test-hygiene-gate \
 	test-assertion-floors test-gate-registry test-compose-drift \
 	test-secret-gates test-compose-gates test-ci-tolerations \
-	test-test-wiring test-test-isolation test-suite-floor
+	test-test-wiring test-test-isolation test-live-smoke test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
 # A-02 ratchet: runs `test-uh` and fails if any suite exercises less than
@@ -783,8 +783,19 @@ test-core: test-phase-b-memu test-memu-pg test-memu-turbovec test-letta test-fin
 test-dashboard-ui:
 	PYTHONPATH=. python scripts/test_dashboard_ui.py
 
+# Live end-to-end smoke against a running stack. Needs a stack: it is
+# run by core-tests.yml after the bring-up, not by `test-uh`.
+#
+# The old target ran `scripts/test_core_integration.py`, which ended in a
+# bare `return 0` after catching every exception it could raise — with
+# the whole stack down it printed eleven failures and exited 0. Its
+# replacement fails. `test-live-smoke` (in `test-uh`) tests *this*
+# script's logic with synthetic input and needs no stack at all.
 test-integration:
-	python3 scripts/test_core_integration.py
+	python3 scripts/ci/live_smoke.py --compose-file docker-compose.minimal.yml
+
+test-live-smoke:
+	python3 scripts/test_live_smoke.py
 
 # bring up full-stack composition
 full-up:

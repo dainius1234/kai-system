@@ -323,9 +323,23 @@ jobs:
           docker images --format '{{.Repository}}:{{.Tag}} {{.Size}}' || true
           echo "── logs ────────────────────────────────────────────────"
           docker compose -f docker-compose.minimal.yml logs --no-color || true
-      - name: Run integration smoke script
+      # Replaced on 2026-08-05. The previous script wrapped every probe
+      # in a catch-all, printed "service X not reachable", and ended in
+      # `return 0` — with the whole stack down it printed eleven failures
+      # and passed. It was the one step whose job is to prove the system
+      # runs, and it could not say no. It also carried its own map of
+      # eleven localhost ports, five of them naming services absent from
+      # this profile and none of them reachable since the edge lockdown
+      # put tool-gate, memu-core and agentic on internal-only networks.
+      #
+      # The replacement reads health from `docker compose ps` — the
+      # verdict of the healthcheck each service already declares — and
+      # exercises endpoints through `docker compose exec`, inside the
+      # network, with ports derived from those same healthchecks.
+      - name: Live smoke against the running stack
         run: |
-          python3 scripts/test_core_integration.py
+          python3 scripts/ci/live_smoke.py \
+            --compose-file docker-compose.minimal.yml
       - name: Kill-isolation — introspect crash must not affect hot path
         run: |
           # Stop the cold-maintenance process (memu-core-introspect, port 8009)

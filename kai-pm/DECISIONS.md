@@ -5949,3 +5949,97 @@ resolved.
 **`KAI-GATE-028`** — bring-up failure. Cause still unknown; the first
 two attempts to read it were defeated by log truncation rather than by
 the failure being subtle. Post-mortem moved to the last step. **OPEN.**
+
+---
+
+## 2026-08-05 (part 16) — a correction, and the step that could not fail
+
+### Correction to part 14
+
+Part 14 says the bring-up "**has never executed in this repository's CI
+history**". I did not know that. I knew that thirty runs on this branch
+died at step 7, and I extrapolated from thirty to always.
+
+Checked properly: `core-tests.yml` has **180 consecutive failures** back
+to 2026-07-27, which is as far as the runs API will page. That is a much
+stronger statement than the one I made and it is still not "never".
+
+Against it, `DECISIONS.md` line 667 records a green Core Tests run on
+`f7cbc86` that explicitly included bringing up
+`docker-compose.minimal.yml` and running the integration script against
+the live stack. `f7cbc86` is **not reachable in this repository** — a
+squashed PR branch, most likely.
+
+So the honest state is: **unverifiable, in both directions.** I cannot
+confirm the green run and I cannot refute it. What is certain is 180
+failures over nine days.
+
+Recorded because the rule is trust no one, and this file is included in
+"no one". Two entries of this file now disagree, and the newer one is
+not automatically the right one — it is only the one with evidence
+attached.
+
+### The step whose job is to prove the system runs, and which could not fail
+
+`scripts/test_core_integration.py`, step 49, the live end-to-end check.
+
+    def safe_get(url):
+        try:    return requests.get(url, timeout=2)
+        except Exception as e:
+            print(f"GET {url} failed: {e}"); return None
+    ...
+        for name, url in services.items():
+            r = safe_get(url)
+            if not r or r.status_code != 200:
+                print(f"service {name} not reachable"); continue
+    ...
+        return 0
+
+Every probe caught every exception. Every failure printed a line and
+continued. `main()` ended in a bare `return 0`. **With the entire stack
+down it printed eleven failures and exited 0.**
+
+It also carried its own map of eleven `http://localhost:PORT` URLs:
+
+  - **Five name services that are not in the minimal profile at all** —
+    `executor`, `camera`, `kai-advisor`, `avatar`, `audio`. Those probes
+    could only ever have printed a failure and continued, since the day
+    they were written.
+  - **None of the eleven are reachable from the host.** `tool-gate`,
+    `memu-core`, `memu-core-introspect` and `agentic` sit on networks
+    declared `internal: true`. There is no port to restore and no
+    address to route to. That is the edge lockdown working correctly.
+
+Tenth venue for the list-beside-the-thing pattern, and the first where
+the copy was not merely stale but addressed to things that never existed.
+
+The replacement, `scripts/ci/live_smoke.py`:
+
+  - reads health from `docker compose ps` — the verdict of the
+    healthcheck each service **already declares beside itself**, so no
+    port appears in the file at all;
+  - exercises endpoints through `docker compose exec`, inside the
+    network, with ports derived from those same healthchecks;
+  - prints a denominator (I-2) and fails on a missing profile, a zero
+    denominator, a `docker` error, an empty health field, or an exercise
+    naming a service the profile does not have (I-1);
+  - has no `return 0` at the bottom.
+
+`scripts/test_live_smoke.py` — 23 assertions, 11 scenarios, all against
+synthetic compose documents and a fake command runner, so none of it
+needs Docker. **Mutation-tested**: reintroducing the exact predecessor
+defect (`return [], probed, exercised`) kills 8 assertions. A suite that
+cannot detect the bug it was written for is the thing this programme
+keeps finding, so it was checked rather than assumed.
+
+### Register
+
+**`KAI-GATE-030`** — the live end-to-end CI step was structurally
+incapable of failing, and five of its eleven probes addressed services
+absent from the profile. Replaced. **OPEN** until the replacement is
+observed running against a live stack, which needs 028 resolved first.
+
+**`KAI-GATE-029`** — partially addressed: the smoke test's port map is
+deleted. The remaining host-port probes in `core-tests.yml` (the wait
+loops, kill-isolation, restart-persistence, memu-graph, sovereign boot)
+are untouched and still address nothing. **OPEN.**

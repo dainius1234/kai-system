@@ -1,0 +1,264 @@
+"""Tests for `live_smoke` — the live check that can now say no.
+
+Its predecessor, `scripts/test_core_integration.py`, ended in a bare
+`return 0` after catching every exception it could raise. With the whole
+stack down it printed eleven failures and exited 0. So the first thing
+this file pins is the property that was missing: **it must be able to
+fail**, and the failure must come from the probes rather than from a
+constant.
+
+Every scenario drives a synthetic compose document and a fake command
+runner, so none of them needs Docker, a network, or the repository to be
+in any particular state. The one that reads the real tree says so.
+"""
+from __future__ import annotations
+
+import json
+import os
+import sys
+import tempfile
+from pathlib import Path
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+from scripts.ci import live_smoke as gate  # noqa: E402
+
+passed = 0
+failed = 0
+EXPECTED_SCENARIOS = 11
+executed: list = []
+
+
+def check(name: str, condition: bool, detail: str = "") -> None:
+    global passed, failed
+    if condition:
+        passed += 1
+    else:
+        failed += 1
+        print(f"  FAIL: {name}" + (f" — {detail}" if detail else ""))
+
+
+def scenario(name: str) -> None:
+    executed.append(name)
+
+
+def _compose(**services) -> str:
+    """A compose document whose services declare healthchecks like the real ones."""
+    lines = ["services:"]
+    for name, port in services.items():
+        real = name.replace("_", "-")
+        lines.append(f"  {real}:")
+        lines.append("    build: ./x")
+        if port is not None:
+            lines.append("    healthcheck:")
+            lines.append(
+                f"      test: [\"CMD-SHELL\", \"python -c \\\"import urllib.request; "
+                f"urllib.request.urlopen('http://localhost:{port}/health')\\\"\"]")
+    return "\n".join(lines) + "\n"
+
+
+class FakeRunner:
+    """Answers `ps` from a health map and `exec` from a status map."""
+
+    def __init__(self, health: dict, statuses: dict | None = None,
+                 ps_code: int = 0):
+        self.health = health
+        self.statuses = statuses or {}
+        self.ps_code = ps_code
+        self.execs: list = []
+
+    def __call__(self, argv):
+        if "ps" in argv:
+            if self.ps_code != 0:
+                return self.ps_code, "", "cannot connect to the docker daemon"
+            rows = [json.dumps({"Service": s, "Health": h})
+                    for s, h in self.health.items()]
+            return 0, "\n".join(rows) + "\n", ""
+        if "exec" in argv:
+            service = argv[argv.index("exec") + 2]
+            self.execs.append(service)
+            status = self.statuses.get(service, 200)
+            if status == "unreachable":
+                return 1, "", "ERROR URLError"
+            return 0, f"STATUS {status}\n", ""
+        return 0, "", ""
+
+
+def _audit(compose_text: str, runner):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "c.yml").write_text(compose_text, encoding="utf-8")
+        original = gate.REPO
+        try:
+            gate.REPO = root
+            return gate.audit("c.yml", runner)
+        finally:
+            gate.REPO = original
+
+
+# ── The property the old file did not have ───────────────────────────
+
+def test_an_unhealthy_service_fails() -> None:
+    """The whole reason this file exists."""
+    scenario("unhealthy fails")
+    text = _compose(**{"heartbeat": 8010, "memu_core": 8001, "dashboard": 8080})
+    runner = FakeRunner({"heartbeat": "healthy", "memu-core": "unhealthy",
+                         "dashboard": "healthy"})
+    failures, probed, _ = _audit(text, runner)
+    check("it fails", len(failures) >= 1, str(failures))
+    check("and names the service",
+          any("memu-core" in f for f in failures), str(failures))
+    check("and every service was counted", probed == 3, str(probed))
+
+
+def test_a_whole_stack_down_fails() -> None:
+    """The exact case the predecessor exited 0 on."""
+    scenario("whole stack down fails")
+    text = _compose(**{"heartbeat": 8010, "memu_core": 8001, "dashboard": 8080})
+    failures, probed, exercised = _audit(text, FakeRunner({}))
+    check("a stack that started nothing fails", len(failures) >= 3, str(failures))
+    check("no exercise was counted as run", exercised == 0, str(exercised))
+    check("and the denominator still shows what was expected",
+          probed == 3, str(probed))
+
+
+def test_a_healthy_stack_passes() -> None:
+    scenario("healthy stack passes")
+    text = _compose(**{"heartbeat": 8010, "memu_core": 8001, "dashboard": 8080})
+    runner = FakeRunner({"heartbeat": "healthy", "memu-core": "healthy",
+                         "dashboard": "healthy"})
+    failures, probed, exercised = _audit(text, runner)
+    check("no failures", failures == [], str(failures))
+    check("three services probed", probed == 3, str(probed))
+    check("three endpoints exercised", exercised == 3, str(exercised))
+
+
+# ── Failing closed ───────────────────────────────────────────────────
+
+def test_a_missing_profile_is_a_failure() -> None:
+    """I-1. A smoke test with no stack to smoke has not passed."""
+    scenario("missing profile fails")
+    with tempfile.TemporaryDirectory() as tmp:
+        original = gate.REPO
+        try:
+            gate.REPO = Path(tmp)
+            failures, probed, _ = gate.audit("absent.yml", FakeRunner({}))
+        finally:
+            gate.REPO = original
+    check("absence is reported", len(failures) == 1, str(failures))
+    check("and nothing is claimed as inspected", probed == 0, str(probed))
+
+
+def test_a_profile_with_no_healthchecks_is_a_failure() -> None:
+    """I-2. Inspecting nothing must not read the same as inspecting all."""
+    scenario("zero denominator fails")
+    text = _compose(**{"opaque": None})
+    failures, probed, _ = _audit(text, FakeRunner({}))
+    check("zero inspected is a failure", len(failures) >= 1, str(failures))
+    check("and says so", any("nothing was inspected" in f for f in failures),
+          str(failures))
+
+
+def test_a_docker_failure_is_a_failure_not_a_pass() -> None:
+    """`docker compose ps` failing means the answer is unknown."""
+    scenario("docker failure fails")
+    text = _compose(**{"heartbeat": 8010})
+    try:
+        _audit(text, FakeRunner({}, ps_code=1))
+        check("it raised rather than reporting clean", False, "no exception")
+    except RuntimeError as exc:
+        check("it raised rather than reporting clean", True, str(exc))
+
+
+def test_a_service_with_no_healthcheck_is_not_read_as_healthy() -> None:
+    scenario("no-healthcheck is not healthy")
+    text = _compose(**{"heartbeat": 8010})
+    runner = FakeRunner({"heartbeat": ""})
+    failures, _, _ = _audit(text, runner)
+    check("an empty health field is a failure", len(failures) >= 1, str(failures))
+    check("reported as no-healthcheck",
+          any("no-healthcheck" in f for f in failures), str(failures))
+
+
+# ── The deleted port map ─────────────────────────────────────────────
+
+def test_ports_come_from_the_healthcheck() -> None:
+    """The map is derived from the compose file, not typed here."""
+    scenario("ports derived from healthchecks")
+    import yaml
+    doc = yaml.safe_load(_compose(**{"memu_core": 8001, "dashboard": 8080}))
+    ports = gate.health_ports(doc)
+    check("both resolve", ports == {"memu-core": 8001, "dashboard": 8080},
+          str(ports))
+
+
+def test_a_healthcheck_without_a_port_is_omitted_not_guessed() -> None:
+    """`redis`, `postgres` and `ollama` probe with their own CLIs."""
+    scenario("portless healthcheck omitted")
+    import yaml
+    doc = yaml.safe_load(
+        "services:\n"
+        "  redis:\n"
+        "    image: redis:7-alpine\n"
+        "    healthcheck:\n"
+        "      test: [\"CMD\", \"redis-cli\", \"ping\"]\n")
+    check("no port is invented", gate.health_ports(doc) == {},
+          str(gate.health_ports(doc)))
+
+
+def test_an_exercise_for_an_absent_service_is_reported() -> None:
+    """Five of the old file's eleven probes addressed services that were
+    not in the profile, and printing a line was all that happened."""
+    scenario("exercise drift is reported")
+    text = _compose(**{"heartbeat": 8010})       # no memu-core, no dashboard
+    runner = FakeRunner({"heartbeat": "healthy"})
+    failures, _, _ = _audit(text, runner)
+    check("the drift is a failure, not a printed line",
+          any("cannot be exercised" in f for f in failures), str(failures))
+
+
+# ── The real tree ────────────────────────────────────────────────────
+
+def test_the_real_profile_declares_the_exercised_services() -> None:
+    """Reads the repository: every service in EXERCISES must exist with a
+    health port, or the exercise list has drifted from the profile."""
+    scenario("real profile matches the exercise list")
+    import yaml
+    doc = yaml.safe_load(
+        (gate.REPO / "docker-compose.minimal.yml").read_text(encoding="utf-8"))
+    ports = gate.health_ports(doc)
+    missing = [s for s, _, _, _ in gate.EXERCISES if s not in ports]
+    check("every exercised service is in the minimal profile",
+          missing == [], str(missing))
+    check("and the profile declares a useful number of health ports",
+          len(ports) > 10, str(len(ports)))
+
+
+def run_all() -> None:
+    test_an_unhealthy_service_fails()
+    test_a_whole_stack_down_fails()
+    test_a_healthy_stack_passes()
+    test_a_missing_profile_is_a_failure()
+    test_a_profile_with_no_healthchecks_is_a_failure()
+    test_a_docker_failure_is_a_failure_not_a_pass()
+    test_a_service_with_no_healthcheck_is_not_read_as_healthy()
+    test_ports_come_from_the_healthcheck()
+    test_a_healthcheck_without_a_port_is_omitted_not_guessed()
+    test_an_exercise_for_an_absent_service_is_reported()
+    test_the_real_profile_declares_the_exercised_services()
+
+    check(f"all {EXPECTED_SCENARIOS} scenarios ran",
+          len(executed) == EXPECTED_SCENARIOS,
+          f"{len(executed)} ran: {executed}")
+    check("no scenario ran twice", len(set(executed)) == len(executed),
+          str(executed))
+
+
+if __name__ == "__main__":
+    run_all()
+    print(f"\n{'=' * 60}")
+    print(f"Live Smoke Tests: {passed} passed, {failed} failed")
+    if failed:
+        print("EXIT GATE: FAIL")
+        sys.exit(1)
+    print("EXIT GATE: PASS")

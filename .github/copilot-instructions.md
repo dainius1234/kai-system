@@ -125,7 +125,7 @@ make dep-audit                          # pip-audit dependency vulnerability sca
 make coverage                           # pytest-cov coverage report (HTML + terminal)
 # Integration / smoke tests (requires running stack)
 make core-smoke              # python3 scripts/smoke_core.py
-make test-integration        # python3 scripts/test_core_integration.py
+make test-integration        # python3 scripts/ci/live_smoke.py (needs a running stack)
 
 # Full merge-gate check (all validation steps)
 make merge-gate
