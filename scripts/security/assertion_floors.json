@@ -5,6 +5,7 @@
     "Assertion Floor Tests": 40,
     "CI Toleration Tests": 15,
     "Compose Drift Tests": 28,
+    "Compose Env Tests": 18,
     "Compose Gate Tests": 54,
     "Compose Probe Tests": 27,
     "Concurrency & Clock Tests": 51,
@@ -44,5 +45,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2516
+  "total": 2534
 }

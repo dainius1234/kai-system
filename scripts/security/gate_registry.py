@@ -335,6 +335,17 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-037",)),
+    # postgres refused to start with a blank password, and compose said
+    # so in a warning printed on every invocation, all day. KAI-GATE-040.
+    Gate(module="check_compose_env",
+         kind=GATE,
+         summary="every compose bring-up step supplies the variables it needs",
+         inputs=(".github/workflows",),
+         denominator=r"inspected: \d+ compose bring-up step",
+         proven_by="scripts/test_compose_env.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-040",)),
     Gate(module="check_test_wiring",
          kind=GATE,
          summary="every test in a self-run suite is dispatched",

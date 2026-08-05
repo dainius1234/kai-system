@@ -99,6 +99,9 @@ jobs:
       - name: Every COPY source resolves in its build context
         run: python scripts/security/check_dockerfile_context.py
 
+      - name: Every compose bring-up supplies the variables it needs
+        run: python scripts/security/check_compose_env.py
+
         run: python scripts/security/check_test_wiring.py
 
       - name: Instrumentation invariants (I-4 enforced)

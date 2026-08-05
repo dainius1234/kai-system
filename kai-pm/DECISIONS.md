@@ -6928,3 +6928,76 @@ Floors: 42 suites, 2,516 assertions.
 a script has assertions that cannot fail anything, and one such suite was
 guarding KAI-GATE-024. Instance wired, class gated, proven by running the
 suite both ways.
+
+---
+
+## 2026-08-05 (part 29) — the build passes, and the answer was in every log
+
+**The images build.** Both the minimal and the full build now complete,
+and the failure moved to the bring-up:
+
+    dependency failed to start: container sovereign-postgres is unhealthy
+
+`docker-compose.minimal.yml` declares `POSTGRES_PASSWORD: ${DB_PASSWORD}`
+with **no default**, and that is right — a default password in a shipped
+compose file is exactly what `check_secret_fallbacks` forbids. The
+consequence is that whoever brings the stack up must supply one, and the
+bring-up step did not. The only step in the entire workflow that set
+`DB_PASSWORD` was the sovereign boot, 150 lines further down. postgres
+refuses to initialise with an empty superuser password.
+
+### The part worth writing down
+
+    The "DB_PASSWORD" variable is not set. Defaulting to a blank string.
+
+That line was printed by **every compose invocation in this workflow, in
+every log I read today** — dozens of times, in outputs I quoted back in
+these entries. I filtered it as noise.
+
+The evidence was never missing. My attention was. That is a different
+failure from every other one recorded here: not a gate with too small a
+scope, but a signal present, correct, and unread. **Warning fatigue is
+its own blindness mechanism**, and the remedy is the same as H-6's — if
+something is worth printing and nobody acts on it, either it should fail
+or it should not be printed.
+
+### The gate, and the bug its own calibration caught
+
+`check_compose_env.py`: a compose variable with no default, in a profile
+a step brings up, must be set **on that step**. Per step, not per file —
+a variable set on one step is not set on another, and a file-level check
+would have called this repository clean while postgres was refusing to
+start. That is the denominator error, one more time.
+
+Per **service**, too. `up -d ollama memu-graph` starts two services, not
+the profile. The first version ignored the service list and produced six
+findings, five of them Grafana, Tailscale and Vault variables belonging
+to services that step never starts. A gate with false positives gets
+ignored.
+
+Then the calibration failed. Removing the `DB_PASSWORD` I had just added
+produced **no finding**. The bring-up command ends with a `\` line
+continuation, my parser treated `\` as a service name, no service
+matched, the scope became empty, and the gate passed the exact defect it
+was written for.
+
+It now fails closed: a token is a service name only if the profile
+defines one by that name, and recognising nothing means the whole
+profile. Over-report, never under-report. Re-calibrated: removing
+`DB_PASSWORD` now names the step, the file and the variable.
+
+**That is the seventh time today the instrument was wrong and the
+calibration caught it — and the first where the calibration caught a
+gate that would otherwise have shipped green and blind.**
+
+Floors: 43 suites, 2,534 assertions.
+
+### Register
+
+**`KAI-GATE-040`** — a compose variable with no default, unsupplied by
+the step that brings the profile up. Instance fixed, class gated,
+service- and step-scoped, and the gate's own calibration caught it
+passing the defect first.
+
+**`KAI-GATE-035`** — **CLOSED**: the images build. Both profiles compile
+every Dockerfile they reference, observed in CI on `cd3dacb`.
