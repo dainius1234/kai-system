@@ -48,7 +48,7 @@ from scripts.security import gate_registry as registry_module  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 35
+EXPECTED_SCENARIOS = 37
 executed: list[str] = []
 
 
@@ -530,17 +530,30 @@ def pathlib_exists(rel: str) -> bool:
 
 
 def test_the_enforced_set_never_shrinks():
-    """A floor on the ratchet itself. Removing an invariant from ENFORCED
-    is the regression this whole file exists to prevent, so it is asserted
-    against a literal rather than against the current value."""
+    """A floor on the ratchet itself.
+
+    Removing an invariant from ENFORCED is the regression this whole file
+    exists to prevent, so each is named against a literal rather than
+    against the current value.
+
+    The count is a FLOOR, not an equality. It was `== 6`, which meant a
+    test named "never shrinks" also forbade growth: adding I-7 failed it.
+    An assertion that blocks the improvement it was written to protect is
+    its own small version of the ratchet problem.
+    """
     scenario("enforced-floor")
     check("I-4 is enforced", "I-4" in meta.ENFORCED, str(meta.ENFORCED))
     check("I-5 is enforced", "I-5" in meta.ENFORCED, str(meta.ENFORCED))
     check("I-6 is enforced", "I-6" in meta.ENFORCED, str(meta.ENFORCED))
     check("I-2 is enforced", "I-2" in meta.ENFORCED, str(meta.ENFORCED))
-    check("all six invariants enforce", len(meta.ENFORCED) == 6,
+    check("I-7 is enforced", "I-7" in meta.ENFORCED, str(meta.ENFORCED))
+    # A FLOOR, not an equality. The literal `== 6` blocked I-7 from being
+    # added at all — a test named "never shrinks" that also forbids
+    # growth. Every invariant that has ever been enforced is named above,
+    # so removing one still fails; adding one does not.
+    check("the enforced set has not shrunk", len(meta.ENFORCED) >= 7,
           str(meta.ENFORCED))
-    check("every enforced name is real",
+    check("every invariant defined is also enforced",
           set(meta.ENFORCED) == set(meta.INVARIANTS), str(meta.ENFORCED))
     check("every enforced name is a real invariant",
           all(n in meta.INVARIANTS for n in meta.ENFORCED), str(meta.ENFORCED))
@@ -606,6 +619,56 @@ def test_a_misreported_closure_is_detected():
             meta.ARCHITECTURE_DOC = original
 
 
+def test_every_ratchet_declares_its_calibration():
+    """I-7. A bound that zero satisfies needs proof zero is real.
+
+    A gate bounding a MAXIMUM is satisfied by zero, and zero is exactly
+    what a detector that has stopped detecting reports. On 2026-08-05 a
+    tokenising bug took the hygiene survey's `clients` from 16 to 0 and
+    adoption from 149 to 0, and the gate passed — doing precisely what a
+    ratchet does. It was caught because 0 was implausible and somebody
+    looked, which is not a control.
+    """
+    scenario("every ratchet declares calibration")
+    from scripts.security.check_gate_registry import uncalibrated_ratchets
+    found = uncalibrated_ratchets(lambda rel: (meta.REPO / rel).exists())
+    check("no ratchet is uncalibrated", found == [], str(found))
+
+    ratchets = [g for g in registry_module.REGISTRY if g.ratchet]
+    check("some gate is actually declared a ratchet",
+          len(ratchets) >= 3, str(len(ratchets)))
+
+
+def test_an_uncalibrated_ratchet_is_detected():
+    """Synthetic, so this does not depend on the repo being wrong."""
+    scenario("an uncalibrated ratchet is caught")
+    from dataclasses import replace
+    from scripts.security import check_gate_registry as m
+
+    original = registry_module.REGISTRY
+    victim = next(g for g in original if g.ratchet)
+    try:
+        registry_module.REGISTRY = tuple(
+            replace(g, calibrated_by=None) if g is victim else g
+            for g in original)
+        found = m.uncalibrated_ratchets(lambda rel: (m.REPO / rel).exists())
+        check("a ratchet with no calibration is reported",
+              any(victim.module in f for f in found), str(found))
+
+        # Fails closed: naming a suite that is not there must not satisfy
+        # the check that exists to require one, or deleting the
+        # calibration would "fix" it.
+        registry_module.REGISTRY = tuple(
+            replace(g, calibrated_by="scripts/test_absent_xyz.py — gone")
+            if g is victim else g
+            for g in original)
+        found = m.uncalibrated_ratchets(lambda rel: (m.REPO / rel).exists())
+        check("a calibration naming a missing file is reported",
+              any(victim.module in f for f in found), str(found))
+    finally:
+        registry_module.REGISTRY = original
+
+
 def run_all() -> None:
     test_invariants_are_counted_per_dimension()
     test_an_enforced_invariant_with_breaches_fails()
@@ -620,6 +683,8 @@ def run_all() -> None:
     test_the_enforced_set_never_shrinks()
     test_the_human_summary_agrees_with_the_register()
     test_a_misreported_closure_is_detected()
+    test_every_ratchet_declares_its_calibration()
+    test_an_uncalibrated_ratchet_is_detected()
     test_a_matching_world_is_clean()
     test_an_unregistered_check_fails()
     test_a_registered_check_with_no_file_fails()

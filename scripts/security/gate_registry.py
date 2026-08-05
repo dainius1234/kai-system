@@ -72,6 +72,29 @@ class Gate:
     # I-3 — the suite that injects a violation and asserts it fires.
     proven_by: Optional[str] = None
 
+    # I-7 — a ratchet must prove its instrument still measures.
+    #
+    # A gate that bounds a MAXIMUM ("this count may not rise") is
+    # satisfied by zero, and zero is exactly what a detector that has
+    # stopped detecting reports. The bound is enforced correctly and the
+    # silence is the danger. On 2026-08-05 a tokenising bug took the
+    # hygiene survey's `clients` from 16 to 0 and its adoption count from
+    # 149 to 0, and the gate passed — it was doing precisely what a
+    # ratchet does.
+    #
+    # `ratchet=True` means the verdict rests on a stored baseline, and
+    # `calibrated_by` must then name the suite that points the detector
+    # at input whose answer is known *before* pointing it at the
+    # repository. A historical baseline says "this is what we saw last
+    # time"; it cannot say whether last time's instrument was working.
+    #
+    # Gates bounding a MINIMUM do not need this — a blinded detector
+    # reports zero, zero is below the floor, and the gate fires. Recorded
+    # anyway where it applies, because "safe by direction" is a property
+    # worth stating rather than rediscovering.
+    ratchet: bool = False
+    calibrated_by: Optional[str] = None
+
     # I-4 — where it is enforced. Discovered independently and compared.
     in_policy_check: bool = False
     in_workflows: Tuple[str, ...] = ()
@@ -176,6 +199,9 @@ REGISTRY: Tuple[Gate, ...] = (
          # narrower scope — so those closures were true of what was
          # measured and not of the repository. Registered rather than
          # absorbed into the baseline silently (Rule 7).
+         ratchet=True,
+         calibrated_by=(
+             "scripts/test_hygiene_gate.py — every detector fires on a known positive and ignores prose describing the same pattern; the denominator is DETECTORS, so a new detector without a sample fails"),
          findings=("KAI-GATE-001", "KAI-GATE-022")),
 
     Gate(module="check_dashboard_findings",
@@ -198,6 +224,15 @@ REGISTRY: Tuple[Gate, ...] = (
                            "probed by scripts/test_assertion_floors.py "
                            "against synthetic logs instead",
          proven_by="scripts/test_assertion_floors.py",
+         # Bounds a MINIMUM, so a blinded counter reports zero, zero is
+         # below every floor, and the gate fires. Declared anyway: the
+         # calibration proves a suite producing no count is reported as
+         # vanished rather than silently dropped.
+         ratchet=True,
+         calibrated_by=(
+             "scripts/test_assertion_floors.py — a suite that produces no "
+             "count is reported as vanished rather than passing, and an "
+             "emptied floors file leaves every suite unrecorded"),
          in_policy_check=False,
          in_workflows=("unified-hunter.yml",)),
 
@@ -248,6 +283,9 @@ REGISTRY: Tuple[Gate, ...] = (
          proven_by="scripts/test_test_isolation.py",
          in_policy_check=False,
          in_workflows=("python-app.yml",),
+         ratchet=True,
+         calibrated_by=(
+             "scripts/test_test_isolation.py — one fixture exercising all five reported categories (replaced, added, env_set, env_changed, path_added); the denominator is the plugin's own finding keys"),
          findings=("KAI-GATE-019",)),
 
     # KAI-GATE-020: the repo-wide result itself, as a ratchet. Recorded at
@@ -266,6 +304,9 @@ REGISTRY: Tuple[Gate, ...] = (
          proven_by="scripts/test_suite_floor.py",
          in_policy_check=False,
          in_workflows=("python-app.yml",),
+         ratchet=True,
+         calibrated_by=(
+             "scripts/test_suite_floor.py — the parser reads 8 failed and 3 errors from a known summary, and a log with no summary returns None rather than zero failures"),
          findings=("KAI-GATE-020",)),
 
     # ── The meta-check, bound by the rules it enforces ───────────────

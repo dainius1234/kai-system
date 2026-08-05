@@ -452,7 +452,46 @@ def evaluate() -> Dict[str, List[str]]:
     from scripts.security.closure_register import lapsed
     problems["lapsed"] += lapsed()
     problems["misreported"] += misreported_closures()
+    problems["uncalibrated"] += uncalibrated_ratchets(
+        lambda rel: (REPO / rel).exists())
     return problems
+
+
+def uncalibrated_ratchets(repo_has) -> List[str]:
+    """Ratchets that cannot show their instrument still measures (I-7).
+
+    A gate bounding a MAXIMUM is satisfied by zero, and zero is exactly
+    what a detector that has stopped detecting reports. The bound is
+    enforced correctly; the silence is the danger. A tokenising bug took
+    the hygiene survey's `clients` from 16 to 0 and its adoption count
+    from 149 to 0, and the gate passed — doing precisely what a ratchet
+    does. It was caught because 0 was implausible and somebody looked,
+    which is not a control.
+
+    So every `ratchet=True` gate must name a suite that points its
+    detector at input whose answer is known *before* pointing it at the
+    repository. A historical baseline says "this is what we saw last
+    time"; it cannot say whether last time's instrument was working.
+
+    Fails closed on a `calibrated_by` naming a file that is not there —
+    otherwise deleting the calibration suite would satisfy the check
+    that exists to require it.
+    """
+    _gate, _report, registry = _load_registry()
+    out = []
+    for gate in registry:
+        if not getattr(gate, "ratchet", False):
+            continue
+        declared = getattr(gate, "calibrated_by", None)
+        if not declared:
+            out.append(f"{gate.module}: ratchets a stored baseline and "
+                       f"declares no calibration")
+            continue
+        path = declared.split(" ")[0].split(" —")[0]
+        if path.endswith(".py") and not repo_has(path):
+            out.append(f"{gate.module}: calibrated_by names {path}, "
+                       f"which is not in the repository")
+    return out
 
 
 ARCHITECTURE_DOC = REPO / "kai-pm" / "INSTRUMENTATION_ARCHITECTURE.md"
@@ -479,7 +518,11 @@ def misreported_closures() -> List[str]:
         doc = ARCHITECTURE_DOC.read_text(encoding="utf-8")
     except OSError as exc:
         return [f"{ARCHITECTURE_DOC.name}: unreadable ({exc})"]
-    rows = dict(re.findall(r"^\| `(KAI-GATE-\d+)` \|.*?\| \*\*([A-Z]+)",
+    # Greedy up to the LAST `| **` on the line: the verdict is always the
+    # final column, and a description may legitimately contain bold — the
+    # row for KAI-GATE-023 opens with it, and a non-greedy match read the
+    # "E" of "**Every ratchet..." as the status.
+    rows = dict(re.findall(r"^\| `(KAI-GATE-\d+)` \|.*\| \*\*([A-Z]+)",
                            doc, re.M))
     if not rows:
         return [f"{ARCHITECTURE_DOC.name}: no finding table found — the "
@@ -516,6 +559,9 @@ _HEADINGS = [
     ("lapsed", "CLOSURES RE-OPENED — the prevention no longer holds (I-6)"),
     ("misreported", "CLOSURE STATE MISREPORTED — the summary a human "
                     "reads disagrees with the register (I-4)"),
+    ("uncalibrated", "RATCHET WITH NO CALIBRATION — a bound that zero "
+                     "satisfies, and zero is what a blinded detector "
+                     "reports (I-7)"),
 ]
 
 # ── Per-invariant enforcement ────────────────────────────────────────
@@ -538,6 +584,7 @@ INVARIANTS = {
             ("unregistered", "phantom", "wiring", "misreported")),
     "I-5": ("no inert rules", ("inert",)),
     "I-6": ("closures still hold", ("lapsed",)),
+    "I-7": ("a ratchet proves it still measures", ("uncalibrated",)),
 }
 
 # Enforced invariants fail the build. Adding one here is the ratchet
@@ -553,7 +600,7 @@ INVARIANTS = {
 # it — I-5 when the inert-rule detector cleared, I-6 on its first run,
 # I-2 when the last compose gates got denominators, I-1 and I-3 when the
 # retrofit finished. Nobody ever remembered to flip one.
-ENFORCED = ("I-1", "I-2", "I-3", "I-4", "I-5", "I-6")
+ENFORCED = ("I-1", "I-2", "I-3", "I-4", "I-5", "I-6", "I-7")
 
 
 def invariant_counts(problems: Dict[str, List[str]]) -> Dict[str, int]:

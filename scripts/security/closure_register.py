@@ -60,6 +60,13 @@ def _in_policy_check(module: str) -> Callable[[], bool]:
     return predicate
 
 
+def _ratchets_calibrated() -> bool:
+    """Every ratchet still names a calibration suite that exists."""
+    from scripts.security.check_gate_registry import (REPO,
+                                                      uncalibrated_ratchets)
+    return uncalibrated_ratchets(lambda rel: (REPO / rel).exists()) == []
+
+
 def _swallows_ratcheted() -> bool:
     """The silent-swallow count is baselined and the survey still gates.
 
@@ -305,6 +312,39 @@ CLOSED = CLOSED + (
                   "_sense_world and submit_feedback)",
         verified_on="2026-08-05",
         still_holds=_swallows_ratcheted,
+    ),
+    Closure(
+        finding="KAI-GATE-023",
+        defect="Every ratchet bounding a MAXIMUM is satisfied by zero, "
+               "and zero is exactly what a detector that has stopped "
+               "detecting reports. The bound is enforced correctly and "
+               "the silence is the danger. Demonstrated by blinding the "
+               "hygiene survey's textual detectors — `clients` 16 -> 0, "
+               "adoption 149 -> 0, every count improved, gate PASSED — "
+               "and again on the isolation gate, where a report naming "
+               "10 of 21 declared files with halved counts passes "
+               "cleanly. Caught only because 0 was implausible and "
+               "somebody looked, which is not a control.",
+        fix="Calibration companions for the two blind ratchets: every "
+            "hygiene detector fires on a known positive and ignores "
+            "prose describing the same pattern; the isolation plugin "
+            "exercises all five reported categories in one fixture. Both "
+            "take their denominator from the thing being calibrated "
+            "(`DETECTORS`, the plugin's own finding keys) so a new "
+            "category cannot appear without a calibration case beside "
+            "it.",
+        prevention="I-7 — `ratchet=True` requires `calibrated_by`, "
+                   "enforced at zero in `policy-check` and "
+                   "`policy-checks.yml`. Fails closed on a calibration "
+                   "naming a file that is not there, so deleting the "
+                   "suite cannot satisfy the check that requires it.",
+        proven_by="scripts/test_gate_registry.py — a ratchet with no "
+                  "calibration, and a calibration pointing at nothing; "
+                  "scripts/test_hygiene_gate.py and "
+                  "scripts/test_test_isolation.py carry the calibrations "
+                  "themselves",
+        verified_on="2026-08-05",
+        still_holds=_ratchets_calibrated,
     ),
 )
 

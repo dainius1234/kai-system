@@ -277,6 +277,7 @@ instrumentation, and letting them dilute or stand in for one of the 96
 | `KAI-GATE-003` | MEDIUM | 8 of 12 gates have **never been observed failing**. No suite injects a violation and asserts they fire | **CLOSED 2026-08-03** · prevention re-verified on every run by `closure_register.still_holds` |
 | `KAI-GATE-004` | MEDIUM | A gate is declared in up to three places with **nothing cross-checking them**. Two of twelve are already inconsistent | **CLOSED 2026-08-03** · prevention re-verified on every run by `closure_register.still_holds` |
 | `KAI-GATE-006` | HIGH | **9 of 21 `sovereign` services had no `restart` and no `security_opt`** — including Vault, the rotator, Postgres and Redis. The profile named for being hardened was the least guarded, because the drift check only ever compared `full` against `minimal` | **CLOSED 2026-08-03** · prevention re-verified on every run by `closure_register.still_holds` |
+| `KAI-GATE-023` | HIGH | **Every ratchet bounding a maximum is satisfied by zero, and zero is what a detector that has stopped detecting reports.** Blinding the hygiene survey took `clients` 16 → 0 and adoption 149 → 0 with the gate still green; an isolation report naming 10 of 21 declared files passes cleanly. Caught only because 0 was implausible and somebody looked | **CLOSED 2026-08-05** — I-7: a ratchet must name a calibration that proves its instrument still measures · prevention re-verified on every run by `closure_register.still_holds` |
 
 **Findings formally closed: 0.** Programme Rule 7.
 

@@ -5414,3 +5414,69 @@ written down than discovered later by someone reading a green gate.
     suite floor  4,286 passed, 0 failed, 0 errors
     isolation    replaced 0, no declared leak grew, five categories calibrated
     hygiene      7, five detectors calibrated
+
+---
+
+## 2026-08-05 (part 9) — I-7: a ratchet must prove its instrument still measures
+
+The operator's instruction was to make the calibration pattern a
+**standing rule** rather than four separate good intentions. It is now
+the seventh instrumentation invariant, enforced at zero.
+
+### The rule
+
+A gate declares `ratchet=True` when its verdict rests on a stored
+baseline, and must then name `calibrated_by` — the suite that points its
+detector at input whose answer is known *before* pointing it at the
+repository.
+
+> A historical baseline says "this is what we saw last time." It cannot
+> say whether last time's instrument was working.
+
+`uncalibrated_ratchets()` reports any ratchet without one, and fails
+closed on a `calibrated_by` naming a file that is not present — otherwise
+deleting the calibration suite would satisfy the check that exists to
+require it. Mutation-tested in both directions.
+
+### The four, and their directions — verified from source, not memory
+
+    check_suite_floor        passed < min_passed        MINIMUM   safe
+                             failed > max_failed        maximum   calibrated
+    check_assertion_floors   counts[n] < floors[n]      MINIMUM   safe
+    hygiene_survey           five columns               maximum   calibrated
+    check_test_isolation     replaced/added/env_set     maximum   calibrated
+
+**A correction to what I reported an hour ago.** I said
+`suite floor / max_failed` was uncovered. It is not:
+`test_failures_and_errors_parse` has always asserted the parser reads 8
+failed and 3 errors from a known summary, and
+`test_a_log_with_no_summary_is_not_zero_failures` that absence returns
+`None` rather than zero failures. That calibration predates this whole
+line of enquiry. I recorded a gap that was already closed, which is the
+mirror of reading the architecture doc and reporting closures that were
+already made.
+
+The two minima are safe **by direction, not by foresight** — a blinded
+counter reports zero, zero is below the floor, the gate fires. They are
+declared `ratchet=True` anyway, with the reason written down, because a
+property nobody stated is a property nobody can rely on.
+
+### A small instance of the same disease, found while fixing it
+
+`test_the_enforced_set_never_shrinks` asserted `len(ENFORCED) == 6`.
+Adding I-7 failed it. A test named *never shrinks* that also forbade
+growth — an assertion blocking the improvement it was written to protect.
+Now a floor (`>= 7`) with every invariant named individually, so removing
+one still fails and adding one does not.
+
+### Register
+
+**`KAI-GATE-023` OPEN → CLOSED in the same entry**, deliberately, because
+the finding and its structural prevention were built together and the
+prevention is enforced rather than promised: *ratchets bounding a maximum
+are blind to a detector that has stopped detecting.* Found by blinding
+one and watching the gate pass; prevented by I-7 at zero and enforced.
+
+    suite floor  4,288 passed, 0 failed, 0 errors
+    policy-check 11 PASS lines, no failures
+    meta-check   I-1..I-7 hold; 10 closures re-verified
