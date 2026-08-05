@@ -18,6 +18,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from common.http_hygiene import bounded_json, pooled_client
+from common.degraded import degradation_report, record_degradation
 from common.auth import sign_gate_request, sign_gate_request_bundle
 from common.service_auth import require_service_auth
 from common.feature_flags import is_enabled
@@ -1010,8 +1011,8 @@ async def watchdog_check() -> Dict[str, Any]:
     for evt_name in fsm_events:
         try:
             await fsm_fire(SysEvent(evt_name))
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("cognition", "fsm_fire", _exc)
     return {
         "checked": len(results),
         "healthy": sum(1 for r in results if r.healthy),
@@ -1544,8 +1545,8 @@ async def _read_mode() -> str:
             resp = await client.get(f"{TOOL_GATE_URL}/gate/mode")
             if resp.status_code == 200:
                 return str(resp.json().get("mode", "PUB")).upper()
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("tool_gate", "read_mode", _exc)
     return "PUB"
 
 
@@ -1581,8 +1582,8 @@ async def _surface_graph_context(query: str, top_k: int = 5) -> Dict[str, Any]:
                 data = resp.json()
                 if data.get("status") not in ("graph_disabled", "graph_unavailable"):
                     return data
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("memu", "surface_graph_context", _exc)
     return {}
 
 
@@ -1598,8 +1599,8 @@ async def _sync_letta_memories() -> None:
                     f"{MEMU_URL}/memory/memorize",
                     json={"content": mem, "category": "letta_archival"},
                 )
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("letta", "sync_letta_memories", _exc)
 
 
 async def _surface_letta_context(user_msg: str) -> Dict[str, Any]:
@@ -1622,8 +1623,8 @@ async def _surface_letta_context(user_msg: str) -> Dict[str, Any]:
                 if is_enabled("LETTA_MEMORY_SYNC") and result.get("memories_updated"):
                     _cleanup_mgr.submit(_sync_letta_memories())
                 return result
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("letta", "surface_letta_context", _exc)
     return {}
 
 
@@ -1651,8 +1652,8 @@ async def _read_financial_context(user_msg: str) -> Dict[str, Any]:
             resp = await client.get(f"{FINANCIAL_URL}/finance/summary")
             if resp.status_code == 200:
                 return resp.json()
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("financial", "read_financial_context", _exc)
     return {}
 
 
@@ -1689,12 +1690,24 @@ async def _sense_world() -> str:
     """Layer 2 (D87): gather one-sentence summaries from all sensory services in parallel.
 
     Only fires when FF_CONTEXT_ENRICHMENT is enabled (default True).
-    Each service gets a 2-second timeout; failures are silently skipped.
-    Trivial/loading/error states are filtered out so only meaningful readings
-    reach the LLM prompt.
+    Each service gets a 2-second timeout. Trivial/loading/error states are
+    filtered out so only meaningful readings reach the LLM prompt.
+
+    H-6: failures used to be *silently* skipped, and this is the worst
+    place in the system for that. What this function returns becomes
+    Kai's description of the world in the prompt. With every sensory
+    service down it returned the empty string — identical to a calm,
+    fully-observed, uneventful world — and Kai then spoke about that
+    world with no idea it had not seen it.
+
+    So a sense that could not be read is named. The prompt now carries
+    "could not read" instead of implying "nothing to report", which are
+    opposite claims.
     """
     if not is_enabled("CONTEXT_ENRICHMENT"):
         return ""
+
+    blind: List[str] = []
 
     async def _fetch_summary(base: str, path: str, label: str) -> Optional[str]:
         try:
@@ -1719,7 +1732,9 @@ async def _sense_world() -> str:
                 if any(s in text.lower() for s in _SENSORY_SKIP):
                     return None
                 return f"{label}: {text}"
-        except Exception:
+        except Exception as _exc:
+            blind.append(label)
+            record_degradation(label.lower().replace(" ", "_"), "sense_world", _exc)
             return None
 
     fetches = [
@@ -1747,8 +1762,8 @@ async def _sense_world() -> str:
                         title = results_data[0].get("title", "")
                         if title:
                             lines.append(f"Vault (recent note): {title}")
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("vault_sync", "sense_world", _exc)
 
     # Screen activity — sense what the operator is looking at
     try:
@@ -1759,8 +1774,8 @@ async def _sense_world() -> str:
                 diff = data.get("last_diff_score", 0)
                 if data.get("watching") and diff > 0.1:
                     lines.append(f"Screen: active, change score {diff:.2f}")
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("screen_watcher", "sense_world", _exc)
 
     # Clipboard — sense what the operator just copied
     try:
@@ -1770,8 +1785,8 @@ async def _sense_world() -> str:
                 content = r.json().get("content", "").strip()
                 if content:
                     lines.append(f"Clipboard: {content[:120]}")
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("clipboard_service", "sense_world", _exc)
 
     # Cortex — pre-interpreted situational awareness (prepended so it reads first)
     try:
@@ -1808,8 +1823,15 @@ async def _sense_world() -> str:
                     logger.debug("cortex source resolution failed: %s", exc)
                 # Feed cognitive module so it can bid to GlobalWorkspace
                 get_cortex().feed_service_state(cs)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("cortex", "sense_world", _exc)
+
+    if blind:
+        # Named, not counted, and phrased so the model cannot read it as
+        # an observation. "Weather could not be read" and "the weather is
+        # unremarkable" must not arrive as the same prompt.
+        lines.append("UNAVAILABLE — could not be read this turn, do not "
+                     "assume quiet: " + ", ".join(sorted(set(blind))))
 
     if not lines:
         return ""
@@ -1908,8 +1930,8 @@ def _correlate_observations(obs: List[str]) -> List[str]:
                     strength=strength, source_type="observed",
                     note=note,
                 ))
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("cognition", "causal_graph_edge", _exc)
 
     return correlated
 
@@ -2023,8 +2045,8 @@ async def _proactive_observer() -> None:
                                 diag = dx.get("primary_diagnosis", "")
                                 if sev in ("WARNING", "CRITICAL") and diag:
                                     observations.append(f"[recent dx/{sev}] {diag}")
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation("house_doctor", "read_recent_diagnoses", _exc)
 
             async def _probe(key: str, base: str, path: str) -> None:
                 try:
@@ -2032,8 +2054,8 @@ async def _proactive_observer() -> None:
                         r = await client.get(f"{base}{path}")
                         if r.status_code == 200:
                             snapshot[key] = r.json()
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation(key, "world_snapshot_probe", _exc)
 
             await asyncio.gather(
                 _probe("docker", DOCKER_WATCHER_URL, "/unhealthy"),
@@ -2121,8 +2143,8 @@ async def _proactive_observer() -> None:
                                 },
                             )
                         logger.info("Proactive schedule: %s", sched_text)
-                    except Exception:
-                        pass
+                    except Exception as _exc:
+                        record_degradation("memu", "observer_write_schedule", _exc)
 
             # ── Main observation write ────────────────────────────────
             if observations:
@@ -2157,8 +2179,8 @@ async def _proactive_observer() -> None:
                             },
                         )
                     logger.info("Sensor pattern detected: %s", pattern_text)
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation("memu", "observer_write_pattern", _exc)
 
             # ── D88 M4 / D89 C3: world model persistence with provenance ─
             if is_enabled("WORLD_MODEL_PERSISTENCE"):
@@ -2193,8 +2215,8 @@ async def _proactive_observer() -> None:
                                 "user_id": "keeper",
                             },
                         )
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation("memu", "observer_write_world_state", _exc)
 
             # ── D89 E: House Doctor — differential diagnosis ──────────
             if is_enabled("HOUSE_DOCTOR") and observations:
@@ -2206,8 +2228,8 @@ async def _proactive_observer() -> None:
                         if is_enabled("WORLD_MODEL_PERSISTENCE") and "world_model" in locals():
                             diag_payload["world_state"] = world_model
                         await client.post(f"{HOUSE_DOCTOR_URL}/diagnose", json=diag_payload)
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation("house_doctor", "request_diagnosis", _exc)
 
             # ── D101: surprise detection — predicted vs actual world state ──
             if is_enabled("CAUSAL_SURPRISE") and _last_world_snapshot and is_enabled("CAUSAL_WORLD_MODEL"):
@@ -2219,8 +2241,8 @@ async def _proactive_observer() -> None:
                     )
                     if surprise and surprise.get("surprised"):
                         logger.info("D101 surprise detected: %s", surprise.get("reason", ""))
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation("cognition", "surprise_detector", _exc)
 
             # ── D102: submit anomaly bids to GlobalWorkspace ──────────
             if is_enabled("GLOBAL_WORKSPACE") and observations:
@@ -2232,8 +2254,8 @@ async def _proactive_observer() -> None:
                             content=obs,
                             urgency=0.4,
                         ))
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation("cognition", "workspace_bid_observer", _exc)
 
             # ── D114: Cortex ambient baseline bid ─────────────────────
             if is_enabled("GLOBAL_WORKSPACE"):
@@ -2241,8 +2263,8 @@ async def _proactive_observer() -> None:
                     cortex_bid = get_cortex().bid_to_workspace()
                     if cortex_bid is not None:
                         get_global_workspace().submit_bid(cortex_bid)
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation("cognition", "workspace_bid_observer", _exc)
 
             # ── D89 F: curiosity idle tick ────────────────────────────
             if is_enabled("CURIOSITY"):
@@ -2258,8 +2280,8 @@ async def _proactive_observer() -> None:
                     for evt_name in fsm_events:
                         try:
                             await fsm_fire(SysEvent(evt_name))
-                        except Exception:
-                            pass
+                        except Exception as _exc:
+                            record_degradation("cognition", "fsm_fire", _exc)
                 except Exception as exc:
                     logger.debug("Service watchdog check failed (non-critical): %s", exc)
 
@@ -2342,8 +2364,8 @@ async def _feel_emotional_context(query: str) -> Dict[str, Any]:
                 result["confidence"] = data.get("confidence", 0.5)
                 result["should_warn"] = data.get("should_warn", False)
                 result["warning"] = data.get("warning", "")
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("memu", "feel_emotional_context", _exc)
     return result
 
 
@@ -2363,8 +2385,8 @@ async def _hold_narrative() -> Dict[str, Any]:
                 data = arc_resp.json()
                 result["current_chapter"] = data.get("current_chapter", "")
                 result["chapter_number"] = data.get("chapter_number", 1)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("memu", "hold_narrative", _exc)
     return result
 
 
@@ -2385,8 +2407,8 @@ async def _imagine_context(user_msg: str) -> Dict[str, Any]:
             if not isinstance(map_resp, Exception) and map_resp.status_code == 200:
                 data = map_resp.json()
                 result["empathy_map"] = data.get("empathy_map", {})
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("memu", "imagine_context", _exc)
     return result
 
 
@@ -2404,8 +2426,8 @@ async def _hold_conscience() -> Dict[str, Any]:
             if not isinstance(audit_resp, Exception) and audit_resp.status_code == 200:
                 data = audit_resp.json()
                 result["integrity_score"] = data.get("integrity_score", 1.0)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("memu", "hold_conscience", _exc)
     return result
 
 
@@ -2426,8 +2448,8 @@ async def _surface_agent_context() -> Dict[str, Any]:
                 result["reminders"] = rem_resp.json().get("reminders", [])[:5]
             if not isinstance(sum_resp, Exception) and sum_resp.status_code == 200:
                 result["capabilities"] = sum_resp.json().get("capabilities", 0)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("memu", "surface_agent_context", _exc)
     return result
 
 
@@ -2464,8 +2486,8 @@ async def _understand_operator(query: str, mode: str) -> Dict[str, Any]:
                 data = cross_resp.json()
                 result["cross_mode"] = data.get("bridge_message")
                 result["cross_mode_count"] = data.get("insights_count", 0)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("memu", "understand_operator", _exc)
     return result
 
 
@@ -2483,8 +2505,8 @@ async def _preclassify_wake_intent(text: str) -> Dict[str, Any]:
                 reasoning = str(payload.get("reasoning", ""))
                 if intent in {"chat", "task", "question", "command", "emotional", "unknown"}:
                     return {"intent": intent, "confidence": confidence, "reasoning": reasoning}
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("wake", "preclassify_wake_intent", _exc)
     return {"intent": "unknown", "confidence": 0.0, "reasoning": "wake_service_unavailable"}
 
 
@@ -2514,8 +2536,8 @@ async def chat_stream(req: ChatRequest):
     if is_enabled("COGNITIVE_FINGERPRINT"):
         try:
             _fp_collector.record(_fp_quick_sample(user_msg, session_id=req.session_id))
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("cognition", "fingerprint_sample", _exc)
 
     wake_intent = await _preclassify_wake_intent(user_msg)
 
@@ -2887,8 +2909,8 @@ async def chat_stream(req: ChatRequest):
                     f"{CORTEX_URL}/observe_turn",
                     json={"session_id": session, "user_message": u_msg[:500]},
                 )
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("cortex", "learn_from_exchange", _exc)
 
         if failed:
             logger.warning("_learn_from_exchange: %d step(s) failed — %s", len(failed), "; ".join(failed))
@@ -3488,6 +3510,9 @@ class _LogCapture(logging.Handler):
                 "msg": record.getMessage()[:500],
             })
         except Exception:
+            # The one deliberate swallow in this file. This *is* the
+            # logging path: record_degradation warns, which re-enters
+            # emit, which fails again.
             pass
 
 

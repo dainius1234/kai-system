@@ -20,6 +20,7 @@ from contextlib import asynccontextmanager
 from typing import List, Optional
 
 from fastapi import FastAPI, HTTPException
+from common.degraded import record_degradation
 
 try:
     from common.runtime import setup_json_logger, ErrorBudget
@@ -95,23 +96,23 @@ def _inspect_repo(path: str) -> dict:
 
     try:
         base["commit_hash"] = _run_git(["rev-parse", "--short", "HEAD"], path)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("git", "read_commit_hash", _exc)
 
     try:
         base["commit_message"] = _run_git(["log", "-1", "--format=%s"], path)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("git", "read_commit_message", _exc)
 
     try:
         base["commit_author"] = _run_git(["log", "-1", "--format=%an"], path)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("git", "read_commit_author", _exc)
 
     try:
         base["commit_date"] = _run_git(["log", "-1", "--format=%ci"], path)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("git", "read_commit_date", _exc)
 
     try:
         status_out = _run_git(["status", "--short"], path)
@@ -125,8 +126,8 @@ def _inspect_repo(path: str) -> dict:
                 changed += 1
         base["uncommitted_changes"] = changed
         base["untracked_files"] = untracked
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("git", "read_working_tree_status", _exc)
 
     try:
         ahead_behind = _run_git(
@@ -136,15 +137,15 @@ def _inspect_repo(path: str) -> dict:
         if len(parts) == 2:
             base["ahead"] = int(parts[0])
             base["behind"] = int(parts[1])
-    except Exception:
+    except Exception as _exc:
         # No upstream configured — leave both at 0.
-        pass
+        record_degradation("git", "read_ahead_behind", _exc)
 
     try:
         stash_out = _run_git(["stash", "list"], path)
         base["stash_count"] = len(stash_out.splitlines()) if stash_out else 0
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("git", "read_stash_count", _exc)
 
     return base
 

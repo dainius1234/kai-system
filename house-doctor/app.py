@@ -21,6 +21,7 @@ import httpx
 from common.http_hygiene import pooled_client
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
+from common.degraded import record_degradation
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("house-doctor")
@@ -207,8 +208,8 @@ async def _write_medical_report(
                     f"{NOTIFY_URL}/notify",
                     json={"message": f"House Doctor [{primary.severity}]: {primary.diagnosis}", "channel": "system"},
                 )
-            except Exception:
-                pass
+            except Exception as _exc:
+                record_degradation("notify", "medical_report_alert", _exc)
 
 
 @app.post("/diagnose")

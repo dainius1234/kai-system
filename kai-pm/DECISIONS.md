@@ -4631,3 +4631,163 @@ suite floor.
 the workflows parse and run. `KAI-GATE-002/003/004` remain OPEN as
 recorded. Programme Rule 7 applies: no other count moves without its own
 evidence-backed closure review.
+
+---
+
+## 2026-08-05 — H-6: the 120 silent swallows, and the detector that could not see its own blind spot
+
+### What was done
+
+`except Exception: pass` across the service entry points: **120 → 4**.
+
+The four that remain are named and defended: two `conn.close()` calls in
+memu-core's connection pool (the operator's Q4 cleanup rule) and two
+logging handlers — `memu-core` and `agentic` both buffer log records for
+their `/logs` endpoints, and a recorder that emits a warning re-enters
+the handler that just failed. That one is the cheaper of two bad options,
+and now says so in the code.
+
+Everything else was replaced with `record_degradation(source, operation,
+exc)` from `common/degraded.py`.
+
+### The rubric, as the operator settled it
+
+  - **read / observe** → degrade visibly
+  - **mutate / act** → propagate
+  - **aggregate perception tick** → normal result for the sources that
+    answered, named degradation for the ones that did not
+
+And the fourth condition on an acceptable swallow, which is the one that
+did the work here: the record must be **aggregatable** — an operator has
+to be able to tell "failing for ten seconds" from "failing for ten days"
+without reading a log one line at a time. So `record_degradation` keys on
+`(source, operation)`, counts, keeps a first-seen, rate-limits its own
+logging to once per five minutes per key, and surfaces at `/health` as
+`degraded_dependencies`.
+
+### The concentration was a copied convention, exactly as predicted
+
+memu-core held 53 and agentic 31 of the 120. In memu-core, 32 of the 53
+were the *same handler*: try Redis, `except Exception: pass`, fall back to
+a module-level Python list. The fallback is correct and stays. Discarding
+the reason meant a Redis outage silently converted memU from a shared
+durable store into twelve replicas with twelve divergent in-memory lists,
+with every health check green.
+
+So the fix includes a comment block above that run of helpers stating the
+convention, and `record_degradation` is one line — shorter than the `pass`
+it replaces. The first one was copied thirty-one times; the next thing
+copied should be the right one.
+
+### The ones that were more than a missing log line
+
+  - **`vault_delete`** answered `{"status": "ok"}` whether or not the
+    graph record was deleted. Now propagates.
+  - **`submit_feedback`** named an `effect` of `"boost"` for a boost
+    whose durable write had failed. Now reports `not_persisted`.
+  - **`/recover`** logged "recovery: nothing to heal" when the heal
+    itself threw — a self-heal endpoint reporting success for a heal that
+    did not happen.
+  - **`full_proactive_scan`** combined five sources behind five swallows
+    and returned `{"status": "ok", "nudge_count": 0, "nudges": []}` with
+    every one of them down — character-identical to a healthy quiet
+    system, which the supervisor and the Telegram bot both act on.
+  - **`tool-gate`'s idempotency cache** fell back from Redis to
+    per-process on a swallow, silently narrowing idempotency from
+    cluster-wide to one replica. A gate that lets an actuator fire twice
+    is the thing the cache exists to prevent. Recorded, and the question
+    of whether the gate should refuse to decide without its shared store
+    is left to the operator with the exposure written down.
+  - **`_sense_world`** is the one that matters most for what this system
+    is. It builds the paragraph describing the world that goes into Kai's
+    prompt, and every sensory fetch was `except Exception: return None`.
+    With the sensory tier down it returned the empty string — identical
+    to a calm, fully-observed, uneventful world. Kai then spoke about a
+    world it had not seen, with no hedge, because nothing in the prompt
+    gave it one. It now names the senses it could not read.
+
+### The suite had not been running. Again.
+
+Mid-way through, the repo-wide pytest aborted during collection:
+`REDIS_URL is required but empty`. `scripts/test_checkpoint.py` set
+`REDIS_URL` to the empty string at module scope; `dashboard/app.py`
+rightly refuses to import on an empty URL; collection died.
+
+It had passed everywhere the variable was already set in the environment,
+because `setdefault` was then a no-op. **The suite's greenness depended on
+an ambient variable that nothing declared.** Same shape as A-05, a day
+later, a different variable. Fixed by spelling "no Redis" as an
+unreachable host — already the convention in `test_episode_saver.py`.
+
+### The detector was blind to the class of defect it exists to find
+
+`scripts/security/isolation_plugin.py` watched this happen and reported
+nothing, and could not have reported anything. It hooked only
+`pytest_runtest_protocol`, which fires during the **run** phase — after
+collection has already imported every test module. Every module-scope
+`os.environ[...] = ...` and `sys.modules[...] = MagicMock()` in the
+repository therefore happened *before* the plugin's first snapshot, and
+sat inside the baseline it measured everything else against.
+
+A detector for cross-file leakage was structurally incapable of seeing
+the leaks that happen earliest and reach furthest. Its denominator
+excluded them. That is the I-2 failure, in the tool built to enforce I-2.
+
+It now brackets each module's import with `pytest_collectstart` /
+`pytest_collectreport`. Calibrated on a two-file fixture before being
+pointed at the repository: the previous version reports `{}` for a file
+whose first four lines poison the interpreter; the new one names it. Both
+directions are now tests.
+
+The widening immediately found **two real module-identity collisions** on
+the generic names `app` and `introspect_app` — `sandboxes/shell/app.py`
+against `memu-core/app.py`, and `agentic/introspect_app.py` against
+`memu-core/introspect_app.py`. That hazard had a *comment* about it in
+`test_letta_agent.py` since long before today and nothing enforcing it.
+Both now scoped with `stubbed()`.
+
+It also produced **three false positives** from one file spelled two ways
+(`dashboard/app.py` versus `scripts/../dashboard/app.py`). Fixed by
+normalising the path, and recorded as a test, because a detector with
+false positives gets somebody to "fix" correct code.
+
+### A correction to my own method
+
+My first triage of the 156 classified them by grepping for `httpx` and
+`AsyncClient`, and reported 21 network calls out of 120. The real number
+was 73. The repository had migrated to `pooled_client()` in H-2/H-3 —
+work done in this same programme — and the classifier's idea of what a
+network call looks like had not moved with it.
+
+That is the fourth instance in two days of *a list of what to check,
+maintained next to the thing that checks, drifting silently* — after the
+dead-test detector's file list, the deprecation rule's seven filenames,
+and `hygiene_survey`'s `COLUMNS` tuple. This time it was my own triage
+tool, and the drift made a finding look four times smaller than it was.
+Reclassifying against what the code actually calls, rather than against
+what I remembered it calling, is what turned two files into 84 of the 120.
+
+### Measurements
+
+    silent_swallows   120 → 4        (baseline updated)
+    suite floor       4,247 → 4,287 passed, 0 failed, 0 errors
+    isolation         replaced 0; declared leakage 7 files → 19, which is
+                      the detector's scope growing, not the leakage
+
+The `+40` on the suite is mostly not new tests: `test_dashboard` and
+`test_dashboard_ui` had not been *collected at all* while the suite was
+aborting.
+
+### Register
+
+**`KAI-GATE-021` remains OPEN.** The count moved 120 → 4 and the ratchet
+moved with it, but Programme Rule 7 is explicit: a finding stays open
+until a separate evidence-backed closure review. The four survivors are
+documented rather than fixed, and whether "documented and defended" closes
+this finding is a closure decision, not a side effect of the work.
+
+**Still open, unchanged:** `KAI-GATE-002/003/004`. `A-03` remains
+unscheduled by agreement.
+
+**Raised for the operator, not decided here:** whether `tool-gate` should
+fail closed when its shared idempotency store is unreachable.

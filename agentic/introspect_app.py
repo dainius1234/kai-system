@@ -26,6 +26,7 @@ from common.http_hygiene import pooled_client
 from common.runtime import AuditStream, INJECTION_RE, detect_device, sanitize_string, setup_json_logger
 from kai_config import build_saver, run_dream_cycle, analyze_failures, load_evolver_reports
 from security_audit import run_security_audit
+from common.degraded import record_degradation
 
 logger = setup_json_logger("agentic-introspect", os.getenv("LOG_PATH", "/tmp/agentic_introspect.json.log"))
 DEVICE = detect_device()
@@ -144,8 +145,8 @@ async def evolve_analyze() -> Dict[str, Any]:
                         },
                     )
                     stored += 1
-            except Exception:
-                pass
+            except Exception as _exc:
+                record_degradation("memu", "write_evolution_suggestion", _exc)
 
     return {
         "status": "ok",

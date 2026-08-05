@@ -2,7 +2,7 @@
   "note": "The repo-wide pytest result. Failures and errors may fall, never rise. See scripts/security/check_suite_floor.py.",
   "max_failed": 0,
   "max_errors": 0,
-  "min_passed": 4285,
+  "min_passed": 4287,
   "recorded": "2026-08-05",
   "history": [
     {
@@ -77,10 +77,10 @@
     },
     {
       "date": "2026-08-05",
-      "passed": 4285,
+      "passed": 4287,
       "failed": 0,
       "errors": 0,
-      "note": "H-6 phase 1: memu-core 53 silent swallows -> 3. +38 is test_dashboard and test_dashboard_ui, which had not been collected AT ALL \u2014 the suite aborted during collection on an empty REDIS_URL set at module scope by test_checkpoint.py, and passed only on machines that already had the variable set. Plus the new failure-path and detector-calibration tests."
+      "note": "H-6 complete: 120 silent swallows -> 4 across 16 services. The 4 left are two conn.close() cleanups and two log handlers, where recording would recurse through the logger."
     }
   ]
 }

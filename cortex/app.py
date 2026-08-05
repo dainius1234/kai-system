@@ -55,6 +55,7 @@ import httpx
 from common.http_hygiene import pooled_client
 from fastapi import FastAPI
 from pydantic import BaseModel
+from common.degraded import record_degradation
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("cortex")
@@ -152,8 +153,8 @@ async def _fetch(url: str, path: str, timeout: float = 2.0) -> Optional[Dict]:
             r = await client.get(f"{url}{path}")
             if r.status_code == 200:
                 return r.json()
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("upstream", "cortex_fetch", _exc)
     return None
 
 

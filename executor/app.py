@@ -42,6 +42,7 @@ from pydantic import BaseModel
 
 from common.resilience import resilient_call
 from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
+from common.degraded import record_degradation
 
 logger = setup_json_logger("executor", os.getenv("LOG_PATH", "/tmp/executor.json.log"))
 DEVICE = detect_device()
@@ -362,8 +363,8 @@ async def recover() -> Dict[str, str]:
     for f in glob.glob("/tmp/sovereign_exec_*"):
         try:
             os.remove(f)
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("filesystem", "recover_remove_stale", _exc)
     return {"status": "ok", "action": "temp_cleanup"}
 
 

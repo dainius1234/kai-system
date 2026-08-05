@@ -39,6 +39,7 @@ from common.service_auth import require_service_auth
 from pydantic import BaseModel
 
 from common.runtime import detect_device, sanitize_string, setup_json_logger
+from common.degraded import record_degradation
 
 logger = setup_json_logger(
     "telegram-bot",
@@ -114,8 +115,8 @@ async def _send_voice(chat_id: int, audio: bytes, caption: str = ""):
 async def _send_typing(chat_id: int):
     try:
         await _tg("sendChatAction", json={"chat_id": chat_id, "action": "typing"})
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("telegram", "send_typing", _exc)
 
 
 MAX_VOICE_BYTES = 10 * 1024 * 1024  # H1.6: 10MB voice file limit

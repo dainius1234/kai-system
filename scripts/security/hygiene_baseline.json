@@ -5,7 +5,7 @@
     "unbounded_bodies": 0,
     "naive_timestamps": 0,
     "success_on_failure": 0,
-    "silent_swallows": 70
+    "silent_swallows": 4
   },
-  "grand_total": 70
+  "grand_total": 4
 }

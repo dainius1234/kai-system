@@ -13,6 +13,7 @@ from pydantic import BaseModel
 
 from common.http_hygiene import pooled_client
 from common.runtime import ErrorBudget, detect_device, setup_json_logger
+from common.degraded import record_degradation
 
 logger = setup_json_logger("heartbeat", os.getenv("LOG_PATH", "/tmp/heartbeat.json.log"))
 DEVICE = detect_device()
@@ -131,8 +132,8 @@ async def _auto_sleep_check() -> None:
             # Active context compression — merge non-focus memories
             try:
                 await client.post(f"{MEMU_INTROSPECT_URL}/memory/focus-compress")
-            except Exception:
-                pass  # non-fatal: new endpoint may not be deployed yet
+            except Exception as _exc:
+                record_degradation("memu", "focus_compress", _exc)  # non-fatal: new endpoint may not be deployed yet
             # P3c: enforce spaced repetition decay during sleep
             await client.post(f"{MEMU_INTROSPECT_URL}/memory/decay?half_life_days=14")
         logger.info("System sleeping — memory compressed + focus-compressed + decay applied")
@@ -385,8 +386,8 @@ async def fetch_world() -> Dict[str, Any]:
         if cached.exists():
             try:
                 return _json.loads(cached.read_text())
-            except Exception:
-                pass
+            except Exception as _exc:
+                record_degradation("cache", "world_cache_parse", _exc)
         return {"status": "cached", "stale": False}
 
     anchor: Dict[str, Any] = {

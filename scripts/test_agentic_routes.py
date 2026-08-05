@@ -1736,3 +1736,62 @@ class TestPayloadBounds:
         """The bound must not block a legitimate identity edit."""
         r = client.post("/soul", json={"content": "# SOUL\n\nA short edit."})
         assert r.status_code != 413, r.status_code
+
+
+class TestBlindSensesAreNamed:
+    """H-6: an unreadable sense must not arrive as a quiet one.
+
+    `_sense_world()` builds the paragraph describing the world that goes
+    into Kai's prompt. Every sensory fetch was `except Exception: return
+    None`, so with the whole sensory tier down the function returned the
+    empty string — byte-identical to a calm, fully-observed world. Kai
+    then spoke about a world it had not seen, with no hedge, because
+    nothing in the prompt gave it one.
+
+    The happy paths are covered elsewhere and would all still pass if
+    this branch were unreachable, which is the reason for this class.
+    """
+
+    def test_unreadable_senses_are_named_in_the_prompt(self):
+        import asyncio
+
+        def _boom(*a, **k):
+            # Raised where `pooled_client(...)` is *called*, not awaited:
+            # a connection that cannot be opened is the failure mode
+            # these handlers exist for, and it keeps the test from
+            # leaving un-awaited coroutines behind.
+            raise RuntimeError("sensor offline")
+
+        with patch.object(ag, "pooled_client", side_effect=_boom):
+            with patch.object(ag, "is_enabled", lambda name: name == "CONTEXT_ENRICHMENT"):
+                text = asyncio.run(ag._sense_world())
+
+        assert "UNAVAILABLE" in text, text
+        assert "do not" in text.lower(), text
+        # Named individually, so an operator (and the model) can tell
+        # which sense is missing rather than only that something is.
+        for label in ("Weather", "Calendar", "Docker"):
+            assert label in text, f"{label} missing from: {text}"
+
+    def test_a_blind_sense_is_recorded_for_the_operator_too(self):
+        """Per-turn honesty in the prompt is not the same as an operator
+        being able to see that a sensor has been dead for a week."""
+        import asyncio
+        from common.degraded import degradation_report, reset_degradations
+
+        def _boom(*a, **k):
+            # Raised where `pooled_client(...)` is *called*, not awaited:
+            # a connection that cannot be opened is the failure mode
+            # these handlers exist for, and it keeps the test from
+            # leaving un-awaited coroutines behind.
+            raise RuntimeError("sensor offline")
+
+        reset_degradations()
+        with patch.object(ag, "pooled_client", side_effect=_boom):
+            with patch.object(ag, "is_enabled", lambda name: name == "CONTEXT_ENRICHMENT"):
+                asyncio.run(ag._sense_world())
+
+        recorded = [e for e in degradation_report() if e["operation"] == "sense_world"]
+        assert recorded, degradation_report()
+        assert all(e["failing_for_seconds"] >= 0 for e in recorded), recorded
+        reset_degradations()

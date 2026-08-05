@@ -23,6 +23,7 @@ import httpx
 from common.http_hygiene import pooled_client
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from common.degraded import record_degradation
 
 app = FastAPI(title="Skill Hunter", version="0.2.0")
 
@@ -144,8 +145,8 @@ def _load_meta(name: str) -> Dict[str, Any]:
     if mp.exists():
         try:
             return json.loads(mp.read_text())
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("filesystem", "skill_meta_parse", _exc)
     return {}
 
 
@@ -256,8 +257,8 @@ async def hunt(req: HuntRequest) -> Dict[str, Any]:
                         "user_id": "keeper",
                     },
                 )
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("memu", "record_acquired_skill", _exc)
 
     import asyncio as _asyncio
     _asyncio.create_task(_log_to_memory())

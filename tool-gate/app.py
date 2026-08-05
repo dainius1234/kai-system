@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 from common.auth import verify_gate_signature
 from common.rate_limit import check_rate_limit
 from common.runtime import AuditStream, ErrorBudget, detect_device, sanitize_string, setup_json_logger
+from common.degraded import record_degradation
 
 logger = setup_json_logger("tool-gate", os.getenv("LOG_PATH", "/tmp/tool-gate.json.log"))
 DEVICE = detect_device()
@@ -107,6 +108,18 @@ except Exception as _re:
     logger.warning("Redis unavailable — idempotency falls back to in-memory: %s", _re)
 
 
+# H-6: all three of these fell back to `_idempotency_cache` after an
+# `except Exception: pass`, so a Redis outage silently narrowed
+# idempotency from cluster-wide to per-process. Within one replica a
+# retried tool call is still deduplicated; across replicas it is not, and
+# a gate that lets an actuator fire twice is the failure this cache
+# exists to prevent. Nothing said a word.
+#
+# Recording the failure is this change. Whether the gate should instead
+# refuse to decide while its shared idempotency store is unreachable is a
+# product decision with its own risk — a Redis blip would then stop every
+# actuator — and is left to the operator. It is now at least *visible* at
+# GET /health rather than inferable only from an actuator firing twice.
 def _idem_get(key: str):
     """Return cached GateDecision JSON or None."""
     if _redis_client:
@@ -114,8 +127,8 @@ def _idem_get(key: str):
             raw = _redis_client.get(f"idem:{key}")
             if raw:
                 return json.loads(raw)
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "idempotency_get", _exc)
     cached = _idempotency_cache.get(key)
     if cached:
         dec_dict, expiry = cached
@@ -130,8 +143,8 @@ def _idem_set(key: str, decision_dict: dict):
     if _redis_client:
         try:
             _redis_client.setex(f"idem:{key}", _IDEMPOTENCY_TTL, json.dumps(decision_dict))
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "idempotency_set", _exc)
     _idempotency_cache[key] = (decision_dict, time.time() + _IDEMPOTENCY_TTL)
     # prune stale in-memory entries
     now = time.time()
@@ -145,8 +158,8 @@ def _idem_evict(key: str):
     if _redis_client:
         try:
             _redis_client.delete(f"idem:{key}")
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "idempotency_evict", _exc)
     _idempotency_cache.pop(key, None)
 
 

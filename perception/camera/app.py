@@ -10,6 +10,7 @@ from fastapi import FastAPI, HTTPException
 
 from common.http_hygiene import pooled_client
 from common.auth import sign_gate_request
+from common.degraded import record_degradation
 
 
 app = FastAPI(title="Camera Service", version="0.2.0")
@@ -268,8 +269,8 @@ async def _gate_allows_speak(urgency: float) -> bool:
             )
             if resp.status_code == 200:
                 return bool(resp.json().get("approved", False))
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("tool_gate", "speak_permission", _exc)
     return False
 
 
@@ -390,8 +391,8 @@ async def interpret_multi(
                     "llm_interpretation": llm_text[:500],
                     "fusion_mode": "llm",
                 }
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("langgraph", "sensor_fusion", _exc)
     return {**heuristic, "llm_interpretation": None, "fusion_mode": "heuristic"}
 
 
@@ -449,8 +450,8 @@ async def proactive_auto() -> Dict[str, Any]:
                 transcripts = data.get("transcripts", [])
                 if transcripts and "emotion" in transcripts[-1]:
                     audio_signals = transcripts[-1]["emotion"]
-    except Exception:
-        pass  # Use defaults
+    except Exception as _exc:
+        record_degradation("perception_audio", "read_transcripts", _exc)  # Use defaults
 
     decision = _speak_or_not(audio_signals, video_signals)
 
@@ -467,8 +468,8 @@ async def proactive_auto() -> Dict[str, Any]:
                         "text": decision["suggested_message"],
                         "voice": "kai-default",
                     })
-            except Exception:
-                pass  # TTS is best-effort
+            except Exception as _exc:
+                record_degradation("tts", "speak", _exc)  # TTS is best-effort
 
     return {"status": "ok", **decision}
 

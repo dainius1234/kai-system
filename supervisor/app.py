@@ -28,6 +28,7 @@ from common.runtime import (
     detect_device,
     setup_json_logger,
 )
+from common.degraded import record_degradation
 
 logger = setup_json_logger("supervisor", os.getenv("LOG_PATH", "/tmp/supervisor.json.log"))
 DEVICE = detect_device()
@@ -241,8 +242,8 @@ async def _get_current_mode() -> str:
             resp = await client.get(f"{TOOL_GATE_URL}/gate/mode")
             if resp.status_code == 200:
                 return str(resp.json().get("mode", "PUB")).upper()
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("tool_gate", "read_mode", _exc)
     return "PUB"
 
 
@@ -413,8 +414,14 @@ async def _fire_due_items() -> None:
                         )
                         await client.post(f"{memu_url}/memory/reminders/{rid}/fire")
                         logger.info("Reminder fired: %s", text[:50])
-                    except Exception:
-                        pass
+                    except Exception as _exc:
+                        # Two calls, one handler, deliberately in this
+                        # order: if the alert fails the reminder is never
+                        # marked fired and the next tick retries it. If
+                        # the *mark* fails the operator gets the reminder
+                        # again — noisy, but nothing is lost. What was
+                        # missing is that neither outcome said anything.
+                        record_degradation("telegram", "fire_reminder", _exc)
 
             # fire due scheduled tasks
             resp = await client.get(f"{memu_url}/memory/schedule/due")
@@ -430,8 +437,8 @@ async def _fire_due_items() -> None:
                         )
                         await client.post(f"{memu_url}/memory/schedule/task/{tid}/fire")
                         logger.info("Scheduled task fired: %s", title[:50])
-                    except Exception:
-                        pass
+                    except Exception as _exc:
+                        record_degradation("telegram", "fire_scheduled_task", _exc)
     except Exception:
         logger.debug("fire_due_items: memu-core unreachable")
 
@@ -454,8 +461,8 @@ async def _check_escalations() -> None:
                                               f"({t.get('name', '?')}, {t.get('dismissals', 0)}x ignored)"},
                             )
                             logger.info("Escalated nudge sent: %s level=%d", t["target"], t["level"])
-                        except Exception:
-                            pass
+                        except Exception as _exc:
+                            record_degradation("telegram", "fire_escalated_nudge", _exc)
     except Exception:
         logger.debug("check_escalations: memu-core unreachable")
 
@@ -554,16 +561,16 @@ async def status() -> Dict[str, Any]:
             q_resp = await client.get(f"{memu_url}/memory/quarantine/list")
             if q_resp.status_code == 200:
                 quarantine_count = q_resp.json().get("count", 0)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("memu", "read_quarantine", _exc)
     try:
         verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8052")
         async with pooled_client(timeout=2.0) as client:
             v_resp = await client.get(f"{verifier_url}/metrics")
             if v_resp.status_code == 200:
                 verifier_verdicts = v_resp.json().get("verdicts", {})
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("verifier", "read_metrics", _exc)
 
     return {
         "fleet": fleet,

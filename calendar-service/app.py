@@ -21,6 +21,7 @@ from datetime import date, datetime, timedelta, timezone
 from typing import List, Optional
 
 from fastapi import FastAPI, HTTPException, Query
+from common.degraded import record_degradation
 
 try:
     from common.runtime import setup_json_logger, ErrorBudget
@@ -96,8 +97,8 @@ def _poll_caldav() -> List[dict]:
                             "description": str(component.get("DESCRIPTION", ""))[:300],
                             "calendar": str(cal.name),
                         })
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation("calendar", "parse_ical_event", _exc)
         except Exception as exc:
             logger.warning("calendar %s fetch error: %s", cal.name, exc)
     events.sort(key=lambda e: e.get("start") or "")

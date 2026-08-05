@@ -22,7 +22,7 @@ from fastapi.responses import (HTMLResponse, JSONResponse,
 from common.dashboard_auth import (DashboardPrincipal, Role, Scope,
                                    require_dashboard_auth)
 from common.degraded import (degraded_response, is_degraded,
-                             unavailable_metric)
+                             record_degradation, unavailable_metric)
 from common.http_hygiene import (MAX_PAYLOAD_BYTES, bounded_json,
                                  bounded_response, bounded_upload,
                                  pooled_client, shutdown_pool)
@@ -736,24 +736,24 @@ async def index() -> Dict[str, object]:
             br_resp = await client.get(f"{SUPERVISOR_URL}/breakers")
             if br_resp.status_code == 200:
                 breaker_states = br_resp.json()
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("supervisor", "read_breakers", _exc)
     try:
         async with pooled_client(timeout=2.0) as client:
             # quarantine count
             q_resp = await client.get(f"{MEMU_INTROSPECT_URL}/memory/quarantine/list")
             if q_resp.status_code == 200:
                 quarantine_count = q_resp.json().get("count", 0)
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("memu", "read_quarantine", _exc)
     try:
         verifier_url = backend_url("VERIFIER_URL", "http://verifier:8052")
         async with pooled_client(timeout=2.0) as client:
             v_resp = await client.get(f"{verifier_url}/metrics")
             if v_resp.status_code == 200:
                 verifier_stats = v_resp.json()
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("verifier", "read_metrics", _exc)
     core_nodes = CORE_NODES
     if _executor_url:
         core_nodes.append("executor")
@@ -1515,8 +1515,8 @@ async def api_logs(limit: int = Query(100, ge=1, le=500), level: str = "", since
             if resp.status_code == 200:
                 data = resp.json()
                 all_logs.extend(data.get("entries", []))
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("memu", "read_logs", _exc)
 
     # Collect from agentic
     agentic_url = backend_url("LANGGRAPH_URL", "http://agentic:8007")
@@ -1526,8 +1526,8 @@ async def api_logs(limit: int = Query(100, ge=1, le=500), level: str = "", since
             if resp.status_code == 200:
                 data = resp.json()
                 all_logs.extend(data.get("entries", []))
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("agentic", "read_logs", _exc)
 
     # Sort all by timestamp (most recent first)
     all_logs.sort(key=lambda x: x.get("time", 0), reverse=True)
