@@ -35,6 +35,7 @@ policy-check: lint-blocking
 	python3 scripts/security/check_workflow_outputs.py
 	python3 scripts/security/check_dockerfile_flags.py
 	python3 scripts/security/check_dockerfile_coverage.py
+	python3 scripts/security/check_dockerfile_context.py
 	python3 scripts/security/check_test_wiring.py
 	python3 scripts/security/check_gate_registry.py --gate
 	@# Doc-drift last: it fails on every commit that adds a test, so it
@@ -305,7 +306,8 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-secret-gates test-compose-gates test-ci-tolerations \
 	test-test-wiring test-test-isolation test-live-smoke \
 	test-compose-probe test-workflow-filters test-workflow-outputs \
-	test-dockerfile-flags test-dockerfile-coverage test-suite-floor
+	test-dockerfile-flags test-dockerfile-coverage \
+	test-dockerfile-context test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
 # A-02 ratchet: runs `test-uh` and fails if any suite exercises less than
@@ -817,6 +819,9 @@ test-dockerfile-flags:
 
 test-dockerfile-coverage:
 	python3 scripts/test_dockerfile_coverage.py
+
+test-dockerfile-context:
+	python3 scripts/test_dockerfile_context.py
 
 # bring up full-stack composition
 full-up:

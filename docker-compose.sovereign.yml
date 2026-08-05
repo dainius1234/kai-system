@@ -153,7 +153,9 @@ services:
 
   tool-gate:
     <<: *service_defaults
-    build: ./tool-gate
+    build:
+      context: .
+      dockerfile: tool-gate/Dockerfile
     container_name: sovereign-tool-gate
     hostname: tool-gate
     networks:
@@ -187,7 +189,9 @@ services:
   memu-core:
     <<: *service_defaults
     read_only: true
-    build: ./memu-core
+    build:
+      context: .
+      dockerfile: memu-core/Dockerfile
     container_name: sovereign-memu-core
     hostname: memu-core
     networks:
@@ -244,7 +248,9 @@ services:
 
   executor:
     profiles: ["execution"]
-    build: ./executor
+    build:
+      context: .
+      dockerfile: executor/Dockerfile
     runtime: gvisor
     restart: on-failure
     container_name: executor
@@ -292,7 +298,9 @@ services:
 
   dashboard:
     <<: *service_defaults
-    build: ./dashboard
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
     container_name: sovereign-dashboard
     hostname: dashboard
     networks:
@@ -330,7 +338,9 @@ services:
 
   agentic:
     <<: *service_defaults
-    build: ./agentic
+    build:
+      context: .
+      dockerfile: agentic/Dockerfile
     container_name: agentic
     hostname: agentic
     networks:
@@ -425,7 +435,9 @@ services:
 
   heartbeat:
     <<: *service_defaults
-    build: ./heartbeat
+    build:
+      context: .
+      dockerfile: heartbeat/Dockerfile
     container_name: sovereign-heartbeat
     hostname: heartbeat
     networks:
@@ -456,7 +468,9 @@ services:
   camera-service:
     profiles: ["sensors"]
     <<: *service_defaults
-    build: ./perception/camera
+    build:
+      context: .
+      dockerfile: perception/camera/Dockerfile
     container_name: camera-service
     hostname: camera-service
     networks:
@@ -465,7 +479,9 @@ services:
   audio-service:
     profiles: ["sensors"]
     <<: *service_defaults
-    build: ./perception/audio
+    build:
+      context: .
+      dockerfile: perception/audio/Dockerfile
     container_name: audio-service
     hostname: audio-service
     networks:

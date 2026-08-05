@@ -323,6 +323,18 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-036",)),
+    # The sovereign profile could not build a single one of its nine
+    # services, and looked healthy because its boot step reused images
+    # another profile had built. KAI-GATE-037.
+    Gate(module="check_dockerfile_context",
+         kind=GATE,
+         summary="every COPY source resolves in the context its profile declares",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ COPY source",
+         proven_by="scripts/test_dockerfile_context.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-037",)),
     Gate(module="check_test_wiring",
          kind=GATE,
          summary="every test in a self-run suite is dispatched",

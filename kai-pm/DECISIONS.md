@@ -6695,3 +6695,93 @@ is how a parse error survived in one of them. Instance closed by
 splitting the build step (49 of 52 now built); class gated; the
 remaining 3 are declared, owned and dated. **OPEN** until the operator
 decides whether the three orphans ship or go.
+
+---
+
+## 2026-08-05 (part 26) — the sovereign profile has never been able to build
+
+The Dockerfile flag fix worked: the build passed `document-parser` and
+stopped at the next thing.
+
+    target notify-service: failed to solve: failed to compute cache key:
+    failed to calculate checksum of ref ...: "/requirements.txt": not found
+
+`COPY` is relative to the build **context**, not to the Dockerfile. So
+the same Dockerfile is correct under one profile and broken under
+another. Measured across all three rather than fixed one at a time:
+
+    docker-compose.full.yml        30 builds,  0 broken COPY
+    docker-compose.minimal.yml     32 builds, 10 broken COPY
+    docker-compose.sovereign.yml   12 builds, 39 broken COPY
+
+**`full.yml` was the only profile CI ever built, and it is the only one
+that worked.**
+
+### The sovereign profile
+
+Thirty services use `context: .` with root-relative paths
+(`COPY tool-gate/app.py ./`). Every build service in
+`docker-compose.sovereign.yml` used `build: ./tool-gate`, which makes the
+context the *service directory*, so `COPY tool-gate/requirements.txt`
+resolved to `tool-gate/tool-gate/requirements.txt`.
+
+**The profile the architecture is named after could not build a single
+one of its nine services.**
+
+It looked healthy because the sovereign boot step runs `up -d` **without
+`--build`**, so it silently reused images the earlier `full.yml` build
+had produced under the same compose project name. The step that verifies
+the sovereign profile has been verifying images from a different
+profile — a masked failure of precisely the class this programme is
+about, sitting inside the step meant to catch that class.
+
+Rewritten: 8 build blocks now use `context: .` with an explicit
+`dockerfile:`, matching the thirty that work.
+
+### Three images that could not build under any context
+
+`output/notify`, `perception/clipboard` and `perception/files` each did
+
+    COPY ../../common /app/common
+
+`..` escapes the build context, which Docker rejects **whatever** the
+context is. Those three were unbuildable in every configuration, not
+merely mismatched. `vault-sync` did `COPY . .`, which under `context: .`
+would have copied the entire repository — every test, every kai-pm
+document, `.git` — into the image. That is a supply-chain and image-size
+problem as much as a build one.
+
+All four now use root-relative paths. Every profile: **0 broken COPY**.
+
+### The gate
+
+`check_dockerfile_context.py`, two exact rules: a `COPY` source must
+exist under the declared context, and must never begin with `../`.
+Globs are skipped rather than resolved — matching them properly needs
+Docker's own semantics, and a wrong answer would report a defect against
+a working build.
+
+Calibrated against both real defects: restoring `build: ./tool-gate`
+fires four findings, restoring `COPY ../../common` fires the escape rule.
+
+**My test harness was wrong before the gate was — the fourth time
+today.** The synthetic-tree tests patched `gate.REPO`, which
+`require()` does not consult, so every synthetic assertion silently read
+the real repository and six of them failed for the wrong reason.
+`audit()` takes an explicit root now.
+
+**And I-1 caught me again.** The gate skipped a build whose Dockerfile is
+absent, delegating that finding to `check_dockerfile_coverage` — but a
+build it could not read must still be subtracted from what it claims to
+have inspected, or the denominator counts a file it never opened. It is
+recorded and printed now.
+
+Floors: 41 suites, 2,485 assertions.
+
+### Register
+
+**`KAI-GATE-037`** — `COPY` sources unresolvable under the context their
+profile declares: 10 in `minimal`, 39 in `sovereign`, 0 in `full`. The
+sovereign profile could not build at all and appeared healthy because
+its boot step reused another profile's images. Instances fixed, class
+gated. **OPEN** until a build of all three profiles is observed.
