@@ -40,7 +40,7 @@ REPO = Path(__file__).resolve().parent.parent
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 15
+EXPECTED_SCENARIOS = 16
 executed: list[str] = []
 
 
@@ -237,6 +237,93 @@ def test_the_real_repository_replaces_nothing() -> None:
           str(baseline.get("leaky_files")))
 
 
+def test_every_reported_category_still_detects() -> None:
+    """Calibration: the check a ratchet cannot make for itself.
+
+    `added`, `env_set`, `env_changed`, `path_added` and `replaced` are all
+    bounded from ABOVE — they may fall, never rise. So a plugin that
+    partially stops detecting produces a smaller report, and the gate
+    reads that as improvement and passes. Demonstrated on 2026-08-05: a
+    synthetic report naming half the declared leaky files, with half the
+    counts, passes the gate cleanly.
+
+    That is the same failure that took the hygiene survey's `clients`
+    from 16 to 0 with a green gate an hour earlier. Every ratchet
+    bounding a maximum has it; only a companion that proves the
+    measurement still measures can close it.
+
+    One fixture exercising all five categories at once, so losing any one
+    of them fails here rather than being reported as progress. Run as a
+    real pytest subprocess because the behaviour under test is pytest's
+    hook ordering, and any other method would assert on my model of
+    pytest rather than on pytest.
+    """
+    scenario("every reported category still detects")
+    import subprocess
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        # A real module for the leaker to replace, so `replaced` has
+        # something to see. Written first and imported at collection.
+        (root / "kai_calib_victim.py").write_text("VALUE = 1\n", encoding="utf-8")
+        # Imported by an EARLIER file, so it is real in the leaker's
+        # "before" snapshot. Import-and-replace inside one file's own
+        # bracket is `added`, not `replaced`, and the plugin is right
+        # about that — the name was free when the file started.
+        (root / "test_aaa0_importer.py").write_text(
+            "import os, sys\n"
+            "sys.path.insert(0, os.path.dirname(__file__))\n"
+            "import kai_calib_victim\n"
+            "def test_ok():\n    assert kai_calib_victim.VALUE == 1\n",
+            encoding="utf-8")
+        (root / "test_aaa_leaker.py").write_text(
+            "import os, sys, types\n"
+            "sys.path.insert(0, os.path.dirname(__file__))\n"
+            "sys.modules['kai_calib_victim'] = types.SimpleNamespace(VALUE=2)\n"
+            "sys.modules['kai_calib_added'] = types.SimpleNamespace()\n"
+            "os.environ['KAI_CALIB_NEW'] = 'introduced'\n"
+            "os.environ['PATH'] = os.environ.get('PATH', '') + ':/kai-calib'\n"
+            "sys.path.append('/kai-calib-path')\n"
+            "def test_ok():\n    assert True\n", encoding="utf-8")
+        (root / "test_bbb_clean.py").write_text(
+            "def test_ok():\n    assert True\n", encoding="utf-8")
+        report = root / "report.json"
+        env = dict(os.environ)
+        env["KAI_ISOLATION_REPORT"] = str(report)
+        env["PYTHONPATH"] = str(REPO)
+        proc = subprocess.run(
+            [sys.executable, "-m", "pytest", str(root), "-q",
+             "-p", "scripts.security.isolation_plugin", "-p", "no:cacheprovider"],
+            capture_output=True, text=True, env=env, cwd=str(root), timeout=180)
+        check("the fixture suite itself passes", proc.returncode == 0,
+              proc.stdout[-400:])
+        found = json.loads(report.read_text(encoding="utf-8")) if report.exists() else {}
+        leaker = next((v for k, v in found.items() if "aaa_leaker" in k), None)
+        check("the leaking file is reported", leaker is not None, str(found))
+        if not leaker:
+            return
+
+        # One assertion per reported category. The denominator is the
+        # plugin's own finding keys, so a new category cannot be added
+        # without a calibration case appearing here.
+        expectations = {
+            "replaced": lambda v: any("kai_calib_victim" in x for x in v),
+            "added": lambda v: "kai_calib_added" in v,
+            "env_set": lambda v: "KAI_CALIB_NEW" in v,
+            "env_changed": lambda v: any(x.startswith("PATH ") for x in v),
+            "path_added": lambda v: any("kai-calib-path" in x for x in v),
+        }
+        uncalibrated = sorted(set(leaker) - set(expectations))
+        check("every reported category has a calibration case",
+              not uncalibrated, str(uncalibrated))
+        for category, holds in sorted(expectations.items()):
+            values = leaker.get(category, [])
+            check(f"{category} still detects", holds(values),
+                  f"{category}={values}")
+
+        check("the clean file is not blamed",
+              not any("bbb_clean" in k for k in found), str(found))
+
+
 def test_a_collection_time_leak_is_seen() -> None:
     """The gap that cost a full-suite abort.
 
@@ -324,6 +411,7 @@ def run_all() -> None:
     test_the_plugin_tells_a_swap_from_an_import()
     test_the_real_repository_replaces_nothing()
     test_a_collection_time_leak_is_seen()
+    test_every_reported_category_still_detects()
     test_one_file_loaded_twice_is_not_a_replacement()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",

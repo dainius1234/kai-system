@@ -2,7 +2,7 @@
   "note": "The repo-wide pytest result. Failures and errors may fall, never rise; the pass count may not fall, or deleting a test would be a way to pass. MEASURED BY ONE COMMAND: `make suite-run`. On 2026-08-05 it was not \u2014 CI wrote out its own pytest invocation which --ignores the two dashboard files (they get their own step, run from dashboard/), a local `pytest scripts/` did not, and this gate read a 24-test difference in *invocation* as 24 deleted tests. Both now call the Makefile target. See scripts/security/check_suite_floor.py.",
   "max_failed": 0,
   "max_errors": 0,
-  "min_passed": 4285,
+  "min_passed": 4286,
   "recorded": "2026-08-05",
   "history": [
     {

@@ -5338,3 +5338,79 @@ was coupled to an implementation detail. Repointed at
 model-aware timeout fails it, and dropping the timeout on the way to the
 client fails it. A test repaired after a refactor is exactly where a
 vacuous pass hides.
+
+---
+
+## 2026-08-05 (part 8) — auditing every ratchet for the blindness I just built
+
+Having blinded the hygiene survey and watched the gate pass, the obvious
+question is which of the other ratchets has the same hole. Audited all
+four against a *broken measurement* rather than a bad value.
+
+### First result: they all fail closed on a missing measurement
+
+    suite floor    log with no summary / zero tests / absent file  -> FAIL
+    isolation      empty report / absent report / malformed JSON   -> FAIL
+    assertion      counter produces nothing (34 "missing")         -> FAIL
+                   floors file empties (34 "unrecorded")           -> FAIL
+
+That is I-1 working. Those were built after the lesson.
+
+### But that is not the failure I hit
+
+My blinded survey produced *plausible* output: a real table, real
+service names, correct counts in the AST-based columns, and zeros in the
+two textual ones. Not an absent measurement — a partial one. So the
+sharper question is: **can this detector still run, still report, and
+stop seeing?**
+
+The answer turns entirely on which direction the ratchet bounds:
+
+    suite floor / min_passed      MINIMUM   safe — blinding reads as a fall
+    assertion floors              MINIMUM   safe — blinding reads as a fall
+    suite floor / max_failed      maximum   blind unless calibrated
+    hygiene survey, 5 columns     maximum   blind — now calibrated
+    isolation / replaced          maximum   blind unless calibrated
+    isolation / added, env_set    maximum   blind unless calibrated
+
+**A ratchet bounding a maximum reads a blinded detector as improvement.
+A ratchet bounding a minimum reads the same blinding as a regression and
+fires.** The two floors were safe by construction and not by foresight —
+worth saying plainly, because it means the property came from the shape
+of the question, not from care.
+
+Demonstrated on the isolation gate rather than asserted: a synthetic
+report naming ten of the twenty-one declared leaky files, with halved
+counts — exactly what a plugin that lost one of its hooks would produce
+— **passes the gate cleanly.**
+
+### The fix, and its denominator
+
+`test_test_isolation.py` now exercises all five reported categories in
+one fixture: a real module replaced (imported by an earlier file, so it
+is real in the leaker's before-snapshot), a stub added, an environment
+variable introduced, an existing one changed, and a `sys.path` entry
+appended. Losing any single category fails here.
+
+The denominator is the plugin's own finding keys — `set(leaker) -
+set(expectations)` — so a sixth category cannot be added without a
+calibration case appearing beside it. That is the same guard as the
+hygiene survey's `set(DETECTORS) - set(_CALIBRATION)`, and for the same
+reason: the list of what to calibrate must be derived from the thing
+being calibrated, or it drifts.
+
+Mutation-tested twice: blinding `path_added` fails one assertion,
+blinding `env_set` fails two, and neither moves the gate.
+
+### What is still uncovered, stated rather than quietly left
+
+`suite floor / max_failed` and `max_errors` are maxima with no
+calibration. A parser that read the pass count correctly and the failure
+count as zero would go unnoticed. The risk is low — `min_passed` anchors
+the same line of the same pytest summary, so a wholesale parse failure
+is caught — but "low risk" is not "covered", and I would rather it be
+written down than discovered later by someone reading a green gate.
+
+    suite floor  4,286 passed, 0 failed, 0 errors
+    isolation    replaced 0, no declared leak grew, five categories calibrated
+    hygiene      7, five detectors calibrated
