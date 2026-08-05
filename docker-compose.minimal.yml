@@ -72,7 +72,7 @@ services:
       - data-net
 
   ollama:
-    image: ollama/ollama:0.6
+    image: ollama/ollama:0.6.8
     container_name: sovereign-ollama
     <<: *defaults
     volumes:
@@ -89,7 +89,7 @@ services:
   ollama-pull:
     security_opt:
       - no-new-privileges:true
-    image: ollama/ollama:0.6
+    image: ollama/ollama:0.6.8
     container_name: sovereign-ollama-pull
     restart: "no"
     entrypoint: ["sh", "-c", "OLLAMA_HOST=ollama:11434 ollama pull ${OLLAMA_MODEL:-qwen2.5:0.5b} && OLLAMA_HOST=ollama:11434 ollama pull ${EMBEDDING_OLLAMA_MODEL:-all-minilm}"]

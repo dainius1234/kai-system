@@ -174,10 +174,16 @@ REGISTRY: Tuple[Gate, ...] = (
          proven_by="scripts/test_secret_gates.py",
          **_COMPOSE_GATE),
     # Denylist of four words became a rule: versioned or digest. GATE-011.
+    # `--verify-exists` runs in core-tests.yml as well, because a pinned
+    # tag and an *existing* tag are different properties and only the
+    # second one needs a network to check. `ollama/ollama:0.6` satisfied
+    # this gate for months and had been withdrawn from Docker Hub.
     Gate(module="check_image_tags",
-         summary="every image tag is versioned or a digest",
+         summary="every image tag is versioned or a digest, and resolves",
          proven_by="scripts/test_compose_gates.py",
-         **_COMPOSE_GATE),
+         **{**_COMPOSE_GATE,
+            "in_workflows": ("policy-checks.yml", "core-tests.yml"),
+            "findings": _COMPOSE_GATE.get("findings", ()) + ("KAI-GATE-028",)}),
     # Rewritten directionally and given a denominator, a failure suite
     # and fail-closed inputs — the first of the eight to be retrofitted.
     Gate(module="check_compose_drift",

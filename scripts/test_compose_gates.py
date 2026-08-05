@@ -41,7 +41,7 @@ from scripts.security import check_turbovec_writers as turbovec  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 20
+EXPECTED_SCENARIOS = 28
 executed: list[str] = []
 
 
@@ -249,6 +249,147 @@ def test_the_primary_writer_may_not_be_read_only():
     check("a read-only primary writer is caught", v, str(v))
 
 
+
+# ── check_image_tags --verify-exists ─────────────────────────────────
+# A tag can be perfectly pinned and simply not be there. On 2026-08-05
+# `ollama/ollama:0.6` passed every rule above and had been withdrawn from
+# Docker Hub, so every `docker compose up` died in under a second and
+# thirteen CI steps never ran. Three more were found the moment the gate
+# learned to ask: `prom/prometheus:v3.2`, `prom/alertmanager:v0.28`,
+# `ghcr.io/mudler/parakeet.cpp-server:v0.1.0`. All four were
+# minor-*series* tags, which upstreams retarget and eventually drop; the
+# patch releases underneath them were still there.
+#
+# These assertions are offline. `tag_resolves` talks to a registry, and a
+# test that needs the network is a test that fails on a train.
+
+
+def test_a_reference_is_split_the_way_a_registry_reads_it():
+    scenario("tag-split-reference")
+    cases = {
+        "redis:7-alpine": ("", "library/redis", "7-alpine"),
+        "ollama/ollama:0.6.8": ("", "ollama/ollama", "0.6.8"),
+        "ghcr.io/mudler/parakeet.cpp-server:v0.5.0":
+            ("ghcr.io", "mudler/parakeet.cpp-server", "v0.5.0"),
+        "python": ("", "library/python", "latest"),
+    }
+    for image, expected in cases.items():
+        check(f"{image} splits correctly",
+              tags.split_reference(image) == expected,
+              f"{tags.split_reference(image)} != {expected}")
+
+
+def test_an_official_image_gets_the_library_prefix():
+    """`redis` is `library/redis` to the registry. Getting this wrong
+    makes every official image look withdrawn — four false findings."""
+    scenario("tag-library-prefix")
+    _, repo, _ = tags.split_reference("redis:7-alpine")
+    check("official images resolve under library/", repo == "library/redis", repo)
+
+
+def test_every_distinct_image_is_collected_once():
+    """The denominator. `ollama/ollama` appears twice in the minimal
+    profile and four times across all three; it is one question."""
+    scenario("tag-images-deduped")
+    a = yml('services:\n  x:\n    image: redis:7\n  y:\n    image: redis:7\n'
+            '  z:\n    image: nginx:1.2\n  w:\n    build: ./b\n')
+    found = tags.images_in([a])
+    check("duplicates collapse", len(found) == 2, str(found))
+    check("built services are not registry questions",
+          all("build" not in i[2] for i in found), str(found))
+
+
+def test_verification_failure_is_a_finding_not_a_pass():
+    """I-1. \"Could not ask the registry\" is not \"the image is there\"."""
+    scenario("tag-unreachable-fails")
+    original = tags.tag_resolves
+    try:
+        tags.tag_resolves = lambda image, timeout=20.0: (
+            False, "could not verify (URLError: offline)")
+        a = yml('services:\n  s:\n    image: redis:7-alpine\n')
+        violations, checked = tags.verify_existence([a])
+        check("an unverifiable tag is reported", len(violations) == 1,
+              str(violations))
+        check("and the denominator still counts it", checked == 1, str(checked))
+        check("the message says it could not verify",
+              violations and "could not verify" in violations[0],
+              str(violations))
+    finally:
+        tags.tag_resolves = original
+
+
+def test_a_withdrawn_tag_is_reported_with_its_service():
+    scenario("tag-withdrawn-named")
+    original = tags.tag_resolves
+    try:
+        tags.tag_resolves = lambda image, timeout=20.0: (
+            False, "not found in the registry (HTTP 404)")
+        a = yml('services:\n  ollama:\n    image: ollama/ollama:0.6\n')
+        violations, _ = tags.verify_existence([a])
+        check("it fails", len(violations) == 1, str(violations))
+        check("and names the service", "ollama" in violations[0], str(violations))
+        check("and names the tag", "0.6" in violations[0], str(violations))
+    finally:
+        tags.tag_resolves = original
+
+
+def test_a_resolvable_tag_is_not_reported():
+    scenario("tag-resolvable-passes")
+    original = tags.tag_resolves
+    try:
+        tags.tag_resolves = lambda image, timeout=20.0: (True, "resolves")
+        a = yml('services:\n  s:\n    image: redis:7-alpine\n')
+        violations, checked = tags.verify_existence([a])
+        check("no finding", violations == [], str(violations))
+        check("one image checked", checked == 1, str(checked))
+    finally:
+        tags.tag_resolves = original
+
+
+
+def test_tag_resolves_itself_reports_an_error_as_absence():
+    """Calibration for the check above, which did not have it.
+
+    The first version of these tests stubbed `tag_resolves` wholesale, so
+    flipping its own `except` clause from False to True — the exact I-1
+    collapse of "could not ask" into "it is fine" — changed nothing and
+    50 assertions still passed. A test that cannot see the defect it was
+    written for is the thing this programme keeps finding, so the real
+    function is driven here with the network taken away from it.
+    """
+    scenario("tag-resolves-error-path")
+    original = tags.urllib.request.urlopen
+
+    def explode(*a, **k):
+        raise OSError("network is unreachable")
+
+    try:
+        tags.urllib.request.urlopen = explode
+        ok, detail = tags.tag_resolves("redis:7-alpine", timeout=1)
+        check("an unreachable registry is not a resolved tag", ok is False,
+              f"{ok} / {detail}")
+        check("and the detail says why", "could not verify" in detail, detail)
+    finally:
+        tags.urllib.request.urlopen = original
+
+
+def test_tag_resolves_reports_a_404_as_absence():
+    scenario("tag-resolves-404")
+    original = tags.urllib.request.urlopen
+
+    def not_found(*a, **k):
+        raise tags.urllib.error.HTTPError(
+            "http://x", 404, "Not Found", {}, None)
+
+    try:
+        tags.urllib.request.urlopen = not_found
+        ok, detail = tags.tag_resolves("ollama/ollama:0.6", timeout=1)
+        check("a 404 is absence", ok is False, f"{ok} / {detail}")
+        check("and says so", "not found" in detail, detail)
+    finally:
+        tags.urllib.request.urlopen = original
+
+
 def run_all() -> None:
     test_a_non_dashboard_publisher_fails()
     test_the_dashboard_may_publish_on_loopback()
@@ -270,6 +411,14 @@ def run_all() -> None:
     test_a_second_turbovec_writer_fails()
     test_a_reader_mounting_read_write_fails()
     test_the_primary_writer_may_not_be_read_only()
+    test_a_reference_is_split_the_way_a_registry_reads_it()
+    test_an_official_image_gets_the_library_prefix()
+    test_every_distinct_image_is_collected_once()
+    test_verification_failure_is_a_finding_not_a_pass()
+    test_a_withdrawn_tag_is_reported_with_its_service()
+    test_a_resolvable_tag_is_not_reported()
+    test_tag_resolves_itself_reports_an_error_as_absence()
+    test_tag_resolves_reports_a_404_as_absence()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,

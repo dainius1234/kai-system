@@ -6043,3 +6043,86 @@ observed running against a live stack, which needs 028 resolved first.
 deleted. The remaining host-port probes in `core-tests.yml` (the wait
 loops, kill-isolation, restart-persistence, memu-graph, sovereign boot)
 are untouched and still address nothing. **OPEN.**
+
+---
+
+## 2026-08-05 (part 17) — the cause: a tag that was pinned and gone
+
+The post-mortem landed in readable range on the third attempt and said
+it in one line:
+
+    ollama Error manifest for ollama/ollama:0.6 not found:
+           manifest unknown: manifest unknown
+    Error response from daemon: manifest for ollama/ollama:0.6 not found
+
+`ollama/ollama:0.6` has been **withdrawn from Docker Hub**. Every
+`docker compose up` died in under a second on a manifest lookup, and
+steps 47 through 59 never ran.
+
+Two things kept this hidden longer than it should have been:
+
+  - **`docker compose build` never touches an `image:` service.** Step 44
+    built the full stack and passed, immediately before the bring-up
+    failed. Nothing looked at the pull until `up`.
+  - **The gate that exists for exactly this looked at the wrong
+    property.** `check_image_tags` asks whether a tag is *pinned*.
+    `0.6` carries a version, is not `latest`, and passed — for months.
+    Pinned and existing are different properties, and the one that broke
+    was the second.
+
+`0.6` was a **minor-series** tag. Upstreams retarget those and
+eventually drop them; the patch release underneath, `0.6.8`, is still
+there. So the tag was reproducible in form and disposable in fact.
+
+### What the gate found once it asked the right question
+
+`--verify-exists` asks the registry whether each tag resolves. On its
+first run it reported **four withdrawn tags, not one**:
+
+    ollama/ollama:0.6                            404
+    prom/prometheus:v3.2                         404
+    prom/alertmanager:v0.28                      404
+    ghcr.io/mudler/parakeet.cpp-server:v0.1.0    404
+
+All four are minor-series tags. Each was verified independently against
+the Hub and ghcr tag lists before being touched, because a 404 can also
+mean my URL was wrong — three of the first findings this repository's
+detectors ever produced were that shape.
+
+Repinned to the nearest release that exists, so no behaviour change is
+intended where the series survived:
+
+    0.6   -> 0.6.8      v3.2  -> v3.2.1      v0.28 -> v0.28.1
+    v0.1.0 -> v0.5.0    (no v0.1.x or v0.2.x was ever published)
+
+10 of 10 image references now resolve.
+
+### The calibration failure inside the fix
+
+The first six tests for the new mode stubbed `tag_resolves` wholesale.
+So flipping its own `except` clause from `False` to `True` — the exact
+I-1 collapse of "could not ask" into "it is fine" — **changed nothing
+and all 50 assertions still passed.**
+
+I had written a test for the I-1 property that could not observe the I-1
+property. Two more assertions now drive the real function with the
+network taken away from it, and both mutations are caught. Checked
+rather than assumed, because assuming is how the gate got here.
+
+### I-4 caught me in the same commit
+
+Wiring `--verify-exists` into `core-tests.yml` without updating the
+registry declaration was reported immediately:
+
+    check_image_tags: declares workflows ['policy-checks.yml'],
+                      actually ['core-tests.yml', 'policy-checks.yml']
+
+Which is the meta-check doing precisely its job, on its author.
+
+### Register
+
+**`KAI-GATE-028`** — cause found: four pinned-but-withdrawn image tags,
+one of which stopped every compose bring-up in CI. Instance fixed; class
+enforced by `check_image_tags --verify-exists`, wired into
+`core-tests.yml` ahead of the Docker section. **OPEN** until the
+bring-up is observed succeeding.

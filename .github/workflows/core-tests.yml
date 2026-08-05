@@ -206,6 +206,19 @@ jobs:
             echo "### GitHub Models smoke test: SKIPPED (rate limit)" >> "$GITHUB_STEP_SUMMARY"
           fi
 
+      # Guards everything below it. On 2026-08-05 `ollama/ollama:0.6` had
+      # been withdrawn from Docker Hub, so the bring-up died in under a
+      # second with `manifest unknown` and thirteen steps never ran — and
+      # the image build above passed, because `docker compose build`
+      # builds `build:` services and never touches an `image:` one.
+      # Nothing looked at the pull until `up`.
+      #
+      # Asking the registry costs seconds and fails with the name of the
+      # image instead of forty minutes later with a manifest error.
+      - name: Every pinned image still exists in its registry
+        run: |
+          python3 scripts/security/check_image_tags.py --verify-exists
+
       - name: Free up runner disk space
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \

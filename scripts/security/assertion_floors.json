@@ -5,7 +5,7 @@
     "Assertion Floor Tests": 40,
     "CI Toleration Tests": 15,
     "Compose Drift Tests": 21,
-    "Compose Gate Tests": 35,
+    "Compose Gate Tests": 54,
     "Concurrency & Clock Tests": 51,
     "Constraint Assessment Tests": 56,
     "Dashboard Auth Tests": 99,
@@ -37,5 +37,5 @@
     "UH-7 Actuator Registry Tests": 75,
     "UH-8 Autonomy Tests": 174
   },
-  "total": 2320
+  "total": 2339
 }

@@ -114,7 +114,7 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    image: prom/prometheus:v3.2
+    image: prom/prometheus:v3.2.1
     container_name: sovereign-prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
@@ -130,7 +130,7 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    image: prom/alertmanager:v0.28
+    image: prom/alertmanager:v0.28.1
     container_name: sovereign-alertmanager
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
