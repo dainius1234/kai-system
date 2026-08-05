@@ -36,7 +36,8 @@
     "UH-5 Policy Bridge Tests": 49,
     "UH-6 Vertical Slice Tests": 86,
     "UH-7 Actuator Registry Tests": 75,
-    "UH-8 Autonomy Tests": 174
+    "UH-8 Autonomy Tests": 174,
+    "Workflow Filter Tests": 22
   },
-  "total": 2373
+  "total": 2395
 }

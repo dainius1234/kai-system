@@ -6310,3 +6310,104 @@ input before it is pointed at the repository, and the meta-check reads
 the instrument. Neither of those existed this morning.
 
 Floors: 36 suites, 2,373 assertions.
+
+---
+
+## 2026-08-05 (part 21) — there are nine workflows and I had checked four
+
+Part 12 established the rule: *every CI report names every workflow.*
+I have been reporting four. There are nine.
+
+    core-tests.yml          push       failing (in progress)
+    policy-checks.yml       push       green
+    python-app.yml          push       green
+    unified-hunter.yml      push       green
+    tech-watch-reminder.yml schedule   green, 4 of 4
+    drift-detector.yml      schedule   FAILED 15 of 15 since 2026-04-27
+    friday-cleanup.yml      schedule   30 of 30 failed — see below
+    weekly-report-card.yml  schedule   30 of 30 failed — see below
+    pm-status.yml           PR only    never runs on this branch
+
+The rule was right and I had been applying it to the subset that
+reports back to me. A push workflow that breaks is noticed by whoever
+pushed. **A scheduled workflow fails into an empty room.**
+
+### The two I would have got wrong
+
+`friday-cleanup` and `weekly-report-card` show 30 consecutive failures,
+and I nearly recorded that as an open defect. Checked first:
+
+    e8e1c2a 2026-08-03 21:50  feat(A-04c): Sort the CI steps — and find
+                              3 workflows that do not parse
+
+The last failing run of both was **21:33 on 2026-08-03**. They were
+fixed seventeen minutes later, and neither has run since — they are
+schedule-only, and their next firings are 2026-08-07 and 2026-08-10.
+Their record is historical. Still never *observed* green, which is a
+different statement and the one I will make.
+
+### drift-detector: three and a half months, one pair of quotes
+
+Not in that fix. Last touched 2026-04-21, failing every scheduled run
+since 2026-04-27:
+
+    --jq '[.[] | select(.title | startswith(\"Weekly drift report (\"))]
+          | sort_by(.updatedAt) | reverse | .[0].number // empty'
+
+Inside a single-quoted shell argument `\"` is a literal backslash and
+quote. jq receives it verbatim:
+
+    jq: error: syntax error, unexpected INVALID_CHARACTER
+        (Unix shell quoting issues?)
+
+`set -euo pipefail` above it turned that into a dead job. **Verified by
+running both forms through jq**, not by reading them.
+
+**Nothing here could see it.** The file is valid YAML, so
+`check_ci_tolerations.unparseable()` passed it. The script is valid
+bash — `bash -n` accepts it — so a shell lint would pass it too. The
+defect lives one level further in, in a string that only jq ever parses.
+
+The step also failed with a bare `Process completed with exit code 1`
+and a hundred lines of bash above it. An `ERR` trap now names the line.
+For a scheduled workflow that matters more than anywhere else: there is
+no author watching, so an unreadable failure there is permanent.
+
+### The gate
+
+`check_workflow_filters.py` compiles every `jq` filter embedded in every
+workflow. Calibrated against the real defect before being trusted:
+reintroducing the original quoting makes it fail with jq's own message,
+and the corrected form passes.
+
+It checks **syntax, not behaviour** — a filter is compiled against
+`null` and only `syntax error` / `compile error` counts. Inventing
+representative input for every filter would be a false-positive machine,
+which is the failure mode this repository works hardest to avoid. A
+double-quoted filter cannot be compiled without knowing the shell
+variables, so it is **reported as unverifiable** rather than skipped.
+
+`scripts/test_workflow_filters.py`: 22 assertions, 10 scenarios. It
+fails rather than skips when `jq` is absent — a suite that exists to
+prove a jq-backed gate works cannot prove it without jq.
+
+I-4 caught the wiring immediately, for the third time today: the gate
+was declared in `policy-checks.yml` before the step existed there.
+
+Floors: 37 suites, 2,395 assertions.
+
+### Register
+
+**`KAI-GATE-032`** — a jq filter embedded in a workflow can be valid
+YAML, valid bash, and uncompilable, and no gate could see that layer.
+`drift-detector.yml` died on one for 15 consecutive scheduled runs over
+three and a half months. Instance fixed, class gated. **OPEN** until
+`drift-detector` is observed green.
+
+**`KAI-GATE-033`** — `friday-cleanup` and `weekly-report-card` have
+never been observed green. Their 30 failures each predate `e8e1c2a` by
+minutes and neither has run since; the record is historical, not a live
+defect. **OPEN** on evidence, not on suspicion: verifying them means
+either waiting for Friday/Monday or dispatching them, and dispatching
+posts a GitHub issue to the operator's repository. That is the
+operator's call, not mine.

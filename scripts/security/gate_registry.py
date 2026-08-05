@@ -277,6 +277,19 @@ REGISTRY: Tuple[Gate, ...] = (
     # draw attention to it. Calibrated against known-good suites before
     # it reports — three earlier versions of this detector produced
     # 1,555, 1,813 and 54 confident wrong answers.
+    # A workflow can be valid YAML and valid bash and still die on a
+    # string only jq ever parses. `drift-detector.yml` failed all 15 of
+    # its scheduled runs for three and a half months on one, and no gate
+    # here could see it. KAI-GATE-032.
+    Gate(module="check_workflow_filters",
+         kind=GATE,
+         summary="every jq filter embedded in a workflow compiles",
+         inputs=(".github/workflows",),
+         denominator=r"inspected: \d+ embedded jq filter",
+         proven_by="scripts/test_workflow_filters.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-032",)),
     Gate(module="check_test_wiring",
          kind=GATE,
          summary="every test in a self-run suite is dispatched",

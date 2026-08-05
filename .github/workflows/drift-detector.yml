@@ -26,6 +26,14 @@ jobs:
           #!/usr/bin/env bash
           set -euo pipefail
 
+          # A hundred lines of bash under `set -e` used to fail with a bare
+          # `Process completed with exit code 1` and nothing else — which is
+          # how this workflow stayed broken from 2026-04-27 to 2026-08-05,
+          # failing all 15 of its scheduled runs while nobody could see why.
+          # Scheduled workflows have no author watching them, so an
+          # unreadable failure there is permanent.
+          trap 'echo "::error::drift-detector failed at line ${LINENO}"' ERR
+
           today="$(date -u +%F)"
           now_epoch="$(date -u +%s)"
 
@@ -97,7 +105,14 @@ jobs:
           } > "${body_file}"
 
           # Reuse the most recently updated open issue titled "Weekly drift report (...)".
-          existing_issue="$(gh issue list --state open --label pm --search 'Weekly drift report in:title' --json number,title,updatedAt --jq '[.[] | select(.title | startswith(\"Weekly drift report (\"))] | sort_by(.updatedAt) | reverse | .[0].number // empty')"
+          # The quotes here were `\"` inside a single-quoted jq filter,
+          # which jq receives literally and rejects:
+          #     jq: error: syntax error, unexpected INVALID_CHARACTER
+          #     (Unix shell quoting issues?)
+          # Verified by running both forms through jq rather than by
+          # reading them. Valid YAML, valid shell, broken jq — which is
+          # why `check_ci_tolerations.unparseable()` could not see it.
+          existing_issue="$(gh issue list --state open --label pm --search 'Weekly drift report in:title' --json number,title,updatedAt --jq '[.[] | select(.title | startswith("Weekly drift report ("))] | sort_by(.updatedAt) | reverse | .[0].number // empty')"
 
           if [ -n "${existing_issue}" ]; then
             gh issue comment "${existing_issue}" --body-file "${body_file}"

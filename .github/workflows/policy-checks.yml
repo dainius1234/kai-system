@@ -84,6 +84,9 @@ jobs:
         run: python scripts/security/check_ci_tolerations.py
 
       - name: Test wiring — no test defined and never called
+      - name: Every jq filter embedded in a workflow compiles
+        run: python scripts/security/check_workflow_filters.py
+
         run: python scripts/security/check_test_wiring.py
 
       - name: Instrumentation invariants (I-4 enforced)
