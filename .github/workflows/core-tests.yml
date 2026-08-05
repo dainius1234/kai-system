@@ -304,6 +304,20 @@ jobs:
           # (DECISIONS.md) — CI exercises spine/gate logic, not embedding
           # quality, and can't rely on the HF model download succeeding.
           MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
+          # `POSTGRES_PASSWORD: ${DB_PASSWORD}` has no default, by design:
+          # a default password in a shipped compose file is what
+          # check_secret_fallbacks exists to forbid. So CI must supply
+          # one, and this step did not — the sovereign boot step further
+          # down was the only place that set it. postgres refuses to
+          # initialise with an empty superuser password, so the container
+          # went unhealthy and every dependent failed with
+          # "dependency failed to start".
+          #
+          # `The "DB_PASSWORD" variable is not set. Defaulting to a blank
+          # string.` was printed by every compose invocation in this
+          # workflow, all day, and I read past it as noise. The warning
+          # was the answer.
+          DB_PASSWORD: localdev
         run: |
           set -o pipefail
           # Captured, because the post-mortem used to *re-run* the
