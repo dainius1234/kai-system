@@ -45,13 +45,27 @@ spec = importlib.util.spec_from_file_location("memu_app", "memu-core/app.py")
 memu = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(memu)
 
-# /memory/decay moved to memu-core-introspect (see DECISIONS.md D21). Register
-# memu's app.py under the literal name "app" so introspect_app's
-# `from app import ...` reuses this instance instead of importing a second one.
-sys.modules["app"] = memu
-introspect_spec = importlib.util.spec_from_file_location("introspect_app", "memu-core/introspect_app.py")
+# /memory/decay moved to memu-core-introspect (see DECISIONS.md D21).
+# `introspect_app.py` does `from app import ...`, so memu's app.py has to
+# be registered under the bare name `app` while it executes — and only
+# while it executes.
+#
+# This file restored `_STUB_NAMES` carefully and then left `app` and
+# `introspect_app` claimed forever. `app` is also `kai-advisor/app.py`,
+# `sandboxes/shell/app.py` and a dozen others; `introspect_app` is also
+# `agentic/introspect_app.py`. Whoever wanted the name next got memu.
+#
+# Invisible locally and caught by CI, because it depends on which file
+# happened to claim the name first — and invisible to the isolation
+# plugin too until it learned to watch collection, since every line here
+# runs at import time. Third instance of this exact collision today.
+from scripts.module_stubs import stubbed  # noqa: E402
+
+introspect_spec = importlib.util.spec_from_file_location(
+    "introspect_app", "memu-core/introspect_app.py")
 introspect_app = importlib.util.module_from_spec(introspect_spec)
-introspect_spec.loader.exec_module(introspect_app)
+with stubbed({"app": memu, "introspect_app": introspect_app}):
+    introspect_spec.loader.exec_module(introspect_app)
 
 # Restore originals so other tests can use the real libraries if needed.
 for mod_name, orig in _originals.items():

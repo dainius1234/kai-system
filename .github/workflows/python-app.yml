@@ -54,16 +54,17 @@ jobs:
         MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
         KAI_ISOLATION_REPORT: .isolation-report.json
       run: |
-        PYTHONPATH=. pytest \
-          -p scripts.security.isolation_plugin \
-          --ignore=_archive --ignore=.venv \
-          --ignore=scripts/test_dashboard.py \
-          --ignore=scripts/test_dashboard_ui.py \
-          --cov=common --cov=agentic --cov=memu-core --cov=letta-agent --cov=financial-awareness \
-          --cov-report=term-missing \
-          --cov-fail-under=60 \
-          -q 2>&1 | tee .pytest-run.log
-        exit ${PIPESTATUS[0]}
+        # The suite's population is defined once, in the Makefile's
+        # `suite-run` target, and both CI and developers call it. It used
+        # to be spelled out here as well, and the two spellings drifted:
+        # this step --ignores the two dashboard files (they get their own
+        # step below, run from dashboard/) and a local `pytest scripts/`
+        # did not, so the floor gate read a 24-test difference in
+        # *invocation* as 24 deleted tests.
+        make suite-run PYTEST_EXTRA="\
+          --cov=common --cov=agentic --cov=memu-core \
+          --cov=letta-agent --cov=financial-awareness \
+          --cov-report=term-missing --cov-fail-under=60"
     # KAI-GATE-020. Failures and errors ratchet down; the pass count
     # ratchets up, so deleting a test is not a way to go green.
     # `if: always()` because a red suite is exactly when this matters —

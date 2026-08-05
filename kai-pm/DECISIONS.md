@@ -4936,3 +4936,68 @@ scope change, not a regression, and closure remains a separate review.
     suite floor   4,287 → 4,290 passed, 0 failed, 0 errors
     hygiene       24 total, baseline recorded with its widening reason
     isolation     replaced 0, no declared leak grew
+
+---
+
+## 2026-08-05 (part 3) — CI disagreed with local, and both times CI was right
+
+Two gates failed on `fa048cd` while pytest itself passed. Both failures
+were real and neither was in the code under test.
+
+### The floor gate compared two different commands
+
+    local  4,287 passed
+    CI     4,263 passed
+    gate   "passing tests 4287 -> 4263 — a falling pass count"
+
+Nothing was deleted. `python-app.yml` wrote out its own pytest
+invocation, which `--ignore`s `scripts/test_dashboard.py` and
+`scripts/test_dashboard_ui.py` — they get their own step, run from
+`dashboard/` — and a local `pytest scripts/` does not. The gate read a
+24-test difference in **invocation** as 24 lost tests.
+
+A ratchet compares a number to a recorded number, so both have to come
+from the same command or the comparison means nothing. That is a
+denominator defect in the gate built to catch regressions, which makes
+it the fourth this week after the dead-test detector, the deprecation
+rule, `hygiene_survey`'s COLUMNS, and the isolation plugin's collection
+blindness.
+
+Fixed by making the invocation a single Makefile target, `suite-run`,
+which CI now calls with `PYTEST_EXTRA` for its coverage flags. The floor
+is re-baselined at 4,264 against that command and the file records which
+command produced it. The apparent drop from 4,290 is the two dashboard
+files moving out of this population and into their own step — stated in
+the history rather than left as an unexplained fall.
+
+`scripts/test_h3_coverage_gate.py` failed on the change, because it
+grepped `python-app.yml` for `--ignore=_archive`. Correct behaviour from
+the test — the declaration moved, so the assertion follows it to the
+Makefile and additionally asserts CI calls the target rather than
+carrying its own copy. A test that pins where a declaration *used to
+live* is a reason not to consolidate, which is the wrong incentive.
+
+Also proved the runner fails closed: `PIPESTATUS` is a bashism and make
+runs `sh`, so the first version silently reported success on a failing
+suite. Checked with a deliberately failing one-test fixture before
+trusting it — exit 2, as required.
+
+### The third collision on the name `app`
+
+`scripts/test_p3_organic_memory.py` left `sys.modules["app"]` pointing at
+memu-core forever. It carefully saved and restored its `_STUB_NAMES` and
+then leaked the two names that matter most. In CI the victim was
+`kai-advisor/app.py`; locally nothing had claimed the name first, so it
+never showed.
+
+Third instance today, after `test_v7_quarantine` and
+`test_integration_chain`. All three had the same cause — `introspect_app`
+does `from app import store`, so registering memu as `app` is genuinely
+necessary — and all three made it permanent instead of scoping it to the
+`exec_module` call that needs it.
+
+Worth stating plainly: **this class was invisible to the isolation plugin
+until this morning**, because every line of it runs at import time. The
+plugin found all three within an hour of learning to watch collection,
+and CI found the one local runs cannot see. Neither would have found it
+alone.

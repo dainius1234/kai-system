@@ -48,10 +48,24 @@ class TestCIWorkflow:
             "CI must emit per-file missing-line coverage report for actionable output"
         )
 
-    def test_ignores_archive_in_ci(self):
-        yml = _pyapp()
-        coverage_step = yml[yml.find("--cov=common"):][:300]
-        assert "--ignore=_archive" in coverage_step or "--ignore=_archive" in yml
+    def test_ignores_archive_in_the_canonical_run(self):
+        """`_archive` must be excluded from the suite CI actually runs.
+
+        This used to grep python-app.yml, because the pytest invocation
+        was written out there. It now lives once in the Makefile's
+        `suite-run` target — CI and developers call the same command, so
+        the floor gate compares like with like. The assertion follows the
+        declaration rather than pinning where it used to be; a test that
+        insists on the old location is a reason not to consolidate.
+        """
+        makefile = _makefile()
+        start = makefile.find("suite-run:")
+        assert start != -1, "the canonical suite-run target has gone missing"
+        target = makefile[start:makefile.find("\n\n", start)]
+        assert "--ignore=_archive" in target, target
+        assert "make suite-run" in _pyapp(), (
+            "CI must call the canonical target, not its own copy of the invocation"
+        )
 
     def test_coverage_step_is_named(self):
         yml = _pyapp()
