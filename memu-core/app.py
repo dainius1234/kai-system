@@ -26,7 +26,7 @@ from typing import Any, Deque, Dict, List, Optional, Protocol, runtime_checkable
 from fastapi import Body, FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from common.degraded import degraded_response
+from common.degraded import degradation_report, degraded_response, record_degradation
 from common.http_hygiene import bounded_json
 from common.runtime import AuditStream, ErrorBudget, detect_device, redact_pii, sanitize_string, setup_json_logger
 
@@ -835,8 +835,11 @@ class TurboVecStore(PGVectorStore):
                 try:
                     self._index.remove(int(row[0]))
                     self._save_index()
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    # The DB row is already gone and committed. If the
+                    # index does not follow, it now holds an id that
+                    # resolves to nothing — searches return a phantom.
+                    record_degradation("faiss_index", "delete_record", _exc)
             return deleted > 0
         finally:
             self._put_conn(conn)
@@ -858,8 +861,8 @@ class TurboVecStore(PGVectorStore):
             for iid in expired_int_ids:
                 try:
                     self._index.remove(int(iid))
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    record_degradation("faiss_index", "delete_old", _exc)
             if expired_int_ids:
                 self._save_index()
             return {"before": before, "after": before - deleted, "deleted": deleted, "cutoff": cutoff}
@@ -1104,8 +1107,8 @@ def score_importance(text: str, is_keeper: bool = False, is_pinned: bool = False
         recent_emotion = _emotional_timeline[-1] if _emotional_timeline else None
         if recent_emotion and recent_emotion.get("intensity", 0.0) > 0.3:
             score += recent_emotion["intensity"] * 0.15
-    except Exception:
-        pass
+    except Exception as _exc:
+        record_degradation("memu", "emotional_encoding", _exc)
 
     return round(min(score, 1.0), 3)
 
@@ -1361,9 +1364,24 @@ async def health() -> Dict[str, Any]:
     else:
         checks["redis_persist"] = "ok"
 
+    # H-6: dependency failures this process *survived*. The `checks` above
+    # only ask "is it broken right now"; this answers "has anything been
+    # quietly failing, how often, and since when" — the question the 32
+    # `except Exception: pass` handlers made unanswerable. A Redis outage
+    # that the in-process fallback covered for is real degradation, and
+    # `checks["redis_persist"] == "ok"` will not tell you about it.
+    survived = degradation_report()
+    checks["survived_failures"] = str(len(survived))
+
     degraded = any(v.startswith("fail") for v in checks.values())
     status = "degraded" if degraded else "ok"
-    return {"status": status, "storage": storage_type, "device": DEVICE, "checks": checks}
+    return {
+        "status": status,
+        "storage": storage_type,
+        "device": DEVICE,
+        "checks": checks,
+        "degraded_dependencies": survived,
+    }
 
 
 _RECOVERY_ENABLED = os.getenv("RECOVERY_ENABLED", "false").lower() == "true"
@@ -1375,13 +1393,20 @@ async def recover() -> Dict[str, Any]:
     if not _RECOVERY_ENABLED:
         return {"status": "disabled", "reason": "RECOVERY_ENABLED=false"}
     recovered: list[str] = []
+    failed_recoveries: list[str] = []
     try:
         if hasattr(store, "_pool") and hasattr(store, "_psycopg2"):
             store._pool = store._psycopg2.pool.SimpleConnectionPool(
                 1, 5, store._pg_uri)
             recovered.append("postgres_pool")
-    except Exception:
-        pass
+    except Exception as _exc:
+        # H-6: this used to be `pass`, so a failed pool rebuild produced
+        # "recovery: nothing to heal" — the same words as a healthy
+        # system with nothing to do. A self-heal endpoint reporting
+        # success for a heal that did not happen is the worst possible
+        # place for that.
+        record_degradation("postgres", "recover_pool", _exc)
+        failed_recoveries.append(f"postgres_pool: {type(_exc).__name__}")
 
     # Log recovery event to conscience (full schema for audit compat)
     healed = list(recovered)
@@ -1396,6 +1421,13 @@ async def recover() -> Dict[str, Any]:
     }
     _p20_append_capped(_P20_CONSCIENCE_KEY, _conscience_log, entry, _CONSCIENCE_LOG_CAP)
 
+    if failed_recoveries:
+        return {
+            "status": "degraded",
+            "recovered": recovered,
+            "failed": failed_recoveries,
+            "recovery_log": entry,
+        }
     return {"status": "ok", "recovered": recovered, "recovery_log": entry}
 
 
@@ -2076,6 +2108,29 @@ def _restore_p17_p22_from_redis() -> Dict[str, bool]:
     return results
 
 
+# ── The Redis-with-in-process-fallback convention ────────────────────
+#
+# Every helper from here to the end of the P22 block has the same shape:
+# try Redis, and on any failure fall back to a module-level Python list
+# or dict. The fallback is deliberate — a Redis outage should degrade
+# memU, not end it — and it stays.
+#
+# What changed (H-6) is the handler. Thirty-two of these were written
+# `except Exception: pass`, which meant a Redis outage produced no signal
+# whatsoever: the fallback answered, the endpoint returned 200, and the
+# only observable difference was that memU had quietly become
+# single-process and non-durable. Twelve workers, twelve divergent
+# in-memory lists, every health check green.
+#
+# The convention is now:
+#
+#     except Exception as _exc:
+#         record_degradation("redis", "<operation>", _exc)
+#
+# One line, no return-value change, and the failure surfaces at
+# `GET /health` under `degraded_dependencies` with a count and an age.
+# Copy this, not the `pass` — the whole reason there were thirty-two is
+# that the first one was copied thirty-one times.
 def _session_key(session_id: str) -> str:
     return f"session:{session_id}:messages"
 
@@ -2087,8 +2142,8 @@ def _get_session_messages(session_id: str) -> List[Dict[str, Any]]:
         try:
             raw = redis.lrange(_session_key(session_id), 0, SESSION_MAX_TURNS - 1)
             return [json.loads(r) for r in raw]
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "get_session_messages", _exc)
     # fallback: in-memory
     _cleanup_expired_sessions()
     return list(_session_store.get(session_id, []))[-SESSION_MAX_TURNS:]
@@ -2105,8 +2160,8 @@ def _append_session_message(session_id: str, role: str, content: str) -> None:
             redis.ltrim(key, -SESSION_MAX_TURNS, -1)
             redis.expire(key, SESSION_TTL_SECONDS)
             return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "append_session_message", _exc)
     # fallback: in-memory
     buf = _session_store.setdefault(session_id, [])
     buf.append(msg)
@@ -2185,8 +2240,8 @@ def _p20_get_value(name: str) -> Optional[Dict[str, Any]]:
         try:
             raw = redis.hget(_P20_VALUES_KEY, name)
             return json.loads(raw) if raw else None
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p20_get_value", _exc)
     return next((v for v in _formed_values if v["value"] == name), None)
 
 
@@ -2196,8 +2251,8 @@ def _p20_put_value(entry: Dict[str, Any]) -> None:
         try:
             redis.hset(_P20_VALUES_KEY, entry["value"], json.dumps(entry))
             return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p20_put_value", _exc)
     existing = next((v for v in _formed_values if v["value"] == entry["value"]), None)
     if existing:
         existing.update(entry)
@@ -2211,8 +2266,8 @@ def _p20_all_values() -> List[Dict[str, Any]]:
         try:
             raw = redis.hgetall(_P20_VALUES_KEY)
             return [json.loads(v) for v in raw.values()]
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p20_all_values", _exc)
     return list(_formed_values)
 
 
@@ -2226,8 +2281,8 @@ def _p20_append_capped(key: str, fallback: List[Dict[str, Any]], entry: Dict[str
             redis.rpush(key, json.dumps(entry))
             redis.ltrim(key, -cap, -1)
             return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p20_append_capped", _exc)
     fallback.append(entry)
     if len(fallback) > cap:
         fallback[:] = fallback[-cap:]
@@ -2239,8 +2294,8 @@ def _p20_all_capped(key: str, fallback: List[Dict[str, Any]]) -> List[Dict[str, 
         try:
             raw = redis.lrange(key, 0, -1)
             return [json.loads(r) for r in raw]
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p20_all_capped", _exc)
     return list(fallback)
 
 
@@ -2255,8 +2310,8 @@ def _p20_alignment_get() -> Dict[str, float]:
                     "streak": int(float(raw.get("streak", 0))),
                     "violations": int(float(raw.get("violations", 0))),
                 }
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p20_alignment_get", _exc)
     return dict(_value_alignment_score)
 
 
@@ -2273,8 +2328,8 @@ def _p20_alignment_set(overall: float, violations: int, increment_streak: bool) 
                 "streak": int(float(raw.get("streak", 0))),
                 "violations": int(float(raw.get("violations", violations))),
             }
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p20_alignment_set", _exc)
     _value_alignment_score["overall"] = overall
     _value_alignment_score["violations"] = violations
     if increment_streak:
@@ -2308,8 +2363,8 @@ def _p17_append_capped(key: str, fallback: List[Dict[str, Any]], entry: Dict[str
             redis.rpush(key, json.dumps(entry))
             redis.ltrim(key, -cap, -1)
             return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p17_append_capped", _exc)
     fallback.append(entry)
     if len(fallback) > cap:
         fallback[:] = fallback[-cap:]
@@ -2321,8 +2376,8 @@ def _p17_all_capped(key: str, fallback: List[Dict[str, Any]]) -> List[Dict[str, 
         try:
             raw = redis.lrange(key, 0, -1)
             return [json.loads(r) for r in raw]
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p17_all_capped", _exc)
     return list(fallback)
 
 
@@ -2332,8 +2387,8 @@ def _p17_cooldown_get(category: str) -> float:
         try:
             raw = redis.hget(_P17_COOLDOWN_KEY, category)
             return float(raw) if raw else 0.0
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p17_cooldown_get", _exc)
     return _confession_cooldown.get(category, 0.0)
 
 
@@ -2343,8 +2398,8 @@ def _p17_cooldown_set(category: str, timestamp: float) -> None:
         try:
             redis.hset(_P17_COOLDOWN_KEY, category, timestamp)
             return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p17_cooldown_set", _exc)
     _confession_cooldown[category] = timestamp
 
 
@@ -2369,8 +2424,8 @@ def _p18_append_capped(key: str, fallback: List[Dict[str, Any]], entry: Dict[str
             redis.rpush(key, json.dumps(entry))
             redis.ltrim(key, -cap, -1)
             return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p18_append_capped", _exc)
     fallback.append(entry)
     if len(fallback) > cap:
         fallback[:] = fallback[-cap:]
@@ -2382,8 +2437,8 @@ def _p18_all_capped(key: str, fallback: List[Dict[str, Any]]) -> List[Dict[str, 
         try:
             raw = redis.lrange(key, 0, -1)
             return [json.loads(r) for r in raw]
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p18_all_capped", _exc)
     return list(fallback)
 
 
@@ -2400,8 +2455,8 @@ def _p18_update_entry(key: str, fallback: List[Dict[str, Any]], entry_id: str, u
                     item.update(updates)
                     redis.lset(key, idx, json.dumps(item))
                     return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p18_update_entry", _exc)
     for item in fallback:
         if item.get("id") == entry_id:
             item.update(updates)
@@ -2431,8 +2486,8 @@ def _p19_append_capped(key: str, fallback: List[Dict[str, Any]], entry: Dict[str
             redis.rpush(key, json.dumps(entry))
             redis.ltrim(key, -cap, -1)
             return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p19_append_capped", _exc)
     fallback.append(entry)
     if len(fallback) > cap:
         fallback[:] = fallback[-cap:]
@@ -2444,8 +2499,8 @@ def _p19_all_capped(key: str, fallback: List[Dict[str, Any]]) -> List[Dict[str, 
         try:
             raw = redis.lrange(key, 0, -1)
             return [json.loads(r) for r in raw]
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p19_all_capped", _exc)
     return list(fallback)
 
 
@@ -2483,8 +2538,8 @@ def _p21_hash_get(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str) -
         try:
             raw = redis.hget(key, item_id)
             return json.loads(raw) if raw else None
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p21_hash_get", _exc)
     return fallback.get(item_id)
 
 
@@ -2494,8 +2549,8 @@ def _p21_hash_put(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str, e
         try:
             redis.hset(key, item_id, json.dumps(entry))
             return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p21_hash_put", _exc)
     fallback[item_id] = entry
 
 
@@ -2505,8 +2560,8 @@ def _p21_hash_all(key: str, fallback: Dict[str, Dict[str, Any]]) -> Dict[str, Di
         try:
             raw = redis.hgetall(key)
             return {k: json.loads(v) for k, v in raw.items()}
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p21_hash_all", _exc)
     return dict(fallback)
 
 
@@ -2515,8 +2570,8 @@ def _p21_hash_len(key: str, fallback: Dict[str, Dict[str, Any]]) -> int:
     if redis:
         try:
             return redis.hlen(key)
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p21_hash_len", _exc)
     return len(fallback)
 
 
@@ -2539,8 +2594,8 @@ def _p21_append_capped(entry: Dict[str, Any], cap: int) -> None:
             redis.rpush(_P21_BRIEFING_KEY, json.dumps(entry))
             redis.ltrim(_P21_BRIEFING_KEY, -cap, -1)
             return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p21_append_capped", _exc)
     _briefing_log.append(entry)
 
 
@@ -2550,8 +2605,8 @@ def _p21_briefing_all() -> List[Dict[str, Any]]:
         try:
             raw = redis.lrange(_P21_BRIEFING_KEY, 0, -1)
             return [json.loads(r) for r in raw]
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p21_briefing_all", _exc)
     return list(_briefing_log)
 
 
@@ -2560,8 +2615,8 @@ def _p21_briefing_len() -> int:
     if redis:
         try:
             return redis.llen(_P21_BRIEFING_KEY)
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p21_briefing_len", _exc)
     return len(_briefing_log)
 
 
@@ -2581,8 +2636,8 @@ def _p22_append_capped(key: str, fallback: Deque[Dict[str, Any]], entry: Dict[st
             redis.rpush(key, json.dumps(entry))
             redis.ltrim(key, -cap, -1)
             return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p22_append_capped", _exc)
     fallback.append(entry)
 
 
@@ -2592,8 +2647,8 @@ def _p22_all_capped(key: str, fallback: Deque[Dict[str, Any]]) -> List[Dict[str,
         try:
             raw = redis.lrange(key, 0, -1)
             return [json.loads(r) for r in raw]
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p22_all_capped", _exc)
     return list(fallback)
 
 
@@ -2603,8 +2658,8 @@ def _p22_hash_get(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str) -
         try:
             raw = redis.hget(key, item_id)
             return json.loads(raw) if raw else None
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p22_hash_get", _exc)
     return fallback.get(item_id)
 
 
@@ -2614,8 +2669,8 @@ def _p22_hash_put(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str, e
         try:
             redis.hset(key, item_id, json.dumps(entry))
             return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p22_hash_put", _exc)
     fallback[item_id] = entry
 
 
@@ -2625,8 +2680,8 @@ def _p22_hash_all(key: str, fallback: Dict[str, Dict[str, Any]]) -> Dict[str, Di
         try:
             raw = redis.hgetall(key)
             return {k: json.loads(v) for k, v in raw.items()}
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p22_hash_all", _exc)
     return dict(fallback)
 
 
@@ -2636,8 +2691,8 @@ def _p22_hash_delete(key: str, fallback: Dict[str, Dict[str, Any]], item_id: str
         try:
             redis.hdel(key, item_id)
             return
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "p22_hash_delete", _exc)
     fallback.pop(item_id, None)
 
 
@@ -2675,8 +2730,8 @@ async def clear_session(session_id: str) -> Dict[str, Any]:
     if redis:
         try:
             redis.delete(_session_key(sid))
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("redis", "clear_session", _exc)
     _session_store.pop(sid, None)
     _session_timestamps.pop(sid, None)
     return {"status": "ok", "session_id": sid, "cleared": True}
@@ -3058,8 +3113,13 @@ async def proactive_nudges() -> Dict[str, Any]:
                 ts = ts.replace(tzinfo=timezone.utc)
             if ts < threshold:
                 continue
-        except Exception:
-            pass
+        except Exception as _exc:
+            # Note the behaviour this preserves: an unparseable timestamp
+            # means the record is *kept*, not skipped. Left as-is
+            # deliberately — changing it is a product decision — but a
+            # corpus of unparseable timestamps is now visible instead of
+            # quietly widening every window.
+            record_degradation("memu", "proactive_timestamp_parse", _exc)
 
         content_text = str(r.content.get("result", ""))
         if not content_text:
@@ -3143,8 +3203,8 @@ async def silence_signals() -> Dict[str, Any]:
             existing_last = category_activity[cat]["last_ts"]
             if existing_last is None or ts > existing_last:
                 category_activity[cat]["last_ts"] = ts
-        except Exception:
-            pass
+        except Exception as _exc:
+            record_degradation("memu", "silence_timestamp_parse", _exc)
 
     # find silent topics
     silent_topics = []
@@ -4143,6 +4203,24 @@ async def detect_operator_drift(
 #  This is what makes KAI talk first.
 # ═══════════════════════════════════════════════════════════════════════
 
+def _source_failed(failed: List[str], source: str, exc: BaseException) -> None:
+    """One source of an aggregate could not be read — note it, keep going.
+
+    The pattern this exists for: a function that gathers from several
+    independent places and returns one combined answer. Losing one source
+    should not lose the others, so the failure genuinely must not
+    propagate. But the *combined answer* has to say a source is missing,
+    or an empty result reads as "nothing to report" when it means
+    "nothing could be reached".
+
+    Two records, deliberately: `failed` is per-request, so this caller's
+    response can name what it lacked, and `record_degradation` is
+    process-wide, so an operator can see it has been lacking it all week.
+    """
+    failed.append(source)
+    record_degradation("memu", source, exc)
+
+
 @app.get("/memory/proactive/full")
 async def full_proactive_scan() -> Dict[str, Any]:
     """Unified proactive scan — the engine that makes KAI initiate.
@@ -4155,8 +4233,21 @@ async def full_proactive_scan() -> Dict[str, Any]:
     5. Spaced repetition reminders (P3c — memories about to fade)
 
     Returns all nudges ranked by urgency for supervisor/Telegram delivery.
+
+    H-6: each of the five sources is read independently and a failure in
+    one must not lose the other four — that part was always right. What
+    was wrong is that a failure lost *itself* too: five `except
+    Exception: pass` handlers meant a scan with every source down
+    returned `{"status": "ok", "nudge_count": 0, "nudges": []}`,
+    character-for-character what a healthy system with nothing to say
+    returns. The supervisor and the Telegram bot both act on that
+    emptiness.
+
+    So the aggregate now reports partial degradation: the sources that
+    answered still answer, and the ones that did not are named.
     """
     all_nudges: List[Dict[str, Any]] = []
+    degraded_sources: List[str] = []
 
     # 1. Time-sensitive reminders
     try:
@@ -4170,8 +4261,8 @@ async def full_proactive_scan() -> Dict[str, Any]:
                 "source": "proactive",
                 "memory_id": n.get("memory_id", ""),
             })
-    except Exception:
-        pass
+    except Exception as _exc:
+        _source_failed(degraded_sources, "proactive_nudges", _exc)
 
     # 2. Silent topics
     try:
@@ -4185,8 +4276,8 @@ async def full_proactive_scan() -> Dict[str, Any]:
                 "source": "silence",
                 "memory_id": "",
             })
-    except Exception:
-        pass
+    except Exception as _exc:
+        _source_failed(degraded_sources, "silence_signals", _exc)
 
     # 3. Goal deadline approaching
     try:
@@ -4210,10 +4301,10 @@ async def full_proactive_scan() -> Dict[str, Any]:
                         "source": "goals",
                         "memory_id": g.get("goal_id", ""),
                     })
-            except Exception:
-                pass
-    except Exception:
-        pass
+            except Exception as _exc:
+                record_degradation("memu", "goal_deadline_parse", _exc)
+    except Exception as _exc:
+        _source_failed(degraded_sources, "goal_deadlines", _exc)
 
     # 4. Drift detection
     try:
@@ -4227,8 +4318,8 @@ async def full_proactive_scan() -> Dict[str, Any]:
                 "source": "drift",
                 "memory_id": "",
             })
-    except Exception:
-        pass
+    except Exception as _exc:
+        _source_failed(degraded_sources, "operator_drift", _exc)
 
     # 5. Fading memories worth saving (high-importance but low recency)
     try:
@@ -4255,17 +4346,24 @@ async def full_proactive_scan() -> Dict[str, Any]:
                 "source": "spaced_rep",
                 "memory_id": record.id,
             })
-    except Exception:
-        pass
+    except Exception as _exc:
+        _source_failed(degraded_sources, "spaced_repetition", _exc)
 
     # sort by urgency (highest first)
     all_nudges.sort(key=lambda x: -x.get("urgency", 0))
 
-    return {
-        "status": "ok",
+    result: Dict[str, Any] = {
+        "status": "degraded" if degraded_sources else "ok",
         "nudge_count": len(all_nudges),
         "nudges": all_nudges[:10],
     }
+    if degraded_sources:
+        # Partial, not total: the sources that answered are still here.
+        # 200 is deliberate — four working sources are a usable answer —
+        # but no consumer can now read this as a complete scan.
+        result["degraded"] = True
+        result["degraded_sources"] = degraded_sources
+    return result
 
 
 # ── P4b: Anti-annoyance engine ──────────────────────────────────────
@@ -4556,6 +4654,7 @@ async def proactive_greeting() -> Dict[str, Any]:
     """
     global _last_greeting
     now = time.time()
+    degraded_sources: List[str] = []
 
     if not _nudge_allowed("greeting", urgency=0.6):
         return {"status": "ok", "greeting": None, "reason": "cooldown"}
@@ -4588,8 +4687,8 @@ async def proactive_greeting() -> Dict[str, Any]:
         if active_goals:
             top_goal = max(active_goals, key=lambda g: g.content.get("priority_score", 0.5))
             parts.append(f"Top goal is still '{top_goal.content.get('title', 'untitled')}' — want to work on that?")
-    except Exception:
-        pass
+    except Exception as _exc:
+        _source_failed(degraded_sources, "greeting_goals", _exc)
 
     # check for deferred topics that are due
     ready_deferred = [
@@ -4607,9 +4706,11 @@ async def proactive_greeting() -> Dict[str, Any]:
     _last_nudge_by_type["greeting"] = now
 
     return {
-        "status": "ok",
+        "status": "degraded" if degraded_sources else "ok",
         "greeting": " ".join(parts),
         "timestamp": now,
+        **({"degraded": True, "degraded_sources": degraded_sources}
+           if degraded_sources else {}),
     }
 
 
@@ -4621,6 +4722,7 @@ async def proactive_check_in() -> Dict[str, Any]:
     """
     global _last_check_in
     now = time.time()
+    degraded_sources: List[str] = []
 
     if not _nudge_allowed("check_in", urgency=0.3):
         return {"status": "ok", "check_in": None, "reason": "cooldown"}
@@ -4645,11 +4747,19 @@ async def proactive_check_in() -> Dict[str, Any]:
         ]
         if active_goals and recent_count > 5:
             messages.append("You've been busy. Making progress on the goals?")
-    except Exception:
-        pass
+    except Exception as _exc:
+        _source_failed(degraded_sources, "check_in_goals", _exc)
 
     if not messages:
-        return {"status": "ok", "check_in": None, "reason": "nothing_to_say"}
+        # "nothing_to_say" is a claim about the operator. If a source
+        # failed, the truthful claim is "nothing could be read".
+        return {
+            "status": "degraded" if degraded_sources else "ok",
+            "check_in": None,
+            "reason": "source_unavailable" if degraded_sources else "nothing_to_say",
+            **({"degraded": True, "degraded_sources": degraded_sources}
+               if degraded_sources else {}),
+        }
 
     _last_check_in = now
     _last_nudge_by_type["check_in"] = now
@@ -4791,6 +4901,14 @@ async def submit_feedback(req: FeedbackRequest) -> Dict[str, Any]:
     if req.rating < 1 or req.rating > 5:
         raise HTTPException(status_code=400, detail="rating must be 1-5")
 
+    # H-6: set when a durable write was *attempted and raised*. The
+    # response used to name an `effect` ("boost" / "correction")
+    # unconditionally, so a store failure was reported to the caller as a
+    # successful boost. Deliberately not "did a write happen": there is
+    # no message to attach to when the session buffer is empty, and that
+    # is a normal outcome, not a degradation.
+    write_failed = False
+
     entry = {
         "session_id": sanitize_string(req.session_id),
         "message_index": req.message_index,
@@ -4820,8 +4938,9 @@ async def submit_feedback(req: FeedbackRequest) -> Dict[str, Any]:
                         importance=0.85,
                     )
                     store.insert(record)
-        except Exception:
-            pass
+        except Exception as _exc:
+            write_failed = True
+            record_degradation("store", "submit_feedback", _exc)
 
     # if bad rating, store as correction signal
     if req.rating <= 2:
@@ -4842,13 +4961,27 @@ async def submit_feedback(req: FeedbackRequest) -> Dict[str, Any]:
                         importance=0.90,
                     )
                     store.insert(record)
-        except Exception:
-            pass
+        except Exception as _exc:
+            write_failed = True
+            record_degradation("store", "submit_feedback", _exc)
 
+    effect = "boost" if req.rating >= 4 else ("correction" if req.rating <= 2 else "noted")
+    if write_failed:
+        # The rating was accepted but the durable signal it was supposed
+        # to create did not land. Saying "boost" here would be a lie the
+        # caller has no way to detect.
+        return {
+            "status": "degraded",
+            "degraded": True,
+            "rating": req.rating,
+            "effect": "not_persisted",
+            "reason": "feedback recorded in memory but the durable write failed",
+            "total_feedback": len(_feedback_store),
+        }
     return {
         "status": "ok",
         "rating": req.rating,
-        "effect": "boost" if req.rating >= 4 else ("correction" if req.rating <= 2 else "noted"),
+        "effect": effect,
         "total_feedback": len(_feedback_store),
     }
 
@@ -6890,6 +7023,10 @@ class _LogCapture(logging.Handler):
                 "msg": record.getMessage()[:500],
             })
         except Exception:
+            # Deliberately silent, and the only handler in this file that
+            # is. This *is* the logging path: `record_degradation` emits
+            # a warning, which re-enters `emit`, which fails again. A
+            # swallow here is the cheaper of two bad options.
             pass
 
 
@@ -7215,6 +7352,7 @@ async def cancel_reminder(reminder_id: str) -> Dict[str, Any]:
 async def morning_briefing() -> Dict[str, Any]:
     """P21d: Generate morning briefing — goals, reminders, emotional arc, nudges."""
     now = datetime.now(timezone.utc)
+    degraded_sources: List[str] = []
     briefing: Dict[str, Any] = {
         "timestamp": now.isoformat(),
         "type": "morning",
@@ -7280,8 +7418,8 @@ async def morning_briefing() -> Dict[str, Any]:
                 "title": "Things To Keep In Mind",
                 "items": [n.get("nudge_message", "")[:150] for n in nudge_list[:3]],
             })
-    except Exception:
-        pass
+    except Exception as _exc:
+        _source_failed(degraded_sources, "briefing_nudges", _exc)
 
     # 5. Scheduled tasks due today
     due_today = []
@@ -7297,6 +7435,10 @@ async def morning_briefing() -> Dict[str, Any]:
         })
 
     _p21_append_capped(briefing, _briefing_log.maxlen or 50)
+    if degraded_sources:
+        briefing["status"] = "degraded"
+        briefing["degraded"] = True
+        briefing["degraded_sources"] = degraded_sources
     return briefing
 
 
@@ -8109,8 +8251,16 @@ async def vault_delete(note_node_id: str):
         del _vault_notes[fp]
     try:
         store.delete_record(note_node_id)
-    except Exception:
-        pass
+    except Exception as _exc:
+        # H-6, mutation path: propagate. The local `_vault_notes` entries
+        # are gone but the graph record is not, and answering
+        # `{"status": "ok"}` tells the caller a deletion happened that
+        # did not. A deletion endpoint is the last place to guess.
+        record_degradation("store", "vault_delete", _exc)
+        raise HTTPException(
+            status_code=500,
+            detail=f"vault note removed locally but graph delete failed: {_exc}",
+        ) from _exc
     return {"status": "ok", "removed": len(to_remove)}
 
 

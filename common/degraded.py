@@ -29,8 +29,11 @@ site should have to think about it.
 """
 from __future__ import annotations
 
+import logging
+import threading
+import time
 from datetime import datetime, timezone
-from typing import Any, Dict, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional
 
 STATUS_UNAVAILABLE = "unavailable"
 DEGRADED_STATUS_CODE = 503
@@ -113,3 +116,130 @@ def unavailable_metric(name: str, reason: str) -> Dict[str, Any]:
         "reason": str(reason)[:300],
         "observed_at": _now_iso(),
     }
+
+
+# ── Recording a dependency failure that is survived rather than raised ──
+#
+# Some failures genuinely should not propagate. `memu-core` keeps an
+# in-process fallback for every Redis operation precisely so a Redis
+# outage degrades the service instead of ending it, and that is a real
+# design decision, not an oversight.
+#
+# What *was* an oversight is that it was spelled `except Exception: pass`
+# — 33 times in one file. The fallback is fine; discarding the reason is
+# not. A single-process fallback silently makes the service
+# non-durable and non-shared: twelve workers reading twelve divergent
+# in-memory lists, every health check green, and nothing anywhere saying
+# the word "Redis".
+#
+# So a swallow is defensible only when all four hold:
+#
+#   1. the fallback is a genuine answer, not a placeholder,
+#   2. the caller cannot act on the failure,
+#   3. the failure is recorded, and
+#   4. the record is *aggregatable* — an operator can tell "failing for
+#      ten seconds" from "failing for ten days" without reading a log
+#      line at a time.
+#
+# (3) and (4) are what this section provides. `record_degradation` is
+# deliberately one call, shorter to type than the `pass` it replaces, so
+# the correct handler is the path of least resistance:
+#
+#     except Exception as exc:
+#         record_degradation("redis", "p20_put_value", exc)
+#
+# Logging is rate-limited per (source, operation) because these sit in
+# hot loops — an unthrottled warning inside a per-request Redis write is
+# its own outage. Every emitted line carries the running count and the
+# age of the failure, so one line answers "how long, how often".
+
+_DEGRADATION_LOG_EVERY = 300.0  # seconds between repeat log lines, per key
+_MAX_TRACKED = 200  # a bound: an unbounded registry is a slow leak
+
+_degradations: Dict[str, Dict[str, Any]] = {}
+_degradation_lock = threading.Lock()
+_degradation_logger = logging.getLogger("kai.degraded")
+
+
+def record_degradation(
+    source: str,
+    operation: str,
+    exc: BaseException | str,
+    *,
+    logger: Optional[logging.Logger] = None,
+) -> None:
+    """Record a dependency failure the caller is deliberately surviving.
+
+    Never raises: a failure in the failure recorder must not become the
+    thing that takes the process down.
+    """
+    try:
+        key = f"{source}:{operation}"
+        reason = f"{type(exc).__name__}: {exc}" if isinstance(exc, BaseException) else str(exc)
+        reason = reason[:300]
+        now = time.time()
+        with _degradation_lock:
+            entry = _degradations.get(key)
+            if entry is None:
+                if len(_degradations) >= _MAX_TRACKED:
+                    # Drop the least recently seen rather than refusing to
+                    # track: the newest failure is the one being diagnosed.
+                    oldest = min(_degradations, key=lambda k: _degradations[k]["last_seen"])
+                    _degradations.pop(oldest, None)
+                entry = {
+                    "source": source,
+                    "operation": operation,
+                    "count": 0,
+                    "first_seen": now,
+                    "last_seen": now,
+                    "_last_logged": 0.0,
+                }
+                _degradations[key] = entry
+            entry["count"] += 1
+            entry["last_seen"] = now
+            entry["reason"] = reason
+            should_log = (now - entry["_last_logged"]) >= _DEGRADATION_LOG_EVERY
+            if should_log:
+                entry["_last_logged"] = now
+            count = entry["count"]
+            age = now - entry["first_seen"]
+        if should_log:
+            (logger or _degradation_logger).warning(
+                "degraded dependency source=%s operation=%s count=%d "
+                "failing_for_seconds=%d reason=%s",
+                source, operation, count, int(age), reason,
+            )
+    except Exception:  # pragma: no cover - defensive
+        pass
+
+
+def degradation_report() -> List[Dict[str, Any]]:
+    """Every dependency failure survived since start, newest first.
+
+    Intended for a health or introspection endpoint, so the answer to
+    "is anything quietly broken" is a request rather than a log search.
+    """
+    now = time.time()
+    with _degradation_lock:
+        entries = list(_degradations.values())
+    report = [
+        {
+            "source": e["source"],
+            "operation": e["operation"],
+            "count": e["count"],
+            "reason": e.get("reason", ""),
+            "first_seen": datetime.fromtimestamp(e["first_seen"], timezone.utc).isoformat(),
+            "last_seen": datetime.fromtimestamp(e["last_seen"], timezone.utc).isoformat(),
+            "failing_for_seconds": int(now - e["first_seen"]),
+            "stale_seconds": int(now - e["last_seen"]),
+        }
+        for e in entries
+    ]
+    report.sort(key=lambda r: r["last_seen"], reverse=True)
+    return report
+
+
+def reset_degradations() -> None:
+    """Clear the registry. For tests; nothing in production should call it."""
+    with _degradation_lock:
+        _degradations.clear()

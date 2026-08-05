@@ -35,10 +35,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from scripts.security import check_test_isolation as gate  # noqa: E402
 from scripts.security import isolation_plugin as plugin  # noqa: E402
 
+REPO = Path(__file__).resolve().parent.parent
+
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 13
+EXPECTED_SCENARIOS = 15
 executed: list[str] = []
 
 
@@ -235,6 +237,78 @@ def test_the_real_repository_replaces_nothing() -> None:
           str(baseline.get("leaky_files")))
 
 
+def test_a_collection_time_leak_is_seen() -> None:
+    """The gap that cost a full-suite abort.
+
+    The plugin originally hooked only `pytest_runtest_protocol`. Pytest
+    imports every test module during *collection*, before the first such
+    hook fires — so every module-scope `os.environ[...] = ...` and
+    `sys.modules[...] = MagicMock()` in the repository had already
+    happened when the plugin took its first snapshot, and sat inside the
+    baseline it measured against. It reported `{}` for a file whose very
+    first lines poison the interpreter.
+
+    Run as a real pytest subprocess against a two-file fixture: the
+    behaviour under test is a pytest hook ordering, and asserting on it
+    any other way would be asserting on my model of pytest rather than
+    on pytest.
+    """
+    scenario("collection-time leak is seen")
+    import subprocess
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "test_aaa_leaker.py").write_text(
+            "import os, sys\n"
+            "from unittest.mock import MagicMock\n"
+            "os.environ['KAI_ISO_PROBE'] = 'set-at-import'\n"
+            "sys.modules['kai_iso_probe_stub'] = MagicMock()\n"
+            "def test_ok():\n    assert True\n", encoding="utf-8")
+        (root / "test_bbb_clean.py").write_text(
+            "def test_ok():\n    assert True\n", encoding="utf-8")
+        report = root / "report.json"
+        env = dict(os.environ)
+        env["KAI_ISOLATION_REPORT"] = str(report)
+        env["PYTHONPATH"] = str(REPO)
+        proc = subprocess.run(
+            [sys.executable, "-m", "pytest", str(root), "-q",
+             "-p", "scripts.security.isolation_plugin", "-p", "no:cacheprovider"],
+            capture_output=True, text=True, env=env, cwd=str(root), timeout=180)
+        check("the fixture suite itself passes", proc.returncode == 0,
+              proc.stdout[-400:])
+        check("a report was written", report.exists(), proc.stdout[-400:])
+        found = json.loads(report.read_text(encoding="utf-8")) if report.exists() else {}
+        leaker = next((v for k, v in found.items() if "aaa_leaker" in k), None)
+        check("the leaking file is reported", leaker is not None, str(found))
+        check("its import-time env write is seen",
+              bool(leaker) and "KAI_ISO_PROBE" in leaker.get("env_set", []),
+              str(leaker))
+        check("its import-time module stub is seen",
+              bool(leaker) and "kai_iso_probe_stub" in leaker.get("added", []),
+              str(leaker))
+        check("the clean file is not blamed",
+              not any("bbb_clean" in k for k in found), str(found))
+
+
+def test_one_file_loaded_twice_is_not_a_replacement() -> None:
+    """`dashboard/app.py` and `scripts/../dashboard/app.py` are one file.
+
+    Compared as raw strings they look like a module being swapped, and
+    three of the first five findings the widened plugin produced were
+    exactly that. A detector with false positives gets somebody to
+    "fix" correct code, so the path is normalised.
+    """
+    scenario("two spellings of one path")
+    import types
+    here = str(REPO / "conftest.py")
+    detour = str(REPO / "scripts" / ".." / "conftest.py")
+    a, b = types.ModuleType("m"), types.ModuleType("m")
+    a.__spec__ = type("S", (), {"origin": here})()
+    b.__spec__ = type("S", (), {"origin": detour})()
+    check("the two spellings fingerprint identically",
+          plugin._fingerprint(a) == plugin._fingerprint(b),
+          f"{plugin._fingerprint(a)} vs {plugin._fingerprint(b)}")
+
+
 def run_all() -> None:
     test_a_replaced_module_fails()
     test_a_replacement_fails_even_when_declared()
@@ -249,6 +323,8 @@ def run_all() -> None:
     test_write_baseline_refuses_to_record_a_replacement()
     test_the_plugin_tells_a_swap_from_an_import()
     test_the_real_repository_replaces_nothing()
+    test_a_collection_time_leak_is_seen()
+    test_one_file_loaded_twice_is_not_a_replacement()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,

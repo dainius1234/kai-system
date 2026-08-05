@@ -29,7 +29,28 @@ sys.path.insert(0, os.path.join(ROOT, "agentic"))
 # Use temp dir for checkpoints so tests don't interfere
 _test_dir = tempfile.mkdtemp(prefix="kai_checkpoint_test_")
 os.environ.setdefault("CHECKPOINT_DIR", _test_dir)
-os.environ.setdefault("REDIS_URL", "")
+
+# "No Redis" spelled as an unreachable host, not as an empty string.
+#
+# This line used to read `os.environ.setdefault("REDIS_URL", "")`. The
+# intent was right — `build_saver()` tries Redis, fails, and falls back
+# to the spool saver — and an empty URL achieves it. What it also does is
+# set a process-global variable, at *collection* time, to a value that
+# makes `dashboard/app.py` refuse to import at all: `backend_url()`
+# rejects an empty URL as a misconfiguration, which for a service is
+# exactly right.
+#
+# So the whole repo-wide suite aborted during collection with
+# "REDIS_URL is required but empty" — 4,000-odd tests not run — and only
+# on a machine where REDIS_URL was not already set in the environment.
+# Where it was set, `setdefault` did nothing and everything passed. The
+# suite's greenness depended on an ambient variable nothing declared.
+#
+# An unreachable host fails the same way for `build_saver()` and is a
+# legal URL for everyone else. It is also already the convention here:
+# `test_episode_saver.py` has used `redis://nonexistent-host:6379` all
+# along.
+os.environ.setdefault("REDIS_URL", "redis://nonexistent-host:6379")
 
 from agentic.kai_config import (
     Checkpoint,

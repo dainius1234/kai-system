@@ -23,12 +23,24 @@ os.environ["MAX_MEMORY_RECORDS"] = "200"
 os.environ.setdefault("VECTOR_STORE", "memory")
 
 
-def _load_module(name: str, path: Path):
+from scripts.module_stubs import stubbed  # noqa: E402
+
+
+def _load_module(name: str, path: Path, extra=None):
+    """Load a service by path without leaving its name claimed.
+
+    `app` and `introspect_app` are each the name of two different files
+    in this repository. Registering one permanently gives the next file
+    to want that name the other service, and the resulting error names
+    the innocent file. Scoped to the exec, which is the only moment the
+    name is actually needed — `introspect_app.py` does
+    `from app import store` at its own import time.
+    """
     spec = importlib.util.spec_from_file_location(name, path)
     assert spec and spec.loader
     mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
+    with stubbed({name: mod, **(extra or {})}):
+        spec.loader.exec_module(mod)
     return mod
 
 
@@ -43,9 +55,10 @@ _lc_spec.loader.exec_module(_lc_mod)
 memu = _load_module("app", ROOT / "memu-core" / "app.py")
 verifier = _load_module("verifier_integ", ROOT / "verifier" / "app.py")
 # Quarantine endpoints moved to memu-core-introspect (see DECISIONS.md D21).
-# introspect_app.py does `from app import store` — memu is registered under
-# the literal name "app" above so this reuses the same module/store instance.
-introspect = _load_module("introspect_app", ROOT / "memu-core" / "introspect_app.py")
+# introspect_app.py does `from app import store`, so memu is handed to it
+# under that name for the duration of the exec and no longer.
+introspect = _load_module(
+    "introspect_app", ROOT / "memu-core" / "introspect_app.py", {"app": memu})
 
 from fastapi.testclient import TestClient
 

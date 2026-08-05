@@ -242,6 +242,39 @@ class TestFeedbackRating:
         data = resp.json()
         assert data["effect"] == "correction"
 
+    def test_a_failed_durable_write_is_not_reported_as_a_boost(self):
+        """H-6: the handler used to be `except Exception: pass`, so the
+        caller was told `effect: boost` whether or not the memory that
+        the boost consists of was ever written.
+
+        This is the half that matters — three tests above assert the
+        happy path and would all still pass if the except-branch were
+        unreachable. Without this one, the branch is a claim nothing
+        checks."""
+        from fastapi.testclient import TestClient
+        from unittest.mock import patch
+
+        # A session message must exist, or the write is never attempted
+        # and "no write" is the correct, non-degraded answer.
+        memu._append_session_message("test_fb_fail", "assistant",
+                                     "something to rate")
+        client = TestClient(memu.app)
+        with patch.object(memu.store, "insert",
+                          side_effect=RuntimeError("store is down")):
+            resp = client.post("/memory/feedback", json={
+                "session_id": "test_fb_fail", "message_index": 0, "rating": 5,
+            })
+        data = resp.json()
+        assert data["effect"] == "not_persisted", data
+        assert data["degraded"] is True, data
+        assert data["status"] == "degraded", data
+
+        # ...and the failure is aggregatable, not just this-request news.
+        from common.degraded import degradation_report
+        entries = [e for e in degradation_report()
+                   if e["operation"] == "submit_feedback"]
+        assert entries, degradation_report()
+
     def test_submit_neutral_feedback(self):
         from fastapi.testclient import TestClient
         client = TestClient(memu.app)

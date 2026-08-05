@@ -22,24 +22,36 @@ sys.path.insert(0, str(ROOT))
 os.environ["MAX_MEMORY_RECORDS"] = "100"
 os.environ.setdefault("VECTOR_STORE", "memory")
 
-module_path = ROOT / "memu-core" / "app.py"
-spec = importlib.util.spec_from_file_location("app", module_path)
-assert spec and spec.loader
-mod = importlib.util.module_from_spec(spec)
-sys.modules["app"] = mod
-spec.loader.exec_module(mod)
+from scripts.module_stubs import stubbed  # noqa: E402
 
+
+def _load_scoped(name: str, path: Path, extra=None):
+    """Load a service by path without leaving its name claimed.
+
+    `memu-core/introspect_app.py` does `from app import store`, so
+    memu-core's `app.py` genuinely must be registered as the bare name
+    `app` while introspect_app executes. What it must not do is stay
+    registered: `sandboxes/shell/app.py` is also `app`, and
+    `agentic/introspect_app.py` is also `introspect_app`. Leaving these
+    claimed hands the next file to want either name the wrong module,
+    and the error surfaces over there.
+
+    Caught by the isolation plugin only once it learned to watch
+    collection — every line of this runs at import time, which is
+    exactly the window the plugin used to treat as its baseline.
+    """
+    spec = importlib.util.spec_from_file_location(name, path)
+    assert spec and spec.loader
+    mod = importlib.util.module_from_spec(spec)
+    with stubbed({name: mod, **(extra or {})}):
+        spec.loader.exec_module(mod)
+    return mod
+
+
+mod = _load_scoped("app", ROOT / "memu-core" / "app.py")
 # Quarantine endpoints moved to memu-core-introspect (see DECISIONS.md D21).
-# introspect_app.py does `from app import store` — by registering memu-core's
-# app.py under the literal name "app" above, introspect_app reuses the same
-# cached module (and the same VectorStore instance) instead of re-importing
-# app.py a second time under a different name.
-introspect_module_path = ROOT / "memu-core" / "introspect_app.py"
-introspect_spec = importlib.util.spec_from_file_location("introspect_app", introspect_module_path)
-assert introspect_spec and introspect_spec.loader
-introspect_mod = importlib.util.module_from_spec(introspect_spec)
-sys.modules["introspect_app"] = introspect_mod
-introspect_spec.loader.exec_module(introspect_mod)
+introspect_mod = _load_scoped(
+    "introspect_app", ROOT / "memu-core" / "introspect_app.py", {"app": mod})
 
 from fastapi.testclient import TestClient
 

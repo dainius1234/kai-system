@@ -2,8 +2,8 @@
   "note": "The repo-wide pytest result. Failures and errors may fall, never rise. See scripts/security/check_suite_floor.py.",
   "max_failed": 0,
   "max_errors": 0,
-  "min_passed": 4247,
-  "recorded": "2026-08-04",
+  "min_passed": 4285,
+  "recorded": "2026-08-05",
   "history": [
     {
       "date": "2026-08-04",
@@ -74,6 +74,13 @@
       "failed": 0,
       "errors": 0,
       "note": "merged to main; +1 is the developer-path rule carried over from the 26 failures it would have caught"
+    },
+    {
+      "date": "2026-08-05",
+      "passed": 4285,
+      "failed": 0,
+      "errors": 0,
+      "note": "H-6 phase 1: memu-core 53 silent swallows -> 3. +38 is test_dashboard and test_dashboard_ui, which had not been collected AT ALL \u2014 the suite aborted during collection on an empty REDIS_URL set at module scope by test_checkpoint.py, and passed only on machines that already had the variable set. Plus the new failure-path and detector-calibration tests."
     }
   ]
 }
