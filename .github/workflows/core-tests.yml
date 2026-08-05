@@ -294,11 +294,35 @@ jobs:
             fi
             sleep 1
           done
+      # This step has never run in a passing job: `core-tests.yml` died at
+      # `make check-docs`, step 7 of 59, on 30 consecutive runs, so the
+      # bring-up above executed for the first time on 2026-08-05 — and
+      # failed in one second with nothing created. Diagnosing it needed
+      # the step's own stderr, which the log API only serves as a tail,
+      # so the questions are asked *here*, after the failure, where the
+      # answers land in the part of the log that can be read.
+      #
+      # Every command tolerates its own exit code, because this step
+      # exists to describe a failure and a diagnostic that aborts before
+      # printing the next fact is worse than no diagnostic. It runs only
+      # `if: failure()`, so the job is already red and nothing here can
+      # make it green. Declared as a documented-skip for that reason.
+      # ci-toleration: documented-skip
       - name: Dump container logs on failure
         if: failure()
         run: |
-          docker compose -f docker-compose.minimal.yml ps
-          docker compose -f docker-compose.minimal.yml logs --no-color
+          echo "── disk ────────────────────────────────────────────────"
+          df -h / /var/lib/docker 2>&1 || true
+          echo "── does the compose file even parse? ───────────────────"
+          docker compose -f docker-compose.minimal.yml config -q \
+            && echo "compose config: valid" \
+            || echo "compose config: INVALID (this is the cause)"
+          echo "── containers, including stopped ───────────────────────"
+          docker compose -f docker-compose.minimal.yml ps -a || true
+          echo "── images present ──────────────────────────────────────"
+          docker images --format '{{.Repository}}:{{.Tag}} {{.Size}}' || true
+          echo "── logs ────────────────────────────────────────────────"
+          docker compose -f docker-compose.minimal.yml logs --no-color || true
       - name: Run integration smoke script
         run: |
           python3 scripts/test_core_integration.py

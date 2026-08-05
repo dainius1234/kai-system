@@ -135,6 +135,23 @@ DECLARED: Tuple[Toleration, ...] = (
         review_by="2026-10-01",
     ),
     Toleration(
+        workflow="core-tests.yml",
+        step="Dump container logs on failure",
+        bucket=DOCUMENTED_SKIP,
+        reason="Runs only `if: failure()`, so the job is already red and "
+               "nothing this step does can turn it green — it has no "
+               "enforcement to skip. Every command tolerates its own exit "
+               "code deliberately: the step exists to describe a failure, "
+               "and a diagnostic that aborts before printing the next "
+               "fact is worse than no diagnostic. Added on 2026-08-05 "
+               "because the bring-up above it failed in one second on the "
+               "first run that ever reached it, and the log API serves "
+               "only a tail — so the questions have to be asked after the "
+               "failure, where the answers land in readable range.",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
         workflow="friday-cleanup.yml",
         step="Post Friday cleanup issue",
         bucket=DOCUMENTED_SKIP,

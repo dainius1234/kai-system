@@ -5840,3 +5840,50 @@ Advisory by decision, not by accident: owner operator, review by
 trivy declaration. Stays **OPEN** until all four workflows are observed
 green on one commit. I have reported green from a local result twice
 today; the third time it will be from the run.
+
+---
+
+## 2026-08-05 (part 14) — what the fixes uncovered underneath
+
+`unified-hunter.yml` went **green on `709fd1c`** — first success in its
+history. `policy-checks.yml` green. That is two of four, both observed
+in CI rather than inferred from a local run.
+
+`core-tests.yml` moved from failing at **step 7 of 59** to passing
+**steps 1–46** and failing at step 47. Everything the doc-drift gate had
+been hiding for 30 commits now runs: every service suite, the coverage
+floors, the full-stack Docker build, the trivy scan and its new advisory
+handling.
+
+Step 47 is `docker compose -f docker-compose.minimal.yml up -d --build`,
+and it **has never executed in this repository's CI history** — 30 of 30
+runs died at step 7, so this is the first time anything reached it. Not
+a regression from today's work: the next layer of previously-skipped
+verification, becoming visible exactly as intended.
+
+What is known from evidence: it failed in about one second, the
+follow-on `docker compose ps` printed a header with no rows, and steps
+43–46 (disk cleanup, full-stack image build, trivy) all succeeded — so
+the daemon works. What is **not** known is the error message. The
+GitHub log API serves only a tail, the failing step's output falls
+outside it, and the full-log archive host is refused by this
+environment's network policy.
+
+I could name three plausible causes. I am not going to, because a
+plausible cause written down becomes a remembered fact. Instead the
+diagnostic moved to where it can be read: the `if: failure()` dump step
+now prints disk usage, `compose config -q`, `ps -a` and the image list
+**after** the failure, which lands inside the readable tail. The next
+run will say what this one could not.
+
+### Register
+
+**`KAI-GATE-028`** — the minimal-stack bring-up fails immediately in CI.
+Cause **unknown**, and recorded as unknown. First observation
+2026-08-05 on `709fd1c`; the step had never run before. **OPEN.**
+
+**`KAI-GATE-025`** — two of four workflows observed green
+(`policy-checks`, `unified-hunter`). `python-app` was already green.
+`core-tests` advanced 40 steps and now fails on 028. Stays **OPEN**:
+the gate was "all four in their final intentional states", and one is
+not.
