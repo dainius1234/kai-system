@@ -43,9 +43,16 @@ jobs:
           out=$(make go_no_go 2>&1)
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          echo "output<<EOF" >> "$GITHUB_OUTPUT"
+          # A fixed `EOF` delimiter cannot bound arbitrary command output:
+          # if the captured text contains a line that is exactly `EOF`, the
+          # block never closes and the runner rejects the whole file with
+          #   Invalid value. Matching delimiter not found 'EOF'
+          # which is what killed this workflow. A per-step random delimiter
+          # cannot collide with content it was generated after.
+          d="EOF_$RANDOM$RANDOM$RANDOM"
+          echo "output<<$d" >> "$GITHUB_OUTPUT"
           echo "$out" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "$d" >> "$GITHUB_OUTPUT"
           exit 0
 
       - name: Run core unit tests (fast Python-only subset)
@@ -75,9 +82,16 @@ jobs:
           # Extract pass/fail summary line
           summary=$(echo "$out" | grep -E "passed|failed|error" | tail -1)
           echo "summary=$summary" >> "$GITHUB_OUTPUT"
-          echo "output<<EOF" >> "$GITHUB_OUTPUT"
+          # A fixed `EOF` delimiter cannot bound arbitrary command output:
+          # if the captured text contains a line that is exactly `EOF`, the
+          # block never closes and the runner rejects the whole file with
+          #   Invalid value. Matching delimiter not found 'EOF'
+          # which is what killed this workflow. A per-step random delimiter
+          # cannot collide with content it was generated after.
+          d="EOF_$RANDOM$RANDOM$RANDOM"
+          echo "output<<$d" >> "$GITHUB_OUTPUT"
           echo "$out" | tail -30 >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "$d" >> "$GITHUB_OUTPUT"
           exit 0
 
       - name: Behavioral scoreboard (LLM quality — advisory)
@@ -86,9 +100,16 @@ jobs:
           set +e
           out=$(python scripts/behavioral_scoreboard.py 2>&1)
           code=$?
-          echo "output<<EOF" >> "$GITHUB_OUTPUT"
+          # A fixed `EOF` delimiter cannot bound arbitrary command output:
+          # if the captured text contains a line that is exactly `EOF`, the
+          # block never closes and the runner rejects the whole file with
+          #   Invalid value. Matching delimiter not found 'EOF'
+          # which is what killed this workflow. A per-step random delimiter
+          # cannot collide with content it was generated after.
+          d="EOF_$RANDOM$RANDOM$RANDOM"
+          echo "output<<$d" >> "$GITHUB_OUTPUT"
           echo "$out" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "$d" >> "$GITHUB_OUTPUT"
           exit 0
 
       # ci-toleration: documented-skip

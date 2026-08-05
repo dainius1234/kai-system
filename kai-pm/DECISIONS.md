@@ -6411,3 +6411,61 @@ defect. **OPEN** on evidence, not on suspicion: verifying them means
 either waiting for Friday/Monday or dispatching them, and dispatching
 posts a GitHub issue to the operator's repository. That is the
 operator's call, not mine.
+
+---
+
+## 2026-08-05 (part 22) — evidence for all nine, and two of my own defects
+
+The operator authorised dispatching the schedule-only workflows:
+*"Better to have the evidence than to wonder whether they'd pass."*
+
+### drift-detector: green
+
+Run `31033089621`, `workflow_dispatch` on this branch: **success**. First
+green in its recorded history, after 15 consecutive scheduled failures
+from 2026-04-27. The jq quoting was the cause, and it is confirmed by a
+run rather than by my reading of the file.
+
+### pm-status: green, and it could never have been dispatched
+
+`pull_request` only — no `workflow_dispatch`, so there is no way to fire
+it. Its history is **30 of 30 success**, most recently 2026-07-24 on
+this same branch, back when PRs existed for it. Green; it simply has not
+run since, because nothing here opens PRs.
+
+That completes the set: nine workflows, each with a verdict backed by a
+run. It took dispatching three and reading the history of two to get
+there, and the honest form of the earlier claim — "four workflows" —
+was never wrong about the four, only about the denominator.
+
+### Two defects of my own, in twenty minutes
+
+**1. I chained a gate with `;` instead of `&&`.**
+
+    make policy-check 2>&1 | tail -1; git add -A && git commit && git push
+
+`policy-check` failed — the README line count had moved by two when I
+removed two unused imports — and the commit and push went out anyway. I
+caught it on the next command and fixed it inside two minutes.
+
+It is the exact shape of everything found today: **a check ran, produced
+the right answer, and nothing acted on it.** The check was mine and the
+defect was a shell operator. Recorded because a stale README fails
+`check-docs`, which is step 7 of `core-tests.yml` — the gate that hid
+fifty steps for thirty commits.
+
+**2. Four concurrent core-tests runs.**
+
+Pushing five times in twenty minutes started five twenty-minute Docker
+builds, each queueing runners behind the last, so the run whose result I
+actually wanted was waiting on three superseded ones. Cancelled the
+three; the newest carries every fix. Worth writing down because the cost
+was the operator's runner minutes, not mine, and the fix is to batch
+pushes rather than to push on every green local check.
+
+### Register
+
+**`KAI-GATE-032`** — jq filters in workflows. Instance fixed, class
+gated, and **CLOSED**: `drift-detector` observed green on run
+`31033089621`, which is the first evidence in this repository that the
+detector, the fix and the workflow all work together.
