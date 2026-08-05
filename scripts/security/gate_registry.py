@@ -312,6 +312,17 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-035",)),
+    # 22 of 52 Dockerfiles were never built by CI, and one held a parse
+    # error that stopped thirteen steps. KAI-GATE-036.
+    Gate(module="check_dockerfile_coverage",
+         kind=GATE,
+         summary="every Dockerfile is built by a profile or declared unbuilt",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ Dockerfile",
+         proven_by="scripts/test_dockerfile_coverage.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-036",)),
     Gate(module="check_test_wiring",
          kind=GATE,
          summary="every test in a self-run suite is dispatched",

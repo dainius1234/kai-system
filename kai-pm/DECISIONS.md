@@ -6608,3 +6608,90 @@ in a file no CI step had ever parsed. Instance fixed, class gated.
 image tag (fixed), then the build never reaching the nineteen
 minimal-only services (fixed by splitting the step), then this parse
 error (fixed). **OPEN** until the bring-up is observed succeeding.
+
+---
+
+## 2026-08-05 (part 25) — the coverage gap behind the typo, measured
+
+The operator asked whether other services live in only one profile and
+are never built. Measured rather than sampled:
+
+    Dockerfiles in the tree                          52
+    referenced by docker-compose.full.yml            30   <- all CI built
+    in another profile but NOT in full.yml           19   <- incl. the typo
+    referenced by no profile at all                   3
+    ----------------------------------------------------
+    never built by CI before today                   22   (42%)
+
+`full.yml` is a name that suggests a superset and denotes the smaller
+set. The single build step in `core-tests.yml` built it, so 42% of the
+Dockerfiles in this repository had never been parsed by anything.
+
+`document-parser/Dockerfile` was one of the nineteen. Its
+`--start_period` could have sat there for the life of the project.
+
+### The three orphans
+
+Not in any profile at all: `orchestrator/`, `sandboxes/shell/`,
+`trust-ledger/`. Each has an `app.py`. None is referenced by a compose
+service, and nothing was found calling any of them.
+
+`trust-ledger` is the clearest, and it matters given today's work:
+`agentic/trust_integration.py` imports `FileLedger` from that directory
+**in-process**, through `sys.path`. It never calls the HTTP service
+`trust-ledger/app.py` defines. So the service is real code that no
+profile runs and no caller reaches — the W-01 orphaned-module class,
+with a Dockerfile attached.
+
+`sandboxes/shell` carries a security dimension too: the `shell` tool is
+classified irreversible-destructive in tool-gate, so whether that
+sandbox is meant to be deployed is not only an architectural question.
+
+**Whether these three are dead code or missing profile entries is a
+decision about the system's intended shape.** It is the operator's, and
+a gate must not guess it. They are declared with a reason, an owner and
+a review date — the `check_ci_tolerations` shape — so the debt is dated
+rather than invisible.
+
+### The gate, and what it does not do
+
+`check_dockerfile_coverage.py` fails on a Dockerfile that no profile
+builds and nobody declared. It also fails in the other two directions,
+each calibrated separately:
+
+  - a profile naming a Dockerfile that is **not in the tree** (I-1: a
+    dangling reference is a finding, not a file to skip);
+  - a **declaration that stopped being true**, because an exception list
+    that has drifted teaches people to ignore it.
+
+The operator suggested a job that builds every Dockerfile. I have not
+added one, and the reason is a measurement rather than a preference:
+with the build step split, `minimal` and `full` together already build
+**49 of the 52**. A third full build costs runner minutes and disk on a
+job that already needs an explicit `docker system prune` to fit, and it
+would buy coverage of exactly three files whose status is an open
+decision. If the operator decides those three should ship, adding them
+to a profile gets them built by the existing steps — which is the
+cheaper and more honest fix, because a service worth building is a
+service worth declaring.
+
+### A calibration that was wrong before the gate was
+
+The second calibration — a profile naming a missing Dockerfile —
+reported PASS, and I nearly recorded a gap in the gate. Checking the
+detection path directly showed it resolved `ghost-service/Dockerfile`
+correctly; the probe had done a string replace on `build: ./cortex`,
+which is not the spelling that file uses, so nothing had been changed at
+all. **The gate was right and the test of it was wrong**, which is the
+third time today, and the reason to check the instrument before
+believing what it says about the instrument.
+
+Floors: 40 suites, 2,466 assertions.
+
+### Register
+
+**`KAI-GATE-036`** — 22 of 52 Dockerfiles were never built by CI, which
+is how a parse error survived in one of them. Instance closed by
+splitting the build step (49 of 52 now built); class gated; the
+remaining 3 are declared, owned and dated. **OPEN** until the operator
+decides whether the three orphans ship or go.

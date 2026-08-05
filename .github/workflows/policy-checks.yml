@@ -93,6 +93,9 @@ jobs:
       - name: Dockerfile instruction flags are hyphenated
         run: python scripts/security/check_dockerfile_flags.py
 
+      - name: Every Dockerfile is built by a profile or declared
+        run: python scripts/security/check_dockerfile_coverage.py
+
         run: python scripts/security/check_test_wiring.py
 
       - name: Instrumentation invariants (I-4 enforced)
