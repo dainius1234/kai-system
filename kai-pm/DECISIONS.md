@@ -7001,3 +7001,70 @@ passing the defect first.
 
 **`KAI-GATE-035`** — **CLOSED**: the images build. Both profiles compile
 every Dockerfile they reference, observed in CI on `cd3dacb`.
+
+---
+
+## 2026-08-05 (part 30) — the operator's rule, implemented, and it caught me
+
+> *"If something is worth printing that often and nobody acts on it, the
+> system is missing either a hard failure or a deliberate silence. The
+> middle ground — printing forever — trains everyone to ignore it."*
+
+Correcting one thing first: the operator's message credits KAI-GATE-040
+with failing the build "if a warning that should have been acted on goes
+unresolved." **It does not do that.** It checks that a compose variable
+with no default is supplied by the step that brings the profile up. It
+would not notice a different warning going unread. Saying so matters,
+because a believed-but-false coverage claim is the exact defect this
+whole day has been about — and it would have been mine to leave standing.
+
+The stronger thing described is buildable, though, in two parts.
+
+### Part one: remove the wallpaper, honestly
+
+Six variables produced `The "X" variable is not set` on **every** compose
+command — `up`, `config`, `ps`, `down` all parse the file and all warn.
+
+The tempting fix is `${TS_AUTHKEY:-}` in the compose files, and
+`check_secret_fallbacks` permits it: its own docstring says
+`${TOKEN}` and `${TOKEN:-}` are both fine. **It is still the wrong fix.**
+Those files are the production deployment definition, where an absent
+`VAULT_ROOT_TOKEN` or `GRAFANA_ADMIN_PASSWORD` *should* warn. Silencing
+them there trades CI noise for production risk.
+
+Checked rather than assumed which are genuinely optional:
+
+    TS_AUTHKEY, TS_HOSTNAME          -> tailscale only      (not started)
+    GRAFANA_ADMIN_USER/PASSWORD      -> grafana only        (not started)
+    VAULT_ROOT_TOKEN                 -> vault, vault-rotator (not started)
+                                        memu-core, executor -- and those
+                                        two already use `${...:-}`
+    DB_PASSWORD                      -> postgres + 4 consumers (required)
+
+So they are declared **empty at job scope in CI**, which states a fact
+about this job — tailscale, grafana and vault are not started here — and
+leaves the deployment definition honest.
+
+### Part two: now the warning can fail
+
+With every intentionally-absent variable declared, a substitution warning
+means a variable **nobody has accounted for**. That is actionable, so the
+bring-up now greps its own captured log and exits 1, printing which
+variable and telling the reader to declare or supply it.
+
+That is the operator's rule as a mechanism rather than a resolution:
+wallpaper removed, and what remains fails.
+
+### And it caught me immediately
+
+Writing that step, I wrapped a long `echo` with a `\` continuation whose
+second line began at **column 0**. That terminates the YAML block scalar
+— the precise defect `check_ci_tolerations.unparseable()` was written for
+after three workflows did it — and the gate failed the commit before it
+was made.
+
+Written for a defect this morning; caught its author committing the same
+defect this evening. That is the watching layer working on the person who
+built it, which is the only test of it that counts.
+
+Floors: 43 suites, 2,534 assertions.

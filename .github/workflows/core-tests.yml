@@ -17,6 +17,30 @@ jobs:
       models: read
     env:
       HMAC_ALLOW_DEV_SECRET: "true"
+      # Declared here, at job scope, so every `docker compose` invocation
+      # in this job has them — including `config`, `ps` and `down`, which
+      # parse the file and warn just as `up` does.
+      #
+      # Until 2026-08-05 these produced six
+      #     The "X" variable is not set. Defaulting to a blank string.
+      # lines on every compose command, in every log, all day. That is
+      # wallpaper, and wallpaper is how a real warning goes unread —
+      # `DB_PASSWORD` was among them and postgres was refusing to start
+      # because of it.
+      #
+      # They are declared EMPTY here rather than given `:-` defaults in
+      # the compose files, and the distinction is the point: those files
+      # are the production deployment definition, where an absent
+      # `VAULT_ROOT_TOKEN` or `GRAFANA_ADMIN_PASSWORD` *should* warn.
+      # Silencing them there would trade CI noise for production risk.
+      # Here it states a fact about this job: tailscale, grafana and
+      # vault are not started, so their secrets are intentionally absent.
+      DB_PASSWORD: localdev
+      TS_AUTHKEY: ""
+      TS_HOSTNAME: ""
+      GRAFANA_ADMIN_USER: ""
+      GRAFANA_ADMIN_PASSWORD: ""
+      VAULT_ROOT_TOKEN: ""
 
     steps:
       - name: Checkout repository
@@ -316,8 +340,8 @@ jobs:
           # `The "DB_PASSWORD" variable is not set. Defaulting to a blank
           # string.` was printed by every compose invocation in this
           # workflow, all day, and I read past it as noise. The warning
-          # was the answer.
-          DB_PASSWORD: localdev
+          # was the answer. It is set at job scope now, so every
+          # compose command in this job has it, not just this one.
         run: |
           set -o pipefail
           # Captured, because the post-mortem used to *re-run* the
@@ -330,6 +354,24 @@ jobs:
           docker compose -f docker-compose.minimal.yml up -d --build \
             2>&1 | tee /tmp/bringup.log
           df -h / | tail -1
+
+          # The operator's rule, from the DB_PASSWORD incident: if a
+          # warning is worth printing on every run and nobody acts on it,
+          # the system is missing either a hard failure or a deliberate
+          # silence. Printing forever is what teaches everyone to ignore
+          # it.
+          #
+          # Every variable this job intentionally leaves empty is now
+          # declared at job scope, so a substitution warning here means a
+          # variable nobody has accounted for. That is actionable, so it
+          # fails.
+          if grep -q 'variable is not set' /tmp/bringup.log; then
+            echo "::error::A compose variable was substituted blank"
+            grep -o 'The "[A-Z_]*" variable is not set' /tmp/bringup.log \
+              | sort -u
+            echo "Declare it at job scope if intentionally absent."
+            exit 1
+          fi
           # Waits on Docker's verdict of each service's own healthcheck.
           # These three used to be `curl http://localhost:8000|8007|8009`,
           # which addressed nothing: tool-gate, agentic and
