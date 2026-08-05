@@ -22,7 +22,24 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install pyyaml
+        # The same install the main workflow does, not a hand-written
+        # subset. `pip install pyyaml` was enough for the checks' own
+        # imports but not for `check_architecture_rules`, which IMPORTS
+        # THE MODULES IT INSPECTS — those need pydantic. Rules 7 and 11
+        # could not run, the check correctly refused to certify what it
+        # could not verify, and this workflow failed **30 runs out of 30
+        # going back to 2026-08-03 without a single success**.
+        #
+        # Same shape as every other list-beside-the-thing this week: a
+        # dependency list written next to the job, drifting from what the
+        # job actually needs. Derived from the tree now.
+        run: |
+          pip install --upgrade pip
+          pip install pyyaml
+          find . -maxdepth 3 -name requirements.txt -not -path './.venv/*' -not -path './_archive/*' -print0 | while IFS= read -r -d '' req; do
+            echo "Installing $req"
+            pip install -r "$req"
+          done
 
       - name: Port binding check
         run: python scripts/security/check_port_bindings.py

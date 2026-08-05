@@ -5590,3 +5590,77 @@ G-04, G-05, G-06, G-09, G-10, G-11 have not been re-verified in this
 pass. G-11's flag defaults in particular are worth checking — the grep
 for them returned nothing, which means the pattern was wrong, not that
 the flags are absent.
+
+---
+
+## 2026-08-05 (part 11) — a second workflow, red 30 runs out of 30, and I was calling it green
+
+The operator asked for CI results. I checked `python-app.yml` — green on
+`c06df5f`, as on the four commits before it — and then, because the new
+`check_service_tokens` gate is wired into `policy-checks.yml`, checked
+that workflow too.
+
+**It has failed 30 runs out of 30, without a single success, going back
+to 2026-08-03.**
+
+I have been reporting "CI green" all day. `python-app.yml` was green and
+I treated one workflow as the whole signal. This is KAI-GATE-019's exact
+shape — *a CI job nobody was watching* — and the one not watching was me,
+in the middle of a programme about not trusting a single instrument.
+
+### The cause
+
+    - name: Install dependencies
+      run: pip install pyyaml
+
+`check_architecture_rules` **imports the modules it inspects** — that is
+how it can assert things a grep cannot — and `common/contracts/autonomy.py`
+and `common/actuator_registry` need `pydantic`. Without it, rules 7
+(legacy action APIs disabled) and 11 (model output labelled, cannot grant
+trust) could not run, and the check **correctly refused to certify what
+it could not verify**:
+
+    FAIL  rule 7   legacy verification unavailable: No module named 'pydantic'
+    FAIL  rule 11  evidence grading not importable: No module named 'pydantic'
+    FAIL: 2 architecture violation(s)
+
+Nothing was broken in the code. The gate was right, the workflow was
+under-provisioned, and the failure was honest all thirty times.
+
+Reproduced locally before fixing, by putting a landmine `pydantic.py` on
+`PYTHONPATH`: identical output, identical exit code. Diagnosis confirmed
+rather than inferred.
+
+### The fix, and the shape it shares with everything else this week
+
+`pip install pyyaml` is a **hand-written dependency list next to the job
+that needs the dependencies**. It was true of the checks' own imports and
+false of their transitive ones, and it drifted the moment a check learned
+to import what it inspects. Sixth venue for that pattern.
+
+`policy-checks.yml` now runs the same install as `python-app.yml` —
+find every `requirements.txt` and install it — so the two CI environments
+cannot diverge again.
+
+### What this says about "green"
+
+Two workflows exist. I watched one and said "CI". The register, the
+ratchets and the meta-check were all telling the truth; the thing that
+was wrong was my *sampling* of them — which is the same error as reading
+the architecture doc instead of the closure register, twice, earlier
+today.
+
+There is no gate for this and there cannot be one inside the repository:
+"has this workflow ever been green" is a question about GitHub's history,
+not about the tree. The practical control is that **every CI report from
+me names every workflow, or it is not a CI report.** Written down here
+because a resolution I hold privately is worth nothing.
+
+### Register
+
+**`KAI-GATE-025`** — `policy-checks.yml` failed 30 consecutive runs from
+2026-08-03 because its dependency install was a hand-written subset;
+`check_architecture_rules` could not import the modules it inspects and
+failed closed on rules 7 and 11. Instance fixed by mirroring the main
+workflow's install. **OPEN** until a green run on this workflow proves
+it, which is the whole point of not closing on a local result.
