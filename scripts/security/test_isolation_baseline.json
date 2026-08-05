@@ -1,14 +1,14 @@
 {
-  "note": "Declared cross-file leakage, recorded at the HIGHEST value seen across environments. The ratchet forbids only growth, so a machine that leaks less still passes \u2014 and CI, lacking some packages this container has, stubs more of them and leaks more. A baseline recorded only locally fails CI forever on a difference that is not a defect. `replaced` stays at zero everywhere: see scripts/security/check_test_isolation.py.\n\n2026-08-05: rose from 7 files / 11 env / 26 added to 19 / 36 / 35. Leakage did not grow \u2014 the detector's scope did. It hooked only pytest_runtest_protocol, which fires after collection has already imported every test module, so every module-scope os.environ[...] and sys.modules[...] write in the repository sat inside the plugin's own baseline and was structurally invisible. It now brackets each module's import as well. The gap cost a full-suite collection abort (test_checkpoint.py set REDIS_URL to the empty string; dashboard/app.py rightly refuses to import on that) which this plugin watched happen and could not see. The same widening also surfaced two real module-identity collisions on the generic names `app` and `introspect_app`, both now scoped.",
+  "note": "Declared cross-file leakage, recorded at the HIGHEST value seen across environments. The ratchet forbids only growth, so a machine that leaks less still passes \u2014 and CI, lacking some packages this container has, stubs more of them and leaks more. A baseline recorded only locally fails CI forever on a difference that is not a defect. `replaced` stays at zero everywhere: see scripts/security/check_test_isolation.py.\n\n2026-08-05: rose from 7 files / 11 env / 26 added to 19 / 36 / 35. Leakage did not grow \u2014 the detector's scope did. It hooked only pytest_runtest_protocol, which fires after collection has already imported every test module, so every module-scope os.environ[...] and sys.modules[...] write in the repository sat inside the plugin's own baseline and was structurally invisible. It now brackets each module's import as well. The gap cost a full-suite collection abort (test_checkpoint.py set REDIS_URL to the empty string; dashboard/app.py rightly refuses to import on that) which this plugin watched happen and could not see. The same widening also surfaced two real module-identity collisions on the generic names `app` and `introspect_app`, both now scoped.\n\n2026-08-05 (2): merged GitHub-runner observations from run 30978117360. Six files stub more there than here \u2014 CI lacks packages this container has installed, so their absent-dependency stubs actually fire. Two (test_audio_service, test_tts_service) leak in CI and not at all locally. Recorded at the per-file MAXIMUM, which is what this baseline has always meant: a machine that leaks less still passes, and a baseline recorded on one machine alone fails the other forever on a difference that is not a defect. `replaced` is 0 in both environments, which is the count that is actually enforced.",
   "replaced_allowed": 0,
   "leaky_files": {
     "scripts/agentic_integration_test.py": {
       "env_set": 1,
-      "added": 0
+      "added": 4
     },
     "scripts/test_ab_log.py": {
       "env_set": 2,
-      "added": 0
+      "added": 1
     },
     "scripts/test_agentic_introspect.py": {
       "env_set": 2,
@@ -17,6 +17,10 @@
     "scripts/test_agentic_routes.py": {
       "env_set": 5,
       "added": 13
+    },
+    "scripts/test_audio_service.py": {
+      "env_set": 0,
+      "added": 2
     },
     "scripts/test_audio_transcribe.py": {
       "env_set": 3,
@@ -64,11 +68,11 @@
     },
     "scripts/test_prod_hardening.py": {
       "env_set": 3,
-      "added": 1
+      "added": 3
     },
     "scripts/test_screen_capture.py": {
       "env_set": 3,
-      "added": 0
+      "added": 5
     },
     "scripts/test_soul_identity.py": {
       "env_set": 0,
@@ -77,8 +81,12 @@
     "scripts/test_temporal_self.py": {
       "env_set": 1,
       "added": 0
+    },
+    "scripts/test_tts_service.py": {
+      "env_set": 0,
+      "added": 2
     }
   },
   "total_env_set": 36,
-  "total_added": 35
+  "total_added": 51
 }

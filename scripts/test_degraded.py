@@ -12,6 +12,7 @@ degraded envelope that answered 200, or a healthy read that carried
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 
@@ -303,6 +304,42 @@ def test_the_log_line_is_machine_parseable():
         check(f"log line carries {field}", field in line, line)
 
 
+def test_concurrent_records_do_not_lose_counts():
+    """`memu-core` is threaded and these sit in per-request paths.
+
+    A read-modify-write on a shared dict without a lock loses increments
+    under contention, and the failure mode would be a count that
+    understates a chronic outage — the exact thing the count exists to
+    make visible. The lock is claimed in the module docstring; this is
+    the claim being checked rather than asserted.
+    """
+    import threading
+    reset_degradations()
+    threads = 16
+    each = 500
+    log = logging.getLogger("test.degraded.concurrency")
+    log.disabled = True
+
+    def worker(i: int) -> None:
+        for _ in range(each):
+            record_degradation("redis", f"op{i % 4}", RuntimeError("x"), logger=log)
+
+    workers = [threading.Thread(target=worker, args=(i,)) for i in range(threads)]
+    for w in workers:
+        w.start()
+    for w in workers:
+        w.join()
+
+    report = degradation_report()
+    check("four distinct operations, not one per thread",
+          len(report) == 4, str(len(report)))
+    check("no increment was lost under contention",
+          sum(e["count"] for e in report) == threads * each,
+          str(sum(e["count"] for e in report)))
+    log.disabled = False
+    reset_degradations()
+
+
 def run() -> None:
     test_body_carries_every_marker()
     test_shape_is_preserved_so_adopting_this_breaks_nothing()
@@ -328,6 +365,7 @@ def run() -> None:
     test_recording_never_raises()
     test_logging_is_rate_limited()
     test_the_log_line_is_machine_parseable()
+    test_concurrent_records_do_not_lose_counts()
     reset_degradations()
 
 
