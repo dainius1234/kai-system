@@ -20,6 +20,7 @@
     "Dockerfile Coverage Tests": 26,
     "Dockerfile Flag Tests": 21,
     "Erasure Tests": 75,
+    "Execution Coverage Tests": 20,
     "Flags-Enabled Integration Tests": 37,
     "Full Migration Tests": 75,
     "Gate Registry Tests": 82,
@@ -50,5 +51,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2724
+  "total": 2744
 }

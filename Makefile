@@ -316,6 +316,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-dockerfile-context test-service-tokens test-compose-env \
 	test-compose-interpolation test-unreachable-bindings \
 	test-implicit-deps test-image-modules test-test-identity \
+	test-execution-coverage \
 	test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
@@ -852,6 +853,12 @@ test-image-modules:
 
 test-test-identity:
 	python3 scripts/test_test_identity.py
+
+test-execution-coverage:
+	python3 scripts/test_execution_coverage.py
+
+execution-coverage:
+	python3 scripts/security/report_execution_coverage.py
 
 # bring up full-stack composition
 full-up:

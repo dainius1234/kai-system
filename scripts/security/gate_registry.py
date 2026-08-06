@@ -413,6 +413,23 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-045",)),
+    # Every one of the ten defects found on 2026-08-06 lived in code
+    # that had never executed. This measures that surface: 34 of 49
+    # services with a Dockerfile have never been started by CI, 8 of
+    # them boot by default in a shipped profile.
+    #
+    # A REPORT, not a gate. How much coverage is enough is a decision
+    # about CI time, and a gate red on a number nobody chose is a gate
+    # people learn to ignore.
+    Gate(module="report_execution_coverage",
+         kind=REPORT,
+         summary="which services CI has never started, derived from its "
+                 "own `up -d` lines",
+         inputs=COMPOSE_FILES + (".github/workflows/core-tests.yml",),
+         denominator=r"inspected: \d+ service\(s\) with a Dockerfile",
+         proven_by="scripts/test_execution_coverage.py",
+         in_policy_check=False,
+         in_workflows=()),
     Gate(module="check_test_wiring",
          kind=GATE,
          summary="every test in a self-run suite is dispatched",

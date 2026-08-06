@@ -8194,3 +8194,101 @@ A check that "an assertion agrees with the service" needs the service.
 The mechanism that catches this class is **the step running at all**,
 on every push — which it now does. That is the closure: not a new gate,
 but the eleven-step live section finally being a section that executes.
+
+---
+
+## 2026-08-06 (part 41) — the minimal live section is green, and the backlog is now computed
+
+Run 31098803606:
+
+```
+  step 49  Bring up minimal stack ........ PASS
+  step 51  Live smoke .................... PASS
+  step 52  Kill-isolation ................ PASS
+  step 53  Restart-persistence ........... PASS   <- first time ever, 12s
+```
+
+**The entire minimal live section passes.** Restart-persistence writes a
+marker, restarts memu-core, waits for health, and finds the record
+again — memory surviving a container restart, demonstrated rather than
+believed.
+
+This morning core-tests died at step 7 of 63. The remaining unproven
+steps are memu-graph (56–59) and the sovereign boot (60–62).
+
+### Where next, grounded rather than guessed
+
+Ten defects were found today and **every one lived in code that had
+never executed**:
+
+```
+  a withdrawn image tag       nothing pulled it
+  `--start_period`            nothing parsed that Dockerfile
+  four broken COPY contexts   nothing built those images
+  a missing DB_PASSWORD       nothing brought the stack up
+  `_pool_lock` unbound        nothing reached the writer branch
+  `socket` unbound            nothing reached the write
+  /data owned by root         nothing wrote to the volume
+  ten stale COPY lines        nothing started the container
+  python-multipart × 2        nothing imported the app
+  `status == "ok"`            nothing called the endpoint
+```
+
+Not one was code that used to work and broke. That is a different kind
+of risk from "the system is buggy": the exposure sits wherever
+execution has not reached, **not** wherever the code looks worst. Which
+means the backlog should be *measured*, not brainstormed.
+
+`scripts/security/report_execution_coverage.py` measures it, derived
+from the tree and from CI's own `up -d` lines:
+
+```
+  services with a Dockerfile ........... 49
+  started by CI at least once .......... 15
+  NEVER started by CI .................. 34
+
+  of those 34:
+    boot BY DEFAULT in a shipped profile ... 8
+      avatar-service, backup-service, calendar-sync, kai-advisor,
+      ledger-worker, memory-compressor, metrics-gateway,
+      workspace-manager
+    opt-in everywhere (`profiles:` gated) .. 26
+      including executor, verifier, supervisor, fusion-engine
+```
+
+The eight are the sharp end: they start on a real deployment with
+nothing having exercised them. That is precisely the condition that
+produced all ten of today's defects.
+
+**A report, not a gate.** How much coverage is enough is a decision
+about CI time, and a gate red on a number nobody chose is a gate people
+learn to ignore. It prints; the number moves when somebody decides it
+should.
+
+### It was wrong on its first run, and that is why it has tests
+
+The first draft took every non-flag token after `up -d` as a service
+name. The minimal bring-up is
+
+```
+docker compose -f … up -d --build \
+  2>&1 | tee /tmp/bringup.log
+```
+
+so it read the trailing `\` as a service, concluded the step named one
+service, and reported **3** covered instead of **15**.
+
+That is the *exact* defect `check_compose_env` was given fail-closed
+handling for this morning — a line continuation parsed as a name —
+committed again by me, hours later, in a new file. It was caught only
+because the number disagreed with a hand count.
+
+Matching tokens against the profile's own service names is what makes
+the question unambiguous. Eight scenarios, twenty assertions.
+
+And the meta-check caught the report a second time, for I-1: it skipped
+a compose file the workflow names but the tree lacks. Now reported as
+`INCOMPLETE — …` rather than silently narrowing the survey.
+
+**Second gate today caught by the meta-check before it ever ran against
+the tree, and the fifth instrument of mine caught misreporting.**
