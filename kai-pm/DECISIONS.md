@@ -7731,3 +7731,121 @@ returned for agentic.
 - **KAI-GATE-044** opened and closed in the same pass; 23 assertions.
 - **KAI-GATE-025** still open — but the bring-up itself is now one
   service away, and that service's fix is pushed.
+
+---
+
+## 2026-08-06 (part 36) — the bring-up passed
+
+Run 31084987768, step 49:
+
+```
+Bring up minimal sovereign AI stack ........... success  (58s)
+```
+
+**KAI-GATE-025's blocker is gone.** Forty-nine steps green, every image
+built, the whole minimal stack healthy in under a minute. The chain that
+started with a withdrawn `ollama` tag and ran through a `--start_period`
+typo, four broken COPY contexts, a missing `DB_PASSWORD`, `_pool_lock`,
+`socket`, a root-owned volume and ten stale COPY lines is closed —
+every link by evidence.
+
+Step 51 then ran for the first time in this repository's history.
+
+### The live smoke reached the system, and its own scope was wrong
+
+```
+inspected: 28 service(s) with a declared health port, 2 endpoint exercise(s)
+
+FAIL: 17 problem(s):
+  - audio-service: declared in docker-compose.minimal.yml but not running
+  - broker-bridge: ...
+  - browser-agent: ...
+  ... thirteen more ...
+  - dashboard: health=starting
+```
+
+**Sixteen of the seventeen were false.** Every one of those services
+carries a `profiles:` key — `sensors`, `finance`, `external-egress`,
+`watchers`, `recovery`, `introspection`. A bare `docker compose up` is
+*meant* not to start them. Eighteen of the minimal profile's services
+are gated that way and the smoke test was demanding all of them.
+
+Verified before touching anything: 16 of 16 have a non-empty `profiles`
+key. `dashboard` does not, and was genuinely `starting` — two seconds
+after its container came up.
+
+### This is the systemic finding inverted, and that is worse
+
+Every defect this programme has found so far was **a check whose scope
+was smaller than its name**, reporting success over the part it did not
+reach. This one is the mirror: **a check whose scope was larger than
+reality**, reporting failure over things that were right.
+
+Worse, not better, for two reasons:
+
+  * A survey with false positives sends people to break working code.
+    Sixteen "fix these services" findings, and nothing was wrong with
+    any of them.
+  * Sixteen false alarms are exactly how the **one true finding** gets
+    lost. `dashboard: health=starting` is the seventeenth line of a
+    list whose first sixteen are noise, and it is the only one that
+    said anything.
+
+That is the warning-wallpaper mechanism the operator named yesterday,
+arriving from the opposite direction: not a signal nobody reads, but a
+signal buried under sixteen that should never have been printed.
+
+### Both fixed, both in the instrument
+
+```
+  gated_services()   services with a `profiles:` key are not expected
+                     up, and the count is PRINTED — "not expected up:
+                     16 service(s) behind a `profiles:` gate this
+                     bring-up did not activate" — so the denominator
+                     still says what was and was not looked at. A scope
+                     stated is not an omission; a scope hidden is.
+
+  wait, not sample   `dashboard: health=starting` was a container two
+                     seconds old. Reading the clock once turns "not
+                     finished starting" into "broken", which is a
+                     different statement about a working system. It
+                     waits now, with `sleep`/`now` injected so the test
+                     proving it waits two minutes does not take two.
+```
+
+Corrected denominator against the real profile:
+
+```
+declared health ports: 28
+behind a profile gate: 16
+expected up:           12   agentic, airquality-service,
+                            calendar-service, dashboard,
+                            document-parser, heartbeat, memu-core,
+                            memu-core-introspect, notify-service,
+                            tool-gate, tts-service, weather-service
+```
+
+Three tests hold it: a gated service is not a failure, an **ungated**
+absent service still is (the rule must not have been widened into
+silence), and the gated set is derived from `profiles:` rather than
+from a list of names.
+
+### The tally that matters
+
+Three instruments of mine have now misreported, all in one day:
+
+  1. the post-mortem re-ran the bring-up with `--no-build` and reported
+     `No such image` instead of the real error;
+  2. `compose_probe` called a dead container `no-healthcheck`;
+  3. `live_smoke` called sixteen correctly-stopped services failures.
+
+Each was found the same way — by reading what actually happened rather
+than what the instrument said about it. Directive 2 names sources, and
+it has always included my own instruments; today is the third time that
+clause earned its place.
+
+### Register
+
+- **KAI-GATE-025**: the bring-up passes. Closure still requires the
+  remaining steps to run — 51 through 62 have never executed, and this
+  is what they are for.

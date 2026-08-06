@@ -25,7 +25,7 @@ from scripts.ci import live_smoke as gate  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 11
+EXPECTED_SCENARIOS = 14
 executed: list = []
 
 
@@ -91,7 +91,13 @@ def _audit(compose_text: str, runner):
         original = gate.REPO
         try:
             gate.REPO = root
-            return gate.audit("c.yml", runner)
+            # `now` advances past the deadline on the second call, so
+            # the wait exercises its real loop without taking two
+            # minutes to prove it waits two minutes.
+            ticks = iter([0.0, 1e9])
+            return gate.audit("c.yml", runner,
+                              sleep=lambda _s: None,
+                              now=lambda: next(ticks, 1e9))
         finally:
             gate.REPO = original
 
@@ -142,7 +148,9 @@ def test_a_missing_profile_is_a_failure() -> None:
         original = gate.REPO
         try:
             gate.REPO = Path(tmp)
-            failures, probed, _ = gate.audit("absent.yml", FakeRunner({}))
+            failures, probed, _ = gate.audit("absent.yml", FakeRunner({}),
+                                             sleep=lambda _s: None,
+                                             now=lambda: 0.0)
         finally:
             gate.REPO = original
     check("absence is reported", len(failures) == 1, str(failures))
@@ -234,7 +242,72 @@ def test_the_real_profile_declares_the_exercised_services() -> None:
           len(ports) > 10, str(len(ports)))
 
 
+def test_a_profile_gated_service_is_not_a_failure() -> None:
+    """The defect this file's first live run committed against itself.
+
+    It reported seventeen failures and sixteen were of this shape:
+
+        - audio-service: declared in docker-compose.minimal.yml but not
+          running — the profile did not start it
+
+    `audio-service` is `profiles: ["sensors"]`. A bare `docker compose
+    up` is *meant* not to start it. Eighteen of the minimal profile's
+    services are gated that way and this file demanded all of them.
+
+    The systemic finding inverted: the scope was larger than reality, so
+    it reported failure over things that were right. That is worse than
+    the usual direction — it sends people to break working code, and
+    sixteen false alarms are how the one true finding
+    (`dashboard: health=starting`) gets lost in the noise."""
+    scenario("profile-gated not a failure")
+    text = ("services:\n"
+            "  core:\n"
+            "    healthcheck:\n"
+            "      test: [\"CMD-SHELL\", \"curl localhost:8001/health\"]\n"
+            "  sensor:\n"
+            "    profiles: [\"sensors\"]\n"
+            "    healthcheck:\n"
+            "      test: [\"CMD-SHELL\", \"curl localhost:8021/health\"]\n")
+    runner = FakeRunner({"core": "healthy"})
+    failures, probed, _ = _audit(text, runner)
+    check("the gated service is not reported",
+          not any("sensor" in f for f in failures), str(failures))
+    check("and it is not counted as inspected", probed == 1, str(probed))
+
+
+def test_an_ungated_service_that_is_absent_is_still_a_failure() -> None:
+    """The rule must not have been widened into silence. A service with
+    no `profiles:` key that the bring-up did not start is still wrong."""
+    scenario("ungated absence still fails")
+    text = ("services:\n"
+            "  core:\n"
+            "    healthcheck:\n"
+            "      test: [\"CMD-SHELL\", \"curl localhost:8001/health\"]\n"
+            "  missing:\n"
+            "    healthcheck:\n"
+            "      test: [\"CMD-SHELL\", \"curl localhost:8002/health\"]\n")
+    failures, probed, _ = _audit(text, FakeRunner({"core": "healthy"}))
+    check("the absent ungated service is reported",
+          any("missing" in f for f in failures), str(failures))
+    check("and the message says it should have been started",
+          any("should have started it" in f for f in failures), str(failures))
+    check("both are counted", probed == 2, str(probed))
+
+
+def test_gated_services_are_identified_from_the_compose_file() -> None:
+    """Derived from `profiles:`, not from a list of names."""
+    scenario("gated set derived")
+    doc = {"services": {"a": {"profiles": ["x"]}, "b": {},
+                        "c": {"profiles": []}, "d": None}}
+    got = gate.gated_services(doc)
+    check("only the one with a non-empty profiles key", got == {"a"},
+          str(got))
+
+
 def run_all() -> None:
+    test_a_profile_gated_service_is_not_a_failure()
+    test_an_ungated_service_that_is_absent_is_still_a_failure()
+    test_gated_services_are_identified_from_the_compose_file()
     test_an_unhealthy_service_fails()
     test_a_whole_stack_down_fails()
     test_a_healthy_stack_passes()

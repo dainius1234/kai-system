@@ -52,7 +52,8 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
-from typing import List, Sequence, Tuple
+import time
+from typing import Callable, List, Sequence, Tuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
@@ -77,8 +78,48 @@ EXERCISES: Tuple[Tuple[str, str, str, dict], ...] = (
 )
 
 
-def audit(compose_file: str, runner: Runner = _run) -> Tuple[List[str], int, int]:
-    """Return (failures, services probed, exercises run)."""
+def gated_services(doc: dict) -> set:
+    """Services a bare `docker compose up` deliberately does not start.
+
+    A service with a `profiles:` key is opt-in: `docker compose up`
+    without `--profile` skips it, by design.
+
+    This function exists because the first live run of this file
+    reported **seventeen** failures, and sixteen of them were these:
+
+        - audio-service: declared in docker-compose.minimal.yml but not
+          running — the profile did not start it
+
+    `audio-service` is `profiles: ["sensors"]`. It was *correctly* not
+    running. Eighteen of the minimal profile's services are gated this
+    way, and the smoke test was demanding all of them.
+
+    That is the systemic finding inverted: usually a check's scope is
+    smaller than its name and it reports success over what it missed.
+    Here the scope was **larger than reality**, and it reported failure
+    over things that were right — which is worse, because a survey with
+    false positives sends people to break working code, and because
+    sixteen false alarms are how the one true finding
+    (`dashboard: health=starting`) gets lost.
+
+    Reported as a count rather than silently dropped, so the
+    denominator still says what was and was not looked at.
+    """
+    return {name for name, cfg in (doc.get("services") or {}).items()
+            if (cfg or {}).get("profiles")}
+
+
+def audit(compose_file: str, runner: Runner = _run,
+          timeout: float = 120.0,
+          sleep: Callable[[float], None] = time.sleep,
+          now: Callable[[], float] = time.monotonic
+          ) -> Tuple[List[str], int, int]:
+    """Return (failures, services probed, exercises run).
+
+    `sleep`/`now` are injectable for the same reason `wait_healthy`
+    injects them: a test that proves this waits two minutes must not
+    take two minutes to say so.
+    """
     import yaml
 
     path = REPO / compose_file
@@ -88,8 +129,21 @@ def audit(compose_file: str, runner: Runner = _run) -> Tuple[List[str], int, int
         return ([f"{compose_file}: missing — nothing to verify"], 0, 0)
     doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
 
-    ports = health_ports(doc)
+    all_ports = health_ports(doc)
+    gated = gated_services(doc)
+    ports = {name: port for name, port in all_ports.items()
+             if name not in gated}
     failures: List[str] = []
+
+    # Wait, do not sample. The first live run caught `dashboard:
+    # health=starting` — the container had been up for two seconds and
+    # its healthcheck had not reported yet. A smoke test that reads the
+    # clock once turns "not finished starting" into "broken", which is a
+    # different statement about a working system.
+    if ports:
+        from scripts.ci.compose_probe import wait_healthy
+        wait_healthy(compose_file, sorted(ports), timeout=timeout,
+                     runner=runner, sleep=sleep, now=now)
 
     states = compose_health(compose_file, runner)
     probed = 0
@@ -97,8 +151,9 @@ def audit(compose_file: str, runner: Runner = _run) -> Tuple[List[str], int, int
         probed += 1
         state = states.get(service)
         if state is None:
-            failures.append(f"{service}: declared in {compose_file} but not "
-                            f"running — the profile did not start it")
+            failures.append(f"{service}: declared in {compose_file} with no "
+                            f"`profiles:` key, so this bring-up should have "
+                            f"started it, and did not")
         elif state != "healthy":
             failures.append(f"{service}: health={state}")
 
@@ -120,8 +175,9 @@ def audit(compose_file: str, runner: Runner = _run) -> Tuple[List[str], int, int
             failures.append(f"{service} {method} {endpoint}: {detail}")
 
     if probed == 0:
-        failures.append(f"{compose_file}: no service declares a health port — "
-                        f"nothing was inspected, which is not a pass")
+        failures.append(f"{compose_file}: no service declares a health port "
+                        f"outside a `profiles:` gate — nothing was "
+                        f"inspected, which is not a pass")
     return failures, probed, exercised
 
 
@@ -137,8 +193,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         print("  A check that could not execute is not a check that passed.")
         return 1
 
+    import yaml
+    doc = yaml.safe_load(
+        (REPO / args.compose_file).read_text(encoding="utf-8")) or {}
+    gated = len(gated_services(doc) & set(health_ports(doc)))
     print(f"  inspected: {probed} service(s) with a declared health port, "
           f"{exercised} endpoint exercise(s) ({args.compose_file})")
+    if gated:
+        # The denominator, stated. These are not skipped quietly: a
+        # bare `docker compose up` is meant not to start them, and
+        # saying so is the difference between a scope and an omission.
+        print(f"  not expected up: {gated} service(s) behind a "
+              f"`profiles:` gate this bring-up did not activate")
     print()
     if failures:
         print(f"FAIL: {len(failures)} problem(s):")
