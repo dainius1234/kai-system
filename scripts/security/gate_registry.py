@@ -386,6 +386,19 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-043",)),
+    # agentic/Dockerfile named ten files by hand against a directory of
+    # thirty-seven; app.py imported twenty-seven of the ones it missed,
+    # so the container died at import on every boot it ever had.
+    # KAI-GATE-044 — the list-beside-the-thing pattern, 14th venue.
+    Gate(module="check_image_modules",
+         kind=GATE,
+         summary="every image contains the modules its entry point imports",
+         inputs=(".",),
+         denominator=r"inspected: \d+ Python service image",
+         proven_by="scripts/test_image_modules.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-044",)),
     Gate(module="check_test_wiring",
          kind=GATE,
          summary="every test in a self-run suite is dispatched",

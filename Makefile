@@ -40,6 +40,7 @@ policy-check: lint-blocking
 	python3 scripts/security/check_compose_interpolation.py
 	python3 scripts/security/check_unreachable_bindings.py
 	python3 scripts/security/check_implicit_deps.py
+	python3 scripts/security/check_image_modules.py
 	python3 scripts/security/check_test_wiring.py
 	python3 scripts/security/check_gate_registry.py --gate
 	@# Doc-drift last: it fails on every commit that adds a test, so it
@@ -313,7 +314,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-dockerfile-flags test-dockerfile-coverage \
 	test-dockerfile-context test-service-tokens test-compose-env \
 	test-compose-interpolation test-unreachable-bindings \
-	test-implicit-deps \
+	test-implicit-deps test-image-modules \
 	test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
@@ -844,6 +845,9 @@ test-unreachable-bindings:
 
 test-implicit-deps:
 	python3 scripts/test_implicit_deps.py
+
+test-image-modules:
+	python3 scripts/test_image_modules.py
 
 # bring up full-stack composition
 full-up:

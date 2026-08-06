@@ -29,7 +29,7 @@ from scripts.ci import compose_probe as probe  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 13
+EXPECTED_SCENARIOS = 16
 executed: list = []
 
 
@@ -250,7 +250,65 @@ def test_a_failed_exec_is_a_failure() -> None:
           "no such service" in detail, detail)
 
 
+def test_a_dead_container_is_not_reported_as_no_healthcheck() -> None:
+    """The defect this instrument committed against itself.
+
+    `agentic` died at import — `ModuleNotFoundError: No module named
+    'system_fsm'` — and this function reported `agentic: no-healthcheck`.
+    That is false: agentic declares one. Docker reports an empty
+    `Health` for a container that is not running, so the message sent
+    the reader to the compose file to look for a healthcheck that was
+    already there, while the traceback in the container log went
+    unmentioned. A diagnostic that reports something other than what
+    happened."""
+    scenario("dead container named as dead")
+
+    def runner(cmd):
+        return 0, ('{"Service":"agentic","State":"exited","ExitCode":1,'
+                   '"Health":""}\n'), ""
+
+    states = probe.compose_health("x.yml", runner)
+    check("it is not called no-healthcheck",
+          "no-healthcheck" not in states["agentic"], states["agentic"])
+    check("it is named as exited", "exited" in states["agentic"],
+          states["agentic"])
+    check("with its exit code", "exit 1" in states["agentic"],
+          states["agentic"])
+    check("and points at the container log",
+          "container log" in states["agentic"], states["agentic"])
+
+
+def test_a_restarting_container_is_named_as_restarting() -> None:
+    """`document-parser` crash-looped for months while reporting
+    nothing useful. A restart loop is not a health state."""
+    scenario("restart loop named")
+
+    def runner(cmd):
+        return 0, '{"Service":"dp","State":"restarting","Health":""}\n', ""
+
+    states = probe.compose_health("x.yml", runner)
+    check("named as restarting", "restarting" in states["dp"], states["dp"])
+    check("not as no-healthcheck", "no-healthcheck" not in states["dp"],
+          states["dp"])
+
+
+def test_a_running_container_without_a_healthcheck_still_says_so() -> None:
+    """The original rule survives: running + no healthcheck is still
+    `no-healthcheck`, not `healthy`."""
+    scenario("running no-healthcheck preserved")
+
+    def runner(cmd):
+        return 0, '{"Service":"x","State":"running","Health":""}\n', ""
+
+    check("unchanged",
+          probe.compose_health("x.yml", runner)["x"] == "no-healthcheck",
+          probe.compose_health("x.yml", runner)["x"])
+
+
 def run_all() -> None:
+    test_a_dead_container_is_not_reported_as_no_healthcheck()
+    test_a_restarting_container_is_named_as_restarting()
+    test_a_running_container_without_a_healthcheck_still_says_so()
     test_both_healthcheck_spellings_yield_a_port()
     test_a_portless_healthcheck_yields_nothing()
     test_it_returns_when_everything_is_healthy()

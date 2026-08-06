@@ -8,7 +8,7 @@
     "Compose Env Tests": 18,
     "Compose Gate Tests": 54,
     "Compose Interpolation Tests": 28,
-    "Compose Probe Tests": 27,
+    "Compose Probe Tests": 34,
     "Concurrency & Clock Tests": 51,
     "Constraint Assessment Tests": 56,
     "Dashboard Auth Tests": 99,
@@ -24,6 +24,8 @@
     "Full Migration Tests": 75,
     "Gate Registry Tests": 82,
     "Hygiene Gate Tests": 63,
+    "Image Module Tests": 23,
+    "Implicit Dependency Tests": 32,
     "Invariant Guard Tests": 26,
     "Legacy Bridge Tests": 58,
     "Live Smoke Tests": 23,
@@ -47,5 +49,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2608
+  "total": 2670
 }

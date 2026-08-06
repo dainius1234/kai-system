@@ -99,6 +99,24 @@ def compose_health(compose_file: str, runner: Runner = run) -> Dict[str, str]:
     That is reported as `no-healthcheck` and never collapsed into
     `healthy`: a container Docker is not checking is a container nobody
     is checking.
+
+    **`State` is read too, and it wins.** On 2026-08-06 `agentic` died
+    at import (`ModuleNotFoundError: No module named 'system_fsm'`) and
+    this function reported it as::
+
+        - agentic: no-healthcheck
+
+    which is false. `agentic` declares a healthcheck; it was *dead*, and
+    Docker reports an empty `Health` for a container that is not
+    running. So the message sent the reader to the compose file to look
+    for a healthcheck that was already there, while the real cause — a
+    traceback in the container log — went unmentioned.
+
+    That is the defect this whole programme is about, committed by the
+    instrument built to find it: **a diagnostic that reports something
+    other than what happened.** A container that is `exited` or
+    `restarting` now says so, and says it before anything about
+    healthchecks.
     """
     code, out, err = runner(["docker", "compose", "-f", compose_file,
                              "ps", "--format", "json"])
@@ -117,7 +135,18 @@ def compose_health(compose_file: str, runner: Runner = run) -> Dict[str, str]:
             name = entry.get("Service") or entry.get("Name")
             if not name:
                 continue
-            states[name] = (entry.get("Health") or "").strip() or "no-healthcheck"
+            health = (entry.get("Health") or "").strip()
+            state = (entry.get("State") or "").strip().lower()
+            if state and state != "running":
+                # Dead, restarting or created. Whatever the healthcheck
+                # says about it is beside the point, and saying
+                # "no-healthcheck" about a corpse points at the wrong
+                # file entirely.
+                code = entry.get("ExitCode")
+                suffix = f" (exit {code})" if code not in (None, "", 0) else ""
+                states[name] = f"{state}{suffix} — check its container log"
+            else:
+                states[name] = health or "no-healthcheck"
     return states
 
 
@@ -227,9 +256,12 @@ def main(argv: Sequence[str] | None = None) -> int:
               f"within {args.timeout:.0f}s:\n")
         for line in unhealthy:
             print(f"  - {line}")
-        print("\n  'no-healthcheck' means the container declares none, so "
-              "Docker is\n  not checking it and neither is anybody else. "
-              "'not running' means\n  the service is not in this stack at all.")
+        print("\n  'exited'/'restarting' means the container is dead or "
+              "looping — read its\n  container log, not the compose file. "
+              "'no-healthcheck' means it is\n  running and declares none, "
+              "so Docker is not checking it and neither\n  is anybody else. "
+              "'not running' means the service is not in this stack\n  at "
+              "all.")
         return 1
     print("PASS: every named service reports healthy.")
     return 0

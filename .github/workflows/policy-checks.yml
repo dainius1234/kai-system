@@ -120,5 +120,8 @@ jobs:
       - name: Every implicit dependency is declared where it is used
         run: python scripts/security/check_implicit_deps.py
 
+      - name: Every image contains the modules its entry point imports
+        run: python scripts/security/check_image_modules.py
+
       - name: Instrumentation invariants (I-4 enforced)
         run: python scripts/security/check_gate_registry.py --gate

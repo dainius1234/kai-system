@@ -7625,3 +7625,109 @@ before it ever ran against the tree.
 - **KAI-GATE-043** opened and closed in the same pass; 32 assertions.
 - **KAI-GATE-025** still open. The bring-up has now cleared four
   distinct blockers; the fifth is pushed and running.
+
+---
+
+## 2026-08-06 (part 35) — the stack came up
+
+Run 31081920735. The bring-up ran for **5 minutes 56 seconds** before
+failing; every previous run today died inside ninety seconds. What it
+did in that time:
+
+```
+Container sovereign-postgres-minimal        Healthy
+Container sovereign-redis-minimal           Healthy
+Container sovereign-ollama                  Healthy
+Container sovereign-ollama-pull             Exited
+Container sovereign-tool-gate-minimal       Healthy
+Container sovereign-memu-core-minimal       Healthy      <-- first time
+Container sovereign-memu-core-introspect    Healthy
+Container sovereign-heartbeat-minimal       Healthy
+Container sovereign-dashboard-minimal       Started
+Container kai-house-doctor                  Started
+Container kai-skill-hunter                  Started
+
+  waited on: 3 service(s), 3 healthy
+PASS: every named service reports healthy.
+```
+
+**memu-core is healthy.** Postgres, redis, ollama, tool-gate,
+introspect and heartbeat with it. Every cause chased since yesterday
+morning — the withdrawn image tag, the `--start_period` typo, the broken
+COPY contexts, the missing DB_PASSWORD, `_pool_lock`, `socket`, the
+volume ownership — is closed by evidence rather than by argument.
+
+One service stood between that and thirteen steps which have never once
+executed.
+
+### The last one: `agentic`
+
+```
+File "/app/app.py", line 27, in <module>
+    from system_fsm import KaiEvent as SysEvent, ...
+ModuleNotFoundError: No module named 'system_fsm'
+```
+
+`agentic/Dockerfile` copied **ten files by name** into a directory
+holding **thirty-seven modules**. `app.py` imports **twenty-seven** of
+the ones the list omitted. The container has died at import on every
+boot it has ever had, and blocked nothing until today because nothing
+had ever got far enough to start it.
+
+**The list-beside-the-thing pattern, fourteenth venue** — and the same
+remedy as all thirteen before it: `COPY agentic/ ./`. A list has to be
+remembered; a directory cannot go stale.
+
+### KAI-GATE-044 — `check_image_modules`
+
+Roots at what the image *actually runs* (the `.py` in its
+`CMD`/`ENTRYPOINT`, including `uvicorn app:app`), walks imports
+transitively through sibling modules, and fails on anything reachable
+that no `COPY` puts in the image.
+
+**Two false positives were caught while calibrating, and both are now
+asserted as tests** — each would have sent somebody to fix working code:
+
+  * rooting every image at `app.py` reported 34 phantom misses against
+    `agentic/Dockerfile.introspect`, which runs `introspect_app.py`;
+  * not understanding `COPY vault-sync/ ./` reported `parser`, `mapper`
+    and `watcher` as missing when the whole directory is copied.
+
+I found both by checking my own sweep before acting on it. The first
+draft of that sweep also keyed its results by *directory*, so a second
+Dockerfile silently overwrote the first — a bug in the instrument, in
+the shape the instrument exists to find.
+
+Calibrated: `git show 189313d:agentic/Dockerfile` → 1 finding naming 27
+modules. Fixed tree → 0 across 49 Python service images.
+
+### And the instrument lied about it first
+
+`compose_probe` reported the failure as:
+
+```
+  - agentic: no-healthcheck
+```
+
+That is **false**. `agentic` declares a healthcheck. Docker reports an
+empty `Health` field for a container that is *not running*, and I
+collapsed empty into `no-healthcheck` without reading `State`. So the
+message sent the reader to the compose file to look for a healthcheck
+that was already there, while the traceback in the container log went
+unmentioned.
+
+**A diagnostic that reports something other than what happened** — the
+defect this entire programme is about, committed by the instrument built
+to find it. Second time today an instrument of mine has done this; the
+first was the post-mortem that re-ran the bring-up with `--no-build`.
+
+`compose_health` reads `State` now, and a dead or looping container says
+`exited (exit 1) — check its container log` before anything about
+healthchecks. Three tests drive it, including the exact JSON Docker
+returned for agentic.
+
+### Register
+
+- **KAI-GATE-044** opened and closed in the same pass; 23 assertions.
+- **KAI-GATE-025** still open — but the bring-up itself is now one
+  service away, and that service's fix is pushed.
