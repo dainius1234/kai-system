@@ -1,4 +1,6 @@
-version: '3.8'
+# No `version:` key. Compose has ignored it since v2 and warns about it on
+# every single invocation — a signal that repeats forever is one nobody
+# reads, and this one sat in the same logs as the warnings that mattered.
 
 x-service-defaults: &service_defaults
   user: "1000:1000"

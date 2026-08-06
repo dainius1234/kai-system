@@ -379,17 +379,18 @@ jobs:
           # silence. Printing forever is what teaches everyone to ignore
           # it.
           #
-          # Every variable this job intentionally leaves empty is now
-          # declared at job scope, so a substitution warning here means a
-          # variable nobody has accounted for. That is actionable, so it
-          # fails.
-          if grep -q 'variable is not set' /tmp/bringup.log; then
-            echo "::error::A compose variable was substituted blank"
-            grep -o 'The "[A-Z_]*" variable is not set' /tmp/bringup.log \
-              | sort -u
-            echo "Declare it at job scope if intentionally absent."
-            exit 1
-          fi
+          # This used to be `grep -q 'variable is not set'`, written out
+          # separately here and in the full-profile step. It matched one
+          # member of the class it stood for, and on 2026-08-06 the full
+          # profile failed on a different member —
+          #
+          #   level=warning msg="secret file kai-system_db_password
+          #   does not exist"
+          #
+          # — which the guard passed in silence. One script now, matching
+          # *any* compose warning, with the benign ones declared inside
+          # it rather than in two copies of a grep.
+          python3 scripts/ci/assert_clean_bringup.py /tmp/bringup.log
           # Waits on Docker's verdict of each service's own healthcheck.
           # These three used to be `curl http://localhost:8000|8007|8009`,
           # which addressed nothing: tool-gate, agentic and
@@ -582,16 +583,19 @@ jobs:
         run: |
           set -o pipefail
           exec > >(tee /tmp/full-bringup.log) 2>&1
+          # This profile declares three file-backed Docker secrets and
+          # nothing in the repository creates them — only a comment
+          # telling a human to. The first run that ever got here died on
+          # exactly that, on a bind mount of a path that does not exist.
+          # The names are read from the compose file's own `secrets:`
+          # block rather than echoed here, so a fourth secret is
+          # provisioned by the rule that already exists.
+          python3 scripts/ci/make_dev_secrets.py docker-compose.full.yml
           docker compose -f docker-compose.full.yml up -d
           df -h / | tail -1
-          # Same rule the minimal bring-up enforces: a substitution
-          # warning here means a variable nobody has accounted for.
-          if grep -q 'variable is not set' /tmp/full-bringup.log; then
-            echo "::error::A compose variable was substituted blank"
-            grep -o 'The "[A-Z_]*" variable is not set' /tmp/full-bringup.log \
-              | sort -u
-            exit 1
-          fi
+          # The same script the minimal bring-up uses, so the two cannot
+          # hold different opinions about what a clean bring-up is.
+          python3 scripts/ci/assert_clean_bringup.py /tmp/full-bringup.log
 
       - name: Live smoke against the full profile
         run: |

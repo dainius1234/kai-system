@@ -17,6 +17,18 @@ env/
 *.pem
 *.key
 
+# Docker secrets. docker-compose.full.yml mounts these as file-backed
+# secrets and its own comment tells you to create them by hand:
+#
+#   echo "my-db-password" > runtime-secrets/db_password
+#
+# That instruction has been in the file since it was written, and this
+# directory was never ignored — so following the documented procedure
+# and then committing would have put real secret material in the
+# history. Found on 2026-08-06, when the first bring-up that ever
+# reached these secrets failed on their absence.
+runtime-secrets/
+
 # IDE
 .idea/
 .vscode/

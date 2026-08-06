@@ -316,7 +316,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-dockerfile-context test-service-tokens test-compose-env \
 	test-compose-interpolation test-unreachable-bindings \
 	test-implicit-deps test-image-modules test-test-identity \
-	test-execution-coverage \
+	test-execution-coverage test-bringup-guards \
 	test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
@@ -856,6 +856,9 @@ test-test-identity:
 
 test-execution-coverage:
 	python3 scripts/test_execution_coverage.py
+
+test-bringup-guards:
+	python3 scripts/test_bringup_guards.py
 
 execution-coverage:
 	python3 scripts/security/report_execution_coverage.py
