@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN addgroup --system app && adduser --system --ingroup app app
 
 COPY backup-service/app.py ./app.py
+COPY common/ ./common/
 
 EXPOSE 8054
 

@@ -316,7 +316,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-dockerfile-context test-service-tokens test-compose-env \
 	test-compose-interpolation test-unreachable-bindings \
 	test-implicit-deps test-image-modules test-test-identity \
-	test-execution-coverage test-bringup-guards \
+	test-execution-coverage test-bringup-guards test-ci-scripts \
 	test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
@@ -344,7 +344,10 @@ gate-registry-gate:
 
 go_no_go:
 	python -m py_compile dashboard/app.py tool-gate/app.py memu-core/app.py agentic/app.py executor/app.py heartbeat/app.py supervisor/app.py verifier/app.py fusion-engine/app.py common/llm.py common/errors.py common/feature_flags.py memory-compressor/app.py ledger-worker/app.py metrics-gateway/app.py telegram-bot/app.py
-	python scripts/go_no_go_check.py
+	# --allow-absent: this stage compiles modules, it does not run a
+	# dashboard. Declared here rather than assumed inside the script,
+	# where it made every invocation everywhere pass on absence.
+	python scripts/go_no_go_check.py --allow-absent
 
 hardening_smoke:
 	python scripts/hardening_smoke.py
@@ -859,6 +862,9 @@ test-execution-coverage:
 
 test-bringup-guards:
 	python3 scripts/test_bringup_guards.py
+
+test-ci-scripts:
+	python3 scripts/test_ci_scripts.py
 
 execution-coverage:
 	python3 scripts/security/report_execution_coverage.py

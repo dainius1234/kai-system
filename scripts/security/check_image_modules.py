@@ -132,9 +132,26 @@ def copied_modules(text: str, root: Path = None) -> Set[str]:
     return names
 
 
-def _local_imports(pyfile: Path, siblings: Set[str]) -> Set[str]:
-    """Sibling modules this file imports. Relative imports are skipped —
-    a package-relative import means the whole package came along."""
+def root_packages(root: Path = None) -> Set[str]:
+    """Importable packages at the repository root, e.g. `common`.
+
+    Derived from `__init__.py`, not listed. These are the *other* thing
+    a service image has to be given, and the first version of this gate
+    could not see them at all — see `reachable`.
+    """
+    root = root or REPO
+    return {p.name for p in root.iterdir()
+            if p.is_dir() and (p / "__init__.py").exists()
+            and p.name not in _EXCLUDED}
+
+
+def _local_imports(pyfile: Path, known: Set[str]) -> Set[str]:
+    """Modules this file imports that the image has to supply.
+
+    `known` is sibling modules **and** repo-root packages. Relative
+    imports are skipped — a package-relative import means the whole
+    package came along.
+    """
     out: Set[str] = set()
     try:
         tree = ast.parse(pyfile.read_text(encoding="utf-8"))
@@ -144,26 +161,58 @@ def _local_imports(pyfile: Path, siblings: Set[str]) -> Set[str]:
         if isinstance(node, ast.Import):
             for alias in node.names:
                 root = alias.name.split(".")[0]
-                if root in siblings:
+                if root in known:
                     out.add(root)
         elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
             root = node.module.split(".")[0]
-            if root in siblings:
+            if root in known:
                 out.add(root)
     return out
 
 
-def reachable(roots: Set[Path], service: Path) -> Set[str]:
-    """Sibling modules reachable from the entry points, transitively."""
+def reachable(roots: Set[Path], service: Path,
+              packages: Set[str] = None) -> Set[str]:
+    """Modules reachable from the entry points, transitively.
+
+    **Siblings and repo-root packages.** This considered only
+
+        siblings = {p.stem for p in service.glob("*.py")}
+
+    — the service's own directory, and nothing else. So a service
+    importing `common.http_hygiene` needed `common/` in its image and
+    this gate could not see the need, because `common` was not a
+    sibling. The gate is named *"every Python service image contains the
+    modules it imports"* and its universe was one directory: the
+    systemic finding again, in the gate written this morning to catch
+    the systemic finding.
+
+    It cost a CI run to find, on 2026-08-06, when the full profile
+    finally started backup-service:
+
+        backup-service-1 | from common.http_hygiene import pooled_client
+        backup-service-1 | ModuleNotFoundError: No module named 'common'
+
+    while this printed `PASS: all 49 Python service image(s) contain the
+    modules they import`. Three images were affected — backup-service,
+    broker-bridge, cortex — and it reported none of them.
+
+    A root package is not recursed into: `COPY common/ ./common/` brings
+    the whole directory, so its internal imports are satisfied by
+    construction.
+    """
+    packages = root_packages() if packages is None else packages
     siblings = {p.stem for p in service.glob("*.py")}
+    known = siblings | packages
     need: Set[str] = set()
     frontier = list(roots)
     seen = set(roots)
     while frontier:
-        for module in _local_imports(frontier.pop(), siblings):
+        for module in _local_imports(frontier.pop(), known):
             if module in need:
                 continue
             need.add(module)
+            if module in packages:
+                continue          # copied wholesale; nothing more to trace
             nxt = service / f"{module}.py"
             if nxt.exists() and nxt not in seen:
                 seen.add(nxt)

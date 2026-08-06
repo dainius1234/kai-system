@@ -497,10 +497,128 @@ REGISTRY: Tuple[Gate, ...] = (
          kind=GATE,
          summary="the four instrumentation invariants (A-04)",
          inputs=("scripts/security/gate_registry.py", "Makefile"),
-         denominator=r"\d+ checks cross-checked",
+         denominator=r"\d+ declared, \d+ found on disk",
          proven_by="scripts/test_gate_registry.py",
          in_policy_check=True,
          in_workflows=("policy-checks.yml",)),
+
+    # ── The eight instruments the denominator could not see ──────────
+    #
+    # This registry's scope was `scripts/security/*.py` — a *directory*,
+    # which is where the checks happened to be put, not what makes
+    # something an instrument. What makes it one is that CI runs it and
+    # a non-zero exit stops the build.
+    #
+    # Measured 2026-08-06: 30 modules in that directory and eight
+    # outside it that can fail the build, none registered, none held to
+    # I-1..I-7 — with the meta-check printing `GATE PASSED` over all of
+    # it. The seventeenth venue of this programme's one finding, in the
+    # file whose whole job is to catch it.
+    #
+    # The widening repaid itself on the first module looked at:
+    # `go_no_go_check` opened with `except Exception: SystemExit(0)` for
+    # "dashboard not running", so `make go_no_go` passed on every run
+    # where nothing was listening. It could not tell a GO decision from
+    # no decision at all. Fixed; absence is now declared by the caller.
+    Gate(module="ci/live_smoke",
+         kind=GATE,
+         summary="every service with a healthcheck is healthy, and the "
+                 "exercised endpoints answer",
+         inputs=("docker-compose.minimal.yml",),
+         denominator=r"inspected: \d+ service\(s\) with a declared health port",
+         probe=False,
+         probe_skip_reason="talks to a running stack over `docker compose "
+                           "exec`; probed by scripts/test_live_smoke.py "
+                           "against an injected runner instead",
+         proven_by="scripts/test_live_smoke.py",
+         in_workflows=("core-tests.yml",)),
+    Gate(module="ci/compose_probe",
+         kind=GATE,
+         summary="waits on Docker's own verdict of each healthcheck, and "
+                 "reports a dead container as dead rather than uncheckable",
+         inputs=("docker-compose.minimal.yml",),
+         denominator=r"waited on: \d+ service\(s\)",
+         probe=False,
+         probe_skip_reason="needs a running daemon; probed by "
+                           "scripts/test_compose_probe.py against an "
+                           "injected runner instead",
+         proven_by="scripts/test_compose_probe.py",
+         in_workflows=("core-tests.yml",)),
+    Gate(module="ci/kill_isolation",
+         kind=GATE,
+         summary="memu-core stays healthy AND writable with "
+                 "memu-core-introspect stopped",
+         inputs=("docker-compose.minimal.yml",),
+         denominator=r"probing: \S+ on port \d+",
+         probe=False,
+         probe_skip_reason="needs the minimal stack up; probed by "
+                           "scripts/test_ci_scripts.py against injected "
+                           "exec_http/load_ports instead",
+         proven_by="scripts/test_ci_scripts.py",
+         in_workflows=("core-tests.yml",)),
+    Gate(module="ci/assert_clean_bringup",
+         kind=GATE,
+         summary="a bring-up that warned did not fully succeed",
+         inputs=(),
+         denominator=r"inspected: \d+ line\(s\) of bring-up output",
+         probe=False,
+         probe_skip_reason="takes the log a bring-up wrote; probed by "
+                           "scripts/test_bringup_guards.py against "
+                           "synthetic logs instead",
+         proven_by="scripts/test_bringup_guards.py",
+         in_workflows=("core-tests.yml",)),
+    Gate(module="ci/make_dev_secrets",
+         kind=GATE,
+         summary="every file-backed secret the profile declares exists "
+                 "before the bring-up needs it",
+         inputs=("docker-compose.full.yml",),
+         denominator=r"inspected: \d+ file-backed secret\(s\)",
+         proven_by="scripts/test_bringup_guards.py",
+         in_workflows=("core-tests.yml",)),
+    Gate(module="test_restart_persistence",
+         kind=GATE,
+         summary="a memory written before a memu-core restart is "
+                 "retrievable after it",
+         inputs=("docker-compose.minimal.yml",),
+         denominator=r"\[4/4\]",
+         probe=False,
+         probe_skip_reason="writes to a live memu-core and restarts its "
+                           "container; probed by scripts/test_ci_scripts.py "
+                           "against an injected caller instead",
+         proven_by="scripts/test_ci_scripts.py",
+         in_workflows=("core-tests.yml",)),
+    Gate(module="sync_docs",
+         kind=GATE,
+         summary="README and backlog metrics match the codebase",
+         inputs=("README.md", "docs/PROJECT_BACKLOG.md"),
+         denominator=r"Tests:\s+[\d,]+ functions in \d+ files",
+         probe=False,
+         probe_skip_reason="`--check` is the gating form and exits 1 on "
+                           "drift, so probing it here would fail the "
+                           "meta-check whenever docs are stale rather than "
+                           "reporting a denominator; probed by "
+                           "scripts/test_ci_scripts.py against its counters",
+         proven_by="scripts/test_ci_scripts.py",
+         # Two callers with different intent: core-tests gates on it via
+         # `make check-docs`, friday-cleanup reports it advisorily. Both
+         # are real and both are declared.
+         in_workflows=("core-tests.yml", "friday-cleanup.yml")),
+    Gate(module="go_no_go_check",
+         kind=GATE,
+         summary="the dashboard's go/no-go decision is GO — and an "
+                 "unreachable dashboard is not a GO",
+         inputs=(),
+         denominator=r"go_no_go: (PASS|FAIL|SKIPPED)",
+         probe=False,
+         probe_skip_reason="polls a dashboard that is not up here, and "
+                           "failing on that is now the point; probed by "
+                           "scripts/test_ci_scripts.py in all four "
+                           "directions instead",
+         proven_by="scripts/test_ci_scripts.py",
+         # Reached through `make go_no_go`, not named in a step. The
+         # meta-check follows make targets now, so this is the answer it
+         # gets rather than the one I guessed.
+         in_workflows=("core-tests.yml",)),
 )
 
 BY_MODULE = {gate.module: gate for gate in REGISTRY}

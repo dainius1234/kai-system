@@ -63,7 +63,90 @@ SECURITY = REPO / "scripts" / "security"
 # though they configured it — so this file reported a gate as invoked by
 # two workflows that only talked about it. A gate is invoked when a
 # python interpreter is pointed at it, and not otherwise.
-_INVOCATION = re.compile(r"python3?\s+(?:-\S+\s+)*scripts/security/([a-z_]+)\.py")
+_INVOCATION = re.compile(
+    r"python3?\s+(?:-\S+\s+)*scripts/(?:security/)?([a-z0-9_/]+)\.py")
+
+#: Modules named without a path live in `scripts/security/`; anything
+#: else carries its directory. Both forms resolve here, so the registry
+#: never has to hold a second copy of where a file is.
+#:
+#: This existed as `SECURITY / f"{module}.py"` at four call sites, which
+#: is the same assumption written four times — and it silently defined
+#: the registry's *reach*: a check outside `scripts/security/` could not
+#: be named, so it could not be registered, so it could not be found
+#: missing. Eight instruments that can fail the build were outside it.
+
+
+def module_path(module: str) -> Path:
+    """Where a registered module's source lives.
+
+    Resolved by looking, not by a naming convention. The convention —
+    *a bare name means `scripts/security/`* — is the obvious rule and it
+    is wrong for `scripts/sync_docs.py`, whose bare name is
+    indistinguishable from a security module's. Encoding that as
+    `if "/" in module` silently dropped three of the eight instruments
+    this widening exists to reach, and it dropped them into the *other*
+    directory, where the file does not exist and every AST check
+    returned "no findings".
+
+    `ambiguous_modules()` covers the one case looking cannot settle.
+    """
+    direct = SECURITY / f"{module}.py"
+    if direct.exists():
+        return direct
+    return REPO / "scripts" / f"{module}.py"
+
+
+def ambiguous_modules() -> List[str]:
+    """Names that exist in both `scripts/` and `scripts/security/`.
+
+    `module_path` resolves by existence, so a name in both places would
+    resolve to one of them and inspect the wrong file — passing while
+    checking something else, which is this programme's whole subject.
+    None exist today; this is the finding that says so if one appears.
+    """
+    return sorted(
+        p.stem for p in (REPO / "scripts").glob("*.py")
+        if (SECURITY / p.name).exists() and not p.stem.startswith("_"))
+
+
+def _swallows(line: str, step: dict, run: str) -> bool:
+    """Does this invocation's exit code get discarded?
+
+    A script whose exit code cannot fail the build is not enforcing, and
+    holding it to a gate's invariants would report a defect in code
+    behaving exactly as designed — the inverse error, and the worse one.
+
+    Three shapes, because the third was found the hard way. The first
+    draft knew `|| true` and `continue-on-error`, and classified
+    `behavioral_scoreboard` as enforcing. It is not, twice over: its step
+    is
+
+        set +e
+        out=$(python scripts/behavioral_scoreboard.py 2>&1)
+        ...
+        exit 0
+
+    and the script itself ends `asyncio.run(run()); sys.exit(0)`, so the
+    score it computes is deliberately advisory. The step even says so in
+    its name. Writing the test for it is what surfaced that — which is
+    what I-3 is for, aimed at my own detector.
+
+    **This is a lower bound and says so.** A step could `set +e` and then
+    `exit 1` on a condition, and deciding that needs shell semantics
+    rather than a regex. Under-reporting is the safe direction here for
+    the same reason the boundary-blindness scan under-reports: a survey
+    with false positives invites people to fix working code.
+    """
+    if (step or {}).get("continue-on-error") is True:
+        return True
+    if re.search(r"\|\|\s*(true|echo)", line):
+        return True
+    # The step manages its own exit code, so the script's is not the
+    # build's.
+    if re.search(r"^\s*set\s+\+e\b", run, re.M):
+        return True
+    return bool(re.search(r"^\s*exit\s+0\s*$", run, re.M))
 
 # Mirrored from the registry so `cross_check` stays a pure function that
 # the suite can call without importing the real registry.
@@ -100,10 +183,109 @@ def discover_modules() -> List[str]:
     so a new helper needs no edit here and a new *check* cannot hide as
     one.
     """
-    return sorted(
+    in_security = [
         p.stem for p in SECURITY.glob("*.py")
         if re.search(r"^def main\(", p.read_text(encoding="utf-8"), re.M)
-    )
+    ]
+    return sorted(set(in_security) | set(enforcing_elsewhere()))
+
+
+def enforcing_elsewhere() -> List[str]:
+    """Scripts outside `scripts/security/` that can fail the build.
+
+    The denominator was `scripts/security/*.py` — a *directory*, which is
+    where the checks happened to be put, not what makes something an
+    instrument. What makes it one is that CI runs it and a non-zero exit
+    stops the build.
+
+    Measured on 2026-08-06: 30 modules in that directory, and **eight**
+    outside it that can fail the build —
+
+        scripts/behavioral_scoreboard      scripts/ci/kill_isolation
+        scripts/ci/assert_clean_bringup    scripts/ci/live_smoke
+        scripts/ci/compose_probe           scripts/ci/make_dev_secrets
+        scripts/sync_docs                  scripts/test_restart_persistence
+
+    none of them registered, none held to I-1 through I-7, and the
+    meta-check printing `GATE PASSED: I-1 … I-7 hold` over all of it.
+    The seventeenth venue of this programme's one finding, and this time
+    in the file whose entire job is to catch it: **a check whose scope
+    was smaller than its name implied.**
+
+    `assert_clean_bringup` made it concrete. It was written this morning
+    to enforce in CI, it is the guard that decides whether a bring-up
+    succeeded — and because it lives in `scripts/ci/`, the registry could
+    not see it, could not find it unregistered, and reported the
+    instrumentation sound.
+
+    An invocation whose exit code is swallowed is excluded: it cannot
+    fail the build, so holding it to a gate's invariants would report a
+    defect in code doing exactly what it was written to do.
+    """
+    import yaml
+
+    found: Dict[str, bool] = {}
+    make_targets: set = set()
+    for path in workflow_files():
+        try:
+            doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        except Exception:
+            continue        # `cross_check` owns the unparseable-workflow finding
+        for job in (doc.get("jobs") or {}).values():
+            for step in (job or {}).get("steps") or []:
+                run = str((step or {}).get("run") or "")
+                # Join shell continuations first: a `|| true` after a
+                # trailing `\` belongs to the same command, and reading
+                # it per physical line got that wrong the first time.
+                joined = re.sub(r"\\\s*\n\s*", " ", run)
+                swallowed_step = _swallows("", step, run)
+                for line in joined.splitlines():
+                    for module in _INVOCATION.findall(line):
+                        if (SECURITY / f"{module}.py").exists():
+                            continue        # already in the directory scan
+                        enforcing = not _swallows(line, step, run)
+                        found[module] = found.get(module, False) or enforcing
+                if not swallowed_step:
+                    make_targets |= set(_MAKE_TARGET.findall(joined))
+
+    # A script can also enforce *through* a make target — `check-docs`
+    # runs `sync_docs.py --check`, and reading only workflow `run:` lines
+    # missed it. Measured before it was added, because widening a scope
+    # past the evidence is the worse defect: the 36 targets CI invokes
+    # run exactly **two** scripts directly, so this is a small, bounded
+    # extension rather than a floodgate.
+    #
+    # Recipe lines only, not prerequisites. `test-uh` is a target whose
+    # prerequisites are forty suites, and those are watched by
+    # `check_assertion_floors` and `check_suite_floor` — a different
+    # instrument, verified to cover them, not an assumption made here.
+    for module in _makefile_scripts(make_targets):
+        if not (SECURITY / f"{module}.py").exists():
+            found[module] = True
+    return sorted(m for m, enforcing in found.items() if enforcing)
+
+
+_MAKE_TARGET = re.compile(r"^\s*make\s+(?:--\S+\s+)*([a-z0-9][a-z0-9_-]*)",
+                          re.M)
+
+
+def _makefile_scripts(targets: set) -> List[str]:
+    """Scripts run directly by the recipe of any of `targets`."""
+    if not targets:
+        return []
+    lines = (REPO / "Makefile").read_text(encoding="utf-8").splitlines()
+    out: List[str] = []
+    for i, line in enumerate(lines):
+        match = re.match(r"^([a-z0-9][a-z0-9_-]*):", line)
+        if not match or match.group(1) not in targets:
+            continue
+        for j in range(i + 1, len(lines)):
+            if lines[j] and not lines[j].startswith(("\t", " ")):
+                break
+            if lines[j].lstrip().startswith("#"):
+                continue
+            out.extend(_INVOCATION.findall(lines[j]))
+    return sorted(set(out))
 
 
 # ── Source 2: what actually runs ─────────────────────────────────────
@@ -167,6 +349,18 @@ def discover_workflows() -> Dict[str, List[str]]:
             for step in (job or {}).get("steps") or []:
                 run = str((step or {}).get("run") or "")
                 for module in _INVOCATION.findall(run):
+                    found.setdefault(module, []).append(path.name)
+                # A workflow that runs `make check-docs` runs
+                # `sync_docs.py` just as surely as one naming it
+                # directly. Without this, a make-invoked gate could
+                # never have a declaration that matches reality: it
+                # would be discovered as enforcing by
+                # `enforcing_elsewhere` and as invoked by nobody here,
+                # so every possible `in_workflows` value was wrong. The
+                # two discoveries have to share one idea of "invoked",
+                # or the cross-check is comparing different questions.
+                for module in _makefile_scripts(
+                        set(_MAKE_TARGET.findall(run))):
                     found.setdefault(module, []).append(path.name)
     return {m: sorted(set(v)) for m, v in found.items()}
 
@@ -234,7 +428,7 @@ def skips_absent_input(module: str) -> List[int]:
     So this is a **lower bound**, and the report says so rather than
     presenting it as complete.
     """
-    path = SECURITY / f"{module}.py"
+    path = module_path(module)
     try:
         tree = ast.parse(path.read_text(encoding="utf-8"))
     except (OSError, SyntaxError):
@@ -274,7 +468,7 @@ def inert_rules(module: str) -> List[str]:
     Both shapes are detected: a policy-shaped constant nobody reads, and
     a conditional whose body is exactly `pass`.
     """
-    path = SECURITY / f"{module}.py"
+    path = module_path(module)
     try:
         tree = ast.parse(path.read_text(encoding="utf-8"))
     except (OSError, SyntaxError):
@@ -351,7 +545,7 @@ def probe_denominator(gate) -> Tuple[str, str]:
     if not gate.probe:
         return "skipped", gate.probe_skip_reason or "no reason given"
     result = subprocess.run(
-        [sys.executable, str(SECURITY / f"{gate.module}.py")],
+        [sys.executable, str(module_path(gate.module))],
         capture_output=True, text=True, cwd=str(REPO), timeout=300,
     )
     output = result.stdout + result.stderr
@@ -669,8 +863,16 @@ def main() -> int:
 
     counts = invariant_counts(problems)
     from scripts.security.closure_register import CLOSED
-    print(f"Instrumentation invariants — {len(REGISTRY)} checks "
-          f"cross-checked, {len(CLOSED)} finding(s) closed and re-verified\n")
+    # Both numbers, because they answer different questions and only
+    # their disagreement is interesting. This printed `len(REGISTRY)`
+    # alone — what somebody declared — so a headline of "30 checks
+    # cross-checked" was true of the register and said nothing about
+    # the eight build-failing instruments outside it. A denominator
+    # taken from the declaration cannot reveal a missing declaration.
+    on_disk = len(discover_modules())
+    print(f"Instrumentation invariants — {len(REGISTRY)} declared, "
+          f"{on_disk} found on disk, {len(CLOSED)} finding(s) closed "
+          f"and re-verified\n")
 
     # Say which teeth are engaged, so "partially on" reads as a design
     # decision rather than an accident.

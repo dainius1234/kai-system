@@ -40,6 +40,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.ci.compose_probe import exec_http, load_ports  # noqa: E402
 
 
+#: memu-core's real success status, from memu-core/app.py:1759. Named
+#: once rather than written into the assertion, its message and a
+#: comment separately — three copies of a contract is three chances
+#: for one of them to describe a service that has moved on.
+EXPECTED_STATUS = "appended"
+
+
 class _Caller:
     """Makes an HTTP call to the service, wherever the service can be reached.
 
@@ -159,9 +166,9 @@ def main() -> int:
     # The id is what actually matters here — it is the handle the record
     # is retrieved by in [4/4], so a response without one would make the
     # rest of this test meaningless rather than merely failing.
-    if result.get("status") != "appended":
+    if result.get("status") != EXPECTED_STATUS:
         print(f"FAIL: memorize did not append. memu-core returns "
-              f"status='appended' on success; got: {result}")
+              f"status={EXPECTED_STATUS!r} on success; got: {result}")
         return 1
     if not result.get("id"):
         print(f"FAIL: memorize appended but returned no id, so there is "

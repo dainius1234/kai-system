@@ -38,7 +38,7 @@ from scripts.security import check_image_modules as gate  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 11
+EXPECTED_SCENARIOS = 14
 executed: list = []
 
 
@@ -231,7 +231,84 @@ def test_the_dockerfile_list_comes_from_a_walk() -> None:
               all("_archive" not in str(p) for p in got), str(got))
 
 
+# ── the scope this gate shipped with ─────────────────────────────────
+
+def test_a_repo_root_package_counts_as_a_module_the_image_needs() -> None:
+    """The defect this gate shipped with, found by a CI run.
+
+    `reachable` built its universe as `service.glob("*.py")` — the
+    service's own directory and nothing else. So a service importing
+    `common.http_hygiene` needed `common/` in its image and this gate
+    could not see the need, because `common` was not a sibling.
+
+    It printed `PASS: all 49 Python service image(s) contain the modules
+    they import` while three of them could not start:
+
+        backup-service-1 | from common.http_hygiene import pooled_client
+        backup-service-1 | ModuleNotFoundError: No module named 'common'
+    """
+    scenario("root package is in scope")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "common").mkdir()
+        (root / "common" / "__init__.py").write_text("")
+        svc = root / "svc"
+        svc.mkdir()
+        (svc / "app.py").write_text(
+            "from common.http_hygiene import pooled_client\n")
+        text = ("FROM python:3.11-slim\n"
+                "COPY svc/app.py ./app.py\n"
+                'CMD ["python", "app.py"]\n')
+        pkgs = gate.root_packages(root)
+        check("common is discovered as a root package", pkgs == {"common"},
+              str(pkgs))
+        need = gate.reachable({svc / "app.py"}, svc, pkgs)
+        check("and the entry point is seen to need it", need == {"common"},
+              str(need))
+        found = gate.findings_in(text, svc, "svc/Dockerfile", root)
+        check("so the missing COPY is reported", len(found) == 1, str(found))
+
+
+def test_copying_the_package_satisfies_it() -> None:
+    """The inverse direction. A gate that reports the need but never
+    sees it met would fail every correct image."""
+    scenario("copied package satisfies")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "common").mkdir()
+        (root / "common" / "__init__.py").write_text("")
+        svc = root / "svc"
+        svc.mkdir()
+        (svc / "app.py").write_text("from common.errors import X\n")
+        text = ("FROM python:3.11-slim\n"
+                "COPY svc/app.py ./app.py\n"
+                "COPY common/ ./common/\n"
+                'CMD ["python", "app.py"]\n')
+        check("nothing reported",
+              gate.findings_in(text, svc, "svc/Dockerfile", root) == [],
+              str(gate.findings_in(text, svc, "svc/Dockerfile", root)))
+
+
+def test_a_third_party_import_is_not_a_missing_module() -> None:
+    """`import fastapi` is pip's job, not COPY's. Reporting it would be
+    a scope larger than reality — findings against working images."""
+    scenario("third-party import ignored")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        svc = root / "svc"
+        svc.mkdir()
+        (svc / "app.py").write_text("import fastapi\nimport httpx\n")
+        text = ("FROM python:3.11-slim\n"
+                "COPY svc/app.py ./app.py\n"
+                'CMD ["python", "app.py"]\n')
+        check("nothing reported",
+              gate.findings_in(text, svc, "svc/Dockerfile", root) == [], "")
+
+
 def run_all() -> None:
+    test_a_repo_root_package_counts_as_a_module_the_image_needs()
+    test_copying_the_package_satisfies_it()
+    test_a_third_party_import_is_not_a_missing_module()
     test_the_real_defect_is_caught()
     test_copying_the_directory_fixes_it()
     test_the_walk_is_transitive()
