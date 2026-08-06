@@ -123,5 +123,8 @@ jobs:
       - name: Every image contains the modules its entry point imports
         run: python scripts/security/check_image_modules.py
 
+      - name: Every test pins the identity it claims to run as
+        run: python scripts/security/check_test_identity.py
+
       - name: Instrumentation invariants (I-4 enforced)
         run: python scripts/security/check_gate_registry.py --gate

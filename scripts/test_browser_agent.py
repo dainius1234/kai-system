@@ -29,7 +29,7 @@ from fastapi.testclient import TestClient
 # one answers 503 and the assertions below would be testing the refusal,
 # not the handler.
 import os as _os
-_os.environ.setdefault("KAI_SERVICE_TOKEN", "test-service-token")
+_os.environ["KAI_SERVICE_TOKEN"] = "test-service-token"
 _SVC_AUTH = {"Authorization": f"Bearer {_os.environ['KAI_SERVICE_TOKEN']}"}
 
 client = TestClient(app, headers=_SVC_AUTH)

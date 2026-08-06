@@ -36,7 +36,7 @@ _originals = {m: sys.modules.get(m) for m in _STUB_NAMES}
 for mod_name in _STUB_NAMES:
     sys.modules[mod_name] = MagicMock()
 
-os.environ.setdefault("MEMU_HMAC_KEY", "test-key")
+os.environ["MEMU_HMAC_KEY"] = "test-key"
 os.environ.setdefault("VECTOR_STORE", "memory")
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))

@@ -75,7 +75,7 @@ sys.path.insert(0, os.path.join(ROOT, "agentic"))
 
 # Set env vars before import to keep the app deterministic
 os.environ.setdefault("LEDGER_PATH", "/tmp/test-ar-ledger.jsonl")
-os.environ.setdefault("TRUSTED_TOKENS_PATH", "/tmp/test-ar-tokens.json")
+os.environ["TRUSTED_TOKENS_PATH"] = "/tmp/test-ar-tokens.json"
 os.environ.setdefault("NONCE_CACHE_PATH", "/tmp/test-ar-nonces.json")
 os.environ.setdefault("BREAKER_STATE_PATH", "/tmp/test-ar-breakers.json")
 os.environ.setdefault("CONVICTION_OVERRIDE_PATH", "/tmp/test-ar-overrides.txt")

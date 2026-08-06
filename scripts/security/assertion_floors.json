@@ -35,6 +35,7 @@
     "Service Auth Tests": 59,
     "Service Token Tests": 24,
     "Suite Floor Tests": 18,
+    "Test Identity Tests": 31,
     "Test Isolation Tests": 38,
     "Test Wiring Tests": 15,
     "UH-1 Contract Tests": 126,
@@ -49,5 +50,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2683
+  "total": 2714
 }

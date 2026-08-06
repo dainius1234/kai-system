@@ -399,6 +399,20 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-044",)),
+    # security_fuzz_upload said `environ.setdefault("KAI_DASHBOARD_ROLE",
+    # "keeper")` and ran as whatever the environment said. When CI gained
+    # an operator token, eight of its fourteen tests silently changed
+    # from checking upload validation to checking authorisation.
+    # KAI-GATE-045.
+    Gate(module="check_test_identity",
+         kind=GATE,
+         summary="every test pins the identity it claims to run as",
+         inputs=(".",),
+         denominator=r"inspected: \d+ environ.setdefault call",
+         proven_by="scripts/test_test_identity.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-045",)),
     Gate(module="check_test_wiring",
          kind=GATE,
          summary="every test in a self-run suite is dispatched",

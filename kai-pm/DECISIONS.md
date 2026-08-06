@@ -7939,3 +7939,83 @@ place** — which is what this is.
 The gate is not closed. But for the first time the remaining steps have
 a running system to run against, and the only thing that was stopping
 them was an instrument asking the wrong question.
+
+---
+
+## 2026-08-06 (part 38) — my own change broke a green step, and the reason was worth it
+
+Run 31089782963 failed at **step 9**, "Upload endpoint security fuzz" —
+a step green in every run today. My previous commit caused it:
+`KAI_DASHBOARD_TOKEN`/`IDENTITY`/`ROLE` at **job** scope reach every
+step, not only the Docker ones.
+
+```
+FAILED test_exactly_at_limit_is_forwarded
+FAILED test_no_filename_rejected
+FAILED test_one_byte_over_limit_returns_413
+FAILED test_oversized_payload_returns_413
+FAILED test_happy_path_returns_ocr_json
+FAILED test_ocr_4xx_is_passed_through
+FAILED test_ocr_5xx_becomes_502
+FAILED test_ocr_unreachable_becomes_503
+8 failed, 6 passed
+```
+
+Reproduced locally in one command. But the cause is not the scoping.
+
+### `setdefault` is not "set"
+
+`scripts/security_fuzz_upload.py` opens with:
+
+```python
+_os.environ.setdefault("KAI_DASHBOARD_TOKEN", "test-dashboard-token")
+_os.environ.setdefault("KAI_DASHBOARD_IDENTITY", "test-operator")
+_os.environ.setdefault("KAI_DASHBOARD_ROLE", "keeper")
+```
+
+which reads as *"this suite runs as keeper"*. **It does not.**
+`setdefault` means *unless somebody else already decided* — and I had
+just decided, `operator`.
+
+`/api/upload` requires `Scope.WRITE_EXTERNAL`. `keeper` has it;
+`operator` does not. So eight tests stopped asserting **upload
+validation** and started asserting **authorisation**. Proven both ways:
+with `KAI_DASHBOARD_ROLE=keeper`, 14 pass; with `operator`, 8 fail.
+
+Neither the tests nor the endpoint were wrong. **The suite's identity
+was chosen by an environment variable it did not control**, so what it
+verified depended on who ran it — and in CI it had only ever run at
+whatever privilege happened to be ambient.
+
+That is the systemic finding aimed at a *test* rather than a check: its
+scope — **which privilege am I exercising** — was inherited rather than
+stated, and it reported success over a question it never asked.
+
+### KAI-GATE-045 — `check_test_identity`
+
+Swept the tree: **29 identity-bearing `environ.setdefault` calls across
+19 files**, all changed to assignment. The other 44 — paths, cache
+locations, feature flags — left alone, because a test tolerating an
+ambient `/tmp` path is not thereby testing something different.
+
+The rule: in a test file, a variable naming an identity, a credential
+or a privilege (TOKEN, ROLE, IDENTITY, SECRET, HMAC, PRINCIPAL, AUTH,
+KEY) must be **assigned**, not `setdefault`.
+
+Calibrated against the real file: `git show
+1689e19:scripts/security_fuzz_upload.py` gives exactly three findings;
+the fixed tree gives none across 205 test files. `conftest.py` is in the
+denominator — it sets the environment every suite inherits, so an
+ambient identity there reaches all of them at once.
+
+Verified the fix does what it claims: with `KAI_DASHBOARD_ROLE=operator`
+exported, both `test-upload-fuzz` (14) and `test-audio-transcribe` (13)
+pass, because they pin their own.
+
+### What this cost and what it bought
+
+It cost one CI cycle, caused by my own change. It bought the discovery
+that a **security** fuzz suite had never verified what its name says —
+and the same pattern in eighteen other files.
+
+`pytest scripts/`: **4,496 passed, 6 skipped, 0 failed.**

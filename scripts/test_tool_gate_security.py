@@ -9,8 +9,7 @@ from pathlib import Path
 
 from fastapi import HTTPException
 
-os.environ.setdefault("HMAC_ALLOW_DEV_SECRET", "true")
-
+os.environ["HMAC_ALLOW_DEV_SECRET"] = "true"
 from common.auth import sign_gate_request
 
 # Set LEDGER_PATH to a temp dir before importing tool-gate (it creates the dir on import)

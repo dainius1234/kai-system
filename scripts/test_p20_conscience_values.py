@@ -37,7 +37,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "agentic"))
 
 os.environ.setdefault("LEDGER_PATH", "/tmp/test-p20-ledger.jsonl")
-os.environ.setdefault("TRUSTED_TOKENS_PATH", "/tmp/test-p20-tokens.json")
+os.environ["TRUSTED_TOKENS_PATH"] = "/tmp/test-p20-tokens.json"
 os.environ.setdefault("NONCE_CACHE_PATH", "/tmp/test-p20-nonces.json")
 
 

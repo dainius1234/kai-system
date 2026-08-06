@@ -5,9 +5,7 @@ import sys
 
 # Allow dev HMAC secret in test environment to avoid RuntimeError
 # in common.auth._secret() when INTERSERVICE_HMAC_SECRET is not set.
-os.environ.setdefault("HMAC_ALLOW_DEV_SECRET", "true")
-
-
+os.environ["HMAC_ALLOW_DEV_SECRET"] = "true"
 # agentic/app.py writes the soul document to
 # `Path(os.getenv("SOUL_PATH", "/data/SOUL.md"))`, and falls back to the
 # *relative* `data/SOUL.md` — which, with pytest's cwd at the repo root, is

@@ -81,8 +81,8 @@ def _load(yf_stub: "types.ModuleType | None") -> object:
     module_name = f"_bb_yf_app_{_load_counter}"
 
     import os
-    os.environ.setdefault("BINANCE_API_KEY", "test-key")
-    os.environ.setdefault("BINANCE_API_SECRET", "test-secret")
+    os.environ["BINANCE_API_KEY"] = "test-key"
+    os.environ["BINANCE_API_SECRET"] = "test-secret"
     os.environ.setdefault("BINANCE_MODE", "spot")
 
     if yf_stub is None:

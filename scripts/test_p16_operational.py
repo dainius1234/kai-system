@@ -38,7 +38,7 @@ sys.path.insert(0, os.path.join(ROOT, "agentic"))
 
 # Set env vars before importing
 os.environ.setdefault("LEDGER_PATH", "/tmp/test-p16-ledger.jsonl")
-os.environ.setdefault("TRUSTED_TOKENS_PATH", "/tmp/test-p16-tokens.json")
+os.environ["TRUSTED_TOKENS_PATH"] = "/tmp/test-p16-tokens.json"
 os.environ.setdefault("NONCE_CACHE_PATH", "/tmp/test-p16-nonces.json")
 
 

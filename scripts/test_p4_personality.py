@@ -28,10 +28,10 @@ _STUBS = absent_stubs((
     "psycopg2", "lakefs_client",
 ))
 
-os.environ.setdefault("MEMU_HMAC_KEY", "test-key")
+os.environ["MEMU_HMAC_KEY"] = "test-key"
 os.environ.setdefault("VECTOR_STORE", "memory")
 os.environ.setdefault("LEDGER_PATH", "/tmp/test-tool-gate-ledger.jsonl")
-os.environ.setdefault("TRUSTED_TOKENS_PATH", "/tmp/test-trusted-tokens.txt")
+os.environ["TRUSTED_TOKENS_PATH"] = "/tmp/test-trusted-tokens.txt"
 os.environ.setdefault("NONCE_CACHE_PATH", "/tmp/test-nonces.json")
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))

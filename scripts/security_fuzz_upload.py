@@ -34,9 +34,9 @@ app = _mod.app
 # present credentials or every route answers 503 instead of exercising
 # the handler under test.
 import os as _os
-_os.environ.setdefault("KAI_DASHBOARD_TOKEN", "test-dashboard-token")
-_os.environ.setdefault("KAI_DASHBOARD_IDENTITY", "test-operator")
-_os.environ.setdefault("KAI_DASHBOARD_ROLE", "keeper")
+_os.environ["KAI_DASHBOARD_TOKEN"] = "test-dashboard-token"
+_os.environ["KAI_DASHBOARD_IDENTITY"] = "test-operator"
+_os.environ["KAI_DASHBOARD_ROLE"] = "keeper"
 _DASH_AUTH = {"Authorization": f"Bearer {_os.environ['KAI_DASHBOARD_TOKEN']}"}
 
 client = TestClient(app, headers=_DASH_AUTH)
