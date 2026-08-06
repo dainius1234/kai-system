@@ -617,16 +617,45 @@ class TurboVecStore(PGVectorStore):
             else:
                 self._index = self._IdMapIndex(self._tv_dim, self._tv_bits)
         else:
+            # `import socket` used to sit inside the `if lock exists:`
+            # branch below — the branch that unconditionally raises. So
+            # the only path that reached `socket.gethostname()` was the
+            # one where the import had never run:
+            #
+            #   UnboundLocalError: cannot access local variable 'socket'
+            #
+            # Which means the writer path has **never completed**, and
+            # `.writer.lock` has never been written in any deployment.
+            # The single-writer guarantee this block exists to provide
+            # has not been in force at any point. Same shape as the
+            # `_pool_lock` defect above it: a name bound on one path and
+            # used on another.
+            import socket
+
             self._tv_path.parent.mkdir(parents=True, exist_ok=True)
+            holder = ""
             if self._tv_lock_path.exists():
-                import socket
-                existing = self._tv_lock_path.read_text().strip()
+                holder = self._tv_lock_path.read_text().strip()
+            host = socket.gethostname()
+            if holder and not holder.startswith(f"{host}:"):
+                # A different container holds it. That is the case this
+                # lock is for: two writers on one index corrupt it.
                 raise RuntimeError(
-                    f"TurboVec writer lock held by {existing} — "
+                    f"TurboVec writer lock held by {holder} — "
                     f"only one writer process is allowed. "
                     f"Set TURBOVEC_READ_ONLY=true for read-only access."
                 )
-            self._tv_lock_path.write_text(f"{socket.gethostname()}:{os.getpid()}")
+            if holder:
+                # Our own hostname, so this is a lock our previous
+                # incarnation left behind: `_release_lock` runs from
+                # `atexit`, which does not run on SIGKILL. Refusing here
+                # would make the first hard kill permanent and hide
+                # whatever actually caused it — a failure mode worse
+                # than the one being guarded against.
+                logger.warning(
+                    "Reclaiming stale TurboVec writer lock from %s "
+                    "(same host, previous process)", holder)
+            self._tv_lock_path.write_text(f"{host}:{os.getpid()}")
             import atexit
             atexit.register(self._release_lock)
             if self._tv_path.exists():
