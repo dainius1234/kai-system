@@ -118,6 +118,50 @@ def count_services(paths: Iterable[Path]) -> int:
     return total
 
 
+def compose_files(root: Path = REPO) -> List[Path]:
+    """Every root compose profile, from a glob rather than a list.
+
+    Lived in three files independently — `check_compose_interpolation`,
+    `report_execution_coverage` and, as a hand-written pair of names, in
+    `test_docker_e2e`. Three copies of a denominator is three chances for
+    one of them to fall behind a fourth profile, which is the
+    list-beside-the-thing pattern applied to the lists themselves.
+    """
+    return sorted(p for p in root.glob("docker-compose*.y*ml") if p.is_file())
+
+
+def built_services(root: Path = REPO) -> "dict":
+    """`service name -> Dockerfile path` for every image this repo builds.
+
+    The denominator for any question of the form *"do all our services
+    do X?"*. Derived from the `build:` stanzas, so a service added to a
+    profile is in scope the moment it is added — and a service using
+    somebody else's image (`redis:7-alpine`) is not, because that is not
+    our code to hold to our rules.
+
+    A service defined in more than one profile maps to the Dockerfile of
+    whichever profile names it; they agree today, and `check_image_modules`
+    is the check that would notice if they stopped.
+    """
+    import yaml
+    out = {}
+    for path in compose_files(root):
+        try:
+            doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        except Exception:
+            continue
+        for name, cfg in (doc.get("services") or {}).items():
+            build = (cfg or {}).get("build")
+            if not build:
+                continue
+            if isinstance(build, dict):
+                rel = build.get("dockerfile") or f"{build.get('context','.')}/Dockerfile"
+            else:
+                rel = f"{build}/Dockerfile"
+            out.setdefault(name, root / rel)
+    return out
+
+
 def inspected(count: int, unit: str, extra: str = "") -> str:
     """The denominator line. Say what was examined, every time.
 

@@ -60,7 +60,8 @@ REPO = Path(__file__).resolve().parent.parent.parent
 
 sys.path.insert(0, str(REPO))
 
-from scripts.security.gate_inputs import inspected  # noqa: E402
+from scripts.security.gate_inputs import (  # noqa: E402
+    compose_files as _compose_files, inspected)
 
 #: `$$NAME` first so an escaped reference is consumed before the bare
 #: pattern can match its tail. `${NAME:-x}` and `${NAME}` are captured
@@ -73,14 +74,15 @@ _REF = re.compile(r"""
 
 
 def compose_files(root: Path = None) -> List[Path]:
-    """Every compose file at the repo root, from a glob.
+    """Every compose file at the repo root — see `gate_inputs.compose_files`.
 
     Derived rather than listed for the reason this gate exists: the
     runtime check it replaces named one profile and the defect was in
-    another.
+    another. Kept as a thin alias because this glob had been written out
+    three times independently, which is the list-beside-the-thing
+    pattern applied to the lists themselves.
     """
-    root = root or REPO
-    return sorted(p for p in root.glob("docker-compose*.y*ml") if p.is_file())
+    return _compose_files(root or REPO)
 
 
 def env_example_names(root: Path = None) -> Set[str]:

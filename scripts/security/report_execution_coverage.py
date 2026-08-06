@@ -49,7 +49,8 @@ REPO = Path(__file__).resolve().parent.parent.parent
 
 sys.path.insert(0, str(REPO))
 
-from scripts.security.gate_inputs import inspected  # noqa: E402
+from scripts.security.gate_inputs import (  # noqa: E402
+    compose_files as _compose_files, inspected)
 
 WORKFLOW = ".github/workflows/core-tests.yml"
 
@@ -57,8 +58,8 @@ _UP = re.compile(r"docker\s+compose\s+-f\s+(\S+)\s+up\s+(-d\s*)?(?P<tail>[^\n|;]
 
 
 def compose_files(root: Path = None) -> List[Path]:
-    root = root or REPO
-    return sorted(p for p in root.glob("docker-compose*.y*ml") if p.is_file())
+    """Every compose profile — see `gate_inputs.compose_files`."""
+    return _compose_files(root or REPO)
 
 
 def started_by_ci(root: Path = None,
