@@ -8,7 +8,7 @@
     "Compose Env Tests": 18,
     "Compose Gate Tests": 54,
     "Compose Interpolation Tests": 28,
-    "Compose Probe Tests": 34,
+    "Compose Probe Tests": 44,
     "Concurrency & Clock Tests": 51,
     "Constraint Assessment Tests": 56,
     "Dashboard Auth Tests": 99,
@@ -50,5 +50,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2714
+  "total": 2724
 }

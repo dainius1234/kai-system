@@ -459,6 +459,27 @@ jobs:
             --compose-file docker-compose.minimal.yml \
             --service memu-core
 
+      # `Dump container logs on failure` sits at step 50, immediately
+      # after the bring-up, so `if: failure()` there can only ever
+      # capture a bring-up failure. Live smoke, kill-isolation and
+      # restart-persistence all run *after* it and all talk to the same
+      # containers — and when restart-persistence failed on 2026-08-06
+      # the only evidence left was a post-mortem taken after teardown,
+      # which by then had nothing to show.
+      #
+      # A step named "dump container logs on failure" that covers a
+      # third of the failures is the pattern this programme keeps
+      # finding: scope smaller than the name. This is the other end of
+      # the live section, before anything is torn down.
+      - name: Dump container logs on failure (after the live steps)
+        if: failure()
+        run: |
+          echo "── containers, including stopped ──────────────────────"
+          docker compose -f docker-compose.minimal.yml ps -a || true
+          echo "── logs ───────────────────────────────────────────────"
+          docker compose -f docker-compose.minimal.yml logs --no-color \
+            --tail 60 || true
+
       - name: Tear down minimal stack
         if: always()
         run: |

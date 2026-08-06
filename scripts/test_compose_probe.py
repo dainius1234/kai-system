@@ -29,7 +29,7 @@ from scripts.ci import compose_probe as probe  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 16
+EXPECTED_SCENARIOS = 19
 executed: list = []
 
 
@@ -305,7 +305,65 @@ def test_a_running_container_without_a_healthcheck_still_says_so() -> None:
           probe.compose_health("x.yml", runner)["x"])
 
 
+def test_a_failed_exec_says_the_exit_code_not_the_wallpaper() -> None:
+    """What a failed `docker compose exec` used to report:
+
+        FAIL: memorize request failed: time="…" level=warning
+        msg="The \"DB_PASSWORD\" variable is not set…"
+
+    Three lines of compose boilerplate, no exit code, and no hint that
+    the *exec* had failed rather than the service having answered badly.
+    The warning is not the error; printing it as though it were sends
+    the reader after the wrong thing."""
+    scenario("exec failure legible")
+
+    def runner(cmd):
+        return 1, "", ('time="2026-08-06T10:42:08Z" level=warning '
+                       'msg="The DB_PASSWORD variable is not set."\n'
+                       'service "memu-core" is not running\n')
+
+    ok, detail, _ = probe.exec_http("x.yml", "memu-core", 8001, "GET", "/h",
+                                    runner=runner)
+    check("it fails", not ok, detail)
+    check("the exit code is named", "exit 1" in detail, detail)
+    check("the real line survives",
+          'service "memu-core" is not running' in detail, detail)
+    check("and the wallpaper is gone", "level=warning" not in detail, detail)
+
+
+def test_meaningful_keeps_a_real_error_alone() -> None:
+    scenario("meaningful filter")
+    check("noise-only output collapses to nothing",
+          probe._meaningful('time="x" level=warning msg="y"\n\n') == "", "")
+    check("a real line is kept",
+          probe._meaningful("Traceback (most recent call last):") ==
+          "Traceback (most recent call last):", "")
+    check("the version warning is noise",
+          probe._meaningful("the attribute `version` is obsolete") == "", "")
+
+
+def test_an_expected_status_is_enforced_both_ways() -> None:
+    """`expect` is what lets a probe tell *refusing correctly* from
+    *broken* — both answer with a status, and only the expectation
+    distinguishes them."""
+    scenario("expect enforced")
+
+    def answering(status):
+        return lambda cmd: (0, f"STATUS {status}\n{{}}", "")
+
+    ok, detail, _ = probe.exec_http("x.yml", "d", 8080, "GET", "/g",
+                                    runner=answering(403), expect=(401, 403))
+    check("an expected refusal passes", ok, detail)
+    ok, detail, _ = probe.exec_http("x.yml", "d", 8080, "GET", "/g",
+                                    runner=answering(200), expect=(401, 403))
+    check("an unexpected success fails", not ok, detail)
+    check("and says what was wanted", "expected 401 or 403" in detail, detail)
+
+
 def run_all() -> None:
+    test_a_failed_exec_says_the_exit_code_not_the_wallpaper()
+    test_meaningful_keeps_a_real_error_alone()
+    test_an_expected_status_is_enforced_both_ways()
     test_a_dead_container_is_not_reported_as_no_healthcheck()
     test_a_restarting_container_is_named_as_restarting()
     test_a_running_container_without_a_healthcheck_still_says_so()

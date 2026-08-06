@@ -76,7 +76,18 @@ class _Caller:
         ok, detail, payload = exec_http(
             self.compose_file, self.service, self.port, method, path, body)
         if not ok:
-            raise RuntimeError(detail)
+            # The body, not just the status. `exec_http` returns what the
+            # service actually said and this used to drop it on the
+            # floor, so a failure here read as `HTTP 500` and nothing
+            # else — the reader then has no way to tell a crashed
+            # handler from a rejected payload without another CI round
+            # trip. Same class as the three instrument defects fixed
+            # earlier today: reporting less than the instrument knows.
+            body_text = (payload or "").strip()
+            raise RuntimeError(
+                f"{method} {path} -> {detail}"
+                + (f"; body: {body_text[:400]}" if body_text
+                   else "; the service returned no body"))
         try:
             return json.loads(payload)
         except json.JSONDecodeError as exc:

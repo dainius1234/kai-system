@@ -189,6 +189,19 @@ def wait_healthy(compose_file: str, services: Sequence[str],
     return [f"{name}: {last.get(name, 'unknown')}" for name in pending]
 
 
+#: Lines docker compose prints on every invocation regardless of outcome.
+#: They are not errors and burying the real one under them is how a
+#: signal becomes wallpaper.
+_COMPOSE_NOISE = re.compile(
+    r'^\s*time="[^"]*"\s+level=warning|^\s*$|the attribute `version` is obsolete')
+
+
+def _meaningful(text: str, limit: int = 400) -> str:
+    """`text` with compose's unconditional warnings removed."""
+    kept = [ln for ln in text.splitlines() if not _COMPOSE_NOISE.search(ln)]
+    return "\n".join(kept).strip()[:limit]
+
+
 def exec_http(compose_file: str, service: str, port: int, method: str,
               path: str, body: dict | None = None,
               runner: Runner = run,
@@ -231,7 +244,20 @@ def exec_http(compose_file: str, service: str, port: int, method: str,
     code, out, err = runner(["docker", "compose", "-f", compose_file,
                              "exec", "-T", service, "python", "-c", program])
     if code != 0:
-        return False, ((out + err).strip()[:300] or f"exit {code}"), ""
+        # Say the exit code *and* the output, with compose's own
+        # boilerplate stripped. This used to return `(out + err)` alone,
+        # so a failed exec reported
+        #
+        #   FAIL: memorize request failed: time="…" level=warning
+        #   msg="The \"DB_PASSWORD\" variable is not set…"
+        #
+        # — three lines of compose wallpaper, no exit code, and no hint
+        # that `docker compose exec` itself had failed rather than the
+        # service having answered badly. The warning is not the error;
+        # printing it as though it were sends the reader after the wrong
+        # thing entirely.
+        return False, f"docker compose exec failed (exit {code}): " \
+                      f"{_meaningful(out + err) or '(no output)'}", ""
     match = re.search(r"STATUS (\d+)", out)
     if not match:
         # Say what was wrong *and* what was seen. Returning the raw output

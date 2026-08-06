@@ -8019,3 +8019,91 @@ that a **security** fuzz suite had never verified what its name says —
 and the same pattern in eighteen other files.
 
 `pytest scripts/`: **4,496 passed, 6 skipped, 0 failed.**
+
+---
+
+## 2026-08-06 (part 39) — steps 51 and 52 pass, and the evidence for 53 does not exist
+
+Run 31092649079:
+
+```
+  step 49  Bring up minimal stack ........ PASS   (60s)
+  step 51  Live smoke .................... PASS   <- first time ever
+  step 52  Kill-isolation ................ PASS   <- first time ever, 14s
+  step 53  Restart-persistence ........... FAIL
+```
+
+Two more of the thirteen dead steps are alive. Kill-isolation is the one
+worth naming: it stops `memu-core-introspect` and proves the hot path
+survives. That is a real resilience property, demonstrated rather than
+assumed, for the first time.
+
+This morning core-tests died at step 7 of 62. It now dies at 53.
+
+### I cannot say why 53 failed, and that is the finding
+
+It failed in about a second, at `[1/4] Writing marker memory`. Beyond
+that I have nothing, and there are three separate reasons — all of them
+instruments reporting less than they know:
+
+**1. `Dump container logs on failure` is at step 50.**
+It sits immediately after the bring-up, so `if: failure()` there can
+only ever capture a *bring-up* failure. Live smoke, kill-isolation and
+restart-persistence all run after it, against the same containers. When
+53 failed, the only evidence left was the post-mortem — taken after
+teardown, by which point there was nothing to show.
+
+A step named *"dump container logs on failure"* that covers a third of
+the failures is this programme's own pattern: **scope smaller than the
+name.** A second dump now runs at the other end of the live section,
+before anything is torn down.
+
+**2. `_Caller.call` threw the response body away.**
+
+```python
+ok, detail, payload = exec_http(...)
+if not ok:
+    raise RuntimeError(detail)      # payload dropped
+```
+
+`detail` is `HTTP 500`. `payload` is what the service *said*. So a
+failure read as a status and nothing else, and no one could tell a
+crashed handler from a rejected payload without another CI round trip.
+
+**3. `exec_http` printed compose's wallpaper instead of the error.**
+
+```
+FAIL: memorize request failed: time="…" level=warning
+  msg="The \"DB_PASSWORD\" variable is not set…"
+```
+
+That is what a *failed exec* looked like: three lines of boilerplate
+compose prints on every invocation, no exit code, and no hint that
+`docker compose exec` itself had failed rather than the service having
+answered badly. It now says `docker compose exec failed (exit N):`
+followed by the output with compose's unconditional warnings filtered
+out — the wallpaper problem, inside an error message.
+
+### Not guessed at
+
+There is no local Docker daemon in this environment, so the stack cannot
+be reproduced here and CI is the only instrument. Rather than guess at a
+cause from a one-second timestamp, the three instruments are fixed so
+that the next run *answers the question*. Directive 1 applies hardest
+when the answer would be cheap to invent.
+
+Six assertions cover the new behaviour: the exit code survives, the real
+line survives, the wallpaper does not, and `expect` is enforced in both
+directions.
+
+### Running total for the day
+
+```
+  defects in the system found and fixed .......... 9
+  gates added (KAI-GATE-041..045) ................ 5
+  my own instruments caught misreporting ......... 6
+```
+
+The instrument count is the one that keeps growing, and it should be
+said plainly: every one was found by reading what actually happened
+instead of what the instrument said about it.
