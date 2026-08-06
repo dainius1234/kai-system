@@ -219,20 +219,28 @@ def shared_container_names(root: Path = None) -> List[str]:
         Conflict. The container name "/sovereign-memu-core" is already
         in use
 
-    Six such names are shared between `docker-compose.minimal.yml` and
-    `docker-compose.sovereign.yml`, which is survivable only because CI
+    Six such names were shared between `docker-compose.minimal.yml` and
+    `docker-compose.sovereign.yml`, which was survivable only because CI
     happens to tear each stack down before starting the next, and every
     teardown is `if: always()`. That is a property of the workflow, not
-    of the compose files, and it is one edit away from not being true.
+    of the compose files, and it was one edit away from not being true.
 
     Not hypothetical: `DECISIONS.md` line 1414 records this exact class
     biting before, with `sovereign-memu-core` and
     `sovereign-memu-core-introspect` colliding inside a single profile.
 
-    Reported, not failed. Renaming a container is a change with reach —
-    `docs/sovereign_ai_spec.md` and `kai-pm/PHASE1_READINESS.md` both
-    name these containers — and a gate that turns red before anyone has
-    decided what the names should be is a gate people learn to ignore.
+    This was **reported, not failed** while the names were still an open
+    question — renaming a container has reach, and a gate that turns red
+    before anyone has decided what the names should be is a gate people
+    learn to ignore. On 2026-08-05 the operator decided: suffix them.
+    The minimal profile's six now end in `-minimal`; the sovereign
+    profile keeps the names that `docs/sovereign_ai_spec.md` and
+    `kai-pm/PHASE1_READINESS.md` document. `docker-compose.full.yml`
+    pins no `container_name` at all and never collided.
+
+    So the finding is closed and the rule is **now a failure**. Leaving
+    it in reporting mode with nothing left to report would make it inert
+    — a rule that cannot fail is not a rule (I-5).
     """
     import yaml
     root = root or Path(__file__).resolve().parent.parent.parent
@@ -274,12 +282,10 @@ def main() -> int:
                     f"across {len(PROFILES)} profiles"))
 
     if shared:
-        print(f"\n  Container names claimed by more than one profile "
-              f"({len(shared)}) — reported, not failed. Docker container "
-              f"names are global to\n  the daemon, so these profiles cannot "
-              f"both be up. KAI-GATE-031:")
-        for line in shared:
-            print(f"    ! {line}")
+        # KAI-GATE-031, closed 2026-08-05 and now enforced: Docker
+        # container names are global to the daemon, so two profiles
+        # claiming one name cannot both be up.
+        violations.extend(shared)
 
     if hardening:
         print(f"\n  Hardening above the floor ({len(hardening)}) — allowed, "

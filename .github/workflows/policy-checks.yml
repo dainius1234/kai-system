@@ -102,7 +102,17 @@ jobs:
       - name: Every compose bring-up supplies the variables it needs
         run: python scripts/security/check_compose_env.py
 
+      # This step had no `- name:` of its own, so its `run:` became a
+      # second `run:` key on the step above. YAML keeps the last one:
+      # the job showed "Every compose bring-up supplies the variables it
+      # needs" and executed check_test_wiring.py. check_compose_env.py
+      # has never run in CI, and the step that claimed to run it was
+      # green every time.
+      - name: Every test in a self-run suite is dispatched
         run: python scripts/security/check_test_wiring.py
+
+      - name: Every `$` in a compose command reaches whoever wrote it
+        run: python scripts/security/check_compose_interpolation.py
 
       - name: Instrumentation invariants (I-4 enforced)
         run: python scripts/security/check_gate_registry.py --gate

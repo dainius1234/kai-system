@@ -308,17 +308,36 @@ def test_services_without_a_container_name_are_ignored():
               str(drift.shared_container_names(root)))
 
 
-def test_the_real_tree_reports_the_six_that_are_known():
-    """Calibration against the repository. Reads it, and can only ever
-    get stronger: if these six are renamed the count falls, and the
-    assertion is a ceiling, not an equality."""
+def test_the_real_tree_has_no_shared_container_names():
+    """KAI-GATE-031, closed 2026-08-05.
+
+    This test used to assert the six known collisions were *still
+    visible* — calibration while the finding was open and the check was
+    in reporting mode. The operator decided to suffix them: the minimal
+    profile's six now end in `-minimal`. So the assertion flips, and the
+    check now contributes to `violations` rather than printing.
+
+    The synthetic case above (`a name claimed by two profiles is
+    reported`) is what keeps this honest — it proves the function can
+    still find a collision, which an all-clear against the tree alone
+    would not (I-3)."""
     scenario("container-name-real-tree")
     shared = drift.shared_container_names()
-    check("the known collisions are still visible", len(shared) >= 1,
+    check("no container name is claimed by two profiles", shared == [],
           str(shared))
-    check("and they are the minimal/sovereign pair",
-          all("minimal" in line and "sovereign" in line for line in shared),
-          str(shared))
+    # And the rename actually happened, rather than the names vanishing.
+    import yaml
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+    doc = yaml.safe_load(
+        (root / "docker-compose.minimal.yml").read_text(encoding="utf-8"))
+    names = {(cfg or {}).get("container_name")
+             for cfg in (doc.get("services") or {}).values()}
+    for base in ("sovereign-postgres", "sovereign-redis",
+                 "sovereign-tool-gate", "sovereign-memu-core",
+                 "sovereign-heartbeat", "sovereign-dashboard"):
+        check(f"{base} was suffixed, not deleted",
+              f"{base}-minimal" in names, base)
 
 
 def run_all() -> None:
@@ -340,7 +359,7 @@ def run_all() -> None:
     test_a_name_claimed_by_two_profiles_is_reported()
     test_distinct_names_are_not_reported()
     test_services_without_a_container_name_are_ignored()
-    test_the_real_tree_reports_the_six_that_are_known()
+    test_the_real_tree_has_no_shared_container_names()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,

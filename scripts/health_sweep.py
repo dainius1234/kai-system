@@ -35,7 +35,6 @@ SERVICES: List[Tuple[str, int]] = [
     ("memory-compressor", 8057),
     ("metrics-gateway", 8058),
     ("screen-capture", 8059),
-    ("orchestrator", 8050),
     ("workspace-manager", 8060),
     ("dashboard", 8080),
     ("avatar-service", 8081),

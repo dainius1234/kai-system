@@ -24,17 +24,32 @@ no profile references and no one has declared.
 `build:` is what counts, not `image:`. A service pulling a pre-built
 image does not exercise a Dockerfile in this tree.
 
-The three orphans are **declared, not skipped** — the same shape as
-`check_ci_tolerations`: a reason, an owner and a review date, so the
-debt is dated rather than invisible. Each of them is a service whose
-Dockerfile exists, whose `app.py` exists, and which no compose profile
-runs and no caller reaches. `trust-ledger` is the clearest: `agentic`
-imports `FileLedger` from it **in-process** via `sys.path`, so the HTTP
-service it defines has never been part of any deployment.
+This gate originally *declared* three orphans — `trust-ledger`,
+`orchestrator`, `sandboxes/shell` — with a reason, an owner and a review
+date, because whether they were dead code or missing profile entries is
+a decision about the system's shape and not a thing to guess at in a
+gate. On 2026-08-05 the operator made that decision: dead code unless
+proven otherwise. Verified before deleting, one at a time:
 
-Whether those three are dead code or missing profile entries is a
-decision about the system's intended shape, which is the operator's to
-make and not a thing to guess at in a gate.
+  orchestrator/       app.py said "DEPRECATED … memu-core is the real
+                      orchestrator" in its own first line, 31 lines, one
+                      /health route. Reached by nothing but two
+                      hand-written lists. Directory removed.
+  trust-ledger/       `app.py` is a FastAPI service; `agentic` imports
+                      `FileLedger` from `ledger.py` **in-process** via
+                      sys.path and never calls the HTTP API, and
+                      `scripts/test_trust_ledger.py` imports `ledger`
+                      and `score` only. Service removed; `ledger.py` and
+                      `score.py` kept — they are load-bearing.
+  sandboxes/shell/    Dockerfile removed; `app.py` **kept**. It is not
+                      dead: `scripts/test_shell_sandbox.py` is 177 lines
+                      exercising its allowlist gating. No profile
+                      deploys the container, so the container went and
+                      the tested module stayed.
+
+`DECLARED` is empty now and that is the honest state, not an oversight.
+It stays in place because the *mechanism* — a dated, owned toleration —
+is what stops the next orphan being silently skipped.
 
 Exit 0 = every Dockerfile is built or declared.  Exit 1 = one is neither.
 """
@@ -70,37 +85,11 @@ class Unbuilt:
     review_by: str
 
 
-DECLARED: Tuple[Unbuilt, ...] = (
-    Unbuilt(
-        path="trust-ledger/Dockerfile",
-        reason="`agentic/trust_integration.py` imports `FileLedger` from "
-               "this directory in-process, via sys.path — it never calls "
-               "the HTTP service `trust-ledger/app.py` defines. So the "
-               "service is real code that no profile runs and no caller "
-               "reaches. Dead code or a missing profile entry is a "
-               "decision about the system's shape, not something a gate "
-               "should guess.",
-        owner="operator",
-        review_by="2026-11-01",
-    ),
-    Unbuilt(
-        path="orchestrator/Dockerfile",
-        reason="Same shape: `orchestrator/app.py` exists, no compose "
-               "profile references it, nothing was found calling it. "
-               "Needs the same decision.",
-        owner="operator",
-        review_by="2026-11-01",
-    ),
-    Unbuilt(
-        path="sandboxes/shell/Dockerfile",
-        reason="Same shape. `sandboxes/shell` is the shell sandbox; the "
-               "`shell` tool is classified irreversible-destructive in "
-               "tool-gate, so whether this is meant to be deployed is a "
-               "security decision as much as an architectural one.",
-        owner="operator",
-        review_by="2026-11-01",
-    ),
-)
+#: Deliberately empty. The operator resolved all three original entries
+#: on 2026-08-05 by deleting the code (see the module docstring). Adding
+#: an entry here is how a *new* orphan gets tolerated — with a reason,
+#: an owner and a date — rather than skipped.
+DECLARED: Tuple[Unbuilt, ...] = ()
 
 
 def tree_dockerfiles() -> Set[str]:
@@ -139,19 +128,19 @@ def profile_dockerfiles(doc: dict) -> Dict[str, str]:
     return out
 
 
-def audit() -> Tuple[List[str], int, int]:
-    """Return (findings, Dockerfiles inspected, profiles read)."""
-    import yaml
+def coverage_findings(built: Set[str], tree: Set[str],
+                      declared: Set[str]) -> List[str]:
+    """The three rules, as a function of three sets.
 
+    Split out from `audit()` so the rules can be driven by synthetic
+    sets. They used to be exercised only against the real tree and the
+    real `DECLARED`, which was fine while `DECLARED` held three entries
+    and became vacuous the moment the operator resolved all three: two
+    tests started looping over an empty tuple and asserting nothing.
+    The assertion ratchet caught the drop (21 → 17) — which is exactly
+    what it is for.
+    """
     findings: List[str] = []
-    paths = require(PROFILES)
-    built: Set[str] = set()
-    for path in paths:
-        doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-        built |= set(profile_dockerfiles(doc).values())
-
-    tree = tree_dockerfiles()
-    declared = {d.path for d in DECLARED}
 
     for spelling in sorted(built - tree):
         # I-1: a profile naming a Dockerfile that is not there is a
@@ -175,6 +164,21 @@ def audit() -> Tuple[List[str], int, int]:
             f"{stale}: declared as unbuilt but a profile now builds it — "
             f"remove the declaration")
 
+    return findings
+
+
+def audit() -> Tuple[List[str], int, int]:
+    """Return (findings, Dockerfiles inspected, profiles read)."""
+    import yaml
+
+    paths = require(PROFILES)
+    built: Set[str] = set()
+    for path in paths:
+        doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        built |= set(profile_dockerfiles(doc).values())
+
+    tree = tree_dockerfiles()
+    findings = coverage_findings(built, tree, {d.path for d in DECLARED})
     return findings, len(tree), len(paths)
 
 

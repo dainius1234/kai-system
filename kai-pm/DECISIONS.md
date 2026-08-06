@@ -7134,3 +7134,268 @@ That is the same move as every gate today — replace a hand-written list
 with a derived denominator — applied to output rather than to code.
 
 Floors: 43 suites, 2,539 assertions.
+
+---
+
+## 2026-08-06 (part 32) — the operator's decisions, executed, and four defects behind them
+
+Append-only. Nothing above this line was edited.
+
+### 1. DB_PASSWORD — already done, reported rather than redone
+
+The PM directive asked for it. It was already at **job scope** in
+`core-tests.yml` (commit `3ee40ba`), so every compose command in the job
+has it, not just the one step. No change was made. Saying so is the
+point: repeating a fix would have produced a green diff that proved
+nothing.
+
+### 2. KAI-GATE-036 — the three orphaned Dockerfiles
+
+The operator decided: dead code unless proven otherwise. Each was
+checked before deletion rather than after.
+
+| service | verdict | evidence |
+|---|---|---|
+| `orchestrator/` | **deleted entirely** | `app.py` line 1: *"Orchestrator stub — DEPRECATED. Memu-core is the real orchestrator."* 31 lines, one `/health` route. Reached only by two hand-written lists. |
+| `trust-ledger/` | **service deleted, library kept** | `app.py`, `Dockerfile`, `requirements.txt`, `schema.sql` removed. `ledger.py` and `score.py` stay — `agentic/trust_integration.py` and `wisdom_ingestion.py` import `FileLedger` from them in-process, and `scripts/test_trust_ledger.py` covers them. |
+| `sandboxes/shell/` | **Dockerfile deleted, `app.py` kept** | The operator's condition was "unless proven otherwise", and it is proven otherwise: `scripts/test_shell_sandbox.py` is 177 lines exercising its allowlist gating. No profile deploys the container, so the container went and the tested module stayed. |
+
+Deleting `orchestrator/app.py` meant two lists that named it had to
+change too — `scripts/health_sweep.py` (port 8050),
+`scripts/test_docker_e2e.py` `CORE_SERVICES`, plus the issue template's
+service dropdown. All three are the list-beside-the-thing pattern; they
+are recorded here, not fixed, because none is a gate.
+
+`DECLARED` in `check_dockerfile_coverage` is now empty. The mechanism
+stays — it is how the *next* orphan gets a name and a date instead of a
+skip. Three of its tests looped over `DECLARED` and would have asserted
+nothing against an empty tuple, so they are driven by a synthetic entry
+now and prove the rule can still fail (I-3).
+
+Dockerfiles in tree: 52 → 49. Declared unbuilt: 3 → 0.
+
+### 3. KAI-GATE-031 — six shared container names
+
+Fixed by suffixing the **minimal** profile's six with `-minimal`.
+`sovereign` keeps the names `docs/sovereign_ai_spec.md` and
+`PHASE1_READINESS.md` document; `full.yml` pins no `container_name` at
+all and never collided. The check moves from **reported** to **failed** —
+with nothing left to report it would otherwise be inert (I-5), and the
+test that asserted the six collisions *were still visible* is now the
+inverse assertion plus a synthetic case proving the function can still
+find one.
+
+### 4. E402 — audited, not suppressed
+
+The operator said do not bulk-suppress; audit ~20 and open a ticket. All
+**321** were classified rather than a sample:
+
+```
+305  sys.path.insert before the import   (103 files)
+  8  importlib module loading            (  4 files)
+  5  conditional / try import            (  3 files)
+  2  os.environ set before the import    (  1 file )
+  1  other — conftest.py
+```
+
+**Zero are misplaced imports.** Service directories are hyphenated —
+`memu-core`, `trust-ledger` — and a hyphen is not a legal identifier, so
+none can be a package and every caller must put the directory on
+`sys.path` first. E402 is a symptom of that layout, which is also why
+bare module names collide and why `module_stubs.py` exists. No `noqa`
+added, no global ignore. `kai-pm/TECH_DEBT_E402.md` records the three
+options; option 2 (underscore the directories) is the real fix and is a
+scheduled change, not a lint commit.
+
+---
+
+## What core-tests said, and the four defects in it
+
+Run 31041711251 failed. Both image builds now **succeed** — the split
+build step works, and all 49 Dockerfiles parse. The failure moved
+deeper, which is what progress looks like here. Every cause below is
+quoted from a container log, not inferred.
+
+### D-1 · memu-core has never started with TurboVec
+
+```
+File "/app/app.py", line 596, in __init__     self._init_schema()
+File "/app/app.py", line 314, in _get_conn    with self._pool_lock:
+AttributeError: 'TurboVecStore' object has no attribute '_pool_lock'
+```
+
+`TurboVecStore.__init__` was a **copy** of `PGVectorStore.__init__` with
+exactly one line dropped: `self._pool_lock = threading.Lock()`. The very
+next line calls `_init_schema()`, which reaches the inherited
+`_get_conn()`, which dies. `VECTOR_STORE: turbovec` is what both minimal
+and sovereign set — so memu-core crashed at import on **every** boot,
+restart-looped, and took down everything with `depends_on:
+service_healthy`, which is most of the stack.
+
+Fixed with `super().__init__()`. Not by re-adding the line: the defect
+exists *because* the constructor was copied, and one copy cannot drift.
+
+### D-2 · ollama could never download a model
+
+```
+sovereign-ollama | request failed: Get "https://registry.ollama.ai/v2/library/qwen2.5/manifests/0.5b": dial tcp: lookup registry.ollama.ai on 127.0.0.11:53
+```
+
+`ollama` and `ollama-pull` are on `agent-net`, which is `internal:
+true`. The model registry is on the internet. `ollama-pull` therefore
+exits 1 every run, and `agentic` and `wake-service` both wait on it with
+`service_completed_successfully`.
+
+The error printed under **`ollama-pull`**, and the obvious fix — give
+`ollama-pull` egress — would have been wrong. The client POSTs
+`/api/pull`; the **server** does the download, and the server's log
+carries the same error. `egress-net` was added to `ollama`, in both
+`minimal` and `full`. Directive 1 earned its keep: the container the
+error printed under was not the container that needed the network.
+
+### D-3 · a retry loop that has never retried — KAI-GATE-041
+
+```yaml
+command: sh -c "set -e; for d in $BACKOFF_SCHEDULE; do python app.py && exit 0 || sleep $d; done; exec python app.py"
+```
+
+`BACKOFF_SCHEDULE: "10 60 300"` is set three lines above — in the
+service's `environment:`, the *container's* environment. Compose
+interpolates `$VAR` when it parses the file, before any container
+exists, and knew neither name. Both became empty, so the shell received
+`for d in ; do … done` — a loop over nothing — and fell straight through
+to the bare `exec`. **The executor's retry-with-backoff has never
+retried once.** The command still ran, which is why it lasted.
+
+Compose said so on every invocation, for as long as the line has
+existed:
+
+```
+The "BACKOFF_SCHEDULE" variable is not set. Defaulting to a blank string.
+The "d" variable is not set. Defaulting to a blank string.
+```
+
+Directive 3 had already produced a check for exactly this signature —
+`core-tests.yml` fails on `variable is not set` — but it greps
+`/tmp/bringup.log`, the **minimal** bring-up, and this defect is in
+**sovereign**. *A check whose scope was smaller than its name, inside
+the fix for the last check whose scope was smaller than its name.*
+
+`scripts/security/check_compose_interpolation.py` replaces the log grep
+with a static parse of every compose file, found by glob. On its first
+real run it found a third instance nobody had named:
+
+```yaml
+tailscale up --authkey=${TS_AUTHKEY} --hostname=${TS_HOSTNAME}
+```
+
+with `TS_HOSTNAME: sovereign-core` set only in the service environment —
+so the node has never carried the name this file gives it. `TS_AUTHKEY`
+did resolve, from `.env`; `$$` is still right, because compose
+interpolation bakes the key into a command line that `docker compose
+config` and `ps` render in the clear.
+
+### D-4 · a gate that has never run in CI
+
+Found while wiring D-3's gate into `policy-checks.yml`:
+
+```yaml
+      - name: Every compose bring-up supplies the variables it needs
+        run: python scripts/security/check_compose_env.py
+
+        run: python scripts/security/check_test_wiring.py
+```
+
+The second step lost its `- name:`, so its `run:` became a **second
+`run:` key on the step above**. YAML keeps the last one. The job
+displayed the compose-env name, executed the test-wiring gate, and went
+green every time. **`check_compose_env.py` has never run in CI** —
+introduced by me in `dd5b91f` and green ever since.
+
+And I-4 — *declare in one place* — said it was wired, because
+`discover_workflows()` **grepped the raw text**. A `run:` line YAML
+discards still matches a regex. The registry's own scope was smaller
+than its name: it verified presence in the *file*, not presence as a
+*step*.
+
+`discover_workflows()` now parses the YAML and reads each step's `run:`.
+Calibrated against the broken file: the grep reported both gates, the
+parse reports one, and the registry raises 2 findings it used to miss.
+The glob also widened to `*.y*ml` — GitHub reads `.yaml` too.
+
+---
+
+### Toleration — KAI-GATE-034, per the PM directive
+
+`friday-cleanup.yml` and `weekly-report-card.yml` had their heredoc and
+`printf` defects fixed, but neither has run since. The fix is therefore
+**unverified**, not closed.
+
+```
+KAI-GATE-034   status: fix pushed, awaiting evidence
+               owner: Orion
+               reason: awaiting next scheduled run
+               review by: 2026-08-12
+```
+
+Programme Rule 7 holds: the count does not move until a run proves it.
+
+### Register
+
+- **KAI-GATE-041** — opened and closed in the same pass: compose
+  interpolation eating shell variables. 3 instances (executor
+  `$BACKOFF_SCHEDULE`, executor `$d`, tailscale `$TS_HOSTNAME`), gate +
+  22-assertion suite, in `policy-check` and `policy-checks.yml`.
+- **KAI-GATE-031** — closed. Six names suffixed; check now fails.
+- **KAI-GATE-036** — closed. Three orphans resolved by decision; declared
+  set empty.
+- **KAI-GATE-034** — open, tolerated, dated above.
+- **KAI-GATE-025** — still open. core-tests is not green yet; D-1 and D-2
+  are the two things that were stopping it.
+
+### The count of venues
+
+The list-beside-the-thing pattern is at **13** now:
+`scripts/health_sweep.py`, `scripts/test_docker_e2e.py` `CORE_SERVICES`,
+and `.github/ISSUE_TEMPLATE/bug.yml`'s service dropdown all named
+`orchestrator`, a service whose own first line called itself deprecated.
+
+And the systemic finding took its sharpest form yet, twice in one pass:
+**a check's scope is defined by the data it traverses, not by a static
+list — and not by the text of the file it reads, either.** D-3's runtime
+grep traversed one profile's log. D-4's registry traversed a file's
+characters instead of its structure. Both reported success over the part
+they reached.
+
+### One unexplained failure, declared rather than shrugged off
+
+The full `pytest scripts/` run on this tree failed once:
+
+```
+FAILED scripts/test_hygiene_gate.py::test_a_risen_count_fails_the_gate - File...
+1 failed, 4441 passed, 6 skipped
+```
+
+It did **not** reproduce: the test passes alone, passes under `-k
+hygiene`, and two subsequent full runs of the whole suite were clean
+(**4,444 passed, 6 skipped, 0 failed**). The message was truncated by
+pytest's `-q` summary at `File…`, most likely `FileNotFoundError` — that
+suite writes a temporary baseline, so a working-directory or temp-path
+interaction with an earlier file is the shape to look for.
+
+Directive 3 says a signal is fixed, made to fail, or **declared with an
+owner and a date**. It is not fixed and I will not claim it is. It is
+also not a repeat — one occurrence in three full runs — so it does not
+yet justify holding the branch.
+
+```
+FLAKE-001   scripts/test_hygiene_gate.py::test_a_risen_count_fails_the_gate
+            seen: 1 of 3 full-suite runs, 2026-08-06
+            owner: Orion
+            action: if it recurs, run with -p no:randomly and --tb=long
+                    and treat it as an isolation defect (the A-05 class)
+            review by: 2026-08-13
+```
+
+Recorded so that a second occurrence is a *known* second occurrence
+rather than a first one.

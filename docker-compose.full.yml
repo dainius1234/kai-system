@@ -748,6 +748,13 @@ services:
       start_period: 15s
     networks:
       - agent-net
+      # The model registry lives on the internet and `agent-net` is
+      # `internal: true`, so `ollama pull` resolved nothing:
+      #   dial tcp: lookup registry.ollama.ai on 127.0.0.11:53
+      # The error printed under `ollama-pull`, but the fetch is the
+      # *server's*: the client POSTs /api/pull and this container
+      # does the download. Egress belongs here, not there.
+      - egress-net
 
   ollama-pull:
     security_opt:

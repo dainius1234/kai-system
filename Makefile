@@ -37,6 +37,7 @@ policy-check: lint-blocking
 	python3 scripts/security/check_dockerfile_coverage.py
 	python3 scripts/security/check_dockerfile_context.py
 	python3 scripts/security/check_compose_env.py
+	python3 scripts/security/check_compose_interpolation.py
 	python3 scripts/security/check_test_wiring.py
 	python3 scripts/security/check_gate_registry.py --gate
 	@# Doc-drift last: it fails on every commit that adds a test, so it
@@ -309,6 +310,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-compose-probe test-workflow-filters test-workflow-outputs \
 	test-dockerfile-flags test-dockerfile-coverage \
 	test-dockerfile-context test-service-tokens test-compose-env \
+	test-compose-interpolation \
 	test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
@@ -830,6 +832,9 @@ test-service-tokens:
 
 test-compose-env:
 	python3 scripts/test_compose_env.py
+
+test-compose-interpolation:
+	python3 scripts/test_compose_interpolation.py
 
 # bring up full-stack composition
 full-up:

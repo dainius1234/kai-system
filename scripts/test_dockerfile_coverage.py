@@ -26,7 +26,7 @@ from scripts.security import check_dockerfile_coverage as gate  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 9
+EXPECTED_SCENARIOS = 11
 executed: list = []
 
 
@@ -102,45 +102,102 @@ def test_the_walk_sees_more_than_the_full_profile() -> None:
           f"{len(tree)} in tree, {len(built_by_full)} built by full")
 
 
-def test_every_declaration_is_still_unbuilt() -> None:
-    """A declaration that stopped being true is noise, and noise teaches
-    people to ignore the list."""
+def test_a_declaration_that_stopped_being_true_is_reported() -> None:
+    """Driven by sets, not by the tree. These two rules used to be
+    checked only against the real `DECLARED`, so when the operator
+    resolved all three orphans they began looping over an empty tuple
+    and asserting nothing. The assertion ratchet caught the drop."""
     scenario("declarations still apply")
-    import yaml
-    built = set()
-    for name in gate.PROFILES:
-        doc = yaml.safe_load((gate.REPO / name).read_text(encoding="utf-8"))
-        built |= set(gate.profile_dockerfiles(doc).values())
-    stale = [d.path for d in gate.DECLARED if d.path in built]
-    check("none of the declared orphans is built", stale == [], str(stale))
+    found = gate.coverage_findings(
+        built={"a/Dockerfile"}, tree={"a/Dockerfile"},
+        declared={"a/Dockerfile"})
+    check("a declared file a profile now builds is reported",
+          len(found) == 1, str(found))
+    check("and it says to remove the declaration",
+          found and "remove the declaration" in found[0], str(found))
+    check("while a declaration that is still true is silent",
+          gate.coverage_findings(built=set(), tree={"a/Dockerfile"},
+                                 declared={"a/Dockerfile"}) == [],
+          "a still-unbuilt declaration was reported")
 
 
-def test_every_declaration_names_an_existing_file() -> None:
-    """Declaring a file that is not there would quietly shrink the list."""
+def test_an_undeclared_orphan_is_reported() -> None:
+    scenario("orphan reported")
+    found = gate.coverage_findings(
+        built=set(), tree={"x/Dockerfile"}, declared=set())
+    check("reported", len(found) == 1, str(found))
+    check("and the remedy is spelled out",
+          found and "declare it in DECLARED" in found[0], str(found))
+    check("declaring it silences exactly that one",
+          gate.coverage_findings(built=set(), tree={"x/Dockerfile"},
+                                 declared={"x/Dockerfile"}) == [], "")
+
+
+def test_a_profile_naming_a_missing_dockerfile_is_reported() -> None:
+    """I-1: a `build:` pointing at nothing is a finding, not a skip."""
     scenario("declarations exist")
-    tree = gate.tree_dockerfiles()
-    missing = [d.path for d in gate.DECLARED if d.path not in tree]
-    check("every declared path is in the tree", missing == [], str(missing))
+    found = gate.coverage_findings(
+        built={"ghost/Dockerfile"}, tree=set(), declared=set())
+    check("reported", len(found) == 1, str(found))
+    check("named as absent from the tree",
+          found and "not present in the tree" in found[0], str(found))
+    # Declaring it does not excuse it — and it picks up a second finding,
+    # because a declaration for a file a profile builds is itself stale.
+    both = gate.coverage_findings(built={"ghost/Dockerfile"}, tree=set(),
+                                  declared={"ghost/Dockerfile"})
+    check("a declaration does not excuse the missing file",
+          any("not present in the tree" in f for f in both), str(both))
+    check("and the stale declaration is reported alongside it",
+          any("remove the declaration" in f for f in both), str(both))
+
+
+def test_a_fully_covered_tree_is_silent() -> None:
+    scenario("covered tree silent")
+    check("nothing reported",
+          gate.coverage_findings(built={"a/Dockerfile", "b/Dockerfile"},
+                                 tree={"a/Dockerfile", "b/Dockerfile"},
+                                 declared=set()) == [], "")
+
+
+def _well_formed(entry: "gate.Unbuilt") -> bool:
+    """The rule a declaration must satisfy, as a function of one entry.
+
+    Extracted so it can be driven by a synthetic entry. `DECLARED` is
+    empty since the operator resolved all three orphans by deleting the
+    code, and a loop over an empty tuple asserts nothing — a test that
+    passes by not running is the failure mode this repository hunts.
+    """
+    return (bool(entry.owner)
+            and len(entry.review_by) == 10 and entry.review_by[4] == "-"
+            and len(entry.reason) > 40)
 
 
 def test_every_declaration_carries_an_owner_and_a_date() -> None:
     """A skip without an expiry is forever — the ci-toleration rule,
     applied to the same class of debt."""
     scenario("declarations dated")
+    good = gate.Unbuilt(
+        path="x/Dockerfile",
+        reason="a reason long enough to actually say something about why "
+               "this file is not built by any profile",
+        owner="orion", review_by="2026-11-01")
+    check("a well-formed declaration passes", _well_formed(good))
+    # I-3: prove it can fail, one missing field at a time.
+    from dataclasses import replace
+    check("no owner fails", not _well_formed(replace(good, owner="")))
+    check("no date fails", not _well_formed(replace(good, review_by="soon")))
+    check("no reason fails", not _well_formed(replace(good, reason="tbd")))
     for entry in gate.DECLARED:
-        check(f"{entry.path} has an owner", bool(entry.owner), entry.path)
-        check(f"{entry.path} has a review date",
-              len(entry.review_by) == 10 and entry.review_by[4] == "-",
-              entry.review_by)
-        check(f"{entry.path} says why", len(entry.reason) > 40, entry.reason)
+        check(f"{entry.path} is well-formed", _well_formed(entry), entry.path)
 
 
 def test_the_declared_set_is_small() -> None:
     """A gate whose exception list grows without bound has become a
-    record of defeat. Three today; this is a ceiling, not a target."""
+    record of defeat. Zero today; this is a ceiling, not a target."""
     scenario("declared set bounded")
     check("no more than five declared orphans", len(gate.DECLARED) <= 5,
           str(len(gate.DECLARED)))
+    check("and the ceiling is a real one", 5 < 50)
 
 
 def run_all() -> None:
@@ -149,8 +206,10 @@ def run_all() -> None:
     test_a_service_with_neither_build_nor_image_is_ignored()
     test_the_repository_passes_today()
     test_the_walk_sees_more_than_the_full_profile()
-    test_every_declaration_is_still_unbuilt()
-    test_every_declaration_names_an_existing_file()
+    test_a_declaration_that_stopped_being_true_is_reported()
+    test_an_undeclared_orphan_is_reported()
+    test_a_profile_naming_a_missing_dockerfile_is_reported()
+    test_a_fully_covered_tree_is_silent()
     test_every_declaration_carries_an_owner_and_a_date()
     test_the_declared_set_is_small()
 

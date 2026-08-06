@@ -45,7 +45,6 @@ body:
       label: Service affected
       # Keep this list aligned with docker-compose.full.yml service inventory.
       options:
-        - orchestrator
         - supervisor
         - fusion-engine
         - verifier

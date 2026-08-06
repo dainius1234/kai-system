@@ -66,7 +66,17 @@ services:
       TS_STATE_DIR: /var/lib/tailscale
       TS_EXTRA_ARGS: --ssh --accept-routes=true
       TS_HOSTNAME: sovereign-core
-    command: sh -c "tailscaled --state=/var/lib/tailscale/tailscaled.state & sleep 2 && tailscale up --authkey=${TS_AUTHKEY} --hostname=${TS_HOSTNAME} --ssh --accept-routes=true && wait"
+    # Same class as the executor's backoff loop, found by the gate that
+    # defect produced. `TS_HOSTNAME: sovereign-core` is set four lines
+    # above and nowhere else, so compose substituted `${TS_HOSTNAME}`
+    # blank and this ran `tailscale up --hostname= …` — the node has
+    # never been named what this file says it is named.
+    #
+    # `TS_AUTHKEY` did resolve, from `.env`, so that half worked. `$$` is
+    # still the right spelling: it takes the value from the container's
+    # environment instead of baking the auth key into a command line
+    # that `docker compose config` and `ps` both render in the clear.
+    command: sh -c "tailscaled --state=/var/lib/tailscale/tailscaled.state & sleep 2 && tailscale up --authkey=$$TS_AUTHKEY --hostname=$$TS_HOSTNAME --ssh --accept-routes=true && wait"
     networks:
       - egress-net
 
@@ -278,7 +288,22 @@ services:
       VAULT_TOKEN: "${VAULT_ROOT_TOKEN:-}"
       AUDIT_REDIS_URL: "redis://redis:6379"
 
-    command: sh -c "set -e; for d in $BACKOFF_SCHEDULE; do python app.py && exit 0 || sleep $d; done; exec python app.py"
+    # `$$`, not `$`. Compose interpolates `$VAR` when it parses this file,
+    # long before any shell sees it — so `$BACKOFF_SCHEDULE` and `$d`
+    # were both substituted with the empty string (they are set in the
+    # *container's* environment, which compose knows nothing about) and
+    # the command reaching the shell was:
+    #
+    #     for d in ; do python app.py && exit 0 || sleep ; done; exec python app.py
+    #
+    # An empty `for` list runs its body zero times. The retry-with-
+    # backoff this line exists to provide has never once retried; every
+    # boot fell straight through to the bare `exec`. It announced itself
+    # on every compose command in CI —
+    #   The "BACKOFF_SCHEDULE" variable is not set. Defaulting to a blank string.
+    #   The "d" variable is not set. Defaulting to a blank string.
+    # — for as long as the line has existed. Directive 3.
+    command: sh -c "set -e; for d in $$BACKOFF_SCHEDULE; do python app.py && exit 0 || sleep $$d; done; exec python app.py"
     depends_on:
       - tool-gate
       - memu-core

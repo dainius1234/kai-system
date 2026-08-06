@@ -4,9 +4,10 @@
     "Architecture Rule Tests": 68,
     "Assertion Floor Tests": 40,
     "CI Toleration Tests": 20,
-    "Compose Drift Tests": 28,
+    "Compose Drift Tests": 33,
     "Compose Env Tests": 18,
     "Compose Gate Tests": 54,
+    "Compose Interpolation Tests": 28,
     "Compose Probe Tests": 27,
     "Concurrency & Clock Tests": 51,
     "Constraint Assessment Tests": 56,
@@ -16,12 +17,12 @@
     "Degraded State Tests": 71,
     "Deployment Preflight Tests": 57,
     "Dockerfile Context Tests": 24,
-    "Dockerfile Coverage Tests": 21,
+    "Dockerfile Coverage Tests": 26,
     "Dockerfile Flag Tests": 21,
     "Erasure Tests": 75,
     "Flags-Enabled Integration Tests": 37,
     "Full Migration Tests": 75,
-    "Gate Registry Tests": 76,
+    "Gate Registry Tests": 82,
     "Hygiene Gate Tests": 63,
     "Invariant Guard Tests": 26,
     "Legacy Bridge Tests": 58,
@@ -45,5 +46,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2539
+  "total": 2583
 }

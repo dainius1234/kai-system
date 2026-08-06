@@ -48,7 +48,7 @@ from scripts.security import gate_registry as registry_module  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 37
+EXPECTED_SCENARIOS = 39
 executed: list[str] = []
 
 
@@ -670,8 +670,59 @@ def test_an_uncalibrated_ratchet_is_detected():
         registry_module.REGISTRY = original
 
 
+def test_workflow_discovery_parses_rather_than_greps() -> None:
+    """A `run:` line that YAML discards is not a step that runs.
+
+    `policy-checks.yml` had a step that lost its `- name:`, so its
+    `run:` became a second `run:` key on the step above. YAML keeps the
+    last one: the job showed "Every compose bring-up supplies the
+    variables it needs" and executed `check_test_wiring.py`.
+    `check_compose_env.py` never ran in CI, and I-4 said it was wired
+    because the module name appeared in the file's text.
+
+    Verified against the exact YAML that caused it.
+    """
+    scenario("workflow discovery parses")
+    import yaml
+    broken = yaml.safe_load(
+        "jobs:\n"
+        "  policy:\n"
+        "    steps:\n"
+        "      - name: Every compose bring-up supplies the variables it needs\n"
+        "        run: python scripts/security/check_compose_env.py\n"
+        "\n"
+        "        run: python scripts/security/check_test_wiring.py\n")
+    runs = [str(s.get("run") or "")
+            for j in broken["jobs"].values() for s in j["steps"]]
+    check("YAML collapses the two into one step", len(runs) == 1, str(runs))
+    modules = [mod for r in runs for mod in meta._INVOCATION.findall(r)]
+    check("and only the last `run:` survives",
+          modules == ["check_test_wiring"], str(modules))
+    check("so compose_env is absent from the parse",
+          "check_compose_env" not in modules, str(modules))
+    # A grep over the same text finds both — the wrong answer, kept here
+    # so the difference between the two readings cannot be argued away.
+    text_hits = meta._INVOCATION.findall(
+        "run: python scripts/security/check_compose_env.py\n"
+        "run: python scripts/security/check_test_wiring.py\n")
+    check("while a text scan reports both", len(text_hits) == 2,
+          str(text_hits))
+
+
+def test_workflow_discovery_covers_both_extensions() -> None:
+    """GitHub reads `.yaml` as well as `.yml`; the glob used to not."""
+    scenario("workflow extensions")
+    names = [p.name for p in meta.workflow_files()]
+    check("every workflow on disk is surveyed", len(names) >= 9, str(names))
+    check("the glob accepts both spellings",
+          "y*ml" in meta.workflow_files.__doc__ or all(
+              n.endswith((".yml", ".yaml")) for n in names), str(names))
+
+
 def run_all() -> None:
     test_invariants_are_counted_per_dimension()
+    test_workflow_discovery_parses_rather_than_greps()
+    test_workflow_discovery_covers_both_extensions()
     test_an_enforced_invariant_with_breaches_fails()
     test_a_reported_invariant_with_breaches_does_not_fail()
     test_an_invariant_at_zero_must_be_enforced()

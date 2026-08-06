@@ -583,19 +583,26 @@ class PGVectorStore:
 # storage rather than wrap pgvector, since TurboVec has its own index format.
 class TurboVecStore(PGVectorStore):
     def __init__(self) -> None:
-        import psycopg2
-        import psycopg2.pool
-        from psycopg2.extras import Json as _Json, RealDictCursor as _RDC
         from turbovec import IdMapIndex
 
-        self._psycopg2 = psycopg2
-        self._Json = _Json
-        self._RDC = _RDC
-        self._pg_uri = os.getenv("PG_URI", "postgresql://keeper:localdev@postgres:5432/sovereign")
-        self._pool = psycopg2.pool.SimpleConnectionPool(1, 5, self._pg_uri)
-        self._init_schema()
-        self.vc = LakeFSClient()
-        self._state: Dict[str, Any] = {}
+        # `super()`, not a copy. This constructor used to repeat the
+        # parent's seven setup lines and had dropped exactly one of them
+        # — `self._pool_lock = threading.Lock()` — so the very next line,
+        # `self._init_schema()`, reached the inherited `_get_conn()` and
+        # died on `with self._pool_lock:`:
+        #
+        #     AttributeError: 'TurboVecStore' object has no attribute
+        #     '_pool_lock'
+        #
+        # `VECTOR_STORE: turbovec` is what both minimal and sovereign
+        # set, so memu-core crashed at import on every boot, restart-
+        # looped, and took down everything with `depends_on:
+        # service_healthy` — which is most of the stack.
+        #
+        # Calling the parent means the two can no longer drift: there is
+        # one copy of the pool setup, and a line added there cannot be
+        # missing here.
+        super().__init__()
 
         self._IdMapIndex = IdMapIndex
         self._tv_bits = int(os.getenv("TURBOVEC_BITS", "4"))

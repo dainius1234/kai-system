@@ -346,6 +346,20 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-040",)),
+    # The executor's retry-with-backoff ran its body zero times for its
+    # whole life: `for d in $BACKOFF_SCHEDULE` was interpolated by
+    # compose, not the shell, and both names became the empty string.
+    # KAI-GATE-041. Found a third instance on its first real run —
+    # `tailscale up --hostname=${TS_HOSTNAME}` had never named the node.
+    Gate(module="check_compose_interpolation",
+         kind=GATE,
+         summary="every `$` in a compose command reaches whoever wrote it",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ variable reference",
+         proven_by="scripts/test_compose_interpolation.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-041",)),
     Gate(module="check_test_wiring",
          kind=GATE,
          summary="every test in a self-run suite is dispatched",

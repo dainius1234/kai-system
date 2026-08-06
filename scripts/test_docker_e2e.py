@@ -30,7 +30,6 @@ CORE_SERVICES = [
     "heartbeat",
     "agentic",
     "dashboard",
-    "orchestrator",
     "fusion-engine",
 ]
 

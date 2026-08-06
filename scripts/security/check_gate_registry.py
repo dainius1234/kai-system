@@ -129,15 +129,45 @@ def discover_policy_check() -> List[str]:
     return sorted(set(_INVOCATION.findall(body)))
 
 
+def workflow_files() -> List[Path]:
+    """Every workflow, both extensions. GitHub accepts `.yaml` too."""
+    root = REPO / ".github" / "workflows"
+    return sorted(p for p in root.glob("*.y*ml") if p.is_file())
+
+
 def discover_workflows() -> Dict[str, List[str]]:
-    """Map module -> the workflow files that invoke it."""
+    """Map module -> the workflow files that actually invoke it.
+
+    **Parsed, not grepped.** This read the raw text and matched any line
+    that looked like an invocation, which is not the same question as
+    "does this step run". `policy-checks.yml` had:
+
+        - name: Every compose bring-up supplies the variables it needs
+          run: python scripts/security/check_compose_env.py
+
+          run: python scripts/security/check_test_wiring.py
+
+    — a step that lost its `- name:`, so its `run:` became a *second*
+    `run:` key on the step above. YAML keeps the last one. The job
+    displayed the compose-env name, executed the test-wiring gate, and
+    went green; `check_compose_env.py` never ran in CI at all.
+
+    The text said both were wired. Only the parse knows which one runs,
+    and I-4's whole job is to make the registry agree with reality.
+    """
+    import yaml
+
     found: Dict[str, List[str]] = {}
-    for path in sorted((REPO / ".github" / "workflows").glob("*.yml")):
-        text = "\n".join(
-            l for l in path.read_text(encoding="utf-8").splitlines()
-            if not l.lstrip().startswith("#"))
-        for module in _INVOCATION.findall(text):
-            found.setdefault(module, []).append(path.name)
+    for path in workflow_files():
+        # I-1: an unparseable workflow is a finding, not a file to skip.
+        # `main()` surfaces it as a phantom/wiring disagreement rather
+        # than silently shrinking the survey.
+        doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        for job in (doc.get("jobs") or {}).values():
+            for step in (job or {}).get("steps") or []:
+                run = str((step or {}).get("run") or "")
+                for module in _INVOCATION.findall(run):
+                    found.setdefault(module, []).append(path.name)
     return {m: sorted(set(v)) for m, v in found.items()}
 
 
