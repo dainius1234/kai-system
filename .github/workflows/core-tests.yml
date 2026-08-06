@@ -8,6 +8,14 @@ on:
     branches: ["main", "claude/**"]
   pull_request:
     branches: [main]
+  # Added 2026-08-06, during a runner-capacity incident: six consecutive
+  # attempts were cancelled at exactly 15m02s having never been assigned
+  # a machine. With only `push` and `pull_request`, the sole way to retry
+  # was a re-run of an existing run or an otherwise-pointless commit —
+  # and a re-run inherits the stuck run's state rather than starting
+  # clean. `workflow_dispatch` makes retrying a first-class action
+  # instead of a side effect of changing the tree.
+  workflow_dispatch:
 
 jobs:
   test:
