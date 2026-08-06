@@ -360,6 +360,19 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-041",)),
+    # memu-core's writer branch imported `socket` inside an `if` that
+    # always raises and used it after — so the branch had never once
+    # completed, and `.writer.lock` had never been written in any
+    # deployment. KAI-GATE-042.
+    Gate(module="check_unreachable_bindings",
+         kind=GATE,
+         summary="every import binds on a path that reaches its uses",
+         inputs=(".",),
+         denominator=r"inspected: \d+ function",
+         proven_by="scripts/test_unreachable_bindings.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-042",)),
     Gate(module="check_test_wiring",
          kind=GATE,
          summary="every test in a self-run suite is dispatched",

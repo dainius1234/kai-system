@@ -43,8 +43,9 @@
     "UH-6 Vertical Slice Tests": 86,
     "UH-7 Actuator Registry Tests": 75,
     "UH-8 Autonomy Tests": 174,
+    "Unreachable Binding Tests": 25,
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2583
+  "total": 2608
 }

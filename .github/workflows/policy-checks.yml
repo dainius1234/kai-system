@@ -114,5 +114,8 @@ jobs:
       - name: Every `$` in a compose command reaches whoever wrote it
         run: python scripts/security/check_compose_interpolation.py
 
+      - name: Every import binds on a path that reaches its uses
+        run: python scripts/security/check_unreachable_bindings.py
+
       - name: Instrumentation invariants (I-4 enforced)
         run: python scripts/security/check_gate_registry.py --gate

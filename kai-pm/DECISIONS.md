@@ -7399,3 +7399,101 @@ FLAKE-001   scripts/test_hygiene_gate.py::test_a_risen_count_fails_the_gate
 
 Recorded so that a second occurrence is a *known* second occurrence
 rather than a first one.
+
+---
+
+## 2026-08-06 (part 33) — the same defect twice, so it gets a mechanism
+
+Run 31077379910 got further than any run of the day, and the diff from
+the one before it is the evidence that two fixes hold:
+
+```
+ Container sovereign-ollama-pull            Exited        <- D-2 holds
+ Container sovereign-memu-core-introspect   Healthy       <- D-1 holds
+ Container sovereign-memu-core-minimal      Error
+```
+
+`ollama-pull` **Exited** instead of `didn't complete successfully: exit
+1`, so the egress fix works. `memu-core-introspect` reached **Healthy**
+for the first time — and it runs the *same* `TurboVecStore` constructor
+with `TURBOVEC_READ_ONLY=true`, so `super().__init__()` is right.
+
+The writer failed one layer down:
+
+```
+File "/app/app.py", line 629, in __init__
+    self._tv_lock_path.write_text(f"{socket.gethostname()}:{os.getpid()}")
+UnboundLocalError: cannot access local variable 'socket'
+```
+
+`import socket` sat inside `if self._tv_lock_path.exists():` — the
+branch that unconditionally raises. The only path that could reach
+`socket.gethostname()` was the path where the import had never run.
+
+### What that actually cost
+
+Not the crash. **The writer branch has never completed in any
+deployment.** `.writer.lock` has never been written, so the
+single-writer guarantee that block exists to provide has never once
+been in force, and `_release_lock` has never had anything to release.
+
+A guarantee that has never executed is indistinguishable, from the
+outside, from a guarantee that was never needed. That is the same
+lesson as the executor's backoff loop, twelve hours apart: **code that
+runs is not code that works.**
+
+### Two of the same in one constructor
+
+  `_pool_lock`  an attribute assigned on the parent's path, used on the
+                child's — caught by reading the container log.
+  `socket`      a name imported on one branch, used on another — caught
+                by reading the container log.
+
+One is dynamic and not decidable statically. The second is decidable,
+and it repeated within one file on one day, so Directive 3 applies: it
+gets a mechanism, not a resolution to be careful.
+
+### KAI-GATE-042 — `check_unreachable_bindings`
+
+The rule, deliberately narrow: an `import` inside an `if` body whose
+last statement is `raise`, `return`, `continue` or `break`, where the
+imported name is also referenced outside that block. Control cannot flow
+from the binding to the use, so every execution reaching the use has the
+name unbound.
+
+It does **not** flag `try: import x / except ImportError:` — idiomatic,
+correct, and 20 sites in this tree use it. A first draft did flag them.
+That draft was wrong and was thrown away rather than tolerated: a survey
+with false positives invites fixes to working code, which is worse than
+the gap it closes.
+
+Calibrated against the real thing, not a fixture:
+
+```
+$ git show e38695f:memu-core/app.py | check_unreachable_bindings
+1 finding: __init__() imports `socket` inside an `if` whose body always
+raises, and uses it at line 629.
+
+$ check_unreachable_bindings          # the fixed tree
+inspected: 7,890 function(s) across 444 Python files
+PASS
+```
+
+### The stale-lock decision
+
+Fixing the import alone would have introduced a worse failure: the lock
+is released by `atexit`, which does not run on `SIGKILL`, so the first
+hard kill would leave a lock that makes memu-core permanently
+unbootable — and the refusal would mask whatever actually caused the
+kill. A diagnostic that changes what it measures, again.
+
+So a lock naming **this same host** is reclaimed with a warning; a lock
+naming a *different* host still raises, which is the case the lock
+exists for: two writer containers on one index.
+
+### Register
+
+- **KAI-GATE-042** opened and closed in the same pass, 25-assertion
+  suite, wired into `policy-check` and `policy-checks.yml`.
+- **KAI-GATE-025** still open. Two of four bring-up blockers are proven
+  fixed by CI; the third is pushed and running.
