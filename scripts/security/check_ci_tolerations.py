@@ -203,6 +203,26 @@ DECLARED: Tuple[Toleration, ...] = (
     ),
     Toleration(
         workflow="core-tests.yml",
+        step="Dump sovereign logs on failure",
+        bucket=DOCUMENTED_SKIP,
+        reason="The third of three profile dump steps, declared "
+               "separately for the same reason as the second: the match "
+               "is on the step name, and each differently-named step is "
+               "its own decision needing its own owner. `if: failure()` "
+               "only, so the job is already red and this has no "
+               "enforcement to skip. Its `|| true`s are deliberate — a "
+               "diagnostic that aborts before printing the next fact is "
+               "worse than no diagnostic, and replacing the real failure "
+               "with a dump failure destroys what the step exists to "
+               "produce. Gained them on 2026-08-06 when it was narrowed "
+               "to `dump_unhealthy`: it had named three services by hand, "
+               "which is a hand-written list of the one thing not "
+               "knowable in advance — which container broke.",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="core-tests.yml",
         step="Post-mortem",
         bucket=DOCUMENTED_SKIP,
         reason="Same argument as the dump step, and it exists because that "

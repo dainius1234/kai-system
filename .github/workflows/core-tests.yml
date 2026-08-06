@@ -491,11 +491,17 @@ jobs:
       - name: Dump container logs on failure (after the live steps)
         if: failure()
         run: |
+          # Teed, so the post-mortem can reprint it inside the log
+          # API's fixed-size window, and narrowed to the containers
+          # Docker says are wrong — twelve services x 60 lines does not
+          # fit that window, and burying the answer is the same failure
+          # as truncating it.
+          exec > >(tee /tmp/minimal-logs.log) 2>&1
           echo "── containers, including stopped ──────────────────────"
           docker compose -f docker-compose.minimal.yml ps -a || true
-          echo "── logs ───────────────────────────────────────────────"
-          docker compose -f docker-compose.minimal.yml logs --no-color \
-            --tail 60 || true
+          echo "── logs of whatever is not healthy ────────────────────"
+          python3 scripts/ci/dump_unhealthy.py \
+            --compose-file docker-compose.minimal.yml --tail 60 || true
 
       - name: Tear down minimal stack
         if: always()
@@ -666,11 +672,20 @@ jobs:
             --timeout 180
           echo "--- Sovereign boot health: all three healthy ---"
 
+      # ci-toleration: documented-skip
       - name: Dump sovereign logs on failure
         if: failure()
         run: |
-          docker compose -f docker-compose.sovereign.yml ps
-          docker compose -f docker-compose.sovereign.yml logs postgres tool-gate memu-core --no-color
+          # Teed and narrowed, like the other three. This named three
+          # services by hand — `postgres tool-gate memu-core` — which is
+          # the list-beside-the-thing pattern inside a diagnostic: the
+          # container that broke is the one thing not knowable in
+          # advance, and a hand-written list assumes exactly that.
+          # `dump_unhealthy` derives it from `compose ps`.
+          exec > >(tee /tmp/sovereign-logs.log) 2>&1
+          docker compose -f docker-compose.sovereign.yml ps -a || true
+          python3 scripts/ci/dump_unhealthy.py \
+            --compose-file docker-compose.sovereign.yml --tail 60 || true
 
       - name: Tear down sovereign stack
         if: always()
@@ -723,6 +738,10 @@ jobs:
           tail -45 /tmp/full-logs.log 2>/dev/null || echo "(did not run)"
           echo "── sovereign boot (its real output) ──"
           tail -30 /tmp/sovereign-boot.log 2>/dev/null || echo "(did not run)"
+          echo "── sovereign: containers Docker says are wrong ──"
+          tail -45 /tmp/sovereign-logs.log 2>/dev/null || echo "(did not run)"
+          echo "── minimal: containers Docker says are wrong ──"
+          tail -30 /tmp/minimal-logs.log 2>/dev/null || echo "(did not run)"
           # This step runs LAST so it survives log truncation — which
           # means the teardown at step 54 has already run, so `ps -a`
           # finds nothing and prints a bare header. An empty container
