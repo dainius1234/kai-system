@@ -103,8 +103,17 @@ services:
       - data-net
       - execution-net
     depends_on:
-      - postgres
-      - redis
+      # `condition:` rather than a bare list. A bare list waits for the
+      # container to be *created*, not for the service to be *ready*, so
+      # memu-core opened a psycopg2 pool against a postgres that had not
+      # finished initialising. `minimal` had these conditions and `full`
+      # did not — the same services, two different opinions about what
+      # "depends on" means. 16 services here; every target declares a
+      # healthcheck, so every wait is on a real readiness signal.
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   memu-core:
     build:
@@ -141,9 +150,12 @@ services:
       - agent-net
       - data-net
     depends_on:
-      - redis
-      - tool-gate
-      - postgres
+      redis:
+        condition: service_healthy
+      tool-gate:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
 
   memu-core-introspect:
     build:
@@ -177,8 +189,10 @@ services:
       - data-net
       - observability-net
     depends_on:
-      - redis
-      - postgres
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
 
   heartbeat:
     build:
@@ -199,8 +213,10 @@ services:
       - execution-net
       - observability-net
     depends_on:
-      - memu-core
-      - memu-core-introspect
+      memu-core:
+        condition: service_healthy
+      memu-core-introspect:
+        condition: service_healthy
 
   dashboard:
     build:
@@ -237,11 +253,16 @@ services:
       - edge-net
       - observability-net
     depends_on:
-      - tool-gate
-      - memu-core
-      - memu-core-introspect
-      - agentic
-      - heartbeat
+      tool-gate:
+        condition: service_healthy
+      memu-core:
+        condition: service_healthy
+      memu-core-introspect:
+        condition: service_healthy
+      agentic:
+        condition: service_healthy
+      heartbeat:
+        condition: service_healthy
 
   supervisor:
     profiles: ["recovery"]
@@ -267,8 +288,10 @@ services:
       - agent-net
       - control-net
     depends_on:
-      - memu-core
-      - tool-gate
+      memu-core:
+        condition: service_healthy
+      tool-gate:
+        condition: service_healthy
 
   verifier:
     profiles: ["recovery"]
@@ -287,7 +310,8 @@ services:
     networks:
       - agent-net
     depends_on:
-      - memu-core
+      memu-core:
+        condition: service_healthy
 
   fusion-engine:
     profiles: ["recovery"]
@@ -306,7 +330,8 @@ services:
     networks:
       - agent-net
     depends_on:
-      - verifier
+      verifier:
+        condition: service_healthy
 
   agentic:
     build:
@@ -400,8 +425,10 @@ services:
     networks:
       - execution-net
     depends_on:
-      - tool-gate
-      - heartbeat
+      tool-gate:
+        condition: service_healthy
+      heartbeat:
+        condition: service_healthy
 
   memory-compressor:
     build:
@@ -422,8 +449,10 @@ services:
       - agent-net
       - observability-net
     depends_on:
-      - memu-core
-      - memu-core-introspect
+      memu-core:
+        condition: service_healthy
+      memu-core-introspect:
+        condition: service_healthy
 
   memu-graph:
     profiles: ["introspection"]
@@ -555,8 +584,10 @@ services:
       - control-net
       - observability-net
     depends_on:
-      - tool-gate
-      - heartbeat
+      tool-gate:
+        condition: service_healthy
+      heartbeat:
+        condition: service_healthy
 
   metrics-gateway:
     build:
@@ -574,8 +605,10 @@ services:
     networks:
       - observability-net
     depends_on:
-      - memu-core
-      - tool-gate
+      memu-core:
+        condition: service_healthy
+      tool-gate:
+        condition: service_healthy
 
   audio-service:
     profiles: ["sensors"]
@@ -598,7 +631,8 @@ services:
     networks:
       - sensor-net
     depends_on:
-      - memu-core
+      memu-core:
+        condition: service_healthy
       # parakeet-server isn't depended on by default — it's only started/needed
       # when WHISPER_BACKEND=api is set. Run with --profile parakeet to include it.
 
@@ -712,7 +746,8 @@ services:
     networks:
       - sensor-net
     depends_on:
-      - memu-core
+      memu-core:
+        condition: service_healthy
 
   backup-service:
     build:
@@ -738,8 +773,10 @@ services:
       - control-net
       - data-net
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   calendar-sync:
     build:
@@ -833,8 +870,10 @@ services:
       - agent-net
       - egress-net
     depends_on:
-      - agentic
-      - tts-service
+      agentic:
+        condition: service_healthy
+      tts-service:
+        condition: service_healthy
 
   workspace-manager:
     build:
