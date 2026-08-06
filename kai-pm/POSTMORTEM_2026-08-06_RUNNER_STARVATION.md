@@ -1,4 +1,4 @@
-# Post-mortem — CI runner starvation, 2026-08-06
+# Post-mortem — GitHub Actions degradation, 2026-08-06
 
 **Status:** ongoing at time of writing. Cause not fully determined; this
 records what is *known* versus *inferred*, and counts the reasoning
@@ -25,6 +25,36 @@ machine.
 
 Six consecutive `core-tests` starvations. Every cancellation is exactly
 15m02s from its own queue entry.
+
+## 1b. Phase three — runs stop being created (from ~16:44)
+
+The title of this document was wrong when it was written. "Runner
+starvation" describes phase two. A third phase followed and is worse:
+
+    cddc01c  pushed ~19:30  →  no workflow run created, in any workflow
+    6253fb2  pushed ~17:20  →  no workflow run created, in any workflow
+
+Both commits are confirmed on the remote (`git log
+origin/claude/project-rework-plan-pgvp35`). The last commit to generate
+any run at all was `ca14229` at 16:44. Since then: two pushes, four
+workflows each, **zero runs created**.
+
+So the degradation has three distinct phases, each worse than the last:
+
+| time | symptom |
+|---|---|
+| ~15:23 | `Failed to resolve action download info. Service Unavailable` — the backend cannot serve action metadata |
+| 15:52–16:59 | runs created, no runner ever assigned, cancelled at exactly 15m02s, six times |
+| ~16:44 → | **pushes no longer create runs at all** |
+
+A consequence worth stating: the `workflow_dispatch` trigger added in
+`cddc01c` cannot help. A workflow file change only takes effect once
+GitHub processes a run from that commit, which is exactly what has
+stopped. The fix is correct and permanent; it is simply inert until
+Actions recovers.
+
+**Nothing on our side influences any of this.** Retrying costs 15
+minutes of wall-clock and returns no information.
 
 ## 2. Signature
 
@@ -120,9 +150,17 @@ day's largest instrumentation defect:
 
 ## 8. Actions
 
+* **Closed:** billing/spending limit ruled out — the account has a paid
+  subscription.
 * **Open — needs a browser:** check githubstatus.com for an Actions
-  incident on 2026-08-06 15:50–17:00 UTC, and check org billing for a
-  spending limit. Neither is reachable from this environment.
+  incident from 2026-08-06 15:20 UTC onward. Not reachable from this
+  environment (`CONNECT tunnel failed, 403` via the agent proxy).
+* **Open — worth a support ticket if status is green:** "pushes to
+  dainius1234/kai-system have not created workflow runs since 16:44 UTC
+  on 2026-08-06, and re-run 31120896342 reports `status: queued` while
+  the cancel endpoint returns `409 Cannot cancel a workflow re-run that
+  has not yet queued`." That self-contradiction, plus the three-phase
+  timeline above, is the evidence.
 * **Done:** stop re-queueing continuously. Capacity is intermittent, so
   periodic retries are the correct cadence; each failed attempt costs 15
   minutes of wall-clock and produces no information.
