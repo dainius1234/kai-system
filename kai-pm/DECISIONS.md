@@ -7497,3 +7497,131 @@ exists for: two writer containers on one index.
   suite, wired into `policy-check` and `policy-checks.yml`.
 - **KAI-GATE-025** still open. Two of four bring-up blockers are proven
   fixed by CI; the third is pushed and running.
+
+---
+
+## 2026-08-06 (part 34) — three layers of code that had never run
+
+Run 31079752977 reached the bring-up with 40 steps green behind it. The
+writer got **further than it has ever got**: it reached `write_text` for
+the first time in the service's life, and found what was waiting there.
+
+```
+File "/app/app.py", line 658, in __init__
+    self._tv_lock_path.write_text(f"{host}:{os.getpid()}")
+PermissionError: [Errno 13] Permission denied: '/data/turbovec/.writer.lock'
+```
+
+memu-core runs as `app`. Docker seeds a fresh named volume from the
+image's directory — contents **and ownership** — and `memu-core/
+Dockerfile` never created `/data/turbovec`, so the volume arrived owned
+by root and the service could not write to it.
+
+Nobody had ever hit this, because nobody had ever got here. Three
+layers, each hiding the next:
+
+```
+_pool_lock unbound   ->  never reached the writer branch
+socket unbound       ->  never reached the write
+/data owned by root  ->  the write fails
+```
+
+Fixed in the image: `mkdir -p /data/turbovec && chown -R app:app /data`
+before `USER app`.
+
+### And what the same log showed, unasked
+
+`sovereign-document-parser` had **324 log lines** in that dump, all of
+them the same crash, over and over:
+
+```
+RuntimeError: Form data requires "python-multipart" to be installed.
+```
+
+`@app.post("/parse")` takes `file: UploadFile = File(...)`. FastAPI
+needs the package to *build* the route and raises at import. The
+container has crash-looped in every deployment there has ever been.
+
+It never blocked anything: `dashboard` waits on it with
+`condition: service_started`, which a container in a restart loop
+satisfies perfectly well.
+
+Swept for the class. One more, and it is the worst one available:
+
+**the dashboard.** Four routes taking `UploadFile = File(...)` —
+`/api/upload`, `/api/audio/transcribe`, `/api/vision/analyze`,
+`/api/vision/presence` — and no `python-multipart`. **The operator's
+entire interface has never started in any deployment.**
+
+### Why no test could ever have caught it
+
+`scripts/test_dashboard.py` passes, and always has. Every workflow
+installs dependencies the same way:
+
+```
+find . -maxdepth 3 -name requirements.txt ... | while read req; do
+  pip install -r "$req"
+```
+
+Every service's requirements go into **one** environment.
+`browser-agent`, `perception/audio`, `perception/vision` and
+`screen-capture` all list `python-multipart`, so it is installed long
+before the dashboard's tests run — by somebody else.
+
+A missing *per-service* dependency is **structurally invisible** to a
+suite that runs against the union of all of them. This is not a test
+that was written badly. It is a question the test harness cannot be
+asked. Only the container can answer it, and the container only speaks
+when something else lets the bring-up get far enough to hear it.
+
+That is the systemic finding again, in its most literal form yet: the
+denominator of "does this service's dependency set work" is one service,
+and every instrument we had measured the union.
+
+### KAI-GATE-043 — `check_implicit_deps`
+
+Five libraries FastAPI and pydantic need at import time that **no import
+statement names**, because the dependency is expressed as a usage:
+
+```
+UploadFile / File(...) / Form(...)  ->  python-multipart
+EmailStr                            ->  email-validator
+SessionMiddleware                   ->  itsdangerous
+ORJSONResponse                      ->  orjson
+UJSONResponse                       ->  ujson
+```
+
+Calibrated against both real files: reverting either
+`document-parser/requirements.txt` or `dashboard/requirements.txt`
+produces exactly its finding; the fixed tree produces none across 48
+service directories.
+
+Requirement names are normalised per PEP 503 — `python_multipart`,
+`Python-Multipart` and `python-multipart` are one package, and treating
+them as three would report a defect in a correctly specified service.
+
+### The meta-check caught this gate on its first run
+
+I-1, boundary blindness:
+
+```
+check_implicit_deps.py:158: skips an absent input instead of refusing
+to certify it
+```
+
+My first draft returned directories and then did `if not (d /
+"requirements.txt").exists(): continue`. A service pinning its
+dependencies in `requirements-dev.txt` alone would have been reported
+clean **without ever being read**. Fixed at the root rather than
+suppressed: the walk now returns the requirement *files*, so there is
+nothing left to be absent, and every `requirements*.txt` in a directory
+counts as declaring. A test drives that case both ways.
+
+Fourth gate today caught by its own calibration or by the meta-check
+before it ever ran against the tree.
+
+### Register
+
+- **KAI-GATE-043** opened and closed in the same pass; 32 assertions.
+- **KAI-GATE-025** still open. The bring-up has now cleared four
+  distinct blockers; the fifth is pushed and running.

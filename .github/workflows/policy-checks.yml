@@ -117,5 +117,8 @@ jobs:
       - name: Every import binds on a path that reaches its uses
         run: python scripts/security/check_unreachable_bindings.py
 
+      - name: Every implicit dependency is declared where it is used
+        run: python scripts/security/check_implicit_deps.py
+
       - name: Instrumentation invariants (I-4 enforced)
         run: python scripts/security/check_gate_registry.py --gate

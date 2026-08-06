@@ -373,6 +373,19 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-042",)),
+    # document-parser and the dashboard both used `UploadFile` without
+    # listing python-multipart, so both raised at import and neither
+    # container had ever started. Invisible to every unit test, because
+    # CI installs all requirements into one environment. KAI-GATE-043.
+    Gate(module="check_implicit_deps",
+         kind=GATE,
+         summary="every implicit dependency is declared where it is used",
+         inputs=(".",),
+         denominator=r"inspected: \d+ service director",
+         proven_by="scripts/test_implicit_deps.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-043",)),
     Gate(module="check_test_wiring",
          kind=GATE,
          summary="every test in a self-run suite is dispatched",
