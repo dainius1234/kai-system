@@ -8107,3 +8107,90 @@ directions.
 The instrument count is the one that keeps growing, and it should be
 said plainly: every one was found by reading what actually happened
 instead of what the instrument said about it.
+
+---
+
+## 2026-08-06 (part 40) — the assertion had never met the service
+
+The `tee` worked on its first run. Step 53's real output, printed by the
+post-mortem where it can be read:
+
+```
+── restart-persistence (its real output) ──
+[1/4] Writing marker memory via memu-core (via docker compose exec, port 8001) ...
+FAIL: memorize returned non-ok status: {'status': 'appended',
+      'id': 'ff6e05f5-8994-4f18-b63d-874febbc279b',
+      'commit': 'c5951f464631', 'state_commit': 'none',
+      'verdict': 'VERIFIER_UNREACHABLE', 'pii_redacted': '0'}
+```
+
+**The write succeeded.** `status: "appended"`, a real id, a real
+commit. The test asserted `status == "ok"`.
+
+`memu-core/app.py:1759` returns
+
+```python
+return {
+    "status": "appended",
+    "id": record.id,
+    ...
+}
+```
+
+unconditionally on the success path. **There is no branch that returns
+`"ok"`.** So this assertion could only ever fail, in any environment,
+against any version of the service.
+
+Nobody knew, because the step had never run against a live memu-core.
+It was written against an *assumed* contract — and an assumption about
+a service is not a fact about it. That is Directive 1 as a defect
+rather than as advice.
+
+### What the same log also proved
+
+Two things passed on the way there, and both are worth recording
+because neither had ever been demonstrated:
+
+```
+── live smoke ──
+  inspected: 12 service(s), 4 endpoint exercise(s)
+  not expected up: 16 behind a `profiles:` gate
+PASS: every service with a healthcheck is healthy and every exercised
+      endpoint answered.
+
+── kill-isolation ──
+  probing: memu-core on port 8001 (from its healthcheck)
+     health ok: HTTP 200
+     memorize ok: HTTP 200 {"status":"appended", …}
+PASS: memu-core stayed healthy and writable with
+      memu-core-introspect stopped.
+```
+
+The live smoke's four exercises now include **both** directions of the
+inbound identity gateway, and they pass — the dashboard refuses the
+unauthenticated call and admits the authenticated one. That is the auth
+layer verified against a running system for the first time.
+
+### The fix
+
+The contract, asserted as it is:
+
+  * `status == "appended"` — quoting where that comes from.
+  * an `id` must be present, because it is the handle [4/4] retrieves
+    by; a response without one makes the rest of the test meaningless
+    rather than merely failing.
+  * `verdict` is **printed, not asserted**. `verifier` is
+    `profiles: ["recovery"]` and deliberately not in this bring-up, so
+    `VERIFIER_UNREACHABLE` is the profile working as configured. Visible
+    if it ever changes; not a gate on something this test is not about.
+
+Steps [2/4], [3/4] and [4/4] were checked against the real contract too
+— `/memory/retrieve` returns `List[MemoryRecord]`, which is what they
+assume. Only [1/4] was blind.
+
+### There is no static gate for this, and there does not need to be
+
+A check that "an assertion agrees with the service" needs the service.
+The mechanism that catches this class is **the step running at all**,
+on every push — which it now does. That is the closure: not a new gate,
+but the eleven-step live section finally being a section that executes.

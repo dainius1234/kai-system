@@ -146,10 +146,35 @@ def main() -> int:
         print(f"FAIL: memorize request failed: {exc}")
         return 1
 
-    if result.get("status") != "ok":
-        print(f"FAIL: memorize returned non-ok status: {result}")
+    # `appended`, not `ok`. `memu-core/app.py` returns
+    #
+    #     {"status": "appended", "id": …, "commit": …, "verdict": …}
+    #
+    # unconditionally on the success path — there is no branch that
+    # returns "ok". This asserted `== "ok"` and could therefore only
+    # ever fail. Nobody knew, because this step had never run against a
+    # live memu-core: it was written against an assumed contract, and an
+    # assumption about a service is not a fact about it.
+    #
+    # The id is what actually matters here — it is the handle the record
+    # is retrieved by in [4/4], so a response without one would make the
+    # rest of this test meaningless rather than merely failing.
+    if result.get("status") != "appended":
+        print(f"FAIL: memorize did not append. memu-core returns "
+              f"status='appended' on success; got: {result}")
         return 1
-    print(f"     memorize ok: {result}")
+    if not result.get("id"):
+        print(f"FAIL: memorize appended but returned no id, so there is "
+              f"nothing to look for after the restart: {result}")
+        return 1
+    # `verdict` is the verifier's opinion, and `verifier` is
+    # `profiles: ["recovery"]` — deliberately not in this bring-up. So
+    # VERIFIER_UNREACHABLE here is the profile working as configured,
+    # not a fault, and this test is about persistence rather than
+    # verification. Printed rather than asserted, so it is visible if it
+    # ever changes.
+    print(f"     memorize appended: id={result['id']} "
+          f"commit={result.get('commit')} verdict={result.get('verdict')}")
 
     print(f"[2/4] Restarting container '{args.service}' ...")
     try:
