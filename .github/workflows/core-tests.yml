@@ -600,9 +600,22 @@ jobs:
             --compose-file docker-compose.full.yml \
             2>&1 | tee /tmp/full-smoke.log
 
+      # ci-toleration: documented-skip
       - name: Dump full-profile logs on failure
         if: failure()
         run: |
+          # `|| true` twice, deliberately. This step exists to explain a
+          # failure that has already happened; if `ps` or `logs` cannot
+          # run — the daemon is wedged, the project is gone — the useful
+          # thing is to print whatever the other command can still get,
+          # not to replace the original failure with a diagnostic one.
+          # A dump that fails is not a defect to be surfaced; it is a
+          # dump that had nothing to dump.
+          #
+          # Declared documented-skip rather than left silent, because
+          # `check_ci_tolerations` caught these two the moment they were
+          # written, which is the gate working exactly as intended on
+          # code committed after it.
           docker compose -f docker-compose.full.yml ps -a || true
           docker compose -f docker-compose.full.yml logs --no-color \
             --tail 40 || true

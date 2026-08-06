@@ -185,6 +185,24 @@ DECLARED: Tuple[Toleration, ...] = (
     ),
     Toleration(
         workflow="core-tests.yml",
+        step="Dump full-profile logs on failure",
+        bucket=DOCUMENTED_SKIP,
+        reason="The same argument as the minimal-profile dump step, "
+               "declared separately because the match is on the step name "
+               "and 'Dump container logs on failure' does not cover a "
+               "differently-named step — the gate caught exactly that on "
+               "the run these two lines were added. Runs only "
+               "`if: failure()`, so the job is already red and nothing "
+               "here can turn it green; it has no enforcement to skip. "
+               "Both `|| true`s are deliberate: a diagnostic that aborts "
+               "before printing the next fact is worse than no diagnostic, "
+               "and replacing the original failure with a dump failure "
+               "hides the thing the step exists to explain.",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="core-tests.yml",
         step="Post-mortem",
         bucket=DOCUMENTED_SKIP,
         reason="Same argument as the dump step, and it exists because that "
@@ -268,6 +286,15 @@ def survey() -> Tuple[List[Tuple[str, int, str, str]], int]:
         lines = path.read_text(encoding="utf-8").splitlines()
         scanned += len(lines)
         for i, line in enumerate(lines):
+            # A comment cannot swallow an exit code. This scanned raw
+            # lines, so a comment *explaining* a `|| true` was reported
+            # as a second `|| true` — which trains people to describe
+            # their code less precisely to keep a gate quiet, the exact
+            # opposite of what this file is for. Caught when a step whose
+            # comment said "`|| true` twice, deliberately" was reported
+            # three times.
+            if line.lstrip().startswith("#"):
+                continue
             if not _SUPPRESSION.search(line):
                 continue
             if (_INSTALL.search(line) or _ICON_TERNARY.search(line)
