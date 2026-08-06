@@ -83,7 +83,22 @@ jobs:
       - name: CI toleration register
         run: python scripts/security/check_ci_tolerations.py
 
+      # This step had a `- name:` and no body. A step with neither `run`
+      # nor `uses` is schema-invalid, so GitHub rejected the whole file,
+      # scheduled **no jobs at all**, and every run of this workflow
+      # completed as `failure` in zero seconds having executed nothing.
+      #
+      # It went unseen because the failure looks like any other red
+      # workflow, and because I was watching core-tests.yml and calling
+      # it "CI" — one workflow out of nine. The programme's own finding,
+      # aimed at how I was watching rather than at what I was watching:
+      # a scope smaller than the claim.
+      #
+      # The step's name is `Test wiring — no test defined and never
+      # called`. It was never called.
       - name: Test wiring — no test defined and never called
+        run: python scripts/security/check_test_wiring.py
+
       - name: Every jq filter embedded in a workflow compiles
         run: python scripts/security/check_workflow_filters.py
 

@@ -384,11 +384,78 @@ def unparseable() -> List[str]:
     broken = []
     for path in sorted(WORKFLOWS.glob("*.yml")):
         try:
-            yaml.safe_load(path.read_text(encoding="utf-8"))
+            doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         except Exception as exc:
             first = str(exc).splitlines()[0]
             broken.append(f"{path.name}: {first}")
+            continue
+        broken.extend(_schema_violations(path.name, doc))
     return broken
+
+
+#: Keys GitHub accepts on a step. Anything else is a typo that GitHub
+#: rejects, and a rejected workflow schedules nothing.
+_STEP_KEYS = {"name", "id", "if", "uses", "run", "with", "env", "shell",
+              "working-directory", "continue-on-error", "timeout-minutes"}
+
+
+def _schema_violations(name: str, doc: dict) -> List[str]:
+    """Shapes that parse as YAML but that GitHub refuses to run.
+
+    **Parseable is not runnable, and this file assumed they were the
+    same.** `unparseable()` was written because "a workflow that does not
+    parse runs nothing, and running nothing is indistinguishable from
+    having no failures". That reasoning is right and its scope was one
+    member of the class: it asked whether *Python* could read the file,
+    not whether *GitHub* would run it.
+
+    Found on 2026-08-06. `policy-checks.yml` had
+
+        - name: Test wiring — no test defined and never called
+        - name: Every jq filter embedded in a workflow compiles
+          run: python scripts/security/check_workflow_filters.py
+
+    — a step with a name and no body. It is valid YAML and invalid
+    GitHub. Every run of that workflow completed as `failure` with
+    **zero jobs scheduled**, having executed none of its 30 steps, on
+    every push for at least a day. Roughly fifteen gates declare
+    `in_workflows=("policy-checks.yml",)`; none of them had run in CI.
+
+    It survived because a startup failure looks like any other red
+    workflow from the outside, and because the only workflow anyone was
+    watching was `core-tests.yml`.
+
+    Deliberately narrow: a step must have `run` or `uses`, a job must
+    have `runs-on` or `uses`, and step keys must be ones GitHub knows.
+    Those are unambiguous. GitHub's full schema is larger, and guessing
+    at the rest would produce findings against workflows that run fine —
+    the inverse defect this programme keeps re-learning.
+    """
+    out: List[str] = []
+    jobs = doc.get("jobs") or {}
+    if not jobs:
+        out.append(f"{name}: declares no jobs, so it runs nothing")
+    for job_name, job in jobs.items():
+        job = job or {}
+        if not job.get("runs-on") and not job.get("uses"):
+            out.append(f"{name}: job '{job_name}' has no `runs-on` — "
+                       f"GitHub cannot schedule it")
+        for index, step in enumerate(job.get("steps") or []):
+            step = step or {}
+            label = step.get("name") or f"step {index}"
+            if "run" not in step and "uses" not in step:
+                out.append(
+                    f"{name}: job '{job_name}' step {index} "
+                    f"({label!r}) has neither `run` nor `uses`. GitHub "
+                    f"rejects the whole file, schedules no jobs, and the "
+                    f"run completes as a failure having executed nothing "
+                    f"— which reads exactly like an ordinary red build.")
+            unknown = sorted(set(step) - _STEP_KEYS)
+            if unknown:
+                out.append(
+                    f"{name}: job '{job_name}' step {index} ({label!r}) "
+                    f"has key(s) GitHub does not accept: {unknown}")
+    return out
 
 
 def main() -> int:

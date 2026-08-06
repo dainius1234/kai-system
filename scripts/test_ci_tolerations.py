@@ -31,7 +31,7 @@ from scripts.security import check_ci_tolerations as ci  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 12
+EXPECTED_SCENARIOS = 17
 executed: list[str] = []
 
 
@@ -204,7 +204,78 @@ def test_an_undeclared_emitter_is_reported():
         ci.DECLARED = original
 
 
+# ── parseable is not runnable ─────────────────────────────────────────
+
+def test_a_step_with_no_body_is_reported() -> None:
+    """The defect that hid an entire workflow for a day.
+
+    `policy-checks.yml` had a `- name:` with no `run:`. Valid YAML,
+    invalid GitHub — so every run completed as `failure` with **zero
+    jobs scheduled**, having executed none of its 30 steps. Roughly
+    fifteen gates declare `in_workflows=("policy-checks.yml",)` and none
+    of them had run in CI.
+
+    `unparseable()` existed for precisely this reasoning — "a workflow
+    that does not parse runs nothing, and running nothing is
+    indistinguishable from having no failures" — and asked whether
+    *Python* could read the file rather than whether *GitHub* would run
+    it. One member of the class, standing in for the class.
+    """
+    scenario("bodiless step reported")
+    import yaml
+    doc = yaml.safe_load(
+        "jobs:\n  policy:\n    runs-on: ubuntu-latest\n    steps:\n"
+        "      - name: a step with no body\n"
+        "      - name: a real one\n        run: echo hi\n")
+    found = ci._schema_violations("t.yml", doc)
+    check("it is reported", len(found) == 1, str(found))
+    check("and says GitHub schedules no jobs",
+          found and "schedules no jobs" in found[0], str(found))
+
+
+def test_a_valid_workflow_is_not_reported() -> None:
+    """The inverse direction. GitHub's real schema is much larger than
+    these three rules, and guessing at the rest would report findings
+    against workflows that run fine."""
+    scenario("valid workflow passes")
+    import yaml
+    doc = yaml.safe_load(
+        "jobs:\n  policy:\n    runs-on: ubuntu-latest\n    steps:\n"
+        "      - uses: actions/checkout@v4\n"
+        "      - name: a real one\n        run: echo hi\n")
+    check("nothing reported", ci._schema_violations("t.yml", doc) == [], "")
+
+
+def test_a_job_with_no_runs_on_is_reported() -> None:
+    scenario("job without runs-on")
+    import yaml
+    doc = yaml.safe_load("jobs:\n  policy:\n    steps:\n"
+                         "      - run: echo hi\n")
+    found = ci._schema_violations("t.yml", doc)
+    check("reported", any("runs-on" in f for f in found), str(found))
+
+
+def test_a_workflow_with_no_jobs_is_reported() -> None:
+    """I-1 for a workflow: a file that schedules nothing has no failures
+    for the same reason it has no successes."""
+    scenario("no jobs reported")
+    import yaml
+    found = ci._schema_violations("t.yml", yaml.safe_load("name: x\n"))
+    check("reported", any("runs nothing" in f for f in found), str(found))
+
+
+def test_the_real_workflows_are_schema_valid_today() -> None:
+    scenario("repository workflows valid")
+    check("no schema violations", ci.unparseable() == [],
+          str(ci.unparseable()))
+
+
 def run_all() -> None:
+    test_a_step_with_no_body_is_reported()
+    test_a_valid_workflow_is_not_reported()
+    test_a_job_with_no_runs_on_is_reported()
+    test_a_workflow_with_no_jobs_is_reported()
+    test_the_real_workflows_are_schema_valid_today()
     test_a_swallowed_exit_code_is_found()
     test_continue_on_error_is_found()
     test_install_tolerance_is_not_a_suppression()
