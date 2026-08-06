@@ -94,6 +94,11 @@ import logging as _logging
 from common.degraded import record_degradation
 _policy_logger = _logging.getLogger("kai.policy")
 
+#: A file that exists and parses to nothing is an impossible result, and
+#: this refuses to run on it. Set only where a deployment genuinely has
+#: no policy and the hardcoded defaults are the intended behaviour.
+_STRICT = os.getenv("KAI_POLICY_ALLOW_EMPTY", "").lower() not in ("1", "true", "yes")
+
 POLICY: Dict[str, Any] = {}
 if _POLICY_PATH.exists():
     try:
@@ -102,13 +107,60 @@ if _POLICY_PATH.exists():
             raise ValueError("policy file parsed to empty or non-dict")
         POLICY = _loaded
     except Exception as _exc:
-        _policy_logger.critical(
-            "POLICY FILE CORRUPT OR UNREADABLE (%s) — failing closed: "
-            "all permissions will use their most restrictive defaults. "
-            "Fix %s and restart.",
-            _exc,
-            _POLICY_PATH,
+        # Three states, three messages. The old code had one, and it said
+        # CORRUPT for all of them.
+        #
+        # On 2026-08-06 the sovereign profile started tool-gate for the
+        # first time and this printed
+        #
+        #     POLICY FILE CORRUPT OR UNREADABLE — failing closed
+        #
+        # The file was not corrupt. pyyaml was not installed, so the
+        # fallback loader ran `json.loads` over a YAML document and could
+        # only return {}. 35 images shipped `common/` and none declared
+        # pyyaml, so this had been true in every container since the
+        # loader was written. The message sent every reader to the file
+        # instead of to the dependency, which is why it survived.
+        #
+        # **Why it now refuses rather than degrades.** Fail-closed was the
+        # right *direction* and it worked — the system was restrictive,
+        # not open. The defect is that "running on the declared policy"
+        # and "running on hardcoded defaults because nothing could read
+        # the policy" were indistinguishable from outside. A file that
+        # exists, has bytes, and parses to nothing is not a policy
+        # decision; it is an impossible output, and a service that
+        # continues on it is asserting a configuration nobody wrote.
+        #
+        # The suggestion came from DeepSeek, asked for a second opinion on
+        # where a static gate should stop: a gate cannot decide whether a
+        # guarded import's fallback works, but the service *can* decide
+        # that its own output is nonsense. Undecidable statically,
+        # decidable at runtime.
+        #
+        # An absent file is a different case and is still allowed — see
+        # the `exists()` guard above. This is only about a file that is
+        # there and yielded nothing.
+        _detail = (
+            f"POLICY NOT LOADED from {_POLICY_PATH} ({_exc}). The file "
+            f"exists and is {_POLICY_PATH.stat().st_size} bytes, so this "
+            f"is not a missing file and almost certainly not a corrupt "
+            f"one: the usual cause is that pyyaml is not installed in "
+            f"this image, leaving a fallback loader that cannot parse "
+            f"YAML. Add pyyaml to this service's requirements.txt."
         )
+        if _STRICT:
+            _policy_logger.critical("%s Refusing to start.", _detail)
+            raise RuntimeError(
+                _detail + " Refusing to start on an empty policy: every "
+                "permission would silently take its most restrictive "
+                "default, which is indistinguishable from the policy "
+                "having been applied. Set KAI_POLICY_ALLOW_EMPTY=1 to "
+                "run on hardcoded defaults deliberately."
+            ) from _exc
+        _policy_logger.critical(
+            "%s Continuing on hardcoded defaults because "
+            "KAI_POLICY_ALLOW_EMPTY is set — this deployment is NOT "
+            "running the policy in %s.", _detail, _POLICY_PATH)
         # POLICY stays {} — all accessors fall back to hardcoded safe defaults
 
 # SHA-256 of the raw file — displayed on dashboard, logged on startup

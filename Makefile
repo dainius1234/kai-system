@@ -318,7 +318,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-compose-interpolation test-unreachable-bindings \
 	test-implicit-deps test-image-modules test-test-identity \
 	test-execution-coverage test-bringup-guards test-ci-scripts \
-	test-shipped-package-deps \
+	test-shipped-package-deps test-policy-loader \
 	test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
@@ -870,6 +870,9 @@ test-ci-scripts:
 
 test-shipped-package-deps:
 	python3 scripts/test_shipped_package_deps.py
+
+test-policy-loader:
+	python3 scripts/test_policy_loader.py
 
 execution-coverage:
 	python3 scripts/security/report_execution_coverage.py
