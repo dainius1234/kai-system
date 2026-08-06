@@ -558,11 +558,71 @@ jobs:
         run: |
           docker compose -f docker-compose.full.yml down
 
+      # The minimal profile is proven: bring-up, live smoke,
+      # kill-isolation and restart-persistence all pass against it. Full
+      # is the next profile out, and it is where the never-executed
+      # surface actually lives — `report_execution_coverage` counts 8
+      # services that boot BY DEFAULT in this profile and have never
+      # been started by anything:
+      #
+      #   avatar-service   backup-service   calendar-sync   kai-advisor
+      #   ledger-worker    memory-compressor  metrics-gateway
+      #   workspace-manager
+      #
+      # Every one of the ten defects found on 2026-08-06 lived in code
+      # that had never executed. These eight are the largest remaining
+      # block of exactly that, and they ship on a real deployment.
+      #
+      # 21 services start by default here, 20 of them declaring a
+      # healthcheck. The images are already built two steps up, so this
+      # costs a bring-up, not a rebuild.
+      - name: Bring up the full profile
+        env:
+          MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
+        run: |
+          set -o pipefail
+          exec > >(tee /tmp/full-bringup.log) 2>&1
+          docker compose -f docker-compose.full.yml up -d
+          df -h / | tail -1
+          # Same rule the minimal bring-up enforces: a substitution
+          # warning here means a variable nobody has accounted for.
+          if grep -q 'variable is not set' /tmp/full-bringup.log; then
+            echo "::error::A compose variable was substituted blank"
+            grep -o 'The "[A-Z_]*" variable is not set' /tmp/full-bringup.log \
+              | sort -u
+            exit 1
+          fi
+
+      - name: Live smoke against the full profile
+        run: |
+          set -o pipefail
+          python3 scripts/ci/live_smoke.py \
+            --compose-file docker-compose.full.yml \
+            2>&1 | tee /tmp/full-smoke.log
+
+      - name: Dump full-profile logs on failure
+        if: failure()
+        run: |
+          docker compose -f docker-compose.full.yml ps -a || true
+          docker compose -f docker-compose.full.yml logs --no-color \
+            --tail 40 || true
+
+      - name: Tear down full profile
+        if: always()
+        run: |
+          docker compose -f docker-compose.full.yml down -v
+
       - name: Boot sovereign profile (pgvector postgres + tool-gate + memu-core)
         env:
           MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
           DB_PASSWORD: localdev
         run: |
+          set -o pipefail
+          # The last live step without a tee. Every other one got it when
+          # restart-persistence's output proved unreadable; this one was
+          # still passing at the time, so it was left — which is exactly
+          # how a remedy ends up applied to some of its subject.
+          exec > >(tee /tmp/sovereign-boot.log) 2>&1
           # S4: First CI verification that the sovereign compose boots correctly.
           # Only start the three services that don't need Tailscale/Vault/Ollama.
           # memu-core with VECTOR_STORE=postgres validates the D79 pgvector image fix.
@@ -625,6 +685,12 @@ jobs:
           echo "── restart-persistence (its real output) ──"
           tail -25 /tmp/restart-persistence.log 2>/dev/null \
             || echo "(did not run)"
+          echo "── full profile bring-up (its real output) ──"
+          tail -20 /tmp/full-bringup.log 2>/dev/null || echo "(did not run)"
+          echo "── full profile live smoke (its real output) ──"
+          tail -30 /tmp/full-smoke.log 2>/dev/null || echo "(did not run)"
+          echo "── sovereign boot (its real output) ──"
+          tail -30 /tmp/sovereign-boot.log 2>/dev/null || echo "(did not run)"
           # This step runs LAST so it survives log truncation — which
           # means the teardown at step 54 has already run, so `ps -a`
           # finds nothing and prints a bare header. An empty container
