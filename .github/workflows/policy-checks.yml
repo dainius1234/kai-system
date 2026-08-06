@@ -123,6 +123,9 @@ jobs:
       - name: Every image contains the modules its entry point imports
         run: python scripts/security/check_image_modules.py
 
+      - name: Every image installs what the packages it ships import
+        run: python scripts/security/check_shipped_package_deps.py
+
       - name: Every test pins the identity it claims to run as
         run: python scripts/security/check_test_identity.py
 

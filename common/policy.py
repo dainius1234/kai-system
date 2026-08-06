@@ -30,26 +30,55 @@ except Exception:
     import json
 
     def _load_yaml(path: Path) -> Dict[str, Any]:  # type: ignore[misc]
-        """Minimal YAML-subset loader (flat keys + lists only).
+        """There is no fallback. This exists to say so, loudly.
 
-        Good enough for CI environments where pyyaml isn't installed.
-        Handles basic scalar, list, and nested dict structures via a
-        JSON conversion fallback (policy.yml is simple enough).
+        It used to describe itself as a *"minimal YAML-subset loader
+        (flat keys + lists only) … good enough for CI environments where
+        pyyaml isn't installed"*. It is `json.loads` pointed at a YAML
+        document. `security/policy.yml` begins
+
+            version: "1.0.0"
+
+        which is not JSON and never will be, so this path could only
+        ever return `{}`. The docstring described an intention; the code
+        was a stub that always failed.
+
+        The consequence, proven in CI on 2026-08-06 when the sovereign
+        profile first started tool-gate:
+
+            JSONDecodeError: Expecting value: line 14 column 1 (char 13)
+            POLICY FILE CORRUPT OR UNREADABLE — failing closed: all
+            permissions will use their most restrictive defaults.
+
+        35 service images ship `common/` and none of them declared
+        pyyaml. `security/policy.yml` calls itself *"the single source of
+        truth — every runtime decision reads from this file"*, and no
+        container had ever read it. Today's pattern with the subject
+        changed: not code that never executed, but configuration that
+        was never loaded.
+
+        Fail-closed is the right direction and it did behave that way —
+        the system was restrictive, not open. But a policy file that has
+        never been parsed is not policy, and the reason it went unnoticed
+        for so long is that the message said CORRUPT, which sends the
+        reader to the file rather than to the missing dependency.
         """
-        # Try to convert simple YAML to JSON-parseable format
         text = path.read_text(encoding="utf-8")
-        # Strip comments
-        lines = []
-        for line in text.splitlines():
-            stripped = line.split("#")[0].rstrip() if "#" in line else line.rstrip()
-            lines.append(stripped)
-        # If it looks like it could be JSON, try that
-        clean = "\n".join(lines)
         try:
-            return json.loads(clean)
+            # Kept only because a *genuinely* JSON policy document would
+            # still load. It is not a YAML fallback and does not pretend
+            # to be one.
+            return json.loads(text)
         except Exception as _exc:
             record_degradation("policy", "parse_policy_document", _exc)
-        # Fallback: return empty dict (services use .get() with defaults)
+            _bootstrap_logger = __import__("logging").getLogger("kai.policy")
+            _bootstrap_logger.error(
+                "POLICY NOT LOADED: pyyaml is not installed in this image, "
+                "so %s could not be parsed. This is a missing dependency, "
+                "not a corrupt file — add pyyaml to this service's "
+                "requirements.txt. Continuing with an empty policy, which "
+                "means every permission takes its most restrictive "
+                "default.", path)
         return {}
 
 

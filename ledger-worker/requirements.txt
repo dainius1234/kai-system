@@ -2,3 +2,8 @@ fastapi>=0.116.2
 starlette>=0.47.2
 uvicorn==0.30.6
 httpx==0.27.2
+# `common/policy.py` reads security/policy.yml at import. Without
+# pyyaml it falls back to a loader that cannot parse YAML, the
+# policy loads empty, and every permission drops to its most
+# restrictive default. Proven in CI on 2026-08-06 (tool-gate).
+pyyaml>=6.0

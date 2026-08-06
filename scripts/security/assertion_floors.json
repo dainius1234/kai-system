@@ -27,7 +27,7 @@
     "Full Migration Tests": 75,
     "Gate Registry Tests": 82,
     "Hygiene Gate Tests": 63,
-    "Image Module Tests": 23,
+    "Image Module Tests": 28,
     "Implicit Dependency Tests": 32,
     "Invariant Guard Tests": 26,
     "Legacy Bridge Tests": 58,
@@ -37,6 +37,7 @@
     "Secret & Restart Gate Tests": 28,
     "Service Auth Tests": 59,
     "Service Token Tests": 24,
+    "Shipped Package Deps Tests": 13,
     "Suite Floor Tests": 18,
     "Test Identity Tests": 31,
     "Test Isolation Tests": 38,
@@ -53,5 +54,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2796
+  "total": 2814
 }

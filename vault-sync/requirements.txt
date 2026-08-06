@@ -5,3 +5,8 @@ watchdog==4.0.1
 python-frontmatter==1.1.0
 Jinja2==3.1.4
 pydantic==2.7.1
+# `common/policy.py` reads security/policy.yml at import. Without
+# pyyaml it falls back to a loader that cannot parse YAML, the
+# policy loads empty, and every permission drops to its most
+# restrictive default. Proven in CI on 2026-08-06 (tool-gate).
+pyyaml>=6.0

@@ -11,3 +11,8 @@ redis==5.0.8
 # other service had already brought it in. Only the container can see
 # a missing per-service dependency.
 python-multipart>=0.0.26
+# `common/policy.py` reads security/policy.yml at import. Without
+# pyyaml it falls back to a loader that cannot parse YAML, the
+# policy loads empty, and every permission drops to its most
+# restrictive default. Proven in CI on 2026-08-06 (tool-gate).
+pyyaml>=6.0

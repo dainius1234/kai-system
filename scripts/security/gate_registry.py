@@ -404,6 +404,15 @@ REGISTRY: Tuple[Gate, ...] = (
     # an operator token, eight of its fourteen tests silently changed
     # from checking upload validation to checking authorisation.
     # KAI-GATE-045.
+    Gate(module="check_shipped_package_deps",
+         kind=GATE,
+         summary="an image that ships a first-party package installs the "
+                 "unguarded imports of the parts it reaches",
+         inputs=(),
+         denominator=r"inspected: \d+ first-party package copy\(ies\)",
+         proven_by="scripts/test_shipped_package_deps.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",)),
     Gate(module="check_test_identity",
          kind=GATE,
          summary="every test pins the identity it claims to run as",

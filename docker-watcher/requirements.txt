@@ -2,3 +2,8 @@ fastapi>=0.110.0
 uvicorn[standard]>=0.29.0
 docker>=7.0.0
 pydantic>=2.0.0
+# `common/policy.py` reads security/policy.yml at import. Without
+# pyyaml it falls back to a loader that cannot parse YAML, the
+# policy loads empty, and every permission drops to its most
+# restrictive default. Proven in CI on 2026-08-06 (tool-gate).
+pyyaml>=6.0

@@ -10,3 +10,11 @@ numpy>=1.26.4
 sentence-transformers>=2.7.0
 # TurboVec vector store backend — only needed when VECTOR_STORE=turbovec
 turbovec>=0.1.0
+# `common/policy.py` reads security/policy.yml at import. Without
+# pyyaml it falls back to a loader that cannot parse YAML, the
+# policy loads empty, and every permission drops to its most
+# restrictive default. Proven in CI on 2026-08-06 (tool-gate).
+pyyaml>=6.0
+# `common/` imports httpx at module level, so this image needs it
+# whether or not something else happens to pull it in.
+httpx>=0.27

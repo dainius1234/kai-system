@@ -6,3 +6,8 @@ cognee==1.1.3
 # Cognee's chunker loads a HuggingFace tokenizer (HUGGINGFACE_TOKENIZER env
 # var) via the transformers library; not pulled in transitively by cognee==1.1.3.
 transformers>=4.40.0
+# `common/policy.py` reads security/policy.yml at import. Without
+# pyyaml it falls back to a loader that cannot parse YAML, the
+# policy loads empty, and every permission drops to its most
+# restrictive default. Proven in CI on 2026-08-06 (tool-gate).
+pyyaml>=6.0
