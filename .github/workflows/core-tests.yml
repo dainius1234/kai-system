@@ -433,12 +433,27 @@ jobs:
       # verdict of the healthcheck each service already declares — and
       # exercises endpoints through `docker compose exec`, inside the
       # network, with ports derived from those same healthchecks.
+      # Every live step `tee`s to a file the post-mortem prints. The
+      # bring-up has done this since 2026-08-05 and the reason was
+      # written down then — "last, so it survives log truncation" — but
+      # the three steps after it were left plain, so when
+      # restart-persistence failed its output sat in the middle of a
+      # 62-step log and could not be retrieved at all.
+      #
+      # The remedy that was found once and applied to one step, applied
+      # to the rest of them.
       - name: Live smoke against the running stack
         run: |
+          set -o pipefail
           python3 scripts/ci/live_smoke.py \
-            --compose-file docker-compose.minimal.yml
+            --compose-file docker-compose.minimal.yml \
+            2>&1 | tee /tmp/live-smoke.log
       - name: Kill-isolation — introspect crash must not affect hot path
         run: |
+          set -o pipefail
+          # This block runs several commands, so it redirects once at
+          # the top rather than teeing each of them.
+          exec > >(tee /tmp/kill-isolation.log) 2>&1
           # Every probe here used to be `curl http://localhost:8001|8009`,
           # aimed at host ports that have not existed since the edge
           # lockdown. The calls now run inside the containers, with the
@@ -455,9 +470,10 @@ jobs:
         env:
           MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
         run: |
+          set -o pipefail
           python3 scripts/test_restart_persistence.py \
             --compose-file docker-compose.minimal.yml \
-            --service memu-core
+            --service memu-core 2>&1 | tee /tmp/restart-persistence.log
 
       # `Dump container logs on failure` sits at step 50, immediately
       # after the bring-up, so `if: failure()` there can only ever
@@ -602,6 +618,13 @@ jobs:
           tail -8 /tmp/build-full.log 2>/dev/null || echo "(did not run)"
           echo "── what the bring-up itself said (its real output) ──"
           tail -20 /tmp/bringup.log 2>/dev/null || echo "(did not run)"
+          echo "── live smoke (its real output) ──"
+          tail -25 /tmp/live-smoke.log 2>/dev/null || echo "(did not run)"
+          echo "── kill-isolation (its real output) ──"
+          tail -15 /tmp/kill-isolation.log 2>/dev/null || echo "(did not run)"
+          echo "── restart-persistence (its real output) ──"
+          tail -25 /tmp/restart-persistence.log 2>/dev/null \
+            || echo "(did not run)"
           # This step runs LAST so it survives log truncation — which
           # means the teardown at step 54 has already run, so `ps -a`
           # finds nothing and prints a bare header. An empty container
