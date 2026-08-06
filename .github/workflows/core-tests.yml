@@ -563,7 +563,17 @@ jobs:
           tail -8 /tmp/build-full.log 2>/dev/null || echo "(did not run)"
           echo "── what the bring-up itself said (its real output) ──"
           tail -20 /tmp/bringup.log 2>/dev/null || echo "(did not run)"
-          echo "── containers (all states) ──"
+          # This step runs LAST so it survives log truncation — which
+          # means the teardown at step 54 has already run, so `ps -a`
+          # finds nothing and prints a bare header. An empty container
+          # table reads as "nothing ever started", which is the
+          # opposite of what happened on every run where the bring-up
+          # succeeded. A diagnostic that reports something other than
+          # what happened — the third time today, so it says so instead.
+          echo "── containers (all states, AFTER teardown) ──"
+          echo "  (empty is expected here: 'Tear down minimal stack' has"
+          echo "   already run. Live container state is in 'Dump container"
+          echo "   logs on failure', which runs before it.)"
           docker compose -f docker-compose.minimal.yml ps -a 2>/dev/null \
             | head -12 || true
           echo "── images built ──"
