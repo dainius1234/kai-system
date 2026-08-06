@@ -25,7 +25,7 @@ from scripts.ci import live_smoke as gate  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 14
+EXPECTED_SCENARIOS = 17
 executed: list = []
 
 
@@ -77,7 +77,13 @@ class FakeRunner:
         if "exec" in argv:
             service = argv[argv.index("exec") + 2]
             self.execs.append(service)
-            status = self.statuses.get(service, 200)
+            # Whether the call carries credentials is part of its
+            # identity now: the dashboard is exercised twice, once
+            # without and once with, and a fake that cannot tell them
+            # apart cannot model a gateway at all.
+            authed = "Authorization" in " ".join(str(a) for a in argv)
+            key = (service, "auth" if authed else "noauth")
+            status = self.statuses.get(key, self.statuses.get(service, 200))
             if status == "unreachable":
                 return 1, "", "ERROR URLError"
             return 0, f"STATUS {status}\n", ""
@@ -131,12 +137,16 @@ def test_a_whole_stack_down_fails() -> None:
 def test_a_healthy_stack_passes() -> None:
     scenario("healthy stack passes")
     text = _compose(**{"heartbeat": 8010, "memu_core": 8001, "dashboard": 8080})
-    runner = FakeRunner({"heartbeat": "healthy", "memu-core": "healthy",
-                         "dashboard": "healthy"})
+    runner = FakeRunner(
+        {"heartbeat": "healthy", "memu-core": "healthy",
+         "dashboard": "healthy"},
+        # A gateway that fails closed: it refuses the call with no
+        # credentials and answers the one that carries them.
+        {("dashboard", "noauth"): 403, ("dashboard", "auth"): 200})
     failures, probed, exercised = _audit(text, runner)
     check("no failures", failures == [], str(failures))
     check("three services probed", probed == 3, str(probed))
-    check("three endpoints exercised", exercised == 3, str(exercised))
+    check("four endpoints exercised", exercised == 4, str(exercised))
 
 
 # ── Failing closed ───────────────────────────────────────────────────
@@ -235,7 +245,7 @@ def test_the_real_profile_declares_the_exercised_services() -> None:
     doc = yaml.safe_load(
         (gate.REPO / "docker-compose.minimal.yml").read_text(encoding="utf-8"))
     ports = gate.health_ports(doc)
-    missing = [s for s, _, _, _ in gate.EXERCISES if s not in ports]
+    missing = [ex.service for ex in gate.EXERCISES if ex.service not in ports]
     check("every exercised service is in the minimal profile",
           missing == [], str(missing))
     check("and the profile declares a useful number of health ports",
@@ -304,7 +314,61 @@ def test_gated_services_are_identified_from_the_compose_file() -> None:
           str(got))
 
 
+def test_the_gateway_is_proven_in_both_directions() -> None:
+    """The dashboard's 503 on the first live run was not a defect — it
+    was Wave 1 Track A working. With no `KAI_DASHBOARD_TOKEN`,
+    `authenticate()` returns 503 "this gateway fails closed by design".
+
+    But a probe that only ever sees a refusal cannot tell *refusing
+    correctly* from *permanently broken* — and the dashboard HAD been
+    permanently broken, on missing python-multipart, until this morning.
+    So both directions are asserted. I-3, applied to a live service
+    rather than to a gate."""
+    scenario("gateway both directions")
+    unauth = [e for e in gate.EXERCISES
+              if e.service == "dashboard" and not e.headers]
+    authed = [e for e in gate.EXERCISES
+              if e.service == "dashboard" and e.headers]
+    check("there is an unauthenticated call", len(unauth) == 1, str(unauth))
+    check("and an authenticated one", len(authed) == 1, str(authed))
+    check("the unauthenticated one must be refused",
+          unauth and unauth[0].expect == (401, 403), str(unauth))
+    check("the authenticated one must be let in",
+          authed and 200 in authed[0].expect, str(authed))
+    check("and it carries a bearer token",
+          authed and authed[0].headers.get("Authorization", "").startswith("Bearer "),
+          str(authed))
+
+
+def test_a_gateway_that_answers_without_credentials_is_a_failure() -> None:
+    """The finding this pair exists to catch: an endpoint that should
+    demand credentials and does not."""
+    scenario("open gateway fails")
+    text = _compose(**{"heartbeat": 8010, "memu_core": 8001, "dashboard": 8080})
+    runner = FakeRunner(
+        {"heartbeat": "healthy", "memu-core": "healthy", "dashboard": "healthy"},
+        {("dashboard", "noauth"): 200, ("dashboard", "auth"): 200})
+    failures, _, _ = _audit(text, runner)
+    check("answering 200 with no credentials is reported",
+          any("gateway must refuse" in f for f in failures), str(failures))
+
+
+def test_a_gateway_that_refuses_valid_credentials_is_a_failure() -> None:
+    """And the other direction: a gateway nobody can get into."""
+    scenario("closed gateway fails")
+    text = _compose(**{"heartbeat": 8010, "memu_core": 8001, "dashboard": 8080})
+    runner = FakeRunner(
+        {"heartbeat": "healthy", "memu-core": "healthy", "dashboard": "healthy"},
+        {("dashboard", "noauth"): 403, ("dashboard", "auth"): 403})
+    failures, _, _ = _audit(text, runner)
+    check("refusing valid credentials is reported",
+          any("with credentials" in f for f in failures), str(failures))
+
+
 def run_all() -> None:
+    test_the_gateway_is_proven_in_both_directions()
+    test_a_gateway_that_answers_without_credentials_is_a_failure()
+    test_a_gateway_that_refuses_valid_credentials_is_a_failure()
     test_a_profile_gated_service_is_not_a_failure()
     test_an_ungated_service_that_is_absent_is_still_a_failure()
     test_gated_services_are_identified_from_the_compose_file()

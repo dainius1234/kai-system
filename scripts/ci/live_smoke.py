@@ -52,8 +52,10 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
+import os
 import time
-from typing import Callable, List, Sequence, Tuple
+from dataclasses import dataclass, field
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
@@ -66,15 +68,52 @@ from scripts.ci.compose_probe import (  # noqa: E402
 # test, and a long one that nobody reads is how the old file grew to
 # eleven probes of which five addressed nothing.
 
-EXERCISES: Tuple[Tuple[str, str, str, dict], ...] = (
-    ("heartbeat", "POST", "/tick", {}),
-    ("memu-core", "POST", "/memory/memorize", {
+@dataclass(frozen=True)
+class Exercise:
+    """One endpoint call, and what counts as the right answer."""
+    service: str
+    method: str
+    path: str
+    body: dict = field(default_factory=dict)
+    headers: Dict[str, str] = field(default_factory=dict)
+    expect: Optional[Tuple[int, ...]] = None
+    why: str = ""
+
+
+def _dashboard_token() -> str:
+    """The token CI gives the dashboard, read at call time."""
+    return os.getenv("KAI_DASHBOARD_TOKEN", "")
+
+
+EXERCISES: Tuple[Exercise, ...] = (
+    Exercise("heartbeat", "POST", "/tick"),
+    Exercise("memu-core", "POST", "/memory/memorize", {
         "timestamp": "2026-01-01T00:00:00Z",
         "event_type": "ci-live-smoke",
         "result_raw": "live smoke",
         "user_id": "ci",
     }),
-    ("dashboard", "GET", "/go-no-go", {}),
+    # The inbound identity gateway, proven in both directions.
+    #
+    # The first live run of this file reported `dashboard GET /go-no-go:
+    # HTTP 503` and that was not a defect — it was Wave 1 Track A
+    # working: with no `KAI_DASHBOARD_TOKEN`, `authenticate()` returns
+    #
+    #   503 "… dashboard authentication is misconfigured. This gateway
+    #        fails closed by design."
+    #
+    # A probe that only ever sees 503 cannot tell *refusing correctly*
+    # from *permanently broken*, and the dashboard had in fact been
+    # permanently broken (no python-multipart) until this morning. So
+    # both directions are asserted, which is I-3 applied to a live
+    # service instead of to a gate.
+    Exercise("dashboard", "GET", "/go-no-go", expect=(401, 403),
+             why="no credentials — the gateway must refuse"),
+    Exercise("dashboard", "GET", "/go-no-go",
+             headers={"Authorization": f"Bearer {_dashboard_token()}"},
+             expect=(200, 503),
+             why="with credentials — 200 GO or 503 NO_GO, both of which "
+                 "mean the gateway let us in and the report was built"),
 )
 
 
@@ -158,7 +197,8 @@ def audit(compose_file: str, runner: Runner = _run,
             failures.append(f"{service}: health={state}")
 
     exercised = 0
-    for service, method, endpoint, body in EXERCISES:
+    for ex in EXERCISES:
+        service, method, endpoint, body = ex.service, ex.method, ex.path, ex.body
         if service not in ports:
             # Not a skip. The exercise list and the profile disagreeing is
             # exactly the drift that left five of the old file's eleven
@@ -170,9 +210,11 @@ def audit(compose_file: str, runner: Runner = _run,
             continue        # already reported above; do not double-count
         exercised += 1
         ok, detail, _ = exec_http(compose_file, service, ports[service],
-                                  method, endpoint, body, runner)
+                                  method, endpoint, body, runner,
+                                  headers=ex.headers, expect=ex.expect)
         if not ok:
-            failures.append(f"{service} {method} {endpoint}: {detail}")
+            note = f" ({ex.why})" if ex.why else ""
+            failures.append(f"{service} {method} {endpoint}{note}: {detail}")
 
     if probed == 0:
         failures.append(f"{compose_file}: no service declares a health port "

@@ -7849,3 +7849,93 @@ clause earned its place.
 - **KAI-GATE-025**: the bring-up passes. Closure still requires the
   remaining steps to run — 51 through 62 have never executed, and this
   is what they are for.
+
+---
+
+## 2026-08-06 (part 37) — one failure left, and it was the system working
+
+Run 31087616905. The bring-up passed again, in 63 seconds, and the live
+smoke ran with its corrected scope:
+
+```
+  inspected: 12 service(s) with a declared health port, 3 endpoint exercise(s)
+  not expected up: 16 service(s) behind a `profiles:` gate this bring-up did not activate
+
+FAIL: 1 problem(s):
+  - dashboard GET /go-no-go: HTTP 503
+```
+
+**Twelve of twelve healthy.** The denominator fix works: 17 findings
+became 1, and the 16 that vanished were the false ones.
+
+And two exercises **passed** — `heartbeat POST /tick` and `memu-core
+POST /memory/memorize`. That is the first live end-to-end proof this
+system has ever produced: a real HTTP call, inside the network, to a
+service that wrote to Postgres and answered.
+
+### The remaining 503 is not a defect
+
+Traced rather than assumed. `GET /go-no-go` carries
+`Depends(require_dashboard_auth(Scope.READ_OPERATIONAL))`, and
+`common/dashboard_auth.authenticate()` says:
+
+```python
+except ConfigError as exc:
+    logger.error("SECURITY: dashboard credentials are misconfigured: %s", exc)
+    return None, 503, (
+        f"{operation} is unavailable: dashboard authentication is "
+        f"misconfigured ({exc}). This gateway fails closed by design.")
+```
+
+`KAI_DASHBOARD_TOKEN` is empty in CI, so `load_principals()` raises and
+the gateway refuses. **That is Wave 1 Track A working exactly as
+designed.** The smoke test was asking an unauthenticated question of a
+service built to refuse unauthenticated questions.
+
+### Which exposes a real gap, and it is worth more than the fix
+
+A probe that only ever sees 503 **cannot tell refusing-correctly from
+permanently-broken**. And the dashboard *was* permanently broken — no
+`python-multipart`, crash-looping at import — until this morning. Both
+states print `503`. The instrument could not distinguish the system
+working from the system dead.
+
+So the gateway is now proven in **both directions**:
+
+```
+  dashboard GET /go-no-go   no credentials    -> must be 401 or 403
+  dashboard GET /go-no-go   Bearer <token>    -> must be 200 or 503
+                                                 (GO or NO_GO — either
+                                                  means it let us in and
+                                                  built the report)
+```
+
+That is I-3 — *prove it can fail* — applied to a live service instead of
+to a gate. Three tests hold it: the pair exists and is shaped right; a
+gateway answering 200 without credentials is reported; a gateway
+refusing valid credentials is reported.
+
+`exec_http` grew `headers` and `expect` to carry it, and the fake runner
+in the suite now distinguishes an authenticated call from an
+unauthenticated one — a fake that cannot tell them apart cannot model a
+gateway at all.
+
+### The CI token
+
+`KAI_DASHBOARD_TOKEN` is set at job scope with a CI-only value, beside
+the other six. It authenticates nothing outside an ephemeral runner.
+`check_secret_fallbacks` forbids a default in the compose files
+precisely so that supplying one is a **deliberate act, visible in one
+place** — which is what this is.
+
+### Where KAI-GATE-025 stands
+
+```
+  step 49  bring up minimal stack ......... PASS  (63s, 12/12 healthy)
+  step 51  live smoke ..................... 2 of 3 exercises passing
+  steps 52-62 ............................. never yet executed
+```
+
+The gate is not closed. But for the first time the remaining steps have
+a running system to run against, and the only thing that was stopping
+them was an instrument asking the wrong question.

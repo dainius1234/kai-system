@@ -28,7 +28,7 @@
     "Implicit Dependency Tests": 32,
     "Invariant Guard Tests": 26,
     "Legacy Bridge Tests": 58,
-    "Live Smoke Tests": 29,
+    "Live Smoke Tests": 36,
     "Migration & Active Mode Tests": 136,
     "Payload Bounds Tests": 24,
     "Secret & Restart Gate Tests": 28,
@@ -49,5 +49,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2676
+  "total": 2683
 }

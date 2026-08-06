@@ -191,11 +191,22 @@ def wait_healthy(compose_file: str, services: Sequence[str],
 
 def exec_http(compose_file: str, service: str, port: int, method: str,
               path: str, body: dict | None = None,
-              runner: Runner = run) -> Tuple[bool, str, str]:
+              runner: Runner = run,
+              headers: Dict[str, str] | None = None,
+              expect: Tuple[int, ...] | None = None) -> Tuple[bool, str, str]:
     """One HTTP call from inside the container. Returns (ok, detail, body).
 
     stdlib only, because the service images carry no HTTP client beyond
     what their own healthchecks already use.
+
+    `headers` carries credentials. `expect` names the statuses that count
+    as success; without it the rule stays "anything under 500".
+
+    `expect` exists because a gateway that fails closed answers 503 to an
+    unauthenticated caller, and a probe that only ever sees 503 cannot
+    tell *refusing correctly* from *broken*. Asserting the refusal AND
+    the acceptance is the same I-3 discipline the gates keep: prove the
+    rule can fail, or you have not shown it is a rule.
     """
     payload = json.dumps(body or {})
     program = (
@@ -204,6 +215,8 @@ def exec_http(compose_file: str, service: str, port: int, method: str,
         f"req=urllib.request.Request('http://localhost:{port}{path}',"
         f"method='{method}')\n"
         "req.add_header('Content-Type','application/json')\n"
+        f"for k, v in {dict(headers or {})!r}.items():\n"
+        "    req.add_header(k, v)\n"
         f"data=body.encode() if '{method}' not in ('GET','HEAD') else None\n"
         "try:\n"
         "    r=urllib.request.urlopen(req,data=data,timeout=30)\n"
@@ -228,6 +241,12 @@ def exec_http(compose_file: str, service: str, port: int, method: str,
         return False, f"no status line in the reply: {seen or '(no output)'}", ""
     status = int(match.group(1))
     payload_text = out.split("\n", 1)[1] if "\n" in out else ""
+    if expect is not None:
+        ok = status in expect
+        wanted = " or ".join(str(s) for s in expect)
+        detail = (f"HTTP {status}" if ok
+                  else f"HTTP {status}, expected {wanted}")
+        return ok, detail, payload_text
     # 4xx is an answer — the service is up and enforcing something.
     # 5xx and no-answer are not.
     return status < 500, f"HTTP {status}", payload_text

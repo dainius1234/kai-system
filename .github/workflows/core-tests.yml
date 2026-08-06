@@ -41,6 +41,24 @@ jobs:
       GRAFANA_ADMIN_USER: ""
       GRAFANA_ADMIN_PASSWORD: ""
       VAULT_ROOT_TOKEN: ""
+      # The dashboard's inbound identity gateway fails closed: with no
+      # token it answers 503 "this gateway fails closed by design" on
+      # every route, which is Wave 1 Track A working. The first live
+      # smoke run reported that 503 as a failure, and it was not one.
+      #
+      # A CI-only value, so the live smoke can prove the gateway BOTH
+      # ways — refuses without credentials, admits with them. Without
+      # it, "always 503" and "permanently broken" look identical, and
+      # the dashboard was in fact permanently broken (no
+      # python-multipart) until 2026-08-06.
+      #
+      # Not a secret: it authenticates nothing outside this ephemeral
+      # runner, and check_secret_fallbacks forbids a default in the
+      # compose file precisely so that supplying one is a deliberate
+      # act, visible here.
+      KAI_DASHBOARD_TOKEN: "ci-live-smoke-token-not-a-real-credential"
+      KAI_DASHBOARD_IDENTITY: "ci"
+      KAI_DASHBOARD_ROLE: "operator"
 
     steps:
       - name: Checkout repository
