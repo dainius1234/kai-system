@@ -28,7 +28,7 @@ from scripts.security import check_compose_env as gate  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 9
+EXPECTED_SCENARIOS = 12
 executed: list = []
 
 
@@ -157,7 +157,52 @@ def test_the_real_workflows_are_all_covered() -> None:
     check("and the bring-up steps were found", steps >= 3, str(steps))
 
 
+# ── the other direction: set, but never read ─────────────────────────
+
+def test_a_variable_the_profile_never_reads_is_reported() -> None:
+    """The defect this direction was added for.
+
+    `MEMU_ALLOW_FAKE_EMBEDDINGS: "true"` was set by four CI bring-up
+    steps and named by only one of the three profiles. Compose passes a
+    variable into a container solely when the service asks for it, so
+    for `full` and `sovereign` it reached nothing — while looking, in
+    the workflow, exactly like configuration. memu-core raises at import
+    when sentence-transformers cannot load and that flag is not true, so
+    the container died before listening and compose reported only
+    `is unhealthy`.
+    """
+    scenario("unread variable reported")
+    with tempfile.TemporaryDirectory() as tmp:
+        f = Path(tmp) / "c.yml"
+        f.write_text("services:\n  a:\n    environment:\n"
+                     "      KNOWN: \"${KNOWN:-x}\"\n")
+        found = gate.unread_by_compose(f, {"KNOWN": "1", "IGNORED": "1"})
+        check("the unread one is named", found == ["IGNORED"], str(found))
+        check("and the one it does read is not",
+              "KNOWN" not in found, str(found))
+
+
+def test_a_missing_compose_file_is_a_finding_not_a_pass() -> None:
+    """I-1. A profile that is not there was not checked, and reporting
+    nothing wrong about a file nobody read is the defect itself."""
+    scenario("missing profile refuses")
+    found = gate.unread_by_compose(Path("/nonexistent/c.yml"), {"X": "1"})
+    check("it refuses rather than passing", found != [], str(found))
+    check("and says nothing could be checked",
+          any("nothing here could be checked" in f for f in found), str(found))
+
+
+def test_the_repository_reads_every_variable_its_steps_set() -> None:
+    scenario("repository passes both directions")
+    findings, steps, _ = gate.audit()
+    check("no findings", findings == [], str(findings))
+    check("across a real number of bring-up steps", steps >= 4, str(steps))
+
+
 def run_all() -> None:
+    test_a_variable_the_profile_never_reads_is_reported()
+    test_a_missing_compose_file_is_a_finding_not_a_pass()
+    test_the_repository_reads_every_variable_its_steps_set()
     test_a_variable_with_a_default_is_not_required()
     test_a_variable_without_a_default_is_required()
     test_naming_services_narrows_the_requirement()

@@ -112,6 +112,15 @@ services:
       dockerfile: memu-core/Dockerfile
     <<: *defaults
     environment:
+      # Declared so it can be *passed*. `MEMU_ALLOW_FAKE_EMBEDDINGS`
+      # was set at step level by every CI bring-up and reached this
+      # container in none of them: compose passes a variable only to
+      # services that name it, and only `minimal` named it. memu-core
+      # raises at import when sentence-transformers cannot load and
+      # this is not true (app.py:1042), so the container died before
+      # listening and compose reported only "is unhealthy".
+      # Defaults to false, so a real deployment is unchanged.
+      MEMU_ALLOW_FAKE_EMBEDDINGS: "${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}"
       MEMU_URL: http://memu-core:8001
       MAX_MEMORY_RECORDS: "5000"
       REDIS_URL: redis://redis:6379
@@ -142,6 +151,15 @@ services:
       dockerfile: memu-core/Dockerfile.introspect
     <<: *defaults
     environment:
+      # Declared so it can be *passed*. `MEMU_ALLOW_FAKE_EMBEDDINGS`
+      # was set at step level by every CI bring-up and reached this
+      # container in none of them: compose passes a variable only to
+      # services that name it, and only `minimal` named it. memu-core
+      # raises at import when sentence-transformers cannot load and
+      # this is not true (app.py:1042), so the container died before
+      # listening and compose reported only "is unhealthy".
+      # Defaults to false, so a real deployment is unchanged.
+      MEMU_ALLOW_FAKE_EMBEDDINGS: "${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}"
       REDIS_URL: redis://redis:6379
       VECTOR_STORE: turbovec
       PG_URI: "postgresql://keeper:${DB_PASSWORD}@postgres:5432/sovereign"

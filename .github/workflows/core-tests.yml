@@ -620,9 +620,19 @@ jobs:
           # `check_ci_tolerations` caught these two the moment they were
           # written, which is the gate working exactly as intended on
           # code committed after it.
+          #
+          # Teed, because the log API serves a fixed-size tail — measured:
+          # asking for 130 lines and for 255 returned the same 15,780
+          # characters. On 2026-08-06 this step held the only explanation
+          # of `memu-core is unhealthy` and sat outside that window, so
+          # the post-mortem prints the file instead. `dump_unhealthy`
+          # narrows it to the containers Docker says are wrong: 40 lines
+          # × 20 services does not fit either, and burying the answer is
+          # the same failure as truncating it.
+          exec > >(tee /tmp/full-logs.log) 2>&1
           docker compose -f docker-compose.full.yml ps -a || true
-          docker compose -f docker-compose.full.yml logs --no-color \
-            --tail 40 || true
+          python3 scripts/ci/dump_unhealthy.py \
+            --compose-file docker-compose.full.yml --tail 60 || true
 
       - name: Tear down full profile
         if: always()
@@ -706,6 +716,11 @@ jobs:
           tail -20 /tmp/full-bringup.log 2>/dev/null || echo "(did not run)"
           echo "── full profile live smoke (its real output) ──"
           tail -30 /tmp/full-smoke.log 2>/dev/null || echo "(did not run)"
+          # The container logs, not just what compose said about them.
+          # `is unhealthy` names the container and not the cause, and the
+          # cause is only ever in the container's own output.
+          echo "── full profile: containers Docker says are wrong ──"
+          tail -45 /tmp/full-logs.log 2>/dev/null || echo "(did not run)"
           echo "── sovereign boot (its real output) ──"
           tail -30 /tmp/sovereign-boot.log 2>/dev/null || echo "(did not run)"
           # This step runs LAST so it survives log truncation — which
