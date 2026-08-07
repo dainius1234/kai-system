@@ -33,6 +33,16 @@ only be tested elsewhere (CI, a runner, a network you cannot reach), say
 so explicitly in the commit message: what was verified here, what was
 not, and what will verify it.
 
+**Corollary — this applies to your own actions, not only to the code.**
+"Saved to `<path>`", "added to the register", "wired into the Makefile"
+are all assertions, and they are the easiest kind to get wrong because
+they feel like memory rather than inference. On 2026-08-07 I told the
+operator twice that a document had been saved to `kai-pm/`. Neither file
+existed; the text had only ever been in a chat message. Both claims were
+made in the same conversation where this rule was written down.
+
+`ls` it, or do not say it.
+
 ## R2. Always *run* the contingency, never merely write one
 
 A rollback that has not been executed is a hypothesis with good
