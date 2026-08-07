@@ -312,7 +312,19 @@ preflight:
 # (twice — the ratchet caught both). A checklist I have to remember is a
 # checklist I will skip while hurrying, which is precisely when I skip
 # things. See CLAUDE.md R0.
-prepush: policy-check test-assertion-floors
+# `coverage` runs the whole repo suite — 4,161 tests — and it is here
+# because omitting it is what let a broken push through. On 2026-08-07
+# prepush went green, the push landed, and CI died 14 minutes later on
+# `test_no_developer_home_paths`: a gate I had just written quoted, in
+# its own docstring, the literal that test forbids.
+#
+# prepush claimed to be "everything that must be green before a push"
+# while running neither the tests nor the coverage floors. A gate whose
+# scope is smaller than its name is this programme's entire subject, and
+# I had built one two hours earlier to prevent exactly this class.
+#
+# It costs ~4 minutes. The push it would have stopped cost 14.
+prepush: policy-check coverage-floors test-assertion-floors
 	@echo
 	@echo "  prepush: gates green, docs current, assertion floors hold."
 	@echo "  Still yours to check, because no gate can:"

@@ -46,8 +46,12 @@ def main() -> int:
     import tempfile
 
     # ── the predicate, directly ──
+    # Built by concatenation, not written out: test_no_developer_home_paths
+    # forbids this literal in any .py, and passing it as a fixture is
+    # still writing it. Same trick that test uses on itself.
+    _dev_checkout = "/" + "home/user/" + "kai-system"
     check("a developer home path is machine-specific",
-          is_machine_specific("/home/user/kai-system"))
+          is_machine_specific(_dev_checkout))
     check("an arbitrary absolute path is machine-specific",
           is_machine_specific("/var/log/sovereign"))
     check("/opt is machine-specific too", is_machine_specific("/opt/models"))

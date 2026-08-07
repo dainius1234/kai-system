@@ -705,8 +705,8 @@ services:
       GIT_WATCH_PATHS: "/workspace"
       GIT_REFRESH_SECONDS: "60"
     volumes:
-      # Was `/home/user/kai-system:/workspace:ro` — one developer's
-      # absolute path. Docker CREATES a missing bind-mount source as an
+      # Was one contributor's absolute checkout root, written out in
+      # full. Docker CREATES a missing bind-mount source as an
       # empty directory rather than failing, so on any other machine
       # git-watcher would boot healthy and watch nothing. A relative path
       # resolves against this compose file's directory, which is the repo,

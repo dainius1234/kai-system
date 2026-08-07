@@ -7,7 +7,7 @@ The defect
 `docker-compose.minimal.yml` declared, for `git-watcher`:
 
     volumes:
-      - /home/user/kai-system:/workspace:ro
+      - <one contributor's checkout root>:/workspace:ro
 
 and `docker-compose.sovereign.yml`, for `heartbeat`:
 
@@ -54,6 +54,14 @@ Against the tree at the commit before the fix, this reports exactly 2:
 `git-watcher` and `heartbeat`. `scripts/test_bind_mount_portability.py`
 asserts that figure, so a detector that stops detecting fails its own
 test rather than reporting a comfortable zero.
+
+A note on the example above: the developer path is *described* rather
+than written out. `test_p1_p4_enhancements.py::test_no_developer_home_paths`
+forbids that literal in any `.py`, and the first draft of this file put it
+in the docstring — so the gate explaining the defect became an instance of
+it, and failed a test whose own docstring records the same trap happening
+three times before. Fifth occurrence. Prose about a forbidden string is
+still the forbidden string.
 
 Exit 0 = every bind mount names something that exists everywhere.
 """
