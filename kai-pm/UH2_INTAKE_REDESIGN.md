@@ -466,3 +466,262 @@ The audit in §0A adds conditions rather than objections.
    table holding copies of facts from four subsystems. The rule is **one
    authoritative owner per fact**, and the instrument is what makes them
    agree.
+
+---
+
+# Revision 3 — adversarial review resolution
+
+Every item below is either a control the plan already carried (kept, not
+rewritten as a discovery), an accepted finding with a decision, or a
+rejection with a reason. **One new blocker was found while resolving
+them** and is stated first because it is larger than anything in the
+review.
+
+## R3.0 NEW BLOCKER — there is no memory-promotion owner to name
+
+Q15 asked me to name the exact component that owns
+`evidence -> candidate memory -> approved long-term memory`. I inspected
+the tree rather than describing an intention.
+
+**It does not exist.** `common/world_state/` contains no promotion path —
+no reference to memorize, memu or long-term storage anywhere. Instead
+**six services write directly** to `POST /memory/memorize`:
+
+    agentic/app.py            agentic/introspect_app.py
+    skill-hunter/app.py       house-doctor/app.py
+    perception/audio/app.py   screen-capture/app.py     (the last two broken, D168)
+
+So the "controlled downstream promotion" this plan has referred to
+throughout is not a component with a gap in it. It is **six independent
+writers and no governed path at all**. The evidence/claim model exists
+and nothing consumes it into memory.
+
+**Consequence:** the redesign cannot end at "evidence, then controlled
+promotion downstream", because downstream is six unrelated callers.
+Naming the owner is not a documentation task — the owner has to be
+designed, and that is a second architecture decision of the same size as
+this one.
+
+**Recommendation:** keep memory promotion explicitly **out of scope** for
+the intake rebuild, and raise it as its own decision. Phase 1-4 stop at
+evidence. Nothing in this plan creates a seventh writer.
+
+## R3.1 Historical journal confidentiality (Blocker 1) — ACCEPTED, solution reopened
+
+The risk is real and I accept it: sensor-intake writes the journal, so a
+fully compromised intake gains **historical** sensor confidentiality, not
+just what it received while compromised. That distinction is the property
+to defend.
+
+The proposed remedy (FIFO/NFS because Docker lacks write-only mounts) is
+**one option, not the option**. Options to evaluate against the property:
+
+| option | prevents historical plaintext recovery? | cost |
+|---|---|---|
+| filesystem permissions — writer uid has write, not read | only if the OS can express append-without-read on the actual deployment; must be *proven*, not assumed | low |
+| per-record encryption to a trusted-side public key | **yes** — intake holds no decryption key, so ciphertext it wrote earlier stays opaque | key management; breaks the "journal is human-readable" convenience |
+| unidirectional handoff (FIFO / one-way channel) | yes | loses journal-first durability unless the writer keeps its own spool, which recreates the problem |
+| rotate-and-hand-off — intake writes a short-lived segment, trusted side takes ownership and the intake loses access | partial: bounded historical window rather than none | operational complexity |
+
+**Leading candidate: per-record encryption to a trusted-side key**, because
+it satisfies the property without giving up journal-first durability, the
+read-only trusted consumer, or the no-dual-homing rule. Provisional, not
+decided.
+
+**Explicitly preserved regardless of which is chosen:** no sensor→trusted
+network bridge; no dual-homed process; journal-first durability; bounded
+failure; trusted consumer read-only.
+
+**Stated plainly: the volume design is not defended because we designed
+it.** If none of the above satisfies the property, the handoff changes.
+
+## R3.2 Compromised intake forging sensor identity (Blocker 2) — ACCEPTED
+
+Correct, and the current design's provenance claim is dishonest under
+intake compromise. Sensor→intake authentication protects against a
+compromised *sensor*; it does nothing against a compromised *intake*.
+
+Decision is **per source class**, and the honest split is:
+
+**Push sensors (audio, wake, camera) — family A, end-to-end authenticity.**
+The sensor authenticates the *observation*, not the connection, with a
+secret the intake never holds. **Per-source HMAC is the minimum adequate
+mechanism** — asymmetric signing buys key-rotation and non-repudiation
+properties this deployment does not currently need, and costs a key
+infrastructure it does not have. The trusted verifier checks origin; the
+intake becomes an untrusted relay.
+
+**Pull sources (weather, docker, git, sysmetrics…) — family B, downgrade
+the claim.** These cannot attest anything; they answer an HTTP GET. So
+the trusted side must record what it actually knows:
+
+    NOT   "sensor X asserted Y"
+    BUT   "the acquiring owner reports that endpoint X returned Y"
+
+That distinction survives into provenance and confidence. **No false
+cryptographic certainty**, and no pretending a `200 OK` is an assertion.
+
+## R3.3 `/observe_turn` migration mechanism (Blocker 3) — ALREADY COVERED as target, ACCEPTED as gap
+
+The target shape was already in §0D. The **mechanism** was not. Now
+specified:
+
+* **the route stays**, and becomes a thin submitter — it validates,
+  authenticates the caller, and forwards a typed event to the governed
+  path. It stops mutating anything.
+* **direct mutation is removed in the same commit** that adds the
+  governed path — not before (no gap), not later (no dual authority).
+* **event type:** `conversation.turn`, with a dedicated reducer. It does
+  not reuse a sensor type.
+* **who may submit:** authenticated callers holding the
+  `conversation.turn` grant. Today that is the dashboard and agentic;
+  derived from the token map, not listed here.
+* **who journals it:** the governed ingress, exactly as for any source.
+* **how Cortex consumes it:** Cortex derives bridge/tacit interpretation
+  **from the accepted journal event**, never from the request.
+* **duplicate/retry:** stable event id over (caller identity, turn
+  timestamp, message digest); resubmission returns `duplicate`, which is
+  a success for the sender.
+* **negative test:** a caller with a valid token but no
+  `conversation.turn` grant is rejected; and `_topic_history`,
+  `bridge_active`, `bridge_note`, `_tacit_msg_lengths` and
+  `_tacit_hourly_counts` are **unchanged** after a rejected submission.
+
+Until this lands, `/observe_turn` remains a **blocker to Cortex
+promotion**.
+
+## R3.4 Cortex interpretations driving action (Major 4) — RECLASSIFIED
+
+The core risk is accepted; the proposed remedy is **rejected as too
+crude**. "Every Cortex interpretation must have independent corroboration
+before any action" would make low-risk reasoning require two sources,
+which is a tax on correctness rather than a control.
+
+The architecture already has the right chain:
+
+    interpretation -> deliberation/proposal -> policy -> approval -> capability -> actuator
+
+The hard invariant, machine-enforced rather than documented:
+
+* **Cortex never holds direct action authority.**
+* `EvidenceRecord` may not be constructed from an interpretation. A
+  Level-2/Level-3/intent/tacit output that reaches evidence is a
+  **BLOCKER**, and a negative test asserts it.
+* a recommendation may become **input to proposal generation**, never an
+  executable command.
+* **policy** decides where corroboration is required, by risk and domain
+  — high-risk action may demand independent evidence; low-risk reasoning
+  need not.
+
+## R3.5 Journal integrity (Major 5) — ALREADY COVERED
+
+§15 already requires `prev_digest` chaining, a trusted `(offset, digest)`
+anchor outside the volume, `TAMPER_SUSPECT` on chain break, and the
+torn-tail vs mid-stream distinction. Kept as written, not restated as a
+finding.
+
+**Accepted refinement:** add a monotonic per-journal sequence number.
+The chain already proves the property; the sequence number makes gap and
+reorder diagnosis explicit rather than inferred, which is an operability
+gain rather than a security one. Recorded as a refinement, not a fix.
+
+## R3.6 Rate / size / DoS (Major 6) — ALREADY COVERED, clarified
+
+§5 already carries payload bounds, per-source rate limits, volume quota,
+hard-full behaviour and a `rate-limited` verdict. Not duplicated.
+
+**Clarification accepted, and it is a real one:** limits are enforced at
+the **first network-facing boundary, before parsing or storage**.
+Bounding after parsing means an attacker still spends our CPU. Per source:
+max event bytes, request rate and burst, storage contribution. Hard-full
+must **surface**, never silently drop, and a test proves it.
+
+## R3.7 Idempotency and dedupe (Major 7) — ACCEPTED, real gap
+
+The plan said "stable event id, duplicate is a success" and stopped. The
+rest matters:
+
+* **no "exactly once" claim.** Target is **at-least-once delivery plus
+  durable deduplication**.
+* **event id ownership:** the *sender* computes it, so a retry is
+  recognisable; the receiver never invents one.
+* **dedupe persistence:** the dedupe set must survive restart, or the
+  first retry after a crash creates a duplicate. This is the gap the
+  current in-memory duplicate detection has.
+* **retention window:** bounded, and the bound is stated — beyond it a
+  replay is accepted as new. An unbounded dedupe set is a memory leak
+  wearing a correctness argument.
+* **sender behaviour on UNKNOWN:** a timeout is not a failure. The sender
+  retries with the same id; the receiver answers `duplicate`.
+* **replay must not double-mutate:** reducers consume by event id, so a
+  journal replay produces no second evidence record.
+
+## R3.8 Observability (Major 8) — ALREADY COVERED, strengthened
+
+§14 already requires counters at every hop. **Accepted strengthening:** a
+correlation/event id carried through every stage, so a *single* event can
+be traced produced → intake → journalled → consumed → evidence, rather
+than only counted at each.
+
+## R3.9 Negative tests (Major 9) — REJECTED as written
+
+The claim that the plan lacks concrete negative tests is **false**. §16
+already mandates eight, named. Kept.
+
+**Extended** for the newly accepted issues:
+
+* a compromised intake cannot recover historical plaintext journal content
+* a compromised intake cannot impersonate an end-to-end-authenticated sensor
+* `/observe_turn` cannot mutate Cortex state before governed acceptance
+* an interpretation cannot enter `EvidenceRecord` as observed fact
+* a recommendation cannot directly invoke an actuator
+
+## R3.10 Cortex full/sovereign (Major 10) — ALREADY COVERED
+
+§0A already makes runtime proof in every required profile a promotion
+condition. Kept.
+
+## R3.11 Cortex network blast radius (Q13) — ACCEPTED, and it is worse than expected
+
+Measured rather than assumed:
+
+| edge | peers | what a compromised Cortex gains |
+|---|---|---|
+| `agent-net` | **17** — agentic, dashboard, **memu-core**, ollama, supervisor, vault-sync, verifier, skill-hunter, notify-service, tts-service, redis, … | **direct reach to memu-core**, which exposes `POST /memory/memorize` |
+| `observability-net` | 7 — docker-watcher, git-watcher, sysmetrics, heartbeat, monitor-service, memu-core-introspect, dashboard | the watcher sources it needs |
+
+**Cortex does not call memu-core today (0 references), but it can.** So
+promoting Cortex to perception authority promotes a service that already
+sits one HTTP call from the memory store.
+
+`observability-net` is justified — it is the whole reason Cortex reaches
+7 of 9. `agent-net` is **not** justified by acquisition: of its 17 peers,
+Cortex needs weather, airquality, calendar and house-doctor. The edge
+should be narrowed or the four moved, and "it reaches 7/9 therefore its
+networks are right" is exactly the reasoning this review exists to stop.
+
+## R3.12 Reuse tool-gate instead of sensor-intake (Q14) — REJECTED, with the check performed
+
+The REUSE → EXTEND → MIGRATE → CREATE check, run once as instructed.
+Every current `sensor-net` member is **itself a source**:
+
+    audio-service  clipboard-service  files-service
+    screen-watcher  vision-service  wake-service
+
+Making any of them the intake would give one sensor authority over the
+others' provenance — the confused-deputy problem, inside the least
+trusted zone. There is **no low-authority sensor-local candidate**.
+
+Putting tool-gate on `sensor-net` is rejected outright: it holds
+execution and policy authority, and would save one container at the cost
+of the trust model. The dedicated `sensor-intake` is retained on
+evidence, not preference.
+
+## R3.13 Minors 11/12 — ACCEPTED
+
+Direct sensor→memu code is **deleted** at the migration point, and the
+duplicate source tables are **physically removed** when the joined
+catalogue becomes authoritative. No dormant escape hatches — code left
+inert behind DNS isolation is code waiting for a network change to
+resurrect it.
+
