@@ -95,6 +95,7 @@ import sentence_transformers, huggingface_hub, os; \
 name = os.getenv('EMBEDDING_MODEL', 'all-MiniLM-L6-v2'); \
 sentence_transformers.SentenceTransformer(name); \
 info = huggingface_hub.model_info(f'sentence-transformers/{name}'); \
+open('/opt/hf_cache/BAKED_REVISION','w').write(f'{name} {info.sha}\n'); \
 print(f'BAKED {name} revision={info.sha}')" && exit 0; \
       echo "model download attempt ${attempt}/5 failed; retrying in $((attempt * 10))s"; \
       sleep $((attempt * 10)); \

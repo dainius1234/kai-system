@@ -461,6 +461,41 @@ jobs:
       #
       # The remedy that was found once and applied to one step, applied
       # to the rest of them.
+      # Two numbers were promised in D167 and no instrument existed to
+      # collect either. The post-mortem step is `skipped` on success, and
+      # the build log sits outside the Actions API's fixed byte window,
+      # so "tune start-period once CI reports a real number" described a
+      # report nothing produced. A measurement you have not arranged to
+      # read is not a measurement.
+      #
+      # `if: always()` on purpose: these are wanted MOST on the run that
+      # failed, and a diagnostic that only prints on success is the same
+      # mistake in the other direction.
+      - name: Measured — baked model revision and embedding load time
+        if: always()
+        run: |
+          echo "── revision baked into the image (pin from THIS value) ──"
+          # Image id asked of compose rather than spelled out. The first
+          # draft hard-coded `kai-system-memu-core:latest`, inferred from
+          # a pattern in an old log — a hand-written name beside the thing
+          # it describes, which is the exact defect class this programme
+          # has spent a week removing. Compose knows; ask it.
+          MEMU_IMAGE="$(docker compose -f docker-compose.minimal.yml images -q memu-core | head -1)"
+          if [ -n "$MEMU_IMAGE" ]; then
+            docker run --rm --entrypoint cat "$MEMU_IMAGE" \
+              /opt/hf_cache/BAKED_REVISION \
+              || echo "  (absent — image predates BAKED_REVISION, or the bake failed)"
+          else
+            echo "  (compose could not name the memu-core image)"
+          fi
+
+          echo "── how long the embedding backend took to be ready ──"
+          echo "  start-period is currently 60s, chosen as an over-allowance."
+          echo "  Tune it from the number below, not from this comment."
+          docker compose -f docker-compose.minimal.yml logs memu-core 2>&1 \
+            | grep -iE "embedding backend ready|Embedding backend unavailable" \
+            || echo "  (no embedding line found — memu-core may not have started)"
+
       - name: Live smoke against the running stack
         run: |
           set -o pipefail

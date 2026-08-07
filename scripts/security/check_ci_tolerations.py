@@ -86,6 +86,23 @@ class Toleration:
 DECLARED: Tuple[Toleration, ...] = (
     Toleration(
         workflow="core-tests.yml",
+        step="Measured — baked model revision and embedding load time",
+        bucket=DOCUMENTED_SKIP,
+        reason="Pure instrumentation: it reads the model revision baked "
+               "into the image and the measured embedding load time so "
+               "start-period can be tuned from a number rather than a "
+               "guess. It must never fail a build, because a missing "
+               "measurement is not a broken stack — the steps that judge "
+               "the stack are the bring-up and the live smoke either side "
+               "of it. Both fallbacks print a specific reason rather than "
+               "an empty line, so an absent value is visible as an absent "
+               "value. Retire this once the revision is pinned and "
+               "start-period is set from a measured figure.",
+        owner="orion",
+        review_by="2026-09-15",
+    ),
+    Toleration(
+        workflow="core-tests.yml",
         step="GitHub Models CI backend smoke test",
         bucket=DOCUMENTED_SKIP,
         reason="Free-tier GitHub Models is rate-limited by design, so a "
