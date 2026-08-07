@@ -8628,3 +8628,73 @@ the first. Recorded as an open population, not a manufactured rule.
 **Credit where it is due:** I did not ask about this. DeepSeek volunteered
 it after answering what I did ask, and it is the most serious finding of
 the day.
+
+---
+
+## D169 — 2026-08-07 — There Is One Shared Service Token, So Provenance Cannot Be Derived From Identity
+
+**Context:** implementing the `/observe_turn` governed path, the first
+Cortex-promotion gate with no topology dependency. Implementation
+evidence contradicted the R3 design, so the phase stopped here per the
+working rule rather than being patched around.
+
+**What was implemented and is sound.** Cortex's `GET /state` and
+`POST /observe_turn` now carry `require_service_auth`, the pattern this
+repository already uses. Proven by running it: 503 when no token is
+configured (fails closed), 401 with no header, 403 on a wrong token, 200
+on the right one. `/health` is left as a health surface, per the ruling.
+
+That closes the open-door half of the blocker: an arbitrary reachable
+caller can no longer read Cortex's Level-2/Level-3 interpretations, nor
+inject a conversation turn that mutates `_topic_history`,
+`bridge_active`, `bridge_note`, `_tacit_msg_lengths` and
+`_tacit_hourly_counts`.
+
+**The blocker, measured.** `KAI_SERVICE_TOKEN` is **one shared secret**:
+
+    minimal.yml    '${KAI_SERVICE_TOKEN:-}'  ->  5 services
+    full.yml       '${KAI_SERVICE_TOKEN:-}'  ->  4 services
+    sovereign.yml  '${KAI_SERVICE_TOKEN:-}'  ->  2 services
+
+One variable, one value, every service. And `common/service_auth.py`'s
+`check_token()` returns `(ok, status, detail)` — **no identity**. The
+mechanism proves *a caller holds the service token*. It cannot say
+**which** caller.
+
+**Three approved requirements rest on something that does not exist:**
+
+1. `/observe_turn` governance requires *provenance derived from
+   authenticated caller identity*. Underivable from a shared secret.
+2. The push-sensor authenticity gate requires *per-source HMAC with
+   secrets unavailable to sensor-intake*. There are no per-source
+   secrets.
+3. Worst: a shared token means **any holder can impersonate any other**.
+   `audio-service` holding it could submit as `screen-capture`. That is
+   precisely the forgery R3.2 was written to prevent, and it is
+   available today to every service in the profile.
+
+**Decision — stop, do not patch around.** The tempting move was to
+derive provenance from something else to hand: the source IP, the
+Docker DNS name, a self-declared header. Every one of those is a claim
+the caller controls or the network asserts, which is exactly the "no
+false certainty" failure R3.2 forbids. Deriving provenance from a
+hostname would have *looked* like identity and been a lie in the
+provenance record — worse than the current honest gap.
+
+**What this needs before the phase resumes: a per-service identity
+mechanism.** Options, none chosen here:
+
+* per-service tokens — one secret per service, delivered as a Docker
+  secret, with a service→token map at the receiver
+* mTLS with per-service certificates
+* signed assertions where the signing key is per-source
+
+That is a prerequisite for `/observe_turn`, for push-sensor
+authenticity, and arguably for the whole R3 provenance model. It is a
+decision of its own size and it belongs to the operator.
+
+**Scope note.** This is the *fourth* prerequisite discovered by building
+rather than planning: the intake denominator (2 of 44), the absent
+memory-promotion owner (D169's sibling, six direct writers), Cortex being
+never-started, and now the absence of per-service identity. Each was
+invisible from the design and obvious from the tree.

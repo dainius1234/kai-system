@@ -782,6 +782,14 @@ services:
     container_name: kai-cortex
     <<: *defaults
     environment:
+      # Required because /state and /observe_turn now enforce
+      # require_service_auth. check_service_tokens caught the
+      # omission immediately: a service that enforces auth and is
+      # given no token fails closed on every call, which is safe
+      # and useless. NOTE: this is a SHARED secret — it proves the
+      # caller holds the service token, not which caller it is.
+      # See D169; per-service identity does not exist yet.
+      KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       FF_CORTEX: "true"
       FF_CORTEX_VERBOSE: "false"
       CORTEX_REFRESH_INTERVAL: "60"

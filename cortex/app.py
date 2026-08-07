@@ -53,9 +53,10 @@ from typing import Any, Deque, Dict, List, Optional, Tuple
 import httpx
 
 from common.http_hygiene import pooled_client
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 from common.degraded import record_degradation
+from common.service_auth import require_service_auth
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("cortex")
@@ -507,7 +508,12 @@ class TurnObservation(BaseModel):
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
-@app.get("/state")
+# Cortex's state includes its Level-2/Level-3 interpretations and intent
+# hypotheses. Reading it is not a public act, and until now any caller
+# that could reach Cortex could read it. Authenticated, failing closed —
+# an unconfigured token returns 503, never 200.
+@app.get("/state",
+         dependencies=[Depends(require_service_auth("cortex_state_read"))])
 async def get_state() -> Dict[str, Any]:
     """Return the current CortexState for agentic context assembly."""
     s = _state
@@ -528,7 +534,24 @@ async def get_state() -> Dict[str, Any]:
     }
 
 
-@app.post("/observe_turn")
+# THIS ENDPOINT MUTATES STATE — _topic_history, bridge_active,
+# bridge_note, _tacit_msg_lengths and _tacit_hourly_counts — and it did
+# so for any caller that could reach the port.
+#
+# Authentication closes that door. It does NOT complete the R3
+# governance requirement: the turn must become a typed, bounded event
+# accepted through the canonical path BEFORE Cortex derives anything
+# from it, with provenance derived from the caller's identity. That
+# work is blocked on a prerequisite that does not exist — see the note
+# on identity below — so this endpoint remains a known blocker to Cortex
+# promotion, now closed to strangers rather than open to them.
+#
+# KAI_SERVICE_TOKEN is a SHARED secret: it proves the caller holds the
+# service token, not WHICH service the caller is. Provenance therefore
+# cannot yet be derived from identity, and any token-holder can claim to
+# be any other. Recorded rather than papered over.
+@app.post("/observe_turn",
+          dependencies=[Depends(require_service_auth("cortex_observe_turn"))])
 async def observe_turn(obs: TurnObservation) -> Dict[str, Any]:
     """Receive a conversation turn for Context Bridge and Tacit Knowledge accumulation."""
     keywords = _extract_topic_keywords(obs.user_message)
