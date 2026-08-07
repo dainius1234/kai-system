@@ -302,6 +302,25 @@ setup-service-token:
 preflight:
 	PYTHONPATH=. python scripts/preflight_deploy.py
 
+# Everything that must be green before a push, in one command, in the
+# right order, joined by `&&` so a failure stops the chain.
+#
+# It exists because the pre-push mistakes were mechanical and repeated:
+# a `;` chain that pushed past a failing gate (twice in one day), stale
+# docs, and an assertion floor left unrecorded after adding a suite
+# (twice — the ratchet caught both). A checklist I have to remember is a
+# checklist I will skip while hurrying, which is precisely when I skip
+# things. See CLAUDE.md R0.
+prepush: policy-check test-assertion-floors
+	@echo
+	@echo "  prepush: gates green, docs current, assertion floors hold."
+	@echo "  Still yours to check, because no gate can:"
+	@echo "    - does the commit message say which half you VERIFIED,"
+	@echo "      and name what you could not verify here?  (R1)"
+	@echo "    - if this adds an external dependency or a new failure"
+	@echo "      mode, did you RUN the contingency?  (R2)"
+	@echo "    - if this fixes an instance, did you count the class?  (R6)"
+
 # Aggregate: every Unified Hunter work package + adversarial guards.
 test-uh: test-contracts test-perception-spine test-world-state \
 	test-proposal-workspace test-policy-bridge test-vertical-slice \
@@ -320,7 +339,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-compose-interpolation test-unreachable-bindings \
 	test-implicit-deps test-image-modules test-test-identity \
 	test-execution-coverage test-bringup-guards test-ci-scripts \
-	test-post-mortem \
+	test-post-mortem test-summarise-runs \
 	test-shipped-package-deps test-policy-loader \
 	test-healthcheck-runnable test-depends-on-readiness \
 	test-suite-floor
@@ -871,6 +890,9 @@ test-bringup-guards:
 
 test-post-mortem:
 	python3 scripts/test_post_mortem.py
+
+test-summarise-runs:
+	python3 scripts/test_summarise_runs.py
 
 test-ci-scripts:
 	python3 scripts/test_ci_scripts.py

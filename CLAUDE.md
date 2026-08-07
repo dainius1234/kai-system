@@ -7,6 +7,31 @@ so the rule is not mistaken for taste. The long form is in
 
 ---
 
+## R0. Stop signals — the tells, in one place
+
+The rules below explain *why*. This is the part that has to work **in
+flight**, so it is first and it is short. If a sentence I am about to
+write or a command I am about to run matches one of these, stop and
+check before continuing.
+
+| the tell | what it usually means |
+|---|---|
+| "would have", "cannot", "is simply", "should work", "it's just a" | R1 — I am asserting something I have not run |
+| "saved to…", "added to…", "wired into…" | R1 — a claim about *my own action*. `ls` it, or do not say it |
+| I am describing a safety net in the present tense | R2 — I have written a contingency, not run one |
+| I am about to describe the *shape* of a failure ("it's X, not Y") | §3.1 — my scope may be narrower than my claim. What is the full set? |
+| I am writing a name I recognise rather than one I looked up | R5 — a list beside the thing. Derive it |
+| I am fixing the second instance of something | R6 — count the population first, then fix all of it |
+| "we'll tune this once we measure it" | ship the instrument that produces the number in the *same* commit |
+| I am typing `;` between commands | R3 — use `&&` |
+
+**The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
+happened while moving fast — a hard-coded image name, a guessed job id,
+two files claimed as saved. None happened because I did not know better;
+each happened because checking felt slower than continuing. When the
+work is flowing is exactly when these tells matter, which is the
+opposite of when they feel necessary.
+
 ## R1. Do not assert what you have not run
 
 If a sentence contains **"would have"**, **"cannot"**, **"is simply"**,
