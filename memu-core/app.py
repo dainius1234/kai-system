@@ -1028,6 +1028,30 @@ EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 # as a silent production fallback. Default is strict: real model or crash.
 _ALLOW_FAKE_EMBEDDINGS = os.getenv("MEMU_ALLOW_FAKE_EMBEDDINGS", "false").lower() == "true"
 
+if _ALLOW_FAKE_EMBEDDINGS:
+    # The flag was read *after* the attempt below, so it never meant
+    # "don't try" — only "it is acceptable that trying failed". On a CI
+    # runner with no egress to huggingface.co the hub client does not
+    # fail fast; it retries with exponential backoff, per file:
+    #
+    #   Retrying in 1s [Retry 1/5] … 2s … 4s … 8s … 8s [Retry 5/5]
+    #
+    # across modules.json, adapter_config.json, config.json and more.
+    # That is 70-100 seconds of DNS backoff before uvicorn ever binds.
+    # memu-core's healthcheck is start_period 10s, interval 30s,
+    # retries 3 — unhealthy at ~100s — so the bring-up was a race, and
+    # on 2026-08-07 run 708 it lost: `dependency failed to start:
+    # container sovereign-memu-core-minimal is unhealthy` at 109s, with
+    # every earlier green run having won the same coin toss.
+    #
+    # Offline mode does not disable the real model; a model already in
+    # the local cache still loads. It only stops the network round-trip
+    # for a model the caller has *already said* they do not need. The
+    # failure then arrives in milliseconds instead of a minute and a
+    # half, and lands in the same `except` as before.
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
+    os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+
 try:
     from sentence_transformers import SentenceTransformer as _ST
 
