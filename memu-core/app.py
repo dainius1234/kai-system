@@ -1052,11 +1052,18 @@ if _ALLOW_FAKE_EMBEDDINGS:
     os.environ.setdefault("HF_HUB_OFFLINE", "1")
     os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 
+_st_load_started = time.monotonic()
+
 try:
     from sentence_transformers import SentenceTransformer as _ST
 
     _st_model = _ST(EMBEDDING_MODEL_NAME)
-    logger.info("sentence-transformers loaded — model=%s  dim=%d", EMBEDDING_MODEL_NAME, _st_model.get_sentence_embedding_dimension())
+    # Logged so the healthcheck's start-period can be set from a measured
+    # number rather than a guess. It is currently 60s, chosen as an
+    # over-allowance after 10s proved too short.
+    logger.info("sentence-transformers loaded — model=%s  dim=%d  embedding backend ready in %.1fs",
+                EMBEDDING_MODEL_NAME, _st_model.get_sentence_embedding_dimension(),
+                time.monotonic() - _st_load_started)
 
     def _embedding_backend(text: str) -> List[float]:
         vec = _st_model.encode(text, show_progress_bar=False)
@@ -1064,12 +1071,43 @@ try:
 
 except Exception as _st_exc:
     if not _ALLOW_FAKE_EMBEDDINGS:
+        # The old message said "sentence-transformers failed to load" for
+        # every cause, which sends the reader to pip when the library is
+        # present and it is the *model* that is absent. That is the same
+        # defect as `POLICY FILE CORRUPT` naming a corrupt file when the
+        # real answer was a missing pyyaml: an error that names the wrong
+        # cause keeps a bug alive for months.
+        #
+        # These two are distinguishable, so distinguish them.
+        try:
+            import sentence_transformers  # noqa: F401
+            _library_present = True
+        except Exception:
+            _library_present = False
+
+        if _library_present:
+            _diagnosis = (
+                f"the sentence-transformers library is installed, so the missing piece is the "
+                f"MODEL {EMBEDDING_MODEL_NAME!r} itself. This service runs on networks declared "
+                f"`internal: true` and has no egress, so it cannot fetch one at runtime by design "
+                f"— the model is baked into the image at build time (see memu-core/Dockerfile). "
+                f"An image without it is an image that cannot do this job. Rebuild it, or set "
+                f"HF_HOME to a cache that already contains the model."
+            )
+        else:
+            _diagnosis = (
+                "the sentence-transformers library is not importable at all, so this is a "
+                "dependency problem rather than a model problem — check memu-core/requirements.txt "
+                "reached the image."
+            )
+
         raise RuntimeError(
-            f"sentence-transformers failed to load (model={EMBEDDING_MODEL_NAME!r}): {_st_exc}. "
-            "Refusing to silently degrade to fake hash-based embeddings — memory retrieval would "
-            "keep returning results while being semantically meaningless. Set "
-            "MEMU_ALLOW_FAKE_EMBEDDINGS=true to explicitly opt into the deterministic hash "
-            "fallback for lightweight/offline tests that don't depend on real embedding quality."
+            f"Embedding backend unavailable after {time.monotonic() - _st_load_started:.1f}s "
+            f"(model={EMBEDDING_MODEL_NAME!r}): {_st_exc}. {_diagnosis} Refusing to silently "
+            "degrade to fake hash-based embeddings — memory retrieval would keep returning "
+            "results while being semantically meaningless. Set MEMU_ALLOW_FAKE_EMBEDDINGS=true "
+            "to explicitly opt into the deterministic hash fallback for lightweight/offline "
+            "tests that don't depend on real embedding quality."
         ) from _st_exc
 
     logger.warning("sentence-transformers not available — using hash-based fake embeddings (MEMU_ALLOW_FAKE_EMBEDDINGS=true)")

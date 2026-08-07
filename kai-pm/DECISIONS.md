@@ -8465,3 +8465,86 @@ Task #46.
 
 **Six green runs in a row had each won the same race. The instrument
 that finally reported it was a failure I initially assumed was mine.**
+
+---
+
+## D167 — 2026-08-07 — The Model Belongs in the Image (three-way review)
+
+**Context:** D166 raised the impossible default — real embeddings, no
+egress, no model in the image — as an operator decision. The operator
+put the brief to DeepSeek. Three-way review; this records what was
+agreed, what was declined, and on what evidence.
+
+**Agreed with DeepSeek — Option A, bake the model at build time.** Build
+has egress, runtime does not need it. Their reasoning matched: B (give
+memu-core egress) contradicts the sovereignty goal and widens the attack
+surface on the service holding all memory; C (shared cache volume) adds
+ordering and volume management for one small model; D (abandon real
+embeddings) discards a deliberate design decision; E (sidecar) adds a
+hop and a failure mode to every write.
+
+**The pattern already existed in this tree.** `memu-graph/Dockerfile`
+solves exactly this — `ENV HF_HOME`, a writable `HOME` because
+`adduser --system` sets `HOME=/nonexistent`, `USER app` *before* the
+build-time download so the cache is owned correctly — and it is green in
+CI. memu-core never got it. Two copies of one fact, one different, and
+the different one had never run. Fifth time this week.
+
+**Declined — DeepSeek's shared `common/embeddings.py`.** They advised
+unifying memu-core, agentic and fusion-engine. Measured first, per the
+plan's own §1.4:
+
+    requirements declaring sentence-transformers: memu-core ONLY
+    agentic/requirements.txt     — no embedding libs
+    fusion-engine/requirements.txt — no embedding libs
+
+Both other sites guard the import with `try/except ImportError` and fall
+back immediately — router to `_HAS_ST = False`, fusion-engine to
+`_jaccard_agreement`. Neither can reach the network. **The real
+population is one.** A shared module for a population of one is
+speculative generality, and I had over-claimed the scope in the brief —
+in the false-positive direction, which is the expensive one. Counting
+corrected me before I "fixed" two things that were right. Same lesson as
+item 0's clause 2.
+
+**Declined — best-effort download.** memu-graph's extension pre-install
+is `|| echo WARNING` because it is recoverable on first run. This is
+not: the runtime cannot fetch a model later, so an image without one is
+an image that cannot do its job. The build fails instead. I-1. The cost,
+stated plainly: builds now depend on huggingface.co being reachable.
+
+**Deferred — revision pinning.** DeepSeek is right that a mutable tag is
+not reproducible. huggingface.co is unreachable from the authoring
+environment (`CONNECT tunnel failed, 403`), and a guessed sha fails every
+build. So the build *prints* the sha it resolved and pinning follows from
+that measured value. Not pinned yet; recorded so it is not forgotten.
+
+**Found while implementing, and not in anyone's brief.**
+`docker-compose.sovereign.yml` mounts `memu_data:/data` — the entire
+tree. Docker seeds a named volume from the image **only when the volume
+is new**. Caching the model at `/data/hf_cache` would therefore work on
+CI's fresh volume and be shadowed on any existing deployment's volume:
+green in CI, refusing to start on upgrade. Moved to `/opt`, which nothing
+mounts in any profile. memu-graph's `/data/hf_cache` is fine because it
+declares no volumes — same rule, different answer, because the mounts
+differ.
+
+**Adopted with a caveat — healthcheck start-period 10s → 60s.**
+DeepSeek's floor. 60s is an over-allowance, not a measurement, so
+`app.py` now logs `embedding backend ready in N.Ns` and this must be
+tuned to a real number once CI reports one. The cost is real and worth
+stating: every dependent now waits on `service_healthy`, so a genuinely
+dead memu-core takes 60+3*30 = 150s to be declared dead, not 100s.
+
+**Adopted — an error that names the right thing.** The old message said
+"sentence-transformers failed to load" whatever the cause, sending the
+reader to pip when the library is present and the *model* is absent.
+Library-missing and model-missing are distinguishable, so they are now
+distinguished. Same defect as `POLICY FILE CORRUPT` naming a corrupt
+file when the answer was a missing pyyaml.
+
+**Not adopted as a gate — the static anti-pattern rule.** DeepSeek
+proposed linting `if allow_X:` inside `except` where `allow_X` is not
+checked before the `try`, and was candid that it is not decidable and
+false-positive heavy. Given the 100+/1 and 69/0 history, that is a rule
+to measure before writing. Logged, not built.
