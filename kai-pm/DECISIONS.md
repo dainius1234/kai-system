@@ -8381,3 +8381,87 @@ Plan logged at `kai-pm/NEXT_STINT_PLAN.md`.
 
 **The operator proposed a method, and it found a live defect in the
 document written to describe it.**
+
+---
+
+## D166 — 2026-08-07 — The Boot Was Always a Race, and the Production Default Cannot Boot at All
+
+**Context:** D165's `depends_on` work pushed as `e0e9849`. Run 708
+failed at step 49 of 67 — `dependency failed to start: container
+sovereign-memu-core-minimal is unhealthy` — after 109 seconds.
+
+**Decision 1 — re-run the unchanged commit before arguing about cause.**
+The obvious suspect was my own change. The argument against it was
+sound: the entire `minimal.yml` diff is one hunk on `skill-hunter`,
+which sits *downstream* of memu-core and cannot delay it. That argument
+was also just an argument. Attempt 2 was run on the identical commit:
+
+| run | commit | offline guard | result |
+|---|---|---|---|
+| 708 attempt 1 | `e0e9849` | no | fail, step 49, 109s |
+| 708 attempt 2 | `e0e9849` | no | fail, step 49, 108s |
+| 709 | `b5deaaa` | yes | success, 67 of 67 |
+
+Deterministic, not a flake — which contradicted my expectation of a
+coin-toss and was worth the 23 minutes to learn. The A/B also exonerates
+the `depends_on` work by construction: it is present in both commits.
+
+**Decision 2 — the flag was read after the attempt it was meant to
+prevent.** `memu-core/app.py`:
+
+    try:
+        _st_model = _ST(EMBEDDING_MODEL_NAME)   # always hits the network
+    except Exception as _st_exc:
+        if not _ALLOW_FAKE_EMBEDDINGS:
+            raise
+
+`MEMU_ALLOW_FAKE_EMBEDDINGS=true` never meant *do not try*. It meant
+*it is acceptable that trying failed*. The container logs:
+
+    '[Errno -3] Temporary failure in name resolution' … huggingface.co
+    Retrying in 1s [Retry 1/5] … 2s … 4s … 8s … 8s [Retry 5/5]
+
+per file, across modules.json, adapter_config.json and config.json —
+70–100 seconds before uvicorn binds, against a healthcheck that gives up
+at ~100 (`start_period 10s`, `interval 30s`, `retries 3`).
+
+Fix: set `HF_HUB_OFFLINE` / `TRANSFORMERS_OFFLINE` before the import when
+the caller has already said they do not need the real model. A cached
+model still loads; an absent one fails in milliseconds into the same
+`except`. Verified by run 709.
+
+**Decision 3 — the finding underneath, which the fix does NOT address.**
+Verified across all three compose files: every service that loads a
+model — memu-core, memu-core-introspect, agentic, fusion-engine,
+memu-graph — is attached only to networks declared `internal: true`.
+Zero egress, in all three profiles. `memu-core/Dockerfile` installs
+`sentence-transformers>=2.7.0` and never downloads a model.
+
+Therefore **`MEMU_ALLOW_FAKE_EMBEDDINGS=false` — the documented
+production default, "real model or crash" — makes memu-core raise at
+import and die, in every profile this project ships.** It has never been
+observed because every CI bring-up overrides the flag to `true`.
+
+This is the programme's shape three ways at once: never-executed
+configuration, a flag whose name misdescribes its control flow, and a
+network topology that makes the sanctioned path impossible.
+
+**Decision 4 — the remedy is an operator decision, not mine to take
+silently.** Pre-downloading the model in the Dockerfile (where the build
+*does* have egress) makes offline load instant, makes `false` work for
+real, and removes the race entirely. It costs roughly 90MB of image and
+introduces a build-time dependency on huggingface.co being up.
+
+The sovereignty argument points the same way — a sovereign stack that
+must phone home at boot is a contradiction — but the build-time
+dependency is a real trade-off and the operator owns it. Raised, not
+executed. Task #47.
+
+**Decision 5 — same class, reported not fixed.** `agentic/router.py:288`
+and `fusion-engine/app.py:166` perform the same unbounded load. Both are
+lazy rather than import-time, so neither blocks startup — which is
+exactly why only memu-core broke the build. Neither reads this flag.
+Task #46.
+
+**Six green runs in a row had each won the same race. The instrument
+that finally reported it was a failure I initially assumed was mine.**
