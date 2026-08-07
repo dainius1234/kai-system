@@ -3,6 +3,7 @@
   "floors": {
     "Architecture Rule Tests": 68,
     "Assertion Floor Tests": 40,
+    "Bind-mount portability tests": 29,
     "Bring-up Guard Tests": 23,
     "CI Script Tests": 23,
     "CI Toleration Tests": 26,
@@ -59,5 +60,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2913
+  "total": 2942
 }

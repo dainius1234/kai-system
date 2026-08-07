@@ -581,6 +581,17 @@ REGISTRY: Tuple[Gate, ...] = (
                            "exec_http/load_ports instead",
          proven_by="scripts/test_ci_scripts.py",
          in_workflows=("core-tests.yml",)),
+    Gate(module="check_bind_mount_portability",
+         kind=GATE,
+         summary="a bind mount must not name a path that exists on one "
+                 "machine — Docker creates a missing source as an EMPTY "
+                 "directory, so the service boots healthy and reads nothing",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ bind mount\(s\)",
+         proven_by="scripts/test_bind_mount_portability.py",
+         calibrated_by="scripts/test_bind_mount_portability.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",)),
     Gate(module="ci/post_mortem",
          kind=REPORT,
          summary="print the captured step logs that have content, and "

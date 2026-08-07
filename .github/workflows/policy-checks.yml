@@ -152,6 +152,14 @@ jobs:
       - name: Every healthcheck can run in the image it checks
         run: python scripts/security/check_healthcheck_runnable.py
 
+      # Docker CREATES a missing bind-mount source as an empty directory
+      # rather than failing, so a machine-specific path boots healthy and
+      # reads nothing. heartbeat scanned /var/log/sovereign for `timeout`,
+      # `blocked` and `injection` and published 0 hits from a directory
+      # that only ever existed on one laptop.
+      - name: Every bind mount names a path that exists on any host
+        run: python scripts/security/check_bind_mount_portability.py
+
       # full.yml's sixteen bare `depends_on` lists were fixed and the
       # class was called closed. Eleven survived in minimal.yml and
       # sovereign.yml, in the same tree on the same day, because the fix

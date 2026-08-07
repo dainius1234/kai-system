@@ -705,7 +705,13 @@ services:
       GIT_WATCH_PATHS: "/workspace"
       GIT_REFRESH_SECONDS: "60"
     volumes:
-      - /home/user/kai-system:/workspace:ro
+      # Was `/home/user/kai-system:/workspace:ro` — one developer's
+      # absolute path. Docker CREATES a missing bind-mount source as an
+      # empty directory rather than failing, so on any other machine
+      # git-watcher would boot healthy and watch nothing. A relative path
+      # resolves against this compose file's directory, which is the repo,
+      # on every host. Override with KAI_REPO_PATH if the repo is elsewhere.
+      - ${KAI_REPO_PATH:-.}:/workspace:ro
     networks:
       - observability-net
 

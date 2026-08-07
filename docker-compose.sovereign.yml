@@ -515,7 +515,17 @@ services:
       - execution-net
       - observability-net
     volumes:
-      - /var/log/sovereign:/var/log/sovereign:ro
+      # Was an absolute `/var/log/sovereign` — machine-specific, so on
+      # any other host Docker silently created it empty and heartbeat's
+      # intrusion scan read nothing while reporting zero hits. Repo-relative
+      # default; override with SOVEREIGN_LOG_DIR for a real deployment.
+      #
+      # NOTE, and it is the more important half: `executor` is supposed to
+      # write executor.log and DOES NOT. It declares no volumes, its code
+      # never references the path, and it has never been started. This
+      # mount is honest about the host now; the pipeline behind it still
+      # does not exist. See the execution batch in NEXT_STINT_PLAN.md.
+      - ${SOVEREIGN_LOG_DIR:-./runtime-logs/sovereign}:/var/log/sovereign:ro
     environment:
       TOOL_GATE_URL: "http://tool-gate:8000"
       MEMU_INTROSPECT_URL: "http://memu-core-introspect:8009"

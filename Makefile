@@ -43,6 +43,7 @@ policy-check: lint-blocking
 	python3 scripts/security/check_image_modules.py
 	python3 scripts/security/check_shipped_package_deps.py
 	python3 scripts/security/check_healthcheck_runnable.py
+	python3 scripts/security/check_bind_mount_portability.py
 	python3 scripts/security/check_depends_on_readiness.py
 	python3 scripts/security/check_test_identity.py
 	python3 scripts/security/check_test_wiring.py
@@ -339,7 +340,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-compose-interpolation test-unreachable-bindings \
 	test-implicit-deps test-image-modules test-test-identity \
 	test-execution-coverage test-bringup-guards test-ci-scripts \
-	test-post-mortem test-summarise-runs \
+	test-post-mortem test-summarise-runs test-bind-mount-portability \
 	test-shipped-package-deps test-policy-loader \
 	test-healthcheck-runnable test-depends-on-readiness \
 	test-suite-floor
@@ -890,6 +891,9 @@ test-bringup-guards:
 
 test-post-mortem:
 	python3 scripts/test_post_mortem.py
+
+test-bind-mount-portability:
+	python3 scripts/test_bind_mount_portability.py
 
 test-summarise-runs:
 	python3 scripts/test_summarise_runs.py
