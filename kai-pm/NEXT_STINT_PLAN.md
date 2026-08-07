@@ -181,7 +181,7 @@ the `dev` profile which nothing has ever started. Adding a probe there
 would be an unverifiable healthcheck on a never-run service — precisely
 the `wget` defect. It goes into item 2 with the rest.
 
-### Item 1 — delete the stub eraser
+### Item 1 — delete the stub eraser — **DONE**
 
 `scripts/kai_supervisor.py:111-118`:
 
@@ -194,6 +194,44 @@ if "TODO" in src or "pass  # stub" in src or "NotImplementedError" in src:
     log_supervisor_action("auto_stub_removed", ...,
                           rationale="Stub/TODO removed for production readiness.")
 ```
+
+
+**Done 2026-08-07.** The whole file removed, not just the eraser —
+183 lines, wired to nothing, containing three paths that rewrite the
+repository and one that posts to a hard-coded URL swallowing every error.
+
+Measured before deleting (§1.4 step 3), against its own glob:
+
+| what it would rewrite | files |
+|---|---|
+| denominator — `scripts/*.py` | 251 |
+| files containing `TODO` | 3 |
+| files containing `pass  # stub` | 2 |
+| files containing `NotImplementedError` | 2 |
+| files it would inject a generic docstring into | 26 |
+| files with a bare `raise NotImplementedError` (→ `raise `, a SyntaxError) | **0** |
+
+That last zero is luck, not safety. Any future bare `raise
+NotImplementedError` in `scripts/` would have become a syntax error, and
+`safe_experimentation()` separately writes `scripts/sandbox_experiment.py`
+into the tree on every call.
+
+**And measuring stopped a gate that would have been wrong.** The obvious
+R6 move was "no script may rewrite `.py` files it did not create". Counted
+first: 469 python files inspected, **5** glob `*.py` and write files —
+and four are correct.
+
+| script | writes | verdict |
+|---|---|---|
+| `sync_docs.py` | README / BACKLOG markdown | legitimate |
+| `hygiene_survey.py` | its own baseline | legitimate |
+| `test_image_modules.py`, `test_test_wiring.py` | test fixtures | legitimate |
+| `kai_supervisor.py` | **source files it did not create** | the defect |
+
+Population one, about to be zero. **No gate written** — a gate for a
+class with no members is an inert rule (I-5), and this one would have
+reported failure over four things that are right. Third time this week
+that counting first changed the answer.
 
 This does not remove stubs. It removes the *words* that name them, over
 every `*.py` in `scripts/`, and logs the result as production readiness.

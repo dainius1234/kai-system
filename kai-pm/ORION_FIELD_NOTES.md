@@ -27,11 +27,11 @@ and it *still* has never been executed anywhere. The bake should make it
 work. Nothing has proven that it does. That is task #47 and it is the
 highest-value unproven claim in the tree.
 
-**Then:** the 26 services that have never been started by anything, and
-the `scripts/kai_supervisor.py` stub-eraser, which "removes stubs" by
-deleting the words `TODO` and `NotImplementedError` from source files.
-It is wired to nothing. Delete it before touching anything else, because
-everything after it edits the tree.
+**Then:** the 26 services that have never been started by anything.
+(`scripts/kai_supervisor.py` — which "removed stubs" by deleting the
+words `TODO` and `NotImplementedError` from 251 source files — is gone
+as of 2026-08-07. If it reappears, something restored it from an old
+branch; it should not come back.)
 
 **Read in this order:** `CLAUDE.md` (the rules that bind) →
 `kai-pm/WAYPOINTS.md` (what is known-good, and the standing contingency
