@@ -581,6 +581,21 @@ REGISTRY: Tuple[Gate, ...] = (
                            "exec_http/load_ports instead",
          proven_by="scripts/test_ci_scripts.py",
          in_workflows=("core-tests.yml",)),
+    Gate(module="report_perception_intake",
+         kind=REPORT,
+         summary="the full UH-2 perception intake surface, with a verdict "
+                 "per source — WORKING only when the whole path is proven",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ perception source\(s\)",
+         probe=False,
+         probe_skip_reason="imports the live UH-2 registry and reducer map; "
+                           "probed by scripts/test_perception_intake.py "
+                           "against synthetic compose trees instead",
+         proven_by="scripts/test_perception_intake.py",
+         pending_wiring="reported while the intake rebuild is decided; it "
+                        "would gate at WORKING == denominator, which is "
+                        "currently 2 of 44",
+         in_workflows=()),
     Gate(module="check_service_reachability",
          kind=REPORT,
          summary="a service that both depends_on a peer and holds its URL "
