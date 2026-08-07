@@ -8292,3 +8292,92 @@ a compose file the workflow names but the tree lacks. Now reported as
 
 **Second gate today caught by the meta-check before it ever ran against
 the tree, and the fifth instrument of mine caught misreporting.**
+
+---
+
+## D165 — 2026-08-07 — Fix the Class, Not the Instance: 11 Survivors of a Closed Finding
+
+**Context:** The operator proposed a working method, in their words:
+
+> "If we have now just one set of wheels and 50 cars and try to move
+> them, and each time we need to take the wheels off to put them on
+> another car — same again 50 times — it's painful. So why not put all
+> cars on wheels, or on a trailer, and make the issue go away."
+
+They asked to be corrected if wrong. They are not wrong. It is this
+programme's own systemic finding — *a scope smaller than the claim* —
+applied to fixes rather than to checks. Seventeen defects last stint
+were each a check whose scope was smaller than its name implied; fixing
+one instance of a class and stopping is a fix whose scope is smaller
+than its class. `ORION_FIELD_NOTES.md` §4 already records that I had to
+be told four times that a remedy applied to one dump step belonged on
+all four.
+
+**Evidence produced while writing the plan, not assumed:**
+
+The register carried "full.yml: 16 services declare `depends_on` with no
+readiness condition" as done. Measured across all compose files:
+
+    full.yml 0 | minimal.yml 1 | sovereign.yml 10
+
+Eleven instances of the identical class survived in the same tree on the
+same day the class was called closed. Thirty gate scripts existed and
+none mentioned `depends_on`. A bare list waits for container *creation*,
+not readiness.
+
+**Decision 1 — the standing sequence for any batch fix.** Six steps, and
+step 3 comes before step 5:
+
+1. One confirmed instance — observed, not suspected.
+2. Derive the rule from why that instance is wrong.
+3. **Measure the population. Print the count. Fix nothing yet.**
+4. **Calibrate against a known answer** — run against the tree one
+   commit before a known fix; it must report exactly the known defects.
+5. Fix the whole population.
+6. Gate it, with the denominator in the gate's own output.
+
+This is not process for its own sake. Uncalibrated broad rules are how
+this programme produced 100+ findings for 1 real, and 69 findings on a
+tree that was already correct.
+
+**Decision 2 — step 3 changed this gate's design, which is the argument
+for the sequence.** The first draft enforced a second clause: *if the
+dependency declares a healthcheck, the condition must be
+`service_healthy`*. Measuring first showed 4 hits, all on `dashboard` in
+`minimal.yml` — the profile CI proves green — against `tts-service`,
+`notify-service`, `document-parser` and `agentic`. Blocking a UI's start
+on a slow optional dependency is a design decision, and `service_healthy`
+against a service that never reaches healthy blocks the entire bring-up.
+That clause is now **reported and counted, not enforced**. Fixing before
+measuring would have "fixed" four correct declarations and called it a
+clean sweep.
+
+**Decision 3 — what was actually changed.** 11 bare `depends_on` lists
+given explicit conditions. `sovereign`'s redis given the `redis-cli
+ping` healthcheck that `minimal` and `full` both already had — same
+service, three profiles, one copy different, and the different one had
+never been depended on with a condition so nothing needed the signal.
+New gate `check_depends_on_readiness.py`: 90 edges, in `make
+policy-check` and `policy-checks.yml`, registered, proven by
+`scripts/test_depends_on_readiness.py` whose calibration test asserts
+the exact figure 16 against `e47622b~1`.
+
+**Decision 4 — this does NOT close the class.** Programme Rule 7:
+closure is a separate evidence-backed action. The evidence here is
+static; no profile has been booted with the new conditions. CI on this
+commit is the first runtime evidence, and it is a real risk — `sovereign`
+previously booted in 11 seconds without waiting for anything, and now
+waits for healthy.
+
+**Decision 5 — what the trailer already covers, and what it cannot.**
+Measured: 49 built services, 23 started by CI, 26 never started. The
+static gates scan all 49, so the 26 are already clean for every class
+encoded statically. What no static gate can answer — does the process
+start, is the value right rather than merely present, does the readiness
+signal ever arrive, does the service degrade correctly — is why booting
+those 26 stays the main body of the next stint rather than a remainder.
+
+Plan logged at `kai-pm/NEXT_STINT_PLAN.md`.
+
+**The operator proposed a method, and it found a live defect in the
+document written to describe it.**

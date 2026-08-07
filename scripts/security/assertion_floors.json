@@ -17,6 +17,7 @@
     "Dashboard Finding Tracker Tests": 217,
     "Dashboard UI Auth Tests": 42,
     "Degraded State Tests": 71,
+    "Depends-On Readiness Tests": 24,
     "Deployment Preflight Tests": 57,
     "Dockerfile Context Tests": 24,
     "Dockerfile Coverage Tests": 26,
@@ -56,5 +57,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2852
+  "total": 2876
 }

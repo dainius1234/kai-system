@@ -20,6 +20,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # GitHub's default job timeout is 360 minutes. Nothing in this
+    # repository has ever needed more than 28. Run 697 of core-tests sat
+    # at 133.9 minutes and finished with no conclusion at all during the
+    # runner-starvation incident, and `docker compose up -d` now blocks
+    # on `condition: service_healthy` — so a dependency that never turns
+    # healthy hangs the step rather than failing it. 60 minutes is over
+    # twice the longest successful run of any workflow here, so it
+    # cannot cut short work that is progressing, and it turns a hang
+    # into a red build with a reason.
+    timeout-minutes: 60
     permissions:
       contents: read
       models: read

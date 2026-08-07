@@ -724,7 +724,8 @@ services:
     networks:
       - agent-net
     depends_on:
-      - dashboard
+      dashboard:
+        condition: service_healthy
 
   house-doctor:
     build:

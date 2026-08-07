@@ -14,6 +14,14 @@ on:
 jobs:
   policy:
     runs-on: ubuntu-latest
+    # GitHub's default job timeout is 360 minutes; a hung job burns six
+    # hours and reads as "still running". Run 697 of core-tests sat at
+    # 133.9 minutes and finished with no conclusion at all. 60 is over
+    # twice the longest successful run of any workflow here, so it
+    # cannot cut short work that is progressing. All nine jobs were
+    # unbounded — the bound is applied to the whole set, not to the one
+    # workflow whose change prompted it.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -143,6 +151,13 @@ jobs:
 
       - name: Every healthcheck can run in the image it checks
         run: python scripts/security/check_healthcheck_runnable.py
+
+      # full.yml's sixteen bare `depends_on` lists were fixed and the
+      # class was called closed. Eleven survived in minimal.yml and
+      # sovereign.yml, in the same tree on the same day, because the fix
+      # had a scope and nothing measured the class.
+      - name: Every depends_on says what it waits for
+        run: python scripts/security/check_depends_on_readiness.py
 
       - name: Every test pins the identity it claims to run as
         run: python scripts/security/check_test_identity.py

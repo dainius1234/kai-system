@@ -118,7 +118,8 @@ services:
       VAULT_ROOT_TOKEN: ${VAULT_ROOT_TOKEN}
     command: sh /vault/scripts/vault-rotate.sh
     depends_on:
-      - vault
+      vault:
+        condition: service_started
     networks:
       - control-net
 
@@ -189,7 +190,8 @@ services:
       AUDIT_REDIS_URL: "redis://redis:6379"
 
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
       interval: 30s
@@ -230,8 +232,10 @@ services:
       - memu_data:/data
 
     depends_on:
-      - postgres
-      - tool-gate
+      postgres:
+        condition: service_healthy
+      tool-gate:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\""]
       interval: 30s
@@ -267,7 +271,8 @@ services:
       VAULT_ADDR: "${VAULT_ADDR:-http://vault:8200}"
       VAULT_TOKEN: "${VAULT_ROOT_TOKEN:-}"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8009/health')\""]
       interval: 30s
@@ -325,8 +330,10 @@ services:
     # — for as long as the line has existed. Directive 3.
     command: sh -c "set -e; for d in $$BACKOFF_SCHEDULE; do python app.py && exit 0 || sleep $$d; done; exec python app.py"
     depends_on:
-      - tool-gate
-      - memu-core
+      tool-gate:
+        condition: service_healthy
+      memu-core:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8002/alive')\""]
       interval: 30s
@@ -371,8 +378,10 @@ services:
       KAI_DASHBOARD_ROLE: "${KAI_DASHBOARD_ROLE:-operator}"
 
     depends_on:
-      - tool-gate
-      - memu-core
+      tool-gate:
+        condition: service_healthy
+      memu-core:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/health')\""]
       interval: 30s
@@ -407,9 +416,12 @@ services:
       EXPENSES_LOG: "/data/self-emp/Accounting/expenses.log"
 
     depends_on:
-      - memu-core
-      - tool-gate
-      - redis
+      memu-core:
+        condition: service_healthy
+      tool-gate:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8007/health')\""]
       interval: 30s
@@ -433,9 +445,12 @@ services:
       REDIS_URL: "redis://redis:6379"
       AGENTIC_CORE_URL: "http://agentic:8007"
     depends_on:
-      - memu-core
-      - redis
-      - agentic
+      memu-core:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      agentic:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8023/health')"]
       interval: 30s
@@ -452,6 +467,16 @@ services:
     command: redis-server --appendonly yes --save ""
     container_name: sovereign-redis
     hostname: redis
+    # `minimal` and `full` both give redis this probe; `sovereign` did
+    # not. Same service, three profiles, one copy different — and the
+    # different one had never been depended on with a condition, so
+    # nothing needed the signal and nothing noticed it was missing.
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
     networks:
       - agent-net
       - data-net
@@ -476,7 +501,8 @@ services:
       - agent-net
       - egress-net
     depends_on:
-      - agentic
+      agentic:
+        condition: service_healthy
 
   heartbeat:
     <<: *service_defaults
@@ -500,8 +526,10 @@ services:
       TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID:-}"
       AUDIT_REDIS_URL: "redis://redis:6379"
     depends_on:
-      - memu-core
-      - memu-core-introspect
+      memu-core:
+        condition: service_healthy
+      memu-core-introspect:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8010/health')\""]
       interval: 30s
