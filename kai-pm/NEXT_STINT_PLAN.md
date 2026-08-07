@@ -248,6 +248,59 @@ after this touches the tree.**
 
 ### Item 2 — the 26 never-started services
 
+**Measured 2026-08-07 before starting.** They are not a flat list of 26;
+they are **8 profile groups**, and which compose file defines them
+matters more than I had assumed — most live only in `minimal.yml`, not
+`full.yml`:
+
+| profile | services | defined in |
+|---|---|---|
+| `sensors` | audio, camera, clipboard, files, screen-capture, screen-watcher, vision, wake | 8 — split across minimal and full |
+| `watchers` | docker-watcher, git-watcher, monitor-service, sysmetrics | 4 — minimal only |
+| `external-egress` | browser-agent, email-reader, news-feed, telegram-bot | 4 — minimal and full |
+| `introspection` | agentic-introspect, cortex, letta-agent | 3 |
+| `recovery` | fusion-engine, supervisor, verifier | 3 |
+| `finance` | broker-bridge, financial-awareness | 2 |
+| `execution` | executor | 1 |
+| `vault` | vault-sync | 1 |
+
+Verified at the same time, because it was an assumption I had written
+into `WAYPOINTS.md` without checking: **26 of 26 are behind a
+`profiles:` gate in every file that defines them. None would start on a
+bare `up`.** The claim held.
+
+**Boot order — cheapest and least dangerous first**, because each batch
+is a chance to learn a defect class and ask whether it is scannable
+across the rest (§1.4 step 1):
+
+1. **`watchers`** (4). Zero `depends_on`, no secrets, no host devices,
+   minimal.yml only. The safest possible first contact with a
+   never-executed service.
+2. **`introspection`** (3) and **`recovery`** (3). 1–3 dependencies, no
+   secrets. `supervisor` and `verifier` are the two the register has
+   been carrying longest.
+3. **`sensors`** (8). The largest group. `camera-service` declares a
+   secret and several want host devices — expect the volume-ownership
+   and device-node classes here, and expect some to be un-bootable in
+   CI by nature. Say which, out loud, rather than quietly skipping.
+4. **`external-egress`** (4). By definition these want the network. On a
+   runner they will exercise the *degradation* path, which is worth
+   knowing and is not the same as exercising the service.
+5. **`execution`** (1) and **`vault`** (1).
+6. **`finance`** (2) **last, and carefully.** `broker-bridge` carries the
+   standing constraint: `BINANCE_API_KEY` and `BINANCE_API_SECRET` never
+   leave that service and must not reach the dashboard layer under any
+   bring-up. Booting it is the first time that constraint is tested by
+   something other than reading.
+
+**What each batch must produce**, or it does not count as done: the
+services boot and answer a probe; every failure is classified; and for
+each class, an answer to *is this scannable across the other groups?* A
+batch that fixes its own failures and encodes nothing is the outcome §4
+names as failure.
+
+
+
 The main body. All 26 sit behind `profiles:` gates and have never been
 started by anything:
 
