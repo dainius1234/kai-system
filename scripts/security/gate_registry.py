@@ -581,6 +581,20 @@ REGISTRY: Tuple[Gate, ...] = (
                            "exec_http/load_ports instead",
          proven_by="scripts/test_ci_scripts.py",
          in_workflows=("core-tests.yml",)),
+    Gate(module="ci/post_mortem",
+         kind=REPORT,
+         summary="print the captured step logs that have content, and "
+                 "name the empty ones in one line instead of a section "
+                 "each — the noise is what evicted the real output",
+         inputs=(),
+         denominator=r"inspected: \d+ captured step log\(s\)",
+         probe=False,
+         probe_skip_reason="reads the log files a failed run left in "
+                           "/tmp; probed by scripts/test_post_mortem.py "
+                           "against fixtures shaped like run 712, where "
+                           "one section had output and twelve did not",
+         proven_by="scripts/test_post_mortem.py",
+         in_workflows=("core-tests.yml",)),
     Gate(module="ci/assert_clean_bringup",
          kind=GATE,
          summary="a bring-up that warned did not fully succeed",

@@ -37,6 +37,7 @@
     "Migration & Active Mode Tests": 136,
     "Payload Bounds Tests": 24,
     "Policy Loader Tests": 16,
+    "Post-mortem tests": 23,
     "Secret & Restart Gate Tests": 28,
     "Service Auth Tests": 59,
     "Service Token Tests": 24,
@@ -57,5 +58,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2876
+  "total": 2899
 }

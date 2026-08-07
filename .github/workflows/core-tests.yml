@@ -767,34 +767,25 @@ jobs:
           echo "── minimal compose config parses? ──"
           docker compose -f docker-compose.minimal.yml config -q 2>&1 \
             && echo "config: VALID" || echo "config: INVALID"
-          echo "── the minimal image build (its real output) ──"
-          tail -25 /tmp/build-minimal.log 2>/dev/null || echo "(did not run)"
-          echo "── the full image build (its real output) ──"
-          tail -8 /tmp/build-full.log 2>/dev/null || echo "(did not run)"
-          echo "── what the bring-up itself said (its real output) ──"
-          tail -20 /tmp/bringup.log 2>/dev/null || echo "(did not run)"
-          echo "── live smoke (its real output) ──"
-          tail -25 /tmp/live-smoke.log 2>/dev/null || echo "(did not run)"
-          echo "── kill-isolation (its real output) ──"
-          tail -15 /tmp/kill-isolation.log 2>/dev/null || echo "(did not run)"
-          echo "── restart-persistence (its real output) ──"
-          tail -25 /tmp/restart-persistence.log 2>/dev/null \
-            || echo "(did not run)"
-          echo "── full profile bring-up (its real output) ──"
-          tail -20 /tmp/full-bringup.log 2>/dev/null || echo "(did not run)"
-          echo "── full profile live smoke (its real output) ──"
-          tail -30 /tmp/full-smoke.log 2>/dev/null || echo "(did not run)"
-          # The container logs, not just what compose said about them.
-          # `is unhealthy` names the container and not the cause, and the
-          # cause is only ever in the container's own output.
-          echo "── full profile: containers Docker says are wrong ──"
-          tail -45 /tmp/full-logs.log 2>/dev/null || echo "(did not run)"
-          echo "── sovereign boot (its real output) ──"
-          tail -30 /tmp/sovereign-boot.log 2>/dev/null || echo "(did not run)"
-          echo "── sovereign: containers Docker says are wrong ──"
-          tail -45 /tmp/sovereign-logs.log 2>/dev/null || echo "(did not run)"
-          echo "── minimal: containers Docker says are wrong ──"
-          tail -30 /tmp/minimal-logs.log 2>/dev/null || echo "(did not run)"
+          # Captured step logs, printed by a script that skips the empty
+          # ones — because printing them is what broke this step.
+          #
+          # Run 712 (2026-08-07) failed in the image build. Every step
+          # after it was skipped, so twelve of these thirteen sections
+          # said "(did not run)" — and the Actions log API serves a FIXED
+          # BYTE WINDOW from the end. Twelve empty headers plus the
+          # teardown chatter pushed the build's own output, which was
+          # first in the fixed order, clean out of the window. All that
+          # could be recovered from the run was that `memu-core` was
+          # missing from the "images built" list.
+          #
+          # The container dumps learned this already (dump_unhealthy.py
+          # prints only what Docker says is wrong). The post-mortem —
+          # the tool built to make failures readable — had not. The
+          # script also reverses the order: build logs LAST, since a
+          # failed build is the only thing that ran and the bottom of the
+          # output is the part guaranteed to be served.
+          python3 scripts/ci/post_mortem.py
           # This step runs LAST so it survives log truncation — which
           # means the teardown at step 54 has already run, so `ps -a`
           # finds nothing and prints a bare header. An empty container
