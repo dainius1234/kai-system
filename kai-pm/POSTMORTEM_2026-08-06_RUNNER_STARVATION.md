@@ -63,19 +63,34 @@ not need a previously-processed run from that commit. So the trigger
 added in `cddc01c` as a general improvement is what unblocked the
 incident, and the claim above was false when written.
 
-That changes the diagnosis materially:
+~~So this is push-event processing for this repository, not Actions
+capacity and not scheduling.~~
 
-| trigger | result |
-|---|---|
-| `push` | no run created, for 11 hours, across 4 workflows and 3 commits |
-| `workflow_dispatch` | run created and running within seconds |
+**Wrong again, within two minutes.** At 06:17:18 a push created three
+runs — Core Tests 699, python-app 621, unified-hunter 70 — all
+`event: push`, all starting immediately. Push works.
 
-So this is **push-event processing for this repository**, not Actions
-capacity and not scheduling. Phase two's runner starvation may well have
-been the same fault upstream, presenting differently.
+The error is the same one as #3 and #4 in the list below, for the sixth
+time: I compared **dispatch-at-06:15 against push-eleven-hours-earlier**
+and read the difference as being about the trigger. The window between
+19:47 on the 6th and 06:15 on the 7th is unobserved — nobody was
+watching — so the only supported statement is that **Actions recovered
+at some unknown point in that window**. The dispatch proved recovery,
+not a push/dispatch distinction.
 
-**Workaround, now proven:** dispatch the workflow directly rather than
-relying on a push to trigger it.
+What the incident actually was therefore remains: an unexplained
+GitHub-side degradation lasting somewhere between 3 and 11 hours,
+progressing from failed action-metadata lookups, through runners never
+being assigned, to runs not being created at all — and then resolving on
+its own.
+
+One artefact outlived it: run 697 was still reporting `status: queued`
+at 06:15, 11h17m after entering that state, and still could not be
+cancelled. A stuck record that survived the recovery.
+
+**Still worth keeping:** `workflow_dispatch` is a real improvement
+regardless. A workflow that can only be triggered by changing the code
+cannot be re-run to tell a flaky failure from a real one.
 
 ## 2. Signature
 
