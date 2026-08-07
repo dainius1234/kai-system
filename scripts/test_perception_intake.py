@@ -95,6 +95,33 @@ def main() -> int:
           "is not defined in this profile" in text
           and "no adapter and no event contract" in text)
 
+    # ── I-3 for the branch that had never fired ──
+    #
+    # After Phase 0 every adapter has a dedicated reducer, so the
+    # "no reducer -> BROKEN" branch produces nothing on the live tree.
+    # It had never fired before Phase 0 either: every source lacking a
+    # reducer was already MISSING, DORMANT or unreachable and was caught
+    # by an earlier clause.
+    #
+    # So it is never-executed code inside the instrument built to find
+    # never-executed code. Proven here rather than trusted.
+    import common.world_state.reducers as _reducers
+    saved = dict(_reducers.REDUCER_MAP)
+    try:
+        _reducers.REDUCER_MAP.pop("weather_reading", None)
+        rows2, n2, counts2 = audit(REPO)
+        text2 = "\n".join(rows2)
+        check("I-3: removing a reducer makes its source BROKEN",
+              "no reducer for `weather_reading`" in text2)
+        check("I-3: and WORKING drops by exactly one",
+              counts2.get("WORKING") == counts.get("WORKING") - 1)
+    finally:
+        _reducers.REDUCER_MAP.clear()
+        _reducers.REDUCER_MAP.update(saved)
+    rows3, n3, counts3 = audit(REPO)
+    check("I-3: the map is restored and the count returns",
+          counts3.get("WORKING") == counts.get("WORKING"))
+
     print("=" * 60)
     print(f"Perception intake tests: {PASSED} passed, {FAILED} failed")
     print(f"EXIT GATE: {'PASS' if FAILED == 0 else 'FAIL'}")

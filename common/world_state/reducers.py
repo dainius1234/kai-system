@@ -294,6 +294,126 @@ def reduce_market(event: PerceptionEvent, principal: Principal) -> ReducerOutput
     return ReducerOutput(claims=claims, evidence=[evidence])
 
 
+# ── The four that used to fall through to reduce_generic ─────────────
+#
+# Phase 0 of the UH-2 intake rebuild. `reduce_generic` is not semantic
+# coverage — it is the reducer equivalent of `except: pass`, and these
+# four adapters had been registered without one since they were written.
+#
+# THESE FOUR ARE DIFFERENT FROM THE OTHER SEVEN, and the difference is
+# the reason they are written the way they are. `weather_reading`,
+# `system_metrics`, `docker_status` and `git_status` carry numbers the
+# host produced about itself. Clipboard previews, email subjects, news
+# headlines and Telegram text are **attacker-influenced content**: a
+# clipboard can be written by any application, a headline by any
+# publisher, a message by anyone who can reach the bot.
+#
+# So the claim is about the OBSERVATION, never the CONTENT:
+#
+#     "a clipboard update of 120 characters was observed"   yes
+#     "the user copied a password"                          no
+#     "3 unread messages"                                   yes
+#     "the user is busy"                                    no
+#
+# Content is carried in `raw_data` (already the whole payload) where a
+# downstream consumer must treat it as untrusted, and is never
+# interpolated into `claim_text`, which reads as a system assertion.
+# R3's raw-observation-is-not-interpretation rule, applied at the first
+# place it actually bites.
+
+
+def reduce_clipboard(event: PerceptionEvent, principal: Principal) -> ReducerOutput:
+    """A clipboard update was observed. Not what it means."""
+    payload = event.payload
+    length = payload.get("content_length")
+    if not length:
+        return ReducerOutput()
+
+    evidence = _make_evidence(
+        event, f"Clipboard update observed, {length} characters",
+        "clipboard_observation", principal, strength=0.9,
+    )
+    # Confidence is in the OBSERVATION — a clipboard service reporting a
+    # change is highly reliable about the fact of the change. It says
+    # nothing about the trustworthiness of the content, which is why the
+    # content is not in the claim.
+    claims = [_make_claim(
+        f"A clipboard update of {length} characters was observed",
+        "user_activity", evidence, principal,
+        confidence=0.9, freshness=_freshness_from_event(event),
+    )]
+    return ReducerOutput(claims=claims, evidence=[evidence])
+
+
+def reduce_email(event: PerceptionEvent, principal: Principal) -> ReducerOutput:
+    """Unread count is a fact. Subject lines are not."""
+    payload = event.payload
+    unread = payload.get("unread_count")
+    if unread is None:
+        return ReducerOutput()
+
+    evidence = _make_evidence(
+        event, f"Mailbox reports {unread} unread", "email_observation",
+        principal, strength=0.9,
+    )
+    claims = [_make_claim(
+        f"The mailbox reported {unread} unread message(s)",
+        "communication", evidence, principal,
+        confidence=0.9, freshness=_freshness_from_event(event),
+    )]
+    return ReducerOutput(claims=claims, evidence=[evidence])
+
+
+def reduce_news(event: PerceptionEvent, principal: Principal) -> ReducerOutput:
+    """Headlines arrived. Whether they are true is not ours to say.
+
+    Lower strength than the others on purpose: a news feed is a
+    third-party assertion relayed by us, so the system knows "this feed
+    published these headlines", not "these things happened". Confidence
+    describes our certainty about the RELAY, and it is the honest number.
+    """
+    payload = event.payload
+    count = payload.get("article_count")
+    if not count:
+        return ReducerOutput()
+
+    evidence = _make_evidence(
+        event, f"News feed returned {count} article(s)", "news_observation",
+        principal, strength=0.6,
+    )
+    claims = [_make_claim(
+        f"A news feed published {count} article(s)",
+        "information", evidence, principal,
+        confidence=0.6, freshness=_freshness_from_event(event),
+    )]
+    return ReducerOutput(claims=claims, evidence=[evidence])
+
+
+def reduce_telegram(event: PerceptionEvent, principal: Principal) -> ReducerOutput:
+    """A message arrived. Its content is an assertion by whoever sent it.
+
+    The most attacker-exposed of the four: anyone who can reach the bot
+    can produce one of these. The claim records that a message was
+    received and how large it was — never what it said, and never who it
+    "was from" beyond the chat id the transport reported.
+    """
+    payload = event.payload
+    length = payload.get("text_length")
+    if not length:
+        return ReducerOutput()
+
+    evidence = _make_evidence(
+        event, f"Telegram message received, {length} characters",
+        "telegram_observation", principal, strength=0.8,
+    )
+    claims = [_make_claim(
+        f"A Telegram message of {length} characters was received",
+        "communication", evidence, principal,
+        confidence=0.8, freshness=_freshness_from_event(event),
+    )]
+    return ReducerOutput(claims=claims, evidence=[evidence])
+
+
 def reduce_generic(event: PerceptionEvent, principal: Principal) -> ReducerOutput:
     payload = event.payload
     summary = payload.get("summary", payload.get("content_preview", ""))
@@ -318,6 +438,13 @@ def reduce_generic(event: PerceptionEvent, principal: Principal) -> ReducerOutpu
 
 
 REDUCER_MAP: Dict[str, ReducerFn] = {
+    # Phase 0 — the four that had no dedicated reducer. See the block
+    # above for why their claims describe the observation and not the
+    # content.
+    "clipboard_update": reduce_clipboard,
+    "email_check": reduce_email,
+    "news_update": reduce_news,
+    "telegram_message": reduce_telegram,
     "weather_reading": reduce_weather,
     "system_metrics": reduce_system,
     "docker_status": reduce_docker,
