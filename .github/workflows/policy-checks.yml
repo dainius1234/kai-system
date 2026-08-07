@@ -141,6 +141,9 @@ jobs:
       - name: Every image installs what the packages it ships import
         run: python scripts/security/check_shipped_package_deps.py
 
+      - name: Every healthcheck can run in the image it checks
+        run: python scripts/security/check_healthcheck_runnable.py
+
       - name: Every test pins the identity it claims to run as
         run: python scripts/security/check_test_identity.py
 

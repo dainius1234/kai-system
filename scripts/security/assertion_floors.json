@@ -26,6 +26,7 @@
     "Flags-Enabled Integration Tests": 37,
     "Full Migration Tests": 75,
     "Gate Registry Tests": 82,
+    "Healthcheck Runnable Tests": 16,
     "Hygiene Gate Tests": 63,
     "Image Module Tests": 28,
     "Implicit Dependency Tests": 32,
@@ -55,5 +56,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2836
+  "total": 2852
 }

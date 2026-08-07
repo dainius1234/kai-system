@@ -191,7 +191,7 @@ services:
     depends_on:
       - postgres
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8000/health || exit 1"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -233,7 +233,7 @@ services:
       - postgres
       - tool-gate
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8001/health || exit 1"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\""]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -269,7 +269,7 @@ services:
     depends_on:
       - postgres
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8009/health || exit 1"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8009/health')\""]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -328,7 +328,7 @@ services:
       - tool-gate
       - memu-core
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8002/alive || exit 1"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8002/alive')\""]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -374,7 +374,7 @@ services:
       - tool-gate
       - memu-core
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/health')\""]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -411,7 +411,7 @@ services:
       - tool-gate
       - redis
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8007/health || exit 1"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8007/health')\""]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -503,7 +503,7 @@ services:
       - memu-core
       - memu-core-introspect
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8010/health || exit 1"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8010/health')\""]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -532,7 +532,7 @@ services:
     networks:
       - sensor-net
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8021/health || exit 1"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8021/health')\""]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -554,7 +554,7 @@ services:
     volumes:
       - memu_data:/data
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8045/health || exit 1"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8045/health')\""]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -575,7 +575,7 @@ services:
     volumes:
       - memu_data:/data
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8046/health || exit 1"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8046/health')\""]
       interval: 30s
       timeout: 5s
       retries: 3

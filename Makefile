@@ -42,6 +42,7 @@ policy-check: lint-blocking
 	python3 scripts/security/check_implicit_deps.py
 	python3 scripts/security/check_image_modules.py
 	python3 scripts/security/check_shipped_package_deps.py
+	python3 scripts/security/check_healthcheck_runnable.py
 	python3 scripts/security/check_test_identity.py
 	python3 scripts/security/check_test_wiring.py
 	python3 scripts/security/check_gate_registry.py --gate
@@ -319,6 +320,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-implicit-deps test-image-modules test-test-identity \
 	test-execution-coverage test-bringup-guards test-ci-scripts \
 	test-shipped-package-deps test-policy-loader \
+	test-healthcheck-runnable \
 	test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
@@ -873,6 +875,9 @@ test-shipped-package-deps:
 
 test-policy-loader:
 	python3 scripts/test_policy_loader.py
+
+test-healthcheck-runnable:
+	python3 scripts/test_healthcheck_runnable.py
 
 execution-coverage:
 	python3 scripts/security/report_execution_coverage.py
