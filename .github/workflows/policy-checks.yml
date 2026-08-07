@@ -160,6 +160,16 @@ jobs:
       - name: Every bind mount names a path that exists on any host
         run: python scripts/security/check_bind_mount_portability.py
 
+      # Reported, not enforced: all 5 findings need a network-topology
+      # decision, and network zones are policy with their own gate. It
+      # exits 0 by design; that is declared in gate_registry.py as
+      # kind=REPORT with pending_wiring naming what would promote it, so
+      # a `ci-toleration` marker here would be the same fact in two
+      # places — and two copies of one fact is the defect shape this
+      # repository has spent a fortnight removing.
+      - name: Peers named twice must be reachable (reported)
+        run: python scripts/security/check_service_reachability.py
+
       # full.yml's sixteen bare `depends_on` lists were fixed and the
       # class was called closed. Eleven survived in minimal.yml and
       # sovereign.yml, in the same tree on the same day, because the fix

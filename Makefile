@@ -341,6 +341,7 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-implicit-deps test-image-modules test-test-identity \
 	test-execution-coverage test-bringup-guards test-ci-scripts \
 	test-post-mortem test-summarise-runs test-bind-mount-portability \
+	test-service-reachability \
 	test-shipped-package-deps test-policy-loader \
 	test-healthcheck-runnable test-depends-on-readiness \
 	test-suite-floor
@@ -894,6 +895,9 @@ test-post-mortem:
 
 test-bind-mount-portability:
 	python3 scripts/test_bind_mount_portability.py
+
+test-service-reachability:
+	python3 scripts/test_service_reachability.py
 
 test-summarise-runs:
 	python3 scripts/test_summarise_runs.py

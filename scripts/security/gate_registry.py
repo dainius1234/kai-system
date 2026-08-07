@@ -581,6 +581,20 @@ REGISTRY: Tuple[Gate, ...] = (
                            "exec_http/load_ports instead",
          proven_by="scripts/test_ci_scripts.py",
          in_workflows=("core-tests.yml",)),
+    Gate(module="check_service_reachability",
+         kind=REPORT,
+         summary="a service that both depends_on a peer and holds its URL "
+                 "must share a network with it — Docker DNS only resolves "
+                 "names on a joined network",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ edge\(s\)",
+         proven_by="scripts/test_service_reachability.py",
+         calibrated_by="scripts/test_service_reachability.py",
+         pending_wiring="reported until the network-topology decision on "
+                        "its 5 findings is taken; widening a service's "
+                        "networks to silence it would change the security "
+                        "topology to quieten a check",
+         in_workflows=("policy-checks.yml",)),
     Gate(module="check_bind_mount_portability",
          kind=GATE,
          summary="a bind mount must not name a path that exists on one "
