@@ -1,5 +1,52 @@
 # Field notes — Orion
 
+## 0. Where we were, last time I closed the book
+
+*Updated at the end of every stint. If this section is stale, trust the
+git log over it — and then fix it, because a handover note that lies is
+worse than none.*
+
+**Last updated:** 2026-08-07, end of the embeddings stint.
+
+**Branch:** `claude/project-rework-plan-pgvp35`. **`main` is at
+`194db0a`** and has received none of this stint — everything below is on
+the branch, awaiting explicit authorisation to merge. Never push `main`
+without it.
+
+**Where the work got to.** `core-tests.yml` is green across all four
+compose profiles, and — new this stint — it is green *deterministically*
+rather than by winning a race. `memu-core` used to attempt a HuggingFace
+download at import on a network with no egress, burning 70–100s against
+a healthcheck that gave up at 100. Six green runs had each won that coin
+toss; run 708 lost it twice. The model is now baked into the image at
+build time. Waypoint `b5deaaa`, then the bake on top.
+
+**The thing I would look at first if I were picking this up cold:**
+`MEMU_ALLOW_FAKE_EMBEDDINGS=false` is the documented production default
+and it *still* has never been executed anywhere. The bake should make it
+work. Nothing has proven that it does. That is task #47 and it is the
+highest-value unproven claim in the tree.
+
+**Then:** the 26 services that have never been started by anything, and
+the `scripts/kai_supervisor.py` stub-eraser, which "removes stubs" by
+deleting the words `TODO` and `NotImplementedError` from source files.
+It is wired to nothing. Delete it before touching anything else, because
+everything after it edits the tree.
+
+**Read in this order:** `CLAUDE.md` (the rules that bind) →
+`kai-pm/WAYPOINTS.md` (what is known-good, and the standing contingency
+for the huggingface build dependency) → `kai-pm/NEXT_STINT_PLAN.md` (the
+plan and, more importantly, §1.4, the sequence that makes batch-fixing
+safe) → the rest of this file.
+
+**What §3.5 says, in one line, because it is the week's real finding:**
+the instruments built to see failures keep inheriting the defect of the
+system they watch, because diagnostics are structurally the
+least-executed code there is.
+
+---
+
+
 Written 2026-08-07, after the stint that took `core-tests.yml` from
 dying at step 7 to 67 of 67 green across four compose profiles.
 

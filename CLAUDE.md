@@ -146,6 +146,7 @@ suspicious.
 
 | file | what it holds |
 |---|---|
+| `kai-pm/ORION_FIELD_NOTES.md` §0 | **start here** — where the last stint stopped, what to look at first, and what is on `main` versus the branch |
 | `kai-pm/WAYPOINTS.md` | known-good commits with evidence, and standing contingencies |
 | `kai-pm/DECISIONS.md` | append-only decision log |
 | `kai-pm/ORION_FIELD_NOTES.md` | defect shapes, my failure modes and the tell for each |
