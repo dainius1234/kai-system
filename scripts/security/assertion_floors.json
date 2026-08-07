@@ -5,7 +5,7 @@
     "Assertion Floor Tests": 40,
     "Bring-up Guard Tests": 23,
     "CI Script Tests": 23,
-    "CI Toleration Tests": 20,
+    "CI Toleration Tests": 26,
     "Compose Drift Tests": 33,
     "Compose Env Tests": 24,
     "Compose Gate Tests": 54,
@@ -34,6 +34,7 @@
     "Live Smoke Tests": 36,
     "Migration & Active Mode Tests": 136,
     "Payload Bounds Tests": 24,
+    "Policy Loader Tests": 16,
     "Secret & Restart Gate Tests": 28,
     "Service Auth Tests": 59,
     "Service Token Tests": 24,
@@ -54,5 +55,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2814
+  "total": 2836
 }

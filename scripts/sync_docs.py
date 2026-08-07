@@ -140,9 +140,16 @@ def sync_readme(metrics: dict, check_only: bool = False) -> bool:
 
     m = STATUS_TABLE_RE.search(text)
     if not m:
-        print("WARNING: Could not find '## Project Status (...)' table in README.md")
-        print("         Skipping auto-patch. Add a conforming table to enable sync.")
-        return True  # Don't fail if table doesn't exist
+        # I-1: a table that cannot be found was not checked. Reporting
+        # "current" here means the gate certifies documentation it never
+        # read — the boundary blindness this programme exists to remove.
+        print("REFUSED: could not find the '## Project Status (...)' table "
+              "in README.md.")
+        print("         Nothing was compared, so nothing can be certified. "
+              "Either the table moved — in which case this gate has been "
+              "inspecting nothing — or it was removed deliberately, in "
+              "which case remove this check too.")
+        return False
 
     today = datetime.now().strftime("%-d %B %Y")
     new_date = today
@@ -151,14 +158,33 @@ def sync_readme(metrics: dict, check_only: bool = False) -> bool:
     current_date = m.group(2)
     current_rows = m.group(4)
 
-    if current_date == new_date and current_rows.strip() == new_table.strip():
+    # **The date is not drift.** This compared `current_date == new_date`
+    # as well as the metrics, which made staleness a function of the
+    # wall clock rather than of the codebase: at midnight UTC every
+    # repository goes red and stays red until somebody happens to push.
+    #
+    # It did exactly that on 2026-08-07. Core Tests run 699 failed at
+    # step 7 and skipped the other 60 — the full Docker stack, the live
+    # smoke, everything — because a README said "6 August" and the day
+    # had become the 7th. Not one line of code had changed.
+    #
+    # A gate that turns red on its own, with no change to the tree, is a
+    # gate people learn to ignore, and that is the failure mode the
+    # whole programme is built to prevent. The stamp is still refreshed
+    # whenever a sync runs for a real reason; its age just is not a
+    # finding.
+    rows_match = current_rows.strip() == new_table.strip()
+
+    if rows_match:
         print(f"docs-sync: README.md is current ({metrics['targets']} targets, "
               f"{metrics['tests']:,} tests, ~{metrics['loc']:,} LOC)")
-        return True
+        if check_only:
+            return True
 
     if check_only:
         print("docs-sync: README.md is STALE — run 'make sync-docs' to fix")
-        print(f"  Date: {current_date} → {new_date}")
+        print(f"  (stamp says {current_date}; the stamp itself is not "
+              f"checked — only the metrics below)")
         # Show diffs
         old_lines = current_rows.strip().splitlines()
         new_lines = new_table.strip().splitlines()
