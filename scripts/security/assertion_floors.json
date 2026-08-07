@@ -39,7 +39,7 @@
     "Migration & Active Mode Tests": 136,
     "Payload Bounds Tests": 24,
     "Perception intake tests": 23,
-    "Phase 0 reducer tests": 31,
+    "Phase 0 reducer tests": 46,
     "Policy Loader Tests": 16,
     "Post-mortem tests": 23,
     "Secret & Restart Gate Tests": 28,
@@ -63,5 +63,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 3033
+  "total": 3048
 }
