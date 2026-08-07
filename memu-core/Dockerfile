@@ -82,12 +82,28 @@ USER app
 # environment; a guessed sha fails every build. So the build *prints* the
 # sha it resolved, and pinning follows from that measured value rather
 # than an invented one.
-RUN HF_HUB_OFFLINE=0 python -c "\
+#
+# Retried, because "fail closed" means *never ship an image without the
+# model* — not *die on the first dropped packet*. A single transient blip
+# at huggingface.co should not fail a build; five consecutive failures
+# over ~100s is a real outage and should. Without this the hard failure
+# above is brittle rather than strict, which is a different property
+# wearing the same word.
+RUN for attempt in 1 2 3 4 5; do \
+      HF_HUB_OFFLINE=0 python -c "\
 import sentence_transformers, huggingface_hub, os; \
 name = os.getenv('EMBEDDING_MODEL', 'all-MiniLM-L6-v2'); \
 sentence_transformers.SentenceTransformer(name); \
 info = huggingface_hub.model_info(f'sentence-transformers/{name}'); \
-print(f'BAKED {name} revision={info.sha}')"
+print(f'BAKED {name} revision={info.sha}')" && exit 0; \
+      echo "model download attempt ${attempt}/5 failed; retrying in $((attempt * 10))s"; \
+      sleep $((attempt * 10)); \
+    done; \
+    echo "REFUSING TO BUILD: could not fetch the embedding model in 5 attempts."; \
+    echo "This image would start only with MEMU_ALLOW_FAKE_EMBEDDINGS=true and"; \
+    echo "could never serve real embeddings, because the running container has"; \
+    echo "no egress by design. Rollback point: kai-pm/WAYPOINTS.md."; \
+    exit 1
 
 EXPOSE 8001
 

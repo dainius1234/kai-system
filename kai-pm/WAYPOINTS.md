@@ -38,6 +38,42 @@ git checkout -b recover <sha>       # start again from there
 
 ---
 
+## Standing contingency — the build now depends on huggingface.co
+
+From `bc70c7d` onward, `memu-core/Dockerfile` downloads the embedding
+model at build time and **fails the build** if it cannot. That is
+deliberate (I-1: an image without the model cannot do the job, and the
+runtime has no egress to fetch one later), but it means this repository
+has acquired an external build-time dependency it did not have before.
+So the contingency is written down rather than assumed.
+
+**If a build fails on the model download:**
+
+1. **First check whether it is transient.** The step retries 5 times
+   over ~100s with increasing backoff. Five consecutive failures is an
+   outage, not a blip.
+2. **Roll back to `b5deaaa`.** Verified 2026-08-07: its Dockerfile has
+   **zero** network dependencies, so it builds when huggingface.co is
+   unreachable. It is green at 67 of 67 steps. It runs on hash-based
+   fake embeddings, which is what the tree did anyway.
+3. **Or revert just this commit.** Verified to apply cleanly:
+
+       git revert --no-commit bc70c7d
+
+   This restores a Dockerfile with no download and leaves every other
+   fix from today in place. Preferred over a full rollback.
+
+**What is NOT at risk:** `main` is at `194db0a` and has received none of
+this work. No deployment from `main` can be affected by any of it.
+
+**Rebuild caution:** the running container sets `HF_HUB_OFFLINE=1`, so a
+memu-core image built *before* `bc70c7d` and run *after* this change is
+not a combination that exists — the variable ships in the image. But an
+image built after `bc70c7d` and run with an old `memu_data` volume is
+fine by construction: the cache lives at `/opt`, outside every mount.
+
+---
+
 ## `b5deaaa3b21b2c6a9ba46f17e9a5e5b1b9057797` — the boot race removed
 
 **Date:** 2026-08-07 · **Branch:** `claude/project-rework-plan-pgvp35`
