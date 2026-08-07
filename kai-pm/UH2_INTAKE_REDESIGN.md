@@ -35,6 +35,87 @@ the reducer equivalent of `except: pass`.
 
 ---
 
+
+---
+
+## 0A. Cortex audit — required before promotion (direction §9)
+
+Cortex was promoted on topology. Topology is not enough, so here is the
+rest of it. **Three findings change the shape of the proposal, and one
+of them is a blocker.**
+
+| check | finding | verdict |
+|---|---|---|
+| network membership | `agent-net`, `observability-net` | **good** — the reason it reaches 7 of 9 |
+| **defined in which profiles** | **`minimal.yml` ONLY** — absent from `full` and `sovereign` | **GAP** |
+| **profile gating** | `introspection` — one of the 26 services **never started by anything** | **GAP** |
+| **authentication** | **NONE.** `/state` (GET) and `/observe_turn` (POST) have no `Depends`, no token check, no auth of any kind | **BLOCKER** |
+| failure semantics | `record_degradation("upstream", "cortex_fetch", exc)` at `app.py:157` | **good** — materially better than `shadow.py:106`'s `logger.debug` |
+| silently drops observations? | records the degradation, then returns `None`; the caller treats `None` as absent | **partial** — visible, but the loss is still indistinguishable from "nothing to report" |
+| writes to memory / world model? | no writes found; it serves state, it does not persist | **good** |
+| `KAI_CORTEX_SOURCE` cutover | exists, defaults to `poll`, has a tested fallback | sound mechanism, unproven at runtime |
+
+### The blocker
+
+Promoting Cortex makes an **unauthenticated service the primary
+perception authority** on `agent-net` and `observability-net`.
+`POST /observe_turn` accepts conversation turns from anyone who can
+reach it. Authentication must land **before** promotion, not after — the
+whole point of the redesign is that provenance is derived from
+authenticated identity, and Cortex currently has no identity to derive
+from.
+
+### A third acquisition path nobody has counted
+
+`POST /observe_turn` — *"receive each conversation turn for bridge +
+tacit learning"* — is a **push** intake into Cortex. So the system has
+three acquisition paths, not two:
+
+1. `ShadowPerceptionRunner` polling (2 of 44)
+2. Cortex polling (7 of 9 reachable, feeding its own state document)
+3. `POST /observe_turn` push (ungoverned, unauthenticated, uncounted)
+
+The third is not in the 44 because the instrument counts *services that
+observe*, and this is a caller pushing in. It must be brought under the
+same governance or explicitly excluded, and it is neither today.
+
+### What this does to the proposal
+
+It does **not** kill it — Cortex is still the best-placed owner, and its
+failure semantics are already better than the runner's. But "reuse
+Cortex" is not free reuse:
+
+* it must gain authentication (blocker)
+* it must be **defined in `full` and `sovereign`**, which is new
+  deployment surface, not reuse
+* it must actually be **started**, which no profile does today
+* `POST /observe_turn` must be governed or excluded
+
+The honest summary: **Cortex is the right owner and is itself
+never-executed code.** Promoting it without the audit above would move
+perception onto a service with the same provenance as everything else
+this programme has been finding.
+
+## 0B. Denominator semantics (direction §10)
+
+"44" is **capability x profile pairs**, not 44 distinct sensors:
+
+    unique perception capabilities .................. 18
+      adapter-backed .............................. 11
+      observers with no adapter .................... 7
+        audio-service, camera-service, files-service,
+        monitor-service, screen-capture, vision-service,
+        wake-service
+
+    profile/deployment source instances ............ 44   <- "the 44"
+
+Both numbers are needed and they answer different questions. **18** is
+how much perception the project intends. **44** is how many
+source-in-a-profile paths must each be proven, and it is the right
+denominator for the gate because a capability working in `minimal` and
+absent from `full` is not a working capability. The instrument will
+report both from now on.
+
 ## 1. Final authoritative source population model
 
 Three classes, so the future gate cannot demand that history be WORKING:
@@ -254,9 +335,24 @@ constants in `cortex/app.py` · the three direct sensor→memu POSTs ·
 
 ## What I am asking
 
-1. Confirm **Cortex as the observability/agent-zone acquisition owner**
-   rather than a new service. This is the load-bearing decision.
-2. Confirm `agentic` becomes **consumer-only**.
-3. Confirm **Phase 0 first** — four reducers, no topology change.
-4. Ruling on the `kai.perception.role` label as the population
-   declaration.
+Direction accepted: reuse Cortex, connect it to UH-2, build one sensor-net
+intake, remove agentic as cross-zone poller, eliminate duplicate tables.
+The audit in §0A adds conditions rather than objections.
+
+1. **Cortex authentication is a blocker, not a follow-up.** Confirm it
+   lands before promotion. Promoting an unauthenticated service to
+   perception authority would reproduce the defect class we are removing.
+2. Confirm the scope includes **defining and starting Cortex in `full`
+   and `sovereign`**. It exists in `minimal` only and has never been
+   started. This is the part of "reuse" that is not free.
+3. Ruling on `POST /observe_turn` — govern it under the same identity
+   and event-type rules, or declare it INTENTIONALLY EXCLUDED. It is a
+   third acquisition path and is currently neither.
+4. Confirm **Phase 0 first** — the four generic reducers, no topology
+   change.
+5. Ruling on the single source catalogue (direction §5): I propose it is
+   **derived from compose**, one entry per service carrying identity,
+   zone, event type, adapter, owner, acquisition method, reducer,
+   lifecycle and required/optional/superseded — so the catalogue cannot
+   drift from the deployment the way `SENSOR_ENDPOINTS` and Cortex's URL
+   constants did.
