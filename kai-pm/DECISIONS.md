@@ -8548,3 +8548,83 @@ proposed linting `if allow_X:` inside `except` where `allow_X` is not
 checked before the `try`, and was candid that it is not decidable and
 false-positive heavy. Given the 100+/1 and 69/0 history, that is a rule
 to measure before writing. Logged, not built.
+
+---
+
+## D168 — 2026-08-07 — Perception Has Been Losing Every Observation, Silently, For The Life Of The Project
+
+**Context:** three-way review with DeepSeek on the network topology
+brief. They answered the five questions and then flagged something I had
+not asked about. It was right, and I verified it before recording it.
+
+**The finding.** `audio-service` and `screen-capture` POST to
+`{MEMU_URL}/memory/memorize` at three sites:
+
+    perception/audio/app.py:200   _auto_memorize        (every transcript)
+    perception/audio/app.py:512   _send_wake_nudge      (every wake word)
+    screen-capture/app.py:148     auto-memorize on OCR  (when enabled)
+
+All three sit on `sensor-net`, which is a **sealed island** — verified in
+both profiles, not one of its members is attached to any other network.
+`memu-core` is on `agent-net`/`data-net`. Docker's embedded DNS only
+resolves names on a joined network, so **every one of these POSTs has
+failed at name resolution since the code was written.**
+
+And all three swallow it identically:
+
+    except Exception as e:
+        logger.warning("auto-memorize failed: %s", e)
+
+So the service reports healthy, the observation is gone, and the only
+trace is a warning line. The system has been losing every audio
+transcript, every wake-word activation and every screen OCR it was told
+to remember — which is precisely the success-shaped failure class this
+programme built a watching layer to catch, in the layer nobody watched.
+
+**Decision 1 — the topology is right; the code is wrong.** DeepSeek's
+reasoning, which I accept: perception is the least trusted surface in the
+system — microphone, camera, screen, clipboard, filesystem — processing
+unstructured input from the physical world. A direct network path from
+any of it to the memory store is the single most valuable pivot an
+attacker could have. The seal is the correct design. The
+`/memory/memorize` calls are the defect.
+
+**Decision 2 — recommended remedy, not yet built: a write-only mediator.**
+A minimal service on both `sensor-net` and `data-net`, exposing only
+`POST /observations`, enforcing a strict schema, authenticating the
+source, and holding **no read path back**. Rejected alternatives and why:
+
+* *give perception egress to data-net* — destroys the boundary
+* *tool-gate gains sensor-net* — concentrates privilege; tool-gate would
+  become the single traversal point for execution **and** perception,
+  removing the isolation those two zones currently have from each other
+* *a queue on sensor-net* — a compromised sensor can flood or poison it,
+  and the puller must validate anyway
+* *perception does not persist; consumers poll it* — makes perception
+  availability a dependency of every consumer, and exposes raw sensor
+  data that should have been filtered before storage
+
+The mediator's own failure mode, which DeepSeek named and I would not
+have: it becomes a **confused deputy**. Write-only stops exfiltration,
+not injection. A compromised sensor can still write arbitrary memories
+unless the mediator enforces a schema and authenticates the source.
+
+**Decision 3 — what was done today, since the mediator is a new service
+and not mine to invent unilaterally.** The three sites now call
+`record_degradation(...)` instead of `logger.warning(...)`. That does not
+make the write work. It makes the loss **visible** in the degradation
+report rather than buried in a log line, until the real path exists.
+
+**Decision 4 — measured, and deliberately NOT gated.** The obvious rule
+was "a swallowed outbound call must record a degradation". Counted first:
+**49 hits across 169 service files** — agentic, supervisor, memu-core,
+tool-gate, dashboard and more. Far past a handful, so the rule is wrong
+as stated (§1.4 step 3). The distinction that matters is narrower and I
+cannot yet decide it statically: **a failed read degrades and can be
+retried; a failed write loses the observation permanently.** The three
+sites fixed here are confirmed instances of the second, not a sample of
+the first. Recorded as an open population, not a manufactured rule.
+
+**Credit where it is due:** I did not ask about this. DeepSeek volunteered
+it after answering what I did ask, and it is the most serious finding of
+the day.
