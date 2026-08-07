@@ -474,6 +474,29 @@ jobs:
       - name: Measured — baked model revision and embedding load time
         if: always()
         run: |
+          # Written to $GITHUB_STEP_SUMMARY as well as stdout, and that
+          # is the point of the step rather than a flourish.
+          #
+          # This step sits at position 50 of 67. The Actions log API
+          # serves a fixed byte window from the END, and everything after
+          # it — live smoke, kill-isolation, restart-persistence, the
+          # memu-graph ingest/query/forget cycle, the full and sovereign
+          # profiles — emits far more than the window holds. So its
+          # output would very likely have been unreadable, which is the
+          # third round of the same mistake: run 712's build cause,
+          # D167's promised measurement, and now the instrument built to
+          # supply it.
+          #
+          # I did not verify that claim. I removed the dependency on it
+          # instead. The step summary is rendered on the run page and is
+          # not subject to log truncation at all, so the question of
+          # whether this lands inside the window stops mattering.
+          #
+          # General rule this implies: any diagnostic whose value is read
+          # by a human belongs in the step summary, not only in stdout.
+          exec > >(tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}") 2>&1
+          echo "### Measured — memu-core embeddings"
+          echo '```'
           echo "── revision baked into the image (pin from THIS value) ──"
           # Image id asked of compose rather than spelled out. The first
           # draft hard-coded `kai-system-memu-core:latest`, inferred from
@@ -495,6 +518,7 @@ jobs:
           docker compose -f docker-compose.minimal.yml logs memu-core 2>&1 \
             | grep -iE "embedding backend ready|Embedding backend unavailable" \
             || echo "  (no embedding line found — memu-core may not have started)"
+          echo '```'
 
       - name: Live smoke against the running stack
         run: |
