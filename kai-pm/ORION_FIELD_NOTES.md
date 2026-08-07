@@ -171,6 +171,77 @@ known defects; anything else means the detector is wrong.
 
 ---
 
+## 3.5 The recursion — my instruments keep inheriting the defect they hunt
+
+Written 2026-08-07 evening, because this is the strongest pattern of the
+week and I did not see it until the fourth instance.
+
+Every tool I built to *see* failures has carried the same defect as the
+system it was watching:
+
+| instrument | its own defect |
+|---|---|
+| the gates | scope smaller than the name implied — the systemic finding, in the thing looking for it |
+| `check_gate_registry` | resolved 3 of 8 modules into a directory where the file did not exist, so every AST check returned "no findings" |
+| the post-mortem | printed twelve empty sections and evicted the one with content from the log window |
+| D167's "tune from a measured number" | promised a measurement and built no instrument to read it |
+
+Four venues. Not coincidence.
+
+**The mechanism, which I think is structural rather than personal.**
+Diagnostics are, by construction, the *least-executed code in any
+system*. A post-mortem runs only on failure. A gate's failing branch
+runs only when something is wrong. An error message's text is reached
+only in the case nobody tested. So the observability layer is made
+almost entirely of the exact category that §2.2 identifies as where
+every defect lives — **never-executed code** — and it is the category
+you are most dependent on precisely when you can least afford it to be
+wrong.
+
+That reframes the remedy. "Write better diagnostics" is not a plan;
+diagnostics fail for the same reason all never-executed code fails, and
+willpower does not execute code. The plan has to be **exercise the
+failure path on purpose, routinely**, so it stops being never-executed:
+
+* inject a failure on a schedule and assert the post-mortem produced a
+  *readable* answer, not merely that it ran — chaos engineering aimed at
+  the observability layer rather than at the system
+* the assertion should be a **property of the output**, e.g. "under 20
+  lines when only the build failed", not "did not crash".
+  `scripts/test_post_mortem.py` does exactly this and is the first
+  instrument here whose test asserts legibility rather than function
+* every "we will tune this from a measured number" must ship the
+  instrument that produces the number **in the same commit**, or the
+  sentence is a promise to nobody
+
+**The uncomfortable corollary.** If diagnostics inherit the defect of
+the observed, then the *rules* in `CLAUDE.md` are also a diagnostic —
+they are an instrument pointed at me — and they will inherit it too. A
+rule that is never exercised is a rule I will discover was wrong at the
+worst moment. Which is an argument for turning rules into gates wherever
+they can be turned, and for being honest about the floor of ones that
+cannot.
+
+## 3.6 A caution about the rules themselves
+
+Eight rules exist as of today. Four of them caught me within an hour of
+being written, which reads as success and might not be.
+
+The failure mode to watch: **rules accumulate, and a wall of rules has
+the same defect as a warning printed on every run** — I wrote in §5 that
+printing forever is what teaches everyone to ignore it. Twenty rules is
+a document nobody reads, including me. So the ratchet on this file is
+not "add a rule per incident"; it is:
+
+1. Can this be a **gate**? Then it belongs in `scripts/security/`, not
+   in prose. I-2 already enforces R5. The register already enforces R7.
+2. If it cannot be a gate, is it a *tell* — a recognisable signal in
+   flight — or merely good advice? Only tells earn a place. R1's value
+   is not "be careful"; it is the five specific words that mean stop.
+3. If a rule has not fired in a month, it is either working or dead, and
+   those look identical. That is I-7 aimed at myself, and I do not yet
+   have an answer for it.
+
 ## 4. What actually worked
 
 * **Calibration against a known-answer input.** Caught every bad
