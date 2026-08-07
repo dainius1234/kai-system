@@ -96,6 +96,97 @@ never-executed code.** Promoting it without the audit above would move
 perception onto a service with the same provenance as everything else
 this programme has been finding.
 
+
+## 0C. RAW OBSERVATION != CORTEX INTERPRETATION
+
+**This is a blocker-class property and it corrects a miss in my own
+audit.** §0A examined Cortex's authority, networks and failure
+semantics, and never asked what it *produces*. I treated an interpreter
+as a pipe.
+
+Verified in `cortex/app.py:95-101` — Cortex's own state model:
+
+    level2_summary: str            "plain-English situation summary <= 20 words"
+    level3_implication: str        "implication + recommendation <= 30 words"
+    intent_fan: List[IntentHypothesis]   probabilistic intent inference
+    tacit_rules: List[str]
+    sensor_credibility: Dict[str, float]
+
+None of these is an observation. They are **derived interpretations over
+observations**, and three distinct epistemic kinds are involved:
+
+| kind | example | status |
+|---|---|---|
+| observation | `CPU 82%` | may become evidence |
+| interpretation | "system under moderate load" | an inference *over* evidence |
+| recommendation | "monitor; investigate if persistent" | an action proposal |
+
+**These must not share epistemic status.** If Cortex is connected to
+UH-2 naively — as an acquisition owner emitting PerceptionEvents — its
+Level-2/Level-3 output would enter through the same door as a sensor
+reading and become indistinguishable from directly observed fact.
+
+Required separation:
+
+    raw source        -> PerceptionEvent -> evidence
+    Cortex inference  -> ATTRIBUTED INTERPRETATION
+                         + explicit references to the evidence it used
+                         + confidence
+                         + freshness
+                         + NO factual-authority upgrade for having been
+                           produced by Cortex
+
+The consequence for the redesign: Cortex has **two outputs and they take
+different paths**. Its pulls become PerceptionEvents. Its inferences must
+not. That is a constraint on the connection design, not a footnote.
+
+**Checklist item for adversarial review:** *if Cortex is compromised, or
+simply wrong, can its Level-2/Level-3/intent/tacit inference be mistaken
+downstream for directly observed fact?* If yes, **BLOCKER**.
+
+## 0D. `/observe_turn` — verified state mutations
+
+Confirmed in `cortex/app.py:531-547`. Unauthenticated, and it mutates
+five pieces of module-global state directly:
+
+    _topic_history.append(keywords)
+    _state.bridge_active = bridge_active
+    _state.bridge_note  = bridge_note
+    _tacit_msg_lengths.append(len(obs.user_message))
+    _tacit_hourly_counts[hour] = _tacit_hourly_counts.get(hour, 0) + 1
+
+So it is a **third state-changing intake path outside the canonical
+spine**, not merely an unauthenticated read. Governing it therefore
+cannot mean adding a token to the existing endpoint — that would leave
+an authenticated-but-still-parallel authority.
+
+Target shape:
+
+    conversation turn
+      -> authenticated caller
+      -> bounded typed observation, allowed event type
+      -> provenance derived from the authenticated identity
+      -> governed acceptance + journal
+      -> ONLY THEN Cortex derives bridge/tacit interpretation from the
+         accepted event
+
+The one-authoritative-path rule applies here exactly as it does to
+sensors.
+
+## 0E. Authentication — the precision that matters
+
+Cortex needs **no caller authentication to perform a controlled pull**;
+provenance for a pull binds to the endpoint Cortex chose to call, which
+is sound for a puller and is what the current runner already relies on.
+
+What requires authentication before promotion is Cortex's **inbound
+service surface**: `GET /state` and `POST /observe_turn` need
+authenticated caller identity and route-specific authorisation. `/health`
+may remain a health surface.
+
+**No promotion while an arbitrary reachable caller can read Cortex state
+or inject conversation turns.**
+
 ## 0B. Denominator semantics (direction §10)
 
 "44" is **capability x profile pairs**, not 44 distinct sensors:
@@ -143,6 +234,17 @@ file that defines the service.
 
 `agentic` stops being an acquirer entirely. That is the redesign in one
 line.
+
+## 2A. Cortex has two outputs, and only one of them is intake
+
+Following from §0C, the ownership model needs a line it did not have:
+
+| Cortex output | path | epistemic status |
+|---|---|---|
+| pulled source readings | PerceptionEvent -> journal -> UH-3 evidence | observation |
+| Level-2 / Level-3 / intent / tacit / credibility | **attributed interpretation**, referencing the evidence it used | inference, never fact |
+
+"Cortex is the acquisition owner" is true of the first row only.
 
 ## 3. Existing component lineage
 
@@ -350,9 +452,17 @@ The audit in §0A adds conditions rather than objections.
    third acquisition path and is currently neither.
 4. Confirm **Phase 0 first** — the four generic reducers, no topology
    change.
-5. Ruling on the single source catalogue (direction §5): I propose it is
-   **derived from compose**, one entry per service carrying identity,
-   zone, event type, adapter, owner, acquisition method, reducer,
-   lifecycle and required/optional/superseded — so the catalogue cannot
-   drift from the deployment the way `SENSOR_ENDPOINTS` and Cortex's URL
-   constants did.
+5. **Catalogue as a JOIN, not a copy.** Refined per ruling 5, and the
+   refinement is better than my proposal. Compose owns only what compose
+   genuinely owns — source identity, trust zone, acquisition owner,
+   acquisition method, lifecycle, required/optional/superseded, profile
+   presence. Reducer and event-contract semantics stay in their own
+   registries. The instrument **joins** compose + `ADAPTER_REGISTRY` +
+   the event contract + `REDUCER_MAP` and **fails on disagreement or a
+   missing link**.
+
+   My version would have copied code-owned facts into compose, which is
+   the same defect as `SENSOR_ENDPOINTS` with a better name — one giant
+   table holding copies of facts from four subsystems. The rule is **one
+   authoritative owner per fact**, and the instrument is what makes them
+   agree.
