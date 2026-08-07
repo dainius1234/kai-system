@@ -289,6 +289,37 @@ not "add a rule per incident"; it is:
    those look identical. That is I-7 aimed at myself, and I do not yet
    have an answer for it.
 
+## 3.7 Kai's rules and mine are the same list, from two ends
+
+The operator's observation, checked rather than admired. `security/`'s
+architecture rules govern Kai; `CLAUDE.md` governs me. They converge:
+
+| Kai's rule | mine |
+|---|---|
+| 11 — model-generated output is labelled and **cannot grant trust** | R1 — do not assert what you have not run |
+| 13 — a missing mandatory dependency produces **blocked/unavailable**, never a guess | R2 / I-1 — fail closed, and *run* the contingency |
+| 14 — **no fail-open** on protected paths | R3 — a gate in a chain must be able to stop it |
+| 8 — state-changing methods **return typed state** | say what happened, not what you intended |
+
+Rule 11 is R1 written for a machine: *your own output is not evidence.*
+memu-core refusing to serve hash-based embeddings silently is that rule
+executing. So is the policy loader refusing to start on a file it could
+not parse.
+
+And rules 9, 13 and 15 are marked `n/a — not statically checkable`,
+which is the same floor I hit deciding which of R1-R8 could become
+gates. Neither of us can check everything from outside; both of us can
+make the *subject* decide its own output is nonsense — which was
+DeepSeek's reframe, and it applies to me as much as to a service.
+
+**The practical consequence, which is why this is here and not just
+pleasant:** a rule proven useful on one side is a candidate for the
+other. When Kai gains an architecture rule, ask whether it belongs in
+`CLAUDE.md`. When I earn an operating rule the hard way, ask whether it
+should be enforced in Kai. They are one design problem — a system that
+must know what it knows, refuse to fake the rest, and not trust its own
+fallbacks.
+
 ## 4. What actually worked
 
 * **Calibration against a known-answer input.** Caught every bad
