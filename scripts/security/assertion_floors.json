@@ -43,7 +43,7 @@
     "Secret & Restart Gate Tests": 28,
     "Service Auth Tests": 59,
     "Service Token Tests": 24,
-    "Service reachability tests": 28,
+    "Service reachability tests": 37,
     "Shipped Package Deps Tests": 13,
     "Suite Floor Tests": 18,
     "Test Identity Tests": 31,
@@ -61,5 +61,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2970
+  "total": 2979
 }

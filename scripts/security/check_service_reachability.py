@@ -48,6 +48,7 @@ than leaving its absence from `policy-check` to be inferred.
 """
 from __future__ import annotations
 
+import ast
 import re
 import sys
 from pathlib import Path
@@ -59,6 +60,10 @@ sys.path.insert(0, str(REPO))
 from scripts.security.gate_inputs import compose_files, inspected  # noqa: E402
 
 _URL = re.compile(r"https?://([a-z0-9][a-z0-9._-]*)")
+
+#: httpx / requests verbs. A name reaching one of these is a real call.
+_REQUEST_METHODS = {"post", "get", "put", "delete", "patch", "request",
+                    "stream"}
 
 
 def _environment(cfg: dict) -> Dict[str, str]:
@@ -77,6 +82,93 @@ def _environment(cfg: dict) -> Dict[str, str]:
 def _depends(cfg: dict) -> Set[str]:
     dep = (cfg or {}).get("depends_on") or {}
     return set(dep.keys()) if isinstance(dep, dict) else set(dep)
+
+
+def _source_dir(cfg: dict) -> Path:
+    """The service's source tree, derived from its own `build:` stanza."""
+    build = (cfg or {}).get("build")
+    if isinstance(build, dict) and build.get("dockerfile"):
+        return REPO / Path(build["dockerfile"]).parent
+    return None
+
+
+class _EnvUse(ast.NodeVisitor):
+    """Which `os.getenv` names are bound, and which names reach a request."""
+
+    def __init__(self) -> None:
+        self.bound: Dict[str, str] = {}     # local variable -> env name
+        self.in_request: Set[str] = set()   # names appearing in an HTTP call
+
+    def visit_Assign(self, node: ast.Assign) -> None:
+        for sub in ast.walk(node.value):
+            if (isinstance(sub, ast.Call)
+                    and getattr(sub.func, "attr", "") == "getenv"
+                    and sub.args and isinstance(sub.args[0], ast.Constant)):
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        self.bound[target.id] = sub.args[0].value
+        self.generic_visit(node)
+
+    def visit_Call(self, node: ast.Call) -> None:
+        if getattr(node.func, "attr", "") in _REQUEST_METHODS:
+            for sub in ast.walk(node):
+                if isinstance(sub, ast.Name):
+                    self.in_request.add(sub.id)
+        self.generic_visit(node)
+
+
+def code_confidence(cfg: dict, env_name: str) -> str:
+    """How strongly the service's own code confirms it makes this call.
+
+    Three states, and the middle one is the point:
+
+      confirmed  the env var is bound to a name and that name reaches an
+                 HTTP call — the strongest evidence the call is real
+      indirect   the env name appears in the source, but not via that
+                 pattern
+      absent     the env name does not appear in the source at all
+
+    **This classifies. It does not filter**, and that distinction is the
+    whole design. The obvious sharpening — report only `confirmed` — was
+    tested on 2026-08-07 and would have SILENTLY DROPPED A REAL FINDING:
+
+        supervisor/app.py:42
+            SERVICES = [
+                {"name": "heartbeat",
+                 "url": os.getenv("HEARTBEAT_URL", "http://heartbeat:8010")},
+                ...
+            ]
+        supervisor/app.py:94
+            base = svc["url"]
+
+    The variable is never bound; the value goes straight into a dict
+    literal and is consumed by subscript later. `supervisor` cannot reach
+    `heartbeat` and that is a genuine defect, and a filter on `confirmed`
+    would have reported it as unwired and moved on.
+
+    In a check adjacent to security, a false negative costs more than a
+    false positive: a false positive is argued about, a false negative is
+    never seen. So the extra signal is added to every finding and removes
+    none of them.
+    """
+    src = _source_dir(cfg)
+    if src is None or not src.is_dir():
+        return "indirect"       # cannot see the source; claim nothing
+    seen_anywhere = False
+    for py in sorted(src.rglob("*.py")):
+        try:
+            text = py.read_text(encoding="utf-8", errors="replace")
+            tree = ast.parse(text)
+        except Exception:
+            continue
+        if env_name in text:
+            seen_anywhere = True
+        use = _EnvUse()
+        use.visit(tree)
+        for var, name in use.bound.items():
+            if name == env_name and var in use.in_request:
+                return "confirmed"
+    return "indirect" if seen_anywhere else "absent"
 
 
 def audit(root: Path = None) -> Tuple[List[str], int, int]:
@@ -112,7 +204,21 @@ def audit(root: Path = None) -> Tuple[List[str], int, int]:
                 checked += 1
                 if nets.get(name, set()) & nets.get(target, set()):
                     continue
+                confidence = code_confidence(cfg, urls[target])
+                _note = {
+                    "confirmed": "the code binds this variable and passes it "
+                                 "to an HTTP call, so the call is real",
+                    "indirect": "the variable name appears in the source but "
+                                "not bound-then-called (it may go straight "
+                                "into a data structure — see supervisor), so "
+                                "verify by hand",
+                    "absent": "the variable name does not appear in this "
+                              "service's source AT ALL — configuration with "
+                              "no consumer, a different defect from an "
+                              "unreachable peer",
+                }[confidence]
                 findings.append(
+                    f"[{confidence}] {_note}. "
                     f"{path.name}: `{name}` depends on `{target}` and holds "
                     f"its address in {urls[target]}, but they share no "
                     f"network — `{name}` is on "

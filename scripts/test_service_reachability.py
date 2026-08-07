@@ -21,7 +21,7 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
 from scripts.security.check_service_reachability import (  # noqa: E402
-    _depends, _environment, audit)
+    _depends, _environment, audit, code_confidence)
 
 PASSED = 0
 FAILED = 0
@@ -164,6 +164,41 @@ def main() -> int:
           not any("`dashboard`" in x for x in f))
     check("CALIBRATION: heartbeat is not flagged as a CALLER",
           not any(x.split("`")[1] == "heartbeat" for x in f))
+
+    # ── the third clause CLASSIFIES; it must never remove a finding ──
+    confirmed = [x for x in f if x.startswith("[confirmed]")]
+    indirect = [x for x in f if x.startswith("[indirect]")]
+    absent = [x for x in f if x.startswith("[absent]")]
+    check("every finding carries a confidence label",
+          len(confirmed) + len(indirect) + len(absent) == len(f))
+    check("audio-service and screen-capture are CONFIRMED",
+          len(confirmed) == 3)
+    check("executor is ABSENT — its source never names MEMU_URL",
+          len(absent) == 1 and "executor" in absent[0])
+
+    # The load-bearing one. supervisor reads HEARTBEAT_URL inline into a
+    # dict literal and consumes it by subscript, so the bound-then-called
+    # pattern misses it. Filtering on `confirmed` — the obvious
+    # sharpening, and what was recommended — would have dropped a real
+    # defect silently. It must survive as `indirect`.
+    check("supervisor -> heartbeat SURVIVES as indirect, not dropped",
+          len(indirect) == 1 and "supervisor" in indirect[0]
+          and "heartbeat" in indirect[0])
+    check("the classifier never shrinks the finding count", len(f) == 5)
+
+    # ── the classifier itself, on known inputs ──
+    audio = {"build": {"context": ".", "dockerfile": "perception/audio/Dockerfile"}}
+    check("a bound-then-called var is confirmed",
+          code_confidence(audio, "MEMU_URL") == "confirmed")
+    execu = {"build": {"context": ".", "dockerfile": "executor/Dockerfile"}}
+    check("a name absent from the source is absent",
+          code_confidence(execu, "MEMU_URL") == "absent")
+    sup = {"build": {"context": ".", "dockerfile": "supervisor/Dockerfile"}}
+    check("an inline-into-a-literal var is indirect, NOT absent",
+          code_confidence(sup, "HEARTBEAT_URL") == "indirect")
+    check("an unreadable source dir claims nothing (indirect)",
+          code_confidence({"build": {"dockerfile": "nope/Dockerfile"}}, "X")
+          == "indirect")
 
     print("=" * 60)
     print(f"Service reachability tests: {PASSED} passed, {FAILED} failed")
