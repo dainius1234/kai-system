@@ -47,14 +47,35 @@ So the degradation has three distinct phases, each worse than the last:
 | 15:52–16:59 | runs created, no runner ever assigned, cancelled at exactly 15m02s, six times |
 | ~16:44 → | **pushes no longer create runs at all** |
 
-A consequence worth stating: the `workflow_dispatch` trigger added in
+~~A consequence worth stating: the `workflow_dispatch` trigger added in
 `cddc01c` cannot help. A workflow file change only takes effect once
 GitHub processes a run from that commit, which is exactly what has
-stopped. The fix is correct and permanent; it is simply inert until
-Actions recovers.
+stopped.~~
 
-**Nothing on our side influences any of this.** Retrying costs 15
-minutes of wall-clock and returns no information.
+**That was wrong, and this is phase four.** At 06:15 UTC on 2026-08-07 —
+eleven hours in, with run 697 *still* reporting `queued` from 18:58 the
+previous evening and three further commits having produced no runs — a
+direct `workflow_dispatch` against the branch was accepted and run 698
+started on a machine **within seconds**.
+
+The dispatch API reads the workflow file at the ref it is given; it does
+not need a previously-processed run from that commit. So the trigger
+added in `cddc01c` as a general improvement is what unblocked the
+incident, and the claim above was false when written.
+
+That changes the diagnosis materially:
+
+| trigger | result |
+|---|---|
+| `push` | no run created, for 11 hours, across 4 workflows and 3 commits |
+| `workflow_dispatch` | run created and running within seconds |
+
+So this is **push-event processing for this repository**, not Actions
+capacity and not scheduling. Phase two's runner starvation may well have
+been the same fault upstream, presenting differently.
+
+**Workaround, now proven:** dispatch the workflow directly rather than
+relying on a push to trigger it.
 
 ## 2. Signature
 
