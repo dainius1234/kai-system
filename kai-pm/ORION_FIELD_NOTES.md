@@ -118,8 +118,37 @@ this, and have I looked at all of them?
 * Wrote in a post-mortem that `workflow_dispatch` "cannot help" — then
   it was the thing that unblocked the incident.
 
-**Tell:** a sentence containing "would have", "cannot", or "is simply".
-**Fix:** `date -u`, run the command, read the field. Cheap every time.
+* Argued a CI failure could not be mine because my change was
+  *downstream* of the failing service. The argument was sound. It was
+  still only an argument — and the re-run showed the failure was
+  deterministic when I had predicted a flake.
+
+**Tell:** a sentence containing "would have", "cannot", "is simply",
+"should work", or "it's just a". **Fix:** `date -u`, run the command,
+read the field. Cheap every time.
+
+**Promoted to `CLAUDE.md` R1 on 2026-08-07**, at the operator's
+instruction, because a rule recorded only in my own notes is a rule I
+have to remember to re-read.
+
+### 3.2b Writing a contingency instead of running one
+
+Asked whether a contingency existed, I could have answered from the
+files — `main` untouched, a waypoint recorded, one isolated commit — and
+every part of that answer would have been true. Checking instead found
+that the "fail closed" model download I had shipped an hour earlier had
+**no retry**, so one dropped packet would fail every build. Fail closed
+means *never ship a broken image*. It does not mean *die on the first
+blip*. Brittle and strict are different properties wearing the same
+word.
+
+I then ran `git revert --no-commit` rather than asserting it would
+apply, and confirmed the rollback target builds *without* the dependency
+whose outage it exists to survive. Both took under a minute.
+
+**Tell:** I am about to describe a safety net in the present tense.
+**Fix:** execute it. A rollback that has not been run is a hypothesis
+with good presentation. `CLAUDE.md` R2.
 
 ### 3.3 The `;` versus `&&` push
 
