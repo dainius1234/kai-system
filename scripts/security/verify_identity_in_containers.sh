@@ -119,8 +119,12 @@ check "cortex reaches healthy with identity wiring present" "healthy" "$state"
 echo
 echo "── 5. the governed endpoint, from a real caller container ──"
 # Signed by agentic's key, through the same helper the service uses.
-run_case() {                    # run_case <label> <python-snippet> <expected-status>
-  actual=$(docker compose -f "$COMPOSE_FILE" --profile "$PROFILE" run --rm -T agentic \
+run_case() {                    # run_case <label> <python-snippet> <expected>
+  # Prints "<status> <turn_source>" so a case can assert WHO the
+  # receiver decided the caller was, not merely that it answered.
+  # stderr is kept: a crash inside the container would otherwise arrive
+  # as an empty string and read like a wrong status code.
+  raw_out=$(docker compose -f "$COMPOSE_FILE" --profile "$PROFILE" run --rm -T agentic \
     python -c "
 import sys, json, urllib.request, urllib.error
 sys.path.insert(0, '/app')
@@ -130,19 +134,27 @@ req = urllib.request.Request('http://cortex:8048/observe_turn', data=raw,
                              headers=headers, method='POST')
 try:
     with urllib.request.urlopen(req, timeout=5) as r:
-        print(r.status)
+        body = json.loads(r.read() or b'{}')
+        print(r.status, body.get('turn_source'))
 except urllib.error.HTTPError as e:
     print(e.code)
-" 2>/dev/null | tail -1)
-  check "$1" "$3" "$actual"
+" 2>&1)
+  actual=$(printf '%s\n' "$raw_out" | tail -1)
+  if [ "$actual" != "$3" ]; then
+    printf '  FAIL  %s (expected %s, got %s)\n' "$1" "$3" "$actual"
+    printf '        container output:\n%s\n' "$raw_out" | sed 's/^/        /'
+    FAIL=$((FAIL + 1))
+  else
+    PASS=$((PASS + 1)); printf '  ok    %s\n' "$1"
+  fi
 }
 
 PAYLOAD='{"session_id": "proof", "user_message": "container proof"}'
 
-run_case "a correctly signed, granted request is ACCEPTED" "
+run_case "a correctly signed, granted request is ACCEPTED, as agentic" "
 raw, headers = signed_json_request(destination='cortex', method='POST',
                                    path='/observe_turn', payload=$PAYLOAD)
-" 200
+" "200 agentic"
 
 run_case "an unsigned request with only the shared token is REFUSED" "
 raw = encode_json_body($PAYLOAD)
@@ -150,12 +162,22 @@ headers = {'content-type': 'application/json',
            'Authorization': 'Bearer ' + __import__('os').environ.get('KAI_SERVICE_TOKEN','')}
 " 401
 
-run_case "a forged identity header buys nothing" "
+# The load-bearing one. A VALID signature carrying forged identity
+# headers must still be identified by the KEY. Deleting the signature
+# first would only prove an unsigned request fails, which is a weaker
+# claim and is already covered above.
+run_case "forged identity headers on a VALID signature change nothing" "
 raw, headers = signed_json_request(destination='cortex', method='POST',
                                    path='/observe_turn', payload=$PAYLOAD)
 headers['X-Kai-Identity'] = 'cortex'
 headers['X-Actor-Did'] = 'cortex'
-del headers[[k for k in headers if k.lower()=='x-kai-signature'][0]]
+headers['X-Service-Name'] = 'cortex'
+" "200 agentic"
+
+run_case "and forged headers without a signature are still refused" "
+raw = encode_json_body($PAYLOAD)
+headers = {'content-type': 'application/json',
+           'X-Kai-Identity': 'agentic', 'X-Actor-Did': 'agentic'}
 " 401
 
 run_case "an altered body is REFUSED" "
