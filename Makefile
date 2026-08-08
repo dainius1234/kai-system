@@ -323,8 +323,19 @@ preflight:
 # scope is smaller than its name is this programme's entire subject, and
 # I had built one two hours earlier to prevent exactly this class.
 #
-# It costs ~4 minutes. The push it would have stopped cost 14.
-prepush: policy-check coverage-floors test-assertion-floors
+# It costs ~6 minutes. The push it would have stopped cost 14.
+#
+# `test-uh` was added 2026-08-07, and its absence was the same defect
+# this programme keeps paying for: a gate whose scope was smaller than
+# its name implied. `prepush` had been widened once already — it ran
+# neither tests nor coverage before — and still excluded the suite that
+# tests the architecture and security invariants. A per-service identity
+# layer could be committed with its 76 refusal assertions never run.
+#
+# Measured before adding: test-uh takes 128s on this tree. Proven able
+# to fail: injecting one false assertion into the identity suite exits
+# prepush with code 2 at that target.
+prepush: policy-check test-uh coverage-floors test-assertion-floors
 	@echo
 	@echo "  prepush: gates green, docs current, assertion floors hold."
 	@echo "  Still yours to check, because no gate can:"
