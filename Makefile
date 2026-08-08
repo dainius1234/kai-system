@@ -353,7 +353,8 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-implicit-deps test-image-modules test-test-identity \
 	test-execution-coverage test-bringup-guards test-ci-scripts \
 	test-post-mortem test-summarise-runs test-bind-mount-portability \
-	test-service-reachability test-perception-intake test-phase0-reducers test-service-identity \
+	test-service-reachability test-perception-intake test-phase0-reducers \
+	test-service-identity test-service-identity-auth \
 	test-shipped-package-deps test-policy-loader \
 	test-healthcheck-runnable test-depends-on-readiness \
 	test-suite-floor
@@ -919,6 +920,9 @@ test-phase0-reducers:
 
 test-service-identity:
 	python3 scripts/test_service_identity.py
+
+test-service-identity-auth:
+	python3 scripts/test_service_identity_auth.py
 
 test-summarise-runs:
 	python3 scripts/test_summarise_runs.py

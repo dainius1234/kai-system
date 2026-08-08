@@ -15,8 +15,16 @@ reached VERIFIED or ACTIVE.
 """
 from __future__ import annotations
 
+import json
+import logging
 import os
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from urllib.parse import urlparse
+
+logger = logging.getLogger("kai.mutating_handlers")
+
+#: One warning per process when outbound requests cannot be signed.
+_WARNED_UNSIGNED: Set[bool] = set()
 
 # actuator → (env var, default URL, {action: (method, path, side_effects)})
 MUTATING_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, Tuple[str, str, List[str]]]]] = {
@@ -180,14 +188,62 @@ def _base_url(actuator: str) -> str:
     return os.getenv(env_key, default).rstrip("/")
 
 
-def _auth_headers() -> Dict[str, str]:
-    """Bearer header for the now-authenticated downstream endpoints."""
+def _encode_body(body: Dict[str, Any]) -> bytes:
+    """The exact bytes that are both sent and signed.
+
+    One function, used by the signer and by the poster, because the
+    receiver hashes what arrives. If these two serialisations differed by
+    a single space, every signature would fail — and it would fail in the
+    way that looks like a key problem rather than an encoding one.
+    """
+    return json.dumps(body or {}, separators=(",", ":"),
+                      sort_keys=True).encode("utf-8")
+
+
+def _destination(actuator: str) -> str:
+    """The peer's service name, derived from the URL actually in use.
+
+    Taken from the resolved base URL rather than a table beside the code,
+    so an environment override changes the signed destination with it.
+    """
+    return urlparse(_base_url(actuator)).hostname or actuator
+
+
+def _auth_headers(actuator: str, method: str, path: str,
+                  body_bytes: bytes) -> Dict[str, str]:
+    """Credentials for one specific downstream request.
+
+    Signs with this service's own key when one is configured, so the
+    receiver derives *which* service called. Falls back to the shared
+    bearer token during the migration window, where the receiver records
+    the caller as unverified rather than guessing.
+
+    Signing failures fall back rather than raise: a caller that cannot
+    sign should be refused by the *receiver*, which is the side that
+    knows whether identity is required. Failing here would let a local
+    key problem masquerade as an authorisation decision.
+    """
+    headers: Dict[str, str] = {}
+    try:
+        from common.service_identity import signed_headers
+        headers.update(signed_headers(
+            destination=_destination(actuator), method=method, path=path,
+            body=body_bytes))
+    except Exception as exc:
+        if not _WARNED_UNSIGNED:
+            _WARNED_UNSIGNED.add(True)
+            logger.warning(
+                "outbound requests are UNSIGNED (%s: %s) — the receiver will "
+                "record this caller as unverified", type(exc).__name__, exc)
+
     try:
         from common.service_auth import _load_token
         token = _load_token()
     except Exception:
         token = os.getenv("KAI_SERVICE_TOKEN", "")
-    return {"Authorization": f"Bearer {token}"} if token else {}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
 
 
 def side_effects_for(actuator: str, action_type: str) -> List[str]:
@@ -209,7 +265,13 @@ def build_mutating_handler(
 
     def _default_post(url: str, body: Dict[str, Any], headers: Dict[str, str]) -> Any:
         import httpx
-        response = httpx.post(url, json=body, headers=headers, timeout=timeout)
+        # `content=`, not `json=`: the signature covers a hash of the body
+        # bytes, so the bytes on the wire must be the ones that were
+        # signed. `json=` would re-serialise with its own separators.
+        sent = dict(headers)
+        sent.setdefault("content-type", "application/json")
+        response = httpx.post(url, content=_encode_body(body), headers=sent,
+                              timeout=timeout)
         response.raise_for_status()
         return response.json()
 
@@ -237,7 +299,9 @@ def build_mutating_handler(
         url = f"{_base_url(actuator)}{path}"
 
         try:
-            payload = poster(url, body, _auth_headers())
+            payload = poster(url, body,
+                             _auth_headers(actuator, method, path,
+                                           _encode_body(body)))
         except Exception as exc:
             return {
                 "actuator": actuator,

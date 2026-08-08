@@ -101,7 +101,12 @@ def check_token(
 
 
 def require_service_auth(operation: str) -> Callable:
-    """FastAPI dependency enforcing service authentication.
+    """FastAPI dependency enforcing service *membership*.
+
+    Correct for the six class-A endpoints — read-only, no attribution,
+    identical response for any authorised caller. For the twenty-six
+    class-B endpoints, where the caller's identity changes what should be
+    recorded or permitted, use ``require_service_identity`` instead.
 
     ``operation`` names the protected action and appears in logs and in
     the 503 body, so a misconfiguration says which endpoint refused.
@@ -112,5 +117,153 @@ def require_service_auth(operation: str) -> Callable:
         ok, status, detail = check_token(authorization or None, operation)
         if not ok:
             raise HTTPException(status_code=status, detail=detail)
+
+    return _dependency
+
+
+# ── identity: who called, not merely that someone did ───────────────────
+#
+# The measurement that produced this (2026-08-07): 26 of 32 protected
+# endpoints need the caller's identity, and the shared token cannot
+# supply it. `common/service_identity` derives the principal from the key
+# that signed the request. Nothing below reads a name from a header.
+
+REQUIRE_IDENTITY_ENV = "KAI_REQUIRE_SERVICE_IDENTITY"
+
+_keymap = None
+_nonce_cache = None
+_keymap_error = ""
+_WARNED_TRANSITION: set = set()
+
+
+def identity_required() -> bool:
+    """Whether an unsigned caller is refused outright.
+
+    False during the migration window, when a class-B endpoint still
+    accepts the shared token but records the caller as **unverified** —
+    which never reaches a provenance record, because
+    ``ServicePrincipal.usable_for_provenance`` is False for it.
+
+    This defaults to False so the migration does not break every caller
+    on the commit that lands it. That is a deliberate, temporary widening
+    and it is loud: every such request logs, and
+    `scripts/security/check_service_identity_rollout.py` prints how many
+    services are still in the window.
+    """
+    return os.getenv(REQUIRE_IDENTITY_ENV, "false").lower() in {
+        "1", "true", "yes"}
+
+
+def _identity_context():
+    """Load the key map and replay cache once, not per request."""
+    global _keymap, _nonce_cache, _keymap_error
+    if _keymap is not None or _keymap_error:
+        return _keymap, _nonce_cache
+    try:
+        from common.service_identity import KeyMap, NonceCache
+        _keymap = KeyMap.load()
+        _nonce_cache = NonceCache()
+    except Exception as exc:
+        # Recorded, not raised. Whether an absent key map is fatal
+        # depends on identity_required(), which is decided per request.
+        _keymap_error = f"{type(exc).__name__}: {exc}"
+        logger.warning("service identity unavailable: %s", _keymap_error)
+    return _keymap, _nonce_cache
+
+
+def reset_identity_context() -> None:
+    """Drop the cached key map. For tests and for key rotation."""
+    global _keymap, _nonce_cache, _keymap_error
+    _keymap = _nonce_cache = None
+    _keymap_error = ""
+
+
+def check_identity(
+    headers, operation: str, *, destination: str, method: str, path: str,
+    body: bytes,
+):
+    """Validate a request and return ``(principal, status, detail)``.
+
+    Order matters. A **valid signature always wins**, in both directions:
+    it is tried first so a signed caller is identified even during the
+    transition window, and a *bad* signature is refused outright rather
+    than falling back to the shared token. Without that second half, an
+    attacker could strip a signature and downgrade to anonymous
+    membership, which would make the whole mechanism optional.
+    """
+    from common.service_identity import (unverified_principal,
+                                         verify_request, SIGNATURE_HEADER)
+
+    lower = {str(k).lower(): v for k, v in dict(headers).items()}
+    keymap, cache = _identity_context()
+
+    if lower.get(SIGNATURE_HEADER):
+        if keymap is None:
+            logger.error(
+                "SECURITY: '%s' received a signed request but has no usable "
+                "key map (%s) — refusing rather than downgrading",
+                operation, _keymap_error)
+            return None, 503, (
+                f"{operation} cannot verify caller identity: "
+                f"the service key map is unavailable")
+        try:
+            principal, status, detail = verify_request(
+                lower, destination=destination, method=method, path=path,
+                body=body, keymap=keymap, cache=cache)
+        except Exception as exc:
+            # Reached when the key map loads but the Ed25519 backend does
+            # not — a missing `cryptography` in the image. Without this,
+            # an absent dependency surfaced as a 500 from somewhere deep,
+            # which is the least useful shape a configuration error can
+            # take. It is still a refusal: no fallback.
+            logger.error("SECURITY: '%s' could not evaluate a signature "
+                         "(%s: %s)", operation, type(exc).__name__, exc)
+            return None, 503, (
+                f"{operation} cannot verify caller identity: "
+                f"the signing backend is unavailable")
+        # No fallback on failure. See docstring.
+        return principal, status, detail
+
+    if identity_required():
+        logger.warning("SECURITY: '%s' refused an unsigned caller", operation)
+        return None, 401, (
+            f"{operation} requires a signed request: this endpoint's "
+            f"behaviour depends on which service called")
+
+    ok, status, detail = check_token(lower.get("authorization"), operation)
+    if not ok:
+        return None, status, detail
+    if operation not in _WARNED_TRANSITION:
+        _WARNED_TRANSITION.add(operation)
+        logger.warning(
+            "SECURITY: '%s' accepted a shared-token caller. Identity is "
+            "UNVERIFIED and will not appear in any provenance record. Set "
+            "%s=true once every caller signs.", operation,
+            REQUIRE_IDENTITY_ENV)
+    return unverified_principal(), 200, "membership only (unverified)"
+
+
+def require_service_identity(operation: str) -> Callable:
+    """FastAPI dependency yielding a ``ServicePrincipal``.
+
+    For the class-B endpoints. The handler receives the principal and
+    must check ``usable_for_provenance`` before attributing anything to
+    it — during the transition window it may legitimately be anonymous,
+    and recording an anonymous caller by name is exactly the defect this
+    replaces.
+    """
+    from fastapi import HTTPException, Request
+
+    async def _dependency(request: "Request"):
+        principal, status, detail = check_identity(
+            request.headers, operation,
+            destination=os.getenv("KAI_SERVICE_NAME", ""),
+            method=request.method,
+            path=request.url.path,
+            body=await request.body(),
+        )
+        if principal is None:
+            raise HTTPException(status_code=status, detail=detail)
+        return principal
 
     return _dependency
