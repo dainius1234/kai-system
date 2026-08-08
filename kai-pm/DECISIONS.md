@@ -8698,3 +8698,83 @@ rather than planning: the intake denominator (2 of 44), the absent
 memory-promotion owner (D169's sibling, six direct writers), Cortex being
 never-started, and now the absence of per-service identity. Each was
 invisible from the design and obvious from the tree.
+
+---
+
+## D170 — 2026-08-07 — The Identity Measurement: 26 of 32, and the Envelope Already Exists
+
+**Status:** measured; architecture NOT chosen. Operator decision pending.
+**Instrument:** `scripts/security/report_service_identity.py` (REPORT),
+`scripts/test_service_identity.py` (21 assertions).
+**Report:** `kai-pm/SERVICE_IDENTITY_MEASUREMENT.md`.
+
+**Context.** D169 stopped the UH-2 build on a real contradiction: R3
+requires receiver-derived provenance, and every protected endpoint
+authenticates with one shared token that proves membership, not
+identity. The operator's instruction was to measure the defect class
+before designing anything, and specifically NOT to work around it with
+a caller-supplied name header.
+
+**Measured population.** 32 endpoints protected by
+`require_service_auth` across 8 services. **26 are class B** — the
+caller's identity materially affects authority, provenance, permissions
+or audit attribution. **6 are class A** — read-only, no attribution,
+identical response for any authorised caller. The A/B split is a
+declared judgement stated per operation, not an inferred one; anything
+undeclared reports UNCLASSIFIED and never defaults to A.
+
+**The instrument's own first run was wrong, and it is recorded here
+because the shape is the programme's own.** It reported 33 endpoints
+across 9 services. The ninth service was `common/db_restore`, matched
+from the *usage example inside `common/service_auth.py`'s docstring* — a
+regex counting prose as code. Scope larger than reality, on the
+instrument built to measure scope. It now parses with `ast`; two tests
+pin the behaviour.
+
+**Finding worth more than the count: there are TWO shared-secret
+mechanisms, and the second already implements most of the proposed
+design.** `common/auth.py` (`INTERSERVICE_HMAC_SECRET`, mounted into
+`agentic`, `tool-gate`, `camera-service`) already has the canonical
+signed payload, key IDs, timestamp skew checking, a nonce replay cache
+that **persists across restart**, dual-sign rotation overlap, and a
+revocation list. What it lacks is the only thing that matters: the key
+is shared and `actor_did` is a **caller-supplied field**. It is
+caller-asserted identity, cryptographically sealed — which reads as
+stronger than a bearer token while guaranteeing exactly the same thing.
+That is arguably worse, because the signature invites trust.
+
+So the remedy is two properties, not a subsystem: **make the key
+per-service, and derive identity from which key verified — never from a
+field.**
+
+**Blast radius, measured.** ~~Assumed to be large.~~ It is one function.
+`_auth_headers()` at `common/actuator_registry/mutating_handlers.py:183`
+is the *only* outbound sender of the service token in non-test source;
+every authenticated service-to-service call is built by
+`build_mutating_handler`. Receiver side is one library,
+`common/service_auth.py`. 12 of the 26 B endpoints live in services that
+exist only in `docker-compose.minimal.yml` and have never been started,
+so their migration can be written but not proven.
+
+**Correction to a claim made in the direction document.** "We already
+have Ed25519" is half true. `scripts/auto_rotate_ed25519.py` generates
+and rotates real keypairs (D68), but **nothing signs or verifies with
+them** — it is key management with no consumer. `cryptography` is pinned
+in exactly one requirements file (`scripts/requirements-kai-control.txt`)
+and is in **no service image**; on this host the distro build panics on
+import (`pyo3_runtime.PanicException`), which is why two existing tests
+skip. Whether it imports inside `python:3.11-slim` is **unverified** and
+is a one-image-build experiment that gates the HMAC/Ed25519 choice.
+
+**Recommendation, not a decision.** Per-service HMAC keys reusing the
+existing envelope, with the signing algorithm as an explicit field so
+Ed25519 is later a key-type swap rather than a rewrite; and the named
+trigger for that swap is `cortex_observe_turn`, where non-repudiation
+against a compromised receiver is the property HMAC cannot give.
+
+**Boundary that must not merge.** Service identity proves who called the
+intake. It does not prove who originated an observation. A compromised
+sensor holding a valid service key still submits fabricated readings,
+and the honest record is *this sensor said it* — which is why the Phase 0
+attribution rule exists. Per-source event signing is a separate control
+with a separate key and is not part of this work.

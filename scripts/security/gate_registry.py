@@ -581,6 +581,21 @@ REGISTRY: Tuple[Gate, ...] = (
                            "exec_http/load_ports instead",
          proven_by="scripts/test_ci_scripts.py",
          in_workflows=("core-tests.yml",)),
+    Gate(module="report_service_identity",
+         kind=REPORT,
+         summary="which shared-token endpoints need verified caller "
+                 "identity (B) and which are fine on membership (A)",
+         inputs=(),
+         denominator=r"inspected: \d+ endpoint\(s\)",
+         probe=False,
+         probe_skip_reason="scans first-party service source; the A/B "
+                           "split is declared judgement, so it is "
+                           "reviewed rather than probed",
+         proven_by="scripts/test_service_identity.py",
+         pending_wiring="reported while the identity architecture is "
+                        "decided; it would gate at B == 0 or every B "
+                        "endpoint using verified identity",
+         in_workflows=()),
     Gate(module="report_perception_intake",
          kind=REPORT,
          summary="the full UH-2 perception intake surface, with a verdict "
