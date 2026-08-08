@@ -28,6 +28,22 @@ def main() -> int:
     rows, n, counts = audit(REPO)
     check("CALIBRATION: 32 protected endpoints found", n == 32)
     check("CALIBRATION: across 8 services", counts.get("_services") == 8)
+
+    # ── migration progress, which the count must not hide ──
+    #
+    # When /observe_turn moved to verified identity it LEFT the
+    # shared-token population. An instrument counting only that
+    # population would have reported the endpoint as gone rather than
+    # fixed — a denominator that shrinks when a defect is repaired can
+    # show absence but never progress. So both mechanisms are counted.
+    check("CALIBRATION: 1 class-B endpoint requires verified identity",
+          counts.get("_migrated_b") == 1)
+    check("the migrated endpoint is cortex_observe_turn, and it is B",
+          any("cortex_observe_turn" in r and "IDENTITY" in r for r in rows))
+    check("the total did NOT shrink when an endpoint was migrated",
+          counts.get("A", 0) + counts.get("B", 0) == n)
+    check("25 class-B endpoints remain on the shared token",
+          counts.get("B", 0) - counts.get("_migrated_b", 0) == 25)
     check("CALIBRATION: 6 are A", counts.get("A") == 6)
     check("CALIBRATION: 26 are B", counts.get("B") == 26)
     check("every endpoint carries a verdict",

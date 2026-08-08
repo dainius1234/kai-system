@@ -45,7 +45,11 @@ sys.path.insert(0, str(REPO))
 
 from scripts.security.gate_inputs import inspected  # noqa: E402
 
-_MARKER = "require_service_auth"
+#: The two mechanisms, and what each proves.
+_MEMBERSHIP = "require_service_auth"
+_IDENTITY = "require_service_identity"
+_MARKERS = (_MEMBERSHIP, _IDENTITY)
+_MARKER = _MEMBERSHIP          # retained: the shared-token denominator
 
 
 def _protected_ops(text: str) -> List[Tuple[str, int]]:
@@ -67,11 +71,34 @@ def _protected_ops(text: str) -> List[Tuple[str, int]]:
             continue
         fn = node.func
         name = getattr(fn, "id", None) or getattr(fn, "attr", None)
-        if name != _MARKER or not node.args:
+        if name not in _MARKERS or not node.args:
             continue
         arg = node.args[0]
         if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
-            out.append((arg.value, node.lineno))
+            out.append((arg.value, node.lineno, name))
+    return [(op, line) for op, line, _ in out]
+
+
+def _protected_ops_with_mechanism(text: str) -> List[Tuple[str, int, str]]:
+    """As above, but keeping which dependency guards each operation.
+
+    Both are counted deliberately. When `/observe_turn` migrated to
+    verified identity it left the shared-token population, and an
+    instrument that only counted that population would have reported the
+    endpoint as *gone* rather than *fixed* — a denominator that shrinks
+    when a defect is repaired cannot show progress, only absence.
+    """
+    out: List[Tuple[str, int, str]] = []
+    for node in ast.walk(ast.parse(text)):
+        if not isinstance(node, ast.Call):
+            continue
+        fn = node.func
+        name = getattr(fn, "id", None) or getattr(fn, "attr", None)
+        if name not in _MARKERS or not node.args:
+            continue
+        arg = node.args[0]
+        if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+            out.append((arg.value, node.lineno, name))
     return out
 
 #: operation -> (class, reason). Judgement, stated so it can be argued
@@ -129,7 +156,7 @@ def audit(root: Path = None) -> Tuple[List[str], int, Dict[str, int]]:
     root = root or REPO
     skip = {"_archive", ".venv", "__pycache__", ".git", "scripts", "output"}
 
-    found: List[Tuple[str, str, int]] = []
+    found: List[Tuple[str, str, int, str]] = []
     unparsed: List[str] = []
     for path in sorted(root.rglob("*.py")):
         rel = str(path.relative_to(root))
@@ -139,16 +166,16 @@ def audit(root: Path = None) -> Tuple[List[str], int, Dict[str, int]]:
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
-        if _MARKER not in text:
+        if not any(marker in text for marker in _MARKERS):
             continue
         try:
-            ops = _protected_ops(text)
+            ops = _protected_ops_with_mechanism(text)
         except SyntaxError:
             # I-1: a module this scan cannot read is unmeasured, not clean.
             unparsed.append(rel)
             continue
-        for op, num in ops:
-            found.append((rel, op, num))
+        for op, num, mechanism in ops:
+            found.append((rel, op, num, mechanism))
 
     if not found:
         # I-1: finding nothing is a broken scan, not a clean system —
@@ -162,15 +189,24 @@ def audit(root: Path = None) -> Tuple[List[str], int, Dict[str, int]]:
     for rel in unparsed:
         rows.append(f"  {rel}: could not be parsed — its endpoints are "
                     f"UNKNOWN, not absent")
-    rows.append(f"  {'service':<18}{'operation':<24}{'class':<14}why")
-    for rel, op, num in sorted(found, key=lambda x: (x[0], x[1], x[2])):
+    rows.append(f"  {'service':<18}{'operation':<24}{'class':<7}"
+                f"{'proves':<12}why")
+    for rel, op, num, mechanism in sorted(found,
+                                          key=lambda x: (x[0], x[1], x[2])):
         service = rel.split("/")[0]
         services.add(service)
         klass, why = _CLASS.get(op, ("UNCLASSIFIED",
                                      "not classified — must not be read "
                                      "as safe"))
         counts[klass] = counts.get(klass, 0) + 1
-        rows.append(f"  {service:<18}{op:<24}{klass:<14}{why}  ({rel}:{num})")
+        verified = mechanism == _IDENTITY
+        proves = "IDENTITY" if verified else "membership"
+        if verified:
+            counts["_migrated"] = counts.get("_migrated", 0) + 1
+            if klass == "B":
+                counts["_migrated_b"] = counts.get("_migrated_b", 0) + 1
+        rows.append(f"  {service:<18}{op:<24}{klass:<7}{proves:<12}{why}"
+                    f"  ({rel}:{num})")
 
     counts["_services"] = len(services)
     return rows, len(found), counts
@@ -178,8 +214,9 @@ def audit(root: Path = None) -> Tuple[List[str], int, Dict[str, int]]:
 
 def main() -> int:
     rows, n, counts = audit()
-    print(inspected(n, "endpoint(s) protected by shared-token auth",
-                    f"across {counts.get('_services', 0)} service(s)"))
+    print(inspected(n, "authenticated endpoint(s)",
+                    f"across {counts.get('_services', 0)} service(s), by either "
+                    f"mechanism"))
     print()
     for row in rows:
         print(row)
@@ -191,9 +228,18 @@ def main() -> int:
     if u:
         print(f"  UNCLASSIFIED ................... {u}  <- treat as B until judged")
     print()
-    print(f"  {b} of {n} protected endpoints rest on a mechanism that cannot")
-    print("  distinguish one caller from another. Every service holding the")
-    print("  shared token can act as any other service on all of them.")
+    migrated_b = counts.get("_migrated_b", 0)
+    remaining = b - migrated_b
+    print(f"  class-B endpoints requiring VERIFIED identity ... {migrated_b}")
+    print(f"  class-B endpoints still on the shared token ..... {remaining}")
+    print()
+    if remaining:
+        print(f"  {remaining} of {b} class-B endpoints still rest on a mechanism "
+              f"that cannot")
+        print("  distinguish one caller from another. Every service holding the")
+        print("  shared token can act as any other service on all of them.")
+    else:
+        print("  Every class-B endpoint derives its caller from a verified key.")
     return 0
 
 

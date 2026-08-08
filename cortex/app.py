@@ -56,7 +56,8 @@ from common.http_hygiene import pooled_client
 from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 from common.degraded import record_degradation
-from common.service_auth import require_service_auth
+from common.service_auth import (require_service_auth,
+                                require_service_identity)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("cortex")
@@ -101,6 +102,10 @@ class CortexState:
     tacit_rules: List[str]
     sensor_credibility: Dict[str, float]
     refresh_count: int
+    #: Which service supplied the last turn, derived from the key that
+    #: signed it. None when the caller authenticated with the shared
+    #: token during the transition window — an honest gap, not a guess.
+    last_turn_source: Optional[str] = None
 
 
 # ── Module state ──────────────────────────────────────────────────────────────
@@ -116,6 +121,7 @@ _state: CortexState = CortexState(
     tacit_rules=[],
     sensor_credibility={},
     refresh_count=0,
+    last_turn_source=None,
 )
 
 # Signal credibility: last 5 raw values per sensor label
@@ -546,14 +552,36 @@ async def get_state() -> Dict[str, Any]:
 # on identity below — so this endpoint remains a known blocker to Cortex
 # promotion, now closed to strangers rather than open to them.
 #
-# KAI_SERVICE_TOKEN is a SHARED secret: it proves the caller holds the
-# service token, not WHICH service the caller is. Provenance therefore
-# cannot yet be derived from identity, and any token-holder can claim to
-# be any other. Recorded rather than papered over.
-@app.post("/observe_turn",
-          dependencies=[Depends(require_service_auth("cortex_observe_turn"))])
-async def observe_turn(obs: TurnObservation) -> Dict[str, Any]:
-    """Receive a conversation turn for Context Bridge and Tacit Knowledge accumulation."""
+# The turn's provenance IS the caller, so this endpoint takes a verified
+# ServicePrincipal rather than a shared token. `require_grant=True` means
+# the key map must also *authorise* that identity for this operation —
+# proving who called is not deciding they may.
+#
+# What changed, and why it was the blocker: KAI_SERVICE_TOKEN is a shared
+# secret. It proved a caller held the token, never WHICH caller, so any
+# token-holder could submit turns as any other service and provenance
+# could not be derived from identity at all. It now is — from the key
+# that signed the request, never from a header or a body field.
+@app.post("/observe_turn")
+async def observe_turn(
+    obs: TurnObservation,
+    principal=Depends(require_service_identity("cortex_observe_turn",
+                                               require_grant=True)),
+) -> Dict[str, Any]:
+    """Receive a conversation turn for Context Bridge and Tacit Knowledge accumulation.
+
+    Nothing is mutated before the dependency has accepted the request:
+    FastAPI resolves dependencies first, so a refused call reaches no
+    line of this body. `scripts/test_observe_turn_identity.py` asserts
+    that directly by checking the accumulators are untouched after each
+    refusal, rather than trusting the framework's ordering.
+    """
+    # `unverified` during the transition window, when the caller
+    # authenticated with the shared token. Recording that name as the
+    # source would be a lie wearing a signature's confidence, so the
+    # source is recorded as absent instead.
+    source = principal.identity if principal.usable_for_provenance else None
+
     keywords = _extract_topic_keywords(obs.user_message)
     bridge_active, bridge_note = _detect_bridge(keywords)
     _topic_history.append(keywords)
@@ -561,12 +589,14 @@ async def observe_turn(obs: TurnObservation) -> Dict[str, Any]:
     # No `global` needed: _state is mutated, never rebound.
     _state.bridge_active = bridge_active
     _state.bridge_note = bridge_note
+    _state.last_turn_source = source
 
     _tacit_msg_lengths.append(len(obs.user_message))
     hour = datetime.now(timezone.utc).hour
     _tacit_hourly_counts[hour] = _tacit_hourly_counts.get(hour, 0) + 1
 
-    return {"bridge_active": bridge_active, "bridge_note": bridge_note}
+    return {"bridge_active": bridge_active, "bridge_note": bridge_note,
+            "turn_source": source}
 
 
 @app.get("/health")

@@ -180,7 +180,7 @@ def reset_identity_context() -> None:
 
 def check_identity(
     headers, operation: str, *, destination: str, method: str, path: str,
-    body: bytes,
+    body: bytes, require_grant: bool = False,
 ):
     """Validate a request and return ``(principal, status, detail)``.
 
@@ -222,7 +222,45 @@ def check_identity(
                 f"{operation} cannot verify caller identity: "
                 f"the signing backend is unavailable")
         # No fallback on failure. See docstring.
+        if principal is None or not require_grant:
+            return principal, status, detail
+        # Proving WHO called is not deciding they MAY. 403, not 401: the
+        # caller is authenticated and simply not authorised, and telling
+        # them apart is what makes the log readable.
+        if not keymap.granted(operation, principal.identity):
+            logger.warning(
+                "SECURITY: '%s' verified as '%s' but that identity holds no "
+                "grant for this operation (granted: %s)",
+                operation, principal.identity,
+                ", ".join(keymap.grants_for(operation)) or "nobody")
+            return None, 403, (
+                f"{principal.identity} is not granted {operation}")
         return principal, status, detail
+
+    if require_grant:
+        # An endpoint that gates on a grant CANNOT be satisfied by an
+        # unsigned caller: a grant is a decision about *who*, and there
+        # is no who. The transition window deliberately does not apply
+        # here.
+        #
+        # This is not how it was first written. The check was
+        # `require_grant and identity_required()`, so with the flag off —
+        # the default — a caller could skip the signature entirely and
+        # sail past the grant table. The scope check was bypassable by
+        # not attempting it, which is the same shape as the signature
+        # downgrade closed above: a control that can be declined is not a
+        # control. Found by the slice test, not by reading this code.
+        #
+        # The cost is intended: turning on require_grant for an endpoint
+        # makes signing mandatory *for that endpoint that day*. That is
+        # the per-endpoint migration switch, and it is why the population
+        # is migrated one slice at a time.
+        logger.warning("SECURITY: '%s' refused an unsigned caller — this "
+                       "operation is grant-gated and requires an identity",
+                       operation)
+        return None, 401, (
+            f"{operation} requires a signed request: this endpoint's "
+            f"authorisation depends on which service called")
 
     if identity_required():
         logger.warning("SECURITY: '%s' refused an unsigned caller", operation)
@@ -243,7 +281,8 @@ def check_identity(
     return unverified_principal(), 200, "membership only (unverified)"
 
 
-def require_service_identity(operation: str) -> Callable:
+def require_service_identity(operation: str,
+                             require_grant: bool = False) -> Callable:
     """FastAPI dependency yielding a ``ServicePrincipal``.
 
     For the class-B endpoints. The handler receives the principal and
@@ -254,16 +293,25 @@ def require_service_identity(operation: str) -> Callable:
     """
     from fastapi import HTTPException, Request
 
-    async def _dependency(request: "Request"):
+    async def _dependency(request):
         principal, status, detail = check_identity(
             request.headers, operation,
             destination=os.getenv("KAI_SERVICE_NAME", ""),
             method=request.method,
             path=request.url.path,
             body=await request.body(),
+            require_grant=require_grant,
         )
         if principal is None:
             raise HTTPException(status_code=status, detail=detail)
         return principal
 
+    # Bound to the real class, not the name. This module uses
+    # `from __future__ import annotations`, so a written annotation would
+    # be the *string* "Request", and FastAPI resolves hints against
+    # module globals where `Request` is not imported — it is local to
+    # this function. Assigning the class sidesteps the resolution
+    # entirely, and the failure it avoids is a startup crash in
+    # pydantic, not a subtle one.
+    _dependency.__annotations__["request"] = Request
     return _dependency

@@ -231,8 +231,10 @@ class KeyMap:
     observable instead of assumed.
     """
 
-    def __init__(self, entries: Dict[str, KeyEntry], digest: str) -> None:
+    def __init__(self, entries: Dict[str, KeyEntry], digest: str,
+                 grants: Optional[Dict[str, frozenset]] = None) -> None:
         self._entries = entries
+        self._grants = dict(grants or {})
         self.digest = digest
 
     def __len__(self) -> int:
@@ -243,6 +245,19 @@ class KeyMap:
 
     def identities(self) -> Tuple[str, ...]:
         return tuple(sorted({e.identity for e in self._entries.values()}))
+
+    def granted(self, operation: str, identity: str) -> bool:
+        """Whether this identity may perform this operation.
+
+        Proving *who* called is not the same as deciding they may. An
+        undeclared operation returns False: a grant table that has never
+        heard of an operation has not authorised it, and reading silence
+        as permission is how a scope check becomes decoration.
+        """
+        return identity in self._grants.get(operation, frozenset())
+
+    def grants_for(self, operation: str) -> Tuple[str, ...]:
+        return tuple(sorted(self._grants.get(operation, frozenset())))
 
     @classmethod
     def from_text(cls, text: str) -> "KeyMap":
@@ -283,7 +298,28 @@ class KeyMap:
                     f"ed25519 public keys are 32")
             entries[key_id] = KeyEntry(key_id=key_id, identity=identity,
                                        algorithm=algorithm, public_key=public)
-        return cls(entries, digest)
+
+        known = {e.identity for e in entries.values()}
+        raw_grants = doc.get("grants") or {}
+        if not isinstance(raw_grants, dict):
+            raise IdentityError("grants must be an object of "
+                                "operation -> [identity]")
+        grants: Dict[str, frozenset] = {}
+        for operation, allowed in raw_grants.items():
+            if not isinstance(allowed, list) or not all(
+                    isinstance(item, str) for item in allowed):
+                raise IdentityError(
+                    f"grant for {operation!r} must be a list of identities")
+            unknown = sorted(set(allowed) - known)
+            if unknown:
+                # A grant naming an identity with no key is either a typo
+                # or a key that was removed and left authorised. Both read
+                # as a working grant and neither is one.
+                raise IdentityError(
+                    f"grant for {operation!r} names identity(ies) with no "
+                    f"key in this map: {', '.join(unknown)}")
+            grants[operation] = frozenset(allowed)
+        return cls(entries, digest, grants)
 
     @classmethod
     def load(cls, path: Optional[str] = None) -> "KeyMap":
