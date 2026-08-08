@@ -313,8 +313,29 @@ part of this work and must not be quietly folded into it.
 
 Authorised as the single next action. **The container half could not be
 run: the Docker daemon is down in this environment** (`docker info` fails;
-the CLI is present). So this is the wheel-level probe, and the two halves
-are separated below rather than blended.
+the CLI is present). So this is the wheel-level probe, and it answers less
+than the authorised probe was meant to answer.
+
+### The two verdicts, kept apart on purpose
+
+> **Ed25519 library feasibility — PARTIALLY PROVEN.**
+> The pinned wheel installs, imports and performs Ed25519 sign/verify on
+> Python 3.11.15 / linux x86_64 in *this* environment. The wheel is
+> `abi3` + `manylinux_2_28`, which is a property of the artefact and
+> therefore travels: no compiler or toolchain is needed to install it
+> anywhere the glibc floor is met.
+
+> **Real service-image feasibility — UNKNOWN.**
+> Nothing here shows that a `python:3.11-slim` image builds with the
+> dependency added, that it imports at runtime inside that container, or
+> that the service starts and serves with it present. UNKNOWN until one
+> `docker build` runs on a host with a daemon.
+
+The distance between those two verdicts is this programme's own recurring
+defect (§R8): an artefact behaving correctly where it *was* tested says
+nothing about the place it has never run. "Works in this Python
+environment" must not be allowed to read as "works in the Kai runtime",
+and the labels above exist so it cannot.
 
 ### Ran, and passed
 
@@ -378,8 +399,11 @@ add `cryptography==43.0.1` to one service's requirements, build, and
 
 ### What this does and does not settle
 
-It settles the *feasibility* objection: Ed25519 is practical inside these
-images, at ~13.7 MB and no toolchain, pending the one build.
+It weakens the *feasibility* objection without removing it. What was
+believed — "cryptography is unavailable" — is wrong: the distro build is
+broken, the library is not. What replaces it is narrower and still open:
+the wheel needs no toolchain and costs ~13.7 MB, **and whether the image
+builds and runs with it remains UNKNOWN.**
 
 It does **not** settle the choice. The remaining question is the one you
 framed — what key model sits under the existing envelope — and the honest
