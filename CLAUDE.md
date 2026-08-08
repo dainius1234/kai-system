@@ -25,6 +25,7 @@ check before continuing.
 | "we'll tune this once we measure it" | ship the instrument that produces the number in the *same* commit |
 | I am typing `;` between commands | R3 — use `&&` |
 | I am writing a loop that waits for a process by name | R9 — the loop's own command line contains that name. It will match itself and wait forever |
+| My evidence that a check works comes from the same place as the thing it checks | I-8 — calibrate against something independent, with a known-positive and a known-negative |
 
 **The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
 happened while moving fast — a hard-coded image name, a guessed job id,
@@ -181,6 +182,43 @@ own presence changes what it measures reports on itself and calls it the
 world.** That is the same defect as a check whose scope is wrong, seen
 from the other side, and §3.5 predicts it — diagnostics are structurally
 the least-executed code, so they are where this lands.
+
+## I-8. Calibrate against independent evidence
+
+**Every instrument must be calibrated against evidence independent of
+the result it is trying to prove, with a known-positive and a
+known-negative case wherever that is feasible.**
+
+Not a second measurement system for everything — that is unaffordable
+and usually impossible. The requirement is that the evidence and the
+claim come from *different places*, so neither can excuse the other.
+
+Six failures in one stint were this one rule, unnamed:
+
+* a detector's population included **its own docstring**, and the count
+  was checked against itself;
+* `prepush` reported "gates green" while skipping the suite that tests
+  the architecture — the pass was evidence only about what it ran;
+* a watcher used `pgrep` on a string its own command line contained, so
+  it measured itself and reported the world;
+* a denominator **shrank when a defect was repaired**, so progress and
+  absence became indistinguishable;
+* a meta-check wanted to *probe* a key generator to read its
+  denominator, which would have written secrets as a side effect of
+  measuring;
+* a `KEY_ID` was classified by the word in its name rather than by what
+  it is, and an exception for it would have blinded the detector to real
+  key material.
+
+The practical form, in order:
+
+1. a **known-positive** — inject the defect, prove the check fires;
+2. a **known-negative** — the correct case, prove it does not;
+3. the *source of the expected answer* must not be the thing under test.
+
+A test list derived from the module it tests is fine; a test list
+**maintained beside** it is not, and neither is a count the instrument
+computes about itself.
 
 ---
 

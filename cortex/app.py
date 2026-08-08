@@ -56,7 +56,8 @@ from common.http_hygiene import pooled_client
 from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 from common.degraded import record_degradation
-from common.service_auth import (require_service_auth,
+from common.service_auth import (auth_telemetry,
+                                require_service_auth,
                                 require_service_identity)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -608,4 +609,12 @@ async def health() -> Dict[str, Any]:
         "refresh_count": _state.refresh_count,
         "last_refresh": _state.timestamp,
         "level2": _state.level2_summary,
+        # Chronic refusal must be visible. /observe_turn's only caller
+        # sent no credentials at all and every call was swallowed as a
+        # degradation, so an integration that had NEVER worked looked
+        # like one nobody used. Counts only — reading this changes
+        # nothing, and no probe posts a turn to prove auth works, which
+        # would make the watchdog a perception source.
+        "auth": auth_telemetry(),
+        "last_turn_source": _state.last_turn_source,
     }

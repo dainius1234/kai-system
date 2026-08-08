@@ -304,6 +304,66 @@ def main() -> int:  # noqa: C901 - a list of refusals, not a branchy algorithm
             ok = True
         check(f"the key map refuses {label}", ok)
 
+    # ── 14b. AMBIGUITY IN THE MAP IS AMBIGUITY IN THE PRINCIPAL ──
+    #
+    # Manual edits, merge mistakes and generated-config errors must not
+    # silently produce an identity decision. Each of these is a map a
+    # human could plausibly write.
+
+    # json.loads keeps the LAST duplicate and drops the first, silently,
+    # so without an explicit hook the principal would be decided by
+    # parse order — a decision nobody made.
+    dup = ('{"keys": {'
+           '"agentic-v1": {"identity": "agentic", "algorithm": "ed25519", '
+           f'"public_key": "{agentic_pub.hex()}"}}, '
+           '"agentic-v1": {"identity": "executor", "algorithm": "ed25519", '
+           f'"public_key": "{cortex_pub.hex()}"}}}}}}')
+    try:
+        si.KeyMap.from_text(dup)
+        ok = False
+    except si.IdentityError as exc:
+        ok = "more than once" in str(exc)
+    check("A DUPLICATE KEY ID IS REFUSED — json would silently keep the "
+          "last and decide the principal by parse order", ok)
+
+    # One signature that verifies as two different callers.
+    conflict = json.dumps({"keys": {
+        "a-v1": {"identity": "agentic", "algorithm": "ed25519",
+                 "public_key": agentic_pub.hex()},
+        "b-v1": {"identity": "executor", "algorithm": "ed25519",
+                 "public_key": agentic_pub.hex()}}})
+    try:
+        si.KeyMap.from_text(conflict)
+        ok = False
+    except si.IdentityError as exc:
+        ok = "different identities" in str(exc)
+    check("shared key material claiming TWO IDENTITIES is refused", ok)
+
+    # Same material twice for one identity is a copy, not a rotation.
+    copied = json.dumps({"keys": {
+        "a-v1": {"identity": "agentic", "algorithm": "ed25519",
+                 "public_key": agentic_pub.hex()},
+        "a-v2": {"identity": "agentic", "algorithm": "ed25519",
+                 "public_key": agentic_pub.hex()}}})
+    try:
+        si.KeyMap.from_text(copied)
+        ok = False
+    except si.IdentityError as exc:
+        ok = "not a rotation" in str(exc)
+    check("duplicated key material for one identity is refused — rotation "
+          "overlap uses two DIFFERENT keys", ok)
+
+    # ...and genuine rotation overlap still loads, or the check above
+    # would have broken the thing it protects.
+    rotating = si.KeyMap.from_text(json.dumps({"keys": {
+        "a-v1": {"identity": "agentic", "algorithm": "ed25519",
+                 "public_key": agentic_pub.hex()},
+        "a-v2": {"identity": "agentic", "algorithm": "ed25519",
+                 "public_key": stranger_pub.hex()}}}))
+    check("GENUINE rotation overlap — two distinct keys, one identity — "
+          "still loads",
+          rotating.identities() == ("agentic",) and len(rotating) == 2)
+
     with tempfile.TemporaryDirectory() as tmp:
         good_map = Path(tmp) / "keys.json"
         good_map.write_text(json.dumps({"keys": {

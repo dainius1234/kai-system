@@ -224,6 +224,36 @@ def main() -> int:  # noqa: C901 - a list of refusals
         ok = "no key in this map" in str(exc)
     check("a grant naming an identity with no key is refused", ok)
 
+    # ── chronic refusal must be COUNTABLE, and counting must not mutate ──
+    #
+    # The defect: this endpoint's only caller sent no credentials, every
+    # call was refused, and record_degradation swallowed it — so an
+    # integration that had NEVER worked looked like one nobody used.
+    telemetry = sa.auth_telemetry()
+    ops = telemetry.get("cortex_observe_turn", {})
+    check("refusals are counted by operation and error class", bool(ops))
+    check("a verified caller is counted under its derived identity",
+          ops.get("verified:agentic", 0) >= 1)
+    check("a grant refusal is counted separately from a bad signature",
+          ops.get("no_grant:executor", 0) >= 1
+          and ops.get("signature_rejected", 0) >= 1)
+    check("an unsigned caller on a grant-gated route is its own class",
+          ops.get("unsigned_but_grant_gated", 0) >= 1)
+
+    # Reading telemetry must change nothing, or the report becomes an
+    # event and the monitor becomes a perception source.
+    before_state = accumulators()
+    before_counts = sa.auth_telemetry()
+    check("reading the telemetry twice returns the same counts",
+          sa.auth_telemetry() == before_counts)
+    check("and mutates no accumulator", accumulators() == before_state)
+
+    health = client.get("/health")
+    check("health exposes the counts", health.status_code == 200
+          and "auth" in health.json())
+    check("and reading health does not learn a turn",
+          accumulators() == before_state)
+
     # ── GET /state is class A and must be UNCHANGED by all of this ──
     os.environ[si.KEYMAP_ENV] = str(keymap_path)
     sa.reset_identity_context()

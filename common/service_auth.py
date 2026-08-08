@@ -32,7 +32,7 @@ from __future__ import annotations
 import hmac
 import logging
 import os
-from typing import Callable, Optional
+from typing import Callable, Dict, Optional, Tuple
 
 logger = logging.getLogger("kai.service_auth")
 
@@ -135,6 +135,43 @@ _nonce_cache = None
 _keymap_error = ""
 _WARNED_TRANSITION: set = set()
 
+#: (operation, outcome) -> count. Chronic refusal must be VISIBLE.
+#:
+#: The reason this exists is a measured one: `/observe_turn`'s only
+#: caller sent no credentials at all, every call was 401'd, and
+#: `record_degradation` swallowed it — so an integration that had never
+#: worked looked exactly like an integration nobody was using. A counter
+#: is not a fix for that, but it is the difference between a silence and
+#: a number somebody can read.
+#:
+#: Deliberately NOT a health probe that exercises the endpoint. A live
+#: monitor that posts turns to prove authentication works would make the
+#: monitor a perception source, and Cortex would learn from its own
+#: watchdog.
+_auth_events: Dict[Tuple[str, str], int] = {}
+
+
+def _record(operation: str, outcome: str) -> None:
+    key = (operation, outcome)
+    _auth_events[key] = _auth_events.get(key, 0) + 1
+
+
+def auth_telemetry() -> Dict[str, Dict[str, int]]:
+    """Counts keyed by operation and error class, for a /health payload.
+
+    Read-only and side-effect free: reporting it changes nothing, which
+    is what lets a service expose it without the report itself becoming
+    an event.
+    """
+    out: Dict[str, Dict[str, int]] = {}
+    for (operation, outcome), count in sorted(_auth_events.items()):
+        out.setdefault(operation, {})[outcome] = count
+    return out
+
+
+def reset_auth_telemetry() -> None:
+    _auth_events.clear()
+
 
 def identity_required() -> bool:
     """Whether an unsigned caller is refused outright.
@@ -146,9 +183,14 @@ def identity_required() -> bool:
 
     This defaults to False so the migration does not break every caller
     on the commit that lands it. That is a deliberate, temporary widening
-    and it is loud: every such request logs, and
-    `scripts/security/check_service_identity_rollout.py` prints how many
-    services are still in the window.
+    and it is loud: the first such request per operation logs, every one
+    is counted in `auth_telemetry()`, and
+    `scripts/security/report_service_identity.py` prints how many class-B
+    endpoints are still on the shared token.
+
+    It does NOT apply to grant-gated endpoints. A grant is a decision
+    about *who*, so an endpoint requiring one always requires a verified
+    identity — see `check_identity`.
     """
     return os.getenv(REQUIRE_IDENTITY_ENV, "false").lower() in {
         "1", "true", "yes"}
@@ -203,6 +245,7 @@ def check_identity(
                 "SECURITY: '%s' received a signed request but has no usable "
                 "key map (%s) — refusing rather than downgrading",
                 operation, _keymap_error)
+            _record(operation, "keymap_unavailable")
             return None, 503, (
                 f"{operation} cannot verify caller identity: "
                 f"the service key map is unavailable")
@@ -218,11 +261,16 @@ def check_identity(
             # take. It is still a refusal: no fallback.
             logger.error("SECURITY: '%s' could not evaluate a signature "
                          "(%s: %s)", operation, type(exc).__name__, exc)
+            _record(operation, "backend_unavailable")
             return None, 503, (
                 f"{operation} cannot verify caller identity: "
                 f"the signing backend is unavailable")
         # No fallback on failure. See docstring.
-        if principal is None or not require_grant:
+        if principal is None:
+            _record(operation, "signature_rejected")
+            return principal, status, detail
+        if not require_grant:
+            _record(operation, f"verified:{principal.identity}")
             return principal, status, detail
         # Proving WHO called is not deciding they MAY. 403, not 401: the
         # caller is authenticated and simply not authorised, and telling
@@ -233,8 +281,10 @@ def check_identity(
                 "grant for this operation (granted: %s)",
                 operation, principal.identity,
                 ", ".join(keymap.grants_for(operation)) or "nobody")
+            _record(operation, f"no_grant:{principal.identity}")
             return None, 403, (
                 f"{principal.identity} is not granted {operation}")
+        _record(operation, f"verified:{principal.identity}")
         return principal, status, detail
 
     if require_grant:
@@ -258,18 +308,21 @@ def check_identity(
         logger.warning("SECURITY: '%s' refused an unsigned caller — this "
                        "operation is grant-gated and requires an identity",
                        operation)
+        _record(operation, "unsigned_but_grant_gated")
         return None, 401, (
             f"{operation} requires a signed request: this endpoint's "
             f"authorisation depends on which service called")
 
     if identity_required():
         logger.warning("SECURITY: '%s' refused an unsigned caller", operation)
+        _record(operation, "unsigned_identity_required")
         return None, 401, (
             f"{operation} requires a signed request: this endpoint's "
             f"behaviour depends on which service called")
 
     ok, status, detail = check_token(lower.get("authorization"), operation)
     if not ok:
+        _record(operation, f"token_rejected_{status}")
         return None, status, detail
     if operation not in _WARNED_TRANSITION:
         _WARNED_TRANSITION.add(operation)
@@ -278,6 +331,7 @@ def check_identity(
             "UNVERIFIED and will not appear in any provenance record. Set "
             "%s=true once every caller signs.", operation,
             REQUIRE_IDENTITY_ENV)
+    _record(operation, "shared_token_unverified")
     return unverified_principal(), 200, "membership only (unverified)"
 
 

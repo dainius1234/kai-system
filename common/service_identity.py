@@ -259,11 +259,33 @@ class KeyMap:
     def grants_for(self, operation: str) -> Tuple[str, ...]:
         return tuple(sorted(self._grants.get(operation, frozenset())))
 
+    @staticmethod
+    def _no_duplicate_keys(pairs):
+        """Reject a duplicated JSON key instead of keeping the last one.
+
+        `json.loads('{"a": 1, "a": 2}')` returns `{"a": 2}` — the first
+        definition vanishes, silently. In a trust map that means a merge
+        mistake or a hand edit can define `agentic-v1` twice and the
+        principal is decided by **parse order**. The map is the root of
+        identity; nothing about it may be resolved by accident.
+        """
+        seen = {}
+        for key, value in pairs:
+            if key in seen:
+                raise IdentityError(
+                    f"key map defines {key!r} more than once — a duplicate in "
+                    f"a trust map is resolved by parse order, which is not a "
+                    f"decision anyone made")
+            seen[key] = value
+        return seen
+
     @classmethod
     def from_text(cls, text: str) -> "KeyMap":
         digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
         try:
-            doc = json.loads(text)
+            doc = json.loads(text, object_pairs_hook=cls._no_duplicate_keys)
+        except IdentityError:
+            raise
         except ValueError as exc:
             raise IdentityError(f"key map is not valid JSON: {exc}") from exc
         keys = doc.get("keys")
@@ -298,6 +320,33 @@ class KeyMap:
                     f"ed25519 public keys are 32")
             entries[key_id] = KeyEntry(key_id=key_id, identity=identity,
                                        algorithm=algorithm, public_key=public)
+
+        # ── ambiguity in the map is ambiguity in the principal ──
+        #
+        # Rotation overlap is two DIFFERENT keys for one identity, which
+        # is fine and needs no protocol. The same public key appearing
+        # twice is never that: at best it is a copy-paste, and if the two
+        # entries disagree about the identity then a single signature
+        # verifies as two different callers and the receiver picks by key
+        # id. That is a principal decided by which id the caller chose to
+        # send — caller-asserted identity, reintroduced through the map.
+        by_public: Dict[bytes, KeyEntry] = {}
+        for entry in entries.values():
+            twin = by_public.get(entry.public_key)
+            if twin is None:
+                by_public[entry.public_key] = entry
+                continue
+            if twin.identity != entry.identity:
+                raise IdentityError(
+                    f"keys {twin.key_id!r} and {entry.key_id!r} share public "
+                    f"key material but claim different identities "
+                    f"({twin.identity!r} vs {entry.identity!r}) — one "
+                    f"signature would verify as two callers")
+            raise IdentityError(
+                f"keys {twin.key_id!r} and {entry.key_id!r} carry identical "
+                f"public key material. Rotation overlap uses two DIFFERENT "
+                f"keys for one identity; duplicated material is a copy, not "
+                f"a rotation")
 
         known = {e.identity for e in entries.values()}
         raw_grants = doc.get("grants") or {}
