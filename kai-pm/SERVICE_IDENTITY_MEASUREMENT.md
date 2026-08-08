@@ -309,6 +309,113 @@ part of this work and must not be quietly folded into it.
 
 ---
 
+## 12. The Ed25519 availability probe — result
+
+Authorised as the single next action. **The container half could not be
+run: the Docker daemon is down in this environment** (`docker info` fails;
+the CLI is present). So this is the wheel-level probe, and the two halves
+are separated below rather than blended.
+
+### Ran, and passed
+
+`pip install cryptography==43.0.1` into an isolated directory, imported
+with nothing else on the path, on Python **3.11.15**, linux x86_64:
+
+```
+cryptography 43.0.1  imported clean
+Ed25519 keypair generated: priv 32 bytes, pub 32 bytes, sig 64 bytes
+sign / verify round trip: OK
+tampered message: InvalidSignature (rejected)
+```
+
+**The broken artefact was never the library.** The panic recorded in
+DECISIONS and skipped by two existing tests comes from the *distro*
+package at `/usr/lib/python3/dist-packages/cryptography`, whose Rust
+binding is mismatched. The pinned wheel does not go near it.
+
+### What the wheel is, which is the part that decides "practical"
+
+```
+cryptography-43.0.1-cp39-abi3-manylinux_2_28_x86_64.whl   3.99 MB
+cffi-2.1.1-cp311-...-manylinux_2_17_x86_64.whl            0.22 MB
+pycparser-3.0-py3-none-any.whl                            0.05 MB
+installed footprint                                      ~13.7 MB
+```
+
+Three facts follow, and they are the useful ones:
+
+* **`abi3`** — one binary works across CPython ≥ 3.9. No per-version
+  rebuild, and it survives a future Python bump.
+* **`manylinux_2_28`** — prebuilt. **No compiler, no Rust toolchain, no
+  build-time headers.** This is the difference between a one-line
+  requirements change and a multi-stage build, and it is the thing I
+  expected to be the blocker. It is not.
+* **~13.7 MB per image**, in 8–9 images (below), not 47.
+
+### Blast radius of the dependency, measured
+
+All **47** Dockerfiles are `python:3.11-slim`; each of the 9 services
+involved has its own `requirements.txt`. The dependency would land in
+**9 of 47 images**: the 8 services holding protected endpoints, plus
+`tool-gate` if the existing envelope is unified. `common/actuator_registry`
+is the only caller-side module, and it ships inside those same images.
+
+Zero service requirements currently pull `cryptography` transitively —
+checked for the usual carriers (pyjwt, paramiko, authlib, pyopenssl and
+others). So this is a genuinely new dependency, not one already present.
+
+### The half I did not prove, stated as such
+
+`python:3.11-slim` is Debian-based and current tags are bookworm
+(glibc 2.36); `manylinux_2_28` requires glibc ≥ 2.28, which bookworm
+(2.36) and even bullseye (2.31) satisfy. **That is an inference from the
+wheel tag, not a run.** This host is glibc 2.39, so it does not prove
+the image.
+
+The outstanding check is one `docker build` on a machine with a daemon:
+add `cryptography==43.0.1` to one service's requirements, build, and
+`import`. Everything else about the dependency is now known.
+
+### What this does and does not settle
+
+It settles the *feasibility* objection: Ed25519 is practical inside these
+images, at ~13.7 MB and no toolchain, pending the one build.
+
+It does **not** settle the choice. The remaining question is the one you
+framed — what key model sits under the existing envelope — and the honest
+statement of the trade is:
+
+| | Option 1 — per-service HMAC | Option 2 — per-service Ed25519 |
+|---|---|---|
+| new dependency | none (stdlib) | 9 images, ~13.7 MB, no toolchain |
+| verifier can forge the caller | **yes** | no |
+| key map contents | secrets | public keys |
+| map compromise | attacker can impersonate every caller | attacker can swap identities but not forge past signatures |
+| envelope changes | identical either way | identical either way |
+
+The row that matters is the second. Under Option 1 the receiver holds a
+key capable of manufacturing any caller's signature, so a record saying
+"cortex asserted this" is only as trustworthy as the service that wrote
+it down. For most of the 26 that is acceptable. For `cortex_observe_turn`,
+where the record *is* the product, it is the same class of defect as
+`actor_did` — weaker, but the same shape: a party with an interest in the
+answer is trusted to produce it.
+
+### One thing to note about "reuse the existing envelope"
+
+REUSE is the right call, and the report should be exact about what is
+being reused. The envelope in `common/auth.py` is currently used by
+**one receiver** (`tool-gate`) and two senders. None of the 8 services
+holding the 32 protected endpoints uses it — they use bearer tokens. So
+extending it means *adopting a proven local mechanism in 8 more services*,
+which is still far better than creating one, but it is adoption work, not
+a no-op. The envelope also needs three additions before it can carry
+identity at all: method, path and body hash are not in the signed string
+today, so a valid signature can currently be replayed onto a different
+route of the same service.
+
+---
+
 ## What was verified here, and what was not
 
 **Verified by running it:** the 32/8/26/6 counts and every row behind them;
@@ -318,7 +425,27 @@ that three services mount `hmac_secret`; that `KAI_SERVICE_TOKEN` is declared
 in every protected service in all three profiles; that exactly one function
 sends it; that `cryptography` panics on import on this host.
 
-**Not verified:** whether `cryptography` installs and imports in a
-`python:3.11-slim` service image. Whether any of the 12 minimal-only B
-endpoints behave as their code reads, since none of them has ever been
-started.
+**Verified by running it (probe, §12):** that the pinned `cryptography`
+wheel installs and imports in isolation on Python 3.11.15 / linux x86_64;
+that Ed25519 sign, verify and tamper-rejection work; that the wheel is
+`abi3` + `manylinux_2_28` and needs no build toolchain; its size and
+dependency set; that all 47 Dockerfiles are `python:3.11-slim`; that no
+service requirement pulls `cryptography` transitively today.
+
+**Not verified:** that the wheel imports *inside* a `python:3.11-slim`
+container — the Docker daemon is down here, so the glibc claim is an
+inference from the wheel's platform tag, not a run. Whether any of the 12
+minimal-only B endpoints behave as their code reads, since none of them
+has ever been started.
+
+**Written and withdrawn, not in the tree:** a draft
+`common/service_identity.py` was started before the "do not build
+anything yet" instruction arrived. It is parked outside the repository
+and is recorded here so its absence is not mistaken for it never having
+existed. Two things in it are worth keeping whichever option wins, and
+they are stated as proposals rather than code: a **length-prefixed**
+canonical string (a delimiter can be forged from inside a field, a length
+cannot), and an answer to the restart-gap question — if the nonce cache
+fails to restore, refuse any timestamp older than start-up for one skew
+window, because a request captured before the restart carries an older
+timestamp by construction.
