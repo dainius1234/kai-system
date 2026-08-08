@@ -152,6 +152,12 @@ jobs:
       - name: Every healthcheck can run in the image it checks
         run: python scripts/security/check_healthcheck_runnable.py
 
+      # A private signing key mounted into two services makes them ONE
+      # principal, which is exactly the defect per-service identity was
+      # built to remove — it would come back wearing a signature.
+      - name: Every signing key has exactly one owner
+        run: python scripts/security/check_service_identity_wiring.py
+
       # Docker CREATES a missing bind-mount source as an empty directory
       # rather than failing, so a machine-specific path boots healthy and
       # reads nothing. heartbeat scanned /var/log/sovereign for `timeout`,

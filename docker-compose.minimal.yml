@@ -217,12 +217,20 @@ services:
       HOUSE_DOCTOR_URL: http://house-doctor:8046
       VAULT_SYNC_URL: http://vault-sync:8047
       CORTEX_URL: http://cortex:8048
+      # Signs outbound requests to grant-gated endpoints. The private
+      # key is mounted ONLY here: a key seen by two services makes them
+      # one principal, and that is the defect this closes.
+      KAI_SERVICE_NAME: agentic
+      KAI_SERVICE_KEY_ID: agentic-v1
+      KAI_SERVICE_PRIVATE_KEY: /run/secrets/agentic_identity_key
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8007/health')\""]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
+    volumes:
+      - ./secrets/service-identity/private/agentic.key:/run/secrets/agentic_identity_key:ro
     networks:
       - agent-net
       - control-net
@@ -788,8 +796,16 @@ services:
       # given no token fails closed on every call, which is safe
       # and useless. NOTE: this is a SHARED secret — it proves the
       # caller holds the service token, not which caller it is.
-      # See D169; per-service identity does not exist yet.
+      # See D169. /state (class A) still uses it; /observe_turn does
+      # NOT — it now derives its caller from a verified signature.
       KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
+      # Local configuration, used as the signed `destination` when
+      # VERIFYING. It is never read from a request: a caller cannot
+      # name itself or its target here. Identity comes only from
+      # signature -> trusted key map -> ServicePrincipal.
+      KAI_SERVICE_NAME: cortex
+      KAI_SERVICE_KEYMAP: /etc/kai/identity/keymap.json
+      KAI_NONCE_CACHE_PATH: /data/nonces/cortex-nonces.json
       FF_CORTEX: "true"
       FF_CORTEX_VERBOSE: "false"
       CORTEX_REFRESH_INTERVAL: "60"
@@ -808,6 +824,15 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+    volumes:
+      # Read-only, and PUBLIC keys only. Anything able to rewrite this
+      # file could mint an identity, which is why KeyMap.load refuses a
+      # group- or other-writable map.
+      - ./secrets/service-identity/keymap.json:/etc/kai/identity/keymap.json:ro
+      # The replay cache must survive restart. When it cannot be
+      # restored the receiver refuses pre-startup timestamps for one
+      # skew window rather than accepting blind.
+      - cortex_nonces:/data/nonces
     networks:
       - agent-net
       - observability-net
@@ -893,6 +918,8 @@ services:
 
 volumes:
   postgres_data:
+  # Replay cache for verified requests; see NonceCache.
+  cortex_nonces:
   ollama_data:
   turbovec_data:
   soul_data:

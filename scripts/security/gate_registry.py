@@ -625,6 +625,36 @@ REGISTRY: Tuple[Gate, ...] = (
                         "networks to silence it would change the security "
                         "topology to quieten a check",
          in_workflows=("policy-checks.yml",)),
+    Gate(module="generate_service_keys",
+         kind=REPORT,
+         summary="generates one ed25519 keypair per service and the trusted "
+                 "receiver key map; NOT a gate — it writes deployment key "
+                 "material and must never run in policy-check",
+         inputs=(),
+         denominator=r"inspected: \d+ service key\(s\) generated",
+         proven_by="scripts/test_service_identity_wiring.py",
+         calibrated_by="scripts/test_service_identity_wiring.py",
+         probe=False,
+         probe_skip_reason="probing it would WRITE PRIVATE KEY MATERIAL. A "
+                           "meta-check must not create secrets as a side "
+                           "effect of measuring, and a generator run with no "
+                           "arguments correctly refuses rather than emitting "
+                           "an empty key map. The denominator is exercised in "
+                           "scripts/test_service_identity_wiring.py against a "
+                           "temporary directory instead.",
+         in_policy_check=False,
+         in_workflows=()),
+    Gate(module="check_service_identity_wiring",
+         kind=GATE,
+         summary="a private signing key must be mounted into exactly ONE "
+                 "service — two services sharing a key are one principal, "
+                 "which is the measured defect this mechanism removes",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ service\(s\) that sign or verify",
+         proven_by="scripts/test_service_identity_wiring.py",
+         calibrated_by="scripts/test_service_identity_wiring.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",)),
     Gate(module="check_bind_mount_portability",
          kind=GATE,
          summary="a bind mount must not name a path that exists on one "

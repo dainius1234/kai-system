@@ -191,13 +191,18 @@ def _base_url(actuator: str) -> str:
 def _encode_body(body: Dict[str, Any]) -> bytes:
     """The exact bytes that are both sent and signed.
 
-    One function, used by the signer and by the poster, because the
-    receiver hashes what arrives. If these two serialisations differed by
-    a single space, every signature would fail — and it would fail in the
-    way that looks like a key problem rather than an encoding one.
+    Delegates to `common.service_identity.encode_json_body` so there is
+    exactly ONE encoder in the system. Two encoders that agree today
+    drift tomorrow, and the drift presents as a key problem rather than
+    an encoding one. Falls back only if that import fails, and then to
+    byte-identical arguments.
     """
-    return json.dumps(body or {}, separators=(",", ":"),
-                      sort_keys=True).encode("utf-8")
+    try:
+        from common.service_identity import encode_json_body
+        return encode_json_body(body)
+    except Exception:
+        return json.dumps(body or {}, separators=(",", ":"),
+                          sort_keys=True).encode("utf-8")
 
 
 def _destination(actuator: str) -> str:

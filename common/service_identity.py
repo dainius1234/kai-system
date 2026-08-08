@@ -513,6 +513,33 @@ class NonceCache:
         return True
 
 
+def encode_json_body(payload) -> bytes:
+    """The exact bytes that are both sent and signed.
+
+    ONE encoder for the whole system. The receiver hashes what arrives,
+    so if the signer and the sender serialised differently — by a single
+    space — every signature would fail, and it would fail looking like a
+    key problem rather than an encoding one. Callers must send these
+    bytes with `content=`, never re-serialise with `json=`.
+    """
+    return json.dumps(payload if payload is not None else {},
+                      separators=(",", ":"), sort_keys=True).encode("utf-8")
+
+
+def signed_json_request(*, destination: str, method: str, path: str,
+                        payload) -> Tuple[bytes, Dict[str, str]]:
+    """(body bytes, headers) for one signed JSON request.
+
+    Returns the bytes rather than letting the caller rebuild them, which
+    is the only way the two halves cannot drift apart.
+    """
+    raw = encode_json_body(payload)
+    headers = signed_headers(destination=destination, method=method,
+                             path=path, body=raw)
+    headers["content-type"] = "application/json"
+    return raw, headers
+
+
 def new_nonce() -> str:
     return secrets.token_hex(16)
 

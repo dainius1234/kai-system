@@ -68,3 +68,11 @@ output/coverage_html/
 logs/
 .isolation-report.json
 .pytest-run.log
+
+# Per-service ed25519 identity material. The private halves are the
+# whole mechanism: a key seen by two services makes them one principal,
+# and the 26-of-32 defect this was built to close comes straight back.
+# The key MAP holds only public halves and is safe to read, but it is
+# generated per deployment and mounted read-only, so it does not belong
+# in git either — a committed map is one a pull request can edit.
+secrets/service-identity/
