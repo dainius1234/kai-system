@@ -24,6 +24,7 @@ check before continuing.
 | I am fixing the second instance of something | R6 — count the population first, then fix all of it |
 | "we'll tune this once we measure it" | ship the instrument that produces the number in the *same* commit |
 | I am typing `;` between commands | R3 — use `&&` |
+| I am writing a loop that waits for a process by name | R9 — the loop's own command line contains that name. It will match itself and wait forever |
 
 **The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
 happened while moving fast — a hard-coded image name, a guessed job id,
@@ -150,6 +151,36 @@ Every defect of the 2026-08-07 stint lived in code or configuration that
 had never run. Not one was code that used to work and broke. When
 choosing where to look, ask what has no execution path — not what looks
 suspicious.
+
+## R9. A watcher must not be able to observe itself
+
+    until ! pgrep -f "make prepush"; do sleep 15; done
+
+This never exits. `pgrep -f` matches the full command line, and the
+command line of the waiting shell *contains the string it is searching
+for*. The loop finds itself, concludes the job is still running, and
+waits forever.
+
+Earned 2026-08-07. Eight of these accumulated in one stint. The gate
+chain they were guarding never ran, so `prepush.log` stayed empty, the
+tree stayed dirty, and the commit never happened — while I reported,
+repeatedly and in good faith, that the gates were "still running". The
+observation was true of the watcher and false of the world.
+
+Two fixes, in order of preference:
+
+1. **Do not wait.** Run the chain in the foreground with a long timeout.
+   `make prepush && git commit && git push` needs no supervision, and
+   the `&&` still stops it at a failing gate.
+2. If a wait is genuinely needed, watch something the watcher cannot
+   be — a pid captured before the loop, a sentinel file, an exit-code
+   file — never a name that appears in the watcher's own text.
+
+The general shape is worth more than the instance: **an instrument whose
+own presence changes what it measures reports on itself and calls it the
+world.** That is the same defect as a check whose scope is wrong, seen
+from the other side, and §3.5 predicts it — diagnostics are structurally
+the least-executed code, so they are where this lands.
 
 ---
 
