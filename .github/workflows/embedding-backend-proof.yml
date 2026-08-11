@@ -26,8 +26,26 @@
 # Vector width decides. Logs corroborate.
 name: Embedding backend proof
 
+# workflow_dispatch ALONE cannot run this. GitHub registers dispatchable
+# workflows only from the DEFAULT branch, and this file exists only on
+# the development branch, so the API answers 404 -- verified: all 13
+# registered workflows report an html_url under /blob/main/ and this one
+# is absent from the list entirely. Merging to main to make it
+# dispatchable would need authorisation this work does not have.
+#
+# A `push` trigger runs from the BRANCH'S OWN copy of the file, so it
+# needs no default-branch registration. The paths filter keeps it to
+# changes in this job or the probe it runs: this builds three images and
+# a compose stack, and firing it on every push would be a standing tax
+# on unrelated work.
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - claude/project-rework-plan-pgvp35
+    paths:
+      - .github/workflows/embedding-backend-proof.yml
+      - scripts/security/probe_embedding_backend.py
 
 permissions:
   contents: read
