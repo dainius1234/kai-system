@@ -625,6 +625,35 @@ REGISTRY: Tuple[Gate, ...] = (
                         "networks to silence it would change the security "
                         "topology to quieten a check",
          in_workflows=("policy-checks.yml",)),
+    Gate(module="report_embedding_backends",
+         kind=REPORT,
+         summary="every service choosing between a semantic backend and a "
+                 "fallback; 2 of 3 degrade SILENTLY, so 'service started' "
+                 "is not evidence the semantic backend started",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ service\(s\) choosing between",
+         proven_by="scripts/test_embedding_backends.py",
+         calibrated_by="scripts/test_embedding_backends.py",
+         in_policy_check=False,
+         in_workflows=()),
+    Gate(module="probe_embedding_backend",
+         kind=REPORT,
+         summary="runs INSIDE a built image and reports whether the "
+                 "semantic operation actually executed; the verdict is the "
+                 "exit code, never a grep over its output",
+         inputs=(),
+         denominator=r"inspected: 3 stage\(s\) of .*semantic path",
+         proven_by="scripts/test_embedding_backends.py",
+         calibrated_by="scripts/test_embedding_backends.py",
+         probe=False,
+         probe_skip_reason="it is designed to run inside a service "
+                           "container, where the library and baked model "
+                           "exist. Probing it on the developer host would "
+                           "measure the host, and reporting that as the "
+                           "image's state is the exact confusion this "
+                           "instrument exists to prevent.",
+         in_policy_check=False,
+         in_workflows=()),
     Gate(module="generate_service_keys",
          kind=REPORT,
          summary="generates one ed25519 keypair per service and the trusted "
