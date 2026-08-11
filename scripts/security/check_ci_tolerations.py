@@ -85,6 +85,61 @@ class Toleration:
 
 DECLARED: Tuple[Toleration, ...] = (
     Toleration(
+        workflow="embedding-backend-proof.yml",
+        step="Record image identity",
+        bucket=DOCUMENTED_SKIP,
+        reason="`docker compose images -q` returns empty rather than "
+               "failing when a service has no built image. The empty case "
+               "is PRINTED as `UNKNOWN`, and every consumer of that value "
+               "treats UNKNOWN as not-executed rather than as a pass, so "
+               "the suppression cannot manufacture a green result. "
+               "Retire when this job is promoted from evidence collection "
+               "to a gate.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="embedding-backend-proof.yml",
+        step="Claim A — does the semantic operation execute in each image?",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same empty-image-id case, and the step ends `exit 0` on "
+               "purpose: this job COLLECTS EVIDENCE and does not gate. A "
+               "FAKE or NO_OBSERVATION verdict is a finding to report, not "
+               "a build to break, and the probe's own exit status is "
+               "captured into a variable BEFORE any inspection so the "
+               "verdict always comes from the probe. Retire when the "
+               "class-level remediation lands and this becomes a gate.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="embedding-backend-proof.yml",
+        step="Claim B — does memu-core reach that backend on its production default?",
+        bucket=DOCUMENTED_SKIP,
+        reason="Two suppressions. `printenv || echo (unset)` is "
+               "CORROBORATION ONLY — an absent variable is the expected "
+               "and correct state for the production default, so it must "
+               "not fail; the authoritative result is the vector width, "
+               "captured separately with its own exit status. `down -v || "
+               "true` is teardown after the measurement is already "
+               "recorded. Retire with the rest of this job.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="embedding-backend-proof.yml",
+        step="Evidence summary",
+        bucket=DOCUMENTED_SKIP,
+        reason="Each `cat ... || echo` prints an explicit `(not executed = "
+               "UNKNOWN)` when a result file is absent. That is the "
+               "I-1 behaviour this programme requires: a missing "
+               "measurement must read as UNKNOWN, never as silence and "
+               "never as success. Failing the step instead would hide the "
+               "other rows that DID produce evidence.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
         workflow="core-tests.yml",
         step="Measured — baked model revision and embedding load time",
         bucket=DOCUMENTED_SKIP,

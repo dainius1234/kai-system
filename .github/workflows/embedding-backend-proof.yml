@@ -1,0 +1,235 @@
+# Does Kai's semantic embedding capability actually exist at runtime?
+#
+# Evidence collection only. This workflow changes no production default,
+# no dependency file and no fallback behaviour, and it is deliberately
+# separate from every existing workflow so it cannot alter their
+# behaviour or inherit their environment.
+#
+# TWO CLAIMS, KEPT APART. Collapsing them is the failure this exists to
+# prevent:
+#
+#   A  IMAGE CAPABILITY — the built image contains the library and model
+#      and can execute the real semantic operation.
+#
+#   B  PRODUCTION-DEFAULT SERVICE PATH — memu-core, started normally with
+#      MEMU_ALLOW_FAKE_EMBEDDINGS resolving to its production default,
+#      actually reaches that backend.
+#
+# A passing A with a failing B is a legitimate and informative result:
+# the engine is in the car and the car is not connected to it. A CANNOT
+# SATISFY B.
+#
+# None of these count as proof of semantic execution:
+#   image built · package imported · model files present ·
+#   container healthy · service started · success log alone
+#
+# Vector width decides. Logs corroborate.
+name: Embedding backend proof
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  embedding-backend-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # NOTE: this job deliberately declares NO env block. The flag must
+    # not appear at workflow, job or step level anywhere in this file —
+    # `unified-hunter.yml` sets it at JOB level, which leaks into every
+    # step of that job, and inheriting that here would mean testing the
+    # override while believing we were testing the default.
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The environment must not already carry the flag
+        run: |
+          # Claim B is only meaningful if the value is genuinely absent
+          # before compose resolves ${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}.
+          # Proven at the boundary rather than assumed.
+          if [ -n "${MEMU_ALLOW_FAKE_EMBEDDINGS:-}" ]; then
+            echo "REFUSING: MEMU_ALLOW_FAKE_EMBEDDINGS is already set to"
+            echo "'${MEMU_ALLOW_FAKE_EMBEDDINGS}' in this environment."
+            echo "Claim B would test the override, not the default."
+            exit 1
+          fi
+          echo "MEMU_ALLOW_FAKE_EMBEDDINGS is unset. Commit ${GITHUB_SHA}"
+
+      - name: Mint an ephemeral database password for this run
+        run: |
+          # Ephemeral and per-run: nothing here is a production secret,
+          # and none is required. If this verification ever needs a real
+          # one, that is a trust decision to bring back, not to provision
+          # quietly.
+          printf 'DB_PASSWORD=ci-ephemeral-%s\n' \
+            "$(head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20)" \
+            >> "$GITHUB_ENV"
+
+      - name: Build the three images under test
+        run: |
+          set -o pipefail
+          docker compose -f docker-compose.minimal.yml build memu-core agentic
+          docker compose -f docker-compose.full.yml build fusion-engine
+
+      # ci-toleration: documented-skip
+      - name: Record image identity
+        run: |
+          # Local image ID / content hash. A registry RepoDigest does not
+          # exist for a locally built image, and requiring one would fail
+          # this step for a reason unrelated to what it measures.
+          {
+            echo "commit: ${GITHUB_SHA}"
+            for svc in memu-core agentic fusion-engine; do
+              file=docker-compose.minimal.yml
+              [ "$svc" = "fusion-engine" ] && file=docker-compose.full.yml
+              image=$(docker compose -f "$file" images -q "$svc" 2>/dev/null || true)
+              echo "$svc image id: ${image:-UNKNOWN}"
+            done
+          } | tee image-identity.txt
+
+      # ── CLAIM A ──────────────────────────────────────────────────────
+      # The probe is mounted into the image because `scripts/` is not
+      # copied in. `docker run` on the image ID is used rather than
+      # `docker compose run` so that NO compose environment can reach it:
+      # this step measures the image, nothing else.
+      # ci-toleration: documented-skip
+      - name: 'Claim A — does the semantic operation execute in each image?'
+        id: claim_a
+        run: |
+          fail=0
+          for svc in memu-core agentic fusion-engine; do
+            file=docker-compose.minimal.yml
+            [ "$svc" = "fusion-engine" ] && file=docker-compose.full.yml
+            image=$(docker compose -f "$file" images -q "$svc" 2>/dev/null || true)
+            if [ -z "$image" ]; then
+              echo "$svc: UNKNOWN — no image id; not executed, so not a pass"
+              fail=1
+              continue
+            fi
+
+            # Redirect to a file, then capture the PROBE's own status.
+            # `probe | tee` would yield tee's status (~always 0), turning
+            # a FAKE verdict into a PASS. That is the same defect family
+            # as a grep supplying a verdict, failing toward false
+            # confidence rather than false alarm.
+            docker run --rm --network none \
+              -v "$PWD/scripts/security/probe_embedding_backend.py:/probe.py:ro" \
+              -e MEMU_ALLOW_FAKE_EMBEDDINGS= \
+              "$image" python /probe.py "$svc" > "claim-a-$svc.log" 2>&1
+            rc=$?
+
+            echo "::group::Claim A — $svc (probe exit $rc)"
+            cat "claim-a-$svc.log"
+            echo "::endgroup::"
+
+            case $rc in
+              0) verdict=REAL ;;
+              3) verdict=FAKE ;;
+              4) verdict=WRONG_DIMENSION ;;
+              5) verdict=NO_OBSERVATION ;;
+              *) verdict="UNKNOWN(exit $rc)" ;;
+            esac
+            echo "$svc claim-A: $verdict" | tee -a claim-a-summary.txt
+          done
+          # Recorded, never converted into a pass. Every row is evidence
+          # whatever it says; this job reports, it does not gate.
+          exit 0
+
+      # ── CLAIM B ──────────────────────────────────────────────────────
+      # ci-toleration: documented-skip
+      - name: 'Claim B — does memu-core reach that backend on its production default?'
+        id: claim_b
+        # Declared HERE rather than exported inside `run:`. An export in
+        # the script works at runtime but is invisible to
+        # check_compose_env, which reads step `env:` — and a checker that
+        # cannot see a connection cannot vouch for it. The gate caught
+        # this and was right to: the previous version would have run with
+        # a blank DB_PASSWORD, postgres would have refused to start, and
+        # Claim B would have reported NO_OBSERVATION for a reason that
+        # had nothing to do with embeddings.
+        #
+        # NOTE the deliberate absence of MEMU_ALLOW_FAKE_EMBEDDINGS.
+        env:
+          # DB_PASSWORD only. POSTGRES_PASSWORD was here and the gate
+          # removed it: docker-compose.minimal.yml never references that
+          # name, so setting it configures nothing while looking like it
+          # does — the same shape as MEMU_ALLOW_FAKE_EMBEDDINGS being set
+          # by four CI steps for months and reaching no container.
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          # No MEMU_ALLOW_FAKE_EMBEDDINGS anywhere: compose must resolve
+          # ${MEMU_ALLOW_FAKE_EMBEDDINGS:-false} from nothing.
+          docker compose -f docker-compose.minimal.yml up -d memu-core \
+            > claim-b-bringup.log 2>&1
+          up_rc=$?
+          echo "compose up exit: $up_rc"
+
+          # Corroboration only — a resolved variable is not a vector.
+          echo "::group::resolved container environment (corroboration)"
+          docker compose -f docker-compose.minimal.yml exec -T memu-core \
+            printenv MEMU_ALLOW_FAKE_EMBEDDINGS || echo "(unset in container)"
+          echo "::endgroup::"
+
+          # THE AUTHORITY: the width memu-core's own module produces,
+          # inside the running service container, under the environment
+          # the service actually resolved. Written to a file first so the
+          # exit status belongs to the measurement.
+          docker compose -f docker-compose.minimal.yml exec -T memu-core \
+            python -c "import sys; sys.path.insert(0,'/app'); from app import generate_embedding; print(len(generate_embedding('claim B probe')))" \
+            > claim-b-width.log 2>&1
+          rc=$?
+
+          echo "::group::Claim B — memu-core application path (exit $rc)"
+          cat claim-b-width.log
+          echo "::endgroup::"
+
+          width=$(tail -1 claim-b-width.log | tr -dc '0-9')
+          if [ "$rc" -ne 0 ] || [ -z "$width" ]; then
+            echo "memu-core claim-B: NO_OBSERVATION — nothing was produced" \
+              | tee -a claim-b-summary.txt
+          elif [ "$width" = "384" ]; then
+            echo "memu-core claim-B: REAL (384) — production default reaches the real backend" \
+              | tee -a claim-b-summary.txt
+          elif [ "$width" = "8" ]; then
+            echo "memu-core claim-B: FAKE (8) — the service degraded despite the default" \
+              | tee -a claim-b-summary.txt
+          else
+            echo "memu-core claim-B: WRONG_DIMENSION ($width)" \
+              | tee -a claim-b-summary.txt
+          fi
+
+          echo "::group::memu-core startup log (corroboration)"
+          docker compose -f docker-compose.minimal.yml logs memu-core | tail -40
+          echo "::endgroup::"
+          docker compose -f docker-compose.minimal.yml down -v || true
+          exit 0
+
+      # ci-toleration: documented-skip
+      - name: Evidence summary
+        if: always()
+        run: |
+          echo "commit ${GITHUB_SHA}"
+          cat image-identity.txt 2>/dev/null || echo "(no image identity)"
+          echo
+          echo "CLAIM A — image capability:"
+          cat claim-a-summary.txt 2>/dev/null || echo "  (not executed = UNKNOWN)"
+          echo
+          echo "CLAIM B — production-default service path:"
+          cat claim-b-summary.txt 2>/dev/null || echo "  (not executed = UNKNOWN)"
+          echo
+          echo "A cannot satisfy B. Startup cannot satisfy semantic execution."
+          echo "Config cannot satisfy runtime proof. Vector width decides."
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: embedding-backend-evidence
+          path: |
+            image-identity.txt
+            claim-a-*.log
+            claim-a-summary.txt
+            claim-b-*.log
+            claim-b-summary.txt
+          if-no-files-found: warn
