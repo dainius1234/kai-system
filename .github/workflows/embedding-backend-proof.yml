@@ -109,29 +109,52 @@ jobs:
               continue
             fi
 
-            # Redirect to a file, then capture the PROBE's own status.
-            # `probe | tee` would yield tee's status (~always 0), turning
-            # a FAKE verdict into a PASS. That is the same defect family
-            # as a grep supplying a verdict, failing toward false
-            # confidence rather than false alarm.
-            docker run --rm --network none \
+            # R-VERDICT-INTEGRITY. Three separate ways this verdict
+            # could be destroyed between the probe and the record, and
+            # all three are defended here:
+            #
+            #   `probe | tee`  yields tee's status (~always 0), so FAKE
+            #                  would read as PASS;
+            #   `bash -e`      GitHub runs steps as `bash -e {0}`, so a
+            #                  DEFINED verdict of 3/4/5 would terminate
+            #                  the step before `rc=$?` ever executed and
+            #                  arrive as a generic job failure;
+            #   `timeout`      returns 124, which must never be mistaken
+            #                  for a verdict the probe produced.
+            #
+            # The `if` form captures the non-zero verdict while leaving
+            # -e active for everything else — no window in which an
+            # unrelated failure passes unnoticed.
+            producer=probe
+            if timeout 600 docker run --rm --network none \
               -v "$PWD/scripts/security/probe_embedding_backend.py:/probe.py:ro" \
               -e MEMU_ALLOW_FAKE_EMBEDDINGS= \
               "$image" python /probe.py "$svc" > "claim-a-$svc.log" 2>&1
-            rc=$?
+            then
+              rc=0
+            else
+              rc=$?
+            fi
+            if [ "$rc" -eq 124 ]; then producer=timeout-wrapper; fi
 
             echo "::group::Claim A — $svc (probe exit $rc)"
             cat "claim-a-$svc.log"
             echo "::endgroup::"
 
-            case $rc in
-              0) verdict=REAL ;;
-              3) verdict=FAKE ;;
-              4) verdict=WRONG_DIMENSION ;;
-              5) verdict=NO_OBSERVATION ;;
-              *) verdict="UNKNOWN(exit $rc)" ;;
-            esac
-            echo "$svc claim-A: $verdict" | tee -a claim-a-summary.txt
+            # A status is only a verdict if the PROBE produced it.
+            if [ "$producer" != "probe" ]; then
+              verdict="TIMEOUT_UNKNOWN"
+            else
+              case $rc in
+                0) verdict=REAL ;;
+                3) verdict=FAKE ;;
+                4) verdict=WRONG_DIMENSION ;;
+                5) verdict=NO_OBSERVATION ;;
+                *) verdict="UNEXPECTED_FAILURE(exit $rc)" ;;
+              esac
+            fi
+            echo "$svc claim-A: $verdict (producer=$producer, exit=$rc)" \
+              | tee -a claim-a-summary.txt
           done
           # Recorded, never converted into a pass. Every row is evidence
           # whatever it says; this job reports, it does not gate.
@@ -161,9 +184,9 @@ jobs:
         run: |
           # No MEMU_ALLOW_FAKE_EMBEDDINGS anywhere: compose must resolve
           # ${MEMU_ALLOW_FAKE_EMBEDDINGS:-false} from nothing.
-          docker compose -f docker-compose.minimal.yml up -d memu-core \
+          if docker compose -f docker-compose.minimal.yml up -d memu-core \
             > claim-b-bringup.log 2>&1
-          up_rc=$?
+          then up_rc=0; else up_rc=$?; fi
           echo "compose up exit: $up_rc"
 
           # Corroboration only — a resolved variable is not a vector.
@@ -176,17 +199,22 @@ jobs:
           # inside the running service container, under the environment
           # the service actually resolved. Written to a file first so the
           # exit status belongs to the measurement.
-          docker compose -f docker-compose.minimal.yml exec -T memu-core \
+          producer=application
+          if timeout 300 docker compose -f docker-compose.minimal.yml exec -T memu-core \
             python -c "import sys; sys.path.insert(0,'/app'); from app import generate_embedding; print(len(generate_embedding('claim B probe')))" \
             > claim-b-width.log 2>&1
-          rc=$?
+          then rc=0; else rc=$?; fi
+          if [ "$rc" -eq 124 ]; then producer=timeout-wrapper; fi
 
           echo "::group::Claim B — memu-core application path (exit $rc)"
           cat claim-b-width.log
           echo "::endgroup::"
 
           width=$(tail -1 claim-b-width.log | tr -dc '0-9')
-          if [ "$rc" -ne 0 ] || [ -z "$width" ]; then
+          if [ "$producer" != "application" ]; then
+            echo "memu-core claim-B: TIMEOUT_UNKNOWN (producer=$producer) — the wrapper stopped it, so nothing was measured" \
+              | tee -a claim-b-summary.txt
+          elif [ "$rc" -ne 0 ] || [ -z "$width" ]; then
             echo "memu-core claim-B: NO_OBSERVATION — nothing was produced" \
               | tee -a claim-b-summary.txt
           elif [ "$width" = "384" ]; then
