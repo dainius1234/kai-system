@@ -6,7 +6,28 @@
 git log over it — and then fix it, because a handover note that lies is
 worse than none.*
 
-**Last updated:** 2026-08-07, end of the embeddings stint.
+**Last updated:** 2026-08-11, end of the service-identity stint.
+
+**HELD WORKSTREAM — service identity.** Read
+`kai-pm/SERVICE_IDENTITY_STATE.md` before touching anything under
+`common/service_identity.py`, `common/service_auth.py`, the key map, or
+any `require_service_identity` endpoint. That file is authoritative for
+what is proven, what is not, why the work stopped, the restart trigger,
+the restart command, and what is **prohibited while held**. Summary so
+nobody has to open it to know whether they need to:
+
+* `/observe_turn` is route-proven and harness-proven, **not**
+  deployment-proven. 1 of 26 class-B endpoints derives a verified
+  caller; 25 remain on the shared token; 6 class-A stay there by design.
+* **Ed25519 feasibility in the real service images is UNKNOWN.** It
+  needs `make verify-identity-containers` on a Docker-daemon-capable
+  environment. This working environment has the CLI and no daemon.
+* The absence of a daemon is *not* evidence either way. It is the
+  absence of a measurement.
+* Bulk migration of the remaining 25 is **BLOCKED** until that run
+  exists.
+
+**Previous stint (2026-08-07, embeddings) below.**
 
 **Branch:** `claude/project-rework-plan-pgvp35`. **`main` is at
 `194db0a`** and has received none of this stint — everything below is on

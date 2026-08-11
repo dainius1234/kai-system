@@ -135,3 +135,74 @@ evidence of anything about the images.
 
 Only then does the bulk migration of the remaining 25 class-B endpoints
 become available, using `/observe_turn` as the template.
+
+---
+
+## 5. PROGRAMME HOLD — read this before touching identity
+
+This workstream is **held**, not in progress. Nobody is waiting at a
+keyboard for it. It is parked deliberately, and the conditions to
+restart it are written below so this does not decay into something
+somebody has to remember.
+
+### Why it stopped
+
+The only unresolved identity claim requires execution inside a
+Docker-daemon-capable environment. This working environment has the
+Docker CLI and no daemon, so **no valid runtime evidence for that
+boundary can be collected here today**.
+
+State the corollary plainly, because it is the easiest thing to get
+wrong: **the absence of a daemon is not evidence for or against
+deployment correctness.** It is the absence of a measurement. Nothing
+about the images, the mounts, the network or the container-to-container
+path is more or less likely because we could not look.
+
+### Restart trigger
+
+Availability of a Docker-daemon-capable environment — later hardware,
+**or another approved GitHub/runtime environment**.
+
+**Worth knowing before anyone waits for hardware:** this repository's
+own CI already satisfies that condition. `.github/workflows/core-tests.yml`
+runs on `ubuntu-latest` and executes `docker compose -f
+docker-compose.minimal.yml up -d --build` — the exact profile the
+identity slice is wired into. So the trigger is plausibly met *today*,
+subject to a decision to run the proof there. That is an operator call,
+not a licence to start: it changes where the proof runs, and running a
+security proof inside CI has its own questions (key material generated
+in a runner, secrets handling, what a green CI run is allowed to prove
+about a production host).
+
+### Restart command
+
+```
+make verify-identity-containers
+```
+
+### Result semantics
+
+| outcome | what it means |
+|---|---|
+| PASS | the deployment claim may be promoted; update the four records in §4 |
+| FAIL | identify the exact failing boundary **before** any remediation |
+| daemon unavailable / not executed | **UNKNOWN remains UNKNOWN** |
+
+### Prohibited while held
+
+Not stylistic preferences — each of these would change the evidence
+baseline the eventual proof is measured against:
+
+* **no opportunistic Category-B migration.** The remaining 25 stay on
+  the shared token. Migrating one without a proven deployment path
+  converts it from insecure-but-working to correctly-closed-and-broken.
+* **no trust-boundary redesign.** §3 of
+  `SERVICE_IDENTITY_TRUST_BOUNDARIES.md` records why there is no map
+  signature; revisiting that without new evidence is re-deciding a
+  settled question.
+* **no identity cleanup that changes the evidence baseline.** Tidying
+  the harness, the key map format, the wiring or the gates would mean
+  the thing eventually proven is not the thing measured here.
+
+Bug fixes that the gates *fail on* are exempt — a red gate is new
+evidence, and this hold is not a reason to leave a gate broken.
