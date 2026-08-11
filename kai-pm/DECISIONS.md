@@ -8778,3 +8778,81 @@ sensor holding a valid service key still submits fabricated readings,
 and the honest record is *this sensor said it* — which is why the Phase 0
 attribution rule exists. Per-source event signing is a separate control
 with a separate key and is not part of this work.
+
+---
+
+## D171 — 2026-08-08 — The Stub-Docker Harness Found a Real Defect Before Deployment
+
+**Status:** harness calibrated. Real-image feasibility still UNKNOWN.
+**Instrument:** `scripts/security/verify_identity_in_containers.sh`,
+proven by `scripts/test_container_proof_harness.py` (35 assertions).
+
+**Context.** `verify_identity_in_containers.sh` is the single experiment
+that can move Ed25519 real-image feasibility from UNKNOWN to PROVEN. It
+had been checked with `bash -n` and by compiling its embedded snippets.
+Neither exercises the control flow, and neither can show that a
+non-execution is incapable of reading as a pass.
+
+**The defect the harness test found, which is the reason this entry
+exists.** Step 3 asserted the key map is read-only by attempting a write
+and catching `PermissionError`:
+
+```python
+try:
+    open(os.environ['KAI_SERVICE_KEYMAP'], 'a')
+    raise SystemExit('key map is WRITABLE')
+except PermissionError:
+    print('   key map is read-only, as mounted')
+```
+
+Two independent faults, both measured rather than reasoned about:
+
+1. **A read-only bind mount raises `EROFS` (errno 30), not `EACCES`
+   (13).** `PermissionError` is `EACCES` only. So on a *correctly*
+   mounted container the write would raise an uncaught `OSError`, the
+   step would exit non-zero, and the harness would have reported FAILURE
+   — against a system that was right. The one run that resolves the
+   UNKNOWN would have been spent producing a false negative, and the
+   obvious reading of that failure would have been "the mount is
+   broken".
+
+2. **Under root a mode-0444 file is writable anyway**, so the check
+   proved nothing about permissions even when it did not crash.
+   Containers run as root by default.
+
+Both were found by driving the real script under a stub `docker`, in the
+first run of `scripts/test_container_proof_harness.py`. Neither `bash
+-n` nor snippet compilation could have found either: the first sees only
+shell syntax, the second only that the Python parses.
+
+**Fix.** Catch `OSError`, require `errno in (EROFS, EACCES)`, re-raise
+anything else, and treat a *successful* write as the failure. The stub
+now runs the container programs as an unprivileged uid, because under
+root the assertion is untestable.
+
+**Why this is kept rather than tidied away.** The instrument justified
+itself before it was ever used for its purpose. A harness that has only
+ever agreed with its author is a hypothesis; this one disagreed, and was
+right. That is the difference between calibration and ceremony, and it
+is I-8 paying for itself the first time it was applied to a shell
+script.
+
+**What the harness now proves** (35 assertions, stub docker, real
+embedded Python, real `check_identity` behind a fake `urlopen`):
+
+* a working stub drives PASS and exit 0;
+* build failure, never-healthy service, malformed embedded Python,
+  non-contract response, and a receiver that verifies NOTHING each drive
+  FAIL and exit 1;
+* absent daemon and absent `docker` binary each exit 2 with UNKNOWN, and
+  the string `PROVEN` appears in none of the failure paths;
+* the health-wait override changes duration only — it appears in exactly
+  two defaults and two wait loops, and in no check, expectation or exit
+  path.
+
+**What it does NOT prove, and must not be read as proving:** anything
+about the real images. The containers and the network are simulated.
+
+    Ed25519 real-image feasibility = UNKNOWN
+    /observe_turn = route-proven and harness-proven, NOT deployment-proven
+    class-B on verified identity = 1 / 26

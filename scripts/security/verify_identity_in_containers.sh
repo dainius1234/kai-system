@@ -26,6 +26,13 @@ KEYS="secrets/service-identity"
 PASS=0
 FAIL=0
 
+# Overridable so the harness can be exercised against a stub docker
+# without waiting a real minute per failure path. Defaults are the real
+# ones; a test that had to change the timing it is testing would be
+# testing something else.
+HEALTH_TRIES="${HEALTH_TRIES:-30}"
+HEALTH_SLEEP="${HEALTH_SLEEP:-2}"
+
 check() {                       # check <label> <expected> <actual>
   if [ "$2" = "$3" ]; then
     PASS=$((PASS + 1)); printf '  ok    %s\n' "$1"
@@ -99,20 +106,34 @@ print('   key map:', len(km), 'key(s), identities', km.identities())
 assert 'agentic' in km.identities()
 assert km.granted('cortex_observe_turn', 'agentic')
 assert not km.granted('cortex_observe_turn', 'cortex')
+import errno
+# The MOUNT must refuse the write, not merely the file mode. A read-only
+# bind mount raises EROFS (errno 30); an unwritable mode raises EACCES
+# (13). Catching only PermissionError misses EROFS entirely, so this
+# check would have CRASHED on a correctly mounted container -- found by
+# driving the harness against a stub docker before spending the real
+# run. And mode alone proves nothing: root writes 0444 files happily,
+# which is exactly what containers run as by default.
 try:
-    open(os.environ['KAI_SERVICE_KEYMAP'], 'a'); raise SystemExit('key map is WRITABLE')
-except PermissionError:
-    print('   key map is read-only, as mounted')
+    with open(os.environ['KAI_SERVICE_KEYMAP'], 'a'):
+        pass
+    raise SystemExit('key map is WRITABLE from inside the container — the '
+                     'mount is not read-only')
+except OSError as exc:
+    if exc.errno not in (errno.EROFS, errno.EACCES):
+        raise
+    print('   key map refuses writes:',
+          'read-only mount' if exc.errno == errno.EROFS else 'permissions')
 "
 check "cortex's key map loads, grants agentic, and is read-only" 0 $?
 
 echo
 echo "── 4. the service starts and serves ──"
 docker compose -f "$COMPOSE_FILE" --profile "$PROFILE" up -d cortex
-for _ in $(seq 1 30); do
+for _ in $(seq 1 "$HEALTH_TRIES"); do
   state=$(docker inspect -f '{{.State.Health.Status}}' kai-cortex 2>/dev/null || echo starting)
   [ "$state" = "healthy" ] && break
-  sleep 2
+  sleep "$HEALTH_SLEEP"
 done
 check "cortex reaches healthy with identity wiring present" "healthy" "$state"
 
@@ -224,10 +245,10 @@ check "the same signed request succeeds ONCE, then is refused as a replay" 0 $?
 echo
 echo "── 7. the replay cache survives restart ──"
 docker compose -f "$COMPOSE_FILE" --profile "$PROFILE" restart cortex
-for _ in $(seq 1 30); do
+for _ in $(seq 1 "$HEALTH_TRIES"); do
   state=$(docker inspect -f '{{.State.Health.Status}}' kai-cortex 2>/dev/null || echo starting)
   [ "$state" = "healthy" ] && break
-  sleep 2
+  sleep "$HEALTH_SLEEP"
 done
 check "cortex is healthy again after restart" "healthy" "$state"
 docker compose -f "$COMPOSE_FILE" --profile "$PROFILE" run --rm -T agentic python -c "
