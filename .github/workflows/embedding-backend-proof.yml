@@ -92,57 +92,85 @@ jobs:
           docker compose -f docker-compose.full.yml build fusion-engine
 
       # ci-toleration: documented-skip
-      - name: Record image identity
+      - name: 'Diagnose image resolution (recorded, not inferred)'
         run: |
-          # Local image ID / content hash. A registry RepoDigest does not
-          # exist for a locally built image, and requiring one would fail
-          # this step for a reason unrelated to what it measures.
-          {
-            echo "commit: ${GITHUB_SHA}"
-            for svc in memu-core agentic fusion-engine; do
-              file=docker-compose.minimal.yml
-              [ "$svc" = "fusion-engine" ] && file=docker-compose.full.yml
-              image=$(docker compose -f "$file" images -q "$svc" 2>/dev/null || true)
-              echo "$svc image id: ${image:-UNKNOWN}"
-            done
-          } | tee image-identity.txt
+          # Run #1 resolved NO image ids and silently skipped all three
+          # Claim-A probes. Cause, read from the command's own help text
+          # rather than guessed: `docker compose images` lists "images
+          # used by the CREATED CONTAINERS". At Claim-A time the images
+          # were built and no container existed, so it correctly returned
+          # nothing. A container-scoped listing was used to resolve a
+          # build-scoped artefact -- an instrument whose scope was
+          # narrower than the question.
+          #
+          # Printed so the next reader sees the evidence rather than
+          # trusting this comment.
+          echo "::group::docker compose images (container-scoped)"
+          docker compose -f docker-compose.minimal.yml images || true
+          echo "::endgroup::"
+          echo "::group::docker compose config --images (build-scoped)"
+          docker compose -f docker-compose.minimal.yml config --images || true
+          docker compose -f docker-compose.full.yml config --images || true
+          echo "::endgroup::"
 
       # ── CLAIM A ──────────────────────────────────────────────────────
-      # The probe is mounted into the image because `scripts/` is not
-      # copied in. `docker run` on the image ID is used rather than
-      # `docker compose run` so that NO compose environment can reach it:
-      # this step measures the image, nothing else.
-      # ci-toleration: documented-skip
+      # Identity now comes from the container COMPOSE ITSELF CREATES, so
+      # the evidence is tied to the image Compose would run rather than
+      # to a listing convenience command. `docker run` on that immutable
+      # ID keeps compose's environment away from the measurement.
       - name: 'Claim A — does the semantic operation execute in each image?'
         id: claim_a
         run: |
-          fail=0
+          resolve_image() {            # resolve_image <compose-file> <service>
+            # Create without starting and without pulling in dependencies,
+            # then read the immutable image ID off the container.
+            docker compose -f "$1" create --no-deps "$2" >/dev/null 2>&1 || true
+            cid=$(docker compose -f "$1" ps -aq "$2" 2>/dev/null | head -1)
+            if [ -n "$cid" ]; then
+              docker inspect --format '{{.Image}}' "$cid" 2>/dev/null && return 0
+            fi
+            # Fallback: the image NAME compose declares, resolved to its ID.
+            name=$(docker compose -f "$1" config --images "$2" 2>/dev/null | head -1)
+            [ -n "$name" ] && docker image inspect -f '{{.Id}}' "$name" 2>/dev/null
+          }
+
+          # CALIBRATION, in the run itself. A service that does not exist
+          # must resolve to nothing -- otherwise "resolved" would mean
+          # nothing at all.
+          absent=$(resolve_image docker-compose.minimal.yml no-such-service-xyz || true)
+          if [ -n "$absent" ]; then
+            echo "REFUSING: a nonexistent service resolved to '$absent'."
+            echo "The resolver cannot distinguish present from absent, so"
+            echo "no Claim-A verdict from it would mean anything."
+            exit 1
+          fi
+          echo "calibration: a nonexistent service resolves to nothing — ok"
+
+          verdicts=0
+          : > claim-a-summary.txt
+          : > image-identity.txt
+          echo "commit: ${GITHUB_SHA}" >> image-identity.txt
+
           for svc in memu-core agentic fusion-engine; do
             file=docker-compose.minimal.yml
             [ "$svc" = "fusion-engine" ] && file=docker-compose.full.yml
-            image=$(docker compose -f "$file" images -q "$svc" 2>/dev/null || true)
+            image=$(resolve_image "$file" "$svc" || true)
+            echo "$svc image id: ${image:-UNRESOLVED}" >> image-identity.txt
+
             if [ -z "$image" ]; then
-              echo "$svc: UNKNOWN — no image id; not executed, so not a pass"
-              fail=1
+              # Recorded as a verdict, not skipped. Run #1 skipped, and a
+              # skip is indistinguishable from a pass in a summary.
+              echo "$svc claim-A: UNKNOWN (image unresolved — not executed)" \
+                | tee -a claim-a-summary.txt
               continue
             fi
 
-            # R-VERDICT-INTEGRITY. Three separate ways this verdict
-            # could be destroyed between the probe and the record, and
-            # all three are defended here:
-            #
-            #   `probe | tee`  yields tee's status (~always 0), so FAKE
-            #                  would read as PASS;
-            #   `bash -e`      GitHub runs steps as `bash -e {0}`, so a
-            #                  DEFINED verdict of 3/4/5 would terminate
-            #                  the step before `rc=$?` ever executed and
-            #                  arrive as a generic job failure;
-            #   `timeout`      returns 124, which must never be mistaken
-            #                  for a verdict the probe produced.
-            #
-            # The `if` form captures the non-zero verdict while leaving
-            # -e active for everything else — no window in which an
-            # unrelated failure passes unnoticed.
+            # R-VERDICT-INTEGRITY. `probe | tee` yields tee's status
+            # (~always 0), so FAKE would read as PASS. GitHub runs steps
+            # as `bash -e {0}`, so a DEFINED verdict of 3/4/5 would kill
+            # the step before `rc=$?` ran and arrive as a generic
+            # failure. `timeout` returns 124, which is never a verdict
+            # the probe produced. All three are defended here.
             producer=probe
             if timeout 600 docker run --rm --network none \
               -v "$PWD/scripts/security/probe_embedding_backend.py:/probe.py:ro" \
@@ -153,13 +181,12 @@ jobs:
             else
               rc=$?
             fi
-            if [ "$rc" -eq 124 ]; then producer=timeout-wrapper; fi
+            [ "$rc" -eq 124 ] && producer=timeout-wrapper
 
-            echo "::group::Claim A — $svc (probe exit $rc)"
+            echo "::group::Claim A — $svc (exit $rc, producer=$producer)"
             cat "claim-a-$svc.log"
             echo "::endgroup::"
 
-            # A status is only a verdict if the PROBE produced it.
             if [ "$producer" != "probe" ]; then
               verdict="TIMEOUT_UNKNOWN"
             else
@@ -170,13 +197,25 @@ jobs:
                 5) verdict=NO_OBSERVATION ;;
                 *) verdict="UNEXPECTED_FAILURE(exit $rc)" ;;
               esac
+              verdicts=$((verdicts + 1))
             fi
-            echo "$svc claim-A: $verdict (producer=$producer, exit=$rc)" \
+            echo "$svc claim-A: $verdict (producer=$producer, exit=$rc, image=${image:0:19})" \
               | tee -a claim-a-summary.txt
           done
-          # Recorded, never converted into a pass. Every row is evidence
-          # whatever it says; this job reports, it does not gate.
-          exit 0
+
+          # EVIDENCE COMPLETENESS. A collector that runs cleanly while
+          # interrogating nothing is the failure of run #1, and it read
+          # as a green tick. PROBE EXECUTION -- not loop iteration --
+          # creates a Claim-A verdict, so this fails when the denominator
+          # was not actually interrogated.
+          echo "claim-A probes that produced a verdict: $verdicts of 3" \
+            | tee -a claim-a-summary.txt
+          if [ "$verdicts" -lt 3 ]; then
+            echo "EVIDENCE INCOMPLETE: only $verdicts of 3 Claim-A probes ran."
+            echo "Recorded as UNKNOWN, and failing so a green tick cannot"
+            echo "be read as 'all claims proven'."
+            exit 1
+          fi
 
       # ── CLAIM B ──────────────────────────────────────────────────────
       # ci-toleration: documented-skip
@@ -265,8 +304,25 @@ jobs:
           echo "CLAIM B — production-default service path:"
           cat claim-b-summary.txt 2>/dev/null || echo "  (not executed = UNKNOWN)"
           echo
-          echo "A cannot satisfy B. Startup cannot satisfy semantic execution."
-          echo "Config cannot satisfy runtime proof. Vector width decides."
+          echo
+          # WORKFLOW STATUS IS NOT EVIDENCE STATUS. Run #1 completed
+          # successfully while three intended measurements never ran, and
+          # the green tick said nothing about that. These are reported as
+          # two different things so a tick can never be read as "all
+          # embedding claims passed".
+          a_ok=$(grep -c 'claim-A: \(REAL\|FAKE\|WRONG_DIMENSION\|NO_OBSERVATION\)' \
+                   claim-a-summary.txt 2>/dev/null || echo 0)
+          b_ok=$(grep -c 'claim-B:' claim-b-summary.txt 2>/dev/null || echo 0)
+          echo "workflow execution:  SUCCESS (the collector ran)"
+          echo "Claim A evidence:    $a_ok of 3 services interrogated" \
+               "$([ "$a_ok" -ge 3 ] && echo '(COMPLETE)' || echo '(INCOMPLETE — the rest are UNKNOWN)')"
+          echo "Claim B evidence:    $([ "$b_ok" -ge 1 ] && echo 'COMPLETE' || echo 'INCOMPLETE — UNKNOWN')"
+          echo
+          echo "A cannot satisfy B. B may entail A where B exercises the same"
+          echo "image capability. Probe EXECUTION, not loop iteration, creates"
+          echo "a Claim-A verdict. Missing observation = UNKNOWN. Infrastructure"
+          echo "failure is not embedding failure. Vector width decides; logs"
+          echo "corroborate."
 
       - uses: actions/upload-artifact@v4
         if: always()

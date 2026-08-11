@@ -86,15 +86,17 @@ class Toleration:
 DECLARED: Tuple[Toleration, ...] = (
     Toleration(
         workflow="embedding-backend-proof.yml",
-        step="Record image identity",
+        step="Diagnose image resolution (recorded, not inferred)",
         bucket=DOCUMENTED_SKIP,
-        reason="`docker compose images -q` returns empty rather than "
-               "failing when a service has no built image. The empty case "
-               "is PRINTED as `UNKNOWN`, and every consumer of that value "
-               "treats UNKNOWN as not-executed rather than as a pass, so "
-               "the suppression cannot manufacture a green result. "
-               "Retire when this job is promoted from evidence collection "
-               "to a gate.",
+        reason="Pure diagnosis. It prints what `docker compose images` "
+               "and `config --images` each return, so the reason run #1 "
+               "resolved nothing is visible as evidence rather than as a "
+               "claim in a comment. Neither command is allowed to decide "
+               "anything -- Claim A resolves identity from the container "
+               "Compose creates, and records UNKNOWN when that fails. A "
+               "diagnostic that could fail the build would hide the "
+               "measurement it exists to explain. Retire once the "
+               "resolution path has been stable across several runs.",
         owner="orion",
         review_by="2026-11-01",
     ),
@@ -102,13 +104,14 @@ DECLARED: Tuple[Toleration, ...] = (
         workflow="embedding-backend-proof.yml",
         step="Claim A — does the semantic operation execute in each image?",
         bucket=DOCUMENTED_SKIP,
-        reason="Same empty-image-id case, and the step ends `exit 0` on "
-               "purpose: this job COLLECTS EVIDENCE and does not gate. A "
-               "FAKE or NO_OBSERVATION verdict is a finding to report, not "
-               "a build to break, and the probe's own exit status is "
-               "captured into a variable BEFORE any inspection so the "
-               "verdict always comes from the probe. Retire when the "
-               "class-level remediation lands and this becomes a gate.",
+        reason="A FAKE or NO_OBSERVATION verdict is a finding to report "
+               "rather than a build to break, and the probe's own exit "
+               "status is captured with the conditional form so the "
+               "verdict always comes from the probe. The step DOES fail "
+               "when fewer than three probes produced a verdict, because "
+               "run #1 completed cleanly having interrogated nothing and "
+               "that read as a green tick. Retire when the class-level "
+               "remediation lands and this becomes a gate.",
         owner="orion",
         review_by="2026-11-01",
     ),

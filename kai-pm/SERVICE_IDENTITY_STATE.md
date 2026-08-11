@@ -206,3 +206,23 @@ baseline the eventual proof is measured against:
 
 Bug fixes that the gates *fail on* are exempt — a red gate is new
 evidence, and this hold is not a reason to leave a gate broken.
+
+---
+
+## 6. Unrelated but recorded here so it is not lost: #47 run 1
+
+`memu-core`'s production embedding default is **deployment-proven in
+CI**, at commit `da566df` / tree `acb60b4`, run 31528178414:
+
+```
+MEMU_ALLOW_FAKE_EMBEDDINGS absent at the environment boundary
+  -> compose resolved ${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}
+  -> normal memu-core startup
+  -> sentence-transformers loaded, model=all-MiniLM-L6-v2, dim=384, 8.8s
+  -> the APPLICATION produced a 384-wide vector
+```
+
+Scoped to that CI evidence boundary and no wider: it is not a claim
+about a production host.
+
+The full record lives in `kai-pm/EMBEDDING_BACKEND_STATE.md`.
