@@ -46,6 +46,13 @@ on:
     paths:
       - .github/workflows/embedding-backend-proof.yml
       - scripts/security/probe_embedding_backend.py
+      # The collector was missing here, and commit 924a600 -- which
+      # repaired the resolver that had filed memu-core's image under
+      # fusion-engine's name -- fired NOTHING. A repair that cannot
+      # execute is indistinguishable from no repair, and the branch
+      # looked fixed. The list is the job's inputs; every input belongs
+      # in it.
+      - scripts/security/collect_embedding_evidence.sh
 
 permissions:
   contents: read

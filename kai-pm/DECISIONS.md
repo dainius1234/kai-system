@@ -9031,3 +9031,42 @@ sentence claimed.
 
 **Standing:** no embedding remediation until all three services have a
 runtime verdict. Currently 1 of 3.
+
+---
+
+## D174 — 2026-08-12 — The Repair Was Committed and Could Not Run
+
+`924a600` repaired the resolver that had filed memu-core's image under
+fusion-engine's name. It fired **no CI run at all**.
+
+The job's `push` trigger carries a literal `paths:` filter naming the
+workflow and the probe. `scripts/security/collect_embedding_evidence.sh`
+— the collector that does the entire measurement, and the only file the
+repair touched — was not in it. So the branch carried a fix that had
+never executed, and nothing said so.
+
+**"Presence is not effect", fourth instance.** A config var set but not
+consumed; a dependency declared but not installed; a workflow file in Git
+but not a registered dispatch target; and now **an input the trigger
+cannot see**. The file is committed, correct and inert.
+
+**Decided.** The collector is added to the filter. The list is the job's
+inputs; every input belongs in it.
+
+**A near-miss worth more than the fix.** Measuring the population first,
+a literal string comparison reported that `policy-checks.yml` omitted
+**31** of its own gate scripts. It does not. It uses the glob
+`scripts/security/**`, which covers all of them. My check did not handle
+globs, so it would have sent someone to "fix" 31 correct entries — an
+uncalibrated rule producing findings against a tree that is already
+right, which is the exact defect R4 step 4 exists to prevent, and which
+this programme has produced twice before (100+ findings for 1 defect; 69
+findings against a correct tree).
+
+Caught because the count was checked against the file before acting on
+it. **Real population: 1.**
+
+No detector is shipped for this class today. Building one needs
+glob-aware matching and a calibration run with a known-positive and a
+known-negative, and doing that carelessly is worse than not doing it.
+Registered rather than improvised.
