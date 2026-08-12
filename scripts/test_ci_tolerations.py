@@ -31,7 +31,7 @@ from scripts.security import check_ci_tolerations as ci  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 17
+EXPECTED_SCENARIOS = 20
 executed: list[str] = []
 
 
@@ -264,6 +264,57 @@ def test_a_workflow_with_no_jobs_is_reported() -> None:
     check("reported", any("runs nothing" in f for f in found), str(found))
 
 
+# ── Declarations that point at nothing ───────────────────────────────
+#
+# The drift check compares `(workflow, bucket)` pairs, so a declaration
+# naming a renamed or deleted step stayed "matched" behind any other
+# marker in the same file carrying the same bucket. Restructuring
+# `embedding-backend-proof.yml` into one collector per service created
+# exactly two of those, and the pair-wise check reported neither.
+
+def _declarations_against(files: dict, declared):
+    original_workflows, original_declared = ci.WORKFLOWS, ci.DECLARED
+    ci.WORKFLOWS = with_workflows(files)
+    ci.DECLARED = declared
+    try:
+        return ci.orphan_declarations()
+    finally:
+        ci.WORKFLOWS, ci.DECLARED = original_workflows, original_declared
+
+
+def _toleration(step: str):
+    return ci.Toleration(workflow="a.yml", step=step,
+                         bucket=ci.DOCUMENTED_SKIP, reason="test",
+                         owner="test", review_by="2099-01-01")
+
+
+def test_a_declaration_naming_a_missing_step_is_reported() -> None:
+    """Known-positive: the injected defect must fire."""
+    scenario("orphan declaration reported")
+    found = _declarations_against(
+        {"a.yml": VALID}, (_toleration("A Step That Was Deleted"),))
+    check("reported", len(found) == 1, str(found))
+    check("names the step",
+          found and "A Step That Was Deleted" in found[0], str(found))
+
+
+def test_a_declaration_naming_a_live_step_is_not_reported() -> None:
+    """Known-negative: the correct case must stay silent, or the gate
+    sends people to delete tolerations that are doing their job."""
+    scenario("live declaration not reported")
+    check("silent", _declarations_against({"a.yml": VALID},
+                                          (_toleration("Step"),)) == [],
+          "a declaration matching a real step was reported")
+
+
+def test_the_real_declarations_all_name_a_live_step() -> None:
+    """The expected answer comes from the workflow files, not from the
+    declaration list being checked."""
+    scenario("real declarations all live")
+    check("none orphaned", ci.orphan_declarations() == [],
+          str(ci.orphan_declarations()))
+
+
 def test_the_real_workflows_are_schema_valid_today() -> None:
     scenario("repository workflows valid")
     check("no schema violations", ci.unparseable() == [],
@@ -276,6 +327,9 @@ def run_all() -> None:
     test_a_job_with_no_runs_on_is_reported()
     test_a_workflow_with_no_jobs_is_reported()
     test_the_real_workflows_are_schema_valid_today()
+    test_a_declaration_naming_a_missing_step_is_reported()
+    test_a_declaration_naming_a_live_step_is_not_reported()
+    test_the_real_declarations_all_name_a_live_step()
     test_a_swallowed_exit_code_is_found()
     test_continue_on_error_is_found()
     test_install_tolerance_is_not_a_suppression()

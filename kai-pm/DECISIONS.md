@@ -8856,3 +8856,90 @@ about the real images. The containers and the network are simulated.
     Ed25519 real-image feasibility = UNKNOWN
     /observe_turn = route-proven and harness-proven, NOT deployment-proven
     class-B on verified identity = 1 / 26
+
+---
+
+## D172 — 2026-08-12 — One Measurement Deleted Another, and the Resolver Destroyed the Evidence It Existed to Gather
+
+**Context.** #47's isolated CI job, run 2 (`31531007344`, commit
+`757d955`, tree `0d5fe1a`). It proved memu-core's Claim A REAL — image
+`sha256:b5e68a3…`, sentence-transformers 5.7.0, 3 of 3 stages, width
+384, executed with `--network none` — and produced **no evidence at all**
+for agentic or fusion-engine. Run 1 had proved memu-core's Claim B.
+
+Both gaps were the instrument. Neither was the subject.
+
+**Defect 1 — a verdict about one claim suppressed an independent claim.**
+Claim A was one step looping over three services. It failed itself when
+its own evidence was incomplete; GitHub then skipped Claim B entirely.
+An image-capability measurement deleted a service-path measurement that
+had nothing to do with it, and run 2's Claim B row is missing for that
+reason and no other.
+
+The operator's ruling, adopted as standing:
+
+> A measurement verdict may affect its own claim. It may never suppress
+> an independent measurement.
+
+**Defect 2 — the resolver sent its own evidence to `/dev/null`.** Every
+resolution attempt discarded stdout, stderr and exit status and returned
+a single string; an empty string collapsed the chain to `UNRESOLVED`. So
+run 2 cannot say whether agentic failed at container creation, at the id
+lookup or at inspect. The instrument built to gather evidence destroyed
+the only evidence that mattered when it failed. That is R8 and §3.5 in
+one place: diagnostics are the least-executed code, so they are where
+this lands.
+
+**Decided.**
+
+1. **One collector per service, each its own step.** A collector exits 0
+   for every *defined* probe verdict and non-zero **only** on instrument
+   malfunction. A probe proving the semantic backend absent is a
+   successful measurement of a failed capability, and must not stop the
+   next measurement.
+2. **Two axes, recorded separately.** `measurement` (COMPLETE /
+   INCOMPLETE / INSTRUMENT_ERROR) answers *did we look?*; `claim_verdict`
+   (REAL / FAKE / WRONG_DIMENSION / NO_OBSERVATION / TIMEOUT_UNKNOWN /
+   UNKNOWN) answers *what was there?* Collapsed, "we could not look" and
+   "we looked and it was absent" produce the same number.
+3. **Every resolution stage is observable** — command, stdout, stderr,
+   exit status — so an empty result is a classified stage outcome rather
+   than silence.
+4. **Completeness is judged once, last.** `Evidence summary` is the only
+   step that decides whether the evidence *set* is complete. It sits
+   after every measurement and before an `if: always()` upload, so
+   failing it suppresses nothing. Its verdict is about the evidence set,
+   never about what the evidence says: a FAKE result passes it, an
+   unresolved image does not.
+
+**Not decided, deliberately.** fusion-engine built successfully in run 2
+and `config --images` still exposed no image name for it. **"Behind a
+profile" is a hypothesis and is not recorded as the cause.** The
+collector will report the failing stage in run 3; the cause gets written
+down then, from evidence.
+
+**Two defects found while repairing this, both in the instrument:**
+
+* `grep -c` **exits 1 on zero matches and still prints `0`**, so
+  `$(grep -c … || echo 0)` yields `"0\n0"` and the comparison after it
+  dies with a syntax error. A completeness verdict was one empty file
+  away from being decided by an arithmetic accident — the same mechanism
+  that made a background wrapper report FAIL over a green chain on
+  2026-08-10.
+* `check_ci_tolerations.py` claimed to catch drift between the record and
+  the workflows, and compared **`(workflow, bucket)` pairs**. A
+  declaration naming a renamed or deleted step stayed "matched" behind
+  any other marker in the same file carrying the same bucket. Drift is a
+  claim about *steps* and was being tested at the granularity of
+  *buckets* — R5, a check whose scope is smaller than its name implies.
+  Restructuring this workflow left exactly two such orphans and the gate
+  reported neither.
+
+  Now checked per step, calibrated in the same run: the new check
+  reported those two and none of the other sixteen, and the expected
+  answer came from the workflow files rather than from the declaration
+  list under test. A known-positive and a known-negative are asserted in
+  `scripts/test_ci_tolerations.py`.
+
+**Status.** Runtime denominator: 1 of 3 services measured. No
+remediation of any embedding backend until run 3 closes the other two.

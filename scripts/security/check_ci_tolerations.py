@@ -84,34 +84,53 @@ class Toleration:
 
 
 DECLARED: Tuple[Toleration, ...] = (
+    # One declaration per service, because the match is on the step name
+    # and there is now one INDEPENDENT collector step per service. They
+    # replace two earlier declarations — a separate "Diagnose image
+    # resolution" step, and a single Claim A step that looped over all
+    # three services. The loop was the defect: run #2 failed that one
+    # step when its evidence was incomplete, and GitHub then SKIPPED
+    # Claim B. One measurement suppressed an independent one.
     Toleration(
         workflow="embedding-backend-proof.yml",
-        step="Diagnose image resolution (recorded, not inferred)",
+        step="Claim A — memu-core",
         bucket=DOCUMENTED_SKIP,
-        reason="Pure diagnosis. It prints what `docker compose images` "
-               "and `config --images` each return, so the reason run #1 "
-               "resolved nothing is visible as evidence rather than as a "
-               "claim in a comment. Neither command is allowed to decide "
-               "anything -- Claim A resolves identity from the container "
-               "Compose creates, and records UNKNOWN when that fails. A "
-               "diagnostic that could fail the build would hide the "
-               "measurement it exists to explain. Retire once the "
-               "resolution path has been stable across several runs.",
+        reason="The collector exits 0 for every DEFINED probe verdict and "
+               "non-zero ONLY on instrument malfunction, so this step "
+               "cannot fail on a finding. That is deliberate: a probe "
+               "proving the semantic backend absent is a SUCCESSFUL "
+               "MEASUREMENT of a FAILED capability, and failing here "
+               "would let one service's negative result skip the "
+               "independent measurements after it. Completeness is judged "
+               "once, last, by `Evidence summary`. Retire when the "
+               "class-level remediation lands and this becomes a gate.",
         owner="orion",
         review_by="2026-11-01",
     ),
     Toleration(
         workflow="embedding-backend-proof.yml",
-        step="Claim A — does the semantic operation execute in each image?",
+        step="Claim A — agentic",
         bucket=DOCUMENTED_SKIP,
-        reason="A FAKE or NO_OBSERVATION verdict is a finding to report "
-               "rather than a build to break, and the probe's own exit "
-               "status is captured with the conditional form so the "
-               "verdict always comes from the probe. The step DOES fail "
-               "when fewer than three probes produced a verdict, because "
-               "run #1 completed cleanly having interrogated nothing and "
-               "that read as a green tick. Retire when the class-level "
-               "remediation lands and this becomes a gate.",
+        reason="Same collector, same argument as memu-core, declared "
+               "separately because the match is on the step name and each "
+               "differently-named step is its own decision. agentic is "
+               "the service whose Claim A was UNRESOLVED in run #2 with "
+               "the failing stage unknowable, so this row existing at all "
+               "is the point of the restructure.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="embedding-backend-proof.yml",
+        step="Claim A — fusion-engine",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same collector, same argument, declared separately for "
+               "the same reason. fusion-engine built successfully in run "
+               "#2 and `config --images` still exposed no image name for "
+               "it; the cause is NOT yet measured, so nothing here names "
+               "one. The collector records each resolution stage's "
+               "command, stdout, stderr and exit status so the next run "
+               "answers that from evidence.",
         owner="orion",
         review_by="2026-11-01",
     ),
@@ -133,12 +152,20 @@ DECLARED: Tuple[Toleration, ...] = (
         workflow="embedding-backend-proof.yml",
         step="Evidence summary",
         bucket=DOCUMENTED_SKIP,
-        reason="Each `cat ... || echo` prints an explicit `(not executed = "
-               "UNKNOWN)` when a result file is absent. That is the "
-               "I-1 behaviour this programme requires: a missing "
-               "measurement must read as UNKNOWN, never as silence and "
-               "never as success. Failing the step instead would hide the "
-               "other rows that DID produce evidence.",
+        reason="The declared item is the two `cat ... || echo` fallbacks, "
+               "which print an explicit `(not executed = UNKNOWN)` when a "
+               "result file is absent. That is the I-1 behaviour this "
+               "programme requires: a missing measurement must read as "
+               "UNKNOWN, never as silence and never as success. The step "
+               "itself is NOT tolerant — it is the job's only "
+               "completeness judgement and exits 1 when fewer than three "
+               "Claim-A measurements or no Claim-B measurement exist. It "
+               "can do that safely only because it is last and the "
+               "artifact upload after it runs `if: always()`, so failing "
+               "here suppresses nothing. The verdict is about whether the "
+               "EVIDENCE SET is complete, never about what the evidence "
+               "says: a FAKE result passes it, an unresolved image does "
+               "not.",
         owner="orion",
         review_by="2026-11-01",
     ),
@@ -446,6 +473,47 @@ def undeclared_warnings() -> List[str]:
     return out
 
 
+def orphan_declarations() -> List[str]:
+    """Declarations naming a step that exists in no workflow.
+
+    The drift check below it compares `(workflow, bucket)` pairs, so a
+    declaration could name a step that had been renamed or deleted and
+    still be counted as matched by some *other* marker in the same file
+    carrying the same bucket. That is R5 in its usual shape: a check
+    whose scope is smaller than its name implies. "The record and the
+    file have drifted apart" is a claim about STEPS, and it was being
+    tested at the granularity of BUCKETS.
+
+    Calibrated when this was written: restructuring
+    `embedding-backend-proof.yml` into one collector per service left
+    exactly two declarations pointing at steps that no longer existed —
+    a deleted `Diagnose image resolution` and a `Claim A` step that had
+    looped over all three services. This function reported those two and
+    none of the other sixteen. Known-positive and known-negative from the
+    same run, and the expected answer came from the workflow files rather
+    than from this list.
+    """
+    import yaml
+    live: dict = {}
+    for path in sorted(WORKFLOWS.glob("*.yml")):
+        try:
+            doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        except Exception:
+            continue            # `unparseable()` owns that finding
+        names = []
+        for job in (doc.get("jobs") or {}).values():
+            for step in ((job or {}).get("steps") or []):
+                names.append((step or {}).get("name") or "")
+        live[path.name] = names
+    out = []
+    for d in DECLARED:
+        if not any(d.step in name for name in live.get(d.workflow, [])):
+            out.append(f"{d.workflow}: '{d.step}' is declared but no step "
+                       f"of that name exists. A toleration for a step that "
+                       f"is gone reads as coverage nobody has.")
+    return out
+
+
 def unparseable() -> List[str]:
     """Workflows a YAML parser rejects.
 
@@ -553,6 +621,7 @@ def main() -> int:
     declared_pairs = {(d.workflow, d.bucket) for d in DECLARED}
     orphan_markers = [f"{w}: {b}" for w, b in marked
                       if (w, b) not in declared_pairs]
+    orphan_steps = orphan_declarations()
     stale = unmarked
 
     print(inspected(scanned, "workflow lines",
@@ -598,6 +667,16 @@ def main() -> int:
               f"declaration:\n")
         for line in orphan_markers:
             print(f"  - {line}")
+        return 1
+
+    if orphan_steps:
+        print(f"\nFAIL: {len(orphan_steps)} declaration(s) name a step that "
+              f"does not exist:\n")
+        for line in orphan_steps:
+            print(f"  - {line}")
+        print("\n  Drift is a claim about steps. Checking it per bucket "
+              "would let a\n  renamed or deleted step keep its toleration "
+              "alive behind another one.")
         return 1
 
     if stale:
