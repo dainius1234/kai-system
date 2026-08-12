@@ -9715,3 +9715,86 @@ activation the chosen profile's consequential members must be checked
 against the P0 profile-security gate — if `KAI-GATE-046` materially
 intersects it, stop and report. `recovery` remains the leading candidate,
 not a conclusion.
+
+---
+
+## D181 — 2026-08-12 — Deployed Run 1: I Cut Off My Own Evidence, Again
+
+Run `31605138566`, commit `fa97b63`. The job reported **success**. It
+established **nothing about the system**.
+
+### Classification, in the order the operator fixed in advance
+
+```
+instrument/environment failure   <-- THIS RUN
+actual default-core defect        -- NOT established
+#53 deployed manifestation        -- NOT established
+successful bounded degradation    -- NOT established
+```
+
+`#53` therefore receives **no severity**. Deployed graceful-degradation
+behaviour remains **PARTIALLY UNKNOWN**, exactly as before the run.
+
+### What happened
+
+`compose up -d --build` exited **1**. The stack never came up, so all 25
+ground-truth probes, all 25 caller probes and every health inspection
+returned `service "dashboard" is not running` or
+`invalid container name or ID: value is empty`. Every row of the evidence
+table was empty — and the table's own shape looked complete.
+
+**And the cause is unreadable, because I truncated it.** The `stage()`
+helper recorded `cut -c1-1500` of stdout and `cut -c1-600` of stderr. The
+build log is tens of kilobytes; the first 1500 characters are Dockerfile
+parsing, and the failure is at the end. The recorded evidence stops at
+`#13 [memu-core-introspect internal] load build definition`.
+
+**This is run 2 of #47 in different clothes.** There a resolver sent
+stdout to `/dev/null`; here a collector kept the wrong 1500 characters.
+Same defect, same place: diagnostics fail where output is large and the
+interesting part is last.
+
+> **A truncation is a `/dev/null` with better manners.** Any excerpt of a
+> diagnostic must be taken from the END unless there is a measured reason
+> otherwise, and the full output must survive somewhere.
+
+### The second defect: it continued past a failed bring-up
+
+Having failed to start the system, the collector ran fifty probes against
+it and recorded fifty results. Every one was correct and none was
+evidence. A full-looking table describing nothing is worse than an empty
+one, because it invites reading.
+
+Repaired: `compose ps -a` runs immediately after the bring-up, and a
+non-zero `up` **aborts with exit 2** and prints the classification order
+above, so the run says what kind of failure it was rather than leaving a
+reader to infer it.
+
+### Wording correction, on operator instruction
+
+D180 said the 150s window's binding term was that *"a container cannot be
+declared unhealthy before 100s"*. **That over-claims.** The arithmetic
+establishes only that 150s **conservatively exceeds the configured
+health / retry / circuit-breaker envelope**. Whether Docker can reach a
+verdict sooner is a statement about the daemon's implementation, which I
+have not measured and must not assert.
+
+The collector now records each container's **observed
+`State.Health.Log` transition timestamps**, and those are authoritative
+for any given run. The arithmetic sizes the window; the observation
+reports what actually happened.
+
+### Repairs in this commit
+
+* `stage()` keeps full stdout/stderr as files under `stage-logs/`,
+  uploaded as artefacts, and records the **tail** rather than the head;
+* byte counts are recorded, so a truncated excerpt is visibly an excerpt;
+* a failed bring-up aborts and self-classifies;
+* missing containers are recorded as `NO CONTAINER — cannot be asked`
+  instead of producing an inspect error;
+* observed health-transition timestamps are captured per container;
+* the window's header no longer claims what Docker cannot do.
+
+Nothing about the production system was changed. `#53` stays
+unremediated, no profile was enabled, and the deployed question is still
+open.

@@ -28,6 +28,13 @@
 # THE OBSERVATION WINDOW IS DERIVED, NOT CHOSEN
 # =============================================
 #
+# The arithmetic below establishes that 150s CONSERVATIVELY EXCEEDS the
+# configured health / retry / circuit-breaker envelope. It is NOT a claim
+# that Docker cannot produce an unhealthy verdict before exactly 100s --
+# that would be an assertion about the daemon's implementation, which
+# this has not measured. The OBSERVED health-transition timestamps,
+# recorded per container below, are authoritative for any given run.
+#
 #   dashboard healthcheck start_period          10s
 #   interval x retries                          30s x 3 = 90s
 #   -> earliest a health verdict can exist     100s
@@ -50,18 +57,35 @@ EVIDENCE="degradation-deployed.evidence"
 
 record() { printf '%s\n' "$*" | tee -a "$EVIDENCE"; }
 
+# RUN 1 DESTROYED ITS OWN EVIDENCE HERE. `compose up` failed, and this
+# function recorded `cut -c1-1500` of a build log tens of kilobytes long
+# -- so the record held the FIRST 1500 characters (dockerfile parsing)
+# and the failure at the END was cut off. Every downstream probe then
+# correctly reported "service dashboard is not running", and the run
+# could not say why.
+#
+# This is the run-2-of-#47 defect wearing different clothes: there, a
+# resolver sent stdout to /dev/null; here, a collector kept the wrong
+# 1500 characters. Diagnostics fail at the same place every time --
+# where the output is large and the interesting part is at the end.
+#
+# So: full output is kept as a FILE and uploaded, and the recorded
+# excerpt is the TAIL, because that is where errors live.
+STAGE_LOGS="stage-logs"
+mkdir -p "$STAGE_LOGS"
+
 stage() {
   local name="$1"; shift
   local out err rc
-  out="$(mktemp)"; err="$(mktemp)"
+  out="$STAGE_LOGS/${name}.out"; err="$STAGE_LOGS/${name}.err"
   if "$@" > "$out" 2> "$err"; then rc=0; else rc=$?; fi
   record "stage=$name"
   record "  cmd=$*"
   record "  exit=$rc"
-  record "  stdout=$( [ -s "$out" ] && tr '\n' '|' < "$out" | cut -c1-1500 || echo '(empty)' )"
-  record "  stderr=$( [ -s "$err" ] && tr '\n' '|' < "$err" | cut -c1-600 || echo '(empty)' )"
+  record "  stdout_bytes=$(wc -c < "$out") stderr_bytes=$(wc -c < "$err")"
+  record "  stdout_TAIL=$( [ -s "$out" ] && tail -c 1200 "$out" | tr '\n' '|' || echo '(empty)' )"
+  record "  stderr_TAIL=$( [ -s "$err" ] && tail -c 1200 "$err" | tr '\n' '|' || echo '(empty)' )"
   STAGE_OUT="$(cat "$out")"
-  rm -f "$out" "$err"
   return $rc
 }
 
@@ -92,6 +116,27 @@ record "gated_count=$(printf '%s\n' $GATED | wc -w)"
 
 # ── 2. bring up the contained core ──────────────────────────────────────
 stage compose_up docker compose -f "$COMPOSE" up -d --build
+up_rc=$?
+record "compose_up_exit=$up_rc"
+
+# WHICH services actually exist, and in what state. Run 1 continued past
+# a failed bring-up into 50 probes that could only say "not running",
+# producing a full evidence table about nothing. The state of the stack
+# is established BEFORE anything is asked of it.
+stage compose_ps docker compose -f "$COMPOSE" ps -a
+if [ "$up_rc" -ne 0 ]; then
+  record ""
+  record "MEASUREMENT ABORTED: the contained core did not come up (exit $up_rc)."
+  record "This is an INSTRUMENT/ENVIRONMENT failure, NOT a finding about"
+  record "default-core degradation. Nothing below would measure the system;"
+  record "it would measure the absence of the system. Classification order:"
+  record "  instrument/environment failure  <-- THIS RUN"
+  record "  actual default-core defect      -- not established"
+  record "  #53 deployed manifestation      -- not established"
+  record "  successful bounded degradation  -- not established"
+  record "The failing stage's full output is in $STAGE_LOGS/compose_up.{out,err}."
+  exit 2
+fi
 
 # ── 3. wait out the DERIVED window ──────────────────────────────────────
 record "waiting ${WINDOW}s — see the header for how this number is derived"
@@ -134,9 +179,22 @@ done
 record ""
 record "=== CALLER HEALTH: the daemon's opinion, not the app's ==="
 for svc in dashboard agentic memu-core; do
+  cid="$(docker compose -f "$COMPOSE" ps -q "$svc" 2>/dev/null)"
+  if [ -z "$cid" ]; then
+    record "health_${svc}=NO CONTAINER — cannot be asked"
+    continue
+  fi
   stage "health_${svc}" docker inspect \
     --format '{{.State.Status}} health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}} restarts={{.RestartCount}}' \
-    "$(docker compose -f "$COMPOSE" ps -q "$svc" 2>/dev/null)"
+    "$cid"
+  # THE OBSERVED TRANSITIONS ARE AUTHORITATIVE FOR THIS RUN, not the
+  # window arithmetic in the header. That arithmetic says only that 150s
+  # conservatively EXCEEDS the configured health/retry/breaker envelope;
+  # it is not a claim that Docker cannot reach a verdict sooner. What
+  # Docker actually did is recorded here and wins.
+  stage "health_log_${svc}" docker inspect \
+    --format '{{if .State.Health}}{{range .State.Health.Log}}{{.Start}} exit={{.ExitCode}} {{end}}{{else}}no healthcheck{{end}}' \
+    "$cid"
 done
 
 # ── 6. THE CALLER'S OWN BEHAVIOUR, in the deployed topology ─────────────

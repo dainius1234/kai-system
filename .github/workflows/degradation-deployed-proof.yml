@@ -85,5 +85,7 @@ jobs:
         if: always()
         with:
           name: degradation-deployed-evidence
-          path: degradation-deployed.evidence
+          path: |
+            degradation-deployed.evidence
+            stage-logs/
           if-no-files-found: warn

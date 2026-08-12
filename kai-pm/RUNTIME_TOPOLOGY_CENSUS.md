@@ -9,6 +9,13 @@
 > proof, and no reading of this document may merge the two.
 >
 > `#53` / `KAI-GATE-047` open and deliberately unremediated.
+>
+> **Deployed run 1 (`31605138566`) produced NO evidence about the system.**
+> Classified as **instrument/environment failure**: `compose up` exited 1,
+> so every probe correctly reported *"service dashboard is not running"*.
+> The cause was unreadable because the collector recorded
+> `cut -c1-1500` of a build log tens of kilobytes long — the first 1500
+> characters, not the failure at the end. Repaired; run 2 pending.
 
 Read-only. Nothing was changed, started, or wired. Every number here was
 derived from this tree today; **no count was carried forward**, including
