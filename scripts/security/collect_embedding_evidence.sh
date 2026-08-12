@@ -96,14 +96,85 @@ else
 fi
 
 # ── 3. the image NAME compose declares for it ───────────────────────────
-stage config_image_name env COMPOSE_PROFILES='*' \
-  docker compose -f "$COMPOSE_FILE" config --images "$SERVICE"
-image_name="$(printf '%s' "$STAGE_OUT" | head -1)"
+#
+# `config --images <service>` RETURNS THE SERVICE'S WHOLE DEPENDENCY
+# GRAPH, in an order that is not the service's own. Run 3 measured it:
+#
+#   config --images memu-core      -> redis:7-alpine | kai-system-memu-core | pgvector…
+#   config --images agentic        -> ollama/ollama:0.6.8 | kai-system-agentic | …
+#   config --images fusion-engine  -> kai-system-memu-core | … | kai-system-fusion-engine
+#
+# Taking `head -1` therefore named a DEPENDENCY'S image as the service's
+# own. For memu-core and agentic the first entry was not built locally,
+# `docker image inspect` failed, and the row honestly read UNKNOWN. For
+# fusion-engine the first entry WAS built — so the probe ran against
+# **memu-core's image** and the collector recorded `fusion-engine
+# claim-A: REAL`. A confident verdict about the wrong artefact, which is
+# worse than the UNKNOWN it replaced, and it survived every
+# verdict-integrity control because those protect a verdict's TRANSPORT,
+# not its SUBJECT.
+#
+# So the name is read from the service's own resolved definition, which
+# is single-valued and cannot include a neighbour.
+stage config_json env COMPOSE_PROFILES='*' \
+  docker compose -f "$COMPOSE_FILE" config --format json
+config_json="$STAGE_OUT"
+image_name="$(printf '%s' "$config_json" | python3 -c '
+import json, sys
+try:
+    doc = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+svc = (doc.get("services") or {}).get(sys.argv[1]) or {}
+print(svc.get("image", ""))
+' "$SERVICE" 2>/dev/null)"
 record "image_name=${image_name:-(none)}"
 
+# CORROBORATION, and a guard against the defect above. The dependency
+# listing is recorded as a second, independent channel: the name chosen
+# above must appear in it, and it must not be a name the listing gives to
+# some OTHER service. A resolver that cannot show its answer belongs to
+# the service it was asked about has not resolved anything.
+stage config_image_list env COMPOSE_PROFILES='*' \
+  docker compose -f "$COMPOSE_FILE" config --images "$SERVICE"
+if [ -n "$image_name" ] && printf '%s\n' "$STAGE_OUT" | grep -qxF "$image_name"; then
+  record "image_name_corroborated=yes"
+else
+  record "image_name_corroborated=no"
+fi
+
+# THE BINDING CHECK. Does this image name belong to a DIFFERENT service?
+# Known-positive from run 3: fusion-engine resolved to kai-system-memu-core,
+# which is memu-core's image, and nothing said so.
+other="$(printf '%s' "$config_json" | python3 -c '
+import json, sys
+try:
+    doc = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+me, name = sys.argv[1], sys.argv[2]
+if not name:
+    sys.exit(0)
+for other, spec in (doc.get("services") or {}).items():
+    if other != me and (spec or {}).get("image") == name:
+        print(other)
+        break
+' "$SERVICE" "$image_name" 2>/dev/null)"
+record "image_name_also_used_by=${other:-(none)}"
+binding_failure=""
+if [ -n "$other" ]; then
+  binding_failure="'$image_name' is also $other's image"
+  record "BINDING FAILURE: $binding_failure"
+fi
+
 # ── 4. create the container Compose would run ───────────────────────────
+#
+# NOT `--no-deps`: `docker compose create` has no such flag and run 3
+# recorded `unknown flag: --no-deps` for all three services, which killed
+# the container-scoped resolution path that had worked in run 2 and
+# forced every row onto the name-based fallback above.
 stage compose_create env COMPOSE_PROFILES='*' \
-  docker compose -f "$COMPOSE_FILE" create --no-deps "$SERVICE"
+  docker compose -f "$COMPOSE_FILE" create "$SERVICE"
 
 # ── 5. its container id ─────────────────────────────────────────────────
 stage container_id env COMPOSE_PROFILES='*' \
@@ -116,11 +187,24 @@ if [ -n "$cid" ]; then
   stage inspect_container_image docker inspect --format '{{.Image}}' "$cid"
   image="$(printf '%s' "$STAGE_OUT" | head -1)"
 fi
+record "image_source=$( [ -n "$image" ] && echo container || echo '(container path failed)' )"
+
+# BUILD-SCOPED FALLBACK, and the ONLY path the binding check governs.
+# The container path resolves from the container Compose created, which
+# cannot be another service's; the name path can be, and was. So the
+# check applies exactly where the risk is, and a mis-bound name is an
+# INSTRUMENT malfunction rather than a claim about the service.
 if [ -z "$image" ] && [ -n "$image_name" ]; then
-  # Build-scoped fallback. Still an IMMUTABLE id -- the name is only used
-  # to look it up, never recorded as the evidence itself.
-  stage inspect_image_by_name docker image inspect -f '{{.Id}}' "$image_name"
-  image="$(printf '%s' "$STAGE_OUT" | head -1)"
+  if [ -n "$binding_failure" ]; then
+    record "probe_refused=the fallback name is not uniquely this service's: $binding_failure"
+    measurement="INSTRUMENT_ERROR"
+  else
+    # Still an IMMUTABLE id -- the name is only used to look it up,
+    # never recorded as the evidence itself.
+    stage inspect_image_by_name docker image inspect -f '{{.Id}}' "$image_name"
+    image="$(printf '%s' "$STAGE_OUT" | head -1)"
+    [ -n "$image" ] && record "image_source=config-name"
+  fi
 fi
 record "image_id=${image:-(unresolved)}"
 
@@ -128,7 +212,11 @@ record "image_id=${image:-(unresolved)}"
 if [ -z "$image" ]; then
   record "probe_ran=no"
   record "reason=no immutable image id could be resolved; the failing stage is above"
-  measurement="INCOMPLETE"
+  # An INSTRUMENT_ERROR already set upstream must SURVIVE. "The resolver
+  # would have probed another service's image" and "nothing resolved" are
+  # different facts, and overwriting the first with the second is the
+  # same silent substitution R-VERDICT-INTEGRITY forbids one layer down.
+  [ "$measurement" = "INSTRUMENT_ERROR" ] || measurement="INCOMPLETE"
   claim="UNKNOWN"
 else
   producer=probe

@@ -1,7 +1,12 @@
 # Embedding backends — measured state
 
-**Last run:** 31531007344, commit `757d955`, tree `0d5fe1a`, 2026-08-11.
-Run 1 was 31528178414, commit `da566df`, tree `acb60b4`.
+**Last run:** 31568526480, commit `189500b`, tree `f4bd412`, 2026-08-12.
+Run 2 was 31531007344 / `757d955`; run 1 was 31528178414 / `da566df`.
+
+> **RETRACTION, run 3.** The row `fusion-engine claim-A: REAL` that run 3
+> printed is **withdrawn**. It is a verdict about **memu-core's image**,
+> mislabelled. See §"Run 3" below. fusion-engine's runtime backend
+> remains **UNKNOWN**.
 
 ---
 
@@ -44,14 +49,15 @@ probe  3 of 3 stages reached — library import, model load, semantic operation
 
 | row | status | why |
 |---|---|---|
-| agentic runtime backend | **UNKNOWN** | image never resolved in run 2; the failing stage was not recorded |
-| fusion-engine runtime backend | **UNKNOWN** | `config --images` exposed no image name for it; **the cause is not measured** |
+| agentic runtime backend | **UNKNOWN** | run 3 measured the failing stages: `create --no-deps` is an invalid flag, and the name fallback resolved `ollama/ollama:0.6.8`, which is not built locally |
+| fusion-engine runtime backend | **UNKNOWN** | run 3's `REAL` row is **retracted** — it probed `kai-system-memu-core`, not fusion-engine's image |
 
-For fusion-engine, "behind a profile" is a **hypothesis and nothing
-more**. It built successfully in the same run, so the failure is
-somewhere in the resolution chain after the build. Run 3's collector
-records each stage's command, stdout, stderr and exit status so the next
-entry here can name the cause from evidence.
+**"Behind a profile" is disproven.** Run 3 measured it: with
+`COMPOSE_PROFILES='*'`, `config --services` lists `fusion-engine`
+(`service_known_with_all_profiles=yes`) and `config --images` names
+`kai-system-fusion-engine`. The profile was never the obstacle. Recording
+this because it was carried as a hypothesis for two runs and the
+temptation was to write it down as a cause.
 
 `agentic` and `fusion-engine` remain **DECLARATION DEFECT** by static
 measurement — the library is absent from their requirements, their
@@ -130,12 +136,69 @@ one empty file away from being decided by an arithmetic accident. This is
 the same mechanism that made a background wrapper report FAIL over a
 green chain on 2026-08-10.
 
-### What run 3 must produce
+### What run 3 produced
 
-Four rows from one commit: Claim A for memu-core, agentic and
-fusion-engine, and Claim B for memu-core. Then the completeness check,
-last. Nothing about remediation until the runtime denominator is complete
-for all three services.
+Four rows from one commit, as required — and the structure held while
+the resolver produced a **confidently wrong answer**.
+
+```
+memu-core     claim-A  measurement=INCOMPLETE  verdict=UNKNOWN  image=unresolved
+agentic       claim-A  measurement=INCOMPLETE  verdict=UNKNOWN  image=unresolved
+fusion-engine claim-A  measurement=COMPLETE    verdict=REAL     image=sha256:121b8200…
+memu-core     claim-B  REAL (384)              dim=384, 8.4s, application path
+Evidence summary: EVIDENCE SET INCOMPLETE -> exit 1
+```
+
+**What worked.** Every measurement step ran to completion; no verdict
+suppressed another; the only failing step was the completeness judgement,
+last, after the artefact upload had its `if: always()`. Claim B is
+reproduced independently at a second commit. The per-stage evidence made
+the defect below readable in a single pass — the previous collector
+would have printed `UNRESOLVED` and nothing else.
+
+**What did not.** Two measured causes.
+
+1. `docker compose create --no-deps <service>` → **`unknown flag:
+   --no-deps`**, for all three services. `create` has no such flag. That
+   killed the container-scoped path — the one that worked in run 2 — and
+   forced every row onto the name-based fallback.
+
+2. `config --images <service>` **returns the service's whole dependency
+   graph**, in an order that is not the service's own:
+
+   ```
+   memu-core      -> redis:7-alpine | kai-system-memu-core | pgvector…
+   agentic        -> ollama/ollama:0.6.8 | kai-system-agentic | …
+   fusion-engine  -> kai-system-memu-core | … | kai-system-fusion-engine
+   ```
+
+   The collector took `head -1`. For memu-core and agentic the first
+   entry was not built locally, `docker image inspect` failed, and the
+   rows honestly read UNKNOWN. **For fusion-engine the first entry WAS
+   built** — so the probe ran against `kai-system-memu-core` and the
+   collector recorded `fusion-engine claim-A: REAL`.
+
+### The shape, named
+
+**A confident verdict about the wrong artefact.** Worse than the UNKNOWN
+it replaced, and it passed every verdict-integrity control in the job —
+because those protect a verdict's **transport**, not its **subject**. The
+exit code survived intact from producer to record; it was simply an
+answer about a different image.
+
+memu-core and agentic were saved only by their first-listed dependency
+not being present locally. That is luck, not a control.
+
+Repaired for run 4: the image name is read from the service's own
+resolved definition (`config --format json` → `services.<name>.image`),
+which is single-valued and cannot name a neighbour; the dependency
+listing is kept as an independent corroborating channel; a **binding
+check** refuses when a fallback name is also another service's image, as
+`INSTRUMENT_ERROR` rather than as a claim; and `--no-deps` is gone.
+
+Nothing about remediation until the runtime denominator is complete for
+all three services. It currently stands at **1 of 3** — memu-core via
+Claim B. fusion-engine and agentic are UNKNOWN.
 
 ## The rules this job holds to
 

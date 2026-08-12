@@ -8943,3 +8943,91 @@ down then, from evidence.
 
 **Status.** Runtime denominator: 1 of 3 services measured. No
 remediation of any embedding backend until run 3 closes the other two.
+
+---
+
+## D173 — 2026-08-12 — A Confident Verdict About the Wrong Artefact
+
+**Run 3** (`31568526480`, commit `189500b`, tree `f4bd412`) produced all
+four required rows from one commit. The structure held: every
+measurement step ran to completion, no verdict suppressed another, and
+the only failing step was the completeness judgement, positioned last,
+after an `if: always()` artefact upload. Claim B reproduced REAL (384) at
+a second, independent commit.
+
+And the collector printed `fusion-engine claim-A: measurement=COMPLETE
+claim_verdict=REAL`, which is **false**. It is a measurement of
+**memu-core's image**.
+
+**RETRACTED:** fusion-engine's runtime embedding backend is UNKNOWN. The
+runtime denominator stands at 1 of 3.
+
+**The two measured causes.**
+
+1. `docker compose create --no-deps <service>` returned **`unknown flag:
+   --no-deps`** for all three services. `create` has no such flag. I
+   added it for tidiness between run 2 and run 3, and it silently
+   destroyed the container-scoped resolution path that had *worked* in
+   run 2 — forcing every row onto the name-based fallback.
+
+2. `docker compose config --images <service>` **returns the service's
+   entire dependency graph**, in an order that is not the service's own:
+
+   ```
+   memu-core      -> redis:7-alpine | kai-system-memu-core | pgvector…
+   agentic        -> ollama/ollama:0.6.8 | kai-system-agentic | …
+   fusion-engine  -> kai-system-memu-core | … | kai-system-fusion-engine
+   ```
+
+   The collector took `head -1`. memu-core and agentic drew a
+   first-listed dependency that was not built locally, `docker image
+   inspect` failed, and those rows honestly read UNKNOWN. fusion-engine
+   drew one that **was** built, so the probe ran and the answer was
+   recorded under the wrong service's name.
+
+**Two of the three rows were correct by luck.** Not by any control.
+
+**The shape, and why it is new.** Every verdict-integrity control this
+programme has built protects a verdict's **transport** — that the
+producer's exit code survives shells, wrappers, `tee`, `timeout`,
+reporting and aggregation without substitution. All of them worked
+perfectly here. The exit code arrived intact. It was an answer about a
+different image.
+
+> **R-VERDICT-INTEGRITY protects a verdict's TRANSPORT. It says nothing
+> about its SUBJECT.** An instrument must also prove the artefact it
+> measured is the artefact it names.
+
+This is R5 seen from a third side. A check whose scope is *smaller* than
+its name reports false green; one whose scope is *larger* reports false
+red; one whose scope is *displaced* reports a true measurement of the
+wrong thing, and is the hardest of the three to see — because everything
+about it looks right.
+
+**Repair, instrument-only.** The image name is now read from the
+service's own resolved definition (`config --format json` →
+`services.<name>.image`), which is single-valued and cannot name a
+neighbour. The dependency listing is kept as an **independent
+corroborating channel** — the chosen name must appear in it. A **binding
+check** asks whether the name is also some *other* service's image and,
+if so, refuses to probe: `INSTRUMENT_ERROR`, not a claim. `--no-deps` is
+gone. An `INSTRUMENT_ERROR` set upstream now survives the later
+"nothing resolved" branch, because overwriting it would be the same
+silent substitution one layer down.
+
+**Disproven, and recorded so it stops being repeated:** "fusion-engine is
+behind a profile" was carried as a hypothesis for two runs. Run 3
+measured it — with `COMPOSE_PROFILES='*'`, `config --services` lists
+`fusion-engine` and `config --images` names `kai-system-fusion-engine`.
+The profile was never the obstacle.
+
+**Also corrected:** `CLAUDE.md` records that the Actions log API "serves
+a fixed byte window from the end — measured identical at 15,780
+characters for two different `tail_lines`". That does not hold on the
+route used today: `tail_lines=1416` returned 148,863 characters, the
+whole log, and the per-stage evidence was only readable because of it.
+The original measurement is not deleted; its scope was narrower than the
+sentence claimed.
+
+**Standing:** no embedding remediation until all three services have a
+runtime verdict. Currently 1 of 3.
