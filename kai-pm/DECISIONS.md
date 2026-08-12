@@ -10128,3 +10128,111 @@ rather than silently cleaning it up is what keeps the evidence record
 trustworthy over time. `DECISIONS.md` is append-only for this reason —
 a disproven claim that is deleted takes the pattern of the mistake with
 it.
+
+---
+
+## D185 — 2026-08-12 — Semantic Necessity: Request-Time by Role, Pre-Readiness by Structure
+
+First sub-task of the D183/D184 sequence. Read-only. Nothing changed.
+
+### Correction to D183's count
+
+`introspect_app.py` imports **15 names: 14 functions + 1 object
+(`store`)**. D183 banked **16**, and I said 16 twice in discussion before
+that. The earlier figure is wrong and is **corrected here rather than
+edited there** — `DECISIONS.md` is append-only, and the correction is
+itself evidence about why denominators need independent derivation. I
+listed the names and miscounted my own list.
+
+### A — role necessity
+
+Of the 14 imported functions:
+
+```
+ROLE-REQUIRED        10 / 14
+NOT ROLE-REQUIRED     4 / 14
+OPTIONAL / UNKNOWN    0
+```
+
+**ROLE-REQUIRED (10):** `apply_spaced_repetition_decay`,
+`clear_quarantine`, `focus_compress`, `list_quarantined`,
+`memory_categories`, `memory_diagnostics`, `memory_stats`,
+`quarantine_record`, `reflect`, `search_by_category`.
+
+All ten reach embeddings by the same path:
+
+```
+store.search()  ->  generate_embedding()
+```
+
+**NOT ROLE-REQUIRED (4):** `memory_cleanup`, `memory_compress`,
+`memory_revert`, `memory_state`.
+
+**Therefore the strong form of Option 3 — remove embedding capability
+from introspection entirely — is DISPROVEN.**
+
+### B — readiness necessity, and the labels matter
+
+```
+REQUEST-TIME REQUIRED BY ROLE
+PRE-READINESS ENFORCED BY CURRENT STRUCTURE
+```
+
+These are deliberately two statements, not one. An earlier draft of mine
+wrote `PRE-READINESS REQUIRED`, which reads as a semantic requirement and
+would have inverted the finding: **the evidence says the opposite.**
+Serving `/health` on `:8009` has **not been shown** to semantically
+require embeddings.
+
+The structure nevertheless forces embeddings into the pre-readiness path
+by **two independent module-scope mechanisms**:
+
+1. `app.py:1058` — `_st_model = _ST(EMBEDDING_MODEL_NAME)` at module
+   scope;
+2. `app.py:1132-1139` — module-level `store: VectorStore`, and with
+   `VECTOR_STORE=turbovec` (introspect's compose value)
+   `store = TurboVecStore()`, whose `__init__` performs an embedding
+   **dimension probe** via `generate_embedding()`.
+
+**Removing only one would not remove the startup dependency**, because
+the second independently reaches embedding generation. Both were measured
+at module scope by AST, not read by eye.
+
+### MEASUREMENT CORRECTION — an over-report caught before reporting
+
+The first tracer classified **14 / 14** as embedding-dependent, because
+it treated **every `store.*` call** as an embedding path. Method-level
+measurement of `TurboVecStore` shows only `__init__` and `search` embed;
+`insert`, `count`, `get_state`, `delete_record`, `delete_old`,
+`compress`, `_row_to_record` and the rest do not.
+
+**Corrected denominator: 10 / 14.** Preserved as an instrument
+correction rather than silently replacing the earlier figure — reporting
+14/14 would have overstated the dependency by four operations and made
+extraction look impossible. It is the same shape as the 22-of-53
+fallback-classifier over-report earlier the same day: a rule that matched
+a *construct* rather than the *behaviour*.
+
+### Option implications
+
+| option | status |
+|---|---|
+| **3 strong** — remove the model dependency entirely | **DISPROVEN** |
+| **3′** — lazy/deferred separation of both module-scope paths | **LIVE, currently strongest local candidate** |
+| **1** — per-image offline asset contract | LIVE |
+| **2** — shared model-bearing build/base stage | LIVE |
+| **4** — offline-runtime contract independent of fake-embedding policy | LIVE |
+
+**Option 3′ alone is insufficient.** Deferred embedding use must still be
+locally satisfiable and must fail closed on an egress-less runtime.
+Lazy loading by itself converts a startup hang into a first-request hang.
+
+**And 3′ is NOT the winner.** It is the strongest *local* architectural
+candidate. The A/B/C denominator may show several services with the same
+pattern, at which point shared infrastructure or a class-level contract
+could dominate. The denominator decides.
+
+### Next
+
+A/B/C class-wide denominator sweep, exactly as scoped in D183, with the
+D184 semantic/readiness fields added. Not started.
