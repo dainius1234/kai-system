@@ -9894,3 +9894,168 @@ R0 stop-signal table:
 UNKNOWN. `#53` severity UNASSESSED, unremediated. No profile enabled, no
 production change, no recovery activation. `#45` awaits 2026-08-14;
 `#49`/`#50`/`#51` parked.
+
+---
+
+## D183 — 2026-08-12 — Run 3 Named the Cause, and the Offline Guard Is Attached to the Wrong Condition
+
+Deployed run 3, `31624071540`, commit `e1e198f`. The read-only
+post-mortem worked: it aborted at the prerequisite boundary, named the
+failing container, and captured the daemon's own record.
+
+### The timeline, elapsed from `StartedAt` 2026-08-12T17:46:39.709Z
+
+```
++0.0s    container started   oomkilled=false exit=0 restarts=0
+                             finished=0001-01-01 -> still running
++2.9s    app begins          {"service":"memu-core","msg":"Running on cpu."}
++52.8s   '[Errno -3] Temporary failure in name resolution'
+           HEAD https://huggingface.co/sentence-transformers/
+                all-MiniLM-L6-v2/resolve/main/config.json  -> Retry 1/5
++53.9s / +55.9s / +59.9s / +67.9s        Retries 2..5 of 5
++72s     post-mortem runs; :8009 never bound
+
+healthcheck output, every probe:
+  urllib.error.URLError: <urlopen error [Errno 111] Connection refused>
+```
+
+`postgres` and `redis` both `running healthy`. No OOM, no restart, no
+crash — the process is alive and has never bound its listener.
+
+**Not established:** +2.9s → +52.8s, and the healthcheck event
+timestamps. Both are in artefact `9152519037` (55 files, 70,483 bytes),
+which this environment cannot reach — the agent proxy denies
+`*.blob.core.windows.net` with `CONNECT tunnel failed, response 403`.
+**The evidence is captured and frozen, not missing.** Run 4 was NOT
+authorised: re-running to work around a local network policy would
+substitute a new runtime instance for evidence already held.
+
+### The finding, in the operator's wording
+
+> **STARTUP-CONTRACT DEFECT.** `memu-core-introspect` runs on egress-less
+> networks (`data-net`, `observability-net`, both `internal: true`) and
+> imports a module that performs model loading during startup, but its
+> image does not carry the offline model contract that its sibling
+> `memu-core` does. **The listener remained unavailable while startup was
+> performing the external Hugging Face resolution/retry sequence, and the
+> service failed its readiness contract.**
+
+That phrasing is deliberate and replaces an earlier draft of mine
+("binds its listener only after that attempt resolves"), which claimed an
+internal causal ordering run 3 did not observe.
+
+### A CORRECTION I must not bury
+
+I stated the model was "baked into the exact image" for
+`memu-core-introspect`, and the operator carried that premise into their
+statement of the finding. **It is false.** The
+`BAKED all-MiniLM-L6-v2 revision=1110a243…` line in run 3's build log
+belongs to `memu-core/Dockerfile`. I read a build-step output and
+attributed it to the wrong image without checking which stage emitted it
+— the fusion-engine displaced-scope error again, in a build log instead
+of a resolver.
+
+### The differential — three independent layers
+
+**Layer 1, the image.** `memu-core/Dockerfile`:
+`HF_HOME=/opt/hf_cache`, `HF_HUB_OFFLINE=1`,
+`HF_HUB_DISABLE_TELEMETRY=1`, and a fail-closed 5-attempt bake writing
+`/opt/hf_cache/BAKED_REVISION`. Its comment states the contract: *"the
+image carries the model, so the running container has no reason to reach
+the network for one… the runtime cannot fetch it later."*
+
+`memu-core/Dockerfile.introspect` has **none of the three and no bake
+step at all.**
+
+Mounts rule out a cache explanation: `memu-core` has
+`turbovec_data:/data/turbovec`, introspect the same `:ro`. Neither
+carries an HF cache. Both containers are fresh in CI.
+
+**Layer 2, the code — and this is the loop back to #47.** `app.py`
+already contains an offline guard:
+
+```python
+_ALLOW_FAKE_EMBEDDINGS = os.getenv("MEMU_ALLOW_FAKE_EMBEDDINGS", "false").lower() == "true"
+if _ALLOW_FAKE_EMBEDDINGS:
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
+    os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+```
+
+**It is guarded by the fake-embeddings flag**, whose production default
+is `false` — the entire subject of #47. On the production default the
+guard does not fire and the process reaches for the network.
+
+Its own comment predicted run 3 before we ran it: *"70-100 seconds of DNS
+backoff before uvicorn ever binds… the bring-up was a race, and on
+2026-08-07 run 708 it lost."* The failure was documented in the source,
+for `memu-core`, and the remedy applied was the Dockerfile's offline env
+— which `Dockerfile.introspect` never received.
+
+**Layer 3, the load is at module scope.** Line 1058 of `app.py` is at
+module level (confirmed by AST, not by eye), so `import app` runs it.
+
+### THE FOURTH OPTION, and it may be the class-wide fix
+
+The three repair architectures on the table were: duplicate the contract,
+share a build stage, or extract the dependency. The layers expose a
+fourth:
+
+> **The offline guard is attached to the wrong condition.** Being unable
+> to reach `huggingface.co` is a property of the **network contract**,
+> not of whether fake embeddings are permitted. Conditioning it on
+> `MEMU_ALLOW_FAKE_EMBEDDINGS` ties an egress decision to a semantic
+> one.
+
+Options 1 and 2 bake a model into an introspection image whose need for
+one is unproven — they make the coupling *work* rather than removing it.
+
+### The unmeasured question that decides Option 3
+
+`introspect_app.py` imports 16 names from `app.py`: `memory_state`,
+`memory_stats`, `memory_diagnostics`, `focus_compress`, `reflect`,
+`quarantine_record`, `clear_quarantine`, `list_quarantined`,
+`memory_revert`, `memory_cleanup`, `memory_compress`,
+`memory_categories`, `search_by_category`,
+`apply_spaced_repetition_decay`, `store`.
+
+Introspection is a reporting surface, but **`store` and
+`search_by_category` plausibly touch embeddings**. Whether any imported
+handler genuinely needs a vector is **NOT MEASURED**, and it is the
+question that decides between extraction and the other options.
+
+**Established regardless:** introspect pays the import-time model load
+**unconditionally**, before serving anything.
+
+### Authorised and NOT started: the class-wide denominator sweep
+
+Read-only. The material denominator is *not* "which Dockerfiles import a
+model-loading module" — that is a source-level population and would
+repeat the fusion-engine mistake. It is:
+
+> Which runnable container paths can execute model-loading code before
+> readiness **while deployed onto an egress-restricted network**, and what
+> offline model contract does each actually carry?
+
+Three populations kept apart: **A** source reachability · **B**
+deployment applicability (`internal: true` or otherwise egress-restricted)
+· **C** runtime-qualified.
+
+Columns: service · image/Dockerfile · network egress contract · startup
+model-load path · model baked? · deterministic cache path? · offline
+enforced? · build fails closed? · mount can shadow cache? · listener
+gated on model? · current runtime status.
+
+Calibration: **known-good `memu-core`**, **known-bad
+`memu-core-introspect`**, plus one service that loads no model, so the
+detector proves it can *exclude* rather than count everything.
+
+Not started deliberately: beginning a multi-service sweep at the end of a
+session risks producing exactly the half-measured population this
+programme keeps paying for.
+
+### Standing
+
+`#41-B` caller logic COMPLETE. `#41` deployed behaviour PARTIALLY
+UNKNOWN, still blocked by this prerequisite. `#53` UNASSESSED and
+unremediated. No `start_period` change, no offline flag, no bake, no
+profile, no run 4. `#45` awaits 2026-08-14; `#49`/`#50`/`#51` parked.
