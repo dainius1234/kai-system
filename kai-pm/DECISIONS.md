@@ -9232,3 +9232,83 @@ delimiter is lost two ways, and my gate only knew one."* The gate is
 green today on both files, and whether it detects the second mechanism is
 **not established**. Registered for a calibrated known-positive; not
 improvised here.
+
+---
+
+## D177 — 2026-08-12 — #41's Title Encodes an Approach the Security Model Forbids
+
+Read-only runtime-topology census, opening task #41. No count carried
+forward, including #41's own figure of 26.
+
+```
+services the repository DEFINES                      61
+services a repo-defined path STARTS                  27
+NEVER-STARTED                                        34
+  ...of which EXPECTED by a component that IS live   25
+```
+
+**The dominant cause is one thing.** Ten profiles gate 32 service
+definitions, and **no repo-defined invocation enables any profile** —
+zero `COMPOSE_PROFILES=` and zero `--profile` in the Makefile, in any
+workflow, or in any script. The profile mechanism has never been
+exercised.
+
+**And the gating is deliberate.** `check_default_profiles.py` is a P0
+security gate: *"Services with consequential capabilities must be behind
+an explicit profile. Only the contained core may start with a bare
+`docker compose up`."* Its list names `fusion-engine`, `supervisor`,
+`verifier`, `executor`, `broker-bridge`, `browser-agent`, `vault-sync`
+and the sensor family.
+
+So **"boot the 26 never-started services" cannot mean "move them into the
+default profile"** — that fails a P0 gate by construction. The task title
+encodes an approach the security model forbids, and only re-deriving the
+denominator surfaced it. The old figure of 26 was never re-checked
+against the tree.
+
+**Two defect classes, separated:**
+
+1. no profile is ever exercised, so 31 services have zero runtime
+   evidence of any kind;
+2. **live components call gated services unconditionally** — `dashboard`,
+   `agentic` and `metrics-gateway` are ACTIVE and call services that, by
+   the security model, are *normally absent*. Whether they degrade
+   gracefully is **unmeasured**. This is plausibly the more important of
+   the two.
+
+**fusion-engine, classified from evidence:** INTENTIONALLY PROFILE-GATED,
+NEVER EXERCISED, WITH LIVE CALLERS. 2 of its 4 expecters are live
+(dashboard, metrics-gateway); the other 2 — `supervisor` and
+`prometheus` — are themselves never started, so part of "live components
+expect a dead service" is really *a dead component expecting a dead
+service*. Not missing wiring (the definition is coherent and it builds),
+not stale-callers-only, not a config mistake (the gate *requires* the
+gating). **Supersession: not established either way — not searched for,
+recorded as unknown rather than assumed absent.**
+
+**A scope finding, recorded not fixed.** `DANGEROUS_SERVICES` is a
+hand-written tuple beside the thing — R5's canonical shape. 29 names
+against 32 services gated in every file that defines them. No live
+violation today, but the gate cannot notice if `parakeet-server`, `vault`
+or `vault-rotator` are ever ungated, because it is not looking at them.
+
+**A false positive caught before publication.** A first comparison
+reported `memu-graph` as "on the dangerous list but not gated". It **is**
+gated (`introspection`, `full.yml`); it read as ACTIVE only because
+`core-tests.yml` names it explicitly, and Compose enables a service's own
+profiles when it is named. My comparison had conflated *gated* with
+*never started*. Corrected before it reached the record — the same
+discipline that stopped the 31-false-positive paths finding in D174.
+
+**Recommended first batch, ordered by evidenceability rather than
+importance:** (1) promote the census to a registered `REPORT` instrument
+with a calibrated suite, since it currently lives outside the tree and
+nobody else can re-derive it; (2) exercise ONE profile in CI — `recovery`,
+which needs no change to any default and contains `verifier`, the service
+with the most live expecters; (3) measure the graceful-degradation
+question, defect class (2).
+
+**Explicitly not recommended:** booting all 34, or moving anything into a
+default profile.
+
+Full census, per-service table and method: `kai-pm/RUNTIME_TOPOLOGY_CENSUS.md`.

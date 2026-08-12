@@ -1,6 +1,16 @@
 # Embedding backends — measured state
 
 **#47 MEASUREMENT: COMPLETE.** Closed 2026-08-12 by operator decision.
+
+> **MEASUREMENT CLOSED IS NOT CAPABILITY HEALTHY.** The runtime denominator
+> is fully measured and the result is **not all-green**:
+> `agentic` is **runtime-confirmed BACKEND_UNAVAILABLE**, in a service
+> with no profile gate that both the minimal and full bring-ups start.
+> That is a live defect and it is tracked in the remediation backlog as
+> **task #52**, deliberately un-remediated. This note exists so that
+> "measurement complete" cannot quietly become "embedding problem
+> complete".
+
 **Last run:** 31570714150, commit `b747388`, tree `2c344ac`, 2026-08-12.
 Runs 1–3: 31528178414 / `da566df`, 31531007344 / `757d955`,
 31568526480 / `189500b`.
