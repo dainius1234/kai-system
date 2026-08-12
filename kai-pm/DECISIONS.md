@@ -9448,3 +9448,155 @@ me:** the parser blind to its own counter-evidence (found by the
 known-positive), a `set`/`list` comparison in the test (found by running
 it), and the unwired suite (found by the gate chain refusing to commit).
 None was found by reading the code.
+
+---
+
+## D179 — 2026-08-12 — The Mechanisms Are Safe. The Call Sites Are Not.
+
+#41 defect class B, measured. Profiles-off is the **intended** posture,
+so this is a question about the system as it is meant to run.
+
+### The denominator, corrected
+
+I had been saying "25 caller→dependency pairs". **It is 25 services and
+41 edges.** 25 is the count of gated services with at least one live
+caller; several have more than one. The unit is the *pair*, and the
+report now asserts `edges > services` so the unit cannot silently
+collapse back to the service.
+
+41 edges reduce to **four call mechanisms** — `resilient_call`,
+`pooled_client`, a raw `httpx` client, and the dashboard's concurrent
+node probe. Instrumenting the mechanism 41 times would have multiplied
+effort without multiplying evidence.
+
+### The mechanisms are sound
+
+Each was run against two genuinely absent dependencies: a **refused**
+connection (closed port) and a **blackhole** (a socket that accepts and
+never answers). The second exists because a refused connection returns
+fast whether or not anyone set a timeout — only the blackhole can expose
+a missing bound.
+
+```
+resilient_call   REFUSED  0.33s  explicit 'unavailable'
+resilient_call   BLACKHOLE 4.31s explicit 'unavailable'
+pooled_client    BLACKHOLE 2.00s ReadTimeout, bounded
+raw_httpx        BLACKHOLE 2.00s ReadTimeout, bounded
+node_probe       BLACKHOLE 2.00s explicit 'down'
+circuit_breaker  BLACKHOLE 6.32s opens and stops dialling
+```
+
+**10 observations, 0 in a dangerous class.** No blocking, no retry storm,
+no crash. The circuit breaker demonstrably stops after repeated failure.
+
+### And the dangerous class is one layer up
+
+`resilient_call` returns whatever `fallback=` the call site handed it. So
+a sound mechanism plus `fallback={"entries": [], "count": 0}` produces an
+**empty success** — a result the caller cannot distinguish from *the
+backend answered and had nothing to report*.
+
+**53 call sites target a gated service with an explicit fallback. 31 of
+them return an empty success.** `broker-bridge` → `{'positions': []}`,
+`email-reader` → `{'messages': []}`, `docker-watcher` →
+`{'containers': [], 'total': 0}`, `sysmetrics` → `{}`.
+
+Those are financial positions, unread mail and container inventories
+rendering as *empty* rather than as *unavailable*, in the system's normal
+configuration.
+
+**Not remediated.** This is a finding, and #41's rule is measure then
+stop.
+
+### The over-report I nearly shipped
+
+The classifier's first version recognised only `status: unavailable`, so
+it called `{'ok': False}` a silent fallback — **22 false positives out of
+53**. A gate that over-reports sends people to break working code, and
+this repository has produced that twice before. `ok=False`,
+`success=False` and an `error` key all say the same thing out loud, and
+the suite now asserts every spelling in both directions, plus that
+`{'ok': True}` is *not* laundered into safe by the key alone.
+
+### THE INSTRUMENT WAS READING ITS OWN STATE
+
+`resilient_call`'s circuit breakers live in a module-level dict **keyed
+by hostname**. Every probe here targets `127.0.0.1`. So the REFUSED run's
+failures opened the circuit, and the BLACKHOLE run afterwards returned
+its fallback **in 0.0s having never connected**.
+
+The output was a fast, clean, explicit degradation. It was the instrument
+reading its own previous result.
+
+Caught by one assertion — that the probe **actually waited** — rather
+than only that it returned quickly. *Fast* and *correct* are different
+observations, and only the second could tell them apart. Fixed by
+resetting the breakers per probe; in production the contamination cannot
+arise, because each service has its own hostname and therefore its own
+breaker. It arose purely because the harness collapses them onto one
+address.
+
+This is R9's shape once more: **an instrument whose own presence changes
+what it measures reports on itself and calls it the world.**
+
+### Registered
+
+`report_degradation_tolerance` (kind `REPORT`), proven and calibrated by
+`scripts/test_degradation_tolerance.py` — 39 assertions, 10 scenarios,
+wired as `make test-degradation-tolerance` and into `test-uh`. Registry:
+52 declared, 52 found, I-1…I-7 hold. The edge denominator is **imported**
+from `report_runtime_topology` rather than recomputed, because two
+implementations of one count are two things to keep in step.
+
+**KAI-GATE-047 opened:** 31 empty-success fallbacks on gated
+dependencies.
+
+### The per-edge answer: concentrated, not systemic
+
+Classified across the full **41-edge** denominator, on three axes kept
+apart — *did the dependency answer* / *did the caller substitute
+something* / *can anyone tell the substitute from a real answer*:
+
+```
+SILENT_FALLBACK        10 of 41
+BOUNDED_DEGRADATION    31 of 41
+MISLEADING_HEALTHY      0
+BLOCKED                 0
+RETRY_STORM             0
+CRASH                   0
+UNKNOWN                 0
+```
+
+An edge takes its **worst** call-site outcome, because the caller only
+has to be misled once.
+
+**All ten silent edges have a single caller: `dashboard/app.py`.**
+
+```
+broker-bridge     [finance]          10 of 11 call sites
+docker-watcher    [watchers]          3 of 4
+git-watcher       [watchers]          3 of 4
+monitor-service   [watchers]          3 of 8
+news-feed         [external-egress]   3 of 5
+sysmetrics        [watchers]          2 of 3
+clipboard-service [sensors]           2 of 3
+email-reader      [external-egress]   2 of 4
+files-service     [sensors]           2 of 3
+screen-watcher    [sensors]           1 of 4
+```
+
+So this is **not** a systemic default-core contract failure across
+services. It is one component's proxy convention, applied inconsistently
+even within itself — `monitor-service` has 3 silent sites out of 8, so
+the same file already marks failure explicitly five times over for the
+same dependency. That makes it a convention to settle rather than 31
+independent mistakes to find, and it makes the eventual repair narrow.
+
+Still not remediated. The measurement is the deliverable.
+
+### Still UNKNOWN, and labelled so
+
+Container DNS resolution, compose network behaviour, what the dashboard
+UI renders from these payloads, and whether each individual call site
+handles what its mechanism propagates. This measured the caller's logic,
+not the deployed system.

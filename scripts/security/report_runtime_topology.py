@@ -270,9 +270,14 @@ def survey(root: Path = REPO):
             "how": sorted(how.get(name, ())),
             "expected_by": sorted(expected.get(name, ())),
             "live_expecters": live,
-            # No machine-readable evidence record exists in this
-            # repository, so this cannot be derived and is not guessed.
-            "runtime_proven": "UNKNOWN (no machine-readable evidence record)",
+            # EVIDENCE STATUS, NOT HISTORY. "UNKNOWN" means this
+            # instrument cannot establish whether anything has executed
+            # inside the service -- there is no machine-readable evidence
+            # record to join to. It does NOT mean "never executed", and
+            # it must not decay into that reading: several of these have
+            # demonstrably run, in CI and by hand, and the evidence lives
+            # in prose nobody can query.
+            "runtime_proven": "UNKNOWN (evidence status: no machine-readable record to join)",
         })
     return rows, invs, defined
 
@@ -297,8 +302,12 @@ def main() -> int:
     print(f"  STARTED by a repo path        {len(started)}")
     print(f"  NEVER-STARTED                 {len(never)}")
     print(f"  ...expected by a LIVE caller  {len(orphaned)}")
-    print(f"  RUNTIME-PROVEN                UNKNOWN for all {len(rows)} — no "
-          f"machine-readable evidence record exists (task #51)")
+    print(f"  RUNTIME-PROVEN                UNKNOWN for all {len(rows)} — this is "
+          f"an EVIDENCE STATUS,\n"
+          f"                                not a history. It means no "
+          f"machine-readable record\n"
+          f"                                exists to join to (task #51), NOT "
+          f"that these never ran.")
 
     print(f"\n  `compose up` invocations found: {len(invs)}")
     print(f"  profile SETS selected by any of them: "

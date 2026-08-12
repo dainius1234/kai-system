@@ -630,6 +630,21 @@ REGISTRY: Tuple[Gate, ...] = (
     # because every adjacent pair has been conflated at least once:
     # defined / profile-gated / profile-set-enabled / individually
     # startable / runtime-proven / expected by a live caller.
+    # #41 defect class B. Profiles-off is the INTENDED posture, so what
+    # the live core does about an absent gated dependency is a question
+    # about the system as it is meant to run.
+    Gate(module="report_degradation_tolerance",
+         kind=REPORT,
+         summary="what the default core does when a profile-gated "
+                 "dependency is absent; 41 caller->dependency edges "
+                 "reduce to 4 call mechanisms, and the dangerous class "
+                 "lives at the call sites, not in the mechanisms",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ live caller -> absent-dependency edge",
+         proven_by="scripts/test_degradation_tolerance.py",
+         calibrated_by="scripts/test_degradation_tolerance.py",
+         in_policy_check=False,
+         findings=("KAI-GATE-047",)),
     Gate(module="report_runtime_topology",
          kind=REPORT,
          summary="what the tree DEFINES, what it GATES, and what a "
