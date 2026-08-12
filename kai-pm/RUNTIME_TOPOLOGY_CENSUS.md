@@ -1,5 +1,15 @@
 # #41 runtime-topology census — measured 2026-08-12
 
+> **#41-B CALLER-LOGIC MEASUREMENT = COMPLETE.** 41/41 edges: 31
+> BOUNDED_DEGRADATION, 10 SILENT_FALLBACK (all in `dashboard/app.py`), 0
+> MISLEADING_HEALTHY, 0 BLOCKED, 0 RETRY_STORM, 0 CRASH, 0 UNKNOWN.
+>
+> **DEPLOYED graceful-degradation behaviour = PARTIALLY UNKNOWN.** Kept
+> as a separate row on purpose. Caller-logic evidence is not deployment
+> proof, and no reading of this document may merge the two.
+>
+> `#53` / `KAI-GATE-047` open and deliberately unremediated.
+
 Read-only. Nothing was changed, started, or wired. Every number here was
 derived from this tree today; **no count was carried forward**, including
 task #41's own previous figure of 26.

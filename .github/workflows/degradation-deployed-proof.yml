@@ -1,0 +1,89 @@
+# Does the contained core behave correctly when gated dependencies are
+# genuinely absent — in containers, with real DNS?
+#
+# #41-B DEPLOYED. Caller-logic evidence already exists and is banked:
+# 41/41 edges, 31 BOUNDED_DEGRADATION, 10 SILENT_FALLBACK. This job asks
+# only whether the deployed topology changes those conclusions.
+#
+# NO PROFILE IS ENABLED, deliberately. Profiles-off is the intended
+# security posture, so this measures the system as it is meant to run.
+#
+# THE DASHBOARD IS THE SUBJECT, NOT THE AUTHORITY. Its status payload is
+# recorded last, labelled corroboration, and cannot establish anything.
+# Ground truth comes from a socket probe inside the container and from
+# `docker inspect` — the daemon's opinion, not the application's.
+name: Degradation tolerance (deployed, profiles OFF)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/project-rework-plan-pgvp35
+    # EVERY INPUT THIS JOB READS. Commit 924a600 repaired a collector and
+    # fired nothing, because the collector was absent from the filter of
+    # the job that runs it — a fix that could not execute. The list is
+    # the job's inputs; all of them belong in it.
+    paths:
+      - .github/workflows/degradation-deployed-proof.yml
+      - scripts/security/collect_degradation_deployed.sh
+      - scripts/security/report_degradation_tolerance.py
+      - scripts/security/report_runtime_topology.py
+
+permissions:
+  contents: read
+
+jobs:
+  deployed-degradation-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No profile may be enabled for this measurement
+        run: |
+          # The whole question is what the CONTAINED core does. A profile
+          # leaking in would measure a different system and the result
+          # would read the same.
+          if [ -n "${COMPOSE_PROFILES:-}" ]; then
+            echo "REFUSING: COMPOSE_PROFILES is set to '${COMPOSE_PROFILES}'"
+            exit 1
+          fi
+          echo "COMPOSE_PROFILES is unset. Commit ${GITHUB_SHA}"
+
+      - name: Mint an ephemeral database password for this run
+        run: |
+          printf 'DB_PASSWORD=ci-ephemeral-%s\n' \
+            "$(head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20)" \
+            >> "$GITHUB_ENV"
+
+      # ci-toleration: documented-skip
+      - name: Deployed degradation evidence
+        if: always()
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          bash scripts/security/collect_degradation_deployed.sh \
+            docker-compose.minimal.yml
+
+      # ci-toleration: documented-skip
+      - name: Evidence summary
+        if: always()
+        run: |
+          echo "commit ${GITHUB_SHA}"
+          echo
+          cat degradation-deployed.evidence 2>/dev/null \
+            || echo "  (not executed = UNKNOWN)"
+          echo
+          echo "Caller-logic evidence is already banked and is NOT re-derived"
+          echo "here: 41/41 edges, 31 BOUNDED_DEGRADATION, 10 SILENT_FALLBACK."
+          echo "This job establishes only whether the DEPLOYED topology changes"
+          echo "those conclusions. Edges not directly exercised above remain"
+          echo "deployment-UNKNOWN and must not be extrapolated from the ones"
+          echo "that were."
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: degradation-deployed-evidence
+          path: degradation-deployed.evidence
+          if-no-files-found: warn

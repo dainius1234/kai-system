@@ -84,8 +84,42 @@ class Toleration:
 
 
 DECLARED: Tuple[Toleration, ...] = (
+    # #41-B deployed. The dashboard is the SUBJECT here, so the
+    # collector records its self-report last and labelled, and takes
+    # ground truth from a socket probe and `docker inspect` instead.
+    Toleration(
+        workflow="degradation-deployed-proof.yml",
+        step="Deployed degradation evidence",
+        bucket=DOCUMENTED_SKIP,
+        reason="The collector's `stage()` records every command's exit "
+               "status as evidence and continues, because a probe that "
+               "proves a dependency ABSENT is a successful measurement of "
+               "an intended state, not a build to break. Profiles-off is "
+               "the correct posture, so nearly every command here is "
+               "expected to fail in a specific way, and the specific way "
+               "IS the result. It exits 2 only when the measurement "
+               "cannot be trusted at all — a profile leaking in. Retire "
+               "when #53's disposition is decided and this becomes a "
+               "regression gate.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="degradation-deployed-proof.yml",
+        step="Evidence summary",
+        bucket=DOCUMENTED_SKIP,
+        reason="`cat ... || echo (not executed = UNKNOWN)` — a missing "
+               "measurement must read as UNKNOWN, never as silence and "
+               "never as success. It does not judge completeness: the "
+               "caller-logic denominator is already banked, and this job "
+               "deliberately exercises a subset, so a completeness "
+               "verdict here would imply a coverage claim the job does "
+               "not make.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
     # One declaration per service, because the match is on the step name
-    # and there is now one INDEPENDENT collector step per service. They
+    # and there is one INDEPENDENT collector step per service. They
     # replace two earlier declarations — a separate "Diagnose image
     # resolution" step, and a single Claim A step that looped over all
     # three services. The loop was the defect: run #2 failed that one

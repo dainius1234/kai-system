@@ -9600,3 +9600,118 @@ Container DNS resolution, compose network behaviour, what the dashboard
 UI renders from these payloads, and whether each individual call site
 handles what its mechanism propagates. This measured the caller's logic,
 not the deployed system.
+
+---
+
+## D180 — 2026-08-12 — #41-B Caller-Logic Measurement Banked; Deployment Remains Partially Unknown
+
+Operator decision after adversarial review. A new invariant is adopted,
+and it generalises past this task:
+
+> **A component under test is not automatically a verification
+> authority.** No component may be the sole authority for proving its own
+> correctness, or the correctness of dependencies it represents. Anything
+> capable of influencing perception of its own correctness must be
+> independently cross-checked.
+
+That names, in one sentence, what R9 and I-8 have each been circling.
+
+### Banked: #41-B CALLER-LOGIC MEASUREMENT = COMPLETE
+
+```
+41 / 41 caller -> gated-dependency edges measured
+    31  BOUNDED_DEGRADATION
+    10  SILENT_FALLBACK          all localised to dashboard/app.py
+     0  MISLEADING_HEALTHY
+     0  BLOCKED
+     0  RETRY_STORM
+     0  CRASH
+     0  UNKNOWN
+```
+
+### Preserved separately, and NOT to be merged into the above
+
+```
+deployed graceful-degradation behaviour = PARTIALLY UNKNOWN
+```
+
+Source and caller-logic evidence is **not** deployment proof. The two are
+recorded as different rows on purpose: every conflation this programme
+has paid for began with one being read as the other.
+
+`#53` / `KAI-GATE-047` remains open and unremediated. It is deliberately
+left intact so its real deployed manifestation can be observed — a repair
+now would destroy the evidence the next measurement exists to collect.
+
+### Authorised next: profiles-OFF DEPLOYED tolerance measurement
+
+No profile is enabled. The contained core, exactly as intended.
+
+**It cannot run here.** Measured, not assumed: the Docker CLI is present
+and `docker info` fails — *"Cannot connect to the Docker daemon at
+unix:///var/run/docker.sock"*. As with #47, the only Docker-capable
+environment available is CI, so this becomes an evidence job on the
+branch-scoped `push` trigger.
+
+**The dashboard is a subject, not an authority.** Ground truth for
+"is the dependency genuinely absent" must come from something the
+dashboard cannot influence — container-level DNS/connect probes and
+`docker inspect` health, never the dashboard's own status payload.
+Dashboard output must never create the PASS.
+
+### The observation window, derived rather than chosen
+
+No magic "watch for two minutes". Every term is read from the system:
+
+| term | value | source |
+|---|---|---|
+| dashboard healthcheck `start_period` | 10s | `docker-compose.minimal.yml` |
+| `interval` × `retries` | 30s × 3 = 90s | same |
+| → earliest a health verdict can exist | **100s** | sum of the above |
+| one further interval, to see it is stable not transitional | 30s | same |
+| slowest single call chain | ≈20.9s | `_proxy_get` timeout 10s × 2 attempts + 0.3 + 0.6 backoff |
+| circuit-breaker recovery | 30s | `common/resilience.py` |
+| dashboard status cache TTL | 2s | `DASHBOARD_STATUS_TTL` |
+
+**Window = 150s.** The binding term is the healthcheck: a container
+cannot be declared unhealthy before 100s, so any shorter observation
+would be measuring the start-up grace period and calling it health. The
+extra 30s distinguishes a settled verdict from a transitional one, and
+the remaining 20s covers the slowest single call chain and overlaps the
+breaker's recovery.
+
+### The classification #53 will receive, decided in advance
+
+Deciding severity *before* the evidence would be the whole defect, so the
+criteria are fixed now and the verdict comes later:
+
+* **BLOCKER** — if false-empty data is consumed by any consequential
+  automated behaviour: routing, policy, memory or state promotion,
+  automated notification, a health-driven decision, an action, or another
+  component treating absence as factual empty state. Stop; do not enter
+  profile qualification.
+* **MAJOR but parkable** — operator-facing representation is misleading
+  but no automated decision is poisoned.
+* **local remediation debt** — the surface is unconsumed and produces no
+  material consequence under profiles-OFF.
+
+### Extrapolation is forbidden
+
+The report must state, per edge, whether it was **directly
+deployment-exercised**, **covered by a shared mechanism**, or **still
+deployment-UNKNOWN**. Where shared-mechanism evidence does not
+legitimately cover an edge, that edge stays UNKNOWN. The full 41-edge
+denominator is preserved either way.
+
+### Standing
+
+`#45` open until its natural 2026-08-14 firing. `#49`/`#50`/`#51` parked.
+`#53` unremediated. agentic `BACKEND_UNAVAILABLE` recorded and not
+interrupting #41. No default-profile expansion, no mass boot, no fallback
+fixes, no `recovery` activation, no new verification-framework campaign.
+
+Profile selection is deferred until after this evidence, and before any
+activation the chosen profile's consequential members must be checked
+against the P0 profile-security gate — if `KAI-GATE-046` materially
+intersects it, stop and report. `recovery` remains the leading candidate,
+not a conclusion.
