@@ -18,6 +18,7 @@ check before continuing.
 |---|---|
 | "would have", "cannot", "is simply", "should work", "it's just a" | R1 — I am asserting something I have not run |
 | "saved to…", "added to…", "wired into…" | R1 — a claim about *my own action*. `ls` it, or do not say it |
+| "recorded", "banked", "documented", "carried forward" | R1 — verifiable state claims. `grep` the record before saying them |
 | I am describing a safety net in the present tense | R2 — I have written a contingency, not run one |
 | I am about to describe the *shape* of a failure ("it's X, not Y") | §3.1 — my scope may be narrower than my claim. What is the full set? |
 | I am writing a name I recognise rather than one I looked up | R5 — a list beside the thing. Derive it |
@@ -71,6 +72,23 @@ existed; the text had only ever been in a chat message. Both claims were
 made in the same conversation where this rule was written down.
 
 `ls` it, or do not say it.
+
+**Earned a second time, 2026-08-12.** I ended a session by listing what
+to "carry forward" — a run's result, a three-layer mechanism, a
+correction, an unmeasured question — as though naming them preserved
+them. `grep` over `kai-pm/` found none of it: the run id appeared
+nowhere, the differential nowhere. Everything since the previous decision
+entry existed only in chat, and the session was one message from ending.
+The check took seconds; without it a full day's evidence would have been
+lost while I reported a clean handoff.
+
+The operator's formulation, which is the one to keep:
+
+> **"Recorded", "saved", "banked" and "documented" are verifiable state
+> claims. Verify the artefact exists before asserting them.**
+
+This applies to our own work at least as aggressively as to evidence from
+the system — more so, because nobody else is auditing it.
 
 ## R2. Always *run* the contingency, never merely write one
 

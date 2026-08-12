@@ -10059,3 +10059,72 @@ programme keeps paying for.
 UNKNOWN, still blocked by this prerequisite. `#53` UNASSESSED and
 unremediated. No `start_period` change, no offline flag, no bake, no
 profile, no run 4. `#45` awaits 2026-08-14; `#49`/`#50`/`#51` parked.
+
+---
+
+## D184 — 2026-08-12 — Sequence Refined: Semantic Necessity First, and the Invariant Is Larger Than the Guard
+
+Operator refinement to D183's plan. No new execution; this fixes the
+ordering and strengthens the invariant before either is acted on.
+
+### The opening sub-task is now the semantic question
+
+D183 listed the `store` / `search_by_category` embedding question as an
+open unknown *inside* the sweep. It is promoted to the **first** thing
+done, because it is cheap and has unusually high decision value. Three
+outcomes, each pointing somewhere different:
+
+* **introspection does not genuinely require embeddings for those
+  operations** → Option 3 (dependency extraction / lazy separation)
+  becomes very strong;
+* **they genuinely require embeddings** → removing the model is wrong,
+  and the question becomes **startup-time necessity vs request-time
+  necessity**, which is a different distinction and not the same answer;
+* **required eventually but not before bind** → still favours extraction
+  or lazy loading over baking another model into the image.
+
+Note the middle branch: "requires embeddings" does **not** imply
+"requires them before `:8009` binds". Collapsing those two is exactly the
+kind of conflation this programme keeps paying for, so they are named
+apart here before anyone measures.
+
+### The fourth option is a symptom of a larger invariant
+
+D183 recorded that the offline guard is attached to the wrong condition —
+an egress question gated on `MEMU_ALLOW_FAKE_EMBEDDINGS`. That stands,
+but it is **not** to be assumed the complete implementation fix. The
+operator's stronger form:
+
+> **Any runtime deployed without model-registry egress must have every
+> pre-readiness model dependency locally satisfiable, and must fail
+> closed rather than attempting external resolution.**
+
+That is a property of the deployment contract. It may be implemented by
+environment policy, shared image machinery, dependency extraction, lazy
+loading, or a combination — and **the denominator decides which
+architecture is justified**, not the first plausible patch. Re-conditioning
+the guard might be necessary and still not be sufficient.
+
+### The sequence, as authorised
+
+```
+semantic necessity (store / search_by_category)
+  -> A/B/C class-wide denominator, exactly as banked in D183
+  -> root-cause grouping
+  -> compare repair architectures
+  -> STOP for authorisation
+```
+
+### Standing prohibitions, restated because they are load-bearing
+
+No run 4. No healthcheck relaxation. No offline-flag patch. No model-bake
+duplication. No `#53` remediation. No profile activation.
+
+### On preserving the correction
+
+The operator's note, recorded because it is a statement about how this
+record stays usable: keeping the `BAKED`-evidence correction **explicit**
+rather than silently cleaning it up is what keeps the evidence record
+trustworthy over time. `DECISIONS.md` is append-only for this reason —
+a disproven claim that is deleted takes the pattern of the mistake with
+it.
