@@ -89,6 +89,74 @@ stage() {
   return $rc
 }
 
+# ── READ-ONLY POST-MORTEM for a failed bring-up ─────────────────────────
+#
+# Strictly non-mutating. It does NOT restart anything, re-run a
+# healthcheck, change a timing, add a secret, raise a limit or touch the
+# service. It reads what THE DAEMON ALREADY RECORDED while the failure
+# was happening.
+#
+# Deliberately NOT re-running the healthcheck command by hand: that would
+# create a new observation under a later state and muddy the original
+# failure. The daemon's own health history is the primary source; a
+# manual probe is a fallback only if that history turns out to be empty.
+diagnose_startup_failure() {
+  record ""
+  record "=== POST-MORTEM: containers that are not healthy ==="
+  local unhealthy=""
+  for cid in $(docker compose -f "$COMPOSE" ps -aq 2>/dev/null); do
+    local state
+    state="$(docker inspect --format '{{.Name}} {{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{else}}no-healthcheck{{end}}' "$cid" 2>/dev/null)"
+    record "  $state"
+    case "$state" in
+      *unhealthy*|*starting*|*exited*|*restarting*|*created*|*dead*)
+        unhealthy="$unhealthy $cid" ;;
+    esac
+  done
+  record "unhealthy_or_not_running=${unhealthy:-(none)}"
+
+  for cid in $unhealthy; do
+    local name
+    name="$(docker inspect --format '{{.Name}}' "$cid" 2>/dev/null | tr -d '/')"
+    record ""
+    record "--- $name ---"
+
+    # identity: which image, so the evidence names an immutable artefact
+    stage "pm_${name}_identity" docker inspect \
+      --format 'image={{.Image}} config_image={{.Config.Image}} exit={{.State.ExitCode}} oomkilled={{.State.OOMKilled}} error={{.State.Error}} restarts={{.RestartCount}} started={{.State.StartedAt}} finished={{.State.FinishedAt}}' \
+      "$cid"
+
+    # the healthcheck AS THE DAEMON HAS IT, not as the compose file reads
+    stage "pm_${name}_healthcheck_config" docker inspect \
+      --format '{{json .Config.Healthcheck}}' "$cid"
+
+    # THE PRIMARY EVIDENCE: what the daemon recorded, with timestamps,
+    # exit codes and the healthcheck's own output.
+    stage "pm_${name}_health_log" docker inspect \
+      --format '{{if .State.Health}}{{range .State.Health.Log}}=== start={{.Start}} end={{.End}} exit={{.ExitCode}}
+{{.Output}}
+{{end}}{{else}}NO HEALTHCHECK RECORDED{{end}}' "$cid"
+
+    # full container logs, timestamped, kept whole as an artefact
+    stage "pm_${name}_logs" docker logs --timestamps "$cid"
+
+    # the full inspect record, so nothing above is the only copy
+    stage "pm_${name}_inspect_full" docker inspect "$cid"
+  done
+
+  record ""
+  record "=== the dependencies its healthcheck path relies on ==="
+  for dep in postgres redis; do
+    dcid="$(docker compose -f "$COMPOSE" ps -q "$dep" 2>/dev/null)"
+    if [ -z "$dcid" ]; then record "  $dep=NO CONTAINER"; continue; fi
+    record "  $(docker inspect --format '{{.Name}} {{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{else}}no-healthcheck{{end}}' "$dcid")"
+  done
+
+  record ""
+  record "READ-ONLY. Nothing was restarted, re-probed, re-timed or repaired."
+  record "Full outputs are in $STAGE_LOGS/; the lines above are excerpts."
+}
+
 record "compose_file=$COMPOSE"
 record "profiles_enabled=NONE (intended contained-core posture)"
 record "observation_window_seconds=$WINDOW"
@@ -126,15 +194,27 @@ record "compose_up_exit=$up_rc"
 stage compose_ps docker compose -f "$COMPOSE" ps -a
 if [ "$up_rc" -ne 0 ]; then
   record ""
-  record "MEASUREMENT ABORTED: the contained core did not come up (exit $up_rc)."
-  record "This is an INSTRUMENT/ENVIRONMENT failure, NOT a finding about"
-  record "default-core degradation. Nothing below would measure the system;"
-  record "it would measure the absence of the system. Classification order:"
-  record "  instrument/environment failure  <-- THIS RUN"
-  record "  actual default-core defect      -- not established"
-  record "  #53 deployed manifestation      -- not established"
-  record "  successful bounded degradation  -- not established"
-  record "The failing stage's full output is in $STAGE_LOGS/compose_up.{out,err}."
+  record "MEASUREMENT ABORTED: PREREQUISITE STARTUP FAILURE (up exit $up_rc)."
+  record ""
+  record "CLASSIFICATION. Not 'instrument/environment failure' -- an earlier"
+  record "wording that was wrong, and wrong in a way that mattered: THE"
+  record "INSTRUMENT DID ITS JOB. It brought the stack up, detected that the"
+  record "prerequisite was unmet, and refused to measure. Calling that an"
+  record "instrument failure would blame the thermometer for the fever."
+  record ""
+  record "  PREREQUISITE STARTUP FAILURE   <-- THIS RUN, root cause UNKNOWN"
+  record "  actual default-core defect      -- NOT established"
+  record "  #53 deployed manifestation      -- NOT established"
+  record "  successful bounded degradation  -- NOT established"
+  record ""
+  record "The cause may be CI resources, healthcheck tuning, configuration or"
+  record "a genuine service defect. Naming which is what the evidence below"
+  record "is for, and nothing here decides it."
+  record ""
+  record "NO SUBJECT -> NO OBSERVATION. Every downstream probe is skipped."
+  record "Fifty correct 'not running' answers are one failed prerequisite"
+  record "repeated fifty times, and the table's shape would be the lie."
+  diagnose_startup_failure
   exit 2
 fi
 

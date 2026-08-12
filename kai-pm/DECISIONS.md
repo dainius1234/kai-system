@@ -9798,3 +9798,99 @@ reports what actually happened.
 Nothing about the production system was changed. `#53` stays
 unremediated, no profile was enabled, and the deployed question is still
 open.
+
+---
+
+## D182 — 2026-08-12 — Run 2 Was Not an Instrument Failure. It Was a Prerequisite Startup Failure.
+
+### Classification corrected, on operator instruction
+
+D181 filed deployed run 2 under *instrument/environment failure*. **That
+is wrong, and wrong in a way that matters.** The instrument did its job:
+it built the stack, detected that the prerequisite was unmet, refused to
+measure, and named the failing container. Calling that an instrument
+failure blames the thermometer for the fever.
+
+```
+PREREQUISITE STARTUP FAILURE — memu-core-introspect unhealthy in the CI
+default-core deployment; root cause UNKNOWN.
+```
+
+The collector printed the wrong label too, so it would have mislabelled
+every future abort. Corrected in the script, not only in the record.
+
+### Run 2 (`31622184972`, `5cfc72f`) — what it established
+
+```
+producer command   docker compose -f docker-compose.minimal.yml up -d --build
+exit status        1
+terminal failure   Container sovereign-memu-core-introspect  Error
+                   dependency failed to start: container
+                   sovereign-memu-core-introspect is unhealthy
+full artefact      stage-logs/compose_up.{out,err} — 197,148 + 71,347 bytes
+defect class       PREREQUISITE STARTUP FAILURE, root cause UNKNOWN
+```
+
+No fifty-row table. R11 held.
+
+**And the search space narrowed sharply.** `compose ps -a` ran before the
+abort, so we know what *did* start: postgres, redis, ollama, tool-gate,
+tts-service, weather-service all `Up (healthy)`; `ollama-pull`
+`Exited (0)` as designed; **`memu-core` itself reached `Healthy`.**
+
+We are no longer diagnosing "the default core failed somehow". We are
+diagnosing **one isolated prerequisite**. That is what makes a third run
+proportionate rather than tunnel vision.
+
+### Run 3 — authorised as diagnostic-only
+
+Strictly read-only, extending the abort path. It captures what the
+**daemon already recorded while the failure was happening**:
+
+* container and image identity, exit code, `OOMKilled`, error, restart
+  count, started/finished timestamps;
+* the healthcheck **as the daemon holds it**, not as the compose file
+  reads;
+* `State.Health.Log` — every probe's start, end, exit code and **output**;
+* full timestamped `docker logs`;
+* the full `docker inspect` record;
+* the state of `postgres` and `redis`, which its healthcheck path depends
+  on.
+
+**Deliberately NOT re-running the healthcheck by hand.** That would
+create a new observation under a later state and muddy the original
+failure. The daemon's own history is the primary source; a manual probe
+is a fallback only if that history proves empty.
+
+Nothing is restarted, re-timed, re-resourced, secret-injected, profiled
+or repaired.
+
+### What is NOT concluded
+
+`memu-core-introspect`'s healthcheck is
+`urlopen('http://localhost:8009/health')` with `start_period: 10s`, and
+its image bakes the same embedding model that takes ~8.4s to load in
+`memu-core`. **That is a hypothesis and it is recorded as one.** CI
+resource limits, healthcheck tuning, configuration and a genuine service
+defect all remain open. Run 3 reads the evidence; it does not decide.
+
+If run 3 says "healthcheck failed because endpoint X returned Y", we stop
+again and classify that boundary before touching production.
+
+### Two rules promoted into CLAUDE.md
+
+They are operating rules now, not historical notes, and both are in the
+R0 stop-signal table:
+
+* **R10** — full diagnostic output survives; excerpts declare themselves
+  partial and preserve terminal context. *A truncation is a `/dev/null`
+  with better manners.*
+* **R11** — no subject → no observation. A dependent measurement may not
+  execute after its prerequisite state is unproven.
+
+### Standing, unchanged
+
+`#41-B` caller logic COMPLETE. `#41` deployed behaviour PARTIALLY
+UNKNOWN. `#53` severity UNASSESSED, unremediated. No profile enabled, no
+production change, no recovery activation. `#45` awaits 2026-08-14;
+`#49`/`#50`/`#51` parked.

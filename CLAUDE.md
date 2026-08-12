@@ -21,6 +21,8 @@ check before continuing.
 | I am describing a safety net in the present tense | R2 — I have written a contingency, not run one |
 | I am about to describe the *shape* of a failure ("it's X, not Y") | §3.1 — my scope may be narrower than my claim. What is the full set? |
 | I am writing a name I recognise rather than one I looked up | R5 — a list beside the thing. Derive it |
+| I am about to `cut`, `head` or `tail` a diagnostic | R10 — keep the full output somewhere, and say how big the excerpt is |
+| A prerequisite failed and I am still collecting rows | R11 — no subject, no observation. Abort at the boundary |
 | I am fixing the second instance of something | R6 — count the population first, then fix all of it |
 | "we'll tune this once we measure it" | ship the instrument that produces the number in the *same* commit |
 | I am typing `;` between commands | R3 — use `&&` |
@@ -182,6 +184,55 @@ own presence changes what it measures reports on itself and calls it the
 world.** That is the same defect as a check whose scope is wrong, seen
 from the other side, and §3.5 predicts it — diagnostics are structurally
 the least-executed code, so they are where this lands.
+
+## R10. Full diagnostic output survives; excerpts say they are excerpts
+
+**The full output of a diagnostic is authoritative and must survive.**
+Any human-facing excerpt must visibly declare that it is partial, and
+must preserve the terminal failure context by default.
+
+Earned twice, the same defect wearing different clothes:
+
+* 2026-08-11, #47 run 2: a resolver sent stdout, stderr and the exit
+  status of every attempt to `/dev/null` and returned one string. When it
+  came back empty the chain collapsed to `UNRESOLVED` and the failing
+  stage was unknowable.
+* 2026-08-12, #41-B deployed run 1: a collector recorded
+  `cut -c1-1500` of a 197KB build log. The first 1500 characters are
+  Dockerfile parsing; the failure is at the end. The record stopped at
+  `#13 … load build definition`, and the run could not say why the stack
+  had not started.
+
+**A truncation is a `/dev/null` with better manners.** Tail-by-default is
+right for build and process failures, because the causal error is
+normally terminal — but the tail is a convenience, and the full artefact
+is what stops one blind spot being swapped for another. Record the byte
+count too: an excerpt that does not announce its own size reads like the
+whole thing.
+
+## R11. No subject → no observation
+
+**A dependent measurement may not execute after its prerequisite state is
+unproven.**
+
+Earned 2026-08-12. `compose up` failed, so the system under test did not
+exist — and the collector went on to run fifty probes against it,
+recording fifty results. Every one was correct. `service "dashboard" is
+not running`, fifty times. Not fifty measurements: **one failed
+prerequisite repeated fifty times**, in a table whose shape said
+otherwise.
+
+That shape is the danger. An empty table invites a question; a full table
+of correct-looking rows invites a conclusion.
+
+Abort at the prerequisite boundary, say which prerequisite failed, and
+say what was therefore not measured.
+
+**And classify the abort honestly.** An instrument that detects an unmet
+prerequisite and refuses to measure has *worked*. Calling that an
+"instrument failure" blames the thermometer for the fever — the correct
+label names the unmet prerequisite and leaves its root cause UNKNOWN
+until something measures it.
 
 ## I-8. Calibrate against independent evidence
 
