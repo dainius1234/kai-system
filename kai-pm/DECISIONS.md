@@ -9070,3 +9070,165 @@ No detector is shipped for this class today. Building one needs
 glob-aware matching and a calibration run with a known-positive and a
 known-negative, and doing that carelessly is worse than not doing it.
 Registered rather than improvised.
+
+---
+
+## D175 — 2026-08-12 — Two Denominators Were Being Mixed, and #47 Was Already Answered
+
+**#47 measurement is CLOSED.** Operator decision, 2026-08-12. Run 5 was
+authorised in principle and deliberately not spent.
+
+**The correction.** Two different populations had been carrying the same
+name:
+
+```
+source-reachability denominator   3   every non-test module importing
+                                      sentence_transformers
+production runtime denominator    2   services a repo-defined path
+                                      actually starts
+```
+
+`report_embedding_backends.py` derives the first. That is the right
+population for *"which modules could degrade"* and the wrong one for
+*"which running services do degrade"*, and nothing had ever said so. The
+gap between them is what nearly bought a fifth CI run.
+
+**The production runtime denominator is 2 of 2, measured:**
+
+| service | verdict | how |
+|---|---|---|
+| `memu-core` | **REAL** | Claim A run 4 — image `sha256:ee94f1cb…`, 3/3 probe stages, `--network none`; and Claim B runs 1/3/4 through the normal application path under the production default, width 384 |
+| `agentic` | **BACKEND_UNAVAILABLE** | Claim A run 4 — image `sha256:47d6a1b6…`, probe exit 5, executed inside agentic's own image, offline |
+
+Both `measurement=COMPLETE`. agentic's negative is a successful
+measurement of an absent capability. The original #47 question — does
+memu-core's documented production default actually reach a real
+backend — is answered, in a runtime, with a vector width.
+
+**fusion-engine is excluded, on measured topology.** Declared only in
+`docker-compose.full.yml` under `profiles: ["recovery"]`; **no
+repo-defined path enables that profile** — zero `COMPOSE_PROFILES=` or
+`--profile` in the Makefile, any workflow or any script. `core-tests.yml`
+runs `up -d` on `full.yml` with no profile, so it is excluded by
+definition, and `test_restart_persistence.py:178` says so in prose. The
+only build of `kai-system-fusion-engine` in the repository is the #47
+evidence job this work introduced.
+
+```
+runtime classification   BUILD-ONLY / NOT CURRENTLY REPO-RUNTIME-REACHABLE
+semantic verdict         NOT APPLICABLE TO THE CURRENT RUNTIME DENOMINATOR
+future status            contingent on task #41
+```
+
+**And the probe would have been the wrong instrument anyway.**
+`_semantic_agreement()` is a plain helper, not an endpoint, wrapped in
+`except ImportError: return _jaccard_agreement(texts)`. Both paths return
+an **agreement float**. There is no vector width, so REAL/FAKE/384-vs-8
+cannot classify it. If #41 proves fusion-engine is intended to run, it
+re-enters the runtime denominator with a **purpose-built
+semantic-agreement probe**.
+
+**Moved to #41:** four components expect `http://fusion-engine:8053`
+while nothing starts it — the dashboard health map, the supervisor
+service list, the metrics-gateway scrape list, and a prometheus job.
+Whether that is missing wiring, a dormant service, stale configuration or
+another topology defect is **not decided here**.
+
+**Correcting D173.** D173 said *"'behind a profile' is disproven."* Too
+broad, and corrected here rather than edited there. fusion-engine **is**
+behind a profile. What run 3 disproved was narrower: the profile was not
+what blocked the **resolver**. The topology claim was right; my phrasing
+overreached the measurement.
+
+**The lesson, which is the durable part.** The instrument was correct and
+the *question* had drifted. Four runs of increasingly careful
+verification could not have revealed that, because none of them asked
+what fusion-engine **is** in the deployment topology. A read-only
+topology reconstruction, costing minutes, answered it.
+
+> Use the smallest trustworthy instrument capable of answering the
+> remaining material question. Do not make the instrument larger than the
+> question. And before repairing a resolver, check that the artefact it
+> is resolving belongs to the runtime the resolver represents.
+
+**Standing:** no embedding remediation yet. What agentic's measured
+degradation means for the intended architecture is a separate,
+deliberate decision.
+
+---
+
+## D176 — 2026-08-12 — KAI-GATE-034 Toleration Review: One Half Closes, One Half Has Still Never Run
+
+Review due today, per the toleration dated 2026-08-05. Closure condition
+as written: *"`friday-cleanup` and `weekly-report-card` are both observed
+green."* Read-only evidence review, no code changed.
+
+### weekly-report-card — CLOSURE CONDITION MET
+
+Run 443, **2026-08-10**, `schedule`, sha `194db0a`, conclusion
+**success**.
+
+Verified that this run executed a **fixed** tree rather than assuming it:
+`194db0a` contains both halves of the fix (`c1cab77` randomised
+delimiter, `1c6936a` trailing newline), and its copy of the workflow has
+**3 randomised-delimiter blocks and 0 constant-`EOF` blocks**. The green
+run exercised the repaired code.
+
+That check is the point. Runs 441 and 442 (2026-08-05, `workflow_dispatch`)
+were also green and are **not** admissible: they ran at `c1cab77`, which
+carries the delimiter half and **not** the trailing-newline half. A green
+run of a half-fixed tree is evidence about that tree, not about the fix.
+
+### friday-cleanup — NO ADMISSIBLE EVIDENCE EXISTS
+
+Last run: 443, **2026-08-07**, `schedule`, sha `a0298c6`, conclusion
+**failure**:
+
+```
+##[error]Unable to process file command 'output' successfully.
+##[error]Invalid value. Matching delimiter not found 'EOF'
+```
+
+That is KAI-GATE-034 firing exactly as described. And `a0298c6`
+**contains neither fix commit** — its copy still reads
+`echo "output<<EOF"` and `printf "%b" "$stale_list"`.
+
+The trap, avoided: `a0298c6` **is** an ancestor of today's `origin/main`,
+so "is the fix on main?" answers *yes* and means nothing. The fix
+commits are dated 2026-08-05 but reached main **after** the 2026-08-07
+firing. **Author date is not merge date**, and asking whether a commit is
+on a branch today says nothing about the tree a run executed. The only
+sound question is what the run's own sha contained.
+
+`friday-cleanup` is `cron: '0 9 * * 5'` — weekly, Friday. It has not
+fired since the fix landed. **Its evidence does not exist yet, and its
+absence is not evidence of failure.**
+
+### Verdict
+
+```
+KAI-GATE-034   status: OPEN, toleration EXTENDED
+               weekly-report-card half:  SATISFIED (194db0a, 2026-08-10)
+               friday-cleanup half:      NOT YET RUN FROM A FIXED TREE
+               next admissible evidence: 2026-08-14, 09:00 UTC
+               review by: 2026-08-17
+               owner: orion
+```
+
+Programme Rule 7: the count does not move. The finding stays open.
+
+**Not done, deliberately:** `workflow_dispatch` is available on
+`friday-cleanup` and would produce the evidence today. It is not fired,
+because forcing a scheduled job to manufacture a green tick is measuring
+the run we wanted rather than the run that happens. Two days' wait costs
+nothing.
+
+**A scope finding, recorded not fixed.** `check_workflow_outputs` gates
+*"no `$GITHUB_OUTPUT` heredoc is bounded by a constant"*. The 2026-08-05
+failure had two mechanisms — the constant delimiter **and** content with
+no trailing newline, so `echo "$d"` lands on the same line as the content
+and the delimiter is never found. `1c6936a`'s own title says it: *"a
+delimiter is lost two ways, and my gate only knew one."* The gate is
+green today on both files, and whether it detects the second mechanism is
+**not established**. Registered for a calibrated known-positive; not
+improvised here.

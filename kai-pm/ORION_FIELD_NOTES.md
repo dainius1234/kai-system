@@ -416,5 +416,8 @@ Worth not re-deriving:
   embeddings and real credentials is not proven.
 * Lint waves: F401 321, E501 246, E127/E221 272, F841 24, F541 20.
 * A-03 sentinel mutation audit; KAI-GATE-026 container CVEs.
-* KAI-GATE-034 tolerated, owner Orion, review 2026-08-12.
+* KAI-GATE-034 tolerated, owner Orion, reviewed 2026-08-12 (D176),
+  extended to 2026-08-17. Half satisfied; friday-cleanup awaits its next
+  scheduled firing. Author date is not merge date -- `a0298c6` is an
+  ancestor of main today and contained neither fix when it ran.
 * 60 commits ahead of `main`, unmerged — awaiting explicit authorisation.

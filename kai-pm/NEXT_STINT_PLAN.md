@@ -385,7 +385,12 @@ effect, removing it changes behaviour.
 * **A-03** sentinel mutation audit — register entry says unscheduled,
   audit tool is not a gate.
 * **KAI-GATE-026** container CVEs.
-* **KAI-GATE-034** tolerated, owner Orion, **review due 2026-08-12**.
+* **KAI-GATE-034** tolerated, owner Orion, **reviewed 2026-08-12 (D176),
+  extended to 2026-08-17**. `weekly-report-card` half SATISFIED — run 443,
+  `194db0a`, green, and that tree verified to contain both fix halves.
+  `friday-cleanup` half has **never run from a fixed tree**: its last
+  firing (2026-08-07, `a0298c6`) predates the merge and failed with the
+  tracked defect. Next admissible evidence 2026-08-14 09:00 UTC.
 * Tag `v0.1-all-profiles-green` exists locally only; five push attempts
   died on `send-pack: unexpected disconnect`. Retry when the network
   allows. `WAYPOINTS.md` is the source of truth regardless.

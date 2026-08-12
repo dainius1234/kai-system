@@ -1,12 +1,92 @@
 # Embedding backends — measured state
 
-**Last run:** 31568526480, commit `189500b`, tree `f4bd412`, 2026-08-12.
-Run 2 was 31531007344 / `757d955`; run 1 was 31528178414 / `da566df`.
+**#47 MEASUREMENT: COMPLETE.** Closed 2026-08-12 by operator decision.
+**Last run:** 31570714150, commit `b747388`, tree `2c344ac`, 2026-08-12.
+Runs 1–3: 31528178414 / `da566df`, 31531007344 / `757d955`,
+31568526480 / `189500b`.
 
 > **RETRACTION, run 3.** The row `fusion-engine claim-A: REAL` that run 3
-> printed is **withdrawn**. It is a verdict about **memu-core's image**,
-> mislabelled. See §"Run 3" below. fusion-engine's runtime backend
-> remains **UNKNOWN**.
+> printed is **withdrawn**. It measured **memu-core's image**. See
+> §"Run 3" below.
+
+---
+
+## THE TWO DENOMINATORS
+
+The single most important correction in this work. They were being mixed,
+and mixing them is what nearly spent a fifth CI run on a dormant artefact.
+
+### Production runtime denominator — **2 of 2 MEASURED**
+
+Services that a **repo-defined execution path actually starts**, and
+whose embedding backend therefore matters in production.
+
+| service | started by | verdict | evidence |
+|---|---|---|---|
+| `memu-core` | minimal, full, sovereign bring-ups | **REAL** | Claim A run 4, immutable image `sha256:ee94f1cb…`, 3/3 probe stages, `--network none`; **and** Claim B runs 1/3/4 through the normal application path under the production default, width 384 |
+| `agentic` | minimal, full bring-ups | **BACKEND_UNAVAILABLE** | Claim A run 4, image `sha256:47d6a1b6…`, probe exit 5 = NO_OBSERVATION, executed inside agentic's own image with `--network none` |
+
+Both rows carry `measurement=COMPLETE`. agentic's negative result is a
+**successful measurement of an absent capability**, not a failed
+measurement.
+
+### Source-reachability denominator — **3 modules**
+
+Every non-test module importing `sentence_transformers`, which is what
+`report_embedding_backends.py` derives. Correct for *"which modules could
+degrade"*; it is **not** the set of *"which running services do
+degrade"*, and nothing had ever said so. The third module is
+`fusion-engine/app.py`.
+
+### fusion-engine — excluded from the runtime denominator
+
+```
+runtime classification        BUILD-ONLY / NOT CURRENTLY REPO-RUNTIME-REACHABLE
+semantic-helper verdict       NOT APPLICABLE TO THE CURRENT RUNTIME DENOMINATOR
+future runtime status         contingent on task #41
+```
+
+Measured topology, 2026-08-12:
+
+* declared in `docker-compose.full.yml` **only**, under
+  `profiles: ["recovery"]`; absent from `minimal.yml` and
+  `sovereign.yml`;
+* **no repo-defined path enables `recovery`** — zero occurrences of
+  `COMPOSE_PROFILES=` or `--profile` in the Makefile, any workflow or any
+  script. `core-tests.yml` runs `up -d` on `full.yml` with no profile, so
+  fusion-engine is excluded by definition;
+* `scripts/test_restart_persistence.py:178` states it outright:
+  *"`profiles: ["recovery"]` — deliberately not in this bring-up"*;
+* the **only** build of `kai-system-fusion-engine` in the repository is
+  the #47 evidence job itself, which this work introduced.
+
+**Its capability is also the wrong shape for this probe.** The
+`sentence_transformers` call lives in `_semantic_agreement()` — a plain
+helper, not an endpoint — wrapped in
+`except ImportError: return _jaccard_agreement(texts)` with a second
+`except Exception:` around the model load. Both paths return an
+**agreement float**. There is no vector to measure, so REAL / FAKE /
+384-vs-8 is not the right instrument for it. If #41 proves fusion-engine
+is intended to run, it re-enters the runtime denominator and gets a
+**purpose-built semantic-agreement probe**, not the embedding-vector one.
+
+### Moved to task #41
+
+**Four components expect `http://fusion-engine:8053` while nothing
+starts that service** — the dashboard health map, the supervisor service
+list, the metrics-gateway scrape list, and a prometheus job. Whether that
+is missing runtime wiring, a dormant/superseded service, stale
+health/metrics configuration, or another topology defect is **not decided
+here**; it is re-derived from #41 evidence.
+
+### Correction to this document's earlier wording
+
+An earlier revision said *"'behind a profile' is disproven."* That was
+too broad, and it is corrected rather than deleted. fusion-engine **is**
+behind a profile — `profiles: ["recovery"]`. What run 3 disproved was
+narrower: the profile was not what blocked the **resolver**; with
+`COMPOSE_PROFILES='*'` it resolves fine. The topology claim was right all
+along; the phrasing overreached the measurement.
 
 ---
 
@@ -49,23 +129,33 @@ probe  3 of 3 stages reached — library import, model load, semantic operation
 
 | row | status | why |
 |---|---|---|
-| agentic runtime backend | **UNKNOWN** | run 3 measured the failing stages: `create --no-deps` is an invalid flag, and the name fallback resolved `ollama/ollama:0.6.8`, which is not built locally |
-| fusion-engine runtime backend | **UNKNOWN** | run 3's `REAL` row is **retracted** — it probed `kai-system-memu-core`, not fusion-engine's image |
+| fusion-engine runtime backend | **NOT APPLICABLE** | build-only; no repo-defined path starts it. See §"The two denominators" |
 
-**"Behind a profile" is disproven.** Run 3 measured it: with
-`COMPOSE_PROFILES='*'`, `config --services` lists `fusion-engine`
-(`service_known_with_all_profiles=yes`) and `config --images` names
-`kai-system-fusion-engine`. The profile was never the obstacle. Recording
-this because it was carried as a hypothesis for two runs and the
-temptation was to write it down as a cause.
+`agentic` moved from UNKNOWN to **BACKEND_UNAVAILABLE** in run 4 — its
+image was resolved from the container Compose created and the probe ran
+inside it.
 
-`agentic` and `fusion-engine` remain **DECLARATION DEFECT** by static
-measurement — the library is absent from their requirements, their
-Dockerfiles install only that file from a bare base, and full transitive
-resolution (46 and 18 packages) contains no `sentence-transformers`,
-`torch` or `transformers`. That proves the declaration is missing. It
-does not prove the built container lacks it, and dependency arithmetic
-is not a built container.
+The profile was not what blocked the **resolver** — with
+`COMPOSE_PROFILES='*'` run 3 showed `config --services` listing
+`fusion-engine` and `config --images` naming `kai-system-fusion-engine`.
+That is a statement about resolution only; see §"Correction to this
+document's earlier wording" above.
+
+### The declaration defect, now settled for agentic
+
+Static measurement said the library was absent from `agentic`'s and
+`fusion-engine`'s requirements — their Dockerfiles install only that file
+from a bare base, and full transitive resolution (46 and 18 packages)
+contains no `sentence-transformers`, `torch` or `transformers`.
+
+That proved the **declaration** was missing and said nothing about the
+built container. **Run 4 closed the gap for agentic through an
+independent channel:** the probe ran inside agentic's own image, offline,
+and reached no semantic backend. Two different methods, same answer —
+which is the point of measuring rather than arguing.
+
+For `fusion-engine` the static finding stands and is **untested at
+runtime by design**: nothing starts it, so there is no runtime to test.
 
 ## Run 1's instrumentation defect, and why it matters
 
