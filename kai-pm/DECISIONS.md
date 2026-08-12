@@ -9312,3 +9312,139 @@ question, defect class (2).
 default profile.
 
 Full census, per-service table and method: `kai-pm/RUNTIME_TOPOLOGY_CENSUS.md`.
+
+---
+
+## D178 — 2026-08-12 — #41 Reframed, and the Parser That Could Not See Its Own Counter-Evidence
+
+**#41 is reframed by operator decision.** The old objective — "boot the 26
+never-started services" — is withdrawn. It conflicts with the P0
+containment model, which *requires* consequential services to be
+profile-gated so that a bare `docker compose up` starts only the
+contained core. #41 now means:
+
+> **DEFAULT-CORE TOLERANCE + EXPLICIT PROFILE RUNTIME QUALIFICATION.**
+> Prove the contained default core works correctly while optional
+> capabilities are deliberately absent; then qualify profiles one at a
+> time, as profiles.
+
+Two measured defect classes, kept separate:
+
+* **A — profile qualification gap.** No repo-defined invocation has
+  exercised an intended profile *set*, so the mechanism and 31 service
+  runtimes carry no profile-level evidence.
+* **B — default-core dependency gap.** Active components call services
+  that are intentionally absent while profiles are off. Graceful
+  degradation is unmeasured.
+
+**B is first**, because profiles-off is the *intended* default security
+state, so B is a question about the system as it is meant to run.
+
+### Wording corrected, on operator instruction
+
+D177 said *"no profile is ever exercised"*. Too broad. `memu-graph` is
+gated (`introspection`) and starts, because `core-tests.yml` names it and
+**Compose enables a service's own profiles when the service is targeted
+by name**. The source-confirmed claim is narrower:
+
+> **No repo-defined path has exercised the intended explicit profile
+> activation mechanism as a profile set.**
+
+That wording survives the `memu-graph` exception. The report now prints
+the exception by name so the distinction cannot quietly collapse again.
+
+### The census is now a registered instrument
+
+`scripts/security/report_runtime_topology.py`, kind `REPORT`, proven and
+calibrated by `scripts/test_runtime_topology.py` (33 assertions, 12
+scenarios). Registry: 51 declared, 51 found, I-1…I-7 hold.
+
+It keeps six things apart, because every adjacent pair has been conflated
+at least once in this programme:
+
+```
+defined · profile-gated · profile-set-enabled · individually startable ·
+runtime-proven · expected by a live caller
+```
+
+`runtime_proven` is printed as **UNKNOWN for all 61** and explicitly not
+derived: there is no machine-readable evidence record in this repository,
+so the column cannot be computed. That absence is task #51's finding,
+surfaced by an instrument rather than argued in prose.
+
+### THE DEFECT THE CALIBRATION FOUND, which is the point of this entry
+
+The report's headline claim is *"no invocation selects a profile set"*.
+Its first parser matched
+
+```python
+r"docker compose\s+(?:-f\s+(?P<file>\S+)\s+)?up\s+…"
+```
+
+which anchors `up` immediately after the optional `-f FILE`. So
+
+```
+docker compose -f X --profile recovery up -d
+```
+
+**did not match at all.** The one command form that could have disproved
+the headline finding was the one form the instrument could not see.
+
+Nothing in the real tree would ever have revealed this, because the real
+tree contains no such invocation — the finding and the blindness produce
+identical output. It was found only by a **known-positive written in the
+test**: a synthetic tree that *does* select a profile, asserting the
+report notices. Both spellings are now covered (`--profile` and
+`COMPOSE_PROFILES=`), on both sides of `up`.
+
+After the repair the real tree reads **identically** — 61 / 32 / 27 / 34 /
+25, profile sets `NONE`. The finding survived becoming falsifiable, which
+is the only reason it is now worth anything.
+
+> **An instrument that cannot represent the counter-evidence to its own
+> conclusion is not measuring — it is asserting.** This is I-8's reason
+> for existing, and it is the fourth distinct shape of it this week:
+> scope too small, scope too large, scope displaced, and now *scope
+> unable to express the negation*.
+
+A second, smaller defect surfaced in the same run: the test compared a
+`set` to a `list`. Test wrong, instrument right — recorded because
+"the test failed" and "the code is broken" are not the same event.
+
+### KAI-GATE-046 — opened
+
+The P0 containment gate's `DANGEROUS_SERVICES` is a hand-written tuple:
+**29 names against 32 services gated in the tree**. `parakeet-server`,
+`vault` and `vault-rotator` are gated but unwatched, so the gate could
+not notice them being ungated later. **No violation today** — they are
+gated. Denominator drift, surfaced by the new report on every run, and
+deliberately **not** repaired inside #41. Repair belongs to #51.
+
+**An id collision caught before it landed:** the registry entry was first
+written with `findings=("KAI-GATE-045",)`, which is already
+`check_test_identity`. Checked against the register rather than assumed
+free.
+
+### And the gate chain caught a third defect, in this very commit
+
+`gated_commit.sh` refused. `check_test_wiring` found that
+`test_runtime_topology.py` reports through `check()` and `EXIT GATE`
+while **no Makefile recipe ran it as a script** — so under `pytest` every
+test function returns normally regardless of what `check()` recorded, and
+its 33 assertions could not have failed anything.
+
+That is the A-04d class exactly: *a test that is never called is not a
+test*. I had written the suite, run it by hand, watched it find a real
+parser defect — and shipped it unwired. Running it by hand is not a
+control; the harness that runs by itself is.
+
+Fixed by a `test-runtime-topology` recipe, added to `.PHONY` and to the
+`test-uh` aggregate so something actually invokes it. A recipe nothing
+calls would have satisfied the wiring gate while remaining an inert rule
+(I-5) — both halves were needed.
+
+**Three defects in one commit, all found by instruments rather than by
+me:** the parser blind to its own counter-evidence (found by the
+known-positive), a `set`/`list` comparison in the test (found by running
+it), and the unwired suite (found by the gate chain refusing to commit).
+None was found by reading the code.

@@ -625,6 +625,23 @@ REGISTRY: Tuple[Gate, ...] = (
                         "networks to silence it would change the security "
                         "topology to quieten a check",
          in_workflows=("policy-checks.yml",)),
+    # #41's denominator, derived rather than remembered. The task carried
+    # the figure 26 for weeks; the tree says 34. Its six columns exist
+    # because every adjacent pair has been conflated at least once:
+    # defined / profile-gated / profile-set-enabled / individually
+    # startable / runtime-proven / expected by a live caller.
+    Gate(module="report_runtime_topology",
+         kind=REPORT,
+         summary="what the tree DEFINES, what it GATES, and what a "
+                 "repo-defined path actually STARTS; a never-started "
+                 "service is usually CORRECT, because the P0 containment "
+                 "model requires consequential services to be gated",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ service definition\(s\)",
+         proven_by="scripts/test_runtime_topology.py",
+         calibrated_by="scripts/test_runtime_topology.py",
+         in_policy_check=False,
+         findings=("KAI-GATE-046",)),
     Gate(module="report_embedding_backends",
          kind=REPORT,
          summary="every service choosing between a semantic backend and a "

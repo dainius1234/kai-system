@@ -23,8 +23,21 @@ profiles ENABLED by any repo-defined invocation:  NONE
 ```
 
 Zero `COMPOSE_PROFILES=` and zero `--profile` in the Makefile, in any
-workflow, or in any script. The profile mechanism has **never been
-exercised**.
+workflow, or in any script.
+
+**Precise claim, and the imprecise one it replaces.** Do *not* say "the
+profile mechanism has never been exercised" — that is broader than the
+evidence and `memu-graph` is the counter-example: it is gated
+(`introspection`) and `core-tests.yml` names it explicitly, and Compose
+enables a service's own profiles when the service is targeted by name, so
+it starts. What is source-confirmed is narrower:
+
+> **No repo-defined path has exercised the intended explicit profile
+> activation mechanism as a profile set.**
+
+Individual gated services can be and are started by naming them. What has
+never happened is a profile being *selected*, as a set, through
+`--profile` or `COMPOSE_PROFILES`.
 
 ## 1. And the gating is deliberate — this is the finding that reframes #41
 
@@ -46,8 +59,9 @@ denominator is what surfaced it.
 
 The defect is therefore **not** that these services are gated. It is:
 
-1. **no profile is ever exercised**, so 31 services have *zero* runtime
-   evidence of any kind; and
+1. **no profile has ever been activated as a profile set**, so the
+   profile mechanism itself and 31 service runtimes carry no
+   profile-level runtime evidence; and
 2. **live components call gated services unconditionally** — whether they
    degrade gracefully when those endpoints are absent is **unmeasured**.
 
@@ -175,15 +189,24 @@ is speech — so this is reported, not decided.
 
 Ordered by **evidenceability**, not importance.
 
-**Work item 1 — promote this census to a registered instrument.**
-It currently lives outside the tree, so its numbers cannot be re-derived
-by anyone else. It needs a `proven_by` suite with a known-positive and a
-known-negative, a printed denominator, and a `gate_registry` entry of
-kind `REPORT` (the `report_embedding_backends` entry is the precedent).
-Until then every figure above is a snapshot, not a measurement anyone can
-repeat.
+**Work item 1 — DONE.** `scripts/security/report_runtime_topology.py`,
+kind `REPORT`, proven and calibrated by
+`scripts/test_runtime_topology.py` (33 assertions, 12 scenarios).
+Registry: 51 declared, 51 found, I-1…I-7 hold. Every figure above is now
+re-derivable with one command.
 
-**Work item 2 — exercise ONE profile in CI, and observe.**
+Its calibration immediately earned itself: the first parser anchored `up`
+directly after `-f FILE`, so
+`docker compose -f X --profile recovery up -d` **did not match at all** —
+the one command form that could have disproved the headline finding was
+the one form the instrument could not see. The real tree would never have
+revealed it, because the finding and the blindness produce identical
+output. Found by a known-positive written in the test. After the repair
+the real tree reads identically, so the finding survived becoming
+falsifiable.
+
+**Work item 2 (operator-reordered: this is now THIRD) — exercise ONE
+profile in CI, and observe.**
 `recovery` is the natural first: 5 members, it contains `verifier`
 (5 live expecters, the highest in the tree), `supervisor` and
 `fusion-engine`, and it needs **no change to any default** — a
@@ -191,8 +214,24 @@ profile-enabled bring-up alongside the existing ones. This converts
 "31 services with zero runtime evidence" into a measured number, and it
 is the smallest instrument that can.
 
-**Work item 3 — measure the graceful-degradation question, which is
-defect class (2).**
+**Work item 2 (operator-reordered: this is now SECOND, and first in
+priority) — measure the graceful-degradation question, defect class B.**
+
+Profiles-off is the *intended* default security state, so this is a
+question about the system as it is meant to run, not about an optional
+extra. For each active caller of a gated dependency, establish: request
+behaviour, timeout/retry behaviour, caller health, capability status,
+fallback, and externally visible indication. The specific failure shapes
+to distinguish are bounded explicit degradation, crash/restart,
+blocking/hang, retry or log storm, misleading healthy status, and silent
+unsafe fallback.
+
+**"The process stayed up" is not proof of graceful degradation.** The
+unavailable capability must not masquerade as available. Profiles are
+**not** to be enabled to make these measurements pass — the point is to
+test the intended profiles-off core.
+
+*(original wording of this item follows)*
 `dashboard`, `agentic` and `metrics-gateway` are live and call gated
 services unconditionally. What they do when those endpoints are absent is
 **unmeasured today**, and by the security model that absence is the
