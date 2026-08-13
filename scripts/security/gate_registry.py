@@ -806,13 +806,26 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=False,
          in_workflows=("memu-graph-startup-proof.yml",),
          findings=("KAI-GATE-049",)),
+    # A GATE, and it was a REPORT until run 8 showed why. What it
+    # ENFORCES is that the diagnostic run obtained an observation at all
+    # — `ingest.log` must carry the probe's pre-request `ENTERED` marker.
+    # It does NOT gate on the stall verdict: which stage owns the silence
+    # and whether the process was computing stay informational, because
+    # nobody has promised those are actionable yet.
+    #
+    # Run 8 fired no request (the probe was invoked without its
+    # subcommand), and the three sections each reported their own absence
+    # correctly — "no markers", "1 sample", "outcome not established" —
+    # while the module exited 0 and the job went green. Three true
+    # statements summed to a diagnostic run that diagnosed nothing.
     Gate(module="summarise_graph_stall",
-         kind=REPORT,
-         summary="names the cognee task that was entered without "
-                 "returning, and whether the process was computing or "
-                 "blocked while it was; authorises no remedy, because "
-                 "slow work, a blocked wait and a deadlock have three "
-                 "different owners",
+         kind=GATE,
+         summary="fails closed when the run asked the service nothing, so "
+                 "an unmeasured diagnostic cannot go green; when a request "
+                 "WAS sent, names the cognee task entered without "
+                 "returning and whether the process was computing or "
+                 "blocked, and authorises no remedy — slow work, a blocked "
+                 "wait and a deadlock have three different owners",
          inputs=(),
          denominator=r"inspected: \d+ of \d+ expected stage log",
          probe=False,
@@ -829,7 +842,9 @@ REGISTRY: Tuple[Gate, ...] = (
          kind=REPORT,
          summary="runs INSIDE the image: POSTs /graph/ingest without the "
                  "300s budget under investigation, and samples pid-1 CPU "
-                 "ticks plus open sockets to the delegate",
+                 "ticks plus open sockets to the delegate; its argv "
+                 "contract is a pure function so a caller's command line "
+                 "can be validated before any stack exists",
          inputs=(),
          denominator=r"inspected: \d+ connection\(s\), \d+ cognee log line",
          probe=False,

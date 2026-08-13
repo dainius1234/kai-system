@@ -125,7 +125,19 @@ if [ $? -ne 0 ]; then
 fi
 stage "probe-health" python3 scripts/ci/compose_probe.py \
     --compose-file "$COMPOSE" --services ollama "$SERVICE" --timeout 300
+health_rc=$?
 excerpt "$LOGDIR/probe-health.log" 6
+if [ "$health_rc" -ne 0 ]; then
+  # R11. A request fired at a subject that never became ready measures
+  # the readiness failure, not the stall — and it would produce an
+  # ingest.log, a samples.log and an evidence file that all look like a
+  # diagnosis. Abort at the boundary and say what was not measured.
+  record ""
+  record "MEASUREMENT ABORTED: PREREQUISITE READINESS FAILURE."
+  record "  compose_probe.py exit ${health_rc}. Neither stage ownership, nor"
+  record "  execution state, nor return semantics was measured."
+  exit 2
+fi
 record ""
 
 # ── the delegate's state BEFORE the request ──────────────────────────
@@ -136,8 +148,16 @@ record ""
 
 # ── fire the ingest, in the background, watching past our own budget ─
 record "== INGEST — fired with a ${WINDOW}s budget, NOT the 300s one =="
+# THE SUBCOMMAND IS PART OF THE COMMAND LINE. Run 8 omitted it — `python
+# - "$WINDOW"` made the budget itself argv[1], the probe refused an
+# unknown subcommand, exited 2, and no request was ever sent. The stack
+# still came up, the samples still ran, the evidence file still had the
+# shape of a diagnosis, and the job still went green. That defect is now
+# caught before a stack exists, by scripts/test_graph_stall.py, which
+# reads THIS line and asks the probe's own parser whether it would
+# accept it.
 docker compose -f "$COMPOSE" exec -T "$SERVICE" \
-    python - "$WINDOW" < scripts/security/probe_graph_stall.py \
+    python - ingest "$WINDOW" < scripts/security/probe_graph_stall.py \
     > "$LOGDIR/ingest.log" 2>&1 &
 INGEST_PID=$!
 record "  ingest probe pid (on the runner, not in the container): ${INGEST_PID}"
@@ -162,7 +182,18 @@ done
 
 wait "$INGEST_PID"
 ingest_rc=$?
-record "  ingest probe exit: ${ingest_rc}  (1 = did not return inside the window)"
+# EVERY EXIT CODE IS NAMED. Run 8 printed "ingest probe exit: 2" beside
+# a legend that explained only 1, so the one number that said "nothing
+# was measured" read as a variant of "measured, did not return".
+record "  ingest probe exit: ${ingest_rc}"
+case "$ingest_rc" in
+  0) record "    0 = the request RETURNED; ingest.log carries status and elapsed" ;;
+  1) record "    1 = did NOT return inside the ${WINDOW}s observation window" ;;
+  2) record "    2 = THE PROBE REJECTED ITS OWN COMMAND LINE. No request was"
+     record "        sent. This is an instrument invocation failure, and NOT a"
+     record "        measurement of the system." ;;
+  *) record "    ${ingest_rc} = unassigned exit code; treat this run as unmeasured" ;;
+esac
 record "  observation ended at +${elapsed}s"
 stage "ingest-result" cat "$LOGDIR/ingest.log"
 excerpt "$LOGDIR/ingest.log" 15

@@ -15,10 +15,22 @@ The load-bearing assertions, in the order they matter:
 
 3. **Marker pairing must find the unpaired one.** A task list is not a
    diagnosis, but the unpaired entry is the question's literal answer.
+
+4. **The collector's command line must be one the probe accepts, and a
+   run in which nothing was asked must not read as a diagnosis.** Run 8
+   invoked the probe as `python - 900`: the budget became argv[1], the
+   subcommand was absent, the probe exited 2 without sending anything,
+   and every downstream section reported its own absence honestly while
+   the job went green. The command line is checked HERE, from the
+   collector's own text, because that costs nothing and happens before
+   a stack exists — and the expected answer comes from the probe's
+   parser rather than from a list kept beside it (R5, I-8).
 """
 from __future__ import annotations
 
 import json
+import re
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -29,10 +41,11 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
 from scripts.security import summarise_graph_stall as s  # noqa: E402
+from scripts.security import probe_graph_stall as p  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 8
+EXPECTED_SCENARIOS = 12
 executed: list[str] = []
 
 
@@ -211,7 +224,8 @@ def test_the_gather_fanout_is_named() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         d = stage_dir(tmp, {
             "rc.env": "INGEST_RC=1\nWINDOW=900\nELAPSED=900\nLIVE_CYCLE_BUDGET=300\n",
-            "ingest.log": "NO-RETURN http-post TimeoutError: x elapsed=900.0s\n",
+            "ingest.log": "ENTERED  http-post  monotonic=1.0 budget=900.0s\n"
+                          "NO-RETURN http-post TimeoutError: x elapsed=900.0s\n",
             "samples.log": rows(5, 5, True),
             "service-logs.log": SERVICE_LOG,
             "ollama-after.log": "",
@@ -231,7 +245,8 @@ def test_the_report_refuses_to_authorise_a_remedy() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         d = stage_dir(tmp, {
             "rc.env": "INGEST_RC=1\nWINDOW=900\nELAPSED=900\nLIVE_CYCLE_BUDGET=300\n",
-            "ingest.log": "NO-RETURN http-post TimeoutError: x elapsed=900.0s\n",
+            "ingest.log": "ENTERED  http-post  monotonic=1.0 budget=900.0s\n"
+                          "NO-RETURN http-post TimeoutError: x elapsed=900.0s\n",
             "samples.log": rows(5, 5, True),
             "service-logs.log": SERVICE_LOG,
             "ollama-after.log": "",
@@ -255,6 +270,150 @@ def test_the_report_refuses_to_authorise_a_remedy() -> None:
               "OUTCOME NOT ESTABLISHED" in out or "0 of 5" in out, out[:600])
 
 
+# ── 4. the collector's command line, and the unmeasured run ──────────
+
+COLLECTOR = REPO / "scripts" / "security" / "diagnose_graph_stall.sh"
+
+# `python - <args> < .../probe_graph_stall.py`. The args are whatever sits
+# between the `-` and the redirection that feeds the script in.
+_INVOCATION = re.compile(
+    r"python\s+-\s+([^\n<]*)<\s*scripts/security/probe_graph_stall\.py")
+
+
+def collector_invocations() -> list[list[str]]:
+    """Every probe command line the collector actually runs.
+
+    DERIVED FROM THE COLLECTOR, never listed beside it: a hand-kept tuple
+    of expected invocations would have agreed with itself while the real
+    one was broken. Shell variables collapse to the sentinel `1`, because
+    what is under test is the SHAPE of the command line — subcommand
+    present, arity right — not the numeric budget. That substitution is
+    also what makes the run-8 defect visible: a bare `"$WINDOW"` in the
+    subcommand position becomes `1`, and `1` is not a subcommand.
+    """
+    text = COLLECTOR.read_text(encoding="utf-8")
+    out = []
+    for raw in _INVOCATION.findall(text):
+        resolved = re.sub(r'"?\$\{?(\w+)\}?"?', "1", raw)
+        if "$" in resolved:
+            raise AssertionError(
+                f"unresolved shell expansion in {raw!r} — this calibration "
+                f"cannot validate that invocation, and must not pretend to")
+        out.append(["-"] + shlex.split(resolved))
+    return out
+
+
+def test_every_collector_invocation_is_one_the_probe_accepts() -> None:
+    scenario("collector invocations accepted")
+    calls = collector_invocations()
+    # I-2. A check that finds nothing and a check that looks at nothing
+    # print the same thing unless the denominator is stated.
+    print(f"  inspected: {len(calls)} probe invocation(s) in "
+          f"{COLLECTOR.relative_to(REPO)}")
+    check("the collector invokes the probe at all", len(calls) >= 2, str(calls))
+    for argv in calls:
+        action, _budget, error = p.parse_argv(argv)
+        check(f"probe accepts {' '.join(argv[1:])!r}", not error,
+              f"{error} (from {argv})")
+        check(f"{' '.join(argv[1:])!r} resolves to an action",
+              action in ("ingest", "sample"), str(action))
+    actions = {p.parse_argv(a)[0] for a in calls}
+    check("both an ingest and a sample invocation exist",
+          actions == {"ingest", "sample"}, str(actions))
+
+
+def test_the_run_8_command_line_is_rejected() -> None:
+    """The known-negative, and the reason this scenario exists at all.
+
+    `python - "$WINDOW"` is exactly what shipped in run 8. If the check
+    above cannot fail on it, it is decoration."""
+    scenario("run-8 command line rejected")
+    action, _b, error = p.parse_argv(["-", "900"])
+    check("a bare budget is not a valid command line", bool(error), str(action))
+    check("and the error names the missing subcommand",
+          "unknown subcommand" in error, error)
+    check("no action is returned", action is None, str(action))
+    # the other arity mistakes in the same family
+    check("ingest with no budget is rejected",
+          bool(p.parse_argv(["-", "ingest"])[2]), "")
+    check("ingest with a non-numeric budget is rejected",
+          bool(p.parse_argv(["-", "ingest", "soon"])[2]), "")
+    check("sample with a stray argument is rejected",
+          bool(p.parse_argv(["-", "sample", "900"])[2]), "")
+    # ...and the known-positives, so the parser is not simply refusing
+    check("ingest with a budget is accepted",
+          p.parse_argv(["-", "ingest", "900"])[:2] == ("ingest", 900.0), "")
+    check("sample alone is accepted",
+          p.parse_argv(["-", "sample"])[0] == "sample", "")
+
+
+def test_a_run_that_asked_nothing_is_not_a_diagnosis() -> None:
+    """Run 8's evidence, reduced. Three honest absences must not add up
+    to a green diagnostic run."""
+    scenario("unmeasured run fails closed")
+    with tempfile.TemporaryDirectory() as tmp:
+        d = stage_dir(tmp, {
+            "rc.env": "INGEST_RC=2\nWINDOW=900\nELAPSED=20\nLIVE_CYCLE_BUDGET=300\n",
+            "ingest.log": "usage: probe_graph_stall.py "
+                          "{ingest <budget-seconds>|sample}\n",
+            "samples.log": rows(1, 5, False),
+            "service-logs.log": "memu-graph-1 | 2026-08-13T18:30:31.1Z "
+                                "INFO:     Application startup complete.\n",
+            "ollama-after.log": "",
+            "ollama-baseline.log": "",
+        })
+        proc = subprocess.run(
+            [sys.executable, "scripts/security/summarise_graph_stall.py",
+             "--stage-logs", str(d)],
+            cwd=REPO, capture_output=True, text=True, timeout=60)
+        out = proc.stdout
+        check("exits non-zero — 'not measured' must not read as 'it works'",
+              proc.returncode != 0, f"rc={proc.returncode}")
+        check("says no request was sent",
+              "NO REQUEST WAS EVER SENT" in out, out[:600])
+        check("names exit 2 as the probe rejecting its command line",
+              "REJECTING ITS OWN COMMAND LINE" in " ".join(out.split()),
+              out[:900])
+        check("calls it an instrument failure, not a system property",
+              "INSTRUMENT INVOCATION FAILURE" in out, out[-700:])
+        check("distinguishes unmeasured from measured-and-clean",
+              "different from" in out and "measured-and-clean" in out,
+              out[-500:])
+        # and it must NOT go on to present the hierarchy as if it held
+        check("does not report a stage-ownership verdict",
+              "1. STAGE OWNERSHIP" not in out, out[:900])
+        check("does not report an execution-state verdict",
+              "STATE:" not in out, out[:900])
+
+
+def test_a_real_observation_still_passes() -> None:
+    """The known-positive for the same gate. A genuine non-return is a
+    RESULT, not an instrument failure, and must still exit 0."""
+    scenario("real observation still passes")
+    with tempfile.TemporaryDirectory() as tmp:
+        d = stage_dir(tmp, {
+            "rc.env": "INGEST_RC=1\nWINDOW=900\nELAPSED=900\nLIVE_CYCLE_BUDGET=300\n",
+            "ingest.log": "ENTERED  http-post  monotonic=1.0 budget=900.0s\n"
+                          "NO-RETURN http-post TimeoutError: timed out "
+                          "elapsed=900.0s\n",
+            "samples.log": rows(5, 5, True),
+            "service-logs.log": SERVICE_LOG,
+            "ollama-after.log": "",
+            "ollama-baseline.log": "",
+        })
+        proc = subprocess.run(
+            [sys.executable, "scripts/security/summarise_graph_stall.py",
+             "--stage-logs", str(d)],
+            cwd=REPO, capture_output=True, text=True, timeout=60)
+        check("a measured non-return exits 0", proc.returncode == 0,
+              f"rc={proc.returncode}")
+        check("and the hierarchy is reported",
+              "1. STAGE OWNERSHIP" in proc.stdout, proc.stdout[:400])
+        check("and it is not called an instrument failure",
+              "INSTRUMENT INVOCATION FAILURE" not in proc.stdout,
+              proc.stdout[-500:])
+
+
 def run_all() -> None:
     test_the_four_states_stay_distinct()
     test_one_sample_cannot_establish_growth()
@@ -264,6 +423,10 @@ def run_all() -> None:
     test_a_fully_paired_log_reports_no_unpaired_task()
     test_the_gather_fanout_is_named()
     test_the_report_refuses_to_authorise_a_remedy()
+    test_every_collector_invocation_is_one_the_probe_accepts()
+    test_the_run_8_command_line_is_rejected()
+    test_a_run_that_asked_nothing_is_not_a_diagnosis()
+    test_a_real_observation_still_passes()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS, f"{len(executed)}: {executed}")

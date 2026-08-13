@@ -28,6 +28,21 @@ WINDOW ending — not a proven hang. Runs 4 and 6 "reproduced" ~291s
 because both used the same 300s client budget; treating an
 instrument-determined number as a system property is the mistake this
 whole unit exists to undo, and it must not be repeated one level up.
+
+AND IT REFUSES TO ANSWER AT ALL IF NOTHING WAS ASKED
+====================================================
+
+Run 8 brought the stack up, sampled the container, collected both logs
+and wrote a complete-looking evidence file in which **no request had
+ever been sent** — the probe was invoked without its subcommand and
+exited 2 before the POST. Sections 1-3 each reported honestly ("no
+markers", "1 sample", "outcome not established"), the report exited 0,
+and the job went green.
+
+Three true statements in a row still added up to a green diagnostic run
+that diagnosed nothing. R11: no subject, no observation — and the abort
+belongs at the prerequisite, ABOVE the hierarchy, not distributed
+through it as three separate absences.
 """
 from __future__ import annotations
 
@@ -146,6 +161,34 @@ def main() -> int:
           f"run watched")
     print(f"    for {window}s instead.")
     print()
+
+    # PREREQUISITE, ABOVE THE HIERARCHY. The hierarchy answers "what
+    # happened during the request"; it presupposes a request. `ENTERED
+    # http-post` is printed by the probe immediately BEFORE urlopen, so
+    # its presence is a direct record that the POST was issued — a
+    # different mechanism from the exit code, which is what makes it
+    # worth checking rather than restating.
+    if not re.search(r"^ENTERED\s+http-post", ingest, re.M):
+        print("  PREREQUISITE FAILED — NO REQUEST WAS EVER SENT")
+        print(f"     ingest.log carries no `ENTERED http-post` marker"
+              f" (probe exit {ingest_rc or '?'}).")
+        if ingest_rc == "2":
+            print("     Exit 2 is the probe REJECTING ITS OWN COMMAND LINE:")
+            print("     the invocation named no subcommand, so nothing was")
+            print("     asked of the service.")
+        for line in ingest.splitlines()[:4]:
+            print(f"       ingest.log | {line}")
+        print()
+        print("  THEREFORE NOT MEASURED, and not reported below:")
+        print("     1. stage ownership   — no pipeline ran, so no task entered")
+        print("     2. execution state   — the samples describe an IDLE service")
+        print("     3. return semantics  — nothing was sent, so nothing returned")
+        print()
+        print("  This is an INSTRUMENT INVOCATION FAILURE, not a property of")
+        print("  the system. Nothing here supports or weakens any claim about")
+        print("  the stall: the run is unmeasured, which is different from")
+        print("  measured-and-clean.")
+        return 1
 
     # THE INTERPRETATION HIERARCHY IS THE OPERATOR'S, AND THE ORDER IS
     # PART OF IT. A reader reaches for the first thing on the page, and

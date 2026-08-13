@@ -50,6 +50,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from typing import Optional
 
 BASE = os.getenv("MEMU_GRAPH_URL", "http://localhost:8061")
 SOURCE_ID = "kai-gate-049-stall-probe"
@@ -189,19 +190,53 @@ def ingest(budget: float) -> int:
         return 1
 
 
-def main(argv: list[str]) -> int:
-    if len(argv) < 2 or argv[1] not in ("ingest", "sample"):
-        print("usage: probe_graph_stall.py {ingest <budget-seconds>|sample}",
-              file=sys.stderr)
-        return 2
-    if argv[1] == "sample":
-        return sample()
+USAGE = "usage: probe_graph_stall.py {ingest <budget-seconds>|sample}"
+
+
+def parse_argv(argv: list[str]) -> tuple[Optional[str], Optional[float], str]:
+    """(action, budget, error) — PURE. No I/O, nothing started.
+
+    Separated from `main` so a command line can be validated WITHOUT a
+    container, a stack, or a request. Run 8 of the stall diagnosis
+    invoked this file as `python - 900`, so argv[1] was the budget and
+    the subcommand was absent; the probe correctly refused, but nothing
+    checked the command line until the whole 900s observation had been
+    scheduled, brought a stack up, and produced an evidence file with no
+    measurement in it. A caller that can ask "would you accept this?"
+    costs nothing and answers before the stack exists — I-8, evidence
+    from somewhere other than the run it is meant to validate.
+    """
+    if len(argv) < 2:
+        return None, None, "no subcommand given. " + USAGE
+    action = argv[1]
+    if action not in ("ingest", "sample"):
+        return None, None, f"unknown subcommand {action!r}. " + USAGE
+    if action == "sample":
+        if len(argv) != 2:
+            return None, None, "sample takes no arguments. " + USAGE
+        return "sample", None, ""
     if len(argv) != 3:
-        print("ingest needs an explicit budget in seconds — there is no "
-              "default, because the budget is the thing under "
-              "investigation.", file=sys.stderr)
+        return None, None, ("ingest needs an explicit budget in seconds — "
+                            "there is no default, because the budget is the "
+                            "thing under investigation. " + USAGE)
+    try:
+        budget = float(argv[2])
+    except ValueError:
+        return None, None, f"ingest budget {argv[2]!r} is not a number. " + USAGE
+    if budget <= 0:
+        return None, None, f"ingest budget {budget} must be positive. " + USAGE
+    return "ingest", budget, ""
+
+
+def main(argv: list[str]) -> int:
+    action, budget, error = parse_argv(argv)
+    if error:
+        print(error, file=sys.stderr)
         return 2
-    return ingest(float(argv[2]))
+    if action == "sample":
+        return sample()
+    assert budget is not None      # parse_argv guarantees it for "ingest"
+    return ingest(budget)
 
 
 if __name__ == "__main__":

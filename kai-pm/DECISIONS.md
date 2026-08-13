@@ -11624,3 +11624,147 @@ worse than no comment.
   measurement window, not a system boundary. Diagnostic instrument built
   and calibrated (31 assertions, 8 scenarios); not yet run.
 * **KAI-GATE-048** — OPEN, C BLOCKED by the above.
+
+---
+
+## D196
+
+**2026-08-13 — run 8 measured nothing, and reported it as a completed
+diagnostic. The KAI-GATE-049 question is still unanswered.**
+
+Run **31730864605**, job **94550774232** (`memu-graph-stall-diagnosis`),
+commit `b225ea5`, tree `69aa6ad0`, dirty 0. Job conclusion: **success**.
+Every step: success.
+
+**It sent no request.**
+
+```
+  ingest probe exit: 2  (1 = did not return inside the window)
+  observation ended at +20s
+  --- EXCERPT: last 15 lines of stall-stage-logs/ingest.log (61 bytes total) ---
+  | usage: probe_graph_stall.py {ingest <budget-seconds>|sample}
+  --- end excerpt ---
+```
+
+The collector invoked the probe as
+
+```
+python - "$WINDOW" < scripts/security/probe_graph_stall.py
+```
+
+so `argv[1]` was `900`, the subcommand was absent, `main()` rejected an
+unknown subcommand and returned 2 **before** `urlopen`. No POST to
+`/graph/ingest` was ever issued. The 900s observation window was never
+entered; the job took ~85s because the probe died in under a second and
+the watcher exited one sleep later.
+
+The corroborating evidence, from a different place than the exit code:
+`ingest.log` carries no `ENTERED http-post` line — the probe prints that
+immediately *before* the request — and the single sample shows pid 1 at
+0.46s of CPU with 2 connections and **no** delegate socket, which is an
+idle server.
+
+### The answer to the operator's hierarchy, in the operator's order
+
+| | |
+|---|---|
+| **1. Stage ownership** | **NOT MEASURED.** Zero cognee task markers, because no pipeline ran. |
+| **2. Execution state** | **NOT MEASURED.** One sample, of an idle process that had been asked nothing. |
+| **3. Return semantics** | **NOT MEASURED.** Nothing was sent, so nothing returned. |
+| **4. Timeout policy** | Still not answered, and now with even less basis than before. |
+
+`~291s` remains what D195 established: **our own client's budget**. The
+duration and outcome of `/graph/ingest` past 300s are still UNMEASURED.
+
+### Why this is worse than a failed run, and what it breaks
+
+The three sections each reported honestly — "no cognee task markers
+found", "1 sample(s) — at least 2 are needed", "OUTCOME NOT ESTABLISHED
+(probe exit 2)". Every sentence was true. The module exited 0, the job
+went green, and **three true statements summed to a diagnostic run that
+diagnosed nothing.**
+
+That is R11 from the other side. R11 says a full table of correct-looking
+rows invites a conclusion where an empty table would invite a question;
+here the rows were correctly *empty* and the **exit code** supplied the
+false shape instead. An absence distributed across three sections reads
+as three small gaps. The same absence stated once, above them, reads as
+what it is.
+
+`ingest probe exit: 2` was printed beside a legend that explained only
+`1`. The one number meaning "nothing was measured" was displayed as an
+unlabelled variant of "measured, did not return".
+
+### Repairs, all instrument-side; nothing about the system changed
+
+1. **`diagnose_graph_stall.sh:159`** — `python - ingest "$WINDOW"`. The
+   missing subcommand.
+2. **Every exit code is now named**, including the unassigned ones. `2`
+   states in the evidence file that it is an *instrument invocation
+   failure and NOT a measurement of the system*.
+3. **`probe-health` now gates the ingest** (R11). It was collected and
+   ignored; a request fired at a subject that never became ready would
+   have measured the readiness failure and produced an ingest.log, a
+   samples.log and an evidence file that all looked like a diagnosis.
+4. **`probe_graph_stall.parse_argv()`** — the argv contract factored out
+   as a pure function, so a command line can be validated with no
+   container, no stack and no request.
+5. **`summarise_graph_stall.py` fails closed** when `ingest.log` carries
+   no `ENTERED http-post` marker: it prints the prerequisite failure,
+   states that 1–3 were therefore not measured, and **exits non-zero**.
+   It refuses to print the hierarchy at all in that case. A genuine
+   non-return still exits 0 — that is a *result*, not an instrument
+   failure. Reclassified in the registry from REPORT to **GATE**,
+   because it now enforces something: that the run obtained an
+   observation. It still gates on nothing about the stall itself.
+6. **`scripts/test_graph_stall.py`** — 4 new scenarios, 55 assertions
+   (was 31/8, now 55/12). The load-bearing one extracts **every** probe
+   command line from the collector's own text, substitutes shell
+   expansions with a sentinel, and asks the probe's parser whether it
+   would accept them. Denominator printed: `inspected: 2 probe
+   invocation(s)`. The expected answer comes from the probe, never from
+   a list kept beside it (R5, I-8).
+
+**Proof it can fail (R2 — run, not written).** The run-8 line was
+reintroduced into the collector and the calibration re-run:
+
+```
+FAIL: probe accepts '1' — unknown subcommand '1'.
+FAIL: '1' resolves to an action — None
+FAIL: both an ingest and a sample invocation exist — {None, 'sample'}
+Graph Stall Analyser Calibration: 52 passed, 3 failed
+EXIT GATE: FAIL
+```
+
+Then restored: `55 passed, 0 failed`. The known-negative also asserts the
+five neighbouring arity mistakes are rejected and the two correct forms
+accepted.
+
+### The class, not the instance (R6)
+
+Population counted before fixing: `grep` for `python - <args> < script`
+across `scripts/` finds **2** invocations of `probe_graph_stall.py`, both
+in `diagnose_graph_stall.sh` — 1 defective, 1 correct. Every other
+`python -` site in the tree is either a heredoc (a different construct)
+or passes no arguments (`test_graph_live.py`). Denominator 2, fixed 1,
+and both are now checked on every calibration run.
+
+### What was NOT done
+
+No timeout changed. No model changed. No Cognee instrumentation added.
+No Phase 2. `memu-graph/` untouched, `scripts/test_graph_live.py`
+untouched. The observation window stays 900s.
+
+### Standing
+
+* **KAI-GATE-049** — OPEN, **still unmeasured**. Restated unchanged: the
+  duration and outcome of `/graph/ingest` past 300s are unknown. Run 8
+  is not evidence for or against any claim about the stall; it is an
+  unmeasured run, which is different from measured-and-clean.
+* **KAI-GATE-048** — OPEN, C BLOCKED by the above.
+* A verified-elsewhere note (R1 corollary): the collector fix, the
+  readiness gate and the exit-code labels are **not** runtime-verified
+  here — they need a runner with Docker. What *was* verified locally is
+  the argv contract, the fail-closed summariser, both directions of the
+  new calibration, `bash -n`, `make policy-check` and the registry gate.
+  The next CI run is what verifies the rest.
