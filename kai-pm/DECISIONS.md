@@ -10893,3 +10893,196 @@ authorise explicitly, not mine to infer from the findings.
 
 For introspect the corresponding asset contract is already known from
 memu-core and does not need re-deriving.
+
+---
+
+## D190 — 2026-08-13 — memu-graph's Asset Contract, MEASURED and PROVEN — plus the remediation plan for both services
+
+Run **31684208364**, job `memu-graph-asset-contract`, commit **5aa4a87**.
+Four throwaway containers from the already-built image. No compose
+service started, no profile activated, no network declaration altered.
+**4 of 4 stages ran.**
+
+### The five questions, answered
+
+**Q1 — what model does the failing path request?**
+`bert-base-uncased`, via `AutoTokenizer.from_pretrained(model)` at
+`cognee/infrastructure/llm/tokenizer/HuggingFace/adapter.py:32`, reached
+from `OllamaEmbeddingEngine.__init__` → `get_tokenizer()`. **One model,
+not several.** The LLM and the embeddings themselves are already
+delegated to `ollama`; only the tokenizer is resolved in-process.
+
+**Q2 — where is it expected locally?**
+`HF_HUB_CACHE = $HF_HOME/hub`. The image sets `HF_HOME=/data/hf_cache`,
+so the deployed path is **`/data/hf_cache/hub`**. `memu-graph` declares
+no volumes in any profile, so nothing shadows it (D188 measured that
+directly).
+
+**Q3 — can the revision be pinned?**
+The resolved snapshot is **`86b5e0934494bd15c9632b12f734a8a67f723594`**.
+But **not through cognee's API**: it calls `from_pretrained(model)` with
+no `revision=` and no `local_files_only=`, and the package contains zero
+occurrences of either anywhere. Pinning is available **only at the asset
+level** — bake that specific snapshot into the cache.
+
+**Q4 — what offline switch does the stack honour?**
+
+```
+with asset  + HF_HUB_OFFLINE=1 & TRANSFORMERS_OFFLINE=1, no network
+  loaded = YES   in  0.38s          <- the switch IS honoured
+without asset + same flags,         no network
+  loaded = NO    in  0.32s          <- fails closed, immediately
+without asset,  NO flags,           no network   (today)
+  loaded = NO    in 46.42s          <- the retry storm
+```
+
+`huggingface_hub.constants.HF_HUB_OFFLINE` read back as `True`, so the
+env var reaches the library rather than merely being set.
+
+**FAIL-CLOSED COST: 46.42s → 0.32s. The same outcome, reached 46.1s
+sooner.** That is precisely what obligation 2 buys on its own, and it is
+measured rather than argued. It is still **not a fix** — the outcome is
+identical.
+
+**Q5 — one asset or multiple transitive assets?**
+**Four real files**, one repo, no transitive model dependencies:
+
+```
+       570  config.json
+   466,062  tokenizer.json
+        48  tokenizer_config.json
+   231,508  vocab.txt
+   -------
+   698,188 bytes of content  (~682 KiB)
+```
+
+plus the cache scaffolding the loader needs: `refs/main`,
+`hub/CACHEDIR.TAG`, four `.locks/` entries, and — importantly — three
+**`.no_exist` markers** for `added_tokens.json`, `chat_template.jinja`
+and `special_tokens_map.json`. Those are negative-cache entries. A bake
+that copies only the four content files and drops them may send the
+offline loader looking for files it has been told do not exist.
+
+**The safe unit is therefore the whole `hub/models--bert-base-uncased/`
+tree as the loader itself produced it, not a hand-picked file list.**
+
+Note on the printed total: the walker reports 18 files / 1,402,305 bytes
+because `snapshots/` entries are symlinks into `blobs/` and `getsize`
+followed them, counting the content twice. **On-disk cost is ~698 KB.**
+
+### CONTRACT PROVEN — and why that word was earned
+
+Stage B is the reason this is a contract rather than a list. With the
+network removed and only stage A's cache mounted read-only, the load
+**succeeded in 0.38s**. Stage A alone would have been a plausible list
+of files nobody had shown to be complete, and a bake built from it could
+have shipped a still-broken image while every log said the contract was
+defined. The summariser distinguishes PROVEN / NOT PROVEN / DISPROVEN /
+AMBIGUOUS for exactly that reason, and all four are asserted in
+`scripts/test_asset_contract.py`.
+
+### An unmeasured risk this surfaced, worth recording
+
+The probe ran against **`transformers 5.15.0` / `huggingface_hub
+1.27.0`**. `memu-graph/requirements.txt` pins only
+`transformers>=4.40.0` — unbounded across a major version. The asset
+contract above is measured against 5.15.0; a future resolution could
+change the required file set, and the bake would still look correct.
+Recorded, **not remediated**, and not merged into KAI-GATE-048.
+
+---
+
+## THE REMEDIATION PLAN — proposed, NOT implemented
+
+No code has been changed. This is for explicit authorisation.
+
+### Class invariant (D189, Option 4) — the acceptance condition
+
+> Any model-dependent capability deployed without model-registry egress
+> must have its required model assets locally satisfiable before the
+> capability is admitted, and runtime loading must fail closed without
+> attempting external resolution.
+
+Both obligations, in both services. `HF_HUB_OFFLINE=1` alone satisfies
+only obligation 2 — now measured: 46.4s → 0.3s, same failure.
+
+### A. `memu-graph` — keep the lazy design, add its own contract
+
+1. **Bake the measured asset.** `RUN` the same
+   `AutoTokenizer.from_pretrained` in the Dockerfile so the loader
+   produces its own cache tree at `$HF_HOME/hub` — including the
+   `.no_exist` markers — rather than a hand-assembled file list. Pin
+   `86b5e0934494bd15c9632b12f734a8a67f723594` at the asset level, since
+   cognee cannot pass `revision=`.
+2. **Fail closed at build**, following `memu-core/Dockerfile`'s proven
+   shape: retry a bounded number of times, then `exit 1`. Note that
+   memu-graph's existing build-time step is `|| echo` best-effort — but
+   that step installs a Kuzu extension, not a model, and its
+   best-effort-ness is correct for what it does. The model step is a
+   different obligation and must not inherit that.
+3. **Enforce offline at runtime**: `ENV HF_HUB_OFFLINE=1` and
+   `TRANSFORMERS_OFFLINE=1`. Measured as honoured by this stack.
+4. **Ownership**: the cache is written before `USER app` in the current
+   Dockerfile ordering — `memu-core` was bitten by exactly this and
+   `/data/hf_cache` is already `chown`ed. Verify, do not assume.
+5. **Do NOT** touch `_cognee()`'s lazy import, the healthcheck, the
+   `start_period`, or the networks. The lazy design is measured correct.
+6. **Acceptance**: a real `POST /graph/ingest` succeeds with
+   `--network none`. Nothing weaker — a green build proves the asset is
+   in the image, not that the capability works without egress.
+
+### B. `memu-core-introspect` — 3′ plus reuse of memu-core's contract
+
+1. **Both module-scope mechanisms** (D185): `app.py:1060`'s
+   `_st_model = _ST(...)` and `app.py:1132-1141`'s module-level
+   `store = TurboVecStore()` whose `__init__` runs a dimension probe.
+   Addressing one leaves the other; the D183/D185 evidence is explicit.
+2. **Reuse, do not copy.** These two images share build context,
+   requirements and model-loading line. A shared build stage or build
+   helper **between these two Dockerfiles only** — not a fleet base,
+   which D189 rejects.
+3. **Acceptance, two parts**: `/health` answers with no model loaded
+   (provable by the same `/proc/1/maps` probe that measured memu-graph);
+   and `search_by_category` — one of the ten role-required operations —
+   succeeds with `--network none`.
+
+### C. `memu-core` — reference implementation, unchanged
+
+### D. The prevention mechanism — relationship, not syntax
+
+Per D189, explicitly **not** a Dockerfile grep for `HF_HUB_OFFLINE`.
+The rule is over `egress contract × model capability × local asset ×
+offline enforcement`:
+
+> For every runtime model capability on an egress-restricted service:
+> either prove the capability is backed by a local asset and an offline
+> loader, or classify it explicitly unavailable.
+
+The runtime qualification is the `--network none` acceptance above, and
+the instruments to express it already exist: `classify_model_startup`
+(no service name as input), `report_model_load_denominator` (populations
+A/B/C), and the two collectors. Building it is **not** part of this
+plan and needs its own authorisation.
+
+### Sequencing, and what would falsify each step
+
+1. `memu-graph` bake — falsified if stage-B-equivalent fails in-image.
+2. `memu-graph` offline env — falsified if a `/graph/ingest` still
+   reaches the network (the socket probe would show it).
+3. introspect 3′ — falsified if `/proc/1/maps` shows model extensions
+   at readiness.
+4. introspect asset reuse — falsified if `search_by_category` fails
+   offline.
+
+`memu-graph` first: it is one Dockerfile, the contract is proven, and it
+does not touch application code. Introspect second: it changes
+`memu-core/app.py`, which `memu-core` also imports, so it carries
+regression risk to the one service currently working.
+
+### Register
+
+**KAI-GATE-048 — asset contract DEFINED and PROVEN. Remains OPEN and
+unremediated.** No code changed. Awaiting explicit authorisation from
+Dainius before any implementation.
+
+Artefact: `9174783810`.
