@@ -181,6 +181,20 @@ DECLARED: Tuple[Toleration, ...] = (
         owner="orion",
         review_by="2026-11-01",
     ),
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Phase 1 acceptance",
+        bucket=DOCUMENTED_SKIP,
+        reason="`if: always()` on the acceptance measurement. Its "
+               "can-fail stage MUST fail (the asset is deliberately "
+               "withheld) and the collector aborts with exit 2 only at a "
+               "prerequisite boundary. The verdict itself is the "
+               "summariser's exit code, printed last so the Actions log "
+               "byte window still carries it; a step-level failure here "
+               "would replace a measured verdict with a shell one.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
     # One declaration per service, because the match is on the step name
     # and there is one INDEPENDENT collector step per service. They
     # replace two earlier declarations — a separate "Diagnose image

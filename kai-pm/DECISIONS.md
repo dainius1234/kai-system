@@ -11086,3 +11086,95 @@ unremediated.** No code changed. Awaiting explicit authorisation from
 Dainius before any implementation.
 
 Artefact: `9174783810`.
+
+---
+
+## D191 — 2026-08-13 — Phase 1 AUTHORISED (memu-graph only), and a correction to D190's acceptance criterion
+
+Operator authorisation. Phase 2 (`memu-core-introspect`) is **not**
+authorised and gets its own checkpoint after Phase 1 lands — introspect
+touches `memu-core/app.py`, shared with the one service currently
+working, and there is no advantage in coupling a bounded contract repair
+to a shared-code refactor.
+
+### The correction — D190 proposed a criterion that tests the wrong topology
+
+D190 said, as the service-level acceptance:
+
+> real `POST /graph/ingest` succeeds under `--network none`
+
+**That is wrong, and it would have proved something we do not want.**
+`memu-graph` deliberately delegates LLM and embedding work to `ollama`
+(`LLM_ENDPOINT`/`EMBEDDING_ENDPOINT` → `http://ollama:11434`). Its
+intended contract is:
+
+> **no external / model-registry egress**
+
+and *not*:
+
+> no networking whatsoever.
+
+`--network none` at the service level would have accidentally required
+memu-graph to survive without the internal peer it is explicitly
+designed to use — a stricter and *different* topology than production.
+Passing it would have proved the wrong property; failing it would have
+sent someone to "fix" a correct design. This is the same shape as the
+`ollama-pull` trap the classifier already guards against
+(`test_delegation_is_tested_before_egress`), reappearing one level up,
+in my own acceptance criterion rather than in a detector.
+
+**Two acceptance levels, kept apart:**
+
+| level | topology | proves |
+|---|---|---|
+| **asset** | `--network none` | the baked tokenizer is locally complete and loads with no network at all |
+| **service / capability** | the repo-defined intended topology, internal peers intact | no external registry egress, while the real capability works |
+
+`--network none` remains exactly right for the asset. It is wrong for
+the capability.
+
+### Authorised change — the measured contract only
+
+Model `bert-base-uncased`; pinned revision
+`86b5e0934494bd15c9632b12f734a8a67f723594`; cache root
+`HF_HUB_CACHE = $HF_HOME/hub` → `/data/hf_cache/hub`. Generate the cache
+with the **actual loader** during build — not a hand-copy of the four
+visible files, because the measured tree also carries `.no_exist`
+negative-cache state. Build must fail closed on acquisition failure,
+preserve the loader-generated tree, and then prove the cached asset
+loads with external access disabled. Do not inherit the Kuzu
+extension's `|| echo` semantics; that step concerns a different,
+optional asset.
+
+Runtime: `HF_HUB_OFFLINE=1`, `TRANSFORMERS_OFFLINE=1`. Network topology
+unchanged. `_cognee()` stays lazy. Healthcheck unchanged. Model loading
+does **not** move into startup — the readiness semantics measured at
++5.1s are correct and are not what is being repaired.
+
+### Dependency-version finding stays separate
+
+`transformers>=4.40.0` is unbounded across a major version and the
+contract was measured against `transformers 5.15.0` /
+`huggingface_hub 1.27.0`. Record the exact versions in the evidence.
+**Do not** fold version pinning into this change. If implementation
+proves pinning is genuinely required for determinism, **STOP and bring
+that decision back** rather than expanding scope.
+
+### Required acceptance evidence
+
+A — final-image asset proof under `--network none`.
+B — readiness preserved, tokenizer still not loaded prematurely.
+C — intended-topology capability proof: external HF egress unavailable,
+internal `ollama` reachable, real `/graph/ingest` succeeds, no HF retry
+sequence.
+D — can-fail calibration, demonstrated not asserted.
+E — artefact identity: TESTED TREE SHA == COMMITTED TREE SHA, evidence
+bound to exact image/container identity.
+
+### KAI-GATE-048 closure condition
+
+Not closed because the Dockerfile changed. Closed only when runtime
+proves: **memu-graph remains correctly lazy and readiness-independent,
+AND its first model-dependent request succeeds without external
+model-registry egress because the required tokenizer asset is locally
+satisfiable.** Build green + runtime capability broken = still OPEN.

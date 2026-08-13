@@ -735,6 +735,61 @@ REGISTRY: Tuple[Gate, ...] = (
                         "workflow-level declaration would claim a wiring "
                         "the workflow parse cannot confirm",
          findings=("KAI-GATE-048",)),
+    # KAI-GATE-048 Phase 1's verdict. A GATE, not a report: unlike the
+    # measurement jobs, its whole purpose is to refuse. It exits non-zero
+    # when acceptance is not met AND when the evidence is merely missing,
+    # because "we did not measure" must not read as "it works".
+    # Both calibrations are invoked as their own workflow `run:` steps,
+    # BEFORE the measurements they judge — so a broken instrument stops
+    # the job instead of decorating its output. That makes them
+    # enforcing, and I-4 discovered them as such the moment they were
+    # wired.
+    Gate(module="test_asset_contract",
+         kind=GATE,
+         summary="the asset-contract summariser may print CONTRACT PROVEN "
+                 "only when the network-removed stage SUCCEEDED on the "
+                 "asset set the fetch stage produced; proven / not-proven "
+                 "/ disproven / ambiguous stay four distinct findings",
+         inputs=(),
+         denominator=r"Asset Contract Summariser Calibration: \d+ passed",
+         proven_by="scripts/test_asset_contract.py",
+         calibrated_by="scripts/test_asset_contract.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_memu_graph_acceptance",
+         kind=GATE,
+         summary="the Phase 1 verdict's can-fail stage is INVERTED (a "
+                 "non-zero exit is its PASS), and blocking ALL networking "
+                 "must NOT satisfy the capability check — memu-graph "
+                 "delegates embedding work to an internal peer",
+         inputs=(),
+         denominator=r"memu-graph Acceptance Calibration: \d+ passed",
+         proven_by="scripts/test_memu_graph_acceptance.py",
+         calibrated_by="scripts/test_memu_graph_acceptance.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="summarise_memu_graph_acceptance",
+         kind=GATE,
+         summary="KAI-GATE-048 Phase 1 acceptance: the asset loads from "
+                 "the shipped image with no network, readiness is still "
+                 "reached without loading it, and the real capability "
+                 "works under the INTENDED topology with the internal "
+                 "delegate present and external registry egress absent",
+         inputs=(),
+         denominator=r"inspected: \d+ of \d+ expected stage log",
+         probe=False,
+         probe_skip_reason="requires a stage-log directory produced by a "
+                           "remediated image on a live stack; both "
+                           "directions of every check are asserted on "
+                           "synthetic stage-log trees in "
+                           "scripts/test_memu_graph_acceptance.py",
+         proven_by="scripts/test_memu_graph_acceptance.py",
+         calibrated_by="scripts/test_memu_graph_acceptance.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-048",)),
     Gate(module="report_runtime_topology",
          kind=REPORT,
          summary="what the tree DEFINES, what it GATES, and what a "

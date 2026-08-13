@@ -36,7 +36,7 @@ from scripts.security import summarise_asset_contract as s  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 9
+EXPECTED_SCENARIOS = 11
 executed: list[str] = []
 
 
@@ -212,8 +212,81 @@ def test_an_empty_stage_directory_answers_nothing() -> None:
               "FAIL-CLOSED COST" not in out, out[-300:])
 
 
+def test_the_tokenizer_name_agrees_between_dockerfile_and_compose() -> None:
+    """The bake put the model name in a SECOND place.
+
+    `docker-compose.full.yml` sets `HUGGINGFACE_TOKENIZER` (what cognee
+    resolves at runtime) and `memu-graph/Dockerfile` sets
+    `MEMU_GRAPH_TOKENIZER` (what the bake fetches). If they drift, the
+    image ships an asset for a model the runtime never asks for — and
+    every log looks correct: the build bakes something, the service
+    starts, and only the first `/graph/*` request discovers it. A value
+    in two places is a value that drifts, so it is asserted rather than
+    remembered.
+    """
+    scenario("tokenizer name agrees")
+    import re as _re
+    import yaml
+    compose = yaml.safe_load((REPO / "docker-compose.full.yml").read_text())
+    from_compose = (compose["services"]["memu-graph"]["environment"]
+                    or {}).get("HUGGINGFACE_TOKENIZER")
+    dockerfile = (REPO / "memu-graph" / "Dockerfile").read_text()
+    m = _re.search(r"^ARG MEMU_GRAPH_TOKENIZER=(\S+)", dockerfile, _re.M)
+    from_dockerfile = m.group(1) if m else None
+    check("compose declares one", bool(from_compose), str(from_compose))
+    check("the Dockerfile declares one", bool(from_dockerfile), str(from_dockerfile))
+    check("and they are the SAME model", from_compose == from_dockerfile,
+          f"compose={from_compose!r} dockerfile={from_dockerfile!r} — the "
+          f"image would bake an asset the runtime never asks for")
+    rev = _re.search(r"^ARG MEMU_GRAPH_TOKENIZER_REVISION=([0-9a-f]{40})$",
+                     dockerfile, _re.M)
+    check("the pinned revision is a full sha", rev is not None,
+          "a short or absent sha cannot be compared to what the loader "
+          "resolves at build time")
+
+
+def test_the_bake_script_refuses_without_its_inputs() -> None:
+    """`bake_tokenizer.py` must not guess. Both subcommands fail closed
+    on a missing name, and `verify` additionally refuses when offline is
+    not actually in force — otherwise it could pass by downloading,
+    which is the one thing it exists to rule out."""
+    scenario("bake script fails closed")
+    import os
+    import subprocess as sp
+    script = REPO / "memu-graph" / "bake_tokenizer.py"
+    # No early return on absence. A missing script must make these
+    # assertions FAIL, not vanish — I-1: "I looked at nothing" is a valid
+    # answer to "were any wrong?" and a silent failure on "are they
+    # right?". The gate refused this file until the `return` came out.
+    check("the script exists", script.exists(),
+          f"{script} is absent, so every assertion below is about nothing")
+    base = {k: v for k, v in os.environ.items() if k != "MEMU_GRAPH_TOKENIZER"}
+    base.pop("HF_HUB_OFFLINE", None)
+    base.pop("TRANSFORMERS_OFFLINE", None)
+    for sub in ("fetch", "verify"):
+        r = sp.run([sys.executable, str(script), sub], env=base,
+                   capture_output=True, text=True, timeout=60)
+        check(f"{sub} refuses with no MEMU_GRAPH_TOKENIZER", r.returncode != 0,
+              f"rc={r.returncode}")
+        check(f"{sub} names the missing input",
+              "MEMU_GRAPH_TOKENIZER" in (r.stderr + r.stdout), r.stderr[-200:])
+    env = dict(base, MEMU_GRAPH_TOKENIZER="bert-base-uncased",
+               HF_HOME="/tmp/nope")
+    r = sp.run([sys.executable, str(script), "verify"], env=env,
+               capture_output=True, text=True, timeout=60)
+    check("verify refuses when offline is not in force", r.returncode != 0,
+          f"rc={r.returncode}")
+    check("and says why", "could pass by fetching" in (r.stderr + r.stdout),
+          (r.stderr + r.stdout)[-300:])
+    r = sp.run([sys.executable, str(script), "bogus"], env=env,
+               capture_output=True, text=True, timeout=60)
+    check("an unknown subcommand refuses", r.returncode == 2, str(r.returncode))
+
+
 def run_all() -> None:
     test_the_result_parser_separates_loaded_failed_and_absent()
+    test_the_tokenizer_name_agrees_between_dockerfile_and_compose()
+    test_the_bake_script_refuses_without_its_inputs()
     test_the_timing_parser_reads_both_shapes()
     test_the_cache_parser_counts_bytes_and_files()
     test_the_revision_is_read_off_the_cache_layout()

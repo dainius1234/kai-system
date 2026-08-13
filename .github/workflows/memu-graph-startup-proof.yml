@@ -35,6 +35,9 @@ on:
       - scripts/test_graph_live.py
       - scripts/security/define_memu_graph_asset_contract.sh
       - scripts/security/summarise_asset_contract.py
+      - scripts/security/accept_memu_graph_offline.sh
+      - scripts/security/summarise_memu_graph_acceptance.py
+      - memu-graph/bake_tokenizer.py
       - memu-graph/Dockerfile
       - memu-graph/requirements.txt
       - memu-graph/app.py
@@ -154,4 +157,78 @@ jobs:
           path: |
             memu-graph-asset-contract.evidence
             asset-stage-logs/
+          if-no-files-found: warn
+
+  # KAI-GATE-048 Phase 1 ACCEPTANCE. Unlike the two jobs above, this one
+  # measures a REMEDIATED image. It is the only thing that can close the
+  # finding: D191 says a green build is not the contract.
+  #
+  # Its capability check runs on the repo-defined INTENDED topology, with
+  # `ollama` present, because memu-graph delegates embedding work to it.
+  # Only the asset checks use `--network none`.
+  memu-graph-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      OLLAMA_MODEL: qwen2.5:3b
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The acceptance verdict must pass its calibration first
+        run: |
+          # A verdict from an uncalibrated instrument is not evidence.
+          python3 scripts/test_memu_graph_acceptance.py
+          python3 scripts/test_asset_contract.py
+
+      - name: Mint an ephemeral database password for this run
+        run: |
+          printf 'DB_PASSWORD=ci-ephemeral-%s\n' \
+            "$(head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20)" \
+            >> "$GITHUB_ENV"
+
+      - name: Free up runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
+          df -h /
+
+      - name: Build the remediated memu-graph image
+        run: docker compose -f docker-compose.full.yml build memu-graph
+
+      # ci-toleration: documented-skip
+      - name: Phase 1 acceptance
+        if: always()
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: bash scripts/security/accept_memu_graph_offline.sh
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker-compose.full.yml down -v || true
+
+      - name: Evidence summary (printed last so it survives truncation)
+        if: always()
+        run: |
+          echo "commit ${GITHUB_SHA}"
+          echo
+          cat memu-graph-acceptance.evidence 2>/dev/null \
+            || echo "  (not executed = UNKNOWN, not clean)"
+
+      # THE GATE. Separate from collection so this exit code is the
+      # verdict, and so the registry's workflow parse can see what
+      # enforces KAI-GATE-048's closure condition. Non-zero on NOT MET
+      # and on INCOMPLETE alike: "we did not measure" must not read as
+      # "it works".
+      - name: KAI-GATE-048 Phase 1 verdict
+        if: always()
+        run: |
+          python3 scripts/security/summarise_memu_graph_acceptance.py \
+            --stage-logs acceptance-stage-logs
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: memu-graph-acceptance
+          path: |
+            memu-graph-acceptance.evidence
+            acceptance-stage-logs/
           if-no-files-found: warn
