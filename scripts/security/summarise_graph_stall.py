@@ -147,46 +147,69 @@ def main() -> int:
     print(f"    for {window}s instead.")
     print()
 
-    m = re.search(r"RETURNED http-post\s+status=(\d+)\s+elapsed=([\d.]+)s", ingest)
-    if m:
-        print(f"  INGEST RETURNED: status={m.group(1)} after {m.group(2)}s")
-        print(f"    Control came back. The operation has a measured duration "
-              f"and outcome\n    for the first time.")
-    elif "NO-RETURN" in ingest:
-        nm = re.search(r"NO-RETURN http-post (\S+): .*elapsed=([\d.]+)s", ingest)
-        print(f"  INGEST DID NOT RETURN inside {window}s"
-              + (f" ({nm.group(1)} at {nm.group(2)}s)" if nm else ""))
-        print("    This is the OBSERVATION WINDOW ending, not a proven hang.")
-    else:
-        print(f"  INGEST OUTCOME NOT ESTABLISHED (probe exit {ingest_rc or '?'})")
-    print()
+    # THE INTERPRETATION HIERARCHY IS THE OPERATOR'S, AND THE ORDER IS
+    # PART OF IT. A reader reaches for the first thing on the page, and
+    # leading with "did it return" invites the timeout framing this whole
+    # unit exists to refuse. Stage ownership, then execution state, then
+    # return semantics. Timeout policy is downstream of all three and is
+    # not answered here at all.
 
+    print("  1. STAGE OWNERSHIP — who received control, who last returned it")
     unpaired, order = task_markers(read(d / "service-logs.log"))
-    print(f"  cognee task markers seen: {len(order)}")
+    print(f"     cognee task markers seen: {len(order)}")
     for name in order:
-        print(f"    entered  {name}")
-    print()
+        print(f"       entered  {name}")
     if unpaired:
-        print("  ENTERED WITHOUT RETURNING — the stage that owns the silence:")
+        print("     ENTERED WITHOUT RETURNING:")
         for name, stamp in unpaired:
-            print(f"    {name}   (entered {stamp or 'unstamped'})")
+            print(f"       {name}   (entered {stamp or 'unstamped'})")
         if any(n == "extract_graph_and_summarize" for n, _ in unpaired):
-            print("    NOTE: this task is asyncio.gather(extract_graph_from_data,")
-            print("    summarize_text) — TWO concurrent LLM paths under one")
-            print("    marker, so cognee's own logging cannot say which.")
+            print("       NOTE: this task is asyncio.gather(")
+            print("       extract_graph_from_data, summarize_text) — TWO")
+            print("       concurrent LLM paths under one marker, so cognee's")
+            print("       own logging cannot say which.")
     elif order:
-        print("  every task that was entered also returned — the silence is "
-              "NOT an\n  unpaired cognee task")
+        print("     every task entered also returned — the silence is NOT an")
+        print("     unpaired cognee task")
     else:
-        print("  NO cognee task markers found — nothing to pair")
+        print("     NO cognee task markers found — nothing to pair")
     print()
 
+    print("  2. EXECUTION STATE — was the responsible process computing, "
+          "blocked, or gone")
     rows = samples(read(d / "samples.log"))
     verdict, detail = cpu_verdict(rows)
-    print(f"  samples taken: {len(rows)}")
-    print(f"  STATE DURING THE SILENCE: {verdict}")
-    print(f"    {detail}")
+    print(f"     samples taken: {len(rows)}")
+    print(f"     STATE: {verdict}")
+    print(f"       {detail}")
     print()
+
+    print("  3. RETURN SEMANTICS — did the request return, and with what")
+    m = re.search(r"RETURNED http-post\s+status=(\d+)\s+elapsed=([\d.]+)s", ingest)
+    if m:
+        print(f"     RETURNED status={m.group(1)} after {m.group(2)}s")
+        print(f"       Control came back. The operation has a measured "
+              f"duration and outcome")
+        print(f"       for the first time.")
+    elif "NO-RETURN" in ingest:
+        nm = re.search(r"NO-RETURN http-post (\S+): .*elapsed=([\d.]+)s", ingest)
+        print(f"     DID NOT RETURN inside {window}s"
+              + (f" ({nm.group(1)} at {nm.group(2)}s)" if nm else ""))
+        print("       This is the OBSERVATION WINDOW ending, not a proven "
+              "hang. The only")
+        print("       justified statement is: the request had not returned by "
+              "the end of")
+        print("       the window.")
+    else:
+        print(f"     OUTCOME NOT ESTABLISHED (probe exit {ingest_rc or '?'})")
+    print()
+
+    print("  4. TIMEOUT POLICY — NOT ANSWERED HERE")
+    print("     Whether any existing limit is inappropriate is downstream of")
+    print("     1-3 and needs its own decision. A window expiring is not a")
+    print("     reason to widen it.")
+    print()
+
     print("  This report names a stage and a state. It does NOT authorise a")
     print("  remedy: slow work, a blocked wait and a deadlock have three")
     print("  different owners, and raising a timeout would answer none of")
