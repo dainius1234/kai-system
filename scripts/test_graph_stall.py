@@ -291,10 +291,18 @@ def collector_invocations() -> list[list[str]]:
     also what makes the run-8 defect visible: a bare `"$WINDOW"` in the
     subcommand position becomes `1`, and `1` is not a subcommand.
     """
-    text = COLLECTOR.read_text(encoding="utf-8")
+    # Join shell line-continuations FIRST. Today both invocations keep
+    # `python -` and the `<` redirect on one physical line, so this
+    # changes nothing — but a wrapped invocation would go unseen, and a
+    # check that quietly inspects fewer things than its name claims is
+    # exactly R5. KAI-GATE-050's collector wraps, and found this gap.
+    text = COLLECTOR.read_text(encoding="utf-8").replace("\\\n", " ")
     out = []
     for raw in _INVOCATION.findall(text):
-        resolved = re.sub(r'"?\$\{?(\w+)\}?"?', "1", raw)
+        # Substitute the EXPANSION only, never the surrounding quotes:
+        # `"kai-gate-050-obs-${n}"` must stay one quoted word, or shlex
+        # sees an unbalanced quote and the check dies instead of judging.
+        resolved = re.sub(r"\$\{(\w+)\}|\$(\w+)", "1", raw)
         if "$" in resolved:
             raise AssertionError(
                 f"unresolved shell expansion in {raw!r} — this calibration "

@@ -11984,3 +11984,151 @@ not established` on any identity change or tick discontinuity, while
 leaving axes 1 and 3 reportable. Measurement degrades by axis.
 
 Not started. Run 9 stands as-is on `da3320a`.
+
+---
+
+## D199
+
+**2026-08-13 — KAI-GATE-050 OPENED. `/graph/ingest` reports success over
+a failed pipeline. The contract is established from source; reproduction
+and controls are instrumented, not yet run.**
+
+Identifier confirmed unused before claiming it: the only occurrence of
+`KAI-GATE-050` anywhere in the tree was D197's own PROPOSED line, and the
+registry's highest allocation was 049.
+
+### The invariant, as the operator stated it
+
+> A boundary may not promote an internal failure into externally
+> successful completion. If the API contract is asynchronous/accepted
+> semantics, it must say so explicitly and expose a durable operation
+> state; otherwise downstream failure must remain failure.
+
+### CONTRACT — established from source, not inferred
+
+`/graph/ingest` is **synchronous**. `memu-graph/app.py:90-99` awaits
+`cognee.add(...)` and `cognee.cognify(...)` inline inside a `try`, and
+declares `HTTPException(status_code=502)` on failure. There is no
+accepted-semantics defence available to it; the second clause of the
+invariant applies.
+
+The mechanism, in cognee 1.1.3's own source with its intent in a comment:
+
+```python
+# cognee/modules/pipelines/operations/run_tasks.py:143-148
+errored_results = [r for r in results
+                   if isinstance(r["run_info"], PipelineRunErrored)]
+if errored_results:
+    raise PipelineRunFailedError(
+        message="Pipeline run failed. Data item could not be processed.")
+
+# ...caught by its own handler, :169-187
+except Exception as error:
+    await log_pipeline_run_error(...)
+    yield PipelineRunErrored(...)
+    # In case of error during incremental loading of data just let the
+    # user know the pipeline Errored, don't raise error
+    if not isinstance(error, PipelineRunFailedError):
+        raise error
+```
+
+**The one exception type that means "the pipeline failed" is the one type
+excluded from re-raising.** The failure travels as a *return value*.
+
+And `memu-graph/app.py:96` is:
+
+```python
+await cognee.cognify(datasets=[DATASET_NAME])     # return value DISCARDED
+```
+
+— not assigned, never inspected. So the boundary is **not lying, it is
+blind**: its success predicate is *absence of exception*, and cognee's
+failure signal is not an exception. A predicate/signal mismatch.
+
+That distinction is load-bearing for any future remedy: the fix is to
+inspect cognify's return value, **not** to add an exception handler.
+
+**A sharp corollary, unmeasured (R8 — never-executed code is where the
+defects are):** if cognee never raises for pipeline failure, then
+`app.py:97-99` — the entire 502 branch — is **dead code for the failure
+mode that matters most**. The instrument records whether any 502 is ever
+observed.
+
+### REPRODUCTION — instrumented, NOT yet run
+
+Observed **once** (run 31733359906). One occurrence opens a gate; it does
+not make the behaviour deterministic. `measure_ingest_contract.sh` takes
+**two observations on two CLEAN STACKS** — `down -v` and a fresh `up`
+between them, because a second request against the same stack shares
+cognee's databases, dataset and pipeline cache and is a weaker
+replication than it looks. The analyser says `Reproduced in N/N` only
+when every observation shows it, and prints **NOT deterministic**
+otherwise.
+
+It also fixes what run 9 could not capture: cognee's log file is read
+**after the request returns**. Run 9 sampled it every 20s and stopped at
+the return, and the pipeline failed *after* the last sample, so the
+terminal marker was never recorded.
+
+### CONTROLS — real, and from the same request
+
+`/graph/ingest` drives **two** cognee pipelines: `add`, which completed
+in run 9 (`93e2b017`), and `cognify`, which failed (`65e9ef5d`). One
+request therefore supplies a genuine **known-positive** and a genuine
+**known-negative**, in one log, from one stack. Neither is synthetic.
+
+This matters because on a CPU runner a genuinely successful *cognify* may
+never occur, and an instrument that could only be calibrated by waiting
+for one would be uncalibratable.
+
+**HTTP 200 is not the success predicate.** The success predicate is
+cognee's own terminal pipeline status, and the verdict is the
+correlation:
+
+| internal | external | verdict |
+|---|---|---|
+| all pipelines COMPLETED | 2xx | CONSISTENT |
+| some pipeline failed | 5xx | CONSISTENT — failure propagated |
+| some pipeline failed | 2xx | **SUCCESS-SHAPED FAILURE** |
+| all COMPLETED | 5xx | INVERTED |
+| no pipeline status, or no HTTP result | — | **UNMEASURED** (R11) |
+
+A pipeline with **no terminal marker** is explicitly *not* a completed
+one — cognee can end a run with neither `completed` nor `errored`, and
+reading that silence as success would reproduce the defect inside the
+instrument.
+
+Calibration: `scripts/test_ingest_contract.py`, **41 assertions across 8
+scenarios**, wired into `make test-ingest-contract` and `test-uh`. All
+four correlation cells, both failure-to-measure paths, and — the
+known-positive for the gate itself — a failed pipeline that DID propagate
+as a 502 must exit **zero**, because a gate with false positives sends
+people to break working code.
+
+### A defect found by the new check, in the check itself
+
+The collector-argv check (run 8's lesson) initially found **1 of 2**
+invocations: the regex could not cross a shell line-continuation, and the
+real `ingest` invocation wraps across three physical lines. A check whose
+scope is smaller than its name implies — R5, one level up. Fixed in both
+suites (R6): continuations are joined before matching, and the shell
+expansion is substituted **without** consuming its surrounding quotes.
+`test_graph_stall.py` was passing only because both of its invocations
+happen to fit on one line today.
+
+### Standing
+
+* **KAI-GATE-050** — **OPEN**. Contract ESTABLISHED. Reproduction and
+  controls INSTRUMENTED, not yet run.
+* **KAI-GATE-048** — C remains BLOCKED by independent runtime defects:
+  graph extraction does not complete successfully, and the API boundary
+  can represent that failed pipeline as successful ingestion. **Not
+  closed or rewritten around either one.**
+* **KAI-GATE-049** — OPEN pending formal closure review. Stage and return
+  semantics located; the execution-state claim remains provisional
+  because process continuity was not instrumented (D198). That is now the
+  smaller verification problem, and it follows KAI-GATE-050.
+* **Raising C3's budget above ~396s would make the acceptance test
+  greener while the operation still failed.** No timeout change.
+* No remediation: no model change, no Cognee change, no endpoint fix, no
+  Phase 2.

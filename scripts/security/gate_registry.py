@@ -860,6 +860,70 @@ REGISTRY: Tuple[Gate, ...] = (
                         "`docker compose exec`, which the workflow parse "
                         "cannot see as an invocation of this module",
          findings=("KAI-GATE-049",)),
+    # KAI-GATE-050. Opened 2026-08-13 from run 31733359906: cognee's
+    # pipeline failed 422 and `/graph/ingest` answered 200
+    # {"status":"ingested"}. Established from source, not inferred —
+    # cognee raises PipelineRunFailedError (run_tasks.py:147) then
+    # deliberately does NOT re-raise it (:185-187, intent in a comment),
+    # so the failure travels as a return value; memu-graph/app.py:96
+    # discards that return value and its only predicate is
+    # `except Exception`, which cannot fire.
+    Gate(module="test_ingest_contract",
+         kind=GATE,
+         summary="HTTP 200 must never be the success predicate — the 200 "
+                 "is the thing under suspicion — and a pipeline with no "
+                 "terminal marker must not read as a completed one, "
+                 "because cognee swallows PipelineRunFailedError without "
+                 "re-raising it",
+         inputs=(),
+         denominator=r"Ingest Contract Analyser Calibration: \d+ passed",
+         proven_by="scripts/test_ingest_contract.py",
+         calibrated_by="scripts/test_ingest_contract.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-050",)),
+    Gate(module="summarise_ingest_contract",
+         kind=GATE,
+         summary="correlates cognee's OWN terminal pipeline status with "
+                 "the HTTP response `/graph/ingest` returned; fails on a "
+                 "2xx over a pipeline that did not complete, and equally "
+                 "on an observation that established neither side — "
+                 "unmeasured is not clean",
+         inputs=(),
+         denominator=r"inspected: \d+ clean-stack observation",
+         probe=False,
+         probe_skip_reason="requires a stage-log directory produced by "
+                           "two clean stacks each running a full "
+                           "~400s ingest; all four correlation cells and "
+                           "both failure-to-measure paths are asserted on "
+                           "synthetic stage-log trees in "
+                           "scripts/test_ingest_contract.py",
+         proven_by="scripts/test_ingest_contract.py",
+         calibrated_by="scripts/test_ingest_contract.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-050",)),
+    Gate(module="probe_ingest_contract",
+         kind=REPORT,
+         summary="runs INSIDE the image: POSTs /graph/ingest recording "
+                 "status AND body, and dumps cognee's own log file IN "
+                 "FULL after the request returns — the terminal pipeline "
+                 "marker run 9 sampled past and never captured",
+         inputs=(),
+         denominator=r"inspected: \d+ cognee log file, \d+ line",
+         probe=False,
+         probe_skip_reason="stdlib-only probe that must execute inside a "
+                           "running memu-graph container; on the host "
+                           "there is no cognee log directory and no "
+                           "endpoint to call",
+         proven_by="scripts/test_ingest_contract.py",
+         in_policy_check=False,
+         in_workflows=(),
+         pending_wiring="invoked by "
+                        "scripts/security/measure_ingest_contract.sh via "
+                        "`docker compose exec`, which the workflow parse "
+                        "cannot see as an invocation of this module",
+         findings=("KAI-GATE-050",)),
     Gate(module="report_runtime_topology",
          kind=REPORT,
          summary="what the tree DEFINES, what it GATES, and what a "
