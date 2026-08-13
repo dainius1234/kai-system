@@ -1,0 +1,112 @@
+# KAI-GATE-048 — does `memu-graph` acquire a model BEFORE readiness?
+#
+# The one decision-changing measurement left in the A/B/C sweep (D186).
+# `memu-graph`'s loader lives inside third-party cognee, so no source
+# trace can establish its timing; that is the entire reason this job
+# exists rather than another parser.
+#
+# THE BRING-UP IS THE ONE THIS REPOSITORY ALREADY DEFINES. The collector
+# copies the command from core-tests.yml's "Bring up memu-graph" step,
+# the same readiness probe and the same live cycle. Nothing about the
+# startup route is invented here — only the observation around it.
+#
+# NO REMEDIATION. This job changes nothing: it snapshots the HuggingFace
+# cache in the image, at readiness, and after the first request, and the
+# differences are the chronology.
+name: memu-graph model-startup chronology (KAI-GATE-048)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/project-rework-plan-pgvp35
+    # EVERY INPUT THIS JOB READS. Commit 924a600 repaired a collector and
+    # fired nothing, because the collector was absent from the filter of
+    # the job that runs it. The list is the job's inputs; all of them
+    # belong in it — including the compose file and the live cycle, whose
+    # absence would make this measure a different system silently.
+    paths:
+      - .github/workflows/memu-graph-startup-proof.yml
+      - scripts/security/collect_memu_graph_startup.sh
+      - scripts/security/summarise_memu_graph_startup.py
+      - scripts/security/classify_model_startup.py
+      - scripts/ci/health_chronology.py
+      - scripts/ci/compose_probe.py
+      - scripts/test_graph_live.py
+      - memu-graph/Dockerfile
+      - memu-graph/requirements.txt
+      - memu-graph/app.py
+      - docker-compose.full.yml
+
+permissions:
+  contents: read
+
+jobs:
+  memu-graph-startup-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      # core-tests.yml overrides this for its memu-graph step only (D49,
+      # D51: the 0.5b default cannot produce valid structured JSON under
+      # Cognee's validation). Same override here, for the same reason and
+      # the same scope — this job starts nothing else.
+      OLLAMA_MODEL: qwen2.5:3b
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The classifier must pass its anti-collapse calibration first
+        run: |
+          # A verdict from an uncalibrated instrument is not evidence.
+          # This runs BEFORE the measurement so a broken classifier stops
+          # the job instead of decorating its output.
+          python3 scripts/test_model_startup_classifier.py
+
+      - name: Mint an ephemeral database password for this run
+        run: |
+          printf 'DB_PASSWORD=ci-ephemeral-%s\n' \
+            "$(head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20)" \
+            >> "$GITHUB_ENV"
+
+      - name: Free up runner disk space
+        run: |
+          # The full-profile images do not fit beside the runner's
+          # preinstalled toolchains. Same treatment core-tests.yml uses.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
+          df -h /
+
+      - name: Build the memu-graph image
+        run: |
+          docker compose -f docker-compose.full.yml build memu-graph
+
+      # ci-toleration: documented-skip
+      - name: memu-graph startup chronology
+        if: always()
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          bash scripts/security/collect_memu_graph_startup.sh
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker-compose.full.yml down -v || true
+
+      # LAST, deliberately. The Actions log API serves a fixed byte
+      # window from the END of a job — measured at ~15.8KB — so a summary
+      # printed early is a summary that may not exist. Run 1 of the
+      # degradation proof lost its whole diagnosis to exactly this.
+      - name: Evidence summary (printed last so it survives truncation)
+        if: always()
+        run: |
+          echo "commit ${GITHUB_SHA}"
+          echo
+          cat memu-graph-startup.evidence 2>/dev/null \
+            || echo "  (not executed = UNKNOWN, not clean)"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: memu-graph-startup-evidence
+          path: |
+            memu-graph-startup.evidence
+            stage-logs/
+          if-no-files-found: warn

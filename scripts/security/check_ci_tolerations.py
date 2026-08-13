@@ -118,6 +118,49 @@ DECLARED: Tuple[Toleration, ...] = (
         owner="orion",
         review_by="2026-11-01",
     ),
+    # KAI-GATE-048's collector. Three suppressions, three different
+    # reasons -- lumping them under one declaration would hide which is
+    # which, and the third is the one that matters.
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Free up runner disk space",
+        bucket=DOCUMENTED_SKIP,
+        reason="`sudo rm -rf ... || true` against the runner's "
+               "preinstalled toolchains. The paths differ between runner "
+               "images and an absent one is not a failure; the build step "
+               "that follows is what fails if the space was genuinely "
+               "not freed. Same treatment core-tests.yml already uses.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Tear down",
+        bucket=DOCUMENTED_SKIP,
+        reason="`compose down -v || true` in an `if: always()` cleanup. A "
+               "teardown that fails the job would replace the "
+               "measurement's verdict with a janitorial one, and the "
+               "runner is discarded either way. It cannot mask a "
+               "measurement failure because it runs after every "
+               "observation is already written to the evidence file.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Evidence summary (printed last so it survives truncation)",
+        bucket=DOCUMENTED_SKIP,
+        reason="`cat ... || echo (not executed = UNKNOWN, not clean)`. "
+               "The absent-evidence branch is the point: a run that "
+               "collected nothing must print UNKNOWN rather than an "
+               "empty section that reads as a clean result. The verdict "
+               "itself is produced inside the collector, which aborts at "
+               "the prerequisite boundary and exits 2; this step only "
+               "reprints it last, where the Actions log byte window can "
+               "still see it.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
     # One declaration per service, because the match is on the step name
     # and there is one INDEPENDENT collector step per service. They
     # replace two earlier declarations — a separate "Diagnose image

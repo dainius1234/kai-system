@@ -665,6 +665,49 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=False,
          in_workflows=(),
          findings=("KAI-GATE-048",)),
+    # KAI-GATE-048, the CALIBRATION half. The workflow runs it as its own
+    # step BEFORE the measurement, so a non-zero exit stops the job — an
+    # uncalibrated classifier must not get to decorate a verdict. That is
+    # what makes this an instrument rather than a test, and why I-4
+    # discovered it as one the moment it was wired.
+    Gate(module="test_model_startup_classifier",
+         kind=GATE,
+         summary="the four known model-startup shapes — memu-core, "
+                 "memu-core-introspect, ollama-pull and a lazy "
+                 "memu-graph — must produce four DIFFERENT verdicts, and "
+                 "`classify()` must not be able to see a service name",
+         inputs=(),
+         denominator=r"Model Startup Classifier Calibration: \d+ passed",
+         proven_by="scripts/test_model_startup_classifier.py",
+         calibrated_by="scripts/test_model_startup_classifier.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="summarise_memu_graph_startup",
+         kind=REPORT,
+         summary="reads the KAI-GATE-048 stage logs into an observation "
+                 "record; a missing or unparseable log stays NOT "
+                 "MEASURED and never becomes a proven absence",
+         inputs=(),
+         denominator=r"inspected: \d+ of \d+ expected stage log",
+         probe=False,
+         probe_skip_reason="requires a stage-log directory produced by a "
+                           "deployed collector; both parser directions "
+                           "are asserted on synthetic stage-log trees in "
+                           "scripts/test_model_startup_classifier.py",
+         proven_by="scripts/test_model_startup_classifier.py",
+         calibrated_by="scripts/test_model_startup_classifier.py",
+         in_policy_check=False,
+         # Invoked by collect_memu_graph_startup.sh, not by a workflow
+         # `run:` step. I-4 compares the declaration against what the
+         # parse can see, and the parse can only see direct invocations —
+         # so the honest declaration is (), with the real caller named.
+         in_workflows=(),
+         pending_wiring="run by scripts/security/collect_memu_graph_startup.sh, "
+                        "which memu-graph-startup-proof.yml invokes; a "
+                        "workflow-level declaration would claim a wiring "
+                        "the workflow parse cannot confirm",
+         findings=("KAI-GATE-048",)),
     Gate(module="report_runtime_topology",
          kind=REPORT,
          summary="what the tree DEFINES, what it GATES, and what a "
