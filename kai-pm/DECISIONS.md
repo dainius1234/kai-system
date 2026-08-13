@@ -11902,3 +11902,85 @@ independently explained.
   it is the operator's call.
 * No remediation performed. No timeout changed, no model changed, no
   Cognee instrumentation added, no Phase 2.
+
+---
+
+## D198
+
+**2026-08-13 — correction to D197, under the operator's degrade-by-axis
+rule. Run 9's EXECUTION STATE is provisional, not established.**
+
+D197 said, of run 9:
+
+> ~~"pid-1 tick counts rose monotonically with no reset"~~
+
+**That claimed more than was checked.** What was actually verified:
+
+* `cpu_verdict` differences the **first and last** samples only — 7.4s
+  over 385s. A mid-run reset followed by recovery yields a positive
+  first→last delta too, so this cannot exclude a discontinuity.
+* The Actions log carries only the **last 40 lines** of `samples.log`
+  (48,490 bytes total), i.e. the +360s and +380s samples, both
+  `632/157`. **18 of 20 samples were never inspected.**
+
+The full file is in artifact 9194434167. It is **not retrievable from
+this environment**: the download host
+`productionresultssa0.blob.core.windows.net` is denied by the network
+policy (`connect_rejected`, gateway 403). Recorded as unreachable, not
+as checked.
+
+### Applying the operator's rule, axis by axis
+
+| axis | status |
+|---|---|
+| **1. Stage ownership** | **MEASURED.** Derived from `service-logs.log`, independent of the samples. `extract_graph_and_summarize` entered 19:00:23.1994, never completed. |
+| **2. Execution state** | **PROVISIONAL.** The instrument records no process identity, and per-sample continuity is unverifiable from here. `WAITING ON DELEGATE` is not withdrawn — it is downgraded from measured to inferred. |
+| **3. Return semantics** | **MEASURED.** `status=200 elapsed=396.3s`, from the probe. |
+| **4. Timeout policy** | Unanswered, still last. |
+
+### What does support continuity — as inference, not measurement
+
+R1: a sound argument is still only an argument. Stated as such.
+
+1. `urllib.request.urlopen` performs **one** POST on **one** TCP
+   connection with no reconnection. A pid-1 restart destroys the
+   listening socket and every established connection, so the probe would
+   have raised and reported `NO-RETURN`. It reported
+   `RETURNED status=200` **with a body**. One connection therefore held
+   from 19:00:15 to 19:06:51.
+2. ollama logged three **200s** from `172.18.0.3` spanning
+   19:00:23→19:06:43. A client restart mid-flight would have aborted
+   those, not completed them.
+3. The delegate socket carries the same ephemeral source port
+   `172.18.0.3:42926` in both inspected samples; a restarted netns
+   cannot preserve it.
+
+Each is evidence against a restart. **None is the measurement the
+instrument was supposed to make.** The correct label for axis 2 is
+therefore *not established by the instrument*.
+
+### Consequence
+
+Nothing in D197's other conclusions changes. The stage, the 396.3s
+return, the three ollama completions totalling 379s, the 422
+`PipelineRunFailedError` behind a `200 {"status":"ingested"}`, and the
+D195 reading of ~291s all stand — none of them depends on axis 2.
+
+### Next unit — PROPOSED (the operator's conditional applies: the gap
+does materially affect the verdict)
+
+Add per-sample identity to `probe_graph_stall.sample()`:
+
+* `container_id` — `/etc/hostname` inside the container;
+* `container_started_at` — the container's own start time;
+* `pid1_starttime` — `/proc/1/stat` **field 22** (`tail[19]` given the
+  probe's existing post-comm split), which changes **iff** pid 1 is a
+  different process. The cheap decisive one;
+* `pid1_cpu_ticks` — already present as `utime`/`stime`.
+
+And in `summarise_graph_stall.cpu_verdict`: walk **adjacent** pairs, not
+just first-vs-last, and return `UNKNOWN — process identity continuity
+not established` on any identity change or tick discontinuity, while
+leaving axes 1 and 3 reportable. Measurement degrades by axis.
+
+Not started. Run 9 stands as-is on `da3320a`.
