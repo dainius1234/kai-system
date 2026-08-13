@@ -41,6 +41,25 @@ COMPOSE="docker-compose.full.yml"
 SERVICE="memu-graph"
 EVIDENCE="memu-graph-acceptance.evidence"
 LOGDIR="acceptance-stage-logs"
+
+# ARTEFACT IDENTITY IS CAPTURED BEFORE ANYTHING IS WRITTEN.
+#
+# Run 4 failed check E with "1 uncommitted modification". The
+# modification was this script's own evidence file: `git status` ran
+# AFTER `: > "$EVIDENCE"` had already created it. The instrument dirtied
+# the tree it was measuring and then reported the tree as dirty — the
+# same shape as R9's watcher matching its own command line, and I-8's
+# rule that evidence and claim must come from different places.
+#
+# So the git state is read first, into variables, and only then are any
+# files created. The full porcelain listing is recorded too: a future
+# reader needs to see WHAT was dirty, not just how many, or this
+# diagnosis has to be made again from scratch.
+TREE_SHA="$(git rev-parse 'HEAD^{tree}' 2>/dev/null || echo UNKNOWN)"
+COMMIT="$(git rev-parse HEAD 2>/dev/null || echo UNKNOWN)"
+DIRTY_LIST="$(git status --porcelain 2>/dev/null)"
+DIRTY="$(printf '%s' "$DIRTY_LIST" | grep -c . || true)"
+
 mkdir -p "$LOGDIR"
 : > "$EVIDENCE"
 
@@ -70,15 +89,14 @@ record ""
 
 # ── E. artefact identity, first, so everything below is bound to it ──
 record "== E. ARTEFACT IDENTITY =="
-TREE_SHA="$(git rev-parse 'HEAD^{tree}' 2>/dev/null || echo UNKNOWN)"
-COMMIT="$(git rev-parse HEAD 2>/dev/null || echo UNKNOWN)"
-DIRTY="$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
 record "  commit          ${COMMIT}"
 record "  TESTED TREE SHA ${TREE_SHA}"
-record "  working tree modifications: ${DIRTY}"
+record "  working tree modifications (read BEFORE this script wrote"
+record "  anything, so its own outputs cannot count): ${DIRTY}"
 if [ "$DIRTY" != "0" ]; then
   record "  WARNING: the tree under test is NOT the committed tree. Any"
   record "  evidence below describes something that was never committed."
+  printf '%s\n' "$DIRTY_LIST" | sed 's/^/    /' | tee -a "$EVIDENCE"
 fi
 
 IMAGE=$(docker compose -f "$COMPOSE" images -q "$SERVICE" 2>/dev/null | head -1)

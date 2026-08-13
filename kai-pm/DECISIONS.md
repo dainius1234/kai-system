@@ -11178,3 +11178,117 @@ proves: **memu-graph remains correctly lazy and readiness-independent,
 AND its first model-dependent request succeeds without external
 model-registry egress because the required tokenizer asset is locally
 satisfiable.** Build green + runtime capability broken = still OPEN.
+
+---
+
+## D192 — 2026-08-13 — Phase 1 run 4: the tokenizer defect is FIXED. C fails on a different, pre-existing defect; E was my instrument measuring itself.
+
+Run **31718982368**, commit **ad37f65**, job `memu-graph-acceptance`.
+Build **succeeded** — so the fail-closed bake, the pin assertion and the
+build-time offline verification all held.
+
+```
+A  PASS   bert-base-uncased loaded in 0.07s from the SHIPPED image
+          with --network none
+B  PASS   ready at +5.1s with no model extension mapped into the
+          serving process — the lazy design is intact
+C  FAIL   external egress blocked: blocked
+          internal delegate reachable: reachable
+          real /graph/ingest succeeded: FAILED
+          no HF retry storm: NONE SEEN
+D  PASS   withholding the asset made the SAME check fail (exit 1)
+E  FAIL   1 uncommitted modification
+
+KAI-GATE-048 Phase 1: NOT MET — C, E failed. The finding stays OPEN.
+```
+
+### What the remediation actually achieved
+
+**The 47-second Hugging Face retry storm is gone.** C4 scanned 9,798
+bytes of service log and found **no** `Retrying in Ns [Retry k/5]`, no
+`huggingface.co`. Before this change that log was nothing else. The
+tokenizer now resolves from the baked cache — A proves it does so in
+**0.07s from the shipped image with no network interface at all**, and D
+proves that measurement is about the asset by making the same check fail
+when the asset is withheld.
+
+So obligation 1 (local asset) and obligation 2 (fail closed, no external
+resolution) are both **met and runtime-proven**. That was the defect
+KAI-GATE-048 recorded.
+
+### C fails on a DIFFERENT defect, and it is not mine
+
+`/graph/ingest` did not return. The service log shows how far it got:
+
+```
+Pipeline run started
+Coroutine task started: classify_documents
+Async Generator task started: extract_chunks_from_documents
+Coroutine task started: extract_graph_and_summarize      <- LLM work
+```
+
+It cleared chunking — which is the step that needs the tokenizer — and
+died in **LLM graph extraction**. `scripts/test_graph_live.py` allows
+`timeout=300` for ingest with the comment *"D53: qwen2.5:3b needs up to
+3-4 LLM calls at 30-45s each for cognify"*. The client hit that 300s
+ceiling.
+
+This is the pre-existing D49/D51/D53 problem — qwen2.5 graph-extraction
+quality and speed on a CPU runner — which `core-tests.yml` already
+declares `needs-owner` best-effort for exactly this reason: *"Ollama
+model quality / extension.kuzudb.com"*.
+
+**Two failure modes, two owners, and they must not be merged.** Before:
+502 after 47s, killed by a missing tokenizer. Now: no answer within
+300s, killed by a slow local LLM. The second is not a regression of the
+first and is not evidence the bake failed — the bake is what let
+execution reach the LLM at all.
+
+**I have not touched it.** Raising the timeout, changing the model or
+relaxing the live cycle would be scope expansion into a different
+finding, and would also be tuning a number to make a test pass.
+
+### E is an instrument defect, and it is mine
+
+`DIRTY=1`. The modification was **this script's own evidence file**:
+`git status` ran *after* `: > "$EVIDENCE"` had created it. The
+instrument dirtied the tree it was measuring and then reported the tree
+as dirty.
+
+That is the same shape as R9's watcher matching its own command line,
+and the same rule as I-8: evidence and claim must come from different
+places. The check was correct about what it saw and wrong about the
+world.
+
+Repaired: git state is now read into variables **before any file is
+created**, and the full `--porcelain` listing is recorded — a future
+reader needs to see *what* was dirty, not just how many, or this
+diagnosis has to be made again.
+
+Note the check was not useless: it fired, and the thing it caught was
+real, just not what it meant. An artefact-identity check that had
+silently passed here would have been worse.
+
+### Disposition
+
+**KAI-GATE-048 remains OPEN.** The closure condition requires the real
+model-dependent request to succeed, and it did not. A is not a
+substitute for C — that distinction is the whole reason both exist.
+
+What is now runtime-proven, and what is not:
+
+| claim | status |
+|---|---|
+| tokenizer locally satisfiable in the shipped image | **PROVEN** (A) |
+| loads with no network at all, in 0.07s | **PROVEN** (A) |
+| that proof is about the asset | **PROVEN** (D) |
+| readiness still independent of the model | **PROVEN** (B) |
+| no external registry egress at runtime | **PROVEN** (C1) |
+| internal delegate still reachable | **PROVEN** (C2) |
+| no HF retry storm | **PROVEN** (C4) |
+| the full graph capability works end to end | **NOT PROVEN** (C3) |
+
+Next run re-measures with E repaired. If C3 still times out in LLM
+extraction, that is a separate finding about graph-extraction
+performance and needs its own authorisation — **not** a change to this
+Dockerfile, this timeout, or this model.
