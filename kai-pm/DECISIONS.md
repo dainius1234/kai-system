@@ -11398,3 +11398,111 @@ resolves to nothing. Asserted in
 * **KAI-GATE-048** — OPEN. A, B, D proven; C BLOCKED by KAI-GATE-049;
   E to be re-measured against `21c5c07`.
 * Phase 2 (`memu-core-introspect`) — **not authorised, not begun.**
+
+---
+
+## D194 — 2026-08-13 — Re-run: E PASSES and is bound to the tree; C reproduces exactly. And my "same image id" prediction was wrong.
+
+Run **31722851785**, commit **a20dd82**, job `memu-graph-acceptance`.
+8 of 8 stage logs.
+
+```
+A  PASS   bert-base-uncased loaded in 0.06s from the shipped image, --network none
+          CACHE ROOT /data/hf_cache  ref=86b5e0934494bd15c9632b12f734a8a67f723594
+B  PASS   ready at +5.1s; tokenizers/torch/safetensors all 0 in /proc/1/maps
+C  FAIL   egress blocked | delegate reachable | /graph/ingest FAILED
+          | no HF retry storm: NONE SEEN
+D  PASS   exit 1 — OSError "couldn't find them in the cached files",
+          6,505-byte traceback kept in full
+E  PASS   tree 72561c72091a  commit a20dd82241e1  image 4a501c42e9ab
+          build-inputs 989961f38ff4   DIRTY=0
+```
+
+### E is repaired, and it is bound to the tree the operator asked for
+
+The run is at `a20dd82`, not `21c5c07`. That is deliberate and was
+stated before the run: the `BUILD_INPUTS` binding the operator required
+does not exist at `21c5c07` — it landed in `a20dd82`. Running at
+`21c5c07` would have satisfied "re-measure after the E repair" and not
+"ensure the image identity resolves to that tree".
+
+The binding is what closes the gap:
+
+```
+git ls-tree -r 21c5c07 -- memu-graph common security | sha256sum
+  989961f38ff4c7116bdd172c4d909f24f5db4f88b5c447412a96371ed5aad671
+git ls-tree -r a20dd82 -- memu-graph common security | sha256sum
+  989961f38ff4c7116bdd172c4d909f24f5db4f88b5c447412a96371ed5aad671
+run 31722851785 recorded
+  BUILD_INPUTS=989961f38ff4c7116bdd172c4d909f24f5db4f88b5c447412a96371ed5aad671
+```
+
+Identical. **The image measured is the image `21c5c07` produces** —
+derived, not asserted. `DIRTY=0`: the collector's own outputs no longer
+count against the tree it measures.
+
+(Run **31720151771** also fired at exactly `21c5c07`. It is the weaker
+measurement: that commit's summariser had no build-inputs requirement,
+so its E could pass on an image id that resolved to nothing.)
+
+### ~~"the rebuilt image is EXPECTED to carry the same id"~~ — WRONG
+
+D193 said that. **It is wrong, and the run disproves it.**
+
+```
+run 4  (ad37f65)  image 2628597bcf13
+run 6  (a20dd82)  image 4a501c42e9ab     <- identical build inputs
+```
+
+Different ids from identical inputs. Docker caches on build inputs
+*within a machine*; each GitHub runner is fresh with no shared layer
+cache, so the bake re-executes and produces a new layer digest. My claim
+was true of a warm local cache and false of the environment this
+actually runs in — a statement about Docker's behaviour asserted without
+running it there. R1.
+
+The correction strengthens rather than weakens the decision: image ids
+are **not** a stable function of build inputs across runners, so an
+image id can never have bound evidence to a tree, in either direction.
+`BUILD_INPUTS` is not a convenience for the same-id case — it is the
+only thing that binds at all. E requiring it is right for a reason
+better than the one I gave.
+
+### C reproduces exactly — same stopping point, second run
+
+```
+16:55:34.829  StartedAt
+      +5.1s   first passing health probe
+16:55:47.024  Pipeline run completed: d5e20691… (ingest_data)
+16:55:48.231  [transformers] PyTorch not found — tokenizers/config only
+16:55:51.164  Pipeline run started: 05372e76…
+16:55:51.164    classify_documents
+16:55:51.165    extract_chunks_from_documents
+16:55:51.174    extract_graph_and_summarize          <- LAST log line
+17:00:42      collection ends;  ~291s of silence
+```
+
+**Confirmed: C again clears tokenizer and chunking, and stops only in
+LLM extraction.** `extract_chunks_from_documents` is where
+`AutoTokenizer.from_pretrained` runs; it completed in 9 milliseconds.
+C4 scanned 9,798 bytes of service log and found no Hugging Face retry
+line. The 291s silence is `extract_graph_and_summarize` — KAI-GATE-049.
+
+Run 4: ~292s silence. Run 6: ~291s. Two runners, two ephemeral stacks,
+the same boundary. Not a flake.
+
+### Disposition, unchanged
+
+| criterion | status |
+|---|---|
+| A — offline asset | **PASS** |
+| B — readiness | **PASS** |
+| C — real graph capability | **BLOCKED** by KAI-GATE-049 |
+| D — can-fail | **PASS** |
+| E — identity / clean tree | **PASS** |
+| **KAI-GATE-048** | **OPEN** |
+
+C is not rewritten to accommodate the result and the gate is not closed
+while real ingest remains incomplete. Phase 2 not begun. No code
+expansion: this run changed nothing beyond the instrumentation the
+operator accepted.
