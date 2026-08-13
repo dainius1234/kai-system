@@ -708,6 +708,33 @@ REGISTRY: Tuple[Gate, ...] = (
                         "workflow-level declaration would claim a wiring "
                         "the workflow parse cannot confirm",
          findings=("KAI-GATE-048",)),
+    # D189's authorised definition unit. Its stages C and D are
+    # known-negatives that MUST fail, so it is a REPORT: a gate whose
+    # correct result includes failures is a gate people learn to ignore.
+    Gate(module="summarise_asset_contract",
+         kind=REPORT,
+         summary="answers KAI-GATE-048's five asset-contract questions "
+                 "from measured stage logs; the contract is PROVEN only "
+                 "when the network-removed stage succeeds on the asset "
+                 "set the fetch stage produced",
+         inputs=(),
+         denominator=r"inspected: \d+ of \d+ expected stage log",
+         probe=False,
+         probe_skip_reason="requires a stage-log directory produced by "
+                           "four throwaway containers with and without "
+                           "network; the parsers are asserted on "
+                           "synthetic stage-log trees in "
+                           "scripts/test_asset_contract.py",
+         proven_by="scripts/test_asset_contract.py",
+         calibrated_by="scripts/test_asset_contract.py",
+         in_policy_check=False,
+         in_workflows=(),
+         pending_wiring="run by "
+                        "scripts/security/define_memu_graph_asset_contract.sh, "
+                        "which memu-graph-startup-proof.yml invokes; a "
+                        "workflow-level declaration would claim a wiring "
+                        "the workflow parse cannot confirm",
+         findings=("KAI-GATE-048",)),
     Gate(module="report_runtime_topology",
          kind=REPORT,
          summary="what the tree DEFINES, what it GATES, and what a "

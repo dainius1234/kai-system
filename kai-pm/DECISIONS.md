@@ -10766,3 +10766,130 @@ stopping condition from the authorised unit still applies.
 
 Artefacts: run 1 evidence artifact `9173768070`, run 2 evidence artifact
 `9174126983` (15 files, includes every full stage log).
+
+---
+
+## D189 — 2026-08-13 — ARCHITECTURE DECIDED (operator): the repeated defect is the ASSET CONTRACT, not the load timing
+
+Operator decision, recorded verbatim in substance. This closes the
+architecture comparison opened in D186 and answered in D187/D188.
+
+### The correction, and it is mine to record
+
+I had been framing the class by **when** the model loads. That framing
+is wrong, and the operator's restatement is the one that survives:
+
+> The repeated defect is not "models load before readiness."
+>
+> The repeated defect is **"a model-dependent capability is deployed
+> without registry egress but lacks a locally satisfiable asset
+> contract."**
+
+Under that framing the three measured services stop looking like three
+different problems and start looking like one defect with a variable:
+
+| service | load timing | asset contract | observed outcome |
+|---|---|---|---|
+| `memu-core` | pre-readiness | **complete** | works |
+| `memu-core-introspect` | pre-readiness | absent | **startup fails** |
+| `memu-graph` | request-time / lazy | absent | starts, **first real request fails** |
+
+Timing decides *where the failure lands*. The asset contract decides
+*whether there is a failure at all*. My G1/G6 split described the first
+column; the defect lives in the second. The groups remain useful for
+choosing a remedy, but they are not the class.
+
+### Two architectural properties this proves
+
+**1. Option 3′ is necessary for introspect and is not an offline
+solution.** `memu-graph` is the deployed experiment we would otherwise
+have had to build: lazy loading protects readiness and moves an
+unsatisfied model dependency from startup to first use. Applying 3′ to
+introspect alone would *knowingly reproduce memu-graph's failure mode*.
+It is still right for introspect, because D185 established `/health`
+does not semantically require embeddings — but as a readiness fix, never
+as the offline fix.
+
+**2. Option 4 is the class-level invariant**, and it is not
+"set `HF_HUB_OFFLINE=1` everywhere":
+
+> **Any model-dependent capability deployed without model-registry egress
+> must have its required model assets locally satisfiable before the
+> capability is admitted, and runtime loading must fail closed without
+> attempting external resolution.**
+
+This holds regardless of whether loading happens at IMPORT, STARTUP or
+REQUEST-TIME. It is the piece shared by all three services.
+
+### The selected architecture — hybrid, because there are two orthogonal defects
+
+**Class level:** the Option 4 invariant above.
+
+**`memu-core-introspect`:** Option 3′ **+ reuse of memu-core's existing,
+proven asset contract.** Refactor both module-scope mechanisms so it can
+bind and answer `/health` without loading embeddings; and because 10 of
+its 14 imported operations genuinely need embeddings (D185), ensure the
+same model memu-core already provisions is locally available when those
+handlers run. These two images share application, build context and
+model-loading path, so a common build stage or build helper **between
+those two images** is justified.
+
+**`memu-graph`:** keep the lazy/request-time structure — that part is
+correct and measured working. Repair only its asset/offline contract as
+cognee actually requires it, and prove a real `/graph/*` request succeeds
+with no egress. **Do not force it into the sentence-transformers image
+machinery merely because both problems involve models.**
+
+**`memu-core`:** the known-good reference implementation. Not to be
+redesigned.
+
+### Explicitly rejected
+
+* **Fleet-wide shared model base (Option 2 at fleet scale)** — rejected
+  by the denominator. memu-core + memu-core-introspect are two images of
+  one application; memu-graph is a different application, a different
+  library, a different timing and a different model/cache contract.
+* **Option 1 as blind copy-per-image** — rejected as the *strategy*,
+  though individual images will necessarily carry their appropriate
+  assets.
+
+### The prevention mechanism, and what it must NOT be
+
+Not a gate that greps Dockerfiles for `HF_HUB_OFFLINE`. That is the
+syntax-versus-behaviour mistake this programme has now caught three
+times in two days (fallback classifier 22/53, semantic tracer 14/14,
+my own `ast.walk` timing bug).
+
+The rule must reason about the **relationship**:
+
+```
+egress contract  ×  model capability  ×  local asset  ×  offline enforcement
+```
+
+> For every runtime model capability on an egress-restricted service:
+> either prove the capability is backed by a local asset and an offline
+> loader, or classify it explicitly unavailable.
+
+with runtime qualification proving the property with the network
+removed: *service ready where appropriate → invoke the model-dependent
+operation → semantic success without external resolution.* That form
+covers startup-loaded and lazy-loaded designs alike, which a
+timing-shaped rule would not.
+
+### Authorised next unit, and the stop
+
+One short **read-only definition** of memu-graph's exact cognee model
+asset contract:
+
+* what model(s) the failing path requests;
+* where cognee expects them locally;
+* whether revision/version can be pinned;
+* what offline switch/API the cognee/HF stack actually honours;
+* whether one asset or multiple transitive assets are required.
+
+Then a concrete remediation plan for both affected services, and
+**stop before any code change** — this architecture is Dainius's to
+authorise explicitly, not mine to infer from the findings.
+
+For introspect the corresponding asset contract is already known from
+memu-core and does not need re-deriving.

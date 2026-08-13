@@ -161,6 +161,26 @@ DECLARED: Tuple[Toleration, ...] = (
         owner="orion",
         review_by="2026-11-01",
     ),
+    # D189's asset-contract definition unit, same workflow, second job.
+    # Its "Free up runner disk space" and "Evidence summary" steps are
+    # already covered by the declarations above -- the match is on
+    # (workflow, step name), and both jobs use identical steps for
+    # identical reasons. A second copy would be a duplicate declaration
+    # of one fact, which is the shape this file exists to prevent.
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Define the model asset contract",
+        bucket=DOCUMENTED_SKIP,
+        reason="`if: always()` on a measurement whose FAILING stages are "
+               "results. Stage C must fail (no asset, offline) and stage "
+               "D must fail (no asset, no flags) -- those are the "
+               "known-negatives the definition rests on. The script "
+               "itself exits 2 only when a PREREQUISITE is unmet (image "
+               "unresolved, or stage A could not fetch), which is the "
+               "one case where nothing below was measured.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
     # One declaration per service, because the match is on the step name
     # and there is one INDEPENDENT collector step per service. They
     # replace two earlier declarations — a separate "Diagnose image
