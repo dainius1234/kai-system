@@ -10236,3 +10236,232 @@ could dominate. The denominator decides.
 
 A/B/C class-wide denominator sweep, exactly as scoped in D183, with the
 D184 semantic/readiness fields added. Not started.
+
+---
+
+## D186 — 2026-08-13 — The A/B/C Model-Load Denominator, Calibrated: 6 / 6 / 3
+
+Read-only sweep. No production file changed. The only new files are an
+instrument and its calibration:
+
+* `scripts/security/report_model_load_denominator.py` (REPORT,
+  registered, `make`-less by design — it is not a gate)
+* `scripts/test_model_load_denominator.py` — 25 scenarios, 110
+  assertions, wired as `make test-model-load-denominator` and into
+  `test-uh`.
+
+### The instrument failed its own calibration twice before the number was believed
+
+This is the part worth keeping. Both defects produced output that looked
+entirely reasonable.
+
+**1. Every load reported as `IMPORT`.** The first tracer decided module
+scope with
+
+```python
+for node in tree.body:
+    for sub in ast.walk(node):
+        module_level_lines.add(sub.lineno)
+```
+
+`ast.walk` descends into the bodies of module-level `def`s, so *every*
+line in the file qualified as a module-level line. It printed four
+services, all loading at import. **Two of them load lazily inside a
+memoised getter.** An inflated pre-readiness count argues directly for
+the most expensive architecture — bake a model into four images — on
+evidence that does not exist. This is the same defect shape as the
+fallback classifier (22/53) and the semantic tracer (14/14): a detector
+matching a *construct* and reporting it as a *behaviour*. Third instance
+in two days.
+
+**2. `COPY common/ ./common/` mapped to `/app/common/common`.** The COPY
+parser appended the source basename unconditionally; Docker copies the
+*contents* of a directory. Every `from common…` import in every image
+therefore resolved to nothing and the trace stopped one hop in. It found
+the same five services, which is exactly why it survived: **a wrong
+traversal that happens to agree with the right one is still wrong, and
+will not agree on the next question.**
+
+Both are asserted in the calibration now, in both directions.
+
+### Calibration — the six capabilities the operator required
+
+| # | required | scenario | result |
+|---|---|---|---|
+| 1 | include `memu-core` | `memu-core included` | TRACED, IMPORT, contract complete on all 5 columns |
+| 2 | include `memu-core-introspect` | `memu-core-introspect included` | TRACED, IMPORT, contract absent on all 5 |
+| 3 | exclude a non-model service | `non-model service excluded` | `tool-gate` — and its Dockerfile, entrypoint and trace all proved to have *run* |
+| 4 | distinguish A from B | `A minus B on a fixture` + `egress known-negative` | the tree cannot show it (A == B today), so it is shown on a fixture; `weather-service` is the real known-negative |
+| 5 | preserve UNKNOWN in C | `UNKNOWN preserved in C`, `bad citation detected` | 3 of 6 UNKNOWN; a fabricated citation is rejected |
+| 6 | reachability ≠ behaviour | `import is not a call`, `lazy is not IMPORT`, `module-scope invocation is IMPORT`, `startup hook is STARTUP` | all four directions assert |
+
+Case 3 asserts more than exclusion: it asserts the service was
+**examined**. An unparsed Dockerfile also produces "not in A" and is
+otherwise indistinguishable — I-1 in the one place nobody looks.
+
+### The denominator
+
+```
+inspected                        61 service definitions across 3 compose files
+POPULATION A  source reachability          6
+POPULATION B  egress-restricted of A       6
+POPULATION C  runtime-qualified of B       3
+```
+
+**A is source reachability only. It is not a count of services affected
+in production.**
+
+| service | reach | timing | lib installed | baked | cache | offline | fail-closed | shadow | listener gated | runtime evidence |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `memu-core` | TRACED | IMPORT | YES | YES | `HF_HOME=/opt/hf_cache` | IMAGE | YES | NO | YES | REAL backend, healthy [D175] |
+| `memu-core-introspect` | TRACED | IMPORT | YES | **NO** | **NO** | **NOT ENFORCED** | N/A | NO | YES | PREREQUISITE STARTUP FAILURE [D183] |
+| `agentic` | TRACED | **LAZY** | **NO** | NO | NO | NOT ENFORCED | N/A | NO | **NO** | BACKEND_UNAVAILABLE [D175] |
+| `fusion-engine` | TRACED | **LAZY** | **NO** | NO | NO | NOT ENFORCED | N/A | NO | **NO** | UNKNOWN |
+| `memu-graph` | THIRD-PARTY-CANDIDATE | UNKNOWN | YES | NO | `HF_HOME=/data/hf_cache` | NOT ENFORCED | N/A | NO | UNKNOWN | UNKNOWN |
+| `ollama-pull` | COMPOSE-COMMAND | STARTUP | — | — | — | — | — | — | N/A | UNKNOWN |
+
+`role-required?` is `REQUIRED` for `memu-core` [D175] and `PARTIAL` for
+`memu-core-introspect` [D185]. Every other row is `UNKNOWN` and stays
+that way — the field is populated only from a cited measurement, and
+`main()` refuses to print population C at all if any citation fails to
+resolve in this file.
+
+### Two members that a tracer-only sweep would have got wrong
+
+**`memu-graph` would have been silently excluded.** It installs
+`transformers>=4.40.0` for cognee's chunker; no repo source calls a
+loader, so an import-graph tracer finds nothing and the denominator
+would have printed 5 and looked complete. It is carried as
+`THIRD-PARTY-CANDIDATE` with `timing=UNKNOWN` rather than guessed either
+way.
+
+**`ollama-pull` would have been a false positive under the obvious
+rule.** It runs the fetch verb `ollama pull` on `agent-net`
+(`internal: true`) — "no egress + a fetch = broken" reports it as a
+defect. It is not: its entrypoint sets `OLLAMA_HOST=ollama:11434`, and
+`ollama` is on `egress-net`. The fetch is *delegated to a service that
+has egress*. That derivation is asserted in both directions.
+
+### Root-cause groups — by mechanism, and only the ones with members
+
+**G1 — pre-readiness model load, image contract absent. `n = 1`.**
+`memu-core-introspect`. Module-scope load in a copied module, library
+installed, no baked asset, no pinned cache, no offline enforcement,
+egress-restricted. Startup performs external resolution; the listener
+never binds; readiness fails.
+
+**G2 — pre-readiness model load, image contract complete. `n = 1`.**
+`memu-core`. The control group, and the reason G1 is a contract gap
+rather than a property of the load: identical mechanism, identical
+source line (`memu-core/app.py:1060` — the two services share the
+module), opposite runtime outcome.
+
+**G3 — request-time capability absent because the library is not in the
+image. `n = 2`.** `agentic`, `fusion-engine`. A guarded import of a
+package `requirements.txt` never installs: `ImportError`, fallback
+branch, no network contact, no readiness impact. The static prediction
+and #47's runtime observation of `agentic` come from entirely different
+places and agree (I-8). `fusion-engine` has the same static shape and
+**no runtime evidence** — it stays UNKNOWN.
+
+**G4 — third-party loader, not derivable from source. `n = 1`.**
+`memu-graph`. `HF_HOME` is pinned and `HOME` is fixed, so two of
+`memu-core`'s traps are already avoided. But there is **no model bake**:
+the build-time step it does have installs a Ladybug/Kuzu JSON extension,
+is best-effort (`|| echo`), and is not the tokenizer. So: pinned cache,
+no asset, no offline enforcement, no egress, timing UNKNOWN. **This is a
+candidate second instance of G1 and it is unmeasured.**
+
+**G5 — fetch delegated to a service that has egress. `n = 1`.**
+`ollama-pull`. Not a defect. Recorded so the population is honest.
+
+**Groups tested for and found EMPTY — stated because an untested empty
+group and an absent one look identical:**
+
+* *mount shadows the baked cache* — **0**. `memu-core` puts its cache in
+  `/opt` precisely because `docker-compose.sovereign.yml` mounts
+  `memu_data:/data`; `memu-graph` declares no volumes in any profile.
+  Both claims are now derived rather than trusted to a comment.
+* *cache/env path mismatch* — **0**. `memu-core` bakes to the path
+  `HF_HOME` names.
+* *offline enforced but asset absent* — **0**. Worth stating plainly:
+  **this failure mode has no instances today, and adopting Option 4
+  alone would create it rather than fix it.**
+* *source-reachable but deployment-non-applicable* — **0**. Every member
+  of A is egress-restricted, so `|A| = |B|`. The A/B distinction is real
+  but is currently unexercised by the tree, which is why case 4 is
+  calibrated on a fixture.
+
+### NOT MEASURED — a stated blind spot, not a clean result
+
+12 services run third-party images this repository does not build. The
+tracer reads repo source and repo Dockerfiles; it cannot open a
+published image. At least two of them serve models for a living:
+
+```
+ollama            ollama/ollama:0.6.8                  EGRESS-AVAILABLE
+parakeet-server   parakeet.cpp-server:v0.5.0           EGRESS-RESTRICTED
+```
+
+`parakeet-server` is started with `--model ${PARAKEET_MODEL:-tdt_ctc-110m}`
+on `sensor-net` (`internal: true`). `--model` **selects**; it is not a
+fetch verb, so it is deliberately not counted — and equally, whether that
+image resolves the model locally or over the network is **unknown here**.
+Reading this section as clean would be the exact mistake the three
+populations exist to prevent.
+
+### What the denominator says about the four options
+
+**Option 3′ alone is insufficient for `memu-core-introspect`, and now by
+measurement rather than by argument.** The failure branch at
+`memu-core/app.py:1073-1110` raises `RuntimeError` when the model is
+absent and `MEMU_ALLOW_FAKE_EMBEDDINGS` is false. Deferring the load to
+first request on an egress-restricted network converts *startup hang*
+into *first-request failure* — the operator predicted this; the code path
+confirms it. 3′ is still worth doing, but for a different reason than
+supposed: D185 showed `/health` is not role-required, so decoupling
+readiness from the model is a **readiness-semantics** fix, not the
+offline fix.
+
+**Option 4 alone makes the failure faster, not absent.** `HF_HUB_OFFLINE=1`
+on `Dockerfile.introspect` with no baked asset turns a ~100s DNS-backoff
+hang into an immediate `RuntimeError` at import. Same outcome, better
+diagnostics. Consistent with the governing invariant's two independent
+obligations — this satisfies obligation 2 and not obligation 1.
+
+**Option 1 vs Option 2 turns on a repetition count of two, not six.**
+The pre-readiness population is `{memu-core, memu-core-introspect}`
+(possibly three if `memu-graph` measures into G1). Those two are not
+merely similar: they build from the same context, install the same
+`memu-core/requirements.txt`, and load the model from the same line of
+the same file. That is not a fleet needing a shared base — it is **one
+application built twice**, and the honest form is for the second
+Dockerfile to inherit the first's model-bearing stage rather than to
+carry a copy of ~90 lines that took two incidents to get right (HOME,
+ownership-before-download, `/opt`-not-`/data`, 5-attempt retry,
+fail-closed).
+
+**No option is selected here.** The stopping condition applies.
+
+### The one measurement that would change the architecture
+
+`memu-graph` is the only unmeasured member of B whose timing is UNKNOWN
+and whose contract is incomplete. If cognee's chunker loads its tokenizer
+before readiness, G1 has two members and the repetition argument shifts;
+if it loads lazily or not at all, G1 has one. **Measuring it is cheaper
+than architecting for either answer**, and the instrument now says so
+explicitly rather than assuming the `memu-core-introspect` pattern —
+which the operator warned against by name.
+
+### Register
+
+New finding, opened here, unremediated:
+
+**KAI-GATE-048** — `memu-graph` installs a model-loading library, pins a
+cache, bakes no asset, enforces no offline mode, and runs
+egress-restricted. Load timing UNKNOWN. Candidate second instance of G1.
+Not remediated; not merged into #53 or #52.
+
+Existing counts unchanged (Programme Rule 7). #52 gains supporting
+static evidence for `agentic` from an independent direction; it is not
+closed by it.

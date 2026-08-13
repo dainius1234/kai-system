@@ -645,6 +645,26 @@ REGISTRY: Tuple[Gate, ...] = (
          calibrated_by="scripts/test_degradation_tolerance.py",
          in_policy_check=False,
          findings=("KAI-GATE-047",)),
+    # The A/B/C denominator for the offline-startup invariant. Three
+    # populations kept apart because merging any adjacent pair picks the
+    # architecture: source reachability is not deployment applicability,
+    # and neither is runtime evidence. Its own first version reported all
+    # four traced services as loading at IMPORT — an `ast.walk` that
+    # descends into function bodies — which would have argued for baking
+    # a model into every image on evidence that did not exist.
+    Gate(module="report_model_load_denominator",
+         kind=REPORT,
+         summary="A/B/C: which runnable container paths can reach a model "
+                 "load, which of those are deployed without egress, and "
+                 "which have a CITED runtime observation; A is source "
+                 "reachability and is NOT a count of affected services",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ service definition\(s\)",
+         proven_by="scripts/test_model_load_denominator.py",
+         calibrated_by="scripts/test_model_load_denominator.py",
+         in_policy_check=False,
+         in_workflows=(),
+         findings=("KAI-GATE-048",)),
     Gate(module="report_runtime_topology",
          kind=REPORT,
          summary="what the tree DEFINES, what it GATES, and what a "
