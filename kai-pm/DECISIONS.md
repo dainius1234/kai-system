@@ -11768,3 +11768,137 @@ untouched. The observation window stays 900s.
   the argv contract, the fail-closed summariser, both directions of the
   new calibration, `bash -n`, `make policy-check` and the registry gate.
   The next CI run is what verifies the rest.
+
+---
+
+## D197
+
+**2026-08-13 — run 9: `/graph/ingest` returns 200 in 396.3s while
+cognee's pipeline FAILS with a 422. The stall is ollama inference; the
+200 is a success-shaped failure.**
+
+Run **31733359906**, job **94558941058**, commit `da3320a`, tree
+`d0695c0e`, dirty 0. Diagnostic step 18:59:09 → 19:07:00.
+
+**Prerequisite MET** — `ENTERED http-post monotonic=289.129
+wall=2026-08-13T19:00:15Z budget=900.0s`. The request was genuinely
+attempted, so sections 1–3 are admissible for the first time.
+
+### The hierarchy, in the operator's order
+
+**1. STAGE OWNERSHIP.** 5 cognee markers. Two pipelines ran:
+`93e2b017` (`resolve_data_directories`, `ingest_data`) completed; then
+`65e9ef5d` entered `classify_documents` (19:00:23.1917),
+`extract_chunks_from_documents` (19:00:23.1922) and
+`extract_graph_and_summarize` (19:00:23.1994). **None of the three
+logged completion.** `extract_graph_and_summarize` is
+`asyncio.gather(extract_graph_from_data, summarize_text)`, so cognee's
+own logging still cannot separate the two paths.
+
+cognee's log FILE (`/data/home/.cognee/logs/2026-08-13_19-00-15.log`,
+29 lines) recorded **nothing after 19:00:23** — silent for the remaining
+~390s. Read for the first time this run.
+
+**2. EXECUTION STATE — `WAITING ON DELEGATE`.** 20 samples.
+
+```
+7.4s CPU over 385s wall (1.9% of one core);
+delegate socket seen in 19/20 samples — blocked on ollama, not computing
+```
+
+`memu-graph` was **not** computing. The socket `172.18.0.3:42926 →
+172.18.0.2:11434` stayed ESTABLISHED throughout.
+
+**Independent corroboration, from the delegate's own log** (I-8 — a
+different source from the CPU sample):
+
+```
+19:04:23 | 200 | 4m0s  | 172.18.0.3 | POST "/v1/chat/completions"
+19:05:27 | 200 | 1m4s  | 172.18.0.3 | POST "/v1/chat/completions"
+19:06:43 | 200 | 1m15s | 172.18.0.3 | POST "/v1/chat/completions"
+```
+
+240 + 64 + 75 = **379s of the 396.3s**. The silence is ollama inference
+on a CPU runner. Three *sequential* completions, not the two concurrent
+paths the gather implies.
+
+**3. RETURN SEMANTICS — it RETURNED.**
+
+```
+RETURNED http-post  status=200 elapsed=396.3s
+BODY {"status":"ingested","source_id":"kai-gate-049-stall-probe","data_id":null}
+```
+
+`INGEST_RC=0`, observation ended at +400s of a 900s window. **The first
+measured duration and outcome for `/graph/ingest` in this programme.**
+
+**4. TIMEOUT POLICY** — not answered, and no longer the interesting
+question.
+
+### What run 9 also found, which nobody was looking for
+
+The service log's terminal lines:
+
+```
+1 validation error for SummarizedContent
+summary
+  Field required [type=missing, input_value={'description': 'Bulleted...tent',
+  'type': 'object'}, input_type=dict]
+...
+19:06:51 [error] PipelineRunFailedError: Pipeline run failed.
+         Data item could not be processed. (Status code: 422)
+```
+
+The model returned a JSON **schema** where an **instance** was required —
+`{'description': …, 'type': 'object'}` instead of an object carrying
+`summary`. Three attempts (1 + `max_retries=2`), ~380s of inference,
+then the pipeline failed 422.
+
+**And `/graph/ingest` answered `200 {"status":"ingested"}` anyway, with
+`data_id: null`.** The pipeline failed and the HTTP layer reported
+success. A caller — including `test_graph_live.py`, the dashboard, and
+any future consumer — cannot distinguish a completed ingest from this.
+
+This is the *same shape* as D49/D51/D53, which established that the 0.5b
+default cannot produce valid structured JSON under Cognee's validation
+and which is why `OLLAMA_MODEL=qwen2.5:3b` is overridden here. **The 3b
+model has now also failed that validation**, for `SummarizedContent`.
+
+### Corrected: ~291s explained, without changing what it was
+
+Runs 4 and 6 gave up at 300s (D195: our client's budget). Run 9 shows
+what was happening in that window: `extract_graph_and_summarize` entered
+at +8s, ollama's first completion took 4m0s alone. The 291s "silence"
+was the first inference still running. **~291s remains the client
+budget, not a system boundary** — that reading is unchanged and now
+independently explained.
+
+### Honest limits of this run
+
+* **One observation.** 396.3s is one measurement on one CPU runner.
+  Nothing here says it is reproducible (Directive 3).
+* **`4m0s` is suspiciously round** and is not explained. `OLLAMA_LOAD_TIMEOUT`
+  is `5m0s`; no 4-minute constant is known in this path. Recorded as an
+  unexplained observation, **not** diagnosed as a timeout.
+* **No restart was observed** — pid-1 tick counts rose monotonically with
+  no reset, and the peer address stayed `172.18.0.3`. That is evidence
+  against a restart, not proof of container identity: the sample still
+  carries no container id, so the operator's condition 7 remains
+  **unenforced**, it simply did not bite this run.
+* Whether the 422 reproduces is **unmeasured**. It was observed once.
+
+### Standing
+
+* **KAI-GATE-049** — the original question is **ANSWERED**: the stage is
+  `extract_graph_and_summarize`, the state is *waiting on the delegate*,
+  and the request returns 200 at 396.3s. Remains OPEN pending formal
+  closure review (Rule 7).
+* **KAI-GATE-048** — C still BLOCKED. Now for a second, independent
+  reason: 396.3s exceeds C3's 300s budget *and* the pipeline fails 422
+  regardless of budget. Raising the budget would convert a timeout into
+  a green 200 over a failed pipeline — strictly worse.
+* **PROPOSED, not opened — KAI-GATE-050:** `/graph/ingest` returns
+  `200 {"status":"ingested"}` when cognee's pipeline has failed. Opening
+  it is the operator's call.
+* No remediation performed. No timeout changed, no model changed, no
+  Cognee instrumentation added, no Phase 2.
