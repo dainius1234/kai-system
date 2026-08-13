@@ -10465,3 +10465,219 @@ Not remediated; not merged into #53 or #52.
 Existing counts unchanged (Programme Rule 7). #52 gains supporting
 static evidence for `agentic` from an independent direction; it is not
 closed by it.
+
+---
+
+## D187 — 2026-08-13 — KAI-GATE-048 Measured: memu-graph Is REQUEST-TIME / LAZY, and It Is Option 3′ Failing Exactly As Predicted
+
+Run **31681569455**, commit **34edea2**, `memu-graph-startup-proof.yml`.
+Read-only. Nothing about the system under test was changed.
+
+### The answer to the authorised question
+
+> Does memu-graph execute model acquisition/loading before its declared
+> readiness boundary under its actual runtime egress contract, and what
+> local/offline asset machinery does that path possess?
+
+**No, it does not load before readiness. It loads on the first request,
+reaches for huggingface.co, fails, and returns a bounded 502.** It
+possesses a pinned cache path and nothing else — no asset, no offline
+enforcement, no build-time proof.
+
+```
+service                memu-graph
+runtime egress         NO EGRESS — proven by socket, not by `internal: true`
+                         huggingface.co:443 -> gaierror, name resolution
+                         1.1.1.1:443        -> OSError, network unreachable
+readiness boundary     healthcheck GET /health :8061, start_period 15s
+                         StartedAt              2026-08-13T08:22:32.889Z
+                         first passing probe    +5.1s      <- the boundary
+model-loader owner     third-party (cognee chunker -> transformers),
+                         HUGGINGFACE_TOKENIZER=bert-base-uncased
+load timing            REQUEST-TIME / LAZY
+resolution path        EXTERNAL — HEAD huggingface.co/bert-base-uncased/
+                         resolve/main/config.json
+local asset            NO
+offline enforcement    NONE (no HF_HUB_OFFLINE, no TRANSFORMERS_OFFLINE)
+delegated fetch        NO — the LLM/embedding calls go to `ollama`, but
+                         the TOKENIZER is resolved in-process
+runtime verdict        REQUEST-TIME / LAZY
+root-cause group       NEW — G6, not G1
+```
+
+### The chronology, from three independent signals
+
+| when | HF cache files | `tokenizers` mapped into pid 1 | what happened |
+|---|---|---|---|
+| at readiness (+5.1s) | **0** | **no** | `/health` 200, nothing model-related loaded |
+| first `/graph/ingest` | — | — | `HEAD huggingface.co/...` — two 5-attempt retry sequences, 08:22:45 → 08:23:32, **~47s** |
+| after the request | **0** | **yes** | HTTP **502**, cause named in the body |
+
+The two signals are deliberately different mechanisms (I-8): a `find`
+over `$HF_HOME`, and the *serving* process's mapped files. `tokenizers`
+is a compiled extension, so its appearance in `/proc/1/maps` says the
+machinery loaded **there** — not in a `docker exec` python, which would
+have proved nothing about the server. They agree: nothing at readiness,
+tokenizer machinery after the request, and **an empty cache both times**
+because the fetch never succeeded.
+
+The application's own diagnostic corroborates from a third direction:
+
+> We couldn't connect to 'https://huggingface.co' to load the files,
+> **and couldn't find them in the cached files.**
+
+### This is NOT a second instance of G1
+
+D186 flagged memu-graph as a *candidate* second G1 and said measuring it
+was cheaper than architecting for either answer. That was right, and the
+answer is **no**.
+
+`memu-graph/app.py` does not import cognee at module scope:
+
+```python
+def _cognee():
+    import cognee
+    return cognee
+```
+
+called only from the three `/graph/*` handlers. `lifespan` logs one line
+and yields; `/health` returns a static dict. **The service is already
+built the way Option 3′ proposes** — deferred import, listener ungated,
+readiness decoupled from the model. The +5.1s readiness and the empty
+maps at readiness prove it works as designed.
+
+**And it still fails.** Not at startup — at the first request that needs
+the capability, after ~47 seconds of retry.
+
+### The strongest evidence yet about Option 3′, and it is not favourable
+
+The operator's prediction, made before any of this was measured:
+
+> Option 3′ alone is insufficient because it can merely convert
+> *startup hang* into *first-request hang* unless the required asset is
+> locally satisfiable and runtime loading fails closed.
+
+`memu-graph` is that sentence, deployed. It is the **only observed
+instance of Option 3′ in production topology**, and it exhibits the
+predicted failure exactly. D186 reached the same conclusion for
+`memu-core-introspect` from the code path at `app.py:1073-1110`; this is
+the same conclusion from a running container, in a different service,
+through a different library, on a different model. Two independent
+routes to one finding.
+
+**Therefore: 3′ is a readiness-semantics fix, never an offline fix.** It
+is still worth doing where readiness is wrongly coupled — D185 showed
+`/health` on introspect is not role-required — but adopting it *as the
+remedy* for the offline invariant would produce, in every case, exactly
+what memu-graph does today.
+
+### What memu-graph does WELL, and it should not be lost
+
+The failure is **bounded**, and that distinguishes it sharply from #53's
+class:
+
+* HTTP **502** with the cause in the body, not a 200 with empty results;
+* `/health` still answers **200** afterwards — one failed capability
+  does not take the service down;
+* the error names the mechanism *and* the remedy (the offline-mode doc).
+
+This is the correct shape for a degraded capability. `memu-graph` is not
+broken in the way `memu-core-introspect` is broken. It has the *asset*
+half of the invariant missing and the *behaviour* half largely right —
+except that it retries an unreachable host for ~47s first, which is
+latency spent proving something the deployment already knows.
+
+### Root-cause groups, revised
+
+The G-series is now:
+
+* **G1** pre-readiness load, contract absent — `memu-core-introspect` — **1**
+* **G2** pre-readiness load, contract complete — `memu-core` — **1**
+* **G3** capability absent, library not installed — `agentic`, `fusion-engine` — **2**
+* **G4** ~~third-party loader, timing not derivable~~ — **0, resolved into G6**
+* **G5** fetch delegated to an egress-capable peer — `ollama-pull` — **1, not a defect**
+* **G6 (NEW)** *request-time* model resolution, no local asset, no
+  egress, **bounded failure** — `memu-graph` — **1**
+
+G4 was an evidence status, not a mechanism. It is now empty because the
+thing it stood for got measured, which is the correct way for that kind
+of group to close.
+
+### The architectural answer
+
+> Does memu-graph materially increase the repetition count for the same
+> startup/offline contract defect, or is it a different mechanism?
+
+**A different mechanism.** The pre-readiness/offline-contract defect
+(G1) still has **exactly one member**. The repetition count for that
+defect does **not** increase.
+
+What memu-graph *does* increase is the population of the **asset
+obligation** — obligation 1 of the governing invariant — which now has
+two members reached by two different timings:
+
+```
+obligation 1, LOCAL ASSET AVAILABLE
+  memu-core                satisfied (baked, fail-closed, /opt, verified)
+  memu-core-introspect     absent, and fails at READINESS       (G1)
+  memu-graph               absent, and fails at FIRST REQUEST   (G6)
+
+obligation 2, RUNTIME FAILS CLOSED RATHER THAN REACHING OUT
+  memu-core                satisfied (HF_HUB_OFFLINE=1 in image)
+  memu-core-introspect     absent
+  memu-graph               absent — ~47s of retry against an
+                           unreachable host before a correct 502
+```
+
+So the options stand as follows, on measured ground:
+
+* **Option 3′** — confirmed insufficient as an offline fix, by a
+  deployed instance. Retain only for readiness semantics.
+* **Option 4** — the *behaviour* obligation. memu-graph is the case that
+  shows what it buys on its own: the 502 arrives in milliseconds instead
+  of 47 seconds, with the same outcome. Necessary, not sufficient —
+  unchanged from D186, now with an instance.
+* **Option 1 vs Option 2** — the repetition count for a *shared
+  model-bearing build stage* is still **two images of one application**
+  (`memu-core` + `memu-core-introspect`). memu-graph does **not** join
+  that count: different application, different library, different model
+  (`bert-base-uncased`, not `all-MiniLM-L6-v2`), different cache path,
+  and a *request-time* rather than build-time need. Baking a shared
+  stage across all three would be one base serving two unrelated model
+  requirements.
+
+**Still not selecting.** The stopping condition applies.
+
+### Instrument note, and one defect in it
+
+`image-cache` was the one stage of nine that did not run: it resolved
+the image from `compose config`, which returns nothing for a service
+that is BUILT rather than pulled. So `asset_present_locally` came back
+**NOT MEASURED**, and the classifier printed exactly that rather than
+inferring absence — the behaviour the calibration exists to protect.
+Repaired in `10bc874` by taking the image id from the running container,
+plus a `mounts` stage, since a volume at the cache path would shadow
+whatever the image carries.
+
+**The verdict does not depend on the missing stage.** `external attempt
+= YES` with an empty cache after the request already establishes the
+asset was not local, and transformers states it directly.
+
+The classifier that produced this verdict takes an observation record
+and **no service name, no source text, no image tag** — asserted
+structurally in `scripts/test_model_startup_classifier.py`, alongside
+the requirement that the four known shapes (`memu-core`,
+`memu-core-introspect`, `ollama-pull`, lazy `memu-graph`) produce four
+**different** verdicts. 65 assertions, 16 scenarios, run as a gating
+step *before* the measurement so an uncalibrated classifier cannot
+decorate a result.
+
+### Register
+
+**KAI-GATE-048 — MEASURED, remains OPEN and unremediated.** Reclassified
+from "candidate second instance of G1" to **G6**: request-time model
+resolution with no local asset and no egress, failing bounded.
+
+Counts otherwise unchanged (Programme Rule 7). The 12 third-party images
+remain NOT MEASURED; `parakeet-server` is still UNKNOWN and was not
+classified from `--model tdt_ctc-110m`.
