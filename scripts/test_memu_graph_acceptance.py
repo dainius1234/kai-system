@@ -35,7 +35,7 @@ sys.path.insert(0, str(REPO))
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 8
+EXPECTED_SCENARIOS = 9
 executed: list[str] = []
 
 
@@ -64,6 +64,7 @@ GOOD = {
 }
 ARGS = ["--tree-sha", "a" * 40, "--commit", "b" * 40,
         "--image", "sha256:" + "c" * 40, "--dirty", "0",
+        "--build-inputs", "d" * 64,
         "--probe-rc", "0", "--a-rc", "0", "--d-rc", "1", "--c3-rc", "0"]
 
 
@@ -181,6 +182,30 @@ def test_a_dirty_tree_fails_artefact_identity() -> None:
         check("exit 1", rc == 1, str(rc))
 
 
+def test_e_is_unknown_without_the_build_inputs_digest() -> None:
+    """An image id and a tree sha are two true facts that, placed side by
+    side, imply a third one neither states: that the image was rebuilt
+    because the tree moved. Docker caches on build INPUTS, and
+    memu-graph's inputs did not change between ad37f65 and 21c5c07 — so
+    the same image id across those commits is CORRECT. Without the
+    digest the id resolves to nothing, and E must say UNKNOWN rather
+    than pass on a coincidence."""
+    scenario("E needs the build-inputs digest")
+    with tempfile.TemporaryDirectory() as tmp:
+        out, rc = run(stages(tmp), {"--build-inputs": ""})
+        check("E is UNKNOWN, not PASS", "E  UNKNOWN" in out, out[-600:])
+        check("says the id resolves to nothing",
+              "resolves to nothing" in out, out[-600:])
+        check("and the overall verdict is not MET",
+              "ACCEPTANCE MET" not in out, out[-400:])
+        check("exit 1", rc == 1, str(rc))
+    with tempfile.TemporaryDirectory() as tmp:
+        out, _ = run(stages(tmp))
+        check("with the digest, E passes and reports it",
+              "E  PASS" in out and "build-inputs dddddddddddd" in out,
+              out[-500:])
+
+
 def test_missing_stages_are_incomplete_not_failed() -> None:
     """"We did not measure" and "we measured and it was wrong" have
     different remedies, and only one of them means the change is bad."""
@@ -208,6 +233,7 @@ def run_all() -> None:
     test_a_premature_load_fails_b()
     test_a_retry_storm_fails_c_even_if_the_request_succeeded()
     test_a_dirty_tree_fails_artefact_identity()
+    test_e_is_unknown_without_the_build_inputs_digest()
     test_missing_stages_are_incomplete_not_failed()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",

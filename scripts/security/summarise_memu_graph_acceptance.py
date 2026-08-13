@@ -75,6 +75,7 @@ def main() -> int:
     for flag in ("--tree-sha", "--commit", "--image"):
         ap.add_argument(flag, default="")
     ap.add_argument("--dirty", default="")
+    ap.add_argument("--build-inputs", default="")
     for flag in ("--probe-rc", "--a-rc", "--d-rc", "--c3-rc"):
         ap.add_argument(flag, type=int, default=None)
     args = ap.parse_args()
@@ -105,6 +106,8 @@ def main() -> int:
             args.image = value
         elif key == "DIRTY" and not args.dirty:
             args.dirty = value
+        elif key == "BUILD_INPUTS" and not args.build_inputs:
+            args.build_inputs = value
 
     expected = ("A-final-image-offline", "D-canfail-no-asset", "B-chronology",
                 "B-maps-ready", "C1-external-egress", "C2-internal-reachability",
@@ -204,9 +207,17 @@ def main() -> int:
                                    f"the tree under test is not a committed tree"))
     elif not args.image:
         results.append(("E", UNKNOWN, "image identity not recorded"))
+    elif not args.build_inputs:
+        # An image id paired with a tree sha implies a rebuild that the
+        # pairing does not establish. Without the build-inputs digest
+        # there is nothing the image id actually resolves TO, so this is
+        # UNKNOWN rather than a pass.
+        results.append(("E", UNKNOWN, "build-inputs digest not recorded, so "
+                                      "the image id resolves to nothing"))
     else:
         results.append(("E", PASS, f"tree {args.tree_sha[:12]} commit "
-                                   f"{args.commit[:12]} image {args.image[:19]}"))
+                                   f"{args.commit[:12]} image {args.image[:19]} "
+                                   f"build-inputs {args.build_inputs[:12]}"))
 
     for key, state, why in results:
         print(f"  {key}  {state:<8} {why}")

@@ -60,6 +60,25 @@ COMMIT="$(git rev-parse HEAD 2>/dev/null || echo UNKNOWN)"
 DIRTY_LIST="$(git status --porcelain 2>/dev/null)"
 DIRTY="$(printf '%s' "$DIRTY_LIST" | grep -c . || true)"
 
+# AN IMAGE ID DOES NOT RESOLVE TO A TREE, AND SAYING SO IS THE POINT.
+#
+# Docker caches on BUILD INPUTS. Between ad37f65 and 21c5c07 only the
+# collector and the decision log changed — nothing memu-graph's image is
+# built from — so the rebuilt image is expected to have the SAME id.
+# Recording "image X, tree Y" from a run at Y would then be a true pair
+# of facts arranged to imply something neither of them says: that the
+# image was rebuilt because the tree moved.
+#
+# So the binding is made explicit. BUILD_INPUTS is a digest over exactly
+# the git-tracked paths this image is built from, derived from the tree
+# rather than listed beside it, and it is what the image id actually
+# corresponds to. If it is unchanged across two commits, an identical
+# image id is CORRECT and the evidence says so out loud instead of
+# implying a rebuild that did not happen.
+BUILD_INPUT_PATHS="memu-graph common security"
+BUILD_INPUTS="$(git ls-tree -r HEAD -- $BUILD_INPUT_PATHS 2>/dev/null \
+                | sha256sum | cut -d' ' -f1)"
+
 mkdir -p "$LOGDIR"
 : > "$EVIDENCE"
 
@@ -104,6 +123,13 @@ if [ -z "$IMAGE" ]; then
   IMAGE=$(docker images --format '{{.ID}}' --filter 'reference=*memu-graph*' | head -1)
 fi
 record "  image id        ${IMAGE:-<unresolved>}"
+record "  build inputs    ${BUILD_INPUTS} (sha256 over git ls-tree of"
+record "                  ${BUILD_INPUT_PATHS})"
+record "  The image id corresponds to the BUILD INPUTS digest, not to the"
+record "  tree sha. Docker caches on inputs, so an unchanged digest across"
+record "  two commits SHOULD produce the same image id — that is correct"
+record "  behaviour, not a stale build, and it is recorded rather than"
+record "  left to be inferred from a matching id."
 if [ -z "$IMAGE" ]; then
   record ""
   record "ABORTED: image unresolved. Nothing below was measured."
@@ -228,6 +254,7 @@ record "== EXIT CODES, for the verdict step =="
   printf 'COMMIT=%s\n' "$COMMIT"
   printf 'IMAGE=%s\n' "$IMAGE"
   printf 'DIRTY=%s\n' "$DIRTY"
+  printf 'BUILD_INPUTS=%s\n' "$BUILD_INPUTS"
 } > "$LOGDIR/rc.env"
 cat "$LOGDIR/rc.env" | sed 's/^/  /' | tee -a "$EVIDENCE"
 

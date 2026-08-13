@@ -11292,3 +11292,109 @@ Next run re-measures with E repaired. If C3 still times out in LLM
 extraction, that is a separate finding about graph-extraction
 performance and needs its own authorisation — **not** a change to this
 Dockerfile, this timeout, or this model.
+
+---
+
+## D193 — 2026-08-13 — KAI-GATE-049 opened: CPU-runner graph-extraction exceeds the live-cycle budget. Phase 1's C3 is BLOCKED by it, not failing on it.
+
+Operator decision. Three parts, recorded so the disposition is not
+re-litigated: C3 is BLOCKED by a pre-existing defect; Phase 2 remains
+unauthorised; `21c5c07` is accepted as an instrumentation correction and
+the acceptance is to be re-measured against it.
+
+### KAI-GATE-049 — new finding, unremediated, no authorisation to fix
+
+**`memu-graph`'s graph-extraction path does not complete within the
+live cycle's budget on a CPU runner.**
+
+Timing evidence, run **31718982368**, job `memu-graph-acceptance`,
+commit `ad37f65`:
+
+```
+16:09:00   acceptance collection starts
+16:10:14   cognee log file created          (/data/home/.cognee/logs/2026-08-13_16-10-14.log)
+16:10:18   Pipeline run completed: 467d452a-a218-5fc2-946a-61fd58a90c69   (ingest_data)
+16:10:19   [transformers] PyTorch was not found — tokenizers/config only
+16:10:22   Pipeline run started:   032c2232-2207-5665-8dc4-5a97cc341363
+16:10:22     Coroutine task started: classify_documents
+16:10:22     Async Generator task started: extract_chunks_from_documents
+16:10:22     Coroutine task started: extract_graph_and_summarize    <- LAST log line
+16:15:14   collection ends; C3 reports "FAIL: timed out"
+```
+
+* chunking — the step that needs the tokenizer — completed at 16:10:22;
+* `extract_graph_and_summarize` produced **no further log line in ~292
+  seconds**;
+* `scripts/test_graph_live.py` allows `timeout=300` for ingest, with the
+  standing comment *"D53: qwen2.5:3b needs up to 3-4 LLM calls at 30-45s
+  each for cognify"*. Budget: 300s. Observed: exceeded.
+* stage log `C3-live-cycle.log` is **107 bytes** in full — `health: {...
+  'indexed_sources': 0}` then `FAIL: timed out`. Not an excerpt.
+
+**Lineage.** D49 (qwen2.5:0.5b cannot produce valid structured JSON
+under instructor/Pydantic), D51 (qwen2.5:1.5b echoed the schema
+description instead of filling it), D53 (3b, with the 300s budget this
+run exhausted). `core-tests.yml` already declares its equivalent step
+`needs-owner` best-effort for this exact reason — *"Ollama model quality
+/ extension.kuzudb.com"*.
+
+**Not authorised, and deliberately not attempted:** raising the timeout,
+changing `OLLAMA_MODEL`, altering the live cycle, or touching
+`memu-graph`. The first three would be tuning a number until a test
+passes.
+
+### Why C3 is BLOCKED and not FAILED
+
+The distinction is load-bearing and is the reason the two failure modes
+must not be merged:
+
+```
+before Phase 1   HTTP 502 after ~47s   killed by a MISSING TOKENIZER
+after  Phase 1   no answer in 300s     killed by a SLOW LOCAL LLM
+```
+
+Execution crossing chunking is the proof that the tokenizer blocker is
+gone — that step is precisely where `AutoTokenizer.from_pretrained` runs,
+and it now completes in the same run where C4 found **zero** Hugging Face
+retry lines in 9,798 bytes of service log.
+
+**But C is not rewritten to accommodate that.** The criterion stays "a
+real model-dependent operation succeeds". `A` is not a substitute for
+`C`; the whole reason both exist is that one is about the asset and the
+other about the capability. Marking C `BLOCKED` records *why* it cannot
+currently pass without quietly lowering what passing means.
+
+**KAI-GATE-048 stays OPEN.**
+
+### The re-run must not let an unchanged image imply a rebuild
+
+The operator's requirement — *"ensure the recorded image identity
+resolves to that tree, not merely the unchanged Docker build context"* —
+names a real trap, and it is the one this evidence would have walked
+into.
+
+Between `ad37f65` and `21c5c07` **nothing memu-graph's image is built
+from changed**: the diff is the collector script and this log. Docker
+caches on build inputs, so the rebuilt image is *expected* to carry the
+same id. Recording "image X, tree Y" from a run at Y would then be two
+true facts arranged to imply a third that neither states — that the
+image was rebuilt because the tree moved. Same shape as the `ollama-pull`
+trap and my own `--network none` criterion: a correct-looking pairing
+standing in for a measurement.
+
+So the collector now derives `BUILD_INPUTS` — a sha256 over
+`git ls-tree -r HEAD -- memu-graph common security` — and records it
+beside the image id, with the explicit note that an unchanged digest
+across two commits *should* yield the same image id. **E is UNKNOWN, not
+PASS, when that digest is absent**, because without it the image id
+resolves to nothing. Asserted in
+`scripts/test_memu_graph_acceptance.py`.
+
+### Register
+
+* **KAI-GATE-049** — OPEN, unremediated: CPU-runner graph-extraction
+  exceeds the 300s live-cycle budget; `extract_graph_and_summarize`
+  silent for ~292s. Owner decision pending. Blocks KAI-GATE-048's C3.
+* **KAI-GATE-048** — OPEN. A, B, D proven; C BLOCKED by KAI-GATE-049;
+  E to be re-measured against `21c5c07`.
+* Phase 2 (`memu-core-introspect`) — **not authorised, not begun.**
