@@ -10681,3 +10681,88 @@ resolution with no local asset and no egress, failing bounded.
 Counts otherwise unchanged (Programme Rule 7). The 12 third-party images
 remain NOT MEASURED; `parakeet-server` is still UNKNOWN and was not
 classified from `--model tdt_ctc-110m`.
+
+---
+
+## D188 — 2026-08-13 — KAI-GATE-048 Run 2: the Evidence Gap Is Closed and the Verdict Reproduces
+
+Run **31682452927**, commit **10bc874**. Read-only. Nothing about the
+system under test changed between runs — only the collector's own
+`image-cache` stage was repaired.
+
+### 10 of 10 stages, and the one field that was NOT MEASURED is now measured
+
+```
+inspected: 10 of 10 expected stage log(s)     (run 1 was 8 of 9)
+
+  cache files:  image=0   at-readiness=0   after-request=0
+  asset present locally   NO        <- was NOT MEASURED in run 1
+  reached readiness       YES
+  loaded before ready     NO
+  loaded at all           YES
+  external attempt        YES
+  egress proven           NO
+
+  VERDICT: REQUEST-TIME / LAZY
+```
+
+The reason string is now the complete one, which is the whole value of
+closing the gap:
+
+> the load happens after readiness — **and the asset is NOT local**, so
+> the first request that needs it performs the resolution on a container
+> with no proven egress
+
+Run 1 could only say *"local asset availability was NOT MEASURED"*. Same
+verdict, but arrived at with a hole in it. The hole is now filled by an
+IMAGE-level observation — a throwaway container from the image the
+running container was actually built from, with `--network none`, so it
+could not have fetched anything while being looked at.
+
+`image=0` also settles a question D186 answered by derivation rather than
+measurement: `memu-graph` bakes **no** model asset. The `mounts` stage
+confirms nothing is mounted at `/data/hf_cache`, so there is no volume
+shadowing the image either — the emptiness is the image's, not an
+artefact of the deployment.
+
+### This is a reproduction, not a re-run of one observation
+
+Two runs, two runners, two ephemeral stacks, same chronology:
+
+| | run 1 (`31681569455`) | run 2 (`31682452927`) |
+|---|---|---|
+| readiness | +5.1s | reached |
+| cache at readiness | 0 | 0 |
+| pid-1 extensions at readiness | none | none |
+| first `/graph/ingest` | `HEAD huggingface.co/...`, 502 | `HEAD huggingface.co/...`, 502 |
+| cache after | 0 | 0 |
+| pid-1 after | `tokenizers` mapped | `tokenizers` mapped |
+| verdict | REQUEST-TIME / LAZY | REQUEST-TIME / LAZY |
+
+Directive 3 — *nothing repeats unexplained* — is satisfied in the useful
+direction here: the repeat is explained, and it is the same explanation
+both times.
+
+### D187 stands unchanged
+
+Every claim in D187 survives the closed gap. The one sentence that can
+now be strengthened is the caveat: D187 said the verdict *did not depend*
+on the missing stage, and reasoned that `external attempt = YES` plus an
+empty post-request cache already established the asset was not local.
+**That reasoning is now confirmed by direct IMAGE-level measurement
+rather than left as an inference.** It was the right call, and it no
+longer has to be taken on the strength of the argument.
+
+`asset_present_locally` moving from NOT MEASURED to NO **did not change
+the verdict** — which is the correct behaviour for a classifier whose
+timing test runs before its asset test, and is exercised as
+`test_timing_is_tested_before_the_asset_contract`.
+
+### Register
+
+**KAI-GATE-048 — MEASURED and REPRODUCED. Remains OPEN and
+unremediated.** Group **G6**. No architecture option selected; the
+stopping condition from the authorised unit still applies.
+
+Artefacts: run 1 evidence artifact `9173768070`, run 2 evidence artifact
+`9174126983` (15 files, includes every full stage log).
