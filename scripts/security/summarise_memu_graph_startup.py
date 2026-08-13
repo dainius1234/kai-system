@@ -118,7 +118,7 @@ def main() -> int:
     # is worth least and looks the same.
     expected = ("image-cache", "cache-ready", "cache-after", "maps-ready",
                 "maps-after", "chronology", "egress-probe", "live-cycle",
-                "service-logs")
+                "service-logs", "mounts")
     present = [n for n in expected if (d / f"{n}.log").exists()]
     print(f"  inspected: {len(present)} of {len(expected)} expected stage "
           f"log(s) in {d}")

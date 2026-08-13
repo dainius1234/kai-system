@@ -100,23 +100,6 @@ record "compose file: $COMPOSE"
 record "started: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 record ""
 
-# ── 0. IMAGE-level: what the built image already carries ─────────────
-record "== 0. IMAGE — the cache as built, looked at with no network =="
-IMAGE=$(docker compose -f "$COMPOSE" config --format json 2>/dev/null \
-        | python3 -c 'import json,sys; print((json.load(sys.stdin)["services"]["memu-graph"].get("image") or ""))')
-if [ -z "$IMAGE" ]; then
-  IMAGE=$(docker compose -f "$COMPOSE" images -q "$SERVICE" 2>/dev/null | head -1)
-fi
-record "  image ref: ${IMAGE:-<unresolved>}"
-if [ -n "$IMAGE" ]; then
-  stage "image-cache" docker run --rm --network none --entrypoint sh "$IMAGE" \
-      -c 'echo "HF_HOME=${HF_HOME:-<unset>}"; echo "HF_HUB_OFFLINE=${HF_HUB_OFFLINE:-<unset>}"; echo "TRANSFORMERS_OFFLINE=${TRANSFORMERS_OFFLINE:-<unset>}"; echo "--- find ${HF_HOME:-/data/hf_cache} ---"; find "${HF_HOME:-/data/hf_cache}" -type f 2>/dev/null | head -200; echo "--- file count ---"; find "${HF_HOME:-/data/hf_cache}" -type f 2>/dev/null | wc -l'
-  excerpt "$LOGDIR/image-cache.log" 20
-else
-  record "  IMAGE SNAPSHOT NOT TAKEN — image reference unresolved."
-fi
-record ""
-
 # ── 1. the repo-defined bring-up, unmodified ─────────────────────────
 record "== 1. BRING-UP — the command from core-tests.yml, unchanged =="
 record "  docker compose -f $COMPOSE up -d ollama ollama-pull $SERVICE"
@@ -166,6 +149,31 @@ stage "inspect-config" docker inspect "$CID" \
 # Elapsed is COMPUTED from StartedAt, never judged by eye -- D183/D184.
 stage "chronology" python3 scripts/ci/health_chronology.py "$CID"
 excerpt "$LOGDIR/chronology.log" 30
+record ""
+
+# ── 2b. IMAGE-level: what the built image already carries ────────────
+#
+# Run 1 took this snapshot BEFORE the bring-up and resolved the image
+# reference from `compose config`, which returns nothing for a service
+# built rather than pulled — so `image-cache` was the one stage of nine
+# that did not run, and `asset_present_locally` came back NOT MEASURED.
+# The image id is taken from the container that is actually running, so
+# it is the image under test by construction rather than by a name that
+# might resolve elsewhere.
+record "== 2b. IMAGE — the cache as BUILT, in a container with no network =="
+IMAGE=$(docker inspect "$CID" --format '{{.Image}}' 2>/dev/null)
+record "  image id (from the running container): ${IMAGE:-<unresolved>}"
+if [ -n "$IMAGE" ]; then
+  stage "image-cache" docker run --rm --network none --entrypoint sh "$IMAGE" \
+      -c 'echo "HF_HOME=${HF_HOME:-<unset>}"; echo "HF_HUB_OFFLINE=${HF_HUB_OFFLINE:-<unset>}"; echo "TRANSFORMERS_OFFLINE=${TRANSFORMERS_OFFLINE:-<unset>}"; echo "--- find ${HF_HOME:-/data/hf_cache} ---"; find "${HF_HOME:-/data/hf_cache}" -type f 2>/dev/null | head -200; echo "--- file count ---"; find "${HF_HOME:-/data/hf_cache}" -type f 2>/dev/null | wc -l'
+  excerpt "$LOGDIR/image-cache.log" 20
+else
+  record "  IMAGE SNAPSHOT NOT TAKEN — image id unresolved. "
+  record "  asset_present_locally therefore stays NOT MEASURED."
+fi
+record "  mounts at the cache path (a volume here would shadow the image):"
+stage "mounts" docker inspect "$CID" --format '{{json .Mounts}}'
+excerpt "$LOGDIR/mounts.log" 5
 record ""
 
 # ── 3. egress, proven from inside ────────────────────────────────────
