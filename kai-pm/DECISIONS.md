@@ -12132,3 +12132,59 @@ happen to fit on one line today.
   greener while the operation still failed.** No timeout change.
 * No remediation: no model change, no Cognee change, no endpoint fix, no
   Phase 2.
+
+---
+
+## D200
+
+**2026-08-13 — two corrections to D199, both from the operator, banked
+before the contract run lands so neither can be tightened to fit it.**
+
+### 1. The 502 branch is not globally dead code
+
+D199 and its commit said the 502 branch is
+
+> ~~"dead code for the failure mode that matters most"~~
+
+Too broad, and it is a reachability claim, which is the kind that gets
+believed. The defensible statement is the operator's:
+
+> **The 502 exception branch is unreachable for the observed cognee
+> pipeline-failure mode if that mode is returned rather than raised.**
+
+Other exceptional failures — a delegate refusing a connection, an
+`add()` error, a database fault — could still raise and reach it. Nothing
+measured says otherwise. `summarise_ingest_contract.py` records whether
+any 502 appears **for this specific failure mode**, which is the only way
+to settle it.
+
+### 2. Terminal-marker settling — a real gap, and the direction it fails
+
+The operator's requirement:
+
+> because terminal logging can lag the return slightly, the post-return
+> observation should have a bounded, justified settling period or poll
+> until a terminal state appears. If that period expires, keep the
+> pipeline UNMEASURED; do not infer completion from the HTTP response.
+
+`measure_ingest_contract.sh` as shipped reads cognee's log **immediately**
+after the return, with **no settling poll**. That is a genuine gap and it
+is queued.
+
+**But it fails in the safe direction, by construction.** The analyser
+classifies a pipeline with no terminal marker as `NO-TERMINAL-MARKER`,
+never as `COMPLETED`, and an observation with no pipeline status at all
+as `UNMEASURED` — asserted both ways in
+`test_ingest_contract.py::test_a_pipeline_with_no_terminal_marker_is_not_completed`
+and `::test_http_200_alone_never_establishes_success`. So a lagging
+marker can only cost a **spurious UNMEASURED** (a wasted ~25-minute run);
+it cannot manufacture a false `CONSISTENT`, and it cannot infer
+completion from the HTTP response. The operator's stated failure mode is
+already prevented; the settling poll would reduce waste, not risk.
+
+Not edited now: the contract run is live on `ffd92b6`, and editing the
+collector mid-run would leave the result describing neither version.
+Queued with the axis-2 identity work.
+
+**Ordering note (R1):** this entry is written *before* the contract run
+reports. Whatever it shows, the rule above was fixed in advance.
