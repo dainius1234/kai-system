@@ -195,6 +195,35 @@ DECLARED: Tuple[Toleration, ...] = (
         owner="orion",
         review_by="2026-11-01",
     ),
+    # KAI-GATE-049's diagnostic job. Both steps are `if: always()`
+    # because a NON-RETURN is a result here, not a build failure.
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Stage decomposition of the post-chunking silence",
+        bucket=DOCUMENTED_SKIP,
+        reason="`if: always()` on a diagnostic whose interesting outcome "
+               "may be that the request never returned. The collector "
+               "exits 2 only at a prerequisite boundary (bring-up "
+               "failed); everything else it observes -- including a "
+               "non-return -- is evidence to be analysed by the next "
+               "step, not a reason to stop the job.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Which stage owns the silence",
+        bucket=DOCUMENTED_SKIP,
+        reason="`if: always()` so the analysis runs even when collection "
+               "aborted -- an empty stage directory must produce 'NOT "
+               "COLLECTED', which is a different finding from a bad "
+               "measurement. This is a REPORT and exits 0: it names a "
+               "stage and a state and deliberately authorises no remedy, "
+               "because slow work, a blocked wait and a deadlock have "
+               "three different owners.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
     # One declaration per service, because the match is on the step name
     # and there is one INDEPENDENT collector step per service. They
     # replace two earlier declarations — a separate "Diagnose image

@@ -790,6 +790,61 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=False,
          in_workflows=("memu-graph-startup-proof.yml",),
          findings=("KAI-GATE-048",)),
+    # KAI-GATE-049's calibration, run as its own workflow step BEFORE
+    # the diagnostic — an uncalibrated analyser must not decorate a
+    # verdict about which stage owns a stall.
+    Gate(module="test_graph_stall",
+         kind=GATE,
+         summary="the four stall states — slow LLM work, waiting on the "
+                 "delegate, stuck elsewhere, local compute — must stay "
+                 "four distinct verdicts, and a non-return must never "
+                 "read as a proven hang",
+         inputs=(),
+         denominator=r"Graph Stall Analyser Calibration: \d+ passed",
+         proven_by="scripts/test_graph_stall.py",
+         calibrated_by="scripts/test_graph_stall.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-049",)),
+    Gate(module="summarise_graph_stall",
+         kind=REPORT,
+         summary="names the cognee task that was entered without "
+                 "returning, and whether the process was computing or "
+                 "blocked while it was; authorises no remedy, because "
+                 "slow work, a blocked wait and a deadlock have three "
+                 "different owners",
+         inputs=(),
+         denominator=r"inspected: \d+ of \d+ expected stage log",
+         probe=False,
+         probe_skip_reason="requires a stage-log directory produced by a "
+                           "live stack observed past its own client "
+                           "budget; every branch is asserted on synthetic "
+                           "stage-log trees in scripts/test_graph_stall.py",
+         proven_by="scripts/test_graph_stall.py",
+         calibrated_by="scripts/test_graph_stall.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-049",)),
+    Gate(module="probe_graph_stall",
+         kind=REPORT,
+         summary="runs INSIDE the image: POSTs /graph/ingest without the "
+                 "300s budget under investigation, and samples pid-1 CPU "
+                 "ticks plus open sockets to the delegate",
+         inputs=(),
+         denominator=r"inspected: \d+ connection\(s\), \d+ cognee log line",
+         probe=False,
+         probe_skip_reason="stdlib-only probe that must execute inside a "
+                           "running memu-graph container; reading "
+                           "/proc/1/stat and /proc/net/tcp on the host "
+                           "would measure the wrong process entirely",
+         proven_by="scripts/test_graph_stall.py",
+         in_policy_check=False,
+         in_workflows=(),
+         pending_wiring="invoked by "
+                        "scripts/security/diagnose_graph_stall.sh via "
+                        "`docker compose exec`, which the workflow parse "
+                        "cannot see as an invocation of this module",
+         findings=("KAI-GATE-049",)),
     Gate(module="report_runtime_topology",
          kind=REPORT,
          summary="what the tree DEFINES, what it GATES, and what a "

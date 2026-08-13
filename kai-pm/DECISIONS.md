@@ -11506,3 +11506,121 @@ C is not rewritten to accommodate the result and the gate is not closed
 while real ingest remains incomplete. Phase 2 not begun. No code
 expansion: this run changed nothing beyond the instrumentation the
 operator accepted.
+
+---
+
+## D195 — 2026-08-13 — KAI-GATE-049 opened as a diagnostic unit, and its premise had to be corrected first: the ~291s is OUR number
+
+Operator authorisation: **KAI-GATE-049 only, diagnostic decomposition,
+no remediation.** Phase 2 remains forbidden and is not begun. State
+frozen at `22a8b8b`.
+
+### The correction, before any instrument was built
+
+The operator's framing — *"Two independent runners reproducing
+essentially the same ~291–292 s boundary is enough that I would stop
+calling this possible CI noise. It is a reproducible system behaviour
+until disproven"* — is right that it is not noise. But **what reproduces
+is our own client's timeout**, and the arithmetic is exact:
+
+```
+cognee log file created                       16:55:42
+scripts/test_graph_live.py ingest budget    + 300s
+                                            = 17:00:42   <- when C3 gave up
+extract_graph_and_summarize started           16:55:51
+                                              -> 291s of "silence"
+```
+
+Computed, not eyeballed: `16:55:42 + 300 == 17:00:42` to the second.
+
+Run 4 gave ~292s and run 6 ~291s **because both used the same 300s
+budget**, not because the system did the same thing twice. The 9s
+difference is the pre-LLM pipeline, which varies slightly.
+
+Corroborating: **there is no 290–300s constant anywhere in cognee's LLM
+stack.** `grep` over `cognee/infrastructure/llm/` finds `max_retries=2`
+in the ollama adapter and no explicit timeout at all.
+
+**So the operation's duration and outcome have never been observed.** We
+have observed when our own instrument stops watching. Treating that as a
+system property would be R9's watcher and I-8's rule in a new place — an
+instrument reporting on itself and calling it the world. The operator
+asked to treat a matching constant as a hypothesis until the runtime
+stage correlates with it; the constant that matches is ours, and it
+correlates perfectly, which is exactly why it is not evidence about
+cognee.
+
+### The pipeline, derived from cognee's source rather than invented
+
+`cognee/api/v1/cognify/cognify.py:315-341`:
+
+```
+classify_documents
+extract_chunks_from_documents          <- the tokenizer step, 9 ms
+extract_graph_and_summarize            <- LAST marker seen
+    = asyncio.gather( extract_graph_from_data, summarize_text )
+add_data_points                        <- persistence + embeddings
+extract_dlt_fk_edges
+```
+
+`extract_graph_and_summarize` is `asyncio.gather` of **two concurrent
+LLM paths** (`cognee/tasks/graph/extract_graph_and_summarize.py:21-33`).
+cognee emits ONE started-marker for the pair, so its own logging cannot
+say which of the two is slow. That is why the instrument reads CPU and
+sockets instead of waiting for a nicer log line.
+
+### The instrument, and what each observation distinguishes
+
+`scripts/security/probe_graph_stall.py` runs **inside** the image,
+stdlib only:
+
+* `ingest <budget>` — POSTs with an explicit budget, no default, and
+  reports `ENTERED` / `RETURNED` / `NO-RETURN` with monotonic elapsed;
+* `sample` — pid-1 `utime+stime` from `/proc/1/stat`, open sockets from
+  `/proc/net/tcp`, and the **cognee log FILE** at
+  `/data/home/.cognee/logs/<ts>.log` — which nothing has ever read.
+  Every diagnosis so far used `docker logs`, a different and smaller
+  stream.
+
+```
+CPU growing, socket to :11434 open   -> genuinely slow LLM work
+CPU flat,    socket to :11434 open   -> waiting on the delegate
+CPU flat,    no socket               -> stuck somewhere else
+CPU growing, no socket               -> local compute, not the LLM
+```
+
+Four states, four owners. A timeout can express none of them, which is
+why raising one would answer nothing — and is the mistake already
+avoided once with the healthcheck.
+
+### The observation window is derived and labelled as a window
+
+`WINDOW = 3 × 300s = 900s`. 300s is the only configured bound anywhere
+in this path and is the number the runs actually reproduced. If the
+request has not returned at 900s, the report says **the observation
+window ended** — not that the system hung. That distinction is asserted
+in `scripts/test_graph_stall.py`, both directions.
+
+The watcher waits on a **PID captured before the loop**, never on a
+name: R9's `pgrep -f` self-match produced eight forever-loops in one
+stint.
+
+### Not done, deliberately
+
+No timeout raised in any shipped path. `scripts/test_graph_live.py`
+untouched. `OLLAMA_MODEL` unchanged. `memu-graph` unchanged — its
+Dockerfile is exactly as Phase 1 left it. No logging added inside
+cognee. Phase 2 not begun.
+
+One stale comment WAS corrected: `accept_memu_graph_offline.sh` still
+claimed identical build inputs would yield the same image id, which
+D194 disproved by measurement. Code that contradicts banked evidence is
+worse than no comment.
+
+### Register
+
+* **KAI-GATE-049** — OPEN. Restated: *the duration and outcome of
+  `/graph/ingest` past 300s are UNMEASURED*; the ~291s is the
+  measurement window, not a system boundary. Diagnostic instrument built
+  and calibrated (31 assertions, 8 scenarios); not yet run.
+* **KAI-GATE-048** — OPEN, C BLOCKED by the above.

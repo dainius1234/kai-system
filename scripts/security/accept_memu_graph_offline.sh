@@ -62,19 +62,24 @@ DIRTY="$(printf '%s' "$DIRTY_LIST" | grep -c . || true)"
 
 # AN IMAGE ID DOES NOT RESOLVE TO A TREE, AND SAYING SO IS THE POINT.
 #
-# Docker caches on BUILD INPUTS. Between ad37f65 and 21c5c07 only the
-# collector and the decision log changed — nothing memu-graph's image is
-# built from — so the rebuilt image is expected to have the SAME id.
-# Recording "image X, tree Y" from a run at Y would then be a true pair
-# of facts arranged to imply something neither of them says: that the
-# image was rebuilt because the tree moved.
+# I first wrote here that identical build inputs would produce the SAME
+# image id, because Docker caches on inputs. THE RUNS DISPROVED IT:
 #
-# So the binding is made explicit. BUILD_INPUTS is a digest over exactly
-# the git-tracked paths this image is built from, derived from the tree
-# rather than listed beside it, and it is what the image id actually
-# corresponds to. If it is unchanged across two commits, an identical
-# image id is CORRECT and the evidence says so out loud instead of
-# implying a rebuild that did not happen.
+#   run 4 (ad37f65)  image 2628597bcf13
+#   run 6 (a20dd82)  image 4a501c42e9ab   <- identical build inputs
+#
+# Docker caches within a MACHINE. Every GitHub runner is fresh with no
+# shared layer cache, so the bake re-executes and yields a new layer
+# digest each time. The claim was true of a warm local cache and false
+# of the environment this actually runs in (D194).
+#
+# Which makes the binding MORE necessary, not less: an image id is not a
+# stable function of build inputs across runners, so it can never bind
+# evidence to a tree in either direction — a matching id would not prove
+# sameness and a differing id does not prove change. BUILD_INPUTS is a
+# digest over exactly the git-tracked paths this image is built from,
+# derived from the tree rather than listed beside it, and it is the only
+# thing here that binds at all.
 BUILD_INPUT_PATHS="memu-graph common security"
 BUILD_INPUTS="$(git ls-tree -r HEAD -- $BUILD_INPUT_PATHS 2>/dev/null \
                 | sha256sum | cut -d' ' -f1)"
@@ -125,11 +130,10 @@ fi
 record "  image id        ${IMAGE:-<unresolved>}"
 record "  build inputs    ${BUILD_INPUTS} (sha256 over git ls-tree of"
 record "                  ${BUILD_INPUT_PATHS})"
-record "  The image id corresponds to the BUILD INPUTS digest, not to the"
-record "  tree sha. Docker caches on inputs, so an unchanged digest across"
-record "  two commits SHOULD produce the same image id — that is correct"
-record "  behaviour, not a stale build, and it is recorded rather than"
-record "  left to be inferred from a matching id."
+record "  The image id does NOT bind to the tree: runners share no build"
+record "  cache, so identical inputs yield DIFFERENT ids each run (measured,"
+record "  D194). The BUILD INPUTS digest is what binds — compare it across"
+record "  commits to know whether the same image was built."
 if [ -z "$IMAGE" ]; then
   record ""
   record "ABORTED: image unresolved. Nothing below was measured."

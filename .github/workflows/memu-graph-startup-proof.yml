@@ -38,6 +38,9 @@ on:
       - scripts/security/accept_memu_graph_offline.sh
       - scripts/security/summarise_memu_graph_acceptance.py
       - memu-graph/bake_tokenizer.py
+      - scripts/security/diagnose_graph_stall.sh
+      - scripts/security/probe_graph_stall.py
+      - scripts/security/summarise_graph_stall.py
       - memu-graph/Dockerfile
       - memu-graph/requirements.txt
       - memu-graph/app.py
@@ -231,4 +234,72 @@ jobs:
           path: |
             memu-graph-acceptance.evidence
             acceptance-stage-logs/
+          if-no-files-found: warn
+
+  # KAI-GATE-049 — DIAGNOSTIC ONLY. Nothing is remediated: no timeout is
+  # raised in any shipped path, no model changed, memu-graph untouched,
+  # scripts/test_graph_live.py untouched.
+  #
+  # It watches PAST the live cycle's 300s budget because that budget is
+  # the number under investigation: runs 4 and 6 "reproduced" ~291s
+  # because both used it, not because the system did the same thing
+  # twice.
+  memu-graph-stall-diagnosis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OLLAMA_MODEL: qwen2.5:3b
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The analyser must pass its calibration first
+        run: python3 scripts/test_graph_stall.py
+
+      - name: Mint an ephemeral database password for this run
+        run: |
+          printf 'DB_PASSWORD=ci-ephemeral-%s\n' \
+            "$(head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20)" \
+            >> "$GITHUB_ENV"
+
+      - name: Free up runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
+          df -h /
+
+      - name: Build the memu-graph image
+        run: docker compose -f docker-compose.full.yml build memu-graph
+
+      # ci-toleration: documented-skip
+      - name: Stage decomposition of the post-chunking silence
+        if: always()
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: bash scripts/security/diagnose_graph_stall.sh
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker-compose.full.yml down -v || true
+
+      - name: Evidence summary (printed last so it survives truncation)
+        if: always()
+        run: |
+          echo "commit ${GITHUB_SHA}"
+          echo
+          cat graph-stall.evidence 2>/dev/null \
+            || echo "  (not executed = UNKNOWN, not clean)"
+
+      # ci-toleration: documented-skip
+      - name: Which stage owns the silence
+        if: always()
+        run: |
+          python3 scripts/security/summarise_graph_stall.py \
+            --stage-logs stall-stage-logs
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: memu-graph-stall-diagnosis
+          path: |
+            graph-stall.evidence
+            stall-stage-logs/
           if-no-files-found: warn
