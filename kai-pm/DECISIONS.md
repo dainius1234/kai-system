@@ -15300,3 +15300,89 @@ correlated run may look persuasive.**
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * The next capture runs only behind a passing transparency selftest, which
   now includes the correlation criteria.
+
+---
+
+## D230 — the correlation id is evidence only if its lifecycle is observed
+
+Operator correction, accepted and implemented. D229 calibrated the id in
+synthetic tests, but the **production capture** did not prove the
+lifecycle that gives the id meaning. A summariser that sees
+`logical_call_id=X` and groups on it is trusting metadata produced by the
+same instrument that reports it.
+
+> **Correlation metadata is evidence only if its lifecycle is observed,
+> not merely because the field exists.**
+
+### 1. The capture now emits machine-checkable lifecycle events
+
+Not descriptive strings — three events, all carrying the same id and a
+monotonic `seq`:
+
+```
+logical-call-enter        id, parent_logical_call_id, boundary, phase, seq
+  llm-call …              id, attempt_index (1..N), seq
+logical-call-exit         id, attempts_observed, outcome, seq
+context-reset-confirmed   id, expected_after, context_after, confirmed, seq
+```
+
+**`CONTEXT_RESET_CONFIRMED` means RESTORED, not "the exit wrapper ran".**
+It is read after the reset and compares the context against the value
+live *before* this invocation set it. "Reset was attempted" would leave
+nesting correctness assumed, which is the thing at issue. `parent` is
+that same prior value, so nesting is checkable rather than asserted.
+
+### 2. Four states, and only one licenses grouping
+
+`validate_correlation()` returns `CORRELATION_VALID`,
+`CORRELATION_INCOMPLETE`, `CORRELATION_CONTRADICTORY` or
+`CORRELATION_UNMEASURED`, and the summariser groups **only** on
+`CORRELATION_VALID`. Anything else leaves the field present and the
+grouping refused, with the reason printed.
+
+Refused, each with a calibration case that must produce it:
+
+no ENTER · no EXIT · no RESET · attempt before ENTER · attempt after EXIT ·
+duplicate attempt_index · zero-based index · non-monotonic index ·
+declared attempt count disagreeing with the rows carrying that id ·
+reset not confirmed · the same id reused by a later invocation ·
+exit out of LIFO order · an enter declaring the wrong parent.
+
+Plus: **selftest rows can never contaminate a production group** — phase
+is filtered before any of this runs, and that has its own case.
+
+### 3. Three defects found while building it, all mine
+
+* **A block replacement deleted the code that built `order`/`by_call`**,
+  so the per-call section referenced undefined names. The summariser
+  crashed mid-report; the truncated stdout is what exposed it.
+* **The refusal path raised `KeyError` instead of refusing.** Overriding
+  `available=False` left out the keys the refusal branch prints — the
+  failure mode was invisible until a fixture without correlation ran.
+* **`CORRELATION_UNMEASURED` returned a different shape** from every other
+  branch, missing `nesting_faults` and `licenses_grouping`. A function
+  whose result keys depend on which branch it took makes its callers
+  guess; fixed at the source rather than guarded at each read.
+
+Each was caught by the suite rather than by a run.
+
+### 4. Calibration — 227 → 249 assertions, 19 scenarios
+
+**Proof it can fail (R2):**
+
+| mutation | result |
+|---|---|
+| license grouping regardless of lifecycle state | 12 failures |
+| treat "reset ran" as confirmed without checking restoration | 2 failures |
+| stop checking attempt order against the boundary | 4 failures |
+
+Restored: **249 / 0**. `policy-check` green, registry gate green.
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 MEASURED** · **cross-run recurrence MEASURED** ·
+  **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* Q6 still needs: logical calls that actually **retried**, a **valid**
+  lifecycle, and — for the cross-run component — a **second** independent
+  correlated capture. One correlated run is not two.

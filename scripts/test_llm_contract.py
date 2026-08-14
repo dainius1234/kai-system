@@ -454,14 +454,40 @@ def test_the_summariser_reports_and_refuses() -> None:
         r["attempt_index"] = idx
         return r
 
+    def lenter(cid, seq, parent=None):
+        return {"event": "logical-call-enter", "logical_call_id": cid,
+                "parent_logical_call_id": parent, "boundary": "retry_sync",
+                "phase": "capture", "seq": seq}
+
+    def lexit(cid, seq, n, outcome="returned"):
+        return {"event": "logical-call-exit", "logical_call_id": cid,
+                "boundary": "retry_sync", "phase": "capture",
+                "attempts_observed": n, "outcome": outcome, "seq": seq}
+
+    def lreset(cid, seq, expected=None, confirmed=True):
+        return {"event": "context-reset-confirmed", "logical_call_id": cid,
+                "phase": "capture", "seq": seq, "expected_after": expected,
+                "context_after": expected if confirmed else "STALE",
+                "confirmed": confirmed}
+
+    def seqd(row, seq):
+        return dict(row, seq=seq)
+
     proc = _run_summariser([
         cfg,
-        crow(1, "call-A", 1, SCHEMA_ECHO_RAW),
-        crow(2, "call-A", 2, SCHEMA_ECHO_RAW,
-             INSTRUCTOR_SYSTEM),          # same contract on retry
-        crow(3, "call-B", 1, INSTANCE_RAW),
+        lenter("call-A", 1),
+        seqd(crow(1, "call-A", 1, SCHEMA_ECHO_RAW), 2),
+        seqd(crow(2, "call-A", 2, SCHEMA_ECHO_RAW, INSTRUCTOR_SYSTEM), 3),
+        lexit("call-A", 4, 2), lreset("call-A", 5),
+        lenter("call-B", 6),
+        seqd(crow(3, "call-B", 1, INSTANCE_RAW), 7),
+        lexit("call-B", 8, 1), lreset("call-B", 9),
     ])
     out = proc.stdout
+    check("the correlation lifecycle is reported, not assumed",
+          "Q6z. CORRELATION LIFECYCLE" in out, out[-1500:])
+    check("and a complete lifecycle is CORRELATION_VALID",
+          f"CORRELATION LIFECYCLE: {c.CORRELATION_VALID}" in out, "")
     check("correlated rows enable per-logical-call reporting",
           "Q6a. PER LOGICAL CALL" in out, out[-1200:])
     check("both logical calls are listed",
@@ -483,10 +509,78 @@ def test_the_summariser_reports_and_refuses() -> None:
     check("and a second independent correlated run is demanded",
           "One correlated run is not two." in out, "")
 
+    # (g2) EVERY REFUSAL CONDITION. An id that exists but whose lifecycle
+    # is missing or self-contradictory must NOT license grouping.
+    def lifecycle_state(rows_):
+        return _run_summariser([cfg] + rows_).stdout
+
+    refusals = {
+        "no ENTER": [seqd(crow(1, "x", 1, SCHEMA_ECHO_RAW), 2),
+                     lexit("x", 3, 1), lreset("x", 4)],
+        "no EXIT": [lenter("x", 1), seqd(crow(1, "x", 1, SCHEMA_ECHO_RAW), 2),
+                    lreset("x", 4)],
+        "no RESET": [lenter("x", 1), seqd(crow(1, "x", 1, SCHEMA_ECHO_RAW), 2),
+                     lexit("x", 3, 1)],
+        "attempt before ENTER": [seqd(crow(1, "x", 1, SCHEMA_ECHO_RAW), 1),
+                                 lenter("x", 2), lexit("x", 3, 1),
+                                 lreset("x", 4)],
+        "attempt after EXIT": [lenter("x", 1), lexit("x", 2, 1),
+                               seqd(crow(1, "x", 1, SCHEMA_ECHO_RAW), 3),
+                               lreset("x", 4)],
+        "duplicate index": [lenter("x", 1),
+                            seqd(crow(1, "x", 1, SCHEMA_ECHO_RAW), 2),
+                            seqd(crow(2, "x", 1, SCHEMA_ECHO_RAW), 3),
+                            lexit("x", 4, 2), lreset("x", 5)],
+        "zero-based index": [lenter("x", 1),
+                             seqd(crow(1, "x", 0, SCHEMA_ECHO_RAW), 2),
+                             lexit("x", 3, 1), lreset("x", 4)],
+        "count disagrees": [lenter("x", 1),
+                            seqd(crow(1, "x", 1, SCHEMA_ECHO_RAW), 2),
+                            seqd(crow(2, "x", 2, SCHEMA_ECHO_RAW), 3),
+                            lexit("x", 4, 1), lreset("x", 5)],
+        "reset not confirmed": [lenter("x", 1),
+                                seqd(crow(1, "x", 1, SCHEMA_ECHO_RAW), 2),
+                                lexit("x", 3, 1),
+                                lreset("x", 4, confirmed=False)],
+        "id reused later": [lenter("x", 1),
+                            seqd(crow(1, "x", 1, SCHEMA_ECHO_RAW), 2),
+                            lexit("x", 3, 1), lreset("x", 4),
+                            lenter("x", 5),
+                            seqd(crow(2, "x", 1, SCHEMA_ECHO_RAW), 6),
+                            lexit("x", 7, 1), lreset("x", 8)],
+        "nesting out of order": [lenter("a", 1), lenter("b", 2, parent="a"),
+                                 seqd(crow(1, "b", 1, SCHEMA_ECHO_RAW), 3),
+                                 lexit("a", 4, 0), lreset("a", 5),
+                                 lexit("b", 6, 1), lreset("b", 7)],
+        "wrong declared parent": [lenter("a", 1), lenter("b", 2, parent=None),
+                                  seqd(crow(1, "b", 1, SCHEMA_ECHO_RAW), 3),
+                                  lexit("b", 4, 1), lreset("b", 5),
+                                  lexit("a", 6, 0), lreset("a", 7)],
+    }
+    for name, rows_ in refusals.items():
+        out_ = lifecycle_state(rows_)
+        bad = (c.CORRELATION_CONTRADICTORY in out_
+               or c.CORRELATION_INCOMPLETE in out_)
+        check(f"refuses grouping: {name}", bad, out_[-500:])
+        check(f"and does not group on it: {name}",
+              "logical calls      : UNAVAILABLE" in out_, "")
+
+    # a selftest row must never contaminate a production group
+    out_ = lifecycle_state([
+        lenter("s", 1), seqd(crow(1, "s", 1, SCHEMA_ECHO_RAW), 2),
+        dict(crow(2, "s", 2, SCHEMA_ECHO_RAW), seq=3, phase="selftest"),
+        lexit("s", 4, 1), lreset("s", 5)])
+    check("a selftest row does not contaminate a production group",
+          c.CORRELATION_VALID in out_, out_[-500:])
+
     # (h) correlated but NO call retried — must not read as retry evidence
     proc = _run_summariser([cfg,
-                            crow(1, "call-C", 1, SCHEMA_ECHO_RAW),
-                            crow(2, "call-D", 1, SCHEMA_ECHO_RAW)])
+                            lenter("call-C", 1),
+                            seqd(crow(1, "call-C", 1, SCHEMA_ECHO_RAW), 2),
+                            lexit("call-C", 3, 1), lreset("call-C", 4),
+                            lenter("call-D", 5),
+                            seqd(crow(2, "call-D", 1, SCHEMA_ECHO_RAW), 6),
+                            lexit("call-D", 7, 1), lreset("call-D", 8)])
     check("no retried call is stated as no evidence, not as success",
           "NO logical call retried" in proc.stdout, proc.stdout[-800:])
     check("and says a single-attempt call gives no retry evidence",

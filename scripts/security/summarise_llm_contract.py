@@ -25,8 +25,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from classify_llm_response import (  # noqa: E402
     classify, canonical, sha256_bytes, sha256_canonical,
     licenses_raw_response_claim, recover_contract, extraction_rule_provenance,
-    logical_call_grouping, validator_status,
-    CONTRACT_UNMEASURED, PASSING_VERDICTS, RAW_MODEL_RESPONSE,
+    logical_call_grouping, validate_correlation, validator_status,
+    CONTRACT_UNMEASURED, CORRELATION_VALID, PASSING_VERDICTS,
+    RAW_MODEL_RESPONSE,
     REQUIRED_FIELDS_PRESENT, SCHEMA_ECHO, VALID_INSTANCE)
 
 
@@ -149,7 +150,27 @@ def main() -> int:
     print()
 
     # ── Q6 ───────────────────────────────────────────────────────────
+    correlation = validate_correlation(rows)
     grouping = logical_call_grouping(calls)
+    # An id is evidence only if its LIFECYCLE was observed. If the
+    # lineage is missing or self-contradictory, the field is still
+    # there — and grouping on it would trust the instrument's own
+    # label instead of the mechanism that makes the label true.
+    if not correlation.get('licenses_grouping'):
+        from classify_llm_response import (LOGICAL_CALL_KEYS,
+                                           FORBIDDEN_GROUPING_SIGNALS)
+        grouping = {
+            "available": False,
+            "why": (f"the correlation lifecycle is {correlation['state']}, so "
+                    f"the id does not license grouping"),
+            "looked_for": list(LOGICAL_CALL_KEYS),
+            "refused_signals": list(FORBIDDEN_GROUPING_SIGNALS),
+            "next_measurement_requirement": grouping.get(
+                "next_measurement_requirement",
+                "an observed ENTER/EXIT/RESET lifecycle for every logical "
+                "call, not merely an id field on the rows"),
+        }
+
     print("  Q6. REPRODUCIBILITY — and why it is not answered here")
     print(f"      raw attempts       : {len(calls)}")
     print(f"      distinct prompts   : {len(seen_prompt)} (canonical)")
@@ -197,6 +218,21 @@ def main() -> int:
                 "response": sha256_bytes(call.get("raw_response")),
                 "messages": call.get("messages"),
             })
+    print(f"  Q6z. CORRELATION LIFECYCLE: {correlation['state']}")
+    print("    LOGICAL_CALL_ENTER -> id minted -> attempts under it, indices")
+    print("    rising -> LOGICAL_CALL_EXIT -> CONTEXT_RESET_CONFIRMED")
+    print("    Correlation metadata is evidence only if its lifecycle was")
+    print("    observed. Only CORRELATION_VALID licenses grouping for Q6.")
+    for cid, det in correlation["calls"].items():
+        print(f"      {cid:<18} {det['state']:<26} {det['attempts']:>2} attempt(s)")
+        for why in det["missing"] + det["contradictions"]:
+            print(f"        - {why}")
+    if correlation["nesting_faults"]:
+        for fault in correlation["nesting_faults"]:
+            print(f"      NESTING: {fault}")
+    print()
+
+    if grouping["available"]:
         print("  Q6a. PER LOGICAL CALL")
         print(f"    {'logical_call_id':<18} {'contract~c':>10} {'n':>2} "
               f"{'classifications':<26} {'prompt~c':<12} {'resp~b'}")

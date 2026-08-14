@@ -41,6 +41,7 @@ two can be compared rather than assumed equal.
 from __future__ import annotations
 
 import contextvars
+import itertools
 import json
 import os
 import sys
@@ -146,6 +147,49 @@ def next_attempt_index():
     return counter["n"]
 
 
+_SEQ = itertools.count(1)
+
+
+def _seq() -> int:
+    """A monotonic order stamp, so ordering is machine-checkable.
+
+    File order would usually do, but an explicit stamp survives
+    interleaving and makes 'this attempt happened before its boundary was
+    entered' a comparison rather than an impression.
+    """
+    return next(_SEQ)
+
+
+def _emit_enter(call_id: str, point: str, parent) -> None:
+    """LOGICAL_CALL_ENTER — the boundary was entered and this id minted."""
+    emit({"event": "logical-call-enter", "logical_call_id": call_id,
+          "parent_logical_call_id": parent, "boundary": point,
+          "phase": STATE.get("phase", "unknown"), "seq": _seq()})
+
+
+def _emit_exit(call_id: str, point: str, counter: dict, outcome: str) -> None:
+    """LOGICAL_CALL_EXIT — the boundary exited, this many attempts under it."""
+    emit({"event": "logical-call-exit", "logical_call_id": call_id,
+          "boundary": point, "phase": STATE.get("phase", "unknown"),
+          "attempts_observed": counter.get("n", 0), "outcome": outcome,
+          "seq": _seq()})
+
+
+def _emit_reset_confirmed(call_id: str, expected) -> None:
+    """CONTEXT_RESET_CONFIRMED — and it means RESTORED, not 'reset ran'.
+
+    Read AFTER the reset, comparing the context against the value that was
+    live before this invocation set it. "The exit wrapper executed" would
+    only say the reset was attempted; this says the state actually
+    returned to what it was, which is what nesting correctness rests on.
+    """
+    observed = LOGICAL_CALL_ID.get()
+    emit({"event": "context-reset-confirmed", "logical_call_id": call_id,
+          "phase": STATE.get("phase", "unknown"), "seq": _seq(),
+          "expected_after": expected, "context_after": observed,
+          "confirmed": observed == expected})
+
+
 def install_correlation() -> dict:
     """Wrap instructor's retry entry points so each invocation is identified.
 
@@ -168,30 +212,50 @@ def install_correlation() -> dict:
         installed[name] = original
 
         if name == "retry_async":
-            def make(orig):
+            def make(orig, point=name):
                 @wraps(orig)
                 async def correlating_retry_async(*args, **kwargs):
-                    token_id = LOGICAL_CALL_ID.set(_mint_logical_call_id())
-                    token_ct = LOGICAL_CALL_ATTEMPTS.set({"n": 0})
+                    parent = LOGICAL_CALL_ID.get()
+                    call_id = _mint_logical_call_id()
+                    counter = {"n": 0}
+                    token_id = LOGICAL_CALL_ID.set(call_id)
+                    token_ct = LOGICAL_CALL_ATTEMPTS.set(counter)
                     STATE["logical_calls"] = STATE.get("logical_calls", 0) + 1
+                    _emit_enter(call_id, point, parent)
+                    outcome = "returned"
                     try:
                         return await orig(*args, **kwargs)
+                    except BaseException:
+                        outcome = "raised"
+                        raise
                     finally:
+                        _emit_exit(call_id, point, counter, outcome)
                         LOGICAL_CALL_ID.reset(token_id)
                         LOGICAL_CALL_ATTEMPTS.reset(token_ct)
+                        _emit_reset_confirmed(call_id, parent)
                 return correlating_retry_async
         else:
-            def make(orig):
+            def make(orig, point=name):
                 @wraps(orig)
                 def correlating_retry_sync(*args, **kwargs):
-                    token_id = LOGICAL_CALL_ID.set(_mint_logical_call_id())
-                    token_ct = LOGICAL_CALL_ATTEMPTS.set({"n": 0})
+                    parent = LOGICAL_CALL_ID.get()
+                    call_id = _mint_logical_call_id()
+                    counter = {"n": 0}
+                    token_id = LOGICAL_CALL_ID.set(call_id)
+                    token_ct = LOGICAL_CALL_ATTEMPTS.set(counter)
                     STATE["logical_calls"] = STATE.get("logical_calls", 0) + 1
+                    _emit_enter(call_id, point, parent)
+                    outcome = "returned"
                     try:
                         return orig(*args, **kwargs)
+                    except BaseException:
+                        outcome = "raised"
+                        raise
                     finally:
+                        _emit_exit(call_id, point, counter, outcome)
                         LOGICAL_CALL_ID.reset(token_id)
                         LOGICAL_CALL_ATTEMPTS.reset(token_ct)
+                        _emit_reset_confirmed(call_id, parent)
                 return correlating_retry_sync
 
         setattr(ipatch, name, make(original))
@@ -286,6 +350,7 @@ def install_capture() -> dict:
             "event": "llm-call",
             "layer": "RAW_MODEL_REQUEST",
             "attempt": attempt,
+            "seq": _seq(),
             "logical_call_id": LOGICAL_CALL_ID.get(),
             "attempt_index": attempt_index,
             "phase": STATE.get("phase", "unknown"),

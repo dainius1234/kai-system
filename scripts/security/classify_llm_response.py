@@ -479,6 +479,178 @@ FORBIDDEN_GROUPING_SIGNALS = (
 )
 
 
+# ── correlation lifecycle states ─────────────────────────────────────
+CORRELATION_VALID = "CORRELATION_VALID"
+CORRELATION_INCOMPLETE = "CORRELATION_INCOMPLETE"
+CORRELATION_CONTRADICTORY = "CORRELATION_CONTRADICTORY"
+CORRELATION_UNMEASURED = "CORRELATION_UNMEASURED"
+
+# Only this one licenses grouping attempts into logical calls for Q6.
+CORRELATION_LICENSING_GROUPING = frozenset({CORRELATION_VALID})
+
+
+def validate_correlation(rows: List[Dict[str, Any]],
+                         phase: str = "capture") -> Dict[str, Any]:
+    """Is the correlation metadata EVIDENCE, or just a field that exists?
+
+    An id proves nothing on its own: it is produced by the same instrument
+    that reports it. What makes it evidence is an observed lifecycle —
+
+        LOGICAL_CALL_ENTER -> id minted -> attempts under that id, indices
+        rising -> LOGICAL_CALL_EXIT -> CONTEXT_RESET_CONFIRMED
+
+    — so this refuses a group whenever the lifecycle is missing or
+    self-contradictory, rather than grouping on the label.
+
+    `context-reset-confirmed` must show the context RETURNED to the value
+    live before the invocation, not merely that a reset ran. Otherwise
+    nesting correctness is assumed, which is the whole thing at issue.
+    """
+    enters, exits, resets, attempts = {}, {}, {}, {}
+    dup = {"enter": set(), "exit": set(), "reset": set()}
+    ordered_boundaries: List[tuple] = []
+    saw_any = False
+
+    for i, r in enumerate(rows):
+        if not isinstance(r, dict):
+            continue
+        cid = r.get("logical_call_id")
+        ev = r.get("event")
+        seq = r.get("seq", i)
+        if cid is not None and ev in ("logical-call-enter", "logical-call-exit",
+                                      "context-reset-confirmed", "llm-call"):
+            saw_any = True
+        if r.get("phase") != phase:
+            continue                      # selftest rows never contaminate
+        if ev == "logical-call-enter":
+            (dup["enter"].add(cid) if cid in enters else None)
+            enters.setdefault(cid, dict(r, seq=seq))
+            ordered_boundaries.append((seq, "enter", cid,
+                                       r.get("parent_logical_call_id")))
+        elif ev == "logical-call-exit":
+            (dup["exit"].add(cid) if cid in exits else None)
+            exits.setdefault(cid, dict(r, seq=seq))
+            ordered_boundaries.append((seq, "exit", cid, None))
+        elif ev == "context-reset-confirmed":
+            (dup["reset"].add(cid) if cid in resets else None)
+            resets.setdefault(cid, dict(r, seq=seq))
+        elif ev == "llm-call":
+            attempts.setdefault(cid, []).append(dict(r, seq=seq))
+
+    if not saw_any:
+        # Same shape as every other return. A function whose result keys
+        # depend on which branch it took makes its callers guess.
+        return {"state": CORRELATION_UNMEASURED,
+                "why": ["no row carries correlation metadata"],
+                "calls": {}, "nesting_faults": [],
+                "licenses_grouping": False}
+
+    # nesting: enters/exits must form a LIFO stack, and each enter's
+    # declared parent must be whatever was open at that moment.
+    stack: List[str] = []
+    nesting_faults: List[str] = []
+    for _seq, kind, cid, parent in sorted(ordered_boundaries,
+                                          key=lambda t: t[0]):
+        if kind == "enter":
+            expected_parent = stack[-1] if stack else None
+            if parent != expected_parent:
+                nesting_faults.append(
+                    f"{cid}: declared parent {parent!r}, but {expected_parent!r} "
+                    f"was open")
+            stack.append(cid)
+        else:
+            if not stack:
+                nesting_faults.append(f"{cid}: exit with nothing open")
+            elif stack[-1] != cid:
+                nesting_faults.append(
+                    f"{cid}: exit out of order — {stack[-1]!r} was innermost")
+                stack.remove(cid) if cid in stack else None
+            else:
+                stack.pop()
+    if stack:
+        nesting_faults.append(f"never exited: {', '.join(map(str, stack))}")
+
+    calls: Dict[str, Dict[str, Any]] = {}
+    for cid in sorted(set(enters) | set(exits) | set(resets) | set(attempts),
+                      key=lambda c: (enters.get(c, {}).get("seq", 1 << 30))):
+        missing, contradictions = [], []
+        en, ex, rs = enters.get(cid), exits.get(cid), resets.get(cid)
+        rows_ = sorted(attempts.get(cid, []), key=lambda r: r["seq"])
+
+        if en is None:
+            missing.append("no LOGICAL_CALL_ENTER")
+        if ex is None:
+            missing.append("no LOGICAL_CALL_EXIT")
+        if rs is None:
+            missing.append("no CONTEXT_RESET_CONFIRMED")
+
+        for kind in ("enter", "exit", "reset"):
+            if cid in dup[kind]:
+                contradictions.append(
+                    f"the id was reused — more than one {kind.upper()}")
+
+        if en and rows_:
+            early = [r for r in rows_ if r["seq"] < en["seq"]]
+            if early:
+                contradictions.append(
+                    f"{len(early)} attempt(s) recorded BEFORE the boundary "
+                    f"was entered")
+        if ex and rows_:
+            late = [r for r in rows_ if r["seq"] > ex["seq"]]
+            if late:
+                contradictions.append(
+                    f"{len(late)} attempt(s) recorded AFTER the boundary exited")
+
+        idx = [r.get("attempt_index") for r in rows_]
+        if rows_:
+            if any(i is None for i in idx):
+                contradictions.append("an attempt carries no attempt_index")
+            elif idx != list(range(1, len(idx) + 1)):
+                if len(set(idx)) != len(idx):
+                    contradictions.append(f"duplicate attempt_index: {idx}")
+                elif 0 in idx:
+                    contradictions.append(f"attempt_index is zero-based: {idx}")
+                elif sorted(idx) != list(range(1, len(idx) + 1)):
+                    contradictions.append(f"attempt_index not 1..N: {idx}")
+                else:
+                    contradictions.append(f"attempt_index non-monotonic: {idx}")
+        if ex is not None:
+            declared = ex.get("attempts_observed")
+            if declared != len(rows_):
+                contradictions.append(
+                    f"the boundary declared {declared} attempt(s) but "
+                    f"{len(rows_)} row(s) carry this id")
+        if rs is not None and not rs.get("confirmed"):
+            contradictions.append(
+                f"context NOT restored: expected {rs.get('expected_after')!r}, "
+                f"observed {rs.get('context_after')!r}")
+        for fault in nesting_faults:
+            if str(cid) in fault:
+                contradictions.append(f"nesting: {fault}")
+
+        if contradictions:
+            state = CORRELATION_CONTRADICTORY
+        elif missing:
+            state = CORRELATION_INCOMPLETE
+        else:
+            state = CORRELATION_VALID
+        calls[str(cid)] = {"state": state, "attempts": len(rows_),
+                           "missing": missing, "contradictions": contradictions}
+
+    states = {c["state"] for c in calls.values()}
+    if CORRELATION_CONTRADICTORY in states:
+        overall = CORRELATION_CONTRADICTORY
+    elif CORRELATION_INCOMPLETE in states:
+        overall = CORRELATION_INCOMPLETE
+    elif states == {CORRELATION_VALID}:
+        overall = CORRELATION_VALID
+    else:
+        overall = CORRELATION_UNMEASURED
+    return {"state": overall, "calls": calls,
+            "nesting_faults": nesting_faults,
+            "licenses_grouping": overall in CORRELATION_LICENSING_GROUPING}
+
+
 def logical_call_grouping(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Can these attempts be grouped into their logical calls? Usually no.
 
