@@ -15791,3 +15791,45 @@ executed and produced its verdict.*
   recurrence MEASURED** · **Q6 UNMEASURED** · ownership **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * **Gate 1: TRANSPARENCY NOT PROVEN** until run 22 says otherwise.
+
+---
+
+## D236 — precision on D235's wording (correction, not an edit)
+
+D235 said *"Nothing else in the repository changed between `3a13100` and
+this entry."* That is true but reads as though HEAD still equals the
+tested tree. The precise form:
+
+> **No repository change occurred between `3a13100` and the
+> authoritative run binding. D235 was added afterward to record that
+> binding.**
+
+HEAD at the time of writing is **`c2faae4`**, already past
+`3a13100` by the D235 commit and this one — both `kai-pm/` only, which
+appears in no workflow `paths:` filter and therefore triggers no run.
+
+**Evidence identity is unchanged and unmovable:** run **31840265412**
+identifies tree **`3a13100`**. Documentation pushed afterwards cannot
+join that binding, and a later clean tree does not inherit its runtime
+proof — the same rule frozen in D221 for run 17.
+
+### The #59 / #60 / D226-D227 / #61 family stays a WORKING generalisation
+
+Not promoted to a universal rule. The shared shape, as far as four
+instances license:
+
+> Presence or configuration of a mechanism is not proof that the mechanism
+> executed, reached its intended subject, completed, and produced the
+> claimed verdict.
+
+Four instances is a pattern worth naming, not a law worth asserting.
+Formal generalisation waits for the methodology pass, where it gets bound
+to each commit, artifact and decision entry that earned it.
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 MEASURED — runs 17 + 18** · **cross-run
+  recurrence MEASURED** · **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* **Gate 1 pending.** Only the actual lifecycle evidence moves it —
+  not timing, not prior runs, not expectation.
