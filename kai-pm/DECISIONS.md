@@ -15929,3 +15929,68 @@ every row above.
   recurrence MEASURED (broad class)** · **within-call reproducibility
   MEASURED for run 22 only** · **Q6 UNMEASURED** · ownership **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+
+---
+
+## D238 — correction: an observed maximum is not a configuration claim
+
+D237 said the `max_retries=2` bound was *"now visible as fact rather than
+arithmetic — no call exceeds two attempts."* That sentence slides from an
+**observation** to a **configuration claim**. The correct form:
+
+> **Run 22 observed no logical call exceeding two attempts, which is
+> consistent with the configured retry contract.** The configuration
+> itself was not captured in this run's evidence.
+
+What run 22 measured is the observed maximum across three logical calls.
+`max_retries=2` is read from cognee's `ollama/adapter.py:130` — source,
+not runtime evidence. A capture that never exceeds two attempts is
+consistent with that source reading and does not independently establish
+it; a run in which every call happened to succeed or fail once would look
+identical on this axis.
+
+Same family as the D215/D222 layer discipline: the evidence licenses the
+observation, not the stronger statement standing behind it.
+
+### Precommitted criteria for a second independent correlated capture
+
+Frozen now, before any such run exists, so the interpretation cannot be
+chosen afterwards. **Not yet authorised** — recorded so that authorisation
+does not have to carry the definition with it.
+
+1. **Gate 1 must again be `CORRELATION_VALID`.** Anything else → stop, Q6
+   remains UNMEASURED, no within-call analysis.
+2. **At least one logical call must actually retry.** No retries → Q6
+   remains UNMEASURED, because the required population did not occur.
+   That is neither a pass nor a failure.
+3. If retries occur, compare on the same axes run 22 used: **contract
+   stability across the retry**, **repair-context change**, **failure
+   class**, **byte identity**.
+4. **Only then** may cross-run retry-level reproducibility be assessed,
+   over a denominator of two.
+5. **A different result is reported as a different result.** If the second
+   capture shows a retry that changes class — or no retries at all — that
+   is the finding. The criterion does not move to accommodate it, and
+   run 22 is not re-read in its light.
+6. **No instrument redesign.** The correlation instrument has produced
+   the evidence it was built to produce; changing it would break the
+   independence of the second sample.
+
+### The three claims, kept at their own strengths
+
+| claim | state | denominator |
+|---|---|---|
+| broad schema-echo recurrence | **MEASURED** | runs 17, 18, 22 |
+| within-call retry reproducibility | **MEASURED** | run 22 only |
+| cross-run retry-level reproducibility (**Q6**) | **UNMEASURED** | 1 — needs 2 |
+
+Runs 17 and 18 cannot be retrofitted into the second row: they carry no
+lifecycle correlation, so they cannot evidence retry-level behaviour
+however many attempts they contain.
+
+### Status — unchanged
+
+* **Q1** partial · ownership **unmoved** · **048 C — BLOCKED. 049/050 —
+  CLOSED. 051/#58 — OPEN, separate.**
+* No model, timeout, retry, schema, validator, Q6-definition, ownership or
+  topology change.
