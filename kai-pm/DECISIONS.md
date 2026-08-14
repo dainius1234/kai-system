@@ -13952,3 +13952,103 @@ construction — run 13's mistake — fails
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — separate, OPEN.**
 * No mode, model, timeout, retry, schema, validator or topology change.
 * The next capture run fires only behind a passing transparency selftest.
+
+---
+
+## D218 — run 16: the gate refused. Criterion 5 was never injected
+
+**Run 16 = 31818649519, commit `b72efa2`, job `memu-graph-llm-contract`
+= 94826328804.** Run id looked up, not guessed. The capture step failed
+after 92 s — selftest speed, not capture speed.
+
+### The gate did its job
+
+```
+CAPTURE POINT NOT TRANSPARENT: exception_type_preserved,
+                               exception_value_preserved
+Refusing to spend a full capture run on a hook that is not proven
+observational.
+MEASUREMENT ABORTED: THE CAPTURE POINT IS NOT TRAVERSED.
+```
+
+`capture.jsonl` held **0 llm-call rows**; the summariser returned
+*"NOT COLLECTED … Q1/Q2/Q6 are UNMEASURED, which is not the same as 'no
+mismatch'."* This is the operator's **outcome 1 of three**: selftest
+fails → instrument failure → **Q1/Q2/Q6 unchanged**.
+
+### What actually failed — and it is not what the criterion name says
+
+Nine of eleven criteria passed:
+
+```
+wrapper_is_sync true · original_is_sync true · convention_matches true
+traversed true · original_executed true
+exactly_once_per_wrapper_call true
+rows_tagged_raw_layer true · rows_tagged_selftest_phase true
+exception_not_swallowed true
+exception_type_preserved FALSE · exception_value_preserved FALSE
+```
+
+The two failures are **an injection defect in the control, not evidence
+that the wrapper rewrites exceptions**:
+
+* `install_capture` binds `original = Completions.create` as a **closure
+  local** (line 113) and calls it at line 144.
+* `selftest` injects its stand-in by swapping **`STATE["original"]`**
+  (line 322) — a key the wrapper never reads.
+
+So the stand-in never ran. The wrapper called the **real**
+`Completions.create` with a `_Fake()` receiver, and openai raised
+`AttributeError: '_Fake' object has no attribute '_post'` from its own
+internals. Compared against a `RuntimeError` sentinel, type and value
+differ — correctly, and for the wrong reason.
+
+**Reproduced locally**, same shape, no cognee: swapping `STATE["original"]`
+after installation leaves the wrapper calling the original it closed over
+(`wrapper returned: REAL ORIGINAL RAN`; the sentinel never raised).
+
+### The claim this licenses, and the one it does not
+
+Criterion 5 is **UNMEASURED**, not failed. Nothing here says the wrapper
+mangles exceptions; nothing here says it doesn't. An uninjected control
+produces no evidence in either direction, and *unmeasured is not a pass* —
+which is exactly why the gate refusing was the right outcome. Recording
+this as "the hook is not exception-transparent" would repeat D215's error
+one layer down.
+
+### The one thing run 16 did establish
+
+The selftest's own ping reached the **raw** boundary and came back
+visible — the first time this instrument has seen a raw completion:
+
+```
+attempt 1 · phase selftest · layer RAW_MODEL_RESPONSE
+mode json_mode (client .mode = <Mode.JSON: 'json_mode'>)
+conveyance: schema in message prose + response_format {'type':'json_object'}
+raw_response: {"answer": "ping"}   finish_reason stop   elapsed 19.794 s
+```
+
+The altitude repair is therefore **confirmed at runtime**: raw text is
+readable at `Completions.create`, and the row is tagged
+`RAW_MODEL_RESPONSE`. But this is the **selftest's** ping, counted in
+`selftest_rows_excluded_from_q6: 1` and excluded by construction. It is
+capability evidence about the instrument. It is **not** evidence about
+the cognify path, and **Q2 remains UNMEASURED**.
+
+### Wording, per the operator's freeze
+
+Selftest row 2 reached the `RAW_MODEL_RESPONSE` phase in the
+implementation and carries `transport_error`. It is **not** a raw model
+response. The correct statement is:
+
+> **RAW_MODEL_REQUEST observed; no raw model response returned;
+> transport error observed.**
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 UNMEASURED** · **Q6 UNMEASURED** · ownership
+  **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — separate, OPEN.**
+* No mode, model, timeout, retry, schema, validator or topology change.
+* No repair applied. The injection defect is reported, not fixed —
+  authorisation pending.
