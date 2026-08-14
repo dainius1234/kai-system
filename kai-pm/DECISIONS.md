@@ -14782,3 +14782,127 @@ is untouched. **Q6 remains UNMEASURED.**
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * Evidence under re-analysis belongs to run **31821368040** (`f1fdf92`).
   The ANALYSER is `397da5a`. Neither inherits the other's proof.
+
+---
+
+## D225 — Q2 MEASURED: 5/5 raw attempts returned the SCHEMA
+
+Run 18 = **31824584514**, job `memu-graph-llm-reanalysis` = **94845575742**.
+Looked up, not guessed. Completed in **12 seconds**, no image build, **no
+model call**.
+
+**Provenance, kept separate:** the EVIDENCE is run **31821368040**'s
+(`f1fdf92`); the ANALYSER is `397da5a`. Neither inherits the other's
+proof. The job printed exactly that before analysing anything.
+
+### The result
+
+```
+inspected: 5 production model call(s)      capture: 23595 bytes, 10 records
+
+ # layer               contract    prompt~c  schema~c   resp~b   classification  elapsed
+ 1 RAW_MODEL_RESPONSE  RECOVERED  dc203ead5 89def7469 44df0fae2  SCHEMA ECHO     176.124
+ 2 RAW_MODEL_RESPONSE  RECOVERED  a6e5e25d2 fd7b68067 73d7a848a  SCHEMA ECHO      45.818
+ 3 RAW_MODEL_RESPONSE  RECOVERED  ae4766ba0 fd7b68067 56766f647  SCHEMA ECHO      50.645
+ 4 RAW_MODEL_RESPONSE  RECOVERED  a6e5e25d2 fd7b68067 f9f04a63a  SCHEMA ECHO      12.249
+ 5 RAW_MODEL_RESPONSE  RECOVERED  83b2f7e40 fd7b68067 8b763bb1e  SCHEMA ECHO      49.545
+
+Q2 at RAW_MODEL_RESPONSE: 5 attempt(s), verdicts SCHEMA ECHO
+MEASURED: at least one attempt returned the SCHEMA where an INSTANCE was
+required. A measurement result, not an instrument failure.
+```
+
+**The contract was recovered on every attempt, from that attempt's own
+system message** — attempt 1 at chars 2529-4422, attempts 2-5 at chars
+1029-1588. Nothing was reached down from the outer caller.
+
+Per-attempt detail:
+
+* **attempt 1** — contract required `['edges', 'nodes']`; the reply is
+  schema-shaped but *describes* `[]`. What it does contain is **not
+  established** from this output alone; the raw text is in the artifact.
+* **attempts 2-5** — contract required `['summary']`; each reply
+  *describes* `['summary']` instead of *carrying* it. A textbook echo: the
+  model returned the definition of `SummarizedContent` rather than an
+  instance of it.
+* every row: *"schema-shaped but not the contract this attempt was sent"*
+  — so the echoes are **not canonically identical** to the schema sent.
+  Near-misses, not verbatim reflections. What differs is not established.
+
+**So Q2 moves: UNMEASURED → MEASURED.** At `RAW_MODEL_RESPONSE`, on the
+five production attempts run 17 captured, the model returned a schema
+where an instance was required, **5 of 5**.
+
+This is the first time that claim has rested on raw bytes classified
+against the contract each attempt actually carried, rather than on a
+cognee log line or an instructor return value.
+
+### What this cost
+
+**Nothing.** No model invocation. The bytes were captured on 2026-08-14 at
+16:56-17:04 by run 17; what had failed was the analyser. Re-analysis of
+stored evidence turned an instrument failure into a measurement for the
+price of a 12-second job.
+
+### The limits, each checked rather than assumed
+
+**Dialect (D224 §1) — MOOT for this result.** No `VALID INSTANCE` was
+produced, so no JSON Schema validation was reached: `classify` returns at
+the schema-echo question, before the validator. The hard-coded
+Draft 2020-12 therefore bears on **nothing** here. The defect remains real
+and unrepaired for any future run that does reach validation.
+
+**Validator version — CI ran `jsonschema 4.10.3`, not the 4.26.0 I
+calibrated against locally.** The calibration step ran in the same job,
+under the same 4.10.3, and passed. So the analysis and its calibration
+share a validator version; the local 4.26.0 result is corroboration, not
+the basis.
+
+**Corroboration NONE (D224 §2).** `instructor available: False` on the
+runner, so the structural rule stood alone, exactly as predicted and
+recorded. The claim stays bounded to **instructor 1.15.1, `Mode.JSON`,
+OpenAI provider, run 31821368040's rows**. It is not evidence that any
+other framework, mode or version puts its contract there.
+
+**Exit code (D224 §3) — the ambiguity was live.** The job went red on
+exit 1, which covers both *"the analyser refused"* and *"the analyser
+measured, and the answer is adverse"*. This was the second. The colour did
+not say which; the text did. The frozen reading rule was needed on its
+first use.
+
+### Q6 — still UNMEASURED, and the temptation is named
+
+```
+raw attempts 5 · distinct prompts 4 · distinct contracts 2 · distinct responses 5
+logical calls: UNAVAILABLE — no attempt carries a logical-call identifier
+```
+
+**Two distinct contracts appear across the five rows.** That is a fact
+about contract diversity. It is *not* used to group: schema hash is on the
+refused-signals list precisely because "same contract" does not mean "same
+invocation" — a contract can repeat across separate calls, and cognee
+issues many. Noting a lower bound on how many distinct contracts were in
+play is not the same as assigning rows to calls, and only the second would
+answer Q6.
+
+So: which failures reproduced **within** a structured-output invocation
+remains unknown, and the cross-run component is untouched.
+**Q6 UNMEASURED.** The next measurement requirement is unchanged: a
+correlation id minted at the outer invocation and carried into every retry.
+
+### Ownership — NOT concluded
+
+Four owners remain live: prompt construction, adapter mode selection,
+model compliance, the validator. A schema echo under `json_mode` is
+consistent with more than one of them, and this table is the evidence for
+that decision, not the decision. No remedy authorised: no mode change, no
+model swap, no timeout or retry change, no schema edit, no validator
+change.
+
+### Status
+
+* **Q1** partial · **Q2 MEASURED — 5/5 SCHEMA ECHO at RAW_MODEL_RESPONSE
+  on run 31821368040's attempts** · **Q6 UNMEASURED** · ownership
+  **unmoved**.
+* **048 C — still BLOCKED as a whole. 049/050 — CLOSED. 051/#58 — OPEN,
+  separate.**
