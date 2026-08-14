@@ -12188,3 +12188,116 @@ Queued with the axis-2 identity work.
 
 **Ordering note (R1):** this entry is written *before* the contract run
 reports. Whatever it shows, the rule above was fixed in advance.
+
+---
+
+## D201
+
+**2026-08-13 — KAI-GATE-050 REPRODUCED 2/2 on clean stacks. The
+predicate/signal mismatch is now runtime-reproduced, not source-inferred.**
+
+Run **31751191404**, job **94617067972**, measurement commit **`ffd92b6`**,
+tree `1e8c22be`, dirty 0. Collection 22:46:24 → 23:03:18.
+
+**Provenance, kept separate on purpose:**
+
+| | commit | what it is |
+|---|---|---|
+| measurement | **`ffd92b6`** | the collector bytes under test |
+| interpretation | **`8807e06`** | D200 only, `kai-pm/DECISIONS.md`, no code, written before this result existed |
+
+`kai-pm/` appears in none of the workflow's 22 `paths:` entries, which is
+why `8807e06` neither triggered a competing run nor entered the measured
+tree. The interpretation rules were **not** part of the measured
+collector.
+
+### The correlation
+
+| stack | `add` terminal | `cognify` terminal | cognee failure signal / return | HTTP status / body | 502 observed? | verdict |
+|---|---|---|---|---|---|---|
+| **1** clean | `7464f1cd…` **COMPLETED** | `084851e5…` **ERRORED** | `PipelineRunFailedError … (Status code: 422)` ×1 — logged, **not raised** | `200` · `{"status":"ingested","source_id":"kai-gate-050-obs-1","data_id":null}` | **no** | **SUCCESS-SHAPED FAILURE** |
+| **2** clean | `7464f1cd…` **COMPLETED** | `084851e5…` **ERRORED** | `PipelineRunFailedError … (Status code: 422)` ×2 — logged, **not raised** | `200` · `{"status":"ingested","source_id":"kai-gate-050-obs-2","data_id":null}` | **no** | **SUCCESS-SHAPED FAILURE** |
+
+```
+DENOMINATOR: 2 observation(s); 2 success-shaped failure(s),
+             0 consistent, 0 unmeasured, 0 inverted
+```
+
+Observation 2 recorded `RETURNED http-post status=200 elapsed=369.1s`.
+
+### The three questions
+
+**1. Reproduces N/N?** **Yes — 2/2**, two independent clean stacks
+(`down -v` and a fresh `up` between, so neither shares cognee's
+databases, dataset or pipeline cache).
+
+**2. Is the 502 branch reachable for this specific returned
+pipeline-failure mode?** **Not observed — 0 of 2.** Both returned 200.
+Scoped exactly as D200 requires: *the 502 exception branch is unreachable
+for the observed cognee pipeline-failure mode if that mode is returned
+rather than raised.* Other failure classes may still raise and reach it;
+nothing here measures those.
+
+**3. Does anything change the queue?** One demotion. The run produced
+**usable terminal markers, 0 UNMEASURED** — cognee had already logged
+`Pipeline run errored` for `084851e5` by the time the collector read the
+file, in both observations. No terminal-marker lag was observed on this
+path, so the **settling poll is DEFERRED — not warranted by current
+observations**. Deferred, not cancelled: absence of lag in two
+observations is not proof it cannot occur, and the calibrated UNMEASURED
+protection stays in place regardless.
+
+### Why this evidence is good
+
+The **built-in control pair worked**. In the *same request, same log*,
+the `add` pipeline reached COMPLETED while the `cognify` pipeline reached
+ERRORED. So the detector demonstrated it can distinguish a valid terminal
+success from a terminal failure, rather than merely flagging everything —
+and it did so without depending on a successful cognify, which a CPU
+runner may never produce.
+
+### The defect, no longer hypothetical
+
+**Predicate/signal mismatch.** `cognify` reaches a terminal ERRORED state
+with `PipelineRunFailedError` / 422, but `/graph/ingest` returns
+`200 {"status":"ingested"}` because the returned failure signal is
+discarded and the endpoint treats *"no exception raised"* as success.
+
+The API boundary remains blind to pipeline failure **while its exception
+handler is intact**.
+
+### Held explicitly uninterpreted
+
+* The pipeline UUIDs are **identical across both clean stacks**
+  (`7464f1cd`, `084851e5`), so they are pipeline identity, not run
+  identity, and are unsuitable as a run key. Nothing more is claimed.
+* Observation 2 logged the 422 **twice** where observation 1 logged it
+  once. A reproducibility detail; **cause UNKNOWN**.
+
+### State after D201
+
+* **KAI-GATE-048 C — BLOCKED** by two independent defects:
+  1. `cognify` graph extraction terminates **ERRORED**;
+  2. `/graph/ingest` can promote that terminal failure into a
+     success-shaped HTTP response.
+* **KAI-GATE-049 — OPEN.** Stage ownership and return semantics measured;
+  execution-state axis still **provisional**.
+* **KAI-GATE-050 — OPEN**, runtime-reproduced 2/2, **unremediated**.
+* **Settling poll — DEFERRED**, not warranted by current observations.
+* **Next: #56**, process/container continuity instrumentation.
+
+### Repair direction, constrained but not decided
+
+Any eventual KAI-GATE-050 repair must **inspect and validate cognee's
+returned pipeline result/state**. Not "add another exception handler" —
+the handler is already there and already correct for the failures it can
+see.
+
+This does **not** settle the response contract. Whether the correct
+external form is a 502, or another explicit failure representation, is a
+later remediation decision. What is settled is **where the blindness
+occurs**.
+
+No remediation performed: no timeout change, no model change, no cognee
+modification, no endpoint fix, no memu-graph production change, no
+Phase 2.
