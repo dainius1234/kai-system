@@ -14906,3 +14906,81 @@ change.
   **unmoved**.
 * **048 C — still BLOCKED as a whole. 049/050 — CLOSED. 051/#58 — OPEN,
   separate.**
+
+---
+
+## D226 — observer liveness, and cross-run recurrence ≠ Q6
+
+Frozen before run 18's capture reports.
+
+### 1. Zero output is not a state
+
+The strengthened rule, in the operator's wording:
+
+> **Before silence can be interpreted as "nothing changed," the observer
+> must prove it successfully observed the subject during that interval.**
+
+The failure was not that the job stayed unchanged. The **observer never
+reached GitHub**: the shell in this session is answered by the proxy with
+`403 "GitHub access is not enabled for this session"`, and the watcher
+wrapped its parse in `except: sys.exit(0)`, so a 403 body became zero
+output. **Observer failure and world-state stability produced the
+identical signal.** Only the MCP tools can reach the API from here; no
+shell-based watcher is possible at all.
+
+A monitor must therefore emit an explicit state every interval:
+
+```
+OBSERVED / SUBJECT_UNCHANGED
+OBSERVED / SUBJECT_CHANGED
+OBSERVER_FAILURE          <- and say what failed
+```
+
+Never nothing. What found this was checking the observer's own liveness
+**before** relying on its silence — the same move as R9, from the side
+where the instrument sees nothing and reports the world.
+
+**Queued for the later documentation milestone** (task #59's family, a
+second concrete instance beside the seven-file `paths:` finding). Not
+written into `ORION_FIELD_NOTES.md` now — that pass is not authorised.
+
+### 2. Cross-run recurrence is a DIFFERENT question from Q6
+
+> **Cross-run recurrence of the failure class can become measured even
+> while retry-level reproducibility within logical calls remains
+> UNMEASURED.**
+
+Two questions, two denominators, and forcing them into one would be the
+same defect as counting five raw rows as one retry sequence:
+
+| question | denominator | state |
+|---|---|---|
+| does the failure CLASS recur across runs? | independent captures | measurable now |
+| do failures reproduce across retries WITHIN a logical call? | attempts grouped by invocation | **UNMEASURED** — no correlation id exists |
+
+Run 18's capture is valuable as an **independent second sample**, not as a
+completion of Q6. If it differs from run 17, that difference is **new
+evidence**; it does not invalidate D225, whose claim is already scoped to
+run 31821368040's rows.
+
+### 3. The three statements required when it lands
+
+1. **Q2** — what did *this* independent raw capture return?
+2. **Cross-run recurrence** — same failure class as run 17, a different
+   class, or mixed?
+3. **Q6** — still UNMEASURED unless logical-call correlation exists in the
+   rows, which it does not.
+
+### 4. Ownership does not move on recurrence
+
+Repeated raw schema echoes locate **where** the malformed output exists.
+They do not say whether the primary cause is instructor's transformed
+prompt/mode, the contract construction, or model compliance. Those remain
+three live owners with three different remedies.
+
+### Status
+
+* **Q1** partial · **Q2 MEASURED** (run 31821368040, 5/5 SCHEMA ECHO at
+  RAW_MODEL_RESPONSE) · **Q6 UNMEASURED** · **cross-run recurrence
+  UNMEASURED, pending run 18** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
