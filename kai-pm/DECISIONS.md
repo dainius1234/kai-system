@@ -13487,3 +13487,104 @@ recorded so it is not rediscovered as a surprise.
 * **KAI-GATE-049 — CLOSED. KAI-GATE-050 — CLOSED.**
 * No mode, model, timeout, retry, schema, validator or topology change.
 * Run 15 proceeds only if the selftest proves the hook transparent.
+
+---
+
+## D214
+
+**2026-08-14 — KAI-GATE-051 OPENED (blocking sync LLM client), and the
+run-15 selftest's scope stated BEFORE it reports.**
+
+`kai-pm/` only; no code touched while run 15 is live.
+
+### KAI-GATE-051 — OPENED, separate from the contract failure
+
+Identifier confirmed unused before claiming it: highest allocated was
+050.
+
+> **`acreate_structured_output` is an `async def` that calls a
+> SYNCHRONOUS OpenAI client with no `await` and no thread offload, so the
+> LLM call blocks the event loop for its entire duration.**
+
+Established from installed source (D213):
+
+```python
+# cognee .../llm/ollama/adapter.py:75, :118
+self.aclient = instructor.from_openai(OpenAI(base_url=...), ...)   # SYNC client
+async def acreate_structured_output(...):
+    response = self.aclient.chat.completions.create(...)           # NO await
+    return response
+```
+
+**Independent corroboration, from evidence banked before the mechanism
+was known:** D197 recorded that run 9's
+`asyncio.gather(extract_graph_from_data, summarize_text)` produced
+**sequential** ollama completions — 4m0s, then 1m4s, then 1m15s — where
+concurrency was implied. A blocking call inside the coroutine explains
+exactly that. Two unrelated sources agreeing (I-8).
+
+**KAI-GATE-048 C therefore likely contains TWO independent problems:**
+
+1. the structured-output **contract** failure (schema echo);
+2. **synchronous LLM calls blocking async concurrency**.
+
+They are not the same defect and must not be conflated: blocking would
+not cause a schema echo, and a schema echo would not cause sequential
+execution. 051 may explain a large share of the ~391s latency; it
+explains **none** of the semantic failure.
+
+**Not remediated. Not started.** Queued behind the contract capture.
+
+### The run-15 selftest proves LESS than the operator's criterion
+
+Stated now, so a pass is not over-read.
+
+The criterion: *hook fired → original `create_fn` executed **exactly
+once** → same return/exception semantics reached the caller.*
+
+What the shipped selftest actually asserts:
+
+```python
+observed = after - before
+if observed < 1:   # AT LEAST ONE
+```
+
+So it proves **only** that the hook was traversed at least once. It does
+**not** assert:
+
+* that the **original** was executed (the wrapper could record and not
+  forward — precisely run 14's defect);
+* **exactly once** rather than one-or-more;
+* that the **return value** reached the caller unchanged;
+* that **exception** behaviour propagated.
+
+A passing selftest in run 15 therefore licenses exactly one sentence:
+**the hook is on the path.** It does not license "the hook is
+transparent."
+
+Two things partly cover the gap, and neither is the assertion:
+
+* the calibration checks the shipped text for a sync wrapper, synchronous
+  un-awaited forwarding, and a re-raise — **static** evidence, not
+  runtime;
+* run 14's failure mode is now impossible in the same way, because a
+  sync wrapper's body runs when called.
+
+**Strengthening the selftest to assert executed-exactly-once and
+semantics-propagated is the next instrument change**, and it is not made
+while run 15 is live.
+
+### Run 15's decision tree — fixed in advance
+
+| outcome | reading |
+|---|---|
+| selftest fails | instrument still unproven; Q1/Q2/Q6 **UNMEASURED** |
+| selftest passes, capture gets calls | first valid contract evidence — *hook on path*, not *proven transparent* |
+| raw completion unavailable | **Q2 stays explicitly UNMEASURED.** No fabrication, and Q2 is not weakened to complete the table |
+| multiple retries captured | compare prompt/schema/response per attempt exactly as D209 defines — response byte-level, prompt and schema canonical |
+
+### Standing
+
+* **KAI-GATE-048 C — BLOCKED.** **KAI-GATE-051 — OPEN**, unremediated,
+  queued. **049 — CLOSED. 050 — CLOSED.**
+* No mode, model, timeout, retry, schema, validator or topology change.
