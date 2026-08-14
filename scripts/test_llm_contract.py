@@ -26,7 +26,7 @@ import classify_llm_response as c  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 7
+EXPECTED_SCENARIOS = 8
 executed: list[str] = []
 
 
@@ -236,6 +236,44 @@ def test_the_collector_gates_on_the_selftest() -> None:
           "instructor_holds_" in probe, "")
 
 
+def test_the_wrapper_preserves_the_callable_convention() -> None:
+    """THE new invariant, from run 14.
+
+    An observation wrapper must preserve not only arguments and return
+    values but the CALLABLE CONVENTION: sync/async behaviour, exception
+    behaviour, and the number of underlying calls. A wrapper that turns
+    sync into async is an actuator, not an observer — it returns a
+    coroutine the caller never awaits, so the original is never invoked
+    and the call is replaced rather than observed.
+
+    Checked against the shipped probe text, because this rule is about
+    what is in the file, not about what was intended."""
+    scenario("wrapper preserves convention")
+    probe = (REPO / "scripts" / "security" /
+             "probe_llm_contract.py").read_text()
+    check("no async wrapper remains",
+          "async def capturing" not in probe, "")
+    check("the wrapper is a plain sync def",
+          "def capturing_create(*args, **kwargs):" in probe, "")
+    check("and it forwards synchronously, not awaited",
+          "result = original(*args, **kwargs)" in probe
+          and "await original(" not in probe, "")
+    check("exception behaviour is preserved by re-raising",
+          "raise          # exception behaviour preserved exactly" in probe, "")
+    # ONE hook, chosen on evidence — not both
+    check("exactly one hook is installed",
+          probe.count('resolved["hooked_points"] = ') == 1, "")
+    check("and it is instructor.create_fn",
+          '"hooked_points"] = ["instructor.create_fn"]' in probe, "")
+    check("the dropped boundary's reason is recorded",
+          "captured AT CONSTRUCTION" in probe, "")
+    check("the convention is recorded alongside the hook",
+          "hook_convention" in probe, "")
+    # raw text absence must be declared, never guessed
+    check("an unreachable raw completion is declared, not invented",
+          "raw text NOT captured at this boundary" in probe, "")
+
+
 def run_all() -> None:
     test_schema_and_instance_are_never_confused()
     test_all_four_kinds_stay_four_verdicts()
@@ -244,6 +282,7 @@ def run_all() -> None:
     test_hashes_measure_identity()
     test_the_summariser_reports_and_refuses()
     test_the_collector_gates_on_the_selftest()
+    test_the_wrapper_preserves_the_callable_convention()
 
     kinds = [c.VALID_INSTANCE, c.SCHEMA_ECHO, c.OTHER_INVALID, c.NO_RESPONSE]
     print(f"  inspected: {len(kinds)} response kind(s) discriminated: {kinds}")

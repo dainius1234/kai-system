@@ -120,17 +120,42 @@ def install_capture() -> dict:
         if held is not None:
             resolved[f"instructor_holds_{attr}"] = repr(held)[:200]
 
-    completions = getattr(getattr(inner, "chat", None), "completions", None)
-    if completions is None or not hasattr(completions, "create"):
-        resolved["capture"] = "NOT INSTALLED — could not locate the inner client"
+    # ── THE HOOK, chosen from installed-source evidence ──────────────
+    #
+    # Read out of instructor 1.15.1 and cognee 1.1.3 in this image:
+    #
+    #   adapter.py:75   instructor.from_openai(OpenAI(base_url=...), ...)
+    #                   -> a SYNCHRONOUS OpenAI client, so from_openai
+    #                      returns the SYNC `Instructor`.
+    #   client.py:230   self.create_fn = create
+    #                   -> the bound method is captured AT CONSTRUCTION,
+    #                      so replacing `inner.chat.completions.create`
+    #                      afterwards is never consulted. H1 CONFIRMED,
+    #                      and that is why run 13 captured nothing.
+    #   client.py:376   return self.create_fn(...)
+    #                   -> the SYNC client calls it WITHOUT `await`.
+    #
+    # So there is exactly ONE boundary that is both traversed and
+    # patchable after construction: `aclient.create_fn`. Run 14 proved it
+    # is traversed — a coroutine object existed, so it was called. And it
+    # must be wrapped SYNCHRONOUSLY, because wrapping a sync callable in
+    # `async def` returns a coroutine the caller never awaits: the
+    # original is then never invoked and the wrapper has replaced the
+    # call instead of observing it. That was run 14's defect, and it is
+    # why only one hook is installed now: more hooks are only safer if
+    # each is independently transparent.
+    original = getattr(aclient, "create_fn", None)
+    if not callable(original):
+        resolved["capture"] = ("NOT INSTALLED — instructor client exposes no "
+                               "callable create_fn")
         emit(resolved)
         return resolved
 
-    original = completions.create
     state = {"attempt": 0, "hooks_fired": set()}
 
-    async def capturing_create(*args, **kwargs):
-        state["hooks_fired"].add("inner.chat.completions.create")
+    def capturing_create(*args, **kwargs):
+        """SYNC wrapper for a SYNC callable. Convention-preserving."""
+        state["hooks_fired"].add("instructor.create_fn")
         state["attempt"] += 1
         attempt = state["attempt"]
         started = time.monotonic()
@@ -141,53 +166,59 @@ def install_capture() -> dict:
             "messages": kwargs.get("messages"),
             "model": kwargs.get("model"),
             "temperature": kwargs.get("temperature"),
+            "response_model": _serialise(kwargs.get("response_model"))
+            if kwargs.get("response_model") is not None else None,
             "response_format": _serialise(kwargs.get("response_format"))
             if kwargs.get("response_format") is not None else None,
             "tools": kwargs.get("tools"),
+            "max_retries": repr(kwargs.get("max_retries")),
             "other_params": sorted(k for k in kwargs
                                    if k not in ("messages", "model",
-                                                "temperature",
+                                                "temperature", "max_retries",
+                                                "response_model",
                                                 "response_format", "tools")),
         }
         try:
-            # STRICT PASS-THROUGH: same args, same kwargs, unaltered result.
-            result = await original(*args, **kwargs)
+            # STRICT PASS-THROUGH: same args, same kwargs, same call
+            # convention, result returned unaltered.
+            result = original(*args, **kwargs)
         except Exception as exc:  # noqa: BLE001
             record["elapsed_s"] = round(time.monotonic() - started, 3)
             record["raw_response"] = None
             record["transport_error"] = f"{type(exc).__name__}: {exc}"
             emit(record)
-            raise
+            raise          # exception behaviour preserved exactly
         record["elapsed_s"] = round(time.monotonic() - started, 3)
-        # Q2 — the raw content, before any cognee/pydantic transformation.
-        try:
-            record["raw_response"] = result.choices[0].message.content
-            record["finish_reason"] = result.choices[0].finish_reason
-        except Exception:  # noqa: BLE001
-            record["raw_response"] = None
-            record["raw_response_note"] = "unexpected response shape"
+        # instructor returns the VALIDATED model here, not the raw
+        # completion, so the raw text is recovered from the attached
+        # completion when instructor exposes it. Recorded as absent
+        # rather than guessed when it is not.
+        raw = None
+        for holder in (getattr(result, "_raw_response", None), result):
+            try:
+                raw = holder.choices[0].message.content
+                break
+            except Exception:  # noqa: BLE001
+                continue
+        record["raw_response"] = raw
+        if raw is None:
+            record["raw_response_note"] = (
+                "instructor returned a validated object with no reachable "
+                "raw completion — raw text NOT captured at this boundary")
+        record["result_type"] = type(result).__name__
         emit(record)
         return result
 
-    completions.create = capturing_create
+    try:
+        aclient.create_fn = capturing_create
+    except Exception as exc:  # noqa: BLE001
+        resolved["capture"] = f"NOT INSTALLED — create_fn not writable: {exc}"
+        emit(resolved)
+        return resolved
 
-    # BOTH candidate boundaries are hooked, because run 13 showed that
-    # choosing one and assuming it is on the path is exactly the error.
-    # Whichever actually fires is recorded; neither alters semantics.
-    hooked = ["inner.chat.completions.create"]
-    bound = getattr(aclient, "create_fn", None)
-    if callable(bound):
-        async def capturing_bound(*args, **kwargs):
-            state["hooks_fired"].add("instructor.create_fn")
-            return await capturing_create(*args, **kwargs)
-        try:
-            aclient.create_fn = capturing_bound
-            hooked.append("instructor.create_fn")
-        except Exception:  # noqa: BLE001 — a read-only attribute is a fact, not a crash
-            resolved["create_fn_not_patchable"] = True
-
-    resolved["capture"] = f"INSTALLED at {', '.join(hooked)}"
-    resolved["hooked_points"] = hooked
+    resolved["capture"] = "INSTALLED at instructor.create_fn (sync)"
+    resolved["hooked_points"] = ["instructor.create_fn"]
+    resolved["hook_convention"] = "sync — matches client.py:376 `return self.create_fn(...)`"
     emit(resolved)
     STATE["capture"] = state
     return resolved

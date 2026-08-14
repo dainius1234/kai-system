@@ -72,7 +72,11 @@ timeout 300 docker compose -f "$COMPOSE" exec -T "$SERVICE" \
     > "$LOGDIR/selftest.log" 2>&1
 selftest_rc=$?
 record "  selftest exit: ${selftest_rc}"
-tail -n 6 "$LOGDIR/selftest.log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+# 40, not 6: run 14's H1/H2 identity evidence WAS captured and then
+# fell outside a 6-line tail, so it survived only in an artifact this
+# environment cannot download. An excerpt narrower than the evidence
+# it carries is R10 in miniature.
+tail -n 40 "$LOGDIR/selftest.log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
 if [ "$selftest_rc" -ne 0 ]; then
   record ""
   record "MEASUREMENT ABORTED: THE CAPTURE POINT IS NOT TRAVERSED."

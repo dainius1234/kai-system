@@ -13356,3 +13356,134 @@ one.
   instructor's actual calling convention from its installed source in the
   image, and read H2's identity evidence out of the artifact — all before
   another capture run.
+
+---
+
+## D213
+
+**2026-08-14 — installed-source inspection settles it: BOTH capture
+failures were one defect of mine, a sync/async convention violation. Hook
+repaired to a single, convention-preserving boundary.**
+
+Order followed as authorised: read the installed source **first**, then
+recover H2, then repair.
+
+### 1. The installed source — three facts, all decisive
+
+Read from `instructor 1.15.1` (the version the image build log pins) and
+cognee 1.1.3, not from upstream docs:
+
+```python
+# cognee .../llm/ollama/adapter.py:75
+self.aclient = instructor.from_openai(
+    OpenAI(base_url=self.endpoint, api_key=self.api_key),   # <- SYNCHRONOUS
+    mode=instructor.Mode(self.instructor_mode))
+
+# instructor/core/client.py:230   (sync Instructor)
+self.create_fn = create          # <- BOUND AT CONSTRUCTION
+
+# instructor/core/client.py:376   (sync Instructor)
+return self.create_fn(...)       # <- CALLED WITHOUT await
+```
+
+**H1 is CONFIRMED, and it is why run 13 captured nothing:** `create_fn`
+is bound at construction, so replacing `inner.chat.completions.create`
+afterwards is never consulted.
+
+**And run 14's failure is the same defect wearing different clothes.**
+Because the client is the **synchronous** `OpenAI`, `from_openai` returns
+the **sync** `Instructor`, whose `create_fn` is invoked **without
+`await`**. My `async def` wrapper therefore returned a coroutine nobody
+awaited — body never ran, original never forwarded.
+
+So both hooks failed for **one** reason, and it was mine: **I wrapped
+synchronous callables in `async def`.**
+
+### The invariant, as the operator stated it
+
+> An observation wrapper must preserve not only arguments and return
+> values, but also the callable convention: sync/async behaviour,
+> exception behaviour, object identity where relevant, and number/order
+> of underlying calls. **A wrapper that changes sync→async or async→sync
+> is an actuator, not an observer.**
+
+### 2. H2 — and an honest failure to recover it
+
+`get_llm_client_stable` and the object ids **were captured** in run 14's
+`resolved-config` record. They are unreachable from here: the collector
+tails only **6 lines** of `selftest.log`, so they never reached the job
+log, and artifact 9221516529's download host is denied by this
+environment's network policy (D198).
+
+The excerpt was narrower than the evidence it carried — **R10 in
+miniature**. Widened to 40 lines, so the next run surfaces it without a
+dedicated one. H2 remains **unrecovered and unasserted**; it is also now
+**moot**, because H1 alone explains both failures.
+
+### 3. The repair — ONE hook, chosen on evidence
+
+`instructor.create_fn`, wrapped **synchronously**. It is the only
+boundary satisfying both of the operator's criteria:
+
+* **traversed** — run 14 proved it: a coroutine object existed, so it was
+  called;
+* **patchable after construction** — unlike the inner client method,
+  which is bound before we can reach it.
+
+`inner.chat.completions.create` is **dropped**. "Hook both boundaries" is
+retired as a default: run 14 showed that more hooks are more
+intervention, and a second hook is only safe if independently
+transparent. It was not.
+
+Exception behaviour is preserved by re-raising. And because instructor
+returns the **validated model** rather than the raw completion at this
+boundary, the raw text is recovered from an attached completion where
+available and otherwise recorded as
+`raw text NOT captured at this boundary` — **declared, never guessed.**
+Whether the raw string is reachable here is for run 15 to say; if it is
+not, this boundary answers Q1 and Q6 but not Q2, and that will be stated
+rather than papered over.
+
+### 4. Calibration
+
+**44/7 → 53 assertions / 8 scenarios.** The new scenario asserts against
+the shipped probe text that no `async def` wrapper remains, that
+forwarding is synchronous and un-awaited, that exceptions are re-raised,
+that **exactly one** hook is installed and it is `instructor.create_fn`,
+that the dropped boundary's reason is recorded, and that an unreachable
+raw completion is declared rather than invented.
+
+**Proof it can fail (R2 — run, not written).** Restoring the async
+wrapper:
+
+```
+FAIL: no async wrapper remains
+FAIL: and it forwards synchronously, not awaited
+LLM Response Contract Calibration: 51 passed, 2 failed
+```
+
+Restored: **53 passed, 0 failed.** `policy-check` and registry green.
+
+### A system fact found on the way — recorded, NOT acted on
+
+`acreate_structured_output` is an `async def` that performs
+`self.aclient.chat.completions.create(...)` with **no `await`** on a
+**synchronous** client. The LLM call therefore **blocks the event loop**
+for its whole duration.
+
+That independently explains an observation banked in D197 and never
+accounted for: run 9's `asyncio.gather(extract_graph_from_data,
+summarize_text)` produced **sequential** ollama completions — 4m0s, then
+1m4s, then 1m15s — rather than concurrent ones. Two unrelated evidence
+sources agreeing.
+
+**Out of scope. Not touched, not remediated, not a new finding here** —
+recorded so it is not rediscovered as a surprise.
+
+### Standing
+
+* **Q1/Q2/Q6 — UNMEASURED. KAI-GATE-048 C — BLOCKED**, ownership not
+  moved.
+* **KAI-GATE-049 — CLOSED. KAI-GATE-050 — CLOSED.**
+* No mode, model, timeout, retry, schema, validator or topology change.
+* Run 15 proceeds only if the selftest proves the hook transparent.
