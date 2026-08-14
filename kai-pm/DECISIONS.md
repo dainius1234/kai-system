@@ -12723,3 +12723,86 @@ repaired input absent from the filter of the job that consumes it.
   unremediated).
 * No timeout change. No model change. No cognee modification. Phase 2 not
   begun.
+
+---
+
+## D206
+
+**2026-08-14 — KAI-GATE-050 runtime-proven: the same terminal ERRORED
+state that produced 200 now produces 502. 2/2 on clean stacks.**
+
+Run **31796138517**, job **94753563671**, commit **`80bdc2c`**, tree
+`5e72d3cf`. Same instrument, same two-clean-stack method, same
+`OLLAMA_MODEL`, as the run that reproduced the defect.
+
+| stack | `add` terminal | `cognify` terminal | cognee failure signal | HTTP | verdict |
+|---|---|---|---|---|---|
+| **1** | `7c45ea21…` **COMPLETED** | `2af8386a…` **ERRORED** | `PipelineRunFailedError … 422` ×1 | **502** | **CONSISTENT** |
+| **2** | `7c45ea21…` **COMPLETED** | `2af8386a…` **ERRORED** | `PipelineRunFailedError … 422` ×2 | **502** | **CONSISTENT** |
+
+```
+DENOMINATOR: 2 observation(s); 0 success-shaped failure(s),
+             2 consistent, 0 unmeasured, 0 inverted
+```
+
+Response body:
+
+```json
+{"detail":"graph ingest failed: 1 of 1 pipeline(s) did not reach a
+ terminal successful state (91a0c053-…=PipelineRunErrored); terminal
+ success is one of ['PipelineRunAlreadyCompleted', ...]"}
+```
+
+### Before / after, same gate
+
+| | internal | external | gate |
+|---|---|---|---|
+| D201 (`ffd92b6`) | `cognify` ERRORED | **200** `{"status":"ingested"}` | **FAIL** — success-shaped failure 2/2 |
+| D206 (`80bdc2c`) | `cognify` ERRORED | **502** with the terminal state named | **PASS** — consistent 2/2 |
+
+The gate that found the defect is the gate that shows it propagating, and
+its known-positive already required a correctly-propagated failure to
+exit **zero** — so this is a correlation result, not the gate merely
+banning failed pipelines.
+
+### Two identifier spaces — recorded so it is not misread as a mismatch
+
+The body names `91a0c053-…`; the log names `2af8386a-…` and `7c45ea21-…`.
+Not a contradiction: `evaluate()` reports **dataset ids** (cognify's
+return is keyed by dataset), while the cognee log reports **pipeline run
+ids**. Likewise "1 of 1 pipeline(s)" in the body vs "2 pipelines seen" in
+the log — cognify's return covers only the cognify pipeline for one
+dataset, while the log also carries `add`'s.
+
+### THE LIMIT THAT MATTERS: only one direction is runtime-proven
+
+* **terminal failure → failure-shaped response** — **RUNTIME-PROVEN**,
+  2/2 clean stacks.
+* **terminal success → success-shaped response** — **CALIBRATION-PROVEN
+  ONLY.** This population contains **no successful cognify**, so the
+  success direction has never been exercised end-to-end. A predicate that
+  refused *everything* would have produced exactly this evidence.
+
+What stops that being an open hole is the calibration's known-positive
+(`test_terminal_success_passes`), which fails if the predicate refuses a
+`Completed`/`AlreadyCompleted` result — and it was proven able to fail by
+reinjecting the defect (19/29, EXIT GATE: FAIL). But calibration is
+synthetic, and this is stated as synthetic.
+
+**The success direction cannot be runtime-proven until the graph pipeline
+can actually succeed — which is KAI-GATE-048 C's blocker.** So 050's
+remaining proof arrives as a by-product of 048's remediation. That is a
+real dependency, not a deferral of convenience.
+
+### Standing
+
+* **KAI-GATE-050 — REMEDIATED + RUNTIME-PROVEN (failure direction).**
+  Recommended for closure on that basis, with the success direction
+  recorded as calibration-only and inherited by KAI-GATE-048.
+* **KAI-GATE-048 C — BLOCKED.** Unchanged, and untouched by this work.
+  Fixing response truth does not make the graph pipeline succeed. C's
+  second blocker (success-laundering) is now **removed**; its first
+  (extraction does not complete successfully) stands alone.
+* **KAI-GATE-049 — CLOSED** (diagnostic complete, condition
+  unremediated).
+* No timeout change, no model change, no cognee modification, no Phase 2.
