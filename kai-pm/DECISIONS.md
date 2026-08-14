@@ -17019,3 +17019,126 @@ sequentially behind Stage 1; they do not launch together.**
   SCHEMA ECHO + 1 VALID INSTANCE) · broad-class recurrence **MEASURED** ·
   **Q6 MEASURED: REPRODUCED** · **ownership UNMOVED**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN.**
+
+---
+
+## D249 — P1 result: UNRESOLVED. The hole is identified; the disposition is yours
+
+**2026-08-14.** P1 ran twice. This entry banks both results, the defect
+found in my own instrument, and the minimum proposed repair. **Stage 1
+and Stage 2 remain BLOCKED.**
+
+### 1. Two runs, and why the first is withdrawn
+
+| run | id | commit | verdict |
+|---|---|---|---|
+| P1 run 1 | 31849363848 | e86ba48 | `REQUEST_REPLAYABLE` — **withdrawn** |
+| P1 run 2 | 31850052572 | 28f0c9d | `UNRESOLVED` |
+
+Run 1 printed `capture note: line 18: unparseable (Expecting value)` and
+then certified a production population of 4 **anyway**. That population
+was a **lower bound, not a denominator**: the unreadable line could have
+been an `llm-call` row carrying the very kwarg that breaks axis A, and
+"it probably is not" is exactly the reasoning P1 exists to refuse.
+
+The defect was mine, in the census, and it is the R10 family seen from a
+new side: **the instrument announced the hole and then reported over it.**
+Announcing a gap is not the same as refusing to conclude across it.
+
+Repaired: an unparseable line now forces `UNRESOLVED`, and the note
+carries the line's **content and byte count**, so the hole is
+identifiable rather than merely announced.
+
+### 2. What line 18 actually is
+
+```
+line 18: unparseable (Expecting value); 35 bytes;
+first 35: 'inspected: 4 model call(s) captured'
+```
+
+**It is the probe's own denominator line** — the I-2 line
+`probe_llm_contract.py` prints about itself — landing in
+`capture.jsonl` because the capture file is the probe's **redirected
+stdout**. It is not a dropped row and it is not model evidence.
+
+So the mechanism is: **the capture file mixes machine rows with human
+text, because one stream carries both.** Every future capture will have
+this line, and a census that must certify a denominator will refuse every
+one of them.
+
+Worth noting and **not** worth acting on alone: that line independently
+declares **4** model calls captured, and the census parsed **4**
+production rows. They agree. But both come from the probe, so this is
+corroboration, not independent evidence (I-8) — and no verdict is being
+upgraded on it.
+
+### 3. What P1 did establish, and what remains open
+
+Measured, run 2, against run 24's artifact (`31844794230`, commit
+`397ad92`):
+
+* **Axis A** — 4 production rows, **0 with extra kwargs**, 0 missing
+  `messages`/`model`. Over a population that is a lower bound.
+* **Axis B — ESTABLISHED.** 13 `chat.completions.create` call sites
+  across **1,430 files** in the image's own cognee, **all with zero
+  positional arguments**; `instructor/core/retry.py:198` and `:376`
+  insert none.
+* **Null-ambiguity, measured per key:** `temperature` 4/4 and `tools`
+  4/4 recorded as `None`; `messages`, `model`, `response_format` 0/4.
+  Replay rule stands: **omit any key recorded as `None`**.
+* **Resolved in the audited image:** `cognee 1.1.3`,
+  `instructor 1.15.1`, `openai 2.54.0`.
+
+On that last line — it **matches** the version the earlier source reading
+used. It does not retroactively prove run 24 used it: the probe records
+`openai_version` and **not** instructor's or cognee's, so run 24's own
+instructor version stays **UNKNOWN**. What is established is repository-
+input equivalence plus this build's resolution (D239).
+
+### 4. A second defect in my own reporting, fixed
+
+Run 1 printed the resolved versions **before** a 13-line call-site
+listing, and they fell outside the Actions log's fixed byte window — so
+the audited instructor version, the version axis B's forwarder evidence
+is bound to, was **unreadable from the log**. A provenance line nobody
+can read is not one. They now print last. Same trap as the ~15.8KB
+window that has cost us diagnostics twice before.
+
+### 5. Minimum proposed repair — NOT implemented, awaiting decision
+
+Per the standing instruction, I stopped rather than iterating.
+
+**Preferred — capture-side, one line.** The probe writes rows and human
+text to the same stream. Give the rows their own sink (a dedicated file
+or fd) so `capture.jsonl` contains **only** JSON rows. Then the census's
+denominator is certifiable by construction rather than by exception, and
+every past capture keeps its meaning. This is a **capture-instrument
+change** and therefore needs authorisation, its own selftest criterion,
+and its own mutation proof before it is used for ownership evidence.
+
+**Alternative — analyser-side reconciliation.** Teach the census to
+extract the probe's declared denominator line **from the probe's own
+source** (never a string maintained beside it), and certify only when
+the probe's declared count **equals** the parsed row count — refusing on
+disagreement. This adds a real cross-check rather than an exemption. It
+is weaker than the capture-side fix because it still parses prose, and
+it makes the census depend on the probe's output format.
+
+**Rejected — a hard-coded allowance for this one line.** That is a list
+beside the instrument (R5) and it would blind the census to a genuinely
+lost row, which is precisely what the check is for.
+
+My recommendation is the capture-side fix, with the reconciliation added
+regardless, because "the probe's own count must equal the rows we can
+read" is worth having whichever sink the rows go to.
+
+### Status
+
+* **P1 — UNRESOLVED.** Axis B established; axis A measured over a lower
+  bound; denominator not certifiable until the capture stream is
+  separated or reconciled.
+* **Stage 1 — BLOCKED pending P1. Stage 2 — BLOCKED pending Stage 1.**
+* **Q1** partial · **Q2 MEASURED** (5 captures, 21 raw attempts, 20
+  SCHEMA ECHO + 1 VALID INSTANCE) · broad-class recurrence **MEASURED** ·
+  **Q6 MEASURED: REPRODUCED** · **ownership UNMOVED**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN.**
