@@ -164,10 +164,22 @@ jobs:
           echo "  cognee     <- $COGNEE_ROOT"
           echo "  instructor <- $INSTRUCTOR_ROOT"
           echo
+          set +e
           python3 scripts/security/p1_replay_completeness.py \
             --capture "$CAP" \
             --call-site-root p1-src/cognee \
             --forwarder-root p1-src/instructor
+          RC=$?
+          set -e
+          # LAST, so it lands inside the Actions log's fixed byte window.
+          # Run 1 printed these before a long call-site listing and they
+          # fell outside it, leaving the audited instructor version — the
+          # version axis B's forwarder evidence is bound to — unreadable
+          # from the log. A provenance line nobody can read is not one.
+          echo
+          echo "RESOLVED IN THE AUDITED IMAGE (name version root):"
+          sed 's/^/  /' p1-resolved.txt
+          exit "$RC"
 
       - uses: actions/upload-artifact@v4
         if: always()

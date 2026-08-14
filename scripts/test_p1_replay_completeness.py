@@ -190,13 +190,36 @@ def test_p1_refuses_rather_than_guessing() -> None:
         check("a row with no model is UNRESOLVED, not replayable",
               verdict([_p1_row(model=None)]) == p1.UNRESOLVED, "")
 
-        # unparseable lines are reported, not dropped into a clean count
+        # An unparseable line is a HOLE IN THE DENOMINATOR, not a
+        # footnote. Run 1 of the P1 job returned REQUEST_REPLAYABLE while
+        # one capture line had failed to parse; the population of 4 was a
+        # lower bound and the verdict said nothing about that. A line
+        # that did not parse could be the `llm-call` row carrying the
+        # very kwarg that breaks axis A, and "it probably is not" is the
+        # reasoning P1 exists to refuse.
         bad = tmp / "bad.jsonl"
         bad.write_text(json.dumps(_p1_row()) + "\n{ not json\n")
         rows, notes = p1.read_rows(bad)
         check("an unparseable capture line is reported", len(notes) == 1,
               str(notes))
         check("and the readable row still counts", len(rows) == 1, "")
+        check("the note carries the line's CONTENT, not just a count",
+              "not json" in notes[0], notes[0])
+        check("and declares its own byte size (R10)",
+              "bytes" in notes[0], notes[0])
+        holed = p1.audit_kwargs(rows, notes)
+        check("an unparseable line forces UNRESOLVED, not REPLAYABLE",
+              p1.classify(holed, p1.audit_positional(clean_src, clean_fwd))[0]
+              == p1.UNRESOLVED, "")
+        check("and says the population is a LOWER BOUND",
+              any("LOWER BOUND" in w for w in p1.classify(
+                  holed, p1.audit_positional(clean_src, clean_fwd))[1]), "")
+        # known-negative: the same rows with no parse hole DO certify, so
+        # the refusal is caused by the hole and by nothing else.
+        whole = p1.audit_kwargs(rows, [])
+        check("the same rows without a parse hole are REPLAYABLE",
+              p1.classify(whole, p1.audit_positional(clean_src, clean_fwd))[0]
+              == p1.REPLAYABLE, "")
 
         # the null ambiguity is measured and stated, not assumed away
         kw = p1.audit_kwargs([_p1_row()])

@@ -115,15 +115,21 @@ def read_rows(path: pathlib.Path) -> tuple[list[dict], list[str]]:
         try:
             row = json.loads(line)
         except json.JSONDecodeError as exc:
-            # R10: a line we could not read is reported, not dropped.
-            notes.append(f"line {n}: unparseable ({exc.msg})")
+            # R10: a line we could not read is reported, not dropped —
+            # and reported with its CONTENT, because "1 line did not
+            # parse" is unactionable while the line itself is not. The
+            # excerpt declares its own size so it cannot read as whole.
+            head = line[:400].replace("\t", " ")
+            notes.append(
+                f"line {n}: unparseable ({exc.msg}); {len(line)} bytes; "
+                f"first {min(400, len(line))}: {head!r}")
             continue
         if isinstance(row, dict) and row.get("event") == "llm-call":
             rows.append(row)
     return rows, notes
 
 
-def audit_kwargs(rows: list[dict]) -> dict:
+def audit_kwargs(rows: list[dict], notes: list[str] | None = None) -> dict:
     """Axis A over the production population."""
     population = [r for r in rows if r.get("phase") == PRODUCTION_PHASE]
     offenders = [r for r in population if r.get("other_params")]
@@ -135,6 +141,7 @@ def audit_kwargs(rows: list[dict]) -> dict:
         k: sum(1 for r in population if r.get(k) is None) for k in VALUED_KEYS
     }
     return {
+        "parse_notes": list(notes or ()),
         "rows_total": len(rows),
         "population": len(population),
         "offenders": offenders,
@@ -309,6 +316,16 @@ def classify(kw: dict | None, pos: dict) -> tuple[str, list[str]]:
     why: list[str] = []
     if kw is None:
         return UNRESOLVED, ["the capture could not be read at all"]
+    if kw["parse_notes"]:
+        # A line that did not parse is a hole in the denominator, and a
+        # denominator with a hole cannot certify anything. It might be an
+        # `llm-call` row carrying the very kwarg that breaks axis A, and
+        # "it probably is not" is exactly the reasoning P1 exists to
+        # refuse. UNRESOLVED until the line is identified.
+        return UNRESOLVED, [
+            f"{len(kw['parse_notes'])} capture line(s) did not parse, so "
+            f"the production population of {kw['population']} is a LOWER "
+            "BOUND, not a certified denominator"] + kw["parse_notes"]
     if kw["population"] == 0:
         return UNRESOLVED, [
             f"no production rows (phase={PRODUCTION_PHASE!r}) in the "
@@ -371,7 +388,7 @@ def main() -> int:
         rows, notes = read_rows(cap)
         for note in notes:
             print(f"  capture note: {note}")
-        kw = audit_kwargs(rows)
+        kw = audit_kwargs(rows, notes)
         print(f"AXIS A — keyword arguments, from the artifact")
         print(f"  llm-call rows            : {kw['rows_total']}")
         print(f"  production population    : {kw['population']} "
