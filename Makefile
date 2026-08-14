@@ -1051,6 +1051,16 @@ test-cognify-result:
 test-llm-contract:
 	python3 scripts/test_llm_contract.py
 
+# D248's P1 prerequisite. Separate from test-llm-contract on purpose:
+# sharing that file would have put a static census inside the LLM
+# capture workflow's paths filter, so editing an analyser would have
+# triggered a live model capture nobody authorised. The property under
+# test is that the two completeness axes NEVER substitute for one
+# another -- a spotless capture with no call-path source must read as
+# REQUEST_INCOMPLETE_POSITIONAL, not as replayable.
+test-p1-replay-completeness:
+	python3 scripts/test_p1_replay_completeness.py
+
 # Proves the drift guard REFUSES: a failing gate, and a tree that
 # changes while the gate runs. Uses throwaway repositories, so it
 # can never commit anything here.

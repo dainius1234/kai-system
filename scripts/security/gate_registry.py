@@ -1012,6 +1012,51 @@ REGISTRY: Tuple[Gate, ...] = (
                         "`docker compose exec`, which the workflow parse "
                         "cannot see as an invocation of this module",
          findings=("KAI-GATE-048",)),
+    # D248's P1 prerequisite, and the reason it is a separate suite: a
+    # shared file would have put a static census inside the LLM capture
+    # workflow's paths filter, so editing an analyser would have fired a
+    # live model capture nobody authorised.
+    Gate(module="test_p1_replay_completeness",
+         kind=GATE,
+         summary="the two replay-completeness axes must NEVER substitute "
+                 "for one another -- a spotless capture with no call-path "
+                 "source must read as REQUEST_INCOMPLETE_POSITIONAL, not "
+                 "as replayable, because the probe records positional "
+                 "arguments nowhere; and the both-defects case must never "
+                 "collapse into either single verdict, because kwargs "
+                 "completeness and positional completeness have different "
+                 "repairs",
+         inputs=(),
+         denominator=r"inspected: \d+ P1 verdict\(s\) discriminated",
+         proven_by="scripts/test_p1_replay_completeness.py",
+         calibrated_by="scripts/test_p1_replay_completeness.py",
+         in_policy_check=False,
+         in_workflows=("p1-replay-completeness.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="p1_replay_completeness",
+         kind=REPORT,
+         summary="whether a captured request can be replayed faithfully, "
+                 "on two axes that may never substitute for one another: "
+                 "keyword completeness measured from the run's own "
+                 "artifact, and positional completeness established from "
+                 "the call path's source inside the image that ran it; "
+                 "emits one of five verdicts and never 'probably "
+                 "complete'",
+         inputs=(),
+         denominator=r"inspected: \d+ production request row\(s\)",
+         probe=False,
+         probe_skip_reason="needs a capture file produced by driving "
+                           "cognee in-process inside the memu-graph image "
+                           "AND that image's site-packages; on the host "
+                           "neither exists. Every verdict, both axes and "
+                           "each refusal path are asserted on synthetic "
+                           "captures and synthetic source trees in "
+                           "scripts/test_p1_replay_completeness.py",
+         proven_by="scripts/test_p1_replay_completeness.py",
+         calibrated_by="scripts/test_p1_replay_completeness.py",
+         in_policy_check=False,
+         in_workflows=("p1-replay-completeness.yml",),
+         findings=("KAI-GATE-048",)),
     Gate(module="report_runtime_topology",
          kind=REPORT,
          summary="what the tree DEFINES, what it GATES, and what a "

@@ -516,6 +516,37 @@ DECLARED: Tuple[Toleration, ...] = (
         review_by="2027-01-01",
     ),
     Toleration(
+        workflow="p1-replay-completeness.yml",
+        step="Free up runner disk space",
+        bucket=DOCUMENTED_SKIP,
+        reason="`sudo rm -rf ... || true` against the runner's "
+               "preinstalled toolchains, identical in shape and reason to "
+               "the declaration for memu-graph-startup-proof.yml above. "
+               "Declared separately because the match is on (workflow, "
+               "step) and this is a different file — a wildcard would let "
+               "a future workflow inherit a toleration nobody wrote for "
+               "it.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="p1-replay-completeness.yml",
+        step="Fetch the capture from run ${{ env.P1_CAPTURE_RUN_ID }}",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same shape and same reason as the re-analysis fetch above: "
+               "P1 certifies the completeness of a PREVIOUS run's captured "
+               "request, so a missing or expired artifact would stop the "
+               "job inside download-artifact with an opaque message. The "
+               "toleration exists so the verdict step runs and says the "
+               "true thing: 'P1 NOT PERFORMED … an availability failure, "
+               "NOT a P1 verdict, and Stage 1 stays blocked.' Nothing is "
+               "skipped — that step exits 2 when the capture is absent, so "
+               "an unavailable subject can never read as REQUEST_REPLAYABLE "
+               "(I-1/R11).",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
         workflow="unified-hunter.yml",
         step="Report the surface that was exercised",
         bucket=DOCUMENTED_SKIP,

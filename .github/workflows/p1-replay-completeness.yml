@@ -1,0 +1,179 @@
+# P1 — is a captured request complete enough to replay it faithfully?
+#
+# D247 froze a two-stage ownership-separation experiment whose Stage 1 is
+# an "exact-request replay". D248 split the prerequisite into two axes
+# that may never substitute for one another:
+#
+#   A  keyword arguments — measured from the capture run's own artifact.
+#      `probe_llm_contract.py:383` records extra kwargs as NAMES ONLY, so
+#      a non-empty `other_params` means values are gone.
+#   B  positional arguments — the probe forwards `*args` and records them
+#      nowhere, so the capture is silent on this axis BY CONSTRUCTION. A
+#      clean axis A says nothing whatsoever about axis B. It is
+#      established from the call path's SOURCE, taken out of the image
+#      that ran it, or it is not established at all.
+#
+# NO MODEL CALL. No stack bring-up. This workflow reads bytes that already
+# exist and source that is already pinned, so it cannot produce evidence
+# about the LLM and does not claim to.
+#
+# IT IS A SEPARATE FILE ON PURPOSE. Putting this job in
+# memu-graph-startup-proof.yml would have placed the P1 census and its
+# calibration inside that workflow's paths filter, so editing a static
+# analyser would have triggered a live model capture nobody authorised.
+# A gate's trigger conditions are part of the gate.
+name: P1 replay completeness (KAI-GATE-048 C)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/project-rework-plan-pgvp35
+    # EVERY INPUT THIS JOB READS: the census, its calibration, this file,
+    # and the image inputs — because the job builds that image and audits
+    # the source inside it, so a Dockerfile change changes the subject.
+    paths:
+      - .github/workflows/p1-replay-completeness.yml
+      - scripts/security/p1_replay_completeness.py
+      - scripts/test_p1_replay_completeness.py
+      - memu-graph/Dockerfile
+      - memu-graph/requirements.txt
+      - docker-compose.full.yml
+
+permissions:
+  contents: read
+
+jobs:
+  p1-replay-completeness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      actions: read          # to read the capture run's artifact
+    env:
+      # The capture whose completeness is being certified, named rather
+      # than discovered — a moving "latest" would silently change the
+      # subject between runs. Taken from an authoritative run listing,
+      # never from memory.
+      P1_CAPTURE_RUN_ID: "31844794230"
+      P1_CAPTURE_COMMIT: "397ad92ed9fd4175f737df3c6b17d358f02c13d5"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # the capture commit must be diffable
+
+      # I-8. The instrument proves it can tell the five verdicts apart,
+      # and proves a clean axis A cannot imply a clean axis B, BEFORE it
+      # is allowed to pronounce on anything.
+      - name: The P1 instrument must pass its calibration first
+        run: python3 scripts/test_p1_replay_completeness.py
+
+      # D239: blob identity proves repository-input equivalence, and that
+      # is all it proves. Name exactly which inputs were compared, so a
+      # green line here cannot be read as "identical runtime".
+      - name: Bind the audited image to the capture's tree
+        run: |
+          set -euo pipefail
+          git cat-file -e "${P1_CAPTURE_COMMIT}^{commit}"
+          echo "capture run   : ${P1_CAPTURE_RUN_ID}"
+          echo "capture commit: ${P1_CAPTURE_COMMIT}"
+          echo "this commit   : ${GITHUB_SHA}"
+          echo
+          echo "image inputs compared: memu-graph/ docker-compose.full.yml"
+          CHANGED=$(git diff --name-only \
+            "${P1_CAPTURE_COMMIT}" "${GITHUB_SHA}" \
+            -- memu-graph docker-compose.full.yml)
+          if [ -n "$CHANGED" ]; then
+            echo "REFUSED: image inputs changed since the capture, so the"
+            echo "  source audited below is not the source that ran:"
+            echo "$CHANGED"
+            exit 2
+          fi
+          echo "  no image input changed between those two commits."
+          echo
+          echo "NOT PROVEN by the above: that every runtime dependency"
+          echo "  resolved identically. python:3.11-slim is a moving tag"
+          echo "  and pip re-resolves cognee's transitive dependencies at"
+          echo "  build time. The probe records openai's version and NOT"
+          echo "  instructor's or cognee's, so run ${P1_CAPTURE_RUN_ID}'s"
+          echo "  exact instructor version is UNKNOWN. The versions printed"
+          echo "  below are this build's, and axis B's forwarder evidence"
+          echo "  is bound to them."
+
+      - name: Free up runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
+          df -h /
+
+      # ci-toleration: documented-skip
+      - name: Fetch the capture from run ${{ env.P1_CAPTURE_RUN_ID }}
+        id: fetch
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: memu-graph-llm-contract
+          run-id: ${{ env.P1_CAPTURE_RUN_ID }}
+          github-token: ${{ github.token }}
+          path: p1-evidence
+
+      - name: Build the image whose site-packages are the call path
+        run: docker compose -f docker-compose.full.yml build memu-graph
+
+      - name: P1 verdict — two axes, no collapsing, no "probably complete"
+        run: |
+          set -euo pipefail
+          CAP=p1-evidence/llm-contract-logs/capture.jsonl
+          if [ ! -f "$CAP" ]; then
+            # R11: no subject, no observation. Say which prerequisite
+            # failed, and do not let it read as a verdict.
+            echo "P1 NOT PERFORMED: run ${P1_CAPTURE_RUN_ID}'s artifact was"
+            echo "  not retrievable, so there was nothing to certify. This"
+            echo "  is an availability failure, NOT a P1 verdict, and"
+            echo "  Stage 1 stays blocked."
+            if [ -d p1-evidence ]; then
+              echo "  what WAS downloaded:"
+              ls -R p1-evidence | head -40
+            else
+              echo "  nothing was downloaded at all."
+            fi
+            exit 2
+          fi
+          echo "capture: $(wc -c < "$CAP") bytes, $(grep -c . "$CAP") record(s)"
+          # The image name comes from compose's OWN resolution, not from a
+          # guessed "<dir>-<service>" convention (R5). `docker compose
+          # images` needs a container, and this job creates none.
+          IMG=$(docker compose -f docker-compose.full.yml \
+                  --profile introspection config --format json \
+                | python3 -c "import json,sys; d=json.load(sys.stdin); s=d['services']['memu-graph']; print(s.get('image') or d['name']+'-memu-graph')")
+          echo "image: ${IMG}"
+          docker image inspect "$IMG" >/dev/null   # fail loudly, not later
+          # The package roots and versions are DERIVED from the image's own
+          # interpreter, never from a hard-coded site-packages path (R5),
+          # and the audited source is then copied OUT of that image so the
+          # census runs as a plain, visible invocation.
+          docker run --rm "$IMG" python3 -c "import importlib, pathlib; [print(n, getattr(importlib.import_module(n), '__version__', 'unrecorded'), pathlib.Path(importlib.import_module(n).__file__).parent) for n in ('cognee', 'instructor', 'openai')]" | tee p1-resolved.txt
+          COGNEE_ROOT=$(awk '$1=="cognee"{print $3}' p1-resolved.txt)
+          INSTRUCTOR_ROOT=$(awk '$1=="instructor"{print $3}' p1-resolved.txt)
+          test -n "$COGNEE_ROOT" && test -n "$INSTRUCTOR_ROOT"
+          CID=$(docker create "$IMG")
+          mkdir -p p1-src
+          docker cp "$CID:$COGNEE_ROOT" p1-src/cognee
+          docker cp "$CID:$INSTRUCTOR_ROOT" p1-src/instructor
+          docker rm "$CID" >/dev/null
+          echo "audited source copied out of ${IMG}:"
+          echo "  cognee     <- $COGNEE_ROOT"
+          echo "  instructor <- $INSTRUCTOR_ROOT"
+          echo
+          python3 scripts/security/p1_replay_completeness.py \
+            --capture "$CAP" \
+            --call-site-root p1-src/cognee \
+            --forwarder-root p1-src/instructor
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-replay-completeness
+          path: |
+            p1-evidence/
+            p1-resolved.txt
+          if-no-files-found: warn

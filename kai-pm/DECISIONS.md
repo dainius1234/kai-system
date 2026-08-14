@@ -16846,3 +16846,176 @@ Nine of ten green is **BLOCKED**, not "nearly PASS".
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN.**
 * **D247 is a design freeze. Awaiting authorisation before P1, Stage 1 or
   Stage 2 executes.**
+
+---
+
+## D248 — P1 has two axes, not one; and what "exact request" is allowed to mean
+
+**2026-08-14.** The operator authorised **P1 only**. Stage 1 and Stage 2
+stay blocked. This entry records the correction to D247's P1, the
+boundary wording it froze, and the instrument built to answer it.
+
+### 1. The correction: a clean axis A says nothing about axis B
+
+D247 named one completeness question. There are two, and they are
+independent:
+
+* **A — keyword arguments.** `probe_llm_contract.py:383` records extra
+  kwargs as **names only**. `other_params == []` on every production row
+  means no unrecorded kwarg values exist.
+* **B — positional arguments.** The probe forwards `*args`
+  (`probe_llm_contract.py:390`) and records them **nowhere**.
+
+The operator's formulation, which is the one that binds:
+
+> **A production capture showing `other_params=[]` tells us nothing about
+> whether positional args were present. P1 cannot close from that alone
+> unless we independently establish that the relevant production
+> invocation supplied zero positional arguments.**
+
+This is the same defect shape as a check whose scope is smaller than its
+name (R5), seen from the evidence side: one axis measured, the other
+inferred from it by adjacency. D247 would have let a spotless axis A
+carry a claim it cannot support.
+
+### 2. Axis B, established from source — 13 call sites, zero positional
+
+Read from the pinned call path, not assumed. `cognee==1.1.3`
+(`memu-graph/requirements.txt:5`),
+`…/litellm_instructor/llm/ollama/adapter.py`
+`acreate_structured_output`:
+
+```python
+response = self.aclient.chat.completions.create(
+    model=self.model,
+    messages=[…],
+    max_retries=2,
+    response_model=response_model,
+    **merged_kwargs,
+)
+```
+
+**Keyword-only. Zero positional arguments.** Two further facts complete
+the hop, both read rather than inferred:
+
+* `instructor/core/patch.py:264` passes `args=args` to `retry_sync` as a
+  **keyword**, and `args` is `new_create_sync`'s own `*args` — nothing is
+  inserted;
+* `instructor/core/retry.py:198` calls `func(*args, **kwargs)` with no
+  literal positional argument of its own.
+
+So zero positional arguments leave the adapter and zero arrive at
+`Completions.create`.
+
+A source claim about one call site is worth less than a denominator, so
+the check derives its scope by walking the package (R5). A dry run of the
+instrument over cognee 1.1.3's tree: **1,430 files scanned, 13
+`chat.completions.create` call sites, 13 of 13 with zero positional
+arguments**, and 2 instructor forwarding calls inserting none. That
+scope is a **superset** of the production path, which is the safe
+direction: if no call site anywhere passes a positional argument, the
+production one does not either.
+
+**That dry run is not P1 evidence.** It used a scratchpad copy of cognee
+and this sandbox's instructor. P1's axis B must be established from the
+source **inside the image that ran the capture**, which is what the CI
+job does.
+
+### 3. The frozen boundary: what "exact request" is allowed to mean
+
+The probe wraps the **client callable**, not the wire. So, frozen:
+
+> **Stage 1 may claim "replay of the complete model-facing client
+> invocation". It may NOT claim "byte-identical wire request".**
+
+The OpenAI client may default, normalise or re-serialise fields after the
+capture boundary. Claiming HTTP equivalence needs evidence from the
+HTTP/wire boundary, which this instrument does not observe. **Do not
+expand into that now** unless Stage 1 actually requires it.
+
+**One residual, recorded rather than hidden.** The probe writes `None`
+for a recorded key that was absent, so *absent* and *explicitly None* are
+indistinguishable for the five valued keys. The certified replay rule is
+**omit any key recorded as None**; the census counts and prints the
+ambiguity per key rather than assuming it away.
+
+### 4. The instrument, and its five verdicts
+
+`scripts/security/p1_replay_completeness.py`, gated by
+`scripts/test_p1_replay_completeness.py` and by
+`.github/workflows/p1-replay-completeness.yml`.
+
+    REQUEST_REPLAYABLE             exit 0   both axes clean
+    UNRESOLVED                     exit 2   artifact/path cannot establish it
+    REQUEST_INCOMPLETE_KWARGS      exit 3   unrecorded kwarg values exist
+    REQUEST_INCOMPLETE_POSITIONAL  exit 4   positional not established
+    REQUEST_INCOMPLETE_MULTIPLE    exit 5   both defects
+
+There is no "probably complete". Five verdicts, five distinct exit codes,
+and only `REQUEST_REPLAYABLE` exits 0.
+
+**Calibration (I-8), 29 assertions across 2 scenarios, every verdict with
+a known-positive and a known-negative.** The load-bearing case is
+asserted directly: *a clean capture with no call-path source must read as
+`REQUEST_INCOMPLETE_POSITIONAL`* — the defect the operator named. Also
+asserted: the both-defects case never collapses into either single
+verdict; a selftest-only capture is `UNRESOLVED`, never `REPLAYABLE`
+(R11); an unparseable capture line is reported, not dropped (R10); and
+the valued-key list is checked **against the probe's own source**, so if
+the probe starts recording a sixth key the suite fails rather than
+silently narrowing the audit.
+
+**Mutation proof, run rather than described.** Blinding the positional
+check (`dirty = []` and `established = True`) took the suite from
+**29 passed / 0 failed** to **3 failed**. Restored, mutation strings
+absent (`grep -c MUTATION` → 0), suite back to 29/0.
+
+### 5. Why this is a separate workflow file
+
+`scripts/test_llm_contract.py` is inside
+`memu-graph-startup-proof.yml`'s `paths:` filter. Putting the P1
+calibration there would have meant that **editing a static census
+triggers a live model capture** — an unauthorised run 25, and an
+unauthorised Q6 sample, as a side effect of writing an analyser.
+
+So P1 lives in `p1-replay-completeness.yml` with its own filter, and
+`test_llm_contract.py` is back to its pre-P1 state (**258 passed /
+0 failed**, verified). A gate's trigger conditions are part of the gate,
+and so are the triggers a gate must *not* pull.
+
+### 6. What the CI job does and does not prove
+
+* Runs the calibration **first**; an uncalibrated instrument may not
+  pronounce.
+* Refuses if any image input changed between the capture commit
+  (`397ad92`, from an authoritative run listing) and the tested tree.
+* **States its own limit out loud:** repository-input equivalence is not
+  runtime-dependency equivalence (D239). `python:3.11-slim` is a moving
+  tag and pip re-resolves cognee's transitive dependencies at build time.
+  The probe records **openai's** version and not instructor's or
+  cognee's, so **run 24's exact instructor version is UNKNOWN**, and axis
+  B's forwarder evidence is bound to the version the job prints.
+* Derives package roots from the image's own interpreter, copies that
+  source out, and runs the census as a visible invocation.
+* If the artifact is unavailable: `P1 NOT PERFORMED … an availability
+  failure, NOT a P1 verdict`, exit 2. A missing subject can never read as
+  `REQUEST_REPLAYABLE` (I-1/R11).
+
+### 7. Standing instruction if P1 fails
+
+**Stop.** Do not execute Stage 1 or Stage 2. Bring back the evidence and
+the *minimum* proposed capture change — which must record the missing
+**values**, not merely presence, and must carry its own calibration and
+mutation proof before it is used for ownership evidence.
+
+If P1 passes, Stage 1 may proceed under D247 unchanged. **Stage 2 stays
+sequentially behind Stage 1; they do not launch together.**
+
+### Status
+
+* **P1 diagnostic — AUTHORISED and shipped; verdict not yet returned.**
+* **Stage 1 — BLOCKED pending P1. Stage 2 — BLOCKED pending Stage 1.**
+* **Q1** partial · **Q2 MEASURED** (5 captures, 21 raw attempts, 20
+  SCHEMA ECHO + 1 VALID INSTANCE) · broad-class recurrence **MEASURED** ·
+  **Q6 MEASURED: REPRODUCED** · **ownership UNMOVED**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN.**
