@@ -13588,3 +13588,93 @@ while run 15 is live.
 * **KAI-GATE-048 C — BLOCKED.** **KAI-GATE-051 — OPEN**, unremediated,
   queued. **049 — CLOSED. 050 — CLOSED.**
 * No mode, model, timeout, retry, schema, validator or topology change.
+
+---
+
+## D215
+
+**2026-08-14 — run 15's summary outran its observation scope. Q status
+corrected, and the next session's first action fixed in writing.**
+
+Run **31814128653**, job **94811588107**, commit `b933546`. Selftest
+passed, capture ran 15:26:33 → 15:40:04 (~13.5 min), summariser exited 0.
+
+### The sentence that is NOT banked
+
+> ~~"every attempt returned a valid instance. The mismatch is NOT at the
+> model's response kind."~~
+
+**Rejected — it outruns the observation scope.** The defensible statement
+is narrower:
+
+> At the captured instructor boundary, the observed return object was
+> instance-valid.
+
+That is not equivalent to *the raw model completion was a valid
+instance*. Instructor performs schema injection, retries, parsing and
+validation **inside** the boundary I hooked (`create_fn` is called with
+`response_model=` and `max_retries=2`), so the failure under study can
+occur underneath and be gone before the hook sees the final object. This
+same run's `memu-graph-acceptance` job still failed with C blocked.
+
+### Corrected Q status
+
+| | |
+|---|---|
+| **Q1** | **PARTIALLY MEASURED** — the adapter → instructor contract at the captured boundary. Does **not** establish the final per-attempt model request after instructor transforms it |
+| **Q2** | **UNMEASURED** — no raw model completion per retry was observed. "Validated model is close enough" is refused |
+| **Q6** | **UNMEASURED for the intended question** — create-function call reproducibility is not model-attempt reproducibility |
+| ownership | **UNCHANGED** |
+
+The passing selftest still proves **on-path only**, not transparency
+(D214).
+
+### A second instrument defect, distinct from the hook's altitude
+
+Even if the capture is technically correct, the **summariser's vocabulary
+conflates validated-return kind with raw-response kind**. It can observe
+an outer validated object and still print a claim about "the model's
+response kind". That is a scope/claim mismatch in the analyser, and it
+would recur with a corrected hook.
+
+**The repair is therefore not merely "move the hook".** Every captured
+record must carry an explicit **layer**, and the analyser may only make
+claims that layer licenses:
+
+```
+ADAPTER_INPUT | INSTRUCTOR_RETURN | RAW_MODEL_REQUEST
+             | RAW_MODEL_RESPONSE | VALIDATION_RESULT
+```
+
+so that `INSTRUCTOR_RETURN = VALID_INSTANCE` can **never** satisfy a
+predicate asking about `RAW_MODEL_RESPONSE`.
+
+### NEXT SESSION STARTS HERE — read, do not write
+
+1. **Read every row of run 15's capture** (artifact 9224859513, or the
+   job log rows above the summary) and determine, per row, what the
+   instrument called an *attempt*: one cognee `acreate_structured_output`
+   invocation, one instructor invocation, one underlying model request,
+   or something else — and **which object was hashed/classified, and
+   where in the call stack it existed**.
+2. That either confirms the wrong-altitude diagnosis or exposes something
+   else. **Do not repair based on our expectation of instructor
+   internals.**
+3. Only if it survives: inspect installed instructor source around
+   construction and retry dispatch to prove the boundary that receives
+   the actual ollama request and returns the raw completion per retry.
+   Run 13 already established that patching
+   `inner.chat.completions.create` *after* construction fails, because
+   instructor binds it at construction — so the strategy is to intercept
+   **at or before the bind point**, preserving the exact synchronous
+   calling convention.
+4. Then, and only then, write code.
+
+### State
+
+* **KAI-GATE-048 C — BLOCKED.** Q1 partial/boundary-scoped, Q2
+  UNMEASURED, Q6 UNMEASURED for raw retries, ownership unmoved.
+* **KAI-GATE-049 — CLOSED. KAI-GATE-050 — CLOSED. KAI-GATE-051 — OPEN,
+  queued.**
+* No production remediation. No mode, model, timeout, retry, schema,
+  validator or topology change.
