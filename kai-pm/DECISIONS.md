@@ -15994,3 +15994,63 @@ however many attempts they contain.
   CLOSED. 051/#58 — OPEN, separate.**
 * No model, timeout, retry, schema, validator, Q6-definition, ownership or
   topology change.
+
+---
+
+## D239 — run 23 launched: the second independent correlated capture
+
+Authorised, Q6 only. **Run 23 = `31842405123`** · head_sha
+**`3d59357`** · event `workflow_dispatch` · run_attempt 1 · created
+2026-08-14T21:26:04Z. Resolved from an authoritative listing.
+
+### Why dispatch on HEAD rather than re-running run 22
+
+A re-run would have kept run 22's id and incremented `run_attempt`, so
+the two captures would share an identifier in the record. A dispatch
+produces a **distinct run id**, which keeps the evidence identities
+separable — the thing D235/D236 exist to protect.
+
+The cost is that HEAD (`3d59357`) is two commits ahead of run 22's tree
+(`3a13100`), so applicability must be **established, not inherited**.
+
+### Applicability proof — claim-relevant inputs are byte-identical
+
+The workflow declares its own inputs in its `paths:` filter. Comparing
+the git blob hash of **every** declared input, plus the workflow file
+itself, at `3a13100` versus `3d59357`:
+
+```
+claim-relevant inputs compared: 34
+differing:                       0
+every declared input is BYTE-IDENTICAL between 3a13100 and HEAD
+```
+
+The whole-tree diff is `kai-pm/DECISIONS.md` alone. So run 23 executes
+**the same claim-relevant instrument, code and configuration as run 22**,
+established by blob identity rather than assumed from "documentation
+only". Run 22's applicability is not silently inherited; it is
+independently re-derived.
+
+**Independence of the sample** comes from a fresh runner, a fresh image
+build, a fresh stack and a fresh model load — not from differing code,
+which would have broken the comparison.
+
+### Frozen, unchanged from D238
+
+No instrument redesign · no model change · no timeout change · no
+schema/contract change · no ownership experiment · **no interpretation
+change after seeing the result.**
+
+Gates, in order: lifecycle must be `CORRELATION_VALID` or stop · at least
+one logical call must retry or Q6 stays UNMEASURED · then the frozen
+within-call axes · then, and only then, cross-run comparison with run 22.
+
+A different result is reported as a different result. Run 22 is not
+re-read in run 23's light.
+
+### Status — unchanged pending the result
+
+* **Q1** partial · **Q2 MEASURED — runs 17, 18, 22** · **broad-class
+  cross-run recurrence MEASURED** · **within-call reproducibility
+  MEASURED for run 22 only** · **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
