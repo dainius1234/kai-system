@@ -14337,3 +14337,192 @@ path defect · `TRANSPARENCY NOT PROVEN` → observer/control defect.
   **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * No edits while run 17 is in flight.
+
+---
+
+## D222 — where the per-attempt contract actually lives (READ ONLY)
+
+Authorised read-only contract-location analysis. **No instrument change.**
+Sources: the pinned wheels the image installs — `instructor==1.15.1`,
+`openai==2.54.0`, `cognee==1.1.3`, versions read from run 17's own build
+log — unpacked and read directly. Nothing here is inferred from names.
+
+### 0. What could NOT be read, and why
+
+`capture.jsonl` is **unreachable from this environment**. The artifact
+download host answers `curl: (56) CONNECT tunnel failed, response 403` at
+the proxy. So the literal kwargs of the five production calls were **not
+read**. Everything below is either installed source, or the one raw row
+the run-17 **log** printed (the selftest ping), or a constraint the
+summariser's own output implies. Each claim says which.
+
+### 1. `response_model` cannot reach the raw call — structurally
+
+`core/patch.py:147` declares it as a **named parameter** of
+`new_create_sync` / `new_create_async`, so it never enters `**kwargs`:
+
+```python
+def new_create_sync(response_model=None, validation_context=None,
+                    context=None, max_retries=1, strict=True,
+                    hooks=None, *args, **kwargs)
+...
+response_model, new_kwargs = handle_response_model(
+    response_model=response_model, mode=mode, **kwargs)   # :238-240
+```
+
+`handle_response_model` (`processing/response.py:409`) starts
+`new_kwargs = kwargs.copy()` and returns the model **separately**, for
+parsing. It is never written into `new_kwargs`.
+
+**The operator's hypothesis 3 is confirmed.** Asking
+`Completions.create` for `response_model` is conceptually wrong — the raw
+boundary legitimately never carries that Python object. The probe's
+`STATE["response_model"]` was not merely unset in production; even set,
+it would have been *the outer caller's* object, not this attempt's.
+
+### 2. Under `Mode.JSON` the contract is compiled into the SYSTEM MESSAGE
+
+`providers/openai/utils.py:491 handle_json_modes`:
+
+```python
+message = dedent(f"""
+    Parse the content and return a JSON object matching this schema:
+
+    {json.dumps(response_model.model_json_schema(), indent=2,
+                ensure_ascii=False)}
+
+    Return a valid JSON instance, not the schema definition.""")
+
+if mode == Mode.JSON:
+    new_kwargs["response_format"] = {"type": "json_object"}
+...
+if new_kwargs["messages"][0]["role"] != "system":
+    new_kwargs["messages"].insert(0, {"role": "system", "content": message})
+elif isinstance(new_kwargs["messages"][0]["content"], str):
+    new_kwargs["messages"][0]["content"] += f"\n\n{message}"
+```
+
+Cognee always sends `messages[0]` as the system prompt
+(`ollama/adapter.py:118-132`), so the branch taken is **append to the
+existing system content**.
+
+Therefore, for every raw attempt in this configuration:
+
+| where | what is actually there |
+|---|---|
+| `messages[0]["content"]` | **THE CONTRACT** — `model_json_schema()` as `indent=2` JSON, between a fixed marker and trailer |
+| `response_format` | `{"type": "json_object"}` — **the JSON-mode directive. No contract.** |
+| `tools` / `functions` | not used by `Mode.JSON` at all |
+| `response_model` | **absent by construction** |
+
+The operator's caution was right: `{"type":"json_object"}` must never be
+labelled "the schema".
+
+**Corroborated by observation:** the one raw row run 17 printed to the
+log (the selftest ping) has exactly this shape — system content
+`"Answer with one word.\n\n\n        Parse the content and return a JSON
+object matching this schema:\n\n        {…Ping schema…}\n\n        Return
+a valid JSON instance, not the schema definition."` with
+`response_format: "{'type': 'json_object'}"`. Source and instance agree.
+**The five production rows were not inspected** — the shape is predicted
+from the same code path, not measured.
+
+### 3. What retries change — and what they do not
+
+`core/retry.py:193-198` is the raw call; on validation failure
+`core/retry.py:255` calls `handle_reask_kwargs`, which for `Mode.JSON`
+dispatches to `reask_md_json` (`processing/response.py:651`), defined at
+`providers/openai/utils.py:151`:
+
+```python
+kwargs = kwargs.copy()
+reask_msgs = [dump_message(response.choices[0].message)]
+reask_msgs.append({"role": "user",
+    "content": f"Correct your JSON ONLY RESPONSE, based on the following errors:\n{exception}"})
+```
+
+It **appends** the failed assistant reply plus a repair instruction. It
+does **not** touch `messages[0]` and does **not** touch `response_format`.
+
+So within one logical call: the **contract prose is constant**, and the
+**messages array grows** — which is why the prompt hash differs per
+attempt while the contract does not. The operator's warning that "the
+per-attempt effective contract could differ in message content" is
+correct in general and, for this mode, resolves to: *the contract is
+stable, the repair context is what varies.*
+
+### 4. The five rows are NOT five retries of one contract
+
+`ollama/adapter.py:130` passes `max_retries=2`, and
+`core/retry.py:63-67` converts an int to `stop_after_attempt(max_retries)`
+— **at most 2 raw calls per logical `create()`**.
+
+**5 raw calls therefore span at least 3 distinct logical calls** (2+2+1).
+The "4 distinct prompts across 5 calls" figure mixes *different logical
+requests* with *retry repair growth* and must not be read as a retry
+measure. Q6 stays **UNMEASURED**; per-logical-call retry depth is bounded
+above by 2, so no run can produce a long retry series to reason over.
+
+### 5. Why the probe produced CLASSIFIER_UNMEASURED — three defects
+
+1. **`response_model` is `None` on production rows.** The wrapper reads
+   `STATE.get("response_model")`, set only inside `selftest()`. Per §1
+   this field was never recoverable at this boundary anyway.
+2. **The summariser then falls back to `response_format`** — which §2
+   shows is the mode directive, carrying no contract.
+3. **`_serialise` on a plain dict returns `str(obj)`** — a *Python repr*,
+   `"{'type': 'json_object'}"`, not JSON. `as_schema` runs `json.loads`,
+   single quotes fail, it returns `None`.
+
+Defect 3 is why the message read *"could not be read"* rather than
+*"names no required fields"*. **Verified by executing the shipped
+functions**, not by reading them:
+
+```
+_serialise({'type':'json_object'}) -> "{'type': 'json_object'}"  (str)
+as_schema(that)                    -> None
+classify(...)                      -> CLASSIFIER_UNMEASURED
+why -> SCHEMA REQUIREMENTS NOT ESTABLISHED — the schema sent for this
+       attempt could not be read …
+```
+
+That reproduces run 17's sentence verbatim. The classifier behaved
+correctly throughout: it was handed a mode directive and refused to
+pretend it was a contract.
+
+### 6. Can the contract be reconstructed from the same attempt? YES
+
+**Without reaching upward to any outer object.** `messages` is already
+captured on every row, and §2 puts the schema inside
+`messages[0]["content"]` of *that same attempt*, delimited by two
+constant strings from `providers/openai/utils.py:509-516`.
+
+So the smallest correct observation change is **analyser-side only**:
+
+* extract the JSON between the marker `Parse the content and return a
+  JSON object matching this schema:` and the trailer `Return a valid JSON
+  instance, not the schema definition.` **from the row itself**;
+* derive those delimiters from the **installed instructor** rather than
+  hard-coding them (R5 — a literal kept beside the code is a scope defect
+  waiting to happen, and this file's exact wording changed upstream for
+  issue #1514);
+* keep `response_format` as a **recorded field**, never as the contract,
+  and fix `_serialise` so a plain dict round-trips as JSON;
+* **do not** attach the outer `response_model` downward — §1 and §3 say
+  the per-attempt contract must come from the attempt.
+
+**Not proposed, not applied.** Authorisation pending.
+
+One consequence worth flagging: because this is analyser-side, run 17's
+existing `capture.jsonl` **already contains the evidence** — but it
+cannot be re-analysed from here (§0), so realising it needs either a CI
+re-run of the summariser step or a fresh capture.
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 UNMEASURED — raw responses captured; the
+  per-attempt contract needed to classify them was not established** ·
+  **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* Run 17 runtime evidence binds to `f1fdf92`. This entry is analysis of
+  installed source plus that run's log; it exercised nothing.
