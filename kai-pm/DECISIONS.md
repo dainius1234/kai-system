@@ -16360,3 +16360,55 @@ does not enter this campaign.
   ownership **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * **Campaign NOT started. Run 24 NOT launched.** Awaiting authorisation.
+
+---
+
+## D244 — campaign attempt 1/5 launched
+
+Authorised under D242 + D243. Sequential, one at a time — the stopping
+rule may end the campaign after the first qualifying capture, so
+pre-launching five runners would spend budget the rule may not need.
+
+**Attempt 1/5 = run `31844794230`** · head_sha **`397ad92`** ·
+`workflow_dispatch` · attempt 1 · created 2026-08-14T21:59:34Z. Resolved
+from an authoritative listing.
+
+**Applicability, re-established not inherited:** all **34** claim-relevant
+inputs (every path in the workflow's own `paths:` filter, plus the
+workflow file) are **byte-identical to run 22's tree `3a13100`**.
+Whole-tree diff versus `3a13100` is `kai-pm/DECISIONS.md` alone.
+
+> Repository-input equivalent to runs 22 and 23 by blob identity;
+> execution-instance independent by fresh runner, build, stack and model
+> load.
+
+### Campaign ledger
+
+| attempt | run id | tree | Gate 1 | retries | qualifying |
+|---|---|---|---|---|---|
+| 1/5 | `31844794230` | `397ad92` | pending | pending | pending |
+
+Reference points, outside the campaign denominator: run 22
+(`31840265412`) qualifying, 3 calls / 2 retried; run 23
+(`31842405123`) valid, 2 calls / 0 retried.
+
+**Two denominators, kept apart from the first row:**
+
+* **sampling** — 1 attempted / 0 qualifying so far;
+* **Q6 evidence** — run 22 only = 1 correlated retry-bearing capture.
+
+### Stopping rule, as it will be applied
+
+Stop after the first qualifying capture **has been analysed**, whatever
+its measured response — reproduction, divergence and mixture all end the
+campaign. Otherwise continue to attempt 2/5. Five attempts with no
+qualifying capture ends it with **Q6 UNMEASURED** and
+`sampling: 5 attempted / 0 qualifying` reported.
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 MEASURED — 17, 18, 22, 23** · **broad-class
+  recurrence MEASURED, 4 captures** · **within-call retry reproducibility
+  MEASURED — run 22 only** · **Q6 UNMEASURED, qualifying denominator 1** ·
+  ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
