@@ -16609,3 +16609,240 @@ yields a schema echo. That claim is now dead.
   **Q6 MEASURED: REPRODUCED** · ownership **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * No further Q6 runs authorised or needed.
+
+---
+
+## D247 — Ownership-separation experiment: FROZEN, NOT EXECUTED
+
+**2026-08-14.** Q6 is measured and the retry question is closed. The
+underlying problem is not. This entry freezes the design of the
+experiment that separates **ownership** — which layer is responsible for
+the schema echo — *before* anything is run, so the design cannot be
+edited by its own results.
+
+**Nothing in this entry has been executed.** No run id, no capture, no
+verdict. It is a pre-registration.
+
+### 0. Why a freeze, and what it forbids
+
+Every prior stint's worst errors came from deciding what counted as
+evidence after seeing the evidence. Freezing the design first means:
+
+* the arms, the wording, the number of calls, and the outcome branches
+  are on record before the first call;
+* an inconvenient result cannot be reclassified as a bad run;
+* the denominator is fixed in advance and reported whatever it contains.
+
+### 1. Prerequisite P1 — the current capture cannot be replayed faithfully
+
+**Verified by reading the shipped instrument, not assumed.**
+`scripts/security/probe_llm_contract.py:383`:
+
+```python
+"other_params": sorted(k for k in kwargs
+                       if k not in ("messages", "model", "temperature",
+                                    "response_format", "tools")),
+```
+
+Captured **with values**: `messages`, `model`, `temperature`,
+`response_format`, `tools`.
+Captured **as key names only, values discarded**: everything else.
+Captured **not at all**: positional `*args` at
+`probe_llm_contract.py:390` (`forward(self, *args, **kwargs)` — `args`
+is forwarded but never recorded).
+
+Consequence, stated exactly:
+
+> **A replay built from current captures reproduces the recorded fields.
+> It cannot be asserted to reproduce the request Instructor sent, because
+> any non-recorded parameter's value is unknown.**
+
+Whether this matters is **UNKNOWN**, and knowingly so. If production rows
+carry `other_params == []` and no positional args, the recorded fields
+*are* the whole request and Stage 1 can proceed unchanged. I checked the
+only capture file reachable from this shell
+(`scratchpad/probe.jsonl`): it contains **one** `llm-call` row,
+`phase=harness`, `other_params=[]`. That is a harness row, not a
+production row, and it licenses nothing about production. Production rows
+live in the `llm-contract-logs/capture.jsonl` artifact, which this shell
+cannot fetch (blob host 403, established earlier this stint).
+
+**P1 resolution rule — one of these, before Stage 1 runs:**
+
+* **P1a.** Read `other_params` and any positional-arg presence off a
+  production capture through a CI-side job that already downloads the
+  artifact (the reanalysis job downloads it today). If every production
+  row has `other_params == []` and no positional args, P1 is **closed by
+  evidence** and no capture change is needed.
+* **P1b.** If any production row has a non-empty `other_params`, the
+  probe must be changed to record those **values** before Stage 1 is
+  meaningful — and that change is itself a capture-instrument change,
+  which needs its own selftest criterion and its own authorisation.
+
+Stage 1 does not start until P1 is closed by P1a or P1b. Running it
+before that would produce a table of results whose subject is not the
+thing named — the exact shape R11 exists to stop.
+
+### 2. Stage 1 — exact-request replay
+
+**What it does.** Take the exact raw request Instructor presented to the
+model — the actual messages, schema presentation and model-facing
+options — and replay that request **directly** to the
+Ollama/OpenAI-compatible endpoint, with Instructor doing no validation
+and no retry around it.
+
+**What it can conclude.**
+
+* If the replay reproduces the schema echo → the failure is present at
+  the raw endpoint given that exact request. Instructor's validation and
+  retry machinery is **not** required to produce it.
+* If the replay does not reproduce it → the raw endpoint, given that
+  request, does not exhibit the defect, and something above the raw layer
+  is implicated. Given the run-24 VALID INSTANCE, a *single* clean replay
+  proves nothing; the same request already produced both classes.
+  Stage 1 therefore replays the same captured request **N times**
+  (N precommitted below), and reports the count.
+
+**What it explicitly cannot conclude — recorded here so it cannot be
+forgotten at reporting time:**
+
+> **A Stage 1 reproduction does not exonerate Instructor's prompt
+> transformation.** We would still be replaying the request *Instructor
+> created*. The schema-in-the-system-message presentation
+> (`providers/openai/utils.py:491 handle_json_modes`) is part of the
+> request under replay, not a variable held constant outside it.
+
+Stage 1 separates **retry/validation machinery** from **the request**.
+It does not separate **the request's authorship** from the model. That is
+Stage 2's job.
+
+**Stage 1 parameters, precommitted:**
+
+| parameter | value |
+|---|---|
+| source request | one production `llm-call` row, chosen by recorded id, quoted in full in the results entry |
+| replay count | **N₁ = 10**, sequential |
+| client | direct HTTP to the same endpoint; no Instructor in the path |
+| classification | the **shipped** `classify_llm_response.py`, same verdicts, at `RAW_MODEL_RESPONSE` |
+| transport error | recorded as a call with `NO_RESPONSE`; **not** replaced. Denominator stays 10 |
+| reporting | all 10 verdicts, in order, with elapsed times |
+
+N₁ = 10 is a **budget cap, not statistical power** (D243). No confidence
+interval, no significance claim.
+
+### 3. Stage 2 — controlled presentation test
+
+**Change one thing only: how the contract is presented.**
+
+* **Arm A — control.** The existing presentation: the Instructor
+  `Mode.JSON` shape, i.e. `response_format = {"type":"json_object"}` plus
+  `json.dumps(model_json_schema(), indent=2)` appended to the system
+  message. This is the presentation already measured 21 times.
+* **Arm B — treatment.** The same required output, presented as an
+  explicitly **instance-oriented** contract: the model is asked for a
+  filled-in object, and is shown what a filled-in object looks like,
+  rather than being handed a JSON Schema document.
+
+**Everything else is held identical between arms:** model, endpoint,
+temperature and every model-facing option, the task input text, the set
+of required fields, and the classifier.
+
+**Held-identical is a claim, and it will be proven, not asserted.** Both
+arms' requests are captured and diffed field-by-field in the results
+entry; the diff must show exactly the intended difference and nothing
+else. If it shows more, the arms are not controlled and the run is
+declared invalid **before** its verdicts are read.
+
+**Arm B wording — pre-registered.** The exact text is frozen *before any
+result exists*. Proposed text, subject to operator amendment before the
+first call and to no amendment after it:
+
+> System: `You return one JSON object and nothing else. The object must
+> contain exactly these keys: <keys>. Each value must be the actual
+> content requested, not a description of it, not a type name, and not a
+> schema. Do not return the words "type", "properties", "required",
+> "$defs" or "title" as keys. Here is the shape of a correct answer with
+> placeholder content: <one filled example object>.`
+
+The `<keys>` list and `<one filled example object>` are derived
+mechanically from the same pydantic model Arm A uses, so the two arms
+demand the same output. That derivation is code, not a hand-written list
+beside the model (R5).
+
+**Stage 2 parameters, precommitted:**
+
+| parameter | value |
+|---|---|
+| calls per arm | **N₂ = 10 per arm**, 20 total |
+| ordering | strictly interleaved A,B,A,B,… to spread server-state drift across arms |
+| independence | separate calls; no conversation carry-over |
+| classification | shipped `classify_llm_response.py` at `RAW_MODEL_RESPONSE` |
+| transport error | recorded, **not** replaced; denominator stays 10 per arm |
+| discarding | **none.** Every call counts. No re-draws, no "bad run" |
+
+N₂ = 10 per arm is a **budget cap, not statistical power**. The report
+gives raw counts over a stated denominator and makes no significance
+claim.
+
+### 4. Precommitted outcome branches
+
+Read the branch, do not invent one afterwards.
+
+1. **Both arms echo** (Arm B no better) → contract presentation is **not**
+   the differentiator under these conditions. Ownership does not move to
+   presentation. Next suspects, untested: sampling parameters, model
+   capability at this size, the adapter's own request construction.
+2. **Arm B substantially better** → evidence that contract presentation
+   is load-bearing, and the repair target is **how the contract is
+   presented**, not the model. Repair applies to the population of call
+   sites, not one (R6).
+3. **Both arms mostly valid** → the raw endpoint under these conditions
+   does not reproduce the defect, and something above the raw layer is
+   implicated. This branch is only readable **in combination with
+   Stage 1**; alone it is a change of conditions, not a finding.
+4. **MIXED / CONTESTED** — counts close, or one arm internally
+   inconsistent → **declare it.** Do not pick a winner, do not extend N to
+   break the tie, do not re-run. A contested result is a result.
+
+**Stopping rule.** The experiment ends when N₁ and N₂ are spent, in every
+branch. There is no "one more run".
+
+### 5. Prohibitions — carried verbatim from the operator's direction
+
+* **Not** switch to another model and declare Qwen guilty if the other
+  model works.
+* **Not** raise timeouts.
+* **Not** tune prompts until something passes.
+* **Not** change the Instructor version.
+* **Not** keep rerunning the existing test looking for convenient
+  outcomes.
+
+### 6. The bar before KAI-GATE-048 C moves BLOCKED → PASS
+
+All ten, each with evidence bound to the exact tested tree:
+
+1. Cause separated — which layer owns the failure, established by
+   experiment, not by argument.
+2. The repair covers the **population**, not the one instance that
+   surfaced it (R6, with the denominator stated — R5).
+3. A regression gate exists and **demonstrably fails** when the defect is
+   reintroduced (known-positive **and** known-negative — I-8).
+4. A real cognify ingest succeeds **end to end** on a fresh stack.
+5. The structured output contains **instances**, not schemas.
+6. A graph is genuinely produced and is usable — not merely "no error".
+7. It repeats on **independent fresh executions**, not one lucky run.
+8. No HuggingFace/network regression (R2: the contingency must survive
+   the failure it is for).
+9. Clean tree; policy-check green; gate registry green.
+10. Every claim bound to the exact tested tree, image and run id.
+
+Nine of ten green is **BLOCKED**, not "nearly PASS".
+
+### Status — unchanged by this entry
+
+* **Q1** partial · **Q2 MEASURED** (5 captures, 21 raw attempts, 20
+  SCHEMA ECHO + 1 VALID INSTANCE) · broad-class recurrence **MEASURED** ·
+  **Q6 MEASURED: REPRODUCED** · **ownership UNMOVED**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN.**
+* **D247 is a design freeze. Awaiting authorisation before P1, Stage 1 or
+  Stage 2 executes.**
