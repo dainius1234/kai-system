@@ -14189,3 +14189,82 @@ workflow was examined.
   only, excluded from Q6, and says nothing about the cognify failure.
 * The next capture fires only behind a passing transparency selftest. If
   it fails, it aborts again — with the state it actually observed.
+
+---
+
+## D220 — CI-control finding, recorded at its own scope
+
+Separated from D219 at the operator's direction. The `paths:` repair is a
+**CI-control fix**, not part of the exception-wrapper repair, and it must
+not be read as more than it is.
+
+### What was measured
+
+**One workflow.** Diffing every repo path `memu-graph-startup-proof.yml`
+references against its own `paths:` filter:
+
+* **7** calibration suites were executed by the workflow while absent
+  from its trigger — `test_asset_contract`, `test_cognify_result`,
+  `test_graph_stall`, `test_ingest_contract`, `test_llm_contract`,
+  `test_memu_graph_acceptance`, `test_model_startup_classifier`.
+* Repaired to **referenced-minus-declared = 0** for this workflow.
+
+Why it matters concretely: a commit that *weakened one of these gates*
+would not have caused the workflow to run it. The gate would still look
+green in history, having never executed against the change that
+loosened it.
+
+### What was NOT measured
+
+* No other workflow was examined. The denominator here is **one file**.
+* **Finding #50 — the general detector** ("a workflow's `paths:` filter
+  must cover every script it runs") remains **OPEN and unbuilt**. This
+  entry is one hand-measured instance, not the class.
+* This does not license "workflow path coverage solved".
+
+### Namespaces, kept explicit
+
+| id | subject | state |
+|---|---|---|
+| **finding #50** | general detector: any workflow's `paths:` vs the scripts it runs | **OPEN, unbuilt** |
+| **D220 (here)** | one workflow, 7 files, hand-measured and repaired | recorded |
+| **KAI-GATE-050** | `/graph/ingest` reported success over a failed pipeline | **CLOSED**, separately |
+
+The numeric adjacency of "#50" and "GATE-050" is a coincidence of
+numbering and nothing else. They share no subject, no evidence and no
+state.
+
+### Deferred to the later documentation milestone
+
+Not written into `ORION_FIELD_NOTES.md` now — documentation cleanup is
+not authorised yet. Queued, with its evidence attached so it does not
+arrive as a slogan:
+
+> **A gate's trigger conditions are part of the gate.** A perfectly
+> calibrated check that does not run when its own inputs change is not
+> fully enforced.
+
+It belongs in the **present ≠ executed ≠ enforced** family, and it should
+be linked to *this* seven-file finding rather than stated abstractly —
+the concrete case is what makes it checkable.
+
+### Run 17 — the interpretation, fixed before the result
+
+Run **17 = 31821368040**, commit `f1fdf92`, started 2026-08-14T16:52:31Z.
+Looked up, not guessed.
+
+| selftest outcome | what it means |
+|---|---|
+| `NOT INSTALLED` | installation defect |
+| `NOT TRAVERSED` | path defect |
+| `TRANSPARENCY NOT PROVEN` | observer/control defect |
+| passes **+ real raw rows captured** | first legitimate Q2/Q6 evidence |
+
+Only the last case licenses inspecting the actual cognify attempts.
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 UNMEASURED** · **Q6 UNMEASURED** · ownership
+  **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* Tree held at `f1fdf92`. No further changes while run 17 is in flight.
