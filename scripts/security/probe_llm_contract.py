@@ -125,6 +125,14 @@ LOGICAL_CALL_ID: contextvars.ContextVar = contextvars.ContextVar(
 LOGICAL_CALL_ATTEMPTS: contextvars.ContextVar = contextvars.ContextVar(
     "kai_gate_048c_logical_call_attempts", default=None)
 
+# Set ONLY by a control that deliberately drives the capture wrapper
+# outside any logical call. It is an EXECUTION-CONTEXT declaration made by
+# the caller, never inferred from a missing id: inferring it would let a
+# genuinely broken in-lifecycle row — one that lost its id — excuse itself
+# under the same rule that excuses the control.
+OUTSIDE_LOGICAL_CALL: contextvars.ContextVar = contextvars.ContextVar(
+    "kai_gate_048c_outside_logical_call", default=False)
+
 
 def _mint_logical_call_id() -> str:
     """An opaque id. Not derived from time, order or any request content."""
@@ -362,6 +370,7 @@ def install_capture() -> dict:
             "seq": _seq(),
             "logical_call_id": LOGICAL_CALL_ID.get(),
             "attempt_index": attempt_index,
+            "outside_logical_call": OUTSIDE_LOGICAL_CALL.get(),
             "phase": STATE.get("phase", "unknown"),
             "messages": kwargs.get("messages"),
             "model": kwargs.get("model"),
@@ -559,18 +568,66 @@ def _selftest_correlation() -> dict:
     out["corr_context_cleared_after_success"] = (
         LOGICAL_CALL_ID.get() is None and LOGICAL_CALL_ATTEMPTS.get() is None)
 
-    # 8, 10 — exception propagates unchanged AND the context is restored
+    # 8, 10 — DIFFERENTIAL exception transparency, plus context restore.
+    #
+    # The old criterion asserted `caught is sentinel`. Measured against the
+    # real installed instructor, the UNINSTRUMENTED path never returns the
+    # sentinel: tenacity wraps it in RetryError and instructor wraps that
+    # in InstructorRetryException (D233). That invariant belonged to the
+    # local stub, not to the subject.
+    #
+    # The real invariant is DIFFERENTIAL: with correlation installed, the
+    # licensed axes must match what the SAME real path produces without
+    # it. Wrapping performed by instructor/tenacity is subject behaviour,
+    # not instrumentation corruption.
     sentinel = RuntimeError("kai-gate-048c correlation sentinel")
+    invocations = {"n": 0}
 
     def raiser(*_a, **_k):
+        invocations["n"] += 1
         raise sentinel
 
-    caught = None
-    try:
-        ipatch.retry_sync(func=raiser, response_model=None, args=(), kwargs={})
-    except Exception as exc:  # noqa: BLE001
-        caught = exc
-    out["corr_exception_object_unchanged"] = caught is sentinel
+    def _chain(exc):
+        seen, out_ = [], []
+        while exc is not None and len(out_) < 8:
+            out_.append(exc)
+            exc = exc.__cause__ or exc.__context__
+        return out_
+
+    def _axes():
+        """The licensed axes, measured by running the raiser once."""
+        invocations["n"] = 0
+        caught = None
+        try:
+            ipatch.retry_sync(func=raiser, response_model=None,
+                              args=(), kwargs={})
+        except BaseException as exc:  # noqa: BLE001
+            caught = exc
+        walked = _chain(caught)
+        return {
+            "invocations": invocations["n"],
+            "exc_type": type(caught).__name__ if caught is not None else None,
+            "chain": [type(e).__name__ for e in walked],
+            "sentinel_in_chain": any(e is sentinel for e in walked),
+            "message": str(caught)[:200] if caught is not None else None,
+        }
+
+    originals = STATE.get("correlation_originals") or {}
+    baseline = None
+    if "retry_sync" in originals:
+        instrumented_fn = ipatch.retry_sync
+        try:
+            ipatch.retry_sync = originals["retry_sync"]   # UNINSTRUMENTED
+            baseline = _axes()
+        finally:
+            ipatch.retry_sync = instrumented_fn
+    with_corr = _axes()
+
+    out["corr_baseline_captured"] = baseline is not None
+    out["corr_exception_transparent_vs_baseline"] = (
+        baseline is not None and baseline == with_corr)
+    out["corr_exception_axes"] = {"baseline": baseline,
+                                  "instrumented": with_corr}
     out["corr_context_cleared_after_exception"] = (
         LOGICAL_CALL_ID.get() is None and LOGICAL_CALL_ATTEMPTS.get() is None)
 
@@ -605,8 +662,16 @@ def _selftest_correlation() -> dict:
     ids_minted = {i for i, _ in first} | {i for i, _ in second}
     out["corr_id_absent_from_model_facing_fields"] = not any(
         i and i in model_facing for i in ids_minted)
-    out["corr_id_present_on_captured_rows"] = bool(rows) and all(
-        r.get("logical_call_id") for r in rows)
+    # POPULATION SPECIFICATION (D233). Only rows produced INSIDE a logical
+    # call are required to carry an id. Rows a control deliberately drove
+    # outside one are kept, stay visible, and are excluded by their own
+    # declared execution context — never by the absence of the id, which
+    # is the very thing under test.
+    in_call = [r for r in rows if not r.get("outside_logical_call")]
+    out["corr_id_population_is_declared"] = any(
+        r.get("outside_logical_call") for r in rows)
+    out["corr_id_present_on_in_call_rows"] = bool(in_call) and all(
+        r.get("logical_call_id") for r in in_call)
     return out
 
 
@@ -628,7 +693,11 @@ def selftest() -> int:
       9 the selftest's own calls are EXCLUDED from the Q6 denominator.
 
      10 the injected stand-in ACTUALLY RAN, exactly once;
-     11 the forward target is the real original again afterwards.
+     11 the forward target is the real original again afterwards;
+     12 correlation is DIFFERENTIALLY transparent — the licensed exception
+        axes match what the SAME real path produces uninstrumented;
+     13 every row produced INSIDE a logical call carries its id, with
+        out-of-call control rows excluded by declared execution context.
 
     Criterion 5 needs no model run: a controlled exception is raised from
     a stand-in original and the wrapper is driven through the real
@@ -756,10 +825,18 @@ def selftest() -> int:
 
         class _Fake:
             pass
+        # This control drives the capture wrapper DIRECTLY, outside any
+        # retry_sync, so the row it produces legitimately has no logical
+        # call. It declares that here (D233) so the correlation-population
+        # criterion can exclude it by EXECUTION CONTEXT rather than by the
+        # absent id, which is the thing being tested.
+        outside_token = OUTSIDE_LOGICAL_CALL.set(True)
         try:
             probe_wrapper(_Fake(), messages=[], model="x")
         except Exception as exc:  # noqa: BLE001
             caught = exc
+        finally:
+            OUTSIDE_LOGICAL_CALL.reset(outside_token)
     finally:
         # try/finally, not a trailing statement: the production drive must
         # never continue against the test stand-in, including if the

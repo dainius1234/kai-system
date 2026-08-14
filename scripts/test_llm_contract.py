@@ -814,10 +814,27 @@ for name, m in (("openai", pkg),
     sys.modules[name] = m
 
 ipatch = types.ModuleType("instructor.core.patch")
+# REPRODUCE THE REAL WRAPPING. Measured against instructor 1.15.1 (D233):
+# an exception from `func` emerges as InstructorRetryException, chained
+# InstructorRetryException -> RetryError -> original. A pass-through stub
+# is kinder than reality and cannot fail the differential criterion.
+class RetryError(Exception): pass
+class InstructorRetryException(Exception): pass
+def _wrap(exc):
+    try:
+        raise RetryError("retry") from exc
+    except RetryError as re:
+        raise InstructorRetryException("<failed_attempts>") from re
 def retry_sync(func, response_model=None, args=(), kwargs=None, **_):
-    return func(*(args or ()), **(kwargs or {}))
+    try:
+        return func(*(args or ()), **(kwargs or {}))
+    except Exception as exc:
+        _wrap(exc)
 async def retry_async(func, response_model=None, args=(), kwargs=None, **_):
-    return func(*(args or ()), **(kwargs or {}))
+    try:
+        return func(*(args or ()), **(kwargs or {}))
+    except Exception as exc:
+        _wrap(exc)
 ipatch.retry_sync = retry_sync
 ipatch.retry_async = retry_async
 icore = types.ModuleType("instructor.core")
@@ -881,14 +898,36 @@ out["id_is_opaque_not_ordinal"] = all(
     not str(i).isdigit() and len(str(i)) >= 12 for i in ids1 | ids2)
 
 sentinel = RuntimeError("corr sentinel")
+inv = {"n": 0}
 def raiser(*a, **k):
+    inv["n"] += 1
     raise sentinel
-caught = None
-try:
-    ipatch.retry_sync(func=raiser)
-except Exception as exc:
-    caught = exc
-out["exception_object_unchanged"] = caught is sentinel
+def chain(e):
+    out_ = []
+    while e is not None and len(out_) < 8:
+        out_.append(e); e = e.__cause__ or e.__context__
+    return out_
+def axes(fn):
+    inv["n"] = 0
+    caught = None
+    try:
+        fn(func=raiser)
+    except BaseException as exc:
+        caught = exc
+    w = chain(caught)
+    return {"invocations": inv["n"],
+            "exc_type": type(caught).__name__ if caught is not None else None,
+            "chain": [type(e).__name__ for e in w],
+            "sentinel_in_chain": any(e is sentinel for e in w),
+            "message": str(caught)[:200] if caught is not None else None}
+originals = probe.STATE.get("correlation_originals") or {}
+base = axes(originals["retry_sync"]) if "retry_sync" in originals else None
+inst = axes(ipatch.retry_sync)
+out["baseline_captured"] = base is not None
+out["exception_transparent_vs_baseline"] = base is not None and base == inst
+out["baseline_actually_wraps"] = bool(
+    base and base["exc_type"] == "InstructorRetryException"
+    and not base.get("sentinel_is_the_object"))
 out["cleared_after_exception"] = (probe.LOGICAL_CALL_ID.get() is None
                                   and probe.LOGICAL_CALL_ATTEMPTS.get() is None)
 
@@ -934,6 +973,22 @@ def one_capture(*a, **k):
 ipatch.retry_sync(func=one_capture)
 rows = [json.loads(l) for l in open(probe.OUT) if '"llm-call"' in l]
 out["row_carries_id"] = bool(rows) and bool(rows[-1].get("logical_call_id"))
+# POPULATION: an out-of-call control row is excluded by DECLARED context.
+tok = probe.OUTSIDE_LOGICAL_CALL.set(True)
+try:
+    wrapper(object(), messages=[{"role": "user", "content": "y"}], model="m")
+finally:
+    probe.OUTSIDE_LOGICAL_CALL.reset(tok)
+rows2 = [json.loads(l) for l in open(probe.OUT) if '"llm-call"' in l]
+declared = [r for r in rows2 if r.get("outside_logical_call")]
+in_call = [r for r in rows2 if not r.get("outside_logical_call")]
+out["out_of_call_row_is_declared"] = len(declared) == 1
+out["out_of_call_row_has_no_id"] = bool(declared) and not declared[0].get(
+    "logical_call_id")
+out["in_call_rows_all_carry_ids"] = bool(in_call) and all(
+    r.get("logical_call_id") for r in in_call)
+out["population_excludes_by_context_not_by_missing_id"] = (
+    bool(declared) and bool(in_call))
 out["row_carries_index"] = bool(rows) and rows[-1].get("attempt_index") == 1
 facing = json.dumps({k: rows[-1].get(k) for k in
                      ("messages", "response_model", "response_format",
@@ -978,7 +1033,13 @@ def test_the_correlation_identifies_isolates_and_cleans_up() -> None:
         "index_restarts": "the next call restarts its index at 1",
         "return_unchanged": "the return value is unchanged",
         "cleared_after_success": "context is cleared after success",
-        "exception_object_unchanged": "the exception object is unchanged",
+        "baseline_captured": "an uninstrumented baseline was captured",
+        "baseline_actually_wraps": "and the baseline WRAPS, as the real path does",
+        "exception_transparent_vs_baseline": "instrumented == uninstrumented on the licensed axes",
+        "out_of_call_row_is_declared": "the out-of-call row declares its context",
+        "out_of_call_row_has_no_id": "and legitimately carries no id",
+        "in_call_rows_all_carry_ids": "every in-call row carries an id",
+        "population_excludes_by_context_not_by_missing_id": "the population is split by context, not by absence",
         "cleared_after_exception": "context is cleared after an exception",
         "no_leak_into_next_call": "no id leaks into the next invocation",
         "concurrent_ids_distinct": "concurrent invocations cannot share an id",

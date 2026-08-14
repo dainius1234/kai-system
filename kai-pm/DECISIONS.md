@@ -15655,3 +15655,86 @@ whose transparency is being claimed.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * Gate 1 stays `TRANSPARENCY NOT PROVEN` until both criteria are
   correctly defined and demonstrated. 25/27 does not weaken it.
+
+---
+
+## D234 — Gate-1 criteria repaired against measured reality (authorised)
+
+The four authorised changes, nothing else. No model, timeout,
+Q6-definition, ownership, production-semantics or architecture change.
+
+### 1. Population defined by execution context, never by a missing id
+
+`OUTSIDE_LOGICAL_CALL` — a contextvar **set by the control that
+deliberately drives the capture wrapper outside any `retry_sync`**
+(`probe:833`), and stamped onto the row as `outside_logical_call`.
+
+The criterion splits on that declaration:
+
+```python
+in_call = [r for r in rows if not r.get("outside_logical_call")]
+out["corr_id_present_on_in_call_rows"] = bool(in_call) and all(
+    r.get("logical_call_id") for r in in_call)
+out["corr_id_population_is_declared"] = any(
+    r.get("outside_logical_call") for r in rows)
+```
+
+**Not** `logical_call_id is None`. Inferring out-of-call status from the
+absent id would let a genuinely broken in-lifecycle row excuse itself
+under the same rule that excuses the control — the exemption would erase
+the defect it exists to permit.
+
+### 2. Differential transparency, from the real baseline
+
+`corr_exception_object_unchanged` is **removed**. It asserted `caught is
+sentinel`, which D233 measured to be false of the *uninstrumented* real
+path: instructor+tenacity yield
+`InstructorRetryException → RetryError → RuntimeError`.
+
+Replaced by `corr_exception_transparent_vs_baseline`: the selftest
+temporarily restores `originals["retry_sync"]`, measures the licensed axes
+uninstrumented, restores the wrapper, measures again, and requires
+equality on **invocation count, final exception type, exception chain,
+sentinel presence in the chain, and message**. Instructor/tenacity
+wrapping is **subject behaviour**, so it appears identically on both sides
+and cancels.
+
+`corr_baseline_captured` records that a baseline was actually taken —
+without it, "equal" could mean "compared nothing".
+
+### 3. The stub now wraps
+
+The calibration's stub `retry_sync` was a pass-through. It now reproduces
+the measured chain (`InstructorRetryException → RetryError → original`),
+and `baseline_actually_wraps` asserts the baseline really does wrap — so
+the differential criterion is exercised against wrapping behaviour rather
+than against a kinder fiction. This is D232's rule applied to the defect
+D233 found.
+
+### 4. Mutations — each repaired criterion fails for its own defect
+
+| mutation | failing criterion |
+|---|---|
+| an in-lifecycle row loses its `logical_call_id` | `in_call_rows_all_carry_ids=False` (+3 others) |
+| correlation alters one real exception axis (type) | `exception_transparent_vs_baseline=False` |
+
+Restored: **258 / 0**, 19 scenarios (was 251). `policy-check` green,
+registry gate green.
+
+**Criteria stay independent.** `corr_context_cleared_after_exception` is
+still its own check and waives nothing.
+
+### Process note
+
+The mutation script hit the 2-minute command limit mid-run, leaving the
+probe mutated. Restored from backup and **verified** — mutation string
+absent, suite back to 258/0 — rather than assumed. A restore that is not
+checked is the same class as a claim that is not run (R1).
+
+### Status — nothing moved
+
+* **Q1** partial · **Q2 MEASURED — runs 17 + 18** · **cross-run
+  recurrence MEASURED** · **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* **Gate 1 remains TRANSPARENCY NOT PROVEN** until the repaired
+  instrument proves otherwise against the real stack.
