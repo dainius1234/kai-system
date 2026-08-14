@@ -12390,3 +12390,108 @@ and the axis dies.
 * **Settling poll — DEFERRED**, not warranted by current observations.
 * No remediation: no timeout, no model, no cognee change, no endpoint
   fix, no memu-graph production change, no Phase 2.
+
+---
+
+## D203
+
+**2026-08-14 — fresh KAI-GATE-049 diagnostic with the identity-bearing
+sampler. Axis 2 is MEASURED for the first time, not inferred.**
+
+Run **31787454480**, job **94726465385**, commit **`d7dadec`**, tree
+`9774dffd`. Diagnostic step 09:19:35 → 09:27:29.
+
+### Axis 1 — STAGE OWNERSHIP (measured)
+
+5 cognee task markers. Entered without returning:
+
+```
+classify_documents              09:20:52.770108506Z
+extract_chunks_from_documents   09:20:52.770529779Z
+extract_graph_and_summarize     09:20:52.778244182Z
+```
+
+`extract_graph_and_summarize` is `asyncio.gather(extract_graph_from_data,
+summarize_text)`, so cognee's own logging still cannot separate the two
+concurrent LLM paths.
+
+### Axis 2 — EXECUTION STATE (MEASURED, no longer provisional)
+
+```
+samples taken: 20
+CONTINUITY: ONE INSTANCE
+  one execution instance across all 20 samples
+  (container_id and pid1_starttime constant, ticks monotonic)
+STATE: WAITING ON DELEGATE
+  9.3s CPU over 385s wall (2.4% of one core);
+  delegate socket seen in 19/20 samples — blocked on ollama, not computing
+```
+
+**All three continuity signals held across all 19 adjacent pairs.** This
+is the first execution-state claim in the programme that rests on
+measured process continuity rather than on inference from the return.
+
+### Axis 3 — RETURN SEMANTICS (measured)
+
+`RETURNED status=200 after 390.9s`, well inside the 900s observation
+window.
+
+### Comparison with run 9 — under the operator's four cautions
+
+| | run 9 (`da3320a`) | run 11 (`d7dadec`) |
+|---|---|---|
+| stage | `extract_graph_and_summarize` | **same** |
+| continuity | **NOT RECORDED** (provisional) | **ONE INSTANCE** (measured) |
+| CPU | 7.4s / 385s = 1.9% | 9.3s / 385s = 2.4% |
+| delegate socket | 19/20 | **19/20** |
+| return | 200 @ 396.3s | 200 @ **390.9s** |
+
+* **Same stage does not imply same process state.** It is not being
+  inferred: run 11 measured its own axis 2 independently. Run 9's axis 2
+  **stays provisional** and is not repaired by this.
+* **Similar duration does not prove a timeout.** 390.9s and 396.3s differ
+  by 5.4s and neither equals any configured bound — not 300s, not 900s.
+  Two runs that *disagree* by seconds are evidence against an
+  instrument-determined constant, which is the opposite of what runs 4
+  and 6 showed when both landed on our own 300s budget.
+* **Different duration does not imply a different root cause.** A 1.4%
+  spread on a shared CPU runner needs no explanation and is not offered
+  one.
+* Run 11 resolves axis 2 **prospectively**. It cannot and does not repair
+  run 9.
+
+### Closure-review precondition
+
+The operator's condition — *continuous PID identity confirmed, and the
+CPU/socket evidence supports WAITING ON DELEGATE* — is **met**.
+
+**KAI-GATE-049 nevertheless remains OPEN.** Rule 7: closure is a separate
+evidence-backed register action, and it is not taken here. One
+distinction a closure review must settle first:
+
+> The **diagnostic question** is answered — the stage is
+> `extract_graph_and_summarize`, the state is *blocked on the delegate*,
+> the request returns 200 at ~391s. The **underlying condition is
+> unremediated** — graph extraction still exceeds the 300s live-cycle
+> budget, which is half of what blocks KAI-GATE-048 C.
+
+Whether a diagnostic finding closes while its condition persists is the
+operator's judgement, not the instrument's.
+
+### The `$?`-after-pipeline incident — checked, nothing opened
+
+The operator's condition was to check whether it exposed a live unchecked
+pipeline in gating code. Measured: **9 of 9** `scripts/security/*.sh`
+collectors set `pipefail`, and no `$?` capture follows a pipeline in any
+of them. The defect was in an ad-hoc shell command of mine, not in gating
+code. No workstream opened.
+
+### Standing
+
+* **KAI-GATE-048 C — BLOCKED** by two independent defects (D201).
+* **KAI-GATE-049 — OPEN**, all three axes now measured for run 11;
+  closure-review precondition met; run 9's axis 2 permanently provisional.
+* **KAI-GATE-050 — OPEN**, reproduced 2/2, unremediated.
+* **Settling poll — DEFERRED.**
+* No remediation: no timeout, no model, no cognee change, no endpoint
+  fix, no memu-graph production change, no Phase 2.
