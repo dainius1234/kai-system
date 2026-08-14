@@ -14984,3 +14984,71 @@ three live owners with three different remedies.
   RAW_MODEL_RESPONSE) · **Q6 UNMEASURED** · **cross-run recurrence
   UNMEASURED, pending run 18** · ownership **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+
+---
+
+## D227 — correction: observer liveness ≠ subject observation
+
+**Correcting my own claim in the previous message, not a prior entry.**
+Having checked `ps` and found the wake timer alive (PID 2904, 3m56s of
+420s), I wrote that its empty output was
+
+> ~~`OBSERVED / SUBJECT_UNCHANGED`~~
+
+That is wrong, and wrong in exactly the shape D226 exists to prevent. What
+`ps` established is that **the scheduler process exists**. Nothing had
+queried GitHub at all. Proving the watcher is running and treating that as
+proof the watcher has *seen its subject* re-creates the defect one layer
+higher — the instrument's own presence standing in for the observation.
+
+The justified state at that moment was:
+
+> **`OBSERVER_ALIVE / OBSERVATION_PENDING`**
+
+### The corrected state machine (supersedes D226 §1's three states)
+
+Observer liveness and subject observation are **separate axes**, and a
+state must name both:
+
+```
+OBSERVER_ALIVE / OBSERVATION_PENDING     <- scheduled, subject not yet queried
+        |
+        +-- query SUCCEEDS -> OBSERVED / SUBJECT_UNCHANGED
+        |                     OBSERVED / SUBJECT_CHANGED
+        |
+        +-- query FAILS    -> OBSERVER_FAILURE  (and say what failed)
+```
+
+`OBSERVED / SUBJECT_UNCHANGED` may be emitted **only after a successful
+query reached the run/job and established that its relevant state has not
+changed.** Never from process liveness, never from elapsed time, never
+from an empty output file.
+
+D226 §1's three states remain correct as far as they went; they simply had
+no term for the interval before the first successful query, and I filled
+that gap with the wrong one. **Both go to the documentation milestone
+together** (task #59's family) — the pending state is the part that makes
+the rule usable in flight, which is where it failed.
+
+### Run 18 — the interpretation order, precommitted
+
+Recorded before the result so no step can be chosen after seeing it:
+
+1. **Selftest class first.** If not `TRANSPARENT`, **stop** — instrument
+   result only, and **no row of the table is quoted.**
+2. **Q2, fresh capture** — establish contract recovery per attempt
+   *before* classifying any response.
+3. **Cross-run recurrence** — only after the fresh capture has a valid
+   raw-layer verdict.
+4. **Q6** — remains UNMEASURED absent logical-call correlation.
+5. **Ownership** — unchanged regardless of recurrence alone.
+
+Step 1's refusal to quote the table is now a **precommitted evidence
+rule**, not a judgement available to be made after an inconvenient result.
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 MEASURED** (run 31821368040, 5/5 SCHEMA ECHO) ·
+  **Q6 UNMEASURED** · **cross-run recurrence UNMEASURED** · ownership
+  **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
