@@ -16412,3 +16412,120 @@ qualifying capture ends it with **Q6 UNMEASURED** and
   MEASURED — run 22 only** · **Q6 UNMEASURED, qualifying denominator 1** ·
   ownership **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+
+---
+
+## D245 — campaign attempt 1/5 QUALIFIED. Q6 measured; a new Q2 verdict appeared
+
+Run **31844794230** · tree **`397ad92`** · job **94908916986**.
+Repository-input equivalent to runs 22/23 by blob identity (34/34 vs
+`3a13100`); execution-instance independent.
+
+### Gate 1 — CORRELATION_VALID
+
+```
+SELFTEST-CLASS: TRANSPARENT — 30 criteria
+Q6z. CORRELATION LIFECYCLE: CORRELATION_VALID
+  8c2541b22f4e4aa8  CORRELATION_VALID  1 attempt(s)
+  7c77a770f01f41ee  CORRELATION_VALID  2 attempt(s)
+  a308ea3d04b6492f  CORRELATION_VALID  1 attempt(s)
+```
+
+### Gate 2 — QUALIFYING
+
+```
+raw attempts 4 · logical calls 3 · calls that RETRIED: 1
+```
+
+**The campaign stops here**, per D242/D243: stop after the first
+qualifying capture has been analysed, whatever it says.
+
+**sampling: 1 attempted / 1 qualifying.**
+**Q6 evidence: run 22 + run 24 = 2 correlated retry-bearing captures.**
+
+### Gate 3 — within-call, and the cross-run comparison
+
+```
+7c77a770f01f41ee: 2 attempt(s)
+  same contract on retry : True
+  repair context changed : yes (+2142 bytes of messages)
+  same failure class     : True (SCHEMA ECHO, SCHEMA ECHO)
+  byte-identical replies : False
+```
+
+Against run 22's two retried calls — same contract on retry **True/True**,
+repair context **+2142 bytes** in both, same failure class **True/True**,
+byte-identical **True / False**:
+
+| axis | run 22 | run 24 |
+|---|---|---|
+| same contract on retry | True (×2) | True |
+| repair context changed | +2142 bytes (×2) | +2142 bytes |
+| same failure class on retry | True (×2) | True |
+| byte-identical replies | True, False | False |
+
+### Q6 — MEASURED: REPRODUCED
+
+Across **two independent qualifying correlated captures**, every retried
+logical call retried **under the same contract**, received **+2142 bytes**
+of repair context, and returned **the same failure class** (SCHEMA ECHO)
+on the retry. Three retried calls in total, 3/3.
+
+Byte identity is **not** part of the reproduced claim — it was True once
+and False twice. The reproduced property is the **failure class**, which
+is what Q6 asks.
+
+**Scope, per D243 amendment 2** — this is a budget-bounded result, not a
+powered one:
+
+> **Retry-level behaviour reproduced across two independent qualifying
+> correlated captures under the frozen conditions** — instructor 1.15.1,
+> `Mode.JSON`, `OllamaAPIAdapter`, `qwen2.5:3b`, this cognify path, these
+> two contracts.
+
+Not "qwen2.5:3b always does this". The conditions travel with the claim.
+
+### A NEW Q2 VERDICT — the first VALID INSTANCE at the raw layer
+
+```
+ # layer               contract    prompt~c  schema~c   resp~b   classification  elapsed
+ 1 RAW_MODEL_RESPONSE  RECOVERED  dc203ead5 89def7469 a547a7ae8 SCHEMA ECHO     233.307
+ 2 RAW_MODEL_RESPONSE  RECOVERED  a6e5e25d2 fd7b68067 f9f04a63a SCHEMA ECHO      57.023
+ 3 RAW_MODEL_RESPONSE  RECOVERED  0220afc97 fd7b68067 bb651c035 SCHEMA ECHO      65.559
+ 4 RAW_MODEL_RESPONSE  RECOVERED  a6e5e25d2 fd7b68067 be76a6ae9 VALID INSTANCE    6.449
+```
+
+Attempt 4, logical call `a308ea3d04b6492f`, **validated against the
+contract it was sent** — same contract hash `fd7b68067d` and same prompt
+hash `a6e5e25d2` as attempt 2, which was a schema echo. Elapsed 6.4 s
+versus 57.0 s.
+
+**This is the first `VALID INSTANCE` at `RAW_MODEL_RESPONSE` in the
+campaign.** Runs 17, 18, 22, 23 were 5/5, 5/5, 5/5, 2/2 schema echo.
+
+It matters, and it is NOT interpreted here:
+
+* it does **not** weaken Q6 — that call had **one** attempt, so it
+  contributes no retry evidence at all;
+* it does **not** overturn broad-class recurrence — schema echo still
+  occurred 3/4 in this run and 17/17 across all five captures;
+* it **does** establish that the same prompt hash under the same contract
+  can produce either kind, so the failure is **not deterministic** at the
+  raw layer.
+
+That last point is new, and it is a fact about this pair of rows only. No
+mechanism is proposed and no ownership is assigned.
+
+### Ownership — UNMOVED
+
+A non-deterministic failure under a fixed prompt and contract is
+consistent with both live candidates. It does not separate them.
+
+### Status
+
+* **Q1** partial · **Q2 MEASURED — runs 17, 18, 22, 23, 24; 20 raw
+  attempts, 19 SCHEMA ECHO, 1 VALID INSTANCE** · **broad-class recurrence
+  MEASURED, 5 captures** · **Q6 — MEASURED: REPRODUCED**, denominator 2
+  qualifying captures, 3 retried calls · ownership **unmoved**.
+* **Campaign CLOSED at 1/5 by the frozen stopping rule.**
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
