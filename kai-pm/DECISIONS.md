@@ -15833,3 +15833,99 @@ to each commit, artifact and decision entry that earned it.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * **Gate 1 pending.** Only the actual lifecycle evidence moves it —
   not timing, not prior runs, not expectation.
+
+---
+
+## D237 — run 22: Gate 1 VALID, retries observed, within-call measured
+
+Run **31840265412** · tree **`3a13100`** · job **94895395491**. Reported in
+D231's frozen order.
+
+### Gate 1 — CORRELATION_VALID
+
+```
+selftest exit: 0
+SELFTEST-CLASS: TRANSPARENT
+CAPTURE POINT PROVEN TRANSPARENT: 30 criteria, 1 call(s) via Completions.create
+
+Q6z. CORRELATION LIFECYCLE: CORRELATION_VALID
+  e43aadfe3a304e82   CORRELATION_VALID   1 attempt(s)
+  da7a7cde64c3444a   CORRELATION_VALID   2 attempt(s)
+  93210fbbc8524a77   CORRELATION_VALID   2 attempt(s)
+```
+
+Every logical call shows the full lifecycle — ENTER → id minted →
+attempts under it with rising indices → EXIT → CONTEXT_RESET_CONFIRMED.
+The D234 criteria passed against the real stack, so the repair is proven
+where it matters and not only in calibration.
+
+### Gate 2 — a retry population EXISTS
+
+```
+raw attempts       : 5
+logical calls      : 3  -> {e43aadfe…: 1, da7a7cde…: 2, 93210fbb…: 2}
+calls that RETRIED : 2
+```
+
+This is the first time the five raw attempts have been **assigned** to
+their invocations. Runs 17 and 18 had the same count and no way to say
+which belonged together; the `max_retries=2` bound is now visible as fact
+rather than arithmetic — no call exceeds two attempts.
+
+### Gate 3 — within-call behaviour, now licensed
+
+```
+logical_call_id    contract~c  n classifications  prompt~c            resp~b
+e43aadfe3a304e82   89def7469d  1 SCHEMA ECHO      dc203ead            56bf4ec3
+da7a7cde64c3444a   fd7b68067d  2 SCHEMA ECHO      a6e5e25d,a1a0a431   f9f04a63,f9f04a63
+93210fbbc8524a77   fd7b68067d  2 SCHEMA ECHO      a6e5e25d,b485c3f1   f9f04a63,7c7688ae
+```
+
+| | da7a7cde64c3444a | 93210fbbc8524a77 |
+|---|---|---|
+| same contract on retry | **True** | **True** |
+| repair context changed | yes, **+2142 bytes** | yes, **+2142 bytes** |
+| same failure class | **True** (SCHEMA ECHO, SCHEMA ECHO) | **True** (SCHEMA ECHO, SCHEMA ECHO) |
+| byte-identical replies | **True** | **False** |
+
+**The answer to the within-call question, for this run:** instructor
+retried the *same* logical request under the *same* contract, added
+~2.1 KB of repair instructions, and the model **returned a schema echo
+again both times**. In one call the retry was byte-identical; in the
+other it was a *different* schema echo — same failure class, different
+bytes. So the repair context demonstrably reached the model and
+demonstrably did not change the outcome class.
+
+Q2 for this run: **5/5 SCHEMA ECHO at RAW_MODEL_RESPONSE**, consistent
+with runs 17 and 18.
+
+### Q6 — still UNMEASURED, and the reason has changed
+
+Within-call reproducibility is now **measured for this run**. Q6 is not
+closed, because its cross-run component is untouched:
+
+> Q6 IS NOT ANSWERED BY THE EXISTENCE OF IDS … a SECOND independent
+> correlated capture. **One correlated run is not two.**
+
+Runs 17 and 18 give cross-run recurrence of the **broad raw failure
+class**, not of **retry-level behaviour** — they had no correlation at
+all. So the cross-run half of Q6 has a denominator of **one**.
+
+**Q6 UNMEASURED.** The definition is not weakened because the first
+correlated run is persuasive.
+
+### Ownership — UNMOVED
+
+That a retry under an unchanged contract with added repair text produces
+the same failure class narrows *where* the failure survives. It does not
+separate the two candidates: `json_mode`'s transformation may be
+inviting description rather than instantiation, or the model may be
+failing an adequate transformed contract. Both remain consistent with
+every row above.
+
+### Status
+
+* **Q1** partial · **Q2 MEASURED — runs 17, 18, 22** · **cross-run
+  recurrence MEASURED (broad class)** · **within-call reproducibility
+  MEASURED for run 22 only** · **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
