@@ -15536,3 +15536,122 @@ Restored: **251 / 0**. `policy-check` green, registry gate green.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * No model, timeout, production-semantics, ownership, Q6-definition or
   architecture change.
+
+---
+
+## D233 — run 21 Gate 1: the two failing criteria are the TEST's, not the hook's
+
+Run 21 = **31836554217**, commit `131497b`, job **94884015129**.
+Diagnostic only — **no criterion changed, no production rerun.**
+
+### Gate 1 verdict
+
+```
+selftest exit: 4
+SELFTEST-CLASS: TRANSPARENCY NOT PROVEN
+CAPTURE POINT TRAVERSED BUT NOT PROVEN TRANSPARENT:
+  corr_exception_object_unchanged, corr_id_present_on_captured_rows
+inspected: 27 transparency criterion(s), 1 model call(s) captured
+inspected: 0 production model call(s)
+```
+
+**Not** `NOT INSTALLED`, **not** `NOT TRAVERSED` — the D232 import repair
+worked. 25 of 27 pass, including the four the run-20 defect made
+unreachable (`corr_same_id_within_one_call`,
+`corr_different_id_across_calls`, `corr_attempt_index_ordered`,
+`corr_index_restarts_next_call`) and, notably,
+`corr_context_cleared_after_exception: true`.
+
+Q6 stops here. **UNMEASURED.**
+
+### `corr_exception_object_unchanged` — the criterion encodes the STUB's behaviour
+
+Measured against the real installed `instructor==1.15.1`, **uninstrumented**:
+
+```
+func_invocations       1
+exc_type               InstructorRetryException
+is_the_sentinel_object FALSE
+chain                  InstructorRetryException -> RetryError -> RuntimeError
+sentinel_in_chain      True
+```
+
+**The real path never returns the sentinel object.** Tenacity wraps it in
+`RetryError` and instructor wraps that in `InstructorRetryException`. My
+criterion asserted `caught is sentinel` — an invariant the subject has
+never had. It was true only of my local stub, whose `retry_sync` called
+`func` directly.
+
+Then the like-for-like control, both halves in one process:
+
+| axis | WITHOUT correlation | WITH correlation |
+|---|---|---|
+| func invocations | 1 | 1 |
+| exception type | InstructorRetryException | InstructorRetryException |
+| is the sentinel object | False | False |
+| chain | IRE → RetryError → RuntimeError | IRE → RetryError → RuntimeError |
+| sentinel in chain | True | True |
+| message prefix | identical | identical |
+
+**IDENTICAL ON EVERY AXIS.** The instrumentation added exactly three
+lifecycle events (`logical-call-enter`, `logical-call-exit`,
+`context-reset-confirmed`) and changed nothing else.
+
+So the correlation **is** exception-transparent against the real path. The
+criterion was wrong about the subject, and it failed for the right reason
+— it just named the wrong invariant.
+
+This is D232's lesson one layer deeper: the stub was kinder than reality
+**again**, this time by making `retry_sync` a pass-through when the real
+one is a tenacity engine.
+
+### `corr_id_present_on_captured_rows` — wrong population
+
+The criterion quantifies over **every** `llm-call` row in the selftest
+file (`probe:608`). The failing row is the D219 exception control at
+`probe:760`, which calls `probe_wrapper(_Fake(), messages=[], model="x")`
+— the capture wrapper **directly**, outside any `retry_sync`, therefore
+outside any logical call by construction.
+
+```
+{"event":"llm-call","attempt":2,"seq":5,"logical_call_id":null,
+ "attempt_index":null,"phase":"selftest",...,
+ "transport_error":"RuntimeError: kai-gate-048c selftest sentinel"}
+```
+
+`null` is **correct behaviour**, and `next_attempt_index()` returning
+`None` outside an invocation is the documented contract. The criterion
+quantified over the wrong denominator.
+
+### Proposed minimum repair — NOT APPLIED, authorisation pending
+
+1. **Population specification.** `corr_id_present_on_captured_rows`
+   restricted to rows produced **inside** a logical-call lifecycle. Rows
+   deliberately generated outside one stay captured, stay
+   distinguishable, and **must not enter the correlation-license
+   denominator**. Implemented by marking the out-of-call control rows
+   explicitly (e.g. `outside_logical_call: true`) rather than by
+   filtering on the absent id — otherwise a genuinely missing id would be
+   excused by the same rule.
+2. **Transparency invariant defined from the measured baseline**, not
+   from the stub: with correlation installed, the real `retry_sync` must
+   produce the **same** exception type, the same chain, the same
+   sentinel-in-chain, the same invocation count and the same message as
+   the uninstrumented real path. Wrapping performed by instructor is
+   **subject behaviour**, not instrumentation corruption.
+3. **The local stub must reproduce tenacity's wrapping** so criterion 2
+   can fail locally, per D232's rule.
+4. Each repaired criterion gets a mutation proving it still fails for the
+   defect it names.
+
+**Not proposed:** replacing the real boundary with a harmless stand-in so
+the sentinel survives. That would test the stand-in, not the boundary
+whose transparency is being claimed.
+
+### Status — nothing moved
+
+* **Q1** partial · **Q2 MEASURED — runs 17 + 18** · **cross-run
+  recurrence MEASURED** · **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* Gate 1 stays `TRANSPARENCY NOT PROVEN` until both criteria are
+  correctly defined and demonstrated. 25/27 does not weaken it.
