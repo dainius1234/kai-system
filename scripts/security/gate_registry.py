@@ -797,8 +797,10 @@ REGISTRY: Tuple[Gate, ...] = (
          kind=GATE,
          summary="the four stall states — slow LLM work, waiting on the "
                  "delegate, stuck elsewhere, local compute — must stay "
-                 "four distinct verdicts, and a non-return must never "
-                 "read as a proven hang",
+                 "four distinct verdicts; a non-return must never read as "
+                 "a proven hang; and a container replaced mid-observation "
+                 "must yield UNKNOWN rather than an execution state, "
+                 "including when the identity fields are absent entirely",
          inputs=(),
          denominator=r"Graph Stall Analyser Calibration: \d+ passed",
          proven_by="scripts/test_graph_stall.py",
@@ -824,7 +826,10 @@ REGISTRY: Tuple[Gate, ...] = (
                  "an unmeasured diagnostic cannot go green; when a request "
                  "WAS sent, names the cognee task entered without "
                  "returning and whether the process was computing or "
-                 "blocked, and authorises no remedy — slow work, a blocked "
+                 "blocked — but only after ADJACENT-PAIR continuity proves "
+                 "the samples describe one execution instance, since a "
+                 "replaced container reads as flat CPU to a first-vs-last "
+                 "difference; authorises no remedy — slow work, a blocked "
                  "wait and a deadlock have three different owners",
          inputs=(),
          denominator=r"inspected: \d+ of \d+ expected stage log",
@@ -842,9 +847,12 @@ REGISTRY: Tuple[Gate, ...] = (
          kind=REPORT,
          summary="runs INSIDE the image: POSTs /graph/ingest without the "
                  "300s budget under investigation, and samples pid-1 CPU "
-                 "ticks plus open sockets to the delegate; its argv "
-                 "contract is a pure function so a caller's command line "
-                 "can be validated before any stack exists",
+                 "ticks, open sockets to the delegate, and the process "
+                 "identity (container_id, /proc/1/stat field 22) that lets "
+                 "a reader tell one execution instance from its "
+                 "replacement; its argv contract is a pure function so a "
+                 "caller's command line can be validated before any stack "
+                 "exists",
          inputs=(),
          denominator=r"inspected: \d+ connection\(s\), \d+ cognee log line",
          probe=False,

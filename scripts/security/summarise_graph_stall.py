@@ -102,11 +102,65 @@ def samples(text: Optional[str]) -> List[dict]:
     return out
 
 
+def continuity(rows: List[dict]) -> Tuple[bool, str]:
+    """(is one execution instance, why not).
+
+    ADJACENT PAIRS, never first-vs-last. `cpu_verdict` used to difference
+    only the endpoints, so a container replaced mid-observation — pid 1
+    reset to near zero, then climbing again — still produced a positive
+    total and was read as "flat CPU", i.e. WAITING ON DELEGATE. That is
+    the hole D198 recorded, and endpoints cannot see it by construction.
+
+    Absence of the identity fields is NOT continuity. Evidence collected
+    before this existed cannot establish that its samples describe one
+    process, and saying otherwise would be the instrument asserting what
+    it did not measure.
+    """
+    if len(rows) < 2:
+        return False, f"{len(rows)} sample(s) — continuity needs at least 2"
+    missing = [k for k in ("container_id", "pid1_starttime_ticks")
+               if any(k not in r for r in rows)]
+    if missing:
+        return False, (f"process identity NOT RECORDED "
+                       f"({', '.join(missing)} absent from at least one "
+                       f"sample) — continuity cannot be established, and "
+                       f"absence is not continuity")
+    for i in range(1, len(rows)):
+        prev, cur = rows[i - 1], rows[i]
+        if cur["container_id"] != prev["container_id"]:
+            return False, (f"container_id changed between sample {i - 1} and "
+                           f"{i}: {prev['container_id']!r} -> "
+                           f"{cur['container_id']!r} — the samples describe "
+                           f"different containers")
+        if cur["pid1_starttime_ticks"] != prev["pid1_starttime_ticks"]:
+            return False, (f"pid1_starttime changed between sample {i - 1} "
+                           f"and {i}: {prev['pid1_starttime_ticks']} -> "
+                           f"{cur['pid1_starttime_ticks']} — pid 1 is a "
+                           f"different process")
+        prev_t = prev.get("pid1_utime_ticks", 0) + prev.get("pid1_stime_ticks", 0)
+        cur_t = cur.get("pid1_utime_ticks", 0) + cur.get("pid1_stime_ticks", 0)
+        if cur_t < prev_t:
+            return False, (f"cumulative CPU ticks DECREASED between sample "
+                           f"{i - 1} and {i}: {prev_t} -> {cur_t} — counters "
+                           f"only rise within one process")
+    return True, (f"one execution instance across all {len(rows)} samples "
+                  f"(container_id and pid1_starttime constant, ticks "
+                  f"monotonic)")
+
+
 def cpu_verdict(rows: List[dict]) -> Tuple[str, str]:
     """(verdict, detail) from CPU growth and delegate sockets."""
     if len(rows) < 2:
         return "UNKNOWN", (f"{len(rows)} sample(s) — at least 2 are needed to "
                            f"see growth at all")
+    intact, why = continuity(rows)
+    if not intact:
+        # The operator's rule: measurement degrades BY AXIS. Execution
+        # state becomes UNKNOWN; stage ownership and return semantics are
+        # measured elsewhere and stay reportable.
+        return ("UNKNOWN — PROCESS IDENTITY CONTINUITY NOT ESTABLISHED",
+                why + ". Computing and blocked cannot be told apart across "
+                      "a replacement, so no execution state is claimed.")
     hz = rows[0].get("clock_ticks_per_sec") or 100
     first, last = rows[0], rows[-1]
     ticks = ((last.get("pid1_utime_ticks", 0) + last.get("pid1_stime_ticks", 0))
@@ -223,8 +277,16 @@ def main() -> int:
     rows = samples(read(d / "samples.log"))
     verdict, detail = cpu_verdict(rows)
     print(f"     samples taken: {len(rows)}")
+    intact, why = continuity(rows)
+    print(f"     CONTINUITY: {'ONE INSTANCE' if intact else 'NOT ESTABLISHED'}")
+    print(f"       {why}")
     print(f"     STATE: {verdict}")
     print(f"       {detail}")
+    if not intact:
+        print("       Axes 1 and 3 above and below are unaffected: stage")
+        print("       ownership comes from the service log and return")
+        print("       semantics from the probe, neither of which depends on")
+        print("       the samples. Measurement degrades by axis.")
     print()
 
     print("  3. RETURN SEMANTICS — did the request return, and with what")

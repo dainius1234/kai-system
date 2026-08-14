@@ -45,7 +45,7 @@ from scripts.security import probe_graph_stall as p  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 12
+EXPECTED_SCENARIOS = 17
 executed: list[str] = []
 
 
@@ -70,10 +70,12 @@ SERVICE_LOG = """
     """
 
 
-def rows(n, utime_step, delegate, hz=100, step=20):
+def rows(n, utime_step, delegate, hz=100, step=20, identity=True):
+    """`identity=False` reproduces a pre-#56 sample, which must read as
+    'continuity not established' rather than as a continuous one."""
     out = []
     for i in range(n):
-        out.append(json.dumps({
+        row = {
             "monotonic": float(i * step),
             "pid1_utime_ticks": i * utime_step,
             "pid1_stime_ticks": 0,
@@ -82,7 +84,37 @@ def rows(n, utime_step, delegate, hz=100, step=20):
             "delegate_connections": (
                 [{"remote": "172.18.0.3:11434", "state": "ESTABLISHED"}]
                 if delegate else []),
-        }))
+        }
+        if identity:
+            row["container_id"] = "1a2b3c4d5e6f"
+            row["pid1_starttime_ticks"] = 4242
+            row["pid1_age_seconds"] = float(i * step)
+        out.append(json.dumps(row))
+    return "\n".join(out) + "\n"
+
+
+def replaced_rows(n, utime_step, delegate, at, new_id=None, new_start=None):
+    """A container replaced at sample `at`: counters reset, then climb.
+
+    THE CASE FIRST-VS-LAST CANNOT SEE. After the reset the totals rise
+    again, so the endpoint difference stays positive and the old logic
+    read it as ordinary flat-or-growing CPU."""
+    out = []
+    for i in range(n):
+        replaced = i >= at
+        row = {
+            "monotonic": float(i * 20),
+            "pid1_utime_ticks": (i - at) * utime_step if replaced else i * utime_step,
+            "pid1_stime_ticks": 0,
+            "clock_ticks_per_sec": 100,
+            "connections_total": 3,
+            "container_id": (new_id or "1a2b3c4d5e6f") if replaced else "1a2b3c4d5e6f",
+            "pid1_starttime_ticks": (new_start or 4242) if replaced else 4242,
+            "delegate_connections": (
+                [{"remote": "172.18.0.3:11434", "state": "ESTABLISHED"}]
+                if delegate else []),
+        }
+        out.append(json.dumps(row))
     return "\n".join(out) + "\n"
 
 
@@ -422,6 +454,119 @@ def test_a_real_observation_still_passes() -> None:
               proc.stdout[-500:])
 
 
+# ── 5. #56: process-identity continuity ──────────────────────────────
+
+def test_continuity_holds_for_one_instance() -> None:
+    """The known-positive. Constant identity and rising ticks must NOT be
+    downgraded, or every honest run becomes UNKNOWN and the axis dies."""
+    scenario("continuity holds")
+    intact, why = s.continuity(json_rows(rows(5, 5, True)))
+    check("one instance is recognised", intact, why)
+    check("and it says so explicitly", "one execution instance" in why, why)
+    check("the four states still work under continuity",
+          s.cpu_verdict(json_rows(rows(5, 5, True)))[0]
+          == "WAITING ON DELEGATE", "")
+    check("and so does the growing case",
+          s.cpu_verdict(json_rows(rows(5, 1200, True)))[0]
+          == "SLOW LLM WORK", "")
+
+
+def test_a_replacement_first_vs_last_could_not_see() -> None:
+    """THE load-bearing case, and the literal hole D198 recorded.
+
+    A container replaced at sample 2: ticks reset, then climb again. The
+    endpoint difference stays POSITIVE, so first-vs-last saw nothing and
+    happily returned an execution state."""
+    scenario("replacement caught")
+    text = replaced_rows(6, 5, True, at=2, new_start=99999)
+    got = json_rows(text)
+    first_last = (got[-1]["pid1_utime_ticks"] + got[-1]["pid1_stime_ticks"]) - \
+                 (got[0]["pid1_utime_ticks"] + got[0]["pid1_stime_ticks"])
+    check("first-vs-last still looks positive — which is why it was blind",
+          first_last > 0, str(first_last))
+    intact, why = s.continuity(got)
+    check("adjacent pairs catch it", not intact, why)
+    check("and name pid1_starttime", "pid1_starttime changed" in why, why)
+    verdict, detail = s.cpu_verdict(got)
+    check("execution state becomes UNKNOWN",
+          verdict.startswith("UNKNOWN"), verdict)
+    check("and says continuity was not established",
+          "CONTINUITY NOT ESTABLISHED" in verdict, verdict)
+    check("and refuses to claim computing-vs-blocked",
+          "cannot be told apart" in detail, detail)
+
+
+def test_each_discontinuity_signal_fires_alone() -> None:
+    """Three independent signals. Any one is enough; none may be the only
+    one that works."""
+    scenario("each signal fires alone")
+    # container replaced but starttime coincidentally equal
+    intact, why = s.continuity(json_rows(
+        replaced_rows(6, 5, True, at=3, new_id="ffffffffffff")))
+    check("container_id change alone is caught", not intact, why)
+    check("and is named", "container_id changed" in why, why)
+    # starttime changes, id unchanged
+    intact, why = s.continuity(json_rows(
+        replaced_rows(6, 5, True, at=3, new_start=77777)))
+    check("pid1_starttime change alone is caught", not intact, why)
+    # ticks go backwards with identity unchanged (counter reset only)
+    back = json_rows(rows(4, 100, True))
+    back[2]["pid1_utime_ticks"] = 0
+    intact, why = s.continuity(back)
+    check("a tick decrease alone is caught", not intact, why)
+    check("and is named", "DECREASED" in why, why)
+
+
+def test_absent_identity_is_not_continuity() -> None:
+    """Pre-#56 evidence — run 9's samples — must read as 'not
+    established', never as continuous. Absence is not continuity, and
+    this is what keeps D198's downgrade honest rather than retroactively
+    reversed."""
+    scenario("absent identity is not continuity")
+    old = json_rows(rows(5, 5, True, identity=False))
+    intact, why = s.continuity(old)
+    check("identity-free samples are NOT continuous", not intact, why)
+    check("and it says NOT RECORDED", "NOT RECORDED" in why, why)
+    check("and says absence is not continuity",
+          "absence is not continuity" in why, why)
+    check("execution state is UNKNOWN for them",
+          s.cpu_verdict(old)[0].startswith("UNKNOWN"), s.cpu_verdict(old)[0])
+
+
+def test_axes_1_and_3_survive_an_unknown_axis_2() -> None:
+    """The operator's rule: measurement degrades BY AXIS. A discontinuity
+    must not discard a measured stage owner or a measured return."""
+    scenario("axes 1 and 3 survive")
+    with tempfile.TemporaryDirectory() as tmp:
+        d = stage_dir(tmp, {
+            "rc.env": "INGEST_RC=0\nWINDOW=900\nELAPSED=400\nLIVE_CYCLE_BUDGET=300\n",
+            "ingest.log": "ENTERED  http-post  monotonic=1.0 budget=900.0s\n"
+                          "RETURNED http-post  status=200 elapsed=396.3s\n"
+                          'BODY {"status":"ingested"}\n',
+            "samples.log": replaced_rows(6, 5, True, at=2, new_start=99999),
+            "service-logs.log": SERVICE_LOG,
+            "ollama-after.log": "",
+            "ollama-baseline.log": "",
+        })
+        proc = subprocess.run(
+            [sys.executable, "scripts/security/summarise_graph_stall.py",
+             "--stage-logs", str(d)],
+            cwd=REPO, capture_output=True, text=True, timeout=60)
+        out = proc.stdout
+        check("axis 1 is still reported",
+              "extract_graph_and_summarize" in out, out[:1400])
+        check("axis 3 is still reported", "status=200" in out
+              and "396.3s" in out, out[-1400:])
+        check("axis 2 is UNKNOWN", "CONTINUITY NOT ESTABLISHED" in out,
+              out[:1600])
+        check("and it says the other axes are unaffected",
+              "unaffected" in out, out[:1600])
+        # A discontinuity is an OBSERVATION, not an instrument failure:
+        # the run still measured two of three axes.
+        check("a discontinuity does not fail the gate", proc.returncode == 0,
+              f"rc={proc.returncode}")
+
+
 def run_all() -> None:
     test_the_four_states_stay_distinct()
     test_one_sample_cannot_establish_growth()
@@ -435,6 +580,11 @@ def run_all() -> None:
     test_the_run_8_command_line_is_rejected()
     test_a_run_that_asked_nothing_is_not_a_diagnosis()
     test_a_real_observation_still_passes()
+    test_continuity_holds_for_one_instance()
+    test_a_replacement_first_vs_last_could_not_see()
+    test_each_discontinuity_signal_fires_alone()
+    test_absent_identity_is_not_continuity()
+    test_axes_1_and_3_survive_an_unknown_axis_2()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS, f"{len(executed)}: {executed}")

@@ -12301,3 +12301,92 @@ occurs**.
 No remediation performed: no timeout change, no model change, no cognee
 modification, no endpoint fix, no memu-graph production change, no
 Phase 2.
+
+---
+
+## D202
+
+**2026-08-13 — #56 built: process/container continuity is now enforced
+per-sample, and D198's downgrade of run 9 is made permanent rather than
+retroactively reversed.**
+
+D198 recorded that run 9's execution-state axis was provisional because
+`cpu_verdict` differenced only the **first and last** samples, so a
+container replaced mid-observation — pid 1 reset to near zero, then
+climbing again — still produced a positive total and read as *flat CPU*,
+i.e. `WAITING ON DELEGATE`.
+
+### What each sample now carries
+
+`probe_graph_stall.sample()` adds:
+
+| field | source | what it settles |
+|---|---|---|
+| `pid1_starttime_ticks` | `/proc/1/stat` **field 22** (`tail[19]`) | **decisive** — changes iff pid 1 is a different process |
+| `container_id` + `container_id_source` | `/proc/self/mountinfo` → `/proc/self/cgroup` → `/etc/hostname` | corroboration |
+| `pid1_age_seconds` | `uptime − starttime/hz` | the `container_started_at` the operator asked for, derived |
+| `uptime_seconds` | `/proc/uptime` | the basis for the above |
+
+**The field index was calibrated against independent evidence (I-8),**
+not trusted from the offset arithmetic: derived pid-1 age **323.3s** vs
+`/proc/1` ctime **320.1s** — agree within 5s. The expected answer came
+from a different file than the one under test.
+
+**`container_id` is corroboration, not the signal.** Its discriminating
+power depends on the runtime: the first local run returned `'vm'` from
+`/etc/hostname` — a non-id — which is why `/proc/self/mountinfo` and
+`/proc/self/cgroup` were put ahead of it. `docker-compose.full.yml` sets
+no `hostname:` for memu-graph (checked), so Docker's default short
+container id applies there — but that is a property of this compose file,
+not a guarantee, and it is written down as such. `pid1_starttime_ticks`
+comes from the kernel and needs no such caveat.
+
+### What the analyser now refuses
+
+`summarise_graph_stall.continuity()` walks **adjacent pairs** and returns
+"not established" on any of three independent signals:
+
+1. `container_id` changes between neighbouring samples;
+2. `pid1_starttime_ticks` changes;
+3. cumulative CPU ticks **decrease** — counters only rise within one
+   process.
+
+Any one is sufficient; each is asserted to fire **alone**, so none can be
+the only one that works.
+
+**Absence of the identity fields is NOT continuity.** Pre-#56 evidence —
+run 9's samples — reads as `process identity NOT RECORDED`, which keeps
+D198's downgrade honest instead of silently reversing it once the
+instrument improved.
+
+### Measurement degrades by axis
+
+On a discontinuity the report prints
+`UNKNOWN — PROCESS IDENTITY CONTINUITY NOT ESTABLISHED` for axis 2 and
+**still reports axes 1 and 3**, which come from the service log and the
+probe respectively and depend on no sample. The gate **exits 0**: a
+discontinuity is an *observation*, not an instrument failure, and the run
+still measured two of three axes.
+
+### Calibration
+
+`scripts/test_graph_stall.py`: **31/8 → 79 assertions / 17 scenarios**.
+The load-bearing one constructs a container replaced at sample 2 and
+first asserts that **first-vs-last still looks positive** — proving the
+old logic was blind by construction, not by accident — then asserts
+adjacent pairs catch it and name `pid1_starttime`.
+
+Known-positives kept: constant identity with rising ticks must still
+yield the four ordinary states, or every honest run degrades to UNKNOWN
+and the axis dies.
+
+### Standing, unchanged by this work
+
+* **KAI-GATE-048 C — BLOCKED** by two independent defects (D201).
+* **KAI-GATE-049 — OPEN.** Axis 2 stays **provisional for run 9**: this
+  instrument cannot retroactively measure a run that did not record
+  identity. It makes the *next* run's axis 2 decidable.
+* **KAI-GATE-050 — OPEN**, reproduced 2/2, unremediated.
+* **Settling poll — DEFERRED**, not warranted by current observations.
+* No remediation: no timeout, no model, no cognee change, no endpoint
+  fix, no memu-graph production change, no Phase 2.

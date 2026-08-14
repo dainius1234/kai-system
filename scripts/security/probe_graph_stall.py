@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import socket
 import struct
 import sys
@@ -92,18 +93,83 @@ def connections() -> list[dict]:
     return out
 
 
-def cpu_ticks() -> tuple[int, int]:
-    """(utime, stime) of pid 1, in clock ticks. Growth = computing."""
+def pid1_stat() -> tuple[int, int, int]:
+    """(utime, stime, starttime) of pid 1, in clock ticks.
+
+    `starttime` is field 22 of /proc/1/stat — the moment pid 1 began,
+    measured in ticks since boot. **It changes if and only if pid 1 is a
+    different process.** That is the whole point: without it, a container
+    replaced mid-observation presents a fresh pid 1 whose counters start
+    near zero, and a verdict computed from first-vs-last totals reads the
+    reset as "flat CPU" and reports WAITING ON DELEGATE. Run 9's
+    execution-state axis is provisional for exactly this reason (D198).
+
+    Indices: the comm field can contain spaces and parentheses, so the
+    split is taken after the LAST ')'. tail[0] is then field 3, hence
+    utime=field 14=tail[11], stime=15=tail[12], starttime=22=tail[19].
+    """
     try:
         stat = open("/proc/1/stat", encoding="utf-8").read()
     except OSError:
-        return (-1, -1)
-    # The comm field can contain spaces and parentheses; split after it.
+        return (-1, -1, -1)
     tail = stat[stat.rfind(")") + 2:].split()
     try:
-        return int(tail[11]), int(tail[12])
+        return int(tail[11]), int(tail[12]), int(tail[19])
     except (IndexError, ValueError):
-        return (-1, -1)
+        return (-1, -1, -1)
+
+
+def container_identity() -> tuple[str, str]:
+    """(container_id, source).
+
+    NONE of these is guaranteed, so they are tried most-discriminating
+    first and the SOURCE is recorded alongside the value:
+
+      1. /proc/self/mountinfo — Docker bind-mounts
+         /var/lib/docker/containers/<id>/{resolv.conf,hostname,hosts},
+         so the real container id appears in the mount source path.
+      2. /proc/self/cgroup — carries the id under cgroup v1, but is
+         frequently a bare `0::/` under v2, which is rejected here.
+      3. /etc/hostname — Docker defaults it to the short container id,
+         and `docker-compose.full.yml` sets no `hostname:` for
+         memu-graph (checked). But that is a property of this compose
+         file, not a guarantee: an override would make it a service name,
+         constant across a replacement and therefore useless here.
+
+    **`pid1_starttime_ticks` is the decisive signal, not this.** It comes
+    from the kernel and changes iff pid 1 is a different process,
+    whatever the runtime chose to call the container. This value is
+    corroboration.
+    """
+    try:
+        for line in open("/proc/self/mountinfo", encoding="utf-8"):
+            m = re.search(r"/docker/containers/([0-9a-f]{12,})/", line)
+            if m:
+                return m.group(1), "/proc/self/mountinfo"
+    except OSError:
+        pass
+    try:
+        for line in open("/proc/self/cgroup", encoding="utf-8"):
+            path = line.rsplit(":", 1)[-1].strip()
+            if len(path) > 1 and path != "/":
+                return path, "/proc/self/cgroup"
+    except OSError:
+        pass
+    try:
+        name = open("/etc/hostname", encoding="utf-8").read().strip()
+        if name:
+            return name, "/etc/hostname"
+    except OSError:
+        pass
+    return "", "UNAVAILABLE"
+
+
+def uptime_seconds() -> float:
+    """Seconds since boot, for deriving how long pid 1 has been alive."""
+    try:
+        return float(open("/proc/uptime", encoding="utf-8").read().split()[0])
+    except (OSError, IndexError, ValueError):
+        return -1.0
 
 
 def cognee_log_tail(lines: int = 12) -> list[str]:
@@ -130,15 +196,32 @@ def cognee_log_tail(lines: int = 12) -> list[str]:
 
 
 def sample() -> int:
-    u, s = cpu_ticks()
+    u, s, starttime = pid1_stat()
+    hz = os.sysconf("SC_CLK_TCK")
+    up = uptime_seconds()
+    container_id, id_source = container_identity()
     conns = connections()
     delegate = [c for c in conns if c["remote"].endswith(":11434")]
     print(json.dumps({
         "monotonic": round(time.monotonic(), 3),
         "wall": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        # ── identity: does this sample describe the SAME execution
+        # instance as the last one? Without these, "flat CPU" and
+        # "replaced container" are the same reading (D198).
+        "container_id": container_id,
+        "container_id_source": id_source,
+        "pid1_starttime_ticks": starttime,
+        # container_started_at, derived: a container's pid 1 begins when
+        # the container does, so its age IS the container's age. Reported
+        # rather than the absolute boot-relative tick alone, because the
+        # age is what a reader can sanity-check against the run.
+        "pid1_age_seconds": (round(up - starttime / hz, 1)
+                             if up >= 0 and starttime >= 0 else None),
+        "uptime_seconds": up,
+        # ── execution state
         "pid1_utime_ticks": u,
         "pid1_stime_ticks": s,
-        "clock_ticks_per_sec": os.sysconf("SC_CLK_TCK"),
+        "clock_ticks_per_sec": hz,
         "connections_total": len(conns),
         "delegate_connections": delegate,
     }))
