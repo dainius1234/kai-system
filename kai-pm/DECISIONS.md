@@ -14268,3 +14268,72 @@ Only the last case licenses inspecting the actual cognify attempts.
   **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * Tree held at `f1fdf92`. No further changes while run 17 is in flight.
+
+---
+
+## D221 — two constraints frozen BEFORE run 17 reports
+
+Written before the result so neither can be chosen after seeing it.
+
+### 1. The runtime evidence binds to `f1fdf92`, not to head
+
+> **Run 17 runtime evidence applies to `f1fdf92`. D220 at `2d53209` is
+> later documentation/evidence bookkeeping and was not exercised by that
+> run.**
+
+| | commit | tree |
+|---|---|---|
+| what run 17 built | `f1fdf92` | `332224d0a7829fd3f38a852e7ca0308415564538` |
+| current head | `2d53209` | `e048d21d67ceb82730f4f92373bb76cb3e7df2b9` |
+
+**Measured, not assumed** — the diff between them is
+`kai-pm/DECISIONS.md`, 79 insertions, one file. Filtering the changed
+paths for anything outside `kai-pm/` returns nothing, so no executable
+input to the workflow moved. That is *why* the trees may be reasoned
+about together; it is **not** a licence to say head was tested.
+
+**TESTED TREE SHA == CLAIMED TESTED TREE SHA.** Whatever run 17 proves,
+it proves about `332224d0…`. A later clean tree does not inherit runtime
+proof it never received — and every subsequent DECISIONS entry pushes
+head further from the tested one, which is exactly the drift this guards.
+
+### 2. Q6 is not promoted by instrument validity
+
+A passing selftest plus real raw rows makes **Q2 genuinely measurable at
+the raw boundary** and gives the **first valid evidence toward Q6**. It
+does not answer Q6.
+
+Q6 is answered only if:
+
+* the **denominator actually contains the required retry attempts** —
+  and if run 17 captures one successful attempt and no retries, the
+  denominator is 1, which is a valid measurement of a case with no
+  retries, **not** an answer about retry reproducibility; and
+* the **cross-run component** is satisfied, which needs an **independent
+  run** for as long as that remains part of Q6's definition.
+
+*A valid instrument is a precondition for the answer, not the answer.*
+Promoting Q6 because the instrument finally works would repeat the shape
+this whole thread exists to refuse.
+
+### 3. Provenance is evidence, never identity proof
+
+CI will print the real `openai.*` module path in
+`provenance_of_original`. It is **recorded and inspected**, and it does
+**not** become an identity criterion. A module string is a name; the
+stronger basis stays what it already is — **source** (what the installed
+code does), **binding** (identity against the pre-patch callable) and
+**invocation** (the stand-in provably executed).
+
+### Reading order, fixed
+
+The **selftest class first**. Only a pass licenses looking at production
+raw attempts. `NOT INSTALLED` → installation defect · `NOT TRAVERSED` →
+path defect · `TRANSPARENCY NOT PROVEN` → observer/control defect.
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 UNMEASURED** · **Q6 UNMEASURED** · ownership
+  **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* No edits while run 17 is in flight.
