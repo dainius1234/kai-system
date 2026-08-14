@@ -16207,3 +16207,63 @@ as a fact about run 23. Outside this experiment; not diagnosed here.
   reproducibility / Q6 — UNMEASURED, denominator still 1** · ownership
   **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+
+---
+
+## D242 — proposed bounded sampling rule for Q6. NOT AUTHORISED
+
+No run 24 has been launched. This entry exists so the stopping rule is
+frozen **before** any further capture, not chosen once results are in.
+
+### Why a rule is needed at all
+
+Run 23 was valid and contained no retry population. The tempting next
+move — launch runs until one happens to retry — would make the stopping
+decision depend on the data, and the resulting sample would be selected
+by the very thing being measured. **The stopping rule is part of the
+experiment.**
+
+### Proposed rule
+
+1. **N = 5.** Up to five additional independent, repository-input-
+   equivalent captures. N is fixed now.
+2. **Every run counts.** Runs that fail Gate 1, and runs that pass Gate 1
+   with zero retries, are both recorded in the denominator of captures
+   attempted. Nothing is discarded for being unhelpful.
+3. **Qualifying run** = Gate 1 `CORRELATION_VALID` **and** at least one
+   logical call with ≥2 attempts. Only qualifying runs may contribute to
+   the retry-level claim.
+4. **Stop on POPULATION, never on OUTCOME.** Sampling stops when either
+   N is exhausted **or** one additional qualifying run is obtained. The
+   qualifying criterion is *"a retry occurred"* — which is independent of
+   what the retry returned. Stopping because a result looked convenient
+   would be the bias this rule exists to prevent, and is prohibited.
+5. **If several qualify within N, all of them are used**, not the
+   agreeable one.
+6. **If none qualify in N runs: Q6 remains UNMEASURED**, with the full
+   denominator reported — "5 additional captures, 0 qualifying" is a
+   result about the sampling, not about the model.
+7. **Both outcomes are measurements.** If a qualifying run's retry
+   reproduces run 22's class, cross-run retry-level reproducibility is
+   MEASURED as reproducing. If it diverges, it is MEASURED as diverging.
+   Divergence is not a failed experiment and does not send us looking for
+   a third opinion.
+8. **No instrument, model, timeout, schema or ownership change** across
+   the series. Any such change ends the series and starts a new one.
+9. Every run: authoritative id ↔ tree binding, and claim-relevant input
+   identity re-established, before its evidence is used.
+
+### What is NOT proposed
+
+Re-running until a retry appears · discarding runs · adjusting N after
+seeing results · treating run 23 as evidence against retry
+reproducibility · re-reading run 22.
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 MEASURED — runs 17, 18, 22, 23** · **broad-class
+  recurrence MEASURED, 4 captures** · **within-call retry reproducibility
+  MEASURED — run 22 only** · **Q6 UNMEASURED, denominator 1** ·
+  ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* Awaiting authorisation. No run 24 exists.
