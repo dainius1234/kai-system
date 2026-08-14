@@ -13272,3 +13272,87 @@ green.
   of the LLM contract.
 * **KAI-GATE-049 — CLOSED. KAI-GATE-050 — CLOSED/remediated.**
 * Q1/Q2/Q6 will be rerun **only after** a capture-point selftest passes.
+
+---
+
+## D212
+
+**2026-08-14 — run 14: the selftest gate fired as designed. And it
+exposed that one of my two hooks was NOT observation-only.**
+
+Run **31806661924**, job **94787126544**, commit `420e27b`, tree
+`f302487f`.
+
+```
+== CAPTURE-POINT SELFTEST — is the hook actually on the path? ==
+  selftest exit: 2
+  | <stdin>:247: RuntimeWarning: coroutine
+  |   'install_capture.<locals>.capturing_bound' was never awaited
+  | {"event": "selftest-result", "calls_observed": 0, "hooks_that_fired": [],
+  |  "hooks_installed": ["inner.chat.completions.create", "instructor.create_fn"]}
+  |   CAPTURE POINT NOT TRAVERSED
+MEASUREMENT ABORTED: THE CAPTURE POINT IS NOT TRAVERSED.
+  Q1/Q2/Q6 were NOT measured. This is an INSTRUMENT failure,
+  not evidence about the LLM contract, and no full capture run
+  was spent on it.
+```
+
+**The gate did its job.** Job duration ~3 minutes, almost all of it
+image build — versus run 13's ~9 minutes spent on a hook that could not
+observe. D211's purpose was to stop paying that cost, and it did.
+
+### The RuntimeWarning is the finding
+
+> `coroutine 'capturing_bound' was never awaited`
+
+A coroutine object only exists if the function was **called**. So
+`instructor.create_fn` **is on the path — it was invoked.** But the
+caller did not `await` it, so my `async def` body never ran, which is
+exactly why `hooks_that_fired` is empty despite the hook being reached.
+
+That is qualitatively different from "the hook is not traversed". It
+narrows H1 sharply: **instructor reaches `create_fn`, but its calling
+convention is not "await this async callable"** — it expects something
+my replacement is not. What it does expect is not yet established.
+
+### The part I have to own: that hook was not observation-only
+
+The standing rule is that the hook must return the exact original object
+and alter nothing. `capturing_bound` **violated it**. Because instructor
+called it and never awaited the result, the original function was
+**never invoked on that path** — my wrapper silently replaced a call
+rather than observing it.
+
+It did not corrupt this run's evidence: the selftest's own invocation
+error is caught and explicitly not treated as a failure, and the
+expensive capture never ran. But had the selftest passed for the other
+hook and proceeded, this one would have been sitting in the path
+suppressing calls. **`instructor.create_fn` must be unhooked or
+re-hooked with the correct convention before any further run.**
+
+I introduced it in D211 while arguing that hooking both boundaries was
+safer than choosing one. Hooking more boundaries is only safer if each
+is genuinely a pass-through, and I did not verify that for the second
+one.
+
+### What is still unmeasured
+
+* **Q1/Q2/Q6 — UNMEASURED.** Run 14 is evidence about the instrument,
+  not the LLM contract. Ownership of KAI-GATE-048 C does not move.
+* **H2** — `get_llm_client_stable` and the object ids were recorded in
+  the `resolved-config` event but are **not in the log window I read**.
+  They are in artifact 9221516529. Not asserted here.
+* `inner.chat.completions.create` also recorded nothing, so it too is
+  either off the path or reached by a convention my wrapper does not
+  satisfy. Undetermined which.
+
+### Standing
+
+* **KAI-GATE-048 C — BLOCKED**, response-contract ownership UNMEASURED.
+* **KAI-GATE-049 — CLOSED. KAI-GATE-050 — CLOSED.**
+* No mode, model, timeout, retry, schema, validator or topology change.
+* **Next, pending authorisation:** remove or correct the
+  `instructor.create_fn` hook so it is a true pass-through, establish
+  instructor's actual calling convention from its installed source in the
+  image, and read H2's identity evidence out of the artifact — all before
+  another capture run.
