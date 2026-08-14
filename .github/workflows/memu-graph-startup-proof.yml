@@ -48,6 +48,18 @@ on:
       - scripts/security/probe_llm_contract.py
       - scripts/security/classify_llm_response.py
       - scripts/security/summarise_llm_contract.py
+      # The calibration suites that GATE the jobs below. Each was run by
+      # this workflow while absent from its own trigger, so a change that
+      # weakened a gate would not have caused the workflow to run it.
+      # Derived by diffing every path this file references against this
+      # list — seven, not the one that was noticed (R4/R6).
+      - scripts/test_asset_contract.py
+      - scripts/test_cognify_result.py
+      - scripts/test_graph_stall.py
+      - scripts/test_ingest_contract.py
+      - scripts/test_llm_contract.py
+      - scripts/test_memu_graph_acceptance.py
+      - scripts/test_model_startup_classifier.py
       - memu-graph/Dockerfile
       - memu-graph/requirements.txt
       - memu-graph/app.py

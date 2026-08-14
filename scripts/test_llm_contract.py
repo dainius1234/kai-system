@@ -26,7 +26,7 @@ import classify_llm_response as c  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 10
+EXPECTED_SCENARIOS = 12
 executed: list[str] = []
 
 
@@ -247,10 +247,26 @@ def test_the_collector_gates_on_the_selftest() -> None:
     check("and it runs BEFORE the expensive capture",
           0 < i_self < i_drive, f"{i_self} vs {i_drive}")
     check("a failed selftest aborts the run",
-          "MEASUREMENT ABORTED: THE CAPTURE POINT IS NOT TRAVERSED"
+          "MEASUREMENT ABORTED: CAPTURE TRANSPARENCY NOT PROVEN"
           in collector, "")
     check("and says it is an instrument failure, not LLM evidence",
           "not evidence about the LLM contract" in collector, "")
+    # D218: run 16 printed "NOT TRAVERSED" for a run in which traversal
+    # WAS proven. One message for three states makes the evidence name a
+    # state that did not occur.
+    check("the abort no longer claims non-traversal generically",
+          "MEASUREMENT ABORTED: THE CAPTURE POINT IS NOT TRAVERSED"
+          not in collector, "")
+    for state in ("NOT INSTALLED", "NOT TRAVERSED", "TRANSPARENCY NOT PROVEN"):
+        check(f"the abort distinguishes {state}", state in collector, "")
+        check(f"and the probe can emit {state}",
+              f"SELFTEST-CLASS: {state}" in probe, "")
+    check("the collector reads the class from the probe's own line",
+          "grep -m1 '^SELFTEST-CLASS: '" in collector, "")
+    check("and fails closed when no class was printed",
+          "UNREPORTED" in collector, "")
+    check("the three classes have distinct exit codes",
+          "return 3" in probe and "return 4" in probe, "")
     # fail-closed on zero observations
     check("the probe fails closed on zero captured calls",
           "if calls == 0:" in probe and "return 2" in probe, "")
@@ -282,11 +298,21 @@ def test_the_wrapper_preserves_the_callable_convention() -> None:
     check("the wrapper is sync and descriptor-correct",
           "def capturing_create(self, *args, **kwargs):" in probe, "")
     check("it forwards self unchanged, synchronously",
-          "result = original(self, *args, **kwargs)" in probe
-          and "await original(" not in probe, "")
+          "result = forward(self, *args, **kwargs)" in probe
+          and "await forward(" not in probe, "")
     check("exception behaviour is preserved by re-raising",
           "raise          # exception type AND value propagate unchanged"
           in probe, "")
+    # D218: the wrapper's forward target must BE the selftest's injection
+    # point. Run 16's wrapper called a closure local while the control
+    # swapped STATE["original"], so the stand-in never ran and two
+    # criteria failed for a reason unrelated to the wrapper.
+    check("the forward target is read from STATE at call time",
+          'forward = STATE.get("original")' in probe, "")
+    check("and is NOT a closure local captured at install",
+          "result = original(self" not in probe, "")
+    check("a missing forward target fails closed rather than passing through",
+          "capture wrapper has no original to forward to" in probe, "")
     # altitude (D216)
     check("the hook is Completions.create at class level",
           "Completions.create = capturing_create" in probe, "")
@@ -306,10 +332,29 @@ def test_the_wrapper_preserves_the_callable_convention() -> None:
     for crit in ("traversed", "original_executed",
                  "exactly_once_per_wrapper_call", "convention_matches",
                  "exception_type_preserved", "exception_value_preserved",
-                 "exception_not_swallowed", "rows_tagged_raw_layer"):
+                 "exception_not_swallowed", "rows_tagged_raw_layer",
+                 # D218 — the exception control's own calibration
+                 "standin_executed_exactly_once", "exception_wrapper_traversed",
+                 "exception_object_not_replaced", "original_restored_to_real",
+                 "restore_check_rejects_a_standin"):
         check(f"selftest asserts {crit}", f'checks["{crit}"]' in probe, "")
+    check("the stand-in counts its OWN executions",
+          'standin["calls"] += 1' in probe
+          and 'standin["calls"] == 1' in probe, "")
+    check("the restore is in a finally, not a trailing statement",
+          probe.index("finally:\n        # try/finally")
+          > probe.index('STATE["original"] = raising_original'), "")
+    check("the restore check has a known-negative and a known-positive",
+          "not forwards_to_the_real_original()" in probe
+          and 'checks["original_restored_to_real"] = '
+              'forwards_to_the_real_original()' in probe, "")
+    check("the restore criterion rejects anything defined in the probe itself",
+          '!= __name__' in probe, "")
+    check("and openai's module path is RECORDED, not used as a gate",
+          "provenance_of_original" in probe
+          and 'module.startswith("openai.")' not in probe, "")
     check("the selftest refuses the run when not transparent",
-          "CAPTURE POINT NOT TRANSPARENT" in probe, "")
+          "NOT PROVEN TRANSPARENT" in probe, "")
     check("and the selftest's own rows are excluded from Q6",
           "selftest_rows_excluded_from_q6" in probe
           and '"phase"' in probe, "")
@@ -364,6 +409,218 @@ def test_layers_gate_what_may_be_claimed() -> None:
                        "VALIDATION_RESULT"}, str(sorted(c.LAYERS)))
 
 
+def test_the_injection_point_is_the_forward_target() -> None:
+    """D218, RUN not read.
+
+    Run 16's control swapped `STATE["original"]` while the wrapper called
+    a closure local captured at install. The stand-in never executed, so
+    `exception_type_preserved` and `exception_value_preserved` failed
+    against an `AttributeError` that came out of openai's own internals —
+    two criteria reading as subject failures when they were UNMEASURED.
+
+    Both shapes are rebuilt here with no openai, no cognee and no model,
+    because the assertions above only pin the TEXT of the repair. The
+    known-negative is what makes the known-positive mean something: if
+    the broken shape also passed, this test would be measuring nothing.
+    """
+    scenario("injection reaches the forward target")
+
+    def build(state: dict, read_from_state: bool):
+        """The wrapper, in each shape. `original` is the closure local."""
+        original = state["original"]
+        calls = {"n": 0}
+
+        def wrapper(self, *a, **k):
+            calls["n"] += 1
+            forward = state["original"] if read_from_state else original
+            return forward(self, *a, **k)
+        return wrapper, calls
+
+    def drive(read_from_state: bool):
+        real_ran = {"n": 0}
+
+        def real_original(_self, *a, **k):
+            real_ran["n"] += 1
+            return "REAL"
+
+        state = {"original": real_original}
+        wrapper, wrapper_calls = build(state, read_from_state)
+
+        sentinel = RuntimeError("kai-gate-048c selftest sentinel")
+        standin_calls = {"n": 0}
+
+        def raising_original(_self, *a, **k):
+            standin_calls["n"] += 1
+            raise sentinel
+
+        saved = state["original"]
+        caught = None
+        try:
+            state["original"] = raising_original
+            try:
+                wrapper(object(), messages=[], model="x")
+            except Exception as exc:  # noqa: BLE001
+                caught = exc
+        finally:
+            state["original"] = saved
+        return {"wrapper_calls": wrapper_calls["n"],
+                "standin_calls": standin_calls["n"],
+                "real_calls": real_ran["n"], "caught": caught,
+                "sentinel": sentinel, "restored": state["original"] is saved}
+
+    # KNOWN-POSITIVE — the repaired shape.
+    ok = drive(read_from_state=True)
+    check("repaired: the wrapper is traversed exactly once",
+          ok["wrapper_calls"] == 1, str(ok["wrapper_calls"]))
+    check("repaired: the injected stand-in actually ran, exactly once",
+          ok["standin_calls"] == 1, str(ok["standin_calls"]))
+    check("repaired: the real original was NOT called instead",
+          ok["real_calls"] == 0, str(ok["real_calls"]))
+    check("repaired: the exception type survives",
+          type(ok["caught"]) is RuntimeError, type(ok["caught"]).__name__)
+    check("repaired: the exception value survives",
+          str(ok["caught"]) == str(ok["sentinel"]), str(ok["caught"]))
+    check("repaired: the exception OBJECT is not replaced",
+          ok["caught"] is ok["sentinel"], "")
+    check("repaired: the forward target is restored",
+          ok["restored"], "")
+
+    # KNOWN-NEGATIVE — run 16's shape, which must fail on the criterion
+    # that names it and on nothing else.
+    bad = drive(read_from_state=False)
+    check("run 16's shape: the wrapper IS still traversed",
+          bad["wrapper_calls"] == 1, str(bad["wrapper_calls"]))
+    check("run 16's shape: the stand-in never runs",
+          bad["standin_calls"] == 0, str(bad["standin_calls"]))
+    check("run 16's shape: the real original runs instead",
+          bad["real_calls"] == 1, str(bad["real_calls"]))
+    check("run 16's shape: no sentinel comes out",
+          bad["caught"] is None, str(bad["caught"]))
+    check("so the known-positive discriminates the two shapes",
+          ok["standin_calls"] != bad["standin_calls"], "")
+    # And the criterion run 16 lacked is exactly the one that catches it.
+    check("standin_executed_exactly_once is what fails on run 16's shape",
+          (ok["standin_calls"] == 1) and not (bad["standin_calls"] == 1), "")
+
+
+SHIPPED_WRAPPER_HARNESS = r'''
+import sys, types, importlib.util, json
+real_calls = {"n": 0}
+mod = types.ModuleType("openai.resources.chat.completions")
+class Completions:
+    def create(self, *a, **k):
+        real_calls["n"] += 1
+        return "REAL RESULT"
+mod.Completions = Completions
+pkg = types.ModuleType("openai"); pkg.__version__ = "stub"
+for name, m in (("openai", pkg),
+                ("openai.resources", types.ModuleType("openai.resources")),
+                ("openai.resources.chat", types.ModuleType("openai.resources.chat")),
+                ("openai.resources.chat.completions", mod)):
+    sys.modules[name] = m
+
+spec = importlib.util.spec_from_file_location("probe", sys.argv[1])
+probe = importlib.util.module_from_spec(spec); spec.loader.exec_module(probe)
+probe.OUT = sys.argv[2]
+open(probe.OUT, "w").close(); probe.STATE["phase"] = "harness"
+try:
+    probe.install_capture()          # patches the class, then wants cognee
+except ModuleNotFoundError:
+    pass                             # by then the wrapper is installed
+
+wrapper = Completions.create
+out = {"wrapper_is_shipped": wrapper is probe.STATE["wrapper"],
+       "known_positive": probe.forwards_to_the_real_original()}
+
+# The stand-in must live in the PROBE's module, exactly as selftest()'s does.
+ns = {}
+exec("def raising_original(_self,*a,**k):\n"
+     "    standin['n'] += 1\n"
+     "    raise sentinel\n", probe.__dict__, ns)
+sentinel = RuntimeError("kai-gate-048c selftest sentinel")
+standin = {"n": 0}
+probe.__dict__["sentinel"] = sentinel; probe.__dict__["standin"] = standin
+raising_original = ns["raising_original"]
+out["standin_defined_in_probe"] = raising_original.__module__ == probe.__name__
+
+saved = probe.STATE["original"]; caught = None
+before = probe.STATE["capture"]["attempt"]
+try:
+    probe.STATE["original"] = raising_original
+    out["known_negative"] = not probe.forwards_to_the_real_original()
+    class _Fake: pass
+    try:
+        wrapper(_Fake(), messages=[], model="x")
+    except Exception as exc:
+        caught = exc
+finally:
+    probe.STATE["original"] = saved
+
+out["standin_ran_once"] = standin["n"] == 1
+out["real_not_called"] = real_calls["n"] == 0
+out["traversed_once"] = probe.STATE["capture"]["attempt"] - before == 1
+out["type_preserved"] = type(caught) is RuntimeError
+out["value_preserved"] = str(caught) == str(sentinel)
+out["object_not_replaced"] = caught is sentinel
+out["restored"] = probe.forwards_to_the_real_original()
+rows = [json.loads(l) for l in open(probe.OUT) if '"llm-call"' in l]
+out["row_has_transport_error"] = bool(rows) and bool(rows[-1].get("transport_error"))
+out["row_has_no_raw_response"] = bool(rows) and rows[-1].get("raw_response") is None
+print(json.dumps(out))
+'''
+
+
+def test_the_shipped_wrapper_is_transparent_in_process() -> None:
+    """The SHIPPED wrapper, executed — not its text, and not a rewrite.
+
+    Everything above this point about the probe is a string match, which
+    would happily pass on code that cannot run. This imports the real
+    `probe_llm_contract.py` with openai stubbed (it is not installed on
+    the calibration host), lets `install_capture` patch the class, and
+    drives the shipped wrapper through the exception control.
+
+    `install_capture` patches `Completions.create` BEFORE it imports
+    cognee, so the ModuleNotFoundError leaves the wrapper installed —
+    which is what makes this possible without the image.
+
+    WHICH HALF THIS VERIFIES. The forward-target chain, the exception
+    chain and the restore are verified HERE. That the production callable
+    lives in an `openai.*` module is NOT asserted anywhere — it is
+    recorded by the probe and readable in CI, because the string cannot
+    be measured on this host.
+    """
+    scenario("shipped wrapper runs transparently")
+    with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as fh:
+        fh.write(SHIPPED_WRAPPER_HARNESS)
+        harness = fh.name
+    capture = tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False).name
+    proc = subprocess.run(
+        [sys.executable, harness,
+         str(REPO / "scripts" / "security" / "probe_llm_contract.py"), capture],
+        cwd=REPO, capture_output=True, text=True, timeout=60)
+    check("the harness ran", proc.returncode == 0, proc.stderr[-400:])
+    if proc.returncode != 0:
+        return
+    got = json.loads(proc.stdout.strip().splitlines()[-1])
+    expected = {
+        "wrapper_is_shipped": "the installed callable is the shipped wrapper",
+        "known_positive": "the restore check accepts the real original",
+        "known_negative": "and REJECTS an injected stand-in",
+        "standin_defined_in_probe": "the stand-in lives where selftest's does",
+        "standin_ran_once": "the injected stand-in actually executed, once",
+        "real_not_called": "and the real original was not called instead",
+        "traversed_once": "the wrapper was traversed exactly once",
+        "type_preserved": "the exception type survives the wrapper",
+        "value_preserved": "the exception value survives the wrapper",
+        "object_not_replaced": "the exception object itself is not replaced",
+        "restored": "the forward target is the real original afterwards",
+        "row_has_transport_error": "the row records the transport error",
+        "row_has_no_raw_response": "and carries NO raw response for it",
+    }
+    for key, name in expected.items():
+        check(f"shipped: {name}", got.get(key) is True, f"{key}={got.get(key)}")
+
+
 def run_all() -> None:
     test_schema_and_instance_are_never_confused()
     test_all_four_kinds_stay_four_verdicts()
@@ -375,6 +632,8 @@ def run_all() -> None:
     test_the_wrapper_preserves_the_callable_convention()
     test_an_unestablished_schema_is_never_a_pass()
     test_layers_gate_what_may_be_claimed()
+    test_the_injection_point_is_the_forward_target()
+    test_the_shipped_wrapper_is_transparent_in_process()
 
     kinds = [c.VALID_INSTANCE, c.SCHEMA_ECHO, c.OTHER_INVALID, c.NO_RESPONSE]
     print(f"  inspected: {len(kinds)} response kind(s) discriminated: {kinds}")

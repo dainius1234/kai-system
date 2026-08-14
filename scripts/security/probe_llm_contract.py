@@ -114,9 +114,30 @@ def install_capture() -> dict:
     state = {"attempt": 0, "hooks_fired": set(), "originals_called": 0}
     STATE["capture"] = state
     STATE["original"] = original
+    # Kept separately so the restore check has something to compare
+    # against that no injection can move (D218).
+    STATE["real_original"] = original
 
     def capturing_create(self, *args, **kwargs):
-        """SYNC, descriptor-correct, strictly pass-through."""
+        """SYNC, descriptor-correct, strictly pass-through.
+
+        THE FORWARD TARGET IS READ FROM `STATE` AT CALL TIME (D218), not
+        closed over. Run 16's selftest injected a stand-in by swapping
+        `STATE["original"]` while this wrapper still called the closure
+        local captured at install — so the stand-in never ran, openai's
+        own internals raised `AttributeError` against the fake receiver
+        instead of the sentinel, and two transparency criteria failed for
+        a reason that had nothing to do with the wrapper's behaviour.
+        Reading `STATE` makes the callable the wrapper uses IDENTICAL to
+        the injection point the selftest exercises, which is the only way
+        the control measures the thing it names.
+        """
+        forward = STATE.get("original")
+        if forward is None:
+            # I-1. No callable, no observation — and never a silent
+            # pass-through that would look like a working hook.
+            raise RuntimeError(
+                "capture wrapper has no original to forward to")
         state["hooks_fired"].add("Completions.create")
         state["attempt"] += 1
         attempt = state["attempt"]
@@ -141,7 +162,7 @@ def install_capture() -> dict:
         }
         try:
             state["originals_called"] += 1
-            result = original(self, *args, **kwargs)
+            result = forward(self, *args, **kwargs)
         except Exception as exc:  # noqa: BLE001
             request["layer"] = "RAW_MODEL_RESPONSE"
             request["elapsed_s"] = round(time.monotonic() - started, 3)
@@ -201,6 +222,43 @@ def install_capture() -> dict:
     return resolved
 
 
+def forwards_to_the_real_original() -> bool:
+    """Is `STATE["original"]` the production callable, not a stand-in?
+
+    Two sources that cannot excuse each other (I-8):
+
+      * IDENTITY against the callable captured before the patch existed.
+        No injection can move it, and it is exactly "the callable the
+        production path held before this file touched anything".
+      * ORIGIN — the callable must not be defined in THIS module. Every
+        stand-in this file can inject is defined here, so a stand-in
+        fails on its own evidence rather than on a name kept beside it.
+
+    The stronger-looking test — matching openai's module path — is NOT a
+    pass condition, because that string cannot be measured where this was
+    written and an unverified assumption inside a gate is how run 16 was
+    spent. The provenance is RECORDED instead (`provenance_of_original`),
+    where a wrong guess costs a reader nothing.
+
+    Used as a known-negative during the injection and as a known-positive
+    after the restore, so the criterion is demonstrably able to fail.
+    """
+    fn = STATE.get("original")
+    if fn is None or fn is not STATE.get("real_original"):
+        return False
+    return (getattr(fn, "__module__", "") or "") != __name__
+
+
+def provenance_of_original() -> dict:
+    """Where the current forward target comes from. Evidence, not a gate."""
+    fn = STATE.get("original")
+    return {"module": getattr(fn, "__module__", None),
+            "qualname": getattr(fn, "__qualname__", None),
+            "is_the_pre_patch_callable": fn is STATE.get("real_original"),
+            "defined_in_this_probe": (getattr(fn, "__module__", "") or "")
+            == __name__}
+
+
 def restore_capture() -> bool:
     """Put the class attribute back. Returns whether it was restored.
 
@@ -236,9 +294,19 @@ def selftest() -> int:
       8 every raw row is tagged RAW_MODEL_REQUEST / RAW_MODEL_RESPONSE;
       9 the selftest's own calls are EXCLUDED from the Q6 denominator.
 
+     10 the injected stand-in ACTUALLY RAN, exactly once;
+     11 the forward target is the real original again afterwards.
+
     Criterion 5 needs no model run: a controlled exception is raised from
     a stand-in original and the wrapper is driven through the real
     instructor path to prove it neither swallows nor rewrites it.
+
+    Criteria 10-11 exist because run 16 proved 5 could fail without ever
+    being exercised (D218). 10 is 5's known-positive — without it, "the
+    sentinel did not come out" cannot be told apart from "the sentinel was
+    never raised". 11 is the guarantee that the expensive capture does not
+    then run against a test stand-in, and it is checked against a
+    known-negative taken while the stand-in is still installed.
 
     Criteria 1-4 are driven through the adapter's PRODUCTION entry point,
     `acreate_structured_output`. Calling the wrapper directly would prove
@@ -253,9 +321,11 @@ def selftest() -> int:
         emit({"event": "selftest-failed", "stage": "install",
               "error": f"{type(exc).__name__}: {exc}",
               "traceback": traceback.format_exc()})
+        print("SELFTEST-CLASS: NOT INSTALLED", flush=True)
         return 2
     if "NOT INSTALLED" in str(resolved.get("capture", "")):
         emit({"event": "selftest-failed", "stage": "install"})
+        print("SELFTEST-CLASS: NOT INSTALLED", flush=True)
         return 2
 
     import asyncio
@@ -312,18 +382,42 @@ def selftest() -> int:
     checks["rows_tagged_selftest_phase"] = bool(rows) and all(
         r.get("phase") == "selftest" for r in rows)
 
-    # 5 — EXCEPTION CONTROL. No model needed: swap in a stand-in original
-    # that raises, drive the wrapper, and require the same object out.
+    # 5 — EXCEPTION CONTROL, WITH ITS KNOWN-POSITIVE (D218). No model run.
+    #
+    # Run 16 swapped `STATE["original"]` while the wrapper called a
+    # closure local, so the stand-in never executed; openai's own
+    # internals raised `AttributeError` against the fake receiver, and the
+    # type/value criteria failed against a `RuntimeError` sentinel —
+    # correctly, and for a reason that said nothing about the wrapper.
+    # Two criteria therefore read as subject failures when they were
+    # simply UNMEASURED.
+    #
+    # The whole chain is now asserted, in order:
+    #   wrapper traversed -> injected stand-in ran EXACTLY ONCE ->
+    #   sentinel raised -> same type out -> same value out ->
+    #   same OBJECT out (not swallowed, not replaced).
+    #
+    # The counter is what makes this evidence. "The sentinel appeared" is
+    # not proof that the injected callable ran — it is exactly the claim
+    # run 16 could not distinguish from its opposite.
     sentinel = RuntimeError("kai-gate-048c selftest sentinel")
+    standin = {"calls": 0}
 
     def raising_original(_self, *a, **k):
+        standin["calls"] += 1
         raise sentinel
 
-    saved, STATE["original"] = STATE["original"], raising_original
-    # rebuild a wrapper bound to the raising original by re-entering the
-    # same code path the class patch uses
+    before_wrapper = state["attempt"]
     caught = None
+    saved = STATE["original"]
     try:
+        STATE["original"] = raising_original
+        # KNOWN-NEGATIVE, taken while the stand-in is installed: the
+        # restore criterion must REFUSE this state, or its later pass
+        # means nothing.
+        checks["restore_check_rejects_a_standin"] = \
+            not forwards_to_the_real_original()
+
         from openai.resources.chat.completions import Completions
         probe_wrapper = Completions.create
 
@@ -334,33 +428,65 @@ def selftest() -> int:
         except Exception as exc:  # noqa: BLE001
             caught = exc
     finally:
+        # try/finally, not a trailing statement: the production drive must
+        # never continue against the test stand-in, including if the
+        # injection block raises somewhere unexpected.
         STATE["original"] = saved
 
-    checks["exception_type_preserved"] = type(caught) is type(sentinel) \
-        if caught is not None else False
+    checks["exception_wrapper_traversed"] = \
+        (state["attempt"] - before_wrapper) == 1
+    checks["standin_executed_exactly_once"] = standin["calls"] == 1
     checks["exception_not_swallowed"] = caught is not None
-    checks["exception_value_preserved"] = (str(caught) == str(sentinel)
-                                           if caught is not None else False)
+    checks["exception_type_preserved"] = type(caught) is type(sentinel)
+    checks["exception_value_preserved"] = str(caught) == str(sentinel)
+    checks["exception_object_not_replaced"] = caught is sentinel
+    # KNOWN-POSITIVE. Nothing expensive may run until the forward target
+    # is the production callable again.
+    checks["original_restored_to_real"] = forwards_to_the_real_original()
 
     emit({"event": "selftest-result", "layer": "ADAPTER_INPUT",
           "calls_observed": observed, "originals_called": originals,
           "hooks_that_fired": sorted(state["hooks_fired"]),
           "checks": checks,
+          "provenance_of_original": provenance_of_original(),
           "selftest_rows_excluded_from_q6": len(rows)})
 
     failed = [k for k, v in checks.items() if not v]
     print(f"  inspected: {len(checks)} transparency criterion(s), "
           f"{observed} model call(s) captured", flush=True)
-    if failed:
-        print(f"  CAPTURE POINT NOT TRANSPARENT: {', '.join(failed)}",
+
+    # THREE STATES, THREE MESSAGES (D218). Run 16 aborted with "THE
+    # CAPTURE POINT IS NOT TRAVERSED" in a run where traversal had been
+    # PROVEN — the failure was transparency. One abort message covering
+    # three different states is the same defect as a check whose scope is
+    # wrong, seen from the reporting side: the evidence reads as a state
+    # that did not occur, and a later reader cannot tell which happened.
+    #
+    # The CLASS is printed by the instrument that knows it, on a line the
+    # collector reads back. A table of codes kept beside the collector
+    # would be a second denominator free to drift from this one (R5).
+    if not failed:
+        print("SELFTEST-CLASS: TRANSPARENT", flush=True)
+        print(f"  CAPTURE POINT PROVEN TRANSPARENT: {len(checks)} criteria, "
+              f"{observed} call(s) via "
+              f"{', '.join(sorted(state['hooks_fired']))}", flush=True)
+        return 0
+    if not checks.get("traversed"):
+        print("SELFTEST-CLASS: NOT TRAVERSED", flush=True)
+        print("  THE CAPTURE POINT WAS NOT TRAVERSED: the hook installed, "
+              "and execution never reached it.", flush=True)
+        print(f"  also unmet: {', '.join(k for k in failed if k != 'traversed')}"
+              if len(failed) > 1 else "  no other criterion was reached.",
               flush=True)
-        print("  Refusing to spend a full capture run on a hook that is not "
-              "proven observational.", flush=True)
-        return 2
-    print(f"  CAPTURE POINT PROVEN TRANSPARENT: {len(checks)} criteria, "
-          f"{observed} call(s) via {', '.join(sorted(state['hooks_fired']))}",
-          flush=True)
-    return 0
+        return 3
+    print("SELFTEST-CLASS: TRANSPARENCY NOT PROVEN", flush=True)
+    print(f"  CAPTURE POINT TRAVERSED BUT NOT PROVEN TRANSPARENT: "
+          f"{', '.join(failed)}", flush=True)
+    print("  Traversal IS proven; what is unproven is that the hook "
+          "observes without altering.", flush=True)
+    print("  Refusing to spend a full capture run on a hook that is not "
+          "proven observational.", flush=True)
+    return 4
 
 
 def main() -> int:

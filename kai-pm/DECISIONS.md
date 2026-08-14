@@ -14052,3 +14052,140 @@ response. The correct statement is:
 * No mode, model, timeout, retry, schema, validator or topology change.
 * No repair applied. The injection defect is reported, not fixed —
   authorisation pending.
+
+---
+
+## D219 — the injection point is now the forward target (authorised)
+
+Operator-authorised repair of the D218 defect. **Observation only.** No
+mode, model, timeout, retry count, schema, validator, Cognee behaviour or
+topology change.
+
+### 1. The wrapper reads its forward target from `STATE` at call time
+
+```python
+forward = STATE.get("original")
+if forward is None:
+    raise RuntimeError("capture wrapper has no original to forward to")
+...
+result = forward(self, *args, **kwargs)
+```
+
+Previously the wrapper called a **closure local** captured at install
+while the selftest injected by swapping `STATE["original"]`. Those were
+two different things wearing one name, so the control never reached the
+wrapper. They are now the same object by construction. A missing target
+fails closed (I-1) rather than silently passing through.
+
+### 2. The exception control has a known-positive
+
+The chain now asserted, in order:
+
+```
+wrapper traversed exactly once
+  -> injected stand-in EXECUTED, exactly once      <- was missing
+  -> sentinel RuntimeError raised
+  -> same type observed by the caller
+  -> same value observed by the caller
+  -> same OBJECT observed by the caller (not replaced)
+```
+
+`standin_executed_exactly_once` is the criterion run 16 lacked. Without
+it "the sentinel did not come out" and "the sentinel was never raised"
+are indistinguishable — and run 16 is the proof, because it reported the
+first while the second was true. **The sentinel appearing is not evidence
+that the injected callable ran; the counter is.**
+
+### 3. Restore, and proof the restored callable is the production one
+
+`try/finally`, so the production drive cannot continue against the stand-in
+even if the injection block raises. `forwards_to_the_real_original()` is
+checked twice: as a **known-negative** while the stand-in is installed,
+and as a **known-positive** after the restore.
+
+It tests **identity** against the callable captured before the patch
+existed — which no injection can move — plus **origin**: the callable must
+not be defined in the probe's own module, which every stand-in this file
+can inject is.
+
+**What it deliberately does NOT gate on:** that the callable's module
+matches `openai.*`. That string cannot be measured on the calibration
+host — openai is not installed there — and *an unverified assumption
+inside a gate is how run 16 was spent*. Provenance is **recorded**
+(`provenance_of_original`) where a wrong guess costs a reader nothing.
+
+### 4. One abort message became three states
+
+Run 16 printed **"THE CAPTURE POINT IS NOT TRAVERSED"** for a run in
+which traversal had been *proven*. One message covering three states is a
+scope defect seen from the reporting side: the evidence named a state
+that had not occurred.
+
+```
+NOT INSTALLED           — the hook was never put in place        (exit 2)
+NOT TRAVERSED           — installed, execution never reached it  (exit 3)
+TRANSPARENCY NOT PROVEN — traversed, not proven to observe
+                          without altering                       (exit 4)
+```
+
+The collector reads the class from the `SELFTEST-CLASS:` line the probe
+prints, rather than keeping its own code table — a second table would be
+free to drift from the first (R5). No class printed ⇒ `UNREPORTED …
+treat as unmeasured`, never the benign reading (I-1).
+
+### Calibration — 92 → 142 assertions, 10 → 12 scenarios
+
+Two new scenarios, and the second is the one that matters:
+
+* **injection reaches the forward target** — both shapes rebuilt with no
+  openai and no model. The known-negative is run 16's shape, and it must
+  fail on `standin_executed_exactly_once` and nothing else.
+* **shipped wrapper runs transparently** — the **shipped** probe is
+  imported with openai stubbed (`install_capture` patches the class
+  *before* it imports cognee, so the ModuleNotFoundError leaves the
+  wrapper installed) and driven through the whole exception chain. Every
+  assertion above this scenario is a string match, which would pass on
+  code that cannot run.
+
+**Which half was verified where (R1).** Forward target, exception chain,
+restore, known-negative: verified **here**, executed. That the production
+callable lives in an `openai.*` module: **not asserted anywhere** —
+recorded by the probe and readable in CI.
+
+**Proof it can fail (R2).** Re-introducing run 16's exact defect —
+`forward(...)` back to `original(...)` — gives **134 passed / 8 failed**,
+and the failures carry run 16's signature at runtime, not just in text:
+
+```
+shipped: the injected stand-in actually executed, once — standin_ran_once=False
+shipped: and the real original was not called instead  — real_not_called=False
+shipped: the exception type survives the wrapper       — type_preserved=False
+```
+
+Restored: **142 / 0**. `policy-check` green, registry gate green
+(0 findings, I-1..I-7 hold).
+
+### 5. Seven calibration suites were outside their own trigger
+
+Noticed one; **counted the population first** (R4). Diffing every path
+`memu-graph-startup-proof.yml` references against its `paths:` filter
+found **7 files run by the workflow but absent from its trigger** —
+`test_asset_contract`, `test_cognify_result`, `test_graph_stall`,
+`test_ingest_contract`, `test_llm_contract`,
+`test_memu_graph_acceptance`, `test_model_startup_classifier`. A change
+that *weakened a gate* would not have caused the workflow to run it.
+
+All seven added (R6 — the class, not the instance); referenced-minus-
+declared is now **0**. This is one workflow measured by hand: the general
+detector (**finding #50**) remains **OPEN and unbuilt**, and no other
+workflow was examined.
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 UNMEASURED** · **Q6 UNMEASURED** · ownership
+  **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — separate, OPEN.**
+* Run 16's `{"answer":"ping"}` remains instrument-capability evidence
+  only, excluded from Q6, and says nothing about the cognify failure.
+* The next capture fires only behind a passing transparency selftest. If
+  it fails, it aborts again — with the state it actually observed.

@@ -77,9 +77,27 @@ record "  selftest exit: ${selftest_rc}"
 # environment cannot download. An excerpt narrower than the evidence
 # it carries is R10 in miniature.
 tail -n 40 "$LOGDIR/selftest.log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+# The failure CLASS is read back from the line the selftest printed, not
+# derived from a code table kept beside it (R5). Run 16 aborted with "THE
+# CAPTURE POINT IS NOT TRAVERSED" for a run in which traversal WAS proven
+# — one message for three states, so the evidence named a state that had
+# not occurred (D218).
+selftest_class="$(grep -m1 '^SELFTEST-CLASS: ' "$LOGDIR/selftest.log" \
+    | sed 's/^SELFTEST-CLASS: //')"
+if [ -z "$selftest_class" ]; then
+  # I-1: absence of a class is not "the benign one".
+  selftest_class="UNREPORTED — the selftest printed no class (exit ${selftest_rc}); treat as unmeasured"
+fi
+record "  selftest class: ${selftest_class}"
 if [ "$selftest_rc" -ne 0 ]; then
   record ""
-  record "MEASUREMENT ABORTED: THE CAPTURE POINT IS NOT TRAVERSED."
+  record "MEASUREMENT ABORTED: CAPTURE TRANSPARENCY NOT PROVEN."
+  record "  class: ${selftest_class}"
+  record "  The three states are distinct and must not be conflated:"
+  record "    NOT INSTALLED           — the hook was never put in place"
+  record "    NOT TRAVERSED           — installed, execution never reached it"
+  record "    TRANSPARENCY NOT PROVEN — traversed, but not proven to observe"
+  record "                              without altering"
   record "  Q1/Q2/Q6 were NOT measured. This is an INSTRUMENT failure,"
   record "  not evidence about the LLM contract, and no full capture run"
   record "  was spent on it."
