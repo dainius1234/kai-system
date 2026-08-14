@@ -15052,3 +15052,128 @@ rule**, not a judgement available to be made after an inconvenient result.
   **Q6 UNMEASURED** · **cross-run recurrence UNMEASURED** · ownership
   **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+
+---
+
+## D228 — run 18 fresh capture: the failure class RECURS across runs
+
+Run 18 = **31824584514**, job `memu-graph-llm-contract` = **94845575643**,
+commit `397da5a`. Reported in D227's precommitted order.
+
+### 1. Selftest class — TRANSPARENT
+
+```
+selftest exit: 0
+inspected: 16 transparency criterion(s), 1 model call(s) captured
+SELFTEST-CLASS: TRANSPARENT
+CAPTURE POINT PROVEN TRANSPARENT: 16 criteria, 1 call(s) via Completions.create
+```
+
+Step 1 passes, so the table may be quoted. This is the first production
+capture where the selftest gate, the repaired forward-target wrapper and
+the new analyser all ran together in one job.
+
+### 2. Q2 — the fresh capture
+
+Contract **RECOVERED on all five attempts**, each from its own system
+message, before any response was classified.
+
+```
+ # layer               contract    prompt~c  schema~c   resp~b   classification  elapsed
+ 1 RAW_MODEL_RESPONSE  RECOVERED  dc203ead5 89def7469 99c0236ee  SCHEMA ECHO     206.550
+ 2 RAW_MODEL_RESPONSE  RECOVERED  a6e5e25d2 fd7b68067 f9f04a63a  SCHEMA ECHO      58.459
+ 3 RAW_MODEL_RESPONSE  RECOVERED  936d06c7b fd7b68067 f9f04a63a  SCHEMA ECHO      66.108
+ 4 RAW_MODEL_RESPONSE  RECOVERED  a6e5e25d2 fd7b68067 f9f04a63a  SCHEMA ECHO      13.149
+ 5 RAW_MODEL_RESPONSE  RECOVERED  8c49d4915 fd7b68067 f9f04a63a  SCHEMA ECHO      67.314
+
+Q2 at RAW_MODEL_RESPONSE: 5 attempt(s), verdicts SCHEMA ECHO
+```
+
+**Q2 for this capture: MEASURED — 5/5 SCHEMA ECHO at the raw layer.**
+
+Attempts 2-5 *describe* `['summary']` where the contract required them to
+*carry* it. Attempt 1's contract required `['edges', 'nodes']` and its
+reply describes exactly those — a full schema echo of the knowledge-graph
+model.
+
+### 3. Cross-run recurrence — MEASURED, same class
+
+| | run 17 (`f1fdf92`) | run 18 (`397da5a`) |
+|---|---|---|
+| raw attempts | 5 | 5 |
+| classification | 5/5 SCHEMA ECHO | 5/5 SCHEMA ECHO |
+| contracts recovered | 5/5 | 5/5 |
+
+**Two independent captures, on separately built stacks, 10/10 raw
+attempts returning a schema where an instance was required.** The failure
+class recurs.
+
+Stronger, and worth recording precisely because it was not asked for:
+
+* **the contract hashes are identical across runs** — `89def7469`
+  (attempt 1) and `fd7b68067` (attempts 2-5) appear in both;
+* **prompt hashes `dc203ead5`, `a6e5e25d2` recur across runs**;
+* **response byte hash `f9f04a63a` recurs across runs** — run 17 attempt 4
+  and run 18 attempts 2, 3, 4 and 5 returned **byte-identical** strings.
+
+And one genuine **difference**: run 17's attempt 1 described `[]`; run 18's
+described `['edges', 'nodes']`. Byte hashes `44df0fae2` vs `99c0236ee`.
+The knowledge-graph attempt is **not** stable across runs; the
+summarisation attempts are.
+
+**Within run 18, distinct responses = 2 (byte) across 5 attempts.** That is
+a statement about response diversity. It is **not** a retry-grouping claim
+— see §4.
+
+### 4. Q6 — still UNMEASURED, on its own denominator
+
+```
+logical calls: UNAVAILABLE — no attempt carries a logical-call identifier
+REFUSED as grouping signals: adjacency, elapsed time, prompt hash,
+                             schema hash, response similarity
+```
+
+The byte-identical responses in §3 are exactly the signal that would be
+most tempting to group on, and it is on the refused list. Four responses
+sharing a hash does **not** establish they were retries of one invocation:
+`max_retries=2` bounds a logical call at two raw attempts, so four
+identical rows cannot all belong to one. Which attempts belong to which
+invocation remains **unknown**.
+
+**Q6 UNMEASURED.** Requirement unchanged: a correlation id minted at the
+outer invocation and carried into every retry.
+
+### 5. Ownership — UNMOVED
+
+Recurrence localises **where** the malformed output exists and shows it is
+not a one-run artefact. It does not distinguish instructor's transformed
+prompt/mode, contract construction, or model compliance. Three live
+owners, three remedies, none authorised.
+
+### Limits, re-checked for this run
+
+* **Dialect (D224 §1) — still moot.** No `VALID INSTANCE` was produced;
+  `classify` returns at the schema-echo question before validation. The
+  hard-coded Draft 2020-12 bears on nothing here either.
+* **Validator** — `jsonschema 4.10.3`, same version the calibration step
+  passed under in the same job.
+* **Corroboration NONE** — instructor not importable on the runner; the
+  structural rule stood alone. Claim stays bounded to instructor 1.15.1,
+  `Mode.JSON`, OpenAI provider.
+* **Exit code** — red on 1 again meant *measured, adverse*, not *refused*.
+  The D224 §3 ambiguity recurred exactly as predicted.
+
+### Other jobs in run 18, recorded without interpretation
+
+`memu-graph-ingest-contract` **succeeded**, including its KAI-GATE-050
+verdict step. `memu-graph-acceptance` **failed** at the known Phase 1
+verdict. `startup-evidence`, `asset-contract`, `stall-diagnosis`
+succeeded. I hold no prior-run conclusions for the ingest job, so no
+trend is claimed.
+
+### Status
+
+* **Q1** partial · **Q2 MEASURED — 5/5 SCHEMA ECHO in run 17, 5/5 in run
+  18** · **cross-run recurrence MEASURED — same class, 2/2 captures** ·
+  **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
