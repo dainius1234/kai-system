@@ -16267,3 +16267,96 @@ reproducibility · re-reading run 22.
   ownership **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * Awaiting authorisation. No run 24 exists.
+
+---
+
+## D243 — three precision amendments to D242's sampling rule
+
+Append-only amendments. D242 stands; these correct and bound it. Run 24
+is still **not launched** and the campaign has **not started**.
+
+### Amendment 1 — TWO denominators, never merged
+
+"Every run counts" and "the Q6 denominator" are different quantities:
+
+* **Campaign denominator** — every additional capture attempted under
+  D242, *including* Gate-1 failures and zero-retry runs.
+* **Q6 evidence denominator** — only correlated captures that actually
+  contain the retry population.
+
+An instrument failure **never enters the Q6 evidence denominator** and is
+**never erased from the campaign denominator**. Reporting form:
+
+> sampling: 3 attempted / 1 qualifying · Q6 evidence: run 22 + qualifying
+> run = 2 correlated retry-bearing captures
+
+Collapsing the two would either inflate the evidence or hide the cost.
+
+### Amendment 2 — N=5 is a BUDGET cap, not statistical power
+
+Five bounds cost. It is not a powered sample size and must never be
+described as one. If one additional qualifying run reproduces run 22,
+what closes is the narrowly scoped claim:
+
+> **retry-level behaviour reproduced across two independent qualifying
+> correlated captures under the frozen conditions.**
+
+Not *"qwen2.5:3b always does this"*, not *"instructor's json_mode always
+produces this"*, and not a general reliability statement about the model.
+The conditions — instructor 1.15.1, `Mode.JSON`, OllamaAPIAdapter,
+`qwen2.5:3b`, this cognify path, these two contracts — travel with the
+claim wherever it is quoted.
+
+### Amendment 3 — FOUR outcomes, not two
+
+A qualifying run may contain several retried logical calls that disagree
+with each other. That must not be forced into a binary:
+
+| outcome | meaning |
+|---|---|
+| **REPRODUCED** | all precommitted retry comparisons support the same retry-level failure class across qualifying captures |
+| **DIVERGED** | the new qualifying evidence contradicts run 22's retry-level pattern |
+| **MIXED / CONTESTED** | qualifying evidence contains both behaviours — Q6 is measured as **heterogeneous**, not squeezed into pass/fail |
+| **UNMEASURED** | no additional qualifying run within the five-attempt budget |
+
+MIXED is a *measured* outcome. It is not a reason to run a sixth capture.
+
+### Scope note on "stop on population, never on outcome"
+
+The rule is sound **for this conditional question**, and the reason should
+not be overgeneralised. A retry occurring is **not** independent of the
+first attempt's behaviour — instructor retries precisely *because*
+something failed validation. What the stopping event does not depend on
+is **what the retry itself returned**, and that is the quantity Q6
+measures. So the rule is: *stopping may depend on the conditioning event,
+never on the measured response.* Stated here so nobody later lifts it as
+a general claim of independence between stopping and data.
+
+### The frozen campaign, in full
+
+> Maximum five additional independent captures. Every attempted capture
+> counts in the campaign denominator. Stop after the first additional
+> qualifying capture or after five attempts. Qualification requires
+> `CORRELATION_VALID` plus at least one actual retry. The stopping event
+> depends only on population occurrence, not on the retry outcome being
+> measured. All evidence produced before stopping is retained. Q6 evidence
+> uses qualifying captures only; sampling yield reports every capture.
+> Outcomes may be REPRODUCED, DIVERGED, MIXED/CONTESTED or UNMEASURED.
+> N=5 is a cost/budget bound, not statistical power.
+
+Unchanged from D242: no instrument, model, timeout, schema or ownership
+change across the series; any such change ends the series and starts a new
+one. Every run gets an authoritative id ↔ tree binding and re-established
+claim-relevant input identity before its evidence is used.
+
+**Task #62** (run 23's Phase-1 acceptance difference) stays isolated and
+does not enter this campaign.
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 MEASURED — runs 17, 18, 22, 23** · **broad-class
+  recurrence MEASURED, 4 captures** · **within-call retry reproducibility
+  MEASURED — run 22 only** · **Q6 UNMEASURED, qualifying denominator 1** ·
+  ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* **Campaign NOT started. Run 24 NOT launched.** Awaiting authorisation.
