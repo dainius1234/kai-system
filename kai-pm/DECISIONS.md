@@ -13111,3 +13111,75 @@ the finding is qualitatively stronger than "bad JSON":
 
 No ownership conclusion until the capture speaks. No mode change, no
 model swap, no timeout or retry change. **KAI-GATE-048 C stays BLOCKED.**
+
+---
+
+## D210
+
+**2026-08-14 — run 13: the capture point was ineffective. Q1/Q2/Q6 are
+UNMEASURED. And my probe reported exit 0 while observing nothing.**
+
+Run **31804846788**, job **94781177680**, commit `c54f544`, tree
+`df222988`. Capture 13:32:22 → 13:41:23 (~9 min).
+
+```
+  probe exit: 0
+    0 = the capture ran to completion
+  capture: 5 record(s), 760 bytes
+  ...
+  inspected: 0 model call(s) in llm-contract-logs/capture.jsonl
+  NOT COLLECTED: no llm-call records. Q1/Q2/Q6 are UNMEASURED,
+  which is not the same as 'no mismatch'.
+```
+
+**The interaction under study definitely happened.** `capture.err`
+carries the full pydantic error and, at 13:41:21,
+`PipelineRunFailedError: … (Status code: 422)` — the same failure as runs
+9, 11 and 12. The pipeline ran; the instrument simply did not see the
+model calls.
+
+### Answers to the four frozen questions
+
+| | |
+|---|---|
+| 1. effective structured-output mode | **UNMEASURED** — the `resolved-config` record exists but is not reported here, because a mode without the calls it governed answers nothing |
+| 2. where the schema was conveyed | **UNMEASURED** |
+| 3. same canonical contract per retry / byte-identical echoes | **UNMEASURED** |
+| 4. does the response reproduce `SummarizedContent` metadata | **UNMEASURED** |
+
+Nothing about KAI-GATE-048 C's ownership moves. **UNMEASURED is not
+FAIL/PASS**, and it is not "no mismatch".
+
+### The defect in MY instrument — the same shape as KAI-GATE-050
+
+`install_capture()` located `chat.completions.create`, replaced the
+attribute, and reported `INSTALLED`. Installation **succeeded**; it was
+**ineffective**. The probe then returned **0** — "the capture ran to
+completion" — for a run in which it observed nothing.
+
+That is a success-shaped failure inside the instrument built to study
+one. Only the summariser caught it, because it refuses to read an empty
+capture as clean. **The probe must fail closed when it captured zero
+model calls after driving a pipeline that demonstrably ran.**
+
+### Leading hypothesis for the ineffective patch — NOT established
+
+`instructor.from_openai()` appears to bind the underlying create function
+**at construction** (a `create_fn` captured once), so replacing
+`client.chat.completions.create` afterwards is never consulted. A second
+candidate is `get_llm_client()`'s caching returning an instance other
+than the one used per call.
+
+Both are hypotheses. **Neither is verified**, and the next unit's first
+job is to establish which — by proving the capture point is on the path
+*before* spending another ~9-minute run on it. A calibration that asserts
+"a call through the adapter produces an `llm-call` record" would have
+caught this without a stack, exactly as the argv check did for run 8.
+
+### Standing — unchanged
+
+* **KAI-GATE-048 C — BLOCKED**, real graph extraction does not complete
+  successfully. Q1/Q2/Q6 still unmeasured.
+* **KAI-GATE-049 — CLOSED. KAI-GATE-050 — CLOSED.**
+* No mode change, no model swap, no timeout or retry change, no schema or
+  validator change, no Phase 2.
