@@ -13019,3 +13019,95 @@ An empty capture **fails closed** and says UNMEASURED is not the same as
   propagation runtime-proven; success direction inherited here).
 * No timeout increase, no model swap, no retry increase, no schema
   change, no cognee validation change, no Phase 2.
+
+---
+
+## D209
+
+**2026-08-14 — four scope qualifications for the KAI-GATE-048 C capture,
+fixed BEFORE the run reports.**
+
+Same discipline as D200: written while the run is in flight, so none of
+these can be tightened or loosened to fit the result. No code changed.
+
+### 1. What this instrument proves — and what it must never be promoted to
+
+It measures the **adapter/model request-response contract exercised
+through the same software path**, in the same image and environment.
+
+It is **NOT** evidence that "the live memu-graph service behaved exactly
+this way". The probe drives cognee in-process; it does not observe the
+running uvicorn worker. Any later sentence claiming deployed HTTP
+behaviour from this capture is out of scope by construction.
+
+### 2. What "byte-identical" actually hashes — three different answers
+
+| hash | source | strength of the term |
+|---|---|---|
+| **response** | `result.choices[0].message.content` — the exact string the client returned | **BYTE-LEVEL.** "byte-identical" is earned |
+| **prompt** | `json.dumps(messages, sort_keys=True, default=str)` in the summariser | **CANONICAL-IDENTICAL.** A re-serialisation, not wire bytes |
+| **schema** | `response_format`/`tools` re-serialised with `sort_keys=True`, **or** raw message content when the mode embeds it | **MIXED** — canonical in the first two cases, byte-level in the third |
+
+The report's sentence *"Every attempt returned a BYTE-IDENTICAL
+response"* is gated on `len(seen_resp) == 1` — **responses only** — so
+that claim is correctly scoped as written. The prompt and schema columns
+are **canonical-identical** and must be described that way. Serialisation
+must not manufacture a stronger identity claim than the captured layer
+supports.
+
+### 3. The pass-through is non-destructive for streams
+
+The wrapper `await`s the original call and then reads
+`result.choices[0].message.content` inside a `try`. It **never iterates**
+the result. If a stream or generator were returned, `.choices` raises,
+the exception is caught, `raw_response` is `None` and the record carries
+`raw_response_note: "unexpected response shape"` — the object is still
+returned untouched. So a stream would be **visible as a gap, not consumed
+into a behaviour change**. Which type actually occurs is for the run to
+say.
+
+### 4. Credential scope — what the artefact can and cannot contain
+
+Recorded per call: `messages`, `model`, `temperature`, `response_format`,
+`tools`, and `other_params` — the latter being **key names only**
+(`sorted(k for k in kwargs ...)`), never their values. So an `api_key`
+kwarg would appear as the string `"api_key"` and nothing more. **No
+headers are captured at all.**
+
+Residual, stated rather than fixed: `resolved-config` records the
+adapter's `endpoint` (here an internal `http://ollama:11434` URL) and
+`transport_error` records an exception's text. Neither carries a secret
+in this topology; in a deployment whose endpoint embedded credentials
+they could. Recorded as a known limit of the artefact, **not changed
+mid-run**.
+
+### What would move ownership — decided in advance
+
+* same effective mode + same schema payload + **byte-identical** schema
+  echo across attempts ⇒ retrying is buying no new information; a
+  reproducible wrong-object interaction at the adapter/model boundary.
+* schema delivered as ordinary message content, worded so that
+  "describe/return this schema" is a plausible reading ⇒ **prompt
+  construction** rises.
+* schema conveyed correctly through a structured-output mechanism, mode
+  confirmed, and the model still returns the definition ⇒ **model/mode
+  compatibility** is the stronger hypothesis.
+* instructor transforming a valid-looking raw response into the wrong
+  structure ⇒ ownership moves to the **adapter**.
+* cognee rejecting a genuinely invalid instance while everything upstream
+  behaved as asked ⇒ the **validator remains innocent**, as current
+  evidence already suggests.
+
+### The result worth most
+
+Whether the schema echo reproduces metadata that existed **only in the
+supplied schema** — the exact `SummarizedContent` title and the docstring
+`"Bulleted memory record produced by chunk summarization."`. If the raw
+response carries those verbatim and hashes consistently across attempts,
+the finding is qualitatively stronger than "bad JSON":
+
+> the model is demonstrably returning the **contract description it was
+> given** instead of constructing an instance satisfying that contract.
+
+No ownership conclusion until the capture speaks. No mode change, no
+model swap, no timeout or retry change. **KAI-GATE-048 C stays BLOCKED.**
