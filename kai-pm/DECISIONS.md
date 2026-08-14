@@ -13678,3 +13678,166 @@ predicate asking about `RAW_MODEL_RESPONSE`.
   queued.**
 * No production remediation. No mode, model, timeout, retry, schema,
   validator or topology change.
+
+---
+
+## D216
+
+**2026-08-14 — run 15 read row by row. The wrong-altitude diagnosis is
+CONFIRMED, and the "VALID INSTANCE" verdicts are VACUOUS. A third
+instrument defect, and one materially new system observation.**
+
+Read-only. No code changed.
+
+### The altitude, established from source — and the name lied
+
+`resolved-config` recorded:
+
+```
+instructor_holds_create_fn : <function Completions.create at 0x7f71ba850860>
+instructor_holds_create    : <bound method Instructor.create of ...>
+get_llm_client_stable      : true
+```
+
+That repr looks like the **raw** OpenAI create. It is not. From installed
+`instructor 1.15.1`:
+
+```python
+# core/patch.py:214
+@wraps(func)                      # <- copies __qualname__ from the RAW create
+def new_create_sync(response_model=None, ..., max_retries=1, ...):
+# core/patch.py:262
+    ... max_retries=max_retries ...   # -> retry_sync
+
+# core/retry.py:193-198
+for attempt in max_retries:
+    ...
+    response = func(*args, **kwargs)   # <- THE RAW PER-ATTEMPT MODEL CALL
+```
+
+`create_fn` is instructor's **patched wrapper**, and `@wraps` copied the
+raw function's `__qualname__`, so `repr()` displayed the wrapped name.
+**I would have inferred the altitude from that name and been wrong** —
+exactly the inference the operator forbade.
+
+**Confirmed:** the hook sits **above** instructor's retry loop. The
+per-attempt raw call is `func(*args, **kwargs)` at `retry.py:198`, where
+`func` is captured in the closure at `patch()` time — i.e. at
+`instructor.from_openai(...)`, the bind point run 13 already identified.
+
+**So one captured "attempt" = one `create_fn` invocation = one adapter
+structured-output request, containing up to `max_retries=2`+1 model
+attempts invisibly.** Corroborated by the elapsed times: **583.245s** and
+**120.681s** for two calls — durations only explicable as several model
+attempts each.
+
+### The verdicts are VACUOUS — a third, separate defect
+
+```
+attempt 1: VALID INSTANCE
+  carries every required field ()
+  required fields derived from the schema SENT: (none found — schema not located in this call)
+attempt 2: VALID INSTANCE
+  carries every required field ()
+```
+
+`required_fields_of` returned **`[]`**. With an empty list,
+`classify()` computes `missing = []`, takes `not missing` as true, finds
+no wrongly-typed fields, and returns **VALID INSTANCE** — for *any* JSON
+object, **including a schema echo**.
+
+**The predicate was trivially satisfiable.** That is the vacuous-assertion
+class this repository already built a ratchet for (A-02), reappearing in
+a new instrument.
+
+Mechanism: `_schema_text` located the schema inside **message prose**
+(the hashes are non-empty and distinct), and `required_fields_of` then
+ran `json.loads()` on prose, raised `ValueError`, and returned `[]`.
+Meanwhile the record carries `response_model` — a clean schema dict —
+which `_schema_text` never inspects.
+
+**So "every attempt returned a valid instance" was not merely
+over-promoted across layers (D215); it was not a measurement at all.**
+D215's rejection stands, and now has a second, independent reason.
+
+### What Q1 DID measure — genuinely, at its layer
+
+The selftest row carries the full request:
+
+```
+system: "Answer with one word.\n\n Parse the content and return a JSON
+         object matching this schema:\n\n {…"title":"Ping"…}\n\n
+         Return a valid JSON instance, not the schema definition."
+model: qwen2.5:3b   temperature: null
+response_model: {…}  response_format: null  tools: null
+max_retries: "2"    other_params: [context, hooks, strict, validation_context]
+raw_response: "{\n  \"answer\": \"pong\"\n}"    result_type: "Ping"
+```
+
+**Measured at INSTRUCTOR_INPUT:** the mode is `json_mode`, and the schema
+is conveyed **as text inside the system message** — not via
+`response_format`, not via `tools`. Both are `null`.
+
+And instructor's injected prompt **already instructs**: *"Return a valid
+JSON instance, not the schema definition."* The model echoed the schema
+anyway in runs 9/11/12. That is evidence about prompt construction —
+recorded, **not** an ownership assignment.
+
+### A materially new system observation — the failure is NOT deterministic
+
+`capture.err` ends:
+
+```
+Async Generator task completed: `extract_chunks_from_documents`
+Coroutine task completed: `classify_documents`
+Pipeline run completed: `7ab112a5-2687-5a01-b21c-a9ca43888663`
+```
+
+**The cognify pipeline COMPLETED in this drive** — where runs 9, 11 and
+12 all ended `PipelineRunErrored` / 422. This is independent of the
+broken classifier: it is cognee's own terminal marker.
+
+**The schema-echo failure is therefore not deterministic.** Confounders,
+none excluded: the selftest had already exercised the model (warm); this
+drive is in-process rather than through `/graph/ingest`; or plain model
+nondeterminism. **Not diagnosed.** It does mean any future claim of
+"reproduces N/N" must count runs at the same layer and by the same route.
+
+### Q status — unchanged where it matters
+
+| | |
+|---|---|
+| **Q1** | **MEASURED at INSTRUCTOR_INPUT** — mode `json_mode`, schema conveyed as system-message text, `response_format`/`tools` null. **NOT** the post-instructor per-attempt request |
+| **Q2** | **UNMEASURED.** `raw_response` was captured, but at this altitude it is the *final* attempt's completion attached to the validated object — not per-retry |
+| **Q6** | **UNMEASURED** for the intended question. Two distinct prompts/schemas/responses across two *create_fn* calls is not retry-level reproducibility |
+| ownership | **UNCHANGED** |
+
+### Proposed observation point — NOT implemented
+
+`openai.resources.chat.completions.Completions.create`, patched **at the
+class level BEFORE any adapter construction**, so the bound method
+captured by `patch()` at `from_openai(...)` is already the wrapper. It
+must be **synchronous** (`retry.py:198` calls `func(...)` un-awaited) and
+transparent.
+
+`get_llm_client_stable: true` means the adapter is **cached**, so the
+patch must precede the first `get_llm_client()` — the probe currently
+calls that first, which would miss it.
+
+### Three defects now, not one
+
+1. hook **altitude** — above the retry loop;
+2. summariser **vocabulary** — promotes INSTRUCTOR_RETURN to a claim about
+   RAW_MODEL_RESPONSE (D215);
+3. classifier **vacuity** — an empty required-field list makes VALID
+   INSTANCE trivially true.
+
+**Fixing the hook alone would leave 2 and 3 live**, and 3 would silently
+validate whatever the new hook captured.
+
+### Standing
+
+* **048 C — BLOCKED.** **049/050 — CLOSED.** **051 — OPEN**, queued.
+* No production remediation; no mode, model, timeout, retry, schema,
+  validator or topology change.
+* **STOPPED before code changes**, as instructed.
