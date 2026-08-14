@@ -16529,3 +16529,83 @@ consistent with both live candidates. It does not separate them.
   qualifying captures, 3 retried calls · ownership **unmoved**.
 * **Campaign CLOSED at 1/5 by the frozen stopping rule.**
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+
+---
+
+## D246 — correction to D245: the cumulative denominator, and a tighter claim
+
+Two corrections. D245's Q6 result stands; its arithmetic and one wording
+do not.
+
+### 1. The denominator was wrong by one
+
+D245 said *"20 raw attempts, 19 SCHEMA ECHO, 1 VALID INSTANCE"*. Run 24
+contributed **4** raw attempts, not 3. Recomputed from each entry's own
+recorded count:
+
+| run | raw attempts | SCHEMA ECHO | VALID INSTANCE |
+|---|---|---|---|
+| 17 | 5 | 5 | 0 |
+| 18 | 5 | 5 | 0 |
+| 22 | 5 | 5 | 0 |
+| 23 | 2 | 2 | 0 |
+| 24 | 4 | 3 | 1 |
+| **total** | **21** | **20** | **1** |
+
+> **21 raw attempts across five captures: 20 SCHEMA ECHO, 1 VALID
+> INSTANCE.**
+
+**"Attempt 4" means the fourth raw model attempt within run 24** — the
+`#` column of that run's per-attempt table, which numbers raw attempts
+sequentially within the capture. It is not a logical-call number, not a
+table row index, and not a cumulative counter. D245 left that ambiguous,
+which is what let the arithmetic error hide.
+
+I stated the total in the report as "19 of 20" as well. Both wrong; the
+figure is **20 of 21**.
+
+### 2. The non-determinism claim was too broad
+
+D245 said the failure *"is not deterministic at the raw layer"*. That
+asserts a property of the system. What was observed is narrower:
+
+> **The captured prompt and contract hashes do not uniquely determine the
+> raw outcome class in the observed system: the same captured
+> prompt/contract pair (`a6e5e25d2` / `fd7b68067d`) produced both SCHEMA
+> ECHO and VALID INSTANCE.**
+
+Stronger than "variation happened", and it stops short of a global
+non-determinism claim we have not earned. Sampling temperature, seed, KV
+cache state, model-server state and request ordering are all uncontrolled
+here. What is established is that **prompt+contract identity alone is
+insufficient to predict the outcome class** — which is a statement about
+our captured variables, not about the system's underlying determinism.
+
+It also **falsifies** any claim that this prompt/contract pair *always*
+yields a schema echo. That claim is now dead.
+
+### Unchanged from D245
+
+* **Q6 — MEASURED: REPRODUCED.** Denominator: 2 qualifying correlated
+  captures, 3 retried logical calls, 3/3 same failure class on retry
+  under the same contract with +2142 bytes of repair context. Byte
+  identity is not part of the claim (True once, False twice).
+* Scope stays narrow: *reproduced across two independent qualifying
+  correlated captures under the frozen conditions* — instructor 1.15.1,
+  `Mode.JSON`, `OllamaAPIAdapter`, `qwen2.5:3b`, this cognify path, these
+  two contracts.
+* The single-attempt VALID INSTANCE contributes **zero** Q6 evidence.
+* **6.4 s vs 57.0 s is observed timing.** No mechanism follows from it.
+* **Campaign CLOSED at 1/5.** sampling: 1 attempted / 1 qualifying.
+* **Ownership unmoved** — and the VALID INSTANCE makes premature
+  attribution *less* defensible, not more: the same captured contract was
+  followed correctly on one invocation and echoed on another, which
+  several mechanisms explain equally well.
+
+### Status
+
+* **Q1** partial · **Q2 MEASURED — 5 captures, 21 raw attempts, 20 SCHEMA
+  ECHO + 1 VALID INSTANCE** · **broad-class recurrence MEASURED** ·
+  **Q6 MEASURED: REPRODUCED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* No further Q6 runs authorised or needed.
