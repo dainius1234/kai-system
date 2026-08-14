@@ -16054,3 +16054,53 @@ re-read in run 23's light.
   cross-run recurrence MEASURED** · **within-call reproducibility
   MEASURED for run 22 only** · **Q6 UNMEASURED** · ownership **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+
+---
+
+## D240 — what blob identity does and does not establish
+
+Frozen before run 23 reports.
+
+> **Blob identity proves repository-input equivalence. It does not prove
+> every runtime dependency was identical.**
+
+D239's 34/34 byte-identical comparison establishes that run 23 executes
+the same declared instrument, code and configuration as run 22. It says
+nothing about the base image layers pulled, the model blob ollama served,
+the wheel set pip resolved, or the runner's kernel. Those are **freshly
+instantiated**, and that is deliberate — it is what makes run 23 an
+independent sample rather than a repetition.
+
+The precise wording for the record:
+
+> **Run 22 and run 23 are repository-input equivalent by blob identity,
+> and execution-instance independent by fresh runner, build, stack and
+> model load.**
+
+More exact than "same code, independent run", and it keeps the two
+properties from being confused for one another.
+
+### Runtime identities to capture — from evidence that ALREADY exists
+
+No instrumentation is to be added for this. Both runs already emit, and
+run 23's log will be read for:
+
+* `resolved-config`: model, endpoint, adapter class, resolved instructor
+  mode, `openai_version`, `adapter_id`;
+* the build log: image `sha256`, and pip's resolved versions
+  (`instructor-1.15.1`, `cognee-1.1.3`, `openai-2.54.0`, …);
+* the asset-contract job: the pinned tokenizer revision.
+
+Where a field exists in both runs it will be compared; where it does not,
+that axis is reported as **unestablished** rather than assumed equal.
+This distinguishes *held constant by identity* from *a fresh independent
+instance of the same declared configuration* — and only the fields
+actually present license either claim.
+
+### Status — unchanged; only run 23's lifecycle evidence may move it
+
+* **Q1** partial · **Q2 MEASURED — runs 17, 18, 22** · **broad-class
+  recurrence MEASURED** · **within-call reproducibility MEASURED — run 22
+  only** · **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* **Run 23 = 31842405123 — OBSERVER_ALIVE / OBSERVATION_PENDING.**
