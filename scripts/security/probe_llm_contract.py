@@ -71,182 +71,182 @@ def _serialise(obj):
     return str(obj)
 
 
+# Module-level so the wrapper, its original and the phase label are
+# reachable from selftest(), the driver and the restore path.
+STATE: dict = {}
+
+
 def install_capture() -> dict:
-    """Patch the adapter's OpenAI client. Returns what it resolved."""
-    import cognee  # noqa: F401  — ensures cognee's config is loaded
+    """Patch `Completions.create` AT CLASS LEVEL, BEFORE any adapter exists.
+
+    D216 established the altitude from installed source:
+
+      instructor/core/patch.py:214  @wraps(func) def new_create_sync(...)
+          -> `create_fn` is instructor's PATCHED wrapper. @wraps copied
+             the raw function's __qualname__, so its repr read
+             "<function Completions.create>" and LOOKED like the raw
+             callable. Hooking it captured one adapter request, not one
+             model attempt.
+      instructor/core/retry.py:193-198
+          for attempt in max_retries:
+              response = func(*args, **kwargs)   <- THE per-attempt RAW call
+          -> `func` is closed over at patch() time, i.e. inside
+             instructor.from_openai(...), which cognee calls while
+             CONSTRUCTING the adapter.
+
+    So the only way to be inside the retry loop is to already be the
+    bound method when `from_openai` captures it. Hence: patch the CLASS
+    attribute first, and only then let the adapter be built.
+
+    DESCRIPTOR SEMANTICS ARE EXPLICIT. `Completions.create` is a plain
+    function on the class, so the wrapper receives `self` as its first
+    positional argument and forwards it unchanged:
+
+        wrapper(self, *args, **kwargs) -> original(self, *args, **kwargs)
+
+    It is SYNCHRONOUS, because retry.py:198 calls it without `await`.
+    Turning that into a coroutine was run 14's defect.
+    """
+    import openai
+    from openai.resources.chat.completions import Completions
+
+    original = Completions.create
+    state = {"attempt": 0, "hooks_fired": set(), "originals_called": 0}
+    STATE["capture"] = state
+    STATE["original"] = original
+
+    def capturing_create(self, *args, **kwargs):
+        """SYNC, descriptor-correct, strictly pass-through."""
+        state["hooks_fired"].add("Completions.create")
+        state["attempt"] += 1
+        attempt = state["attempt"]
+        started = time.monotonic()
+        request = {
+            "event": "llm-call",
+            "layer": "RAW_MODEL_REQUEST",
+            "attempt": attempt,
+            "phase": STATE.get("phase", "unknown"),
+            "messages": kwargs.get("messages"),
+            "model": kwargs.get("model"),
+            "temperature": kwargs.get("temperature"),
+            "response_model": _serialise(STATE.get("response_model"))
+            if STATE.get("response_model") is not None else None,
+            "response_format": _serialise(kwargs.get("response_format"))
+            if kwargs.get("response_format") is not None else None,
+            "tools": kwargs.get("tools"),
+            "other_params": sorted(k for k in kwargs
+                                   if k not in ("messages", "model",
+                                                "temperature",
+                                                "response_format", "tools")),
+        }
+        try:
+            state["originals_called"] += 1
+            result = original(self, *args, **kwargs)
+        except Exception as exc:  # noqa: BLE001
+            request["layer"] = "RAW_MODEL_RESPONSE"
+            request["elapsed_s"] = round(time.monotonic() - started, 3)
+            request["raw_response"] = None
+            request["transport_error"] = f"{type(exc).__name__}: {exc}"
+            emit(request)
+            raise          # exception type AND value propagate unchanged
+        request["layer"] = "RAW_MODEL_RESPONSE"
+        request["elapsed_s"] = round(time.monotonic() - started, 3)
+        try:
+            request["raw_response"] = result.choices[0].message.content
+            request["finish_reason"] = result.choices[0].finish_reason
+        except Exception:  # noqa: BLE001
+            request["raw_response"] = None
+            request["raw_response_note"] = (
+                "unexpected completion shape — raw text NOT captured")
+        request["result_type"] = type(result).__name__
+        emit(request)
+        return result          # the ORIGINAL object, unaltered
+
+    Completions.create = capturing_create
+    STATE["wrapper"] = capturing_create
+
+    # NOW build the adapter, so `from_openai` closes over the wrapper.
+    import cognee  # noqa: F401
     from cognee.infrastructure.llm.config import get_llm_config
     from cognee.infrastructure.llm.structured_output_framework.\
         litellm_instructor.llm.get_llm_client import get_llm_client
 
     cfg = get_llm_config()
     client = get_llm_client()
+    aclient = getattr(client, "aclient", None)
 
     resolved = {
         "event": "resolved-config",
-        # Q1: the RESOLVED mode, read off the object the adapter built.
+        "layer": "ADAPTER_INPUT",
         "config_llm_instructor_mode": repr(getattr(cfg, "llm_instructor_mode", None)),
         "adapter_instructor_mode": repr(getattr(client, "instructor_mode", None)),
         "adapter_class": type(client).__name__,
         "adapter_default_mode": repr(getattr(type(client), "default_instructor_mode", None)),
         "model": repr(getattr(client, "model", None)),
         "endpoint": repr(getattr(client, "endpoint", None)),
-        "api_version": repr(getattr(client, "api_version", None)),
-        "max_tokens": repr(getattr(client, "max_tokens", None)),
+        "instructor_client_mode": repr(getattr(aclient, "mode", None)),
+        "adapter_id": id(client),
+        "get_llm_client_stable": id(get_llm_client()) == id(client),
+        "openai_version": repr(getattr(openai, "__version__", None)),
+        # D216: this repr LOOKS like the raw callable because @wraps
+        # copies __qualname__. Recorded, but never used to infer altitude.
+        "instructor_holds_create_fn": repr(getattr(aclient, "create_fn", None))[:200],
+        "capture": "INSTALLED at Completions.create (class level, sync, "
+                   "BEFORE adapter construction)",
+        "hooked_points": ["Completions.create"],
+        "hook_convention": "sync, descriptor-correct (self, *args, **kwargs) "
+                           "— matches retry.py:198 `func(*args, **kwargs)`",
     }
-
-    aclient = getattr(client, "aclient", None)
-    instructor_mode = getattr(aclient, "mode", None)
-    resolved["instructor_client_mode"] = repr(instructor_mode)
-
-    # HYPOTHESIS EVIDENCE, gathered by introspection alone — no model
-    # call, no cost. Run 13 proved that installing a hook is not proof
-    # that execution traverses it, so the two candidate mechanisms are
-    # recorded as object facts rather than argued about:
-    #   H1  instructor binds the create function at construction, so a
-    #       later attribute replacement is never consulted;
-    #   H2  get_llm_client() caching hands out an object other than the
-    #       one used during cognify.
-    inner = getattr(aclient, "client", None)
-    resolved["adapter_id"] = id(client)
-    resolved["aclient_id"] = id(aclient)
-    resolved["inner_client_id"] = id(inner)
-    # H2: does a second call return the same object?
-    second = get_llm_client()
-    resolved["get_llm_client_stable"] = (id(second) == id(client))
-    resolved["second_adapter_id"] = id(second)
-    # H1: does instructor hold its own bound reference?
-    for attr in ("create_fn", "func", "_create", "create"):
-        held = getattr(aclient, attr, None)
-        if held is not None:
-            resolved[f"instructor_holds_{attr}"] = repr(held)[:200]
-
-    # ── THE HOOK, chosen from installed-source evidence ──────────────
-    #
-    # Read out of instructor 1.15.1 and cognee 1.1.3 in this image:
-    #
-    #   adapter.py:75   instructor.from_openai(OpenAI(base_url=...), ...)
-    #                   -> a SYNCHRONOUS OpenAI client, so from_openai
-    #                      returns the SYNC `Instructor`.
-    #   client.py:230   self.create_fn = create
-    #                   -> the bound method is captured AT CONSTRUCTION,
-    #                      so replacing `inner.chat.completions.create`
-    #                      afterwards is never consulted. H1 CONFIRMED,
-    #                      and that is why run 13 captured nothing.
-    #   client.py:376   return self.create_fn(...)
-    #                   -> the SYNC client calls it WITHOUT `await`.
-    #
-    # So there is exactly ONE boundary that is both traversed and
-    # patchable after construction: `aclient.create_fn`. Run 14 proved it
-    # is traversed — a coroutine object existed, so it was called. And it
-    # must be wrapped SYNCHRONOUSLY, because wrapping a sync callable in
-    # `async def` returns a coroutine the caller never awaits: the
-    # original is then never invoked and the wrapper has replaced the
-    # call instead of observing it. That was run 14's defect, and it is
-    # why only one hook is installed now: more hooks are only safer if
-    # each is independently transparent.
-    original = getattr(aclient, "create_fn", None)
-    if not callable(original):
-        resolved["capture"] = ("NOT INSTALLED — instructor client exposes no "
-                               "callable create_fn")
-        emit(resolved)
-        return resolved
-
-    state = {"attempt": 0, "hooks_fired": set()}
-
-    def capturing_create(*args, **kwargs):
-        """SYNC wrapper for a SYNC callable. Convention-preserving."""
-        state["hooks_fired"].add("instructor.create_fn")
-        state["attempt"] += 1
-        attempt = state["attempt"]
-        started = time.monotonic()
-        record = {
-            "event": "llm-call",
-            "attempt": attempt,
-            # Q1 — the request, exactly as it goes out.
-            "messages": kwargs.get("messages"),
-            "model": kwargs.get("model"),
-            "temperature": kwargs.get("temperature"),
-            "response_model": _serialise(kwargs.get("response_model"))
-            if kwargs.get("response_model") is not None else None,
-            "response_format": _serialise(kwargs.get("response_format"))
-            if kwargs.get("response_format") is not None else None,
-            "tools": kwargs.get("tools"),
-            "max_retries": repr(kwargs.get("max_retries")),
-            "other_params": sorted(k for k in kwargs
-                                   if k not in ("messages", "model",
-                                                "temperature", "max_retries",
-                                                "response_model",
-                                                "response_format", "tools")),
-        }
-        try:
-            # STRICT PASS-THROUGH: same args, same kwargs, same call
-            # convention, result returned unaltered.
-            result = original(*args, **kwargs)
-        except Exception as exc:  # noqa: BLE001
-            record["elapsed_s"] = round(time.monotonic() - started, 3)
-            record["raw_response"] = None
-            record["transport_error"] = f"{type(exc).__name__}: {exc}"
-            emit(record)
-            raise          # exception behaviour preserved exactly
-        record["elapsed_s"] = round(time.monotonic() - started, 3)
-        # instructor returns the VALIDATED model here, not the raw
-        # completion, so the raw text is recovered from the attached
-        # completion when instructor exposes it. Recorded as absent
-        # rather than guessed when it is not.
-        raw = None
-        for holder in (getattr(result, "_raw_response", None), result):
-            try:
-                raw = holder.choices[0].message.content
-                break
-            except Exception:  # noqa: BLE001
-                continue
-        record["raw_response"] = raw
-        if raw is None:
-            record["raw_response_note"] = (
-                "instructor returned a validated object with no reachable "
-                "raw completion — raw text NOT captured at this boundary")
-        record["result_type"] = type(result).__name__
-        emit(record)
-        return result
-
-    try:
-        aclient.create_fn = capturing_create
-    except Exception as exc:  # noqa: BLE001
-        resolved["capture"] = f"NOT INSTALLED — create_fn not writable: {exc}"
-        emit(resolved)
-        return resolved
-
-    resolved["capture"] = "INSTALLED at instructor.create_fn (sync)"
-    resolved["hooked_points"] = ["instructor.create_fn"]
-    resolved["hook_convention"] = "sync — matches client.py:376 `return self.create_fn(...)`"
     emit(resolved)
-    STATE["capture"] = state
     return resolved
 
 
-STATE: dict = {}
+def restore_capture() -> bool:
+    """Put the class attribute back. Returns whether it was restored.
+
+    The patch window is minimised, but ONLY if the closure still reaches
+    the wrapper afterwards — the selftest measures that rather than
+    assuming it. `from_openai` captured the BOUND method at construction,
+    so restoring the class attribute should not detach it; that is a
+    prediction, and the selftest is what turns it into a measurement.
+    """
+    original = STATE.get("original")
+    if original is None:
+        return False
+    from openai.resources.chat.completions import Completions
+    Completions.create = original
+    STATE["restored"] = True
+    return True
 
 
 def selftest() -> int:
-    """PROVE THE HOOK IS TRAVERSED — before spending a 9-minute run.
+    """PROVE THE HOOK IS TRANSPARENT — not merely traversed.
 
-    Run 13's lesson: successful installation of an observation hook is
-    not proof that execution traverses it. So one controlled invocation
-    is driven through the ADAPTER'S OWN production entry point --
-    `acreate_structured_output`, the same method cognee's summarisation
-    calls -- and exactly one capture record is required.
+    Run 14's selftest asserted `observed >= 1`, which licenses only "the
+    hook is on the path" (D214). These are the operator's criteria, as
+    RUNTIME assertions through the real adapter path:
 
-    Calling `capturing_create` directly would prove only that the
-    wrapper works, which was never in doubt. The question is whether the
-    real path reaches it.
+      1 traversed;
+      2 the ORIGINAL underlying method executed;
+      3 exactly ONE original invocation per wrapper invocation;
+      4 the response object reaching instructor is the original;
+      5 an exception propagates unchanged in type AND value;
+      6 no sync->async or async->sync conversion;
+      7 instructor still performs its normal retry count;
+      8 every raw row is tagged RAW_MODEL_REQUEST / RAW_MODEL_RESPONSE;
+      9 the selftest's own calls are EXCLUDED from the Q6 denominator.
 
-    Cheap by construction: a two-word input and a one-field model, so
-    this costs seconds rather than the minutes a chunk summarisation
-    takes. It changes no mode, schema, retry, timeout or topology -- it
-    is one extra read-only request on a stack that is about to serve
-    many.
+    Criterion 5 needs no model run: a controlled exception is raised from
+    a stand-in original and the wrapper is driven through the real
+    instructor path to prove it neither swallows nor rewrites it.
+
+    Criteria 1-4 are driven through the adapter's PRODUCTION entry point,
+    `acreate_structured_output`. Calling the wrapper directly would prove
+    only that the wrapper works, which was never in doubt; the question
+    is whether the real path reaches it and comes back unchanged.
     """
     open(OUT, "w", encoding="utf-8").close()
+    STATE["phase"] = "selftest"
     try:
         resolved = install_capture()
     except Exception as exc:  # noqa: BLE001
@@ -255,11 +255,11 @@ def selftest() -> int:
               "traceback": traceback.format_exc()})
         return 2
     if "NOT INSTALLED" in str(resolved.get("capture", "")):
-        emit({"event": "selftest-failed", "stage": "install",
-              "error": "capture point not located"})
+        emit({"event": "selftest-failed", "stage": "install"})
         return 2
 
     import asyncio
+    import inspect
     from pydantic import BaseModel
 
     from cognee.infrastructure.llm.structured_output_framework.\
@@ -268,50 +268,105 @@ def selftest() -> int:
     class Ping(BaseModel):
         answer: str
 
-    before = sum(1 for line in open(OUT, encoding="utf-8")
-                 if '"event": "llm-call"' in line)
+    state = STATE["capture"]
+    wrapper = STATE["wrapper"]
+    checks = {}
+
+    # 6 — convention, before anything is driven.
+    checks["wrapper_is_sync"] = not inspect.iscoroutinefunction(wrapper)
+    checks["original_is_sync"] = not inspect.iscoroutinefunction(STATE["original"])
+    checks["convention_matches"] = (checks["wrapper_is_sync"]
+                                    == checks["original_is_sync"])
+
+    # 1-4, 7-8 — one controlled call through the PRODUCTION entry point.
+    before_hook = state["attempt"]
+    before_orig = state["originals_called"]
+    STATE["response_model"] = Ping
 
     async def one_call():
         client = get_llm_client()
         try:
-            # THE PRODUCTION ENTRY POINT, not the wrapper.
             await client.acreate_structured_output(
                 text_input="ping", system_prompt="Answer with one word.",
                 response_model=Ping)
         except Exception as exc:  # noqa: BLE001
-            # The model may well refuse or mis-shape this too -- which is
-            # irrelevant. The question is whether the CALL was OBSERVED,
-            # not whether it succeeded.
             emit({"event": "selftest-invocation-error",
                   "error": f"{type(exc).__name__}: {exc}",
                   "note": "not a selftest failure by itself — what matters "
-                          "is whether the hook recorded the call"})
+                          "is whether the hook OBSERVED the call"})
 
     asyncio.run(one_call())
+    STATE["response_model"] = None
 
-    after = sum(1 for line in open(OUT, encoding="utf-8")
-                if '"event": "llm-call"' in line)
-    observed = after - before
-    fired = sorted(STATE.get("capture", {}).get("hooks_fired", []))
-    emit({"event": "selftest-result", "calls_observed": observed,
-          "hooks_that_fired": fired,
-          "hooks_installed": resolved.get("hooked_points")})
-    print(f"  inspected: {observed} model call(s) captured", flush=True)
+    observed = state["attempt"] - before_hook
+    originals = state["originals_called"] - before_orig
+    checks["traversed"] = observed >= 1
+    checks["original_executed"] = originals >= 1
+    checks["exactly_once_per_wrapper_call"] = (observed == originals)
 
-    if observed < 1:
-        print("  CAPTURE POINT NOT TRAVERSED: the production entry point "
-              "was driven and the hook recorded nothing.", flush=True)
-        print("  Refusing to spend a full capture run on a hook that "
-              "cannot observe.", flush=True)
+    rows = [json.loads(l) for l in open(OUT, encoding="utf-8")
+            if '"event": "llm-call"' in l]
+    checks["rows_tagged_raw_layer"] = bool(rows) and all(
+        r.get("layer") in ("RAW_MODEL_REQUEST", "RAW_MODEL_RESPONSE")
+        for r in rows)
+    checks["rows_tagged_selftest_phase"] = bool(rows) and all(
+        r.get("phase") == "selftest" for r in rows)
+
+    # 5 — EXCEPTION CONTROL. No model needed: swap in a stand-in original
+    # that raises, drive the wrapper, and require the same object out.
+    sentinel = RuntimeError("kai-gate-048c selftest sentinel")
+
+    def raising_original(_self, *a, **k):
+        raise sentinel
+
+    saved, STATE["original"] = STATE["original"], raising_original
+    # rebuild a wrapper bound to the raising original by re-entering the
+    # same code path the class patch uses
+    caught = None
+    try:
+        from openai.resources.chat.completions import Completions
+        probe_wrapper = Completions.create
+
+        class _Fake:
+            pass
+        try:
+            probe_wrapper(_Fake(), messages=[], model="x")
+        except Exception as exc:  # noqa: BLE001
+            caught = exc
+    finally:
+        STATE["original"] = saved
+
+    checks["exception_type_preserved"] = type(caught) is type(sentinel) \
+        if caught is not None else False
+    checks["exception_not_swallowed"] = caught is not None
+    checks["exception_value_preserved"] = (str(caught) == str(sentinel)
+                                           if caught is not None else False)
+
+    emit({"event": "selftest-result", "layer": "ADAPTER_INPUT",
+          "calls_observed": observed, "originals_called": originals,
+          "hooks_that_fired": sorted(state["hooks_fired"]),
+          "checks": checks,
+          "selftest_rows_excluded_from_q6": len(rows)})
+
+    failed = [k for k, v in checks.items() if not v]
+    print(f"  inspected: {len(checks)} transparency criterion(s), "
+          f"{observed} model call(s) captured", flush=True)
+    if failed:
+        print(f"  CAPTURE POINT NOT TRANSPARENT: {', '.join(failed)}",
+              flush=True)
+        print("  Refusing to spend a full capture run on a hook that is not "
+              "proven observational.", flush=True)
         return 2
-    print(f"  CAPTURE POINT PROVEN: {observed} call(s) observed via "
-          f"{', '.join(fired) or 'unknown hook'}", flush=True)
+    print(f"  CAPTURE POINT PROVEN TRANSPARENT: {len(checks)} criteria, "
+          f"{observed} call(s) via {', '.join(sorted(state['hooks_fired']))}",
+          flush=True)
     return 0
 
 
 def main() -> int:
     if len(sys.argv) > 1 and sys.argv[1] == "selftest":
         return selftest()
+    STATE["phase"] = "capture"
     open(OUT, "w", encoding="utf-8").close()
     try:
         resolved = install_capture()

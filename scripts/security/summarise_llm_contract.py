@@ -17,7 +17,8 @@ from typing import Any, Dict, List
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from classify_llm_response import (  # noqa: E402
-    classify, required_fields_of, sha256, SCHEMA_ECHO, VALID_INSTANCE)
+    classify, canonical, sha256, licenses_raw_response_claim,
+    CLASSIFIER_UNMEASURED, RAW_MODEL_RESPONSE, SCHEMA_ECHO, VALID_INSTANCE)
 
 
 def load(path: Path) -> List[dict]:
@@ -35,22 +36,36 @@ def load(path: Path) -> List[dict]:
     return rows
 
 
-def _schema_text(call: Dict[str, Any]) -> str:
-    """The schema material actually sent, wherever the adapter put it.
+def _schema_for(call: Dict[str, Any]) -> tuple:
+    """(schema object, how it was conveyed, canonical text).
 
-    json_mode embeds it in the messages; other modes use response_format
-    or tools. Looking in only one place would report 'no schema sent' for
-    a mode that simply carries it elsewhere — a scope narrower than the
-    claim (R5)."""
+    PREFERS the structured `response_model` the record already carries.
+    Run 15 fell back to scraping the schema out of message prose, which
+    parses as text but not as JSON — so the requirements collapsed to
+    empty and every verdict went vacuous (D216). Prose is still recorded
+    as the CONVEYANCE, because for json_mode that is the truth; it is
+    just not the thing to validate against.
+    """
+    rm = call.get("response_model")
+    if isinstance(rm, dict) and rm:
+        conveyance = "message text (json_mode)"
+        if call.get("response_format"):
+            conveyance = "response_format"
+        elif call.get("tools"):
+            conveyance = "tools"
+        return rm, conveyance, canonical(rm)
     if call.get("response_format"):
-        return json.dumps(call["response_format"], sort_keys=True, default=str)
+        rf = call["response_format"]
+        return rf, "response_format", canonical(rf)
     if call.get("tools"):
-        return json.dumps(call["tools"], sort_keys=True, default=str)
+        return call["tools"], "tools", canonical(call["tools"])
     for msg in call.get("messages") or []:
         content = str(msg.get("content", ""))
         if '"properties"' in content or "'properties'" in content:
-            return content
-    return ""
+            # Conveyance is knowable; the schema OBJECT is not, and that
+            # must surface as unmeasured rather than as an empty contract.
+            return None, "message text (unparsed)", content
+    return None, "NOT LOCATED", ""
 
 
 def main() -> int:
@@ -80,27 +95,34 @@ def main() -> int:
     print()
 
     print("  Q1b/Q2/Q6. PER ATTEMPT")
-    print(f"    {'#':>2}  {'prompt':>10} {'schema':>10} {'response':>10}  "
-          f"{'classification':<24} {'elapsed':>8}")
+    print("    prompt/schema hashes are CANONICAL identity; the response")
+    print("    hash is BYTE identity of the returned content string (D209).")
+    print(f"    {'#':>2} {'layer':<19} {'conveyance':<26} {'prompt':>10} "
+          f"{'schema':>10} {'response':>10}  {'classification':<22} {'elapsed':>8}")
     seen_prompt, seen_schema, seen_resp = set(), set(), set()
     verdicts = []
     for call in calls:
-        prompt_text = json.dumps(call.get("messages"), sort_keys=True, default=str)
-        schema_text = _schema_text(call)
+        layer = call.get("layer")
+        prompt_text = canonical(call.get("messages"))
+        schema_obj, conveyance, schema_text = _schema_for(call)
         raw = call.get("raw_response")
-        fields = required_fields_of(schema_text) if schema_text else []
-        verdict, why = classify(raw, fields)
-        verdicts.append((call.get("attempt"), verdict, why, fields))
+        verdict, why = classify(raw, schema_obj)
+        verdicts.append((call.get("attempt"), layer, verdict, why, conveyance))
         ph, sh, rh = sha256(prompt_text), sha256(schema_text), sha256(raw)
         seen_prompt.add(ph); seen_schema.add(sh); seen_resp.add(rh)
-        print(f"    {call.get('attempt', '?'):>2}  {ph[:10]} {sh[:10]} "
-              f"{rh[:10]}  {verdict:<24} {call.get('elapsed_s', '?'):>8}")
+        print(f"    {call.get('attempt', '?'):>2} {str(layer):<19} "
+              f"{conveyance:<26} {ph[:10]} {sh[:10]} {rh[:10]}  "
+              f"{verdict:<22} {call.get('elapsed_s', '?'):>8}")
     print()
-    for attempt, verdict, why, fields in verdicts:
-        print(f"    attempt {attempt}: {verdict}")
+    for attempt, layer, verdict, why, conveyance in verdicts:
+        print(f"    attempt {attempt} [{layer}]: {verdict}")
         print(f"      {why}")
-        print(f"      required fields derived from the schema SENT: "
-              f"{fields or '(none found — schema not located in this call)'}")
+        print(f"      schema conveyance: {conveyance}")
+        if verdict in (VALID_INSTANCE, SCHEMA_ECHO) \
+                and not licenses_raw_response_claim(layer):
+            print(f"      LAYER LIMIT: {layer} does NOT license a claim about")
+            print(f"      the MODEL's reply — instructor retries, parses and")
+            print(f"      validates between there and RAW_MODEL_RESPONSE.")
     print()
 
     # ── Q6 ────────────────────────────────────────────────────────────
@@ -108,7 +130,7 @@ def main() -> int:
     print(f"      distinct prompts   : {len(seen_prompt)} across {len(calls)} call(s)")
     print(f"      distinct schemas   : {len(seen_schema)}")
     print(f"      distinct responses : {len(seen_resp)}")
-    kinds = sorted({v for _, v, _, _ in verdicts})
+    kinds = sorted({v for _, _, v, _, _ in verdicts})
     print(f"      classifications    : {', '.join(kinds)}")
     if len(seen_resp) == 1 and len(calls) > 1:
         print("      Every attempt returned a BYTE-IDENTICAL response.")
@@ -126,18 +148,33 @@ def main() -> int:
     print("     no mode change, no model swap, no timeout or retry change,")
     print("     no schema edit, no validator change.")
 
-    if any(v == SCHEMA_ECHO for _, v, _, _ in verdicts):
-        # A finding, not an instrument failure — exit non-zero so it is
-        # visible, and say which it is.
+    raw_layer = [v for _, layer, v, _, _ in verdicts
+                 if licenses_raw_response_claim(layer)]
+    if not raw_layer:
         print()
-        print("  MEASURED: at least one attempt returned the SCHEMA where an")
-        print("  INSTANCE was required. This is a measurement result, not an")
-        print("  instrument failure.")
+        print("  Q2 — UNMEASURED. No captured row came from")
+        print(f"  {RAW_MODEL_RESPONSE}, so nothing here describes what the")
+        print("  model actually returned per attempt. A validated object, an")
+        print("  instructor return value or a parsed result is NOT a")
+        print("  substitute (D215).")
         return 1
-    if all(v == VALID_INSTANCE for _, v, _, _ in verdicts):
+    if any(v == CLASSIFIER_UNMEASURED for v in raw_layer):
         print()
-        print("  MEASURED: every attempt returned a valid instance. The")
-        print("  mismatch is NOT at the model's response kind.")
+        print("  CLASSIFIER UNMEASURED on at least one attempt: the schema")
+        print("  requirements could not be established, so no verdict about")
+        print("  the response kind is possible. This is not a pass.")
+        return 1
+    if any(v == SCHEMA_ECHO for v in raw_layer):
+        print()
+        print("  MEASURED at RAW_MODEL_RESPONSE: at least one attempt returned")
+        print("  the SCHEMA where an INSTANCE was required. A measurement")
+        print("  result, not an instrument failure.")
+        return 1
+    if all(v == VALID_INSTANCE for v in raw_layer):
+        print()
+        print("  MEASURED at RAW_MODEL_RESPONSE: every raw attempt returned a")
+        print("  valid instance. The mismatch is NOT at the model's response")
+        print("  kind.")
         return 0
     return 1
 

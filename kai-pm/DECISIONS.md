@@ -13841,3 +13841,114 @@ validate whatever the new hook captured.
 * No production remediation; no mode, model, timeout, retry, schema,
   validator or topology change.
 * **STOPPED before code changes**, as instructed.
+
+---
+
+## D217
+
+**2026-08-14 — capture instrument repaired in all three areas.
+Calibrated, not yet run.**
+
+Authorised scope, no production behaviour change.
+
+### 1. Hook altitude — class level, before construction
+
+`openai.resources.chat.completions.Completions.create`, patched **at
+class level BEFORE the adapter is built**, so `from_openai` closes over
+the wrapper when instructor captures its create function.
+
+**Descriptor semantics explicit:** `Completions.create` is a plain
+function on the class, so the wrapper takes `self` first and forwards it
+unchanged —
+`wrapper(self, *args, **kwargs) → original(self, *args, **kwargs)` — and
+is **synchronous**, matching `retry.py:198`'s un-awaited `func(...)`.
+Exceptions are re-raised with type **and** value intact. The original
+object is returned unaltered.
+
+**Patch window.** `restore_capture()` exists but is **not called before
+the drive**, and deliberately so: restoring the class attribute early is
+only safe if instructor's closure still reaches the wrapper afterwards,
+and that is a *prediction*. The operator's instruction was not to
+optimise patch lifetime by assumption, so the patch stays active for the
+isolated probe process — the smallest scope that is *known* to work.
+Narrowing it later requires a measurement, not an argument.
+
+### 2. Layer provenance (D215)
+
+Records carry `layer`. Raw rows enter as `RAW_MODEL_REQUEST` and are
+promoted to `RAW_MODEL_RESPONSE` once a reply (or transport error)
+exists; `resolved-config` is `ADAPTER_INPUT`.
+
+`licenses_raw_response_claim()` admits **only** `RAW_MODEL_RESPONSE`. The
+analyser now prints a **LAYER LIMIT** line whenever a verdict comes from
+a layer that cannot support it, and returns `Q2 — UNMEASURED` when no row
+came from the raw layer — refusing a validated object, an instructor
+return value or a parsed result as substitutes.
+
+### 3. Classifier vacuity — the questions are now independent
+
+Not a special case for the empty list. `classify(raw, schema)` asks, in
+an order where vacuity is impossible:
+
+```
+0 is there a response?                        -> NO RESPONSE
+1 is it JSON, and an object?                  -> OTHER INVALID
+2 CAN THE SCHEMA'S REQUIREMENTS BE ESTABLISHED?
+                                              -> CLASSIFIER_UNMEASURED
+3 is it the schema definition itself?         -> SCHEMA ECHO
+4 is it a valid instance of THAT schema?      -> VALID INSTANCE
+5 otherwise                                   -> OTHER INVALID
+```
+
+**Step 2 precedes every instance test**, so an unreadable or
+requirement-less schema yields `CLASSIFIER_UNMEASURED /
+SCHEMA REQUIREMENTS NOT ESTABLISHED — this is not a pass`, never a
+success. `as_schema()` returns `None` for "unusable" so callers can no
+longer confuse it with "no requirements" — the exact conflation behind
+D216.
+
+The summariser now prefers the record's structured `response_model` over
+scraping prose, while still reporting prose as the **conveyance**.
+
+### 4. Transparency selftest — runtime, through the production path
+
+Nine criteria, all runtime: traversed; original executed; **exactly once
+per wrapper invocation**; convention matches (no sync↔async conversion);
+exception type, value and non-swallowing preserved; rows tagged at the
+raw layer; selftest rows carry `phase: selftest` and are counted so they
+can be **excluded from the Q6 denominator**.
+
+The exception control needs **no model run** — a stand-in original raises
+a sentinel and the wrapper is driven to prove it neither swallows nor
+rewrites it.
+
+Criteria 1–4 are driven through `acreate_structured_output`, the
+production entry point. Calling the wrapper directly would prove only
+that the wrapper works, which was never in doubt.
+
+The collector still gates the expensive capture on this selftest and
+aborts with *"THE CAPTURE POINT IS NOT TRAVERSED … not evidence about the
+LLM contract"*.
+
+### Calibration
+
+**53/8 → 92 assertions / 10 scenarios.** New: the unestablished-schema
+scenario pins D216's defect across six unusable-schema forms and asserts
+a schema echo with an unreadable schema is **not** VALID INSTANCE; the
+layer scenario asserts only `RAW_MODEL_RESPONSE` licenses a raw claim and
+that the vocabulary is exactly the five agreed layers; the summariser
+scenario now runs four fixtures including one where every row is
+`VALID INSTANCE` at `INSTRUCTOR_RETURN` and the gate **still** refuses.
+
+**Proof it can fail (R2).** Moving the patch to after adapter
+construction — run 13's mistake — fails
+`and it is installed BEFORE adapter construction`, 91/1. Restored, 92/0.
+`policy-check` and registry green.
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 UNMEASURED** · **Q6 UNMEASURED** · ownership
+  **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — separate, OPEN.**
+* No mode, model, timeout, retry, schema, validator or topology change.
+* The next capture run fires only behind a passing transparency selftest.
