@@ -31,7 +31,7 @@ import classify_llm_response as c  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 17
+EXPECTED_SCENARIOS = 19
 executed: list[str] = []
 
 
@@ -446,12 +446,64 @@ def test_the_summariser_reports_and_refuses() -> None:
     check("and explains the max_retries=2 arithmetic",
           "max_retries=2" in proc.stdout, "")
 
-    # (f) the only exit-0 path: real validation, at the raw layer
+    # (g) CORRELATED rows — the Q6a/Q6b path, which no earlier fixture
+    # reaches. One call retried twice, one call with a single attempt.
+    def crow(n, cid, idx, raw, system=INSTRUCTOR_SYSTEM):
+        r = row(n, c.RAW_MODEL_RESPONSE, raw, system)
+        r["logical_call_id"] = cid
+        r["attempt_index"] = idx
+        return r
+
+    proc = _run_summariser([
+        cfg,
+        crow(1, "call-A", 1, SCHEMA_ECHO_RAW),
+        crow(2, "call-A", 2, SCHEMA_ECHO_RAW,
+             INSTRUCTOR_SYSTEM),          # same contract on retry
+        crow(3, "call-B", 1, INSTANCE_RAW),
+    ])
+    out = proc.stdout
+    check("correlated rows enable per-logical-call reporting",
+          "Q6a. PER LOGICAL CALL" in out, out[-1200:])
+    check("both logical calls are listed",
+          "call-A" in out and "call-B" in out, "")
+    check("logical calls are counted, not inferred",
+          "logical calls      : 2 via 'logical_call_id'" in out, "")
+    check("retried calls are counted separately",
+          "calls that RETRIED : 1" in out, "")
+    check("within-call reproducibility is reported",
+          "Q6b. WITHIN-CALL REPRODUCIBILITY" in out, "")
+    check("the retried call reports contract stability",
+          "same contract on retry : True" in out, "")
+    check("and whether the failure class recurred",
+          "same failure class     : True" in out, "")
+    check("and whether the bytes were identical",
+          "byte-identical replies : True" in out, "")
+    check("Q6 is NOT promoted merely because ids exist",
+          "Q6 IS NOT ANSWERED BY THE EXISTENCE OF IDS" in out, "")
+    check("and a second independent correlated run is demanded",
+          "One correlated run is not two." in out, "")
+
+    # (h) correlated but NO call retried — must not read as retry evidence
+    proc = _run_summariser([cfg,
+                            crow(1, "call-C", 1, SCHEMA_ECHO_RAW),
+                            crow(2, "call-D", 1, SCHEMA_ECHO_RAW)])
+    check("no retried call is stated as no evidence, not as success",
+          "NO logical call retried" in proc.stdout, proc.stdout[-800:])
+    check("and says a single-attempt call gives no retry evidence",
+          "no retry was observed" in proc.stdout, "")
+
+    # (f) the only exit-0 path: real validation, at the raw layer.
+    # Runs its OWN fixture — it previously read whatever `proc` happened
+    # to hold, which silently became a later fixture's result when one
+    # was inserted above it.
     if REAL_VALIDATOR["available"]:
+        proc_ok = _run_summariser([cfg,
+                                   row(1, c.RAW_MODEL_RESPONSE, INSTANCE_RAW),
+                                   row(2, c.RAW_MODEL_RESPONSE, INSTANCE_RAW)])
         check("valid instances at the raw layer with a validator pass",
-              proc.returncode == 0, proc.stdout[-700:])
+              proc_ok.returncode == 0, proc_ok.stdout[-700:])
         check("and it says validation actually happened",
-              "validated against the contract" in proc.stdout, "")
+              "validated against the contract" in proc_ok.stdout, "")
 
 
 def test_the_collector_gates_on_the_selftest() -> None:
@@ -649,6 +701,216 @@ def test_the_shipped_wrapper_is_transparent_in_process() -> None:
         check(f"shipped: {name}", got.get(key) is True, f"{key}={got.get(key)}")
 
 
+CORRELATION_HARNESS = r'''
+import sys, types, importlib.util, json, asyncio
+
+# Stub only what install_capture/install_correlation need. instructor's
+# patch module is stubbed with a retry_sync/retry_async of the REAL
+# shape: called once per logical invocation, attempt loop inside.
+mod = types.ModuleType("openai.resources.chat.completions")
+class Completions:
+    def create(self, *a, **k):
+        return "REAL RESULT"
+mod.Completions = Completions
+pkg = types.ModuleType("openai"); pkg.__version__ = "stub"
+for name, m in (("openai", pkg),
+                ("openai.resources", types.ModuleType("openai.resources")),
+                ("openai.resources.chat", types.ModuleType("openai.resources.chat")),
+                ("openai.resources.chat.completions", mod)):
+    sys.modules[name] = m
+
+ipatch = types.ModuleType("instructor.core.patch")
+def retry_sync(func, response_model=None, args=(), kwargs=None, **_):
+    return func(*(args or ()), **(kwargs or {}))
+async def retry_async(func, response_model=None, args=(), kwargs=None, **_):
+    return func(*(args or ()), **(kwargs or {}))
+ipatch.retry_sync = retry_sync
+ipatch.retry_async = retry_async
+icore = types.ModuleType("instructor.core"); icore.patch = ipatch
+inst = types.ModuleType("instructor"); inst.core = icore
+for name, m in (("instructor", inst), ("instructor.core", icore),
+                ("instructor.core.patch", ipatch)):
+    sys.modules[name] = m
+
+spec = importlib.util.spec_from_file_location("probe", sys.argv[1])
+probe = importlib.util.module_from_spec(spec); spec.loader.exec_module(probe)
+probe.OUT = sys.argv[2]
+open(probe.OUT, "w").close()
+# install_capture patches Completions.create AND calls install_correlation,
+# then wants cognee — so the ModuleNotFoundError leaves both installed.
+# Calling install_correlation alone would leave the capture wrapper absent
+# and every row-level assertion below would fail for the wrong reason.
+try:
+    probe.install_capture()
+except ModuleNotFoundError:
+    pass
+
+out = {}
+seen = []
+def attempts(n):
+    def run(*a, **k):
+        for _ in range(n):
+            seen.append((probe.LOGICAL_CALL_ID.get(), probe.next_attempt_index()))
+        return "ok-%d" % n
+    return run
+
+r1 = ipatch.retry_sync(func=attempts(3))
+first = list(seen); seen.clear()
+r2 = ipatch.retry_sync(func=attempts(1))
+second = list(seen)
+
+ids1 = {i for i, _ in first}; ids2 = {i for i, _ in second}
+out["same_id_within_call"] = len(ids1) == 1 and None not in ids1
+out["different_id_across_calls"] = bool(ids1 and ids2 and ids1 != ids2)
+out["index_ordered"] = [n for _, n in first] == [1, 2, 3]
+out["index_restarts"] = [n for _, n in second] == [1]
+out["return_unchanged"] = (r1 == "ok-3" and r2 == "ok-1")
+out["cleared_after_success"] = (probe.LOGICAL_CALL_ID.get() is None
+                                and probe.LOGICAL_CALL_ATTEMPTS.get() is None)
+out["id_is_opaque_not_ordinal"] = all(
+    not str(i).isdigit() and len(str(i)) >= 12 for i in ids1 | ids2)
+
+sentinel = RuntimeError("corr sentinel")
+def raiser(*a, **k):
+    raise sentinel
+caught = None
+try:
+    ipatch.retry_sync(func=raiser)
+except Exception as exc:
+    caught = exc
+out["exception_object_unchanged"] = caught is sentinel
+out["cleared_after_exception"] = (probe.LOGICAL_CALL_ID.get() is None
+                                  and probe.LOGICAL_CALL_ATTEMPTS.get() is None)
+
+# no id may leak into the NEXT invocation
+seen.clear()
+ipatch.retry_sync(func=attempts(1))
+out["no_leak_into_next_call"] = (
+    bool(seen) and seen[0][0] not in ids1 and seen[0][0] not in ids2)
+
+# concurrency: interleaved Tasks must not read each other's id
+async def conc():
+    got = {}
+    async def one(tag):
+        def body(*a, **k):
+            got[tag] = probe.LOGICAL_CALL_ID.get()
+            return tag
+        await asyncio.sleep(0)          # force interleaving
+        return ipatch.retry_sync(func=body)
+    await asyncio.gather(*(one(t) for t in "abc"))
+    return got
+got = asyncio.run(conc())
+out["concurrent_ids_distinct"] = (len(got) == 3
+                                  and len(set(got.values())) == 3
+                                  and None not in got.values())
+
+# nesting must be LIFO-deterministic
+outer_seen = []
+def nester(*a, **k):
+    outer = probe.LOGICAL_CALL_ID.get()
+    ipatch.retry_sync(func=lambda *x, **y: outer_seen.append(
+        probe.LOGICAL_CALL_ID.get()))
+    outer_seen.append(("after-inner", probe.LOGICAL_CALL_ID.get() == outer))
+    return "nested"
+ipatch.retry_sync(func=nester)
+out["nested_inner_gets_own_id"] = outer_seen[0] not in (None,)
+out["nested_outer_restored"] = outer_seen[1] == ("after-inner", True)
+
+# the id must never reach model-facing kwargs
+probe.STATE["phase"] = "harness"
+wrapper = Completions.create
+def one_capture(*a, **k):
+    wrapper(object(), messages=[{"role": "user", "content": "x"}], model="m")
+ipatch.retry_sync(func=one_capture)
+rows = [json.loads(l) for l in open(probe.OUT) if '"llm-call"' in l]
+out["row_carries_id"] = bool(rows) and bool(rows[-1].get("logical_call_id"))
+out["row_carries_index"] = bool(rows) and rows[-1].get("attempt_index") == 1
+facing = json.dumps({k: rows[-1].get(k) for k in
+                     ("messages", "response_model", "response_format",
+                      "tools", "other_params")}) if rows else ""
+out["id_absent_from_model_facing"] = bool(rows) and (
+    rows[-1]["logical_call_id"] not in facing)
+print(json.dumps(out))
+'''
+
+
+def test_the_correlation_identifies_isolates_and_cleans_up() -> None:
+    """Q6's correlation, EXECUTED against the shipped probe.
+
+    Every substitute for an identity was refused (adjacency, timing,
+    prompt hash, schema hash, response similarity), so the id itself has
+    to be trustworthy. These are the operator's eleven criteria, driven
+    through instructor's real boundary shape — `retry_sync(func=...)`
+    called once per invocation with the attempt loop inside — using
+    stand-ins, so it costs no model time.
+    """
+    scenario("correlation identifies and isolates")
+    with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as fh:
+        fh.write(CORRELATION_HARNESS)
+        harness = fh.name
+    capture = tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False).name
+    proc = subprocess.run(
+        [sys.executable, harness,
+         str(REPO / "scripts" / "security" / "probe_llm_contract.py"), capture],
+        cwd=REPO, capture_output=True, text=True, timeout=60)
+    check("the correlation harness ran", proc.returncode == 0,
+          proc.stderr[-500:])
+    if proc.returncode != 0:
+        return
+    got = json.loads(proc.stdout.strip().splitlines()[-1])
+    expected = {
+        "same_id_within_call": "retries of one call share one id",
+        "different_id_across_calls": "a separate invocation gets a different id",
+        "index_ordered": "attempt indices run 1..N inside a call",
+        "index_restarts": "the next call restarts its index at 1",
+        "return_unchanged": "the return value is unchanged",
+        "cleared_after_success": "context is cleared after success",
+        "exception_object_unchanged": "the exception object is unchanged",
+        "cleared_after_exception": "context is cleared after an exception",
+        "no_leak_into_next_call": "no id leaks into the next invocation",
+        "concurrent_ids_distinct": "concurrent invocations cannot share an id",
+        "nested_inner_gets_own_id": "a nested invocation gets its own id",
+        "nested_outer_restored": "and the outer id is restored after it",
+        "row_carries_id": "the captured row carries the id",
+        "row_carries_index": "and its within-call attempt index",
+        "id_absent_from_model_facing": "the id NEVER reaches model-facing fields",
+        "id_is_opaque_not_ordinal": "the id is opaque, not an ordinal",
+    }
+    for key, name in expected.items():
+        check(f"correlation: {name}", got.get(key) is True,
+              f"{key}={got.get(key)}")
+
+
+def test_the_probe_never_shows_the_id_to_the_model() -> None:
+    """Read out of the shipped text: the id is diagnostic provenance only."""
+    scenario("correlation invisible to the subject")
+    probe = (REPO / "scripts" / "security" /
+             "probe_llm_contract.py").read_text()
+    check("the id is minted at instructor's retry boundary",
+          "instructor.core.patch" in probe, "")
+    check("and the boundary is justified from the installed source",
+          "patch.py:258" in probe and "retry.py:193" in probe, "")
+    check("the import-binding trap is recorded",
+          "binding the names into patch.py's OWN namespace" in probe, "")
+    check("contextvars are used, not a mutable global id",
+          "contextvars.ContextVar" in probe, "")
+    check("sync and async boundaries get separate wrappers",
+          "correlating_retry_sync" in probe
+          and "correlating_retry_async" in probe, "")
+    check("the async wrapper awaits; the sync one does not",
+          "return await orig(" in probe and "return orig(" in probe, "")
+    check("both restore context in finally",
+          probe.count("LOGICAL_CALL_ID.reset(token_id)") >= 2, "")
+    for forbidden in ('messages"] = ', "system_prompt", "reask"):
+        check(f"the id is not injected via {forbidden!r}",
+              f'{forbidden}' not in probe.split("install_correlation")[1]
+              .split("def restore_capture")[0], "")
+    check("the id is recorded on the row only",
+          '"logical_call_id": LOGICAL_CALL_ID.get()' in probe, "")
+    check("attempt_index comes from the shared helper, not a copy",
+          "attempt_index = next_attempt_index()" in probe, "")
+
+
 def run_all() -> None:
     test_contract_is_recovered_from_the_attempt()
     test_ambiguous_or_absent_contract_is_unmeasured()
@@ -667,6 +929,8 @@ def run_all() -> None:
     test_the_collector_gates_on_the_selftest()
     test_the_wrapper_preserves_the_callable_convention()
     test_the_shipped_wrapper_is_transparent_in_process()
+    test_the_correlation_identifies_isolates_and_cleans_up()
+    test_the_probe_never_shows_the_id_to_the_model()
 
     kinds = [c.VALID_INSTANCE, c.INSTANCE_INVALID, c.REQUIRED_FIELDS_PRESENT,
              c.REQUIRED_FIELDS_MISSING, c.SCHEMA_ECHO, c.NOT_JSON,

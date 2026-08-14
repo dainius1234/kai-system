@@ -40,11 +40,14 @@ two can be compared rather than assumed equal.
 """
 from __future__ import annotations
 
+import contextvars
 import json
 import os
 import sys
 import time
 import traceback
+import uuid
+from functools import wraps
 
 OUT = os.environ.get("LLM_CAPTURE_PATH", "/tmp/llm-contract-capture.jsonl")
 TEXT = ("Ada Lovelace wrote the first algorithm for the Analytical "
@@ -74,6 +77,139 @@ def _serialise(obj):
 # Module-level so the wrapper, its original and the phase label are
 # reachable from selftest(), the driver and the restore path.
 STATE: dict = {}
+
+# ── LOGICAL-CALL CORRELATION (Q6) ────────────────────────────────────
+#
+# Q6 asks whether a failure reproduces ACROSS RETRIES OF ONE logical
+# structured-output invocation. Runs 17 and 18 could not answer it: five
+# raw attempts existed with nothing to say which invocation each belonged
+# to, and every tempting substitute — adjacency, timing, prompt hash,
+# schema hash, response similarity — was refused, because none of them is
+# an identity. Four byte-identical responses in run 18 are exactly the
+# trap: `max_retries=2` bounds a logical call at two attempts, so four
+# identical rows CANNOT all be one call's retries.
+#
+# THE BOUNDARY, READ FROM THE INSTALLED SOURCE, NOT ASSUMED:
+#
+#   instructor/core/patch.py:258   response = retry_sync(...)
+#       -> entered exactly ONCE per logical invocation
+#   instructor/core/retry.py:193   for attempt in max_retries:
+#       -> the attempt loop lives INSIDE it
+#
+# So `retry_sync` / `retry_async` ARE the logical-call boundary. Wrapping
+# them mints one id per invocation regardless of which cognee method
+# called it — a denominator derived from the traversed path rather than a
+# hand-kept list of call sites (R5).
+#
+# PATCH TARGET. `core/patch.py:17` does `from .retry import retry_async,
+# retry_sync`, binding the names into patch.py's OWN namespace. Patching
+# `instructor.core.retry` would therefore change nothing at the call site
+# — the run-13 altitude defect exactly. The target is
+# `instructor.core.patch`, and because Python resolves module globals at
+# CALL time, patching it works even though `from_openai` has already run.
+#
+# MECHANISM. `contextvars`, chosen after reading the path rather than by
+# preference: from `retry_sync` down to `Completions.create` is a plain
+# synchronous call stack, so the value is visible without being passed;
+# asyncio gives every Task its own copy, so concurrent invocations cannot
+# read each other's id; and set/reset tokens restore LIFO, so nesting is
+# deterministic. A single mutable global would fail all three.
+#
+# INVISIBLE TO THE SUBJECT. The id is never placed in messages, system or
+# user content, the response model, `response_format`, any provider
+# kwarg, or reask text. It exists only in capture metadata.
+LOGICAL_CALL_ID: contextvars.ContextVar = contextvars.ContextVar(
+    "kai_gate_048c_logical_call_id", default=None)
+LOGICAL_CALL_ATTEMPTS: contextvars.ContextVar = contextvars.ContextVar(
+    "kai_gate_048c_logical_call_attempts", default=None)
+
+
+def _mint_logical_call_id() -> str:
+    """An opaque id. Not derived from time, order or any request content."""
+    return uuid.uuid4().hex[:16]
+
+
+def next_attempt_index():
+    """This attempt's 1-based position within its logical invocation.
+
+    Returns None outside any invocation context — "no logical call" is a
+    first-class answer, not index 1.
+
+    Shared by the capture wrapper and its calibration deliberately: a
+    calibration that re-implements the thing it calibrates tests its own
+    copy, and the two are then free to drift (R5/I-8).
+    """
+    counter = LOGICAL_CALL_ATTEMPTS.get()
+    if counter is None:
+        return None
+    counter["n"] += 1
+    return counter["n"]
+
+
+def install_correlation() -> dict:
+    """Wrap instructor's retry entry points so each invocation is identified.
+
+    OBSERVATION ONLY: mints an id, sets two context variables, calls the
+    original with the arguments it was given, returns what it returned,
+    and restores the context in `finally` so no id can survive into the
+    next invocation.
+
+    The sync and async entry points get SEPARATE wrappers. Collapsing
+    them was run 14's defect — a wrapper that changes the callable
+    convention is an actuator, not an observer.
+    """
+    import instructor.core.patch as ipatch
+
+    installed = {}
+    for name in ("retry_sync", "retry_async"):
+        original = getattr(ipatch, name, None)
+        if original is None:
+            continue
+        installed[name] = original
+
+        if name == "retry_async":
+            def make(orig):
+                @wraps(orig)
+                async def correlating_retry_async(*args, **kwargs):
+                    token_id = LOGICAL_CALL_ID.set(_mint_logical_call_id())
+                    token_ct = LOGICAL_CALL_ATTEMPTS.set({"n": 0})
+                    STATE["logical_calls"] = STATE.get("logical_calls", 0) + 1
+                    try:
+                        return await orig(*args, **kwargs)
+                    finally:
+                        LOGICAL_CALL_ID.reset(token_id)
+                        LOGICAL_CALL_ATTEMPTS.reset(token_ct)
+                return correlating_retry_async
+        else:
+            def make(orig):
+                @wraps(orig)
+                def correlating_retry_sync(*args, **kwargs):
+                    token_id = LOGICAL_CALL_ID.set(_mint_logical_call_id())
+                    token_ct = LOGICAL_CALL_ATTEMPTS.set({"n": 0})
+                    STATE["logical_calls"] = STATE.get("logical_calls", 0) + 1
+                    try:
+                        return orig(*args, **kwargs)
+                    finally:
+                        LOGICAL_CALL_ID.reset(token_id)
+                        LOGICAL_CALL_ATTEMPTS.reset(token_ct)
+                return correlating_retry_sync
+
+        setattr(ipatch, name, make(original))
+
+    STATE["correlation_originals"] = installed
+    return {
+        "correlation": "INSTALLED at instructor.core.patch."
+                       + "/".join(sorted(installed)),
+        "correlation_boundary": "retry_sync/retry_async — entered once per "
+                                "logical invocation (patch.py:258), attempt "
+                                "loop inside (retry.py:193)",
+        "correlation_mechanism": "contextvars — per-Task isolation, LIFO "
+                                 "reset tokens, no global mutable id",
+        "correlation_visibility": "capture metadata ONLY — never in "
+                                  "messages, schema, response_format or any "
+                                  "provider kwarg",
+        "correlation_points": sorted(installed),
+    }
 
 
 def install_capture() -> dict:
@@ -142,10 +278,16 @@ def install_capture() -> dict:
         state["attempt"] += 1
         attempt = state["attempt"]
         started = time.monotonic()
+        # Q6 correlation, read out of band. `attempt` remains the global
+        # capture counter; `attempt_index` is the position WITHIN this
+        # logical invocation, which is the only one Q6 can use.
+        attempt_index = next_attempt_index()
         request = {
             "event": "llm-call",
             "layer": "RAW_MODEL_REQUEST",
             "attempt": attempt,
+            "logical_call_id": LOGICAL_CALL_ID.get(),
+            "attempt_index": attempt_index,
             "phase": STATE.get("phase", "unknown"),
             "messages": kwargs.get("messages"),
             "model": kwargs.get("model"),
@@ -186,6 +328,12 @@ def install_capture() -> dict:
     Completions.create = capturing_create
     STATE["wrapper"] = capturing_create
 
+    # The logical-call boundary, patched before anything is driven. Safe
+    # in either order relative to `from_openai`, because patch.py looks
+    # `retry_sync` up as a module global at CALL time — but installed
+    # here so there is one place that says what was patched.
+    correlation = install_correlation()
+
     # NOW build the adapter, so `from_openai` closes over the wrapper.
     import cognee  # noqa: F401
     from cognee.infrastructure.llm.config import get_llm_config
@@ -218,6 +366,7 @@ def install_capture() -> dict:
         "hook_convention": "sync, descriptor-correct (self, *args, **kwargs) "
                            "— matches retry.py:198 `func(*args, **kwargs)`",
     }
+    resolved.update(correlation)
     emit(resolved)
     return resolved
 
@@ -275,6 +424,108 @@ def restore_capture() -> bool:
     Completions.create = original
     STATE["restored"] = True
     return True
+
+
+def _selftest_correlation() -> dict:
+    """PROVE THE CORRELATION IDENTIFIES, ISOLATES AND CLEANS UP.
+
+    No model run: instructor's patched `retry_sync` is driven with a
+    stand-in `func` that invokes the capture wrapper N times, which is
+    exactly the shape of a real retry sequence. Q6's whole value depends
+    on these ids being trustworthy, so they are measured rather than
+    assumed to work because the code looks right.
+    """
+    import asyncio
+    import instructor.core.patch as ipatch
+
+    out: dict = {}
+    seen: list = []
+
+    def fake_attempts(n):
+        """Stand in for instructor's `func`, N attempts deep.
+
+        Reads the correlation exactly as the capture wrapper does — via
+        `next_attempt_index()`, the SAME function — so this cannot pass
+        against a copy the wrapper no longer uses.
+        """
+        def run(*_a, **_k):
+            for _ in range(n):
+                seen.append((LOGICAL_CALL_ID.get(), next_attempt_index()))
+            return f"returned-{n}"
+        return run
+
+    # 1-4 — two logical calls, the first with three attempts.
+    seen.clear()
+    r1 = ipatch.retry_sync(func=fake_attempts(3), response_model=None,
+                           args=(), kwargs={})
+    first = list(seen)
+    seen.clear()
+    r2 = ipatch.retry_sync(func=fake_attempts(1), response_model=None,
+                           args=(), kwargs={})
+    second = list(seen)
+
+    ids1 = {i for i, _ in first}
+    ids2 = {i for i, _ in second}
+    out["corr_same_id_within_one_call"] = len(ids1) == 1 and None not in ids1
+    out["corr_different_id_across_calls"] = bool(ids1 and ids2 and ids1 != ids2)
+    out["corr_attempt_index_ordered"] = [n for _, n in first] == [1, 2, 3]
+    out["corr_index_restarts_next_call"] = [n for _, n in second] == [1]
+    out["corr_return_value_unchanged"] = (r1 == "returned-3"
+                                          and r2 == "returned-1")
+
+    # 9 — context cleared after success
+    out["corr_context_cleared_after_success"] = (
+        LOGICAL_CALL_ID.get() is None and LOGICAL_CALL_ATTEMPTS.get() is None)
+
+    # 8, 10 — exception propagates unchanged AND the context is restored
+    sentinel = RuntimeError("kai-gate-048c correlation sentinel")
+
+    def raiser(*_a, **_k):
+        raise sentinel
+
+    caught = None
+    try:
+        ipatch.retry_sync(func=raiser, response_model=None, args=(), kwargs={})
+    except Exception as exc:  # noqa: BLE001
+        caught = exc
+    out["corr_exception_object_unchanged"] = caught is sentinel
+    out["corr_context_cleared_after_exception"] = (
+        LOGICAL_CALL_ID.get() is None and LOGICAL_CALL_ATTEMPTS.get() is None)
+
+    # 11 — concurrency: interleaved tasks must not read each other's id.
+    async def _concurrent():
+        results = {}
+
+        async def one(tag):
+            def body(*_a, **_k):
+                results[tag] = LOGICAL_CALL_ID.get()
+                return tag
+            # each Task gets its own context copy
+            return ipatch.retry_sync(func=body, response_model=None,
+                                     args=(), kwargs={})
+
+        await asyncio.gather(*(one(t) for t in ("a", "b", "c")))
+        return results
+
+    conc = asyncio.run(_concurrent())
+    out["corr_concurrent_ids_distinct"] = (
+        len(conc) == 3 and len(set(conc.values())) == 3
+        and None not in conc.values())
+
+    # 6 — the id must never be visible to the model. Checked against the
+    # REAL captured rows, not against the wrapper's intentions.
+    rows = [json.loads(l) for l in open(OUT, encoding="utf-8")
+            if '"event": "llm-call"' in l]
+    model_facing = json.dumps([{k: v for k, v in r.items()
+                                if k in ("messages", "response_model",
+                                         "response_format", "tools",
+                                         "other_params")} for r in rows])
+    ids_minted = {i for i, _ in first} | {i for i, _ in second}
+    out["corr_id_absent_from_model_facing_fields"] = not any(
+        i and i in model_facing for i in ids_minted)
+    out["corr_id_present_on_captured_rows"] = bool(rows) and all(
+        r.get("logical_call_id") for r in rows)
+    return out
 
 
 def selftest() -> int:
@@ -443,6 +694,8 @@ def selftest() -> int:
     # KNOWN-POSITIVE. Nothing expensive may run until the forward target
     # is the production callable again.
     checks["original_restored_to_real"] = forwards_to_the_real_original()
+
+    checks.update(_selftest_correlation())
 
     emit({"event": "selftest-result", "layer": "ADAPTER_INPUT",
           "calls_observed": observed, "originals_called": originals,

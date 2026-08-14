@@ -15177,3 +15177,126 @@ trend is claimed.
   18** · **cross-run recurrence MEASURED — same class, 2/2 captures** ·
   **Q6 UNMEASURED** · ownership **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+
+---
+
+## D229 — logical-call correlation, so Q6 can be asked (authorised)
+
+Instrumentation only. **No mode, model, timeout, retry count, schema,
+cognee validator or topology change.** Nothing here reopens Q2, cross-run
+recurrence, ownership, or any gate's state.
+
+### 1. The boundary was READ, not assumed
+
+Two facts out of the installed `instructor==1.15.1`:
+
+```
+core/patch.py:258   response = retry_sync(...)   <- entered ONCE per
+                                                   logical invocation
+core/retry.py:193   for attempt in max_retries:  <- the attempt loop is
+                                                   INSIDE it
+```
+
+So `retry_sync` / `retry_async` **are** the logical-call boundary. Minting
+there identifies every invocation regardless of which cognee method
+called it — a denominator derived from the traversed path rather than a
+hand-kept list of call sites (R5). Wrapping cognee's
+`acreate_structured_output` instead would have missed any other caller.
+
+**The patch target is `instructor.core.patch`, not `instructor.core.retry`.**
+`core/patch.py:17` does `from .retry import retry_async, retry_sync`,
+binding the names into **patch.py's own namespace** — patching the retry
+module would have changed nothing at the call site. That is precisely the
+run-13 altitude defect, and reading found it before a run paid for it.
+Python resolves module globals at CALL time, so patching works even though
+`from_openai` already ran.
+
+### 2. Mechanism — contextvars, chosen after reading the path
+
+* `retry_sync` → `Completions.create` is a plain **synchronous** call
+  stack, so the value is visible without being threaded through anything;
+* asyncio gives every **Task its own context copy**, so concurrent
+  invocations cannot read each other's id;
+* set/reset **tokens restore LIFO**, so nesting is deterministic.
+
+A single mutable global would fail all three, which is why it was
+rejected rather than merely disliked.
+
+**Sync and async get SEPARATE wrappers.** Collapsing them was run 14's
+defect: a wrapper that changes the callable convention is an actuator.
+
+### 3. Invisible to the subject
+
+The id is never placed in messages, system/user content, the response
+model, `response_format`, any provider kwarg, or reask text. It is
+written **only** into the capture record:
+
+```
+logical_call_id | attempt_index | phase | RAW_MODEL_REQUEST/RESPONSE | …
+```
+
+`attempt_index` is 1-based **within its logical call**, and comes from
+`next_attempt_index()` — the **same function** the calibration uses, so a
+calibration cannot pass against a copy the wrapper no longer uses. Outside
+any invocation it returns **None**, not 1: "no logical call" is an answer,
+not a default.
+
+### 4. Calibration — 181 → 222 assertions, 17 → 19 scenarios
+
+Sixteen correlation criteria, executed against the **shipped** probe with
+instructor's real boundary shape stubbed (`retry_sync(func=…)` called once
+per invocation, attempts inside), so it costs **no model time**: same id
+within a call · different id across calls · indices 1..N · index restarts ·
+return value unchanged · exception object unchanged · context cleared after
+success · after exception · no leak into the next call · concurrent ids
+distinct · nested inner gets its own id · outer restored after it · row
+carries id · row carries index · **id absent from every model-facing
+field** · id opaque, not an ordinal.
+
+**Proof it can fail (R2)** — the three modes named in the authorisation:
+
+| mutation | result |
+|---|---|
+| one global id for every invocation | 3 failures |
+| retry re-mints instead of inheriting | 1 failure |
+| no reset — id leaks into the next call | 4 failures |
+
+Restored: **222 / 0**. `policy-check` green, registry gate green.
+
+### 5. Two defects the calibration caught in this change
+
+* **The harness installed only the correlation, not the capture wrapper**,
+  so `Completions.create` was still the stub and every row-level assertion
+  failed for a reason unrelated to correlation.
+* **A fixture read a stale `proc`.** Inserting new fixtures above it
+  silently repointed an exit-0 assertion at a different fixture's result.
+  It now runs its own. A test that depends on a previous fixture's
+  leftover variable is measuring whatever ran last.
+
+### 6. Q6 is NOT promoted by the existence of ids
+
+The summariser now prints per logical call — id, contract hash, attempt
+count, classifications, prompt hashes, raw-response hashes — and a
+**within-call reproducibility** block answering, for each call with more
+than one attempt: same contract on retry? what changed in repair context
+(± bytes of messages)? same failure class? byte-identical replies?
+
+And it refuses the two easy over-readings:
+
+* a call with **one** attempt prints *"no retry was observed"* — not
+  "the retry behaved";
+* the Q6 block prints **"Q6 IS NOT ANSWERED BY THE EXISTENCE OF IDS"** and
+  **"One correlated run is not two"**, because if Q6's definition requires
+  retry-level behaviour to recur **across** runs, one correlated capture
+  cannot close it.
+
+**Q6's precommitted definition is not weakened because the first
+correlated run may look persuasive.**
+
+### Status — nothing moves
+
+* **Q1** partial · **Q2 MEASURED** (5/5 run 17, 5/5 run 18) · **cross-run
+  recurrence MEASURED** · **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* The next capture runs only behind a passing transparency selftest, which
+  now includes the correlation criteria.

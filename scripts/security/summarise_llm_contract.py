@@ -158,6 +158,13 @@ def main() -> int:
     if grouping["available"]:
         print(f"      logical calls      : {len(grouping['groups'])} "
               f"via '{grouping['key']}' -> {grouping['groups']}")
+        retried = [c for c, n in grouping["groups"].items() if n > 1]
+        print(f"      calls that RETRIED : {len(retried)}")
+        print("      Q6 IS NOT ANSWERED BY THE EXISTENCE OF IDS. It needs")
+        print("      logical calls that actually retried, and — if Q6's")
+        print("      definition requires retry-level behaviour to recur")
+        print("      ACROSS runs — a SECOND independent correlated capture.")
+        print("      One correlated run is not two.")
     else:
         print("      logical calls      : UNAVAILABLE — "
               f"{grouping['why']}")
@@ -171,6 +178,65 @@ def main() -> int:
         print(f"      NEXT MEASUREMENT REQUIREMENT: "
               f"{grouping['next_measurement_requirement']}")
     print()
+
+    # ── Q6: per logical call, only when correlation exists ───────────
+    if grouping["available"]:
+        key = grouping["key"]
+        order = []
+        by_call: Dict[str, List[dict]] = {}
+        for call, v in zip(calls, verdicts):
+            cid = str(call.get(key))
+            if cid not in by_call:
+                by_call[cid] = []
+                order.append(cid)
+            by_call[cid].append({
+                "attempt_index": call.get("attempt_index"),
+                "verdict": v["verdict"],
+                "schema": v["schema"],
+                "prompt": sha256_canonical(call.get("messages")),
+                "response": sha256_bytes(call.get("raw_response")),
+                "messages": call.get("messages"),
+            })
+        print("  Q6a. PER LOGICAL CALL")
+        print(f"    {'logical_call_id':<18} {'contract~c':>10} {'n':>2} "
+              f"{'classifications':<26} {'prompt~c':<12} {'resp~b'}")
+        for cid in order:
+            rows_ = sorted(by_call[cid],
+                           key=lambda r: (r["attempt_index"] or 0))
+            kinds = ",".join(sorted({r["verdict"] for r in rows_}))
+            print(f"    {cid:<18} "
+                  f"{(sha256_canonical(rows_[0]['schema'])[:10] if rows_[0]['schema'] else '—'):>10} "
+                  f"{len(rows_):>2} {kinds:<26} "
+                  f"{','.join(r['prompt'][:8] for r in rows_):<12} "
+                  f"{','.join(r['response'][:8] for r in rows_)}")
+        print()
+
+        print("  Q6b. WITHIN-CALL REPRODUCIBILITY")
+        multi = [cid for cid in order if len(by_call[cid]) > 1]
+        print(f"      logical calls           : {len(order)}")
+        print(f"      with more than 1 attempt: {len(multi)}")
+        if not multi:
+            print("      NO logical call retried. A single-attempt call gives")
+            print("      NO retry-reproducibility evidence — this is not")
+            print("      'the retry behaved', it is 'no retry was observed'.")
+        for cid in multi:
+            rows_ = sorted(by_call[cid],
+                           key=lambda r: (r["attempt_index"] or 0))
+            same_contract = len({sha256_canonical(r["schema"]) for r in rows_}) == 1
+            same_kind = len({r["verdict"] for r in rows_}) == 1
+            same_bytes = len({r["response"] for r in rows_}) == 1
+            first, last = rows_[0], rows_[-1]
+            grew = (len(json.dumps(last["messages"] or []))
+                    - len(json.dumps(first["messages"] or [])))
+            print(f"      {cid}: {len(rows_)} attempt(s)")
+            print(f"        same contract on retry : {same_contract}")
+            print(f"        repair context changed : "
+                  f"{'yes' if first['prompt'] != last['prompt'] else 'no'}"
+                  f" ({grew:+d} bytes of messages)")
+            print(f"        same failure class     : {same_kind} "
+                  f"({', '.join(r['verdict'] for r in rows_)})")
+            print(f"        byte-identical replies : {same_bytes}")
+        print()
 
     # ── what this refuses to conclude ────────────────────────────────
     print("  OWNERSHIP — NOT CONCLUDED HERE")
