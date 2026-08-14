@@ -14671,3 +14671,114 @@ Restored: **181 / 0**. `policy-check` green, registry gate green
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * A repaired instrument is not evidence. Only re-analysis of run 17's
   bytes, or a new valid run, can move Q2.
+
+---
+
+## D224 — three constraints frozen BEFORE run 18 reports
+
+Written before the result, so none can be chosen after seeing it. Two of
+these are limits in code I have already pushed, found by checking rather
+than by being told.
+
+### 1. The validator DIALECT is a silent choice — measured, and it is mine
+
+`classify_llm_response.py:354` hard-codes:
+
+```python
+validator = jsonschema.Draft202012Validator
+```
+
+and `grep -n dialect` across the analyser and summariser returns
+**nothing**. The dialect is neither derived nor recorded.
+
+It is also not derivable from the contract: pydantic's
+`model_json_schema()` emits no `$schema` key, confirmed against the real
+`SummarizedContent` schema. So **no dialect is declared anywhere**, and
+mine is the operative one by default.
+
+**Therefore, frozen now:** if run 18 reports `VALID INSTANCE`, that means
+
+> *validates under Draft 2020-12 — a dialect the analyser chose, did not
+> derive from the schema, and did not record.*
+
+That is weaker than `VALID INSTANCE` reads. The operator's point stands:
+a validator that silently picks a draft which happens to accept the
+document makes the verdict stronger than the evidence.
+
+**Not repaired now** (no changes while the run is in flight). The repair
+is: derive the dialect from `$schema` when present, otherwise record the
+chosen default explicitly in the output and calibrate against a case where
+the dialect changes the answer.
+
+### 2. The structural extraction rule is scoped to THIS path and version
+
+"A unique schema-shaped JSON object was found in the system message" is
+**not** universal proof that a framework puts its contract there. It is
+acceptable for this re-analysis only because independent source evidence
+(D222 §2, read from the pinned `instructor==1.15.1` wheel) shows that
+**this installed `Mode.JSON` path** embeds `model_json_schema()` in the
+first system message.
+
+The claim is therefore bounded to: **instructor 1.15.1, `Mode.JSON`,
+OpenAI provider, the rows captured by run 31821368040.** Any other
+framework, mode, provider or version is **out of scope and unproven**.
+
+The analyser cannot import instructor on the runner, so it cannot
+re-derive this per run — which is exactly why the bound is written down
+rather than assumed. The proper strengthening is capture-side provenance
+recorded from inside the image, where instructor is installed. Not
+authorised here.
+
+### 3. A green workflow must not be read as "Q2 measured"
+
+**Verified:** the re-analysis step carries no `continue-on-error` and no
+`if:` condition, and the summariser is the last command in its block — so
+its exit code IS the step's, and the tolerated download failure cannot
+produce a green measurement. Missing artifact exits **2** before the
+analyser runs.
+
+**But the exit code conflates two states**, and this is the same defect
+D218 named one layer up — one code covering more than one state:
+
+| exit | means |
+|---|---|
+| 0 | measured, every raw attempt validated |
+| 1 | **either** the analyser refused (contract unmeasured, wrong layer, no validator) **or** it measured and found something adverse |
+| 2 | no subject — artifact unavailable |
+
+So **red is ambiguous**: "we could not measure" and "we measured, and the
+answer is bad" are different findings with different owners, and they
+currently share an exit code. The summariser's *text* distinguishes them;
+its *status* does not.
+
+**Reading rule, frozen:** the authoritative statement is the analyser's
+printed verdict block, not the job colour. On a red job the first question
+is always *which of the three states*, read from the text.
+
+**Not repaired now.** The repair mirrors the selftest classes: distinct
+codes for NOT MEASURED / MEASURED-ADVERSE / MEASURED-CLEAN, with the class
+printed by the analyser and read back rather than inferred.
+
+### The sequence, fixed before the result
+
+```
+artifact availability -> contract recovery -> validator/schema validity
+   -> per-attempt raw classification -> Q2 verdict
+```
+
+Ownership is discussed only after that, and not before.
+
+### Q6 stays separate whatever run 18 says
+
+Even if all five responses classify cleanly, without a trustworthy
+logical-call correlation id we cannot say which failures reproduced across
+retries **within** a structured-output invocation. The cross-run component
+is untouched. **Q6 remains UNMEASURED.**
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 UNMEASURED** · **Q6 UNMEASURED** · ownership
+  **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* Evidence under re-analysis belongs to run **31821368040** (`f1fdf92`).
+  The ANALYSER is `397da5a`. Neither inherits the other's proof.
