@@ -15386,3 +15386,60 @@ Restored: **249 / 0**. `policy-check` green, registry gate green.
 * Q6 still needs: logical calls that actually **retried**, a **valid**
   lifecycle, and — for the cross-run component — a **second** independent
   correlated capture. One correlated run is not two.
+
+---
+
+## D231 — run 20's decision tree, frozen before the result
+
+Tree held at `6136e97`. No further correlation-instrument changes.
+
+### Run 19 — how it is to be read
+
+Run 19 (`7638ec2`) carries the correlation ids but **predates the
+lifecycle events** that prove them. The new analyser will **refuse to
+group** its rows. That refusal is **correct, not a regression**: run 19
+simply predates the evidence needed to show its ids are trustworthy.
+
+It can still contribute ordinary **raw-response / Q2** evidence. It
+cannot contribute **Q6 grouping** evidence.
+
+### Run 20 — the four outcomes, and what each licenses
+
+| lifecycle | retry population | verdict |
+|---|---|---|
+| INCOMPLETE / CONTRADICTORY / UNMEASURED | — | **Q6 UNMEASURED** — grouping is not trustworthy |
+| VALID | every logical call has ONE attempt | **Q6 UNMEASURED** — no retry population occurred |
+| VALID | ≥1 logical call actually retried | **within-call retry behaviour measurable for this run** |
+| VALID + retries, in a **second independent** correlated run showing the same retry-level behaviour | | the **cross-run** part of Q6 may then be considered against its precommitted definition |
+
+The second row is the one most likely to be misreported: a valid
+correlation with no retries is **not** a clean result and **not** a
+failure. It means the population Q6 needs did not occur in that sample.
+
+### Ownership stays unassigned even if Q6 closes
+
+Q6 would tell us whether instructor retries the **same logical request**
+and the **same failure repeats**. That materially narrows the cause. It
+does **not** separate the transformed prompt/mode from the model's
+compliance — both remain consistent with a repeated schema echo unless
+evidence distinguishes them.
+
+### Deferred to the documentation milestone
+
+Queued beside the observer-liveness rule and the workflow-trigger finding
+(task #59's family), earned by the `KeyError` in D230 §3:
+
+> **A refusal path must itself be tested to return a verdict. Crashing
+> while trying to refuse is not fail-closed measurement; it is loss of
+> measurement state.**
+
+The guard was written to refuse, and refusing was exactly what it could
+not do — it raised on a key it needed to print, producing a red job with
+no verdict at all. "Fails closed" describes the *intent*; only a test of
+the refusal path establishes the *behaviour*.
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 MEASURED** · **cross-run recurrence MEASURED** ·
+  **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
