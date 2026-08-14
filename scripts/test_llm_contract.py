@@ -820,7 +820,16 @@ async def retry_async(func, response_model=None, args=(), kwargs=None, **_):
     return func(*(args or ()), **(kwargs or {}))
 ipatch.retry_sync = retry_sync
 ipatch.retry_async = retry_async
-icore = types.ModuleType("instructor.core"); icore.patch = ipatch
+icore = types.ModuleType("instructor.core")
+# REPRODUCE THE HOSTILE PROPERTY. The real instructor/core/__init__.py:19
+# does `from .patch import patch, apatch`, which REBINDS the attribute
+# `instructor.core.patch` from the module to the FUNCTION. A stub that
+# leaves the attribute pointing at the module is kinder than reality, and
+# a kinder stub cannot catch the defect that reality causes: run 20 died
+# on exactly this and the calibration had passed.
+def patch(*a, **k):
+    raise AssertionError("this is the shadowing FUNCTION, not the module")
+icore.patch = patch                     # <- the shadow, as in the real package
 inst = types.ModuleType("instructor"); inst.core = icore
 for name, m in (("instructor", inst), ("instructor.core", icore),
                 ("instructor.core.patch", ipatch)):
@@ -848,6 +857,13 @@ def attempts(n):
         return "ok-%d" % n
     return run
 
+import importlib
+resolved = importlib.import_module("instructor.core.patch")
+out["stub_reproduces_shadowing"] = (
+    getattr(icore, "patch") is not resolved
+    and not hasattr(getattr(icore, "patch"), "retry_sync"))
+out["probe_resolved_the_module"] = hasattr(resolved, "retry_sync")
+ipatch = resolved
 r1 = ipatch.retry_sync(func=attempts(3))
 first = list(seen); seen.clear()
 r2 = ipatch.retry_sync(func=attempts(1))
@@ -922,8 +938,11 @@ out["row_carries_index"] = bool(rows) and rows[-1].get("attempt_index") == 1
 facing = json.dumps({k: rows[-1].get(k) for k in
                      ("messages", "response_model", "response_format",
                       "tools", "other_params")}) if rows else ""
-out["id_absent_from_model_facing"] = bool(rows) and (
-    rows[-1]["logical_call_id"] not in facing)
+# A criterion must yield a verdict, not raise. When nothing was patched
+# the id is None, and `None in str` is a TypeError — the harness would
+# crash instead of reporting which criterion failed (task #60).
+_id = rows[-1].get("logical_call_id") if rows else None
+out["id_absent_from_model_facing"] = bool(_id) and (_id not in facing)
 print(json.dumps(out))
 '''
 
@@ -969,6 +988,8 @@ def test_the_correlation_identifies_isolates_and_cleans_up() -> None:
         "row_carries_index": "and its within-call attempt index",
         "id_absent_from_model_facing": "the id NEVER reaches model-facing fields",
         "id_is_opaque_not_ordinal": "the id is opaque, not an ordinal",
+        "stub_reproduces_shadowing": "the stub reproduces the real package shadowing",
+        "probe_resolved_the_module": "and the probe still resolves the real module",
     }
     for key, name in expected.items():
         check(f"correlation: {name}", got.get(key) is True,

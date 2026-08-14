@@ -15443,3 +15443,96 @@ the refusal path establishes the *behaviour*.
 * **Q1** partial · **Q2 MEASURED** · **cross-run recurrence MEASURED** ·
   **Q6 UNMEASURED** · ownership **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+
+---
+
+## D232 — run 20 refused; the import bound a function, not the module
+
+### Run 20 = 31828878232, commit `6136e97` — INSTRUMENT FAILURE
+
+```
+selftest exit: 1
+AttributeError: 'function' object has no attribute 'retry_sync'
+  in _selftest_correlation:524
+selftest class: UNREPORTED — the selftest printed no class (exit 1)
+MEASUREMENT ABORTED: CAPTURE TRANSPARENCY NOT PROVEN.
+inspected: 0 production model call(s)
+```
+
+D231's gate 1 was not passed, so gates 2 and 3 were not evaluated and **no
+table was produced.** Q6 remains UNMEASURED.
+
+### The cause — the third instance of one class
+
+`instructor/core/__init__.py:19` does `from .patch import patch, apatch`,
+**rebinding the attribute `instructor.core.patch` from the MODULE to the
+FUNCTION**. `import instructor.core.patch as X` is an import followed by
+an attribute lookup, so it bound the function. `getattr(ipatch,
+"retry_sync", None)` returned `None` for both names, `installed` was
+empty, and **the correlation was never installed**.
+
+Reproduced directly: `import_module` returns the module and has
+`retry_sync`; the `as` form returns the function and does not.
+
+Same class as run 13 (patched the object I could see, not the callable the
+path uses) and as the `patch.py`-vs-`retry.py` binding trap. The comment
+warning about the binding trap sits three lines from the defect.
+
+### Run 19 = 31827807793 — ALSO an instrument failure
+
+Capture step failed in **1m44s** (run 20: 1m42s); artifact **8767 bytes**
+against run 17's real capture of **310238**; and `git show
+7638ec2:…probe_llm_contract.py` carries the same broken import at lines
+161 and 439.
+
+**Run 19 is therefore NOT a third Q2 sample.** Q2 rests on runs 17 and 18
+— two samples. My earlier statement that run 19 "can contribute Q2
+evidence" was right as a rule and wrong about this run, which had already
+failed at the same gate.
+
+### The repair (authorised scope only)
+
+1. `ipatch = importlib.import_module("instructor.core.patch")` in both
+   sites, with the shadowing recorded in a comment.
+2. **The calibration stub now reproduces the shadowing**: `icore.patch` is
+   set to a FUNCTION, as the real package does, instead of the module.
+3. A criterion that raised instead of reporting was repaired —
+   `None in str` is a `TypeError`, so the harness crashed rather than
+   naming the failed criterion (task #60's lesson, found again here).
+
+### The lesson, preserved
+
+> **A calibration fixture that removes the hostile production property
+> cannot prove the instrument handles that property.** The stub must
+> reproduce the relevant real-package behaviour strongly enough that the
+> defect can fail locally.
+
+The old stub set `icore.patch = ipatch` — the module — which is *kinder
+than reality*. The calibration passed 249/0 while the instrument could not
+install at all.
+
+### Calibration — 249 → 251 assertions, 19 scenarios
+
+Two new criteria: `stub_reproduces_shadowing` (the stub's
+`instructor.core.patch` attribute is NOT the module and has no
+`retry_sync`) and `probe_resolved_the_module` (the probe still resolves
+the real module through it).
+
+**Proof it can fail (R2):** restoring run 20's `import … as` form now
+fails **10 correlation criteria** by name — `same_id_within_call`,
+`different_id_across_calls`, `index_ordered`, `index_restarts`,
+`no_leak_into_next_call`, `concurrent_ids_distinct`,
+`nested_inner_gets_own_id`, `row_carries_id`, `row_carries_index`,
+`id_absent_from_model_facing`. Before the criterion repair it failed as a
+crash; it now fails as verdicts.
+
+Restored: **251 / 0**. `policy-check` green, registry gate green.
+
+### Status — nothing moved
+
+* **Q1** partial · **Q2 MEASURED — runs 17 and 18 only, two samples** ·
+  **cross-run recurrence MEASURED** · **Q6 UNMEASURED** · ownership
+  **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* No model, timeout, production-semantics, ownership, Q6-definition or
+  architecture change.

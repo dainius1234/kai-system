@@ -41,6 +41,7 @@ two can be compared rather than assumed equal.
 from __future__ import annotations
 
 import contextvars
+import importlib
 import itertools
 import json
 import os
@@ -202,7 +203,15 @@ def install_correlation() -> dict:
     them was run 14's defect — a wrapper that changes the callable
     convention is an actuator, not an observer.
     """
-    import instructor.core.patch as ipatch
+    # `import instructor.core.patch as X` binds an ATTRIBUTE lookup,
+    # and `instructor/core/__init__.py:19` does
+    # `from .patch import patch, apatch` — which rebinds that
+    # attribute from the MODULE to the FUNCTION. The `as` form
+    # therefore yields a function with no `retry_sync`, `installed`
+    # comes back empty, and NOTHING is patched (run 20).
+    # `import_module` resolves through sys.modules and returns the
+    # module regardless of what the package shadowed.
+    ipatch = importlib.import_module("instructor.core.patch")
 
     installed = {}
     for name in ("retry_sync", "retry_async"):
@@ -501,7 +510,15 @@ def _selftest_correlation() -> dict:
     assumed to work because the code looks right.
     """
     import asyncio
-    import instructor.core.patch as ipatch
+    # `import instructor.core.patch as X` binds an ATTRIBUTE lookup,
+    # and `instructor/core/__init__.py:19` does
+    # `from .patch import patch, apatch` — which rebinds that
+    # attribute from the MODULE to the FUNCTION. The `as` form
+    # therefore yields a function with no `retry_sync`, `installed`
+    # comes back empty, and NOTHING is patched (run 20).
+    # `import_module` resolves through sys.modules and returns the
+    # module regardless of what the package shadowed.
+    ipatch = importlib.import_module("instructor.core.patch")
 
     out: dict = {}
     seen: list = []
