@@ -12495,3 +12495,90 @@ code. No workstream opened.
 * **Settling poll — DEFERRED.**
 * No remediation: no timeout, no model, no cognee change, no endpoint
   fix, no memu-graph production change, no Phase 2.
+
+---
+
+## D204
+
+**2026-08-14 — KAI-GATE-049 CLOSED: DIAGNOSTIC COMPLETE / CONDITION
+UNREMEDIATED.**
+
+Formal closure review, operator-authorised. **Closure means the
+previously unknown stage/state/return behaviour is now runtime-measured.
+It does NOT mean the graph capability is healthy, and it does NOT mean
+the >300s behaviour has been remediated.**
+
+### What the closure rests on
+
+Run **31787454480**, job **94726465385**, commit `d7dadec` (D203):
+
+* **Stage ownership** — `extract_graph_and_summarize` is the last entered
+  stage. **The evidence does not distinguish `extract_graph_from_data`
+  from `summarize_text` inside the `asyncio.gather`, and no deeper
+  ownership is claimed.**
+* **Execution state** — *waiting on the Ollama delegate path*, measured
+  with one continuous process instance across all 20 samples and all 19
+  adjacent-pair continuity checks.
+* **Return semantics** — the request returned **200 after 390.9s**.
+* **Timeout hypothesis** — **NOT ESTABLISHED.** The observation returned
+  naturally inside the 900s window and coincides with no measured
+  configured limit.
+
+### The wording this closure is careful about
+
+The claim is **"waiting on the Ollama delegate path"**, not *"Ollama is
+the cause"*.
+
+The socket evidence plus low local CPU establishes that `memu-graph` was
+**predominantly waiting on its delegate**. It does **not** isolate
+whether the ~391s is ollama inference itself, queueing, the
+`extract_graph_from_data` branch, `summarize_text`, retries above the
+socket, or another delegate-side behaviour. The diagnostic does not need
+that resolution to be complete, and over-diagnosing it to justify closure
+would be the error this whole unit was built to avoid.
+
+**Noted, not done:** `summarise_graph_stall.py`'s detail string reads
+*"blocked on ollama, not computing"*, which is a shade stronger than the
+evidence supports. A one-line wording fix to match the above is proposed;
+it is not made here, because closure was the authorised unit. Recorded so
+it cannot be lost.
+
+### Why this does not violate Rule 7
+
+Rule 7 exists so a finding is not closed because a fix landed or because
+something looks better. Nothing is being promoted: **KAI-GATE-048 remains
+OPEN with C BLOCKED**, and real ingest is not being called healthy. The
+condition that remains bad —
+
+> the graph capability still does not satisfy the existing 300s
+> live-cycle requirement, and its downstream pipeline still fails
+> semantically
+
+— is **not deleted by this closure**; it is relocated to where it belongs,
+under KAI-GATE-048 C, and given its own tracker (#57) so the closure of a
+completed diagnostic cannot orphan it.
+
+### Run 9 is preserved, not upgraded
+
+Run 9's axis 2 stays **PROVISIONAL / identity not recorded**,
+permanently. It is not retrospectively repaired by run 11. Run 11 is its
+own complete observation, and the instrument that made it possible
+(`#56`) explicitly refuses to read absent identity fields as continuity.
+
+### The `$?`-after-pipeline self-audit — CLOSED
+
+Bounded and answered: **9 of 9** `scripts/security/*.sh` collectors set
+`pipefail`, and none captures `$?` after a pipeline. No new repository
+defect. Closed as a self-audit, not carried as a workstream.
+
+### State banked
+
+| finding | state |
+|---|---|
+| **KAI-GATE-048 C** | **BLOCKED** — (1) the graph pipeline does not successfully satisfy the live capability requirement; (2) `/graph/ingest` independently launders a returned terminal pipeline failure into HTTP 200 success semantics |
+| **KAI-GATE-049** | **CLOSED / DIAGNOSTIC COMPLETE, CONDITION UNREMEDIATED** — stage measured, execution state measured with continuity, return semantics measured; run 9 axis 2 permanently provisional |
+| **KAI-GATE-050** | **OPEN**, runtime-reproduced 2/2, unremediated |
+| settling poll | **DEFERRED** |
+| timeouts | **UNCHANGED** |
+
+Neither 048 nor 050 was touched as part of this closure.
