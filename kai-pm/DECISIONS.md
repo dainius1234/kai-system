@@ -12806,3 +12806,102 @@ real dependency, not a deferral of convenience.
 * **KAI-GATE-049 — CLOSED** (diagnostic complete, condition
   unremediated).
 * No timeout change, no model change, no cognee modification, no Phase 2.
+
+---
+
+## D207
+
+**2026-08-14 — KAI-GATE-050 CLOSED: REMEDIATED + RUNTIME-PROVEN FOR
+FAILURE PROPAGATION. KAI-GATE-048 C simplified to its one remaining
+blocker.**
+
+### KAI-GATE-050 — CLOSED
+
+The finding was opened for one specific defect: *a terminally failed
+cognee pipeline could be promoted into a success-shaped HTTP response.*
+That property is repaired and reproduced against the same runtime failure
+mode that exposed it.
+
+* `ffd92b6`: `cognify` ERRORED → HTTP **200** → gate **FAIL**
+* `80bdc2c`: `cognify` ERRORED → HTTP **502** → gate **PASS**
+* reproduced **2/2** on clean stacks
+* the response body carries the **actual failed terminal-state
+  diagnosis**, not merely a different number
+
+**Runtime evidence proves the observed returned cognee terminal-failure
+mode no longer produces success-shaped ingestion semantics.**
+
+**Terminal-success → success-shaped response remains
+CALIBRATION-PROVEN, not runtime-proven**, because no real successful
+cognify execution currently exists in the measured environment. That
+runtime proof depends on KAI-GATE-048 C becoming capable of genuine graph
+success and **will be collected there** rather than by manufacturing a
+synthetic success path.
+
+This does not weaken the closure. A predicate that refused everything
+would satisfy the failure-only runtime observation — which is why the
+independent regression guard matters: the known-positive accepts terminal
+success, reinjection proved that guard can fail (19/29, EXIT GATE: FAIL),
+and the limitation is recorded as synthetic rather than passed off as
+runtime evidence.
+
+The identifier-space notes stay: dataset ids and pipeline-run ids are
+different namespaces, and "1 of 1" in cognify's returned result versus
+two pipelines in the broader request log is not a contradiction.
+
+### KAI-GATE-048 C — now reads simply
+
+> **BLOCKED — real graph extraction does not complete successfully.**
+
+Not *"blocked by API truthfulness"*. The API now reports that failure
+truthfully. C's second blocker is **removed**; the first stands alone.
+
+That `memu-graph-acceptance` is the **only** red job in run 12 is the
+correct state: the contract repair passed, while the capability gate
+continues refusing promotion because the capability itself is still
+broken.
+
+### Next unit — AUTHORISED, read-only
+
+Attack **KAI-GATE-048 C only**. The failing boundary is already narrow:
+
+```
+extract_graph_and_summarize
+  -> predominantly waiting on the Ollama delegate path
+  -> qwen2.5:3b
+  -> three attempts
+  -> model returns a JSON-SCHEMA-shaped object where an INSTANCE is required
+  -> cognee pipeline terminal ERRORED / 422
+```
+
+Before changing model, timeout or cognee, determine the exact LLM
+response-contract mismatch:
+
+1. what exact payload/prompt/schema is sent to qwen2.5:3b for the failing
+   extraction call;
+2. what exact response it returns on each attempt;
+3. what cognee expects structurally;
+4. where that expectation is enforced;
+5. whether the model is asked to emit JSON matching a schema, to emit the
+   schema itself, to use structured-output mode, or is answering an
+   incorrectly constructed prompt;
+6. whether the same malformed semantic response reproduces across
+   attempts and runs, or whether different failures are being collapsed
+   into one 422;
+7. which side owns the mismatch — prompt construction, model
+   capability/configuration, structured-output adapter, cognee
+   parser/validator, or another boundary.
+
+**No timeout increase. No model swap. No retry increase.**
+
+The ~391s duration is now **secondary**: a faster model returning the
+wrong object would still fail, and a longer timeout would only wait
+longer for invalid output.
+
+### Standing
+
+| finding | state |
+|---|---|
+| **KAI-GATE-048 C** | **BLOCKED — real graph extraction does not complete successfully** (one blocker) |
+| **KAI-GATE-049** | CLOSED — diagnostic complete, condition unremediated |
+| **KAI-GATE-050** | **CLOSED — remediated + runtime-proven for failure propagation**; success direction calibration-proven, inherited by 048 |
