@@ -1,62 +1,75 @@
-"""KAI-GATE-048 C: what KIND of object did the model return, and at what LAYER?
+"""KAI-GATE-048 C: recover each attempt's CONTRACT, then classify its response.
 
-Pure stdlib, no I/O — calibratable on the host with no cognee, no
-container and no model.
+Pure stdlib. Calibratable on a host with no cognee, no container, no model
+and — deliberately — no instructor and no jsonschema, because the analyser
+must state honestly what it could and could not establish in each case.
 
-THE DISTINCTION THIS EXISTS TO MAKE
-===================================
+WHAT D222 ESTABLISHED, AND WHY THIS FILE CHANGED
+================================================
 
-    a JSON **instance** conforming to a schema
-    vs
-    the **schema definition itself**
+Read out of the pinned wheels the image installs (instructor 1.15.1):
 
-WHY THIS FILE WAS REWRITTEN (D216)
-==================================
+* `response_model` is a NAMED PARAMETER of instructor's patched create
+  (`core/patch.py:147`) and is returned separately by
+  `handle_response_model` (`processing/response.py:409`). It NEVER enters
+  the kwargs that reach `Completions.create`. Fabricating it into a
+  production row would be inventing evidence.
+* Under `Mode.JSON`, `handle_json_modes`
+  (`providers/openai/utils.py:491`) puts `response_format` =
+  `{"type": "json_object"}` — a MODE DIRECTIVE carrying no contract — and
+  appends `json.dumps(response_model.model_json_schema(), indent=2)` to
+  the SYSTEM MESSAGE.
+* Retries (`reask_md_json`, `providers/openai/utils.py:151`) APPEND the
+  failed reply and a repair instruction. They do not touch `messages[0]`.
 
-The previous version took a `required_fields` list and asked one fused
-question. In run 15 that list arrived **empty** — the schema had been
-located inside message prose, so `json.loads` failed and the list
-collapsed to `[]`. With no required fields, "carries every required
-field" is **trivially true**, and every response classified as
-`VALID INSTANCE` — including, had one appeared, a schema echo.
+So the contract for an attempt is carried BY THAT ATTEMPT, inside
+`messages[0]["content"]`. It is recovered from the row, never reached
+down from the outer caller.
 
-That is a vacuous predicate: a check that cannot fail is not a check.
-The repair is not a special case for an empty list. The questions are now
-asked **independently and in an order where vacuity is impossible**:
+TWO INDEPENDENT LABELS THAT MUST NOT MERGE
+==========================================
 
-    0. is there a response at all?                  -> NO RESPONSE
-    1. is it JSON, and an object?                   -> OTHER INVALID
-    2. CAN THE SCHEMA'S REQUIREMENTS BE ESTABLISHED?
-                                                    -> CLASSIFIER_UNMEASURED
-    3. is it the schema definition itself?          -> SCHEMA ECHO
-    4. is it a valid instance of THAT schema?       -> VALID INSTANCE
-    5. anything else                                -> OTHER INVALID
+`REQUIRED_FIELDS_PRESENT` is not `VALID_INSTANCE`. Checking that the
+top-level required keys exist is not JSON Schema validation: it ignores
+types, formats, nested objects, enums, `additionalProperties` and every
+other constraint. When no validator is available the analyser says the
+narrower thing and does not round up. That is the same defect as D216's
+vacuous predicate, one level less obvious.
 
-Step 2 comes **before** any instance test. An unestablished schema can
-therefore never produce a success verdict — it produces an explicit
-"not measured", which is what run 15 should have said.
+THE QUESTIONS, ASKED INDEPENDENTLY AND IN ORDER
+===============================================
 
-LAYERS
-======
+    1. was the CONTRACT recovered?      -> CONTRACT_UNMEASURED
+    2. is the response parseable JSON?  -> NOT_JSON / NOT_JSON_OBJECT
+    3. is it the schema definition?     -> SCHEMA_ECHO
+    4. does it VALIDATE as an instance? -> VALID_INSTANCE
+                                           / INSTANCE_INVALID
+       (no validator available)         -> REQUIRED_FIELDS_PRESENT
+                                           / REQUIRED_FIELDS_MISSING
+    5. if not, what failed?             -> carried in `why`
 
-D215's requirement: every captured record declares the layer it came
-from, and a claim may only be made by evidence from a layer that
-licenses it. `INSTRUCTOR_RETURN = VALID INSTANCE` must never satisfy a
-question about `RAW_MODEL_RESPONSE`, because instructor's retry and
-validation machinery sits between them.
+Unknown at any prerequisite leaves every dependent predicate UNMEASURED.
 """
 from __future__ import annotations
 
 import hashlib
 import json
+import re
 from typing import Any, Dict, List, Optional, Tuple
 
 # ── verdicts ─────────────────────────────────────────────────────────
-VALID_INSTANCE = "VALID INSTANCE"
-SCHEMA_ECHO = "SCHEMA ECHO"
-OTHER_INVALID = "OTHER INVALID STRUCTURE"
+CONTRACT_UNMEASURED = "CONTRACT_UNMEASURED"
 NO_RESPONSE = "NO RESPONSE"
-CLASSIFIER_UNMEASURED = "CLASSIFIER_UNMEASURED"
+NOT_JSON = "NOT JSON"
+NOT_JSON_OBJECT = "NOT A JSON OBJECT"
+SCHEMA_ECHO = "SCHEMA ECHO"
+VALID_INSTANCE = "VALID INSTANCE"
+INSTANCE_INVALID = "INSTANCE INVALID"
+REQUIRED_FIELDS_PRESENT = "REQUIRED FIELDS PRESENT"
+REQUIRED_FIELDS_MISSING = "REQUIRED FIELDS MISSING"
+
+# Only this one says "the response satisfied the captured JSON Schema".
+PASSING_VERDICTS = frozenset({VALID_INSTANCE})
 
 # ── layers (D215) ────────────────────────────────────────────────────
 ADAPTER_INPUT = "ADAPTER_INPUT"
@@ -67,76 +80,185 @@ VALIDATION_RESULT = "VALIDATION_RESULT"
 
 LAYERS = frozenset({ADAPTER_INPUT, INSTRUCTOR_RETURN, RAW_MODEL_REQUEST,
                     RAW_MODEL_RESPONSE, VALIDATION_RESULT})
-
-# Only this layer licenses a claim about what the MODEL returned.
-# Everything above it has passed through instructor's retry, parsing and
-# validation, any of which can turn a malformed completion into a clean
-# object — which is exactly how run 15 misreported.
 LAYERS_LICENSING_RAW_RESPONSE_CLAIMS = frozenset({RAW_MODEL_RESPONSE})
 
-# Keys that only ever appear in a JSON Schema, never in an instance of
-# the models cognee asks for. From the JSON Schema vocabulary, not from
-# the one response we happened to see.
 _SCHEMA_KEYS = frozenset({
     "$schema", "$defs", "$ref", "properties", "required",
     "additionalProperties", "patternProperties", "definitions",
 })
 
 
-def sha256(text: Optional[str]) -> str:
-    """Byte-level identity, so 'identical' is measured, not eyeballed."""
+# ── identity: two different questions, two different functions ───────
+def sha256_bytes(text: Optional[str]) -> str:
+    """EXACT byte identity of the string as returned. Not canonical."""
     if text is None:
         return ""
     return hashlib.sha256(text.encode("utf-8", "replace")).hexdigest()
 
 
 def canonical(obj: Any) -> str:
-    """Order-independent serialisation, for CANONICAL (not byte) identity."""
+    """Order-independent JSON serialisation.
+
+    Plain dicts serialise as VALID JSON — never `str(dict)`, whose single
+    quotes are Python repr and not parseable. Run 17 recorded
+    `response_format` that way, so the analyser could not read back its
+    own record (D222 §5.3).
+    """
     try:
         return json.dumps(obj, sort_keys=True, separators=(",", ":"),
                           default=str)
     except (TypeError, ValueError):
-        return str(obj)
+        return json.dumps(str(obj))
 
 
-def as_schema(schema: Any) -> Optional[Dict[str, Any]]:
-    """The schema as a dict, or None when it cannot be established.
+def sha256_canonical(obj: Any) -> str:
+    """CANONICAL identity — key order irrelevant. Never call this byte identity."""
+    return hashlib.sha256(canonical(obj).encode("utf-8", "replace")).hexdigest()
 
-    None is a first-class answer. Run 15's failure was treating an
-    unusable schema as an empty one and carrying on.
+
+# ── is a real JSON Schema validator available? ───────────────────────
+def validator_status() -> Dict[str, Any]:
+    """Recorded, so a weaker claim is never mistaken for a stronger one."""
+    try:
+        import jsonschema  # noqa: F401
+        try:                      # __version__ is deprecated in 4.26
+            from importlib.metadata import version as _v
+            ver = _v("jsonschema")
+        except Exception:  # noqa: BLE001
+            ver = None
+        return {"available": True, "library": "jsonschema", "version": ver}
+    except Exception as exc:  # noqa: BLE001
+        return {"available": False, "library": None, "version": None,
+                "why": f"{type(exc).__name__}: {exc}",
+                "consequence": "no verdict stronger than "
+                               f"{REQUIRED_FIELDS_PRESENT} is possible"}
+
+
+# ── where the extraction rule comes from ─────────────────────────────
+def _markers_from_source(src: str) -> List[str]:
+    """The literal, non-interpolated lines of instructor's json-mode prose.
+
+    Derived from the INSTALLED implementation's source text, so a change
+    upstream changes this too. The wording moved once already (upstream
+    issue #1514), which is exactly why it is not copied in here.
     """
-    if isinstance(schema, dict):
-        return schema
-    if isinstance(schema, str) and schema.strip():
-        try:
-            parsed = json.loads(schema)
-        except ValueError:
-            return None
-        return parsed if isinstance(parsed, dict) else None
+    body = src.split("dedent(", 1)[-1]
+    body = body.split('"""', 2)[1] if '"""' in body else body
+    out = []
+    for line in body.splitlines():
+        line = line.strip()
+        if line and "{" not in line and "}" not in line:
+            out.append(line)
+    return out
+
+
+def extraction_rule_provenance() -> Dict[str, Any]:
+    """WHERE the rule came from, recorded on every run (I-8).
+
+    The property the analyser needs is *this region of the system message
+    is the JSON Schema instructor generated for this request* — not *these
+    English strings were found*. So the primary rule is STRUCTURAL and
+    works with no instructor present; when instructor IS importable its
+    source is read and used as an independent corroboration.
+    """
+    prov: Dict[str, Any] = {
+        "primary_rule": "structural: the unique schema-shaped JSON object "
+                        "embedded in this attempt's system message",
+        "instructor_available": False,
+        "instructor_version": None,
+        "source": None,
+        "source_sha256": None,
+        "markers": [],
+    }
+    try:
+        import inspect
+        import instructor
+        from instructor.providers.openai import utils as iu
+        src = inspect.getsource(iu.handle_json_modes)
+        prov.update({
+            "instructor_available": True,
+            "instructor_version": getattr(instructor, "__version__", None),
+            "source": "instructor.providers.openai.utils.handle_json_modes",
+            "source_sha256": hashlib.sha256(src.encode()).hexdigest(),
+            "markers": _markers_from_source(src),
+            "corroboration": "the recovered region must fall between the "
+                             "markers read from this source",
+        })
+    except Exception as exc:  # noqa: BLE001
+        prov["instructor_import_error"] = f"{type(exc).__name__}: {exc}"
+        prov["corroboration"] = ("NONE — instructor not importable here, so "
+                                 "the structural rule stands alone")
+    return prov
+
+
+# ── recovering the contract from the attempt itself ──────────────────
+def _system_text(messages: Any) -> Optional[str]:
+    """The system message's text, or None. Never guesses at another role."""
+    if not isinstance(messages, list) or not messages:
+        return None
+    system = None
+    for msg in messages:
+        if isinstance(msg, dict) and msg.get("role") == "system":
+            system = msg
+            break
+    if system is None:
+        return None
+    content = system.get("content")
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = [p.get("text") for p in content
+                 if isinstance(p, dict) and isinstance(p.get("text"), str)]
+        return "\n".join(parts) if parts else None
     return None
 
 
-def required_fields_of(schema: Any) -> List[str]:
-    """Required field names, read out of the schema that was SENT (R5).
+def _json_objects_in(text: str) -> List[Tuple[int, int, Dict[str, Any]]]:
+    """Every balanced-brace region that parses as a JSON object.
 
-    Returns [] both for 'no requirements' and for 'unusable' — which is
-    why callers must use `as_schema` to tell those apart rather than
-    inferring from an empty list. That conflation was the D216 defect.
+    A scanner rather than a regex, because a JSON Schema nests braces and
+    contains strings that may hold braces of their own.
     """
-    obj = as_schema(schema)
-    if obj is None:
-        return []
-    req = obj.get("required")
-    if isinstance(req, list):
-        return [str(r) for r in req]
-    props = obj.get("properties")
-    if isinstance(props, dict):
-        return sorted(str(k) for k in props)
-    return []
+    found = []
+    depth = 0
+    start = -1
+    in_str = False
+    escape = False
+    for i, ch in enumerate(text):
+        if in_str:
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == '"':
+                in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+        elif ch == "{":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch == "}":
+            if depth:
+                depth -= 1
+                if depth == 0 and start >= 0:
+                    chunk = text[start:i + 1]
+                    try:
+                        obj = json.loads(chunk)
+                    except ValueError:
+                        pass
+                    else:
+                        if isinstance(obj, dict):
+                            found.append((start, i + 1, obj))
+                    start = -1
+    return found
 
 
-def _is_schema_shaped(obj: Dict[str, Any]) -> bool:
+def is_schema_shaped(obj: Any) -> bool:
     """A JSON Schema *describing* an object, rather than being one."""
+    if not isinstance(obj, dict):
+        return False
     keys = set(obj)
     if "properties" in keys and isinstance(obj.get("properties"), dict):
         return True
@@ -145,71 +267,241 @@ def _is_schema_shaped(obj: Dict[str, Any]) -> bool:
     return bool(keys & {"$schema", "$defs"})
 
 
-def classify(raw: Optional[str], schema: Any) -> Tuple[str, str]:
-    """(verdict, why). `schema` is the schema ACTUALLY SENT for this attempt.
+def recover_contract(messages: Any,
+                     provenance: Optional[Dict[str, Any]] = None
+                     ) -> Tuple[Optional[Dict[str, Any]], str, Dict[str, Any]]:
+    """(schema, why, detail) — the contract THIS attempt actually carried.
 
-    Never returns a success verdict when the schema's requirements could
-    not be established — that is `CLASSIFIER_UNMEASURED`.
+    Never reaches upward to the outer `response_model`: D222 §1 shows that
+    object cannot reach this boundary, so anything found up there would be
+    a different request's contract wearing this one's row.
+
+    Ambiguity is refused, not resolved. Zero candidate regions and two
+    candidate regions both yield no contract, because picking one would be
+    a guess dressed as a measurement.
     """
-    # 0 — is there a response at all?
+    prov = provenance if provenance is not None else extraction_rule_provenance()
+    detail: Dict[str, Any] = {"candidates": 0, "corroborated": None}
+
+    text = _system_text(messages)
+    if not text:
+        return None, ("no system message with readable text on this attempt, "
+                      "so the contract it was sent under cannot be read"), detail
+
+    candidates = [(a, b, o) for a, b, o in _json_objects_in(text)
+                  if is_schema_shaped(o)]
+    detail["candidates"] = len(candidates)
+    if not candidates:
+        return None, ("the system message carries no schema-shaped JSON "
+                      "object, so no contract was conveyed in it"), detail
+    if len(candidates) > 1:
+        return None, (f"{len(candidates)} schema-shaped regions in the system "
+                      f"message — ambiguous, and choosing between them would "
+                      f"be a guess"), detail
+
+    start, end, schema = candidates[0]
+
+    # Independent corroboration, only when the installed source is readable.
+    markers = prov.get("markers") or []
+    if markers:
+        before, after = text[:start], text[end:]
+        lead = [m for m in markers if m in before]
+        tail = [m for m in markers if m in after]
+        detail["corroborated"] = bool(lead and tail)
+        detail["markers_before"] = lead
+        detail["markers_after"] = tail
+        if not (lead and tail):
+            return None, ("a schema-shaped region was found, but it does not "
+                          "sit between the markers read from the installed "
+                          "instructor source — the region cannot be confirmed "
+                          "as the generated contract"), detail
+
+    return schema, (f"recovered from this attempt's system message "
+                    f"(chars {start}-{end})"), detail
+
+
+def required_fields_of(schema: Any) -> List[str]:
+    """Required field names, read out of the schema THIS attempt carried."""
+    if not isinstance(schema, dict):
+        return []
+    req = schema.get("required")
+    if isinstance(req, list):
+        return [str(r) for r in req]
+    props = schema.get("properties")
+    if isinstance(props, dict):
+        return sorted(str(k) for k in props)
+    return []
+
+
+def _validate(instance: Any, schema: Dict[str, Any]) -> Tuple[str, str]:
+    """Real JSON Schema validation.
+
+    Returns one of four statuses, because they have DIFFERENT OWNERS:
+
+      unavailable     — the library is not importable after all; the caller
+                        must degrade to the narrower claim, never pass
+      schema_unusable — the CONTRACT is not a valid JSON Schema. That is a
+                        defect in what was sent, not in what came back, and
+                        reporting it as an invalid instance would blame the
+                        model for the request's problem
+      invalid         — the response fails a usable contract
+      valid           — the response satisfies it
+    """
+    try:
+        import jsonschema
+    except Exception as exc:  # noqa: BLE001
+        return "unavailable", f"validator not importable after all: {exc}"
+    validator = jsonschema.Draft202012Validator
+    try:
+        validator.check_schema(schema)
+    except Exception as exc:  # noqa: BLE001
+        return "schema_unusable", (f"the recovered contract is not a valid "
+                                   f"JSON Schema: {type(exc).__name__}")
+    try:
+        errors = sorted(validator(schema).iter_errors(instance),
+                        key=lambda e: list(e.path))
+    except Exception as exc:  # noqa: BLE001
+        return "schema_unusable", (f"the recovered contract could not be "
+                                   f"applied: {type(exc).__name__}")
+    if not errors:
+        return "valid", ""
+    first = errors[0]
+    where = "/".join(str(p) for p in first.path) or "(root)"
+    return "invalid", (f"{len(errors)} violation(s); first at {where}: "
+                       f"{first.message}")
+
+
+def classify(raw: Optional[str], schema: Any,
+             validator: Optional[Dict[str, Any]] = None) -> Tuple[str, str]:
+    """(verdict, why). `schema` is the contract RECOVERED FROM THIS ATTEMPT.
+
+    Never returns a passing verdict on an unrecovered contract, and never
+    promotes a required-field check to schema validation.
+    """
+    val = validator if validator is not None else validator_status()
+
+    # 1 — was the contract recovered? Asked FIRST, so nothing downstream
+    # can be trivially true.
+    #
+    # "A non-empty dict" is NOT enough. `{"type": "json_object"}` is a
+    # non-empty dict and is the MODE DIRECTIVE — with it as the contract,
+    # `required_fields_of` returns [] and "carries every required field"
+    # becomes trivially true. That is D216's vacuous predicate returning
+    # in new clothes; the calibration caught it here rather than in a run.
+    if not isinstance(schema, dict) or not schema or not is_schema_shaped(schema):
+        return CONTRACT_UNMEASURED, (
+            "CONTRACT NOT RECOVERED for this attempt — no schema-shaped "
+            "contract was established, so neither 'is it an instance' nor "
+            "'is it the schema' can be asked. A mode directive such as "
+            "{\"type\": \"json_object\"} is not a contract. This is not a pass")
+
+    # 2 — is there a response, and is it a JSON object?
     if raw is None or not str(raw).strip():
         return NO_RESPONSE, "the model returned nothing to classify"
-
-    # 1 — is it JSON, and an object?
     try:
         obj = json.loads(raw)
     except ValueError as exc:
-        return OTHER_INVALID, f"not JSON at all ({exc.__class__.__name__})"
+        return NOT_JSON, f"not JSON at all ({exc.__class__.__name__})"
     if not isinstance(obj, dict):
-        return OTHER_INVALID, (f"JSON, but a {type(obj).__name__}, not an "
-                               f"object")
+        return NOT_JSON_OBJECT, (f"JSON, but a {type(obj).__name__}, not an "
+                                 f"object")
 
-    # 2 — CAN THE CONTRACT BE ESTABLISHED? Asked BEFORE any instance
-    # test, so an unknown contract can never yield a success verdict.
-    schema_obj = as_schema(schema)
-    if schema_obj is None:
-        return CLASSIFIER_UNMEASURED, (
-            "SCHEMA REQUIREMENTS NOT ESTABLISHED — the schema sent for this "
-            "attempt could not be read, so neither 'is it an instance' nor "
-            "'is it the schema' can be answered. This is not a pass")
-    required = required_fields_of(schema_obj)
-    if not required:
-        return CLASSIFIER_UNMEASURED, (
-            "SCHEMA REQUIREMENTS NOT ESTABLISHED — the schema names no "
-            "required fields and no properties, so 'valid instance' would "
-            "be trivially true. This is not a pass")
+    required = required_fields_of(schema)
 
-    # 3 — is it the schema definition itself? Compared against the schema
-    # ACTUALLY SENT, not against a generic shape alone.
-    if _is_schema_shaped(obj):
-        same = canonical(obj) == canonical(schema_obj)
-        described = sorted(obj.get("properties", {}))
+    # 3 — is it the schema definition itself?
+    if is_schema_shaped(obj):
+        same = canonical(obj) == canonical(schema)
+        described = sorted(obj.get("properties", {})) if isinstance(
+            obj.get("properties"), dict) else []
         return SCHEMA_ECHO, (
             f"this is the SCHEMA, not an instance of it — it describes "
             f"{described} instead of carrying {required}"
-            + ("; BYTE-FOR-BYTE the schema that was sent, canonicalised"
-               if same else "; schema-shaped but not identical to the one sent"))
+            + ("; canonically IDENTICAL to the contract this attempt was "
+               "sent" if same else "; schema-shaped but not the contract "
+                                   "this attempt was sent"))
 
-    # 4 — is it a valid instance of THAT schema?
+    # 4 — does it VALIDATE? Only a real validator licenses VALID_INSTANCE.
+    if val.get("available"):
+        status, why = _validate(obj, schema)
+        if status == "valid":
+            return VALID_INSTANCE, (
+                f"validates against the contract this attempt carried "
+                f"({val.get('library')} {val.get('version')})")
+        if status == "invalid":
+            return INSTANCE_INVALID, f"fails the captured schema: {why}"
+        if status == "schema_unusable":
+            # The REQUEST is malformed, not the reply. Calling this an
+            # invalid instance would hand the finding to the wrong owner.
+            return CONTRACT_UNMEASURED, (
+                f"{why} — so the response cannot be judged against it. This "
+                f"is a defect in the contract sent, not in what came back, "
+                f"and it is not a pass")
+        # "unavailable" — the library vanished between the status check and
+        # here. Fall through to the narrower claim rather than guess.
+
+    # 4b — NO VALIDATOR. Say the narrower thing; never round up.
+    #
+    # And refuse outright when the contract names nothing to check: with no
+    # required fields a presence test cannot fail, and a check that cannot
+    # fail is not a check. Real validation (4) is immune to this, which is
+    # why the guard lives only on the key-presence path.
+    if not required:
+        return CONTRACT_UNMEASURED, (
+            "the recovered contract names no required fields and no "
+            "properties, so a top-level presence check would be trivially "
+            "true, and no validator was available to test anything else. "
+            "This is not a pass")
     missing = [f for f in required if f not in obj]
-    if not missing:
-        wrong = [f for f in required
-                 if not isinstance(obj.get(f), (str, int, float, bool, list))]
-        if not wrong:
-            return VALID_INSTANCE, (f"carries every required field "
-                                    f"({', '.join(required)})")
-        return OTHER_INVALID, (f"has the required field(s) but with unusable "
-                               f"value type(s): {', '.join(wrong)}")
-
-    # 5 — anything else
-    return OTHER_INVALID, (f"an object, but neither a valid instance nor a "
-                           f"schema: missing {', '.join(missing)}")
+    if missing:
+        return REQUIRED_FIELDS_MISSING, (
+            f"missing {', '.join(missing)}. NOTE: no JSON Schema validator "
+            f"available, so only top-level required-key presence was tested")
+    return REQUIRED_FIELDS_PRESENT, (
+        f"carries every required top-level field ({', '.join(required)}). "
+        f"THIS IS NOT SCHEMA VALIDATION — no validator was available, so "
+        f"types, nested objects and every other constraint went untested. "
+        f"It must not be read as {VALID_INSTANCE}")
 
 
 def licenses_raw_response_claim(layer: Optional[str]) -> bool:
-    """May evidence from `layer` support a claim about the MODEL's reply?
-
-    D215. `INSTRUCTOR_RETURN = VALID INSTANCE` says nothing about the raw
-    completion: instructor retried, parsed and validated in between.
-    """
+    """May evidence from `layer` support a claim about the MODEL's reply?"""
     return layer in LAYERS_LICENSING_RAW_RESPONSE_CLAIMS
+
+
+# ── Q6: grouping attempts into logical calls ─────────────────────────
+# The correlation id an attempt would need to be grouped with the other
+# attempts of ITS structured-output call. Absent from run 17's rows.
+LOGICAL_CALL_KEYS = ("logical_call_id", "invocation_id", "correlation_id")
+
+FORBIDDEN_GROUPING_SIGNALS = (
+    "adjacency", "elapsed time", "prompt hash", "schema hash",
+    "response similarity",
+)
+
+
+def logical_call_grouping(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Can these attempts be grouped into their logical calls? Usually no.
+
+    `max_retries=2` (cognee `ollama/adapter.py:130`) bounds a logical call
+    at two raw attempts, so five raw rows span at least three separate
+    calls. Grouping them by anything else — order, timing, or hash
+    similarity — would manufacture a denominator, so this refuses and
+    names what would be needed instead.
+    """
+    key = next((k for k in LOGICAL_CALL_KEYS
+                if all(isinstance(r, dict) and r.get(k) is not None
+                       for r in rows) and rows), None)
+    if key:
+        groups: Dict[str, int] = {}
+        for r in rows:
+            groups[str(r[key])] = groups.get(str(r[key]), 0) + 1
+        return {"available": True, "key": key, "groups": groups}
+    return {
+        "available": False,
+        "why": "no attempt carries a logical-call identifier",
+        "looked_for": list(LOGICAL_CALL_KEYS),
+        "refused_signals": list(FORBIDDEN_GROUPING_SIGNALS),
+        "next_measurement_requirement":
+            "an explicit correlation id minted at the outer structured-output "
+            "invocation and carried into every underlying retry attempt",
+    }

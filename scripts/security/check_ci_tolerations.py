@@ -499,6 +499,23 @@ DECLARED: Tuple[Toleration, ...] = (
         review_by="2026-11-01",
     ),
     Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Fetch the raw evidence captured by run ${{ env.REANALYSE_RUN_ID }}",
+        bucket=DOCUMENTED_SKIP,
+        reason="Re-analysis reads a PREVIOUS run's artifact. When that "
+               "artifact is missing or expired, download-artifact fails "
+               "inside the action with an opaque message and the job stops "
+               "there. The toleration exists so the NEXT step runs and says "
+               "the true thing: 'RE-ANALYSIS NOT PERFORMED … Q2 remains "
+               "UNMEASURED … an availability failure, NOT a finding about "
+               "the LLM.' No enforcement is skipped — that next step IS the "
+               "enforcement, and it exits 2 when the capture file is "
+               "absent, so a missing subject can never read as a clean "
+               "result (I-1/R11).",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
         workflow="unified-hunter.yml",
         step="Report the surface that was exercised",
         bucket=DOCUMENTED_SKIP,

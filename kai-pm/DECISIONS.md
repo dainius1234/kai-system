@@ -14526,3 +14526,148 @@ re-run of the summariser step or a fresh capture.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * Run 17 runtime evidence binds to `f1fdf92`. This entry is analysis of
   installed source plus that run's log; it exercised nothing.
+
+---
+
+## D223 — analyser-side repair: the contract comes from the attempt
+
+Authorised analyser-only change. **No production path touched.** No mode,
+model, timeout, retry count, schema, cognee validator or topology change.
+
+### 1. Contract recovered from the row, never reached down from above
+
+`recover_contract(messages)` reads the schema out of **that attempt's own
+system message**. The outer `response_model` is not consulted, because
+D222 §1 showed it cannot reach the raw boundary — anything found up there
+would be a different request's contract wearing this row.
+
+Ambiguity is **refused, not resolved**: zero schema-shaped regions and two
+schema-shaped regions both yield no contract. Choosing between two would
+be a guess dressed as a measurement.
+
+### 2. The extraction rule is structural, and states its provenance
+
+The property needed is *this region is the JSON Schema instructor
+generated for this request* — not *these English strings were found*. So
+the primary rule is **structural**: the unique schema-shaped JSON object
+embedded in the system message, located by a brace scanner that respects
+strings and nesting.
+
+When instructor **is** importable, its `handle_json_modes` source is read,
+the markers derived from it, the source digested, and the recovered region
+required to sit between them. When it is not, that is **recorded**
+(`corroboration: NONE — structural rule stands alone`), never silently
+skipped.
+
+`extraction_rule_provenance()` reports the rule, instructor availability,
+version, source name and sha256 on every run.
+
+**Known limit:** the analyser runs on the RUNNER, where instructor is not
+installed, so in CI the corroboration path will report unavailable and the
+structural rule stands alone. The natural fix is to have the probe — which
+runs INSIDE the image — record the provenance at capture time. That is a
+capture-side change and is **not** authorised here.
+
+### 3. `REQUIRED FIELDS PRESENT` is not `VALID INSTANCE`
+
+The operator's rule, enforced structurally:
+
+* with a real validator → `VALID INSTANCE` / `INSTANCE INVALID`;
+* **without** one → `REQUIRED FIELDS PRESENT` / `REQUIRED FIELDS MISSING`,
+  whose text says *"THIS IS NOT SCHEMA VALIDATION … types, nested objects
+  and every other constraint went untested"*;
+* `PASSING_VERDICTS == {VALID_INSTANCE}` — the summariser exits 0 on
+  nothing else.
+
+`jsonschema` is now installed in CI so the strong path is reachable, and
+the calibration **fails** rather than skipping if it is absent — absence
+of a validator is not the benign case (I-1).
+
+### 4. Two defects the calibration caught in this very change
+
+Both were mine, both found before a run:
+
+**(a) The vacuity bug, reintroduced.** My first contract guard was
+`isinstance(schema, dict) and schema`. `{"type": "json_object"}` is a
+non-empty dict — so the mode directive passed as a contract,
+`required_fields_of` returned `[]`, and the verdict was
+`REQUIRED FIELDS PRESENT ()` — **trivially true**. That is D216 in new
+clothes. Fixed by requiring `is_schema_shaped`, plus a separate refusal
+when a recovered contract names no fields at all.
+
+**(b) An unusable contract was blaming the model.** A schema that is not
+valid JSON Schema made `iter_errors` raise, and the code reported
+`INSTANCE_INVALID` — a defect in *what was sent* reported as a defect in
+*what came back*, handing the finding to the wrong owner. `_validate` now
+returns four statuses (`valid` / `invalid` / `schema_unusable` /
+`unavailable`), using `check_schema` to separate them, and
+`schema_unusable` becomes `CONTRACT_UNMEASURED` with the text *"this is a
+defect in the contract sent, not in what came back"*.
+
+**(c) A guard nothing tested.** Mutation-testing showed that deleting the
+`is_schema_shaped` guard changed **no** verdict — the empty-required guard
+masked it. A guard that can be removed with no test failing is untested,
+so a case was added that only it can catch (`{"required": ["summary"]}` —
+names a field, so the other guard cannot fire). Re-mutated: now fails 2.
+
+### 5. Q6 grouping is refused, not invented
+
+`logical_call_grouping()` looks for a correlation id; finding none it
+returns `available: False`, names what it looked for, **lists the signals
+it refuses** — adjacency, elapsed time, prompt hash, schema hash, response
+similarity — and states the next measurement requirement: *an explicit
+correlation id minted at the outer structured-output invocation and
+carried into every underlying retry attempt.*
+
+The summariser prints the `max_retries=2` arithmetic so a reader cannot
+mistake five raw rows for one retry sequence. A partially-tagged set is
+**not** grouped.
+
+### 6. Re-analysis before re-running the model
+
+Run 17 already captured the bytes; what failed was the analyser. A new
+job, `memu-graph-llm-reanalysis`, downloads run **31821368040**'s artifact
+and runs **only** the corrected analyser — **no image build, no model
+call**. The run id is pinned in `env`, not discovered, so re-analysis is
+reproducible against a fixed body of evidence rather than a moving
+"latest".
+
+If the artifact is unavailable it prints *"RE-ANALYSIS NOT PERFORMED …
+Q2 remains UNMEASURED … an availability failure, NOT a finding about the
+LLM"* and exits 2 (I-1/R11). The `continue-on-error` that makes that
+message reachable is declared in the toleration register with a reason,
+an owner and a review date — the policy gate caught it undeclared, and
+the second suppression it caught (`|| true` on a diagnostic listing) was
+removed rather than declared.
+
+**Why a job and not a local re-analysis:** the artifact host is denied
+from the development environment (`CONNECT tunnel failed, 403`), so the
+evidence can only be reached from inside CI.
+
+### Calibration — 142 → 181 assertions, 12 → 17 scenarios
+
+Every case the operator named: contract recovered from a real
+instructor-formatted system message · altered/absent/ambiguous region →
+unmeasured · mode directive alone → not a contract · dict → valid JSON ·
+schema echo · valid instance · invalid instance · **required fields
+present but another constraint violated** · non-JSON · unusable contract ·
+refusal when the evidence layer is wrong.
+
+**Proof it can fail (R2)**, three mutations:
+
+| mutation | result |
+|---|---|
+| promote `REQUIRED_FIELDS_PRESENT` → `VALID_INSTANCE` | 4 failures |
+| drop the `is_schema_shaped` contract guard | 2 failures |
+| empty the refused-grouping-signal list | 4 failures |
+
+Restored: **181 / 0**. `policy-check` green, registry gate green
+(I-1..I-7 hold).
+
+### Status — UNCHANGED, and it does not move because the analyser improved
+
+* **Q1** partial · **Q2 UNMEASURED — raw responses captured, per-attempt
+  contract unresolved** · **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* A repaired instrument is not evidence. Only re-analysis of run 17's
+  bytes, or a new valid run, can move Q2.

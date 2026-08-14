@@ -958,9 +958,13 @@ REGISTRY: Tuple[Gate, ...] = (
                  "collapse to one verdict -- the observed failure is the "
                  "first wearing the shape of the second -- and a schema "
                  "echo, a wrong-key object and no response must stay three "
-                 "verdicts, because they have three different owners",
+                 "verdicts, because they have three different owners; "
+                 "REQUIRED FIELDS PRESENT must never be promoted to VALID "
+                 "INSTANCE, because a top-level key check is not JSON "
+                 "Schema validation; and each attempt's contract must be "
+                 "recovered from THAT attempt, never from the outer caller",
          inputs=(),
-         denominator=r"inspected: \d+ response kind\(s\) discriminated",
+         denominator=r"inspected: \d+ response verdict\(s\) discriminated",
          proven_by="scripts/test_llm_contract.py",
          calibrated_by="scripts/test_llm_contract.py",
          in_policy_check=False,

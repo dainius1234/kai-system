@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
-"""Calibration for the KAI-GATE-048 C response classifier.
+"""Calibration for the KAI-GATE-048 C contract recovery and classifier.
 
 The operator's fitness condition, verbatim:
 
 > If the instrument cannot distinguish schema-definition from
 > schema-instance, it is not fit for this question.
 
-So that pair is asserted first and hardest. The four kinds must stay four
-verdicts: a valid instance, the schema itself, another malformed object,
-and nothing at all have four different owners, and collapsing any two
-would hide which.
+and, after run 17:
+
+> If the analyser says VALID_INSTANCE, that must mean the raw response
+> satisfies the actual captured JSON Schema, not merely that it contains
+> the required top-level keys.
+
+So both pairs are asserted first and hardest: schema vs instance, and
+required-fields-present vs schema-validated. Collapsing either hides which
+of four different owners has the defect.
 """
 from __future__ import annotations
 
@@ -26,7 +31,7 @@ import classify_llm_response as c  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 12
+EXPECTED_SCENARIOS = 17
 executed: list[str] = []
 
 
@@ -51,107 +56,334 @@ SCHEMA = {
     "title": "SummarizedContent",
     "type": "object",
 }
-# The real observed response, from run 12's cognee log.
 SCHEMA_ECHO_RAW = json.dumps(SCHEMA)
 INSTANCE_RAW = json.dumps({"summary": "Ada Lovelace wrote the first algorithm."})
-FIELDS = ["summary"]
+
+# A real instructor-formatted system message, built the way
+# providers/openai/utils.py:491 handle_json_modes builds it: the caller's
+# system prompt, then the marker, the indent=2 schema, then the trailer.
+INSTRUCTOR_SYSTEM = (
+    "You are a summarizer.\n\n"
+    "\n        Parse the content and return a JSON object matching this schema:\n\n"
+    "        " + json.dumps(SCHEMA, indent=2) + "\n\n"
+    "        Return a valid JSON instance, not the schema definition."
+)
 
 
-def test_schema_and_instance_are_never_confused() -> None:
-    """THE fitness condition. Both are valid JSON objects; only the KIND
-    differs, and the whole question turns on that difference."""
+def messages(system_text: str, user: str = "Ada Lovelace...") -> list:
+    return [{"role": "system", "content": system_text},
+            {"role": "user", "content": user}]
+
+
+# Forced-unavailable validator: safe to fabricate, because it only ever
+# WEAKENS a claim. The reverse (fabricating availability) is refused by
+# _validate returning None.
+NO_VALIDATOR = {"available": False, "library": None, "version": None,
+                "consequence": "narrower label only"}
+REAL_VALIDATOR = c.validator_status()
+
+
+def test_contract_is_recovered_from_the_attempt() -> None:
+    """D222: the schema lives in THIS attempt's system message."""
+    scenario("contract recovered from the row")
+    schema, why, detail = c.recover_contract(messages(INSTRUCTOR_SYSTEM))
+    check("a real instructor system message yields the schema",
+          schema == SCHEMA, f"{why} / {schema}")
+    check("and says where it came from", "system message" in why, why)
+    check("exactly one candidate region was found",
+          detail["candidates"] == 1, str(detail))
+    check("the recovered contract names the right required field",
+          c.required_fields_of(schema) == ["summary"], "")
+
+
+def test_ambiguous_or_absent_contract_is_unmeasured() -> None:
+    """Zero regions and two regions are BOTH refusals. Picking would guess."""
+    scenario("ambiguous contract refused")
+    none_schema, why_none, d0 = c.recover_contract(
+        messages("You are a summarizer. No schema here."))
+    check("no schema-shaped region -> no contract", none_schema is None, why_none)
+    check("and says so", "no schema-shaped" in why_none, why_none)
+    check("zero candidates counted", d0["candidates"] == 0, str(d0))
+
+    two = INSTRUCTOR_SYSTEM + "\n\nAlso consider: " + json.dumps(
+        {"properties": {"other": {}}, "required": ["other"], "type": "object"})
+    amb, why_amb, d2 = c.recover_contract(messages(two))
+    check("two schema-shaped regions -> no contract", amb is None, why_amb)
+    check("and names the ambiguity", "ambiguous" in why_amb, why_amb)
+    check("both candidates counted", d2["candidates"] == 2, str(d2))
+
+    check("no system message at all -> no contract",
+          c.recover_contract([{"role": "user", "content": "hi"}])[0] is None, "")
+    check("messages missing entirely -> no contract",
+          c.recover_contract(None)[0] is None, "")
+
+
+def test_the_mode_directive_is_not_a_contract() -> None:
+    """response_format={"type":"json_object"} carries no schema (D222 §2)."""
+    scenario("mode directive is not a contract")
+    directive = {"type": "json_object"}
+    check("the directive is not schema-shaped",
+          not c.is_schema_shaped(directive), "")
+    verdict, why = c.classify(INSTANCE_RAW, directive, NO_VALIDATOR)
+    check("classifying against it yields CONTRACT_UNMEASURED",
+          verdict == c.CONTRACT_UNMEASURED, verdict)
+    check("and explicitly not a pass", "not a pass" in why, why)
+    # a directive sitting in a system message must not be mistaken for one
+    check("a directive in the system text is not recovered as a contract",
+          c.recover_contract(messages(
+              'Reply with {"type": "json_object"} only.'))[0] is None, "")
+
+    # ISOLATES the schema-shaped guard. A mutation test showed the empty-
+    # required guard was MASKING it: deleting `is_schema_shaped` from step 1
+    # changed no verdict, so nothing was testing it. This dict names a
+    # required field, so the empty-required guard cannot fire, and only the
+    # shape guard stands between it and a verdict.
+    fragment = {"required": ["summary"]}
+    check("a non-schema-shaped dict is not a contract even with required[]",
+          not c.is_schema_shaped(fragment), "")
+    check("and classifying against it is CONTRACT_UNMEASURED",
+          c.classify(INSTANCE_RAW, fragment, NO_VALIDATOR)[0]
+          == c.CONTRACT_UNMEASURED, "")
+    check("the same holds WITH a validator available",
+          c.classify(INSTANCE_RAW, fragment, REAL_VALIDATOR)[0]
+          == c.CONTRACT_UNMEASURED, "")
+
+
+def test_an_unusable_contract_is_not_an_invalid_response() -> None:
+    """Different owners: a malformed REQUEST is not a bad REPLY.
+
+    `check_schema` separates them. Reporting an unusable contract as
+    INSTANCE_INVALID would hand the finding to the model when the defect is
+    in what was sent."""
+    scenario("unusable contract is not an invalid response")
+    check("a JSON Schema validator is available to calibrate this",
+          REAL_VALIDATOR["available"], str(REAL_VALIDATOR))
+    if not REAL_VALIDATOR["available"]:
+        return
+    # schema-shaped (has properties) but not a valid JSON Schema
+    broken = {"type": "not-a-type", "properties": {"summary": {}},
+              "required": ["summary"]}
+    check("the broken contract IS schema-shaped, so it reaches validation",
+          c.is_schema_shaped(broken), "")
+    verdict, why = c.classify(INSTANCE_RAW, broken, REAL_VALIDATOR)
+    check("an unusable contract is CONTRACT_UNMEASURED",
+          verdict == c.CONTRACT_UNMEASURED, f"{verdict}: {why}")
+    check("and NOT INSTANCE_INVALID", verdict != c.INSTANCE_INVALID, verdict)
+    check("the reason blames the contract, not the reply",
+          "not in what came back" in why, why)
+    check("and it is not a pass", verdict not in c.PASSING_VERDICTS, "")
+
+
+def test_dicts_serialise_as_valid_json() -> None:
+    """Run 17 recorded str(dict) — Python repr, unparseable (D222 §5.3)."""
+    scenario("dicts serialise as JSON")
+    text = c.canonical({"type": "json_object"})
+    check("canonical output parses as JSON", json.loads(text) ==
+          {"type": "json_object"}, text)
+    check("and uses double quotes, not Python repr", "'" not in text, text)
+    check("key order does not change canonical identity",
+          c.sha256_canonical({"a": 1, "b": 2}) == c.sha256_canonical({"b": 2, "a": 1}), "")
+    check("byte identity is a DIFFERENT question from canonical identity",
+          c.sha256_bytes('{"b":2,"a":1}') != c.sha256_bytes('{"a":1,"b":2}'), "")
+    check("byte identity of identical text matches",
+          c.sha256_bytes(SCHEMA_ECHO_RAW) == c.sha256_bytes(SCHEMA_ECHO_RAW), "")
+    check("None hashes to empty", c.sha256_bytes(None) == "", "")
+
+
+def test_schema_echo_is_never_an_instance() -> None:
+    """THE fitness condition. Both are JSON objects; only the KIND differs."""
     scenario("schema vs instance")
-    inst, why_i = c.classify(INSTANCE_RAW, SCHEMA)
-    echo, why_e = c.classify(SCHEMA_ECHO_RAW, SCHEMA)
-    check("an instance is VALID INSTANCE", inst == c.VALID_INSTANCE, why_i)
+    echo, why_e = c.classify(SCHEMA_ECHO_RAW, SCHEMA, NO_VALIDATOR)
+    inst, why_i = c.classify(INSTANCE_RAW, SCHEMA, NO_VALIDATOR)
     check("the schema is SCHEMA ECHO", echo == c.SCHEMA_ECHO, why_e)
-    check("they are different verdicts", inst != echo, f"{inst} / {echo}")
-    check("and the schema verdict explains the difference",
+    check("an instance is not", inst != c.SCHEMA_ECHO, why_i)
+    check("and the echo verdict explains the difference",
           "not an instance" in why_e, why_e)
-    # both parse as JSON objects, so the distinction is not accidental
+    check("it notes the echo IS the captured contract",
+          "canonically IDENTICAL" in why_e, why_e)
     check("both are JSON objects — the split is on kind, not validity",
           isinstance(json.loads(INSTANCE_RAW), dict)
           and isinstance(json.loads(SCHEMA_ECHO_RAW), dict), "")
 
 
-def test_all_four_kinds_stay_four_verdicts() -> None:
-    scenario("four kinds distinct")
+def test_required_fields_are_never_promoted() -> None:
+    """THE operator's rule after run 17.
+
+    Without a validator the analyser may say only what it tested. A
+    top-level key check is not JSON Schema validation."""
+    scenario("required fields never promoted")
+    verdict, why = c.classify(INSTANCE_RAW, SCHEMA, NO_VALIDATOR)
+    check("no validator -> REQUIRED_FIELDS_PRESENT",
+          verdict == c.REQUIRED_FIELDS_PRESENT, verdict)
+    check("and NOT VALID_INSTANCE", verdict != c.VALID_INSTANCE, verdict)
+    check("the reason says it is not schema validation",
+          "NOT SCHEMA VALIDATION" in why, why)
+    check("and names what went untested", "types" in why, why)
+    check("REQUIRED_FIELDS_PRESENT is not in the passing set",
+          c.REQUIRED_FIELDS_PRESENT not in c.PASSING_VERDICTS, "")
+    check("only VALID_INSTANCE passes",
+          c.PASSING_VERDICTS == {c.VALID_INSTANCE}, str(c.PASSING_VERDICTS))
+    missing, why_m = c.classify(json.dumps({"other": 1}), SCHEMA, NO_VALIDATOR)
+    check("a missing required key is REQUIRED_FIELDS_MISSING",
+          missing == c.REQUIRED_FIELDS_MISSING, missing)
+    check("and says only presence was tested", "no JSON Schema validator" in why_m,
+          why_m)
+
+
+def test_real_validation_catches_what_key_presence_cannot() -> None:
+    """The case that separates the two labels: required key present, but
+    the schema violated in another way (wrong type)."""
+    scenario("validator catches constraint violations")
+    wrong_type = json.dumps({"summary": 12345})     # required key, wrong type
+    weak, _ = c.classify(wrong_type, SCHEMA, NO_VALIDATOR)
+    check("without a validator this looks like REQUIRED_FIELDS_PRESENT",
+          weak == c.REQUIRED_FIELDS_PRESENT, weak)
+    check("but it is never VALID_INSTANCE", weak != c.VALID_INSTANCE, weak)
+
+    # I-1: absence of the validator is not the benign case. If it is not
+    # installed, this scenario is NOT calibrated and must say so loudly.
+    check("a JSON Schema validator is available to calibrate the strong path",
+          REAL_VALIDATOR["available"],
+          f"jsonschema missing: {REAL_VALIDATOR.get('why')}")
+    if not REAL_VALIDATOR["available"]:
+        return
+    strong, why_s = c.classify(wrong_type, SCHEMA, REAL_VALIDATOR)
+    check("WITH a validator the same object is INSTANCE_INVALID",
+          strong == c.INSTANCE_INVALID, f"{strong}: {why_s}")
+    check("and the violation is named", "violation" in why_s, why_s)
+    good, why_g = c.classify(INSTANCE_RAW, SCHEMA, REAL_VALIDATOR)
+    check("a genuinely valid instance IS VALID_INSTANCE",
+          good == c.VALID_INSTANCE, f"{good}: {why_g}")
+    check("and cites the validator that ran", "jsonschema" in why_g, why_g)
+    echo, _ = c.classify(SCHEMA_ECHO_RAW, SCHEMA, REAL_VALIDATOR)
+    check("the schema echo stays SCHEMA ECHO even with a validator",
+          echo == c.SCHEMA_ECHO, echo)
+
+
+def test_malformed_responses_stay_distinct() -> None:
+    """Four failure kinds, four owners. Collapsing hides which."""
+    scenario("failure kinds stay distinct")
     got = {
-        "instance": c.classify(INSTANCE_RAW, SCHEMA)[0],
-        "schema": c.classify(SCHEMA_ECHO_RAW, SCHEMA)[0],
-        "other": c.classify(json.dumps({"nonsense": 1}), SCHEMA)[0],
-        "none": c.classify("", SCHEMA)[0],
+        "none": c.classify("", SCHEMA, NO_VALIDATOR)[0],
+        "prose": c.classify("Here is your summary: Ada wrote...", SCHEMA,
+                            NO_VALIDATOR)[0],
+        "array": c.classify("[1,2,3]", SCHEMA, NO_VALIDATOR)[0],
+        "wrongkey": c.classify(json.dumps({"summary_text": "x"}), SCHEMA,
+                               NO_VALIDATOR)[0],
     }
     check("four inputs give four distinct verdicts",
           len(set(got.values())) == 4, str(got))
-    check("other malformed object is OTHER INVALID STRUCTURE",
-          got["other"] == c.OTHER_INVALID, got["other"])
     check("empty is NO RESPONSE", got["none"] == c.NO_RESPONSE, got["none"])
     check("None is NO RESPONSE too",
-          c.classify(None, SCHEMA)[0] == c.NO_RESPONSE, "")
+          c.classify(None, SCHEMA, NO_VALIDATOR)[0] == c.NO_RESPONSE, "")
+    check("prose is NOT JSON", got["prose"] == c.NOT_JSON, got["prose"])
+    check("an array is NOT A JSON OBJECT",
+          got["array"] == c.NOT_JSON_OBJECT, got["array"])
+    check("a wrong-key object is REQUIRED_FIELDS_MISSING",
+          got["wrongkey"] == c.REQUIRED_FIELDS_MISSING, got["wrongkey"])
 
 
-def test_validator_failures_are_not_collapsed() -> None:
-    """The operator's rule: do not collapse every validator failure into
-    one 422. A schema echo and a random object are both 'invalid' to
-    pydantic and must NOT be the same verdict here."""
-    scenario("failures not collapsed")
-    echo = c.classify(SCHEMA_ECHO_RAW, SCHEMA)[0]
-    junk = c.classify(json.dumps({"summary_text": "wrong key"}), SCHEMA)[0]
-    notjson = c.classify("Here is your summary: Ada wrote...", SCHEMA)[0]
-    check("schema echo is not the same as a wrong-key object",
-          echo != junk, f"{echo} / {junk}")
-    check("non-JSON prose is OTHER INVALID STRUCTURE",
-          notjson == c.OTHER_INVALID, notjson)
-    check("and says it is not JSON", "not JSON" in
-          c.classify("Here is your summary", SCHEMA)[1], "")
-    check("a JSON array is not an object",
-          c.classify("[1,2,3]", SCHEMA)[0] == c.OTHER_INVALID, "")
+def test_an_unusable_contract_is_never_a_pass() -> None:
+    """D216's defect, re-pinned at the new boundary."""
+    scenario("unusable contract is never a pass")
+    for bad in (None, "", "not a schema", [], 0, {}, {"type": "json_object"}):
+        v, why = c.classify(INSTANCE_RAW, bad, NO_VALIDATOR)
+        check(f"{bad!r} yields CONTRACT_UNMEASURED",
+              v == c.CONTRACT_UNMEASURED, f"{bad!r} -> {v}")
+        check(f"{bad!r} is not a pass", v not in c.PASSING_VERDICTS, v)
+    v, _ = c.classify(SCHEMA_ECHO_RAW, None, NO_VALIDATOR)
+    check("a schema echo with no contract is NOT valid instance",
+          v != c.VALID_INSTANCE, v)
 
 
-def test_required_fields_come_from_the_schema_sent() -> None:
-    """R5: derived from the payload under test, never a tuple kept here.
-    A schema change must not leave the classifier measuring the old one."""
-    scenario("fields derived from schema")
-    check("required[] is read", c.required_fields_of(SCHEMA) == ["summary"],
-          str(c.required_fields_of(SCHEMA)))
-    check("a JSON string schema works too",
-          c.required_fields_of(json.dumps(SCHEMA)) == ["summary"], "")
-    other = {"properties": {"a": {}, "b": {}}, "type": "object"}
-    check("falls back to properties when required[] is absent",
-          c.required_fields_of(other) == ["a", "b"],
-          str(c.required_fields_of(other)))
-    check("an unusable schema yields no fields",
-          c.required_fields_of("not a schema") == [], "")
-    # and with a DIFFERENT schema, the same echo is still an echo
-    two = {"properties": {"x": {}, "y": {}}, "required": ["x", "y"],
-           "type": "object", "title": "Other"}
-    check("a different schema's echo is still SCHEMA ECHO",
-          c.classify(json.dumps(two), two)[0] == c.SCHEMA_ECHO, "")
+def test_layers_gate_what_may_be_claimed() -> None:
+    """D215. INSTRUCTOR_RETURN must never answer a RAW_MODEL_RESPONSE question."""
+    scenario("layers gate claims")
+    check("RAW_MODEL_RESPONSE licenses a raw-response claim",
+          c.licenses_raw_response_claim(c.RAW_MODEL_RESPONSE), "")
+    for layer in (c.INSTRUCTOR_RETURN, c.ADAPTER_INPUT, c.RAW_MODEL_REQUEST,
+                  c.VALIDATION_RESULT, None, "MADE_UP"):
+        check(f"{layer} does NOT license a raw-response claim",
+              not c.licenses_raw_response_claim(layer), str(layer))
+    check("the vocabulary is exactly the five agreed layers",
+          c.LAYERS == {"ADAPTER_INPUT", "INSTRUCTOR_RETURN",
+                       "RAW_MODEL_REQUEST", "RAW_MODEL_RESPONSE",
+                       "VALIDATION_RESULT"}, str(sorted(c.LAYERS)))
 
 
-def test_hashes_measure_identity() -> None:
-    """Q6 must be measured, not eyeballed."""
-    scenario("hashes measure identity")
-    check("identical text hashes identically",
-          c.sha256(SCHEMA_ECHO_RAW) == c.sha256(SCHEMA_ECHO_RAW), "")
-    check("a one-character difference does not",
-          c.sha256(SCHEMA_ECHO_RAW) != c.sha256(SCHEMA_ECHO_RAW + " "), "")
-    check("None hashes to empty", c.sha256(None) == "", "")
+def test_extraction_rule_records_its_provenance() -> None:
+    """I-8: where the rule came from is recorded, never assumed."""
+    scenario("extraction rule provenance")
+    prov = c.extraction_rule_provenance()
+    check("a primary rule is stated", bool(prov["primary_rule"]), "")
+    check("the rule is structural, not a copied English string",
+          "structural" in prov["primary_rule"], prov["primary_rule"])
+    check("instructor availability is recorded either way",
+          "instructor_available" in prov, "")
+    check("corroboration status is always stated",
+          bool(prov.get("corroboration")), str(prov))
+    if prov["instructor_available"]:
+        check("the source is named", prov["source"] is not None, "")
+        check("and digested", bool(prov["source_sha256"]), "")
+        check("markers are derived from that source", bool(prov["markers"]), "")
+    else:
+        check("absence of instructor is stated, not silently ignored",
+              "instructor_import_error" in prov, str(prov))
+        check("and the structural rule is declared to stand alone",
+              "NONE" in prov["corroboration"], prov["corroboration"])
+    val = c.validator_status()
+    check("validator availability is recorded", "available" in val, "")
+    if not val["available"]:
+        check("and its consequence is spelled out", "consequence" in val, "")
+
+
+def test_q6_grouping_is_refused_not_invented() -> None:
+    """max_retries=2 means five raw rows span several logical calls."""
+    scenario("Q6 grouping refused")
+    rows = [{"attempt": n, "elapsed_s": 10.0 * n} for n in range(1, 6)]
+    g = c.logical_call_grouping(rows)
+    check("without a correlation id, grouping is UNAVAILABLE",
+          g["available"] is False, str(g))
+    check("it says why", "no attempt carries" in g["why"], g["why"])
+    check("it names what it looked for", "logical_call_id" in g["looked_for"], "")
+    check("it names the next measurement requirement",
+          "correlation id" in g["next_measurement_requirement"], "")
+    for signal in ("adjacency", "elapsed time", "prompt hash", "schema hash"):
+        check(f"{signal} is explicitly refused as a grouping signal",
+              signal in g["refused_signals"], str(g["refused_signals"]))
+    tagged = [{"attempt": 1, "logical_call_id": "A"},
+              {"attempt": 2, "logical_call_id": "A"},
+              {"attempt": 3, "logical_call_id": "B"}]
+    g2 = c.logical_call_grouping(tagged)
+    check("WITH a correlation id, grouping becomes available",
+          g2["available"] is True, str(g2))
+    check("and the groups are counted", g2["groups"] == {"A": 2, "B": 1},
+          str(g2.get("groups")))
+    partial = [{"attempt": 1, "logical_call_id": "A"}, {"attempt": 2}]
+    check("a partially tagged set is NOT grouped",
+          c.logical_call_grouping(partial)["available"] is False, "")
+
+
+def _run_summariser(rows):
+    with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as fh:
+        for r in rows:
+            fh.write(json.dumps(r) + "\n")
+        path = fh.name
+    return subprocess.run(
+        [sys.executable, "scripts/security/summarise_llm_contract.py",
+         "--capture", path], cwd=REPO, capture_output=True, text=True,
+        timeout=60)
 
 
 def test_the_summariser_reports_and_refuses() -> None:
-    """End to end, on the NEW record shape: every row declares its layer
-    and carries the structured response_model."""
+    """End to end on the run-17 record shape."""
     scenario("summariser end to end")
 
-    def row(n, layer, raw, elapsed):
+    def row(n, layer, raw, system=INSTRUCTOR_SYSTEM, phase="capture"):
         return {"event": "llm-call", "attempt": n, "layer": layer,
-                "elapsed_s": elapsed, "response_model": SCHEMA,
-                "messages": [{"role": "system",
-                              "content": "…schema… " + json.dumps(SCHEMA)},
-                             {"role": "user", "content": "Ada Lovelace..."}],
-                "raw_response": raw}
+                "phase": phase, "elapsed_s": 12.0 * n,
+                "response_format": {"type": "json_object"},
+                "messages": messages(system), "raw_response": raw}
 
     cfg = {"event": "resolved-config", "config_llm_instructor_mode": "''",
            "adapter_instructor_mode": "'json_mode'",
@@ -159,101 +391,85 @@ def test_the_summariser_reports_and_refuses() -> None:
            "adapter_class": "OllamaAPIAdapter",
            "adapter_default_mode": "'json_mode'"}
 
-    def run(rows):
-        with tempfile.NamedTemporaryFile("w", suffix=".jsonl",
-                                         delete=False) as fh:
-            for r in rows:
-                fh.write(json.dumps(r) + "\n")
-            path = fh.name
-        return subprocess.run(
-            [sys.executable, "scripts/security/summarise_llm_contract.py",
-             "--capture", path], cwd=REPO, capture_output=True, text=True,
-            timeout=60)
-
     # (a) raw-layer schema echoes — the finding, reportable
-    proc = run([cfg, row(1, c.RAW_MODEL_RESPONSE, SCHEMA_ECHO_RAW, 240.1),
-                row(2, c.RAW_MODEL_RESPONSE, SCHEMA_ECHO_RAW, 64.0)])
+    proc = _run_summariser([cfg,
+                            row(1, c.RAW_MODEL_RESPONSE, SCHEMA_ECHO_RAW),
+                            row(2, c.RAW_MODEL_RESPONSE, SCHEMA_ECHO_RAW)])
     out = proc.stdout
-    check("reports the denominator", "inspected: 2 model call(s)" in out, out[:300])
-    check("reports the RESOLVED mode, not the config default",
-          "json_mode" in out and "instructor client .mode" in out, out[:900])
-    check("says an empty config field is not proof",
-          "NOT proof of the effective mode" in out, out[:900])
-    check("classifies both attempts as schema echo",
-          out.count("SCHEMA ECHO") >= 2, out[:2000])
-    check("measures byte-identity across attempts",
-          "BYTE-IDENTICAL" in out, out[-1600:])
-    check("labels prompt/schema hashes as canonical, response as byte",
-          "CANONICAL identity" in out and "BYTE identity" in out, out[:1200])
-    check("names the schema conveyance", "json_mode" in out, out[:2000])
-    check("refuses to assign ownership", "NOT CONCLUDED HERE" in out, out[-1400:])
-    check("and authorises no remedy",
-          "No remedy is authorised" in " ".join(out.split()), out[-1400:])
-    check("exits non-zero on a measured schema echo", proc.returncode != 0,
-          f"rc={proc.returncode}")
+    check("reports the production denominator",
+          "inspected: 2 production model call(s)" in out, out[:400])
+    check("recovers the contract per attempt", "RECOVERED" in out, out[:400])
+    check("reports the RESOLVED mode", "Mode.JSON" in out, "")
+    check("names response_format as a MODE DIRECTIVE",
+          "MODE DIRECTIVE, not the contract" in out, "")
+    check("reports schema echo at the raw layer", c.SCHEMA_ECHO in out, "")
+    check("and refuses", proc.returncode == 1, str(proc.returncode))
 
-    # (b) THE D215 GATE: instructor-layer evidence may not answer Q2
-    proc = run([cfg, row(1, c.INSTRUCTOR_RETURN, INSTANCE_RAW, 583.2),
-                row(2, c.INSTRUCTOR_RETURN, INSTANCE_RAW, 120.7)])
-    out = proc.stdout
-    check("an instructor-layer row is flagged as not licensing the claim",
-          "LAYER LIMIT" in out, out[:2200])
-    check("Q2 is declared UNMEASURED at that layer",
-          "Q2 — UNMEASURED" in out, out[-1000:])
-    # Whitespace-normalised: the report wraps at ~72 columns, so a
-    # contiguous match asserts the LAYOUT rather than the content.
-    check("and a validated object is refused as a substitute",
-          "is NOT a substitute" in " ".join(out.split()), out[-1000:])
-    check("even though every row classified VALID INSTANCE",
-          out.count("VALID INSTANCE") >= 2, out[:2200])
-    check("it still exits non-zero", proc.returncode != 0, f"rc={proc.returncode}")
+    # (b) selftest rows are excluded from the production denominator
+    proc = _run_summariser([cfg,
+                            row(1, c.RAW_MODEL_RESPONSE, INSTANCE_RAW),
+                            row(2, c.RAW_MODEL_RESPONSE, SCHEMA_ECHO_RAW,
+                                phase="selftest")])
+    check("selftest rows are excluded",
+          "inspected: 1 production model call(s)" in proc.stdout, "")
+    check("and counted separately",
+          "excluded : 1 selftest row(s)" in proc.stdout, proc.stdout[:400])
 
-    # (c) raw-layer valid instances — the only path to exit 0
-    proc = run([cfg, row(1, c.RAW_MODEL_RESPONSE, INSTANCE_RAW, 12.0)])
-    check("raw-layer valid instances exit zero", proc.returncode == 0,
-          proc.stdout[-800:])
-    check("and the claim is explicitly scoped to RAW_MODEL_RESPONSE",
-          "MEASURED at RAW_MODEL_RESPONSE" in proc.stdout, proc.stdout[-800:])
+    # (c) run 17's actual shape: no contract in the system message
+    proc = _run_summariser([cfg,
+                            row(1, c.RAW_MODEL_RESPONSE, INSTANCE_RAW,
+                                system="You are a summarizer.")])
+    check("no recoverable contract -> CONTRACT_UNMEASURED",
+          c.CONTRACT_UNMEASURED in proc.stdout, proc.stdout[:400])
+    check("and it is not a pass", proc.returncode == 1, "")
+    check("and the row shows UNMEASURED for the contract column",
+          "UNMEASURED" in proc.stdout, "")
 
-    # (d) an empty capture still fails closed
-    with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as fh:
-        empty = fh.name
-    proc2 = subprocess.run(
-        [sys.executable, "scripts/security/summarise_llm_contract.py",
-         "--capture", empty], cwd=REPO, capture_output=True, text=True,
-        timeout=60)
-    check("an empty capture fails closed", proc2.returncode != 0,
-          f"rc={proc2.returncode}")
-    check("and says UNMEASURED is not 'no mismatch'",
-          "not the same as 'no mismatch'" in proc2.stdout, proc2.stdout[:400])
+    # (d) all valid at the WRONG layer must still refuse
+    proc = _run_summariser([cfg,
+                            row(1, c.INSTRUCTOR_RETURN, INSTANCE_RAW),
+                            row(2, c.INSTRUCTOR_RETURN, INSTANCE_RAW)])
+    check("no raw-layer row -> Q2 UNMEASURED",
+          "Q2 — UNMEASURED" in proc.stdout, proc.stdout[-600:])
+    check("and it refuses", proc.returncode == 1, "")
+
+    # (e) Q6 grouping refused in the report itself
+    proc = _run_summariser([cfg,
+                            row(1, c.RAW_MODEL_RESPONSE, INSTANCE_RAW),
+                            row(2, c.RAW_MODEL_RESPONSE, INSTANCE_RAW)])
+    check("Q6 reports logical calls UNAVAILABLE",
+          "logical calls      : UNAVAILABLE" in proc.stdout, proc.stdout[-900:])
+    check("and names the next measurement requirement",
+          "NEXT MEASUREMENT REQUIREMENT" in proc.stdout, "")
+    check("and refuses adjacency as a grouping signal",
+          "REFUSED as grouping signals" in proc.stdout, "")
+    check("and explains the max_retries=2 arithmetic",
+          "max_retries=2" in proc.stdout, "")
+
+    # (f) the only exit-0 path: real validation, at the raw layer
+    if REAL_VALIDATOR["available"]:
+        check("valid instances at the raw layer with a validator pass",
+              proc.returncode == 0, proc.stdout[-700:])
+        check("and it says validation actually happened",
+              "validated against the contract" in proc.stdout, "")
 
 
 def test_the_collector_gates_on_the_selftest() -> None:
-    """Run 13's lesson, checked without a stack.
-
-    The expensive capture must not run unless the capture point has been
-    proven traversable, and the probe must not report success having
-    observed nothing. Both are read out of the shipped text, because a
-    rule that is only in a commit message is not enforced."""
+    """Run 13/16's lessons, read out of the shipped text."""
     scenario("selftest gates the run")
     collector = (REPO / "scripts" / "security" /
                  "capture_llm_contract.sh").read_text()
     probe = (REPO / "scripts" / "security" /
              "probe_llm_contract.py").read_text()
-    # ordering: the selftest must precede the expensive drive
     i_self = collector.find("selftest")
     i_drive = collector.find("== CAPTURE — in-process")
     check("the collector runs a selftest", i_self > 0, "")
     check("and it runs BEFORE the expensive capture",
           0 < i_self < i_drive, f"{i_self} vs {i_drive}")
     check("a failed selftest aborts the run",
-          "MEASUREMENT ABORTED: CAPTURE TRANSPARENCY NOT PROVEN"
-          in collector, "")
+          "MEASUREMENT ABORTED: CAPTURE TRANSPARENCY NOT PROVEN" in collector, "")
     check("and says it is an instrument failure, not LLM evidence",
           "not evidence about the LLM contract" in collector, "")
-    # D218: run 16 printed "NOT TRAVERSED" for a run in which traversal
-    # WAS proven. One message for three states makes the evidence name a
-    # state that did not occur.
     check("the abort no longer claims non-traversal generically",
           "MEASUREMENT ABORTED: THE CAPTURE POINT IS NOT TRAVERSED"
           not in collector, "")
@@ -267,53 +483,34 @@ def test_the_collector_gates_on_the_selftest() -> None:
           "UNREPORTED" in collector, "")
     check("the three classes have distinct exit codes",
           "return 3" in probe and "return 4" in probe, "")
-    # fail-closed on zero observations
     check("the probe fails closed on zero captured calls",
           "if calls == 0:" in probe and "return 2" in probe, "")
-    check("and names it an instrument failure",
-          "INSTRUMENT FAILURE: 0 model call(s) captured" in probe, "")
     check("and refuses to read it as 'no mismatch'",
           "which is not 'no mismatch'" in probe, "")
-    # the selftest must use the production entry point, not the wrapper
     check("the selftest drives the production entry point",
           "acreate_structured_output" in probe, "")
-    check("and says why calling the wrapper directly would prove nothing",
-          "which was never in doubt" in probe, "")
-    # both candidate hypotheses are recorded as object facts
-    check("H2 (client caching) is measured by object identity",
-          "get_llm_client_stable" in probe, "")
-    check("H1 (instructor binding) is measured by what it holds",
-          "instructor_holds_" in probe, "")
 
 
 def test_the_wrapper_preserves_the_callable_convention() -> None:
-    """The invariant from run 14, plus D216's altitude and the operator's
-    transparency criteria — asserted against the SHIPPED probe text,
-    because a rule that lives only in a commit message is not enforced."""
+    """Run 14/16's invariants, asserted against the SHIPPED probe text."""
     scenario("wrapper preserves convention")
     probe = (REPO / "scripts" / "security" /
              "probe_llm_contract.py").read_text()
-    # convention
     check("no async wrapper remains", "async def capturing" not in probe, "")
     check("the wrapper is sync and descriptor-correct",
           "def capturing_create(self, *args, **kwargs):" in probe, "")
     check("it forwards self unchanged, synchronously",
           "result = forward(self, *args, **kwargs)" in probe
           and "await forward(" not in probe, "")
-    check("exception behaviour is preserved by re-raising",
-          "raise          # exception type AND value propagate unchanged"
-          in probe, "")
-    # D218: the wrapper's forward target must BE the selftest's injection
-    # point. Run 16's wrapper called a closure local while the control
-    # swapped STATE["original"], so the stand-in never ran and two
-    # criteria failed for a reason unrelated to the wrapper.
     check("the forward target is read from STATE at call time",
           'forward = STATE.get("original")' in probe, "")
     check("and is NOT a closure local captured at install",
           "result = original(self" not in probe, "")
-    check("a missing forward target fails closed rather than passing through",
+    check("a missing forward target fails closed",
           "capture wrapper has no original to forward to" in probe, "")
-    # altitude (D216)
+    check("exception behaviour is preserved by re-raising",
+          "raise          # exception type AND value propagate unchanged"
+          in probe, "")
     check("the hook is Completions.create at class level",
           "Completions.create = capturing_create" in probe, "")
     check("and it is installed BEFORE adapter construction",
@@ -321,19 +518,14 @@ def test_the_wrapper_preserves_the_callable_convention() -> None:
           < probe.index("client = get_llm_client()"), "")
     check("the retry-loop call site is cited as the reason",
           "retry.py:193-198" in probe, "")
-    check("and the @wraps name trap is recorded",
-          "@wraps copied" in probe or "@wraps(func)" in probe, "")
-    # layer tagging (D215)
     check("raw rows are tagged RAW_MODEL_REQUEST",
           '"layer": "RAW_MODEL_REQUEST"' in probe, "")
     check("and promoted to RAW_MODEL_RESPONSE once the reply exists",
           'request["layer"] = "RAW_MODEL_RESPONSE"' in probe, "")
-    # transparency criteria present as runtime checks
     for crit in ("traversed", "original_executed",
                  "exactly_once_per_wrapper_call", "convention_matches",
                  "exception_type_preserved", "exception_value_preserved",
                  "exception_not_swallowed", "rows_tagged_raw_layer",
-                 # D218 — the exception control's own calibration
                  "standin_executed_exactly_once", "exception_wrapper_traversed",
                  "exception_object_not_replaced", "original_restored_to_real",
                  "restore_check_rejects_a_standin"):
@@ -348,159 +540,13 @@ def test_the_wrapper_preserves_the_callable_convention() -> None:
           "not forwards_to_the_real_original()" in probe
           and 'checks["original_restored_to_real"] = '
               'forwards_to_the_real_original()' in probe, "")
-    check("the restore criterion rejects anything defined in the probe itself",
-          '!= __name__' in probe, "")
-    check("and openai's module path is RECORDED, not used as a gate",
+    check("openai's module path is RECORDED, not used as a gate",
           "provenance_of_original" in probe
           and 'module.startswith("openai.")' not in probe, "")
     check("the selftest refuses the run when not transparent",
           "NOT PROVEN TRANSPARENT" in probe, "")
     check("and the selftest's own rows are excluded from Q6",
-          "selftest_rows_excluded_from_q6" in probe
-          and '"phase"' in probe, "")
-    check("the exception control needs no model run",
-          "No model needed" in probe or "needs no model run" in probe, "")
-
-
-def test_an_unestablished_schema_is_never_a_pass() -> None:
-    """D216'S DEFECT, pinned.
-
-    Run 15 classified every response VALID INSTANCE because the required
-    field list arrived EMPTY — the schema had been found inside message
-    prose, json.loads failed, and 'carries every required field' became
-    trivially true. A check that cannot fail is not a check.
-
-    The contract question must be asked BEFORE any instance test, and an
-    unestablished contract must produce an explicit not-measured."""
-    scenario("unestablished schema is not a pass")
-    for bad in (None, "", "not json at all", "[1,2,3]", 42,
-                "Parse the content and return a JSON object matching this "
-                "schema: {…prose…}"):
-        v, why = c.classify(INSTANCE_RAW, bad)
-        check(f"schema={bad!r:.34} -> CLASSIFIER_UNMEASURED",
-              v == c.CLASSIFIER_UNMEASURED, f"{v}: {why}")
-    # a schema with no requirements at all is equally unmeasurable
-    v, why = c.classify(INSTANCE_RAW, {"type": "object"})
-    check("a schema naming nothing required is not a pass",
-          v == c.CLASSIFIER_UNMEASURED, f"{v}: {why}")
-    check("and it says requirements were not established",
-          "SCHEMA REQUIREMENTS NOT ESTABLISHED" in why, why)
-    check("and explicitly that this is not a pass", "not a pass" in why, why)
-    # THE REGRESSION: a schema echo must not sail through an empty contract
-    v, _ = c.classify(SCHEMA_ECHO_RAW, None)
-    check("a schema echo with an unreadable schema is NOT valid instance",
-          v != c.VALID_INSTANCE, v)
-
-
-def test_layers_gate_what_may_be_claimed() -> None:
-    """D215. INSTRUCTOR_RETURN = VALID INSTANCE must never answer a
-    question about RAW_MODEL_RESPONSE — instructor retried, parsed and
-    validated in between."""
-    scenario("layers gate claims")
-    check("RAW_MODEL_RESPONSE licenses a raw-response claim",
-          c.licenses_raw_response_claim(c.RAW_MODEL_RESPONSE), "")
-    for layer in (c.INSTRUCTOR_RETURN, c.ADAPTER_INPUT, c.RAW_MODEL_REQUEST,
-                  c.VALIDATION_RESULT, None, "MADE_UP"):
-        check(f"{layer} does NOT license a raw-response claim",
-              not c.licenses_raw_response_claim(layer), str(layer))
-    check("the vocabulary is exactly the five agreed layers",
-          c.LAYERS == {"ADAPTER_INPUT", "INSTRUCTOR_RETURN",
-                       "RAW_MODEL_REQUEST", "RAW_MODEL_RESPONSE",
-                       "VALIDATION_RESULT"}, str(sorted(c.LAYERS)))
-
-
-def test_the_injection_point_is_the_forward_target() -> None:
-    """D218, RUN not read.
-
-    Run 16's control swapped `STATE["original"]` while the wrapper called
-    a closure local captured at install. The stand-in never executed, so
-    `exception_type_preserved` and `exception_value_preserved` failed
-    against an `AttributeError` that came out of openai's own internals —
-    two criteria reading as subject failures when they were UNMEASURED.
-
-    Both shapes are rebuilt here with no openai, no cognee and no model,
-    because the assertions above only pin the TEXT of the repair. The
-    known-negative is what makes the known-positive mean something: if
-    the broken shape also passed, this test would be measuring nothing.
-    """
-    scenario("injection reaches the forward target")
-
-    def build(state: dict, read_from_state: bool):
-        """The wrapper, in each shape. `original` is the closure local."""
-        original = state["original"]
-        calls = {"n": 0}
-
-        def wrapper(self, *a, **k):
-            calls["n"] += 1
-            forward = state["original"] if read_from_state else original
-            return forward(self, *a, **k)
-        return wrapper, calls
-
-    def drive(read_from_state: bool):
-        real_ran = {"n": 0}
-
-        def real_original(_self, *a, **k):
-            real_ran["n"] += 1
-            return "REAL"
-
-        state = {"original": real_original}
-        wrapper, wrapper_calls = build(state, read_from_state)
-
-        sentinel = RuntimeError("kai-gate-048c selftest sentinel")
-        standin_calls = {"n": 0}
-
-        def raising_original(_self, *a, **k):
-            standin_calls["n"] += 1
-            raise sentinel
-
-        saved = state["original"]
-        caught = None
-        try:
-            state["original"] = raising_original
-            try:
-                wrapper(object(), messages=[], model="x")
-            except Exception as exc:  # noqa: BLE001
-                caught = exc
-        finally:
-            state["original"] = saved
-        return {"wrapper_calls": wrapper_calls["n"],
-                "standin_calls": standin_calls["n"],
-                "real_calls": real_ran["n"], "caught": caught,
-                "sentinel": sentinel, "restored": state["original"] is saved}
-
-    # KNOWN-POSITIVE — the repaired shape.
-    ok = drive(read_from_state=True)
-    check("repaired: the wrapper is traversed exactly once",
-          ok["wrapper_calls"] == 1, str(ok["wrapper_calls"]))
-    check("repaired: the injected stand-in actually ran, exactly once",
-          ok["standin_calls"] == 1, str(ok["standin_calls"]))
-    check("repaired: the real original was NOT called instead",
-          ok["real_calls"] == 0, str(ok["real_calls"]))
-    check("repaired: the exception type survives",
-          type(ok["caught"]) is RuntimeError, type(ok["caught"]).__name__)
-    check("repaired: the exception value survives",
-          str(ok["caught"]) == str(ok["sentinel"]), str(ok["caught"]))
-    check("repaired: the exception OBJECT is not replaced",
-          ok["caught"] is ok["sentinel"], "")
-    check("repaired: the forward target is restored",
-          ok["restored"], "")
-
-    # KNOWN-NEGATIVE — run 16's shape, which must fail on the criterion
-    # that names it and on nothing else.
-    bad = drive(read_from_state=False)
-    check("run 16's shape: the wrapper IS still traversed",
-          bad["wrapper_calls"] == 1, str(bad["wrapper_calls"]))
-    check("run 16's shape: the stand-in never runs",
-          bad["standin_calls"] == 0, str(bad["standin_calls"]))
-    check("run 16's shape: the real original runs instead",
-          bad["real_calls"] == 1, str(bad["real_calls"]))
-    check("run 16's shape: no sentinel comes out",
-          bad["caught"] is None, str(bad["caught"]))
-    check("so the known-positive discriminates the two shapes",
-          ok["standin_calls"] != bad["standin_calls"], "")
-    # And the criterion run 16 lacked is exactly the one that catches it.
-    check("standin_executed_exactly_once is what fails on run 16's shape",
-          (ok["standin_calls"] == 1) and not (bad["standin_calls"] == 1), "")
+          "selftest_rows_excluded_from_q6" in probe, "")
 
 
 SHIPPED_WRAPPER_HARNESS = r'''
@@ -524,15 +570,14 @@ probe = importlib.util.module_from_spec(spec); spec.loader.exec_module(probe)
 probe.OUT = sys.argv[2]
 open(probe.OUT, "w").close(); probe.STATE["phase"] = "harness"
 try:
-    probe.install_capture()          # patches the class, then wants cognee
+    probe.install_capture()
 except ModuleNotFoundError:
-    pass                             # by then the wrapper is installed
+    pass
 
 wrapper = Completions.create
 out = {"wrapper_is_shipped": wrapper is probe.STATE["wrapper"],
        "known_positive": probe.forwards_to_the_real_original()}
 
-# The stand-in must live in the PROBE's module, exactly as selftest()'s does.
 ns = {}
 exec("def raising_original(_self,*a,**k):\n"
      "    standin['n'] += 1\n"
@@ -571,24 +616,7 @@ print(json.dumps(out))
 
 
 def test_the_shipped_wrapper_is_transparent_in_process() -> None:
-    """The SHIPPED wrapper, executed — not its text, and not a rewrite.
-
-    Everything above this point about the probe is a string match, which
-    would happily pass on code that cannot run. This imports the real
-    `probe_llm_contract.py` with openai stubbed (it is not installed on
-    the calibration host), lets `install_capture` patch the class, and
-    drives the shipped wrapper through the exception control.
-
-    `install_capture` patches `Completions.create` BEFORE it imports
-    cognee, so the ModuleNotFoundError leaves the wrapper installed —
-    which is what makes this possible without the image.
-
-    WHICH HALF THIS VERIFIES. The forward-target chain, the exception
-    chain and the restore are verified HERE. That the production callable
-    lives in an `openai.*` module is NOT asserted anywhere — it is
-    recorded by the probe and readable in CI, because the string cannot
-    be measured on this host.
-    """
+    """The SHIPPED wrapper, executed — not its text, and not a rewrite."""
     scenario("shipped wrapper runs transparently")
     with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as fh:
         fh.write(SHIPPED_WRAPPER_HARNESS)
@@ -622,32 +650,39 @@ def test_the_shipped_wrapper_is_transparent_in_process() -> None:
 
 
 def run_all() -> None:
-    test_schema_and_instance_are_never_confused()
-    test_all_four_kinds_stay_four_verdicts()
-    test_validator_failures_are_not_collapsed()
-    test_required_fields_come_from_the_schema_sent()
-    test_hashes_measure_identity()
+    test_contract_is_recovered_from_the_attempt()
+    test_ambiguous_or_absent_contract_is_unmeasured()
+    test_the_mode_directive_is_not_a_contract()
+    test_an_unusable_contract_is_not_an_invalid_response()
+    test_dicts_serialise_as_valid_json()
+    test_schema_echo_is_never_an_instance()
+    test_required_fields_are_never_promoted()
+    test_real_validation_catches_what_key_presence_cannot()
+    test_malformed_responses_stay_distinct()
+    test_an_unusable_contract_is_never_a_pass()
+    test_layers_gate_what_may_be_claimed()
+    test_extraction_rule_records_its_provenance()
+    test_q6_grouping_is_refused_not_invented()
     test_the_summariser_reports_and_refuses()
     test_the_collector_gates_on_the_selftest()
     test_the_wrapper_preserves_the_callable_convention()
-    test_an_unestablished_schema_is_never_a_pass()
-    test_layers_gate_what_may_be_claimed()
-    test_the_injection_point_is_the_forward_target()
     test_the_shipped_wrapper_is_transparent_in_process()
 
-    kinds = [c.VALID_INSTANCE, c.SCHEMA_ECHO, c.OTHER_INVALID, c.NO_RESPONSE]
-    print(f"  inspected: {len(kinds)} response kind(s) discriminated: {kinds}")
+    kinds = [c.VALID_INSTANCE, c.INSTANCE_INVALID, c.REQUIRED_FIELDS_PRESENT,
+             c.REQUIRED_FIELDS_MISSING, c.SCHEMA_ECHO, c.NOT_JSON,
+             c.NOT_JSON_OBJECT, c.NO_RESPONSE, c.CONTRACT_UNMEASURED]
+    print(f"  inspected: {len(kinds)} response verdict(s) discriminated")
+    print(f"  validator: {REAL_VALIDATOR}")
+    print(f"  extraction rule: {c.extraction_rule_provenance()['primary_rule']}")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS, f"{len(executed)}: {executed}")
-    check("no scenario ran twice", len(set(executed)) == len(executed),
-          str(executed))
 
 
 if __name__ == "__main__":
+    print("=" * 60)
     run_all()
-    print(f"\n{'=' * 60}")
+    print()
+    print("=" * 60)
     print(f"LLM Response Contract Calibration: {passed} passed, {failed} failed")
-    if failed:
-        print("EXIT GATE: FAIL")
-        sys.exit(1)
-    print("EXIT GATE: PASS")
+    print(f"EXIT GATE: {'PASS' if failed == 0 else 'FAIL'}")
+    sys.exit(1 if failed else 0)

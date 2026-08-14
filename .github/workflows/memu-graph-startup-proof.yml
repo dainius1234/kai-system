@@ -411,6 +411,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # A real JSON Schema validator, so VALID INSTANCE can mean
+      # "satisfies the captured schema" rather than "has the right
+      # top-level keys". Without it the analyser is not broken — it
+      # degrades to REQUIRED FIELDS PRESENT and says so — but the
+      # strongest verdict becomes unreachable, and the calibration
+      # refuses to certify a path it could not exercise.
+      - name: Install the JSON Schema validator the analyser needs
+        run: python3 -m pip install --quiet jsonschema
+
       - name: The classifier must pass its fitness calibration first
         run: |
           # If it cannot tell a schema definition from an instance of it,
@@ -464,4 +473,82 @@ jobs:
           path: |
             llm-contract.evidence
             llm-contract-logs/
+          if-no-files-found: warn
+
+  # KAI-GATE-048 C — RE-ANALYSIS OF EVIDENCE ALREADY CAPTURED.
+  #
+  # Run 17 crossed the raw-response boundary: five real production calls
+  # were captured with their full `messages`, and D222 established that
+  # each attempt's contract is carried inside its OWN system message. So
+  # the evidence needed to answer Q2 already exists on disk — what failed
+  # was the analyser, not the capture.
+  #
+  # This job therefore spends NO model time. It re-runs only the corrected
+  # analyser against the stored artifact. Re-running the model because
+  # re-running is easier would burn ~8 minutes of GPU-less inference to
+  # re-collect bytes we already have.
+  memu-graph-llm-reanalysis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read          # to read a PREVIOUS run's artifact
+    env:
+      # The run whose raw evidence is being re-analysed. Named here rather
+      # than discovered, because re-analysis must be reproducible against
+      # a fixed body of evidence; a moving "latest" would silently change
+      # the denominator between runs.
+      REANALYSE_RUN_ID: "31821368040"
+      REANALYSE_COMMIT: "f1fdf926b67f99bbef2a48c247b929ac593393c1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the JSON Schema validator the analyser needs
+        run: python3 -m pip install --quiet jsonschema
+
+      - name: The analyser must pass its calibration first
+        run: python3 scripts/test_llm_contract.py
+
+      # ci-toleration: documented-skip
+      - name: Fetch the raw evidence captured by run ${{ env.REANALYSE_RUN_ID }}
+        id: fetch
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: memu-graph-llm-contract
+          run-id: ${{ env.REANALYSE_RUN_ID }}
+          github-token: ${{ github.token }}
+          path: reanalysis
+
+      - name: Re-analyse — NO model call
+        run: |
+          echo "re-analysing run ${REANALYSE_RUN_ID}, commit ${REANALYSE_COMMIT}"
+          echo "this commit: ${GITHUB_SHA}"
+          echo "the EVIDENCE is run ${REANALYSE_RUN_ID}'s; only the ANALYSER"
+          echo "is this commit's. Any verdict below is about that run's"
+          echo "captured bytes, not about this tree's runtime behaviour."
+          echo
+          CAP=reanalysis/llm-contract-logs/capture.jsonl
+          if [ ! -f "$CAP" ]; then
+            # I-1: a missing subject is not a clean result.
+            echo "RE-ANALYSIS NOT PERFORMED: the artifact from run"
+            echo "  ${REANALYSE_RUN_ID} was not retrievable, so there was no"
+            echo "  evidence to analyse. Q2 remains UNMEASURED. This is an"
+            echo "  availability failure, NOT a finding about the LLM."
+            if [ -d reanalysis ]; then
+              echo "  what WAS downloaded:"
+              ls -R reanalysis | head -40
+            else
+              echo "  nothing was downloaded at all."
+            fi
+            exit 2
+          fi
+          echo "  capture: $(wc -c < "$CAP") bytes, $(grep -c . "$CAP") record(s)"
+          python3 scripts/security/summarise_llm_contract.py --capture "$CAP"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: memu-graph-llm-reanalysis
+          path: reanalysis/
           if-no-files-found: warn
