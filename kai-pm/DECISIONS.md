@@ -15738,3 +15738,56 @@ checked is the same class as a claim that is not run (R1).
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * **Gate 1 remains TRANSPARENCY NOT PROVEN** until the repaired
   instrument proves otherwise against the real stack.
+
+---
+
+## D235 — run 22 bound to the repaired tree; awaiting Gate 1
+
+**Run 22 = `31840265412`** · head_sha **`3a13100`** · created
+2026-08-14T20:57:19Z · status `in_progress` at binding time.
+
+Resolved from an authoritative listing, not guessed. Five prior 404s in
+this campaign came from typing a plausible id; every id since has come
+from a listing.
+
+**Binding:** run `31840265412` tests tree `3a13100` — the repaired
+candidate accepted on calibration 258/258 across 19 scenarios, declared
+in-call/out-of-call population, differential exception transparency
+against the real instructor baseline, named mutation proof for both
+repaired criteria, verified restoration after the interrupted mutation
+run, and green policy/registry with a clean tree.
+
+Nothing else in the repository changed between `3a13100` and this entry.
+
+### What this run may and may not license (D231, unchanged)
+
+| Gate 1 lifecycle | consequence |
+|---|---|
+| `CORRELATION_VALID` | evaluate the retry population |
+| INCOMPLETE / CONTRADICTORY / UNMEASURED | **stop** — Q6 UNMEASURED |
+| VALID **but no logical call retried** | **Q6 UNMEASURED** — the required population did not occur |
+
+Within-call behaviour is neither inspected nor quoted unless **both**
+prerequisites hold. No definition is weakened because the instrument is
+finally close to working.
+
+### Logged for the later methodology pass — NOT acted on now
+
+> **An interrupted mutation or calibration run can contaminate the
+> instrument itself. Restoration must be verified, not assumed.**
+
+Earned this turn: the mutation script hit the command timeout after
+mutating the probe and before restoring it. Had the next action been a
+push or a run, the mutated instrument would have shipped while the
+transcript said "restored". Sibling of task #59 (a gate's triggers are
+part of the gate), task #60 (a refusal path must return a verdict), and
+D226/D227 (observer liveness vs subject observation) — all four are the
+same family: *the mechanism being present is not the mechanism having
+executed and produced its verdict.*
+
+### Status — unchanged
+
+* **Q1** partial · **Q2 MEASURED — runs 17 + 18** · **cross-run
+  recurrence MEASURED** · **Q6 UNMEASURED** · ownership **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
+* **Gate 1: TRANSPARENCY NOT PROVEN** until run 22 says otherwise.
