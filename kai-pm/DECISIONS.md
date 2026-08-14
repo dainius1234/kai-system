@@ -16104,3 +16104,106 @@ actually present license either claim.
   only** · **Q6 UNMEASURED** · ownership **unmoved**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
 * **Run 23 = 31842405123 — OBSERVER_ALIVE / OBSERVATION_PENDING.**
+
+---
+
+## D241 — run 23: Gate 1 VALID, Gate 2 EMPTY. Q6 stays UNMEASURED
+
+Run **31842405123** · tree **`3d59357`** · job **94901894269** ·
+`workflow_dispatch`, attempt 1. D238's gates, in order.
+
+### Gate 1 — CORRELATION_VALID
+
+```
+selftest exit: 0    SELFTEST-CLASS: TRANSPARENT
+CAPTURE POINT PROVEN TRANSPARENT: 30 criteria
+
+Q6z. CORRELATION LIFECYCLE: CORRELATION_VALID
+  b5bde2e5a7c84454   CORRELATION_VALID   1 attempt(s)
+  a20eee5af13b4cbb   CORRELATION_VALID   1 attempt(s)
+```
+
+The instrument worked. Second consecutive real-stack `CORRELATION_VALID`.
+
+### Gate 2 — the required population DID NOT OCCUR
+
+```
+raw attempts       : 2
+logical calls      : 2  -> {b5bde2e5…: 1, a20eee5a…: 1}
+calls that RETRIED : 0
+
+NO logical call retried. A single-attempt call gives NO
+retry-reproducibility evidence — this is not 'the retry behaved',
+it is 'no retry was observed'.
+```
+
+**Stop here.** D238 criterion 2, precommitted:
+
+> At least one logical call must retry. Zero retries → Q6 remains
+> UNMEASURED, neither pass nor failure.
+
+No within-call comparison performed. No cross-run comparison performed.
+**Q6 UNMEASURED.**
+
+This is the outcome the precommitment existed to protect. Run 23 is a
+valid experiment that did not contain the population Q6 needs — not a
+failed experiment, and emphatically not a licence to reason from run 22
+alone.
+
+### Q2 — a third correlated data point, unchanged in kind
+
+```
+Q2 at RAW_MODEL_RESPONSE: 2 attempt(s), verdicts SCHEMA ECHO
+```
+
+Both attempts, under two different contracts (`89def7469d`,
+`fd7b68067d` — the same two contract hashes as run 22), returned the
+schema. Broad-class recurrence now rests on runs **17, 18, 22, 23**.
+
+### What differed, reported as a difference, not smoothed
+
+Run 22 drove **5 attempts across 3 logical calls, 2 of which retried**.
+Run 23 drove **2 attempts across 2 logical calls, none retried** — under
+byte-identical declared inputs (D239, 34/34). The pipeline did less work
+and no call needed a second attempt.
+
+**Why is not established.** Run 22 is not re-read in this light, and no
+mechanism is proposed here.
+
+### Runtime identities — from evidence that already existed (D240)
+
+| axis | run 23 |
+|---|---|
+| model | `qwen2.5:3b` |
+| endpoint | `http://ollama:11434/v1` |
+| adapter | `OllamaAPIAdapter`, `json_mode`, `<Mode.JSON: 'json_mode'>` |
+| openai | `2.54.0` |
+| pinned | instructor 1.15.1 · cognee 1.1.3 · openai 2.54.0 · litellm 1.96.2 |
+| image | `sha256:5fafd8cc6fb989aee90c227fc9d1a31e1db2757522de82f347c0710…` |
+
+The **image digest differs from run 22's** — expected, since each run
+builds its own. Comparing digests across runs is therefore not an
+equality axis here; it is the recorded identity of each instance. Run 22's
+digest was not extracted at the time, so **that axis is unestablished for
+the pair** rather than assumed equal.
+
+Standing wording:
+
+> Run 22 and run 23 are **repository-input equivalent by blob identity**
+> and **execution-instance independent by fresh runner, build, stack and
+> model load.**
+
+### Also observed, without interpretation
+
+Run 23's `memu-graph-acceptance` failed at **Phase 1 acceptance** (step 7);
+in run 22 that step succeeded and only the verdict step failed. Recorded
+as a fact about run 23. Outside this experiment; not diagnosed here.
+
+### Status
+
+* **Q1** partial · **Q2 MEASURED — runs 17, 18, 22, 23** · **broad-class
+  recurrence MEASURED (4 captures)** · **within-call retry
+  reproducibility MEASURED — run 22 only** · **cross-run retry-level
+  reproducibility / Q6 — UNMEASURED, denominator still 1** · ownership
+  **unmoved**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN, separate.**
