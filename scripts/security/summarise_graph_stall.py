@@ -179,7 +179,14 @@ def cpu_verdict(rows: List[dict]) -> Tuple[str, str]:
     if growing and delegate:
         return "SLOW LLM WORK", detail + " — computing AND talking to the delegate"
     if not growing and delegate:
-        return "WAITING ON DELEGATE", detail + " — blocked on ollama, not computing"
+        # EVIDENCE-LANGUAGE HYGIENE (D204). This said "blocked on ollama,
+        # not computing", which is stronger than the evidence: a socket
+        # plus low local CPU shows the service was WAITING on its
+        # delegate path — it does not isolate inference from queueing,
+        # from either branch of the gather, or from retries above the
+        # socket. Output must not outrun what was banked.
+        return ("WAITING ON DELEGATE",
+                detail + " — waiting on Ollama delegate path; local CPU low")
     if not growing and not delegate:
         return "STUCK ELSEWHERE", detail + " — not computing and not connected"
     return "LOCAL COMPUTE", detail + " — computing with no delegate connection"

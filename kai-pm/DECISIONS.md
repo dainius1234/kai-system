@@ -12582,3 +12582,144 @@ defect. Closed as a self-audit, not carried as a workstream.
 | timeouts | **UNCHANGED** |
 
 Neither 048 nor 050 was touched as part of this closure.
+
+---
+
+## D205
+
+**2026-08-14 — KAI-GATE-050 REMEDIATED at the predicate, not at the
+instance. Runtime proof pending the next run.**
+
+Operator-authorised sequence: wording fix → define the return contract →
+remediate by validating terminal pipeline state → prove both directions
+→ only then KAI-GATE-048's performance defect.
+
+### 1. #49 wording correction — done
+
+`summarise_graph_stall.py` said *"blocked on ollama, not computing"*. Now
+*"waiting on Ollama delegate path; local CPU low"*, matching D204.
+Evidence language in code output must not outrun what was banked.
+
+### 2. The `cognify()` return contract, read from cognee 1.1.3
+
+```
+cognify(datasets=[...])                    # run_in_background=False (default,
+                                           #   api/v1/cognify/cognify.py:53)
+  -> run_pipeline_blocking(...)            # layers/pipeline_execution_mode.py
+  -> Dict[dataset_id -> the LAST run_info yielded for that dataset]
+     or that bare run_info when it carries no dataset_id
+```
+
+Every `run_info` is a `PipelineRunInfo` with a `.status` string
+(`models/PipelineRunInfo.py`):
+
+```
+PipelineRunStarted   PipelineRunYield   PipelineRunCompleted
+PipelineRunAlreadyCompleted             PipelineRunErrored
+```
+
+Because `run_pipeline_blocking` **overwrites** its per-dataset entry on
+every yield, the retained status **is** the terminal state. That is what
+makes this checkable at all.
+
+**Verified, not assumed:** `run_in_background: bool = False`. Had it
+defaulted to True the endpoint would have accepted-semantics and the
+entire analysis would change.
+
+### 3. The remediation — a class, not the observed instance
+
+`memu-graph/cognify_result.py` (new, pure stdlib, no third-party imports)
+asks exactly one question:
+
+> **Did cognee return a terminal successful pipeline result?**
+
+`TERMINAL_SUCCESS = {PipelineRunCompleted, PipelineRunAlreadyCompleted}`.
+Everything else refuses success — including statuses that do not exist
+yet, a run left mid-flight, an empty result, and a shape the code cannot
+read (I-1: an unreadable input is a failure to answer, not a pass —
+precisely how the original defect worked).
+
+**It never mentions `PipelineRunFailedError`.** Hard-coding that would
+have fixed run 9 and stayed blind to the next mode. Asserted: the failure
+text for an errored pipeline does not contain that name.
+
+`AlreadyCompleted` is deliberately a **success** — re-ingesting unchanged
+data is a legitimate no-op, and calling it a failure would break
+idempotent callers to fix a different bug.
+
+`memu-graph/app.py` now assigns cognify's return value and evaluates it.
+**The existing exception handler stays**: it is correct for what it can
+see, and the defect was never that it was wrong — it was that it could
+not fire for a returned failure.
+
+### 4. The external status — a deliberate choice, isolated to one line
+
+`INGEST_FAILURE_STATUS = 502`, a single named constant used by both
+paths.
+
+502 is kept because the endpoint **already declared it** for a raised
+cognify failure, and a caller must not have to distinguish *"cognee
+raised"* from *"cognee returned a failure"* — the same event to a client.
+The pre-existing branch is evidence of intended failure semantics, **not
+proof that every returned pipeline failure must map to 502**. Whether 502
+is the right external contract for `/graph/ingest` remains a separate
+deliberate decision; changing it is one line, by construction.
+
+### 5. Calibration, and proof it can fail
+
+`scripts/test_cognify_result.py` — **29 assertions / 7 scenarios**, wired
+into `make test-cognify-result` and `test-uh`, registered, and run as the
+contract job's first step.
+
+Both directions: terminal success passes (without this the predicate
+could simply always refuse and every other assertion would still be
+green); the reproduced mixed result — `add` COMPLETED, `cognify`
+ERRORED — refuses and names the failing dataset.
+
+**Proof it can fail (R2 — run, not written).** The original defect was
+reinjected (`bad = {}`, i.e. absence of an exception equals success):
+
+```
+FAIL: 'SomeFutureCogneeStatus' is not terminal success
+FAIL: a bare errored run_info is NOT success
+Cognify Result Predicate Calibration: 19 passed, 10 failed
+EXIT GATE: FAIL
+```
+
+Restored: `29 passed, 0 failed`.
+
+### 6. What proves it at runtime — already built
+
+No new instrument is needed for step 4. `measure_ingest_contract.sh` +
+`summarise_ingest_contract.py` already classify all four cells, and the
+fix moves the observed one:
+
+| internal | external | verdict |
+|---|---|---|
+| before | `cognify` ERRORED + **200** | SUCCESS-SHAPED FAILURE (gate fails) |
+| expected after | `cognify` ERRORED + **502** | **CONSISTENT — failure propagated** (gate passes) |
+
+The gate that reproduced the defect is the same gate that will show it
+propagating truthfully — and its known-positive already asserts that a
+failure correctly propagated as 502 must exit **zero**, so it cannot
+merely be banning failed pipelines.
+
+### 7. `cognify_result.py` is a BUILD INPUT
+
+Added to the Dockerfile (`COPY memu-graph/cognify_result.py`) and to the
+workflow's `paths:` filter. `app.py` imports it at module scope, so an
+image missing it fails at **import**, not at request time. Omitting it
+from the filter would have been commit 924a600's defect exactly — a
+repaired input absent from the filter of the job that consumes it.
+
+### Standing
+
+* **KAI-GATE-050 — OPEN.** Remediated in source and calibrated;
+  **runtime propagation NOT YET PROVEN**. Rule 7: it closes on evidence,
+  not on a landed fix.
+* **KAI-GATE-048 C — BLOCKED.** Untouched. The performance/semantic
+  pipeline defect is next, after 050's runtime proof.
+* **KAI-GATE-049 — CLOSED** (diagnostic complete, condition
+  unremediated).
+* No timeout change. No model change. No cognee modification. Phase 2 not
+  begun.

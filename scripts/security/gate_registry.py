@@ -890,6 +890,24 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=False,
          in_workflows=("memu-graph-startup-proof.yml",),
          findings=("KAI-GATE-050",)),
+    # KAI-GATE-050 REMEDIATION. The predicate itself lives in
+    # memu-graph/cognify_result.py -- production code, not a check -- so
+    # what is registered here is the suite that proves it fires. Without
+    # this entry the suite would be an enforced test nobody declared.
+    Gate(module="test_cognify_result",
+         kind=GATE,
+         summary="did cognee return a TERMINAL SUCCESSFUL pipeline "
+                 "result? Both directions, plus a status the predicate "
+                 "has never been taught -- the rule is a class, not the "
+                 "one failure observed; hard-coding PipelineRunFailedError "
+                 "would have fixed run 9 and stayed blind to the next mode",
+         inputs=(),
+         denominator=r"inspected: \d+ terminal-success status\(es\) accepted",
+         proven_by="scripts/test_cognify_result.py",
+         calibrated_by="scripts/test_cognify_result.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-050",)),
     Gate(module="summarise_ingest_contract",
          kind=GATE,
          summary="correlates cognee's OWN terminal pipeline status with "

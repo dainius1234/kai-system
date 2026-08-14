@@ -27,8 +27,8 @@
 |---|---|
 | **Services** | 61 Docker containers |
 | **Test targets** | 91 (`make test-core`) |
-| **Individual tests** | 4,594 (`def test_` across 229 files) |
-| **Python LOC** | ~147,780 |
+| **Individual tests** | 4,601 (`def test_` across 230 files) |
+| **Python LOC** | ~148,128 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 45 |
 | **Failures** | 0 |

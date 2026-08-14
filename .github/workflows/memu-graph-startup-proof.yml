@@ -47,6 +47,7 @@ on:
       - memu-graph/Dockerfile
       - memu-graph/requirements.txt
       - memu-graph/app.py
+      - memu-graph/cognify_result.py
       - docker-compose.full.yml
 
 permissions:
@@ -323,8 +324,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: The correlation analyser must pass its calibration first
-        run: python3 scripts/test_ingest_contract.py
+      - name: The predicate and the analyser must pass calibration first
+        run: |
+          # The predicate is what memu-graph now uses to decide success.
+          # An uncalibrated one would decorate a verdict, not make it.
+          python3 scripts/test_cognify_result.py
+          python3 scripts/test_ingest_contract.py
 
       - name: Mint an ephemeral database password for this run
         run: |

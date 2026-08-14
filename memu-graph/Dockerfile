@@ -12,6 +12,9 @@ RUN addgroup --system app && adduser --system --ingroup app app
 COPY common/ ./common/
 COPY security/ ./security/
 COPY memu-graph/app.py ./app.py
+# KAI-GATE-050's success predicate. app.py imports it at module
+# scope, so an image without it fails at import, not at request time.
+COPY memu-graph/cognify_result.py ./cognify_result.py
 
 RUN mkdir -p /data/cognee /data/hf_cache /data/home && chown -R app:app /data/cognee /data/hf_cache /data/home
 ENV SYSTEM_ROOT_DIRECTORY=/data/cognee/system
