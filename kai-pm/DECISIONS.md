@@ -12905,3 +12905,117 @@ longer for invalid output.
 | **KAI-GATE-048 C** | **BLOCKED — real graph extraction does not complete successfully** (one blocker) |
 | **KAI-GATE-049** | CLOSED — diagnostic complete, condition unremediated |
 | **KAI-GATE-050** | **CLOSED — remediated + runtime-proven for failure propagation**; success direction calibration-proven, inherited by 048 |
+
+---
+
+## D208
+
+**2026-08-14 — KAI-GATE-048 C: Q1/Q2/Q6 capture instrument built and
+calibrated. Observation only. Not yet run.**
+
+Authorised scope: establish what the structured-output adapter sends to
+`qwen2.5:3b`, what the model returns on each attempt, and whether the
+same wrong-object response reproduces. **Stop after Q1/Q2/Q6.**
+
+### Observation-only, by construction
+
+`probe_llm_contract.py` wraps the adapter's own
+`chat.completions.create` with a **strict pass-through**: same `*args`,
+same `**kwargs`, original object returned unaltered. It changes no
+prompt, schema, instructor mode, retry count, timeout, model,
+temperature or network path.
+
+**Why in-process rather than a proxy or a patched service:** a proxy
+between memu-graph and ollama would change the very topology under
+observation and make the measurement about the proxy; patching the live
+uvicorn process would modify a running service. Instead the probe runs in
+the **same image with the same environment**, imports cognee as `app.py`
+does, and drives the same `add` + `cognify` path — so the adapter, its
+resolved mode and its config are the real ones. Patching at the innermost
+client also makes **each instructor retry its own record**, which is what
+Q2 requires.
+
+### The resolved mode is READ, never inferred
+
+The operator's caution is encoded: `llm_instructor_mode` defaults to `""`
+in cognee's config and the ollama adapter falls back to `"json_mode"` —
+**an empty config field is not proof of the effective mode.** The capture
+records four values side by side (config field, adapter attribute, class
+default, and `mode` read off the instructor client the adapter actually
+built) and the report prints all four with that warning in the output.
+
+**No conclusion that `json_mode` is the defect.** That it is configurable
+proves only that there is another variable to measure.
+
+### The fitness condition is enforced, not decorative
+
+> If the instrument cannot distinguish schema-definition from
+> schema-instance, it is not fit for this question.
+
+`classify_llm_response.py` is a pure, host-testable classifier returning
+four verdicts — `VALID INSTANCE`, `SCHEMA ECHO`,
+`OTHER INVALID STRUCTURE`, `NO RESPONSE`. **Instance-validity is tested
+FIRST**: a schema definition is also a JSON object of strings, so a lax
+instance check applied second would swallow it.
+
+Required field names are **derived from the schema actually sent** (R5),
+not from a tuple kept beside the classifier — so a schema change cannot
+leave it quietly measuring the old one.
+
+**Validator failures are not collapsed.** A schema echo, a wrong-key
+object and non-JSON prose are all "invalid" to pydantic and are three
+distinct verdicts here, because they have three different owners.
+
+**Proof it can fail (R2 — run, not written).** Collapsing schema-echo
+into the generic invalid verdict:
+
+```
+FAIL: the schema is SCHEMA ECHO
+FAIL: four inputs give four distinct verdicts —
+      {'schema': 'OTHER INVALID STRUCTURE', 'other': 'OTHER INVALID STRUCTURE', ...}
+FAIL: schema echo is not the same as a wrong-key object
+LLM Response Contract Calibration: 27 passed, 6 failed   EXIT GATE: FAIL
+```
+
+Restored: **33 passed, 0 failed / 6 scenarios**.
+
+### Reproducibility is measured, not eyeballed
+
+sha256 of prompt, schema and raw response per attempt. The report states
+distinct-hash counts and only says *"BYTE-IDENTICAL"* when the measure
+supports it; when responses differ byte-wise but share a verdict it says
+so explicitly, so distinct failures are visibly not being collapsed.
+
+The schema is located wherever the mode puts it — `response_format`,
+`tools`, or embedded in the messages — because looking in only one place
+would report "no schema sent" for a mode that merely carries it
+elsewhere (R5, one level up).
+
+### What the report refuses
+
+Ownership between prompt construction, adapter mode selection, model
+compliance and the validator is **NOT CONCLUDED** by the instrument. It
+prints the evidence and says so. It authorises no mode change, model
+swap, timeout or retry change, schema edit, or validator change.
+
+An empty capture **fails closed** and says UNMEASURED is not the same as
+"no mismatch".
+
+### Two registry refusals, both correct
+
+* `classify_llm_response` was registered and rejected as a **PHANTOM** —
+  the registry counts only `scripts/security/*.py` that define `main()`,
+  and this is a pure library. Its own docstring says helpers need no
+  entry. **Registering it was my error; the entry was removed.**
+* `probe_llm_contract` has a `main()` and so **must report a
+  denominator** (I-2). It now prints
+  `inspected: N model call(s) captured`, declared in the registry.
+
+### Standing
+
+* **KAI-GATE-048 C — BLOCKED**, real graph extraction does not complete
+  successfully. Instrument built; **Q1/Q2/Q6 not yet measured**.
+* **KAI-GATE-049 — CLOSED.** **KAI-GATE-050 — CLOSED** (failure
+  propagation runtime-proven; success direction inherited here).
+* No timeout increase, no model swap, no retry increase, no schema
+  change, no cognee validation change, no Phase 2.

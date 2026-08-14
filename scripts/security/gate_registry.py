@@ -950,6 +950,64 @@ REGISTRY: Tuple[Gate, ...] = (
                         "`docker compose exec`, which the workflow parse "
                         "cannot see as an invocation of this module",
          findings=("KAI-GATE-050",)),
+    # KAI-GATE-048 C, Q1/Q2/Q6 capture. Observation only -- it changes
+    # no mode, model, timeout, retry, schema, validation or topology.
+    Gate(module="test_llm_contract",
+         kind=GATE,
+         summary="a schema DEFINITION and an INSTANCE of it must never "
+                 "collapse to one verdict -- the observed failure is the "
+                 "first wearing the shape of the second -- and a schema "
+                 "echo, a wrong-key object and no response must stay three "
+                 "verdicts, because they have three different owners",
+         inputs=(),
+         denominator=r"inspected: \d+ response kind\(s\) discriminated",
+         proven_by="scripts/test_llm_contract.py",
+         calibrated_by="scripts/test_llm_contract.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="summarise_llm_contract",
+         kind=REPORT,
+         summary="the per-attempt table -- effective structured-output "
+                 "mode read at runtime rather than inferred from config, "
+                 "plus prompt/schema/response hashes so reproducibility is "
+                 "measured not eyeballed; assigns NO ownership between "
+                 "prompt construction, adapter mode, model compliance and "
+                 "the validator",
+         inputs=(),
+         denominator=r"inspected: \d+ model call\(s\)",
+         probe=False,
+         probe_skip_reason="requires a capture file produced by driving "
+                           "cognee in-process inside the memu-graph "
+                           "image; every branch is asserted on synthetic "
+                           "capture files in scripts/test_llm_contract.py",
+         proven_by="scripts/test_llm_contract.py",
+         calibrated_by="scripts/test_llm_contract.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="probe_llm_contract",
+         kind=REPORT,
+         summary="runs INSIDE the image: wraps the adapter's own client "
+                 "method with a strict pass-through, recording every "
+                 "attempt's request and raw response plus the RESOLVED "
+                 "instructor mode; alters no argument and returns the "
+                 "original object",
+         inputs=(),
+         denominator=r"inspected: \d+ model call\(s\) captured",
+         probe=False,
+         probe_skip_reason="imports cognee and drives a real pipeline "
+                           "inside a running memu-graph container; on the "
+                           "host there is no cognee, no adapter and no "
+                           "delegate to observe",
+         proven_by="scripts/test_llm_contract.py",
+         in_policy_check=False,
+         in_workflows=(),
+         pending_wiring="invoked by "
+                        "scripts/security/capture_llm_contract.sh via "
+                        "`docker compose exec`, which the workflow parse "
+                        "cannot see as an invocation of this module",
+         findings=("KAI-GATE-048",)),
     Gate(module="report_runtime_topology",
          kind=REPORT,
          summary="what the tree DEFINES, what it GATES, and what a "

@@ -44,6 +44,10 @@ on:
       - scripts/security/measure_ingest_contract.sh
       - scripts/security/probe_ingest_contract.py
       - scripts/security/summarise_ingest_contract.py
+      - scripts/security/capture_llm_contract.sh
+      - scripts/security/probe_llm_contract.py
+      - scripts/security/classify_llm_response.py
+      - scripts/security/summarise_llm_contract.py
       - memu-graph/Dockerfile
       - memu-graph/requirements.txt
       - memu-graph/app.py
@@ -382,4 +386,70 @@ jobs:
           path: |
             ingest-contract.evidence
             contract-stage-logs/
+          if-no-files-found: warn
+
+  # KAI-GATE-048 C — Q1/Q2/Q6 CAPTURE. OBSERVATION ONLY. No instructor
+  # mode, model, timeout, retry, schema, cognee validation or topology
+  # change. Stops after Q1/Q2/Q6 are measured; assigns no ownership.
+  memu-graph-llm-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OLLAMA_MODEL: qwen2.5:3b
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The classifier must pass its fitness calibration first
+        run: |
+          # If it cannot tell a schema definition from an instance of it,
+          # it is not fit for this question and must not decorate a table.
+          python3 scripts/test_llm_contract.py
+
+      - name: Mint an ephemeral database password for this run
+        run: |
+          printf 'DB_PASSWORD=ci-ephemeral-%s\n' \
+            "$(head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20)" \
+            >> "$GITHUB_ENV"
+
+      - name: Free up runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
+          df -h /
+
+      - name: Build the memu-graph image
+        run: docker compose -f docker-compose.full.yml build memu-graph
+
+      # ci-toleration: documented-skip
+      - name: Capture the structured-output request and response
+        if: always()
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: bash scripts/security/capture_llm_contract.sh
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker-compose.full.yml down -v || true
+
+      - name: Evidence summary (printed last so it survives truncation)
+        if: always()
+        run: |
+          echo "commit ${GITHUB_SHA}"
+          echo
+          cat llm-contract.evidence 2>/dev/null \
+            || echo "  (not executed = UNKNOWN, not clean)"
+
+      # ci-toleration: documented-skip
+      - name: Q1/Q2/Q6 — request, response, reproducibility
+        if: always()
+        run: |
+          python3 scripts/security/summarise_llm_contract.py \
+            --capture llm-contract-logs/capture.jsonl
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: memu-graph-llm-contract
+          path: |
+            llm-contract.evidence
+            llm-contract-logs/
           if-no-files-found: warn
