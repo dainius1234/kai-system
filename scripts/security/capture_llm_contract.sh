@@ -61,6 +61,29 @@ if [ "$health_rc" -ne 0 ]; then
   exit 2
 fi
 
+# STEP 1 — PROVE THE HOOK IS TRAVERSED BEFORE SPENDING THE RUN.
+# Run 13 burned ~9 minutes on a hook that was installed and never
+# reached. This drives ONE controlled call through the adapter's own
+# production entry point and requires a capture record. It is cheap, and
+# it happens before anything expensive.
+record "== CAPTURE-POINT SELFTEST — is the hook actually on the path? =="
+timeout 300 docker compose -f "$COMPOSE" exec -T "$SERVICE" \
+    python - selftest < scripts/security/probe_llm_contract.py \
+    > "$LOGDIR/selftest.log" 2>&1
+selftest_rc=$?
+record "  selftest exit: ${selftest_rc}"
+tail -n 6 "$LOGDIR/selftest.log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+if [ "$selftest_rc" -ne 0 ]; then
+  record ""
+  record "MEASUREMENT ABORTED: THE CAPTURE POINT IS NOT TRAVERSED."
+  record "  Q1/Q2/Q6 were NOT measured. This is an INSTRUMENT failure,"
+  record "  not evidence about the LLM contract, and no full capture run"
+  record "  was spent on it."
+  docker compose -f "$COMPOSE" down -v > "$LOGDIR/down.log" 2>&1 || true
+  exit 2
+fi
+record ""
+
 record "== CAPTURE — in-process, same image, same environment =="
 timeout "$BUDGET" docker compose -f "$COMPOSE" exec -T "$SERVICE" \
     python - < scripts/security/probe_llm_contract.py \

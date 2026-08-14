@@ -26,7 +26,7 @@ import classify_llm_response as c  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 6
+EXPECTED_SCENARIOS = 7
 executed: list[str] = []
 
 
@@ -194,6 +194,48 @@ def test_the_summariser_reports_and_refuses() -> None:
           "not the same as 'no mismatch'" in proc2.stdout, proc2.stdout[:400])
 
 
+def test_the_collector_gates_on_the_selftest() -> None:
+    """Run 13's lesson, checked without a stack.
+
+    The expensive capture must not run unless the capture point has been
+    proven traversable, and the probe must not report success having
+    observed nothing. Both are read out of the shipped text, because a
+    rule that is only in a commit message is not enforced."""
+    scenario("selftest gates the run")
+    collector = (REPO / "scripts" / "security" /
+                 "capture_llm_contract.sh").read_text()
+    probe = (REPO / "scripts" / "security" /
+             "probe_llm_contract.py").read_text()
+    # ordering: the selftest must precede the expensive drive
+    i_self = collector.find("selftest")
+    i_drive = collector.find("== CAPTURE — in-process")
+    check("the collector runs a selftest", i_self > 0, "")
+    check("and it runs BEFORE the expensive capture",
+          0 < i_self < i_drive, f"{i_self} vs {i_drive}")
+    check("a failed selftest aborts the run",
+          "MEASUREMENT ABORTED: THE CAPTURE POINT IS NOT TRAVERSED"
+          in collector, "")
+    check("and says it is an instrument failure, not LLM evidence",
+          "not evidence about the LLM contract" in collector, "")
+    # fail-closed on zero observations
+    check("the probe fails closed on zero captured calls",
+          "if calls == 0:" in probe and "return 2" in probe, "")
+    check("and names it an instrument failure",
+          "INSTRUMENT FAILURE: 0 model call(s) captured" in probe, "")
+    check("and refuses to read it as 'no mismatch'",
+          "which is not 'no mismatch'" in probe, "")
+    # the selftest must use the production entry point, not the wrapper
+    check("the selftest drives the production entry point",
+          "acreate_structured_output" in probe, "")
+    check("and says why calling the wrapper directly would prove nothing",
+          "which was never in doubt" in probe, "")
+    # both candidate hypotheses are recorded as object facts
+    check("H2 (client caching) is measured by object identity",
+          "get_llm_client_stable" in probe, "")
+    check("H1 (instructor binding) is measured by what it holds",
+          "instructor_holds_" in probe, "")
+
+
 def run_all() -> None:
     test_schema_and_instance_are_never_confused()
     test_all_four_kinds_stay_four_verdicts()
@@ -201,6 +243,7 @@ def run_all() -> None:
     test_required_fields_come_from_the_schema_sent()
     test_hashes_measure_identity()
     test_the_summariser_reports_and_refuses()
+    test_the_collector_gates_on_the_selftest()
 
     kinds = [c.VALID_INSTANCE, c.SCHEMA_ECHO, c.OTHER_INVALID, c.NO_RESPONSE]
     print(f"  inspected: {len(kinds)} response kind(s) discriminated: {kinds}")

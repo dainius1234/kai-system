@@ -98,9 +98,28 @@ def install_capture() -> dict:
     instructor_mode = getattr(aclient, "mode", None)
     resolved["instructor_client_mode"] = repr(instructor_mode)
 
-    # The innermost OpenAI async client instructor wraps. Patching HERE
-    # sees each retry as its own call, which is what Q2 needs.
+    # HYPOTHESIS EVIDENCE, gathered by introspection alone — no model
+    # call, no cost. Run 13 proved that installing a hook is not proof
+    # that execution traverses it, so the two candidate mechanisms are
+    # recorded as object facts rather than argued about:
+    #   H1  instructor binds the create function at construction, so a
+    #       later attribute replacement is never consulted;
+    #   H2  get_llm_client() caching hands out an object other than the
+    #       one used during cognify.
     inner = getattr(aclient, "client", None)
+    resolved["adapter_id"] = id(client)
+    resolved["aclient_id"] = id(aclient)
+    resolved["inner_client_id"] = id(inner)
+    # H2: does a second call return the same object?
+    second = get_llm_client()
+    resolved["get_llm_client_stable"] = (id(second) == id(client))
+    resolved["second_adapter_id"] = id(second)
+    # H1: does instructor hold its own bound reference?
+    for attr in ("create_fn", "func", "_create", "create"):
+        held = getattr(aclient, attr, None)
+        if held is not None:
+            resolved[f"instructor_holds_{attr}"] = repr(held)[:200]
+
     completions = getattr(getattr(inner, "chat", None), "completions", None)
     if completions is None or not hasattr(completions, "create"):
         resolved["capture"] = "NOT INSTALLED — could not locate the inner client"
@@ -108,9 +127,10 @@ def install_capture() -> dict:
         return resolved
 
     original = completions.create
-    state = {"attempt": 0}
+    state = {"attempt": 0, "hooks_fired": set()}
 
     async def capturing_create(*args, **kwargs):
+        state["hooks_fired"].add("inner.chat.completions.create")
         state["attempt"] += 1
         attempt = state["attempt"]
         started = time.monotonic()
@@ -150,12 +170,117 @@ def install_capture() -> dict:
         return result
 
     completions.create = capturing_create
-    resolved["capture"] = "INSTALLED at chat.completions.create"
+
+    # BOTH candidate boundaries are hooked, because run 13 showed that
+    # choosing one and assuming it is on the path is exactly the error.
+    # Whichever actually fires is recorded; neither alters semantics.
+    hooked = ["inner.chat.completions.create"]
+    bound = getattr(aclient, "create_fn", None)
+    if callable(bound):
+        async def capturing_bound(*args, **kwargs):
+            state["hooks_fired"].add("instructor.create_fn")
+            return await capturing_create(*args, **kwargs)
+        try:
+            aclient.create_fn = capturing_bound
+            hooked.append("instructor.create_fn")
+        except Exception:  # noqa: BLE001 — a read-only attribute is a fact, not a crash
+            resolved["create_fn_not_patchable"] = True
+
+    resolved["capture"] = f"INSTALLED at {', '.join(hooked)}"
+    resolved["hooked_points"] = hooked
     emit(resolved)
+    STATE["capture"] = state
     return resolved
 
 
+STATE: dict = {}
+
+
+def selftest() -> int:
+    """PROVE THE HOOK IS TRAVERSED — before spending a 9-minute run.
+
+    Run 13's lesson: successful installation of an observation hook is
+    not proof that execution traverses it. So one controlled invocation
+    is driven through the ADAPTER'S OWN production entry point --
+    `acreate_structured_output`, the same method cognee's summarisation
+    calls -- and exactly one capture record is required.
+
+    Calling `capturing_create` directly would prove only that the
+    wrapper works, which was never in doubt. The question is whether the
+    real path reaches it.
+
+    Cheap by construction: a two-word input and a one-field model, so
+    this costs seconds rather than the minutes a chunk summarisation
+    takes. It changes no mode, schema, retry, timeout or topology -- it
+    is one extra read-only request on a stack that is about to serve
+    many.
+    """
+    open(OUT, "w", encoding="utf-8").close()
+    try:
+        resolved = install_capture()
+    except Exception as exc:  # noqa: BLE001
+        emit({"event": "selftest-failed", "stage": "install",
+              "error": f"{type(exc).__name__}: {exc}",
+              "traceback": traceback.format_exc()})
+        return 2
+    if "NOT INSTALLED" in str(resolved.get("capture", "")):
+        emit({"event": "selftest-failed", "stage": "install",
+              "error": "capture point not located"})
+        return 2
+
+    import asyncio
+    from pydantic import BaseModel
+
+    from cognee.infrastructure.llm.structured_output_framework.\
+        litellm_instructor.llm.get_llm_client import get_llm_client
+
+    class Ping(BaseModel):
+        answer: str
+
+    before = sum(1 for line in open(OUT, encoding="utf-8")
+                 if '"event": "llm-call"' in line)
+
+    async def one_call():
+        client = get_llm_client()
+        try:
+            # THE PRODUCTION ENTRY POINT, not the wrapper.
+            await client.acreate_structured_output(
+                text_input="ping", system_prompt="Answer with one word.",
+                response_model=Ping)
+        except Exception as exc:  # noqa: BLE001
+            # The model may well refuse or mis-shape this too -- which is
+            # irrelevant. The question is whether the CALL was OBSERVED,
+            # not whether it succeeded.
+            emit({"event": "selftest-invocation-error",
+                  "error": f"{type(exc).__name__}: {exc}",
+                  "note": "not a selftest failure by itself — what matters "
+                          "is whether the hook recorded the call"})
+
+    asyncio.run(one_call())
+
+    after = sum(1 for line in open(OUT, encoding="utf-8")
+                if '"event": "llm-call"' in line)
+    observed = after - before
+    fired = sorted(STATE.get("capture", {}).get("hooks_fired", []))
+    emit({"event": "selftest-result", "calls_observed": observed,
+          "hooks_that_fired": fired,
+          "hooks_installed": resolved.get("hooked_points")})
+    print(f"  inspected: {observed} model call(s) captured", flush=True)
+
+    if observed < 1:
+        print("  CAPTURE POINT NOT TRAVERSED: the production entry point "
+              "was driven and the hook recorded nothing.", flush=True)
+        print("  Refusing to spend a full capture run on a hook that "
+              "cannot observe.", flush=True)
+        return 2
+    print(f"  CAPTURE POINT PROVEN: {observed} call(s) observed via "
+          f"{', '.join(fired) or 'unknown hook'}", flush=True)
+    return 0
+
+
 def main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] == "selftest":
+        return selftest()
     open(OUT, "w", encoding="utf-8").close()
     try:
         resolved = install_capture()
@@ -187,10 +312,29 @@ def main() -> int:
     asyncio.run(drive())
     calls = sum(1 for line in open(OUT, encoding="utf-8")
                 if '"event": "llm-call"' in line)
-    emit({"event": "drive-end", "llm_calls_captured": calls})
+    fired = sorted(STATE.get("capture", {}).get("hooks_fired", []))
+    emit({"event": "drive-end", "llm_calls_captured": calls,
+          "hooks_that_fired": fired})
     # I-2. A capture that says nothing about how much it saw reads
     # identically whether the adapter was called twenty times or never.
     print(f"  inspected: {calls} model call(s) captured", flush=True)
+
+    # RUN 13'S LESSON, ENFORCED. Successful installation of an
+    # observation hook is NOT proof that execution traverses it. The
+    # probe previously returned 0 -- "the capture ran to completion" --
+    # having observed nothing, which is the success-shaped failure this
+    # whole programme exists to refuse. Control flow completing is not a
+    # measurement.
+    if calls == 0:
+        emit({"event": "instrument-failure",
+              "why": "the pipeline was driven but ZERO model calls were "
+                     "captured: the hook was installed and not traversed",
+              "hooks_installed": True, "hooks_that_fired": fired})
+        print("  INSTRUMENT FAILURE: 0 model call(s) captured after driving "
+              "the pipeline.", flush=True)
+        print("  Q1/Q2/Q6 are UNMEASURED — which is not 'no mismatch'.",
+              flush=True)
+        return 2
     return 0
 
 

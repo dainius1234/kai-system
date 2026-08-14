@@ -13183,3 +13183,92 @@ caught this without a stack, exactly as the argv check did for run 8.
 * **KAI-GATE-049 — CLOSED. KAI-GATE-050 — CLOSED.**
 * No mode change, no model swap, no timeout or retry change, no schema or
   validator change, no Phase 2.
+
+---
+
+## D211
+
+**2026-08-14 — capture instrument repaired. The rule run 13 taught, now
+enforced: successful installation of an observation hook is not proof
+that execution traverses it.**
+
+Instrument repair only. No mode, model, timeout, retry, schema,
+validator or topology change. No capture run spent.
+
+### 1. Fail closed on zero observations
+
+The probe previously returned **0** — *"the capture ran to completion"* —
+having observed nothing, because its control flow completed. Control
+flow completing is not a measurement.
+
+It now counts `llm-call` records after driving the pipeline and, on
+zero, emits an `instrument-failure` record, prints
+`INSTRUMENT FAILURE: 0 model call(s) captured`, states that Q1/Q2/Q6 are
+UNMEASURED *"which is not 'no mismatch'"*, and **exits 2**.
+
+### 2. The capture point is proven traversable BEFORE the expensive run
+
+New `selftest` subcommand, and the collector runs it **first**, aborting
+on failure with `MEASUREMENT ABORTED: THE CAPTURE POINT IS NOT
+TRAVERSED` and the note that this is an *instrument* failure, **not
+evidence about the LLM contract**.
+
+It drives one controlled invocation through the adapter's **production
+entry point** — `acreate_structured_output`, the method cognee's
+summarisation itself calls — and requires a capture record. Calling
+`capturing_create` directly would prove only that the wrapper works,
+which was never in doubt; the question is whether the real path reaches
+it. Cheap by construction: a two-word input and a one-field model, so it
+costs seconds where a chunk summarisation costs minutes.
+
+An invocation *error* during the selftest is explicitly **not** a
+selftest failure — the model may mis-shape this reply too, which is
+irrelevant. What is required is that the call was **observed**.
+
+### 3. The two hypotheses are measured, not argued — and cost nothing
+
+Neither H1 nor H2 is assumed. Both are now recorded as object facts by
+introspection alone, with no model call:
+
+* **H1 — instructor binds `create` at construction:** the capture records
+  what the instructor client *holds* (`create_fn`, `func`, `_create`,
+  `create`), so a bound reference is visible rather than inferred.
+* **H2 — `get_llm_client()` caching hands out a different object:**
+  `get_llm_client()` is called twice and the identities compared
+  (`get_llm_client_stable`), with `adapter_id`, `aclient_id`,
+  `inner_client_id` recorded.
+
+**And both candidate boundaries are now hooked**, because picking one and
+assuming it is on the path is precisely the run-13 error. Each wrapper
+records *which* fired (`hooks_that_fired`), so the correct observation
+boundary is read off the evidence rather than chosen in advance. Both
+remain strict pass-throughs.
+
+### Calibration
+
+`scripts/test_llm_contract.py`: **33/6 → 44 assertions / 7 scenarios**.
+The new scenario reads the shipped collector and probe text and asserts
+the selftest exists, runs **before** the expensive capture, aborts the
+run on failure, and that the probe fails closed on zero calls — because
+a rule that lives only in a commit message is not enforced.
+
+**Proof it can fail (R2 — run, not written).** Deleting the selftest
+block from the collector:
+
+```
+FAIL: the collector runs a selftest
+FAIL: and it runs BEFORE the expensive capture — -1 vs 2423
+FAIL: a failed selftest aborts the run
+LLM Response Contract Calibration: 40 passed, 4 failed
+```
+
+Restored: **44 passed, 0 failed**. `policy-check` and the registry gate
+green.
+
+### Standing — unchanged
+
+* **KAI-GATE-048 C — BLOCKED.** Response-contract ownership remains
+  **UNMEASURED**; run 13 was evidence of an instrumentation failure, not
+  of the LLM contract.
+* **KAI-GATE-049 — CLOSED. KAI-GATE-050 — CLOSED/remediated.**
+* Q1/Q2/Q6 will be rerun **only after** a capture-point selftest passes.
