@@ -17719,3 +17719,113 @@ without an assertion, silently doing nothing).
 * **Real-format validation — PASSED** (run 31890166592's capture).
 * **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.**
 * **048 C — BLOCKED. Campaign — CLOSED at 1/5.**
+
+---
+
+## D255 — The Stage-1 selection rule, frozen before the capture exists
+
+**2026-08-15.**
+
+### 1. The question, answered from the frozen text
+
+> Does D247 already contain an immutable rule identifying which
+> production request becomes the Stage-1 replay subject when the capture
+> contains multiple rows?
+
+**No.** D247's Stage-1 parameter table says, verbatim:
+
+> | source request | one production `llm-call` row, **chosen by recorded
+> id**, quoted in full in the results entry |
+
+That fixes how the chosen row is **identified and published**. It does
+not say **which** row is chosen. With a capture holding several rows,
+that gap is exactly a post-result selection decision waiting to happen —
+and run 24 is the proof it would matter, because its rows did not all
+produce the same outcome class.
+
+So the rule is frozen here, **before the capture exists**.
+
+### 2. S1 — the selection rule
+
+> **The Stage-1 replay subject is the production `llm-call` row with the
+> lowest `seq`.**
+
+`seq` is assigned by the probe when the request is recorded — before the
+call is forwarded and therefore before any response exists. The lowest is
+the **first raw model request the capture holds**: the first attempt of
+the first logical call, carrying the contract as Instructor first
+presented it, with no reask or repair text appended. That is the cleanest
+reading of "the request Instructor presented", and every term in the rule
+is request-side.
+
+**Preconditions. All must hold, or Stage 1 does not start.** There is no
+falling through to another row — falling through is selection by
+convenience wearing a rule's clothes.
+
+1. P1 over the **whole** population returned `REQUEST_REPLAYABLE`. S1
+   selects from a certified population or not at all.
+2. **Exactly one** row holds the minimum `seq`. A tie means a duplicated
+   counter, which is an instrument defect to investigate, not a choice to
+   make. **Refuse.**
+3. If the chosen row records an `attempt_index` and it is **not 1**,
+   **refuse and report**. The justification above rests on this being a
+   first attempt; if it is not, the justification is false and the rule
+   must be re-derived rather than quietly applied.
+
+**The prohibition, stated so it cannot be softened:**
+
+> **No model response may be read to make, validate or revisit this
+> selection.** The selected row's identity is computed and published
+> BEFORE any response field of the capture is read. If a response has
+> already been read, the selection is contaminated and a fresh capture is
+> required.
+
+**What gets published before Stage 1 runs:** the chosen row's `seq`, its
+`logical_call_id`, its `attempt_index`, and its prompt and contract
+hashes — all request-side — plus the row quoted in full, as D247 already
+requires.
+
+### 3. The authorised fresh capture, pre-registered
+
+**Authorised: one fresh production capture as the P1 / prospective
+Stage-1 replay subject.** Recorded before it exists:
+
+* **a live model will execute, and that is explicitly authorised this
+  time** — the trigger side effect is *included*, not a side effect
+  reasoned about afterwards (D251's rule, applied as intended);
+* run ↔ tree bound exactly, from an authoritative listing;
+* the new capture format validated;
+* P1 run against that capture;
+* request-side evidence only decides whether the declared client
+  invocation is reconstructable;
+* **its model responses are NOT admitted to Q2, Q6 or ownership.** The
+  campaign stays **CLOSED at 1/5**;
+* **no replay row selected on the basis of a response**;
+* **if P1 does not return `REQUEST_REPLAYABLE`, stop and report why.**
+  Stage 1 stays BLOCKED until that result exists.
+
+**Run 25 is not promoted.** Its capture is `FORMAT: VALID` and would have
+served, and that is precisely why it must not be used: it was authorised
+for format validation only, and changing a subject's role because it
+turned out to be convenient is the retrospective admission this whole
+discipline exists to prevent.
+
+### 4. Operator dispositions, logged
+
+* **Report-all-applicable census defects — LOG AND DEFER.** Agreed as an
+  improvement; first-failure verdict semantics are preserved; the census
+  is **not** altered again during 048. Revisit in the diagnostic tooling
+  pass. Task #65.
+* **Safe patch helper — DEFERRED; the rule applies now.** Doctrine rule
+  18 is in force without it: **every scripted source edit asserts its
+  expected match/change count before being accepted.** Task #66.
+* **`core-tests.yml` live model on every push — logged, not fixed**
+  (task #64, CI/release-gate normalisation).
+
+### Status
+
+* **Real-format validation — PASSED.**
+* **P1 refusal path — LIVE-PROVEN** (run 31893763430).
+* **P1 replay completeness — UNRESOLVED.**
+* **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.**
+* **048 C — BLOCKED.**
