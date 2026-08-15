@@ -17294,3 +17294,106 @@ not the answer.
   SCHEMA ECHO + 1 VALID INSTANCE) · broad-class recurrence **MEASURED** ·
   **Q6 MEASURED: REPRODUCED**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN.**
+
+---
+
+## D251 — Evidence-admission is not action-authorisation
+
+**2026-08-15.** A governance correction from the operator, recorded
+before the run it governs has finished, and a standing rule that follows
+from it.
+
+### 1. The distinction I collapsed
+
+D250 §7 pre-registered what the automatically-triggered capture may and
+may not be **used for**. That was the right thing to write and it was not
+the whole question. The operator's correction:
+
+> **Evidence-admission rules are not the same as action authorisation.**
+
+Earlier in this same sequence, a full workflow run that triggers an LLM
+capture was explicitly treated as **outside P1's authorised scope** —
+which is why P1 was split into its own workflow file in the first place.
+Then the capture-side repair necessarily touched
+`probe_llm_contract.py`, which **is** inside
+`memu-graph-startup-proof.yml`'s `paths:` filter, and pushing it started
+a live capture.
+
+I saw that coming and wrote down how the result would be treated. What I
+did not do was ask whether the *action* was authorised. Constraining what
+evidence may be used for is not the same as having permission to produce
+it, and I reasoned about the first as though it settled the second.
+
+### 2. How run 25 is classified
+
+**Run 25 = `31890166592`, commit `930e7d0`.**
+
+> An **automatic CI side effect of the authorised repair** — NOT an
+> authorised ownership experiment.
+
+The operator authorises the already-triggered run to complete, **for
+format validation only**:
+
+* **not admitted** to Q2, Q6, ownership attribution, or the closed
+  campaign;
+* the sampling campaign stays **CLOSED at 1/5** (D243/D245);
+* its model outcomes are **not to be inspected or promoted**. Not
+  "inspected and set aside" — not looked at.
+
+### 3. Standing rule
+
+> **A repair authorisation that touches a path inside an LLM-triggering
+> workflow's filter must state in advance whether the trigger side effect
+> is included or excluded.**
+
+The check belongs at authorisation time, not after the run has started.
+Proposed as a mechanism rather than a habit, because a rule that depends
+on someone remembering is debt: a check that, for each workflow
+performing live model calls, derives the path set that triggers it and
+reports which changed files fall inside it — so a triggering change is
+**visibly** triggering before it is pushed, rather than noticed
+afterwards by the person who pushed it. Filed as a task; not built under
+this authorisation.
+
+### 4. The reconciliation claim, kept honest
+
+To be repeated wherever the reconciliation is reported:
+
+> The manifest counter and the captured rows are **two internal counters
+> in the same instrument**. Their agreement is a strong integrity and
+> reconciliation check. It is **not** independent proof that no
+> completely unobserved model-call path exists.
+
+A path that never reaches the wrapper increments neither counter, so both
+agree and both are blind. Reconciliation catches loss **between** the
+wrapper and the file; it cannot see what never arrived at the wrapper.
+Traversal evidence is a different question, answered by the selftest, and
+neither substitutes for the other.
+
+### 5. The sequence, frozen
+
+1. Let the automatic format-validation capture finish.
+2. Bind its run and tree exactly.
+3. Check **only**: zero non-machine rows in the data stream; manifest
+   count equals parsed production rows; `args_state` present and
+   distinguishing all three states; positional fields present and
+   reconstructable; refusal behaviour still works on a legacy capture.
+4. Do **not** inspect or promote its model outcomes.
+5. P1 against run 24 stays **UNRESOLVED** regardless — run 24 is legacy
+   evidence and validating a new format does not change what old evidence
+   is.
+6. Only then decide whether to authorise one fresh production capture
+   **specifically as the Stage 1 replay subject**.
+
+Step 5 is the one worth guarding: a green format validation is about the
+instrument, and reading it as progress on run 24 would be the same
+substitution P1 exists to refuse.
+
+### Status
+
+* **P1 — UNRESOLVED.**
+* **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.**
+* **Instrument repair — PROVEN in calibration, awaiting real-format
+  validation.**
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN.**
+* **Campaign — CLOSED at 1/5. Run 25 contributes nothing to it.**
