@@ -52,6 +52,10 @@ jobs:
       S1_PROMPT_HASH: "d53797298bea"
       S1_CONTRACT_HASH: "98c57afadeae"
       OLLAMA_MODEL: qwen2.5:3b
+      # Attempt 1. It executed nothing, but it DID produce a valid freeze
+      # manifest, so attempt 2's request identity can be checked against
+      # a real artifact rather than against a hash somebody transcribed.
+      S1_ATTEMPT1_RUN_ID: "31899571806"
     steps:
       - uses: actions/checkout@v4
 
@@ -101,6 +105,30 @@ jobs:
             --expect-contract-hash "${S1_CONTRACT_HASH}" \
             --url "http://ollama:11434/v1/chat/completions" \
             --timeout 300
+
+      # ci-toleration: documented-skip
+      - name: Fetch attempt 1's freeze manifest
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: stage1-replay
+          run-id: ${{ env.S1_ATTEMPT1_RUN_ID }}
+          github-token: ${{ github.token }}
+          path: s1-attempt1
+
+      # VALUE-level identity, not code identity. Attempt 1 froze a
+      # request; this attempt must freeze the same one, or nothing is
+      # sent. `request_hash` covers the request body alone, so this
+      # opens nothing about the original model response — and
+      # `manifest_hash` is deliberately not compared, because the repair
+      # was authorised to move instrument metadata.
+      - name: Attempt 1 and attempt 2 must send the same request
+        run: |
+          set -euo pipefail
+          python3 scripts/security/stage1_replay.py --verify-request-hash \
+            --manifest stage1-manifest.json \
+            --against s1-attempt1/stage1-manifest.json \
+            --attempt-replies s1-attempt1/stage1-replies.jsonl
 
       - name: Build the image
         env:

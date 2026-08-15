@@ -36,7 +36,7 @@ DRIVER = REPO / "scripts" / "security" / "stage1_replay.py"
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 9
+EXPECTED_SCENARIOS = 10
 executed: list[str] = []
 LEAK = "ORIGINAL-RESPONSE-MUST-NEVER-BE-READ"
 
@@ -455,6 +455,84 @@ def test_the_loggable_allow_list_is_closed_over_the_classifier() -> None:
           st.loggable(cl.VALID_INSTANCE, "plain") == "plain")
 
 
+def test_request_identity_is_compared_across_attempts() -> None:
+    """Code identity is an argument about the instrument; this is the
+    thing itself -- attempt 2's frozen request against attempt 1's."""
+    scenario("cross-attempt request identity")
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        a2 = _manifest(tmp)
+        ref = tmp / "attempt1.json"
+        ref.write_text(a2.read_text())
+
+        r = cli("--verify-request-hash", "--manifest", str(a2),
+                "--against", str(ref))
+        check("identical requests pass", r.returncode == 0, r.stdout[-300:])
+        check("and both hashes are printed in full",
+              r.stdout.count(json.loads(a2.read_text())["request_hash"]) == 2,
+              r.stdout[-300:])
+
+        # KNOWN POSITIVE: a moved request must stop the run
+        drifted = json.loads(ref.read_text())
+        drifted["request_hash"] = "0" * 64
+        ref.write_text(json.dumps(drifted))
+        r = cli("--verify-request-hash", "--manifest", str(a2),
+                "--against", str(ref))
+        check("a moved request is STAGE 1 INVALID", r.returncode == 5,
+              f"{r.returncode}: {r.stdout[-300:]}")
+        check("and it says nothing is sent",
+              "Nothing is sent" in r.stdout, r.stdout[-300:])
+
+        # manifest_hash may legitimately differ -- only the request may not
+        moved_meta = json.loads(a2.read_text())
+        moved_meta["manifest_hash"] = "1" * 64
+        ref.write_text(json.dumps(moved_meta))
+        r = cli("--verify-request-hash", "--manifest", str(a2),
+                "--against", str(ref))
+        check("a moved manifest_hash alone still passes", r.returncode == 0,
+              r.stdout[-300:])
+
+        # an absent or unusable reference is UNMEASURED, never a match
+        for label, path in (("absent", tmp / "nope.json"),
+                            ("unparseable", tmp / "bad.json")):
+            if label == "unparseable":
+                path.write_text("{not json")
+            r = cli("--verify-request-hash", "--manifest", str(a2),
+                    "--against", str(path))
+            check(f"an {label} reference is UNMEASURED", r.returncode == 4,
+                  f"{r.returncode}: {r.stdout[-300:]}")
+            check(f"an {label} reference names the prerequisite",
+                  "unmet prerequisite:" in r.stdout, r.stdout[-300:])
+            check(f"an {label} reference does not traceback",
+                  "Traceback" not in r.stderr, r.stderr[-300:])
+
+        # reading the reference must not be able to open a response
+        leaky = tmp / "leaky.json"
+        blob = json.loads(a2.read_text())
+        blob["subject"]["raw_response"] = LEAK
+        leaky.write_text(json.dumps(blob))
+        r = cli("--verify-request-hash", "--manifest", str(a2),
+                "--against", str(leaky))
+        check("a response-bearing reference is REFUSED", r.returncode == 4,
+              f"{r.returncode}: {r.stdout[-300:]}")
+        check("and the response itself never reaches the log",
+              LEAK not in r.stdout and LEAK not in r.stderr, r.stdout[-300:])
+        check("the scan finds a key at any depth",
+              st.response_bearing_keys({"a": [{"b": {"raw_response": 1}}]})
+              == ["raw_response"])
+        check("and finds nothing in a clean manifest",
+              st.response_bearing_keys(json.loads(a2.read_text())) == [])
+
+        # a reference attempt recorded as 0/10 cannot have left replies
+        stray = tmp / "attempt1-replies.jsonl"
+        stray.write_text("{}\n")
+        ref.write_text(a2.read_text())
+        r = cli("--verify-request-hash", "--manifest", str(a2),
+                "--against", str(ref), "--attempt-replies", str(stray))
+        check("a replies file contradicting a 0/10 record REFUSES",
+              r.returncode == 4, f"{r.returncode}: {r.stdout[-300:]}")
+
+
 def run_all() -> None:
     test_response_format_is_rebuilt_and_asserted()
     test_identity_must_match_or_it_refuses()
@@ -465,6 +543,7 @@ def run_all() -> None:
     test_absent_replay_evidence_is_a_verdict_not_a_crash()
     test_no_reply_content_reaches_the_ci_log()
     test_the_loggable_allow_list_is_closed_over_the_classifier()
+    test_request_identity_is_compared_across_attempts()
     print(f"  inspected: {st.N1} precommitted replay execution(s), "
           f"{len(s1.RESPONSE_BEARING)} response-bearing field(s) withheld")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",

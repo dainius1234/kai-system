@@ -18588,3 +18588,104 @@ legitimately re-frozen subject until it is updated.
   Attempt 1 remains UNMEASURED; nothing about it is re-labelled.**
 * **Awaiting fresh authorisation before any new attempt.**
 * **Stage 2 — BLOCKED. Ownership — UNMOVED. 048 C — BLOCKED.**
+
+---
+
+## D264 — Attempt 2 pre-dispatch: value-level request identity across attempts
+
+**2026-08-15. Fresh operator authorisation for Stage-1 Attempt 2 granted
+on the D263 certificate. This entry is the PRE-DISPATCH commit; it does
+not touch the sentinel and starts nothing.**
+
+The operator added one requirement beyond the repair: attempt 1 produced
+a valid freeze manifest, so before attempt 2 sends anything, its newly
+frozen `request_hash` must equal attempt 1's. Code identity and YAML
+identity are arguments about the instrument. This is the thing itself.
+
+### 1. Why the comparison lives in CI, not in a pinned constant
+
+The obvious implementation is to read attempt 1's hash now and pin it
+into the workflow. **I cannot read it here.** The artifact download URL
+resolves, but the blob host is denied by this environment's proxy:
+
+```
+curl: (56) CONNECT tunnel failed, response 403
+"host": "productionresultssa6.blob.core.windows.net:443"
+"kind": "connect_rejected"
+```
+
+Pinning a hash I have not read would be R1 in its purest form — an
+assertion presented as a measurement. So the job fetches artifact
+`stage1-replay` from run `31899571806` and compares against the real
+file. That is also the stronger design: no transcription step exists to
+get wrong, and an expired artifact fails closed instead of silently
+comparing against a stale literal.
+
+### 2. `--verify-request-hash`
+
+Runs immediately after `--freeze` and **before** the image build, so it
+is the cheapest gate in the chain.
+
+* compares `request_hash` only. **`manifest_hash` is deliberately not
+  compared** — it covers runtime metadata the D263 repair was authorised
+  to move, and requiring it equal would fail the run for the repair
+  having happened.
+* equal → 0. Different → **5, `STAGE 1 INVALID`**, printing both hashes
+  and stating that nothing is sent. Absent, unparseable or hash-less
+  reference → **4, `STAGE 1 UNMEASURED`**, naming the unmet
+  prerequisite. An equality that was never established is not a match.
+* refuses if the reference manifest carries any response-bearing key at
+  any depth — the reference is *supposed* to be request-only by
+  construction, but "by construction" is a claim about code that has
+  since been edited, so the artifact in hand is checked instead.
+* refuses if `s1-attempt1/stage1-replies.jsonl` **exists**. Attempt 1 is
+  recorded as 0 executions; a replies file would contradict our own
+  record, and attempt 2 must not be built on a record known to be
+  wrong. Existence only — the file is never opened.
+
+### 3. Model-facing surface still IDENTICAL
+
+`check_invocation_identity.py --old 9a53ee6` → working tree:
+
+```
+  main                   CHANGED  -    53cf81154228 -> 5b718d75dae4
+  read_request_hash      ADDED    -    - -> 726a8fac985b
+  response_bearing_keys  ADDED    -    - -> 3ae3b8c26a68
+  inspected: 19 top-level definition(s), 7 in the model-facing surface
+  IDENTICAL — every definition that builds or sends the request is byte-for-byte unchanged.
+```
+
+`freeze`, `send_once`, `rebuild`, `_digest`, `N1`, `SENDABLE` and
+`EXPECTED_RESPONSE_FORMAT` are unmoved; `p1_replay_completeness.py` and
+`select_replay_subject.py` unchanged in full.
+
+**Workflow env delta, stated rather than glossed:** one key ADDED —
+`S1_ATTEMPT1_RUN_ID: "31899571806"`. Zero keys changed. Every
+model-facing constant (`S1_CAPTURE_RUN_ID`, `S1_CAPTURE_COMMIT`,
+`S1_SEQ`, `S1_PROMPT_HASH`, `S1_CONTRACT_HASH`, `OLLAMA_MODEL`) and the
+whole `--freeze` step are byte-identical to `6b52008`.
+
+### 4. Calibration
+
+* `scripts/test_stage1_replay.py` — **130 passed / 0 failed**, 10
+  scenarios (was 114 / 9). The new scenario runs through the shipped
+  CLI: equal hashes pass; a moved `request_hash` returns 5; a moved
+  `manifest_hash` alone still passes; an absent and an unparseable
+  reference each return 4 without a traceback; a response-bearing
+  reference is refused and its sentinel reaches neither stdout nor
+  stderr; a stray replies file contradicting the 0/10 record refuses.
+* `scripts/test_invocation_identity.py` — **26 passed / 0 failed**.
+* `make policy-check` — green. It first refused the new fetch step's
+  `continue-on-error` as an undeclared suppression; declared in
+  `check_ci_tolerations.py` with reason, owner and review date.
+
+### 5. What this commit does not do
+
+It does not touch `kai-pm/STAGE1_GO`, so it starts nothing. The
+dispatch commit that follows changes that file **and nothing else**.
+
+### Status
+
+* **Attempt 1 — BANKED, instrument failure, 0/10, UNMEASURED.**
+* **Attempt 2 — AUTHORISED, not yet dispatched.**
+* **Stage 2 — BLOCKED. Ownership — UNMOVED. 048 C — BLOCKED.**

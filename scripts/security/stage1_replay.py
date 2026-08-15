@@ -378,15 +378,72 @@ def loggable(verdict: str, detail: str) -> str:
             f"full text in the sealed classification artifact]")
 
 
+# ── value-level identity across two attempts ─────────────────────────
+#
+# Code identity and YAML identity are both arguments about the
+# instrument. This is the thing itself: attempt 1 got as far as
+# producing a freeze manifest, so attempt 2's request hash can be
+# compared to it BEFORE anything is sent. `request_hash` is computed
+# over the request body alone, so reading it opens nothing about the
+# original model response.
+#
+# `manifest_hash` is deliberately NOT compared: it covers runtime
+# metadata that the repair is allowed to have moved. Equal requests
+# under different instrument metadata is the intended state.
+def response_bearing_keys(obj, seen=None) -> list[str]:
+    """Every response-bearing key anywhere in a structure.
+
+    The reference manifest is request-only by construction, but "by
+    construction" is a claim about code that has since been edited.
+    This checks the artifact in hand instead.
+    """
+    found = seen if seen is not None else []
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if k in s1.RESPONSE_BEARING:
+                found.append(k)
+            response_bearing_keys(v, found)
+    elif isinstance(obj, list):
+        for item in obj:
+            response_bearing_keys(item, found)
+    return found
+
+
+def read_request_hash(path: pathlib.Path) -> tuple[str | None, str | None]:
+    """(request_hash, failure). Reads one request-side field, never more."""
+    if not path.is_file():
+        return None, (f"{path} does not exist, so the reference request "
+                      f"identity could not be read")
+    try:
+        man = json.loads(path.read_text())
+    except (OSError, ValueError) as exc:
+        return None, f"{path} could not be read: {type(exc).__name__}: {exc}"
+    leaked = sorted(set(response_bearing_keys(man)))
+    if leaked:
+        return None, (f"{path} carries response-bearing key(s) {leaked}; it "
+                      f"is not the request-only manifest it is taken for, "
+                      f"and reading it further would open the response")
+    value = man.get("request_hash")
+    if not isinstance(value, str) or len(value) != 64:
+        return None, (f"{path} carries no usable request_hash "
+                      f"({value!r})")
+    return value, None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     mode = ap.add_mutually_exclusive_group(required=True)
     mode.add_argument("--freeze", action="store_true")
     mode.add_argument("--preflight", action="store_true")
+    mode.add_argument("--verify-request-hash", action="store_true")
     mode.add_argument("--replay", action="store_true")
     mode.add_argument("--classify", action="store_true")
     ap.add_argument("--capture")
     ap.add_argument("--manifest")
+    ap.add_argument("--against", help="a previous attempt's freeze manifest")
+    ap.add_argument("--attempt-replies",
+                    help="a previous attempt's replies file, which must NOT "
+                         "exist if that attempt is recorded as 0 executions")
     ap.add_argument("--replies")
     ap.add_argument("--classification")
     ap.add_argument("--url")
@@ -462,6 +519,52 @@ def main() -> int:
             print("  model stack was up, and executed 0 of 10 calls. Failing")
             print("  here costs a container start and measures the same thing.")
             return 6
+        return 0
+
+    if args.verify_request_hash:
+        print("STAGE 1 — REQUEST IDENTITY ACROSS ATTEMPTS")
+        print("=" * 64)
+        mine, why_mine = read_request_hash(pathlib.Path(args.manifest))
+        theirs, why_theirs = read_request_hash(pathlib.Path(args.against))
+        print(f"  this attempt   : {args.manifest}")
+        print(f"  reference      : {args.against}")
+        # A previous attempt recorded as ZERO executions cannot have left
+        # a replies file. If one arrived with the reference artifact, our
+        # record of that attempt is wrong and this one must not proceed
+        # on top of it.
+        if args.attempt_replies and pathlib.Path(args.attempt_replies).exists():
+            print(f"  REFUSED: {args.attempt_replies} exists. The reference "
+                  f"attempt is recorded as having executed nothing; a "
+                  f"replies file contradicts that record, and this attempt "
+                  f"must not be built on a record known to be wrong.")
+            return 4
+        for label, failure in (("this attempt", why_mine),
+                               ("reference", why_theirs)):
+            if failure:
+                print(f"  {UNMEASURED}")
+                print(f"  unmet prerequisite: {label} — {failure}")
+                print()
+                print("  NOT MEASURED: whether the two attempts send the same")
+                print("  request. Equality was not established, and an")
+                print("  unestablished equality is not a match.")
+                return 4
+        print(f"  reference hash : {theirs}")
+        print(f"  this attempt   : {mine}")
+        print("  inspected: 2 freeze manifest(s) across 1 request identity")
+        if mine != theirs:
+            print()
+            print("STAGE 1 INVALID — the request identity changed between "
+                  "attempts")
+            print("  The instrument was repaired; the request was not "
+                  "supposed to move.")
+            print("  Do not explain this away mid-execution. Nothing is sent.")
+            return 5
+        print()
+        print("  IDENTICAL — attempt 2 sends byte-for-byte the request "
+              "attempt 1 froze.")
+        print("  manifest_hash is deliberately NOT compared: it covers "
+              "instrument")
+        print("  metadata the repair was authorised to move.")
         return 0
 
     if args.replay:

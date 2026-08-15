@@ -545,6 +545,21 @@ DECLARED: Tuple[Toleration, ...] = (
     ),
     Toleration(
         workflow="stage1-replay.yml",
+        step="Fetch attempt 1's freeze manifest",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same shape as the capture fetch above: a missing or "
+               "expired artifact would stop the job inside "
+               "download-artifact with an opaque message. The toleration "
+               "exists so the NEXT step is the one that speaks -- "
+               "`--verify-request-hash` reports STAGE 1 UNMEASURED and "
+               "names the unmet prerequisite, and exits non-zero. "
+               "Equality that was never established is not a match, so "
+               "nothing reaches a model on this path.",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="stage1-replay.yml",
         step="Free up runner disk space",
         bucket=DOCUMENTED_SKIP,
         reason="`sudo rm -rf ... || true` against the runner's "
