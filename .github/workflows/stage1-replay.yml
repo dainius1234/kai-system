@@ -1,0 +1,133 @@
+# STAGE 1 — replay the exact captured request, with no Instructor.
+#
+# The frozen experiment is D247's; the subject is D255-D259's, selected
+# on request-side evidence alone and published before any response was
+# read. This workflow runs that experiment and nothing else.
+#
+# A LIVE MODEL EXECUTES HERE, AND THAT IS EXPLICITLY AUTHORISED. It is
+# named in the record before the run, not reasoned about afterwards
+# (D251). It writes no capture, so it produces no Q2/Q6/ownership
+# evidence and the sampling campaign stays CLOSED at 1/5.
+#
+# Dispatch only. Stage 1 is a one-shot authorised experiment, not
+# something a push should be able to start.
+name: Stage 1 exact-request replay (KAI-GATE-048 C)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stage1-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: read
+    env:
+      # The capture holding the frozen subject, and the subject's own
+      # request-side identity as published in D259. The replay REFUSES if
+      # re-selection does not reproduce all three.
+      S1_CAPTURE_RUN_ID: "31894868473"
+      S1_CAPTURE_COMMIT: "1d79b145a04f1bc35a9bc9d0a31251153f6e6a10"
+      S1_SEQ: "2"
+      S1_PROMPT_HASH: "d53797298bea"
+      S1_CONTRACT_HASH: "98c57afadeae"
+      OLLAMA_MODEL: qwen2.5:3b
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the JSON Schema validator the classifier needs
+        run: python3 -m pip install --quiet jsonschema
+
+      - name: The replay driver and the classifier must pass calibration
+        run: |
+          python3 scripts/test_stage1_replay.py
+          python3 scripts/test_replay_subject_selection.py
+          python3 scripts/test_llm_contract.py
+
+      - name: Mint an ephemeral database password for this run
+        run: |
+          printf 'DB_PASSWORD=ci-ephemeral-%s\n' \
+            "$(head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20)" \
+            >> "$GITHUB_ENV"
+
+      - name: Free up runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
+          df -h /
+
+      # ci-toleration: documented-skip
+      - name: Fetch the capture holding the frozen subject
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: memu-graph-llm-contract
+          run-id: ${{ env.S1_CAPTURE_RUN_ID }}
+          github-token: ${{ github.token }}
+          path: s1-evidence
+
+      # BEFORE anything is sent. Re-selects under S1, verifies the frozen
+      # seq/prompt/contract identity, rebuilds response_format with
+      # ast.literal_eval and asserts the typed value. Refuses on any
+      # mismatch, and never reads the original response.
+      - name: Freeze the exact request — refuse if identity fails
+        run: |
+          set -euo pipefail
+          python3 scripts/security/stage1_replay.py --freeze \
+            --capture s1-evidence/llm-contract-logs/capture.jsonl \
+            --manifest stage1-manifest.json \
+            --expect-seq "${S1_SEQ}" \
+            --expect-prompt-hash "${S1_PROMPT_HASH}" \
+            --expect-contract-hash "${S1_CONTRACT_HASH}"
+
+      - name: Build the image and start ONLY the model service
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          docker compose -f docker-compose.full.yml build memu-graph
+          docker compose -f docker-compose.full.yml up -d ollama ollama-pull
+          python3 scripts/ci/compose_probe.py \
+            --compose-file docker-compose.full.yml \
+            --services ollama --timeout 300
+
+      # The replay runs INSIDE the network the capture was taken on, and
+      # posts straight to the endpoint: no Instructor, no validation, no
+      # retry. The sender knows nothing about verdicts.
+      - name: Replay the request 10 times, sequentially
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          docker compose -f docker-compose.full.yml run --rm --no-deps \
+            -T -v "$PWD:/w" -w /w memu-graph \
+            python3 scripts/security/stage1_replay.py --replay \
+              --manifest stage1-manifest.json \
+              --replies stage1-replies.jsonl \
+              --url "http://ollama:11434/v1/chat/completions" \
+              --timeout 300
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker-compose.full.yml down -v || true
+
+      # LAST, so the verdicts land inside the Actions log byte window.
+      - name: Stage 1 verdicts — all ten, in order
+        if: always()
+        run: |
+          set -euo pipefail
+          python3 scripts/security/stage1_replay.py --classify \
+            --manifest stage1-manifest.json \
+            --replies stage1-replies.jsonl
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage1-replay
+          path: |
+            stage1-manifest.json
+            stage1-replies.jsonl
+          if-no-files-found: warn

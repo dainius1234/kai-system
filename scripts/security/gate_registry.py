@@ -568,7 +568,7 @@ REGISTRY: Tuple[Gate, ...] = (
                            "scripts/test_compose_probe.py against an "
                            "injected runner instead",
          proven_by="scripts/test_compose_probe.py",
-         in_workflows=("core-tests.yml",)),
+         in_workflows=("core-tests.yml", "stage1-replay.yml")),
     Gate(module="ci/kill_isolation",
          kind=GATE,
          summary="memu-core stays healthy AND writable with "
@@ -968,7 +968,7 @@ REGISTRY: Tuple[Gate, ...] = (
          proven_by="scripts/test_llm_contract.py",
          calibrated_by="scripts/test_llm_contract.py",
          in_policy_check=False,
-         in_workflows=("memu-graph-startup-proof.yml",),
+         in_workflows=("memu-graph-startup-proof.yml", "stage1-replay.yml"),
          findings=("KAI-GATE-048",)),
     Gate(module="summarise_llm_contract",
          kind=REPORT,
@@ -1098,6 +1098,45 @@ REGISTRY: Tuple[Gate, ...] = (
          findings=("KAI-GATE-048",)),
     # S1 (D255-D257). Selection is the step where a post-result choice
     # would be easiest to make and hardest to notice.
+    Gate(module="stage1_replay",
+         kind=REPORT,
+         summary="D247's Stage-1 experiment and nothing else: re-select "
+                 "under S1, REFUSE unless the frozen seq/prompt/contract "
+                 "identity reproduces, rebuild response_format with "
+                 "ast.literal_eval and assert the exact typed value, then "
+                 "replay N1=10 times with no Instructor, no validation and "
+                 "no retry; a transport error is one execution and is not "
+                 "replaced, and the original captured response is never "
+                 "read",
+         inputs=(),
+         denominator=r"inspected: \d+ replay execution\(s\) of \d+ "
+                     r"precommitted",
+         probe=False,
+         probe_skip_reason="needs a production capture and a live model "
+                           "endpoint; reconstruction, identity refusal, the "
+                           "response boundary and the fixed denominator are "
+                           "all asserted offline in "
+                           "scripts/test_stage1_replay.py",
+         proven_by="scripts/test_stage1_replay.py",
+         calibrated_by="scripts/test_stage1_replay.py",
+         in_policy_check=False,
+         in_workflows=("stage1-replay.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_stage1_replay",
+         kind=GATE,
+         summary="ast.literal_eval and never eval; a repr that parses to "
+                 "the wrong typed value REFUSES; a changed prompt, "
+                 "contract or seq REFUSES; a key recorded ABSENT is "
+                 "omitted rather than sent as null; and the original "
+                 "response is unreadable from the frozen manifest, "
+                 "asserted against a sentinel",
+         inputs=(),
+         denominator=r"inspected: \d+ precommitted replay execution\(s\)",
+         proven_by="scripts/test_stage1_replay.py",
+         calibrated_by="scripts/test_stage1_replay.py",
+         in_policy_check=False,
+         in_workflows=("stage1-replay.yml",),
+         findings=("KAI-GATE-048",)),
     Gate(module="select_replay_subject",
          kind=REPORT,
          summary="which captured request becomes the Stage-1 replay "
@@ -1132,7 +1171,7 @@ REGISTRY: Tuple[Gate, ...] = (
          proven_by="scripts/test_replay_subject_selection.py",
          calibrated_by="scripts/test_replay_subject_selection.py",
          in_policy_check=False,
-         in_workflows=("p1-replay-completeness.yml",),
+         in_workflows=("p1-replay-completeness.yml", "stage1-replay.yml"),
          findings=("KAI-GATE-048",)),
     Gate(module="test_p1_replay_completeness",
          kind=GATE,

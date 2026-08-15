@@ -530,6 +530,42 @@ DECLARED: Tuple[Toleration, ...] = (
         review_by="2026-11-01",
     ),
     Toleration(
+        workflow="stage1-replay.yml",
+        step="Fetch the capture holding the frozen subject",
+        bucket=DOCUMENTED_SKIP,
+        reason="A missing or expired artifact would stop the job inside "
+               "download-artifact with an opaque message. The toleration "
+               "exists so the freeze step runs and refuses out loud: "
+               "'STAGE 1 NOT STARTED: the capture is absent. This is an "
+               "availability failure, not a replay result.' Nothing is "
+               "skipped -- that step exits non-zero, and no request is "
+               "sent to a model without a proven subject.",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="stage1-replay.yml",
+        step="Free up runner disk space",
+        bucket=DOCUMENTED_SKIP,
+        reason="`sudo rm -rf ... || true` against the runner's "
+               "preinstalled toolchains, identical in shape and reason to "
+               "the declarations for the other workflows. Declared "
+               "separately because the match is on (workflow, step).",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="stage1-replay.yml",
+        step="Tear down",
+        bucket=DOCUMENTED_SKIP,
+        reason="`compose down -v || true` in an `if: always()` cleanup. A "
+               "teardown that failed the job would replace the "
+               "experiment's verdict with a janitorial one, and it runs "
+               "after every reply is already written to disk.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
         workflow="p1-replay-completeness.yml",
         step="Fetch the capture from run ${{ env.P1_CAPTURE_RUN_ID }}",
         bucket=DOCUMENTED_SKIP,

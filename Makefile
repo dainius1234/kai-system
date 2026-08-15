@@ -1068,6 +1068,11 @@ test-p1-replay-completeness:
 test-replay-subject-selection:
 	python3 scripts/test_replay_subject_selection.py
 
+# D247's Stage-1 experiment driver. Reconstruction, identity refusal,
+# the response boundary and the fixed denominator are all offline.
+test-stage1-replay:
+	python3 scripts/test_stage1_replay.py
+
 # D251. "I did not touch the probe" never proved that no live model
 # would run -- core-tests.yml has no paths filter and starts ollama on
 # every push, which this check found on its first execution. Run it
