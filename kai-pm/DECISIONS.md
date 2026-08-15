@@ -18239,3 +18239,85 @@ capture is the subject. **Task #66.**
 * **S1 — SELECTED and published (request-side only).**
 * **Stage 1 — BLOCKED, awaiting authorisation.** Stage 2 — BLOCKED.
   Ownership — UNMOVED. **048 C — BLOCKED.**
+
+---
+
+## D261 — Two corrections: a task number reused, and my trigger check misreading a dispatch-only workflow
+
+**2026-08-15.** Both recorded before Stage 1 is dispatched, because both
+affect how its output should be read.
+
+### 1. Task #66 was used for two different issues
+
+The operator's bookkeeping point, and it is correct. **#66** was cited
+in D258 for the *stale format-job wording naming run 24*, and again in
+D259 for the *`response_format` repr-serialisation* issue. Two distinct
+defects, one number.
+
+Corrected append-only rather than by renumbering history:
+
+* **#66 — stale wording**: the format job prints *"Item 5 … is the P1
+  job's own verdict against run 24"*, which became false when P1 was
+  repointed. Text-only; census frozen during 048.
+* **#67 — `response_format` serialisation**: `_serialise()` falls back to
+  `str(obj)`, so the recorded value is a Python repr. Reconstructable via
+  `ast.literal_eval`, and Stage 1 does exactly that — but a capture
+  format that stores a repr where JSON would do is a probe-side wrinkle
+  worth closing when the probe is unfrozen.
+
+D258 and D259 stand as written. This entry is the correction, per the
+append-only rule.
+
+### 2. `check_capture_trigger_paths` misreports dispatch-only workflows
+
+Found by running it on my own commit. It printed:
+
+```
+[live-model] stage1-replay.yml: <no paths: filter>  (matched every push fires it)
+```
+
+**That is false.** `stage1-replay.yml` declares `on: workflow_dispatch:`
+and **no `push:` trigger at all**. It fires on **zero** pushes.
+
+The defect: `_push_paths()` returns `has_filter=False` both when a
+workflow has a `push:` trigger *without* a `paths:` filter — which really
+does fire on every push — and when it has **no `push:` trigger
+whatsoever**. The reporter then treats the second case as the first.
+
+This is R5's inverted form again, in the same file that already had it
+once: **a scope larger than reality.** The first version counted
+docstrings as executions; this one counts a workflow that cannot be
+push-triggered as one that always is. The correct reading of my own
+output for commit `1b1c39c` is therefore:
+
+> `core-tests.yml` fires (live-model, as on every push).
+> `stage1-replay.yml` does **NOT** fire on push. It is dispatch-only.
+> **CAPTURE-WRITING: none.**
+
+**Not fixed.** The check is not the census, but repairing it mid-Stage-1
+is scope expansion, and the direction is one controlled workstream at a
+time. The distinction it must learn: *no `push:` trigger* is not *a
+`push:` trigger with no filter*. **Task #68.**
+
+Worth noting what caught it: not the calibration — which asserts a
+missing `paths:` list reads as ABSENT rather than empty, and is
+satisfied here — but reading the check's output against a workflow whose
+triggers I had just written. A calibration can only test the cases
+someone thought of.
+
+### 3. And a note on the edit discipline
+
+Registering Stage 1 took **three rejected anchors** before a correct
+edit: one matched zero times, one matched **eight** unrelated gate
+entries, one matched two. Under doctrine rule 18 each was refused before
+anything was written. Without that assertion, the eight-match edit would
+have silently rewritten seven gates' declared wiring.
+
+That is the strongest argument yet for the deferred patch helper — the
+rule worked, but it worked because it was applied by hand each time.
+
+### Status
+
+* **Stage 1 — AUTHORISED, driver built and calibrated, NOT yet
+  dispatched.** Stage 2 — BLOCKED. Ownership — UNMOVED. **048 C —
+  BLOCKED.**
