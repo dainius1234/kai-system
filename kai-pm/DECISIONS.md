@@ -17932,3 +17932,116 @@ its own justification cannot be established; it adds no machinery.
 * **P1 refusal path — LIVE-PROVEN. P1 replay completeness — UNRESOLVED.**
 * **Stage 1 — BLOCKED. Dispatching a capture did not authorise the
   replay.** Stage 2 — BLOCKED. Ownership — UNMOVED. **048 C — BLOCKED.**
+
+---
+
+## D257 — The `llm-call` row carries the response, so "the full row" cannot be published before selection
+
+**2026-08-15.** A schema check the operator called for, which found a
+contradiction inside my own frozen rule.
+
+### 1. The check: is an `llm-call` row purely request-side?
+
+**No.** `probe_llm_contract.py` builds ONE dict, fills it with
+request-side fields, forwards the call, then **adds the outcome to the
+same dict** and emits it:
+
+```python
+        except Exception as exc:
+            request["layer"] = "RAW_MODEL_RESPONSE"          # :433
+            request["elapsed_s"] = round(...)                # :434
+            request["raw_response"] = None                   # :435
+            request["transport_error"] = f"{type(exc).__name__}: {exc}"
+            emit(request)                                    # :437
+        request["layer"] = "RAW_MODEL_RESPONSE"              # :439
+        request["elapsed_s"] = round(...)                    # :440
+        request["raw_response"] = result.choices[0].message.content   # :442
+        request["finish_reason"] = result.choices[0].finish_reason    # :443
+        request["result_type"] = type(result).__name__       # :448
+        emit(request)                                        # :449
+```
+
+Response-bearing keys on every emitted row: `raw_response`,
+`finish_reason`, `result_type`, `transport_error`, `raw_response_note`,
+`elapsed_s`, and `layer` flipped to `RAW_MODEL_RESPONSE`.
+
+*(Schema/source inspection. No capture was read and no particular model
+response was inspected to establish this.)*
+
+### 2. What that breaks — mine, not D247's alone
+
+D255 said the selected row would be published *"plus the row quoted in
+full, as D247 already requires"*, **before** any response field is read.
+Those two clauses cannot both hold. Quoting the full row **is** reading
+the response. I wrote the prohibition and the thing that violates it in
+the same paragraph.
+
+D247's *"quoted in full in the results entry"* is not wrong — it is a
+requirement about the **results** entry, which comes after use is
+authorised. It becomes wrong only where D255 pulled it forward to
+selection time.
+
+### 3. Frozen: the pre-selection projection is an ALLOW-LIST
+
+Before any response field is read, exactly these are published, and
+nothing else:
+
+| published | why it is safe |
+|---|---|
+| `seq` | assigned before the call is forwarded |
+| `logical_call_id`, `attempt_index`, `outside_logical_call` | set on entry to the logical call, before forwarding |
+| `phase` | stamped before the drive begins |
+| `model`, `temperature`, `response_format`, `tools`, `other_params` | arguments passed IN |
+| `args_state`, `positional_arg_count`, `positional_args` | computed from the arguments passed IN |
+| **prompt hash** | over `messages`, which are request-side |
+| **contract hash** | over the schema recovered from the request's own system message |
+| **hash of the complete stored row** | identifies the row immutably **without exposing it** |
+
+**An allow-list, deliberately, not a deny-list.** A deny-list lets a
+newly added field leak by default; this list makes a new field withheld
+by default until someone classifies it.
+
+**Withheld until use is authorised:** `raw_response`, `finish_reason`,
+`result_type`, `transport_error`, `raw_response_note`, `elapsed_s`,
+`layer`, `wall`, and the full `messages` body — the last only for
+minimal disclosure, not because it is unsafe.
+
+### 4. `elapsed_s` is an outcome side-channel, and we have measured it
+
+Not theoretical hygiene. Run 24 recorded **6.4 s** for the VALID INSTANCE
+and **57.0 s** for a SCHEMA ECHO (D245/D246). Elapsed time is therefore
+**empirically correlated with outcome class in our own data**. Publishing
+it beside a candidate row would let the outcome be inferred without ever
+reading `raw_response` — selection contaminated through a side door.
+
+`wall` is excluded for the same reason: stamped in `emit()` after the
+call returns, so differences between rows reconstruct durations.
+
+### 5. Sequence, restated
+
+1. P1 verdict. If it is **not** `REQUEST_REPLAYABLE` → **stop and
+   report**. Nothing below happens.
+2. Check S1's five preconditions (D255/D256).
+3. Publish the **allow-listed projection** of the selected row.
+4. **Stop for authorisation.** The full row, and any response field, are
+   exposed only when Stage 1 use is authorised.
+
+### 6. Operator decisions logged
+
+* **No second legacy live P1 job.** The historical demonstration is
+  banked (run 31893763430, D254).
+* **Preferred long-run shape: an immutable LOCAL legacy-capture
+  regression fixture**, not a permanent dependency on a historical
+  GitHub artifact — artifacts expire, permissions fail, and network state
+  otherwise becomes part of the test. To be settled in the
+  methodology/CI pass, including whether existing calibration already
+  covers the refusal property equivalently. **Task #67.**
+* Standing for now: no census changes, no patch-helper implementation, no
+  Stage 1.
+
+### Status
+
+* **Fresh capture — CAPTURED and bound** (run 31894868473, tree
+  `1d79b14`). **P1 — MEASURING** (measurer at `188fa51`).
+* **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.
+  048 C — BLOCKED.**
