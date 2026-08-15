@@ -36,7 +36,7 @@ DRIVER = REPO / "scripts" / "security" / "stage1_replay.py"
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 10
+EXPECTED_SCENARIOS = 11
 executed: list[str] = []
 LEAK = "ORIGINAL-RESPONSE-MUST-NEVER-BE-READ"
 
@@ -533,6 +533,73 @@ def test_request_identity_is_compared_across_attempts() -> None:
               r.returncode == 4, f"{r.returncode}: {r.stdout[-300:]}")
 
 
+def test_a_population_that_reached_no_model_is_not_a_result() -> None:
+    """D265's false green, reproduced exactly and then refused.
+
+    Run 31906667051 produced ten rows, every request hash matching and
+    the count equal to N1. Every rule this classifier enforced was
+    satisfied, so it exited 0 and GitHub went green over an experiment
+    in which nothing reached a model.
+    """
+    scenario("zero model responses is not green")
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        man = _manifest(tmp)
+        frozen_hash = json.loads(man.read_text())["request_hash"]
+
+        def rows(path, n_ok):
+            """n_ok rows carrying a model reply; the rest transport errors."""
+            out = []
+            for i in range(1, 11):
+                rec = {"replay_index": i, "elapsed_s": 0.001,
+                       "request_hash": frozen_hash}
+                if i <= n_ok:
+                    rec["raw_response"] = '{"summary": "x"}'
+                    rec["elapsed_s"] = 12.0
+                else:
+                    rec["raw_response"] = None
+                    rec["transport_error"] = ("HTTPError: HTTP Error 404: "
+                                              "Not Found")
+                out.append(rec)
+            path.write_text("".join(json.dumps(r) + "\n" for r in out))
+            return path
+
+        # KNOWN POSITIVE: attempt 2, byte-for-byte in shape
+        attempt2 = rows(tmp / "attempt2.jsonl", 0)
+        r = cli("--classify", "--manifest", str(man), "--replies",
+                str(attempt2))
+        check("ten transport failures do NOT exit 0", r.returncode == 4,
+              f"{r.returncode}: {r.stdout[-400:]}")
+        check("and the verdict is UNMEASURED", st.UNMEASURED in r.stdout,
+              r.stdout[-400:])
+        check("naming zero model responses as the unmet prerequisite",
+              "0 model response(s)" in r.stdout, r.stdout[-400:])
+        check("the ten row-level outcomes are STILL reported",
+              r.stdout.count("NO RESPONSE") >= 10, r.stdout[-800:])
+        check("and each row is still called individually true",
+              "Every row above is individually true" in r.stdout,
+              r.stdout[-500:])
+        check("no traceback", "Traceback" not in r.stderr, r.stderr[-300:])
+
+        # KNOWN NEGATIVE: the rule must not fire on a real population.
+        # D247 specifies no partial-population threshold, so none is
+        # invented -- ONE model response is enough to leave the verdict
+        # exactly where it was before this rule existed.
+        for n_ok in (1, 5, 10):
+            path = rows(tmp / f"ok{n_ok}.jsonl", n_ok)
+            r = cli("--classify", "--manifest", str(man), "--replies",
+                    str(path))
+            check(f"{n_ok}/10 model responses still exits 0",
+                  r.returncode == 0, f"{r.returncode}: {r.stdout[-400:]}")
+            check(f"{n_ok}/10 reports how many reached a model",
+                  f"model responses: {n_ok} of 10" in r.stdout,
+                  r.stdout[-400:])
+        # the rule counts MODEL RESPONSES, not rows
+        check("a row with an unexpected shape counts as no response",
+              "raw_response" in _src() and
+              'r.get("raw_response") is not None' in _src())
+
+
 def run_all() -> None:
     test_response_format_is_rebuilt_and_asserted()
     test_identity_must_match_or_it_refuses()
@@ -544,6 +611,7 @@ def run_all() -> None:
     test_no_reply_content_reaches_the_ci_log()
     test_the_loggable_allow_list_is_closed_over_the_classifier()
     test_request_identity_is_compared_across_attempts()
+    test_a_population_that_reached_no_model_is_not_a_result()
     print(f"  inspected: {st.N1} precommitted replay execution(s), "
           f"{len(s1.RESPONSE_BEARING)} response-bearing field(s) withheld")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",

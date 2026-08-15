@@ -1181,6 +1181,44 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=False,
          in_workflows=("stage1-replay.yml",),
          findings=("KAI-GATE-048",)),
+    # D265. Attempt 2's defect: server health read as model readiness.
+    Gate(module="check_model_ready",
+         kind=REPORT,
+         summary="whether the EXACT model the replay will send is "
+                 "present, asked of the server's own inventory and "
+                 "matched exactly against runtime.model from the frozen "
+                 "manifest rather than a literal; a prefix is not a "
+                 "match, a pulled identity that disagrees with the one "
+                 "to be requested refuses, an unreadable inventory "
+                 "refuses, and /v1/models corroborates without a veto",
+         inputs=(),
+         denominator=r"inspected: \d+ model identities across \d+ server",
+         probe=False,
+         probe_skip_reason="it needs a running ollama on an internal "
+                           "network; both directions are calibrated "
+                           "against a real HTTP server serving fixture "
+                           "inventories in scripts/test_model_ready.py",
+         proven_by="scripts/test_model_ready.py",
+         calibrated_by="scripts/test_model_ready.py",
+         in_policy_check=False,
+         in_workflows=("stage1-replay.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_model_ready",
+         kind=GATE,
+         summary="the readiness gate must say BOTH things: a healthy "
+                 "server holding nothing refuses, a different tag of the "
+                 "same family refuses, the exact model permits the "
+                 "replay, every refusal returns a verdict rather than a "
+                 "traceback, and the pull is a foreground gate ordered "
+                 "before the probe and the replay",
+         inputs=(),
+         denominator=r"inspected: \d+ model-readiness scenario\(s\) "
+                     r"across \d+ gate",
+         proven_by="scripts/test_model_ready.py",
+         calibrated_by="scripts/test_model_ready.py",
+         in_policy_check=False,
+         in_workflows=("stage1-replay.yml",),
+         findings=("KAI-GATE-048",)),
     Gate(module="select_replay_subject",
          kind=REPORT,
          summary="which captured request becomes the Stage-1 replay "

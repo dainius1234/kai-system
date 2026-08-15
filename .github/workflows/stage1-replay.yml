@@ -68,6 +68,7 @@ jobs:
           python3 scripts/test_replay_subject_selection.py
           python3 scripts/test_llm_contract.py
           python3 scripts/test_invocation_identity.py
+          python3 scripts/test_model_ready.py
 
       - name: Mint an ephemeral database password for this run
         run: |
@@ -151,15 +152,55 @@ jobs:
             python3 scripts/security/stage1_replay.py --preflight \
               --replies /tmp/stage1-replies.jsonl
 
+      # A SERVER, which is not the same claim as A MODEL. Attempt 2
+      # stopped here and called it ready.
       - name: Start ONLY the model service
         env:
           DB_PASSWORD: ${{ env.DB_PASSWORD }}
         run: |
           set -euo pipefail
-          docker compose -f docker-compose.full.yml up -d ollama ollama-pull
+          docker compose -f docker-compose.full.yml up -d ollama
           python3 scripts/ci/compose_probe.py \
             --compose-file docker-compose.full.yml \
             --services ollama --timeout 300
+
+      # THE PULL IS A GATE, NOT A BACKGROUND HOPE.
+      #
+      # Attempt 2 ran `up -d ollama ollama-pull` and moved on: the pull
+      # container had been alive 0.49 s when the first request went out,
+      # and was killed mid-pull at teardown. Run in the FOREGROUND under
+      # `set -e`, its exit status stops the chain — a failed pull can no
+      # longer be followed by ten requests.
+      #
+      # (docker-compose.full.yml already declares memu-graph ->
+      # ollama-pull `service_completed_successfully`. The replay's
+      # --no-deps, which is right for keeping the rest of the stack
+      # down, told Compose to ignore it. This step is that condition,
+      # restored explicitly.)
+      - name: Pull the model — the pull's exit status is the gate
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          docker compose -f docker-compose.full.yml run --rm ollama-pull
+
+      # AND PROVE IT INDEPENDENTLY. A completed pull is a claim about a
+      # process; this asks the server what it actually holds, and
+      # requires an EXACT match with runtime.model from the frozen
+      # manifest — the value the replay will really send. `ollama`
+      # publishes no ports and agent-net is internal, so the probe runs
+      # inside the network, in the same image as the replay.
+      - name: The exact model must be present, or nothing is sent
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          docker compose -f docker-compose.full.yml run --rm --no-deps \
+            -T -v "$PWD:/w" -w /w memu-graph \
+            python3 scripts/security/check_model_ready.py \
+              --manifest stage1-manifest.json \
+              --declared "${OLLAMA_MODEL}" \
+              --url "http://ollama:11434"
 
       # The replay runs INSIDE the network the capture was taken on, and
       # posts straight to the endpoint: no Instructor, no validation, no

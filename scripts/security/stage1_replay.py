@@ -693,7 +693,31 @@ def main() -> int:
         print("  unmet prerequisite: the replay did not run to its "
               "precommitted denominator")
         return 4
+    # THE FALSE GREEN (D265). Attempt 2 produced ten rows, all with
+    # matching request hashes and a count equal to N1, and every rule
+    # this classifier enforced was satisfied — so it exited 0 over an
+    # experiment in which nothing reached a model. Each row was
+    # truthful; the aggregate was not.
+    #
+    # Deliberately narrow: ONLY the proven hole. D247 specifies no
+    # threshold for partial populations, so none is invented here — a
+    # run with even one model response is reported as it always was.
+    responded = [r for r in replies if r.get("raw_response") is not None]
+    if not responded:
+        print()
+        print(f"  {UNMEASURED}")
+        print(f"  unmet prerequisite: {len(replies)} execution(s) were "
+              f"attempted and NONE reached a model — 0 model response(s)")
+        print()
+        print("  Every row above is individually true. The set is not a")
+        print("  Stage-1 result: D247 asks what the model returns to this")
+        print("  request, and no request was answered by one. A complete")
+        print("  population of transport failures is a fact about the")
+        print("  infrastructure, not a measurement of the model.")
+        return 4
     print()
+    print(f"  model responses: {len(responded)} of {len(replies)} execution(s) "
+          f"reached a model")
     print("  These are REPLAY outcomes. The original captured response has")
     print("  NOT been opened, and comparing them to it is a separate,")
     print("  separately authorised step.")

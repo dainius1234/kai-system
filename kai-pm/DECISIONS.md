@@ -18819,3 +18819,121 @@ lived in a path that had never run.
   0 classifiable replies. STAGE 1 UNMEASURED. The D263 write repair is
   PROVEN; a different, previously unreached prerequisite failed.**
 * **Stage 2 — BLOCKED. Ownership — UNMOVED. 048 C — BLOCKED.**
+
+---
+
+## D266 — Attempt 2's two defects repaired: model readiness, and the false green
+
+**2026-08-15. Authorised scope: two instrument defects only. `send_once`
+is NOT touched. No Attempt 3 is started.**
+
+### 1. Model readiness — and what the tree already said
+
+`ollama` publishes no ports and `agent-net` is `internal: true`, so any
+probe must run inside the network. More importantly, read from
+`docker-compose.full.yml`:
+
+```yaml
+memu-graph:
+  depends_on: {ollama-pull: {condition: service_completed_successfully}}
+```
+
+**The correct gate was already declared.** The replay's `--no-deps` —
+right for keeping the rest of the stack down — told Compose to ignore
+it. So this was not a missing dependency. It was an instrument
+instructing the platform to skip one, which is worse, because the
+declaration reads as protection that is not in force.
+
+Two steps replace the assumption:
+
+* **the pull is a gate.** `docker compose run --rm ollama-pull` in the
+  **foreground** under `set -euo pipefail`. Its exit status stops the
+  chain. Attempt 2 used `up -d ollama ollama-pull` and moved on 0.49 s
+  later.
+* **and the model is proven independently.** A completed pull is a
+  claim about a process; `check_model_ready.py` asks the server what it
+  actually holds.
+
+`check_model_ready.py`, and where its expectation comes from:
+
+* the required identity is **`runtime.model` from the frozen
+  manifest** — the value the replay will really put on the wire. Not a
+  literal typed into the checker, and not the environment variable.
+* `OLLAMA_MODEL` **is** checked, against the manifest. It is what the
+  pull fetched; `runtime.model` is what will be requested; if they
+  differ the run pulled one model and would ask for another. That is a
+  404 waiting to happen and it refuses.
+* presence is an **exact** match in `/api/tags`. A prefix is not a
+  match — `qwen2.5:latest` is a different model from `qwen2.5:3b`, and
+  the refusal says so and lists the near misses.
+* `/v1/models` is queried and reported as corroboration but **may not
+  veto**: refusing a working server because a second endpoint was
+  unavailable would be a false negative dressed as rigour. Its absence
+  is printed, not passed over.
+* it names its own limit: *NOT PROVEN: that generation will succeed.*
+  The narrow claim is the one that failed in attempt 2.
+
+### 2. The false green
+
+`--classify` now ends:
+
+> `model_response_count == 0` → **`STAGE 1 UNMEASURED`**, exit 4.
+
+Deliberately **narrow**. D247 specifies no threshold for partial
+populations, so none is invented: one model response and the verdict is
+exactly what it was before this rule existed. The ten row-level
+outcomes are still printed in full, and the refusal says *every row
+above is individually true* — because they are. What was wrong was the
+aggregate, not the rows.
+
+### 3. `send_once` untouched, as directed
+
+The 404's specific meaning stays an **inference**. Availability is now
+established in advance by something that is not the sender, which is
+the better shape anyway: a prerequisite proven beforehand beats a
+failure explained afterwards. The invocation-identity check confirms
+it: `9a53ee6` → this tree, **IDENTICAL**, 7 definitions in the
+model-facing surface unmoved.
+
+### 4. Calibration
+
+* **`scripts/test_model_ready.py` — 38 passed / 0 failed**, 5 scenarios,
+  against a **real HTTP server** rather than a stubbed `fetch()`. The
+  defect being repaired lived in a network call; a mocked one would
+  have tested the branch and not the mechanism, which is how attempt
+  2's hole survived a green calibration in the first place.
+  1. server healthy, inventory empty (attempt 2's exact state) → REFUSE;
+     same family at another tag → REFUSE; pulled≠requested → REFUSE.
+  2. pull exits non-zero → asserted **structurally** against the
+     shipped YAML: foreground `run --rm ollama-pull`, under `set -e`,
+     ordered before the probe and the replay, with no
+     `continue-on-error` escape and no `up -d` of the puller anywhere.
+     There is no Docker daemon here; this file says so rather than
+     implying it ran.
+  3. exact model present → READY.
+  5. unreachable server, absent/torn/model-less manifest, unreadable
+     inventory → all exit 7 with an explicit REFUSED, no traceback.
+* **`scripts/test_stage1_replay.py` — 143 passed / 0 failed**, 11
+  scenarios. The new one reproduces attempt 2's population exactly —
+  ten rows, matching hashes, count == N₁ — and requires exit 4; then a
+  known-negative at 1, 5 and 10 model responses, each still exit 0.
+* **`scripts/test_invocation_identity.py` — 26 / 0.**
+* **`make policy-check` — green.**
+
+### 5. Not done
+
+* **No Attempt 3.** `kai-pm/STAGE1_GO` untouched.
+* **The original captured response remains unopened.**
+* `check_invocation_identity.py` stays unwired from the workflow, as
+  directed. No permanent baseline gate.
+* Attempts 1 and 2 are untouched, append-only, still UNMEASURED.
+
+### Status
+
+* **Attempt 1 — UNMEASURED, 0/10. Attempt 2 — UNMEASURED, 10 transport
+  attempts / 0 model responses.**
+* **Filesystem/export repair — LIVE-PROVEN. Model-readiness gate —
+  REPAIRED, calibrated, not yet live-proven. Zero-response run-level
+  verdict — REPAIRED, calibrated.**
+* **Attempt 3 — NOT AUTHORISED. Stage 2 — BLOCKED. Ownership —
+  UNMOVED. 048 C — BLOCKED.**

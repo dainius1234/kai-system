@@ -1080,6 +1080,12 @@ test-stage1-replay:
 test-invocation-identity:
 	python3 scripts/test_invocation_identity.py
 
+# D265. A healthy server is not an available model: attempt 2 sent ten
+# requests 0.49s after the model-pull container started and got ten
+# 404s. Both directions, against a real HTTP server rather than a mock.
+test-model-ready:
+	python3 scripts/test_model_ready.py
+
 # D251. "I did not touch the probe" never proved that no live model
 # would run -- core-tests.yml has no paths filter and starts ollama on
 # every push, which this check found on its first execution. Run it
