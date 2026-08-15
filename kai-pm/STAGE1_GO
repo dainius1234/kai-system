@@ -1,19 +1,65 @@
-STAGE 1 — EXACT-REQUEST REPLAY: AUTHORISED AND STARTED
+STAGE 1 — EXACT-REQUEST REPLAY: ATTEMPT 2, AUTHORISED AND STARTED
 
-Authorisation: operator, 2026-08-15 — "Stage 1: GO ... Dispatch Stage 1
-now", against the prospectively selected subject only.
+ATTEMPT      : 2
+Authorisation: Dainius/Kai, 2026-08-15, fresh and specific — "Fresh
+               authorisation is granted for Stage-1 Attempt 2", granted
+               on the D263 pre-dispatch certificate. This is NOT a rerun
+               of run 31899571806; it is a new attempt with its own run
+               identity.
+
+Repaired base commit : 9a53ee630188b0c58cdea0f3539baecaed35fe9b
+Repaired base tree   : 26eee3c8084312d084cca57015241e6202fc361d
+Pre-dispatch commit  : a29aa97dcfe6e360a319133c7d980bd15787d322 (D264 —
+                       adds only the cross-attempt request-hash check;
+                       model-facing surface reported IDENTICAL against
+                       the repaired base)
 
 Subject      : capture run 31894868473, tree
                1d79b145a04f1bc35a9bc9d0a31251153f6e6a10
 Selected row : seq 2, logical_call_id a39b6669dc1240c3, attempt_index 1
                prompt d53797298bea, contract 98c57afadeae   (D259)
-Experiment   : D247 Stage 1, unchanged. N1 = 10, sequential, direct HTTP,
-               no Instructor, no validation, no reask, no retry.
-               Transport errors recorded and NOT replaced.
-Constraints  : the original captured response is not opened until the ten
+Model        : qwen2.5:3b
+Endpoint     : http://ollama:11434/v1/chat/completions, timeout 300 s
+
+Experiment   : D247 Stage 1, UNCHANGED. N1 = 10, sequential, direct HTTP.
+               No Instructor. No validation. No retry, no reask, no
+               replacement calls. Transport errors are recorded as that
+               execution and are NOT replaced. The denominator does not
+               shrink. Any request-side drift invalidates the whole
+               experiment — it is never a 9/10 result.
+
+Constraints  : the original captured response is not opened until all ten
                executions are complete and sealed; no model, timeout,
-               schema or request parameter is altered; any invocation
-               whose request identity differs makes the set INVALID.
+               schema or request parameter is altered; the ten outcomes
+               are interpreted under D247's already-frozen rules and no
+               interpretation is invented after seeing them.
+
+Prerequisites, in order, all before model call 1
+  1. the capture artifact is present, or the run refuses;
+  2. re-selection under S1 reproduces seq 2 / d53797298bea / 98c57afadeae,
+     or the run refuses;
+  3. attempt 2's request_hash EQUALS attempt 1's, read from run
+     31899571806's freeze manifest — value-level identity, not merely
+     code identity. Unequal is STAGE 1 INVALID; unestablished is STAGE 1
+     UNMEASURED. Either way nothing is sent;
+  4. the repaired output path is proven writable in the same image, as
+     the same `app` user, at the same container-local path, through the
+     same open() the replay uses.
+
+  If any prerequisite fails the attempt STOPS BEFORE MODEL CALL 1 and
+  returns STAGE 1 UNMEASURED — REPLAY INSTRUMENT FAILURE. No rerun, no
+  replacement attempt, no reduced denominator.
+
+Attempt 1    : run 31899571806, run_attempt 1, 0 of 10 executions.
+               INSTRUMENT / INFRASTRUCTURE FAILURE — UNMEASURED.
+               PermissionError writing into a host-owned bind mount from
+               a container running USER app. Permanently banked as such;
+               nothing here re-labels it, and no execution of it is
+               replaced.
+
+Still blocked: Stage 2 remains BLOCKED and requires separate
+               authorisation. Ownership remains UNMOVED. 048 C remains
+               BLOCKED.
 
 A live model executes. That is explicitly authorised for this run and
 recorded here BEFORE it starts, not reconstructed afterwards (D251).
