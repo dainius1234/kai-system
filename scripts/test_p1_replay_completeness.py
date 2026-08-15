@@ -25,6 +25,7 @@ model capture that nobody authorised.
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -36,7 +37,7 @@ import p1_replay_completeness as p1  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 4
+EXPECTED_SCENARIOS = 5
 executed: list[str] = []
 
 
@@ -417,11 +418,86 @@ def test_format_validation_cannot_become_a_verdict() -> None:
 
 
 
+def test_the_shipped_entry_point_runs_both_paths() -> None:
+    """The SCRIPT, executed — not its functions called individually.
+
+    P1 workflow run 5 died with `ValueError: too many values to unpack`
+    at `main()`'s `rows, notes = read_rows(cap)`: `read_rows` had grown a
+    third return value and one of its two call sites was never updated.
+    Every unit assertion in this file passed, because every one of them
+    calls `read_rows`, `audit_kwargs` and `classify` DIRECTLY and none of
+    them had ever run the entry point that CI runs.
+
+    A suite that exercises the parts and not the shipped invocation is
+    testing something adjacent to the thing being shipped. So both paths
+    are executed here as subprocesses, exactly as the workflow executes
+    them.
+    """
+    scenario("shipped entry point")
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        cap = _p1_capture(tmp, "e2e", [_p1_row(), _p1_row()])
+        src = _p1_source(tmp, "clean", CLEAN_CALL_SITE)
+        fwd = _p1_forwarder(tmp, "fwdok", CLEAN_FORWARDER)
+        script = REPO / "scripts" / "security" / "p1_replay_completeness.py"
+
+        def run(*extra):
+            return subprocess.run([sys.executable, str(script),
+                                   "--capture", cap, *extra],
+                                  capture_output=True, text=True, timeout=120)
+
+        # 1. the P1 verdict path, end to end
+        proc = run("--call-site-root", str(src), "--forwarder-root", str(fwd))
+        check("the P1 path does not crash", "Traceback" not in proc.stderr,
+              proc.stderr[-400:])
+        check("and reaches a verdict", "P1 VERDICT:" in proc.stdout,
+              proc.stdout[-400:])
+        check("which is REQUEST_REPLAYABLE for a clean capture",
+              "P1 VERDICT: REQUEST_REPLAYABLE" in proc.stdout,
+              proc.stdout[-600:])
+        check("and exits 0 for it", proc.returncode == 0, str(proc.returncode))
+
+        # 2. the P1 refusal path, end to end — the run-24 shape
+        legacy = tmp / "legacy.jsonl"
+        legacy.write_text(json.dumps(_p1_row()) + "\n")
+        proc = subprocess.run(
+            [sys.executable, str(script), "--capture", str(legacy),
+             "--call-site-root", str(src), "--forwarder-root", str(fwd)],
+            capture_output=True, text=True, timeout=120)
+        check("the refusal path does not crash either",
+              "Traceback" not in proc.stderr, proc.stderr[-400:])
+        check("a legacy capture is refused, with a verdict",
+              "P1 VERDICT: UNRESOLVED" in proc.stdout, proc.stdout[-400:])
+        check("and exits 2", proc.returncode == 2, str(proc.returncode))
+
+        # 3. the format path, end to end
+        proc = run("--format-check", "12345")
+        check("the format path does not crash",
+              "Traceback" not in proc.stderr, proc.stderr[-400:])
+        check("and reaches a format verdict",
+              "FORMAT: VALID" in proc.stdout, proc.stdout[-400:])
+        check("and exits 0 for it", proc.returncode == 0, str(proc.returncode))
+        check("and still refuses to be read as a P1 verdict",
+              "P1 VERDICT:" not in proc.stdout, proc.stdout[-400:])
+
+        # 4. a missing capture must refuse from the entry point too
+        proc = subprocess.run(
+            [sys.executable, str(script), "--capture", str(tmp / "nope.jsonl"),
+             "--call-site-root", str(src)],
+            capture_output=True, text=True, timeout=120)
+        check("an absent capture does not crash",
+              "Traceback" not in proc.stderr, proc.stderr[-400:])
+        check("and is UNRESOLVED", "P1 VERDICT: UNRESOLVED" in proc.stdout,
+              proc.stdout[-300:])
+
+
+
 def run_all() -> None:
     test_p1_never_lets_one_clean_axis_imply_the_other()
     test_p1_refuses_rather_than_guessing()
     test_p1_reconciles_and_refuses_the_new_holes()
     test_format_validation_cannot_become_a_verdict()
+    test_the_shipped_entry_point_runs_both_paths()
 
     print(f"  inspected: {len(p1.EXIT)} P1 verdict(s) discriminated")
     print(f"  axes: keyword (artifact) and positional (call-path source)")

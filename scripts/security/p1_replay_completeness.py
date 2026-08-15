@@ -598,10 +598,10 @@ def main() -> int:
         # R11: no subject, no observation. Say which prerequisite failed.
         print(f"AXIS A: capture not found at {cap} — not measured.")
     else:
-        rows, notes = read_rows(cap)
+        rows, notes, manifest = read_rows(cap)
         for note in notes:
             print(f"  capture note: {note}")
-        kw = audit_kwargs(rows, notes)
+        kw = audit_kwargs(rows, notes, manifest)
         print(f"AXIS A — keyword arguments, from the artifact")
         print(f"  llm-call rows            : {kw['rows_total']}")
         print(f"  production population    : {kw['population']} "

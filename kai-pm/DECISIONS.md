@@ -17528,3 +17528,115 @@ Stated in advance rather than discovered afterwards.
 * **P1 — UNRESOLVED. Real-format validation — PENDING.**
 * **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.**
 * **048 C — BLOCKED. Campaign — CLOSED at 1/5.**
+
+---
+
+## D253 — Format VALID; item 5 not demonstrated, because my instrument crashed
+
+**2026-08-15.** Two results, one of which is a defect in the census.
+
+### 1. Wording correction, in the operator's formulation
+
+D252 §7 said *"no new evidence of any kind comes from `8bc56c0`"*. Too
+broad. The correct statement, which supersedes it:
+
+> **No new capture-writing evidence admissible to Q2, Q6 or ownership
+> was produced by `8bc56c0`.**
+
+A live `core-tests` execution still produces run and log evidence **about
+that CI execution itself**. It is not admissible for ownership, and it is
+not nothing.
+
+### 2. Format validation — VALID
+
+| | |
+|---|---|
+| **SUBJECT** (produced the artifact) | run **31890166592**, commit `930e7d09` |
+| **MEASURER** (measured it) | run **31892236432**, commit `8bc56c0e` |
+
+Capture: 28,345 bytes, 19 lines, **5 production request rows**.
+
+| criterion | result |
+|---|---|
+| 1. data stream carries machine rows only | **PASS** — 0 non-machine lines |
+| 2. manifest declared == parsed rows | **PASS** — declared 5, parsed 5 |
+| 3. every production row records `args_state`, valid labels | **PASS** — 5/5; labels seen `ABSENT`, `VALUE` |
+| 4. positional fields present and reconstructable | **PASS** — 0 without a count, 0 unreconstructable, 0 carrying positional args |
+
+**FORMAT: VALID.** No response field was read; no model outcome was
+inspected; nothing is admitted to Q2, Q6 or ownership.
+
+Only two of the three presence labels appear, and that is correct rather
+than a gap: the adapter never passes `temperature`, so production data
+cannot exhibit `NULL`. That the three are *distinguishable* is proven by
+the probe's selftest criteria, not by production traffic.
+
+### 3. Item 5 was NOT demonstrated — the P1 job crashed
+
+The same workflow run's P1 job did **not** produce `UNRESOLVED` for run
+24. It died:
+
+```
+File "scripts/security/p1_replay_completeness.py", line 601, in main
+    rows, notes = read_rows(cap)
+ValueError: too many values to unpack (expected 2)
+```
+
+`read_rows` grew a third return value in D250 and **one of its two call
+sites was never updated**. The `--format-check` path was; the P1 verdict
+path was not.
+
+**How it survived every gate.** All 67 census assertions call
+`read_rows`, `audit_kwargs` and `classify` **directly**. Not one had ever
+run the entry point CI runs. `policy-check` does not execute it either.
+So a suite testing the parts certified a shipped invocation that could
+not start — which is this programme's own subject wearing a new costume:
+*the evidence for a thing came from somewhere that could not see the
+thing*.
+
+It also had a mechanical cause worth naming: the edit that should have
+fixed the second call site was a string replacement whose anchor no
+longer matched, and it was applied **without an assertion**. A patch that
+silently does nothing is indistinguishable from one that worked.
+
+**Repaired**: the call site, and the calibration. Five subprocess cases
+now execute the shipped script exactly as the workflow does — P1 verdict,
+P1 refusal on a legacy capture, format check, format check not leaking a
+P1 verdict, and an absent capture. Mutation: reverting the call site to
+the two-value unpack turns **80 passed / 0 failed** into **73 / 7**;
+restored, 80/0 with no mutation string present.
+
+So, precisely:
+
+> **Item 5 — refusal on a legacy capture — is UNDEMONSTRATED in run 5.**
+> It is asserted in calibration and will be demonstrated live on the next
+> P1 run. A crash is not a refusal, and must not be counted as one.
+
+### 4. Governance finding — logged, not fixed
+
+`core-tests.yml` has no `on.push.paths` filter and starts a real model
+stack on every push (`docker compose … up -d ollama ollama-pull
+memu-graph`, line 604). It writes **no** capture, so no ownership
+evidence is affected. Implications for CI cost, runtime side effects,
+reproducibility and governance belong to the later CI/release-gate
+normalisation work. **Task #64. Not touched during 048.**
+
+Detector over-scope stays visible in the record too: the trigger check's
+first version counted 3 live-model workflows by matching command text
+inside docstrings; the corrected version reasons over executable lines
+and counts 2. That history is evidence about the instrument, not an
+embarrassment to tidy away.
+
+### 5. Fetch-state ordering, preserved
+
+Transport and authorisation are established **before** subject state is
+trusted, because a `run_status` we could not fetch cannot be relied on to
+say "completed". Asserted in calibration and stated in the module.
+
+### Status
+
+* **Real-format validation — PASSED** for the subject named above.
+* **P1 — UNRESOLVED.** Run 24 is legacy evidence; validating a new format
+  changes nothing about old evidence.
+* **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.**
+* **048 C — BLOCKED. Campaign — CLOSED at 1/5.**
