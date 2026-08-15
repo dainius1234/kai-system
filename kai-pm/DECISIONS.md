@@ -18157,3 +18157,85 @@ surviving because fixing it was inconvenient.
 * **S1 — built, calibrated, mutation-proven; NOT yet executed.**
 * **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.
   048 C — BLOCKED.**
+
+---
+
+## D259 — S1: the Stage-1 replay subject, request-side identity only
+
+**2026-08-15.** Published. **Stage 1 remains BLOCKED.**
+
+| | |
+|---|---|
+| **SUBJECT artifact** | run **31894868473**, tree **`1d79b145a04f1bc35a9bc9d0a31251153f6e6a10`** |
+| **SELECTOR run** | **31896596443**, commit **`eb155a3f`** |
+
+Preconditions, all five:
+
+```
+precondition 1: established by P1 run 31896596443 — enforced structurally
+  (`needs:`; only REQUEST_REPLAYABLE exits 0), not re-derived
+candidate population: 3 production row(s)
+precondition 2: every candidate row has an integer seq >= 1        OK
+precondition 3: exactly one row holds the minimum seq (2)           OK
+precondition 4: the selected row has a logical_call_id              OK
+precondition 5: the selected row's attempt_index == 1               OK
+```
+
+### The selected subject — allow-listed projection
+
+```
+seq                    2
+logical_call_id        "a39b6669dc1240c3"
+attempt_index          1
+outside_logical_call   false
+phase                  "capture"
+model                  "qwen2.5:3b"
+temperature            null
+response_format        "{'type': 'json_object'}"
+tools                  null
+other_params           []
+args_state             {"messages": "VALUE", "model": "VALUE",
+                        "temperature": "ABSENT",
+                        "response_format": "VALUE", "tools": "ABSENT"}
+positional_arg_count   0
+positional_args        []
+prompt_hash            "d53797298bea"
+contract_hash          "98c57afadeae"
+contract_provenance    "recovered from this attempt's system message
+                        (chars 2529-4422)"
+```
+
+**Withheld** until Stage-1 use is authorised: `raw_response`,
+`finish_reason`, `result_type`, `transport_error`, `raw_response_note`,
+`elapsed_s`, `layer`, `wall`, the full `messages` body, and any hash of
+the complete stored row.
+
+**No model response has been read at any point in this selection.**
+
+### Two observations, neither a blocker
+
+**1. The minimum `seq` is 2, not 1 — and that is expected.** `_SEQ`
+counts every emitted row, and rows such as `resolved-config` and
+`drive-start` precede the first `llm-call`. S1 selects the lowest `seq`
+*among production `llm-call` rows*, not `seq == 1`. Recorded because a
+later reader could otherwise mistake it for a dropped row.
+
+**2. `response_format` is stored as a Python repr, not as JSON.**
+`"{'type': 'json_object'}"` — single quotes. The probe's `_serialise()`
+falls back to `str(obj)` for objects without a schema method, so the
+recorded value is a repr string rather than a nested JSON object.
+
+Reconstructable for this value (a flat dict of literals, via
+`ast.literal_eval`), but it is a **replay-fidelity wrinkle**, not a
+formatting nicety: a Stage-1 replay must rebuild the argument, and
+`json.loads` on that string fails. Flagged now rather than discovered
+mid-replay. It does **not** change the P1 verdict — the value is present
+and reconstructable, which is what `REQUEST_REPLAYABLE` asserts — and it
+is **not** fixed here, because the probe is frozen during 048 and this
+capture is the subject. **Task #66.**
+
+### Status
+
+* **S1 — SELECTED and published (request-side only).**
+* **Stage 1 — BLOCKED, awaiting authorisation.** Stage 2 — BLOCKED.
+  Ownership — UNMOVED. **048 C — BLOCKED.**
