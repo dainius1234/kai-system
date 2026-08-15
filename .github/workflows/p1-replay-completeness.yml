@@ -5,13 +5,20 @@
 # that may never substitute for one another:
 #
 #   A  keyword arguments — measured from the capture run's own artifact.
-#      `probe_llm_contract.py:383` records extra kwargs as NAMES ONLY, so
-#      a non-empty `other_params` means values are gone.
-#   B  positional arguments — the probe forwards `*args` and records them
-#      nowhere, so the capture is silent on this axis BY CONSTRUCTION. A
-#      clean axis A says nothing whatsoever about axis B. It is
-#      established from the call path's SOURCE, taken out of the image
-#      that ran it, or it is not established at all.
+#      The probe records extra kwargs as NAMES ONLY, so a non-empty
+#      `other_params` means values are gone.
+#   B  positional arguments — from the call path's SOURCE, taken out of
+#      the image that ran it, AND from the count the probe records at
+#      runtime (D250). Neither substitutes for the other: source says
+#      what the code can do, the record says what arrived. Before D250
+#      the probe recorded nothing here, so a clean axis A said nothing
+#      whatsoever about axis B — the substitution this job refuses.
+#
+# D250 also requires the capture to be certifiable at all: machine rows
+# only, a manifest whose declared count must equal the parsed rows, and
+# ABSENT/NULL/VALUE kept apart. Captures written before that format keep
+# their historical meaning and are NOT retroactively upgraded — they are
+# simply not certifiable under this standard, and the census says so.
 #
 # NO MODEL CALL. No stack bring-up. This workflow reads bytes that already
 # exist and source that is already pinned, so it cannot produce evidence
@@ -36,6 +43,11 @@ on:
       - .github/workflows/p1-replay-completeness.yml
       - scripts/security/p1_replay_completeness.py
       - scripts/test_p1_replay_completeness.py
+      # The census's calibration asserts against the probe's own source —
+      # what it records by value, what it records as a name, and that it
+      # keeps ABSENT/NULL/VALUE apart. So the probe is an input to THIS
+      # job too, and a format change here must re-run this census.
+      - scripts/security/probe_llm_contract.py
       - memu-graph/Dockerfile
       - memu-graph/requirements.txt
       - docker-compose.full.yml

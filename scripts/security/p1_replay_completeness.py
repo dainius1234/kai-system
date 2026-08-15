@@ -8,17 +8,20 @@ question has to be answered with evidence rather than confidence:
     does the capture actually hold the whole model-facing invocation?
 
 `probe_llm_contract.py` records five arguments **with their values**
-(`messages`, `model`, `temperature`, `response_format`, `tools`), records
-every other keyword argument as a **name only**, and does not record
-positional arguments at all. So "we replayed the exact request" is a
-claim about two independent axes, and each needs its own evidence:
+(`messages`, `model`, `temperature`, `response_format`, `tools`) and
+records every other keyword argument as a **name only**. So "we replayed
+the exact request" is a claim about two independent axes, and each needs
+its own evidence:
 
   A. keyword arguments — is `other_params` empty for every relevant
      production row? Measured from the artifact. Empirical.
   B. positional arguments — did the production call path supply any?
-     The capture is silent on this by construction, so a capture showing
-     `other_params == []` says NOTHING about axis B. It is established
-     from the call path's source, or it is not established at all.
+     Two sources, and neither may stand in for the other: the call
+     path's **source**, which says what the code can do, and the
+     probe's recorded `positional_arg_count`, which says what actually
+     arrived. Before D250 the probe recorded nothing here at all, and a
+     capture showing `other_params == []` said NOTHING about this axis —
+     which is exactly the substitution this instrument refuses.
 
 This script measures both and refuses to collapse them. It emits exactly
 one of five verdicts, per the frozen procedure:
@@ -47,12 +50,36 @@ and may NOT claim "byte-identical wire request". Claiming the latter
 needs evidence from the HTTP/wire boundary, which this instrument does
 not observe and does not pretend to.
 
-One residual, recorded rather than hidden: the probe writes `None` for a
-recorded key that was absent, so absent and explicitly-None are
-indistinguishable in the record for the five valued keys. The certified
-replay rule is therefore **omit any key recorded as None**. For these
-five that is materially equivalent — the OpenAI client omits unset
-optionals — but the ambiguity is real and is reported, not assumed away.
+--- what a certifiable capture must contain (D250) ----------------------
+
+P1 run 2 refused run 24's capture because one line of it was the probe's
+own prose. The repair was not a whitelist for that line; it was a stream
+that structurally cannot hold prose, plus three further requirements:
+
+  * **the data stream is machine rows only** — one JSON object per line,
+    each naming its `event`. A line that is not one is a hole in the
+    denominator, whatever it says;
+  * **a `capture-manifest` row declares the production-call count**,
+    counted from the wrapper's own entry counter rather than by counting
+    the rows it wrote. Declared must equal parsed, or the census
+    refuses. Same instrument, so this is internal corroboration and NOT
+    independent proof — but a lost or truncated row now shows up as a
+    mismatch instead of shrinking the denominator along with the
+    evidence;
+  * **`args_state` gives every model-facing key three states** —
+    `ABSENT` / `NULL` / `VALUE`. `"temperature": None` alone cannot say
+    whether the caller omitted the key or passed None, and at the
+    client-invocation boundary those are not the same claim. A replay
+    rule of "if None, omit it" is an inference presented as a record;
+  * **`positional_arg_count` is recorded**, so axis B has a runtime
+    record as well as source analysis. If positional arguments ever
+    appear and their values were not recorded, the census refuses rather
+    than inferring replayability from an absence of evidence.
+
+Captures written before this format keep their historical meaning and
+are **not** retroactively upgraded: with no manifest and no `args_state`
+they are simply not certifiable under this standard, and the census says
+so rather than reading them as clean.
 
 Usage:
 
@@ -104,10 +131,17 @@ PRODUCTION_PHASE = "capture"
 # ---------------------------------------------------------------- axis A
 
 
-def read_rows(path: pathlib.Path) -> tuple[list[dict], list[str]]:
-    """Every `llm-call` row in the capture, plus any parse complaints."""
+def read_rows(path: pathlib.Path) -> tuple[list[dict], list[str], dict | None]:
+    """Every `llm-call` row, the parse complaints, and the manifest.
+
+    A JSON line that is not an object, or an object with no `event`, is a
+    malformed machine row and is a complaint too — the stream's contract
+    is "one JSON object per line, each naming its event", and a line that
+    breaks it is as much a hole in the denominator as prose is.
+    """
     rows: list[dict] = []
     notes: list[str] = []
+    manifest: dict | None = None
     for n, line in enumerate(path.read_text(errors="replace").splitlines(), 1):
         line = line.strip()
         if not line:
@@ -124,12 +158,26 @@ def read_rows(path: pathlib.Path) -> tuple[list[dict], list[str]]:
                 f"line {n}: unparseable ({exc.msg}); {len(line)} bytes; "
                 f"first {min(400, len(line))}: {head!r}")
             continue
-        if isinstance(row, dict) and row.get("event") == "llm-call":
+        if not isinstance(row, dict):
+            notes.append(
+                f"line {n}: parsed as {type(row).__name__}, not a JSON "
+                f"object; {len(line)} bytes")
+            continue
+        if "event" not in row:
+            notes.append(
+                f"line {n}: JSON object with no `event` key, so it names "
+                f"no record type; {len(line)} bytes; keys: "
+                f"{sorted(row)[:8]}")
+            continue
+        if row["event"] == "capture-manifest":
+            manifest = row
+        elif row["event"] == "llm-call":
             rows.append(row)
-    return rows, notes
+    return rows, notes, manifest
 
 
-def audit_kwargs(rows: list[dict], notes: list[str] | None = None) -> dict:
+def audit_kwargs(rows: list[dict], notes: list[str] | None = None,
+                 manifest: dict | None = None) -> dict:
     """Axis A over the production population."""
     population = [r for r in rows if r.get("phase") == PRODUCTION_PHASE]
     offenders = [r for r in population if r.get("other_params")]
@@ -137,11 +185,31 @@ def audit_kwargs(rows: list[dict], notes: list[str] | None = None) -> dict:
         r for r in population
         if any(r.get(k) is None for k in REQUIRED_FOR_REPLAY)
     ]
-    ambiguous = {
-        k: sum(1 for r in population if r.get(k) is None) for k in VALUED_KEYS
-    }
+    # THREE STATES, COUNTED. A row that records only the value cannot say
+    # whether a key was absent or explicitly None, so it is counted as
+    # legacy rather than quietly read as one or the other.
+    legacy = [r for r in population if not isinstance(r.get("args_state"), dict)]
+    presence: dict = {k: {"ABSENT": 0, "NULL": 0, "VALUE": 0, "UNRECORDED": 0}
+                      for k in VALUED_KEYS}
+    for r in population:
+        st = r.get("args_state") if isinstance(r.get("args_state"), dict) else {}
+        for k in VALUED_KEYS:
+            presence[k][st.get(k, "UNRECORDED")] = \
+                presence[k].get(st.get(k, "UNRECORDED"), 0) + 1
+    # Axis B as RECORDED at runtime, which is a different source from the
+    # source-code analysis and may not be substituted for it.
+    pos_rows = [r for r in population if r.get("positional_arg_count")]
+    pos_unrecorded = [r for r in population
+                      if r.get("positional_arg_count") is None]
+    pos_unreconstructable = [
+        r for r in pos_rows
+        if len(r.get("positional_args") or []) != r.get("positional_arg_count")
+    ]
+    declared = (manifest or {}).get("declared_production_calls")
     return {
         "parse_notes": list(notes or ()),
+        "manifest": manifest,
+        "declared": declared,
         "rows_total": len(rows),
         "population": len(population),
         "offenders": offenders,
@@ -149,7 +217,11 @@ def audit_kwargs(rows: list[dict], notes: list[str] | None = None) -> dict:
             name for r in offenders for name in (r.get("other_params") or [])
         }),
         "unreconstructable": len(unreconstructable),
-        "null_ambiguous": ambiguous,
+        "legacy_rows": len(legacy),
+        "presence": presence,
+        "positional_rows": len(pos_rows),
+        "positional_unrecorded": len(pos_unrecorded),
+        "positional_unreconstructable": len(pos_unreconstructable),
     }
 
 
@@ -317,19 +389,49 @@ def classify(kw: dict | None, pos: dict) -> tuple[str, list[str]]:
     if kw is None:
         return UNRESOLVED, ["the capture could not be read at all"]
     if kw["parse_notes"]:
-        # A line that did not parse is a hole in the denominator, and a
-        # denominator with a hole cannot certify anything. It might be an
-        # `llm-call` row carrying the very kwarg that breaks axis A, and
-        # "it probably is not" is exactly the reasoning P1 exists to
-        # refuse. UNRESOLVED until the line is identified.
+        # A line that did not parse, or parsed into something that is not
+        # a record, is a hole in the denominator — and a denominator with
+        # a hole cannot certify anything. It might be the `llm-call` row
+        # carrying the very kwarg that breaks axis A, and "it probably is
+        # not" is exactly the reasoning P1 exists to refuse.
         return UNRESOLVED, [
-            f"{len(kw['parse_notes'])} capture line(s) did not parse, so "
-            f"the production population of {kw['population']} is a LOWER "
-            "BOUND, not a certified denominator"] + kw["parse_notes"]
+            f"{len(kw['parse_notes'])} capture line(s) are not valid "
+            f"machine rows, so the production population of "
+            f"{kw['population']} is a LOWER BOUND, not a certified "
+            "denominator"] + kw["parse_notes"]
+    if kw["manifest"] is None:
+        # No manifest: either a legacy capture, or a run that died before
+        # declaring. Both mean the same thing here — nothing independent
+        # of the rows says how many there should be.
+        return UNRESOLVED, [
+            "the capture declares no `capture-manifest` row, so nothing "
+            "states how many production calls there SHOULD be. A capture "
+            "written before the manifest existed keeps its historical "
+            "meaning and is simply not certifiable under this standard; "
+            "a truncated one is indistinguishable from it here, which is "
+            "why neither is upgraded"]
+    if kw["declared"] != kw["population"]:
+        # THE reconciliation. Two counters from different places in the
+        # probe: the wrapper's entry counter, and the rows that reached
+        # the file. Same instrument, so this is internal corroboration
+        # and not independent proof — but a dropped, truncated or
+        # never-written row shows up as a mismatch instead of quietly
+        # shrinking the denominator along with the evidence.
+        return UNRESOLVED, [
+            f"reconciliation FAILED: the capture declares "
+            f"{kw['declared']} production call(s) and "
+            f"{kw['population']} row(s) were parsed. One of them is "
+            "wrong, and until that is resolved neither is a denominator"]
     if kw["population"] == 0:
         return UNRESOLVED, [
             f"no production rows (phase={PRODUCTION_PHASE!r}) in the "
             f"capture; {kw['rows_total']} llm-call row(s) total"]
+    if kw["legacy_rows"]:
+        return UNRESOLVED, [
+            f"{kw['legacy_rows']} of {kw['population']} production row(s) "
+            "record no `args_state`, so ABSENT and NULL are "
+            "indistinguishable in them. A replay rule of 'if None, omit "
+            "it' would be an inference presented as a record"]
     if kw["unreconstructable"]:
         return UNRESOLVED, [
             f"{kw['unreconstructable']} of {kw['population']} production "
@@ -337,14 +439,29 @@ def classify(kw: dict | None, pos: dict) -> tuple[str, list[str]]:
             "artifact cannot establish completeness"]
 
     kwargs_bad = bool(kw["offenders"])
-    pos_bad = not pos["established"]
+    # Axis B now has TWO sources that must agree: the source analysis,
+    # and what the wrapper recorded arriving at runtime. Neither may
+    # stand in for the other — source says what the code can do, the
+    # record says what happened.
+    recorded_bad = bool(kw["positional_unrecorded"]
+                        or kw["positional_unreconstructable"])
+    pos_bad = (not pos["established"]) or recorded_bad
     if kwargs_bad:
         why.append(
             f"{len(kw['offenders'])} of {kw['population']} production "
             f"row(s) carry unrecorded kwarg value(s): "
             f"{', '.join(kw['extra_names'])}")
-    if pos_bad:
-        why.append(f"positional axis: {pos['reason']}")
+    if not pos["established"]:
+        why.append(f"positional axis, source: {pos['reason']}")
+    if kw["positional_unrecorded"]:
+        why.append(
+            f"positional axis, record: {kw['positional_unrecorded']} row(s) "
+            "do not record a positional argument count at all")
+    if kw["positional_unreconstructable"]:
+        why.append(
+            f"positional axis, record: {kw['positional_unreconstructable']} "
+            "row(s) report positional arguments whose values were not "
+            "recorded, so they cannot be replayed and must not be inferred")
 
     if kwargs_bad and pos_bad:
         return INCOMPLETE_MULTIPLE, why
@@ -355,7 +472,13 @@ def classify(kw: dict | None, pos: dict) -> tuple[str, list[str]]:
     return REPLAYABLE, [
         f"{kw['population']} production row(s), every one with "
         f"other_params == []",
-        f"positional axis: {pos['reason']}"]
+        f"reconciliation: {kw['declared']} declared == {kw['population']} "
+        "parsed (internal corroboration, not independent proof)",
+        f"presence recorded on all {kw['population']} row(s): ABSENT, NULL "
+        "and VALUE are distinguished",
+        f"positional axis, record: {kw['positional_rows']} row(s) with "
+        "positional arguments",
+        f"positional axis, source: {pos['reason']}"]
 
 
 def main() -> int:
@@ -398,10 +521,18 @@ def main() -> int:
             print(f"  unrecorded kwarg names   : {', '.join(kw['extra_names'])}")
         print(f"  rows missing "
               f"{'/'.join(REQUIRED_FOR_REPLAY)}: {kw['unreconstructable']}")
-        print("  recorded-None (absent and explicit-None indistinguishable):")
-        for k, n in kw["null_ambiguous"].items():
-            print(f"      {k:<16} {n}/{kw['population']}")
-        print("    replay rule: omit any key recorded as None.")
+        print(f"  declared by the capture   : {kw['declared']}"
+              f"  (manifest present: {kw['manifest'] is not None})")
+        print(f"  rows without args_state   : {kw['legacy_rows']}")
+        print("  argument presence, three states (D250):")
+        for k, counts in kw["presence"].items():
+            print(f"      {k:<16} " + "  ".join(
+                f"{s}={counts.get(s, 0)}"
+                for s in ("VALUE", "NULL", "ABSENT", "UNRECORDED")))
+        print(f"  positional, recorded      : "
+              f"{kw['positional_rows']} row(s) with args, "
+              f"{kw['positional_unrecorded']} row(s) with no count, "
+              f"{kw['positional_unreconstructable']} unreconstructable")
     print()
 
     pos = audit_positional(

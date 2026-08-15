@@ -52,8 +52,33 @@ import uuid
 from functools import wraps
 
 OUT = os.environ.get("LLM_CAPTURE_PATH", "/tmp/llm-contract-capture.jsonl")
+# The model-facing arguments recorded WITH their values, and the same
+# tuple that defines what `other_params` is the complement of. One
+# definition, so a key cannot be valued here and "extra" there.
+VALUED_KEYS = ("messages", "model", "temperature", "response_format", "tools")
 TEXT = ("Ada Lovelace wrote the first algorithm for the Analytical "
         "Engine, which Charles Babbage designed in London.")
+
+
+# THE TWO STREAMS, SEPARATED BY CONSTRUCTION.
+#
+# `capture.jsonl` is this process's stdout. Until 2026-08-14 the probe
+# also printed its own human-readable denominator there, so the capture
+# file was not a machine-data stream at all: P1 run 2 refused it, and it
+# was right to. One stream carrying rows AND prose cannot have a
+# certifiable denominator, and the fix is not a whitelist for the prose
+# we happen to recognise — it is a stream that structurally cannot hold
+# any.
+#
+#   stdout  -> machine rows ONLY, one JSON object per line
+#   stderr  -> every human-readable word this probe ever writes
+#
+# `say()` is the only way to write prose, and it cannot reach stdout.
+def say(*args, **kwargs) -> None:
+    """Human-readable output. NEVER stdout — that stream is the data."""
+    kwargs.pop("file", None)
+    kwargs.setdefault("flush", True)
+    print(*args, file=sys.stderr, **kwargs)
 
 
 def emit(record: dict) -> None:
@@ -61,7 +86,9 @@ def emit(record: dict) -> None:
     line = json.dumps(record, default=str)
     with open(OUT, "a", encoding="utf-8") as fh:
         fh.write(line + "\n")
-    print(line, flush=True)
+    # The ONLY writer of stdout in this file.
+    sys.stdout.write(line + "\n")
+    sys.stdout.flush()
 
 
 def _serialise(obj):
@@ -381,9 +408,23 @@ def install_capture() -> dict:
             if kwargs.get("response_format") is not None else None,
             "tools": kwargs.get("tools"),
             "other_params": sorted(k for k in kwargs
-                                   if k not in ("messages", "model",
-                                                "temperature",
-                                                "response_format", "tools")),
+                                   if k not in VALUED_KEYS),
+            # THREE STATES, NOT TWO. `"temperature": None` cannot say
+            # whether the caller omitted the key or passed it as None,
+            # and at the client-invocation boundary those are not the
+            # same claim. A replay rule of "if None, omit it" is an
+            # inference dressed as a record. P1 run 2 measured 4/4 rows
+            # ambiguous on `temperature` and `tools`; this ends it.
+            "args_state": {k: ("ABSENT" if k not in kwargs
+                               else "NULL" if kwargs[k] is None
+                               else "VALUE")
+                           for k in VALUED_KEYS},
+            # Axis B, recorded at runtime rather than inferred from the
+            # absence of evidence. Source analysis says zero; this says
+            # what actually arrived. If any ever appear and cannot be
+            # reconstructed, the analyser refuses instead of assuming.
+            "positional_arg_count": len(args),
+            "positional_args": [_serialise(a) for a in args],
         }
         try:
             state["originals_called"] += 1
@@ -675,6 +716,105 @@ def _selftest_correlation() -> dict:
     return out
 
 
+
+def _selftest_streams_and_presence() -> dict:
+    """D250. Can the data stream hold prose, and can a record still
+    confuse *absent* with *null*?
+
+    Both questions are asked by EXERCISING the mechanism, not by reading
+    the source. `say()` is called for real and stdout is checked to be
+    untouched; `emit()` is called for real and every line it produced is
+    required to parse as a JSON object. A capture wrapper row is built
+    from a call with one key omitted, one key explicitly None and one key
+    valued, and the three must come back as three different states.
+    """
+    import io
+
+    checks: dict = {}
+    real_out, real_err = sys.stdout, sys.stderr
+
+    # 1. Prose must not be able to reach the data stream. KNOWN-POSITIVE
+    #    for the stream (emit lands there) and KNOWN-NEGATIVE for prose.
+    out, err = io.StringIO(), io.StringIO()
+    try:
+        sys.stdout, sys.stderr = out, err
+        say("this sentence must never appear in the data stream")
+        checks["prose_never_reaches_the_data_stream"] = out.getvalue() == ""
+        checks["prose_does_reach_the_human_stream"] = "must never" in err.getvalue()
+        emit({"event": "selftest-stream-probe", "layer": "ADAPTER_INPUT"})
+    finally:
+        sys.stdout, sys.stderr = real_out, real_err
+
+    written = [ln for ln in out.getvalue().splitlines() if ln.strip()]
+    parsed = []
+    for ln in written:
+        try:
+            parsed.append(json.loads(ln))
+        except json.JSONDecodeError:
+            parsed.append(None)
+    checks["data_stream_carries_at_least_one_row"] = len(written) >= 1
+    checks["every_data_stream_line_is_a_json_object"] = bool(parsed) and all(
+        isinstance(obj, dict) for obj in parsed)
+
+    # 2. ABSENT / NULL / VALUE must be three states, not two. Driven
+    #    through the real wrapper so the record under test is the record
+    #    production writes.
+    from openai.resources.chat.completions import Completions
+
+    class _Fake:
+        pass
+
+    state = STATE.get("capture", {})
+    saved = STATE.get("original")
+    seen: dict = {}
+
+    def _recording_original(self, *args, **kwargs):
+        raise RuntimeError("selftest presence stand-in")
+
+    out2 = io.StringIO()
+    outside_token = OUTSIDE_LOGICAL_CALL.set(True)
+    try:
+        STATE["original"] = _recording_original
+        sys.stdout = out2
+        try:
+            # `model` valued, `temperature` explicitly None, `tools`
+            # omitted entirely — the exact ambiguity P1 measured.
+            Completions.create(_Fake(), messages=[], model="x",
+                               temperature=None)
+        except Exception:  # noqa: BLE001 — the stand-in always raises
+            pass
+    finally:
+        sys.stdout = real_out
+        STATE["original"] = saved
+        OUTSIDE_LOGICAL_CALL.reset(outside_token)
+
+    for ln in out2.getvalue().splitlines():
+        try:
+            row = json.loads(ln)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(row, dict) and row.get("event") == "llm-call":
+            seen = row
+
+    st = seen.get("args_state", {})
+    checks["presence_state_recorded"] = bool(st)
+    checks["presence_distinguishes_value"] = st.get("model") == "VALUE"
+    checks["presence_distinguishes_null"] = st.get("temperature") == "NULL"
+    checks["presence_distinguishes_absent"] = st.get("tools") == "ABSENT"
+    # The collapse this criterion exists to catch: NULL and ABSENT
+    # reported as the same string is the defect, whatever that string is.
+    checks["null_and_absent_are_not_collapsed"] = (
+        st.get("temperature") is not None
+        and st.get("temperature") != st.get("tools"))
+    checks["positional_count_recorded"] = seen.get("positional_arg_count") == 0
+    # The declared count must come from the wrapper's counters, so it can
+    # disagree with the rows. Proven by the counter having advanced for
+    # the call above.
+    checks["declared_count_is_independent_of_rows"] = (
+        state.get("attempt", 0) > 0)
+    return checks
+
+
 def selftest() -> int:
     """PROVE THE HOOK IS TRANSPARENT — not merely traversed.
 
@@ -723,11 +863,11 @@ def selftest() -> int:
         emit({"event": "selftest-failed", "stage": "install",
               "error": f"{type(exc).__name__}: {exc}",
               "traceback": traceback.format_exc()})
-        print("SELFTEST-CLASS: NOT INSTALLED", flush=True)
+        say("SELFTEST-CLASS: NOT INSTALLED", flush=True)
         return 2
     if "NOT INSTALLED" in str(resolved.get("capture", "")):
         emit({"event": "selftest-failed", "stage": "install"})
-        print("SELFTEST-CLASS: NOT INSTALLED", flush=True)
+        say("SELFTEST-CLASS: NOT INSTALLED", flush=True)
         return 2
 
     import asyncio
@@ -855,6 +995,7 @@ def selftest() -> int:
     checks["original_restored_to_real"] = forwards_to_the_real_original()
 
     checks.update(_selftest_correlation())
+    checks.update(_selftest_streams_and_presence())
 
     emit({"event": "selftest-result", "layer": "ADAPTER_INPUT",
           "calls_observed": observed, "originals_called": originals,
@@ -864,7 +1005,7 @@ def selftest() -> int:
           "selftest_rows_excluded_from_q6": len(rows)})
 
     failed = [k for k, v in checks.items() if not v]
-    print(f"  inspected: {len(checks)} transparency criterion(s), "
+    say(f"  inspected: {len(checks)} transparency criterion(s), "
           f"{observed} model call(s) captured", flush=True)
 
     # THREE STATES, THREE MESSAGES (D218). Run 16 aborted with "THE
@@ -878,25 +1019,25 @@ def selftest() -> int:
     # collector reads back. A table of codes kept beside the collector
     # would be a second denominator free to drift from this one (R5).
     if not failed:
-        print("SELFTEST-CLASS: TRANSPARENT", flush=True)
-        print(f"  CAPTURE POINT PROVEN TRANSPARENT: {len(checks)} criteria, "
+        say("SELFTEST-CLASS: TRANSPARENT", flush=True)
+        say(f"  CAPTURE POINT PROVEN TRANSPARENT: {len(checks)} criteria, "
               f"{observed} call(s) via "
               f"{', '.join(sorted(state['hooks_fired']))}", flush=True)
         return 0
     if not checks.get("traversed"):
-        print("SELFTEST-CLASS: NOT TRAVERSED", flush=True)
-        print("  THE CAPTURE POINT WAS NOT TRAVERSED: the hook installed, "
+        say("SELFTEST-CLASS: NOT TRAVERSED", flush=True)
+        say("  THE CAPTURE POINT WAS NOT TRAVERSED: the hook installed, "
               "and execution never reached it.", flush=True)
-        print(f"  also unmet: {', '.join(k for k in failed if k != 'traversed')}"
+        say(f"  also unmet: {', '.join(k for k in failed if k != 'traversed')}"
               if len(failed) > 1 else "  no other criterion was reached.",
               flush=True)
         return 3
-    print("SELFTEST-CLASS: TRANSPARENCY NOT PROVEN", flush=True)
-    print(f"  CAPTURE POINT TRAVERSED BUT NOT PROVEN TRANSPARENT: "
+    say("SELFTEST-CLASS: TRANSPARENCY NOT PROVEN", flush=True)
+    say(f"  CAPTURE POINT TRAVERSED BUT NOT PROVEN TRANSPARENT: "
           f"{', '.join(failed)}", flush=True)
-    print("  Traversal IS proven; what is unproven is that the hook "
+    say("  Traversal IS proven; what is unproven is that the hook "
           "observes without altering.", flush=True)
-    print("  Refusing to spend a full capture run on a hook that is not "
+    say("  Refusing to spend a full capture run on a hook that is not "
           "proven observational.", flush=True)
     return 4
 
@@ -934,14 +1075,36 @@ def main() -> int:
                   "error": f"{type(exc).__name__}: {exc}"})
 
     asyncio.run(drive())
-    calls = sum(1 for line in open(OUT, encoding="utf-8")
-                if '"event": "llm-call"' in line)
-    fired = sorted(STATE.get("capture", {}).get("hooks_fired", []))
-    emit({"event": "drive-end", "llm_calls_captured": calls,
+    cap = STATE.get("capture", {})
+    fired = sorted(cap.get("hooks_fired", []))
+    # THE DECLARED COUNT COMES FROM THE WRAPPER'S OWN COUNTERS, NOT FROM
+    # COUNTING THE ROWS IT WROTE.
+    #
+    # It used to be `sum(1 for line in OUT if '"event": "llm-call"')` —
+    # the emitted rows counting themselves, which agrees with the rows
+    # by construction and therefore reconciles nothing. `attempt` is
+    # incremented on entry to the wrapper and `originals_called` just
+    # before forwarding, both before any row exists, so a row that is
+    # lost, truncated or never written shows up as a MISMATCH instead of
+    # quietly shrinking the denominator with the evidence.
+    declared = cap.get("attempt", 0)
+    forwarded = cap.get("originals_called", 0)
+    emit({"event": "drive-end", "llm_calls_captured": declared,
           "hooks_that_fired": fired})
+    emit({"event": "capture-manifest",
+          "declared_production_calls": declared,
+          "declared_originals_called": forwarded,
+          "counted_from": "wrapper entry counter, not emitted rows",
+          "phase": STATE.get("phase"),
+          "args_state_recorded": True,
+          "positional_recorded": True,
+          "hooks_that_fired": fired})
+    calls = declared
     # I-2. A capture that says nothing about how much it saw reads
     # identically whether the adapter was called twenty times or never.
-    print(f"  inspected: {calls} model call(s) captured", flush=True)
+    # On stderr, because stdout is the data stream — this exact line, in
+    # this exact position, is what P1 run 2 refused (D249).
+    say(f"  inspected: {calls} model call(s) captured", flush=True)
 
     # RUN 13'S LESSON, ENFORCED. Successful installation of an
     # observation hook is NOT proof that execution traverses it. The
@@ -954,9 +1117,9 @@ def main() -> int:
               "why": "the pipeline was driven but ZERO model calls were "
                      "captured: the hook was installed and not traversed",
               "hooks_installed": True, "hooks_that_fired": fired})
-        print("  INSTRUMENT FAILURE: 0 model call(s) captured after driving "
+        say("  INSTRUMENT FAILURE: 0 model call(s) captured after driving "
               "the pipeline.", flush=True)
-        print("  Q1/Q2/Q6 are UNMEASURED — which is not 'no mismatch'.",
+        say("  Q1/Q2/Q6 are UNMEASURED — which is not 'no mismatch'.",
               flush=True)
         return 2
     return 0

@@ -17142,3 +17142,155 @@ read" is worth having whichever sink the rows go to.
   SCHEMA ECHO + 1 VALID INSTANCE) · broad-class recurrence **MEASURED** ·
   **Q6 MEASURED: REPRODUCED** · **ownership UNMOVED**.
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN.**
+
+---
+
+## D250 — The capture is a data stream again: separation, reconciliation, three states
+
+**2026-08-14.** Authorised scope: **capture/analyser completeness repair
+only**. Stage 1, Stage 2, model, timeout, schema, ownership and 048
+acceptance are all untouched and remain blocked.
+
+### 1. Separation by construction, not by whitelist
+
+`capture.jsonl` is the probe's stdout, and the probe wrote **both** JSON
+rows and its own prose there. That is why P1 refused it, and the fix is
+not an allowance for the prose we happen to recognise:
+
+```
+stdout  ->  machine rows ONLY, one JSON object per line, each naming its event
+stderr  ->  every human-readable word this probe ever writes
+```
+
+`say()` is now the only way to write prose and **cannot be aimed at
+stdout** — it discards a caller's `file=`. `emit()` is the only writer of
+stdout in the file. Fifteen prose `print()` calls moved; one row writer
+stayed.
+
+The collector moved with it: the excerpt it prints is no longer "the last
+6 error lines" but the probe's whole human-readable account, tailed at 40
+of a declared total, and it now counts and reports **non-machine lines in
+the data stream (must be 0)** at collection time — so contamination is
+visible in the evidence file rather than only in a later refusal.
+
+### 2. Reconciliation, from a counter that is not the rows
+
+`capture-manifest` declares `declared_production_calls`, and the census
+refuses unless **declared == parsed**.
+
+The count comes from the wrapper's **entry counter**, incremented before
+any row exists. It used to be
+
+```python
+calls = sum(1 for line in open(OUT) if '"event": "llm-call"' in line)
+```
+
+— the emitted rows counting themselves, which agrees with the rows by
+construction and reconciles nothing. Now a row that is lost, truncated or
+never written appears as a **mismatch** instead of quietly shrinking the
+denominator along with the evidence.
+
+**This is internal corroboration, not independent proof**, and the census
+prints it as such in its own PASS text. Same instrument, two counters.
+
+### 3. ABSENT / NULL / VALUE — the ambiguity P1 measured, closed
+
+P1 measured `temperature` 4/4 and `tools` 4/4 recorded as `None`, with no
+way to tell an omitted key from an explicit `None`. At the
+client-invocation boundary those are not the same claim, and "if None,
+omit it" is an inference presented as a record.
+
+Every row now carries `args_state` with three states per model-facing
+key. A row without it is **legacy**: the census refuses to certify it
+rather than reading it as one state or the other.
+
+### 4. Positional arguments: recorded, not inferred
+
+`positional_arg_count` and `positional_args` are recorded at runtime.
+Axis B now has **two sources that must agree** — source analysis (what
+the code can do) and the runtime record (what arrived). If positional
+arguments ever appear and their values were not recorded, the census
+returns `REQUEST_INCOMPLETE_POSITIONAL` rather than inferring
+replayability from an absence of evidence.
+
+### 5. Proof — run, not described
+
+Calibration: **census 53 passed / 0 failed** across 3 scenarios;
+**probe suite 277 passed / 0 failed** across 20 scenarios.
+
+Seven mutations, each run and each restored:
+
+| mutation | detected as |
+|---|---|
+| reconciliation blinded | 2 failures |
+| prose/malformed-row refusal blinded | 2 failures |
+| `args_state` refusal blinded | 2 failures |
+| positional-record refusal blinded | 2 failures |
+| manifest requirement blinded | 2 failures |
+| probe collapses NULL into ABSENT | 2 failures |
+| probe's prose leaks to stdout | 4 failures |
+
+After restore: no mutation strings present, **53/0** and **277/0**.
+
+The prose-leak criterion also has an **in-suite** known-negative: the
+harness replaces `say()` with a stdout-writing version, requires the
+criterion to flip to False, restores it and requires the clean verdict
+back. A criterion nothing can break is decoration.
+
+The probe's own selftest gained the same criteria, exercised rather than
+read: prose is emitted for real and stdout is required to be untouched;
+`emit()` is called for real and every line it produced must parse as a
+JSON object; a wrapper row is built from a call with one key **valued**,
+one **explicitly None** and one **omitted**, and the three must come back
+as three different states.
+
+### 6. Past captures are not retroactively upgraded
+
+A capture with no manifest and no `args_state` is `UNRESOLVED` — not
+`REPLAYABLE`, and not reinterpreted. Run 24's capture keeps exactly the
+meaning it had; it is simply not certifiable under this standard, and a
+truncated capture is indistinguishable from a legacy one **at this
+boundary**, which is why neither is upgraded. The next P1 run against run
+24 will therefore say `UNRESOLVED — the capture declares no
+capture-manifest row`, and that is the correct answer, not a regression.
+
+### 7. A consequence, pre-registered BEFORE it exists
+
+`probe_llm_contract.py` is inside `memu-graph-startup-proof.yml`'s
+`paths:` filter, so this repair **will** trigger a live capture run.
+Recorded now, before any result:
+
+> **Any capture produced by that firing is NOT admitted as Q2 or Q6
+> evidence.** The sampling campaign stays CLOSED at 1/5 (D243/D245). It
+> is admitted for exactly one purpose: testing the new capture format —
+> does the data stream contain only machine rows, does the manifest
+> reconcile, are the three presence states present.
+
+Writing this down first is the point. A capture whose admissibility is
+decided after its contents are known is not evidence, it is a choice.
+
+### 8. Two lessons, both earned this session
+
+**An instrument detecting its own invalidity does not count unless that
+invalidity governs the final verdict.** P1 run 1 printed the parse
+warning and returned `REQUEST_REPLAYABLE` one line later. Announcing a
+gap is not refusing to conclude across it — and a success-shaped failure
+that has already diagnosed itself is the worst kind, because the evidence
+of the defect is sitting inside the report that denies it.
+
+**Evidence that falls outside the retrievable observation window is not
+available evidence for that run.** The ~15.8KB Actions log window has now
+cost us diagnostics three times. The direction is not cleverer ordering:
+**concise verdict and identity in the log, authoritative detail in the
+artifact.** Log ordering was the fix applied this time; it is a patch,
+not the answer.
+
+### Status
+
+* **P1 — UNRESOLVED.** The repair makes a *future* capture certifiable;
+  it does not certify run 24's.
+* **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.**
+* **Q1** partial · **Q2 MEASURED** (5 captures, 21 raw attempts, 20
+  SCHEMA ECHO + 1 VALID INSTANCE) · broad-class recurrence **MEASURED** ·
+  **Q6 MEASURED: REPRODUCED**.
+* **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN.**

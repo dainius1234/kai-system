@@ -123,9 +123,31 @@ esac
 bytes=$(wc -c < "$LOGDIR/capture.jsonl" | tr -d ' ')
 lines=$(grep -c . "$LOGDIR/capture.jsonl" || true)
 record "  capture: ${lines} record(s), ${bytes} bytes, full-log=${LOGDIR}/capture.jsonl"
-record "  --- EXCERPT: last 6 lines of ${LOGDIR}/capture.err ---"
-tail -n 6 "$LOGDIR/capture.err" 2>/dev/null | sed 's/^/  | /' | tee -a "$EVIDENCE"
+# D250. stdout is now machine rows ONLY and stderr carries every word the
+# probe writes about itself -- including its I-2 denominator line, which
+# used to sit in capture.jsonl and made that file uncertifiable. So this
+# excerpt is no longer "the last few error lines"; it is the probe's
+# whole human-readable account, and 6 lines of it would drop the part
+# that says how much was seen.
+err_bytes=$(wc -c < "$LOGDIR/capture.err" | tr -d ' ')
+err_lines=$(grep -c . "$LOGDIR/capture.err" || true)
+record "  probe diagnostics: ${err_lines} line(s), ${err_bytes} bytes, full-log=${LOGDIR}/capture.err"
+record "  --- EXCERPT: last 40 of ${err_lines} line(s) of ${LOGDIR}/capture.err ---"
+tail -n 40 "$LOGDIR/capture.err" 2>/dev/null | sed 's/^/  | /' | tee -a "$EVIDENCE"
 record "  --- end excerpt ---"
+# The machine stream must be machine-only. Said here, at collection time,
+# so a contaminated capture is visible in the evidence file rather than
+# only in a later analyser's refusal.
+nonjson=$(python3 -c 'import json,sys
+bad=0
+for line in open(sys.argv[1],encoding="utf-8",errors="replace"):
+    line=line.strip()
+    if not line: continue
+    try: obj=json.loads(line)
+    except Exception: bad+=1; continue
+    if not isinstance(obj,dict) or "event" not in obj: bad+=1
+print(bad)' "$LOGDIR/capture.jsonl")
+record "  non-machine lines in the data stream: ${nonjson} (must be 0)"
 record ""
 
 docker compose -f "$COMPOSE" logs "$SERVICE" --no-color --timestamps \

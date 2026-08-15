@@ -36,7 +36,7 @@ import p1_replay_completeness as p1  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 2
+EXPECTED_SCENARIOS = 3
 executed: list[str] = []
 
 
@@ -53,9 +53,18 @@ def scenario(name: str) -> None:
     executed.append(name)
 
 
-def _p1_capture(tmp: Path, name: str, rows: list[dict]) -> str:
+def _p1_capture(tmp: Path, name: str, rows: list[dict],
+                declared: int | None = None, extra: str = "") -> str:
+    """A capture in the D250 format: rows plus a manifest that declares
+    the production-call count from a counter, not from the rows."""
     path = tmp / f"{name}.jsonl"
-    path.write_text("".join(json.dumps(r) + "\n" for r in rows))
+    body = "".join(json.dumps(r) + "\n" for r in rows)
+    if declared is None:
+        declared = sum(1 for r in rows if r.get("phase") == "capture")
+    if declared >= 0:
+        body += json.dumps({"event": "capture-manifest",
+                            "declared_production_calls": declared}) + "\n"
+    path.write_text(body + extra)
     return str(path)
 
 
@@ -64,7 +73,11 @@ def _p1_row(**over) -> dict:
            "messages": [{"role": "user", "content": "hi"}],
            "model": "qwen2.5:3b", "temperature": None,
            "response_format": {"type": "json_object"}, "tools": None,
-           "other_params": []}
+           "other_params": [],
+           "args_state": {"messages": "VALUE", "model": "VALUE",
+                          "temperature": "NULL", "response_format": "VALUE",
+                          "tools": "ABSENT"},
+           "positional_arg_count": 0, "positional_args": []}
     row.update(over)
     return row
 
@@ -107,8 +120,8 @@ def test_p1_never_lets_one_clean_axis_imply_the_other() -> None:
         def verdict(capture, call=None, fwd=None):
             kw = None
             if capture is not None:
-                rows, _ = p1.read_rows(Path(capture))
-                kw = p1.audit_kwargs(rows)
+                rows, notes, manifest = p1.read_rows(Path(capture))
+                kw = p1.audit_kwargs(rows, notes, manifest)
             pos = p1.audit_positional(call, fwd)
             return p1.classify(kw, pos)[0]
 
@@ -171,8 +184,10 @@ def test_p1_refuses_rather_than_guessing() -> None:
         clean_src = _p1_source(tmp, "clean", CLEAN_CALL_SITE)
         clean_fwd = _p1_forwarder(tmp, "fwdok", CLEAN_FORWARDER)
 
-        def verdict(rows):
-            kw = p1.audit_kwargs(rows)
+        def verdict(rows, declared=None):
+            if declared is None:
+                declared = sum(1 for r in rows if r.get("phase") == "capture")
+            kw = p1.audit_kwargs(rows, [], {"declared_production_calls": declared})
             return p1.classify(kw, p1.audit_positional(clean_src, clean_fwd))[0]
 
         # R11: selftest rows are not the replay population. A capture of
@@ -198,8 +213,10 @@ def test_p1_refuses_rather_than_guessing() -> None:
         # very kwarg that breaks axis A, and "it probably is not" is the
         # reasoning P1 exists to refuse.
         bad = tmp / "bad.jsonl"
-        bad.write_text(json.dumps(_p1_row()) + "\n{ not json\n")
-        rows, notes = p1.read_rows(bad)
+        bad.write_text(json.dumps(_p1_row()) + "\n{ not json\n"
+                       + json.dumps({"event": "capture-manifest",
+                                     "declared_production_calls": 1}) + "\n")
+        rows, notes, _mf = p1.read_rows(bad)
         check("an unparseable capture line is reported", len(notes) == 1,
               str(notes))
         check("and the readable row still counts", len(rows) == 1, "")
@@ -207,7 +224,7 @@ def test_p1_refuses_rather_than_guessing() -> None:
               "not json" in notes[0], notes[0])
         check("and declares its own byte size (R10)",
               "bytes" in notes[0], notes[0])
-        holed = p1.audit_kwargs(rows, notes)
+        holed = p1.audit_kwargs(rows, notes, {"declared_production_calls": 1})
         check("an unparseable line forces UNRESOLVED, not REPLAYABLE",
               p1.classify(holed, p1.audit_positional(clean_src, clean_fwd))[0]
               == p1.UNRESOLVED, "")
@@ -216,17 +233,19 @@ def test_p1_refuses_rather_than_guessing() -> None:
                   holed, p1.audit_positional(clean_src, clean_fwd))[1]), "")
         # known-negative: the same rows with no parse hole DO certify, so
         # the refusal is caused by the hole and by nothing else.
-        whole = p1.audit_kwargs(rows, [])
+        whole = p1.audit_kwargs(rows, [], {"declared_production_calls": 1})
         check("the same rows without a parse hole are REPLAYABLE",
               p1.classify(whole, p1.audit_positional(clean_src, clean_fwd))[0]
               == p1.REPLAYABLE, "")
 
         # the null ambiguity is measured and stated, not assumed away
-        kw = p1.audit_kwargs([_p1_row()])
-        check("recorded-None is counted per key",
-              kw["null_ambiguous"]["temperature"] == 1, str(kw))
-        check("and a valued key is not counted as ambiguous",
-              kw["null_ambiguous"]["model"] == 0, str(kw))
+        kw = p1.audit_kwargs([_p1_row()], [], {"declared_production_calls": 1})
+        check("NULL is counted as NULL, not as absent",
+              kw["presence"]["temperature"]["NULL"] == 1, str(kw["presence"]))
+        check("ABSENT is counted as ABSENT, not as null",
+              kw["presence"]["tools"]["ABSENT"] == 1, str(kw["presence"]))
+        check("and a valued key is counted as VALUE",
+              kw["presence"]["model"]["VALUE"] == 1, str(kw["presence"]))
 
         # I-8: the key list must come from the probe, not be maintained
         # beside it. If the probe starts recording a sixth key's value,
@@ -239,15 +258,107 @@ def test_p1_refuses_rather_than_guessing() -> None:
                   or f'"{key}": _serialise(kwargs.get("{key}"))' in probe, "")
         check("the probe records other_params as NAMES only",
               'sorted(k for k in kwargs' in probe, "")
-        check("the probe forwards positional args without recording them",
-              "forward(self, *args, **kwargs)" in probe
-              and '"positional"' not in probe, "")
+        check("the probe records the three presence states",
+              '"ABSENT" if k not in kwargs' in probe
+              and '"NULL" if kwargs[k] is None' in probe, "")
+        check("the probe records a positional argument count",
+              '"positional_arg_count": len(args)' in probe, "")
+
+
+
+def test_p1_reconciles_and_refuses_the_new_holes() -> None:
+    """D250. Four ways a capture can look complete and not be, each with
+    a known-positive and the clean case beside it as known-negative."""
+    scenario("p1 reconciliation and format refusals")
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        src = _p1_source(tmp, "clean", CLEAN_CALL_SITE)
+        fwd = _p1_forwarder(tmp, "fwdok", CLEAN_FORWARDER)
+
+        def verdict(capture):
+            rows, notes, manifest = p1.read_rows(Path(capture))
+            kw = p1.audit_kwargs(rows, notes, manifest)
+            return p1.classify(kw, p1.audit_positional(src, fwd))
+
+        # known-negative: the clean D250 capture certifies.
+        ok = _p1_capture(tmp, "ok", [_p1_row(), _p1_row()])
+        check("a clean D250 capture is REQUEST_REPLAYABLE",
+              verdict(ok)[0] == p1.REPLAYABLE, str(verdict(ok)))
+        check("and says the reconciliation is internal, not independent",
+              any("not independent proof" in w for w in verdict(ok)[1]), "")
+
+        # 1. a dropped production row must break reconciliation
+        dropped = _p1_capture(tmp, "dropped", [_p1_row()], declared=2)
+        v, why = verdict(dropped)
+        check("a dropped production row fails reconciliation",
+              v == p1.UNRESOLVED, v)
+        check("and names both counts",
+              any("2 production call(s)" in w and "1 row(s)" in w
+                  for w in why), str(why))
+
+        # 2. prose in the machine stream
+        prose = _p1_capture(tmp, "prose", [_p1_row()],
+                            extra="  inspected: 1 model call(s) captured\n")
+        check("prose in the data stream refuses", verdict(prose)[0]
+              == p1.UNRESOLVED, "")
+        check("and the note carries the prose itself",
+              any("inspected: 1 model call" in w for w in verdict(prose)[1]),
+              str(verdict(prose)[1]))
+
+        # 3. malformed machine rows: valid JSON, not a record
+        for name, blob in (("scalar", "42"),
+                           ("array", '["llm-call"]'),
+                           ("eventless", '{"phase": "capture"}')):
+            cap = _p1_capture(tmp, f"bad-{name}", [_p1_row()],
+                              extra=blob + "\n")
+            check(f"a {name} line is a malformed machine row, and refuses",
+                  verdict(cap)[0] == p1.UNRESOLVED, "")
+
+        # 4. no manifest at all -> legacy or truncated, never upgraded
+        legacy_path = tmp / "legacy.jsonl"
+        legacy_path.write_text(json.dumps(_p1_row()) + "\n")
+        check("a capture with no manifest is UNRESOLVED",
+              verdict(str(legacy_path))[0] == p1.UNRESOLVED, "")
+        check("and says past captures keep their historical meaning",
+              any("historical meaning" in w
+                  for w in verdict(str(legacy_path))[1]), "")
+
+        # 5. ABSENT/NULL collapsed back into a bare value -> refuse
+        old = _p1_row()
+        old.pop("args_state")
+        collapsed = _p1_capture(tmp, "collapsed", [old])
+        v, why = verdict(collapsed)
+        check("a row without args_state cannot certify", v == p1.UNRESOLVED, v)
+        check("and says ABSENT and NULL are indistinguishable in it",
+              any("indistinguishable" in w for w in why), str(why))
+
+        # 6. positional arguments recorded but not reconstructable
+        lost = _p1_capture(tmp, "lost",
+                           [_p1_row(positional_arg_count=1,
+                                    positional_args=[])])
+        v, why = verdict(lost)
+        check("unreconstructable positional args are INCOMPLETE_POSITIONAL",
+              v == p1.INCOMPLETE_POSITIONAL, v)
+        check("and refuse rather than infer",
+              any("must not be inferred" in w for w in why), str(why))
+        kept = _p1_capture(tmp, "kept",
+                           [_p1_row(positional_arg_count=1,
+                                    positional_args=["payload"])])
+        check("but recorded positional VALUES are replayable",
+              verdict(kept)[0] == p1.REPLAYABLE, str(verdict(kept)))
+        # a row that records no count at all is the pre-D250 blind spot
+        blind = _p1_row()
+        blind.pop("positional_arg_count")
+        check("a row with no positional count is INCOMPLETE_POSITIONAL",
+              verdict(_p1_capture(tmp, "blind", [blind]))[0]
+              == p1.INCOMPLETE_POSITIONAL, "")
 
 
 
 def run_all() -> None:
     test_p1_never_lets_one_clean_axis_imply_the_other()
     test_p1_refuses_rather_than_guessing()
+    test_p1_reconciles_and_refuses_the_new_holes()
 
     print(f"  inspected: {len(p1.EXIT)} P1 verdict(s) discriminated")
     print(f"  axes: keyword (artifact) and positional (call-path source)")

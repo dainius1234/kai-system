@@ -31,7 +31,7 @@ import classify_llm_response as c  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 19
+EXPECTED_SCENARIOS = 20
 executed: list[str] = []
 
 
@@ -1087,6 +1087,103 @@ def test_the_probe_never_shows_the_id_to_the_model() -> None:
           "attempt_index = next_attempt_index()" in probe, "")
 
 
+STREAM_PRESENCE_HARNESS = r"""
+import sys, types, importlib.util, json
+mod = types.ModuleType("openai.resources.chat.completions")
+class Completions:
+    def create(self, *a, **k):
+        return "REAL RESULT"
+mod.Completions = Completions
+pkg = types.ModuleType("openai"); pkg.__version__ = "stub"
+for name, m in (("openai", pkg),
+                ("openai.resources", types.ModuleType("openai.resources")),
+                ("openai.resources.chat", types.ModuleType("openai.resources.chat")),
+                ("openai.resources.chat.completions", mod)):
+    sys.modules[name] = m
+
+spec = importlib.util.spec_from_file_location("probe", sys.argv[1])
+probe = importlib.util.module_from_spec(spec); spec.loader.exec_module(probe)
+probe.OUT = sys.argv[2]
+open(probe.OUT, "w").close(); probe.STATE["phase"] = "harness"
+try:
+    probe.install_capture()
+except ModuleNotFoundError:
+    pass
+
+clean = probe._selftest_streams_and_presence()
+
+# KNOWN-NEGATIVE, injected here rather than asserted from source: if
+# prose could reach the data stream, the criterion must say so. Without
+# this the criterion's pass means only that nothing tried.
+real_say = probe.say
+def leaking_say(*a, **k):
+    k.pop("file", None)
+    print(*a, **k)          # straight to stdout, the data stream
+probe.say = leaking_say
+leaked = probe._selftest_streams_and_presence()
+probe.say = real_say
+restored = probe._selftest_streams_and_presence()
+
+sys.stderr.write(json.dumps({
+    "clean": clean, "leaked": leaked, "restored": restored}) + "\n")
+"""
+
+
+def test_the_probe_cannot_write_prose_into_its_data_stream() -> None:
+    """D250. Exercised, not read: prose is emitted for real and stdout is
+    required to be untouched, and a leaking `say` must flip the verdict."""
+    scenario("data stream cannot hold prose")
+    with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as fh:
+        fh.write(STREAM_PRESENCE_HARNESS)
+        harness = fh.name
+    capture = tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False).name
+    proc = subprocess.run(
+        [sys.executable, harness,
+         str(REPO / "scripts" / "security" / "probe_llm_contract.py"), capture],
+        cwd=REPO, capture_output=True, text=True, timeout=60)
+    check("the stream harness ran", proc.returncode == 0, proc.stderr[-400:])
+    if proc.returncode != 0:
+        return
+    got = json.loads(proc.stderr.strip().splitlines()[-1])
+    clean, leaked, restored = got["clean"], got["leaked"], got["restored"]
+
+    for name in ("prose_never_reaches_the_data_stream",
+                 "prose_does_reach_the_human_stream",
+                 "data_stream_carries_at_least_one_row",
+                 "every_data_stream_line_is_a_json_object"):
+        check(f"clean run: {name}", clean.get(name) is True, str(clean))
+    # THE known-negative. A criterion nothing can break is decoration.
+    check("a leaking say() is DETECTED, not tolerated",
+          leaked.get("prose_never_reaches_the_data_stream") is False,
+          str(leaked))
+    check("and the contaminated stream stops being all-JSON",
+          leaked.get("every_data_stream_line_is_a_json_object") is False,
+          str(leaked))
+    check("restoring say() restores the clean verdict",
+          restored.get("prose_never_reaches_the_data_stream") is True,
+          str(restored))
+
+    # ABSENT / NULL / VALUE, from a real wrapper row.
+    for name in ("presence_state_recorded", "presence_distinguishes_value",
+                 "presence_distinguishes_null", "presence_distinguishes_absent",
+                 "null_and_absent_are_not_collapsed",
+                 "positional_count_recorded",
+                 "declared_count_is_independent_of_rows"):
+        check(f"clean run: {name}", clean.get(name) is True, str(clean))
+
+    probe = (REPO / "scripts" / "security" / "probe_llm_contract.py").read_text()
+    # The manifest's count must not be the rows counting themselves.
+    check("the declared count comes from the wrapper's counters",
+          'declared = cap.get("attempt", 0)' in probe, "")
+    check("and NOT from re-reading the emitted rows",
+          '"event": "llm-call"\' in line' not in probe, "")
+    check("emit is the only writer of the data stream",
+          probe.count("sys.stdout.write(") == 1, "")
+    check("say() cannot be aimed at stdout by a caller",
+          'kwargs.pop("file", None)' in probe, "")
+
+
+
 def run_all() -> None:
     test_contract_is_recovered_from_the_attempt()
     test_ambiguous_or_absent_contract_is_unmeasured()
@@ -1107,6 +1204,7 @@ def run_all() -> None:
     test_the_shipped_wrapper_is_transparent_in_process()
     test_the_correlation_identifies_isolates_and_cleans_up()
     test_the_probe_never_shows_the_id_to_the_model()
+    test_the_probe_cannot_write_prose_into_its_data_stream()
 
     kinds = [c.VALID_INSTANCE, c.INSTANCE_INVALID, c.REQUIRED_FIELDS_PRESENT,
              c.REQUIRED_FIELDS_MISSING, c.SCHEMA_ECHO, c.NOT_JSON,
