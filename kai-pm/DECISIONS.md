@@ -18937,3 +18937,137 @@ model-facing surface unmoved.
   verdict — REPAIRED, calibrated.**
 * **Attempt 3 — NOT AUTHORISED. Stage 2 — BLOCKED. Ownership —
   UNMOVED. 048 C — BLOCKED.**
+
+---
+
+## D267 — Stage 1 MEASURED. The schema echo reproduces with no Instructor in the path.
+
+**2026-08-15. Run `31908872172`, `run_number` 3, `run_attempt` 1, head
+`b45330b355d712241bfa5fedc7e73824171f65c5`, tree
+`3abe4dcddfd0f59be2524999ba2622260230b84b`. 21:14:14Z → 21:32:55Z.
+Repair base: `dce597c` (D266). Ten of ten executions reached a model.**
+
+**This is the first Stage-1 measurement in three attempts.**
+
+### 1. The result
+
+```
+   1. INSTANCE INVALID   152.73s
+   2. SCHEMA ECHO         79.488s
+   3. SCHEMA ECHO         99.387s
+   4. SCHEMA ECHO         92.509s
+   5. SCHEMA ECHO         97.523s
+   6. SCHEMA ECHO         87.506s
+   7. SCHEMA ECHO         85.877s
+   8. SCHEMA ECHO         85.886s
+   9. SCHEMA ECHO         86.91s
+  10. INSTANCE INVALID    40.686s
+
+  inspected: 10 replay execution(s) of 10 precommitted
+    INSTANCE INVALID   2
+    SCHEMA ECHO        8
+  model responses: 10 of 10 execution(s) reached a model
+  request identity: all 10 invocation(s) reproduce the frozen request hash
+```
+
+**`VALID INSTANCE`: 0 of 10.**
+
+Elapsed 40.7–152.7 s per call, all inside the 300 s timeout. The
+original capture recorded 57.0 s for this call; this runner is slower,
+consistent with KAI-GATE-049.
+
+### 2. The interpretation, read from D247 rather than composed now
+
+D247 §2 froze the branch before any call was made:
+
+> *If the replay reproduces the schema echo → the failure is present at
+> the raw endpoint given that exact request. Instructor's validation and
+> retry machinery is **not** required to produce it.*
+
+Eight of ten replays are `SCHEMA ECHO`, with **no Instructor, no
+validation, no reask and no retry** in the path. That branch is
+therefore taken as written.
+
+**And the limit D247 recorded in the same breath, so it could not be
+forgotten at reporting time:**
+
+> *A Stage 1 reproduction does not exonerate Instructor's prompt
+> transformation. We would still be replaying the request Instructor
+> created. The schema-in-the-system-message presentation
+> (`providers/openai/utils.py:491 handle_json_modes`) is part of the
+> request under replay, not a variable held constant outside it.*
+
+So the finding is bounded exactly as pre-registered: **retry/validation
+machinery is separated from the request and is not required to produce
+the echo. The request's AUTHORSHIP is not separated from the model.**
+That is Stage 2's job, and Stage 2 remains BLOCKED.
+
+D247 also anticipated a single clean replay proving nothing, since the
+same request had historically produced both classes. It did not need to:
+the population is 8 echo / 2 invalid / **0 valid**.
+
+### 3. Every prerequisite, and what each proved
+
+| # | prerequisite | result |
+|---|---|---|
+| 1 | capture artifact present | fetched |
+| 2 | S1 re-selection reproduces the frozen subject | seq 2, prompt `d53797298bea`, contract `98c57afadeae` — all match |
+| 3 | attempt-3 `request_hash` == attempt-1's | `afd8f4e0…ae86` both sides |
+| 4 | output path writable as `app` | preflight OK |
+| 5 | **model pull completes** | 21:17:12 → 21:17:41, **exit 0** |
+| 6 | **exact model present in the server's inventory** | passed, 21:17:41 |
+| 7 | request identity across the ten | all 10 reproduce the frozen hash |
+
+**Both D266 gates are now LIVE-PROVEN.** In attempt 2 the pull had run
+0.49 s when the first call went out; here it completed and gated the
+chain, and the readiness probe then confirmed the exact model
+independently before anything was sent.
+
+The zero-response refusal did **not** fire, correctly: `model
+responses: 10 of 10`. Its known-negative behaviour is therefore also
+observed live, not only in calibration.
+
+### 4. What the log deliberately does not contain
+
+All ten explanations were withheld from the CI log — `10 explanation(s)
+withheld` — because `SCHEMA_ECHO` and `INSTANCE_INVALID` build their
+text partly from the reply. Each is stated with its length and a sha256
+prefix and survives in full in `stage1-classification.jsonl`, artifact
+**`9253313044`** (4,788 bytes, with `stage1-manifest.json` and
+`stage1-replies.jsonl`).
+
+Those digests cluster: `33f683f02cc9` at replays 2, 4, 6, 7, 8, 9 (six)
+and `e0be3e669d75` at 3, 5 (two). **Stated precisely:** identical
+digests mean identical *explanations* — the same described property set
+and the same contract-identity flag — **not** proven byte-identical
+replies. Reading the replies themselves is a separate step against the
+sealed artifact.
+
+### 5. What is NOT in this entry
+
+* **The original captured response is still UNOPENED.** D247's
+  permission to open it now exists — the replay population is complete
+  and sealed — but this shell **cannot fetch the capture artifact**
+  (blob host 403, recorded in D247 §1 and re-measured this stint). That
+  comparison needs a CI-side job, and no such job is written or
+  authorised. Item 9 of the return chain is therefore **NOT PRODUCED**,
+  and is not guessed.
+* **No finding is closed.** Programme Rule 7: counts do not change
+  because a result landed. 048 C stays open pending a formal closure
+  review.
+* **Stage 2 is not started** and requires separate authorisation.
+* Attempts 1 and 2 are untouched and remain UNMEASURED.
+
+### Status
+
+* **Stage 1 — MEASURED. 10/10 executions reached a model. 8 SCHEMA
+  ECHO, 2 INSTANCE INVALID, 0 VALID INSTANCE. Under D247's frozen
+  branch: the failure is present at the raw endpoint given this exact
+  request, and Instructor's validation/retry machinery is not required
+  to produce it.**
+* **Filesystem/export repair — LIVE-PROVEN. Model-readiness gate —
+  LIVE-PROVEN. Zero-response refusal — calibrated, and its
+  known-negative observed live.**
+* **Original selected response — UNOPENED. Stage 2 — BLOCKED.
+  Ownership — NOT MOVED by this result beyond D247's stated bound.
+  048 C — still open.**
