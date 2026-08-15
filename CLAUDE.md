@@ -305,10 +305,31 @@ computes about itself.
 * **No destructive git operations without explicit permission.**
 * **Do not open a pull request unless asked.**
 
+## R12. Flag the better route, even unasked
+
+**If a materially safer, stronger, more correct, more maintainable or
+more evidentially defensible route exists, say so — even when nobody
+asked for it.** Silence is not permission to take the easiest path, and
+the operator not knowing that a technical question exists is not
+permission to ignore it.
+
+Flag → explain (FACT / EVIDENCE / INFERENCE) → give the options →
+recommend → name the cost and risk → **and do not implement scope
+expansion without authorisation.** Proactive engineering is not
+autonomous scope expansion.
+
+The full doctrine this serves, its 27 standing rules and the specific
+failure that earned each one, is in `kai-pm/ENGINEERING_DOCTRINE.md`.
+It applies to my work and to anything delegated to a subagent, and it
+outlives the investigation that produced it.
+
+---
+
 ## Where things are
 
 | file | what it holds |
 |---|---|
+| `kai-pm/ENGINEERING_DOCTRINE.md` | the standing engineering doctrine — permanent, not 048-specific |
 | `kai-pm/ORION_FIELD_NOTES.md` §0 | **start here** — where the last stint stopped, what to look at first, and what is on `main` versus the branch |
 | `kai-pm/WAYPOINTS.md` | known-good commits with evidence, and standing contingencies |
 | `kai-pm/DECISIONS.md` | append-only decision log |

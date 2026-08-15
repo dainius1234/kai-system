@@ -17640,3 +17640,82 @@ say "completed". Asserted in calibration and stated in the module.
   changes nothing about old evidence.
 * **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.**
 * **048 C — BLOCKED. Campaign — CLOSED at 1/5.**
+
+---
+
+## D254 — The live P1 verdict, and the doctrine made permanent
+
+**2026-08-15.**
+
+### 1. P1, measured live — and NOT for the reason I predicted
+
+| | |
+|---|---|
+| **SUBJECT** (the capture under test) | run **31844794230** (run 24), commit `397ad92e` — legacy format |
+| **MEASURER** (the tree that judged it) | run **31893763430**, commit `08e5df05` — the repaired entry point |
+
+```
+inspected: 4 production request row(s) across 2 completeness axes
+P1 VERDICT: UNRESOLVED
+  - 1 capture line(s) are not valid machine rows, so the production
+    population of 4 is a LOWER BOUND, not a certified denominator
+  - line 18: unparseable (Expecting value); 35 bytes;
+    first 35: 'inspected: 4 model call(s) captured'
+Process completed with exit code 2.
+```
+
+**Two things this run establishes, and one it does not.**
+
+**Establishes:** the shipped refusal path **returns a verdict**. Exit 2,
+no traceback, the verdict printed with its reason and its denominator.
+Item 5 of the frozen sequence is now demonstrated **live** rather than
+only in calibration. A crash is not a refusal; this was a refusal.
+
+**Establishes:** axis B still resolved in the same run — 13 call sites
+across 1,430 files, zero positional, 2 forwarding calls inserting none —
+and the audited image printed `cognee 1.1.3`, `instructor 1.15.1`,
+`openai 2.54.0`.
+
+**Does NOT establish, and I predicted it wrongly:** D253 said the next
+run would refuse *"the capture declares no `capture-manifest` row"*. It
+did not. It refused on the **parse hole** — the probe's own prose line —
+because that check comes first in the ordering and returns immediately.
+
+Both conditions are true of run 24's capture. Only one was **reported**,
+and the reported one is the evidence. The missing-manifest condition was
+never reached and is therefore **not** something this run measured. I am
+recording the mis-prediction rather than quietly noting that the verdict
+matched: the operator's instruction was *do not assume the expected
+answer*, and my expected answer was wrong about the reason even though it
+was right about the verdict.
+
+### 2. Doctrine made permanent
+
+The standards developed during 048 are now standing operating rules, not
+048-specific ones. Recorded in `kai-pm/ENGINEERING_DOCTRINE.md`: the
+**proactive engineering duty** and **27 standing rules**, each with the
+specific failure that earned it, and applying equally to work delegated
+to subagents.
+
+`CLAUDE.md` gains **R12 — flag the better route, even unasked**, and
+points at the doctrine. That is the part that binds in flight:
+
+> Silence is not permission to take the easiest path, and the operator
+> not knowing that a technical question exists is not permission to
+> ignore it. Flag → explain → recommend → name cost and risk → and do
+> **not** implement scope expansion without authorisation.
+
+Two of the 27 were earned by this session's own defects and are worth
+naming here because they are mine: **17 — the shipped entry point must be
+directly exercised** (67 assertions on the parts, none on the invocation
+CI runs), and **18 — programmatic edits must assert mutation
+cardinality** (a replacement whose anchor no longer matched, applied
+without an assertion, silently doing nothing).
+
+### 3. Status
+
+* **P1 — UNRESOLVED**, measured live, refusal path proven to return a
+  verdict.
+* **Real-format validation — PASSED** (run 31890166592's capture).
+* **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.**
+* **048 C — BLOCKED. Campaign — CLOSED at 1/5.**
