@@ -1073,6 +1073,13 @@ test-replay-subject-selection:
 test-stage1-replay:
 	python3 scripts/test_stage1_replay.py
 
+# D262's repair. A repair to the instrument is only admissible if the
+# model-facing invocation is unchanged, and this proves the check can
+# say BOTH things -- a mutation inside the derived surface breaches,
+# one outside it does not.
+test-invocation-identity:
+	python3 scripts/test_invocation_identity.py
+
 # D251. "I did not touch the probe" never proved that no live model
 # would run -- core-tests.yml has no paths filter and starts ollama on
 # every push, which this check found on its first execution. Run it

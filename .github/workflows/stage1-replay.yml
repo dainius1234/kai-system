@@ -63,6 +63,7 @@ jobs:
           python3 scripts/test_stage1_replay.py
           python3 scripts/test_replay_subject_selection.py
           python3 scripts/test_llm_contract.py
+          python3 scripts/test_invocation_identity.py
 
       - name: Mint an ephemeral database password for this run
         run: |
@@ -101,12 +102,32 @@ jobs:
             --url "http://ollama:11434/v1/chat/completions" \
             --timeout 300
 
-      - name: Build the image and start ONLY the model service
+      - name: Build the image
         env:
           DB_PASSWORD: ${{ env.DB_PASSWORD }}
         run: |
           set -euo pipefail
           docker compose -f docker-compose.full.yml build memu-graph
+
+      # BEFORE the model service, because attempt 1 (run 31899571806)
+      # discovered a PermissionError on its output file AFTER the stack
+      # was up, and executed 0 of 10 calls. Same image, same `app` user,
+      # same destination, same open() — one container start, no model.
+      - name: Preflight — prove the replay output path is writable
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          docker compose -f docker-compose.full.yml run --rm --no-deps \
+            -T -v "$PWD:/w" -w /w memu-graph \
+            python3 scripts/security/stage1_replay.py --preflight \
+              --replies /tmp/stage1-replies.jsonl
+
+      - name: Start ONLY the model service
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -euo pipefail
           docker compose -f docker-compose.full.yml up -d ollama ollama-pull
           python3 scripts/ci/compose_probe.py \
             --compose-file docker-compose.full.yml \
@@ -115,29 +136,61 @@ jobs:
       # The replay runs INSIDE the network the capture was taken on, and
       # posts straight to the endpoint: no Instructor, no validation, no
       # retry. The sender knows nothing about verdicts.
+      #
+      # It writes to /tmp INSIDE the container — a path the image's own
+      # `app` user owns — rather than into the host-owned bind mount at
+      # /w. The runtime user is unchanged; the destination moved. The
+      # container is named and NOT --rm, so whatever rows exist can be
+      # copied out even if this step fails.
       - name: Replay the request 10 times, sequentially
         env:
           DB_PASSWORD: ${{ env.DB_PASSWORD }}
         run: |
           set -euo pipefail
-          docker compose -f docker-compose.full.yml run --rm --no-deps \
-            -T -v "$PWD:/w" -w /w memu-graph \
+          docker compose -f docker-compose.full.yml run --no-deps \
+            -T --name stage1-replay-run -v "$PWD:/w" -w /w memu-graph \
             python3 scripts/security/stage1_replay.py --replay \
               --manifest stage1-manifest.json \
-              --replies stage1-replies.jsonl
+              --replies /tmp/stage1-replies.jsonl
+
+      # Sizes and row counts only. The replies themselves are an
+      # artifact, never log lines.
+      - name: Export the sealed replies
+        if: always()
+        run: |
+          set -uo pipefail
+          if docker cp stage1-replay-run:/tmp/stage1-replies.jsonl \
+               stage1-replies.jsonl; then
+            echo "exported $(wc -c < stage1-replies.jsonl) byte(s) in" \
+                 "$(wc -l < stage1-replies.jsonl) row(s)"
+          else
+            echo "NO REPLIES EXPORTED: the replay container holds no"
+            echo "/tmp/stage1-replies.jsonl. What that means for the"
+            echo "experiment is the classify step's verdict, not this"
+            echo "step's guess."
+          fi
+          if docker rm -f stage1-replay-run; then
+            echo "replay container removed"
+          else
+            echo "no replay container existed to remove"
+          fi
 
       - name: Tear down
         if: always()
         run: docker compose -f docker-compose.full.yml down -v || true
 
       # LAST, so the verdicts land inside the Actions log byte window.
+      # Absent or short replay evidence returns STAGE 1 UNMEASURED here
+      # rather than raising FileNotFoundError, which is what attempt 1's
+      # equivalent step did.
       - name: Stage 1 verdicts — all ten, in order
         if: always()
         run: |
           set -euo pipefail
           python3 scripts/security/stage1_replay.py --classify \
             --manifest stage1-manifest.json \
-            --replies stage1-replies.jsonl
+            --replies stage1-replies.jsonl \
+            --classification stage1-classification.jsonl
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -146,4 +199,5 @@ jobs:
           path: |
             stage1-manifest.json
             stage1-replies.jsonl
+            stage1-classification.jsonl
           if-no-files-found: warn

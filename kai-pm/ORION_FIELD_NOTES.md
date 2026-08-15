@@ -6,7 +6,30 @@
 git log over it — and then fix it, because a handover note that lies is
 worse than none.*
 
-**Last updated:** 2026-08-11, end of the service-identity stint.
+**Last updated:** 2026-08-11, end of the service-identity stint. The
+KAI-GATE-048 C position below is newer than that date and is kept
+current separately.
+
+**CURRENT POSITION — KAI-GATE-048 C, 2026-08-15.** Read `DECISIONS.md`
+D247 and D255-D263, newest last; that thread is authoritative and this
+paragraph is only a pointer.
+
+* **P1 is CLOSED — `REQUEST_REPLAYABLE`.** The production capture from
+  run `31894868473` (tree `1d79b14`) carries no positional args and no
+  unrecorded kwargs, on both the capture axis and the source axis.
+* **The Stage-1 subject is FROZEN and was published before any response
+  was read** (D259): `seq 2`, prompt `d53797298bea`, contract
+  `98c57afadeae`, model `qwen2.5:3b`.
+* **Stage 1 attempt 1 (run `31899571806`) is UNMEASURED — 0 of 10
+  executions.** It failed on our instrument, not on the model: a
+  `PermissionError` writing into a host-owned bind mount from a
+  container running `USER app`. D262 has the detail.
+* **The instrument is repaired and calibrated (D263); no new attempt has
+  been made and none is authorised.** `kai-pm/STAGE1_GO` is the trigger
+  and must not be touched without fresh authorisation — editing it
+  starts a live experiment.
+* The original captured response has **not** been opened. Neither have
+  attempt 1's `request_hash` / `manifest_hash`.
 
 **HELD WORKSTREAM — service identity.** Read
 `kai-pm/SERVICE_IDENTITY_STATE.md` before touching anything under

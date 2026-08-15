@@ -1137,6 +1137,50 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=False,
          in_workflows=("stage1-replay.yml",),
          findings=("KAI-GATE-048",)),
+    # D262's repair. "I only touched the plumbing" is an assertion
+    # until something computes it.
+    Gate(module="check_invocation_identity",
+         kind=REPORT,
+         summary="whether a repair changed what the model is actually "
+                 "asked: the transitive closure of module-level names "
+                 "reachable from the definitions that BUILD and SEND the "
+                 "request, digested per definition OLD vs NEW, with every "
+                 "reached repo module required unchanged in full and "
+                 "every out-of-surface change reported but not failed",
+         inputs=(),
+         denominator=r"inspected: \d+ top-level definition\(s\), \d+ in "
+                     r"the model-facing surface",
+         probe=False,
+         probe_skip_reason="it compares two git revisions, so a probe "
+                           "would need a repository state to compare "
+                           "against; both directions are calibrated by "
+                           "injected mutation in "
+                           "scripts/test_invocation_identity.py",
+         proven_by="scripts/test_invocation_identity.py",
+         calibrated_by="scripts/test_invocation_identity.py",
+         in_policy_check=False,
+         # Run BY HAND at repair time, against two git revisions. It is
+         # not wired into the Stage-1 workflow: making it a gate there
+         # means pinning a baseline commit into the experiment, which is
+         # a change to the experiment and needs its own authorisation.
+         in_workflows=(),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_invocation_identity",
+         kind=GATE,
+         summary="the identity check must be able to say BOTH things: a "
+                 "mutation inside the derived surface breaches, one "
+                 "outside it is reported and does not, a removed "
+                 "in-surface definition cannot take its own scope with "
+                 "it, and an aliased repo module resolves to its file "
+                 "rather than to its alias",
+         inputs=(),
+         denominator=r"inspected: \d+ top-level definition\(s\), \d+ in "
+                     r"the model-facing surface",
+         proven_by="scripts/test_invocation_identity.py",
+         calibrated_by="scripts/test_invocation_identity.py",
+         in_policy_check=False,
+         in_workflows=("stage1-replay.yml",),
+         findings=("KAI-GATE-048",)),
     Gate(module="select_replay_subject",
          kind=REPORT,
          summary="which captured request becomes the Stage-1 replay "

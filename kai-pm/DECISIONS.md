@@ -18413,3 +18413,178 @@ And separately: **the classify step must refuse rather than crash**.
 * **Stage 1 — ATTEMPTED, FAILED, 0/10 executions. No evidence produced,
   and no subject claim licensed either way.**
 * **Stage 2 — BLOCKED. Ownership — UNMOVED. 048 C — BLOCKED.**
+
+---
+
+## D263 — Stage-1 instrument repair: the destination moved, the user did not
+
+**2026-08-15. Branch `claude/project-rework-plan-pgvp35`. Authorised
+scope: instrument repair and calibration only. NO new live Stage-1
+attempt, and none is started by this entry.**
+
+The operator accepted D262's classification — *a clean failure of our
+measuring equipment, not of Kai, the model, or the Stage-1 hypothesis* —
+rejected candidate repair 1 (changing the container's runtime UID/GID to
+obtain write permission) and directed repairs 2 + 3 together.
+
+### 1. What was changed, and what was held
+
+**Changed — the destination, not the identity.**
+
+| property | before | after |
+|---|---|---|
+| replay output path | `stage1-replies.jsonl` (host-owned bind mount at `/w`) | `/tmp/stage1-replies.jsonl` (container-local, owned by the image's `app` user) |
+| container lifetime | `run --rm` | `run --name stage1-replay-run`, removed after export |
+| export | none — the file was expected to appear on the host | `docker cp` under `if: always()`, so partial rows survive a failed step |
+| runtime user | `USER app` | **`USER app` — unchanged** |
+
+`memu-graph/Dockerfile:32` is untouched. No `--user` flag was added
+anywhere. The permission problem was solved by moving the write, which
+is what the operator directed.
+
+**Held — everything the model sees.** The `--freeze` step, its `--url`
+(`http://ollama:11434/v1/chat/completions`), its `--timeout` (300), the
+frozen `S1_SEQ` / `S1_PROMPT_HASH` / `S1_CONTRACT_HASH` /
+`S1_CAPTURE_RUN_ID` / `S1_CAPTURE_COMMIT` and `OLLAMA_MODEL`
+(`qwen2.5:3b`) are byte-identical in the workflow diff.
+
+### 2. The OLD→NEW delta is computed, not asserted
+
+"I only touched the plumbing" is exactly the shape of claim R1 exists to
+stop, so `scripts/security/check_invocation_identity.py` computes it.
+The scope is **derived**, not listed (R5): the question is named as two
+seed definitions — the code that BUILDS the request (`freeze`) and the
+code that SENDS it (`send_once`) — and the surface is the transitive
+closure of module-level names they reach, plus any repo module they
+import, which must then be unchanged in full.
+
+Measured, `6b52008` → working tree, `scripts/security/stage1_replay.py`:
+
+```
+  definition                   status     surface  old -> new
+  EXPECTED_RESPONSE_FORMAT     unchanged  YES      5fdf855ba87d -> 5fdf855ba87d
+  N1                           unchanged  YES      b39bbc67d9c9 -> b39bbc67d9c9
+  SENDABLE                     unchanged  YES      23b68080934c -> 23b68080934c
+  _digest                      unchanged  YES      47a624fa8584 -> 47a624fa8584
+  freeze                       unchanged  YES      dc588326b2dc -> dc588326b2dc
+  rebuild                      unchanged  YES      6b5df5149e02 -> 6b5df5149e02
+  send_once                    unchanged  YES      2f0c046ab75a -> 2f0c046ab75a
+  main                         CHANGED    -        9ff309f8cf79 -> 53cf81154228
+  open_output                  ADDED      -        - -> 8d1c76a819b8
+  probe_output_path            ADDED      -        - -> 081cd65c8536
+  load_replay_evidence         ADDED      -        - -> f8332333dfa2
+  loggable                     ADDED      -        - -> f888968a2245
+  PREFLIGHT_LINE               ADDED      -        - -> 25547d3cc74e
+  RESPONSE_FREE_DETAIL         ADDED      -        - -> c25b1633a65d
+  UNMEASURED                   ADDED      -        - -> fddf18ae41c4
+  (instrument_identity, REPO   unchanged  -)
+
+  module reached by the surface: p1 -> scripts/security/p1_replay_completeness.py unchanged (d0d2ad247558)
+  module reached by the surface: s1 -> scripts/security/select_replay_subject.py  unchanged (254745c0fa6c)
+
+  inspected: 17 top-level definition(s), 7 in the model-facing surface
+  IDENTICAL — every definition that builds or sends the request is byte-for-byte unchanged.
+```
+
+Every changed or added definition is outside the surface. The check
+states its own blind spot: it compares **code**, so values supplied from
+outside the file are not in these bytes — those were diffed separately
+in the workflow, above, and no line touching them changed.
+
+The check found a defect in itself on first execution: it mapped an
+import **alias** to a filename, so `s1` and `p1` — the two repo modules
+the surface actually reaches — were reported as "not a repo file" and
+went unchecked. A scope smaller than the check's name implied, R5's
+exact shape, visible only because the report prints its whole
+denominator. Fixed before use; `test_invocation_identity.py` holds it.
+
+### 3. The write fault is now provable in seconds, not minutes
+
+`--preflight` opens the replay's destination, writes, reads the bytes
+back, and deletes — in the **same image**, as the **same user**, at the
+**same path**, through the **same `open_output()` call** the replay uses.
+Structurally, not by convention: the calibration parses the driver and
+asserts there are exactly two call sites of `open_output`, so the
+preflight cannot prove one path while the replay takes another.
+
+It runs after `build` and **before** `up ollama`. Attempt 1 spent
+~3 minutes to reach a fault provable in milliseconds.
+
+### 4. The classifier refuses instead of crashing
+
+`--classify` now returns **`STAGE 1 UNMEASURED — REPLAY INSTRUMENT
+FAILURE`** with the unmet prerequisite named, for: no manifest, an
+unreadable manifest, no replies file, an empty replies file, a torn
+replies file, and a short population. Exit 4 in every case; no
+traceback in any. A short population still prints the rows that exist
+and keeps the denominator at 10 — a shortfall, never a smaller sample.
+
+A torn file is **not** classified across. That was D250's defect —
+an instrument announcing its own invalidity and then reporting anyway.
+
+### 5. Replies stay sealed
+
+Two of the classifier's explanations are built partly from the reply:
+`INSTANCE_INVALID` carries jsonschema's message, which embeds the
+offending value, and `SCHEMA_ECHO` lists property names taken from the
+reply itself. Those are withheld from the CI log behind their own
+length and sha256 prefix — an excerpt that declares itself (R10) — and
+survive in full in `stage1-classification.jsonl`, uploaded as an
+artifact. Anything **not** on the allow-list is withheld by default, so
+a verdict added upstream later fails safe. The allow-list's denominator
+is derived by AST from what `classify()` can actually return, and the
+leak path is calibrated with a sentinel that must appear in the sealed
+file and nowhere in stdout or stderr.
+
+### 6. Calibration
+
+* `scripts/test_stage1_replay.py` — **114 passed, 0 failed**, 9
+  scenarios (was 67 / 5). New: the preflight both directions (a
+  writable path passes; a path that cannot exist fails with
+  `NotADirectoryError`; an unwritable directory fails with
+  `PermissionError` where uid makes that decidable), five refusal cases
+  through the **shipped CLI** as a subprocess, the sentinel leak test,
+  and the allow-list closure.
+* `scripts/test_invocation_identity.py` — **26 passed, 0 failed**, 4
+  scenarios, every case a known-positive or known-negative supplied by
+  an injected mutation rather than by the checker (I-8): in-surface
+  mutation breaches, out-of-surface mutation does not, a **removed**
+  in-surface definition cannot take its own scope with it.
+* `make policy-check` — green.
+* The registry meta-check rejected my first registration: I declared
+  `check_invocation_identity` as running in `stage1-replay.yml` when the
+  workflow references only its test. Corrected to `in_workflows=()`.
+
+### 7. What is NOT done
+
+* **No live Stage-1 attempt is started.** `kai-pm/STAGE1_GO` is
+  untouched, verified with the trigger check: of 9 changed paths, none
+  matches `stage1-replay.yml`'s single trigger path. (The check reports
+  `TRIGGER: YES` for `core-tests.yml`, which has no paths filter and
+  fires a live model on **every** push to this branch — task #64,
+  pre-existing, live-model-only and **not** capture-writing, so it
+  produces no Q2/Q6/ownership evidence.)
+* The next execution is **not** a rerun of `31899571806`. It is a new
+  prospectively authorised attempt with a new sentinel and its own run
+  identity, and it needs fresh authorisation.
+* `request_hash` / `manifest_hash` from attempt 1's manifest are still
+  **not quoted** — still not read.
+
+### 8. Flagged, not implemented (R12)
+
+`check_invocation_identity` is run by hand. It could be a **gate inside
+`stage1-replay.yml`**: pin the baseline commit whose surface was frozen,
+and refuse to run the experiment if the model-facing surface has moved
+since. That would make identity enforced rather than reported, and would
+catch a future edit nobody thought to check. It is not done here because
+pinning a baseline into the experiment is a change to the experiment,
+which is the operator's call and outside the authorised repair scope.
+**Cost:** one env var and one step. **Risk:** a stale baseline blocks a
+legitimately re-frozen subject until it is updated.
+
+### Status
+
+* **Stage 1 — instrument REPAIRED and CALIBRATED. Still 0/10 executed.
+  Attempt 1 remains UNMEASURED; nothing about it is re-labelled.**
+* **Awaiting fresh authorisation before any new attempt.**
+* **Stage 2 — BLOCKED. Ownership — UNMOVED. 048 C — BLOCKED.**

@@ -17,7 +17,10 @@ operator made preconditions of authorising Stage 1 at all:
 """
 from __future__ import annotations
 
+import ast
 import json
+import os
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -27,10 +30,13 @@ sys.path.insert(0, str(REPO / "scripts" / "security"))
 
 import stage1_replay as st  # noqa: E402
 import select_replay_subject as s1  # noqa: E402
+import classify_llm_response as cl  # noqa: E402
+
+DRIVER = REPO / "scripts" / "security" / "stage1_replay.py"
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 5
+EXPECTED_SCENARIOS = 9
 executed: list[str] = []
 LEAK = "ORIGINAL-RESPONSE-MUST-NEVER-BE-READ"
 
@@ -254,12 +260,211 @@ def test_the_manifest_carries_everything_needed_to_reproduce() -> None:
               'rec["request_hash"] = _digest(body)' in src)
 
 
+def cli(*argv: str) -> subprocess.CompletedProcess:
+    """The SHIPPED entry point, as CI invokes it.
+
+    Attempt 1's classify step crashed in code no unit test had ever run
+    through `main()`. A driver is what the command line does, not what
+    its functions do when called from a test.
+    """
+    return subprocess.run([sys.executable, str(DRIVER), *argv],
+                          capture_output=True, text=True)
+
+
+def _manifest(tmp: Path) -> Path:
+    man, probs = frozen(tmp, [row()])
+    if man is None:
+        raise SystemExit(f"fixture manifest would not freeze: {probs}")
+    p = tmp / "manifest.json"
+    p.write_text(json.dumps(man))
+    return p
+
+
+def test_the_output_path_is_proven_before_the_model_starts() -> None:
+    """Attempt 1 discovered `PermissionError` after the stack was up."""
+    scenario("output write preflight")
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        good = tmp / "replies.jsonl"
+        ok, why = st.probe_output_path(good)
+        check("a writable destination passes", ok, why)
+        check("and the probe file does not survive to be mistaken for "
+              "evidence", not good.exists())
+
+        # KNOWN NEGATIVE that does not depend on our uid: a parent that is
+        # a regular file cannot hold a child, for root as much as anyone.
+        blocker = tmp / "blocker"
+        blocker.write_text("not a directory\n")
+        bad, why = st.probe_output_path(blocker / "replies.jsonl")
+        check("a destination that cannot exist FAILS", not bad, why)
+        check("and the failure names the errno, not a guess",
+              "NotADirectoryError" in why, why)
+
+        # a second known negative, where permissions are actually decidable
+        if os.geteuid() != 0:
+            locked = tmp / "locked"
+            locked.mkdir()
+            locked.chmod(0o500)
+            try:
+                bad2, why2 = st.probe_output_path(locked / "replies.jsonl")
+                check("an unwritable directory FAILS — attempt 1's defect",
+                      not bad2, why2)
+                check("and it is reported as a permission failure",
+                      "PermissionError" in why2, why2)
+            finally:
+                locked.chmod(0o700)
+
+        # the shipped CLI, both directions
+        r = cli("--preflight", "--replies", str(tmp / "cli-ok.jsonl"))
+        check("the CLI preflight exits 0 on a writable path",
+              r.returncode == 0, r.stdout + r.stderr)
+        check("and says which user proved it",
+              "running as   : uid" in r.stdout, r.stdout)
+        r = cli("--preflight", "--replies", str(blocker / "x.jsonl"))
+        check("and exits 6 on one it cannot write",
+              r.returncode == 6, f"{r.returncode}: {r.stdout}{r.stderr}")
+        check("naming it a refusal, not a result",
+              "REFUSED" in r.stdout, r.stdout)
+        # Structural, not a substring tally: EXACTLY two call sites, so
+        # the preflight cannot prove one path while the replay takes
+        # another. Prose mentioning the name must not shift the count.
+        calls = [n for n in ast.walk(ast.parse(_src()))
+                 if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+                 and n.func.id == "open_output"]
+        check("the preflight and the replay open the destination through "
+              "the same call, and nothing else does", len(calls) == 2,
+              str(len(calls)))
+
+
+def test_absent_replay_evidence_is_a_verdict_not_a_crash() -> None:
+    """Attempt 1's classify step raised FileNotFoundError under always()."""
+    scenario("refusal instead of crash")
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        man = _manifest(tmp)
+        cases = {
+            "no manifest at all": ("--manifest", str(tmp / "nope.json"),
+                                   "--replies", str(tmp / "nope.jsonl")),
+            "manifest but no replies": ("--manifest", str(man),
+                                        "--replies", str(tmp / "nope.jsonl")),
+        }
+        (tmp / "empty.jsonl").write_text("")
+        cases["an empty replies file"] = ("--manifest", str(man),
+                                          "--replies", str(tmp / "empty.jsonl"))
+        (tmp / "torn.jsonl").write_text(
+            json.dumps({"replay_index": 1, "raw_response": "{}"}) + "\n{ tor")
+        cases["a torn replies file"] = ("--manifest", str(man),
+                                        "--replies", str(tmp / "torn.jsonl"))
+        (tmp / "unreadable.json").write_text("{not json")
+        cases["an unreadable manifest"] = ("--manifest",
+                                           str(tmp / "unreadable.json"),
+                                           "--replies", str(tmp / "empty.jsonl"))
+        for name, argv in cases.items():
+            r = cli("--classify", *argv)
+            check(f"{name}: exits 4, not a traceback", r.returncode == 4,
+                  f"{r.returncode}: {r.stderr[-200:]}")
+            check(f"{name}: no traceback at all",
+                  "Traceback" not in r.stderr, r.stderr[-300:])
+            check(f"{name}: says STAGE 1 UNMEASURED",
+                  st.UNMEASURED in r.stdout, r.stdout[-300:])
+            check(f"{name}: names the unmet prerequisite",
+                  "unmet prerequisite:" in r.stdout, r.stdout[-300:])
+
+        # a SHORT population is a shortfall, never a smaller sample
+        short = tmp / "short.jsonl"
+        frozen_hash = json.loads(man.read_text())["request_hash"]
+        short.write_text("".join(json.dumps(
+            {"replay_index": i, "raw_response": '{"summary": "x"}',
+             "elapsed_s": 1.0, "request_hash": frozen_hash}) + "\n"
+            for i in range(1, 4)))
+        r = cli("--classify", "--manifest", str(man), "--replies", str(short))
+        check("3 of 10 exits 4", r.returncode == 4, r.stdout[-300:])
+        check("and keeps the denominator at 10",
+              "DENOMINATOR MISMATCH: 3 replies for 10" in r.stdout,
+              r.stdout[-400:])
+        check("and still calls the experiment UNMEASURED",
+              st.UNMEASURED in r.stdout, r.stdout[-300:])
+        check("the three rows it DID have are still reported",
+              "inspected: 3 replay execution(s) of 10 precommitted"
+              in r.stdout, r.stdout[-600:])
+
+
+def test_no_reply_content_reaches_the_ci_log() -> None:
+    scenario("replies stay sealed")
+    sentinel = "REPLY-BODY-MUST-NOT-REACH-THE-LOG"
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        man = _manifest(tmp)
+        frozen_hash = json.loads(man.read_text())["request_hash"]
+        # A schema echo: the classifier describes it using property names
+        # taken from the REPLY, so this is a real leak path, not a mock.
+        echo = json.dumps({"type": "object",
+                           "properties": {sentinel: {"type": "string"}}})
+        replies = tmp / "replies.jsonl"
+        replies.write_text("".join(json.dumps(
+            {"replay_index": i, "raw_response": echo, "elapsed_s": 1.0,
+             "request_hash": frozen_hash}) + "\n" for i in range(1, 11)))
+        sealed = tmp / "classification.jsonl"
+        r = cli("--classify", "--manifest", str(man), "--replies",
+                str(replies), "--classification", str(sealed))
+        check("it classifies", r.returncode == 0,
+              f"{r.returncode}: {r.stdout[-400:]}{r.stderr[-300:]}")
+        check("the verdict IS in the log", "SCHEMA ECHO" in r.stdout,
+              r.stdout[-400:])
+        check("the reply's content is NOT",
+              sentinel not in r.stdout and sentinel not in r.stderr,
+              r.stdout[-400:])
+        check("the withholding declares its own size and digest",
+              "withheld — derived from the reply body" in r.stdout and
+              "chars, sha256" in r.stdout, r.stdout[-400:])
+        check("and the full text survives in the sealed artifact",
+              sentinel in sealed.read_text(), sealed.read_text()[:200])
+        check("which carries one row per execution",
+              len(sealed.read_text().strip().splitlines()) == 10)
+        # withholding with nowhere to seal it must say so
+        r2 = cli("--classify", "--manifest", str(man), "--replies",
+                 str(replies))
+        check("withholding without a sealed file announces the loss",
+              "NOT sealed anywhere" in r2.stdout, r2.stdout[-400:])
+
+
+def test_the_loggable_allow_list_is_closed_over_the_classifier() -> None:
+    """The denominator is every verdict `classify()` can return."""
+    scenario("allow-list is closed")
+    src = (REPO / "scripts" / "security" /
+           "classify_llm_response.py").read_text()
+    fn = next(n for n in ast.walk(ast.parse(src))
+              if isinstance(n, ast.FunctionDef) and n.name == "classify")
+    verdicts = {getattr(cl, r.value.elts[0].id)
+                for r in ast.walk(fn)
+                if isinstance(r, ast.Return) and isinstance(r.value, ast.Tuple)
+                and isinstance(r.value.elts[0], ast.Name)}
+    check("the denominator was derived, not typed", len(verdicts) >= 7,
+          str(sorted(verdicts)))
+    check("every allow-listed verdict is one the classifier can return",
+          st.RESPONSE_FREE_DETAIL <= verdicts,
+          str(sorted(st.RESPONSE_FREE_DETAIL - verdicts)))
+    for leaky in (cl.SCHEMA_ECHO, cl.INSTANCE_INVALID):
+        check(f"{leaky} is withheld — its text quotes the reply",
+              leaky not in st.RESPONSE_FREE_DETAIL)
+    unlisted = verdicts - st.RESPONSE_FREE_DETAIL
+    for v in sorted(unlisted):
+        check(f"an unlisted verdict ({v}) fails SAFE",
+              st.loggable(v, "secret") != "secret")
+    check("a listed one passes through",
+          st.loggable(cl.VALID_INSTANCE, "plain") == "plain")
+
+
 def run_all() -> None:
     test_response_format_is_rebuilt_and_asserted()
     test_identity_must_match_or_it_refuses()
     test_the_original_response_is_never_read()
     test_a_transport_error_is_one_execution_not_a_retry()
     test_the_manifest_carries_everything_needed_to_reproduce()
+    test_the_output_path_is_proven_before_the_model_starts()
+    test_absent_replay_evidence_is_a_verdict_not_a_crash()
+    test_no_reply_content_reaches_the_ci_log()
+    test_the_loggable_allow_list_is_closed_over_the_classifier()
     print(f"  inspected: {st.N1} precommitted replay execution(s), "
           f"{len(s1.RESPONSE_BEARING)} response-bearing field(s) withheld")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
