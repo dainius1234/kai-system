@@ -18321,3 +18321,95 @@ rule worked, but it worked because it was applied by hand each time.
 * **Stage 1 — AUTHORISED, driver built and calibrated, NOT yet
   dispatched.** Stage 2 — BLOCKED. Ownership — UNMOVED. **048 C —
   BLOCKED.**
+
+---
+
+## D262 — Stage 1 run 1 FAILED before any model call. 0 of 10 executions.
+
+**2026-08-15.** Reported, not repaired. **No rerun.**
+
+| | |
+|---|---|
+| **Run** | **31899571806**, `run_attempt 1`, commit **`281d5c7a`** |
+| **Trigger** | push touching `kai-pm/STAGE1_GO` — the sentinel worked |
+| **Conclusion** | **failure**, 17:53:06 → 17:56:12 |
+| **Model calls made by the replay** | **ZERO** |
+
+### 1. The exact failure
+
+```
+File "/w/scripts/security/stage1_replay.py", line 275, in main
+    out = pathlib.Path(args.replies).open("w")
+PermissionError: [Errno 13] Permission denied: 'stage1-replies.jsonl'
+```
+
+**Cause.** The replay runs inside the `memu-graph` container, which
+declares `USER app` (`memu-graph/Dockerfile:32`), with the repository
+bind-mounted at `/w`. That directory belongs to the runner's user on the
+host, so the container's unprivileged `app` cannot create a file in it.
+The driver could not open its output file and stopped **before the first
+request was sent**.
+
+**Classification (doctrine rule 5).** This is an **instrument /
+infrastructure failure**. It is **not** an adverse result about the
+subject, the request, the model or the endpoint. Nothing was measured.
+
+**What DID complete:** the freeze step succeeded and its manifest was
+produced and uploaded (`stage1-manifest.json`, 2,625 bytes, artifact
+9250735252). So exact-request identity did **not** fail — the run never
+reached the point where it could. The manifest's `request_hash` and
+`manifest_hash` are in that artifact and in the run log; **they are not
+quoted here because I have not read them**, and a hash asserted from
+memory is worth nothing.
+
+### 2. A second defect, mine, in the same run
+
+With the replay dead, the classify step ran under `if: always()` and
+**crashed**:
+
+```
+FileNotFoundError: [Errno 2] No such file or directory: 'stage1-replies.jsonl'
+```
+
+That is **doctrine rule 6** — *a refusal must return a verdict; crashing
+while attempting to refuse is instrument failure, not fail-closed proof*
+— and **R11**, a dependent measurement executing after its prerequisite
+is unproven. I built that exact defect into a new instrument two days
+after the census taught it to me. The classify step should have said
+*"no replies file: the replay did not run; nothing is classified"* and
+exited with a state, not a traceback.
+
+Both repairs are obvious. **Neither is made now**, because Stage 1's
+disposition is the operator's and a driver edited between a failed
+attempt and the next one is a different instrument.
+
+### 3. What is NOT being done
+
+* **No rerun.** Not the workflow, not the failed job. The standing rule
+  is fresh authorisation, and this failure is evidence rather than
+  something to clear.
+* **No replacement executions**, and no manufacturing of a complete N₁.
+  Zero is the count.
+* **`kai-pm/STAGE1_GO` is untouched** — editing it would re-trigger the
+  experiment. The sentinel constrains me exactly as intended.
+
+### 4. Candidate repairs, for the operator's decision only
+
+1. **Run the replay as the invoking user** — `docker compose run --user
+   "$(id -u):$(id -g)"` — so the container can write to the mounted
+   workspace. Smallest change; the network path and image stay identical.
+2. **Write to a container-local path and copy it out**, leaving the
+   image's user model untouched.
+3. **Refuse earlier**: have `--replay` prove it can create its output
+   file *before* the stack is built, so a permission fault costs seconds
+   rather than a full bring-up. This one is a genuine improvement
+   regardless of which of 1 or 2 is chosen — the run spent ~3 minutes to
+   discover a fault provable in milliseconds.
+
+And separately: **the classify step must refuse rather than crash**.
+
+### Status
+
+* **Stage 1 — ATTEMPTED, FAILED, 0/10 executions. No evidence produced,
+  and no subject claim licensed either way.**
+* **Stage 2 — BLOCKED. Ownership — UNMOVED. 048 C — BLOCKED.**
