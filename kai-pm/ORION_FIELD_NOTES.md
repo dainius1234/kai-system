@@ -23,9 +23,15 @@ paragraph is only a pointer.
 * **Stage 1 attempt 1 (run `31899571806`) is UNMEASURED — 0 of 10
   executions.** It failed on our instrument, not on the model: a
   `PermissionError` writing into a host-owned bind mount from a
-  container running `USER app`. D262 has the detail.
-* **The instrument is repaired and calibrated (D263); no new attempt has
-  been made and none is authorised.** `kai-pm/STAGE1_GO` is the trigger
+  container running `USER app`. D262 has the detail; D263 repaired it.
+* **Stage 1 attempt 2 (run `31906667051`, head `b51c8f5`) is ALSO
+  UNMEASURED.** The D263 repair is proven on the real runner, and the
+  request hash matched attempt 1's exactly — but the model-pull
+  container had run for 0.49 s when the calls went out, so all ten
+  returned HTTP 404 and none reached a model. D265 has the detail.
+  **The run went green over it**, which is the defect that matters.
+* **No repair to attempt 2's cause has been made and no attempt 3 is
+  authorised.** `kai-pm/STAGE1_GO` is the trigger
   and must not be touched without fresh authorisation — editing it
   starts a live experiment.
 * The original captured response has **not** been opened. Neither have

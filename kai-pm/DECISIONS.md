@@ -18689,3 +18689,133 @@ dispatch commit that follows changes that file **and nothing else**.
 * **Attempt 1 — BANKED, instrument failure, 0/10, UNMEASURED.**
 * **Attempt 2 — AUTHORISED, not yet dispatched.**
 * **Stage 2 — BLOCKED. Ownership — UNMOVED. 048 C — BLOCKED.**
+
+---
+
+## D265 — Attempt 2: the repair worked; a prerequisite nobody had reached failed
+
+**2026-08-15. Run `31906667051`, `run_number` 2, `run_attempt` 1, head
+`b51c8f5a9e9493e20796cb0dd63d4f5f92ba9e15`, tree
+`052a6d1f68c7fea18632bee033c8865d486feaaa`. 20:25:58Z → 20:29:04Z.**
+
+**STAGE 1 REMAINS UNMEASURED. Ten executions were attempted. Zero
+reached a model.**
+
+### 1. Provenance, stated precisely
+
+Attempt 2 executed on **`b51c8f5`**, not on `9a53ee6`. `9a53ee6` is the
+*repaired baseline*; `a29aa97` added the cross-attempt hash check and
+the sentinel produced `b51c8f5`. The separate, weaker claim is that
+`b51c8f5`'s model-facing surface is IDENTICAL to `9a53ee6`'s. The two
+must not be collapsed.
+
+### 2. Every prerequisite the operator asked to see — all passed
+
+| # | prerequisite | evidence, from the run log |
+|---|---|---|
+| 1 | capture artifact fetched | `Downloading artifact '9249683223'` → `Total of 1 artifact(s) downloaded` |
+| 2 | S1 re-selection reproduces the frozen subject | 3 production rows; preconditions 2-5 OK; `seq 2, prompt d53797298bea, contract 98c57afadeae — all match frozen`; `response_format` rebuilt via `ast.literal_eval` to `{'type': 'json_object'}` (dict) |
+| 3 | attempt-1 artifact located | `Downloading artifact '9250735252'` → `Total of 1 artifact(s) downloaded` |
+| 4 | **request hashes equal** | reference `afd8f4e08bca944664ed9f5472260be87b1493ae9a72362018574e763b48ae86`; this attempt the same value; `IDENTICAL — attempt 2 sends byte-for-byte the request attempt 1 froze.` |
+| 5 | **the D263 write repair, on the real runner** | `destination: /tmp/stage1-replies.jsonl`, `running as: uid 100 gid 101`, `wrote and read back 55 byte(s) … then removed it` |
+| 6 | named container + `docker cp` export | `exported 2051 byte(s) in 10 row(s)`, `replay container removed` |
+| 7 | request identity across all ten | `all 10 invocation(s) reproduce the frozen request hash` |
+
+**The one live-only unknown from D263 is now closed.** `USER app` (uid
+100, gid 101) writes to a container-local path, and the export
+mechanics work. That repair is proven in the environment it was built
+for.
+
+### 3. What failed instead
+
+All ten executions returned `HTTPError: HTTP Error 404: Not Found` in
+**0.001-0.003 s**. The timeline:
+
+```
+20:28:43.266  ollama-pull  Pulled          (the IMAGE, 1.704 GB)
+20:28:48.923  ollama-pull  Starting
+20:28:49.023  ollama-pull  Started
+20:28:49.510  replay 1/10 done
+20:28:49.521  replay 10/10 done
+20:28:49.746  ollama-pull  Stopping        (torn down mid-pull)
+20:29:00.709  ollama-pull  Stopped
+```
+
+Read from `docker-compose.full.yml`, not guessed from the name:
+
+```yaml
+ollama-pull:
+  entrypoint: ["sh","-c","OLLAMA_HOST=ollama:11434 ollama pull ${OLLAMA_MODEL:-qwen2.5:0.5b} && ..."]
+  depends_on: {ollama: {condition: service_healthy}}
+```
+
+`ollama-pull` is the container that pulls **the model**. It had been
+running for **0.49 seconds** when the first call went out, and was
+killed at teardown still unfinished. The readiness probe was
+`compose_probe.py --services ollama --timeout 300`: it waited for the
+**server**, and nothing waited for the **model**.
+
+**R11 again, in its most dangerous dress.** A dependent measurement ran
+against an unproven prerequisite and produced ten correct-looking rows.
+An empty table invites a question; a full table of ten uniform results
+invites a conclusion.
+
+### 4. What is PROVEN and what is INFERRED
+
+**Proven:** ten HTTP 404s; their timings; that the model-pull container
+had run for half a second; that the probe waited only on the server.
+
+**Inferred, NOT proven:** that the 404 *means* "model not found".
+`send_once` records `f"{type(exc).__name__}: {exc}"`, which for an
+`HTTPError` is `HTTP Error 404: Not Found` — **the response body, where
+ollama names the reason, was discarded.** The timeline makes the cause
+near-certain; near-certain is not measured, and D247's rules do not
+have a slot for near-certain.
+
+### 5. A defect of mine, and it is the serious one
+
+**The job concluded `success`.** Ten transport failures with matching
+request hashes and a count equal to N₁ satisfied every rule the
+classifier enforces, so `--classify` exited 0 and the run went green
+over an experiment that measured nothing.
+
+Per-row the verdicts are honest — `NO RESPONSE` ten times is exactly
+what happened. The **run-level** conclusion is not. A population in
+which zero executions reached a model is not a Stage-1 result, and my
+instrument had no rule that said so. That is the third defect this
+experiment has found in its own apparatus, and like the other two it
+lived in a path that had never run.
+
+### 6. Not done
+
+* **No rerun. No replacement executions. No manufactured population.**
+  The standing rule holds and this failure is evidence, not something
+  to clear.
+* **`kai-pm/STAGE1_GO` untouched** — this entry cannot restart anything.
+* **The original captured response has not been opened.** There is
+  nothing to compare it against, and opening it now would be reading
+  the answer with no result to hold beside it.
+* **No repair is made.** Attempt 2's disposition is the operator's.
+
+### 7. Flagged for the operator (R12)
+
+1. **Wait for the model, not the server.** `ollama-pull` exits 0 when
+   the pull completes; the run must wait for that exit, and then prove
+   the model is listed, before the replay. Cheap, and it is the actual
+   prerequisite. *(Instrument-only; does not touch the request.)*
+2. **A run-level refusal rule.** If zero executions produced a model
+   response, `--classify` should return `STAGE 1 UNMEASURED` rather than
+   0, regardless of how tidy the population looks. *(Instrument-only.)*
+3. **The 404 body is discarded.** Recording an `HTTPError`'s body would
+   have turned §4's inference into a measurement — but `send_once` **is
+   the model-facing surface**, and changing it breaks the byte-identity
+   guarantee that made attempts 1 and 2 comparable. This is a genuine
+   trade-off and it is the operator's call, not mine.
+
+### Status
+
+* **Attempt 1 — BANKED, 0/10, INSTRUMENT / INFRASTRUCTURE FAILURE.**
+* **Attempt 2 — BANKED, 10 executions attempted, 0 model responses,
+  0 classifiable replies. STAGE 1 UNMEASURED. The D263 write repair is
+  PROVEN; a different, previously unreached prerequisite failed.**
+* **Stage 2 — BLOCKED. Ownership — UNMOVED. 048 C — BLOCKED.**
