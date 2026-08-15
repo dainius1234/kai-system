@@ -1,18 +1,17 @@
-STAGE 1 — EXACT-REQUEST REPLAY: ATTEMPT 2, AUTHORISED AND STARTED
+STAGE 1 — EXACT-REQUEST REPLAY: ATTEMPT 3, AUTHORISED AND STARTED
 
-ATTEMPT      : 2
-Authorisation: Dainius/Kai, 2026-08-15, fresh and specific — "Fresh
-               authorisation is granted for Stage-1 Attempt 2", granted
-               on the D263 pre-dispatch certificate. This is NOT a rerun
-               of run 31899571806; it is a new attempt with its own run
-               identity.
+ATTEMPT      : 3
+Authorisation: Dainius/Kai, 2026-08-15, fresh and specific — "Stage-1
+               Attempt 3 is AUTHORISED", granted on the D266
+               pre-dispatch certificate. NOT a rerun of 31899571806 or
+               31906667051; a new attempt with its own run identity.
 
-Repaired base commit : 9a53ee630188b0c58cdea0f3539baecaed35fe9b
-Repaired base tree   : 26eee3c8084312d084cca57015241e6202fc361d
-Pre-dispatch commit  : a29aa97dcfe6e360a319133c7d980bd15787d322 (D264 —
-                       adds only the cross-attempt request-hash check;
-                       model-facing surface reported IDENTICAL against
-                       the repaired base)
+Repair commit : dce597ca4d8282a4f43facd7ba6e320b33bcb194
+Repair tree   : fa2160f26307b0ea9ce3eb3d0abf8c20b3877145
+                (D266 — model-readiness gate and zero-response
+                run-level refusal. 0 model-facing changes; the
+                invocation surface is IDENTICAL to the D263 repaired
+                baseline 9a53ee6, and send_once is untouched.)
 
 Subject      : capture run 31894868473, tree
                1d79b145a04f1bc35a9bc9d0a31251153f6e6a10
@@ -34,28 +33,51 @@ Constraints  : the original captured response is not opened until all ten
                are interpreted under D247's already-frozen rules and no
                interpretation is invented after seeing them.
 
-Prerequisites, in order, all before model call 1
+Prerequisites, ALL of which hold before model call 1
   1. the capture artifact is present, or the run refuses;
-  2. re-selection under S1 reproduces seq 2 / d53797298bea / 98c57afadeae,
-     or the run refuses;
-  3. attempt 2's request_hash EQUALS attempt 1's, read from run
-     31899571806's freeze manifest — value-level identity, not merely
-     code identity. Unequal is STAGE 1 INVALID; unestablished is STAGE 1
-     UNMEASURED. Either way nothing is sent;
-  4. the repaired output path is proven writable in the same image, as
-     the same `app` user, at the same container-local path, through the
-     same open() the replay uses.
+  2. re-selection under S1 reproduces seq 2 / d53797298bea / 98c57afadeae;
+  3. attempt 3's request_hash EQUALS attempt 1's, read from run
+     31899571806's freeze manifest;
+  4. the output path is proven writable in the same image, as the same
+     `app` user, at the same container-local path;
+  5. the model pull completes SUCCESSFULLY in the foreground — its exit
+     status is the gate, not a container that has merely started;
+  6. the EXACT frozen runtime model is proven present in the server's
+     own inventory. A healthy server is insufficient. A running
+     ollama-pull container is insufficient. A related tag of the same
+     family is insufficient.
 
-  If any prerequisite fails the attempt STOPS BEFORE MODEL CALL 1 and
-  returns STAGE 1 UNMEASURED — REPLAY INSTRUMENT FAILURE. No rerun, no
-  replacement attempt, no reduced denominator.
+  Order note: the shipped order is 1-2-3-4 then 5-6, cheapest first, so
+  a 1.7 GB pull is not spent before the request identity is proven. The
+  operator's stated sequence listed 5-6 before 3-4. All six hold before
+  model call 1 either way; the deviation is recorded here rather than
+  discovered later.
 
-Attempt 1    : run 31899571806, run_attempt 1, 0 of 10 executions.
+  If ANY prerequisite fails the attempt STOPS BEFORE MODEL CALL 1 and
+  returns an explicit refusal / STAGE 1 UNMEASURED. No rerun, no
+  replacement, no reduced denominator.
+
+Aggregate rule: zero model responses across the ten executions is
+               STAGE 1 UNMEASURED and a non-green run, however complete
+               the population looks. Row-level transport outcomes are
+               all preserved. No threshold beyond this is invented.
+
+Attempt 1    : run 31899571806, run_attempt 1. 0 of 10 executions.
                INSTRUMENT / INFRASTRUCTURE FAILURE — UNMEASURED.
-               PermissionError writing into a host-owned bind mount from
-               a container running USER app. Permanently banked as such;
-               nothing here re-labels it, and no execution of it is
-               replaced.
+Attempt 2    : run 31906667051, run_attempt 1, head b51c8f5. Ten
+               transport attempts, 0 model responses — UNMEASURED. The
+               server was healthy; the model was not there.
+               Both are permanently banked. Nothing here re-labels them
+               and no execution of either is replaced.
+
+Standing record (do not collapse these two states): docker-compose.full
+               .yml ALREADY declared memu-graph -> ollama-pull
+               `service_completed_successfully`. The declaration was
+               PRESENT but NOT ENFORCED in the execution path, because
+               the replay's `--no-deps` told Compose to ignore it. A
+               declared gate that is bypassed is not a missing gate; it
+               is worse, because it reads as protection while not being
+               in force.
 
 Still blocked: Stage 2 remains BLOCKED and requires separate
                authorisation. Ownership remains UNMOVED. 048 C remains
