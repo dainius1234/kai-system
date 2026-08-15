@@ -67,8 +67,8 @@ jobs:
       # than discovered — a moving "latest" would silently change the
       # subject between runs. Taken from an authoritative run listing,
       # never from memory.
-      P1_CAPTURE_RUN_ID: "31844794230"
-      P1_CAPTURE_COMMIT: "397ad92ed9fd4175f737df3c6b17d358f02c13d5"
+      P1_CAPTURE_RUN_ID: "31894868473"
+      P1_CAPTURE_COMMIT: "1d79b145a04f1bc35a9bc9d0a31251153f6e6a10"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -223,8 +223,8 @@ jobs:
       contents: read
       actions: read
     env:
-      P1_FORMAT_RUN_ID: "31890166592"
-      P1_FORMAT_COMMIT: "930e7d09"
+      P1_FORMAT_RUN_ID: "31894868473"
+      P1_FORMAT_COMMIT: "1d79b145a04f1bc35a9bc9d0a31251153f6e6a10"
     steps:
       - uses: actions/checkout@v4
 
