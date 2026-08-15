@@ -531,6 +531,22 @@ DECLARED: Tuple[Toleration, ...] = (
     ),
     Toleration(
         workflow="p1-replay-completeness.yml",
+        step="Why did the artifact arrive, or not",
+        bucket=DOCUMENTED_SKIP,
+        reason="`HTTP=$(curl … || echo \"\")`. The empty string IS the "
+               "signal: it makes the classifier report NETWORK_FAILURE "
+               "rather than letting an unreachable API be mistaken for a "
+               "run that produced nothing. Swallowing the code here is "
+               "what keeps two causes distinguishable, which is the whole "
+               "point of the step (D251). It suppresses no enforcement: "
+               "the classifier exits non-zero for every state except "
+               "ARTIFACT_PRESENT, and the format step refuses separately "
+               "when the capture file is absent.",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="p1-replay-completeness.yml",
         step="Fetch the capture from run ${{ env.P1_FORMAT_RUN_ID }}",
         bucket=DOCUMENTED_SKIP,
         reason="Same shape and reason as the P1 fetch below: format "

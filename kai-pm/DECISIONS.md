@@ -17397,3 +17397,134 @@ substitution P1 exists to refuse.
   validation.**
 * **048 C — BLOCKED. 049/050 — CLOSED. 051/#58 — OPEN.**
 * **Campaign — CLOSED at 1/5. Run 25 contributes nothing to it.**
+
+---
+
+## D252 — Three precision checks, and a claim of mine they falsified
+
+**2026-08-15.** The operator's three precision points, built. The first
+one falsified something I had asserted twice.
+
+### 1. "I did not touch the probe" never proved what I used it to prove
+
+The standard:
+
+> **changed paths ∩ live-capture trigger paths = ∅.**
+
+`scripts/security/check_capture_trigger_paths.py` computes it, deriving
+both halves from the tree (R5): which scripts really start the model
+service, which workflows run them, and what each of those is triggered
+by. On its **first execution** it reported:
+
+> **`core-tests.yml` has NO `paths:` filter and runs
+> `docker compose -f docker-compose.full.yml up -d ollama ollama-pull
+> memu-graph` at line 604.**
+
+So it starts a real model **on every push** — including every push I
+have made in this sequence.
+
+I said, of commit `0819123`: *"nothing here touches
+`probe_llm_contract.py`, so no new capture workflow was triggered."* The
+literal claim was true — `memu-graph-startup-proof.yml` did not fire.
+What I meant it to convey, and what a reader would take from it, is that
+no live model ran. **That was wrong.** A live model ran, as it does on
+every push. I inferred a general property from one specific path, which
+is the same shape as a check whose scope is smaller than its name.
+
+Nothing about the evidence changes: `core-tests.yml` writes no capture,
+so nothing it did is admissible for anything, and no Q2/Q6/ownership
+claim rests on it. What changes is that a statement of mine was doing
+work it had not earned.
+
+### 2. Two classes, because they mean different things
+
+| class | what it is | concern |
+|---|---|---|
+| **LIVE-MODEL** | a real model answers | resource + side effect (D251's rule) |
+| **LIVE-MODEL + CAPTURE-WRITING** | the run also writes a capture that could become Q2/Q6 or Stage-1 evidence | **evidence** |
+
+Measured today: `core-tests.yml` is live-model only; the capture workflow
+is both. Conflating them would have made "a model ran" and "evidence was
+produced" the same sentence, and they are not.
+
+### 3. My own check had the inverted defect, and it lasted one run
+
+The first version matched anywhere in a file, and reported
+`check_compose_env.py` and `test_graph_live.py` as model-starting. Both
+only **describe** the command, in docstrings. That is R5's inverted form
+— **a scope LARGER than reality** — and here it is the more expensive
+error: it sends someone to reason about a live model run that never
+happens.
+
+Fixed by matching only executable lines: comments excluded, and for
+Python, docstrings located by **parsing** rather than by guessing at
+quote characters. The population fell from 3 workflows to 2, and the two
+that remain were each confirmed by reading the command.
+
+### 4. Fetch failure: seven states, not one "not performed"
+
+`scripts/security/classify_artifact_fetch.py`.
+`SUBJECT_RUN_INCOMPLETE` · `ACCESS_DENIED` · `NETWORK_FAILURE` ·
+`ARTIFACT_ABSENT` · `ARTIFACT_EXPIRED` · `ARTIFACT_MALFORMED` ·
+`ARTIFACT_PRESENT`, each with its own exit code, and only the last
+licensing a measurement.
+
+Two of these are **findings about the subject**, not availability
+problems here: an artifact absent after a **completed** run means that
+run produced nothing, and an expired one means the evidence existed and
+was lost. Collapsing either into "not performed" reports a condition
+that may not have occurred — the same defect as one abort message for
+three selftest states (D218).
+
+The classification is a pure function of facts the caller gathered, so
+it is calibrated with no network. Order is asserted: transport before
+authorisation before the subject's state, because a `run_status` we could
+not fetch cannot be trusted to say "completed".
+
+### 5. Subject and measurer, kept apart
+
+The format job now prints both identities and says which is which:
+
+```
+SUBJECT  (produced the artifact): run 31890166592, commit 930e7d0
+MEASURER (measures the artifact): run <this>, commit <this>
+```
+
+with the explicit note that the verdict belongs to the measurer's tree
+and is about the subject's artifact, and neither identity may be read off
+the other.
+
+### 6. Proof
+
+* trigger check: **27 passed / 0 failed**, 4 scenarios — every assertion
+  paired, because the claim is a *negative* one and a check that answers
+  it wrongly in the reassuring direction converts "I did not look" into
+  "I looked and it was clean". A workflow with no `paths:` filter is
+  asserted to read as **ABSENT, not empty**; `*` is asserted **not** to
+  span a separator; a prefix is asserted **not** to match.
+* fetch states: **41 passed / 0 failed**, 3 scenarios, including seven
+  inputs producing seven distinct states, and the pair the operator
+  named — a run in progress must not be `ARTIFACT_ABSENT`, a completed
+  run with nothing must be.
+* Its calibration runs inside `policy-checks.yml`, so a suite that has
+  stopped being able to fail is caught by a gate rather than by nobody.
+  An author-invoked check with an unproven calibration is a comfort.
+* `policy-check` green; `make trigger-check` added.
+
+### 7. This change, measured by the check it adds
+
+Run before the push, which is the entire point:
+
+> **TRIGGER: YES** — `core-tests.yml` (live-model, no paths filter).
+> **CAPTURE-WRITING: none.** `memu-graph-startup-proof.yml` is not
+> matched by any of the 11 changed paths.
+
+So: a live model will run, as on every push; **no capture will be
+written**, and no new evidence of any kind is produced by this commit.
+Stated in advance rather than discovered afterwards.
+
+### Status — unchanged by this entry
+
+* **P1 — UNRESOLVED. Real-format validation — PENDING.**
+* **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.**
+* **048 C — BLOCKED. Campaign — CLOSED at 1/5.**

@@ -31,6 +31,7 @@ policy-check: lint-blocking
 	python3 scripts/security/check_architecture_rules.py
 	python3 scripts/security/hygiene_survey.py --gate
 	python3 scripts/security/check_ci_tolerations.py
+	python3 scripts/test_capture_trigger_paths.py
 	python3 scripts/security/check_workflow_filters.py
 	python3 scripts/security/check_workflow_outputs.py
 	python3 scripts/security/check_dockerfile_flags.py
@@ -1060,6 +1061,22 @@ test-llm-contract:
 # REQUEST_INCOMPLETE_POSITIONAL, not as replayable.
 test-p1-replay-completeness:
 	python3 scripts/test_p1_replay_completeness.py
+
+# D251. "I did not touch the probe" never proved that no live model
+# would run -- core-tests.yml has no paths filter and starts ollama on
+# every push, which this check found on its first execution. Run it
+# BEFORE pushing: the authorisation for a change must say whether a
+# trigger side effect is included, and that cannot be decided after the
+# run has started.
+trigger-check: test-capture-trigger-paths
+	python3 scripts/test_artifact_fetch_states.py
+	python3 scripts/security/check_capture_trigger_paths.py
+
+# Runs inside policy-check, so the trigger check's own
+# calibration can fail a build. A suite nothing can fail with
+# is a suite nobody has to keep working.
+test-capture-trigger-paths:
+	python3 scripts/test_capture_trigger_paths.py
 
 # Proves the drift guard REFUSES: a failing gate, and a tree that
 # changes while the gate runs. Uses throwaway repositories, so it

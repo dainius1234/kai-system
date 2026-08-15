@@ -1016,6 +1016,86 @@ REGISTRY: Tuple[Gate, ...] = (
     # shared file would have put a static census inside the LLM capture
     # workflow's paths filter, so editing an analyser would have fired a
     # live model capture nobody authorised.
+    # D251. Answers "changed paths ∩ live-capture trigger paths = ∅"
+    # BEFORE a push, because "I did not touch the probe" never proved it.
+    Gate(module="check_capture_trigger_paths",
+         kind=REPORT,
+         summary="which workflows can call a real model, which of those "
+                 "also WRITE a capture that could become evidence, and "
+                 "whether any changed path falls inside their trigger "
+                 "filters; both halves derived by walking the tree, and a "
+                 "workflow with no paths filter is reported as firing on "
+                 "every push rather than as having no triggers",
+         inputs=(),
+         denominator=r"inspected: \d+ changed path\(s\) against \d+ "
+                     r"live-capture workflow\(s\)",
+         probe=False,
+         probe_skip_reason="needs a working tree with changes to inspect; "
+                           "the matcher, the filter reader, the "
+                           "intersection and the two-class separation are "
+                           "each asserted with a known-positive and a "
+                           "known-negative in "
+                           "scripts/test_capture_trigger_paths.py",
+         proven_by="scripts/test_capture_trigger_paths.py",
+         calibrated_by="scripts/test_capture_trigger_paths.py",
+         in_policy_check=False,
+         in_workflows=(),
+         pending_wiring="invoked by the author before a push, and by "
+                        "`make trigger-check`; wiring it into a workflow "
+                        "needs a base ref to diff against, which a push "
+                        "event does not carry unambiguously",
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_capture_trigger_paths",
+         kind=GATE,
+         summary="the trigger check must not answer its negative claim in "
+                 "the reassuring direction: a workflow with no paths "
+                 "filter reads as ABSENT rather than empty, `*` does not "
+                 "span a separator, a prefix is not a match, and "
+                 "live-model must stay separable from capture-writing",
+         inputs=(),
+         denominator=r"inspected: \d+ live-capture workflow\(s\)",
+         proven_by="scripts/test_capture_trigger_paths.py",
+         calibrated_by="scripts/test_capture_trigger_paths.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-048",)),
+    # D251. Five causes of a missing artifact, five states.
+    Gate(module="classify_artifact_fetch",
+         kind=REPORT,
+         summary="why an artifact did not arrive, as one of seven "
+                 "distinguishable states rather than one 'not performed': "
+                 "a run still going, a permissions failure HERE, a "
+                 "network failure, an artifact absent after a COMPLETED "
+                 "run, an expired one, a malformed one, and present; only "
+                 "the last licenses a measurement",
+         inputs=(),
+         denominator=r"inspected: \d+ artifact fetch across \d+ "
+                     r"distinguishable state\(s\)",
+         probe=False,
+         probe_skip_reason="the classification is a pure function of facts "
+                           "the caller gathered from the API, so it is "
+                           "calibrated without a network in "
+                           "scripts/test_artifact_fetch_states.py; only "
+                           "the gathering needs one",
+         proven_by="scripts/test_artifact_fetch_states.py",
+         calibrated_by="scripts/test_artifact_fetch_states.py",
+         in_policy_check=False,
+         in_workflows=("p1-replay-completeness.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_artifact_fetch_states",
+         kind=GATE,
+         summary="the five failure causes must stay distinguishable: a run "
+                 "in progress is not an absent artifact, a permissions "
+                 "failure here is not the subject having produced "
+                 "nothing, expired is not absent, and transport is asked "
+                 "before a run status we may not have been able to fetch",
+         inputs=(),
+         denominator=r"inspected: \d+ fetch state\(s\) discriminated",
+         proven_by="scripts/test_artifact_fetch_states.py",
+         calibrated_by="scripts/test_artifact_fetch_states.py",
+         in_policy_check=False,
+         in_workflows=("p1-replay-completeness.yml",),
+         findings=("KAI-GATE-048",)),
     Gate(module="test_p1_replay_completeness",
          kind=GATE,
          summary="the two replay-completeness axes must NEVER substitute "

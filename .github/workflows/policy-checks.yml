@@ -6,6 +6,9 @@ on:
       - 'docker-compose*.yml'
       - 'scripts/security/**'
       - '.github/workflows/policy-checks.yml'
+      # The suites this workflow runs are its inputs too; a change that
+      # weakened one would otherwise not cause the workflow to run it.
+      - 'scripts/test_capture_trigger_paths.py'
   pull_request:
     paths:
       - 'docker-compose*.yml'
@@ -48,6 +51,14 @@ jobs:
             echo "Installing $req"
             pip install -r "$req"
           done
+
+      # D251. The trigger check answers "changed paths ∩ live-capture
+      # trigger paths = ∅" before a push. Its calibration runs HERE so a
+      # suite that has stopped being able to fail is caught by a gate,
+      # rather than by nobody: the check itself is author-invoked, and an
+      # author-invoked check with an unproven calibration is a comfort.
+      - name: Live-capture trigger check calibration
+        run: python scripts/test_capture_trigger_paths.py
 
       - name: Port binding check
         run: python scripts/security/check_port_bindings.py

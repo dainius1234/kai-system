@@ -228,8 +228,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: The instrument must pass its calibration first
-        run: python3 scripts/test_p1_replay_completeness.py
+      - name: The instruments must pass their calibration first
+        run: |
+          python3 scripts/test_p1_replay_completeness.py
+          python3 scripts/test_artifact_fetch_states.py
 
       # ci-toleration: documented-skip
       - name: Fetch the capture from run ${{ env.P1_FORMAT_RUN_ID }}
@@ -241,15 +243,61 @@ jobs:
           github-token: ${{ github.token }}
           path: fmt-evidence
 
+      # "Not performed" was absorbing five different causes. A run still
+      # going, a permissions failure here, a network failure, an artifact
+      # that never existed after a COMPLETED run, and one that downloaded
+      # malformed are five different facts demanding five different
+      # actions — and two of them are findings about the subject rather
+      # than availability problems here.
+      - name: Why did the artifact arrive, or not — five states, not one
+        id: fetch_state
+        run: |
+          set -uo pipefail
+          API="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          HTTP=$(curl -sS -o run.json -w '%{http_code}' \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "${API}/actions/runs/${P1_FORMAT_RUN_ID}" || echo "")
+          curl -sS -o artifacts.json \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "${API}/actions/runs/${P1_FORMAT_RUN_ID}/artifacts"
+          # No `|| true`: this step runs without `set -e`, so a failed
+          # curl leaves artifacts.json absent or unparseable and the
+          # classifier reads that as NETWORK_FAILURE — which is the
+          # honest answer. Swallowing the exit code would have made an
+          # unreachable API indistinguishable from an empty artifact list.
+          python3 scripts/security/classify_artifact_fetch.py \
+            ${HTTP:+--http-status "$HTTP"} \
+            --run-json run.json --artifacts-json artifacts.json \
+            --artifact-name memu-graph-llm-contract \
+            --expected-file fmt-evidence/llm-contract-logs/capture.jsonl
+          echo "rc=$?" >> "$GITHUB_OUTPUT"
+
       - name: Capture format validation — the file's shape, nothing else
         run: |
           set -euo pipefail
           CAP=fmt-evidence/llm-contract-logs/capture.jsonl
+          # TWO IDENTITIES, KEPT APART. The subject produced the artifact;
+          # this run measures it. A result belongs to the measurer's tree
+          # and says something about the subject's — conflating them is how
+          # "the analyser is this commit's, the evidence is that run's"
+          # stops being visible.
+          echo "SUBJECT  (produced the artifact): run ${P1_FORMAT_RUN_ID}, "\
+               "commit ${P1_FORMAT_COMMIT}"
+          echo "MEASURER (measures the artifact): run ${GITHUB_RUN_ID}, "\
+               "commit ${GITHUB_SHA}"
+          echo "The verdict below belongs to the MEASURER's tree and is"
+          echo "about the SUBJECT's artifact. Neither identity may be read"
+          echo "off the other."
+          echo
           if [ ! -f "$CAP" ]; then
-            # R11: no subject, no observation.
-            echo "FORMAT VALIDATION NOT PERFORMED: run"
-            echo "  ${P1_FORMAT_RUN_ID}'s artifact was not retrievable."
-            echo "  This is an availability failure, NOT a format verdict."
+            # R11: no subject, no observation. The state was already
+            # named above; this step refuses rather than restating it as
+            # a single undifferentiated "not performed".
+            echo "NO FORMAT VERDICT: the expected capture file is absent."
+            echo "  The fetch state printed by the previous step says WHY,"
+            echo "  and that state is the report — not a format result."
             if [ -d fmt-evidence ]; then
               echo "  what WAS downloaded:"
               ls -R fmt-evidence | head -40
@@ -258,8 +306,6 @@ jobs:
             fi
             exit 2
           fi
-          echo "subject run   : ${P1_FORMAT_RUN_ID}"
-          echo "subject commit: ${P1_FORMAT_COMMIT}"
           echo "capture: $(wc -c < "$CAP") bytes, $(grep -c . "$CAP") line(s)"
           echo
           python3 scripts/security/p1_replay_completeness.py \
