@@ -531,6 +531,21 @@ DECLARED: Tuple[Toleration, ...] = (
     ),
     Toleration(
         workflow="p1-replay-completeness.yml",
+        step="Fetch the capture from run ${{ env.P1_FORMAT_RUN_ID }}",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same shape and reason as the P1 fetch below: format "
+               "validation reads a PREVIOUS run's artifact, so a missing "
+               "or expired one would stop the job inside download-artifact "
+               "with an opaque message. The toleration exists so the next "
+               "step runs and says 'FORMAT VALIDATION NOT PERFORMED … an "
+               "availability failure, NOT a format verdict', and exits 2. "
+               "An unavailable subject can never read as FORMAT VALID "
+               "(I-1/R11).",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="p1-replay-completeness.yml",
         step="Fetch the capture from run ${{ env.P1_CAPTURE_RUN_ID }}",
         bucket=DOCUMENTED_SKIP,
         reason="Same shape and same reason as the re-analysis fetch above: "

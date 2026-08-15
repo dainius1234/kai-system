@@ -381,6 +381,64 @@ def audit_positional(call_root: pathlib.Path | None,
     return result
 
 
+# ------------------------------------------------- format validation only
+
+
+VALID_STATES = ("ABSENT", "NULL", "VALUE")
+
+
+def format_check(kw: dict | None) -> tuple[bool, list[tuple[str, bool, str]]]:
+    """Is a capture WRITTEN IN THE D250 FORMAT? Nothing more.
+
+    Deliberately not a P1 verdict and deliberately unable to become one:
+    it returns a boolean about the file's shape, never a `REQUEST_*`
+    value, so a green format validation cannot be read as a certified
+    replay subject. It also never touches a response field — the model
+    outcomes in the capture it validates are not its business.
+
+    Item 5 of the frozen sequence — "refusal behaviour still works on a
+    legacy capture" — is NOT here. It is the P1 job's own verdict against
+    the legacy capture, which is the real thing rather than a re-enactment
+    of it.
+    """
+    items: list[tuple[str, bool, str]] = []
+    if kw is None:
+        return False, [("the capture could not be read at all", False, "")]
+
+    bad_lines = len(kw["parse_notes"])
+    items.append((
+        "1. the data stream carries machine rows only",
+        bad_lines == 0,
+        f"{bad_lines} non-machine line(s); must be 0"
+        + ("".join(f"\n        {n}" for n in kw["parse_notes"][:5]))))
+
+    declared, parsed = kw["declared"], kw["population"]
+    items.append((
+        "2. the manifest's declared count equals the parsed rows",
+        kw["manifest"] is not None and declared == parsed,
+        f"declared {declared} vs parsed {parsed}"
+        if kw["manifest"] is not None else "no capture-manifest row"))
+
+    states_seen = {s for counts in kw["presence"].values()
+                   for s, n in counts.items() if n}
+    items.append((
+        "3. every production row records args_state, with valid labels",
+        kw["population"] > 0 and kw["legacy_rows"] == 0
+        and states_seen.issubset(set(VALID_STATES)),
+        f"{kw['population'] - kw['legacy_rows']}/{kw['population']} row(s) "
+        f"carry args_state; labels seen: {sorted(states_seen) or 'none'}"))
+
+    items.append((
+        "4. positional fields present and reconstructable",
+        kw["population"] > 0 and kw["positional_unrecorded"] == 0
+        and kw["positional_unreconstructable"] == 0,
+        f"{kw['positional_unrecorded']} row(s) with no count, "
+        f"{kw['positional_unreconstructable']} unreconstructable, "
+        f"{kw['positional_rows']} row(s) carrying positional arguments"))
+
+    return all(ok for _, ok, _ in items), items
+
+
 # ----------------------------------------------------------------- verdict
 
 
@@ -491,7 +549,39 @@ def main() -> int:
     ap.add_argument("--forwarder-root",
                     help="package root of the last forwarding hop "
                          "(e.g. site-packages/instructor)")
+    ap.add_argument("--format-check", metavar="RUN_ID",
+                    help="validate that the capture is written in the D250 "
+                         "format and STOP. Emits no P1 verdict and reads no "
+                         "response field.")
     args = ap.parse_args()
+
+    if args.format_check:
+        cap = pathlib.Path(args.capture)
+        kw = None
+        if cap.exists():
+            rows, notes, manifest = read_rows(cap)
+            kw = audit_kwargs(rows, notes, manifest)
+        print("CAPTURE FORMAT VALIDATION — "
+              f"the capture written by run {args.format_check}")
+        print("=" * 64)
+        print("This is NOT a P1 verdict. It cannot become one. It does not")
+        print("make this capture a Stage 1 replay subject, and it reads no")
+        print("response field, so it says nothing whatever about the model")
+        print("outcomes this capture contains.")
+        print()
+        ok, items = format_check(kw)
+        for name, passed, detail in items:
+            print(f"  {'PASS' if passed else 'FAIL'}  {name}")
+            print(f"        {detail}")
+        print()
+        print(f"  inspected: {kw['population'] if kw else 0} production "
+              f"request row(s) across {len(items)} format criteria")
+        print(f"FORMAT: {'VALID' if ok else 'INVALID'}")
+        if ok:
+            print("  Item 5 of the frozen sequence — refusal on a legacy")
+            print("  capture — is the P1 job's own verdict against run 24,")
+            print("  not a re-enactment here.")
+        return 0 if ok else 6
 
     print("P1 — REPLAY COMPLETENESS OF THE CAPTURED REQUEST")
     print("=" * 64)

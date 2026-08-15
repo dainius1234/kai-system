@@ -36,7 +36,7 @@ import p1_replay_completeness as p1  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 3
+EXPECTED_SCENARIOS = 4
 executed: list[str] = []
 
 
@@ -355,10 +355,73 @@ def test_p1_reconciles_and_refuses_the_new_holes() -> None:
 
 
 
+def test_format_validation_cannot_become_a_verdict() -> None:
+    """D251. The format check answers one question — is this capture
+    written in the D250 format — and must not be able to answer any
+    other. Each criterion gets a known-positive and a known-negative."""
+    scenario("format validation is bounded")
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+
+        def fc(capture):
+            rows, notes, manifest = p1.read_rows(Path(capture))
+            return p1.format_check(p1.audit_kwargs(rows, notes, manifest))
+
+        good = _p1_capture(tmp, "good", [_p1_row(), _p1_row()])
+        ok, items = fc(good)
+        check("a D250-format capture is FORMAT VALID", ok, str(items))
+        check("four criteria are reported", len(items) == 4, str(items))
+
+        # known-positives, one per criterion
+        prose = _p1_capture(tmp, "prose", [_p1_row()],
+                            extra="  inspected: 1 model call(s) captured\n")
+        check("prose in the stream fails criterion 1",
+              fc(prose)[1][0][1] is False, str(fc(prose)[1][0]))
+        drop = _p1_capture(tmp, "drop", [_p1_row()], declared=2)
+        check("a count mismatch fails criterion 2",
+              fc(drop)[1][1][1] is False, str(fc(drop)[1][1]))
+        nostate = _p1_row(); nostate.pop("args_state")
+        check("a row without args_state fails criterion 3",
+              fc(_p1_capture(tmp, "nostate", [nostate]))[1][2][1] is False, "")
+        bogus = _p1_row(args_state={"messages": "MAYBE", "model": "VALUE",
+                                    "temperature": "NULL",
+                                    "response_format": "VALUE",
+                                    "tools": "ABSENT"})
+        check("an invalid state label fails criterion 3",
+              fc(_p1_capture(tmp, "bogus", [bogus]))[1][2][1] is False, "")
+        nopos = _p1_row(); nopos.pop("positional_arg_count")
+        check("a row with no positional count fails criterion 4",
+              fc(_p1_capture(tmp, "nopos", [nopos]))[1][3][1] is False, "")
+        lost = _p1_row(positional_arg_count=1, positional_args=[])
+        check("unreconstructable positional args fail criterion 4",
+              fc(_p1_capture(tmp, "lost", [lost]))[1][3][1] is False, "")
+        # an empty capture must not pass by having nothing to fail on
+        check("a capture with no production rows is not FORMAT VALID",
+              fc(_p1_capture(tmp, "empty", []))[0] is False, "")
+        check("and an unreadable capture is not FORMAT VALID",
+              p1.format_check(None)[0] is False, "")
+
+        # THE bound. Format validation returns a boolean about the file's
+        # shape; it has no way to express REQUEST_REPLAYABLE, so a green
+        # format run cannot be mistaken for a certified replay subject.
+        check("format_check returns a bool, never a P1 verdict",
+              isinstance(fc(good)[0], bool), "")
+        check("and no verdict string can leak out of it",
+              not any(str(i) in p1.EXIT for i in fc(good)[1]), "")
+        src = (REPO / "scripts" / "security"
+               / "p1_replay_completeness.py").read_text()
+        check("the format path reads no response field",
+              "raw_response" not in src, "")
+        check("and says out loud it is not a P1 verdict",
+              "This is NOT a P1 verdict. It cannot become one." in src, "")
+
+
+
 def run_all() -> None:
     test_p1_never_lets_one_clean_axis_imply_the_other()
     test_p1_refuses_rather_than_guessing()
     test_p1_reconciles_and_refuses_the_new_holes()
+    test_format_validation_cannot_become_a_verdict()
 
     print(f"  inspected: {len(p1.EXIT)} P1 verdict(s) discriminated")
     print(f"  axes: keyword (artifact) and positional (call-path source)")

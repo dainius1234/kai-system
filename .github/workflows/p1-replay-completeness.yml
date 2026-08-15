@@ -201,3 +201,73 @@ jobs:
             p1-evidence/
             p1-resolved.txt
           if-no-files-found: warn
+
+  # D251. Was the capture written in the D250 format? That question, and
+  # nothing else.
+  #
+  # The subject is an automatic CI SIDE EFFECT of the authorised capture
+  # repair, not an authorised ownership experiment. It is admitted for
+  # format validation ONLY: not for Q2, not for Q6, not for ownership
+  # attribution, and not into the closed sampling campaign, which stays
+  # CLOSED at 1/5. `--format-check` reads no response field, so this job
+  # cannot inspect the model outcomes it is validating even by accident.
+  #
+  # It emits no P1 verdict and cannot: a green run here says the FILE is
+  # well-formed, never that its contents are a certified replay subject.
+  # P1 against the legacy capture stays UNRESOLVED regardless — item 5 of
+  # the frozen sequence is that job's verdict, not a re-enactment.
+  p1-format-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    env:
+      P1_FORMAT_RUN_ID: "31890166592"
+      P1_FORMAT_COMMIT: "930e7d09"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The instrument must pass its calibration first
+        run: python3 scripts/test_p1_replay_completeness.py
+
+      # ci-toleration: documented-skip
+      - name: Fetch the capture from run ${{ env.P1_FORMAT_RUN_ID }}
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: memu-graph-llm-contract
+          run-id: ${{ env.P1_FORMAT_RUN_ID }}
+          github-token: ${{ github.token }}
+          path: fmt-evidence
+
+      - name: Capture format validation — the file's shape, nothing else
+        run: |
+          set -euo pipefail
+          CAP=fmt-evidence/llm-contract-logs/capture.jsonl
+          if [ ! -f "$CAP" ]; then
+            # R11: no subject, no observation.
+            echo "FORMAT VALIDATION NOT PERFORMED: run"
+            echo "  ${P1_FORMAT_RUN_ID}'s artifact was not retrievable."
+            echo "  This is an availability failure, NOT a format verdict."
+            if [ -d fmt-evidence ]; then
+              echo "  what WAS downloaded:"
+              ls -R fmt-evidence | head -40
+            else
+              echo "  nothing was downloaded at all."
+            fi
+            exit 2
+          fi
+          echo "subject run   : ${P1_FORMAT_RUN_ID}"
+          echo "subject commit: ${P1_FORMAT_COMMIT}"
+          echo "capture: $(wc -c < "$CAP") bytes, $(grep -c . "$CAP") line(s)"
+          echo
+          python3 scripts/security/p1_replay_completeness.py \
+            --capture "$CAP" --format-check "${P1_FORMAT_RUN_ID}"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-format-validation
+          path: fmt-evidence/
+          if-no-files-found: warn
