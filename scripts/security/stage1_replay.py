@@ -45,6 +45,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import hashlib
 import json
 import pathlib
 import sys
@@ -71,6 +72,31 @@ EXPECTED_RESPONSE_FORMAT = {"type": "json_object"}
 SENDABLE = ("model", "messages", "temperature", "response_format", "tools")
 
 
+def _digest(obj) -> str:
+    """A stable identity over a JSON-serialisable value.
+
+    Full sha256, not a prefix: this is the value ten invocations are
+    required to reproduce exactly, and a truncated digest is a weaker
+    claim than the one being made.
+    """
+    return hashlib.sha256(
+        json.dumps(obj, sort_keys=True, separators=(",", ":"),
+                   default=str).encode()).hexdigest()
+
+
+def instrument_identity(path: pathlib.Path) -> dict:
+    """An instrument's exact code identity, part of the measurement.
+
+    We have learned too much about instruments to leave which one ran
+    implicit: a verdict is a claim about bytes produced by a specific
+    analyser, not by a name.
+    """
+    text = path.read_bytes()
+    return {"file": str(path.relative_to(REPO)),
+            "sha256": hashlib.sha256(text).hexdigest(),
+            "bytes": len(text)}
+
+
 def rebuild(value):
     """A recorded argument, back to its typed form.
 
@@ -87,7 +113,8 @@ def rebuild(value):
 
 
 def freeze(capture: pathlib.Path, expect_prompt: str, expect_contract: str,
-           expect_seq: int) -> tuple[dict | None, list[str]]:
+           expect_seq: int, url: str = "", timeout: float = 300.0
+           ) -> tuple[dict | None, list[str]]:
     """Re-select under S1 and verify the subject is the frozen one."""
     problems: list[str] = []
     rows, notes, manifest = p1.read_rows(capture)
@@ -139,7 +166,22 @@ def freeze(capture: pathlib.Path, expect_prompt: str, expect_contract: str,
             f"{leaked}")
         return None, problems
 
-    return {"request": body, "subject": proj, "n": N1, "checks": checks}, []
+    # D247's held constants, frozen INTO the manifest. The hashes prove
+    # identity; they do not reconstruct an invocation, so everything
+    # needed to reproduce it travels with it.
+    runtime = {"n": N1, "url": url, "timeout_s": timeout,
+               "instructor_in_path": False, "validation": "none",
+               "retry": "none",
+               "model": body.get("model")}
+    man = {"request": body, "subject": proj, "n": N1, "runtime": runtime,
+           "checks": checks}
+    # ONE immutable identity over request + constants, and a separate one
+    # over the request alone, because every invocation is required to
+    # reproduce the second exactly.
+    man["request_hash"] = _digest(body)
+    man["manifest_hash"] = _digest({"request": body, "runtime": runtime,
+                                    "subject": proj})
+    return man, []
 
 
 def send_once(url: str, body: dict, timeout: float) -> dict:
@@ -189,7 +231,8 @@ def main() -> int:
                   "availability failure, not a replay result.")
             return 2
         man, problems = freeze(cap, args.expect_prompt_hash,
-                               args.expect_contract_hash, args.expect_seq)
+                               args.expect_contract_hash, args.expect_seq,
+                               url=args.url or "", timeout=args.timeout)
         print("STAGE 1 — FREEZE THE EXACT REQUEST")
         print("=" * 64)
         if man is None:
@@ -211,6 +254,15 @@ def main() -> int:
         print(f"  request keys sent: {sorted(man['request'])}")
         print(f"  keys recorded ABSENT and therefore NOT sent: "
               f"{[k for k in SENDABLE if k not in man['request']]}")
+        print(f"  request body keys : {sorted(man['request'])}")
+        print(f"  messages present  : "
+              f"{len(man['request'].get('messages') or [])} message(s), "
+              f"{sum(len(m.get('content') or '') for m in man['request'].get('messages') or [])} chars")
+        print("  frozen runtime constants (D247):")
+        for k in sorted(man["runtime"]):
+            print(f"      {k:<20} {man['runtime'][k]!r}")
+        print(f"  request_hash      : {man['request_hash']}")
+        print(f"  manifest_hash     : {man['manifest_hash']}")
         print(f"  inspected: 1 replay subject across "
               f"{len(man['checks']) + 3} identity check(s)")
         pathlib.Path(args.manifest).write_text(json.dumps(man, indent=2))
@@ -222,8 +274,14 @@ def main() -> int:
         body = man["request"]
         out = pathlib.Path(args.replies).open("w")
         for i in range(1, man["n"] + 1):
-            rec = send_once(args.url, body, args.timeout)
+            rec = send_once(man["runtime"]["url"], body,
+                            man["runtime"]["timeout_s"])
             rec["replay_index"] = i
+            # The identity of what was ACTUALLY sent, per invocation.
+            # Ten calls from one frozen manifest should all reproduce the
+            # frozen request hash; if one does not, the experiment is
+            # invalid rather than nine-tenths usable.
+            rec["request_hash"] = _digest(body)
             out.write(json.dumps(rec) + "\n")
             out.flush()
             # Progress to stderr: stdout stays a machine stream (D250).
@@ -245,8 +303,31 @@ def main() -> int:
           f"{man['subject']['contract_hash']}")
     print(f"  contract     : {why}")
     print(f"  validator    : {validator}")
+    print(f"  manifest     : {man['manifest_hash']}")
+    print(f"  request id   : {man['request_hash']}")
+    print(f"  runtime      : {man['runtime']}")
     print(f"  precommitted : N1 = {man['n']}, sequential, no Instructor, "
           f"transport error recorded and NOT replaced")
+    print(f"  classifier   : {instrument_identity(REPO / 'scripts' / 'security' / 'classify_llm_response.py')}")
+    print()
+    # EVERY invocation must reproduce the frozen request identity. One
+    # that does not makes the experiment INVALID, not nine-tenths usable
+    # -- a set of ten in which one call sent something else is not a
+    # sample of ten replays of the same request.
+    mismatched = [r for r in replies
+                  if r.get("request_hash") != man["request_hash"]]
+    if mismatched:
+        print("STAGE 1 INVALID — request identity was not constant")
+        for r in mismatched:
+            print(f"    replay {r.get('replay_index')}: sent "
+                  f"{r.get('request_hash')}, frozen {man['request_hash']}")
+        print()
+        print("  This is not a 9/10 result. Ten replays of one request is")
+        print("  the experiment; a set in which one call sent something")
+        print("  else measures something nobody designed.")
+        return 5
+    print(f"  request identity: all {len(replies)} invocation(s) reproduce "
+          f"the frozen request hash")
     print()
     counts: dict[str, int] = {}
     for rec in replies:

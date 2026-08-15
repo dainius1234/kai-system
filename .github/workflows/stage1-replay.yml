@@ -81,7 +81,9 @@ jobs:
             --manifest stage1-manifest.json \
             --expect-seq "${S1_SEQ}" \
             --expect-prompt-hash "${S1_PROMPT_HASH}" \
-            --expect-contract-hash "${S1_CONTRACT_HASH}"
+            --expect-contract-hash "${S1_CONTRACT_HASH}" \
+            --url "http://ollama:11434/v1/chat/completions" \
+            --timeout 300
 
       - name: Build the image and start ONLY the model service
         env:
@@ -106,9 +108,7 @@ jobs:
             -T -v "$PWD:/w" -w /w memu-graph \
             python3 scripts/security/stage1_replay.py --replay \
               --manifest stage1-manifest.json \
-              --replies stage1-replies.jsonl \
-              --url "http://ollama:11434/v1/chat/completions" \
-              --timeout 300
+              --replies stage1-replies.jsonl
 
       - name: Tear down
         if: always()

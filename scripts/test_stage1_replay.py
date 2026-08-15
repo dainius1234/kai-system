@@ -30,7 +30,7 @@ import select_replay_subject as s1  # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 4
+EXPECTED_SCENARIOS = 5
 executed: list[str] = []
 LEAK = "ORIGINAL-RESPONSE-MUST-NEVER-BE-READ"
 
@@ -184,13 +184,74 @@ def test_a_transport_error_is_one_execution_not_a_retry() -> None:
     src = _src()
     check("the sender catches every failure as a datum",
           "transport_error" in src and "every failure is a datum" in src)
-    check("and the driver never re-sends on failure",
-          "for i in range(1, man[\"n\"] + 1)" in src
-          and "retry" not in src.lower().replace("no retry", ""))
+    # A substring hunt for "retry" was the first version of this and it
+    # broke the moment the manifest declared `"retry": "none"` — a check
+    # that fires on the word rather than the behaviour. The property is
+    # structural: exactly one call site, inside a loop bounded by n.
+    check("there is exactly one send call site (plus its definition)",
+          src.count("send_once(") == 2, str(src.count("send_once(")))
+    check("and it is driven by a loop bounded by the frozen n",
+          'for i in range(1, man["n"] + 1)' in src)
+    check("the manifest declares no retry and no validation",
+          '"retry": "none"' in src and '"validation": "none"' in src)
     # a short reply file must be reported as a shortfall, not a smaller N
     check("a denominator mismatch is named",
           "DENOMINATOR MISMATCH" in src and "not a smaller sample" in src)
     check("and it exits non-zero", "return 4" in src)
+
+
+
+def test_the_manifest_carries_everything_needed_to_reproduce() -> None:
+    """Hashes prove identity; they do not reconstruct an invocation."""
+    scenario("manifest reproduces the invocation")
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        cap = capture(tmp, "c", [row()])
+        proj = s1.projection(row())
+        man, probs = st.freeze(cap, proj["prompt_hash"], proj["contract_hash"],
+                               proj["seq"], url="http://x/v1/chat/completions",
+                               timeout=300.0)
+        check("it freezes", man is not None, str(probs))
+        # the actual body, not merely its hash
+        msgs = man["request"].get("messages")
+        check("the full messages body is present", isinstance(msgs, list)
+              and len(msgs) == 2, str(type(msgs)))
+        check("with real content, not a digest",
+              "Ada Lovelace" in json.dumps(msgs), json.dumps(msgs)[:120])
+        # D247's held constants
+        for k in ("n", "url", "timeout_s", "instructor_in_path", "validation",
+                  "retry", "model"):
+            check(f"runtime constant {k} is frozen", k in man["runtime"],
+                  str(sorted(man["runtime"])))
+        check("instructor is declared out of the path",
+              man["runtime"]["instructor_in_path"] is False)
+        check("n matches the precommitted N1", man["runtime"]["n"] == st.N1)
+        # identities
+        check("a request hash is produced", len(man["request_hash"]) == 64)
+        check("a manifest hash is produced", len(man["manifest_hash"]) == 64)
+        check("they are different values",
+              man["request_hash"] != man["manifest_hash"])
+        check("the request hash covers the body",
+              man["request_hash"] == st._digest(man["request"]))
+        # the manifest hash must move when a runtime constant moves
+        man2, _ = st.freeze(cap, proj["prompt_hash"], proj["contract_hash"],
+                            proj["seq"], url="http://other/v1", timeout=300.0)
+        check("a changed endpoint changes the manifest hash",
+              man2["manifest_hash"] != man["manifest_hash"])
+        check("but not the request hash",
+              man2["request_hash"] == man["request_hash"])
+        # classifier identity is part of the measurement
+        ident = st.instrument_identity(
+            REPO / "scripts" / "security" / "classify_llm_response.py")
+        check("the classifier's identity is its bytes",
+              len(ident["sha256"]) == 64 and ident["bytes"] > 0, str(ident))
+        # one drifting invocation invalidates the set
+        src = _src()
+        check("a request-hash mismatch is INVALID, not 9/10",
+              "STAGE 1 INVALID" in src and "not a 9/10 result" in src)
+        check("and it exits non-zero", "return 5" in src)
+        check("every invocation records what it actually sent",
+              'rec["request_hash"] = _digest(body)' in src)
 
 
 def run_all() -> None:
@@ -198,6 +259,7 @@ def run_all() -> None:
     test_identity_must_match_or_it_refuses()
     test_the_original_response_is_never_read()
     test_a_transport_error_is_one_execution_not_a_retry()
+    test_the_manifest_carries_everything_needed_to_reproduce()
     print(f"  inspected: {st.N1} precommitted replay execution(s), "
           f"{len(s1.RESPONSE_BEARING)} response-bearing field(s) withheld")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
