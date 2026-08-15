@@ -9,12 +9,28 @@
 # (D251). It writes no capture, so it produces no Q2/Q6/ownership
 # evidence and the sampling campaign stays CLOSED at 1/5.
 #
-# Dispatch only. Stage 1 is a one-shot authorised experiment, not
-# something a push should be able to start.
+# STARTED BY A DELIBERATE ACT, NEVER BY ORDINARY WORK.
+#
+# `workflow_dispatch` alone cannot work here: GitHub registers workflows
+# from the DEFAULT branch, so a dispatch-only file living on a feature
+# branch is never registered and the dispatch API answers 404 — measured,
+# not assumed (the workflow list holds 17 entries and this file is not
+# among them). Pushing to `main` is not authorised.
+#
+# So the trigger is a SENTINEL: this workflow fires only when a commit
+# touches `kai-pm/STAGE1_GO`. Ordinary work on the driver, the analysers
+# or the docs cannot start a live experiment; adding or changing that one
+# file is an explicit, auditable act, and the commit that did it is the
+# record of who started the run and when.
 name: Stage 1 exact-request replay (KAI-GATE-048 C)
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - claude/project-rework-plan-pgvp35
+    paths:
+      - kai-pm/STAGE1_GO
 
 permissions:
   contents: read

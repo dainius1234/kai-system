@@ -1,0 +1,22 @@
+STAGE 1 — EXACT-REQUEST REPLAY: AUTHORISED AND STARTED
+
+Authorisation: operator, 2026-08-15 — "Stage 1: GO ... Dispatch Stage 1
+now", against the prospectively selected subject only.
+
+Subject      : capture run 31894868473, tree
+               1d79b145a04f1bc35a9bc9d0a31251153f6e6a10
+Selected row : seq 2, logical_call_id a39b6669dc1240c3, attempt_index 1
+               prompt d53797298bea, contract 98c57afadeae   (D259)
+Experiment   : D247 Stage 1, unchanged. N1 = 10, sequential, direct HTTP,
+               no Instructor, no validation, no reask, no retry.
+               Transport errors recorded and NOT replaced.
+Constraints  : the original captured response is not opened until the ten
+               executions are complete and sealed; no model, timeout,
+               schema or request parameter is altered; any invocation
+               whose request identity differs makes the set INVALID.
+
+A live model executes. That is explicitly authorised for this run and
+recorded here BEFORE it starts, not reconstructed afterwards (D251).
+
+This file is the trigger. Touching it starts the experiment, so it is
+not to be edited casually — a change here is an act, not an edit.
