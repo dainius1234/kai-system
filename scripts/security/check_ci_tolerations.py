@@ -531,6 +531,21 @@ DECLARED: Tuple[Toleration, ...] = (
     ),
     Toleration(
         workflow="p1-replay-completeness.yml",
+        step="Fetch the capture from run ${{ env.P1_CAPTURE_RUN_ID }}",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same shape and reason as the other capture fetches in this "
+               "workflow: a missing or expired artifact would stop the job "
+               "inside download-artifact with an opaque message. The "
+               "toleration exists so the next step runs and says the true "
+               "thing -- 'NO SELECTION: the capture file is absent ... an "
+               "availability failure, NOT a selection verdict' -- and exits "
+               "2. An unavailable subject can never read as a selection "
+               "(I-1/R11).",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="p1-replay-completeness.yml",
         step="Why did the artifact arrive, or not",
         bucket=DOCUMENTED_SKIP,
         reason="`HTTP=$(curl … || echo \"\")`. The empty string IS the "

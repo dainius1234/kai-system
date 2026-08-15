@@ -1062,6 +1062,12 @@ test-llm-contract:
 test-p1-replay-completeness:
 	python3 scripts/test_p1_replay_completeness.py
 
+# S1's selection rule. The preconditions must REFUSE and the response
+# boundary must hold; a selector that quietly falls through to another
+# row would make the choice unfalsifiable after the fact.
+test-replay-subject-selection:
+	python3 scripts/test_replay_subject_selection.py
+
 # D251. "I did not touch the probe" never proved that no live model
 # would run -- core-tests.yml has no paths filter and starts ollama on
 # every push, which this check found on its first execution. Run it

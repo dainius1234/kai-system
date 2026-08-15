@@ -1096,6 +1096,44 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=False,
          in_workflows=("p1-replay-completeness.yml",),
          findings=("KAI-GATE-048",)),
+    # S1 (D255-D257). Selection is the step where a post-result choice
+    # would be easiest to make and hardest to notice.
+    Gate(module="select_replay_subject",
+         kind=REPORT,
+         summary="which captured request becomes the Stage-1 replay "
+                 "subject -- the lowest-seq production row, with five "
+                 "preconditions that REFUSE rather than fall through to "
+                 "another row -- published as an allow-list request-side "
+                 "projection so that no response field, no timing and no "
+                 "hash of the response-bearing row can bias or be inferred "
+                 "from the choice",
+         inputs=(),
+         denominator=r"inspected: \d+ production request row\(s\) across "
+                     r"\d+ S1 precondition\(s\)",
+         probe=False,
+         probe_skip_reason="needs a production capture, which exists only "
+                           "as a CI artifact; every precondition and the "
+                           "response boundary are asserted on synthetic "
+                           "rows in scripts/test_replay_subject_selection.py",
+         proven_by="scripts/test_replay_subject_selection.py",
+         calibrated_by="scripts/test_replay_subject_selection.py",
+         in_policy_check=False,
+         in_workflows=("p1-replay-completeness.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_replay_subject_selection",
+         kind=GATE,
+         summary="each of S1's five preconditions must refuse, and NO "
+                 "response-bearing value may reach the published "
+                 "projection -- asserted against rows whose response "
+                 "fields carry a sentinel, so a leak is detected rather "
+                 "than an absence merely observed",
+         inputs=(),
+         denominator=r"inspected: \d+ request-side field\(s\) allowed",
+         proven_by="scripts/test_replay_subject_selection.py",
+         calibrated_by="scripts/test_replay_subject_selection.py",
+         in_policy_check=False,
+         in_workflows=("p1-replay-completeness.yml",),
+         findings=("KAI-GATE-048",)),
     Gate(module="test_p1_replay_completeness",
          kind=GATE,
          summary="the two replay-completeness axes must NEVER substitute "

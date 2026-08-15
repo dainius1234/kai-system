@@ -18045,3 +18045,115 @@ call returns, so differences between rows reconstruct durations.
   `1d79b14`). **P1 — MEASURING** (measurer at `188fa51`).
 * **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.
   048 C — BLOCKED.**
+
+---
+
+## D258 — P1: REQUEST_REPLAYABLE on the fresh capture; S1 built, not yet run
+
+**2026-08-15.** Read in the frozen order — fetch state, format criteria,
+verdict — and nothing beyond.
+
+### 1. Identities
+
+| | |
+|---|---|
+| **SUBJECT** (the capture) | run **31894868473**, tree **`1d79b145a04f1bc35a9bc9d0a31251153f6e6a10`** |
+| **MEASURER** (P1 + format) | run **31895631429**, commit **`188fa519`** |
+
+### 2. Format validation — VALID
+
+Capture: 19,593 bytes, 14 lines, **3 production request rows**.
+
+| criterion | result |
+|---|---|
+| 1. machine rows only | **PASS** — 0 non-machine lines |
+| 2. manifest declared == parsed | **PASS** — declared 3, parsed 3 |
+| 3. `args_state` on every row, valid labels | **PASS** — 3/3; labels `ABSENT`, `VALUE` |
+| 4. positional fields present, reconstructable | **PASS** — 0 missing, 0 unreconstructable, 0 carrying positional args |
+
+### 3. P1 — REQUEST_REPLAYABLE
+
+```
+inspected: 3 production request row(s) across 2 completeness axes
+P1 VERDICT: REQUEST_REPLAYABLE
+  - 3 production row(s), every one with other_params == []
+  - reconciliation: 3 declared == 3 parsed
+      (internal corroboration, not independent proof)
+  - presence recorded on all 3 row(s): ABSENT, NULL and VALUE are distinguished
+  - positional axis, record: 0 row(s) with positional arguments
+  - positional axis, source: 13 call site(s) across 1430 file(s) pass zero
+      positional arguments; 2 forwarding call(s) insert none
+RESOLVED IN THE AUDITED IMAGE: cognee 1.1.3, instructor 1.15.1, openai 2.54.0
+```
+
+**What this licenses:** the declared client invocation in this capture is
+reconstructable at the client-callable boundary. **What it does not:** any
+claim about the wire body (D248), and anything at all about the model's
+responses, which were not read.
+
+**No model response has been inspected.** Not the count of outcome
+classes, not their timings, nothing. The campaign stays **CLOSED at
+1/5**.
+
+### 4. The full-row hash is withdrawn from the pre-selection projection
+
+D257 proposed publishing a hash of the complete stored row as an
+immutable locator. **The operator refused it, and correctly.** That hash
+is a deterministic function of a response-bearing row: it is
+outcome-derived, and *"probably does not reveal the response"* is not the
+standard — it could become a comparison or lookup side channel later.
+
+The artifact is already immutably bound, so the locator needs no
+outcome-derived value at all. The boundary is now:
+
+> **Before response authority:** request-only projection, no
+> full-row-derived value.
+> **After response authority:** the full row and its hash may be opened
+> and checked against that fixed locator.
+
+That is the third leak this boundary has had to close, each subtler than
+the last: `raw_response` was obvious; `elapsed_s` was measured; a hash is
+one nobody would have called a response at all.
+
+### 5. S1 built and calibrated — and deliberately not yet run
+
+`scripts/security/select_replay_subject.py`, gated by
+`scripts/test_replay_subject_selection.py`.
+
+**Precondition 1 is enforced by the DAG, not asserted by the tool.** The
+job declares `needs: p1-replay-completeness`, and only
+`REQUEST_REPLAYABLE` exits 0, so the selector **cannot run** unless that
+verdict was reached. A tool that certified its own licence to run would
+be the self-approval doctrine rule 26 forbids.
+
+Calibration **48 passed / 0 failed**, 3 scenarios. Five mutations, each
+run and restored:
+
+| mutation | detected as |
+|---|---|
+| allow-list becomes pass-through | 12 failures |
+| duplicate-minimum check blinded | 2 |
+| `attempt_index` check blinded | 5 |
+| `logical_call_id` check blinded | 4 |
+| lowest `seq` becomes highest | 2 |
+
+The response boundary is asserted against rows whose response fields all
+carry a sentinel string, so a **leak is detected** rather than an absence
+merely observed — and an unclassified future field is proven withheld,
+which is what makes it an allow-list rather than a deny-list.
+
+### 6. A stale line in shipped output, flagged not fixed
+
+The format job still prints *"Item 5 … is the P1 job's own verdict
+against run 24"*. Since P1 was repointed, that sentence is **false**. It
+is a text-only defect in the census's output; the operator's standing
+direction is **no census changes during 048**, so it is recorded here and
+left. **Task #66.** Saying it out loud beats a silently wrong line
+surviving because fixing it was inconvenient.
+
+### Status
+
+* **Fresh capture — bound. Format — VALID. P1 — REQUEST_REPLAYABLE.**
+* **S1 — built, calibrated, mutation-proven; NOT yet executed.**
+* **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.
+  048 C — BLOCKED.**

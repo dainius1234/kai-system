@@ -202,6 +202,64 @@ jobs:
             p1-resolved.txt
           if-no-files-found: warn
 
+  # S1 (D255/D256/D257). Which captured request becomes the Stage-1
+  # replay subject — published as a REQUEST-SIDE PROJECTION and nothing
+  # more.
+  #
+  # `needs:` is load-bearing, not tidiness. S1's first precondition is
+  # "P1 returned REQUEST_REPLAYABLE over the whole population", and only
+  # REQUEST_REPLAYABLE exits 0, so this job structurally cannot run
+  # unless that verdict was reached. The precondition is enforced by the
+  # DAG rather than asserted by the tool that would benefit from it.
+  #
+  # It publishes the subject's identity. It does NOT authorise the
+  # replay, and it reads no response field: D257 established that an
+  # llm-call row carries the outcome in the same dict as the request, so
+  # the projection is an allow-list and every outcome-derived value —
+  # including elapsed_s, wall, and any hash of the complete stored row —
+  # is withheld until Stage-1 use is authorised.
+  s1-replay-subject:
+    needs: p1-replay-completeness
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    env:
+      P1_CAPTURE_RUN_ID: "31894868473"
+      P1_CAPTURE_COMMIT: "1d79b145a04f1bc35a9bc9d0a31251153f6e6a10"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The selector must pass its calibration first
+        run: python3 scripts/test_replay_subject_selection.py
+
+      # ci-toleration: documented-skip
+      - name: Fetch the capture from run ${{ env.P1_CAPTURE_RUN_ID }}
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: memu-graph-llm-contract
+          run-id: ${{ env.P1_CAPTURE_RUN_ID }}
+          github-token: ${{ github.token }}
+          path: s1-evidence
+
+      - name: S1 — publish the replay subject's request-side identity
+        run: |
+          set -euo pipefail
+          python3 scripts/security/select_replay_subject.py \
+            --capture s1-evidence/llm-contract-logs/capture.jsonl \
+            --p1-run-id "${GITHUB_RUN_ID}" \
+            --capture-run-id "${P1_CAPTURE_RUN_ID}" \
+            --capture-commit "${P1_CAPTURE_COMMIT}"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: s1-replay-subject
+          path: s1-evidence/
+          if-no-files-found: warn
+
   # D251. Was the capture written in the D250 format? That question, and
   # nothing else.
   #
