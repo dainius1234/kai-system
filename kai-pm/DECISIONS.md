@@ -17829,3 +17829,106 @@ discipline exists to prevent.
 * **P1 replay completeness — UNRESOLVED.**
 * **Stage 1 — BLOCKED. Stage 2 — BLOCKED. Ownership — UNMOVED.**
 * **048 C — BLOCKED.**
+
+---
+
+## D256 — S1's integrity preconditions, and which are already guaranteed
+
+**2026-08-15.** The operator's precision on S1: the rule now depends on
+`seq`, so `seq`'s integrity conditions must be explicit, and the
+justification's own terms must be establishable or the rule refuses.
+
+Checked against `probe_llm_contract.py` rather than assumed.
+
+### 1. What the format contract already guarantees
+
+**`seq` presence and type — GUARANTEED BY CONSTRUCTION.**
+
+```python
+_SEQ = itertools.count(1)          # probe_llm_contract.py:186
+...
+"seq": _seq(),                     # :397, unconditional in the row
+```
+
+Every `llm-call` row is built with `"seq": _seq()`, with no branch that
+can omit it, and `itertools.count(1)` yields integers from 1. So
+*missing* `seq` and *non-integer* `seq` are not states this format can
+produce.
+
+**Minimum-`seq` uniqueness — GUARANTEED WITHIN ONE PROCESS.**
+`itertools.count` is strictly increasing, so no two rows written by one
+probe process share a `seq`.
+
+**The residual, stated rather than waved away:** that guarantee is
+*per-process*. A capture assembled from two probe processes could carry
+two rows numbered 1. Nothing in the current pipeline does that — the
+capture is one `docker compose exec` writing one stream — but the
+guarantee is structural, not enforced, so conditions 2 and 3 are
+**verified by reading at selection time** rather than trusted. Cheap,
+request-side, and it converts an assumption into a check.
+
+### 2. What is NOT guaranteed, and therefore must refuse
+
+**`logical_call_id` may be null:**
+
+```python
+LOGICAL_CALL_ID: contextvars.ContextVar = contextvars.ContextVar(
+    "kai_gate_048c_logical_call_id", default=None)     # :150-151
+```
+
+**`attempt_index` may be null:**
+
+```python
+def next_attempt_index():
+    """... Returns None outside any invocation context — "no logical
+    call" is a first-class answer, not index 1."""
+```
+
+A row can therefore be the lowest-`seq` row and carry neither. The
+operator is right that this matters: S1's justification calls the
+selected row *"the first attempt of the first logical call"*, and
+without those two fields that sentence is unlicensed even though the
+`seq` ordering is fine.
+
+**A tightening this forces.** D255 said *"if `attempt_index` is present
+and is not 1, refuse"* — which quietly permits a **null** one. It should
+not. `LOGICAL_CALL_ID.set()` and `LOGICAL_CALL_ATTEMPTS.set()` happen as
+a pair (`:265-266`), so a row inside a logical call has both or neither.
+The condition becomes strict.
+
+### 3. S1's preconditions, amended and frozen
+
+Selection proceeds only if **all five** hold. Any failure **refuses**;
+none permits falling through to another row.
+
+| # | condition | status |
+|---|---|---|
+| 1 | P1 returned `REQUEST_REPLAYABLE` over the **whole** population | external; must be established |
+| 2 | every candidate production row has an integer `seq` ≥ 1 | guaranteed by construction; **verified at selection** |
+| 3 | exactly one row holds the minimum `seq` | guaranteed within one process; **verified at selection** |
+| 4 | the selected row's `logical_call_id` is present and non-null | **not guaranteed — refusal condition** |
+| 5 | the selected row's `attempt_index` **== 1** (strictly; null refuses) | **not guaranteed — refusal condition** |
+
+Unchanged and still binding: **no model response may be read to make,
+validate or revisit this selection**, and the selected row's identity is
+published — `seq`, `logical_call_id`, `attempt_index`, prompt and
+contract hashes, plus the row in full — **before** any response field is
+read.
+
+### 4. No instrument change
+
+Conditions 2–5 are reads of request-side fields performed **at selection
+time**, which happens only if P1 returns `REQUEST_REPLAYABLE`. The census
+is **not** altered (operator direction: no further census changes during
+048), and no new tooling is built. This entry makes the rule refuse when
+its own justification cannot be established; it adds no machinery.
+
+### Status
+
+* **Fresh replay-subject capture — IN FLIGHT.** Run **31894868473**,
+  head_sha **`1d79b145a04f1bc35a9bc9d0a31251153f6e6a10`**,
+  `workflow_dispatch`, bound from an authoritative listing.
+* **Real-format validation — PASSED** (earlier subject).
+* **P1 refusal path — LIVE-PROVEN. P1 replay completeness — UNRESOLVED.**
+* **Stage 1 — BLOCKED. Dispatching a capture did not authorise the
+  replay.** Stage 2 — BLOCKED. Ownership — UNMOVED. **048 C — BLOCKED.**
