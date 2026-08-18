@@ -19972,3 +19972,135 @@ from anything found in that inspection.
 * Post-freeze inspection — **AUTHORISED, NOT YET PERFORMED**, blocked on
   artifact access this environment does not have.
 * Stage 2 — **NOT AUTHORISED.** 048 C — open. No finding closed.
+
+---
+
+## D276 — Post-freeze inspection: the original failure shape is reproduced, and it is not byte repetition
+
+**2026-08-17. The Stage-1 evidence chain is COMPLETE. All ten items
+returned. GPT-REPORTED with method; classifier identity independently
+verified here. Stage 2 was NOT run and remains NOT AUTHORISED.**
+
+### 1. Method, and the one part of it verified from this side
+
+| | |
+|---|---|
+| replay material | artifact `9253313044`, run `31908872172`, head `b45330b3…` — manifest, classification, replies |
+| original response | capture artifact `9249683223`, run `31894868473`, head `1d79b145…`, `capture.jsonl` row `event="llm-call"`, `seq=2` |
+| classifier | `scripts/security/classify_llm_response.py`, git blob `ce90e1431bec1001158122bbcf94895a9234243b`, 30,050 bytes |
+
+**Independently verified in this environment:** that blob hash and the
+sha256 `b187dd441052288b2e159e62cb60ca1ac2dd6d5de2059b500776f0a50c17acb0`
+banked in D267 are **the same 30,050 bytes** under two different hash
+functions. The original was judged by the exact instrument the replay
+was judged by — the one property that makes the eleven comparable at
+all, and it is now checked rather than asserted.
+
+D275 also independently confirmed at commit `0bc0112c84d10bdd6331eddc4a29aa3ea549ebfa`.
+
+### 2. The two INSTANCE INVALID replies are two different failures
+
+Neither is a disguised echo. Both produced **graph-shaped objects** —
+the model genuinely attempted the instance:
+
+* **replay 1** — nodes present, but `description` set to `null` on both.
+  2 violations, first at `nodes/0/description`: *None is not of type
+  'string'*. **Wrong type.**
+* **replay 10** — three nodes, `description` **omitted entirely**.
+  3 violations, first at `nodes/0`: *'description' is a required
+  property*. **Missing field.**
+
+So the population is not "eight echoes and two of the same near-miss".
+It is eight echoes and **two distinct kinds** of attempted compliance.
+
+### 3. My byte-identity hypothesis is DISPROVED
+
+Before the inspection I flagged this as the item to watch: if the eight
+schema echoes were byte-identical, the behaviour would read as
+near-deterministic rather than stochastic.
+
+**They are not.** Seven distinct raw bodies among eight responses; only
+replays 7 and 8 are byte-for-byte identical.
+
+```
+2 d44c1f87…  3 387edfa9…  4 b0a922fe…  5 785a62f3…
+6 d1216c31…  7 b1cb5e7f…  8 b1cb5e7f…  9 9a8806f2…
+```
+
+Six of the eight — 2, 4, 6, 7, 8, 9 — are **canonically identical to the
+contract**, differing only in whitespace and formatting. Replays 3 and 5
+are **hybrid** schema-shaped objects rather than exact contract copies.
+
+The model is generating each reply, not repeating one.
+
+### 4. The original response, and a precision about how closely it was reproduced
+
+**Original: `SCHEMA ECHO`.** 2,072 bytes, sha256
+`17971528680e22560259f46f28bcbe05bcb3c97a82dc362537ef7cb8629c0a0b`.
+Schema-shaped but **not** canonically identical to the contract, so the
+frozen classifier returns *"schema-shaped but not the contract this
+attempt was sent"*.
+
+Structurally it is **almost identical to Stage-1 replay 3**: both
+preserve the `Node`/`Edge` schema machinery, both replace
+`properties.edges` with an actual edge array, and both drop the root
+`"type": "object"`. They differ only in two edge-string values — the
+relationship name and its description.
+
+**The precision worth stating, because "reproduced" can be read too
+strongly:**
+
+* the **failure class** is reproduced — 8 of 10 replays echo, and the
+  original echoes;
+* the **original's specific sub-shape** — the hybrid — is reproduced in
+  **2 of 10** replays (3 and 5);
+* the **modal replay sub-shape** — an exact canonical copy of the
+  contract, 6 of 10 — is **not** what the original did.
+
+So Stage 1 reproduced the original's failure *class* strongly, and its
+*exact structural signature* in a minority of replays. Both facts belong
+in any claim made from this.
+
+### 5. Stage-1 interpretation under D247 — COMPLETE
+
+For the exact frozen subject there are now **eleven observed raw-model
+responses**: the original plus ten controlled replays.
+
+```
+ELEVEN OBSERVATIONS   9 SCHEMA ECHO · 2 INSTANCE INVALID · 0 VALID INSTANCE
+TEN REPLAYS ALONE     8 SCHEMA ECHO · 2 INSTANCE INVALID · 0 VALID INSTANCE
+```
+
+D247's branch, taken as written: **the failure is present at the raw
+endpoint given that exact request, and Instructor's validation and retry
+machinery is not required to produce it.** The original production
+failure sits in the modal class the replay reproduced, and its exact
+structural signature recurs in replays 3 and 5 without Instructor
+anywhere in the path.
+
+**The bound D247 recorded in the same breath still holds in full:** this
+does not exonerate Instructor's prompt transformation, because the
+schema-in-system-message presentation is part of the request under
+replay. Stage 1 separates retry/validation from the request. It does not
+separate the request's authorship from the model.
+
+**And the honest description of the behaviour:** strong, patterned,
+stochastic unreliability under a fixed request. **Not** deterministic
+impossibility — twice the model produced instance-shaped output and got
+the details wrong, which is a different kind of failure from echoing.
+
+### 6. What remains open, unchanged
+
+Why it happens is **still unknown**. Live and mutually confounded:
+presentation, contract complexity (D274 §3), model capability at this
+size (D247 §4 branch 1). Frozen Stage 2 narrows the first of those,
+within the limits already recorded in D275 §3.
+
+### Status
+
+* **STAGE-1 EVIDENCE CHAIN — COMPLETE. All ten items returned.**
+* Arm B — **FROZEN, UNCHANGED**, window closed (D275).
+* Stage 2 — **NOT AUTHORISED.** Boundary reached; stopped.
+* **048 C — still OPEN.** Programme Rule 7: no finding closes because a
+  result landed. Closure is a separate evidence-backed review.
+* Succession — LOGGED NOT PRIORITISED. Three bypasses — OPEN, parked.
