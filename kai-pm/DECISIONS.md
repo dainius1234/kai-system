@@ -20104,3 +20104,334 @@ within the limits already recorded in D275 §3.
 * **048 C — still OPEN.** Programme Rule 7: no finding closes because a
   result landed. Closure is a separate evidence-backed review.
 * Succession — LOGGED NOT PRIORITISED. Three bypasses — OPEN, parked.
+
+---
+
+## D277 — KAI-GATE-048 C closure review: the bar retrieved, not remembered
+
+**2026-08-18. OPERATOR-AUTHORISED closure review.** Dainius: *"048 C
+closure review — authorised. Stage 2 — HOLD."* No model call, no CI job,
+no Stage-2 execution, no finding closed by this entry. Programme Rule 7
+governs: this entry produces an assessment, not a state change.
+
+### 0. Provenance of the bar — retrieved, and made mechanically checkable
+
+The ten items were **read out of this file**, not reconstructed from
+memory. The operator explicitly declined to manufacture them from
+recollection and instructed retrieval; rule 4 says the same thing.
+
+| | |
+|---|---|
+| source | `kai-pm/DECISIONS.md`, D247 §6, **lines 16820–16839** |
+| region | between `### 6. The bar before KAI-GATE-048 C moves BLOCKED → PASS` and `### Status — unchanged by this entry` |
+| normalised size | **958 bytes** |
+| **BAR FINGERPRINT** | `7c3ad6ad7ca6432ae201bd1c181f5b3adabb3b864e21c53ae83aed8d2124e73c` |
+
+**Recipe**, published with the value because withholding it was rule 28's
+own defect (D274 §5): take the region between the **first** occurrence of
+the start heading and the **first** end heading after it; normalise each
+line's whitespace to single spaces; join with `\n`; strip; UTF-8 encode;
+SHA-256; hex digest.
+
+Any party asserting a different ten-item bar must reproduce that digest
+or the two records have drifted, and the file wins (rule 28).
+
+**"First" is load-bearing, and I nearly shipped it implicit.** Naming the
+region in the table above put a **second** copy of the start heading in
+this file — `DECISIONS.md` now contains it twice. My first draft of this
+recipe said only *"between the two named headings"*, and it reproduced
+`7c3ad6ad…4e73c` purely because the implementation happened to split on
+the first match. That is R9's shape seen from the other side: **the
+report's own text entered the region the report measures.** Caught by
+recomputing the digest after writing the entry rather than before, which
+is the only reason it is a sentence here instead of a defect later.
+
+### 1. The assessment
+
+Assessment tree: **HEAD `146bacf997ec76ba1e55ffb071642a8524b78875`**,
+tree `3b2534a85db1f8027ed66a1376ecbf074fb6bcdb`, branch
+`claude/project-rework-plan-pgvp35`, working tree clean (0 modified
+paths).
+
+| # | bar item (abbreviated — canonical text is D247 §6) | verdict |
+|---|---|---|
+| 1 | Cause separated — which layer owns the failure, by experiment | **MOVED BUT OPEN** |
+| 2 | The repair covers the population, denominator stated | **UNADDRESSED** |
+| 3 | A regression gate exists and demonstrably fails when reintroduced | **UNADDRESSED** |
+| 4 | A real cognify ingest succeeds end to end on a fresh stack | **UNADDRESSED** |
+| 5 | The structured output contains instances, not schemas | **MOVED BUT OPEN** — moved to MEASURED-NEGATIVE |
+| 6 | A graph is genuinely produced and is usable | **UNADDRESSED** |
+| 7 | It repeats on independent fresh executions | **UNADDRESSED** |
+| 8 | No HuggingFace/network regression (R2) | **MOVED BUT OPEN** |
+| 9 | Clean tree; policy-check green; gate registry green | **SATISFIED** — and re-earned, not inherited |
+| 10 | Every claim bound to the exact tested tree, image and run id | **MOVED BUT OPEN** — tree and run bound, **image not** |
+
+**Tally: 1 SATISFIED · 4 MOVED BUT OPEN · 5 UNADDRESSED · 0 NOT
+APPLICABLE.** D247's own arithmetic applies: *"Nine of ten green is
+BLOCKED, not nearly PASS."* One of ten is not a near miss either way.
+
+### 2. Item-by-item, with the evidence bound
+
+**Item 1 — cause separated. MOVED BUT OPEN.**
+
+*Moved.* D267 (run `31908872172`, `run_number` 3, `run_attempt` 1, head
+`b45330b355d712241bfa5fedc7e73824171f65c5`, tree
+`3abe4dcddfd0f59be2524999ba2622260230b84b`) took D247 §2's frozen branch
+as written: 8 `SCHEMA ECHO` / 2 `INSTANCE INVALID` / **0 `VALID
+INSTANCE`** over ten replays, 10/10 reaching a model, all ten
+reproducing the frozen request hash
+`afd8f4e08bca944664ed9f5472260be87b1493ae9a72362018574e763b48ae86`.
+**Instructor's validation and retry machinery is separated from the
+request and is not required to produce the echo.** D276 §5 confirms the
+original production response sits in the reproduced class
+(`SCHEMA ECHO`, 2,072 bytes, sha256
+`17971528680e22560259f46f28bcbe05bcb3c97a82dc362537ef7cb8629c0a0b`,
+capture artifact `9249683223`, run `31894868473`, seq 2) and that its
+exact structural signature recurs in replays 3 and 5 with no Instructor
+in the path.
+
+*Open, and by how much.* One layer was excluded. **Ownership was not
+assigned.** Three suspects are live and mutually confounded (D276 §6):
+
+* **presentation** — the schema-in-system-message shape, which D247 §2
+  itself records is *inside* the replayed request, not held constant
+  outside it;
+* **contract complexity** — promoted from unconsidered to live by D274
+  §3, which also records that **Stage 2 does not separate it**, because
+  D247 §3 holds the required-field set identical between arms;
+* **model capability at 3B** — D247 §4 branch 1, untested.
+
+D274 §2 further removed the one historical lever that looked like it
+might discriminate: the run-24 `VALID INSTANCE` (run `31844794230`,
+seq 11) shares the *same* presentation scaffold as the Stage-1 subject
+and differs by **task and contract** (`SummarizedContent` vs
+`KnowledgeGraph`), with byte-identical user content (107 bytes, sha256
+`283ced2b469ef46fa8ee768bb1024eb24d3824e970f9827b34f64797ddacc761`).
+So the corpus contains **no clean presentation comparator**, and
+`qwen2.5:3b` has produced a valid instance *under* schema-style
+presentation.
+
+**Verdict: one of four candidate owners excluded by experiment. Three
+remain, confounded. The item asks which layer owns it; that is not
+answered.**
+
+**Item 2 — repair covers the population. UNADDRESSED.**
+
+FACT: **no repair exists.** Nothing in D271–D276 changes any production
+call path; every entry is measurement or governance. The denominator the
+item demands — the population of call sites that construct a
+schema-presented structured-output request — has never been enumerated.
+It cannot be enumerated usefully before item 1 names the layer, because
+the population's *shape* depends on which layer owns the defect (call
+sites, contracts, or the model). R4's ordering (one confirmed instance →
+derive → **count** → calibrate → fix) is at step 2 of 6.
+
+**Item 3 — regression gate with known-positive and known-negative.
+UNADDRESSED.**
+
+No defect-specific regression gate exists, and none can be written
+before a repair defines what "reintroduced" means. The nearest live
+instrument is the `memu-graph-acceptance` job
+(`.github/workflows/memu-graph-startup-proof.yml:192`), which supplies
+something like I-8's **known-positive** — it has refused promotion
+continuously while the capability is broken (D207) — but its
+**known-negative is unobtainable**, because no execution has ever been
+observed in which the defect is absent. Half of I-8 is structurally
+unavailable until items 4–6 produce a success. `stage1-replay.yml` is a
+one-shot pre-registered experiment, not a gate, and must not be
+mistaken for one.
+
+**Item 4 — real cognify ingest end to end on a fresh stack.
+UNADDRESSED.** No such execution exists on any tree. D207's framing is
+unchanged: *"BLOCKED — real graph extraction does not complete
+successfully."*
+
+**Item 5 — structured output contains instances, not schemas. MOVED BUT
+OPEN, and the movement is negative.**
+
+This is the one item whose *epistemic* state changed substantially
+without any repair. It was UNKNOWN for the exact frozen subject; it is
+now **measured and failing**, with the strongest denominator the
+programme has produced:
+
+```
+ELEVEN OBSERVATIONS   9 SCHEMA ECHO · 2 INSTANCE INVALID · 0 VALID INSTANCE
+TEN REPLAYS ALONE     8 SCHEMA ECHO · 2 INSTANCE INVALID · 0 VALID INSTANCE
+```
+
+(D276 §5; the eleventh is the original, D271 §4 having corrected my
+earlier claim that this request had historically validated — it had
+not.) D276 §3 additionally **disproved** my byte-identity hypothesis:
+seven distinct raw bodies across eight echoes, only replays 7 and 8
+identical, six canonically identical to the contract and replays 3 and 5
+hybrid. The honest description is **strong, patterned, stochastic
+unreliability under a fixed request** — not deterministic impossibility,
+since twice the model produced instance-shaped output and got the field
+details wrong (`description: null`, 2 violations, replay 1; `description`
+omitted, 3 violations, replay 10 — D276 §2).
+
+Recorded as MOVED rather than UNADDRESSED because the item is no longer
+an open question about this subject; it is a closed measurement with an
+adverse answer. It is not SATISFIED and is not close to it.
+
+**Item 6 — a graph genuinely produced and usable. UNADDRESSED.**
+Downstream of item 4. Never observed. Note that "usable" is a stronger
+predicate than "no error" by D247's own wording, and no instrument in
+the tree currently measures usability — that instrument does not exist
+yet either.
+
+**Item 7 — repeats on independent fresh executions. UNADDRESSED.**
+"It" is the end-to-end success of items 4–6. There is no success to
+repeat. Stage 1's ten replays do **not** discharge this item: they
+repeat a *failure*, which is evidence for item 1 and against item 5, and
+is not what item 7 asks for.
+
+**Item 8 — no HuggingFace/network regression. MOVED BUT OPEN.**
+
+*Evidence.* Run `31908872172` built `memu-graph`
+(`.github/workflows/stage1-replay.yml:139`) on head `b45330b3…` and
+proceeded, so the image's build-time tokenizer bake and its
+`HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1` **verify** step
+(`memu-graph/Dockerfile:133`) passed on that tree. `git diff --stat
+b45330b…HEAD` touches **only** `.github/workflows/policy-checks.yml`,
+`Makefile`, `README.md`, `docs/PROJECT_BACKLOG.md`, four `kai-pm/`
+documents and four `scripts/` files — **no Dockerfile, no compose file,
+no service source**. Build inputs are unchanged by inspection.
+
+*Why open, not satisfied.* Two reasons, and §0.0 is the first: an
+unchanged input is not an executed build, and this item is an R2 item —
+*the contingency must survive the failure it is for*, which means it
+must be **run**, not diffed. Second, `memu-core`'s HF path (its
+five-consecutive-failure retry, `memu-core/Dockerfile:88`) was **not
+exercised** by the Stage-1 workflow, which builds `memu-graph` only. The
+item's denominator is the stack, and the evidence covers one image of it.
+
+**Item 9 — clean tree; policy-check green; gate registry green.
+SATISFIED.**
+
+Re-run for this review rather than inherited (§0.0):
+
+```
+$ git status --porcelain | wc -l          → 0
+$ make policy-check                        → EXIT 0   (20,007 bytes of output)
+    check_gate_registry.py --gate          → 87 declared, 87 found on disk,
+                                             11 finding(s) closed and re-verified
+                                             0 finding(s) across 4 invariants
+                                             GATE PASSED: I-1..I-7
+    sync_docs.py --check                   → all documentation current
+```
+
+Doctrine fingerprint recomputed at this tree:
+`f79ae859ccd13dca76739bc0d42a4bad969c1060fef63bb595633c83a5add039` —
+unchanged from D273.
+
+This is the **only** item of the ten that is green, and it is a hygiene
+precondition, not a capability result. Stating that plainly matters:
+a reader scanning for green must not mistake it for progress on the
+defect.
+
+**Item 10 — every claim bound to the exact tested tree, image and run
+id. MOVED BUT OPEN — and the open half is `image`.**
+
+*Bound.* Tree and run identity are now bound to a standard the programme
+did not previously reach: D267 records run id, `run_number`,
+`run_attempt`, head SHA and tree SHA; D276 §1 records replay artifact
+`9253313044`, capture artifact `9249683223`, and the classifier's
+identity **verified across two hash functions** — git blob
+`ce90e1431bec1001158122bbcf94895a9234243b` and sha256
+`b187dd441052288b2e159e62cb60ca1ac2dd6d5de2059b500776f0a50c17acb0` are
+the same 30,050 bytes of `scripts/security/classify_llm_response.py`.
+Every GPT-REPORTED measurement (D271, D274, D276) published its method
+with its result, as D271 required.
+
+*Not bound.* **No image identity is recorded anywhere.**
+`.github/workflows/stage1-replay.yml` builds `memu-graph` and never
+captures a digest; `grep` for `digest`/`inspect` in that workflow returns
+nothing, and no image digest appears in D267–D276. D247 §6 item 10 names
+**three** identities and the tree carries two. The build is reproducible
+by description and not by identity, which is precisely the gap rule 3
+exists to close.
+
+This is a **new finding of this review**, not a restatement: the
+programme's own bar demands an identity it does not collect.
+
+### 3. What the remaining gap actually consists of
+
+Stated as a dependency chain rather than a list, because the items are
+not independent:
+
+```
+item 1 (ownership)  ──▶ item 2 (population)  ──▶ item 3 (regression gate)
+                                                        │
+item 5 (instances) ◀────────────────────────────────────┘
+        │
+        ▼
+item 4 (ingest e2e) ──▶ item 6 (usable graph) ──▶ item 7 (repeats)
+
+item 8  — independent, needs an executed build across the stack
+item 9  — green, standing, re-earned each time
+item 10 — needs one workflow change: record the image digest
+```
+
+**Five of the ten (2, 3, 4, 6, 7) are gated behind a repair that does not
+exist, and the repair is gated behind item 1.** Two (8, 10) are
+independent of the LLM question entirely and are cheap. One (9) is green.
+One (5) is measured negative and moves only when a repair lands.
+
+So the whole substantive gap reduces to: **item 1 is not answered, and
+everything expensive waits on it.**
+
+### 4. FACT / EVIDENCE / INFERENCE on what Stage 2 would move
+
+**FACT.** Stage 2 as frozen (D275, design fingerprint
+`e27bb25a655d944adcad468f01b8656774127714928932ab8840213df8301de2`,
+Arm B wording `9b7e77fc931ca5d556c5dd751fd22254ea33aa4c3ff13887805a3acd909157f6`)
+varies presentation and holds the required-field set identical.
+
+**EVIDENCE.** D274 §3, pre-registered before any Stage-2 result exists:
+*"Stage 2 cannot resolve it [contract complexity] … it answers whether
+presentation is load-bearing for the `KnowledgeGraph` contract."* D275 §3
+carries the same bound into the freeze, and adds that if both arms echo,
+**contract complexity and model capability remain live and confounded
+with each other**.
+
+**INFERENCE.** Stage 2 therefore addresses **one** of the three surviving
+suspects, for **one** contract, and its "both arms echo" branch returns
+the programme to a two-way confound it cannot break. It moves item 1
+partially in one branch and not at all in the other, and it moves no
+other item of the ten directly.
+
+That is not an argument against running it — D247 froze it for good
+reasons and D275 closed the amendment window. It is the honest
+statement of what the remaining gap would and would not receive, which
+is what a closure review owes the operator before he decides.
+
+### 5. What this review deliberately does not do
+
+* It **closes nothing.** Programme Rule 7 and doctrine rule 24: no
+  finding closes because a result landed, and this entry is a result.
+* It **authorises nothing.** Stage 2 remains NOT AUTHORISED and is on
+  explicit operator HOLD.
+* It **proposes no new rule.** The candidate rule the operator flagged —
+  *"cross-run observations are comparable only after the measurement
+  instrument's identity is established"* — is recorded as flagged, in his
+  words, and is **not** added to the doctrine here. Adding it silently is
+  exactly what rule 28 and §0's step 7 forbid. The doctrine fingerprint
+  above is unchanged, which proves it was not added.
+* It **does not re-open** D275's freeze, D271's correction or D276's
+  counts.
+
+### Status
+
+* **KAI-GATE-048 C — BLOCKED.** Assessed against the retrieved D247 §6
+  bar (fingerprint `7c3ad6ad…4e73c`): **1 SATISFIED · 4 MOVED BUT OPEN ·
+  5 UNADDRESSED.**
+* **New finding of this review:** item 10's `image` identity is not
+  collected by any instrument in the tree. Opened, not fixed.
+* Stage 1 — MEASURED and COMPLETE (D267, D276). Arm B — FROZEN,
+  UNCHANGED (D275). Stage 2 — **NOT AUTHORISED, operator HOLD.**
+* Candidate rule 29 — **FLAGGED, NOT ADDED.** Doctrine fingerprint
+  `f79ae859…add039`, unchanged.
+* Succession — LOGGED NOT PRIORITISED. Three `--no-deps` bypasses —
+  OPEN, parked. Programme lock in force: finish 048 before A-4, Kingsman
+  integration, repo consolidation or the assurance upgrade.
