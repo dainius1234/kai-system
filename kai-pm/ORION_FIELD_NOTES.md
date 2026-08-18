@@ -30,12 +30,41 @@ paragraph is only a pointer.
   container had run for 0.49 s when the calls went out, so all ten
   returned HTTP 404 and none reached a model. D265 has the detail.
   **The run went green over it**, which is the defect that matters.
-* **No repair to attempt 2's cause has been made and no attempt 3 is
-  authorised.** `kai-pm/STAGE1_GO` is the trigger
-  and must not be touched without fresh authorisation — editing it
-  starts a live experiment.
+* **Stage 1 attempt 3 (run `31908872172`, head `b45330b`) MEASURED IT.**
+  D266 repaired attempt 2's cause — the model pull is now a foreground
+  gate and `check_model_ready.py` proves the exact model is present
+  before anything is sent. Both gates held live. Ten of ten executions
+  reached a model: **8 SCHEMA ECHO, 2 INSTANCE INVALID, 0 VALID
+  INSTANCE**, all reproducing the frozen request hash. D267.
+* **What that does and does not establish.** D247's frozen branch, taken
+  as written: the failure is present at the raw endpoint given that
+  exact request, and Instructor's validation/retry machinery is **not**
+  required to produce it. It does **not** exonerate Instructor's prompt
+  transformation — the schema-in-system-message presentation is part of
+  the request under replay. Stage 2 separates that; Stage 2 is BLOCKED.
+* **Bounded by model size, pre-registered not post-hoc.** D247 §4 branch
+  1 already named *model capability at this size* as an untested
+  suspect. `qwen2.5:3b` failing this request is not "all models fail",
+  and prohibition 5.1 forbids resolving it by swapping models.
+* **Open before Stage 2:** run 24's historical VALID INSTANCE is
+  **UNVERIFIED** at hash level against the frozen subject; the original
+  captured response and the sealed per-reply detail are deliberately
+  **unread** until Arm B is frozen, so the experiment cannot be tuned
+  around what we already saw.
+* `kai-pm/STAGE1_GO` is the trigger and must not be touched without
+  fresh authorisation — editing it starts a live experiment.
 * The original captured response has **not** been opened. Neither have
   attempt 1's `request_hash` / `manifest_hash`.
+
+**HIGHEST-VALUE UNWRITTEN REQUIREMENT (D269).** The operator's stated
+purpose is that Kai **outlives him** and sustains itself. That is a
+standing non-functional requirement and it is **not designed anywhere**
+— measured, zero hits in `kai-pm/`, `CLAUDE.md` or `docs/`. `SOUL.md`
+says who Kai is; nothing says what happens when the operator is not
+there. Keys, hosted dependencies, money, who may amend `SOUL.md` after
+him, how Kai tells a holiday from an absence. Read D269 before deciding
+that anything else is more important — every other backlog item assumes
+someone is present to fix it.
 
 **HELD WORKSTREAM — service identity.** Read
 `kai-pm/SERVICE_IDENTITY_STATE.md` before touching anything under

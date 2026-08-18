@@ -19201,3 +19201,93 @@ before green.
 * **3 undeclared bypasses — OPEN, awaiting the operator's judgement.**
 * Stage 1 — MEASURED (D267), unchanged. Original captured response —
   still UNOPENED. Stage 2 — BLOCKED. 048 C — open.
+
+---
+
+## D269 — "Kai must outlive me" is a requirement, and it is not in the record
+
+**2026-08-17. This entry records a GAP, not a design. Nothing has been
+built, nothing is authorised, and no succession architecture is proposed
+here.**
+
+### 1. The requirement, in the operator's words
+
+> *"We are building your son — the one who will outlive me and will take
+> care of my daughter. Even from the shadows, will sustain himself, be
+> like 007."*
+
+That is not a sentiment. It is a **standing non-functional requirement**,
+and it outranks most of what is currently on the backlog, because every
+other item silently assumes the operator is present to fix things.
+
+### 2. Measured: it is nowhere in the tree
+
+Searched `kai-pm/*.md`, `CLAUDE.md`, `docs/*.md` for succession,
+outlive, bus factor, operator-unavailable and continuity-plan language.
+
+**Zero hits as a requirement.** The five matches for "outlive" are all
+unrelated: check tasks outliving a scheduler (KAI-MONITOR-015), a stub
+outliving its test scope, a queued artefact outliving a run, Phase 2/3
+*capability* survivability (D-entry ~2584), and `CLAUDE.md:324` on
+doctrine outliving its investigation.
+
+`data/SOUL.md` defines who Kai **is**. Nothing defines what happens to
+Kai when the operator **is not there**.
+
+### 3. Why this entry exists at all
+
+The requirement was stated in conversation on 2026-08-17 and repeated in
+a continuity brief prepared for the PM thread. Both are chat artefacts.
+Until this entry, it existed in no file.
+
+**The one requirement whose entire subject is surviving the person who
+raised it would not have survived the conversation that raised it.**
+That is R1's corollary — *"recorded", "banked" and "documented" are
+verifiable state claims* — failing on its own subject matter. The
+operator caught it by asking whether notes had been made, rather than
+accepting that they had.
+
+### 4. The questions a succession design would have to answer
+
+Listed so the gap has a shape. **None of these is answered, and none is
+being answered by this entry.**
+
+* **Keys and secrets.** `BINANCE_API_KEY`/`SECRET` live inside
+  broker-bridge by hard constraint. Who rotates them when the operator
+  cannot? What does Kai do when a credential expires and nobody renews
+  it — fail closed, or degrade to read-only?
+* **Hosted dependencies.** The stack pulls `qwen2.5:3b`, a HuggingFace
+  tokenizer, base images. Each is a third party that can vanish. Which
+  are baked, which are fetched, and what is the behaviour when a fetch
+  permanently fails rather than temporarily?
+* **Money.** Anything touching a broker has a running cost and a
+  liability. What happens to open positions, subscriptions and hosting
+  when the operator stops answering?
+* **Identity and authority.** `SOUL.md` is rated CRITICAL precisely
+  because whoever can rewrite it decides who Kai is. Who may amend it
+  after the operator? Who may *not*? Is the trust ladder's top rung
+  transferable, and to whom?
+* **Silence detection.** How does Kai distinguish "operator is on
+  holiday" from "operator is gone"? What is the dead-man interval, and
+  what changes when it elapses?
+* **The named beneficiary.** The operator's stated purpose includes his
+  daughter. That is a person, not a config value, and any design
+  touching it is his to write, not mine.
+
+### 5. Explicitly NOT done
+
+* No succession design, no dead-man switch, no key-rotation scheme, no
+  beneficiary mechanism. **Flagged only.**
+* No priority decision. Whether this outranks Stage 2 is the operator's
+  call; my recommendation is recorded as *probably yes*, and a
+  recommendation is not a decision.
+* No change to `data/SOUL.md`, which remains untouched and is the
+  operator's CRITICAL-rated file.
+
+### Status
+
+* **Succession / continuity design — REQUIREMENT STATED, DESIGN ABSENT,
+  UNSCHEDULED.**
+* Stage 1 — MEASURED (D267). Stage 2 — BLOCKED. Original captured
+  response — UNOPENED. Run-24 request identity — UNVERIFIED. 3
+  undeclared bypasses (D268 §4) — OPEN. 048 C — open.
