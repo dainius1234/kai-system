@@ -19738,3 +19738,129 @@ untouched.
 * Stage 1 — MEASURED. Step 1 — COMPLETE (D271). Arm B — UNAMENDED,
   decision pending. Original response — UNOPENED. Stage 2 — BLOCKED.
   048 C — open.
+
+---
+
+## D274 — The historical VALID differs by TASK AND CONTRACT, not by document
+
+**2026-08-17. Pre-freeze measurement. GPT-REPORTED, request-side only.
+No response body, timing, `finish_reason`, `result_type`, sealed Stage-1
+detail or original captured response was accessed. Arm B is NOT frozen
+by this entry — that is the operator's act.**
+
+### 1. The measurement
+
+Decomposing the `messages` difference established in D271:
+
+| | |
+|---|---|
+| user / task-input content | **BYTE-IDENTICAL.** 107 bytes, SHA-256 `283ced2b469ef46fa8ee768bb1024eb24d3824e970f9827b34f64797ddacc761` |
+| Stage-1 subject (run `31894868473` seq 2) | knowledge-graph extraction, **`KnowledgeGraph`** schema |
+| run-24 VALID (run `31844794230` seq 11) | chunk summarisation, **`SummarizedContent`** schema |
+| presentation scaffold | **THE SAME on both**: *"Parse the content and return a JSON object matching this schema:"* |
+
+Internally coherent with D271: identical user content plus differing
+system content yields the differing full-`messages` hashes already
+recorded (`dc203ead5f97…` vs `a6e5e25d28e8…`).
+
+### 2. What this kills, and what it establishes
+
+**KILLED — the concern I raised before the Arm-B decision.** I flagged
+that if the difference were the *task input text*, the historical
+comparison would license nothing. It is not the input text. But the
+comparison is still **not a presentation-only comparator**, for a
+different reason than I anticipated: both rows use the *same* scaffold.
+
+**ESTABLISHED, bounded exactly:** `qwen2.5:3b` has produced a
+`VALID INSTANCE` **while being shown a JSON Schema in the system
+message**, for a different task and a simpler contract.
+
+**Therefore we may not claim "schema-style presentation itself causes
+the failure."** The one historical success occurred *under* that
+presentation.
+
+### 3. A THIRD suspect, now live, and Stage 2 does not separate it
+
+The two rows differ in **task and contract complexity** — a nested
+entity/relationship graph versus a summary string.
+
+D247 §4 branch 1 names the untested suspects as *"sampling parameters,
+model capability at this size, the adapter's own request construction."*
+**Contract complexity is not among them**, and this measurement promotes
+it from unconsidered to live.
+
+**Stage 2 cannot resolve it.** D247 holds *"the set of required fields"*
+identical between arms and moves only presentation. So Stage 2 answers
+whether presentation is load-bearing **for the `KnowledgeGraph`
+contract**. It cannot answer whether that contract's complexity is what
+defeats a 3B model.
+
+Pre-registered so neither outcome can be over-read:
+
+* **Arm B wins** → the Arm-B presentation package materially improved
+  compliance *for this contract*. Not "instance orientation alone caused
+  it", not "JSON Schema caused the defect", and **not** "contract
+  complexity is exonerated".
+* **Both arms echo** → presentation is not the differentiator *for this
+  contract*. Contract complexity and model capability both remain live,
+  and they are **confounded with each other** in everything measured so
+  far.
+
+Separating contract complexity is a **new pre-registered experiment**,
+not something to inject into 048.
+
+### 4. Arm B — recommendation, and why NOT amending is the finding
+
+The PM thread recommends freezing D247's Arm B exactly as
+pre-registered. **Concur, at high confidence, and for the strongest
+available reason: no evidence was found that would justify a change.**
+
+Amending now would add researcher degrees of freedom immediately before
+the experiment, on the basis of a historical correlation that this very
+measurement has just disqualified. D247 froze Arm B's wording precisely
+so it could not be tuned by what we learned in the meantime, and the
+first real opportunity to tune it has arrived — which is exactly when
+the freeze is supposed to hold.
+
+**The bounded reading if Arm B wins**, carried verbatim: *"The Arm-B
+presentation package materially improved compliance."* Not *"instance
+orientation alone caused the improvement"*, and not *"JSON Schema caused
+the defect."* The anti-schema wording is a **treatment component**, not
+an isolated variable.
+
+**Arm B remains UNFROZEN until the operator explicitly freezes it.** A
+recommendation from two agents is not an operator act.
+
+### 5. The fingerprint recipe, because withholding it broke rule 28
+
+The PM thread correctly declined to claim it had reproduced
+`f79ae859…add039`, having been given the digest but not the recipe. That
+is my omission and it is rule 28's own defect: I published a value to be
+reconciled without publishing the means of reconciling it.
+
+The canonical serialisation, stated so it needs no code reading —
+`scripts/security/check_doctrine_integrity.py` is the implementation:
+
+1. take only the region between `## The rules` and
+   `Where each rule was earned`;
+2. match `N. **statement**`, where the bold statement **may wrap across
+   lines**;
+3. normalise each statement's whitespace to single spaces
+   (`" ".join(text.split())`);
+4. order by `N`; join each entry as `f"{N}\x1f{statement}"`;
+5. join entries with `\x1e`; UTF-8 encode; **SHA-256**; hex digest.
+
+Per-rule digests are the first 12 hex of `sha256(f"{N}\x1f{statement}")`.
+Prose outside the rules section deliberately does not move the value.
+
+### Status
+
+* **Arm B — UNFROZEN. Recommended: freeze unchanged. Awaiting the
+  operator's explicit act.**
+* Historical VALID — **disqualified** as a presentation comparator;
+  retained as evidence that a valid instance is possible under
+  schema-style presentation for a simpler contract.
+* **Contract complexity — NEW LIVE SUSPECT**, not separated by Stage 2,
+  confounded with model capability.
+* Original response — UNOPENED. Sealed Stage-1 detail — UNREAD. Stage 2
+  — NOT AUTHORISED. 048 C — open.
