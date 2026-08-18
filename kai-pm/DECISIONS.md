@@ -19400,3 +19400,123 @@ untouched since `b45330b`.
   Arm B — **UNAMENDED, window open**. Stage 2 — **BLOCKED**.
 * Succession — **LOGGED, NOT PRIORITISED** (corrects D269 §5).
 * D268 bypasses — **OPEN, parked outside 048**. 048 C — open.
+
+---
+
+## D271 — The Stage-1 subject is NOT the request that once produced a VALID INSTANCE
+
+**2026-08-17. Step 1 of the frozen sequence is COMPLETE. Append-only
+correction to how D247's premise has been applied. No CI job, no repo
+mutation beyond this entry, no model call, no sealed material opened.**
+
+### 1. The measurement, and its provenance
+
+**GPT-REPORTED**, executed read-only against the GitHub artifacts, which
+this environment cannot fetch (blob host denied, `CONNECT` 403). The
+method was published with the result, as required:
+
+| | |
+|---|---|
+| historical VALID row | run `31844794230`, **seq 11**, `logical_call_id a308ea3d04b6492f`, `attempt_index 1` |
+| frozen Stage-1 subject | run `31894868473`, **seq 2** |
+| convention | one canonical JSON / SHA-256 over the common legacy-recorded request projection |
+| field set compared | `messages`, `model`, `temperature`, `response_format`, `tools`, `other_params`, `response_model` |
+| row selection | from the already-banked D245/D246 classification, by correlation id. **Not** by timing |
+
+**Verdict: `REQUEST_FIELDS_DIFFER`.** The difference is in `messages`.
+
+```
+run-24 VALID (seq 11)  messages  a6e5e25d28e8ee87539accfc65d7a22a44fec323d6185e6a1c29cb9ae9bfca00
+Stage-1 subject (seq 2) messages dc203ead5f9758fbf24898f736c2b7955bd3bee1650d3e73286988891db5410c
+
+common projection      run-24 VALID    863175320ccd0ed7d7d74a8642d868cd5bc6570fc533b5275e13efec179a9c8c
+                       Stage-1 subject 484bda931592965e3185b93d3e56a4db8d9ad9bb05a077839e69ba9b9b1f0858
+```
+
+### 2. Independently corroborated against our own banked table
+
+D245 printed 9-character `prompt~c` prefixes. GPT computed full SHA-256s
+under its own convention, in a different context, without reference to
+those prefixes. **They reproduce exactly:**
+
+```
+D245 attempt 1  SCHEMA ECHO    233.307s  dc203ead5  == first 9 of the STAGE-1 SUBJECT
+D245 attempt 2  SCHEMA ECHO     57.023s  a6e5e25d2  == first 9 of the run-24 VALID projection
+D245 attempt 4  VALID INSTANCE   6.449s  a6e5e25d2  == first 9 of the run-24 VALID projection
+```
+
+Two measurements, two instruments, two contexts, same values. My earlier
+caution that the 9-character and 12-character conventions could not be
+compared by eye was right to raise and is now resolved by computation
+rather than by assumption.
+
+### 3. Both truths, and they are different propositions
+
+**SUPPORTED — D247's within-run-24 premise.** Run-24 seq 6 and seq 11
+carry the *same entire* legacy-recorded common projection, and one
+echoed while the other validated. Stochastic class variation for a
+repeated request is established. D245/D246 stand.
+
+**DISPROVED — the stronger reading.** *"The exact request selected for
+Stage 1 previously produced both classes"* is **false on the recorded
+fields**. The Stage-1 subject matches run-24 **seq 2**
+(`logical_call_id 8c2541b22f4e4aa8`), which D245 classified **SCHEMA
+ECHO**. It does not match the VALID row.
+
+The legacy capture still cannot certify ABSENT/NULL/VALUE or positional
+completeness. **That no longer matters here:** a *known* difference in
+`messages` is sufficient to decide inequality. Unknown dimensions cannot
+rescue an established mismatch.
+
+### 4. A correction I owe the operator directly
+
+On 2026-08-15 I told him, and it went into the record's framing:
+
+> ~~*"This configuration has produced a valid instance at least once
+> historically. That makes the finding stochastic unreliability, not
+> deterministic failure."*~~
+
+**That was wrong as applied to the Stage-1 subject.** It rested on
+D247's premise, and the premise is about a *different* request. I had no
+way to check it from here and I said so; what I should not have done is
+lean on it while it was unverified. R1: I asserted across a gap I had
+already labelled.
+
+**The corrected count.** The Stage-1 frozen subject now has **eleven
+recorded observations and zero VALID INSTANCE**: one historical
+(run 24, seq 2, SCHEMA ECHO, 233.307 s) plus ten from Stage 1 (8 SCHEMA
+ECHO, 2 INSTANCE INVALID). That is a *stronger* negative result for this
+request than the one I described, not a weaker one.
+
+### 5. What is still UNKNOWN, and why it matters to Arm B
+
+**We do not know WHAT differs inside `messages`.** The hashes prove
+inequality; they say nothing about which part moved.
+
+This is load-bearing for the Stage-2 decision. If the difference is in
+the **schema presentation**, the historical data weakly suggests
+presentation correlates with outcome — which is Arm B's hypothesis. If
+the difference is in the **task input text**, the two rows summarise
+different documents, the outcome comparison across them licenses
+nothing about presentation, and D247's held-identical list already
+names *"the task input text"* as a controlled variable for exactly this
+reason.
+
+It is **request-side and therefore admissible now**. It is also
+confounded regardless: the projection that once validated also echoed,
+so no projection in the corpus has a clean record.
+
+**Not investigated. Flagged before the Arm B decision rather than
+after it.**
+
+### Status
+
+* **Step 1 — COMPLETE.** Run-24 cross-capture identity: `REQUEST_FIELDS_DIFFER`.
+* **D247 within-run-24 premise — SUPPORTED.** Cross-capture application
+  to the Stage-1 subject — **DISPROVED**.
+* Stage-1 subject: **11 observations, 0 VALID INSTANCE.**
+* Next: Arm B amendment decision → freeze Arm B → *then* inspect the
+  sealed Stage-1 detail and the original captured response.
+* Original response — **UNOPENED**. Stage-1 detail — **UNREAD**.
+  Stage 2 — **BLOCKED**. Succession — LOGGED NOT PRIORITISED. Three
+  bypasses — OPEN and parked. 048 C — open.
