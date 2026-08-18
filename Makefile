@@ -32,6 +32,7 @@ policy-check: lint-blocking
 	python3 scripts/security/hygiene_survey.py --gate
 	python3 scripts/security/check_ci_tolerations.py
 	python3 scripts/test_capture_trigger_paths.py
+	python3 scripts/test_declared_prerequisites.py
 	python3 scripts/security/check_workflow_filters.py
 	python3 scripts/security/check_workflow_outputs.py
 	python3 scripts/security/check_dockerfile_flags.py
@@ -1079,6 +1080,13 @@ test-stage1-replay:
 # one outside it does not.
 test-invocation-identity:
 	python3 scripts/test_invocation_identity.py
+
+# D268. Nothing is true because it was true last time. A depends_on
+# condition is a record of intent; it becomes protection only where
+# something honours it. Earned by run 31906667051, where the condition
+# was declared in compose and bypassed by --no-deps at the call site.
+test-declared-prerequisites:
+	python3 scripts/test_declared_prerequisites.py
 
 # D265. A healthy server is not an available model: attempt 2 sent ten
 # requests 0.49s after the model-pull container started and got ten

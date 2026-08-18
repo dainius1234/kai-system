@@ -9,6 +9,7 @@ on:
       # The suites this workflow runs are its inputs too; a change that
       # weakened one would otherwise not cause the workflow to run it.
       - 'scripts/test_capture_trigger_paths.py'
+      - 'scripts/test_declared_prerequisites.py'
   pull_request:
     paths:
       - 'docker-compose*.yml'
@@ -59,6 +60,14 @@ jobs:
       # author-invoked check with an unproven calibration is a comfort.
       - name: Live-capture trigger check calibration
         run: python scripts/test_capture_trigger_paths.py
+
+      # D268. `nothing is true because it was true last time`, in its one
+      # decidable form. The report itself is not enforcing yet -- it has
+      # open findings awaiting judgement -- but its calibration runs here
+      # so the instrument cannot quietly stop being able to fail while
+      # those findings are still open.
+      - name: Declared-prerequisite gate calibration
+        run: python scripts/test_declared_prerequisites.py
 
       - name: Port binding check
         run: python scripts/security/check_port_bindings.py

@@ -19071,3 +19071,133 @@ sealed artifact.
 * **Original selected response — UNOPENED. Stage 2 — BLOCKED.
   Ownership — NOT MOVED by this result beyond D247's stated bound.
   048 C — still open.**
+
+---
+
+## D268 — The doctrine's spine, named and then enforced
+
+**2026-08-17. Authorised scope: doctrine + one new instrument. No live
+model, no Stage-1 trigger, no Attempt 4. `kai-pm/STAGE1_GO` untouched.**
+
+The operator named the principle the other 27 rules had been circling:
+
+> **Nothing is true because it was true last time.** Thor's hammer was
+> never inherited — he had to be worthy of it every time he picked it up.
+
+Checked before writing: **that sentence existed nowhere.** 154 lines of
+doctrine, 27 rules, every one of them an *instance* of it, and the spine
+unnamed. It is now `ENGINEERING_DOCTRINE.md` §0.0.
+
+### 1. Why a document was not enough
+
+Stating it and stopping would have been the defect itself. A principle
+that lives only in a file is a declaration that was true when written —
+precisely the shape that cost Attempt 2 ten empty executions.
+
+So it has a decidable form and an instrument:
+
+> **A declared prerequisite must be IN FORCE where the service is
+> started, not merely declared.**
+
+`scripts/security/check_declared_prerequisites.py` derives its
+denominator from the tree (R5): every `depends_on` condition in every
+compose file × every `--no-deps` execution site in workflows, shell
+scripts and the Makefile. A site that bypasses a declared condition must
+say **which** condition and **what compensates**, with an owner and a
+review date — the shape `check_ci_tolerations.py` already proves works.
+
+**It does not ban `--no-deps`**, deliberately. Two of the three Stage-1
+bypasses are correct: the output preflight and the model-readiness probe
+must not start the stack. Banning the flag would be a scope wider than
+reality, which reports failure over things that are right — the inverted
+form of this programme's one finding.
+
+### 2. Measured, before anything was fixed (R4)
+
+```
+46 services carry depends_on conditions  (79 healthy · 6 completed · 5 started)
+30 compose run/up invocations across workflows, scripts, Makefile
+ 6 use --no-deps
+ 3 declared and accounted for   (stage1-replay.yml, all memu-graph)
+ 3 UNDECLARED — a finding, see §4
+```
+
+### 3. Two defects in the instrument, found by running it
+
+Both are this programme's one finding, in an instrument built to catch
+that finding, within twenty minutes of naming it:
+
+* **Too generous.** The first measurement printed `none declared` for
+  sites whose compose file is `-f "$COMPOSE_FILE"`. That is not zero —
+  it is *unresolved*, wearing the clothes of clean. Repaired: unknown is
+  reported as UNRESOLVED, counted separately, and never folded into the
+  clean total. `COMPOSE_FILE="docker-compose.minimal.yml"` is a plain
+  literal and now resolves; anything built from another variable stays
+  unknown rather than being guessed at.
+* **Too narrow.** It resolved a site's service against the services that
+  *have* conditions, so a service with none read as unresolvable instead
+  of trivially clean. Repaired: the service set is every service in every
+  compose file.
+
+### 4. A finding, NOT declared away
+
+With both repairs, the instrument immediately found three undeclared
+bypasses **outside the file that earned it**:
+
+```
+scripts/security/verify_identity_in_containers.sh:85
+    agentic --no-deps skips
+        memu-core   : service_healthy
+        redis       : service_healthy
+        ollama-pull : service_completed_successfully
+```
+
+These are **open**, not papered over. Declaring them myself would be the
+easy move and the wrong one: Programme Rule 7 says a finding is closed by
+an evidence-backed decision, not by the person who found it writing a
+reason next to it. They are almost certainly legitimate — that script
+verifies crypto inside images and has no business starting a stack — but
+"almost certainly" is not a judgement, and the operator makes it.
+
+### 5. Why the report is not yet a gate
+
+`check_declared_prerequisites` is registered as a **REPORT**, not in
+`policy-check`. Wiring a red gate into the build would force §4 to be
+declared away rather than decided — the tree would demand the answer
+before the question was considered. It is promoted to an enforcing GATE
+the moment those three are judged.
+
+**Its calibration enforces regardless.** `test_declared_prerequisites`
+runs in `policy-check` and in `policy-checks.yml`, because an instrument
+with open findings is exactly the one whose ability to fail must not
+quietly lapse.
+
+### 6. Calibration
+
+`scripts/test_declared_prerequisites.py` — **25 passed / 0 failed**, 5
+scenarios, against **fixture repositories built on disk** rather than
+stubbed functions, because the defect being guarded lives in reading real
+files. All three ways to be wrong are exercised: too narrow, too
+generous, too wide.
+
+One brittleness was found and removed during writing: the first draft
+asserted that the §4 finding *appears* in the live output, which would
+have failed the suite the moment that finding was judged — a test that
+pressures the operator to leave a finding open. Replaced with the
+structural property: whatever is reported must name the condition it
+skipped, which holds whether the list is empty or not.
+
+The registry meta-check rejected three of my declarations in a row:
+a GATE nothing invoked, a phantom module, and an `in_policy_check` /
+`in_workflows` pair that disagreed with the wiring. All three corrected
+before green.
+
+`make policy-check` — green.
+
+### Status
+
+* **Doctrine §0.0 — recorded, and enforced by an instrument rather than
+  by good intentions.**
+* **3 undeclared bypasses — OPEN, awaiting the operator's judgement.**
+* Stage 1 — MEASURED (D267), unchanged. Original captured response —
+  still UNOPENED. Stage 2 — BLOCKED. 048 C — open.

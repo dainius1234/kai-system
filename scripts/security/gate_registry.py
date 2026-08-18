@@ -1219,6 +1219,63 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=False,
          in_workflows=("stage1-replay.yml",),
          findings=("KAI-GATE-048",)),
+    # D268. The doctrine's spine, in its one decidable form. Earned by
+    # run 31906667051: the condition was declared and bypassed.
+    Gate(module="check_declared_prerequisites",
+         kind=REPORT,
+         summary="a depends_on condition must be IN FORCE where the "
+                 "service is started, not merely declared: every "
+                 "--no-deps site is resolved against the compose "
+                 "declarations it skips, an undeclared bypass fails, a "
+                 "compose file that cannot be resolved is UNRESOLVED "
+                 "rather than clean, and a service with no conditions is "
+                 "trivially clean rather than unresolvable",
+         inputs=(),
+         denominator=r"inspected: \d+ bypass site\(s\) against \d+ "
+                     r"declared condition\(s\)",
+         probe=False,
+         probe_skip_reason="it reads compose files and execution sites "
+                           "from the tree, so a probe would need a second "
+                           "tree to read; both directions are calibrated "
+                           "against fixture repositories built on disk in "
+                           "scripts/test_declared_prerequisites.py",
+         proven_by="scripts/test_declared_prerequisites.py",
+         calibrated_by="scripts/test_declared_prerequisites.py",
+         # REPORT, not GATE, and deliberately: it currently reports 3
+         # undeclared bypasses in verify_identity_in_containers.sh, which
+         # are a finding awaiting the operator's judgement (Programme
+         # Rule 7). Wiring a red gate into policy-check would force them
+         # to be declared away rather than decided. It is promoted to a
+         # GATE, in_policy_check, the moment they are judged. Until then
+         # calling it enforcing would be the claim this file exists to
+         # catch: a declaration that is not in force.
+         # NOT enforcing yet: it currently reports 3 undeclared bypasses
+         # in verify_identity_in_containers.sh, which are a finding
+         # awaiting the operator's judgement (Programme Rule 7). Wiring a
+         # red gate into policy-check would force them to be declared
+         # away rather than decided. It becomes enforcing when they are.
+         in_policy_check=False,
+         in_workflows=(),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_declared_prerequisites",
+         kind=GATE,
+         summary="the gate must be neither too narrow, too generous nor "
+                 "too wide: a service with no conditions is clean rather "
+                 "than unresolvable, an unresolvable compose file is "
+                 "UNRESOLVED rather than clean, a declaration for the "
+                 "wrong dependency does not cover a bypass, and "
+                 "--no-deps is never banned outright",
+         inputs=(),
+         denominator=r"inspected: \d+ declared-prerequisite scenario\(s\) "
+                     r"across \d+ gate",
+         proven_by="scripts/test_declared_prerequisites.py",
+         calibrated_by="scripts/test_declared_prerequisites.py",
+         # The CALIBRATION enforces even while the report it proves does
+         # not. An instrument with open findings is exactly the one whose
+         # ability to fail must not quietly lapse.
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-048",)),
     Gate(module="select_replay_subject",
          kind=REPORT,
          summary="which captured request becomes the Stage-1 replay "

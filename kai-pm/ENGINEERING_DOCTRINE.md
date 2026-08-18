@@ -17,6 +17,54 @@ The operator's framing, which is the point of the whole document:
 
 ---
 
+## 0.0 Nothing is true because it was true last time
+
+**Every claim is re-earned at the moment it is relied upon.** A fact
+established in a previous run, a previous commit or a previous
+conversation is a **record of a past measurement**, never a licence for a
+present one.
+
+The operator's framing, which is the one to keep:
+
+> Thor's hammer was never inherited. Odin did not hand it over — Thor had
+> to be worthy of it, **every single time he picked it up.**
+
+This is the spine the rest of this document hangs from. R1 is this rule
+applied to assertions; R2 to contingencies; R5 to denominators; R11 to
+prerequisites. It had never been stated on its own, which is why it kept
+being rediscovered one venue at a time.
+
+**Earned by, in one week:**
+
+* `docker-compose.full.yml` declared
+  `memu-graph → ollama-pull: service_completed_successfully`. That was
+  true in the file and **not in force at runtime**, because the replay's
+  `--no-deps` told Compose to ignore it. Ten replays hit a model that was
+  not there and the run went green. A declaration that reads as
+  protection while not being enforced is worse than a missing one,
+  because everyone who greps for it stops looking. (D265, D266)
+* The gate registry's `in_workflows` was accurate for every gate written
+  before mine and false for the one I added the same hour.
+  Correct-last-time is not correct-now. (D266)
+* Attempt 1 froze the request correctly. That licensed nothing about
+  Attempt 3 — which is why `--verify-request-hash` exists and why S1
+  re-selection runs live on every attempt instead of trusting the
+  frozen record. (D264, D267)
+
+**The tell, in flight:** *"we already established that."* The moment a
+claim is load-bearing because of something earlier rather than something
+now — run it again.
+
+**And the corollary that makes it more than a slogan:** a principle that
+lives only in a document is itself a declaration that was true when
+written. This one is enforced by
+`scripts/security/check_declared_prerequisites.py`, which requires every
+site that bypasses a declared condition to say which condition it skips
+and what compensates for it. Without that, the rule would violate itself
+on the day it was written. (D268)
+
+---
+
 ## 0. Proactive engineering duty
 
 **If you see a materially safer, stronger, more correct, more
