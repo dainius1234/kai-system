@@ -10,6 +10,8 @@ on:
       # weakened one would otherwise not cause the workflow to run it.
       - 'scripts/test_capture_trigger_paths.py'
       - 'scripts/test_declared_prerequisites.py'
+      - 'scripts/test_doctrine_integrity.py'
+      - 'kai-pm/ENGINEERING_DOCTRINE.md'
   pull_request:
     paths:
       - 'docker-compose*.yml'
@@ -68,6 +70,16 @@ jobs:
       # those findings are still open.
       - name: Declared-prerequisite gate calibration
         run: python scripts/test_declared_prerequisites.py
+
+      # D272 / rule 28. Two records of the same 27 rules diverged and the
+      # casualty was rule 4, the anti-drift rule. This publishes the
+      # fingerprint an external copy must reproduce, and fails on a gap,
+      # a duplicate or a rule with no recorded provenance.
+      - name: Doctrine integrity and fingerprint
+        run: python scripts/security/check_doctrine_integrity.py
+
+      - name: Doctrine integrity gate calibration
+        run: python scripts/test_doctrine_integrity.py
 
       - name: Port binding check
         run: python scripts/security/check_port_bindings.py

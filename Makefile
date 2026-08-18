@@ -33,6 +33,8 @@ policy-check: lint-blocking
 	python3 scripts/security/check_ci_tolerations.py
 	python3 scripts/test_capture_trigger_paths.py
 	python3 scripts/test_declared_prerequisites.py
+	python3 scripts/security/check_doctrine_integrity.py
+	python3 scripts/test_doctrine_integrity.py
 	python3 scripts/security/check_workflow_filters.py
 	python3 scripts/security/check_workflow_outputs.py
 	python3 scripts/security/check_dockerfile_flags.py
@@ -1080,6 +1082,12 @@ test-stage1-replay:
 # one outside it does not.
 test-invocation-identity:
 	python3 scripts/test_invocation_identity.py
+
+# D272 / rule 28. Governing material must be checkable from the work it
+# governs. Prints the fingerprint any external copy of the doctrine must
+# reproduce; `--quiet` emits that value alone, for reconciliation.
+doctrine-fingerprint:
+	python3 scripts/security/check_doctrine_integrity.py --quiet
 
 # D268. Nothing is true because it was true last time. A depends_on
 # condition is a record of intent; it becomes protection only where

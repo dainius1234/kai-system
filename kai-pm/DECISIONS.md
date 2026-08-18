@@ -19615,3 +19615,126 @@ the external record is the PM thread's action, not mine.
 * Stage 1 — MEASURED. Step 1 — COMPLETE (D271). Arm B — UNAMENDED,
   decision pending. Original response — UNOPENED. Stage 2 — BLOCKED.
   048 C — open.
+
+---
+
+## D273 — Rule 28, and the doctrine gets a fingerprint
+
+**2026-08-17. Scope stated in the ASK this time, not the artefact
+(D270 §4's lesson): this is work OUTSIDE 048, in the same category as
+D268, and the operator authorised it explicitly — *"as before, after
+learning something, log new rule and implement"*. It is not Stage-1
+evidence and must not broaden 048.**
+
+### 1. The rule
+
+Added to `kai-pm/ENGINEERING_DOCTRINE.md` under a new heading,
+*Governing material*:
+
+> **28. Governing material must be checkable from the work it governs.**
+> A rule, priority order or constraint that binds this repository must
+> exist as an artefact **inside** it. A copy held elsewhere is a
+> convenience, never the canon, and every copy must be reconcilable by
+> **mechanical comparison** rather than by reading. Where two records
+> disagree, the one both parties can open wins.
+
+**Earned by two instances in two days:**
+
+* the programme's binding order of work — 048 → A-4 →
+  Assurance/Kingsman — exists nowhere in the tree (D270 §2);
+* the external doctrine copy was silently missing **rule 4**, the
+  anti-drift rule itself, while reaching 27 by splitting rule 26, so
+  "Rule 17" named different rules in each record (D272).
+
+Nobody was at fault in either case, which is the point. **Nobody could
+see it.**
+
+### 2. The implementation, because a stated rule is not an enforced one
+
+`scripts/security/check_doctrine_integrity.py` enforces the decidable
+half:
+
+* rules **contiguous 1..N**, no gap, no duplicate;
+* every rule carries **provenance** in the earned-by table — this file's
+  own standard is that each rule was earned by a specific failure, so a
+  rule with no recorded failure is an opinion;
+* the population is scoped to the **rules section**, derived from the
+  document's own headings;
+* and it publishes a **fingerprint**.
+
+The fingerprint is the part that addresses the actual failure. A gap
+check catches a rule dropped *inside* this file. Only a fingerprint
+catches a rule dropped from *somebody else's copy*, which is what
+happened. `make doctrine-fingerprint` emits that value alone.
+
+**Current value, 28 rules:**
+
+```
+f79ae859ccd13dca76739bc0d42a4bad969c1060fef63bb595633c83a5add039
+```
+
+Any external copy must reproduce it. If it cannot, the copy has drifted
+and **the file wins** — it is the artefact both parties can open.
+
+**Stated limit:** this cannot reach the external record. It does not
+prove the PM copy is correct; it produces the value that copy must
+reproduce. Reconciliation stays a human act, now performed against a
+machine-checkable target instead of against prose.
+
+### 3. Three defects in the instrument, all the same shape
+
+Every one is this programme's single finding — *a population that is not
+the population the check's name claims* — inside the check written to
+catch it. Two were found by running it, one by the calibration.
+
+1. **Too narrow.** The first draft matched single-line bold openers
+   only, "found" 23 of 27 rules and reported four phantom gaps. Four
+   rules simply wrap across lines.
+2. **Too wide.** The second scanned the whole file and reported rule 7
+   duplicated, because §0's proactive-duty **step** 7 is also a bold
+   numbered item. Fixed by deriving the boundary from the document's own
+   headings rather than by filtering ids — filtering would have hidden
+   it.
+3. **It crashed while reporting.** `--file` pointing outside the
+   repository raised `ValueError` from `relative_to()` before any
+   verdict was printed. Rule 6's defect, in the reporter. Found only
+   because the calibration exercises the shipped CLI with a fixture path
+   (rule 17).
+
+### 4. Calibration
+
+`scripts/test_doctrine_integrity.py` — **23 passed / 0 failed**, 5
+scenarios, against doctrine files written to disk and parsed by the
+shipped code, because the defect being guarded lives in reading a real
+document. Both of the gate's own bugs are now permanent fixtures:
+
+* a **dropped** rule fails, naming the id — D272's actual failure;
+* a **split** rule fails as a duplicate — D272's other half;
+* §0's bold step 7 is **not** counted; a rule whose bold text **wraps**
+  still is; a file with no rules section **refuses** rather than passing
+  empty;
+* the fingerprint **moves** on a reworded, dropped or renumbered rule
+  and **stays still** for prose outside them — otherwise every edit
+  invalidates every external copy and the value becomes noise;
+* `--quiet` emits exactly one line, and it is that value.
+
+Registered, in `policy-check` and in `policy-checks.yml`, with
+`ENGINEERING_DOCTRINE.md` added to that workflow's paths filter so a
+change to the doctrine runs its own check. `make policy-check` green.
+Gate registry green after rejecting three of my declarations.
+
+### 5. Not done
+
+No change to `CLAUDE.md` or `data/SOUL.md`. No external record touched —
+reconciling it is the PM thread's action. No finding closed. 048
+untouched.
+
+### Status
+
+* **Rule 28 — recorded and enforced.** Doctrine: **28 rules**,
+  fingerprint `f79ae859ccd13dca76739bc0d42a4bad969c1060fef63bb595633c83a5add039`.
+* **External copy — still drifted** (rule 4 absent, rule 26 split).
+  Reconciliation outstanding, now with a target.
+* Stage 1 — MEASURED. Step 1 — COMPLETE (D271). Arm B — UNAMENDED,
+  decision pending. Original response — UNOPENED. Stage 2 — BLOCKED.
+  048 C — open.

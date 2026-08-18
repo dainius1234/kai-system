@@ -174,6 +174,15 @@ Proactive engineering is not autonomous scope expansion.
     standards and return **evidence, not confidence**.
 26. **No consequential mechanism self-approves or self-verifies.**
 
+### Governing material
+
+28. **Governing material must be checkable from the work it governs.** A
+    rule, priority order or constraint that binds this repository must
+    exist as an artefact **inside** it. A copy held elsewhere is a
+    convenience, never the canon, and every copy must be reconcilable by
+    **mechanical comparison** rather than by reading. Where two records
+    disagree, the one both parties can open wins.
+
 ---
 
 ## Where each rule was earned
@@ -200,3 +209,4 @@ Proactive engineering is not autonomous scope expansion.
 | 22 | the ~15.8KB Actions log window, three times |
 | 23 | disproven claims struck through rather than deleted, so the pattern stays visible |
 | 25, 26 | a meta-check that wanted to probe a key generator to read its own denominator |
+| 28 | the programme's binding order of work existed nowhere in the tree (D270 §2); and the external doctrine copy was silently missing rule 4 — the anti-drift rule itself — while reaching 27 by splitting rule 26, so "Rule 17" named different rules in each record (D272) |

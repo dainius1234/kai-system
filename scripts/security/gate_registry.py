@@ -1276,6 +1276,41 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-048",)),
+    # D273 / rule 28. Two records of the doctrine diverged and the
+    # casualty was rule 4 -- the anti-drift rule itself.
+    Gate(module="check_doctrine_integrity",
+         kind=GATE,
+         summary="the doctrine must stay mechanically comparable: rules "
+                 "numbered contiguously with no gap and no duplicate, "
+                 "every rule carrying provenance in the earned-by table, "
+                 "the population scoped to the rules section so a bold "
+                 "numbered item elsewhere is not counted, and a "
+                 "fingerprint published that any external copy must "
+                 "reproduce",
+         inputs=(),
+         denominator=r"inspected: \d+ rule\(s\) across \d+ provenance "
+                     r"entry\(s\)",
+         proven_by="scripts/test_doctrine_integrity.py",
+         calibrated_by="scripts/test_doctrine_integrity.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_doctrine_integrity",
+         kind=GATE,
+         summary="the integrity gate must catch a dropped rule, a split "
+                 "rule and a missing rules section, must NOT count "
+                 "section 0's bold numbered step as a rule, must find a "
+                 "rule whose bold statement wraps, and its fingerprint "
+                 "must move on a reworded, dropped or renumbered rule "
+                 "while staying still for prose outside them",
+         inputs=(),
+         denominator=r"inspected: \d+ doctrine-integrity scenario\(s\) "
+                     r"across \d+ gate",
+         proven_by="scripts/test_doctrine_integrity.py",
+         calibrated_by="scripts/test_doctrine_integrity.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-048",)),
     Gate(module="select_replay_subject",
          kind=REPORT,
          summary="which captured request becomes the Stage-1 replay "
