@@ -19291,3 +19291,112 @@ being answered by this entry.**
 * Stage 1 — MEASURED (D267). Stage 2 — BLOCKED. Original captured
   response — UNOPENED. Run-24 request identity — UNVERIFIED. 3
   undeclared bypasses (D268 §4) — OPEN. 048 C — open.
+
+---
+
+## D270 — Corrections to D269 §5, and the governance trail GPT asked for
+
+**2026-08-17. Append-only correction. D269 stands as written; this entry
+supersedes one recommendation inside it and records three governance
+facts the PM thread raised. No new work is authorised by this entry.**
+
+### 1. CORRECTION — D269 §5's priority recommendation was wrong
+
+D269 §5 recorded my recommendation that succession design *"arguably
+outranks Stage 2"*. ~~That recommendation stands.~~ **It does not.**
+
+The programme sequence is **finish 048 → A-4 provenance → Assurance /
+Kingsman integration**, with no bolt-on architecture while those
+foundations are unfinished. That order was given to me directly by the
+operator on 2026-08-17:
+
+> *"And keep the wider rule in force: finish 048 before A-4, Kingsman
+> integration, repo consolidation or the assurance upgrade work begins."*
+
+I was told this and then recommended against it eight messages later.
+The requirement in D269 is real and the gap is real; the **priority
+claim attached to it was not mine to make**, and it contradicted a
+standing instruction I had already received.
+
+**Corrected position:** succession/continuity is a legitimate future
+Kingsman/Assurance requirement. It is **LOGGED, NOT PRIORITISED**, and
+it does not outrank Stage 2 unless the operator explicitly changes
+programme priority. D269's §4 question list remains valid as a
+description of the gap.
+
+### 2. The programme lock is not in this repository
+
+Measured: `finish 048`, `A-4 provenance`, `no continual bolt-on` return
+**zero hits** across `kai-pm/`, `CLAUDE.md` and `docs/`. The governing
+priority order lives in the operator's external PM continuity record and
+in the PM thread, not in the tree.
+
+That is not an excuse — I was told it in conversation, which is binding.
+But it is the **same class of gap as D269 itself**: the binding order of
+work is not an artefact anyone can open. Any agent starting from this
+repository alone cannot discover it. Logged as a fact, not a complaint.
+
+### 3. Order deviation, acknowledged
+
+The frozen sequence was: **(1) run-24 request-identity check, then
+(2) recover the untouched D247 Stage-2 design.** I supplied (2) while
+(1) was still blocked.
+
+The PM thread's assessment is accepted in full: not contamination —
+the sealed Stage-1 detail and the original response were not opened and
+Arm B is untouched — but a **real order deviation**, and it must not
+become a reason to skip step 1.
+
+The reason, recorded rather than offered as justification: step 1 cannot
+be done from this environment at all (artifact blob host denied at the
+proxy, `CONNECT` 403), so waiting for it would have blocked step 2
+indefinitely. That explains the deviation; it does not authorise it.
+**Step 1 remains outstanding and blocking.**
+
+### 4. D268 authorisation trail, since the PM thread asked
+
+The question was whether D268 was explicitly authorised or was silent
+scope expansion. The record, verbatim from the session:
+
+* I surfaced the fork **before** building: *"One fork, your call: the
+  closeout job is still the locked unit. This gate is the challenge you
+  just accepted. I'd do the gate now while it's hot and cheap, then
+  closeout... Say which and I'm moving."*
+* The operator answered: *"challenge accepted"*, and then asked *"Can I
+  talk while you work on it?"* — which presupposes the build.
+
+**So it was authorised, and the fork was surfaced first.** The residue,
+stated honestly: I surfaced the fork between *two units of work*, not
+the fact that one of them fell **outside 048's scope**. That boundary
+appears in D268's own header — *"Authorised scope: doctrine + one new
+instrument"* — but it was written **after** the choice, not before it.
+Next time the scope boundary goes in the ask, not the artefact.
+
+### 5. D268's standing, per the PM thread and accepted
+
+* D268 is **separate work**. It is **not Stage-1 evidence** and must not
+  broaden 048. Its own header already says so.
+* The three undeclared `--no-deps` bypasses stay **OPEN / UNRESOLVED**,
+  parked outside 048 for later adjudication.
+* `check_declared_prerequisites` stays a **REPORT**. It is **not** to be
+  promoted to an enforcing gate now — deferred to the consolidation /
+  assurance work, unless one of those bypasses is shown to create an
+  immediate safety or authority defect. Nothing observed suggests it
+  does.
+
+### 6. Repo claims are CLAUDE-REPORTED
+
+The PM thread correctly labels live repo state as Claude-reported and
+not independently verified from its side. That caveat is accepted and
+should stay attached. Current state as reported here: **HEAD `56aa757`**
+(D269) — note this has moved on from the `de7fc8b` quoted in the earlier
+brief — working tree clean, 0 uncommitted paths, `kai-pm/STAGE1_GO`
+untouched since `b45330b`.
+
+### Status — unchanged by this entry
+
+* Stage 1 — MEASURED (D267). Run-24 byte-identity — **UNVERIFIED**.
+  Original captured response — **UNOPENED**. Stage-1 detail — **UNREAD**.
+  Arm B — **UNAMENDED, window open**. Stage 2 — **BLOCKED**.
+* Succession — **LOGGED, NOT PRIORITISED** (corrects D269 §5).
+* D268 bypasses — **OPEN, parked outside 048**. 048 C — open.
