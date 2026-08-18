@@ -19520,3 +19520,98 @@ after it.**
 * Original response — **UNOPENED**. Stage-1 detail — **UNREAD**.
   Stage 2 — **BLOCKED**. Succession — LOGGED NOT PRIORITISED. Three
   bypasses — OPEN and parked. 048 C — open.
+
+---
+
+## D272 — Two records of the doctrine diverged, and the drift dropped rule 4
+
+**2026-08-17. Record integrity finding. No rule is changed by this
+entry; `kai-pm/ENGINEERING_DOCTRINE.md` is unmodified and remains
+canonical.**
+
+### 1. What was asked, and what was already true
+
+The PM thread supplied a 27-rule list reconstructed from its own
+continuity record and asked to "log rule 27".
+
+**Rule 27 requires no logging. It is already in the canonical file,**
+and the PM thread's wording of it is faithful:
+
+> 27. **UNKNOWN remains UNKNOWN until evidence moves it.**
+
+Verified against `kai-pm/ENGINEERING_DOCTRINE.md`, which contains all 27
+rules, ids 1..27, no gaps.
+
+### 2. The divergence
+
+The PM thread's list is **missing rule 4** and reaches 27 by **splitting
+rule 26 into two**.
+
+| canonical | PM list |
+|---|---|
+| 4. **LOOKUP → VERIFY SUBJECT → USE IDENTIFIER.** Never use a remembered run id, SHA, artifact or subject where an authoritative lookup exists. | **ABSENT** |
+| 26. No consequential mechanism self-approves **or self-verifies**. | split into 25 (self-approval) + 26 (self-verification) |
+
+Consequences:
+
+* every rule from position 4 onward is **off by one** between the two
+  records, so "Rule 17" names different rules in each;
+* the PM thread's own provenance note — *"Rules 17 and 18 were added
+  during that session"* — refers to the **canonical** 17 and 18 (shipped
+  entry point, mutation cardinality), which are **16 and 17** in its own
+  list. The note is internally inconsistent with the list it annotates,
+  which is a second, independent signal of the drift.
+
+### 3. Why this one matters more than a numbering slip
+
+**The rule that went missing is the rule about not trusting remembered
+identifiers.**
+
+Rule 4 was earned by *"five 404s from guessed run ids"*. It governs
+precisely the traffic between these two records: run ids, artifact ids,
+commit shas and hashes, exchanged between two parties that cannot verify
+each other's environment. It is the rule the PM thread most needs, being
+the party that fetches artifacts this environment cannot reach — and it
+is the one absent from its canon.
+
+**This is §0.0 turned on the doctrine itself.** A record that was true
+when written stopped being true, quietly, and the specific casualty was
+the anti-drift rule. Nothing detected it because nothing compares the
+two records; the divergence surfaced only because the list was pasted
+back and read against the file.
+
+No fault is assigned. Reconstruction from a summary is a lossy
+operation, the PM thread said plainly that its text was a faithful
+reconstruction rather than byte-for-byte, and that honesty is what made
+the comparison possible.
+
+### 4. What follows
+
+* **`kai-pm/ENGINEERING_DOCTRINE.md` is canonical.** Where the records
+  disagree, the file wins, because it is the artefact both parties can
+  open.
+* **Rule 4 must be restored to the PM continuity record**, and rules
+  25/26 recombined, or the numbering re-synchronised deliberately with
+  the split declared.
+* **Cross-references should cite rule TEXT, not number**, until the two
+  records are reconciled. "Rule 17" is currently ambiguous across
+  threads.
+* This is a second instance of the class D270 §2 recorded: **binding
+  material that lives outside the tree cannot be checked by anyone
+  reading the tree.** The programme lock had the same shape. Two
+  instances is a pattern, not an incident.
+
+### 5. Not done
+
+No rule added, removed, renumbered or reworded. No change to
+`ENGINEERING_DOCTRINE.md`, `CLAUDE.md` or `data/SOUL.md`. Reconciling
+the external record is the PM thread's action, not mine.
+
+### Status
+
+* **Doctrine file — INTACT, 27 rules, canonical.**
+* **External continuity copy — DRIFTED: rule 4 absent, rule 26 split,
+  numbering off by one from position 4.**
+* Stage 1 — MEASURED. Step 1 — COMPLETE (D271). Arm B — UNAMENDED,
+  decision pending. Original response — UNOPENED. Stage 2 — BLOCKED.
+  048 C — open.
