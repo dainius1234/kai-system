@@ -19864,3 +19864,111 @@ Prose outside the rules section deliberately does not move the value.
   confounded with model capability.
 * Original response — UNOPENED. Sealed Stage-1 detail — UNREAD. Stage 2
   — NOT AUTHORISED. 048 C — open.
+
+---
+
+## D275 — ARM B IS FROZEN. Unchanged, and now mechanically checkable.
+
+**2026-08-17. OPERATOR ACT, relayed and recorded. Dainius:
+*"FREEZE D247 ARM B — UNCHANGED."* The amendment window that D247 opened
+is CLOSED. No amendment is permitted from this entry onward, by anyone,
+for any reason, including a convenient one.**
+
+### 1. What is frozen
+
+D247's Stage-2 design, **exactly as pre-registered on 2026-08-14**, with
+no edit of any kind. Both agents recommended freezing unchanged; the
+operator decided it. A recommendation from two agents was never the act.
+
+**Arm B wording, verbatim and now closed:**
+
+> System: `You return one JSON object and nothing else. The object must
+> contain exactly these keys: <keys>. Each value must be the actual
+> content requested, not a description of it, not a type name, and not a
+> schema. Do not return the words "type", "properties", "required",
+> "$defs" or "title" as keys. Here is the shape of a correct answer with
+> placeholder content: <one filled example object>.`
+
+`<keys>` and `<one filled example object>` are derived **mechanically**
+from the same pydantic model Arm A uses, so both arms demand the same
+output. That derivation is code, not a list kept beside the model (R5).
+
+### 2. "Unchanged" is now a computable claim, not an assertion
+
+D247's own sentence was *"subject to operator amendment before the first
+call and **to no amendment after it**."* Enforcing that required a way
+to detect an amendment. It now exists — the same shape as rule 28's
+doctrine fingerprint, applied to a frozen experiment.
+
+```
+STAGE-2 FROZEN DESIGN   (D247 §3-§5, 4,168 bytes)
+  e27bb25a655d944adcad468f01b8656774127714928932ab8840213df8301de2
+
+ARM B WORDING ONLY      (826 bytes)
+  9b7e77fc931ca5d556c5dd751fd22254ea33aa4c3ff13887805a3acd909157f6
+```
+
+**Recipe**, stated so it needs no code reading — the omission of which
+was rule 28's own defect two entries ago: take the region of D247
+between the named headings; normalise each line's whitespace to single
+spaces; join with `\n`; strip; UTF-8 encode; SHA-256; hex digest.
+
+Before Stage 2 executes, these values must be recomputed and must match.
+**If either has moved, Stage 2 does not run** — an amended design
+running under a frozen design's authority is the worst failure available
+to us, and it would be invisible without this.
+
+### 3. Bounds carried into the freeze, pre-registered
+
+Frozen alongside the design, so no outcome can be over-read later:
+
+* **If Arm B wins:** *"the Arm-B presentation package materially
+  improved compliance for this contract."* NOT "instance orientation
+  alone caused it". NOT "JSON Schema caused the defect". The
+  anti-schema wording is a **treatment component**, not an isolated
+  variable (D274 §4).
+* **If both arms echo:** presentation is not the differentiator *for
+  this contract*. **Contract complexity and model capability remain live
+  and confounded with each other** (D274 §3).
+* **Contract complexity is not separated by Stage 2 at all**, and D247
+  §4 never listed it. Separating it is a new pre-registered experiment.
+* **Model size stays bounded** by D247 §5's prohibition: not to be
+  resolved by swapping models.
+
+### 4. What happens next, and the one thing blocking it
+
+The frozen sequence says: **freeze → inspect the sealed Stage-1 detail
+and the original captured response → report → STOP.**
+
+The freeze is done. The inspection **cannot be performed from this
+environment**: both artifacts sit behind the blob host this shell is
+denied (`CONNECT` 403), the same limit recorded in D247 §1, D264 and
+D271.
+
+What must be read, now authorised:
+
+| | |
+|---|---|
+| sealed Stage-1 detail | artifact **9253313044** (run `31908872172`) — `stage1-classification.jsonl`, the 10 withheld explanations, and `stage1-replies.jsonl` |
+| original captured response | run `31894868473`, **seq 2**, `raw_response` — the request frozen as the Stage-1 subject |
+
+**Route:** the PM thread has demonstrated read-only artifact access
+twice, and it is lower scope than a CI job — no workflow, no repo
+mutation, no model. Same reasoning the operator already accepted for the
+run-24 comparison.
+
+**Condition, unchanged from D271:** publish the method with the result —
+which artifact, which row, which fields — so the reading is reproducible
+by description. A result nobody can re-derive is unbound, whichever side
+of the table produces it.
+
+**Stage 2 remains NOT AUTHORISED** and does not follow automatically
+from anything found in that inspection.
+
+### Status
+
+* **ARM B — FROZEN, UNCHANGED. Amendment window CLOSED.**
+  Design `e27bb25a…01de2` · Arm B wording `9b7e77fc…157f6`.
+* Post-freeze inspection — **AUTHORISED, NOT YET PERFORMED**, blocked on
+  artifact access this environment does not have.
+* Stage 2 — **NOT AUTHORISED.** 048 C — open. No finding closed.
