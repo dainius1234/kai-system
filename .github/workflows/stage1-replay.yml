@@ -22,6 +22,29 @@
 # or the docs cannot start a live experiment; adding or changing that one
 # file is an explicit, auditable act, and the commit that did it is the
 # record of who started the run and when.
+#
+# ── DO NOT "FIX" THE PATHS FILTER BY ADDING THIS JOB'S INPUTS ─────────
+#
+# Rule 9 says a gate's trigger conditions are part of the gate, and
+# commit 924a600 earned it: a repaired collector was absent from its own
+# workflow's filter and therefore fired nothing. Three workflows in this
+# repository consequently list every input they read — and each of them
+# also lists ITSELF, so editing them EXECUTES them.
+#
+# That is right for a repeatable measurement and WRONG here. This
+# workflow starts a live model as a one-shot pre-registered experiment
+# (D247). If `scripts/security/stage1_replay.py`, or the image-identity
+# collector added below, appeared in this filter, then editing an
+# instrument would dispatch the experiment — the exact "manufactured
+# evidence run" the freeze exists to prevent, and a reduced-denominator
+# rerun nobody authorised.
+#
+# The sentinel IS this job's trigger condition, and it satisfies rule 9
+# by being deliberately narrower than the input set. The compensating
+# control is that no instrument change can reach a model without a
+# separate, auditable commit to `kai-pm/STAGE1_GO`. Recorded here so the
+# next person to run a paths-coverage detector against this file reads
+# the reason before repairing the protection. (D278)
 name: Stage 1 exact-request replay (KAI-GATE-048 C)
 
 on:
@@ -137,6 +160,35 @@ jobs:
         run: |
           set -euo pipefail
           docker compose -f docker-compose.full.yml build memu-graph
+
+      # WHICH IMAGE ACTUALLY EXECUTED. D247 §6 item 10 requires every
+      # claim bound to "the exact tested tree, image and run id"; D277
+      # found the tree carried two of those three, for the whole of
+      # Stage 1. Immediately after the build, so the identity recorded is
+      # the one the replay is about to run — not one re-derived later.
+      #
+      # `--no-deps`-style caveats do not apply: this reads the image and
+      # starts nothing. It is observational, and R11 is enforced INSIDE
+      # the collector — a failed or empty inspect records UNRECORDED
+      # rather than an empty identity field.
+      #
+      # `continue-on-error`, deliberately. This step must not be able to
+      # abort the frozen experiment: the collector's exit 3 means "no
+      # image identity", which is a fact ABOUT THE EVIDENCE, not an
+      # adverse result about the subject (rule 5). The UNRECORDED row is
+      # written and uploaded either way, so the gap is visible in the
+      # artifact instead of being inferred from a workflow that stopped.
+      # ci-toleration: documented-skip
+      - name: Record the image identity that will execute
+        continue-on-error: true
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -uo pipefail
+          python3 scripts/security/collect_image_identity.py \
+            --compose-file docker-compose.full.yml \
+            --service memu-graph \
+            --out stage1-image-identity.jsonl
 
       # BEFORE the model service, because attempt 1 (run 31899571806)
       # discovered a PermissionError on its output file AFTER the stack
@@ -269,4 +321,5 @@ jobs:
             stage1-manifest.json
             stage1-replies.jsonl
             stage1-classification.jsonl
+            stage1-image-identity.jsonl
           if-no-files-found: warn

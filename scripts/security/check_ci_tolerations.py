@@ -560,6 +560,24 @@ DECLARED: Tuple[Toleration, ...] = (
     ),
     Toleration(
         workflow="stage1-replay.yml",
+        step="Record the image identity that will execute",
+        bucket=DOCUMENTED_SKIP,
+        reason="The image-identity collector is EVIDENCE COLLECTION about "
+               "the run, not a prerequisite of it. Doctrine rule 5: "
+               "measurement state and subject verdict are separate, so a "
+               "collector that cannot record an identity must not convert "
+               "itself into an adverse result about the replay. Its exit "
+               "3 means 'no image identity' -- and it still WRITES the "
+               "UNRECORDED row, which is uploaded with the artifacts, so "
+               "the gap is visible in the evidence rather than inferred "
+               "from a workflow that stopped. Nothing is skipped: the "
+               "collector starts nothing, sends nothing to a model, and "
+               "the frozen experiment is unaffected either way. (D278)",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="stage1-replay.yml",
         step="Free up runner disk space",
         bucket=DOCUMENTED_SKIP,
         reason="`sudo rm -rf ... || true` against the runner's "

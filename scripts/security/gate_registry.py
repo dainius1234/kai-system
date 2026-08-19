@@ -1311,6 +1311,49 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-048",)),
+    # D278 / D247 §6 item 10. The bar demanded tree, IMAGE and run id;
+    # nothing in the tree recorded an image identity (D277).
+    Gate(module="collect_image_identity",
+         kind=REPORT,
+         summary="which image actually executed, bound to the tree and "
+                 "run that produced it -- named DOCKER_LOCAL_IMAGE_ID "
+                 "rather than a digest, because a built-in-job image is "
+                 "never pushed and has no registry digest; RepoDigests "
+                 "kept as ABSENT/NULL/VALUE, and a failed, empty or "
+                 "Id-less inspect recorded as UNRECORDED rather than as "
+                 "an empty identity field",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ service\(s\), \d+ recorded, "
+                     r"\d+ UNRECORDED",
+         probe=False,
+         probe_skip_reason="needs a Docker daemon and a built image; this "
+                           "host has neither. Every path -- the recorded "
+                           "case, all three RepoDigests states and six "
+                           "refusals -- is asserted against the shipped "
+                           "CLI with an injected docker in "
+                           "scripts/test_image_identity.py",
+         proven_by="scripts/test_image_identity.py",
+         calibrated_by="scripts/test_image_identity.py",
+         in_policy_check=False,
+         in_workflows=("stage1-replay.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_image_identity",
+         kind=GATE,
+         summary="the collector must record an identity when one exists "
+                 "and REFUSE when one does not: a failed inspect, an "
+                 "inspect exiting 0 with no payload, a payload carrying "
+                 "no Id, a service resolving to two images and a compose "
+                 "resolution that names nothing must all read UNRECORDED "
+                 "with the prerequisite named, never an empty string; "
+                 "and ABSENT must not collapse into NULL",
+         inputs=(),
+         denominator=r"inspected: \d+ image-identity scenario\(s\) across "
+                     r"\d+ collector",
+         proven_by="scripts/test_image_identity.py",
+         calibrated_by="scripts/test_image_identity.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-048",)),
     Gate(module="select_replay_subject",
          kind=REPORT,
          summary="which captured request becomes the Stage-1 replay "

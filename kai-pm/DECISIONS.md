@@ -20612,3 +20612,211 @@ count; the D275 byte-count correction.
   still FLAGGED, NOT ADDED.
 * Programme lock in force: finish 048 before A-4, Kingsman integration,
   repo consolidation or the assurance upgrade.
+
+---
+
+## D279 — The image-identity collector: built, calibrated, wired to one workflow only
+
+**2026-08-18. AUTHORISED WORK, bounded exactly as instructed. Step 1 of
+the corrected sequence. Item 10 is NOT closed by this entry, deliberately.
+Item 8 not started. Stage 2 remains NOT AUTHORISED.**
+
+### 1. The authorisation, and its two boundaries
+
+Operator, via the PM thread: *"Implement one reusable image-identity
+collector designed for the five-workflow population, but wire it
+initially only into the Stage-2 execution path needed to unblock the
+frozen experiment. Do not claim Item 10 satisfied from that one
+integration."*
+
+And the boundary that matters more: *"fixing the evidence collector is
+not permission to change Arm B."*
+
+Both held. What was built is one module with no Stage-1 knowledge in it;
+what was **wired** is one step in `stage1-replay.yml`.
+
+### 2. The scope reasoning was verified, not accepted
+
+The PM thread's argument for narrow wiring was that several of the five
+workflows self-trigger when their own YAML changes, so "adding
+observation" would in fact *cause execution*. That is a factual claim
+about this tree and §0.0 says a correct-sounding claim is still a claim.
+Checked directly:
+
+| workflow | trigger | edit fires it? |
+|---|---|---|
+| `memu-graph-startup-proof.yml` | `paths:` includes **itself** | **YES** |
+| `p1-replay-completeness.yml` | `paths:` includes **itself** | **YES** |
+| `embedding-backend-proof.yml` | `paths:` includes **itself** | **YES** |
+| `core-tests.yml` | `push: branches: ["main", "claude/**"]`, **no paths filter at all** | **YES, on every push** |
+| `stage1-replay.yml` | `paths: [kai-pm/STAGE1_GO]` only | **NO** |
+
+**Confirmed on all five.** Editing four of them manufactures evidence
+runs; editing the fifth does not. The narrow wiring is not a compromise,
+it is the only option that does not fire the laboratory to install a
+thermometer.
+
+### 3. A doctrine conflict, resolved in writing rather than silently
+
+Rule 9 says a gate's trigger conditions are part of the gate, and commit
+`924a600` earned it: a repaired collector absent from its own workflow's
+filter fired nothing. The straightforward application of that rule here
+would add `collect_image_identity.py` — and `stage1_replay.py` — to
+`stage1-replay.yml`'s `paths:`.
+
+**That would be wrong, and dangerously so.** It would mean *editing an
+instrument dispatches a live one-shot experiment* — a manufactured
+evidence run, and a rerun of a frozen experiment nobody authorised.
+
+The resolution, now written into the workflow header so the next person
+running a paths-coverage detector reads the reason before "repairing"
+the protection: **the sentinel IS this job's trigger condition, and it
+satisfies rule 9 by being deliberately narrower than the input set.** The
+compensating control is that no instrument change can reach a model
+without a separate, auditable commit to `kai-pm/STAGE1_GO`.
+
+Rule 9 is right for a repeatable measurement. A one-shot pre-registered
+experiment inverts its cost, and the two cases needed distinguishing in
+the tree rather than in someone's memory.
+
+### 4. What it records, and the name it refuses to use
+
+`scripts/security/collect_image_identity.py`. The naming is the finding,
+not a detail:
+
+```
+identity_type      DOCKER_LOCAL_IMAGE_ID
+docker_image_id    sha256:...            <- NOT "image_digest"
+repo_digest_state  ABSENT | NULL | VALUE
+repo_digest        null | <registry digest>
+image_ref  service  commit_sha  tree_sha  run_id  platform
+identity_state     RECORDED | UNRECORDED
+```
+
+* **`image_digest` is not used anywhere**, and the calibration asserts
+  the field does not exist. These images are built in-job and never
+  pushed; a reader meeting `image_digest` in two years would take it for
+  an OCI manifest digest and believe the image is pullable. It is not.
+* **`repo_digest_state` is ABSENT / NULL / VALUE**, never an empty
+  string — doctrine rule 20. "Never pushed" (key present, list empty)
+  and "key absent" are different facts about provenance, and the
+  calibration proves they do not collapse.
+* **The bound is printed in every report**: *a local image ID proves
+  which image ran; it does not make that image independently
+  retrievable.* Sufficient for D247 §6 item 10, insufficient for release
+  provenance, and said out loud rather than left to be discovered.
+
+**The population is derived, not guessed (R5).** The caller names
+services; the image reference comes from `docker compose config --images`,
+which is client-side and needs no daemon. Every graph-path service here
+is build-only with **no `image:` key**, so a hand-written reference would
+have encoded a guess about Compose's `<project>-<service>` naming rule —
+correct until silently not.
+
+### 5. R11 inside the collector, and rule 5 outside it
+
+**Inside:** a failed inspect, an inspect exiting 0 with no payload, a
+payload carrying no `Id`, a compose resolution naming nothing, and a
+service resolving to two images all record **UNRECORDED** with the unmet
+prerequisite named. Never an empty identity field. An empty field reads
+as an answer; a table of blank identities looks like a table that was
+filled in.
+
+**Outside:** the workflow step is `continue-on-error: true`, declared in
+the toleration register with reason, owner and review date — the
+existing gate caught it undeclared and refused, correctly. The reasoning
+is doctrine rule 5: **measurement state and subject verdict are
+separate.** A collector that cannot record an identity must not convert
+itself into an adverse result about the replay. Its exit 3 still writes
+the UNRECORDED row, which is uploaded with the artifacts, so the gap is
+visible **in the evidence** rather than inferred from a workflow that
+stopped.
+
+### 6. Calibration — and the calibration's own defect, found by using it
+
+`scripts/test_image_identity.py`: **43 assertions, 9 scenarios, 0
+failed.** Every scenario drives the shipped CLI as a subprocess with a
+fake `docker` injected via `--docker` (rule 17), because this host has no
+daemon and a calibration that only runs where the subject runs never
+runs.
+
+**Proven able to fail (rule 15), by reinjection, not by assertion:**
+
+| defect reinjected | result |
+|---|---|
+| write `""` instead of refusing when there is no `Id` | 40 passed, **3 failed**, EXIT GATE: FAIL |
+| collapse `ABSENT` into `NULL` | 42 passed, **1 failed**, EXIT GATE: FAIL |
+| both reverted | 43 passed, 0 failed, PASS |
+
+**The first reinjection initially made the suite CRASH with a
+`KeyError`, not fail.** That is doctrine rule 6 — *a refusal must return
+a verdict; crashing while attempting to refuse is instrument failure* —
+living inside the calibration written to enforce it. Six unguarded
+dictionary indexings were the cause. Repaired, and the reinjection
+re-run: it now returns 40/3 and prints the offending empty identity in
+the failure detail.
+
+Worth stating plainly: the defect was found **because the reinjection
+was actually performed**. Had I asserted "the suite would catch this" —
+R1's exact tell — the crash would have shipped inside the instrument
+whose whole purpose is refusing cleanly.
+
+### 7. Wiring, and the four proofs taken afterwards
+
+Added to `stage1-replay.yml` immediately after `Build the image`, so the
+identity recorded is the one the replay is about to run rather than one
+re-derived later; `stage1-image-identity.jsonl` joins the uploaded
+artifact set. Registered as REPORT (`in_policy_check=False`,
+`in_workflows=("stage1-replay.yml",)`); its calibration is registered as
+a GATE and runs on every push via `policy-checks.yml` and `make
+policy-check`, so the collector's ability to refuse cannot lapse between
+experiments.
+
+| # | proof | result |
+|---|---|---|
+| 1 | model-facing invocation surface vs D263 baseline `9a53ee6` | **IDENTICAL** — 19 definitions, 7 in surface, `freeze dc588326b2dc`, `send_once 2f0c046ab75a` unmoved |
+| 2 | Stage-2 design fingerprint | `e27bb25a…01de2` **MATCH** |
+| 3 | Arm B wording fingerprint | `9b7e77fc…157f6` **MATCH** |
+| 4 | `kai-pm/STAGE1_GO` | untouched since `b45330b`; **no experiment dispatched** |
+
+`make policy-check` **EXIT 0**. Gate registry **89 declared, 89 found on
+disk** (87 before), I-1..I-7 hold. Doctrine fingerprint
+`f79ae859…add039` unchanged.
+
+### 8. Item 10 is NOT closed, and this is the honest count
+
+Instructed, and correct: *"Do not claim Item 10 satisfied from that one
+integration."*
+
+```
+item 10 population        5 workflows that build images
+wired with a collector    1  (stage1-replay.yml)
+remaining                 4  (memu-graph-startup-proof, core-tests,
+                              embedding-backend-proof, p1-replay-completeness)
+```
+
+**Item 10 remains MOVED BUT OPEN, at 1 of 5.** The four outstanding ones
+each fire on edit, so wiring them is a scheduling problem with an
+evidence cost, not a code problem — each execution must be accounted for
+before it is caused. `memu-graph-startup-proof.yml` is the one that
+matters most later, because it is the job that must eventually produce
+items 4, 6 and 7.
+
+**And what none of this has done:** no image identity has actually been
+*collected* yet. The collector is proven against a fake docker and has
+never met a real daemon. That is the one remaining live-only unknown,
+and it resolves on the next run of `stage1-replay.yml` — which is not
+being started here.
+
+### Status
+
+* **Image-identity collector — BUILT, CALIBRATED (43/0, 9 scenarios),
+  REINJECTION-PROVEN, WIRED to 1 of 5 workflows.**
+* **Item 10 — MOVED BUT OPEN at 1/5.** Not closed. Not claimed.
+* **Arm B and D247 §§3-5 — UNTOUCHED and re-verified by fingerprint.**
+* **Model-facing surface — IDENTICAL to the D263 baseline.**
+* **No experiment dispatched.** `STAGE1_GO` unchanged since `b45330b`.
+* Item 8 (HuggingFace/network contingency, executed) — **NOT STARTED**,
+  next in the sequence. Stage 2 — **NOT AUTHORISED.**
+* 048 C — **BLOCKED**, 1 SATISFIED / 4 MOVED BUT OPEN / 5 UNADDRESSED,
+  unchanged by this entry. Programme Rule 7.

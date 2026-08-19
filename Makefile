@@ -35,6 +35,7 @@ policy-check: lint-blocking
 	python3 scripts/test_declared_prerequisites.py
 	python3 scripts/security/check_doctrine_integrity.py
 	python3 scripts/test_doctrine_integrity.py
+	python3 scripts/test_image_identity.py
 	python3 scripts/security/check_workflow_filters.py
 	python3 scripts/security/check_workflow_outputs.py
 	python3 scripts/security/check_dockerfile_flags.py

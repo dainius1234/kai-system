@@ -11,6 +11,7 @@ on:
       - 'scripts/test_capture_trigger_paths.py'
       - 'scripts/test_declared_prerequisites.py'
       - 'scripts/test_doctrine_integrity.py'
+      - 'scripts/test_image_identity.py'
       - 'kai-pm/ENGINEERING_DOCTRINE.md'
   pull_request:
     paths:
@@ -80,6 +81,13 @@ jobs:
 
       - name: Doctrine integrity gate calibration
         run: python scripts/test_doctrine_integrity.py
+
+      # D278 / D247 §6 item 10. The collector itself runs only in
+      # stage1-replay.yml, where a Docker daemon exists; its ability to
+      # REFUSE -- rather than write an empty identity -- is proven here,
+      # on every push, so it cannot quietly lapse between experiments.
+      - name: Image-identity collector calibration
+        run: python scripts/test_image_identity.py
 
       - name: Port binding check
         run: python scripts/security/check_port_bindings.py
