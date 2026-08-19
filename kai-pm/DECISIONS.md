@@ -21960,3 +21960,100 @@ None has happened.
   D247 §6 bar `7c3ad6ad…4e73c` · Stage-2 design `e27bb25a…01de2` ·
   Arm B wording `9b7e77fc…157f6` · doctrine `f79ae859…add039`.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D287 — R2 independently reproduced; the freeze has NOT been given
+
+**2026-08-18. Records an evidentiary event and resolves one bookkeeping
+discrepancy. This entry is NOT a freeze, does not authorise
+implementation, and does not authorise execution.**
+
+### 1. The verification gate is satisfied
+
+The PM thread independently reconstructed the canonical region from the
+commit diff — not from my report — and reproduced the digest:
+
+```
+reconstructed from  78fb3d5675bc3e0838c5f008445fa22a7b5e56ad
+                 -> b9fb175e09a0a36ef3d0839fb6ef8b38b18cbf0d
+                    kai-pm/DECISIONS.md blob 6bee91c8d19a740e1740d007ba236e2bc4e489f9
+
+  7,776 normalised bytes
+  0055ead8f51d8758bcd6f05b9b1fff84dd9509e91e79c79b6a2500ab78488796   EXACT MATCH
+```
+
+This is the property rule 28 exists for, working as designed: two parties,
+two independent computations over the same artefact, one value. The PM
+thread declined to take my hash on my word, which is correct and is the
+reason the gate has any force.
+
+### 2. The 156 / 155 discrepancy — measured, not waved through
+
+I reported *"156 lines recovered"*; the PM thread's reconstruction gave
+155. Flagged as non-blocking on the grounds that the byte count and
+digest matched. **Correct, and it is still worth a measurement rather
+than an assumption** — a counting difference nobody checks is how a real
+one eventually hides.
+
+```
+raw slice [BEGIN inclusive .. END exclusive]   156 elements
+  last element, repr:                          ''      <- empty line
+"\n".join(...) then .splitlines()              155 lines
+```
+
+Both numbers are right; they count **different objects**. Joining 156
+elements whose last is empty yields a string ending in `\n`, and
+`splitlines()` on that returns 155. `.strip()` then removes nothing
+further. The PM thread's diagnosis — *"terminal-blank/counting
+convention, not content drift"* — is confirmed by measurement.
+
+**No amendment.** Reconciling a cosmetic count would change the region's
+bytes and therefore its digest, invalidating a verification that has
+already succeeded. The design is not touched.
+
+### 3. What has and has not happened
+
+**Has:** the design is reviewed and passed; the fingerprint is published
+and independently reproduced; the superseded R1 value is published beside
+it as dead.
+
+**Has not — and I will not act as though it had:** the operator has not
+issued the freeze. The PM thread was explicit that a freeze phrase
+appearing inside a relayed message is quoted material, not an operator
+act, and the same standard applies to this entry. D275 §4 already
+established that *"a recommendation from two agents is not the act."*
+
+**The three gates remain, in order, none taken:**
+
+```
+FREEZE      awaiting the operator's own words
+IMPLEMENT   separate act, after the freeze
+EXECUTE     separate act, after implementation
+```
+
+### 4. Option B — agreed, and deliberately not now
+
+Both parties agree that extracting canonical regions into individually
+fetchable files, with a gate reconciling each against its region in
+`DECISIONS.md`, is the right fix for a structural problem: this file is
+~21,900 lines and the reviewer's retrieval path already fails on it. The
+diff recipe works only while a region was appended in a single recent
+commit.
+
+**Not now, and not inside Item 8.** It has its own denominator — every
+fingerprinted region in this file, not just this one — and needs its own
+calibration. Bolting it on would delay a freeze that is one operator
+sentence away, and would put a governance improvement inside an
+experiment where it does not belong. Logged as a separate authorised unit
+to be taken after the freeze.
+
+### Status
+
+* **R2 `0055ead8…8796` — INDEPENDENTLY REPRODUCED.** Verification gate
+  satisfied.
+* **R1 `b8ba2ae3…ff98` — SUPERSEDED, dead.**
+* **Item 8 — NOT FROZEN, NOT IMPLEMENTED, NOT EXECUTED.**
+* Option B (canonical-region extraction + reconciliation gate) — AGREED
+  IN PRINCIPLE, DEFERRED, unauthorised.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
