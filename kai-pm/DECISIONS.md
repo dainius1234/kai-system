@@ -21037,3 +21037,283 @@ is the next authorised step.
 * Arm B and D247 §§3-5 — **UNTOUCHED**, re-verified by fingerprint.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
   Programme Rule 7.
+
+---
+
+## D281 — Item 10's denominator, derived from claims instead of from a grep
+
+**2026-08-18. ANALYSIS ONLY. No workflow changed, nothing executed,
+nothing wired. Produced because D278 §4 stated a denominator it had not
+derived, and the PM thread caught it.**
+
+### 1. The method, which is the whole correction
+
+D278 §4 ran `grep -rlnE "docker compose .*build|docker build"` over
+`.github/workflows/`, found five files, and called that item 10's
+denominator. **A grep finds a capability, not a claim.** D247 §6 item 10
+binds *"every claim"* — so the population is derived by asking, of each
+of the ten bar items:
+
+> which workflow execution supplies the claim, and does that claim rest
+> on a built or executed image?
+
+A workflow that builds an image but supplies no 048 C claim is **not in
+the denominator**, and firing it to install a collector would manufacture
+an evidence run for no closure benefit.
+
+### 2. The matrix
+
+| bar item | the claim | who supplies it | image-borne? | identity evidence |
+|---|---|---|---|---|
+| 1 cause separated | Instructor's retry/validation excluded | `stage1-replay.yml` run `31908872172` (D267); prospectively Stage 2 | **YES** — memu-graph built and executed | **wired now, ABSENT for the run already taken** |
+| 2 repair covers population | — | **NOT YET DESIGNED** (no repair exists) | UNKNOWN | UNKNOWN |
+| 3 regression gate | — | **NOT YET DESIGNED** | UNKNOWN | UNKNOWN |
+| 4 cognify ingest end to end | a real ingest succeeds on a fresh stack | `memu-graph-startup-proof.yml` (`memu-graph-ingest-contract`) | **YES** | **REQUIRED, NOT WIRED** |
+| 5 instances not schemas | 11 observations, 0 VALID (D276) | `stage1-replay.yml` `31908872172`; later the acceptance path | **YES** | **ABSENT for the run already taken** |
+| 6 graph produced and usable | — | `memu-graph-startup-proof.yml` (`memu-graph-acceptance`) | **YES** | **REQUIRED, NOT WIRED** |
+| 7 repeats on fresh executions | ≥2 independent successes | `memu-graph-startup-proof.yml`, ≥2 runs | **YES** | **REQUIRED, NOT WIRED** |
+| 8 no HF/network regression | contingency survives the failure it is for | **a workflow that does not exist yet** | **YES** — memu-graph *and* memu-core | **REQUIRED, born-with-it** |
+| 9 clean tree / gates green | policy-check, registry, tree | `policy-checks.yml` + local `make policy-check` | **NO** | **NOT APPLICABLE** |
+| 10 everything bound | meta-item over 1-9 | — | — | satisfied when 1-9's bindings exist |
+
+**Supporting, not a bar item in itself:** `p1-replay-completeness.yml`
+establishes that the captured request is replayable at all (D248, D264),
+which item 1's chain rests on. It builds `memu-graph` and audits the
+source *inside* that image, so its verdict is image-borne. **IN, at
+lower priority than items 4/6/7.**
+
+### 3. The denominator, and the two that drop out
+
+```
+CANDIDATE POPULATION (grep, D278 §4)          5 workflows
+  stage1-replay.yml                  IN   items 1, 5        WIRED
+  memu-graph-startup-proof.yml       IN   items 4, 6, 7     NOT WIRED  <- the big one
+  p1-replay-completeness.yml         IN   supports item 1   NOT WIRED
+  core-tests.yml                     OUT  supplies no §6 bar claim
+  embedding-backend-proof.yml        OUT  supplies #47's embedding denominator, not a §6 item
+
+  the Item-8 workflow                IN   item 8            DOES NOT EXIST YET
+
+ITEM-10 CLOSURE DENOMINATOR = 4 (three existing + one to be created)
+```
+
+**The PM thread's specific suspicion is confirmed:**
+`embedding-backend-proof.yml` is outside 048 C's claim set. Under D278
+§4's stated "5" it would have been fired — a self-triggering workflow —
+to install an instrument for a claim it does not make. `core-tests.yml`
+likewise.
+
+**Two of five were about to be worked on for no reason.** That is R5's
+inverted form doing exactly what R5 says it does: a scope larger than
+reality reports failure over things that are right, and here it would
+have caused executions as well.
+
+### 4. A consequence that needs an operator decision, not my judgement
+
+**FACT.** Stage 1's measured run — `31908872172`, head `b45330b3…`, the
+run supplying items 1 and 5 — recorded **no image identity**. The
+collector did not exist. The runner is gone.
+
+**FACT.** D247 §6 item 10 requires *"every claim bound to the exact
+tested tree, image and run id."* Items 1 and 5 are bound to tree and run.
+Their image binding is **permanently unobtainable** — not UNRECORDED
+pending a retry, but ABSENT with no path to recovery.
+
+**The available routes, none of which I may choose:**
+
+1. **Accept ABSENT with a stated reason** — item 10 is met going forward,
+   and the Stage-1 claims carry a documented, permanent image gap.
+2. **Re-run Stage 1 with the collector wired** — this is a **rerun of a
+   frozen one-shot experiment** and is forbidden by the standing rule
+   against reruns, replacement executions and reduced denominators. I
+   raise it only to record that it was considered and refused, not as an
+   option I am offering.
+3. **Narrow item 10's wording** — editing the bar after seeing which
+   claims fail it. D247 §0 exists to forbid exactly this, and the bar is
+   fingerprinted (`7c3ad6ad…4e73c`) precisely so an edit is detectable.
+
+**My recommendation is route 1**, stated with its cost: 048 C would then
+close, if it ever closes, with two of its ten items resting on evidence
+whose image identity is absent by history rather than by design. That is
+weaker than the bar as written and it must be visible in the closure,
+not buried.
+
+**This is the finding that justified doing the matrix before Item 8.**
+Had Item 8 run first, it would have produced *more* evidence and only
+then revealed that the question of what to do about unbound historical
+evidence was still open.
+
+### Status
+
+* **Item-10 closure denominator — DERIVED: 4.** Not 5. `core-tests.yml`
+  and `embedding-backend-proof.yml` are **OUT**.
+* Wired: 1 of 4. Outstanding: `memu-graph-startup-proof.yml`,
+  `p1-replay-completeness.yml`, and the Item-8 workflow (born with it).
+* **OPEN, needs an operator decision:** the permanent absence of image
+  identity for run `31908872172`, which supplies items 1 and 5.
+* Nothing executed. Nothing wired. Stage 2 — NOT AUTHORISED.
+
+---
+
+## D282 — Item 8 pre-registration: three branches, two images, frozen before any build
+
+**2026-08-18. PRE-REGISTRATION. Nothing has been executed, no workflow
+exists yet, no run id, no verdict. Frozen before the first build so the
+design cannot be edited by its own results (D247 §0).**
+
+### 1. What Item 8 must prove, and why a green build does not
+
+D247 §6 item 8: *"No HuggingFace/network regression (R2: the contingency
+must survive the failure it is for)."*
+
+R2 is the operative half. **A successful build does not exercise a
+retry-then-fail-closed contingency at all** — it takes the first-attempt
+success path and never enters the loop. Both Dockerfiles claim *retry*
+behaviour explicitly, not merely eventual failure, so persistent denial
+alone proves the fail-closed half and leaves the survive-a-transient-blip
+half untested.
+
+**Verified in the tree, not assumed:**
+
+```
+memu-core/Dockerfile:92    RUN for attempt in 1 2 3 4 5; do
+                             HF_HUB_OFFLINE=0 python -c "...SentenceTransformer..."
+                             && exit 0; sleep $((attempt * 10)); done; exit 1
+
+memu-graph/Dockerfile:110  RUN for attempt in 1 2 3 4 5; do
+                             python /tmp/bake_tokenizer.py fetch && exit 0;
+                             sleep 10; done; exit 1
+```
+
+Two independent contingencies, two different assets (an embedding model;
+a pinned tokenizer), two different backoff shapes. Testing one cannot
+support a **stack-level** claim.
+
+### 2. The three branches, per image. Six builds. Denominator fixed.
+
+| branch | condition | pre-registered expected result |
+|---|---|---|
+| **B1 normal** | unmodified network | bake succeeds; the offline verify step then loads the asset with `HF_HUB_OFFLINE=1`; image produced |
+| **B2 transient** | first fetch attempt fails, later attempt allowed | the loop **recovers**; image produced; log shows ≥1 retry line |
+| **B3 persistent** | network denied to the HF-fetching `RUN` only | the loop exhausts 5 attempts and the build **REFUSES**; **no image** |
+
+**N = 6 builds (2 images × 3 branches). No re-draws. A branch that
+errors for an unrelated reason is recorded as such and is NOT replaced.**
+
+### 3. How the failure is induced — and the trap in the obvious way
+
+**Per-instruction denial, never build-level.** `docker build
+--network=none` applies to **every** `RUN`, which would kill
+`pip install` at `memu-graph/Dockerfile:5` and `:8` long before the
+experiment reached the HF loop — the build would fail for the wrong
+reason and the branch would look like a pass.
+
+So B3 mutates **one instruction**: `RUN --network=none` on the HF-fetching
+`RUN` alone. That requires a BuildKit frontend directive, and **neither
+Dockerfile currently has one** (checked: no `# syntax` line in either),
+so the derived file must add `# syntax=docker/dockerfile:1`.
+
+**The experimental Dockerfiles are derived mechanically from the real
+ones, and the real ones are NOT touched.** Exactly one targeted mutation
+per image per branch, and the derivation **asserts mutation cardinality**
+— one intended target changed, no more, no fewer. A zero-match silent
+edit is a failure (rule 18). The derived file's sha256 is recorded with
+every result.
+
+**B2's mutation** is a first-attempt shim: the real fetch command is
+wrapped so that attempt 1 fails and attempts 2+ run the genuine command.
+One mutation, same assertion.
+
+**Unresolvable host is CALIBRATION, not the experiment.** It is
+deterministic and hermetic, so it is right for proving the adverse
+classifier fires — and it is *not* the real deployed condition, so it may
+not substitute for network denial. Both exist; neither replaces the
+other.
+
+### 4. IMAGE_NOT_PRODUCED_BY_DESIGN — pre-registered before it is needed
+
+In B3 there is **intentionally no image**, because the correct result is
+a refused build. Recording that as `UNRECORDED` would say *the collector
+failed* when the collector did exactly the right thing, and would put an
+instrument failure and a correct subject verdict in the same bucket —
+doctrine rule 5's exact prohibition.
+
+So a fourth state, frozen now so it cannot be invented afterwards:
+
+```
+IMAGE_NOT_PRODUCED_BY_DESIGN
+  bound to: tree_sha, run_id, experimental Dockerfile sha256,
+            branch (B3), image (memu-graph | memu-core),
+            failure_mode (persistent network denial to the HF RUN),
+            attempts_observed, elapsed_seconds
+```
+
+**No image identity is invented for an image whose correct behaviour is
+not to exist.**
+
+### 5. Two verdict axes, kept apart
+
+Item 8 is also the collector's **first contact with a real Docker
+daemon** — every one of its 67 calibration assertions used an injected
+fake. Those are different questions and are reported separately:
+
+* **Axis 1 — the HF/network contingency**, per image per branch;
+* **Axis 2 — the collector's live qualification**: does `--collect`
+  produce a `docker_image_id` against a real daemon, and does
+  `--verify-executed` bind a real container.
+
+**Pre-registered so neither can launder the other:** if the HF experiment
+succeeds but the collector returns UNRECORDED or MISMATCH, the HF result
+stands as measured **and item 10's provenance does not move.** Conversely
+a perfect image binding cannot turn a failed contingency into a success.
+
+`--iidfile` is recorded on the positive branches as **corroboration** of
+the build's resulting image id. It corroborates; it does not replace the
+executed-container binding, which is the only thing that speaks about a
+container that actually ran (D280).
+
+### 6. Numbers this experiment will produce, pre-registered as measurements
+
+Recorded whatever they turn out to be, rather than asserted now:
+
+* **elapsed seconds to exhaust five attempts**, per image. `memu-core`'s
+  comment says *"five consecutive failures over ~100s"*; its sleeps are
+  `10+20+30+40+50`. `memu-graph`'s are `10` fixed. The B3 branches
+  settle both by measurement — which is what "ship the instrument that
+  produces the number" means.
+* **attempts observed**, per image, versus the 5 claimed.
+* **`memu-core`'s retry line is already known to print `attempt /5`**,
+  because Docker substitutes `${attempt}` — not a build arg — to the
+  empty string before the shell sees it. This is documented at
+  `memu-graph/Dockerfile:105-109`. **Observing it in B3 is EXPECTED and
+  is not a new finding.** Pre-registered so it is not re-discovered and
+  double-counted.
+
+### 7. Where it runs
+
+**A dedicated `SENTINEL_AUTHORISED` workflow**, not a job bolted onto
+`core-tests.yml`. `core-tests.yml` runs on every push to `claude/**`, and
+an incidental build is evidence *production* without evidence
+*authorisation* — rule 10. The Item-8 workflow is triggered by its own
+sentinel (`kai-pm/ITEM8_GO`), is registered `trigger_class=
+SENTINEL_AUTHORISED` (D280), and is **instrumented from birth**: the
+image-identity collector is wired before its first run, never afterwards.
+
+### 8. Prohibitions, carried in the freeze
+
+* **The real Dockerfiles are not modified.** Ever, by this experiment.
+* **No rerun**, no replacement execution, no reduced denominator. Six
+  builds, all reported.
+* **Unresolvable-host must not be substituted** for network denial in
+  B3.
+* **No build-level `--network=none`.**
+* **No new doctrine rule** is proposed by this entry.
+
+### Status
+
+* **Item 8 — PRE-REGISTERED, NOT IMPLEMENTED, NOT EXECUTED.** N = 6,
+  frozen. Awaiting review of this design before the workflow is written,
+  so the design cannot be tuned to fit an implementation.
+* `IMAGE_NOT_PRODUCED_BY_DESIGN` — frozen before it is needed.
+* Axes 1 and 2 — separated in advance.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
