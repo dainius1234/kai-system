@@ -21646,3 +21646,317 @@ of them has happened.
   D247 §6 bar `7c3ad6ad…4e73c` · Stage-2 design `e27bb25a…01de2` ·
   Arm B wording `9b7e77fc…157f6` · doctrine `f79ae859…add039`.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D285 — Item-8 canonical design, revision 2: pinned frontend, provable non-existence, untouched collector
+
+**2026-08-18. SUPERSEDES D283's canonical region. D282, D283 and D284
+stand untouched, append-only, with their defects visible. Fingerprint
+`b8ba2ae3…ff98` is SUPERSEDED and must not be frozen. Nothing
+implemented. Nothing executed. Stage 2 remains NOT AUTHORISED.**
+
+### 1. Amendment 1 — the frontend was floating, and I measured it
+
+D283 called `# syntax=docker/dockerfile:1` a *"reproducibility choice"*.
+The PM thread pointed out that `:1` is documented as **latest stable**,
+i.e. deliberately mutable. Rather than accept or argue, I resolved the
+tags against the registry:
+
+```
+resolved 2026-08-18, registry-1.docker.io, Docker-Content-Digest:
+  docker/dockerfile:1       sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
+  docker/dockerfile:1.7.1   sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
+  docker/dockerfile:1.9.0   sha256:fe40cf4e92cd0c467be2cfc30657a680ae2398318afd50b0c80585784c604f28
+```
+
+`:1` resolves to a digest that is **none of the version tags** — it is a
+moving pointer, measured, not argued. Fingerprinting the word
+"reproducibility" around it would have been a claim the artefact could
+not support, which is the same defect class as D280's.
+
+`RUN --network` needs syntax ≥ 1.3, so floating on "latest stable" buys
+the experiment nothing. **Pinned by digest below.**
+
+### 2. Amendment 2 — a non-zero build does not prove no image exists
+
+`IMAGE_NOT_PRODUCED_BY_DESIGN` was, in D283, inferred from the build
+exiting non-zero. That is `present ≠ executed` wearing its third face: a
+**stale or pre-existing tag, or a leftover iidfile, would satisfy the
+inference while an image quietly existed.** The absence has to be
+measured at both ends. Specified below.
+
+### 3. Amendment 3 — the frozen path's collector is not touched at all
+
+D283 said the existing collector would be *extended* with an explicit
+image-reference mode. The PM thread chose a separate module, and the
+reasoning is better than mine:
+
+> **"This is better than modifying the old collector and then proving we
+> supposedly didn't disturb it. We can simply say: old collector source
+> bytes unchanged."**
+
+`collect_image_identity.py` is already wired into `stage1-replay.yml` —
+the frozen Stage-2 execution path — at two points. A new narrow module
+serves Item 8's different subject, and the **existing, byte-unchanged**
+collector still performs the executed-container binding, because
+`--verify-executed` reads a JSONL record and compares `docker_image_id`
+with the container's `.Image`; it does not care which module wrote the
+record.
+
+An unchanged instrument needs no argument that it is unchanged. The
+D263 model-facing re-proof still runs — as **corroboration**, not as
+compensation for an avoidable mutation.
+
+### CANONICAL ITEM-8 DESIGN R2 — BEGIN
+
+**Item 8 of D247 §6: "No HuggingFace/network regression (R2: the
+contingency must survive the failure it is for)."**
+
+**Subjects.** Two independent contingencies, both required:
+`memu-core/Dockerfile:92` (embedding model, backoff `10,20,30,40,50`)
+and `memu-graph/Dockerfile:110` (pinned tokenizer, fixed `10`).
+
+**Denominator. N = 6 builds: 2 images × 3 branches. No re-draws. No
+replacement executions. A branch failing for an unrelated reason is
+recorded as such and is not repeated.**
+
+**Branch order is frozen: B1 → B2 → B3, per image.**
+
+**Dockerfile frontend, pinned by digest, identical in all three derived
+files:**
+
+```
+# syntax=docker/dockerfile:1.9.0@sha256:fe40cf4e92cd0c467be2cfc30657a680ae2398318afd50b0c80585784c604f28
+```
+
+This is **common controlled scaffolding**, not a treatment: identical
+across branches, so it cannot be a variable between them. It is ≥ 1.3,
+which is what `RUN --network` requires. `docker/dockerfile:1` is
+forbidden here — it is a moving pointer, and a one-shot pre-registered
+experiment may not float its own toolchain. The resolved frontend
+identity is recorded with every branch alongside the Docker and buildx
+versions, the `python:3.11-slim` base-image digest, the runner OS,
+`tree_sha` and `run_id`.
+
+**B1 — GENUINE FETCH.** Built with `--no-cache`, so the HF instruction
+provably executes rather than being served from cache. PASS requires all
+of: the HF target step executed and not cached; the build succeeded; a
+**named disposable container** started from the resulting image with
+`--network none` loads the baked asset for real; and that container's
+`.Image` MATCHes the recorded image id. Treatment mutations: **0**.
+
+**B2 — INJECTED FIRST-ATTEMPT FETCH FAILURE.** One mutation wraps the
+fetch command so attempt 1 returns failure and attempts 2+ run the
+genuine command. **This measures recovery of the retry loop from a
+failing fetch command. It does NOT measure recovery from a real
+transient network outage, and no result from it may be stated that way.**
+PASS requires: the injected first-attempt failure observed; ≥1 retry line
+observed; a later genuine fetch succeeding; the offline disposable-
+container load succeeding; and `.Image` MATCH. Treatment mutations: **1**.
+
+**B3 — PERSISTENT NETWORK DENIAL.** One mutation adds `--network=none`
+to the HF-fetching `RUN` **only**. Build-level `--network=none` is
+forbidden: it would deny network to every `RUN`, killing `pip install`
+at `memu-graph/Dockerfile:5` and `:8`, and the branch would fail for the
+wrong reason while looking like a pass. Treatment mutations: **1**.
+
+**B3's absence of an image is MEASURED at both ends, never inferred from
+an exit status:**
+
+* **before the build** — assert the branch-specific target tag does not
+  resolve and the branch-specific iidfile path does not exist. A stale
+  tag or a leftover file from any earlier activity would otherwise
+  contaminate the verdict;
+* **after the intended refusal** — assert the branch-specific tag still
+  does not resolve, and that no successful iidfile identity was written.
+  `--iidfile` records the image id of a **successful** build, so its
+  absence is corroboration that no image was produced;
+* only with both assertions satisfied does the branch record
+  `IMAGE_NOT_PRODUCED_BY_DESIGN`. If either fails, the verdict is
+  `UNMEASURED`, and the reason is named.
+
+B3 PASS requires: only the intended `RUN` denied; five attempts
+observed; the intended refusal marker and non-zero exit arising **from
+that target step**; and both non-existence assertions above satisfied.
+
+**Verdicts, defined before implementation so a failed build cannot drift
+into a pass:**
+
+* **PASS** — every clause of that branch's criterion met.
+* **WRONG_FAILURE** — the build failed at a step other than the intended
+  target. Never a PASS, never a FAIL of the contingency.
+* **UNMEASURED** — a prerequisite was unmet, so the branch has no
+  subject. Never an adverse result about the contingency.
+
+**Instruments. `scripts/security/collect_image_identity.py` IS NOT
+MODIFIED BY THIS EXPERIMENT — its source bytes remain exactly as shipped
+in D280, because it is already wired into the frozen Stage-2 execution
+path.** Item 8 uses:
+
+* a **new, narrow module** taking an explicit image reference →
+  `docker image inspect` → the **same identity JSONL contract**
+  (`identity_type`, `docker_image_id`, `repo_digest_state`
+  ABSENT/NULL/VALUE, `repo_digest`, `image_ref`, `service`, `commit_sha`,
+  `tree_sha`, `run_id`, `platform`, `identity_state`), with its own
+  calibration including known-positive and known-negative;
+* the **existing unchanged** collector's `--verify-executed --against`
+  for the disposable container's `.Image`, which reads that record and
+  needs no knowledge of which module wrote it.
+
+The D263 model-facing invocation-surface re-proof is run as
+corroboration.
+
+**Image identity per branch.**
+
+* B1/B2 produce an image: record `docker_image_id` via the new explicit
+  collector, **corroborated** by `--iidfile`, then bind the named
+  disposable container's `.Image` via the unchanged collector.
+  Corroboration does not replace the binding.
+* **B3: `IMAGE_NOT_PRODUCED_BY_DESIGN`**, established by the two
+  assertions above. Executed-container binding is
+  **NOT_APPLICABLE_BY_DESIGN**. Bound to: `tree_sha`, `run_id`,
+  experimental Dockerfile sha256, branch, image, `failure_mode`,
+  `attempts_observed`, `elapsed_seconds`.
+
+**Experimental images must not overwrite normal tags.** Each derived
+image gets a unique branch-specific tag. Retagging an experimental image
+over a Compose service tag to make an instrument fit would corrupt the
+thing the instrument measures.
+
+**Derivation.** Experimental Dockerfiles are derived mechanically from
+the real ones. **The shipped Dockerfiles are never modified by this
+experiment.** The derivation asserts mutation cardinality — exactly the
+counts above, no more, no fewer; a zero-match silent edit is a failure
+(rule 18). The pinned syntax line is scaffolding and is excluded from
+the treatment count. Each derived file's sha256 is recorded with its
+result.
+
+**Two verdict axes, reported separately and neither able to launder the
+other:** Axis 1 is the HF/network contingency; Axis 2 is the collectors'
+**first qualification against a real Docker daemon** — every one of the
+existing collector's 67 calibration assertions used an injected fake. A
+collector fault leaves Axis 1's result standing and leaves item 10's
+provenance unmoved; a clean binding cannot turn a failed contingency
+into a success.
+
+**Measurements produced, not asserted:** elapsed seconds to exhaust five
+attempts per image, and attempts observed versus the five claimed.
+`memu-core`'s comment says *"five consecutive failures over ~100s"*
+while its sleeps sum to 150; B3 settles it. **`memu-core`'s retry line
+printing `attempt /5` is a KNOWN Docker substitution artefact**,
+documented at `memu-graph/Dockerfile:105-109`; observing it is expected
+and is not a new finding.
+
+**Where it runs.** A dedicated workflow with `trigger_class=
+SENTINEL_AUTHORISED`, its own sentinel `kai-pm/ITEM8_GO`, instrumented
+from birth. Not a job on `core-tests.yml`, which runs on every push —
+an incidental build is evidence production without evidence
+authorisation (rule 10).
+
+**Prohibitions.** No modification of the shipped Dockerfiles. No
+modification of `collect_image_identity.py`. No rerun, no replacement
+execution, no reduced denominator. Unresolvable-host behaviour is
+**calibration only** and may never be substituted for network denial in
+B3. No build-level `--network=none`. No floating frontend tag. No
+retagging over normal Compose service tags.
+
+**Before any build, the workflow recomputes this design's fingerprint
+and REFUSES if it differs.**
+
+### CANONICAL ITEM-8 DESIGN R2 — END
+
+### 4. Q3 — the just-in-time ordering stands, and why
+
+The PM thread's answer, adopted: Stage 2 needing fully bound evidence
+means **Stage 2's own workflow must be instrumented from birth.** It
+does not promote every other eventual member of item 10's denominator
+into a Stage-2 prerequisite.
+
+> *"Pulling `memu-graph-startup-proof.yml` forward would repeat the exact
+> mistake D281 just corrected: confusing 'eventually belongs to closure
+> denominator' with 'must execute now.'"*
+
+Correct, and it is worth noticing that I asked the question in a form
+that invited exactly that error. The standing order:
+
+| workflow | when it gets instrumented |
+|---|---|
+| the Item-8 workflow | born with it |
+| Stage 2's workflow, if authorised | born with it |
+| `memu-graph-startup-proof.yml` | immediately before items 4/6/7 need their qualifying executions |
+| `p1-replay-completeness.yml` | when its supporting evidence must be freshly bound for closure, not merely because it is in the denominator |
+
+**Item 10 stays OPEN until every necessary claim carries its binding.
+Nothing requires manufacturing those runs early.**
+
+### Status
+
+* **Canonical Item-8 design — REVISION 2.** `b8ba2ae3…ff98` is
+  **SUPERSEDED; do not freeze it.** The new fingerprint is published
+  separately.
+* Frontend **pinned by digest**; B3 non-existence **measured at both
+  ends**; `collect_image_identity.py` **not modified**.
+* Item 8 — **NOT FROZEN, NOT IMPLEMENTED, NOT EXECUTED.** N = 6.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D286 — Revision 2's fingerprint, and the supersession made explicit
+
+**2026-08-18. Publishes the fingerprint of D285's canonical region.
+Adds no design and changes none. Not a freeze.**
+
+### The value
+
+```
+ITEM-8 CANONICAL DESIGN R2   (D285, 7,776 normalised bytes)
+  0055ead8f51d8758bcd6f05b9b1fff84dd9509e91e79c79b6a2500ab78488796
+
+SUPERSEDED, MUST NOT BE FROZEN
+  b8ba2ae363d827b33e8d10c54a44789f35c22f0ad14f04b306897fa416e8ff98   (D284/D283 R1)
+```
+
+**Recipe**, identical in shape to D284's: take the region from the
+**first** occurrence of the R2 begin-marker line, **inclusive**, to the
+first following R2 end-marker, **exclusive**; normalise each line's
+whitespace to single spaces; join with `\n`; strip; UTF-8; SHA-256.
+The markers are the D285 headings ending `— BEGIN` and `— END`.
+**Verified: one occurrence of each in the file.**
+
+### Why both values are published together
+
+A superseded fingerprint that is merely abandoned is worse than one
+that is named. Anyone holding `b8ba2ae3…ff98` — the PM thread does, it
+was published to them — must be able to discover that it is dead
+**without reading the design**, which is the whole point of publishing a
+digest. So supersession is stated as a value, not as prose.
+
+R1 was superseded for three reasons, all recorded in D285: a floating
+frontend tag, an inferred rather than measured absence of an image, and
+an avoidable mutation of an instrument already wired into the frozen
+path. None was found by me.
+
+### The freeze, if it is given
+
+```
+FREEZE TARGET   0055ead8f51d8758bcd6f05b9b1fff84dd9509e91e79c79b6a2500ab78488796
+```
+
+On an explicit operator act, and only then: the design becomes
+unamendable; the Item-8 workflow recomputes that value before any build
+and **refuses to run if it differs**; implementation may proceed; and
+execution remains a separate decision after that.
+
+**Three gates, three separate acts: freeze → implement → execute.**
+None has happened.
+
+### Status
+
+* **Item-8 canonical design R2 — fingerprinted `0055ead8…8796`, 7,776
+  bytes. NOT FROZEN. NOT IMPLEMENTED. NOT EXECUTED.**
+* **`b8ba2ae3…ff98` — SUPERSEDED. Do not freeze.**
+* Frozen values standing in this repository, unchanged:
+  D247 §6 bar `7c3ad6ad…4e73c` · Stage-2 design `e27bb25a…01de2` ·
+  Arm B wording `9b7e77fc…157f6` · doctrine `f79ae859…add039`.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
