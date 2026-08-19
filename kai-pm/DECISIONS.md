@@ -20435,3 +20435,180 @@ is what a closure review owes the operator before he decides.
 * Succession — LOGGED NOT PRIORITISED. Three `--no-deps` bypasses —
   OPEN, parked. Programme lock in force: finish 048 before A-4, Kingsman
   integration, repo consolidation or the assurance upgrade.
+
+---
+
+## D278 — 048 C does not require Stage 2; and step 3 of the corrected sequence, executed
+
+**2026-08-18. OPERATOR DECISION, banked from D277, plus three read-only
+verifications performed to produce it. No workflow changed, no experiment
+run, no finding closed. Stage 2 remains NOT AUTHORISED.**
+
+### 1. The decision, in the operator's words
+
+> **"048 C does not require Stage 2. It requires causal ownership.
+> Stage 2 is the currently frozen, uncontaminated experiment for the
+> presentation axis and remains worth running, but it may only move — not
+> necessarily close — Item 1. Before spending it, repair the newly
+> discovered image-identity evidence gap so the result can satisfy the
+> bar it is intended to support."**
+
+And the correction he made to his own earlier framing, recorded because
+this log keeps corrections rather than tidying them: *"My earlier wording
+that Stage 2 was 'the next required step' was too strong."*
+
+| question | answer |
+|---|---|
+| Is Stage 2 required by the ten-point bar? | **NO** |
+| Can Stage 2 materially advance item 1? | **YES** |
+| Can Stage 2 guarantee item 1 closes? | **NO** |
+| Is there a completed experiment separating the remaining causes? | **NO** |
+| Could another experiment be designed instead? | **YES**, but as a new pre-registration |
+
+**Route A adopted:** fix evidence identity → run frozen Stage 2 →
+inspect → if presentation loses, design a separate
+complexity/capability experiment. Route B (skip Stage 2, design a wider
+presentation × complexity experiment) is rejected — not because it is
+unsound, but because it abandons an already-frozen, uncontaminated
+experiment and enlarges the design surface *after* seeing Stage-1
+results, which is the researcher-degree-of-freedom D247 §0 exists to
+forbid.
+
+**The constraint that travels with it, verbatim:** *"fixing the evidence
+collector is not permission to change Arm B."* D275's frozen design and
+wording remain untouched.
+
+### 2. A correction to D277, made against myself
+
+D277 §2 item 10 asserted: *"`grep` for `digest`/`inspect` in that
+workflow returns nothing."*
+
+**The claim is true.** `grep -nE "digest|inspect|image"
+.github/workflows/stage1-replay.yml` returns four lines, all matching
+`image`, at 134 (a step name), 143, 192 and 209 (comments). `digest` and
+`inspect` appear nowhere in the file.
+
+**The order was wrong.** I ran that grep *after* writing the sentence,
+while assembling this entry — not before. R1 is not "be right", it is
+"run it first". Being right afterwards is how the rule gets eroded: the
+sentence was indistinguishable, at the moment it was written, from one
+that would have been wrong. Recorded because a rule that is only
+enforced when it catches an error is not enforced.
+
+### 3. Step 3 of the corrected sequence — EXECUTED. Both fingerprints reproduce.
+
+The operator's sequence puts fingerprint verification third. It is
+read-only, costs nothing, and gates everything after it, so it was done
+now rather than promised.
+
+```
+STAGE-2 FROZEN DESIGN   D247 §3 heading .. §6 heading (exclusive)
+  computed  e27bb25a655d944adcad468f01b8656774127714928932ab8840213df8301de2
+  D275      e27bb25a655d944adcad468f01b8656774127714928932ab8840213df8301de2   MATCH
+
+ARM B WORDING ONLY      "**Arm B wording — pre-registered.**" .. "**Stage 2 parameters, precommitted:**"
+  computed  9b7e77fc931ca5d556c5dd751fd22254ea33aa4c3ff13887805a3acd909157f6
+  D275      9b7e77fc931ca5d556c5dd751fd22254ea33aa4c3ff13887805a3acd909157f6   MATCH
+```
+
+**ARM B IS PROVABLY UNAMENDED.** D275 §2's condition — *"Before Stage 2
+executes, these values must be recomputed and must match. If either has
+moved, Stage 2 does not run"* — is satisfied as of this tree.
+
+**The region convention, now published, because D275 did not state it
+and it took four attempts to find.** Both regions are **inclusive of the
+start marker and exclusive of the end marker**. D275's recipe said only
+*"the region between the named headings"*, which admits four readings;
+three of them produce digests that do not match, and a party reconciling
+in good faith would have concluded the design had been amended. That is
+rule 28's own defect for the third time — a published value whose
+recipe is not sufficient to reproduce it — and it is now closed for
+these two values.
+
+**A discrepancy in D275, corrected append-only.** D275 §2 states the
+design region is **4,168 bytes**. The region that produces the matching
+digest is **4,147 bytes**. Arm B's stated **826 bytes** is exact.
+
+D275's *digest* is right and its *byte count* is wrong by 21. The digest
+is authoritative — it is the value the freeze depends on — and the
+freeze therefore holds. But the byte count exists precisely to catch a
+wrong region, and here it would have sent a reconciling party looking
+for a 21-byte region that does not exist. **D275 stands as written; this
+is the correction, not an edit.**
+
+### 4. Item 10's denominator is five, not one
+
+D277 opened item 10's gap against `stage1-replay.yml`. Counting before
+proposing a fix (R4 step 3), the population is larger:
+
+```
+$ grep -rlnE "docker compose .*build|docker build" .github/workflows/
+  .github/workflows/memu-graph-startup-proof.yml
+  .github/workflows/core-tests.yml
+  .github/workflows/embedding-backend-proof.yml
+  .github/workflows/stage1-replay.yml
+  .github/workflows/p1-replay-completeness.yml
+```
+
+**Five workflows build images.** D247 §6 item 10 binds *every claim*, not
+Stage-1's claims, and `memu-graph-startup-proof.yml` is the very job
+that will have to produce items 4, 6 and 7 when a repair exists. Fixing
+one workflow and calling item 10 closed is R6's defect exactly.
+
+Whether all five are in scope is a judgement for the operator: the
+minimum that unblocks Stage 2 is one; the minimum that satisfies item 10
+as written is five. **Stated, not decided.**
+
+### 5. The hazard in "record the image digest", flagged before it is built
+
+Not an objection — a design constraint that must be settled before code,
+because getting it wrong produces an identity that looks authoritative
+and is not:
+
+* **A locally built image has no registry digest.** `RepoDigests` is
+  populated by a push or pull. These images are built in-job and never
+  pushed, so the only available identity is the **image config ID**
+  (`docker image inspect --format '{{.Id}}'`), a sha256 over the config
+  blob. It is a true identity of *that built image* and it is **not** a
+  content-addressable digest anyone else can pull. The record must say
+  which of the two it is, or it will be read as the stronger one.
+* **The collector must not touch the subject.** Adding a step to
+  `stage1-replay.yml` puts new code in the workflow that runs the frozen
+  experiment. `scripts/security/check_invocation_identity.py` exists to
+  prove the model-facing surface is unchanged, and its baseline
+  (`freeze dc588326b2dc`, `send_once 2f0c046ab75a`, and the rest) must be
+  reproduced after the change, not assumed. An `inspect` step is
+  observational, but "observational" was also true of the collector that
+  wrote fifty rows against a stack that did not exist (R11).
+* **R11 applies to the new step itself.** If `inspect` fails or returns
+  empty, the run must say the image identity is UNRECORDED. An empty
+  string written into an identity field is worse than a missing field.
+
+### 6. What is authorised, and what is not
+
+**Done in this entry, needing no authority:** the decision banked; the
+D277 self-correction; the two fingerprint verifications; the population
+count; the D275 byte-count correction.
+
+**NOT done, and awaiting authorisation:**
+
+* step 1 — the image-identity collector, and over which of the five
+  workflows;
+* step 2 — an executed HuggingFace/network contingency for item 8;
+* step 4 — Stage-2 execution, which remains explicitly NOT AUTHORISED
+  and does not follow from anything in this entry.
+
+### Status
+
+* **048 C — BLOCKED.** Stage 2 is **NOT required** by the bar; item 1 is.
+  Route A adopted.
+* **Stage-2 freeze — VERIFIED INTACT.** Design `e27bb25a…01de2` and Arm B
+  `9b7e77fc…157f6` both reproduce at this tree. D275 §2's precondition is
+  met.
+* **D275 byte-count correction:** design region is 4,147 bytes, not
+  4,168. Digest unaffected. D275 stands as written.
+* **Item 10 population: 5 workflows**, not 1. Scope undecided.
+* Doctrine fingerprint `f79ae859…add039` — unchanged; candidate rule 29
+  still FLAGGED, NOT ADDED.
+* Programme lock in force: finish 048 before A-4, Kingsman integration,
+  repo consolidation or the assurance upgrade.
