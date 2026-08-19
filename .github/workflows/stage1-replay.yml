@@ -161,11 +161,18 @@ jobs:
           set -euo pipefail
           docker compose -f docker-compose.full.yml build memu-graph
 
-      # WHICH IMAGE ACTUALLY EXECUTED. D247 §6 item 10 requires every
-      # claim bound to "the exact tested tree, image and run id"; D277
-      # found the tree carried two of those three, for the whole of
-      # Stage 1. Immediately after the build, so the identity recorded is
-      # the one the replay is about to run — not one re-derived later.
+      # THE IMAGE REFERENCED IMMEDIATELY BEFORE EXECUTION — which is a
+      # SMALLER claim than "the image that executed", and the difference
+      # is deliberate. A tag can be repointed between this lookup and the
+      # container start, and this step cannot see that. The claim is
+      # completed by the post-run container check further down; neither
+      # step is sufficient alone. (Rule 2: present ≠ executed. D280)
+      #
+      # D247 §6 item 10 requires every claim bound to "the exact tested
+      # tree, image and run id"; D277 found the tree carried two of those
+      # three, for the whole of Stage 1. Taken immediately after the
+      # build, so the recorded identity is the one the replay is about to
+      # use — not one re-derived later.
       #
       # `--no-deps`-style caveats do not apply: this reads the image and
       # starts nothing. It is observational, and R11 is enforced INSIDE
@@ -274,6 +281,34 @@ jobs:
               --manifest stage1-manifest.json \
               --replies /tmp/stage1-replies.jsonl
 
+      # THE SECOND MEASUREMENT, and the one that actually binds.
+      #
+      # The step after the build records the image Compose resolved
+      # BEFORE any container existed. That establishes "the image
+      # referenced immediately before execution" — it does NOT establish
+      # what ran, because a tag can be repointed in between. Rule 2:
+      # present is not executed.
+      #
+      # This reads the replay container's own `.Image` and requires it to
+      # equal the recorded id. MISMATCH and UNRECORDED are both failures
+      # and both are written to the artifact.
+      #
+      # MUST run BEFORE the export step, which does `docker rm -f
+      # stage1-replay-run`. A container that has been removed cannot be
+      # asked what it ran, and the answer would be UNRECORDED forever.
+      # `if: always()` so a failed replay still gets its binding checked.
+      # ci-toleration: documented-skip
+      - name: Prove the container ran the image we recorded
+        if: always()
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          python3 scripts/security/collect_image_identity.py \
+            --verify-executed stage1-replay-run \
+            --service memu-graph \
+            --against stage1-image-identity.jsonl \
+            --out stage1-image-executed.jsonl
+
       # Sizes and row counts only. The replies themselves are an
       # artifact, never log lines.
       - name: Export the sealed replies
@@ -322,4 +357,5 @@ jobs:
             stage1-replies.jsonl
             stage1-classification.jsonl
             stage1-image-identity.jsonl
+            stage1-image-executed.jsonl
           if-no-files-found: warn

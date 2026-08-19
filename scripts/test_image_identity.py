@@ -35,7 +35,7 @@ COLLECTOR = REPO / "scripts" / "security" / "collect_image_identity.py"
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 9
+EXPECTED_SCENARIOS = 13
 executed: list[str] = []
 
 
@@ -71,6 +71,21 @@ if argv[:1] == ["compose"]:
         print("proj-b")
         sys.exit(0)
     print("kai-system-memu-graph")
+    sys.exit(0)
+
+if argv[:2] == ["container", "inspect"]:
+    if mode == "exec_container_gone":
+        sys.stderr.write("Error: No such container: stage1-replay-run\\n")
+        sys.exit(1)
+    if mode == "exec_silent":
+        sys.exit(0)
+    if mode == "exec_no_image":
+        print(json.dumps({"Name": "/stage1-replay-run"}))
+        sys.exit(0)
+    if mode == "exec_mismatch":
+        print(json.dumps({"Image": "sha256:" + "c" * 64}))
+        sys.exit(0)
+    print(json.dumps({"Image": "sha256:" + "a" * 64}))
     sys.exit(0)
 
 if argv[:2] == ["image", "inspect"]:
@@ -245,6 +260,100 @@ def test_refusals_before_collecting() -> None:
           "not an identity" in out, out)
 
 
+def run_verify(mode: str, collected_rows: list[dict] | None,
+               *, container="stage1-replay-run", service="memu-graph",
+               against=True) -> tuple[int, str, list[dict]]:
+    """Drive --verify-executed against a collected record we control."""
+    with tempfile.TemporaryDirectory() as td:
+        fake = Path(td) / "docker"
+        fake.write_text(FAKE_DOCKER)
+        fake.chmod(0o755)
+        rec = Path(td) / "collected.jsonl"
+        if collected_rows is not None:
+            rec.write_text("".join(json.dumps(r) + "\n" for r in collected_rows))
+        outfile = Path(td) / "executed.jsonl"
+        argv = [sys.executable, str(COLLECTOR), "--docker", str(fake),
+                "--verify-executed", container, "--out", str(outfile)]
+        if against:
+            argv += ["--against", str(rec)]
+        if service:
+            argv += ["--service", service]
+        env = {**os.environ, "FAKE_MODE": mode}
+        p = subprocess.run(argv, capture_output=True, text=True,
+                           cwd=str(REPO), env=env)
+        rows = []
+        if outfile.exists():
+            rows = [json.loads(l) for l in
+                    outfile.read_text().splitlines() if l.strip()]
+        return p.returncode, p.stdout + p.stderr, rows
+
+
+GOOD = [{"identity_type": "DOCKER_LOCAL_IMAGE_ID", "service": "memu-graph",
+         "identity_state": "RECORDED",
+         "docker_image_id": "sha256:" + "a" * 64,
+         "run_id": "999", "tree_sha": "deadbeef"}]
+
+
+def test_executed_match() -> None:
+    """Known-positive for the SECOND measurement."""
+    scenario("executed: MATCH")
+    code, out, rows = run_verify("ok", GOOD)
+    check("a container running the recorded image EXITS 0", code == 0, out)
+    check("binding is MATCH", rows[0]["execution_binding"] == "MATCH", str(rows[0]))
+    check("both ids are carried",
+          rows[0]["collected_image_id"] == rows[0]["executed_image_id"], str(rows[0]))
+    check("and it says this is now a measurement, not an inference",
+          "not an" in out and "inference" in out, out)
+
+
+def test_executed_mismatch_is_never_absorbed() -> None:
+    """The case the whole repair exists for: a DIFFERENT image ran."""
+    scenario("executed: MISMATCH")
+    code, out, rows = run_verify("exec_mismatch", GOOD)
+    check("a different executed image EXITS 3", code == 3, out)
+    check("binding is MISMATCH",
+          rows[0]["execution_binding"] == "MISMATCH", str(rows[0]))
+    check("the two ids differ in the record",
+          rows[0]["collected_image_id"] != rows[0]["executed_image_id"], str(rows[0]))
+    check("and it says the claims are bound to the wrong image",
+          "wrong image" in out, out)
+
+
+def test_executed_unrecorded_paths() -> None:
+    """R11 at every boundary of the second measurement."""
+    scenario("executed: UNRECORDED boundaries")
+    for mode, needle in [("exec_container_gone", "container inspect"),
+                         ("exec_silent", "not a payload"),
+                         ("exec_no_image", "no Image")]:
+        code, out, rows = run_verify(mode, GOOD)
+        check(f"{mode} EXITS 3", code == 3, out)
+        check(f"{mode} is UNRECORDED",
+              rows[0]["execution_binding"] == "UNRECORDED", str(rows[0]))
+        check(f"{mode} names its unmet prerequisite",
+              needle in rows[0].get("unmet_prerequisite", "<ABSENT>"), str(rows[0]))
+    check("UNKNOWN is not a match", "UNKNOWN is not a match" in out, out)
+    # a collected row that was itself UNRECORDED cannot be bound afterwards
+    bad = [{**GOOD[0], "identity_state": "UNRECORDED", "docker_image_id": None}]
+    code, out, rows = run_verify("ok", bad)
+    check("an UNRECORDED collected row cannot become MATCH", code == 3, out)
+    check("and says an unbound run cannot be bound retroactively",
+          "retroactively" in rows[0].get("unmet_prerequisite", ""), str(rows[0]))
+    # no collected file at all
+    code, out, rows = run_verify("ok", None)
+    check("a missing collected record EXITS 3", code == 3, out)
+    check("and refuses rather than trusting the container alone",
+          "no recorded" in rows[0].get("unmet_prerequisite", ""), str(rows[0]))
+
+
+def test_verify_refuses_without_a_comparator() -> None:
+    """Reading the container and calling it agreement is self-verification."""
+    scenario("executed: refuses without --against")
+    code, out, _ = run_verify("ok", GOOD, against=False)
+    check("--verify-executed without --against REFUSES (exit 1)", code == 1, out)
+    check("and says why comparing against nothing is not agreement",
+          "call it agreement" in out, out)
+
+
 def run_all() -> None:
     test_known_positive()
     test_the_field_is_never_called_a_digest()
@@ -255,8 +364,12 @@ def run_all() -> None:
     test_compose_resolution_failures()
     test_the_gap_survives_in_the_artifact()
     test_refusals_before_collecting()
+    test_executed_match()
+    test_executed_mismatch_is_never_absorbed()
+    test_executed_unrecorded_paths()
+    test_verify_refuses_without_a_comparator()
     print(f"  inspected: {EXPECTED_SCENARIOS} image-identity scenario(s) "
-          f"across 1 collector")
+          f"across 1 collector, both measurements")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS, f"{len(executed)}: {executed}")
 

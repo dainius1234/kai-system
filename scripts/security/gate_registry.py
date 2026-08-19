@@ -44,6 +44,10 @@ from typing import Optional, Tuple
 GATE = "gate"
 REPORT = "report"
 
+# Trigger classes -- see Gate.trigger_class.
+CONTINUOUS = "CONTINUOUS"
+SENTINEL_AUTHORISED = "SENTINEL_AUTHORISED"
+
 COMPOSE_FILES = (
     "docker-compose.full.yml",
     "docker-compose.minimal.yml",
@@ -99,6 +103,30 @@ class Gate:
     in_policy_check: bool = False
     in_workflows: Tuple[str, ...] = ()
     pending_wiring: Optional[str] = None
+
+    # HOW THE WORKFLOWS IN `in_workflows` ARE TRIGGERED, machine-readably.
+    #
+    # Rule 9 says a gate's trigger conditions are part of the gate. The
+    # obvious reading -- "every input must appear in the workflow's
+    # paths: filter" -- is right for a CONTINUOUS gate and WRONG for a
+    # one-shot authorised experiment, where it would mean that editing an
+    # analyser DISPATCHES the experiment. That is a manufactured evidence
+    # run, and rule 10 already says evidence-admission rules do not
+    # authorise evidence production.
+    #
+    # Two classes, so a future paths-coverage detector (finding #50) can
+    # tell them apart FROM THE REGISTRY instead of inferring an exception
+    # from a comment it cannot parse:
+    #
+    #   CONTINUOUS          every enforcement input must trigger it.
+    #   SENTINEL_AUTHORISED input changes must NOT execute it. An explicit
+    #                       sentinel triggers it, and the run revalidates
+    #                       its frozen inputs and calibration before
+    #                       reaching the subject.
+    #
+    # Default CONTINUOUS: the safe direction is over-triggering a check,
+    # never silently exempting one. (D280)
+    trigger_class: str = "CONTINUOUS"
 
     # The register entry this check's own defects are tracked under.
     findings: Tuple[str, ...] = field(default_factory=tuple)
@@ -1336,6 +1364,7 @@ REGISTRY: Tuple[Gate, ...] = (
          calibrated_by="scripts/test_image_identity.py",
          in_policy_check=False,
          in_workflows=("stage1-replay.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
          findings=("KAI-GATE-048",)),
     Gate(module="test_image_identity",
          kind=GATE,

@@ -578,6 +578,23 @@ DECLARED: Tuple[Toleration, ...] = (
     ),
     Toleration(
         workflow="stage1-replay.yml",
+        step="Prove the container ran the image we recorded",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same reasoning as the collector step, and the same rule 5 "
+               "boundary: this is EVIDENCE ABOUT the run, not a "
+               "prerequisite of it, so a binding it cannot establish must "
+               "not become an adverse verdict about the replay. It exits "
+               "3 on MISMATCH and on UNRECORDED, and WRITES that row -- "
+               "which is uploaded -- so a wrong or unknowable binding is "
+               "visible in the evidence rather than swallowed. It runs "
+               "`if: always()` before the export step removes the "
+               "container, because a removed container cannot be asked "
+               "what it ran. (D280)",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="stage1-replay.yml",
         step="Free up runner disk space",
         bucket=DOCUMENTED_SKIP,
         reason="`sudo rm -rf ... || true` against the runner's "

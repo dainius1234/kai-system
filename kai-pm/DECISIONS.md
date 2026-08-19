@@ -20820,3 +20820,220 @@ being started here.
   next in the sequence. Stage 2 — **NOT AUTHORISED.**
 * 048 C — **BLOCKED**, 1 SATISFIED / 4 MOVED BUT OPEN / 5 UNADDRESSED,
   unchanged by this entry. Programme Rule 7.
+
+---
+
+## D280 — The collector's claim was one step stronger than its measurement
+
+**2026-08-18. EVIDENCE-BOUNDARY CORRECTION, found in review by the PM
+thread before any evidence depended on it. Item 8 remains HOLD until this
+entry's work is complete — it now is. Stage 2 remains NOT AUTHORISED.**
+
+### 1. The defect, stated exactly
+
+D279 shipped `collect_image_identity.py` whose opening line asked:
+
+> *"Which image actually executed?"*
+
+Mechanically it runs `docker image inspect` **immediately after the
+build, before any container exists.** So what it establishes is:
+
+> *the image Compose resolved immediately before execution.*
+
+**Those are not the same claim.** A tag can be repointed between the
+lookup and the container start, and a pre-run inspect cannot see that
+happen. This is doctrine rule 2 — **present ≠ executed ≠ enforced** —
+inside the instrument written to bind execution, which is the same shape
+as R9's watcher and §3.5's prediction that diagnostics are where this
+lands.
+
+Nothing was wrong with the mechanism. **The sentence around it was one
+step stronger than the measurement**, and that is the failure mode this
+programme has spent a week eliminating everywhere else.
+
+**Credit where it belongs:** I did not find this. The PM thread did, on
+review of D279, before the collector had produced a single row of real
+evidence. Recorded plainly because the register should show which
+failures were caught by whom — a log that only records my own catches
+would misrepresent how this actually works.
+
+### 2. The repair is a second measurement, not a weaker adjective
+
+The tempting fix is to soften the docstring and move on. That would
+leave item 10 satisfied by a lookup that cannot see the failure it is
+supposed to exclude.
+
+**Two measurements, two different sizes of claim, both recorded:**
+
+| mode | what it reads | what it establishes |
+|---|---|---|
+| `--collect` | `docker image inspect <ref>` after the build | the image **referenced immediately before execution** |
+| `--verify-executed` | `docker container inspect <name>` → `.Image` | the image the container **actually ran** |
+
+The second requires `.Image` to equal the recorded `docker_image_id`.
+Three outcomes, and the middle one is the point:
+
+```
+MATCH       the container ran the image we recorded
+MISMATCH    it ran a DIFFERENT image -- every claim bound to the
+            collected id is bound to the wrong image
+UNRECORDED  what ran is UNKNOWN, and UNKNOWN is not a match (rule 27)
+```
+
+**Neither step is sufficient alone**, and both say so in their own
+output rather than in a comment elsewhere.
+
+### 3. R11 at every boundary of the second measurement
+
+The comparison refuses rather than assuming agreement when:
+
+* the collected record does not exist — *"no recorded identity for the
+  executed image to be compared with"*;
+* the collected row was itself `UNRECORDED` — *"an unbound run cannot be
+  bound retroactively"*;
+* the record holds ≠ 1 row for the named service — ambiguity is not
+  resolved by picking one;
+* `container inspect` fails, exits 0 printing nothing, or returns an
+  object with no `Image`;
+* `--against` is omitted — **refused with exit 1**, because reading the
+  container and calling it agreement is the container verifying itself
+  (rule 26).
+
+### 4. Ordering, which is load-bearing
+
+The verification step runs **before** `Export the sealed replies`,
+because that step ends with `docker rm -f stage1-replay-run`. **A removed
+container cannot be asked what it ran**, and the answer would be
+`UNRECORDED` permanently — an instrument defeated by the cleanup of the
+thing it measures. `if: always()`, so a failed replay still gets its
+binding checked.
+
+`continue-on-error: true`, declared in the toleration register, on the
+same rule 5 grounds as the collector: a binding this cannot establish
+must not become an adverse verdict about the replay. Exit 3 still
+**writes** the MISMATCH or UNRECORDED row, which is uploaded.
+
+### 5. Calibration
+
+`scripts/test_image_identity.py`: **67 assertions, 13 scenarios, 0
+failed** (was 43/9). Four new scenarios cover the second measurement,
+including a fake container reporting a *different* image.
+
+**Proven able to fail, by reinjection:**
+
+| defect reinjected | result |
+|---|---|
+| treat MISMATCH as MATCH (absorb the disagreement) | 64 passed, **3 failed**, FAIL |
+| assume MATCH when the container cannot be inspected | 60 passed, **7 failed**, FAIL |
+| both reverted | 67 passed, 0 failed, PASS |
+
+### 6. Rule 9, formalised as GPT framed it — and made machine-readable
+
+The PM thread accepted D279 §3's sentinel reasoning but corrected the
+framing, and the correction is better than what I wrote:
+
+> **"An application of Rule 9, not an exception to it."**
+
+Rule 9 says trigger conditions are part of the gate. It does not say
+every input must appear in `paths:`; that full-input reading was earned
+by a *repeatable* gate whose repair failed to fire. For a one-shot
+authorised experiment the correct trigger condition is *explicit
+sentinel act → revalidate frozen inputs before execution*.
+
+Two classes, now declared **in the registry** rather than left in prose,
+because the PM thread's improvement was exactly right — a future
+paths-coverage detector (#50) must not have to infer an exception from a
+comment it cannot parse:
+
+```python
+CONTINUOUS           every enforcement input must trigger it   (default)
+SENTINEL_AUTHORISED  input changes must NOT execute it
+```
+
+`Gate.trigger_class` defaults to `CONTINUOUS`, because the safe
+direction is over-triggering a check, never silently exempting one.
+`collect_image_identity` is the one entry currently marked
+`SENTINEL_AUTHORISED`.
+
+**No new doctrine rule.** This is a clarification of rule 9, and the
+doctrine fingerprint is unchanged, which is the proof that nothing was
+added.
+
+### 7. Item 10's denominator — my count was a population, not a denominator
+
+The PM thread corrected its own earlier recommendation, and it corrects
+D278 §4 with it:
+
+> *"Five workflows building images does not automatically mean five is
+> Item 10's final denominator… the Item-10 denominator should be derived
+> from: which workflow executions produce claims actually relied upon to
+> close 048 C?"*
+
+**Concur, and it is my error to own.** D278 §4 ran a grep for
+`docker build`, found five, and called it the denominator. That is R5's
+defect in the direction R5 warns about *least* often — a scope **larger**
+than reality, which fires work at things that are right. `embedding-backend-proof.yml`
+may not be in 048 C's claim set at all, and firing it to install a
+thermometer would manufacture an evidence run for no closure benefit.
+
+Corrected, append-only:
+
+```
+5 image-building workflows   = CANDIDATE INSTRUMENTATION POPULATION (grep-derived)
+Item-10 closure denominator  = the workflows whose evidence 048 C actually relies on
+                               -- NOT YET DERIVED
+```
+
+**Item 10 stays MOVED BUT OPEN, and its denominator is now honestly
+UNKNOWN rather than wrongly stated as 5.** Deriving it is a prerequisite
+of closing item 10 and is not done here.
+
+### 8. Item 8, scoped by the same decision
+
+Instructed: **both images.** `memu-graph` bakes the tokenizer and
+verifies it offline; `memu-core` independently bakes its embedding model
+and carries the five-consecutive-failure HuggingFace retry. Testing only
+`memu-graph` cannot support a stack-level *"no HuggingFace/network
+regression"*.
+
+And the precision that makes it an R2 item rather than a build:
+
+> *a normal successful `memu-core` build does not prove the five-failure
+> contingency. The contingency must survive the failure it exists for.*
+
+So Item 8 needs an **intentional failure-mode case** alongside the
+offline-success case. And an incidental `core-tests.yml` build does not
+count as the Item-8 experiment — evidence production and evidence
+admission are different things (rule 10).
+
+**Item 8 remains NOT STARTED.** Its design is now specified; executing it
+is the next authorised step.
+
+### 9. Verification taken at this tree
+
+| # | proof | result |
+|---|---|---|
+| 1 | image-identity calibration | **67 passed, 0 failed, 13 scenarios** |
+| 2 | reinjection, MISMATCH absorbed | **64/3 FAIL** — catches it |
+| 3 | reinjection, uninspectable container assumed MATCH | **60/7 FAIL** — catches it |
+| 4 | model-facing invocation surface vs `9a53ee6` | **IDENTICAL** |
+| 5 | Stage-2 design fingerprint | `e27bb25a…01de2` **MATCH** |
+| 6 | Arm B wording fingerprint | `9b7e77fc…157f6` **MATCH** |
+| 7 | `kai-pm/STAGE1_GO` | unmodified — **no experiment dispatched** |
+| 8 | `make policy-check` | **EXIT 0**, registry 89/89, I-1..I-7 hold |
+
+### Status
+
+* **Collector — CORRECTED.** Two measurements; the execution binding is
+  now measured, not inferred. `--collect` no longer claims what only
+  `--verify-executed` can establish.
+* **Rule 9 — CLARIFIED, not excepted**, and encoded as
+  `Gate.trigger_class` for finding #50.
+* **Item 10 — MOVED BUT OPEN.** Wired: 1 workflow. Denominator:
+  **NOT YET DERIVED** (D278 §4's "5" corrected to a candidate
+  population).
+* **Item 8 — NOT STARTED**, scope now fixed: both images, with a
+  deliberate HF failure case, not an incidental build.
+* Arm B and D247 §§3-5 — **UNTOUCHED**, re-verified by fingerprint.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+  Programme Rule 7.

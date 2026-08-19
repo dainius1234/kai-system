@@ -1,5 +1,32 @@
 #!/usr/bin/env python3
-"""Which image actually executed? Bind the run to it, or say UNRECORDED.
+"""Bind a run to the image that executed it — in TWO steps, not one.
+
+TWO CLAIMS, AND THE ONE THAT WAS OVERSTATED
+===========================================
+
+This module makes two separate, differently-sized claims, and the
+distinction between them is the whole point:
+
+  --collect  records the image Compose resolves for a service, read
+             immediately after the build. That establishes **the image
+             referenced immediately before execution.**
+
+  --verify-executed  reads the `.Image` of the container that actually
+             ran, and requires it to equal the collected id. That, and
+             only that, establishes **the image that executed.**
+
+**The first version of this file claimed the second while measuring the
+first.** Its opening line asked *"Which image actually executed?"* while
+running `docker image inspect` after the build and before any container
+existed. Nothing was wrong with the mechanism; the sentence around it
+was one step stronger than the measurement, which is doctrine rule 2 —
+*present ≠ executed ≠ enforced* — inside the instrument written to bind
+execution. A tag can be repointed between the build and the run, and a
+pre-run lookup cannot see that happen.
+
+Caught in review before any evidence depended on it (D280). The repair
+is not a stronger adjective: it is a second measurement, taken from the
+container, that can come back MISMATCH.
 
 THE FAILURE THAT EARNED THIS
 ============================
@@ -79,10 +106,12 @@ and a table of blank identities looks like a table that was filled in.
 That is the same shape as the collector which ran fifty probes against a
 stack that did not exist and produced fifty correct-looking rows.
 
-Exit 0 = every requested service has an identity.
-Exit 3 = at least one is UNRECORDED. The record is still written, so the
-         gap is visible in the artifact rather than inferred from a
-         missing file.
+Exit 0 = every requested service has an identity (--collect), or the
+         executed image MATCHES the collected one (--verify-executed).
+Exit 3 = at least one is UNRECORDED, or the executed image is MISMATCH
+         or UNRECORDED. The record is still written, so the gap is
+         visible in the artifact rather than inferred from a missing
+         file.
 Exit 1 = refused before collecting: nothing to collect, or the caller's
          request could not be resolved at all.
 """
@@ -254,6 +283,124 @@ def collect(docker: str, compose_file: str, services: list[str],
     return rows
 
 
+# The execution binding, which is a different question from identity.
+MATCH = "MATCH"
+MISMATCH = "MISMATCH"
+
+
+def container_image(docker: str, container: str) -> tuple[str | None, str]:
+    """The image id the CONTAINER ran. Not the image a tag points at now."""
+    code, out, err = run([docker, "container", "inspect",
+                          "--format", "{{json .}}", container])
+    if code != 0:
+        return None, (f"`container inspect {container}` exited {code}: "
+                      f"{(err or out).strip()[:300]}")
+    text = out.strip()
+    if not text:
+        return None, (f"`container inspect {container}` exited 0 and printed "
+                      f"nothing. An exit status is not a payload")
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError as e:
+        return None, f"`container inspect {container}` printed bad JSON: {e}"
+    if isinstance(data, list):
+        if not data:
+            return None, f"`container inspect {container}` printed an empty array"
+        data = data[0]
+    if not isinstance(data, dict):
+        return None, (f"`container inspect {container}` printed a "
+                      f"{type(data).__name__}, not an object")
+    image = data.get("Image")
+    if not image:
+        return None, (f"`container inspect {container}` returned an object "
+                      f"with no Image. What it ran is not knowable from this")
+    return image, ""
+
+
+def verify_executed(docker: str, container: str, collected: pathlib.Path,
+                    service: str | None) -> list[dict]:
+    """Did the container actually run the image we recorded?
+
+    R11 at every boundary: if the collected record is missing, if it
+    said UNRECORDED, if the container is gone, or if its inspect yields
+    no Image — the answer is UNRECORDED, never an assumed MATCH.
+    """
+    base = {"identity_type": IDENTITY_TYPE, "container": container,
+            "service": service}
+    if not collected.is_file():
+        return [{**base, "execution_binding": UNRECORDED,
+                 "collected_image_id": None, "executed_image_id": None,
+                 "unmet_prerequisite":
+                     f"{collected} does not exist, so there is no recorded "
+                     f"identity for the executed image to be compared with"}]
+    rows = [json.loads(l) for l in collected.read_text().splitlines()
+            if l.strip()]
+    if service is not None:
+        rows = [r for r in rows if r.get("service") == service]
+    if len(rows) != 1:
+        return [{**base, "execution_binding": UNRECORDED,
+                 "collected_image_id": None, "executed_image_id": None,
+                 "unmet_prerequisite":
+                     f"{collected} holds {len(rows)} row(s) for "
+                     f"service={service!r}; exactly one is required to make "
+                     f"the comparison unambiguous"}]
+    row = rows[0]
+    base["service"] = row.get("service")
+    base["run_id"] = row.get("run_id")
+    base["tree_sha"] = row.get("tree_sha")
+    collected_id = row.get("docker_image_id")
+    if row.get("identity_state") != RECORDED or not collected_id:
+        return [{**base, "execution_binding": UNRECORDED,
+                 "collected_image_id": None, "executed_image_id": None,
+                 "unmet_prerequisite":
+                     f"the collected row is {row.get('identity_state')}, so "
+                     f"there is nothing to compare the executed image with. "
+                     f"An unbound run cannot be bound retroactively"}]
+    executed, err = container_image(docker, container)
+    if err:
+        return [{**base, "execution_binding": UNRECORDED,
+                 "collected_image_id": collected_id, "executed_image_id": None,
+                 "unmet_prerequisite": err}]
+    return [{**base,
+             "execution_binding": MATCH if executed == collected_id else MISMATCH,
+             "collected_image_id": collected_id,
+             "executed_image_id": executed}]
+
+
+def report_executed(rows: list[dict], out_path: pathlib.Path | None) -> int:
+    r = rows[0]
+    print("EXECUTED IMAGE — DID THE CONTAINER RUN WHAT WE RECORDED?")
+    print("=" * 68)
+    print(f"  container: {r['container']}   service: {r['service']}")
+    print(f"  collected: {r['collected_image_id']}")
+    print(f"  executed : {r['executed_image_id']}")
+    print(f"  binding  : {r['execution_binding']}")
+    if r.get("unmet_prerequisite"):
+        print(f"  WHY      : {r['unmet_prerequisite']}")
+    print()
+    print(f"  inspected: 1 container(s) against 1 collected identity(s)")
+
+    if out_path is not None:
+        out_path.write_text("".join(json.dumps(x) + "\n" for x in rows))
+        print(f"  written: {out_path} ({out_path.stat().st_size} bytes)")
+
+    print()
+    if r["execution_binding"] == MATCH:
+        print("PASS: the container ran the image that was recorded. The claim")
+        print("      'this image executed' is now a measurement, not an")
+        print("      inference from a pre-run lookup.")
+        return 0
+    if r["execution_binding"] == MISMATCH:
+        print("FAIL: the container ran a DIFFERENT image from the one")
+        print("      recorded after the build. Every claim bound to the")
+        print("      collected id is bound to the wrong image.")
+        return 3
+    print("FAIL: the executed image is UNRECORDED. What ran is UNKNOWN, and")
+    print("      UNKNOWN is not a match (rule 27). D247 §6 item 10 is not")
+    print("      met for this run.")
+    return 3
+
+
 def report(rows: list[dict], out_path: pathlib.Path | None) -> int:
     print("IMAGE IDENTITY — WHICH IMAGE ACTUALLY EXECUTED")
     print("=" * 68)
@@ -299,7 +446,7 @@ def report(rows: list[dict], out_path: pathlib.Path | None) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--compose-file", required=True)
+    ap.add_argument("--compose-file")
     ap.add_argument("--service", action="append", default=[],
                     help="repeatable; the population this run traverses")
     ap.add_argument("--out", help="write JSONL records here")
@@ -308,8 +455,32 @@ def main() -> int:
     ap.add_argument("--docker", default="docker",
                     help="the docker binary; overridden by calibration so "
                          "the shipped code paths run without a daemon")
+    ap.add_argument("--verify-executed", metavar="CONTAINER",
+                    help="second measurement: read this container's .Image "
+                         "and require it to equal the collected id")
+    ap.add_argument("--against", metavar="JSONL",
+                    help="the --collect record to compare against")
     args = ap.parse_args()
 
+    if args.verify_executed:
+        if not args.against:
+            print("REFUSED: --verify-executed needs --against. Comparing the "
+                  "executed image with nothing recorded would restate the "
+                  "container's own answer and call it agreement.")
+            return 1
+        if len(args.service) > 1:
+            print("REFUSED: --verify-executed compares ONE container with ONE "
+                  "recorded identity; more than one --service makes the "
+                  "comparison ambiguous.")
+            return 1
+        rows = verify_executed(args.docker, args.verify_executed,
+                               pathlib.Path(args.against),
+                               args.service[0] if args.service else None)
+        return report_executed(rows, pathlib.Path(args.out) if args.out else None)
+
+    if not args.compose_file:
+        print("REFUSED: --compose-file is required to collect an identity.")
+        return 1
     if not args.service:
         print("REFUSED: no --service given. A collector with an empty "
               "population reports success over nothing, which is the "
