@@ -22171,3 +22171,110 @@ differently.
 * Programme lock in force: finish 048 before A-4, Kingsman assurance
   integration, Task 4 consolidation, RC/dev→main requalification and
   Evidence Plane work.
+
+---
+
+## D289 — Cause attribution is separate from branch verdict
+
+**2026-08-18. Records the PM thread's ruling on D288 §4, adopted. This
+entry constrains how a result may be described; it loosens nothing. The
+frozen R2 design is NOT amended. Implementation is NOT authorised.
+Execution is NOT authorised.**
+
+### 1. The ruling, and the trap it closes
+
+D288 §4 established that a B1 branch which cannot establish its
+genuine-fetch control is **UNMEASURED**, not WRONG_FAILURE and not an
+adverse Item-8 result. Accepted. The PM thread added the half I had left
+open:
+
+> **"Orion must not infer 'Hugging Face outage' merely because the HF
+> target step failed. If he names upstream degradation as the reason,
+> there must be independent evidence for that."**
+
+This is right and it is a trap I was walking toward. D288 §4 reasoned
+about the *scenario* "if upstream is degraded" and would have made it
+easy, in the moment, to write that sentence into a result because the
+scenario had already been described. **A step that fetches from
+huggingface.co failing does not establish that huggingface.co was
+degraded.** It is consistent with DNS, egress policy, an auth change, a
+renamed model, a disk-full runner, or a defect in our own loop.
+
+That is R1 — asserting what has not been run — wearing the clothes of a
+pre-registered scenario. It is also §3.1's shape: *describing the form of
+a failure when my scope is narrower than my claim.*
+
+### 2. The exact wording, frozen before any result exists
+
+When the prerequisite is unmet and the cause is not independently
+established, the branch is recorded verbatim as:
+
+```
+UNMEASURED — genuine-fetch prerequisite not established; cause unresolved
+```
+
+An upstream cause may be **named only** when the run itself carries
+independent evidence for it. Absent that, `cause unresolved` stands, and
+rule 27 governs: **UNKNOWN remains UNKNOWN until evidence moves it.**
+
+**Branch verdict and cause attribution are two separate records.** A
+verdict may be certain while its cause is unresolved, and collapsing them
+is how a guess acquires the authority of a measurement.
+
+### 3. No redraws, confirmed — and the only legitimate later route
+
+My reading is confirmed: an UNMEASURED branch is **banked as it
+occurred**. It is not retried until the network cooperates. R2's
+six-build denominator is reported exactly as it happened, and **Item 8
+remains incomplete for that subject.**
+
+"Retry until convenient" is precisely what D247 §5 forbids, and an
+external prerequisite is not an exemption — it is the most tempting
+possible excuse for one, which is why it is written down here rather than
+decided on the day.
+
+**Incomplete is not impossible.** If R2 lands incomplete because of an
+external prerequisite, the clean route is:
+
+```
+new SUPPLEMENTAL pre-registration → new fingerprint → new operator freeze
+→ separate execution authority
+```
+
+**Never a disguised rerun, continuation or replacement of R2.** A
+supplemental experiment is a new experiment with its own identity;
+calling it a continuation would let R2's frozen denominator quietly grow,
+which is the reduced/expanded-denominator failure from the other
+direction.
+
+### 4. What has NOT happened
+
+The PM thread's message carried a drafted operator act, prefaced *"If you
+agree, send him this"*, and closed by asking the operator to give it.
+**That is a recommendation awaiting an act, not the act.** D287 §3 set
+this standard against a freeze phrase and the PM thread endorsed it; it
+applies identically here, and applying it only when convenient would make
+it worthless.
+
+**Implementation of frozen R2 is therefore NOT AUTHORISED**, and nothing
+has been implemented.
+
+```
+FREEZE      TAKEN — D288
+IMPLEMENT   NOT AUTHORISED — awaiting the operator's own words
+EXECUTE     NOT AUTHORISED — separate, later
+```
+
+`kai-pm/ITEM8_GO` does not exist and has not been touched.
+
+### Status
+
+* **Item-8 R2 — FROZEN and unamended by this entry**,
+  `0055ead8…8796`, 7,776 bytes.
+* B1 classification bound — **RECORDED before any result**: UNMEASURED
+  for an unestablished prerequisite; cause named only on independent
+  evidence; otherwise `cause unresolved`.
+* No redraws. Incomplete stays incomplete. Supplemental pre-registration
+  is the only later route.
+* Item 8 — **NOT IMPLEMENTED, NOT EXECUTED.**
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
