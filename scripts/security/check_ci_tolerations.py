@@ -679,6 +679,34 @@ DECLARED: Tuple[Toleration, ...] = (
         review_by="2027-01-01",
     ),
     Toleration(
+        workflow="item8-network-contingency.yml",
+        step="Record the toolchain identities this experiment ran under",
+        bucket=DOCUMENTED_SKIP,
+        reason="`|| echo UNRESOLVED` on the base-image digest lookup only. "
+               "Rule 20: the record must distinguish a digest we HAVE from "
+               "one we could not resolve, and writing UNRESOLVED is that "
+               "distinction -- an empty field would read as an answer. The "
+               "other identities on this step (docker, buildx, runner, "
+               "commit, tree, run id, pinned frontend) are not tolerated "
+               "and a failure in them stops the step. Nothing is skipped: "
+               "this records provenance, it does not gate the experiment, "
+               "and the frozen-design check above it is what can stop the "
+               "chain. (D285, D290)",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="item8-network-contingency.yml",
+        step="Free up runner disk space",
+        bucket=DOCUMENTED_SKIP,
+        reason="`sudo rm -rf ... || true` against the runner's preinstalled "
+               "toolchains, identical in shape and reason to the "
+               "declarations for the other workflows. Declared separately "
+               "because the match is on (workflow, step). (D290)",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
         workflow="unified-hunter.yml",
         step="Report the surface that was exercised",
         bucket=DOCUMENTED_SKIP,

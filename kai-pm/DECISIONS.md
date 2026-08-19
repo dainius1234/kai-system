@@ -22278,3 +22278,123 @@ EXECUTE     NOT AUTHORISED — separate, later
   is the only later route.
 * Item 8 — **NOT IMPLEMENTED, NOT EXECUTED.**
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D290 — Item 8 IMPLEMENTED, not executed
+
+**2026-08-18. OPERATOR ACT: implementation only, authorised for frozen
+Item-8 canonical design R2 `0055ead8…8796`. Nothing was built. No
+experimental image exists. `kai-pm/ITEM8_GO` does not exist. Stage 2
+remains NOT AUTHORISED.**
+
+### 1. What was built
+
+| file | role |
+|---|---|
+| `scripts/security/check_item8_design.py` | recomputes the frozen digest and **refuses** if it moved — the clause that makes the freeze a control rather than a document |
+| `scripts/security/derive_item8_dockerfile.py` | derives the six experimental Dockerfiles, asserting treatment cardinality B1=0, B2=1, B3=1 |
+| `scripts/security/collect_explicit_image_identity.py` | identity for an explicitly named image; **imports** its sibling's primitives rather than copying them |
+| `scripts/security/run_item8_experiment.sh` | the six frozen builds and the branch criteria, in one reviewable place |
+| `scripts/security/summarise_item8.py` | six verdicts on two axes that cannot launder one another |
+| `scripts/test_item8_instruments.py` | calibration: **71 assertions, 8 scenarios, 0 failed** |
+| `.github/workflows/item8-network-contingency.yml` | `SENTINEL_AUTHORISED`, sentinel `kai-pm/ITEM8_GO`, instrumented from birth |
+
+Registered: 5 new entries, registry **94 declared, 94 found on disk**,
+I-1..I-7 hold.
+
+### 2. Contract compatibility is guaranteed, not asserted
+
+R2 requires the new collector to emit *the same identity JSONL contract*
+so the unchanged sibling's `--verify-executed --against` can read it. The
+weak way is to copy field names across and hope they stay in step — which
+is D272's failure exactly.
+
+So the shared primitives are **imported** from `collect_image_identity`:
+the inspect call, the ABSENT/NULL/VALUE classification, the platform
+derivation, the state constants. Importing reads that module; it cannot
+modify it. **If its contract moves, this module moves with it by
+construction rather than by anyone remembering to.** The calibration then
+proves the round trip: a record written by the new module is fed to the
+unchanged sibling, which binds it MATCH.
+
+### 3. Two defects the instruments found in my own work
+
+**(a) My calibration did not pin the comparison's STRENGTH.** Reinjecting
+a weakened freeze guard — comparing only the first 8 hex characters —
+passed all 69 assertions, because every fixture moved the digest
+entirely. A comparison whose strength is untested is a comparison nobody
+has checked. Two assertions added: a digest differing by **one
+character**, at either end, must fail. Reinjected again: it now fires.
+71 assertions.
+
+**(b) The registry meta-check caught me pinning baselines into a frozen
+experiment.** I had put the D263 surface re-proof and the
+`collect_image_identity.py` byte-check inside the Item-8 workflow. I-4
+flagged the wiring disagreement, and the registry entry for
+`check_invocation_identity` already said why:
+
+> *"It is not wired into the Stage-1 workflow: making it a gate there
+> means pinning a baseline commit into the experiment, which is a change
+> to the experiment and needs its own authorisation."*
+
+Both checks take a baseline commit as an argument. **R2 requires that
+corroboration to exist; it does not require it to run inside the
+experiment.** The step was removed; the corroboration runs in this
+evidence package, where a pinned baseline is a reviewer's input rather
+than part of the frozen experiment. The comment in the workflow now
+records why it is deliberately absent, so the next person does not
+"repair" it back in.
+
+### 4. One design improvement, and why it is not a deviation
+
+**All six derivations now happen before any build**, in the workflow,
+rather than inside the per-branch loop. A derivation that refuses — a
+reworded retry loop, a wrong mutation count — must cost **zero** builds
+rather than being discovered a third of the way through the denominator.
+The runner now *requires* the derived file and records UNMEASURED if it
+is missing (R11).
+
+R2 fixes the branch semantics, the counts, the order and the criteria. It
+does not prescribe where in the workflow derivation happens, and the
+frozen fingerprint is unchanged — verified before and after this change.
+
+### 5. Reinjection — every instrument proven able to fail
+
+| defect reinjected | result |
+|---|---|
+| freeze guard compares only an 8-char prefix | **70/1 FAIL** (after §3a) |
+| derivation applies B3's denial at build level | **64/5 FAIL** |
+| derivation silently returns the source when its anchor is gone | **66/3 FAIL** |
+| explicit collector writes `""` instead of refusing | **67/2 FAIL** |
+| all reverted | **71/0 PASS** |
+
+### 6. The pre-execution evidence package
+
+| # | required | result |
+|---|---|---|
+| 1 | frozen fingerprint recomputed, mismatch refuses | `0055ead8…8796` **PASS**, and reinjection proves it fails |
+| 2 | N remains 6, B1→B2→B3 semantics match R2 | runner loop `B1 B2 B3`; summariser expects **6** pairs |
+| 3 | shipped Dockerfiles untouched | **0** lines of diff, both |
+| 4 | `collect_image_identity.py` byte-unchanged | **0** lines vs `b53fd4e` |
+| 5 | new collector calibrated, reinjection-proven | **71/0**, four reinjections fire |
+| 6 | mutation cardinality enforced | 0/0, 1/1, 1/1 across both images |
+| 7 | B3 stale-tag/iidfile checks at both ends | pre- and post-assertions present |
+| 8 | B1/B2 offline container + `.Image` binding | `--network none` + `--verify-executed` wired |
+| 9 | axes cannot launder one another | reported separately, stated in the output |
+| 10 | D263 model-facing surface identical | **IDENTICAL** |
+| 11 | Stage-2 / Arm B fingerprints unchanged | `e27bb25a…` / `9b7e77fc…` **MATCH** |
+| 12 | `ITEM8_GO` still absent | **ABSENT**; `STAGE1_GO` untouched since `b45330b` |
+| 13 | tree, policy-check, registry green | `make policy-check` **EXIT 0**; **94/94**; I-1..I-7 hold |
+
+### Status
+
+* **Item 8 — IMPLEMENTED, NOT EXECUTED.** Six builds not run. No
+  experimental image exists.
+* **`kai-pm/ITEM8_GO` — DOES NOT EXIST.** Creating it is the execution
+  act and requires separate authority.
+* Frozen R2 `0055ead8…8796` — **unchanged**, verified before and after
+  every step of this work.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+* Awaiting adversarial review of this implementation before any execution
+  decision.

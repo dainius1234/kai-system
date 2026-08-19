@@ -1,0 +1,176 @@
+# ITEM 8 — does the HuggingFace/network contingency survive the failure
+# it exists for? (KAI-GATE-048 C, D247 §6 item 8)
+#
+# The experiment is FROZEN. D288 froze D285's canonical region at
+#   0055ead8f51d8758bcd6f05b9b1fff84dd9509e91e79c79b6a2500ab78488796
+# and this workflow implements that text and nothing else. Its FIRST
+# real step recomputes that digest and refuses if it has moved, because
+# an amended experiment running under a frozen experiment's authority
+# would look exactly like the real thing.
+#
+# SIX BUILDS. TWO IMAGES. THREE BRANCHES. NO RE-DRAWS.
+#   B1 genuine fetch          (--no-cache, 0 treatment mutations)
+#   B2 injected first-attempt fetch failure   (1 mutation)
+#   B3 persistent network denial on the HF RUN only  (1 mutation)
+#
+# STARTED BY A DELIBERATE ACT, NEVER BY ORDINARY WORK.
+#
+# ── DO NOT "FIX" THE PATHS FILTER BY ADDING THIS JOB'S INPUTS ─────────
+#
+# Same reasoning as stage1-replay.yml, and the registry says so
+# mechanically: this gate is `trigger_class=SENTINEL_AUTHORISED` (D280).
+# Rule 9 requires a gate's trigger conditions to be part of the gate, and
+# for a CONTINUOUS gate that means every input belongs in `paths:`. For a
+# one-shot authorised experiment it means the opposite: if the derivation
+# script or the collectors appeared here, editing an instrument would
+# DISPATCH the experiment — a manufactured evidence run, and a
+# denominator nobody authorised. The sentinel IS the trigger condition,
+# and it satisfies rule 9 by being deliberately narrower than the input
+# set. (D278, D280, D285)
+name: Item 8 — HuggingFace/network contingency (KAI-GATE-048 C)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/project-rework-plan-pgvp35
+    paths:
+      - kai-pm/ITEM8_GO
+
+permissions:
+  contents: read
+
+jobs:
+  item8:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      # THE FROZEN DESIGN, FIRST. Nothing below may run if the experiment
+      # under whose authority it runs has changed. No `continue-on-error`
+      # anywhere on this step: it is the one thing that must be able to
+      # stop the chain.
+      - name: The frozen Item-8 design must be intact
+        run: python3 scripts/security/check_item8_design.py
+
+      - name: Item-8 instruments must pass calibration
+        run: python3 scripts/test_item8_instruments.py
+
+      # NOT HERE: the D263 model-facing surface re-proof and the
+      # byte-unchanged check on collect_image_identity.py.
+      #
+      # Both take a BASELINE COMMIT as an argument, and the gate registry
+      # already records why that must not live inside an experiment's
+      # workflow: "making it a gate there means pinning a baseline commit
+      # into the experiment, which is a change to the experiment and needs
+      # its own authorisation."
+      #
+      # Caught by the registry meta-check (I-4) when this workflow first
+      # named it. R2 requires that corroboration to exist; it does not
+      # require it to run HERE, and it belongs in the pre-execution
+      # evidence package instead, where a pinned baseline is a reviewer's
+      # input rather than part of the frozen experiment.
+
+      # ci-toleration: documented-skip
+      - name: Record the toolchain identities this experiment ran under
+        run: |
+          set -uo pipefail
+          {
+            echo "docker_version=$(docker --version)"
+            echo "buildx_version=$(docker buildx version)"
+            echo "runner_os=$(uname -srm)"
+            echo "commit_sha=$(git rev-parse HEAD)"
+            echo "tree_sha=$(git rev-parse 'HEAD^{tree}')"
+            echo "run_id=${GITHUB_RUN_ID}"
+            echo "frontend=docker/dockerfile:1.9.0@sha256:fe40cf4e92cd0c467be2cfc30657a680ae2398318afd50b0c80585784c604f28"
+            echo "base_image_digest=$(docker buildx imagetools inspect \
+              python:3.11-slim --format '{{.Manifest.Digest}}' 2>/dev/null \
+              || echo UNRESOLVED)"
+          } | tee item8-toolchain.txt
+
+      # ci-toleration: documented-skip
+      - name: Free up runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
+          df -h /
+
+      # ALL SIX DERIVATIONS BEFORE ANY BUILD. A derivation that refuses
+      # -- because a Dockerfile's retry loop was reworded, or because the
+      # mutation cardinality is wrong -- must cost ZERO builds, not be
+      # discovered halfway through the denominator. The deriver asserts
+      # B1=0, B2=1, B3=1 treatment mutations itself and exits non-zero
+      # otherwise, so `set -e` here is the gate.
+      - name: Derive all six experimental Dockerfiles
+        run: |
+          set -euo pipefail
+          mkdir -p item8-derived
+          for image in memu-core memu-graph; do
+            for branch in B1 B2 B3; do
+              python3 scripts/security/derive_item8_dockerfile.py \
+                --image "$image" --branch "$branch" \
+                --out "item8-derived/Dockerfile.$image.$branch"
+            done
+          done
+          test -z "$(git status --porcelain -- memu-core/Dockerfile \
+            memu-graph/Dockerfile)" \
+            || { echo "REFUSED: a shipped Dockerfile was modified."; exit 1; }
+
+      # PROVE THE IDENTITY INSTRUMENT REFUSES, against this daemon, before
+      # six builds depend on it. Its 71 calibration assertions all used an
+      # injected fake; this is the first contact with a real daemon and it
+      # is deliberately a known-NEGATIVE, because an instrument that has
+      # only been seen to succeed is comfort, not control (rule 15).
+      - name: The identity instrument must refuse a reference that is not there
+        run: |
+          set -uo pipefail
+          python3 scripts/security/collect_explicit_image_identity.py \
+            --image-ref kai-item8:deliberately-absent \
+            --label preflight-known-negative \
+            --out item8-identity/preflight.jsonl
+          rc=$?
+          test "$rc" -eq 3 || { echo "REFUSED: the identity instrument \
+            returned $rc for an absent image; 3 (UNRECORDED) was required. \
+            An instrument that cannot refuse cannot be relied on."; exit 1; }
+          echo "known-negative confirmed against a real daemon: exit 3"
+
+      # SIX BUILDS, IN THE FROZEN ORDER. The runner script owns the
+      # branch semantics; this step owns nothing but invoking it, so the
+      # frozen criteria live in one reviewable place rather than being
+      # spread across YAML.
+      #
+      # It exits non-zero only on an INSTRUMENT failure. A branch that is
+      # WRONG_FAILURE or UNMEASURED is a RESULT and is banked as one --
+      # doctrine rule 5, measurement state and subject verdict are
+      # separate, and a failing contingency must not be reported as a
+      # broken workflow.
+      - name: Run the six frozen builds — B1, B2, B3 per image
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: |
+          set -uo pipefail
+          bash scripts/security/run_item8_experiment.sh 2>&1 \
+            | tee item8-run.log
+          echo "runner exit: ${PIPESTATUS[0]}"
+
+      # LAST, so the six verdicts land inside the Actions log byte window.
+      - name: Item 8 verdicts — six branches, in order
+        if: always()
+        run: |
+          set -uo pipefail
+          python3 scripts/security/summarise_item8.py \
+            --results item8-results.jsonl
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: item8-network-contingency
+          path: |
+            item8-results.jsonl
+            item8-toolchain.txt
+            item8-run.log
+            item8-derived/
+            item8-identity/
+          if-no-files-found: warn

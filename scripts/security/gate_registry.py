@@ -1383,6 +1383,105 @@ REGISTRY: Tuple[Gate, ...] = (
          in_policy_check=True,
          in_workflows=("policy-checks.yml",),
          findings=("KAI-GATE-048",)),
+    # D285/D288. Item 8's frozen experiment and its three instruments.
+    Gate(module="check_item8_design",
+         kind=GATE,
+         summary="the frozen Item-8 canonical design must be byte-identical "
+                 "to what D288 froze before any build runs; a moved design, "
+                 "the superseded R1 digest, an unreadable decisions file or "
+                 "an ambiguous region all REFUSE, because an amended "
+                 "experiment running under a frozen design's authority "
+                 "would be invisible without this",
+         inputs=("kai-pm/DECISIONS.md",),
+         denominator=r"inspected: \d+ canonical region across \d+ frozen "
+                     r"design",
+         proven_by="scripts/test_item8_instruments.py",
+         calibrated_by="scripts/test_item8_instruments.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml", "item8-network-contingency.yml"),
+         findings=("KAI-GATE-048",)),
+    Gate(module="derive_item8_dockerfile",
+         kind=REPORT,
+         summary="Item 8's experimental Dockerfiles, derived mechanically "
+                 "from the shipped ones with treatment-mutation cardinality "
+                 "asserted (B1=0, B2=1, B3=1) and the pinned frontend added "
+                 "as scaffolding; refuses rather than silently emitting the "
+                 "source when its anchor no longer matches, and refuses to "
+                 "write over the shipped Dockerfile",
+         inputs=("memu-core/Dockerfile", "memu-graph/Dockerfile"),
+         denominator=r"inspected: \d+ shipped Dockerfile, \d+ treatment "
+                     r"mutation\(s\) of \d+ required",
+         probe=False,
+         probe_skip_reason="writes a derived file, so probing it in the "
+                           "meta-check would create artifacts as a side "
+                           "effect of measuring; all six derivations and "
+                           "every refusal are asserted in "
+                           "scripts/test_item8_instruments.py",
+         proven_by="scripts/test_item8_instruments.py",
+         calibrated_by="scripts/test_item8_instruments.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="collect_explicit_image_identity",
+         kind=REPORT,
+         summary="identity for an image named directly rather than resolved "
+                 "through Compose, emitting the same JSONL contract as "
+                 "collect_image_identity by importing its primitives rather "
+                 "than copying them; a failed or Id-less inspect records "
+                 "UNRECORDED, never an empty identity field",
+         inputs=(),
+         denominator=r"inspected: \d+ explicit image reference, \d+ "
+                     r"recorded, \d+ UNRECORDED",
+         probe=False,
+         probe_skip_reason="needs a Docker daemon and a built experimental "
+                           "image; this host has neither. The recorded case "
+                           "and every refusal are asserted against the "
+                           "shipped CLI with an injected docker in "
+                           "scripts/test_item8_instruments.py",
+         proven_by="scripts/test_item8_instruments.py",
+         calibrated_by="scripts/test_item8_instruments.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="summarise_item8",
+         kind=REPORT,
+         summary="Item 8's six verdicts on two axes that may not launder "
+                 "one another -- the contingency, and the collectors' first "
+                 "live-daemon qualification -- refusing to compose a verdict "
+                 "from fewer than the six precommitted branches",
+         inputs=(),
+         denominator=r"inspected: \d+ branch result\(s\) of \d+ "
+                     r"precommitted",
+         probe=False,
+         probe_skip_reason="needs a results file produced by the six frozen "
+                           "builds; its absent-input and short-input "
+                           "refusals are asserted in "
+                           "scripts/test_item8_instruments.py",
+         proven_by="scripts/test_item8_instruments.py",
+         calibrated_by="scripts/test_item8_instruments.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_item8_instruments",
+         kind=GATE,
+         summary="Item 8's three instruments must each refuse: a moved "
+                 "frozen design (including one differing by a single "
+                 "character) stops the build, a derivation whose anchor "
+                 "moved refuses instead of emitting the source, B3 denies "
+                 "network to exactly the HF instruction and leaves pip "
+                 "alone, and an explicit-image record must be readable by "
+                 "the unchanged sibling collector",
+         inputs=(),
+         denominator=r"inspected: \d+ Item-8 instrument scenario\(s\) "
+                     r"across \d+ instruments",
+         proven_by="scripts/test_item8_instruments.py",
+         calibrated_by="scripts/test_item8_instruments.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml", "item8-network-contingency.yml"),
+         findings=("KAI-GATE-048",)),
     Gate(module="select_replay_subject",
          kind=REPORT,
          summary="which captured request becomes the Stage-1 replay "

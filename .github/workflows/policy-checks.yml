@@ -12,6 +12,8 @@ on:
       - 'scripts/test_declared_prerequisites.py'
       - 'scripts/test_doctrine_integrity.py'
       - 'scripts/test_image_identity.py'
+      - 'scripts/test_item8_instruments.py'
+      - 'kai-pm/DECISIONS.md'
       - 'kai-pm/ENGINEERING_DOCTRINE.md'
   pull_request:
     paths:
@@ -88,6 +90,15 @@ jobs:
       # on every push, so it cannot quietly lapse between experiments.
       - name: Image-identity collector calibration
         run: python scripts/test_image_identity.py
+
+      # D288. The frozen Item-8 design must not drift between the
+      # freeze and the experiment, and the drift would be invisible
+      # without this. Runs on every push, not only when Item 8 runs.
+      - name: Item-8 frozen design integrity
+        run: python scripts/security/check_item8_design.py
+
+      - name: Item-8 instrument calibration
+        run: python scripts/test_item8_instruments.py
 
       - name: Port binding check
         run: python scripts/security/check_port_bindings.py
