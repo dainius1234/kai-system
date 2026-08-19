@@ -55,7 +55,7 @@ PARSER = REPO / "scripts" / "security" / "parse_buildkit_events.py"
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 15
+EXPECTED_SCENARIOS = 23
 executed: list[str] = []
 
 
@@ -77,10 +77,23 @@ def scenario(name: str) -> None:
 FAKE_DOCKER = r'''#!/usr/bin/env python3
 """A docker emitting BuildKit rawjson: instruction text and runtime
 output in DIFFERENT fields, exactly as the real one does.
+
+AND ON THE SAME FILE DESCRIPTOR AS THE REAL ONE. buildx writes its
+progress printer -- rawjson included -- to STDERR. This fake wrote it to
+stdout, so the calibration modelled a transport the shipped command path
+does not have: the runner captured stdout, every fixture passed, and the
+real six builds would have produced an empty stream and reported six
+UNMEASURED after the denominator was spent. Measured against
+`docker buildx build --progress=rawjson >/dev/null`, not reasoned about.
+(D294)
 """
 import base64, json, os, sys
 argv = sys.argv[1:]
 mode = os.environ["FAKE_MODE"]
+# STDERR, like buildx. `events_on_stdout` is the known-negative for the
+# opposite mistake: the runner captures BOTH descriptors, so it must
+# measure correctly whichever one carries the events.
+OUT = sys.stdout if mode == "events_on_stdout" else sys.stderr
 # Branch from the -f BASENAME suffix ONLY. Deriving it from the whole
 # argv meant a random temp-dir name containing "b3" silently switched
 # the scenario -- the same "matched incidental text" defect this whole
@@ -91,9 +104,10 @@ if branch not in ("B1", "B2", "B3"):
     branch = "B1"
 DIG = "sha256:" + "1" * 64
 
-def ev(o): print(json.dumps(o))
+def ev(o): print(json.dumps(o), file=OUT)
 def log(s): ev({"logs": [{"vertex": DIG, "stream": 1,
                           "data": base64.b64encode(s.encode()).decode()}]})
+def diag(s): print(s, file=sys.stderr)
 
 if argv and argv[0] == "build":
     name = '[3/9] RUN for attempt in 1 2 3 4 5; do python fetch && exit 0; echo "retrying in 10s"; done; echo "REFUSING TO BUILD"'
@@ -105,7 +119,7 @@ if argv and argv[0] == "build":
                           "name": "[1/9] FROM python:3.11-slim",
                           "started": "t0", "completed": "t1"}]})
     if mode == "unparseable":
-        print("{not json")
+        print("{not json", file=OUT)
         sys.exit(1)
     n = 0
     if branch == "B3":
@@ -113,20 +127,43 @@ if argv and argv[0] == "build":
         for _ in range(n):
             log("model download attempt /5 failed; retrying in 10s\n")
         log("REFUSING TO BUILD: could not fetch the model in 5 attempts.\n")
+        # The vertex's OWN error. `b3_no_vertex_error` is the case R2
+        # cares about: the build failed and our text appeared, but the
+        # target step carries no error, so the failure is somewhere else.
+        verr = ("" if mode == "b3_no_vertex_error"
+                else "process did not complete successfully")
         ev({"vertexes": [{"digest": DIG, "name": name, "completed": "t1",
-                          "error": "process did not complete successfully"}]})
+                          "error": verr}]})
+        # A real failed build also prints a CLI diagnostic on stderr,
+        # which is NOT a BuildKit event. The parser must keep it and
+        # report it, never treat it as a truncated event (R10).
+        diag('ERROR: failed to solve: process "/bin/sh -c for attempt in '
+             '1 2 3 4 5" did not complete successfully: exit code: 1')
         if mode == "b3_leaves_iid":
             open(argv[argv.index("--iidfile") + 1], "w").write("sha256:" + "f" * 64)
         if mode == "b3_leaves_empty_iid":
             open(argv[argv.index("--iidfile") + 1], "w").close()
         sys.exit(1)
     if branch == "B2":
-        log("ITEM8-B2-INJECTED-ATTEMPT=%s\n" % ("2" if mode == "b2_inject_late" else "1"))
-        if mode == "b2_double_inject":
-            log("ITEM8-B2-INJECTED-ATTEMPT=1\n")
-        if mode != "b2_no_genuine_retry":
+        # A CONSTANT marker. The derivation cannot interpolate the attempt
+        # number -- `\$attempt` inside a double-quoted RUN string is the
+        # literal text -- so a fake that manufactured `=1` was proving a
+        # behaviour the shipped Dockerfile did not have. (D294)
+        MARK = "ITEM8-B2-INJECTED-FIRST-ATTEMPT\n"
+        if mode == "b2_out_of_order":
+            # retry BEFORE the injection: the sequence R2 requires is
+            # injection -> retry -> success, and order is the criterion.
             log("model download attempt /5 failed; retrying in 10s\n")
-        log("BAKED ok\n")
+            log(MARK)
+            log("BAKED ok\n")
+        else:
+            log(MARK)
+            if mode == "b2_double_inject":
+                log(MARK)
+            if mode != "b2_no_genuine_retry":
+                log("model download attempt /5 failed; retrying in 10s\n")
+            if mode != "b2_never_bakes":
+                log("BAKED ok\n")
     else:
         log("BAKED ok\n")
     ev({"vertexes": [{"digest": DIG, "name": name, "completed": "t1"}]})
@@ -156,7 +193,37 @@ sys.exit(0)
 '''
 
 
-def run_runner(mode: str, td: Path) -> tuple[int, str, list[dict]]:
+PINNED_FRONTEND = ("docker/dockerfile:1.9.0@sha256:"
+                   "fe40cf4e92cd0c467be2cfc30657a680ae2398318afd50b0c80585784c604f28")
+
+
+def git(*a: str) -> str:
+    return subprocess.run(["git", *a], capture_output=True, text=True,
+                          cwd=str(REPO)).stdout.strip()
+
+
+def toolchain_text(**over: str) -> str:
+    """A COMPLETE toolchain record, of the shape R2 requires.
+
+    The previous fixture had two fields, and six branches qualified
+    against it. That is the defect this file now calibrates: the record
+    is validated before build 1, so the fixture has to be a real one and
+    the reinjections below break it one field at a time.
+    """
+    rec = {"frontend": PINNED_FRONTEND,
+           "docker_version": "Docker version 27.0.3, build fake",
+           "buildx_version": "github.com/docker/buildx v0.16.0 fake",
+           "base_image_digest": "sha256:" + "a" * 64,
+           "runner_os": "Linux 6.8.0 x86_64",
+           "commit_sha": git("rev-parse", "HEAD"),
+           "tree_sha": git("rev-parse", "HEAD^{tree}"),
+           "run_id": "555"}
+    rec.update(over)
+    return "".join(f"{k}={v}\n" for k, v in rec.items())
+
+
+def run_runner(mode: str, td: Path,
+               toolchain: str | None = None) -> tuple[int, str, list[dict]]:
     """Drive the shipped runner with a fake docker and pre-derived files."""
     fake = td / "docker"
     fake.write_text(FAKE_DOCKER)
@@ -171,7 +238,7 @@ def run_runner(mode: str, td: Path) -> tuple[int, str, list[dict]]:
                 f"# derived {image} {branch}\nFROM scratch\n")
     results = td / "results.jsonl"
     tool = td / "toolchain.txt"
-    tool.write_text("docker_version=fake\nbase_image_digest=sha256:abc\n")
+    tool.write_text(toolchain_text() if toolchain is None else toolchain)
     env = {**os.environ, "FAKE_MODE": mode, "DOCKER": str(fake),
            "ITEM8_DERIVED": str(derived), "ITEM8_IDENT": str(ident),
            "ITEM8_RESULTS": str(results), "GITHUB_RUN_ID": "555",
@@ -183,11 +250,14 @@ def run_runner(mode: str, td: Path) -> tuple[int, str, list[dict]]:
     return p.returncode, p.stdout + p.stderr, rows
 
 
-def summarise(rows: list[dict], td: Path) -> tuple[int, str]:
+def summarise(rows: list[dict], td: Path,
+              toolchain: str | None = None) -> tuple[int, str]:
     f = td / "s.jsonl"
     f.write_text("".join(json.dumps(r) + "\n" for r in rows))
-    p = subprocess.run([sys.executable, str(SUMMARISE), "--results", str(f)],
-                       capture_output=True, text=True, cwd=str(REPO))
+    argv = [sys.executable, str(SUMMARISE), "--results", str(f)]
+    if toolchain is not None:
+        argv += ["--toolchain", toolchain]
+    p = subprocess.run(argv, capture_output=True, text=True, cwd=str(REPO))
     return p.returncode, p.stdout + p.stderr
 
 
@@ -666,6 +736,254 @@ def test_b1_must_prove_uncached_execution() -> None:
                   "did not execute" in r.get("note", ""), str(r))
 
 
+# ── D294 1: the transport. rawjson is on STDERR, and both are captured ──
+
+def test_events_are_read_from_either_descriptor() -> None:
+    """The fake used to write events to stdout. buildx does not."""
+    scenario("transport: rawjson arrives on stderr, and both FDs are read")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # DEFAULT mode now emits on stderr, like real buildx. If the
+        # runner captured only stdout this would produce six UNMEASURED.
+        _, out, rows = run_runner("ok", td)
+        check("stderr-borne events are measured", len(rows) == 6, out)
+        for r in rows:
+            check(f"{r['image']} {r['branch']} was actually measured",
+                  r["axis1_verdict"] == "PASS", str(r))
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # And the opposite mistake must not break it either: the runner
+        # passes BOTH descriptors, so events on stdout measure the same.
+        _, out, rows = run_runner("events_on_stdout", td)
+        check("stdout-borne events are measured too", len(rows) == 6, out)
+        for r in rows:
+            check(f"{r['image']} {r['branch']} measured from stdout",
+                  r["axis1_verdict"] == "PASS", str(r))
+
+
+def test_parser_names_the_wrong_descriptor_possibility() -> None:
+    """A capture that watched the wrong FD looks exactly like no build."""
+    scenario("transport: an eventless capture refuses and names the FD")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        empty = td / "stdout.jsonl"
+        empty.write_text("")
+        p = subprocess.run(
+            [sys.executable, str(PARSER), "--events", str(empty),
+             "--target-substring", "for attempt in 1 2 3 4 5", "--json"],
+            capture_output=True, text=True, cwd=str(REPO))
+        check("a single empty descriptor REFUSES", p.returncode == 1, p.stdout)
+        check("and names the wrong-descriptor possibility",
+              "DIFFERENT FILE DESCRIPTOR" in p.stdout
+              or "descriptor" in p.stdout, p.stdout)
+        # CLI diagnostics are kept, not mistaken for truncated events.
+        both = td / "stderr.jsonl"
+        both.write_text(
+            'ERROR: failed to solve: process "/bin/sh -c x" did not '
+            'complete successfully\n'
+            + json.dumps({"vertexes": [{"digest": "sha256:" + "1" * 64,
+                                        "name": "RUN for attempt in 1 2 3 4 5",
+                                        "started": "t0"}]}) + "\n")
+        p = subprocess.run(
+            [sys.executable, str(PARSER), "--events", str(both),
+             "--events", str(empty), "--target-substring",
+             "for attempt in 1 2 3 4 5", "--json"],
+            capture_output=True, text=True, cwd=str(REPO))
+        check("a mixed stream parses", p.returncode == 0, p.stdout + p.stderr)
+        facts = json.loads(p.stdout)
+        check("and the CLI diagnostic is COUNTED, not discarded",
+              facts["cli_diagnostic_lines"] == 1, p.stdout)
+
+
+# ── D294 2: B2's marker is a constant, and order is the criterion ───────
+
+def test_b2_marker_is_a_constant_and_order_matters() -> None:
+    scenario("B2: one marker, and injection then retry then success")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, _, rows = run_runner("b2_double_inject", td)
+        for r in [r for r in rows if r["branch"] == "B2"]:
+            check(f"{r['image']} B2 two markers is NOT PASS",
+                  r["axis1_verdict"] != "PASS", str(r))
+            check(f"{r['image']} B2 counts them", r["injection_markers"] == 2,
+                  str(r))
+            check(f"{r['image']} B2 says exactly one is required",
+                  "exactly one is required" in r.get("note", ""), str(r))
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, _, rows = run_runner("b2_out_of_order", td)
+        for r in [r for r in rows if r["branch"] == "B2"]:
+            check(f"{r['image']} B2 retry BEFORE injection is NOT PASS",
+                  r["axis1_verdict"] != "PASS", str(r))
+            check(f"{r['image']} B2 names the ordering",
+                  "in that order" in r.get("note", ""), str(r))
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, _, rows = run_runner("b2_never_bakes", td)
+        for r in [r for r in rows if r["branch"] == "B2"]:
+            check(f"{r['image']} B2 with no later success is NOT PASS",
+                  r["axis1_verdict"] != "PASS", str(r))
+
+
+def test_b2_shim_prints_a_constant_in_a_real_shell() -> None:
+    """The fake must not be better than the shipped command path.
+
+    The derived Dockerfile is fed to /bin/sh here, not reasoned about.
+    An earlier shim wrote `\\$attempt` intending expansion; the shell
+    prints the literal, and only running it says so.
+    """
+    scenario("B2: the derived shim's marker, measured against /bin/sh")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        out = td / "Dockerfile.memu-graph.B2"
+        p = subprocess.run(
+            [sys.executable, str(REPO / "scripts" / "security" /
+                                 "derive_item8_dockerfile.py"),
+             "--image", "memu-graph", "--branch", "B2", "--out", str(out)],
+            capture_output=True, text=True, cwd=str(REPO))
+        check("the B2 derivation succeeds", p.returncode == 0,
+              p.stdout + p.stderr)
+        text = out.read_text()
+        check("the marker is a CONSTANT",
+              "ITEM8-B2-INJECTED-FIRST-ATTEMPT" in text, text[:400])
+        check("and carries no interpolation at all",
+              "$attempt" not in text.split("ITEM8-B2-INJECTED-FIRST-ATTEMPT")[0]
+              .rsplit("\n", 1)[-1], text[:400])
+
+
+# ── D294 3: B3's failure must arise from the target vertex ─────────────
+
+def test_b3_requires_the_target_vertexs_own_error() -> None:
+    scenario("B3: our text in a build that failed elsewhere is WRONG_FAILURE")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, _, rows = run_runner("b3_no_vertex_error", td)
+        for r in [r for r in rows if r["branch"] == "B3"]:
+            check(f"{r['image']} B3 with no vertex error is WRONG_FAILURE",
+                  r["axis1_verdict"] == "WRONG_FAILURE", str(r))
+            check(f"{r['image']} B3 says it is not attributable",
+                  "not attributable" in r.get("note", ""), str(r))
+            check(f"{r['image']} B3 records the empty error",
+                  r["target_vertex_error"] == "", str(r))
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, _, rows = run_runner("ok", td)
+        for r in [r for r in rows if r["branch"] == "B3"]:
+            check(f"{r['image']} B3 WITH a vertex error PASSES",
+                  r["axis1_verdict"] == "PASS", str(r))
+            check(f"{r['image']} B3 records that error",
+                  r["target_vertex_error"] != "", str(r))
+
+
+# ── D294 4: the toolchain record, validated before build 1 ─────────────
+
+def toolchain_check(text: str | None, td: Path,
+                    extra: list[str] | None = None) -> tuple[int, str]:
+    f = td / "toolchain.txt"
+    if text is not None:
+        f.write_text(text)
+    p = subprocess.run(
+        [sys.executable, str(REPO / "scripts" / "security" /
+                             "check_item8_toolchain.py"),
+         "--toolchain", str(f), *(extra or [])],
+        capture_output=True, text=True, cwd=str(REPO))
+    return p.returncode, p.stdout + p.stderr
+
+
+def test_toolchain_record_is_validated_not_merely_hashed() -> None:
+    """A SHA-256 of an incomplete record is a perfect hash of bad evidence."""
+    scenario("toolchain: completeness is checked before any build")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # KNOWN-POSITIVE first, so the refusals below mean something.
+        code, out = toolchain_check(toolchain_text(), td)
+        check("a complete record PASSES", code == 0, out)
+        check("and reports its own denominator",
+              "8 required identity(s)" in out, out)
+        # the original two-field fixture -- the defect, exactly as it was
+        code, out = toolchain_check(
+            "docker_version=fake\nbase_image_digest=sha256:abc\n", td)
+        check("the old two-field fixture REFUSES", code == 1, out)
+        check("and names every missing identity",
+              "frontend" in out and "runner_os" in out, out)
+        # `key=` -- present, empty. `set -uo pipefail` produces exactly this.
+        code, out = toolchain_check(toolchain_text(buildx_version=""), td)
+        check("an EMPTY value REFUSES", code == 1, out)
+        check("and says absence wearing a key's clothes",
+              "absence wearing a key" in out, out)
+        code, out = toolchain_check(
+            toolchain_text(base_image_digest="UNRESOLVED"), td)
+        check("UNRESOLVED REFUSES", code == 1, out)
+        code, out = toolchain_check(
+            toolchain_text(frontend="docker/dockerfile:1"), td)
+        check("a floating frontend REFUSES", code == 1, out)
+        check("and says a different frontend is a different experiment",
+              "different experiment" in out, out)
+        code, out = toolchain_check(toolchain_text(tree_sha="0" * 40), td)
+        check("a stale tree_sha REFUSES", code == 1, out)
+        code, out = toolchain_check(toolchain_text(commit_sha="0" * 40), td)
+        check("a stale commit_sha REFUSES", code == 1, out)
+        code, out = toolchain_check(toolchain_text(), td,
+                                    ["--expect-run-id", "999"])
+        check("a record describing another run REFUSES", code == 1, out)
+        (td / "toolchain.txt").unlink()
+        code, out = toolchain_check(None, td)
+        check("an absent record REFUSES", code == 1, out)
+        check("and says no build may start", "NO BUILD MAY START" in out, out)
+
+
+def test_runner_refuses_before_build_1_on_a_bad_toolchain() -> None:
+    """Zero builds spent, not six. That is the whole point of the ordering."""
+    scenario("toolchain: a bad record costs zero experimental builds")
+    for label, tc in (("two fields", "docker_version=fake\n"),
+                      ("an empty value", toolchain_text(runner_os="")),
+                      ("UNRESOLVED", toolchain_text(
+                          base_image_digest="UNRESOLVED"))):
+        with tempfile.TemporaryDirectory() as d:
+            td = Path(d)
+            code, out, rows = run_runner("ok", td, toolchain=tc)
+            check(f"{label}: the runner exits NON-ZERO", code != 0, out)
+            check(f"{label}: it is an INSTRUMENT FAILURE",
+                  "INSTRUMENT FAILURE" in out, out)
+            check(f"{label}: ZERO result rows were written",
+                  len(rows) == 0, str(rows))
+            check(f"{label}: no build was attempted",
+                  "::group::" not in out, out[:400])
+
+
+def test_summariser_rehashes_the_toolchain_artefact() -> None:
+    """Six rows agreeing with each other are six statements from one source."""
+    scenario("toolchain: rows are matched against the artefact, not each other")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        art = td / "toolchain.txt"
+        art.write_text(toolchain_text())
+        import hashlib
+        real = hashlib.sha256(art.read_bytes()).hexdigest()
+
+        code, out = summarise(six(toolchain_sha256=real), td, str(art))
+        check("rows bound to the artefact QUALIFY", code == 0, out)
+        check("and the recomputation is reported", "TOOLCHAIN  recomputed" in out, out)
+
+        # All six agree with each other and none with the artefact. This
+        # is the case a row-to-row comparison cannot see.
+        code, out = summarise(six(toolchain_sha256="d" * 64), td, str(art))
+        check("six self-consistent rows still REFUSE", code == 4, out)
+        check("and each is named", out.count("TOOLCHAIN: ") == 6, out)
+
+        rows = six(toolchain_sha256=real)
+        rows[3]["toolchain_sha256"] = "e" * 64
+        code, out = summarise(rows, td, str(art))
+        check("one divergent row REFUSES", code == 4, out)
+        check("and only that one is named",
+              out.count("TOOLCHAIN: ") == 1, out)
+        check("naming the subject", "memu-graph/B1" in out, out)
+
+        code, out = summarise(six(toolchain_sha256=real), td,
+                              str(td / "not-there.txt"))
+        check("an absent artefact REFUSES", code == 4, out)
+
+
 def run_all() -> None:
     test_axis2_failure_leaves_axis1_standing()
     test_b3_requires_five_attempts()
@@ -682,6 +1000,14 @@ def run_all() -> None:
     test_authority_one_shot_controls()
     test_toolchain_binding_is_required()
     test_b1_must_prove_uncached_execution()
+    test_events_are_read_from_either_descriptor()
+    test_parser_names_the_wrong_descriptor_possibility()
+    test_b2_marker_is_a_constant_and_order_matters()
+    test_b2_shim_prints_a_constant_in_a_real_shell()
+    test_b3_requires_the_target_vertexs_own_error()
+    test_toolchain_record_is_validated_not_merely_hashed()
+    test_runner_refuses_before_build_1_on_a_bad_toolchain()
+    test_summariser_rehashes_the_toolchain_artefact()
     print(f"  inspected: {EXPECTED_SCENARIOS} verdict-layer scenario(s) "
           f"across 3 shipped entry points")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",

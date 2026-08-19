@@ -90,20 +90,39 @@ class Vertex:
         }
 
 
-def parse(text: str) -> tuple[dict[str, Vertex], str]:
-    """Every vertex in the stream, with its RUNTIME output attached."""
+def parse(text: str, source: str = "stream"
+          ) -> tuple[dict[str, Vertex], list[str], str]:
+    """Every vertex, its RUNTIME output, and any non-event diagnostics.
+
+    THE TRANSPORT IS NOT ONE CLEAN STREAM. buildx writes its progress
+    printer -- including rawjson -- to STDERR, and ordinary CLI
+    diagnostics arrive on stderr too, especially on the failed build B3
+    deliberately causes. So a caller may hand us a file containing both.
+
+    A line beginning `{` that does not parse is a TRUNCATED EVENT and is
+    refused: silently skipping it would turn a partially-captured stream
+    into "no retries observed". A line not beginning `{` is a CLI
+    diagnostic; it is collected and reported, never discarded (R10).
+    """
     vertices: dict[str, Vertex] = {}
+    diagnostics: list[str] = []
     seen_any = False
     for lineno, line in enumerate(text.splitlines(), 1):
         line = line.strip()
         if not line:
             continue
+        if not line.startswith("{"):
+            diagnostics.append(line)
+            continue
         try:
             ev = json.loads(line)
         except json.JSONDecodeError as e:
-            return {}, (f"line {lineno} of the event stream is not JSON "
-                        f"({e}). A partially-read event stream cannot be "
-                        f"distinguished from a build that printed nothing")
+            return {}, diagnostics, (
+                f"{source} line {lineno} begins '{{' but is not valid JSON "
+                f"({e}). A truncated event is not a diagnostic: skipped, a "
+                f"partial capture cannot be distinguished from an empty "
+                f"one, and 'no retries observed' would be the answer to "
+                f"both")
         if not isinstance(ev, dict):
             continue
         seen_any = True
@@ -132,10 +151,12 @@ def parse(text: str) -> tuple[dict[str, Vertex], str]:
                 # Undecodable payload is a fact, not something to drop.
                 vx.log.append(f"<UNDECODABLE LOG PAYLOAD: {data[:40]!r}>")
     if not seen_any:
-        return {}, ("the event stream held no BuildKit events at all. "
-                    "Either the build produced none or --progress=rawjson "
-                    "was not in effect; neither licenses a conclusion")
-    return vertices, ""
+        return {}, diagnostics, (
+            f"{source} held no BuildKit events at all. Either the build "
+            f"produced none, --progress=rawjson was not in effect, or the "
+            f"events were written to a DIFFERENT FILE DESCRIPTOR than the "
+            f"one captured; none of those licenses a conclusion")
+    return vertices, diagnostics, ""
 
 
 def find_target(vertices: dict[str, Vertex], needle: str
@@ -160,7 +181,11 @@ def find_target(vertices: dict[str, Vertex], needle: str
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--events", required=True)
+    ap.add_argument("--events", action="append", required=True,
+                    metavar="PATH",
+                    help="repeatable. buildx writes rawjson to STDERR, and "
+                         "CLI diagnostics land there too, so BOTH captured "
+                         "descriptors are passed and neither is assumed")
     ap.add_argument("--target-substring", required=True)
     ap.add_argument("--count", action="append", default=[], metavar="STRING",
                     help="count occurrences of STRING in the target's "
@@ -172,15 +197,47 @@ def main() -> int:
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args()
 
-    path = pathlib.Path(args.events)
-    if not path.is_file():
-        print(f"REFUSED: {path} does not exist. There is no event stream "
-              f"to read, and an absent stream is not an empty one.")
-        return 1
+    texts: list[tuple[str, str]] = []
+    for e in args.events:
+        path = pathlib.Path(e)
+        if not path.is_file():
+            print(f"REFUSED: {path} does not exist. There is no event "
+                  f"stream to read, and an absent stream is not an empty "
+                  f"one.")
+            return 1
+        texts.append((e, path.read_text()))
 
-    vertices, err = parse(path.read_text())
-    if err:
-        print(f"REFUSED: {err}.")
+    # Parse each capture separately, then merge. A truncated event in
+    # EITHER descriptor is a refusal.
+    vertices: dict[str, Vertex] = {}
+    diagnostics: list[str] = []
+    found_events = False
+    for name, text in texts:
+        vx, diag, err = parse(text, name)
+        diagnostics.extend(diag)
+        if err and "held no BuildKit events" not in err:
+            print(f"REFUSED: {err}.")
+            return 1
+        if vx:
+            found_events = True
+            for d, v in vx.items():
+                if d in vertices:
+                    vertices[d].log.extend(v.log)
+                    vertices[d].name = v.name or vertices[d].name
+                    vertices[d].error = v.error or vertices[d].error
+                    vertices[d].cached = v.cached or vertices[d].cached
+                    vertices[d].started = v.started or vertices[d].started
+                else:
+                    vertices[d] = v
+    if not found_events:
+        print(f"REFUSED: none of the {len(texts)} captured descriptor(s) "
+              f"held BuildKit events. buildx writes rawjson to STDERR; a "
+              f"capture that watched only stdout would look exactly like "
+              f"this, and so would a build that never ran. Nothing here "
+              f"licenses a conclusion about either.")
+        if diagnostics:
+            print(f"  {len(diagnostics)} diagnostic line(s) were captured, "
+                  f"first: {diagnostics[0][:160]!r}")
         return 1
     target, err = find_target(vertices, args.target_substring)
     if err:
@@ -191,6 +248,7 @@ def main() -> int:
     facts = target.as_dict()
     facts["counts"] = {s: runtime.count(s) for s in args.count}
     facts["vertices_total"] = len(vertices)
+    facts["cli_diagnostic_lines"] = len(diagnostics)
 
     if args.emit_log:
         # RUNTIME ONLY. A caller grepping this file cannot match a
@@ -213,7 +271,11 @@ def main() -> int:
     for s, n in facts["counts"].items():
         print(f"    {n:>3} x {s!r}  (RUNTIME output only)")
     print()
-    print(f"  inspected: 1 target vertex of {len(vertices)} in the stream")
+    print(f"  inspected: 1 target vertex of {len(vertices)} across "
+          f"{len(texts)} captured descriptor(s)")
+    if diagnostics:
+        print(f"  {len(diagnostics)} CLI diagnostic line(s), kept separate "
+              f"from events and not discarded")
     print()
     print("  Counts are over RUNTIME OUTPUT attributed to this vertex.")
     print("  The instruction text above is metadata and is never counted,")

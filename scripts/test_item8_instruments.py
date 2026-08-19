@@ -219,16 +219,25 @@ def test_b2_injects_one_first_attempt_failure() -> None:
             check(f"{image} B2 injects the sentinel once",
                   text.count("item8-b2-first-attempt-consumed") == 2,
                   str(text.count("item8-b2-first-attempt-consumed")))
-            check(f"{image} B2 announces the injection with a RUNTIME value",
-                  'ITEM8-B2-INJECTED-ATTEMPT=\\$attempt' in text, text[:300])
-            # THE STRUCTURAL PROPERTY: the measured form must not exist in
-            # the source. Source carries `$attempt`; only an execution ever
-            # prints a number. Belt as well as braces -- the parser already
-            # reads runtime output only, so this can no longer be the sole
-            # defence, but a source that cannot forge the value is still
-            # worth having.
-            check(f"{image} B2 source contains NO expanded marker",
-                  "INJECTED-ATTEMPT=1" not in text, text[:300])
+            # A CONSTANT, SINGLE-QUOTED marker. The previous form was
+            # `ITEM8-B2-INJECTED-ATTEMPT=\$attempt`, meant to expand at
+            # runtime. Run against /bin/sh it does not: a backslash before
+            # `$` inside a double-quoted string SUPPRESSES expansion, so
+            # the container printed the literal `$attempt` while the
+            # calibration's fake docker manufactured `=1`. The fixture was
+            # asserting a behaviour the shipped derivation did not have.
+            #
+            # The number was never needed: the shim's sentinel file cannot
+            # exist before the shim creates it, so the injected iteration
+            # IS the first one by construction, and the criterion is
+            # "exactly one occurrence". (D294)
+            check(f"{image} B2 announces the injection with a CONSTANT",
+                  "echo 'ITEM8-B2-INJECTED-FIRST-ATTEMPT'" in text, text[:300])
+            check(f"{image} B2 attempts NO shell interpolation in the marker",
+                  "INJECTED-ATTEMPT" not in text, text[:300])
+            check(f"{image} B2 emits the marker exactly once in the source",
+                  text.count("ITEM8-B2-INJECTED-FIRST-ATTEMPT") == 1,
+                  str(text.count("ITEM8-B2-INJECTED-FIRST-ATTEMPT")))
             check(f"{image} B2 carries NO instrumentation scaffolding",
                   "ITEM8-MARK" not in text, text[:300])
             check(f"{image} B2 keeps the genuine command reachable",

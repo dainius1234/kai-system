@@ -113,6 +113,24 @@ jobs:
               || echo UNRESOLVED)"
           } | tee item8-toolchain.txt
 
+      # THE RECORD MUST BE COMPLETE BEFORE BUILD 1, NOT HASHED AFTER IT.
+      #
+      # The step above runs under `set -uo pipefail`, deliberately -- it
+      # must not abort the job -- but that means a failed `$( )` leaves
+      # `key=`, a present key with nothing behind it, and the enclosing
+      # `echo` still succeeds. Hashing that file binds six rows to a
+      # digest of an incomplete record.
+      #
+      # This validates presence, non-emptiness, resolution, the pinned
+      # frontend, and that the commit and tree named are THIS execution's.
+      # A failure here costs zero builds; the same failure discovered
+      # after build 6 costs the entire no-redraw denominator. (D294)
+      - name: The toolchain record must be complete before any build
+        run: |
+          python3 scripts/security/check_item8_toolchain.py \
+            --toolchain item8-toolchain.txt \
+            --expect-run-id "${GITHUB_RUN_ID}"
+
       # ci-toleration: documented-skip
       - name: Free up runner disk space
         run: |
@@ -209,7 +227,8 @@ jobs:
         run: |
           set -uo pipefail
           python3 scripts/security/summarise_item8.py \
-            --results item8-results.jsonl
+            --results item8-results.jsonl \
+            --toolchain item8-toolchain.txt
 
       - uses: actions/upload-artifact@v4
         if: always()

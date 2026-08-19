@@ -94,6 +94,23 @@ _RETRY_OPEN = re.compile(r"^RUN for attempt in 1 2 3 4 5; do \\\s*$", re.M)
 # removed, and with it the question of whether it counted against the
 # frozen mutation cardinality. (D293)
 
+# B2's marker carries NO INTERPOLATED VALUE, and that is deliberate.
+#
+# An earlier version emitted `ITEM8-B2-INJECTED-ATTEMPT=\$attempt`,
+# intending the shell to expand the loop variable at runtime. It does
+# not: inside a double-quoted string a backslash before `$` SUPPRESSES
+# parameter expansion, so the real container printed the literal text
+# `$attempt`. The calibration's fake docker, meanwhile, manufactured
+# `=1` -- so the fixture proved a behaviour the shipped derivation did
+# not implement, and the fake was semantically BETTER than the real
+# command path. Measured against /bin/sh, not reasoned about. (D294)
+#
+# The number is not needed. The shim's own control flow guarantees the
+# injected branch is the FIRST iteration: the sentinel file cannot exist
+# before it is created. So the marker is a constant, single-quoted so no
+# shell touches it, and the criterion is "exactly one occurrence".
+# Another interpolation argument deleted rather than won.
+#
 # B2's shim. `attempt` is the shell loop variable; on the FIRST iteration
 # the sentinel is absent, so we create it and return failure without ever
 # running the real command. Every later iteration finds it and runs the
@@ -103,7 +120,7 @@ _RETRY_OPEN = re.compile(r"^RUN for attempt in 1 2 3 4 5; do \\\s*$", re.M)
 # already documented at memu-graph/Dockerfile:105-109.
 _B2_SHIM = ("if [ ! -f /tmp/item8-b2-first-attempt-consumed ]; then \\\n"
             "        touch /tmp/item8-b2-first-attempt-consumed; \\\n"
-            "        echo \"ITEM8-B2-INJECTED-ATTEMPT=\\$attempt\"; \\\n"
+            "        echo 'ITEM8-B2-INJECTED-FIRST-ATTEMPT'; \\\n"
             "        false; \\\n"
             "      else \\\n"
             "        {REAL}; \\\n"

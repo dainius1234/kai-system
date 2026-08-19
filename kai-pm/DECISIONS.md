@@ -22864,3 +22864,150 @@ is information about the calibration.
 * **Frozen R2 unamended.** Every defect was an implementation failure.
 * Awaiting a fourth adversarial review.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D294 — Fourth review: the fixture was better than the shipped command path
+
+**2026-08-19. Repair of D293 against the frozen contract. No amendment to
+frozen R2 `0055ead8…8796`. Nothing built. `kai-pm/ITEM8_GO` still does
+not exist. Stage 2 remains NOT AUTHORISED.**
+
+### 1. The defect that would have cost the whole denominator
+
+`docker buildx build --progress=rawjson` writes its progress printer to
+**STDERR**. The runner captured **stdout**.
+
+The calibration could not see it, because the fake docker printed its
+events with a bare `print()` — to stdout. **So the fixture modelled a
+transport the shipped command path does not have**, every scenario
+passed, and the first contact with a real buildx would have produced an
+empty stream for all six builds. Six branches, `UNMEASURED`, "the build
+event stream could not be parsed", after the no-redraw denominator had
+already been spent.
+
+The repair is not "capture stderr instead". Assuming the other
+descriptor is the same mistake with the sign flipped, so:
+
+* the runner captures **both**, into `.events-stderr.jsonl` and
+  `.events-stdout.jsonl`, and passes both to the parser;
+* `--events` is repeatable; each capture is parsed separately and merged;
+* a line beginning `{` that does not parse is a **truncated event** and
+  refuses — skipping it makes a partial capture indistinguishable from an
+  empty one, and "no retries observed" is the answer to both;
+* a line **not** beginning `{` is a CLI diagnostic — collected, counted
+  and reported, never discarded (R10);
+* if no descriptor held events, the refusal **names the wrong-descriptor
+  possibility** rather than reporting zero.
+
+The fake now writes to stderr like the real one, and `events_on_stdout`
+is the known-negative for the opposite error.
+
+### 2. The fixture was semantically better than the shipped Dockerfile
+
+D293's B2 shim emitted `ITEM8-B2-INJECTED-ATTEMPT=\$attempt`, intending
+the shell to expand the loop variable at runtime.
+
+**It does not.** Inside a double-quoted string a backslash before `$`
+*suppresses* parameter expansion, so a real container prints the literal
+text `$attempt`. The calibration's fake, meanwhile, manufactured `=1` —
+and the runner then required the value to be `1`. The fixture was
+asserting a behaviour the shipped derivation did not implement, in the
+direction that makes the instrument look correct.
+
+Measured, not reasoned about: the derived RUN body extracted with the
+deriver's own `find_retry_run` and fed to `/bin/sh`, with a stub `python`
+on `PATH`:
+
+```
+ITEM8-B2-INJECTED-FIRST-ATTEMPT
+tokenizer bake attempt failed; retrying in 10s
+BAKED ok
+```
+
+The number was never needed. The shim's sentinel file cannot exist
+before the shim creates it, so **the injected iteration is the first one
+by construction**. The marker is now a constant, single-quoted so no
+shell touches it, the criterion is *exactly one occurrence*, and the
+attempt-number comparison is deleted. A second interpolation argument
+removed rather than won.
+
+The ordering criterion is now observed rather than inferred: an `awk`
+pass over the target vertex's runtime log requires **injection → a
+genuine retry line → a `BAKED` success, in that order**.
+
+### 3. B3's exit status must arise from the target step
+
+R2 requires the non-zero exit to come from the denied instruction. The
+runner computed the target vertex's own `error` field and **threw it
+away**. A build failing anywhere else, in which our refusal text happens
+to appear, would have read as a `PASS`.
+
+B3 now requires a non-empty `target_vertex_error`, and its absence is
+`WRONG_FAILURE` — *"the failure is not attributable to it"* — not a pass
+and not a fail of the contingency.
+
+### 4. A SHA-256 of an incomplete record is a perfect hash of bad evidence
+
+D293 made every row carry `toolchain_sha256`. That binds a row to **a
+file**; it does not establish that the file says anything. The
+calibration proved the gap without meaning to: **its fixture toolchain
+had two fields, and all six branches qualified against it.**
+
+Worse, the CI generator runs under `set -uo pipefail` rather than `-e`,
+so a failed command inside `$( )` leaves an **empty** value while the
+enclosing `echo` succeeds. `key=` is a present key with nothing behind
+it, and only the literal word `UNRESOLVED` was ever looked for.
+
+Two separate repairs, at two different levels:
+
+**Before build 1** — `scripts/security/check_item8_toolchain.py`
+validates every identity R2 names: present, non-empty, not `UNRESOLVED`,
+frontend equal to the pinned digest, and `commit_sha`/`tree_sha` equal to
+**this** execution's. A digest proves two parties read the same bytes; it
+says nothing about whether those bytes describe this run. The workflow
+runs it immediately after the record is written, and the runner refuses
+to start without it. **A failure there costs zero builds.**
+
+**After the six builds** — the summariser now takes `--toolchain`,
+recomputes the artefact's digest itself, and requires all six rows to
+carry exactly that value. Six rows agreeing with each other are six
+statements from one producer; the artefact is the independent evidence
+(I-8).
+
+### 5. Calibration and reinjection
+
+Instruments **77/0**. Verdict layer **208/0 across 23 scenarios**.
+
+| reinjected | result |
+|---|---|
+| runner captures ONE descriptor (the wrong-FD defect) | **all six branches UNMEASURED** — *"the build event stream could not be parsed"* — and the suite then aborts on a missing key |
+| B2 marker interpolates `$attempt` again | **278/7 FAIL** |
+| B3 ignores the target vertex's own error | **281/4 FAIL** |
+| runner stops validating the toolchain before build 1 | **273/12 FAIL** |
+| summariser stops re-hashing the toolchain artefact | **279/6 FAIL** |
+| all reverted | **285/0 PASS** |
+
+The first row is the one worth reading twice: **that is exactly what a
+real run would have produced** with the shipped code as it stood before
+this repair — six irreversible builds spent, every branch `UNMEASURED`,
+and no way to re-draw.
+
+### 6. State
+
+| | |
+|---|---|
+| instruments / verdicts | **77/0** · **208/0**, 23 scenarios |
+| registry | **98 declared, 98 found**, I-1..I-7 hold |
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| mutation cardinality | **0/1/1**, no scaffolding in any derived file |
+| shipped Dockerfiles | **0** lines of diff |
+| `collect_image_identity.py` | **0** lines vs `b53fd4e` |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+
+### Status
+
+* **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.**
+* **Frozen R2 unamended.** Every defect was an implementation failure.
+* Awaiting a fifth adversarial review.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.

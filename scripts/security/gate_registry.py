@@ -1474,7 +1474,8 @@ REGISTRY: Tuple[Gate, ...] = (
                  "target vertex and an ambiguous one rather than "
                  "reporting zero occurrences",
          inputs=(),
-         denominator=r"inspected: \d+ target vertex of \d+ in the stream",
+         denominator=r"inspected: \d+ target vertex of \d+ across \d+ "
+                     r"captured descriptor\(s\)",
          probe=False,
          probe_skip_reason="needs a BuildKit event stream, produced only "
                            "by a real build; the positive case, the "
@@ -1503,6 +1504,31 @@ REGISTRY: Tuple[Gate, ...] = (
                            "not exist and must not be created outside an "
                            "execution authorisation; every refusal path is "
                            "asserted in scripts/test_item8_verdicts.py",
+         proven_by="scripts/test_item8_verdicts.py",
+         calibrated_by="scripts/test_item8_verdicts.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="check_item8_toolchain",
+         kind=GATE,
+         summary="validates the Item-8 toolchain record BEFORE build 1: "
+                 "every identity R2 names present, non-empty, resolved, "
+                 "the frontend equal to the pinned digest, and the commit "
+                 "and tree it names equal to this execution's -- because a "
+                 "SHA-256 of an incomplete record is a perfect hash of bad "
+                 "evidence, and the generator runs without `set -e` so a "
+                 "failed lookup leaves `key=` rather than UNRESOLVED",
+         inputs=(),
+         denominator=r"inspected: \d+ required identity\(s\), \d+ recorded",
+         probe=False,
+         probe_skip_reason="needs a toolchain record produced by the CI "
+                           "step that runs docker/buildx; the "
+                           "known-positive and eight refusals -- missing, "
+                           "empty, UNRESOLVED, floating frontend, stale "
+                           "commit, stale tree, wrong run and absent file "
+                           "-- are asserted against the shipped CLI in "
+                           "scripts/test_item8_verdicts.py",
          proven_by="scripts/test_item8_verdicts.py",
          calibrated_by="scripts/test_item8_verdicts.py",
          in_policy_check=False,

@@ -41,10 +41,25 @@ never been measured at all.
 lines.** This requires exactly the six expected keys, each once, no
 extras, before any conclusion is drawn — and reports the mismatch
 precisely when it is not so.
+
+WHY THE TOOLCHAIN IS RE-HASHED HERE
+===================================
+
+The runner puts a `toolchain_sha256` in every row. That proves the six
+rows agree with **each other** about which file they ran under; it does
+not prove which file that was, and every one of them came from the same
+producer. Rule 26 again, and I-8: the expected answer must not come from
+the thing under test.
+
+So `--toolchain` takes the artefact itself, recomputes its digest here,
+and requires all six rows to carry exactly that value. A row bound to a
+different toolchain than the one archived beside the results is a row
+whose conditions are unknown, whatever its axes say.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import pathlib
 import sys
@@ -119,6 +134,11 @@ def validate_keys(rows: list[dict]) -> tuple[bool, list[str]]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--results", required=True)
+    ap.add_argument("--toolchain",
+                    help="the toolchain artefact itself. Its digest is "
+                         "recomputed here and every row must carry exactly "
+                         "that value; six rows agreeing with each other are "
+                         "six statements from one producer")
     args = ap.parse_args()
 
     path = pathlib.Path(args.results)
@@ -137,6 +157,29 @@ def main() -> int:
 
     ok, problems = validate_keys(rows)
 
+    # THE TOOLCHAIN, RE-HASHED FROM THE ARTEFACT. Computed before the
+    # tables so the refusal below can be unconditional: a result set whose
+    # conditions are unknown is not summarised under a heading that
+    # implies they are known.
+    tc_expected = None
+    tc_problems: list[str] = []
+    if args.toolchain:
+        tc_path = pathlib.Path(args.toolchain)
+        if not tc_path.is_file():
+            tc_problems.append(
+                f"TOOLCHAIN: {tc_path} does not exist. R2 records these "
+                f"identities with every branch; the rows name a digest of "
+                f"nothing this summary can read")
+        else:
+            tc_expected = hashlib.sha256(tc_path.read_bytes()).hexdigest()
+            for r in rows:
+                got = r.get("toolchain_sha256")
+                if got != tc_expected:
+                    tc_problems.append(
+                        f"TOOLCHAIN: {r.get('image')}/{r.get('branch')} is "
+                        f"bound to {str(got)[:12]}, not the archived "
+                        f"artefact's {tc_expected[:12]}")
+
     print("ITEM 8 — HUGGINGFACE/NETWORK CONTINGENCY")
     print("=" * 74)
     print()
@@ -150,7 +193,7 @@ def main() -> int:
             continue
         for r in matches:
             print(f"  {image:<12} {branch}  {r.get('axis1_verdict', '?'):<14}"
-                  f" retries={r.get('genuine_retries_observed', '?')}"
+                  f" retries={r.get('runtime_retries_observed', '?')}"
                   f" elapsed={r.get('elapsed_seconds', '?')}s")
             if r.get("note"):
                 print(f"  {'':<12}     {r['note']}")
@@ -195,6 +238,14 @@ def main() -> int:
           f"UNMEASURED {a1[UNMEASURED]}")
     print(f"    AXIS 2   sound {a2_sound} of {len(rows)}")
     print(f"    QUALIFIED FOR CLOSURE  {qualified} of {len(EXPECTED)}")
+    if tc_expected:
+        print(f"    TOOLCHAIN  recomputed {tc_expected[:16]}… from the "
+              f"artefact, matched against {len(rows)} row(s)")
+    elif args.toolchain:
+        print("    TOOLCHAIN  NOT RECOMPUTED — the artefact is missing")
+    else:
+        print("    TOOLCHAIN  not supplied; row bindings are unverified "
+              "against any artefact")
 
     print()
     print("  Reading rules, frozen before these results existed:")
@@ -207,6 +258,17 @@ def main() -> int:
     print("     never taken from the producer of it (rule 26).")
     print("   * No re-draws. An UNMEASURED branch stays UNMEASURED and Item 8")
     print("     is incomplete for that subject. (D247 §5, D289)")
+
+    if tc_problems:
+        print()
+        for p in tc_problems:
+            print(f"FAIL: {p}")
+        print()
+        print("Six rows agreeing with each other about a digest are six "
+              "statements from one producer. The artefact is the "
+              "independent evidence (I-8), and a row bound to a different "
+              "toolchain ran under conditions this summary cannot name.")
+        return 4
 
     if disagreements:
         print()
