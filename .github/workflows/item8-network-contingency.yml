@@ -29,8 +29,12 @@
 # set. (D278, D280, D285)
 name: Item 8 — HuggingFace/network contingency (KAI-GATE-048 C)
 
+# NO `workflow_dispatch:`. It is deliberately absent, not forgotten.
+# GitHub enables manual dispatch once a workflow reaches the default
+# branch, which would create a second authority path into a frozen
+# no-redraw experiment. The sentinel push is the only way in, and
+# check_item8_authority.py refuses any other event even if one appears.
 on:
-  workflow_dispatch:
   push:
     branches:
       - claude/project-rework-plan-pgvp35
@@ -51,12 +55,11 @@ jobs:
 
       # EXECUTION AUTHORITY, FIRST AND UNCONDITIONALLY.
       #
-      # `workflow_dispatch:` above is inert TODAY only because GitHub
-      # registers workflows from the default branch and this file lives
-      # on a feature branch. That is a property of the platform's current
-      # state, not of our design, and it would quietly become live on a
-      # merge. So authority is checked here regardless of how the job was
-      # triggered: no envelope, no build.
+      # `workflow_dispatch:` is now ABSENT from the triggers above, but
+      # this guard does not rely on that either: it refuses any event
+      # other than the sentinel push, refuses run attempt > 1, and
+      # refuses without a valid envelope. Removing a trigger is a design
+      # choice somebody can undo; the guard is the control.
       #
       # The envelope binds the frozen design AND the exact reviewed
       # implementation, and proves HEAD differs from the approved commit

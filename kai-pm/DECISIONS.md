@@ -22551,3 +22551,162 @@ calibration that covers the runner, and left open.
   not a fault in it.
 * Awaiting a second adversarial review before any execution decision.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D292 — Second review: three more defects, and one of them was in the repository
+
+**2026-08-18. Repair of D291 against the frozen contract. No amendment to
+frozen R2 `0055ead8…8796`. Nothing built. `kai-pm/ITEM8_GO` still does
+not exist. Stage 2 remains NOT AUTHORISED.**
+
+### 1. The one that was already committed
+
+**`item8-results.jsonl` was a TRACKED FILE in this repository**, added by
+`df1783e`, containing six rows bound to tree
+`5d2265594ea9fee10b142db94af00dac2e6dfe53` — before the experiment had
+ever run.
+
+It came from a calibration fixture that invoked the runner without an
+output override, so the runner wrote to its default path in the repo
+root, and `git add -A` swept it into the commit.
+
+**And my evidence line said "working tree clean" — which was TRUE
+PRECISELY BECAUSE the artefact had been committed.** A cleanliness check
+answers "is anything uncommitted", never "is anything here that should
+not be". I reported the former as though it covered the latter.
+
+The file is named exactly like the real experimental evidence. Anyone
+fetching `item8-results.jsonl` from history would have got six
+authoritative-looking rows for an experiment that never happened.
+
+Removed from tracking and from disk. `.gitignore` now excludes
+`item8-results.jsonl`, `item8-toolchain.txt`, `item8-run.log`,
+`item8-derived/` and `item8-identity/`, and every calibration path writes
+into a temporary directory.
+
+### 2. The detector could still measure presentation instead of execution
+
+Both strings the runner grepped for — `retrying in` and the injected
+`echo` line — **exist literally in the derived Dockerfile**, and BuildKit
+presents instruction text alongside container output. So the parser could
+match the *presentation of a command* rather than its *execution*.
+
+And the ordering proof was weaker than it looked: `retrying in` is
+emitted **after** the injected failure and **before** the next genuine
+fetch. Injection → retry proves the retry path was entered. It does not
+prove a later genuine fetch ran.
+
+**The repair is a marker whose measured value cannot exist in the
+source.** The derived Dockerfile carries `ITEM8-MARK ATTEMPT=\$attempt`;
+the shell expands it at runtime, so only a real execution ever prints
+`ATTEMPT=1`. Verified both directions: the expanded form appears **0
+times** in all six derived files.
+
+* **B3** now requires the exact sequence `1 2 3 4 5`, not five
+  occurrences of prose.
+* **B2** requires `B2INJECT=1` and a genuine `ATTEMPT` marker with a
+  **higher number** on a build that succeeded — which is what
+  establishes a later real fetch.
+* `--progress=plain` is set, so output does not vary with TTY or
+  BuildKit version. A detector that depends on presentation mode is
+  measuring the presenter.
+
+**Classification stated, not assumed:** the attempt marker is applied
+**identically to all three branches** and changes no experimental
+condition — no network, no fetch, no attempt count. It is scaffolding on
+exactly the basis frozen R2 already uses to exclude the pinned syntax
+line, so treatment cardinality remains **B1=0, B2=1, B3=1**. If the
+reviewer reads that differently, it is a classification question and not
+a silent change.
+
+### 3. The remaining four
+
+**A missing iidfile no longer qualifies.** `IIDCORR` was `UNRECORDED`
+when the file was absent, and the branch qualified anyway — so a positive
+branch could close with the corroboration R2 requires simply *missing*.
+`ABSENT` is now its own state (rule 20, applied to a file), and the
+summariser refuses to qualify without `CORROBORATED`.
+
+**Closure qualification moved downstream.** The runner emitted
+`qualified_for_closure` — an observation producer certifying the
+composite claim drawn from its own observations, which rule 26 forbids.
+The runner now emits only Axis 1, Axis 2 and evidence; the summariser
+derives qualification. If any row ever carries the field again, the
+summariser **recomputes and prints a DISAGREEMENT** rather than
+believing it.
+
+**B3 absence uses existence, not size.** Post-build used `-s` while the
+pre-check used `-e`. A zero-byte iidfile is a file; the two ends must ask
+the same question.
+
+**Axis 2 is no longer named before it is measured.**
+`NOT_APPLICABLE_BY_DESIGN` was assigned at the top of the B3 branch,
+before absence was established. It now stays `UNRECORDED` until both
+non-existence assertions pass.
+
+### 4. Execution authority is now one-shot
+
+`workflow_dispatch` is **removed** from the triggers — parsed triggers
+are `['push']` on `kai-pm/ITEM8_GO` alone. But the guard does not rely on
+that, because a removed trigger is a design choice somebody can undo:
+
+* the event must be `push`;
+* `GITHUB_RUN_ATTEMPT` must be `1` — **a re-run reuses the same commit
+  and ref and would otherwise satisfy every other check**;
+* HEAD must be a **direct child** of `approved_commit`, not merely a
+  descendant — intervening history is not reviewed history;
+* the diff must be `A kai-pm/ITEM8_GO` — **ADDED**, not merely "the only
+  path that changed". Editing an existing sentinel would have
+  re-authorised a second six-build denominator under the first
+  authorisation.
+
+### 5. Calibration, and two fixture gaps it exposed in itself
+
+Instruments **75/0** (was 71). Verdict layer **89/0** across **11**
+scenarios (was 63/7).
+
+**Reinjection — every defect fires:**
+
+| reinjected | result |
+|---|---|
+| iidfile ABSENT treated as acceptable | **87/2 FAIL** |
+| detector back to prose (presentation satisfies it) | **85/4 FAIL** |
+| B3 absence back to `-s` | **87/2 FAIL** |
+| summariser trusts a row's own claim | **87/2 FAIL** |
+| B3 accepts any five markers, not 1..5 | **87/2 FAIL** |
+
+**Two of those did not fire on the first attempt, and the reason was my
+fixtures, not the code:**
+
+* the `-s`/`-e` fixture wrote a **non-empty** iidfile, so both operators
+  behaved identically. It now writes a **zero-byte** file, which is the
+  only case that distinguishes them;
+* nothing supplied a row carrying `qualified_for_closure`, so the
+  self-certification path was never exercised. A fixture now does.
+
+A reinjection that does not fire is information about the calibration,
+not a licence to move on.
+
+### 6. State
+
+| | |
+|---|---|
+| instruments / verdicts | **75/0** · **89/0**, 11 scenarios |
+| registry | **96 declared, 96 found**, I-1..I-7 hold |
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| Stage-2 / Arm B / 048 C bar | all **MATCH** |
+| tracked `item8*` artefacts | **0** |
+| parsed workflow triggers | `['push']` on `kai-pm/ITEM8_GO` |
+| shipped Dockerfiles | **0** lines of diff |
+| `collect_image_identity.py` | **0** lines vs `b53fd4e` |
+| D263 model-facing surface | **IDENTICAL** |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+| `make policy-check` | **EXIT 0** |
+
+### Status
+
+* **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.**
+* **Frozen R2 unamended.** Every defect was an implementation failure.
+* Awaiting a third adversarial review.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.

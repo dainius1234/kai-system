@@ -53,6 +53,7 @@ Exit 1 = refused. No build may start.
 from __future__ import annotations
 
 import argparse
+import os
 import pathlib
 import subprocess
 import sys
@@ -142,19 +143,54 @@ def main() -> int:
                       f"match the tree of approved_commit ({tree[:12]}). The "
                       f"envelope is internally inconsistent")
 
-    # (c) THE LOAD-BEARING ONE: only the envelope may have changed
-    rc, out = git("diff", "--name-only", env["approved_commit"], args.head)
+    # (c) THE LOAD-BEARING ONE: the executed tree IS the reviewed tree,
+    #     plus the ADDITION of the envelope and nothing else.
+    rc, out = git("diff", "--name-status", env["approved_commit"], args.head)
     if rc != 0:
         return refuse(f"could not diff {env['approved_commit'][:12]}..{args.head}")
-    changed = [p for p in out.splitlines() if p.strip()]
-    extra = [p for p in changed if p != SENTINEL_REL]
+    rows = [l.split("\t") for l in out.splitlines() if l.strip()]
+    extra = [r for r in rows if r[-1] != SENTINEL_REL]
     if extra:
         return refuse(
             f"the executed tree is NOT the reviewed tree. Beyond "
             f"{SENTINEL_REL}, {len(extra)} path(s) changed since "
-            f"{env['approved_commit'][:12]}:\n  " + "\n  ".join(extra[:20])
+            f"{env['approved_commit'][:12]}:\n  "
+            + "\n  ".join(" ".join(r) for r in extra[:20])
             + ("\n  ..." if len(extra) > 20 else "")
             + "\n\nReview approved one artefact; this would run another")
+    # ADDED, not merely "the only path that changed". A later edit to an
+    # existing sentinel would satisfy the weaker test and authorise a
+    # SECOND six-build denominator under the first authorisation.
+    if not rows or rows[0][0] != "A":
+        status = rows[0][0] if rows else "no change at all"
+        return refuse(f"{SENTINEL_REL} shows diff status '{status}', not 'A'. "
+                      f"Execution authority is the ADDITION of the envelope; "
+                      f"editing an existing one would re-authorise a frozen "
+                      f"no-redraw experiment")
+
+    # (d) ONE SHOT. Re-running a workflow reuses the same commit and ref
+    #     and would otherwise satisfy every check above.
+    attempt = os.environ.get("GITHUB_RUN_ATTEMPT")
+    if attempt is not None and attempt != "1":
+        return refuse(f"GITHUB_RUN_ATTEMPT={attempt}. A re-run executes the "
+                      f"same authorised commit a second time, which is a "
+                      f"replacement execution of a frozen no-redraw "
+                      f"experiment. A second run needs a second authority")
+    event = os.environ.get("GITHUB_EVENT_NAME")
+    if event is not None and event != "push":
+        return refuse(f"GITHUB_EVENT_NAME={event}. Only the sentinel push "
+                      f"carries execution authority; a manual dispatch does "
+                      f"not, whatever the platform permits")
+
+    # (e) DIRECT CHILD. Ancestry alone permits arbitrary intervening
+    #     commits whose changes were later reverted, which would pass (c).
+    rc, parents = git("rev-list", "--parents", "-n", "1", args.head)
+    if rc == 0 and parents:
+        bits = parents.split()
+        if len(bits) < 2 or env["approved_commit"] not in bits[1:]:
+            return refuse(f"{args.head} is not a DIRECT CHILD of "
+                          f"approved_commit {env['approved_commit'][:12]}. "
+                          f"Intervening history is not reviewed history")
 
     print("ITEM-8 EXECUTION AUTHORITY")
     print("=" * 68)
@@ -162,11 +198,13 @@ def main() -> int:
     print(f"  frozen design   : {got}  ({size} bytes)")
     print(f"  approved commit : {env['approved_commit']}")
     print(f"  approved tree   : {env['approved_tree']}")
-    print(f"  changed since   : {len(changed)} path(s), "
-          f"{'only the envelope' if changed == [SENTINEL_REL] else 'NONE'}")
+    print(f"  changed since   : ADD {SENTINEL_REL}, nothing else")
+    print(f"  run attempt     : {os.environ.get('GITHUB_RUN_ATTEMPT', 'n/a')}")
+    print(f"  event           : {os.environ.get('GITHUB_EVENT_NAME', 'n/a')}")
     print()
     print(f"  inspected: 1 authority envelope across 3 binding(s) "
-          f"(design, ancestry, tree identity)")
+          f"(design, direct-child ancestry, tree identity, "
+          f"one-shot)")
     print()
     print("PASS: the artefact about to run is the artefact that was "
           "reviewed, under the design that was frozen.")

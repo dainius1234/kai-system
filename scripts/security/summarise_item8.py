@@ -59,6 +59,32 @@ UNMEASURED = "UNMEASURED"
 SOUND_A2 = {"BOUND", "IMAGE_NOT_PRODUCED_BY_DESIGN"}
 
 
+def qualifies(r: dict) -> tuple[bool, str]:
+    """Closure qualification is DERIVED HERE, not trusted from the runner.
+
+    The runner produces observations and per-axis classifications. It
+    does not certify the composite claim — an observation producer that
+    also certifies the conclusion drawn from it is a second authority for
+    the same statement, and rule 26 says no consequential mechanism
+    self-approves. So this recomputes it from the row's evidence, and a
+    runner that shipped a `qualified_for_closure` field would be
+    contradicted rather than believed.
+    """
+    if r.get("axis1_verdict") != PASS:
+        return False, f"Axis 1 is {r.get('axis1_verdict')}"
+    a2 = r.get("axis2_provenance")
+    if a2 not in SOUND_A2:
+        return False, f"Axis 2 is {a2}"
+    if r.get("branch") == "B3":
+        return True, "refused by design, no image to bind"
+    # Positive branches need the iidfile corroboration R2 requires.
+    # ABSENT is not "no objection": it is the corroboration missing.
+    corr = r.get("iidfile_corroboration")
+    if corr != "CORROBORATED":
+        return False, f"iidfile corroboration is {corr}"
+    return True, "Axis 1 PASS, bound, iidfile corroborated"
+
+
 def refuse(reason: str, detail: str = "") -> int:
     print("ITEM 8 UNMEASURED — EXPERIMENT INSTRUMENT FAILURE")
     print(f"  unmet prerequisite: {reason}")
@@ -130,14 +156,30 @@ def main() -> int:
     for image, branch in EXPECTED:
         for r in [r for r in rows if (r.get("image"), r.get("branch"))
                   == (image, branch)]:
+            q, why = qualifies(r)
             print(f"  {image:<12} {branch}  "
                   f"{r.get('axis2_provenance', 'UNRECORDED'):<30}"
-                  f" iidfile={r.get('iidfile_corroboration', 'n/a')}")
+                  f" iidfile={r.get('iidfile_corroboration', 'n/a'):<14}"
+                  f" qualifies={'yes' if q else 'NO'}")
+            if not q:
+                print(f"  {'':<12}     {why}")
 
     a1 = {v: sum(1 for r in rows if r.get("axis1_verdict") == v)
           for v in (PASS, WRONG, UNMEASURED)}
     a2_sound = sum(1 for r in rows if r.get("axis2_provenance") in SOUND_A2)
-    qualified = sum(1 for r in rows if r.get("qualified_for_closure") is True)
+    quals = {(r.get("image"), r.get("branch")): qualifies(r) for r in rows}
+    qualified = sum(1 for v in quals.values() if v[0])
+
+    # A runner that certifies its own composite claim is contradicted,
+    # not trusted. Nothing currently emits this field; if something does,
+    # a disagreement is a finding.
+    for r in rows:
+        if "qualified_for_closure" in r:
+            got, why = qualifies(r)
+            if bool(r["qualified_for_closure"]) != got:
+                print(f"  DISAGREEMENT: {r.get('image')}/{r.get('branch')} "
+                      f"row claims qualified={r['qualified_for_closure']}, "
+                      f"derived {got} ({why})")
 
     print()
     print(f"  inspected: {len(rows)} result row(s) against "
@@ -154,6 +196,8 @@ def main() -> int:
     print("   * UNMEASURED is never an adverse result about the contingency.")
     print("   * WRONG_FAILURE is never a PASS and never a FAIL of it.")
     print("   * An Axis-2 fault blocks closure and leaves Axis 1 standing.")
+    print("   * Closure qualification is DERIVED here from the evidence,")
+    print("     never taken from the producer of it (rule 26).")
     print("   * No re-draws. An UNMEASURED branch stays UNMEASURED and Item 8")
     print("     is incomplete for that subject. (D247 §5, D289)")
 

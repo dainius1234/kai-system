@@ -54,7 +54,7 @@ AUTHORITY = REPO / "scripts" / "security" / "check_item8_authority.py"
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 7
+EXPECTED_SCENARIOS = 11
 executed: list[str] = []
 
 
@@ -80,34 +80,46 @@ mode = os.environ["FAKE_MODE"]
 joined = " ".join(argv).upper()
 branch = "B3" if "B3" in joined else ("B2" if "B2" in joined else "B1")
 
-def retries(n):
-    for _ in range(n):
+def attempts(lo, hi):
+    """Runtime-expanded markers, exactly as the derived Dockerfile emits."""
+    for n in range(lo, hi + 1):
+        print("ITEM8-MARK ATTEMPT=%d" % n)
         print("model download attempt /5 failed; retrying in 10s")
+
+def write_iid(argv, mode):
+    if mode == "iid_absent":
+        return
+    if "--iidfile" in argv:
+        p = argv[argv.index("--iidfile") + 1]
+        open(p, "w").write("sha256:" + ("f" * 64 if mode != "iid_mismatch"
+                                        else "0" * 64))
 
 if argv and argv[0] == "build":
     if branch == "B3":
-        n = 4 if mode == "b3_four_attempts" else 5
-        retries(n)
+        attempts(1, 4 if mode == "b3_four_attempts" else 5)
+        if mode == "b3_presentation_only":
+            # BuildKit echoing the INSTRUCTION TEXT, never a runtime value.
+            print('#5 [3/9] RUN for attempt in 1 2 3 4 5; do echo "ITEM8-MARK ATTEMPT=$attempt"')
         print("REFUSING TO BUILD: could not fetch the embedding model in 5 attempts.")
+        if mode == "b3_leaves_iid":
+            write_iid(argv, "ok")
+        if mode == "b3_leaves_empty_iid" and "--iidfile" in argv:
+            open(argv[argv.index("--iidfile") + 1], "w").close()
         sys.exit(1)
     if branch == "B2":
-        print("ITEM8-B2: first attempt failed by injection")
+        print("ITEM8-MARK B2INJECT=1")
         if mode != "b2_no_genuine_retry":
-            retries(1)
+            attempts(2, 2)
         print("BAKED ok")
-        # a successful build writes the iidfile
-        if "--iidfile" in argv:
-            p = argv[argv.index("--iidfile") + 1]
-            open(p, "w").write("sha256:" + ("f" * 64 if mode != "iid_mismatch" else "0" * 64))
+        write_iid(argv, mode)
         sys.exit(0)
+    attempts(1, 1)
     print("BAKED ok")
-    if "--iidfile" in argv:
-        p = argv[argv.index("--iidfile") + 1]
-        open(p, "w").write("sha256:" + ("f" * 64 if mode != "iid_mismatch" else "0" * 64))
+    write_iid(argv, mode)
     sys.exit(0)
 
 if argv[:2] == ["image", "inspect"]:
-    if branch == "B3":
+    if branch == "B3" and mode != "b3_leaves_image":
         sys.exit(1)                      # no image, by design
     print(json.dumps({"Id": "sha256:" + "f" * 64, "RepoDigests": [],
                       "Os": "linux", "Architecture": "amd64"}))
@@ -163,10 +175,13 @@ def summarise(rows: list[dict], td: Path) -> tuple[int, str]:
     return p.returncode, p.stdout + p.stderr
 
 
-def row(image="memu-core", branch="B1", a1="PASS", a2="BOUND", qual=True):
-    return {"image": image, "branch": branch, "axis1_verdict": a1,
-            "axis2_provenance": a2, "qualified_for_closure": qual,
-            "genuine_retries_observed": 1, "elapsed_seconds": 1, "note": ""}
+def row(image="memu-core", branch="B1", a1="PASS", a2="BOUND", **extra):
+    r = {"image": image, "branch": branch, "axis1_verdict": a1,
+         "axis2_provenance": a2, "genuine_retries_observed": 1,
+         "elapsed_seconds": 1, "note": "",
+         "iidfile_corroboration": "n/a" if branch == "B3" else "CORROBORATED"}
+    r.update(extra)
+    return r
 
 
 def six(**over):
@@ -194,8 +209,8 @@ def test_axis2_failure_leaves_axis1_standing() -> None:
                   r["axis1_verdict"] == "PASS", str(r))
             check(f"{r['image']} B1 Axis 2 records the fault",
                   r["axis2_provenance"] == "MISMATCH", str(r))
-            check(f"{r['image']} B1 does NOT qualify for closure",
-                  r["qualified_for_closure"] is False, str(r))
+            check(f"{r['image']} B1 emits NO composite claim",
+                  "qualified_for_closure" not in r, str(r))
         _, sout = summarise(rows, td)
         check("the summary keeps Axis 1 complete",
               "AXIS 1 COMPLETE, PROVENANCE INCOMPLETE" in sout, sout)
@@ -213,10 +228,10 @@ def test_b3_requires_five_attempts() -> None:
         for r in b3:
             check(f"{r['image']} B3 with 4 retries is NOT PASS",
                   r["axis1_verdict"] != "PASS", str(r))
-            check(f"{r['image']} B3 names the count it saw",
-                  "4 genuine retry line(s)" in r.get("note", ""), str(r))
-            check(f"{r['image']} B3 records the measured count",
-                  r["genuine_retries_observed"] == 4, str(r))
+            check(f"{r['image']} B3 names the markers it saw",
+                  "[1 2 3 4]" in r.get("note", ""), str(r))
+            check(f"{r['image']} B3 records the measured attempts",
+                  r["attempt_markers"] == "1 2 3 4", str(r))
     with tempfile.TemporaryDirectory() as d:
         td = Path(d)
         _, _, rows = run_runner("ok", td)
@@ -241,10 +256,10 @@ def test_b2_retry_detector_is_independent() -> None:
         for r in b2:
             check(f"{r['image']} B2 with only the injection is NOT PASS",
                   r["axis1_verdict"] != "PASS", str(r))
-            check(f"{r['image']} B2 says the injection alone is not recovery",
-                  "injection marker alone" in r.get("note", ""), str(r))
-            check(f"{r['image']} B2 counted ZERO genuine retries",
-                  r["genuine_retries_observed"] == 0, str(r))
+            check(f"{r['image']} B2 says recovery is not established",
+                  "recovery is not established" in r.get("note", ""), str(r))
+            check(f"{r['image']} B2 saw NO genuine attempt marker",
+                  r["attempt_markers"] == "", str(r))
 
 
 # ── defect 4: iidfile corroboration ─────────────────────────────────────
@@ -368,6 +383,88 @@ def test_authority_envelope() -> None:
               "authorises nothing" in p.stdout, p.stdout)
 
 
+# ── new blocker 1: a MISSING iidfile must block qualification ───────────
+
+def test_absent_iidfile_blocks_qualification() -> None:
+    scenario("iidfile: ABSENT is not 'no objection'")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, _, rows = run_runner("iid_absent", td)
+        built = [r for r in rows if r["branch"] in ("B1", "B2")]
+        check("built branches exist", len(built) == 4, str(len(built)))
+        for r in built:
+            check(f"{r['image']} {r['branch']} iidfile is ABSENT",
+                  r["iidfile_corroboration"] == "ABSENT", str(r))
+            check(f"{r['image']} {r['branch']} Axis 1 still PASS",
+                  r["axis1_verdict"] == "PASS", str(r))
+        code, out = summarise(rows, td)
+        check("an absent iidfile blocks closure", code != 0, out)
+        check("and the reason is named",
+              "iidfile corroboration is ABSENT" in out, out)
+
+
+# ── new blocker: presentation must not satisfy the attempt detector ────
+
+def test_presentation_cannot_satisfy_the_detector() -> None:
+    scenario("markers: instruction text is not execution")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, _, rows = run_runner("b3_presentation_only", td)
+        b3 = [r for r in rows if r["branch"] == "B3"]
+        for r in b3:
+            check(f"{r['image']} B3 unaffected by echoed instruction text",
+                  r["attempt_markers"] == "1 2 3 4 5", str(r))
+            check(f"{r['image']} B3 still PASSES on runtime evidence",
+                  r["axis1_verdict"] == "PASS", str(r))
+
+
+# ── new blocker: B3 absence uses EXISTENCE, not size ──────────────────
+
+def test_b3_absence_is_existence_not_size() -> None:
+    scenario("B3: a leftover iidfile blocks IMAGE_NOT_PRODUCED_BY_DESIGN")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, _, rows = run_runner("b3_leaves_iid", td)
+        for r in [r for r in rows if r["branch"] == "B3"]:
+            check(f"{r['image']} B3 with a leftover iidfile is NOT PASS",
+                  r["axis1_verdict"] != "PASS", str(r))
+            check(f"{r['image']} B3 provenance is not by-design",
+                  r["axis2_provenance"] != "IMAGE_NOT_PRODUCED_BY_DESIGN",
+                  str(r))
+    # A ZERO-BYTE iidfile is the case that distinguishes -e from -s. The
+    # first version of this fixture wrote a NON-empty file, so both
+    # operators behaved identically and the reinjection could not fire.
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, _, rows = run_runner("b3_leaves_empty_iid", td)
+        for r in [r for r in rows if r["branch"] == "B3"]:
+            check(f"{r['image']} B3 with a ZERO-BYTE iidfile is NOT PASS",
+                  r["axis1_verdict"] != "PASS", str(r))
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, _, rows = run_runner("b3_leaves_image", td)
+        for r in [r for r in rows if r["branch"] == "B3"]:
+            check(f"{r['image']} B3 with a surviving image is NOT PASS",
+                  r["axis1_verdict"] != "PASS", str(r))
+
+
+def test_a_self_certified_row_is_contradicted() -> None:
+    """Rule 26: no consequential mechanism self-approves."""
+    scenario("qualification: a row's own claim is never trusted")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        rows = six()
+        # Axis 1 failed, yet the row asserts it qualifies.
+        rows[0] = row("memu-core", "B1", a1="UNMEASURED", a2="BOUND",
+                      qualified_for_closure=True)
+        code, out = summarise(rows, td)
+        check("a self-certified row does NOT qualify", code != 0, out)
+        check("and the disagreement is printed",
+              "DISAGREEMENT: memu-core/B1" in out, out)
+        check("and the derived reason is given",
+              "Axis 1 is UNMEASURED" in out, out)
+
+
 def run_all() -> None:
     test_axis2_failure_leaves_axis1_standing()
     test_b3_requires_five_attempts()
@@ -376,6 +473,10 @@ def run_all() -> None:
     test_denominator_is_the_six_subjects()
     test_instrument_failure_is_not_swallowed()
     test_authority_envelope()
+    test_absent_iidfile_blocks_qualification()
+    test_presentation_cannot_satisfy_the_detector()
+    test_b3_absence_is_existence_not_size()
+    test_a_self_certified_row_is_contradicted()
     print(f"  inspected: {EXPECTED_SCENARIOS} verdict-layer scenario(s) "
           f"across 3 shipped entry points")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",

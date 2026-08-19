@@ -76,3 +76,14 @@ logs/
 # generated per deployment and mounted read-only, so it does not belong
 # in git either — a committed map is one a pull request can edit.
 secrets/service-identity/
+
+# Item-8 transient outputs. These names are EXPERIMENT-SHAPED: a tracked
+# item8-results.jsonl is indistinguishable from real evidence by name,
+# and D291 committed one containing six calibration rows bound to a real
+# tree SHA before the experiment had ever run. `git status` called the
+# tree clean precisely BECAUSE the artefact had been committed. (D292)
+item8-results.jsonl
+item8-toolchain.txt
+item8-run.log
+item8-derived/
+item8-identity/

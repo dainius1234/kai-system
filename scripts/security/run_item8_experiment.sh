@@ -93,7 +93,7 @@ for IMAGE in memu-core memu-graph; do
 
     echo "::group::${IMAGE} ${BRANCH}"
 
-    A1="UNMEASURED"; A2="UNRECORDED"; QUAL="false"; NOTE=""
+    A1="UNMEASURED"; A2="UNRECORDED"; NOTE=""
     RETRIES=0; ELAPSED=0; BUILD_RC=-1; PRE_CLEAN="n/a"; IIDCORR="n/a"
 
     # ── the derived file must already exist (R11) ─────────────────────
@@ -102,7 +102,7 @@ for IMAGE in memu-core memu-graph; do
 import json,os
 print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
  "axis1_verdict":"UNMEASURED","axis2_provenance":"UNRECORDED",
- "qualified_for_closure":False,"run_id":os.environ["RI"],
+ "run_id":os.environ["RI"],
  "tree_sha":os.environ["TS"],
  "note":"derivation refused; no experimental Dockerfile exists, so the "
         "branch has no subject"}))')"
@@ -120,7 +120,7 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
 import json,os
 print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
  "axis1_verdict":"UNMEASURED","axis2_provenance":"UNRECORDED",
- "qualified_for_closure":False,"run_id":os.environ["RI"],
+ "run_id":os.environ["RI"],
  "tree_sha":os.environ["TS"],"dockerfile_sha256":os.environ["DS"],
  "pre_build_state":os.environ["PC"],
  "note":"pre-build state not clean; a stale tag or leftover iidfile would "
@@ -133,40 +133,60 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
     NOCACHE=""; [ "$BRANCH" = "B1" ] && NOCACHE="--no-cache"
     START="$(date +%s)"
     # shellcheck disable=SC2086
-    DOCKER_BUILDKIT=1 "$DOCKER" build $NOCACHE \
+    # --progress=plain: deterministic output. `auto` varies with TTY and
+    # BuildKit version, and a detector that depends on presentation mode
+    # is measuring the presenter.
+    DOCKER_BUILDKIT=1 "$DOCKER" build $NOCACHE --progress=plain \
       -f "$DF" -t "$TAG" --iidfile "$IID" . > "$LOG" 2>&1
     BUILD_RC=$?
     ELAPSED=$(( $(date +%s) - START ))
 
-    # `grep -c` PRINTS the count and EXITS 1 when the count is zero, so
-    # `|| echo 0` appended a second zero and produced "0\n0" -- which
-    # crashed the row builder and emitted a blank line that `wc -l` then
-    # counted as a result. Found by this script's own calibration.
-    RETRIES="$(grep -c "$RETRY_MARK" "$LOG" 2>/dev/null || true)"
+    # STRUCTURED, RUNTIME-ONLY EVIDENCE. `ITEM8-MARK ATTEMPT=<n>` is
+    # emitted by the derived Dockerfile as `ATTEMPT=\$attempt`, so the
+    # EXPANDED form exists only in a real execution and never in the
+    # source BuildKit may echo back. The previous detector grepped the
+    # Dockerfiles' own prose, which appears literally in the instruction
+    # text -- it could match presentation instead of execution.
+    #
+    # `grep -c` PRINTS the count and EXITS 1 at zero, so `|| echo 0` once
+    # produced "0\n0" and crashed the row builder. Hence `|| true`.
+    ATTEMPT_NUMS="$(grep -o 'ITEM8-MARK ATTEMPT=[0-9][0-9]*' "$LOG" 2>/dev/null \
+                    | sed 's/.*=//' | sort -n -u | tr '\n' ' ' || true)"
+    ATTEMPT_NUMS="${ATTEMPT_NUMS% }"
+    RETRIES="$(printf '%s' "$ATTEMPT_NUMS" | wc -w | tr -d ' ')"
     RETRIES="${RETRIES:-0}"
-    INJECTED="no"; grep -q "$INJECT_MARK" "$LOG" 2>/dev/null && INJECTED="yes"
+    INJECT_AT="$(grep -o 'ITEM8-MARK B2INJECT=[0-9][0-9]*' "$LOG" 2>/dev/null \
+                 | sed 's/.*=//' | head -1 || true)"
+    INJECTED="no"; [ -n "${INJECT_AT:-}" ] && INJECTED="yes"
+    MAX_ATTEMPT="$(printf '%s' "$ATTEMPT_NUMS" | tr ' ' '\n' | sort -n | tail -1)"
+    MAX_ATTEMPT="${MAX_ATTEMPT:-0}"
     TARGET_REFUSAL="no"; grep -q 'REFUSING TO BUILD' "$LOG" 2>/dev/null && TARGET_REFUSAL="yes"
 
     # ── AXIS 1: the contingency, decided WITHOUT any identity input ───
     if [ "$BRANCH" = "B3" ]; then
-      A2="NOT_APPLICABLE_BY_DESIGN"
+      # A2 stays UNRECORDED until non-existence is ESTABLISHED. Asserting
+      # NOT_APPLICABLE_BY_DESIGN up front would name the expected answer
+      # before measuring it.
       POST_TAG="absent"; POST_IID="absent"
       "$DOCKER" image inspect "$TAG" >/dev/null 2>&1 && POST_TAG="present"
-      [ -s "$IID" ] && POST_IID="present"
+      # EXISTENCE, not size. `-s` treats a zero-byte iidfile as absent,
+      # and a zero-byte file is a file. The pre-check already used -e;
+      # the two ends must ask the same question.
+      [ -e "$IID" ] && POST_IID="present"
       if [ "$BUILD_RC" -eq 0 ]; then
         A1="UNMEASURED"; NOTE="the build SUCCEEDED under network denial; the intended refusal did not occur"
       elif [ "$TARGET_REFUSAL" != "yes" ]; then
         A1="WRONG_FAILURE"; NOTE="the build failed without the target step's refusal marker; the failure was elsewhere"
-      elif [ "$RETRIES" -ne 5 ]; then
+      elif [ "$ATTEMPT_NUMS" != "1 2 3 4 5" ]; then
         # Frozen R2 requires FIVE attempts observed. The first
         # implementation asserted "five attempts" in its note while never
         # checking the count -- a claim in the place of a measurement.
-        A1="UNMEASURED"; NOTE="the refusal occurred but ${RETRIES} genuine retry line(s) were observed, not the five the design requires"
+        A1="UNMEASURED"; NOTE="the refusal occurred but the runtime attempt markers were [${ATTEMPT_NUMS}], not the exact 1..5 the design requires"
       elif [ "$POST_TAG" != "absent" ] || [ "$POST_IID" != "absent" ]; then
         A1="UNMEASURED"; NOTE="post-build non-existence not established (tag=${POST_TAG}, iidfile=${POST_IID})"
       else
         A1="PASS"; A2="IMAGE_NOT_PRODUCED_BY_DESIGN"
-        NOTE="${RETRIES} genuine retries, target-step refusal, no image at either end"
+        NOTE="runtime attempts [${ATTEMPT_NUMS}], target-step refusal, no image at either end"
       fi
     elif [ "$BUILD_RC" -ne 0 ]; then
       if [ "$TARGET_REFUSAL" = "yes" ]; then
@@ -191,10 +211,14 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
         A1="UNMEASURED"; NOTE="the image built but the offline asset load failed; the branch's criterion is not established"
       elif [ "$BRANCH" = "B2" ] && [ "$INJECTED" != "yes" ]; then
         A1="UNMEASURED"; NOTE="the injected first-attempt failure was not observed; B2 measured nothing about recovery"
-      elif [ "$BRANCH" = "B2" ] && [ "$RETRIES" -lt 1 ]; then
-        A1="UNMEASURED"; NOTE="no GENUINE retry line observed; recovery cannot be claimed from the injection marker alone"
-      elif [ "$BRANCH" = "B2" ] && ! awk "/${INJECT_MARK}/{i=NR} /${RETRY_MARK}/{if(i&&NR>i){f=1}} END{exit !f}" "$LOG"; then
-        A1="UNMEASURED"; NOTE="no genuine retry line appears AFTER the injected failure; ordering does not establish recovery"
+      elif [ "$BRANCH" = "B2" ] && [ "${INJECT_AT:-0}" -ne 1 ]; then
+        A1="UNMEASURED"; NOTE="the injection fired at attempt ${INJECT_AT:-none}, not attempt 1"
+      elif [ "$BRANCH" = "B2" ] && [ "$MAX_ATTEMPT" -lt 2 ]; then
+        # A genuine attempt marker with a number GREATER than the
+        # injected one, on a build that succeeded, is what establishes
+        # that a later real fetch ran. Line ordering over prose did not:
+        # it proved only that the retry path was entered.
+        A1="UNMEASURED"; NOTE="no genuine attempt marker above the injected attempt; recovery is not established"
       else
         A1="PASS"
         NOTE="built, loaded offline with the network denied"
@@ -212,8 +236,12 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
 
       # iidfile corroboration -- required by R2 and previously written
       # then ignored. Disagreement is an AXIS 2 fault, never an Axis 1 one.
-      IIDCORR="UNRECORDED"
-      if [ -s "$IID" ]; then
+      # ABSENT is its own state. The first implementation left it
+      # UNRECORDED and let the branch qualify anyway, so a positive
+      # branch could close with the corroboration R2 requires simply
+      # missing. ABSENT/NULL/VALUE, rule 20, applied to a file.
+      IIDCORR="ABSENT"
+      if [ -e "$IID" ]; then
         IIDVAL="$(tr -d ' \n' < "$IID")"
         if [ -n "$COLLECTED_ID" ] && [ "$IIDVAL" = "$COLLECTED_ID" ]; then
           IIDCORR="CORROBORATED"
@@ -235,20 +263,16 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
       "$DOCKER" rm -f "$CNAME" >/dev/null 2>&1
     fi
 
-    case "$A1:$A2" in
-      PASS:BOUND|PASS:IMAGE_NOT_PRODUCED_BY_DESIGN) QUAL="true" ;;
-      *) QUAL="false" ;;
-    esac
-
-    emit "$(IM="$IMAGE" BR="$BRANCH" A1="$A1" A2="$A2" QU="$QUAL" NT="$NOTE" \
+    emit "$(IM="$IMAGE" BR="$BRANCH" A1="$A1" A2="$A2" NT="$NOTE" \
             RI="$RUN_ID" TS="$TREE_SHA" DS="$DF_SHA" TG="$TAG" RT="$RETRIES" \
             EL="$ELAPSED" RC="$BUILD_RC" PC="$PRE_CLEAN" IC="$IIDCORR" \
+            AM="${ATTEMPT_NUMS:-}" \
             IJ="${INJECTED:-n/a}" python3 -c '
 import json,os
 e=os.environ
 row={"image":e["IM"],"branch":e["BR"],"axis1_verdict":e["A1"],
-     "axis2_provenance":e["A2"],"qualified_for_closure":e["QU"]=="true",
-     "note":e["NT"],"run_id":e["RI"],"tree_sha":e["TS"],
+     "axis2_provenance":e["A2"],"note":e["NT"],
+     "attempt_markers":e["AM"],"run_id":e["RI"],"tree_sha":e["TS"],
      "dockerfile_sha256":e["DS"],"image_ref":e["TG"],
      "genuine_retries_observed":int(e["RT"]),"elapsed_seconds":int(e["EL"]),
      "build_exit":int(e["RC"]),"pre_build_state":e["PC"],

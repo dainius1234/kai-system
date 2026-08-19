@@ -216,11 +216,19 @@ def test_b2_injects_one_first_attempt_failure() -> None:
         td = Path(d)
         for image in ("memu-core", "memu-graph"):
             _, _, text = derive(image, "B2", td)
+            check(f"{image} B2 carries the scaffolding attempt marker",
+                  'ITEM8-MARK ATTEMPT=\\$attempt' in text, text[:200])
             check(f"{image} B2 injects the sentinel once",
                   text.count("item8-b2-first-attempt-consumed") == 2,
                   str(text.count("item8-b2-first-attempt-consumed")))
-            check(f"{image} B2 announces the injection",
-                  "ITEM8-B2: first attempt failed by injection" in text)
+            check(f"{image} B2 announces the injection with a RUNTIME value",
+                  'ITEM8-MARK B2INJECT=\\$attempt' in text, text[:200])
+            # THE STRUCTURAL PROPERTY: the measured form must not exist in
+            # the source, or BuildKit echoing the instruction could satisfy
+            # the detector. Source carries `$attempt`; only an execution
+            # ever prints a number.
+            check(f"{image} B2 source contains NO expanded marker",
+                  "B2INJECT=1" not in text and "ATTEMPT=1" not in text, text[:200])
             check(f"{image} B2 keeps the genuine command reachable",
                   "else" in text and "fi && exit 0" in text)
             check(f"{image} B2 does NOT deny the network",
