@@ -128,7 +128,7 @@ jobs:
       - name: Derive all six experimental Dockerfiles
         run: |
           set -euo pipefail
-          mkdir -p item8-derived
+          mkdir -p item8-derived item8-identity
           for image in memu-core memu-graph; do
             for branch in B1 B2 B3; do
               python3 scripts/security/derive_item8_dockerfile.py \
@@ -157,6 +157,25 @@ jobs:
             returned $rc for an absent image; 3 (UNRECORDED) was required. \
             An instrument that cannot refuse cannot be relied on."; exit 1; }
           echo "known-negative confirmed against a real daemon: exit 3"
+
+      # AND PROVE THE EVENT PARSER REFUSES, on this runner, before six
+      # builds depend on it. Same discipline as the identity
+      # known-negative above: an instrument that has only been seen to
+      # succeed is comfort, not control (rule 15). An empty stream must
+      # not read as "no retries observed".
+      - name: The event parser must refuse an empty stream
+        run: |
+          set -uo pipefail
+          : > item8-derived/empty-events.jsonl
+          python3 scripts/security/parse_buildkit_events.py \
+            --events item8-derived/empty-events.jsonl \
+            --target-substring 'for attempt in 1 2 3 4 5' --json
+          rc=$?
+          test "$rc" -eq 1 || { echo "REFUSED: the event parser returned \
+            $rc for an empty stream; 1 was required. A parser that reports \
+            zero occurrences for a stream it could not read is a /dev/null \
+            with better manners."; exit 1; }
+          echo "parser known-negative confirmed on this runner: exit 1"
 
       # SIX BUILDS, IN THE FROZEN ORDER. The runner script owns the
       # branch semantics; this step owns nothing but invoking it, so the

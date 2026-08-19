@@ -22710,3 +22710,157 @@ not a licence to move on.
 * **Frozen R2 unamended.** Every defect was an implementation failure.
 * Awaiting a third adversarial review.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D293 — Third review: the architecture changed, and the argument became unnecessary
+
+**2026-08-18. Repair of D292 against the frozen contract. No amendment to
+frozen R2 `0055ead8…8796`. Nothing built. `kai-pm/ITEM8_GO` still does
+not exist. Stage 2 remains NOT AUTHORISED.**
+
+### 1. Three rounds of the same defect, ended structurally
+
+Every round, the verdict layer searched BuildKit's rendered output for a
+string, and every round the reviewer found the same thing wearing new
+clothes:
+
+| round | the marker | why it could still be forged |
+|---|---|---|
+| D290 | `attempt.*failed` | matched **our own injected line** |
+| D291 | `retrying in` | exists **literally in the Dockerfile** |
+| D292 | `ITEM8-MARK ATTEMPT=$attempt` | value could not be forged, but `REFUSING TO BUILD` still could, and the retry proved only that the retry path was **entered** |
+
+Each repair made the string harder to counterfeit. **None changed the
+fact that instruction text and runtime output arrived in the same
+stream.**
+
+`--progress=rawjson` does. BuildKit's `SolveStatus` events keep them in
+**different fields of different objects**: `vertexes[].name` is
+instruction metadata, `logs[].data` is runtime output tagged with the
+vertex that produced it. `scripts/security/parse_buildkit_events.py`
+reads the second and never counts the first.
+
+**The parser's calibration proves exactly that property**: a fixture
+whose *instruction name* contains `retrying in` three times and whose
+*runtime log* contains it twice must report **2**.
+
+### 2. The classification question dissolved rather than being won
+
+D292 added `ITEM8-MARK ATTEMPT=$attempt` to all three derived
+Dockerfiles and argued it was scaffolding, not a treatment, so
+cardinality stayed 0/1/1. The argument was reasonable and I flagged it
+rather than deciding silently.
+
+**With runtime logs attributable per vertex, the markers are
+unnecessary.** The Dockerfiles' own retry lines are runtime output now,
+not searchable prose. The scaffolding is removed, B1's derived file is
+**byte-identical to the shipped Dockerfile plus the pinned syntax line**,
+and the mutation counts are 0/1/1 with nothing to argue about.
+
+A question you can delete is better than a question you can win.
+
+### 3. Six blockers, each verified before repair
+
+**Presentation could still satisfy `TARGET_REFUSAL`** — `REFUSING TO
+BUILD` is in the Dockerfile source. Now counted from the target vertex's
+runtime log only.
+
+**`sort -n -u` destroyed order and multiplicity** — demonstrated:
+`1,5,5,2,3,4` collapses to `1 2 3 4 5`, satisfying an "exact sequence"
+test it should have failed. The count now comes from occurrences in
+runtime output, and B3 requires exactly five.
+
+**B2 took the first injection marker only.** It now requires **exactly
+one**, at attempt 1, plus a runtime retry line — and R2's retry
+requirement is kept as its own criterion rather than substituted by
+"build succeeded plus a later attempt", because one criterion may not
+stand in for another.
+
+**B1 did not prove uncached execution.** `--no-cache` is a request; the
+vertex's own `started` and `cached` fields are the observation. Both are
+now required.
+
+**`item8-identity/` was never created** before the real-daemon
+known-negative wrote into it — a fresh run would have failed before the
+builds. Created alongside `item8-derived/`.
+
+**The authority guard accepted absence as consent.** `GITHUB_RUN_ATTEMPT`
+or `GITHUB_EVENT_NAME` merely missing passed every one-shot control, and
+a failed parent query **skipped** the direct-child check entirely — an
+instrument failure silently satisfying the control it applies. All three
+now refuse, exactly one parent is required, and the environment controls
+are evaluated **first** because they depend on nothing and give a
+clearer diagnosis. That ordering was found by calibration: the fixtures
+for those controls could not reach them.
+
+### 4. Two more, and a toolchain that was merely adjacent
+
+**A disagreement now refuses.** The summariser printed a contradiction
+between a row's own `qualified_for_closure` and the derived answer, then
+carried on and could still exit 0. A row certifying a claim that
+contradicts its evidence is schema drift **in either direction**, and
+both directions are now fixtures.
+
+**Every row binds to the toolchain.** R2 records the frontend, docker and
+buildx versions, base-image digest, runner OS, tree and run with *every
+branch*. One shared file and a row are merely adjacent; each row now
+carries `toolchain_sha256`, a row without one cannot qualify, and an
+`UNRESOLVED` identity in the toolchain record is an instrument failure
+rather than something to qualify around.
+
+### 5. A defect in the fixture, of the very class under repair
+
+The fake docker derived the branch from the **whole argv**, uppercased.
+Temporary directory names are random — and one containing `b3` silently
+switched a B2 scenario onto the B3 path. The failure was intermittent and
+looked like a code defect.
+
+**That is "matched incidental text", reproduced inside the fixture built
+to test for it.** Branch now comes from the `-f` basename suffix alone,
+and from the tag for `image inspect`, which has no `-f`. Verified stable
+across three consecutive runs.
+
+### 6. Calibration and reinjection
+
+Instruments **75/0**. Verdict layer **131/0 across 15 scenarios** (was
+89/11).
+
+| reinjected | result |
+|---|---|
+| parser counts the instruction name as runtime | **92/22 FAIL** |
+| authority accepts a missing env var | **113/1 FAIL** |
+| authority skips the parent check | **105/9 FAIL** |
+| summariser only prints a disagreement | **113/1 FAIL** |
+| toolchain binding not required | **111/3 FAIL** |
+| B1 no longer requires uncached execution | **123/8 FAIL** |
+| all reverted | **131/0 PASS** |
+
+The last one **did not fire at first** — no fixture made the target
+vertex cached. A scenario now does, covering both `cached` and
+never-started. Third round running that a reinjection which does not fire
+is information about the calibration.
+
+### 7. State
+
+| | |
+|---|---|
+| instruments / verdicts | **75/0** · **131/0**, 15 scenarios |
+| registry | **97 declared, 97 found**, I-1..I-7 hold |
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| mutation cardinality | **0/1/1**, no scaffolding in any derived file |
+| B1 derived file | shipped Dockerfile + syntax line, **byte-identical** |
+| parsed workflow triggers | `['push']` on `kai-pm/ITEM8_GO` |
+| tracked `item8*` artefacts | **0** |
+| shipped Dockerfiles | **0** lines of diff |
+| `collect_image_identity.py` | **0** lines vs `b53fd4e` |
+| D263 model-facing surface | **IDENTICAL** |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+| `make policy-check` | **EXIT 0** |
+
+### Status
+
+* **Item 8 — RE-IMPLEMENTED ON STRUCTURED EVIDENCE, NOT EXECUTED.**
+* **Frozen R2 unamended.** Every defect was an implementation failure.
+* Awaiting a fourth adversarial review.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.

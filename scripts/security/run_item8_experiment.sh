@@ -51,14 +51,32 @@ RESULTS="${ITEM8_RESULTS:-item8-results.jsonl}"
 
 EXPLICIT="scripts/security/collect_explicit_image_identity.py"
 BINDER="scripts/security/collect_image_identity.py"
+PARSER="scripts/security/parse_buildkit_events.py"
+TOOLCHAIN="${ITEM8_TOOLCHAIN:-item8-toolchain.txt}"
 
 # INSTRUMENT PREREQUISITES. Missing here means we cannot measure at all,
 # which is a different thing from a branch having no subject.
-for f in "$EXPLICIT" "$BINDER"; do
+for f in "$EXPLICIT" "$BINDER" "$PARSER"; do
   [ -f "$f" ] || { echo "INSTRUMENT FAILURE: $f is missing"; exit 2; }
 done
 mkdir -p "$DERIVED" "$IDENT" || { echo "INSTRUMENT FAILURE: cannot create output dirs"; exit 2; }
 : > "$RESULTS" || { echo "INSTRUMENT FAILURE: cannot write $RESULTS"; exit 2; }
+
+# EVERY ROW BINDS TO THE TOOLCHAIN RECORD. Frozen R2 requires the
+# frontend, docker/buildx versions, base-image digest, runner OS, tree
+# and run identity recorded with every branch. One shared file plus a
+# digest in each row is that binding; without the digest a row and a
+# toolchain file are merely adjacent.
+TOOLCHAIN_SHA="ABSENT"
+if [ -f "$TOOLCHAIN" ]; then
+  TOOLCHAIN_SHA="$(python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" "$TOOLCHAIN")"
+  if grep -q 'UNRESOLVED' "$TOOLCHAIN"; then
+    echo "INSTRUMENT FAILURE: $TOOLCHAIN contains an UNRESOLVED identity."
+    echo "R2 requires these identities recorded with every branch; a"
+    echo "branch cannot qualify against a toolchain we could not name."
+    exit 2
+  fi
+fi
 
 RUN_ID="${GITHUB_RUN_ID:-local}"
 TREE_SHA="$(git rev-parse 'HEAD^{tree}' 2>/dev/null || echo UNKNOWN)"
@@ -98,12 +116,12 @@ for IMAGE in memu-core memu-graph; do
 
     # ── the derived file must already exist (R11) ─────────────────────
     if [ ! -s "$DF" ]; then
-      emit "$(BR="$BRANCH" IM="$IMAGE" RI="$RUN_ID" TS="$TREE_SHA" python3 -c '
+      emit "$(BR="$BRANCH" IM="$IMAGE" RI="$RUN_ID" TS="$TREE_SHA" TC="$TOOLCHAIN_SHA" python3 -c '
 import json,os
 print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
  "axis1_verdict":"UNMEASURED","axis2_provenance":"UNRECORDED",
  "run_id":os.environ["RI"],
- "tree_sha":os.environ["TS"],
+ "tree_sha":os.environ["TS"],"toolchain_sha256":os.environ.get("TC","ABSENT"),
  "note":"derivation refused; no experimental Dockerfile exists, so the "
         "branch has no subject"}))')"
       echo "::endgroup::"; continue
@@ -116,13 +134,13 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
       "$DOCKER" image inspect "$TAG" >/dev/null 2>&1 && PRE_CLEAN="tag-already-exists"
       [ -e "$IID" ] && PRE_CLEAN="${PRE_CLEAN},iidfile-already-exists"
       if [ "$PRE_CLEAN" != "clean" ]; then
-        emit "$(BR="$BRANCH" IM="$IMAGE" RI="$RUN_ID" TS="$TREE_SHA" DS="$DF_SHA" PC="$PRE_CLEAN" python3 -c '
+        emit "$(BR="$BRANCH" IM="$IMAGE" RI="$RUN_ID" TS="$TREE_SHA" DS="$DF_SHA" PC="$PRE_CLEAN" TC="$TOOLCHAIN_SHA" python3 -c '
 import json,os
 print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
  "axis1_verdict":"UNMEASURED","axis2_provenance":"UNRECORDED",
  "run_id":os.environ["RI"],
  "tree_sha":os.environ["TS"],"dockerfile_sha256":os.environ["DS"],
- "pre_build_state":os.environ["PC"],
+ "toolchain_sha256":os.environ.get("TC","ABSENT"),"pre_build_state":os.environ["PC"],
  "note":"pre-build state not clean; a stale tag or leftover iidfile would "
         "contaminate IMAGE_NOT_PRODUCED_BY_DESIGN"}))')"
         echo "::endgroup::"; continue
@@ -133,34 +151,57 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
     NOCACHE=""; [ "$BRANCH" = "B1" ] && NOCACHE="--no-cache"
     START="$(date +%s)"
     # shellcheck disable=SC2086
-    # --progress=plain: deterministic output. `auto` varies with TTY and
-    # BuildKit version, and a detector that depends on presentation mode
-    # is measuring the presenter.
-    DOCKER_BUILDKIT=1 "$DOCKER" build $NOCACHE --progress=plain \
-      -f "$DF" -t "$TAG" --iidfile "$IID" . > "$LOG" 2>&1
+    # STRUCTURED EVENTS, not a rendered log. `--progress=rawjson` emits
+    # BuildKit SolveStatus objects in which a step's INSTRUCTION TEXT and
+    # its RUNTIME OUTPUT are different fields of different objects, so no
+    # amount of the log echoing an instruction can be read as execution.
+    # Three reviews found that same confusion wearing three disguises;
+    # this ends it structurally rather than with a stronger pattern.
+    EVENTS="${DERIVED}/${IMAGE}.${BRANCH}.events.jsonl"
+    RTLOG="${DERIVED}/${IMAGE}.${BRANCH}.runtime.log"
+    NOCACHE=""; [ "$BRANCH" = "B1" ] && NOCACHE="--no-cache"
+    START="$(date +%s)"
+    # shellcheck disable=SC2086
+    DOCKER_BUILDKIT=1 "$DOCKER" build $NOCACHE --progress=rawjson \
+      -f "$DF" -t "$TAG" --iidfile "$IID" . > "$EVENTS" 2> "$LOG"
     BUILD_RC=$?
     ELAPSED=$(( $(date +%s) - START ))
 
-    # STRUCTURED, RUNTIME-ONLY EVIDENCE. `ITEM8-MARK ATTEMPT=<n>` is
-    # emitted by the derived Dockerfile as `ATTEMPT=\$attempt`, so the
-    # EXPANDED form exists only in a real execution and never in the
-    # source BuildKit may echo back. The previous detector grepped the
-    # Dockerfiles' own prose, which appears literally in the instruction
-    # text -- it could match presentation instead of execution.
-    #
-    # `grep -c` PRINTS the count and EXITS 1 at zero, so `|| echo 0` once
-    # produced "0\n0" and crashed the row builder. Hence `|| true`.
-    ATTEMPT_NUMS="$(grep -o 'ITEM8-MARK ATTEMPT=[0-9][0-9]*' "$LOG" 2>/dev/null \
-                    | sed 's/.*=//' | sort -n -u | tr '\n' ' ' || true)"
-    ATTEMPT_NUMS="${ATTEMPT_NUMS% }"
-    RETRIES="$(printf '%s' "$ATTEMPT_NUMS" | wc -w | tr -d ' ')"
-    RETRIES="${RETRIES:-0}"
-    INJECT_AT="$(grep -o 'ITEM8-MARK B2INJECT=[0-9][0-9]*' "$LOG" 2>/dev/null \
+    # The target vertex is the HF retry loop, identified by its
+    # instruction text -- which is the one legitimate use of the name:
+    # asking WHICH STEP is the subject, never what happened in it.
+    FACTS="$(python3 "$PARSER" --events "$EVENTS" \
+               --target-substring 'for attempt in 1 2 3 4 5' \
+               --count 'retrying in' \
+               --count 'REFUSING TO BUILD' \
+               --count 'ITEM8-B2-INJECTED-ATTEMPT=' \
+               --emit-log "$RTLOG" --json 2>"${EVENTS}.parse.err")"
+    PARSE_RC=$?
+
+    if [ "$PARSE_RC" -ne 0 ] || [ -z "$FACTS" ]; then
+      emit "$(BR="$BRANCH" IM="$IMAGE" RI="$RUN_ID" TS="$TREE_SHA" DS="$DF_SHA" \
+              TC="$TOOLCHAIN_SHA" PE="$(head -c 300 "${EVENTS}.parse.err" 2>/dev/null)" python3 -c '
+import json,os
+e=os.environ
+print(json.dumps({"image":e["IM"],"branch":e["BR"],
+ "axis1_verdict":"UNMEASURED","axis2_provenance":"UNRECORDED",
+ "run_id":e["RI"],"tree_sha":e["TS"],"dockerfile_sha256":e["DS"],
+ "toolchain_sha256":e["TC"],
+ "note":"the build event stream could not be parsed, so nothing about "
+        "this branch was observed: " + e["PE"]}))')"
+      echo "::endgroup::"; continue
+    fi
+
+    EXECUTED="$(printf '%s' "$FACTS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["executed"])')"
+    CACHED="$(printf '%s' "$FACTS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["cached"])')"
+    VERR="$(printf '%s' "$FACTS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["error"][:200])')"
+    RETRIES="$(printf '%s' "$FACTS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["counts"]["retrying in"])')"
+    TARGET_REFUSALS="$(printf '%s' "$FACTS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["counts"]["REFUSING TO BUILD"])')"
+    INJECTIONS="$(printf '%s' "$FACTS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["counts"]["ITEM8-B2-INJECTED-ATTEMPT="])')"
+    # The injected attempt NUMBER, read from runtime output only.
+    INJECT_AT="$(grep -o 'ITEM8-B2-INJECTED-ATTEMPT=[0-9][0-9]*' "$RTLOG" 2>/dev/null \
                  | sed 's/.*=//' | head -1 || true)"
-    INJECTED="no"; [ -n "${INJECT_AT:-}" ] && INJECTED="yes"
-    MAX_ATTEMPT="$(printf '%s' "$ATTEMPT_NUMS" | tr ' ' '\n' | sort -n | tail -1)"
-    MAX_ATTEMPT="${MAX_ATTEMPT:-0}"
-    TARGET_REFUSAL="no"; grep -q 'REFUSING TO BUILD' "$LOG" 2>/dev/null && TARGET_REFUSAL="yes"
+    TARGET_REFUSAL="no"; [ "${TARGET_REFUSALS:-0}" -ge 1 ] && TARGET_REFUSAL="yes"
 
     # ── AXIS 1: the contingency, decided WITHOUT any identity input ───
     if [ "$BRANCH" = "B3" ]; then
@@ -177,16 +218,16 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
         A1="UNMEASURED"; NOTE="the build SUCCEEDED under network denial; the intended refusal did not occur"
       elif [ "$TARGET_REFUSAL" != "yes" ]; then
         A1="WRONG_FAILURE"; NOTE="the build failed without the target step's refusal marker; the failure was elsewhere"
-      elif [ "$ATTEMPT_NUMS" != "1 2 3 4 5" ]; then
+      elif [ "${RETRIES:-0}" -ne 5 ]; then
         # Frozen R2 requires FIVE attempts observed. The first
         # implementation asserted "five attempts" in its note while never
         # checking the count -- a claim in the place of a measurement.
-        A1="UNMEASURED"; NOTE="the refusal occurred but the runtime attempt markers were [${ATTEMPT_NUMS}], not the exact 1..5 the design requires"
+        A1="UNMEASURED"; NOTE="the refusal occurred but ${RETRIES} runtime retry line(s) were attributed to the target vertex, not the five the design requires"
       elif [ "$POST_TAG" != "absent" ] || [ "$POST_IID" != "absent" ]; then
         A1="UNMEASURED"; NOTE="post-build non-existence not established (tag=${POST_TAG}, iidfile=${POST_IID})"
       else
         A1="PASS"; A2="IMAGE_NOT_PRODUCED_BY_DESIGN"
-        NOTE="runtime attempts [${ATTEMPT_NUMS}], target-step refusal, no image at either end"
+        NOTE="${RETRIES} runtime retries and the refusal, both attributed to the target vertex; no image at either end"
       fi
     elif [ "$BUILD_RC" -ne 0 ]; then
       if [ "$TARGET_REFUSAL" = "yes" ]; then
@@ -207,18 +248,24 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
         python -c "$PROBE" > "${IDENT}/${LABEL}.offline.log" 2>&1
       OFFLINE_RC=$?
 
-      if [ "$OFFLINE_RC" -ne 0 ]; then
+      if [ "$EXECUTED" != "True" ]; then
+        # R2's B1 requires the HF instruction to PROVABLY execute rather
+        # than be served from cache. Requesting --no-cache is a request;
+        # the vertex's own `started` field is the observation.
+        A1="UNMEASURED"; NOTE="the target vertex did not execute in this build"
+      elif [ "$CACHED" = "True" ]; then
+        A1="UNMEASURED"; NOTE="the target vertex was served FROM CACHE; the genuine fetch path did not run"
+      elif [ "$OFFLINE_RC" -ne 0 ]; then
         A1="UNMEASURED"; NOTE="the image built but the offline asset load failed; the branch's criterion is not established"
-      elif [ "$BRANCH" = "B2" ] && [ "$INJECTED" != "yes" ]; then
-        A1="UNMEASURED"; NOTE="the injected first-attempt failure was not observed; B2 measured nothing about recovery"
+      elif [ "$BRANCH" = "B2" ] && [ "${INJECTIONS:-0}" -ne 1 ]; then
+        A1="UNMEASURED"; NOTE="${INJECTIONS} injection marker(s) in the target vertex runtime output; exactly one is required"
       elif [ "$BRANCH" = "B2" ] && [ "${INJECT_AT:-0}" -ne 1 ]; then
         A1="UNMEASURED"; NOTE="the injection fired at attempt ${INJECT_AT:-none}, not attempt 1"
-      elif [ "$BRANCH" = "B2" ] && [ "$MAX_ATTEMPT" -lt 2 ]; then
-        # A genuine attempt marker with a number GREATER than the
-        # injected one, on a build that succeeded, is what establishes
-        # that a later real fetch ran. Line ordering over prose did not:
-        # it proved only that the retry path was entered.
-        A1="UNMEASURED"; NOTE="no genuine attempt marker above the injected attempt; recovery is not established"
+      elif [ "$BRANCH" = "B2" ] && [ "${RETRIES:-0}" -lt 1 ]; then
+        # R2 requires a retry line OBSERVED. Build success plus a later
+        # attempt is persuasive but is a DIFFERENT criterion, and one
+        # criterion may not be substituted for another.
+        A1="UNMEASURED"; NOTE="no runtime retry line attributed to the target vertex; recovery is not established"
       else
         A1="PASS"
         NOTE="built, loaded offline with the network denied"
@@ -266,17 +313,21 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
     emit "$(IM="$IMAGE" BR="$BRANCH" A1="$A1" A2="$A2" NT="$NOTE" \
             RI="$RUN_ID" TS="$TREE_SHA" DS="$DF_SHA" TG="$TAG" RT="$RETRIES" \
             EL="$ELAPSED" RC="$BUILD_RC" PC="$PRE_CLEAN" IC="$IIDCORR" \
-            AM="${ATTEMPT_NUMS:-}" \
-            IJ="${INJECTED:-n/a}" python3 -c '
+            EX="${EXECUTED:-unknown}" CA="${CACHED:-unknown}" \
+            TC="${TOOLCHAIN_SHA:-ABSENT}" IJ2="${INJECTIONS:-0}" \
+            IJ="${INJECT_AT:-none}" python3 -c '
 import json,os
 e=os.environ
 row={"image":e["IM"],"branch":e["BR"],"axis1_verdict":e["A1"],
      "axis2_provenance":e["A2"],"note":e["NT"],
-     "attempt_markers":e["AM"],"run_id":e["RI"],"tree_sha":e["TS"],
+     "target_vertex_executed":e["EX"],"target_vertex_cached":e["CA"],
+     "toolchain_sha256":e["TC"],"injection_markers":int(e["IJ2"]),
+     "injected_at_attempt":e["IJ"],
+     "run_id":e["RI"],"tree_sha":e["TS"],
      "dockerfile_sha256":e["DS"],"image_ref":e["TG"],
-     "genuine_retries_observed":int(e["RT"]),"elapsed_seconds":int(e["EL"]),
+     "runtime_retries_observed":int(e["RT"]),"elapsed_seconds":int(e["EL"]),
      "build_exit":int(e["RC"]),"pre_build_state":e["PC"],
-     "iidfile_corroboration":e["IC"],"injection_observed":e["IJ"]}
+     "iidfile_corroboration":e["IC"]}
 if e["BR"]=="B3":
     row["failure_mode"]="persistent network denial on the HF RUN only"
 print(json.dumps(row))')"

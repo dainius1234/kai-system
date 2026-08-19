@@ -82,27 +82,17 @@ IMAGES = ("memu-core", "memu-graph")
 # The HF-fetching instruction opens with this, in both Dockerfiles.
 _RETRY_OPEN = re.compile(r"^RUN for attempt in 1 2 3 4 5; do \\\s*$", re.M)
 
-# STRUCTURED RUNTIME MARKERS, emitted once per loop iteration.
+# NO INSTRUMENTATION MARKERS. An earlier repair added
+# `ITEM8-MARK ATTEMPT=$attempt` to all three branches, because the
+# verdict layer was grepping a rendered build log and needed a token
+# that could not be forged by the log echoing the instruction.
 #
-# The first implementation measured B2 and B3 by grepping the build log
-# for the Dockerfiles' own human prose -- `retrying in`, and an injected
-# `echo` line. Both strings exist LITERALLY IN THE DOCKERFILE SOURCE, and
-# BuildKit's progress output presents instruction text alongside container
-# output. So the parser could match the PRESENTATION of a command rather
-# than its EXECUTION. Caught in the second adversarial review.
-#
-# The fix is a marker whose measured value cannot appear in the source.
-# `\$attempt` reaches the shell as `$attempt` and is expanded at RUNTIME,
-# so the Dockerfile contains `attempt=$attempt` while only a real
-# execution ever prints `attempt=1`. Grep for the expanded form and
-# presentation cannot satisfy it.
-#
-# This is COMMON SCAFFOLDING: identical in all three branches, so it is
-# not a variable between them, and excluded from the treatment count on
-# exactly the same basis the frozen design excludes the pinned syntax
-# line. It changes no experimental condition -- no network, no fetch, no
-# attempt count -- it only makes the attempts countable.
-_ATTEMPT_MARK = 'echo "ITEM8-MARK ATTEMPT=\\$attempt"; \\\n      '
+# `--progress=rawjson` makes that unnecessary: BuildKit attributes
+# RUNTIME OUTPUT to a vertex separately from the vertex's INSTRUCTION
+# TEXT, so the Dockerfiles' own retry lines are sufficient evidence and
+# the subject carries no instrumentation at all. The scaffolding is
+# removed, and with it the question of whether it counted against the
+# frozen mutation cardinality. (D293)
 
 # B2's shim. `attempt` is the shell loop variable; on the FIRST iteration
 # the sentinel is absent, so we create it and return failure without ever
@@ -113,7 +103,7 @@ _ATTEMPT_MARK = 'echo "ITEM8-MARK ATTEMPT=\\$attempt"; \\\n      '
 # already documented at memu-graph/Dockerfile:105-109.
 _B2_SHIM = ("if [ ! -f /tmp/item8-b2-first-attempt-consumed ]; then \\\n"
             "        touch /tmp/item8-b2-first-attempt-consumed; \\\n"
-            "        echo \"ITEM8-MARK B2INJECT=\\$attempt\"; \\\n"
+            "        echo \"ITEM8-B2-INJECTED-ATTEMPT=\\$attempt\"; \\\n"
             "        false; \\\n"
             "      else \\\n"
             "        {REAL}; \\\n"
@@ -153,14 +143,6 @@ def derive(src: str, branch: str) -> tuple[str, int, str]:
     a, b = span
     run_text = src[a:b]
     mutations = 0
-
-    # Scaffolding first, identically on every branch.
-    body_open = "; do \\\n"
-    i = run_text.find(body_open)
-    if i < 0:
-        return "", 0, "the retry loop's body could not be located"
-    run_text = (run_text[:i + len(body_open)] + "      " + _ATTEMPT_MARK
-                + run_text[i + len(body_open):].lstrip())
 
     if branch == "B3":
         # Per-instruction denial. NOT build-level: that would deny network

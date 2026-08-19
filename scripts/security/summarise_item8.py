@@ -70,6 +70,11 @@ def qualifies(r: dict) -> tuple[bool, str]:
     runner that shipped a `qualified_for_closure` field would be
     contradicted rather than believed.
     """
+    # R2 records the toolchain with EVERY branch. A row that does not
+    # name the toolchain it ran under is not bound to one.
+    tc = r.get("toolchain_sha256")
+    if not tc or tc == "ABSENT":
+        return False, f"toolchain binding is {tc or 'missing'}"
     if r.get("axis1_verdict") != PASS:
         return False, f"Axis 1 is {r.get('axis1_verdict')}"
     a2 = r.get("axis2_provenance")
@@ -173,13 +178,15 @@ def main() -> int:
     # A runner that certifies its own composite claim is contradicted,
     # not trusted. Nothing currently emits this field; if something does,
     # a disagreement is a finding.
+    disagreements: list[str] = []
     for r in rows:
         if "qualified_for_closure" in r:
             got, why = qualifies(r)
             if bool(r["qualified_for_closure"]) != got:
-                print(f"  DISAGREEMENT: {r.get('image')}/{r.get('branch')} "
-                      f"row claims qualified={r['qualified_for_closure']}, "
-                      f"derived {got} ({why})")
+                disagreements.append(
+                    f"DISAGREEMENT: {r.get('image')}/{r.get('branch')} row "
+                    f"claims qualified={r['qualified_for_closure']}, derived "
+                    f"{got} ({why})")
 
     print()
     print(f"  inspected: {len(rows)} result row(s) against "
@@ -200,6 +207,18 @@ def main() -> int:
     print("     never taken from the producer of it (rule 26).")
     print("   * No re-draws. An UNMEASURED branch stays UNMEASURED and Item 8")
     print("     is incomplete for that subject. (D247 §5, D289)")
+
+    if disagreements:
+        print()
+        for d in disagreements:
+            print(f"FAIL: {d}")
+        print()
+        print("A row carrying a composite claim that contradicts the "
+              "evidence is schema drift, in EITHER direction. The producer "
+              "of an observation does not certify the conclusion drawn "
+              "from it (rule 26), and a contradiction is refused rather "
+              "than noted.")
+        return 4
 
     if not ok:
         print()

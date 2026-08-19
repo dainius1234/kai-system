@@ -1465,6 +1465,28 @@ REGISTRY: Tuple[Gate, ...] = (
          in_workflows=("item8-network-contingency.yml",),
          trigger_class=SENTINEL_AUTHORISED,
          findings=("KAI-GATE-048",)),
+    Gate(module="parse_buildkit_events",
+         kind=REPORT,
+         summary="separates a build step's INSTRUCTION TEXT from its "
+                 "RUNTIME OUTPUT using BuildKit rawjson events, so no "
+                 "amount of the log echoing an instruction can be read as "
+                 "execution; refuses an unparseable stream, a missing "
+                 "target vertex and an ambiguous one rather than "
+                 "reporting zero occurrences",
+         inputs=(),
+         denominator=r"inspected: \d+ target vertex of \d+ in the stream",
+         probe=False,
+         probe_skip_reason="needs a BuildKit event stream, produced only "
+                           "by a real build; the positive case, the "
+                           "instruction-is-not-runtime case and four "
+                           "refusals are asserted against the shipped CLI "
+                           "in scripts/test_item8_verdicts.py",
+         proven_by="scripts/test_item8_verdicts.py",
+         calibrated_by="scripts/test_item8_verdicts.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
     Gate(module="check_item8_authority",
          kind=GATE,
          summary="no Item-8 build starts without an authority envelope "

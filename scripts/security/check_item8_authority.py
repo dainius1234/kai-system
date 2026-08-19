@@ -94,6 +94,9 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--sentinel", default=str(SENTINEL))
     ap.add_argument("--head", default="HEAD")
+    ap.add_argument("--allow-no-ci", action="store_true",
+                    help="calibration only: exercise the git-side bindings "
+                         "without CI environment variables present")
     args = ap.parse_args()
 
     path = pathlib.Path(args.sentinel)
@@ -109,6 +112,38 @@ def main() -> int:
         return refuse(f"{SENTINEL_REL} is missing {', '.join(missing)}. An "
                       f"envelope that does not name what it authorises "
                       f"authorises nothing")
+
+    # ONE SHOT, FIRST. These controls depend on nothing but the
+    # environment, so they cost nothing and give a clearer
+    # diagnosis than a git-state refusal that happens to fire
+    # earlier. Ordering was found by calibration: the fixtures
+    # for these controls could not reach them.
+    # FAIL CLOSED ON ABSENCE. The first version accepted a missing
+    # variable, so an environment that simply did not set them passed
+    # every one-shot control -- absence read as consent. `--allow-no-ci`
+    # exists so the calibration can exercise the git-side bindings, and
+    # is never used by the workflow.
+    attempt = os.environ.get("GITHUB_RUN_ATTEMPT")
+    event = os.environ.get("GITHUB_EVENT_NAME")
+    if not args.allow_no_ci:
+        if attempt is None:
+            return refuse("GITHUB_RUN_ATTEMPT is not set. One-shot execution "
+                          "cannot be established, and an unestablished "
+                          "control is not a satisfied one")
+        if event is None:
+            return refuse("GITHUB_EVENT_NAME is not set. The trigger cannot "
+                          "be established, so sentinel authority cannot be "
+                          "distinguished from any other entry path")
+    if attempt is not None and attempt != "1":
+        return refuse(f"GITHUB_RUN_ATTEMPT={attempt}. A re-run executes the "
+                      f"same authorised commit a second time, which is a "
+                      f"replacement execution of a frozen no-redraw "
+                      f"experiment. A second run needs a second authority")
+    if event is not None and event != "push":
+        return refuse(f"GITHUB_EVENT_NAME={event}. Only the sentinel push "
+                      f"carries execution authority; a manual dispatch does "
+                      f"not, whatever the platform permits")
+
 
     # (a) the design it authorises must be the design that exists now
     sys.path.insert(0, str(REPO / "scripts" / "security"))
@@ -170,27 +205,25 @@ def main() -> int:
 
     # (d) ONE SHOT. Re-running a workflow reuses the same commit and ref
     #     and would otherwise satisfy every check above.
-    attempt = os.environ.get("GITHUB_RUN_ATTEMPT")
-    if attempt is not None and attempt != "1":
-        return refuse(f"GITHUB_RUN_ATTEMPT={attempt}. A re-run executes the "
-                      f"same authorised commit a second time, which is a "
-                      f"replacement execution of a frozen no-redraw "
-                      f"experiment. A second run needs a second authority")
-    event = os.environ.get("GITHUB_EVENT_NAME")
-    if event is not None and event != "push":
-        return refuse(f"GITHUB_EVENT_NAME={event}. Only the sentinel push "
-                      f"carries execution authority; a manual dispatch does "
-                      f"not, whatever the platform permits")
-
     # (e) DIRECT CHILD. Ancestry alone permits arbitrary intervening
     #     commits whose changes were later reverted, which would pass (c).
     rc, parents = git("rev-list", "--parents", "-n", "1", args.head)
-    if rc == 0 and parents:
-        bits = parents.split()
-        if len(bits) < 2 or env["approved_commit"] not in bits[1:]:
-            return refuse(f"{args.head} is not a DIRECT CHILD of "
-                          f"approved_commit {env['approved_commit'][:12]}. "
-                          f"Intervening history is not reviewed history")
+    if rc != 0 or not parents:
+        # A query that failed cannot establish the relationship, and the
+        # first version SKIPPED the check in that case -- an instrument
+        # failure silently satisfying the control it was meant to apply.
+        return refuse(f"could not resolve the parents of {args.head}; the "
+                      f"direct-child relationship is unestablished, and "
+                      f"unestablished is not satisfied")
+    bits = parents.split()
+    if len(bits) != 2:
+        return refuse(f"{args.head} has {max(len(bits) - 1, 0)} parent(s); "
+                      f"execution authority requires exactly one, so the "
+                      f"reviewed commit is unambiguous")
+    if bits[1] != env["approved_commit"]:
+        return refuse(f"{args.head}'s parent is {bits[1][:12]}, not "
+                      f"approved_commit {env['approved_commit'][:12]}. "
+                      f"Intervening history is not reviewed history")
 
     print("ITEM-8 EXECUTION AUTHORITY")
     print("=" * 68)
