@@ -22057,3 +22057,117 @@ to be taken after the freeze.
 * Option B (canonical-region extraction + reconciliation gate) — AGREED
   IN PRINCIPLE, DEFERRED, unauthorised.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D288 — ITEM-8 CANONICAL DESIGN R2 IS FROZEN
+
+**2026-08-18. OPERATOR ACT, relayed and recorded. Dainius: *"FREEZE
+ITEM-8 CANONICAL DESIGN R2 — UNCHANGED."* The amendment window on
+D285's canonical region is CLOSED. No amendment is permitted from this
+entry onward, by anyone, for any reason, including a convenient one.**
+
+**This act authorises the freeze ONLY. It does not authorise
+implementation. It does not authorise execution.**
+
+### 1. What is frozen, and the value that says so
+
+D285's canonical region, exactly as banked in
+`b9fb175e09a0a36ef3d0839fb6ef8b38b18cbf0d`, with no edit of any kind.
+
+```
+FROZEN   0055ead8f51d8758bcd6f05b9b1fff84dd9509e91e79c79b6a2500ab78488796
+         7,776 normalised bytes
+
+DEAD     b8ba2ae363d827b33e8d10c54a44789f35c22f0ad14f04b306897fa416e8ff98
+         (R1, D283/D284) — superseded, must never be frozen
+```
+
+**Recomputed at the moment of banking**, not quoted from D286 — a
+fingerprint restated from memory is exactly the thing these values exist
+to prevent (§0.0). Recipe: region from the first R2 begin-marker line
+inclusive to the first following end-marker exclusive; whitespace of each
+line normalised to single spaces; joined with `\n`; stripped; UTF-8;
+SHA-256.
+
+**Independently reproduced by the PM thread** from the commit diff before
+this act, not from my report (D287 §1). Two parties, two computations,
+one value. That is why the freeze rests on evidence rather than on
+assurance.
+
+### 2. What the freeze binds
+
+* The design is **unamendable**. A change requires a new
+  pre-registration and a new operator act, not an edit.
+* **The Item-8 workflow must recompute `0055ead8…8796` before any build
+  and refuse to run if it differs.** This clause is what makes the freeze
+  self-enforcing rather than aspirational; without it a frozen design is
+  a document, not a control.
+* N = 6, the two subjects, the B1 → B2 → B3 order, the pinned frontend
+  digest, the mutation cardinalities, the verdict vocabulary and every
+  prohibition in the region are now fixed.
+
+### 3. The three gates, and where we are
+
+```
+FREEZE      TAKEN — this entry, operator act, 2026-08-18
+IMPLEMENT   NOT AUTHORISED — separate decision, after adversarial review
+EXECUTE     NOT AUTHORISED — separate decision, after implementation review
+```
+
+`kai-pm/ITEM8_GO` **does not exist and must not be created** until
+execution is separately authorised. Implementation, when authorised, must
+land and return for review **without** causing the six builds.
+
+### 4. One classification question raised now, needing no amendment
+
+Raised at the freeze rather than discovered during the run, and raised
+**because it needs no change to the frozen text** — the frozen verdict
+vocabulary already covers it, and only the mapping needs confirming.
+
+**B1 depends on a third party.** Its genuine-fetch control requires
+`huggingface.co` to serve the asset. If upstream is degraded on the day,
+B1 does not PASS — and that outcome must not be read as a failure of our
+contingency, which would blame our retry loop for somebody else's outage.
+
+Under the frozen vocabulary this is **UNMEASURED** — *"a prerequisite was
+unmet, so the branch has no subject"* — with upstream availability named
+as the unmet prerequisite. It is **not** WRONG_FAILURE, because the
+target step is the step that failed; and it is **not** an adverse result
+about item 8.
+
+**No amendment is sought or required.** Recorded here so the mapping is
+fixed before results exist rather than chosen while looking at one, and
+so the PM thread can dissent now if it reads the frozen vocabulary
+differently.
+
+### 5. State at the freeze
+
+| | |
+|---|---|
+| branch | `claude/project-rework-plan-pgvp35` |
+| R2 fingerprint, recomputed | `0055ead8…8796`, 7,776 bytes — **MATCH** |
+| R1 | `b8ba2ae3…ff98` — **SUPERSEDED, dead** |
+| canonical R2 bytes | **UNCHANGED** since `b9fb175` |
+| D247 §6 bar | `7c3ad6ad…4e73c` — unchanged |
+| Stage-2 design / Arm B | `e27bb25a…01de2` / `9b7e77fc…157f6` — unchanged |
+| doctrine | `f79ae859…add039` — unchanged |
+| `collect_image_identity.py` | byte-unchanged since `b53fd4e` |
+| `kai-pm/STAGE1_GO` | unchanged since `b45330b` — nothing dispatched |
+| `kai-pm/ITEM8_GO` | **does not exist** |
+
+### Status
+
+* **ITEM-8 CANONICAL DESIGN R2 — FROZEN, UNCHANGED. Amendment window
+  CLOSED.** `0055ead8…8796`.
+* Item 8 — **NOT IMPLEMENTED, NOT EXECUTED.**
+* Option B (canonical-region extraction + reconciliation gate) — AGREED,
+  PARKED, unauthorised, and explicitly not lost.
+* Item 10 — OPEN, wired 1 of 4, remaining members instrumented
+  just-in-time. Stage-1 provenance PARTIAL: built image
+  `sha256:ee2ad9ee…e614f` recovered, executed binding historically
+  UNKNOWN. No rerun, no bar amendment.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+* Programme lock in force: finish 048 before A-4, Kingsman assurance
+  integration, Task 4 consolidation, RC/dev→main requalification and
+  Evidence Plane work.
