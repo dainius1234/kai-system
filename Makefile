@@ -38,6 +38,7 @@ policy-check: lint-blocking
 	python3 scripts/test_image_identity.py
 	python3 scripts/security/check_item8_design.py
 	python3 scripts/test_item8_instruments.py
+	python3 scripts/test_item8_verdicts.py
 	python3 scripts/security/check_workflow_filters.py
 	python3 scripts/security/check_workflow_outputs.py
 	python3 scripts/security/check_dockerfile_flags.py

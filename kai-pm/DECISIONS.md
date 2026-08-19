@@ -22398,3 +22398,156 @@ frozen fingerprint is unchanged — verified before and after this change.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
 * Awaiting adversarial review of this implementation before any execution
   decision.
+
+---
+
+## D291 — The verdict layer was uncalibrated, and it was wrong in six ways
+
+**2026-08-18. Repair of D290 against the already-frozen contract. No
+amendment to frozen R2 `0055ead8…8796` — every defect below was an
+implementation failure to implement it. Nothing built. `kai-pm/ITEM8_GO`
+still does not exist. Stage 2 remains NOT AUTHORISED.**
+
+### 1. The root cause, which is a denominator
+
+D290's calibration was 71 assertions across the freeze guard, the
+deriver and the explicit collector. It described itself, accurately, as
+calibration for *"three new instruments"*.
+
+**The runner and the summariser — the two components that actually turn
+six builds into Item-8 verdicts — were not in that population.** Six
+verdict defects shipped through the gap, and every one was found by the
+PM thread's review rather than by my gates.
+
+That is R5 in its most expensive form: *a check whose scope is smaller
+than its name implies.* I called it "Item-8 instrument calibration" while
+the instruments that produce the conclusions were outside it.
+
+### 2. The six, each now a permanent fixture
+
+| # | defect | why it mattered |
+|---|---|---|
+| 1 | a failed `.Image` binding rewrote the branch's single `verdict`, and the summariser printed that field as **Axis 1** | an image-provenance fault laundered into a contingency measurement — the exact thing R2 forbids in the sentence it forbids it |
+| 2 | B3 could PASS without five attempts, while its own note **asserted** "five attempts" | a claim standing where a measurement belonged (R1), inside the experiment built to measure |
+| 3 | B2's retry detector matched `attempt.*failed` — which its **own injected line** satisfies | the detector was measuring the treatment. I-8: evidence and claim came from the same place |
+| 4 | `--iidfile` was written and never read | the corroboration R2 requires was manufactured and then discarded |
+| 5 | the summariser keyed rows into a dict (collapsing duplicates) and checked only `len(rows) == 6` | six rows with a duplicate and a gap would have reached "ALL SIX PASS" with one subject never measured |
+| 6 | the runner promised a non-zero instrument-failure path and ended `exit 0` unconditionally; the workflow echoed `PIPESTATUS` without propagating it | the distinction between "a contingency failed" and "we could not measure" was decorative |
+
+### 3. The repair
+
+**Three fields, not one.** Every row now carries `axis1_verdict`,
+`axis2_provenance` and `qualified_for_closure`, computed independently.
+Axis 1 is decided **before any identity instrument runs**. Axis 2 may
+block closure; it can never rewrite Axis 1.
+
+**An independent retry detector.** `retrying in` is what the *shipped*
+Dockerfiles print (`memu-core:100`, `memu-graph:112`); the injection
+marker deliberately does not contain it. The detector now keys on the
+subject's output rather than on ours, and B2 additionally requires a
+genuine retry to appear **after** the injection.
+
+**B3 requires exactly five genuine retries**, and reports the number it
+saw when it does not get them.
+
+**The iidfile is compared** with the collected `docker_image_id`;
+disagreement is an Axis-2 fault and leaves Axis 1 standing.
+
+**The denominator is a key set.** Exactly the six precommitted subjects,
+each once, no extras — duplicates and gaps are named individually.
+
+**Instrument failure propagates.** The runner exits 2 on a genuine
+inability to measure and the workflow now `exit "$rc"` rather than
+echoing it.
+
+### 4. Two more defects the new calibration found in me
+
+Neither was in the review; both were found by writing the fixtures.
+
+* **`grep -c` prints the count AND exits 1 when the count is zero.** So
+  `$(grep -c … || echo 0)` produced `"0\n0"`, which crashed the row
+  builder and wrote a **blank line** — and `wc -l` counted that blank
+  line as a result while the summariser skipped it. The two disagreed
+  about the denominator, silently. `emit` now refuses an empty payload
+  and the row count uses `grep -c .`.
+* **The collectors were invoked without the injected `--docker`.** In
+  production the default is correct, so this would never have shown up
+  live; it meant the builder and the identity instruments could disagree
+  about which daemon they were talking to.
+
+### 5. Governance hardening: the envelope
+
+`workflow_dispatch:` is inert **today** only because GitHub registers
+workflows from the default branch and this file lives on a feature
+branch. That is a property of the platform's current state, not of our
+design, and a merge would quietly make it live.
+
+So `kai-pm/ITEM8_GO` is now an **authority envelope**, not a flag:
+
+```
+frozen_r2       = the frozen canonical-design digest
+approved_commit = the implementation commit that was reviewed
+approved_tree   = its tree
+```
+
+`check_item8_authority.py` runs **first and unconditionally**, whatever
+triggered the job, and proves three things: the envelope's digest equals
+the design the tree holds now; `approved_commit` is an ancestor of HEAD;
+and **HEAD differs from it by the envelope alone.**
+
+That third clause is the load-bearing one. It is the difference between
+*somebody was allowed to run this* and *this exact artefact was allowed
+to run* — review approves artefact A, and without it the run could
+execute artefact B.
+
+### 6. Reinjection — all six review defects, plus the originals
+
+| reinjected | result |
+|---|---|
+| binding failure rewrites Axis 1 | **60/3 FAIL** |
+| B3 accepts four attempts | **59/4 FAIL** |
+| B2 counts its own injection as a retry | **59/4 FAIL** |
+| iidfile written then ignored | **55/8 FAIL** |
+| denominator back to a row count | **58/5 FAIL** |
+| every instrument-failure path neutered | **61/2 FAIL** |
+| all reverted | **63/0 PASS** |
+
+Stated precisely: reinjecting **only** the final row-count guard did not
+fire, because two earlier guards catch the same condition. That guard is
+redundant defence, not independently isolated, and saying so is better
+than implying coverage the fixtures do not give.
+
+### 7. One registry gap, named rather than worked around
+
+`run_item8_experiment.sh` is **not** in the gate registry. No shell
+script is: the registry's population is Python modules under
+`scripts/security/`, and there are nine other unregistered `.sh`
+collectors. Registering mine alone would have made the count agree while
+leaving the real gap untouched.
+
+That is **finding #48's shape** — a denominator defined by file type
+rather than by what instruments exist. Noted in the registry beside the
+calibration that covers the runner, and left open.
+
+### 8. State
+
+| | |
+|---|---|
+| instrument calibration | **71 passed, 0 failed** |
+| verdict-layer calibration | **63 passed, 0 failed** (new) |
+| registry | **96 declared, 96 found**, I-1..I-7 hold |
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| Stage-2 / Arm B / 048 C bar | all **MATCH** |
+| shipped Dockerfiles | **0** lines of diff |
+| `collect_image_identity.py` | **0** lines vs `b53fd4e` |
+| D263 model-facing surface | **IDENTICAL** |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+| `make policy-check` | **EXIT 0** |
+
+### Status
+
+* **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.** Six builds not run.
+* **Frozen R2 unamended.** Every defect was a failure to implement it,
+  not a fault in it.
+* Awaiting a second adversarial review before any execution decision.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.

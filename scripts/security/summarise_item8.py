@@ -1,37 +1,46 @@
 #!/usr/bin/env python3
-"""Item 8's six verdicts, on two axes that may not launder one another.
+"""Item 8's six results, on two axes that may not launder one another.
 
-WHY TWO AXES
-============
+WHY TWO AXES, AND A THIRD COLUMN
+================================
 
-Frozen design R2 requires it, and the reason is that this run does two
-jobs at once:
+This run does two jobs at once:
 
 * **Axis 1 — the HuggingFace/network contingency.** Does the retry loop
-  survive a transient failure and refuse after a persistent one?
-* **Axis 2 — the collectors' first qualification against a real Docker
-  daemon.** Every one of the existing collector's 67 calibration
-  assertions used an injected fake; this is the first time either
-  collector meets a daemon.
+  recover from a failing fetch and refuse after persistent denial?
+* **Axis 2 — image provenance**, and the collectors' first qualification
+  against a real Docker daemon.
 
-> *"A collector fault leaves Axis 1's result standing and leaves item 10's
-> provenance unmoved; a clean binding cannot turn a failed contingency
-> into a success."*
+Frozen R2: *"A collector fault leaves Axis 1's result standing and leaves
+item 10's provenance unmoved; a clean binding cannot turn a failed
+contingency into a success."*
 
-Reporting them in one column would let a provenance failure read as a
-contingency failure, or — worse — let a clean image binding decorate a
-branch that measured nothing.
+The first implementation of this pair had **one** verdict field. A failed
+`.Image` binding rewrote it to UNMEASURED, and this file then printed
+that field under "AXIS 1". So an image-provenance fault silently became a
+contingency measurement — precisely the laundering R2 forbids. Caught in
+adversarial review before any build existed.
 
-WHAT IT REFUSES TO DO
-=====================
+Three columns now, and they are computed independently:
 
-R11: if the results file is absent or short, this says so and does not
-compose a verdict from the branches that happen to exist. Six rows were
-promised; fewer than six is a fact about the run, not a smaller
-experiment.
+    axis1_verdict          PASS / WRONG_FAILURE / UNMEASURED
+    axis2_provenance       BOUND / MISMATCH / UNRECORDED /
+                           IMAGE_NOT_PRODUCED_BY_DESIGN
+    qualified_for_closure  true only when BOTH are sound
 
-It never repairs, re-runs or re-weights anything. D247 §5 and D289: no
-re-draws, and an UNMEASURED branch is banked as it occurred.
+WHY A ROW COUNT IS NOT A DENOMINATOR
+====================================
+
+The first implementation keyed rows by `(image, branch)` into a dict —
+which silently collapses duplicates — and then checked only
+`len(rows) == 6`. Six rows containing a duplicate and a missing branch
+would have satisfied it while one of the six precommitted subjects had
+never been measured at all.
+
+**A denominator is the set of precommitted subjects, not a number of
+lines.** This requires exactly the six expected keys, each once, no
+extras, before any conclusion is drawn — and reports the mismatch
+precisely when it is not so.
 """
 from __future__ import annotations
 
@@ -40,12 +49,40 @@ import json
 import pathlib
 import sys
 
+# The frozen denominator, in the frozen order.
 EXPECTED = [(i, b) for i in ("memu-core", "memu-graph")
             for b in ("B1", "B2", "B3")]
 
 PASS = "PASS"
 WRONG = "WRONG_FAILURE"
 UNMEASURED = "UNMEASURED"
+SOUND_A2 = {"BOUND", "IMAGE_NOT_PRODUCED_BY_DESIGN"}
+
+
+def refuse(reason: str, detail: str = "") -> int:
+    print("ITEM 8 UNMEASURED — EXPERIMENT INSTRUMENT FAILURE")
+    print(f"  unmet prerequisite: {reason}")
+    if detail:
+        print(f"  {detail}")
+    print("  No conclusion is drawn about the contingency from a partial "
+          "or malformed result set.")
+    return 4
+
+
+def validate_keys(rows: list[dict]) -> tuple[bool, list[str]]:
+    """Exactly the six precommitted subjects, each exactly once."""
+    seen = [(r.get("image"), r.get("branch")) for r in rows]
+    problems: list[str] = []
+    for key in EXPECTED:
+        n = seen.count(key)
+        if n == 0:
+            problems.append(f"MISSING: {key[0]}/{key[1]} was never reported")
+        elif n > 1:
+            problems.append(f"DUPLICATE: {key[0]}/{key[1]} reported {n} times")
+    for key in sorted(set(seen) - set(EXPECTED)):
+        problems.append(f"UNEXPECTED: {key[0]}/{key[1]} is not a "
+                        f"precommitted subject")
+    return (not problems), problems
 
 
 def main() -> int:
@@ -55,55 +92,60 @@ def main() -> int:
 
     path = pathlib.Path(args.results)
     if not path.is_file():
-        print("ITEM 8 UNMEASURED — EXPERIMENT INSTRUMENT FAILURE")
-        print(f"  unmet prerequisite: {path} does not exist. No branch "
-              f"result was recorded, so there is nothing to report and "
-              f"nothing to conclude about the contingency.")
-        return 4
-
-    rows = [json.loads(l) for l in path.read_text().splitlines() if l.strip()]
+        return refuse(f"{path} does not exist",
+                      "No branch result was recorded, so there is nothing "
+                      "to report.")
+    try:
+        rows = [json.loads(l) for l in path.read_text().splitlines()
+                if l.strip()]
+    except json.JSONDecodeError as e:
+        return refuse(f"{path} is not readable as JSONL: {e}")
     if not rows:
-        print("ITEM 8 UNMEASURED — EXPERIMENT INSTRUMENT FAILURE")
-        print(f"  unmet prerequisite: {path} is empty. Six branches were "
-              f"precommitted and none reported.")
-        return 4
+        return refuse(f"{path} is empty",
+                      "Six branches were precommitted and none reported.")
 
-    by_key = {(r.get("image"), r.get("branch")): r for r in rows}
+    ok, problems = validate_keys(rows)
 
     print("ITEM 8 — HUGGINGFACE/NETWORK CONTINGENCY")
-    print("=" * 72)
+    print("=" * 74)
     print()
-    print("AXIS 1 — the contingency")
-    print("-" * 72)
+    print("AXIS 1 — the contingency (computed with NO identity input)")
+    print("-" * 74)
     for image, branch in EXPECTED:
-        r = by_key.get((image, branch))
-        if r is None:
+        matches = [r for r in rows if (r.get("image"), r.get("branch"))
+                   == (image, branch)]
+        if not matches:
             print(f"  {image:<12} {branch}  NOT REPORTED")
             continue
-        print(f"  {image:<12} {branch}  {r['verdict']:<14} "
-              f"attempts={r.get('attempts_observed', '?')} "
-              f"elapsed={r.get('elapsed_seconds', '?')}s")
-        if r.get("note"):
-            print(f"  {'':<12}     {r['note']}")
+        for r in matches:
+            print(f"  {image:<12} {branch}  {r.get('axis1_verdict', '?'):<14}"
+                  f" retries={r.get('genuine_retries_observed', '?')}"
+                  f" elapsed={r.get('elapsed_seconds', '?')}s")
+            if r.get("note"):
+                print(f"  {'':<12}     {r['note']}")
 
     print()
-    print("AXIS 2 — image provenance (separate; cannot move Axis 1)")
-    print("-" * 72)
+    print("AXIS 2 — provenance (separate; may block closure, never Axis 1)")
+    print("-" * 74)
     for image, branch in EXPECTED:
-        r = by_key.get((image, branch))
-        if r is None:
-            continue
-        bind = r.get("executed_binding", "see identity artifacts")
-        print(f"  {image:<12} {branch}  {r.get('image_state', 'UNRECORDED'):<30} "
-              f"{bind}")
+        for r in [r for r in rows if (r.get("image"), r.get("branch"))
+                  == (image, branch)]:
+            print(f"  {image:<12} {branch}  "
+                  f"{r.get('axis2_provenance', 'UNRECORDED'):<30}"
+                  f" iidfile={r.get('iidfile_corroboration', 'n/a')}")
 
-    counts = {v: sum(1 for r in rows if r.get("verdict") == v)
-              for v in (PASS, WRONG, UNMEASURED)}
+    a1 = {v: sum(1 for r in rows if r.get("axis1_verdict") == v)
+          for v in (PASS, WRONG, UNMEASURED)}
+    a2_sound = sum(1 for r in rows if r.get("axis2_provenance") in SOUND_A2)
+    qualified = sum(1 for r in rows if r.get("qualified_for_closure") is True)
+
     print()
-    print(f"  inspected: {len(rows)} branch result(s) of {len(EXPECTED)} "
-          f"precommitted")
-    for v in (PASS, WRONG, UNMEASURED):
-        print(f"    {v:<14} {counts[v]}")
+    print(f"  inspected: {len(rows)} result row(s) against "
+          f"{len(EXPECTED)} precommitted subject(s)")
+    print(f"    AXIS 1   PASS {a1[PASS]}  WRONG_FAILURE {a1[WRONG]}  "
+          f"UNMEASURED {a1[UNMEASURED]}")
+    print(f"    AXIS 2   sound {a2_sound} of {len(rows)}")
+    print(f"    QUALIFIED FOR CLOSURE  {qualified} of {len(EXPECTED)}")
 
     print()
     print("  Reading rules, frozen before these results existed:")
@@ -111,22 +153,36 @@ def main() -> int:
     print("     It does NOT measure recovery from a real network outage.")
     print("   * UNMEASURED is never an adverse result about the contingency.")
     print("   * WRONG_FAILURE is never a PASS and never a FAIL of it.")
+    print("   * An Axis-2 fault blocks closure and leaves Axis 1 standing.")
     print("   * No re-draws. An UNMEASURED branch stays UNMEASURED and Item 8")
     print("     is incomplete for that subject. (D247 §5, D289)")
 
-    if len(rows) != len(EXPECTED):
+    if not ok:
         print()
-        print(f"INCOMPLETE: {len(rows)} of {len(EXPECTED)} branches reported. "
-              f"The denominator is six and it is not adjusted downward.")
+        for p in problems:
+            print(f"FAIL: {p}")
+        print()
+        print("The denominator is the six precommitted subjects, not a count "
+              "of lines. It is not adjusted downward, and a duplicate does "
+              "not substitute for a missing subject.")
         return 4
-    if counts[PASS] == len(EXPECTED):
+
+    if a1[PASS] == len(EXPECTED) and qualified == len(EXPECTED):
         print()
-        print("ALL SIX PASS: both contingencies survive a transient failure "
-              "and refuse after a persistent one.")
+        print("ALL SIX QUALIFY: both contingencies recover from an injected "
+              "failure and refuse after persistent denial, and every branch "
+              "carries sound provenance.")
         return 0
+
     print()
-    print(f"NOT ALL SIX PASS: {counts[PASS]}/{len(EXPECTED)}. Item 8 is not "
-          f"satisfied. Every outcome above is banked as it occurred.")
+    if a1[PASS] == len(EXPECTED):
+        print(f"AXIS 1 COMPLETE, PROVENANCE INCOMPLETE: 6/6 contingency PASS "
+              f"but only {qualified}/6 qualify for closure. The contingency "
+              f"result stands; item 10's provenance does not move for the "
+              f"branches whose Axis 2 is unsound.")
+    else:
+        print(f"NOT ALL SIX PASS: Axis 1 {a1[PASS]}/6. Item 8 is not "
+              f"satisfied. Every outcome above is banked as it occurred.")
     return 1
 
 

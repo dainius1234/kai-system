@@ -49,15 +49,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # THE FROZEN DESIGN, FIRST. Nothing below may run if the experiment
-      # under whose authority it runs has changed. No `continue-on-error`
+      # EXECUTION AUTHORITY, FIRST AND UNCONDITIONALLY.
+      #
+      # `workflow_dispatch:` above is inert TODAY only because GitHub
+      # registers workflows from the default branch and this file lives
+      # on a feature branch. That is a property of the platform's current
+      # state, not of our design, and it would quietly become live on a
+      # merge. So authority is checked here regardless of how the job was
+      # triggered: no envelope, no build.
+      #
+      # The envelope binds the frozen design AND the exact reviewed
+      # implementation, and proves HEAD differs from the approved commit
+      # by the envelope alone -- otherwise review approves artefact A and
+      # the run executes artefact B. (D291)
+      - name: Execution authority must validate
+        run: python3 scripts/security/check_item8_authority.py
+
+      # THE FROZEN DESIGN. Nothing below may run if the experiment under
+      # whose authority it runs has changed. No `continue-on-error`
       # anywhere on this step: it is the one thing that must be able to
       # stop the chain.
       - name: The frozen Item-8 design must be intact
         run: python3 scripts/security/check_item8_design.py
 
       - name: Item-8 instruments must pass calibration
-        run: python3 scripts/test_item8_instruments.py
+        run: |
+          set -euo pipefail
+          python3 scripts/test_item8_instruments.py
+          python3 scripts/test_item8_verdicts.py
 
       # NOT HERE: the D263 model-facing surface re-proof and the
       # byte-unchanged check on collect_image_identity.py.
@@ -153,7 +172,14 @@ jobs:
           set -uo pipefail
           bash scripts/security/run_item8_experiment.sh 2>&1 \
             | tee item8-run.log
-          echo "runner exit: ${PIPESTATUS[0]}"
+          rc="${PIPESTATUS[0]}"
+          echo "runner exit: ${rc}"
+          # PROPAGATED, not merely echoed. The runner exits 0 for every
+          # SUBJECT outcome -- a failing contingency is a result, not a
+          # broken workflow (rule 5) -- and non-zero only when it could
+          # not measure at all. Swallowing that would make the distinction
+          # decorative, which is what the first implementation did.
+          exit "$rc"
 
       # LAST, so the six verdicts land inside the Actions log byte window.
       - name: Item 8 verdicts — six branches, in order

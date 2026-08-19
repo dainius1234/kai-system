@@ -1465,6 +1465,51 @@ REGISTRY: Tuple[Gate, ...] = (
          in_workflows=("item8-network-contingency.yml",),
          trigger_class=SENTINEL_AUTHORISED,
          findings=("KAI-GATE-048",)),
+    Gate(module="check_item8_authority",
+         kind=GATE,
+         summary="no Item-8 build starts without an authority envelope "
+                 "that validates: it must name the frozen design digest "
+                 "that the tree actually holds, an approved commit that is "
+                 "an ancestor of HEAD, and HEAD must differ from that "
+                 "commit by the envelope alone -- otherwise review "
+                 "approves one artefact and the run executes another",
+         inputs=(),
+         denominator=r"inspected: \d+ authority envelope across \d+ "
+                     r"binding\(s\)",
+         probe=False,
+         probe_skip_reason="refuses without kai-pm/ITEM8_GO, which does "
+                           "not exist and must not be created outside an "
+                           "execution authorisation; every refusal path is "
+                           "asserted in scripts/test_item8_verdicts.py",
+         proven_by="scripts/test_item8_verdicts.py",
+         calibrated_by="scripts/test_item8_verdicts.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_item8_verdicts",
+         kind=GATE,
+         # The runner it calibrates is `run_item8_experiment.sh`, which
+         # is NOT in this registry: no shell script is, because the
+         # population is Python modules under scripts/security. That is
+         # finding #48's shape -- a denominator defined by file type
+         # rather than by what instruments exist -- and it is noted here
+         # rather than worked around by registering one .sh and leaving
+         # the other nine unregistered. (D291)
+         summary="the verdict layer must not launder one axis into the "
+                 "other, must refuse a B3 with four retries, must not "
+                 "count its own injection marker as a genuine retry, must "
+                 "compare the iidfile it writes, must reject a six-row "
+                 "result set containing a duplicate and a gap, and must "
+                 "exit non-zero on a genuine inability to measure",
+         inputs=(),
+         denominator=r"inspected: \d+ verdict-layer scenario\(s\) across "
+                     r"\d+ shipped entry points",
+         proven_by="scripts/test_item8_verdicts.py",
+         calibrated_by="scripts/test_item8_verdicts.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml", "item8-network-contingency.yml"),
+         findings=("KAI-GATE-048",)),
     Gate(module="test_item8_instruments",
          kind=GATE,
          summary="Item 8's three instruments must each refuse: a moved "

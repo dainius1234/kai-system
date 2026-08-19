@@ -13,6 +13,7 @@ on:
       - 'scripts/test_doctrine_integrity.py'
       - 'scripts/test_image_identity.py'
       - 'scripts/test_item8_instruments.py'
+      - 'scripts/test_item8_verdicts.py'
       - 'kai-pm/DECISIONS.md'
       - 'kai-pm/ENGINEERING_DOCTRINE.md'
   pull_request:
@@ -99,6 +100,11 @@ jobs:
 
       - name: Item-8 instrument calibration
         run: python scripts/test_item8_instruments.py
+
+      # The layer that turns six builds into verdicts. Its absence
+      # from the first calibration is why six verdict defects shipped.
+      - name: Item-8 verdict-layer calibration
+        run: python scripts/test_item8_verdicts.py
 
       - name: Port binding check
         run: python scripts/security/check_port_bindings.py
