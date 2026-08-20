@@ -93,6 +93,7 @@ mkdir -p "$DERIVED" "$IDENT" || { echo "INSTRUMENT FAILURE: cannot create output
 # its own must hold when this script is what runs. (D296)
 RUN_ID="${GITHUB_RUN_ID:-local}"
 TREE_SHA="$(git rev-parse 'HEAD^{tree}' 2>/dev/null || echo UNKNOWN)"
+COMMIT_SHA="$(git rev-parse HEAD 2>/dev/null || echo UNKNOWN)"
 
 [ -f "$TOOLCHAIN" ] || {
   echo "INSTRUMENT FAILURE: $TOOLCHAIN does not exist."
@@ -276,11 +277,12 @@ print(json.dumps({"image":e["IM"],"branch":e["BR"],
       # for itself, since that file is in the artefact package. (D296)
       PRE="$PRE_CLEAN" PT="$POST_TAG" PI="$POST_IID" LB="$LABEL" \
         IR="$TAG" RI="$RUN_ID" TS="$TREE_SHA" IM="$IMAGE" BR="$BRANCH" \
-        python3 -c '
+        CS="$COMMIT_SHA" python3 -c '
 import json,os
 e=os.environ
 print(json.dumps({"service":e["LB"],"image_ref":e["IR"],
  "image":e["IM"],"branch":e["BR"],"run_id":e["RI"],"tree_sha":e["TS"],
+ "commit_sha":e["CS"],
  "pre_build_state":e["PRE"],"post_build_tag":e["PT"],
  "post_build_iidfile":e["PI"]}))' > "${IDENT}/${LABEL}.absence.json"
       if [ "$BUILD_RC" -eq 0 ]; then
@@ -330,11 +332,12 @@ print(json.dumps({"service":e["LB"],"image_ref":e["IR"],
       # and which tree, and the summariser reconciles all four against
       # the toolchain artefact. (D296, D297)
       LB="$LABEL" IR="$TAG" RC="$OFFLINE_RC" RI="$RUN_ID" TS="$TREE_SHA" \
-        IM="$IMAGE" BR="$BRANCH" python3 -c '
+        IM="$IMAGE" BR="$BRANCH" CS="$COMMIT_SHA" python3 -c '
 import json,os
 e=os.environ
 print(json.dumps({"service":e["LB"],"image_ref":e["IR"],
  "image":e["IM"],"branch":e["BR"],"run_id":e["RI"],"tree_sha":e["TS"],
+ "commit_sha":e["CS"],
  "exit_status":int(e["RC"]),
  "observation":"offline asset load with the network denied"}))' \
         > "${IDENT}/${LABEL}.offline.json"

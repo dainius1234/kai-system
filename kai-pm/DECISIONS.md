@@ -23501,3 +23501,115 @@ tamper-integrity layer; it is not this repair.
 * The next artefact, if the review clears, is `kai-pm/ITEM8_GO` — and
   that is the **operator's** act, not mine and not a reviewer's.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D299 — I asserted a disjointness I had not checked
+
+**2026-08-20. Repair of D298 against the frozen contract. No amendment to
+frozen R2 `0055ead8…8796`. No redesign. Nothing built. `kai-pm/ITEM8_GO`
+still does not exist. Stage 2 remains NOT AUTHORISED.**
+
+### 0. The correction, first, because it is an R1 breach in this register
+
+D298 §2 said, of B1 and B3 when the RUN flag is unavailable:
+
+> ~~"they are separated instead by criteria that are mutually exclusive:
+> B3 requires the target's own error, a refusal and five retries; B1
+> requires none of those plus an image and an offline load"~~
+
+**This is false.** `memu-core/Dockerfile:92-107` — the **unmutated
+control**, the thing B1 builds — retries five times, prints
+`REFUSING TO BUILD`, and `exit 1` when its genuine fetch cannot reach
+upstream. `memu-graph` is the same shape.
+
+So a genuine B1 network outage produces **exactly** the evidence B3
+requires: five retries, a refusal, the target vertex's own error, and no
+image. Disproved by GPT; I confirmed it by reading the file I had
+written the claim about.
+
+An upstream outage during B1 is not hypothetical — it is the explicitly
+recognised B1 failure mode, and D289 already ruled on how to record it.
+
+**I asserted a property of the shipped Dockerfiles without reading
+them**, in a decision entry, in the same register whose whole purpose is
+that its claims can be relied on. The cost of checking was one `grep`.
+R1, and it is worse here than in a chat message, because the register is
+what the next person believes.
+
+### 1. So there is no degraded mode
+
+D298 built one: full binding when the daemon exposes RUN flags, a
+fallback to "disjoint criteria" when it does not. The fallback rested on
+the false claim above, so it was never a weaker binding — it was **no
+binding**, dressed as a lesser one.
+
+Deleted. The preflight now **fails** when `--network=none` does not
+appear in a vertex name:
+
+> *"Six subjects that cannot be distinguished are not six subjects."*
+
+That is an unmeasured instrument capability, and the answer to an
+unmeasured capability is not to infer identity from the observed result.
+Zero Item-8 builds spent, exactly as the preflight exists to ensure.
+
+### 2. The binding rule is itself evidence
+
+`binding-rule.json` was read and its contents partly used. It is now held
+to the standard it licenses: exactly one record, **both** capabilities
+true, and the run and tree it names equal to the toolchain's. A rule
+carried forward from another run would authorise a binding nobody
+measured here.
+
+### 3. commit_sha: required, with one named exception
+
+D298 added the comparison but skipped it when a record carried no commit
+— so absence bypassed it silently, and two of the four record types
+carried none. "All four compare the commit" read as true and was
+mechanically false.
+
+Now: the runner stamps commit on the offline-load and absence records,
+and absence of a commit is a failure, not agreement.
+
+**The executed-binding record is a named exception**, because
+`collect_image_identity.py` is byte-frozen at `b53fd4e` and its record
+contract carries service, run and tree but not commit. Editing a frozen
+instrument to satisfy a checker is the tail wagging the dog. It is
+declared in code as `COMMIT_BEARING`, not hidden in a conditional — and
+the binding record's `collected_image_id` must equal the identity
+record's image id, which **is** commit-checked, so the tie exists
+transitively through an id rather than a field.
+
+### 4. Calibration and reinjection
+
+Instruments **77/0**. Verdict layer **368/0 across 47 scenarios**.
+
+| reinjected | result |
+|---|---|
+| the degraded flags-absent path comes back | **442/3 FAIL** |
+| preflight tolerates a flagless daemon | **441/4 FAIL** |
+| binding rule not reconciled with the toolchain | **443/2 FAIL** |
+| commit absence accepted again | **441/4 FAIL** |
+| all reverted | **445/0 PASS** |
+
+The adversarial case GPT named is now a permanent fixture: a **B1
+genuine-outage capture** — five retries, refusal, vertex error, no image
+— substituted as B3. It refuses on the instruction, and with the flag
+binding unavailable the whole run refuses before anything is built.
+
+### 5. State
+
+| | |
+|---|---|
+| instruments / verdicts | **77/0** · **368/0**, 47 scenarios |
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| mutation cardinality | **0/1/1** |
+| shipped Dockerfiles | **0** lines of diff |
+| `collect_image_identity.py` | **0** lines vs `b53fd4e` |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+
+### Status
+
+* **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.**
+* **Frozen R2 unamended** across nine reviews.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.

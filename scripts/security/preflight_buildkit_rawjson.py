@@ -31,11 +31,14 @@ has, and proves the five properties the verdicts depend on:
     5. a deliberately failing target carries its OWN `error`
     6. **how this daemon represents a RUN in a vertex name** — whether
        the full instruction survives, and whether RUN FLAGS survive with
-       it. That answer is archived, and the claim engine applies the
-       strongest subject binding it supports. B1 and B3 of one image
-       differ ONLY by `--network=none`, so whether that flag appears in
-       a vertex name decides whether they can be told apart by
-       instruction text at all. Reasoning about it is not measuring it.
+       it. **Both are REQUIRED, not merely recorded.** B1 and B3 of one
+       image differ only by `--network=none`, and they do NOT separate
+       on outcome either: B1's own unmutated control retries five times,
+       prints "REFUSING TO BUILD" and exits non-zero when upstream is
+       unreachable, which is exactly B3's required shape. A daemon that
+       hides the flag cannot say which subject produced a capture, and
+       that is an unmeasured capability -- so this refuses rather than
+       degrading. (D299)
 
 IT IS NOT AN EXPERIMENTAL ARM
 =============================
@@ -317,6 +320,29 @@ def main() -> int:
         else:
             flags_in_name = "--network=none" in EV.normalise_command(t4.name)
         observed["flags_in_vertex_name"] = flags_in_name
+        if not e4 and not flags_in_name:
+            # NOT A DEGRADED MODE. A FAILURE.
+            #
+            # B1 and B3 differ only by this flag, and their evidence does
+            # NOT otherwise separate them: memu-core/Dockerfile:92-107 --
+            # the UNMUTATED control -- retries five times, prints
+            # "REFUSING TO BUILD" and exits 1 when its genuine fetch
+            # cannot reach upstream. A B1 outage produces exactly B3's
+            # required shape, and an outage during B1 is a recognised
+            # possibility rather than a hypothetical.
+            #
+            # So without the flag this instrumentation cannot say WHICH
+            # frozen subject produced a capture. That is an unmeasured
+            # instrument capability, and the answer to an unmeasured
+            # capability is not to infer identity from the result.
+            failures.append(
+                "this daemon does not carry RUN flags in vertex names, so "
+                "B1 and B3 of one image cannot be told apart by their "
+                "instructions -- and they cannot be told apart by their "
+                "outcomes either, because B1's own control emits five "
+                "retries, REFUSING TO BUILD and a non-zero exit when "
+                "upstream is unreachable. Six subjects that cannot be "
+                "distinguished are not six subjects (property 6)")
         if not failures and args.emit_binding_rule:
             pathlib.Path(args.emit_binding_rule).write_text(json.dumps({
                 "flags_in_vertex_name": flags_in_name,
@@ -340,13 +366,7 @@ def main() -> int:
     print()
     print(f"  inspected: 4 non-subject build(s) across 6 required "
           f"propert(ies) of --progress=rawjson")
-    if not failures and not observed.get("flags_in_vertex_name"):
-        print()
-        print("  NOTE: this daemon does not carry RUN flags in vertex names.")
-        print("  B1 and B3 of one image differ only by --network=none, so the")
-        print("  claim engine separates them by their disjoint Axis-1")
-        print("  criteria rather than by instruction text. Stated because it")
-        print("  is a real limit of the binding, not implied by silence.")
+
     print()
     if failures:
         for f in failures:

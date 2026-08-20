@@ -70,7 +70,7 @@ DERIVER = _mod("derive_item8_dockerfile")
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 43
+EXPECTED_SCENARIOS = 47
 executed: list[str] = []
 
 
@@ -300,6 +300,34 @@ TC_RUN = "555"
 TC_BASE = "sha256:" + "a" * 64
 
 
+FLAGLESS_DOCKER = r'''#!/usr/bin/env python3
+"""Well-formed rawjson, but RUN flags never reach the vertex name."""
+import base64, json, sys
+argv = sys.argv[1:]
+D = "sha256:" + "1" * 64
+def ev(o): print(json.dumps(o), file=sys.stderr)
+if argv and argv[0] == "build":
+    df = argv[argv.index("-f") + 1]
+    body = open(df).read().split("\nRUN ", 1)[1].replace("\\\n", " ")
+    # the flag is STRIPPED, which is the property under test
+    import re
+    body = re.sub(r"^(?:--\S+ )*", "", " ".join(body.split()))
+    name = "[2/2] RUN " + body
+    ev({"vertexes": [{"digest": D, "name": name, "started": "t0",
+                      "cached": "--no-cache" not in argv}]})
+    for _ in range(3):
+        ev({"logs": [{"vertex": D, "stream": 1,
+                      "data": base64.b64encode(
+                          b"PREFLIGHT-RUNTIME-LINE x\n").decode()}]})
+    fail = "exit 7" in open(df).read()
+    ev({"vertexes": [{"digest": D, "name": name, "completed": "t1",
+                      "error": "process did not complete successfully"
+                               if fail else ""}]})
+    sys.exit(7 if fail else 0)
+sys.exit(0)
+'''
+
+
 def run_runner(mode: str, td: Path,
                toolchain: str | None = None) -> tuple[int, str, list[dict]]:
     """Drive the shipped runner with a fake docker and pre-derived files."""
@@ -419,6 +447,7 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
                            "image": image, "branch": branch,
                            "run_id": over.get(f"run:{key}", TC_RUN),
                            "tree_sha": over.get(f"tree:{key}", TC_TREE),
+                           "commit_sha": over.get(f"commit:{key}", TC_COMMIT),
                            "pre_build_state": "clean",
                            "post_build_tag": "absent",
                            "post_build_iidfile": "absent"}
@@ -427,6 +456,19 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
                     json.dumps(abs_rec) + "\n")
                 if over.get(f"b3iid:{key}"):
                     (derived / f"{key}.iid").write_text(IMAGE_ID)
+            elif over.get(f"outage:{key}"):
+                # THE B1 GENUINE-OUTAGE SHAPE. memu-core/Dockerfile:92-107
+                # -- the UNMUTATED control -- retries five times, prints
+                # REFUSING TO BUILD and exits 1 when upstream is
+                # unreachable. That is byte for byte B3's required
+                # evidence, which is why there is no degraded binding.
+                out += [_lg("model download attempt /5 failed; "
+                            "retrying in 10s\n")] * 5
+                out.append(_lg("REFUSING TO BUILD: could not fetch the "
+                               "model in 5 attempts.\n"))
+                out.append(_ev({"vertexes": [{
+                    "digest": DIGEST, "name": name, "completed": "t1",
+                    "error": "process did not complete successfully"}]}))
             else:
                 if branch == "B2" and not over.get(f"noinject:{key}"):
                     if over.get(f"disorder:{key}"):
@@ -1715,20 +1757,21 @@ def test_capture_is_bound_to_the_derived_subject() -> None:
                               **{"swap:memu-core.B3": ("memu-core", "B1")})
         check("a B1-for-B3 substitution REFUSES", code != 0, out)
 
-        # ...and it must ALSO refuse on a daemon that does NOT, where the
-        # separation falls to the disjoint Axis-1 criteria instead. This
-        # is the honest half: the binding is weaker there, and the
-        # refusal must not depend on the stronger rule being available.
+        # ...and with the flag binding unavailable there is NO weaker
+        # mode to fall back to. D298 built one and D299 deleted it: B1
+        # and B3 are not separated by their outcomes either, because
+        # B1's own control emits five retries, REFUSING TO BUILD and a
+        # non-zero exit when upstream is unreachable. The run refuses
+        # outright rather than binding on something weaker.
         code, out = summarise(
             six(), td,
             **{"swap:memu-core.B3": ("memu-core", "B1"),
                "binding_rule": {"flags_in_vertex_name": False,
                                 "full_instruction_in_vertex_name": True,
                                 "run_id": TC_RUN, "tree_sha": TC_TREE}})
-        check("B1-for-B3 still REFUSES without flag binding", code != 0, out)
-        check("and the weaker binding is STATED, not implied",
-              "disjoint Axis-1 criteria" in out
-              or "no error on the target vertex" in out, out)
+        check("no flag binding REFUSES the whole run", code == 4, out)
+        check("naming the capability rather than degrading",
+              "flags_in_vertex_name is False" in out, out)
 
 
 def test_derived_dockerfile_must_be_the_re_derivation() -> None:
@@ -1765,9 +1808,9 @@ def test_binding_rule_must_have_been_measured() -> None:
         code, out = summarise(six(), td, dirs=(derived, ident))
         check("a missing binding rule REFUSES", code != 0, out)
         check("and says the preflight did not run",
-              "did not run" in out, out)
-        check("naming the strength as unknown, not assuming it",
-              "strength of the subject binding is unknown" in out, out)
+              "did not run" in out or "holds no records" in out, out)
+        check("naming the rule as inadmissible, not assuming a strength",
+              "BINDING RULE" in out, out)
 
 
 def test_generic_loop_alone_does_not_bind() -> None:
@@ -1805,6 +1848,113 @@ def test_commit_is_compared_as_D297_said_it_was() -> None:
         code, out = summarise(six(), td, dirs=(derived, ident))
         check("a record from another COMMIT does NOT qualify", code != 0, out)
         check("and the commit is named", "names commit" in out, out)
+
+
+# ── D299: there is no degraded binding, because B1 and B3 are not ──────
+#         separated by their outcomes either
+
+def test_b1_outage_looks_exactly_like_b3() -> None:
+    """The premise D298 got wrong, made permanent as a fixture."""
+    scenario("binding: a B1 outage capture is B3's evidence shape")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # A REAL B1 outage: five retries, REFUSING TO BUILD, vertex
+        # error, no image -- exactly what B3 requires. Filed as B3.
+        code, out = summarise(six(), td, **{
+            "outage:memu-core.B1": True,
+            "swap:memu-core.B3": ("memu-core", "B1")})
+        check("a B1-outage capture filed as B3 does NOT qualify",
+              code != 0, out)
+        check("and it is the INSTRUCTION that catches it, not the outcome",
+              "is not evidence about memu-core/B3" in out
+              or "does not carry it" in out, out)
+        # And with the flag binding unavailable, the whole run must have
+        # been refused before build 1 -- there is no weaker mode left.
+        code, out = summarise(six(), td, **{
+            "outage:memu-core.B1": True,
+            "swap:memu-core.B3": ("memu-core", "B1"),
+            "binding_rule": {"flags_in_vertex_name": False,
+                             "full_instruction_in_vertex_name": True,
+                             "run_id": TC_RUN, "tree_sha": TC_TREE}})
+        check("with no flag binding the summary REFUSES outright",
+              code == 4, out)
+        check("naming the capability, not the branch",
+              "flags_in_vertex_name is False" in out, out)
+        check("and saying the preflight should have stopped it",
+              "should have refused" in out, out)
+
+
+def test_preflight_refuses_a_daemon_that_hides_run_flags() -> None:
+    scenario("preflight: no flag in the vertex name is a FAILURE")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # A docker that emits well-formed rawjson but never carries the
+        # RUN flag in a vertex name.
+        fake = td / "flagless-docker"
+        fake.write_text(FLAGLESS_DOCKER)
+        fake.chmod(0o755)
+        p = subprocess.run(
+            [sys.executable, str(REPO / "scripts" / "security" /
+                                 "preflight_buildkit_rawjson.py"),
+             "--docker", str(fake)],
+            capture_output=True, text=True, cwd=str(REPO))
+        check("a flagless daemon REFUSES", p.returncode == 1, p.stdout)
+        check("and says six subjects that cannot be distinguished",
+              "are not six subjects" in p.stdout, p.stdout)
+        check("and names B1's own refusal behaviour as the reason",
+              "REFUSING TO BUILD" in p.stdout, p.stdout)
+        check("ZERO builds spent", "ZERO Item-8 builds" in p.stdout, p.stdout)
+
+
+def test_binding_rule_is_itself_admissible_evidence() -> None:
+    scenario("binding rule: from this run, this tree, both capabilities")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        for label, rule, why in (
+            ("a rule from another run",
+             {"flags_in_vertex_name": True,
+              "full_instruction_in_vertex_name": True,
+              "run_id": "999", "tree_sha": TC_TREE}, "measured in run"),
+            ("a rule from another tree",
+             {"flags_in_vertex_name": True,
+              "full_instruction_in_vertex_name": True,
+              "run_id": TC_RUN, "tree_sha": "0" * 40},
+             "measured against tree"),
+            ("a rule with truncated instructions",
+             {"flags_in_vertex_name": True,
+              "full_instruction_in_vertex_name": False,
+              "run_id": TC_RUN, "tree_sha": TC_TREE},
+             "full_instruction_in_vertex_name is False"),
+        ):
+            code, out = summarise(six(), td, **{"binding_rule": rule})
+            check(f"{label} REFUSES", code == 4, out)
+            check(f"{label} is named", why in out, out)
+        # two records is not "take the first"
+        derived, ident = write_evidence(td)
+        f = derived / "binding-rule.json"
+        f.write_text(f.read_text() + f.read_text())
+        code, out = summarise(six(), td, dirs=(derived, ident))
+        check("a duplicated binding rule REFUSES", code == 4, out)
+
+
+def test_commit_is_required_not_merely_compared() -> None:
+    scenario("evidence: absence of a commit is not agreement")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        derived, ident = write_evidence(td)
+        for name in ("item8-b1-memu-core.offline.json",
+                     "item8-b3-memu-graph.absence.json"):
+            derived, ident = write_evidence(td)
+            f = ident / name
+            rec = json.loads(f.read_text())
+            check(f"{name} carries a commit", "commit_sha" in rec, str(rec))
+            rec.pop("commit_sha")
+            f.write_text(json.dumps(rec) + "\n")
+            code, out = summarise(six(), td, dirs=(derived, ident))
+            check(f"{name} without a commit does NOT qualify",
+                  code != 0, out)
+            check(f"{name} says absence is not agreement",
+                  "absence is not agreement" in out, out)
 
 
 def run_all() -> None:
@@ -1851,6 +2001,10 @@ def run_all() -> None:
     test_binding_rule_must_have_been_measured()
     test_generic_loop_alone_does_not_bind()
     test_commit_is_compared_as_D297_said_it_was()
+    test_b1_outage_looks_exactly_like_b3()
+    test_preflight_refuses_a_daemon_that_hides_run_flags()
+    test_binding_rule_is_itself_admissible_evidence()
+    test_commit_is_required_not_merely_compared()
     print(f"  inspected: {EXPECTED_SCENARIOS} verdict-layer scenario(s) "
           f"across 3 shipped entry points")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",

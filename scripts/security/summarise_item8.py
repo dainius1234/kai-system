@@ -242,6 +242,24 @@ def _json_one(path: pathlib.Path) -> tuple[dict | None, str]:
     return objs[0], ""
 
 
+# WHICH RECORD TYPES CARRY A COMMIT, and why one does not.
+#
+# The executed-container binding is written by `collect_image_identity.py`,
+# which is BYTE-FROZEN at b53fd4e and whose record contract carries
+# service, run and tree but not commit. Requiring a commit there would
+# mean editing a frozen instrument to satisfy a checker -- the tail
+# wagging the dog, and the exact thing "an unchanged instrument needs no
+# argument that it is unchanged" exists to prevent.
+#
+# It is a NAMED exception, not a silent conditional: the binding record
+# is still reconciled on service, image ref, run and tree, and its
+# `collected_image_id` must equal the identity record's image id -- and
+# THAT record is commit-checked. So the binding is tied to a
+# commit-verified record transitively, by an id rather than by a field.
+# (D299)
+COMMIT_BEARING = {"identity", "offline-load", "absence"}
+
+
 def subject_problems(rec: dict, kind: str, label: str, image_ref: str,
                      run_id: str | None, tree_sha: str | None,
                      commit_sha: str | None = None) -> list[str]:
@@ -268,15 +286,20 @@ def subject_problems(rec: dict, kind: str, label: str, image_ref: str,
         out.append(f"the {kind} record names tree "
                    f"{str(rec.get('tree_sha'))[:12]}, the toolchain names "
                    f"{tree_sha[:12]}")
-    # D297 said this function compared commit_sha. It did not — it
-    # compared four fields and the entry named five. The cheap repair is
-    # to make the mechanism match the statement rather than soften the
-    # statement, since the collectors already record the commit. (D298)
-    if (commit_sha is not None and rec.get("commit_sha") is not None
-            and rec.get("commit_sha") != commit_sha):
-        out.append(f"the {kind} record names commit "
-                   f"{str(rec.get('commit_sha'))[:12]}, the toolchain names "
-                   f"{commit_sha[:12]}")
+    # REQUIRED, not conditional. D298 added this check but skipped it
+    # when the record carried no commit at all -- so absence bypassed it
+    # silently, and two of the four record types did not carry one. That
+    # made "all four compare the commit" mechanically false while reading
+    # as true, which is the shape of statement this register exists to
+    # prevent. Present, and equal, or it is a problem. (D299)
+    if commit_sha is not None and kind in COMMIT_BEARING:
+        if rec.get("commit_sha") is None:
+            out.append(f"the {kind} record carries no commit_sha; absence "
+                       f"is not agreement")
+        elif rec["commit_sha"] != commit_sha:
+            out.append(f"the {kind} record names commit "
+                       f"{str(rec['commit_sha'])[:12]}, the toolchain names "
+                       f"{commit_sha[:12]}")
     return out
 
 
@@ -381,34 +404,39 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
     # applies the strongest rule that measurement supports, and says
     # plainly when it supports none.
     seen = _EV.normalise_command(target.name)
+    # THERE IS NO DEGRADED MODE, and D298 was WRONG to build one.
+    #
+    # D298 §2 claimed B1 and B3 could fall back on "disjoint Axis-1
+    # criteria" when the flag is unavailable. They are not disjoint.
+    # memu-core/Dockerfile:92-107 -- the UNMUTATED control -- retries
+    # five times, prints "REFUSING TO BUILD" and exits 1 when its
+    # genuine fetch cannot reach upstream. That is byte for byte the
+    # evidence shape B3 requires, and an upstream outage during B1 is an
+    # explicitly recognised possibility, not a hypothetical.
+    #
+    # So a B1 outage capture filed as B3 would have been indistinguishable
+    # from a real B3 under the fallback. Without the flag this
+    # instrumentation cannot say WHICH frozen subject produced a capture,
+    # and that is an UNMEASURED instrument capability -- not licence to
+    # infer identity from the observed result. The preflight refuses
+    # before build 1 instead. (D299)
     if binding_rule is None:
-        e.unmet = ("no archived binding rule; the preflight that measures "
-                   "how this daemon represents RUN flags did not run, so "
-                   "the strength of the subject binding is unknown")
+        e.unmet = ("no admissible binding rule; the preflight that measures "
+                   "how this daemon represents a RUN did not run, or its "
+                   "record does not describe this execution")
         return e
-    if binding_rule.get("flags_in_vertex_name"):
-        for f in flags:
-            if f not in seen:
-                e.unmet = (f"this daemon carries RUN flags in vertex names, "
-                           f"and {image}/{branch} requires {f}, which this "
-                           f"capture's target does not have")
-                return e
-        for f in ("--network=none",):
-            if f in seen and f not in flags:
-                e.unmet = (f"the capture's target carries {f}, which "
-                           f"{image}/{branch} does not; this is another "
-                           f"branch's evidence")
-                return e
-    else:
-        # Stated, not implied. B1 and B3 within one image are the only
-        # pair this cannot separate, and they are separated instead by
-        # criteria that are mutually exclusive: B3 requires the target's
-        # own error, a refusal and five retries; B1 requires none of
-        # those plus an image and an offline load.
-        e.binding_note = ("this daemon does not carry RUN flags in vertex "
-                          "names, so B1 and B3 of one image are separated "
-                          "by their disjoint Axis-1 criteria rather than by "
-                          "the instruction text")
+    for f in flags:
+        if f not in seen:
+            e.unmet = (f"{image}/{branch} requires {f} in its target "
+                       f"instruction and this capture's target does not "
+                       f"carry it; this is not {branch}'s evidence")
+            return e
+    for f in ("--network=none",):
+        if f in seen and f not in flags:
+            e.unmet = (f"the capture's target carries {f}, which "
+                       f"{image}/{branch} does not; this is another "
+                       f"branch's evidence")
+            return e
     e.target = target
     e.runtime = "".join(target.log)
 
@@ -822,8 +850,37 @@ def main() -> int:
     # archived. Without it the STRENGTH of the subject binding below is
     # unknown, and an unknown-strength binding is not one (R11).
     binding_rule, br_err = _json_one(derived_dir / "binding-rule.json")
+    binding_problems: list[str] = []
     if br_err:
         binding_rule = None
+        binding_problems.append(f"BINDING RULE: {br_err}")
+    else:
+        # THE RULE IS EVIDENCE TOO, and is held to the same standard as
+        # everything else it licenses: one record, from THIS run and
+        # tree, and both capabilities actually present. A rule carried
+        # forward from another run would authorise a binding nobody
+        # measured here. (D299)
+        for k in ("full_instruction_in_vertex_name", "flags_in_vertex_name"):
+            if binding_rule.get(k) is not True:
+                binding_problems.append(
+                    f"BINDING RULE: {k} is {binding_rule.get(k)!r}. Without "
+                    f"it the six subjects cannot be told apart by their "
+                    f"instructions, and the preflight should have refused "
+                    f"before build 1")
+        if tc_rec.get("run_id") and str(binding_rule.get("run_id")) != \
+                str(tc_rec["run_id"]):
+            binding_problems.append(
+                f"BINDING RULE: measured in run {binding_rule.get('run_id')!r}, "
+                f"the toolchain names {tc_rec['run_id']!r}")
+        if tc_rec.get("tree_sha") and binding_rule.get("tree_sha") != \
+                tc_rec["tree_sha"]:
+            binding_problems.append(
+                f"BINDING RULE: measured against tree "
+                f"{str(binding_rule.get('tree_sha'))[:12]}, the toolchain "
+                f"names {tc_rec['tree_sha'][:12]}")
+        if binding_problems:
+            binding_rule = None
+    tc_problems.extend(binding_problems)
     derived: dict[tuple, tuple[str, str, str, str]] = {}
     disagreements: list[str] = []
     for image, branch in EXPECTED:
