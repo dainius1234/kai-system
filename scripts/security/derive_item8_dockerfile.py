@@ -88,45 +88,17 @@ IMAGES = ("memu-core", "memu-graph")
 # same assertions while being a different thing.
 _RETRY_OPEN = re.compile(r"^RUN for attempt in 1 2 3 4 5; do \\\s*$", re.M)
 
-# ── THE SAME INSTRUCTION, LOCATED IN A *DERIVED* FILE ────────────────
+# THE LOCATOR FOR A *DERIVED* FILE LIVES IN parse_buildkit_events.py,
+# beside normalise_command() and strip_run_flags() -- the other helpers
+# that describe the shape of a Dockerfile instruction.
 #
-# B3's derived Dockerfile carries `RUN --network=none for attempt …`, so
-# the shipped-source anchor above does not match it -- correctly, since
-# that anchor's job is to find something to derive FROM.
-#
-# The claim engine needs the opposite direction: given an archived
-# derived Dockerfile, which instruction is the subject? That is this,
-# and it is here rather than in the summariser so there is exactly ONE
-# statement in the tree of what Item 8's target instruction looks like.
-# (D298)
-_TARGET_OPEN = re.compile(
-    r"^RUN (?:--\S+ )*for attempt in 1 2 3 4 5; do \\\s*$", re.M)
-
-
-def find_target_run(text: str) -> str | None:
-    """The whole target RUN of a DERIVED Dockerfile, verbatim."""
-    m = _TARGET_OPEN.search(text)
-    if not m:
-        return None
-    start = m.start()
-    idx = start
-    for line in text[start:].splitlines(keepends=True):
-        idx += len(line)
-        if not line.rstrip("\n").endswith("\\"):
-            break
-    return text[start:idx]
-
-# NO INSTRUMENTATION MARKERS. An earlier repair added
-# `ITEM8-MARK ATTEMPT=$attempt` to all three branches, because the
-# verdict layer was grepping a rendered build log and needed a token
-# that could not be forged by the log echoing the instruction.
-#
-# `--progress=rawjson` makes that unnecessary: BuildKit attributes
-# RUNTIME OUTPUT to a vertex separately from the vertex's INSTRUCTION
-# TEXT, so the Dockerfiles' own retry lines are sufficient evidence and
-# the subject carries no instrumentation at all. The scaffolding is
-# removed, and with it the question of whether it counted against the
-# frozen mutation cardinality. (D293)
+# It was here, and that put this module on the dependency path of the
+# standalone preflight, which imported it only to measure how long the
+# longest real instruction is. A measurement path that can reach the
+# thing which produces the six subjects is not the separation the
+# operator is being asked to authorise, and narrowing the forbidden set
+# to make the check pass would be a reduced denominator by another
+# name. Moved rather than permitted. (D301)
 
 # B2's marker carries NO INTERPOLATED VALUE, and that is deliberate.
 #

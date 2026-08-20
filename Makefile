@@ -31,6 +31,8 @@ policy-check: lint-blocking
 	python3 scripts/security/check_architecture_rules.py
 	python3 scripts/security/hygiene_survey.py --gate
 	python3 scripts/security/check_ci_tolerations.py
+	python3 scripts/security/check_preflight_reachability.py \
+	  --expect-reachable scripts/test_item8_preflight.py
 	python3 scripts/test_capture_trigger_paths.py
 	python3 scripts/test_declared_prerequisites.py
 	python3 scripts/security/check_doctrine_integrity.py
@@ -39,6 +41,7 @@ policy-check: lint-blocking
 	python3 scripts/security/check_item8_design.py
 	python3 scripts/test_item8_instruments.py
 	python3 scripts/test_item8_verdicts.py
+	python3 scripts/test_item8_preflight.py
 	python3 scripts/security/check_workflow_filters.py
 	python3 scripts/security/check_workflow_outputs.py
 	python3 scripts/security/check_dockerfile_flags.py
@@ -407,6 +410,8 @@ gate-registry:
 # A-04e will move this into policy-check. Runnable now to see it bite.
 gate-registry-gate:
 	python3 scripts/security/check_ci_tolerations.py
+	python3 scripts/security/check_preflight_reachability.py \
+	  --expect-reachable scripts/test_item8_preflight.py
 	python3 scripts/security/check_test_wiring.py
 	python3 scripts/security/check_gate_registry.py --gate
 

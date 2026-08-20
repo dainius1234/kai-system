@@ -93,11 +93,40 @@ def refuse(msg: str) -> int:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--sentinel", default=str(SENTINEL))
+    # ONE GUARD, TWO ENVELOPES.
+    #
+    # The standalone preflight is a different act with a different
+    # sentinel and its own approved commit -- but every control here
+    # applies to it identically: the reviewed artefact, direct-child,
+    # sentinel-only diff, push event, attempt one. Giving it a second
+    # implementation would mean two authority mechanisms drifting apart,
+    # which is D272's shape applied to the thing that decides whether
+    # anything runs at all. So it is a parameter, not a copy. (D301)
+    ap.add_argument("--envelope-kind", default="experiment",
+                    choices=("experiment", "preflight"),
+                    help="which act this envelope authorises. The preflight "
+                         "measures the instrument and cannot build a "
+                         "subject; the experiment spends the frozen "
+                         "denominator. An envelope for one NEVER authorises "
+                         "the other")
     ap.add_argument("--head", default="HEAD")
     ap.add_argument("--allow-no-ci", action="store_true",
                     help="calibration only: exercise the git-side bindings "
                          "without CI environment variables present")
     args = ap.parse_args()
+
+    # The sentinel the DIFF is checked against must be the sentinel this
+    # invocation is authorising -- otherwise a preflight envelope would
+    # be diffed against the experiment's path and the ADD requirement
+    # could never be satisfied. Set before ANY use, because every
+    # refusal below names it. (D301)
+    global SENTINEL_REL
+    try:
+        SENTINEL_REL = str(pathlib.Path(args.sentinel).resolve()
+                           .relative_to(REPO))
+    except ValueError:
+        SENTINEL_REL = args.sentinel
+
 
     path = pathlib.Path(args.sentinel)
     if not path.is_file():
@@ -106,13 +135,27 @@ def main() -> int:
                       f"authorised, however the job was triggered")
 
     env = parse(path.read_text())
-    missing = [k for k in ("frozen_r2", "approved_commit", "approved_tree")
+    missing = [k for k in ("frozen_r2", "approved_commit", "approved_tree",
+                           "authorises")
                if not env.get(k)]
     if missing:
         return refuse(f"{SENTINEL_REL} is missing {', '.join(missing)}. An "
                       f"envelope that does not name what it authorises "
                       f"authorises nothing")
 
+    # AN ENVELOPE FOR ONE ACT NEVER AUTHORISES THE OTHER.
+    #
+    # The preflight measures the instrument; the experiment spends a
+    # frozen denominator that cannot be re-drawn. They are not degrees
+    # of the same permission, and an envelope that does not say which
+    # one it grants is an envelope somebody can point at either.
+    if env.get("authorises") != args.envelope_kind:
+        return refuse(
+            f"this envelope authorises {env.get('authorises')!r}; this is "
+            f"the {args.envelope_kind!r} path. An authorisation to measure "
+            f"the instrument is not an authorisation to spend the "
+            f"denominator, and the difference is the whole point of "
+            f"running them separately")
     # ONE SHOT, FIRST. These controls depend on nothing but the
     # environment, so they cost nothing and give a clearer
     # diagnosis than a git-state refusal that happens to fire

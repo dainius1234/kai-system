@@ -1507,7 +1507,8 @@ REGISTRY: Tuple[Gate, ...] = (
          proven_by="scripts/test_item8_verdicts.py",
          calibrated_by="scripts/test_item8_verdicts.py",
          in_policy_check=False,
-         in_workflows=("item8-network-contingency.yml",),
+         in_workflows=("item8-network-contingency.yml",
+                       "item8-preflight.yml"),
          trigger_class=SENTINEL_AUTHORISED,
          findings=("KAI-GATE-048",)),
     Gate(module="preflight_buildkit_rawjson",
@@ -1535,6 +1536,48 @@ REGISTRY: Tuple[Gate, ...] = (
          in_workflows=("item8-network-contingency.yml",
                        "item8-preflight.yml"),
          trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_item8_preflight",
+         kind=GATE,
+         summary="calibration for the STANDALONE MEASUREMENT and nothing "
+                 "else: the preflight's refusals, that an unavailable "
+                 "digest corroborator is recorded rather than fatal, that "
+                 "raw captures survive only with --keep and their deletion "
+                 "is announced, and that a preflight envelope never "
+                 "authorises the experiment. Its dependency graph reaches "
+                 "no subject-build machinery, which "
+                 "check_preflight_reachability.py asserts mechanically",
+         inputs=(),
+         denominator=r"inspected: \d+ preflight scenario\(s\) across \d+ "
+                     r"shipped entry points",
+         probe=False,
+         probe_skip_reason="it IS the calibration; probing a calibration "
+                           "with itself is the self-reference I-8 exists "
+                           "to stop",
+         proven_by="scripts/test_item8_preflight.py",
+         calibrated_by="scripts/test_item8_preflight.py",
+         in_policy_check=True,
+         in_workflows=("item8-preflight.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="check_preflight_reachability",
+         kind=GATE,
+         summary="computes the TRANSITIVE closure of what the standalone "
+                 "preflight workflow can execute, and refuses if the "
+                 "six-build runner, the subject deriver or the claim engine "
+                 "is inside it -- because the previous claim of structural "
+                 "incapability was made by grepping one YAML file for a "
+                 "name while a path existed one file away; a mention counts "
+                 "as a reference on purpose, so the scan over-reports",
+         inputs=(".github/workflows/item8-preflight.yml",),
+         denominator=r"inspected: \d+ reachable script\(s\) against \d+ "
+                     r"forbidden target\(s\)",
+         probe=True,
+         proven_by="scripts/test_item8_preflight.py",
+         calibrated_by="scripts/test_item8_preflight.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         trigger_class=CONTINUOUS,
          findings=("KAI-GATE-048",)),
     Gate(module="check_item8_toolchain",
          kind=GATE,
@@ -1582,8 +1625,8 @@ REGISTRY: Tuple[Gate, ...] = (
          proven_by="scripts/test_item8_verdicts.py",
          calibrated_by="scripts/test_item8_verdicts.py",
          in_policy_check=True,
-         in_workflows=("policy-checks.yml", "item8-network-contingency.yml",
-                       "item8-preflight.yml"),
+         in_workflows=("policy-checks.yml",
+                       "item8-network-contingency.yml"),
          findings=("KAI-GATE-048",)),
     Gate(module="test_item8_instruments",
          kind=GATE,
@@ -1600,8 +1643,8 @@ REGISTRY: Tuple[Gate, ...] = (
          proven_by="scripts/test_item8_instruments.py",
          calibrated_by="scripts/test_item8_instruments.py",
          in_policy_check=True,
-         in_workflows=("policy-checks.yml", "item8-network-contingency.yml",
-                       "item8-preflight.yml"),
+         in_workflows=("policy-checks.yml",
+                       "item8-network-contingency.yml"),
          findings=("KAI-GATE-048",)),
     Gate(module="select_replay_subject",
          kind=REPORT,

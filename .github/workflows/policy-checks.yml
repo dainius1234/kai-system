@@ -148,6 +148,11 @@ jobs:
       - name: CI toleration register
         run: python scripts/security/check_ci_tolerations.py
 
+      - name: The standalone preflight must not reach the experiment
+        run: |
+          python scripts/security/check_preflight_reachability.py \
+            --expect-reachable scripts/test_item8_preflight.py
+
       # This step had a `- name:` and no body. A step with neither `run`
       # nor `uses` is schema-invalid, so GitHub rejected the whole file,
       # scheduled **no jobs at all**, and every run of this workflow

@@ -201,6 +201,79 @@ def strip_run_flags(command: str) -> tuple[str, list[str]]:
     return m.group(2).strip(), m.group(1).split()
 
 
+# ── THE TARGET INSTRUCTION, LOCATED IN A *DERIVED* DOCKERFILE ───────
+#
+# B3's derived Dockerfile carries `RUN --network=none for attempt …`, so
+# the shipped-source anchor above does not match it -- correctly, since
+# that anchor's job is to find something to derive FROM.
+#
+# The claim engine needs the opposite direction: given an archived
+# derived Dockerfile, which instruction is the subject? That is this,
+# and it is here rather than in the summariser so there is exactly ONE
+# statement in the tree of what Item 8's target instruction looks like.
+# (D298)
+_TARGET_OPEN = re.compile(
+    r"^RUN (?:--\S+ )*for attempt in 1 2 3 4 5; do \\\s*$", re.M)
+
+
+def find_target_run(text: str) -> str | None:
+    """The whole target RUN of a DERIVED Dockerfile, verbatim."""
+    m = _TARGET_OPEN.search(text)
+    if not m:
+        return None
+    start = m.start()
+    idx = start
+    for line in text[start:].splitlines(keepends=True):
+        idx += len(line)
+        if not line.rstrip("\n").endswith("\\"):
+            break
+    return text[start:idx]
+
+# NO INSTRUMENTATION MARKERS. An earlier repair added
+# `ITEM8-MARK ATTEMPT=$attempt` to all three branches, because the
+# verdict layer was grepping a rendered build log and needed a token
+# that could not be forged by the log echoing the instruction.
+#
+# `--progress=rawjson` makes that unnecessary: BuildKit attributes
+# RUNTIME OUTPUT to a vertex separately from the vertex's INSTRUCTION
+# TEXT, so the Dockerfiles' own retry lines are sufficient evidence and
+# the subject carries no instrumentation at all. The scaffolding is
+# removed, and with it the question of whether it counted against the
+# frozen mutation cardinality. (D293)
+
+# B2's marker carries NO INTERPOLATED VALUE, and that is deliberate.
+#
+# An earlier version emitted `ITEM8-B2-INJECTED-ATTEMPT=\$attempt`,
+# intending the shell to expand the loop variable at runtime. It does
+# not: inside a double-quoted string a backslash before `$` SUPPRESSES
+# parameter expansion, so the real container printed the literal text
+# `$attempt`. The calibration's fake docker, meanwhile, manufactured
+# `=1` -- so the fixture proved a behaviour the shipped derivation did
+# not implement, and the fake was semantically BETTER than the real
+# command path. Measured against /bin/sh, not reasoned about. (D294)
+#
+# The number is not needed. The shim's own control flow guarantees the
+# injected branch is the FIRST iteration: the sentinel file cannot exist
+# before it is created. So the marker is a constant, single-quoted so no
+# shell touches it, and the criterion is "exactly one occurrence".
+# Another interpolation argument deleted rather than won.
+#
+# B2's shim. `attempt` is the shell loop variable; on the FIRST iteration
+# the sentinel is absent, so we create it and return failure without ever
+# running the real command. Every later iteration finds it and runs the
+# genuine fetch. Written as a file test rather than a numeric comparison
+# on ${attempt} because Docker substitutes ${attempt} -- which is not a
+# build arg -- to the empty string before the shell sees it, a defect
+# already documented at memu-graph/Dockerfile:105-109.
+_B2_SHIM = ("if [ ! -f /tmp/item8-b2-first-attempt-consumed ]; then \\\n"
+            "        touch /tmp/item8-b2-first-attempt-consumed; \\\n"
+            "        echo 'ITEM8-B2-INJECTED-FIRST-ATTEMPT'; \\\n"
+            "        false; \\\n"
+            "      else \\\n"
+            "        {REAL}; \\\n"
+            "      fi")
+
+
 def find_target(vertices: dict[str, Vertex], needle: str
                 ) -> tuple[Vertex | None, str]:
     """The ONE vertex whose INSTRUCTION TEXT contains `needle`.

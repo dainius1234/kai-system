@@ -91,26 +91,28 @@ def _longest_real_target() -> int:
     containment check fails on every subject and all six builds are
     spent discovering it. So the preflight's own command is made AT
     LEAST as long as the longest instruction the experiment will
-    actually present -- derived from the shipped Dockerfiles, not a
-    number kept beside them (R5).
+    actually present.
+
+    Measured from the SHIPPED Dockerfiles plus the treatment that makes
+    the longest branch longest -- and WITHOUT importing the deriver,
+    which would put the module that produces the six subjects on the
+    measurement's dependency path. The locator lives in the parser,
+    which this already depends on. (D301)
     """
-    spec = importlib.util.spec_from_file_location(
-        "derive_item8_dockerfile", _HERE / "derive_item8_dockerfile.py")
-    dv = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(dv)
     longest = 0
     for image in ("memu-core", "memu-graph"):
         src = _HERE.parent.parent / image / "Dockerfile"
         if not src.is_file():
             continue
-        for branch in ("B1", "B2", "B3"):
-            text, _n, err = dv.derive(src.read_text(), branch)
-            if err:
-                continue
-            run = dv.find_target_run(text)
-            if run:
-                longest = max(longest, len(EV.normalise_command(run)))
-    return longest
+        run = EV.find_target_run(src.read_text())
+        if run:
+            longest = max(longest, len(EV.normalise_command(run)))
+    # The B2 shim wraps the shipped command, so the longest DERIVED
+    # instruction exceeds the longest shipped one. Doubling is a
+    # deliberate over-allowance rather than a measured figure, and it is
+    # over-allowance in the safe direction: a longer probe can only make
+    # the truncation test harder to pass.
+    return longest * 2
 
 
 def _ok_dockerfile(pad_to: int) -> str:
@@ -230,7 +232,16 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--docker", default="docker")
     ap.add_argument("--keep", action="store_true",
-                    help="leave the temporary context for inspection")
+                    help="leave the build context and every capture in "
+                         "place. REQUIRED whenever the evidence is to be "
+                         "archived: without it this deletes the captures "
+                         "it just produced, and a measurement whose raw "
+                         "evidence no longer exists is a claim")
+    ap.add_argument("--workdir",
+                    help="create the context INSIDE this directory, so the "
+                         "captures land in the workspace an artefact "
+                         "uploader can see rather than in the system "
+                         "temporary directory")
     ap.add_argument("--emit-binding-rule", metavar="PATH",
                     help="archive how this daemon represents a RUN, for the "
                          "claim engine to apply")
@@ -243,8 +254,11 @@ def main() -> int:
               f"cannot qualify a toolchain it cannot invoke.")
         return 2
 
-    ctx = pathlib.Path(tempfile.mkdtemp(prefix="item8-preflight-"))
+    ctx = pathlib.Path(tempfile.mkdtemp(prefix="item8-preflight-",
+                                        dir=str(args.workdir) if args.workdir
+                                        else None))
     failures: list[str] = []
+    notes: list[str] = []
     observed: dict = {}
     try:
         # ── 1: a forced build that SUCCEEDS ──────────────────────────
@@ -365,21 +379,33 @@ def main() -> int:
                                   and digests["aba1"] != digests["abab"])
         observed["digest_stable_across_invocations"] = digest_stable
         observed["netmode_changes_vertex_digest"] = netmode_changes_digest
+        # RECORDED, NOT FATAL. Both of these were failures, and both
+        # were wrong to be.
+        #
+        # BuildKit documents vertex-digest comparison as valid within a
+        # RUNNING SOLVER, and this experiment is six separate
+        # invocations. Making a corroborator BuildKit does not license
+        # across invocations into a gate would stop the measurement for
+        # a reason that is not about evidence quality -- the same
+        # mistake the cosmetic flag-name dependency made, one layer in.
+        #
+        # The subject binding is the invocation chain. This probe says
+        # how much CORROBORATION that chain will have, and either answer
+        # is a result. (D301)
         if len(digests) == 3 and not digest_stable:
-            failures.append(
+            notes.append(
                 "the same command built twice produced DIFFERENT target "
-                "vertex digests, so on this daemon a vertex digest is not "
-                "comparable across invocations and cannot corroborate "
-                "subject identity (property 7)")
+                "vertex digests: on this daemon a vertex digest is not "
+                "comparable across invocations, so it corroborates "
+                "nothing. Recorded, not fatal — the invocation chain does "
+                "not depend on it")
         if len(digests) == 3 and not netmode_changes_digest:
-            failures.append(
-                "--network=none did NOT change the target vertex digest, so "
-                "B1 and B3 of one image are structurally indistinguishable "
-                "on this daemon. They do not separate on outcome either: "
-                "B1's own control emits five retries, REFUSING TO BUILD and "
-                "a non-zero exit when upstream is unreachable. Six subjects "
-                "that cannot be distinguished are not six subjects "
-                "(property 7)")
+            notes.append(
+                "--network=none did NOT change the target vertex digest, "
+                "so B1 and B3 of one image are structurally alike to this "
+                "daemon. Recorded, not fatal — they are separated by the "
+                "invocation chain, which binds each capture to the exact "
+                "derived Dockerfile and flags that produced it")
 
         # The rendered name is RECORDED, and no longer REQUIRED. It was a
         # cosmetic dependency; the structural one above replaces it.
@@ -390,6 +416,8 @@ def main() -> int:
         if not e4:
             flags_in_name = "--network=none" in EV.normalise_command(t4.name)
         observed["flags_in_vertex_name"] = flags_in_name
+        # Emitted on PASS of the REQUIRED properties. The digest fields
+        # carry whatever was measured, including False.
         if not failures and args.emit_binding_rule:
             pathlib.Path(args.emit_binding_rule).write_text(json.dumps({
                 "flags_in_vertex_name": flags_in_name,
@@ -405,7 +433,15 @@ def main() -> int:
             subprocess.run([args.docker, "image", "rm", "-f",
                             f"kai-item8-preflight:{tag}"],
                            capture_output=True)
-        if not args.keep:
+        if args.keep:
+            print(f"  raw captures retained: {ctx}")
+        else:
+            # Said out loud. The first version deleted these silently
+            # while the report above described them as archived, and
+            # "all three captures archived" was mechanically false at
+            # that tree. (D301)
+            print("  raw captures DELETED (no --keep): this run produced "
+                  "no archivable evidence")
             shutil.rmtree(ctx, ignore_errors=True)
 
     print("ITEM-8 BUILDKIT PREFLIGHT — instrument qualification")
@@ -417,6 +453,10 @@ def main() -> int:
           f"propert(ies) of --progress=rawjson")
 
     print()
+    for n in notes:
+        print(f"  NOTE: {n}")
+    if notes:
+        print()
     if failures:
         for f in failures:
             print(f"FAIL: {f}")

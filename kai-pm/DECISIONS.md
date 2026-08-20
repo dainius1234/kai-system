@@ -23760,3 +23760,125 @@ is re-derived here from a file the runner never touches.
 * **Frozen R2 unamended** across ten reviews.
 * A measurement path now exists and has **not** been authorised to run.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D301 — The new authority path had not earned any of its own trust
+
+**2026-08-20. Repair of D300 against the frozen contract. No amendment to
+frozen R2 `0055ead8…8796`. Nothing built. Neither sentinel exists. Stage
+2 remains NOT AUTHORISED.**
+
+Six blockers, and the pattern across them is one thing: I built a second
+entry point and gave it none of the controls the first one earned over
+ten reviews.
+
+### 0. The ruling I asked for, and lost
+
+I made the preflight FAIL when the vertex digest was unstable across
+invocations. **Overruled, correctly.** BuildKit licenses vertex-digest
+comparison *within a running solver*; Item 8 is six separate
+invocations. Making a corroborator BuildKit does not license into a gate
+is the same mistake the cosmetic flag-name dependency made, one layer
+in.
+
+So: digest properties are **recorded**, never required. Duplicate
+digests across the six are an **anomaly reported**, not a closure
+refusal — the bytes already refuse a copied capture, which is where that
+duty belongs. And the corroboration state is printed either way, because
+a corroborator that is silent when unavailable reads as one that agreed.
+
+### 1. "All three captures archived" was false
+
+The workflow did not pass `--keep`, and the script deletes its context
+in `finally`. **The captures were being destroyed by the same run that
+produced them**, while my report to the reviewer described them as
+archived.
+
+That is D299's breach exactly — a claim about my own code that one read
+of the cleanup path would have refuted. Repaired with `--workdir` into
+the workspace *and* `--keep`, uploads set to `if-no-files-found: error`,
+and the deletion path now says so out loud when it happens.
+
+### 2. "It cannot reach the experiment" was the wrong altitude
+
+I proved structural incapability by grepping one YAML file for the
+runner's name. The workflow ran the verdict-layer calibration, which
+holds the runner's path in a module-level constant and executes it.
+
+`check_preflight_reachability.py` now computes the **transitive
+closure** of what that workflow can execute and refuses if the runner,
+the deriver or the claim engine is inside it. A mention counts as a
+reference *on purpose*: a reachability check that under-reports is worse
+than one that over-reports.
+
+It found three breaches immediately. Two were my own comments naming the
+forbidden paths **while explaining that they were forbidden** — R9's
+shape, twice, in the files written to prevent it. The third was real:
+the preflight imported the deriver to measure an instruction length.
+
+**I moved the locator into the parser rather than narrowing the
+forbidden set.** Shrinking the set to make my own check pass is a
+reduced denominator wearing a different hat.
+
+### 3. A sentinel trigger is not an authority check
+
+`item8-preflight.yml` had a `paths:` filter and nothing else. No
+envelope, no approved commit, no direct-child requirement, no
+sentinel-only diff, no run-attempt control — every one of which the
+experiment's path has had since D291.
+
+One guard, parameterised, not a second copy: `--envelope-kind`. And an
+envelope must now **name the act it authorises**, checked before
+anything else because it depends on nothing. An authorisation to measure
+the instrument is not an authorisation to spend the denominator.
+
+### 4. And two repairs shipped with no fixture at all
+
+| reinjected | first result |
+|---|---|
+| `no_cache` not reconciled (B1's frozen flag) | **486/0 — PASS** |
+| invocation exempt from the commit contract | **486/0 — PASS** |
+
+Removing either broke **nothing**. I repaired two of the six blockers
+and neither repair was covered — the silent form of the weak
+reinjection, and worse, because it reports coverage it does not have.
+
+Fixtures added for every frozen invocation parameter individually
+(`subcommand`, `progress`, `no_cache` in both directions, `iidfile`,
+`context`) and for a missing and a wrong commit. Both reinjections now
+fire, **498/4** and **500/2**.
+
+The fixture for the missing commit did not work on the first attempt
+either: my edit removed the field from the *absence* record instead of
+the *invocation* record, because both lines were identical and the
+replace took the first. Same wrong-target edit as the over-broad
+registry fix earlier in this patch.
+
+### 5. Calibration and reinjection
+
+Preflight **19/0** · instruments **77/0** · verdict layer **406/0**.
+
+| reinjected | result |
+|---|---|
+| the preflight deletes its evidence silently | **484/2 FAIL** |
+| one envelope authorises both acts | **485/1 FAIL** |
+| digest corroboration state not reported | **484/2 FAIL** |
+| `no_cache` not reconciled | **498/4 FAIL** |
+| invocation exempt from the commit contract | **500/2 FAIL** |
+| all reverted | **502/0 PASS** |
+
+### 6. State
+
+| | |
+|---|---|
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| preflight reachability | closure of 3, forbidden set unreachable |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+| `kai-pm/ITEM8_PREFLIGHT_GO` | **ABSENT** |
+
+### Status
+
+* **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.** No measurement has run.
+* **Frozen R2 unamended** across eleven reviews.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.

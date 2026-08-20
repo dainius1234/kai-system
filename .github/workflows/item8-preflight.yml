@@ -64,14 +64,49 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
-      # The instruments this measurement itself depends on. If the
-      # parser is broken, the measurement is meaningless.
-      - name: Item-8 instruments must pass calibration
+      # EXECUTION AUTHORITY, FIRST AND UNCONDITIONALLY.
+      #
+      # This workflow had a sentinel TRIGGER and no authority CHECK. A
+      # paths filter says when a job starts; it says nothing about which
+      # artefact was reviewed, whether the sentinel is the only change,
+      # or whether this is a re-run. The experiment's own guard has
+      # refused all of that since D291, and this path -- newer, and the
+      # one that runs first -- had none of it.
+      #
+      # Same module, different envelope and different sentinel, so the
+      # authority logic is not duplicated. (D301)
+      - name: Execution authority must validate
+        run: |
+          python3 scripts/security/check_item8_authority.py \
+            --sentinel kai-pm/ITEM8_PREFLIGHT_GO \
+            --envelope-kind preflight
+
+      # THE INSTRUMENTS THIS MEASUREMENT DEPENDS ON — AND ONLY THOSE.
+      #
+      # This step used to run the VERDICT-LAYER calibration, which
+      # drives the six-build runner under a fake docker. So the claim
+      # that this workflow "cannot reach the experiment" was made by
+      # grepping the YAML, while a transitive path existed one file
+      # away. Grepping a file for a name is the wrong altitude for a
+      # reachability question.
+      #
+      # That suite is NOT NAMED HERE, deliberately. Naming it — even to
+      # explain that it is excluded — puts it back in the closure that
+      # check_preflight_reachability.py computes, because that check
+      # counts a mention as a reference on purpose. A comment that
+      # describes a rule must not violate it. (R9, D301)
+      #
+      # This runs a calibration whose dependency graph reaches the
+      # parser, the preflight and the authority guard, and nothing that
+      # can build a subject. A meta-check asserts that closure rather
+      # than leaving it to the next reader's care. (D301)
+      - name: Preflight-only instruments must pass calibration
         run: |
           set -euo pipefail
-          python3 scripts/test_item8_instruments.py
-          python3 scripts/test_item8_verdicts.py
+          python3 scripts/test_item8_preflight.py
 
       # ci-toleration: documented-skip
       - name: Record the toolchain this measurement ran under
@@ -94,8 +129,17 @@ jobs:
         run: |
           set -uo pipefail
           mkdir -p item8-preflight
+          mkdir -p item8-preflight/captures
+          # --keep AND --workdir, together, deliberately. Without --keep
+          # this deletes the captures it just produced; without
+          # --workdir it writes them to the system temp directory where
+          # the artefact uploader cannot see them. Either omission makes
+          # "the raw evidence is archived" false, and it WAS false at
+          # b971807. (D301)
           python3 scripts/security/preflight_buildkit_rawjson.py \
             --emit-binding-rule item8-preflight/binding-rule.json \
+            --workdir item8-preflight/captures \
+            --keep \
             --run-id "${GITHUB_RUN_ID}" \
             --tree-sha "$(git rev-parse 'HEAD^{tree}')" \
             2>&1 | tee item8-preflight/preflight.log
@@ -112,7 +156,10 @@ jobs:
           path: |
             item8-preflight/
             item8-preflight-toolchain.txt
-          if-no-files-found: warn
+          # ERROR, not warn. This job exists to produce evidence; a run
+          # that uploads nothing has measured nothing, and a warning is
+          # how that goes unnoticed.
+          if-no-files-found: error
 
       # SAID OUT LOUD, IN THE LOG, WHATEVER THE OUTCOME.
       - name: This was a measurement, not an authorisation

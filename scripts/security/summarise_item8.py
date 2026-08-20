@@ -260,7 +260,8 @@ def _json_one(path: pathlib.Path) -> tuple[dict | None, str]:
 # THAT record is commit-checked. So the binding is tied to a
 # commit-verified record transitively, by an id rather than by a field.
 # (D299)
-COMMIT_BEARING = {"identity", "offline-load", "absence"}
+COMMIT_BEARING = {"identity", "offline-load", "absence",
+                  "invocation"}
 
 
 def subject_problems(rec: dict, kind: str, label: str, image_ref: str,
@@ -388,7 +389,7 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
                    f"produces; the subject built is not the subject the "
                    f"design specifies")
         return e
-    run_text = _DV.find_target_run(expect_text)
+    run_text = _EV.find_target_run(expect_text)
     if run_text is None:
         e.unmet = (f"the derived Dockerfile for {image}/{branch} holds no "
                    f"target RUN, so no vertex can be bound to it")
@@ -417,15 +418,31 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
                    f"source gives {want_df_sha[:12]}. This build was not "
                    f"given this subject")
         return e
+    # EVERY FROZEN INVOCATION PARAMETER, not the two that were easy.
+    #
+    # `--no-cache` is the sharpest of these: R2 gives it to B1 and to no
+    # other branch, and it is what makes B1's genuine-fetch criterion a
+    # fetch rather than a cache read. Leaving it as producer metadata
+    # meant the design's own distinguishing flag was taken on the
+    # runner's word -- and "the derived Dockerfile was right" says
+    # nothing about how the build was invoked. (D301)
     invoked = (inv.get("invocation") or {})
-    if invoked.get("file") != str(want_df):
-        e.unmet = (f"{image}/{branch}: the invocation names -f "
-                   f"{invoked.get('file')!r}, not {str(want_df)!r}")
-        return e
-    if invoked.get("tag") != image_ref:
-        e.unmet = (f"{image}/{branch}: the invocation names -t "
-                   f"{invoked.get('tag')!r}, not {image_ref!r}")
-        return e
+    expected_invocation = {
+        "subcommand": "build",
+        "progress": "rawjson",
+        "file": str(want_df),
+        "tag": image_ref,
+        "iidfile": str(derived / f"{image}.{branch}.iid"),
+        "context": ".",
+        "no_cache": (branch == "B1"),
+    }
+    for k, want in expected_invocation.items():
+        if invoked.get(k) != want:
+            e.unmet = (f"{image}/{branch}: the invocation records "
+                       f"{k}={invoked.get(k)!r}; the frozen design for this "
+                       f"branch requires {want!r}. This build was not the "
+                       f"one the design specifies")
+            return e
     # AND THE BYTES. Recomputed from the archived captures themselves, so
     # a capture copied or swapped after the fact no longer matches the
     # invocation that produced it.
@@ -936,9 +953,18 @@ def main() -> int:
         # of the operation, and a vertex digest checksums the definition
         # graph. `flags_in_vertex_name` is still recorded, and used below
         # as corroboration when present. (D300)
-        for k in ("full_instruction_in_vertex_name",
-                  "digest_stable_across_invocations",
-                  "netmode_changes_vertex_digest"):
+        # ONLY the property the PRIMARY chain depends on is required.
+        #
+        # The subject binding is SUBJECT -> INVOCATION -> HASH-BOUND
+        # CAPTURE -> VERTEX, and locating the vertex inside a capture
+        # needs the instruction to survive into the name. The two digest
+        # properties are CORROBORATION: BuildKit documents vertex-digest
+        # comparison as valid within a running solver and does not
+        # license it across separate invocations, and Item 8 is six
+        # separate invocations. Requiring them would make a corroborator
+        # into an authority -- which is what the prose already said we
+        # must not do, while the mechanism did it anyway. (D301)
+        for k in ("full_instruction_in_vertex_name",):
             if binding_rule.get(k) is not True:
                 binding_problems.append(
                     f"BINDING RULE: {k} is {binding_rule.get(k)!r}. The "
@@ -1003,18 +1029,32 @@ def main() -> int:
     # structurally identical subjects, and it is stated as the
     # corroboration it is. (D300)
     seen_digests: dict[str, list] = {}
-    for key, d in derived.items():
+    digest_anomalies: list[str] = []
+    for key in EXPECTED:
         ev_d = evidence_digests.get(key)
         if ev_d:
             seen_digests.setdefault(ev_d, []).append(key)
     for dg, keys in seen_digests.items():
         if len(keys) > 1:
-            tc_problems.append(
-                f"STRUCTURAL: {', '.join(f'{i}/{b}' for i, b in keys)} share "
-                f"target vertex digest {dg[:19]}. Two of the six frozen "
-                f"subjects are structurally the same step, which means one "
-                f"capture is another's copy or the derivation produced "
-                f"identical subjects")
+            # RECORDED, NOT REFUSED.
+            #
+            # This was a hard refusal, and it should not have been. A
+            # vertex digest is BuildKit's content address for a step
+            # WITHIN a running solve; comparing digests across six
+            # separate invocations is a comparison BuildKit does not
+            # license, so it may not be the thing that blocks a closure
+            # claim. It is a real anomaly and it is reported as one --
+            # the primary chain already refuses a copied or swapped
+            # capture on the bytes, which is where that duty belongs.
+            # (D301)
+            digest_anomalies.append(
+                f"DIGEST ANOMALY: {', '.join(f'{a}/{b}' for a, b in keys)} "
+                f"share target vertex digest {dg[:19]}. Two of the six "
+                f"frozen subjects are structurally the same step, which "
+                f"means one derivation did not differ from another -- or "
+                f"this daemon does not distinguish them. CORROBORATION "
+                f"ONLY: the subject binding is the invocation chain, and "
+                f"it is not weakened by this")
 
     print("ITEM 8 — HUGGINGFACE/NETWORK CONTINGENCY")
     print("=" * 74)
@@ -1073,6 +1113,31 @@ def main() -> int:
               f"{len(_TC.REQUIRED)}-field contract the pre-build check uses")
     else:
         print("    TOOLCHAIN  NOT RECOMPUTED — the artefact is missing")
+
+    # ── CORROBORATION, REPORTED AS SUCH ──────────────────────────────
+    #
+    # Available or not, it is stated. A corroborator that is silent when
+    # unavailable reads as one that agreed.
+    print()
+    if binding_rule:
+        stable = binding_rule.get("digest_stable_across_invocations")
+        netmode = binding_rule.get("netmode_changes_vertex_digest")
+        if stable and netmode:
+            print("  DIGEST CORROBORATION  AVAILABLE — on this runner the "
+                  "vertex digest was stable across invocations and changed "
+                  "with network mode")
+        else:
+            print(f"  DIGEST CORROBORATION  UNAVAILABLE — stable={stable!r}, "
+                  f"netmode-sensitive={netmode!r}. BuildKit licenses "
+                  f"vertex-digest comparison within a running solver, not "
+                  f"across the six separate invocations this experiment "
+                  f"makes, so this blocks nothing: the subject binding is "
+                  f"the invocation chain.")
+    else:
+        print("  DIGEST CORROBORATION  UNRESOLVED — no admissible binding "
+              "rule was read")
+    for a in digest_anomalies:
+        print(f"  {a}")
 
     print()
     print("  Reading rules, frozen before these results existed:")

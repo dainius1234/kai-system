@@ -70,7 +70,7 @@ DERIVER = _mod("derive_item8_dockerfile")
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 50
+EXPECTED_SCENARIOS = 52
 executed: list[str] = []
 
 
@@ -428,7 +428,7 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
                 (REPO / _im / "Dockerfile").read_text(), _br)
             assert not err, err
             (derived / f"Dockerfile.{_im}.{_br}").write_text(text)
-            run = DERIVER.find_target_run(text)
+            run = PARSER_MOD.find_target_run(text)
             names[(_im, _br)] = "[3/9] " + PARSER_MOD.normalise_command(run)
             _dsrc = over.get(f"samedigest:{_im}.{_br}", (_im, _br))
             digests[(_im, _br)] = "sha256:" + hashlib.sha256(
@@ -566,16 +566,23 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
                    "image_ref": f"kai-item8:{src[1].lower()}-{src[0]}",
                    "run_id": over.get(f"run:{key}", TC_RUN),
                    "tree_sha": over.get(f"tree:{key}", TC_TREE),
-                   "commit_sha": over.get(f"commit:{key}", TC_COMMIT),
+                   **({} if over.get(f"nocommit:{key}") else
+                      {"commit_sha": over.get(f"commit:{key}", TC_COMMIT)}),
                    "derived_dockerfile_path": str(df),
                    "derived_dockerfile_sha256": over.get(
                        f"dfsha:{key}", sh(df)),
-                   "invocation": {"subcommand": "build",
-                                  "no_cache": src[1] == "B1",
-                                  "progress": "rawjson", "file": str(df),
+                   "invocation": {"subcommand": over.get(
+                                      f"sub:{key}", "build"),
+                                  "no_cache": over.get(
+                                      f"nocache:{key}", src[1] == "B1"),
+                                  "progress": over.get(
+                                      f"progress:{key}", "rawjson"),
+                                  "file": str(df),
                                   "tag": f"kai-item8:{src[1].lower()}-{src[0]}",
-                                  "iidfile": str(derived / f"{skey}.iid"),
-                                  "context": "."},
+                                  "iidfile": over.get(
+                                      f"iidpath:{key}",
+                                      str(derived / f"{skey}.iid")),
+                                  "context": over.get(f"ctx:{key}", ".")},
                    "events_stderr_sha256": over.get(f"errsha:{key}", err_sha),
                    "events_stdout_sha256": sh(outf),
                    "build_exit": 1 if src[1] == "B3" else 0}
@@ -798,7 +805,7 @@ def test_authority_envelope() -> None:
 
         s = td / "ITEM8_GO"
         s.write_text("frozen_r2=deadbeef\napproved_commit=HEAD\n"
-                     "approved_tree=x\n")
+                     "approved_tree=x\nauthorises=experiment\n")
         p = subprocess.run([sys.executable, str(AUTHORITY), "--sentinel",
                             str(s), "--allow-no-ci"], capture_output=True,
                            text=True, cwd=str(REPO))
@@ -994,7 +1001,8 @@ def test_authority_one_shot_controls() -> None:
     tree = subprocess.run(["git", "rev-parse", "HEAD^{tree}"],
                           capture_output=True, text=True,
                           cwd=str(REPO)).stdout.strip()
-    good = f"frozen_r2={frozen}\napproved_commit={head}\napproved_tree={tree}\n"
+    good = (f"frozen_r2={frozen}\napproved_commit={head}\n"
+            f"approved_tree={tree}\nauthorises=experiment\n")
 
     with tempfile.TemporaryDirectory() as d:
         td = Path(d)
@@ -1032,7 +1040,7 @@ def test_authority_one_shot_controls() -> None:
                                cwd=str(REPO)).stdout.strip()
         code, out = authority(
             f"frozen_r2={frozen}\napproved_commit={parent}\n"
-            f"approved_tree={ptree}\n", td)
+            f"approved_tree={ptree}\nauthorises=experiment\n", td)
         check("a tree differing beyond the envelope REFUSES", code == 1, out)
         check("and says review approved one artefact",
               "would run another" in out, out)
@@ -1830,23 +1838,38 @@ def test_capture_is_bound_to_the_derived_subject() -> None:
                               **{"swap:memu-core.B3": ("memu-core", "B1")})
         check("a B1-for-B3 substitution REFUSES", code != 0, out)
 
-        # ...and with the flag binding unavailable there is NO weaker
-        # mode to fall back to. D298 built one and D299 deleted it: B1
-        # and B3 are not separated by their outcomes either, because
-        # B1's own control emits five retries, REFUSING TO BUILD and a
-        # non-zero exit when upstream is unreachable. The run refuses
-        # outright rather than binding on something weaker.
+        # ...and it must STILL refuse with every digest corroborator
+        # switched off. That is the point of the primary chain: the
+        # refusal comes from the bytes the invocation recorded, not from
+        # a structural signal BuildKit does not license across separate
+        # invocations. If this ever passes, the chain is not carrying
+        # the weight the design says it carries. (D301)
         code, out = summarise(
             six(), td,
             **{"swap:memu-core.B3": ("memu-core", "B1"),
                "binding_rule": {"flags_in_vertex_name": False,
                                 "full_instruction_in_vertex_name": True,
-                                "digest_stable_across_invocations": True,
+                                "digest_stable_across_invocations": False,
                                 "netmode_changes_vertex_digest": False,
                                 "run_id": TC_RUN, "tree_sha": TC_TREE}})
-        check("no STRUCTURAL binding REFUSES the whole run", code == 4, out)
-        check("naming the capability rather than degrading",
-              "netmode_changes_vertex_digest is False" in out, out)
+        check("the swap REFUSES with NO digest corroboration at all",
+              code == 4, out)
+        check("and the refusal comes from the invocation chain",
+              "not the bytes that build returned" in out
+              or "was not given this subject" in out, out)
+        # A clean six with the corroborators unavailable must NOT be
+        # blocked by their absence -- corroboration is not authority.
+        code, out = summarise(
+            six(), td,
+            **{"binding_rule": {"flags_in_vertex_name": False,
+                                "full_instruction_in_vertex_name": True,
+                                "digest_stable_across_invocations": False,
+                                "netmode_changes_vertex_digest": False,
+                                "run_id": TC_RUN, "tree_sha": TC_TREE}})
+        check("an unstable digest does NOT block a sound chain",
+              code == 0, out)
+        check("and the corroboration is reported as unavailable",
+              "DIGEST CORROBORATION" in out, out)
 
 
 def test_derived_dockerfile_must_be_the_re_derivation() -> None:
@@ -1967,46 +1990,54 @@ def test_b1_outage_looks_exactly_like_b3() -> None:
             "invswap:memu-core.B3": ("memu-core", "B1")})
         check("with the record moved too it STILL does not qualify",
               code != 0, out)
-        # And with the flag binding unavailable, the whole run must have
-        # been refused before build 1 -- there is no weaker mode left.
+        # THE HARDEST FORM: a genuine B1 OUTAGE capture -- five retries,
+        # refusal, vertex error, no image, indistinguishable from B3 by
+        # outcome -- substituted as B3, with EVERY digest corroborator
+        # switched off. The refusal must come from the invocation chain
+        # alone, because that is the only thing left. (D301)
         code, out = summarise(six(), td, **{
             "outage:memu-core.B1": True,
             "swap:memu-core.B3": ("memu-core", "B1"),
             "binding_rule": {"flags_in_vertex_name": False,
                              "full_instruction_in_vertex_name": True,
-                             "digest_stable_across_invocations": True,
+                             "digest_stable_across_invocations": False,
                              "netmode_changes_vertex_digest": False,
                              "run_id": TC_RUN, "tree_sha": TC_TREE}})
-        check("with no structural binding the summary REFUSES outright",
+        check("a B1 OUTAGE capture as B3 REFUSES with no corroboration",
               code == 4, out)
-        check("naming the capability, not the branch",
-              "netmode_changes_vertex_digest is False" in out, out)
-        check("and saying the preflight should have stopped it",
-              "should have refused" in out, out)
+        check("and the refusal is the invocation chain, not a corroborator",
+              "not the bytes that build returned" in out
+              or "was not given this subject" in out, out)
+        check("and the unavailable corroboration is stated",
+              "DIGEST CORROBORATION  UNAVAILABLE" in out, out)
 
 
-def test_preflight_refuses_a_daemon_that_hides_run_flags() -> None:
-    scenario("preflight: netmode that changes nothing structural is a FAILURE")
+def test_preflight_flat_digest_is_not_a_verdict_layer_concern() -> None:
+    """The overruled hard-fail, and where its replacement now lives.
+
+    D300 made the preflight FAIL when netmode changed no vertex digest.
+    That was overruled: BuildKit licenses vertex-digest comparison
+    within a running solver, not across the six separate invocations
+    this experiment makes, so a corroborator that is unavailable may not
+    stop the measurement. The behaviour is now calibrated in the
+    PREFLIGHT suite, which is the entry point that owns it. (D301)
+    """
+    scenario("preflight: an unavailable corroborator is not a verdict fault")
     with tempfile.TemporaryDirectory() as d:
         td = Path(d)
-        # A docker that emits well-formed rawjson but never carries the
-        # RUN flag in a vertex name.
-        fake = td / "flagless-docker"
-        fake.write_text(FLAGLESS_DOCKER)
-        fake.chmod(0o755)
-        p = subprocess.run(
-            [sys.executable, str(REPO / "scripts" / "security" /
-                                 "preflight_buildkit_rawjson.py"),
-             "--docker", str(fake)],
-            capture_output=True, text=True, cwd=str(REPO))
-        check("a daemon where netmode changes no digest REFUSES",
-              p.returncode == 1, p.stdout)
-        check("and says six subjects that cannot be distinguished",
-              "are not six subjects" in p.stdout, p.stdout)
-        check("and names B1's own refusal behaviour as the reason",
-              "REFUSING TO BUILD" in p.stdout, p.stdout)
-        check("ZERO builds spent", "ZERO Item-8 builds" in p.stdout, p.stdout)
-
+        # The verdict layer's concern is only that it is TOLD, and that
+        # the primary chain still carries the weight.
+        code, out = summarise(
+            six(), td,
+            **{"binding_rule": {"flags_in_vertex_name": False,
+                                "full_instruction_in_vertex_name": True,
+                                "digest_stable_across_invocations": False,
+                                "netmode_changes_vertex_digest": False,
+                                "run_id": TC_RUN, "tree_sha": TC_TREE}})
+        check("a sound chain qualifies without any corroboration",
+              code == 0, out)
+        check("and the unavailability is stated, not silent",
+              "DIGEST CORROBORATION  UNAVAILABLE" in out, out)
 
 def test_binding_rule_is_itself_admissible_evidence() -> None:
     scenario("binding rule: from this run, this tree, both capabilities")
@@ -2136,22 +2167,74 @@ def test_invocation_chain_links_are_each_load_bearing() -> None:
 
 def test_two_subjects_may_not_be_one_step() -> None:
     """Distinctness is corroboration, and corroboration still has to fire."""
-    scenario("structural: two subjects sharing a vertex digest is refused")
+    scenario("structural: a shared vertex digest is reported, not fatal")
     with tempfile.TemporaryDirectory() as d:
         td = Path(d)
-        # The clean six first, so the refusal below means something.
         code, out = summarise(six(), td)
         check("six structurally distinct subjects qualify", code == 0, out)
-        # Now two of the six are the SAME step. That is either one
-        # capture copied into another's slot, or a derivation that
-        # produced identical subjects -- and neither is six subjects.
+        check("and no anomaly is invented", "DIGEST ANOMALY" not in out, out)
+        # Two of the six are the SAME step. That IS an anomaly and it is
+        # reported -- but it may not block closure, because comparing
+        # vertex digests across six separate invocations is a comparison
+        # BuildKit does not license. The bytes are what refuse a copied
+        # capture, and they already do. (D301)
         code, out = summarise(six(), td, **{
             "samedigest:memu-graph.B2": ("memu-core", "B2")})
-        check("two subjects sharing a digest REFUSES", code == 4, out)
-        check("and both are named",
+        check("a shared digest is REPORTED", "DIGEST ANOMALY" in out, out)
+        check("and both subjects are named",
               "memu-core/B2, memu-graph/B2" in out, out)
-        check("saying they are structurally the same step",
-              "structurally the same step" in out, out)
+        check("and it is labelled corroboration only",
+              "CORROBORATION ONLY" in out, out)
+        check("and it does NOT block an otherwise sound chain",
+              code == 0, out)
+
+
+def test_every_frozen_invocation_parameter_is_reconciled() -> None:
+    """Two repairs shipped with no fixture. Removing them broke nothing."""
+    scenario("invocation: each frozen build parameter is checked")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # --no-cache IS THE FROZEN DESIGN. R2 gives it to B1 and to no
+        # other branch, and it is what makes B1's genuine-fetch
+        # criterion a fetch rather than a cache read. Left as producer
+        # metadata, the design's own distinguishing flag was taken on
+        # the runner's word.
+        code, out = summarise(six(), td, **{"nocache:memu-core.B1": False})
+        check("B1 invoked WITHOUT --no-cache REFUSES", code != 0, out)
+        check("and names the parameter", "no_cache=False" in out, out)
+        code, out = summarise(six(), td, **{"nocache:memu-graph.B3": True})
+        check("B3 invoked WITH --no-cache REFUSES", code != 0, out)
+        check("and says the branch requires otherwise",
+              "the frozen design for this branch requires" in out, out)
+        # and the rest of the invocation, each on its own
+        for label, over, token in (
+            ("a different subcommand", {"sub:memu-core.B2": "buildx"},
+             "subcommand="),
+            ("progress not rawjson", {"progress:memu-core.B1": "plain"},
+             "progress="),
+            ("an iidfile somewhere else", {"iidpath:memu-graph.B1": "/tmp/x"},
+             "iidfile="),
+            ("a different build context", {"ctx:memu-core.B3": "subdir"},
+             "context="),
+        ):
+            code, out = summarise(six(), td, **over)
+            check(f"{label} REFUSES", code != 0, out)
+            check(f"{label} is named", token in out, out)
+
+
+def test_invocation_record_must_carry_its_commit() -> None:
+    scenario("invocation: absence of a commit is not agreement")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        code, out = summarise(six(), td, **{"nocommit:memu-core.B1": True})
+        check("an invocation record with NO commit REFUSES", code != 0, out)
+        check("and says absence is not agreement",
+              "absence is not agreement" in out, out)
+        code, out = summarise(six(), td,
+                              **{"commit:memu-graph.B2": "0" * 40})
+        check("an invocation record from another COMMIT REFUSES",
+              code != 0, out)
+        check("and names the commit", "names commit" in out, out)
 
 
 def run_all() -> None:
@@ -2199,11 +2282,13 @@ def run_all() -> None:
     test_generic_loop_alone_does_not_bind()
     test_commit_is_compared_as_D297_said_it_was()
     test_b1_outage_looks_exactly_like_b3()
-    test_preflight_refuses_a_daemon_that_hides_run_flags()
+    test_preflight_flat_digest_is_not_a_verdict_layer_concern()
     test_binding_rule_is_itself_admissible_evidence()
     test_reciprocal_swap_is_caught()
     test_invocation_chain_links_are_each_load_bearing()
     test_two_subjects_may_not_be_one_step()
+    test_every_frozen_invocation_parameter_is_reconciled()
+    test_invocation_record_must_carry_its_commit()
     test_commit_is_required_not_merely_compared()
     print(f"  inspected: {EXPECTED_SCENARIOS} verdict-layer scenario(s) "
           f"across 3 shipped entry points")
