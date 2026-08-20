@@ -149,14 +149,27 @@ for IMAGE in memu-core memu-graph; do
     A1="UNMEASURED"; A2="UNRECORDED"; NOTE=""
     RETRIES=0; ELAPSED=0; BUILD_RC=-1; PRE_CLEAN="n/a"; IIDCORR="n/a"
 
+    # WHAT THE MUTABLE BASE TAG RESOLVES TO, AT THIS BRANCH'S BUILD.
+    #
+    # `python:3.11-slim` can move under a six-build experiment, and two
+    # arms on two base images are not two arms of one experiment. Pinning
+    # it would change the subject; observing it does not. The summariser
+    # requires all six to agree with each other and with the record taken
+    # before build 1. Unresolvable is UNRESOLVED -- a fact, not a blank.
+    # (D295)
+    BASEDIG="$("$DOCKER" buildx imagetools inspect python:3.11-slim \
+                 --format '{{.Manifest.Digest}}' 2>/dev/null | tr -d ' \n')"
+    [ -n "$BASEDIG" ] || BASEDIG="UNRESOLVED"
+
     # ── the derived file must already exist (R11) ─────────────────────
     if [ ! -s "$DF" ]; then
-      emit "$(BR="$BRANCH" IM="$IMAGE" RI="$RUN_ID" TS="$TREE_SHA" TC="$TOOLCHAIN_SHA" python3 -c '
+      emit "$(BR="$BRANCH" IM="$IMAGE" RI="$RUN_ID" TS="$TREE_SHA" TC="$TOOLCHAIN_SHA" BD="$BASEDIG" python3 -c '
 import json,os
 print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
  "axis1_verdict":"UNMEASURED","axis2_provenance":"UNRECORDED",
  "run_id":os.environ["RI"],
  "tree_sha":os.environ["TS"],"toolchain_sha256":os.environ.get("TC","ABSENT"),
+ "base_image_digest":os.environ.get("BD","UNRESOLVED"),
  "note":"derivation refused; no experimental Dockerfile exists, so the "
         "branch has no subject"}))')"
       echo "::endgroup::"; continue
@@ -169,13 +182,14 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
       "$DOCKER" image inspect "$TAG" >/dev/null 2>&1 && PRE_CLEAN="tag-already-exists"
       [ -e "$IID" ] && PRE_CLEAN="${PRE_CLEAN},iidfile-already-exists"
       if [ "$PRE_CLEAN" != "clean" ]; then
-        emit "$(BR="$BRANCH" IM="$IMAGE" RI="$RUN_ID" TS="$TREE_SHA" DS="$DF_SHA" PC="$PRE_CLEAN" TC="$TOOLCHAIN_SHA" python3 -c '
+        emit "$(BR="$BRANCH" IM="$IMAGE" RI="$RUN_ID" TS="$TREE_SHA" DS="$DF_SHA" PC="$PRE_CLEAN" TC="$TOOLCHAIN_SHA" BD="$BASEDIG" python3 -c '
 import json,os
 print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
  "axis1_verdict":"UNMEASURED","axis2_provenance":"UNRECORDED",
  "run_id":os.environ["RI"],
  "tree_sha":os.environ["TS"],"dockerfile_sha256":os.environ["DS"],
  "toolchain_sha256":os.environ.get("TC","ABSENT"),"pre_build_state":os.environ["PC"],
+ "base_image_digest":os.environ.get("BD","UNRESOLVED"),
  "note":"pre-build state not clean; a stale tag or leftover iidfile would "
         "contaminate IMAGE_NOT_PRODUCED_BY_DESIGN"}))')"
         echo "::endgroup::"; continue
@@ -218,13 +232,13 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
 
     if [ "$PARSE_RC" -ne 0 ] || [ -z "$FACTS" ]; then
       emit "$(BR="$BRANCH" IM="$IMAGE" RI="$RUN_ID" TS="$TREE_SHA" DS="$DF_SHA" \
-              TC="$TOOLCHAIN_SHA" PE="$(head -c 300 "${EVENTS}.parse.err" 2>/dev/null)" python3 -c '
+              TC="$TOOLCHAIN_SHA" BD="$BASEDIG" PE="$(head -c 300 "${EVENTS}.parse.err" 2>/dev/null)" python3 -c '
 import json,os
 e=os.environ
 print(json.dumps({"image":e["IM"],"branch":e["BR"],
  "axis1_verdict":"UNMEASURED","axis2_provenance":"UNRECORDED",
  "run_id":e["RI"],"tree_sha":e["TS"],"dockerfile_sha256":e["DS"],
- "toolchain_sha256":e["TC"],
+ "toolchain_sha256":e["TC"],"base_image_digest":e["BD"],
  "note":"the build event stream could not be parsed, so nothing about "
         "this branch was observed: " + e["PE"]}))')"
       echo "::endgroup::"; continue
@@ -372,14 +386,15 @@ print(json.dumps({"image":e["IM"],"branch":e["BR"],
             RI="$RUN_ID" TS="$TREE_SHA" DS="$DF_SHA" TG="$TAG" RT="$RETRIES" \
             EL="$ELAPSED" RC="$BUILD_RC" PC="$PRE_CLEAN" IC="$IIDCORR" \
             EX="${EXECUTED:-unknown}" CA="${CACHED:-unknown}" \
-            TC="${TOOLCHAIN_SHA:-ABSENT}" IJ2="${INJECTIONS:-0}" \
+            TC="${TOOLCHAIN_SHA:-ABSENT}" IJ2="${INJECTIONS:-0}" BD="${BASEDIG:-UNRESOLVED}" \
             VE="${VERR:-}" python3 -c '
 import json,os
 e=os.environ
 row={"image":e["IM"],"branch":e["BR"],"axis1_verdict":e["A1"],
      "axis2_provenance":e["A2"],"note":e["NT"],
      "target_vertex_executed":e["EX"],"target_vertex_cached":e["CA"],
-     "toolchain_sha256":e["TC"],"injection_markers":int(e["IJ2"]),
+     "toolchain_sha256":e["TC"],"base_image_digest":e["BD"],
+     "injection_markers":int(e["IJ2"]),
      "target_vertex_error":e["VE"],
      "run_id":e["RI"],"tree_sha":e["TS"],
      "dockerfile_sha256":e["DS"],"image_ref":e["TG"],

@@ -21,12 +21,16 @@ that field under "AXIS 1". So an image-provenance fault silently became a
 contingency measurement — precisely the laundering R2 forbids. Caught in
 adversarial review before any build existed.
 
-Three columns now, and they are computed independently:
+Two columns from the runner, computed independently, and a third derived
+HERE and never taken from the producer of the first two:
 
     axis1_verdict          PASS / WRONG_FAILURE / UNMEASURED
     axis2_provenance       BOUND / MISMATCH / UNRECORDED /
                            IMAGE_NOT_PRODUCED_BY_DESIGN
-    qualified_for_closure  true only when BOTH are sound
+    qualifies              derived below — and per branch, not by a
+                           single "sound" set applied to all six; see
+                           REQUIRED_A2, where a BOUND B3 is a
+                           contradiction rather than acceptable evidence
 
 WHY A ROW COUNT IS NOT A DENOMINATOR
 ====================================
@@ -55,6 +59,20 @@ So `--toolchain` takes the artefact itself, recomputes its digest here,
 and requires all six rows to carry exactly that value. A row bound to a
 different toolchain than the one archived beside the results is a row
 whose conditions are unknown, whatever its axes say.
+
+**It is REQUIRED, and that is the whole point.** While the flag was
+optional, six rows agreeing with each other reached ALL SIX QUALIFY on
+the producer's word alone — the exact defect the paragraph above claims
+to close, still reachable through the shipped entry point. Optional
+independent evidence is not independent evidence.
+
+Digest equality is also not the whole binding. `tree_sha` and `run_id`
+are written into each row by the same runner that wrote the digest into
+it, so comparing them with each other is the producer agreeing with
+itself. Both are now reconciled against the artefact, as is the
+base-image digest each branch observed at its own build — a mutable tag
+that moves mid-experiment would otherwise become an unexplained
+difference between arms.
 """
 from __future__ import annotations
 
@@ -71,7 +89,22 @@ EXPECTED = [(i, b) for i in ("memu-core", "memu-graph")
 PASS = "PASS"
 WRONG = "WRONG_FAILURE"
 UNMEASURED = "UNMEASURED"
-SOUND_A2 = {"BOUND", "IMAGE_NOT_PRODUCED_BY_DESIGN"}
+
+# THE BRANCH CONTRACT, PER BRANCH. Not one "sound" set for all six.
+#
+# `SOUND_A2 = {BOUND, IMAGE_NOT_PRODUCED_BY_DESIGN}` was a set of states
+# that are sound SOMEWHERE, applied EVERYWHERE. Under it a B3 row
+# carrying BOUND qualified -- while B3's entire contract is that no image
+# is produced -- and a B1 row carrying IMAGE_NOT_PRODUCED_BY_DESIGN could
+# qualify on its iidfile alone. Both are contradictions, and a
+# contradiction is not sound provenance to be tolerated: it is evidence
+# that the row does not describe the branch it claims to.
+#
+# The frozen design assigns each branch exactly one admissible state, so
+# this does too, and anything else REFUSES. (D295)
+REQUIRED_A2 = {"B1": "BOUND", "B2": "BOUND",
+               "B3": "IMAGE_NOT_PRODUCED_BY_DESIGN"}
+SOUND_A2 = set(REQUIRED_A2.values())   # for reporting counts only
 
 
 def qualifies(r: dict) -> tuple[bool, str]:
@@ -92,10 +125,19 @@ def qualifies(r: dict) -> tuple[bool, str]:
         return False, f"toolchain binding is {tc or 'missing'}"
     if r.get("axis1_verdict") != PASS:
         return False, f"Axis 1 is {r.get('axis1_verdict')}"
+    branch = r.get("branch")
     a2 = r.get("axis2_provenance")
-    if a2 not in SOUND_A2:
-        return False, f"Axis 2 is {a2}"
-    if r.get("branch") == "B3":
+    want = REQUIRED_A2.get(branch)
+    if want is None:
+        return False, f"{branch} is not a precommitted branch"
+    if a2 != want:
+        if a2 in SOUND_A2:
+            return False, (f"Axis 2 is {a2}, which {branch} may never be: "
+                           f"the branch contract requires {want}, and a row "
+                           f"claiming the other is describing a different "
+                           f"branch than the one it is filed under")
+        return False, f"Axis 2 is {a2}, not {want}"
+    if branch == "B3":
         return True, "refused by design, no image to bind"
     # Positive branches need the iidfile corroboration R2 requires.
     # ABSENT is not "no objection": it is the corroboration missing.
@@ -134,11 +176,17 @@ def validate_keys(rows: list[dict]) -> tuple[bool, list[str]]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--results", required=True)
-    ap.add_argument("--toolchain",
-                    help="the toolchain artefact itself. Its digest is "
-                         "recomputed here and every row must carry exactly "
-                         "that value; six rows agreeing with each other are "
-                         "six statements from one producer")
+    # REQUIRED. Optional independent evidence is not independent
+    # evidence: with the flag omitted, six rows agreeing with each other
+    # about a digest reached ALL SIX QUALIFY on the producer's word
+    # alone, which is the exact I-8 defect D294 claimed to close. The
+    # calibration was itself calling the summariser without it. (D295)
+    ap.add_argument("--toolchain", required=True,
+                    help="REQUIRED. The toolchain artefact itself. Its "
+                         "digest is recomputed here, and its tree and run "
+                         "identity are compared against every row -- six "
+                         "rows agreeing with each other are six statements "
+                         "from one producer")
     args = ap.parse_args()
 
     path = pathlib.Path(args.results)
@@ -162,23 +210,73 @@ def main() -> int:
     # conditions are unknown is not summarised under a heading that
     # implies they are known.
     tc_expected = None
+    tc_rec: dict[str, str] = {}
     tc_problems: list[str] = []
-    if args.toolchain:
-        tc_path = pathlib.Path(args.toolchain)
-        if not tc_path.is_file():
+    tc_path = pathlib.Path(args.toolchain)
+    if not tc_path.is_file():
+        tc_problems.append(
+            f"TOOLCHAIN: {tc_path} does not exist. R2 records these "
+            f"identities with every branch; the rows name a digest of "
+            f"nothing this summary can read")
+    else:
+        raw = tc_path.read_bytes()
+        tc_expected = hashlib.sha256(raw).hexdigest()
+        for line in raw.decode("utf-8", "replace").splitlines():
+            line = line.strip()
+            if line and "=" in line:
+                k, v = line.split("=", 1)
+                tc_rec[k.strip()] = v.strip()
+        # THE HASH IS NOT THE WHOLE BINDING. Digest equality proves a row
+        # names THIS file. It does not prove the row was produced under
+        # the tree and run the file describes -- `tree_sha` and `run_id`
+        # are written into the row by the same runner that wrote the
+        # digest into it, so on their own they are the producer agreeing
+        # with itself. The artefact is the second source; compare them.
+        # (D295)
+        want_tree = tc_rec.get("tree_sha")
+        want_run = tc_rec.get("run_id")
+        for r in rows:
+            who = f"{r.get('image')}/{r.get('branch')}"
+            got = r.get("toolchain_sha256")
+            if got != tc_expected:
+                tc_problems.append(
+                    f"TOOLCHAIN: {who} is bound to {str(got)[:12]}, not the "
+                    f"archived artefact's {tc_expected[:12]}")
+            if want_tree and r.get("tree_sha") != want_tree:
+                tc_problems.append(
+                    f"TOOLCHAIN: {who} names tree "
+                    f"{str(r.get('tree_sha'))[:12]}, the artefact names "
+                    f"{want_tree[:12]}. A row and its conditions must "
+                    f"describe the same tree")
+            if want_run and str(r.get("run_id")) != want_run:
+                tc_problems.append(
+                    f"TOOLCHAIN: {who} names run {r.get('run_id')}, the "
+                    f"artefact names {want_run}")
+        if not want_tree or not want_run:
             tc_problems.append(
-                f"TOOLCHAIN: {tc_path} does not exist. R2 records these "
-                f"identities with every branch; the rows name a digest of "
-                f"nothing this summary can read")
-        else:
-            tc_expected = hashlib.sha256(tc_path.read_bytes()).hexdigest()
-            for r in rows:
-                got = r.get("toolchain_sha256")
-                if got != tc_expected:
-                    tc_problems.append(
-                        f"TOOLCHAIN: {r.get('image')}/{r.get('branch')} is "
-                        f"bound to {str(got)[:12]}, not the archived "
-                        f"artefact's {tc_expected[:12]}")
+                "TOOLCHAIN: the artefact does not name a tree_sha and a "
+                "run_id, so the rows cannot be reconciled against it. "
+                "check_item8_toolchain.py requires both before build 1; "
+                "this record did not come from a validated run")
+
+        # THE BASE IMAGE IS A MUTABLE TAG. `python:3.11-slim` can move
+        # under the experiment, and six arms built against two different
+        # base images are not six arms of one experiment. Pinning it
+        # would change the subject, so instead each branch RECORDS what
+        # the tag resolved to at its own build, and all six must agree
+        # with each other and with the pre-run record. Observation, not
+        # mutation -- and a divergence blocks interpretation rather than
+        # being discovered later as an unexplained difference. (D295)
+        want_base = tc_rec.get("base_image_digest")
+        seen_base = {str(r.get("base_image_digest")) for r in rows}
+        if want_base and seen_base - {want_base}:
+            tc_problems.append(
+                f"BASE IMAGE: the tag resolved to more than one digest "
+                f"across the experiment — recorded before build 1 as "
+                f"{want_base[:19]}, observed {sorted(seen_base)}. Six arms "
+                f"built on two base images are not six arms of one "
+                f"experiment, and which arms differ is not recoverable "
+                f"afterwards")
 
     print("ITEM 8 — HUGGINGFACE/NETWORK CONTINGENCY")
     print("=" * 74)
@@ -240,12 +338,10 @@ def main() -> int:
     print(f"    QUALIFIED FOR CLOSURE  {qualified} of {len(EXPECTED)}")
     if tc_expected:
         print(f"    TOOLCHAIN  recomputed {tc_expected[:16]}… from the "
-              f"artefact, matched against {len(rows)} row(s)")
-    elif args.toolchain:
-        print("    TOOLCHAIN  NOT RECOMPUTED — the artefact is missing")
+              f"artefact, reconciled against {len(rows)} row(s) on digest, "
+              f"tree, run and base image")
     else:
-        print("    TOOLCHAIN  not supplied; row bindings are unverified "
-              "against any artefact")
+        print("    TOOLCHAIN  NOT RECOMPUTED — the artefact is missing")
 
     print()
     print("  Reading rules, frozen before these results existed:")

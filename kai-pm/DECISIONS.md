@@ -23011,3 +23011,112 @@ and no way to re-draw.
 * **Frozen R2 unamended.** Every defect was an implementation failure.
 * Awaiting a fifth adversarial review.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D295 — Fifth review: the last layer, where evidence becomes a claim
+
+**2026-08-20. Repair of D294 against the frozen contract. No amendment to
+frozen R2 `0055ead8…8796`. Nothing built. `kai-pm/ITEM8_GO` still does
+not exist. Stage 2 remains NOT AUTHORISED.**
+
+GPT's framing is worth keeping, because it names where the work now is:
+*"the experiment logic itself is no longer where I'm finding faults; it's
+the last layer that decides whether evidence is allowed to become a
+closure claim."* It also independently verified the architecture against
+current BuildKit — `RawJSONMode` JSON-encodes `client.SolveStatus`, whose
+shape is what the parser reads.
+
+### 1. Optional independent evidence is not independent evidence
+
+D294 argued that six row hashes are six claims from one producer and that
+the summariser must hash the artefact itself. It then made `--toolchain`
+**optional** — so the shipped entry point could still reach ALL SIX
+QUALIFY on the producer's word alone. **My own calibration was invoking
+it that way**, which is how the gap survived a round that was explicitly
+about this defect.
+
+Required now. No artefact, no summary at all.
+
+### 2. A state that is sound somewhere, applied everywhere
+
+`SOUND_A2 = {BOUND, IMAGE_NOT_PRODUCED_BY_DESIGN}` was checked
+identically for all six branches. Under it a **B3 row carrying `BOUND`
+qualified** — while B3's entire contract is that no image is produced —
+and a B1 row could carry `IMAGE_NOT_PRODUCED_BY_DESIGN` and pass on its
+iidfile alone.
+
+Those are not lenient readings, they are contradictions: a row claiming
+the other branch's state is not describing the branch it is filed under.
+The contract is now per branch (`REQUIRED_A2`), and both impossible
+states refuse with the contradiction named.
+
+### 3. Hash equality binds a row to a FILE, not to a run
+
+`tree_sha` and `run_id` are written into each row by the same runner that
+wrote the digest into it. Comparing them with each other is the producer
+agreeing with itself. The summariser now parses the mandatory artefact
+and requires every row's tree and run to match it — including the case a
+row-to-row check can never see, **all six wrong but mutually
+consistent**.
+
+### 4. File order is not chronology
+
+Capturing both descriptors was the D294 repair. **Merging them was a
+second, unexamined act.** Concatenating file A's logs then file B's
+imposes an order nothing observed, and B2's criterion *is* an order:
+injection → retry → BAKED. A split capture could manufacture that
+sequence or destroy a real one, and either would look like a
+measurement.
+
+Exactly one descriptor may carry BuildKit events; the other may carry
+diagnostics or nothing. Both, and it refuses.
+
+The merge loop is gone rather than guarded — replaced by taking the one
+source whole. **That change came out of the reinjection**, which fired on
+only a single assertion: with the guard removed, `dict.update` *replaced*
+vertices instead of extending their logs, so the fixture was measuring
+data loss rather than the guard. Rewritten faithfully, it fires 320/5. A
+reinjection that fires weakly is information about the calibration.
+
+### 5. Proactive: the base tag is mutable
+
+`python:3.11-slim` can move under a six-build experiment, and six arms on
+two base images are not six arms of one experiment. Pinning it would
+change the subject; **observing it does not.** Each branch now records
+what the tag resolved to at its own build, and the summariser requires
+all six to agree with each other and with the pre-run record. A movement
+blocks interpretation instead of surfacing later as an unexplained
+difference between arms.
+
+### 6. Calibration and reinjection
+
+Instruments **77/0**. Verdict layer **248/0 across 28 scenarios**.
+
+| reinjected | result |
+|---|---|
+| `--toolchain` optional again | **322/3 FAIL** |
+| `SOUND_A2` applied to every branch | **321/4 FAIL** |
+| row tree/run not reconciled with the artefact | **317/8 FAIL** |
+| parser merges two event-bearing descriptors | **320/5 FAIL** |
+| base-image movement does not block interpretation | **322/3 FAIL** |
+| all reverted | **325/0 PASS** |
+
+### 7. State
+
+| | |
+|---|---|
+| instruments / verdicts | **77/0** · **248/0**, 28 scenarios |
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| mutation cardinality | **0/1/1** |
+| shipped Dockerfiles | **0** lines of diff |
+| `collect_image_identity.py` | **0** lines vs `b53fd4e` |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+
+### Status
+
+* **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.**
+* **Frozen R2 unamended** across five reviews. Every defect found in all
+  five rounds was an implementation failure, never a design one.
+* Awaiting a sixth adversarial review.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.

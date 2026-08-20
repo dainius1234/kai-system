@@ -40,6 +40,7 @@ key on the SUBJECT's output and not on ours.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import subprocess
@@ -55,7 +56,7 @@ PARSER = REPO / "scripts" / "security" / "parse_buildkit_events.py"
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 23
+EXPECTED_SCENARIOS = 28
 executed: list[str] = []
 
 
@@ -104,9 +105,10 @@ if branch not in ("B1", "B2", "B3"):
     branch = "B1"
 DIG = "sha256:" + "1" * 64
 
-def ev(o): print(json.dumps(o), file=OUT)
-def log(s): ev({"logs": [{"vertex": DIG, "stream": 1,
-                          "data": base64.b64encode(s.encode()).decode()}]})
+def ev(o, stream=None): print(json.dumps(o), file=stream or OUT)
+def log(s, stream=None):
+    ev({"logs": [{"vertex": DIG, "stream": 1,
+                  "data": base64.b64encode(s.encode()).decode()}]}, stream)
 def diag(s): print(s, file=sys.stderr)
 
 if argv and argv[0] == "build":
@@ -150,6 +152,20 @@ if argv and argv[0] == "build":
         # literal text -- so a fake that manufactured `=1` was proving a
         # behaviour the shipped Dockerfile did not have. (D294)
         MARK = "ITEM8-B2-INJECTED-FIRST-ATTEMPT\n"
+        if mode == "split_fd":
+            # The ordered sequence, SPLIT ACROSS BOTH DESCRIPTORS. File
+            # order is not chronology: concatenating them could
+            # manufacture the order R2 requires, or destroy a real one.
+            log(MARK, sys.stdout)
+            log("model download attempt /5 failed; retrying in 10s\n",
+                sys.stderr)
+            log("BAKED ok\n", sys.stderr)
+            ev({"vertexes": [{"digest": DIG, "name": name,
+                              "completed": "t1"}]}, sys.stderr)
+            if "--iidfile" in argv:
+                open(argv[argv.index("--iidfile") + 1], "w").write(
+                    "sha256:" + "f" * 64)
+            sys.exit(0)
         if mode == "b2_out_of_order":
             # retry BEFORE the injection: the sequence R2 requires is
             # injection -> retry -> success, and order is the criterion.
@@ -170,6 +186,22 @@ if argv and argv[0] == "build":
     if mode != "iid_absent" and "--iidfile" in argv:
         open(argv[argv.index("--iidfile") + 1], "w").write(
             "sha256:" + ("f" * 64 if mode != "iid_mismatch" else "0" * 64))
+    sys.exit(0)
+
+if argv[:2] == ["buildx", "imagetools"]:
+    # The mutable base tag, resolved once per branch. There is no branch
+    # in this argv -- it inspects python:3.11-slim -- so the counter is
+    # kept beside the fake, and `base_digest_moves` lets the tag move
+    # PART WAY THROUGH the experiment, which is the real failure shape:
+    # the first arms build on one base image and the rest on another.
+    if mode == "base_digest_unresolved":
+        sys.exit(1)
+    st = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])),
+                      ".base-calls")
+    n = (int(open(st).read()) if os.path.exists(st) else 0) + 1
+    open(st, "w").write(str(n))
+    print("sha256:" + ("b" * 64 if mode == "base_digest_moves" and n > 3
+                       else "a" * 64))
     sys.exit(0)
 
 if argv[:2] == ["image", "inspect"]:
@@ -222,6 +254,17 @@ def toolchain_text(**over: str) -> str:
     return "".join(f"{k}={v}\n" for k, v in rec.items())
 
 
+# THE CANONICAL ARTEFACT the default fixtures reconcile against. The
+# summariser now REQUIRES it, and requires each row's tree, run and base
+# image to agree with it -- so a row helper that invents those fields
+# independently would be testing a world the runner cannot produce.
+TC_TEXT = toolchain_text()
+TC_SHA = hashlib.sha256(TC_TEXT.encode()).hexdigest()
+TC_TREE = git("rev-parse", "HEAD^{tree}")
+TC_RUN = "555"
+TC_BASE = "sha256:" + "a" * 64
+
+
 def run_runner(mode: str, td: Path,
                toolchain: str | None = None) -> tuple[int, str, list[dict]]:
     """Drive the shipped runner with a fake docker and pre-derived files."""
@@ -250,12 +293,16 @@ def run_runner(mode: str, td: Path,
     return p.returncode, p.stdout + p.stderr, rows
 
 
-def summarise(rows: list[dict], td: Path,
-              toolchain: str | None = None) -> tuple[int, str]:
+def summarise(rows: list[dict], td: Path, toolchain: str | None = None,
+              omit_toolchain: bool = False) -> tuple[int, str]:
     f = td / "s.jsonl"
     f.write_text("".join(json.dumps(r) + "\n" for r in rows))
     argv = [sys.executable, str(SUMMARISE), "--results", str(f)]
-    if toolchain is not None:
+    if not omit_toolchain:
+        if toolchain is None:
+            art = td / "canonical-toolchain.txt"
+            art.write_text(TC_TEXT)
+            toolchain = str(art)
         argv += ["--toolchain", toolchain]
     p = subprocess.run(argv, capture_output=True, text=True, cwd=str(REPO))
     return p.returncode, p.stdout + p.stderr
@@ -263,10 +310,11 @@ def summarise(rows: list[dict], td: Path,
 
 def row(image="memu-core", branch="B1", a1="PASS", a2="BOUND", **extra):
     r = {"image": image, "branch": branch, "axis1_verdict": a1,
-         "axis2_provenance": a2, "genuine_retries_observed": 1,
+         "axis2_provenance": a2, "runtime_retries_observed": 1,
          "elapsed_seconds": 1, "note": "",
          "iidfile_corroboration": "n/a" if branch == "B3" else "CORROBORATED",
-         "toolchain_sha256": "t" * 64}
+         "toolchain_sha256": TC_SHA, "tree_sha": TC_TREE,
+         "run_id": TC_RUN, "base_image_digest": TC_BASE}
     r.update(extra)
     return r
 
@@ -984,6 +1032,182 @@ def test_summariser_rehashes_the_toolchain_artefact() -> None:
         check("an absent artefact REFUSES", code == 4, out)
 
 
+# ── D295 1: the independent evidence may not be optional ───────────────
+
+def test_toolchain_artefact_is_mandatory() -> None:
+    """Optional independent evidence is not independent evidence."""
+    scenario("toolchain: six perfect rows cannot qualify without the artefact")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        code, out = summarise(six(), td)
+        check("with the artefact, the true six QUALIFY", code == 0, out)
+        # The same six rows, through the same shipped entry point, with
+        # the flag omitted. This USED to reach ALL SIX QUALIFY on the
+        # producer's word alone.
+        code, out = summarise(six(), td, omit_toolchain=True)
+        check("without it the summariser REFUSES to run at all", code != 0,
+              out)
+        check("and argparse names the required flag",
+              "--toolchain" in out, out)
+        check("and it never reaches a qualification verdict",
+              "ALL SIX QUALIFY" not in out, out)
+
+
+# ── D295 2: each branch has ONE admissible provenance state ────────────
+
+def test_branch_contract_is_enforced_per_branch() -> None:
+    scenario("provenance: a BOUND B3 is a contradiction, not sound evidence")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # B3's whole contract is that no image is produced. A B3 row
+        # claiming a successful binding is describing something else.
+        rows = six()
+        rows[2]["axis2_provenance"] = "BOUND"
+        rows[2]["iidfile_corroboration"] = "CORROBORATED"
+        code, out = summarise(rows, td)
+        check("a BOUND B3 does NOT qualify", code != 0, out)
+        check("and the contradiction is named",
+              "which B3 may never be" in out, out)
+        check("naming the state it must carry",
+              "IMAGE_NOT_PRODUCED_BY_DESIGN" in out, out)
+        # And the mirror image: a built branch claiming no image was
+        # produced, carried past by its iidfile alone.
+        rows = six()
+        rows[0]["axis2_provenance"] = "IMAGE_NOT_PRODUCED_BY_DESIGN"
+        code, out = summarise(rows, td)
+        check("an IMAGE_NOT_PRODUCED_BY_DESIGN B1 does NOT qualify",
+              code != 0, out)
+        check("and it is named as impossible for that branch",
+              "which B1 may never be" in out, out)
+
+
+# ── D295 3: tree and run reconciled against the artefact ───────────────
+
+def test_row_identity_is_reconciled_with_the_artefact() -> None:
+    """Hash equality binds a row to a FILE, not to a run."""
+    scenario("toolchain: tree and run are compared, not just the digest")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        rows = six()
+        rows[1]["tree_sha"] = "0" * 40
+        code, out = summarise(rows, td)
+        check("one wrong tree REFUSES", code == 4, out)
+        check("and names that subject once",
+              out.count("names tree") == 1, out)
+
+        rows = six()
+        rows[4]["run_id"] = "999"
+        code, out = summarise(rows, td)
+        check("one wrong run REFUSES", code == 4, out)
+        check("and names the run it expected", "names run 999" in out, out)
+
+        # ALL SIX wrong but mutually consistent -- the case row-to-row
+        # comparison can never see.
+        code, out = summarise(six(tree_sha="0" * 40, run_id="999"), td)
+        check("six self-consistent wrong identities REFUSE", code == 4, out)
+        check("and every one is named", out.count("names tree") == 6, out)
+
+        rows = six()
+        rows[0]["tree_sha"] = "0" * 40
+        rows[3]["run_id"] = "888"
+        code, out = summarise(rows, td)
+        check("mixed identities REFUSE", code == 4, out)
+        check("and both faults are named",
+              out.count("names tree") == 1 and out.count("names run") == 1,
+              out)
+
+        # An artefact that cannot supply the identities is itself a
+        # refusal: there is nothing to reconcile against.
+        art = td / "thin.txt"
+        art.write_text("docker_version=fake\n")
+        code, out = summarise(six(), td, str(art))
+        check("an artefact naming no tree/run REFUSES", code == 4, out)
+        check("and says the rows cannot be reconciled",
+              "cannot be reconciled" in out, out)
+
+
+# ── D295 4: two event-bearing descriptors have no shared chronology ────
+
+def test_split_descriptors_refuse_rather_than_invent_order() -> None:
+    scenario("transport: a split capture must not manufacture an order")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        a = td / "a.jsonl"
+        b = td / "b.jsonl"
+        D = "sha256:" + "1" * 64
+        import base64 as b64
+
+        def lg(s):
+            return json.dumps({"logs": [{"vertex": D, "stream": 1,
+                                         "data": b64.b64encode(
+                                             s.encode()).decode()}]})
+        a.write_text(json.dumps({"vertexes": [
+            {"digest": D, "name": "RUN for attempt in 1 2 3 4 5",
+             "started": "t0"}]}) + "\n" + lg("ITEM8-B2-INJECTED-FIRST-ATTEMPT\n") + "\n")
+        b.write_text(lg("retrying in 10s\n") + "\n" + lg("BAKED ok\n") + "\n")
+        p = subprocess.run(
+            [sys.executable, str(PARSER), "--events", str(a),
+             "--events", str(b), "--target-substring",
+             "for attempt in 1 2 3 4 5", "--json"],
+            capture_output=True, text=True, cwd=str(REPO))
+        check("two event-bearing descriptors REFUSE", p.returncode == 1,
+              p.stdout)
+        check("and say the chronology is unestablished",
+              "chronology" in p.stdout, p.stdout)
+        check("and no facts are emitted", "counts" not in p.stdout, p.stdout)
+
+    # Through the shipped runner: B2's evidence split across the two
+    # captures must not become a PASS.
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, out, rows = run_runner("split_fd", td)
+        b2 = [r for r in rows if r["branch"] == "B2"]
+        check("split-FD B2 rows exist", len(b2) == 2, str(rows))
+        for r in b2:
+            check(f"{r['image']} B2 split across descriptors is NOT PASS",
+                  r["axis1_verdict"] != "PASS", str(r))
+            check(f"{r['image']} B2 says nothing was observed",
+                  "could not be parsed" in r.get("note", ""), str(r))
+
+
+# ── D295 proactive: the base tag is mutable ────────────────────────────
+
+def test_base_image_digest_must_hold_across_the_six() -> None:
+    """Six arms on two base images are not six arms of one experiment."""
+    scenario("base image: a tag that moves mid-experiment blocks closure")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, out, rows = run_runner("ok", td)
+        check("every branch records what the tag resolved to",
+              all(r.get("base_image_digest") == TC_BASE for r in rows),
+              str([r.get("base_image_digest") for r in rows]))
+        code, sout = summarise(rows, td)
+        check("a stable base image qualifies", code == 0, sout)
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, out, rows = run_runner("base_digest_moves", td)
+        digests = {r.get("base_image_digest") for r in rows}
+        check("the movement is visible in the rows", len(digests) == 2,
+              str(digests))
+        code, sout = summarise(rows, td)
+        check("and it blocks interpretation", code == 4, sout)
+        check("naming it as a cross-arm confound",
+              "not six arms of one experiment" in sout, sout)
+        for r in rows:
+            check(f"{r['image']} {r['branch']} Axis 1 is untouched by it",
+                  r["axis1_verdict"] in ("PASS", "WRONG_FAILURE",
+                                         "UNMEASURED"), str(r))
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        _, out, rows = run_runner("base_digest_unresolved", td)
+        check("an unresolvable tag is recorded as UNRESOLVED",
+              all(r.get("base_image_digest") == "UNRESOLVED" for r in rows),
+              str([r.get("base_image_digest") for r in rows]))
+        code, sout = summarise(rows, td)
+        check("and blocks closure rather than passing silently",
+              code == 4, sout)
+
+
 def run_all() -> None:
     test_axis2_failure_leaves_axis1_standing()
     test_b3_requires_five_attempts()
@@ -1008,6 +1232,11 @@ def run_all() -> None:
     test_toolchain_record_is_validated_not_merely_hashed()
     test_runner_refuses_before_build_1_on_a_bad_toolchain()
     test_summariser_rehashes_the_toolchain_artefact()
+    test_toolchain_artefact_is_mandatory()
+    test_branch_contract_is_enforced_per_branch()
+    test_row_identity_is_reconciled_with_the_artefact()
+    test_split_descriptors_refuse_rather_than_invent_order()
+    test_base_image_digest_must_hold_across_the_six()
     print(f"  inspected: {EXPECTED_SCENARIOS} verdict-layer scenario(s) "
           f"across 3 shipped entry points")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",

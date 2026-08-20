@@ -53,6 +53,13 @@ and a target matched by more than one vertex are all refusals. A parser
 that silently returns "no retries found" for a log it could not read is
 the `/dev/null` with better manners that R10 exists to stop.
 
+And one more, added in D295: **two event-bearing descriptors**. Both are
+captured because assuming which one buildx uses is how the previous
+round's defect happened — but merging them is a different act from
+capturing them. File order is not chronology, and B2's criterion is an
+order. Exactly one descriptor may carry events; the other may carry
+diagnostics or nothing.
+
 Exit 0 = the target vertex was located and its facts emitted.
 Exit 1 = refused, with the unmet prerequisite named.
 """
@@ -207,11 +214,12 @@ def main() -> int:
             return 1
         texts.append((e, path.read_text()))
 
-    # Parse each capture separately, then merge. A truncated event in
-    # EITHER descriptor is a refusal.
+    # Parse each capture separately. A truncated event in EITHER
+    # descriptor is a refusal.
     vertices: dict[str, Vertex] = {}
     diagnostics: list[str] = []
-    found_events = False
+    bearing: list[str] = []
+    per_fd: dict[str, dict[str, Vertex]] = {}
     for name, text in texts:
         vx, diag, err = parse(text, name)
         diagnostics.extend(diag)
@@ -219,17 +227,41 @@ def main() -> int:
             print(f"REFUSED: {err}.")
             return 1
         if vx:
-            found_events = True
-            for d, v in vx.items():
-                if d in vertices:
-                    vertices[d].log.extend(v.log)
-                    vertices[d].name = v.name or vertices[d].name
-                    vertices[d].error = v.error or vertices[d].error
-                    vertices[d].cached = v.cached or vertices[d].cached
-                    vertices[d].started = v.started or vertices[d].started
-                else:
-                    vertices[d] = v
-    if not found_events:
+            bearing.append(name)
+            per_fd[name] = vx
+
+    # ── EXACTLY ONE DESCRIPTOR MAY CARRY EVENTS ──────────────────────
+    #
+    # Merging two event-bearing captures does not merge their
+    # chronology. Concatenating file A's logs then file B's imposes an
+    # order that nothing observed, and B2's whole criterion IS an order:
+    # injection -> retry -> BAKED. A split capture could manufacture that
+    # sequence, or destroy a real one, and the result would look
+    # identical to a measurement.
+    #
+    # There is no cross-descriptor timestamp to reconcile them with after
+    # the fact, so the honest move is to refuse rather than to invent.
+    # buildx puts rawjson on ONE stream, so this costs nothing in the
+    # production case and fails closed in the case we cannot interpret.
+    # (D295)
+    if len(bearing) > 1:
+        print(f"REFUSED: {len(bearing)} captured descriptors contain "
+              f"BuildKit events ({', '.join(bearing)}). Their chronology "
+              f"relative to one another is unestablished, and this "
+              f"experiment's B2 criterion is an ORDER -- injection, then a "
+              f"genuine retry, then success. Concatenating two streams "
+              f"imposes an order nothing observed: it could manufacture "
+              f"that sequence or destroy a real one, and either would be "
+              f"indistinguishable from a measurement.")
+        return 1
+    # ONE SOURCE, taken whole. Not a merge -- there is nothing left to
+    # merge once two event-bearing descriptors are refused above, and a
+    # merge loop kept here "just in case" would be the only code able to
+    # invent an order. The guard is the sole thing in this position, so
+    # removing it cannot be mistaken for a smaller change than it is.
+    if bearing:
+        vertices = per_fd[bearing[0]]
+    else:
         print(f"REFUSED: none of the {len(texts)} captured descriptor(s) "
               f"held BuildKit events. buildx writes rawjson to STDERR; a "
               f"capture that watched only stdout would look exactly like "
