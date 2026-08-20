@@ -23242,3 +23242,138 @@ to accept a claim engine that trusted its own supplier.
 * **Frozen R2 unamended** across six reviews.
 * Awaiting a targeted seventh review of the claim engine.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D297 — Seventh review: the evidence must be provably about this subject
+
+**2026-08-20. Repair of D296 against the frozen contract. No amendment to
+frozen R2 `0055ead8…8796`. No redesign. Nothing built. `kai-pm/ITEM8_GO`
+still does not exist. Stage 2 remains NOT AUTHORISED.**
+
+The self-certification question is **closed**: the runner's verdict
+strings no longer create the closure claim. What GPT found underneath it
+is narrower and still load-bearing — the claim engine correctly
+interpreted evidence it had not proved was *about the right subject*.
+
+### 0. The BuildKit model, independently checked
+
+GPT verified the parser's assumptions against current material: buildx
+documents `--progress=rawjson` as JSON-encoded solve-status events;
+`client.SolveStatus` carries `vertexes/statuses/logs/warnings`, `Vertex`
+carries `started`/`completed`/`cached`/`error`, `VertexLog` carries a
+vertex digest and bytes; `docker build` is a Buildx/BuildKit wrapper. The
+flattened `id/status/detail` rawjson example belongs to
+`buildx history logs`, a different command.
+
+**Schema model: PASS.** Behaviour on a real daemon: still UNKNOWN — see
+§5, which is the repair for that.
+
+### 1. MATCH was a word inside an artefact I otherwise reparsed
+
+`derive_axis2` accepted `execution_binding == "MATCH"`. The binding
+record carries **both raw ids** the verdict was computed from, and I read
+the verdict and ignored them. A record saying MATCH while its own ids
+differed would have qualified.
+
+MATCH is now **re-derived**: `binding.collected_image_id ==
+identity.docker_image_id == iidfile`, and `binding.executed_image_id ==
+binding.collected_image_id`. A record whose word contradicts its own ids
+refuses as a self-contradiction rather than being believed either way.
+
+### 2. A filename is not an identity
+
+The collectors already stamp `service`, `image_ref`, `commit_sha`,
+`tree_sha` and `run_id` into every record. `load_evidence` opened the
+expected filename and **ignored all five**. A record from another branch,
+another run or another tree, placed under the expected name, could
+participate in BOUND.
+
+Every per-branch record is now reconciled: expected service, expected
+image ref, and the run and tree the **toolchain artefact** names. D247's
+bar is exact claim → tree/image/run, and a filename is none of those.
+
+### 3. "The first record that parses" was the reader choosing
+
+`_json_first` took the first non-empty JSON line and ignored the rest, so
+a file holding two contradictory records was silently reduced to
+whichever was written first. These contracts are one subject, one record.
+Zero, two, malformed or trailing records all refuse now.
+
+### 4. The raw observations carry who, which run, which tree
+
+D296 archived the offline-load exit status as a bare number in a
+well-named file, and B3's absence record as pre/post state alone. Both
+now carry service, image ref, image, branch, run and tree, and the claim
+engine reconciles them like every other record. `ABSENT` and "present but
+not about this subject" are different facts and no longer read the same.
+
+### 5. And the one thing neither of us could establish from here
+
+Everything the verdict layer concludes rests on a claim about the
+toolchain that has been checked against documentation and source and
+**never against a running daemon**. D294's defect was exactly that: a
+model that was wrong about the real thing while every fixture passed.
+
+`scripts/security/preflight_buildkit_rawjson.py` runs **three
+non-subject builds** on the authorised runner, through the production
+command path, and proves five properties before build 1:
+
+1. the target vertex is identifiable by instruction text;
+2. runtime output is attributed to it — the instruction mentions the
+   marker once, the loop prints it three times, and the parser must say
+   **three**;
+3. `started` is readable and true;
+4. `cached` **moves** — false forced, true repeated. A field that is
+   always false measures nothing, and B1's whole criterion rests on it;
+5. a deliberately failing target carries its **own** error.
+
+It touches neither subject, writes no result row, and nothing it
+produces can become evidence about the contingency. **If it fails, zero
+Item-8 builds have been spent.** That is instrument qualification under
+rule 15 — not an arm, not a re-draw, not an R2 amendment.
+
+### 6. Calibration and reinjection
+
+Instruments **77/0**. Verdict layer **328/0 across 38 scenarios**.
+
+| reinjected | result |
+|---|---|
+| binding MATCH accepted as a word again | **395/5 FAIL** |
+| artefact subject identity not reconciled | **390/10 FAIL** |
+| reader takes the first record again | **397/3 FAIL** |
+| offline observation accepted unstamped | **402/3 FAIL** |
+| all reverted | **405/0 PASS** |
+
+The last one first fired on a **single** assertion. Rather than bank a
+thin result I widened the fixture — swapped run, missing exit status,
+and which axis the fault lands on — and it now fires on three. Third
+round running that a weak reinjection is information about the
+calibration, not about the code.
+
+### 7. A note on the environment, recorded because it matters
+
+The container was recycled mid-round and the repository re-cloned at the
+default branch. `50fdeab` existed only on the remote. Recovered by fetch
+and a **fast-forward**, after proving the local HEAD was a strict
+ancestor — no reset, no force, nothing discarded. Recording it because a
+recovered working tree is exactly the situation in which someone
+reaches for `--force` and loses work.
+
+### 8. State
+
+| | |
+|---|---|
+| instruments / verdicts | **77/0** · **328/0**, 38 scenarios |
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| mutation cardinality | **0/1/1** |
+| shipped Dockerfiles | **0** lines of diff |
+| `collect_image_identity.py` | **0** lines vs `b53fd4e` |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+
+### Status
+
+* **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.**
+* **Frozen R2 unamended** across seven reviews.
+* Awaiting the final execution-readiness review.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.

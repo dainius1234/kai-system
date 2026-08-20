@@ -195,6 +195,28 @@ jobs:
             with better manners."; exit 1; }
           echo "parser known-negative confirmed on this runner: exit 1"
 
+      # QUALIFY THE INSTRUMENT AGAINST THIS DAEMON, BEFORE BUILD 1.
+      #
+      # Everything the verdict layer concludes rests on one claim about
+      # the toolchain: that `--progress=rawjson` separates a step's
+      # instruction text from its runtime output, reports `started` and
+      # `cached`, and attributes a failing step's error to that step.
+      #
+      # That claim has been checked against Docker's documentation and
+      # BuildKit's source. It has NEVER been checked against a running
+      # daemon, because no environment the implementation was written in
+      # had one -- and D294's defect was exactly a model that was wrong
+      # about the real thing while every fixture passed.
+      #
+      # Three NON-SUBJECT builds. No derived Dockerfile, no result row,
+      # no outcome here can become evidence about the contingency. It is
+      # rule 15 applied to the instrument rather than the subject, and
+      # its position is the argument: a failure costs ZERO experimental
+      # builds and leaves the frozen denominator untouched. Not an arm,
+      # not a re-draw, not an R2 amendment. (D297)
+      - name: rawjson must behave on THIS daemon before any subject build
+        run: python3 scripts/security/preflight_buildkit_rawjson.py
+
       # SIX BUILDS, IN THE FROZEN ORDER. The runner script owns the
       # branch semantics; this step owns nothing but invoking it, so the
       # frozen criteria live in one reviewable place rather than being

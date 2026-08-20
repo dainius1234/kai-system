@@ -1510,6 +1510,31 @@ REGISTRY: Tuple[Gate, ...] = (
          in_workflows=("item8-network-contingency.yml",),
          trigger_class=SENTINEL_AUTHORISED,
          findings=("KAI-GATE-048",)),
+    Gate(module="preflight_buildkit_rawjson",
+         kind=GATE,
+         summary="qualifies --progress=rawjson against the REAL daemon "
+                 "before any subject build: the target vertex is "
+                 "identifiable, runtime output is attributed to it and the "
+                 "instruction's own mentions are not counted, `started` is "
+                 "readable, `cached` MOVES between a forced and a repeated "
+                 "build, and a deliberately failing step carries its own "
+                 "error -- three non-subject builds, so a failure costs "
+                 "ZERO experimental builds",
+         inputs=(),
+         denominator=r"inspected: \d+ non-subject build\(s\) across \d+ "
+                     r"required propert\(ies\)",
+         probe=False,
+         probe_skip_reason="needs a running Docker daemon, which is the "
+                           "whole point of it; the two refusal paths -- no "
+                           "docker at all, and a daemon emitting no rawjson "
+                           "-- are asserted against the shipped CLI in "
+                           "scripts/test_item8_verdicts.py",
+         proven_by="scripts/test_item8_verdicts.py",
+         calibrated_by="scripts/test_item8_verdicts.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
     Gate(module="check_item8_toolchain",
          kind=GATE,
          summary="validates the Item-8 toolchain record BEFORE build 1: "

@@ -274,10 +274,14 @@ print(json.dumps({"image":e["IM"],"branch":e["BR"],
       # either end, and "axis2_provenance says so" is not evidence of
       # it. The summariser reads this AND checks the iidfile's absence
       # for itself, since that file is in the artefact package. (D296)
-      PRE="$PRE_CLEAN" PT="$POST_TAG" PI="$POST_IID" python3 -c '
+      PRE="$PRE_CLEAN" PT="$POST_TAG" PI="$POST_IID" LB="$LABEL" \
+        IR="$TAG" RI="$RUN_ID" TS="$TREE_SHA" IM="$IMAGE" BR="$BRANCH" \
+        python3 -c '
 import json,os
 e=os.environ
-print(json.dumps({"pre_build_state":e["PRE"],"post_build_tag":e["PT"],
+print(json.dumps({"service":e["LB"],"image_ref":e["IR"],
+ "image":e["IM"],"branch":e["BR"],"run_id":e["RI"],"tree_sha":e["TS"],
+ "pre_build_state":e["PRE"],"post_build_tag":e["PT"],
  "post_build_iidfile":e["PI"]}))' > "${IDENT}/${LABEL}.absence.json"
       if [ "$BUILD_RC" -eq 0 ]; then
         A1="UNMEASURED"; NOTE="the build SUCCEEDED under network denial; the intended refusal did not occur"
@@ -319,10 +323,21 @@ print(json.dumps({"pre_build_state":e["PRE"],"post_build_tag":e["PT"],
       "$DOCKER" run --name "$CNAME" --network none "$TAG" \
         python -c "$PROBE" > "${IDENT}/${LABEL}.offline.log" 2>&1
       OFFLINE_RC=$?
-      # ARCHIVED, because the claim engine may not take this from a
-      # row field this same script wrote. The container's own exit
-      # status is the observation; the row is a summary of it. (D296)
-      echo "$OFFLINE_RC" > "${IDENT}/${LABEL}.offline.rc"
+      # ARCHIVED, and STAMPED WITH THE SUBJECT. The claim engine may not
+      # take this from a row field this same script wrote -- but a bare
+      # exit code in a well-named file is barely better, because a file
+      # name is not an identity. It carries who, which image, which run
+      # and which tree, and the summariser reconciles all four against
+      # the toolchain artefact. (D296, D297)
+      LB="$LABEL" IR="$TAG" RC="$OFFLINE_RC" RI="$RUN_ID" TS="$TREE_SHA" \
+        IM="$IMAGE" BR="$BRANCH" python3 -c '
+import json,os
+e=os.environ
+print(json.dumps({"service":e["LB"],"image_ref":e["IR"],
+ "image":e["IM"],"branch":e["BR"],"run_id":e["RI"],"tree_sha":e["TS"],
+ "exit_status":int(e["RC"]),
+ "observation":"offline asset load with the network denied"}))' \
+        > "${IDENT}/${LABEL}.offline.json"
 
       if [ "$EXECUTED" != "True" ]; then
         # R2's B1 requires the HF instruction to PROVABLY execute rather

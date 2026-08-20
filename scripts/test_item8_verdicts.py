@@ -57,7 +57,7 @@ PARSER = REPO / "scripts" / "security" / "parse_buildkit_events.py"
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 33
+EXPECTED_SCENARIOS = 38
 executed: list[str] = []
 
 
@@ -351,11 +351,19 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
                     "digest": DIGEST, "name": name, "completed": "t1",
                     "error": "" if over.get(f"noerr:{key}")
                              else "process did not complete successfully"}]}))
-                (ident / f"{label}.absence.json").write_text(json.dumps(
-                    over.get(f"absence:{key}",
-                             {"pre_build_state": "clean",
-                              "post_build_tag": "absent",
-                              "post_build_iidfile": "absent"})))
+                abs_rec = {"service": over.get(f"svc:{key}", label),
+                           "image_ref": over.get(
+                               f"ref:{key}",
+                               f"kai-item8:{branch.lower()}-{image}"),
+                           "image": image, "branch": branch,
+                           "run_id": over.get(f"run:{key}", TC_RUN),
+                           "tree_sha": over.get(f"tree:{key}", TC_TREE),
+                           "pre_build_state": "clean",
+                           "post_build_tag": "absent",
+                           "post_build_iidfile": "absent"}
+                abs_rec.update(over.get(f"absence:{key}", {}))
+                (ident / f"{label}.absence.json").write_text(
+                    json.dumps(abs_rec) + "\n")
                 if over.get(f"b3iid:{key}"):
                     (derived / f"{key}.iid").write_text(IMAGE_ID)
             else:
@@ -376,17 +384,28 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
                 iid = over.get(f"iid:{key}", IMAGE_ID)
                 if iid is not None:
                     (derived / f"{key}.iid").write_text(iid)
-                (ident / f"{label}.offline.rc").write_text(
-                    str(over.get(f"offline:{key}", 0)))
-                (ident / f"{label}.jsonl").write_text(json.dumps({
-                    "service": label,
+                ref = over.get(f"ref:{key}",
+                               f"kai-item8:{branch.lower()}-{image}")
+                stamp = {"service": over.get(f"svc:{key}", label),
+                         "image_ref": ref,
+                         "run_id": over.get(f"run:{key}", TC_RUN),
+                         "tree_sha": over.get(f"tree:{key}", TC_TREE)}
+                (ident / f"{label}.offline.json").write_text(json.dumps({
+                    **stamp, "image": image, "branch": branch,
+                    "exit_status": over.get(f"offline:{key}", 0)}) + "\n")
+                idrec = json.dumps({
+                    **stamp,
                     "identity_state": over.get(f"idstate:{key}", "RECORDED"),
-                    "docker_image_id": IMAGE_ID}) + "\n")
+                    "docker_image_id": IMAGE_ID}) + "\n"
+                if over.get(f"dupe:{key}"):
+                    idrec += idrec.replace("RECORDED", "UNRECORDED")
+                (ident / f"{label}.jsonl").write_text(idrec)
                 (ident / f"{label}.executed.jsonl").write_text(json.dumps({
-                    "service": label,
+                    **stamp,
                     "execution_binding": over.get(f"binding:{key}", "MATCH"),
                     "collected_image_id": IMAGE_ID,
-                    "executed_image_id": IMAGE_ID}) + "\n")
+                    "executed_image_id": over.get(f"execid:{key}",
+                                                  IMAGE_ID)}) + "\n")
             (derived / f"{key}.events-stderr.jsonl").write_text("".join(out))
             (derived / f"{key}.events-stdout.jsonl").write_text("")
     return derived, ident
@@ -1373,8 +1392,8 @@ def test_axis2_is_derived_from_the_identity_artefacts() -> None:
         td = Path(d)
         code, out = summarise(six(), td, **{"binding:memu-core.B1": "MISMATCH"})
         check("a MISMATCH binding does not qualify", code != 0, out)
-        check("and it is read from the binding artefact",
-              "executed container's image is MISMATCH" in out, out)
+        check("and a record whose word contradicts its own ids is named",
+              "contradicts itself" in out, out)
 
         code, out = summarise(six(), td,
                               **{"iid:memu-graph.B2": "sha256:" + "0" * 64})
@@ -1456,6 +1475,145 @@ def test_runner_binds_the_run_id_before_build_1() -> None:
               "is not this run" in out, out)
 
 
+# ── D297: the evidence must be provably about THIS subject and run ─────
+
+def test_binding_match_is_rederived_from_the_raw_ids() -> None:
+    """MATCH is somebody's reading of two ids. The ids are the evidence."""
+    scenario("binding: MATCH is re-derived, not accepted as a word")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # THE CASE GPT NAMED: the record says MATCH while carrying two
+        # different ids. Reading the verdict and ignoring the ids left
+        # one classification still trusted inside a reparsed artefact.
+        code, out = summarise(six(), td,
+                              **{"execid:memu-core.B1": "sha256:" + "9" * 64})
+        check("MATCH over disagreeing ids does NOT qualify", code != 0, out)
+        check("and the executed id is named",
+              "the executed container ran" in out, out)
+        check("Axis 2 is the fault, not Axis 1",
+              "DISAGREEMENT: memu-core/B1 Axis 2" in out, out)
+        # A binding missing an id cannot have its comparison redone.
+        code, out = summarise(six(), td, **{"execid:memu-graph.B2": ""})
+        check("a binding without both ids does NOT qualify", code != 0, out)
+        check("and says the comparison cannot be redone",
+              "cannot be redone here" in out, out)
+
+
+def test_artefact_subject_identity_is_reconciled() -> None:
+    """A correctly named file is not evidence about the right subject."""
+    scenario("evidence: filename is not identity")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        for label, over, why in (
+            ("a swapped RUN id", {"run:memu-core.B1": "999"}, "names run"),
+            ("a swapped TREE", {"tree:memu-core.B1": "0" * 40}, "names tree"),
+            ("a swapped SERVICE", {"svc:memu-core.B1": "item8-b1-memu-graph"},
+             "names service"),
+            ("a swapped IMAGE REF", {"ref:memu-core.B1": "kai-item8:b3-memu-graph"},
+             "names image_ref"),
+        ):
+            code, out = summarise(six(), td, **over)
+            check(f"{label} does NOT qualify", code != 0, out)
+            check(f"{label} is named as the reason", why in out, out)
+        # and the same for B3's absence record
+        code, out = summarise(six(), td, **{"run:memu-graph.B3": "999"})
+        check("a B3 absence record from another run does NOT qualify",
+              code != 0, out)
+
+
+def test_one_subject_one_record() -> None:
+    scenario("evidence: two contradictory records is not 'take the first'")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        code, out = summarise(six(), td, **{"dupe:memu-core.B1": True})
+        check("a duplicated identity record does NOT qualify", code != 0, out)
+        check("and says one subject, one record",
+              "one subject and one record" in out, out)
+        check("rather than silently using the first",
+              "holds 2 records" in out, out)
+        # a malformed record is refused, not skipped
+        derived, ident = write_evidence(td)
+        (ident / "item8-b1-memu-core.jsonl").write_text("{not json\n")
+        code, out = summarise(six(), td, dirs=(derived, ident))
+        check("a malformed identity record does NOT qualify", code != 0, out)
+        check("and names the line", "is not valid JSON" in out, out)
+        # zero records is its own state
+        (ident / "item8-b1-memu-core.jsonl").write_text("")
+        code, out = summarise(six(), td, dirs=(derived, ident))
+        check("an empty identity record does NOT qualify", code != 0, out)
+        check("and says it holds no records", "holds no records" in out, out)
+
+
+def test_offline_observation_is_a_stamped_record() -> None:
+    scenario("evidence: the offline load carries who, which run, which tree")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        derived, ident = write_evidence(td)
+        rec = json.loads(
+            (ident / "item8-b1-memu-core.offline.json").read_text())
+        for k in ("service", "image_ref", "run_id", "tree_sha",
+                  "exit_status"):
+            check(f"the offline record carries {k}", k in rec, str(rec))
+        # a bare exit code in a well-named file is no longer enough
+        (ident / "item8-b1-memu-core.offline.json").write_text(
+            json.dumps({"exit_status": 0}) + "\n")
+        code, out = summarise(six(), td, dirs=(derived, ident))
+        check("an unstamped offline record does NOT qualify", code != 0, out)
+        check("and the missing subject is named",
+              "the offline-load record names service" in out, out)
+        check("and Axis 1 is where it lands, not Axis 2",
+              "DISAGREEMENT: memu-core/B1 Axis 1" in out, out)
+        # an offline record from ANOTHER run, correctly named
+        code, out = summarise(six(), td, **{"run:memu-graph.B1": "999"})
+        check("an offline record from another run does NOT qualify",
+              code != 0, out)
+        # present, stamped, and carrying no exit status at all: ABSENT is
+        # not zero, and a record that observes nothing is not evidence.
+        derived, ident = write_evidence(td)
+        rec = json.loads(
+            (ident / "item8-b1-memu-core.offline.json").read_text())
+        rec.pop("exit_status")
+        (ident / "item8-b1-memu-core.offline.json").write_text(
+            json.dumps(rec) + "\n")
+        code, out = summarise(six(), td, dirs=(derived, ident))
+        check("an offline record with no exit_status does NOT qualify",
+              code != 0, out)
+        check("and says so", "no integer exit_status" in out, out)
+
+
+def test_preflight_refuses_without_a_daemon() -> None:
+    """R11 for the preflight itself: it cannot qualify what it can't invoke."""
+    scenario("preflight: a toolchain it cannot invoke is a refusal")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        p = subprocess.run(
+            [sys.executable, str(REPO / "scripts" / "security" /
+                                 "preflight_buildkit_rawjson.py"),
+             "--docker", str(td / "no-such-docker")],
+            capture_output=True, text=True, cwd=str(REPO))
+        check("an absent docker REFUSES", p.returncode == 2, p.stdout)
+        check("and says it cannot qualify what it cannot invoke",
+              "cannot qualify a toolchain it cannot invoke" in p.stdout,
+              p.stdout)
+        # A daemon that emits NO events must refuse, not report zero.
+        fake = td / "silent-docker"
+        fake.write_text("#!/bin/sh\nexit 0\n")
+        fake.chmod(0o755)
+        p = subprocess.run(
+            [sys.executable, str(REPO / "scripts" / "security" /
+                                 "preflight_buildkit_rawjson.py"),
+             "--docker", str(fake)],
+            capture_output=True, text=True, cwd=str(REPO))
+        check("a daemon emitting no rawjson REFUSES", p.returncode == 1,
+              p.stdout)
+        check("and says which builds were spent: none",
+              "ZERO Item-8 builds have been spent" in p.stdout, p.stdout)
+        check("and names the rawjson possibility",
+              "--progress=rawjson" in p.stdout, p.stdout)
+        check("and reports its own denominator",
+              "5 required propert" in p.stdout, p.stdout)
+
+
 def run_all() -> None:
     test_axis2_failure_leaves_axis1_standing()
     test_b3_requires_five_attempts()
@@ -1490,6 +1648,11 @@ def run_all() -> None:
     test_the_package_must_actually_be_present()
     test_closure_toolchain_contract_matches_pre_build()
     test_runner_binds_the_run_id_before_build_1()
+    test_binding_match_is_rederived_from_the_raw_ids()
+    test_artefact_subject_identity_is_reconciled()
+    test_one_subject_one_record()
+    test_offline_observation_is_a_stamped_record()
+    test_preflight_refuses_without_a_daemon()
     print(f"  inspected: {EXPECTED_SCENARIOS} verdict-layer scenario(s) "
           f"across 3 shipped entry points")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",

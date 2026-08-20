@@ -182,7 +182,8 @@ class Evidence:
     """What the artefact package says, read without the runner's help."""
 
     __slots__ = ("target", "runtime", "diagnostics", "unmet", "iid",
-                 "identity", "binding", "offline_rc", "absence")
+                 "identity", "binding", "offline_rc", "absence",
+                 "identity_err", "binding_err", "offline_err", "absence_err")
 
     def __init__(self) -> None:
         self.target = None          # the BuildKit target vertex
@@ -194,22 +195,78 @@ class Evidence:
         self.binding = None         # the executed-container comparison
         self.offline_rc = None      # the container's own exit status
         self.absence = None         # B3's archived no-image observation
+        # WHY a record is unusable, kept rather than collapsed to None:
+        # "absent" and "present but not about this subject" are different
+        # facts and must not read the same (rule 20).
+        self.identity_err = ""
+        self.binding_err = ""
+        self.offline_err = ""
+        self.absence_err = ""
 
 
-def _json_first(path: pathlib.Path):
+def _json_one(path: pathlib.Path) -> tuple[dict | None, str]:
+    """EXACTLY ONE record. Not "the first one that parses".
+
+    The identity and binding contracts are one subject, one record. The
+    previous reader took the first non-empty JSON line and ignored
+    everything after it, so a file holding two CONTRADICTORY records was
+    silently reduced to whichever was written first — the reader
+    choosing, invisibly, which evidence counts. Zero, two, malformed or
+    trailing records all refuse now. (D297)
+    """
     if not path.is_file():
-        return None
-    for line in path.read_text().splitlines():
-        if line.strip():
-            try:
-                return json.loads(line)
-            except json.JSONDecodeError:
-                return None
-    return None
+        return None, f"{path.name} does not exist"
+    objs = []
+    for n, line in enumerate(path.read_text().splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            objs.append(json.loads(line))
+        except json.JSONDecodeError as e:
+            return None, f"{path.name} line {n} is not valid JSON ({e})"
+    if not objs:
+        return None, f"{path.name} holds no records"
+    if len(objs) > 1:
+        return None, (f"{path.name} holds {len(objs)} records; this contract "
+                      f"is one subject and one record, and choosing among "
+                      f"them would be this file deciding which evidence "
+                      f"counts")
+    if not isinstance(objs[0], dict):
+        return None, f"{path.name} does not hold a JSON object"
+    return objs[0], ""
+
+
+def subject_problems(rec: dict, kind: str, label: str, image_ref: str,
+                     run_id: str | None, tree_sha: str | None) -> list[str]:
+    """Is this record about THE SUBJECT, or merely in the right filename?
+
+    The collectors already stamp `service`, `image_ref`, `commit_sha`,
+    `tree_sha` and `run_id` into every record. The claim engine read the
+    expected FILENAME and then ignored all of it — so a record from
+    another branch, another run or another tree, placed under the
+    expected name, could participate in BOUND. D247's bar is exact claim
+    → tree/image/run, and a filename is none of those. (D297)
+    """
+    out: list[str] = []
+    if rec.get("service") != label:
+        out.append(f"the {kind} record names service "
+                   f"{rec.get('service')!r}, not {label!r}")
+    if rec.get("image_ref") not in (None, image_ref):
+        out.append(f"the {kind} record names image_ref "
+                   f"{rec.get('image_ref')!r}, not {image_ref!r}")
+    if run_id is not None and str(rec.get("run_id")) != str(run_id):
+        out.append(f"the {kind} record names run {rec.get('run_id')!r}, "
+                   f"the toolchain names {run_id!r}")
+    if tree_sha is not None and rec.get("tree_sha") != tree_sha:
+        out.append(f"the {kind} record names tree "
+                   f"{str(rec.get('tree_sha'))[:12]}, the toolchain names "
+                   f"{tree_sha[:12]}")
+    return out
 
 
 def load_evidence(image: str, branch: str, derived: pathlib.Path,
-                  ident: pathlib.Path) -> Evidence:
+                  ident: pathlib.Path, run_id: str | None = None,
+                  tree_sha: str | None = None) -> Evidence:
     """Re-read the raw artefacts. No row is consulted anywhere here."""
     e = Evidence()
     label = f"item8-{branch.lower()}-{image}"
@@ -250,15 +307,49 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
 
     iid = derived / f"{image}.{branch}.iid"
     e.iid = iid.read_text().strip() if iid.is_file() else None
-    e.identity = _json_first(ident / f"{label}.jsonl")
-    e.binding = _json_first(ident / f"{label}.executed.jsonl")
-    rc = ident / f"{label}.offline.rc"
-    if rc.is_file():
-        try:
-            e.offline_rc = int(rc.read_text().strip())
-        except ValueError:
-            e.offline_rc = None
-    e.absence = _json_first(ident / f"{label}.absence.json")
+
+    # EVERY per-branch record is checked for SUBJECT IDENTITY, not just
+    # for being in the expected filename.
+    image_ref = f"kai-item8:{branch.lower()}-{image}"
+    if branch != "B3":
+        e.identity, err = _json_one(ident / f"{label}.jsonl")
+        if err:
+            e.identity_err = err
+        elif e.identity:
+            probs = subject_problems(e.identity, "identity", label,
+                                     image_ref, run_id, tree_sha)
+            if probs:
+                e.identity, e.identity_err = None, "; ".join(probs)
+        e.binding, err = _json_one(ident / f"{label}.executed.jsonl")
+        if err:
+            e.binding_err = err
+        elif e.binding:
+            probs = subject_problems(e.binding, "binding", label,
+                                     image_ref, run_id, tree_sha)
+            if probs:
+                e.binding, e.binding_err = None, "; ".join(probs)
+        off, err = _json_one(ident / f"{label}.offline.json")
+        if err:
+            e.offline_err = err
+        elif off:
+            probs = subject_problems(off, "offline-load", label, image_ref,
+                                     run_id, tree_sha)
+            if probs:
+                e.offline_err = "; ".join(probs)
+            elif not isinstance(off.get("exit_status"), int):
+                e.offline_err = ("the offline-load record names no integer "
+                                 "exit_status")
+            else:
+                e.offline_rc = off["exit_status"]
+    else:
+        e.absence, err = _json_one(ident / f"{label}.absence.json")
+        if err:
+            e.absence_err = err
+        elif e.absence:
+            probs = subject_problems(e.absence, "absence", label, image_ref,
+                                     run_id, tree_sha)
+            if probs:
+                e.absence, e.absence_err = None, "; ".join(probs)
     return e
 
 
@@ -314,6 +405,9 @@ def derive_axis1(branch: str, e: Evidence) -> tuple[str, str]:
         if e.iid is not None:
             return UNMEASURED, ("an iidfile exists in the artefact package, "
                                 "so the no-image contract is not established")
+        if e.absence_err:
+            return UNMEASURED, (f"the archived absence record is unusable: "
+                                f"{e.absence_err}")
         if not e.absence:
             return UNMEASURED, ("no archived absence observation; post-build "
                                 "non-existence is asserted, not recorded")
@@ -333,6 +427,8 @@ def derive_axis1(branch: str, e: Evidence) -> tuple[str, str]:
                             "genuine fetch path did not run")
     if t.error:
         return WRONG, f"the target vertex carries an error: {t.error[:120]}"
+    if e.offline_err:
+        return UNMEASURED, f"offline-load record unusable: {e.offline_err}"
     if e.offline_rc is None:
         return UNMEASURED, ("no archived offline-load result; the branch's "
                             "criterion is asserted, not recorded")
@@ -368,6 +464,8 @@ def derive_axis2(branch: str, e: Evidence) -> tuple[str, str]:
         if e.iid is not None:
             return "MISMATCH", ("an iidfile exists; B3's contract is that no "
                                 "image was produced")
+        if e.absence_err:
+            return "UNRECORDED", f"absence record unusable: {e.absence_err}"
         if not e.absence:
             return "UNRECORDED", "no archived absence observation"
         if (e.absence.get("post_build_tag") != "absent"
@@ -375,6 +473,8 @@ def derive_axis2(branch: str, e: Evidence) -> tuple[str, str]:
             return "MISMATCH", f"the absence record shows {e.absence}"
         return "IMAGE_NOT_PRODUCED_BY_DESIGN", "no image at either end"
 
+    if e.identity_err:
+        return "UNRECORDED", f"identity record unusable: {e.identity_err}"
     if not e.identity:
         return "UNRECORDED", "no archived image-identity record"
     if e.identity.get("identity_state") != "RECORDED":
@@ -389,14 +489,39 @@ def derive_axis2(branch: str, e: Evidence) -> tuple[str, str]:
     if e.iid != collected:
         return "MISMATCH", (f"the iidfile says {e.iid[:19]}, the collector "
                             f"says {collected[:19]}")
+    if e.binding_err:
+        return "UNRECORDED", f"binding record unusable: {e.binding_err}"
     if not e.binding:
         return "UNRECORDED", "no executed-container binding record"
+
+    # MATCH IS RE-DERIVED FROM THE RAW IDs, not accepted as a word.
+    #
+    # The binding artefact carries `execution_binding`, and it also
+    # carries the two ids that verdict was computed from. Reading the
+    # verdict and ignoring the ids left one classification still trusted
+    # inside an artefact this file otherwise reparses — so a record
+    # saying MATCH while its own ids differ would have qualified. The
+    # ids are the evidence; MATCH is somebody's reading of them. (D297)
+    b_coll = e.binding.get("collected_image_id")
+    b_exec = e.binding.get("executed_image_id")
+    if not b_coll or not b_exec:
+        return "UNRECORDED", ("the binding record does not carry both image "
+                              "ids, so the comparison cannot be redone here")
+    if b_coll != collected:
+        return "MISMATCH", ("the binding compared against a different "
+                            "identity than the one collected")
+    if b_exec != b_coll:
+        return "MISMATCH", (f"the executed container ran {b_exec[:19]}, the "
+                            f"collected identity is {b_coll[:19]}")
     if e.binding.get("execution_binding") != "MATCH":
-        return "MISMATCH", (f"the executed container's image is "
-                            f"{e.binding.get('execution_binding')}")
-    if e.binding.get("collected_image_id") != collected:
-        return "MISMATCH", "the binding compared against a different identity"
-    return "BOUND", "identity recorded, iidfile corroborated, binding MATCH"
+        # The ids agree and the record says otherwise: a contradiction
+        # inside one artefact, refused rather than resolved.
+        return "MISMATCH", (f"the binding record says "
+                            f"{e.binding.get('execution_binding')} while its "
+                            f"own two ids are equal; the artefact "
+                            f"contradicts itself")
+    return "BOUND", ("identity recorded, iidfile corroborated, and the "
+                     "executed image re-derived equal from the raw ids")
 
 
 def qualifies(r: dict, a1: str, a2: str) -> tuple[bool, str]:
@@ -588,7 +713,8 @@ def main() -> int:
     derived: dict[tuple, tuple[str, str, str, str]] = {}
     disagreements: list[str] = []
     for image, branch in EXPECTED:
-        ev = load_evidence(image, branch, derived_dir, ident_dir)
+        ev = load_evidence(image, branch, derived_dir, ident_dir,
+                           tc_rec.get('run_id'), tc_rec.get('tree_sha'))
         d1, why1 = derive_axis1(branch, ev)
         d2, why2 = derive_axis2(branch, ev)
         derived[(image, branch)] = (d1, why1, d2, why2)
