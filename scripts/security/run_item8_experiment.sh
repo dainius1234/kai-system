@@ -84,6 +84,16 @@ mkdir -p "$DERIVED" "$IDENT" || { echo "INSTRUMENT FAILURE: cannot create output
 # So the record is validated by a separate instrument, HERE, before any
 # irreversible build. A defect found now costs zero builds; found after
 # build 6 it costs the whole no-redraw denominator. (D294)
+# RUN_ID IS DEFINED BEFORE THE CHECK THAT USES IT, not after.
+#
+# The workflow passed `--expect-run-id`; this script called the same
+# validator WITHOUT it, and defined RUN_ID afterwards -- so the shipped
+# entry point could not fail closed on a stale record, and only the
+# surrounding YAML was catching it. A prerequisite this script names as
+# its own must hold when this script is what runs. (D296)
+RUN_ID="${GITHUB_RUN_ID:-local}"
+TREE_SHA="$(git rev-parse 'HEAD^{tree}' 2>/dev/null || echo UNKNOWN)"
+
 [ -f "$TOOLCHAIN" ] || {
   echo "INSTRUMENT FAILURE: $TOOLCHAIN does not exist."
   echo "R2 requires the toolchain identities recorded WITH EVERY BRANCH."
@@ -91,16 +101,13 @@ mkdir -p "$DERIVED" "$IDENT" || { echo "INSTRUMENT FAILURE: cannot create output
   echo "cheapest moment to find that out is before build 1."
   exit 2
 }
-if ! python3 "$TCCHECK" --toolchain "$TOOLCHAIN"; then
+if ! python3 "$TCCHECK" --toolchain "$TOOLCHAIN" --expect-run-id "$RUN_ID"; then
   echo "INSTRUMENT FAILURE: the toolchain record did not validate."
   echo "No build has started, and none will. A SHA-256 of an incomplete"
   echo "record is a perfect hash of bad evidence."
   exit 2
 fi
 TOOLCHAIN_SHA="$(python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" "$TOOLCHAIN")"
-
-RUN_ID="${GITHUB_RUN_ID:-local}"
-TREE_SHA="$(git rev-parse 'HEAD^{tree}' 2>/dev/null || echo UNKNOWN)"
 
 # An EMPTY payload must never reach the results file. A blank line is
 # counted by `wc -l` and skipped by the summariser, so the two disagree
@@ -263,6 +270,15 @@ print(json.dumps({"image":e["IM"],"branch":e["BR"],
       # and a zero-byte file is a file. The pre-check already used -e;
       # the two ends must ask the same question.
       [ -e "$IID" ] && POST_IID="present"
+      # ARCHIVED ABSENCE. R2's B3 contract is that no image exists at
+      # either end, and "axis2_provenance says so" is not evidence of
+      # it. The summariser reads this AND checks the iidfile's absence
+      # for itself, since that file is in the artefact package. (D296)
+      PRE="$PRE_CLEAN" PT="$POST_TAG" PI="$POST_IID" python3 -c '
+import json,os
+e=os.environ
+print(json.dumps({"pre_build_state":e["PRE"],"post_build_tag":e["PT"],
+ "post_build_iidfile":e["PI"]}))' > "${IDENT}/${LABEL}.absence.json"
       if [ "$BUILD_RC" -eq 0 ]; then
         A1="UNMEASURED"; NOTE="the build SUCCEEDED under network denial; the intended refusal did not occur"
       elif [ "$TARGET_REFUSAL" != "yes" ]; then
@@ -303,6 +319,10 @@ print(json.dumps({"image":e["IM"],"branch":e["BR"],
       "$DOCKER" run --name "$CNAME" --network none "$TAG" \
         python -c "$PROBE" > "${IDENT}/${LABEL}.offline.log" 2>&1
       OFFLINE_RC=$?
+      # ARCHIVED, because the claim engine may not take this from a
+      # row field this same script wrote. The container's own exit
+      # status is the observation; the row is a summary of it. (D296)
+      echo "$OFFLINE_RC" > "${IDENT}/${LABEL}.offline.rc"
 
       if [ "$EXECUTED" != "True" ]; then
         # R2's B1 requires the HF instruction to PROVABLY execute rather

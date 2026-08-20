@@ -73,14 +73,85 @@ itself. Both are now reconciled against the artefact, as is the
 base-image digest each branch observed at its own build — a mutable tag
 that moves mid-experiment would otherwise become an unexplained
 difference between arms.
+
+**And the contract itself is imported, not restated.** This file used to
+require only enough of the artefact to reconcile hash, tree, run and
+base image, while `check_item8_toolchain.py` required eight identities
+before build 1. A record holding only the four could therefore support a
+closure claim — the package was not self-validating, it relied on
+remembering that a stricter step had once run. Same function, both
+boundaries.
+
+WHY THIS FILE DERIVES THE AXES INSTEAD OF READING THEM
+======================================================
+
+Through D295 this file asked `row["axis1_verdict"] == "PASS"` — and the
+calibration's own six-row fixture was the proof that this is not enough.
+Those rows said `PASS` while carrying `runtime_retries_observed = 1` for
+a B3 branch whose frozen contract requires **five**, with no execution
+proof, no vertex error and no injection sequence anywhere. They were a
+valid ALL SIX QUALIFY fixture.
+
+So the last self-certification path was the biggest one: **the producer
+of the observations was also the authority on what they meant.**
+
+Both axes are now derived HERE, from artefacts produced by instruments
+that are not the runner:
+
+    BuildKit's own event stream   executed / cached / vertex error /
+                                  runtime output, re-parsed from the
+                                  archived captures
+    docker's --iidfile            what the build says it produced
+    the identity collectors       docker_image_id, execution_binding
+    the container's own exit      the offline load, archived as a file
+    the archived absence record   B3's no-image contract, plus this
+                                  file's own check that no iidfile exists
+
+The runner's `axis1_verdict` and `axis2_provenance` are still read — and
+**compared**. A disagreement between the producer's classification and
+the derived one REFUSES rather than being resolved in either direction:
+one of the two is wrong, and which is not something to guess at.
+
+    RAW OBSERVATION  →  QUALIFICATION  →  CLAIM
+    (runner, BuildKit,   (here)            (here)
+     collectors)
 """
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
+import importlib.util
 import json
 import pathlib
 import sys
+
+_HERE = pathlib.Path(__file__).resolve().parent
+
+
+def _sibling(name: str):
+    """Import a sibling instrument rather than restating its contract.
+
+    D272's failure was two records of the same thing drifting apart. The
+    toolchain contract and the BuildKit event model each live in exactly
+    one module; this reads them there.
+    """
+    spec = importlib.util.spec_from_file_location(name, _HERE / f"{name}.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+_TC = _sibling("check_item8_toolchain")
+_EV = _sibling("parse_buildkit_events")
+
+# The frozen target instruction and the frozen markers, in one place.
+TARGET = "for attempt in 1 2 3 4 5"
+RETRY_MARK = "retrying in"
+REFUSE_MARK = "REFUSING TO BUILD"
+INJECT_MARK = "ITEM8-B2-INJECTED-FIRST-ATTEMPT"
+BAKED_MARK = "BAKED "
+B3_REQUIRED_RETRIES = 5
 
 # The frozen denominator, in the frozen order.
 EXPECTED = [(i, b) for i in ("memu-core", "memu-graph")
@@ -107,26 +178,242 @@ REQUIRED_A2 = {"B1": "BOUND", "B2": "BOUND",
 SOUND_A2 = set(REQUIRED_A2.values())   # for reporting counts only
 
 
-def qualifies(r: dict) -> tuple[bool, str]:
-    """Closure qualification is DERIVED HERE, not trusted from the runner.
+class Evidence:
+    """What the artefact package says, read without the runner's help."""
 
-    The runner produces observations and per-axis classifications. It
-    does not certify the composite claim — an observation producer that
-    also certifies the conclusion drawn from it is a second authority for
-    the same statement, and rule 26 says no consequential mechanism
-    self-approves. So this recomputes it from the row's evidence, and a
-    runner that shipped a `qualified_for_closure` field would be
-    contradicted rather than believed.
+    __slots__ = ("target", "runtime", "diagnostics", "unmet", "iid",
+                 "identity", "binding", "offline_rc", "absence")
+
+    def __init__(self) -> None:
+        self.target = None          # the BuildKit target vertex
+        self.runtime = ""           # its runtime output, decoded
+        self.diagnostics = 0
+        self.unmet = ""             # why nothing could be read, if so
+        self.iid = None             # ABSENT / "" / the id, per rule 20
+        self.identity = None        # the explicit-collector record
+        self.binding = None         # the executed-container comparison
+        self.offline_rc = None      # the container's own exit status
+        self.absence = None         # B3's archived no-image observation
+
+
+def _json_first(path: pathlib.Path):
+    if not path.is_file():
+        return None
+    for line in path.read_text().splitlines():
+        if line.strip():
+            try:
+                return json.loads(line)
+            except json.JSONDecodeError:
+                return None
+    return None
+
+
+def load_evidence(image: str, branch: str, derived: pathlib.Path,
+                  ident: pathlib.Path) -> Evidence:
+    """Re-read the raw artefacts. No row is consulted anywhere here."""
+    e = Evidence()
+    label = f"item8-{branch.lower()}-{image}"
+
+    captures = [derived / f"{image}.{branch}.events-stderr.jsonl",
+                derived / f"{image}.{branch}.events-stdout.jsonl"]
+    present = [p for p in captures if p.is_file()]
+    if not present:
+        e.unmet = (f"no archived BuildKit event capture for {image}/{branch}; "
+                   f"the raw evidence for this branch is not in the package")
+        return e
+    bearing = []
+    for p in present:
+        vx, diag, err = _EV.parse(p.read_text(), p.name)
+        e.diagnostics += len(diag)
+        if err and "held no BuildKit events" not in err:
+            e.unmet = f"the archived capture {p.name} is unreadable: {err}"
+            return e
+        if vx:
+            bearing.append((p.name, vx))
+    if not bearing:
+        e.unmet = (f"the archived captures for {image}/{branch} hold no "
+                   f"BuildKit events at all")
+        return e
+    if len(bearing) > 1:
+        # Same rule as the parser, for the same reason: file order is not
+        # chronology, and B2's criterion is an order.
+        e.unmet = (f"{len(bearing)} archived captures for {image}/{branch} "
+                   f"contain events; their chronology relative to one "
+                   f"another is unestablished")
+        return e
+    target, err = _EV.find_target(bearing[0][1], TARGET)
+    if err:
+        e.unmet = f"{image}/{branch}: {err}"
+        return e
+    e.target = target
+    e.runtime = "".join(target.log)
+
+    iid = derived / f"{image}.{branch}.iid"
+    e.iid = iid.read_text().strip() if iid.is_file() else None
+    e.identity = _json_first(ident / f"{label}.jsonl")
+    e.binding = _json_first(ident / f"{label}.executed.jsonl")
+    rc = ident / f"{label}.offline.rc"
+    if rc.is_file():
+        try:
+            e.offline_rc = int(rc.read_text().strip())
+        except ValueError:
+            e.offline_rc = None
+    e.absence = _json_first(ident / f"{label}.absence.json")
+    return e
+
+
+def ordered(runtime: str) -> bool:
+    """injection → a GENUINE retry → a later success, in that order.
+
+    Derived from the runtime text here rather than taken from the
+    runner's `awk`. Same criterion, computed by a different party.
     """
-    # R2 records the toolchain with EVERY branch. A row that does not
-    # name the toolchain it ran under is not bound to one.
+    i = runtime.find(INJECT_MARK)
+    if i < 0:
+        return False
+    r = runtime.find(RETRY_MARK, i + len(INJECT_MARK))
+    if r < 0:
+        return False
+    return runtime.find(BAKED_MARK, r + len(RETRY_MARK)) >= 0
+
+
+def derive_axis1(branch: str, e: Evidence) -> tuple[str, str]:
+    """The contingency verdict, from BuildKit's evidence and nothing else.
+
+    Frozen R2's criteria, restated as questions about artefacts:
+
+      B1  the target instruction EXECUTED, uncached, without its own
+          error, and the image loaded its asset with the network denied
+      B2  the same, plus exactly one injection and the ordered recovery
+      B3  the target carries its OWN error, refused, and did so after
+          exactly the five attempts the design names
+    """
+    if e.unmet:
+        return UNMEASURED, e.unmet
+    t = e.target
+    retries = e.runtime.count(RETRY_MARK)
+    refusals = e.runtime.count(REFUSE_MARK)
+    injections = e.runtime.count(INJECT_MARK)
+
+    if branch == "B3":
+        if not t.error:
+            if refusals:
+                return WRONG, ("the target vertex carries no error of its "
+                               "own; the refusal text is present but the "
+                               "failure is not attributable to that step")
+            return UNMEASURED, ("no error on the target vertex and no "
+                                "refusal in its output; the intended "
+                                "refusal is not evidenced")
+        if not refusals:
+            return WRONG, ("the target vertex errored without its refusal "
+                           "marker; the failure was something else")
+        if retries != B3_REQUIRED_RETRIES:
+            return UNMEASURED, (f"{retries} runtime retry line(s) attributed "
+                                f"to the target vertex, not the "
+                                f"{B3_REQUIRED_RETRIES} the design requires")
+        if e.iid is not None:
+            return UNMEASURED, ("an iidfile exists in the artefact package, "
+                                "so the no-image contract is not established")
+        if not e.absence:
+            return UNMEASURED, ("no archived absence observation; post-build "
+                                "non-existence is asserted, not recorded")
+        if (e.absence.get("post_build_tag") != "absent"
+                or e.absence.get("post_build_iidfile") != "absent"
+                or e.absence.get("pre_build_state") != "clean"):
+            return UNMEASURED, (f"the archived absence record does not "
+                                f"establish non-existence: {e.absence}")
+        return PASS, (f"{retries} retries and the refusal, both attributed "
+                      f"to the target vertex; no image at either end")
+
+    # B1 and B2 — the positive branches.
+    if not t.started:
+        return UNMEASURED, "the target vertex did not execute in this build"
+    if t.cached:
+        return UNMEASURED, ("the target vertex was served FROM CACHE; the "
+                            "genuine fetch path did not run")
+    if t.error:
+        return WRONG, f"the target vertex carries an error: {t.error[:120]}"
+    if e.offline_rc is None:
+        return UNMEASURED, ("no archived offline-load result; the branch's "
+                            "criterion is asserted, not recorded")
+    if e.offline_rc != 0:
+        return UNMEASURED, (f"the offline asset load exited {e.offline_rc} "
+                            f"with the network denied")
+    if branch == "B2":
+        if injections != 1:
+            return UNMEASURED, (f"{injections} injection marker(s) in the "
+                                f"target vertex output; exactly one is "
+                                f"required")
+        if retries < 1:
+            return UNMEASURED, ("no runtime retry line attributed to the "
+                                "target vertex; recovery is not established")
+        if not ordered(e.runtime):
+            return UNMEASURED, ("the runtime output does not show injection, "
+                                "then a genuine retry, then a success, in "
+                                "that order")
+    elif injections:
+        return WRONG, (f"{injections} injection marker(s) in a branch that "
+                       f"has no injection; this is not B1's subject")
+    return PASS, "executed uncached, and loaded its asset offline"
+
+
+def derive_axis2(branch: str, e: Evidence) -> tuple[str, str]:
+    """Provenance, from the identity artefacts rather than from a word.
+
+    For B1/B2 the three independent records already exist and were
+    simply never read here: the explicit collector's identity, the
+    executed-container binding, and docker's own iidfile.
+    """
+    if branch == "B3":
+        if e.iid is not None:
+            return "MISMATCH", ("an iidfile exists; B3's contract is that no "
+                                "image was produced")
+        if not e.absence:
+            return "UNRECORDED", "no archived absence observation"
+        if (e.absence.get("post_build_tag") != "absent"
+                or e.absence.get("post_build_iidfile") != "absent"):
+            return "MISMATCH", f"the absence record shows {e.absence}"
+        return "IMAGE_NOT_PRODUCED_BY_DESIGN", "no image at either end"
+
+    if not e.identity:
+        return "UNRECORDED", "no archived image-identity record"
+    if e.identity.get("identity_state") != "RECORDED":
+        return "UNRECORDED", (f"the identity record is "
+                              f"{e.identity.get('identity_state')}")
+    collected = e.identity.get("docker_image_id")
+    if not collected:
+        return "UNRECORDED", "the identity record names no image id"
+    if e.iid is None:
+        return "MISMATCH", ("no iidfile in the package; R2 requires the "
+                            "corroboration and ABSENT is not 'no objection'")
+    if e.iid != collected:
+        return "MISMATCH", (f"the iidfile says {e.iid[:19]}, the collector "
+                            f"says {collected[:19]}")
+    if not e.binding:
+        return "UNRECORDED", "no executed-container binding record"
+    if e.binding.get("execution_binding") != "MATCH":
+        return "MISMATCH", (f"the executed container's image is "
+                            f"{e.binding.get('execution_binding')}")
+    if e.binding.get("collected_image_id") != collected:
+        return "MISMATCH", "the binding compared against a different identity"
+    return "BOUND", "identity recorded, iidfile corroborated, binding MATCH"
+
+
+def qualifies(r: dict, a1: str, a2: str) -> tuple[bool, str]:
+    """Whether DERIVED evidence supports closure. The row supplies neither
+    axis: `a1` and `a2` come from `derive_axis1`/`derive_axis2`, computed
+    from the artefact package.
+
+    The row is still consulted for its toolchain binding, which is a fact
+    about which conditions record it names — reconciled separately
+    against the artefact — and not a verdict about itself.
+    """
     tc = r.get("toolchain_sha256")
     if not tc or tc == "ABSENT":
         return False, f"toolchain binding is {tc or 'missing'}"
-    if r.get("axis1_verdict") != PASS:
-        return False, f"Axis 1 is {r.get('axis1_verdict')}"
+    if a1 != PASS:
+        return False, f"Axis 1 is {a1}"
     branch = r.get("branch")
-    a2 = r.get("axis2_provenance")
     want = REQUIRED_A2.get(branch)
     if want is None:
         return False, f"{branch} is not a precommitted branch"
@@ -139,12 +426,12 @@ def qualifies(r: dict) -> tuple[bool, str]:
         return False, f"Axis 2 is {a2}, not {want}"
     if branch == "B3":
         return True, "refused by design, no image to bind"
-    # Positive branches need the iidfile corroboration R2 requires.
-    # ABSENT is not "no objection": it is the corroboration missing.
-    corr = r.get("iidfile_corroboration")
-    if corr != "CORROBORATED":
-        return False, f"iidfile corroboration is {corr}"
-    return True, "Axis 1 PASS, bound, iidfile corroborated"
+    # The iidfile corroboration R2 requires is now PART OF deriving
+    # BOUND, from the archived iidfile itself rather than from a row
+    # field reporting the comparison's outcome. Reaching BOUND above
+    # already means the collector's id, the iidfile and the executed
+    # container's `.Image` all agree.
+    return True, "Axis 1 PASS, bound, iidfile corroborated (all derived)"
 
 
 def refuse(reason: str, detail: str = "") -> int:
@@ -187,6 +474,13 @@ def main() -> int:
                          "identity are compared against every row -- six "
                          "rows agreeing with each other are six statements "
                          "from one producer")
+    # THE RAW EVIDENCE PACKAGE. Both axes are derived from what is in
+    # these directories, not from the row's classification of it.
+    ap.add_argument("--derived-dir", default="item8-derived",
+                    help="archived BuildKit event captures and iidfiles")
+    ap.add_argument("--identity-dir", default="item8-identity",
+                    help="archived identity, binding, offline-load and "
+                         "absence records")
     args = ap.parse_args()
 
     path = pathlib.Path(args.results)
@@ -252,12 +546,19 @@ def main() -> int:
                 tc_problems.append(
                     f"TOOLCHAIN: {who} names run {r.get('run_id')}, the "
                     f"artefact names {want_run}")
+        # THE SAME EIGHT-FIELD CONTRACT the pre-build validator applies,
+        # imported from it rather than restated. This file used to check
+        # only what it needed for reconciliation, so an artefact holding
+        # tree, run and base image alone could support closure while
+        # lacking the frontend, the Docker and buildx versions, the
+        # runner OS and the commit -- and reading the package later would
+        # have meant REMEMBERING that a stricter step once ran. (D296)
+        for p in _TC.contract_problems(tc_rec):
+            tc_problems.append(f"TOOLCHAIN: {p}")
         if not want_tree or not want_run:
             tc_problems.append(
                 "TOOLCHAIN: the artefact does not name a tree_sha and a "
-                "run_id, so the rows cannot be reconciled against it. "
-                "check_item8_toolchain.py requires both before build 1; "
-                "this record did not come from a validated run")
+                "run_id, so the rows cannot be reconciled against it")
 
         # THE BASE IMAGE IS A MUTABLE TAG. `python:3.11-slim` can move
         # under the experiment, and six arms built against two different
@@ -278,10 +579,48 @@ def main() -> int:
                 f"experiment, and which arms differ is not recoverable "
                 f"afterwards")
 
+    # ── DERIVE BOTH AXES FROM THE ARTEFACTS, PER SUBJECT ─────────────
+    #
+    # Nothing below reads `axis1_verdict` or `axis2_provenance` to decide
+    # anything. Those two are read exactly once each, to be COMPARED.
+    derived_dir = pathlib.Path(args.derived_dir)
+    ident_dir = pathlib.Path(args.identity_dir)
+    derived: dict[tuple, tuple[str, str, str, str]] = {}
+    disagreements: list[str] = []
+    for image, branch in EXPECTED:
+        ev = load_evidence(image, branch, derived_dir, ident_dir)
+        d1, why1 = derive_axis1(branch, ev)
+        d2, why2 = derive_axis2(branch, ev)
+        derived[(image, branch)] = (d1, why1, d2, why2)
+        for r in rows:
+            if (r.get("image"), r.get("branch")) != (image, branch):
+                continue
+            # A DISAGREEMENT IS A FINDING, NOT A TIE TO BREAK. One of the
+            # two computations is wrong, and choosing between them here
+            # would be the summariser deciding which instrument to
+            # believe -- which is the authority question all over again.
+            if r.get("axis1_verdict") != d1:
+                disagreements.append(
+                    f"DISAGREEMENT: {image}/{branch} Axis 1 — the row says "
+                    f"{r.get('axis1_verdict')}, the artefacts give {d1} "
+                    f"({why1})")
+            if r.get("axis2_provenance") != d2:
+                disagreements.append(
+                    f"DISAGREEMENT: {image}/{branch} Axis 2 — the row says "
+                    f"{r.get('axis2_provenance')}, the artefacts give {d2} "
+                    f"({why2})")
+            if "qualified_for_closure" in r:
+                got, _ = qualifies(r, d1, d2)
+                if bool(r["qualified_for_closure"]) != got:
+                    disagreements.append(
+                        f"DISAGREEMENT: {image}/{branch} row claims "
+                        f"qualified={r['qualified_for_closure']}, derived "
+                        f"{got}")
+
     print("ITEM 8 — HUGGINGFACE/NETWORK CONTINGENCY")
     print("=" * 74)
     print()
-    print("AXIS 1 — the contingency (computed with NO identity input)")
+    print("AXIS 1 — the contingency, DERIVED from BuildKit's own evidence")
     print("-" * 74)
     for image, branch in EXPECTED:
         matches = [r for r in rows if (r.get("image"), r.get("branch"))
@@ -289,45 +628,37 @@ def main() -> int:
         if not matches:
             print(f"  {image:<12} {branch}  NOT REPORTED")
             continue
+        d1, why1, _, _ = derived[(image, branch)]
         for r in matches:
-            print(f"  {image:<12} {branch}  {r.get('axis1_verdict', '?'):<14}"
-                  f" retries={r.get('runtime_retries_observed', '?')}"
+            print(f"  {image:<12} {branch}  {d1:<14}"
+                  f" (row said {r.get('axis1_verdict', '?')})"
                   f" elapsed={r.get('elapsed_seconds', '?')}s")
-            if r.get("note"):
-                print(f"  {'':<12}     {r['note']}")
+            print(f"  {'':<12}     {why1}")
 
     print()
-    print("AXIS 2 — provenance (separate; may block closure, never Axis 1)")
+    print("AXIS 2 — provenance, DERIVED from the identity artefacts")
     print("-" * 74)
     for image, branch in EXPECTED:
         for r in [r for r in rows if (r.get("image"), r.get("branch"))
                   == (image, branch)]:
-            q, why = qualifies(r)
-            print(f"  {image:<12} {branch}  "
-                  f"{r.get('axis2_provenance', 'UNRECORDED'):<30}"
-                  f" iidfile={r.get('iidfile_corroboration', 'n/a'):<14}"
+            d1, _, d2, why2 = derived[(image, branch)]
+            q, why = qualifies(r, d1, d2)
+            print(f"  {image:<12} {branch}  {d2:<30}"
+                  f" (row said {r.get('axis2_provenance', '?')})"
                   f" qualifies={'yes' if q else 'NO'}")
+            print(f"  {'':<12}     {why2}")
             if not q:
-                print(f"  {'':<12}     {why}")
+                print(f"  {'':<12}     BLOCKED: {why}")
 
-    a1 = {v: sum(1 for r in rows if r.get("axis1_verdict") == v)
+    a1 = {v: sum(1 for k, d in derived.items() if d[0] == v)
           for v in (PASS, WRONG, UNMEASURED)}
-    a2_sound = sum(1 for r in rows if r.get("axis2_provenance") in SOUND_A2)
-    quals = {(r.get("image"), r.get("branch")): qualifies(r) for r in rows}
+    a2_sound = sum(1 for d in derived.values() if d[2] in SOUND_A2)
+    quals = {(r.get("image"), r.get("branch")):
+             qualifies(r, *(derived.get((r.get("image"), r.get("branch")),
+                                        (UNMEASURED, "", "UNRECORDED", ""))[i]
+                            for i in (0, 2)))
+             for r in rows}
     qualified = sum(1 for v in quals.values() if v[0])
-
-    # A runner that certifies its own composite claim is contradicted,
-    # not trusted. Nothing currently emits this field; if something does,
-    # a disagreement is a finding.
-    disagreements: list[str] = []
-    for r in rows:
-        if "qualified_for_closure" in r:
-            got, why = qualifies(r)
-            if bool(r["qualified_for_closure"]) != got:
-                disagreements.append(
-                    f"DISAGREEMENT: {r.get('image')}/{r.get('branch')} row "
-                    f"claims qualified={r['qualified_for_closure']}, derived "
-                    f"{got} ({why})")
 
     print()
     print(f"  inspected: {len(rows)} result row(s) against "
@@ -339,7 +670,8 @@ def main() -> int:
     if tc_expected:
         print(f"    TOOLCHAIN  recomputed {tc_expected[:16]}… from the "
               f"artefact, reconciled against {len(rows)} row(s) on digest, "
-              f"tree, run and base image")
+              f"tree, run and base image, and validated against the same "
+              f"{len(_TC.REQUIRED)}-field contract the pre-build check uses")
     else:
         print("    TOOLCHAIN  NOT RECOMPUTED — the artefact is missing")
 
@@ -371,11 +703,11 @@ def main() -> int:
         for d in disagreements:
             print(f"FAIL: {d}")
         print()
-        print("A row carrying a composite claim that contradicts the "
-              "evidence is schema drift, in EITHER direction. The producer "
-              "of an observation does not certify the conclusion drawn "
-              "from it (rule 26), and a contradiction is refused rather "
-              "than noted.")
+        print("A row whose classification contradicts the artefacts is a "
+              "finding, in EITHER direction, and it is not resolved here: "
+              "one of the two computations is wrong, and choosing between "
+              "them would be this file deciding which instrument to "
+              "believe — the authority question all over again (rule 26).")
         return 4
 
     if not ok:

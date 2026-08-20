@@ -85,6 +85,39 @@ def parse(text: str) -> dict[str, str]:
     return out
 
 
+def contract_problems(rec: dict[str, str]) -> list[str]:
+    """THE CONTRACT, in ONE place, for BOTH boundaries.
+
+    This module ran before build 1 and required eight identities. The
+    summariser then re-derived a smaller contract of its own -- enough of
+    the artefact to reconcile hash, tree, run and base image -- so an
+    archived toolchain holding only those four could support a closure
+    claim while lacking the frontend, the Docker and buildx versions, the
+    runner OS and the commit.
+
+    That made the evidence package non-self-validating: reading it later
+    meant *remembering* that a stricter step had once run. Two
+    interpretations of one contract is D272's failure shape, and the
+    repair is the same one — a single function, imported, not copied.
+    (D296)
+    """
+    problems: list[str] = []
+    missing = [k for k in REQUIRED if k not in rec]
+    if missing:
+        problems.append(f"missing required identity(s): {', '.join(missing)}")
+    empty = [k for k in REQUIRED if k in rec and not rec[k]]
+    if empty:
+        problems.append(f"present but EMPTY: {', '.join(empty)} — `key=` is "
+                        f"absence wearing a key's clothes")
+    unresolved = [k for k in REQUIRED if rec.get(k) == "UNRESOLVED"]
+    if unresolved:
+        problems.append(f"UNRESOLVED: {', '.join(unresolved)}")
+    if rec.get("frontend") and rec["frontend"] != FRONTEND:
+        problems.append(f"frontend is {rec['frontend']!r}, not the pinned "
+                        f"value R2 froze")
+    return problems
+
+
 def refuse(msg: str) -> int:
     print(f"REFUSED: {msg}")
     print()
@@ -111,25 +144,15 @@ def main() -> int:
     raw = path.read_bytes()
     rec = parse(raw.decode("utf-8", "replace"))
 
-    missing = [k for k in REQUIRED if k not in rec]
-    if missing:
-        return refuse(f"missing required identity(s): {', '.join(missing)}. "
-                      f"R2 names them; a record without them describes a "
-                      f"different, smaller thing")
-    empty = [k for k in REQUIRED if not rec[k]]
-    if empty:
-        return refuse(f"present but EMPTY: {', '.join(empty)}. `key=` is "
-                      f"absence wearing a key's clothes, and the generator "
-                      f"runs without `set -e`, so a failed lookup leaves "
-                      f"exactly this")
-    unresolved = [k for k in REQUIRED if rec[k] == "UNRESOLVED"]
-    if unresolved:
-        return refuse(f"UNRESOLVED: {', '.join(unresolved)}. A branch cannot "
-                      f"qualify against a toolchain we could not name")
-    if rec["frontend"] != FRONTEND:
-        return refuse(f"frontend is {rec['frontend']!r}, not the pinned "
-                      f"value R2 froze. A different frontend is a different "
-                      f"experiment")
+    # THE SHARED CONTRACT. Same function the summariser calls at closure,
+    # so the two boundaries cannot drift into two different ideas of what
+    # a complete record is.
+    problems = contract_problems(rec)
+    if problems:
+        return refuse("; ".join(problems) + ". R2 names these identities; a "
+                      "record without them describes a different, smaller "
+                      "thing, and the generator runs without `set -e`, so a "
+                      "failed lookup leaves exactly this")
 
     if not args.skip_repo_identity:
         head = git("rev-parse", "HEAD")

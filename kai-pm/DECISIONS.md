@@ -23120,3 +23120,125 @@ Instruments **77/0**. Verdict layer **248/0 across 28 scenarios**.
   five rounds was an implementation failure, never a design one.
 * Awaiting a sixth adversarial review.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D296 — Sixth review: the answer to my own question was yes
+
+**2026-08-20. Repair of D295 against the frozen contract. No amendment to
+frozen R2 `0055ead8…8796`. Nothing built. `kai-pm/ITEM8_GO` still does
+not exist. Stage 2 remains NOT AUTHORISED.**
+
+I asked the fifth review whether any path remained by which a row could
+become closure evidence on the strength of something the runner itself
+asserted. The answer was **yes, and the largest one**, and the proof was
+sitting in my own calibration.
+
+### 1. The smoking gun was my fixture
+
+The canonical six-row fixture said `axis1_verdict = PASS` for every
+branch while carrying `runtime_retries_observed = 1` — for a B3 whose
+frozen contract requires **five** — with no execution proof, no vertex
+error, no injection sequence and no identity artefacts anywhere.
+
+It was a valid `ALL SIX QUALIFY` case.
+
+The summariser asked `row["axis1_verdict"] == PASS`. So the producer of
+the observations was also the authority on what they meant, and the
+fixture that was supposed to calibrate the check was demonstrating the
+defect instead.
+
+**That is the whole finding.** Everything below follows from it.
+
+### 2. Both axes are now derived, from artefacts the runner did not write
+
+| derived from | who produced it |
+|---|---|
+| executed / cached / vertex error / runtime output | **BuildKit**, re-parsed from the archived captures |
+| the image the build produced | **docker**, via `--iidfile` |
+| `docker_image_id`, `execution_binding` | **the identity collectors** |
+| the offline load's exit status | **the container**, archived as a file |
+| B3's no-image state | an archived absence record, **plus this file's own check that no iidfile exists** |
+
+The runner's two classifications are still read — and **compared**. A
+disagreement refuses rather than being resolved: one of the two
+computations is wrong, and choosing between them here would be this file
+deciding which instrument to believe, which is the authority question
+again.
+
+An empty evidence package now qualifies nothing, whatever six perfect
+rows say.
+
+### 3. The B3 and B1 contradictions became unreachable
+
+D295 made a `BOUND` B3 *refuse at qualification*. It now cannot arise:
+`derive_axis2` for B3 returns only `MISMATCH`, `UNRECORDED` or
+`IMAGE_NOT_PRODUCED_BY_DESIGN`, because those are the only things the
+artefacts can support. A row claiming otherwise is contradicted.
+
+The per-branch contract stays as the second line — but the first line is
+now that the impossible state has no way in.
+
+### 4. One toolchain contract, two boundaries
+
+`check_item8_toolchain.py` required eight identities before build 1; the
+summariser had quietly grown a smaller contract of its own — enough to
+reconcile hash, tree, run and base image. An artefact holding only those
+could support a closure claim.
+
+**The package was not self-validating: reading it later meant
+remembering that a stricter step had once run.** That is D272's shape —
+two records of one thing, drifting. `contract_problems()` is now
+exported from the validator and called at both ends.
+
+### 5. And the runner's own prerequisite did not hold for the runner
+
+The workflow passed `--expect-run-id`; the runner called the same
+validator without it, and defined `RUN_ID` *after* the call. Only the
+surrounding YAML was catching a stale record. A prerequisite a script
+names as its own must hold when that script is what runs.
+
+### 6. Calibration and reinjection
+
+Instruments **77/0**. Verdict layer **290/0 across 33 scenarios**.
+
+| reinjected | result |
+|---|---|
+| Axis 1 read from the row again | **347/20 FAIL** |
+| Axis 2 read from the row again | **356/11 FAIL** |
+| closure applies its own smaller toolchain contract | **361/6 FAIL** |
+| runner drops `--expect-run-id` | **362/5 FAIL** |
+| all reverted | **367/0 PASS** |
+
+Every one of GPT's eight named reinjections is now a permanent fixture,
+including the exact one that exposed the defect: six rows saying PASS
+over a B3 package holding one retry.
+
+### 7. The shape this leaves
+
+    RAW OBSERVATION   →   QUALIFICATION   →   CLAIM
+    runner, BuildKit,     summariser          summariser
+    docker, collectors,
+    the container
+
+The runner records. It no longer decides. That is the Evidence-Plane
+shape the programme wants anyway, arrived at because a reviewer refused
+to accept a claim engine that trusted its own supplier.
+
+### 8. State
+
+| | |
+|---|---|
+| instruments / verdicts | **77/0** · **290/0**, 33 scenarios |
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| mutation cardinality | **0/1/1** |
+| shipped Dockerfiles | **0** lines of diff |
+| `collect_image_identity.py` | **0** lines vs `b53fd4e` |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+
+### Status
+
+* **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.**
+* **Frozen R2 unamended** across six reviews.
+* Awaiting a targeted seventh review of the claim engine.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.

@@ -40,6 +40,7 @@ key on the SUBJECT's output and not on ours.
 """
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import os
@@ -56,7 +57,7 @@ PARSER = REPO / "scripts" / "security" / "parse_buildkit_events.py"
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 28
+EXPECTED_SCENARIOS = 33
 executed: list[str] = []
 
 
@@ -225,6 +226,8 @@ sys.exit(0)
 '''
 
 
+LAST_DIRS: tuple = ()
+
 PINNED_FRONTEND = ("docker/dockerfile:1.9.0@sha256:"
                    "fe40cf4e92cd0c467be2cfc30657a680ae2398318afd50b0c80585784c604f28")
 
@@ -290,11 +293,109 @@ def run_runner(mode: str, td: Path,
                        cwd=str(REPO), env=env)
     rows = [json.loads(l) for l in results.read_text().splitlines()
             if l.strip()] if results.exists() else []
+    # The runner's OWN artefact package. Scenarios that drive the runner
+    # summarise against what it actually left behind, not against a
+    # hand-written package -- otherwise the derivation would be checked
+    # against evidence nothing produced.
+    global LAST_DIRS
+    LAST_DIRS = (derived, ident)
     return p.returncode, p.stdout + p.stderr, rows
 
 
+DIGEST = "sha256:" + "1" * 64
+IMAGE_ID = "sha256:" + "f" * 64
+
+
+def _ev(o: dict) -> str:
+    return json.dumps(o) + "\n"
+
+
+def _lg(s: str) -> str:
+    return _ev({"logs": [{"vertex": DIGEST, "stream": 1,
+                          "data": base64.b64encode(s.encode()).decode()}]})
+
+
+def write_evidence(td: Path, **over) -> tuple[Path, Path]:
+    """A COMPLETE artefact package, as the runner would leave one.
+
+    The summariser derives both axes from these files. Synthetic rows
+    alone can no longer reach a closure claim — which is the point of
+    D296, and the reason this helper had to exist at all: the previous
+    six() fixture qualified while the package it described was empty.
+
+    `over` names one artefact to corrupt, so every reinjection below is a
+    single contradiction between a row and the evidence for it.
+    """
+    derived = td / "ev-derived"
+    ident = td / "ev-identity"
+    derived.mkdir(exist_ok=True)
+    ident.mkdir(exist_ok=True)
+    name = ('[3/9] RUN for attempt in 1 2 3 4 5; do python fetch && exit 0; '
+            'echo "retrying in 10s"; done; echo "REFUSING TO BUILD"')
+    for image in ("memu-core", "memu-graph"):
+        for branch in ("B1", "B2", "B3"):
+            label = f"item8-{branch.lower()}-{image}"
+            key = f"{image}.{branch}"
+            out = [_ev({"vertexes": [{"digest": DIGEST, "name": name,
+                                      "cached": over.get(f"cached:{key}",
+                                                         False),
+                                      "started": None if over.get(
+                                          f"unstarted:{key}") else "t0"}]})]
+            if branch == "B3":
+                n = over.get(f"retries:{key}", 5)
+                out += [_lg("model download attempt /5 failed; "
+                            "retrying in 10s\n")] * n
+                out.append(_lg("REFUSING TO BUILD: could not fetch the "
+                               "model in 5 attempts.\n"))
+                out.append(_ev({"vertexes": [{
+                    "digest": DIGEST, "name": name, "completed": "t1",
+                    "error": "" if over.get(f"noerr:{key}")
+                             else "process did not complete successfully"}]}))
+                (ident / f"{label}.absence.json").write_text(json.dumps(
+                    over.get(f"absence:{key}",
+                             {"pre_build_state": "clean",
+                              "post_build_tag": "absent",
+                              "post_build_iidfile": "absent"})))
+                if over.get(f"b3iid:{key}"):
+                    (derived / f"{key}.iid").write_text(IMAGE_ID)
+            else:
+                if branch == "B2" and not over.get(f"noinject:{key}"):
+                    if over.get(f"disorder:{key}"):
+                        out.append(_lg("retrying in 10s\n"))
+                        out.append(_lg("ITEM8-B2-INJECTED-FIRST-ATTEMPT\n"))
+                        out.append(_lg("BAKED ok\n"))
+                    else:
+                        out.append(_lg("ITEM8-B2-INJECTED-FIRST-ATTEMPT\n"))
+                        out.append(_lg("model download attempt /5 failed; "
+                                       "retrying in 10s\n"))
+                        out.append(_lg("BAKED ok\n"))
+                else:
+                    out.append(_lg("BAKED ok\n"))
+                out.append(_ev({"vertexes": [{"digest": DIGEST, "name": name,
+                                              "completed": "t1"}]}))
+                iid = over.get(f"iid:{key}", IMAGE_ID)
+                if iid is not None:
+                    (derived / f"{key}.iid").write_text(iid)
+                (ident / f"{label}.offline.rc").write_text(
+                    str(over.get(f"offline:{key}", 0)))
+                (ident / f"{label}.jsonl").write_text(json.dumps({
+                    "service": label,
+                    "identity_state": over.get(f"idstate:{key}", "RECORDED"),
+                    "docker_image_id": IMAGE_ID}) + "\n")
+                (ident / f"{label}.executed.jsonl").write_text(json.dumps({
+                    "service": label,
+                    "execution_binding": over.get(f"binding:{key}", "MATCH"),
+                    "collected_image_id": IMAGE_ID,
+                    "executed_image_id": IMAGE_ID}) + "\n")
+            (derived / f"{key}.events-stderr.jsonl").write_text("".join(out))
+            (derived / f"{key}.events-stdout.jsonl").write_text("")
+    return derived, ident
+
+
 def summarise(rows: list[dict], td: Path, toolchain: str | None = None,
-              omit_toolchain: bool = False) -> tuple[int, str]:
+              omit_toolchain: bool = False,
+              dirs: tuple[Path, Path] | None = None,
+              **over) -> tuple[int, str]:
     f = td / "s.jsonl"
     f.write_text("".join(json.dumps(r) + "\n" for r in rows))
     argv = [sys.executable, str(SUMMARISE), "--results", str(f)]
@@ -304,6 +405,9 @@ def summarise(rows: list[dict], td: Path, toolchain: str | None = None,
             art.write_text(TC_TEXT)
             toolchain = str(art)
         argv += ["--toolchain", toolchain]
+    if dirs is None:
+        dirs = write_evidence(td, **over)
+    argv += ["--derived-dir", str(dirs[0]), "--identity-dir", str(dirs[1])]
     p = subprocess.run(argv, capture_output=True, text=True, cwd=str(REPO))
     return p.returncode, p.stdout + p.stderr
 
@@ -346,9 +450,11 @@ def test_axis2_failure_leaves_axis1_standing() -> None:
                   r["axis2_provenance"] == "MISMATCH", str(r))
             check(f"{r['image']} B1 emits NO composite claim",
                   "qualified_for_closure" not in r, str(r))
-        _, sout = summarise(rows, td)
+        _, sout = summarise(rows, td, dirs=LAST_DIRS)
         check("the summary keeps Axis 1 complete",
               "AXIS 1 COMPLETE, PROVENANCE INCOMPLETE" in sout, sout)
+        check("and Axis 2 was DERIVED as the fault, not read from the row",
+              "MISMATCH" in sout, sout)
 
 
 # ── defect 2: B3 five attempts ──────────────────────────────────────────
@@ -532,10 +638,10 @@ def test_absent_iidfile_blocks_qualification() -> None:
                   r["iidfile_corroboration"] == "ABSENT", str(r))
             check(f"{r['image']} {r['branch']} Axis 1 still PASS",
                   r["axis1_verdict"] == "PASS", str(r))
-        code, out = summarise(rows, td)
+        code, out = summarise(rows, td, dirs=LAST_DIRS)
         check("an absent iidfile blocks closure", code != 0, out)
-        check("and the reason is named",
-              "iidfile corroboration is ABSENT" in out, out)
+        check("and the reason is named — from the PACKAGE, not the row",
+              "no iidfile in the package" in out, out)
 
 
 # ── new blocker: presentation must not satisfy the attempt detector ────
@@ -596,8 +702,8 @@ def test_a_self_certified_row_is_contradicted() -> None:
         check("a self-certified row does NOT qualify", code != 0, out)
         check("and the disagreement is printed",
               "DISAGREEMENT: memu-core/B1" in out, out)
-        check("and the derived reason is given",
-              "Axis 1 is UNMEASURED" in out, out)
+        check("and the artefacts' answer is given",
+              "the artefacts give PASS" in out, out)
 
 
 # ── the parser itself ──────────────────────────────────────────────────
@@ -965,8 +1071,8 @@ def test_toolchain_record_is_validated_not_merely_hashed() -> None:
         code, out = toolchain_check(
             toolchain_text(frontend="docker/dockerfile:1"), td)
         check("a floating frontend REFUSES", code == 1, out)
-        check("and says a different frontend is a different experiment",
-              "different experiment" in out, out)
+        check("and says it is not the pinned value",
+              "not the pinned value R2 froze" in out, out)
         code, out = toolchain_check(toolchain_text(tree_sha="0" * 40), td)
         check("a stale tree_sha REFUSES", code == 1, out)
         code, out = toolchain_check(toolchain_text(commit_sha="0" * 40), td)
@@ -1060,25 +1166,30 @@ def test_branch_contract_is_enforced_per_branch() -> None:
     with tempfile.TemporaryDirectory() as d:
         td = Path(d)
         # B3's whole contract is that no image is produced. A B3 row
-        # claiming a successful binding is describing something else.
+        # claiming a successful binding is describing something else --
+        # and since D296 the claim never reaches the qualification test,
+        # because the ARTEFACTS are what answer the question. The row is
+        # contradicted instead, which is a stronger outcome: the
+        # impossible state is now unreachable rather than merely refused.
         rows = six()
         rows[2]["axis2_provenance"] = "BOUND"
         rows[2]["iidfile_corroboration"] = "CORROBORATED"
         code, out = summarise(rows, td)
         check("a BOUND B3 does NOT qualify", code != 0, out)
-        check("and the contradiction is named",
-              "which B3 may never be" in out, out)
-        check("naming the state it must carry",
-              "IMAGE_NOT_PRODUCED_BY_DESIGN" in out, out)
-        # And the mirror image: a built branch claiming no image was
-        # produced, carried past by its iidfile alone.
+        check("and the row is contradicted by the artefacts",
+              "DISAGREEMENT: memu-core/B3 Axis 2" in out, out)
+        check("which give the state the branch must carry",
+              "artefacts give IMAGE_NOT_PRODUCED_BY_DESIGN" in out, out)
+        # The mirror image, likewise contradicted rather than believed.
         rows = six()
         rows[0]["axis2_provenance"] = "IMAGE_NOT_PRODUCED_BY_DESIGN"
         code, out = summarise(rows, td)
         check("an IMAGE_NOT_PRODUCED_BY_DESIGN B1 does NOT qualify",
               code != 0, out)
-        check("and it is named as impossible for that branch",
-              "which B1 may never be" in out, out)
+        check("and it too is contradicted",
+              "DISAGREEMENT: memu-core/B1 Axis 2" in out, out)
+        check("the artefacts giving BOUND for a built branch",
+              "artefacts give BOUND" in out, out)
 
 
 # ── D295 3: tree and run reconciled against the artefact ───────────────
@@ -1208,6 +1319,143 @@ def test_base_image_digest_must_hold_across_the_six() -> None:
               code == 4, sout)
 
 
+# ── D296: the claim engine derives both axes from the artefacts ────────
+
+def test_axis1_is_derived_not_read() -> None:
+    """The smoking gun: rows saying PASS over evidence that says otherwise."""
+    scenario("claim engine: Axis 1 is derived from BuildKit's evidence")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # THE EXACT FIXTURE GPT NAMED. Six rows saying PASS, and a B3
+        # package holding ONE retry where the frozen design requires
+        # five. Before D296 this was a valid ALL SIX QUALIFY case.
+        code, out = summarise(six(), td, **{"retries:memu-core.B3": 1})
+        check("B3 with one retry does NOT qualify", code != 0, out)
+        check("and the count is derived, not read",
+              "1 runtime retry line(s)" in out, out)
+        check("naming the five the design requires", "not the 5" in out, out)
+        check("and the row is contradicted",
+              "DISAGREEMENT: memu-core/B3 Axis 1" in out, out)
+
+        code, out = summarise(six(), td, **{"cached:memu-core.B1": True})
+        check("a CACHED target does not qualify", code != 0, out)
+        check("and says the genuine fetch did not run",
+              "FROM CACHE" in out, out)
+
+        code, out = summarise(six(), td, **{"unstarted:memu-graph.B1": True})
+        check("a target that never executed does not qualify", code != 0, out)
+        check("and says so", "did not execute" in out, out)
+
+        code, out = summarise(six(), td, **{"noinject:memu-core.B2": True})
+        check("B2 without its injection does not qualify", code != 0, out)
+        check("and names the missing marker",
+              "0 injection marker(s)" in out, out)
+
+        code, out = summarise(six(), td, **{"disorder:memu-graph.B2": True})
+        check("B2 out of order does not qualify", code != 0, out)
+        check("and names the ordering", "in that order" in out, out)
+
+        code, out = summarise(six(), td, **{"noerr:memu-core.B3": True})
+        check("B3 without its own vertex error does not qualify",
+              code != 0, out)
+        check("and says it is not attributable",
+              "not attributable" in out, out)
+
+        code, out = summarise(six(), td, **{"offline:memu-core.B1": 1})
+        check("a failed offline load does not qualify", code != 0, out)
+        check("and reads the container's own exit status",
+              "offline asset load exited 1" in out, out)
+
+
+def test_axis2_is_derived_from_the_identity_artefacts() -> None:
+    scenario("claim engine: Axis 2 is derived from the identity records")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        code, out = summarise(six(), td, **{"binding:memu-core.B1": "MISMATCH"})
+        check("a MISMATCH binding does not qualify", code != 0, out)
+        check("and it is read from the binding artefact",
+              "executed container's image is MISMATCH" in out, out)
+
+        code, out = summarise(six(), td,
+                              **{"iid:memu-graph.B2": "sha256:" + "0" * 64})
+        check("an iidfile disagreeing with the collector does not qualify",
+              code != 0, out)
+        check("and both values are named", "the collector says" in out, out)
+
+        code, out = summarise(six(), td, **{"idstate:memu-core.B1": "UNRECORDED"})
+        check("an UNRECORDED identity does not qualify", code != 0, out)
+
+        code, out = summarise(six(), td, **{"b3iid:memu-core.B3": True})
+        check("a B3 with an iidfile does not qualify", code != 0, out)
+        check("and says the no-image contract is unestablished",
+              "no-image contract is not established" in out, out)
+
+        code, out = summarise(six(), td, **{
+            "absence:memu-graph.B3": {"pre_build_state": "clean",
+                                      "post_build_tag": "present",
+                                      "post_build_iidfile": "absent"}})
+        check("a B3 whose absence record shows a surviving tag fails",
+              code != 0, out)
+
+
+def test_the_package_must_actually_be_present() -> None:
+    """R11 at the claim boundary: no artefacts, no claim."""
+    scenario("claim engine: an empty evidence package qualifies nothing")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        empty_d = td / "no-derived"
+        empty_i = td / "no-identity"
+        empty_d.mkdir()
+        empty_i.mkdir()
+        code, out = summarise(six(), td, dirs=(empty_d, empty_i))
+        check("six perfect rows over an EMPTY package REFUSE", code != 0, out)
+        check("and it says the raw evidence is not in the package",
+              "not in the package" in out, out)
+        check("every subject is named",
+              out.count("the raw evidence for this branch") >= 6, out)
+
+
+def test_closure_toolchain_contract_matches_pre_build() -> None:
+    """One contract, both boundaries — not two that can drift."""
+    scenario("toolchain: closure applies the same eight-field contract")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # Exactly the artefact GPT described: enough to reconcile
+        # hash/tree/run/base, missing the other five identities.
+        thin = td / "thin.txt"
+        thin.write_text(f"tree_sha={TC_TREE}\nrun_id={TC_RUN}\n"
+                        f"base_image_digest={TC_BASE}\n")
+        thin_sha = hashlib.sha256(thin.read_bytes()).hexdigest()
+        rows = six(toolchain_sha256=thin_sha)
+        code, out = summarise(rows, td, str(thin))
+        check("rows correctly bound to a THIN artefact still REFUSE",
+              code == 4, out)
+        for k in ("frontend", "docker_version", "buildx_version",
+                  "runner_os", "commit_sha"):
+            check(f"and {k} is named as missing", k in out, out)
+        # and the shared contract is reported by size, from the module
+        code, out = summarise(six(), td)
+        check("the complete artefact passes the same contract",
+              code == 0, out)
+        check("and the summary says which contract it applied",
+              "8-field contract" in out, out)
+
+
+def test_runner_binds_the_run_id_before_build_1() -> None:
+    scenario("toolchain: a stale run id costs the runner zero builds")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        code, out, rows = run_runner(
+            "ok", td, toolchain=toolchain_text(run_id="999"))
+        check("a record describing another run exits NON-ZERO",
+              code != 0, out)
+        check("it is an INSTRUMENT FAILURE", "INSTRUMENT FAILURE" in out, out)
+        check("ZERO rows were written", len(rows) == 0, str(rows))
+        check("and no build was attempted", "::group::" not in out, out[:400])
+        check("the runner names the run it expected",
+              "is not this run" in out, out)
+
+
 def run_all() -> None:
     test_axis2_failure_leaves_axis1_standing()
     test_b3_requires_five_attempts()
@@ -1237,6 +1485,11 @@ def run_all() -> None:
     test_row_identity_is_reconciled_with_the_artefact()
     test_split_descriptors_refuse_rather_than_invent_order()
     test_base_image_digest_must_hold_across_the_six()
+    test_axis1_is_derived_not_read()
+    test_axis2_is_derived_from_the_identity_artefacts()
+    test_the_package_must_actually_be_present()
+    test_closure_toolchain_contract_matches_pre_build()
+    test_runner_binds_the_run_id_before_build_1()
     print(f"  inspected: {EXPECTED_SCENARIOS} verdict-layer scenario(s) "
           f"across 3 shipped entry points")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
