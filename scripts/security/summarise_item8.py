@@ -186,7 +186,8 @@ class Evidence:
     __slots__ = ("target", "runtime", "diagnostics", "unmet", "iid",
                  "identity", "binding", "offline_rc", "absence",
                  "identity_err", "binding_err", "offline_err", "absence_err",
-                 "expected_command", "expected_flags", "binding_note")
+                 "expected_command", "expected_flags", "binding_note",
+                 "invocation", "target_digest")
 
     def __init__(self) -> None:
         self.target = None          # the BuildKit target vertex
@@ -208,6 +209,8 @@ class Evidence:
         self.expected_command = ""
         self.expected_flags: list[str] = []
         self.binding_note = ""
+        self.invocation = None
+        self.target_digest = ""
 
 
 def _json_one(path: pathlib.Path) -> tuple[dict | None, str]:
@@ -311,6 +314,7 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
     """Re-read the raw artefacts. No row is consulted anywhere here."""
     e = Evidence()
     label = f"item8-{branch.lower()}-{image}"
+    image_ref = f"kai-item8:{branch.lower()}-{image}"
 
     captures = [derived / f"{image}.{branch}.events-stderr.jsonl",
                 derived / f"{image}.{branch}.events-stdout.jsonl"]
@@ -354,6 +358,17 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
     # 13 of 15 pairs are separated by the command alone; the two that
     # are not are B1 vs B3 within one image, which differ only by the
     # RUN flag -- see the binding rule below. (D298)
+    # ── SUBJECT → INVOCATION → EXACT CAPTURE ─────────────────────────
+    #
+    # Distinctness of the six vertex digests is a COLLISION detector, not
+    # an identity: swap two captures and they stay perfectly distinct
+    # while the subjects are reversed. Six different digests, test
+    # passes, evidence reversed. Presence versus identity, one more time.
+    #
+    # So the load-bearing chain is a provenance binding, and every link
+    # of it is recomputed HERE. The runner produces the record; it does
+    # not certify it. The chain anchors at the SHIPPED Dockerfile, which
+    # the runner does not write. (D300)
     src = REPO / image / "Dockerfile"
     want_df = derived / f"Dockerfile.{image}.{branch}"
     if not src.is_file():
@@ -382,6 +397,52 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
     body, flags = _EV.strip_run_flags(full)
     e.expected_command = body
     e.expected_flags = flags
+
+    # THE INVOCATION RECORD, verified link by link before the capture it
+    # describes is allowed to mean anything.
+    inv, inv_err = _json_one(ident / f"{label}.invocation.json")
+    if inv_err:
+        e.unmet = f"{image}/{branch}: invocation record unusable: {inv_err}"
+        return e
+    probs = subject_problems(inv, "invocation", label, image_ref,
+                             run_id, tree_sha, commit_sha)
+    if probs:
+        e.unmet = f"{image}/{branch}: {'; '.join(probs)}"
+        return e
+    want_df_sha = hashlib.sha256(expect_text.encode()).hexdigest()
+    if inv.get("derived_dockerfile_sha256") != want_df_sha:
+        e.unmet = (f"{image}/{branch}: the invocation was given a Dockerfile "
+                   f"whose sha is {str(inv.get('derived_dockerfile_sha256'))[:12]}, "
+                   f"and re-deriving {image}/{branch} from the shipped "
+                   f"source gives {want_df_sha[:12]}. This build was not "
+                   f"given this subject")
+        return e
+    invoked = (inv.get("invocation") or {})
+    if invoked.get("file") != str(want_df):
+        e.unmet = (f"{image}/{branch}: the invocation names -f "
+                   f"{invoked.get('file')!r}, not {str(want_df)!r}")
+        return e
+    if invoked.get("tag") != image_ref:
+        e.unmet = (f"{image}/{branch}: the invocation names -t "
+                   f"{invoked.get('tag')!r}, not {image_ref!r}")
+        return e
+    # AND THE BYTES. Recomputed from the archived captures themselves, so
+    # a capture copied or swapped after the fact no longer matches the
+    # invocation that produced it.
+    for fname, key in ((f"{image}.{branch}.events-stderr.jsonl",
+                        "events_stderr_sha256"),
+                       (f"{image}.{branch}.events-stdout.jsonl",
+                        "events_stdout_sha256")):
+        f = derived / fname
+        got = (hashlib.sha256(f.read_bytes()).hexdigest() if f.is_file()
+               else "ABSENT")
+        if inv.get(key) != got:
+            e.unmet = (f"{image}/{branch}: {fname} hashes to {got[:12]}, the "
+                       f"invocation that produced it recorded "
+                       f"{str(inv.get(key))[:12]}. These are not the bytes "
+                       f"that build returned")
+            return e
+    e.invocation = inv
 
     hits = [v for v in bearing[0][1].values()
             if body in _EV.normalise_command(v.name)]
@@ -425,19 +486,25 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
                    "how this daemon represents a RUN did not run, or its "
                    "record does not describe this execution")
         return e
-    for f in flags:
-        if f not in seen:
-            e.unmet = (f"{image}/{branch} requires {f} in its target "
-                       f"instruction and this capture's target does not "
-                       f"carry it; this is not {branch}'s evidence")
-            return e
-    for f in ("--network=none",):
-        if f in seen and f not in flags:
-            e.unmet = (f"the capture's target carries {f}, which "
-                       f"{image}/{branch} does not; this is another "
-                       f"branch's evidence")
-            return e
+    # CORROBORATION WHEN AVAILABLE, never the sole mechanism. If this
+    # daemon happens to print RUN flags, a mismatch is still a finding;
+    # if it does not, the load-bearing binding is the invocation chain
+    # above and the structural differential recorded in the rule.
+    if binding_rule.get("flags_in_vertex_name"):
+        for f in flags:
+            if f not in seen:
+                e.unmet = (f"{image}/{branch} requires {f} in its target "
+                           f"instruction and this capture's target does not "
+                           f"carry it; this is not {branch}'s evidence")
+                return e
+        for f in ("--network=none",):
+            if f in seen and f not in flags:
+                e.unmet = (f"the capture's target carries {f}, which "
+                           f"{image}/{branch} does not; this is another "
+                           f"branch's evidence")
+                return e
     e.target = target
+    e.target_digest = target.digest
     e.runtime = "".join(target.log)
 
     iid = derived / f"{image}.{branch}.iid"
@@ -445,7 +512,6 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
 
     # EVERY per-branch record is checked for SUBJECT IDENTITY, not just
     # for being in the expected filename.
-    image_ref = f"kai-item8:{branch.lower()}-{image}"
     if branch != "B3":
         e.identity, err = _json_one(ident / f"{label}.jsonl")
         if err:
@@ -860,13 +926,24 @@ def main() -> int:
         # tree, and both capabilities actually present. A rule carried
         # forward from another run would authorise a binding nobody
         # measured here. (D299)
-        for k in ("full_instruction_in_vertex_name", "flags_in_vertex_name"):
+        # THE STRUCTURAL PROPERTIES, not the cosmetic one.
+        #
+        # D299 required `flags_in_vertex_name` -- whether BuildKit PRINTS
+        # `--network=none`. That was very likely to be false for reasons
+        # unrelated to evidence quality, and would have blocked Item 8 on
+        # a rendering detail. What actually matters is whether the flag
+        # is STRUCTURAL: BuildKit's ExecOp carries `network` as a field
+        # of the operation, and a vertex digest checksums the definition
+        # graph. `flags_in_vertex_name` is still recorded, and used below
+        # as corroboration when present. (D300)
+        for k in ("full_instruction_in_vertex_name",
+                  "digest_stable_across_invocations",
+                  "netmode_changes_vertex_digest"):
             if binding_rule.get(k) is not True:
                 binding_problems.append(
-                    f"BINDING RULE: {k} is {binding_rule.get(k)!r}. Without "
-                    f"it the six subjects cannot be told apart by their "
-                    f"instructions, and the preflight should have refused "
-                    f"before build 1")
+                    f"BINDING RULE: {k} is {binding_rule.get(k)!r}. The "
+                    f"preflight should have refused before build 1 rather "
+                    f"than producing a rule that licenses nothing")
         if tc_rec.get("run_id") and str(binding_rule.get("run_id")) != \
                 str(tc_rec["run_id"]):
             binding_problems.append(
@@ -882,6 +959,7 @@ def main() -> int:
             binding_rule = None
     tc_problems.extend(binding_problems)
     derived: dict[tuple, tuple[str, str, str, str]] = {}
+    evidence_digests: dict[tuple, str] = {}
     disagreements: list[str] = []
     for image, branch in EXPECTED:
         ev = load_evidence(image, branch, derived_dir, ident_dir,
@@ -890,6 +968,7 @@ def main() -> int:
         d1, why1 = derive_axis1(branch, ev)
         d2, why2 = derive_axis2(branch, ev)
         derived[(image, branch)] = (d1, why1, d2, why2)
+        evidence_digests[(image, branch)] = ev.target_digest
         for r in rows:
             if (r.get("image"), r.get("branch")) != (image, branch):
                 continue
@@ -914,6 +993,28 @@ def main() -> int:
                         f"DISAGREEMENT: {image}/{branch} row claims "
                         f"qualified={r['qualified_for_closure']}, derived "
                         f"{got}")
+
+    # ── STRUCTURAL CORROBORATION: the six targets must be six ────────
+    #
+    # NOT an identity. Distinctness is a COLLISION detector: swap two
+    # captures and they stay distinct while the subjects are reversed.
+    # The identity is the invocation chain in load_evidence(). This
+    # catches the copy case and any derivation that produced two
+    # structurally identical subjects, and it is stated as the
+    # corroboration it is. (D300)
+    seen_digests: dict[str, list] = {}
+    for key, d in derived.items():
+        ev_d = evidence_digests.get(key)
+        if ev_d:
+            seen_digests.setdefault(ev_d, []).append(key)
+    for dg, keys in seen_digests.items():
+        if len(keys) > 1:
+            tc_problems.append(
+                f"STRUCTURAL: {', '.join(f'{i}/{b}' for i, b in keys)} share "
+                f"target vertex digest {dg[:19]}. Two of the six frozen "
+                f"subjects are structurally the same step, which means one "
+                f"capture is another's copy or the derivation produced "
+                f"identical subjects")
 
     print("ITEM 8 — HUGGINGFACE/NETWORK CONTINGENCY")
     print("=" * 74)

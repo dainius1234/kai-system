@@ -70,7 +70,7 @@ DERIVER = _mod("derive_item8_dockerfile")
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 47
+EXPECTED_SCENARIOS = 50
 executed: list[str] = []
 
 
@@ -117,7 +117,14 @@ _df = argv[argv.index("-f") + 1] if "-f" in argv else ""
 branch = _df.rsplit(".", 1)[-1].upper() if _df else "B1"
 if branch not in ("B1", "B2", "B3"):
     branch = "B1"
-DIG = "sha256:" + "1" * 64
+# A DISTINCT VERTEX DIGEST PER SUBJECT, as a real daemon gives -- the
+# LLB op differs per subject, and one constant digest across six builds
+# made the fake weaker than the thing it models. Derived from the
+# Dockerfile this build was actually handed, so a swapped -f swaps the
+# digest too, which is the property under test.
+import hashlib as _h
+DIG = "sha256:" + _h.sha256(
+    (open(_df).read() if _df else "none").encode()).hexdigest()
 
 def ev(o, stream=None): print(json.dumps(o), file=stream or OUT)
 def log(s, stream=None):
@@ -350,6 +357,8 @@ def run_runner(mode: str, td: Path,
     (derived / "binding-rule.json").write_text(json.dumps(
         {"flags_in_vertex_name": True,
          "full_instruction_in_vertex_name": True,
+         "digest_stable_across_invocations": True,
+         "netmode_changes_vertex_digest": True,
          "run_id": "555", "tree_sha": git("rev-parse", "HEAD^{tree}")}) + "\n")
     results = td / "results.jsonl"
     tool = td / "toolchain.txt"
@@ -379,8 +388,8 @@ def _ev(o: dict) -> str:
     return json.dumps(o) + "\n"
 
 
-def _lg(s: str) -> str:
-    return _ev({"logs": [{"vertex": DIGEST, "stream": 1,
+def _lg(s: str, dg: str = DIGEST) -> str:
+    return _ev({"logs": [{"vertex": dg, "stream": 1,
                           "data": base64.b64encode(s.encode()).decode()}]})
 
 
@@ -407,8 +416,11 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
         over.get("binding_rule",
                  {"flags_in_vertex_name": True,
                   "full_instruction_in_vertex_name": True,
+                  "digest_stable_across_invocations": True,
+                  "netmode_changes_vertex_digest": True,
                   "run_id": TC_RUN, "tree_sha": TC_TREE})) + "\n")
     names = {}
+    digests: dict = {}
     captures: dict = {}
     for _im in ("memu-core", "memu-graph"):
         for _br in ("B1", "B2", "B3"):
@@ -418,6 +430,9 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
             (derived / f"Dockerfile.{_im}.{_br}").write_text(text)
             run = DERIVER.find_target_run(text)
             names[(_im, _br)] = "[3/9] " + PARSER_MOD.normalise_command(run)
+            _dsrc = over.get(f"samedigest:{_im}.{_br}", (_im, _br))
+            digests[(_im, _br)] = "sha256:" + hashlib.sha256(
+                f"{_dsrc[0]}/{_dsrc[1]}".encode()).hexdigest()
     for image in ("memu-core", "memu-graph"):
         for branch in ("B1", "B2", "B3"):
             label = f"item8-{branch.lower()}-{image}"
@@ -425,7 +440,8 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
             # `swap:<key>` files ANOTHER subject's capture under this
             # subject's filename -- the exact corruption D298 closes.
             name = names[(image, branch)]
-            out = [_ev({"vertexes": [{"digest": DIGEST, "name": name,
+            dg = digests[(image, branch)]
+            out = [_ev({"vertexes": [{"digest": dg, "name": name,
                                       "cached": over.get(f"cached:{key}",
                                                          False),
                                       "started": None if over.get(
@@ -433,11 +449,11 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
             if branch == "B3":
                 n = over.get(f"retries:{key}", 5)
                 out += [_lg("model download attempt /5 failed; "
-                            "retrying in 10s\n")] * n
+                            "retrying in 10s\n", dg)] * n
                 out.append(_lg("REFUSING TO BUILD: could not fetch the "
-                               "model in 5 attempts.\n"))
+                               "model in 5 attempts.\n", dg))
                 out.append(_ev({"vertexes": [{
-                    "digest": DIGEST, "name": name, "completed": "t1",
+                    "digest": dg, "name": name, "completed": "t1",
                     "error": "" if over.get(f"noerr:{key}")
                              else "process did not complete successfully"}]}))
                 abs_rec = {"service": over.get(f"svc:{key}", label),
@@ -463,26 +479,26 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
                 # unreachable. That is byte for byte B3's required
                 # evidence, which is why there is no degraded binding.
                 out += [_lg("model download attempt /5 failed; "
-                            "retrying in 10s\n")] * 5
+                            "retrying in 10s\n", dg)] * 5
                 out.append(_lg("REFUSING TO BUILD: could not fetch the "
-                               "model in 5 attempts.\n"))
+                               "model in 5 attempts.\n", dg))
                 out.append(_ev({"vertexes": [{
-                    "digest": DIGEST, "name": name, "completed": "t1",
+                    "digest": dg, "name": name, "completed": "t1",
                     "error": "process did not complete successfully"}]}))
             else:
                 if branch == "B2" and not over.get(f"noinject:{key}"):
                     if over.get(f"disorder:{key}"):
-                        out.append(_lg("retrying in 10s\n"))
-                        out.append(_lg("ITEM8-B2-INJECTED-FIRST-ATTEMPT\n"))
-                        out.append(_lg("BAKED ok\n"))
+                        out.append(_lg("retrying in 10s\n", dg))
+                        out.append(_lg("ITEM8-B2-INJECTED-FIRST-ATTEMPT\n", dg))
+                        out.append(_lg("BAKED ok\n", dg))
                     else:
-                        out.append(_lg("ITEM8-B2-INJECTED-FIRST-ATTEMPT\n"))
+                        out.append(_lg("ITEM8-B2-INJECTED-FIRST-ATTEMPT\n", dg))
                         out.append(_lg("model download attempt /5 failed; "
-                                       "retrying in 10s\n"))
-                        out.append(_lg("BAKED ok\n"))
+                                       "retrying in 10s\n", dg))
+                        out.append(_lg("BAKED ok\n", dg))
                 else:
-                    out.append(_lg("BAKED ok\n"))
-                out.append(_ev({"vertexes": [{"digest": DIGEST, "name": name,
+                    out.append(_lg("BAKED ok\n", dg))
+                out.append(_ev({"vertexes": [{"digest": dg, "name": name,
                                               "completed": "t1"}]}))
                 iid = over.get(f"iid:{key}", IMAGE_ID)
                 if iid is not None:
@@ -516,11 +532,55 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
     # WRITTEN LAST, so `swap:` can file ANOTHER subject's WHOLE capture
     # under this subject's name -- vertex name and runtime output
     # together, which is what an accidental copy actually looks like.
+    # `swap` is also usable RECIPROCALLY (B1<->B3), which distinctness
+    # cannot see and the invocation binding must.
     for image in ("memu-core", "memu-graph"):
         for branch in ("B1", "B2", "B3"):
             key = f"{image}.{branch}"
             src = over.get(f"swap:{key}", (image, branch))
             (derived / f"{key}.events-stderr.jsonl").write_text(captures[src])
+
+    # THE INVOCATION RECORDS, written from what is actually on disk --
+    # so an unrepaired swap is visible as a hash mismatch, exactly as it
+    # would be in a real package. `invswap:` moves the RECORD too, which
+    # is the harder case: then only the re-derived Dockerfile SHA can
+    # tell that the pair is reversed.
+    for image in ("memu-core", "memu-graph"):
+        for branch in ("B1", "B2", "B3"):
+            key = f"{image}.{branch}"
+            label = f"item8-{branch.lower()}-{image}"
+            src = over.get(f"invswap:{key}", (image, branch))
+            skey = f"{src[0]}.{src[1]}"
+            df = derived / f"Dockerfile.{skey}"
+            outf = derived / f"{skey}.events-stdout.jsonl"
+            sh = lambda f: (hashlib.sha256(f.read_bytes()).hexdigest()
+                            if f.is_file() else "ABSENT")
+            # THE RECORD HASHES THE CAPTURE AS PRODUCED, not as it sits
+            # on disk afterwards. The runner writes it immediately after
+            # its own build; a swap performed later is exactly what the
+            # byte binding is for, and generating the record from
+            # post-swap disk state would model a threat nobody has.
+            err_sha = hashlib.sha256(captures[src].encode()).hexdigest()
+            rec = {"service": f"item8-{src[1].lower()}-{src[0]}",
+                   "image": src[0], "branch": src[1],
+                   "image_ref": f"kai-item8:{src[1].lower()}-{src[0]}",
+                   "run_id": over.get(f"run:{key}", TC_RUN),
+                   "tree_sha": over.get(f"tree:{key}", TC_TREE),
+                   "commit_sha": over.get(f"commit:{key}", TC_COMMIT),
+                   "derived_dockerfile_path": str(df),
+                   "derived_dockerfile_sha256": over.get(
+                       f"dfsha:{key}", sh(df)),
+                   "invocation": {"subcommand": "build",
+                                  "no_cache": src[1] == "B1",
+                                  "progress": "rawjson", "file": str(df),
+                                  "tag": f"kai-item8:{src[1].lower()}-{src[0]}",
+                                  "iidfile": str(derived / f"{skey}.iid"),
+                                  "context": "."},
+                   "events_stderr_sha256": over.get(f"errsha:{key}", err_sha),
+                   "events_stdout_sha256": sh(outf),
+                   "build_exit": 1 if src[1] == "B3" else 0}
+            (ident / f"{label}.invocation.json").write_text(
+                json.dumps(rec) + "\n")
     return derived, ident
 
 
@@ -1724,7 +1784,7 @@ def test_preflight_refuses_without_a_daemon() -> None:
         check("and names the rawjson possibility",
               "--progress=rawjson" in p.stdout, p.stdout)
         check("and reports its own denominator",
-              "6 required propert" in p.stdout, p.stdout)
+              "7 required propert" in p.stdout, p.stdout)
 
 
 # ── D298: the raw BuildKit capture must be THIS subject's ──────────────
@@ -1738,17 +1798,30 @@ def test_capture_is_bound_to_the_derived_subject() -> None:
         # memu-graph/B3. Both have a five-attempt target, five retries,
         # a refusal and a vertex error; only the derived instruction
         # tells them apart.
+        # LAYER 1 — the bytes. The invocation recorded what its own
+        # build returned; this capture is not it.
         code, out = summarise(six(), td,
                               **{"swap:memu-graph.B3": ("memu-core", "B3")})
         check("a cross-IMAGE substitution REFUSES", code != 0, out)
-        check("and says the capture is not evidence about that subject",
-              "is not evidence about memu-graph/B3" in out, out)
+        check("on the bytes first",
+              "not the bytes that build returned" in out, out)
+
+        # LAYER 2 — move the invocation record with the capture, so the
+        # hashes agree, and the INSTRUCTION binding has to catch it.
+        code, out = summarise(six(), td,
+                              **{"swap:memu-graph.B3": ("memu-core", "B3"),
+                                 "invswap:memu-graph.B3": ("memu-core", "B3")})
+        check("moving the record too still REFUSES", code != 0, out)
+        check("and names the subject mismatch",
+              "names service" in out or "names -f" in out
+              or "is not evidence about" in out, out)
 
         code, out = summarise(six(), td,
-                              **{"swap:memu-core.B2": ("memu-graph", "B2")})
+                              **{"swap:memu-core.B2": ("memu-graph", "B2"),
+                                 "invswap:memu-core.B2": ("memu-graph", "B2")})
         check("the reverse cross-image substitution REFUSES", code != 0, out)
         check("naming the subject it was filed as",
-              "not evidence about memu-core/B2" in out, out)
+              "memu-core/B2" in out, out)
 
         # B1's capture filed as B3, same image. On a daemon that carries
         # RUN flags in vertex names this is caught by the instruction;
@@ -1768,10 +1841,12 @@ def test_capture_is_bound_to_the_derived_subject() -> None:
             **{"swap:memu-core.B3": ("memu-core", "B1"),
                "binding_rule": {"flags_in_vertex_name": False,
                                 "full_instruction_in_vertex_name": True,
+                                "digest_stable_across_invocations": True,
+                                "netmode_changes_vertex_digest": False,
                                 "run_id": TC_RUN, "tree_sha": TC_TREE}})
-        check("no flag binding REFUSES the whole run", code == 4, out)
+        check("no STRUCTURAL binding REFUSES the whole run", code == 4, out)
         check("naming the capability rather than degrading",
-              "flags_in_vertex_name is False" in out, out)
+              "netmode_changes_vertex_digest is False" in out, out)
 
 
 def test_derived_dockerfile_must_be_the_re_derivation() -> None:
@@ -1829,9 +1904,25 @@ def test_generic_loop_alone_does_not_bind() -> None:
         generic += json.dumps({"logs": [{"vertex": DIGEST, "stream": 1,
                                          "data": b64.b64encode(
                                              b"BAKED ok\n").decode()}]}) + "\n"
-        (derived / "memu-core.B1.events-stderr.jsonl").write_text(generic)
+        cap = derived / "memu-core.B1.events-stderr.jsonl"
+        cap.write_text(generic)
+        # LAYER 1: the invocation that produced this branch recorded the
+        # bytes it got back, and these are not those bytes.
         code, out = summarise(six(), td, dirs=(derived, ident))
-        check("the generic loop alone does NOT bind", code != 0, out)
+        check("a substituted capture fails the BYTE binding first",
+              code != 0, out)
+        check("and says these are not the bytes that build returned",
+              "not the bytes that build returned" in out, out)
+        # LAYER 2: now repair the record so the bytes agree, and the
+        # INSTRUCTION binding is what has to catch it. The old anchor
+        # matched all six; this proves it no longer suffices.
+        inv = ident / "item8-b1-memu-core.invocation.json"
+        rec = json.loads(inv.read_text())
+        rec["events_stderr_sha256"] = hashlib.sha256(
+            cap.read_bytes()).hexdigest()
+        inv.write_text(json.dumps(rec) + "\n")
+        code, out = summarise(six(), td, dirs=(derived, ident))
+        check("the generic loop alone still does NOT bind", code != 0, out)
         check("and says no vertex carries this subject's instruction",
               "carries this subject's target instruction" in out, out)
 
@@ -1865,9 +1956,17 @@ def test_b1_outage_looks_exactly_like_b3() -> None:
             "swap:memu-core.B3": ("memu-core", "B1")})
         check("a B1-outage capture filed as B3 does NOT qualify",
               code != 0, out)
-        check("and it is the INSTRUCTION that catches it, not the outcome",
-              "is not evidence about memu-core/B3" in out
-              or "does not carry it" in out, out)
+        check("and it is the PROVENANCE that catches it, not the outcome",
+              "not the bytes that build returned" in out, out)
+        # Even with the record moved to match the bytes -- so provenance
+        # agrees and the outcome is indistinguishable from a real B3 --
+        # the re-derived subject still refuses it.
+        code, out = summarise(six(), td, **{
+            "outage:memu-core.B1": True,
+            "swap:memu-core.B3": ("memu-core", "B1"),
+            "invswap:memu-core.B3": ("memu-core", "B1")})
+        check("with the record moved too it STILL does not qualify",
+              code != 0, out)
         # And with the flag binding unavailable, the whole run must have
         # been refused before build 1 -- there is no weaker mode left.
         code, out = summarise(six(), td, **{
@@ -1875,17 +1974,19 @@ def test_b1_outage_looks_exactly_like_b3() -> None:
             "swap:memu-core.B3": ("memu-core", "B1"),
             "binding_rule": {"flags_in_vertex_name": False,
                              "full_instruction_in_vertex_name": True,
+                             "digest_stable_across_invocations": True,
+                             "netmode_changes_vertex_digest": False,
                              "run_id": TC_RUN, "tree_sha": TC_TREE}})
-        check("with no flag binding the summary REFUSES outright",
+        check("with no structural binding the summary REFUSES outright",
               code == 4, out)
         check("naming the capability, not the branch",
-              "flags_in_vertex_name is False" in out, out)
+              "netmode_changes_vertex_digest is False" in out, out)
         check("and saying the preflight should have stopped it",
               "should have refused" in out, out)
 
 
 def test_preflight_refuses_a_daemon_that_hides_run_flags() -> None:
-    scenario("preflight: no flag in the vertex name is a FAILURE")
+    scenario("preflight: netmode that changes nothing structural is a FAILURE")
     with tempfile.TemporaryDirectory() as d:
         td = Path(d)
         # A docker that emits well-formed rawjson but never carries the
@@ -1898,7 +1999,8 @@ def test_preflight_refuses_a_daemon_that_hides_run_flags() -> None:
                                  "preflight_buildkit_rawjson.py"),
              "--docker", str(fake)],
             capture_output=True, text=True, cwd=str(REPO))
-        check("a flagless daemon REFUSES", p.returncode == 1, p.stdout)
+        check("a daemon where netmode changes no digest REFUSES",
+              p.returncode == 1, p.stdout)
         check("and says six subjects that cannot be distinguished",
               "are not six subjects" in p.stdout, p.stdout)
         check("and names B1's own refusal behaviour as the reason",
@@ -1957,6 +2059,101 @@ def test_commit_is_required_not_merely_compared() -> None:
                   "absence is not agreement" in out, out)
 
 
+# ── D300: the invocation chain, and what distinctness cannot see ───────
+
+def test_reciprocal_swap_is_caught() -> None:
+    """Six distinct digests, subjects reversed. The case that killed the
+    distinctness proposal."""
+    scenario("provenance: a reciprocal B1<->B3 swap is refused")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        recip = {"swap:memu-core.B1": ("memu-core", "B3"),
+                 "swap:memu-core.B3": ("memu-core", "B1")}
+        # First, the thing that makes this case interesting: after a
+        # RECIPROCAL swap the six digests are still all different, so a
+        # distinctness rule sees nothing wrong.
+        derived, ident = write_evidence(td, **recip)
+        seen = set()
+        for im in ("memu-core", "memu-graph"):
+            for br in ("B1", "B2", "B3"):
+                cap = (derived / f"{im}.{br}.events-stderr.jsonl").read_text()
+                for line in cap.splitlines():
+                    o = json.loads(line)
+                    for v in o.get("vertexes") or []:
+                        seen.add(v["digest"])
+        check("a reciprocal swap leaves six DISTINCT digests",
+              len(seen) == 6, str(len(seen)))
+        # ...and the invocation chain refuses it anyway. Tested with
+        # flag corroboration OFF, so the refusal cannot be coming from
+        # the one signal that may not exist on the real daemon.
+        noflag = dict(recip)
+        noflag["binding_rule"] = {"flags_in_vertex_name": False,
+                                  "full_instruction_in_vertex_name": True,
+                                  "digest_stable_across_invocations": True,
+                                  "netmode_changes_vertex_digest": True,
+                                  "run_id": TC_RUN, "tree_sha": TC_TREE}
+        code, out = summarise(six(), td, **noflag)
+        check("the reciprocal swap REFUSES without flag corroboration",
+              code != 0, out)
+        check("on the bytes the invocation recorded",
+              "not the bytes that build returned" in out, out)
+
+        # HARDER: swap the invocation RECORDS with the captures, so the
+        # byte hashes agree again. Only re-deriving the expected
+        # Dockerfile for the slot can tell the pair is reversed.
+        both = dict(recip)
+        both.update({"invswap:memu-core.B1": ("memu-core", "B3"),
+                     "invswap:memu-core.B3": ("memu-core", "B1")})
+        code, out = summarise(six(), td, **both)
+        check("swapping the records TOO still REFUSES", code != 0, out)
+        check("because the re-derived subject disagrees",
+              "was not given this subject" in out
+              or "names -f" in out or "names service" in out, out)
+
+
+def test_invocation_chain_links_are_each_load_bearing() -> None:
+    scenario("provenance: every link of subject->invocation->capture")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # a record naming another branch's Dockerfile
+        code, out = summarise(six(), td, **{
+            "dfsha:memu-graph.B2": "0" * 64})
+        check("a wrong derived-Dockerfile sha REFUSES", code != 0, out)
+        check("and says the build was not given this subject",
+              "was not given this subject" in out, out)
+        # a record whose stderr hash does not match the archived capture
+        code, out = summarise(six(), td, **{
+            "errsha:memu-core.B3": "0" * 64})
+        check("a wrong capture hash REFUSES", code != 0, out)
+        check("naming the file", "events-stderr.jsonl hashes to" in out, out)
+        # a missing invocation record is not "no objection"
+        derived, ident = write_evidence(td)
+        (ident / "item8-b1-memu-core.invocation.json").unlink()
+        code, out = summarise(six(), td, dirs=(derived, ident))
+        check("an ABSENT invocation record REFUSES", code != 0, out)
+        check("and says so", "invocation record unusable" in out, out)
+
+
+def test_two_subjects_may_not_be_one_step() -> None:
+    """Distinctness is corroboration, and corroboration still has to fire."""
+    scenario("structural: two subjects sharing a vertex digest is refused")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # The clean six first, so the refusal below means something.
+        code, out = summarise(six(), td)
+        check("six structurally distinct subjects qualify", code == 0, out)
+        # Now two of the six are the SAME step. That is either one
+        # capture copied into another's slot, or a derivation that
+        # produced identical subjects -- and neither is six subjects.
+        code, out = summarise(six(), td, **{
+            "samedigest:memu-graph.B2": ("memu-core", "B2")})
+        check("two subjects sharing a digest REFUSES", code == 4, out)
+        check("and both are named",
+              "memu-core/B2, memu-graph/B2" in out, out)
+        check("saying they are structurally the same step",
+              "structurally the same step" in out, out)
+
+
 def run_all() -> None:
     test_axis2_failure_leaves_axis1_standing()
     test_b3_requires_five_attempts()
@@ -2004,6 +2201,9 @@ def run_all() -> None:
     test_b1_outage_looks_exactly_like_b3()
     test_preflight_refuses_a_daemon_that_hides_run_flags()
     test_binding_rule_is_itself_admissible_evidence()
+    test_reciprocal_swap_is_caught()
+    test_invocation_chain_links_are_each_load_bearing()
+    test_two_subjects_may_not_be_one_step()
     test_commit_is_required_not_merely_compared()
     print(f"  inspected: {EXPECTED_SCENARIOS} verdict-layer scenario(s) "
           f"across 3 shipped entry points")

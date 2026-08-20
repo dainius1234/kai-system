@@ -707,6 +707,23 @@ DECLARED: Tuple[Toleration, ...] = (
         review_by="2026-11-01",
     ),
     Toleration(
+        workflow="item8-preflight.yml",
+        step="Record the toolchain this measurement ran under",
+        bucket=DOCUMENTED_SKIP,
+        reason="`set -uo pipefail` without `-e`, so a failed lookup leaves "
+               "an empty value rather than aborting the job. Same shape and "
+               "reason as the experiment's own toolchain step, declared "
+               "separately because the match is on (workflow, step). "
+               "NOTHING IS GATED BY IT: this record is provenance for a "
+               "MEASUREMENT of the instrument, not for the experiment -- "
+               "this workflow runs no subject build, writes no result row, "
+               "and cannot reach the frozen denominator. The measurement "
+               "itself is the step below, and it exits non-zero when the "
+               "daemon cannot support the evidence model. (D300)",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
         workflow="unified-hunter.yml",
         step="Report the surface that was exercised",
         bucket=DOCUMENTED_SKIP,

@@ -23613,3 +23613,150 @@ binding unavailable the whole run refuses before anything is built.
 * **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.**
 * **Frozen R2 unamended** across nine reviews.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D300 — Distinctness is a collision detector, not an identity
+
+**2026-08-20. Repair of D299 against the frozen contract. No amendment to
+frozen R2 `0055ead8…8796`. Nothing built. Neither sentinel exists.
+Stage 2 remains NOT AUTHORISED.**
+
+### 0. The R12 flag, and why my own remedy was wrong
+
+I raised R12 on D299: the claim engine bound subjects by the **rendered
+vertex name**, a cosmetic surface, while BuildKit's `digest` — the
+strongest structural signal in the stream — was read by the parser and
+used for nothing. That finding was accepted.
+
+**My proposed remedy was not, and the counterexample is decisive.**
+
+> B1 = digest A, B3 = digest B. **Swap** the captures: B1 = B, B3 = A.
+> Still perfectly distinct. Six different digests, test passes, subjects
+> reversed.
+
+"All six digests differ" proves six structurally different vertices were
+observed. It does not prove *this* digest belongs to B3. Presence versus
+identity, in a new costume, proposed by the person who has spent nine
+reviews learning to tell them apart.
+
+GPT also established two facts I had only inferred: BuildKit's `ExecOp`
+carries `network` as a real protobuf field, and a vertex digest
+checksums the definition graph through that vertex — so netmode
+*should* be structural. And one limit I had not considered at all:
+**BuildKit documents vertex-digest comparison as valid within a running
+solver**, not as a stable cross-invocation identity. Item 8 runs six
+separate builds.
+
+### 1. What is load-bearing now
+
+    SUBJECT DEFINITION → EXACT INVOCATION → HASH-BOUND CAPTURE → VERTEX
+
+The runner writes an invocation record the instant its build exits —
+service, image, branch, image ref, run, tree, commit, the derived
+Dockerfile's path and SHA, the flags it was given, and the SHA-256 of
+both captures. It **produces** that record; it certifies nothing.
+
+The summariser re-derives the expected Dockerfile from the **shipped**
+source, recomputes its SHA, recomputes both capture hashes from the
+archived bytes, and only then parses the capture and locates the target.
+The chain anchors at a file the runner does not write.
+
+### 2. The cosmetic dependency is gone
+
+D299 made `flags_in_vertex_name` a hard requirement — whether BuildKit
+*prints* `--network=none`. I said at the time it was more likely than
+not to fail, which would have blocked Item 8 for a rendering detail.
+
+Replaced by the **A/B/A structural differential**, measured on the real
+daemon:
+
+    A1  the command, default network        digest(A1) == digest(A2)
+    B   the same command, --network=none    digest(A1) != digest(B)
+    A2  the command again, default network
+
+Stated narrowly as **runner-local structural behaviour**, because we may
+qualify a behaviour experimentally and may not redefine somebody else's
+contract. The printed flag is still recorded and used as corroboration
+where present; it no longer gates.
+
+### 3. The measurement had no way to happen
+
+`preflight_buildkit_rawjson.py` existed only inside the experiment's own
+workflow, whose only trigger is the experiment's sentinel. "Measure
+first, decide later" was therefore impossible without first creating the
+sentinel that authorises the experiment.
+
+`.github/workflows/item8-preflight.yml` is that path. It runs seven
+non-subject builds, writes no result row, and **names neither the runner
+script, nor the deriver, nor the experiment's sentinel anywhere** — that
+absence is the control, and `grep` returns **0**.
+
+**Including in its own comments.** The first draft listed the forbidden
+paths in a comment explaining that they were forbidden — which would
+have made any grep for them match the prose describing the rule. That is
+R9's shape exactly, in a file written to prevent a second entry point.
+Caught and rewritten; the comment now describes them without quoting
+them.
+
+### 4. Three more fixture defects, same class as always
+
+* the fake docker emitted **one constant vertex digest for six builds**,
+  so every subject was structurally identical and the fake was weaker
+  than the daemon it models;
+* invocation records were generated from **post-swap disk state**, which
+  models a corruption nobody has — the runner writes its record the
+  moment its own build exits, so a later swap must break the hash;
+* the substitution fixtures asserted the **instruction** layer while the
+  **byte** layer now fires first.
+
+All three made a fixture that could not fail. That is now five separate
+occasions in this chain, and the tell is constant: the model is easier
+than the thing.
+
+### 5. Calibration and reinjection
+
+Instruments **77/0**. Verdict layer **388/0 across 50 scenarios**.
+
+| reinjected | result |
+|---|---|
+| invocation record not verified at all | **411/50 FAIL** |
+| capture bytes not rehashed | **455/6 FAIL** |
+| derived-Dockerfile SHA in the record not compared | **459/2 FAIL** |
+| preflight drops the A/B/A differential | **457/4 FAIL** |
+| digest distinctness corroboration removed | **461/0 — DID NOT FIRE** |
+
+**The last one is the finding.** Nothing in the calibration exercised
+the distinctness check, so it was a mechanism with no fixture — the
+thing I have twice said a weak reinjection reveals, this time as a
+*silent* one. A fixture was added (two subjects sharing a digest, both
+named, refused) and it now fires **462/3**.
+
+The reciprocal B1↔B3 swap is a permanent fixture and is proved to refuse
+**with flag corroboration switched off**, so the refusal cannot be
+coming from the one signal that may not exist on the real daemon.
+
+### 6. On the manifest, again
+
+Not built, for GPT's own reason: a manifest can hash incorrectly
+labelled bytes and faithfully preserve the wrong label. The invocation
+record is not a manifest — it binds to the **subject definition**, which
+is re-derived here from a file the runner never touches.
+
+### 7. State
+
+| | |
+|---|---|
+| instruments / verdicts | **77/0** · **388/0**, 50 scenarios |
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| mutation cardinality | **0/1/1** |
+| shipped Dockerfiles | **0** lines of diff |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+| the preflight sentinel | **ABSENT** |
+
+### Status
+
+* **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.** Zero subject builds.
+* **Frozen R2 unamended** across ten reviews.
+* A measurement path now exists and has **not** been authorised to run.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.

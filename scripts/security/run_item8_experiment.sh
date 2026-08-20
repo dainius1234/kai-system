@@ -222,6 +222,40 @@ print(json.dumps({"image":os.environ["IM"],"branch":os.environ["BR"],
     BUILD_RC=$?
     ELAPSED=$(( $(date +%s) - START ))
 
+    # ── THE INVOCATION RECORD: subject → invocation → exact capture ───
+    #
+    # Written IMMEDIATELY after the process that produced these two
+    # files exits, by the shell that opened those descriptors for that
+    # process. It ties the derived Dockerfile this build was given, the
+    # flags it was given, and the BYTES that came back.
+    #
+    # This exists because "the six digests are all different" is a
+    # collision detector, not an identity: swap two captures and they
+    # remain perfectly distinct while the subjects are reversed. Only a
+    # binding from the SUBJECT DEFINITION through the INVOCATION to the
+    # EXACT CAPTURE says which evidence belongs to which branch.
+    #
+    # The runner PRODUCES this. It does not certify it -- every field
+    # here is recomputed independently by the summariser, and the chain
+    # anchors at the SHIPPED Dockerfile, which the runner does not
+    # write. (D300)
+    SH() { python3 -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" "$1" 2>/dev/null || echo ABSENT; }
+    LB="$LABEL" IM2="$IMAGE" BR2="$BRANCH" RI="$RUN_ID" TS="$TREE_SHA" \
+      CS="$COMMIT_SHA" DS2="$DF_SHA" DFP="$DF" TG2="$TAG" IIDP="$IID" \
+      NC="${NOCACHE:-}" ES="$(SH "$EVENTS")" OS="$(SH "$EVENTS_OUT")" \
+      RC2="$BUILD_RC" python3 -c '
+import json,os
+e=os.environ
+print(json.dumps({"service":e["LB"],"image":e["IM2"],"branch":e["BR2"],
+ "image_ref":e["TG2"],"run_id":e["RI"],"tree_sha":e["TS"],
+ "commit_sha":e["CS"],
+ "derived_dockerfile_path":e["DFP"],"derived_dockerfile_sha256":e["DS2"],
+ "invocation":{"subcommand":"build","no_cache":bool(e["NC"]),
+               "progress":"rawjson","file":e["DFP"],"tag":e["TG2"],
+               "iidfile":e["IIDP"],"context":"."},
+ "events_stderr_sha256":e["ES"],"events_stdout_sha256":e["OS"],
+ "build_exit":int(e["RC2"])}))' > "${IDENT}/${LABEL}.invocation.json"
+
     # The target vertex is the HF retry loop, identified by its
     # instruction text -- which is the one legitimate use of the name:
     # asking WHICH STEP is the subject, never what happened in it.

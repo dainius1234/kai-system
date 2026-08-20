@@ -137,11 +137,39 @@ FROM {BASE}
 RUN echo {TARGET} && echo "{MARK} failing" && exit 7
 """
 
-# The flag probe. Its ONLY job is to reveal whether `--network=none`
-# survives into the vertex name on this daemon.
-FLAG_DOCKERFILE = f"""{SYNTAX}
+# THE A/B/A DIGEST DIFFERENTIAL.
+#
+# Not "does the flag appear in the rendered name" -- that is cosmetic,
+# and depending on it would very likely have blocked Item 8 for a reason
+# that has nothing to do with evidence quality.
+#
+# BuildKit's ExecOp carries `network` as a real field of the operation,
+# and a vertex digest is a checksum of the definition graph through that
+# vertex. So changing ONLY the network mode SHOULD change the structural
+# identity of the step. That is an inference, not a measurement, which is
+# exactly what this probe turns into a measurement:
+#
+#   A1  the command, default network
+#   B   the same command, --network=none
+#   A2  the command again, default network
+#
+#   digest(A1) == digest(A2)   the digest is stable across invocations
+#                              on THIS daemon
+#   digest(A1) != digest(B)    network mode changes structural identity
+#
+# Stated narrowly as RUNNER-LOCAL structural behaviour, because BuildKit
+# documents vertex-digest comparison as valid within a running solver and
+# does not license it as a universal cross-invocation identity. We may
+# qualify a behaviour experimentally; we may not redefine somebody else's
+# contract. (D300)
+ABA_BODY = f'echo {TARGET}-ABA && echo "{MARK} aba"'
+ABA_DEFAULT = f"""{SYNTAX}
 FROM {BASE}
-RUN --network=none echo {TARGET}-FLAGPROBE
+RUN {ABA_BODY}
+"""
+ABA_DENIED = f"""{SYNTAX}
+FROM {BASE}
+RUN --network=none {ABA_BODY}
 """
 
 
@@ -304,55 +332,76 @@ def main() -> int:
             if MARK not in "".join(t3.log):
                 failures.append("no runtime output was attributed to the "
                                 "failing target")
-        # ── 4: PROPERTY 6b — do RUN FLAGS survive into the name? ────
+        # ── 4: PROPERTY 7 — THE A/B/A STRUCTURAL DIFFERENTIAL ───────
         #
-        # Not a pass/fail. B1 and B3 of one image differ ONLY by
-        # `--network=none`, so this decides whether the claim engine can
-        # separate them by instruction text or must fall back to their
-        # disjoint Axis-1 criteria. Measured and archived either way,
-        # because assuming it in EITHER direction is the mistake.
-        rc4, err4, out4 = build(args.docker, ctx, FLAG_DOCKERFILE, "flag",
-                                no_cache=True)
+        # This is a PASS/FAIL, and it replaces the cosmetic
+        # "does the flag appear in the vertex name" dependency that
+        # D299 made load-bearing. B1 and B3 differ only by
+        # `--network=none`; the question is whether that difference is
+        # STRUCTURAL on this daemon, which is a different and far more
+        # likely thing than whether it is PRINTED.
+        #
+        # The stale comment that used to sit here said "not a pass/fail"
+        # while the code below it treated absence as fatal. GPT caught
+        # the contradiction. It is gone rather than reworded, because a
+        # comment that argues with its code is what the next reader
+        # believes. (D300)
+        digests = {}
+        aba_err = ""
+        for tag, df in (("aba1", ABA_DEFAULT), ("abab", ABA_DENIED),
+                        ("aba2", ABA_DEFAULT)):
+            _rc, _e, _o = build(args.docker, ctx, df, tag, no_cache=True)
+            tv, terr = target_of(_e, _o)
+            if terr:
+                aba_err = f"A/B/A probe {tag}: {terr}"
+                break
+            digests[tag] = tv.digest
+        if aba_err:
+            failures.append(aba_err)
+        observed["aba_digests"] = {k: v[:19] for k, v in digests.items()}
+        digest_stable = (len(digests) == 3
+                         and digests["aba1"] == digests["aba2"])
+        netmode_changes_digest = (len(digests) == 3
+                                  and digests["aba1"] != digests["abab"])
+        observed["digest_stable_across_invocations"] = digest_stable
+        observed["netmode_changes_vertex_digest"] = netmode_changes_digest
+        if len(digests) == 3 and not digest_stable:
+            failures.append(
+                "the same command built twice produced DIFFERENT target "
+                "vertex digests, so on this daemon a vertex digest is not "
+                "comparable across invocations and cannot corroborate "
+                "subject identity (property 7)")
+        if len(digests) == 3 and not netmode_changes_digest:
+            failures.append(
+                "--network=none did NOT change the target vertex digest, so "
+                "B1 and B3 of one image are structurally indistinguishable "
+                "on this daemon. They do not separate on outcome either: "
+                "B1's own control emits five retries, REFUSING TO BUILD and "
+                "a non-zero exit when upstream is unreachable. Six subjects "
+                "that cannot be distinguished are not six subjects "
+                "(property 7)")
+
+        # The rendered name is RECORDED, and no longer REQUIRED. It was a
+        # cosmetic dependency; the structural one above replaces it.
+        rc4, err4, out4 = build(args.docker, ctx, ABA_DENIED, "flag",
+                                no_cache=False)
         t4, e4 = target_of(err4, out4)
         flags_in_name = False
-        if e4:
-            failures.append(f"flag probe: {e4}")
-        else:
+        if not e4:
             flags_in_name = "--network=none" in EV.normalise_command(t4.name)
         observed["flags_in_vertex_name"] = flags_in_name
-        if not e4 and not flags_in_name:
-            # NOT A DEGRADED MODE. A FAILURE.
-            #
-            # B1 and B3 differ only by this flag, and their evidence does
-            # NOT otherwise separate them: memu-core/Dockerfile:92-107 --
-            # the UNMUTATED control -- retries five times, prints
-            # "REFUSING TO BUILD" and exits 1 when its genuine fetch
-            # cannot reach upstream. A B1 outage produces exactly B3's
-            # required shape, and an outage during B1 is a recognised
-            # possibility rather than a hypothetical.
-            #
-            # So without the flag this instrumentation cannot say WHICH
-            # frozen subject produced a capture. That is an unmeasured
-            # instrument capability, and the answer to an unmeasured
-            # capability is not to infer identity from the result.
-            failures.append(
-                "this daemon does not carry RUN flags in vertex names, so "
-                "B1 and B3 of one image cannot be told apart by their "
-                "instructions -- and they cannot be told apart by their "
-                "outcomes either, because B1's own control emits five "
-                "retries, REFUSING TO BUILD and a non-zero exit when "
-                "upstream is unreachable. Six subjects that cannot be "
-                "distinguished are not six subjects (property 6)")
         if not failures and args.emit_binding_rule:
             pathlib.Path(args.emit_binding_rule).write_text(json.dumps({
                 "flags_in_vertex_name": flags_in_name,
+                "digest_stable_across_invocations": digest_stable,
+                "netmode_changes_vertex_digest": netmode_changes_digest,
                 "full_instruction_in_vertex_name": True,
                 "measured_against": "a real daemon, by "
                                     "preflight_buildkit_rawjson.py",
                 "run_id": args.run_id, "tree_sha": args.tree_sha,
                 "longest_real_target_chars": pad}) + "\n")
     finally:
-        for tag in ("ok", "cached", "fail", "flag"):
+        for tag in ("ok", "cached", "fail", "flag", "aba1", "abab", "aba2"):
             subprocess.run([args.docker, "image", "rm", "-f",
                             f"kai-item8-preflight:{tag}"],
                            capture_output=True)
@@ -364,7 +413,7 @@ def main() -> int:
     for k, v in observed.items():
         print(f"  {k:<24} {v}")
     print()
-    print(f"  inspected: 4 non-subject build(s) across 6 required "
+    print(f"  inspected: 7 non-subject build(s) across 7 required "
           f"propert(ies) of --progress=rawjson")
 
     print()

@@ -1,0 +1,127 @@
+# ITEM 8 — INSTRUMENT QUALIFICATION ONLY. NOT THE EXPERIMENT.
+#
+# This measures whether the authorised runner's Docker/Buildx/BuildKit
+# behaves the way Item 8's claim engine assumes. It runs SEVEN
+# NON-SUBJECT builds and answers one question:
+#
+#   can this daemon distinguish and observe the six frozen subjects?
+#
+# ── WHY THIS IS A SEPARATE WORKFLOW ──────────────────────────────────
+#
+# The measurement had no execution path at all: preflight_buildkit_
+# rawjson.py existed only inside the experiment's own workflow, whose
+# only trigger is the experiment's sentinel. So "measure first, decide
+# later" was impossible without creating the sentinel that authorises
+# the experiment — the opposite of measuring first.
+#
+# ── WHAT THIS FILE MUST NEVER BE ABLE TO DO ──────────────────────────
+#
+# It must not be able to reach the denominator, and that ABSENCE is the
+# control rather than a promise: this file names neither the experiment
+# runner, nor the derivation script, nor the experiment's sentinel,
+# anywhere -- including in this comment.
+#
+# Spelling them out here to say they are forbidden would defeat the
+# check that looks for them: a grep would match the prose describing the
+# rule and report the very thing the rule forbids. That is R9's shape --
+# an instrument whose own presence changes what it measures -- and it is
+# why this paragraph describes them instead of quoting them.
+#
+# A second entry point that COULD start six irreversible builds is what
+# three reviews were spent eliminating. Confirm by grepping this file.
+#
+# It writes no result row, touches neither memu-core nor memu-graph, and
+# nothing it produces may be cited as evidence about the contingency.
+# Its output is evidence about the INSTRUMENT.
+#
+# ── AND IT IS STILL A DELIBERATE ACT ─────────────────────────────────
+#
+# `workflow_dispatch:` is absent here for the same reason it is absent
+# from the experiment: GitHub enables manual dispatch once a workflow
+# reaches the default branch, and a manual path is a second authority
+# nobody reviewed. A separate sentinel keeps "started by a deliberate
+# act, never by ordinary work" true for the measurement too.
+#
+# The preflight sentinel this file triggers on DOES NOT EXIST and must
+# not be created without the operator's explicit authorisation. (D300)
+name: Item 8 — rawjson instrument qualification (NOT the experiment)
+
+on:
+  push:
+    branches:
+      - claude/project-rework-plan-pgvp35
+    paths:
+      - kai-pm/ITEM8_PREFLIGHT_GO
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      # The instruments this measurement itself depends on. If the
+      # parser is broken, the measurement is meaningless.
+      - name: Item-8 instruments must pass calibration
+        run: |
+          set -euo pipefail
+          python3 scripts/test_item8_instruments.py
+          python3 scripts/test_item8_verdicts.py
+
+      # ci-toleration: documented-skip
+      - name: Record the toolchain this measurement ran under
+        run: |
+          set -uo pipefail
+          {
+            echo "docker_version=$(docker --version)"
+            echo "buildx_version=$(docker buildx version)"
+            echo "runner_os=$(uname -srm)"
+            echo "commit_sha=$(git rev-parse HEAD)"
+            echo "tree_sha=$(git rev-parse 'HEAD^{tree}')"
+            echo "run_id=${GITHUB_RUN_ID}"
+          } | tee item8-preflight-toolchain.txt
+
+      # THE MEASUREMENT. Exits non-zero if this daemon cannot support
+      # the evidence model, which is a RESULT and not a broken workflow
+      # -- but it is reported as a failure so nobody reads a red run as
+      # "inconclusive" and nobody reads a green one as permission.
+      - name: Measure rawjson behaviour on this daemon
+        run: |
+          set -uo pipefail
+          mkdir -p item8-preflight
+          python3 scripts/security/preflight_buildkit_rawjson.py \
+            --emit-binding-rule item8-preflight/binding-rule.json \
+            --run-id "${GITHUB_RUN_ID}" \
+            --tree-sha "$(git rev-parse 'HEAD^{tree}')" \
+            2>&1 | tee item8-preflight/preflight.log
+          rc="${PIPESTATUS[0]}"
+          echo "preflight exit: ${rc}"
+          exit "$rc"
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: item8-preflight-evidence
+          path: |
+            item8-preflight/
+            item8-preflight-toolchain.txt
+          if-no-files-found: warn
+
+      # SAID OUT LOUD, IN THE LOG, WHATEVER THE OUTCOME.
+      - name: This was a measurement, not an authorisation
+        if: always()
+        run: |
+          echo "This job measured the INSTRUMENT. It did not run Item 8."
+          echo "  subject builds run      : 0"
+          echo "  result rows written     : 0"
+          echo "  frozen denominator      : untouched"
+          echo "  Stage 2                 : NOT AUTHORISED"
+          echo "A passing measurement is evidence that the six builds"
+          echo "COULD be observed. It is not permission to run them."
