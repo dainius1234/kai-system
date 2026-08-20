@@ -127,6 +127,7 @@ import pathlib
 import sys
 
 _HERE = pathlib.Path(__file__).resolve().parent
+REPO = _HERE.parent.parent
 
 
 def _sibling(name: str):
@@ -144,6 +145,7 @@ def _sibling(name: str):
 
 _TC = _sibling("check_item8_toolchain")
 _EV = _sibling("parse_buildkit_events")
+_DV = _sibling("derive_item8_dockerfile")
 
 # The frozen target instruction and the frozen markers, in one place.
 TARGET = "for attempt in 1 2 3 4 5"
@@ -183,7 +185,8 @@ class Evidence:
 
     __slots__ = ("target", "runtime", "diagnostics", "unmet", "iid",
                  "identity", "binding", "offline_rc", "absence",
-                 "identity_err", "binding_err", "offline_err", "absence_err")
+                 "identity_err", "binding_err", "offline_err", "absence_err",
+                 "expected_command", "expected_flags", "binding_note")
 
     def __init__(self) -> None:
         self.target = None          # the BuildKit target vertex
@@ -202,6 +205,9 @@ class Evidence:
         self.binding_err = ""
         self.offline_err = ""
         self.absence_err = ""
+        self.expected_command = ""
+        self.expected_flags: list[str] = []
+        self.binding_note = ""
 
 
 def _json_one(path: pathlib.Path) -> tuple[dict | None, str]:
@@ -237,7 +243,8 @@ def _json_one(path: pathlib.Path) -> tuple[dict | None, str]:
 
 
 def subject_problems(rec: dict, kind: str, label: str, image_ref: str,
-                     run_id: str | None, tree_sha: str | None) -> list[str]:
+                     run_id: str | None, tree_sha: str | None,
+                     commit_sha: str | None = None) -> list[str]:
     """Is this record about THE SUBJECT, or merely in the right filename?
 
     The collectors already stamp `service`, `image_ref`, `commit_sha`,
@@ -261,12 +268,23 @@ def subject_problems(rec: dict, kind: str, label: str, image_ref: str,
         out.append(f"the {kind} record names tree "
                    f"{str(rec.get('tree_sha'))[:12]}, the toolchain names "
                    f"{tree_sha[:12]}")
+    # D297 said this function compared commit_sha. It did not — it
+    # compared four fields and the entry named five. The cheap repair is
+    # to make the mechanism match the statement rather than soften the
+    # statement, since the collectors already record the commit. (D298)
+    if (commit_sha is not None and rec.get("commit_sha") is not None
+            and rec.get("commit_sha") != commit_sha):
+        out.append(f"the {kind} record names commit "
+                   f"{str(rec.get('commit_sha'))[:12]}, the toolchain names "
+                   f"{commit_sha[:12]}")
     return out
 
 
 def load_evidence(image: str, branch: str, derived: pathlib.Path,
                   ident: pathlib.Path, run_id: str | None = None,
-                  tree_sha: str | None = None) -> Evidence:
+                  tree_sha: str | None = None,
+                  commit_sha: str | None = None,
+                  binding_rule: dict | None = None) -> Evidence:
     """Re-read the raw artefacts. No row is consulted anywhere here."""
     e = Evidence()
     label = f"item8-{branch.lower()}-{image}"
@@ -298,10 +316,99 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
                    f"contain events; their chronology relative to one "
                    f"another is unestablished")
         return e
-    target, err = _EV.find_target(bearing[0][1], TARGET)
-    if err:
-        e.unmet = f"{image}/{branch}: {err}"
+
+    # ── THE CAPTURE MUST BE THIS SUBJECT'S, NOT MERELY THIS FILENAME'S ─
+    #
+    # The target used to be found by `for attempt in 1 2 3 4 5`, which
+    # appears in ALL SIX derived Dockerfiles. So a memu-core/B3 capture
+    # copied under memu-graph/B3's name could satisfy memu-graph's five
+    # retries, refusal and vertex error, and nothing would notice --
+    # D297's own rule, one layer lower: a filename is not an identity.
+    #
+    # The subject is now re-derived from the SHIPPED Dockerfile, required
+    # to equal the archived derived file byte for byte, and its target
+    # instruction is what selects the vertex. Measured over the six:
+    # 13 of 15 pairs are separated by the command alone; the two that
+    # are not are B1 vs B3 within one image, which differ only by the
+    # RUN flag -- see the binding rule below. (D298)
+    src = REPO / image / "Dockerfile"
+    want_df = derived / f"Dockerfile.{image}.{branch}"
+    if not src.is_file():
+        e.unmet = f"the shipped {image}/Dockerfile is not in this tree"
         return e
+    if not want_df.is_file():
+        e.unmet = (f"no archived derived Dockerfile for {image}/{branch}; "
+                   f"the subject of this capture cannot be established")
+        return e
+    expect_text, _n, derr = _DV.derive(src.read_text(), branch)
+    if derr:
+        e.unmet = f"{image}/{branch} could not be re-derived: {derr}"
+        return e
+    if want_df.read_text() != expect_text:
+        e.unmet = (f"the archived derived Dockerfile for {image}/{branch} is "
+                   f"NOT what deriving the shipped {image}/Dockerfile "
+                   f"produces; the subject built is not the subject the "
+                   f"design specifies")
+        return e
+    run_text = _DV.find_target_run(expect_text)
+    if run_text is None:
+        e.unmet = (f"the derived Dockerfile for {image}/{branch} holds no "
+                   f"target RUN, so no vertex can be bound to it")
+        return e
+    full = _EV.normalise_command(run_text)
+    body, flags = _EV.strip_run_flags(full)
+    e.expected_command = body
+    e.expected_flags = flags
+
+    hits = [v for v in bearing[0][1].values()
+            if body in _EV.normalise_command(v.name)]
+    if not hits:
+        e.unmet = (f"no vertex in the {image}/{branch} capture carries this "
+                   f"subject's target instruction. The capture is not "
+                   f"evidence about {image}/{branch}, whatever it is filed "
+                   f"as")
+        return e
+    if len(hits) > 1:
+        e.unmet = (f"{len(hits)} vertices carry {image}/{branch}'s target "
+                   f"instruction; the subject must be unambiguous")
+        return e
+    target = hits[0]
+
+    # THE FLAG, WHEN THE DAEMON EXPOSES IT. B1 and B3 differ only by
+    # `--network=none`, and whether BuildKit keeps RUN flags in a vertex
+    # NAME is a property of the daemon that no amount of reasoning here
+    # settles. The preflight MEASURES it and archives the answer; this
+    # applies the strongest rule that measurement supports, and says
+    # plainly when it supports none.
+    seen = _EV.normalise_command(target.name)
+    if binding_rule is None:
+        e.unmet = ("no archived binding rule; the preflight that measures "
+                   "how this daemon represents RUN flags did not run, so "
+                   "the strength of the subject binding is unknown")
+        return e
+    if binding_rule.get("flags_in_vertex_name"):
+        for f in flags:
+            if f not in seen:
+                e.unmet = (f"this daemon carries RUN flags in vertex names, "
+                           f"and {image}/{branch} requires {f}, which this "
+                           f"capture's target does not have")
+                return e
+        for f in ("--network=none",):
+            if f in seen and f not in flags:
+                e.unmet = (f"the capture's target carries {f}, which "
+                           f"{image}/{branch} does not; this is another "
+                           f"branch's evidence")
+                return e
+    else:
+        # Stated, not implied. B1 and B3 within one image are the only
+        # pair this cannot separate, and they are separated instead by
+        # criteria that are mutually exclusive: B3 requires the target's
+        # own error, a refusal and five retries; B1 requires none of
+        # those plus an image and an offline load.
+        e.binding_note = ("this daemon does not carry RUN flags in vertex "
+                          "names, so B1 and B3 of one image are separated "
+                          "by their disjoint Axis-1 criteria rather than by "
+                          "the instruction text")
     e.target = target
     e.runtime = "".join(target.log)
 
@@ -317,7 +424,7 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
             e.identity_err = err
         elif e.identity:
             probs = subject_problems(e.identity, "identity", label,
-                                     image_ref, run_id, tree_sha)
+                                     image_ref, run_id, tree_sha, commit_sha)
             if probs:
                 e.identity, e.identity_err = None, "; ".join(probs)
         e.binding, err = _json_one(ident / f"{label}.executed.jsonl")
@@ -325,7 +432,7 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
             e.binding_err = err
         elif e.binding:
             probs = subject_problems(e.binding, "binding", label,
-                                     image_ref, run_id, tree_sha)
+                                     image_ref, run_id, tree_sha, commit_sha)
             if probs:
                 e.binding, e.binding_err = None, "; ".join(probs)
         off, err = _json_one(ident / f"{label}.offline.json")
@@ -333,7 +440,7 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
             e.offline_err = err
         elif off:
             probs = subject_problems(off, "offline-load", label, image_ref,
-                                     run_id, tree_sha)
+                                     run_id, tree_sha, commit_sha)
             if probs:
                 e.offline_err = "; ".join(probs)
             elif not isinstance(off.get("exit_status"), int):
@@ -347,7 +454,7 @@ def load_evidence(image: str, branch: str, derived: pathlib.Path,
             e.absence_err = err
         elif e.absence:
             probs = subject_problems(e.absence, "absence", label, image_ref,
-                                     run_id, tree_sha)
+                                     run_id, tree_sha, commit_sha)
             if probs:
                 e.absence, e.absence_err = None, "; ".join(probs)
     return e
@@ -710,11 +817,19 @@ def main() -> int:
     # anything. Those two are read exactly once each, to be COMPARED.
     derived_dir = pathlib.Path(args.derived_dir)
     ident_dir = pathlib.Path(args.identity_dir)
+
+    # HOW THIS DAEMON REPRESENTS A RUN, measured before build 1 and
+    # archived. Without it the STRENGTH of the subject binding below is
+    # unknown, and an unknown-strength binding is not one (R11).
+    binding_rule, br_err = _json_one(derived_dir / "binding-rule.json")
+    if br_err:
+        binding_rule = None
     derived: dict[tuple, tuple[str, str, str, str]] = {}
     disagreements: list[str] = []
     for image, branch in EXPECTED:
         ev = load_evidence(image, branch, derived_dir, ident_dir,
-                           tc_rec.get('run_id'), tc_rec.get('tree_sha'))
+                           tc_rec.get('run_id'), tc_rec.get('tree_sha'),
+                           tc_rec.get('commit_sha'), binding_rule)
         d1, why1 = derive_axis1(branch, ev)
         d2, why2 = derive_axis2(branch, ev)
         derived[(image, branch)] = (d1, why1, d2, why2)

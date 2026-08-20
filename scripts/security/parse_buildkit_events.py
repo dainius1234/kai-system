@@ -69,6 +69,7 @@ import argparse
 import base64
 import json
 import pathlib
+import re
 import sys
 
 
@@ -164,6 +165,40 @@ def parse(text: str, source: str = "stream"
             f"events were written to a DIFFERENT FILE DESCRIPTOR than the "
             f"one captured; none of those licenses a conclusion")
     return vertices, diagnostics, ""
+
+
+def normalise_command(text: str) -> str:
+    """A Dockerfile RUN and a BuildKit vertex name, in one shape.
+
+    A Dockerfile instruction is written across continued lines with
+    whatever indentation the author used; BuildKit's vertex name carries
+    the command after the parser has joined it, prefixed by a stage and
+    step counter. The only difference that matters for identity is the
+    text of the command, so both sides collapse to it: continuations
+    joined, every run of whitespace reduced to one space.
+
+    Deliberately NOT a fuzzy match. This is the minimum normalisation
+    that lets two representations of the same instruction compare equal,
+    and the real-daemon preflight exercises this exact function before
+    any subject build, because a normalisation that has only ever been
+    applied to modelled data is a model. (D298)
+    """
+    return " ".join(text.replace("\\\n", " ").split())
+
+
+def strip_run_flags(command: str) -> tuple[str, list[str]]:
+    """Split `RUN --network=none for attempt …` into flags and body.
+
+    BuildKit's dockerfile frontend consumes RUN flags into the LLB op;
+    whether they survive into the vertex NAME is a property of the
+    daemon, not something to assume in either direction. So the two
+    parts are separated here and the caller decides what it can require
+    — after the preflight has measured which is available.
+    """
+    m = re.match(r"^RUN ((?:--\S+ )*)(.*)$", command, re.S)
+    if not m:
+        return command, []
+    return m.group(2).strip(), m.group(1).split()
 
 
 def find_target(vertices: dict[str, Vertex], needle: str

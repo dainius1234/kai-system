@@ -214,8 +214,21 @@ jobs:
       # its position is the argument: a failure costs ZERO experimental
       # builds and leaves the frozen denominator untouched. Not an arm,
       # not a re-draw, not an R2 amendment. (D297)
+      #
+      # It also MEASURES how this daemon represents a RUN in a vertex
+      # name -- whether the whole instruction survives, and whether RUN
+      # FLAGS survive with it -- and archives the answer. The claim
+      # engine binds each capture to its subject by that instruction, so
+      # the strength of that binding is a property of the daemon and is
+      # measured rather than assumed in either direction. (D298)
       - name: rawjson must behave on THIS daemon before any subject build
-        run: python3 scripts/security/preflight_buildkit_rawjson.py
+        run: |
+          python3 scripts/security/preflight_buildkit_rawjson.py \
+            --emit-binding-rule item8-derived/binding-rule.json \
+            --run-id "${GITHUB_RUN_ID}" \
+            --tree-sha "$(git rev-parse 'HEAD^{tree}')"
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
 
       # SIX BUILDS, IN THE FROZEN ORDER. The runner script owns the
       # branch semantics; this step owns nothing but invoking it, so the

@@ -29,6 +29,13 @@ has, and proves the five properties the verdicts depend on:
     4. `cached` is readable and MOVES — false on a forced build, true on
        a repeat (a field that is always false measures nothing)
     5. a deliberately failing target carries its OWN `error`
+    6. **how this daemon represents a RUN in a vertex name** — whether
+       the full instruction survives, and whether RUN FLAGS survive with
+       it. That answer is archived, and the claim engine applies the
+       strongest subject binding it supports. B1 and B3 of one image
+       differ ONLY by `--network=none`, so whether that flag appears in
+       a vertex name decides whether they can be told apart by
+       instruction text at all. Reasoning about it is not measuring it.
 
 IT IS NOT AN EXPERIMENTAL ARM
 =============================
@@ -74,20 +81,64 @@ TARGET = "PREFLIGHT-TARGET-INSTRUCTION"
 MARK = "PREFLIGHT-RUNTIME-LINE"
 RUNTIME_EMISSIONS = 3
 
-# The instruction MENTIONS the marker once (in the echo it will run) and
-# the loop PRINTS it three times. A parser reading the vertex name would
-# say 1, or 4; only runtime attribution says 3. That is property 2, and
-# it is the same trap three earlier reviews found in the verdict layer.
-OK_DOCKERFILE = f"""{SYNTAX}
-FROM {BASE}
-RUN echo {TARGET} && for probe in 1 2 3; do \\
-      echo "{MARK} $probe"; \\
-    done
-"""
+def _longest_real_target() -> int:
+    """How long a command must be before this preflight means anything.
+
+    If BuildKit truncates long vertex names, the claim engine's
+    containment check fails on every subject and all six builds are
+    spent discovering it. So the preflight's own command is made AT
+    LEAST as long as the longest instruction the experiment will
+    actually present -- derived from the shipped Dockerfiles, not a
+    number kept beside them (R5).
+    """
+    spec = importlib.util.spec_from_file_location(
+        "derive_item8_dockerfile", _HERE / "derive_item8_dockerfile.py")
+    dv = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(dv)
+    longest = 0
+    for image in ("memu-core", "memu-graph"):
+        src = _HERE.parent.parent / image / "Dockerfile"
+        if not src.is_file():
+            continue
+        for branch in ("B1", "B2", "B3"):
+            text, _n, err = dv.derive(src.read_text(), branch)
+            if err:
+                continue
+            run = dv.find_target_run(text)
+            if run:
+                longest = max(longest, len(EV.normalise_command(run)))
+    return longest
+
+
+def _ok_dockerfile(pad_to: int) -> str:
+    """The instruction MENTIONS the marker once (in the echo it will run)
+    and the loop PRINTS it three times. A parser reading the vertex name
+    would say 1, or 4; only runtime attribution says 3. That is property
+    2, and it is the same trap three earlier reviews found in the
+    verdict layer, aimed at the toolchain instead of at the subject.
+    """
+    # Pad with echoes until the normalised command is at least as long
+    # as the longest real one. The padding is inert output, not a probe.
+    body = (f'echo {TARGET} && for probe in 1 2 3; do \\\n'
+            f'      echo "{MARK} $probe"; \\\n'
+            f'    done')
+    n = 0
+    while len(EV.normalise_command("RUN " + body)) < pad_to:
+        n += 1
+        body += f' \\\n    && echo "PREFLIGHT-PADDING-{n:03d}-xxxxxxxxxxxxxxxx"'
+    return f"{SYNTAX}\nFROM {BASE}\nRUN {body}\n"
+
 
 FAIL_DOCKERFILE = f"""{SYNTAX}
 FROM {BASE}
 RUN echo {TARGET} && echo "{MARK} failing" && exit 7
+"""
+
+# The flag probe. Its ONLY job is to reveal whether `--network=none`
+# survives into the vertex name on this daemon.
+FLAG_DOCKERFILE = f"""{SYNTAX}
+FROM {BASE}
+RUN --network=none echo {TARGET}-FLAGPROBE
 """
 
 
@@ -149,6 +200,11 @@ def main() -> int:
     ap.add_argument("--docker", default="docker")
     ap.add_argument("--keep", action="store_true",
                     help="leave the temporary context for inspection")
+    ap.add_argument("--emit-binding-rule", metavar="PATH",
+                    help="archive how this daemon represents a RUN, for the "
+                         "claim engine to apply")
+    ap.add_argument("--run-id", default="")
+    ap.add_argument("--tree-sha", default="")
     args = ap.parse_args()
 
     if shutil.which(args.docker) is None and not pathlib.Path(args.docker).exists():
@@ -161,8 +217,13 @@ def main() -> int:
     observed: dict = {}
     try:
         # ── 1: a forced build that SUCCEEDS ──────────────────────────
-        rc, err, out = build(args.docker, ctx, OK_DOCKERFILE, "ok",
-                             no_cache=True)
+        pad = _longest_real_target()
+        ok_df = _ok_dockerfile(pad)
+        ok_cmd = EV.normalise_command(
+            "RUN " + ok_df.split("\nRUN ", 1)[1])
+        observed["longest_real_target_chars"] = pad
+        observed["preflight_command_chars"] = len(ok_cmd)
+        rc, err, out = build(args.docker, ctx, ok_df, "ok", no_cache=True)
         t, e = target_of(err, out)
         if e:
             failures.append(f"forced build: {e}")
@@ -189,9 +250,24 @@ def main() -> int:
             if t.cached:
                 failures.append("the vertex reports `cached` on a "
                                 "--no-cache build (property 4)")
+            # PROPERTY 6a: does the WHOLE instruction survive into the
+            # vertex name? The claim engine binds a capture to its
+            # subject by containment of exactly this text, and a daemon
+            # that truncates long names would fail every subject after
+            # the denominator was spent.
+            seen = EV.normalise_command(t.name)
+            body, _flags = EV.strip_run_flags(ok_cmd)
+            observed["full_instruction_in_vertex_name"] = body in seen
+            if body not in seen:
+                failures.append(
+                    f"the vertex name does not carry the whole instruction "
+                    f"({len(body)} chars); the claim engine binds a capture "
+                    f"to its subject by exactly this containment, and on "
+                    f"this daemon it would fail for every branch. Name "
+                    f"seen: {seen[:160]!r}")
 
         # ── 2: the same build again, WITHOUT --no-cache ──────────────
-        rc2, err2, out2 = build(args.docker, ctx, OK_DOCKERFILE, "cached",
+        rc2, err2, out2 = build(args.docker, ctx, ok_df, "cached",
                                 no_cache=False)
         t2, e2 = target_of(err2, out2)
         if e2:
@@ -225,8 +301,32 @@ def main() -> int:
             if MARK not in "".join(t3.log):
                 failures.append("no runtime output was attributed to the "
                                 "failing target")
+        # ── 4: PROPERTY 6b — do RUN FLAGS survive into the name? ────
+        #
+        # Not a pass/fail. B1 and B3 of one image differ ONLY by
+        # `--network=none`, so this decides whether the claim engine can
+        # separate them by instruction text or must fall back to their
+        # disjoint Axis-1 criteria. Measured and archived either way,
+        # because assuming it in EITHER direction is the mistake.
+        rc4, err4, out4 = build(args.docker, ctx, FLAG_DOCKERFILE, "flag",
+                                no_cache=True)
+        t4, e4 = target_of(err4, out4)
+        flags_in_name = False
+        if e4:
+            failures.append(f"flag probe: {e4}")
+        else:
+            flags_in_name = "--network=none" in EV.normalise_command(t4.name)
+        observed["flags_in_vertex_name"] = flags_in_name
+        if not failures and args.emit_binding_rule:
+            pathlib.Path(args.emit_binding_rule).write_text(json.dumps({
+                "flags_in_vertex_name": flags_in_name,
+                "full_instruction_in_vertex_name": True,
+                "measured_against": "a real daemon, by "
+                                    "preflight_buildkit_rawjson.py",
+                "run_id": args.run_id, "tree_sha": args.tree_sha,
+                "longest_real_target_chars": pad}) + "\n")
     finally:
-        for tag in ("ok", "cached", "fail"):
+        for tag in ("ok", "cached", "fail", "flag"):
             subprocess.run([args.docker, "image", "rm", "-f",
                             f"kai-item8-preflight:{tag}"],
                            capture_output=True)
@@ -238,8 +338,15 @@ def main() -> int:
     for k, v in observed.items():
         print(f"  {k:<24} {v}")
     print()
-    print(f"  inspected: 3 non-subject build(s) across 5 required "
+    print(f"  inspected: 4 non-subject build(s) across 6 required "
           f"propert(ies) of --progress=rawjson")
+    if not failures and not observed.get("flags_in_vertex_name"):
+        print()
+        print("  NOTE: this daemon does not carry RUN flags in vertex names.")
+        print("  B1 and B3 of one image differ only by --network=none, so the")
+        print("  claim engine separates them by their disjoint Axis-1")
+        print("  criteria rather than by instruction text. Stated because it")
+        print("  is a real limit of the binding, not implied by silence.")
     print()
     if failures:
         for f in failures:

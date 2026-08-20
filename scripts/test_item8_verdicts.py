@@ -55,9 +55,22 @@ SUMMARISE = REPO / "scripts" / "security" / "summarise_item8.py"
 AUTHORITY = REPO / "scripts" / "security" / "check_item8_authority.py"
 PARSER = REPO / "scripts" / "security" / "parse_buildkit_events.py"
 
+
+def _mod(name):
+    import importlib.util
+    s = importlib.util.spec_from_file_location(
+        name, REPO / "scripts" / "security" / f"{name}.py")
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    return m
+
+
+PARSER_MOD = _mod("parse_buildkit_events")
+DERIVER = _mod("derive_item8_dockerfile")
+
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 38
+EXPECTED_SCENARIOS = 43
 executed: list[str] = []
 
 
@@ -113,7 +126,25 @@ def log(s, stream=None):
 def diag(s): print(s, file=sys.stderr)
 
 if argv and argv[0] == "build":
-    name = '[3/9] RUN for attempt in 1 2 3 4 5; do python fetch && exit 0; echo "retrying in 10s"; done; echo "REFUSING TO BUILD"'
+    # THE VERTEX NAME COMES FROM THE SUBJECT'S OWN DERIVED DOCKERFILE,
+    # exactly as BuildKit's would. A generic name here would let every
+    # fixture pass while the shipped claim engine binds on a specific
+    # one -- the fake being easier than the real thing, which is D294's
+    # defect in a new place. (D298)
+    import re as _re
+    _txt = open(_df).read() if _df else ""
+    _m = _re.search(r"^RUN (?:--\S+ )*for attempt in 1 2 3 4 5; do \\\s*$",
+                    _txt, _re.M)
+    if _m:
+        _s = _m.start(); _i = _s
+        for _l in _txt[_s:].splitlines(keepends=True):
+            _i += len(_l)
+            if not _l.rstrip("\n").endswith("\\"):
+                break
+        name = "[3/9] " + " ".join(
+            _txt[_s:_i].replace("\\\n", " ").split())
+    else:
+        name = "[3/9] RUN for attempt in 1 2 3 4 5; do :; done"
     cached = (mode == "cached_target")
     ev({"vertexes": [{"digest": DIG, "name": name, "cached": cached,
                       "started": None if mode == "never_started" else "t0"}]})
@@ -264,6 +295,7 @@ def toolchain_text(**over: str) -> str:
 TC_TEXT = toolchain_text()
 TC_SHA = hashlib.sha256(TC_TEXT.encode()).hexdigest()
 TC_TREE = git("rev-parse", "HEAD^{tree}")
+TC_COMMIT = git("rev-parse", "HEAD")
 TC_RUN = "555"
 TC_BASE = "sha256:" + "a" * 64
 
@@ -278,10 +310,19 @@ def run_runner(mode: str, td: Path,
     ident = td / "ident"
     derived.mkdir(exist_ok=True)
     ident.mkdir(exist_ok=True)
+    # REAL derived Dockerfiles: the claim engine re-derives them from the
+    # shipped sources and requires byte equality, so a stub would fail
+    # for a reason unrelated to the scenario under test.
     for image in ("memu-core", "memu-graph"):
         for branch in ("B1", "B2", "B3"):
-            (derived / f"Dockerfile.{image}.{branch}").write_text(
-                f"# derived {image} {branch}\nFROM scratch\n")
+            text, _n, err = DERIVER.derive(
+                (REPO / image / "Dockerfile").read_text(), branch)
+            assert not err, err
+            (derived / f"Dockerfile.{image}.{branch}").write_text(text)
+    (derived / "binding-rule.json").write_text(json.dumps(
+        {"flags_in_vertex_name": True,
+         "full_instruction_in_vertex_name": True,
+         "run_id": "555", "tree_sha": git("rev-parse", "HEAD^{tree}")}) + "\n")
     results = td / "results.jsonl"
     tool = td / "toolchain.txt"
     tool.write_text(toolchain_text() if toolchain is None else toolchain)
@@ -330,12 +371,32 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
     ident = td / "ev-identity"
     derived.mkdir(exist_ok=True)
     ident.mkdir(exist_ok=True)
-    name = ('[3/9] RUN for attempt in 1 2 3 4 5; do python fetch && exit 0; '
-            'echo "retrying in 10s"; done; echo "REFUSING TO BUILD"')
+    # THE VERTEX NAME IS NOW SUBJECT-SPECIFIC, because the claim engine
+    # binds a capture to its subject by the derived target instruction.
+    # A generic name would make every fixture pass for the wrong reason
+    # -- which is the defect this repair is about. (D298)
+    (derived / "binding-rule.json").write_text(json.dumps(
+        over.get("binding_rule",
+                 {"flags_in_vertex_name": True,
+                  "full_instruction_in_vertex_name": True,
+                  "run_id": TC_RUN, "tree_sha": TC_TREE})) + "\n")
+    names = {}
+    captures: dict = {}
+    for _im in ("memu-core", "memu-graph"):
+        for _br in ("B1", "B2", "B3"):
+            text, _n, err = DERIVER.derive(
+                (REPO / _im / "Dockerfile").read_text(), _br)
+            assert not err, err
+            (derived / f"Dockerfile.{_im}.{_br}").write_text(text)
+            run = DERIVER.find_target_run(text)
+            names[(_im, _br)] = "[3/9] " + PARSER_MOD.normalise_command(run)
     for image in ("memu-core", "memu-graph"):
         for branch in ("B1", "B2", "B3"):
             label = f"item8-{branch.lower()}-{image}"
             key = f"{image}.{branch}"
+            # `swap:<key>` files ANOTHER subject's capture under this
+            # subject's filename -- the exact corruption D298 closes.
+            name = names[(image, branch)]
             out = [_ev({"vertexes": [{"digest": DIGEST, "name": name,
                                       "cached": over.get(f"cached:{key}",
                                                          False),
@@ -389,7 +450,8 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
                 stamp = {"service": over.get(f"svc:{key}", label),
                          "image_ref": ref,
                          "run_id": over.get(f"run:{key}", TC_RUN),
-                         "tree_sha": over.get(f"tree:{key}", TC_TREE)}
+                         "tree_sha": over.get(f"tree:{key}", TC_TREE),
+                         "commit_sha": over.get(f"commit:{key}", TC_COMMIT)}
                 (ident / f"{label}.offline.json").write_text(json.dumps({
                     **stamp, "image": image, "branch": branch,
                     "exit_status": over.get(f"offline:{key}", 0)}) + "\n")
@@ -406,8 +468,17 @@ def write_evidence(td: Path, **over) -> tuple[Path, Path]:
                     "collected_image_id": IMAGE_ID,
                     "executed_image_id": over.get(f"execid:{key}",
                                                   IMAGE_ID)}) + "\n")
-            (derived / f"{key}.events-stderr.jsonl").write_text("".join(out))
+            captures[(image, branch)] = "".join(out)
             (derived / f"{key}.events-stdout.jsonl").write_text("")
+
+    # WRITTEN LAST, so `swap:` can file ANOTHER subject's WHOLE capture
+    # under this subject's name -- vertex name and runtime output
+    # together, which is what an accidental copy actually looks like.
+    for image in ("memu-core", "memu-graph"):
+        for branch in ("B1", "B2", "B3"):
+            key = f"{image}.{branch}"
+            src = over.get(f"swap:{key}", (image, branch))
+            (derived / f"{key}.events-stderr.jsonl").write_text(captures[src])
     return derived, ident
 
 
@@ -1611,7 +1682,129 @@ def test_preflight_refuses_without_a_daemon() -> None:
         check("and names the rawjson possibility",
               "--progress=rawjson" in p.stdout, p.stdout)
         check("and reports its own denominator",
-              "5 required propert" in p.stdout, p.stdout)
+              "6 required propert" in p.stdout, p.stdout)
+
+
+# ── D298: the raw BuildKit capture must be THIS subject's ──────────────
+
+def test_capture_is_bound_to_the_derived_subject() -> None:
+    """A filename is not an identity — one layer below D297."""
+    scenario("capture: a substituted BuildKit capture is refused")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # THE CASE GPT NAMED: memu-core/B3's capture filed as
+        # memu-graph/B3. Both have a five-attempt target, five retries,
+        # a refusal and a vertex error; only the derived instruction
+        # tells them apart.
+        code, out = summarise(six(), td,
+                              **{"swap:memu-graph.B3": ("memu-core", "B3")})
+        check("a cross-IMAGE substitution REFUSES", code != 0, out)
+        check("and says the capture is not evidence about that subject",
+              "is not evidence about memu-graph/B3" in out, out)
+
+        code, out = summarise(six(), td,
+                              **{"swap:memu-core.B2": ("memu-graph", "B2")})
+        check("the reverse cross-image substitution REFUSES", code != 0, out)
+        check("naming the subject it was filed as",
+              "not evidence about memu-core/B2" in out, out)
+
+        # B1's capture filed as B3, same image. On a daemon that carries
+        # RUN flags in vertex names this is caught by the instruction;
+        # the fixture's binding rule says it does.
+        code, out = summarise(six(), td,
+                              **{"swap:memu-core.B3": ("memu-core", "B1")})
+        check("a B1-for-B3 substitution REFUSES", code != 0, out)
+
+        # ...and it must ALSO refuse on a daemon that does NOT, where the
+        # separation falls to the disjoint Axis-1 criteria instead. This
+        # is the honest half: the binding is weaker there, and the
+        # refusal must not depend on the stronger rule being available.
+        code, out = summarise(
+            six(), td,
+            **{"swap:memu-core.B3": ("memu-core", "B1"),
+               "binding_rule": {"flags_in_vertex_name": False,
+                                "full_instruction_in_vertex_name": True,
+                                "run_id": TC_RUN, "tree_sha": TC_TREE}})
+        check("B1-for-B3 still REFUSES without flag binding", code != 0, out)
+        check("and the weaker binding is STATED, not implied",
+              "disjoint Axis-1 criteria" in out
+              or "no error on the target vertex" in out, out)
+
+
+def test_derived_dockerfile_must_be_the_re_derivation() -> None:
+    scenario("capture: the subject is re-derived from the shipped source")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        derived, ident = write_evidence(td)
+        (derived / "Dockerfile.memu-core.B1").unlink()
+        code, out = summarise(six(), td, dirs=(derived, ident))
+        check("an ABSENT derived Dockerfile REFUSES", code != 0, out)
+        check("and says the subject cannot be established",
+              "cannot be established" in out, out)
+
+        derived, ident = write_evidence(td)
+        f = derived / "Dockerfile.memu-graph.B2"
+        before = f.read_text()
+        after = before.replace("for attempt in 1 2 3 4 5",
+                               "for attempt in 1 2 3 4 5 6", 1)
+        assert after != before, "the tamper must actually change the file"
+        f.write_text(after)
+        code, out = summarise(six(), td, dirs=(derived, ident))
+        check("a TAMPERED derived Dockerfile REFUSES", code != 0, out)
+        check("and says it is not what the shipped source produces",
+              "NOT what deriving the shipped" in out, out)
+
+
+def test_binding_rule_must_have_been_measured() -> None:
+    """R11: an unknown-strength binding is not a binding."""
+    scenario("capture: no measured binding rule, no claim")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        derived, ident = write_evidence(td)
+        (derived / "binding-rule.json").unlink()
+        code, out = summarise(six(), td, dirs=(derived, ident))
+        check("a missing binding rule REFUSES", code != 0, out)
+        check("and says the preflight did not run",
+              "did not run" in out, out)
+        check("naming the strength as unknown, not assuming it",
+              "strength of the subject binding is unknown" in out, out)
+
+
+def test_generic_loop_alone_does_not_bind() -> None:
+    """The old anchor matched all six. It must no longer be sufficient."""
+    scenario("capture: the generic retry loop is not a subject")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        derived, ident = write_evidence(td)
+        # A capture whose target carries the GENERIC anchor and nothing
+        # else. This satisfied the old selector for every branch.
+        import base64 as b64
+        generic = json.dumps({"vertexes": [{
+            "digest": DIGEST,
+            "name": "[3/9] RUN for attempt in 1 2 3 4 5; do :; done",
+            "started": "t0"}]}) + "\n"
+        generic += json.dumps({"logs": [{"vertex": DIGEST, "stream": 1,
+                                         "data": b64.b64encode(
+                                             b"BAKED ok\n").decode()}]}) + "\n"
+        (derived / "memu-core.B1.events-stderr.jsonl").write_text(generic)
+        code, out = summarise(six(), td, dirs=(derived, ident))
+        check("the generic loop alone does NOT bind", code != 0, out)
+        check("and says no vertex carries this subject's instruction",
+              "carries this subject's target instruction" in out, out)
+
+
+def test_commit_is_compared_as_D297_said_it_was() -> None:
+    scenario("evidence: commit_sha is compared, matching the statement")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        derived, ident = write_evidence(td)
+        f = ident / "item8-b1-memu-core.jsonl"
+        rec = json.loads(f.read_text())
+        rec["commit_sha"] = "0" * 40
+        f.write_text(json.dumps(rec) + "\n")
+        code, out = summarise(six(), td, dirs=(derived, ident))
+        check("a record from another COMMIT does NOT qualify", code != 0, out)
+        check("and the commit is named", "names commit" in out, out)
 
 
 def run_all() -> None:
@@ -1653,6 +1846,11 @@ def run_all() -> None:
     test_one_subject_one_record()
     test_offline_observation_is_a_stamped_record()
     test_preflight_refuses_without_a_daemon()
+    test_capture_is_bound_to_the_derived_subject()
+    test_derived_dockerfile_must_be_the_re_derivation()
+    test_binding_rule_must_have_been_measured()
+    test_generic_loop_alone_does_not_bind()
+    test_commit_is_compared_as_D297_said_it_was()
     print(f"  inspected: {EXPECTED_SCENARIOS} verdict-layer scenario(s) "
           f"across 3 shipped entry points")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",

@@ -80,7 +80,41 @@ BRANCHES = {"B1": 0, "B2": 1, "B3": 1}
 IMAGES = ("memu-core", "memu-graph")
 
 # The HF-fetching instruction opens with this, in both Dockerfiles.
+#
+# UNCHANGED, deliberately. This anchor runs against SHIPPED sources, and
+# its strictness is what makes the mutation cardinality meaningful: if
+# it also matched a flagged RUN it could match a file this experiment had
+# already derived, and a derivation of a derivation would satisfy the
+# same assertions while being a different thing.
 _RETRY_OPEN = re.compile(r"^RUN for attempt in 1 2 3 4 5; do \\\s*$", re.M)
+
+# ── THE SAME INSTRUCTION, LOCATED IN A *DERIVED* FILE ────────────────
+#
+# B3's derived Dockerfile carries `RUN --network=none for attempt …`, so
+# the shipped-source anchor above does not match it -- correctly, since
+# that anchor's job is to find something to derive FROM.
+#
+# The claim engine needs the opposite direction: given an archived
+# derived Dockerfile, which instruction is the subject? That is this,
+# and it is here rather than in the summariser so there is exactly ONE
+# statement in the tree of what Item 8's target instruction looks like.
+# (D298)
+_TARGET_OPEN = re.compile(
+    r"^RUN (?:--\S+ )*for attempt in 1 2 3 4 5; do \\\s*$", re.M)
+
+
+def find_target_run(text: str) -> str | None:
+    """The whole target RUN of a DERIVED Dockerfile, verbatim."""
+    m = _TARGET_OPEN.search(text)
+    if not m:
+        return None
+    start = m.start()
+    idx = start
+    for line in text[start:].splitlines(keepends=True):
+        idx += len(line)
+        if not line.rstrip("\n").endswith("\\"):
+            break
+    return text[start:idx]
 
 # NO INSTRUMENTATION MARKERS. An earlier repair added
 # `ITEM8-MARK ATTEMPT=$attempt` to all three branches, because the

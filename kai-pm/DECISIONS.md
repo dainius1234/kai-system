@@ -23377,3 +23377,127 @@ reaches for `--force` and loses work.
 * **Frozen R2 unamended** across seven reviews.
 * Awaiting the final execution-readiness review.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D298 — Execution-readiness review: the last filename standing in for an identity
+
+**2026-08-20. Repair of D297 against the frozen contract. No amendment to
+frozen R2 `0055ead8…8796`. No redesign. Nothing built. `kai-pm/ITEM8_GO`
+still does not exist. Stage 2 remains NOT AUTHORISED.**
+
+D297 established that a filename is not an identity — and applied that
+rule to the JSON evidence records while leaving the **raw BuildKit
+capture**, the single most important Axis-1 evidence, selected by
+filename and matched on a substring present in all six subjects.
+
+### 1. The corruption that nothing detected
+
+`load_evidence` opened `<image>.<branch>.events-*` and found the target
+by `for attempt in 1 2 3 4 5`. **Measured: that string appears in all
+six derived Dockerfiles.** So `memu-core/B3`'s capture, filed under
+`memu-graph/B3`'s name, could satisfy memu-graph's five retries, refusal
+and vertex error — with memu-graph's own stamped absence record still
+perfectly correct, because it is a different artefact about a different
+thing.
+
+The subject is now **re-derived from the shipped Dockerfile**, required
+to equal the archived derived file byte for byte, and its target
+instruction is what selects the vertex.
+
+### 2. What that binding can and cannot do — measured, not assumed
+
+| | |
+|---|---|
+| pairs separated by the instruction alone | **13 of 15** |
+| pairs it cannot separate | **B1↔B3 within one image** |
+
+B1 and B3 differ **only** by `--network=none`, and BuildKit's dockerfile
+frontend consumes RUN flags into the LLB op — whether they survive into
+the vertex *name* is a property of the daemon. I could not settle it
+here, and reasoning about it is not measuring it.
+
+So the preflight **measures** it and archives the answer, and the claim
+engine applies the strongest rule that measurement supports:
+
+* flags in vertex names → full six-way binding by instruction text;
+* not → **stated in the output**, and B1/B3 are separated by their
+  disjoint Axis-1 criteria (B3 requires the target's own error, a
+  refusal and five retries; B1 requires none of those plus an image and
+  an offline load).
+
+Both paths are fixtures. The weaker one is *stated*, not implied by
+silence, which is the difference between a limit and a blind spot.
+
+### 3. The preflight grew a sixth property, and a length
+
+It also now proves the **whole instruction** survives into the vertex
+name — because the binding is containment of exactly that text, and a
+daemon that truncates long names would fail every subject *after* the
+denominator was spent. Its own command is padded to at least the length
+of the longest real derived RUN, **derived from the shipped Dockerfiles**
+rather than a number kept beside them (R5).
+
+### 4. commit_sha: making the mechanism match the statement
+
+D297 said every identity record was checked against commit, tree and
+run. It checked **four** fields and the entry named five. GPT caught the
+discrepancy. Rather than soften the sentence, the comparison was added —
+the collectors already record the commit, so it was cheap.
+
+~~D297 §2, "expected service, expected image ref, and the run and tree"~~
+stands as written; what was wrong was the *implication* elsewhere in that
+entry that the commit was among them. Corrected here rather than edited
+there.
+
+### 5. Two fixture defects, of the class this chain keeps finding
+
+Both surfaced from my own new fixtures failing:
+
+* the substitution fixture swapped only the vertex **name**, leaving the
+  right runtime content underneath — a corruption that cannot fail;
+* the tamper fixture replaced a string **that does not occur** in the
+  file, so it tampered with nothing.
+
+A fixture that cannot fail is worse than no fixture, because it reports
+coverage. Both now substitute or alter the real thing, and the B1-for-B3
+case refuses under both binding rules.
+
+### 6. Calibration and reinjection
+
+Instruments **77/0**. Verdict layer **346/0 across 43 scenarios**.
+
+| reinjected | result |
+|---|---|
+| target selected by the generic loop again | **417/6 FAIL** |
+| archived derived Dockerfile not re-derived | **421/2 FAIL** |
+| binding rule not required | **421/2 FAIL** |
+| commit_sha not compared again | **421/2 FAIL** |
+| all reverted | **423/0 PASS** |
+
+### 7. On the manifest, which I did not build
+
+GPT asked whether one was wanted and answered it in the same breath: a
+manifest can hash incorrectly labelled bytes and faithfully preserve the
+wrong label. Byte integrity is not subject identity. The binding above
+is to the **derived subject**, which is the thing a manifest would have
+had to name correctly anyway. A manifest remains available later as a
+tamper-integrity layer; it is not this repair.
+
+### 8. State
+
+| | |
+|---|---|
+| instruments / verdicts | **77/0** · **346/0**, 43 scenarios |
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| mutation cardinality | **0/1/1** |
+| shipped Dockerfiles | **0** lines of diff |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+
+### Status
+
+* **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.**
+* **Frozen R2 unamended** across eight reviews.
+* The next artefact, if the review clears, is `kai-pm/ITEM8_GO` — and
+  that is the **operator's** act, not mine and not a reviewer's.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
