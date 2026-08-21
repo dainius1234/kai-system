@@ -241,37 +241,20 @@ def find_target_run(text: str) -> str | None:
 # removed, and with it the question of whether it counted against the
 # frozen mutation cardinality. (D293)
 
-# B2's marker carries NO INTERPOLATED VALUE, and that is deliberate.
+# NO TREATMENT LOGIC LIVES HERE.
 #
-# An earlier version emitted `ITEM8-B2-INJECTED-ATTEMPT=\$attempt`,
-# intending the shell to expand the loop variable at runtime. It does
-# not: inside a double-quoted string a backslash before `$` SUPPRESSES
-# parameter expansion, so the real container printed the literal text
-# `$attempt`. The calibration's fake docker, meanwhile, manufactured
-# `=1` -- so the fixture proved a behaviour the shipped derivation did
-# not implement, and the fake was semantically BETTER than the real
-# command path. Measured against /bin/sh, not reasoned about. (D294)
+# A copy of the B2 shim ended up in this module when code was moved to
+# break a dependency edge, while the deriver kept its own. Two
+# definitions of one treatment is D272's shape, and moving code to
+# satisfy a reachability gate is not a licence to duplicate it -- the
+# gate would then be enforcing a boundary by creating a drift.
 #
-# The number is not needed. The shim's own control flow guarantees the
-# injected branch is the FIRST iteration: the sentinel file cannot exist
-# before it is created. So the marker is a constant, single-quoted so no
-# shell touches it, and the criterion is "exactly one occurrence".
-# Another interpolation argument deleted rather than won.
-#
-# B2's shim. `attempt` is the shell loop variable; on the FIRST iteration
-# the sentinel is absent, so we create it and return failure without ever
-# running the real command. Every later iteration finds it and runs the
-# genuine fetch. Written as a file test rather than a numeric comparison
-# on ${attempt} because Docker substitutes ${attempt} -- which is not a
-# build arg -- to the empty string before the shell sees it, a defect
-# already documented at memu-graph/Dockerfile:105-109.
-_B2_SHIM = ("if [ ! -f /tmp/item8-b2-first-attempt-consumed ]; then \\\n"
-            "        touch /tmp/item8-b2-first-attempt-consumed; \\\n"
-            "        echo 'ITEM8-B2-INJECTED-FIRST-ATTEMPT'; \\\n"
-            "        false; \\\n"
-            "      else \\\n"
-            "        {REAL}; \\\n"
-            "      fi")
+# This module owns the shared TARGET LOCATOR, because locating an
+# instruction is a property of reading a build. Producing the six
+# subjects belongs to the deriver and nowhere else -- named by role,
+# not by filename, because the reachability gate counts a mention as a
+# reference on purpose and a comment explaining the rule must not trip
+# it. Third time that shape has appeared in this chain. (D302)
 
 
 def find_target(vertices: dict[str, Vertex], needle: str

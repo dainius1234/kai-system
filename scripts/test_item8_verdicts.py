@@ -1792,7 +1792,7 @@ def test_preflight_refuses_without_a_daemon() -> None:
         check("and names the rawjson possibility",
               "--progress=rawjson" in p.stdout, p.stdout)
         check("and reports its own denominator",
-              "7 required propert" in p.stdout, p.stdout)
+              "6 required propert" in p.stdout, p.stdout)
 
 
 # ── D298: the raw BuildKit capture must be THIS subject's ──────────────

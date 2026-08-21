@@ -23882,3 +23882,135 @@ Preflight **19/0** · instruments **77/0** · verdict layer **406/0**.
 * **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.** No measurement has run.
 * **Frozen R2 unamended** across eleven reviews.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D302 — Two of these would have stopped the experiment starting at all
+
+**2026-08-20. Repair of D301 against the frozen contract. No amendment to
+frozen R2 `0055ead8…8796`. No redesign. Nothing built. Neither sentinel
+exists. Stage 2 remains NOT AUTHORISED.**
+
+Seven findings. The two that matter most were not about evidence
+quality — they were about the experiment being unable to run, or running
+and throwing its own qualification away.
+
+### 1. The main workflow could not have satisfied its own guard
+
+`item8-network-contingency.yml` used plain `actions/checkout@v4`.
+`actions/checkout` fetches **one commit** by default, and the authority
+guard asks git for the reviewed **parent** — its commit, its tree, and
+whether HEAD is a direct child of it.
+
+So the guard would have refused for want of *history* rather than want
+of *authority*, and the experiment could not have started. The
+standalone workflow already had `fetch-depth: 2`; the one that matters
+did not, because I added the control to the new path and never re-read
+the old one.
+
+### 2. The experiment-time preflight was deleting its own evidence
+
+`--keep` and `--workdir` were added to the standalone workflow only. The
+experiment's own qualification step therefore ran, concluded, wrote
+`binding-rule.json`, and **destroyed the captures the conclusion came
+from** — a conclusion with its observation thrown away, which is the
+shape R10 exists to stop.
+
+And the standalone measurement cannot cover for it: GitHub runners are
+ephemeral, so the daemon that was measured is not the daemon that builds
+the six subjects. Now `--workdir item8-derived/preflight-captures
+--keep`, inside the uploaded package.
+
+### 3. The reachability gate was not transitive
+
+`check_preflight_reachability.py` matched literal `scripts/….py` strings.
+Ordinary Python —
+
+    import derive_item8_dockerfile
+    from derive_item8_dockerfile import derive
+
+— contains neither pattern. **The gate written to forbid a dependency
+could not see the most normal way of creating one.** A check whose scope
+is smaller than its name (R5), inside the instrument built to enforce a
+boundary, one round after I claimed that boundary was structural.
+
+Now real AST import resolution, including the
+`spec_from_file_location` form this codebase uses. It caught two things
+at once:
+
+* my own new comment naming the deriver **while explaining that naming
+  it was forbidden** — R9's shape, the third occurrence in this chain;
+* the closure was counting paths that exist only as **string literals in
+  my own calibration**, including files that do not exist. A reference
+  to an absent file is now reported separately and never traversed —
+  the instrument was measuring its own test's prose.
+
+### 4. The corroborator could still stop the run through the back door
+
+D301 made an unstable digest non-fatal. But if the A/B/A probe could not
+be *measured at all*, `aba_err` was appended to `failures`. "We could not
+obtain the corroboration" and "a required property failed" are different
+facts, and collapsing them reinstates the promotion D301 removed from
+the front door. Now `DIGEST CORROBORATION = UNRESOLVED`, with the reason
+printed.
+
+### 5. A treatment definition had been duplicated to satisfy a gate
+
+Moving code to break a dependency edge left a second `_B2_SHIM` in the
+parser while the deriver kept its own. Two definitions of one treatment
+is D272's shape, and **satisfying a boundary check is not a licence to
+create a drift**. Removed. The parser owns the shared locator; producing
+the six subjects belongs to one module.
+
+### 6. The authority guard had never been seen to say yes
+
+Every authority fixture in eleven reviews was a refusal. **A guard that
+always refused would have satisfied all of them** — rule 15 upside down,
+and it would have been discovered by the operator creating a sentinel
+and watching the run stop for no reason they could see.
+
+Proved in a throwaway clone, so a real commit adds a real sentinel to a
+real history and **no sentinel is ever created here**: the correct
+preflight envelope is ACCEPTED, the same envelope REFUSES on the
+experiment path, and attempt 2 of the accepted case refuses.
+
+### 7. And the prose still described the overruled rule
+
+Properties are now 1-6 REQUIRED, 7 corroboration; "PASS/FAIL" is gone
+from the digest section; the denominator says 6; and the success line no
+longer reads *"the six frozen builds may proceed"* — a measurement that
+ends by announcing what may now proceed is a measurement quietly issuing
+permission. It says **PREFLIGHT PASS IS EVIDENCE, NOT EXECUTION
+AUTHORITY.**
+
+### 8. Calibration and reinjection
+
+Preflight **37/0** · instruments **77/0** · verdict layer **406/0**.
+
+| reinjected | result |
+|---|---|
+| reachability sees only literal paths again | **507/3 FAIL** |
+| absent references counted as reachable again | **514/1 FAIL** |
+| an unmeasurable digest probe fails the preflight | **517/3 FAIL** |
+| all reverted | **520/0 PASS** |
+
+**The third one was silent on its first run — 515/0.** That is the third
+uncovered repair in two patches, and the tell is identical each time: I
+repair the mechanism and do not ask what would now fail if I removed it.
+The fixture came after the reinjection, not before, and it should be the
+other way round.
+
+### 9. State
+
+| | |
+|---|---|
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| reachability | closure of 5, forbidden set unreachable |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+| `kai-pm/ITEM8_PREFLIGHT_GO` | **ABSENT** |
+
+### Status
+
+* **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.** No measurement has run.
+* **Frozen R2 unamended** across twelve reviews.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.

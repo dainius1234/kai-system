@@ -20,9 +20,9 @@ wrote to the wrong file descriptor and every fixture passed.
 
 So this runs the real command path — same flags, same parser, same
 capture — on whatever Docker and buildx the authorised runner actually
-has. Properties 1-5 are REQUIRED -- the verdict layer cannot
-read a capture without them. Properties 6-7 are MEASURED AND
-RECORDED, and the claim engine applies whatever they support:
+has. Properties 1-6 are REQUIRED -- the verdict layer cannot
+read a capture without them. Property 7 is MEASURED AND
+RECORDED, corroboration only:
 
     1. the target vertex is identifiable by its instruction text
     2. runtime output is attributed to it, and the INSTRUCTION's own
@@ -63,8 +63,14 @@ If it fails, **zero Item-8 builds have been spent** and the frozen
 denominator is untouched. That is the whole point of its position in the
 workflow.
 
+A PASS IS EVIDENCE, NOT EXECUTION AUTHORITY. It says this daemon can
+be read; it does not say anything may be built. The sentinel is a
+separate act by a separate party, and a measurement that ends by
+announcing what may now proceed is a measurement quietly issuing
+permission. (D302)
+
 Exit 0 = the toolchain on this runner behaves as the verdict layer
-         assumes. The six builds may proceed.
+         assumes. Nothing is thereby authorised.
 Exit 1 = it does not. STOP. Nothing has been consumed.
 Exit 2 = the preflight itself could not run (no docker, no workspace).
 """
@@ -358,7 +364,7 @@ def main() -> int:
                                 "failing target")
         # ── 4: PROPERTY 7 — THE A/B/A STRUCTURAL DIFFERENTIAL ───────
         #
-        # This is a PASS/FAIL, and it replaces the cosmetic
+        # CORROBORATION, NOT PASS/FAIL. It replaces the cosmetic
         # "does the flag appear in the vertex name" dependency that
         # D299 made load-bearing. B1 and B3 differ only by
         # `--network=none`; the question is whether that difference is
@@ -381,7 +387,19 @@ def main() -> int:
                 break
             digests[tag] = tv.digest
         if aba_err:
-            failures.append(aba_err)
+            # NOT A FAILURE. "The corroboration could not be obtained" and
+            # "a required property is broken" are different facts, and
+            # collapsing them lets a corroborator stop the run through
+            # the back door -- the same promotion D301 removed from the
+            # front door.
+            #
+            # If the A/B/A probe failed for a reason that IS a required
+            # property, properties 1-6 above have already recorded it
+            # against that property, on their own builds. What is left
+            # here is only "we could not measure the corroborator", and
+            # the answer to that is to say so. (D302)
+            observed["digest_corroboration"] = "UNRESOLVED"
+            observed["digest_corroboration_why"] = aba_err
         observed["aba_digests"] = {k: v[:19] for k, v in digests.items()}
         digest_stable = (len(digests) == 3
                          and digests["aba1"] == digests["aba2"])
@@ -459,7 +477,7 @@ def main() -> int:
     for k, v in observed.items():
         print(f"  {k:<24} {v}")
     print()
-    print(f"  inspected: 7 non-subject build(s) across 7 required "
+    print(f"  inspected: 7 non-subject build(s) across 6 required "
           f"propert(ies) of --progress=rawjson")
 
     print()
@@ -480,7 +498,8 @@ def main() -> int:
     print("PASS: rawjson on THIS daemon separates instruction from runtime, "
           "reports execution and cache state, and attributes a failing "
           "step's error to that step.")
-    print("The six frozen builds may proceed.")
+    print("PREFLIGHT PASS IS EVIDENCE, NOT EXECUTION AUTHORITY. It says "
+          "this daemon can be read; it authorises nothing.")
     return 0
 
 

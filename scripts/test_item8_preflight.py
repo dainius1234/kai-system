@@ -44,13 +44,15 @@ import tempfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+REACH = (REPO / "scripts" / "security"
+         / "check_preflight_reachability.py")
 PREFLIGHT = REPO / "scripts" / "security" / "preflight_buildkit_rawjson.py"
 PARSER = REPO / "scripts" / "security" / "parse_buildkit_events.py"
 AUTHORITY = REPO / "scripts" / "security" / "check_item8_authority.py"
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 5
+EXPECTED_SCENARIOS = 9
 executed: list[str] = []
 
 
@@ -109,6 +111,19 @@ if argv and argv[0] == "build":
     sys.exit(7 if failing else 0)
 sys.exit(0)
 '''
+
+
+# A daemon on which the CORROBORATOR CANNOT BE MEASURED AT ALL: the
+# A/B/A probes return no target vertex, while every REQUIRED property is
+# still satisfied by the builds that prove them. "We could not measure
+# the corroborator" and "a required property failed" are different
+# facts, and collapsing them let a corroborator stop the run through the
+# back door. (D302)
+ABA_BLIND_DOCKER = FLAT_DOCKER.replace(
+    'ev({"vertexes": [{"digest": D, "name": "[2/2] RUN " + cmd,',
+    'if "-ABA" in cmd:\n'
+    '        sys.exit(0)\n'
+    '    ev({"vertexes": [{"digest": D, "name": "[2/2] RUN " + cmd,')
 
 
 def run_preflight(docker: Path, *extra: str) -> tuple[int, str]:
@@ -220,12 +235,173 @@ def test_preflight_authority_is_a_separate_envelope() -> None:
               p.stdout)
 
 
+# ── D302: the reachability gate at the right altitude ──────────────────
+
+def test_reachability_follows_real_python_imports() -> None:
+    """A gate that matched only literal paths could not see `import X`."""
+    scenario("reachability: an ordinary import is a dependency edge")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        # THE HOSTILE CHAIN GPT NAMED: workflow -> A -> B -> a plain
+        # Python import of a forbidden module. No literal "scripts/....py"
+        # string anywhere in it, which is exactly what the first version
+        # of this gate keyed on.
+        sec = REPO / "scripts" / "security"
+        a = sec / "_probe_reach_a.py"
+        b = sec / "_probe_reach_b.py"
+        wf = REPO / ".github" / "workflows" / "_probe-reach.yml"
+        try:
+            a.write_text("import _probe_reach_b\n")
+            b.write_text("import derive_item8_dockerfile\n")
+            wf.write_text("jobs:\n  x:\n    steps:\n      - run: "
+                          "python3 scripts/security/_probe_reach_a.py\n")
+            r = subprocess.run(
+                [sys.executable, str(REACH), "--workflow",
+                 ".github/workflows/_probe-reach.yml"],
+                capture_output=True, text=True, cwd=str(REPO))
+            check("a three-hop import chain is FOUND", r.returncode == 1,
+                  r.stdout)
+            check("and the forbidden module is named",
+                  "derive_item8_dockerfile" in r.stdout, r.stdout)
+            check("and the hop that reached it is named",
+                  "_probe_reach_b" in r.stdout, r.stdout)
+            # ...and the same chain WITHOUT the forbidden import passes,
+            # so the fixture is not merely detecting the probe files.
+            b.write_text("import json\n")
+            r = subprocess.run(
+                [sys.executable, str(REACH), "--workflow",
+                 ".github/workflows/_probe-reach.yml"],
+                capture_output=True, text=True, cwd=str(REPO))
+            check("the same chain without the import PASSES",
+                  r.returncode == 0, r.stdout)
+        finally:
+            for f in (a, b, wf):
+                f.unlink(missing_ok=True)
+
+
+def test_reachability_positive_closure_is_not_empty() -> None:
+    """A gate that finds nothing passes for the wrong reason."""
+    scenario("reachability: the closure must actually discover the parser")
+    r = subprocess.run(
+        [sys.executable, str(REACH), "--expect-reachable",
+         "scripts/security/parse_buildkit_events.py"],
+        capture_output=True, text=True, cwd=str(REPO))
+    check("the real workflow PASSES", r.returncode == 0, r.stdout)
+    check("having actually traversed to the parser",
+          "parse_buildkit_events.py" in r.stdout, r.stdout)
+    check("and it reports its denominator",
+          "reachable script(s) against" in r.stdout, r.stdout)
+    # the expectation itself must be able to fail
+    r = subprocess.run(
+        [sys.executable, str(REACH), "--expect-reachable",
+         "scripts/security/nothing_reaches_this.py"],
+        capture_output=True, text=True, cwd=str(REPO))
+    check("an unmet --expect-reachable REFUSES", r.returncode == 1, r.stdout)
+
+
+def test_a_correct_preflight_envelope_actually_PASSES() -> None:
+    """A guard that always refuses satisfies every negative fixture.
+
+    Every authority test in this chain has been a refusal, so nothing
+    proved the guard could say yes. That is rule 15 upside down: an
+    instrument seen only to refuse is as unproven as one seen only to
+    pass, and it would have been discovered by the operator creating a
+    sentinel and watching the run stop for no reason.
+
+    Exercised in a THROWAWAY CLONE, so a real commit really does add a
+    real sentinel to a real history -- and no sentinel is ever created
+    in this repository. (D302)
+    """
+    scenario("authority: the correct preflight envelope is ACCEPTED")
+    with tempfile.TemporaryDirectory() as d:
+        clone = Path(d) / "clone"
+        r = subprocess.run(["git", "clone", "--quiet", str(REPO), str(clone)],
+                           capture_output=True, text=True)
+        if r.returncode != 0:
+            check("the clone could be made", False, r.stderr[:200])
+            return
+        def g(*a):
+            return subprocess.run(["git", "-C", str(clone), *a],
+                                  capture_output=True, text=True).stdout.strip()
+        g("checkout", "-B", "claude/project-rework-plan-pgvp35")
+        g("config", "user.email", "calibration@local")
+        g("config", "user.name", "calibration")
+        frozen = subprocess.run(
+            [sys.executable, str(clone / "scripts" / "security"
+                                 / "check_item8_design.py"), "--quiet"],
+            capture_output=True, text=True).stdout.strip()
+        parent = g("rev-parse", "HEAD")
+        ptree = g("rev-parse", "HEAD^{tree}")
+        sentinel = clone / "kai-pm" / "ITEM8_PREFLIGHT_GO"
+        sentinel.write_text(f"frozen_r2={frozen}\napproved_commit={parent}\n"
+                            f"approved_tree={ptree}\nauthorises=preflight\n")
+        g("add", "kai-pm/ITEM8_PREFLIGHT_GO")
+        g("commit", "-m", "authorise the standalone measurement")
+
+        guard = clone / "scripts" / "security" / "check_item8_authority.py"
+        env = {**os.environ, "GITHUB_RUN_ATTEMPT": "1",
+               "GITHUB_EVENT_NAME": "push"}
+        r = subprocess.run(
+            [sys.executable, str(guard), "--sentinel",
+             "kai-pm/ITEM8_PREFLIGHT_GO", "--envelope-kind", "preflight"],
+            capture_output=True, text=True, cwd=str(clone), env=env)
+        check("a CORRECT preflight envelope is ACCEPTED", r.returncode == 0,
+              r.stdout + r.stderr)
+        check("and says the artefact is the reviewed one",
+              "was reviewed" in r.stdout, r.stdout)
+        check("and reports its own denominator",
+              "authority envelope across" in r.stdout, r.stdout)
+
+        # ...and the SAME envelope must not open the experiment's path.
+        r = subprocess.run(
+            [sys.executable, str(guard), "--sentinel",
+             "kai-pm/ITEM8_PREFLIGHT_GO", "--envelope-kind", "experiment"],
+            capture_output=True, text=True, cwd=str(clone), env=env)
+        check("the same envelope REFUSES on the experiment path",
+              r.returncode == 1, r.stdout)
+
+        # ...and a second run attempt of the accepted case still refuses,
+        # so the acceptance above is not acceptance of anything at all.
+        r = subprocess.run(
+            [sys.executable, str(guard), "--sentinel",
+             "kai-pm/ITEM8_PREFLIGHT_GO", "--envelope-kind", "preflight"],
+            capture_output=True, text=True, cwd=str(clone),
+            env={**env, "GITHUB_RUN_ATTEMPT": "2"})
+        check("attempt 2 of the accepted case REFUSES", r.returncode == 1,
+              r.stdout)
+
+
+def test_an_unmeasurable_corroborator_is_unresolved_not_fatal() -> None:
+    """The back door: aba_err used to be appended to `failures`."""
+    scenario("preflight: a corroborator that cannot be measured is UNRESOLVED")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        fake = td / "aba-blind-docker"
+        fake.write_text(ABA_BLIND_DOCKER)
+        fake.chmod(0o755)
+        rule = td / "binding-rule.json"
+        code, out = run_preflight(fake, "--emit-binding-rule", str(rule))
+        check("an unmeasurable A/B/A probe does NOT fail the preflight",
+              code == 0, out)
+        check("and the state is UNRESOLVED, not silence",
+              "UNRESOLVED" in out, out)
+        check("naming why it could not be measured",
+              "A/B/A probe" in out, out)
+        check("while the REQUIRED properties still report as met",
+              "PREFLIGHT PASS IS EVIDENCE" in out, out)
+        check("and the binding rule is still emitted", rule.is_file(), out)
+
+
 def run_all() -> None:
     test_preflight_refuses_what_it_cannot_invoke()
     test_preflight_refuses_a_silent_daemon()
     test_unstable_digest_is_recorded_not_fatal()
+    test_an_unmeasurable_corroborator_is_unresolved_not_fatal()
     test_captures_survive_only_with_keep()
     test_preflight_authority_is_a_separate_envelope()
+    test_reachability_follows_real_python_imports()
+    test_reachability_positive_closure_is_not_empty()
+    test_a_correct_preflight_envelope_actually_PASSES()
     print(f"  inspected: {EXPECTED_SCENARIOS} preflight scenario(s) across "
           f"2 shipped entry points, reaching NO subject-build machinery")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",

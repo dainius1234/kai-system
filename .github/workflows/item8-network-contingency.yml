@@ -51,7 +51,17 @@ jobs:
     permissions:
       contents: read
     steps:
+      # fetch-depth: 2, because the authority guard below asks git for
+      # the REVIEWED PARENT -- its commit, its tree, and whether HEAD is
+      # a direct child of it. actions/checkout fetches ONE commit by
+      # default, so the guard would refuse for want of history rather
+      # than for want of authority, and the experiment could not start
+      # at all. This supplies what the guard requires; it weakens
+      # nothing. The standalone measurement workflow already had it.
+      # (D302)
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       # EXECUTION AUTHORITY, FIRST AND UNCONDITIONALLY.
       #
@@ -221,10 +231,19 @@ jobs:
       # engine binds each capture to its subject by that instruction, so
       # the strength of that binding is a property of the daemon and is
       # measured rather than assumed in either direction. (D298)
+      # --workdir + --keep: THIS run's raw qualification evidence must
+      # survive too. A standalone measurement ran on a DIFFERENT ephemeral
+      # runner and cannot vouch for the daemon that builds the six
+      # subjects. Without these the script deletes its context in
+      # `finally` and only binding-rule.json survives -- a conclusion
+      # with its observation thrown away, which is the shape R10 exists
+      # to stop. The captures land inside the uploaded package. (D302)
       - name: rawjson must behave on THIS daemon before any subject build
         run: |
+          mkdir -p item8-derived/preflight-captures
           python3 scripts/security/preflight_buildkit_rawjson.py \
             --emit-binding-rule item8-derived/binding-rule.json \
+            --workdir item8-derived/preflight-captures --keep \
             --run-id "${GITHUB_RUN_ID}" \
             --tree-sha "$(git rev-parse 'HEAD^{tree}')"
         env:
