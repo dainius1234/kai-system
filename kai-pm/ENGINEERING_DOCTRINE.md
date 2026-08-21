@@ -156,6 +156,43 @@ Proactive engineering is not autonomous scope expansion.
     expected to change one target must prove exactly one intended target
     changed. A zero-match silent edit is a failure.
 
+### Repair
+
+29. **A repair is not complete until a fixture can detect its absence.**
+    Before a repair may be banked as proven, there must exist an
+    independent fixture that **fails on the defective behaviour and
+    passes on the repaired one**. Test-first is not the requirement —
+    some defects are only visible at runtime, and turning method into
+    ceremony helps nobody. The requirement is about **proof order**: the
+    deletion-sensitivity of a repair is established *before* the repair
+    is called done, not discovered later by a reviewer.
+
+    Earned three times in two patches, always identically: the repair
+    was written, the suite stayed green, and only a destructive
+    reinjection revealed that **nothing specifically proved the repair**
+    — `--no-cache` reconciliation, the invocation commit contract, and
+    the unmeasurable-corroborator path each survived their own deletion
+    at 486/0, 486/0 and 515/0. A mechanism can become untestable by
+    deletion while still accumulating reassuring green tests, and green
+    tests are exactly what stops anyone looking.
+
+    For repairs made before this rule, destructive reinjection is
+    acceptable as retrospective evidence.
+
+30. **Qualification and mutation may not share an uncontrolled subject
+    state.** A test or collector may not claim evidence over files or
+    processes that it — or anything running beside it — is actively
+    mutating, unless that interaction is itself part of the declared
+    experiment.
+
+    Earned by running a suite in the foreground while a reinjection
+    sweep held the same files patched, and reading three failures as
+    real for long enough to start diagnosing them. R9 is the special
+    case where the instrument observes *itself*; this is the general
+    one, where the instrument observes a subject somebody else is
+    changing underneath it. The tell is the same: **the measurement was
+    true of something, just not of the world it claimed.**
+
 ### Records and streams
 
 19. **Machine evidence and human prose stay separate.**
@@ -190,6 +227,8 @@ Proactive engineering is not autonomous scope expansion.
 | rule | the failure that earned it |
 |---|---|
 | 1, 24, 27 | findings "closed" on argument rather than evidence; counts that changed because a fix landed |
+| 29 | three repairs in two patches survived their own deletion at 486/0, 486/0 and 515/0 — repaired, green, and proved by nothing |
+| 30 | a suite read in the foreground while a reinjection sweep held the same files patched; three failures diagnosed as real |
 | 2 | a hook installed and never traversed, reported as a measurement |
 | 3 | a re-analysis whose evidence and analyser came from different trees |
 | 4 | five 404s from guessed run ids |

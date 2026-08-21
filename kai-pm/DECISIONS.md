@@ -24014,3 +24014,85 @@ other way round.
 * **Item 8 — RE-IMPLEMENTED, NOT EXECUTED.** No measurement has run.
 * **Frozen R2 unamended** across twelve reviews.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D303 — Two rules imposed on me, and the one I would not have written
+
+**2026-08-20. Doctrine change, banked at Kai's ruling on D302. No code
+change. No amendment to frozen R2 `0055ead8…8796`. Nothing built.
+Neither sentinel exists. Stage 2 remains NOT AUTHORISED.**
+
+### 1. What was ruled
+
+D302 was accepted as **evidence-backed and bankable**; the envelope is
+**PROVISIONALLY REVIEWABLE, not execution-authorised**. And rather than
+another patch, two permanent rules — now doctrine **29** and **30**.
+
+**Rule 29 — a repair is not complete until a fixture can detect its
+absence.** The invariant is *proof order*, deliberately not dogmatic
+test-first: some defects are only visible at runtime, and turning method
+into ceremony helps nobody. Before a repair is banked as proven, an
+independent fixture must fail on the defect and pass on the repair.
+
+The formulation worth keeping is Kai's:
+
+> *"A mechanism can become untestable by deletion while still
+> accumulating reassuring green tests."*
+
+Green tests are exactly what stops anyone looking. Three repairs in two
+patches survived their own deletion — 486/0, 486/0, 515/0 — and every
+one was found by a destructive reinjection I ran *after* calling the
+repair done.
+
+**Rule 30 — qualification and mutation may not share an uncontrolled
+subject state.** This is the one I would not have written, and it is the
+better of the two.
+
+I had recorded the foreground-suite collision as an R9 incident: an
+instrument that observes itself. Kai's reading is more general and more
+useful — R9 is the *special case* where the instrument is its own
+subject; this is the general one, where the instrument observes a
+subject somebody else is changing underneath it. Same tell either way:
+**the measurement was true of something, just not of the world it
+claimed.**
+
+I would have written a third narrow rule about test isolation and missed
+the family.
+
+### 2. Why a rule rather than a patch
+
+Because I had already promised the discipline and not kept it. D302 §8
+says the fixture should gate the repair rather than follow the
+reinjection — and I wrote that sentence *after* the third occurrence,
+having written a version of it after the first.
+
+A rule I state about my own future conduct is worth very little. A rule
+in the governing material, with the failure that earned it named beside
+it, is checkable by someone who was not here. Rule 28 exists for exactly
+that reason, and this is that reason applied to my own reliability.
+
+### 3. What this obliges next
+
+Every repaired mechanism in this chain now needs a deletion-sensitive
+fixture, or a statement that it lacks one. Retrospective destructive
+reinjection is admissible for repairs made before the rule; it is not
+admissible as a substitute going forward.
+
+**I expect that audit to find more uncovered mechanisms than the three
+already named**, because the three were found by sampling rather than by
+enumeration — and sampling that finds three defects in three attempts is
+not evidence of a small population (R4).
+
+### 4. Status
+
+| | |
+|---|---|
+| doctrine | rules **29** and **30** added, with earning failures |
+| D302 envelope | `e11e86a` / `692d1ce9` — **provisionally reviewable** |
+| frozen R2 | `0055ead8…8796` **PASS**, unamended |
+| `kai-pm/ITEM8_GO` | **ABSENT** |
+| `kai-pm/ITEM8_PREFLIGHT_GO` | **ABSENT** |
+
+* **Item 8 — NOT EXECUTED.** No measurement has run.
+* Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
