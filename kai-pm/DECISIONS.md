@@ -24299,3 +24299,118 @@ the extractor to list it.
 * `kai-pm/ITEM8_GO` **ABSENT**. `kai-pm/ITEM8_PREFLIGHT_GO` **ABSENT**.
 * **Item 8 — NOT EXECUTED.** Stage 2 — **NOT AUTHORISED.** 048 C —
   **BLOCKED**, counts unchanged.
+
+---
+
+## D306 — Two denominators, and a proportionality question I should have asked first
+
+**2026-08-20. Ruling on D305's proposal recorded. Phase B still NOT
+STARTED and NOT AUTHORISED. No sweep code exists. No amendment to frozen
+R2 `0055ead8…8796`. Nothing built. Neither sentinel exists.**
+
+### 1. C is not P, and collapsing them was the defect
+
+My proposal made one population do two jobs. Kai split it:
+
+* **C** — every mechanically extracted in-scope change unit. Anti-
+  omission lives here: each member gets exactly one disposition.
+* **P** — the subset dispositioned as *surviving protective repair
+  obligations*. The sweep mutates **P**, and reports back against C.
+
+Without the split, a rename, a helper extraction or a test rearrangement
+becomes a "repair obligation" whose coverage is UNRESOLVED — conflating
+*"we have not determined whether this was protective"* with *"this is
+protective and its proof coverage is unknown"*. I had noticed the
+UNRESOLVED count would be large and treated that as a tolerable cost
+rather than as the symptom it was.
+
+**Disposition vocabulary, frozen:**
+
+| state | meaning |
+|---|---|
+| `PROTECTIVE_OBLIGATION` | enters P; must map to a current mechanism |
+| `NOT_A_PROTECTIVE_OBLIGATION` | structural/test/support; stays counted in C with its reason |
+| `SUPERSEDED` | was protective, later replaced in-range; **must name its successor** |
+| `UNRESOLVED` | classification not yet justifiable |
+
+    C = P + NOT_A_PROTECTIVE_OBLIGATION + SUPERSEDED + UNRESOLVED
+
+Everything reconciles exactly once; nothing vanishes. And `UNMUTATABLE`
+moves out of this vocabulary entirely — it belongs to *mutation
+qualification*, after an item is already in P. I had it in the wrong
+stage.
+
+### 2. My known-negative was miscalibrated, again
+
+I proposed: *revert one repair in a scratch clone, require the extractor
+to list it.*
+
+The extractor is driven by **history and diff**. Reverting runtime
+behaviour does not test whether the census can omit a changed unit — it
+tests something else and would have reported success for the wrong
+reason.
+
+That is I-8's exact failure, inside the calibration design for an
+instrument whose entire purpose is to fix miscalibration. Third time in
+this chain that I have calibrated a property adjacent to the one I
+claimed.
+
+Kai's replacement is three independently qualified stages —
+**EXTRACT → CLASSIFY/RECONCILE → MUTATE/DETECT** — so a failure in one
+cannot masquerade as success in another. Each gets its own known-positive
+and known-negative. The historical reinjection rows remain a valid
+known-positive, but for the **mapping** stage, not for extraction
+completeness.
+
+### 3. Three things I am flagging back
+
+**(a) The shell hole in "logical unit".** Kai's remaining 0.01 is that
+two implementations must derive the same C. For Python and YAML the unit
+boundary can be delegated to a parser neither of us wrote — CPython's
+`ast`, PyYAML — which makes it genuinely implementation-independent.
+**Shell has no such parser**, and `run_item8_experiment.sh` carries a
+large share of the repairs.
+
+Any "logical unit" I invent for shell is precisely the
+judgement-dependent boundary the requirement exists to prevent. So I
+propose: **for shell, the unit is the whole file.** Coarse, deterministic,
+and it fails in the safe direction — one large obligation that must be
+dispositioned, rather than many small ones each of which can be waved
+away individually.
+
+**(b) `SUPERSEDED` needs a termination rule.** "Points to its successor"
+admits a cycle if two in-range changes supersede each other. Proposed:
+supersession must **strictly advance in commit order**, and every chain
+must terminate at a non-superseded obligation. Otherwise the
+reconciliation equation can loop and still balance.
+
+**(c) The proportionality question I should have asked before proposing
+any of this.** The sweep qualifies **the preflight**, and the preflight
+**cannot consume the frozen denominator** — its worst failure costs a
+wasted CI run, not an arm of the experiment. Meanwhile Phase B's cost
+has grown from "a day" to a frozen contract, a three-stage calibration,
+and its own adversarial review.
+
+Two risk questions have been travelling together and are not the same:
+
+* does the **six-build experiment** need proof-covered repairs? — yes,
+  the denominator is irreversible;
+* does the **preflight** need them before it may run once? — its failure
+  mode is a wasted run.
+
+I am not arguing against the sweep; Phase C's standing value is real. I
+am saying the operator should be able to decide those separately, and my
+proposal presented them as one. Raising it late is itself the finding —
+I should have asked what the sweep protects **before** designing how to
+build it.
+
+### 4. Status
+
+* Ruling **recorded**. C/P split, the four-state census vocabulary, the
+  three-stage calibration and out-of-tree envelope fixing all **accepted**.
+* P-derivation contract **not frozen**; three flags outstanding.
+* Phase B **NOT AUTHORISED**, no sweep code.
+* frozen R2 `0055ead8…8796` **PASS**, unamended.
+* `kai-pm/ITEM8_GO` **ABSENT**. `kai-pm/ITEM8_PREFLIGHT_GO` **ABSENT**.
+* **Item 8 — NOT EXECUTED.** Stage 2 — **NOT AUTHORISED.** 048 C —
+  **BLOCKED**, counts unchanged.
