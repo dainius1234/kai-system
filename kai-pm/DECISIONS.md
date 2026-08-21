@@ -24180,3 +24180,122 @@ and the two extra states are the honest part.
 * `kai-pm/ITEM8_GO` **ABSENT**. `kai-pm/ITEM8_PREFLIGHT_GO` **ABSENT**.
 * **Item 8 — NOT EXECUTED.** Stage 2 — **NOT AUTHORISED.** 048 C —
   **BLOCKED**, counts unchanged.
+
+---
+
+## D305 — A precise denominator for the wrong population
+
+**2026-08-20. Ruling on D304's three flags recorded, plus a proposed
+method for the one question left open. Phase B still NOT STARTED and NOT
+AUTHORISED. No code change. No amendment to frozen R2 `0055ead8…8796`.
+Nothing built. Neither sentinel exists.**
+
+### 1. Flag 2 was half right, and the wrong half was mine
+
+I proposed deriving the sweep's population by AST: every guarded refusal
+branch in the Item-8 instruments. Rejected, and the counterexample list
+is decisive — repairs already verified in this chain that are **not
+refusal branches**:
+
+| repair | why my population would miss it |
+|---|---|
+| `fetch-depth: 2` | YAML, no Python at all |
+| `--workdir … --keep` | an invocation change, not a guard |
+| AST dependency traversal | changes what is *seen*, branches nowhere |
+| absent references separated | classification semantics |
+| duplicated `_B2_SHIM` removed | a **deletion** — has no branch to find |
+| `UNRESOLVED` corroboration preserved | an outcome kept, not a check added |
+| positive authority acceptance | the guard saying **yes** |
+
+Seven, and I knew about all seven.
+
+Kai's sentence is the one to keep:
+
+> *"A Python-AST census of refusal branches could give us a beautifully
+> precise denominator for the wrong population. That would be worse than
+> a hand list because the number would look authoritative."*
+
+I was fixing R5 — a scope smaller than its name — by proposing a scope
+that is **precise and wrong**, which is the same defect wearing better
+clothes. R5's inverse has bitten this programme before: a scope *larger*
+than reality reports failure over things that are right. This is the
+third variant: a scope that is neither larger nor smaller but **beside**
+the truth, and carries a number to make it convincing.
+
+### 2. Flag 1, amended — the operator is semantic, not syntactic
+
+Accepted, with the definition widened and rightly:
+
+> **PROTECTIVE-EFFECT-SUPPRESSION** — mechanically suppress the specific
+> protective effect the mechanism provides, without deliberately
+> changing unrelated behaviour.
+
+My "force the guard condition false" already assumed every mechanism is
+a conditional guard — the same assumption that produced the bad
+population. The invariant is the **suppressed protection**, not a
+particular AST rewrite. Bare `COVERED` is never reported; the verdict
+carries the operator.
+
+### 3. Flag 3, amended — the envelope must be fixed OUT of the tree
+
+Accepted, and the amendment closes a hole I left open. I had step 3 as
+"envelope fixed to X" without saying *where*. If fixing it means writing
+a file, **the act of fixing the envelope moves the tree it binds** —
+the race I flagged, one level in, in my own proposed remedy for it.
+
+So: the reviewed payload is fixed out-of-tree, and the only permitted
+mutation of X is the operator adding the envelope at its prescribed
+path.
+
+> **Reviewed parent X becomes immutable. The only permitted child
+> mutation is addition of the authorised envelope.**
+
+### 4. The open question, and my proposal for it
+
+Kai's remaining 0.01: how to derive population **P** — the repair
+obligations — without it becoming a hand list in disguise. To be
+designed and **frozen before any sweep code is written**.
+
+My proposal, offered as a proposal:
+
+**Move the judgement from the population to the item.** The failure mode
+in a hand list is that the *omission* is invisible. So make omission
+impossible and disposition mandatory:
+
+1. **Extraction is mechanical.** For every commit in the declared Item-8
+   range, take the diff. For every changed file that is not prose,
+   extract the changed logical units — function, workflow step, YAML
+   key. Comment- and docstring-only changes are excluded **and counted
+   as excluded**.
+2. **Every extracted unit must be dispositioned**, one of: mapped to a
+   mechanism in M; `UNMUTATABLE` with a reason; `UNRESOLVED` with a
+   reason. There is no fourth option and no silent drop.
+3. **The denominator is the extracted set**, recomputed per run from the
+   range — not a list anyone maintains.
+
+Judgement does not disappear; it moves from *"which obligations exist"*,
+where it is hidden and unauditable, to *"what is the disposition of this
+specific changed unit"*, where it is per-item, recorded and countable.
+
+**And the extractor gets a known-positive from an artefact that already
+exists.** Every reinjection this chain has run is a row in a decision
+entry's table, written *at the time*, before this question arose. Those
+rows name protective changes we claimed and claimed to have proven —
+**every one of them must appear in P**, and an extractor that misses one
+is under-reporting, mechanically demonstrated rather than argued.
+
+For the known-negative: revert one repair in a scratch clone and require
+the extractor to list it.
+
+### 5. Status
+
+* Flag 1 **accepted, amended**. Flag 2 **diagnosis accepted, remedy
+  rejected**. Flag 3 **accepted, amended**.
+* The P-derivation method above is **proposed, not adopted**, and must
+  be frozen before sweep code exists.
+* Phase B **NOT AUTHORISED**. Kai's ruling is technical; the
+  authorisation is the operator's and has not been given.
+* frozen R2 `0055ead8…8796` **PASS**, unamended.
+* `kai-pm/ITEM8_GO` **ABSENT**. `kai-pm/ITEM8_PREFLIGHT_GO` **ABSENT**.
+* **Item 8 — NOT EXECUTED.** Stage 2 — **NOT AUTHORISED.** 048 C —
+  **BLOCKED**, counts unchanged.
