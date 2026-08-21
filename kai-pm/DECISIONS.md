@@ -24096,3 +24096,87 @@ not evidence of a small population (R4).
 
 * **Item 8 — NOT EXECUTED.** No measurement has run.
 * Stage 2 — **NOT AUTHORISED.** 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D304 — Ruling received: B → C, and the boundary that keeps it an instrument
+
+**2026-08-20. Ruling recorded, NOT yet acted on. No code change. No
+amendment to frozen R2 `0055ead8…8796`. Nothing built. Neither sentinel
+exists. Stage 2 remains NOT AUTHORISED.**
+
+### 1. The ruling
+
+Kai verified D303 independently — `5f1832a` exactly one commit ahead of
+`e11e86a`, two files changed, 82 and 39 additive lines, zero deletions —
+and confirmed the envelope point: once `5f1832a` exists, an authority
+envelope may not bind `e11e86a` on the grounds that the diff was "only
+docs". **Identity is the exact history being authorised, not the
+semantic importance of the change.**
+
+On the audit, the ruling is **C, staged as B → C**:
+
+* **not A.** Three uncovered repairs found in three sampled reinjections
+  is a warning that the denominator is unknown, and another hand audit
+  produces another sample plus a fresh sense of completion. That would
+  contradict R4 and rule 29 in the same act.
+* **not C directly.** Promoting a new, unqualified measurement straight
+  into authority-bearing infrastructure is rule 15 inverted — the same
+  error as every instrument in this chain that had only ever been seen
+  to succeed.
+
+### 2. The contract the sweep must meet
+
+Kai's, not mine, and recorded before anything is written so the design
+cannot drift toward what turns out to be easy:
+
+* enumerate a **defined population** of Item-8 repair mechanisms and
+  **state that denominator explicitly**;
+* mutate **one mechanism at a time, in isolated state** — rule 30
+  applies to every mutation, and the sweep is precisely an instrument
+  that mutates its own subject;
+* run the relevant suites and classify each mechanism
+  **COVERED / UNCOVERED / UNMUTATABLE / UNRESOLVED**;
+* **both-direction calibration**: at least one known-covered repair must
+  report COVERED, and at least one deliberately uncovered mechanism must
+  report UNCOVERED;
+* record **mutation identity → targeted mechanism → expected detecting
+  fixture → actual result**. *"42/45 covered" is not evidence*, and it
+  is not enough for A-4 provenance later.
+
+### 3. The boundary, which is the part I would have got wrong
+
+> *"The mutation sweep may test Item-8 repair proof coverage only. It may
+> not modify R2, run the real preflight, create either sentinel, build
+> any of the six subjects, consume the frozen denominator, or expand
+> into a generic repository mutation-testing framework."*
+
+The last clause is the one worth naming. A sweep that works is
+immediately attractive everywhere, and "while we're here" is how a
+qualification instrument becomes a programme nobody authorised. It
+qualifies **this envelope**, and its scope is stated before it exists
+rather than defended after.
+
+### 4. The uncertainty Kai kept, and why it is the design's centre
+
+Their remaining 0.02 is not about the strategy: it is whether every
+Item-8 repair mechanism can be **mechanically mutated without producing
+misleading equivalent mutants** — a mutation that changes the source and
+not the behaviour, which reports UNCOVERED while nothing is wrong.
+
+That is exactly what `UNMUTATABLE` and `UNRESOLVED` exist to expose
+rather than hide. A sweep that forces every mechanism into
+COVERED/UNCOVERED would be a two-state answer to a four-state question,
+and the two extra states are the honest part.
+
+### 5. Status
+
+* Ruling **recorded**. Phase B **not started**: Kai conditioned it on
+  explicit operator authorisation, and a relayed reviewer ruling is not
+  that. Asked, not assumed.
+* D302 envelope `e11e86a` / `692d1ce9` — **provisionally reviewable**.
+  A later envelope binds the then-current HEAD, not this one.
+* frozen R2 `0055ead8…8796` **PASS**, unamended.
+* `kai-pm/ITEM8_GO` **ABSENT**. `kai-pm/ITEM8_PREFLIGHT_GO` **ABSENT**.
+* **Item 8 — NOT EXECUTED.** Stage 2 — **NOT AUTHORISED.** 048 C —
+  **BLOCKED**, counts unchanged.
