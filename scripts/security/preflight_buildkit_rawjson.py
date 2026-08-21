@@ -20,7 +20,9 @@ wrote to the wrong file descriptor and every fixture passed.
 
 So this runs the real command path — same flags, same parser, same
 capture — on whatever Docker and buildx the authorised runner actually
-has, and proves the five properties the verdicts depend on:
+has. Properties 1-5 are REQUIRED -- the verdict layer cannot
+read a capture without them. Properties 6-7 are MEASURED AND
+RECORDED, and the claim engine applies whatever they support:
 
     1. the target vertex is identifiable by its instruction text
     2. runtime output is attributed to it, and the INSTRUCTION's own
@@ -29,16 +31,24 @@ has, and proves the five properties the verdicts depend on:
     4. `cached` is readable and MOVES — false on a forced build, true on
        a repeat (a field that is always false measures nothing)
     5. a deliberately failing target carries its OWN `error`
-    6. **how this daemon represents a RUN in a vertex name** — whether
-       the full instruction survives, and whether RUN FLAGS survive with
-       it. **Both are REQUIRED, not merely recorded.** B1 and B3 of one
-       image differ only by `--network=none`, and they do NOT separate
-       on outcome either: B1's own unmutated control retries five times,
-       prints "REFUSING TO BUILD" and exits non-zero when upstream is
-       unreachable, which is exactly B3's required shape. A daemon that
-       hides the flag cannot say which subject produced a capture, and
-       that is an unmeasured capability -- so this refuses rather than
-       degrading. (D299)
+    6. the WHOLE INSTRUCTION survives into the vertex name — REQUIRED,
+       because the claim engine locates a subject's step by containment
+       of exactly that text, and a daemon that truncates would fail
+       every branch after the denominator was spent
+    7. whether RUN FLAGS survive into the name, and whether the vertex
+       DIGEST is stable across invocations and moves with the network
+       mode — MEASURED AND RECORDED, never required
+
+~~D299 made property 7 a hard failure, on the grounds that B1 and B3
+differ only by `--network=none` and do not separate on outcome either.~~
+That reasoning about the subjects is correct and stands. The conclusion
+was overruled in D301, and rightly: BuildKit licenses vertex-digest
+comparison WITHIN a running solver, and Item 8 is six separate
+invocations, so neither the printed flag nor the digest may be the thing
+a closure claim rests on. The subject binding is the invocation chain --
+SUBJECT -> INVOCATION -> HASH-BOUND CAPTURE -> VERTEX -- and properties
+6-7 corroborate it. A corroborator promoted to an authority is the same
+error as a cosmetic dependency, one layer in. (D300, D301)
 
 IT IS NOT AN EXPERIMENTAL ARM
 =============================
