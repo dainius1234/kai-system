@@ -25794,3 +25794,127 @@ Closure remains a separate, evidence-backed register action.
 
 **`ITEM8_GO` ABSENT. Stage 2 NOT AUTHORISED. Six subject builds NOT
 AUTHORISED.** Nothing in D315–D318 asks for them.
+
+---
+
+## D319 — CI-truth census at 7c2669b. Denominator 4, not 16.
+
+Operator-authorised, Kai-scoped, **read-only**. No fixes, no workflow
+edits, no suppressions, no sentinel changes, no `ITEM8_GO`, no subject
+builds, no Phase-B expansion, no Stage 2. Nothing was run or spent.
+
+### 1. The denominator, derived from trigger semantics
+
+Kai's warning was load-bearing: **the workflow-file count is not the
+denominator.** Applicability was computed from each workflow's `on:`
+against this exact `(HEAD, event, branch, changed-paths)` tuple.
+
+```
+HEAD 7c2669b17ab09e4f3008d7ab1f005274e633c5e9 | push
+branch claude/project-rework-plan-pgvp35 | 5 changed paths
+
+16 workflow files  →  APPLICABLE 4 | NOT APPLICABLE 12 | UNPARSED 0
+```
+
+**Not applicable, each with a reason** rather than an omission: 5 have no
+`push` trigger (4 schedule/dispatch, 1 pull_request-only); 7 carry
+`paths` filters matching none of this commit's changed paths — including
+`item8-preflight.yml` (`kai-pm/ITEM8_PREFLIGHT_GO`) and
+`item8-network-contingency.yml` (`kai-pm/ITEM8_GO`). **Both Item-8
+workflows correctly did not fire.**
+
+**A trap declared, not hidden.** PyYAML parses the bare key `on:` as the
+boolean `True`. A census that missed that would have found no triggers at
+all, reported a denominator of **zero**, and looked tidy doing it.
+Handled; `UNPARSED = 0` is a measured result.
+
+### 2. Dispositions
+
+| workflow | run/attempt | conclusion | failing step | origin |
+|---|---|---|---|---|
+| Policy-as-Code Checks | `32598411049` / 1 | **SUCCESS** | — | — |
+| Core Tests | `32598411105` / 1 | **FAILURE** | Docker bring-up; our image builds produced no output | **PRE-EXISTING** |
+| Unified Hunter Suites | `32598411126` / 1 | **FAILURE** | `Assertion-count ratchet` — 8 suites absent from `test-uh.log` | **UNKNOWN** |
+| Python application | `32598411094` / 1 | **FAILURE** | 3 steps, below | **PRE-EXISTING + UNKNOWN** |
+
+**Core Tests — PRE-EXISTING, to Kai's standard.** Not "also red": the
+`ce2d9a4` post-mortem shows the *same mechanism* — identical empty
+container tables, same `0 service(s) not plainly healthy`, "images built"
+listing only the runner's own `ghcr.io/github/gh-aw-*` images and none of
+ours, same 9,411-line log. `ce2d9a4` predates D316 and D317.
+
+**Python application — three steps, and step 7 is a defect we already
+measured.**
+
+```
+step 7  Test with pytest (with coverage gate)   FAILURE  21m53s
+        35 failed, 4790 passed, 4 skipped
+        pydantic.errors.PydanticUserError: … is not fully defined
+        errors.pydantic.dev/2.13/u/class-not-fully-defined
+step 8  Repo-wide suite floor (KAI-GATE-020)    FAILURE
+        "the repo-wide suite regressed: failures 0 -> 35"
+step 9  Cross-file test isolation (A-05)        FAILURE
+        leakage grew in 2: test_contradiction.py, test_llm_contract.py
+```
+
+* **step 7 — PRE-EXISTING.** Same mechanism as **D314 §3(b)**, measured
+  and banked at `848c42a` *before* this census existed: pydantic 2.13.4 →
+  39 `PydanticUserError`; 2.9.2 → 4 collection errors; 2.8.2 → PASS. CI
+  runs **pydantic 2.13** and produces 35 failures of that class. The
+  prior evidence is independent of this census and predates D316/D317.
+  **This upgrades D314 §3(b) from a local-environment observation to a
+  defect CONFIRMED IN CI:** the repository's declared per-service pins are
+  mutually unsatisfiable, and the repo-wide run has no coherent pinned
+  environment.
+* **step 8 — DOWNSTREAM of step 7.** `check_suite_floor.py --from-log
+  .pytest-run.log` reports `0 -> 35`; it is reading step 7's failures, not
+  finding new ones.
+* **step 9 — UNKNOWN.** Neither named file is one I edited, but I have no
+  prior-run mechanism comparison.
+
+### 3. Unified Hunter is UNKNOWN, and I am applying that to myself
+
+**I edited `unified-hunter.yml`**, so I have the strongest possible
+interest in declaring this not-mine. What is mechanically true:
+
+* `make test-uh`'s prerequisites contain **neither file I edited** — no
+  `test-item8-verdicts`, no `test-item8-preflight`;
+* `fetch-depth: 2` **increases** available history; it cannot remove a
+  suite from a log.
+
+What I do **not** have is a prior Unified Hunter run compared by
+mechanism. The GitHub API ignored the `workflow_id` filter and returned
+branch-wide runs, so I could not reach one cheaply.
+
+By Kai's own rule — *"'I didn't change that workflow' is not enough"* —
+that leaves origin **UNKNOWN**. The temptation to call it PRE-EXISTING on
+the strength of a good argument is exactly what the rule exists to stop,
+and the argument being mine makes it worse, not better.
+
+### 4. Corrections to my own earlier statements
+
+* **"Core Tests is PRE-EXISTING" (before this census) — WITHDRAWN as
+  stated.** I had verified only that `ce2d9a4` was *also red*. It has
+  since been re-established properly, by mechanism.
+* **"Whatever failed, it was not a container falling over" — WITHDRAWN.**
+  That is the post-mortem's own output, computed as `0 service(s) not
+  plainly healthy` **over an empty container table**: zero containers,
+  therefore zero unhealthy, therefore "every container reports healthy".
+  **Vacuously true and printed as reassurance**, inside the diagnostic
+  whose job is to explain a failure. R11's shape in the post-mortem
+  itself. I quoted it approvingly instead of noticing it. The bounded
+  claim is: *captured evidence does not implicate service health; the
+  image-build execution and output path is UNRESOLVED.*
+
+### 5. Status
+
+* Census **CLOSED** on the denominator: 4/4 members resolved to a
+  conclusion. **1 green, 3 red.** Two reds PRE-EXISTING by mechanism, one
+  step DOWNSTREAM, two origins **UNKNOWN**.
+* **No adjudication performed.** Which reds block Item 8 versus which are
+  unrelated debt is a separate act, per Kai's sequence.
+* Nothing repaired, nothing suppressed, no workflow edited during the
+  census.
+* `ITEM8_PREFLIGHT_GO` present and **spent**; `ITEM8_GO` **ABSENT**;
+  Phase B unresolved and unauthorised; **Stage 2 NOT AUTHORISED**; counts
+  unchanged (Programme Rule 7).
