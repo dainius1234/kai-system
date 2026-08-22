@@ -52,7 +52,7 @@ AUTHORITY = REPO / "scripts" / "security" / "check_item8_authority.py"
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 9
+EXPECTED_SCENARIOS = 10
 executed: list[str] = []
 
 
@@ -299,76 +299,151 @@ def test_reachability_positive_closure_is_not_empty() -> None:
     check("an unmet --expect-reachable REFUSES", r.returncode == 1, r.stdout)
 
 
-def test_a_correct_preflight_envelope_actually_PASSES() -> None:
-    """A guard that always refuses satisfies every negative fixture.
+def _positive_authority_against(source: Path, d: Path, label: str) -> None:
+    """Run the positive-authority case against ONE source repository.
 
-    Every authority test in this chain has been a refusal, so nothing
-    proved the guard could say yes. That is rule 15 upside down: an
-    instrument seen only to refuse is as unproven as one seen only to
-    pass, and it would have been discovered by the operator creating a
-    sentinel and watching the run stop for no reason.
+    THE FIXTURE ESTABLISHES ITS OWN SENTINEL-ABSENT BASELINE.
 
-    Exercised in a THROWAWAY CLONE, so a real commit really does add a
-    real sentinel to a real history -- and no sentinel is ever created
-    in this repository. (D302)
+    It used to clone the live repository and treat whatever HEAD held as
+    its parent. That made it valid ONLY BEFORE THE FIRST REAL
+    AUTHORISATION EVENT: the moment `kai-pm/ITEM8_PREFLIGHT_GO` existed
+    upstream, the clone inherited it, the fixture's write became a
+    MODIFY, and the guard correctly refused `'M', not 'A'`.
+
+    So the fixture proving the guard can say YES was invalidated by the
+    act it exists to validate. Discovered in production on run
+    32575388846 — authority PASSED, this calibration then failed, and
+    rawjson was never measured.
+
+    That is rule 30: qualification and mutation sharing an uncontrolled
+    subject state, in the one place where the state being mutated is the
+    repository itself. The repair is not "delete the file if present" —
+    it is that the calibration's parent state is CONSTRUCTED here, so
+    the live repository's authority state has no bearing on it. (D309)
     """
+    clone = d / f"clone-{label}"
+    r = subprocess.run(["git", "clone", "--quiet", str(source), str(clone)],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        check(f"[{label}] the clone could be made", False, r.stderr[:200])
+        return
+
+    def g(*a):
+        return subprocess.run(["git", "-C", str(clone), *a],
+                              capture_output=True, text=True).stdout.strip()
+
+    g("checkout", "-B", "claude/project-rework-plan-pgvp35")
+    g("config", "user.email", "calibration@local")
+    g("config", "user.name", "calibration")
+
+    # THE BASELINE, established rather than inherited. Any authority
+    # state carried in from the source is removed and COMMITTED, so the
+    # envelope below is a genuine ADD against a parent that provably has
+    # none. Removing and re-adding within one commit would still read as
+    # a MODIFY -- the removal has to be its own commit.
+    carried = [s for s in ("kai-pm/ITEM8_PREFLIGHT_GO", "kai-pm/ITEM8_GO")
+               if (clone / s).exists()]
+    if carried:
+        g("rm", "--quiet", *carried)
+        g("commit", "-m", "calibration baseline: no authority state")
+    for s in ("kai-pm/ITEM8_PREFLIGHT_GO", "kai-pm/ITEM8_GO"):
+        check(f"[{label}] baseline carries no {s.split('/')[-1]}",
+              not (clone / s).exists(), str(carried))
+
+    frozen = subprocess.run(
+        [sys.executable, str(clone / "scripts" / "security"
+                             / "check_item8_design.py"), "--quiet"],
+        capture_output=True, text=True).stdout.strip()
+    parent = g("rev-parse", "HEAD")
+    ptree = g("rev-parse", "HEAD^{tree}")
+    (clone / "kai-pm" / "ITEM8_PREFLIGHT_GO").write_text(
+        f"frozen_r2={frozen}\napproved_commit={parent}\n"
+        f"approved_tree={ptree}\nauthorises=preflight\n")
+    g("add", "kai-pm/ITEM8_PREFLIGHT_GO")
+    g("commit", "-m", "authorise the standalone measurement")
+
+    # THE DIFF MUST BE AN ADD. Asserted here rather than left to the
+    # guard's message, because this is the exact property that silently
+    # stopped holding in production.
+    status = g("diff", "--name-status", parent, "HEAD")
+    check(f"[{label}] the envelope commit is an ADD, not a MODIFY",
+          status.startswith("A\t"), status or "(empty diff)")
+
+    guard = clone / "scripts" / "security" / "check_item8_authority.py"
+    env = {**os.environ, "GITHUB_RUN_ATTEMPT": "1",
+           "GITHUB_EVENT_NAME": "push"}
+    r = subprocess.run(
+        [sys.executable, str(guard), "--sentinel",
+         "kai-pm/ITEM8_PREFLIGHT_GO", "--envelope-kind", "preflight"],
+        capture_output=True, text=True, cwd=str(clone), env=env)
+    check(f"[{label}] a CORRECT preflight envelope is ACCEPTED",
+          r.returncode == 0, r.stdout + r.stderr)
+    check(f"[{label}] and says the artefact is the reviewed one",
+          "was reviewed" in r.stdout, r.stdout)
+    check(f"[{label}] and reports its own denominator",
+          "authority envelope across" in r.stdout, r.stdout)
+
+    r = subprocess.run(
+        [sys.executable, str(guard), "--sentinel",
+         "kai-pm/ITEM8_PREFLIGHT_GO", "--envelope-kind", "experiment"],
+        capture_output=True, text=True, cwd=str(clone), env=env)
+    check(f"[{label}] the same envelope REFUSES on the experiment path",
+          r.returncode == 1, r.stdout)
+
+    r = subprocess.run(
+        [sys.executable, str(guard), "--sentinel",
+         "kai-pm/ITEM8_PREFLIGHT_GO", "--envelope-kind", "preflight"],
+        capture_output=True, text=True, cwd=str(clone),
+        env={**env, "GITHUB_RUN_ATTEMPT": "2"})
+    check(f"[{label}] attempt 2 of the accepted case REFUSES",
+          r.returncode == 1, r.stdout)
+
+
+def test_a_correct_preflight_envelope_actually_PASSES() -> None:
+    """A guard that always refuses satisfies every negative fixture."""
     scenario("authority: the correct preflight envelope is ACCEPTED")
     with tempfile.TemporaryDirectory() as d:
-        clone = Path(d) / "clone"
-        r = subprocess.run(["git", "clone", "--quiet", str(REPO), str(clone)],
+        _positive_authority_against(REPO, Path(d), "live")
+
+
+def test_positive_authority_survives_a_source_that_already_authorised() -> None:
+    """The hostile property production exposed, CONSTRUCTED not inherited.
+
+    Asserting this against the live repository would only hold while the
+    live repository happens to carry a sentinel — which is the ambient
+    state coupling that caused the defect. So the hostile source is
+    BUILT here: a repository that already contains an authority
+    envelope, exactly as the real one did on run 32575388846.
+
+    If the isolation repair is removed, this fails. (D309, rule 29)
+    """
+    scenario("authority: the positive case survives an already-authorised "
+             "source")
+    with tempfile.TemporaryDirectory() as d:
+        src = Path(d) / "already-authorised"
+        r = subprocess.run(["git", "clone", "--quiet", str(REPO), str(src)],
                            capture_output=True, text=True)
         if r.returncode != 0:
-            check("the clone could be made", False, r.stderr[:200])
+            check("the hostile source could be made", False, r.stderr[:200])
             return
-        def g(*a):
-            return subprocess.run(["git", "-C", str(clone), *a],
+
+        def gs(*a):
+            return subprocess.run(["git", "-C", str(src), *a],
                                   capture_output=True, text=True).stdout.strip()
-        g("checkout", "-B", "claude/project-rework-plan-pgvp35")
-        g("config", "user.email", "calibration@local")
-        g("config", "user.name", "calibration")
-        frozen = subprocess.run(
-            [sys.executable, str(clone / "scripts" / "security"
-                                 / "check_item8_design.py"), "--quiet"],
-            capture_output=True, text=True).stdout.strip()
-        parent = g("rev-parse", "HEAD")
-        ptree = g("rev-parse", "HEAD^{tree}")
-        sentinel = clone / "kai-pm" / "ITEM8_PREFLIGHT_GO"
-        sentinel.write_text(f"frozen_r2={frozen}\napproved_commit={parent}\n"
-                            f"approved_tree={ptree}\nauthorises=preflight\n")
-        g("add", "kai-pm/ITEM8_PREFLIGHT_GO")
-        g("commit", "-m", "authorise the standalone measurement")
 
-        guard = clone / "scripts" / "security" / "check_item8_authority.py"
-        env = {**os.environ, "GITHUB_RUN_ATTEMPT": "1",
-               "GITHUB_EVENT_NAME": "push"}
-        r = subprocess.run(
-            [sys.executable, str(guard), "--sentinel",
-             "kai-pm/ITEM8_PREFLIGHT_GO", "--envelope-kind", "preflight"],
-            capture_output=True, text=True, cwd=str(clone), env=env)
-        check("a CORRECT preflight envelope is ACCEPTED", r.returncode == 0,
-              r.stdout + r.stderr)
-        check("and says the artefact is the reviewed one",
-              "was reviewed" in r.stdout, r.stdout)
-        check("and reports its own denominator",
-              "authority envelope across" in r.stdout, r.stdout)
-
-        # ...and the SAME envelope must not open the experiment's path.
-        r = subprocess.run(
-            [sys.executable, str(guard), "--sentinel",
-             "kai-pm/ITEM8_PREFLIGHT_GO", "--envelope-kind", "experiment"],
-            capture_output=True, text=True, cwd=str(clone), env=env)
-        check("the same envelope REFUSES on the experiment path",
-              r.returncode == 1, r.stdout)
-
-        # ...and a second run attempt of the accepted case still refuses,
-        # so the acceptance above is not acceptance of anything at all.
-        r = subprocess.run(
-            [sys.executable, str(guard), "--sentinel",
-             "kai-pm/ITEM8_PREFLIGHT_GO", "--envelope-kind", "preflight"],
-            capture_output=True, text=True, cwd=str(clone),
-            env={**env, "GITHUB_RUN_ATTEMPT": "2"})
-        check("attempt 2 of the accepted case REFUSES", r.returncode == 1,
-              r.stdout)
+        gs("checkout", "-B", "claude/project-rework-plan-pgvp35")
+        gs("config", "user.email", "calibration@local")
+        gs("config", "user.name", "calibration")
+        # Force the hostile condition regardless of what the live repo
+        # holds right now: this source HAS an authority envelope.
+        (src / "kai-pm" / "ITEM8_PREFLIGHT_GO").write_text(
+            "frozen_r2=x\napproved_commit=x\napproved_tree=x\n"
+            "authorises=preflight\n")
+        gs("add", "kai-pm/ITEM8_PREFLIGHT_GO")
+        gs("commit", "-m", "a source that has already authorised once")
+        check("the hostile source really does carry a sentinel",
+              (src / "kai-pm" / "ITEM8_PREFLIGHT_GO").exists())
+        _positive_authority_against(src, Path(d), "already-authorised")
 
 
 def test_an_unmeasurable_corroborator_is_unresolved_not_fatal() -> None:
@@ -402,6 +477,7 @@ def run_all() -> None:
     test_reachability_follows_real_python_imports()
     test_reachability_positive_closure_is_not_empty()
     test_a_correct_preflight_envelope_actually_PASSES()
+    test_positive_authority_survives_a_source_that_already_authorised()
     print(f"  inspected: {EXPECTED_SCENARIOS} preflight scenario(s) across "
           f"2 shipped entry points, reaching NO subject-build machinery")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",

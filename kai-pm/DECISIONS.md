@@ -24585,3 +24585,132 @@ banked nowhere.
 * frozen R2 `0055ead8…8796` — **PASS, unamended** across fourteen
   reviews.
 * 048 C — **BLOCKED**, counts unchanged.
+
+---
+
+## D309 — Preflight attempt P0: authority PASSED, calibration FAILED, rawjson UNMEASURED
+
+**2026-08-22. The first real execution in this programme. Banked as a
+FAILED QUALIFICATION ATTEMPT, never to be erased or renamed. No
+amendment to frozen R2 `0055ead8…8796`. Zero subject builds. The frozen
+denominator is untouched.**
+
+### 1. What ran, and what it produced
+
+| | |
+|---|---|
+| run | **32575388846**, attempt 1, event `push` |
+| commit | `0149cbb97936d8dde8509d68b0d54f14fd4a0f6c` |
+| parent | `56af9529eb4f2f0adcc4f9f9411ee27c4b1139cb` (X) |
+| diff | `A kai-pm/ITEM8_PREFLIGHT_GO` — single path |
+| duration | 13 seconds |
+| **subject builds** | **0** |
+| **result rows** | **0** |
+| **frozen denominator** | **UNTOUCHED** |
+
+**THE AUTHORITY MECHANISM PASSED.** Verbatim from the runner:
+
+> `inspected: 1 authority envelope across 3 binding(s) (design,
+> direct-child ancestry, tree identity, one-shot)`
+> `PASS: the artefact about to run is the artefact that was reviewed,
+> under the design that was frozen.`
+
+Fifteen reviews of that guard, and this is the first time it executed
+against a real repository, a real push, a real parent and a real
+sentinel. Everything before was calibration.
+
+**THEN THE CALIBRATION GATE STOPPED THE CHAIN**, before the measurement:
+`34 passed, 3 failed`, all three from one fixture.
+
+**RAWJSON WAS NEVER MEASURED.** The question Item 8 needs answered is
+exactly as open as it was before the run.
+
+### 2. The defect — MAJOR instrument defect, not experiment failure
+
+> **Calibration environment inherited live authority state, making the
+> positive-authority fixture valid only before the first real
+> authorisation event.**
+
+`test_item8_preflight.py` cloned the live repository and treated
+whatever HEAD held as its parent. The moment
+`kai-pm/ITEM8_PREFLIGHT_GO` existed upstream, the clone inherited it,
+the fixture's write became a **MODIFY**, and the guard correctly refused
+`'M', not 'A'`.
+
+**The fixture proving the guard can say YES was invalidated by the act
+it exists to validate.**
+
+That is doctrine **rule 30** — qualification and mutation sharing an
+uncontrolled subject state — in the one place where the state being
+mutated is the repository itself. Kai imposed rule 30 two rounds ago; I
+broke it inside the fixture written to satisfy their blocker.
+
+**No local test could have found it.** It requires the sentinel to
+exist, and the sentinel had never existed. Fifteen adversarial reviews
+and ~450 calibration assertions did not find it. Doing the thing found
+it in thirteen seconds.
+
+### 3. Everything else behaved as repaired
+
+* the calibration is a **gate before** the measurement, and it gated;
+* artifact upload errored — *"No files were found"* — because no
+  evidence existed. `if-no-files-found: error` doing exactly what D302
+  made it do; a silent empty upload would have been the defect;
+* the epilogue printed 0 builds, 0 rows, denominator untouched — and it
+  was **true**, not decorative.
+
+### 4. The repair — not the cheap patch
+
+Rejected: *"if the sentinel exists in the clone, delete it before
+writing it."* That makes the test green without fixing the coupling.
+
+The invariant, Kai's: **the fixture must create its calibration
+repository from a known sentinel-absent parent state, independent of the
+live repository's current authority state.**
+
+So the baseline is now **established, not inherited**: any authority
+state carried in from the source is removed and **committed as its own
+baseline commit** — removal and re-addition inside one commit would
+still read as a MODIFY — and the envelope is then a genuine ADD against
+a parent provably without one.
+
+The positive case is parameterised by source repository, and the
+hostile condition is **constructed rather than ambient**: a scratch
+source that already carries an envelope, exactly as the real repository
+did on P0. Asserting it against the live repo would only hold while the
+live repo happens to carry a sentinel — which is the ambient coupling
+that caused the defect.
+
+### 5. Calibration and reinjection
+
+Preflight **49/0**, and the live scenario is currently exercising the
+production condition, because the sentinel is still present at HEAD.
+
+| reinjected | result |
+|---|---|
+| the fixture inherits live authority state again | **39/10 FAIL** |
+| the ADD assertion is dropped | **49/0 — DID NOT FIRE** |
+
+**The second is reported, not hidden.** With the isolation repair in
+place the ADD always holds, so that assertion cannot fail on its own —
+it fires only in combination with the isolation being broken, where the
+first reinjection already fires. It is kept because it localises the
+failure, and recorded as **not independently deletion-sensitive**. Rule
+29 asks for a fixture that detects a repair's absence; it does not
+license calling an assertion covered when it is not.
+
+### 6. Status
+
+* **Attempt P0 is permanent**: FAILED QUALIFICATION. Not erased, not
+  renamed, not re-run. GitHub's "re-run failed jobs" on 32575388846 is
+  forbidden — the commit is unchanged and one-shot semantics make it the
+  wrong mechanism.
+* A repaired attempt is **legitimate and is not an Item-8 re-draw**:
+  no-redraw protects the frozen subject population and its irreversible
+  observations, and **no experimental arm existed in this run**.
+* Steps remaining before any second attempt: adversarial review of this
+  repair → removal of the sentinel as an explicit governed transition,
+  **not** a history rewrite → new reviewed terminal X₂ → regenerated
+  envelope → **fresh operator authorisation**.
+* `kai-pm/ITEM8_GO` **ABSENT**. Stage 2 **NOT AUTHORISED**. Phase B not
+  authorised, no sweep code. 048 C **BLOCKED**, counts unchanged.
