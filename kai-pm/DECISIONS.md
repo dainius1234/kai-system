@@ -25918,3 +25918,102 @@ and the argument being mine makes it worse, not better.
 * `ITEM8_PREFLIGHT_GO` present and **spent**; `ITEM8_GO` **ABSENT**;
   Phase B unresolved and unauthorised; **Stage 2 NOT AUTHORISED**; counts
   unchanged (Programme Rule 7).
+
+---
+
+## D320 — Correcting D319: I named diagnostics as failing steps
+
+Kai's correction, verified by me at step level rather than accepted.
+**Both of D319's red-workflow "failing step" entries were wrong**, and
+the way they were wrong is worth more than the entries.
+
+### 1. What GitHub actually says
+
+**Core Tests `32598411105`** — the sole failing step is **step 11,
+"Browser agent service tests (mocked playwright)"**, 4 seconds. Steps
+12–49 and 52–65 are **skipped** — *including step 45 "Build the images
+the bring-up needs" and step 46 "Build full stack Docker images"*. Step
+68, the post-mortem, **succeeded**.
+
+**Unified Hunter `32598411126`** — the sole failing step is **step 6,
+"Unified Hunter suites"**, 10 minutes. Step 8, the **Assertion-count
+ratchet, was SKIPPED**. Step 9, "Report the surface that was exercised"
+(`if: always()`, `--json || true`), **SUCCEEDED**.
+
+### 2. What I wrote, and why it was wrong
+
+D319 recorded Core Tests' failing step as *"Docker bring-up; our image
+builds produced no output"* and Unified Hunter's as *"Assertion-count
+ratchet — 8 suites absent from test-uh.log"*.
+
+**Neither is a failing step.** The first describes steps that never ran;
+the second names a step that was **skipped**, quoting JSON produced by a
+**different step that passed**.
+
+The containers were empty and no images were built **because the whole
+Docker phase was skipped after step 11 failed** — I reported the
+consequence as the cause. And the `missing: [8 suites]` list is not a
+finding about a ratchet; it is a diagnostic observing that `make test-uh`
+stopped early, which it did because step 6 failed.
+
+### 3. The mechanism of my error, which is the part that generalises
+
+**A diagnostic that runs `if: always()` is placed LAST so it survives log
+truncation** — this repository does that deliberately, and the step is
+even named *"Post-mortem (last, so it survives log truncation)"*.
+
+So the tail of a failed job's log is **systematically the output of a
+step that succeeded**. I read the tail, found the most failure-shaped
+text in it, and called that the failing step. The log tail cannot answer
+"which step failed"; only the step-level API can.
+
+This is R10 from the other side. R10 says the full diagnostic must
+survive and excerpts must declare themselves. The corollary I had not
+drawn: **an excerpt positioned at the end of a log is not a neutral
+sample — it is the part most likely to be a post-mortem, and therefore
+the part least likely to be the failure.**
+
+### 4. A worse consequence: my PRE-EXISTING method was invalid
+
+D319 classified Core Tests PRE-EXISTING by comparing **post-mortems**
+between `7c2669b` and `ce2d9a4` — identical empty tables, identical
+9,411-line log.
+
+**That comparison cannot distinguish which step failed.** Two runs
+failing at *different* steps both skip the Docker phase and both emit an
+identical empty post-mortem. The evidence I used was insensitive to the
+question I asked it.
+
+**Re-established properly, at step level:** on `ce2d9a4`, step 11
+"Browser agent service tests" is likewise the **sole** failure, same
+position, same ~4-second duration, same downstream skips.
+
+**The classification PRE-EXISTING survives. The reasoning that produced
+it does not**, and it survives only because it was redone. Kai's rule —
+that same-mechanism evidence is required — was right, and my first
+attempt at satisfying it satisfied the letter while measuring the wrong
+thing.
+
+### 5. Corrected dispositions
+
+| workflow | run | failing step | origin |
+|---|---|---|---|
+| Policy-as-Code Checks | `32598411049` | — | **SUCCESS** |
+| Core Tests | `32598411105` | **step 11 — Browser agent service tests (mocked playwright)** | **PRE-EXISTING** (step-level match at `ce2d9a4`) |
+| Unified Hunter | `32598411126` | **step 6 — Unified Hunter suites** | **UNKNOWN** |
+| Python application | `32598411094` | **step 7 — pytest + coverage gate** (steps 8, 9 downstream/separate) | step 7 **PRE-EXISTING**; step 9 **UNKNOWN** |
+
+Python application's step 7 classification is **unaffected** by this
+correction: it rests on the pytest summary line and the
+`PydanticUserError` class matching D314 §3(b)'s measurement at `848c42a`
+— evidence about the failing step itself, not about a post-mortem.
+
+### 6. Status
+
+* **No adjudication performed.** Whether each red BLOCKS ITEM 8 /
+  UNRELATED EXISTING PROBLEM / STILL UNKNOWN is the next act and is not
+  taken here.
+* Nothing repaired, nothing suppressed, no workflow edited.
+* P1 stands: rawjson MEASURED and PASS, run `32594846522`.
+* `ITEM8_PREFLIGHT_GO` present and spent; `ITEM8_GO` **ABSENT**; Phase B
+  unresolved; **Stage 2 NOT AUTHORISED**; counts unchanged (Rule 7).
