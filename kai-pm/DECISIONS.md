@@ -26017,3 +26017,134 @@ correction: it rests on the pytest summary line and the
 * P1 stands: rawjson MEASURED and PASS, run `32594846522`.
 * `ITEM8_PREFLIGHT_GO` present and spent; `ITEM8_GO` **ABSENT**; Phase B
   unresolved; **Stage 2 NOT AUTHORISED**; counts unchanged (Rule 7).
+
+---
+
+## D321 — Adjudication: brakes or radio. Two radios, one still unknown.
+
+Operator-authorised, Kai-scoped, **read-only**. Each red adjudicated
+against one question — *can this failure make the Item-8 experiment
+unsafe, uninterpretable, falsely green/red, or unable to execute as
+frozen?* — on Kai's six axes. **Nothing repaired. Nothing suppressed.**
+
+Doctrine **rule 31** banked this entry (Kai's wording, replacing my
+overcorrection that "only the step-level API answers which step failed" —
+true of step *identity*, not of *root cause*).
+
+### 1. The mechanical evidence, computed once and used by all three
+
+**Item 8's transitive import closure, derived by AST from its six shipped
+entry points:**
+
+```
+scripts/security/check_item8_authority.py      scripts/security/summarise_item8.py
+scripts/security/check_item8_design.py         scripts/security/parse_buildkit_events.py
+scripts/security/preflight_buildkit_rawjson.py scripts/test_item8_preflight.py
+
+6 first-party modules. Third-party imports: NONE.
+Non-first-party names: __future__, argparse, base64, hashlib,
+importlib.util, json, os, pathlib, re, shutil, subprocess, sys, tempfile
+— stdlib, all of it.
+
+Failed surfaces reached: 0 of 8
+(browser_agent, browser-agent, playwright, pydantic, fastapi,
+ notify_app, test_contradiction, test_llm_contract)
+```
+
+**And a concern of mine, raised and then disproven by measurement.** Both
+subject images declare `fastapi>=0.116.2` while pinning pydantic —
+`memu-core` at **`==2.8.2`**, the exact conflict class of D314 §3(b), and
+`memu-core/Dockerfile:6` runs `pip install -r requirements.txt`, which B1
+(`--no-cache`) traverses. Core Tests steps 45–46 (the image builds) were
+**skipped** on both recent runs, so no recent CI had demonstrated
+memu-core builds at all.
+
+Resolver dry-run, read-only:
+
+```
+memu-core/requirements.txt   → pip exit 0
+memu-graph/requirements.txt  → pip exit 0
+```
+
+**Both resolve.** `fastapi>=0.116.2` is satisfiable with `pydantic==2.8.2`
+by selecting a 0.116.x fastapi. The pydantic conflict is an artefact of
+merging the **whole repository into one interpreter**, which is what the
+repo-wide pytest and `make coverage` do and what **no image build does**.
+Recorded because I raised it: it was a real question, and the answer is no.
+
+### 2. Core Tests — step 11, Browser agent service tests (mocked playwright)
+
+| axis | evidence |
+|---|---|
+| 1 dependency | Item-8 workflows invoke no `make` target, no pytest, no Core Tests step. Grep of both workflows: no `browser`/`playwright`/`test-uh`/`policy-check` reference. |
+| 2 change coupling | Step 11 fails **identically at `ce2d9a4`** — same step, same position, same ~4s — which predates D316/D317. None of my changes touch browser-agent. |
+| 3 measurement coupling | Closure reaches neither `browser_agent` nor `playwright`. Collector, denominator, rawjson parse and evidence admission are stdlib-only. |
+| 4 authority coupling | `check_item8_authority.py` + `check_item8_design.py` are inside that stdlib-only closure. Frozen R2 `0055ead8…8796` unaffected. |
+| 5 execution coupling | Subject Dockerfiles COPY only `memu-core/`, `memu-graph/`, `common/`, `security/` paths. **Neither COPYs browser-agent**, and no build step executes its tests. Build context is `.`, but presence in a context is not traversal. |
+| 6 counterfactual | **Empirically settled: P1 (`32594846522`) executed and passed at `ce2d9a4` while Core Tests was already red at that same commit.** Not an argument — it already happened. |
+
+**→ UNRELATED EXISTING PROBLEM.** Independence demonstrated, including by
+an experiment that already ran successfully alongside it.
+
+### 3. Python application — step 7 (pytest) and step 9 (isolation)
+
+| axis | evidence |
+|---|---|
+| 1 dependency | Item-8 workflows run no repo-wide pytest. |
+| 2 change coupling | Step 7's mechanism matches D314 §3(b), measured at `848c42a` before this census existed. |
+| 3 measurement coupling | Closure contains **no pydantic and no fastapi**. |
+| 4 authority coupling | Same stdlib-only closure. |
+| 5 execution coupling | **Measured, §1**: both subject requirement sets resolve. The conflict needs one interpreter holding the whole repo; the six builds never construct that. |
+| 6 counterfactual | P1 ran and passed with this red present. |
+
+Step 9's leak names `test_contradiction.py` and `test_llm_contract.py` —
+neither in the closure, neither an Item-8 file.
+
+**→ UNRELATED EXISTING PROBLEM** for both steps. Step 9's *origin*
+remains UNKNOWN; its *coupling* is absent, and the disposition asks about
+blocking, not origin.
+
+### 4. Unified Hunter — step 6, `make test-uh`
+
+**Root cause: UNRESOLVED, and for a reason worth recording.** The Actions
+log API serves a **fixed byte window from the end** — `tail_lines` 62 and
+125 returned identical content. Step 6's own output lies outside it.
+Under **rule 22** that is not available evidence, and under **rule 31**
+I may not substitute the `if: always()` diagnostic that follows it.
+
+| axis | evidence |
+|---|---|
+| 1 dependency | Item-8 workflows do not invoke `make test-uh`; its 76 prerequisites include **neither** `test-item8-verdicts` nor `test-item8-preflight`. |
+| 2 change coupling | **NOT EXCLUDED.** `test-uh` includes `test-workflow-filters` and `test-workflow-outputs`, which inspect workflow YAML — **and I edited two workflow YAMLs.** Tested directly: `test-workflow-filters` **22/0**, `test-workflow-outputs` **29/0**, both at their recorded floors. That is local evidence, and D317 is the standing proof that local green is not evidence about CI. |
+| 3 measurement coupling | Closure untouched by any `test-uh` suite. |
+| 4 authority coupling | Same stdlib-only closure. |
+| 5 execution coupling | The six builds run `docker build`; they do not run `make test-uh`. |
+| 6 counterfactual | **Not established.** I have no verified Unified Hunter conclusion at `ce2d9a4`, so I cannot say P1 ran alongside this red as I can for Core Tests. |
+
+**→ STILL UNKNOWN.** Independence is *likely* on four axes and *untested*
+on two: the root cause is unreachable, and the one change-coupling path
+that could implicate **my own edit** has been probed only locally.
+
+I am keeping this UNKNOWN precisely because the plausible culprit is
+mine. A disposition that clears my own change on an argument is the
+thing D320 was written about.
+
+### 5. Result
+
+| red | disposition |
+|---|---|
+| Core Tests step 11 | **UNRELATED EXISTING PROBLEM** |
+| Python application steps 7, 9 | **UNRELATED EXISTING PROBLEM** |
+| Unified Hunter step 6 | **STILL UNKNOWN** |
+
+**No red is demonstrated to block Item 8. One is not demonstrated not
+to.** Under Kai's own dispositions that is not a green light — "STILL
+UNKNOWN" means independence is not proven, and the six builds are
+irreversible.
+
+**Nothing repaired.** No red was fixed merely for being red.
+
+* P1 stands: rawjson MEASURED, PASS, run `32594846522`.
+* `ITEM8_PREFLIGHT_GO` present and **spent**; `ITEM8_GO` **ABSENT**.
+* Phase B **unresolved and unauthorised**. Stage 2 **NOT AUTHORISED**.
+* Counts unchanged (Programme Rule 7).

@@ -193,6 +193,42 @@ Proactive engineering is not autonomous scope expansion.
     changing underneath it. The tell is the same: **the measurement was
     true of something, just not of the world it claimed.**
 
+31. **Failure identity before causal attribution.** The failed CI step
+    must be established from authoritative **step-level execution
+    state**. Root-cause attribution must then come from evidence
+    generated **by that failing step**, or from independently
+    corroborated evidence. `if: always()` diagnostics, post-mortems,
+    downstream skips and log-tail excerpts are **consequences and
+    context** unless separately proven causal.
+
+    Earned 2026-08-22, in the census. Two red workflows were recorded
+    with the wrong failing step: a **skipped** ratchet was named as the
+    failure while the JSON quoted from it came from a later step that
+    **passed**, and "the image builds produced no output" described
+    steps that never ran because an earlier step had already failed.
+
+    The mechanism generalises, and it is the reason this is a rule
+    rather than a note. A diagnostic that runs `if: always()` is
+    deliberately placed **last so it survives log truncation** — this
+    repository does that on purpose and even names the step for it. So
+    **the tail of a failed job's log is systematically the output of a
+    step that succeeded.** Reading the tail and taking the most
+    failure-shaped text in it inverts cause and consequence.
+
+    That is R10 seen from the other side: R10 says the full output must
+    survive and excerpts must declare themselves; this adds that **an
+    excerpt at the end of a log is not a neutral sample** — it is the
+    part most likely to be a post-mortem, and therefore the part least
+    likely to be the failure.
+
+    It also invalidated a *classification*, not just a label: an origin
+    was called PRE-EXISTING by comparing post-mortems between two runs,
+    evidence that cannot distinguish **which step** failed, because any
+    failure before the same phase produces an identical empty
+    post-mortem. The conclusion happened to survive re-derivation at
+    step level. The method did not, and nothing but redoing it would
+    have revealed that.
+
 ### Records and streams
 
 19. **Machine evidence and human prose stay separate.**
@@ -229,6 +265,7 @@ Proactive engineering is not autonomous scope expansion.
 | 1, 24, 27 | findings "closed" on argument rather than evidence; counts that changed because a fix landed |
 | 29 | three repairs in two patches survived their own deletion at 486/0, 486/0 and 515/0 — repaired, green, and proved by nothing |
 | 30 | a suite read in the foreground while a reinjection sweep held the same files patched; three failures diagnosed as real |
+| 31 | a **skipped** ratchet named as a failing step, quoting JSON emitted by a later step that **passed**; and an origin classified PRE-EXISTING by comparing post-mortems, which cannot see which step failed |
 | 2 | a hook installed and never traversed, reported as a measurement |
 | 3 | a re-analysis whose evidence and analyser came from different trees |
 | 4 | five 404s from guessed run ids |
