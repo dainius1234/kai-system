@@ -24994,3 +24994,144 @@ two results, both standing.
 * Phase B not authorised, no sweep code. Stage 2 **NOT AUTHORISED**.
 * **rawjson on a real daemon: still UNMEASURED.** 048 C **BLOCKED**,
   counts unchanged.
+
+---
+
+## D313 — Step 5 executed. The gate refused, at the gate, in 38 milliseconds.
+
+**Authority.** Operator, explicit and bounded: *"proceed with Step 5 only.
+Remove the spent `kai-pm/ITEM8_PREFLIGHT_GO` as the governed single-path
+transition and verify the resulting workflow refuses at the authority gate
+exactly as predicted. No P1 authorisation, no ITEM8_GO, no six subject
+builds, no Stage 2."* Nothing here exceeds that.
+
+### 1. The transition
+
+Commit `f6151711b687db90b94e00a4d9d7c9ffcf794742`, pushed
+`31cdac7..f615171`, confirmed by `ls-remote` against the remote rather than
+a cached ref.
+
+`git diff --cached --name-status` before committing was **exactly**
+`D	kai-pm/ITEM8_PREFLIGHT_GO` and nothing else. `sync-docs` and
+`policy-check` were deliberately NOT run first: either can rewrite a
+generated date stamp, and a second changed path would have destroyed the
+single-path property the transition is *defined by*. That omission is
+recorded here because it was a choice, not an oversight.
+
+Committed state now, read from the tree and not the filesystem:
+
+```
+git ls-tree -r --name-only HEAD | grep -c ITEM8_PREFLIGHT_GO  →  0
+git ls-tree -r --name-only HEAD | grep -c ITEM8_GO            →  0
+```
+
+### 2. The prediction, banked before the fact
+
+D311 §4 and D312 §3, both written before the push:
+
+> workflow starts → authority guard: the sentinel does not exist →
+> REFUSED → calibration does not run → rawjson does not run → zero
+> subject builds.
+
+and, in the commit message itself:
+
+> If anything gets PAST the authority gate it is a finding, and it will be
+> reported as one rather than as an expected inconvenience.
+
+### 3. The result — run `32583346970`
+
+run_number 2, attempt 1, event `push`, head_sha `f615171`, conclusion
+**failure**, 11 seconds wall clock.
+
+Timestamps from the job log, which are the evidence:
+
+| t (15:59:25.x) | event |
+|---|---|
+| `.4028` | checkout resolves HEAD = `f615171` |
+| `.4248` | step **Execution authority must validate** starts |
+| `.4631` | `REFUSED: kai-pm/ITEM8_PREFLIGHT_GO does not exist` |
+| `.4683` | `Process completed with exit code 1` |
+| `.4882` | `upload-artifact` (`if: always()`) |
+| `.6580` | epilogue (`if: always()`) |
+
+**38 milliseconds from gate entry to refusal.** The refusal text is the
+one the guard was written to emit:
+
+> Item 8's execution authority is this envelope; without it nothing is
+> authorised, **however the job was triggered**
+> NO ITEM-8 BUILD MAY START. Execution authority is an envelope that must
+> validate, not a file that must exist. (D291)
+
+**What did not run, established by absence from the log between `.4683`
+and `.4882`:** `Preflight-only instruments must pass calibration`,
+`Record the toolchain`, `Measure rawjson behaviour on this daemon`. None
+carries `if: always()`, so each was skipped. **Zero subject builds. Zero
+result rows.**
+
+The prediction holds in full. Nothing got past the gate, so there is no
+finding of that class to report.
+
+### 4. What this run does and does not prove
+
+**It proves** the paths filter reacts to a deletion (the run existed at
+all), and that the authority guard is *not* satisfied by the trigger —
+the job started and was refused anyway. That gap between *triggered* and
+*authorised* is the whole point of D291, and this is the first time it
+has been demonstrated on the real path rather than in a fixture.
+
+**It does not prove** anything about rawjson, the daemon, or the six
+subjects. The measurement never ran. **rawjson on a real daemon remains
+UNMEASURED.**
+
+### 5. Two observations from reading the run — neither a violation
+
+Flagged under R12; neither is fixed, because fixing either exceeds
+"Step 5 only".
+
+**(a) A second red error that is not a fault.** `upload-artifact` carries
+`if-no-files-found: error`, so a refused run emits
+`##[error]No files were found…` on top of the real failure. The comment
+justifying `error` is sound for a run that *measured* and produced
+nothing. It is wrong for a run that was *refused before measuring*: those
+are different states and the artefact step cannot currently tell them
+apart. Cosmetic on an already-failed run; it degrades signal, it does not
+falsify anything. **Logged, not fixed.**
+
+**(b) The epilogue asserts rather than derives.** The final step echoes
+`subject builds run : 0` unconditionally under `if: always()`. It is a
+hardcoded claim, not a derivation — the exact shape this programme has
+spent sixteen reviews removing (runner verdicts, MATCH-as-a-word,
+filename-as-identity).
+
+Two things stop it being a finding, and both were checked rather than
+assumed:
+
+* In *this* workflow the claim is guaranteed true by
+  `check_preflight_reachability.py` — the AST closure proves no path from
+  here can build a subject. The echo is redundant-but-true, and its truth
+  is anchored somewhere real.
+* The **experiment** workflow, where such a claim *could* be false, does
+  not carry this epilogue: its final step is `summarise_item8.py`, which
+  derives from artefacts. Verified by reading it, not by memory.
+
+So the population of "hardcoded outcome claims that could lie" is **zero**.
+Had the experiment carried the same echo, this would have been a finding.
+**Logged, not fixed.**
+
+### 6. Status
+
+* Step 5 **COMPLETE and VERIFIED**. Both sentinels **ABSENT** from the
+  committed tree. The preflight workflow is now inert: it cannot be
+  triggered without a new sentinel, and cannot proceed without a valid
+  envelope.
+* **P0 = run `32575388846` remains permanent**: authority PASS →
+  calibration FAIL → rawjson UNMEASURED. **P1 will never overwrite it.**
+  Two attempts, two results, both standing.
+* Still mine to do, none of it authorised to execute: establish **X₂** (a
+  new clean reviewed tree), regenerate the envelope **WHOLE** out of tree
+  against X₂ — never field-edited — and show the operator the payload.
+* **The operator alone decides whether P1 runs.**
+* frozen R2 `0055ead8…8796` unamended. Phase B not authorised, no sweep
+  code. Stage 2 **NOT AUTHORISED**.
+* **rawjson on a real daemon: UNMEASURED.** 048 C **BLOCKED**, counts
+  unchanged (Programme Rule 7).
