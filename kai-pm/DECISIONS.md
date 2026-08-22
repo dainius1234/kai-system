@@ -25523,3 +25523,122 @@ remains unauthorised with no sweep code.
 * **048 C's blocking question is answered. Closure is a separate,
   evidence-backed register action and is NOT taken here** (Programme
   Rule 7 — counts do not change because a result landed).
+
+---
+
+## D316 — Runtime chronology: a required property that was only ever counted
+
+**Kai's finding after P1**, and it is a good one. Implementation only —
+**no run, no authority sought, no denominator touched.**
+
+### 1. The gap
+
+`preflight_buildkit_rawjson.py` required the runtime marker to appear
+`RUNTIME_EMISSIONS` times:
+
+```python
+n = runtime.count(MARK)
+if n != RUNTIME_EMISSIONS: ...
+```
+
+A **count**. `3,1,2` counts identically to `1,2,3`.
+
+B2's frozen verdict is **injection → genuine retry → BAKED success, in
+that order**. The parser preserves log entries in arrival order and the
+verdict layer reads that ordering. So a daemon that attributed runtime
+lines correctly but **reordered** them would pass every required property
+and then make B2 **UNMEASURABLE**.
+
+Kai's severity call is the right one and worth keeping: that failure
+would **not** produce a false PASS — B2 would go UNMEASURED — but it
+would **waste an irreversible frozen build**, and the denominator cannot
+be redrawn.
+
+This is R5 again: *a check whose scope was smaller than its name
+implied.* The emission was already ordered and distinguishable
+(`echo "$MARK $probe"` for `probe in 1 2 3`); only the **check** was
+blind to it.
+
+Kai independently inspected P1's retained capture and found this daemon
+preserved `1 → 2 → 3` in runtime log data, not instruction metadata. So
+**P1's result stands** — chronology held on that daemon. What was missing
+is any mechanism that would *reject* a daemon where it does not, and the
+six-build workflow re-runs this preflight on a **new ephemeral daemon**
+immediately before spending the denominator.
+
+### 2. The repair
+
+Chronology is now a **required** property: the ordered marker sequence is
+recovered and must equal `1..RUNTIME_EMISSIONS`. `runtime_marker_order`
+is reported alongside `runtime_marker_count`, so the two facts are
+separable in the artefact rather than collapsed.
+
+### 3. The fixture was weaker than the shipped path — again
+
+`FLAT_DOCKER` emitted the literal `PREFLIGHT-RUNTIME-LINE x` three times,
+while the real Dockerfile emits `1`, `2`, `3`. **A fixture modelling the
+payload differently from the shipped path is the D294 defect wearing new
+clothes** — there the fake wrote to a descriptor the real one did not
+use. Corrected before it could serve as a known-positive.
+
+### 4. Proven in both directions (I-8, rule 29)
+
+* **known-positive** — ordered daemon: `68 passed, 0 failed`, 12 scenarios.
+* **known-negative** — `OUT_OF_ORDER_DOCKER`, in which attribution is
+  *perfect* (three markers, right vertex, count exactly 3) and **only the
+  order is wrong**: preflight REFUSES, names chronology rather than
+  attribution, and says B2 would be UNMEASURABLE.
+* **mutation** — the chronology branch neutered to `if False and ...`:
+  **3 assertions fail, EXIT GATE: FAIL**. The fixture detects the
+  repair's absence, which is rule 29's whole requirement.
+
+### 5. A second defect, found because the first one was fixed
+
+The summary line was:
+
+```
+inspected: 7 non-subject build(s) across 6 required propert(ies)
+```
+
+**Both numbers hand-written.** The tell was noticing that my fix would be
+to change a `6` into a `7` — *writing a name I recognised rather than one
+I looked up* (R5's own wording).
+
+Now: the build count is **counted** as builds run, and the property count
+is `len(REQUIRED_PROPERTIES)`. Neither is typed in. A run that aborts
+early now reports **fewer** builds inspected, instead of claiming seven
+regardless — the R11 shape, where a fixed number describes a table that
+was never filled.
+
+**And a third, which a gate caught rather than me.** `policy-check` went
+red on `test_item8_verdicts.py`, which asserted `"6 required propert" in
+p.stdout` — *a second hand-written copy of the same denominator*, in a
+suite with nothing to do with chronology. It now asserts the **shape**
+(`\d+ required propert`), which is what its own name says it checks. The
+value keeps exactly **one** maintained expectation, declared as a drift
+detector in `test_item8_preflight.py`.
+
+**What this does NOT claim.** The property count is still `len()` of a
+declared tuple, and nothing proves every declared property was *reached*
+on a given run. The preflight now says so in its own output rather than
+leaving the reader to assume it. Deriving evaluated-vs-declared coverage
+is real work and is **not** done here — Kai's bounded-qualification
+ruling stands.
+
+### 6. Status — unchanged where it matters
+
+* **No run. No authority sought.** Zero subject builds, zero result rows,
+  frozen denominator untouched.
+* frozen R2 `0055ead8…8796` **verified unamended** after the change — the
+  design digest does not cover this script.
+* **P1's result stands**: rawjson MEASURED and PASS on run `32594846522`.
+  This repair does not retract it; it makes the *next* daemon's
+  chronology checkable before anything is spent.
+* Kai's remaining pre-six-build conditions, none of them met here and
+  none of them mine to decide: formal P1/048 blocker-closure banking with
+  counts unchanged; **Phase B prerequisite still unresolved and still
+  unauthorised**; spent `ITEM8_PREFLIGHT_GO` retirement under **separate
+  operator authority**; then a fresh exact-tree review before any
+  `ITEM8_GO`.
+* `ITEM8_GO` **ABSENT**. Stage 2 **NOT AUTHORISED**. Counts unchanged
+  (Programme Rule 7).

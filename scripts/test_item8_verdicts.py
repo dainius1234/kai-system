@@ -44,6 +44,7 @@ import base64
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -1791,8 +1792,21 @@ def test_preflight_refuses_without_a_daemon() -> None:
               "ZERO Item-8 builds have been spent" in p.stdout, p.stdout)
         check("and names the rawjson possibility",
               "--progress=rawjson" in p.stdout, p.stdout)
+        # THE SHAPE, NOT THE VALUE. This asserted "6 required propert"
+        # -- a second hand-written copy of a denominator the preflight
+        # also typed in, so adding the chronology property broke a test
+        # that has nothing to do with chronology. That is R5 twice over:
+        # the count lived beside the thing in two places, and neither
+        # derived it.
+        #
+        # What this check is NAMED for is that the preflight REPORTS a
+        # denominator. The value has exactly one maintained expectation,
+        # in test_item8_preflight.py, declared there as a drift detector.
+        # Pinning it here as well would mean a property could not be
+        # added without editing two unrelated suites.
         check("and reports its own denominator",
-              "6 required propert" in p.stdout, p.stdout)
+              re.search(r"\d+ required propert", p.stdout) is not None,
+              p.stdout)
 
 
 # ── D298: the raw BuildKit capture must be THIS subject's ──────────────

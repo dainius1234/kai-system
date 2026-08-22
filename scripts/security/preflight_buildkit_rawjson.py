@@ -80,6 +80,7 @@ import argparse
 import importlib.util
 import json
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -99,6 +100,38 @@ BASE = "python:3.11-slim"
 TARGET = "PREFLIGHT-TARGET-INSTRUCTION"
 MARK = "PREFLIGHT-RUNTIME-LINE"
 RUNTIME_EMISSIONS = 3
+
+# THE REQUIRED PROPERTIES, DECLARED ONCE.
+#
+# The summary line used to read "7 non-subject build(s) across 6 required
+# propert(ies)" with BOTH numbers typed in by hand. That is R5's defect
+# sitting inside the instrument: a denominator kept beside the thing
+# instead of derived from it.
+#
+# It was found while adding the chronology property below, and the tell
+# was noticing that the fix would be to change a "6" to a "7" -- writing
+# a name I recognised rather than one I looked up. So the count is now
+# len() of this tuple, and the build count is counted as builds run.
+#
+# The tuple is still a list of names, which R5 also distrusts. What
+# stops it drifting is that the count printed to a human now moves only
+# when this tuple moves; what it cannot do is prove every declared
+# property was actually EVALUATED on a given run. That gap is real and
+# is reported, not papered over. (see the note emitted at the end)
+REQUIRED_PROPERTIES = (
+    "rawjson is emitted and can be parsed",
+    "runtime output is attributed to its vertex, apart from the instruction",
+    "execution is observable (`started`)",
+    "cache state is reported, and moves",
+    "a failing step's error is attributed to that step",
+    "the whole instruction survives into the vertex name",
+    "runtime CHRONOLOGY is preserved, in emission order",
+)
+
+# Counted, not asserted. A run that aborts early has inspected FEWER
+# builds than a full pass, and saying "7" regardless would be the same
+# defect as a fifty-row table built on a failed prerequisite. (R11)
+BUILDS_RUN = 0
 
 def _longest_real_target() -> int:
     """How long a command must be before this preflight means anything.
@@ -205,6 +238,8 @@ EV = _parser()
 def build(docker: str, ctx: pathlib.Path, dockerfile: str, tag: str,
           no_cache: bool) -> tuple[int, pathlib.Path, pathlib.Path]:
     """The PRODUCTION command path, byte for byte in its shape."""
+    global BUILDS_RUN
+    BUILDS_RUN += 1
     df = ctx / f"Dockerfile.{tag}"
     df.write_text(dockerfile)
     err = ctx / f"{tag}.events-stderr.jsonl"
@@ -305,6 +340,35 @@ def main() -> int:
                     f"{RUNTIME_EMISSIONS} times and its instruction mentions "
                     f"it {t.name.count(MARK)} time(s); the parser counted "
                     f"{n}. Property 2 does not hold on this daemon")
+
+            # CHRONOLOGY, NOT JUST CARDINALITY.
+            #
+            # Counting the marker three times says the runtime lines were
+            # attributed. It says NOTHING about the order they arrived
+            # in, and 3,1,2 counts exactly the same as 1,2,3.
+            #
+            # B2's frozen verdict is injection -> genuine retry -> BAKED
+            # success IN THAT ORDER. The parser preserves log entries in
+            # arrival order and the verdict layer then reads that
+            # ordering, so a daemon that attributed correctly but
+            # reordered would not produce a false PASS -- it would make
+            # B2 UNMEASURABLE. That is not a wrong answer, it is a WASTED
+            # IRREVERSIBLE BUILD, and the denominator cannot be redrawn.
+            #
+            # The emission is already distinguishable (`echo "$MARK
+            # $probe"` for probe in 1 2 3); only the CHECK was blind to
+            # it. Scope smaller than the name implied. (R5)
+            order = re.findall(rf"{re.escape(MARK)} (\S+)", runtime)
+            expected_order = [str(i) for i in range(1, RUNTIME_EMISSIONS + 1)]
+            observed["runtime_marker_order"] = ",".join(order) or "(none)"
+            if order != expected_order:
+                failures.append(
+                    f"runtime chronology: the target printed {MARK} "
+                    f"{'->'.join(expected_order)} in that order; the parser "
+                    f"recovered {'->'.join(order) if order else '(none)'}. "
+                    f"B2's verdict is injection -> retry -> success IN THAT "
+                    f"ORDER, so on this daemon B2 would be UNMEASURABLE "
+                    f"after the build had already been spent")
             if not t.started:
                 failures.append("the vertex reports no `started`, so "
                                 "execution cannot be observed (property 3)")
@@ -477,8 +541,13 @@ def main() -> int:
     for k, v in observed.items():
         print(f"  {k:<24} {v}")
     print()
-    print(f"  inspected: 7 non-subject build(s) across 6 required "
-          f"propert(ies) of --progress=rawjson")
+    print(f"  inspected: {BUILDS_RUN} non-subject build(s) across "
+          f"{len(REQUIRED_PROPERTIES)} required propert(ies) of "
+          f"--progress=rawjson")
+    print(f"  the build count is COUNTED and the property count is len() "
+          f"of the declared tuple; neither is typed in. What this does "
+          f"NOT prove is that every declared property was reached on "
+          f"this run -- an early abort inspects fewer.")
 
     print()
     for n in notes:

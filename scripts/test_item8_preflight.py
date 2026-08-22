@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -54,7 +55,7 @@ AUTHORITY_PATHS = {"kai-pm/ITEM8_PREFLIGHT_GO", "kai-pm/ITEM8_GO"}
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 10
+EXPECTED_SCENARIOS = 12
 executed: list[str] = []
 
 
@@ -101,11 +102,17 @@ if argv and argv[0] == "build":
     cached = seen and "--no-cache" not in argv
     ev({"vertexes": [{"digest": D, "name": "[2/2] RUN " + cmd,
                       "cached": cached, "started": "t0"}]})
-    n = 1 if failing else 3
-    for _ in range(n):
+    # ORDERED, DISTINGUISHABLE MARKERS -- because the real Dockerfile
+    # emits `echo "$MARK $probe"` for probe in 1 2 3, and this fixture
+    # used to emit the literal "x" three times. A fixture that models
+    # the payload differently from the shipped path is the D294 defect
+    # again: the fake wrote to a transport the real one did not use.
+    ORDER = [1, 2, 3]
+    for i in (ORDER[:1] if failing else ORDER):
         ev({"logs": [{"vertex": D, "stream": 1,
                       "data": base64.b64encode(
-                          b"PREFLIGHT-RUNTIME-LINE x\n").decode()}]})
+                          ("PREFLIGHT-RUNTIME-LINE %d\n" % i).encode()
+                      ).decode()}]})
     ev({"vertexes": [{"digest": D, "name": "[2/2] RUN " + cmd,
                       "completed": "t1",
                       "error": "process did not complete successfully: "
@@ -126,6 +133,14 @@ ABA_BLIND_DOCKER = FLAT_DOCKER.replace(
     'if "-ABA" in cmd:\n'
     '        sys.exit(0)\n'
     '    ev({"vertexes": [{"digest": D, "name": "[2/2] RUN " + cmd,')
+
+
+# THE KNOWN-NEGATIVE FOR CHRONOLOGY. Attribution is PERFECT here --
+# three markers, all on the right vertex, count exactly 3 -- and only
+# the ORDER is wrong. A check that counts cannot tell this daemon from a
+# good one, which is precisely why counting was not enough. (I-8)
+OUT_OF_ORDER_DOCKER = FLAT_DOCKER.replace("ORDER = [1, 2, 3]",
+                                          "ORDER = [3, 1, 2]")
 
 
 def run_preflight(docker: Path, *extra: str) -> tuple[int, str]:
@@ -533,6 +548,68 @@ def test_an_unmeasurable_corroborator_is_unresolved_not_fatal() -> None:
         check("and the binding rule is still emitted", rule.is_file(), out)
 
 
+def test_runtime_chronology_is_required_not_merely_counted() -> None:
+    """KNOWN-NEGATIVE. Kai's finding after P1: the preflight required the
+    marker to appear three times and never required 1,2,3. B2's verdict
+    is injection -> retry -> success IN THAT ORDER, so a reordering
+    daemon would make B2 unmeasurable AFTER an irreversible build was
+    spent. Attribution here is perfect and only the order is wrong."""
+    scenario("preflight: runtime chronology is required, not just counted")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        fake = td / "out-of-order-docker"
+        fake.write_text(OUT_OF_ORDER_DOCKER)
+        fake.chmod(0o755)
+        code, out = run_preflight(fake)
+        check("a daemon that reorders runtime lines REFUSES",
+              code == 1, out)
+        check("and the refusal names chronology, not attribution",
+              "runtime chronology" in out, out)
+        check("and says B2 would be UNMEASURABLE rather than wrong",
+              "UNMEASURABLE" in out, out)
+        check("and the observed order is reported, not just the verdict",
+              "runtime_marker_order" in out, out)
+        check("while the COUNT it would have passed is still 3",
+              "runtime_marker_count     3" in out, out)
+
+
+def test_the_reported_denominators_are_derived_not_typed() -> None:
+    """The summary said "7 non-subject build(s) across 6 required
+    propert(ies)" with both numbers hand-written. The build count is now
+    checked against an INDEPENDENT source -- the Dockerfiles actually
+    written into the capture directory -- rather than against the
+    module's own constant, which would be the thing under test
+    certifying itself. (I-8, R5)"""
+    scenario("preflight: the reported denominators are derived")
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        fake = td / "flat-docker"
+        fake.write_text(FLAT_DOCKER)
+        fake.chmod(0o755)
+        work = td / "w"
+        work.mkdir()
+        code, out = run_preflight(fake, "--workdir", str(work), "--keep")
+        check("the flat daemon still PASSES", code == 0, out)
+
+        dockerfiles = sorted(work.glob("*/Dockerfile.*"))
+        m = re.search(r"inspected: (\d+) non-subject build\(s\) across "
+                      r"(\d+) required", out)
+        check("the summary line parses", m is not None, out)
+        if m:
+            check("the BUILD count equals the Dockerfiles actually written",
+                  int(m.group(1)) == len(dockerfiles),
+                  f"reported={m.group(1)} on disk={len(dockerfiles)}: "
+                  f"{[p.name for p in dockerfiles]}")
+            # A maintained expectation, and declared as one. It is a
+            # DRIFT DETECTOR, not a derivation: it fails if the tuple
+            # changes without this number changing. Saying otherwise
+            # would be the overclaim D314 struck.
+            check("the REQUIRED-property count is 7 (maintained expectation)",
+                  int(m.group(2)) == 7, out)
+        check("and the summary admits what it does not prove",
+              "does\n  NOT prove" in out or "NOT prove" in out, out)
+
+
 def run_all() -> None:
     test_preflight_refuses_what_it_cannot_invoke()
     test_preflight_refuses_a_silent_daemon()
@@ -544,6 +621,8 @@ def run_all() -> None:
     test_reachability_positive_closure_is_not_empty()
     test_a_correct_preflight_envelope_actually_PASSES()
     test_positive_authority_survives_a_source_that_already_authorised()
+    test_runtime_chronology_is_required_not_merely_counted()
+    test_the_reported_denominators_are_derived_not_typed()
     print(f"  inspected: {EXPECTED_SCENARIOS} preflight scenario(s) across "
           f"2 shipped entry points, reaching NO subject-build machinery")
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
