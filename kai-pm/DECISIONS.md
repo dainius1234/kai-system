@@ -24520,3 +24520,68 @@ that must never be *assumed*, and here it is checked.
 * `kai-pm/ITEM8_GO` **ABSENT**. `kai-pm/ITEM8_PREFLIGHT_GO` **ABSENT**.
 * **Item 8 — NOT EXECUTED.** Stage 2 — **NOT AUTHORISED.** 048 C —
   **BLOCKED**, counts unchanged.
+
+---
+
+## D308 — Terminal governance record. Nothing follows this.
+
+**2026-08-22. Records already-decided facts only. No new design, no
+repair, no cleanup, no P-contract material. This entry authorises
+nothing.**
+
+### 1. What was decided
+
+* **Kai's final adversarial review of the standalone preflight:
+  TECHNICALLY READY FOR ONE OPERATOR-AUTHORISED RUN.** No remaining
+  blocker requires an implementation repair before the measurement.
+* **Technical blocker removed is not execution authority.** The review
+  does not create `kai-pm/ITEM8_PREFLIGHT_GO`, does not approve its
+  creation on the operator's behalf, and does not touch the six builds.
+* **Phase B is not a prerequisite** for this standalone measurement.
+  That bar was withdrawn as disproportionate (D307 §3). It remains a
+  prerequisite candidate for the irreversible six-build experiment.
+* **The standalone measurement does not qualify the daemon that will
+  build the six subjects.** Runners are ephemeral; the experiment
+  workflow repeats the rawjson qualification beside the subject builds,
+  with its own retained captures (D302 §2). Standalone answers *"does
+  this environment appear capable of supporting the evidence model?"*
+  and nothing more.
+* **Logged, not fixed:** `check_item8_authority.py` prints
+  `1 authority envelope across 3 binding(s)` while naming four concepts
+  — design, direct-child ancestry, tree identity, one-shot. Cosmetic;
+  weakens no check. Deliberately untouched, because moving HEAD for
+  prose is the churn this entry exists to end.
+
+### 2. The terminal condition
+
+**After this entry, the reviewed parent X is immutable.**
+
+X is **this commit and its tree** — not `832dd7f`, and not any later
+one. The only permitted repository mutation under this path is the
+addition of `kai-pm/ITEM8_PREFLIGHT_GO`, by explicit operator authority,
+as the sole direct-child change.
+
+    … → 832dd7f → D308 [X, FINAL REVIEWED PARENT]
+                     → kai-pm/ITEM8_PREFLIGHT_GO  [operator only]
+
+No intervening commit is permitted. **There is no D309 recording that
+D308 was accepted** — that would recreate the race this entry closes.
+
+The identity verification that follows — establishing X, confirming the
+implementation is unchanged from `e11e86a`, confirming both sentinels
+absent, and regenerating the envelope payload out of tree — is
+*preparation of the payload described here*, not a new ruling, and is
+banked nowhere.
+
+### 3. What remains unauthorised
+
+* `kai-pm/ITEM8_PREFLIGHT_GO` — **ABSENT**, and its creation is the
+  operator's act alone.
+* `kai-pm/ITEM8_GO` — **ABSENT**. The six-build experiment is
+  **NOT AUTHORISED**.
+* Phase B — **NOT AUTHORISED**, not started, no sweep code, contract not
+  frozen.
+* Stage 2 — **NOT AUTHORISED.**
+* frozen R2 `0055ead8…8796` — **PASS, unamended** across fourteen
+  reviews.
+* 048 C — **BLOCKED**, counts unchanged.
