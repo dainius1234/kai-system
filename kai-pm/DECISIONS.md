@@ -24414,3 +24414,109 @@ build it.
 * `kai-pm/ITEM8_GO` **ABSENT**. `kai-pm/ITEM8_PREFLIGHT_GO` **ABSENT**.
 * **Item 8 — NOT EXECUTED.** Stage 2 — **NOT AUTHORISED.** 048 C —
   **BLOCKED**, counts unchanged.
+
+---
+
+## D307 — The preflight is unblocked, and my shell fallback broke the invariant
+
+**2026-08-20. Ruling on D306's three flags recorded. Phase B still NOT
+STARTED and NOT AUTHORISED — and no longer a prerequisite for the
+standalone measurement. No code change. No amendment to frozen R2
+`0055ead8…8796`. Nothing built. Neither sentinel exists.**
+
+### 1. Flag A — my fallback was deterministic and wrong
+
+I proposed the whole shell file as the unit, reasoning that a coarse
+boundary I cannot bias beats a fine one I can.
+
+Rejected, and the reason is one I should have seen: **a whole-file C
+item can contain a protective repair, a refactor and a test-support
+change at once** — so "every C item receives exactly one disposition"
+becomes impossible to apply truthfully. I optimised against bias and
+broke the invariant the census exists to hold.
+
+The replacement is better than either of our positions:
+
+> **C is extracted from zero-context Git diff edit regions under pinned
+> diff options**, for formats without an independently specified parser
+> boundary.
+
+And the generalisation is the part worth keeping:
+
+> **C is syntactic and historical evidence. P is where semantics begin.**
+
+Multiple C units may reconcile to one P obligation; a C unit that
+genuinely mixes concerns stays `UNRESOLVED` rather than being forced
+into a false classification. Parser-derived projections for Python and
+YAML remain useful for *reviewability*, but the canonical anti-omission
+census is grounded in the diff — which also protects it from PyYAML or
+`ast` grouping changing under us.
+
+### 2. Flag B — accepted, tightened
+
+Supersession edges strictly advance in the declared commit order, so
+cycles are structurally impossible. And the terminal condition is
+stronger than mine:
+
+> Every supersession chain must terminate at an **explicitly classified
+> current state**, with no dangling successor.
+
+My "terminate at a non-SUPERSEDED obligation" left a gap: a protection
+*intentionally retired* because the condition it guarded ceased to exist
+would have had to be laundered into `NOT_A_PROTECTIVE_OBLIGATION`,
+which is a different and false statement.
+
+A fifth state — `RETIRED` / `NO_LONGER_APPLICABLE` — may eventually be
+needed. **It is deliberately not added now.** If the census meets such a
+case it surfaces as `UNRESOLVED` and the frozen vocabulary is amended on
+purpose. Inventing a state for a case nobody has met is how a
+classification grows a bucket that quietly absorbs the hard ones.
+
+### 3. Flag C — accepted, and the sequencing changes
+
+Kai inspected the standalone preflight at the current tree and
+**withdrew Phase B as a prerequisite for running it once**:
+
+> *"That bar was disproportionate."*
+
+The two decisions are now separate, and the new order buys information
+earlier:
+
+1. final adversarial review of the standalone preflight's **exact tree**
+2. **operator** authorises the preflight — separately
+3. run it; inspect and bank its evidence
+4. *then* decide Phase-B authorisation
+5. qualify Phase B
+6. final experiment review → terminal envelope → **separate**
+   authorisation for the six builds
+
+**The caveat is binding and stays.** GitHub runners are ephemeral, so
+the standalone measurement does **not** qualify the daemon that will
+build the six subjects — which is exactly why the experiment workflow
+repeats the rawjson qualification beside them (D302 §2). Standalone
+answers *"does this environment appear capable of supporting the
+evidence model?"*. It does not answer *"the daemon that will execute the
+six subjects is qualified."*
+
+### 4. What the pending review actually covers — measured
+
+`git diff --name-only e11e86a 911d0be` returns exactly two paths:
+`kai-pm/DECISIONS.md` and `kai-pm/ENGINEERING_DOCTRINE.md`.
+
+**Zero non-`kai-pm/` changes.** So the implementation Kai inspected at
+`e11e86a` is byte-identical at `911d0be`, and the outstanding review is
+of code that has not moved — only the register and the doctrine around
+it have. Stated because "only docs changed" is precisely the reasoning
+that must never be *assumed*, and here it is checked.
+
+### 5. Status
+
+* Flag A **amended**, B **accepted and tightened**, C **accepted**.
+* Standalone preflight: **no longer blocked on Phase B**; blocked on
+  final exact-tree review and explicit operator authorisation.
+* Phase B: **not authorised, not started, no sweep code.** Contract not
+  frozen.
+* frozen R2 `0055ead8…8796` **PASS**, unamended.
+* `kai-pm/ITEM8_GO` **ABSENT**. `kai-pm/ITEM8_PREFLIGHT_GO` **ABSENT**.
+* **Item 8 — NOT EXECUTED.** Stage 2 — **NOT AUTHORISED.** 048 C —
+  **BLOCKED**, counts unchanged.
