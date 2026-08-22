@@ -50,6 +50,8 @@ PREFLIGHT = REPO / "scripts" / "security" / "preflight_buildkit_rawjson.py"
 PARSER = REPO / "scripts" / "security" / "parse_buildkit_events.py"
 AUTHORITY = REPO / "scripts" / "security" / "check_item8_authority.py"
 
+AUTHORITY_PATHS = {"kai-pm/ITEM8_PREFLIGHT_GO", "kai-pm/ITEM8_GO"}
+
 passed = 0
 failed = 0
 EXPECTED_SCENARIOS = 10
@@ -341,14 +343,39 @@ def _positive_authority_against(source: Path, d: Path, label: str) -> None:
     # envelope below is a genuine ADD against a parent that provably has
     # none. Removing and re-adding within one commit would still read as
     # a MODIFY -- the removal has to be its own commit.
-    carried = [s for s in ("kai-pm/ITEM8_PREFLIGHT_GO", "kai-pm/ITEM8_GO")
-               if (clone / s).exists()]
+    # WHAT THE COMMIT HOLDS, not what the directory shows. A failed
+    # `git commit` leaves a file visible on the filesystem while HEAD
+    # does not contain it -- so a filesystem check would confirm a
+    # property of the working directory and call it a property of the
+    # tree. Adjacent-property calibration, which is the defect this
+    # whole entry exists to repair. (D310)
+    def tracked() -> set:
+        return set(g("ls-tree", "-r", "--name-only", "HEAD").splitlines())
+
+    before = tracked()
+    carried = sorted(s for s in AUTHORITY_PATHS if s in before)
     if carried:
         g("rm", "--quiet", *carried)
         g("commit", "-m", "calibration baseline: no authority state")
-    for s in ("kai-pm/ITEM8_PREFLIGHT_GO", "kai-pm/ITEM8_GO"):
-        check(f"[{label}] baseline carries no {s.split('/')[-1]}",
-              not (clone / s).exists(), str(carried))
+    after = tracked()
+
+    # MUTATION CARDINALITY. The baseline must remove EXACTLY the
+    # authority paths and nothing else -- rule 18 applied to a fixture
+    # rather than to a deriver. A baseline that quietly dropped an
+    # unrelated file would still satisfy "no sentinel present", and the
+    # ADD below would still succeed, and the calibration would be about
+    # a tree nobody intended.
+    removed = before - after
+    check(f"[{label}] the baseline removed EXACTLY the authority path(s)",
+          removed == set(carried),
+          f"removed={sorted(removed)} intended={carried}")
+    check(f"[{label}] and added nothing", not (after - before),
+          str(sorted(after - before)))
+    for s in AUTHORITY_PATHS:
+        check(f"[{label}] HEAD carries no {s.split('/')[-1]}",
+              s not in after, str(sorted(after & AUTHORITY_PATHS)))
+    check(f"[{label}] the baseline working tree is clean",
+          g("status", "--porcelain") == "", g("status", "--porcelain"))
 
     frozen = subprocess.run(
         [sys.executable, str(clone / "scripts" / "security"
@@ -441,8 +468,18 @@ def test_positive_authority_survives_a_source_that_already_authorised() -> None:
             "authorises=preflight\n")
         gs("add", "kai-pm/ITEM8_PREFLIGHT_GO")
         gs("commit", "-m", "a source that has already authorised once")
-        check("the hostile source really does carry a sentinel",
-              (src / "kai-pm" / "ITEM8_PREFLIGHT_GO").exists())
+        # COMMITTED, not merely present. If the commit silently failed,
+        # the file would still be on the filesystem while HEAD lacked
+        # it -- and the clone below would receive a NON-hostile source,
+        # so the hostile regression would pass without ever meeting the
+        # hostile condition. That is the same adjacent-property mistake
+        # in the fixture written to catch it. (D310)
+        tracked = set(gs("ls-tree", "-r", "--name-only", "HEAD").splitlines())
+        check("the hostile source COMMITTED a sentinel (ls-tree, not stat)",
+              "kai-pm/ITEM8_PREFLIGHT_GO" in tracked,
+              str(sorted(x for x in tracked if "ITEM8" in x)))
+        check("and its working tree is clean, so the clone gets that state",
+              gs("status", "--porcelain") == "", gs("status", "--porcelain"))
         _positive_authority_against(src, Path(d), "already-authorised")
 
 

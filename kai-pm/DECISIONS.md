@@ -24714,3 +24714,91 @@ license calling an assertion covered when it is not.
   envelope → **fresh operator authorisation**.
 * `kai-pm/ITEM8_GO` **ABSENT**. Stage 2 **NOT AUTHORISED**. Phase B not
   authorised, no sweep code. 048 C **BLOCKED**, counts unchanged.
+
+---
+
+## D310 — Proving the state, not the directory
+
+**2026-08-22. Two bounded hardenings of the D309 repair, to Kai's
+attack points 2, 3 and 4. No expansion into rule-30 enforcement or Phase
+B. Still at step 4 — the sentinel is untouched. No amendment to frozen
+R2 `0055ead8…8796`. Nothing built.**
+
+### 1. `git ls-tree HEAD`, not the filesystem
+
+Kai's sharpest point, and it is the same defect one level further in:
+
+> a failed `git commit` leaves the sentinel visible in the source
+> working directory while the clone receives a HEAD that does not
+> contain it — so the hostile regression would pass against a
+> **non-hostile source**.
+
+The fixture would then have confirmed a property of a *working
+directory* and called it a property of a *tree*. Adjacent-property
+calibration — the fourth occurrence in this chain, and this one was in
+the fixture written to repair the third.
+
+Both sides now read what the **commit** holds:
+
+* the baseline computes `git ls-tree -r --name-only HEAD` before and
+  after, and asserts against those sets;
+* the hostile source asserts `kai-pm/ITEM8_PREFLIGHT_GO` is **in
+  `ls-tree HEAD`**, not that the path exists.
+
+Both additionally assert `git status --porcelain` is empty, so the state
+the clone receives is the state that was asserted.
+
+### 2. Mutation cardinality on the baseline
+
+Kai's point 4, which I had flagged as unmet. The baseline asserted its
+post-state but never that it removed **exactly** the intended paths.
+
+A baseline that quietly dropped an unrelated file would still satisfy
+*"no sentinel present"*, the ADD would still succeed, and the whole
+calibration would be about a tree nobody intended.
+
+Now: `removed == set(carried)`, plus **added nothing**, plus per-path
+absence from `HEAD`, plus a clean tree. Rule 18 applied to a fixture
+rather than to a deriver — the same rule, one layer over.
+
+### 3. Calibration and reinjection
+
+Preflight **56/0**.
+
+| reinjected | result |
+|---|---|
+| baseline also removes an unrelated file | **54/2 FAIL** |
+| hostile source leaves the sentinel uncommitted | **55/1 FAIL** |
+| hostile check reads the filesystem again | **55/1 FAIL** |
+| the cardinality *assertion* is deleted | **56/0 — did not fire** |
+| all reverted | **56/0 PASS** |
+
+Two things worth stating exactly.
+
+**The fourth did not fire, and that is the class Kai already ruled on.**
+Deleting an assertion while its property still holds changes nothing;
+the assertion earns its place when the property is *falsified*, which is
+reinjection 1, and that fires. Recorded as a `DIAGNOSTIC INVARIANT`
+under the classification Kai set for the ADD assertion — retained for
+fault localisation, **not counted as independent mutation coverage**.
+
+**The third fired through the clean-state check, not the one I aimed
+at.** Skipping the commit *and* reverting the check to a filesystem read
+still fails, because the uncommitted file leaves the tree dirty. The two
+assertions compose: reading the wrong thing is caught by the other
+half. That was not designed and I am recording it as observed rather
+than claiming it as intent.
+
+### 4. Status
+
+* Attack points 2, 3, 4 addressed. Point 1 (isolation constructed) and
+  point 5 (production guard unweakened) were already PASS —
+  `check_item8_authority.py` remains untouched by D309 and D310.
+* Still **step 4**. `kai-pm/ITEM8_PREFLIGHT_GO` remains at HEAD; its
+  removal is step 5 and is not mine to start.
+* Execution counts remain **ORION-REPORTED** until reproduced against
+  the pushed tree. The mechanism is inspectable; the numbers are not
+  self-verifying.
+* `kai-pm/ITEM8_GO` **ABSENT**. Phase B not authorised, no sweep code.
+  Stage 2 **NOT AUTHORISED**. Frozen R2 unamended. **rawjson on a real
+  daemon: still UNMEASURED.** 048 C **BLOCKED**, counts unchanged.
