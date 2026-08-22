@@ -1039,12 +1039,37 @@ def test_authority_one_shot_controls() -> None:
         ptree = subprocess.run(["git", "rev-parse", "HEAD~1^{tree}"],
                                capture_output=True, text=True,
                                cwd=str(REPO)).stdout.strip()
-        code, out = authority(
-            f"frozen_r2={frozen}\napproved_commit={parent}\n"
-            f"approved_tree={ptree}\nauthorises=experiment\n", td)
-        check("a tree differing beyond the envelope REFUSES", code == 1, out)
-        check("and says review approved one artefact",
-              "would run another" in out, out)
+        # R11 — NO SUBJECT, NO OBSERVATION.
+        #
+        # `git rev-parse HEAD~1` prints its ARGUMENT back on stdout when
+        # the revision does not exist. On a shallow checkout `parent`
+        # therefore became the literal string "HEAD~1", and this scenario
+        # went on to build an authority envelope out of it and assert
+        # against the result. The refusal that came back was real, but it
+        # was about a MALFORMED ENVELOPE -- not about the property named
+        # below. One failed prerequisite wearing the costume of a
+        # measurement.
+        #
+        # It was not hypothetical: actions/checkout@v4 defaults to
+        # fetch-depth 1, so this had been RED in policy-checks since
+        # cf84ac1 (2026-08-19) while the same suite passed locally on a
+        # full clone. LOCAL GREEN IS NOT EVIDENCE ABOUT CI, and I
+        # reported gates green from a local run while this was failing.
+        # (I-8)
+        if not re.fullmatch(r"[0-9a-f]{40}", parent):
+            check("PREREQUISITE: HEAD~1 must resolve before the property "
+                  "below can be measured at all", False,
+                  f"rev-parse HEAD~1 returned {parent!r}; this checkout is "
+                  f"too shallow. fetch-depth must be >= 2. NOT MEASURED: "
+                  f"whether a tree differing beyond the envelope refuses")
+        else:
+            code, out = authority(
+                f"frozen_r2={frozen}\napproved_commit={parent}\n"
+                f"approved_tree={ptree}\nauthorises=experiment\n", td)
+            check("a tree differing beyond the envelope REFUSES",
+                  code == 1, out)
+            check("and says review approved one artefact",
+                  "would run another" in out, out)
 
 
 # ── toolchain binding ──────────────────────────────────────────────────

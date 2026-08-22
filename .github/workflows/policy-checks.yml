@@ -34,6 +34,15 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          # fetch-depth 2, NOT the default 1. scripts/test_item8_verdicts.py
+          # resolves HEAD~1 to build an authority envelope for a parent
+          # that is not the approved commit. `git rev-parse` echoes its
+          # argument back on stdout when a revision is missing, so at
+          # depth 1 that scenario silently measured a malformed envelope
+          # instead of the property it names -- red here since cf84ac1
+          # while passing locally on a full clone. (R11, I-8)
+          fetch-depth: 2
 
       - uses: actions/setup-python@v5
         with:

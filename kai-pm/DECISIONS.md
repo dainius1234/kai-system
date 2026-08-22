@@ -25642,3 +25642,155 @@ ruling stands.
   `ITEM8_GO`.
 * `ITEM8_GO` **ABSENT**. Stage 2 **NOT AUTHORISED**. Counts unchanged
   (Programme Rule 7).
+
+---
+
+## D317 — I reported "gates green" from a local run while CI had been red for three days
+
+Found by accident, while trying to answer a fair objection of Kai's:
+that the `68/0` and mutation counts in D316 were **ORION-REPORTED**. I
+went looking for an independent execution — `policy-check` runs the
+calibration (`Makefile:44`) and `.github/workflows/policy-checks.yml`
+runs `policy-check`, so pushing D316 should have produced one for free.
+
+It had. It was **red**.
+
+### 1. What I claimed, and what was true
+
+D316's commit chain ran `make policy-check >/dev/null 2>&1 && echo "GATE
+GREEN"`, and I reported **GATE GREEN**. That statement was true of my
+container and false of CI. Run `32597169024` (Policy-as-Code Checks,
+`772ae55`) failed:
+
+```
+FAIL: and says review approved one artefact
+  — REFUSED: approved_commit HEAD~1 is not an ancestor of HEAD
+Item-8 Verdict-Layer Calibration: 405 passed, 1 failed
+```
+
+**LOCAL GREEN IS NOT EVIDENCE ABOUT CI.** That is I-8's rule — the
+evidence and the claim came from the same place — and it is the same
+shape as `prepush` reporting "gates green" while skipping the suite that
+tested the architecture.
+
+### 2. It was not mine, and I proved that rather than asserting it
+
+My D316 edit to that file was an `import re` and one assertion about a
+denominator's *shape*. Neither touches ancestry. But "my change cannot
+have caused it" is precisely the R1 sentence that has been wrong before,
+so I reproduced it instead:
+
+| subject | result |
+|---|---|
+| `82f33c3` (**D315**, the commit *before* mine) at depth 1 | identical failure, `405 passed, 1 failed` |
+| `cf84ac1` (2026-08-19, the commit that **added** the assertion) at depth 1 | identical failure, `130 passed, 1 failed` |
+
+**Red since 2026-08-19. Three days.** Every "gates green" I have reported
+since then was a statement about a full clone.
+
+### 3. The mechanism, and why it is worse than a failing test
+
+`actions/checkout@v4` defaults to **`fetch-depth: 1`**. Both consumers of
+`policy-check` — `policy-checks.yml` and `unified-hunter.yml` — used a
+bare `- uses: actions/checkout@v4`.
+
+The scenario resolves `HEAD~1` to build an authority envelope for a
+parent that is not the approved commit. And:
+
+```
+depth-1 clone, HEAD~1 -> 'HEAD~1'
+```
+
+**`git rev-parse` prints its ARGUMENT back on stdout when a revision does
+not exist.** It does not fail; it hands you the string you asked about.
+So `parent` became the literal `"HEAD~1"`, the scenario built an envelope
+out of it, and asserted against the result.
+
+The refusal that came back was **real** — and it was about a *malformed
+envelope*, not about the property the check is named for. **One failed
+prerequisite wearing the costume of a measurement** (R11). The suite
+reported `405 passed, 1 failed` when the honest report was *"this
+property was never measured."*
+
+### 4. The repair, proven in three states
+
+**Cause** — `fetch-depth: 2` added to both workflows, with the reason
+recorded in the YAML. YAML re-parsed and the value read back
+programmatically, not eyeballed.
+
+**Symptom** — an R11 guard: if `HEAD~1` does not resolve to a 40-hex sha,
+the scenario **refuses to measure**, names the unmet prerequisite, and
+states what was therefore NOT measured.
+
+| state | result |
+|---|---|
+| full clone | **406 passed, 0 failed** — property measured |
+| **depth 1** | **404 passed, 1 failed** — honest refusal naming the prerequisite |
+| **depth 2** (the fix) | **406 passed, 0 failed**, `HEAD~1 -> 82f33c3…` |
+
+The depth-1 row is the one worth reading twice: it is **404**, not 405.
+Two checks are genuinely not measured, and the suite no longer counts
+them as passes. The denominator moving *down* when a prerequisite fails
+is the correct direction — it is the shape D314 §4 flagged as debt, here
+working in our favour.
+
+### 5. What this does and does not touch
+
+* **P1 is unaffected.** Run `32594846522` had its own workflow, its own
+  `fetch-depth: 2`, and its authority guard passed on the real path.
+* **D316 is unaffected in substance** — the chronology repair, its
+  known-negative and its mutation proof all stand. What was wrong was my
+  *reporting* of the gate, not the work.
+* **Kai's objection is now answered properly**: the calibration will run
+  in CI on this push, and that execution will not be Orion-reported.
+
+---
+
+## D318 — Formal P1 / 048 banking. Counts unchanged.
+
+Kai's condition 1, executed to his wording. **A register action only —
+nothing measured, nothing run, no count moved.**
+
+### 1. What is banked
+
+* **RAWJSON PREREQUISITE — CLOSED-PROVEN.** Measured on a real hosted
+  daemon, run `32594846522`: 7 non-subject builds, 6 required properties
+  (as then defined), evidence retained as artifact `9481273862`.
+* **P0's calibration defect — CLOSED-PROVEN, REPAIRED IN PRODUCTION.**
+  The `carried`-non-empty branch that failed at D309 executed on the real
+  runner and passed (58/0). Not a fixture: the production state.
+
+### 2. What is NOT banked, and the reason
+
+**KAI-GATE-048 C remains OPEN.** Rawjson is removed from its blocker
+field; nothing else about C changes.
+
+Kai's reasoning, which I accept and did not argue with: writing
+CLOSED-PROVEN for C would require a formal closure review showing that
+frozen Criterion C was only ever asking *whether rawjson could be read*.
+The evidence supports **removing a blocker**, not **broadening P1 into a
+contingency result it never tested**. D315 says so itself — zero
+subjects, zero rows, denominator untouched.
+
+**Status line, superseding the blocker clause of D201 and its repeats:**
+
+> **KAI-GATE-048 — OPEN. C OPEN, no longer blocked by rawjson.** The
+> rawjson prerequisite is CLOSED-PROVEN; whether the contingency holds is
+> **UNTESTED** and requires the six frozen subjects, which are **NOT
+> AUTHORISED**.
+
+**Programme Rule 7 holds: no count moves because a result landed.**
+Closure remains a separate, evidence-backed register action.
+
+### 3. Kai's four pre-`ITEM8_GO` conditions
+
+| # | condition | state |
+|---|---|---|
+| 1 | formal P1/048 banking, counts unchanged | **DONE — this entry** |
+| 2 | runtime-order qualification | **CLOSED** (D316, accepted by Kai) |
+| 3 | **Phase B** — deletion-sensitive coverage of the Item-8 repairs | **UNRESOLVED, UNAUTHORISED.** P1 removed the rawjson blocker; it did not remove this. Requires a deliberate decision. |
+| 4 | retire the spent `ITEM8_PREFLIGHT_GO` | **NOT DONE.** Still physically present in the tree. Requires a **separate operator-authorised single-path transition**. |
+| 5 | final experiment parent, exact-tree review, separate `ITEM8_GO` envelope | **NOT STARTED** — and comes last. |
+
+**`ITEM8_GO` ABSENT. Stage 2 NOT AUTHORISED. Six subject builds NOT
+AUTHORISED.** Nothing in D315–D318 asks for them.
