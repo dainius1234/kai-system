@@ -353,11 +353,40 @@ def _positive_authority_against(source: Path, d: Path, label: str) -> None:
         return set(g("ls-tree", "-r", "--name-only", "HEAD").splitlines())
 
     before = tracked()
+    baseline_before = g("rev-parse", "HEAD")
     carried = sorted(s for s in AUTHORITY_PATHS if s in before)
     if carried:
         g("rm", "--quiet", *carried)
         g("commit", "-m", "calibration baseline: no authority state")
+    baseline_after = g("rev-parse", "HEAD")
     after = tracked()
+
+    # THE CARDINALITY PROOF IS THE DIFF, NOT THE PATH SETS.
+    #
+    # D310 compared tracked-path membership before and after, which sees
+    # additions and deletions and is BLIND TO A MODIFY: an unrelated
+    # file changed and committed alongside the removal exists in both
+    # sets, so the sets are identical and the clean-tree check passes
+    # too, because the modification is already committed.
+    #
+    # Demonstrated before repairing it, per rule 29: a baseline commit
+    # carrying `D <sentinel>` plus `M README.md` left the suite at 56/0.
+    # So D310's wording -- "removed exactly the intended paths and
+    # nothing else" -- was stronger than its mechanism, which proved
+    # only "no other path was added or removed".
+    #
+    # `--name-status` is the contract because it is the one that names
+    # the OPERATION, not just the membership. (D311)
+    rows = [r for r in g("diff", "--name-status",
+                         baseline_before, baseline_after).splitlines() if r]
+    expected_rows = sorted(f"D\t{s}" for s in carried)
+    check(f"[{label}] the baseline diff is EXACTLY the intended deletion(s)",
+          sorted(rows) == expected_rows,
+          f"rows={sorted(rows)} expected={expected_rows}")
+    if not carried:
+        check(f"[{label}] with nothing carried, the baseline did not commit",
+              baseline_after == baseline_before,
+              f"{baseline_before[:12]} -> {baseline_after[:12]}")
 
     # MUTATION CARDINALITY. The baseline must remove EXACTLY the
     # authority paths and nothing else -- rule 18 applied to a fixture

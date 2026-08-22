@@ -24802,3 +24802,100 @@ than claiming it as intent.
 * `kai-pm/ITEM8_GO` **ABSENT**. Phase B not authorised, no sweep code.
   Stage 2 **NOT AUTHORISED**. Frozen R2 unamended. **rawjson on a real
   daemon: still UNMEASURED.** 048 C **BLOCKED**, counts unchanged.
+
+---
+
+## D311 — Path sets cannot see a modify
+
+**2026-08-22. One bounded correction to D310's cardinality proof, to
+Kai's final point. Still step 4 — the sentinel is untouched. No
+amendment to frozen R2 `0055ead8…8796`. Nothing built.**
+
+### 1. The defect, demonstrated before it was repaired
+
+D310 claimed *"removed exactly the intended paths and nothing else"*.
+What the mechanism actually proved was **"no other tracked path was
+added or removed"** — because it compared path-set membership, and a
+file that is **modified** exists in both sets. The clean-tree check does
+not catch it either: the modification is already committed.
+
+Kai asked for the gap to be shown before it was closed, which is rule 29
+in its proper order. Arranged a baseline commit carrying:
+
+    D  kai-pm/ITEM8_PREFLIGHT_GO
+    M  README.md
+
+Result against D310's code, unmodified: **56 passed, 0 failed.**
+
+The gap is real, and my wording was stronger than my mechanism. That is
+the same failure as the D298 `--network=none` claim: a sentence in the
+register asserting more than the code beneath it does.
+
+### 2. The correction — the diff, not the sets
+
+The cardinality proof is now `git diff --name-status BEFORE AFTER`
+between the captured baseline parent and its result, required to equal
+**exactly** the intended `D` rows and nothing else. `--name-status` is
+the right contract because it names the **operation**, not merely
+membership.
+
+When nothing is carried, the baseline must not have committed at all:
+`baseline_after == baseline_before`.
+
+The `ls-tree` and clean-tree checks stay — they establish complementary
+properties, as Kai noted.
+
+### 3. Reinjection
+
+Preflight **58/0**.
+
+| reinjected | result |
+|---|---|
+| `D` sentinel **+ `M` unrelated file** (the gap probe) | **56/2 FAIL** |
+| an unrelated file is **renamed** in the baseline commit | **52/6 FAIL** |
+| the name-status contract itself is removed | **58/0 — did not fire** |
+| all reverted | **58/0 PASS** |
+
+The gap probe now names the offending row exactly:
+
+> `rows=['D\tkai-pm/ITEM8_PREFLIGHT_GO', 'M\tREADME.md']`
+> `expected=['D\tkai-pm/ITEM8_PREFLIGHT_GO']`
+
+The same probe was **green before the repair and red after it** —
+which is the deletion-sensitivity rule 29 asks for, established in the
+order rule 29 asks for it.
+
+The third did not fire and is the `DIAGNOSTIC INVARIANT` class already
+ruled on: removing an assertion while its property holds changes
+nothing; the assertion earns its place when the property is falsified,
+which is probes 1 and 2.
+
+### 4. A prediction banked BEFORE it happens
+
+Kai's transition note, recorded now so it cannot be misread later:
+
+> **Deleting `kai-pm/ITEM8_PREFLIGHT_GO` will itself match the preflight
+> workflow's `paths:` filter**, because that filter reacts to the named
+> path being *changed*, and deletion is a change.
+
+So **step 5 will trigger a workflow run**. The authority gate should
+refuse before any measurement, because the envelope is then absent — so
+it consumes nothing. Expect an authority-refusal run, and do not read it
+as a failure of anything.
+
+Writing this down in advance is the point. An unexpected red run during
+a governed transition is exactly the kind of thing that gets explained
+after the fact; a predicted one is evidence the mechanism behaved.
+
+### 5. Status
+
+* Attack points 1, 2, 3, 5 **PASS**. Point 4 now closed by the
+  name-status contract.
+* `check_item8_authority.py` untouched across D309, D310 and D311.
+* Execution counts remain **ORION-REPORTED**. Kai could not reproduce
+  them — outbound cloning is unavailable in their sandbox — so the
+  implementation is **KAI-VERIFIED** and the numbers are not.
+* Still **step 4**. `kai-pm/ITEM8_PREFLIGHT_GO` present, untouched.
+* `kai-pm/ITEM8_GO` **ABSENT**. Stage 2 **NOT AUTHORISED**. Phase B not
+  authorised, no sweep code. **rawjson on a real daemon: still
+  UNMEASURED.** 048 C **BLOCKED**, counts unchanged.
