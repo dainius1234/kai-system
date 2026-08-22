@@ -26267,3 +26267,130 @@ None of these is authorised and none has been performed.
 `ITEM8_PREFLIGHT_GO` present and spent; `ITEM8_GO` **ABSENT**; Phase B
 **unresolved and unauthorised** — untouched by any of this; Stage 2 **NOT
 AUTHORISED**; counts unchanged (Rule 7).
+
+---
+
+## D323 — Option 2 executed. Unified Hunter has been red for 60 consecutive runs.
+
+Kai's ruling: recover the pre-`7c2669b` datum from history before
+touching the instrument. **Read-only. No mutation. No revert performed.**
+
+### 1. The result
+
+Unified Hunter runs on this branch, `event=push`, newest first:
+
+```
+run 291  5b490c9  failure      run 286  772ae55  failure   <- BEFORE my edit
+run 290  a496d2d  failure      run 285  82f33c3  failure
+run 289  dcd3b6e  failure      run 284  ce2d9a4  failure   <- the P1 commit
+run 288  bc9a4d3  failure      run 283  848c42a  failure   <- X2
+run 287  7c2669b  failure      ...
+                               run 232  2b3fe98  failure
+
+runs 232 .. 291 : 60 consecutive runs, 60 failures, ZERO successes
+```
+
+The last green is older than run 232; I did not page further, because the
+question was already answered 57 times over.
+
+### 2. My edit is EXONERATED, by evidence rather than by argument
+
+`fetch-depth: 2` entered `unified-hunter.yml` at **`7c2669b` (run 287)**.
+The workflow was already failing at **run 286 (`772ae55`)**, the commit
+immediately before it, and at every one of the **55 runs before that**.
+
+**Change coupling: EXCLUDED.** Not "unlikely on a mechanism argument" —
+excluded by fifty-five prior red runs.
+
+This is the discriminator I proposed as option 1, obtained without
+mutating the tree. Kai's instruction to spend free historical evidence
+before deliberately changing the instrument was the right call, and the
+revert is **not needed**. It has not been performed.
+
+### 3. The counterfactual I lacked at D321 is now settled
+
+D321 recorded that, unlike Core Tests, I could not say P1 ran alongside a
+red Unified Hunter.
+
+**Run 284 = `ce2d9a4` = the P1 commit = FAILURE.**
+
+So **P1 (`32594846522`) executed and passed while Unified Hunter was
+already red at that exact commit** — the same empirical form that cleared
+Core Tests, now available for this red too.
+
+### 4. Disposition — moved
+
+**Unified Hunter step 6: STILL UNKNOWN → UNRELATED EXISTING PROBLEM.**
+
+| axis | evidence |
+|---|---|
+| 1 dependency | Item-8 workflows do not invoke `make test-uh`. |
+| 2 change coupling | **EXCLUDED** — red at run 286 and 55 runs before my edit existed. |
+| 3 measurement coupling | Item-8 closure is 6 modules + stdlib (D321 §1). |
+| 4 authority coupling | Guard modules sit inside that stdlib-only closure. |
+| 5 execution coupling | The six builds run `docker build`, not `make test-uh`. |
+| 6 counterfactual | **P1 passed at `ce2d9a4` while run 284 was red at that commit.** |
+
+**Cause remains UNRESOLVED** — step 6's output is outside the retrievable
+byte window (rule 22), and it passes locally at 78/0 (D322 §3), so it is
+CI-environment-dependent. *Unrelated to Item 8* and *unexplained* are
+different statements and both hold.
+
+### 5. Corrections owed
+
+**(a) Terminology, per Kai.** D322 said the failure is "reproducible, not
+transient". Overstated from two runs. The correct form was *"recurred in
+CI; a transient explanation is materially weakened."* At **60 consecutive
+failures** determinism is now strongly evidenced — but the register
+should show that the wording was fixed before the evidence arrived, not
+because of it.
+
+**(b) I blamed a tool for my own malformed call.** D321 and D322 both
+record that "the API ignores its `workflow_id` filter". **It does not.**
+The parameter is `resource_id`; filters belong inside
+`workflow_runs_filter`; the page size is `per_page`. I sent `workflow_id`
+and a top-level `branch`, which are not in the schema and were silently
+dropped. **I never sent a filter and then reported that the filter was
+ignored** — an instrument blamed for an unread manual. Reading the tool
+schema, which took one call, turned an "unavailable" datum into a
+five-second query.
+
+**(c) A "cannot" withdrawn.** D322 §4 argued `fetch-depth: 2` "cannot
+remove a suite from a log". **"Cannot" is R0's first tell**, and Kai is
+right that `test-uh` contains workflow/CI-inspection suites
+(`test-workflow-filters`, `test-workflow-outputs`, `test-ci-scripts`,
+`test-test-wiring`) whose subject *is* CI behaviour. The inference is
+withdrawn. It is now moot — §2 settles the same question with evidence —
+but it was wrong when written.
+
+### 6. THE FINDING THAT IS BIGGER THAN ITEM 8
+
+**A gate has been failing in CI for at least 60 consecutive pushes, and
+nobody noticed.**
+
+`make test-uh` is the Unified Hunter suite — the architecture's own test
+surface, 78 suites, all of which **pass locally**. In CI it has not
+passed once in the last 60 runs on this branch.
+
+That is the precise thing the census was authorised to find, and it is
+much larger than any Item-8 question. It is **not** repaired here, and
+nothing about it is fixed merely for being red. It is recorded so that
+"gates green" can never again be said of this repository without naming
+which gate, in which environment, and when it last actually passed.
+
+### 7. Status
+
+* Census + adjudication now **complete**: **3 of 3 reds classified
+  UNRELATED EXISTING PROBLEM**, all three with the counterfactual that
+  P1 ran and passed alongside them.
+* **No red is demonstrated to block Item 8, and none now sits in STILL
+  UNKNOWN.**
+* Causes of all three remain **UNRESOLVED**. Unrelated is not explained.
+* `fetch-depth: 2` on `unified-hunter.yml` remains **unjustified**
+  (D322 §4). Now a tidiness matter, not a discriminator. **Not touched.**
+* Nothing repaired, nothing suppressed, no workflow edited, **no revert
+  performed**.
+* P1 stands. `ITEM8_PREFLIGHT_GO` present and spent. `ITEM8_GO`
+  **ABSENT**. **Phase B unresolved and unauthorised** — untouched by any
+  of this and unaffected by it. **Stage 2 NOT AUTHORISED.** Counts
+  unchanged (Rule 7).
