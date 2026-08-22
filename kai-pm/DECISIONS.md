@@ -24899,3 +24899,98 @@ after the fact; a predicted one is evidence the mechanism behaved.
 * `kai-pm/ITEM8_GO` **ABSENT**. Stage 2 **NOT AUTHORISED**. Phase B not
   authorised, no sweep code. **rawjson on a real daemon: still
   UNMEASURED.** 048 C **BLOCKED**, counts unchanged.
+
+---
+
+## D312 — Step 4 cleared. The little test that checks the preflight test is finished.
+
+**2026-08-22. Kai's clearance of the D309–D311 repair, recorded. Step 5
+NOT started. No amendment to frozen R2 `0055ead8…8796`. Nothing built.
+`kai-pm/ITEM8_GO` absent.**
+
+### 1. What was cleared
+
+Verified by Kai at the exact pushed commit
+`12fc0bfe42589d4049d001a3c70219f45530016e`:
+
+* baseline cardinality is proven from `git diff --name-status BEFORE
+  AFTER` and must equal exactly the expected sentinel-deletion rows;
+* when there is nothing to remove, it also proves **no baseline commit
+  happened**;
+* an unrelated `M`, `A`, `D` or rename can no longer hide behind
+  identical path membership;
+* `ls-tree` and clean-tree remain as **complementary** checks rather
+  than pretending to prove cardinality themselves;
+* across D309 → D311 the **production authority guard is unchanged** —
+  the changes are confined to preflight calibration plus records.
+
+The `58/0` and reinjection numbers remain **ORION-REPORTED**; the
+mechanism they describe is **KAI-VERIFIED** by source inspection. Kai
+cannot execute the clone-based suite from their sandbox, and that split
+stays explicit rather than collapsing because the numbers have been
+consistent.
+
+### 2. What this cost, stated plainly
+
+Four entries — D309, D310, D311, and this — to repair **a test that
+checks a test**. Not the experiment, not the measurement: the
+calibration of the calibration.
+
+That is not obviously proportionate, and I want the reason recorded
+rather than assumed. It was worth it because the defect class was the
+one that has recurred most in this programme — an instrument confirming
+a property *adjacent* to the one it claims — and because each repair I
+made contained the next instance of it:
+
+| round | what was claimed | what was actually proved |
+|---|---|---|
+| D309 | the fixture proves the guard says yes | it proved that only before the first real authorisation |
+| D310 | removed exactly the intended paths | no other path was **added or removed** |
+| D311 | — | the diff, by operation, is exactly the intended rows |
+
+Three layers, each found by the reviewer, each real. A cheaper stopping
+point would have been available at any of them, and would have left a
+fixture that reports coverage it does not have.
+
+### 3. Step 5, predicted before it runs
+
+Removing `kai-pm/ITEM8_PREFLIGHT_GO` **will trigger the preflight
+workflow** — the `paths:` filter reacts to the named path changing, and
+deletion is a change (D311 §4).
+
+Expected sequence, written down in advance:
+
+    workflow starts
+      → authority guard: the sentinel does not exist
+      → REFUSED
+      → calibration does not run
+      → rawjson does not run
+      → zero subject builds
+
+**That refusal is the mechanism working, not a defect.** If anything
+gets *past* the authority gate, that is a finding and will be reported
+as one.
+
+### 4. What follows, and whose act each is
+
+1. **step 5** — remove the spent sentinel as a governed transition,
+   never a history rewrite; verify the refusal run behaves as predicted;
+2. **X₂** — a new clean reviewed tree;
+3. a **completely regenerated** envelope against X₂, held out of tree;
+4. the payload shown to the operator;
+5. **the operator alone** decides whether to authorise **P1**.
+
+**P0 is permanent and P1 will never overwrite it**: authority PASS →
+calibration FAIL → rawjson UNMEASURED, run `32575388846`. Two attempts,
+two results, both standing.
+
+### 5. Status
+
+* Step 4 **CLEARED**. Step 5 **not started** — it mutates the repository
+  and triggers a run, so it is not mine to begin unasked.
+* `kai-pm/ITEM8_PREFLIGHT_GO` present and spent. `kai-pm/ITEM8_GO`
+  **ABSENT**.
+* frozen R2 `0055ead8…8796` **PASS**, unamended.
+* Phase B not authorised, no sweep code. Stage 2 **NOT AUTHORISED**.
+* **rawjson on a real daemon: still UNMEASURED.** 048 C **BLOCKED**,
+  counts unchanged.
