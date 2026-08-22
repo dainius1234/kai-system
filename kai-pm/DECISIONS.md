@@ -25135,3 +25135,232 @@ Had the experiment carried the same echo, this would have been a finding.
   code. Stage 2 **NOT AUTHORISED**.
 * **rawjson on a real daemon: UNMEASURED.** 048 C **BLOCKED**, counts
   unchanged (Programme Rule 7).
+
+---
+
+## D314 — Narrowing correction to D313, and a state-dependent denominator found while gating
+
+Governance-only. **No implementation changes.** Kai ruled Step 5
+**CLOSED-PROVEN**; this entry records the four rulings, corrects one
+overclaim of mine in D313, and logs one new observation found while
+running the gates Kai asked for.
+
+### 1. CORRECTION — D313 §5(b) overclaimed a denominator
+
+D313 ended §5(b) with:
+
+> ~~So the population of "hardcoded outcome claims that could lie" is
+> **zero**.~~
+
+**Struck.** That sentence claims a mechanically complete population from
+a **hand-reviewed denominator of two workflow files**. It is the exact
+defect R5 names — a scope defined by a list I checked rather than by data
+traversed — committed in the same paragraph where I congratulated myself
+for having read the second file instead of remembering it.
+
+What disproves it: `check_preflight_reachability.py` forbids **three
+known Item-8 mechanisms** (runner, deriver, summariser). It does not
+mechanically derive every future way a script could build a subject, and
+it says nothing about a workflow nobody has written yet.
+
+**The corrected claim, which is what the evidence actually supports:**
+
+> The current tree was reviewed and **no unsafe hardcoded outcome claim
+> was identified**. In run `32583346970` subject machinery did not
+> execute; the experiment workflow derives its verdicts through
+> `summarise_item8.py` rather than through a hardcoded epilogue.
+
+**Classification: real assurance debt, not a P1 blocker.** Kai's ruling,
+which I accept: do **not** build another generic checker now — that is
+another apparatus detour in front of the only unanswered question.
+
+I raised this myself as attack (ii) and I was right to distrust it. I was
+still wrong to have written it.
+
+### 2. Ruling — "triggered ≠ authorised", phrased precisely
+
+I accept Kai's narrowing. The defensible statement is:
+
+> **A workflow trigger is not sufficient execution authority.**
+
+This run is a genuine counterexample, not merely "the guard happened to
+run first": the GitHub trigger condition was **TRUE** — the deletion
+started the workflow — while the authority condition was **FALSE**, and
+execution stopped at that **independent** predicate.
+
+It does **not** prove complete mediation, nor that every conceivable
+unauthorised state is caught. It proves the separation exists and held on
+the real path.
+
+### 3. Ruling — the skipped gates before `f615171`
+
+Approved **for this transition only, and not to be generalised.** The
+opposing argument is real and is recorded so it is not lost: a policy
+gate could in principle detect a bad post-state, and running it on the
+following commit does not retroactively prove the `f615171` tree.
+
+It stands here because the object under authorisation was explicitly one
+deletion; allowing `sync-docs` to rewrite a second path would have
+destroyed the reviewed transition identity; the parent was already
+reviewed and green; no executable code changed; mutation cardinality was
+exact; and the real authority mechanism then exercised the resulting
+state.
+
+**Standing improvement, logged not built:** identity-critical transitions
+need **check-only/non-mutating gates**, or gates run in an **isolated
+worktree**, so that "gate it" and "preserve exact mutation identity" stop
+competing. They should never have been in tension.
+
+### 4. NEW OBSERVATION — the calibration's denominator moves with tree state
+
+Found while running the gates Kai ordered. **Measured, not inferred**,
+with a known-positive and a known-negative (I-8):
+
+| tree state | result |
+|---|---|
+| sentinel **ABSENT** (live tree, `76fc7bc`) | **59 passed, 0 failed** |
+| sentinel **PRESENT** (scratch clone `ff4b3ec`) | **58 passed, 0 failed** |
+
+Cause, located rather than guessed —
+`scripts/test_item8_preflight.py:386-389`:
+
+```python
+if not carried:
+    check(f"[{label}] with nothing carried, the baseline did not commit",
+          baseline_after == baseline_before, ...)
+```
+
+A check that exists only on the `carried`-empty branch.
+
+**Two consequences, and they point opposite ways.**
+
+**The good one, and it is substantial.** The repaired fixture has now
+been exercised in **BOTH** states by **real repository state**, not by
+simulation:
+
+* `carried` **non-empty** → baseline commit made → ADD still holds. Proven
+  at 58/0 while the sentinel was live in the tree.
+* `carried` **empty** → no baseline commit → and the extra check proves
+  no commit happened. Proven at 59/0 now.
+
+The P0 production defect (D309) lived precisely in the first branch and
+was **unreachable by local testing at the time**. Both branches are now
+closed by execution.
+
+**The debt.** A printed total that moves with repository state means a
+reader comparing runs cannot distinguish *"coverage changed"* from
+*"state changed"* — the I-8 shape where progress and absence become
+indistinguishable. Severity **LOW**: the exit gate keys on failures, not
+on the count, and no assertion was lost in either direction. **Logged,
+not fixed**, under the same ruling as §1 — no apparatus before rawjson.
+
+### 5. The sequence from here, constrained in advance
+
+1. this correction (**done**);
+2. **all normal gates** while the tree is still mutable, including the
+   repaired calibration in the sentinel-absent state;
+3. establish the exact **X₂** commit and tree, final review;
+4. once X₂ is declared **terminal, nothing else is committed** before
+   authorisation;
+5. regenerate the envelope **from scratch, outside the repo** — all four
+   lines, exact X₂ commit and tree, frozen R2, `authorises=preflight` —
+   and compute the **SHA-256 of the exact payload bytes**. **No
+   hand-editing the P0 envelope.**
+6. show the operator: X₂ commit, X₂ tree, complete payload, payload
+   SHA-256 — **before any file is added**;
+7. after fresh operator authorisation the only child of X₂ is
+   `A	kai-pm/ITEM8_PREFLIGHT_GO`. **Nothing else** — no `sync-docs`, no
+   cleanup, no decision entry between X₂ and that child.
+
+Then P1 asks the question: authority → repaired calibration → toolchain
+capture → **real rawjson/BuildKit measurement** → retained evidence.
+**Green or red rawjson is evidence.** If calibration stops it again,
+rawjson remains UNMEASURED and we say exactly that.
+
+### 6. Status
+
+* Step 5 **CLOSED-PROVEN** (Kai).
+* **P0 remains permanent beside P1.** It is not a failed attempt to be
+  hidden — it is the run that exposed the calibration-state defect.
+* Neither R12 observation from D313 is fixed: the artefact error is
+  signal-quality debt, the hardcoded epilogue is future-proofing debt,
+  and §4 above is denominator-stability debt. **None threatens this
+  measurement.**
+* `ITEM8_GO` **ABSENT**. `ITEM8_PREFLIGHT_GO` **ABSENT**. frozen R2
+  `0055ead8…8796` unamended. Phase B not authorised. Stage 2 **NOT
+  AUTHORISED**.
+* **rawjson on a real daemon: UNMEASURED.** 048 C is blocked on that and
+  on nothing else. Counts unchanged (Programme Rule 7).
+
+### 7. The gates Kai ordered — results, and what running them exposed
+
+**All four `prepush` components PASS**, plus the calibration Kai named:
+
+| gate | result |
+|---|---|
+| `policy-check` | **exit 0** — 101 instrumentation invariants, 0 findings; docs current |
+| `test-uh` | **exit 0** — Suite Floor 18/0, all Unified Hunter suites |
+| `test-assertion-floors` | **exit 0** — 40/0 |
+| `coverage-floors` | **exit 0** — all per-module floors met, total 71% |
+| preflight calibration, sentinel-absent | **exit 0** — 59/0 |
+
+**But the chain did not run on the first attempt, or the second, or the
+fifth**, and what stopped it is worth recording because it changes what
+"gates green" is evidence *about*.
+
+**Six dependencies were absent** from a freshly-provisioned container:
+`httpx`, `fastapi`, `pytest`, `cffi`, `jsonschema`, `pytest-cov`,
+`python-multipart`, `python-docx`. Each stopped the chain at a different
+target. Every failure was an **unmet environment prerequisite**, and in
+every case the suite **refused to certify rather than fabricating a
+result** — R11 working, including the test-isolation suite's nine rows
+that all traced to one missing `pytest`, and `test_llm_contract`'s
+explicit *"no verdict stronger than REQUIRED FIELDS PRESENT is possible"*.
+
+`scripts/setup.sh` installs **no Python dependencies** — it is
+Docker-oriented. **There is no declared path that provisions a local
+environment for `make prepush`.** Discovering the set required six
+iterations of run-fail-install. That is real debt: it makes local gating
+unreproducible, and it means an operator running the gates locally cannot
+know whether a red is a tree defect or a missing package.
+
+**The sharper finding — a gate whose verdict is decided by a version
+nobody declares.** `make coverage` runs the **entire repository's tests
+in one interpreter**, but services declare **mutually unsatisfiable**
+pins: 22 want `fastapi>=0.116.2` (which requires `pydantic>=2.9.0`) while
+9 pin `pydantic==2.8.2`. So a single local environment **cannot** match
+all declared pins simultaneously — fine for containerised services that
+each get their own image, incoherent for a gate that runs them together.
+
+Measured across three points rather than argued (I-8, known-positive and
+known-negative):
+
+| pydantic | `coverage-floors` |
+|---|---|
+| `2.13.4` (pip's choice with latest fastapi) | **39 failed** — `PydanticUserError: At least one of by_alias or by_name must be set` |
+| `2.9.2` (a declared pin) | **4 collection errors** — `PydanticUndefinedAnnotation` |
+| `2.8.2` (a declared pin) | **exit 0, PASS** |
+
+**The configuration in which this gate passes is one `pip` reports as
+broken** — it warns `fastapi 0.141.1 requires pydantic>=2.9.0, but you
+have pydantic 2.8.2`. A gate that is green only under a dependency set
+its own resolver calls invalid is not measuring what its name claims.
+
+I initially attributed the 39 failures to my own installs and was
+**right, but only by luck of ordering** — I had no evidence until I
+pinned the declared version and re-ran the six affected files: **95
+passed, 4 failed**, the four being `ModuleNotFoundError: No module named
+'docx'`. That converted an inference into a measurement, and it is the
+only reason the attribution is stated here as fact.
+
+**Classification: environment and gate-definition debt. Zero tree
+defects found.** Nothing here is an Item-8 blocker and nothing here is
+fixed — same ruling as §1 and §4, no apparatus before rawjson. It is
+logged so that the next person who sees `make prepush` fail does not
+spend six rounds rediscovering it.
+
+**What this does NOT establish:** that CI would produce these same
+results. CI provisions its own environment (`pip install -r "$req" ||
+true`, per-service), and remains the authority for these suites. What is
+established is that **the tree at this commit passes every gate in the
+declared chain**, under a pin set recorded above.
