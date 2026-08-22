@@ -26148,3 +26148,122 @@ irreversible.
 * `ITEM8_PREFLIGHT_GO` present and **spent**; `ITEM8_GO` **ABSENT**.
 * Phase B **unresolved and unauthorised**. Stage 2 **NOT AUTHORISED**.
 * Counts unchanged (Programme Rule 7).
+
+---
+
+## D322 — Unified Hunter red again, my discriminator logic was wrong, and I over-applied my own fix
+
+### 1. The result
+
+Run `32601856400`, `a496d2d`, **FAILURE**. Also on that commit:
+Policy-as-Code `32601856410` **SUCCESS**; Core Tests `32601856884`
+**FAILURE**; Python application still running at time of writing.
+
+**The failure is REPRODUCIBLE, not transient.**
+
+### 2. CORRECTION — the discriminator reasoning was wrong, and I repeated it
+
+Kai offered, and **I accepted and restated**, that `a496d2d` is a clean
+discriminator "because it does not change those workflow YAMLs".
+
+That is wrong. **The `fetch-depth: 2` edits are still in `a496d2d`'s
+tree.** They were introduced at `7c2669b` and persist. A commit that does
+not *modify* a file still *contains* it.
+
+So this run discriminates **transience** — reproducible, not a flake —
+and discriminates **nothing** about whether my edit is implicated,
+because the edit is present in both red runs. The green branch of Kai's
+conditional was sound; the red branch carries no symmetric conclusion,
+and I should have caught that before repeating it rather than after.
+
+### 3. Independent corroboration: it does not reproduce here
+
+`make test-uh` at `a496d2d`, this container:
+
+```
+78 suite(s) reporting EXIT GATE: PASS
+ 0 suite(s) reporting EXIT GATE: FAIL
+make test-uh exit: 0
+"All Unified Hunter suites passed."
+```
+
+The `FAIL:` strings in that log are **known-negative fixture output** —
+one sits directly beneath a `PASS:` line from the same test — and `make`
+would have halted at any real failure.
+
+**Local green, CI red. The second instance of this divergence** (D317 was
+the first). And it is **not** a clearing argument: D317 is the standing
+proof that local green is not evidence about CI. What it establishes is
+narrower and still useful — the failure is **CI-environment-dependent**
+and is not a defect reproducible in a clean checkout.
+
+### 4. MY OWN ERROR — `fetch-depth: 2` never belonged on this workflow
+
+Found while checking whether my edit could be causal.
+
+At D317 I identified "both consumers of `policy-check`" with
+`grep -rln 'policy-check\|test-item8-preflight' .github/workflows/`,
+which matched `policy-checks.yml` and `unified-hunter.yml`.
+
+**`unified-hunter.yml` matched on PROSE, not on an invocation.** Its
+line 61 is a *pre-existing comment* reading "`pip install pyyaml` in
+policy-checks.yml was exactly…". The workflow runs one thing —
+`make test-uh` — whose 76 prerequisites include **neither**
+`test-item8-verdicts` nor `test-item8-preflight`, and nothing in it
+resolves `HEAD~1`.
+
+So the D317 repair was applied to a workflow **that did not have the
+defect**. A scope derived from a grep over comments is R5's defect
+exactly, and it is the same trap `item8-preflight.yml`'s own comments
+warn about: *"Naming it — even to explain that it is excluded — puts it
+back in the closure, because that check counts a mention as a
+reference."* I then added a comment naming `test_item8_verdicts.py` to
+that file, so the grep now matches it **because of my own edit** — R9's
+shape, an instrument whose presence changes what it measures.
+
+**This does not establish that my edit caused the red.** `fetch-depth: 2`
+supplies *more* history than `1`; there is no mechanism by which it
+removes a suite from a log. What it establishes is that the change was
+**unjustified**, and an unjustified change sitting in a red workflow
+cannot be waved off.
+
+### 5. The datum that would settle it, and which I do not have
+
+**Was Unified Hunter red before `7c2669b`?** I have no verified
+conclusion for it at `82f33c3` or earlier. The API ignores its
+`workflow_id` filter and returns branch-wide runs, and **guessing run ids
+is forbidden** — doctrine rule 4 was earned by four 404s from guessed
+ids.
+
+Without that datum, *both* "my edit caused it" and "pre-existing" are
+unproven.
+
+### 6. Disposition — unchanged
+
+**Unified Hunter step 6: STILL UNKNOWN.**
+
+Better characterised than before — reproducible in CI, not reproducible
+locally, therefore environment-dependent — but the cause is
+**UNRESOLVED**: step 6's own output is outside the retrievable byte
+window (rule 22) and rule 31 forbids substituting the diagnostic after
+it.
+
+### 7. Options, presented and NOT taken
+
+None of these is authorised and none has been performed.
+
+1. **Revert `fetch-depth: 2` on `unified-hunter.yml` only.** It was never
+   needed (§4), so this is a *correctness* change on its own merits —
+   and it doubles as the decisive discriminator: still red ⇒ my edit
+   exonerated; green ⇒ implicated. Mutating; requires operator
+   authority.
+2. **Recover a pre-`7c2669b` Unified Hunter conclusion** by paging the
+   runs API far enough back. Read-only, costly in context, no guessed
+   ids.
+3. **Leave it UNKNOWN** and treat an unresolved red as a standing bar to
+   the six builds.
+
+**Nothing repaired. No red fixed for being red.** P1 stands.
+`ITEM8_PREFLIGHT_GO` present and spent; `ITEM8_GO` **ABSENT**; Phase B
+**unresolved and unauthorised** — untouched by any of this; Stage 2 **NOT
+AUTHORISED**; counts unchanged (Rule 7).
