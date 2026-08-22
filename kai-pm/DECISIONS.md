@@ -25364,3 +25364,162 @@ results. CI provisions its own environment (`pip install -r "$req" ||
 true`, per-service), and remains the authority for these suites. What is
 established is that **the tree at this commit passes every gate in the
 declared chain**, under a pin set recorded above.
+
+---
+
+## D315 — P1: rawjson MEASURED on a real daemon. And the P0 defect is repaired in production.
+
+**Authority.** Explicit operator authorisation for P1 only, given after I
+declined to treat Kai's relayed recommendation as authority and asked the
+operator directly. Kai's instruction template is not the operator's act;
+every prior gate this programme carried the operator's own words, and so
+does this one.
+
+**Run `32594846522`** — `item8-preflight.yml`, run_number 3, attempt 1,
+event `push`, head_sha `ce2d9a4`, conclusion **success**, 23 seconds.
+
+### 1. The launch, and what each gate stopped
+
+Child commit `ce2d9a47950dcbe7b6083b1ac2336d7ef33526cb`, sole direct
+child of X₂ `848c42a`. Five gates, each able to abort before the push:
+launch pad unmoved (HEAD, tree **and remote** all X₂, clean, zero
+sentinels); payload 208 bytes / sha256 `6e0ab5e3…9b10` byte-identical to
+the reviewed envelope; staged diff exactly `A ITEM8_PREFLIGHT_GO`;
+commit with **one** parent = X₂ and a one-ADD diff; and the shipped guard
+returning 0 locally. Pushed once, `848c42a..ce2d9a4`.
+
+### 2. THE RESULT — rawjson works on this daemon
+
+```
+docker 28.0.4  |  buildx v0.36.1  |  Linux 6.17.0-1022-azure
+
+started                          True
+cached_forced                    False
+cached_repeat                    True
+full_instruction_in_vertex_name  True
+instruction_mentions             1
+runtime_marker_count             3
+failing_build_exit               1
+target_error                     process "/bin/sh -c echo PREFLIGHT-TARGET-
+                                 INSTRUCTION && … exit 7" did not complete
+aba_digests    aba1 sha256:e9c3ea287bac
+               abab sha256:aa375eaf4ab9
+               aba2 sha256:e9c3ea287bac
+digest_stable_across_invocations True
+netmode_changes_vertex_digest    True
+flags_in_vertex_name             True     (property 7 — measured, not required)
+
+inspected: 7 non-subject build(s) across 6 required propert(ies)
+PASS: rawjson on THIS daemon separates instruction from runtime, reports
+execution and cache state, and attributes a failing step's error to that step.
+```
+
+The A/B/A differential is the part that matters most: `aba1` and `aba2`
+are **identical** and `abab` **differs**. A digest that changed on
+irrelevant re-invocation would have made vertex corroboration worthless;
+one that never changed would have made it vacuous. It does neither.
+
+**Evidence retained**: 24 files, artifact `9481273862`, 20,083 bytes,
+zip sha256 `ec89c363…acdc`. Raw captures kept under
+`item8-preflight/captures/item8-preflight-gssalmp9` — `--workdir` and
+`--keep` both did their job.
+
+**The 23 seconds is explained, not waved away**: the seven builds are
+deliberately trivial non-subject builds; the measurement step itself ran
+9 seconds (19:49:33→19:49:42). Nothing was skipped — every step
+completed, and the step list shows all eight.
+
+### 3. THE MORE IMPORTANT RESULT — P0's defect is repaired *in production*
+
+The calibration reported **58 passed, 0 failed**. Not 59.
+
+That is not a discrepancy. It is the confirmation. D314 §4 recorded that
+the count is state-dependent, and **on the runner the sentinel is
+PRESENT** — P1 put it there. So the fixture took the `carried`-**non-empty**
+path: clone, find inherited authority state, remove it, commit that
+removal as its own commit, then ADD the envelope against a parent that
+provably has none.
+
+**That is the exact branch that failed P0** (D309), where the inherited
+sentinel turned the ADD into a MODIFY and the guard refused `'M', not
+'A'`. It was the branch **unreachable by local testing at the time**.
+
+It now passes, in the real runner, in the real production state.
+
+**This retires Kai's narrowing on attack (iv).** His ruling was that the
+`carried`-non-empty branch was only *"exercised against a constructed
+committed sentinel-present state"* and that *"only P1 will exercise the
+repaired chain again in the real GitHub runner environment."* P1 has now
+done exactly that. The correct classification is:
+
+* `carried`-**empty** — exercised against real repository state (59/0, D314);
+* `carried`-**non-empty** — **exercised in production on the real runner
+  (58/0, this run)**, closing the branch that broke P0.
+
+Rule 29 — *a repair is not complete until a fixture can detect its
+absence* — is satisfied by execution, not by argument.
+
+### 4. Corrections banked as promised
+
+Recorded here because I said in chat that they would be, and "said in
+chat" is not "recorded" (R1, D311).
+
+**Kai's ruling on (iii), adopted verbatim as the verdict for
+`coverage-floors` at X₂:**
+
+> **PASS-UNDER-STATED-LOCAL-ENVIRONMENT** (pydantic 2.8.2);
+> **REPOSITORY-WIDE APPLICABILITY UNRESOLVED.**
+
+*"coverage-floors exited 0 under environment E"* is evidence. *"the
+repository's declared dependency configuration passes coverage-floors"*
+is **not established** — the gate runs the whole repository in one
+interpreter while the declared per-service pins cannot coexist in one.
+I had overpromoted it to a plain PASS. Debt banked, not repaired.
+
+**Kai's sharpening on (ii)**, replacing my reasoning: the dry-run consumed
+nothing not because the throwaway child was "content-addressed and
+destroyed", but because the one-shot mechanism is *real repository state
++ ADD + direct-child identity + run attempt 1*, and a local clone
+satisfies none of those against the authoritative branch. My version
+named a property that was true but not the operative one.
+
+### 5. What is now answered, and what is not
+
+**ANSWERED.** rawjson on a real daemon: **MEASURED, PASS.** This is the
+single question 048 C was blocked on since the contingency work began.
+The instrument can be read; the six frozen subjects **could** be observed.
+
+**NOT ANSWERED, and not touched.** Whether the contingency holds. Zero
+subject builds ran. No result row was written. The frozen denominator is
+untouched.
+
+The measurement says so itself, and the wording is the whole point:
+
+> **PREFLIGHT PASS IS EVIDENCE, NOT EXECUTION AUTHORITY.** It says this
+> daemon can be read; it authorises nothing.
+
+**A green preflight is not permission to spend the denominator.** Stage 2
+remains **NOT AUTHORISED**. `ITEM8_GO` remains **ABSENT**. Phase B
+remains unauthorised with no sweep code.
+
+### 6. Status
+
+* **P1 COMPLETE.** Authority PASS → calibration PASS (58/0, production
+  branch) → toolchain recorded → **rawjson PASS** → evidence retained.
+* **P0 = run `32575388846` remains permanent beside it.** It is not a
+  failed attempt to be hidden — it is the run that exposed the
+  calibration-state defect that P1 has now proved repaired. Two attempts,
+  two results, both standing, neither overwriting the other.
+* `ITEM8_PREFLIGHT_GO` is now **spent**: the guard requires an ADD, so it
+  can never authorise anything again. Retiring it is a separate governed
+  act and is **not** taken here.
+* frozen R2 `0055ead8…8796` verified unamended at X₂ and by the run.
+* Open debt, none of it fixed and none of it blocking: the artefact step
+  cannot distinguish "measured nothing" from "refused before measuring";
+  the epilogue asserts `subject builds run : 0` rather than deriving it;
+  the calibration denominator moves with tree state; `coverage-floors`
+  applicability UNRESOLVED; the guard still prints "3 binding(s)" while
+  naming four concepts.
+* **048 C's blocking question is answered. Closure is a separate,
+  evidence-backed register action and is NOT taken here** (Programme
+  Rule 7 — counts do not change because a result landed).
