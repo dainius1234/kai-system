@@ -15,7 +15,7 @@ Use this order when recovering state:
 5. **Canonical machine registers / experiment artefacts / workflow run evidence** for the specific claim.
 6. Other plans, trackers, READMEs and status documents only after their authority/currentness has been qualified.
 
-Never promote README, STATUS, backlog, continuation notes, this continuity file, or chat memory above the sources above.
+Never promote README, STATUS, backlog, continuation notes, this continuity file, external-model advice, or chat memory above the sources above.
 
 ## 2. Fresh-thread recovery algorithm
 
@@ -72,3 +72,73 @@ When a Kai thread is approaching a handoff or context limit:
 4. Do not claim the handoff is complete until the repository artefact is independently visible.
 
 The repository is the workshop. Chat is the working conversation, not the durable record.
+
+## 6. External Technical Review Protocol — DeepSeek / specialist second opinion
+
+Dainius has authorised use of an outside technical/coding adviser when a fresh independent view or specialist expertise can materially improve a decision.
+
+### Role separation
+
+- **Orion** — repository-side evidence collection, controlled execution and implementation.
+- **Kai** — programme architecture, historical context, repository review, reconciliation and challenge.
+- **DeepSeek / external specialist** — adversarial technical/coding review, alternative implementation ideas, algorithmic critique and specialist second opinion.
+- **Dainius** — final operator authority for consequential programme decisions.
+
+An external adviser does **not** have repository authority merely because its technical analysis is strong. Advice that depends on repository reality remains `HYPOTHESIS / REVIEW INPUT` until verified against the exact repo/tree/run/evidence by Kai or Orion.
+
+### When Kai should seek an external technical review
+
+Use judgement rather than a fixed quota, but positively consider review when any of these apply:
+
+1. **Novel or difficult implementation** — complex algorithm, parser, concurrency, security, provenance, build/release, model-runtime or infrastructure design.
+2. **Repeated failure class** — two or more fixes expose defects in the same conceptual family, or a repair creates a neighbouring defect.
+3. **Disagreement or unresolved interpretation** — Kai and Orion reach materially different technical conclusions, or available evidence supports competing explanations.
+4. **High-consequence boundary** — before freezing a major instrument/specification, adopting a new architecture, approving a consequential control, or making a hard-to-reverse implementation choice.
+5. **Fresh-eye checkpoint** — a long run of internally consistent work risks shared assumptions or tunnel vision.
+6. **Specialist gap** — a question is likely to benefit from deeper coding/algorithmic expertise than the current review has exercised.
+
+Routine, already-proven work does not require external review merely for ceremony.
+
+### Before asking the external adviser
+
+Kai should formulate the smallest technically complete question and provide the minimum evidence/context needed to avoid solving the wrong problem. Where relevant include:
+
+- exact claim/question;
+- applicable frozen rules/constraints;
+- relevant code or pseudocode;
+- observed results/failures;
+- what is known versus inferred;
+- what the adviser cannot independently verify because it lacks repository access.
+
+Do not ask an external adviser to infer current repository state from incomplete prose if Kai/Orion can measure it directly.
+
+### How external advice is admitted
+
+For every material external recommendation:
+
+1. classify it as `SUPPORTED / PARTIALLY_SUPPORTED / CONFLICTS_WITH_REPO / UNVERIFIED` after repo review;
+2. verify every repository-dependent factual premise independently;
+3. surface disagreements rather than averaging them away;
+4. where conclusions differ, identify the cheapest discriminating measurement/test;
+5. bank any adopted material design change or new obligation in the repository decision/evidence trail.
+
+External advice can strengthen, challenge or replace a proposed technical approach after verification. It cannot by itself close findings, alter frozen evidence, authorize scope, or establish repository facts.
+
+### Orion signal
+
+When Orion reaches a question that would materially benefit from outside specialist review, it should explicitly flag:
+
+`EXTERNAL TECHNICAL REVIEW CANDIDATE`
+
+and state:
+
+- the precise technical question;
+- why current internal evidence is insufficient or why fresh review is valuable;
+- the minimum code/evidence/context to send;
+- what decision is blocked or could be improved by the review.
+
+Kai may also invoke external review independently when the conditions above are met.
+
+### Principle
+
+**Use multiple minds, but one evidence standard.** Different reviewers are valuable because they fail differently. Repository truth remains evidence-bound, and consequential authority remains with Dainius.
