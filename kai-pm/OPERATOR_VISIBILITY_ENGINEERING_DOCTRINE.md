@@ -113,6 +113,79 @@ It should answer, quickly and truthfully:
 
 This operator view should be derived from the same qualified truth used by engineering controls where practical.
 
+## OV-7A — Visual mission-control view is mandatory
+
+Dainius primarily consumes complex programme information visually. The operator surface must therefore provide an **overview-first, drill-down-second** experience rather than requiring him to reconstruct programme state from long prose files.
+
+The Phase-2 operator/front-page design should include, where practical:
+
+### 1. Full architecture overview
+
+One current high-level architecture view showing the major Kai systems and how they connect, including the Kingsman control/evidence loop.
+
+The visual must distinguish at least:
+
+- current/live architecture;
+- target/future architecture;
+- transitional/not-cut-over components where material;
+- authority/evidence boundaries;
+- major dependency/order relationships such as Item 8 before A4.
+
+### 2. Programme roadmap / phase strip
+
+A visual progression showing major stages and current position, for example:
+
+`House-in-Order Phase 1 → Item 8 → A4 / Evidence Plane → Phase 2 Professionalisation → Final Kingsman Review`
+
+The exact sequence must be derived from the current D-numbered authority, not this illustrative line.
+
+### 3. Outstanding-work board
+
+Provide a concise status view of material obligations with visible states such as:
+
+- `✅ COMPLETE / VERIFIED`
+- `🟡 IN PROGRESS`
+- `⏸ BLOCKED / WAITING AUTHORITY`
+- `⚠ OPEN DEFECT / RISK`
+- `⬜ NOT STARTED`
+- `❓ UNKNOWN / NEEDS QUALIFICATION`
+
+The state must be evidence-backed; a tick is a claim and must not be used merely because work feels finished.
+
+### 4. Operator decisions / approvals
+
+Clearly surface what requires Dainius's decision separately from technical work the team can continue without him.
+
+### 5. Risks / unknowns overview
+
+Show the small number of material unresolved risks/unknowns that could affect current direction, with links to full evidence.
+
+### 6. Recent-change summary
+
+Show the most important recent architecture/programme changes in plain language so the operator can re-orient quickly after time away.
+
+### 7. Drill-down navigation
+
+Every overview element should point to the deeper canonical evidence/specification/decision rather than duplicating full technical detail on the front page.
+
+The desired operator experience is:
+
+> **See the whole machine → see where we are → see what is done → see what is outstanding → see what needs my decision → drill into detail only when I choose.**
+
+## OV-7B — Visuals are evidence-bearing views, not decoration
+
+Architecture diagrams, progress boards and status graphics must obey the same truth rules as prose.
+
+A diagram arrow is a claim. A green box is a claim. A tick is a claim.
+
+Therefore:
+
+- visuals must carry or inherit exact subject/currentness identity;
+- a superseded diagram must be visibly marked historical/stale;
+- generated status colours/icons must come from qualified status data where practical;
+- no visual should imply a component is live merely because it exists in the target architecture;
+- Phase 2 should prefer diagrams/status views that can be regenerated from structured sources to reduce visual drift.
+
 ## OV-8 — Mechanical enforcement target
 
 The doctrine must not stop at prose.
@@ -126,7 +199,9 @@ Phase 2 must implement/check, where practical:
 - currentness/authority markers for linked architecture/reference documents;
 - a closed denominator showing which operator-facing surfaces/claims the gate actually checks;
 - known-positive mutation demonstrating that a stale/contradictory operator fact makes the control fail;
-- handoff checks that refuse a complete status when material operator state is missing or knowingly stale.
+- handoff checks that refuse a complete status when material operator state is missing or knowingly stale;
+- reconciliation between structured programme status and the visual roadmap/checklist;
+- checks that a displayed completion tick cannot survive withdrawal of its underlying closure evidence where practical.
 
 Until those controls exist, Kai/Orion must compensate procedurally by explicitly checking operator-facing state at handoff.
 
@@ -140,7 +215,8 @@ Examples:
 - service is no longer live but README says LIVE;
 - current metrics differ across the front page;
 - a capability was superseded but old operator guidance still routes to it;
-- a governing rule changed but the handover still states the old rule.
+- a governing rule changed but the handover still states the old rule;
+- roadmap says COMPLETE while its evidence/closure condition no longer holds.
 
 Kai Doctor should be able to report:
 
@@ -152,8 +228,8 @@ During House-in-Order planning on 23 August 2026, the active README was found to
 
 Inspection showed the control only covered a narrow generated population: one README status table and two backlog metrics. Other badges, Quick Reference counts, architecture/status prose and graphics could drift while the docs gate remained green.
 
-The operator stated the practical consequence directly: without a current and comprehensive front page/notes/handover, they cannot keep up with the technical team well enough to lead it. That converts documentation drift from presentation debt into a governance/control defect.
+The operator stated the practical consequence directly: without a current and comprehensive front page/notes/handover, they cannot keep up with the technical team well enough to lead it. The operator further clarified that a visual overview of architecture, planning, outstanding work and completed/checkable items is the primary way they intake complex programme state. That converts visual status design from presentation preference into part of the governance interface.
 
 ## Plain-language rule
 
-> **Do not make Dainius reverse-engineer the project from our code and evidence. We are responsible for keeping the truth visible enough for him to lead it.**
+> **Do not make Dainius reverse-engineer the project from our code and evidence. We are responsible for keeping the truth visible enough for him to lead it — preferably as a clear visual overview first, with technical depth underneath.**
