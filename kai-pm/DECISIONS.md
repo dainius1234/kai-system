@@ -28893,3 +28893,191 @@ README currency.**
   is one**
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D341 — Census v1.0 emittability audit: three defects, one of them
+## architectural (`NO_WRITER` cannot close on this repository)
+
+**Authority.** Kai's D340 ruling: *"Read-only audit is approved under
+existing read-only authority. Do not modify frozen Census v1.0. For
+every disposition/value Census v1.0 declares, establish: implemented
+emission path exists; fixture can reach it; calibration distinguishes
+it. Report unreachable/dead values as findings against the frozen
+instrument. If any load-bearing disposition is unreachable, STOP and
+return the evidence before proposing Census v1.1."*
+
+Nothing was modified. `sha256sum -c MANIFEST.sha256` = 12/12 OK before
+and after. Subject `7466499b`, tree `4fcec98d`, 274 tracked documents.
+
+### 1. Method — and the correction to my own first attempt
+
+My first pass grepped each source file for assignment of each declared
+literal. **That instrument was itself uncalibrated (I-8)**: a "fixture
+reaches it" column that only checks whether the string *appears* in a
+calibration file proves nothing — a value can be named in an assertion
+that never fires. Withdrawn before use.
+
+Replaced with a **runtime probe**: the real emission points are wrapped
+in memory, then (a) the full repository census is run and (b) all seven
+calibration suites are executed in the same process. A value counts as
+reached only when it is **observed being emitted**. The expected value
+set is read from the modules' own declared tuples — data, not the
+detector's opinion of them.
+
+All seven calibration suites pass (exit 0) at the frozen bytes.
+
+### 2. Result — 33 declared values across 7 alphabets
+
+29 of 33 are REACHABLE in both the real run and calibration. Four are
+not:
+
+| value | real run | calibration | finding |
+|---|---|---|---|
+| `genlink.STATES` :: `POSSIBLE_WRITER` | 0 | 0 | **never emitted — no code path assigns it** |
+| `doccensus2.contexts` :: `OTHER` | 0 | 0 | **never emitted — structurally unreachable** |
+| `genlink3.PATH_DOMAINS` :: `REMOTE_URI` | 275 | 0 | emitted at scale, **no fixture** |
+| `genlink3.PATH_DOMAINS` :: `PUNCTUATION_ARTEFACT` | 3,577 | 0 | emitted at scale, **no fixture** |
+
+(The `PATH_DOMAINS` real-run counts are probe-call counts, not a census
+statistic — `target_disposition` calls `path_domain` internally. They
+evidence reachability only.)
+
+**F1 — `POSSIBLE_WRITER`.** `genlink.py:174` declares five states; the
+code assigns three. This is the *same defect class* as H2's unreachable
+`REFERENCE`, now found **inside frozen Census v1.0**. Effect is
+contained: `genlink.py` is superseded by `genlink3.py` for all H1/H2
+results and is exercised only by its own calibration. It is a false
+declaration, not a false measurement.
+
+**F2 — context `OTHER`.** Proven structurally, not by reading: an
+exhaustive probe over every `(is_link, line-class)` input shows
+`line_contexts` produces `OTHER` as a *line* class, but `_ctx` converts
+every `OTHER` line into `INLINE_CODE` or `PROSE_PATH`. The edge-context
+alphabet is 6 values; the docstring declares 7. No data is lost — the
+declaration is wrong, not the classification.
+
+**F3 — two uncalibrated exclusion paths.** `REMOTE_URI` and
+`PUNCTUATION_ARTEFACT` both map to `EXCLUDED_FROM_T`, i.e. they
+manufacture **negative** claims, and neither was ever proven against a
+known answer. This is the I-8 shape exactly: *the suites passed, and
+the pass was evidence only about what they ran.*
+
+Blast radius, measured: 3,836 of 115,954 exclusion witnesses (3.3%)
+across the 274 per-document claims. The contributing write-op sites are
+a **closed population of 8**, so all 8 were inspected, not sampled — 7
+are `>` redirects into `"$(...)"`, `>&2`, or `<placeholder>` text inside
+comments; 1 is a URL inside a comment. **All 8 verdicts are correct.**
+The defect is that their correctness rests on my inspection rather than
+on a fixture, and I built the thing I inspected.
+
+### 3. F4 — the load-bearing finding: `NO_WRITER` never closes
+
+`NO_WRITER` passes all three of Kai's legs — it is assigned, a fixture
+reaches it, calibration distinguishes it. **On the real repository it is
+emitted zero times, for zero of 274 documents,** and not narrowly.
+
+The probe surfaces a fourth leg the three-leg test does not ask for:
+**real-population reachability.** For the document with the *smallest*
+open bucket, 254 write operations remain `COULD_REACH_T`. `NO_WRITER`
+requires that bucket to reach 0.
+
+Cause, for that document (300 open operations at frozen v1.0):
+
+| n | why it cannot be constructively excluded |
+|---|---|
+| 145 | contains `$` / `{}` / `*` — dynamic (`"$GITHUB_STEP_SUMMARY"`) |
+| 92 | fixed bare token with no directory to prove disjoint (`'30'`, `'60'`, `'30d'`) |
+| 63 | no literal fragment at all — fully dynamic Python expression |
+
+**This is not a parser bug that v1.1 can fix.** The 92 bare tokens are
+non-path artefacts a stronger witness could exclude; the other 208 are
+*genuinely* dynamic, and excluding them would mean asserting a negative
+about an expression whose value is unknown — which is precisely what
+P13 and P14 exist to forbid.
+
+The consequence, stated plainly: **P14 was built to rescue `NO_WRITER`
+from P13's repository-wide closure requirement, and on real data it does
+not rescue it. Census v1.0 cannot state that nothing writes a given
+document — about any document in this repository.** Every one of the 274
+returns `NO_PROVEN_WRITER` (269) or `PROVEN_WRITE_RELATION` (5).
+
+That is not a wrong answer. It is the correct answer, and it means the
+instrument's strongest negative claim is decorative here.
+
+### 4. Denominator contamination (observed during the audit)
+
+63 of 455 shell/YAML matches (13.8%) arise from `>` inside a **comment**
+or a prose arrow `->` / `=>`. `-> http://ollama:11434` in a comment is
+recorded as a write operation.
+
+I tested whether this is verdict-changing by re-running all 274 claims
+with the 63 phantoms removed in memory: **0 verdicts flip** (5 / 269 / 0
+before and after). It inflates the operation denominator — 1,349 → 1,286
+— so any statistic quoted from it must carry that qualification. It does
+not corrupt a published claim.
+
+### 5. What this does NOT say
+
+* It does not say Census v1.0's H1 numbers are wrong. No emitted claim
+  was falsified by this audit.
+* It does not say F3's exclusions are wrong. It says they are unproven.
+* It does not propose v1.1. **Under R12 the better route is flagged
+  below; implementation requires Dainius's authorisation.**
+
+### 6. Flagged under R12, not implemented
+
+1. **An emittability meta-check belongs in the instrument itself.** F1,
+   F2 and H2's `REFERENCE` are one defect appearing three times: a
+   declared alphabet larger than the emitted one. A gate that fails when
+   any declared value has no emission path would have caught all three,
+   and it must print its denominator.
+2. **Calibration must cover every emitted disposition, not every
+   assertion the author thought of.** F3 exists because coverage was
+   never measured. The natural gate: fail when a disposition is emitted
+   against the real tree but reached by no fixture.
+3. **The `NO_WRITER` question needs Kai's ruling, not my preference.**
+   Either the census stops declaring a value it cannot reach on real
+   data, or a different *kind* of evidence is admitted for closure. I
+   have no authority to choose, and it changes what H3 can claim.
+
+### 7. Correction to my own record
+
+D340's recovery block lists "`REFERENCE`/`OTHER` unreachable" as an
+**H2** defect. F1 and F2 establish the same class inside **frozen
+Census v1.0**, which D340 recorded as `UNTOUCHED` — true of its bytes,
+and I let it read as though untouched implied unexamined-and-sound. It
+was neither examined nor sound.
+
+---
+
+## THREAD RECOVERY BLOCK — D341
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **MEASURED SUBJECT** — `7466499b74dcd38b6bdfa582533a3815689e6846`,
+  tree `4fcec98de500cfd5532dbd7aaf7282b22bdb5b84`, **274** tracked
+  documents (H1's 272 was bound to an earlier commit — quote it with
+  its subject or not at all)
+* **INSTRUMENTS** — census `v1.0` `4a5b40a1…` **UNMODIFIED**, manifest
+  12/12 OK before and after; H2 classifier `v1.0` `fa847726…`
+  untouched this entry
+* **CURRENT WORKSTREAM** — House-in-Order; Census v1.0 emittability
+  audit **COMPLETE**
+* **LAST PROVEN STATE** — 7/7 calibration suites pass at frozen bytes;
+  29/33 declared values reachable; 4 findings F1–F4; 0 verdicts change
+  under phantom removal
+* **AUTHORISED NEXT ACTION** — none. The audit is delivered and I have
+  **STOPPED as instructed**, because F4 is load-bearing
+* **EXPLICITLY NOT AUTHORISED** — Census v1.1 · H2 v1.1 · H3 · H4 · H5 ·
+  R2+ mutation · document/register repair · Phase B · `ITEM8_GO` · six
+  subject builds · Stage 2 · seven research obligations · `=0.2.0`
+* **OPEN / UNRESOLVED** — F1 `POSSIBLE_WRITER` dead · F2 context
+  `OTHER` dead · F3 two exclusion paths uncalibrated · **F4 `NO_WRITER`
+  unreachable on real data, needs a ruling** · 63 phantom operations ·
+  v1.1 unbuilt · portability defect · history window unqualified
+* **CORRECTIONS TO PRIOR RECORDS** — my first grep-based audit
+  instrument withdrawn before use (uncalibrated, I-8); D340's
+  "census v1.0 UNTOUCHED" clarified — untouched, and now examined, and
+  it has four defects
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).
