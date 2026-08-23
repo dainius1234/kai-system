@@ -26394,3 +26394,159 @@ which gate, in which environment, and when it last actually passed.
   **ABSENT**. **Phase B unresolved and unauthorised** — untouched by any
   of this and unaffected by it. **Stage 2 NOT AUTHORISED.** Counts
   unchanged (Rule 7).
+
+---
+
+## D324 — Zero-loose-ends control delta. PLANNING ONLY: nothing repaired, nothing promoted.
+
+Operator directive after Kai review: **UNRELATED ≠ CLOSED ≠ OPTIONAL.**
+A finding may be proven NON-BLOCKING for Item 8 and remain a mandatory
+open engineering obligation.
+
+**This entry mutates no code, workflow, sentinel, frozen-R2 artefact,
+subject build or Stage-2 state.** It is the delta returned for review.
+
+### 0. THE ENABLING DEFECT, found while looking for where to file
+
+The canonical machine-checked register is **§5 of
+`kai-pm/INSTRUMENTATION_ARCHITECTURE.md`**, parsed by
+`check_gate_registry.py:749` and cross-checked against
+`scripts/security/closure_register.py`.
+
+**It contains 20 of the 51 `KAI-GATE` ids in use.**
+
+```
+in the machine table : 001-012, 014-017, 019-021, 023          (20)
+in DECISIONS only    : 018, 022, 024-051                        (31)
+```
+
+The table stopped being maintained at `023` while the programme ran on to
+`051`. And the I-4 cross-check is **directional**: it verifies that every
+entry marked CLOSED in `closure_register.py` also reads CLOSED in the
+document. **Nothing verifies that every id in use appears in the table at
+all.** A finding's *denominator* is unchecked — R5, in the one register
+that is supposed to make R5 unnecessary.
+
+This is why the operator's instruction is correct and why narrative
+tracking has been insufficient in fact and not merely in principle. It
+is filed below as **KAI-GATE-052** and it gates the credibility of every
+other row.
+
+### 1. Control classes (operator's A / B / C)
+
+**A — CURRENT EXPERIMENT PREREQUISITES.** Control whether the six frozen
+builds may happen. Already tracked as `KAI-GATE-048` work; listed for
+completeness, not renumbered:
+
+* **Phase B** — deletion-sensitive coverage of the Item-8 repairs.
+  UNRESOLVED, UNAUTHORISED.
+* **Retirement of the spent `ITEM8_PREFLIGHT_GO`** — governed single-path
+  transition, requires separate operator authority.
+* **Final exact-tree parent review** (X₃).
+* **Separate `ITEM8_GO` authority envelope.**
+
+**B — ASSURANCE-INFRASTRUCTURE DEFECTS.** Demonstrated NON-BLOCKING for
+Item 8 (D321, D323) and **not acceptable repository health.**
+
+**C — PARKED ENGINEERING DEBT.** Pre-existing, now given named closure
+milestones instead of "later".
+
+### 2. THE DELTA — proposed new ids, deduplicated
+
+Deduplicated against: the 20 rows in §5; the 51 ids in use; the 4,580
+frozen `CODE_AUDIT_*` findings (a snapshot of `2d830f2`, 27 July,
+explicitly "no remediation performed" — none of the defects below appear
+there, because all post-date it and all concern assurance machinery the
+audit did not cover); and the parked `#NN` backlog namespace, which is
+separate and is **not** renumbered.
+
+Next free id: **`KAI-GATE-052`**.
+
+| proposed ID | class | defect | sev | root cause | Item-8 coupling | MUST-CLOSE-BEFORE |
+|---|---|---|---|---|---|---|
+| **052** | B | **Register covers 20 of 51 live ids**; I-4 cross-check is directional and never asserts the denominator | HIGH | **PROVEN** | NON-BLOCKING | **M1** |
+| **053** | B | Unified Hunter **red 60 consecutive CI runs** (232–291), passes locally 78/0 | HIGH | **UNRESOLVED** | NON-BLOCKING (D323 §4) | **M2** |
+| **054** | B | Core Tests **step 11 browser-agent tests** fail; all 50+ downstream steps skipped, incl. both image builds | HIGH | **PARTIAL** | NON-BLOCKING (D321 §2) | **M2** |
+| **055** | B | Repo-wide pytest **35 failed** under pydantic 2.13; declared per-service pins mutually unsatisfiable in one interpreter | HIGH | **PROVEN** (D314 §3b) | NON-BLOCKING (D321 §3) | **M2** |
+| **056** | B | Cross-file isolation leak grew: `test_contradiction.py`, `test_llm_contract.py` | MEDIUM | **UNRESOLVED** | NON-BLOCKING | **M2** |
+| **057** | B | **Local-green / CI-red divergence as a class** — two instances (D317, D322); no mechanism detects it | HIGH | **PARTIAL** | NON-BLOCKING | **M2** |
+| **058** | B | **Diagnostics assert reassurance over an empty population** — `0 service(s) not plainly healthy` with zero containers | HIGH | **PROVEN** (D320 §4) | NON-BLOCKING | **M2** |
+| **059** | B | **Rule 31 has no enforcing mechanism**: `if: always()` post-mortems sit at the log tail, so tail-reading inverts cause and consequence | MEDIUM | **PROVEN** (D320 §3) | NON-BLOCKING | **M2** |
+| **060** | B | **Unjustified `fetch-depth: 2` block on `unified-hunter.yml`** — scope derived from a grep matching prose | LOW | **PROVEN** (D322 §4) | NON-BLOCKING | **M2** |
+| **061** | C | Artefact step cannot distinguish *measured nothing* from *refused before measuring* | LOW | PROVEN (D313 §5a) | NON-BLOCKING | **M3** |
+| **062** | C | Preflight epilogue **asserts** `subject builds run: 0` rather than deriving it | LOW | PROVEN (D313 §5b) | NON-BLOCKING | **M3** |
+| **063** | C | **Calibration denominator moves with tree state** (58 ↔ 59) | LOW | PROVEN (D314 §4) | NON-BLOCKING | **M3** |
+| **064** | C | `coverage-floors` = PASS-UNDER-STATED-LOCAL-ENVIRONMENT; **repo-wide applicability UNRESOLVED** | MEDIUM | PARTIAL (D318) | NON-BLOCKING | **M2** |
+| **065** | C | Authority guard prints **"3 binding(s)" while naming four** concepts | LOW | PROVEN | NON-BLOCKING | **M3** |
+| **066** | C | Preflight property count is `len()` of a **declared tuple**; nothing proves each was *evaluated* | LOW | PROVEN (D316 §5) | NON-BLOCKING | **M3** |
+| **067** | C | **No declared path provisions a local environment** for `make prepush` (6 rounds of run-fail-install) | MEDIUM | PROVEN (D314 §3a) | NON-BLOCKING | **M2** |
+
+**Carried forward unrenumbered** (already have ids or live in the `#NN`
+namespace): D268 dependency/`--no-deps` bypass; D269 succession
+continuity; programme-lock persistence; live-model CI trigger on every
+push; and parked `#34, #41, #43–45, #48–53, #57–62, #64–69`. **Each
+requires a milestone before it counts as controlled debt** — proposed
+**M3** unless Kai reassigns.
+
+**Proposed CLOSED-with-evidence, not carried as open:** the D317
+`fetch-depth` defect on `policy-checks.yml` — repaired at cause and
+symptom, and **verified green in CI twice** (`32598411049`,
+`32601856410`). Closure requires a `closure_register.py` entry, which is
+a code change and is **not** made here.
+
+### 3. Required fields — where they do NOT fit
+
+The operator requires eleven fields per obligation. **§5's table has
+four columns** (`ID | Severity | Finding | Status`) and is parsed by a
+regex anchored to that shape.
+
+Three options, **none taken**:
+
+1. extend §5 with a parallel **obligations** table carrying the other
+   seven fields, keyed by the same id — the machine regex is unaffected;
+2. widen §5 itself — **breaks `check_gate_registry.py:749`**;
+3. a new file — **rejected**, it is the competing source of truth the
+   operator forbade.
+
+**Recommendation: (1).** It keeps one document authoritative, leaves the
+existing cross-check intact, and lets a *new* check assert the
+denominator (052's repair).
+
+### 4. Milestones
+
+* **M1 — REGISTER INTEGRITY.** `KAI-GATE-052` only. Every live id present
+  in the canonical table; a check that **fails when an id in use is
+  absent**. Small, and it is what makes every other milestone auditable.
+* **M2 — CI TRUTH RESTORATION / ZERO-LOOSE-ENDS STABILISATION.** Proposed
+  new bounded gate: 053–060, 064, 067.
+* **M3 — PROFESSIONALISATION / REMEDIATION PHASES.** Mapped into existing
+  `CODE_AUDIT_P0–P4` phase plans: 061–063, 065, 066 and the carried
+  backlog.
+
+### 5. Sequencing, and its ONE conflict with the frozen order
+
+Proposed: **finish 048 prerequisites → formally close 048 → M1 → M2 →
+M3.**
+
+**CONFLICT, declared rather than resolved:** M1 (`KAI-GATE-052`) is a
+register-integrity repair that the operator's own directive depends on —
+"if an issue has no named closure milestone it is not controlled debt"
+cannot be enforced while the register tracks 39% of ids. But the
+programme lock says *finish 048 before anything else*, and M1 touches
+`check_gate_registry.py`, a gate in 048's own path.
+
+I am **not** resolving this. Two admissible readings: M1 is part of 048's
+closure evidence (its counts must be trustworthy to close anything), or
+M1 waits. **Kai and the operator decide.**
+
+**No other conflict.** M2 and M3 are strictly after 048 and touch nothing
+in the frozen critical path.
+
+### 6. Status
+
+* **Nothing repaired. Nothing promoted into the canonical register.
+  No id allocated in the machine table. No code, workflow or sentinel
+  touched.**
+* P1 stands. `ITEM8_PREFLIGHT_GO` present and spent. `ITEM8_GO`
+  **ABSENT**. **Phase B unresolved and unauthorised.** **Stage 2 NOT
+  AUTHORISED.** Counts unchanged (Rule 7).
