@@ -27037,3 +27037,134 @@ by me, in this entry.
   no register repair, no README or backlog repair.
 * Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
   Counts unchanged (Rule 7).
+
+---
+
+## D328 — P10 calibration passed and mutation-proven. R1B-1 STOPPED: the classifier is unsound.
+
+Kai's three precision corrections accepted; collector extended to
+preserve evidence context; P10 calibration built, passed, and proven
+non-vacuous. **R1B-1 was then attempted and is WITHDRAWN** — per Kai's
+standing instruction, *"if the instrument surprises you again, stop
+before classification."* It did.
+
+**Scratchpad only. The measured tree was not mutated; this reporting
+commit appends `DECISIONS.md` only.**
+
+### 1. Corrections accepted
+
+* **Wording.** D327 said "no repository file modified". Wrong as stated.
+  Correct: *the census instrument did not mutate the measured tree; the
+  reporting commit subsequently modified `DECISIONS.md` only.*
+* **"90% unlinked prose" WITHDRAWN** — and §3 shows it was wrong twice
+  over.
+* **"Citation" retired** for inferred relationships. The term is now
+  **textual reference pair**.
+
+**A consequence worth naming: each governance commit changes the corpus
+being measured.** D327's own text added references, so this run measures
+`9d15bcd` / tree `627104d6`, not `73f514b6`. The measuring instrument's
+output becomes part of its next subject.
+
+### 2. P10 calibration — passed, then proven able to fail
+
+```
+60 generated crossings  (syntax × ambiguity × context × target-exists)
++ 7 metamorphic groups  (Kai's list)
+= 125 assertions, 0 failed
+```
+
+Non-vacuity proven by mutation, not asserted:
+
+| mutation | result |
+|---|---|
+| context collapsed to a constant | **6 crossings FAIL** — context preservation detected |
+| distinct-pair dedup removed | **M1 and M7 FAIL** — pair semantics detected |
+| restored | 125 / 0 |
+
+### 3. The corrected statistic — and "prose" was wrong twice
+
+```
+distinct textual source→target pairs : 515
+  backed by a markdown link          :  52
+  NOT backed by a markdown link      : 463   (89.9%)
+```
+
+Kai's "at least 459/514" is confirmed at **463/515** on this tree.
+
+**The context tally retires the word "prose" outright:**
+
+```
+INLINE_CODE   508      TABLE   181      FENCED_CODE  59
+PROSE_PATH     75      MARKDOWN_LINK 55      QUOTE      8
+```
+
+**The dominant evidence context is INLINE_CODE — 508 occurrences — while
+actual prose is 75.** Most cross-references in this repository are
+**paths written in backticks**, not sentences. My "unlinked prose" was
+wrong about the link part *and* about the prose part; Kai's instruction
+to classify context before naming it is precisely what exposed that.
+
+### 4. WHY R1B-1 IS WITHDRAWN — the DERIVED classifier is unsound
+
+The role census ran to completion and produced a plausible table.
+Reading it, the generator column is nonsense:
+
+```
+DECISIONS.md                    "written by" scripts/__pycache__/*.pyc
+INSTRUMENTATION_ARCHITECTURE.md "written by" check_gate_registry.py
+ENGINEERING_DOCTRINE.md         "written by" test_doctrine_integrity.py
+data/SOUL.md                    "written by" check_dashboard_findings.py
+W1_GLOBAL_HYGIENE_SUBPLAN.md    "written by" hygiene_baseline.json
+```
+
+Two independent defects:
+
+1. **`__pycache__` bytecode is in the code corpus.** Compiled `.pyc`
+   files are being treated as source that "writes" documents.
+2. **The write-proximity regex is catastrophically loose.** It includes
+   `>>?\s` — matching **any `>` followed by whitespace**, which occurs in
+   every markdown quote, every shell comparison and most YAML in the
+   corpus. Any file that *mentions* a document within 300 characters of a
+   `>` is recorded as its generator.
+
+`check_gate_registry.py` **reads** `INSTRUMENTATION_ARCHITECTURE.md` — I
+established that at D324 by reading the code. The classifier calls it a
+writer. **A reader misclassified as a generator would invert the
+authority model**: it would mark a hand-maintained authority as machine-
+derived, and therefore as something that need not be reviewed.
+
+The tell was `.pyc` files appearing as generators. Implausible, so I
+looked — KAI-GATE-023's discipline.
+
+**Therefore the 268-row role census is NOT presented as a result.** The
+counts it produced (144 REFERENCE-EVIDENCE / 73 UNKNOWN / 27 HISTORICAL
+/ 13 DERIVED / 10 ACTIVE / 1 SUPERSEDED) are **withdrawn**, because
+DERIVED contamination moves documents between buckets — `DECISIONS.md`
+is the clearest case, classed DERIVED when it is the repository's
+principal hand-written authority.
+
+### 5. What the repair requires
+
+* exclude `__pycache__`, `.pyc` and other generated artefacts from the
+  code corpus, by a **declared, recorded** rule;
+* replace write-proximity heuristics with **structural detection** —
+  resolve the actual write target of `write_text` / `open(..., "w")` /
+  redirection, rather than matching characters near a mention;
+* add known-answer fixtures for **reader-vs-writer**: a script that only
+  reads a document must never be recorded as its generator, and a script
+  that writes one must always be.
+
+That is instrument work, in scratchpad, and it must pass before any role
+is assigned.
+
+### 6. Status
+
+* **R1A stands** on the corrected denominator (268) and qualified graph.
+* **R1B-1 WITHDRAWN. R1B-2 NOT ATTEMPTED** — extracting claims from a
+  candidate set produced by an unsound classifier would inherit the
+  defect.
+* **No repository file modified beyond this entry.** No register, README,
+  backlog, workflow, `.gitignore`, archive move or Item-8 state touched.
+* Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
+  Counts unchanged (Rule 7).
