@@ -27782,3 +27782,164 @@ never explicit.**
 * **No repository file modified beyond this entry.**
 * Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
   Counts unchanged (Rule 7).
+
+---
+
+## D333 — H0 complete. INSTRUMENT FREEZE PROPOSAL. Research obligations banked.
+
+Kai's two governance artefacts read and adopted:
+`kai-pm/KAI_ORION_CONTINUITY.md` (b35639e) and
+`kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md` (55060ab).
+Branch HEAD fast-forwarded to `55060ab`; **D332 `b14e6f9` remains the
+latest D-numbered programme state**, and Kai's commits are reporting
+artefacts, **not** new qualification subjects.
+
+Frozen subject unchanged: **`9d15bcd` / tree `627104d6`.**
+
+### H0.1 — dict-key MISBINDING fixed
+
+`os.environ["P"]` extracted the **subscript key** `"P"` as a path
+fragment. Constants inside a `Subscript` slice are now excluded. This is
+the defect that made Kai's specified mutation vacuous twice.
+
+**Regression fixture added (CASE 7)**: asserts the key is not extracted,
+asserts the expression is therefore **not** `_fixed`, and asserts the
+operation lands in `COULD_REACH_T`. The fixture tests **absence of the
+defect**, not merely presence of the fix.
+
+### H0.2 — path domains, and a second shell defect found
+
+**The 99 `dev` exclusions are `/dev/null`** — 98 exact, 1 with a stray
+backtick. Kai's hypothesis confirmed by measurement. Witness now reads
+*"absolute system path, outside the repository target domain"* rather
+than describing a device node as a repository directory.
+
+Domains: `REPO_RELATIVE · ABSOLUTE_SYSTEM · REMOTE_URI · SHELL_VARIABLE ·
+PUNCTUATION_ARTEFACT · DYNAMIC_UNKNOWN`.
+
+**A second defect surfaced while looking:** the shell regex captured
+`'"'`, `'>'` and quote characters as write targets — `>>` matched as
+`>` plus a **captured** `>`, so the redirection operator became a
+target. Fixed; candidate operations fell **1330 → 1321**.
+
+**And my first fix introduced a third MISBINDING**, caught by CASE 4:
+`str(tmp) + "/SOUL.md"` yields the literal `/SOUL.md`, which the new
+domain classifier read as an **absolute path** rather than a
+concatenation **suffix** — excluding the canonical tmp-vs-repository
+case. Repaired by tracking whether the expression contains an
+unresolvable dynamic part; a positive match against the tracked set
+beats appearances, and dynamic beats "looks absolute".
+
+### H0.3 — retro-qualification of D328–D331 mutation claims
+
+Each prior mutation re-run with the four-part standard asserted:
+
+| claim | APPLIED | REACHABLE | DISCRIMINATING | TARGETED |
+|---|---|---|---|---|
+| D330 `ast.walk` source order | anchor=1, MUTANT verified | 3 failures | named assertions | *"multi-segment … resolves (source order)"* ✓ |
+| D331 P13 open-space guard | anchor=1, verified | 2 failures | named assertions | *"OPEN → NO_PROVEN_WRITER, never NO_WRITER"* ✓ |
+| D332 P14 absence exclusion | anchor=1, verified | 6 failures | named assertions | *"target token ABSENT must NOT cause exclusion"* ✓ |
+
+**All three qualify. No wording is downgraded.** D332's P14 mutation now
+produces **6** failures rather than 3 — the H0.1 fix made CASE 2
+discriminate as well.
+
+### H0.4 — P14 witness model
+
+The governing rule is **constructive set disjointness**: an exclusion is
+valid only where positive evidence proves the operation's possible
+repository target set is disjoint from T. The four implemented witnesses
+are **instances, not a denominator**; each carries identity, assumptions
+and fixtures, and anything unproven falls back to `COULD_REACH_T`.
+
+### H0.5 — declared open debt, NOT built
+
+**No general shell parser.** YAML `run:` bodies and Makefile recipes are
+still scanned as whole-file text. **This blind spot must be closed
+before static generation corroboration may ever become enforcing.**
+Static analysis remains lower-bound, corroborative, adversarial — never
+generation authority.
+
+### Frozen-subject measurement after H0
+
+```
+candidate operations 1321   sum 1321   equal: YES
+  RESOLVED_READ                    15
+  RESOLVED_WRITE                    5
+  READ_AND_WRITE                    0
+  RESOLVED_NON_DOCUMENT_TARGET    421
+  UNRESOLVED_TARGET                27
+  UNRESOLVED_RELEVANCE            853
+
+data/SOUL.md  NO_PROVEN_WRITER   REACHES 0 | EXCLUDED 411 | COULD_REACH 291
+README.md     PROVEN_WRITE_RELATION scripts/sync_docs.py
+                                  REACHES 1 | EXCLUDED 366 | COULD_REACH 335
+```
+
+Suites: **P10 125/0 · P11 14/0 · P12 8/0 · P13 7/0 · P14 22/0 ·
+reader-writer 7/7.**
+
+### INSTRUMENT FREEZE PROPOSAL
+
+```
+af5a7d9f5d38e115  genlink3.py          2ad79be051ebf852  AUTHORITY_ONTOLOGY.md
+289cf9dabb44b604  doccensus2.py        c9c596ba0cbab077  calibrate2.py
+7503d6b4b787e5a6  cal_p14.py           556ff3950d1b0362  cal_p13.py
+72a69aa71c6fa537  cal_p12.py           32857714bc012aad  cal_p11.py
+3fe493ddfd903db2  cal_gen.py
+```
+
+**Declared blind spots carried into the freeze:** whole-file YAML/Make
+scanning (H0.5); bounded redirection set only; single-level literal
+binding only; `RESOLVED_NON_DOCUMENT_TARGET` rests on extension and
+tracked-path witnesses; **853 `UNRESOLVED_RELEVANCE` operations remain
+open by design.**
+
+**Freeze is PROPOSED, not taken.**
+
+### Research obligations — provisional, deduplicated, NO IDs allocated
+
+Each verified against the tree before recording (R1). **None repaired.**
+
+| obligation | verification | MUST-CLOSE-BEFORE |
+|---|---|---|
+| `main` unprotected while `.github/CODEOWNERS` exists (864 bytes) and is unenforced | CODEOWNERS confirmed present | **CI Truth Restoration** — enforcement AFTER CI is truthful, never before |
+| mutable action identity `aquasecurity/trivy-action@master` | confirmed `core-tests.yml:320` | professionalisation |
+| CI environment hermeticity — one interpreter, mutually unsatisfiable pins | D314 §3(b), D319 | **CI Truth Restoration** |
+| Weekly Report Card "all green" from a narrow subset | research memo | **H3** to identify · CI Truth Restoration to repair |
+| PM automation directing readers to stale `STATUS.md` | D325, D329 (STATUS frozen at import, 14 citers) | **H5** |
+| tracked file literally named **`=0.2.0`** at repository root | **confirmed present in `git ls-tree HEAD`** | **A-4 provenance** — cause established by provenance, never guessed |
+| no `SECURITY.md` in the tracked tree | **confirmed absent** | professionalisation |
+
+**No `KAI-GATE` ID allocated for any of these** — the canonical register
+is itself broken (**20 of 51 ids**, D324 §0), and allocating into a
+broken register is what H4 exists to prevent.
+
+---
+
+## THREAD RECOVERY BLOCK — D333
+
+* **REPORTING_COMMIT** — this entry's commit (see `git log -1`)
+* **FROZEN SUBJECT** — `9d15bcd207ad7a33e1087667b245970f989e366f`, tree
+  `627104d61b4f91e110a36cf65a44fed2cfbad078` (≠ reporting tree, by design)
+* **CURRENT WORKSTREAM** — House-in-Order **H0**, instrument freeze
+* **LAST PROVEN STATE** — H0.1–H0.5 complete; all suites green;
+  D328–D331 mutations retro-qualified on all four criteria; freeze
+  **proposed** with hashes and declared blind spots
+* **AUTHORISED NEXT ACTION** — none beyond H0. Await Kai/operator ruling
+  on the freeze proposal
+* **EXPLICITLY NOT AUTHORISED** — R1B corpus classification · R2+
+  mutation · document/register repair · Phase B · `ITEM8_GO` · six
+  subject builds · Stage 2 · any repair of the seven research
+  obligations
+* **OPEN / UNRESOLVED** — 853 `UNRESOLVED_RELEVANCE` operations ·
+  whole-file YAML/Make scanning · KAI-GATE register covers 20 of 51 ids ·
+  three-way closure-count contradiction (STATUS 9 / register 11 /
+  architecture 0) · seven research obligations, unrepaired
+* **CORRECTIONS TO PRIOR RECORDS** — D332 appended the D331→D330
+  provenance correction; this entry corrects D332's `dev` witness
+  rationale (`/dev/null` is an absolute system path, not a repository
+  directory) and records that the D332 shell regex captured `>` and
+  quote characters as targets
+* **P0** `32575388846` · **P1** `32594846522` — both permanent. Counts
+  unchanged (Programme Rule 7).
