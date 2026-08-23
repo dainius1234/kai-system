@@ -26898,3 +26898,142 @@ rather than a fourth instance.
   register, README, backlog, workflow, sentinel or Item-8 state touched.
 * Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
   Counts unchanged (Rule 7).
+
+---
+
+## D327 — Census instrument qualified. Denominator corrected. R1B still not started.
+
+Kai's ruling: qualify the map-making instrument before drawing the map;
+the denominator is the **Git-tracked** Markdown population of the exact
+HEAD tree, not `rglob` over a workspace. Executed in **scratchpad only**.
+**No tracked repository file was modified.**
+
+### A. Exact state
+
+```
+HEAD : 73f514b6e81e744b2829027f5390108f19e3e77e
+tree : 2f90b3f5a0ea27888eb55ffabbe7bce215f2ad64
+```
+
+### B. Tracked Markdown denominator — 269 WITHDRAWN, 268 stands
+
+```
+git ls-tree -r --name-only HEAD, *.md  →  268
+```
+
+**D325/D326's 269 is withdrawn.** The single difference is
+`.pytest_cache/README.md`.
+
+### C. Untracked / generated Markdown
+
+```
+untracked, not ignored : 0
+ignored                : 1   .pytest_cache/README.md
+```
+
+**CORRECTION TO KAI, evidenced.** He observed that the root `.gitignore`
+contains no `.pytest_cache/` rule — **true** — and inferred an
+ignore-rule defect. `git check-ignore -v` resolves it:
+
+```
+.pytest_cache/.gitignore:2:*   .pytest_cache/README.md
+```
+
+**pytest writes its own `.gitignore` containing `*`.** The directory
+self-ignores. The observation is correct; the inferred defect does not
+exist. No ignore rule is missing and none should be added.
+
+### D. Calibration — and it caught a real defect
+
+A synthetic git repository whose answers are known **by construction**
+(I-8: the expected answer does not come from the thing under test).
+Seventeen assertions across Kai's nine required properties.
+
+**First run: 16 passed, 1 FAILED.**
+
+```
+FAIL 4c ambiguous mention did NOT inflate either README
+     a=2 b=1
+```
+
+Cause: `docs/guide.md` links to `../a/README.md`, and that text also
+**contains the literal substring** `a/README.md`, so the link scan and
+the explicit-path scan both fired on **one** reference. Raw-edge counting
+reported a document cited once as cited twice.
+
+**That defect would have inflated every citation figure in D326.**
+
+Repair: a citation is a **distinct document-to-document relationship**,
+counted once however many kinds of evidence support it; the evidence
+kinds stay separately reported so the two views can be compared.
+
+**Second run: 17 passed, 0 failed.** Only then was the instrument run
+against the repository.
+
+### E. Full-path document graph
+
+```
+raw evidence edges        : 569
+  BASENAME_UNIQUE         : 273
+  EXPLICIT_PATH_REFERENCE : 241
+  MARKDOWN_LINK           :  55
+distinct citing pairs     : 514
+documents cited at least once : 160 of 268
+documents with ZERO citations : 108
+```
+
+### F. Corrected hubs
+
+```
+ 57  FROZEN@import  kai-pm/CODE_AUDIT_MASTER.md
+ 24  maintained     kai-pm/DECISIONS.md
+ 18  FROZEN@import  data/SOUL.md
+ 14  FROZEN@import  kai-pm/STATUS.md
+ 13  FROZEN@import  data/AGENTS.md
+ 11  FROZEN@import  kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md
+ 10  FROZEN@import  kai-pm/SESSION_BOOTSTRAP.md
+  9  FROZEN@import  kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md
+  9  maintained     README.md
+  9  FROZEN@import  kai-pm/STRATEGIC_PLAN.md
+```
+
+**Documents cited by ≥5 others AND frozen at the import: 23** — D326's
+**30 is withdrawn**; the excess was the shared-basename artefact.
+
+`CODE_AUDIT_MASTER.md = 57` **survived** deduplication and is confirmed.
+
+`CODE_AUDIT_BATCH_*`: **144 tracked, 64 with ≥1 incoming document
+citation** — unchanged, and Kai's refusal to move them stands on
+corrected data.
+
+### G. Two zeros I did not believe, and what they turned out to be
+
+Both were checked rather than reported, because an implausible zero is
+where a detector has stopped detecting (KAI-GATE-023).
+
+**Zero ambiguous basename mentions — REAL.** Seven tracked files are
+named `README.md` and two `_template.md`. Independent check: **0**
+documents mention a shared basename without also containing an explicit
+path to one of them. So D326's identical `in_doc=9` across six READMEs
+was **entirely** the bare-name matcher crediting every mention of a full
+path like `bootstrap/README.md` to all seven. Nothing is being
+suppressed; the ambiguity simply is not there.
+
+**Zero broken links — REAL, but its denominator matters more than the
+zero.** The corpus contains **60 markdown links in total** across 268
+documents, of which 55 target `.md`. All 55 resolve. **"No broken links"
+is a statement about 55 links, not about 514 citations** — 90% of
+cross-references in this repository are unlinked prose, which cannot
+break and cannot be checked. Reporting the zero without that denominator
+would have been the third pattern in the "written zero" class, committed
+by me, in this entry.
+
+### H. Status
+
+* **R1A re-run on the corrected denominator: complete.** Instrument
+  qualified 17/17 with a known-answer fixture that caught a real defect.
+* **R1B NOT STARTED**, per Kai.
+* **No repository file modified.** No archive move, no `.gitignore` edit,
+  no register repair, no README or backlog repair.
+* Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
+  Counts unchanged (Rule 7).
