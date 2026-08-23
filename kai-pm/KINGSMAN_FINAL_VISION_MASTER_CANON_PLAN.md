@@ -2,7 +2,9 @@
 
 > **STATUS: MASTER-DESIGN PLANNING OBLIGATION — FINAL CANON NOT YET FROZEN BY THIS FILE.**
 >
-> Operator ruling: before House-in-Order Phase 2 professionalisation proceeds materially, Kai must reconcile the existing final-product architecture, Unified Hunter, A4, Evidence Plane, specialist-team / Team 8 intent, engineering doctrine, hardware/runtime design, self-diagnosis/recovery, governance/autonomy and all later validated lessons into **one final Kingsman-tier master architecture and operating canon**.
+> Operator correction: the previous draft incorrectly recorded `Team 8`. The intended programme item is **Item 8**, and Item 8 sits **before A4** in the programme sequence. No Team 8 concept is implied by this plan.
+>
+> Operator ruling: before House-in-Order Phase 2 professionalisation proceeds materially, Kai must reconcile the existing final-product architecture, Unified Hunter, Evidence Plane, A4, engineering doctrine, hardware/runtime design, self-diagnosis/recovery, governance/autonomy and all later validated lessons into **one final Kingsman-tier master architecture and operating canon**, while preserving the already-governed programme sequence in which **Item 8 is completed before A4**.
 >
 > Once independently reviewed, accepted by Dainius and frozen, that master canon becomes the design baseline for Phase 2. Phase 2 should then implement/professionalise toward it rather than repeatedly redefining the destination.
 
@@ -15,6 +17,7 @@ Relevant existing material includes, among others:
 - `kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md`
 - `kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md`
 - House-in-Order decisions and engineering laws
+- Item 8 frozen design / authority / BuildKit assurance evidence
 - Evidence Plane / assurance research
 - `kai-pm/A4_SELF_DIAGNOSIS_EVOLUTION.md`
 - Unified Hunter migration evidence
@@ -74,9 +77,9 @@ The canonical end-to-end path should reconcile to a form equivalent to:
 
 No major architecture should bypass this path without an explicit, justified exception class in the final canon.
 
-## 4. Required reconciliation domains
+## 4. Required reconciliation domains and programme prerequisites
 
-The final canon must explicitly reconcile the following as one product rather than separate roadmaps.
+The final canon must explicitly reconcile the following as one product while respecting programme ordering.
 
 ### 4.1 Kingsman Tier
 
@@ -93,7 +96,29 @@ Define the final engineering, governance and product standard:
 - no silent uncertainty collapse;
 - no feature marketed beyond its qualified state.
 
-### 4.2 A4 / self-diagnosis
+### 4.2 Item 8 — pre-A4 assurance obligation
+
+**Item 8 is not a product persona/team and must not be conflated with specialist cognition.**
+
+It is an assurance/build workstream with a frozen design and explicit execution-authority controls. The current authority mechanism is designed so no Item-8 build starts unless the authority envelope validates the exact frozen design and exact reviewed artefact.
+
+Programme rule for canon/Phase-2 planning:
+
+> **ITEM 8 BEFORE A4.**
+
+The final master canon must therefore:
+
+- preserve Item 8 as an upstream assurance obligation;
+- treat its completed evidence/results as inputs to later A4/Evidence-Plane design where relevant;
+- not silently redraw or re-authorise its frozen experiment;
+- not allow A4 planning/implementation to erase or bypass unresolved Item-8 obligations;
+- keep Item-8 execution authority separate from architecture-design authority.
+
+Item 8 belongs in the **programme/evidence dependency chain**, not as another runtime organ of Kai unless later evidence explicitly establishes a reusable mechanism worth promoting.
+
+### 4.3 A4 / self-diagnosis
+
+A4 comes **after Item 8** in the programme sequence.
 
 A4 should become the structural/evidence intelligence behind Kai's future self-diagnosis, not a disconnected scanner.
 
@@ -113,7 +138,7 @@ Reconcile:
 
 See `kai-pm/A4_SELF_DIAGNOSIS_EVOLUTION.md`.
 
-### 4.3 Evidence Plane / assurance spine
+### 4.4 Evidence Plane / assurance spine
 
 Define how claims become admissible evidence and how evidence travels through Kai.
 
@@ -133,7 +158,7 @@ Reconcile:
 
 The Evidence Plane must support cognition and self-diagnosis without becoming another parallel decision authority.
 
-### 4.4 Unified Hunter
+### 4.5 Unified Hunter
 
 Preserve the "one hunter, many senses and tools" concept.
 
@@ -147,23 +172,6 @@ The final canon must clearly map old/current services into bounded roles such as
 - actuator;
 - outcome verifier;
 - learning/diagnostic consumer.
-
-### 4.5 Team 8 / specialist-team intent
-
-**Do not guess or silently redefine this concept.**
-
-The operator has explicitly identified `Team 8` as part of the final vision and as another side of the same Kai architecture.
-
-Before final-canon freeze:
-
-1. recover the exact historical Team 8 intent/composition from prior decisions, files or operator-approved design;
-2. distinguish public/persona naming from actual execution roles;
-3. determine how Team 8 relates to Scout/Sage/Doctor/Oracle, model councils, specialist routers, swarms and Global Workspace;
-4. eliminate duplicate teams performing the same responsibility under different names;
-5. preserve useful specialisms even if the old implementation/name is superseded;
-6. ensure Team 8 remains **specialist cognition under ONE KAI**, never eight independent authorities.
-
-Until the exact design is recovered and reconciled, `Team 8` remains a **required canon input with composition UNQUALIFIED**, not something to fill in from memory.
 
 ### 4.6 Cognitive architecture
 
@@ -258,21 +266,25 @@ Thus:
 
 Never confuse the two.
 
+Item 8 remains separately governed by its own frozen design/authority/evidence rules. A master architecture document does not authorise an Item-8 build.
+
 ## 6. Process for producing the final canon
 
 ### C0 — Source recovery
 
-Collect and authority-qualify all candidate final-vision sources.
+Collect and authority-qualify all candidate final-vision sources and relevant programme prerequisites.
 
 Do not trust a document solely because its title says FINAL, MASTER or AUTHORITATIVE.
 
-### C1 — Concept inventory
+### C1 — Concept / dependency inventory
 
 Build a matrix:
 
-`concept | original intent | current implementation(s) | duplicate names | current status | target role | evidence | unresolved question`
+`concept/workstream | original intent | current implementation/evidence | duplicate names | current status | target role/dependency | evidence | unresolved question`
 
-Include Kingsman, A4, Team 8, Hunter, Global Workspace, specialist council, Evidence Plane, House Doctor/self-heal, Ohana, autonomy, skill growth, memory, hardware and interfaces.
+Include Kingsman, Item 8, A4, Hunter, Global Workspace, specialist council, Evidence Plane, House Doctor/self-heal, Ohana, autonomy, skill growth, memory, hardware and interfaces.
+
+Item 8 must be represented as a **pre-A4 programme/evidence dependency**, not as a runtime specialist/team.
 
 ### C2 — Conflict / overlap map
 
@@ -283,7 +295,8 @@ Identify:
 - different layers being mistaken for duplicates;
 - same responsibility implemented multiple times;
 - valuable concepts with weak implementations;
-- architectural gaps.
+- architectural gaps;
+- programme prerequisites being accidentally treated as runtime architecture.
 
 ### C3 — Kai synthesis
 
@@ -305,14 +318,14 @@ Appropriate uses:
 - test whether an architecture is understandable/coherent;
 - attack trust/authority/evidence assumptions;
 - identify missing failure modes;
-- review the Team 8/specialist-team integration;
+- review Item-8 → A4 → Evidence-Plane sequencing/dependencies;
 - review A4/Evidence Plane/self-diagnosis convergence.
 
 DeepSeek input remains advisory. Repo-dependent facts are verified independently.
 
 ### C5 — Orion feasibility / repo mapping
 
-Orion maps proposed canonical components to actual source/services/contracts and identifies:
+Orion maps proposed canonical components and programme dependencies to actual source/services/contracts/evidence and identifies:
 
 - reuse candidates;
 - rework required;
@@ -339,7 +352,7 @@ Dainius confirms:
 - hardware direction;
 - autonomy boundaries;
 - major naming/UX choices;
-- Team 8 intent;
+- Item-8 / A4 sequencing and preserved obligations;
 - what must never be removed.
 
 ### C8 — Canon freeze
@@ -352,6 +365,7 @@ Record:
 - subject/reference set;
 - resolved decisions;
 - remaining explicitly deferred questions;
+- programme prerequisites/dependencies;
 - change-control rule.
 
 ### C9 — Phase 2 traceability
@@ -359,6 +373,7 @@ Record:
 Every Phase-2 work package should state:
 
 `CANON REQUIREMENT(S)`
+→ `PROGRAMME PREREQUISITES`
 → `CURRENT REPO REALITY`
 → `GAP`
 → `APPROVED CHANGE`
@@ -384,23 +399,36 @@ After freeze, a canon change requires:
 
 No silent architectural drift through opportunistic coding.
 
-## 8. Relationship to House-in-Order Phase 2
+Frozen experiment authority such as Item 8 remains independently governed; canon change control does not silently grant execution permission.
 
-This master canon is **Phase 2 prerequisite P2.0**.
+## 8. Relationship to House-in-Order Phase 2 and programme order
 
-Recommended order:
+This master canon is **Phase 2 prerequisite P2.0**, but it must preserve upstream programme obligations rather than reorder them.
+
+Key correction:
+
+> **ITEM 8 PRECEDES A4.**
+
+The detailed programme order remains controlled by the latest D-numbered decisions/evidence. This planning file must not silently supersede those decisions.
+
+Conceptually:
 
 `PHASE 1 TRUTH / AUTHORITY QUALIFICATION`
-→ `P2.0 FINAL KINGSMAN MASTER CANON`
-→ `P2.1+ PROFESSIONALISATION / REWORK`
+→ `P2.0 FINAL KINGSMAN MASTER CANON (design baseline)`
+→ `complete/retain upstream obligations in governed order, including ITEM 8 BEFORE A4`
+→ `A4 / Evidence-Plane evolution when authorised`
+→ `P2.1+ PROFESSIONALISATION / REWORK against the canon`
 → `README + GRAPHICS DERIVED FROM FINAL TRUTH`
 → `FINAL PRODUCTION-GRADE REVIEW`
+
+Where the latest D-numbered programme sequence is more specific, **the D-numbered sequence wins**.
 
 See:
 
 - `kai-pm/HOUSE_IN_ORDER_PHASE2_PROFESSIONALISATION.md`
 - `kai-pm/KINGSMAN_README_ARCHITECTURE_REFRESH_PLAN.md`
 - `kai-pm/A4_SELF_DIAGNOSIS_EVOLUTION.md`
+- current Item-8 design/authority evidence.
 
 ## 9. Definition of done for the master canon
 
@@ -408,7 +436,7 @@ Do not freeze until:
 
 - all major historical final-vision documents have been considered/qualified;
 - every major capability family has a clear architectural home;
-- Team 8 exact intent is recovered or explicitly resolved by Dainius;
+- Item 8 is correctly represented as a pre-A4 programme/evidence obligation, not a cognitive team;
 - duplicate/overlapping architectures are reconciled;
 - authority and evidence boundaries are explicit;
 - self-diagnosis/recovery is one coherent architecture;
@@ -426,8 +454,10 @@ Do not freeze until:
 
 We already have most of Kai's organs and most of the ideas for the finished organism.
 
-The job now is to stop treating Kingsman, A4, Team 8, Unified Hunter, Evidence Plane, House Doctor, swarms, hardware and autonomy as separate inventions.
+The job now is to stop treating Kingsman, Unified Hunter, Evidence Plane, A4, House Doctor, swarms, hardware and autonomy as unrelated inventions while also keeping programme experiments/assurance work in their correct place.
 
-We lay every good idea on the table, recover what each was meant to do, remove overlaps, decide the clean final structure, attack it from multiple angles, map it to the real repository, get Dainius's approval, and freeze **one blueprint for the finished Kai**.
+**Item 8 is one of those upstream assurance obligations and comes before A4. It is not "Team 8" and it is not another Kai persona/team.**
+
+We lay every good idea on the table, recover what each was meant to do, preserve the correct programme order, remove overlaps, decide the clean final structure, attack it from multiple angles, map it to the real repository, get Dainius's approval, and freeze **one blueprint for the finished Kai**.
 
 Then Phase 2 builds toward that blueprint one controlled piece at a time.
