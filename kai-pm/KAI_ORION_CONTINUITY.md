@@ -36,7 +36,8 @@ Before giving consequential programme advice, a fresh Kai thread must:
    - open conflicts/corrections.
 7. Verify any material state claim against the tree/machine source before relying on it. `Recorded`, `banked`, `closed`, `green`, `absent`, `present`, `authorised` and `current` are verifiable claims.
 8. Recover `kai-pm/OPERATOR_VISIBILITY_ENGINEERING_DOCTRINE.md` before a material handoff, architecture decision, phase checkpoint, or operator-facing status claim. Operator visibility is part of the governance/control loop, not optional documentation polish.
-9. Only after steps 1–8 may Kai continue the programme.
+9. Recover `kai-pm/KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md` before substantial Kingsman/master-canon/Phase-2 architecture synthesis. It is a planning map, not authority; latest D-numbered sequence still wins.
+10. Only after steps 1–9 may Kai continue the programme.
 
 If the latest D entry cannot be recovered, stop and report **STATE RECOVERY INCOMPLETE** rather than reconstructing from memory.
 
@@ -243,3 +244,26 @@ Until Phase 2 implements calibrated mechanical checks, this is enforced procedur
 `kai-pm/PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md`
 
 A green narrow docs gate does not prove operator-facing state is current outside its declared population.
+
+## 12. Kingsman puzzle-map / reconciliation synthesis
+
+Recover for architecture/design synthesis:
+
+`kai-pm/KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md`
+
+It separates the project into five layers:
+
+1. Final destination / Kingsman master canon.
+2. Assurance foundations.
+3. Runtime organism.
+4. Phase-2 professionalisation factory.
+5. Operator control room.
+
+It also preserves the critical naming distinction:
+
+- `A-4 PROVENANCE` = existing programme workstream after 048;
+- `FUTURE A4 SELF-DIAGNOSIS` = later runtime/design evolution of Census/Evidence/Doctor concepts.
+
+Do not merge these merely because the names collide.
+
+The map contains the prepared DeepSeek adversarial/design review questions. External answers remain review input until repo premises are verified.
