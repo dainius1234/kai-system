@@ -28164,3 +28164,132 @@ H1.
 * **CORRECTIONS TO PRIOR RECORDS** — none in this entry
 * **P0** `32575388846` · **P1** `32594846522` — both permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D336 — H1 COMPLETE. The real current population, measured once with the frozen instrument.
+
+**Frozen instrument `v1.0` retrieved from the repository and
+manifest-verified BEFORE use**, in an independent shallow checkout of
+the declared subject:
+
+```
+H1 CENSUS SUBJECT  d8aac4d49e6ba997e3eb38062c0917186ee3f197
+                   tree 3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+instrument         12/12 artefacts OK · aggregate
+                   4a5b40a1c1f1aeb7fe26d5341f71b039360f69e22784a6d0fcddfb200fbd3f1e
+```
+
+**MEASURED TREE ≠ REPORTING TREE**: this entry is a child commit of the
+subject, by construction.
+
+### 1. Document population
+
+```
+tracked *.md            272
+untracked, not ignored    0
+ignored                   0
+```
+
+**The old 268 is superseded** — it was evidence about tree `627104d6`,
+never a permanent number.
+
+**The delta is fully accounted, mechanically:** exactly **4 added, 0
+removed** —
+
+```
++ kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md   (Kai, 55060ab)
++ kai-pm/KAI_ORION_CONTINUITY.md                        (Kai, b35639e)
++ kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md
++ kai-pm/house_in_order_instrument/README.md
+```
+
+**Every one is an artefact this House-in-Order exercise created.** The
+document corpus grew by exactly what we added and nothing else.
+
+**And a correction to how I once reported it.** D327 recorded "ignored:
+1 — `.pytest_cache/README.md`". Here it is **0**. Neither tree contains
+it (verified: `0` in both). It is created by **running pytest**, so it
+is a property of the **workspace**, not of the tree. **My earlier figure
+described my container, not the repository** — the local-vs-real
+confusion in miniature, and the reason H1 measures an independent
+checkout.
+
+### 2. Textual reference graph — discovery evidence only
+
+```
+raw evidence edges 944   EXPLICIT_PATH 532 · BASENAME_UNIQUE 357 · MARKDOWN_LINK 55
+distinct reference pairs 530   backed by a link 52   NOT backed 478
+contexts  INLINE_CODE 528 · TABLE 189 · FENCED_CODE 83 · PROSE_PATH 80 · MARKDOWN_LINK 55 · QUOTE 9
+referenced >=1  163 of 272        never referenced  109
+```
+
+Per Kai's ruling this is **Graph A** — impact and review-priority
+evidence. It establishes **no** governance or authority relationship.
+
+### 3. I/O operation accounting (P12)
+
+```
+tracked source files 615
+candidate operations 1343   sum(dispositions) 1343   EQUAL: YES
+  RESOLVED_READ                    15
+  RESOLVED_WRITE                    5
+  READ_AND_WRITE                    0
+  RESOLVED_NON_DOCUMENT_TARGET    428
+  UNRESOLVED_TARGET                30
+  UNRESOLVED_RELEVANCE            865
+```
+
+### 4. Proven write relations — 5 documents
+
+```
+CHANGELOG.md                       <- scripts/auto_changelog.py
+README.md                          <- scripts/sync_docs.py
+SESSION_BACKLOG.md                 <- scripts/auto_session_log.py
+docs/PROJECT_BACKLOG.md            <- scripts/sync_docs.py
+kai-pm/BASELINE_RESPONSES_0.5B.md  <- scripts/capture_baseline_responses.py
+```
+
+**`PROVEN_WRITE_RELATION` only. Scope is NOT established**, so no
+document is `PARTIAL_DERIVED` or `FULL_DERIVED`. Kai's disproof stands:
+`auto_changelog.py` owns `[Unreleased]`, `auto_session_log.py` owns
+appended blocks — **ownership of a region is not ownership of a file**,
+and that determination belongs to H2/R4.
+
+### 5. What H1 did NOT produce
+
+**No classification.** No document has a lifecycle, function, authority,
+generation, validity binding or scope. H1 produced a **population and
+its evidence**, nothing more. H2 is not started.
+
+---
+
+## THREAD RECOVERY BLOCK — D336
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`,
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117` (≠ reporting tree)
+* **INSTRUMENT** — FROZEN `v1.0`, aggregate `4a5b40a1…1d77`, verified
+  from the subject checkout before use
+* **CURRENT WORKSTREAM** — House-in-Order; **H1 COMPLETE**
+* **LAST PROVEN STATE** — population **272** tracked documents; 530
+  distinct textual reference pairs; 1343 I/O operations fully
+  reconciled; **5 proven write relations, scope unestablished**
+* **AUTHORISED NEXT ACTION** — none. **H2 requires operator
+  authorisation.** H2 would classify all 272 on six independent axes
+  with UNKNOWN first-class
+* **EXPLICITLY NOT AUTHORISED** — H2 classification · H3 claim
+  qualification · H4 register repair · R2+ mutation · document repair ·
+  Phase B · `ITEM8_GO` · six subject builds · Stage 2 · repair of the
+  seven research obligations · investigation of `=0.2.0` (A-4)
+* **OPEN / UNRESOLVED** — 865 `UNRESOLVED_RELEVANCE` (accepted into the
+  freeze) · whole-file YAML/Make scanning · KAI-GATE register covers 20
+  of 51 ids · three-way closure-count contradiction (STATUS 9 / register
+  11 / architecture 0) · seven research obligations · 109 documents
+  referenced by nothing (**an observation, not a defect**)
+* **CORRECTIONS TO PRIOR RECORDS** — D327's "ignored: 1
+  `.pytest_cache/README.md`" described my **workspace**, not the
+  repository; neither tree contains it. The **268** population is
+  superseded by **272** at this subject
+* **P0** `32575388846` · **P1** `32594846522` — both permanent. Counts
+  unchanged (Programme Rule 7).
