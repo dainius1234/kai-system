@@ -28714,3 +28714,182 @@ authority state anywhere until H3**.
   D338 FUNCTION values withdrawn for want of a positive witness
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D340 — Blind holdout comparison. 93.3% agreement, one false positive, three append-corrections.
+
+Kai's instruction honoured: **the classifier has NOT been patched.** The
+banked `HOUSE-IN-ORDER-H2-CLASSIFIER v1.0` is the exact comparison
+subject, unmodified.
+
+### 1. THE COMPARISON — v1.0 against Kai's blind adjudication
+
+```
+20 paths · 6 axes · 120 cells
+agree 112 · DISAGREE 8 · agreement 93.3%
+```
+
+| path | axis | KAI | v1.0 | class |
+|---|---|---|---|---|
+| `KAI_ORION_CONTINUITY.md` | LIFECYCLE | ACTIVE | UNKNOWN | ONTOLOGY_AMBIGUITY |
+| `PLAYBOOKS/resume_session.md` | LIFECYCLE | ACTIVE | UNKNOWN | ONTOLOGY_AMBIGUITY |
+| `docs/wake_intent_j2.md` | FUNCTION | REFERENCE | UNKNOWN | **IMPLEMENTATION_GAP** |
+| `NAVIGATION.md` | FUNCTION | REFERENCE | UNKNOWN | **IMPLEMENTATION_GAP** |
+| `docs/agentic_patterns_spec.md` | FUNCTION | PLAN | UNKNOWN | OVER_ABSTENTION |
+| `PLAYBOOKS/resume_session.md` | FUNCTION | USER_GUIDE | UNKNOWN | OVER_ABSTENTION |
+| `TECH_WATCH.md` | FUNCTION | STATUS | UNKNOWN | OVER_ABSTENTION |
+| `docs/agentic_patterns_spec.md` | VALIDITY | TIME_BOUND | CURRENT_TREE | **FALSE_POSITIVE** |
+
+### 2. CORRECTION TO MY OWN IN-FLIGHT CLAIM
+
+While producing this comparison I said *"zero false positives — every
+disagreement is abstention."* **Wrong.** Seven are abstentions; **one is
+an incorrect assertion.**
+
+`docs/agentic_patterns_spec.md` carries `> Version: 1.0 — 2 Mar 2026`.
+My date pattern requires **full month names**, so `Mar` was missed and
+the row asserted `CURRENT_TREE` — *"claims current state, **unbound**"* —
+for a document that **is** date-bound.
+
+**That is the dangerous direction**, and it is exactly what Kai's rule
+protects against: `CURRENT_TREE` would invite H3 to check a **March 2026**
+specification against **today's** tree. An UNKNOWN would merely have
+cost coverage.
+
+### 3. Causes established, not guessed
+
+**`REFERENCE` IS UNREACHABLE.** `grep REFERENCE classify.py` → **no
+match**. The ontology defines the value; **my classifier cannot emit
+it.** Two rows were not over-abstention at all — the correct answer was
+*structurally impossible*. A category present in the specification and
+absent from the implementation is a worse defect than a wrong rule,
+because no amount of evidence could have produced the right answer.
+
+**Nomination gaps:** `PLAYBOOKS/`, `TECH_WATCH`, `NAVIGATION` nominate
+**nothing**. `docs/` nominates `USER_GUIDE` and stops, so
+`agentic_patterns_spec` could never reach `PLAN`.
+
+**LIFECYCLE ambiguity:** both disputed documents have `commits=1`,
+`present_tense=False`. My rule requires one of those witnesses; Kai read
+them as obviously live. Genuine ontology ambiguity — *does a
+newly-created protocol document have positive ACTIVE evidence?* — and
+**not mine to settle unilaterally.**
+
+### 4. APPEND-CORRECTIONS to D339
+
+**(a) HOLDOUT COUNT.** D339 said **11** audit batches. It is **12**.
+And the "58%" was the `FUNCTION=EVIDENCE` share (**159/272 = 58.5%**),
+while the `CODE_AUDIT_BATCH_*` family is **144/272 = 52.9%**. I bound a
+number to the wrong population *and* miscounted. **Sixth MISBINDING.**
+
+**And the inference was wrong even had the numbers been right.**
+Non-curation is established by the **hash-selection rule committed at
+`5766fe4` before selection** — not by the sample happening to look
+proportionate. Withdrawn.
+
+**(b) HISTORY BOUNDARY.** D339 called `d6e5d8cf` *"the import"*.
+**Withdrawn.** Verified: its subject is
+*"fix(KAI-GATE-032): a workflow can be valid YAML…"* — a **normal repair
+commit**. It shows `parents: []` **only because the shallow graft made
+it parentless**. Rootness is an artefact of truncation, not of being a
+root.
+
+Therefore *"no earlier per-file history exists to lose"* is **not
+established**. Corrected rule, adopted:
+
+* `commits > 1` → positive maintenance evidence **within the observed
+  history window**;
+* `commits == 1` → **UNKNOWN**, never proof of being unmaintained.
+
+Evidence wording to be renamed **`commits_since_observed_boundary`**.
+The current classifier already turns 1 into UNKNOWN, so **no unsafe
+positive was produced** — but the words were wrong.
+
+**(c) VALIDITY UNKNOWN REASON.** A row can carry `has_date=true` while
+its reason says *"none present"*. The rule (date **+** present-tense →
+TIME_BOUND) may be right; **the explanation is false**. Observed
+evidence must never be erased because it was insufficient.
+
+### 5. DEFECT 4 — the reproduction procedure is not portable
+
+Kai is right, and I verified it. `RUN.md` advertises generic
+`<subject-checkout>` / `<full-history-repo>` inputs, but banked
+`pass_a.py` **hard-codes** `FULL=/home/user/kai-system` and writes to a
+session-specific `/tmp/claude-0/.../scratchpad/` path. `run_h2.py`
+accepts a history source — **after Pass A already used the hard-coded
+one.**
+
+**The bytes are durable; the advertised fresh-reproduction path is
+not.** My D334 lesson — *a manifest that verifies is not an instrument
+that runs* — recurring one layer up: **a package that runs is not a
+package that runs ANYWHERE.**
+
+### 6. PROPOSED v1.1 DELTA — not implemented, awaiting ruling
+
+`v1.0` preserved exactly as historical candidate evidence; **v1.1 cut,
+never edited in place.**
+
+1. explicit parameters: subject checkout, history source, subject SHA,
+   output location — **no user-home or scratchpad paths**;
+2. one top-level reproduction command covering Pass A + capability
+   contract + classification;
+3. record subject/tree and **shallow-boundary commit(s) with the
+   history-window limitation**;
+4. implement `REFERENCE` (and `OTHER`) so every ontology value is
+   reachable, **plus a meta-check that every ontology value is
+   emittable** — the general form of this defect;
+5. extend date recognition (abbreviated months) **with a boundary pair**;
+6. repair the false UNKNOWN explanations;
+7. rename to `commits_since_observed_boundary`;
+8. nomination coverage for the gaps — **with positive witnesses, not
+   pattern expansion alone**;
+9. fresh-environment reproduction proven by **executing** the package,
+   not by `sha256sum`.
+
+**LIFECYCLE ambiguity (§3) is NOT in this delta** — it needs Kai's
+ruling, not my preference.
+
+### 7. Accepted permanent rule
+
+**H2 `UNKNOWN` MUST NEVER BE USED AS NEGATIVE EVIDENCE OR AN EXCLUSION
+CRITERION.** It cannot mean inactive, irrelevant, false, superseded or
+safe-to-ignore. Recorded as binding on H3.
+
+### 8. Reporting-tree side effect
+
+D339 moved the root README Python-LOC metric while banking new Python
+artefacts. **Auto-derived reporting-tree side effect — not H2 subject
+evidence, not a document repair, and it does not imply whole-document
+README currency.**
+
+---
+
+## THREAD RECOVERY BLOCK — D340
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`,
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`
+* **INSTRUMENTS** — census `v1.0` `4a5b40a1…1d77` UNTOUCHED; H2
+  classifier `v1.0` `fa847726…45f4` **UNMODIFIED, the comparison
+  subject**
+* **CURRENT WORKSTREAM** — House-in-Order; H2 holdout comparison
+  returned; **v1.1 proposed, not built**
+* **LAST PROVEN STATE** — 93.3% agreement (112/120); 1 FALSE_POSITIVE, 2
+  IMPLEMENTATION_GAP, 3 OVER_ABSTENTION, 2 ONTOLOGY_AMBIGUITY
+* **AUTHORISED NEXT ACTION** — none. Awaiting Kai's ruling on the v1.1
+  delta and the LIFECYCLE ambiguity
+* **EXPLICITLY NOT AUTHORISED** — H3 · H4 · H5 · R2+ mutation ·
+  document/register repair · Phase B · `ITEM8_GO` · six subject builds ·
+  Stage 2 · seven research obligations · `=0.2.0`
+* **OPEN / UNRESOLVED** — v1.1 unbuilt · `REFERENCE`/`OTHER` unreachable
+  · portability defect · 865 `UNRESOLVED_RELEVANCE` · whole-file
+  YAML/Make scanning · history window unqualified before `d6e5d8cf` ·
+  243 abstained claim sentences
+* **CORRECTIONS TO PRIOR RECORDS** — D339 holdout count 11→**12**; D339
+  "58% proportionate" withdrawn as bound to the wrong population **and**
+  as an invalid basis for non-curation; D339 `d6e5d8cf` "the import"
+  withdrawn; my own in-flight "zero false positives" withdrawn — **there
+  is one**
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).
