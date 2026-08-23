@@ -26550,3 +26550,184 @@ in the frozen critical path.
 * P1 stands. `ITEM8_PREFLIGHT_GO` present and spent. `ITEM8_GO`
   **ABSENT**. **Phase B unresolved and unauthorised.** **Stage 2 NOT
   AUTHORISED.** Counts unchanged (Rule 7).
+
+---
+
+## D325 — House-in-order census, step 1. Read-only. Nothing repaired.
+
+Operator directive: **freeze substantive work**; take stock of the whole
+active documentation, register, tracker, architecture and
+programme-control surface; produce the authoritative-source map, the
+stale/conflicting census and a proposed reconciliation order. **Repair
+nothing.** Phase B and all new implementation are stopped.
+
+**Nothing in this entry mutates code, workflows, sentinels, frozen-R2
+artefacts, registers, subject builds or Stage-2 state.**
+
+### 0. Method, and an R10 breach I committed against my own census
+
+Population derived by `rglob("*.md")` over the tree — not a list.
+Per-document signals: byte size, last-commit date, commit count,
+self-declared status strings, and whether any of **486** scanned
+scripts/workflows/Makefile references the file by name.
+
+**I truncated my own census output.** The first run was
+`python3 census.py | tee log | head -90`; `head` closed the pipe, the
+writer took SIGPIPE, and the log stopped at **97 of 218 lines** — while
+I was reading it as complete. Caught by checking `wc -l` against the
+expected row count, and re-run without `head`.
+
+That is **R10 inside the exercise convened to find exactly this**. The
+census is only trustworthy because the truncation was detected; had I
+not counted the rows I would have classified 52 documents and reported
+125.
+
+### 1. The population
+
+```
+markdown documents in tree                              269
+  CODE_AUDIT_BATCH_*                144 files, 1,998,544 bytes
+                                    ALL last-touched 2026-08-05
+                                    referenced by 0 of 486 scripts
+  all other control documents       125
+
+documents touched since the 2026-08-05 import            15
+documents frozen at the import                          254  (94%)
+```
+
+**Only 15 documents out of 269 have been maintained at all.** Git dates
+before 2026-08-05 carry no information — the repository was
+imported/squashed that day — so "last touched" is a staleness signal
+only *after* that date.
+
+The 15: `DECISIONS.md` (175 commits), `README.md` (120),
+`docs/PROJECT_BACKLOG.md` (79), `ORION_FIELD_NOTES.md` (11),
+`CLAUDE.md` (9), `ENGINEERING_DOCTRINE.md` (5),
+`EMBEDDING_BACKEND_STATE.md` (5), `NEXT_STINT_PLAN.md` (4),
+`RUNTIME_TOPOLOGY_CENSUS.md` (4), `UH2_INTAKE_REDESIGN.md` (4),
+`POSTMORTEM_2026-08-06` (4), `WAYPOINTS.md` (3),
+`SERVICE_IDENTITY_MEASUREMENT.md` (3), `SERVICE_IDENTITY_STATE.md` (3),
+`UH2_SENSOR_INGRESS_PLAN.md` (2).
+
+### 2. The three stated claims — ALL VERIFIED, each worse than stated
+
+**(1) "Formally closed: 0" while closures exist — CONFIRMED, and
+compounded.**
+
+```
+kai-pm/INSTRUMENTATION_ARCHITECTURE.md:282
+    **Findings formally closed: 0.** Programme Rule 7.
+
+scripts/security/closure_register.py
+    11 formal Closure() entries
+```
+
+And the document has **1 commit, last touched 2026-08-05.** The
+canonical finding register has never been updated since the import,
+while the programme went from `KAI-GATE-023` to `051` and formally
+closed eleven findings.
+
+**The cross-check passes anyway**, and that is the instructive part.
+`check_gate_registry.py` verifies that every id CLOSED in
+`closure_register.py` reads CLOSED **in the table**. It does — those
+rows are correct. **Nothing checks the human-readable summary sentence
+above the table**, which states the opposite of the table it introduces.
+A machine-validated table under a false headline: technically-true
+fragments, wrong overall picture, exactly as the operator described.
+
+**(2) README is date-touched — CONFIRMED, with the mechanism named.**
+`scripts/sync_docs.py` "patches the README *Project Status* table
+in-place". Its own `--check` output states:
+
+> `stamp says 22 August 2026; the stamp itself is not checked — only the
+> metrics below`
+
+So the date stamp is **written but never verified**, while the metrics
+beside it are verified. A reader takes the stamp as the document's
+currency; the tool guarantees only the two numbers under it.
+
+**(3) PROJECT_BACKLOG materially stale — CONFIRMED, and it is the
+sharpest case.**
+
+```
+docs/PROJECT_BACKLOG.md:15
+    **Last updated:** 2026-07-21 — Phase 0.5 complete; D55–D59 shipped
+
+file: 79 commits, last machine-patched 2026-08-22
+sync_docs.py patches ONLY the 'Test targets' and 'Individual tests' rows
+```
+
+Its narrative is frozen at **2026-07-21 and decision D59**. We are at
+**D325**. But it has 79 commits and a recent date, because a tool
+rewrites two numeric cells inside it. **It looks maintained and is five
+weeks and ~266 decisions stale.** A document can be simultaneously
+machine-current and humanly false.
+
+### 3. Proposed AUTHORITATIVE-SOURCE MAP — one owner per fact
+
+Proposed, not applied.
+
+| fact | proposed owner | current state |
+|---|---|---|
+| programme history | `kai-pm/DECISIONS.md` (append-only) | **AUTHORITATIVE**, maintained |
+| standing doctrine | `kai-pm/ENGINEERING_DOCTRINE.md` | **AUTHORITATIVE**, maintained |
+| operating rules | `CLAUDE.md` | **AUTHORITATIVE**, maintained |
+| **finding population** | `INSTRUMENTATION_ARCHITECTURE.md` §5 | **AUTHORITATIVE-IN-NAME / STALE** — 20 of 51 ids, frozen at import, false summary |
+| **formal closure** | `scripts/security/closure_register.py` | **AUTHORITATIVE** (11), contradicted by its own consumer doc |
+| known-good commits | `kai-pm/WAYPOINTS.md` | maintained; needs revalidation |
+| plan of work | `kai-pm/NEXT_STINT_PLAN.md` | maintained 2026-08-12; **11 days behind** |
+| repo overview + metrics | `README.md` | **DERIVED** (2 metric rows) + unverified stamp |
+| backlog | `docs/PROJECT_BACKLOG.md` | **DERIVED metrics over STALE narrative** — dual identity, must split |
+| 27-July audit snapshot | `CODE_AUDIT_MASTER.md` | **HISTORICAL-AUTHORITATIVE** for `2d830f2` only; self-declares FINAL |
+| audit evidence | 144 `CODE_AUDIT_BATCH_*` | **HISTORICAL**, self-declared chronology-only, 0 machine refs |
+| experiment evidence | GitHub run ids + artefacts | **IMMUTABLE** — P0 `32575388846`, P1 `32594846522` |
+| everything else | 254 untouched documents | **UNKNOWN** — unclassified, none proven current |
+
+**The largest single gap: 254 documents (94%) have no classification and
+no owner.** None is proven current; none is marked historical. They are
+the "probably current" population the directive forbids.
+
+### 4. Contradiction census — confirmed instances
+
+1. `INSTRUMENTATION_ARCHITECTURE.md:282` "formally closed: **0**" vs
+   `closure_register.py` **11**.
+2. Same document's §5 table: **20 of 51** live ids.
+3. `PROJECT_BACKLOG.md` "Last updated 2026-07-21 / D55–D59" vs 79
+   commits and D325.
+4. README stamp written but explicitly unverified.
+5. `SESSION_BACKLOG.md` self-declares **stale** and is still machine-
+   written by `auto_session_log.py`.
+6. `CODE_AUDIT_CONTINUATION_LOG.md` declares itself **ACTIVE** *and*
+   **superseded** in its own header.
+7. `CLEANUP_TODO.md` declares itself **historical** and **superseded**,
+   with no pointer to the successor.
+
+### 5. Proposed reconciliation order — for review, NOT started
+
+* **R0 — freeze.** Substantive work stopped. **Already in force.**
+* **R1 — classify all 269.** Every document gets AUTHORITATIVE / DERIVED
+  / HISTORICAL / SUPERSEDED / STALE / UNKNOWN + named owner. Read-only.
+* **R2 — repair the finding register.** All 51 ids present; correct the
+  false "closed: 0" summary; add the missing-id check (`KAI-GATE-052`).
+* **R3 — resolve the seven contradictions**, machine evidence winning,
+  by **append-only supersession** — history is never rewritten to agree
+  with today.
+* **R4 — bind claims to revisions.** Every "green/passed/healthy" states
+  SHA, environment, workflow run id and coverage.
+* **R5 — prove drift detection.** A check that fails when a document
+  claiming authority is not derivable or not classified. Without it this
+  recurs in six weeks.
+* **R6 — re-establish exact programme state**, then resume 048.
+
+### 6. What requires the operator's mutation authority
+
+Everything from **R2** onward. **R1 is read-only and is the natural
+continuation of this census.** None of it is started.
+
+### 7. Status
+
+* Phase B **STOPPED**. No new substantive implementation.
+* **Nothing repaired, reclassified, deleted or promoted.**
+* P1 stands; P0 permanent. `ITEM8_PREFLIGHT_GO` present and spent;
+  `ITEM8_GO` **ABSENT**; **Stage 2 NOT AUTHORISED**; counts unchanged
+  (Rule 7).
