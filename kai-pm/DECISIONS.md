@@ -28076,3 +28076,91 @@ banked at `kai-pm/house_in_order_instrument/`.
   full-SHA-256, execution-verified package here
 * **P0** `32575388846` · **P1** `32594846522` — both permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D335 — FREEZE TAKEN. `HOUSE-IN-ORDER-CENSUS-INSTRUMENT v1.0`.
+
+**Operator authorisation: "I authorise: Yes — this is the evidence we
+needed."** Kai's technical review: **H0 FREEZE CRITERIA: PASS**, with
+the recommendation to freeze this exact instrument and move to H1.
+
+### The freeze
+
+```
+identifier : HOUSE-IN-ORDER-CENSUS-INSTRUMENT v1.0
+location   : kai-pm/house_in_order_instrument/
+artefacts  : 12, each with a full SHA-256 in MANIFEST.sha256
+aggregate  : 4a5b40a1c1f1aeb7fe26d5341f71b039360f69e22784a6d0fcddfb200fbd3f1e
+verify     : cd kai-pm/house_in_order_instrument && sha256sum -c MANIFEST.sha256
+```
+
+**H0 IS CLOSED.** No further instrument development is authorised. Any
+future change to these artefacts is a **new version requiring its own
+freeze**, not an amendment to this one.
+
+### What the freeze does and does not assert
+
+**Asserts:** the instrument is durable, recoverable, cryptographically
+identified, calibration-tested, boundary-tested, and its blind spots are
+explicit. Verified by hash **and by execution** from a fresh clone.
+
+**Does not assert:** that it knows every writer in the repository. It
+knows what it can prove, what it can positively exclude, and it reports
+853 operations it cannot resolve. Kai's ruling stands: **the remaining
+unknowns do not block the freeze because the instrument is not
+pretending to know them.**
+
+### The blind spots are frozen WITH it
+
+Whole-file YAML/Make scanning · bounded redirection set · single-level
+literal binding · `RESOLVED_NON_DOCUMENT_TARGET` resting on extension
+and tracked-path witnesses · **853 `UNRESOLVED_RELEVANCE` open by
+design** · static analysis remains **corroborative and lower-bound** and
+may never assign GENERATION, authority, or a negative claim beyond its
+constructive-exclusion rules.
+
+### H1 census subject — declared here, measured next
+
+**This commit's tree is the H1 CENSUS SUBJECT.** The census will be run
+against it and reported in a **child** commit, so **MEASURED TREE ≠
+REPORTING TREE** by construction — the self-reference instability
+identified at D328 §1 and closed by Kai's frozen-subject rule.
+
+The old **268** is evidence about tree `627104d6` and is **not** a
+permanent number. H1 derives the population afresh.
+
+### Scope of H1 — and its hard stop
+
+Run the frozen census **once** against the declared subject and capture
+the real current population. **H1 produces a POPULATION, not a
+classification.** H2 is not started, and no document receives a
+lifecycle, function, authority, generation, validity or scope label in
+H1.
+
+---
+
+## THREAD RECOVERY BLOCK — D335
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **INSTRUMENT** — FROZEN `v1.0`, aggregate `4a5b40a1…1d77`, 12
+  artefacts at `kai-pm/house_in_order_instrument/`
+* **H1 CENSUS SUBJECT** — this commit's tree; results reported in a
+  child commit
+* **CURRENT WORKSTREAM** — House-in-Order **H1**, population census
+* **LAST PROVEN STATE** — H0 closed; freeze granted by the operator on
+  Kai's PASS; instrument verified by hash and execution from a fresh
+  clone
+* **AUTHORISED NEXT ACTION** — run the frozen census once against the
+  declared subject; report the population
+* **EXPLICITLY NOT AUTHORISED** — H2 classification · further instrument
+  development · R2+ mutation · document/register repair · Phase B ·
+  `ITEM8_GO` · six subject builds · Stage 2 · repair of the seven
+  research obligations · investigation of `=0.2.0` (A-4 provenance)
+* **OPEN / UNRESOLVED** — 853 `UNRESOLVED_RELEVANCE` (accepted into the
+  freeze) · whole-file YAML/Make scanning · KAI-GATE register covers 20
+  of 51 ids · three-way closure-count contradiction · seven research
+  obligations
+* **CORRECTIONS TO PRIOR RECORDS** — none in this entry
+* **P0** `32575388846` · **P1** `32594846522` — both permanent. Counts
+  unchanged (Programme Rule 7).
