@@ -37,7 +37,8 @@ Before giving consequential programme advice, a fresh Kai thread must:
 7. Verify any material state claim against the tree/machine source before relying on it. `Recorded`, `banked`, `closed`, `green`, `absent`, `present`, `authorised` and `current` are verifiable claims.
 8. Recover `kai-pm/OPERATOR_VISIBILITY_ENGINEERING_DOCTRINE.md` before a material handoff, architecture decision, phase checkpoint, or operator-facing status claim. Operator visibility is part of the governance/control loop, not optional documentation polish.
 9. Recover `kai-pm/KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md` before substantial Kingsman/master-canon/Phase-2 architecture synthesis. It is a planning map, not authority; latest D-numbered sequence still wins.
-10. Only after steps 1–9 may Kai continue the programme.
+10. Recover the long-horizon/resilience inputs in §§13–14 below before final-canon design, because the final system is intended to survive local failures, long-term dependency changes and eventual operator succession.
+11. Only after steps 1–10 may Kai continue the programme.
 
 If the latest D entry cannot be recovered, stop and report **STATE RECOVERY INCOMPLETE** rather than reconstructing from memory.
 
@@ -267,3 +268,52 @@ It also preserves the critical naming distinction:
 Do not merge these merely because the names collide.
 
 The map contains the prepared DeepSeek adversarial/design review questions. External answers remain review input until repo premises are verified.
+
+## 13. Organic resilience / contingency pillar
+
+Recover during master-canon, Phase-2 and self-diagnosis work:
+
+- `kai-pm/KINGSMAN_ORGANIC_RESILIENCE_ARCHITECTURE_DOCTRINE.md`
+- `kai-pm/KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md`
+
+Core invariant:
+
+> **ORGANIC INTEGRATION WITHOUT SHARED-FATE COUPLING.**
+
+The final Kai must operate as one organism but not one fragile blob. Local failures should stop at the narrowest safe boundary, degraded modes must remain truthful, and recovery knowledge should be shared/qualified rather than improvised independently by each service.
+
+Existing `common/resilience.py` is a foundation/prototype with retries, circuit breakers, health probes, watchdogs and a heuristic HealingEngine; future work must qualify/evolve it rather than blindly creating a second recovery authority.
+
+## 14. Long-horizon stewardship / succession / self-sufficiency pillar
+
+Recover:
+
+- `kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md`
+- `kai-pm/KINGSMAN_ARCHITECTURAL_PILLARS_INDEX.md`
+
+This is a **core final-product requirement**, not a convenience feature.
+
+D269 previously recorded the operator requirement that Kai must outlive Dainius and continue caring for/supporting his daughter, but only as a design gap. The new stewardship file preserves that purpose as an explicit master-canon design obligation while still authorising no succession or financial mechanism by itself.
+
+Long-horizon design must account for:
+
+- temporary operator unavailability;
+- permanent succession;
+- identity/authority continuity;
+- protected family data/assets;
+- secrets/key lifecycle;
+- hardware migration/replacement;
+- critical provider/dependency disappearance;
+- backups/restoration;
+- operating costs/runway;
+- lawful, bounded eventual revenue/self-sufficiency;
+- trusted human/legal stewardship roles;
+- safe archival/read-only stop conditions where continued autonomous operation is not justified.
+
+Important distinction:
+
+> **SELF-SUFFICIENCY IS NOT UNCONTROLLED SELF-PRESERVATION.**
+
+Kai may eventually earn/manage resources to remain viable only through explicit mandates, risk limits, accounting/auditability, legal/tax compliance, protected separation from family assets, and the same evidence/policy/authority/verification chain as other consequential action.
+
+Any future succession mechanism must distinguish temporary silence from permanent succession and must not rely on a dead-man timer alone.
