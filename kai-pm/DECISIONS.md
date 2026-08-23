@@ -27168,3 +27168,134 @@ is assigned.
   backlog, workflow, `.gitignore`, archive move or Item-8 state touched.
 * Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
   Counts unchanged (Rule 7).
+
+---
+
+## D329 — Construct before classifier: ontology, P11, and an independent oracle.
+
+Kai's eight instructions accepted in full. **Instrument-development
+quarantine in force**: no corpus-level totals, hub conclusions or
+authority counts are promoted here. What follows is instrument evidence,
+specification, oracle construction and withdrawn claims — nothing else.
+
+**QUALIFICATION_SUBJECT frozen at `9d15bcd207ad7a33e1087667b245970f989e366f`
+/ tree `627104d61b4f91e110a36cf65a44fed2cfbad078`**, checked out
+read-only in scratchpad. This and later governance commits are
+**reports, not new subjects**.
+
+### C. P11 — DIRECTIONALITY MUST BE PROVEN
+
+Built to Kai's fixture list. **First run: 13 passed, 1 FAILED** — and
+the failure mattered more than a wrong answer would have.
+
+`both.py` binds its path first (`p = pathlib.Path("t/f.md")`, then
+`p.read_text()` / `p.write_text()`). The detector returned **nothing at
+all** — not `UNRESOLVED`, but **silent absence**. A silent miss is worse
+than an abstention: nothing marks the gap.
+
+Repaired with deliberately shallow single-level literal binding, plus
+the rule that an unresolvable target **must surface as UNRESOLVED rather
+than be skipped**. **14 passed, 0 failed.**
+
+Mutation-proven three ways:
+
+| mutation | result |
+|---|---|
+| reads relabelled as writes | **4 assertions FAIL** |
+| unresolvable targets silently dropped | **2 FAIL** (abstention detected) |
+| binding resolution reverted | **1 FAIL** (silent miss returns) |
+| restored | 14 / 0 |
+
+Reader-vs-writer fixtures (7/7) additionally prove `__pycache__`
+exclusion and that a mention beside an unrelated redirect is not a
+writer.
+
+### C2. The corrected detector reverses D328's errors
+
+At the frozen subject, only **8 documents have any proven writer**.
+Gold-set directionality:
+
+```
+kai-pm/DECISIONS.md                  PROVEN_READER ×4   (NOT derived)
+kai-pm/INSTRUMENTATION_ARCHITECTURE  PROVEN_READER      check_gate_registry.py
+kai-pm/ENGINEERING_DOCTRINE.md       PROVEN_READER      test_doctrine_integrity.py
+README.md                            READ_AND_WRITE     sync_docs.py
+docs/PROJECT_BACKLOG.md              READ_AND_WRITE     sync_docs.py
+CHANGELOG.md                         READ_AND_WRITE     auto_changelog.py
+SESSION_BACKLOG.md                   READ_AND_WRITE     auto_session_log.py
+kai-pm/STATUS.md · SESSION_BOOTSTRAP · CODE_AUDIT_MASTER · WAYPOINTS
+                                     (no proven read or write)
+```
+
+D328's classifier called the first three DERIVED. They are **readers**.
+The reversal is now demonstrated, not merely suspected.
+
+**Declared limit: 172 source files contained targets that could not be
+structurally resolved and were ABSTAINED.** That is a large abstention
+and it bounds completeness — these results are a **lower bound on
+writers**, never a proof of absence.
+
+### A / B. Ontology and admissibility
+
+Written to scratchpad (`AUTHORITY_ONTOLOGY.md`). Governing principle:
+**a document's self-description is evidence about its claim, never proof
+of its role.** Each role defines what supports it, what is insufficient,
+what contradicts it, and when UNKNOWN is the only admissible verdict.
+`UNKNOWN` is a first-class answer, not a leftover bucket.
+
+### D. Independent oracle — my labels, with reasons
+
+**CONTAMINATION DISCLOSED FIRST:** I have already seen the withdrawn
+D328 classifier output for these documents. My labels are therefore
+**not blind**. They are grounded in reading each document and in the
+structural directionality evidence above, and Kai must attack them on
+that basis.
+
+| document | my label | reason |
+|---|---|---|
+| `DECISIONS.md` | ACTIVE-AUTHORITY-CANDIDATE | 177 commits, append-only by rule, PROVEN_READER only |
+| `ENGINEERING_DOCTRINE.md` | ACTIVE-AUTHORITY-CANDIDATE | maintained; read, not written |
+| `WAYPOINTS.md` | ACTIVE-AUTHORITY-CANDIDATE | each claim bound to an exact sha + CI run |
+| `INSTRUMENTATION_ARCHITECTURE.md` | ACTIVE-AUTHORITY-CANDIDATE | the finding register; machine-**read** |
+| `STATUS.md` | ACTIVE-AUTHORITY-CANDIDATE | claims current phase — *truth is R4's job, not this label's* |
+| `SESSION_BOOTSTRAP.md` | ACTIVE-AUTHORITY-CANDIDATE | self-declared entry point, present tense |
+| `README.md` | **SPLIT** — DERIVED (Project Status table) + ACTIVE (rest) | one PROVEN_WRITER with partial scope |
+| `PROJECT_BACKLOG.md` | **SPLIT** — DERIVED (2 metric rows) + ACTIVE (rest) | same generator, same partial scope |
+| `CHANGELOG.md`, `SESSION_BACKLOG.md` | DERIVED-CANDIDATE | PROVEN_WRITER, whole-document |
+| `CODE_AUDIT_MASTER.md` | HISTORICAL | bound to snapshot `2d830f2`, "no remediation performed" |
+| `CODE_AUDIT_BATCH_*` | REFERENCE-EVIDENCE | snapshot-bound evidence cited by the P-plans |
+| `UH2_SENSOR_INGRESS_PLAN.md` | SUPERSEDED | declares supersession |
+| `data/SOUL.md`, `data/AGENTS.md` | **RUNTIME-DATA (role absent)** | `AGENTS.md`: "Loaded on startup by agentic/app.py" |
+| `data/self-emp/*/README.md` | RUNTIME-DATA | 35–114-byte folder markers, not documentation |
+
+### E. Construct ambiguities discovered
+
+**E1 — the ontology has no role for runtime data.** `SOUL.md` and
+`AGENTS.md` are *inputs the running system consumes*, not documentation
+about it. Forcing them into HISTORICAL or AUTHORITATIVE is a category
+error. **RUNTIME-DATA proposed.**
+
+**E2 — role is a property of SCOPE, not of the file.** `README.md` and
+`PROJECT_BACKLOG.md` are each partly generated and partly hand-written.
+One label per document cannot express that, and it is precisely where
+the "machine-current, humanly false" defect lives. **The unit of
+classification may need to be a document REGION.**
+
+**E3 — a third closure count.** `STATUS.md` states **"9 now formally
+closed"**. `closure_register.py` holds **11**.
+`INSTRUMENTATION_ARCHITECTURE.md` states **0**. **Three documents, three
+numbers, for one fact.**
+
+**E4 — residual instrument limit, declared.** Basename fallback can
+attribute a write to a repository document when a script writes a
+same-named temporary file. `data/SOUL.md` shows `READ_AND_WRITE` by
+`test_soul_identity.py`; `SOUL.md` is the operator's CRITICAL-rated
+file. **I am not claiming a test writes it** — this needs adjudication,
+and until then it is an open question, not a finding.
+
+### Status
+
+* R1B **NOT STARTED**. No 268-row classification. No corpus totals.
+* **No repository file modified beyond this entry.**
+* Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
+  Counts unchanged (Rule 7).
