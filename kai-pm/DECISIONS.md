@@ -28405,3 +28405,132 @@ than merely remembered.
   order
 * **P0** `32575388846` · **P1** `32594846522` — both permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D338 — H2 COMPLETE. 272 documents classified on six axes. Two classifier defects caught before publication.
+
+**Operator authorisation: "I authorise."** Executed under D337's fixed
+method: evidence-density order, two passes, UNKNOWN first-class per
+axis, no cross-document influence.
+
+**The classifier is NEW work consuming frozen `v1.0`'s output. It is not
+part of `v1.0` and does not amend it.** Frozen instrument re-verified
+12/12 before use. Subject unchanged: `d8aac4d` / tree `3abc9e9d`.
+
+### 1. TWO DEFECTS CAUGHT BY SPOT-CHECKING KNOWN ANSWERS
+
+Both found by checking documents whose answers I already knew — the
+landmark discipline applied to classification. **I would otherwise have
+published 272 rows carrying both.**
+
+**(a) MISBINDING — a successor that was an article.** The single
+`SUPERSEDED` row named its successor as **`"the"`**, captured from
+*"superseded by the 4,580-finding reconciliation"*. My own ontology
+requires a **named successor**; `"the"` is not one. Successor extraction
+now requires a **path-like token**. **Result: SUPERSEDED drops 1 → 0.**
+No document in this repository names a path-like successor.
+
+**(b) ERASURE — history destroyed by my measurement environment.**
+`README.md` classified `LIFECYCLE UNKNOWN`. It has **122 commits**.
+
+The H1 subject checkout is **depth-1**, so `git rev-list --count`
+returned **1 for every one of the 272 documents**. Verified directly:
+README `1` in the shallow checkout, **`122`** at the *same commit* with
+full history.
+
+**My measurement environment erased 121 commits of maintenance history
+for every document, uniformly and silently.** Commit history is now read
+from a full-history repository **at the exact subject commit** — still
+bound to the subject. **LIFECYCLE `ACTIVE` rose 36 → 43.**
+
+This is the D317 lesson in a new costume: *the environment I measured in
+was not the world I was describing.*
+
+### 2. The classification — 272/272
+
+```
+LIFECYCLE     UNKNOWN 216 · ACTIVE 43 · HISTORICAL 13 · SUPERSEDED 0
+FUNCTION      EVIDENCE 159 · UNKNOWN 50 · PLAN 25 · USER_GUIDE 15
+              RUNTIME_INPUT 8 · MARKER 5 · GOVERNANCE 4 · STATUS 4 · TEMPLATE 2
+AUTHORITY     UNKNOWN 268 · NON_AUTHORITY 4
+GENERATION    UNKNOWN 272
+VALIDITY      UNKNOWN 216 · EXACT_SNAPSHOT 26 · TIME_BOUND 22 · CURRENT_TREE 8
+SCOPE         WHOLE_FILE 267 · WHOLE_FILE* 5  (region determination required)
+```
+
+### 3. THE THREE RESULTS THAT MATTER
+
+**GENERATION is UNKNOWN for all 272.** Not one document is `MANUAL`
+(the search space is open — `NO_PROVEN_WRITER`, never `NO_WRITER`), and
+not one is `PARTIAL_` or `FULL_DERIVED` (scope unestablished, so the 5
+proven write relations cannot be promoted).
+
+**This is not a failure. It vindicates Kai's pivot**: static analysis
+genuinely cannot determine generation at corpus scale, and the frozen
+instrument says so rather than guessing. Generation must be
+**declaration-led**.
+
+**AUTHORITY is UNKNOWN for 268, NON_AUTHORITY for 4. Zero
+AUTHORITATIVE.** By design — nothing may enter that state before H3
+claim qualification. **The repository currently has no document proven
+to hold authority over anything**, and that is now recorded rather than
+assumed.
+
+**LIFECYCLE is UNKNOWN for 216 (79%).** Most documents have one commit
+(the import) and assert no present-tense state. We genuinely do not know
+whether they are current — which is the honest answer, and precisely the
+"probably current" population the directive forbids carrying forward.
+
+### 4. Spot-check after repair
+
+```
+README.md                     122 commits  ACTIVE
+kai-pm/DECISIONS.md           186 commits  ACTIVE      GOVERNANCE
+docs/PROJECT_BACKLOG.md        79 commits  ACTIVE      PLAN
+kai-pm/CODE_AUDIT_MASTER.md     1 commit   HISTORICAL  NON_AUTHORITY · EXACT_SNAPSHOT
+kai-pm/UH2_SENSOR_INGRESS_PLAN  2 commits  ACTIVE      (correctly NOT superseded)
+```
+
+`CODE_AUDIT_MASTER` resolves exactly as Kai predicted: **HISTORICAL,
+EXACT_SNAPSHOT, NON_AUTHORITY** — authoritative *for its snapshot*, not
+for the current tree, and its own disclaimer carries the authority axis.
+
+### 5. What H2 did NOT do
+
+No claim was verified. `STATUS.md` is `ACTIVE` because it **asserts**
+present-tense state — **not** because that state is true. Whether its
+claims hold is **H3**, and H3 is not started.
+
+Full 272-row classification at `scratchpad/h2-classification.json`,
+regenerable from frozen `v1.0` plus the two pass scripts.
+
+---
+
+## THREAD RECOVERY BLOCK — D338
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`,
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117` (≠ reporting tree)
+* **INSTRUMENT** — FROZEN `v1.0`, aggregate `4a5b40a1…1d77`, re-verified
+  12/12 before use; **classifier is separate work, not part of v1.0**
+* **CURRENT WORKSTREAM** — House-in-Order; **H2 COMPLETE**
+* **LAST PROVEN STATE** — 272/272 classified on six axes; GENERATION
+  UNKNOWN for all; AUTHORITY UNKNOWN for 268 and NON_AUTHORITY for 4,
+  **zero AUTHORITATIVE**; LIFECYCLE UNKNOWN for 216
+* **AUTHORISED NEXT ACTION** — none. **H3 requires operator
+  authorisation** (verify what ACTIVE/derived documents actually claim,
+  against tree, runs, registers and evidence)
+* **EXPLICITLY NOT AUTHORISED** — H3 · H4 · H5 · R2+ mutation ·
+  document/register repair · Phase B · `ITEM8_GO` · six subject builds ·
+  Stage 2 · repair of the seven research obligations · investigation of
+  `=0.2.0` (A-4 provenance)
+* **OPEN / UNRESOLVED** — 865 `UNRESOLVED_RELEVANCE` · whole-file
+  YAML/Make scanning · KAI-GATE register 20 of 51 ids · three-way
+  closure-count contradiction · seven research obligations · 5 documents
+  needing region determination · 50 FUNCTION-UNKNOWN documents
+* **CORRECTIONS TO PRIOR RECORDS** — the first H2 run assigned
+  `SUPERSEDED` on an article and `LIFECYCLE` on commit counts erased by
+  a depth-1 checkout; **both withdrawn before publication** and repaired
+* **P0** `32575388846` · **P1** `32594846522` — both permanent. Counts
+  unchanged (Programme Rule 7).
