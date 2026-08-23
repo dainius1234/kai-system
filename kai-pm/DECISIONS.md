@@ -28534,3 +28534,183 @@ regenerable from frozen `v1.0` plus the two pass scripts.
   a depth-1 checkout; **both withdrawn before publication** and repaired
 * **P0** `32575388846` · **P1** `32594846522` — both permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D339 — H2 ACCEPTANCE EVIDENCE. Authority separated from claim; four more defects caught.
+
+Kai's ten-point acceptance direction executed, reconciling DeepSeek's
+external technical review. **`HOUSE-IN-ORDER-CENSUS-INSTRUMENT v1.0`
+UNTOUCHED — 12/12 artefacts still verify, 0 files modified.**
+
+**External technical input recorded:** DeepSeek — *adopted*: orthogonal
+AUTHORITY/VALIDITY, no ontology bump, durable classifier package,
+positive-evidence-first subject binding. *Rejected*: general
+pronoun/NLP resolution — token matching pretending to understand
+semantics is what produced five MISBINDINGs. **Abstention over
+inference.**
+
+### 0. APPEND-CORRECTION to D338
+
+D338 said `CODE_AUDIT_MASTER` is *"authoritative for its snapshot"*.
+**Withdrawn.** At H2 we know only that it **claims** single-source
+authority and **is bound** to an exact snapshot. Its four
+`NON_AUTHORITY` values are withdrawn — see §2.
+
+### 1. FOUR MORE DEFECTS, all caught before publication
+
+**(a) `final` treated as authority vocabulary.** 98 of 103 self-claims
+fired on it — **91 from "Status: CONFIRMED — pending final
+consolidation"**, which says consolidation is *pending*. One fired
+`AUTHORITY_POSITIVE` on **"It is not the final repository total."**
+Removed: *final* describes a **stage**, not authority.
+
+**(b) A self-disclaimer discarded as a quotation.**
+`KAI_ORION_CONTINUITY.md` states *"NOT A SOURCE OF PROGRAMME TRUTH"*
+about itself — inside a **blockquote banner**. My "a quotation is not a
+declaration" rule silently discarded a document's own disclaimer.
+Structural fix: a **controlled field** inside a quote is a declaration;
+free prose inside a quote remains a quotation.
+
+**(c) My fix for (b) was too broad — caught by its own boundary pair.**
+`> This document is the single source of truth.` became a declaration.
+`SELF_MARK` split into `SELF_FIELD` and `SELF_PROSE`; only the field
+survives inside a quote. **Boundary preservation catching a same-family
+over-correction, exactly as designed.**
+
+**(d) A colon severed controlled fields from their values.** The
+splitter broke on `:`, so `Status: **SINGLE SOURCE OF TRUTH**` became
+two fragments and the subject marker was never seen — tokenisation
+silently changing a semantic outcome.
+
+### 2. AUTHORITY — derived, not forced
+
+```
+AUTHORITY        UNKNOWN 272
+authority_claim  NO_SELF_CLAIM 266 · SELF_ASSERTS_AUTHORITY 5
+                 SELF_ASSERTS_NON_AUTHORITY 1
+ambiguous-subject claim sentences ABSTAINED: 243
+
+SELF_ASSERTS_AUTHORITY      README.md · CODE_AUDIT_MASTER.md · DECISIONS.md
+                            KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md
+                            PHASE1_READINESS.md
+SELF_ASSERTS_NON_AUTHORITY  KAI_ORION_CONTINUITY.md
+```
+
+**272 UNKNOWN was derived, not targeted** — no rule can award a
+qualified authority state before H3, so every row abstains and says so.
+
+### 3. FUNCTION — positive witness required
+
+```
+EVIDENCE 159 · UNKNOWN 69 · PLAN 25 · MARKER 5 · GOVERNANCE 4
+RUNTIME_INPUT 4 · USER_GUIDE 3 · STATUS 3        (TEMPLATE 2 → 0)
+```
+
+**UNKNOWN rose 50 → 69.** Twenty rows previously assigned on a path
+pattern alone now abstain. The `CODE_AUDIT_BATCH_*` family rule is
+**proven, not assumed** — 144 members, every title names audit/finding.
+
+### 4. Every UNKNOWN carries its reason
+
+```
+LIFECYCLE  216  no positive lifecycle witness
+FUNCTION    49  no nomination and no witness
+            20  nominated by path, no corroborating witness
+GENERATION 267  MANUAL not admissible while unresolved operations remain
+             5  scope unestablished: cannot distinguish PARTIAL from FULL
+VALIDITY   216  no validity binding evidence
+```
+
+### 5. Environment-subject capability contract
+
+```
+OK                   EXACT_TREE_CHECKOUT            d8aac4d49e6b
+DECLARED_LIMITATION  HISTORY_BOUNDARY               shallow=true; oldest d6e5d8cf
+OK                   SUBJECT_REACHABLE_IN_HISTORY   present
+OK                   HISTORY_SOURCE_NON_DEGENERATE  README.md = 122
+```
+
+**I replaced a proxy with a direct test, and record it plainly rather
+than bury it.** `is-shallow == false` would have **failed this
+repository** — shallow-marked yet reporting 122 — and **passed** a deep
+repository pointed at the wrong subject. The boundary (`d6e5d8cf`,
+2026-08-05, the import) is a **DECLARED_LIMITATION**: counts are **since
+the boundary**, not absolute.
+
+Calibration 8/8 including the known-negative: the depth-1 checkout as
+history source **fails** the contract and **blocks** LIFECYCLE, which
+emits `UNMEASURED / ENVIRONMENT_CAPABILITY_MISSING` rather than a
+plausible 1.
+
+### 6. Calibration and mutation
+
+```
+subject-binding  21/0  — self/other collapse      → 4 fail
+                        widened quote exemption   → 3 fail
+env capability    8/0  — shallow source blocks LIFECYCLE
+census v1.0     125/0 · 14/0 · 8/0 · 7/0 · 22/0 · 7/0 · 10/0   UNCHANGED
+```
+
+### 7. Durable package
+
+```
+HOUSE-IN-ORDER-H2-CLASSIFIER v1.0
+kai-pm/house_in_order_h2/    14 artefacts
+aggregate fa8477261b83ef1bfdca273742554329918a80a8ac025f7ad2155e0d655145f4
+```
+
+Pass A, classifier, subject binding, capability contract, both
+calibrations, the 272-row output, capability evidence, exact
+subject/tree, exact commands, runtime identity, and
+**`D338_PREACCEPT_WITHDRAWN.json`** preserved for row-level
+reconciliation.
+
+### 8. Independent holdout — rule committed BEFORE selection
+
+`HOLDOUT_RULE.md` committed at **`5766fe4`**, *before* selection;
+ordering verifiable in history. 20 paths by
+`SHA256("H2-HOLDOUT-v1|"+path)`, published at `HOLDOUT_SELECTION.txt`.
+**11 of 20 are audit batches — proportionate to their 58% share, so the
+sample is not curated.** **Kai adjudicates before seeing my verdicts**;
+no comparison is made here.
+
+### 9. Row-level delta from D338
+
+`AUTHORITY`: 4 `NON_AUTHORITY` → `UNKNOWN`. `FUNCTION`: 19 rows →
+UNKNOWN for want of a positive witness. `LIFECYCLE`, `VALIDITY`, `SCOPE`
+unchanged. Both outputs banked; the delta is reconcilable row by row.
+
+### 10. Remaining declared limitations
+
+865 `UNRESOLVED_RELEVANCE` · whole-file YAML/Make scanning · history
+counts bounded at the 2026-08-05 import · 243 abstained claim sentences ·
+69 FUNCTION UNKNOWN · 5 documents needing region determination · **no
+authority state anywhere until H3**.
+
+---
+
+## THREAD RECOVERY BLOCK — D339
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`,
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117` (≠ reporting tree)
+* **INSTRUMENTS** — census `v1.0` aggregate `4a5b40a1…1d77` **UNTOUCHED**;
+  H2 classifier `v1.0` aggregate `fa847726…45f4`
+* **CURRENT WORKSTREAM** — House-in-Order; **H2 acceptance evidence
+  returned**
+* **LAST PROVEN STATE** — 272/272 classified; AUTHORITY UNKNOWN for all
+  272 with claims recorded separately; capability contract satisfied with
+  one declared limitation; holdout rule committed before selection
+* **AUTHORISED NEXT ACTION** — none. **Kai adjudicates the 20 holdout
+  paths; Kai/operator accept or reject this package. H3 remains
+  unauthorised.**
+* **EXPLICITLY NOT AUTHORISED** — H3 · H4 · H5 · R2+ mutation ·
+  document/register repair · Phase B · `ITEM8_GO` · six subject builds ·
+  Stage 2 · seven research obligations · `=0.2.0` (A-4)
+* **OPEN / UNRESOLVED** — as §10
+* **CORRECTIONS TO PRIOR RECORDS** — D338's *"authoritative for its
+  snapshot"* withdrawn; D338's four `NON_AUTHORITY` values withdrawn; 19
+  D338 FUNCTION values withdrawn for want of a positive witness
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

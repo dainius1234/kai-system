@@ -1,0 +1,30 @@
+[
+ {
+  "capability": "EXACT_TREE_CHECKOUT",
+  "required_state": "HEAD == d8aac4d49e6b",
+  "observed_state": "d8aac4d49e6b",
+  "evidence": "git rev-parse HEAD in the tree source",
+  "disposition": "OK"
+ },
+ {
+  "capability": "HISTORY_BOUNDARY",
+  "required_state": "boundary recorded, not assumed absent",
+  "observed_state": "shallow=true; oldest reachable d6e5d8cf7d55b72b9b5e683d0009229259db004a 2026-08-05",
+  "evidence": "git rev-parse --is-shallow-repository; git log --reverse",
+  "disposition": "DECLARED_LIMITATION"
+ },
+ {
+  "capability": "SUBJECT_REACHABLE_IN_HISTORY",
+  "required_state": "subject commit object present",
+  "observed_state": "present",
+  "evidence": "git cat-file -e d8aac4d49e6b^{commit}",
+  "disposition": "OK"
+ },
+ {
+  "capability": "HISTORY_SOURCE_NON_DEGENERATE",
+  "required_state": "a known-maintained path reports > 1 commit",
+  "observed_state": "README.md = 122",
+  "evidence": "git rev-list --count d8aac4d49e6b -- README.md",
+  "disposition": "OK"
+ }
+]
