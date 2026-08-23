@@ -29278,3 +29278,165 @@ is not authorised and has not been started.
   `UNRESOLVED_RELEVANCE`
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D343 — Census v1.1 freeze condition implemented: applicability travels
+## with the evidence; full requalification; new aggregate
+
+**Authority.** Kai's D342 freeze ruling: *"CENSUS v1.1 IS APPROVED FOR
+FREEZE SUBJECT TO ONE BINDING CONDITION ... This authorises only the
+minimal pre-freeze applicability condition and requalification inherent
+in the already-authorised Census-v1.1 work."*
+
+Census v1.0 remains **untouched**: 12/12 OK, zero diff against HEAD.
+H2 v1.1 not authorised, not started.
+
+### 1. The condition — applicability is now inseparable from the numbers
+
+A leg-4 restriction living only in `qualify.py` or a narrative report
+can be separated from what it restricts: a downstream tool reads
+`census-worldA.json` and never reads the report. Fixed with a **subject
+applicability record bound in both directions**:
+
+* the **full record is a top-level block inside the census**, so copying
+  the file cannot strip it;
+* the **identical canonical bytes** are written as a standalone artefact
+  (`applicability-world*.json`), named in `MANIFEST.sha256` and
+  referenced from the census by exact SHA-256.
+
+Per declared state: `L1_IMPLEMENTATION_EMITTABLE`,
+`L2_FIXTURE_REACHABLE`, `L3_CALIBRATION_DISCRIMINATING`,
+`L4_SUBJECT_POPULATION_COUNT`, **`DOWNSTREAM_USABLE_ON_THIS_SUBJECT`**,
+`DOWNSTREAM_RESTRICTION_REASON`. The binding rule is carried inside the
+record, not asserted about it. Not duplicated into document rows, as
+Kai directed.
+
+**Both subjects: 39 declared states, 33 usable, 6 restricted.** The
+restriction reason states explicitly that zero applicability is neither
+a defect nor evidence of absence in the world.
+
+Binding verified mechanically in both directions: the sidecar's SHA
+matches the census field, **and** the embedded record re-serialises to
+the sidecar's exact bytes. `run_census.py` aborts if its own record
+fails self-binding.
+
+### 2. Repair impact kept orthogonal to semantics
+
+No new ontology value was created. `repairs.py` records
+`RULE_STATUS` / `CURRENT_SUBJECT_EFFECT` separately, and **every figure
+is measured on the subject at run time** — a hand-maintained impact
+claim is the "list beside the thing" defect R5 forbids, and it would rot
+the moment the tree changed.
+
+| rule | status | current-subject effect |
+|---|---|---|
+| `URI_SYNTAX_NOT_REMOTE_SEMANTICS` | `CORRECTED_AND_QUALIFIED` | `NONE` — 0 operations |
+| `ABSOLUTE_PATH_NOT_OUTSIDE_REPOSITORY` | `CORRECTED_AND_QUALIFIED` | `NONE` — 0 operations |
+| `READ_TARGET_RECLASSIFIED_CONSERVATIVELY` | `CORRECTED_AND_QUALIFIED` | `OPERATIONS_RECLASSIFIED` — 7 |
+
+The in-run measurement independently reproduced the seven, which had
+been found by the v1.0↔v1.1 reconciliation — two different routes to the
+same number.
+
+### 3. The seven reads — Kai's wording correction adopted
+
+**They are not seven erased read relations, and D342 should not have
+been readable that way.** Every operation is preserved and each is now
+listed by `file:line` in both `applicability-world*.json` and
+`compare-v10-v11.json`:
+
+```
+scripts/security/check_item8_authority.py:195        kai-pm/DECISIONS.md
+scripts/security/report_model_load_denominator.py:946 kai-pm/DECISIONS.md
+scripts/sync_docs.py:87                              README.md
+scripts/test_doctrine_integrity.py:181               kai-pm/ENGINEERING_DOCTRINE.md
+scripts/test_item8_instruments.py:115                kai-pm/DECISIONS.md
+scripts/test_kai_intelligence.py:290                 kai-pm/DECISIONS.md
+scripts/test_trust_auditor.py:16                     data/teammates/auditor.md
+```
+
+Document **relevance** is PROVEN by the fixed `.md` component; the exact
+tracked **target** is UNPROVEN because of the dynamic prefix. What was
+withdrawn is false precision about *which* document, not the operation.
+
+The distinct fact remains recorded: an **intermediate version of the
+v1.1 build** really did erase the relevance by filing all seven under
+`UNRESOLVED_RELEVANCE`, and every suite stayed green while it did. That
+is a different defect from the accepted v1.0→v1.1 delta, and both are
+kept.
+
+### 4. Full requalification (Kai: evidence about X does not qualify X+1 file)
+
+All regenerated from final code, nothing carried over:
+
+* calibration **173/173**, 0 failures — `cal_docgraph` 127, `cal_opscan`
+  12, `cal_claims` 34, chained with `&&`;
+* four-leg qualification **39/39**, 0 findings;
+* **World A** `d8aac4d4` tree `3abc9e9d`: 272 documents, 944 edges,
+  raw 1458 = 272 rejected + 1186 admitted = sum(dispositions);
+* **World B** `ca5b1e7` tree `1c347a29`: 275 documents, 975 edges,
+  raw 1473 = 272 + 1201 = sum(dispositions);
+* **v1.0 ↔ v1.1 on the identical World A subject**: documents and edges
+  identical (272 / 944), **`RESOLVED_WRITE` 5 → 5 with no erasure and no
+  fabrication**, **0 documents whose claim changed**;
+* **portable reproduction proven by execution** from an unrelated
+  directory: manifest 18/18, every suite and both runners exit 0, and
+  census measures, applicability SHA, applicability record,
+  reconciliation and the seven instances all reproduce **identically**.
+
+**World B advanced from 274 to 275 documents** because D342's own commit
+added a README to the package. That is not drift: a current-tree census
+necessarily predates the commit that banks it, so its subject can never
+be the commit containing it. World A is invariant and is the comparison
+subject for exactly that reason. Every World B number must be read with
+its `subject_commit` or not at all.
+
+### 5. Freeze identity
+
+Pre-freeze candidate `c81ef694…7a4f` is **superseded** and is historical
+only, exactly as Kai ruled.
+
+**CENSUS v1.1 FINAL FREEZE EVIDENCE — 18 artefacts, aggregate
+`67071cce7b2fe86aa756e29d0c8efc65ec995161368f63f8892f32a50c006353`.**
+
+No new load-bearing disagreement arose, so no STOP was triggered.
+**Freeze and acceptance remain Kai's and Dainius's to grant.**
+
+---
+
+## THREAD RECOVERY BLOCK — D343
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **MEASURED SUBJECTS** — World A `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents
+  (invariant comparison subject); World B
+  `ca5b1e772853c6b178b8a00b07f270e3d7d9e45c` tree `1c347a29…`, 275
+  documents (applicability only, read with its commit)
+* **INSTRUMENTS** — Census `v1.0` **UNTOUCHED**, 12/12 OK, zero diff;
+  Census `v1.1` **FINAL FREEZE EVIDENCE RETURNED**, 18 artefacts,
+  aggregate `67071cce…6353`, **NOT YET FROZEN**; candidate
+  `c81ef694…7a4f` superseded; H2 `v1.0` untouched
+* **CURRENT WORKSTREAM** — House-in-Order; Census v1.1 freeze condition
+  satisfied and requalified
+* **LAST PROVEN STATE** — 173/173 calibration; 39/39 qualification, 0
+  findings; 33 usable / 6 restricted states on both subjects; both
+  denominators reconcile; 5 → 5 write relations; 0 claims changed;
+  applicability cross-binding verified both directions; relocated
+  execution reproduces everything identically
+* **AUTHORISED NEXT ACTION** — none. Awaiting Kai's freeze ruling
+* **EXPLICITLY NOT AUTHORISED** — H2 v1.1 · H3 · H4 · H5 ·
+  document/register repair · Phase B · `ITEM8_GO` · six subject builds ·
+  Stage 2 · seven research-obligation repairs · `=0.2.0`
+* **OPEN / UNRESOLVED** — Census v1.1 unfrozen · six states restricted
+  on both subjects, `NO_WRITER_WITHIN_ANALYZED_SCOPE` among them · URI
+  and absolute repairs sound but inert here · 715 `UNRESOLVED_RELEVANCE`
+  remain · whether the claim layer is insensitive to evidence quality
+  (raised in D342 remarks, still unmeasured) · history window
+  unqualified before `d6e5d8cf`
+* **CORRECTIONS TO PRIOR RECORDS** — D342's description of the seven
+  reads is corrected per Kai: they are operations whose *target
+  precision* was withdrawn, not read relations that were erased. D342's
+  aggregate `c81ef694…7a4f` is superseded as freeze identity
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

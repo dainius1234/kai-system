@@ -28,10 +28,12 @@ import tempfile
 
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+import applicability as AP   # noqa: E402
 import claims as C          # noqa: E402
 import docgraph as G        # noqa: E402
 import opscan as O          # noqa: E402
 import qualify as Q         # noqa: E402
+import repairs as RP        # noqa: E402
 
 INSTRUMENT = "HOUSE-IN-ORDER-CENSUS-INSTRUMENT v1.1"
 
@@ -142,6 +144,7 @@ def census(subject: pathlib.Path):
         "claim_tally": dict(claim_tally),
         "claims": claims_out,
         "subject_counts": dict(counts),
+        "repair_evidence": RP.measure(ops, docs, tracked_all),
     }
 
 
@@ -179,6 +182,31 @@ def main():
                         "failures": cal[2]},
     }
 
+    # ── KAI'S D342 FREEZE CONDITION ──────────────────────────────────
+    # The applicability restriction must not be separable from the
+    # numbers it restricts. The record is embedded in the census AND
+    # written as a standalone artefact carrying identical canonical
+    # bytes, so the binding is checkable from either side.
+    record, blob, sha = AP.build(INSTRUMENT, head, tree, rows,
+                                 res.pop("repair_evidence"))
+    if not AP.verify(record, blob, sha):
+        raise SystemExit("ABORT: applicability record failed self-binding")
+
+    side = None
+    if a.out:
+        p = pathlib.Path(a.out)
+        side = p.with_name(
+            p.name.replace("census-", "applicability-", 1)
+            if p.name.startswith("census-") else p.stem + ".applicability.json")
+        side.write_bytes(blob)
+
+    res["applicability"] = {
+        "artefact": side.name if side else None,
+        "sha256": sha,
+        "binding_rule": record["binding_rule"],
+        "record": record,
+    }
+
     print(Q.report(rows, findings, cal, subject_label=head))
     print()
     print(f"SUBJECT {head}  tree {tree}")
@@ -195,9 +223,24 @@ def main():
     for k, v in sorted(res["claim_tally"].items()):
         print(f"      {k:<36} {v}")
 
+    rec = res["applicability"]["record"]
+    print(f"\n  APPLICABILITY RECORD  sha256 {sha[:16]}…  "
+          f"artefact {rec['declared_states']} states, "
+          f"{rec['usable_on_this_subject']} usable, "
+          f"{rec['restricted_on_this_subject']} restricted")
+    for alpha, val, _why in AP.restricted(rec):
+        print(f"      RESTRICTED  {alpha}::{val}")
+    print("      " + rec["binding_rule"])
+    for r in rec["repair_evidence"]["repairs"]:
+        print(f"      REPAIR {r['rule_id']}: {r['RULE_STATUS']}, "
+              f"CURRENT_SUBJECT_EFFECT={r['CURRENT_SUBJECT_EFFECT']} "
+              f"({r['operations_affected_on_this_subject']} operations)")
+
     if a.out:
         pathlib.Path(a.out).write_text(json.dumps(res, indent=1, default=str))
         print(f"\nwritten: {a.out}")
+        if side:
+            print(f"written: {side}  (sha256 {sha})")
     return 1 if (findings or cal[1]) else 0
 
 

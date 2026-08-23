@@ -113,13 +113,22 @@ sum(dispositions)             1186     reconciles: True
 claims: NO_PROVEN_WRITER 267 · PROVEN_WRITE_RELATION 5
 ```
 
-### World B — current tree
+### World B — current tree at `ca5b1e7`
 
 ```
-documents 274   edges 969
-raw 1464 = rejected 272 + admitted 1192 = sum(dispositions)
-claims: NO_PROVEN_WRITER 269 · PROVEN_WRITE_RELATION 5
+documents 275   edges 975
+raw 1473 = rejected 272 + admitted 1201 = sum(dispositions)
+claims: NO_PROVEN_WRITER 270 · PROVEN_WRITE_RELATION 5
 ```
+
+**World B is bound to the commit named in its own artefact, not to
+"now".** A current-tree census necessarily predates the commit that
+banks it, so its subject can never be the commit containing it. World A
+is invariant and is the comparison subject for that reason; World B
+exists only to report subject-population applicability, and its
+`subject_commit` must be read with it. Re-running it on a later tree
+produces a different, equally valid subject — which is why the number
+travels with its commit or not at all.
 
 ### v1.0 ↔ v1.1 reconciliation on the identical World A subject
 
@@ -148,26 +157,35 @@ Every delta is explained, and they sum to −157:
 Edges being identical proves change 7 was declaration-only: removing a
 structurally unreachable context value changed no output.
 
-### The seven reclassified reads — a regression this build introduced and fixed
+### The seven reclassified reads — `READ_TARGET_RECLASSIFIED_CONSERVATIVELY`
 
 `(ROOT / "README.md").read_text()` has an unresolvable **prefix** and a
-fixed final component ending `.md`. An intermediate version of this
-build folded the AST dynamic-expression flag into the disposition test,
-which filed all seven under `UNRESOLVED_RELEVANCE` — asserting we could
-not tell whether the target was a document, when the `.md` is right
-there. That is a MISBINDING, and it silently erased seven real read
-relations.
+fixed final component ending `.md`.
 
-**Relevance and target are separate questions.** They are now separated:
-relevance is proven (`.md`), the target is not, so the disposition is
-`UNRESOLVED_TARGET`.
+**These are not seven read relations that were erased.** Every one of
+the seven operations is preserved in full, and each is listed by file
+and line in `applicability-world*.json` and `compare-v10-v11.json`. What
+was withdrawn is the *unproven claim about which tracked document each
+one touches*:
 
-This is deliberately more conservative than v1.0, which resolved such
-paths by matching the literal suffix against the tracked tree. That is
-the D332 shape: `str(tmp) + "/SOUL.md"` has identical structure and
-denotes a temporary file, not the repository document. Same shape,
-different truth — so static evidence cannot decide it, and the honest
+* document **relevance** — PROVEN, by the fixed `.md` component;
+* exact document **target** — UNPROVEN, because of the dynamic prefix.
+
+Hence `UNRESOLVED_TARGET`. v1.0 resolved such paths by matching the
+literal suffix against the tracked tree, which asserts a target it has
+not established. That is the D332 shape: `str(tmp) + "/SOUL.md"` is
+structurally identical and denotes a temporary file. Same shape,
+different truth — static evidence cannot separate them, so the honest
 answer is that the target is unproven. Calibrated as a boundary pair.
+
+**A regression this build introduced, and fixed.** An intermediate
+version folded the AST dynamic-expression flag into the disposition
+test, filing all seven under `UNRESOLVED_RELEVANCE` — which asserts we
+cannot tell whether the target is a document *at all*, when the `.md` is
+right there. That version really did erase the relevance, and every
+calibration suite stayed green while it did. The v1.0 ↔ v1.1
+reconciliation caught it, not the suites. **Relevance and target are
+separate questions**, and conflating them is a misbinding.
 
 ### Leg 4 — zero-applicability on both subjects
 
@@ -180,13 +198,49 @@ downstream claim about these subjects. In particular
 holding under v1.1 exactly as Kai ruled it would — the closure rules
 were not relaxed by one inch to manufacture it.
 
-### Changes proven sound but INERT on this subject
+### Applicability travels with the evidence (Kai's D342 freeze condition)
 
-The URI and absolute corrections (5 and 6) are proven by boundary-paired
-fixtures and change **nothing** on either subject: no absolute path in
-the tree has a suffix matching any tracked document, and `URI_SYNTAX`
-has zero applicability. They prevent a future false exclusion; they
-repair no present number. Recorded here so the distinction is not lost.
+A leg-4 restriction that lives only in a qualification report can be
+separated from the numbers it restricts: a downstream tool reads
+`census-worldA.json` and never reads the report. So every census carries
+a **subject applicability record**, bound both ways:
+
+* the full record is a **top-level block inside the census**, so copying
+  the file cannot strip it;
+* the identical canonical bytes are written as a standalone artefact
+  (`applicability-world*.json`), named in `MANIFEST.sha256` and
+  referenced from the census by exact SHA-256.
+
+Per declared state it carries `L1_IMPLEMENTATION_EMITTABLE`,
+`L2_FIXTURE_REACHABLE`, `L3_CALIBRATION_DISCRIMINATING`,
+`L4_SUBJECT_POPULATION_COUNT`, **`DOWNSTREAM_USABLE_ON_THIS_SUBJECT`**
+and `DOWNSTREAM_RESTRICTION_REASON`. The binding rule is stated in the
+record itself:
+
+> A downstream claim about this subject MAY NOT rely on any state whose
+> `DOWNSTREAM_USABLE_ON_THIS_SUBJECT` is false.
+
+On both subjects: **39 declared states, 33 usable, 6 restricted.** It is
+not duplicated into document rows.
+
+### Repair impact is orthogonal to semantics
+
+A repair with no current-subject effect must not become another ontology
+value — that mixes two separate things. Repair impact is recorded
+separately, and every figure is **measured on the subject**, never a
+constant kept beside the code:
+
+| rule | `RULE_STATUS` | `CURRENT_SUBJECT_EFFECT` |
+|---|---|---|
+| `URI_SYNTAX_NOT_REMOTE_SEMANTICS` | `CORRECTED_AND_QUALIFIED` | `NONE` (0 ops) |
+| `ABSOLUTE_PATH_NOT_OUTSIDE_REPOSITORY` | `CORRECTED_AND_QUALIFIED` | `NONE` (0 ops) |
+| `READ_TARGET_RECLASSIFIED_CONSERVATIVELY` | `CORRECTED_AND_QUALIFIED` | `OPERATIONS_RECLASSIFIED` (7 ops) |
+
+The first two are **proven sound by boundary-paired fixtures and inert
+on this subject**: no absolute path in either tree has a suffix matching
+a tracked document, and `URI_SYNTAX` has zero applicability. They
+prevent a future false exclusion; they repair no present number. The
+measurement is recomputed on every run, so this claim cannot rot.
 
 ---
 
@@ -198,11 +252,15 @@ repair no present number. Recorded here so the distinction is not lost.
 | `claims.py` | dispositions, exclusion witnesses, scoped claims |
 | `docgraph.py` | document reference graph, kinds and edge contexts |
 | `qualify.py` | four-leg qualification gate |
+| `applicability.py` | subject applicability record and its SHA binding |
+| `repairs.py` | measured repair impact, orthogonal to semantics |
 | `caltrace.py` | calibration trace harness (legs 2 and 3) |
 | `cal_docgraph.py` `cal_opscan.py` `cal_claims.py` | calibration suites |
 | `run_census.py` | portable subject-bound runner |
 | `compare_v10_v11.py` | v1.0 ↔ v1.1 reconciliation |
-| `census-worldA.json` `census-worldB.json` `compare-v10-v11.json` | run evidence |
+| `census-worldA.json` `census-worldB.json` | census evidence, each embedding its applicability record |
+| `applicability-worldA.json` `applicability-worldB.json` | standalone applicability artefacts, SHA-bound to the censuses |
+| `compare-v10-v11.json` | reconciliation evidence, carrying the seven reclassified instances |
 
 ## Status
 

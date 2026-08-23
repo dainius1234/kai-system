@@ -26,6 +26,7 @@ sys.path.insert(0, str(HERE))
 import claims as C          # noqa: E402
 import docgraph as G        # noqa: E402
 import opscan as O          # noqa: E402
+import repairs as RP        # noqa: E402
 import run_census as RC     # noqa: E402
 
 
@@ -75,6 +76,9 @@ def main():
         for d in d11:
             v, _src, b, _w, _sc = C.scoped_claim(o11, d, ta11)
             c11[d] = (v, b)
+        # Kai's D342 ruling: preserve the exact reclassified instances in
+        # the RECONCILIATION evidence, not only in the census.
+        repair_ev = RP.measure(o11, d11, ta11)
 
     out = []
     def p(s=""):
@@ -140,7 +144,20 @@ def main():
            "claims_v10": dict(tally10), "claims_v11": dict(tally11),
            "claim_changes": [{"doc": d, "v10": x, "v11": y}
                              for d, x, y in changed],
-           "narrowed": len(narrow), "widened": len(widen)}
+           "narrowed": len(narrow), "widened": len(widen),
+           "repair_evidence": repair_ev}
+
+    recl = next(r for r in repair_ev["repairs"]
+                if r["rule_id"] == "READ_TARGET_RECLASSIFIED_CONSERVATIVELY")
+    p(f"\n  READ_TARGET_RECLASSIFIED_CONSERVATIVELY: "
+      f"{len(recl['reclassified_operations'])} operations")
+    p("    Relevance PROVEN (.md), exact tracked target UNPROVEN. The")
+    p("    operations are preserved; the withdrawn part is the unproven")
+    p("    claim about WHICH document each one touches.")
+    for r in recl["reclassified_operations"]:
+        p(f"    {r['src']}:{r['line']} mode={r['mode']} "
+          f"{r['fragments']} — v1.0 bound it to "
+          f"{r['v10_would_have_bound_to']}, v1.1 says {r['v11_disposition']}")
     if a.out:
         pathlib.Path(a.out).write_text(json.dumps(res, indent=1, default=str))
         p(f"\nwritten: {a.out}")

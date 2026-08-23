@@ -42,5 +42,122 @@
  },
  "claim_changes": [],
  "narrowed": 272,
- "widened": 0
+ "widened": 0,
+ "repair_evidence": {
+  "note": "Repair impact is orthogonal to the analyser's semantic alphabets. No repair introduces an ontology value.",
+  "repairs": [
+   {
+    "rule_id": "URI_SYNTAX_NOT_REMOTE_SEMANTICS",
+    "RULE_STATUS": "CORRECTED_AND_QUALIFIED",
+    "unsound_rule_in_v1_0": "any target containing '://' was EXCLUDED_FROM_T as a 'remote URI, not a repository path'",
+    "corrected_rule_in_v1_1": "URI syntax is a recorded observation only; the literal is reasoned about as the path string it is",
+    "operations_affected_on_this_subject": 0,
+    "CURRENT_SUBJECT_EFFECT": "NONE",
+    "how_measured": "counted operations whose path syntax is URI_SYNTAX and whose literal has a tracked document as a path suffix, i.e. those v1.0 excluded but v1.1 must leave open",
+    "claim_level_effect_established_by": "compare-v10-v11.json",
+    "uri_syntax_operations_on_this_subject": 0
+   },
+   {
+    "rule_id": "ABSOLUTE_PATH_NOT_OUTSIDE_REPOSITORY",
+    "RULE_STATUS": "CORRECTED_AND_QUALIFIED",
+    "unsound_rule_in_v1_0": "any target beginning '/' was EXCLUDED_FROM_T as an 'absolute system path, outside the repository target domain'",
+    "corrected_rule_in_v1_1": "an absolute literal excludes a target only when that target is not a path SUFFIX of it",
+    "operations_affected_on_this_subject": 0,
+    "CURRENT_SUBJECT_EFFECT": "NONE",
+    "how_measured": "counted absolute-syntax operations whose literal has a tracked document as a path suffix, i.e. those v1.0 falsely excluded",
+    "claim_level_effect_established_by": "compare-v10-v11.json",
+    "absolute_operations_on_this_subject": 97
+   },
+   {
+    "rule_id": "READ_TARGET_RECLASSIFIED_CONSERVATIVELY",
+    "RULE_STATUS": "CORRECTED_AND_QUALIFIED",
+    "unsound_rule_in_v1_0": "a dynamic-prefix path whose literal suffix matched a tracked file was RESOLVED to that file",
+    "corrected_rule_in_v1_1": "document relevance is proven by the fixed '.md' component, but the exact tracked target is NOT proven, so the disposition is UNRESOLVED_TARGET",
+    "operations_affected_on_this_subject": 7,
+    "CURRENT_SUBJECT_EFFECT": "OPERATIONS_RECLASSIFIED",
+    "how_measured": "counted operations with proven .md relevance, an unresolvable prefix, and a literal suffix that v1.0's exact-resolution step would have bound to a document",
+    "claim_level_effect_established_by": "compare-v10-v11.json",
+    "reclassified_operations": [
+     {
+      "src": "scripts/security/check_item8_authority.py",
+      "line": 195,
+      "mode": "R",
+      "fragments": [
+       "kai-pm",
+       "DECISIONS.md"
+      ],
+      "v10_would_have_bound_to": "kai-pm/DECISIONS.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     },
+     {
+      "src": "scripts/security/report_model_load_denominator.py",
+      "line": 946,
+      "mode": "R",
+      "fragments": [
+       "kai-pm",
+       "DECISIONS.md"
+      ],
+      "v10_would_have_bound_to": "kai-pm/DECISIONS.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     },
+     {
+      "src": "scripts/sync_docs.py",
+      "line": 87,
+      "mode": "R",
+      "fragments": [
+       "README.md"
+      ],
+      "v10_would_have_bound_to": "README.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     },
+     {
+      "src": "scripts/test_doctrine_integrity.py",
+      "line": 181,
+      "mode": "R",
+      "fragments": [
+       "kai-pm",
+       "ENGINEERING_DOCTRINE.md"
+      ],
+      "v10_would_have_bound_to": "kai-pm/ENGINEERING_DOCTRINE.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     },
+     {
+      "src": "scripts/test_item8_instruments.py",
+      "line": 115,
+      "mode": "R",
+      "fragments": [
+       "kai-pm",
+       "DECISIONS.md"
+      ],
+      "v10_would_have_bound_to": "kai-pm/DECISIONS.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     },
+     {
+      "src": "scripts/test_kai_intelligence.py",
+      "line": 290,
+      "mode": "R",
+      "fragments": [
+       "kai-pm",
+       "DECISIONS.md"
+      ],
+      "v10_would_have_bound_to": "kai-pm/DECISIONS.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     },
+     {
+      "src": "scripts/test_trust_auditor.py",
+      "line": 16,
+      "mode": "R",
+      "fragments": [
+       "data",
+       "teammates",
+       "auditor.md"
+      ],
+      "v10_would_have_bound_to": "data/teammates/auditor.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     }
+    ],
+    "semantic_note": "These are NOT read relations that were erased. Each operation is preserved in full; what was withdrawn is the unproven claim about WHICH tracked document it touches. Relevance proven, exact target unproven."
+   }
+  ]
+ }
 }

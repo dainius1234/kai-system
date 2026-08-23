@@ -1,0 +1,519 @@
+{
+ "binding_rule": "A downstream claim about this subject MAY NOT rely on any state whose DOWNSTREAM_USABLE_ON_THIS_SUBJECT is false.",
+ "declared_states": 39,
+ "instrument_version": "HOUSE-IN-ORDER-CENSUS-INSTRUMENT v1.1",
+ "record_type": "SUBJECT_APPLICABILITY_RECORD",
+ "repair_evidence": {
+  "note": "Repair impact is orthogonal to the analyser's semantic alphabets. No repair introduces an ontology value.",
+  "repairs": [
+   {
+    "CURRENT_SUBJECT_EFFECT": "NONE",
+    "RULE_STATUS": "CORRECTED_AND_QUALIFIED",
+    "claim_level_effect_established_by": "compare-v10-v11.json",
+    "corrected_rule_in_v1_1": "URI syntax is a recorded observation only; the literal is reasoned about as the path string it is",
+    "how_measured": "counted operations whose path syntax is URI_SYNTAX and whose literal has a tracked document as a path suffix, i.e. those v1.0 excluded but v1.1 must leave open",
+    "operations_affected_on_this_subject": 0,
+    "rule_id": "URI_SYNTAX_NOT_REMOTE_SEMANTICS",
+    "unsound_rule_in_v1_0": "any target containing '://' was EXCLUDED_FROM_T as a 'remote URI, not a repository path'",
+    "uri_syntax_operations_on_this_subject": 0
+   },
+   {
+    "CURRENT_SUBJECT_EFFECT": "NONE",
+    "RULE_STATUS": "CORRECTED_AND_QUALIFIED",
+    "absolute_operations_on_this_subject": 98,
+    "claim_level_effect_established_by": "compare-v10-v11.json",
+    "corrected_rule_in_v1_1": "an absolute literal excludes a target only when that target is not a path SUFFIX of it",
+    "how_measured": "counted absolute-syntax operations whose literal has a tracked document as a path suffix, i.e. those v1.0 falsely excluded",
+    "operations_affected_on_this_subject": 0,
+    "rule_id": "ABSOLUTE_PATH_NOT_OUTSIDE_REPOSITORY",
+    "unsound_rule_in_v1_0": "any target beginning '/' was EXCLUDED_FROM_T as an 'absolute system path, outside the repository target domain'"
+   },
+   {
+    "CURRENT_SUBJECT_EFFECT": "OPERATIONS_RECLASSIFIED",
+    "RULE_STATUS": "CORRECTED_AND_QUALIFIED",
+    "claim_level_effect_established_by": "compare-v10-v11.json",
+    "corrected_rule_in_v1_1": "document relevance is proven by the fixed '.md' component, but the exact tracked target is NOT proven, so the disposition is UNRESOLVED_TARGET",
+    "how_measured": "counted operations with proven .md relevance, an unresolvable prefix, and a literal suffix that v1.0's exact-resolution step would have bound to a document",
+    "operations_affected_on_this_subject": 7,
+    "reclassified_operations": [
+     {
+      "fragments": [
+       "kai-pm",
+       "DECISIONS.md"
+      ],
+      "line": 195,
+      "mode": "R",
+      "src": "scripts/security/check_item8_authority.py",
+      "v10_would_have_bound_to": "kai-pm/DECISIONS.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     },
+     {
+      "fragments": [
+       "kai-pm",
+       "DECISIONS.md"
+      ],
+      "line": 946,
+      "mode": "R",
+      "src": "scripts/security/report_model_load_denominator.py",
+      "v10_would_have_bound_to": "kai-pm/DECISIONS.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     },
+     {
+      "fragments": [
+       "README.md"
+      ],
+      "line": 87,
+      "mode": "R",
+      "src": "scripts/sync_docs.py",
+      "v10_would_have_bound_to": "README.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     },
+     {
+      "fragments": [
+       "kai-pm",
+       "ENGINEERING_DOCTRINE.md"
+      ],
+      "line": 181,
+      "mode": "R",
+      "src": "scripts/test_doctrine_integrity.py",
+      "v10_would_have_bound_to": "kai-pm/ENGINEERING_DOCTRINE.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     },
+     {
+      "fragments": [
+       "kai-pm",
+       "DECISIONS.md"
+      ],
+      "line": 115,
+      "mode": "R",
+      "src": "scripts/test_item8_instruments.py",
+      "v10_would_have_bound_to": "kai-pm/DECISIONS.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     },
+     {
+      "fragments": [
+       "kai-pm",
+       "DECISIONS.md"
+      ],
+      "line": 290,
+      "mode": "R",
+      "src": "scripts/test_kai_intelligence.py",
+      "v10_would_have_bound_to": "kai-pm/DECISIONS.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     },
+     {
+      "fragments": [
+       "data",
+       "teammates",
+       "auditor.md"
+      ],
+      "line": 16,
+      "mode": "R",
+      "src": "scripts/test_trust_auditor.py",
+      "v10_would_have_bound_to": "data/teammates/auditor.md",
+      "v11_disposition": "UNRESOLVED_TARGET"
+     }
+    ],
+    "rule_id": "READ_TARGET_RECLASSIFIED_CONSERVATIVELY",
+    "semantic_note": "These are NOT read relations that were erased. Each operation is preserved in full; what was withdrawn is the unproven claim about WHICH tracked document it touches. Relevance proven, exact target unproven.",
+    "unsound_rule_in_v1_0": "a dynamic-prefix path whose literal suffix matched a tracked file was RESOLVED to that file"
+   }
+  ]
+ },
+ "restricted_on_this_subject": 6,
+ "states": [
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 8,
+   "alphabet": "claims.DISPOSITIONS",
+   "value": "RESOLVED_READ"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 5,
+   "alphabet": "claims.DISPOSITIONS",
+   "value": "RESOLVED_WRITE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": "ZERO_SUBJECT_POPULATION: the state is qualified (emittable, fixture-reachable, calibration-discriminating) but occurred zero times on this exact subject. It is NOT a defect and NOT evidence of absence in the world; it may not support a subject-specific downstream claim about this subject.",
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": false,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 0,
+   "alphabet": "claims.DISPOSITIONS",
+   "value": "READ_AND_WRITE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 424,
+   "alphabet": "claims.DISPOSITIONS",
+   "value": "RESOLVED_NON_DOCUMENT_TARGET"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 3,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 37,
+   "alphabet": "claims.DISPOSITIONS",
+   "value": "UNRESOLVED_TARGET"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 727,
+   "alphabet": "claims.DISPOSITIONS",
+   "value": "UNRESOLVED_RELEVANCE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 458,
+   "alphabet": "claims.PATH_SYNTAX",
+   "value": "REPO_RELATIVE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 98,
+   "alphabet": "claims.PATH_SYNTAX",
+   "value": "ABSOLUTE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": "ZERO_SUBJECT_POPULATION: the state is qualified (emittable, fixture-reachable, calibration-discriminating) but occurred zero times on this exact subject. It is NOT a defect and NOT evidence of absence in the world; it may not support a subject-specific downstream claim about this subject.",
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": false,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 0,
+   "alphabet": "claims.PATH_SYNTAX",
+   "value": "URI_SYNTAX"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 147,
+   "alphabet": "claims.PATH_SYNTAX",
+   "value": "SHELL_VARIABLE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 498,
+   "alphabet": "claims.PATH_SYNTAX",
+   "value": "DYNAMIC_UNKNOWN"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 5,
+   "alphabet": "claims.TARGET_DISPOSITIONS",
+   "value": "REACHES_T"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 6,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 118775,
+   "alphabet": "claims.TARGET_DISPOSITIONS",
+   "value": "EXCLUDED_FROM_T"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 5,
+   "L3_CALIBRATION_DISCRIMINATING": 3,
+   "L4_SUBJECT_POPULATION_COUNT": 49520,
+   "alphabet": "claims.TARGET_DISPOSITIONS",
+   "value": "COULD_REACH_T"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 4,
+   "L3_CALIBRATION_DISCRIMINATING": 3,
+   "L4_SUBJECT_POPULATION_COUNT": 100981,
+   "alphabet": "claims.EXCLUSION_WITNESSES",
+   "value": "FIXED_COMPLETE_PATH_DIFFERS"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 8250,
+   "alphabet": "claims.EXCLUSION_WITNESSES",
+   "value": "FIXED_BASENAME_DIFFERS"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 9544,
+   "alphabet": "claims.EXCLUSION_WITNESSES",
+   "value": "FIXED_DIRECTORY_DISJOINT"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 5,
+   "alphabet": "claims.CLAIMS",
+   "value": "PROVEN_WRITE_RELATION"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 270,
+   "alphabet": "claims.CLAIMS",
+   "value": "NO_PROVEN_WRITER"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": "ZERO_SUBJECT_POPULATION: the state is qualified (emittable, fixture-reachable, calibration-discriminating) but occurred zero times on this exact subject. It is NOT a defect and NOT evidence of absence in the world; it may not support a subject-specific downstream claim about this subject.",
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": false,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 0,
+   "alphabet": "claims.CLAIMS",
+   "value": "NO_WRITER_WITHIN_ANALYZED_SCOPE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 10,
+   "L3_CALIBRATION_DISCRIMINATING": 10,
+   "L4_SUBJECT_POPULATION_COUNT": 55,
+   "alphabet": "docgraph.KINDS",
+   "value": "MARKDOWN_LINK"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 10,
+   "L3_CALIBRATION_DISCRIMINATING": 10,
+   "L4_SUBJECT_POPULATION_COUNT": 561,
+   "alphabet": "docgraph.KINDS",
+   "value": "EXPLICIT_PATH_REFERENCE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 15,
+   "L3_CALIBRATION_DISCRIMINATING": 5,
+   "L4_SUBJECT_POPULATION_COUNT": 359,
+   "alphabet": "docgraph.KINDS",
+   "value": "BASENAME_UNIQUE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": "ZERO_SUBJECT_POPULATION: the state is qualified (emittable, fixture-reachable, calibration-discriminating) but occurred zero times on this exact subject. It is NOT a defect and NOT evidence of absence in the world; it may not support a subject-specific downstream claim about this subject.",
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": false,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 5,
+   "L3_CALIBRATION_DISCRIMINATING": 5,
+   "L4_SUBJECT_POPULATION_COUNT": 0,
+   "alphabet": "docgraph.KINDS",
+   "value": "BASENAME_AMBIGUOUS"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": "ZERO_SUBJECT_POPULATION: the state is qualified (emittable, fixture-reachable, calibration-discriminating) but occurred zero times on this exact subject. It is NOT a defect and NOT evidence of absence in the world; it may not support a subject-specific downstream claim about this subject.",
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": false,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 10,
+   "L3_CALIBRATION_DISCRIMINATING": 10,
+   "L4_SUBJECT_POPULATION_COUNT": 0,
+   "alphabet": "docgraph.KINDS",
+   "value": "BROKEN_LINK"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 20,
+   "L3_CALIBRATION_DISCRIMINATING": 20,
+   "L4_SUBJECT_POPULATION_COUNT": 55,
+   "alphabet": "docgraph.EDGE_CONTEXTS",
+   "value": "MARKDOWN_LINK"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 6,
+   "L3_CALIBRATION_DISCRIMINATING": 4,
+   "L4_SUBJECT_POPULATION_COUNT": 81,
+   "alphabet": "docgraph.EDGE_CONTEXTS",
+   "value": "PROSE_PATH"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 6,
+   "L3_CALIBRATION_DISCRIMINATING": 4,
+   "L4_SUBJECT_POPULATION_COUNT": 536,
+   "alphabet": "docgraph.EDGE_CONTEXTS",
+   "value": "INLINE_CODE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 6,
+   "L3_CALIBRATION_DISCRIMINATING": 4,
+   "L4_SUBJECT_POPULATION_COUNT": 98,
+   "alphabet": "docgraph.EDGE_CONTEXTS",
+   "value": "FENCED_CODE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 6,
+   "L3_CALIBRATION_DISCRIMINATING": 4,
+   "L4_SUBJECT_POPULATION_COUNT": 196,
+   "alphabet": "docgraph.EDGE_CONTEXTS",
+   "value": "TABLE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 6,
+   "L3_CALIBRATION_DISCRIMINATING": 4,
+   "L4_SUBJECT_POPULATION_COUNT": 9,
+   "alphabet": "docgraph.EDGE_CONTEXTS",
+   "value": "QUOTE"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 26,
+   "alphabet": "opscan.REJECTION_REASONS",
+   "value": "NOT_SHELL_CONTEXT"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 38,
+   "alphabet": "opscan.REJECTION_REASONS",
+   "value": "COMMENT_CONTEXT"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 87,
+   "alphabet": "opscan.REJECTION_REASONS",
+   "value": "QUOTED_STRING_CONTENT"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 4,
+   "alphabet": "opscan.REJECTION_REASONS",
+   "value": "ARROW_OPERATOR"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 117,
+   "alphabet": "opscan.REJECTION_REASONS",
+   "value": "EXTRACTION_ARTEFACT"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 589,
+   "alphabet": "opscan.OP_MODES",
+   "value": "R"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": null,
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 2,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 612,
+   "alphabet": "opscan.OP_MODES",
+   "value": "W"
+  },
+  {
+   "DOWNSTREAM_RESTRICTION_REASON": "ZERO_SUBJECT_POPULATION: the state is qualified (emittable, fixture-reachable, calibration-discriminating) but occurred zero times on this exact subject. It is NOT a defect and NOT evidence of absence in the world; it may not support a subject-specific downstream claim about this subject.",
+   "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": false,
+   "L1_IMPLEMENTATION_EMITTABLE": true,
+   "L2_FIXTURE_REACHABLE": 1,
+   "L3_CALIBRATION_DISCRIMINATING": 1,
+   "L4_SUBJECT_POPULATION_COUNT": 0,
+   "alphabet": "opscan.OP_MODES",
+   "value": "RW"
+  }
+ ],
+ "subject_commit": "ca5b1e772853c6b178b8a00b07f270e3d7d9e45c",
+ "subject_tree": "1c347a295a71a2776eccf7f05b168927fa7ea764",
+ "usable_on_this_subject": 33
+}
