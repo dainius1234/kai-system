@@ -154,3 +154,25 @@ That file preserves Dainius's operator intent that the House-in-Order/Census mac
 This is a **reminder to recover and reconsider the design obligation, not authority to implement it**. A future Kai must reconcile it against the then-current architecture, Evidence Plane, D-numbered decisions and Dainius's authority before taking action.
 
 When closing a thread that materially changes Census/H2/Evidence-Plane machinery or discovers a reusable diagnostic principle, check whether `A4_SELF_DIAGNOSIS_EVOLUTION.md` needs a durable update so those lessons are not lost before A4 planning begins.
+
+## 8. Persistent future-design reminder — Kingsman README / architecture truth refresh
+
+Before any substantial rewrite of the repository front page, architecture graphics, public capability description or professionalisation pass, recover:
+
+`kai-pm/KINGSMAN_README_ARCHITECTURE_REFRESH_PLAN.md`
+
+The existing README and legacy architecture documents are **inputs to audit, not sources of truth**. The refresh must be rebuilt from qualified repository/runtime evidence, House-in-Order results and the then-current Kingsman architecture.
+
+The future work must specifically preserve:
+
+- checked, non-duplicated metrics and status claims;
+- a coherent Kingsman end-to-end architecture rather than chronological feature accumulation;
+- one unified Self-Diagnosis & Recovery architecture rather than duplicate Doctor/Self-Healing concepts;
+- engineering truths/rules already discovered and new rules discovered later;
+- explicit LIVE / NOT-CUT-OVER / STUB / PLANNED / UNKNOWN distinctions;
+- professional visual/diagram strategy;
+- current hardware/runtime truth;
+- honest limitations and evidence routes;
+- DeepSeek / external adversarial review before publication where it materially improves the result.
+
+When closing a thread that materially changes final architecture, capability naming, engineering doctrine, Evidence Plane, A4/self-diagnosis, runtime topology or verified counts, check whether the Kingsman README refresh plan needs an update so the eventual front page is not rebuilt from stale assumptions.
