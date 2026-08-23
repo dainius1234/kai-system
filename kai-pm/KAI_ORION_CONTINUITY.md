@@ -142,3 +142,15 @@ Kai may also invoke external review independently when the conditions above are 
 ### Principle
 
 **Use multiple minds, but one evidence standard.** Different reviewers are valuable because they fail differently. Repository truth remains evidence-bound, and consequential authority remains with Dainius.
+
+## 7. Persistent future-design reminder — A4 self-diagnosis evolution
+
+At thread recovery and especially before future **A4 / Evidence Plane / self-diagnosis architecture work**, check:
+
+`kai-pm/A4_SELF_DIAGNOSIS_EVOLUTION.md`
+
+That file preserves Dainius's operator intent that the House-in-Order/Census machinery and lessons should not be discarded as temporary build tooling. The proven concepts — component/file mapping, reader/writer relationships, drift detection, applicability, UNKNOWN/UNRESOLVED semantics, calibrated diagnostics and evidence-bound repair proposals — are candidates to evolve into Kai's later self-diagnosis capability.
+
+This is a **reminder to recover and reconsider the design obligation, not authority to implement it**. A future Kai must reconcile it against the then-current architecture, Evidence Plane, D-numbered decisions and Dainius's authority before taking action.
+
+When closing a thread that materially changes Census/H2/Evidence-Plane machinery or discovers a reusable diagnostic principle, check whether `A4_SELF_DIAGNOSIS_EVOLUTION.md` needs a durable update so those lessons are not lost before A4 planning begins.
