@@ -176,3 +176,20 @@ The future work must specifically preserve:
 - DeepSeek / external adversarial review before publication where it materially improves the result.
 
 When closing a thread that materially changes final architecture, capability naming, engineering doctrine, Evidence Plane, A4/self-diagnosis, runtime topology or verified counts, check whether the Kingsman README refresh plan needs an update so the eventual front page is not rebuilt from stale assumptions.
+
+## 9. Persistent programme reminder — House-in-Order Phase 2 professionalisation
+
+Dainius has defined the broader professionalisation work as **Phase 2 of House-in-Order**. Recover:
+
+`kai-pm/HOUSE_IN_ORDER_PHASE2_PROFESSIONALISATION.md`
+
+Interpretation:
+
+- Phase 1 establishes repository truth, authority, evidence, applicability and currentness.
+- Phase 2 takes that qualified truth and professionalises the repository one subsystem/file/capability family at a time to the final Kingsman standard.
+
+A stale, messy or poor-quality file is not automatically a poor idea. Before reworking, merging, superseding, archiving or deleting an artefact, recover the original capability intent and decide where that idea belongs in the final architecture.
+
+The Phase-2 target is not cosmetic tidiness. It is production-grade coherence across implementation, architecture, engineering doctrine, tests, runtime/deployment, documentation, self-diagnosis/recovery, graphics, README/front page and branch/merge hygiene.
+
+DeepSeek remains available under §6 for adversarial technical review at difficult or high-consequence points. Dainius remains final programme authority.
