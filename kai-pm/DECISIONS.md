@@ -28293,3 +28293,115 @@ its evidence**, nothing more. H2 is not started.
   superseded by **272** at this subject
 * **P0** `32575388846` · **P1** `32594846522` — both permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D337 — H2 method fixed before H2 is authorised. Evidence-density order derived.
+
+Kai's D336 review adopted in full. **H2 is NOT started** — it requires
+operator authority, and no document has been labelled.
+
+### 1. VERSION RULE for the frozen instrument — adopted before it is needed
+
+`v1.0` is **immutable**. If H2 exposes a problem:
+
+* **Case A — an already-declared blind spot**, and the affected result
+  can safely stay UNKNOWN → continue on `v1.0`. No new version.
+* **Case B — a defect contradicting a behaviour `v1.0` explicitly
+  claims, or capable of materially changing H1 evidence relied on
+  downstream** → **stop the affected classification**, cut **`v1.1`**,
+  freeze it independently, and **re-run it against the SAME H1 subject**
+  so the delta is visible.
+
+`v1.0` remains historical evidence permanently and is **never amended**.
+
+Recorded **now, before H2**, precisely because deciding it
+mid-classification is how a freeze becomes ceremonial.
+
+### 2. EVIDENCE-DENSITY ORDER — mechanical, not my judgement
+
+My proposed "risk order" is **withdrawn**. Ordering by what looks
+important is how the gold-set contamination happened.
+
+Derived from H1 evidence only, at subject `d8aac4d`:
+
+1. proven write relation present;
+2. executable/config evidence count, descending;
+3. Graph-A distinct incoming references, descending;
+4. repository-relative path ascending, deterministic tie-break.
+
+```
+ordered rows 272 == population 272 : YES
+  with a proven write     :   5
+  with executable evidence:   9
+  with Graph-A references : 163
+  with NO evidence at all : 109
+```
+
+**Definition declared:** "executable evidence" counts **RESOLVED I/O
+operations** targeting the document — **not** source files that
+*mention* it. Mentions would reintroduce the basename ambiguity the
+frozen instrument exists to eliminate.
+
+First five are the proven-write documents (`SESSION_BACKLOG`,
+`CHANGELOG`, `README`, `PROJECT_BACKLOG`, `BASELINE_RESPONSES`), then
+executable evidence (`DECISIONS` at 4 ops / 27 refs,
+`ENGINEERING_DOCTRINE`, `INSTRUMENTATION_ARCHITECTURE`), then Graph-A
+hubs (`CODE_AUDIT_MASTER` 57, `SOUL` 18, `STATUS` 15). The 109
+evidence-free documents sort last.
+
+**No thresholds. No document omitted. All 272 remain the denominator** —
+ordering changes *when* a document is inspected, never *whether*.
+
+Full order at `scratchpad/h2-order.json` (regenerable deterministically
+from the frozen instrument and the H1 subject).
+
+### 3. TWO-PASS RULE — adopted
+
+**Pass A** collects the evidence packet for all 272 **without assigning
+roles**. **Pass B** classifies against the frozen six-axis ontology
+(`LIFECYCLE · FUNCTION · AUTHORITY · GENERATION · VALIDITY_BINDING ·
+SCOPE`), UNKNOWN first-class **independently on each axis**.
+
+**A previous document's classification is not admissible evidence for a
+later one.** Cross-document reconciliation happens only after the full
+272-row classification exists. Population rules (e.g. audit batches) may
+be used **only if mechanically proven**, and **every individual path
+still gets its own row**.
+
+### 4. Precision accepted
+
+**"0 untracked / 0 ignored" is evidence about the clean independent H1
+checkout — not a timeless property of the repository.** Qualification
+attached, per Kai. It is the `.pytest_cache` lesson kept in force rather
+than merely remembered.
+
+---
+
+## THREAD RECOVERY BLOCK — D337
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **MEASURED SUBJECT** — H1 subject `d8aac4d49e6ba997e3eb38062c0917186ee3f197`,
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117` (unchanged; ≠ reporting tree)
+* **INSTRUMENT** — FROZEN `v1.0`, aggregate `4a5b40a1…1d77`, immutable;
+  version rule for `v1.1` recorded in §1
+* **CURRENT WORKSTREAM** — House-in-Order; H1 complete, **H2 method
+  fixed, H2 NOT started**
+* **LAST PROVEN STATE** — population **272**; evidence-density order
+  derived and reconciled 272/272; no document classified on any axis
+* **AUTHORISED NEXT ACTION** — none. **H2 requires operator
+  authorisation**
+* **EXPLICITLY NOT AUTHORISED** — H2 labels · H3 · H4 · R2+ mutation ·
+  document/register repair · Phase B · `ITEM8_GO` · six subject builds ·
+  Stage 2 · repair of the seven research obligations · investigation of
+  `=0.2.0` (A-4 provenance)
+* **OPEN / UNRESOLVED** — 865 `UNRESOLVED_RELEVANCE` (accepted into the
+  freeze) · whole-file YAML/Make scanning · KAI-GATE register 20 of 51
+  ids · three-way closure-count contradiction · seven research
+  obligations · 109 documents with no evidence of any kind
+  (**observation, not defect**)
+* **CORRECTIONS TO PRIOR RECORDS** — my "risk order" proposal is
+  **withdrawn** in favour of the mechanically derived evidence-density
+  order
+* **P0** `32575388846` · **P1** `32594846522` — both permanent. Counts
+  unchanged (Programme Rule 7).
