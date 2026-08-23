@@ -193,3 +193,23 @@ A stale, messy or poor-quality file is not automatically a poor idea. Before rew
 The Phase-2 target is not cosmetic tidiness. It is production-grade coherence across implementation, architecture, engineering doctrine, tests, runtime/deployment, documentation, self-diagnosis/recovery, graphics, README/front page and branch/merge hygiene.
 
 DeepSeek remains available under §6 for adversarial technical review at difficult or high-consequence points. Dainius remains final programme authority.
+
+## 10. Persistent programme reminder — Kingsman final master canon and Item 8 correction
+
+Before Phase-2 architecture/professionalisation is materially executed, recover:
+
+`kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md`
+
+This is the P2.0 plan for reconciling the final Kingsman vision into one controlled blueprint.
+
+**Correction that must survive thread handoff:** the earlier draft incorrectly said `Team 8`. The operator meant **Item 8**. No Team-8 concept is implied.
+
+**Programme ordering that must survive handoff:**
+
+> **ITEM 8 BEFORE A4.**
+
+Item 8 is a separately governed assurance/build workstream with frozen-design and execution-authority controls. It is not a cognitive team and the master canon does not authorise its execution.
+
+A4 remains the later structural/evidence/self-diagnosis evolution. The latest D-numbered programme sequence remains authoritative where it is more specific.
+
+The master canon is the design baseline for where Kai is going; repository/test/runtime evidence remains the authority for where Kai actually is.
