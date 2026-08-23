@@ -27299,3 +27299,165 @@ and until then it is an open question, not a finding.
 * **No repository file modified beyond this entry.**
 * Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
   Counts unchanged (Rule 7).
+
+---
+
+## D330 — Multi-axis control model. P12 built. Two more instrument defects, one a FALSE NEGATIVE.
+
+Kai's diagnosis accepted: the single-role ontology conflated orthogonal
+concepts. **Quarantine in force** — instrument evidence, specification
+and withdrawn claims only. Frozen subject `9d15bcd` / tree `627104d6`
+throughout.
+
+### 1. Kai's three disproofs — VERIFIED, and the third is worse than stated
+
+**`UH2_SENSOR_INGRESS_PLAN.md`** — title reads *"(rev 2)"*; line 6 reads
+*"Rev 2 supersedes rev 1."* **It is the SUCCESSOR.** I labelled it
+SUPERSEDED by regex-matching the word `supersed`, while **my own
+ontology in the same entry** declared a self-declaration without a named
+successor *insufficient*. **I violated my own specification in the
+document that contained it.**
+
+Third instance of one personal failure mode: **match a word, assign a
+meaning** — D322 (prose grep), D326 (basename matcher), now D329.
+
+**`CHANGELOG.md`** — `auto_changelog.py:107` "Replace the [Unreleased]
+section", bounded `## [Unreleased]` → next `## [`. **Owns one section.**
+**`SESSION_BACKLOG.md`** — `auto_session_log.py` "appends a new session
+block. Idempotent." **Owns appended blocks.**
+
+Neither is whole-document derived. And the instrument never said they
+were: it reported `READ_AND_WRITE`, a **directionality** fact. **I**
+promoted it to a **scope** claim. Kai's diagnosis is proven by my own
+error — the single-role model made me smuggle scope into directionality.
+
+### 2. P12 — ANALYSIS COVERAGE MUST BE EXPLICIT
+
+Source population now **git-tracked at the frozen tree** (605 files), not
+`rglob`. Every candidate operation gets exactly one disposition.
+
+```
+candidate operations : 1330      sum(dispositions) : 1330   EQUAL
+  RESOLVED_READ          15
+  RESOLVED_WRITE          5
+  READ_AND_WRITE          0
+  UNRESOLVED            518
+  NON_DOCUMENT_TARGET   792
+```
+
+Mutation-proven: silently dropping UNRESOLVED → **2 fail**; restoring
+basename fallback → **2 fail**. 8/8 restored.
+
+**No basename fallback for writers.** Exact resolved repository-relative
+target or UNRESOLVED.
+
+### 3. TWO MORE INSTRUMENT DEFECTS — the second is a FALSE NEGATIVE
+
+**(a) Double-counted chained operations.** `open(x,"r+").read()` was
+counted twice — once as the `open`, once as `.read()` on its result —
+manufacturing a spurious UNRESOLVED. Caught by P12's
+candidates-equals-sum assertion.
+
+**(b) `ast.walk` is breadth-first, so multi-segment paths were
+scrambled.** `ROOT / "docs" / "PROJECT_BACKLOG.md"` yielded
+`['PROJECT_BACKLOG.md', 'docs']` — the outer operand before the deeper
+one. Joined: `PROJECT_BACKLOG.md/docs`. Matches nothing → **UNRESOLVED**.
+
+`README.md` resolved **only because it is a single fragment.**
+
+**This is a FALSE NEGATIVE — the mirror of D328's false positives.** A
+genuinely derived document was recorded as having no writer. Caught
+because `PROJECT_BACKLOG` dropped out of the write list while I had
+watched `sync_docs` update it earlier the same day: **an implausible
+absence deserves the suspicion of an implausible zero.**
+
+Repaired by sorting constants by `(lineno, col_offset)`. Recovery:
+reads **7 → 15**, writes **4 → 5**, unresolved **527 → 518**. A
+known-answer fixture for multi-segment construction now exists.
+
+### 4. D. Unresolved taxonomy — reported both ways Kai required
+
+```
+unresolved OPERATIONS            : 518
+source FILES with >=1 unresolved : 199
+```
+
+```
+  227  bare-name target (no literal binding)
+  161  shell/format variable in path
+   61  attribute chain (self.X / obj.attr)
+   36  literal .md path not tracked at this tree
+   26  BinOp with no string literal
+   14  call result (f(...).read/write)
+    2  subscript (d[k])
+  ---
+  518  taxonomy total == unresolved operations: YES
+```
+
+**The magnitude Kai suspected is real: "199 files" would have hidden 518
+operations.**
+
+### 5. Proven writes at the frozen subject — 5 documents
+
+```
+CHANGELOG.md                       scripts/auto_changelog.py
+README.md                          scripts/sync_docs.py
+SESSION_BACKLOG.md                 scripts/auto_session_log.py
+docs/PROJECT_BACKLOG.md            scripts/sync_docs.py
+kai-pm/BASELINE_RESPONSES_0.5B.md  scripts/capture_baseline_responses.py
+```
+
+**E4 from D329 is RESOLVED:** `data/SOUL.md` has **no proven write**.
+Its earlier `READ_AND_WRITE` was basename fallback attributing a
+same-named write elsewhere. Removing the fallback removed the artefact.
+**No test writes the operator's CRITICAL-rated file** on this evidence.
+
+### 6. A / B — multi-axis model (scratchpad)
+
+Six independent axes: **LIFECYCLE · FUNCTION · AUTHORITY · GENERATION ·
+VALIDITY_BINDING · SCOPE**. UNKNOWN is first-class on **each axis
+independently**.
+
+Two rules earned by this round's errors:
+* **SUPERSEDED requires a named successor AND the document to be the
+  predecessor.** *"X supersedes Y"* makes **Y** superseded.
+* **FULL_DERIVED requires the writer to own WHOLE_FILE.** A writer owning
+  a region yields **PARTIAL_DERIVED**, never FULL.
+
+Scope uses **stable semantic selectors** — `HEADING(...)`, `TABLE(...)`,
+`MANAGED_REGION(...)` — **never byte or line offsets**, which drift on
+every edit. File default + region overrides only where mixed.
+
+### 7. F — new construct ambiguities
+
+**F1 — operation-level vs relationship-level.** `READ_AND_WRITE` is now
+**0**, because per-operation it means one call doing both (`r+`).
+`sync_docs.py` both reads and writes `README.md` — as **two separate
+operations**. The relationship is an **aggregate**, not a disposition.
+Conflating them is what produced my whole-document error.
+
+**F2 — the resolved fraction is 1.5%.** 20 of 1330 candidate operations
+resolved to a tracked document. **Any generation-axis conclusion today
+rests on 1.5% of the evidence**, with 39% unresolved. That is a bound on
+every GENERATION verdict and must travel with it.
+
+**F3 — 792 NON_DOCUMENT_TARGET operations are unexamined.** They are the
+majority of the denominator. They are *presumed* irrelevant because no
+fragment ends `.md` — a presumption, not a measurement.
+
+### 8. E — synthetic axis fixtures: SPECIFIED, NOT YET RUNNABLE
+
+Fixtures for each axis, including cases whose correct answer is
+**UNKNOWN by construction**, are specified — but they cannot execute
+until a classifier exists, and **the classifier does not exist and is
+not authorised**. Recorded deliberately: under rule 29 the fixture must
+be able to detect the classifier's absence, so it is written first.
+
+### 9. Status
+
+* R1B **NOT STARTED**. No corpus classification. No authority counts.
+* Instrument: P10 125/0, P11 14/0, P12 8/0, reader-writer 7/7 — all
+  mutation-proven. **Instrument NOT frozen.**
+* **No repository file modified beyond this entry.**
+* Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
+  Counts unchanged (Rule 7).
