@@ -11,7 +11,7 @@ Use this order when recovering state:
 1. **Git branch/commit/tree and machine evidence** — exact repository state.
 2. **Latest D-numbered entry in `kai-pm/DECISIONS.md` on the active work branch** — latest programme/governance record.
 3. **`CLAUDE.md`** — binding operating rules and stop signals.
-4. **`kai-pm/ENGINEERING_DOCTRINE.md`** — engineering doctrine/fingerprint where applicable.
+4. **`kai-pm/ENGINEERING_DOCTRINE.md` and standing doctrine extensions** — engineering doctrine/fingerprint where applicable.
 5. **Canonical machine registers / experiment artefacts / workflow run evidence** for the specific claim.
 6. Other plans, trackers, READMEs and status documents only after their authority/currentness has been qualified.
 
@@ -35,7 +35,8 @@ Before giving consequential programme advice, a fresh Kai thread must:
    - next permitted action;
    - open conflicts/corrections.
 7. Verify any material state claim against the tree/machine source before relying on it. `Recorded`, `banked`, `closed`, `green`, `absent`, `present`, `authorised` and `current` are verifiable claims.
-8. Only after steps 1–7 may Kai continue the programme.
+8. Recover `kai-pm/OPERATOR_VISIBILITY_ENGINEERING_DOCTRINE.md` before a material handoff, architecture decision, phase checkpoint, or operator-facing status claim. Operator visibility is part of the governance/control loop, not optional documentation polish.
+9. Only after steps 1–8 may Kai continue the programme.
 
 If the latest D entry cannot be recovered, stop and report **STATE RECOVERY INCOMPLETE** rather than reconstructing from memory.
 
@@ -51,14 +52,23 @@ Every future D-numbered governance entry should finish with a compact **THREAD R
 - `EXPLICITLY NOT AUTHORISED`
 - `OPEN / UNRESOLVED ITEMS`
 - `CORRECTIONS TO PRIOR RECORDS`
+- `OPERATOR VISIBILITY` — `COMPLETE` or `INCOMPLETE`, with any known stale/missing operator-facing surface named explicitly
 
 This block is a **navigation aid only**. It must point to evidence rather than replace it.
+
+If material operator-facing state is knowingly stale, contradictory or missing, the handoff must report:
+
+`OPERATOR VISIBILITY INCOMPLETE`
+
+and may not be called fully complete merely because code/tests/evidence are green.
 
 ## 4. Anti-staleness rule
 
 Do **not** maintain a duplicated prose copy of the current programme state in this file.
 
 This protocol should remain stable while programme state changes beneath it. Current state is recovered from the latest D entry and exact repository evidence. That is deliberate: a recovery file that needs manual status updates becomes another stale tracker.
+
+Operator visibility does **not** mean duplicating all evidence here. It means ensuring the operator has a current, intelligible surface that points to the evidence and states what is true, uncertain, authorised, blocked and next.
 
 If the recovery procedure itself changes, update this file and record the reason in `DECISIONS.md`.
 
@@ -69,9 +79,11 @@ When a Kai thread is approaching a handoff or context limit:
 1. Verify that all material new decisions/findings are present in the repository rather than only in chat.
 2. Ask Orion to bank a D-numbered governance entry if material state exists only in conversation.
 3. Confirm the latest D entry contains the THREAD RECOVERY BLOCK.
-4. Do not claim the handoff is complete until the repository artefact is independently visible.
+4. Check operator-facing current-state material for material contradiction/staleness introduced by the work. Where immediate synchronization is outside the authorised workstream, mark the stale surface explicitly and bank the obligation.
+5. Give Dainius a plain-language explanation of what changed, what is proven, what remains unresolved, what comes next and what decision/authority is required from him.
+6. Do not claim the handoff is complete until the repository artefact is independently visible **and operator visibility is complete or explicitly reported incomplete**.
 
-The repository is the workshop. Chat is the working conversation, not the durable record.
+The repository is the workshop. Chat is the working conversation, not the durable record. The operator-facing summary is the control panel; it must not knowingly lie about the workshop.
 
 ## 6. External Technical Review Protocol — DeepSeek / specialist second opinion
 
@@ -213,3 +225,21 @@ Item 8 is a separately governed assurance/build workstream with frozen-design an
 A4 remains the later structural/evidence/self-diagnosis evolution. The latest D-numbered programme sequence remains authoritative where it is more specific.
 
 The master canon is the design baseline for where Kai is going; repository/test/runtime evidence remains the authority for where Kai actually is.
+
+## 11. Standing operator-visibility doctrine
+
+Recover and apply:
+
+`kai-pm/OPERATOR_VISIBILITY_ENGINEERING_DOCTRINE.md`
+
+Core rule:
+
+> **The operator cannot govern what the system does not make legible.**
+
+Dainius is not expected to reverse-engineer programme truth from source code, CI logs, hundreds of evidence files or contradictory status pages. Kai/Orion are responsible for keeping material truth visible enough for him to understand the current state and exercise final authority.
+
+Until Phase 2 implements calibrated mechanical checks, this is enforced procedurally at every material handoff. The Phase-2 automated target is defined in:
+
+`kai-pm/PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md`
+
+A green narrow docs gate does not prove operator-facing state is current outside its declared population.
