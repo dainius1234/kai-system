@@ -27461,3 +27461,180 @@ be able to detect the classifier's absence, so it is written first.
 * **No repository file modified beyond this entry.**
 * Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
   Counts unchanged (Rule 7).
+
+---
+
+## D331 — P13, the relevance correction, and 371 operations that were dismissed on absence.
+
+Kai's correction and design pivot accepted in full. **Quarantine in
+force.** Frozen subject `9d15bcd` / tree `627104d6`.
+
+### 0. THE SOUL OVERCLAIM — WITHDRAWN IMMEDIATELY
+
+D331 §5 said: *"No test writes the operator's CRITICAL-rated file."*
+**Withdrawn.** That is a closed-world claim over an open search space —
+written **one paragraph after** I recorded a false negative.
+
+Kai verified `test_soul_identity.py` directly: it writes `tmp_path /
+"SOUL.md"` fixtures; its accesses to repository `data/SOUL.md` are
+existence checks and reads. **That specific suspicion is exonerated.**
+
+The admissible statement, now produced mechanically:
+
+```
+data/SOUL.md → NO_PROVEN_WRITER  {unresolved_operations: 889}
+```
+
+### A. P12 relevance model corrected — NON_DOCUMENT needs a positive witness
+
+`NON_DOCUMENT_TARGET` was assigned because **no fragment ended `.md`**.
+That is absence of a marker used as a negative conclusion — the exact
+defect P13 forbids. A dynamic path can resolve to Markdown at runtime.
+
+Now `RESOLVED_NON_DOCUMENT_TARGET` requires a positive witness: an exact
+tracked non-`.md` path, or a decisive non-Markdown extension. Everything
+else becomes `UNRESOLVED_RELEVANCE`.
+
+**The effect is large:**
+
+```
+                              BEFORE          AFTER
+RESOLVED_READ                     15             15
+RESOLVED_WRITE                     5              5
+READ_AND_WRITE                     0              0
+non-document                     792  →  421 (positive witness)
+unresolved                       518  →  889  (27 target + 862 relevance)
+                                 ────           ────
+candidate operations            1330           1330   sum equal: YES
+```
+
+**371 operations that had been confidently binned as "not a document"
+now have no positive witness and return to open.** The open population
+rose **518 → 889 (+71%)**, across **234 files**.
+
+Kai's suspicion is confirmed quantitatively: absence of a `.md` marker
+was doing a great deal of work it had not earned.
+
+**"GENERATION rests on 1.5% of the evidence" is WITHDRAWN.** 20/1330 is
+an arithmetic fact about candidate operations; **1330 is not a qualified
+denominator for document-generation evidence**, so the ratio must not be
+presented as coverage.
+
+### B. P13 — NEGATIVE CLAIMS REQUIRE A CLOSED SEARCH SPACE
+
+`NO_WRITER` is emitted **only** when zero operations remain with
+unresolved relevance or target. Otherwise the strongest admissible
+answer is `NO_PROVEN_WRITER`, **and it reports how open the space is.**
+
+Calibration 7/7 across closed-space, open-space, positive-relation and
+extensionless-literal fixtures. **Mutation-proven twice:**
+
+| mutation | result |
+|---|---|
+| drop a real positive relation | `NO_WRITER {search_space: CLOSED}` — **a CONFIDENT FALSE NEGATIVE**, 1 fail |
+| assume the search space closed | `NO_WRITER` on an open space, **2 fail** |
+| restored | 7 / 0 |
+
+The first mutation is the one worth keeping: silently losing a true
+relationship produces not "unknown" but **a confident denial**.
+
+All suites green: **P10 125/0 · P11 14/0 · P12 8/0 · P13 7/0 ·
+reader-writer 7/7.**
+
+### C. Landmarks — answers independent of the detector
+
+Each landmark's correct answer comes from **direct source inspection
+with a line citation**, or from Kai's independent verification — never
+from the analyser.
+
+```
+POSITIVE — must always be recalled
+  RECALLED  sync_docs.py       → README.md                (:200 write_text)
+  RECALLED  sync_docs.py       → docs/PROJECT_BACKLOG.md  (:239 write_text)
+  RECALLED  auto_changelog.py  → CHANGELOG.md             (:107 [Unreleased])
+  RECALLED  auto_session_log.py→ SESSION_BACKLOG.md       (appends block)
+
+NEGATIVE — must never become writers
+  CORRECT   check_gate_registry.py  NOT-writer-of INSTRUMENTATION_ARCHITECTURE.md
+  CORRECT   test_soul_identity.py   NOT-writer-of data/SOUL.md
+  CORRECT   test_doctrine_integrity NOT-writer-of ENGINEERING_DOCTRINE.md
+
+  positive recalled 4/4 · negative respected 3/3
+```
+
+### D. Revised unresolved taxonomy — reconciles exactly
+
+```
+  371  literals present, extension not decisive   ← NEW class, was "non-document"
+  227  bare-name target (no literal binding)
+  161  shell/format variable in path
+   61  attribute chain (self.X / obj.attr)
+   27  literal .md path not tracked at this tree
+   26  BinOp with no string literal
+   14  call result (f(...).read/write)
+    2  subscript (d[k])
+  ───
+  889  == open operations: YES
+```
+
+### E. Declaration-led GENERATION — design
+
+Static analysis is **demoted** to evidence provider, adversarial checker
+and lower-bound detector. It does **not** assign GENERATION.
+
+A derived region declares: `generator` (tracked repo-relative path),
+`generated_scope` (stable selector), `source` (machine source of truth),
+`verification` (check name). The checker then proves the generator
+exists and is tracked; that the declared scope selector resolves in the
+document; and that static analysis **corroborates** the relation.
+
+Two asymmetric outcomes, neither a silent pass:
+* **declared generator with no static evidence → SURPRISE/INVESTIGATE**,
+  not failure — with 889 open operations, static silence proves nothing;
+* **PROVEN_WRITE_RELATION with no declaration → SURPRISE/INVESTIGATE**,
+  an undeclared generator.
+
+Exact resolved relations are recorded as **`PROVEN_WRITE_RELATION`
+only**. They do **not** become PARTIAL/FULL_DERIVED until scope is
+independently established.
+
+### F. Safe dynamic corroboration — design only
+
+A disposable copy of the frozen tree; run **only explicitly declared,
+allow-listed generators** — never arbitrary repository source; capture a
+before/after filesystem diff by path and content hash; compare observed
+changed paths against static relations.
+
+* **observed but not static → FALSE-NEGATIVE ALARM** (the channel that
+  would have caught the `PROJECT_BACKLOG` miss without my memory);
+* **static but not observed → scope or conditional-path question.**
+
+No network, no repository mutation, nothing executed that is not
+declared.
+
+### G. Newly exposed false-negative surfaces
+
+**G1 — shell is still regex, not structurally parsed.** Kai required
+structural shell parsing. I have regexes for `>`/`>>`/`tee`/`sed -i` and
+`cat`/`head`/`tail`. **161 shell-variable operations are open**, and any
+redirection form outside those patterns is invisible — an unmeasured
+miss surface, declared.
+
+**G2 — YAML `run:` blocks are scanned as whole-file text.** The shell
+regexes are applied to the entire YAML document, not to `run:` bodies.
+Both over- and under-detection are possible.
+
+**G3 — Makefile recipes get shell-regex treatment only.** Recipe
+semantics, variables and `$(…)` expansion are not modelled.
+
+**G4 — the 371 reclassified operations are un-triaged.** They are now
+open rather than dismissed, which is correct — but nothing yet
+characterises how many are genuinely irrelevant.
+
+### Status
+
+* R1B **NOT STARTED**. No corpus classification, no authority counts.
+* **Instrument NOT frozen.** No repository file modified beyond this
+  entry.
+* Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
+  Counts unchanged (Rule 7).
