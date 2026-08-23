@@ -29081,3 +29081,200 @@ was neither examined nor sound.
   it has four defects
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D342 — Census v1.1 built and qualified: 39/39 values pass, 0 claims
+## change, and one regression I introduced and caught
+
+**Authority.** Dainius, 2026-08-23: *"AUTHORISED: Census v1.1
+implementation and qualification exactly within Kai's D341 ruling ...
+NOT AUTHORISED YET: H2 v1.1, H3, H4, H5, document/register repair,
+Phase B, ITEM8_GO, six subject builds, Stage 2, seven
+research-obligation repairs, or =0.2.0."*
+
+Census v1.0 is **untouched**: manifest 12/12 OK, zero working-tree
+modifications, zero diff against HEAD. v1.1 is a separate package at
+`kai-pm/house_in_order_census_v11/`, 14 artefacts, aggregate
+`c81ef694c85d1b3d307bff7335c9c6e3326ec975f587f6a5709502c6b64a7a4f`.
+
+### 1. F4 — the state was renamed, not removed
+
+Kai's ruling is implemented exactly: `NO_WRITER` becomes
+`NO_WRITER_WITHIN_ANALYZED_SCOPE`, carrying an explicit `ANALYSIS_SCOPE`
+record, and **the closure rules are not relaxed by one inch**. Its
+observed population on both subjects is **0**, so it is unavailable as
+current-subject evidence — reported as a restriction, not a defect.
+
+I had proposed the opposite in D341 §6.3, treating "unreachable on this
+corpus" as grounds to stop declaring the value. That would have let the
+corpus define the ontology. **Kai is right and my framing was wrong.**
+
+### 2. The fourth leg, adopted with Kai's correction
+
+`IMPLEMENTATION_EMITTABLE` · `FIXTURE_REACHABLE` ·
+`CALIBRATION_DISCRIMINATING` · `SUBJECT_POPULATION_APPLICABILITY`.
+
+Leg 4 is **mandatory reporting, never pass/fail** — a legitimate state
+may simply be absent from a corpus. Its binding consequence is enforced
+instead: *a downstream claim about a subject may not rely on a state
+whose applicability on that subject is zero.* Six values are reported at
+zero on both subjects.
+
+`qualify.py` derives its denominator by scanning the package for modules
+exporting `ALPHABETS` (R5) and excludes the declaration itself and every
+docstring from the emission scan (I-8, the "detector counted its own
+docstring" failure).
+
+**Proof the gate can fail.** Its first run reported
+`EXCLUDED_FROM_T :: NOT DISCRIMINATED` — reached six times, but every
+assertion about it had been credited to the *witness* alphabet. A real
+gap, closed by an assertion whose subject is the disposition itself.
+
+### 3. F3 — semantics corrected before calibration, per Kai
+
+`PUNCTUATION_ARTEFACT` is no longer an exclusion witness. Extraction
+artefacts are **rejected before admission** with a declared reason, so
+they clean the denominator instead of explaining pollution.
+
+`REMOTE_URI` is gone as a witness. `open("https://x.md","w")` performs
+no HTTP request. URI syntax is recorded as an observation only.
+
+**R6 forced the same correction on absolute paths**, which are the
+identical defect wearing a different character: v1.0 excluded any target
+starting with `/` as "outside the repository target domain", but
+`/home/user/repo/data/SOUL.md` **is** `data/SOUL.md`. An absolute or
+URI-shaped literal is now excluded only when the target is not a path
+**suffix** of it — the sound test, since an absolute path can denote
+only repository-relative paths that are suffixes of it. Preflight
+measured the blast radius first: 125 such operations, **zero** with a
+suffix matching any tracked document, so this repair changes nothing on
+either subject. **Proven sound by boundary-paired fixtures, and inert
+here.** It prevents a future false exclusion; it repairs no present
+number, and saying otherwise would be over-claiming.
+
+A further class emerged from the D341 preflight: v1.0 scanned **whole
+YAML files as shell**, so `expr: vram_percent > 90` and
+`placeholder: "... <sha>"` were admitted as write operations. Shell
+redirection is now recognised only in shell context — `run:` block
+scalars, `.sh`/`.bash`, Makefile recipe lines.
+
+### 4. Denominator reconciliation, asserted not narrated
+
+World A (`d8aac4d4`, tree `3abc9e9d`, 272 documents, 944 edges):
+
+```
+raw_candidate_matches         1458
+  EXTRACTION_ARTEFACT   117   QUOTED_STRING_CONTENT  87
+  COMMENT_CONTEXT        38   NOT_SHELL_CONTEXT      26
+  ARROW_OPERATOR          4
+rejected_non_operations        272
+admitted_candidate_operations 1186 == sum(dispositions)   reconciles: True
+claims: NO_PROVEN_WRITER 267 · PROVEN_WRITE_RELATION 5
+```
+
+World B (current tree, 274 documents, 969 edges): raw 1464 = 272
+rejected + 1192 admitted = sum(dispositions). Claims 269 / 5.
+
+### 5. v1.0 ↔ v1.1 on the IDENTICAL subject
+
+Both instruments pointed at the same materialised tree in one process,
+so every delta is attributable to the instrument alone.
+
+| measure | v1.0 | v1.1 |
+|---|---|---|
+| documents / edges | 272 / 944 | **272 / 944 — identical** |
+| operations | 1343 | 1186 |
+| `RESOLVED_WRITE` | 5 | **5** |
+| `RESOLVED_READ` | 15 | 8 |
+| `UNRESOLVED_TARGET` | 30 | 37 |
+| `UNRESOLVED_RELEVANCE` | 865 | 715 |
+| `RESOLVED_NON_DOCUMENT_TARGET` | 428 | 421 |
+| **documents whose claim changed** | — | **0** |
+
+Deltas sum to −157 and each is explained. **Write-side evidence is
+identical — the same 5 proven write relations, zero erasure, zero
+fabrication** — which matters because every claim rests on that set.
+Edges identical proves the F2 repair was declaration-only.
+
+### 6. A regression I introduced, and how it was caught
+
+An intermediate version folded the AST dynamic-expression flag into the
+disposition test. `(ROOT / "README.md").read_text()` has an unresolvable
+**prefix** and a fixed final component ending `.md`; all seven such
+reads were filed under `UNRESOLVED_RELEVANCE` — asserting the target
+could not be shown to be a document when the `.md` is right there. A
+MISBINDING that **silently erased seven real read relations**.
+
+It was caught by the v1.0↔v1.1 reconciliation, not by any suite: the
+suites were green while it was wrong. Relevance and target are now
+separated — relevance proven, target unproven, therefore
+`UNRESOLVED_TARGET`.
+
+This is deliberately more conservative than v1.0, which resolved such
+paths by matching the literal suffix against the tracked tree. That is
+the D332 shape: `str(tmp) + "/SOUL.md"` is structurally identical and
+denotes a temporary file. **Same shape, different truth — so static
+evidence cannot decide it**, and the honest answer is that the target is
+unproven. Calibrated as a boundary pair.
+
+### 7. Portable reproduction — proven by EXECUTION (D334)
+
+"A manifest that verifies is not an instrument that runs." The package
+was copied to an unrelated directory: manifest 14/14 OK, `qualify.py`
+and all three suites exit 0, and a World A census reproduced **every
+measure identically**.
+
+That check earned its place at once: its first run showed
+`disposition_tally` DIFFERING, because `census-worldA.json` had been
+generated **before** the seven-reads correction. The manifest was
+hashing stale evidence and verifying it perfectly. All artefacts were
+regenerated from final code.
+
+### 8. Calibration
+
+173 assertions, 0 failures — `cal_docgraph` 127 (60 generated crossings,
+7 metamorphic groups), `cal_opscan` 12, `cal_claims` 34. Chained with
+`&&` (R3). The admission filter carries the **known-negative** that a
+genuine redirection is still admitted; it fired immediately, catching a
+regex change that had silently dropped `> docs/real.md`. A filter with
+no known-negative scores perfectly by rejecting everything.
+
+### 9. Status
+
+**PROPOSED FOR FREEZE. NOT FROZEN, NOT ACCEPTED.** H2 classifier v1.1
+is not authorised and has not been started.
+
+---
+
+## THREAD RECOVERY BLOCK — D342
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **MEASURED SUBJECTS** — World A `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117` (272 docs);
+  World B `16f9b1c323ccf5843ad66942874e660d2b0fe5b5` (274 docs)
+* **INSTRUMENTS** — Census `v1.0` **UNTOUCHED**, 12/12 OK, zero diff;
+  Census `v1.1` NEW, 14 artefacts, aggregate `c81ef694…7a4f`,
+  **proposed for freeze, not frozen**; H2 `v1.0` untouched
+* **CURRENT WORKSTREAM** — House-in-Order; Census v1.1 built and
+  qualified
+* **LAST PROVEN STATE** — 39/39 declared values pass legs 1–3; 0
+  qualification findings; 173/173 calibration assertions; both worlds
+  reconcile; 0 claims changed vs v1.0; write-side identical; portable
+  reproduction proven by execution
+* **AUTHORISED NEXT ACTION** — none. The build is delivered; freeze and
+  acceptance are Kai's and Dainius's to grant
+* **EXPLICITLY NOT AUTHORISED** — H2 v1.1 · H3 · H4 · H5 ·
+  document/register repair · Phase B · `ITEM8_GO` · six subject builds ·
+  Stage 2 · seven research-obligation repairs · `=0.2.0`
+* **OPEN / UNRESOLVED** — Census v1.1 unfrozen · `NO_WRITER_WITHIN_
+  ANALYZED_SCOPE` applicability 0 on both subjects · URI/absolute
+  repairs sound but inert here · 715 `UNRESOLVED_RELEVANCE` remain ·
+  history window unqualified before `d6e5d8cf`
+* **CORRECTIONS TO PRIOR RECORDS** — D341 §6.3 withdrawn: I proposed
+  retiring a state because the corpus could not reach it; that inverts
+  P10 and Kai's ruling is adopted instead. Also withdrawn: this build's
+  own intermediate classification of seven dynamic-prefix reads as
+  `UNRESOLVED_RELEVANCE`
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

@@ -1,0 +1,46 @@
+{
+ "subject": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+ "docs_v10": 272,
+ "docs_v11": 272,
+ "edges_v10": 944,
+ "edges_v11": 944,
+ "ops_v10": 1343,
+ "ops_v11": 1186,
+ "admission": {
+  "raw_candidate_matches": 1458,
+  "rejected_non_operations": {
+   "NOT_SHELL_CONTEXT": 26,
+   "COMMENT_CONTEXT": 38,
+   "EXTRACTION_ARTEFACT": 117,
+   "QUOTED_STRING_CONTENT": 87,
+   "ARROW_OPERATOR": 4
+  },
+  "rejected_total": 272,
+  "admitted_candidate_operations": 1186
+ },
+ "dispositions_v10": {
+  "UNRESOLVED_RELEVANCE": 865,
+  "RESOLVED_NON_DOCUMENT_TARGET": 428,
+  "UNRESOLVED_TARGET": 30,
+  "RESOLVED_READ": 15,
+  "RESOLVED_WRITE": 5
+ },
+ "dispositions_v11": {
+  "UNRESOLVED_RELEVANCE": 715,
+  "RESOLVED_NON_DOCUMENT_TARGET": 421,
+  "UNRESOLVED_TARGET": 37,
+  "RESOLVED_READ": 8,
+  "RESOLVED_WRITE": 5
+ },
+ "claims_v10": {
+  "NO_PROVEN_WRITER": 267,
+  "PROVEN_WRITE_RELATION": 5
+ },
+ "claims_v11": {
+  "NO_PROVEN_WRITER": 267,
+  "PROVEN_WRITE_RELATION": 5
+ },
+ "claim_changes": [],
+ "narrowed": 272,
+ "widened": 0
+}
