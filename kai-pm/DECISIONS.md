@@ -27638,3 +27638,147 @@ characterises how many are genuinely irrelevant.
   entry.
 * Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
   Counts unchanged (Rule 7).
+
+---
+
+## D332 — P14 claim-scoped negatives; a vacuous mutation test; and the third failure axis.
+
+Kai's rulings accepted. **Quarantine in force.** Frozen subject
+`9d15bcd` / tree `627104d6`.
+
+### 0. APPEND-CORRECTION to the D331 record
+
+The committed D331 §0 reads *"D331 §5 said…"*. **The overclaim
+originated in D330 §5.** D331 cited itself for a sentence it did not
+contain. Corrected here by append, **not by rewriting** — the erroneous
+provenance stays visible in D331, as the append-only rule requires.
+
+### A. P14 — CLAIM-SCOPED NEGATIVES REQUIRE CONSTRUCTIVE EXCLUSION
+
+P13 demanded a repository-wide closed search space. With 889 open
+operations that meant `NO_WRITER` could **never** be emitted for any
+document — a control so strict it was inert.
+
+P14 closes the space **for one claim**. For target T, every candidate
+write receives exactly one of `REACHES_T` / `EXCLUDED_FROM_T{witness}` /
+`COULD_REACH_T`, and the population must reconcile. `NO_WRITER(T)` is
+admissible only when `REACHES_T == 0 AND COULD_REACH_T == 0`.
+
+Four constructive exclusion witnesses, never absence: exact resolved
+path that is some other tracked file; decisive non-Markdown extension;
+fixed basename differing from the target's; fixed directory provably
+disjoint.
+
+**Calibration 16/0.**
+
+### B. THE MUTATION TEST WAS VACUOUS TWICE — and that is the finding
+
+Kai specified the mutation: exclude because the target token is absent.
+
+**Attempt 1 — 8/8 PASSED under mutation.** I could have reported "P14
+mutation-proven" then. I checked whether the patch had applied at all
+(rule 18) and it had: anchor matched once, `MUTANT` present in the file.
+**So the fixtures were blind.**
+
+Cause: my dynamic fixture used `os.environ["P"]`, and **my collector
+extracts the DICT KEY `"P"` as a path fragment** — so the expression
+looked *fixed* and never reached the mutated branch.
+
+**Attempt 2 — added a `${OUT}/SOUL.md` shell case. STILL 8/8.** That path
+*contains* `SOUL.md`, so the mutant's token check succeeded by accident.
+The fixture reached the branch but **did not discriminate**.
+
+**Attempt 3 — `echo x > "$DEST"`: fully dynamic, no basename.** Target
+token absent, yet the operation could reach the target at runtime.
+
+```
+clean            : 16 passed, 0 failed
+under mutation   : 13 passed, 3 failed
+  FAIL target token ABSENT must NOT cause exclusion
+  FAIL it is COULD_REACH
+  FAIL so NO_WRITER is inadmissible   → NO_WRITER wrongly emitted
+```
+
+**A mutation test proves nothing unless the mutation is REACHABLE and
+DISCRIMINATING.** Mine was neither, twice, and "the suite passed" looked
+identical in all three states. Reachability and discrimination are now
+asserted by the fixture itself (`CASE5` asserts `not _fixed`).
+
+### C. THE THIRD FAILURE AXIS — Kai's doctrine, with earned examples
+
+| axis | meaning | earned by |
+|---|---|---|
+| **FABRICATION** | a relationship invented that is not there | D328 — readers recorded as writers; `.pyc` as generators |
+| **ERASURE** | a real relationship missed | D330 — `ast.walk` scrambled multi-segment paths; `PROJECT_BACKLOG` lost |
+| **MISBINDING** | real evidence attached to the wrong subject, scope, time or meaning | tmp `SOUL.md` vs repository `data/SOUL.md`; *"Rev 2 supersedes rev 1"* read as rev 2 being superseded; a writer of one table promoted to whole-document generator; local green applied to CI; a post-mortem read as the failing step; a prose match deciding which workflow consumed `HEAD~1` |
+
+Control order: **EXISTENCE → COMPLETENESS → BINDING.** A result is not
+qualified until all three hold for the claim.
+
+**And MISBINDING struck again inside this entry**: `os.environ["P"]`
+extracted the **dict key** as a path fragment. Real evidence — a string
+constant — bound to the wrong role. It is why B's first mutation was
+vacuous. The doctrine was demonstrated by the instrument written to
+carry it.
+
+### D. Bounded YAML/Make extraction — DESIGN, no shell interpreter
+
+Per Kai: no Bash semantics, no recursive expansion, no command
+substitution.
+
+* **YAML** — parse the document; treat **only `jobs.*.steps[].run`
+  bodies** as shell. Everything else is not shell text. Today the shell
+  regexes run over the whole file, so a path in a `with:` block or a
+  comment is scanned as if it were a command.
+* **Makefile** — isolate recipe bodies (tab-indented lines following a
+  target) before scanning; `$(…)`/`${…}` present ⇒ `UNRESOLVED`.
+* **Redirection** — a bounded declared set: `>`, `>>`, `tee [-a]`,
+  `sed -i`. Anything else is **not** claimed as detected.
+* Variable expansion, command substitution and process substitution
+  remain **UNRESOLVED**, never guessed.
+
+The analyser stays a **declared lower bound**.
+
+### E. Target-scoped demonstration — the SOUL question, without overclaim
+
+```
+data/SOUL.md
+  P13 global : NO_PROVEN_WRITER {unresolved_operations: 889}
+  P14 scoped : NO_PROVEN_WRITER
+     REACHES 0 | EXCLUDED 398 (with witnesses) | COULD_REACH 313
+     top witnesses: directory 'dev' disjoint from 'data' (99),
+                    fixed non-Markdown extension (9+9)
+
+README.md
+  P14 scoped : PROVEN_WRITE_RELATION  scripts/sync_docs.py
+     REACHES 1 | EXCLUDED 251 | COULD_REACH 459
+```
+
+All populations reconcile. **The claim is unchanged — still
+NO_PROVEN_WRITER — but the residual fell from 889 to 313, and every one
+of the 398 exclusions carries a positive witness.** README has *fewer*
+exclusions (251) because it sits at the repository root, so the
+disjoint-directory witness cannot apply — the asymmetry is explainable,
+which is what a witness-bearing exclusion buys.
+
+### F. Newly exposed gaps
+
+**F1 — dict keys extracted as path fragments** (`os.environ["P"]` →
+`"P"`). A MISBINDING in the collector; it silently made a dynamic
+expression look fixed.
+**F2 — my mutation tests were not checked for reachability** until this
+entry. Every earlier "mutation-proven" claim in D328–D331 rests on
+mutations I did not verify were both reachable and discriminating. **I
+am not withdrawing those results — the mutations there did produce
+failures, which is evidence of reachability — but the assertion was
+never explicit.**
+**F3 — YAML/Make scanning remains whole-file** (design in D, not built).
+
+### Status
+
+* R1B **NOT STARTED**. No corpus classification, no authority counts.
+* Suites: P10 125/0 · P11 14/0 · P12 8/0 · P13 7/0 · **P14 16/0** ·
+  reader-writer 7/7. **Instrument NOT frozen.**
+* **No repository file modified beyond this entry.**
+* Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
+  Counts unchanged (Rule 7).
