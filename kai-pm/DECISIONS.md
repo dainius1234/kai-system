@@ -26731,3 +26731,170 @@ continuation of this census.** None of it is started.
 * P1 stands; P0 permanent. `ITEM8_PREFLIGHT_GO` present and spent;
   `ITEM8_GO` **ABSENT**; **Stage 2 NOT AUTHORISED**; counts unchanged
   (Rule 7).
+
+---
+
+## D326 — R1A/R1C executed. Population qualified; two defects in my own instrument.
+
+Kai authorised **R1 read-only with a stronger method**. Executed:
+**R1A** population qualification, **R1C** claim extraction. **R1B
+classification is NOT done** — §4 explains why attempting it on this data
+would have been unsound.
+
+**Read-only. Nothing repaired, moved, reclassified or promoted.**
+
+### 1. R1A — completeness asserted, not assumed
+
+```
+markdown files discovered        : 269
+manifest rows produced           : 269
+ROWS == POPULATION               : YES
+executable/config files scanned  : 1,265
+manifest                         : r1a-manifest.json, 109,917 bytes
+```
+
+Per row: path, title, content sha256, bytes, self-declared status,
+incoming references from executable/config material, incoming references
+from other documents, outgoing document references, commit count, last
+commit date, extracted authority claims.
+
+### 2. KAI'S CAUTION WAS RIGHT, AND THE MEASUREMENT PROVES IT
+
+He refused to let the 144 `CODE_AUDIT_BATCH_*` files be moved on the
+strength of "zero executable references", because that does not prove
+zero *documentary* references.
+
+```
+CODE_AUDIT_BATCH_* files          : 144
+with incoming CODE references     :   0
+with incoming DOCUMENT references :  64
+citing documents: CODE_AUDIT_P2 (11), P3 (7),
+                  BATCH_CROSS_SERVICE_ATTACK_CHAINS (7), P4 (6), …
+```
+
+**64 of them are cited by other documents.** Relocating them would have
+severed 64 provenance links while every executable check stayed green.
+My D325 phrasing — "referenced by 0 of 486 scripts" — was true and would
+have licensed exactly the wrong action.
+
+### 3. THE STRUCTURAL FINDING — citation weight is inverted against maintenance
+
+```
+documents cited by >= 5 other documents AND frozen at the import : 30
+```
+
+Including `STATUS.md` (cited by 14), `SESSION_BOOTSTRAP.md` (10),
+`CODE_AUDIT_REMEDIATION_BACKLOG.md` (10), `SEQUENCE.md` (8),
+`STRATEGIC_PLAN.md` (9), `UH_PROGRESS_TRACKER.md` (6), `RISKS.md` (5).
+
+**The most-cited document in the repository is
+`kai-pm/CODE_AUDIT_MASTER.md` — cited by 57 others — and it is frozen at
+the import.**
+
+Several of these frozen hubs assert currency: `STATUS.md` claims
+`CURRENT/LATEST` + `LAST UPDATED`; `SESSION_BOOTSTRAP.md` claims
+`CURRENT/LATEST` + `PASSING` + `READY/COMPLETE`;
+`CODE_AUDIT_REMEDIATION_BACKLOG.md` claims `AUTHORITATIVE` +
+`CURRENT/LATEST`.
+
+**The documents the repository leans on hardest are the ones nobody has
+touched, and they are the ones claiming to be current.** That is the
+mechanism behind "which document is real?", stated as a measurement
+rather than a feeling.
+
+### 4. TWO DEFECTS IN MY OWN INSTRUMENT — the reason R1B is not done
+
+**(a) Reference counts are unreliable for ambiguously-named files.**
+
+The tell was implausibly identical numbers:
+
+```
+README.md                              in_code=5  in_doc=9
+bootstrap/README.md                    in_code=5  in_doc=9
+data/self-emp/Accounting/README.md     in_code=5  in_doc=9
+data/self-emp/Coding/README.md         in_code=5  in_doc=9
+data/self-emp/Engineering/README.md    in_code=5  in_doc=9
+data/self-emp/Legal/README.md          in_code=5  in_doc=9
+```
+
+Six different documents cannot have identical citation profiles. My
+matcher keys on **bare filename**, so every mention of "README.md"
+anywhere is credited to all six. **This is D322's prose-grep defect
+again, committed inside the census built to find it.**
+
+R1B must match **full relative paths**, with bare-name matching demoted
+to a secondary, separately-reported signal.
+
+**(b) The `declared` field is a raw signal, not a verdict.**
+
+It is captured from the first 4,000 characters, and **a document's header
+may describe OTHER documents**. `CODE_AUDIT_MASTER.md` reports
+`['FINAL', 'SINGLE SOURCE OF TRUTH', 'chronology only', 'not
+authoritative', 'stale']` — but "chronology only" and "not
+authoritative" are what it says about the *historical registers it
+supersedes*, not about itself. Reading that as five contradictory
+self-declarations would be exactly the over-reading this exercise
+condemns.
+
+**Classification requires per-document adjudication of what each string
+refers to. That is R1B, and it cannot be automated from this signal
+alone.**
+
+**(c) Population noise, declared not silenced.** The 269 includes
+`.pytest_cache/README.md`, a generated cache artefact. R1B needs an
+**explicit, recorded** exclusion rule — never a silent filter, because a
+silent filter is how a denominator shrinks unnoticed.
+
+### 5. R1C — extracted authority claims
+
+`docs/PROJECT_BACKLOG.md` carries **six** claim types simultaneously:
+`0 FAILURES`, `ALL GREEN`, `CURRENT/LATEST`, `LAST UPDATED`, `PASSING`,
+`READY/COMPLETE`.
+
+Self-contradicting documents:
+
+* `SESSION_BACKLOG.md` — declares **stale**, claims `CURRENT/LATEST`,
+  `HEALTHY`, `PASSING`, `READY/COMPLETE`.
+* `W1_DASHBOARD_REMEDIATION_PLAN.md` — declares **historical**, claims
+  **AUTHORITATIVE**.
+* `ORION_FIELD_NOTES.md` — declares `CURRENT`, `historical` *and*
+  `stale`.
+
+### 6. KAI'S NEW FINDING — VERIFIED, and it belongs to a class
+
+```
+scripts/sync_docs.py:131        '| **Failures** | 0 |'
+README.md:34                    | **Failures** | 0 |
+README.md:36                    > **Auto-synced** by `make sync-docs`.
+                                  Stale metrics block `make merge-gate`.
+```
+
+Line 131 is a **string literal** in a list where every other row is an
+f-string interpolating a measured metric. It is a constant wearing the
+uniform of a measurement, inside a block that certifies its own currency
+— while three CI workflows are red.
+
+**It is not a distinct root cause. It is the third confirmed instance of
+one class:**
+
+| instance | source |
+|---|---|
+| post-mortem prints `0 service(s) not plainly healthy` over an **empty container table** | D320 §4 |
+| preflight epilogue **asserts** `subject builds run : 0` | D313 §5b |
+| `sync_docs.py` **hard-codes** `Failures \| 0` | here |
+
+**A ZERO THAT WAS WRITTEN, NOT COUNTED — presented inside output that
+reads as measured.** All three are reassuring, all three are unmeasured,
+and all three sit in instruments whose purpose is to report state. Per
+Kai's instruction, **no ID allocated**; it is proposed as a **class**
+rather than a fourth instance.
+
+### 7. Status
+
+* **R1A complete and asserted. R1C complete. R1B NOT DONE** — blocked on
+  the instrument defects in §4, which must be repaired in the census
+  tooling (scratchpad, not the repository) before classification.
+* **Nothing repaired, moved, archived, reclassified or promoted.** No
+  register, README, backlog, workflow, sentinel or Item-8 state touched.
+* Phase B **STOPPED**. `ITEM8_GO` **ABSENT**. **Stage 2 NOT AUTHORISED.**
+  Counts unchanged (Rule 7).
