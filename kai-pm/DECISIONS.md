@@ -27943,3 +27943,136 @@ broken register is what H4 exists to prevent.
   quote characters as targets
 * **P0** `32575388846` · **P1** `32594846522` — both permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D334 — FINAL FREEZE EVIDENCE. Both pre-freeze requirements met.
+
+Kai's ruling accepted: **853 `UNRESOLVED_RELEVANCE` does not block the
+freeze**, and I have not chased it toward zero. Two bounded
+requirements remained; both are now satisfied.
+
+### 1. Durable, cryptographically identified, and RECOVERABLE
+
+The instrument existed only as scratchpad files identified by 16-hex
+prefixes — insufficient for an exact freeze, and contradicting the
+continuity mechanism just installed.
+
+**Exact bytes banked at `kai-pm/house_in_order_instrument/`**, with
+`MANIFEST.sha256` carrying full SHA-256 per artefact plus a
+deterministic aggregate.
+
+```
+retrieval : kai-pm/house_in_order_instrument/  (branch claude/project-rework-plan-pgvp35)
+artefacts : 12
+aggregate : 4a5b40a1c1f1aeb7fe26d5341f71b039360f69e22784a6d0fcddfb200fbd3f1e
+verify    : cd kai-pm/house_in_order_instrument && sha256sum -c MANIFEST.sha256
+```
+
+Full hashes (abbreviated here; complete values in `MANIFEST.sha256`):
+`genlink3.py af5a7d9f…dcccd` · `genlink.py` · `doccensus2.py 289cf9da…8deb` ·
+`calibrate2.py c9c596ba…bf52` · `cal_p14.py 7503d6b4…e025` ·
+`cal_p13.py 556ff395…3425` · `cal_p12.py 72a69aa7…bc3f` ·
+`cal_p11.py 32857714…9346` · `cal_gen.py 3fe493dd…bb80` ·
+`cal_boundary.py 03c32a59…79e2` · `AUTHORITY_ONTOLOGY.md 2ad79be0…a256` ·
+`README.md`
+
+### 2. A DEFECT IN THE FREEZE PACKAGE — found by running it, not hashing it
+
+The first attempt banked **11** artefacts. Every recorded hash verified
+**OK** from a fresh clone, and the aggregate matched.
+
+**Two of seven suites then failed to run.** `cal_p11.py` and
+`cal_gen.py` import `genlink.py`, which was **never banked** —
+`ModuleNotFoundError` from the clone.
+
+**A MANIFEST THAT VERIFIES IS NOT AN INSTRUMENT THAT RUNS.** Hash
+integrity proves the bytes *present* are the bytes recorded; it says
+nothing about the bytes **absent**. That is the **ERASURE** axis applied
+to the freeze package itself — and it is exactly why Kai required proof
+that *retrieval reproduces the instrument*, not merely that hashes were
+recorded. Had the requirement been "record full hashes", this freeze
+would have shipped broken with a perfect manifest.
+
+**A second, smaller instance of the same discipline:** my commit chain
+was `make policy-check && git commit && git push`. Policy-check failed
+on doc staleness, so **nothing was committed** — and I noticed only
+because the verification clone reported the **old** HEAD. R3's `&&`
+stopped the chain exactly as intended; checking the clone's HEAD is what
+revealed it.
+
+### 3. BOUNDARY-PRESERVING REPAIR — adopted and proven
+
+Kai's property: a classifier repair must prove **both** the corrected
+known-bad case **and** a same-family counterexample on the opposite side
+of the boundary.
+
+`cal_boundary.py` — **5 pairs, 10 assertions, 10/10**:
+
+| pair | corrected case | opposite-side counterexample |
+|---|---|---|
+| 1 | `/dev/null` → ABSOLUTE_SYSTEM | dynamic prefix + `"/SOUL.md"` → COULD_REACH, **not** absolute from its suffix |
+| 2 | subscript key not a path | a real literal path **still** resolves |
+| 3 | `>` never captured | the real redirect target **is** captured |
+| 4 | `ROOT/"data"/"SOUL.md"` resolves in source order | an unrelated multi-segment path does **not** reach the target |
+| 5 | `.json` excluded on a positive extension witness | an extensionless literal is **not** excluded |
+
+**Proven to detect boundary collapse**: reintroducing the H0.2 bug
+("looks absolute" beats dynamic) leaves **PAIR1a passing** and fails
+**PAIR1b**. One side passing is precisely what the pair rejects.
+
+### 4. Reproduction check — hashes AND execution, from a fresh clone
+
+```
+clone HEAD b86d5e31…
+  12/12 artefacts verify OK · aggregate MATCHES
+  cal_p11 14/0 · cal_p12 8/0 · cal_p13 7/0 · cal_p14 22/0
+  cal_gen 7/0 · cal_boundary 10/0 (5 pairs) · calibrate2 125/0
+```
+
+### 5. Declared blind spots — part of the freeze, not omissions from it
+
+Whole-file YAML/Make scanning · bounded redirection set only ·
+single-level literal binding only · `RESOLVED_NON_DOCUMENT_TARGET` rests
+on extension and tracked-path witnesses · **853
+`UNRESOLVED_RELEVANCE` operations open by design** · static analysis is
+**corroborative and lower-bound**, and may never assign GENERATION,
+authority, or a negative claim beyond its constructive-exclusion rules.
+
+### 6. Proposed frozen version identifier
+
+**`HOUSE-IN-ORDER-CENSUS-INSTRUMENT v1.0`**, aggregate
+`4a5b40a1c1f1aeb7fe26d5341f71b039360f69e22784a6d0fcddfb200fbd3f1e`,
+banked at `kai-pm/house_in_order_instrument/`.
+
+**Freeze remains PROPOSED. Kai and the operator grant it.**
+
+---
+
+## THREAD RECOVERY BLOCK — D334
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **FROZEN SUBJECT** — `9d15bcd207ad7a33e1087667b245970f989e366f`, tree
+  `627104d61b4f91e110a36cf65a44fed2cfbad078` (≠ reporting tree, by design)
+* **INSTRUMENT** — `kai-pm/house_in_order_instrument/`, aggregate
+  `4a5b40a1…1d77`, 12 artefacts, verified and executed from a fresh clone
+* **CURRENT WORKSTREAM** — House-in-Order **H0-final**; freeze proposed
+* **LAST PROVEN STATE** — both pre-freeze requirements met; all seven
+  suites green from a clone; boundary preservation proven to detect
+  collapse; one freeze-package defect found and repaired
+* **AUTHORISED NEXT ACTION** — none. Await the freeze ruling. On grant,
+  **H1**: select a fresh exact current tree, run the frozen census once,
+  capture the real current population
+* **EXPLICITLY NOT AUTHORISED** — H2 classification · R2+ mutation ·
+  document/register repair · Phase B · `ITEM8_GO` · six subject builds ·
+  Stage 2 · repair of the seven research obligations · investigation of
+  `=0.2.0` (reserved for A-4 provenance)
+* **OPEN / UNRESOLVED** — 853 `UNRESOLVED_RELEVANCE` (accepted) ·
+  whole-file YAML/Make scanning · KAI-GATE register covers 20 of 51 ids ·
+  three-way closure-count contradiction (STATUS 9 / register 11 /
+  architecture 0) · seven research obligations
+* **CORRECTIONS TO PRIOR RECORDS** — D333's freeze proposal listed 9
+  artefacts and 16-hex prefixes; **superseded** by the 12-artefact,
+  full-SHA-256, execution-verified package here
+* **P0** `32575388846` · **P1** `32594846522` — both permanent. Counts
+  unchanged (Programme Rule 7).
