@@ -2,26 +2,70 @@
 
 > **STATUS: OPERATOR / PROGRAMME CONTROL REGISTER — PLANNING STATE ONLY, NOT IMPLEMENTATION AUTHORITY.**
 >
-> Purpose: make the D344 primary-mission/identity/lineage correction and its propagation status impossible to lose between threads. This register separates **already aligned**, **durably bound by the new root**, **direct rewrite still open**, and **intentionally deferred because current programme/frozen work must not be contaminated**.
+> Purpose: make the primary-mission/identity/lineage correction and the subsequent master-architecture consolidation impossible to lose between threads. This register separates **already aligned**, **durably consolidated**, **direct rewrite still open**, and **intentionally deferred because current programme/frozen work must not be contaminated**.
 >
-> Current root architecture: `KINGSMAN_ROOT_ARCHITECTURE_AND_CANON_ALIGNMENT.md`
+> **Current primary master review subject:** `KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDATE_V0_2.md`
+>
+> **Current zero-loss input manifest:** `KINGSMAN_MASTER_CANON_INPUT_MANIFEST_V0_2.md`
+>
+> **Current external-review packet:** `DEEPSEEK_REVIEW_PACKET_KINGSMAN_MASTER_CANDIDATE_V0_2.md`
+>
+> **Pending canonical decision queue:** `DECISIONS_CANONICAL_APPEND_QUEUE_D344_D347.md`
 >
 > Root doctrine: `KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md`
->
-> Governance recovery: `D344_PRIMARY_MISSION_IDENTITY_LINEAGE_CANON_CORRECTION.md` + `D344A_PRIMARY_MISSION_CANON_ALIGNMENT_CHECKPOINT.md`
+
+---
+
+## D347 current control state
+
+### Consolidated / banked
+
+- [x] Primary mission / identity / lineage doctrine.
+- [x] Root whole-system architecture alignment.
+- [x] Proactive-organism doctrine.
+- [x] Organic resilience/evolvability doctrine.
+- [x] Contingency/fail-safe design obligation.
+- [x] Long-horizon stewardship/succession/self-sufficiency doctrine.
+- [x] Deterministic engineering-visual standard.
+- [x] Current deterministic engineering drawing set v0.1.
+- [x] **Whole-system Master Architecture & Professionalisation Candidate v0.2.**
+- [x] **Master Canon Input & Zero-Loss Manifest v0.2.**
+- [x] **DeepSeek adversarial review packet v0.2.**
+- [x] **Canonical `DECISIONS.md` append queue D344–D347.**
+- [x] D344/D344A/D345/D346/D347 standalone governance recovery records.
+
+### Still OPEN — do not call fully synchronized/frozen
+
+- [ ] DeepSeek v0.2 adversarial review.
+- [ ] Kai verification/reconciliation of DeepSeek findings.
+- [ ] Orion complete current-service/component/dependency/state-owner/consumer map.
+- [ ] Discriminating implementation spikes where architecture cannot be settled by design review.
+- [ ] Engineering drawing set v0.2 aligned to master candidate.
+- [ ] Direct reconciliation/supersession of legacy master-plan/puzzle/Phase2/continuity/README/A4/final-product/Hunter surfaces.
+- [ ] Operator mission-control implementation/specification aligned to machine truth.
+- [ ] Canonical `kai-pm/DECISIONS.md` byte-safe append.
+- [ ] Dainius final review/approval.
+- [ ] Exact-byte `KINGSMAN_MASTER_CANON_v1` freeze.
+
+Correct current statement:
+
+> **MASTER CANDIDATE CONSOLIDATED — FINAL CANON NOT YET FROZEN / DOCUMENT ECOSYSTEM NOT YET FULLY SYNCHRONIZED.**
+
+A consolidated v0.2 does not turn the remaining direct-sync tasks into completion. It gives them one explicit destination and traceability manifest.
 
 ---
 
 ## Status legend
 
 - `[x] ALIGNED` — current file already expresses the corrected root interpretation materially.
-- `[~] ROOT-BOUND` — older file remains an input, but D344/D344A explicitly require it to be read through the new root architecture until directly reconciled.
+- `[x] CONSOLIDATED` — material concept is represented in the current master v0.2 subject even if an older source still awaits direct synchronization.
+- `[~] ROOT-BOUND` — older file remains an input, but D344–D347 require it to be read through the current root/master architecture until directly reconciled.
 - `[ ] DIRECT SYNC OPEN` — specific future edit/reconciliation is still required.
 - `[F] FROZEN / DO NOT TOUCH NOW` — current frozen/experimental/programme authority prevents opportunistic change.
 - `[H] HISTORICAL INPUT` — retain for intent/evidence; do not present as current standalone architecture.
 - `[?] QUALIFY FIRST` — currentness/authority must be measured before relying on the file.
 
-A `[~]` is **not completion**. It is a safety binding that prevents stale hierarchy from propagating while the direct reconciliation remains open.
+A `[~]` is **not completion**.
 
 ---
 
@@ -30,10 +74,13 @@ A `[~]` is **not completion**. It is a safety binding that prevents stale hierar
 | Status | Surface | Current interpretation / obligation |
 |---|---|---|
 | [x] | `KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md` | Root mission, Kai-as-organism, lineage, core/evolvable/learned-state split. |
-| [x] | `KINGSMAN_ROOT_ARCHITECTURE_AND_CANON_ALIGNMENT.md` | Whole-system architecture now rooted in mission/identity/lineage. |
-| [x] | `KINGSMAN_PRIMARY_MISSION_CANON_PROPAGATION_MAP.md` | Lists exact cross-document corrections. |
-| [x] | `D344_PRIMARY_MISSION_IDENTITY_LINEAGE_CANON_CORRECTION.md` | Durable decision recovery artifact; canonical ledger append still open. |
-| [x] | `D344A_PRIMARY_MISSION_CANON_ALIGNMENT_CHECKPOINT.md` | Confirms architecture alignment banked and preserves programme no-go. |
+| [x] | `KINGSMAN_ROOT_ARCHITECTURE_AND_CANON_ALIGNMENT.md` | Whole-system architecture rooted in mission/identity/lineage. |
+| [x] | `KINGSMAN_PRIMARY_MISSION_CANON_PROPAGATION_MAP.md` | Cross-document correction obligations preserved. |
+| [x] | `KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDATE_V0_2.md` | Current consolidated master review subject. |
+| [x] | `KINGSMAN_MASTER_CANON_INPUT_MANIFEST_V0_2.md` | Zero-loss source/disposition traceability. |
+| [x] | `D344_PRIMARY_MISSION_IDENTITY_LINEAGE_CANON_CORRECTION.md` | Durable governance recovery artifact; canonical ledger append still open. |
+| [x] | `D344A_PRIMARY_MISSION_CANON_ALIGNMENT_CHECKPOINT.md` | Root hierarchy banked, programme no-go preserved. |
+| [x] | `D347_MASTER_ARCHITECTURE_CONSOLIDATION_CHECKPOINT.md` | Records v0.2 consolidation and correct incomplete status. |
 
 **Root rule:**
 
@@ -47,13 +94,14 @@ Do not invert this into “features first, mission later.”
 
 | Status | Surface | Current interpretation / obligation |
 |---|---|---|
-| [~] [ ] | `KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md` | Must gain Layer 0 root mission/identity/lineage; lineage continuity; proactive foundation; long-horizon stewardship as root time dimension; final freeze tests from root alignment. |
-| [~] [ ] | `KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md` | Must gain Layer 0 above A–E and redraw flows from mission → canon → assurance/runtime → resilience/stewardship → Phase 2 → operator. |
-| [~] [ ] | `KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md` | Treat as historical/current design input until currentness qualified and reconciled; future replacement must be rooted in mission and lineage. |
-| [~] [ ] | `KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` | Preserve one-hunter idea but ensure Hunter is an organ/coordinator, not Kai identity or parallel authority. |
-| [x] | `KINGSMAN_ARCHITECTURAL_PILLARS_INDEX.md` | Already places seven pillars under primary mission/identity/lineage root. |
-
-**Definition of alignment:** old service/model diagrams may remain as evidence/history, but no current master view may define Kai by its model roster, containers or framework.
+| [x] [~] | `KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDATE_V0_2.md` | Current comprehensive master candidate. Review/freeze still open. |
+| [~] [ ] | `KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md` | Semantics consolidated into v0.2; direct update/supersession still required. |
+| [~] [ ] | `KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md` | Semantics consolidated into v0.2; direct Layer-0/current-target refresh still required. |
+| [~] [ ] | `KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md` | Integrated as historical/current design input; direct supersession/currentness classification still required. |
+| [~] [ ] | `KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` | One-hunter concepts integrated; direct supersession/currentness classification still required. |
+| [x] | `KINGSMAN_ARCHITECTURAL_PILLARS_INDEX.md` | Seven pillars under primary mission/identity/lineage root. |
+| [x] | `KINGSMAN_ENGINEERING_ARCHITECTURE_VISUAL_STANDARD.md` | Architecture visual is engineering model, not decoration. |
+| [x] [ ] | `KINGSMAN_ENGINEERING_ARCHITECTURE_DRAWING_SET_V0_1.md` | Deterministic drawing set exists; v0.2 refresh still required. |
 
 ---
 
@@ -62,10 +110,11 @@ Do not invert this into “features first, mission later.”
 | Status | Surface | Current interpretation / obligation |
 |---|---|---|
 | [x] | `KINGSMAN_PROACTIVE_ORGANISM_DOCTRINE.md` | Proactivity is foundational organism behaviour under governed authority. |
-| [~] [ ] | Cognitive council / Global Workspace / swarm / specialist plans | Reconcile as replaceable cognitive organs under one evidence/authority path. No specialist becomes sovereign Kai. |
-| [~] [ ] | Model runtime / hardware residency plans | Reconcile to replaceable-organ model; model selection is a resource/role question, not identity. |
-| [~] [ ] | Memory / identity / relationship architecture | Must separate core invariants, trusted learned state and successor-specific relationship state; preserve provenance. |
-| [~] [ ] | Perception / world-state architecture | Must serve proactive awareness while keeping prediction/inference separate from fact/evidence. |
+| [x] | master candidate v0.2 | First-class Goals/Obligations/Commitments/Watches/Time/Attention architecture. |
+| [~] [ ] | Cognitive council / Global Workspace / swarm / specialist implementations | Reconcile as replaceable cognitive organs under one evidence/authority path. |
+| [~] [ ] | Model runtime / hardware residency implementations | Model Runtime Manager target defined; repo feasibility/measurement still required. |
+| [~] [ ] | Memory / identity / relationship implementations | Target classes/ownership defined; current responsibilities still require Orion map. |
+| [~] [ ] | Perception / world-state implementations | Strong seeds identified; durability/provenance migrations still future work. |
 
 Canonical runtime path:
 
@@ -78,11 +127,11 @@ Canonical runtime path:
 | Status | Surface | Current interpretation / obligation |
 |---|---|---|
 | [F] | House-in-Order current frozen work | Do not mutate because of architecture reconciliation. Truth qualification remains upstream evidence discipline. |
-| [F] | KAI-GATE-048 | No scope expansion or redesign from this canon work. |
+| [F] | KAI-GATE-048 | No scope expansion/redesign from master-canon work. |
 | [F] | Item 8 | Separately governed. **ITEM 8 BEFORE A4.** No architecture document authorises execution. |
-| [~] [ ] | `A-4 PROVENANCE` future work | Later programme stage; identity/provenance/lineage lessons may feed it when authorised. Distinct from FUTURE A4. |
-| [~] [ ] | Evidence Plane | Must carry qualified evidence/provenance/identity/applicability into cognition/policy without becoming a second authority. |
-| [~] [ ] | Identity/auth architecture | Preserve **MEMBERSHIP ≠ IDENTITY**; identity-sensitive paths need receiver-verifiable principal/provenance, not shared membership alone. |
+| [~] [ ] | `A-4 PROVENANCE` future work | Later programme stage; distinct from Future A4. |
+| [x] [~] | Evidence Plane target | Master candidate defines role; implementation/assurance sequencing remains future work. |
+| [~] [ ] | Identity/auth rollout | Preserve `MEMBERSHIP ≠ IDENTITY ≠ AUTHORITY`; full rollout still requires qualification. |
 
 ---
 
@@ -92,13 +141,14 @@ Canonical runtime path:
 |---|---|---|
 | [x] | `KINGSMAN_ORGANIC_RESILIENCE_ARCHITECTURE_DOCTRINE.md` | One organism, bounded failure domains, replaceable organs, truthful degradation. |
 | [x] | `KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md` | Shared qualified recovery knowledge, not a second recovery authority. |
-| [~] [ ] | `A4_SELF_DIAGNOSIS_EVOLUTION.md` / FUTURE A4 | Must eventually understand dependency graph, lineage divergence, migration failures, learned-state corruption and long-horizon risks. |
-| [~] [ ] | House Doctor / Supervisor / FSM / anomaly / healing paths | Reconcile into one Self-Diagnosis & Recovery architecture: `SEE → UNDERSTAND → DIAGNOSE → EXPLAIN → PROPOSE → APPROVE → HEAL → VERIFY → LEARN`. |
-| [~] [ ] | `common/resilience.py` and related runtime mechanisms | Qualify/evolve existing foundation before inventing another resilience plane. |
+| [x] [~] | master candidate v0.2 | Integrates Telemetry → Structure Graph → Doctor → Contingency → Authority → Recovery → Verification. |
+| [~] [ ] | `A4_SELF_DIAGNOSIS_EVOLUTION.md` | Semantics integrated; direct update still required when appropriate. |
+| [~] [ ] | House Doctor / Supervisor / FSM / anomaly / healing implementations | Current responsibilities still require full component/consumer map and migration plan. |
+| [~] [ ] | `common/resilience.py` | Retain primitives; qualify/evolve into governed architecture. |
 
-Standing state vocabulary where applicable:
+Standing state vocabulary:
 
-`HEALTHY / DEGRADED / RECOVERING / UNAVAILABLE / QUARANTINED / UNKNOWN-UNMEASURED`
+`HEALTHY / DEGRADED / RECOVERING / UNAVAILABLE / QUARANTINED / UNKNOWN-UNMEASURED`.
 
 ---
 
@@ -106,13 +156,11 @@ Standing state vocabulary where applicable:
 
 | Status | Surface | Current interpretation / obligation |
 |---|---|---|
-| [x] | `KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md` | Core mission time-dimension: temporary absence, permanent succession, identity continuity, funding, dependencies, family protection. |
-| [~] [ ] | Future succession architecture | Must distinguish temporary silence from permanent succession; no dead-man timer alone; legal/human/evidence authority required. |
-| [~] [ ] | Future Financial Sustainability Plane/equivalent | Lawful bounded survival funding; no unlimited mandate, self-created debt, hidden positions or family-asset reinterpretation. |
-| [~] [ ] | Backup / restore / migration architecture | Must prove lineage/invariants survived, not only that bytes/services restarted. |
-| [~] [ ] | Dependency survivability plan | Critical providers/models/packages/credentials/hardware need replacement/migration/degraded-mode strategy. |
-
-Standing distinction:
+| [x] | `KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md` | Core mission time dimension. |
+| [x] [~] | master candidate v0.2 | Backup/restore/lineage, EOL registry, runway, safe preservation, succession boundaries integrated. |
+| [ ] | Future succession architecture | Legal/human/technical design remains explicitly future/high-consequence. |
+| [ ] | Financial Sustainability / Runway implementation | Proposal/read/control design only; no autonomous finance authorised. |
+| [ ] | automated restore drills / lineage proof | Required before long-horizon maturity. |
 
 > **SELF-SUFFICIENCY IS NOT UNCONTROLLED SELF-PRESERVATION.**
 
@@ -122,14 +170,14 @@ Standing distinction:
 
 | Status | Surface | Current interpretation / obligation |
 |---|---|---|
-| [~] [ ] | `HOUSE_IN_ORDER_PHASE2_PROFESSIONALISATION.md` | Directly add mission-fit, organ identity, stable contract, replaceability, continuity, proactive role, short/long failure story and operator-view checks. |
-| [~] [ ] | Component/file review templates | Every surviving idea gets intent recovery before disposition. Poor implementation ≠ poor idea. |
-| [~] [ ] | Maturity criteria S0–S5 | S5 requires mission fit, evidence, authority, resilience, replaceability/continuity and operator legibility where applicable. |
-| [~] [ ] | Repo/branch/merge professionalisation | Must preserve historical evidence and controlled supersession; no “tidy” deletion that destroys lineage/lessons. |
+| [x] [~] | master candidate v0.2 W0–W9 + 24-question organ template | Consolidated professionalisation destination/dependency plan exists. |
+| [~] [ ] | `HOUSE_IN_ORDER_PHASE2_PROFESSIONALISATION.md` | Semantics integrated; direct update/supersession still open. |
+| [~] [ ] | Component/file review templates | Must consume v0.2 organ/maturity/continuity/failure requirements. |
+| [~] [ ] | Repo/branch/merge professionalisation | Preserve historical evidence and controlled supersession. |
 
-Phase-2 flow now reads:
+Phase-2 flow:
 
-`INTENT → MISSION FIT → CURRENT REALITY → DEPENDENCIES/AUTHORITY → ROOT CANON GAP → PRESERVE/REWORK/MERGE/REHOME → CONTRACT/FAILURE/REPLACEMENT DESIGN → REVIEW → IMPLEMENT → VERIFY → CONTINUITY CHECK → DOC/OPERATOR SYNC → BANK`
+`INTENT → MISSION FIT → CURRENT REALITY → DEPENDENCIES/AUTHORITY → ROOT CANON GAP → PRESERVE/REWORK/MERGE/REHOME → CONTRACT/FAILURE/REPLACEMENT DESIGN → REVIEW → IMPLEMENT → VERIFY → CONTINUITY CHECK → DOC/OPERATOR SYNC → BANK`.
 
 ---
 
@@ -138,10 +186,11 @@ Phase-2 flow now reads:
 | Status | Surface | Current interpretation / obligation |
 |---|---|---|
 | [x] | `OPERATOR_VISIBILITY_ENGINEERING_DOCTRINE.md` | Operator legibility is part of governance/control loop. |
-| [x] | `PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md` | Current docs sync is narrow; future generated/checked state required. |
-| [~] [ ] | `KINGSMAN_README_ARCHITECTURE_REFRESH_PLAN.md` | Front page must lead with WHY KAI EXISTS → WHAT KAI IS → HOW IT OPERATES → HOW IT GROWS → WHERE IT ACTUALLY IS. |
-| [~] [ ] | README / architecture graphics | Intentionally not rewritten during frozen House work; must ultimately derive from qualified truth. |
-| [~] [ ] | Mission-control dashboard | Must show whole organism, maturity, evidence, risks, degraded state, contingencies, lineage, runway/succession risks, approvals and recent changes. |
+| [x] | `PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md` | Current docs sync narrow; future generated/checked state required. |
+| [x] [~] | master candidate v0.2 | Defines five mission-control views and evidence-bearing status requirements. |
+| [~] [ ] | `KINGSMAN_README_ARCHITECTURE_REFRESH_PLAN.md` | Semantics integrated; direct update/supersession remains open. |
+| [ ] | README / front-page implementation | Intentionally not rewritten from unqualified/stale truth. |
+| [ ] | Mission-control dashboard implementation | Target defined; implementation/claim binding future work. |
 
 Operator rule:
 
@@ -153,9 +202,10 @@ Operator rule:
 
 | Status | Surface | Current interpretation / obligation |
 |---|---|---|
-| [~] [ ] | `KAI_ORION_CONTINUITY.md` | Already recovers resilience/stewardship/pillars, but fresh-thread algorithm should directly require the primary-mission doctrine + root architecture + D344/D344A before consequential canon/identity/succession work. |
-| [x] | D344/D344A recovery artifacts | Prevent correction being lost while large canonical ledger append is unsafe. |
-| [ ] | Canonical `kai-pm/DECISIONS.md` append | **OPEN.** Retrieve exact bytes safely, verify terminal entry/blob, append without reconstructing history, mechanically confirm prefix/history preservation. |
+| [~] [ ] | `KAI_ORION_CONTINUITY.md` | Existing recovery protocol remains useful but must directly point at v0.2/D347 in a future safe update. |
+| [x] | D344–D347 standalone records | Current architecture/governance sequence recoverable without chat memory. |
+| [x] | `DECISIONS_CANONICAL_APPEND_QUEUE_D344_D347.md` | Exact zero-loss bridge for pending canonical entries. |
+| [ ] | Canonical `kai-pm/DECISIONS.md` append | **OPEN.** Requires exact-byte/prefix-preserving append verification. |
 
 No thread may claim canonical-ledger propagation complete until the exact append is verified.
 
@@ -184,44 +234,39 @@ Programme sequencing remains controlled by the latest valid canonical D-numbered
 
 ---
 
-## K. Synchronisation completion criteria
+## K. Master-canon freeze completion criteria
 
-The D344 correction is considered **fully propagated at planning/document level** only when:
+The architecture programme is not complete until:
 
 - [x] root mission doctrine exists;
-- [x] root whole-system architecture exists;
-- [x] D344 decision recovery exists;
-- [x] D344A alignment checkpoint exists;
-- [x] propagation map exists;
-- [x] architectural pillars index is rooted correctly;
-- [x] organic resilience doctrine is rooted correctly;
-- [x] long-horizon stewardship doctrine is rooted correctly;
-- [x] proactive doctrine is rooted correctly;
-- [ ] master canon plan directly reconciled;
-- [ ] puzzle map directly reconciled;
-- [ ] Phase-2 plan directly reconciled;
-- [ ] continuity fresh-thread algorithm directly reconciled;
-- [ ] README refresh plan directly reconciled;
-- [ ] Future A4/self-diagnosis plan directly reconciled;
-- [ ] current whole-product architecture specification rebuilt/reconciled from qualified evidence;
-- [ ] operator mission-control design reflects the rooted architecture;
+- [x] comprehensive master candidate v0.2 exists;
+- [x] zero-loss input manifest exists;
+- [x] DeepSeek v0.2 review packet exists;
+- [x] deterministic visual standard exists;
+- [x] D344–D347 governance recovery exists;
+- [x] canonical append queue exists;
+- [ ] DeepSeek v0.2 review completed;
+- [ ] Kai review/reconciliation completed;
+- [ ] Orion complete current→target map completed;
+- [ ] material discriminating spikes completed/decided;
+- [ ] engineering drawings v0.2 reconciled;
+- [ ] legacy planning surfaces directly reconciled/superseded;
 - [ ] canonical `DECISIONS.md` safely appended;
-- [ ] DeepSeek adversarial review completed at the appropriate master-canon checkpoint;
-- [ ] Orion repo-feasibility/component map completed at the appropriate master-canon checkpoint;
-- [ ] Dainius approves/finally freezes the reconciled master canon.
+- [ ] Dainius approves final design;
+- [ ] exact `KINGSMAN_MASTER_CANON_v1` + diagrams + manifest frozen/hashed.
 
-Until those boxes are closed with evidence, do not describe the master canon as fully synchronised/frozen.
+Until those boxes are closed with evidence, do not describe the master canon as final/frozen/fully synchronized.
 
 ---
 
 ## L. Plain-language control statement
 
-We have now recovered **why Kai exists** and **what Kai is**.
+We now have the **one professional master candidate that the previous handoff should have made clearer was still outstanding**.
 
-The remaining job is to make every plan, diagram, service family and future implementation point in the same direction without destroying the experiments, evidence and good ideas that got us here.
+The architecture is no longer dependent on a collection of chat explanations or one generic diagram. Its source set, current repo seeds, gaps, target organs, professionalisation path and unresolved decisions are consolidated and traceable.
 
-Nothing is silently dropped. Every unsynchronised surface stays on this register until it is either:
+The remaining work is review, repo mapping, measured resolution of contested choices, direct legacy-document synchronization, canonical decision append and Dainius's final freeze.
 
-`RECONCILED / SUPERSEDED WITH REASON / RETAINED AS HISTORICAL INPUT / OR EXPLICITLY REJECTED BY GOVERNED DECISION.`
+Nothing is silently dropped. Every remaining item stays visible until it is:
 
-There is no category called **forgotten**.
+`RECONCILED / SUPERSEDED WITH REASON / RETAINED AS HISTORICAL INPUT / REJECTED BY GOVERNED DECISION / OR EXPLICITLY LEFT UNKNOWN PENDING EVIDENCE.`
