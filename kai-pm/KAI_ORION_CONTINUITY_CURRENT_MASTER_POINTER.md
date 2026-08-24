@@ -16,7 +16,7 @@ Before consequential Kingsman/master-canon/Phase-2 architecture advice, recover:
 4. D344 through D348 standalone checkpoints.
 5. `kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md`.
 6. `kai-pm/KINGSMAN_EXISTING_KAI_EVOLUTION_MASTER_PLAN_V0_3.md` — current primary architecture candidate, not frozen.
-7. `kai-pm/KAI_RECONCILIATION_DEEPSEEK_EXISTING_KAI_EVOLUTION_V0_3.md` — **mandatory repo-backed correction layer after DeepSeek review**.
+7. `kai-pm/KAI_RECONCILIATION_DEEPSEEK_EXISTING_KAI_EVOLUTION_V0_3.md` — **mandatory repo-backed correction layer after DeepSeek review and standing role definition**.
 8. `kai-pm/DEEPSEEK_REVIEW_PACKET_EXISTING_KAI_EVOLUTION_V0_3.md` — review prompt/history, not authority.
 9. `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_3.md`.
 10. `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_3.md`.
@@ -25,29 +25,57 @@ Before consequential Kingsman/master-canon/Phase-2 architecture advice, recover:
 
 ## 2. Current correct status
 
-> **v0.3 EXISTING-KAI EVOLUTION REVIEWED BY DEEPSEEK AND RECONCILED BY KAI — v0.4 CHANGE SET / FINAL CANON NOT YET AUTHORED OR FROZEN — DOCUMENT/CANONICAL DECISION SYNCHRONISATION STILL OPEN.**
+> **v0.3 EXISTING-KAI EVOLUTION REVIEWED BY DEEPSEEK AS KAI'S ANALYSIS INSTRUMENT AND RECONCILED BY KAI — v0.4 CHANGE SET / FINAL CANON NOT YET AUTHORED OR FROZEN — DOCUMENT/CANONICAL DECISION SYNCHRONISATION STILL OPEN.**
 
 Do not reconstruct the state as:
 
 - “nothing after D343 happened” — false;
 - “DeepSeek's review is accepted verbatim” — false;
+- “DeepSeek is a project co-authority/co-architect” — false;
 - “v0.2 is current review subject” — false;
 - “Kai needs a fresh architecture from scratch” — false;
 - “Unified Hunter final-hand cutover is complete” — false;
 - “master canon is final/frozen” — false.
 
-## 3. Current subject identities
+## 3. Standing multi-mind role law
+
+DeepSeek is an **external specialist analysis instrument used by Kai**. It is not an independent owner of Kai's philosophy, mission, repository truth, history, architecture or programme order.
+
+Its purpose is to challenge, attack, suggest alternatives, identify hidden failure modes and propose discriminating tests.
+
+Kai remains responsible for reconciling all DeepSeek output against:
+
+- current repo evidence;
+- accumulated design/programme history;
+- Dainius's philosophy and intended destination;
+- existing architecture and capability-retention obligations;
+- standing evidence/authority rules.
+
+DeepSeek recommendations are therefore never promoted directly into the plan.
+
+Standing workflow:
+
+`KAI DEFINES QUESTION + QUALIFIED CONTEXT`
+→ `DEEPSEEK ATTACKS / PROPOSES`
+→ `KAI RECONCILES REPO + HISTORY + PHILOSOPHY + ARCHITECTURE`
+→ `KAI ACCEPTS / MODIFIES / REJECTS`
+→ `ORION VERIFIES/EXECUTES APPROVED WORK WHEN USEFUL`
+→ `DAINIUS FINAL PROJECT AUTHORITY`.
+
+> **MULTIPLE MINDS — ONE EVIDENCE STANDARD — KAI OWNS ARCHITECTURAL RECONCILIATION — DAINIUS OWNS FINAL PROJECT AUTHORITY.**
+
+## 4. Current subject identities
 
 - v0.3 Existing-Kai Evolution Master Plan: `98dc2560c0204dd9c58d823dbd8c07754704276a`
 - v0.3 DeepSeek packet: `1d189de2cfd7b20499b7b7fc8bb8981915672350`
 - D348: `c683a533fc984afa63cf890541ae7842c34f76b5`
-- Kai DeepSeek reconciliation: `89fdd1b820e245550fe2574d26ef17e6651f4dec`
+- Kai DeepSeek reconciliation latest role-clarified commit: `41dbf9ee0cdac7f3b83f0ad602f65b632a1879e2`
 - D349 checkpoint: `8a949da867045a61563e59d608bf6d0f29521211`
 - D344–D349 append queue: `f6713b50a4f829b81bc0f68b6568d33c763056b5`
 - v0.3 architecture authority index: `343d7d4f736a89fb3944054051276f1d9da3def0`
 - v0.3 synchronisation register: `c14232a8e93bc6d785de8adaf72cd6226a739497`
 
-## 4. Mandatory D349 corrections
+## 5. Mandatory D349 corrections
 
 ### KAI-REV-016 — final-hand capability blocker
 
@@ -67,7 +95,7 @@ Current autonomy grants are process-local and current preflight constructs a fre
 
 Manual operator-approved actions do **not** universally require `KAI_AUTONOMY_ENFORCE=true`; autonomous initiation does.
 
-## 5. Architecture intent that survives
+## 6. Architecture intent that survives
 
 - Kai is the organism; models/frameworks/services/hardware are replaceable organs.
 - Existing Kai is substantial; no blank-sheet redesign.
@@ -82,7 +110,7 @@ Manual operator-approved actions do **not** universally require `KAI_AUTONOMY_EN
 - Feature flags remain selectors; evidence-bound migration/release state governs promotion.
 - Egress/target constraints belong in policy/exact capability and final-hand enforcement.
 
-## 6. Programme order remains separate
+## 7. Programme order remains separate
 
 This pointer authorises no implementation/experiment.
 
@@ -90,7 +118,7 @@ Preserve latest valid canonical D-numbered sequence, including House-in-Order, K
 
 No architecture/review document authorises H2 v1.1, runtime refactor, service merge/delete, succession, autonomous finance or uncontrolled self-modification.
 
-## 7. Next architecture action
+## 8. Next architecture action
 
 Prepare a **v0.4 delta/change set**, not a fresh architecture, carrying only repo-supported/corrected D349 findings. Before freezing physical service homes for memory/proactivity/model runtime, complete the exact current component/reader/writer/authority census and any discriminating spikes.
 
