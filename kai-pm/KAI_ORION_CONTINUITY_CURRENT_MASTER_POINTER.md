@@ -20,8 +20,9 @@ For any consequential Kingsman/master-canon/Phase-2/identity/lineage/proactivity
 8. `kai-pm/D347_MASTER_ARCHITECTURE_CONSOLIDATION_CHECKPOINT.md`.
 9. `kai-pm/KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDATE_V0_2.md` — **current primary master review subject**.
 10. `kai-pm/KINGSMAN_MASTER_CANON_INPUT_MANIFEST_V0_2.md` — zero-loss source/disposition manifest.
-11. `kai-pm/DEEPSEEK_REVIEW_PACKET_KINGSMAN_MASTER_CANDIDATE_V0_2.md` — current external review packet.
-12. `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER.md` — current completion/open-work control surface.
+11. `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_2.md` — current architecture/document authority + supersession map.
+12. `kai-pm/DEEPSEEK_REVIEW_PACKET_KINGSMAN_MASTER_CANDIDATE_V0_2.md` — current external review packet.
+13. `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER.md` — current completion/open-work control surface.
 
 ## 2. Current correct status
 
@@ -40,6 +41,7 @@ Do not reconstruct the state as either:
 - Canonical decision append queue creation commit: `7701e572026282e90f34f2546dd0aca6101bd379`
 - D347 checkpoint creation commit: `5d4252e6e8ffe0f7ac97005556697702ce5271af`
 - Synchronisation register D347 update commit: `005951f61f73af9920ba438bf17fa7ccc6f8761b`
+- Architecture document authority/supersession index commit: `723cbef277a708daef72ec877a980219850de2a7`
 
 ## 4. Architecture intent that must survive recovery
 
@@ -55,6 +57,7 @@ Do not reconstruct the state as either:
 - Long-horizon self-sufficiency/succession serve stewardship and remain bounded by operator/family interests.
 - Operator mission control is part of governance, not presentation polish.
 - Historical ideas must be recovered before service/file disposition.
+- Old files titled FINAL/MASTER/ARCHITECTURE do not become current authority merely by title; use the authority index.
 
 ## 5. Programme order remains separate
 
