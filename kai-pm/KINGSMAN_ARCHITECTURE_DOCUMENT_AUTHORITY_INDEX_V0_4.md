@@ -1,6 +1,6 @@
 # Kingsman Architecture Document Authority Index v0.4
 
-> **STATUS: CURRENT ARCHITECTURE/DOCUMENT AUTHORITY MAP AFTER D350 — PLANNING/GOVERNANCE ONLY.**
+> **STATUS: CURRENT ARCHITECTURE/DOCUMENT AUTHORITY MAP AFTER D351 — PLANNING/GOVERNANCE ONLY.**
 
 ## Current architecture review order
 
@@ -8,47 +8,80 @@ For consequential architecture/design work use:
 
 1. exact repository/runtime evidence for current reality;
 2. latest valid canonical `DECISIONS.md` programme authority for execution/order;
-3. pending canonical append queue while D344–D350 remain outside byte-safe canonical append;
+3. pending canonical append queue while D344–D351 remain outside byte-safe canonical append;
 4. primary mission/identity/lineage and standing Kingsman doctrines;
-5. **`KINGSMAN_EXISTING_KAI_MASTER_ARCHITECTURE_PLAN_V0_4.md` — primary whole-system architecture candidate**;
-6. **`KINGSMAN_ENGINEERING_ARCHITECTURE_DRAWING_SET_V0_4.md` — primary deterministic engineering drawing set**;
-7. **`KINGSMAN_CURRENT_TO_TARGET_MIGRATION_MATRIX_V0_4.md` — primary migration/disposition control matrix**;
-8. D349 Kai reconciliation for the repo-backed corrections behind v0.4;
-9. Unified Hunter roadmap/tracker for current built migration state;
-10. v0.3/v0.2 and earlier architecture as retained review/design lineage;
-11. stale README/status/architecture docs only after currentness/authority qualification.
+5. **`D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md` — governing current architecture posture/acceptance correction**;
+6. current repository product architecture/capability surfaces, especially README + Unified Hunter roadmap/tracker, as **organism/capability lineage inputs subject to currentness qualification**;
+7. `KINGSMAN_EXISTING_KAI_MASTER_ARCHITECTURE_PLAN_V0_4.md` — **engineering synthesis / control-and-migration input, NOT yet the professional front-door master blueprint**;
+8. `KINGSMAN_ENGINEERING_ARCHITECTURE_DRAWING_SET_V0_4.md` — detailed engineering appendix/drawing source, pending organism-first front-layer replacement;
+9. `KINGSMAN_CURRENT_TO_TARGET_MIGRATION_MATRIX_V0_4.md` — current migration/disposition control matrix;
+10. D349 Kai reconciliation for repo-backed security/control corrections;
+11. v0.3/v0.2 and earlier architecture as retained review/design lineage.
 
 ## Current primary subjects
 
 | File | Status |
 |---|---|
-| `KINGSMAN_EXISTING_KAI_MASTER_ARCHITECTURE_PLAN_V0_4.md` | **PRIMARY MASTER ARCHITECTURE CANDIDATE** |
-| `KINGSMAN_ENGINEERING_ARCHITECTURE_DRAWING_SET_V0_4.md` | **PRIMARY DETERMINISTIC DRAWING SET** |
-| `KINGSMAN_CURRENT_TO_TARGET_MIGRATION_MATRIX_V0_4.md` | **PRIMARY CURRENT→TARGET CONTROL MATRIX** |
-| `D350_MASTER_ARCHITECTURE_PLAN_AND_DRAWING_SET_V0_4.md` | **CURRENT GOVERNANCE CHECKPOINT** |
+| `D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md` | **CURRENT GOVERNING ARCHITECTURE POSTURE / ACCEPTANCE BAR** |
+| `README.md` | **STALE FACTUALLY, BUT IMPORTANT ORGANISM/CAPABILITY/PRESENTATION LINEAGE — NOT CURRENT FACT AUTHORITY** |
+| `KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` | **FOUNDATIONAL EXISTING MIGRATION ARCHITECTURE** |
+| `UH_PROGRESS_TRACKER.md` | **CURRENT UH WORKSTREAM STATUS INPUT WITHIN ITS SCOPE** |
+| `KINGSMAN_EXISTING_KAI_MASTER_ARCHITECTURE_PLAN_V0_4.md` | **ENGINEERING SYNTHESIS / MIGRATION INPUT — DEMOTED FROM PRIMARY MASTER BLUEPRINT** |
+| `KINGSMAN_ENGINEERING_ARCHITECTURE_DRAWING_SET_V0_4.md` | **ENGINEERING APPENDIX / DETAILED VIEW SOURCE** |
+| `KINGSMAN_CURRENT_TO_TARGET_MIGRATION_MATRIX_V0_4.md` | **CURRENT CURRENT→TARGET CONTROL MATRIX** |
 | `KAI_RECONCILIATION_DEEPSEEK_EXISTING_KAI_EVOLUTION_V0_3.md` | **MANDATORY REPO-BACKED PREDECESSOR RECONCILIATION** |
 | `KAI_ORION_CONTINUITY_CURRENT_MASTER_POINTER.md` | **MANDATORY RECOVERY POINTER WHILE CANONICAL APPEND OPEN** |
 
-## v0.3 disposition
+## Professional master blueprint status
 
-`KINGSMAN_EXISTING_KAI_EVOLUTION_MASTER_PLAN_V0_3.md`
+> **OPEN.**
 
-> `RETAINED EXISTING-SYSTEM EVOLUTION INPUT / SUPERSEDED AS PRIMARY ARCHITECTURE SUBJECT BY v0.4.`
+The final professional blueprint must combine:
 
-Its current-system mapping/shim work survives in v0.4.
+- the existing organism/product vocabulary and recognisable capability map;
+- exact current repo truth/currentness;
+- current→mature change type for each major organ;
+- Unified Hunter's real migration state;
+- D349/v0.4 engineering/security corrections;
+- one-glance current/today → mature → change delta → roadmap → risks/operator decisions;
+- detailed engineering drill-downs underneath.
 
-`DEEPSEEK_REVIEW_PACKET_EXISTING_KAI_EVOLUTION_V0_3.md`
+It must beat the stale README on communication while beating it on truth, currentness, architecture discipline and operator control.
 
-> `HISTORICAL ANALYSIS-INSTRUMENT PACKET — NOT CURRENT ARCHITECTURE AUTHORITY.`
+## v0.4 disposition after D351
 
-DeepSeek output is never promoted directly; D349/Kai reconciliation governs what survived.
+`KINGSMAN_EXISTING_KAI_MASTER_ARCHITECTURE_PLAN_V0_4.md`
 
-## v0.2/v0.1 disposition
+> `RETAINED ENGINEERING SYNTHESIS / CONTROL-AND-MIGRATION INPUT — NOT ACCEPTED AS PROFESSIONAL MASTER BLUEPRINT.`
 
-- v0.2: retained target-design input; superseded as primary subject.
-- v0.1: historical review input.
-- generated D345 presentation infographic: rejected as architecture authority.
-- old deterministic drawing set v0.1: historical seed, superseded by v0.4 drawing set.
+Retain its useful technical work, especially final-hand capability, authority separation, legacy-bypass proof, durable authority/workflow, failure containment, continuity and migration discipline.
+
+The error was architectural posture/presentation: too much abstract target decomposition and insufficient organism-first continuity with the existing Kai.
+
+## Existing README/product architecture disposition
+
+The README is not restored as current technical authority. Its metrics/status contain known drift and contradictions.
+
+However its grouping and presentation of:
+
+- Soul & Inner Life;
+- Intelligence & Reasoning;
+- Cognitive Depth;
+- Sensory & World Awareness;
+- Operator Relationship;
+- concrete named capabilities and live/stub states;
+
+is an architectural/product communication asset that the professional master must preserve and improve rather than replace with generic systems vocabulary.
+
+## Standing architecture posture
+
+> **REFIT, HARDEN, RATIONALISE, MATURE — DO NOT REINVENT KAI.**
+
+Default assumption:
+
+`KEEP CONCEPT/CAPABILITY → QUALIFY CURRENT REALITY → HARDEN / MERGE / MOVE / SPLIT ONLY WHERE EVIDENCE JUSTIFIES → ADD ONLY GENUINELY MISSING JOINTS`.
+
+Major structural change requires evidence of duplicate authority/truth, unsafe trust, shared-fate failure, incorrect state ownership, lifecycle/resource isolation need, irreducible contract conflict or proven maintenance burden.
 
 ## Unified Hunter authority/status
 
@@ -56,7 +89,7 @@ DeepSeek output is never promoted directly; D349/Kai reconciliation governs what
 
 `UH_PROGRESS_TRACKER.md` remains current workstream evidence within its own scope.
 
-v0.4 integrates UH as the existing migration skeleton rather than inventing a new control system.
+The future professional blueprint must show Unified Hunter as the existing maturing nervous/cognitive-control skeleton, not as a replacement system.
 
 ## Standing rule
 
