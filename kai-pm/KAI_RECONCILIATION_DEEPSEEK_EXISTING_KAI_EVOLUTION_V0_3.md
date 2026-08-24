@@ -4,6 +4,51 @@
 >
 > DeepSeek had no repo access. Its findings are therefore review input until reconciled against the current repository. This file records that reconciliation.
 
+## Standing role clarification — DeepSeek is Kai's analysis instrument, not a project authority
+
+This is not a temporary limitation caused only by lack of GitHub access. It is the intended operating model.
+
+DeepSeek is used by Kai as an **external specialist analysis instrument** for:
+
+- adversarial review;
+- alternative hypotheses;
+- architecture attack;
+- coding/technical second opinion;
+- identifying hidden failure modes;
+- proposing discriminating tests;
+- challenging Kai's assumptions.
+
+DeepSeek does **not** independently own or determine:
+
+- Dainius's philosophy or primary mission;
+- Kai's identity/lineage intent;
+- the accumulated architectural history;
+- current repository truth;
+- current programme order;
+- authority/freeze state;
+- product capability retention;
+- final architecture;
+- implementation authority.
+
+DeepSeek output is therefore never accepted "in full" merely because it is technically persuasive. Kai is responsible for using it as raw analytical input, reconciling it against the actual repository, prior decisions, project philosophy and Dainius's intended destination, and rejecting or modifying anything that does not fit.
+
+The durable workflow is:
+
+`KAI DEFINES THE QUESTION + SUPPLIES QUALIFIED CONTEXT`
+→ `DEEPSEEK ATTACKS / CHALLENGES / PROPOSES`
+→ `KAI CHECKS REPO + HISTORY + PHILOSOPHY + ARCHITECTURE`
+→ `KAI ACCEPTS / MODIFIES / REJECTS EACH POINT`
+→ `ORION MAY VERIFY FEASIBILITY OR EXECUTE APPROVED WORK`
+→ `DAINIUS RETAINS FINAL PROJECT AUTHORITY`.
+
+DeepSeek is therefore analogous to a specialist analytical subsystem available to Kai, **not a fourth architect sitting beside Kai and Dainius**.
+
+The standing law remains:
+
+> **MULTIPLE MINDS — ONE EVIDENCE STANDARD — ONE ARCHITECTURAL RECONCILIATION RESPONSIBILITY.**
+
+Kai owns that reconciliation responsibility.
+
 ## Executive result
 
 DeepSeek's overall direction is useful and substantially better than a blank-sheet review, but it must **not** be adopted verbatim.
@@ -180,10 +225,12 @@ Do **not** edit runtime now. Future v0.4/master-canon candidate should incorpora
 
 ## DeepSeek review disposition
 
-**USE:** architecture attack, gap discovery, migration-order refinement.
+**USE:** architecture attack, gap discovery, migration-order refinement, alternative hypotheses and discriminating-test generation.
 
-**DO NOT USE AS AUTHORITY:** repo-current claims, exact component ownership, existing security-feature absence, service merge decisions, final programme order.
+**DO NOT USE AS AUTHORITY:** repo-current claims, exact component ownership, project philosophy, Dainius's vision, existing security-feature absence, service merge decisions, final architecture, final programme order or implementation authority.
+
+DeepSeek recommendations are never promoted directly into the plan. They are inputs to Kai's analysis.
 
 Every recommendation remains subject to:
 
-`DeepSeek review → Kai repo verification → Orion exact feasibility/evidence → Dainius final authority`.
+`DeepSeek analysis input → Kai repo/history/philosophy reconciliation → Orion exact feasibility/evidence when useful → Dainius final authority`.
