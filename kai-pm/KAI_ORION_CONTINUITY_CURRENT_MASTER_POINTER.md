@@ -1,6 +1,6 @@
 # KAI ↔ ORION — Current Master Recovery Pointer
 
-> **STATUS: MANDATORY RECOVERY POINTER WHILE CANONICAL `DECISIONS.md` APPEND D344–D348 IS OPEN.**
+> **STATUS: MANDATORY RECOVERY POINTER WHILE CANONICAL `DECISIONS.md` APPEND D344–D349 IS OPEN.**
 >
 > This file exists so a fresh Kai/Orion thread cannot stop at the last entry currently inside canonical `kai-pm/DECISIONS.md` and miss later architecture/governance work that is durably banked but awaiting a byte-safe canonical append.
 >
@@ -12,92 +12,86 @@ Before consequential Kingsman/master-canon/Phase-2 architecture advice, recover:
 
 1. `kai-pm/KAI_ORION_CONTINUITY.md` — standing protocol.
 2. latest canonical D-numbered programme state in `kai-pm/DECISIONS.md` — execution/programme authority.
-3. `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D348.md` — pending governance not yet byte-safely appended.
-4. `kai-pm/D344_PRIMARY_MISSION_IDENTITY_LINEAGE_CANON_CORRECTION.md`.
-5. `kai-pm/D344A_PRIMARY_MISSION_CANON_ALIGNMENT_CHECKPOINT.md`.
-6. `kai-pm/D345_KINGSMAN_ARCHITECTURE_V0_1_REVIEW_CHECKPOINT.md`.
-7. `kai-pm/D346_ENGINEERING_ARCHITECTURE_VISUAL_CORRECTION.md`.
-8. `kai-pm/D347_MASTER_ARCHITECTURE_CONSOLIDATION_CHECKPOINT.md`.
-9. `kai-pm/D348_EXISTING_KAI_EVOLUTION_CORRECTION.md`.
-10. `kai-pm/KINGSMAN_EXISTING_KAI_EVOLUTION_MASTER_PLAN_V0_3.md` — **CURRENT PRIMARY MASTER REVIEW SUBJECT**.
-11. `kai-pm/DEEPSEEK_REVIEW_PACKET_EXISTING_KAI_EVOLUTION_V0_3.md` — **CURRENT EXTERNAL REVIEW SUBJECT**.
-12. `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_3.md` — current architecture/document authority map.
-13. `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_3.md` — current completion/open-work control surface.
-14. `kai-pm/UH_PROGRESS_TRACKER.md` and `KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` — mandatory when runtime/control migration is discussed.
-15. `kai-pm/KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDATE_V0_2.md` — retained target-design/history input, not primary review subject.
-16. `kai-pm/KINGSMAN_MASTER_CANON_INPUT_MANIFEST_V0_2.md` — retained source/zero-loss input pending v0.3 refresh.
-17. standing root/proactivity/resilience/contingency/stewardship/operator-visibility doctrines.
+3. `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D349.md` — pending governance not yet byte-safely appended.
+4. D344 through D348 standalone checkpoints.
+5. `kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md`.
+6. `kai-pm/KINGSMAN_EXISTING_KAI_EVOLUTION_MASTER_PLAN_V0_3.md` — current primary architecture candidate, not frozen.
+7. `kai-pm/KAI_RECONCILIATION_DEEPSEEK_EXISTING_KAI_EVOLUTION_V0_3.md` — **mandatory repo-backed correction layer after DeepSeek review**.
+8. `kai-pm/DEEPSEEK_REVIEW_PACKET_EXISTING_KAI_EVOLUTION_V0_3.md` — review prompt/history, not authority.
+9. `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_3.md`.
+10. `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_3.md`.
+11. `kai-pm/UH_PROGRESS_TRACKER.md` and `KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` whenever runtime/control migration is discussed.
+12. v0.2 master/manifest and standing doctrines as retained source inputs.
 
 ## 2. Current correct status
 
-> **EXISTING-KAI EVOLUTION CANDIDATE v0.3 BANKED — DEEPSEEK REVIEW OPEN — FINAL CANON NOT FROZEN — DOCUMENT/CANONICAL DECISION SYNCHRONISATION STILL OPEN.**
+> **v0.3 EXISTING-KAI EVOLUTION REVIEWED BY DEEPSEEK AND RECONCILED BY KAI — v0.4 CHANGE SET / FINAL CANON NOT YET AUTHORED OR FROZEN — DOCUMENT/CANONICAL DECISION SYNCHRONISATION STILL OPEN.**
 
 Do not reconstruct the state as:
 
 - “nothing after D343 happened” — false;
-- “v0.2 is still the current DeepSeek subject” — false;
+- “DeepSeek's review is accepted verbatim” — false;
+- “v0.2 is current review subject” — false;
 - “Kai needs a fresh architecture from scratch” — false;
-- “master canon is finished/frozen” — false.
+- “Unified Hunter final-hand cutover is complete” — false;
+- “master canon is final/frozen” — false.
 
-## 3. Current architecture subject identities
+## 3. Current subject identities
 
 - v0.3 Existing-Kai Evolution Master Plan: `98dc2560c0204dd9c58d823dbd8c07754704276a`
-- v0.3 DeepSeek review packet: `1d189de2cfd7b20499b7b7fc8bb8981915672350`
-- D348 checkpoint: `c683a533fc984afa63cf890541ae7842c34f76b5`
-- D344–D348 append queue: `3222f805df74781353d27cc5ee7ccbb423b97119`
+- v0.3 DeepSeek packet: `1d189de2cfd7b20499b7b7fc8bb8981915672350`
+- D348: `c683a533fc984afa63cf890541ae7842c34f76b5`
+- Kai DeepSeek reconciliation: `89fdd1b820e245550fe2574d26ef17e6651f4dec`
+- D349 checkpoint: `8a949da867045a61563e59d608bf6d0f29521211`
+- D344–D349 append queue: `f6713b50a4f829b81bc0f68b6568d33c763056b5`
 - v0.3 architecture authority index: `343d7d4f736a89fb3944054051276f1d9da3def0`
-- v0.3 synchronization register: `c14232a8e93bc6d785de8adaf72cd6226a739497`
-- v0.2 master candidate: `32e62b51fc209d7db3d4621d079a08b50fdc259f` — retained input, superseded as primary review subject.
+- v0.3 synchronisation register: `c14232a8e93bc6d785de8adaf72cd6226a739497`
 
-## 4. Architecture intent that must survive recovery
+## 4. Mandatory D349 corrections
+
+### KAI-REV-016 — final-hand capability blocker
+
+Current central `ActuatorRegistry` consumes `ActionCapability`, but current mutating handlers send downstream parameters plus auth/signature rather than the exact one-use capability. The actual side-effecting service therefore does not yet atomically validate/consume the exact capability at the final hand.
+
+### KAI-REV-017 — legacy closure blocker
+
+An authenticated direct route is not equivalent to a dead legacy authority path. Current source verifier can call some routes closed once service authentication exists, while a shared-token holder may still bypass central one-use capability control.
+
+### KAI-REV-018 — durable autonomy/preflight gap
+
+Current autonomy grants are process-local and current preflight constructs a fresh authority. It cannot prove durable runtime grant readiness.
+
+### Authority separation
+
+`MEMBERSHIP != IDENTITY != AUTHORITY != ONE-TIME EXECUTION CAPABILITY != AUTONOMY DELEGATION`.
+
+Manual operator-approved actions do **not** universally require `KAI_AUTONOMY_ENFORCE=true`; autonomous initiation does.
+
+## 5. Architecture intent that survives
 
 - Kai is the organism; models/frameworks/services/hardware are replaceable organs.
-- Primary mission/identity/lineage sit above architecture.
-- Existing Kai is substantial; do not blank-sheet redesign it.
-- Unified Hunter already supplies a tested migration skeleton behind the existing runtime.
-- Preserve existing shims and use them as migration patterns.
+- Existing Kai is substantial; no blank-sheet redesign.
+- Unified Hunter remains the migration skeleton, but its final-hand claim must be requalified against D349.
 - **NO NEW BOX WITHOUT CURRENT-TO-TARGET LINEAGE.**
-- Evolution pattern:
-  `CURRENT → QUALIFY → PRESERVE INTENT → SHIM → TARGET → SHADOW/SOAK → VERIFIED CUTOVER → PROVE OLD PATH DEAD → RETIRE/REHOME`.
-- Product capabilities may be consolidated but not silently deleted.
-- Proactivity is foundational and must consolidate existing observers/watchers rather than replace them blindly.
-- One qualified evidence/world-state path and one governed authority path remain core.
-- Independent outcome verification stays separate from execution.
-- Organic integration must avoid shared-fate coupling.
-- Qualified contingency knowledge is not recovery authority.
-- Long-horizon self-sufficiency/succession remain subordinate to stewardship/operator/family interests.
-- Operator mission control evolves from existing Dashboard/status machinery; do not create competing truth surfaces.
-
-## 5. Existing migration assets that must be recovered
-
-At minimum recover before runtime architecture decisions:
-
-- perception Shadow/Active runner (`KAI_PERCEPTION_MODE`);
-- Cortex World-State adapter (`KAI_CORTEX_SOURCE`);
-- `LegacyTrustBridge` (`KAI_AUTONOMY_ENFORCE`);
-- actuator migration driver + source-based legacy verifier;
-- existing service-auth bridge + newer signed workload identity;
-- dashboard credential/degraded-response shims;
-- release/evidence/verifier/erasure foundations;
-- Unified Hunter tracker operational cutover steps O-01→O-04.
+- Product capability may be consolidated but not silently deleted.
+- Use existing House/Census/instrumentation as the basis for E0 rather than inventing another census system.
+- Cortex/world-state fallback must become explicit COLD_START/DEGRADED/UNKNOWN, not silent steady-state legacy truth.
+- Signed identity already has body/path/destination/timestamp/nonce/replay/revocation protections; finish migration instead of reimplementing them.
+- Durable authority evolves behind existing Tool Gate-compatible interfaces.
+- Postgres workflow/outbox is the first justified durable-workflow candidate, not an eternal technology prohibition.
+- Feature flags remain selectors; evidence-bound migration/release state governs promotion.
+- Egress/target constraints belong in policy/exact capability and final-hand enforcement.
 
 ## 6. Programme order remains separate
 
 This pointer authorises no implementation/experiment.
 
-Preserve latest valid canonical D-numbered sequence, including:
+Preserve latest valid canonical D-numbered sequence, including House-in-Order, KAI-GATE-048, Item8 separate frozen authority, **ITEM 8 BEFORE A4**, and `A-4 PROVENANCE` distinct from `FUTURE A4 SELF-DIAGNOSIS`.
 
-- House-in-Order current authority;
-- KAI-GATE-048 authority;
-- Item 8 separate frozen authority;
-- **ITEM 8 BEFORE A4**;
-- `A-4 PROVENANCE` distinct from `FUTURE A4 SELF-DIAGNOSIS`;
-- no architecture document authorises H2 v1.1, service refactor, succession, autonomous finance or uncontrolled self-modification.
+No architecture/review document authorises H2 v1.1, runtime refactor, service merge/delete, succession, autonomous finance or uncontrolled self-modification.
 
-## 7. Retirement condition
+## 7. Next architecture action
 
-Retire/supersede this pointer only after:
+Prepare a **v0.4 delta/change set**, not a fresh architecture, carrying only repo-supported/corrected D349 findings. Before freezing physical service homes for memory/proactivity/model runtime, complete the exact current component/reader/writer/authority census and any discriminating spikes.
 
-1. D344–D348 are safely represented/appended in canonical `DECISIONS.md` with historical bytes mechanically preserved;
-2. standing `KAI_ORION_CONTINUITY.md` is directly updated to recover the accepted master-canon subjects;
-3. final master canon is frozen or a later pointer explicitly supersedes this one.
+Retire this pointer only after D344–D349 are safely represented/appended in canonical `DECISIONS.md`, standing continuity is directly updated, and a later accepted/frozen master-canon pointer supersedes it.
