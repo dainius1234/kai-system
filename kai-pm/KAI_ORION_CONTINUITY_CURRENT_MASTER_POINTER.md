@@ -21,10 +21,12 @@ Before consequential Kingsman/master-canon/Phase-2 architecture advice, recover:
 9. `kai-pm/D348_EXISTING_KAI_EVOLUTION_CORRECTION.md`.
 10. `kai-pm/KINGSMAN_EXISTING_KAI_EVOLUTION_MASTER_PLAN_V0_3.md` — **CURRENT PRIMARY MASTER REVIEW SUBJECT**.
 11. `kai-pm/DEEPSEEK_REVIEW_PACKET_EXISTING_KAI_EVOLUTION_V0_3.md` — **CURRENT EXTERNAL REVIEW SUBJECT**.
-12. `kai-pm/KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDATE_V0_2.md` — retained target-design/history input, not primary review subject.
-13. `kai-pm/KINGSMAN_MASTER_CANON_INPUT_MANIFEST_V0_2.md` — source/zero-loss traceability input pending v0.3 refresh.
-14. current architecture authority/synchronisation controls and standing doctrines.
-15. `kai-pm/UH_PROGRESS_TRACKER.md` and `KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` whenever current→target runtime migration is discussed.
+12. `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_3.md` — current architecture/document authority map.
+13. `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_3.md` — current completion/open-work control surface.
+14. `kai-pm/UH_PROGRESS_TRACKER.md` and `KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` — mandatory when runtime/control migration is discussed.
+15. `kai-pm/KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDATE_V0_2.md` — retained target-design/history input, not primary review subject.
+16. `kai-pm/KINGSMAN_MASTER_CANON_INPUT_MANIFEST_V0_2.md` — retained source/zero-loss input pending v0.3 refresh.
+17. standing root/proactivity/resilience/contingency/stewardship/operator-visibility doctrines.
 
 ## 2. Current correct status
 
@@ -39,11 +41,13 @@ Do not reconstruct the state as:
 
 ## 3. Current architecture subject identities
 
-- v0.3 Existing-Kai Evolution Master Plan creation commit: `98dc2560c0204dd9c58d823dbd8c07754704276a`
-- v0.3 DeepSeek review packet creation commit: `1d189de2cfd7b20499b7b7fc8bb8981915672350`
-- D348 checkpoint creation commit: `c683a533fc984afa63cf890541ae7842c34f76b5`
-- D344–D348 canonical append queue creation commit: `3222f805df74781353d27cc5ee7ccbb423b97119`
-- v0.2 master candidate creation commit: `32e62b51fc209d7db3d4621d079a08b50fdc259f` — retained input, superseded as primary review subject.
+- v0.3 Existing-Kai Evolution Master Plan: `98dc2560c0204dd9c58d823dbd8c07754704276a`
+- v0.3 DeepSeek review packet: `1d189de2cfd7b20499b7b7fc8bb8981915672350`
+- D348 checkpoint: `c683a533fc984afa63cf890541ae7842c34f76b5`
+- D344–D348 append queue: `3222f805df74781353d27cc5ee7ccbb423b97119`
+- v0.3 architecture authority index: `343d7d4f736a89fb3944054051276f1d9da3def0`
+- v0.3 synchronization register: `c14232a8e93bc6d785de8adaf72cd6226a739497`
+- v0.2 master candidate: `32e62b51fc209d7db3d4621d079a08b50fdc259f` — retained input, superseded as primary review subject.
 
 ## 4. Architecture intent that must survive recovery
 
