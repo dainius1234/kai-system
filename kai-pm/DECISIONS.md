@@ -30088,3 +30088,184 @@ working-directory scope-binding lesson.
   check before use
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D358 — Helper-contract clarification (append-only) and Engineering
+## Doctrine rule 32: a shared-fate control cannot prove the shared property
+
+**Authority.** Kai referred two governance decisions to Dainius after the
+post-freeze adversarial round; Dainius answered **A — yes** and
+**B — yes**. Neither modifies the frozen package.
+
+**THE FROZEN PACKAGE WAS NOT TOUCHED.** Census v1.1 remains
+`eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e` at
+commit `bf7313a3a983cf9d908512be54e4d7c3278d43ac`. D357 stands.
+
+### 1. (A) `materialise()` helper contract — clarified, not repaired
+
+DeepSeek found a real overstatement in the frozen package's own
+documentation, and it is **mine**. D356 and its README say the guard
+makes the defect *mechanically impossible* for a future caller because
+`materialise()` rejects anything that is not a 40-hex id.
+
+**That is too strong. A Git TREE object id is also 40 hex characters.** A
+future direct caller could pass a tree id — or a blob id, or an id from
+another repository — straight through the shape guard.
+
+The binding contract, recorded here because the frozen bytes cannot be
+edited:
+
+> **`materialise()`'s local guard excludes SYMBOLIC REFS. It does not
+> independently establish Git commit type.** The current frozen
+> entrypoints are commit-safe because `main()` and
+> `compare_v10_v11.py` each resolve `<ref>^{commit}` before calling it.
+> **Any future direct reuse of `materialise()` must preserve that
+> precondition or add explicit commit-type verification.**
+
+Two properties, which I had collapsed into one:
+
+| | |
+|---|---|
+| CURRENT SHIPPED CALL-PATH CONTRACT | commit type proven by `^{commit}` **plus** the helper rejecting symbolic refs — **SOUND** |
+| HELPER SELF-DEFENCE | 40-hex shape alone proves commit type — **FALSE** |
+
+**This does not invalidate the freeze.** D357 froze exact
+committed-subject semantics, and every shipped path establishes commit
+type before the helper is reached. The defect is in what the
+documentation *claims about future callers*, and it is corrected here
+rather than in the frozen bytes.
+
+It is also the same defect class as the one being repaired, committed by
+me while describing the repair: **a guard whose scope was narrower than
+its name implied (R5).**
+
+### 2. (B) Engineering Doctrine rule 32 — banked
+
+Added to `kai-pm/ENGINEERING_DOCTRINE.md` under *Calibration*, with its
+earning row:
+
+> **A shared-fate control cannot prove the shared property.** Agreement
+> between two observations is not independent corroboration when both
+> depend on the same decisive mutable source, parser, state, authority
+> or failure path. For a control to detect failure of dependency X, **at
+> least one decisive verification leg must not share dependency X.**
+
+Qualifier carried in the rule text: this does **not** demand universal
+independence. Independence remains claim-specific. It governs only the
+decisive dependency whose failure the control claims to detect. Rule 21
+is the special case for two counters inside one instrument; 32 is the
+general form.
+
+**Earned three times, in three different mechanisms:**
+
+* R9 — a watcher whose `pgrep` pattern matched its own command line;
+* I-8 — a detector whose population included its own docstring;
+* D356 — the subject reconciliation, whose two supposedly independent
+  sides **both dereferenced the same moving symbolic ref**, so they
+  agreed perfectly and reported `reconciles: True` while the result was
+  stamped with a different commit than the one measured.
+
+Three independent bites is the threshold at which an incident pattern
+has earned the right to stop being a story and become a rule.
+
+### 3. Captured as a MANDATORY future consumer invariant — not implemented
+
+DeepSeek's most important post-freeze warning, and Kai's ruling on it:
+
+> **AN ABSTENTION MUST SURVIVE CONSUMPTION AS AN ABSTENTION.**
+
+No future H2/H3/H4 or other consumer may translate `NO_PROVEN_WRITER`
+into *no writer*, *unowned*, *unmaintained*, *low priority* or *false*
+unless a separately qualified closed-world proof earns that promotion.
+
+When such a consumer is authorised, this must be a **hostile acceptance
+fixture, not prose**:
+
+```
+input     = NO_PROVEN_WRITER
+expected  = UNKNOWN / ABSTENTION preserved
+forbidden = any negative ownership or maintenance conclusion
+```
+
+The frozen artefact is not making the false claim — the state is
+deliberately named `NO_PROVEN_WRITER`, and D357 records the 267/325
+population as abstentions with completeness expressly NOT EARNED. The
+risk lives entirely at the consumer boundary. **Kai declined to reopen
+the schema to add a redundant `unproven_writers_unknown` flag**, on the
+grounds that a second field carrying the same meaning can itself drift.
+
+### 4. Adjudications recorded — attacks that did NOT establish a defect
+
+* **Movement between commit and tree resolution.** Does not apply. The
+  dangerous shape is `tree = resolve(symbolic_ref)`; the actual code is
+  `tree = resolve(commit^{tree})` against the already-immutable id.
+  Branch movement cannot turn `A^{tree}` into B's tree. No new fixture
+  required.
+* **Package self-identity.** The package does not embed the repository
+  tree SHA, and should not: inserting the containing tree into the
+  package that determines that tree is self-referential. D357's external
+  binding — aggregate, commit, tree and the full 19-line manifest —
+  is the cleaner architecture and is sufficient.
+* **World A equivalence wording.** Already narrowed; no disagreement
+  remaining. Earned: the applicability/repair-evidence record is
+  byte-identical, and the measured payload showed no observed
+  regression. Not earned: identical behaviour over every possible
+  future corpus.
+
+### 5. Held, not adopted
+
+* **Closed-subset completeness predicate** — a valid future design
+  hypothesis. It could materially alter the existing H2/H3 design, and
+  the programme is not redesigned from an adversarial suggestion without
+  first reconciling it against the already-banked plan. Must be compared
+  explicitly against the planned machinery **before** any H2/H3
+  authority.
+* **Mechanical scope enforcement** — the principle stands: *where
+  authority is consequential, make violation mechanically detectable or
+  impossible where practical.* A protected scope manifest plus an
+  external diff gate is one credible architecture. Not authorised, and
+  no new control plane is created under Census.
+
+---
+
+## THREAD RECOVERY BLOCK — D358
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **FROZEN ARTEFACT — UNCHANGED** — Census v1.1, 19 artefacts, aggregate
+  `eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e`,
+  commit `bf7313a3a983cf9d908512be54e4d7c3278d43ac`, tree
+  `2d6b4e5d44021fff322acefbed73968968848a85`. **FROZEN. D357 stands.**
+* **DOCTRINE** — `ENGINEERING_DOCTRINE.md` now carries **rule 32**, with
+  its earning row. Highest rule: 32
+* **OTHER INSTRUMENTS** — Census `v1.0` untouched, 12 entries, declared
+  aggregate `4a5b40a1…`; `67071cce…6353` superseded; H2 `v1.0` untouched
+  and REJECTED as H3 evidence per D340
+* **CURRENT WORKSTREAM** — House-in-Order; ruler frozen, post-freeze
+  adversarial round adjudicated and closed
+* **LAST PROVEN STATE** — freeze verified from fresh retrieval at two
+  separate commits, 19/19 and identical aggregate from each
+* **AUTHORISED NEXT ACTION** — none. Return to Dainius/Kai for the next
+  programme-authority decision
+* **EXPLICITLY NOT AUTHORISED** — H2 v1.1 · H3 · H4 · H5 ·
+  document/register repair · Phase B · `ITEM8_GO` · six subject builds ·
+  Stage 2 · seven research-obligation repairs · `=0.2.0` ·
+  closed-subset implementation · scope-gate implementation · helper
+  patch · KAI-GATE-048 unchanged · Item 8 remains before A-4
+* **OPEN / UNRESOLVED** — abstention completeness NOT established ·
+  consumer invariant captured but unenforced until a consumer exists ·
+  currentness classifier unbuilt · manifest-convention determinism
+  captured only · v1.0 `"sorted content"` derivation ambiguity ·
+  closed-subset predicate held for reconciliation against the H2/H3
+  plan · mechanical scope enforcement unbuilt · D344–D353 not in the
+  canonical ledger · local mislabelled ref `backup-local-d344`
+* **CORRECTIONS TO PRIOR RECORDS** — D356's and the frozen README's
+  claim that the 40-hex guard makes the defect *mechanically impossible*
+  for any future caller is **withdrawn**: the guard excludes symbolic
+  refs only; commit type is established by the callers via `^{commit}`.
+  The frozen bytes are deliberately not edited; §1 above is the binding
+  contract
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D358
+  Orion. **Next free: D359**, subject to a fresh allocator check
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

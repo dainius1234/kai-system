@@ -155,6 +155,24 @@ Proactive engineering is not autonomous scope expansion.
 18. **Programmatic edits must assert mutation cardinality.** An edit
     expected to change one target must prove exactly one intended target
     changed. A zero-match silent edit is a failure.
+32. **A shared-fate control cannot prove the shared property.**
+    Agreement between two observations is not independent corroboration
+    when both depend on the same decisive mutable source, parser, state,
+    authority or failure path. For a control to detect failure of
+    dependency X, **at least one decisive verification leg must not
+    share dependency X**.
+
+    Before trusting a gate, ask what failure dependencies its evidence
+    legs share. Where they share the decisive one, the gate reports on
+    itself and calls it the world.
+
+    This does **not** demand universal independence, which is
+    unaffordable and usually impossible. Independence remains
+    claim-specific. The rule governs only the decisive dependency whose
+    failure the control claims it can detect.
+
+    Rule 21 is the special case for two counters inside one instrument;
+    this is the general form.
 
 ### Repair
 
@@ -286,3 +304,4 @@ Proactive engineering is not autonomous scope expansion.
 | 23 | disproven claims struck through rather than deleted, so the pattern stays visible |
 | 25, 26 | a meta-check that wanted to probe a key generator to read its own denominator |
 | 28 | the programme's binding order of work existed nowhere in the tree (D270 §2); and the external doctrine copy was silently missing rule 4 — the anti-drift rule itself — while reaching 27 by splitting rule 26, so "Rule 17" named different rules in each record (D272) |
+| 32 | the same structural failure in three different mechanisms: R9's watcher whose `pgrep` pattern matched its own command line; a detector whose population included its own docstring (I-8); and Census v1.1's subject reconciliation, whose two supposedly independent sides both dereferenced the same moving symbolic ref, so they agreed perfectly and reported `reconciles: True` while the result was stamped with a different commit than the one measured (D356) |
