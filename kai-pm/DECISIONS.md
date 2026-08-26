@@ -29624,3 +29624,147 @@ subject.
   answered by measurement rather than argument
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D355 — Working-boundary ruling adopted; currentness guard applied to
+## existing evidence; its implementation FLAGGED, not performed
+
+**Authority.** Kai's R12 working-boundary ruling, issued after my
+escalation and Kai's own acknowledgement that Kai-side writes landed on
+the active branch while tree-bound work was running. Ruling adopted in
+full. It changes working mechanics only and authorises no programme
+scope.
+
+### 1. The boundary, recorded
+
+1. **Single active-branch writer** — Orion holds the write hand for
+   `claude/project-rework-plan-pgvp35` while this execution workstream
+   is active. Kai: architecture, rulings, reconciliation, challenge,
+   independent review. DeepSeek: adversarial review. Dainius: final
+   authority.
+2. **Write notification** — an exceptional Kai-side write requires
+   Dainius authority and advance notice.
+3. **D-number control** — Orion allocates while holding the branch;
+   Kai requests, Orion checks ledger plus pending queues and reserves.
+4. **Measurement quiescence** — no writes land while a tree-bound
+   measurement is declared in flight.
+5. **Instrument-level currentness guard** — see §3.
+6. **Kai rules → Orion implements → Orion returns machine evidence →
+   Kai independently verifies.**
+7. **Independence qualifier** — see §4.
+8. No programme authority change.
+
+### 2. D-number allocation under item 3
+
+Canonical ledger highest: **D354**. D344–D353 are reserved to the
+Kingsman workstream and banked in
+`DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md`; `D355` was verified
+unused anywhere in `kai-pm/` before being taken. Allocation record:
+**D344–D353 Kingsman (queued, not yet appended) · D354 Orion · D355
+Orion.** Next free: **D356**.
+
+### 3. Item 5 applied IMMEDIATELY to existing evidence
+
+Branch HEAD is now `906c7aa691d7d9f9d05002a5ad5eff062949254d`.
+
+**World A** — subject `d8aac4d4`. `CURRENTNESS: NOT APPLICABLE.` Bound
+to an immutable historical commit and never described as current tree.
+Unaffected by the rule. **All Census v1.1 freeze evidence rests on World
+A**, so no freeze evidence is touched by this.
+
+**World B** — subject `ca5b1e77`, described as current tree.
+**`CURRENTNESS: OVERTAKEN / EXPIRED.`** Overtaken by **91 commits**;
+**55 documents added** since; population **275 at its stamped subject
+versus 330 at branch HEAD now**. The evidence **remains valid for its
+stamped subject** and **MUST NOT be reported as evidence of present
+branch state**. I have quoted World B figures in D342 and D343; from
+this entry onward they carry that qualification.
+
+### 4. Item 7 — a correction to my own wording
+
+Kai's qualifier is right and it corrects me. In D354 I wrote that Kai's
+manual check of the five positives was *"corroborated outside my
+analyser, by a party that did not build it"* and *"worth more than any
+internal check"*. The check **does** carry genuine evidence
+independence — Kai read the actual source tree, a different source and
+a different method from my static analyser — but my phrasing credited
+the independence to **authorship** rather than to **source and method**,
+and that is the wrong reason.
+
+Recorded permanently: **REVIEW DIVERSITY ≠ EVIDENCE INDEPENDENCE ≠
+AUTHORITY INDEPENDENCE.** Different authors alone prove nothing.
+Evidence independence requires a separately justified source,
+measurement or method wherever the claim demands it.
+
+### 5. Item 5 implementation — FLAGGED UNDER R12, NOT PERFORMED
+
+Kai's item 5 is an **instrument change**: `START_HEAD` → materialise and
+verify → measure frozen subject → resolve `END_HEAD` → mark
+`OVERTAKEN/EXPIRED` on divergence. I have **not** implemented it,
+because doing so silently would contradict two things Kai established:
+
+* it would change `run_census.py`, therefore the manifest, therefore the
+  aggregate **Kai independently recomputed and accepted**
+  (`67071cce…6353`), superseding the freeze-ready identity one decision
+  before the freeze call; and
+* D343's own precedent — *evidence about version X does not qualify
+  version X-plus-one-file* — requires the **full requalification** for
+  any package change: 173 calibration assertions, 39/39 qualification,
+  World A, World B, v1.0↔v1.1 reconciliation, relocated execution and
+  fresh-retrieval verification.
+
+**Recommendation: freeze Census v1.1 at `67071cce…6353` first, then land
+the guard as the first change of the next version.** Reasoning: the
+guard protects *current-tree* reporting only, and every piece of freeze
+evidence rests on **World A**, which is invariant and never described as
+current. So the guard changes nothing the freeze rests on, and freezing
+first locks the exact ruler Kai verified rather than re-opening it.
+
+**Interim control, in force now:** I will not describe any measurement
+as current tree until the guard exists in code. That closes the exposure
+without a package change. World A work is unaffected and may continue.
+
+If Kai or Dainius prefers the guard before the freeze, say so and I will
+implement it and requalify in full — the cost is known and stated above,
+not hidden.
+
+### 6. What I have not done
+
+I have not touched, reviewed, reconciled or measured the Kingsman
+workstream's 55 new documents, and I have not appended D344–D353 on
+their behalf. Both are outside my authority.
+
+---
+
+## THREAD RECOVERY BLOCK — D355
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **BRANCH HEAD AT WRITING** — `906c7aa691d7d9f9d05002a5ad5eff062949254d`
+* **MEASURED SUBJECTS** — World A `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d…`, 272 documents, `CURRENTNESS: NOT APPLICABLE`;
+  World B `ca5b1e77…`, 275 documents, **`CURRENTNESS: OVERTAKEN`**
+* **INSTRUMENTS** — Census `v1.1` **UNCHANGED**, 18/18, aggregate
+  `67071cce7b2fe86aa756e29d0c8efc65ec995161368f63f8892f32a50c006353`,
+  **FREEZE-READY, NOT FROZEN**; Census `v1.0` untouched 12/12; H2 `v1.0`
+  untouched
+* **CURRENT WORKSTREAM** — House-in-Order; working boundary adopted;
+  awaiting the freeze decision and a ruling on item 5 sequencing
+* **LAST PROVEN STATE** — claim-sensitivity 15/15 (D354); package
+  integrity re-verified after rebase and push
+* **AUTHORISED NEXT ACTION** — none. Two decisions are outstanding and
+  both are Kai's/Dainius's: (a) freeze `67071cce…6353`; (b) whether the
+  item-5 guard lands before or after that freeze
+* **EXPLICITLY NOT AUTHORISED** — H2 v1.1 · H3 · H4 · H5 ·
+  document/register repair · Phase B · `ITEM8_GO` · six subject builds ·
+  Stage 2 · seven research-obligation repairs · `=0.2.0` ·
+  KAI-GATE-048 unchanged · Item 8 still before A-4
+* **OPEN / UNRESOLVED** — item-5 guard unimplemented (flagged, costed) ·
+  World B evidence expired for present-state purposes · 267
+  `NO_PROVEN_WRITER` remain abstentions, completeness NOT established ·
+  D344–D353 not yet in the canonical ledger
+* **CORRECTIONS TO PRIOR RECORDS** — D354's independence wording
+  corrected per item 7: the independence came from **source and method**,
+  not from different authorship
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).
