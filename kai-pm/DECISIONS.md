@@ -29938,3 +29938,153 @@ formal binding matrix. None started.
   derivation
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D357 — CENSUS v1.1 FROZEN at `eb7aad7c…fa0e`, for exact
+## committed-subject semantics only
+
+**Authority.** Dainius: *"FREEZE Census v1.1 D356 candidate
+`eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e` at
+commit `bf7313a3a983cf9d908512be54e4d7c3278d43ac`, for exact
+committed-subject semantics only. Do not modify the package, do not
+begin downstream work, and return the banked freeze evidence."*
+Preceded by Kai's freeze-eligibility ruling and independent
+recomputation of the aggregate.
+
+### 1. What is frozen
+
+| | |
+|---|---|
+| package | `kai-pm/house_in_order_census_v11/` |
+| artefacts | 19 |
+| **aggregate** | `eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e` |
+| **commit** | `bf7313a3a983cf9d908512be54e4d7c3278d43ac` |
+| tree at that commit | `2d6b4e5d44021fff322acefbed73968968848a85` |
+| verified at freeze | 19/19 entries, zero diff against the commit |
+
+**THE FREEZE IS AN EXTERNAL GOVERNANCE RECORD. THE PACKAGE BYTES WERE
+NOT TOUCHED.** Editing so much as the README to say "frozen" would
+change the manifest, change the aggregate, and destroy the exact
+identity being frozen. So the package still describes itself internally
+as a *PRE-FREEZE REPAIRED CANDIDATE* — that wording is deliberately left
+in place, and this entry is the authority that supersedes it. A future
+reader finding a frozen package that calls itself pre-freeze is looking
+at the intended state, not an inconsistency.
+
+The 19 artefacts and their hashes are recorded below so this entry is
+verifiable even if the manifest is lost.
+
+### 2. EARNED by this freeze
+
+* exact committed-subject Census v1.1 semantics;
+* resolve-once subject binding;
+* immutable materialisation of the measured committed subject;
+* qualified and calibrated declared states under the existing
+  qualification model;
+* World A evidence under its exact subject;
+* World B evidence **only** for its exact stamped subject;
+* the existing claim-sensitivity result within its stated scope.
+
+### 3. NOT EARNED — and the freeze confers none of it
+
+* branch currentness;
+* worktree equivalence;
+* global writer completeness;
+* closed-world absence for the abstention population — 267 (World A) and
+  325 (World B) `NO_PROVEN_WRITER` remain **ABSTENTIONS**;
+* downstream execution authority;
+* H2 / H3 / H4 / H5 authority;
+* Item 8 authority;
+* A-4 authority;
+* autonomous self-repair.
+
+**Freezing the ruler does not authorise measuring anything with it.** No
+downstream work begins because a freeze landed.
+
+### 4. Supersession
+
+`67071cce7b2fe86aa756e29d0c8efc65ec995161368f63f8892f32a50c006353`
+remains the historical identity of the pre-repair candidate that carried
+the execution-proven symbolic-ref subject-misbinding defect. It is not
+the frozen identity and must never be cited as such.
+
+Census v1.0 (`4a5b40a1…`, 12 entries) remains untouched immutable
+historical evidence with its known aggregate-derivation-description
+ambiguity.
+
+### 5. Frozen manifest, recorded in full
+
+```
+c78220e306c3fa7be53d98339414ef7f9f7a1b45b45f735b340e8a6cbbe9ea4c  applicability.py
+7e72eaf95aaa48de3a81d583007e11579caaa8352f9ad51a5a9214816725e4d1  cal_claims.py
+9bbb9e5c75f038d1ca14b5d603ba3f3ed9f7a644ee231cc573a27dc937fb07fe  cal_docgraph.py
+9159382718873ba1cfdb2d6285b0d85fa5ae1d0f238bad9a49c2b917fe995cc2  cal_opscan.py
+2f38230f773e3ee4d2a055a2f56c2fa619280d3bd74280a37dd1e66aefe026a4  cal_subject_binding.py
+2d18bd5eaf61dfac21c60232e772c65075db293916b917736abcafceae151947  caltrace.py
+2119916ee105ad6778945c43ea0f055d148b0613366ad7f75864c7220db4d234  claims.py
+5f51228a1ee4b1546065842117cf1a78eddf458d076191c4f988a1a5a20dcf57  compare_v10_v11.py
+1ad714e74a344f222effb75d65d68e78c85745a19625fc3efbd3db5d6b0865d2  docgraph.py
+55dee3aa851a1c582d69a27f89a5eb0c78c48306a935a1c65a6774758ce2abe1  opscan.py
+864f773d4a986c4ec7ba4a05dc5cce0599059bd0ac9227c4385d063be59b3beb  qualify.py
+e9aef51f3de38865fd90910ac9b65ba177e2a6bdf2e23f52a0987da8d36a8836  repairs.py
+a69f0512efba5de72061fcee3078695dcfb06160d992fed2e465074243d3ee94  run_census.py
+11452e9506d18989cde43974f2173e925fdf78943a0471bc79d93cf9dd6cd924  README.md
+ef9737701fff7ff2c6617afbe1d44520eb964b1b582555196922f88f94041095  applicability-worldA.json
+ba356abd3a84d32d7b9a86918ea3395dbf80af18dd60b22112b8edd5624e3636  applicability-worldB.json
+8f7d6266a2995cc0d53c14878116317e90c07192f847598299fa6ed93a65533c  census-worldA.json
+6b5ef8cdb9e4b9982825bd48d73e64c71625b15d255aef0badf8c04d0f7e92b6  census-worldB.json
+4ffe60a8baf8e9339a29a82fac2517db21d0c08f879d1ce6d5efcfa65e08d596  compare-v10-v11.json
+```
+
+aggregate = sha256 of the manifest file above =
+`eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e`
+
+### 6. Still captured, still not executed
+
+manifest-convention determinism · the v1.0 `"sorted content"` ambiguity ·
+the currentness classifier · closed-subset completeness · the D-number
+reservation mechanism · the formal binding matrix · mechanical
+enforcement of the flag-before-implement boundary · the
+working-directory scope-binding lesson.
+
+---
+
+## THREAD RECOVERY BLOCK — D357
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **FROZEN ARTEFACT** — Census v1.1, 19 artefacts, aggregate
+  `eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e`,
+  at commit `bf7313a3a983cf9d908512be54e4d7c3278d43ac`, tree
+  `2d6b4e5d44021fff322acefbed73968968848a85`. **FROZEN.**
+* **MEASURED SUBJECTS** — World A `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents;
+  World B `0dcd2288d4b724d878bd538da61a78b4fe476d3e` tree
+  `89960687a29f738da6a7ffb521a78aabb7dad551`, 330 documents
+* **OTHER INSTRUMENTS** — Census `v1.0` untouched, 12 entries, declared
+  aggregate `4a5b40a1…`; `67071cce…6353` superseded; H2 `v1.0` untouched
+  and REJECTED as H3 evidence per D340
+* **CURRENT WORKSTREAM** — House-in-Order; **the ruler is locked**
+* **LAST PROVEN STATE** — calibration 182/182; qualification 39/39, 0
+  findings; subject-binding defect execution-proven before repair and
+  the regression fixture passing after; World A applicability record
+  byte-identical pre/post repair; 5 → 5 write relations; 0 claims
+  changed; portable reproduction and fresh-retrieval both proven by
+  execution; Kai independently recomputed the aggregate and matched
+* **AUTHORISED NEXT ACTION** — none. Return to Dainius/Kai for the next
+  programme-authority decision
+* **EXPLICITLY NOT AUTHORISED** — H2 v1.1 · H3 · H4 · H5 ·
+  document/register repair · Phase B · `ITEM8_GO` · six subject builds ·
+  Stage 2 · seven research-obligation repairs · `=0.2.0` · KAI-GATE-048
+  unchanged · Item 8 remains before A-4 · Kingsman implementation ·
+  appending D344–D353 on Kingsman's behalf
+* **OPEN / UNRESOLVED** — abstention completeness NOT established ·
+  currentness classifier unbuilt · manifest convention captured only ·
+  v1.0 derivation ambiguity · six states restricted on both subjects ·
+  D344–D353 not in the canonical ledger · local mislabelled ref
+  `backup-local-d344`
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354, D355,
+  D356, D357 Orion. **Next free: D358**, subject to a fresh allocator
+  check before use
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).
