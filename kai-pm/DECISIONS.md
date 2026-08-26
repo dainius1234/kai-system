@@ -30269,3 +30269,287 @@ grounds that a second field carrying the same meaning can itself drift.
   Orion. **Next free: D359**, subject to a fresh allocator check
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D359 — CANONICAL PROGRAMME ORDER, adopted prospectively; post-freeze
+## Census claim-scope corrections; governance/evidence only
+
+**Authority.** Dainius, this session: *"authorise D359 exactly as Kai
+specified: governance/evidence only, ratify the existing H0–H6 and
+post-House programme sequence prospectively as canonical, define House
+exit as H6 evidence plus my explicit ruling, create no implementation
+authority, and return before starting HOUSE_H2 or anything
+downstream."*
+
+**THIS ENTRY CREATES NO IMPLEMENTATION AUTHORITY.** Nothing here
+authorises code, a Census successor, HOUSE_H2 v1.1, HOUSE_H3–H6,
+KAI-GATE-048 execution, Item 8, A-4_PROVENANCE, A4_SELF_DIAGNOSIS,
+Phase B, Stage 2, the six subject builds, or any Kingsman
+implementation.
+
+**The frozen Census v1.1 package was not touched.** It remains
+`eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e` at
+commit `bf7313a3a983cf9d908512be54e4d7c3278d43ac`. D357 stands.
+
+---
+
+### 1. THIS ENTRY IS THE CANONICAL PROGRAMME-ORDER SOURCE
+
+**Until explicitly superseded by a later D-numbered decision, D359 is
+the SOLE canonical source of programme order.** Any other document
+stating a sequence — planning material, synthesis maps, research briefs,
+recovery pointers, convenience summaries — is **subordinate and
+derived**, and may not be cited as programme-order authority.
+
+**Recovery blocks must stop independently restating the sequence.** They
+reference this decision by identity. A convenience summary is derived,
+never a second authority.
+
+### 2. THE CANONICAL SEQUENCE — ADOPTED PROSPECTIVELY, NOT RECOVERED
+
+**This is a NEW decision. It is not a recovered fact, and it must never
+be described as something the repository already said.**
+
+```
+HOUSE-IN-ORDER
+  HOUSE_H0 → HOUSE_H1 → HOUSE_H2 → HOUSE_H3 → HOUSE_H4 → HOUSE_H5
+           → HOUSE_H6 → explicit DAINIUS HOUSE EXIT RULING
+        ↓
+KAI-GATE-048 CLOSURE PATH
+  Phase B resolution/authority → sentinel retirement where applicable
+  → exact-tree review → separate ITEM8_GO → six subject builds under
+  explicit Dainius authority → FORMAL KAI-GATE-048 CLOSURE
+        ↓
+A-4_PROVENANCE
+        ↓
+ASSURANCE INTEGRATION MAPPING
+        ↓
+PROFESSIONALISATION / CI TRUTH RESTORATION
+        ↓
+EVIDENCE PLANE / KINGSMAN IMPLEMENTATION
+```
+
+**`A4_SELF_DIAGNOSIS` is a later architectural evolution obligation. It
+is NOT interchangeable with `A-4_PROVENANCE` and does NOT follow
+automatically after it.**
+
+The substance mirrors the plan written in
+`ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md` §5. That document
+declares itself *"SNAPSHOT-BOUND RESEARCH EVIDENCE … NOT CANONICAL
+PROGRAMME STATE … does not supersede `DECISIONS.md`."* Its plan was
+therefore never binding. **D359 promotes it; D359 does not discover
+it.**
+
+### 3. ITEM 8 IS INSIDE THE 048 CLOSURE PATH
+
+`ITEM8_GO` and the six subject builds precede **formal 048 closure**.
+**Item 8 does not discharge, partially satisfy or substitute for
+KAI-GATE-048** unless a later explicit decision establishes such a
+dependency. They remain separate authorities.
+
+### 4. HOUSE EXIT CONTRACT
+
+`HOUSE_H6`'s phrase *"trustworthy enough to resume the pre-existing
+programme"* **shall not be treated as an automatic all-green
+predicate**, and shall not be replaced by a manufactured mathematical
+one.
+
+```
+required HOUSE_H6 evidence mechanically produced and reviewed
+   → explicit DAINIUS HOUSE EXIT RULING
+   → the ruling cites the evidence relied upon
+   → only then may the pre-existing programme resume
+```
+
+**Mechanical evidence determines what was measured and whether required
+checks passed. Dainius determines whether that evidence is sufficient.**
+Subjectivity belongs at a named operator decision, never hidden inside a
+script or implied by green checks.
+
+### 5. CANONICAL HOUSE STATE — INDEPENDENTLY RECOVERED FROM THE LEDGER
+
+| phase | purpose | status |
+|---|---|---|
+| `HOUSE_H0` | instrument qualification and freeze | **CLOSED** |
+| `HOUSE_H1` | final census on an exact subject; a **population, not a verdict** | **COMPLETE** — D336 |
+| `HOUSE_H2` | six-axis classification, `UNKNOWN` first-class | **v1.0 COMPLETE — D338**, then **REJECTED AS H3 EVIDENCE — D340** |
+| `HOUSE_H3` | active claim qualification against tree, registers, CI, artefacts, human authority | **NOT STARTED** |
+| `HOUSE_H4` | repair the control sources — KAI-GATE denominator/register first | **NOT STARTED** |
+| `HOUSE_H5` | document authority / drift enforcement; the check must FAIL on an unclassified controlled document | **NOT STARTED** |
+| `HOUSE_H6` | bank the baseline; prove the drift checks detect their own absence | **NOT STARTED** |
+
+**THEREFORE THE CENSUS FREEZE DOES NOT CONSTITUTE HOUSE EXIT.** Census
+was part of the foundation, not the House itself.
+
+### 6. TERMINOLOGY — BINDING ON ALL NEW GOVERNANCE MATERIAL
+
+`HOUSE_H0` … `HOUSE_H6` · `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS`
+
+Bare `H<n>`, `A-4` and `A4` are **not to be used** in new
+governance/recovery text where the referent could be ambiguous. Three
+collisions are on record: `A-4_PROVENANCE` vs `A4_SELF_DIAGNOSIS`; and
+D66/D67's `H1/H2/H3/H4`, which denote `STUBS_AND_PLACEHOLDERS` findings,
+not House phases.
+
+**Historical records are NOT rewritten to rename them.** Append-only
+stands.
+
+### 7. POST-FREEZE CENSUS CLAIM-SCOPE CORRECTIONS
+
+`D357` frozen status preserved unchanged. Classification going forward:
+
+> **FROZEN HISTORICAL / QUALIFIED EXACT-SUBJECT EVIDENCE ARTEFACT —
+> NOT CLEARED AS A STANDALONE FUTURE CONSUMABLE RELEASE.**
+
+**7.1 DENOMINATOR FAIL-OPEN — EXECUTION-PROVEN.** `qualify.py`
+discovers modules by glob, then swallows import failures with
+`except Exception: continue`. Measured in a disposable copy:
+
+| case | declared values | findings |
+|---|---|---|
+| baseline | 39 | 0 |
+| eligible `ALPHABETS` module, imports cleanly | **41** | **2** |
+| **same module, raises on import** | **39** | **0** |
+| module absent entirely | 39 | 0 |
+
+**A broken eligible module is INDISTINGUISHABLE from an absent one.**
+Silent denominator shrinkage with a green result.
+
+*Bounded:* all six eligible modules in the frozen package import
+cleanly, verified individually, so the qualified runs measured the full
+intended population. **The frozen 39-state result is NOT invalidated.**
+What is false is the emitted claim *"denominator derived from the tree"*
+— it is derived from the **successfully importable subset** of the tree.
+
+Successor requirement, not implemented:
+`DISCOVERED = ADMITTED + EXPLICITLY_REJECTED + ERRORED`; if
+`ERRORED > 0`, a completeness-dependent qualification becomes
+**FAIL / UNKNOWN**, never green. **Not** a hard-coded expected-minimum
+count, which would merely create another list-beside-the-thing defect.
+
+**7.2 OTHER NARROWED CLAIMS.**
+
+* **Subject binding** — proven for the shipped commit-resolving
+  entrypoints; **not** for direct `materialise()` commit-type
+  self-defence. The 40-hex guard excludes symbolic refs only; a tree or
+  blob OID satisfies it.
+* **Portability** — earned claim is *relocation / working-directory
+  independence on the qualified host and dependency environment*. **Not**
+  cross-platform or clean-environment portability.
+* **Applicability** — inseparable **at the artefact level** (bytes and
+  SHA, both directions); **not** mechanically inseparable at arbitrary
+  consumer interpretation.
+* **`qualify.py` self-scope** — manifest-bound, but excluded from its
+  own `instrument_modules()` population, so the mechanism deriving the
+  denominator is not itself four-leg qualified and had no fail-closed
+  fixture.
+
+**7.3 CONSUMER PATH.** No mandatory HOUSE_H2/H3/H4/H5 component
+executes, imports or consumes Census v1.1. The only importer is the
+D354 mutation harness. **A successor package is a future release
+obligation, not a prerequisite for the next programme node.**
+
+**7.4 SUPERSESSION PATTERN.** Never rewrite history to repair history.
+Historical frozen bytes stay immutable; a successor release carries
+corrected documentation and declares `supersedes=<old aggregate>`; an
+external registry marks the old aggregate superseded.
+
+### 8. RULE-28 RECURRENCE AND NEGATIVE-SEARCH DISCIPLINE
+
+**Rule 28 recurrence — CONFIRMED.** Rule 28 requires governing material
+to exist inside the repository and copies to be mechanically
+reconcilable, but **designates no unique programme-order source and no
+hard failure when that source is absent.** Classification: **valid
+doctrine, incomplete enforcement.** §1 supplies the missing designation
+for programme order. No CI mechanism is authorised; binding the
+authority precedes mechanising it.
+
+**Negative-search discipline, adopted:**
+
+> **A governance absence claim must state its search universe and
+> subject. Say `NOT_FOUND_IN_DECLARED_SCOPE`, not `DOES_NOT_EXIST`,
+> unless the search boundary is demonstrably closed.**
+
+This is rule 13 / `UNKNOWN` discipline applied to governance, and it is
+the same requirement P13/P14 impose on the analyser.
+
+### 9. CORRECTIONS TO MY OWN RECORDS
+
+**9.1 "THREE INDEPENDENT CONFIRMATIONS" — WITHDRAWN.** I described the
+programme order as corroborated by three concurring statements. It is
+not. Provenance checked: the research brief and the puzzle map were
+committed **the same day, from the same account, both originating as
+Kai's governance output**, and the puzzle map does not cite the brief.
+The third "witness" was Kai's own recollection — the same mind that
+wrote the brief.
+
+The accurate description is **a consistently repeated non-canonical plan
+with common provenance**. **REPETITION IS NOT CORROBORATION.** Repeating
+a statement in three places makes it feel authoritative while adding no
+authority.
+
+This is the same error as **REVIEW DIVERSITY ≠ EVIDENCE INDEPENDENCE**,
+which I had accepted two entries earlier and then failed to apply to
+governance material.
+
+**9.2 NARROWED PROGRAMME LOCK — WITHDRAWN.** Four consecutive recovery
+blocks of mine state *"Item 8 remains before A-4"*. The canonical lock
+was broader: **048** — not merely Item 8 — before A-4, Kingsman
+integration, repo consolidation, the assurance upgrade, Task 4
+consolidation, RC/dev→main requalification and Evidence Plane work.
+Superseded by §2 and §3.
+
+**9.3 "THE ORDER DOES NOT EXIST" — CORRECTED.** My earlier report should
+have read `NOT_FOUND_IN_CANONICAL_AUTHORITY`, per §8. The plan existed
+in declared-non-canonical material I had not yet exhausted.
+
+### 10. THE NEXT QUESTION IS NOT "START ITEM 8"
+
+On the now-canonical model, the immediate programme problem is:
+
+> **WHAT EXACT REPLACEMENT OR REQUALIFICATION IS REQUIRED FOR
+> `HOUSE_H2` TO BECOME ADMISSIBLE EVIDENCE FOR `HOUSE_H3`?**
+
+Nothing downstream begins until that is decided.
+
+---
+
+## THREAD RECOVERY BLOCK — D359
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **PROGRAMME ORDER AUTHORITY** — **THIS ENTRY (D359) §2**, sole
+  canonical source until explicitly superseded. Do not restate the
+  sequence from any other document, and do not restate it independently
+  in recovery blocks — cite D359
+* **FROZEN ARTEFACT — UNCHANGED** — Census v1.1, 19 artefacts, aggregate
+  `eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e`,
+  commit `bf7313a3a983cf9d908512be54e4d7c3278d43ac`, tree
+  `2d6b4e5d44021fff322acefbed73968968848a85`. **FROZEN, D357 stands.**
+  Classification: frozen historical / qualified exact-subject evidence;
+  **NOT a standalone consumable release**
+* **HOUSE STATE** — `HOUSE_H0` CLOSED · `HOUSE_H1` COMPLETE ·
+  `HOUSE_H2` v1.0 complete but REJECTED as H3 evidence ·
+  `HOUSE_H3`/`H4`/`H5`/`H6` NOT STARTED. **House is NOT exited**
+* **OTHER INSTRUMENTS** — Census `v1.0` untouched, 12 entries, declared
+  aggregate `4a5b40a1…`; `67071cce…6353` superseded; H2 `v1.0` untouched
+* **CURRENT WORKSTREAM** — House-in-Order; programme map bound
+* **AUTHORISED NEXT ACTION** — none. Return to Dainius/Kai to decide the
+  `HOUSE_H2` → `HOUSE_H3` admissibility question (§10)
+* **EXPLICITLY NOT AUTHORISED** — implementation of any kind ·
+  `HOUSE_H2` v1.1 · `HOUSE_H3`–`H6` · Census successor ·
+  programme-order CI mechanism · KAI-GATE-048 execution · Phase B ·
+  `ITEM8_GO` · six subject builds · Stage 2 · `A-4_PROVENANCE` ·
+  `A4_SELF_DIAGNOSIS` · seven research-obligation repairs · `=0.2.0` ·
+  document/register repair · Kingsman implementation · appending
+  D344–D353 on Kingsman's behalf
+* **OPEN / UNRESOLVED** — `HOUSE_H2` admissibility for `HOUSE_H3` ·
+  abstention completeness NOT established · consumer invariant captured
+  but unenforced · denominator fail-open (successor obligation) ·
+  currentness classifier unbuilt · manifest-convention determinism ·
+  v1.0 `"sorted content"` ambiguity · D344–D353 not in the canonical
+  ledger · local mislabelled ref `backup-local-d344`
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D359
+  Orion. **Next free: D360**, subject to a fresh allocator check
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).
