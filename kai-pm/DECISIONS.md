@@ -29440,3 +29440,187 @@ No new load-bearing disagreement arose, so no STOP was triggered.
   aggregate `c81ef694…7a4f` is superseded as freeze identity
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D354 — CENSUS v1.1 CLAIM-SENSITIVITY FREEZE ADDENDUM: both mutations
+## pass, 15/15, claim layer demonstrably sensitive to decisive evidence
+
+> **NUMBERING NOTE — THE GAP D344–D353 IS DELIBERATE AND NOT A LOSS.**
+> This entry was written as D344 and renumbered before it was pushed.
+> While the Census v1.1 work was in flight, a parallel governance and
+> architecture workstream (Kingsman) claimed **D344 through D353** and
+> banked them deliberately *outside* this ledger, in
+> `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md`, under its own
+> integrity rule: *"Until exact current bytes are safely available and
+> an append-only update can be proven, D344–D353 remain durably banked
+> outside the canonical ledger."*
+>
+> Appending mine as D344 would have created two different D344s. So it
+> is D354, the next free number after their queued D353. **I have not
+> appended D344–D353 on their behalf** — that is their workstream's
+> action and not my authority. Until they do, this ledger runs
+> D343 → D354 and the intervening entries live in the queue file.
+
+**Authority.** Kai's D343 final review: *"Census v1.1 is FREEZE-READY
+EXCEPT FOR ONE FINAL LOAD-BEARING QUALIFICATION: CLAIM-LAYER
+SENSITIVITY ... These are calibration mutations only. Do not mutate the
+repository subject or frozen candidate package."*
+
+Census v1.1 package **UNCHANGED**: 18/18 OK, aggregate still
+`67071cce…6353`, zero diff against HEAD. Census v1.0 untouched, 12/12.
+Mutations ran on **disposable copies** of the materialised World A
+subject. No package semantics were changed, because the test revealed no
+defect.
+
+### 1. Kai's independent verification, recorded
+
+Kai independently recomputed the aggregate and got
+`67071cce7b2fe86aa756e29d0c8efc65ec995161368f63f8892f32a50c006353`,
+confirmed the applicability cross-reference is real, and **manually
+checked all five `PROVEN_WRITE_RELATION` positives against the actual
+World A source tree**. All five are genuine.
+
+That is the first time the positive claim side has been corroborated
+**outside my analyser**, by a party that did not build it. It is worth
+more than any internal check in this workstream.
+
+### 2. Precommitment
+
+The mutants and their expected results were written to
+`kai-pm/census_v11_claim_sensitivity/PRECOMMIT.md` and hashed
+(`a89bb9cc2f6aa9bf66096ebf424a9d6fd50dd328b04c39b7ea54bd7430efd5a0`)
+**before any mutant was built or run**. A prediction written after
+seeing the result is not a prediction.
+
+Discovery ran first, and changed the design: the analyser reports
+**three** operations resolving to `CHANGELOG.md` — two READs (lines 55,
+112) and exactly **one** WRITE (line 139). Neutralising "a" write site
+would have been meaningless had there been several; there is one, so the
+removal is precise. The reads were deliberately left intact: if a read
+were enough to keep a write claim alive, the claim layer would be wrong.
+
+### 3. MUTATION A — POSITIVE INJECTION · 7/7
+
+Appended to tracked `scripts/sync_docs.py`:
+`pathlib.Path("docs/DEMO.md").write_text("mutation A probe")`.
+
+`pathlib` is written literally on purpose: a renamed import alias is
+treated as a dynamic expression, so the mutation would never reach the
+branch under test — **which is exactly how two earlier mutation attempts
+(D332) passed while proving nothing.**
+
+| id | expectation | result |
+|---|---|---|
+| A0 | mutation applied | PASS |
+| A5 | injected op admitted, `RESOLVED_WRITE`, target `docs/DEMO.md` — REACHABLE | PASS |
+| A1 | `PROVEN_WRITE_RELATION` 5 → **6** | PASS |
+| A2 | `docs/DEMO.md` `NO_PROVEN_WRITER` → `PROVEN_WRITE_RELATION` | PASS |
+| A3 | sources == `["scripts/sync_docs.py"]` | PASS |
+| A4 | no unrelated document changed claim — TARGETED | PASS |
+| A6 | claim tables differ — DISCRIMINATING | PASS |
+
+### 4. MUTATION B — POSITIVE REMOVAL · 8/8
+
+`scripts/auto_changelog.py:139` `CHANGELOG.write_text(new_text)` →
+`pass`. The anchor was asserted to match before editing on a line number
+(rule 18); the run aborts if it does not.
+
+| id | expectation | result |
+|---|---|---|
+| B0 | anchor matched, write statement removed | PASS |
+| B5 | no WRITE resolves to `CHANGELOG.md`; **both READs survive** | PASS |
+| B1 | `PROVEN_WRITE_RELATION` 5 → **4** | PASS |
+| B2 | `CHANGELOG.md` `PROVEN_WRITE_RELATION` → `NO_PROVEN_WRITER` | PASS |
+| B3 | must **NOT** become `NO_WRITER_WITHIN_ANALYZED_SCOPE` | PASS |
+| B4 | no unrelated document changed claim — TARGETED | PASS |
+| B6 | claim tables differ — DISCRIMINATING | PASS |
+
+B3 matters on its own: removing the only proven writer did **not** close
+the search space. Unresolved candidates remain, so the instrument
+correctly fell back to an abstention rather than manufacturing a
+closed-world negative — the exact failure P13 and P14 exist to prevent.
+
+### 5. Recorded finding
+
+**CLAIM LAYER DEMONSTRABLY SENSITIVE TO DECISIVE EVIDENCE.** 15/15
+checks, both directions: adding decisive evidence strengthens the claim,
+removing it weakens the claim, and neither perturbs an unrelated
+document.
+
+The zero claim changes across the five v1.1 correctness repairs may
+therefore be described as: **those repairs changed evidence quality and
+precision but did not alter the decisive writer relationships on World
+A.** My D342 worry that the claim layer might be insensitive to evidence
+quality is **answered and withdrawn** — not by argument, by measurement.
+
+**This does NOT prove the 267 `NO_PROVEN_WRITER` are complete.** They
+remain abstentions. Sensitivity to decisive evidence is not completeness
+of search.
+
+### 6. Self-binding semantics — recorded explicitly
+
+Cross-binding between the embedded record, the sidecar and the manifest
+proves **INTERNAL CONSISTENCY / NON-DIVERGENCE ONLY**. It does **not**
+independently prove semantic correctness — all three are produced by the
+same run, and an instrument attesting to its own output is the I-8
+shape. Semantic qualification rests on calibration, mutation, exact-
+subject reconciliation, independent execution and Kai's evidence review.
+Self-binding must never be described as independent semantic
+verification.
+
+### 7. Design ruling recorded, implementation NOT authorised
+
+When and if H2 v1.1 is authorised, any consumer of Census v1.1 MUST
+refuse if: the applicability record is missing; its SHA mismatches; the
+embedded record differs from the sidecar; subject identity mismatches;
+or a state with `DOWNSTREAM_USABLE_ON_THIS_SUBJECT=false` is requested
+as supporting evidence. **Binding becomes enforcement at the consumer
+boundary.**
+
+Restricted states stay **declared** in the Census ontology. Removing
+them because `L4=0` would let the corpus edit the ontology — the same
+inversion D341/D342 already corrected. State declared · applicability
+says unusable here · consumer refuses misuse.
+
+### 8. World B
+
+Current handling accepted. Census/instrument files are **not** excluded
+to stabilise the denominator. World B figures are valid only with their
+exact subject commit and tree; World A remains the invariant comparison
+subject.
+
+---
+
+## THREAD RECOVERY BLOCK — D354
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **MEASURED SUBJECT** — World A `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents;
+  mutants were disposable copies, never the repository subject
+* **INSTRUMENTS** — Census `v1.1` **UNCHANGED**, 18/18, aggregate
+  `67071cce7b2fe86aa756e29d0c8efc65ec995161368f63f8892f32a50c006353`,
+  **FREEZE-READY, NOT YET FROZEN**; Census `v1.0` untouched 12/12;
+  H2 `v1.0` untouched
+* **CURRENT WORKSTREAM** — House-in-Order; claim-sensitivity
+  qualification COMPLETE
+* **LAST PROVEN STATE** — 15/15 precommitted checks; A: 5→6 with
+  `docs/DEMO.md` promoted; B: 5→4 with `CHANGELOG.md` demoted to
+  `NO_PROVEN_WRITER` and NOT to the closed-world negative; both TARGETED
+  and DISCRIMINATING; five positives independently corroborated by Kai
+* **AUTHORISED NEXT ACTION** — none. Awaiting the freeze decision on
+  `67071cce…6353`
+* **EXPLICITLY NOT AUTHORISED** — H2 v1.1 (including the applicability
+  enforcement design recorded above) · H3 · H4 · H5 ·
+  document/register repair · Phase B · `ITEM8_GO` · six subject builds ·
+  Stage 2 · seven research-obligation repairs · `=0.2.0`
+* **OPEN / UNRESOLVED** — Census v1.1 unfrozen · 267 `NO_PROVEN_WRITER`
+  remain **abstentions, completeness NOT established** · six states
+  restricted on both subjects · URI and absolute repairs sound but inert
+  here · 715 `UNRESOLVED_RELEVANCE` · history window unqualified before
+  `d6e5d8cf`
+* **CORRECTIONS TO PRIOR RECORDS** — my D342/D343 open worry that the
+  claim layer might be insensitive to evidence quality is **withdrawn**,
+  answered by measurement rather than argument
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).
