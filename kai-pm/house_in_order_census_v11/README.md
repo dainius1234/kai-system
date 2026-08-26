@@ -23,6 +23,7 @@ every claim it makes carries the scope it was measured in.
 | 8 | **Denominator reconciliation** emitted and asserted | Kai: report raw / rejected / admitted / sum(dispositions) and prove they reconcile |
 | 9 | **Relevance and target separated** | a dynamic prefix does not erase `.md` evidence (see below) |
 | 10 | **Portable and subject-bound** | D340: H2's `pass_a.py` hard-coded an absolute repo path and a session `/tmp` path |
+| 11 | **RESOLVE-ONCE subject binding**, and `materialise()` refuses anything that is not an immutable object id | an execution-proven silent misbinding: a symbolic ref re-dereferenced after resolution let the census measure one commit while stamping another, with reconciliation passing |
 
 ### The four legs (Kai's D341 formulation)
 
@@ -62,12 +63,30 @@ python3 compare_v10_v11.py --repo /path/to/repo --ref <sha> \
 Exit status is non-zero when qualification finds anything, so it can be
 chained with `&&` (R3).
 
-**Subject binding.** `run_census.py` materialises the ref with
-`git archive` and verifies the result against `git ls-tree` of the
-original repository *before measuring anything*. v1.0 listed files from
-git but read their bytes from the working tree, so a dirty checkout
-silently mixed two subjects. If materialisation does not match, the run
-aborts and measures nothing (R11).
+**Subject binding — the resolve-once invariant.** The supplied ref is
+resolved to an **immutable commit id exactly once**. Tree derivation,
+`ls-tree`, `git archive`, reconciliation and stamping all use that id;
+nothing dereferences the symbolic ref again, and `materialise()`
+**refuses** any argument that is not a 40-hex object id. The
+materialisation is then verified against `git ls-tree` of the original
+repository before anything is measured, and a mismatch aborts the run
+(R11).
+
+This is a repair, not a precaution. The previous version passed the
+symbolic ref into `materialise()`, which re-dereferenced it. If a branch
+moved in between, **both** sides of the expect/got reconciliation saw
+the new commit — so they agreed, the run reported `reconciles: True`,
+and the result was stamped with the old commit while containing the new
+one's content. A silent MISBINDING that presents as a clean, fully
+populated table, invisible to the very control meant to catch it.
+Demonstrated by execution with the movement forced at a controlled
+boundary, and now held by `cal_subject_binding.py`.
+
+A symbolic ref is a **pointer**. Only an object id is an **identity**.
+
+`--ref` still accepts a branch name for convenience; the resolution
+happens once, up front, and both the invocation ref and the resolved
+commit are recorded so a reader can see which was used.
 
 ---
 
@@ -79,17 +98,21 @@ All 39 pass legs 1–3. The denominator is derived by scanning the package
 for modules exporting `ALPHABETS` (R5); there is no list of values kept
 beside the thing being checked.
 
-Calibration: **173 assertions, 0 failures** across three suites —
-`cal_docgraph` 127, `cal_opscan` 12, `cal_claims` 34 — including 60
-generated crossings and 7 metamorphic groups.
+Calibration: **182 assertions, 0 failures** across four suites —
+`cal_docgraph` 127, `cal_opscan` 12, `cal_claims` 34,
+`cal_subject_binding` 9 — including 60 generated crossings and 7
+metamorphic groups. The suites are discovered by scanning the package
+for `cal_*.py` rather than from a hand-written list, so a new suite
+cannot be added and silently left unexecuted (R5).
 
 Portable reproduction is proven **by execution, not by `sha256sum`**
 (D334): the package was copied to an unrelated directory, where its
-manifest verified 14/14, all suites and `qualify.py` exited 0, and a
+manifest verified 19/19, all suites and `qualify.py` exited 0, and a
 World A census reproduced every measure of the in-tree run identically.
 That check earned its place immediately — it caught `census-worldA.json`
 having been generated *before* the seven-reads correction, so the
-manifest was hashing stale evidence.
+manifest was hashing stale evidence: a manifest that verified perfectly
+over content that was already wrong.
 
 **Proof the gate can fail.** On its first run it reported
 `EXCLUDED_FROM_T :: NOT DISCRIMINATED` — reached six times, but every
@@ -113,13 +136,18 @@ sum(dispositions)             1186     reconciles: True
 claims: NO_PROVEN_WRITER 267 · PROVEN_WRITE_RELATION 5
 ```
 
-### World B — current tree at `ca5b1e7`
+### World B — subject `0dcd228`, tree `89960687`
 
 ```
-documents 275   edges 975
-raw 1473 = rejected 272 + admitted 1201 = sum(dispositions)
-claims: NO_PROVEN_WRITER 270 · PROVEN_WRITE_RELATION 5
+documents 330   edges 1389
+admitted 1210 = sum(dispositions)          reconciles: True
+claims: NO_PROVEN_WRITER 325 · PROVEN_WRITE_RELATION 5
 ```
+
+Invoked with an **immutable commit SHA**, not with `HEAD`. The
+population grew from 275 to 330 because a parallel workstream added 55
+documents to the measured directory; that is a real change in the
+subject, not drift in the instrument.
 
 **World B is bound to the commit named in its own artefact, not to
 "now".** A current-tree census necessarily predates the commit that
@@ -257,6 +285,7 @@ measurement is recomputed on every run, so this claim cannot rot.
 | `caltrace.py` | calibration trace harness (legs 2 and 3) |
 | `cal_docgraph.py` `cal_opscan.py` `cal_claims.py` | calibration suites |
 | `run_census.py` | portable subject-bound runner |
+| `cal_subject_binding.py` | the moving-symbolic-ref regression fixture |
 | `compare_v10_v11.py` | v1.0 ↔ v1.1 reconciliation |
 | `census-worldA.json` `census-worldB.json` | census evidence, each embedding its applicability record |
 | `applicability-worldA.json` `applicability-worldB.json` | standalone applicability artefacts, SHA-bound to the censuses |
@@ -264,7 +293,19 @@ measurement is recomputed on every run, so this claim cannot rot.
 
 ## Status
 
-**PROPOSED FOR FREEZE. NOT FROZEN, NOT ACCEPTED.**
+**PRE-FREEZE REPAIRED CANDIDATE. NOT FROZEN. NOT FREEZE-READY.**
 
-Freeze and acceptance are Kai's and Dainius's to grant. H2 classifier
-v1.1 is **not authorised** and has not been started.
+Freeze eligibility is not a property this package can assert about
+itself, and a green manifest does not confer it:
+
+> **PACKAGE INTEGRITY ≠ INSTRUMENT VALIDITY ≠ FREEZE ELIGIBILITY.**
+
+The manifest verifying proves the bytes match. It proves nothing about
+whether the instrument may be frozen. That decision is Kai's and
+Dainius's. H2 classifier v1.1 is **not authorised** and has not been
+started.
+
+The superseded pre-repair candidate identity is
+`67071cce7b2fe86aa756e29d0c8efc65ec995161368f63f8892f32a50c006353`. It
+remains the historical identity of the package that carried the
+subject-binding defect, and it is not the identity of this one.

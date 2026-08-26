@@ -47,7 +47,16 @@ HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import caltrace as ct  # noqa: E402
 
-CAL_MODULES = ("cal_docgraph", "cal_opscan", "cal_claims")
+def cal_modules():
+    """The calibration population, DERIVED FROM THE TREE (R5).
+
+    This was a hand-written tuple. A list of names kept beside the thing
+    it describes is a defect waiting to be found: adding a suite and
+    forgetting to register it would leave the new suite silently
+    unexecuted while qualification still reported green. Discovering
+    them by glob means the denominator cannot drift from reality.
+    """
+    return tuple(sorted(p.stem for p in HERE.glob("cal_*.py")))
 
 
 def instrument_modules():
@@ -101,7 +110,7 @@ def emission_sites(path: pathlib.Path, value: str):
 
 def run_calibration():
     ct.reset()
-    for name in CAL_MODULES:
+    for name in cal_modules():
         m = importlib.import_module(name)
         m.run()
     return ct.PASSED, ct.FAILED, list(ct.FAILURES)

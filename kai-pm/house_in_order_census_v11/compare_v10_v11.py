@@ -50,9 +50,20 @@ def main():
     frozen = pathlib.Path(a.frozen_v10).resolve()
     dc, g3 = load_v10(frozen)
 
+    # RESOLVE ONCE to an immutable commit, then use only that id. This
+    # evidence object is subject-dependent, so it carries commit AND
+    # tree explicitly rather than leaving the tree to be derived later.
+    commit = RC._run(["git", "rev-parse", f"{a.ref}^{{commit}}"],
+                     cwd=repo).stdout.strip()
+    if not RC.IMMUTABLE_OID.fullmatch(commit or ""):
+        raise SystemExit(f"R11 ABORT: cannot resolve {a.ref!r} to an "
+                         f"immutable commit in {repo}")
+    tree = RC._run(["git", "rev-parse", f"{commit}^{{tree}}"],
+                   cwd=repo).stdout.strip()
+
     with tempfile.TemporaryDirectory() as td:
         subject = pathlib.Path(td) / "subject"
-        RC.materialise(repo, a.ref, subject)
+        RC.materialise(repo, commit, subject)
 
         # ── v1.0, frozen, unmodified ─────────────────────────────────
         d10 = dc.tracked_md(subject)
@@ -85,7 +96,8 @@ def main():
         out.append(s)
         print(s)
 
-    p(f"v1.0 <-> v1.1 RECONCILIATION — subject {a.ref}")
+    p(f"v1.0 <-> v1.1 RECONCILIATION — subject {commit}")
+    p(f"  tree {tree}   (invoked as {a.ref!r})")
     p(f"  population       docs {len(d10)} -> {len(d11)}   "
       f"{'IDENTICAL' if d10 == d11 else 'DIFFERS'}")
     p(f"  edges            {len(e10)} -> {len(e11)}   "
@@ -137,7 +149,11 @@ def main():
         nmin = min(narrow, key=lambda m: m[2] - m[1])
         p(f"    largest narrowing: {nmin[0]}  {nmin[1]} -> {nmin[2]}")
 
-    res = {"subject": a.ref, "docs_v10": len(d10), "docs_v11": len(d11),
+    res = {"subject": commit, "subject_commit": commit,
+           "subject_tree": tree, "invocation_ref": a.ref,
+           "immutable_ref_as_invoked":
+               bool(RC.IMMUTABLE_OID.fullmatch(a.ref or "")),
+           "docs_v10": len(d10), "docs_v11": len(d11),
            "edges_v10": len(e10), "edges_v11": len(e11),
            "ops_v10": n10, "ops_v11": n11, "admission": acc11,
            "dispositions_v10": t10, "dispositions_v11": t11,

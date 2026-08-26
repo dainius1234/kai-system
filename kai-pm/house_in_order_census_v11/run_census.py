@@ -10,10 +10,24 @@ the package unreproducible on any other machine.
 
 SUBJECT BINDING. v1.0 listed files from git but read their CONTENT from
 the working tree, so a dirty checkout silently mixed two subjects. Here
-the ref is MATERIALISED with `git archive`, so the analysed bytes are
-exactly the bytes of that commit -- and the materialisation is verified
-against `git ls-tree` of the original repository before anything is
-measured (R11: no subject, no observation).
+the subject is MATERIALISED with `git archive` and verified against
+`git ls-tree` before anything is measured (R11: no subject, no
+observation).
+
+THE RESOLVE-ONCE INVARIANT. The supplied ref is resolved to an
+IMMUTABLE COMMIT ID EXACTLY ONCE, and every later step -- tree
+derivation, ls-tree, archive, reconciliation and stamping -- uses that
+commit id. Nothing dereferences the symbolic ref again.
+
+This is not a precaution, it is a repair. The previous version passed
+the symbolic ref down into materialise(), which re-dereferenced it for
+ls-tree and archive AFTER main() had recorded the identity. A branch
+moving in between made both sides of the reconciliation see the NEW
+commit, so they agreed, "reconciles: True" was reported, and the result
+was stamped with the OLD commit. Demonstrated by execution on a
+synthetic repository with the movement forced at a controlled boundary.
+`materialise()` now REFUSES anything that is not a 40-hex object id, so
+the defect cannot be reintroduced by a future caller.
 
     python3 run_census.py --repo /path/to/repo --ref <sha> --out out.json
 """
@@ -22,9 +36,15 @@ import argparse
 import collections
 import json
 import pathlib
+import re
 import subprocess
 import sys
 import tempfile
+
+# A subject identity must be an immutable object id. A symbolic ref is
+# a POINTER, and a pointer can move between the moment it is read and
+# the moment it is used.
+IMMUTABLE_OID = re.compile(r"[0-9a-f]{40}")
 
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -42,26 +62,46 @@ def _run(cmd, cwd=None, **kw):
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, **kw)
 
 
-def materialise(repo: pathlib.Path, ref: str, dest: pathlib.Path):
-    """Extract the exact tree at `ref` into `dest` and prove it matches.
+def materialise(repo: pathlib.Path, commit: str, dest: pathlib.Path):
+    """Extract the exact tree at `commit` into `dest` and prove it matches.
+
+    `commit` MUST be an immutable 40-hex object id, and the guard below
+    enforces it rather than trusting the caller.
+
+    THE DEFECT THIS PREVENTS. Earlier this function took the SYMBOLIC REF
+    and re-dereferenced it for both `ls-tree` and `git archive`, after
+    main() had already resolved and recorded the identity. If the ref
+    moved in between, ls-tree and archive both saw the NEW commit, so
+    `expect` and `got` agreed perfectly and the run reported
+    "reconciles: True" while the result was stamped with the OLD commit.
+    A silent subject MISBINDING that presents as a clean, fully
+    populated table -- the exact shape this programme exists to remove.
+    Proven by execution against a synthetic repository, not argued.
+
+    A symbolic ref is a pointer. Only an object id is an identity.
 
     Returns the expected tracked-file list from the ORIGINAL repository,
     which is independent evidence of what the subject contains (I-8).
     """
+    if not IMMUTABLE_OID.fullmatch(commit or ""):
+        raise SystemExit(
+            f"R11 ABORT: materialise() requires an immutable 40-hex commit "
+            f"id; got {commit!r}. A symbolic ref may move between "
+            f"resolution and materialisation.")
     expect = sorted(p for p in _run(
-        ["git", "ls-tree", "-r", "--name-only", ref],
+        ["git", "ls-tree", "-r", "--name-only", commit],
         cwd=repo).stdout.splitlines() if p)
     if not expect:
-        raise SystemExit(f"R11 ABORT: ref {ref!r} lists no files in {repo}")
+        raise SystemExit(f"R11 ABORT: commit {commit!r} lists no files in {repo}")
 
     # binary stdout: the archive is bytes, so it cannot go through the
     # text-mode helper above.
-    tar = subprocess.run(["git", "archive", "--format=tar", ref],
+    tar = subprocess.run(["git", "archive", "--format=tar", commit],
                          cwd=repo, stdout=subprocess.PIPE)
     dest.mkdir(parents=True, exist_ok=True)
     x = subprocess.run(["tar", "-x", "-C", str(dest)], input=tar.stdout)
     if x.returncode != 0:
-        raise SystemExit(f"R11 ABORT: could not materialise {ref}")
+        raise SystemExit(f"R11 ABORT: could not materialise {commit}")
 
     _run(["git", "init", "-q"], cwd=dest)
     # --force: a file may be BOTH tracked at the ref and gitignored, and
@@ -76,7 +116,7 @@ def materialise(repo: pathlib.Path, ref: str, dest: pathlib.Path):
         missing = sorted(set(expect) - set(got))[:10]
         extra = sorted(set(got) - set(expect))[:10]
         raise SystemExit(
-            f"R11 ABORT: materialised subject does not match {ref}. "
+            f"R11 ABORT: materialised subject does not match {commit}. "
             f"expected {len(expect)} files, got {len(got)}. "
             f"missing={missing} extra={extra}")
     return expect
@@ -157,23 +197,36 @@ def main():
     a = ap.parse_args()
 
     repo = pathlib.Path(a.repo).resolve()
-    head = _run(["git", "rev-parse", a.ref], cwd=repo).stdout.strip()
-    tree = _run(["git", "rev-parse", f"{a.ref}^{{tree}}"], cwd=repo).stdout.strip()
-    if not head:
-        raise SystemExit(f"R11 ABORT: cannot resolve ref {a.ref!r} in {repo}")
+    # THE SUBJECT IS RESOLVED EXACTLY ONCE. From here on nothing
+    # dereferences the symbolic ref again -- the tree is derived FROM
+    # the resolved commit, and the commit is what is materialised,
+    # reconciled and stamped.
+    commit = _run(["git", "rev-parse", f"{a.ref}^{{commit}}"],
+                  cwd=repo).stdout.strip()
+    if not IMMUTABLE_OID.fullmatch(commit or ""):
+        raise SystemExit(
+            f"R11 ABORT: cannot resolve ref {a.ref!r} to an immutable "
+            f"commit in {repo} (got {commit!r})")
+    tree = _run(["git", "rev-parse", f"{commit}^{{tree}}"],
+                cwd=repo).stdout.strip()
+    if not IMMUTABLE_OID.fullmatch(tree or ""):
+        raise SystemExit(f"R11 ABORT: cannot derive tree from {commit}")
 
     with tempfile.TemporaryDirectory() as td:
         subject = pathlib.Path(td) / "subject"
-        expect = materialise(repo, a.ref, subject)
+        expect = materialise(repo, commit, subject)
         res = census(subject)
 
     res["instrument"] = INSTRUMENT
-    res["subject"] = {"repo": str(repo), "ref": a.ref, "commit": head,
-                      "tree": tree, "tracked_files": len(expect),
+    res["subject"] = {"repo": str(repo), "invocation_ref": a.ref,
+                      "commit": commit, "tree": tree,
+                      "immutable_ref_as_invoked":
+                          bool(IMMUTABLE_OID.fullmatch(a.ref or "")),
+                      "tracked_files": len(expect),
                       "label": a.label or a.ref}
 
     rows, findings, cal = Q.qualify(res["subject_counts"],
-                                    subject_label=head)
+                                    subject_label=commit)
     res["qualification"] = {
         "rows": rows,
         "findings": [{"alphabet": x, "value": y, "finding": z}
@@ -187,7 +240,7 @@ def main():
     # numbers it restricts. The record is embedded in the census AND
     # written as a standalone artefact carrying identical canonical
     # bytes, so the binding is checkable from either side.
-    record, blob, sha = AP.build(INSTRUMENT, head, tree, rows,
+    record, blob, sha = AP.build(INSTRUMENT, commit, tree, rows,
                                  res.pop("repair_evidence"))
     if not AP.verify(record, blob, sha):
         raise SystemExit("ABORT: applicability record failed self-binding")
@@ -207,9 +260,9 @@ def main():
         "record": record,
     }
 
-    print(Q.report(rows, findings, cal, subject_label=head))
+    print(Q.report(rows, findings, cal, subject_label=commit))
     print()
-    print(f"SUBJECT {head}  tree {tree}")
+    print(f"SUBJECT {commit}  tree {tree}")
     print(f"  documents {res['documents']}   edges {res['edges']}")
     dr = res["denominator_reconciliation"]
     print(f"  raw_candidate_matches         {dr['raw_candidate_matches']}")

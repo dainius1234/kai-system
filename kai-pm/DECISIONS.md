@@ -29768,3 +29768,173 @@ their behalf. Both are outside my authority.
   not from different authorship
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D356 — Subject-binding repair: resolve-once, an immutability guard,
+## and a permanent regression fixture. New candidate identity.
+
+**Authority.** Dainius, this session: *"Subject-binding only"* — the
+narrow repair, its discriminating test and full requalification. The
+manifest-convention obligation was explicitly EXCLUDED and remains
+captured, not executed.
+
+Census v1.0 **untouched**: 12 entries verify, declared aggregate
+`4a5b40a1c1f1aeb7fe26d5341f71b039360f69e22784a6d0fcddfb200fbd3f1e`,
+zero diff against HEAD.
+
+### 1. Allocator re-checked first (Kai's step 1)
+
+`D356` initially showed one hit — which turned out to be my own D355
+entry recording *"Next free: D356"*, a forward reference and not an
+allocation. Checked before concluding rather than after. **D356 taken.**
+Next free: **D357**. D344–D353 remain reserved to Kingsman.
+
+### 2. The defect, proven by execution before it was repaired
+
+`main()` resolved the ref and recorded the identity, then passed the
+**symbolic ref** into `materialise()`, which dereferenced it AGAIN for
+`ls-tree` and for `git archive`.
+
+Hostile fixture, movement forced at a controlled boundary — no sleep, no
+race — on a synthetic repository:
+
+| invocation | stamped | measured | verdict |
+|---|---|---|---|
+| mutable ref `main` | A | **B (3 documents)** | **FAIL** |
+| immutable SHA | A | A (1 document) | PASS |
+
+**Worse than first stated, and this is the part that matters:** the
+`expect`/`got` reconciliation — the control I had been citing as subject
+integrity — is BLIND to it. After the move both sides see B, so they
+agree perfectly and the run reports `reconciles: True` while stamped
+with A. A silent MISBINDING that presents as a clean, fully populated,
+internally consistent table, invisible to the very check meant to catch
+it.
+
+### 3. The repair
+
+**RESOLVE ONCE.** `rev-parse <ref>^{commit}` yields an immutable id; the
+tree is derived FROM THAT ID; `ls-tree`, `archive`, reconciliation and
+stamping all use it. Nothing dereferences the symbolic ref again.
+
+**AND THE DEFECT IS NOW MECHANICALLY IMPOSSIBLE, NOT MERELY AVOIDED.**
+`materialise()` refuses any argument that is not a 40-hex object id. A
+future caller that reintroduces the pattern gets a loud R11 abort
+instead of a silent misbinding. *A symbolic ref is a pointer; only an
+object id is an identity.*
+
+The census now records `invocation_ref`, `commit`, `tree` and
+`immutable_ref_as_invoked`, so a reader can see which was used.
+`compare_v10_v11.py` — also subject-dependent — carries `subject_commit`
+and `subject_tree` explicitly. Per Kai's ruling this is a **provenance
+explicitness** improvement, not the creation of a binding that was
+missing: a commit id already commits to its tree, and I verified that by
+deriving it.
+
+### 4. The fixture is permanent, and it exposed a self-observation trap
+
+`cal_subject_binding.py`, 9 assertions: the guard refuses a pointer;
+movement after resolution has zero effect; and end-to-end the stamp,
+the tree and the content are all A with B having no influence.
+
+**R9 hazard, found while writing it.** Case 3 drives `main()`, `main()`
+calls `qualify()`, and `qualify()` runs this module — infinite
+recursion, an instrument whose own execution is part of what it
+measures. Qualification is stubbed for the duration of that case and
+restored, and the reason is documented in the file rather than left as a
+silent trick.
+
+**`CAL_MODULES` was a hand-written tuple** and is now derived by
+globbing `cal_*.py` (R5). Registering a new suite by hand is exactly how
+a suite gets added and silently never run while qualification still
+reports green.
+
+### 5. Full requalification
+
+* calibration **182/182**, 0 failures — 127 · 12 · 34 · **9**
+* four-leg qualification **39/39**, 0 findings
+* **World A** `d8aac4d4` tree `3abc9e9d`: 272 documents, 944 edges,
+  1458 = 272 rejected + 1186 admitted = sum(dispositions).
+  **Applicability SHA `ef973770…` — IDENTICAL to the pre-repair run**,
+  which is the evidence that the repair changed no measurement.
+* **World B** `0dcd2288` tree `89960687`: 330 documents, 1389 edges,
+  1210 admitted, 325 `NO_PROVEN_WRITER` · 5 `PROVEN_WRITE_RELATION`.
+  Invoked with an **immutable SHA**. The rise from 275 to 330 is 55
+  documents added by the Kingsman workstream — a real change in the
+  subject, not instrument drift.
+* **v1.0 ↔ v1.1 on the identical World A subject**: 272/944 identical,
+  `RESOLVED_WRITE` **5 → 5**, **0 documents whose claim changed**
+* **portable reproduction PROVEN BY EXECUTION** from an unrelated
+  directory: manifest 19/19, all suites and both runners exit 0, and
+  every measure — including `repair_evidence` and the applicability
+  SHA — reproduced identically.
+
+### 6. Identity
+
+**REPAIRED CANDIDATE:
+`eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e`,
+19 artefacts.**
+
+`67071cce…6353` is **superseded** and is now solely the historical
+identity of the package that carried the subject-binding defect.
+
+### 7. Status — Kai's terminology adopted
+
+**PACKAGE INTEGRITY ≠ INSTRUMENT VALIDITY ≠ FREEZE ELIGIBILITY.**
+
+19/19 proves the bytes match the manifest. It does not make the package
+freeze-eligible, and this package does not assert that about itself.
+**PRE-FREEZE REPAIRED CANDIDATE · NOT FROZEN · NOT FREEZE-READY.**
+Returned unfrozen, as instructed.
+
+### 8. Captured, NOT executed
+
+Manifest-convention determinism (input population, ordering key,
+canonical serialisation, newline treatment, metadata inclusion,
+algorithm, derivation — executable rather than prose); the v1.0
+`"sorted content"` derivation ambiguity; the currentness classifier;
+closed-subset completeness; the D-number reservation mechanism; the
+formal binding matrix. None started.
+
+---
+
+## THREAD RECOVERY BLOCK — D356
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **MEASURED SUBJECTS** — World A `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents
+  (invariant comparison subject); World B `0dcd2288d4b724d878bd538da61a78b4fe476d3e`
+  tree `89960687a29f738da6a7ffb521a78aabb7dad551`, 330 documents
+* **INSTRUMENTS** — Census `v1.0` **UNTOUCHED**, 12 entries verify,
+  declared aggregate `4a5b40a1…`, known derivation-description
+  ambiguity; Census `v1.1` **REPAIRED CANDIDATE**, 19 artefacts,
+  aggregate `eb7aad7c…fa0e`, **NOT FROZEN, NOT FREEZE-READY**;
+  `67071cce…6353` superseded; H2 `v1.0` untouched
+* **CURRENT WORKSTREAM** — House-in-Order; subject-binding repair
+  complete and requalified
+* **LAST PROVEN STATE** — 182/182 calibration; 39/39 qualification, 0
+  findings; subject-binding defect execution-proven BEFORE repair and
+  the fixture now passing AFTER; World A measurement identical
+  pre/post-repair; 5 → 5 write relations; 0 claims changed; portable
+  reproduction proven by execution
+* **AUTHORISED NEXT ACTION** — none. Returned unfrozen; the freeze
+  decision is Kai's and Dainius's
+* **EXPLICITLY NOT AUTHORISED** — manifest-convention change · H2 v1.1 ·
+  H3 · H4 · H5 · document/register repair · Phase B · `ITEM8_GO` · six
+  subject builds · Stage 2 · seven research-obligation repairs ·
+  `=0.2.0` · KAI-GATE-048 unchanged · Item 8 remains before A-4
+* **OPEN / UNRESOLVED** — repaired candidate unfrozen · manifest
+  convention captured not executed · v1.0 `"sorted content"` ambiguity ·
+  currentness classifier not built · 267 (World A) / 325 (World B)
+  `NO_PROVEN_WRITER` remain **abstentions, completeness NOT
+  established** · six states restricted on both subjects · D344–D353 not
+  yet in the canonical ledger · local mislabelled ref
+  `backup-local-d344`
+* **CORRECTIONS TO PRIOR RECORDS** — my "FREEZE-READY" wording is
+  withdrawn per Kai: package integrity does not confer freeze
+  eligibility. My "not fully bound" description of commit-only evidence
+  is withdrawn: a commit id already binds its tree, verified by
+  derivation
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

@@ -3898,9 +3898,10 @@
  "instrument": "HOUSE-IN-ORDER-CENSUS-INSTRUMENT v1.1",
  "subject": {
   "repo": "/home/user/kai-system",
-  "ref": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+  "invocation_ref": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
   "commit": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
   "tree": "3abc9e9d8ca11966a6f996d5f0af68072ee5b117",
+  "immutable_ref_as_invoked": true,
   "tracked_files": 1032,
   "label": "WORLD-A original H1 subject"
  },
@@ -4372,7 +4373,7 @@
   ],
   "findings": [],
   "calibration": {
-   "passed": 173,
+   "passed": 182,
    "failed": 0,
    "failures": []
   }

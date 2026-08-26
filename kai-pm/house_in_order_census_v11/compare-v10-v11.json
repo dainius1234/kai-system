@@ -1,5 +1,9 @@
 {
  "subject": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+ "subject_commit": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+ "subject_tree": "3abc9e9d8ca11966a6f996d5f0af68072ee5b117",
+ "invocation_ref": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+ "immutable_ref_as_invoked": true,
  "docs_v10": 272,
  "docs_v11": 272,
  "edges_v10": 944,
