@@ -30553,3 +30553,239 @@ Nothing downstream begins until that is decided.
   Orion. **Next free: D360**, subject to a fresh allocator check
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D360 — Full-history recovery: the window explained 20%, not the cause.
+## LIFECYCLE ontology ruling — evidence facts are not verdicts.
+
+**Authority.** Dainius, this session, on Kai's recommendation:
+*"Authorise D360 as Kai specified"* — governance/evidence only.
+
+**CREATES NO H2 IMPLEMENTATION AUTHORITY AND NO H3 AUTHORITY.** Census
+frozen candidate `eb7aad7c…fa0e` untouched (19/19). HOUSE_H2 `v1.0`
+untouched (14/14, declared `fa8477261b83ef1bfdca273742554329918a80a8ac025f7ad2155e0d655145f4`).
+The active repository was **not unshallowed**; recovery ran in a separate
+temporary clone.
+
+### 1. Full-history recovery — SUCCESS
+
+| | active repo | recovered clone |
+|---|---|---|
+| shallow | **YES**, 1 boundary commit | **NO** |
+| window | 2026-08-05 → 2026-08-26 (**21 days**) | 2025-06-18 → 2026-08-07 (**~14 months**) |
+| subject ancestry depth | 280 | **986** |
+| subject `d8aac4d4` present | yes | yes |
+| subject tree | `3abc9e9d…` | `3abc9e9d…` **EXACT MATCH** |
+
+Mechanism: full clone from origin into a separate temporary directory.
+The subject and its tree were **verified, not assumed**, so this is a
+clean evidence comparison rather than a measurement of a different
+system.
+
+### 2. Sensitivity — and MY FIRST CORRECTION
+
+Recomputed at the **same immutable subject**, same 272-document
+population. 205 unchanged, 67 increased.
+
+Transition distribution for the 216 `LIFECYCLE=UNKNOWN` rows:
+
+```
+1 → 1     173        1 → 2      15
+1 → 4+     23        1 → 3       5
+```
+
+* **43 (20%)** gained further history — abstention caused by the window.
+* **173 (80%)** have exactly one commit **across fourteen months**.
+
+**I told Kai *"the limitation is the history window, not the
+ontology."* THAT IS ONLY 20% TRUE, and it is withdrawn.** The window was
+a real instrumentation defect and it is removable — but the lifecycle
+evidence problem **survives evidence recovery** for 173 documents. The
+ontology question is genuine, not an artefact.
+
+The value of the probe is that it **separated an instrumentation defect
+from genuine uncertainty**. Those were indistinguishable before it ran.
+
+### 3. Witness audit of the 43 existing ACTIVE rows
+
+| witness | count |
+|---|---|
+| `maintained_since_boundary` (commits>1) | 14 |
+| **`present_tense_claim` ONLY** | **29** |
+| overlap (both) | 7 |
+| other | 0 |
+
+**29 of 43 — 67% — of the classifier's existing ACTIVE verdicts rest
+solely on the document's own self-claim**, the exact witness class
+rejected as candidate C. Under recovered history 17 regain ACTIVE via
+`commits>1`; **12 fall to UNKNOWN even with fourteen months of
+history**:
+
+| document | shallow | recovered | fate under a self-claim ban |
+|---|---|---|---|
+| `SESSION_BACKLOG.md` | 1 | 10 | ACTIVE via commits>1 |
+| `data/teammates/scout.md` | 1 | 3 | ACTIVE via commits>1 |
+| `docs/agentic_patterns_spec.md` | 1 | 4 | ACTIVE via commits>1 |
+| `docs/ara_review_status.md` | 1 | 6 | ACTIVE via commits>1 |
+| `docs/hmac_rotation_runbook.md` | 1 | 6 | ACTIVE via commits>1 |
+| `docs/unfair_advantages.md` | 1 | 13 | ACTIVE via commits>1 |
+| `kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE_EXTENSION.md` | 1 | 1 | **UNKNOWN** |
+| `kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md` | 1 | 1 | **UNKNOWN** |
+| `kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE.md` | 1 | 1 | **UNKNOWN** |
+| `kai-pm/CODE_AUDIT_BATCH_GPU_FOUNDATION_STUBS.md` | 1 | 1 | **UNKNOWN** |
+| `kai-pm/CODE_AUDIT_BATCH_GPU_UTILITIES.md` | 1 | 1 | **UNKNOWN** |
+| `kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE.md` | 1 | 1 | **UNKNOWN** |
+| `kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md` | 1 | 1 | **UNKNOWN** |
+| `kai-pm/CODE_AUDIT_REGISTER.md` | 1 | 4 | ACTIVE via commits>1 |
+| `kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` | 1 | 1 | **UNKNOWN** |
+| `kai-pm/MAKEFILE_AUDIT.md` | 1 | 1 | **UNKNOWN** |
+| `kai-pm/MEMORY_GRAPH_DESIGN.md` | 1 | 1 | **UNKNOWN** |
+| `kai-pm/NAVIGATION.md` | 1 | 3 | ACTIVE via commits>1 |
+| `kai-pm/PHASE1_READINESS.md` | 1 | 5 | ACTIVE via commits>1 |
+| `kai-pm/PHASE_0_5_BACKLOG.md` | 1 | 4 | ACTIVE via commits>1 |
+| `kai-pm/PLAYBOOKS/post_merge_checklist.md` | 1 | 2 | ACTIVE via commits>1 |
+| `kai-pm/RISKS.md` | 1 | 4 | ACTIVE via commits>1 |
+| `kai-pm/SERVICE_IDENTITY_TRUST_BOUNDARIES.md` | 1 | 1 | **UNKNOWN** |
+| `kai-pm/SESSION_BOOTSTRAP.md` | 1 | 35 | ACTIVE via commits>1 |
+| `kai-pm/SHOPPING_LIST_PLAN.md` | 1 | 1 | **UNKNOWN** |
+| `kai-pm/STATUS.md` | 1 | 69 | ACTIVE via commits>1 |
+| `kai-pm/STUBS_AND_PLACEHOLDERS.md` | 1 | 6 | ACTIVE via commits>1 |
+| `kai-pm/TECH_WATCH.md` | 1 | 4 | ACTIVE via commits>1 |
+| `kai-pm/UH_PROGRESS_TRACKER.md` | 1 | 33 | ACTIVE via commits>1 |
+
+### 4. MY SECOND CORRECTION — there is no canonical H3 conflict
+
+I reported *"a conflict between two banked rules."* **Withdrawn.**
+
+* `D340` / `D358` **are** canonically banked and binding.
+* The *"qualify claims from active/derived candidates"* wording exists
+  **only** in `ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md` (line 188,
+  commit `55060ab3…`, blob `a283ed33…`, never superseded), whose own
+  header states **"NOT CANONICAL PROGRAMME STATE … does not supersede
+  `DECISIONS.md`"** — plus one **parenthetical gloss** inside D338's
+  recovery block, which D359 §1 classifies as subordinate and derived.
+
+**One side of the claimed tension has no canonical authority behind it.**
+Correct state: **H3's DETAILED INPUT CONTRACT IS NOT YET CANONICALLY
+DEFINED.**
+
+When H3 is designed, `D340`/`D358` bind it:
+**UNKNOWN / ABSTENTION MAY NOT BE USED AS NEGATIVE EVIDENCE OR AS AN
+EXCLUSION CRITERION.** H3 does not need repairing, because H3 does not
+yet exist.
+
+### 5. ONTOLOGY RULING — EVIDENCE FACTS ARE NOT VERDICTS
+
+Full-history recovery exposed a deeper defect than the window. HOUSE_H2
+`v1.0` awards:
+
+```
+commits > 1          → ACTIVE
+present_tense_claim  → ACTIVE
+```
+
+**Neither witness independently proves current ACTIVE lifecycle.**
+
+* `commits > 1` proves **observed maintenance within the measured
+  history**. A deprecated document can be edited; a historical document
+  can receive cleanup; a file can carry many commits and govern nothing.
+* `present_tense_claim` proves only that **the document asserts
+  currentness** — not that the assertion is true.
+* A machine reader establishes **`CONSUMED_AT_SUBJECT`**, not ACTIVE.
+  Stale, deprecated or accidentally retained artefacts are read by code
+  too.
+
+**THE CLASSIFIER WAS MIXING OBSERVATIONS WITH CONCLUSIONS.** HOUSE_H2
+v1.1 must separate them:
+
+| evidence | becomes | may earn |
+|---|---|---|
+| maintenance / history | `MAINTENANCE_OBSERVED` | **not ACTIVE** |
+| document asserts currentness | `SELF_ASSERTS_CURRENT` | **not ACTIVE** |
+| executable component reads it | `CONSUMED_AT_SUBJECT` | **not ACTIVE** |
+| explicit named successor | — | may earn `SUPERSEDED` |
+| properly bound snapshot/date | — | may earn `HISTORICAL` |
+| insufficient qualified evidence | — | `UNKNOWN` |
+
+> **ACTIVE MUST NOT BE AWARDED MERELY FROM COMMIT COUNT, SELF-CLAIM OR
+> CONSUMPTION.** Any future rule earning ACTIVE requires separately
+> justified positive evidence and calibration.
+
+`SUPERSEDED` and `HISTORICAL` remain positively earnable as today.
+
+**H2 v1.0 is NOT repaired in place.** It remains a historical
+benchmark/evidence artefact.
+
+### 6. On the 79% UNKNOWN
+
+**It does not mean H2 failed.** H2's purpose is not to force every
+document into ACTIVE or INACTIVE; it is to classify what can actually be
+supported, preserve uncertainty where it cannot, and hand H3 evidence
+**without poisoning it with false certainty**.
+
+The mistake would have been promoting 177 documents to ACTIVE because
+their prose contains *current*, *final* or *active* — **beautiful
+statistics on a corrupt foundation.**
+
+### 7. Design basis for HOUSE_H2 v1.1 — NOT AUTHORISED, NOT STARTED
+
+Use an explicit full-history source rather than the shallow active
+checkout for history-sensitive evidence; carry subject **and
+history-window** identity; fix abbreviated dates with a boundary pair;
+implement `REFERENCE`/`OTHER` with an emittability meta-check; repair
+nomination gaps with positive witnesses; separate lifecycle evidence
+from lifecycle verdicts per §5; make self-claims evidence rather than
+truth; preserve UNKNOWN; correct the false UNKNOWN explanations; add the
+machine-readable H2→H3 admission contract; traversal errors fail or
+report UNKNOWN rather than shrink a denominator silently; hostile
+fixtures that **fail** against v1.0; precommitted blind holdout; and
+**no adjudicated false positive surviving in any emitted non-abstention
+state**.
+
+---
+
+## THREAD RECOVERY BLOCK — D360
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **PROGRAMME ORDER AUTHORITY** — **D359 §2**. Do not restate the
+  sequence here or elsewhere; cite D359
+* **FROZEN ARTEFACTS — UNCHANGED** — Census `v1.1` 19 artefacts
+  `eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e`
+  at `bf7313a3…`, D357 stands; Census `v1.0` 12 entries `4a5b40a1…`;
+  HOUSE_H2 `v1.0` 14 artefacts `fa847726…45f4`
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents.
+  History-window identity now matters: **shallow view = 21 days /
+  ancestry 280; recovered view = ~14 months / ancestry 986.** Any
+  history-derived number must state which view produced it
+* **HOUSE STATE** — `HOUSE_H0` CLOSED · `HOUSE_H1` COMPLETE ·
+  `HOUSE_H2` v1.0 complete but REJECTED as H3 evidence, and now also
+  subject to the §5 ontology ruling · `HOUSE_H3`–`H6` NOT STARTED
+* **CURRENT WORKSTREAM** — House-in-Order; lifecycle ontology settled,
+  v1.1 design basis banked
+* **AUTHORISED NEXT ACTION** — none. The next decision is whether to
+  authorise **one** HOUSE_H2 v1.1 build/requalification cycle against
+  §5 and §7
+* **EXPLICITLY NOT AUTHORISED** — HOUSE_H2 v1.1 implementation ·
+  `HOUSE_H3`–`H6` · Census successor · unshallowing the active
+  repository · programme-order CI mechanism · KAI-GATE-048 execution ·
+  Phase B · `ITEM8_GO` · six subject builds · Stage 2 ·
+  `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · document/register repair ·
+  Kingsman implementation · appending D344–D353 on Kingsman's behalf
+* **OPEN / UNRESOLVED** — 173 documents with one commit across full
+  history: no evidence yet distinguishes *finished and stable* from
+  *abandoned* from *never adopted* · 12 current ACTIVE rows would fall
+  to UNKNOWN under §5 even with full history · H3 input contract not
+  canonically defined · abstention completeness not established ·
+  Census denominator fail-open (successor obligation) ·
+  manifest-convention determinism · v1.0 `"sorted content"` ambiguity ·
+  D344–D353 not in the canonical ledger
+* **CORRECTIONS TO PRIOR RECORDS** — my *"the history window is the
+  cause"* WITHDRAWN: it explains ~20%, not the whole; my *"conflict
+  between two banked rules"* WITHDRAWN: the H3 scoping phrase is not
+  canonically bound
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D360
+  Orion. **Next free: D361**, subject to a fresh allocator check
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).
