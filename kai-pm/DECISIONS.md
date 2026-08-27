@@ -31249,3 +31249,204 @@ suppression of evidence.
   Orion. **Next free: D364**, subject to a fresh allocator check
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D364 — 2026-08-27 — VALIDITY-binding population audit: 6 of 56 whole-file verdicts proven. EVIDENCE ONLY
+
+**Authority.** Dainius authorised D364 as **evidence-only** on Kai's
+recommendation. This entry **creates no repair authority, no ontology
+implementation authority, no HOUSE_H3 authority and no freeze
+authority.** It banks measurements and corrections. Kai's earlier "no
+D364 yet" barred turning the first holdout failure into a repair
+decision before the population was counted; the population is now
+counted, and banking it is a different act.
+
+**Why banked now rather than after the repair.** The measurement is
+history-sensitive and the active repository **cannot reproduce it**: it
+is shallow (ancestry 280 at the subject, oldest 2026-08-05) where the
+audit needs full history (ancestry 986, oldest 2025-06-18). A shallow
+source does not fail — it returns its graft boundary as a plausible
+date. `TECH_WATCH.md` answers `2026-08-05` shallow and `2026-07-24`
+truthfully. The audit and its recovered environment were in `/tmp` and
+would have died with the container.
+
+### 1. What the blind holdout found, and what the audit found under it
+
+Kai's independent adjudication of the 24-row holdout returned a blocking
+false positive: `kai-pm/SEQUENCE.md` emitted `VALIDITY=EXACT_SNAPSHOT`
+on the strength of citing `97a3a61` for the single local statement that
+J1–J7 are done. `CITES_COMMIT` was promoted to whole-file snapshot
+binding — the D360 defect class, on an axis nobody was watching.
+
+The commissioned read-only population audit found the same shape across
+**all four** VALIDITY rules, and two are worse than `has_sha`.
+
+| emitted state | N | BINDING PROVEN | SELF_CLAIM_ONLY | REGION/CITATION | AMBIGUOUS | FALSE_POSITIVE |
+|---|---|---|---|---|---|---|
+| `RUN_ARTEFACT` | **0** | 0 | 0 | 0 | 0 | 0 |
+| `EXACT_SNAPSHOT` | 26 | 6 | 0 | 13 | 0 | **7** |
+| `TIME_BOUND` | 23 | **0** | 14 | 9 | 0 | 0 |
+| `CURRENT_TREE` | 7 | **0** | 0 | 0 | 0 | **7** |
+| **TOTAL** | **56** | **6** | **14** | **22** | 0 | **14** |
+
+**50 of 56 non-abstention VALIDITY verdicts are not proven as whole-file
+validity states.** 14 are adjudicated false positives; the other 36 are
+not thereby false — their truth is unproven, which is a different claim
+and is recorded as such. **12 of the 14 false positives lie outside the
+partially-revealed holdout**, so the class does not rest on that sample.
+
+### 2. Two checks, each using evidence independent of the pattern under test (I-8)
+
+**Does a commit-shaped witness resolve as a commit?** 19 of 26 do. Seven
+do not: `ed25519` twice (an algorithm name), `1700000000` (a unix
+timestamp, in a line naming it as one), three 11-digit **workflow run
+ids**, and `b5e68a3` — a fragment of `` `sha256:b5e68a3…` ``, a **Docker
+image digest**. `SHA = \b[0-9a-f]{7,40}\b` is not a commit-shaped test.
+
+Caveat carried in the data: *"does not resolve" is not proof a token is
+not a commit elsewhere; it is proof the classifier never checked.*
+
+**Does a self-claimed date survive the history?** `last` was already in
+the Pass A row and was never consulted. **9 of 23 documents changed
+after the date they claim** — `TECH_WATCH.md` +94d,
+`agentic_patterns_spec.md` +92d, `unfair_advantages.md` +90d,
+`PROJECT_BACKLOG.md` +32d, `DECISIONS.md` +30d, and four more.
+
+### 3. ~~The D340 date repair proved the classifier's VALIDITY had improved~~
+
+**Struck through. Withdrawn as proof of correct VALIDITY.** D361 recorded
+`docs/agentic_patterns_spec.md` moving `CURRENT_TREE` → `TIME_BOUND` as
+the repaired D340 false positive, proved by a fail-old/pass-new pair.
+
+The fixture proved **abbreviated date recognition was repaired**. It did
+**not** prove **the date binds the document**. The document claims
+`2 Mar 2026`; history shows it last changed `2026-06-02`. One syntactic
+defect repair followed by an unsupported semantic promotion, certified
+by a green fixture that never tested the property being claimed.
+
+The date-recognition repair itself stands. Only the semantic conclusion
+drawn from it is withdrawn.
+
+### 4. `RUN_ARTEFACT = 0` was an empty population reported as though measured
+
+`RUN`'s character class `[ :#]*` admits space, colon and hash but not
+`*` or a backtick, so `**Last run:** 31570714150` and `` run `31894868473` ``
+both miss; `SHA` reaches the digits first and the document is routed to
+`EXACT_SNAPSHOT`. The rule is unaudited **and** its subjects exist in the
+corpus. R11 seen from the other side.
+
+### 5. `CURRENT_TREE` is 0-for-7 against our own qualified instrument
+
+`SELF_ASSERTS_CURRENT` (narrow, subject-bound) = 6. The raw
+`present_tense` flag = 39. `CURRENT_TREE` = 7, **none** carrying the
+qualified fact. `PLAYBOOKS/post_merge_checklist.md` earns it for
+instructing the reader to refresh *`STATUS.md`'s current-focus field* —
+a field name in another document.
+
+`RUN.md` already states the raw flag is six times broader than a real
+currentness claim, *"which is why it should never have earned a
+verdict."* We built the narrow instrument, wired it into `LIFECYCLE`,
+and left `VALIDITY` consuming the raw flag. **R6: the class was repaired
+in one place and declared closed.**
+
+### 6. Kai's ontology ruling, recorded as binding for the later repair
+
+**No region-scoped `VALIDITY` state is to be added.** `SCOPE` region
+overrides are not earnable at H2, and inventing a state to retain
+positive counts would couple two unresolved axes. `VALIDITY` stays a
+whole-document verdict axis. The observations beneath it separate into
+evidence facts — `CITES_COMMIT`, `CITES_RUN`, `CARRIES_DATE_STAMP`,
+`SELF_ASSERTS_CURRENT`, `BINDING_CONTRADICTION` — which earn nothing.
+
+A positive whole-file verdict requires **explicit document-level
+binding + verified witness kind + applicable scope = whole document + no
+unresolved material contradiction**; otherwise `UNKNOWN`. The binding
+requirement is **semantic, not a Markdown-header layout rule** — Kai's
+refinement, taken to avoid replacing a phrase-list defect with a
+formatting defect. `CURRENT_TREE` is not to be forced to stay populated.
+
+Predicted impact, recorded **before any repair code** so it cannot be
+tuned to afterwards: `VALIDITY UNKNOWN` 216 → ~266 of 272 (98%),
+`CURRENT_TREE` → 0, `EXACT_SNAPSHOT` → ~6, `TIME_BOUND` → 0. Kai's
+judgement, adopted: *98% UNKNOWN is better than 75% believable-looking
+fiction.* My own reservation is recorded with it — an instrument that
+abstains on 98% of its corpus has nearly stopped measuring, and that
+tension is real rather than resolved.
+
+### 7. Artefacts banked
+
+* `kai-pm/VALIDITY_BINDING_AUDIT.md` — the report, all 56 rows
+* `kai-pm/validity_binding_audit_d364.json` — witness, context, position
+  and per-row reasoning for every row
+* `kai-pm/validity_binding_audit.py` — the read-only instrument, fully
+  parameterised. **Not part of the HOUSE_H2 package and never imported
+  by a classifier.** Its three R11 guards were each proven to fire:
+  shallow history source, mutable ref, mismatched subject repo. Re-run
+  reproduces 6 / 14 / 22 / 0 / 14 and 9 contradictions exactly.
+
+The adjudication classes are an **author nomination**, not authority.
+Every row ships its witness and context so an independent reviewer can
+overturn it.
+
+### 8. What this does NOT establish
+
+The 36 unproven-but-not-false verdicts are **not** shown to be wrong.
+`FUNCTION`, `AUTHORITY`, `GENERATION` and `SCOPE` are **UNMEASURED** for
+this defect class. `SCOPE` in particular emits `WHOLE_FILE` across all
+272 — and *whole file* is itself a scope claim, so a default presented
+as a finding is exactly the shape this audit was built to detect.
+
+---
+
+### THREAD RECOVERY BLOCK
+
+* **HEAD** — this entry, on `claude/project-rework-plan-pgvp35`
+* **H2 v1.1 CANDIDATE** —
+  `be37a0aa5d56255a151c31361d93e8b4be94ab912ec9441c8ac3535a84fbf133`,
+  **UNFROZEN FAILED-ADMISSION CANDIDATE**, preserved as evidence, not
+  discarded. Lifecycle boundary **ACCEPTED** (D363). VALIDITY semantics
+  **DEFECTIVE, POPULATION NOW COUNTED**
+* **UNTOUCHED** — HOUSE_H2 `v1.0` `fa847726…45f4` · Census `v1.1`
+  `eb7aad7c…fa0e` · Census `v1.0` `4a5b40a1…`
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents.
+  **History source must be NON-SHALLOW** (ancestry 986, oldest
+  2025-06-18); the active repo is shallow and returns wrong answers
+* **HOUSE STATE** — `HOUSE_H0` CLOSED · `HOUSE_H1` COMPLETE ·
+  `HOUSE_H2` failed admission, repair scope not yet known ·
+  `HOUSE_H3`–`H6` NOT STARTED
+* **AUTHORISED NEXT ACTION** — **read-only cross-axis semantic audit of
+  `FUNCTION`, `AUTHORITY`, `GENERATION`, `SCOPE`** on the same immutable
+  subject. For each: derive the non-abstention population, identify the
+  witness earning every positive class, determine whether it proves the
+  semantic claim the label makes, classify as PROVEN /
+  UNSUPPORTED_POSITIVE / FALSE_POSITIVE / ABSTENTION /
+  DEFERRED_BY_DESIGN / AMBIGUOUS, and count before proposing anything.
+  Then return
+* **EXPLICITLY NOT AUTHORISED** — the VALIDITY repair · any classifier
+  or H2 package change · ontology implementation · a new H2 candidate ·
+  a new blind holdout · `HOUSE_H3`–`H6` · freezing · Census successor or
+  modification · H2 v1.0 modification · programme-order CI mechanism ·
+  KAI-GATE-048 · Phase B · `ITEM8_GO` · six subject builds · Stage 2 ·
+  `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · document/register repair ·
+  Kingsman implementation
+* **OPEN / UNRESOLVED** — 50 of 56 VALIDITY verdicts unproven at claimed
+  scope · four axes unaudited for this defect class · `wake_intent_j2`
+  FUNCTION gap uncurated · 173 documents undecidable from git evidence ·
+  `LIFECYCLE=ACTIVE` earnable by no existing rule · Census confound not
+  isolatable without an adapter · H3 consumer gate specified but
+  unbuilt · D344–D353 not in the ledger
+* **HOLDOUT** — the D363 24-row holdout is **partially revealed
+  regression evidence only**. Adjudication stopped at the first blocker.
+  **Not to be inspected further.** A new holdout is created only after
+  the complete repair scope is known, under a new salt, its selection
+  contract committed in **its own durable pre-repair commit**, and not
+  adjudicated by Orion
+* **CORRECTIONS TO PRIOR RECORDS** — D361's `agentic_patterns_spec.md`
+  repair is **withdrawn as proof of correct VALIDITY** (§3); the date
+  recognition repair itself stands
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D364
+  Orion. **Next free: D365**, subject to a fresh allocator check
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).
