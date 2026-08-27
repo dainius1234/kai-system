@@ -131,6 +131,37 @@ Proactive engineering is not autonomous scope expansion.
     > already widened.*
     > *OWNER/STAGE: instrument capture layers.*
 
+40. **An anomaly signal is an instruction to check, not a caveat to
+    record.** When a result registers as wrong — including when the
+    reason cannot yet be articulated — investigate before continuing.
+    **A doubt written down beside the deliverable it doubts is not
+    action; it is insurance against being wrong later.**
+
+    The signal is a **pointer, not a claim**. It licenses no assertion
+    whatever — rule 1 and R1 bind absolutely — it decides only **where
+    the next check is spent**.
+
+    The asymmetry is never close, and the characteristic failure is not
+    weighing it at all:
+
+    ```
+    check, clean      -> minutes spent, confidence gained
+    check, not clean  -> caught before it reaches anyone else
+    do not check      -> the cost lands downstream, later and larger
+    ```
+
+    This generalises rule 14 from detector output to any anomalous
+    observation, and it binds every producer — human, model or
+    instrument. **"The work is finished and the tests are green" is sunk
+    cost, not judgement.**
+
+    > *ENFORCEMENT: manual now.*
+    > *MACHINE HOOK: hedging language in a deliverable ("deserves
+    > suspicion", "worth noting", "I would flag") detected and required
+    > to resolve to either a completed check or an explicit accepted-risk
+    > record before the artefact ships.*
+    > *OWNER/STAGE: report/deliverable tooling.*
+
 36. **A sound negative indicator does not authorise its converse.**
     That *X* is evidence **against** *Y* does not make *not-X* evidence
     **for** *Y*. Repeated per-record date fields may be evidence against
@@ -466,6 +497,7 @@ Proactive engineering is not autonomous scope expansion.
 | 34 | a plain `Reviewed: <date>` witness parked as `UNRESOLVED PENDING SEMANTIC AUTHORITY` when the source was perfectly intelligible and it was the *positive* that had failed its burden. Searching for authority forbidding a label, when abstention was already the default (D369) |
 | 35 | seventeen HOUSE_H2 defect classes, all one shape: an observation recorded at one scope and reported at a wider one. `reviewed-at` promoted to `time-bound-validity`; a commit cited for one sentence promoted to a whole-file snapshot binding; a bare pronoun promoted to a subject (D364–D368) |
 | 36 | a uniqueness rule shipped on a denominator of one in 162: repetition of a binding predicate is evidence *against* whole-document scope, and its converse was implemented as evidence *for* it (D368) |
+| 40 | HOUSE_H2 v1.2 W2: `VALIDITY` rose 56 → 161 while every other axis fell. The anomaly was registered, written into the report as a worry, and the candidate shipped anyway on an explanation that was liked but unproven. The skipped check was minutes of source reading; the cost landed on the adjudicator, who reasoned with the wrong figure in front of him. Directed into doctrine by Dainius (D368/D369) |
 | 37 | the same 18-vs-19 count as rule 33, seen from the population side: a literal filter reported as a mechanism population, where the corpus split 120/24 across two dates (D369) |
 | 38 | an instruction to stop the 40-row holdout at the first blocker, when the frozen contract required all forty. Repository state had been verified; the instruction against the contract had not (D369) |
 | 39 | six `EXACT_SNAPSHOT` documents called "independent corroboration" when both the machine rule and the prior source adjudication traced to the same authority (D369) |
