@@ -12,11 +12,19 @@ DeepSeek found it and Kai confirmed it. The earned claim at that point
 was only "the current implementation does not use those fields" -- code
 discipline, not a boundary.
 
-`lifecycle()` now receives `lifecycle_view(row)`, which contains ONLY
-LIFECYCLE_AUTHORISED_INPUTS. The forbidden fields are ABSENT from the
-object, so reading one raises KeyError, and widening the boundary
-requires editing a named tuple -- a visible, reviewable change rather
-than a silent one.
+THE SECOND ATTEMPT WAS ALSO OVERSTATED. `lifecycle(view, blocked)` took
+a narrowed mapping, and I called that structural -- but nothing stopped a
+caller passing the full row instead of the view, and the function would
+have accepted it. The SHIPPED PATH was narrow; the API was not. DeepSeek
+found that too.
+
+`lifecycle()` is now SCALAR and KEYWORD-ONLY:
+
+    lifecycle(*, path, superseded_by, has_sha, blocked)
+
+There is no row-like parameter at all, so there is no object through
+which anything else can arrive. Adding a lifecycle input requires
+changing this signature.
 
 The lesson is the one I had just argued and then failed to apply: a
 comment saying "do not use these" would not have prevented v1.0's defect
@@ -98,30 +106,30 @@ def _val(v, witness_type=None, witness=None):
 LIFECYCLE_AUTHORISED_INPUTS = ("path", "superseded_by", "has_sha")
 
 
-def lifecycle_view(row):
-    """A narrowed input containing ONLY authorised lifecycle fields.
+def lifecycle(*, path, superseded_by, has_sha, blocked):
+    """SCALAR, KEYWORD-ONLY. There is no row-like parameter at all.
 
-    THIS EXISTS BECAUSE MY EARLIER CLAIM WAS FALSE. v1.1 as first built
-    passed the FULL Pass A row to lifecycle(), and I described that as
-    "cannot convert evidence facts into verdicts even by accident". It
-    could: commits_in_window, present_tense, readers and exe_ops were all
-    reachable inside the function. It declined to read them; it was not
-    prevented from reading them.
+    TWO EARLIER ATTEMPTS AT THIS BOUNDARY WERE BOTH OVERSTATED BY ME.
 
-    That is the defect I had just finished arguing against -- I said a
-    comment would not have stopped v1.0 awarding ACTIVE from a self-claim,
-    then relied on discipline rather than structure myself. The boundary
-    is now the object, not the intention.
+    First: lifecycle(row, blocked) received the FULL Pass A row. I called
+    that "cannot convert evidence facts into verdicts even by accident".
+    It could -- every forbidden field was reachable.
+
+    Second: lifecycle(view, blocked) received a narrowed mapping. I called
+    that structural. But nothing stopped a caller passing the full row
+    instead of the view, and the function would have accepted it happily.
+    The SHIPPED PATH was narrow; the API was not.
+
+    Now there is no object to smuggle anything through. Adding a lifecycle
+    input requires changing this signature -- an explicit, reviewable API
+    change, not a silent one.
+
+    The claim this earns, and no more: UNDER THIS INTERFACE, LIFECYCLE HAS
+    NO PARAMETER THROUGH WHICH MAINTENANCE, SELF-CURRENTNESS, CONSUMPTION
+    OR ANY OTHER NON-AUTHORISED PASS-A FIELD CAN ENTER. Source can always
+    be changed later; that is not what "structural" claims.
     """
-    return {k: row[k] for k in LIFECYCLE_AUTHORISED_INPUTS}
-
-
-def lifecycle(view, blocked):
-    """Receives ONLY `lifecycle_view(row)`. The evidence facts and the
-    raw fields behind them are not present in `view` at all, so no
-    future edit can read them here without first widening
-    LIFECYCLE_AUTHORISED_INPUTS -- a visible, reviewable change."""
-    row = view
+    row = {"path": path, "superseded_by": superseded_by, "has_sha": has_sha}
     if blocked:
         return dict(value=ont.CAPABILITY_FAILURE,
                     unresolved_reason="ENVIRONMENT_CAPABILITY_MISSING: "
@@ -212,10 +220,11 @@ def family_rule_proven(rows):
 
 def classify(row, text, blocked_by_axis, fam_ok, fam_why):
     out = {}
-    # the narrowed view is constructed HERE; the full row never
-    # crosses the lifecycle boundary
-    out["LIFECYCLE"] = lifecycle(lifecycle_view(row),
-                                 blocked_by_axis.get("LIFECYCLE"))
+    # the authorised values are selected HERE, individually, by name.
+    # There is no object crossing the lifecycle boundary at all.
+    out["LIFECYCLE"] = lifecycle(
+        path=row["path"], superseded_by=row["superseded_by"],
+        has_sha=row["has_sha"], blocked=blocked_by_axis.get("LIFECYCLE"))
     out["FUNCTION"] = function(row, text, fam_ok, fam_why)
 
     claims, amb = sb.bind_claims(row["path"], text)

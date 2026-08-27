@@ -59,9 +59,46 @@ def qualify(result):
     return table, findings, observed
 
 
+def runtime_module_identity(manifest_path):
+    """Prove WHICH BYTES actually executed.
+
+    Kai's requirement, and it is not paranoia: this workstream has
+    produced three wrong answers from wrong-path/shared-state errors,
+    each caught only because the number looked implausible. Inspecting
+    sys.path and concluding "stale imports are impossible" is the same
+    reasoning that failed before. So the loaded modules are resolved and
+    their SOURCE BYTES hashed against the candidate manifest.
+    """
+    import hashlib
+    import classify2, evidence, ontology, passa, subjectbind2, envcontract2
+    manifest = {}
+    for line in pathlib.Path(manifest_path).read_text().splitlines():
+        if "  " in line:
+            h, n = line.split("  ", 1)
+            manifest[n.strip()] = h.strip()
+    rows, bad = [], []
+    here = pathlib.Path(manifest_path).resolve().parent
+    for m in (classify2, evidence, ontology, passa, subjectbind2, envcontract2):
+        f = pathlib.Path(m.__file__).resolve()
+        name = f.name
+        under = f.parent == here
+        digest = hashlib.sha256(f.read_bytes()).hexdigest()
+        want = manifest.get(name)
+        match = (digest == want)
+        rows.append({"module": m.__name__, "file": str(f),
+                     "under_candidate_dir": under,
+                     "source_sha256": digest, "manifest_sha256": want,
+                     "matches": match})
+        if not (under and match):
+            bad.append(name)
+    return rows, bad
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--result", required=True)
+    ap.add_argument("--manifest", default=None,
+                    help="candidate MANIFEST.sha256 for runtime identity")
     a = ap.parse_args()
     res = json.load(open(a.result))
     table, findings, observed = qualify(res)
@@ -90,6 +127,19 @@ def main():
     print(f"  reconciles          : {recon}")
     if not recon:
         findings.append(("POPULATION", "-", "-", "declared != classified"))
+
+    if a.manifest:
+        print("\n  RUNTIME MODULE IDENTITY (which bytes actually executed)")
+        rows_id, bad = runtime_module_identity(a.manifest)
+        for r in rows_id:
+            print(f"    {r['module']:<16} under-candidate={r['under_candidate_dir']}"
+                  f"  sha-match={r['matches']}  {r['source_sha256'][:16]}…")
+        if bad:
+            findings.append(("RUNTIME_IDENTITY", ",".join(bad), "-",
+                             "loaded module is not the candidate's byte"))
+        else:
+            print("    ALL loaded modules resolve under the candidate "
+                  "directory and match the manifest byte-for-byte")
 
     print(f"\n  FINDINGS: {len(findings)}")
     for axis, v, disp, note in findings:

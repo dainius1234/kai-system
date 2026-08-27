@@ -31112,3 +31112,140 @@ axis kept. D360 ontology untouched.
   Orion. **Next free: D363**, subject to a fresh allocator check
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D363 — HOUSE_H2 v1.1 final boundary hardening: scalar lifecycle API,
+## schema-derived fixture, runtime identity proven
+
+**Authority.** Dainius, this session: *"authorise the final narrow
+HOUSE_H2 v1.1 boundary hardening exactly as Kai specified."* **NO H3
+AUTHORITY. NOT FROZEN. NOT ADMITTED.**
+
+**FINAL CANDIDATE:
+`be37a0aa5d56255a151c31361d93e8b4be94ab912ec9441c8ac3535a84fbf133`**,
+15 artefacts.
+Predecessors preserved as historical unfrozen: **D361 `2e308be7…47a7`**,
+**D362 `d3139978…60e4`**.
+
+HOUSE_H2 `v1.0` untouched (14/14). Census `v1.1` untouched (19/19).
+
+### 1. The boundary — third attempt, and the first two were both mine
+
+| attempt | interface | boundary |
+|---|---|---|
+| D361 | `lifecycle(row, blocked)` — full Pass A row | **FAILS** |
+| D362 | `lifecycle(view, blocked)` — narrowed mapping | **FAILS** |
+| D363 | `lifecycle(*, path, superseded_by, has_sha, blocked)` | **HOLDS** |
+
+D362 narrowed the **shipped call path** but not the **API**: nothing
+stopped a caller passing the full row instead of the view, and the
+function would have accepted it. I called that structural. It was not.
+**DeepSeek found it; Kai confirmed it; I verified it before accepting
+it** — `lifecycle(FULL_ROW, [])` succeeded.
+
+There is now **no row-like parameter at all**. A full row is refused
+positionally and every forbidden field is refused as a keyword.
+
+**The exact claim earned, and no more:** *under this interface, lifecycle
+has no parameter through which maintenance, self-currentness,
+consumption or any other non-authorised Pass A field can enter.* Source
+can always be changed later; that is not what "structural" claims.
+
+### 2. F9's forbidden set is now DERIVED
+
+`passa.PASSA_ROW_SCHEMA` is declared explicitly and **asserted against
+every emitted row** (missing, extra or drifting fields abort). F9 then
+computes
+
+```
+forbidden = PASSA_ROW_SCHEMA − LIFECYCLE_AUTHORISED_INPUTS
+```
+
+and **fails if any schema field lacks mutation coverage**. The first F9
+hand-enumerated that list — the list-beside-the-thing defect (R5) inside
+the fixture written to guard against it.
+
+F9 proves: the API refuses every forbidden field as a keyword; refuses a
+full row positionally; varying every forbidden field through the shipped
+`classify()` path leaves the verdict **byte-identical**; and a
+**known-negative** confirms an authorised input still moves it.
+
+### 3. Fail-old / pass-new for the boundary itself
+
+Run against the actual committed predecessors in a disposable location:
+**D361 FAILS · D362 FAILS · final HOLDS.** A boundary check that only
+passes on the code it was written for proves nothing.
+
+### 4. Runtime module identity — which bytes actually executed
+
+All six modules resolve **under the candidate directory** and their
+**source bytes hash to the manifest entries**. Inspecting `sys.path` and
+concluding stale imports are impossible is the reasoning that has
+already produced three wrong answers in this workstream, each caught
+only because the number looked implausible.
+
+### 5. SEMANTIC INVARIANCE — the STOP condition was not met
+
+All **272 classification rows**, every axis tally, the evidence-fact
+tallies, the admission contract (`1173eb0b…da05`) and the **24 holdout
+rows** are **byte-identical across D361 → D362 → D363**.
+
+**The repairs changed the interface, never the answer.** Had any
+classification moved I was to stop and return it as a new finding rather
+than explain it as repair fallout; it did not.
+
+### 6. Requalification
+
+40/40 hostile fixtures · state-disposition qualification **0 findings** ·
+population 272 == 272 asserted · runtime identity **6/6** ·
+fresh-environment reproduction **executed**, all 272 rows and the
+admission contract identical · holdout regenerated under the
+precommitted rule and **NOT self-adjudicated**.
+
+### 7. Unchanged
+
+`wake_intent_j2` FUNCTION abstention preserved, uncurated. LIFECYCLE
+axis kept. D360 ontology untouched. Evidence facts still emitted beside
+verdicts — the control is a **future H3 consumer gate under D358**, not
+suppression of evidence.
+
+---
+
+## THREAD RECOVERY BLOCK — D363
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **PROGRAMME ORDER AUTHORITY** — **D359 §2**; cite, do not restate
+* **FINAL CANDIDATE** — HOUSE_H2 `v1.1`, 15 artefacts,
+  `be37a0aa5d56255a151c31361d93e8b4be94ab912ec9441c8ac3535a84fbf133`,
+  **NOT FROZEN, NOT ADMITTED**. Predecessors D361 `2e308be7…47a7`,
+  D362 `d3139978…60e4`. Precommit `fa106910…4258e` (chronology =
+  execution claim). Admission contract `1173eb0b…da05`
+* **UNTOUCHED** — HOUSE_H2 `v1.0` `fa847726…45f4` · Census `v1.1`
+  `eb7aad7c…fa0e` · Census `v1.0` `4a5b40a1…`
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents,
+  history window `2025-06-18 → 2026-08-07`, ancestry 986
+* **HOUSE STATE** — `HOUSE_H0` CLOSED · `HOUSE_H1` COMPLETE ·
+  `HOUSE_H2` final candidate returned, admission undecided ·
+  `HOUSE_H3`–`H6` NOT STARTED
+* **AUTHORISED NEXT ACTION** — none. Kai's independent reconciliation
+  and **blind adjudication of the 24-row holdout**, then the
+  freeze/admission recommendation
+* **EXPLICITLY NOT AUTHORISED** — `HOUSE_H3`–`H6` · freezing this
+  candidate · Census successor or modification · H2 v1.0 modification ·
+  H3 consumer gate implementation · programme-order CI mechanism ·
+  KAI-GATE-048 · Phase B · `ITEM8_GO` · six subject builds · Stage 2 ·
+  `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · document/register repair ·
+  Kingsman implementation
+* **OPEN / UNRESOLVED** — holdout unadjudicated · `wake_intent_j2`
+  FUNCTION gap uncurated · 173 documents undecidable from git evidence ·
+  `LIFECYCLE=ACTIVE` earnable by no existing rule · 259 UNKNOWN ·
+  Census confound declared, not isolatable without an adapter · H3
+  consumer gate specified but unbuilt · D344–D353 not in the ledger
+* **CORRECTIONS TO PRIOR RECORDS** — D362's "structural" claim NARROWED
+  and now repaired: the shipped path was narrow, the API was not
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D363
+  Orion. **Next free: D364**, subject to a fresh allocator check
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

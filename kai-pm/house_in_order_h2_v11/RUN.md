@@ -32,16 +32,45 @@ could: `commits_in_window`, `present_tense`, `readers` and `exe_ops`
 were all reachable inside the function. It declined to read them;
 nothing prevented it. DeepSeek found it; Kai confirmed it.
 
-`lifecycle()` now receives `lifecycle_view(row)`, containing only
-`LIFECYCLE_AUTHORISED_INPUTS = ("path", "superseded_by", "has_sha")`.
-The forbidden fields are **absent from the object** — reading one raises
-`KeyError`, and widening the boundary means editing a named tuple, which
-is visible in review.
+**The second attempt was also overstated.** `lifecycle(view, blocked)`
+took a narrowed mapping — but nothing stopped a caller passing the full
+row instead, and the function would have accepted it. The *shipped path*
+was narrow; the *API* was not. DeepSeek found that too.
 
-Fixture **F9** proves it: every forbidden field is varied across its
-range and the verdict bytes do not move, with a **known-negative**
-showing an *authorised* input still does move them — otherwise the
-fixture would pass on a function that ignores everything.
+`lifecycle()` is now **scalar and keyword-only**:
+
+```python
+lifecycle(*, path, superseded_by, has_sha, blocked)
+```
+
+There is no row-like parameter at all, so there is no object through
+which anything else can arrive.
+
+**The exact claim this earns, and no more:** *under this interface,
+lifecycle has no parameter through which maintenance, self-currentness,
+consumption or any other non-authorised Pass A field can enter.* Source
+can always be changed later; that is not what "structural" claims.
+
+**Fixture F9 derives its own forbidden set:**
+
+```
+forbidden = PASSA_ROW_SCHEMA − LIFECYCLE_AUTHORISED_INPUTS
+```
+
+and **fails if any schema field lacks mutation coverage** — the first
+version hand-enumerated that list, which is the very defect it guards
+against. It proves the API refuses every forbidden field as a keyword,
+refuses a full row positionally, and that varying every forbidden field
+through the shipped `classify()` path leaves the verdict byte-identical
+— with a **known-negative** showing an authorised input still moves it.
+
+**Fail-old / pass-new for the boundary itself:**
+
+| implementation | boundary |
+|---|---|
+| D361 (full-row parameter) | **FAILS** — accepts a full row |
+| D362 (permissive view parameter) | **FAILS** — accepts a full row |
+| final (scalar keyword-only) | **HOLDS** |
 
 The lesson is the one I had just argued and then failed to apply: prose
 does not constrain code, **and that includes my prose.**
@@ -62,7 +91,7 @@ python3 run_h2_v11.py --subject-repo <...> --history-repo <...> \
                  --passa passA.json --out result.json
 
 python3 qualify_h2.py --result result.json      # exits non-zero on findings
-python3 cal_fixtures.py                         # 37 hostile assertions
+python3 cal_fixtures.py                         # 40 hostile assertions
 python3 holdout.py --result result.json --out holdout.json
 ```
 
@@ -118,15 +147,26 @@ adjudication is fitting to the holdout, not repair.
 
 ## Qualification
 
-* hostile fixtures **37/37**, covering all six precommitted classes,
+* hostile fixtures **40/40**, covering all six precommitted classes,
   `REFERENCE`/`OTHER` reachability, the three values unobserved on this
   subject, and **F9** — the evidence-mutation boundary proof;
 * state-disposition qualification **0 findings** — every
   `H2_NOT_EARNABLE` and `DEFERRED_TO_H3` value emitted **zero** times;
   every `H2_EMITTABLE` value reachable;
 * population 272 == 272, asserted;
+* **runtime module identity** — every loaded module's `__file__`
+  resolves under the candidate directory and its **source bytes hash to
+  the manifest entry**. Inspecting `sys.path` and concluding stale
+  imports are impossible is the reasoning that has already failed three
+  times in this workstream; this proves which bytes actually executed;
 * fresh-environment reproduction **executed** from an unrelated
   directory: all 272 rows and the admission contract identical.
+
+**Semantic invariance across the boundary repairs.** All 272
+classification rows, every axis tally, the evidence-fact tallies, the
+admission contract and the 24 holdout rows are **byte-identical** across
+D361 → D362 → final. The repairs changed the interface, never the
+answer.
 
 Acceptance contract at
 `fa1069103a721cf5911641cbe6447360069eb9f2a3873a4296531ae280f4258e`,

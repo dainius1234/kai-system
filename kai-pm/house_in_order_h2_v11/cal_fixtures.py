@@ -35,6 +35,12 @@ def check(name, cond, detail=""):
         print(f"          {str(detail)[:150]}")
 
 
+def _lc(r, blocked=()):
+    """Call the SCALAR lifecycle API from a test row."""
+    return cl.lifecycle(path=r["path"], superseded_by=r["superseded_by"],
+                        has_sha=r["has_sha"], blocked=list(blocked))
+
+
 def row(**kw):
     base = dict(path="x.md", title="", bytes=500, sha256="0"*16,
                 commits_in_window=1, last="2026-08-05", graphA_in=0,
@@ -81,7 +87,7 @@ def f2_self_claim_only():
     facts = ev.facts(r, txt)
     check("F2a SELF_ASSERTS_CURRENT is present",
           facts["SELF_ASSERTS_CURRENT"]["present"], facts["SELF_ASSERTS_CURRENT"])
-    lc = cl.lifecycle(cl.lifecycle_view(r), [])
+    lc = _lc(r)
     check("F2b LIFECYCLE=ACTIVE is FORBIDDEN — verdict is UNKNOWN",
           lc["value"] == "UNKNOWN", lc)
     check("F2c the abstention explains WHY ACTIVE was not awarded",
@@ -99,7 +105,7 @@ def f3_reader_only():
           not facts["SELF_ASSERTS_CURRENT"]["present"],
           facts["SELF_ASSERTS_CURRENT"])
     check("F3c LIFECYCLE=ACTIVE is FORBIDDEN",
-          cl.lifecycle(cl.lifecycle_view(r), [])["value"] == "UNKNOWN")
+          _lc(r)["value"] == "UNKNOWN")
 
 
 def f4_no_evidence():
@@ -117,7 +123,7 @@ def f5_not_earnable():
     # a classifier that emitted ACTIVE must be caught by the self-check
     real = cl.lifecycle
     try:
-        cl.lifecycle = lambda r, b: {"value": "ACTIVE", "witness": "injected"}
+        cl.lifecycle = lambda **kw: {"value": "ACTIVE", "witness": "injected"}
         try:
             cl.classify(row(), "# x\n", {"LIFECYCLE": []}, False, "n/a")
             check("F5c injected ACTIVE is REJECTED by the contract self-check",
@@ -145,7 +151,7 @@ def f6_discovery_failure():
     finally:
         ont.ALPHABETS["LIFECYCLE"] = saved
     check("F6c capability failure yields UNMEASURED, never a plausible value",
-          cl.lifecycle(cl.lifecycle_view(row()), ["HISTORY_SOURCE_NON_DEGENERATE"])["value"]
+          _lc(row(), ["HISTORY_SOURCE_NON_DEGENERATE"])["value"]
           == ont.CAPABILITY_FAILURE)
 
 
@@ -176,7 +182,7 @@ def f8_unobserved_but_emittable():
     Zero on a corpus is applicability, not unreachability, but the two
     are indistinguishable without a fixture. These prove reachability."""
     print("\nF8 — H2_EMITTABLE VALUES UNOBSERVED ON THE SUBJECT")
-    lc = cl.lifecycle(cl.lifecycle_view(row(superseded_by="successor.md")), [])
+    lc = _lc(row(superseded_by="successor.md"))
     check("F8a SUPERSEDED is reachable", lc["value"] == "SUPERSEDED", lc)
     tm = cl.function(row(path="docs/operator-journal/_template.md",
                          title="Session template"),
@@ -187,47 +193,78 @@ def f8_unobserved_but_emittable():
 
 
 def f9_evidence_cannot_reach_lifecycle():
-    """KAI'S REQUIRED MUTATION FIXTURE. Vary every forbidden evidence
-    field across its range; the lifecycle verdict BYTES must not move.
+    """KAI'S REQUIRED BOUNDARY PROOF, with the forbidden set DERIVED.
 
-    This is the fixture the first build lacked. Without it, "lifecycle
-    does not use the evidence" was an assertion about code I had read,
-    not a property anything tested."""
-    print("\nF9 — EVIDENCE MUTATION CANNOT MOVE THE LIFECYCLE VERDICT")
-    forbidden = ("commits_in_window", "present_tense", "readers", "exe_ops",
-                 "graphA_in", "graphA_out", "writers", "has_run", "has_date")
-    check("F9a no forbidden field is in the authorised input tuple",
-          not (set(forbidden) & set(cl.LIFECYCLE_AUTHORISED_INPUTS)),
-          cl.LIFECYCLE_AUTHORISED_INPUTS)
-    base = row(path="kai-pm/thing.md")
-    ref = json.dumps(cl.lifecycle(cl.lifecycle_view(base), []), sort_keys=True)
-    variants = dict(commits_in_window=[0, 1, 2, 99, 986],
-                    present_tense=[True, False],
-                    readers=[[], ["a.py"], ["a.py", "b.py"]],
-                    exe_ops=[0, 1, 50], graphA_in=[0, 119], graphA_out=[0, 140],
-                    writers=[[], ["w.py"]], has_run=[True, False],
-                    has_date=[True, False])
-    moved = []
-    for field, vals in variants.items():
-        for v in vals:
-            got = json.dumps(cl.lifecycle(cl.lifecycle_view(row(
-                path="kai-pm/thing.md", **{field: v})), []), sort_keys=True)
-            if got != ref:
-                moved.append((field, v))
-    check("F9b varying ALL forbidden evidence leaves the verdict byte-identical",
-          not moved, moved)
-    # KNOWN-NEGATIVE: an AUTHORISED input MUST still move the verdict,
-    # or the fixture would pass on a function that ignores everything.
-    auth = cl.lifecycle(cl.lifecycle_view(
-        row(path="kai-pm/thing.md", superseded_by="next.md")), [])
-    check("F9c KNOWN-NEGATIVE: an authorised input DOES move the verdict",
-          auth["value"] == "SUPERSEDED", auth)
+    The first version of this fixture hand-enumerated the forbidden
+    fields. That is the list-beside-the-thing defect (R5) it exists to
+    guard against: add a field to Pass A, forget to add it here, and the
+    fixture stays green over an uncovered field.
+
+        forbidden = PASSA_ROW_SCHEMA - LIFECYCLE_AUTHORISED_INPUTS
+
+    and the fixture FAILS if any schema field lacks mutation coverage.
+    """
+    print("\nF9 — EVIDENCE CANNOT REACH LIFECYCLE (schema-derived)")
+    schema = set(passa.PASSA_ROW_SCHEMA)
+    authorised = set(cl.LIFECYCLE_AUTHORISED_INPUTS)
+    forbidden = schema - authorised
+    check("F9a authorised inputs are a strict subset of the Pass A schema",
+          authorised < schema, f"authorised={sorted(authorised)} schema-={sorted(authorised-schema)}")
+    check("F9b forbidden set derived from the schema is non-empty",
+          bool(forbidden), forbidden)
+
+    # every forbidden field must have declared mutation coverage
+    VARIANTS = {"title": ["", "Weekly totals"], "bytes": [0, 500, 99999],
+                "sha256": ["0"*16, "f"*16], "commits_in_window": [0, 1, 2, 99, 986],
+                "last": ["", "2026-08-05", "2025-06-18"],
+                "graphA_in": [0, 119], "graphA_out": [0, 140],
+                "exe_ops": [0, 1, 50], "writers": [[], ["w.py"]],
+                "readers": [[], ["a.py"], ["a.py", "b.py"]],
+                "has_run": [True, False], "has_date": [True, False],
+                "says_supersedes": [True, False],
+                "present_tense": [True, False]}
+    uncovered = sorted(forbidden - set(VARIANTS))
+    check("F9c EVERY forbidden schema field has mutation coverage",
+          not uncovered,
+          f"uncovered: {uncovered} — add coverage or the field is untested")
+
+    # the scalar API has NO parameter for any forbidden field
+    refused = []
+    for f in sorted(forbidden):
+        try:
+            cl.lifecycle(path="x.md", superseded_by=None, has_sha=False,
+                         blocked=[], **{f: "anything"})
+            refused.append(f)          # accepted it -> boundary breached
+        except TypeError:
+            pass
+    check("F9d the scalar API REFUSES every forbidden field as a keyword",
+          not refused, f"accepted: {refused}")
     try:
-        cl.lifecycle_view(base)["present_tense"]
-        check("F9d forbidden field raises KeyError at the boundary", False,
-              "field was reachable")
-    except KeyError:
-        check("F9d forbidden field raises KeyError at the boundary", True)
+        cl.lifecycle(row(), [])
+        check("F9e a full row cannot be passed positionally", False,
+              "positional call accepted")
+    except TypeError:
+        check("F9e a full row cannot be passed positionally", True)
+
+    # semantic: vary every forbidden field through the SHIPPED classify()
+    # path and the LIFECYCLE verdict must not move
+    base = row(path="kai-pm/thing.md")
+    ref = json.dumps(cl.classify(base, "# t\n", {"LIFECYCLE": []}, False,
+                                 "n/a")["LIFECYCLE"], sort_keys=True)
+    moved = []
+    for f in sorted(forbidden):
+        for v in VARIANTS[f]:
+            got = json.dumps(cl.classify(row(path="kai-pm/thing.md", **{f: v}),
+                                         "# t\n", {"LIFECYCLE": []}, False,
+                                         "n/a")["LIFECYCLE"], sort_keys=True)
+            if got != ref:
+                moved.append((f, v))
+    check("F9f varying every forbidden field through classify() leaves the "
+          "LIFECYCLE verdict byte-identical", not moved, moved)
+    # KNOWN-NEGATIVE: an authorised input MUST move the verdict
+    check("F9g KNOWN-NEGATIVE: an authorised input DOES move the verdict",
+          _lc(row(path="kai-pm/thing.md", superseded_by="next.md"))["value"]
+          == "SUPERSEDED")
 
 
 def run():

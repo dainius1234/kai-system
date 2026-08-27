@@ -49,6 +49,35 @@ PRESENT = re.compile(r"\bcurrent phase\b|\bcurrent focus\b|\bcurrently\b"
                      r"|\blast updated\b|\bnext\b:", re.I)
 
 
+# THE EXPLICIT PASS A ROW SCHEMA. Declared, asserted against every
+# emitted row, and consumed by the F9 fixture so that the set of fields
+# LIFECYCLE must be insensitive to is DERIVED --
+#     forbidden = PASSA_ROW_SCHEMA - LIFECYCLE_AUTHORISED_INPUTS
+# -- rather than hand-maintained beside the fixture. A hand-written
+# forbidden list is the list-beside-the-thing defect (R5): add a field
+# to Pass A, forget to add it to the fixture, and the fixture stays green
+# while the new field is entirely uncovered.
+PASSA_ROW_SCHEMA = (
+    "path", "title", "bytes", "sha256", "commits_in_window", "last",
+    "graphA_in", "graphA_out", "exe_ops", "writers", "readers",
+    "has_sha", "has_run", "has_date", "superseded_by", "says_supersedes",
+    "present_tense",
+)
+
+
+def assert_schema(rows):
+    """Every row must match the declared schema EXACTLY -- no missing
+    field, no extra field, and no drift between rows."""
+    want = set(PASSA_ROW_SCHEMA)
+    for i, r in enumerate(rows):
+        got = set(r)
+        if got != want:
+            raise SystemExit(
+                f"SCHEMA ABORT: row {i} ({r.get('path')!r}) "
+                f"missing={sorted(want - got)} extra={sorted(got - want)}")
+    return True
+
+
 def git(repo, *a):
     return subprocess.run(["git", *a], cwd=str(repo),
                           capture_output=True, text=True).stdout
@@ -121,6 +150,7 @@ def build(subject_repo, history_repo, subject, census_pkg):
             present_tense=bool(PRESENT.search(head)),
         ))
     assert len(rows) == len(tracked), "PASS A population mismatch"
+    assert_schema(rows)
     return rows, tracked
 
 
