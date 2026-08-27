@@ -698,3 +698,58 @@ right only because it came from a different query.
 **The tell:** when I write *"share the same mechanism"*, the filter must
 be the mechanism. If I can name a literal in the query, I am counting
 instances of a string and reporting them as instances of a cause.
+
+### `UNRESOLVED` is not a parking place for an unmet proof burden
+
+*2026-08-27. Kai's ruling, after DeepSeek's challenge. Recorded because
+it is the cleanest statement of the architecture we have.*
+
+Two dispositions that look adjacent and are not:
+
+```
+UNKNOWN     the classifier has insufficient qualified evidence
+            to assert a positive state
+
+UNRESOLVED  the independent adjudicator cannot determine the SOURCE
+            TRUTH, because the underlying evidence is genuinely
+            ambiguous
+```
+
+They operate at **different levels**. Contract silence, or a positive
+whose proof burden simply was not met, produces `UNKNOWN` — never
+`UNRESOLVED`.
+
+The test case: `Reviewed: 27 July 2026`. That source line is not
+ambiguous. Its predicate is *reviewed-at*, and it is perfectly
+intelligible. What failed is that the candidate promoted *reviewed-at*
+to *time-bound-validity* — a second proposition the witness never
+states. Unintelligible evidence would be `UNRESOLVED`; an unearned
+promotion is `UNKNOWN`, and emitting a positive instead is a blocker.
+
+**The burden runs one way.** We do not need the contract to contain a
+blacklist saying `Reviewed:` does not count. D367 requires the positive
+verdict to establish document-level temporal binding **and says
+otherwise UNKNOWN**. Looking for a prior ruling that forbids a specific
+label is searching for permission to abstain, when abstention is already
+the default.
+
+**My own W2 worry was this defect and I could not prove it.** I flagged
+that `VALIDITY` rising 56 → 161 was the only axis where my repair made
+the instrument claim *more*, and said an increase after an honesty
+repair deserves suspicion. Correct instinct, no proof. Kai proved it
+from the frozen text rather than from the number — which is the right
+order, and the one I did not use.
+
+Arithmetic, stated as fact rather than adjudication: if the family
+falls, non-UNKNOWN `VALIDITY` goes 161 → 16, **below v1.1's 56**. Of the
+40 holdout rows, 20 carry a non-UNKNOWN `VALIDITY` and 19 of those 20
+are this family.
+
+**The tells:**
+
+* **When a repair makes an instrument claim MORE, the burden is on me,
+  not on the reviewer.** I stated the worry and shipped anyway.
+* **Searching for authority that forbids X is the wrong search when the
+  contract already requires proof of X.** Abstention needs no permission.
+* **Before writing `UNRESOLVED`, ask whether the SOURCE is unclear or my
+  EVIDENCE is insufficient.** Only the first is ambiguity.
