@@ -1,13 +1,28 @@
 #!/usr/bin/env python3
 """HOUSE_H2 v1.1 — VERDICTS. Evidence facts are computed elsewhere.
 
-STRUCTURAL SEPARATION IS THE POINT. `lifecycle()` below does not receive
-the evidence facts at all. It cannot read `MAINTENANCE_OBSERVED`,
-`SELF_ASSERTS_CURRENT` or `CONSUMED_AT_SUBJECT`, so it cannot convert
-one into a verdict even by accident. That is what D360 §5 requires, and
-a comment saying "do not use these" would not have prevented v1.0's
-defect -- v1.0's own docstring already said authority was earned at H3
-while its LIFECYCLE branch awarded ACTIVE from a self-claim.
+STRUCTURAL SEPARATION IS THE POINT -- AND THE FIRST ATTEMPT DID NOT
+ACHIEVE IT. As originally built, `lifecycle()` took the FULL Pass A row,
+and I described that as "cannot convert evidence facts into verdicts
+even by accident". IT COULD: commits_in_window, present_tense, readers
+and exe_ops were all reachable inside the function. It declined to read
+them; nothing prevented it.
+
+DeepSeek found it and Kai confirmed it. The earned claim at that point
+was only "the current implementation does not use those fields" -- code
+discipline, not a boundary.
+
+`lifecycle()` now receives `lifecycle_view(row)`, which contains ONLY
+LIFECYCLE_AUTHORISED_INPUTS. The forbidden fields are ABSENT from the
+object, so reading one raises KeyError, and widening the boundary
+requires editing a named tuple -- a visible, reviewable change rather
+than a silent one.
+
+The lesson is the one I had just argued and then failed to apply: a
+comment saying "do not use these" would not have prevented v1.0's defect
+-- v1.0's own docstring already said authority was earned at H3 while its
+LIFECYCLE branch awarded ACTIVE from a self-claim. Prose does not
+constrain code, and that includes my prose.
 
 REPAIRS IMPLEMENTED HERE
   * ACTIVE is NOT EARNABLE. Declared in ontology.py, enforced by the
@@ -77,8 +92,36 @@ def _val(v, witness_type=None, witness=None):
     return dict(value=v, witness_type=witness_type, witness=witness)
 
 
-def lifecycle(row, blocked):
-    """DELIBERATELY receives no evidence facts. ACTIVE is unreachable."""
+# The ONLY fields LIFECYCLE is authorised to read. Anything absent from
+# this tuple is PHYSICALLY UNAVAILABLE inside lifecycle() -- reaching for
+# it raises KeyError rather than silently succeeding.
+LIFECYCLE_AUTHORISED_INPUTS = ("path", "superseded_by", "has_sha")
+
+
+def lifecycle_view(row):
+    """A narrowed input containing ONLY authorised lifecycle fields.
+
+    THIS EXISTS BECAUSE MY EARLIER CLAIM WAS FALSE. v1.1 as first built
+    passed the FULL Pass A row to lifecycle(), and I described that as
+    "cannot convert evidence facts into verdicts even by accident". It
+    could: commits_in_window, present_tense, readers and exe_ops were all
+    reachable inside the function. It declined to read them; it was not
+    prevented from reading them.
+
+    That is the defect I had just finished arguing against -- I said a
+    comment would not have stopped v1.0 awarding ACTIVE from a self-claim,
+    then relied on discipline rather than structure myself. The boundary
+    is now the object, not the intention.
+    """
+    return {k: row[k] for k in LIFECYCLE_AUTHORISED_INPUTS}
+
+
+def lifecycle(view, blocked):
+    """Receives ONLY `lifecycle_view(row)`. The evidence facts and the
+    raw fields behind them are not present in `view` at all, so no
+    future edit can read them here without first widening
+    LIFECYCLE_AUTHORISED_INPUTS -- a visible, reviewable change."""
+    row = view
     if blocked:
         return dict(value=ont.CAPABILITY_FAILURE,
                     unresolved_reason="ENVIRONMENT_CAPABILITY_MISSING: "
@@ -169,7 +212,10 @@ def family_rule_proven(rows):
 
 def classify(row, text, blocked_by_axis, fam_ok, fam_why):
     out = {}
-    out["LIFECYCLE"] = lifecycle(row, blocked_by_axis.get("LIFECYCLE"))
+    # the narrowed view is constructed HERE; the full row never
+    # crosses the lifecycle boundary
+    out["LIFECYCLE"] = lifecycle(lifecycle_view(row),
+                                 blocked_by_axis.get("LIFECYCLE"))
     out["FUNCTION"] = function(row, text, fam_ok, fam_why)
 
     claims, amb = sb.bind_claims(row["path"], text)

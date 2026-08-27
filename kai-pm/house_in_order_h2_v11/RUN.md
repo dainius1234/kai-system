@@ -23,11 +23,28 @@ a self-claim alone.**
 | `SELF_ASSERTS_CURRENT` | the document asserts currentness | that the assertion is true |
 | `CONSUMED_AT_SUBJECT` | code reads it at the subject | that it is live — stale artefacts are read too |
 
-The separation is **structural**: `classify2.lifecycle()` does not
-receive the evidence facts, so it cannot convert one into a verdict even
-by accident. A comment would not have prevented v1.0's defect — v1.0's
-docstring already said authority was earned at H3 while its LIFECYCLE
-branch awarded ACTIVE from a self-claim.
+### The separation is structural — after a correction
+
+**The first build did not achieve this, and I claimed it did.**
+`lifecycle()` originally took the FULL Pass A row, and I described it as
+*"cannot convert evidence facts into verdicts even by accident."* It
+could: `commits_in_window`, `present_tense`, `readers` and `exe_ops`
+were all reachable inside the function. It declined to read them;
+nothing prevented it. DeepSeek found it; Kai confirmed it.
+
+`lifecycle()` now receives `lifecycle_view(row)`, containing only
+`LIFECYCLE_AUTHORISED_INPUTS = ("path", "superseded_by", "has_sha")`.
+The forbidden fields are **absent from the object** — reading one raises
+`KeyError`, and widening the boundary means editing a named tuple, which
+is visible in review.
+
+Fixture **F9** proves it: every forbidden field is varied across its
+range and the verdict bytes do not move, with a **known-negative**
+showing an *authorised* input still does move them — otherwise the
+fixture would pass on a function that ignores everything.
+
+The lesson is the one I had just argued and then failed to apply: prose
+does not constrain code, **and that includes my prose.**
 
 ## Running it
 
@@ -45,7 +62,7 @@ python3 run_h2_v11.py --subject-repo <...> --history-repo <...> \
                  --passa passA.json --out result.json
 
 python3 qualify_h2.py --result result.json      # exits non-zero on findings
-python3 cal_fixtures.py                         # 33 hostile assertions
+python3 cal_fixtures.py                         # 37 hostile assertions
 python3 holdout.py --result result.json --out holdout.json
 ```
 
@@ -101,9 +118,9 @@ adjudication is fitting to the holdout, not repair.
 
 ## Qualification
 
-* hostile fixtures **33/33**, covering all six precommitted classes plus
-  `REFERENCE`/`OTHER` reachability and the three values unobserved on
-  this subject;
+* hostile fixtures **37/37**, covering all six precommitted classes,
+  `REFERENCE`/`OTHER` reachability, the three values unobserved on this
+  subject, and **F9** — the evidence-mutation boundary proof;
 * state-disposition qualification **0 findings** — every
   `H2_NOT_EARNABLE` and `DEFERRED_TO_H3` value emitted **zero** times;
   every `H2_EMITTABLE` value reachable;
@@ -111,9 +128,19 @@ adjudication is fitting to the holdout, not repair.
 * fresh-environment reproduction **executed** from an unrelated
   directory: all 272 rows and the admission contract identical.
 
-Acceptance contract precommitted at
-`fa1069103a721cf5911641cbe6447360069eb9f2a3873a4296531ae280f4258e`
-before any v1.1 code existed, and **unamended**.
+Acceptance contract at
+`fa1069103a721cf5911641cbe6447360069eb9f2a3873a4296531ae280f4258e`,
+**unamended**.
+
+**A narrowed claim about its chronology.** The contract was written and
+hashed before any v1.1 code existed — but that is an **execution claim,
+not something canonical history attests**. `PRECOMMIT.md` is absent at
+D360 and first becomes durable in D361 *together with* the
+implementation, so the ordering cannot be independently proven from the
+repository. Recorded as
+**`precommit-before-code = ORION EXECUTION CLAIM, not independently
+time-proven`**. The rule this earns: an acceptance precommit must land
+in **its own commit** before implementation begins.
 
 ## Blind holdout
 
@@ -132,6 +159,19 @@ figure I compute would carry no acceptance weight.
 * `UNKNOWN`/`UNMEASURED` are abstentions — per D340 §7 and D358 they may
   **never** be used as negative evidence or an exclusion criterion;
 * history-derived facts are void outside the declared window.
+
+## Census isolation probe — NOT TESTABLE WITHOUT ADAPTER
+
+Kai authorised a read-only probe running this classifier against Census
+v1.0 **only if directly schema-compatible, with no adapter**. It is not:
+v1.1 requires `docgraph` / `opscan` / `claims`; Census v1.0 exposes
+`doccensus2` / `genlink3`. Module names, call signatures and the
+operation model all differ.
+
+**Result: `NOT TESTABLE WITHOUT ADAPTER`. Stopped.** Building
+compatibility code around a known-defective instrument to produce a
+prettier attribution table was explicitly forbidden, and no causal
+attribution is claimed.
 
 ## Known confound, stated so it is not misattributed
 

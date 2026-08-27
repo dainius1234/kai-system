@@ -30956,3 +30956,159 @@ nothing about itself.
   Orion. **Next free: D362**, subject to a fresh allocator check
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D362 — HOUSE_H2 v1.1 narrow repair: the evidence→lifecycle boundary
+## made structural; two of my claims narrowed
+
+**Authority.** Dainius, this session: *"authorise the narrow HOUSE_H2
+v1.1 repair/requalification exactly as Kai specified."* **CREATES NO
+HOUSE_H3 AUTHORITY. NOT FROZEN. NOT ADMITTED.**
+
+**REPAIRED CANDIDATE:
+`d31399780368df956d5942056118804f5854f8a7a2fc7ce13fb3915c389960e4`**,
+15 artefacts.
+**D361 candidate `2e308be7…47a7` is preserved as the historical
+unfrozen predecessor** and is not the identity of this one.
+
+HOUSE_H2 `v1.0` untouched (14/14). Census `v1.1` untouched (19/19).
+
+### 1. The structural-separation defect — CONFIRMED, MINE
+
+DeepSeek found it; Kai confirmed it; I verified it before accepting it.
+`lifecycle(row, blocked)` received the **full Pass A row**, so
+`commits_in_window`, `present_tense`, `readers` and `exe_ops` were all
+reachable inside it. It declined to read them; **nothing prevented it.**
+
+**WITHDRAWN:** *"cannot convert evidence facts into verdicts even by
+accident."* **Earned at that point:** *the current implementation does
+not use those fields* — code discipline, not a boundary.
+
+This is the defect I had just finished arguing against. I wrote that a
+comment would not have stopped v1.0 awarding ACTIVE from a self-claim,
+and then relied on discipline rather than structure myself. **Prose does
+not constrain code, and that includes my prose.**
+
+### 2. The repair
+
+```python
+LIFECYCLE_AUTHORISED_INPUTS = ("path", "superseded_by", "has_sha")
+def lifecycle_view(row): return {k: row[k] for k in ...}
+def lifecycle(view, blocked): ...
+```
+
+The forbidden fields are **absent from the object**. Reading one raises
+`KeyError`, and widening the boundary requires editing a named tuple — a
+visible, reviewable change rather than a silent one.
+
+**Fixture F9** (Kai's requirement): every forbidden field varied across
+its range — `commits_in_window` 0/1/2/99/986, `present_tense`,
+`readers`, `exe_ops`, `graphA_in`, `graphA_out`, `writers`, `has_run`,
+`has_date` — and the **verdict bytes do not move**. With a
+**known-negative**: an *authorised* input (`superseded_by`) **does**
+move the verdict, so the fixture cannot pass on a function that ignores
+everything.
+
+**The repair changed NO output.** All 272 rows, every axis tally and the
+admission-contract hash are byte-identical to D361. It is a boundary
+change, not a behaviour change — which is what makes it safe and what
+makes it necessary.
+
+### 3. Precommit chronology — CLAIM NARROWED
+
+Kai checked canonical history and I confirmed it: `PRECOMMIT.md` is
+**absent at D360** and first becomes durable in D361 **together with the
+implementation**.
+
+Recorded: **`precommit-before-code = ORION EXECUTION CLAIM, NOT
+INDEPENDENTLY TIME-PROVEN BY REPOSITORY HISTORY`.**
+
+The contract was written and hashed before any v1.1 code existed, and it
+is unamended — but the repository cannot attest the ordering, and I
+described it as though it could. **Rule earned: an acceptance precommit
+must land in its own commit before implementation begins.** No history
+was rewritten.
+
+### 4. Census isolation probe — NOT TESTABLE WITHOUT ADAPTER
+
+H2 v1.1 requires `docgraph` / `opscan` / `claims`; Census v1.0 exposes
+`doccensus2` / `genlink3`. Module names, signatures and operation model
+all differ. **Result: `NOT TESTABLE WITHOUT ADAPTER`. Stopped as
+instructed** — no compatibility code was written around a
+known-defective instrument, and **no causal attribution is claimed.**
+The confound stands as declared in D361.
+
+### 5. Artefact boundary — captured, evidence NOT suppressed
+
+The result deliberately emits raw fields, verdicts and `EVIDENCE_FACTS`
+together. Per Kai, **evidence is not thrown away to prevent misuse.**
+The control belongs at the consumer: no future H3 may derive `ACTIVE`,
+any negative lifecycle conclusion, or an exclusion of `UNKNOWN` from
+`MAINTENANCE_OBSERVED`, `SELF_ASSERTS_CURRENT` or
+`CONSUMED_AT_SUBJECT` without separately qualified authority. **A
+mandatory H3 acceptance fixture under D358 — not permission to build H3.**
+
+### 6. A mutation-cardinality failure of my own, mid-repair
+
+A string replacement intended for one call site also matched the
+function *definition*, producing a syntax error. Rule 18 exists for
+exactly this. Both subsequent edits assert `count == 1` before
+replacing.
+
+### 7. Requalification
+
+* hostile fixtures **37/37** (was 33; F9 adds 4);
+* state-disposition qualification **0 findings**; every
+  `H2_NOT_EARNABLE` / `DEFERRED_TO_H3` value emitted **zero** times;
+* population **272 == 272**, asserted;
+* admission contract hash unchanged: `1173eb0b…da05`;
+* **fresh-environment reproduction executed** — 15/15 manifest, all 272
+  rows identical;
+* blind holdout regenerated under the precommitted rule, **not
+  self-adjudicated**.
+
+### 8. Unchanged by this repair
+
+`wake_intent_j2` FUNCTION abstention preserved, uncurated. LIFECYCLE
+axis kept. D360 ontology untouched.
+
+---
+
+## THREAD RECOVERY BLOCK — D362
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **PROGRAMME ORDER AUTHORITY** — **D359 §2**; cite, do not restate
+* **CANDIDATE** — HOUSE_H2 `v1.1` repaired, 15 artefacts,
+  `d31399780368df956d5942056118804f5854f8a7a2fc7ce13fb3915c389960e4`,
+  **NOT FROZEN, NOT ADMITTED**. Predecessor `2e308be7…47a7` (D361)
+  preserved as historical unfrozen. Precommit `fa106910…4258e`
+  (chronology = execution claim). Admission contract `1173eb0b…da05`
+* **UNTOUCHED** — HOUSE_H2 `v1.0` `fa847726…45f4` · Census `v1.1`
+  `eb7aad7c…fa0e` · Census `v1.0` `4a5b40a1…`
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents,
+  history window `2025-06-18 → 2026-08-07`, ancestry 986
+* **HOUSE STATE** — `HOUSE_H0` CLOSED · `HOUSE_H1` COMPLETE ·
+  `HOUSE_H2` repaired candidate returned, admission undecided ·
+  `HOUSE_H3`–`H6` NOT STARTED
+* **AUTHORISED NEXT ACTION** — none. Kai's independent reconciliation
+  and **blind adjudication of the 24-row holdout**
+* **EXPLICITLY NOT AUTHORISED** — `HOUSE_H3`–`H6` · freezing this
+  candidate · Census successor or modification · H2 v1.0 modification ·
+  H3 consumer gate implementation · programme-order CI mechanism ·
+  KAI-GATE-048 · Phase B · `ITEM8_GO` · six subject builds · Stage 2 ·
+  `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · document/register repair ·
+  Kingsman implementation
+* **OPEN / UNRESOLVED** — holdout unadjudicated · `wake_intent_j2`
+  FUNCTION gap uncurated · 173 documents undecidable from git evidence ·
+  `LIFECYCLE=ACTIVE` earnable by no existing rule · 259 UNKNOWN ·
+  Census confound declared and unisolatable without an adapter · H3
+  consumer gate specified but unbuilt · D344–D353 not in the ledger
+* **CORRECTIONS TO PRIOR RECORDS** — D361's structural-separation claim
+  WITHDRAWN and repaired; D361's precommit chronology NARROWED to an
+  execution claim
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D362
+  Orion. **Next free: D363**, subject to a fresh allocator check
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

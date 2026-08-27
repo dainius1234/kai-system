@@ -10,6 +10,7 @@ A repair that only proves the corrected case can silently destroy the
 property it was protecting, so each pair also proves the opposite side.
 """
 from __future__ import annotations
+import json
 import re
 import sys
 
@@ -80,7 +81,7 @@ def f2_self_claim_only():
     facts = ev.facts(r, txt)
     check("F2a SELF_ASSERTS_CURRENT is present",
           facts["SELF_ASSERTS_CURRENT"]["present"], facts["SELF_ASSERTS_CURRENT"])
-    lc = cl.lifecycle(r, [])
+    lc = cl.lifecycle(cl.lifecycle_view(r), [])
     check("F2b LIFECYCLE=ACTIVE is FORBIDDEN — verdict is UNKNOWN",
           lc["value"] == "UNKNOWN", lc)
     check("F2c the abstention explains WHY ACTIVE was not awarded",
@@ -98,7 +99,7 @@ def f3_reader_only():
           not facts["SELF_ASSERTS_CURRENT"]["present"],
           facts["SELF_ASSERTS_CURRENT"])
     check("F3c LIFECYCLE=ACTIVE is FORBIDDEN",
-          cl.lifecycle(r, [])["value"] == "UNKNOWN")
+          cl.lifecycle(cl.lifecycle_view(r), [])["value"] == "UNKNOWN")
 
 
 def f4_no_evidence():
@@ -144,7 +145,7 @@ def f6_discovery_failure():
     finally:
         ont.ALPHABETS["LIFECYCLE"] = saved
     check("F6c capability failure yields UNMEASURED, never a plausible value",
-          cl.lifecycle(row(), ["HISTORY_SOURCE_NON_DEGENERATE"])["value"]
+          cl.lifecycle(cl.lifecycle_view(row()), ["HISTORY_SOURCE_NON_DEGENERATE"])["value"]
           == ont.CAPABILITY_FAILURE)
 
 
@@ -175,7 +176,7 @@ def f8_unobserved_but_emittable():
     Zero on a corpus is applicability, not unreachability, but the two
     are indistinguishable without a fixture. These prove reachability."""
     print("\nF8 — H2_EMITTABLE VALUES UNOBSERVED ON THE SUBJECT")
-    lc = cl.lifecycle(row(superseded_by="successor.md"), [])
+    lc = cl.lifecycle(cl.lifecycle_view(row(superseded_by="successor.md")), [])
     check("F8a SUPERSEDED is reachable", lc["value"] == "SUPERSEDED", lc)
     tm = cl.function(row(path="docs/operator-journal/_template.md",
                          title="Session template"),
@@ -185,10 +186,54 @@ def f8_unobserved_but_emittable():
     check("F8c RUN_ARTEFACT is reachable", ra["value"] == "RUN_ARTEFACT", ra)
 
 
+def f9_evidence_cannot_reach_lifecycle():
+    """KAI'S REQUIRED MUTATION FIXTURE. Vary every forbidden evidence
+    field across its range; the lifecycle verdict BYTES must not move.
+
+    This is the fixture the first build lacked. Without it, "lifecycle
+    does not use the evidence" was an assertion about code I had read,
+    not a property anything tested."""
+    print("\nF9 — EVIDENCE MUTATION CANNOT MOVE THE LIFECYCLE VERDICT")
+    forbidden = ("commits_in_window", "present_tense", "readers", "exe_ops",
+                 "graphA_in", "graphA_out", "writers", "has_run", "has_date")
+    check("F9a no forbidden field is in the authorised input tuple",
+          not (set(forbidden) & set(cl.LIFECYCLE_AUTHORISED_INPUTS)),
+          cl.LIFECYCLE_AUTHORISED_INPUTS)
+    base = row(path="kai-pm/thing.md")
+    ref = json.dumps(cl.lifecycle(cl.lifecycle_view(base), []), sort_keys=True)
+    variants = dict(commits_in_window=[0, 1, 2, 99, 986],
+                    present_tense=[True, False],
+                    readers=[[], ["a.py"], ["a.py", "b.py"]],
+                    exe_ops=[0, 1, 50], graphA_in=[0, 119], graphA_out=[0, 140],
+                    writers=[[], ["w.py"]], has_run=[True, False],
+                    has_date=[True, False])
+    moved = []
+    for field, vals in variants.items():
+        for v in vals:
+            got = json.dumps(cl.lifecycle(cl.lifecycle_view(row(
+                path="kai-pm/thing.md", **{field: v})), []), sort_keys=True)
+            if got != ref:
+                moved.append((field, v))
+    check("F9b varying ALL forbidden evidence leaves the verdict byte-identical",
+          not moved, moved)
+    # KNOWN-NEGATIVE: an AUTHORISED input MUST still move the verdict,
+    # or the fixture would pass on a function that ignores everything.
+    auth = cl.lifecycle(cl.lifecycle_view(
+        row(path="kai-pm/thing.md", superseded_by="next.md")), [])
+    check("F9c KNOWN-NEGATIVE: an authorised input DOES move the verdict",
+          auth["value"] == "SUPERSEDED", auth)
+    try:
+        cl.lifecycle_view(base)["present_tense"]
+        check("F9d forbidden field raises KeyError at the boundary", False,
+              "field was reachable")
+    except KeyError:
+        check("F9d forbidden field raises KeyError at the boundary", True)
+
+
 def run():
     f1_abbreviated_date(); f2_self_claim_only(); f3_reader_only()
     f4_no_evidence(); f5_not_earnable(); f6_discovery_failure()
-    f7_reference_and_other(); f8_unobserved_but_emittable()
+    f7_reference_and_other(); f8_unobserved_but_emittable(); f9_evidence_cannot_reach_lifecycle()
 
 
 if __name__ == "__main__":
