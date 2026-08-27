@@ -32545,3 +32545,161 @@ become another assurance implementation project on top of the D368 hold.
   Orion. **Next free: D370 — NOT TO BE TAKEN without authorisation**
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D370 — 2026-08-27 — Doctrine rules 41–45 and two amendments. GOVERNANCE ONLY
+
+**Authority.** Dainius authorised governance-only banking; Kai specified
+the items and the scope. D-number **reserved through the allocator**:
+branch 369, `main` 164, zero collisions on D370.
+
+**This decision:** amends no frozen contract · changes no candidate,
+package or holdout · grants no repair, admission or HOUSE_H3 authority ·
+implements no CI or tooling. Verified after the change: D367 contract
+**OK**, v1.2 package **14/14**, aggregate `ba2b16d4…de4a` unchanged,
+holdout **40 rows**.
+
+### 1. A correction to my own coverage claim, made before it was relied on
+
+I reported that the holdout *"exercises 6 distinct witness mechanisms"*
+and that three axes were *"structurally untestable"*. Kai corrected both,
+and he is right on both.
+
+My key was `witness_type / binding label / emitted value` — **my own
+construction**, and the Fact Card's `limitations` field said so while the
+headline said "mechanisms". That is the literal-versus-cause promotion of
+the 18→19 error, committed **inside the correction to that error**. The
+earned term is **routing signatures**.
+
+*"Structurally untestable"* is also too broad. What the measurement
+supports: `FUNCTION`, `AUTHORITY` and `GENERATION` carry **zero
+non-abstention cells** in this holdout, so it has **no false-positive
+detection opportunity** on those axes. **Over-abstention on them remains
+adjudicable**, so the axes are not untestable — one failure class is
+undetectable by this sample.
+
+The measurement itself stands: 42 of 240 cells non-abstention, 38 of 42
+sharing one routing signature, 20 document families, 6 routing
+signatures.
+
+### 2. What was banked — new rules versus amendments
+
+| item | disposition | rule |
+|---|---|---|
+| **A** unadmitted-candidate quarantine | **NEW** | **41** |
+| **B** consumer-requirement independence | **NEW** | **42** |
+| **C** coverage-capability reporting | **NEW** | **43** |
+| **D** routing signature ≠ mechanism | **AMENDMENT** to existing rule | **37** |
+| **E** `RULE_BANKED` vs `CONTROL_OPERATIONALISED` | **NEW** | **44** |
+| **W-C** purpose-limited assurance-tool trust | **NEW** | **45** |
+| **W-D** graded independent reproduction | **AMENDMENT** | **33** |
+| **W-B** a complete card is not a true card | **AMENDMENT** | **33** |
+
+Deduplicated against rules 33–40 as instructed rather than creating
+parallel rules. Survey before writing: `coverage`, `baseline` and
+`operationalis` had **zero** occurrences in the doctrine, confirming A, C
+and E were genuinely new; D and W-B/W-D attach to rules that already
+existed.
+
+**41 — unadmitted-candidate quarantine.** A failed candidate's output may
+say *where to look*; it may not become the baseline for an architecture,
+utility or scope conclusion until the adjudication governing it
+completes. Earned by my reframe argument, built on D368's counts while
+D368's positives were known to be partly wrong.
+
+**42 — consumer requirements are not reverse-engineered from producer
+output.** Where the builder has already seen the output, the builder
+**cannot be the sole author** of the consumer contract. It must carry
+negative/rejection cases and at least one need the producer may fail.
+DeepSeek's conditions, adopted without amendment.
+
+**43 — coverage is detection capability, not sample size.** State per
+axis which failure classes a sample can actually expose, and which it
+cannot. **Forty rows is not forty independent questions.** No "effective
+sample size" without a statistical model — my own `~22` phrasing is
+withdrawn.
+
+**44 — `RULE_BANKED` ≠ `CONTROL_OPERATIONALISED`.** Prose with provenance
+and a named hook is banked governance and stays banked; it is
+operationally closed only when the hook exists, has hostile calibration
+and is enforced. **D369 is `RULE_BANKED`, not `CONTROL_OPERATIONALISED`,
+and so is this entry.**
+
+**45 — assurance-tool trust is purpose-limited.** Historical output stays
+historical evidence; a tool gains admission weight for a *new* purpose
+only once qualified for it. This governs what
+`validity_binding_audit.py` and `cross_axis_semantic_audit.py` may be
+trusted to decide next **without reopening D364 or D365**, per Kai's
+boundary.
+
+**33 amended twice.** The card is universal; **independent reproduction
+is graded** — mandatory only where a claim could itself determine
+admission, closure, authority or irreversible scope, or where the
+producer would be self-certifying. This prevents the adjudicator becoming
+a bottleneck. And: **a complete card is not a true card** — free-text
+`interpretation` is where unearned promotion lives, so constraints that
+bind *content* are worth more than additional fields.
+
+**37 amended.** A witness key, classifier route or emitted-value tuple is
+a **routing signature** — rows that travelled the same path, not rows
+with one cause.
+
+### 3. Sequencing — accepted, and it constrains this entry too
+
+Kai accepted W-A. **No P1 implementation during the hold**: no
+dual-sample tooling, no provenance-graph machinery, no assurance-tool
+qualification infrastructure, no H3 design. The cheap P0 controls are
+already banked as manual doctrine. Governance banking is authorised;
+implementation is not.
+
+### 4. Scope
+
+Changed: `kai-pm/ENGINEERING_DOCTRINE.md` (rules 41–45, amendments to 33
+and 37, five earned-table rows) · `CLAUDE.md` (two R0 tells and two
+mirrored amendments to R13 — **no new operating rule**) ·
+`kai-pm/ORION_FIELD_NOTES.md` (**provenance pointer only**, explicitly
+non-authoritative).
+
+---
+
+### THREAD RECOVERY BLOCK
+
+* **HEAD** — this entry, on `claude/project-rework-plan-pgvp35`
+* **SCOPE** — governance/documentation only. **No instrument, contract,
+  candidate, package or holdout byte changed**
+* **D368 CANDIDATE** — `9d787706…`, aggregate `ba2b16d4…de4a`, **NOT
+  FROZEN, NOT ADMITTED**, package 14/14 verified after this change
+* **D367 CONTRACT** — `0ce5792e…00bb`, **unamended**, verified OK
+* **HOLDOUT** — 40 rows, **not regenerated**. Kai continues the frozen
+  40 × six-axis adjudication. The plain `Reviewed:` → `TIME_BOUND`
+  mechanism is a BLOCKER under D367 §9; that does not end the holdout
+* **DOCTRINE STATE** — rules 1–45. Rules 33–45 are **`RULE_BANKED`,
+  none `CONTROL_OPERATIONALISED`**
+* **AUTHORISED NEXT ACTION** — **NONE. HOLD.**
+* **EXPLICITLY NOT AUTHORISED** — H2 repair · candidate/contract/package/
+  holdout modification · building any hook named in rules 33–45 ·
+  dual-sample tooling · provenance-graph machinery · assurance-tool
+  qualification infrastructure · H3 design or requirement authorship ·
+  reopening D364/D365 · `HOUSE_H3`–`H6` · freezing or admitting D368 ·
+  Census successor or modification · KAI-GATE-048 · Phase B ·
+  `ITEM8_GO` · Stage 2 · `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` ·
+  document/register repair · Kingsman implementation
+* **OPEN / UNRESOLVED** — the frozen 40 × six-axis adjudication ·
+  consolidated blocker/unresolved/over-abstention register · H2 utility
+  decision (separate gate) · **no H3 consumer requirement exists, and
+  under rule 42 I may not author it** · every hook in rules 33–45
+  unbuilt · D358 consumer gate unbuilt · `wake_intent_j2` FUNCTION gap ·
+  173 documents undecidable from the current H2 evidence set ·
+  `LIFECYCLE=ACTIVE` earnable by no existing rule · D344–D353 not in the
+  ledger
+* **CORRECTIONS TO PRIOR RECORDS** — my "6 distinct witness mechanisms"
+  is superseded by **6 routing signatures**; "three axes structurally
+  untestable" by **zero false-positive detection opportunity on three
+  axes, over-abstention still adjudicable**; "~22 independent rows"
+  **withdrawn**. The withdrawn H2 reframe must not be used in any
+  strategic or repair argument
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D370
+  Orion. **Next free: D371 — NOT TO BE TAKEN without authorisation**
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

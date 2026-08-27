@@ -31,6 +31,8 @@ check before continuing.
 | My evidence that a check works comes from the same place as the thing it checks | I-8 — calibrate against something independent, with a known-positive and a known-negative |
 | I am about to send a count, ratio, "clean", "byte-identical" or "independent" | R13 — the derivation travels with the claim, at transmission, not on request |
 | I can name a literal string in the query behind a number I am calling a *mechanism* | R13 — I am counting instances of a string and reporting instances of a cause |
+| I grouped rows by a key **I** constructed and called the groups *mechanisms* | R13 / doctrine 37 — that is a **routing signature**. Same path ≠ same cause |
+| I am reasoning strategically from a candidate that has not passed adjudication | doctrine 41 — diagnostic signal only, never a baseline |
 | An instruction lets me do **less** than the contract requires | R14 — re-read the contract before executing. A verified state under an unverified instruction is not a verified position |
 | I am writing "independent" | name the authority behind each leg. Same authority, different method = cross-method convergence |
 | I am about to write `UNRESOLVED` | is the **source** unclear, or is my **evidence** insufficient? Only the first is ambiguity |
@@ -344,7 +346,15 @@ have returned 120 instead of 144.
 different denominators. A query proves what it actually matches.
 
 Single-producer reproducible evidence *is* evidence. It is not
-*independent corroboration* — say which one it is.
+*independent corroboration* — say which one it is. **The card is
+universal; independent reproduction is not.** It is required only where
+the claim itself could decide admission, closure, authority or
+irreversible scope — elsewhere, label the evidence honestly and move on.
+
+**And a grouping I built is not a cause.** If I keyed rows by something
+I constructed — a witness type, a classifier route, an emitted value —
+that is a **routing signature**. It says those rows travelled the same
+path, not that one mechanism produced them.
 
 ## R14. Reconcile the instruction against the contract before executing
 

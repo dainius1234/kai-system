@@ -767,3 +767,13 @@ are this family.
   contract already requires proof of X.** Abstention needs no permission.
 * **Before writing `UNRESOLVED`, ask whether the SOURCE is unclear or my
   EVIDENCE is insufficient.** Only the first is ambiguity.
+
+### Pointer — D370
+
+The routing-signature error (calling six machine-constructed witness keys
+"six distinct mechanisms", in a Fact Card whose own `limitations` field
+said the key was my construction) is banked in **D370**, doctrine rule 37.
+The holdout coverage measurement that earned rule 43 is there too.
+
+*Pointer only. Re-earn the evidence from D370 and the doctrine, not from
+this note.*
