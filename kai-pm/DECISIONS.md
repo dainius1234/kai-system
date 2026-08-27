@@ -31690,3 +31690,263 @@ and reported at a wider one. `SCOPE` is the purest case — the widening
   Orion. **Next free: D366**, subject to a fresh allocator check
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D366 — 2026-08-27 — Authority-claim evidence audit, and Kai's corrections A–G. EVIDENCE ONLY
+
+**Authority.** Dainius authorised D366 as **evidence-only** on Kai's
+recommendation, after Kai independently checked D365 and the authority
+extractor against source. **No classifier repair authority, no ontology
+implementation authority, no new H2 candidate, no holdout, no HOUSE_H3
+authority, no freeze authority.** After this entry: **RETURN.** Do not
+take the next D-number and do not start the repair.
+
+### 1. The six authority-claim rows — 5 correct, 1 false evidence fact
+
+| document | claim | bound to SELF by | assessment |
+|---|---|---|---|
+| `README.md` | `SELF_ASSERTS_AUTHORITY` | bare pronoun **"It"** | **FALSE EVIDENCE FACT / SUBJECT MISBINDING** |
+| `kai-pm/CODE_AUDIT_MASTER.md` | `SELF_ASSERTS_AUTHORITY` | `Status: **FINAL — SINGLE SOURCE OF TRUTH**` | correct |
+| `kai-pm/DECISIONS.md` | `SELF_ASSERTS_AUTHORITY` | names itself | correct, **not recoverable from the package** |
+| `kai-pm/KAI_ORION_CONTINUITY.md` | `SELF_ASSERTS_NON_AUTHORITY` | `STATUS: … NOT A SOURCE OF PROGRAMME TRUTH` | correct |
+| `kai-pm/KAI_UNIFIED_HUNTER_…` | `SELF_ASSERTS_AUTHORITY` | `Status: **AUTHORITATIVE …**` | correct |
+| `kai-pm/PHASE1_READINESS.md` | `SELF_ASSERTS_AUTHORITY` | `This document is the source of truth for…` | correct |
+
+The extractor is otherwise careful: it separates `SELF` from `OTHER` and
+`AMBIGUOUS_SUBJECT`, and correctly declines to count
+`"They are not authoritative."` in `CODE_AUDIT_MASTER.md`, which is about
+other documents.
+
+**The claim cannot become a verdict.** Injecting `AUTHORITY=ADVISORY`
+through the real code path is rejected by the contract self-check while
+the clean row still passes; the verdict abstains 272/272.
+
+### 2. `README.md` — subject misbinding, Kai's classification adopted
+
+```
+**Status lives in one place:** [`kai-pm/UH_PROGRESS_TRACKER.md`](…).
+It is the source of truth for UH work …
+```
+
+The authority subject is `UH_PROGRESS_TRACKER.md`. `SELF_PROSE` admits a
+bare sentence-initial `it` with **no antecedent resolution**, so a
+document *attributing* authority to another is recorded as claiming it.
+1 of 6 SELF bindings comes from a bare pronoun; the other 5 come from
+controlled fields or `this document`.
+
+**Kai's ruling, adopted verbatim as the distinction that matters:**
+
+> AUTHORITY verdict layer = still correctly abstaining.
+> authority-claim evidence layer = defective.
+> **`EVIDENCE FACTS ARE NOT VERDICTS` does not mean `EVIDENCE FACTS MAY
+> BE WRONG`.** A false evidence fact is a candidate-integrity defect even
+> when the associated verdict abstains.
+
+**This blocks HOUSE_H2 admission.** H2 exists to hand evidence forward;
+a false evidence fact a future H3 consumer may qualify is not harmless
+because H2 withheld the final verdict.
+
+### 3. `non-authoritative` polarity inversion — LATENT, NO CURRENT INSTANCE
+
+`AUTH_POS` contains `\bauthoritative\b`; `AUTH_NEG` requires the separate
+word `not`. A hyphen is a word boundary, so `non-authoritative` matches
+POSITIVE and not NEGATIVE. Verified through `bind_claims()`:
+
+```
+'This document is non-authoritative.'  -> SELF_ASSERTS_AUTHORITY   INVERTED
+'This document is not authoritative.'  -> SELF_ASSERTS_NON_AUTHORITY   ok
+'**Status:** non-authoritative'        -> SELF_ASSERTS_AUTHORITY   INVERTED
+```
+
+A document explicitly disclaiming authority is recorded as claiming it.
+Seven corpus lines contain `non-authoritative`; none is currently
+SELF-bound. Recorded as **`LATENT FALSE-POSITIVE CAPABILITY / NO CURRENT
+EMITTED INSTANCE`**, and it must be closed before admission because the
+extractor feeds future authority qualification. Same family as
+`Audit` ⊂ `Auditor`: a word boundary that is not where the meaning is.
+
+Kai's minimum hostile boundary set for the later repair, recorded now:
+`authoritative` · `non-authoritative` · `not authoritative` · `not a
+source of truth` · an authoritative statement about **another** document
+· a **quoted** authority statement · a controlled-field self-declaration.
+
+### 4. Undeclared evidence truncation — CONFIRMED, and general to three axes
+
+`authority_claim_evidence` is capped at `[:6]` with no declaration.
+`kai-pm/DECISIONS.md` has **43 claims, exactly 1 SELF-bound, and 0 SELF
+rows in the artefact** — the package records `SELF_ASSERTS_AUTHORITY`
+while every visible row is `OTHER`/`AMBIGUOUS`. An independent
+adjudicator sees a conclusion its own visible evidence contradicts, and
+cannot recover the decisive witness. R10.
+
+Kai accepted the cross-axis generalisation:
+
+| axis | what the artefact records | what it should record |
+|---|---|---|
+| `VALIDITY` | the static string `"cites a commit sha"` | the exact witness |
+| `FUNCTION` | `"144 members; every title names audit/finding: True"` | each decisive witness |
+| `AUTHORITY` | 6 of 43 claims, cap undeclared | the determining row |
+
+**One class: THE ARTEFACT DOES NOT CARRY SUFFICIENT SOURCE-BOUND
+EVIDENCE TO INDEPENDENTLY ADJUDICATE ITS OWN CELL.** Kai's ruling: this
+is the **first implementation step inside the consolidated repair**,
+before the semantic changes — and it must **not** become a separate
+frozen H2 release.
+
+**Future requirement, recorded verbatim.** Every positive evidence fact
+or non-abstention verdict must carry a source-bound witness sufficient
+for independent adjudication: witness type · exact token/value · source
+path · line/span or equivalent stable selector · local context ·
+applicability scope · total evidence count · shown evidence count ·
+explicit `truncated=true/false`. Oversized evidence may live in a bound
+sidecar; **silent truncation is forbidden.**
+
+### 5. Kai's corrections A–G, banked because they did not reach D365
+
+**A — claim scope.** ~~`SCOPE` is the largest defect in the system.~~
+**Withdrawn.** Earned: *`SCOPE` is the largest unsupported-positive
+population in the HOUSE_H2 cross-axis semantic audit measured so far.*
+This audit does not rank defects across the Kai system.
+
+**B — `SCOPE` classifications.** For the 267 ordinary `WHOLE_FILE`
+defaults the emitted result is `UNSUPPORTED_POSITIVE`; the corrected
+behaviour absent evidence is **ABSTAIN**. Lack of proof does not prove
+whole-file is factually false. The 5 rows saying `REGION DETERMINATION
+REQUIRED` while emitting `WHOLE_FILE` are
+**`UNSUPPORTED_POSITIVE + INTERNAL_SCOPE_CONTRADICTION`**, unless
+independent evidence proves the scope is non-whole-file. The opposite
+conclusion must not be manufactured.
+
+**C — `SCOPE` ontology inconsistency. VERIFIED HERE FROM THE TREE, and
+it is stronger than reported.** `kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md:44`
+states `UNKNOWN` is *"First-class on EVERY axis, independently."*
+`SCOPE`'s alphabet is `('WHOLE_FILE','HEADING','TABLE','MANAGED_REGION')`
+— **the only axis of six omitting `UNKNOWN`** — and
+`STATE_DISPOSITION[('SCOPE','WHOLE_FILE')] = ('H2_EMITTABLE',
+'file-level default')`.
+
+`ont.emittable('SCOPE','UNKNOWN')` is **`False`**, and injecting the
+abstention raises `CONTRACT VIOLATION: emitted SCOPE=UNKNOWN,
+disposition None`. **The abstention is not merely absent — the
+qualification contract would reject it.** `SCOPE` is the one axis
+structurally forbidden to say *I do not know*. Banked as an ontology
+defect. No repair.
+
+**D — global `SCOPE` inheritance is unresolved and likely structurally
+wrong.** One document can carry whole-file `FUNCTION` evidence,
+one-citation `VALIDITY` evidence, one-declaration `AUTHORITY` evidence
+and managed-region `GENERATION` evidence. **Row-level `SCOPE` ≠ the
+automatic scope of every cell.** Kai's design direction for the eventual
+repair: preserve a document-level `SCOPE` axis, give it proper
+abstention, and **do not let it widen another axis** — each evidence,
+verdict and claim carries its own applicability scope. A document-level
+`SCOPE` positive must itself be earned; if unearned, `SCOPE=UNKNOWN`.
+Region/citation evidence may be recorded with its own selector while the
+whole-file `VALIDITY` verdict abstains. This preserves the standing
+ruling that H2 does not invent a region-scoped `VALIDITY` state to
+retain positive counts.
+
+**E — `FUNCTION` family "PROVEN" claim NOT ACCEPTED.**
+~~144 `CODE_AUDIT_BATCH_*` rows are independently PROVEN.~~ Path and
+title created as part of the same document are **not** independent
+corroboration. `PATH says audit + TITLE says audit ≠ two independent
+proofs of actual function`. They may support a later evidence fact such
+as `NOMINAL_FUNCTION` or `SELF_ASSERTS_FUNCTION`, which is not actual
+function. The 5 objective `MARKER` cases remain **candidate-proven,
+subject to final qualification**. DeepSeek's stronger claim that
+`FUNCTION` can never be proven at H2 **remains rejected** — objective
+machine evidence can potentially prove function, for example proven
+executable consumption of a registry as runtime input. The confirmed
+`FUNCTION` defects are preserved: token inside an unrelated word ·
+degenerate `OTHER` negative · purpose branch never firing ·
+candidate-order dependence.
+
+**F — repair sequencing. Do NOT ship a standalone `SCOPE` repair.** My
+R12 recommendation to repair `SCOPE` first and alone is **overruled**.
+One consolidated H2 candidate, in this internal order: **(1)**
+evidence/witness trace completeness · **(2)** `SCOPE`
+ontology/foundation · **(3)** `VALIDITY` evidence-vs-verdict under
+corrected scope · **(4)** `FUNCTION` evidence-vs-verdict/witness ·
+**(5)** `AUTHORITY` claim-extractor defects · **(6)** retain
+`GENERATION`/`AUTHORITY` verdict abstention controls · **(7)** recompute
+all six axes · **(8)** one full qualification · **(9)** one new
+independent full-H2 blind holdout. **No implementation authority exists.**
+
+**G — future holdout.** No separate axis holdouts. The next candidate
+gets **one fresh six-axis H2 blind holdout under a new salt**, its
+selection/evaluation contract exact-subject/tree bound, fixed before
+repair code, **durably committed in its own pre-repair commit**, and not
+adjudicated by Orion. Kai adjudicates the returned final candidate.
+
+### 6. The withdrawn mutation proof — Kai's acceptance recorded
+
+My correction is accepted: the neutral-row mutation sweep did not prove
+`AUTHORITY`/`GENERATION` deferral. Silence from a row that cannot reach
+the state is not negative proof. The known-positive injected rejection
+through the real contract guard is the relevant evidence. **Both are
+banked — the conclusion survives, the prior proof is withdrawn.** Kai's
+framing: another clean instance of D340/D358, *absence of emission
+cannot establish non-emittability.*
+
+### 7. Artefacts banked
+
+* `kai-pm/authority_claim_audit_d366.json` — the six rows with claim,
+  binding source, total vs shown evidence counts, whether the
+  determining row is recoverable from the package, the polarity probe,
+  and the verified `SCOPE` ontology defect.
+
+Adjudication remains an **author nomination** with no admission weight.
+
+---
+
+### THREAD RECOVERY BLOCK
+
+* **HEAD** — this entry, on `claude/project-rework-plan-pgvp35`
+* **H2 v1.1 CANDIDATE** —
+  `be37a0aa5d56255a151c31361d93e8b4be94ab912ec9441c8ac3535a84fbf133`,
+  **UNFROZEN FAILED-ADMISSION CANDIDATE**, preserved as evidence.
+  Blocking defects: VALIDITY binding (D364) · SCOPE default and ontology
+  (D365, D366-C) · FUNCTION witness and boundary (D365) · AUTHORITY
+  false evidence fact and undeclared truncation (D366)
+* **UNTOUCHED** — HOUSE_H2 `v1.0` `fa847726…45f4` · Census `v1.1`
+  `eb7aad7c…fa0e` · Census `v1.0` `4a5b40a1…`
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents.
+  **History source must be NON-SHALLOW** (ancestry 986, oldest
+  2025-06-18); the active repo is shallow and returns wrong answers
+* **HOUSE STATE** — `HOUSE_H0` CLOSED · `HOUSE_H1` COMPLETE ·
+  `HOUSE_H2` failed admission, full defect population measured, repair
+  sequence ruled but **not authorised** · `HOUSE_H3`–`H6` NOT STARTED
+* **AUTHORISED NEXT ACTION** — **NONE. RETURN.** Do not take the next
+  D-number. Do not start the repair. The next decision is Kai's and
+  Dainius's: to freeze the consolidated repair + qualification +
+  fresh-holdout contract in **its own durable pre-implementation
+  commit** before any H2 code changes
+* **EXPLICITLY NOT AUTHORISED** — any repair (evidence trace, `SCOPE`,
+  `VALIDITY`, `FUNCTION`, `AUTHORITY`) · any classifier or H2 package
+  change · ontology implementation · a new H2 candidate · a new blind
+  holdout · `HOUSE_H3`–`H6` · freezing · Census successor or
+  modification · H2 v1.0 modification · programme-order CI mechanism ·
+  KAI-GATE-048 · Phase B · `ITEM8_GO` · six subject builds · Stage 2 ·
+  `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · document/register repair ·
+  Kingsman implementation
+* **OPEN / UNRESOLVED** — the nine-step consolidated repair unbuilt ·
+  `SCOPE` cannot abstain under the present ontology · row-level `SCOPE`
+  inheritance structurally unresolved · D358 consumer gate specified but
+  unbuilt · 335 `UNSUPPORTED_POSITIVE` cells · 50 of 56 VALIDITY
+  verdicts unproven at claimed scope · `wake_intent_j2` FUNCTION gap
+  uncurated · 173 documents undecidable from git evidence ·
+  `LIFECYCLE=ACTIVE` earnable by no existing rule · Census confound not
+  isolatable without an adapter · D344–D353 not in the ledger
+* **HOLDOUT** — the D363 24-row holdout is **partially revealed
+  regression evidence only**. Not to be inspected further. Superseded
+  by correction G: one fresh six-axis holdout for the next candidate
+* **CORRECTIONS TO PRIOR RECORDS** — corrections A, B, E and F above
+  amend D365; the `AUTHORITY`/`GENERATION` mutation proof is withdrawn
+  with the conclusion retained (§6); my R12 "repair `SCOPE` first and
+  alone" is **overruled** by correction F
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D366
+  Orion. **Next free: D367 — NOT TO BE TAKEN without authorisation**
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).
