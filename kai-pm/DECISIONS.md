@@ -31950,3 +31950,212 @@ Adjudication remains an **author nomination** with no admission weight.
   Orion. **Next free: D367 — NOT TO BE TAKEN without authorisation**
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D367 — 2026-08-27 — HOUSE_H2 consolidated repair contract. PRE-IMPLEMENTATION, NO CODE
+
+**Authority.** Dainius authorised D367 as the pre-implementation
+contract, exactly as Kai specified, after Kai independently verified
+D366 at `86a1399e6e31477ba67cd38c12d22627a8b4d6ef`. **No classifier
+implementation. No ontology implementation. No new candidate. No
+holdout. No HOUSE_H3.** After this entry: **RETURN.** Implementation
+begins only when Kai has independently verified the contract **and**
+Dainius separately authorises the consolidated repair.
+
+**Contract:** `kai-pm/H2_REPAIR_CONTRACT_D367.md`, sha256
+`0ce5792ed72e6e7051ecc050664490899a847d01de2f62cff564f460d46800bb`,
+hashed in `H2_REPAIR_CONTRACT_D367.sha256`.
+
+**This lands in its own commit, before the first repair byte.** That
+ordering is the direct remedy for the D361 defect in which `PRECOMMIT.md`
+landed *together with* the implementation, so its chronology could only
+ever be an execution claim. Here the ordering is attested by git rather
+than asserted by me.
+
+### 1. A seventeenth defect, demonstrated here — why the gate stayed green
+
+Kai source-confirmed that `qualify_h2.py` iterates only values already
+present in `ont.ALPHABETS`, so it can detect an undeclared disposition
+for an existing value but **cannot detect a governing value missing from
+the alphabet entirely.** I demonstrated it rather than reading it:
+
+```
+qualification as shipped                        : 0 findings
+after REMOVING UNKNOWN from VALIDITY's alphabet : 0 findings
+VALIDITY values the gate then examines          : 4 (UNKNOWN not among them)
+documents emitting VALIDITY=UNKNOWN             : 216
+```
+
+**216 documents emit a value the gate no longer knows exists, and the
+gate stays green.** R5: the check's scope was defined by a list rather
+than derived from the tree.
+
+This is why the following could coexist: the governing text requires
+`UNKNOWN` on every axis · `SCOPE`'s alphabet omits it · qualification
+reports zero findings. **D17 is the reason the other sixteen defects
+survived a green gate**, and it is now in the register.
+
+### 2. What the contract freezes
+
+**Identity**, each independently recomputed: subject
+`d8aac4d49e6ba997e3eb38062c0917186ee3f197`, tree
+`3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, population 272, Census v1.1
+`eb7aad7c…fa0e`, failed candidate `be37a0aa…f133`, freeze commit
+`86a1399e…d6ef`. History source must be **non-shallow**, ancestry 986,
+oldest `e8c3209c…` dated 2025-06-18. The active repository is shallow and
+**must not be used**; it returns its graft boundary as a plausible date.
+
+**The demonstrated defect-class register — D1–D17, closed at freeze.**
+Kai's Q2 ruling adopted: only defects **demonstrated** on a concrete
+input before freeze are admission blockers, each requiring a fail-old /
+pass-new control whose fail-old half runs against the **actual committed**
+pre-repair implementation. An imaginable defect with no failing input is
+not automatically a blocker. **Nothing may be added to the admission bar
+after implementation begins without a new decision entry.**
+
+**Ontology correction authorised** — `SCOPE` gains `UNKNOWN` with an
+explicit disposition, emittable as an abstention; `WHOLE_FILE` ceases to
+be a default. Kai's framing adopted: this is a **corrective amendment**
+bringing the executable ontology into conformance with an invariant the
+governing text already ratified, not new invented semantics. No
+region-scoped `VALIDITY` state is invented. No standalone `SCOPE`
+release.
+
+**Scope semantics** — row-level `SCOPE` is **not** the automatic scope of
+every cell; `SCOPE` must not widen any other axis; every evidence fact,
+claim and verdict carries its own applicability scope; region evidence
+may be recorded with its own selector while the whole-file verdict
+abstains.
+
+**Evidence/witness trace schema** — nine mandatory fields including
+`witness_value` (the exact token, never a description), `source_selector`,
+`applicability_scope`, `evidence_total`, `evidence_shown` and an explicit
+`truncated` flag. Oversized evidence may live in a hash-bound sidecar.
+**Silent truncation is forbidden.** This is step 1 of implementation.
+
+**Per-axis repair semantics** for `VALIDITY`, `FUNCTION`, `AUTHORITY`,
+and the retained `GENERATION`/`AUTHORITY` abstention invariants proven by
+injection known-positive with its known-negative.
+
+**Ontology meta-check invariants** with the removal calibration —
+synthetically remove `UNKNOWN` from an axis and qualification **must
+fail**.
+
+**Qualification criteria**, eight items including runtime module identity
+and fresh reproduction.
+
+**H2 utility metrics reported separately from correctness** — positives
+must never be preserved to keep classification rates attractive.
+Qualification asks *is the instrument truthful*; a later operator
+decision asks *is the truthful instrument discriminating enough to feed
+H3*. Two separate gates.
+
+### 3. The final holdout — both halves frozen, and verified computable
+
+Size **40 documents**, all six axes plus consequential evidence facts.
+Kai's framing recorded: an independent surprise detector on top of the
+mechanical fixtures, **not** a claimed statistical guarantee.
+
+```
+key = sha256("H2FINAL-D367:" + "86a1399e6e31477ba67cd38c12d22627a8b4d6ef"
+             + ":" + FINAL_CANDIDATE_AGGREGATE + ":" + path)
+sort ascending, first 40
+```
+
+**Dry-run verified here.** Two hypothetical aggregates share only **9 of
+40** selected rows, so the sample is genuinely determined by an aggregate
+that cannot exist until the repair completes — while the rule itself is
+frozen now. Overlap with the D363 24-row holdout is 1–4 rows depending on
+aggregate; only `SEQUENCE.md` of that set was ever actually adjudicated,
+so contamination is bounded to that single document and is recorded
+rather than engineered away.
+
+**The evaluation rule is frozen in the same commit** — five blocker
+classes, `UNRESOLVED` for genuine ambiguity, `UNKNOWN` as abstention and
+never negative evidence, and over-abstention as a coverage finding rather
+than an automatic safety blocker. Fixing evaluation now is what stops
+success being reinterpreted after the rows are seen.
+
+**Kai adjudicates all 40. Orion computes no acceptance agreement figure.**
+
+### 4. Independence, recorded as a standing constraint
+
+> **ORION SELF-AUDIT RESULTS HAVE ZERO FINAL ADMISSION WEIGHT.**
+
+Defect-discovery evidence, repair-design evidence and calibration input —
+**not** independent qualification. The supporting record: `TIME_BOUND`
+graded 83% sound and was not · the 144 `CODE_AUDIT_BATCH_` rows called
+`PROVEN` and were not · `AUTHORITY` reported sound while carrying a false
+evidence fact · deferral claimed *proven by mutation* when the sweep had
+merely failed to reach the state. **Every self-assessment error ran in
+the same direction**, which makes it a bias rather than a run of bad
+luck.
+
+### 5. DeepSeek's contributions adjudicated by Kai and recorded
+
+* **Latent-defect bound — ACCEPTED.** His objection that "close every
+  latent defect" is unbounded and unfalsifiable is upheld; the criterion
+  is now *demonstrated* defects only.
+* **Meta-check free shot — CONFIRMED**, and is D17 above.
+* **`FUNCTION` refinement — ACCEPTED**, narrowing Kai's own earlier
+  counterexample: static Census reader evidence establishes proven
+  reader evidence only, **not** `FUNCTION=RUNTIME_INPUT`. A runtime-input
+  claim needs the live contract demonstrably consuming the document in
+  that role, excluding test readers, dead paths, tooling/migration
+  readers, generic scanners, conditionally inactive readers and unrelated
+  reads. **Current reader lists must not be used to rescue `FUNCTION`
+  positives.** His absolute claim that `FUNCTION` can never be proven at
+  H2 **remains rejected** as too broad.
+* **H2-usefulness objection — VALID, DEFERRED.** Not resolved by
+  preserving false positives. If the repaired H2 becomes mostly evidence
+  plus `UNKNOWN`, that is the measured truth, and its operational
+  fitness is a separate later decision.
+
+---
+
+### THREAD RECOVERY BLOCK
+
+* **HEAD** — this entry, on `claude/project-rework-plan-pgvp35`
+* **CONTRACT** — `kai-pm/H2_REPAIR_CONTRACT_D367.md` sha256
+  `0ce5792ed72e6e7051ecc050664490899a847d01de2f62cff564f460d46800bb`,
+  banked in its own pre-implementation commit
+* **H2 v1.1 CANDIDATE** — `be37a0aa…f133`, **UNFROZEN FAILED-ADMISSION
+  CANDIDATE**, preserved as evidence. 17 demonstrated defect classes
+  registered and closed at freeze
+* **UNTOUCHED** — HOUSE_H2 `v1.0` `fa847726…45f4` · Census `v1.1`
+  `eb7aad7c…fa0e` · Census `v1.0` `4a5b40a1…`
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents.
+  **History source must be NON-SHALLOW** (ancestry 986, oldest
+  2025-06-18); the active repo is shallow and returns wrong answers
+* **HOUSE STATE** — `HOUSE_H0` CLOSED · `HOUSE_H1` COMPLETE ·
+  `HOUSE_H2` failed admission, repair contract FROZEN, implementation
+  **NOT AUTHORISED** · `HOUSE_H3`–`H6` NOT STARTED
+* **AUTHORISED NEXT ACTION** — **NONE. RETURN.** Awaiting Kai's
+  independent verification of this contract and Dainius's separate
+  authorisation of the consolidated repair
+* **EXPLICITLY NOT AUTHORISED** — the consolidated repair · any
+  classifier, ontology or H2 package change · a new H2 candidate · the
+  holdout · `HOUSE_H3`–`H6` · freezing · Census successor or
+  modification · H2 v1.0 modification · programme-order CI mechanism ·
+  KAI-GATE-048 · Phase B · `ITEM8_GO` · six subject builds · Stage 2 ·
+  `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · document/register repair ·
+  Kingsman implementation
+* **OPEN / UNRESOLVED** — the nine-step consolidated repair unbuilt ·
+  D358 consumer gate specified but unbuilt · H2 operational fitness a
+  separate later gate · `wake_intent_j2` FUNCTION gap uncurated · 173
+  documents undecidable from git evidence · `LIFECYCLE=ACTIVE` earnable
+  by no existing rule · Census confound not isolatable without an
+  adapter · D344–D353 not in the ledger
+* **HOLDOUT** — 40 documents, selection AND evaluation both frozen in
+  this commit; sample not knowable until the candidate aggregate exists;
+  **Kai adjudicates, Orion computes no agreement figure.** The D363
+  24-row holdout is partially revealed regression evidence only, with
+  contamination bounded to `SEQUENCE.md`
+* **CORRECTIONS TO PRIOR RECORDS** — none new; D366 carries the standing
+  corrections
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D367
+  Orion. **Next free: D368 — NOT TO BE TAKEN without authorisation**
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).
