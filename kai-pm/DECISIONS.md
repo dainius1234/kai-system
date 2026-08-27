@@ -31450,3 +31450,243 @@ as a finding is exactly the shape this audit was built to detect.
   Orion. **Next free: D365**, subject to a fresh allocator check
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D365 — 2026-08-27 — Cross-axis semantic audit: 149 of 494 live cells proven. EVIDENCE ONLY
+
+**Authority.** Dainius authorised D365 as **evidence-only** on Kai's
+recommendation. **No repair authority, no ontology implementation
+authority, no new candidate, no new holdout, no HOUSE_H3 authority, no
+freeze authority.** Kai adjudicates independently after the final
+candidate returns.
+
+**Scope note, stated because it matters.** Kai's relayed instruction
+asked that this entry bank "the corrections and unresolved ontology
+questions above". **The corrections text was not included in the relay I
+received.** I have banked what I actually hold: the audit, the
+instrument, the subject and history identity, my classifications marked
+as author nominations, the corrections **I** made, and my four open
+questions recorded as OPEN. Any correction Kai issued that did not reach
+me is **not** in this entry and must be banked separately.
+
+### 1. Result — axes `FUNCTION`, `AUTHORITY`, `GENERATION`, `SCOPE`
+
+`LIFECYCLE` was qualified under D361–D363 and `VALIDITY` audited under
+D364; re-adjudicating them here would produce two numbers for one
+question.
+
+| axis | N | PROVEN | UNSUPPORTED | FALSE_POS | AMBIG | ABSTENTION | DEFERRED |
+|---|---|---|---|---|---|---|---|
+| `FUNCTION` | 272 | 149 | 63 | **6** | 4 | 50 | 0 |
+| `AUTHORITY` | 272 | 0 | 0 | 0 | 0 | 0 | **272** |
+| `GENERATION` | 272 | 0 | 0 | 0 | 0 | 0 | **272** |
+| `SCOPE` | 272 | **0** | **272** | 0 | 0 | 0 | 0 |
+
+Of 494 cells that are neither abstention nor deferred: **149 PROVEN
+(30%) · 335 UNSUPPORTED_POSITIVE (68%) · 6 FALSE_POSITIVE · 4
+AMBIGUOUS.**
+
+### 2. ~~`AUTHORITY` and `GENERATION` deferral is proven by mutation~~
+
+**Struck through. Not proven as claimed in the D364-era relay.** The
+first version of this instrument reported `FUNCTION` as
+`DEFERRED_BY_DESIGN`. That is false — `FUNCTION` emits 222 verdicts. The
+mutation sweep used a neutral row that never reaches a `FUNCTION`
+verdict, and **"the sweep found nothing" was read as "nothing is
+reachable"**.
+
+That is `UNKNOWN` used as negative evidence — the abstention invariant
+(D340 §7 / D358) — broken **inside the instrument written to detect
+exactly that**, and it means the same sweep's silence about `AUTHORITY`
+and `GENERATION` proved nothing either.
+
+Deferral is now decided by three legs, and only the third is proof:
+a **declaration** that every non-abstention value is unearnable; an
+**observation** that the corpus emits none, which cannot distinguish
+forbidden from not-encountered; and a **known-positive** — injecting a
+forbidden value through the real code path and requiring the contract
+self-check to reject it, with the clean row still passing.
+
+Leg 3 was run. `AUTHORITY=ADVISORY` and `GENERATION=FULL_DERIVED`
+injected through `_unknown()` are **both rejected**; the clean row is
+still accepted. `_unknown` is poisoned rather than `classify()`:
+patching `classify()` would bypass the guard and prove nothing, and
+patching `ont.emittable` would be patching the check instead of testing
+it. **The conclusion survives; the earlier proof of it did not.**
+
+### 3. `SCOPE` — a default presented as a finding, 272 of 272
+
+There is **no `def scope()`**. The value is a literal. `WHOLE_FILE` is
+the only value reachable by 153 mutations *or* observed on the corpus.
+267 rows carry the witness `default`.
+
+**Five carry `default_pending_region`, witness `"proven writer present:
+REGION DETERMINATION REQUIRED"` — and emit `WHOLE_FILE` anyway.** The
+instrument states the determination is required and returns the verdict
+without it.
+
+Load-bearing: every `VALIDITY` verdict is scoped `WHOLE_FILE` by this
+default, and that scope is what made the D364 defect harmful.
+
+### 4. `AUTHORITY` is the axis that gets it right, and it is the model
+
+Self-claims are computed and recorded as a **row-level evidence field** —
+`SELF_ASSERTS_AUTHORITY` 5, `SELF_ASSERTS_NON_AUTHORITY` 1,
+`NO_SELF_CLAIM` 266 — while the verdict abstains 272/272. Evidence
+recorded, verdict withheld: exactly what `VALIDITY` failed to do with
+`present_tense`. **The correct pattern already exists inside the
+package**, implemented on one axis and not on two others, in the same
+file, by the same author. That is R6, not a knowledge gap.
+
+Residual risk unchanged: the claim sits in the artefact, so a careless H3
+consumer could read it as authority. That is the D358 consumer gate —
+**specified but unbuilt**.
+
+### 5. `FUNCTION` — the most disciplined axis, and one source counted twice
+
+It requires **path nomination + a corroborating title witness**,
+genuinely stronger than any `VALIDITY` rule. But path and title are both
+authored by the same person at the same time, so by the rule this
+programme already banked — *repetition is not corroboration; common
+provenance across copies adds no authority* — **the two-source design is
+one source counted twice.** Hence 63 `UNSUPPORTED_POSITIVE`.
+
+**PROVEN (149):** 144 from the `CODE_AUDIT_BATCH_*` family rule, an
+`all()` over the family derived from the tree — if it fires, every member
+individually carries the title evidence, and no member carries a
+non-evidence title. Plus 5 `MARKER` on byte count and path suffix.
+*Fragility noted: if one member failed, all 144 fall through silently.*
+
+**FALSE_POSITIVE (6):** three are substring matches on a term list with
+no word boundaries — `Audit` ⊂ **`Auditor`**, `Plan` ⊂ **`Plane`**,
+`Plan` ⊂ **`Planning`**, none a plural of the term. `auditor.md` has a
+control that did not need constructing: `doctor.md`, `oracle.md`,
+`sage.md`, `scout.md` are the same kind of document in the same directory
+and are **all `UNKNOWN`**; the only difference is that one role is
+*named* auditor. Three more are `OTHER` verdicts whose
+closed-vocabulary negative is **satisfied by construction**: `PURPOSE`
+captures only the trigger phrase, so the negative is tested against
+`'This file'` and `'records'` — one taken from prose about a **source
+file** under `## Common Mistakes`, another matched at a **line-wrap
+boundary**. The `purpose_statement` corroboration branch fires **0 times
+in 272 documents** — R8 never-executed code, the D341 class.
+
+**AMBIGUOUS (4):** two candidates' terms both match, so
+`PATH_NOMINATION` **order** picks the winner — the `RUN` vs `SHA`
+precedence shape.
+
+### 6. Divergence from my own hand adjudication, recorded
+
+The hand pass reported 5 FALSE_POSITIVE / 5 AMBIGUOUS; the derived rule
+reports **6 / 4**. `CODE_AUDIT_PLANNING_PACKAGE_QA.md` moves to
+FALSE_POSITIVE. **The derived result is the one kept** — it is
+reproducible, the hand call was not. A hand-maintained verdict list
+beside the thing it judges is the R5 defect and is also unfalsifiable.
+
+### 7. The consolidated defect population
+
+| defect | axis | population |
+|---|---|---|
+| default emitted as verdict | `SCOPE` | **272** |
+| self-description counted twice | `FUNCTION` | **63** |
+| evidence token → whole-file verdict | `VALIDITY` (D364) | **50** |
+| self-claim never checked against available evidence | `VALIDITY` | 9 |
+| witness kind assumed from shape, never verified | `VALIDITY` | 7 |
+| candidate order decides the verdict | `FUNCTION`, `VALIDITY` | 4 + `RUN`/`SHA` |
+| substring match, no word boundary | `FUNCTION` | 3 |
+| closed-vocabulary negative over a degenerate capture | `FUNCTION` | 3 |
+| population empty because the detector cannot fire | `VALIDITY` | 0 measured |
+| never-executed branch | `FUNCTION` | 0 fired |
+
+**One shape underneath all ten:** an observation is recorded at one scope
+and reported at a wider one. `SCOPE` is the purest case — the widening
+*is* the entire rule.
+
+### 8. Open questions, recorded as OPEN and not answered here
+
+1. Is `FUNCTION`'s path+title corroboration acceptable, or does
+   *repetition is not corroboration* bind here as it did when the
+   three-copy programme-order claim was withdrawn? If it binds, 63
+   verdicts are unsupported.
+2. Does `SCOPE=WHOLE_FILE` as a **declared** default count as a false
+   positive or an honest declaration? All 272 were classified
+   `UNSUPPORTED_POSITIVE` because the witness says `default`. The 5
+   saying `REGION DETERMINATION REQUIRED` were not separated out.
+3. Do these four axes need a blind holdout? Every finding is the
+   author's, on an instrument the author wrote.
+4. **R12, recommendation not decision — repair `SCOPE` first and alone**,
+   against the consolidated-repair plan. It is 272 of the 335 unsupported
+   cells; it is a constant rather than a wrong rule, so its repair is
+   bounded and checkable independently; every other axis inherits its
+   widening; and repairing `VALIDITY`'s binding underneath an unmeasured
+   scope would make the `VALIDITY` repair's own impact unmeasurable. It
+   also unblocks the ontology ruling: region overrides are unearnable
+   *because `SCOPE` never measures anything*.
+
+### 9. Artefacts banked
+
+* `kai-pm/CROSS_AXIS_SEMANTIC_AUDIT.md` — the report
+* `kai-pm/cross_axis_audit_d365.json` — reachability, per-axis tallies,
+  and every flagged row with its mechanical signals
+* `kai-pm/cross_axis_semantic_audit.py` — the read-only instrument.
+  **Not part of the HOUSE_H2 package; never imported by a classifier.**
+  Classifications are **derived by declared rule from mechanical
+  signals**, not hand-listed. Output byte-identical across runs. Aborts
+  on a mutable ref, a mismatched subject repo, or a module loaded from
+  outside the named package.
+
+---
+
+### THREAD RECOVERY BLOCK
+
+* **HEAD** — this entry, on `claude/project-rework-plan-pgvp35`
+* **H2 v1.1 CANDIDATE** —
+  `be37a0aa5d56255a151c31361d93e8b4be94ab912ec9441c8ac3535a84fbf133`,
+  **UNFROZEN FAILED-ADMISSION CANDIDATE**, preserved as evidence.
+  Lifecycle boundary ACCEPTED (D363). VALIDITY defective (D364).
+  FUNCTION/SCOPE defective, AUTHORITY/GENERATION sound (D365)
+* **UNTOUCHED** — HOUSE_H2 `v1.0` `fa847726…45f4` · Census `v1.1`
+  `eb7aad7c…fa0e` · Census `v1.0` `4a5b40a1…`
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents.
+  **History source must be NON-SHALLOW** (ancestry 986, oldest
+  2025-06-18); the active repo is shallow and returns wrong answers
+* **HOUSE STATE** — `HOUSE_H0` CLOSED · `HOUSE_H1` COMPLETE ·
+  `HOUSE_H2` failed admission, full defect population now measured ·
+  `HOUSE_H3`–`H6` NOT STARTED
+* **AUTHORISED NEXT ACTION** — **the six-row authority-claim evidence
+  audit only**, read-only, then return. The 5 `SELF_ASSERTS_AUTHORITY`
+  and 1 `SELF_ASSERTS_NON_AUTHORITY` rows: what the claim is, where it
+  sits, whether the evidence field is correctly derived, and whether it
+  can leak into a verdict
+* **EXPLICITLY NOT AUTHORISED** — any repair (`SCOPE`, `VALIDITY`,
+  `FUNCTION`) · any classifier or H2 package change · ontology
+  implementation · a new H2 candidate · a new blind holdout ·
+  `HOUSE_H3`–`H6` · freezing · Census successor or modification · H2
+  v1.0 modification · programme-order CI mechanism · KAI-GATE-048 ·
+  Phase B · `ITEM8_GO` · six subject builds · Stage 2 ·
+  `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · document/register repair ·
+  Kingsman implementation
+* **OPEN / UNRESOLVED** — the four questions in §8 · 335
+  `UNSUPPORTED_POSITIVE` cells across FUNCTION and SCOPE · 50 of 56
+  VALIDITY verdicts unproven at claimed scope · D358 consumer gate
+  specified but unbuilt · `wake_intent_j2` FUNCTION gap uncurated · 173
+  documents undecidable from git evidence · `LIFECYCLE=ACTIVE` earnable
+  by no existing rule · Census confound not isolatable without an
+  adapter · D344–D353 not in the ledger · **Kai's corrections referenced
+  in the D365 relay were not received and are not banked**
+* **HOLDOUT** — the D363 24-row holdout is **partially revealed
+  regression evidence only**. Not to be inspected further. A new holdout
+  comes only after the complete repair scope is known, under a new salt,
+  its selection contract committed in **its own durable pre-repair
+  commit**, and not adjudicated by Orion
+* **CORRECTIONS TO PRIOR RECORDS** — the D364-era claim that
+  `AUTHORITY`/`GENERATION` deferral was *proven by mutation* is
+  **withdrawn**; the conclusion survives on a known-positive injection
+  test, the earlier proof did not (§2). My hand adjudication of 5/5
+  FALSE_POSITIVE/AMBIGUOUS is superseded by the derived 6/4 (§6)
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D365
+  Orion. **Next free: D366**, subject to a fresh allocator check
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).
