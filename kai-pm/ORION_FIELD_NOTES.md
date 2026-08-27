@@ -479,3 +479,113 @@ Worth not re-deriving:
   scheduled firing. Author date is not merge date -- `a0298c6` is an
   ancestor of main today and contained neither fix when it ran.
 * 60 commits ahead of `main`, unmerged — awaiting explicit authorisation.
+
+---
+
+# The HOUSE_H2 stint — a detection retrospective
+
+*Logged 2026-08-27. **Not a decision entry. No D-number consumed. No
+repair authorised.** Doctrine amendments arising from this are Kai's to
+draft and Dainius's to ratify; nothing here is a rule yet.*
+
+Seventeen demonstrated defect classes were registered in the D367 repair
+contract. This section is about **how they were found**, because that
+turned out to be more instructive than what they were.
+
+## The three numbers
+
+```
+caught by the 40 hostile fixtures          :  0 of 17
+caught by the qualification gate           :  0 of 17
+already named by a rule in the doctrine    : 14 of 17
+```
+
+The suite ran **40/40 green** and the gate reported **0 findings** at
+every single point during which all seventeen were present. Not one
+defect was surfaced by the machinery built to surface defects.
+
+And the doctrine had already named most of them:
+
+| rule | defects it already covered |
+|---|---|
+| **R5** — derive the denominator from the tree | 4 (D8, D13, D16, D17) |
+| **R8** — never-executed code | 2 (D4, D10) |
+| **R10** — full output survives; excerpts declare themselves | 2 (D14, D15) |
+| **I-8** — calibrate against independent evidence | 2 (D2, D3) |
+| **D360** — evidence facts are not verdicts | 2 (D1, D5) |
+| **P13/P14** — negatives need a closed search space | 1 (D9) |
+| **MISBINDING** — right evidence, wrong subject | 1 (D12) |
+
+**Knowing the rule did not produce the check.** That is the finding. The
+gap was never knowledge; it was that nothing forced a stated rule to be
+applied to a *derived* denominator rather than to the case in front of
+me.
+
+## Who actually found them
+
+```
+KAI      3   (blind holdout; reading the ontology; reading the GATE)
+ORION   14   — but 12 of those inside audits KAI COMMISSIONED
+             and only 2 on my own initiative
+DEEPSEEK 3   boundary defects preceding the register
+```
+
+I found the most, and I found almost none of them unprompted. My value
+in this stint was **executing a search someone else scoped**. Every time
+I chose the scope myself, the answer came back clean — and was wrong.
+
+## My failure mode, and its direction
+
+Four self-assessments, four errors, **all in the same direction**:
+
+| I said | it was |
+|---|---|
+| `TIME_BOUND` 83% sound | 0 proven; 9 of 23 contradicted by git |
+| 144 family rows `PROVEN` | not proven — path and title share provenance |
+| `AUTHORITY` axis sound | carries a false evidence fact |
+| deferral "proven by mutation" | the sweep never reached the state |
+
+Never once too harsh. A bias, not a run of bad luck. **The tell:** when a
+population I built comes back mostly clean, that is the moment to stop —
+not the moment to report.
+
+## The shape under all seventeen
+
+**An observation recorded at one scope, reported at a wider one.**
+
+`SCOPE` is the pure case: the widening *is* the entire rule — a literal
+`WHOLE_FILE` on 272 of 272 documents with no `def scope()` behind it.
+Everything else inherited from it. A commit cited for one sentence became
+a whole-file snapshot binding; a word inside another word became a
+function; a pronoun became a subject.
+
+## Why it survived so long — D17, and the level above
+
+The last defect found explains the rest. `qualify_h2.qualify()` iterates
+`ont.ALPHABETS`, so **a value absent from an alphabet lies outside the
+gate's denominator entirely.** Remove `UNKNOWN` from `VALIDITY`'s
+alphabet and the gate stays at 0 findings while 216 documents emit it.
+
+So these held at once: the governing text requires `UNKNOWN` on every
+axis · `SCOPE`'s alphabet omits it · qualification is green.
+
+For a fortnight we audited what the instrument said about documents.
+**Nobody audited what the gate could see.** Every green result it ever
+produced was green about a smaller world than it claimed — which is R5
+again, one level up, and it is where I should have looked first because
+§3.5 already says diagnostics are the least-executed code in any system.
+
+## The tells this stint earns
+
+* **A suite that has never failed is not evidence; it is an untested
+  instrument.** 40/40 green across seventeen live defects. Ask when each
+  fixture last failed, and against what.
+* **A denominator I can enumerate by hand is a denominator I have
+  already got wrong.** Alphabets, term lists, forbidden sets, candidate
+  orders — every one of them bit.
+* **A default is a verdict with better manners.** If a value is emitted
+  when nothing was measured, it is a claim.
+* **When my own population comes back clean, that is a finding about my
+  scope, not about the population.**
+* **Audit the gate before the thing it gates.** The gate is the most
+  load-bearing never-executed code in the system.
