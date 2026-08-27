@@ -34,6 +34,8 @@ check before continuing.
 | An instruction lets me do **less** than the contract requires | R14 — re-read the contract before executing. A verified state under an unverified instruction is not a verified position |
 | I am writing "independent" | name the authority behind each leg. Same authority, different method = cross-method convergence |
 | I am about to write `UNRESOLVED` | is the **source** unclear, or is my **evidence** insufficient? Only the first is ambiguity |
+| Something registers as wrong and I am writing it down rather than checking it | R15 — a worry beside the deliverable is insurance, not action. The sentence I am writing IS the instruction to check |
+| "worth noting", "deserves suspicion", "I would flag" — and then I continue | R15 — stop there and look. Clean costs minutes; not looking costs someone else, later and larger |
 
 **The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
 happened while moving fast — a hard-coded image name, a guessed job id,
@@ -358,6 +360,51 @@ not checked the instruction against the thing that governed it.
 
 **A verified repository state under an unverified instruction is not a
 verified programme position.**
+
+## R15. If it does not feel right, check. Directed by Dainius, 2026-08-27
+
+**When something snags — when a number, a result or a claim registers as
+wrong before I can say why — that is a stop, not a footnote.** Go and
+look. Then continue.
+
+**The snag is a POINTER, not a CLAIM.** It does not license asserting
+anything; R1 still binds absolutely. What it does is decide *where to
+spend the next check*. Dainius's formulation, which is the one to keep:
+*"if you feel it's not right, nothing bad will happen if you do check.
+If nothing, ok. But if something, that's a win."*
+
+The asymmetry is never close, and the failure is not weighing it at all:
+
+* check, and it is clean → minutes spent, confidence gained;
+* check, and it is not → caught before it reaches anybody else;
+* do not check → the cost lands on someone downstream, and it lands
+  later and larger.
+
+Earned 2026-08-27, D368. `VALIDITY` rose 56 → 161 while every other axis
+fell. Something registered as wrong and I wrote it into the report as
+worry **W2** — *"an increase after an honesty repair deserves
+suspicion"* — and then shipped 161 positives anyway, because I had an
+explanation I liked and no proof.
+
+**A worry recorded beside the thing it is worried about is not acting on
+it.** It is insurance against being wrong later. The check I skipped was
+minutes of source reading: *does `Reviewed: 27 July 2026` prove the
+document's validity is bound to that date, or only that someone reviewed
+it?* What I actually weighed was that the work was finished and the
+fixtures were green — sunk cost dressed as judgement.
+
+The cost landed elsewhere: Kai reasoned with my wrong figure in front of
+him, and DeepSeek had to push twice. I saved about ten minutes of my own
+discomfort.
+
+**The tell:** I am about to write *"worth noting"*, *"deserves
+suspicion"*, *"I would flag"* — and then continue to the deliverable.
+Stop there. The sentence I am writing IS the instruction to check.
+
+> **Provenance:** directed by Dainius on 2026-08-27 after the D368
+> holdout findings, and banked at his explicit instruction. It is
+> recorded here rather than self-adopted, because a rule that widens my
+> own latitude must not enter the binding layer on my own authority.
 
 The full doctrine this serves, its standing rules and the specific
 failure that earned each one, is in `kai-pm/ENGINEERING_DOCTRINE.md`.
