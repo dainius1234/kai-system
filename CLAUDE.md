@@ -29,6 +29,11 @@ check before continuing.
 | I am typing `;` between commands | R3 — use `&&` |
 | I am writing a loop that waits for a process by name | R9 — the loop's own command line contains that name. It will match itself and wait forever |
 | My evidence that a check works comes from the same place as the thing it checks | I-8 — calibrate against something independent, with a known-positive and a known-negative |
+| I am about to send a count, ratio, "clean", "byte-identical" or "independent" | R13 — the derivation travels with the claim, at transmission, not on request |
+| I can name a literal string in the query behind a number I am calling a *mechanism* | R13 — I am counting instances of a string and reporting instances of a cause |
+| An instruction lets me do **less** than the contract requires | R14 — re-read the contract before executing. A verified state under an unverified instruction is not a verified position |
+| I am writing "independent" | name the authority behind each leg. Same authority, different method = cross-method convergence |
+| I am about to write `UNRESOLVED` | is the **source** unclear, or is my **evidence** insufficient? Only the first is ambiguity |
 
 **The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
 happened while moving fast — a hard-coded image name, a guessed job id,
@@ -318,7 +323,43 @@ recommend → name the cost and risk → **and do not implement scope
 expansion without authorisation.** Proactive engineering is not
 autonomous scope expansion.
 
-The full doctrine this serves, its 27 standing rules and the specific
+## R13. A derived claim travels with its derivation
+
+**Any figure or derived statement that could change an adjudication,
+admission, repair scope or programme decision carries its computation at
+the moment it is sent** — subject, exact query, instrument, denominator,
+**unit**, raw result, limitations, and how to re-run it. The obligation
+is mine as producer. Nobody should have to discover later that a
+computation was missing.
+
+Earned 2026-08-27. I reported "18 of 40 rows share the mechanism". The
+query had filtered the literal `Reviewed: 27 July 2026`; one member
+carried 26 July. The real figure was 19, and the wrong one was in front
+of the adjudicator while he reasoned. Corpus-wide the same mistake would
+have returned 120 instead of 144.
+
+**Say the unit.** Literal matches, rows, cells, mechanisms and runs are
+different denominators. A query proves what it actually matches.
+
+Single-producer reproducible evidence *is* evidence. It is not
+*independent corroboration* — say which one it is.
+
+## R14. Reconcile the instruction against the contract before executing
+
+**When an instruction changes, narrows, shortcuts or expands work
+governed by a frozen or active contract, re-read the contract first.**
+Execute only if compatible; otherwise HOLD and escalate. This binds no
+matter who issued the instruction.
+
+Earned 2026-08-27: I was told to stop a 40-row holdout at the first
+blocker when the frozen contract required all forty. I had verified
+`HEAD`, the tree, every checksum and the D-number allocator — and had
+not checked the instruction against the thing that governed it.
+
+**A verified repository state under an unverified instruction is not a
+verified programme position.**
+
+The full doctrine this serves, its standing rules and the specific
 failure that earned each one, is in `kai-pm/ENGINEERING_DOCTRINE.md`.
 It applies to my work and to anything delegated to a subagent, and it
 outlives the investigation that produced it.
@@ -333,7 +374,7 @@ outlives the investigation that produced it.
 | `kai-pm/ORION_FIELD_NOTES.md` §0 | **start here** — where the last stint stopped, what to look at first, and what is on `main` versus the branch |
 | `kai-pm/WAYPOINTS.md` | known-good commits with evidence, and standing contingencies |
 | `kai-pm/DECISIONS.md` | append-only decision log |
-| `kai-pm/ORION_FIELD_NOTES.md` | defect shapes, my failure modes and the tell for each |
+| `kai-pm/ORION_FIELD_NOTES.md` | **NON-AUTHORITATIVE WORKING MEMORY** — defect shapes, my failure modes and the tell for each. Creates no programme state, authority, acceptance criteria, closure or permission; a decision may cite it as a pointer but must re-earn the original evidence |
 | `kai-pm/NEXT_STINT_PLAN.md` | current plan of work and its ordering |
 | `scripts/security/` | the gates; `check_gate_registry.py --gate` audits them |
 

@@ -1,5 +1,19 @@
 # Field notes — Orion
 
+> ## NON-AUTHORITATIVE WORKING MEMORY
+>
+> **This file cannot create:** programme state · authority · sequence ·
+> acceptance criteria · finding closure · implementation permission ·
+> admission.
+>
+> A later governing decision may use this file as a **provenance
+> pointer**, but must re-earn and cite the original source evidence or
+> governing artefact. Authority is never acquired by repetition.
+>
+> Binding operating rules live in `CLAUDE.md`; standing doctrine in
+> `kai-pm/ENGINEERING_DOCTRINE.md`; programme decisions in
+> `kai-pm/DECISIONS.md`. This file is long-form history and nothing more.
+
 ## 0. Where we were, last time I closed the book
 
 *Updated at the end of every stint. If this section is stale, trust the

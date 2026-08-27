@@ -32372,3 +32372,176 @@ engineered away. **No positives were preserved to improve the profile.**
   Orion. **Next free: D369 — NOT TO BE TAKEN without authorisation**
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D369 — 2026-08-27 — Process doctrine from the HOUSE_H2 stint. GOVERNANCE ONLY
+
+**Authority.** Dainius authorised governance-only banking on Kai's
+recommendation, after DeepSeek's process challenge. The D-number was
+**reserved through the allocator**, not assumed from conversation state:
+highest on branch 368, highest on `main` 164, zero collisions on D369.
+
+**This decision is prospective standing doctrine only. It:**
+
+* **does not amend frozen D367;**
+* **does not change the D368 holdout evaluation;**
+* **adds no retrospective D368 admission criterion;**
+* **grants no H2 repair authority;**
+* **grants no HOUSE_H3 authority.**
+
+The D368 candidate, the D367 contract, the v1.2 package and the 40-row
+holdout **remain untouched** — verified by checksum after the banking
+change: contract 1/1, v1.2 package 14/14, v1.1 15/15, Census v1.1 19/19,
+aggregate `ba2b16d4…de4a` unchanged, holdout still 40 rows.
+
+### 1. The failure class, and it is not Orion-specific
+
+**A derived statement was travelling without its derivation.**
+
+Three instances in one stint, from three different producers:
+
+* I reported *"18 of 40 share the mechanism"*. The hidden computation was
+  a filter on the literal `Reviewed: 27 July 2026`; one member carries
+  26 July. The true figure is **19**, and the wrong one sat in front of
+  the adjudicator while he reasoned.
+* Kai instructed early termination of the 40-row holdout. The hidden
+  assumption was that the instruction matched D367 §9, which requires
+  **all forty**.
+* We called six `EXACT_SNAPSHOT` agreements *independent*. The hidden
+  fact was that the **same adjudication authority** stood behind both
+  the machine rule and the prior source adjudication.
+
+Each became visible only when someone asked *how did you get from the
+evidence to that sentence?* The producers were different every time; the
+shape was identical.
+
+### 2. Why more rules alone would not have helped
+
+The HOUSE_H2 retrospective records that **14 of 17 defects were already
+described by existing doctrine.** Knowing a rule did not make the rule
+fire. So this entry banks **two operational mechanisms** and targeted
+strengthening — not ten new philosophical laws — and **every amendment
+states its enforcement hook**, because a rule with no enforcement
+remains advisory knowledge.
+
+### 3. What was banked
+
+**`ENGINEERING_DOCTRINE.md`, rules 33–39** (new section *Derived
+claims*, plus additions to *Truth and promotion*, *Populations and
+detectors*, *Delegation and authority*, and a strengthened rule 28):
+
+| rule | what it binds |
+|---|---|
+| **33** | **DERIVED CLAIM CARD** — a consequential derived claim travels with its computation **at transmission**. Producer's obligation. Missing derivation ⇒ `UNVERIFIED_DERIVED_CLAIM`, which may be discussed but **must not alter adjudication, admission or repair scope**. Single-producer reproducible evidence **is** evidence — it is simply not independent corroboration, and `independence_status` keeps them apart |
+| **34** | `UNKNOWN` = insufficient qualified evidence. `UNRESOLVED` = the **source truth** is genuinely ambiguous. **Lack of proof is not ambiguity** |
+| **35** | **EVIDENCE CONSERVATION / NO UNPROVEN PROMOTION** — no silent widening of subject, predicate, scope, polarity, temporal applicability, certainty or authority status |
+| **36** | **A sound negative indicator does not authorise its converse.** *X* is evidence against *Y* does not make *not-X* evidence for *Y* |
+| **37** | **A query proves what it actually matches.** A literal search establishes literal instances, not mechanism instances. **The unit must be stated** |
+| **38** | **INSTRUCTION–CONTRACT RECONCILIATION** — re-read the governing artefact before executing an instruction that narrows, expands or shortcuts governed work. Binds regardless of who issued it, **including the adjudicating authority** |
+| **39** | **Name the authority behind every independence claim.** Same authority, different method = **cross-method convergence**, not authority-independent corroboration |
+
+**Rule 28 strengthened — working notes are non-authoritative memory.**
+They may preserve observations and provenance but may **never** create
+programme state, authority, sequence, acceptance criteria, finding
+closure, implementation permission or admission. A later decision may
+cite one as a **provenance pointer** but must re-earn and cite the
+original evidence. **Authority is never acquired by repetition**, and no
+second status ledger may be created.
+
+**`ORION_FIELD_NOTES.md`** now carries a prominent
+`NON-AUTHORITATIVE WORKING MEMORY` block at its head, naming exactly what
+it cannot create. Kai's review found the file had **not** become a
+parallel ledger — the H2 retrospective already disclaimed itself and
+CLAUDE.md already named itself binding — but the loophole is now closed
+explicitly rather than by habit.
+
+**`CLAUDE.md`** gains **R13** (derived claim travels with its
+derivation; say the unit) and **R14** (reconcile the instruction against
+the contract before executing), six new R0 stop-signal tells, and the
+working-memory status in its file table.
+
+### 4. Two corrections to DeepSeek's challenge, recorded
+
+**This is not Orion-specific doctrine.** The failure class is
+producer-independent and binds Orion, Kai, DeepSeek, human operators,
+scripts and future instruments alike.
+
+**A result produced by one actor is not thereby "not evidence".** Exact
+subject + exact query + reproducible raw output **is** evidence — a valid
+engineering measurement. What it is not is *independent corroboration*
+until an appropriately independent decisive leg reproduces the property.
+Collapsing that distinction would discard sound measurements.
+
+### 5. The raw extraction, bound
+
+Kai requested raw source extraction for the 19 Reviewed-family holdout
+rows and it was supplied with no interpretation attached. It is banked as
+**adjudication-support evidence only**, bound to its subject, method and
+denominator, at
+`kai-pm/d368_holdout_raw_extraction_19.txt`, sha256
+`5cb99626904b958a06bbce8ed1246c04d89ab15efc963c21219761f286d757c9`.
+
+**It is not part of the D368 candidate and does not regenerate, alter or
+supersede the frozen holdout.**
+
+### 6. Enforcement status, stated so this entry does not become slogans
+
+Every rule above carries `ENFORCEMENT STATUS`, `FUTURE MACHINE HOOK` and
+`OWNER/STAGE`. All are **manual operational control now**, except rule 35
+which is **partially mechanised** — HOUSE_H2 v1.2 ships an ordered
+envelope lattice refusing undeclared promotions. Its named gap is the one
+Kai identified: *a lattice cannot detect a widening it receives already
+widened*, so the same check belongs at the **capture** stage.
+
+**None of those mechanisms is built here, and none is authorised by this
+entry.** The Fact Card is the immediate operational mechanism; the rest
+are requirements for a later, separately authorised cycle. This must not
+become another assurance implementation project on top of the D368 hold.
+
+---
+
+### THREAD RECOVERY BLOCK
+
+* **HEAD** — this entry, on `claude/project-rework-plan-pgvp35`
+* **SCOPE OF THIS ENTRY** — governance/documentation only. `CLAUDE.md`,
+  `kai-pm/ENGINEERING_DOCTRINE.md`, `kai-pm/ORION_FIELD_NOTES.md`, and
+  the bound raw extraction. **No instrument, contract, candidate,
+  package or holdout byte changed**
+* **D368 CANDIDATE** — `9d7877063d9a2579d1370111177b23274fd288ef`,
+  aggregate
+  `ba2b16d400aafd2b694890149bbaae1d1369d3771c25ce809d2f752d5248de4a`,
+  **NOT FROZEN, NOT ADMITTED**, package 14/14 verified after this change
+* **D367 CONTRACT** — `0ce5792e…00bb`, verified `OK`, **unamended**
+* **HOLDOUT** — 40 rows, **not regenerated**. Kai continues the frozen
+  40 × six-axis adjudication. At least the plain `Reviewed:` →
+  `TIME_BOUND` mechanism is a BLOCKER under D367 §9; that does not end
+  the holdout
+* **UNTOUCHED** — HOUSE_H2 `v1.0` · `v1.1` 15/15 · Census `v1.1` 19/19
+* **AUTHORISED NEXT ACTION** — **NONE. HOLD.** No corrective H2
+  implementation until the full adjudication and consolidated repair
+  ruling are complete
+* **EXPLICITLY NOT AUTHORISED** — H2 repair · candidate, contract,
+  package or holdout modification · building any enforcement mechanism
+  named in rules 33–39 · `HOUSE_H3`–`H6` · freezing or admitting D368 ·
+  Census successor or modification · programme-order CI mechanism ·
+  KAI-GATE-048 · Phase B · `ITEM8_GO` · six subject builds · Stage 2 ·
+  `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · document/register repair ·
+  Kingsman implementation
+* **OPEN / UNRESOLVED** — the frozen 40 × six-axis adjudication in
+  progress · consolidated blocker/unresolved/over-abstention register
+  pending · H2 utility decision (separate gate from truthfulness) ·
+  enforcement mechanisms for rules 33–39 unbuilt · D358 consumer gate
+  specified but unbuilt · `wake_intent_j2` FUNCTION gap uncurated · 173
+  documents undecidable from git evidence · `LIFECYCLE=ACTIVE` earnable
+  by no existing rule · D344–D353 not in the ledger
+* **CORRECTIONS TO PRIOR RECORDS** — my "18 of 40" is superseded by
+  **19 of 40** (rule 37's earned example). "Independent corroboration"
+  for the six `EXACT_SNAPSHOT` agreements is superseded by
+  **cross-method convergence under the same authority** (rule 39).
+  Kai's `UNRESOLVED PENDING PRE-D367 SEMANTIC AUTHORITY` disposition is
+  permanently withdrawn (rule 34)
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D369
+  Orion. **Next free: D370 — NOT TO BE TAKEN without authorisation**
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

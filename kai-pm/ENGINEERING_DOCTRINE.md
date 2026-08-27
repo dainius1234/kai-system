@@ -101,6 +101,101 @@ Proactive engineering is not autonomous scope expansion.
 24. **No finding closes because source looks better or a related test
     passed.** Closure requires evidence appropriate to the claim.
 27. **UNKNOWN remains UNKNOWN until evidence moves it.**
+34. **`UNKNOWN` and `UNRESOLVED` are different states at different
+    levels.** `UNKNOWN` means the instrument has **insufficient
+    qualified evidence** to earn a positive. `UNRESOLVED` means the
+    **source truth itself** cannot be adjudicated because the qualified
+    evidence is genuinely ambiguous, conflicting or indeterminate.
+    **Lack of proof is not ambiguity**, and contract silence about a
+    particular label never creates `UNRESOLVED` — the burden sits on the
+    positive, so failing it yields abstention.
+
+    > *ENFORCEMENT: manual now.*
+    > *MACHINE HOOK: adjudication schema that will not accept
+    > `UNRESOLVED` without a recorded ambiguity witness in the source.*
+    > *OWNER/STAGE: holdout adjudication tooling.*
+
+35. **Evidence conservation — no unproven promotion.** A downstream
+    claim may not silently broaden the **subject**, **predicate or
+    evidence kind**, **applicability scope**, **polarity**, **temporal
+    applicability**, **certainty** or **authority status** of the
+    evidence supporting it. Any such widening must itself carry
+    qualified evidence; absent that, abstain. *Reviewed-at* is not
+    *valid-as-of*; a commit cited for one sentence is not a whole-file
+    binding; a pronoun is not a subject.
+
+    > *ENFORCEMENT: partially mechanised — an ordered envelope lattice
+    > refusing undeclared promotions exists in HOUSE_H2 v1.2.*
+    > *MACHINE HOOK: the same conservation check applied at the CAPTURE
+    > stage, since a lattice cannot detect a widening it receives
+    > already widened.*
+    > *OWNER/STAGE: instrument capture layers.*
+
+36. **A sound negative indicator does not authorise its converse.**
+    That *X* is evidence **against** *Y* does not make *not-X* evidence
+    **for** *Y*. Repeated per-record date fields may be evidence against
+    whole-file applicability; a unique date field does not thereby prove
+    it.
+
+    > *ENFORCEMENT: manual now.*
+    > *MACHINE HOOK: review checklist requiring each positive rule to
+    > name the evidence that earns it, not merely the absence of a
+    > disqualifier.*
+    > *OWNER/STAGE: rule authoring.*
+
+### Derived claims
+
+33. **A derived claim travels with the derivation that earns it.** Any
+    statement that could materially influence adjudication, admission,
+    repair scope, closure or programme state must carry its computation
+    **at the moment it is transmitted**, not on later request. The
+    obligation is the **producer's**; a consumer is never required to
+    discover afterwards that a computation was missing.
+
+    Mandatory classes: counts, ratios and aggregates · absence and
+    negative claims · structural-impossibility claims · causal or
+    mechanism claims · any *clean / green / sound / proven*
+    self-assessment · any *nothing changed / boundary only /
+    byte-identical* claim · independence or corroboration claims · and
+    anything else derived that could change a consequential decision.
+
+    ```
+    DERIVED_CLAIM
+      claim:
+      claim_class:
+      producer:
+      subject_commit:
+      subject_tree:
+      source_or_artefact:
+      query_or_command:
+      instrument_and_version_or_hash:
+      denominator_or_search_universe:
+      unit:                 rows | cells | literal matches | mechanisms | runs
+      raw_result:
+      derived_result:
+      interpretation:
+      limitations:
+      independence_status:
+      rerun:
+    ```
+
+    A consequential derived claim transmitted without sufficient
+    derivation is **`UNVERIFIED_DERIVED_CLAIM`**. It may be logged or
+    discussed; it **must not alter adjudication, admission or repair
+    scope** until the derivation is supplied and — where consequential —
+    reproduced through the required independent leg.
+
+    **Single-producer reproducible evidence is still evidence.** Exact
+    subject plus exact query plus reproducible raw output is a valid
+    engineering measurement. What it is not is *independent
+    corroboration*, and the card's `independence_status` field exists to
+    keep those apart.
+
+    > *ENFORCEMENT: manual operational control now.*
+    > *MACHINE HOOK: a transmission-time schema check that refuses to
+    > emit a consequential claim lacking required fields, and a linter
+    > over decision entries flagging bare figures with no adjacent card.*
+    > *OWNER/STAGE: evidence-plane tooling, after the H2 repair cycle.*
 
 ### Evidence identity
 
@@ -142,6 +237,19 @@ Proactive engineering is not autonomous scope expansion.
 14. **Detector surprise means inspect the detector first.** If the
     expected population is 1 and the detector reports 50, do not begin
     fixing 50 defects.
+37. **A query proves what it actually matches.** A search over a
+    literal or token establishes *N instances of that literal*. It does
+    **not** establish *N instances of one causal mechanism* — mechanism
+    equivalence requires evidence of the mechanism. When reporting a
+    population, the **unit must be stated**: literal matches, rows,
+    cells, mechanisms or runs are different denominators and are not
+    interchangeable.
+
+    > *ENFORCEMENT: manual now, via rule 33's mandatory `unit` field.*
+    > *MACHINE HOOK: population reports that emit their unit and their
+    > exact query alongside the count, so a literal filter cannot be
+    > presented as a mechanism population.*
+    > *OWNER/STAGE: audit instruments.*
 
 ### Calibration
 
@@ -261,6 +369,41 @@ Proactive engineering is not autonomous scope expansion.
 
 ### Delegation and authority
 
+38. **Reconcile an instruction against its governing contract before
+    executing it.** When an instruction changes, narrows, shortcuts or
+    expands work governed by a frozen or active contract, re-read the
+    exact governing artefact first:
+
+    ```
+    instruction received
+      → identify the governing artefact
+      → exact-subject read
+      → reconcile instruction against contract
+      → execute only if compatible
+      → otherwise HOLD and escalate
+    ```
+
+    **A verified repository state under an unverified instruction is not
+    a verified programme position.** This binds regardless of who issued
+    the instruction, including the adjudicating authority.
+
+    > *ENFORCEMENT: manual now.*
+    > *MACHINE HOOK: contract artefacts carrying a machine-readable
+    > obligations block that an executor can diff an instruction against.*
+    > *OWNER/STAGE: contract format, next contract cycle.*
+
+39. **Name the authority behind every independence claim.** Before
+    writing *independent*, *corroborated* or *equivalent*, state for each
+    leg its **producer/authority** and its **decisive dependency**. Same
+    authority with a different method is **cross-method convergence under
+    the same authority** — real evidence, and not authority-independent
+    corroboration. Rule 32's shared-fate semantics continue to apply.
+
+    > *ENFORCEMENT: manual now, via rule 33's `independence_status` field.*
+    > *MACHINE HOOK: independence assertions required to enumerate legs
+    > with producer and dependency before the word is accepted.*
+    > *OWNER/STAGE: evidence-plane tooling.*
+
 25. **No agent may silently expand its remit.** Subagents inherit these
     standards and return **evidence, not confidence**.
 26. **No consequential mechanism self-approves or self-verifies.**
@@ -273,6 +416,21 @@ Proactive engineering is not autonomous scope expansion.
     convenience, never the canon, and every copy must be reconcilable by
     **mechanical comparison** rather than by reading. Where two records
     disagree, the one both parties can open wins.
+
+    **Working notes are non-authoritative memory.** Field notes,
+    retrospectives and lesson logs may preserve observations and
+    provenance, but may **never** create programme state, authority,
+    sequence, acceptance criteria, finding closure, implementation
+    permission or admission. A later governing decision may cite such a
+    file as a **provenance pointer**, but must re-earn and cite the
+    original evidence or governing artefact. Authority is never acquired
+    by repetition, and no second status ledger may be created.
+
+    > *ENFORCEMENT: a prominent non-authoritative status block at the
+    > head of each working-notes file.*
+    > *MACHINE HOOK: a check that decision entries citing a working-notes
+    > file also cite a primary source or governing artefact.*
+    > *OWNER/STAGE: ledger tooling.*
 
 ---
 
@@ -304,4 +462,11 @@ Proactive engineering is not autonomous scope expansion.
 | 23 | disproven claims struck through rather than deleted, so the pattern stays visible |
 | 25, 26 | a meta-check that wanted to probe a key generator to read its own denominator |
 | 28 | the programme's binding order of work existed nowhere in the tree (D270 §2); and the external doctrine copy was silently missing rule 4 — the anti-drift rule itself — while reaching 27 by splitting rule 26, so "Rule 17" named different rules in each record (D272) |
+| 33 | "18 of 40 share the mechanism" — computed by filtering the literal `Reviewed: 27 July 2026` while describing a mechanism, so the 26 July member was missed. The figure reached the adjudicator with its derivation invisible, and was in front of him while he reasoned (D369) |
+| 34 | a plain `Reviewed: <date>` witness parked as `UNRESOLVED PENDING SEMANTIC AUTHORITY` when the source was perfectly intelligible and it was the *positive* that had failed its burden. Searching for authority forbidding a label, when abstention was already the default (D369) |
+| 35 | seventeen HOUSE_H2 defect classes, all one shape: an observation recorded at one scope and reported at a wider one. `reviewed-at` promoted to `time-bound-validity`; a commit cited for one sentence promoted to a whole-file snapshot binding; a bare pronoun promoted to a subject (D364–D368) |
+| 36 | a uniqueness rule shipped on a denominator of one in 162: repetition of a binding predicate is evidence *against* whole-document scope, and its converse was implemented as evidence *for* it (D368) |
+| 37 | the same 18-vs-19 count as rule 33, seen from the population side: a literal filter reported as a mechanism population, where the corpus split 120/24 across two dates (D369) |
+| 38 | an instruction to stop the 40-row holdout at the first blocker, when the frozen contract required all forty. Repository state had been verified; the instruction against the contract had not (D369) |
+| 39 | six `EXACT_SNAPSHOT` documents called "independent corroboration" when both the machine rule and the prior source adjudication traced to the same authority (D369) |
 | 32 | the same structural failure in three different mechanisms: R9's watcher whose `pgrep` pattern matched its own command line; a detector whose population included its own docstring (I-8); and Census v1.1's subject reconciliation, whose two supposedly independent sides both dereferenced the same moving symbolic ref, so they agreed perfectly and reported `reconciles: True` while the result was stamped with a different commit than the one measured (D356) |
