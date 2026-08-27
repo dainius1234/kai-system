@@ -589,3 +589,83 @@ again, one level up, and it is where I should have looked first because
   scope, not about the population.**
 * **Audit the gate before the thing it gates.** The gate is the most
   load-bearing never-executed code in the system.
+
+## The repair round — four more, and one of them is about instructions
+
+*Logged 2026-08-27, after D368 and the hold. **Not a decision entry. No
+D-number consumed.** Doctrine amendments remain Kai's to draft and
+Dainius's to ratify.*
+
+### I verified the state and not the thing that governed it
+
+Kai instructed me to stop the 40-row holdout at the first blocker. D367
+§9 says *"Kai independently adjudicates all 40 documents across all six
+axes."* There is no early-stop rule in the frozen text.
+
+Before that instruction I had verified `HEAD`, the tree, `local ==
+origin`, 14/14 package checksums, the contract checksum and the
+D-number allocator. **I had not re-read the contract to check whether
+the instruction I had been given matched it.** DeepSeek did, and the
+breach was withdrawn before I acted on it.
+
+That is the same shape as all seventeen defects, aimed at me instead of
+the code: **I checked the thing in front of me and not the thing that
+governed it.** A verified state under an unverified instruction is not a
+verified position.
+
+**The tell:** an instruction that narrows work I was contracted to do in
+full. Cheaper compliance is exactly when to re-read the contract, not
+when to feel efficient.
+
+### "Independent" was the wrong word and I chose it
+
+I described `EXACT_SNAPSHOT` landing on Kai's six documents as
+*independent corroboration*. The six were originally source-adjudicated
+**by Kai**, who is also the adjudicator now. The accurate phrase is
+**cross-method convergence under the same authority** — real evidence,
+and not authority-independent.
+
+Same family as *repetition is not corroboration*, which this programme
+already banked and which I then re-earned from the other direction. The
+prior version was two documents sharing an author; this one is two
+methods sharing an adjudicator.
+
+### I assumed the converse of a sound inference
+
+My uniqueness rule reads: a binding predicate appearing once ⇒
+`WHOLE_FILE`. The sound half is the other one:
+
+> **Repetition may be evidence AGAINST whole-document applicability.
+> Uniqueness is not by itself evidence FOR it.**
+
+I inverted an implication and shipped it with a principled-sounding
+justification, on a denominator of **one document in 162**. R4 names
+that trap and I walked into it while quoting R4 about something else.
+
+### The one that went right, and it was not judgement
+
+The first draft of `bind_claims` imposed a 6000-byte window v1.1 never
+had on that extractor, silently destroying two authority claims Kai had
+adjudicated **correct** — at bytes 18,877 and 287,981.
+
+Nothing in my reasoning caught it. **The regression assertions caught
+it** — five rows asserted unchanged because a repair that proves only the
+corrected case can destroy the property it was protecting. The mechanism
+worked where the author did not, which is the entire argument for having
+mechanisms.
+
+I also named W1 — that `FUNCTION`'s surviving positives rest on
+`path.endswith("README.md")`, and a path is authored exactly like a
+title — **before shipping rather than after adjudication**. First time in
+this programme. One is not a trend.
+
+### Tells added
+
+* **An instruction that lets me do less than the contract requires is an
+  instruction to re-read the contract.**
+* **Before calling evidence independent, name the authority behind each
+  half.** If it is the same, it is convergence, not independence.
+* **If a rule's sound form is "X is evidence against Y", check whether I
+  have shipped "not-X is evidence for Y".** It is not the same claim.
+* **A verified state under an unverified instruction is not a verified
+  position.**
