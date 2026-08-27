@@ -32159,3 +32159,216 @@ luck.
   Orion. **Next free: D368 — NOT TO BE TAKEN without authorisation**
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D368 — 2026-08-27 — HOUSE_H2 v1.2: the consolidated repair, built under frozen D367
+
+**Authority.** Dainius authorised the consolidated repair and full
+requalification exactly under frozen D367, with the standing condition:
+do not alter the contract or admission bar during implementation, and if
+a new material condition makes the contract impossible or invalid, stop
+and return rather than silently redesign it. **The contract was not
+altered.** Verified: `H2_REPAIR_CONTRACT_D367.md` checksums `OK` and has
+zero tracked changes.
+
+**Candidate:** HOUSE_H2 v1.2, aggregate
+`ba2b16d400aafd2b694890149bbaae1d1369d3771c25ce809d2f752d5248de4a`
+(instrument + result), 14 artefacts. **NOT FROZEN. NOT ADMITTED.**
+
+**Untouched, verified by checksum and by `git status`:** HOUSE_H2 v1.0 ·
+v1.1 15/15 · Census v1.1 19/19 · the D367 contract. Zero tracked changes
+in all four.
+
+### 1. The one architectural change
+
+All seventeen registered defects were one shape — an observation
+recorded at one scope, reported at a wider one — and remembering not to
+do it failed seventeen times. Kai's root-cause ruling, **NO UNPROVEN
+PROMOTION**, is therefore implemented as mechanism rather than doctrine.
+
+Pass A no longer emits booleans. `has_sha=True` discarded the token, its
+position, its kind and its scope — everything a verdict needs in order
+not to over-claim — and six of the seventeen live in that one decision.
+v1.2 emits `Witness` objects carrying the nine fields of D367 §5, and
+every verdict is constructed through `envelope.claim()`, which refuses to
+widen subject, scope, polarity, certainty or temporal applicability
+without a **declared** promotion. Each dimension is an ordered lattice,
+so *wider* is computed rather than judged; a promotion absent from the
+declared table cannot be performed at all, and an invented justification
+string is refused.
+
+This is not an addition to the frozen bar. D367 §4 and §5 already
+required per-cell applicability scope and an adjudicable witness; the
+envelope is **how** that is delivered instead of remembered.
+
+### 2. Results — subject `d8aac4d4`, tree `3abc9e9d`, 272 documents
+
+| axis | v1.2 positive | UNKNOWN | v1.1 positive |
+|---|---|---|---|
+| `LIFECYCLE` | 11 `HISTORICAL` | 261 | 13 |
+| `FUNCTION` | **5** `MARKER` | 267 | 222 |
+| `AUTHORITY` | 0 | 272 | 0 |
+| `GENERATION` | 0 | 272 | 0 |
+| `VALIDITY` | 161 (155 `TIME_BOUND`, **6** `EXACT_SNAPSHOT`) | 111 | 56 |
+| `SCOPE` | 166 | 106 | **272** |
+
+**Independent corroboration, and it is the strongest evidence in this
+entry.** `EXACT_SNAPSHOT` is **exactly the 6 documents Kai adjudicated
+from source in D364** — no extras, no misses. That set was derived by a
+human reading documents; this one by a rule derived from the contract.
+The two could not excuse each other, which is what I-8 asks for.
+
+**`FUNCTION` 222 → 5 is correction E working.** Path and title are
+created as part of the same document by the same author, so
+`PATH says audit + TITLE says audit` is one source counted twice.
+Self-description now earns the evidence fact `NOMINAL_FUNCTION` (207
+documents) and the verdict abstains. Only the objective `MARKER` case
+earns `FUNCTION` at H2.
+
+**`VALIDITY` 56 → 161, stated plainly rather than buried.** v1.1
+required `has_date AND present_tense`, and the defective `present_tense`
+conjunct was suppressing 133 documents that *do* carry a document-level
+date stamp. v1.1 was not more careful; it was accidentally narrower via a
+broken conjunct. 155 of those stamps sit in a header block, are unique
+within their document, and survive the history check.
+
+**`SCOPE` 272 → 166** because it is earned rather than defaulted.
+
+### 3. Qualification
+
+* **78 hostile fixtures, 0 failures** — one fail-old/pass-new pair per
+  class D1–D17, plus regression assertions. **The fail-old half runs the
+  actual committed v1.1 in a subprocess**: its modules import each other
+  by bare name and three collide with v1.2's, so an in-process import
+  would let one version shadow the other and a contaminated fail-old
+  would prove nothing.
+* **Three denominators from three different places** — the axis set, the
+  alphabet, and **the output**. Each is blind in a direction the others
+  are not. D17 existed precisely because v1.1 had only the second.
+* **Removal calibration runs inside the qualification**, not only in the
+  fixtures: `UNKNOWN` is removed from each axis in turn and the invariant
+  must fire. A gate never shown to fail is an untested instrument — v1.1
+  reported 40/40 green the entire time seventeen defects were live.
+* **Runtime module identity** 5/5 under the candidate directory, source
+  bytes matching the manifest.
+* **Fresh reproduction executed** from an unrelated directory: 272 rows,
+  every tally and the admission contract byte-identical.
+* **0 qualification findings.**
+
+### 4. Two changes outside the letter of the contract, both declared
+
+**A uniqueness requirement on binding predicates.** D367 §6 requires a
+binding "whose subject is the document as a whole"; a predicate appearing
+*twice* cannot satisfy that in both places. `kai-pm/WAYPOINTS.md` carries
+`**Date:**` per waypoint record and its L79 entry would otherwise have
+bound the whole file to one entry's date. **It discriminates 1 document
+of 162** — the denominator is stated because a rule justified by a single
+instance deserves suspicion. It implements the contract's wording rather
+than extending it, and it fails toward abstention.
+
+**`LIFECYCLE` was ported, not redesigned.** It was qualified under
+D361–D363 and was outside the repair scope, but its *inputs* changed
+underneath it since `has_sha` no longer exists. Silently losing 13
+verdicts would have been a scope change I had no authority to make, so
+v1.1's two `HISTORICAL` rules were carried onto the repaired evidence.
+The snapshot rule is now **strictly stronger** — a commit witness
+verified by resolution and bound at document scope, where v1.1 accepted
+any hex-shaped token anywhere in 6000 bytes.
+
+**11 of 13 retained; the 2 drops are the repaired evidence working.**
+`CODE_AUDIT_BATCH_HMAC_ROTATION_DRILL.md` earned `HISTORICAL` from
+`1700000000` — a **unix timestamp, named as one in its own line** — and
+`CODE_AUDIT_CONTINUATION_LOG.md` from a real commit cited **mid-document
+at SPAN scope**.
+
+### 5. A defect I introduced during this repair, and how it was caught
+
+The first draft of `bind_claims` imposed a 6000-byte window by analogy
+with Pass A. **v1.1 had no such window on that extractor.** The window
+silently destroyed two authority claims **Kai had adjudicated CORRECT** —
+`PHASE1_READINESS.md`'s self-declaration at byte 18,877 and
+`DECISIONS.md`'s at byte 287,981 — both falling to `NO_SELF_CLAIM`.
+
+It was caught only by asserting the five correct rows unchanged. A repair
+that proves only the corrected case can destroy the property it was
+protecting; that is why the boundary half exists, and it earned its place
+again here. Those assertions are now permanent fixtures.
+
+### 6. The blind holdout — 40 documents, both halves frozen
+
+Selected by the D367 §9 rule under the candidate aggregate, which did not
+exist when the rule was frozen. A circularity was found and removed:
+`MANIFEST.sha256` covers the **instrument and its result**, fixing the
+aggregate *before* the holdout exists, while `PACKAGE.sha256` is the full
+inventory including it. Without that separation the selection would have
+depended on its own output.
+
+**5 rows overlap the D363 24-row holdout, and `SEQUENCE.md` — the only
+row of that set ever adjudicated — is not among them. Contamination is
+zero.**
+
+**Not self-adjudicated. No agreement figure is computed anywhere in the
+package**, and any figure I computed would carry no admission weight
+(D367 §10).
+
+### 7. Utility, reported and not optimised
+
+`UNKNOWN` dominates four of six axes. That is the measured truth, not a
+target and not a failure. Per D367 §11 and Kai's stop rule, two separate
+gates follow: **qualification** asks whether the instrument is truthful;
+a later **operator decision** asks whether the truthful instrument is
+discriminating enough to feed HOUSE_H3. If H2 proves to be principally an
+evidence-and-abstention instrument, that is to be reported rather than
+engineered away. **No positives were preserved to improve the profile.**
+
+---
+
+### THREAD RECOVERY BLOCK
+
+* **HEAD** — this entry, on `claude/project-rework-plan-pgvp35`
+* **H2 v1.2 CANDIDATE** —
+  `ba2b16d400aafd2b694890149bbaae1d1369d3771c25ce809d2f752d5248de4a`,
+  14 artefacts, **NOT FROZEN, NOT ADMITTED**. 78/78 fixtures, 0
+  qualification findings, fresh reproduction byte-identical
+* **CONTRACT** — `kai-pm/H2_REPAIR_CONTRACT_D367.md` sha256
+  `0ce5792e…00bb`, **unaltered during implementation**, verified `OK`
+* **UNTOUCHED** — HOUSE_H2 `v1.0` · `v1.1` `be37a0aa…f133` (preserved as
+  the failed-admission candidate) · Census `v1.1` `eb7aad7c…fa0e`. All
+  checksum-verified with zero tracked changes
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents.
+  **History source must be NON-SHALLOW** (ancestry 986, oldest
+  2025-06-18); Pass A aborts on a shallow source rather than measuring
+* **HOUSE STATE** — `HOUSE_H0` CLOSED · `HOUSE_H1` COMPLETE ·
+  `HOUSE_H2` repaired candidate returned, admission undecided ·
+  `HOUSE_H3`–`H6` NOT STARTED
+* **AUTHORISED NEXT ACTION** — **NONE. RETURN.** Awaiting Kai's
+  independent verification of the candidate and his **blind adjudication
+  of the 40-document six-axis holdout**, then the freeze/admission
+  recommendation. Orion self-adjudication carries **zero** admission
+  weight
+* **EXPLICITLY NOT AUTHORISED** — freezing or admitting this candidate ·
+  further classifier or ontology change · `HOUSE_H3`–`H6` · a second
+  holdout · Census successor or modification · H2 v1.0/v1.1
+  modification · programme-order CI mechanism · KAI-GATE-048 · Phase B ·
+  `ITEM8_GO` · six subject builds · Stage 2 · `A-4_PROVENANCE` ·
+  `A4_SELF_DIAGNOSIS` · document/register repair · Kingsman
+  implementation
+* **OPEN / UNRESOLVED** — the H2 utility decision (a separate gate from
+  qualification) · D358 consumer gate specified but unbuilt ·
+  `wake_intent_j2` FUNCTION gap uncurated · 173 documents undecidable
+  from git evidence · `LIFECYCLE=ACTIVE` earnable by no existing rule ·
+  the v1.0↔v1.1 Census confound (unchanged; v1.1 and v1.2 share Census
+  v1.1, so it is not a confound between them) · D344–D353 not in the
+  ledger
+* **HOLDOUT** — 40 documents, selection and evaluation frozen in D367 and
+  carried in the artefact. **Kai adjudicates.** The D363 24-row holdout
+  remains partially revealed regression evidence only
+* **CORRECTIONS TO PRIOR RECORDS** — none new. D367's corrections A–G
+  stand and are implemented here; correction E cost 217 `FUNCTION`
+  positives and correction F's ordering was followed
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D368
+  Orion. **Next free: D369 — NOT TO BE TAKEN without authorisation**
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).
