@@ -669,3 +669,32 @@ this programme. One is not a trend.
   have shipped "not-X is evidence for Y".** It is not the same claim.
 * **A verified state under an unverified instruction is not a verified
   position.**
+
+### Addendum — I filtered on the literal while describing the mechanism
+
+*2026-08-27, same day. Kai's correction, verified.*
+
+I reported that 18 of the 40 holdout rows shared the `Reviewed:` →
+`TIME_BOUND` mechanism. **It is 19.** Kai found it by inspecting the
+frozen holdout; I confirmed it and found why I was wrong.
+
+My query filtered on the literal string `"Reviewed: 27 July 2026"`.
+`CODE_AUDIT_BATCH_AUTONOMOUS_STATE.md` carries `Reviewed: 26 July 2026`
+and fell outside it.
+
+```
+path contains CODE_AUDIT_BATCH_          : 19
+TIME_BOUND via a "Reviewed:" witness     : 19
+my filter, literal "27 July 2026"        : 18   <- what I reported
+```
+
+**I measured the token instead of the mechanism, in a report whose whole
+point was that the rows share a mechanism.** That is the defect class
+this entire programme exists to remove, committed by me in the sentence
+naming it. Corpus-wide the same mistake would have returned 120 rather
+than 144, because the family splits 120/24 across two dates; the 144 was
+right only because it came from a different query.
+
+**The tell:** when I write *"share the same mechanism"*, the filter must
+be the mechanism. If I can name a literal in the query, I am counting
+instances of a string and reporting them as instances of a cause.
