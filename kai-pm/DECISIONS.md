@@ -30789,3 +30789,170 @@ state**.
   Orion. **Next free: D361**, subject to a fresh allocator check
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D361 — HOUSE_H2 v1.1 built and qualified: ACTIVE not earnable,
+## evidence separated from verdict, UNKNOWN rose as predicted
+
+**Authority.** Dainius, this session: *"authorise one HOUSE_H2 v1.1
+build-and-requalification cycle exactly within Kai's scope"* (D360 §5,
+§7). **CREATES NO HOUSE_H3 AUTHORITY.** HOUSE_H2 `v1.0` untouched
+(14/14, `fa847726…45f4`, 0 diff). Census `v1.1` untouched and consumed
+read-only (19/19, `eb7aad7c…fa0e`, 0 diff).
+
+**CANDIDATE: `2e308be7ac846bdbfefd25fdefc30938574ea288a7d9e591cdfe7b4f8c510fc7`**,
+15 artefacts at `kai-pm/house_in_order_h2_v11/`. **NOT FROZEN. NOT
+ADMITTED TO HOUSE_H3.**
+
+### 1. Precommit discipline
+
+The acceptance contract, fixture expectations, holdout rule and
+**predicted outcome** were written and hashed
+(`fa1069103a721cf5911641cbe6447360069eb9f2a3873a4296531ae280f4258e`)
+**before any v1.1 code existed**, and are **unamended**. §7 of that
+contract predicted `ACTIVE ⇒ 0`, `UNKNOWN` rising above 216, and
+`FUNCTION=UNKNOWN` falling — and recorded that **UNKNOWN falling would
+be a red flag, not a success.**
+
+### 2. The separation is structural, not documentary
+
+`classify2.lifecycle()` **does not receive the evidence facts**. It
+cannot convert one into a verdict even by accident. A comment would not
+have sufficed: v1.0's own docstring said authority was earned at H3
+while its LIFECYCLE branch awarded ACTIVE from a self-claim.
+
+Every declared value carries a machine-readable disposition —
+`H2_EMITTABLE` · `H2_NOT_EARNABLE` · `DEFERRED_TO_H3` — because a
+comment saying *"deliberate"* is indistinguishable from an unimplemented
+branch (D341's class, found three times by hand).
+
+### 3. Results — identical subject `d8aac4d4`, tree `3abc9e9d`, 272 docs
+
+History window `2025-06-18 → 2026-08-07`, non-shallow, ancestry 986.
+
+| | v1.0 | v1.1 |
+|---|---|---|
+| `LIFECYCLE ACTIVE` | 43 | **0** |
+| `LIFECYCLE UNKNOWN` | 216 | **259** |
+| `LIFECYCLE HISTORICAL` | 13 | 13 |
+| `FUNCTION UNKNOWN` | 69 | **50** |
+| `FUNCTION REFERENCE` | 0 | **8** |
+| `FUNCTION OTHER` | 0 | **3** |
+| `FUNCTION USER_GUIDE` | 3 | 10 |
+| `VALIDITY CURRENT_TREE` | 8 | 7 |
+| `VALIDITY TIME_BOUND` | 22 | 23 |
+
+**UNKNOWN ROSE, EXACTLY AS PREDICTED.** All 43 v1.0 `ACTIVE` became
+`UNKNOWN`; 31 of them retain `MAINTENANCE_OBSERVED` and 4
+`SELF_ASSERTS_CURRENT`. **The observation survives; the verdict does
+not.** That is the whole content of D360 §5.
+
+**A number worth recording:** `SELF_ASSERTS_CURRENT` is **6** where
+v1.0's `present_tense` flag was **39**. The raw flag was more than six
+times broader than a subject-bound, polarity-aware currentness claim —
+which is precisely why it should never have earned a verdict.
+
+### 4. The D340 false positive is repaired, with a fail-old pair
+
+`docs/agentic_patterns_spec.md` (`Version: 1.0 — 2 Mar 2026`):
+`CURRENT_TREE` → **`TIME_BOUND`**. v1.0's date pattern is reproduced
+verbatim in the fixtures and **must fail** the input v1.1 passes.
+Boundary preserved: an *undated* present-tense document is still
+`CURRENT_TREE`.
+
+### 5. ONE D340 GAP NOT REPAIRED — STATED, NOT CURATED
+
+`docs/wake_intent_j2.md` remains `FUNCTION=UNKNOWN`; Kai's blind
+adjudication said `REFERENCE`. `kai-pm/NAVIGATION.md` **is** now
+`REFERENCE`.
+
+**I did not add a rule to capture the remaining one.** Its correct
+answer is known to me from D340, and tuning a classifier to match a
+known adjudication is **fitting to the holdout, not repair**. Recorded
+as an open gap rather than closed by curation.
+
+### 6. A defect I introduced and a fixture caught
+
+`PURPOSE` was carried forward from v1.0 with `^` and **no `re.M`**, so
+it matched only at the very first character of a file — a purpose
+statement under a heading, which is how essentially every document here
+is written, was invisible to the witness that exists to find it. Scope
+narrower than the name implied (R5). Caught by fixture F7b, not by
+review. Fixed with `re.M`.
+
+### 7. Qualification
+
+* hostile fixtures **33/33**, all six precommitted classes, plus
+  `REFERENCE`/`OTHER` reachability and the three values unobserved on
+  this subject (`SUPERSEDED`, `TEMPLATE`, `RUN_ARTEFACT`);
+* state-disposition qualification **0 findings** — every
+  `H2_NOT_EARNABLE` and `DEFERRED_TO_H3` value emitted **zero** times;
+* population **272 == 272**, asserted;
+* **fresh-environment reproduction executed** from an unrelated
+  directory: all 272 rows, the axis tallies, the history identity and
+  the admission contract **identical**;
+* machine-readable **H2→H3 admission contract** emitted, sha256
+  `1173eb0bf557780431486022cdfaef65c45ff42c32d513994d4cace12247da05`,
+  carrying its own restrictions and stating
+  `"self_approval": "NONE"`.
+
+### 8. Blind holdout — emitted, NOT self-adjudicated
+
+24 of 272 under the precommitted rule `sha256("H2V11:" + path)`
+ascending, fixed before the code existed and distinct from D340's set by
+salt. Emitted at `h2v11-holdout.json` **for independent blind
+adjudication**. I have computed no agreement figure; one produced by me
+would carry no acceptance weight.
+
+### 9. Known confound, stated so it cannot be misattributed
+
+v1.0 consumed **Census v1.0**, proven defective by D341. v1.1 consumes
+**frozen Census v1.1**. Any v1.0↔v1.1 delta may originate in the Census
+change as well as the classifier change. **The two are not separable by
+comparison alone.**
+
+### 10. Status
+
+**CANDIDATE. NOT FROZEN. NOT ADMITTED TO HOUSE_H3.** Admission is a
+governing decision, never a test result, and the package approves
+nothing about itself.
+
+---
+
+## THREAD RECOVERY BLOCK — D361
+
+* **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+* **PROGRAMME ORDER AUTHORITY** — **D359 §2**; cite it, do not restate it
+* **CANDIDATE** — HOUSE_H2 `v1.1`, 15 artefacts,
+  `2e308be7ac846bdbfefd25fdefc30938574ea288a7d9e591cdfe7b4f8c510fc7`,
+  **NOT FROZEN, NOT ADMITTED**. Precommit
+  `fa106910…4258e`, admission contract `1173eb0b…da05`
+* **UNTOUCHED** — HOUSE_H2 `v1.0` `fa847726…45f4` (14/14) · Census
+  `v1.1` `eb7aad7c…fa0e` (19/19) · Census `v1.0` `4a5b40a1…`
+* **MEASURED SUBJECT** — `d8aac4d49e6ba997e3eb38062c0917186ee3f197`
+  tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`, 272 documents,
+  **history window `2025-06-18 → 2026-08-07`, non-shallow, ancestry
+  986**. History-derived facts are void outside that window
+* **HOUSE STATE** — `HOUSE_H0` CLOSED · `HOUSE_H1` COMPLETE ·
+  `HOUSE_H2` **v1.1 candidate returned, admission undecided** ·
+  `HOUSE_H3`–`H6` NOT STARTED
+* **AUTHORISED NEXT ACTION** — none. Kai's independent reconciliation of
+  the candidate, and blind adjudication of the 24-row holdout
+* **EXPLICITLY NOT AUTHORISED** — `HOUSE_H3` · `H4` · `H5` · `H6` ·
+  Census successor or modification · H2 v1.0 modification · freezing
+  this candidate on my own authority · programme-order CI mechanism ·
+  KAI-GATE-048 execution · Phase B · `ITEM8_GO` · six subject builds ·
+  Stage 2 · `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · document/register
+  repair · Kingsman implementation
+* **OPEN / UNRESOLVED** — `docs/wake_intent_j2.md` FUNCTION gap left
+  uncurated · 173 documents with one commit across full history remain
+  epistemically undecidable from git evidence · `LIFECYCLE=ACTIVE`
+  earnable by no rule that exists · 259 UNKNOWN · Census dependency
+  confound · holdout unadjudicated · D344–D353 not in the canonical
+  ledger
+* **CORRECTIONS TO PRIOR RECORDS** — none new; D360's corrections stand
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D361
+  Orion. **Next free: D362**, subject to a fresh allocator check
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

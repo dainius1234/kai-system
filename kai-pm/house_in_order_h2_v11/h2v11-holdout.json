@@ -1,0 +1,345 @@
+{
+ "selection_rule": "sha256(\"H2V11:\" + path) ascending, first 24",
+ "precommit_sha256": "fa1069103a721cf5911641cbe6447360069eb9f2a3873a4296531ae280f4258e",
+ "population": 272,
+ "selected": 24,
+ "adjudication": "INDEPENDENT AND BLIND. Not self-adjudicated.",
+ "rows": [
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_HEARTBEAT.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "vault-sync/templates/kai-inbox.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "UNKNOWN",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/RISKS.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "UNKNOWN",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "TIME_BOUND",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": true,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/DEEPSEEK_BRIEF_2026-08-07_METHOD.md",
+   "LIFECYCLE": "HISTORICAL",
+   "FUNCTION": "UNKNOWN",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/INSTRUMENTATION_ARCHITECTURE.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "UNKNOWN",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": true,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": true
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_SELF_AUDIT_SUPERVISOR.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "docs/DEMO.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "USER_GUIDE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_AGENTIC_INTROSPECTION.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_SHELL_HEALTH_ROTATION_WRAPPERS.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "CLAUDE.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "GOVERNANCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": true,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/RUNTIME_TOPOLOGY_CENSUS.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "EXACT_SNAPSHOT",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": true,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_REPOSITORY_QUALITY_DOCS.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_DEPLOYMENT_EXTENSION.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "skills/_template.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "UNKNOWN",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/SEQUENCE.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "PLAN",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "EXACT_SNAPSHOT",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": true,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/MEMORY_GRAPH_DESIGN.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "REFERENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "CURRENT_TREE",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE_EXTENSION.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_SHARED_RUNTIME_CONTROLS.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_TEST_STUBS_EXTERNAL_MODEL_OCR_FUZZ.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "data/AGENTS.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "RUNTIME_INPUT",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": true,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT.md",
+   "LIFECYCLE": "UNKNOWN",
+   "FUNCTION": "EVIDENCE",
+   "AUTHORITY": "UNKNOWN",
+   "GENERATION": "UNKNOWN",
+   "VALIDITY": "UNKNOWN",
+   "SCOPE": "WHOLE_FILE",
+   "EVIDENCE_FACTS": {
+    "MAINTENANCE_OBSERVED": false,
+    "SELF_ASSERTS_CURRENT": false,
+    "CONSUMED_AT_SUBJECT": false
+   }
+  }
+ ]
+}
