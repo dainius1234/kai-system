@@ -32839,3 +32839,29 @@ so it is untouched.
   none
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+### C5 — the sidecar's checksum file was malformed, and I said it was bound without checking
+
+Appended to the same errata, 2026-08-28.
+
+C1 remedied D370's rule-33 breach with a **hash-bound** sidecar, and I
+reported it as such. The two sha256 values quoted in C1 and relayed to
+Kai are **correct** and match the artefacts exactly.
+
+But the `.sha256` file itself was written with **three spaces** between
+digest and filename where `sha256sum` requires two, so
+`sha256sum -c d368_holdout_coverage_card.sha256` **failed to parse it**.
+The binding was substantively right and mechanically unusable.
+
+**I asserted "hash-bound" without running the verification.** Computing a
+digest and writing it to a file is not the same as demonstrating the file
+verifies — which is R1, and rule 15's *calibration must prove the
+instrument can fail* seen from the other side: I never ran the check that
+would have failed.
+
+Corrected by regenerating the file with `sha256sum` itself rather than a
+hand-formatted `print`. **No hash changed**, so C1's quoted values and
+the relay to Kai remain accurate; only the file expressing them was
+repaired. Verified after the fix: both entries report `OK`.
+
+No claim in C1–C4 is affected. No D-number consumed.
