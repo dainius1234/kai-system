@@ -308,6 +308,74 @@ Proactive engineering is not autonomous scope expansion.
     > has not occurred.*
     > *OWNER/STAGE: evidence-plane tooling. NOT to be implemented during
     > the H2 hold.*
+
+47. **SOURCE OPENED ≠ SOURCE READ. INSPECTION MUST BE
+    CLAIM-SUFFICIENT.** Retrieving or opening an authoritative source
+    earns **zero substantive claim by itself**. Before emitting a
+    source-dependent conclusion, the inspection performed must be
+    sufficient for the **exact predicate and scope** of the claim.
+
+    ```
+    identify the claim
+      -> identify the authoritative source
+      -> establish exact subject / version
+      -> determine the evidence scope the CLAIM requires
+      -> inspect that scope COMPLETELY
+      -> follow governing internal references or delegations where material
+      -> only then emit
+    ```
+
+    **READ TO THE CLAIM BOUNDARY.** A paragraph glance cannot support a
+    document-wide conclusion. A heading scan cannot establish that a
+    phase is undefined. A single search hit cannot establish programme
+    meaning where another section qualifies it. A retrieved snippet or
+    line window cannot establish absence outside that window. A summary
+    cannot substitute for available primary material.
+
+    Whole-artefact claim ⇒ the whole artefact inspected or completely
+    searched. Bounded claim ⇒ the conclusion stays bounded to that
+    section. Where a source **delegates or promotes** substantive detail
+    into another identified artefact, that dependency is followed before
+    a conclusion whose truth depends on it.
+
+    **PARTIAL READING REQUIRES PARTIAL CLAIMS.** Having inspected only
+    lines 1-100, `NOT_FOUND_IN_INSPECTED_RANGE` may be earned;
+    `NOT_FOUND_IN_DOCUMENT` may not. Having inspected only one section,
+    report what that section says — never that the document contains
+    nothing else.
+
+    **NEGATIVES CARRY A COVERAGE BURDEN.** For existence, absence,
+    completeness, definition, authority, sequence, enumeration and
+    *all/none* claims, record the inspection universe that supports the
+    claim. **"I opened it" is not a proxy for "I checked it."**
+
+    **RULES 46 AND 47 ARE A COUPLED CONTROL.**
+
+    | | asks |
+    |---|---|
+    | rule 46 | did you go to the authoritative source rather than memory? |
+    | rule 47 | did you inspect **enough of it** to earn the exact claim? |
+
+    Either alone is insufficient: memory yields a wrong premise; the
+    correct source read shallowly yields a wrong *source-derived*
+    premise, which is more dangerous because it arrives wearing a
+    citation.
+
+    **This supplements rule 46. It does not rewrite it, and no
+    overlapping doctrine is to be created elsewhere.**
+
+    > *ENFORCEMENT: `RULE_BANKED` / manual, effective immediately. A
+    > consequential source-derived answer must state enough of its own
+    > reading or search scope to justify its conclusion. Whole-source
+    > negatives require whole-source or demonstrably complete coverage.*
+    > *MACHINE HOOK: claim metadata carrying `source_identity`,
+    > `subject/version`, `claim_predicate`, `claim_scope`,
+    > `inspection_scope`, `coverage_mode` =
+    > `FULL_ARTEFACT | COMPLETE_BOUNDED_SEARCH | SECTION_BOUND`, and
+    > `followed_dependencies` — refusing promotion where
+    > `inspection_scope < claim_scope`.*
+    > *OWNER/STAGE: assurance/evidence tooling when authorised. NO
+    > implementation during the H2 hold.*
 23. **Historical corrections are append-only.** Do not erase mistakes
     that taught us something.
 
@@ -668,6 +736,7 @@ Proactive engineering is not autonomous scope expansion.
 | 11, 12 | `core-tests.yml` starts a model on every push; the first detector counted docstrings as execution |
 | 13, 14 | 100+ findings for 1 real defect; 69 findings against a correct tree |
 | 15, 16 | a stub that could not reproduce the hostile property it was testing |
+| 47 | **the same D359 artefact, the second half of the failure.** Rule 46 worked — D359 was opened rather than answered from memory. But only the §2 sequence block was inspected: **1,400 characters of a 12,939-character, ten-section entry — 10.8% coverage** — and a WHOLE-DOCUMENT negative, `NOT_FOUND_IN_D359`, was emitted from it. §5 defines `HOUSE_H3` (active claim qualification), `H4` (repair the control sources), `H5` (document authority / drift enforcement) and `H6` (bank the baseline; prove the drift checks detect their own absence). The same artefact therefore demonstrates that **source retrieval and source qualification are separate operations** (D372) |
 | 46 | **the D359 incident.** Six specific absence claims were produced about D359 without opening it — *Item 8 inside the 048 path · `A-4_PROVENANCE` distinct from `A4_SELF_DIAGNOSIS` · Assurance Integration · repository consolidation · Evidence Plane last · the explicit Dainius House Exit Ruling*. **All six were false; every one was already in D359.** A second producer accepted the summary and designed a governance remedy on the false premise. Only operator scrutiny forced primary-source inspection, which disproved it before any repository mutation. The enumerated negative was written in a message about durability discipline, one paragraph after quoting the rule it broke (D371) |
 | 15, 44 (and R1) | **PRODUCED ≠ USABLE ≠ VERIFIED.** A sidecar's `.sha256` file carried two CORRECT digests and was reported as "hash-bound" — but it had been hand-formatted with three spaces where `sha256sum` requires two, so `sha256sum -c` could not parse it at all. The digests were right; the verification artefact did not work, and the consumer command had never been run before the property was reported. Existing controls, not a new law: R1 forbids asserting what has not been run; rule 15 asks a control to demonstrate it can fail; rule 44 separates a written control from an enforced one (D370 errata C5) |
 | 17 | P1 run 5 again: 67 assertions on the parts, none on the shipped entry point |

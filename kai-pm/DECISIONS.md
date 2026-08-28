@@ -33048,3 +33048,138 @@ edit was *made*, which is not the same as the edit being *correct*.
   Orion. **Next free: D372 — NOT TO BE TAKEN without authorisation**
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D372 — 2026-08-28 — Rule 47: source opened ≠ source read. GOVERNANCE ONLY
+
+**Authority.** Dainius explicitly authorised this narrow governance
+addition despite the HOLD; Kai specified the semantics. **Allocator
+checked fresh, by inspection**: branch 371, `main` 164, **D372** next
+free, zero collisions. Doctrine stood at rule 46 by inspection.
+
+**This decision:** amends no frozen contract · changes no candidate,
+package or holdout · does not touch D359 or the programme sequence ·
+grants no HOUSE_H3 authorship or H2 repair authority · implements no
+tooling.
+
+### 1. The failure, quantified
+
+Rule 46 **worked, and was not enough.** Asked what came next, I did not
+answer from memory — I opened D359. Then I inspected **one section of
+it** and emitted a **whole-document negative**.
+
+| | |
+|---|---|
+| D359 total | **12,939 characters, 10 numbered sections** |
+| what I actually read | **1,400 characters** — a window around the §2 sequence block |
+| coverage | **10.8%** |
+| claim emitted | `NOT_FOUND_IN_D359` — whole-document |
+| never opened | §5, §6, §7, §8, §9, §10 |
+
+**§5 is where the answer was.** D359's canonical House-state table
+defines `HOUSE_H3` — *active claim qualification against tree, registers,
+CI, artefacts, human authority*; `HOUSE_H4` — *repair the control
+sources, KAI-GATE denominator/register first*; `HOUSE_H5` — *document
+authority / drift enforcement; the check must FAIL on an unclassified
+controlled document*; `HOUSE_H6` — *bank the baseline; prove the drift
+checks detect their own absence.*
+
+This is the **second** false claim about D359 in two days. The first came
+from not opening it (rule 46). The second came from opening it and
+reading a tenth of it. **The same artefact demonstrates that source
+retrieval and source qualification are separate operations** — which is
+exactly why rule 47 is a supplement to rule 46 and not a restatement.
+
+A source-derived false premise is **more** dangerous than a remembered
+one, because it arrives wearing a citation.
+
+### 2. What was banked — doctrine rule 47
+
+`SOURCE OPENED ≠ SOURCE READ. INSPECTION MUST BE CLAIM-SUFFICIENT.`
+
+Retrieving a source earns **zero substantive claim by itself**. The
+inspection must be sufficient for the **exact predicate and scope** of
+the claim: identify the claim → identify the source → establish exact
+subject/version → determine the evidence scope the *claim* requires →
+inspect that scope **completely** → follow governing internal references
+or delegations where material → only then emit.
+
+* **READ TO THE CLAIM BOUNDARY** — a paragraph glance cannot support a
+  document-wide conclusion; a retrieved window cannot establish absence
+  outside that window; a summary cannot substitute for available primary
+  material;
+* **PARTIAL READING REQUIRES PARTIAL CLAIMS** —
+  `NOT_FOUND_IN_INSPECTED_RANGE` may be earned;
+  `NOT_FOUND_IN_DOCUMENT` may not;
+* **NEGATIVES CARRY A COVERAGE BURDEN** — record the inspection
+  universe. **"I opened it" is not a proxy for "I checked it."**
+
+**Rules 46 and 47 are a coupled control.** 46 asks *did you go to the
+source rather than memory?* 47 asks *did you read enough of it to earn
+the claim?* Either alone is insufficient.
+
+`CLAUDE.md` receives **two R0 stop-signal tells and one coupling
+sentence inside R16 — no new operating rule**, per Kai's instruction not
+to create overlapping doctrine elsewhere. `CLAUDE.md` remains at R16.
+
+### 3. Kai's rulings on the three forward flags, recorded
+
+**F1 — partly valid, NOT authorised for execution.** Gate-B utility does
+ultimately need a source-bound consumer need, but the HOLD grants no
+HOUSE_H3 authorship authority. DeepSeek's opposite absolute is also
+rejected: **rule 42 does not require an uncontaminated external
+adjudicator** — it permits a later-authored contract where the
+underlying need predates producer exposure, contamination and authorship
+are declared, and the exposed builder is not sole author. If parallel
+preparation is later authorised, the first operation is **pre-H2 need
+extraction from authoritative sources**, not free-form H3 design.
+
+**F2 — WITHDRAWN as false.** See §1.
+
+**F3 — risk accepted, remedy deferred.** Manual enforcement across the
+forward programme is a genuine risk. DeepSeek's structured
+rule-registry idea is retained as a **future architecture candidate
+only** — no sequence change, no implementation during HOLD. Its stage is
+decided from the governing need, not pulled forward by intuition.
+
+**Terminology corrected.** The canonical stage is **`ASSURANCE
+INTEGRATION MAPPING`**, meaning *map the repaired evidence/provenance
+layer against the real system*. **"Mapping" must not be widened into a
+claim that runtime integration has been completed.**
+
+---
+
+### THREAD RECOVERY BLOCK
+
+* **HEAD** — this entry, on `claude/project-rework-plan-pgvp35`
+* **SCOPE** — governance only: `kai-pm/ENGINEERING_DOCTRINE.md`,
+  `CLAUDE.md`, `kai-pm/DECISIONS.md` (append). **No instrument,
+  contract, candidate, package or holdout byte changed. D359 untouched**
+* **NEW IDENTIFIERS** — doctrine **rule 47** · two R0 tells · one R16
+  coupling sentence · one earned-table row. **`CLAUDE.md` stays at R16**
+* **DOCTRINE STATE** — rules 1–47. **33–47 `RULE_BANKED`; none
+  `CONTROL_OPERATIONALISED`**
+* **PROGRAMME ORDER** — unchanged and canonical in D359, which also
+  defines `HOUSE_H3`–`H6` in §5
+* **D368 CANDIDATE** — `9d787706…`, aggregate `ba2b16d4…de4a`, **NOT
+  FROZEN, NOT ADMITTED**
+* **D367 CONTRACT** — `0ce5792e…00bb`, **unamended**
+* **HOLDOUT** — 40 rows, **not regenerated**. Kai continues the frozen
+  40 × six-axis adjudication — the only active substantive task
+* **AUTHORISED NEXT ACTION** — **NONE. HOLD.**
+* **EXPLICITLY NOT AUTHORISED** — HOUSE_H3 contract design or authorship
+  · H2 repair · candidate/contract/package/holdout modification ·
+  building any hook in rules 33–47 · programme-sequence change ·
+  reopening D364/D365 · `HOUSE_H3`–`H6` · freezing or admitting D368 ·
+  Census successor or modification · KAI-GATE-048 · Phase B ·
+  `ITEM8_GO` · Stage 2 · `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` ·
+  document/register repair · Kingsman implementation
+* **CORRECTIONS TO PRIOR RECORDS** — my `NOT_FOUND_IN_D359` for
+  `HOUSE_H3`–`H6` content is **withdrawn as false**; D359 §5 defines all
+  four. DeepSeek's derived "D359 is merely a routing skeleton"
+  conclusion **falls with the premise**
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D372
+  Orion. **Next free: D373 — NOT TO BE TAKEN without authorisation**
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

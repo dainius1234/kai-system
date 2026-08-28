@@ -40,6 +40,8 @@ check before continuing.
 | "I remember…", "from memory…", "as I recall…" | R16 — STOP. Open the authoritative source before continuing |
 | I am about to say what a named artefact **contains or lacks**, and I have not opened it | R16 — memory locates, it never establishes. Open it |
 | I am designing a remedy from **someone else's** description of a file | R16 — no cascaded memory authority. Their recollection is not my premise |
+| I opened the file, read one section, and am about to say what the **document** contains or lacks | doctrine 47 — opened ≠ read. `NOT_FOUND_IN_INSPECTED_RANGE`, never `NOT_FOUND_IN_DOCUMENT` |
+| I am writing "not found", "no", "none", "nothing in X" | doctrine 47 — state the inspection universe that earns the negative. "I opened it" is not "I checked it" |
 | "worth noting", "deserves suspicion", "I would flag" — and then I continue | R15 — stop there and look. Clean costs minutes; not looking costs someone else, later and larger |
 
 **The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
@@ -465,9 +467,18 @@ documented are verifiable state claims."*
 **The tell:** an uncited sentence about what a named artefact contains
 or lacks. That sentence is the instruction to open it.
 
+**Opening the source is only half of it.** Doctrine rule 47 is R16's
+coupled half: *source opened ≠ source read; inspection must be
+claim-sufficient.* Going to the right file and reading 10% of it still
+produces a false premise — one that arrives wearing a citation, which is
+worse. **Read to the claim boundary, and if the reading was partial, the
+claim must be partial too.**
+
 > **Provenance:** directed by Dainius on 2026-08-28 and banked under
 > doctrine rule 46, which states the producer-independent form. Recorded
-> rather than self-adopted.
+> rather than self-adopted. Rule 47 was added the same day, after this
+> very rule was followed and still produced a false negative from a
+> shallow read.
 
 The full doctrine this serves, its standing rules and the specific
 failure that earned each one, is in `kai-pm/ENGINEERING_DOCTRINE.md`.
