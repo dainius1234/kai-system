@@ -253,6 +253,61 @@ Proactive engineering is not autonomous scope expansion.
    independently established.
 4. **LOOKUP → VERIFY SUBJECT → USE IDENTIFIER.** Never use a remembered
    run id, SHA, artifact or subject where an authoritative lookup exists.
+46. **MEMORY IS A LOCATOR, NEVER EVIDENCE.** A remembered fact may tell
+    you **where to look**. It may never establish **what is true**.
+
+    Any source-dependent claim — engineering, repository, governance,
+    programme-state, runtime, evidence, decision, sequence, existence,
+    absence, identity, count, status or historical content — must be
+    **re-earned from the authoritative source at the moment it is
+    relied upon**.
+
+    **PRIMARY SOURCE BEFORE SYNTHESIS.** No remedy, decision, scope
+    change, repository change, challenge to another producer, or
+    consequential interpretation may be designed from a **remembered
+    description of what an artefact contains or lacks**. Open the
+    artefact first.
+
+    **Positive and negative claims are equally bound.** *"It contains X"*
+    requires inspection. *"It does not contain X"* requires inspection
+    **plus a bounded search sufficient to earn the negative** (rule 33,
+    P13/P14).
+
+    Prior chat, summaries, handovers, field notes, another model's
+    statement and a producer's own recollection are **navigation aids**
+    when a primary source is accessible — never substitutes for it.
+
+    **If the authoritative source cannot be retrieved, or the exact
+    subject cannot be established, return `UNVERIFIED`,
+    `STATE RECOVERY INCOMPLETE` or the governing abstention state.**
+    Never complete a missing fact from memory.
+
+    **NO CASCADED MEMORY AUTHORITY.** One producer's unverified
+    recollection cannot become another producer's verified premise.
+    Orion saying *"D359 lacks X"* does not entitle Kai to design against
+    that premise; Kai must open D359. This binds in every direction —
+    Orion, Kai, DeepSeek, human operators and scripts alike, **including
+    the adjudicating authority.**
+
+    **Current claims require current evidence.** Historical evidence
+    proves the historical subject only, until present applicability is
+    separately re-earned.
+
+    This **generalises** existing controls rather than duplicating them:
+    doctrine §0.0 (*every claim is re-earned when relied upon*), rule 4
+    (*lookup, verify subject, use identifier* — for ids and artefacts),
+    rule 33 (*derived and negative claims travel with their
+    derivation*), and CLAUDE.md R1 (*do not assert what you have not
+    run*). What was implicit across those four is now an explicit
+    **no-memory-authority boundary**.
+
+    > *ENFORCEMENT: manual operational control, effective immediately.*
+    > *MACHINE HOOK: where technically feasible, a consequential
+    > repository or programme claim carries source identity and current
+    > subject, and emission is refused when the required source lookup
+    > has not occurred.*
+    > *OWNER/STAGE: evidence-plane tooling. NOT to be implemented during
+    > the H2 hold.*
 23. **Historical corrections are append-only.** Do not erase mistakes
     that taught us something.
 
@@ -613,6 +668,7 @@ Proactive engineering is not autonomous scope expansion.
 | 11, 12 | `core-tests.yml` starts a model on every push; the first detector counted docstrings as execution |
 | 13, 14 | 100+ findings for 1 real defect; 69 findings against a correct tree |
 | 15, 16 | a stub that could not reproduce the hostile property it was testing |
+| 46 | **the D359 incident.** Six specific absence claims were produced about D359 without opening it — *Item 8 inside the 048 path · `A-4_PROVENANCE` distinct from `A4_SELF_DIAGNOSIS` · Assurance Integration · repository consolidation · Evidence Plane last · the explicit Dainius House Exit Ruling*. **All six were false; every one was already in D359.** A second producer accepted the summary and designed a governance remedy on the false premise. Only operator scrutiny forced primary-source inspection, which disproved it before any repository mutation. The enumerated negative was written in a message about durability discipline, one paragraph after quoting the rule it broke (D371) |
 | 15, 44 (and R1) | **PRODUCED ≠ USABLE ≠ VERIFIED.** A sidecar's `.sha256` file carried two CORRECT digests and was reported as "hash-bound" — but it had been hand-formatted with three spaces where `sha256sum` requires two, so `sha256sum -c` could not parse it at all. The digests were right; the verification artefact did not work, and the consumer command had never been run before the property was reported. Existing controls, not a new law: R1 forbids asserting what has not been run; rule 15 asks a control to demonstrate it can fail; rule 44 separates a written control from an enforced one (D370 errata C5) |
 | 17 | P1 run 5 again: 67 assertions on the parts, none on the shipped entry point |
 | 18 | a string replacement whose anchor no longer matched, applied without an assertion, silently doing nothing |

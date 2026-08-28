@@ -32897,3 +32897,154 @@ rule 15 (a control must demonstrate it can fail) and rule 44
 doctrine's earned table against those three. **No rule 46.**
 
 No D-number consumed. No candidate, contract, package or holdout change.
+
+---
+
+## D371 — 2026-08-28 — Memory is a locator, never evidence. GOVERNANCE ONLY
+
+**Authority.** Dainius directed that the recurring *"I did it from
+memory"* failure be stopped at engineering-rule level; Kai specified the
+semantics and the scope. **D-number reserved through the allocator by
+inspection, not recollection**: branch 370, `main` 164, zero collisions
+on D371.
+
+**This decision:** amends no frozen contract · changes no candidate,
+package or holdout · **does not touch D359 or the programme sequence** ·
+grants no H2 repair or HOUSE_H3 authority · implements no tooling.
+
+### 1. The failure it closes, in full
+
+```
+Orion memory
+  -> six specific ABSENCE claims about D359, none verified
+  -> Kai accepts the summary without opening D359
+  -> governance remedy designed on the false premise
+  -> Dainius scrutiny forces primary-source inspection
+  -> ALL SIX NEGATIVES DISPROVED — every one was already in D359
+```
+
+I stated that D359 lacked: Item 8 sitting inside the 048 closure path ·
+`A-4_PROVENANCE` as distinct from `A4_SELF_DIAGNOSIS` · Assurance
+Integration · repository consolidation · Evidence Plane last · the
+explicit **DAINIUS HOUSE EXIT RULING**. **All six were present.** D359
+carries the 048 sub-sequence verbatim — *Phase B resolution/authority →
+sentinel retirement where applicable → exact-tree review → separate
+`ITEM8_GO` → six subject builds under explicit Dainius authority →
+FORMAL KAI-GATE-048 CLOSURE* — and states `A4_SELF_DIAGNOSIS` "is NOT
+interchangeable with `A-4_PROVENANCE`".
+
+I produced an **enumerated negative** — the claim class rule 33 names as
+mandatory-card — with **no query, no search universe and no card**, in a
+message *about durability discipline*, one paragraph after quoting
+*"recorded, banked and documented are verifiable state claims."*
+
+**It nearly caused a repository change.** Had it executed, the append
+would have restated an order D359 explicitly instructs derived material
+**not** to restate, manufacturing the very drift its subordination
+architecture prevents.
+
+### 2. What was banked
+
+**Doctrine rule 46 — MEMORY IS A LOCATOR, NEVER EVIDENCE.** Placed in
+*Evidence identity*, immediately after rule 4, which it generalises.
+
+> A remembered fact may tell you **where to look**. It may never
+> establish **what is true**.
+
+Any source-dependent claim — engineering, repository, governance,
+programme-state, runtime, evidence, decision, sequence, existence,
+absence, identity, count, status or historical content — is **re-earned
+from the authoritative source at the moment it is relied upon**.
+
+* **PRIMARY SOURCE BEFORE SYNTHESIS** — no remedy, decision, scope
+  change, repository change or challenge to another producer may be
+  designed from a *remembered description* of what an artefact contains
+  or lacks;
+* **positive and negative equally bound** — absence additionally needs a
+  bounded search sufficient to earn it;
+* **NO CASCADED MEMORY AUTHORITY** — one producer's unverified
+  recollection cannot become another's verified premise, **in every
+  direction, including toward the adjudicating authority**;
+* source unretrievable or subject unestablished ⇒ `UNVERIFIED` /
+  `STATE RECOVERY INCOMPLETE` / the governing abstention. **Never fill
+  the gap from memory**;
+* current claims require current evidence.
+
+**`CLAUDE.md` R16** — the in-flight form, with three R0 stop-signal
+tells: *"I remember / from memory / as I recall"* · an uncited sentence
+about what a named artefact contains or lacks · designing a remedy from
+**someone else's** description of a file.
+
+### 3. Relationship to existing controls — generalisation, not duplication
+
+| existing control | scope it already had |
+|---|---|
+| doctrine §0.0 | every claim re-earned when relied upon |
+| rule 4 | ids, SHAs, artefacts, subjects — *lookup, verify, use* |
+| rule 33 | derived and negative claims travel with derivation |
+| `CLAUDE.md` R1 | do not assert what you have not run |
+
+Rule 46 makes explicit what was implicit across all four: an unqualified
+**no-memory-authority boundary** covering artefact *content*, not only
+identifiers, actions and figures. The D359 incident proves the narrower
+wordings were still readable as not covering *"what does that file
+say"*.
+
+### 4. Enforcement
+
+**`ENFORCEMENT STATUS`: manual operational control, effective
+immediately.**
+
+**`FUTURE MACHINE HOOK`:** where technically feasible, a consequential
+repository or programme claim carries source identity and current
+subject, and emission is refused when the required source lookup has not
+occurred.
+
+**`OWNER/STAGE`:** evidence-plane tooling. **Not to be implemented during
+the H2 hold.** By rule 44, rule 46 is **`RULE_BANKED`, not
+`CONTROL_OPERATIONALISED`.**
+
+### 5. A note on the placement, since it was nearly wrong
+
+R16 was first inserted mid-way through R15, orphaning R15's closing text
+and its provenance block beneath the new heading. Caught by checking the
+resulting structure rather than assuming the edit landed cleanly, and
+relocated before commit. Recorded because it is the same discipline: the
+edit was *made*, which is not the same as the edit being *correct*.
+
+---
+
+### THREAD RECOVERY BLOCK
+
+* **HEAD** — this entry, on `claude/project-rework-plan-pgvp35`
+* **SCOPE** — governance only: `kai-pm/ENGINEERING_DOCTRINE.md`,
+  `CLAUDE.md`, `kai-pm/DECISIONS.md` (append). **No instrument,
+  contract, candidate, package or holdout byte changed. D359 untouched**
+* **NEW IDENTIFIERS** — doctrine **rule 46** · `CLAUDE.md` **R16** ·
+  three new R0 tells · one earned-table row
+* **PROGRAMME ORDER** — **unchanged and canonical in D359**, which
+  remains the sole source until superseded by a later D-numbered
+  decision. D371 does not supersede it and does not restate it
+* **D368 CANDIDATE** — `9d787706…`, aggregate `ba2b16d4…de4a`, **NOT
+  FROZEN, NOT ADMITTED**
+* **D367 CONTRACT** — `0ce5792e…00bb`, **unamended**
+* **HOLDOUT** — 40 rows, **not regenerated**. Kai continues the frozen
+  40 × six-axis adjudication
+* **DOCTRINE STATE** — rules 1–46. **33–46 `RULE_BANKED`; none
+  `CONTROL_OPERATIONALISED`**
+* **AUTHORISED NEXT ACTION** — **NONE. HOLD.**
+* **EXPLICITLY NOT AUTHORISED** — H2 repair · candidate/contract/package/
+  holdout modification · building any hook in rules 33–46 · H3 design or
+  requirement authorship · programme-sequence change · reopening
+  D364/D365 · `HOUSE_H3`–`H6` · freezing or admitting D368 · Census
+  successor or modification · KAI-GATE-048 · Phase B · `ITEM8_GO` ·
+  Stage 2 · `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · document/register
+  repair · Kingsman implementation
+* **CORRECTIONS TO PRIOR RECORDS** — my claim that D359 lacked six named
+  items is **withdrawn as false**; all six are present. Kai's proposed
+  D359 durability append and his *"under Dainius's authority"* framing
+  for it are both **withdrawn** and were never executed
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D371
+  Orion. **Next free: D372 — NOT TO BE TAKEN without authorisation**
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

@@ -37,6 +37,9 @@ check before continuing.
 | I am writing "independent" | name the authority behind each leg. Same authority, different method = cross-method convergence |
 | I am about to write `UNRESOLVED` | is the **source** unclear, or is my **evidence** insufficient? Only the first is ambiguity |
 | Something registers as wrong and I am writing it down rather than checking it | R15 — a worry beside the deliverable is insurance, not action. The sentence I am writing IS the instruction to check |
+| "I remember…", "from memory…", "as I recall…" | R16 — STOP. Open the authoritative source before continuing |
+| I am about to say what a named artefact **contains or lacks**, and I have not opened it | R16 — memory locates, it never establishes. Open it |
+| I am designing a remedy from **someone else's** description of a file | R16 — no cascaded memory authority. Their recollection is not my premise |
 | "worth noting", "deserves suspicion", "I would flag" — and then I continue | R15 — stop there and look. Clean costs minutes; not looking costs someone else, later and larger |
 
 **The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
@@ -423,6 +426,48 @@ need it in while working.
 > not merely personal. Recorded rather than self-adopted, because a rule
 > that widens my own latitude must not enter the binding layer on my own
 > authority.
+
+## R16. Memory is a locator, never evidence. Directed by Dainius, 2026-08-28
+
+**A remembered fact tells me where to look. It never tells me what is
+true.** Before asserting anything source-dependent — what a file
+contains or lacks, a decision, a sequence, a count, an identity, a
+status, an existence or an absence — **open the authoritative source**.
+
+**PRIMARY SOURCE BEFORE SYNTHESIS.** No remedy, decision, scope change,
+repository change or challenge to another producer may be built on a
+*remembered description* of an artefact. Open it first.
+
+**Positive and negative are equally bound.** *"It contains X"* needs
+inspection. *"It does not contain X"* needs inspection **plus a bounded
+search** big enough to earn the negative.
+
+**No cascaded memory authority.** Someone else's unverified recollection
+is not my verified premise — and mine is not theirs. This binds in every
+direction, including toward the adjudicating authority.
+
+If the source cannot be retrieved or the subject cannot be established:
+`UNVERIFIED` / `STATE RECOVERY INCOMPLETE` / the governing abstention.
+**Never fill the gap from memory.**
+
+Earned 2026-08-28, the D359 incident. I stated six specific things were
+absent from D359 — Item 8 inside the 048 path, `A-4_PROVENANCE` distinct
+from `A4_SELF_DIAGNOSIS`, Assurance Integration, repository
+consolidation, Evidence Plane last, and the Dainius House Exit Ruling.
+**All six were already in D359. I never opened it.** Kai accepted the
+summary and designed a governance remedy on the false premise; only
+Dainius's scrutiny forced the file open.
+
+I wrote that enumerated negative in a message *about durability
+discipline*, one paragraph after quoting *"recorded, banked and
+documented are verifiable state claims."*
+
+**The tell:** an uncited sentence about what a named artefact contains
+or lacks. That sentence is the instruction to open it.
+
+> **Provenance:** directed by Dainius on 2026-08-28 and banked under
+> doctrine rule 46, which states the producer-independent form. Recorded
+> rather than self-adopted.
 
 The full doctrine this serves, its standing rules and the specific
 failure that earned each one, is in `kai-pm/ENGINEERING_DOCTRINE.md`.
