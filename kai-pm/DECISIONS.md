@@ -32703,3 +32703,139 @@ non-authoritative).
   Orion. **Next free: D371 — NOT TO BE TAKEN without authorisation**
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D370 CORRECTION / ERRATA — 2026-08-28 — three defects in D370's own record
+
+**Not a new decision. No D-number consumed. D370 remains banked and its
+rules stand.** Appended under Dainius's authority on Kai's ruling, after
+he independently verified D370 at commit
+`e52bff87d7041bd6fadf22ad1d7c6cd017e65b0f`, tree
+`f8f27aedee0bb1f6cdbf2233dfe9f8e26c0fd020`. **Historical text is not
+rewritten** — corrections are append-only.
+
+The scrutiny found three defects in the governance entry that was written
+to prevent defects. That is uncomfortable and it is the process working.
+
+### C1 — D370 BROKE RULE 33, INSIDE THE ENTRY THAT STRENGTHENED RULE 33
+
+D370 cited *"42 of 240 cells non-abstention, 38 of 42 sharing one routing
+signature, 20 document families, 6 routing signatures"* as the earned
+evidence for rule 43. **The full `DERIVED_CLAIM` card for those figures
+existed only in a chat message.** Chat is not repository canon, and rule
+33 was already banked before D370 was written.
+
+So a consequential derived number entered an authoritative decision while
+its derivation lived somewhere the record could not reach — precisely
+what rule 33 exists to stop.
+
+**Remedied by a durable, hash-bound evidence sidecar**, not another
+summary:
+
+| artefact | sha256 |
+|---|---|
+| `kai-pm/d368_holdout_coverage_card.py` | `91d19a30d48338e586e0b6e102335135983dc905d91c6dd6b08d48aaaee3d1f7` |
+| `kai-pm/d368_holdout_coverage_card.json` | `5e903fb02f893073a858bfb3c2932bc597175cbc1d664d9294443cf86cf23774` |
+
+The card carries claim, subject commit and tree, source artefact **and
+its sha256**, candidate aggregate, instrument **and its sha256**, exact
+query, denominator, unit, raw result, derived result, interpretation,
+five limitations, independence status and the exact rerun command.
+
+**All four cited figures reproduce exactly** from the frozen holdout: 42
+of 240 · 6 routing signatures · 20 families · 38 of 42 sharing
+`DATE_STAMP/reviewed`. No new interpretation was added while remedying
+this.
+
+The card also states two limitations D370 did not: the **document-family
+key is a filename heuristic**, a cruder construction than the routing
+signature and carrying the same rule 37 caveat; and axes with zero
+non-abstention cells are **not untestable**, since over-abstention
+remains adjudicable from source.
+
+### C2 — ~~a lexical survey confirmed rules 41, 43 and 44 were genuinely new~~
+
+**Withdrawn.** D370 wrote that zero occurrences of `coverage`, `baseline`
+and `operationalis` *"confirmed"* novelty. **A keyword search proves the
+absence of those strings, not the absence of those concepts.**
+
+That is rule 37 — *a query proves what it actually matches* — breached in
+the entry that extended rule 37, one paragraph from where the routing
+signature correction was recorded.
+
+**Corrected record:** a lexical survey found zero direct terminology
+matches; **semantic deduplication was performed separately** against the
+existing rules, and that is what produced the NEW/AMENDMENT
+classification. The classification itself stands; the *proof offered for
+it* did not.
+
+### C3 — rule 42's future machine hook is withdrawn and narrowed
+
+D370's hook read: *consumer contracts hash-bound to a commit predating
+the producer artefact they govern.*
+
+**Too strong, and wrong for the actual situation.** H2 already exists and
+no H3 consumer contract does, so that formulation makes a legitimate H3
+contract **impossible by chronology**. What must predate exposure to the
+producer output is **the need**, not the document that states it.
+
+**Narrowed hook, now in the doctrine:** every consequential consumer
+requirement traces to a governing need, problem or evidence source that
+predates exposure to the producer output; a contract authored later
+declares its authorship and contamination status and may not be shaped
+solely by the exposed builder.
+
+**Rule 42's principle is unchanged, and this authorises no H3 requirement
+now.**
+
+### C4 — a shorthand correction
+
+My closing summary said *"rules 1–45, all `RULE_BANKED`, none
+operationalised."* **Withdrawn.** The authoritative D370 text is correct
+and narrower: **rules 33–45 are `RULE_BANKED`; none is
+`CONTROL_OPERATIONALISED`.** Earlier doctrine does contain existing
+enforcement mechanisms, and that statement must not be widened to rules
+1–32.
+
+### What this errata does not do
+
+No new programme semantics. No D-number. No change to D367, D368, the
+candidate, the package or the holdout. No repair, admission or H3
+authority. `CLAUDE.md` was checked and repeats neither withdrawn claim,
+so it is untouched.
+
+---
+
+### THREAD RECOVERY BLOCK
+
+* **HEAD** — this errata, on `claude/project-rework-plan-pgvp35`
+* **D370** — remains **banked**; rules 41–45 and the amendments to 33 and
+  37 stand. Three record defects corrected append-only above
+* **SCOPE** — `kai-pm/DECISIONS.md`, `kai-pm/ENGINEERING_DOCTRINE.md`
+  (rule 42 hook wording only), plus the new hash-bound evidence sidecar.
+  **No instrument, contract, candidate, package or holdout byte changed**
+* **D368 CANDIDATE** — `9d787706…`, aggregate `ba2b16d4…de4a`, **NOT
+  FROZEN, NOT ADMITTED**
+* **D367 CONTRACT** — `0ce5792e…00bb`, **unamended**
+* **HOLDOUT** — 40 rows, **not regenerated**. Kai continues the frozen
+  40 × six-axis adjudication
+* **DOCTRINE STATE** — rules 1–45. **Rules 33–45 are `RULE_BANKED`; none
+  is `CONTROL_OPERATIONALISED`.** No claim is made about 1–32
+* **AUTHORISED NEXT ACTION** — **NONE. HOLD.**
+* **EXPLICITLY NOT AUTHORISED** — H2 repair · candidate/contract/package/
+  holdout modification · building any hook in rules 33–45 · H3 design or
+  requirement authorship · reopening D364/D365 · `HOUSE_H3`–`H6` ·
+  freezing or admitting D368 · Census successor or modification ·
+  KAI-GATE-048 · Phase B · `ITEM8_GO` · Stage 2 · `A-4_PROVENANCE` ·
+  `A4_SELF_DIAGNOSIS` · document/register repair · Kingsman
+  implementation
+* **CORRECTIONS TO PRIOR RECORDS** — C1 remedies D370's rule-33 breach
+  by sidecar · C2 withdraws "confirmed" from the lexical survey · C3
+  withdraws and narrows rule 42's machine hook · C4 withdraws the
+  "rules 1–45" shorthand
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D370
+  Orion. **Next free: D371 — NOT TO BE TAKEN.** This errata consumed
+  none
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7).

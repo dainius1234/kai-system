@@ -343,8 +343,16 @@ Proactive engineering is not autonomous scope expansion.
     instrument instead of governing it.
 
     > *ENFORCEMENT: manual now -- authorship separation and blind drafting.*
-    > *MACHINE HOOK: consumer contracts hash-bound to a commit predating
-    > the producer artefact they govern.*
+    > *MACHINE HOOK (NARROWED, D370 CORRECTION): every consequential
+    > consumer requirement traces to a governing need, problem or
+    > evidence source that PREDATES EXPOSURE TO THE PRODUCER OUTPUT. A
+    > contract authored later declares its authorship and contamination
+    > status and may not be shaped solely by the exposed builder. The
+    > original wording -- "hash-bound to a commit predating the producer
+    > artefact" -- was withdrawn: it would make a legitimate H3 contract
+    > impossible by chronology, since H2 already exists. What must
+    > predate the producer output is THE NEED, not the document that
+    > states it.*
     > *OWNER/STAGE: contract format.*
 
 43. **Coverage is reported by DETECTION CAPABILITY, not by sample

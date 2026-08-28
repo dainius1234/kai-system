@@ -1,0 +1,89 @@
+{
+ "DERIVED_CLAIM": {
+  "claim": "coverage profile of the frozen D368 40-row holdout: non-abstention cells, distinct routing signatures per axis, and which axes carry a false-positive detection opportunity",
+  "claim_class": "coverage / structural",
+  "producer": "Orion",
+  "subject_commit": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+  "subject_tree": "3abc9e9d8ca11966a6f996d5f0af68072ee5b117",
+  "source_artefact": "kai-pm/house_in_order_h2_v12/h2v12-holdout.json",
+  "source_artefact_sha256": "26168dbb589aec7f8cf5dcaa990a0df2a516463c9b8d0af9bcc35d84f0362046",
+  "candidate_aggregate": "ba2b16d400aafd2b694890149bbaae1d1369d3771c25ce809d2f752d5248de4a",
+  "instrument": "kai-pm/d368_holdout_coverage_card.py",
+  "instrument_sha256": "91d19a30d48338e586e0b6e102335135983dc905d91c6dd6b08d48aaaee3d1f7",
+  "query_or_command": "per-cell key = witness_type + '/' + leading `Label:` of the witness local_context + '->' + emitted value; abstentions (UNKNOWN, UNMEASURED) excluded; counted over 6 axes x 40 rows",
+  "denominator_or_search_universe": "240 axis cells (40 rows x 6 axes)",
+  "unit": "CELLS and ROUTING SIGNATURES (not mechanisms, not literal matches)",
+  "raw_result": {
+   "rows": 40,
+   "total_cells": 240,
+   "non_abstention_cells": 42,
+   "distinct_routing_signatures": 6,
+   "distinct_document_families": 20,
+   "largest_routing_signature": "DATE_STAMP/reviewed->TIME_BOUND",
+   "largest_routing_signature_cells": 19,
+   "per_axis": {
+    "LIFECYCLE": {
+     "non_abstention_cells": 2,
+     "distinct_routing_signatures": 2,
+     "largest_signature": "COMMIT/audited snapshot->HISTORICAL",
+     "largest_share": 1,
+     "false_positive_detection_opportunity": true
+    },
+    "FUNCTION": {
+     "non_abstention_cells": 0,
+     "distinct_routing_signatures": 0,
+     "largest_signature": null,
+     "largest_share": 0,
+     "false_positive_detection_opportunity": false
+    },
+    "AUTHORITY": {
+     "non_abstention_cells": 0,
+     "distinct_routing_signatures": 0,
+     "largest_signature": null,
+     "largest_share": 0,
+     "false_positive_detection_opportunity": false
+    },
+    "GENERATION": {
+     "non_abstention_cells": 0,
+     "distinct_routing_signatures": 0,
+     "largest_signature": null,
+     "largest_share": 0,
+     "false_positive_detection_opportunity": false
+    },
+    "VALIDITY": {
+     "non_abstention_cells": 20,
+     "distinct_routing_signatures": 2,
+     "largest_signature": "DATE_STAMP/reviewed->TIME_BOUND",
+     "largest_share": 19,
+     "false_positive_detection_opportunity": true
+    },
+    "SCOPE": {
+     "non_abstention_cells": 20,
+     "distinct_routing_signatures": 2,
+     "largest_signature": "DATE_STAMP/reviewed->WHOLE_FILE",
+     "largest_share": 19,
+     "false_positive_detection_opportunity": true
+    }
+   },
+   "signature_tally": {
+    "DATE_STAMP/reviewed->TIME_BOUND": 19,
+    "DATE_STAMP/reviewed->WHOLE_FILE": 19,
+    "COMMIT/audited snapshot->HISTORICAL": 1,
+    "DATED_ARTEFACT_PATH/(inline)->HISTORICAL": 1,
+    "COMMIT/audited snapshot->EXACT_SNAPSHOT": 1,
+    "COMMIT/audited snapshot->WHOLE_FILE": 1
+   }
+  },
+  "derived_result": "42 of 240 cells non-abstention; 38 of 42 share the DATE_STAMP/reviewed signature across two axes; 3 of 6 axes carry NO false-positive detection opportunity in this sample",
+  "interpretation": "the sample's capacity to expose an INCORRECT NON-ABSTENTION VERDICT is confined to the axes with non-abstention cells",
+  "limitations": [
+   "the routing signature is the PRODUCER'S CONSTRUCTION, not an adjudicated causal equivalence class (rule 37). Rows sharing a key travelled the same classifier path; nothing here shows one cause produced them",
+   "'document family' is a cruder construction still \u2014 a filename heuristic \u2014 and carries the same caveat",
+   "axes with zero non-abstention cells are NOT untestable: OVER-ABSTENTION on them remains adjudicable from source",
+   "says nothing about whether any verdict is correct",
+   "no effective sample size is computed; there is no statistical model to support one"
+  ],
+  "independence_status": "SINGLE-PRODUCER REPRODUCIBLE EVIDENCE. Not independent corroboration. Under rule 33 as amended, this claim does not itself determine admission, closure, authority or irreversible scope, so an independent leg is not mandatory",
+  "rerun": "python3 kai-pm/d368_holdout_coverage_card.py --holdout kai-pm/house_in_order_h2_v12/h2v12-holdout.json"
+ }
+}
