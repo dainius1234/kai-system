@@ -32865,3 +32865,35 @@ the relay to Kai remain accurate; only the file expressing them was
 repaired. Verified after the fix: both entries report `OK`.
 
 No claim in C1–C4 is affected. No D-number consumed.
+
+### C6 — an evidence-boundary correction to my reporting
+
+Appended 2026-08-28 on Kai's ruling, after he verified C5 remotely.
+
+C5 is **source-confirmed** by Kai from the remote branch: HEAD
+`f0289ba1f79c7069a52e7e10e8620206921b4e7b`, tree
+`5326d511dc4ac9010d83d2eefcf7591d8e3a1f22`, parent errata
+`a66cb40421ee74beac4fa7ccf9d6ab17ca4d72ec`.
+
+**But not everything I reported alongside it is remotely verifiable, and
+I presented them together without distinction.**
+
+| statement | who can verify it |
+|---|---|
+| commit sha, tree sha, pushed diff, file contents | **Kai, independently, from the remote** |
+| checksum values and whether `sha256sum -c` passes | **Kai, from the pushed artefacts** |
+| *"branch clean"*, *"local == origin"* | **ORION MACHINE EVIDENCE ONLY** — not observable through the remote |
+
+Going forward I will label the third row as machine evidence rather than
+listing it among facts Kai can check. This is rule 39's discipline —
+*name the authority behind every claim* — applied to routine status
+reporting rather than only to the word "independent".
+
+**C5's lesson is banked as an earned example, not a new rule**, per Kai's
+instruction: it belongs to R1 (do not assert what has not been run),
+rule 15 (a control must demonstrate it can fail) and rule 44
+(`RULE_BANKED` ≠ `CONTROL_OPERATIONALISED`). The compressed form is
+**PRODUCED ≠ USABLE ≠ VERIFIED**, and it is recorded in the
+doctrine's earned table against those three. **No rule 46.**
+
+No D-number consumed. No candidate, contract, package or holdout change.

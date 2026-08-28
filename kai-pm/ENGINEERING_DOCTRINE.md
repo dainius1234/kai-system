@@ -613,6 +613,7 @@ Proactive engineering is not autonomous scope expansion.
 | 11, 12 | `core-tests.yml` starts a model on every push; the first detector counted docstrings as execution |
 | 13, 14 | 100+ findings for 1 real defect; 69 findings against a correct tree |
 | 15, 16 | a stub that could not reproduce the hostile property it was testing |
+| 15, 44 (and R1) | **PRODUCED ≠ USABLE ≠ VERIFIED.** A sidecar's `.sha256` file carried two CORRECT digests and was reported as "hash-bound" — but it had been hand-formatted with three spaces where `sha256sum` requires two, so `sha256sum -c` could not parse it at all. The digests were right; the verification artefact did not work, and the consumer command had never been run before the property was reported. Existing controls, not a new law: R1 forbids asserting what has not been run; rule 15 asks a control to demonstrate it can fail; rule 44 separates a written control from an enforced one (D370 errata C5) |
 | 17 | P1 run 5 again: 67 assertions on the parts, none on the shipped entry point |
 | 18 | a string replacement whose anchor no longer matched, applied without an assertion, silently doing nothing |
 | 19 | the probe's own denominator line inside `capture.jsonl`, which made the file uncertifiable |
