@@ -1,20 +1,21 @@
 # HOUSE_H2 — CONSOLIDATED REPAIR SPECIFICATION / DESIGN OPTIONS
 
-**REVISION 2 — incorporating Kai Design Review Round 1.**
+**REVISION 3 — incorporating Kai Design Review Rounds 1 and 2.**
 **STATUS: DRAFT FOR REVIEW. NOT AUTHORISED. NO IMPLEMENTATION.**
 
-Revision 1 (commit `3782662`) proposed mechanisms. Kai reviewed it and
-issued fourteen rulings. This revision marks every mechanism
-`ACCEPTED` / `ACCEPTED WITH KAI MODIFICATION` / `REJECTED — SUPERSEDED`,
-incorporates the two-stage identity architecture, and records one
-source-confirmed finding that arose while implementing Kai's correction.
+Revision 1 (`3782662`) proposed mechanisms. Revision 2 (`27e4e48`)
+applied Kai's fourteen Round-1 rulings and reported the selection-
+integrity finding. Kai independently verified that finding and issued
+Round 2. This revision formalises `I1-A`/`I1-B`, closes the Stage A
+membership rule, relabels the historical holdout throughout, and makes
+`D13` deterministic enough to implement.
 
 This document still decides nothing. No repair, fixture mutation,
 candidate generation or change to the H2 package has been made.
 
 | | |
 |---|---|
-| repository state at authorship | `3782662` + this revision, worktree otherwise clean |
+| repository state at authorship | `27e4e48` + this revision, worktree otherwise clean |
 | candidate under repair | HOUSE_H2 v1.2, aggregate `ba2b16d4…de4a` — **UNMODIFIED** |
 | subject | `d8aac4d49e6ba997e3eb38062c0917186ee3f197`, tree `3abc9e9d…b117`, 272 documents |
 | governing contract | `kai-pm/H2_REPAIR_CONTRACT_D367.md`, sha256 `0ce5792e…00bb`, 389 lines |
@@ -44,7 +45,7 @@ comparison only.
 
 ---
 
-## 0.1 DISPOSITION SUMMARY — Kai Design Review Round 1
+## 0.1 DISPOSITION SUMMARY — Kai Design Review Rounds 1 and 2
 
 | obligation | rev-1 recommendation | disposition |
 |---|---|---|
@@ -59,8 +60,14 @@ comparison only.
 | `D13-res` | A9-i clause scope | **ACCEPTED WITH KAI MODIFICATION** — conservative, abstain on complex prose |
 | `Q1b` | B1-i derive the population | **ACCEPTED WITH ONE CONDITION** — derive, never hard-code |
 | `Q1a` | B2-i single manifest | **REJECTED — SUPERSEDED** by two-stage identity |
-| `I1` | B3-i "one identity, one moment" | **REJECTED — SUPERSEDED** by two-stage identity |
+| `I1` | B3-i "one identity, one moment" | **REJECTED — SUPERSEDED**; now a **DEMONSTRATED CURRENT BLOCKER** carrying `I1-A` + `I1-B` |
 | `F6` | open question | **DECIDED BY KAI** — presentation, `context_excerpt` |
+
+**Round 2 additions:** `I1` split into `I1-A` (identity output-free) and
+`I1-B` (universe from the frozen tree), both inside the existing row ·
+Stage A given a **closed membership rule** with enumerated exclusions ·
+the historical 40 **relabelled as regression evidence** (§0.3) · `D13`
+given an **executable decision procedure** (A9).
 
 ---
 
@@ -114,30 +121,81 @@ rows, not from the subject tree. A candidate that emitted a different
 set of paths would draw its 40 from a different population, independently
 of the aggregate.
 
-**SCOPE OF THIS CLAIM (R17).** I measured the manifest membership, the
-aggregate equality, and the selection universe expression. I have **NOT**
-established that this was ever exploited, that the adjudicated 40 are
-wrong, or that any verdict is affected. The 240-cell result
-(208 CLEAN / 20 BLOCKER / 12 OVER_ABSTENTION / 0 UNRESOLVED) stands
-unchallenged by this finding.
+**THE TWO COUPLINGS ARE NOT IN THE SAME STATE. MEASURED.**
 
-**WHAT I DELIBERATELY DID NOT MEASURE, AND WHY.** I could size the impact
-by computing which 40 a code-only aggregate would select and diffing it
-against the adjudicated 40. **I did not, and I recommend against it.**
-Doing so would reveal a *second* set of 40 documents. Under §9,
-previously revealed rows become regression evidence only — so
-pre-emptively revealing another 40 would permanently shrink the pool of
-unrevealed documents available to the final blind holdout. That is a
-contamination cost paid to satisfy curiosity about a defect we have
-already confirmed structurally. **Kai's decision, not mine.**
+| | `I1-A` aggregate | `I1-B` universe |
+|---|---|---|
+| defective by construction | **YES** | **YES** |
+| currently *realised* | **YES** — the aggregate genuinely is a function of classification output | **NO divergence today** |
+| evidence | `h2v12-classification.json` is inside `MANIFEST.sha256`; its sha256 **is** `ba2b16d4…de4a` | frozen tree 272 tracked `.md` vs candidate output 272 paths — **tree-only 0, output-only 0, reconciles exactly** |
+| fail-old control | available from the artefacts | **requires a synthetic** — a candidate that drops, adds or duplicates a row |
+
+`I1-B` is a latent defect: nothing *enforces* the universe, and today it
+happens to be right. That distinction is why its control must be
+synthetic, and why it would be easy to declare it fixed without testing
+it.
+
+**SCOPE OF THIS CLAIM (R17).** I measured the manifest membership, the
+aggregate equality, the selection universe expression, and the
+tree-vs-output reconciliation. I have **NOT** established that this was
+ever exploited, that the adjudicated 40 are wrong, or that any verdict is
+affected. The 240-cell result
+(208 CORRECT / 20 BLOCKER / 12 OVER_ABSTENTION / 0 UNRESOLVED) stands
+unchallenged by this finding — see §0.3 for its status.
+
+**NOT MEASURED, BY RULING.** Sizing the impact would mean computing which
+40 a code-only aggregate would select and diffing it against the
+adjudicated 40. I recommended against it; **Kai Round 2 §3 accepted that
+recommendation and made it binding.** It would reveal a *second* set of
+40, and under §9 revealed rows become regression evidence only — so it
+would permanently shrink the pool available to the **new blind 40**,
+without changing any repair decision. **Not computed. Not to be
+computed.**
 
 **EFFECT ON THE MATRIX: NONE. NO NEW D-NUMBER. NO NEW ROW.**
-`I1` is already the obligation covering blind precommit identity. What
-changes is its characterisation: `I1` is not *"the identity excludes the
-evidence"*. It is **"the identity includes evidence it must not include,
-and excludes evidence it must include."** Kai's two-stage architecture
-repairs both halves; it now has a confirmed defect to point at rather
-than a hypothetical one to avoid.
+`I1` is already the obligation covering blind precommit identity. Kai
+Round 2 §4 strengthens its characterisation to **DEMONSTRATED CURRENT
+SELECTION-INTEGRITY BLOCKER** — not future packaging work. The current
+candidate cannot earn admission from its historical 40.
+
+---
+
+# SECTION 0.3 — STATUS OF THE HISTORICAL 40 (Kai Round 2 §2, §11)
+
+**The adjudication is NOT discarded and the findings do not disappear.**
+
+```
+208 CORRECT · 20 BLOCKER · 12 OVER_ABSTENTION · 0 UNRESOLVED
+```
+
+**PERMANENT QUALIFIER, to travel with these figures wherever they are
+cited:**
+
+> *Adjudicated under a holdout-selection mechanism later shown not to
+> satisfy the intended D367 §9 independence property. Retained as
+> reviewed regression evidence. NOT final blind admission evidence.*
+
+**WHAT THIS DOES NOT MEAN (Kai Round 2 §11, exact language).** It does
+not mean their adjudications are false, the arithmetic is wrong, the
+sample was manipulated, or the findings disappear. It means **the
+sampling mechanism did not establish the independence we intended it to
+establish.**
+
+**BINDING TERMINOLOGY.** This set is never again called *the final
+holdout* or *the final blind holdout*. It is **the historical 40** or
+**reviewed regression evidence**. A repaired candidate requires a **new
+blind 40 under corrected Stage A**.
+
+**NO ALTERNATIVE-40 CALCULATION (Kai Round 2 §3).** We already hold
+structural proof of the defect. Computing which 40 a corrected
+historical aggregate would have selected would reveal another sample and
+consume unrevealed material without changing any repair decision. The
+unrevealed pool is preserved. **Not computed. Not to be computed.**
+
+**FLAGGED, NOT EDITED.** `kai-pm/DECISIONS.md` carries 1 line using the
+superseded labelling. That file is **append-only** — a correction is a
+new entry, which requires a D-number, which is not authorised. Raised
+here for Kai and Dainius to dispose of; I have not touched it.
 
 ---
 
@@ -585,15 +643,91 @@ prose sentence into POSITIVE/NEGATIVE.** Rev-1 flagged the contrastive
 risk but still proposed a mechanism that would classify everything. The
 amendment is that *declining to classify* is a legitimate output.
 
-**MECHANISM — conservative deterministic semantics.**
+**MECHANISM — DETERMINISTIC DECISION PROCEDURE (Kai Round 2 §10).**
 
-| form | disposition |
-|---|---|
-| explicit attached negation (`non-authoritative`) | polarity earned |
-| explicit simple same-clause negation | polarity earned |
-| explicit controlled-field declaration | polarity earned |
-| genuine simple positive declaration | polarity earned |
-| **contrastive / structurally complex / semantically unresolved prose** | **`UNKNOWN` / unresolved — never guessed** |
+Descriptive phrases such as *"simple same-clause negation"* are replaced
+by an ordered, mechanically decidable rule. Evaluated **in order**;
+first match wins; **the default is abstention, not a polarity.**
+
+```
+INPUT   one sentence S containing an AUTH_TERM match at offset a
+CLAUSE  C = the maximal span around a bounded by  . ; : — |  ( )  and
+            by the sentence boundaries. Clause segmentation is the ONLY
+            structural analysis performed. No parsing, no NLP.
+
+R1  ATTACHED NEGATION
+    prefix non-/un-/nonauthoritative immediately bound to the term
+        → NEGATIVE
+
+R2  CONTRASTIVE / COORDINATION DISQUALIFIER   ← tested BEFORE any
+                                                negation is honoured
+    C contains a coordinating contrast marker
+        ( but | however | yet | whereas | rather than | although |
+          though | while | instead )
+        → UNRESOLVED.  Never POSITIVE, never NEGATIVE.
+    This single rule disposes of BOTH
+        "not a draft but authoritative"
+        "authoritative but not a draft"
+    without needing to know which side the negation governs — which is
+    exactly the knowledge H2 does not have and is not required to have.
+
+R3  CONTROLLED-FIELD DECLARATION
+    C matches SELF_FIELD (a Status:/Authority: label line)
+        negation present in C → NEGATIVE
+        otherwise             → POSITIVE
+
+R4  SIMPLE SAME-CLAUSE NEGATION
+    a negation token occurs in C, on the same side of every clause
+    delimiter as the AUTH_TERM, with NO intervening subject change
+    marker ( which | that | whose | who | : | — )
+        → NEGATIVE
+    NOTE: distance is not consulted. The 40-character bound is gone;
+    the CLAUSE is the bound, and it is semantic rather than metric.
+
+R5  SIMPLE POSITIVE DECLARATION
+    C contains the AUTH_TERM, no negation token anywhere in C, and no
+    quotation/reported-speech marker
+        → POSITIVE
+
+R6  DEFAULT
+        → UNRESOLVED
+```
+
+**PROPERTIES THIS RULE HAS, STATED SO THEY CAN BE TESTED.**
+
+* **Total and deterministic.** Every sentence reaches exactly one
+  outcome. No fall-through to a guess.
+* **`R2` precedes `R4`.** Contrast is a *disqualifier*, not a tie-break.
+  If it ran after negation detection, the gap-70 repair would create the
+  contrastive false-negative this design exists to avoid.
+* **Symmetric by construction.** `R2` does not care which side the
+  negation sits on, so the two hostile controls below cannot be passed by
+  a rule that has memorised one direction.
+* **`UNRESOLVED` is a first-class output**, not a failure. H2's AUTHORITY
+  verdict is abstention-only regardless.
+* **No unbounded quantifier replaces `{0,40}`.** The clause is the bound.
+
+**WORKED AGAINST THE KNOWN CASES.**
+
+| input | rule | result |
+|---|---|---|
+| `This document is non-authoritative.` | R1 | NEGATIVE |
+| `This document is not authoritative.` | R4 | NEGATIVE |
+| gap-70 separated negation, one clause | R4 | **NEGATIVE** (was POSITIVE) |
+| `not a draft but is authoritative` | R2 | UNRESOLVED |
+| `authoritative but not a draft` | R2 | UNRESOLVED |
+| `**Status:** authoritative` | R3 | POSITIVE |
+| `Do not treat X … as authoritative` | R4 | NEGATIVE — **see below** |
+
+> **DECLARED CONSEQUENCE, NOT HIDDEN.** Under `R4` the three long-gap
+> corpus inputs become `NEGATIVE` rather than `POSITIVE`. Two of them
+> describe *other components* and one is instructional, so a NEGATIVE
+> authority *claim* is arguably no more correct than a POSITIVE one —
+> what should carry them is the **subject binding** (`D12`/`bind_subject`
+> resolving them to `OTHER`), not the polarity axis. I flag this rather
+> than tune `R4` around it: it is precisely the `D12`+`D13` combined
+> regression population Kai requires, and it must be adjudicated on the
+> combined output, not designed around here.
 
 **H2 is not required to solve unrestricted natural-language semantics**
 (Kai §9). The AUTHORITY verdict remains abstention-only at H2 regardless.
@@ -696,53 +830,116 @@ complete, so the sample cannot be known during implementation."* That
 property requires the aggregate to be a function of the **candidate**,
 never of the candidate's **results**.
 
+### `I1` — TWO MANDATORY SUB-PROPERTIES (Kai Round 2 §5)
+
+No new row. `I1` carries both.
+
+> **`I1-A`** — the candidate identity used for blind selection must
+> contain **no execution-produced artefact**.
+>
+> **`I1-B`** — the holdout selection universe must come from the
+> **immutable frozen subject tree**, never from candidate output rows.
+
 ### MECHANISM — TWO-STAGE BINDING (Kai §1, REQUIRED)
 
+#### STAGE A — CANDIDATE PRECOMMIT IDENTITY · frozen FIRST · **CLOSED MEMBERSHIP RULE**
+
+Kai Round 2 §6: a **closed construction rule**, not a category
+description. **No `etc.` in the executable manifest.**
+
+**ADMISSION RULE.** A file may enter Stage A **only if its bytes exist
+independently of executing the candidate.** Membership is enumerated and
+each member is mechanically proved static/pre-execution.
+
+**STAGE A MEMBERS — derived from the package by origin, not listed from
+memory:**
+
+| member | class |
+|---|---|
+| `passa.py` `classify.py` `subjectbind.py` `ontology.py` `envelope.py` `run_h2_v12.py` `qualify.py` `cal_fixtures.py` | candidate source modules |
+| `holdout.py` | holdout-selection code |
+| `RUN.md` | governed static package document |
+| `H2_REPAIR_CONTRACT_D367.md` sha256 `0ce5792e…00bb` | frozen repair/admission contract |
+| subject commit `d8aac4d4…f197` + tree `3abc9e9d…b117` | subject identity |
+| history-source identity | resolution authority for `D2` |
+| `TREE_PATHS_IDENTITY` (below) | tree-derived document population |
+| governed static dependency identities | interpreter/library pins as applicable |
+
+**STAGE A EXCLUSIONS — enumerated, not implied:**
+`passA.json` · `h2v12-classification.json` · `h2v12-holdout.json` ·
+qualification output · logs · generated evidence · **any artefact whose
+bytes result from running the candidate.**
+
+**`MANIFEST.sha256` CANNOT SERVE AS STAGE A IN ITS CURRENT FORM** — it
+already contains `h2v12-classification.json`. **`PACKAGE.sha256` cannot
+either**; it additionally contains `passA.json` and `h2v12-holdout.json`.
+Both remain valid **only** as post-execution package/evidence bundle
+identities (Kai Round 2 §8). Stage A is a **new, separately constructed
+manifest**.
+
+#### `I1-B` — THE SELECTION UNIVERSE
+
 ```
-STAGE A — CANDIDATE PRECOMMIT IDENTITY          frozen FIRST
-    code · candidate modules · governed static inputs ·
-    contract / manifest dependencies
-    → THIS is the identity D367 §9 uses to derive the blind 40
-    → contains NO artefact produced by executing the candidate
+tree_paths = exact tracked .md population of the frozen subject tree
+selection  = select(sorted(tree_paths), stage_a_identity)
+assert candidate output paths reconcile EXACTLY against tree_paths
+```
 
-STAGE B — EVIDENCE BUNDLE IDENTITY              frozen AFTER execution
-    exact Pass A output · exact classification output ·
-    selected holdout identity/list ·
-    consequential evidence artefacts · qualification output
+**A candidate cannot move its own holdout by omitting a row, adding a
+row, duplicating a row, or changing its path set.**
 
-ADMISSION RECORD                                binds both
-    candidate_precommit_identity
-    evidence_bundle_identity
-    subject identity
-    holdout derivation
-    qualification identity
+**FEASIBILITY MEASURED.** Frozen tree = 272 tracked `.md`; candidate
+output = 272 paths; tree-only 0, output-only 0, **reconciles exactly**.
+The assert can be made mandatory without first repairing a divergence —
+there is none today. The defect is that **nothing enforces it**.
+
+#### STAGE B — EVIDENCE BUNDLE IDENTITY · frozen AFTER execution
+
+Pass A output · classification output · the exact selected-40 list /
+holdout artefact · qualification output · consequential evidence
+artefacts.
+
+#### ADMISSION RECORD — binds both, no circular hash
+
+```
+stage_a_identity          (contains no execution output)
+stage_b_identity          (the evidence that identity produced)
+frozen subject / tree identity
+derived universe          (tree_paths)
+selected 40
+qualification result
 ```
 
 **MUTATION CONTROLS.**
-Alter a candidate byte → **candidate identity changes.**
-Alter an evidence byte → **evidence identity changes.**
+Alter a candidate byte → **Stage A identity changes.**
+Alter an evidence byte → **Stage B identity changes.**
 **Altered evidence MUST NOT retroactively redefine which candidate
 selected the holdout.**
 
 `Q1a` and `I1` may share manifest machinery but **MUST NOT create a
 self-referential aggregate.**
 
-### ADDITIONAL DESIGN REQUIREMENT ARISING FROM §0.2
+**FAIL-OLD CONTROLS — ALL MANDATORY, ALL EXECUTED NOT ASSERTED (R2).**
 
-The two-stage split fixes the aggregate. It does **not**, on its own,
-fix the second coupling: `holdout.py:49-50` derives the **selection
-universe** from `res["rows"]` — the candidate's own output. Under
-Stage A the universe must be pinned to the **subject tree** (the 272
-documents of `3abc9e9d…b117`), not to whatever the candidate emitted, or
-a candidate that drops a row still moves its own holdout.
+1. One byte altered in one module → Stage A identity changes, package
+   **fails**.
+2. **`I1-A`** — an evidence artefact altered after Stage A must **not**
+   change the Stage A identity, and therefore must not change the
+   selected 40. *This is the control that would have caught the current
+   defect.* A fail-old is available directly from the artefacts: today,
+   altering `h2v12-classification.json` **does** change the aggregate.
+3. **`I1-B` — SYNTHETIC REQUIRED.** There is no natural fail-old, because
+   output and tree currently reconcile exactly. Construct a candidate
+   that drops one row, adds one, and duplicates one; each must leave the
+   selected 40 **unchanged**. Without this synthetic, `I1-B` would pass
+   its own test by accident and be declared repaired untested — I-8.
 
-**FAIL-OLD CONTROLS — BOTH MANDATORY, BOTH EXECUTED NOT ASSERTED (R2).**
-1. A package with one byte altered in one module must **fail**.
-2. **An evidence artefact altered after Stage A must NOT change the
-   Stage A identity, and therefore must not change the selected 40.**
-   This is the control that would have caught the current defect.
 **PASS-NEW.** The unmodified package passes both stages, and the
 admission record reproduces the holdout selection from Stage A alone.
+
+**QUALIFICATION MUST ENUMERATE STAGE A MEMBERS AND PROVE EACH IS
+STATIC/PRE-EXECUTION** (Kai Round 2 §6) — printing the membership and
+its denominator, so a member silently added later is visible.
 
 **INTERACTION RISKS.** Every Group A repair changes module digests, so
 Stage A is the last thing built and the first thing run. Stage B cannot
@@ -801,7 +998,7 @@ D367 §12 fixes the order; this analysis makes it load-bearing.
 | 6 · retain abstention controls | — | no relaxation |
 | 7 · recompute all six axes | — | one consolidated candidate |
 | 8 · one full qualification | `Q1b`, then Stage A `Q1a`/`I1` | Group B must be able to see Group A |
-| 9 · fresh independent blind holdout | — | §9 selection from Stage A only, §10 independence |
+| 9 · **NEW** blind 40 | — | §9 selection from Stage A only, universe = frozen tree, §10 independence. The historical 40 is regression evidence and is NOT reused |
 
 **One consolidated candidate. No standalone axis release.**
 
@@ -812,7 +1009,8 @@ D367 §12 fixes the order; this analysis makes it load-bearing.
 **THE FROZEN ADMISSION CONTRACT IS NOT REPLACEABLE.** Required proof
 remains: every demonstrated fail-old population · protected pass-new
 controls · mutation / known-positive controls · full mechanical candidate
-qualification · fresh reproduction · the D367 final blind 40 · Kai
+qualification · fresh reproduction · **a NEW D367 §9 blind 40 selected
+from Stage A over the frozen tree** · Kai
 independent adjudication.
 
 **No generic 20-document sample substitutes for D367 qualification.**
@@ -851,33 +1049,37 @@ not enlarge this repair into a general H2 rewrite for elegance.
 
 ```
 DOCUMENT          H2 CONSOLIDATED REPAIR SPECIFICATION / DESIGN OPTIONS
-REVISION          2 — incorporates Kai Design Review Round 1 (14 rulings)
+REVISION          3 — incorporates Kai Design Review Rounds 1 and 2
 STATUS            DRAFT. NOT AUTHORISED. NO IMPLEMENTATION.
 AUTHORED          2026-08-29, by Orion
-PRIOR REVISION    3782662 (revision 1)
+PRIOR REVISIONS   3782662 (rev 1) · 27e4e48 (rev 2)
 CANDIDATE         HOUSE_H2 v1.2, aggregate ba2b16d4…de4a — UNMODIFIED
 SUBJECT           d8aac4d4…f197, tree 3abc9e9d…b117, 272 documents
 CONTRACT          H2_REPAIR_CONTRACT_D367.md, sha256 0ce5792e…00bb
 OBLIGATIONS       12 — unchanged
                   A: D2 M1 M2 M3 D14 E1 E2 D12-residual D13-residual
-                  B: Q1b Q1a I1
-DISPOSITIONS      4 ACCEPTED · 6 ACCEPTED WITH KAI MODIFICATION ·
-                  2 REJECTED/SUPERSEDED (Q1a, I1 → two-stage identity) ·
-                  1 DECIDED BY KAI (F6 = presentation)
-NEW FINDING       §0.2 — the identity cycle Kai forbade ALREADY EXISTS:
-                  h2v12-classification.json is inside MANIFEST.sha256,
-                  whose sha256 ba2b16d4…de4a IS the holdout-selecting
-                  aggregate. Second coupling: holdout.py:49-50 draws the
-                  selection universe from candidate OUTPUT rows.
-                  NO NEW D-NUMBER. NO NEW ROW. Recharacterises I1.
-NOT MEASURED      the alternative 40 under a code-only aggregate —
-                  deliberately not computed; it would reveal a second 40
-                  and permanently contaminate the blind pool. KAI DECIDES.
+                  B: Q1b Q1a I1 (I1 = I1-A + I1-B, one row)
+I1 STATUS         DEMONSTRATED CURRENT SELECTION-INTEGRITY BLOCKER.
+                  I1-A  aggregate contains execution output — REALISED
+                  I1-B  universe drawn from candidate rows — LATENT
+                        (tree 272 vs output 272, reconciles exactly;
+                         nothing enforces it; needs a SYNTHETIC fail-old)
+HISTORICAL 40     208 CORRECT · 20 BLOCKER · 12 OVER_ABSTENTION ·
+                  0 UNRESOLVED — RETAINED as reviewed regression
+                  evidence. NOT final blind admission evidence. Never
+                  again called "the final holdout". A repaired candidate
+                  requires a NEW blind 40 under corrected Stage A.
+NOT COMPUTED      the alternative 40 — forbidden by Kai Round 2 §3.
+                  Unrevealed pool preserved.
+FLAGGED NOT EDITED  kai-pm/DECISIONS.md carries 1 line of superseded
+                  labelling. Append-only; a correction needs a D-number,
+                  which is not authorised. For Kai/Dainius to dispose of.
 NEW D-NUMBERS     0
 DISCOVERY         CLOSED by Kai ruling. Narrow reopen condition only.
 NOT AUTHORISED    repair · fixture mutation · design implementation ·
-                  candidate generation · D375 · ledger append
+                  candidate generation · D375 · ledger append ·
+                  any holdout computation
 HOLD              H2 HOLD remains until Dainius authorises implementation
-NEXT              Kai reviews revision 2; final design to Dainius for the
-                  implementation-authority decision.
+NEXT              Final design to Dainius for the implementation-authority
+                  decision.
 ```
