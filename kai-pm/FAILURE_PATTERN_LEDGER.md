@@ -519,3 +519,225 @@ downstream; the two incidents whose controls were a machine gate and an
 explicit population count were caught by the producer, before transmission.
 One session is not a denominator. Recorded so it can be tested when there
 is one, not relied upon now.
+
+---
+
+# MATERIALITY BOUNDARY
+
+Added under D374 authority at Kai's ruling, 2026-08-29. **Without this,
+rule 49 becomes noise and the ledger stops being read — which is the one
+failure mode that makes the whole control worthless (rule 49.9).**
+
+**Log an incident where a verified error:**
+
+* could alter admission, closure, authority or repair scope;
+* materially misstates evidence, identity or coverage;
+* could cause an unsafe or incorrect mutation; or
+* provides recurrence evidence for a known or candidate mechanism.
+
+**Do not log:** normal hypothesis → evidence → revised hypothesis. That
+is engineering, not failure. A changed opinion is not an incident.
+
+**And the distinction that matters most for the adversarial role:**
+**being wrong is not the same as doing adversarial reasoning.** A
+reviewer whose job is to attack the architecture must attack it
+aggressively and will sometimes be wrong; that is the role working, not
+failing. What is logged is a **specific, disproven, consequential
+technical assertion or proposal** — never *"DeepSeek challenged us"* and
+never a rejected challenge as such.
+
+The system we want is: **challenge freely, correct visibly, retain proven
+failure mechanisms, become progressively less likely to repeat them.** A
+ledger that makes producers challenge less would damage the programme
+more than the failures it records.
+
+---
+
+# ADJUDICATOR AND REVIEWER INCIDENTS
+
+Rule 49.8: **everyone is in the denominator, and no role is exempt
+because it adjudicates others.** These three entries exist because that
+clause is load-bearing rather than decorative. All were directed by Kai
+against Kai and DeepSeek after Orion's correction reached him.
+
+---
+
+### `INC-2026-08-29-06` — adjudicator propagated an unverified producer label
+
+```
+date                    2026-08-29
+producer                KAI
+subject/version         kai-pm/ENGINEERING_DOCTRINE.md at fb2892b; the
+                        INC-2026-08-29-05 incident record
+false_or_faulty_output  "27 pre-existing rules" — repeated in an adjudicator
+                        ruling. The unit was not independently checked
+corrected_output        27 unintended column-0 numbered items = 26 GOVERNED
+                        DOCTRINE RULES + 1 SECTION-0 PROCEDURAL ITEM
+                        (L80, "1. state what you observed;"). The COUNT was
+                        correct; the LABEL was wide by one
+detection_method        Orion applied rule 48 to his own incident record and
+                        measured the population against the actual file rather
+                        than repeating the figure
+evidence                column-0 numbered items preceded by a blank line: 27 ·
+                        inside the governed rules section: 26 · outside it: 1
+origin_of_the_claim     Orion's commit message for fb2892b. The label
+                        originated with Orion; PROPAGATING IT WITHOUT
+                        CHECKING THE UNIT IS A SEPARATE PRODUCER EVENT
+affected_scope          one label in one ruling
+downstream_impact       NONE — no disposition, count, admission or repair
+                        scope turned on it
+mechanism_status        INCIDENT_ONLY
+mechanism_id            (none)
+NOT_ASSIGNED_TO         M-SCOPE-WIDEN. Explicitly. Kai did not perform a
+                        bounded measurement and then widen it; Kai accepted
+                        and forwarded another producer's classification
+                        without independent unit verification. Different step,
+                        different producer, different failure. Assigning it
+                        for resemblance is exactly rule 49.2
+related_controls        doctrine 33 (a derived claim travels with its
+                        derivation — including its UNIT) · 46 (no cascaded
+                        memory authority; another producer's recollection is
+                        not my verified premise) · 48 (claim ⊆ measurement) ·
+                        49 (the ledger applies to adjudicators)
+recurrence_previously_established  see the candidate below
+status                  CLOSED as an incident
+```
+
+---
+
+### `P-ADJUDICATOR-PROPAGATION` — candidate locator, NOT a mechanism
+
+**State: `PATTERN_CANDIDATE`. Two occurrences preserved. Causal
+equivalence NOT asserted.**
+
+**Proposed shape:** *a producer-derived consequential claim is accepted
+or propagated by the adjudicator without independent source or unit
+verification.*
+
+| # | occurrence | what was propagated | what disproved it |
+|---|---|---|---|
+| 1 | the D359 incident, recorded in doctrine 46's earned row and banked in D371 | six specific absence claims about D359, produced without opening it. **All six false.** The adjudicator accepted the summary and designed a governance remedy on the false premise | operator scrutiny forced primary-source inspection, before any repository mutation |
+| 2 | `INC-2026-08-29-06` | the label "27 pre-existing rules", propagated without checking the unit | the originating producer measured it against the file: 26 rules + 1 procedural item |
+
+**Why this is a locator and not yet a mechanism.** Two occurrences
+separated by a day, in different subject matter, with materially
+different consequence — one nearly drove a governance remedy, the other
+changed nothing. That is enough to **preserve the candidate**; it is not
+enough to declare the causal step identical (rule 49.2, doctrine 37).
+**Two is not three, and resemblance is not cause.**
+
+**What would earn it:** a third independently confirmed occurrence, or
+evidence that the same reasoning step — *accepting a producer's derived
+claim as a premise without re-deriving it* — is what produced both.
+
+**If it is ever confirmed, note that rule 49.6 would fire immediately**,
+because the manual control (doctrine 46's no-cascaded-memory-authority
+clause) was already banked and cited at the time of occurrence 2.
+
+---
+
+### `INC-2026-08-29-07` — reviewer mis-scoped a frozen qualification obligation
+
+```
+date                    2026-08-29
+producer                DEEPSEEK
+subject/version         kai-pm/H2_REPAIR_CONTRACT_D367.md (frozen,
+                        0ce5792e…00bb) §8(8); qualify.py at ee4e1824…
+false_or_faulty_output  "This is not a bug in qualify.py. qualify.py was
+                        scoped to verify the classification, not the evidence."
+corrected_output        Frozen §8 is titled "Qualification criteria" and item
+                        8 reads verbatim: "every emitted positive carries the
+                        §5 witness trace." It is a QUALIFICATION obligation,
+                        not a packaging one. A qualification implementation
+                        that cannot observe that denominator fails to
+                        establish its frozen criterion
+detection_method        Kai rejected the framing and had the frozen contract
+                        opened and §8 read to the claim boundary; Orion
+                        returned L277 verbatim and measured the denominator
+                        (343 non-abstention verdicts + 316 positive evidence
+                        facts = 659 §5 subjects; qualify.py [5] reaches only
+                        the 343)
+impact_if_accepted      repair responsibility would have been displaced
+                        wholly into packaging, and Q1 — the qualification
+                        coverage defect — could have been missed entirely
+downstream_impact       NONE — rejected before it entered any ruling
+mechanism_status        INCIDENT_ONLY
+mechanism_id            (none — not invented for a single occurrence)
+related_controls        doctrine 14 · 46 · 47 — the governing frozen contract
+                        is opened, and read to the claim boundary, BEFORE
+                        responsibility for a defect is assigned
+status                  CLOSED as an incident
+```
+
+**Recorded with the role protected.** The logged item is the specific
+disproven technical assertion, not the act of challenging. DeepSeek's
+adversarial review in the same exchange is what widened Q1 correctly and
+forced the §5 denominator to be measured at all.
+
+---
+
+### `INC-2026-08-29-08` — reviewer proposed a circular holdout identity
+
+```
+date                    2026-08-29
+producer                DEEPSEEK
+subject/version         holdout.py at 4c5c06ac… ; PACKAGE.sha256 ;
+                        MANIFEST.sha256 (candidate ba2b16d4…de4a)
+false_or_faulty_output  proposed remedy for I1: make blind-holdout selection
+                        incorporate / hash PACKAGE.sha256
+corrected_output        REJECTED AS CIRCULAR. PACKAGE.sha256 lists
+                        h2v12-holdout.json (26168dbb…362046) among its 14
+                        entries, and holdout.py L47-50 derives the sample from
+                        sha256(--manifest). Feeding the package inventory in
+                        yields:
+                            holdout -> package identity -> holdout selection
+                        The correct requirement remains a PRE-HOLDOUT EVIDENCE
+                        IDENTITY binding instrument, ontology/envelope/
+                        qualification bytes, the classification result, the
+                        evidence sidecar or its root digest, subject
+                        commit/tree and dependency identity — and EXCLUDING
+                        the as-yet-unselected holdout
+detection_method        Kai identified the circularity; Orion verified from
+                        the artefacts that PACKAGE.sha256 does list
+                        h2v12-holdout.json and that holdout.py consumes
+                        sha256(MANIFEST.sha256)
+impact_if_accepted      would have reintroduced precisely the self-dependence
+                        D367 §9 was frozen to prevent
+downstream_impact       NONE — rejected before any design or mutation
+mechanism_status        INCIDENT_ONLY
+mechanism_id            (none)
+related_controls        circularity / self-observation checks (doctrine 32,
+                        R9, I-8 — an instrument must not observe itself) ·
+                        rule 46 primary-source inspection
+status                  CLOSED as an incident
+```
+
+**Again, the role is not the incident.** DeepSeek identified the real
+structural gap in the blind-sample chain of custody, which is why I1 was
+upgraded to BLOCKER at all. A wrong counterproposal from an adversarial
+reviewer is the role functioning; the logged item is the specific
+disproven proposal.
+
+---
+
+## Ledger state after this append
+
+| id | producer | mechanism_status | assigned mechanism | reached branch / ruling |
+|---|---|---|---|---|
+| `INC-2026-08-29-01` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` | NO |
+| `INC-2026-08-29-02` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` | NO |
+| `INC-2026-08-29-03` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` | NO |
+| `INC-2026-08-29-04` | Orion | `INCIDENT_ONLY` | none | NO |
+| `INC-2026-08-29-05` | Orion | `INCIDENT_ONLY` | none | NO |
+| `INC-2026-08-29-06` | **Kai** | `INCIDENT_ONLY` | none — locator only | reached a ruling; no disposition turned on it |
+| `INC-2026-08-29-07` | **DeepSeek** | `INCIDENT_ONLY` | none | NO |
+| `INC-2026-08-29-08` | **DeepSeek** | `INCIDENT_ONLY` | none | NO |
+
+| candidate | occurrences | state |
+|---|---|---|
+| `M-PRODUCER-CURATION` | 0 confirmed | `PATTERN_CANDIDATE` |
+| `P-ADJUDICATOR-PROPAGATION` | 2 preserved | `PATTERN_CANDIDATE` |
+
+**Producers represented: Orion 5 · Kai 1 · DeepSeek 2.** Recorded because
+a ledger containing only one producer's failures would be evidence about
+who writes the ledger, not about the system (rule 49.8).
