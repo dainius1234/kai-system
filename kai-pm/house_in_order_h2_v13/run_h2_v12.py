@@ -97,35 +97,76 @@ def _witness_trace(row, family):
     return w
 
 
-def _history_trace(row, kind, value, note):
-    """A 9-field trace for a fact whose evidence is the HISTORY, not the
-    document text. The selector is the history coordinate rather than a
-    line, which is what D367 5 means by "or an equivalent STABLE
-    selector" -- it is re-derivable by anyone with the subject.
+def _history_trace(row, subject, count):
+    """MAINTENANCE_OBSERVED. Genuinely history-derived, so the selector is
+    the exact reproducible history operation -- frozen subject, path and
+    all -- not the bare `history:<path>` label v1.3a used, which named no
+    operation and reproduced nothing.
     """
-    return {"witness_type": kind, "witness_value": str(value),
-            "source_path": row["path"],
-            "source_selector": f"history:{row['path']}",
-            "local_context": note, "applicability_scope": "WHOLE_FILE",
+    sel = f"git:rev-list --count {subject} -- {row['path']}"
+    return {"witness_type": "COMMIT_COUNT_IN_WINDOW", "witness_value": str(count),
+            "source_path": row["path"], "source_selector": sel,
+            "local_context": f"{sel} => {count}; last commit "
+                             f"{row.get('last') or 'unknown'}",
+            "applicability_scope": "WHOLE_FILE",
             "evidence_total": 1, "evidence_shown": 1, "truncated": False,
-            "polarity": "POSITIVE", "certainty": "OBSERVED",
+            "polarity": "POSITIVE", "certainty": "VERIFIED",
             "temporal": "AT_COMMIT", "subject": "SELF"}
+
+
+def _reader_trace(row, subject_repo):
+    """CONSUMED_AT_SUBJECT. The determining evidence is a STATIC READER
+    REFERENCE produced by the Census opscan -- NOT history. v1.3a labelled
+    it `history:` , which named the wrong evidence class entirely.
+
+    The evidence lives in the READING document, so `source_path` is the
+    reader and `local_context` is that document's actual source line. A
+    fact with several reader references carries the D367 5
+    evidence_total / evidence_shown semantics rather than dropping any.
+    """
+    ops = row.get("reader_ops") or []
+    if not ops:
+        return None                      # A6-ii will abstain, correctly
+    o = sorted(ops, key=lambda x: (x["src"], x["line"]))[0]
+    try:
+        line = (pathlib.Path(subject_repo) / o["src"]).read_text(
+            errors="ignore").splitlines()[o["line"] - 1].strip()
+    except Exception:
+        return None                      # no locator -> no certification
+    # The Census stores `expr` as an AST DUMP -- "Name(id='CHANGELOG',
+    # ctx=Load())" -- which is a description of the node, not a token in
+    # the source. D367 5 wants "the EXACT token or value matched", so the
+    # trace carries the identifier the dump names, and only if that
+    # identifier is genuinely present in the reading line. If it is not,
+    # we abstain rather than certify a value the source does not contain.
+    ident = next((g for g in re.findall(r"id='([^']+)'", o["expr"] or "")
+                  if g in line), None)
+    if not ident:
+        return None
+    return {"witness_type": "STATIC_READER_REFERENCE",
+            "witness_value": ident, "source_path": o["src"],
+            "source_selector": f"opscan:{o['src']}:L{o['line']}",
+            "local_context": line, "applicability_scope": "SPAN",
+            "reader_ast_expr": o["expr"], "reader_mode": o["mode"],
+            "evidence_total": len(ops), "evidence_shown": 1,
+            "truncated": len(ops) > 1,
+            "polarity": "POSITIVE", "certainty": "OBSERVED",
+            "temporal": "AT_COMMIT", "subject": f"OTHER:{row['path']}"}
 
 
 def _claim_trace(row, determining, total):
     """A 9-field trace for a SELF-bound authority fact.
 
-    The determining rows are CLAIM records, not witnesses -- they carry a
-    selector and a sentence but not the nine fields -- so E1 could not
-    bind them, and A6-ii would have ABSTAINED four SELF_ASSERTS_AUTHORITY
-    and one SELF_ASSERTS_NON_AUTHORITY rather than tracing them. That
-    would be E1 deleting facts instead of binding them, and it would move
-    AUTHORITY, which belongs to step 5. The claim is promoted to a trace
-    instead.
+    The determining rows are CLAIM records, not witnesses -- a selector
+    and a sentence, but not the nine fields -- so E1 could not bind them
+    and A6-ii would have ABSTAINED four SELF_ASSERTS_AUTHORITY and one
+    SELF_ASSERTS_NON_AUTHORITY rather than tracing them. That would be E1
+    deleting facts instead of binding them, and it would move AUTHORITY,
+    which belongs to step 5. The claim is promoted to a trace instead.
 
     `applicability_scope` is SPAN, not WHOLE_FILE: the evidence is the
-    sentence. Choosing WHOLE_FILE here would be an unearned widening and
-    a scope decision, which is M3's at step 2.
+    sentence. WHOLE_FILE would be an unearned widening and a scope
+    decision, which is M3's at step 2.
     """
     c = determining[0]
     return {"witness_type": "SELF_AUTHORITY_CLAIM",
@@ -143,6 +184,31 @@ NINE_FIELDS = ("witness_type", "witness_value", "source_path",
                "evidence_total", "evidence_shown", "truncated")
 
 
+# E1 FAMILY GATE (Kai). value-in-context is necessary, not sufficient:
+# a generated sentence containing a generated number would pass it. The
+# trace's EVIDENCE CLASS must match the producer that made the fact
+# positive.
+TRACE_CLASS = {
+    "MAINTENANCE_OBSERVED":       ("COMMIT_COUNT_IN_WINDOW", "git:rev-list"),
+    "CONSUMED_AT_SUBJECT":        ("STATIC_READER_REFERENCE", "opscan:"),
+    "CITES_COMMIT":               ("COMMIT", "L"),
+    "CITES_RUN":                  ("RUN_ID", "L"),
+    "CARRIES_DATE_STAMP":         ("DATE_STAMP", "L"),
+    "BINDING_CONTRADICTION":      ("DATE_STAMP", "L"),
+    "SELF_ASSERTS_AUTHORITY":     ("SELF_AUTHORITY_CLAIM", "L"),
+    "SELF_ASSERTS_NON_AUTHORITY": ("SELF_AUTHORITY_CLAIM", "L"),
+}
+
+
+def _class_ok(name, tr):
+    want = TRACE_CLASS.get(name)
+    if not want:
+        return False
+    kind, sel = want
+    return tr.get("witness_type") == kind and \
+        str(tr.get("source_selector", "")).startswith(sel)
+
+
 def _compliant(t):
     """E1 / D367 5. Present is not enough -- the trace must be SEMANTICALLY
     TRUTHFUL: all nine fields, and the context must actually contain the
@@ -153,7 +219,8 @@ def _compliant(t):
     return str(t["witness_value"]) in str(t["local_context"])
 
 
-def evidence_facts(row, claims, contradiction, determining=()):
+def evidence_facts(row, claims, contradiction, determining=(),
+                   subject="", subject_repo="."):
     """FACTS, each bound to the trace that DETERMINED it. None is a
     verdict (D360 5).
 
@@ -173,16 +240,10 @@ def evidence_facts(row, claims, contradiction, determining=()):
     cand, traces = {}, {}
     cand["MAINTENANCE_OBSERVED"] = (
         row["commits_in_window"] > 1,
-        lambda: _history_trace(
-            row, "COMMIT_COUNT_IN_WINDOW", row["commits_in_window"],
-            f"{row['commits_in_window']} commits touch {row['path']} in the "
-            f"subject window; last {row.get('last') or 'unknown'}"))
+        lambda: _history_trace(row, subject, row["commits_in_window"]))
     cand["CONSUMED_AT_SUBJECT"] = (
         bool(row["readers"]),
-        lambda: _history_trace(
-            row, "STATIC_READER_REFERENCE", len(row["readers"]),
-            f"{len(row['readers'])} static reader reference(s) resolve to "
-            f"{row['path']}: {', '.join(row['readers'])}"))
+        lambda: _reader_trace(row, subject_repo))
     cand["CITES_COMMIT"] = (bool(row["witnesses"].get("COMMIT")),
                             lambda: _witness_trace(row, "COMMIT"))
     cand["CITES_RUN"] = (bool(row["witnesses"].get("RUN_ID")),
@@ -207,7 +268,7 @@ def evidence_facts(row, claims, contradiction, determining=()):
             f[name] = False
             continue
         t = mk()
-        if _compliant(t):
+        if _compliant(t) and _class_ok(name, t):
             f[name] = True
             traces[name] = t
         else:                       # A6-ii: no compliant trace, no positive
@@ -241,7 +302,7 @@ def main():
         # must bind to the row that determined it.
         det = sb.determining_claims(claims)
         facts, ac, fact_traces, abstained = evidence_facts(
-            row, claims, contradiction, det)
+            row, claims, contradiction, det, pa["subject"], sr)
         row["authority_claim"] = ac
         out = cl.classify(row, text, contradiction)
         out["evidence_facts"] = facts

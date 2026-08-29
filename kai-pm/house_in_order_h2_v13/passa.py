@@ -307,12 +307,23 @@ def build(subject_repo, history_repo, subject, census_pkg):
     exe, writers, readers = (collections.Counter(),
                              collections.defaultdict(set),
                              collections.defaultdict(set))
+    # E1: the census Op carries src AND line AND expr. v1.2 kept only the
+    # source path, so a CONSUMED_AT_SUBJECT fact had no locator anywhere
+    # in the package and could not be traced to the reference that made
+    # it true. The locator is retained; `readers` keeps its old shape so
+    # no existing consumer changes.
+    reader_ops = collections.defaultdict(list)
     for o in ops:
         if o.target and o.disposition in ("RESOLVED_READ", "RESOLVED_WRITE",
                                           "READ_AND_WRITE"):
             exe[o.target] += 1
             (writers if o.disposition != "RESOLVED_READ"
              else readers)[o.target].add(o.src)
+            if o.disposition == "RESOLVED_READ":
+                reader_ops[o.target].append(
+                    {"src": o.src, "line": int(o.line or 0),
+                     "mode": o.mode, "expr": o.expr,
+                     "disposition": o.disposition})
 
     rows = []
     for d in tracked:
@@ -333,6 +344,7 @@ def build(subject_repo, history_repo, subject, census_pkg):
             "graphA_in": inc.get(d, 0), "graphA_out": out_deg.get(d, 0),
             "exe_ops": exe.get(d, 0), "writers": sorted(writers.get(d, ())),
             "readers": sorted(readers.get(d, ())),
+            "reader_ops": reader_ops.get(d, []),
             "says_supersedes": bool(SUPES.search(txt[:HEAD_BYTES])),
             "witnesses": {k: [w.asdict() for w in v] for k, v in
                           scan(d, txt, history_repo, subject).items()},
