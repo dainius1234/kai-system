@@ -246,6 +246,79 @@ Proactive engineering is not autonomous scope expansion.
     > over decision entries flagging bare figures with no adjacent card.*
     > *OWNER/STAGE: evidence-plane tooling, after the H2 repair cycle.*
 
+48. **EVIDENCE HANDOFF IS LOSSLESS AND SCOPE-PRESERVING.** A transmitted
+    claim may never have a broader **universe**, **subject** or
+    **certainty** than the measurement that earned it, and a producer may
+    never **silently curate** the population a declared extraction
+    returned.
+
+    ```
+    CLAIM_SCOPE ⊆ MEASURED_SCOPE
+    TRANSMITTED_RESULT = PREDICATE_RESULT     (before any DECLARED transformation)
+    ```
+
+    1) **A bounded search earns only a bounded statement.** Searching
+       `/tmp/a` and `/tmp/b` earns `NOT_FOUND_IN_SEARCHED_PATHS` — never
+       `NOT_FOUND_ANYWHERE`.
+    2) **A field-level measurement earns only a field-level statement.**
+       *0 witnesses in `classification.json`* must not become *0
+       witnesses in the package*.
+    3) **A snippet is not its source.** An excerpt, a `local_context`
+       field, a log tail, an API window or any truncated diagnostic must
+       never be described as though it were the underlying artefact.
+    4) **The consumer defines the universe and the predicate; the
+       producer executes them literally.** If the predicate is poor,
+       return its actual result **first**, then propose a corrected
+       predicate separately.
+    5) **Everything returned travels.** Unexpected rows, nulls,
+       duplicates, malformed records, counterexamples and inconvenient
+       results are not silently pruned, ranked, deduplicated or cleaned.
+    6) **Every exclusion arises from the declared predicate or a declared
+       transformation.** Producer judgement is never an invisible
+       exclusion criterion.
+    7) **Post-extraction transformations are named.** Filtering,
+       normalisation, deduplication, aggregation and ranking are
+       separately identified, reproducible, and reconciled against the
+       raw population.
+    8) **Transport limits are not filtering authority.** Large results
+       are chunked deterministically, carrying total count, chunk range
+       and a final coverage reconciliation.
+    9) **Negative, completeness and universality claims state the
+       universe inspected.** *none · nothing · no · all · only · never*
+       each carry that burden.
+    10) `claim_scope > measured_scope` ⇒ **`SCOPE_OVERCLAIM`**: zero
+        weight for admission, closure, repair scope or programme state
+        until re-earned at the claimed scope.
+    11) `transmitted_result ≠ predicate_result` without a declared
+        transformation ⇒ **`SILENTLY_CURATED`**: zero evidential weight
+        until reproduced.
+
+    This binds **humans, AI producers, scripts, CI, audit tooling, search
+    systems, dashboards, metrics, model evaluations and evidence
+    pipelines** alike. It is the transmission-side enforcement of
+    evidence conservation and **supplements rules 33, 35, 46 and 47
+    rather than replacing them**: 33 governs whether the derivation
+    travels, 35 whether the meaning was promoted, 46 whether the source
+    was opened, 47 whether it was read far enough — and 48 whether the
+    sentence finally sent is no wider than what was actually measured.
+
+    Every consequential extraction transmits: subject/version ·
+    measurement universe · predicate/method · **raw returned count** ·
+    **transmitted count** · transformations · claim scope · limitations.
+
+    **A recipient who detects a scope-overclaim stops using the claim**
+    and requests or reproduces the bounded version rather than reasoning
+    through it.
+
+    > *ENFORCEMENT: `RULE_BANKED` / manual operational control, effective
+    > immediately. Directed by Dainius, 2026-08-29.*
+    > *MACHINE HOOK: reconcile extraction count against transmission
+    > count, and refuse a consequential claim whose declared scope
+    > exceeds its measurement universe.*
+    > *OWNER/STAGE: evidence-plane / professionalisation machinery. NOT
+    > to be implemented inside the frozen H2 candidate under this
+    > authority.*
+
 ### Evidence identity
 
 3. **Evidence identity is immutable.** Bind runtime evidence to the exact
@@ -650,6 +723,85 @@ Proactive engineering is not autonomous scope expansion.
     > with the tool hash recorded in every claim card it produces.*
     > *OWNER/STAGE: assurance tooling.*
 
+49. **FAILURE PATTERNS ARE FIRST-CLASS ENGINEERING EVIDENCE.** A material
+    mistake does not end when its immediate output is corrected. Every
+    verified material failure enters a durable learning cycle:
+
+    ```
+    FAILURE -> INCIDENT RECORD -> MECHANISM -> RECURRENCE SIGNATURE
+            -> STOP-SIGNAL / CONTROL -> CALIBRATION -> FUTURE RETRIEVAL
+    ```
+
+    The purpose is not blame. It is that the system, its operators, its
+    models and its instruments stop paying repeatedly for one underlying
+    mistake.
+
+    1) **Material errors are logged, not merely corrected.** A correction
+       that erases how the error happened destroys the future defence.
+    2) **Incident and mechanism are separate.** Similar outputs do not
+       prove a shared cause. Wording similarity, common file paths and
+       routing signatures are **locators only** (rule 37). A pattern is
+       promoted only once the causal mechanism is supported by evidence.
+    3) **Recurrence is actively searched for**, not waited for. Once a
+       mechanism is confirmed, inspect current and prior work for the
+       same mechanism wherever the denominator is material (rule 13).
+    4) **Known patterns become pre-action checks.** Before consequential
+       work, the relevant confirmed patterns and their stop-signals are
+       consulted — not recalled (rule 46).
+    5) **A repeated mistake is evidence against its current control.**
+       When a confirmed pattern recurs after a rule exists, do not
+       reissue the reminder; reassess the control.
+    6) **THREE CONFIRMED OCCURRENCES FORCE ESCALATION.** On the third
+       independently confirmed occurrence of one mechanism, a
+       prose-only/manual control is **presumed insufficient** unless
+       evidence shows otherwise, and must receive a machine-enforcement
+       design, a stronger structural constraint, or an explicit
+       accepted-risk decision carrying its justification.
+    7) **Corrections are append-only.** The false claim stays visible
+       beside its correction. History is never rewritten to make a
+       producer look consistently right (rule 23).
+    8) **Everyone is inside the denominator** — operator, Orion, Kai,
+       DeepSeek, subagents, scripts, classifiers, gates and any future
+       autonomous component. **No role is exempt because it adjudicates
+       others.**
+    9) **Patterns must travel into future reasoning.** A ledger that is
+       never consulted is archival documentation, not a control.
+    10) **Pattern effectiveness is measured.** Track recurrence after a
+        control is introduced. *Rule written* is not *failure
+        prevented* — rule 44 is the reason that distinction exists.
+
+    **The authoritative record is `kai-pm/FAILURE_PATTERN_LEDGER.md`,
+    append-only.** It is distinct from `ORION_FIELD_NOTES.md`, which
+    remains non-authoritative working memory and creates no programme
+    state. Its schema, pattern states and the initial banked patterns
+    live in that file. A producer may **propose** a pattern; it may never
+    silently self-certify causal equivalence.
+
+    **ARCHITECTURAL DESTINATION — recorded as a requirement, carrying no
+    implementation authority.** A governed *Failure Pattern Memory /
+    Reasoning Guard* that ingests only verified incidents, derives
+    candidate mechanism similarity without automatic causal promotion,
+    retrieves confirmed patterns **before** consequential reasoning,
+    injects their stop-signals into the reasoning context, checks
+    proposed outputs and actions against known mechanisms, logs
+    recurrences, measures whether controls reduce them, escalates
+    repeated manual-control failures toward machine enforcement, and
+    **never autonomously rewrites doctrine or its own governing rules.**
+    House Doctor is one *consumer* of this intelligence, not its owner:
+    the pattern memory must reach the reasoning and orchestration layer,
+    so a known failure is avoided before there is anything to diagnose.
+    The target is not a producer that remembers being wrong — it is one
+    that has become **progressively harder to fool in ways that have
+    already fooled it.**
+
+    > *ENFORCEMENT: `RULE_BANKED` / manual operational control, effective
+    > immediately. Directed by Dainius, 2026-08-29.*
+    > *MACHINE HOOK: ledger schema validation; a recurrence report per
+    > confirmed mechanism; an escalation trigger at the third confirmed
+    > occurrence; and retrieval-before-reasoning in the evidence plane.*
+    > *OWNER/STAGE: evidence-plane / reasoning-architecture programme
+    > stage. NO implementation during the H2 hold.*
+
 ### Delegation and authority
 
 38. **Reconcile an instruction against its governing contract before
@@ -721,6 +873,8 @@ Proactive engineering is not autonomous scope expansion.
 
 | rule | the failure that earned it |
 |---|---|
+| 48 | **three incidents in one H2 adjudication session, one mechanism: *bounded measurement → correct local result → unbounded transmitted claim*.** (1) A Pass A `local_context` cut at the 6000-byte window was described as *the source document carries a truncated SHA with no closing backtick* — the source was intact; the instrument's own output had been read as the artefact. (2) `find` over `/tmp/tmp.6xNl2hBs2V` and `/tmp/claude-0` became *"passA.json was not preserved anywhere on disk. I looked."* — it was tracked at `f196366`, 359,173 bytes, and `sha256sum -c PACKAGE.sha256` verified all 14 entries. (3) *0 positive evidence facts carry a witness* was measured over `h2v12-classification.json` and transmitted as a claim about the candidate package — **235 of 316 carry the full nine-field §5 trace** in the package-bound sidecar. Each measurement was locally correct; each sentence was wider than what was measured. Adjudicated by Kai across three exchanges, directed into doctrine by Dainius (D373) |
+| 49 | **the same three incidents, seen from the control side.** Rules 33, 35, 46 and 47 were all banked and all cited — one of them quoted in the very message that broke it — and the mechanism still recurred three times inside a single session. The programme's own record already showed 14 of 17 defects were covered by written doctrine when they occurred (rule 44). What was missing was not another rule but the closed loop: preserve the incident, name the mechanism, search for recurrence, and escalate the control when a confirmed pattern repeats. Directed by Dainius (D374) |
 | 1, 24, 27 | findings "closed" on argument rather than evidence; counts that changed because a fix landed |
 | 29 | three repairs in two patches survived their own deletion at 486/0, 486/0 and 515/0 — repaired, green, and proved by nothing |
 | 30 | a suite read in the foreground while a reinjection sweep held the same files patched; three failures diagnosed as real |

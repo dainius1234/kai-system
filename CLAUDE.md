@@ -43,6 +43,16 @@ check before continuing.
 | I opened the file, read one section, and am about to say what the **document** contains or lacks | doctrine 47 — opened ≠ read. `NOT_FOUND_IN_INSPECTED_RANGE`, never `NOT_FOUND_IN_DOCUMENT` |
 | I am writing "not found", "no", "none", "nothing in X" | doctrine 47 — state the inspection universe that earns the negative. "I opened it" is not "I checked it" |
 | "worth noting", "deserves suspicion", "I would flag" — and then I continue | R15 — stop there and look. Clean costs minutes; not looking costs someone else, later and larger |
+| I searched X and am about to write "nowhere", "none", "nothing", "no", "all" or "only" **without naming X** | R17 — a bounded search earns a bounded sentence. Name the universe or do not make the claim |
+| I am describing a snippet, an excerpt, a `local_context`, a log tail or an API window as though it were the source, the package or the system | R17 — the instrument's output is not the artefact. Open the artefact |
+| I measured one field of one file and the sentence I am writing says *the package* / *the candidate* / *anywhere* | R17 — `CLAIM_SCOPE ⊆ MEASURED_SCOPE`. The qualifier was in my table; keep it in the prose |
+| The predicate returned an awkward row and I am considering leaving it out | R17 — everything returned travels. Dropping it is editing the evidence, not tidying it |
+| I filtered, normalised, deduplicated, ranked or aggregated and have not said so | R17 — name the transformation and reconcile it against the raw count |
+| I have made essentially this correction before | R18 — search `FAILURE_PATTERN_LEDGER.md` before continuing. Recurrence is the finding, not the instance |
+| A different incident, but the *reasoning step* feels familiar | R18 — compare mechanisms, not appearances |
+| The same rule has been broken again and I am about to restate it | R18 — do not reissue the reminder. Test whether the **control** failed |
+| I corrected it and am about to move on | R18 — if it was consequential, record the incident and check for recurrence first |
+| I am calling two mistakes the same pattern because they look alike | R18 / doctrine 37 — that is a locator. The mechanism has to be earned |
 
 **The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
 happened while moving fast — a hard-coded image name, a guessed job id,
@@ -480,6 +490,86 @@ claim must be partial too.**
 > very rule was followed and still produced a false negative from a
 > shallow read.
 
+## R17. Never say more than you measured; never silently tidy what came back. Directed by Dainius, 2026-08-29
+
+**The sentence I transmit may not cover more ground than the check I
+ran.** Not a wider universe, not a wider subject, not more certainty.
+And whatever the query returned goes out — all of it.
+
+```
+CLAIM_SCOPE ⊆ MEASURED_SCOPE
+TRANSMITTED_RESULT = PREDICATE_RESULT     (before any transformation I NAME)
+```
+
+This is not R16 again. R16 is about where I looked; R47/R47's half is
+about how far I read. **R17 is about the sentence I write afterwards.**
+All three can fail separately, and the third is the one that reaches
+another person.
+
+* Searched two paths → `NOT_FOUND_IN_SEARCHED_PATHS`. Never *nowhere*.
+* Measured one field of one file → say **that file, that field**.
+* A `local_context`, an excerpt, a log tail, an API window **is not the
+  source.** Describing it as the source is the same error twice.
+* Awkward rows, duplicates, nulls, malformed records and counterexamples
+  **travel**. If I drop one, I have edited the evidence.
+* If I filtered, normalised, deduplicated or ranked — **say so, and
+  reconcile against the raw count.**
+* Transport limits are not permission to filter: chunk deterministically
+  and reconcile at the end.
+
+Every consequential extraction carries: subject/version · universe ·
+predicate · **raw count** · **transmitted count** · transformations ·
+claim scope · limitations.
+
+Earned 2026-08-29, three times in one session, each measurement correct
+and each sentence wider than it:
+
+1. A Pass A `local_context` cut at 6000 bytes → *"the document itself
+   carries a truncated SHA"*. The document was intact. I had read my own
+   instrument's output as the artefact.
+2. `find` over two `/tmp` paths → *"passA.json was not preserved
+   anywhere on disk. I looked."* It was in the repository, tracked, and
+   hash-bound.
+3. *0 witnesses in `h2v12-classification.json`* → *"316 positive facts
+   carry none"*. **235 of 316 carry the full nine-field trace** in the
+   package-bound sidecar.
+
+The tell in all three: I had the qualifier while measuring and dropped
+it one line later. **The table said "in the RESULT"; the prose did not,
+and the prose is what enters the record.**
+
+> **Provenance:** directed by Dainius on 2026-08-29 after Kai adjudicated
+> the third instance. Banked as doctrine rule 48, which states the
+> producer-independent form. Recorded rather than self-adopted.
+
+## R18. A mistake is not finished when it is corrected. Check whether it is a pattern. Directed by Dainius, 2026-08-29
+
+**Correcting the output is the cheap half.** The expensive half is
+asking whether the *reasoning step* that produced it has produced others.
+
+R17 exists because three different-looking incidents were one mechanism.
+Correcting each one in turn would have left the mechanism live — and it
+was live while doctrine rules 33, 35, 46 and 47 were all banked, all
+cited, and one of them quoted in the message that broke it.
+
+* A material error gets **recorded**, not just fixed —
+  `kai-pm/FAILURE_PATTERN_LEDGER.md`, append-only.
+* **Incident ≠ mechanism.** Two mistakes that look alike are a locator,
+  not a cause. Earn the mechanism before calling it a pattern.
+* Once a mechanism is confirmed, **go looking** for it in work already
+  done, where the denominator matters.
+* **Third confirmed occurrence ⇒ the control has failed, not the
+  producer.** Do not write the reminder a second time. Escalate to
+  structure or machine enforcement, or record accepted risk with reasons.
+* The false claim stays visible beside its correction. Always.
+* **I am not the only producer in the denominator** — nor is any
+  adjudicator exempt.
+
+> **Provenance:** directed by Dainius on 2026-08-29, banked as doctrine
+> rule 49. His instruction, which is the one to keep: *make the lesson
+> part of the engineering system so none of us has to remember to be
+> good at it next time.*
+
 The full doctrine this serves, its standing rules and the specific
 failure that earned each one, is in `kai-pm/ENGINEERING_DOCTRINE.md`.
 It applies to my work and to anything delegated to a subagent, and it
@@ -496,6 +586,7 @@ outlives the investigation that produced it.
 | `kai-pm/WAYPOINTS.md` | known-good commits with evidence, and standing contingencies |
 | `kai-pm/DECISIONS.md` | append-only decision log |
 | `kai-pm/ORION_FIELD_NOTES.md` | **NON-AUTHORITATIVE WORKING MEMORY** — defect shapes, my failure modes and the tell for each. Creates no programme state, authority, acceptance criteria, closure or permission; a decision may cite it as a pointer but must re-earn the original evidence |
+| `kai-pm/FAILURE_PATTERN_LEDGER.md` | **AUTHORITATIVE, APPEND-ONLY** — verified incidents and confirmed failure mechanisms, with the control state of each. Consult it *before* consequential work (R18), not after. Distinct from the field notes: this one is governed |
 | `kai-pm/NEXT_STINT_PLAN.md` | current plan of work and its ordering |
 | `scripts/security/` | the gates; `check_gate_registry.py --gate` audits them |
 

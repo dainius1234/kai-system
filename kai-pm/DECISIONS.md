@@ -33183,3 +33183,248 @@ claim that runtime integration has been completed.**
   Orion. **Next free: D373 — NOT TO BE TAKEN without authorisation**
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7).
+
+---
+
+## D373 — 2026-08-29 — Rule 48: evidence handoff is lossless and scope-preserving. GOVERNANCE ONLY
+
+**Authority.** Dainius explicitly authorised banking this as permanent
+engineering doctrine after Kai adjudicated the third occurrence of one
+mechanism. Kai specified the semantics and the eleven invariants; he also
+directed that a single unified rule be banked rather than separate
+"anti-filtering" and "bounded-search" rules. **Allocator checked fresh,
+by inspection**: highest D-heading in this file was **D372**, `D373` had
+zero matches, next free confirmed. Doctrine stood at **rule 47** by
+inspection of every numbered rule; `CLAUDE.md` stood at **R16**.
+
+**This decision:** amends no frozen contract · changes no candidate,
+package or holdout · touches no H2 implementation · grants no HOUSE_H3
+authorship or H2 repair authority · implements no tooling.
+
+### 1. The failure, quantified
+
+Three incidents in one session. **One mechanism.** The measurements were
+correct every time; the sentence built on each was wider than what had
+been measured.
+
+| # | measured | transmitted | truth |
+|---|---|---|---|
+| 1 | a Pass A `local_context` field, cut at the 6000-byte window | "the document itself carries a truncated SHA, no closing backtick" | source intact — 40 chars, backtick present, `git show` byte-identical to the working tree at sha256 `ef81ac69…3f54` |
+| 2 | `find` over `/tmp/tmp.6xNl2hBs2V` and `/tmp/claude-0` | "passA.json was not preserved anywhere on disk. I looked." | tracked at `f196366`, 359,173 bytes, `PACKAGE.sha256`-bound as `0ea78096…d082d42`; `sha256sum -c` all 14 OK |
+| 3 | `h2v12-classification.json`, sha256 `eb50452d…0ad2fd` | "all 316 positive evidence facts carry none" | **235 of 316** carry the full nine-field §5 trace in the package-bound sidecar; 81 do not; **zero** have no support at all |
+
+**The tell is identical in all three.** The correct qualifier existed in
+the producer's own working output — a table header reading *"carrying a
+witness in the RESULT"*, a `find` command naming two paths, a field label
+— and was absent from the prose one or two lines later. **The prose is
+what enters the record.**
+
+**Controls in force at the moment of every occurrence:** doctrine 33, 35,
+46, 47 and `CLAUDE.md` R1, R13, R16 — all banked, all cited. Doctrine 47,
+which governs this shape for *reading*, was quoted by the producer in the
+same message that contained incident 2.
+
+### 2. What was banked
+
+* **`kai-pm/ENGINEERING_DOCTRINE.md` — rule 48**, in `### Derived
+  claims`, with the two formal invariants (`CLAIM_SCOPE ⊆
+  MEASURED_SCOPE`; `TRANSMITTED_RESULT = PREDICATE_RESULT` before any
+  declared transformation), eleven numbered consequences,
+  `SCOPE_OVERCLAIM` and `SILENTLY_CURATED` as zero-weight dispositions,
+  the mandatory eight-field transmission envelope, the recipient's
+  obligation to stop using a detected overclaim, and one earned-table
+  row. Explicitly **supplements** 33/35/46/47 and replaces none of them.
+* **`CLAUDE.md` — R17**, the in-flight form, plus **six R0 stop-signals**
+  and the ledger row in *Where things are*.
+
+### 3. What is deliberately NOT claimed
+
+Rule 48 is **`RULE_BANKED`, not `CONTROL_OPERATIONALISED`** (rule 44).
+The machine hook — reconcile extraction count against transmission count,
+refuse a consequential claim whose declared scope exceeds its measurement
+universe — is **specified, owned and unbuilt.** It is assigned to
+evidence-plane / professionalisation machinery and is **not to be
+implemented inside the frozen H2 candidate under this authority.**
+
+### 4. Substantive H2 findings recorded alongside, NOT resolved by this entry
+
+* **residual D14** — Pass A bisects a lexical token at `HEAD_BYTES=6000`,
+  emits a 29-of-40-character prefix with `truncated=false`, and git
+  resolves the unique prefix so it is stamped `VERIFIED`. 1 occurrence /
+  1 document / 272 population. Kai's ruling: **residual D14, not a new
+  class; BLOCKER; D14 closure FAILED in D368.** Class invariant: *a
+  bounded extraction must never silently terminate inside a recognised
+  evidence token.* **No repair mechanism chosen; none authorised.**
+* **E1** — 81 of 316 positive evidence facts do not carry the frozen §5
+  nine-field trace. Unit `path × positive fact`. **These are NOT 81 false
+  evidence facts** — the propositions may be true; the trace schema is
+  not satisfied as emitted.
+* **Q1** — `qualify.py` criterion [5] iterates axis cells only and never
+  reaches `evidence_facts`, so frozen §8(8) is not mechanically
+  established. Calibration in temp copies: `passA.json` **deleted** →
+  `FINDINGS: 0, EXIT 0`; `passA.json` **gutted and unbound** →
+  `FINDINGS: 0, EXIT 0`; `sha256sum -c PACKAGE.sha256` → exit 1 on both
+  trees. No executable file in the candidate references `PACKAGE.sha256`.
+* **I1** — `sha256(MANIFEST.sha256)` seeds the frozen holdout and
+  `MANIFEST.sha256` does not list `passA.json`. **BLOCKER on the
+  blind-holdout admission path.** A remedy of hashing `PACKAGE.sha256`
+  into the selection rule was **rejected as circular** — `PACKAGE.sha256`
+  lists `h2v12-holdout.json`.
+
+**E1 and Q1 may later deduplicate under one evidence-chain root cause.
+They are NOT to be counted as independent root causes yet.**
+
+### THREAD RECOVERY BLOCK — D373
+
+* **SCOPE** — governance only: `kai-pm/ENGINEERING_DOCTRINE.md`,
+  `CLAUDE.md`, `kai-pm/DECISIONS.md` (append). **No instrument,
+  contract, candidate, package or holdout byte changed**
+* **NEW IDENTIFIERS** — doctrine **rule 48** · **`CLAUDE.md` R17** · six
+  R0 tells · one earned-table row
+* **DOCTRINE STATE** — rules 1–48. **33–48 `RULE_BANKED`; none
+  `CONTROL_OPERATIONALISED`**
+* **D368 CANDIDATE** — `9d787706…`, aggregate `ba2b16d4…de4a`, **NOT
+  FROZEN, NOT ADMITTED, NOT ADMISSIBLE** on M1, M2, M3, residual D14,
+  E1, Q1 and I1. **Root-cause deduplication remains open**
+* **D367 CONTRACT** — `0ce5792e…00bb`, **unamended**
+* **HOLDOUT** — 40 rows, **not regenerated**, revealed rows retained as
+  regression and defect-discovery evidence. A repaired candidate requires
+  a **new** pre-holdout identity and a **newly selected** blind sample
+* **AUTHORISED NEXT ACTION** — **NONE. HOLD.**
+* **EXPLICITLY NOT AUTHORISED** — H2 repair of any kind · Pass A repair ·
+  candidate/contract/package/holdout modification · building any hook in
+  rules 33–49 · HOUSE_H3 design or authorship · programme-sequence change
+  · reopening D364/D365 · freezing or admitting D368
+* **CORRECTIONS TO PRIOR RECORDS** — three producer claims **withdrawn as
+  false**: "the document itself carries a truncated SHA"; "passA.json was
+  not preserved anywhere on disk"; "316 positive evidence facts carry a
+  witness: 0". The corrected values are in §1 above and in
+  `kai-pm/FAILURE_PATTERN_LEDGER.md`
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D373
+  Orion. **Next free: D374**
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7)
+
+---
+
+## D374 — 2026-08-29 — Rule 49: failure patterns are first-class engineering evidence. GOVERNANCE ONLY
+
+**Authority.** Dainius explicitly directed that monitoring mistakes,
+identifying recurrence patterns and maintaining a durable failure-pattern
+record become an enforced engineering rule — *"make the lesson part of
+the engineering system so none of us has to remember to be good at it
+next time."* Kai specified the ten invariants, the ledger schema, the
+pattern states and the architectural destination. **Allocator checked
+fresh**: D373 taken by the entry above, `D374` next free. Doctrine stood
+at rule 48; `CLAUDE.md` at R17.
+
+**This decision:** amends no frozen contract · changes no candidate,
+package or holdout · touches no H2 implementation · grants no
+implementation authority of any kind.
+
+### 1. Why a separate rule was needed
+
+D373 banked a rule against a mechanism that had already recurred three
+times **while four doctrine rules covering adjacent ground were banked
+and cited.** Writing a fifth rule and stopping there would repeat the
+programme's own recorded history: **14 of 17 H2 defects were covered by
+written doctrine at the moment they occurred** (rule 44).
+
+What was missing is not another prohibition. It is the closed loop:
+
+```
+FAILURE -> INCIDENT RECORD -> MECHANISM -> RECURRENCE SIGNATURE
+        -> STOP-SIGNAL / CONTROL -> CALIBRATION -> FUTURE RETRIEVAL
+```
+
+Without it we become excellent at correcting mistakes and keep
+rediscovering the same cognitive failure in different clothes.
+
+### 2. What was banked
+
+* **`kai-pm/ENGINEERING_DOCTRINE.md` — rule 49**, in `### Records and
+  streams`: ten mandatory invariants, including **incident ≠ mechanism**
+  (resemblance is a locator, rule 37), **recurrence is actively searched
+  for**, **a repeated mistake is evidence against its control**, the
+  **third-occurrence escalation threshold**, append-only corrections,
+  **everyone inside the denominator with no adjudicator exemption**,
+  retrieval-before-reasoning, and measured control effectiveness. Plus
+  the architectural destination, recorded as a requirement carrying no
+  implementation authority.
+* **`kai-pm/FAILURE_PATTERN_LEDGER.md`** — **new, authoritative,
+  append-only.** Distinct from `ORION_FIELD_NOTES.md`, which remains
+  non-authoritative working memory creating no programme state. Carries
+  the governing rules, the pattern-state machine, the three control
+  types, the eighteen-field incident schema, and the initial banked
+  content.
+* **`CLAUDE.md` — R18**, plus **five R0 stop-signals** and the ledger row
+  in *Where things are*.
+
+### 3. Initial ledger content
+
+* **`M-SCOPE-WIDEN`** — *bounded measurement → unbounded transmitted
+  claim*. **`PATTERN_CONFIRMED`**, recurrence **3**, incidents
+  `INC-2026-08-29-01/02/03` recorded in full with detection method,
+  evidence, affected scope and downstream impact. **Escalation threshold
+  reached.** Control is `MANUAL` (rule 48 / R17) with the machine hook
+  specified, owned and **unbuilt** — recorded as such rather than
+  reported as prevented.
+* **`M-PRODUCER-CURATION`** — *unexpected result → tidied handoff*. Kept
+  **`PATTERN_CANDIDATE`** and deliberately **NOT** merged into
+  `M-SCOPE-WIDEN`, because promoting it on resemblance is precisely what
+  rule 49.2 forbids. The evidence held against it so far is negative —
+  the 44-row / 238-witness M3 extraction went out complete, in
+  deterministic order, duplicates in place, with the `ed25519`
+  counterexample retained after being ruled not-M3, and per-chunk
+  reconciliation.
+
+### 4. Architectural destination — REQUIREMENT, NOT AUTHORITY
+
+A governed *Failure Pattern Memory / Reasoning Guard* that ingests only
+verified incidents, derives candidate mechanism similarity **without**
+automatic causal promotion, retrieves confirmed patterns **before**
+consequential reasoning, injects stop-signals into the reasoning context,
+checks proposed outputs and actions against known mechanisms, logs
+recurrences, measures whether controls reduce them, escalates repeated
+manual-control failures toward machine enforcement, and **never
+autonomously rewrites doctrine or its own governing rules.**
+
+**House Doctor is one consumer of this intelligence, not its owner.** The
+pattern memory must reach the reasoning and orchestration layer, so a
+known failure is avoided before there is anything to diagnose. The target
+is not a producer that remembers being wrong; it is one that becomes
+**progressively harder to fool in ways that have already fooled it.**
+
+**Not to be implemented during H2.** This becomes an Evidence Plane /
+reasoning-architecture requirement when that programme stage is reached.
+
+### THREAD RECOVERY BLOCK — D374
+
+* **SCOPE** — governance only: `kai-pm/ENGINEERING_DOCTRINE.md`,
+  `CLAUDE.md`, **new** `kai-pm/FAILURE_PATTERN_LEDGER.md`,
+  `kai-pm/DECISIONS.md` (append). **No instrument, contract, candidate,
+  package or holdout byte changed**
+* **NEW IDENTIFIERS** — doctrine **rule 49** · **`CLAUDE.md` R18** · five
+  R0 tells · one earned-table row · mechanisms **`M-SCOPE-WIDEN`**
+  (CONFIRMED) and **`M-PRODUCER-CURATION`** (CANDIDATE) · incidents
+  `INC-2026-08-29-01`, `-02`, `-03`
+* **DOCTRINE STATE** — rules 1–49. **33–49 `RULE_BANKED`; none
+  `CONTROL_OPERATIONALISED`**
+* **OPEN ESCALATION OBLIGATION** — `M-SCOPE-WIDEN` reached three
+  confirmed occurrences. Under rule 49.6 its `MANUAL` control is presumed
+  insufficient; the machine hook is specified and **not built**. **Do not
+  report this mechanism as prevented**
+* **D368 CANDIDATE** — **NOT ADMISSIBLE** on M1, M2, M3, residual D14,
+  E1, Q1, I1. **Root-cause deduplication remains open — these are
+  independently sufficient admission failures, NOT yet independent root
+  causes**
+* **D367 CONTRACT** — `0ce5792e…00bb`, **unamended**
+* **AUTHORISED NEXT ACTION** — **NONE. H2 HOLD REMAINS ABSOLUTE**
+* **EXPLICITLY NOT AUTHORISED** — H2 repair · Pass A repair ·
+  classifier/fixture/holdout change · building any hook in rules 33–49 ·
+  the Failure Pattern Memory plumbing · HOUSE_H3 design or authorship ·
+  reopening D364/D365 · freezing or admitting D368
+* **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D374
+  Orion. **Next free: D375**
+* **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+  unchanged (Programme Rule 7)
