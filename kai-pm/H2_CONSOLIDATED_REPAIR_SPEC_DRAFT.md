@@ -1,21 +1,25 @@
 # HOUSE_H2 — CONSOLIDATED REPAIR SPECIFICATION / DESIGN OPTIONS
 
-**REVISION 3 — incorporating Kai Design Review Rounds 1 and 2.**
+**REVISION 4 — incorporating Kai Design Review Rounds 1, 2 and 3.**
 **STATUS: DRAFT FOR REVIEW. NOT AUTHORISED. NO IMPLEMENTATION.**
 
 Revision 1 (`3782662`) proposed mechanisms. Revision 2 (`27e4e48`)
 applied Kai's fourteen Round-1 rulings and reported the selection-
 integrity finding. Kai independently verified that finding and issued
-Round 2. This revision formalises `I1-A`/`I1-B`, closes the Stage A
-membership rule, relabels the historical holdout throughout, and makes
-`D13` deterministic enough to implement.
+Round 2. Revision 3 (`c612562`) formalised `I1-A`/`I1-B`, closed the
+Stage A membership rule, relabelled the historical holdout and made `D13`
+deterministic. Kai Round 3 required four amendments, applied here:
+**`RUN.md` removed from Stage A** · **`I1-B`'s synthetic expectation
+corrected to an abort** · **the non-SELF invariant made explicit** ·
+**the three long-gap `D13` cases precommitted with their combined
+expected outputs.**
 
 This document still decides nothing. No repair, fixture mutation,
 candidate generation or change to the H2 package has been made.
 
 | | |
 |---|---|
-| repository state at authorship | `27e4e48` + this revision, worktree otherwise clean |
+| repository state at authorship | `c612562` + this revision, worktree otherwise clean |
 | candidate under repair | HOUSE_H2 v1.2, aggregate `ba2b16d4…de4a` — **UNMODIFIED** |
 | subject | `d8aac4d49e6ba997e3eb38062c0917186ee3f197`, tree `3abc9e9d…b117`, 272 documents |
 | governing contract | `kai-pm/H2_REPAIR_CONTRACT_D367.md`, sha256 `0ce5792e…00bb`, 389 lines |
@@ -45,7 +49,7 @@ comparison only.
 
 ---
 
-## 0.1 DISPOSITION SUMMARY — Kai Design Review Rounds 1 and 2
+## 0.1 DISPOSITION SUMMARY — Kai Design Review Rounds 1, 2 and 3
 
 | obligation | rev-1 recommendation | disposition |
 |---|---|---|
@@ -68,6 +72,26 @@ comparison only.
 Stage A given a **closed membership rule** with enumerated exclusions ·
 the historical 40 **relabelled as regression evidence** (§0.3) · `D13`
 given an **executable decision procedure** (A9).
+
+**Round 3 additions:** `RUN.md` **removed from Stage A**, with the
+membership test restated as *could these bytes change because the
+candidate was executed?* · `I1-B`'s synthetic expectation corrected from
+*"selected 40 unchanged"* to **reconciliation gate fails, selection does
+not run** · the **non-SELF invariant** made explicit with four combined
+`D12`/`D13` controls · the three long-gap `D13` cases **precommitted**
+with expected polarity, binding and SELF-fact result · additional `R1`/
+`R2` and parenthetical/`while` hostile controls.
+
+> **`RUN.md` IS A FAILURE OF MINE, AND IT HAS A NAME.** My rev-3 origin
+> table classified package files by **extension** — `*.md → PRE-EXECUTION
+> document` — and `RUN.md` inherited that label without being opened.
+> That is the **`D2` mechanism**: kind decided by character class rather
+> than by what the thing is. I wrote the amended `D2` rule requiring
+> *context and resolution* in the same document in which I classified a
+> file by its suffix. Logged as a recurrence observation under R18; the
+> ledger append is not authorised. **The membership test in B2/B3 is now
+> a content test, not a filename test** — which is the structural form of
+> the correction, not a reminder to be more careful.
 
 ---
 
@@ -719,15 +743,76 @@ R6  DEFAULT
 | `**Status:** authoritative` | R3 | POSITIVE |
 | `Do not treat X … as authoritative` | R4 | NEGATIVE — **see below** |
 
-> **DECLARED CONSEQUENCE, NOT HIDDEN.** Under `R4` the three long-gap
-> corpus inputs become `NEGATIVE` rather than `POSITIVE`. Two of them
-> describe *other components* and one is instructional, so a NEGATIVE
-> authority *claim* is arguably no more correct than a POSITIVE one —
-> what should carry them is the **subject binding** (`D12`/`bind_subject`
-> resolving them to `OTHER`), not the polarity axis. I flag this rather
-> than tune `R4` around it: it is precisely the `D12`+`D13` combined
-> regression population Kai requires, and it must be adjudicated on the
-> combined output, not designed around here.
+**ADDITIONAL HOSTILE CONTROLS (Kai Round 3 §1, §7).**
+
+| control | rule | expected |
+|---|---|---|
+| `This document is non-authoritative but current.` | **R1 before R2** | `NEGATIVE` — the authority term itself is explicitly negated; later contrast about another property does not make that assertion unclear |
+| `not authoritative but final` | R2 | `UNRESOLVED` — R1 is **attached** negation only and does not consume `not authoritative`, so this correctly reaches the contrast rule |
+| parenthetical authority declaration | R2 / R6 | conservative abstention acceptable |
+| temporal `while` | R2 | `UNRESOLVED` — **over-abstention, and accepted.** `while` is in the contrast set and the rule cannot distinguish temporal from contrastive use. Kai Round 3 §7: conservative over-abstention is acceptable where the deterministic rule cannot distinguish the meaning. **We do not enlarge D13 into NLP to recover these.** |
+| contrastive `while` | R2 | `UNRESOLVED` |
+
+**`R1` STAYS BEFORE `R2`** (Kai Round 3 §1). The ordering is correct
+because the two rules answer different questions: `R1` sees the authority
+term *itself* negated; `R2` sees a sentence whose structure hides which
+property the negation governs.
+
+---
+
+### THE NON-SELF INVARIANT (Kai Round 3 §2) — REGRESSION HARDENING
+
+> **A NON-SELF SUBJECT CAN NEVER EMIT A SELF AUTHORITY FACT, REGARDLESS
+> OF POLARITY.**
+
+**VERIFIED IN THE LIVE CODE, not accepted on description.**
+`subjectbind.py:157-167`:
+
+```python
+def authority_claim(claims):
+    s = {c["polarity"] for c in claims if c["subject"] == "SELF"}
+```
+
+The comprehension filters on `c["subject"] == "SELF"` — an exact match.
+`OTHER`, `AMBIGUOUS` and any unresolved subject cannot reach
+`SELF_ASSERTS_AUTHORITY`, `SELF_ASSERTS_NON_AUTHORITY` or
+`CONFLICTING_SELF_CLAIMS`. **The protection exists today.** It is written
+here as an explicit invariant so that no repair removes it by accident —
+`D12` changes what `bind_subject` returns and `D13` changes what
+`polarity_of` returns, and this guard sits directly downstream of both.
+
+**MANDATORY COMBINED `D12`/`D13` REGRESSION CONTROLS.**
+
+| polarity | subject | required emission |
+|---|---|---|
+| `NEGATIVE` | `OTHER` | **no SELF authority fact** |
+| `NEGATIVE` | `UNRESOLVED` | **no SELF authority fact** |
+| `POSITIVE` | `OTHER` | **no SELF authority fact** |
+| `POSITIVE` | `UNRESOLVED` | **no SELF authority fact** |
+
+---
+
+### PRECOMMITTED REGRESSION TABLE — THE THREE LONG-GAP CASES (Kai Round 3 §6)
+
+**Precommitted here, before implementation, so the expected outputs
+cannot be adjusted to whatever the repair produces.** The load-bearing
+requirement is the **COMBINED** result in the final column — not the
+polarity column.
+
+| # | source sentence (opening) | file | expected polarity (new rule) | expected subject binding | **expected SELF evidence fact** |
+|---|---|---|---|---|---|
+| 1 | `Do not treat Dashboard, Agentic, Verifier, Fusion, Tool Gate, Trust, self-audit or health output as …` | `CODE_AUDIT_FINAL_REPORT.md` | `NEGATIVE` (R4) | `OTHER` — the sentence names other components | **none** |
+| 2 | `- Do not treat Dashboard, Agentic, Verifier, … output a…` | `CODE_AUDIT_REMEDIATION_BACKLOG.md` | `NEGATIVE` (R4) | `OTHER` | **none** |
+| 3 | `**LOOKUP → VERIFY SUBJECT → USE IDENTIFIER.** Never use a remembered run id, SHA, artifact or subjec…` | `DECISIONS.md` | `NEGATIVE` (R4) | `OTHER` / `UNRESOLVED` — instructional, no self-assertion | **none** |
+
+> **NO LEXICAL EXCEPTIONS (Kai Round 3 §6).** Rev-3 flagged that these
+> three flip from `POSITIVE` to `NEGATIVE` and declined to tune `R4`
+> around them. That stands, and Kai has now made it binding: **do not
+> invent special lexical exceptions to preserve historical polarity.**
+> The polarity column is not what protects these rows — **the subject
+> binding is.** If the combined result emits a SELF fact for any of the
+> three, the defect is in `D12`'s binding, not in `D13`'s polarity, and
+> it must be repaired there.
 
 **H2 is not required to solve unrestricted natural-language semantics**
 (Kai §9). The AUTHORITY verdict remains abstention-only at H2 regardless.
@@ -858,7 +943,6 @@ memory:**
 |---|---|
 | `passa.py` `classify.py` `subjectbind.py` `ontology.py` `envelope.py` `run_h2_v12.py` `qualify.py` `cal_fixtures.py` | candidate source modules |
 | `holdout.py` | holdout-selection code |
-| `RUN.md` | governed static package document |
 | `H2_REPAIR_CONTRACT_D367.md` sha256 `0ce5792e…00bb` | frozen repair/admission contract |
 | subject commit `d8aac4d4…f197` + tree `3abc9e9d…b117` | subject identity |
 | history-source identity | resolution authority for `D2` |
@@ -867,8 +951,47 @@ memory:**
 
 **STAGE A EXCLUSIONS — enumerated, not implied:**
 `passA.json` · `h2v12-classification.json` · `h2v12-holdout.json` ·
-qualification output · logs · generated evidence · **any artefact whose
-bytes result from running the candidate.**
+**`RUN.md`** · qualification output · logs · generated evidence · **any
+artefact whose bytes result from running the candidate.**
+
+#### THE MEMBERSHIP TEST (Kai Round 3 §5)
+
+> **NOT** *"committed, therefore static."*
+> **THE TEST IS: could these exact bytes change because the candidate was
+> executed?** If YES → Stage B, not Stage A.
+
+**`RUN.md` REMOVED FROM STAGE A — verified, not accepted on description.**
+It fails the test on its own face:
+
+* L13-14 — *"**Candidate aggregate** (instrument **and result**):
+  `ba2b16d4…de4a`"*
+* L67-76 — per-axis result tables (`SCOPE 166 WHOLE_FILE / 106`, …)
+* L126 — *"0 qualification findings"*
+* L167-183 — the blind-holdout narrative
+
+213 lines, and its bytes plainly change when the candidate runs. It may
+be bound in **Stage B** / the final package as documentation, but **it
+must never influence the blind-selection identity.**
+
+> **AND `RUN.md` L175-179 IS EVIDENCE ABOUT `I1-A` ITSELF.** In the
+> package's own words:
+>
+> > *"`MANIFEST.sha256` covers the **instrument and its result**, fixing
+> > the aggregate before the holdout exists; `PACKAGE.sha256` is the full
+> > inventory including the holdout. **Without that separation the
+> > selection would depend on its own output.**"*
+>
+> The hazard was **named**, in the package, by its author. The separation
+> was then drawn **one artefact too late** — between *result* and
+> *holdout*, instead of between *instrument* and *result*. The stated
+> guarantee prevents the selection depending on the **holdout**; it does
+> not prevent it depending on the **classification**, and the label
+> *"instrument and result"* says so openly.
+>
+> This is **R15 / doctrine 40**: a risk recorded in prose beside the
+> construction that realises it. The same mechanism as the D368 `W2`
+> incident — worry written down, construction shipped. Logged here as a
+> recurrence observation; the ledger append is not authorised.
 
 **`MANIFEST.sha256` CANNOT SERVE AS STAGE A IN ITS CURRENT FORM** — it
 already contains `h2v12-classification.json`. **`PACKAGE.sha256` cannot
@@ -880,9 +1003,18 @@ manifest**.
 #### `I1-B` — THE SELECTION UNIVERSE
 
 ```
-tree_paths = exact tracked .md population of the frozen subject tree
-selection  = select(sorted(tree_paths), stage_a_identity)
-assert candidate output paths reconcile EXACTLY against tree_paths
+tree_paths  = exact tracked .md population of the frozen subject tree
+out_paths   = candidate output path MULTISET   (multiset, not set —
+                                                a duplicate must be visible)
+
+RECONCILIATION GATE — runs BEFORE selection, and can abort it:
+    same count            |out_paths| == |tree_paths|
+    no duplicates         out_paths has no repeated member
+    no tree-only path     tree_paths - out_paths == {}
+    no output-only path   out_paths - tree_paths == {}
+  ── any guard fails → ABORT. HOLDOUT SELECTION DOES NOT RUN. ──
+
+selection   = select(sorted(tree_paths), stage_a_identity)
 ```
 
 **A candidate cannot move its own holdout by omitting a row, adding a
@@ -923,16 +1055,37 @@ self-referential aggregate.**
 
 1. One byte altered in one module → Stage A identity changes, package
    **fails**.
-2. **`I1-A`** — an evidence artefact altered after Stage A must **not**
-   change the Stage A identity, and therefore must not change the
-   selected 40. *This is the control that would have caught the current
-   defect.* A fail-old is available directly from the artefacts: today,
-   altering `h2v12-classification.json` **does** change the aggregate.
-3. **`I1-B` — SYNTHETIC REQUIRED.** There is no natural fail-old, because
-   output and tree currently reconcile exactly. Construct a candidate
-   that drops one row, adds one, and duplicates one; each must leave the
-   selected 40 **unchanged**. Without this synthetic, `I1-B` would pass
-   its own test by accident and be declared repaired untested — I-8.
+2. **`I1-A`, cleanly separated from `I1-B` (Kai Round 3 §3).** Mutate an
+   evidence artefact **after** a valid Stage A identity exists, leaving
+   the output path population intact so the reconciliation gate passes:
+   → **Stage A identity unchanged**
+   → **tree-derived selected 40 unchanged**
+   → **Stage B identity changes**
+   *This is the control that would have caught the current defect.* A
+   fail-old is available directly from the artefacts: today, altering
+   `h2v12-classification.json` **does** change the aggregate.
+   Keeping the path set intact is what makes this test `I1-A` and not a
+   second `I1-B` test.
+3. **`I1-B` — SYNTHETIC REQUIRED, EXPECTED BEHAVIOUR CORRECTED
+   (Kai Round 3 §3).** There is no natural fail-old: output and tree
+   currently reconcile exactly. Construct three mutations — **drop one
+   row · add one row · duplicate one row.**
+
+   **Rev-3 stated the wrong expectation.** It required the selected 40 to
+   be *unchanged*, which would let a malformed candidate proceed to
+   evaluation as long as the sample held still. That is the wrong safety
+   property: a candidate whose output does not match the frozen 272 has
+   no business being evaluated at all.
+
+   **EXPECTED RESULT FOR EACH MUTATION:**
+   **RECONCILIATION GATE FAILS · HOLDOUT SELECTION DOES NOT RUN.**
+
+   This is R11 in its proper form — *no subject, no observation.* The
+   prerequisite is a candidate whose output population is the frozen
+   subject population. Unmet, nothing downstream may be measured.
+
+   Without this synthetic, `I1-B` would pass its own test by accident and
+   be declared repaired untested — I-8.
 
 **PASS-NEW.** The unmodified package passes both stages, and the
 admission record reproduces the holdout selection from Stage A alone.
@@ -1049,10 +1202,10 @@ not enlarge this repair into a general H2 rewrite for elegance.
 
 ```
 DOCUMENT          H2 CONSOLIDATED REPAIR SPECIFICATION / DESIGN OPTIONS
-REVISION          3 — incorporates Kai Design Review Rounds 1 and 2
+REVISION          4 — incorporates Kai Design Review Rounds 1, 2 and 3
 STATUS            DRAFT. NOT AUTHORISED. NO IMPLEMENTATION.
 AUTHORED          2026-08-29, by Orion
-PRIOR REVISIONS   3782662 (rev 1) · 27e4e48 (rev 2)
+PRIOR REVISIONS   3782662 (r1) · 27e4e48 (r2) · c612562 (r3)
 CANDIDATE         HOUSE_H2 v1.2, aggregate ba2b16d4…de4a — UNMODIFIED
 SUBJECT           d8aac4d4…f197, tree 3abc9e9d…b117, 272 documents
 CONTRACT          H2_REPAIR_CONTRACT_D367.md, sha256 0ce5792e…00bb
@@ -1080,6 +1233,14 @@ NOT AUTHORISED    repair · fixture mutation · design implementation ·
                   candidate generation · D375 · ledger append ·
                   any holdout computation
 HOLD              H2 HOLD remains until Dainius authorises implementation
+ROUND 3 EDITS     RUN.md removed from Stage A (execution-derived:
+                    carries the candidate aggregate, axis results,
+                    qualification findings, holdout narrative) ·
+                  I1-B synthetic now expects RECONCILIATION GATE FAILS /
+                    SELECTION DOES NOT RUN, not "selected 40 unchanged" ·
+                  non-SELF invariant explicit + 4 combined controls ·
+                  3 long-gap D13 cases precommitted with expected
+                    polarity, binding and SELF-fact result
 NEXT              Final design to Dainius for the implementation-authority
-                  decision.
+                  decision. Kai: technically ready after these four edits.
 ```
