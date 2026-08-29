@@ -70,26 +70,150 @@ def contradiction_of(row):
         except Exception:
             continue
         if (gl - claimed).days > 0:
+            # F6 (Kai): `context` is PRESENTATION, not determining
+            # evidence. It is named as an excerpt, and the evidence that
+            # actually determined the contradiction travels beside it as
+            # a complete 9-field witness -- which is also what lets E1
+            # bind this fact to a compliant trace.
             return {"claimed": str(claimed), "git_last": row["last"],
                     "drift_days": (gl - claimed).days,
                     "selector": w["source_selector"],
-                    "context": w["local_context"][:120]}
+                    "context_excerpt": w["local_context"][:120],
+                    "context_excerpt_is_partial":
+                        len(w["local_context"]) > 120,
+                    "determining_witness": dict(w)}
     return None
 
 
-def evidence_facts(row, claims, contradiction):
-    """FACTS. None of these is a verdict (D360 5)."""
-    f = {}
-    f["MAINTENANCE_OBSERVED"] = row["commits_in_window"] > 1
-    f["CONSUMED_AT_SUBJECT"] = bool(row["readers"])
-    f["CITES_COMMIT"] = bool(row["witnesses"].get("COMMIT"))
-    f["CITES_RUN"] = bool(row["witnesses"].get("RUN_ID"))
-    f["CARRIES_DATE_STAMP"] = bool(row["witnesses"].get("DATE"))
-    f["BINDING_CONTRADICTION"] = contradiction is not None
+def _witness_trace(row, family):
+    """The first emitted witness of `family`, already 9-field compliant."""
+    ws = (row["witnesses"] or {}).get(family) or []
+    if not ws:
+        return None
+    w = dict(ws[0])
+    w["evidence_total"] = len(ws)
+    w["evidence_shown"] = 1
+    w["truncated"] = len(ws) > 1
+    return w
+
+
+def _history_trace(row, kind, value, note):
+    """A 9-field trace for a fact whose evidence is the HISTORY, not the
+    document text. The selector is the history coordinate rather than a
+    line, which is what D367 5 means by "or an equivalent STABLE
+    selector" -- it is re-derivable by anyone with the subject.
+    """
+    return {"witness_type": kind, "witness_value": str(value),
+            "source_path": row["path"],
+            "source_selector": f"history:{row['path']}",
+            "local_context": note, "applicability_scope": "WHOLE_FILE",
+            "evidence_total": 1, "evidence_shown": 1, "truncated": False,
+            "polarity": "POSITIVE", "certainty": "OBSERVED",
+            "temporal": "AT_COMMIT", "subject": "SELF"}
+
+
+def _claim_trace(row, determining, total):
+    """A 9-field trace for a SELF-bound authority fact.
+
+    The determining rows are CLAIM records, not witnesses -- they carry a
+    selector and a sentence but not the nine fields -- so E1 could not
+    bind them, and A6-ii would have ABSTAINED four SELF_ASSERTS_AUTHORITY
+    and one SELF_ASSERTS_NON_AUTHORITY rather than tracing them. That
+    would be E1 deleting facts instead of binding them, and it would move
+    AUTHORITY, which belongs to step 5. The claim is promoted to a trace
+    instead.
+
+    `applicability_scope` is SPAN, not WHOLE_FILE: the evidence is the
+    sentence. Choosing WHOLE_FILE here would be an unearned widening and
+    a scope decision, which is M3's at step 2.
+    """
+    c = determining[0]
+    return {"witness_type": "SELF_AUTHORITY_CLAIM",
+            "witness_value": c.get("term") or "",
+            "source_path": row["path"], "source_selector": c["selector"],
+            "local_context": c["text"], "applicability_scope": "SPAN",
+            "evidence_total": total, "evidence_shown": len(determining),
+            "truncated": len(determining) < total,
+            "polarity": c["polarity"], "certainty": "OBSERVED",
+            "temporal": "AT_COMMIT", "subject": "SELF"}
+
+
+NINE_FIELDS = ("witness_type", "witness_value", "source_path",
+               "source_selector", "local_context", "applicability_scope",
+               "evidence_total", "evidence_shown", "truncated")
+
+
+def _compliant(t):
+    """E1 / D367 5. Present is not enough -- the trace must be SEMANTICALLY
+    TRUTHFUL: all nine fields, and the context must actually contain the
+    value it claims to evidence.
+    """
+    if not t or any(t.get(k) in (None, "") for k in NINE_FIELDS):
+        return False
+    return str(t["witness_value"]) in str(t["local_context"])
+
+
+def evidence_facts(row, claims, contradiction, determining=()):
+    """FACTS, each bound to the trace that DETERMINED it. None is a
+    verdict (D360 5).
+
+    E1. v1.2 emitted these as bare booleans. D367 5 requires every
+    POSITIVE evidence fact to carry a source-bound witness sufficient for
+    independent adjudication, and 81 of 316 positives carried none that
+    was bound to the fact itself: 71 MAINTENANCE_OBSERVED and 5
+    CONSUMED_AT_SUBJECT had no witness at all, and 5
+    BINDING_CONTRADICTION carried a 5-field contradiction record rather
+    than a 9-field witness.
+
+    A6-i: the producer that SETS the boolean carries the witness that set
+    it. A6-ii: a positive with no compliant trace is NOT emitted as
+    positive -- it abstains. A related trace living elsewhere in the
+    package does not qualify; the binding is to the fact.
+    """
+    cand, traces = {}, {}
+    cand["MAINTENANCE_OBSERVED"] = (
+        row["commits_in_window"] > 1,
+        lambda: _history_trace(
+            row, "COMMIT_COUNT_IN_WINDOW", row["commits_in_window"],
+            f"{row['commits_in_window']} commits touch {row['path']} in the "
+            f"subject window; last {row.get('last') or 'unknown'}"))
+    cand["CONSUMED_AT_SUBJECT"] = (
+        bool(row["readers"]),
+        lambda: _history_trace(
+            row, "STATIC_READER_REFERENCE", len(row["readers"]),
+            f"{len(row['readers'])} static reader reference(s) resolve to "
+            f"{row['path']}: {', '.join(row['readers'])}"))
+    cand["CITES_COMMIT"] = (bool(row["witnesses"].get("COMMIT")),
+                            lambda: _witness_trace(row, "COMMIT"))
+    cand["CITES_RUN"] = (bool(row["witnesses"].get("RUN_ID")),
+                         lambda: _witness_trace(row, "RUN_ID"))
+    cand["CARRIES_DATE_STAMP"] = (bool(row["witnesses"].get("DATE")),
+                                  lambda: _witness_trace(row, "DATE"))
+    cand["BINDING_CONTRADICTION"] = (
+        contradiction is not None,
+        lambda: dict(contradiction["determining_witness"])
+        if contradiction else None)
     ac = sb.authority_claim(claims)
-    f["SELF_ASSERTS_AUTHORITY"] = ac == "SELF_ASSERTS_AUTHORITY"
-    f["SELF_ASSERTS_NON_AUTHORITY"] = ac == "SELF_ASSERTS_NON_AUTHORITY"
-    return f, ac
+    for name, want in (("SELF_ASSERTS_AUTHORITY", "SELF_ASSERTS_AUTHORITY"),
+                       ("SELF_ASSERTS_NON_AUTHORITY",
+                        "SELF_ASSERTS_NON_AUTHORITY")):
+        cand[name] = (ac == want,
+                      (lambda d=determining, n=len(claims): _claim_trace(
+                          row, d, n) if d else None))
+
+    f, abstained = {}, []
+    for name, (positive, mk) in cand.items():
+        if not positive:
+            f[name] = False
+            continue
+        t = mk()
+        if _compliant(t):
+            f[name] = True
+            traces[name] = t
+        else:                       # A6-ii: no compliant trace, no positive
+            f[name] = False
+            abstained.append(name)
+    return f, ac, traces, abstained
 
 
 def main():
@@ -112,13 +236,20 @@ def main():
         text = (sr / row["path"]).read_text(errors="ignore")
         claims, stats = sb.bind_claims(row["path"], text)
         contradiction = contradiction_of(row)
-        facts, ac = evidence_facts(row, claims, contradiction)
+        # D14/D15: the DETERMINING rows are always carried, with counts.
+        # E1 needs them BEFORE the facts, because a SELF-authority fact
+        # must bind to the row that determined it.
+        det = sb.determining_claims(claims)
+        facts, ac, fact_traces, abstained = evidence_facts(
+            row, claims, contradiction, det)
         row["authority_claim"] = ac
         out = cl.classify(row, text, contradiction)
         out["evidence_facts"] = facts
+        # E1: every POSITIVE fact carries the trace that determined it.
+        out["evidence_fact_traces"] = fact_traces
+        if abstained:
+            out["evidence_facts_abstained_no_compliant_trace"] = abstained
         out["authority_claim"] = ac
-        # D14/D15: the DETERMINING rows are always carried, with counts
-        det = sb.determining_claims(claims)
         out["authority_evidence"] = {
             "determining": det, "total": stats["total"],
             "shown": len(det),

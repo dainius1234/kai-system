@@ -140,10 +140,19 @@ def bind_claims(path, text, head_bytes=None):
         if pol is None:
             continue
         subject, why = bind_subject(head, start, sent, path)
+        at = AUTH_TERM.search(sent)
         claims.append({
             "polarity": pol, "subject": subject, "subject_reason": why,
             "selector": f"L{head[:start].count(chr(10)) + 1}",
-            "text": sent[:200],
+            # E1 / Kai step-1 7: NO DETERMINING EVIDENCE FIELD MAY BE
+            # SILENTLY TRUNCATED. `sent[:200]` was the same clip as F5,
+            # in the authority path, and this text becomes the
+            # `local_context` of the trace that determines a SELF
+            # authority fact. It is carried whole.
+            "text": sent,
+            # the EXACT matched phrase, so the trace can carry a value
+            # rather than a description (D367 5).
+            "term": at.group(0) if at else "",
         })
     stats = {"total": len(claims),
              "self_bound": sum(1 for c in claims if c["subject"] == "SELF"),
