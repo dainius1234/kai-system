@@ -126,46 +126,36 @@ def _selector(text, start, end=None):
     return f"L{line}" if last == line else f"L{line}-L{last}"
 
 
-CONTEXT_BUDGET = 200
-
-
 def _context(text, start, end):
-    """The determining evidence must be INSIDE the context it ships with.
+    """The COMPLETE logical source line(s) the witness sits in. No cap.
 
     D367 5: "local_context -- surrounding text sufficient to judge the
-    match", and "the evidence actually responsible for the emitted cell
-    must always be recoverable ... without guessing which source fragment
-    mattered."
+    match", and "SILENT TRUNCATION IS FORBIDDEN. The evidence actually
+    responsible for the emitted cell must always be recoverable ...
+    without guessing which source fragment mattered."
 
-    v1.2 took `line[:200]`, which is the first 200 characters of the line
-    REGARDLESS OF WHERE THE MATCH SITS. When the line was long and the
-    match late, the context did not contain the witness at all. Measured
-    on the frozen candidate: 40 clipped contexts, of which 10 -- every one
-    a TECH_WATCH row -- did not contain their own `witness_value`, and all
-    10 declared `truncated=False`.
+    v1.2 took `line[:200]` -- the first 200 characters OF THE LINE,
+    wherever the match sat. A long line with a late match shipped a
+    context that did not contain the witness at all: 40 clipped contexts,
+    of which 10 (every one a TECH_WATCH DATE row) lacked their own
+    `witness_value`, all declaring `truncated=False`.
 
-    The budget is now spent AROUND the match rather than from the start of
-    the line, and it never returns a window that excludes the value: a
-    witness longer than the budget widens the window to fit rather than
-    being cut. F5.
+    A centred 200-character budget was the first repair. It proved
+    PRESENCE but not COMPLETENESS, so it left silent truncation in place
+    at the line's edges. THE CAP IS NOW GONE.
+
+    There is deliberately no tenth field and no reuse of `truncated`.
+    `truncated` is bound by envelope.py to `evidence_shown <
+    evidence_total` -- a row-count property -- and context clipping is a
+    different truncation wearing the same word. Carrying the complete
+    line dissolves the collision instead of encoding it. Where a source
+    region is genuinely too large to carry inline, D367 5's authorised
+    alternative is a stable selector plus a hash-bound sidecar -- never a
+    silent clip.
     """
     ls = text.rfind("\n", 0, start) + 1
     le = text.find("\n", end)
-    if le < 0:
-        le = len(text)
-    line = text[ls:le]
-    if len(line) <= CONTEXT_BUDGET:
-        return line.strip()
-
-    # Centre the budget on the match. The value is never the thing cut:
-    # if it alone exceeds the budget, the window grows to contain it.
-    a, b = start - ls, end - ls
-    span = max(CONTEXT_BUDGET, b - a)
-    slack = span - (b - a)
-    lo = max(0, a - slack // 2)
-    hi = min(len(line), lo + span)
-    lo = max(0, hi - span)
-    return line[lo:hi].strip()
+    return text[ls:le if le >= 0 else len(text)].strip()
 
 
 def _scope_of(text, start):
@@ -221,49 +211,82 @@ def classify_token_kind(text, m, history_repo, subject):
     return "HEX_SHAPED_UNRESOLVED", False
 
 
+def _eligible(m):
+    """D14 / A5-ii, START-BOUND. The boundary decides WHICH TOKENS ARE
+    ELIGIBLE; it must never decide WHAT AN ELIGIBLE TOKEN IS.
+
+    v1.2 matched against `text[:HEAD_BYTES]`, so a token straddling the
+    boundary was recognised in its cut form: 76dbba4... was emitted as a
+    29-character prefix with `truncated=False` (D14-A), and a token cut
+    below the recogniser's 7-character minimum vanished entirely (D14-B).
+    The character index was deciding what a token *was*.
+
+    Recognition now runs against the COMPLETE source and admission is by
+    the frozen start predicate alone. `token_end` MAY exceed HEAD_BYTES.
+    A token whose START is at or beyond the boundary is NOT admitted
+    merely because the scanner can now see it -- that would be A5-i,
+    which was rejected at a measured 491 -> ~1973 records.
+
+    This is not a larger HEAD_BYTES and not a guessed extension margin.
+    """
+    return m.start() < HEAD_BYTES
+
+
 def scan(path, text, history_repo, subject):
-    """Every witness in the head window. NO verdict is formed here."""
+    """Every witness whose token STARTS in the head window, carried whole.
+    NO verdict is formed here.
+
+    `head` survives for ONE purpose: _scope_of's uniqueness universe. Its
+    denominator is deliberately left unchanged here, because moving it is
+    an M3 decision (step 2) and step 1 may not shift applicability scope.
+    """
     head = text[:HEAD_BYTES]
     out = collections.defaultdict(list)
 
-    for m in HEX.finditer(head):
-        kind, is_commit = classify_token_kind(head, m, history_repo, subject)
+    for m in HEX.finditer(text):
+        if not _eligible(m):
+            continue
+        kind, is_commit = classify_token_kind(text, m, history_repo, subject)
         out["COMMIT" if is_commit else kind].append(Witness(
             witness_type=kind, witness_value=m.group(0), source_path=path,
-            source_selector=_selector(head, m.start()),
-            local_context=_context(head, m.start(), m.end()),
+            source_selector=_selector(text, m.start()),
+            local_context=_context(text, m.start(), m.end()),
             applicability_scope=_scope_of(head, m.start()),
             evidence_total=1, evidence_shown=1, truncated=False,
             polarity="POSITIVE", certainty="VERIFIED" if is_commit else "OBSERVED"))
 
-    for m in DECIMAL_RUN.finditer(head):
-        before = head[max(0, m.start() - 24):m.start()]
-        window = head[max(0, m.start() - 24):m.end()]
+    for m in DECIMAL_RUN.finditer(text):
+        if not _eligible(m):
+            continue
+        before = text[max(0, m.start() - 24):m.start()]
+        window = text[max(0, m.start() - 24):m.end()]
         if not (RUN_NEAR.search(before) or RUN_URL.search(window)):
             continue
         out["RUN_ID"].append(Witness(
             witness_type="RUN_ID", witness_value=m.group(0), source_path=path,
-            source_selector=_selector(head, m.start()),
-            local_context=_context(head, m.start(), m.end()),
+            source_selector=_selector(text, m.start()),
+            local_context=_context(text, m.start(), m.end()),
             applicability_scope=_scope_of(head, m.start()),
             evidence_total=1, evidence_shown=1, truncated=False,
             polarity="POSITIVE", certainty="OBSERVED"))
 
-    for m in DATE.finditer(head):
+    for m in DATE.finditer(text):
+        if not _eligible(m):
+            continue
         out["DATE"].append(Witness(
             witness_type="DATE_STAMP", witness_value=m.group(0),
-            source_path=path, source_selector=_selector(head, m.start()),
-            local_context=_context(head, m.start(), m.end()),
+            source_path=path, source_selector=_selector(text, m.start()),
+            local_context=_context(text, m.start(), m.end()),
             applicability_scope=_scope_of(head, m.start()),
             evidence_total=1, evidence_shown=1, truncated=False,
             polarity="POSITIVE", certainty="OBSERVED"))
 
-    m = SUPBY.search(head)
+    m = next((x for x in SUPBY.finditer(text) if _eligible(x)), None)
     if m:
         out["SUPERSEDED_BY"].append(Witness(
             witness_type="NAMED_SUCCESSOR", witness_value=m.group(1),
-            source_path=path, source_selector=_selector(head, m.start()),
-            local_context=_context(head, m.start(), m.end()),
+            source_path=path, source_selector=_selector(text, m.start()),
+            local_context=_context(text, m.start(), m.end()),
             applicability_scope="WHOLE_FILE",   # supersession is file-level
             evidence_total=1, evidence_shown=1, truncated=False,
             polarity="POSITIVE", certainty="OBSERVED"))
