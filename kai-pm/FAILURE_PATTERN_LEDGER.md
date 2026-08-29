@@ -741,3 +741,197 @@ disproven proposal.
 **Producers represented: Orion 5 · Kai 1 · DeepSeek 2.** Recorded because
 a ledger containing only one producer's failures would be evidence about
 who writes the ledger, not about the system (rule 49.8).
+
+---
+
+# QUEUED INCIDENTS, BANKED 2026-08-29
+
+Kai directed these three to be held until the repair matrix closed, then
+**reversed that instruction**: an incident that exists only in chat is
+not durable engineering memory, and rule 49.1 says material errors are
+logged, not merely corrected. Banked under existing D374 authority.
+Ledger only. No D-number. No doctrine change. No H2 artefact touched.
+
+All three `INCIDENT_ONLY`. No mechanism id invented for any of them.
+
+---
+
+### `INC-2026-08-29-09` — a control asserted as a current output, never checked
+
+```
+date                    2026-08-29
+producer                Orion
+subject/version         the M1 row of the repair-spec matrix; committed
+                        h2v12-classification.json eb50452d…0ad2fd
+false_or_faulty_output  "same-family positive: `Last updated:` on
+                        kai-pm/STATUS.md L3 MUST still earn it
+                        [TIME_BOUND]" — offered as the control proving an
+                        M1 repair had not over-fired
+corrected_output        kai-pm/STATUS.md emits UNKNOWN ON ALL SIX AXES.
+                        Its VALIDITY observed reads "witness kinds
+                        present: ['DATE']"; its SCOPE observed reads "no
+                        witness whose applicability is the document as a
+                        whole". Its date witness is SPAN. It is row [35]
+                        of the 44-row M3 locator and appears in Kai's own
+                        list of 29 M3-AFFECTED documents. IT IS NOT A
+                        TIME_BOUND POSITIVE AND NEVER WAS
+detection_method        Kai rejected the control on SEMANTICS — that a
+                        metadata label does not earn temporal validity
+                        under D367. Orion then opened the artefact and
+                        found the underlying FACTUAL error, which is the
+                        worse of the two
+evidence                the six committed cells for kai-pm/STATUS.md;
+                        locator membership True
+affected_scope          one control in one matrix row
+downstream_impact       NONE — the matrix was rejected before any repair
+                        or fixture was designed against it
+mechanism_status        INCIDENT_ONLY
+mechanism_id            (none)
+NOT_ASSIGNED_TO         M-SCOPE-WIDEN. That mechanism is measure-then-
+                        widen: a correct bounded measurement transmitted
+                        at a wider scope. THIS IS ASSERT-WITHOUT-
+                        MEASURING — no measurement was taken at all.
+                        Adjacent, and NOT demonstrated identical.
+                        Assigning it on resemblance is rule 49.2
+related_controls        R1 (do not assert what you have not run) ·
+                        R17 / rule 48 · doctrine 46
+why_it_matters          the assertion was label-shaped: STATUS.md carries
+                        `Last updated:`, the predicate family under
+                        adjudication, and the producer inferred the
+                        verdict from the label instead of reading the
+                        cell. The M1 repair must not degenerate into a
+                        label whitelist — and the matrix specifying that
+                        repair contained a label-shaped assumption
+status                  CLOSED as an incident
+```
+
+---
+
+### `INC-2026-08-29-10` — reproducibility reported as independence
+
+```
+date                    2026-08-29
+producer                Orion
+subject/version         frozen Census v1.1, aggregate eb7aad7c…fa0e;
+                        subject d8aac4d4… / tree 3abc9e9d…
+false_or_faulty_output  "INDEPENDENT COUNT CHECK, not a restatement:
+                        frozen census-worldA disposition_tally
+                        RESOLVED_READ : 8 / my live re-run : 8"
+corrected_output        NOT INDEPENDENT. The re-run imported the Census's
+                        OWN frozen opscan/docgraph/claims modules, so
+                        both legs trace to one authority and neither can
+                        excuse the other. Correct label: SAME-INSTRUMENT
+                        REPRODUCIBILITY CHECK AGAINST THE IDENTICAL
+                        IMMUTABLE SUBJECT
+detection_method        Kai rejected the wording and supplied the actual
+                        independent leg himself — opening the subject
+                        sources directly, without the Census parser, and
+                        confirming the reads at auto_changelog.py L55 and
+                        L112 and the other six
+evidence                the re-run's own import line:
+                        `import docgraph as G, opscan as O, claims as C`
+                        from ../house_in_order_census_v11
+affected_scope          one label on one result
+downstream_impact       NONE — corrected before the selector ruling
+                        depended on it. The 8==8 result itself is sound;
+                        only its independence status was wrong
+mechanism_status        INCIDENT_ONLY
+mechanism_id            (none)
+related_controls        doctrine 39 — NAME THE AUTHORITY BEHIND EVERY
+                        INDEPENDENCE CLAIM. Rule 33's
+                        `independence_status` field exists for exactly
+                        this. CLAUDE.md R0 carries the tell: "I am
+                        writing 'independent' — name the authority behind
+                        each leg"
+                        THE CONTROL EXISTED, WAS BANKED, AND DID NOT
+                        FIRE. Recorded because that is the kind of fact
+                        rule 49.5 asks us to notice
+CONSEQUENT_SCOPE_LIMIT  the wider 1186 / 1143 / 41-duplicate-group result
+                        from the same re-run is likewise ORION SAME-
+                        INSTRUMENT MEASUREMENT, not a hash-bound property
+                        of census-worldA.json, which records the 1186
+                        denominator and the RESOLVED_READ count but does
+                        NOT preserve the raw (src,line) population. It is
+                        not load-bearing for E1
+status                  CLOSED as an incident
+```
+
+---
+
+### `INC-2026-08-29-11` — adjudicator supported a subset ruling with corpus-wide evidence
+
+```
+date                    2026-08-29
+producer                KAI
+subject/version         the ten non-M1 candidate TIME_BOUND rows;
+                        committed h2v12-classification.json
+false_or_faulty_output  cited "the committed classification contains
+                        `Last updated` cases whose own history
+                        contradicts the claimed date" as support for
+                        rejecting or protecting those ten rows
+corrected_output        TRUE OF THE CORPUS, NOT OF THE SUBSET. None of
+                        the ten carries a binding contradiction — all ten
+                        have binding_contradiction = null. The five
+                        contradiction rows corpus-wide are
+                        docs/PROJECT_BACKLOG.md 32d ·
+                        docs/unfair_advantages.md 90d ·
+                        kai-pm/ORION_FIELD_NOTES.md 7d ·
+                        kai-pm/STUBS_AND_PLACEHOLDERS.md 3d ·
+                        kai-pm/UH_PROGRESS_TRACKER.md 1d — and ALL FIVE
+                        ALREADY EMIT VALIDITY=UNKNOWN. The contradiction
+                        check is working; the contradicting documents are
+                        not among the positives
+                        Correct statement: 5 contradiction rows exist
+                        corpus-wide; 0 occur in this 10-row subset
+detection_method        Orion measured binding_contradiction across both
+                        populations rather than accepting the premise,
+                        and reported the mismatch to the adjudicator
+affected_scope          one evidential leg of one ruling
+downstream_impact       NONE. THE SEMANTIC CONCLUSION SURVIVED ON ITS
+                        OWN — a review event is not a validity binding,
+                        which stands without the contradiction evidence.
+                        Only the supporting leg was out of scope
+mechanism_status        INCIDENT_ONLY
+mechanism_id            (none)
+related_controls        rule 48 (CLAIM_SCOPE ⊆ MEASURED_SCOPE) applied to
+                        a SUBSET rather than a search universe · rule 33
+                        (the derivation, including its population,
+                        travels with the claim)
+note                    directed into the ledger by Kai against Kai.
+                        Rule 49.8: no role is exempt because it
+                        adjudicates others
+status                  CLOSED as an incident
+```
+
+---
+
+## Ledger state after this append
+
+| id | producer | mechanism_status | assigned mechanism |
+|---|---|---|---|
+| `INC-2026-08-29-01` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` |
+| `INC-2026-08-29-02` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` |
+| `INC-2026-08-29-03` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` |
+| `INC-2026-08-29-04` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-05` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-06` | Kai | `INCIDENT_ONLY` | none — locator only |
+| `INC-2026-08-29-07` | DeepSeek | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-08` | DeepSeek | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-09` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-10` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-11` | Kai | `INCIDENT_ONLY` | none |
+
+**Producers: Orion 7 · Kai 2 · DeepSeek 2.** The counts carry no fairness
+or bias inference; they are the currently recorded population and nothing
+more.
+
+**A withdrawal recorded here rather than elsewhere.** Orion reported the
+two-witness line at `AUTHORITY_ONTOLOGY.md:L2` as a possible
+line-inheritance false positive. Kai opened the source and adjudicated
+both tokens — commit `9d15bcd` and tree `627104d6` — as legitimate
+components of one whole-document subject declaration:
+`Subject: QUALIFICATION_SUBJECT 9d15bcd / tree 627104d6`. **The concern
+is withdrawn; no defect is established there, and no `167 + 1 exception`
+regression contract is to be created.** The per-line implementation
+remains structurally risky as an unadjudicated property. That risk is not
+an incident and is not logged as one.
