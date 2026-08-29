@@ -935,3 +935,144 @@ is withdrawn; no defect is established there, and no `167 + 1 exception`
 regression contract is to be created.** The per-line implementation
 remains structurally risky as an unadjudicated property. That risk is not
 an incident and is not logged as one.
+
+---
+
+# APPEND 2026-08-29 — acquisition-side contamination
+
+Authorised by Kai under existing D374 ledger authority. **No D-number, no
+doctrine edit, no `CLAUDE.md` edit, no H2 artefact change.** Banked
+*before* M3 resumes, because this file's stated purpose is *retrieval
+before reasoning, not archival after it* — the failure mode has to be
+available before the next contamination-sensitive search, not after.
+
+## `M-QUERY-OVERREACH` — lower-information question, higher-information instrument
+
+**State: `PATTERN_CANDIDATE`.** Named by Orion, adjudicated by Kai on
+2026-08-29. **Explicitly NOT `PATTERN_CONFIRMED`: one material incident.
+The recurrence threshold is not met and no general pattern is proven.**
+
+**Proposed mechanism.** A query is run to answer a *lower-information*
+question — does this exist, how many are there, is it non-empty — but the
+instrument chosen returns *higher-information* content, in a context
+where **merely seeing that content changes or contaminates the
+experiment**. The failure is complete at the moment of reading. There is
+no later step at which it can be caught, and no transmission is required
+for the damage to be done.
+
+**Why it is kept distinct from `M-SCOPE-WIDEN`.** That mechanism fails at
+**TRANSMISSION**: a correctly bounded measurement is described in a
+sentence wider than the measurement. This one fails at **ACQUISITION**:
+the measurement itself was wider than the question, and the producer's
+own knowledge is the thing contaminated. The two are adjacent and will
+look alike in a post-mortem. Resemblance is a locator, not a cause
+(doctrine 37), and promoting this into the confirmed pattern on
+similarity would be the error doctrine 49.2 forbids.
+
+**Stop-signal (in-flight).**
+
+> *I only need to know WHETHER something exists. Can the query I am about
+> to run reveal WHAT it contains?*
+
+**Manual control.** Before a contamination-sensitive search, classify the
+information need as `EXISTENCE` / `METADATA` / `CONTENT`, and use the
+least-revealing operation that answers it. If `EXISTENCE` is sufficient,
+do not retrieve substantive content.
+
+**`control_type: MANUAL`.** Kai's ruling is explicit that this is not
+promoted into doctrine or `CLAUDE.md` in this commit, and that **it is
+not claimed to prevent recurrence.** A future recurrence is evidence
+against the adequacy of this manual control, not against the producer
+alone.
+
+---
+
+### `INC-2026-08-30-12` — an existence question answered with the answer sheet
+
+> **Id/date note, recorded rather than silently corrected.** Kai
+> allocated the id `INC-2026-08-30-12`. The verified container date at
+> banking is **2026-08-29**, and every prior id encodes the incident
+> date. The allocated id is used verbatim because id allocation is the
+> adjudicator's, and the discrepancy is recorded here instead of being
+> resolved unilaterally.
+
+```
+INCIDENT_ID             INC-2026-08-30-12
+date                    2026-08-29 (see id/date note above)
+producer                Orion
+subject/version         Step-2 M3 blind/reference calibration at 0f3da09
+                        STEP2_M3_RECORD_MANIFEST.tsv
+                        manifest sha256
+                        8343760003c18abd7a1787d697cdab861c2571285dfd9a2c81005f75ecb2efd0
+false_or_faulty_output  A query intended to answer the EXISTENCE question
+                        "does the historical per-record M3 answer set
+                        exist on disk?" was run with a content-extracting
+                        regex over past adjudication text. It returned
+                        substantive adjudication content. Reading it
+                        exposed approximately 15-20 expected rows,
+                        INCLUDING THE SOLE WHOLE_FILE -> SPAN CORRECTION,
+                        and therefore compromised the intended
+                        builder-blind Step-2 M3 comparison.
+corrected_output        The original 48-row blind claim is PERMANENTLY
+                        WITHDRAWN. The 48 are retained only as
+                        REFERENCE / REGRESSION CORRECTNESS EVIDENCE WITH
+                        ZERO BLIND WEIGHT. No further historical-ruling
+                        extraction is authorised. The final D367 section
+                        9 candidate-derived blind 40 remains untouched.
+detection_method        Producer self-disclosure, before any M3
+                        implementation and before any evaluation
+evidence                HEAD 0f3da09 with no M3 code; manifest sha256
+                        unchanged; the exposing search and its output are
+                        in the session record
+affected_scope          The intermediate Step-2 M3 blind control. One
+                        control, not a candidate artefact
+downstream_impact       The M3 blind-control design lost its blind
+                        status. NO M3 code had been written. NO result
+                        had been produced. NO candidate verdict changed.
+                        The final D367 independent holdout is intact
+mechanism_status        PATTERN_CANDIDATE
+mechanism_id            M-QUERY-OVERREACH
+related_incidents       none confirmed. M-SCOPE-WIDEN is ADJACENT, not
+                        assigned: that one fails at transmission, this at
+                        acquisition
+recurrence_count        1 of 1. Threshold for escalation NOT met
+stop_signal             I only need to know WHETHER something exists --
+                        can this query reveal WHAT it contains?
+current_control         classify the need EXISTENCE / METADATA / CONTENT
+                        and use the least-revealing operation
+control_type            MANUAL
+control_introduced_at   2026-08-29, this append
+recurred_after_control  NO -- the control postdates the incident
+owner/stage             Step-2 M3 calibration
+status                  CLOSED as an incident. The CONTROL it damaged is
+                        withdrawn, not repaired: builder blindness for
+                        the 48 cannot be restored
+```
+
+**What had no control at all.** Nothing in the doctrine, in `CLAUDE.md`
+or in R0 said *before searching, ask whether SEEING the answer is itself
+the harm.* Every banked rule to date governs what is measured, how far it
+is read, and how it is described. **None governs whether the act of
+looking is itself destructive.** That gap is the finding; the incident is
+the instance.
+
+## Ledger state after this append
+
+| id | producer | mechanism_status | assigned mechanism |
+|---|---|---|---|
+| `INC-2026-08-29-01` … `-03` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` |
+| `INC-2026-08-29-04` `-05` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-06` | Kai | `INCIDENT_ONLY` | none — locator only |
+| `INC-2026-08-29-07` `-08` | DeepSeek | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-09` `-10` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-11` | Kai | `INCIDENT_ONLY` | none |
+| `INC-2026-08-30-12` | Orion | `PATTERN_CANDIDATE` | `M-QUERY-OVERREACH` |
+
+**Producers: Orion 8 · Kai 2 · DeepSeek 2.** The counts carry no fairness
+or bias inference; they are the currently recorded population and nothing
+more.
+
+**Mechanisms: `M-SCOPE-WIDEN` `PATTERN_CONFIRMED` · `M-PRODUCER-CURATION`
+`PATTERN_CANDIDATE` · `P-ADJUDICATOR-PROPAGATION` `PATTERN_CANDIDATE` ·
+`M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.** Three of the four are
+candidates. None is `CONTROL_OPERATIONALISED`.
