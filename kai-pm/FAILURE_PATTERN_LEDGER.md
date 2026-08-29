@@ -356,3 +356,166 @@ considering leaving it out.*
 **Nothing in this file authorises implementation.** The H2 hold is
 absolute: no classifier repair, no Pass A repair, no fixture, no new
 holdout until a repaired candidate exists.
+
+---
+
+# INCIDENTS NOT ASSIGNED TO A MECHANISM
+
+Appended under D374 authority at Kai's ruling of 2026-08-29, the first
+operational enforcement of rule 49 — and it lands on the change that
+created rule 49.
+
+**Both carry `mechanism_status: INCIDENT_ONLY` deliberately.** No
+mechanism id is invented in order to file them, and neither is merged
+into `M-SCOPE-WIDEN` or `M-PRODUCER-CURATION`. They resemble both.
+Resemblance is a locator, not causal equivalence (rule 49.2 / rule 37),
+and the recurrence evidence that would earn a mechanism does not exist.
+
+**Both were corrected before `fb2892b`, so committed downstream impact is
+NONE. That does not make them immaterial.** A near-miss that exposes a
+reusable failure mode is learning evidence — which is the whole reason
+rule 49 exists rather than a note in a commit message.
+
+---
+
+### `INC-2026-08-29-04` — doctrine grammar collision
+
+```
+date                    2026-08-29
+producer                Orion
+subject/version         kai-pm/ENGINEERING_DOCTRINE.md, while authoring
+                        rules 48 and 49 under D373/D374
+false_or_faulty_output  Rules 48 and 49 were drafted with numbered
+                        SUBORDINATE invariants written as `    N. **text**`.
+                        The doctrine parser in
+                        scripts/security/check_doctrine_integrity.py is
+                        `^\s*(\d+)\.\s+\*\*(.+?)\*\*` — `^\s*` admits leading
+                        whitespace — so 19 of my subordinate items were read
+                        as top-level RULE IDS
+corrected_output        Subordinate items re-delimited as `N)`, which the
+                        parser cannot match. Gate returns:
+                        "PASS: contiguous, unduplicated, every rule has
+                        provenance", inspected 49 rules across 49 provenance
+                        entries
+detection_method        make policy-check, stage
+                        scripts/security/check_doctrine_integrity.py:
+                        "FAIL: DUPLICATE: rule id(s) [1,2,3,4,5,6,7,8,9,10]
+                        appear more than once. A split or a paste, either way
+                        ambiguous"
+evidence                Indented numbered-bold items at HEAD: 0.
+                        After my draft: 19 (later 21 counting the two items
+                        beginning with a backtick rather than bold).
+                        Baseline established from an independent tree
+                        extracted with `git archive HEAD`
+intended_population     21 subordinate items across rules 48 and 49
+actual_population       21 — the AUTHORING scope was correct; the defect is
+                        that the chosen GRAMMAR collided with the parser's
+                        rule-id grammar
+reached_committed_branch NO
+control_that_caught_it  the doctrine integrity gate itself
+                        (control_type MACHINE — it fired, correctly, and named
+                        the exact ambiguity)
+recurrence_previously_established  NO
+mechanism_status        INCIDENT_ONLY
+mechanism_id            (none — not invented to file this)
+related_incidents       INC-2026-08-29-05 (same authoring session, different
+                        failure; NOT asserted to share a mechanism)
+related_controls        rule 5 / R5 — a checker's scope is defined by the data
+                        it traverses. A document grammar and its parser's
+                        grammar are one namespace, and I authored in it
+                        without reading the parser first
+downstream_impact       NONE
+status                  CLOSED as an incident. Remains available as
+                        recurrence evidence if a mechanism is later earned
+```
+
+**Worth preserving:** this is a case where a `MACHINE` control existed,
+fired, named the defect precisely, and cost minutes. It is the
+counter-example to `M-SCOPE-WIDEN`, whose control is `MANUAL` and which
+recurred three times before an adjudicator caught it. **That contrast is
+the argument for rule 49.6, and it should not be lost.**
+
+---
+
+### `INC-2026-08-29-05` — transformation-scope overrun
+
+```
+date                    2026-08-29
+producer                Orion
+subject/version         kai-pm/ENGINEERING_DOCTRINE.md, repairing
+                        INC-2026-08-29-04
+false_or_faulty_output  The repair applied
+                        `re.subn(r"(?m)^(\s+)(\d+)\. ", r"\1\2) ", text)`.
+                        In Python `\s` INCLUDES `\n`, so `^` matched at the
+                        start of a BLANK line, `\s+` consumed the newline, and
+                        the pattern went on to match a COLUMN-0 item on the
+                        following line. The transformation crossed line
+                        boundaries
+corrected_output        Reversed with `(?m)^(\d+)\) ` -> `\1. `, which is
+                        line-anchored at column 0 and cannot cross a newline.
+                        27 restored, 21 retained. Final diff to HEAD:
+                        0 deletions, 3 pure insertion hunks
+detection_method        The substitution PRINTED ITS OWN COUNT — 48 — against
+                        an intended 21. The discrepancy was visible in the
+                        tool output before any further step
+evidence                48 substitutions reported · 21 intended ·
+                        27 unintended · 27 restored · 27 + 21 = 48 reconciles
+intended_population     21 subordinate items in rules 48 and 49
+actual_population       48 items. THE 27 UNINTENDED, MEASURED RATHER THAN
+                        INFERRED: 26 governed doctrine rules + 1 item in the
+                        section-0 procedural list (L80,
+                        "1. state what you observed;"). Every one was a
+                        column-0 numbered item whose preceding line was blank
+reached_committed_branch NO
+control_that_caught_it  R4 step 3 — count the population; the instrument
+                        printing its own denominator
+                        (control_type MANUAL)
+recurrence_previously_established  NO
+mechanism_status        INCIDENT_ONLY
+mechanism_id            (none — not invented to file this)
+related_incidents       INC-2026-08-29-04
+related_controls        R4 / doctrine 13 — measure the population before
+                        applying a rule to it; the count is what exposed the
+                        scope overrun.
+                        R17 / rule 48 — a transformation whose actual
+                        population exceeds its declared one is the mutation-
+                        side analogue of a claim wider than its measurement.
+                        RECORDED AS RELATED, NOT AS MEMBERSHIP: this is NOT
+                        filed as an instance of M-SCOPE-WIDEN or
+                        M-PRODUCER-CURATION
+downstream_impact       NONE
+status                  CLOSED as an incident
+```
+
+**The reusable shape, stated without promoting it to a mechanism:** a
+transformation is a claim about a population. `\s` in a multiline regex
+is a silent scope widener because it crosses the boundary the author is
+reasoning in terms of. The defence that worked was not knowing that fact
+— it was **making the instrument print its own count and reading it
+against the intended one.**
+
+**A correction applied to this very record, under rule 48.** My commit
+message and the adjudicator's ruling both say *"27 pre-existing rules"*.
+Measured, it is **26 rules + 1 non-rule procedural item**. The false
+figure stays here beside its correction (rule 49.7). It changes no
+disposition; it is recorded because a record of a scope error must not
+itself contain one.
+
+---
+
+## Ledger state after this append
+
+| id | mechanism_status | mechanism | control that caught it | reached branch |
+|---|---|---|---|---|
+| `INC-2026-08-29-01` | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` | adjudicator (Kai) | NO |
+| `INC-2026-08-29-02` | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` | adjudicator (Kai) | NO |
+| `INC-2026-08-29-03` | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` | adjudicator (Kai) | NO |
+| `INC-2026-08-29-04` | `INCIDENT_ONLY` | none assigned | MACHINE gate | NO |
+| `INC-2026-08-29-05` | `INCIDENT_ONLY` | none assigned | MANUAL (R4 count) | NO |
+
+**Observation offered as a candidate signal, NOT as a finding:** the
+three occurrences of the confirmed mechanism were all caught by a person
+downstream; the two incidents whose controls were a machine gate and an
+explicit population count were caught by the producer, before transmission.
+One session is not a denominator. Recorded so it can be tested when there
+is one, not relied upon now.
