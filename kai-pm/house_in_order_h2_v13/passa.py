@@ -115,42 +115,113 @@ BINDING_LINE = re.compile(
 
 # ── M3 scope derivation: the four authorised inputs ───────────────────
 # Rev4: WHOLE_FILE requires BOTH a structural document-level binding AND
-# subject = the document as a whole. Detector is NOT an input here.
+# subject = the document as a whole. Detector is NOT an input.
+#
+# CYCLE 3. Cycle 2 collapsed the conjunction: it treated
+# "labelled field + unique label" as sufficient, and uniqueness is
+# INPUT 2 alone. A unique field may describe one section, one phase, one
+# audited snapshot or one run and still be local. Four source-confirmed
+# over-promotions followed, every one of them a labelled field sitting
+# INSIDE an H2+ section that cycle 2 never looked at.
 
-# INPUT 4. A table row or a list item is an ENTRY. Its subject is the
-# entry, not the document.
-# A TABLE ROW is an entry: its subject is the row. A list item is NOT
-# automatically one -- a single bulleted metadata line in front matter
-# ("- Findings-bearing audited snapshot: <sha>") states something about
-# the document. What makes a register is REPETITION, and INPUT 2 tests
-# that directly, so the bullet is left to uniqueness rather than
-# disqualified on layout.
-ENTRY_LINE = re.compile(r"^\s{0,3}\|")
-# INPUT 1. The document's own title.
+TABLE_ROW = re.compile(r"^\s{0,3}\|")
 H1 = re.compile(r"^#[^#]", re.M)
-# INPUT 1+2. A labelled field, DERIVED from line structure rather than
-# from a list of predicate names kept beside the check (R5). Optional
-# blockquote prefix and markdown emphasis, a short label, then a colon.
-# The colon may sit INSIDE the emphasis -- `**Last updated:**` is the
-# commonest form in this corpus -- so emphasis is permitted on both
-# sides of it. Requiring ":" + whitespace missed every one of them.
+SECTION = re.compile(r"^#{2,}\s", re.M)
 LABEL_LINE = re.compile(r"^\s{0,3}>?\s*(?:[-*+]\s+)?[*_`]{0,2}\s*"
                         r"([A-Za-z][A-Za-z0-9 ._/-]{0,40}?)"
                         r"\s*[*_`]{0,2}\s*:[*_`]{0,2}\s")
-# INPUT 3. DECLARED CLOSED-WORLD, same standing as BINDING_PREDICATES:
-# the nouns by which a document refers to itself. Declared, not derived,
-# because there is no tree to derive self-reference from.
+# INPUT 3, DECLARED CLOSED-WORLD, same standing as BINDING_PREDICATES:
+# the nouns by which a document refers to itself.
 SELF_SUBJECT = re.compile(
     r"\bthis\s+(?:document|file|register|tracker|log|report|plan|brief|"
     r"note|index|census|audit|spec|specification|record|policy|guide)\b",
     re.I)
-SECTION = re.compile(r"^#{2,}\s", re.M)
+# INPUT 3, the other direction. A label whose head noun names an
+# ARTEFACT has that artefact as its subject; the document merely records
+# it. "Findings-bearing audited snapshot: <sha>" is a statement about the
+# snapshot, not about the document that cites it. DECLARED closed-world,
+# with that rationale, because there is no tree to derive it from.
+ARTEFACT_LABEL = re.compile(
+    r"\b(?:snapshot|commit|tree|checkpoint|head|digest|sha|hash|run|"
+    r"artefact|artifact|image|tag|branch|pointer)\b", re.I)
 
 
 def _preamble_end(text):
-    """Front matter: everything before the first section heading."""
+    """Front matter ends at the first section heading."""
     m = SECTION.search(text)
     return m.start() if m else len(text)
+
+
+def _structural_position(text, ls, line):
+    """INPUT 1, parsed structural position. TABLE_ROW | SECTION | ROOT."""
+    if TABLE_ROW.match(line):
+        return "TABLE_ROW"
+    return "ROOT" if ls < _preamble_end(text) else "SECTION"
+
+
+def _scope_of(text, start):
+    """WHOLE_FILE iff BOTH conditions of the Rev4 conjunction hold.
+
+    They are evaluated SEPARATELY and neither substitutes for the other:
+
+      structural_document_level  -- INPUT 1, and INPUT 4 as a disqualifier
+      subject_is_whole_document  -- INPUT 3, with INPUT 2 distinguishing a
+                                    unique field from a per-entry stamp
+
+    Residual ambiguity falls to SPAN. Never upward: D367 9 makes an
+    unsupported scope widening a BLOCKER, while an unfound promotion is a
+    coverage finding.
+    """
+    ls = text.rfind("\n", 0, start) + 1
+    le = text.find("\n", start)
+    line = text[ls:le if le >= 0 else len(text)]
+    before = text[ls:start + 1]
+
+    pos = _structural_position(text, ls, line)
+
+    # INPUT 4. A table row's subject is the row, whatever label it carries.
+    if pos == "TABLE_ROW":
+        return "SPAN"
+
+    # INPUT 1. A witness inside an H2+ section is structurally LOCAL. The
+    # enclosing section is a nearer subject than the document, and cycle
+    # 2's defect was never asking. This alone makes all four of Kai's
+    # source-confirmed over-promotions SPAN, with no path exception:
+    # ORION_FIELD_NOTES L9 under "## 0. Where we were...",
+    # STRATEGIC_PLAN L11 under "## Phase 0 - Pre-GPU Hardening",
+    # PLANNING_PACKAGE_QA L21 under "## 2. Repository state verified",
+    # CONTINUATION_LOG L116 under "### Reviewed findings snapshot".
+    if pos == "SECTION":
+        return "SPAN"
+
+    # ---- from here the witness is at the document root ----
+
+    # INPUT 1. The document's own H1 title: the document naming itself.
+    m1 = H1.search(text)
+    if m1 and m1.start() == ls:
+        return "WHOLE_FILE"
+
+    # INPUT 3. An explicit self-reference at the root binds the document.
+    if SELF_SUBJECT.search(line):
+        return "WHOLE_FILE"
+
+    m = LABEL_LINE.match(before)
+    if not m:
+        return "SPAN"
+    lab = m.group(1).strip().lower()
+
+    # INPUT 3. Root position supplies no narrower subject, but the LABEL
+    # can: one naming an artefact is about that artefact.
+    if ARTEFACT_LABEL.search(lab):
+        return "SPAN"
+
+    # INPUT 2. Uniqueness does ONE job -- separating a per-entry stamp
+    # from a single field. It is not evidence of either conjunct.
+    hits = sum(1 for ln in text.splitlines()
+               if (mm := LABEL_LINE.match(ln)) and
+               mm.group(1).strip().lower() == lab and
+               not TABLE_ROW.match(ln))
+    return "WHOLE_FILE" if hits <= 1 else "SPAN"
 
 
 def git(repo, *a):
@@ -196,75 +267,6 @@ def _context(text, start, end):
     ls = text.rfind("\n", 0, start) + 1
     le = text.find("\n", end)
     return text[ls:le if le >= 0 else len(text)].strip()
-
-
-def _scope_of(text, start):
-    """WHOLE_FILE only if the witness sits inside a structured binding
-    whose subject is the document. Everything else is SPAN.
-
-    UNIQUENESS IS PART OF THE TEST, and it is not a layout rule.
-    D367 6 requires a binding "whose subject is the document as a
-    whole". A predicate that appears TWICE cannot have the whole
-    document as its subject in both places -- it is a per-entry stamp in
-    a register. `kai-pm/WAYPOINTS.md` carries `**Date:**` on each
-    waypoint record; the L79 occurrence would otherwise have bound the
-    whole file to one entry's date.
-
-    Denominator stated honestly: this discriminates ONE document of 162
-    positives (161 carry their predicate exactly once). It is kept
-    because it implements the contract's own wording rather than because
-    of that one case, and it fails toward ABSTENTION, never toward a
-    false positive.
-    """
-    ls = text.rfind("\n", 0, start) + 1
-    le = text.find("\n", start)
-    line = text[ls:le if le >= 0 else len(text)]
-    before = text[ls:start + 1]
-
-    # INPUT 4 -- ENCLOSING ENTRY / TABLE / REGISTER CONTEXT.
-    # Tested FIRST and it is a disqualifier, not a tie-break. A witness
-    # inside a table row or a list item has that ROW or ITEM as its
-    # subject, however document-level the label on it looks. This is what
-    # M3's over-assignment class was: a labelled field belonging to a
-    # register entry read as a whole-document binding.
-    if ENTRY_LINE.match(line):
-        return "SPAN"
-
-    # INPUT 1 -- PARSED STRUCTURAL POSITION.
-    # The document's own H1 title. Its subject is the document by
-    # construction: it is the document naming itself. Only the FIRST
-    # level-1 heading qualifies; a later one is a section.
-    if H1.match(line):
-        first_h1 = next((m for m in H1.finditer(text, 0) if True), None)
-        if first_h1 and first_h1.start() == ls:
-            return "WHOLE_FILE"
-
-    # INPUT 1 + INPUT 2 -- LABELLED FIELD, DERIVED, PLUS UNIQUENESS.
-    # A label at the start of a line, the witness after it. The label set
-    # is DERIVED from the document's own structure rather than kept as a
-    # list beside the check (R5). Uniqueness carries "subject = document
-    # as a whole": a label that appears twice is a per-entry stamp and
-    # cannot have the whole document as its subject in both places.
-    m = LABEL_LINE.match(before)
-    if m:
-        lab = m.group(1).strip().lower()
-        hits = sum(1 for ln in text.splitlines()
-                   if (mm := LABEL_LINE.match(ln)) and
-                   mm.group(1).strip().lower() == lab and
-                   not ENTRY_LINE.match(ln))
-        if hits <= 1:
-            return "WHOLE_FILE"
-        return "SPAN"
-
-    # INPUT 3 -- EXPLICIT SUBJECT, and only in the document's own
-    # front matter. A sentence that names the document as its subject
-    # binds the document. Restricted to the preamble because the same
-    # phrase inside a section is describing that section's topic.
-    if SELF_SUBJECT.search(line) and ls < _preamble_end(text):
-        return "WHOLE_FILE"
-
-    # Residual ambiguity fails toward the local reading, never upward.
-    return "SPAN"
 
 
 def classify_token_kind(text, m, history_repo, subject):
