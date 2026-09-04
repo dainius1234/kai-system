@@ -113,6 +113,37 @@ BINDING_LINE = re.compile(
     "|".join(BINDING_PREDICATES) + r")\s*[*_`]{0,2}\s*:", re.I)
 
 
+# ── M3 scope derivation: the four authorised inputs ───────────────────
+# Rev4: WHOLE_FILE requires BOTH a structural document-level binding AND
+# subject = the document as a whole. Detector is NOT an input here.
+
+# INPUT 4. A table row or a list item is an ENTRY. Its subject is the
+# entry, not the document.
+ENTRY_LINE = re.compile(r"^\s{0,3}(?:\||[-*+]\s|\d+[.)]\s)")
+# INPUT 1. The document's own title.
+H1 = re.compile(r"^#[^#]", re.M)
+# INPUT 1+2. A labelled field, DERIVED from line structure rather than
+# from a list of predicate names kept beside the check (R5). Optional
+# blockquote prefix and markdown emphasis, a short label, then a colon.
+LABEL_LINE = re.compile(r"^\s{0,3}>?\s*[*_`]{0,2}\s*"
+                        r"([A-Za-z][A-Za-z0-9 ._/-]{0,28}?)"
+                        r"\s*[*_`]{0,2}\s*:\s")
+# INPUT 3. DECLARED CLOSED-WORLD, same standing as BINDING_PREDICATES:
+# the nouns by which a document refers to itself. Declared, not derived,
+# because there is no tree to derive self-reference from.
+SELF_SUBJECT = re.compile(
+    r"\bthis\s+(?:document|file|register|tracker|log|report|plan|brief|"
+    r"note|index|census|audit|spec|specification|record|policy|guide)\b",
+    re.I)
+SECTION = re.compile(r"^#{2,}\s", re.M)
+
+
+def _preamble_end(text):
+    """Front matter: everything before the first section heading."""
+    m = SECTION.search(text)
+    return m.start() if m else len(text)
+
+
 def git(repo, *a):
     return subprocess.run(["git", *a], cwd=str(repo),
                           capture_output=True, text=True)
@@ -177,13 +208,54 @@ def _scope_of(text, start):
     false positive.
     """
     ls = text.rfind("\n", 0, start) + 1
-    m = BINDING_LINE.match(text[ls:start + 1])
-    if not m:
+    le = text.find("\n", start)
+    line = text[ls:le if le >= 0 else len(text)]
+    before = text[ls:start + 1]
+
+    # INPUT 4 -- ENCLOSING ENTRY / TABLE / REGISTER CONTEXT.
+    # Tested FIRST and it is a disqualifier, not a tie-break. A witness
+    # inside a table row or a list item has that ROW or ITEM as its
+    # subject, however document-level the label on it looks. This is what
+    # M3's over-assignment class was: a labelled field belonging to a
+    # register entry read as a whole-document binding.
+    if ENTRY_LINE.match(line):
         return "SPAN"
-    pred = m.group(1).lower()
-    hits = sum(1 for line in text.splitlines()
-               if (mm := BINDING_LINE.match(line)) and mm.group(1).lower() == pred)
-    return "WHOLE_FILE" if hits <= 1 else "SPAN"
+
+    # INPUT 1 -- PARSED STRUCTURAL POSITION.
+    # The document's own H1 title. Its subject is the document by
+    # construction: it is the document naming itself. Only the FIRST
+    # level-1 heading qualifies; a later one is a section.
+    if H1.match(line):
+        first_h1 = next((m for m in H1.finditer(text, 0) if True), None)
+        if first_h1 and first_h1.start() == ls:
+            return "WHOLE_FILE"
+
+    # INPUT 1 + INPUT 2 -- LABELLED FIELD, DERIVED, PLUS UNIQUENESS.
+    # A label at the start of a line, the witness after it. The label set
+    # is DERIVED from the document's own structure rather than kept as a
+    # list beside the check (R5). Uniqueness carries "subject = document
+    # as a whole": a label that appears twice is a per-entry stamp and
+    # cannot have the whole document as its subject in both places.
+    m = LABEL_LINE.match(before)
+    if m:
+        lab = m.group(1).strip().lower()
+        hits = sum(1 for ln in text.splitlines()
+                   if (mm := LABEL_LINE.match(ln)) and
+                   mm.group(1).strip().lower() == lab and
+                   not ENTRY_LINE.match(ln))
+        if hits <= 1:
+            return "WHOLE_FILE"
+        return "SPAN"
+
+    # INPUT 3 -- EXPLICIT SUBJECT, and only in the document's own
+    # front matter. A sentence that names the document as its subject
+    # binds the document. Restricted to the preamble because the same
+    # phrase inside a section is describing that section's topic.
+    if SELF_SUBJECT.search(line) and ls < _preamble_end(text):
+        return "WHOLE_FILE"
+
+    # Residual ambiguity fails toward the local reading, never upward.
+    return "SPAN"
 
 
 def classify_token_kind(text, m, history_repo, subject):
