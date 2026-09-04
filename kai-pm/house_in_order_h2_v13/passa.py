@@ -119,15 +119,24 @@ BINDING_LINE = re.compile(
 
 # INPUT 4. A table row or a list item is an ENTRY. Its subject is the
 # entry, not the document.
-ENTRY_LINE = re.compile(r"^\s{0,3}(?:\||[-*+]\s|\d+[.)]\s)")
+# A TABLE ROW is an entry: its subject is the row. A list item is NOT
+# automatically one -- a single bulleted metadata line in front matter
+# ("- Findings-bearing audited snapshot: <sha>") states something about
+# the document. What makes a register is REPETITION, and INPUT 2 tests
+# that directly, so the bullet is left to uniqueness rather than
+# disqualified on layout.
+ENTRY_LINE = re.compile(r"^\s{0,3}\|")
 # INPUT 1. The document's own title.
 H1 = re.compile(r"^#[^#]", re.M)
 # INPUT 1+2. A labelled field, DERIVED from line structure rather than
 # from a list of predicate names kept beside the check (R5). Optional
 # blockquote prefix and markdown emphasis, a short label, then a colon.
-LABEL_LINE = re.compile(r"^\s{0,3}>?\s*[*_`]{0,2}\s*"
-                        r"([A-Za-z][A-Za-z0-9 ._/-]{0,28}?)"
-                        r"\s*[*_`]{0,2}\s*:\s")
+# The colon may sit INSIDE the emphasis -- `**Last updated:**` is the
+# commonest form in this corpus -- so emphasis is permitted on both
+# sides of it. Requiring ":" + whitespace missed every one of them.
+LABEL_LINE = re.compile(r"^\s{0,3}>?\s*(?:[-*+]\s+)?[*_`]{0,2}\s*"
+                        r"([A-Za-z][A-Za-z0-9 ._/-]{0,40}?)"
+                        r"\s*[*_`]{0,2}\s*:[*_`]{0,2}\s")
 # INPUT 3. DECLARED CLOSED-WORLD, same standing as BINDING_PREDICATES:
 # the nouns by which a document refers to itself. Declared, not derived,
 # because there is no tree to derive self-reference from.
