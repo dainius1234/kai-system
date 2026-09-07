@@ -49,3 +49,21 @@ PRODUCED BY ORION. NOT A REFERENCE KEY. ZERO ADJUDICATION WEIGHT.
     NEW kai-pm/UH2_INTAKE_REDESIGN.md	39	49	DATE	L3	'2026-08-07. **No implementation. No trust-boundary chang'
     NEW kai-pm/UH2_SENSOR_INGRESS_PLAN.md	53	63	DATE	L3	'2026-08-07. **No code written. No trust-boundary change '
         kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md	119	129	DATE	L4	'**Created:** 2026-08-02'
+
+  SELF-REPORTED OVER-PROMOTION — one, found by inspecting my own new rows
+  kai-pm/EMBEDDING_BACKEND_STATE.md	740	751	HEX	L16
+      line: "31568526480 / `189500b`."
+      This is a RUN ID in the continuation of a run list, not a dateline.
+      BARE_DATELINE fired because it requires only that nothing precede
+      the witness on the line. It does NOT require the witness to be a
+      DATE, and it does not require the line to be the document's
+      dateline rather than a wrapped list item. The first `##` in that
+      file is at line 24, so line 16 is still root.
+      DEFECT IN MY CYCLE-4 RULE. Not fixed here: the implementation is
+      frozen at 468bee5 and altering it after seeing the run is what the
+      freeze forbids. Flagged for Kai's ruling as an unexpected
+      mechanism class.
+      The other five bare-dateline promotions (DEEPSEEK_BRIEF_TOPOLOGY
+      L3, UH2_INTAKE_REBUILD_ANALYSIS L3, UH2_INTAKE_REDESIGN L3,
+      UH2_SENSOR_INGRESS_PLAN L3) are genuine leading datelines and were
+      named by Kai as positive controls.
