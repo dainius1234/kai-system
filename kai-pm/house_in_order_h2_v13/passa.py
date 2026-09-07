@@ -167,7 +167,17 @@ ROOT_LIFECYCLE = re.compile(
     r"drafted|updated|reviewed)\b[^.;]{0,40}$", re.I)
 # A bare leading date IS the document's dateline when it opens the line
 # at root.
+# A bare leading date IS the document's dateline when it opens a root
+# line. CYCLE 5: this route is now restricted to the DATE detector.
+# Cycle 4 required only that nothing precede the witness on its line, so
+# a wrapped continuation of a run list --
+#   "31568526480 / `189500b`."
+# in EMBEDDING_BACKEND_STATE L16 -- promoted a RUN ID as though it were a
+# dateline. The defect was DETECTOR-CLASS LEAKAGE, not position: a
+# genuine dateline may legitimately follow other root metadata, so the
+# repair is to the detector class and not to the line's ordinal.
 BARE_DATELINE = re.compile(r"^\s{0,3}>?\s*[*_`]{0,2}\s*$")
+DATELINE_DETECTORS = ("DATE",)
 
 
 def _preamble_end(text):
@@ -183,9 +193,13 @@ def _label_of(before):
     return QUALIFIER.sub("", m.group(1)).strip().lower()
 
 
-def _scope_of(text, start):
+def _scope_of(text, start, detector=None):
     """WHOLE_FILE iff BOTH conjuncts of the Rev4 rule hold, derived
     separately. Uniqueness (INPUT 2) never promotes on its own.
+
+    `detector` gates the bare-dateline route only (cycle 5). It is NOT a
+    scope input anywhere else: Rev4 excludes it, and every other route
+    here decides on structure and subject alone.
     """
     ls = text.rfind("\n", 0, start) + 1
     le = text.find("\n", start)
@@ -219,7 +233,9 @@ def _scope_of(text, start):
         return "WHOLE_FILE" if hits <= 1 else "SPAN"
 
     # INPUT 3 without a colon: a root lifecycle dateline.
-    if ROOT_LIFECYCLE.search(before) or BARE_DATELINE.match(before):
+    if ROOT_LIFECYCLE.search(before):
+        return "WHOLE_FILE"
+    if BARE_DATELINE.match(before) and detector in DATELINE_DETECTORS:
         return "WHOLE_FILE"
 
     return "SPAN"
@@ -335,7 +351,7 @@ def scan(path, text, history_repo, subject):
             witness_type=kind, witness_value=m.group(0), source_path=path,
             source_selector=_selector(text, m.start()),
             local_context=_context(text, m.start(), m.end()),
-            applicability_scope=_scope_of(head, m.start()),
+            applicability_scope=_scope_of(head, m.start(), "HEX"),
             evidence_total=1, evidence_shown=1, truncated=False,
             polarity="POSITIVE", certainty="VERIFIED" if is_commit else "OBSERVED"))
 
@@ -350,7 +366,7 @@ def scan(path, text, history_repo, subject):
             witness_type="RUN_ID", witness_value=m.group(0), source_path=path,
             source_selector=_selector(text, m.start()),
             local_context=_context(text, m.start(), m.end()),
-            applicability_scope=_scope_of(head, m.start()),
+            applicability_scope=_scope_of(head, m.start(), "DECIMAL_RUN"),
             evidence_total=1, evidence_shown=1, truncated=False,
             polarity="POSITIVE", certainty="OBSERVED"))
 
@@ -361,7 +377,7 @@ def scan(path, text, history_repo, subject):
             witness_type="DATE_STAMP", witness_value=m.group(0),
             source_path=path, source_selector=_selector(text, m.start()),
             local_context=_context(text, m.start(), m.end()),
-            applicability_scope=_scope_of(head, m.start()),
+            applicability_scope=_scope_of(head, m.start(), "DATE"),
             evidence_total=1, evidence_shown=1, truncated=False,
             polarity="POSITIVE", certainty="OBSERVED"))
 

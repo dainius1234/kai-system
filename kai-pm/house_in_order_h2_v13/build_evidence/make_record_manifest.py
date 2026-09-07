@@ -54,7 +54,7 @@ def occurrences(repo, tree):
             e = m.end() if end is None else end
             rows.append({"path": d, "start": s, "end": e, "detector": det,
                          "source_selector": P._selector(text, s),
-                         "current_applicability_scope": P._scope_of(head, s)})
+                         "current_applicability_scope": P._scope_of(head, s, det)})
 
         for det, rx in (("HEX", P.HEX), ("DATE", P.DATE)):
             for m in rx.finditer(text):
