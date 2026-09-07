@@ -33428,3 +33428,100 @@ reasoning-architecture requirement when that programme stage is reached.
   Orion. **Next free: D375**
 * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
   unchanged (Programme Rule 7)
+
+---
+
+## RATIFICATION — 2026-09-07 — HOUSE_H2 Revision 4 / Step-2 M3 historical implementation authority. GOVERNANCE ONLY, NO D-NUMBER TAKEN
+
+**Authority.** Dainius replied **APPROVED** to the M3 Historical
+Implementation Ratification / Governance Close-Out dated 2026-09-07. Kai
+relayed the approval and specified the banking requirements.
+
+**NO D-NUMBER IS TAKEN, AND THAT IS DELIBERATE.** Kai's ruling states
+this approval does **not** authorise `D375`. The allocator was checked
+fresh: the highest allocated number is `D374`, and this file's own
+recovery block reserves *"Next free: D375"*. Consuming it here would
+spend a reserved identifier in an append-only record for a close-out
+that grants no implementation authority. This entry therefore follows
+the `D370 CORRECTION / ERRATA` precedent of a titled, unnumbered entry.
+**`D375` remains unallocated.** If Kai or Dainius rules that this
+ratification must carry a D-number, that is a further append, not an
+edit.
+
+### 1. What is and is not established
+
+* **The original independently preserved historical approval artefact
+  was NOT FOUND.** Kai reports this. **I did not perform that search and
+  do not present it as my verification** (doctrine 46/50).
+* **Repository evidence contemporaneously records the authorisation, and
+  I verified this leg myself.** Commit
+  `b6b601036964e2fa0fccae4d3b2afba2e817b40c`, dated 2026-08-29, states
+  in its message: *"Implementation authorised by Dainius under D367
+  section 13. Building in D367 section 12 order under Revision 4."* That
+  is a contemporaneous record written at the time the work began.
+* **Dainius has now expressly RATIFIED** the historical H2 Revision 4 /
+  Step-2 M3 implementation authority.
+
+### 2. This is prospective, and it is not a discovery
+
+**This entry is a PROSPECTIVE GOVERNANCE CLOSE-OUT dated 2026-09-07.**
+It is **not** backdated, and it **must never** be represented as the
+discovery or recovery of the missing historical artefact. The artefact
+remains not found. What exists is a contemporaneous repository record
+plus a present-day ratification, and those are different things from the
+original approval evidence. Anyone reading this later should treat the
+gap as real and permanent.
+
+### 3. Binding
+
+Ratification binds to the frozen M3 mechanism:
+
+```
+c3c7731592620227a35da4200b936dd7480140f7
+```
+
+### 4. State preserved exactly
+
+```
+M3 MECHANISM                          FROZEN at c3c7731
+M3 SOURCE-DERIVED CORRECTNESS REF     NOT YET SEALED
+M3 VALIDATION / QUALIFICATION / ADMISSION   OPEN
+```
+
+### 5. What this approval does NOT do
+
+It does not authorise Cycle 6 · does not modify M3 · does **not** declare
+M3 correct, validated, qualified or admitted · does not authorise M1,
+D2, E2, Stage A, D367 final40 or D375 · gives **no blind weight** to any
+previous M3 evidence, which remains sighted regression and calibration
+evidence · does not approve the historical `214/278` or `47/1` figures
+as targets, which remain *HISTORICAL RECONCILIATION ONLY, ZERO DESIGN
+AUTHORITY* · and does **not** cure the separately confirmed manifest
+source-byte binding defect.
+
+### THREAD RECOVERY BLOCK
+
+```
+ENTRY            RATIFICATION, unnumbered. D375 NOT taken, still free.
+DATE             2026-09-07, prospective. NOT backdated.
+AUTHORITY        Dainius APPROVED; relayed and specified by Kai.
+RATIFIES         H2 Revision 4 / Step-2 M3 historical implementation
+                 authority, bound to mechanism c3c7731.
+NOT FOUND        the original independently preserved approval artefact.
+                 Kai's finding, not independently searched by Orion.
+VERIFIED BY ORION  contemporaneous record at b6b6010, 2026-08-29,
+                 "Implementation authorised by Dainius under D367 s.13".
+FROZEN           M3 MECHANISM   c3c7731
+                 CYCLE-5 RESULT 3be6699
+                 PARITY GUARD   a8eefc2
+                 BASELINE       0f3da09
+STATE            mechanism FROZEN · correctness reference NOT SEALED ·
+                 validation/qualification/admission OPEN
+GRANTS           no implementation authority of any kind
+OPEN DEFECT      manifest source-byte binding, REPO_CONFIRMED, repaired
+                 forward at 479596e in a new builder; the historical
+                 builder and its manifest are untouched. NOT cured by
+                 this ratification.
+NEXT             Kai reviews this commit and issues the next engineering
+                 ruling. No source-byte repair work begins before that.
+```
