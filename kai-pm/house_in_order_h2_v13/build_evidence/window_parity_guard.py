@@ -53,9 +53,17 @@ def discover(root):
     """
     found = []
     for py in sorted(pathlib.Path(root).rglob("*.py")):
-        if "__pycache__" in py.parts:
-            continue
-        if py.resolve() == GUARD:          # the instrument, not a caller
+        if py.resolve() == GUARD:
+            # THE ONLY EXCLUSION, and it is by resolved PATH IDENTITY, not
+            # by directory name or category. The guard's own leg-B probe
+            # must call _scope_of with BOTH windows in order to prove they
+            # differ; the instrument is not one of the callers it governs.
+            # There is deliberately no EXCLUDE_DIRS list: fixtures and
+            # tests inside the governed tree ARE scanned, because a
+            # divergent call in a fixture is still a divergent call. A
+            # skip for "__pycache__" was removed as dead code -- rglob
+            # matches *.py and that directory holds only *.pyc -- so no
+            # directory-name exclusion survives anywhere in this file.
             continue
         try:
             tree = ast.parse(py.read_text())
