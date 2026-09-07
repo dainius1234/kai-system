@@ -43,6 +43,13 @@ carrying a per-entry rationale, calibrated with known-positive and
 known-negative fixtures, and printing its own denominator. A closed-world
 list that announces itself is not the R5 defect; a list kept beside the
 thing and passed off as derived is.
+
+CYCLE 6 adds ONE further route, and it is a CONTEXTUAL one: a predicate
+that is not intrinsically document-binding may still take the document
+as its subject when the surrounding structure establishes it. That set
+is declared separately, in CONTEXTUAL_PREDICATES, and holds exactly one
+entry. Its conditions are structural and all required; see the block
+comment there for the defect it repairs.
 """
 from __future__ import annotations
 import argparse
@@ -179,6 +186,48 @@ ROOT_LIFECYCLE = re.compile(
 BARE_DATELINE = re.compile(r"^\s{0,3}>?\s*[*_`]{0,2}\s*$")
 DATELINE_DETECTORS = ("DATE",)
 
+# ── CYCLE 6. CONTEXT-DEPENDENT DOCUMENT METADATA ──────────────────────
+# THE ROOT DEFECT REPAIRED HERE. Cycle 5 read a generic label as a
+# TERMINAL VETO -- `if not DOC_BINDING.match(lab): return "SPAN"` -- so
+# once a label failed the intrinsic test no further evidence could be
+# considered, however strong. That is a category error: the absence of
+# INTRINSIC document-binding evidence is not PROOF OF LOCAL SCOPE. The
+# veto is now a failed conjunct, and the remaining authorised evidence is
+# examined. That is the repair; the class below is what the repair lets
+# through, and nothing else is admitted by it.
+#
+# `Status` is neither intrinsically document-binding nor intrinsically
+# local. Under a task heading it is the task's status. In a document's
+# own root metadata block, beside a field that has ALREADY earned
+# document binding on its own terms, its subject is the document.
+#
+# IT IS DELIBERATELY NOT IN BINDING_PREDICATES. Adding it there would
+# promote every root `Status:` on label authority alone -- the same
+# defect in the opposite direction. `status` is the ONLY contextual
+# predicate; Owner, Purpose and Branch are NOT admitted.
+CONTEXTUAL_PREDICATES = {
+    "status": "document-level state, and ONLY inside the root metadata "
+              "block of a document that has independently earned an "
+              "intrinsic document-binding field",
+}
+# A root metadata line begins the line itself, with nothing but markdown
+# emphasis before the label. A bullet, a blockquote marker or leading
+# indentation introduces an ENTRY, and the entry is then a nearer subject
+# than the document (condition 4).
+ROOT_METADATA_LINE = re.compile(r"^[*_`]{0,2}[A-Za-z]")
+# Condition 5. The statement must describe the DOCUMENT's state, not an
+# artefact or a person it mentions. A handle, a link, a quoted
+# identifier, a named file or an issue reference in the value IS a
+# nearer subject. This test fails CLOSED -- toward SPAN, the pre-cycle-6
+# answer -- because an over-narrow contextual class costs a missed
+# promotion, while an over-broad one manufactures WHOLE_FILE.
+EMBEDDED_SUBJECT = re.compile(
+    r"@[A-Za-z0-9_-]+"
+    r"|\[[^\]]*\]\([^)]*\)"
+    r"|`[^`]*`"
+    r"|\b[\w./-]+\.(?:md|py|ya?ml|json|tsv|txt|sh|toml)\b"
+    r"|#\d+", re.I)
+
 
 def _preamble_end(text):
     m = SECTION.search(text)
@@ -191,6 +240,82 @@ def _label_of(before):
     if not m:
         return None
     return QUALIFIER.sub("", m.group(1)).strip().lower()
+
+
+def _label_hits(text, lab):
+    """INPUT 2's denominator: how many non-table lines carry this label."""
+    return sum(1 for ln in text.split("\n")
+               if not TABLE_ROW.match(ln) and _label_of(ln) == lab)
+
+
+def _block_of(text, ls):
+    """The contiguous non-blank block holding the line at offset `ls`.
+
+    Returns (lines, index of that line within them). Contiguity is the
+    structural expression of 'the same root metadata block': a blank line
+    ends the block, so a field further down the preamble is not a
+    neighbour.
+    """
+    lines = text.split("\n")
+    starts, off = [], 0
+    for ln in lines:
+        starts.append(off)
+        off += len(ln) + 1
+    i = max(k for k, s in enumerate(starts) if s <= ls)
+    a = i
+    while a > 0 and lines[a - 1].strip():
+        a -= 1
+    b = i
+    while b + 1 < len(lines) and lines[b + 1].strip():
+        b += 1
+    return lines[a:b + 1], i - a
+
+
+def _earned_binding_anchor(text, block, skip):
+    """A block member that earns document binding on its OWN terms.
+
+    Condition 3, and the word doing the work is INDEPENDENTLY: the
+    anchor must be an intrinsic BINDING_PREDICATES field that would
+    itself return WHOLE_FILE -- including INPUT 2's uniqueness test. A
+    repeated per-entry stamp is not an anchor, so anchor existence alone
+    cannot be borrowed by an arbitrary neighbour.
+    """
+    for k, ln in enumerate(block):
+        if k == skip:
+            continue
+        lab = _label_of(ln)
+        if lab is None or not DOC_BINDING.match(lab):
+            continue
+        if _label_hits(text, lab) <= 1:
+            return lab, ln
+    return None
+
+
+def _contextual_document_metadata(text, ls, lab, line):
+    """The five structural conditions, ALL required. Any one absent and
+    the answer stays SPAN.
+
+    1  root / pre-H2          -- established by the caller before this runs
+    2  not a table row        -- established by the caller before this runs
+    3  same contiguous root metadata block as an independently earned
+       intrinsic document-binding field
+    4  no nearer section, entry or register subject
+    5  the statement describes document-level state
+    """
+    if lab not in CONTEXTUAL_PREDICATES:
+        return False
+    if not ROOT_METADATA_LINE.match(line):          # 4: it is an entry
+        return False
+    block, idx = _block_of(text, ls)
+    # 4 again: prose, a heading, a table row or a list entry sharing the
+    # block means the block is not a root metadata block at all.
+    if any(_label_of(ln) is None or not ROOT_METADATA_LINE.match(ln)
+           for ln in block):
+        return False
+    if _earned_binding_anchor(text, block, idx) is None:    # 3
+        return False
+    _, _, value = line.partition(":")
+    return not EMBEDDED_SUBJECT.search(value)               # 5
 
 
 def _scope_of(text, start, detector=None):
@@ -224,13 +349,24 @@ def _scope_of(text, start, detector=None):
     if lab is not None:
         # INPUT 3. A root label promotes ONLY on positive document-binding
         # authority. A generic unique label proves nothing about subject.
-        if not DOC_BINDING.match(lab):
-            return "SPAN"
-        # INPUT 2, and only now: one document-level field, or a repeated
-        # per-entry stamp?
-        hits = sum(1 for ln in text.splitlines()
-                   if not TABLE_ROW.match(ln) and _label_of(ln) == lab)
-        return "WHOLE_FILE" if hits <= 1 else "SPAN"
+        if DOC_BINDING.match(lab):
+            # INPUT 2, and only now: one document-level field, or a
+            # repeated per-entry stamp?
+            return "WHOLE_FILE" if _label_hits(text, lab) <= 1 else "SPAN"
+        # CYCLE 6. Failing the INTRINSIC test is a failed conjunct, NOT a
+        # terminal veto. Absence of intrinsic document-binding evidence is
+        # not proof of local scope, so the remaining authorised evidence is
+        # examined -- and for a labelled field that evidence is exactly one
+        # class, the contextual root metadata class above.
+        #
+        # It deliberately does NOT fall through to the label-free routes
+        # below. ROOT_LIFECYCLE and BARE_DATELINE read the text BEFORE the
+        # witness as an unlabelled dateline; a labelled field has already
+        # declared its own predicate, and letting it reach those routes
+        # would widen the repair past the class Kai demonstrated.
+        if _contextual_document_metadata(text, ls, lab, line):
+            return "WHOLE_FILE"
+        return "SPAN"
 
     # INPUT 3 without a colon: a root lifecycle dateline.
     if ROOT_LIFECYCLE.search(before):
@@ -511,6 +647,9 @@ def main():
     print(f"  scope determined: WHOLE_FILE {wf} · SPAN {sp}")
     print(f"  binding predicates declared closed-world: "
           f"{len(BINDING_PREDICATES)}")
+    print(f"  contextual predicates declared closed-world: "
+          f"{len(CONTEXTUAL_PREDICATES)} "
+          f"({', '.join(sorted(CONTEXTUAL_PREDICATES))})")
     print("  NO VERDICT ASSIGNED IN PASS A.")
 
 
