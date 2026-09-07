@@ -9,17 +9,27 @@ leave the divergence unguarded**, and the agreement was a fact about this
 corpus rather than about the code.
 
 THE DIVERGENCE IS REAL AND OBSERVABLE. It is not `_preamble_end`: a
-witness starting before HEAD_BYTES is at root under either window. It is
-the LABEL-UNIQUENESS DENOMINATOR, which iterates the lines of whichever
+witness starting before HEAD_BYTES sits at root under either window. It
+is the LABEL-UNIQUENESS DENOMINATOR, which iterates the lines of whichever
 window it was given. A document carrying `**Date:**` once inside the head
 window and again beyond it resolves WHOLE_FILE over `head` and SPAN over
-the full text. That is what this guard protects.
+the full text. That is the property this guard protects.
+
+THE UNIVERSE IS DISCOVERED, NOT LISTED. The first version of this file
+began from a hand-written `SCOPE_CALLERS` tuple of filenames. That is a
+list kept beside the thing it governs -- R5, the exact defect class this
+guard exists to catch, reproduced inside the guard. A new module calling
+`_scope_of` would have escaped it silently. The universe is now walked.
+
+The only exclusion is structural and is this file: the guard's own probe
+must call `_scope_of` with BOTH windows in order to prove they differ.
+The instrument is not one of the callers it governs.
 
 This is MEASUREMENT HARDENING. It does not touch `_scope_of`, does not
 change M3 scope logic, and requires no corpus run.
 
     python3 window_parity_guard.py            # run the guard
-    python3 window_parity_guard.py --can-fail # prove each leg can fail
+    python3 window_parity_guard.py --can-fail # prove it can fail, 2 ways
 """
 from __future__ import annotations
 import argparse
@@ -27,110 +37,137 @@ import ast
 import pathlib
 import sys
 
-HERE = pathlib.Path(__file__).resolve().parent
-PKG = HERE.parent
+GUARD = pathlib.Path(__file__).resolve()
+PKG = GUARD.parent.parent
 sys.path.insert(0, str(PKG))
 import passa as P                                              # noqa: E402
 
-# Every path that computes an applicability scope must hand `_scope_of`
-# the SAME source window. Declared here so a new caller cannot be added
-# silently without either appearing in this list or failing leg A.
-SCOPE_CALLERS = ("passa.py", "build_evidence/make_record_manifest.py")
 REQUIRED_WINDOW = "head"
 
 
-def _call_sites(src):
-    """(lineno, first-argument source expression) for each _scope_of call."""
-    out = []
-    for n in ast.walk(ast.parse(src)):
-        if not isinstance(n, ast.Call):
+def discover(root):
+    """Every `_scope_of` call in the governed source tree.
+
+    Walked, never listed. Returns (relative path, lineno, first-argument
+    source expression) so a violation names itself.
+    """
+    found = []
+    for py in sorted(pathlib.Path(root).rglob("*.py")):
+        if "__pycache__" in py.parts:
             continue
-        f = n.func
-        name = f.attr if isinstance(f, ast.Attribute) else getattr(f, "id", "")
-        if name == "_scope_of" and n.args:
-            out.append((n.lineno, ast.unparse(n.args[0])))
-    return out
+        if py.resolve() == GUARD:          # the instrument, not a caller
+            continue
+        try:
+            tree = ast.parse(py.read_text())
+        except SyntaxError:
+            found.append((py.relative_to(root), 0, "<UNPARSEABLE>"))
+            continue
+        for n in ast.walk(tree):
+            if not isinstance(n, ast.Call) or not n.args:
+                continue
+            f = n.func
+            name = f.attr if isinstance(f, ast.Attribute) else getattr(
+                f, "id", "")
+            if name == "_scope_of":
+                found.append((py.relative_to(root), n.lineno,
+                              ast.unparse(n.args[0])))
+    return found
 
 
-def leg_a(sources):
-    """STATIC. Every _scope_of call site passes the production window."""
-    rows, ok = [], True
-    for label, src in sources.items():
-        sites = _call_sites(src)
-        if not sites:
-            rows.append((label, "-", "NO CALL SITES", False))
-            ok = False
-            continue
-        for lineno, arg in sites:
-            good = arg == REQUIRED_WINDOW
-            ok &= good
-            rows.append((label, lineno, arg, good))
-    return ok, rows
+def leg_a(root):
+    """STATIC. Every discovered call site passes the production window."""
+    sites = discover(root)
+    rows = [(p, ln, arg, arg == REQUIRED_WINDOW) for p, ln, arg in sites]
+    return bool(rows) and all(r[3] for r in rows), rows
 
 
 def leg_b():
     """BEHAVIOURAL. A probe on which the two windows genuinely disagree,
-    so the guard is never merely asserting that two identical things are
-    identical (I-8: a control that cannot fail proves nothing).
+    so leg A is never merely asserting that two identical things are
+    identical. A control that cannot fail proves nothing (I-8).
     """
     doc = ("# T\n\n**Date:** 2026-01-02\n\n" + "filler line\n" * 700 +
            "**Date:** 2026-03-04\n\n## S\n")
     i = doc.index("2026-01-02")
     head_scope = P._scope_of(doc[:P.HEAD_BYTES], i, "DATE")
     full_scope = P._scope_of(doc, i, "DATE")
-    discriminates = head_scope != full_scope
-    return discriminates, head_scope, full_scope
+    return head_scope != full_scope, head_scope, full_scope
 
 
-def run(sources, verbose=True):
-    a_ok, rows = leg_a(sources)
+def report(root):
+    a_ok, rows = leg_a(root)
     b_ok, hs, fs = leg_b()
-    if verbose:
-        print("LEG A — every _scope_of call site passes "
-              f"{REQUIRED_WINDOW!r}, the production window")
-        for label, lineno, arg, good in rows:
-            print(f"  {label:<42} L{lineno:<5} arg={arg!r:<10} "
-                  f"{'OK' if good else '<<< DIVERGENT'}")
-        print(f"  leg A: {'PASS' if a_ok else 'FAIL'}")
-        print()
-        print("LEG B — the probe must DISCRIMINATE, or leg A guards nothing")
-        print(f"  scope over head[:{P.HEAD_BYTES}] : {hs}")
-        print(f"  scope over full text        : {fs}")
-        print(f"  windows disagree on the probe: {b_ok}")
-        print(f"  leg B: {'PASS' if b_ok else 'FAIL'}")
+    print(f"LEG A — every _scope_of call DISCOVERED under {root} must pass "
+          f"{REQUIRED_WINDOW!r}")
+    for p, ln, arg, good in rows:
+        print(f"  {str(p):<44} L{ln:<5} arg={arg!r:<22} "
+              f"{'OK' if good else '<<< DIVERGENT'}")
+    print(f"  {len(rows)} call sites discovered by walking the tree, "
+          f"no filename list")
+    print(f"  leg A: {'PASS' if a_ok else 'FAIL'}\n")
+    print("LEG B — the probe must DISCRIMINATE, or leg A guards nothing")
+    print(f"  scope over head[:{P.HEAD_BYTES}] : {hs}")
+    print(f"  scope over full text        : {fs}")
+    print(f"  leg B: {'PASS' if b_ok else 'FAIL'}")
     return a_ok and b_ok
+
+
+def _can_fail(root):
+    print("CAN-FAIL PROOF — the guard is byte-identical throughout\n")
+    ok = True
+
+    # A. EXISTING CALLER DRIFT.
+    victim = root / "build_evidence" / "make_record_manifest.py"
+    original = victim.read_text()
+    try:
+        victim.write_text(original.replace("P._scope_of(head, s, det)",
+                                           "P._scope_of(text, s, det)"))
+        a_ok, rows = leg_a(root)
+        bad = [r for r in rows if not r[3]]
+        print(f"  A. existing caller mutated head -> text : "
+              f"{'FAIL' if not a_ok else 'PASS'}  "
+              f"{'OK, guard fires' if not a_ok else '<<< VACUOUS'}")
+        for p, ln, arg, _ in bad:
+            print(f"       caught: {p} L{ln} arg={arg!r}")
+        ok &= not a_ok
+    finally:
+        victim.write_text(original)
+
+    # B. NEW CALLER DRIFT -- a module the guard has never heard of.
+    rogue = root / "_parity_rogue_tmp.py"
+    try:
+        rogue.write_text("import passa\n"
+                         "def f(text, s):\n"
+                         "    return passa._scope_of(text, s, 'DATE')\n")
+        a_ok, rows = leg_a(root)
+        bad = [r for r in rows if not r[3]]
+        print(f"  B. NEW module added to the tree          : "
+              f"{'FAIL' if not a_ok else 'PASS'}  "
+              f"{'OK, discovered automatically' if not a_ok else '<<< ESCAPED'}")
+        for p, ln, arg, _ in bad:
+            print(f"       caught: {p} L{ln} arg={arg!r}")
+        ok &= not a_ok
+    finally:
+        rogue.unlink(missing_ok=True)
+
+    b_ok, hs, fs = leg_b()
+    print(f"  leg-B probe discriminates ({hs} vs {fs})  : "
+          f"{'OK' if b_ok else '<<< VACUOUS'}")
+    print(f"\n  restored tree still passes: {report(root)}")
+    return ok and b_ok
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--can-fail", action="store_true",
-                    help="prove each leg fails when its property is broken")
+    ap.add_argument("--can-fail", action="store_true")
     a = ap.parse_args()
-
-    live = {label: (PKG / label).read_text() for label in SCOPE_CALLERS}
-
-    if not a.can_fail:
-        ok = run(live)
-        print(f"\nWINDOW PARITY: {'PASS' if ok else 'FAIL'}")
+    if a.can_fail:
+        ok = _can_fail(PKG)
+        print(f"\nCAN-FAIL: {'PROVEN, both modes' if ok else 'NOT PROVEN'}")
         raise SystemExit(0 if ok else 1)
-
-    print("CAN-FAIL PROOF — each leg is broken deliberately and must FAIL\n")
-    broken = dict(live)
-    broken["build_evidence/make_record_manifest.py"] = live[
-        "build_evidence/make_record_manifest.py"].replace(
-        "P._scope_of(head, s, det)", "P._scope_of(text, s, det)")
-    a_ok, rows = leg_a(broken)
-    bad = [r for r in rows if not r[3]]
-    print(f"  leg A with one caller switched to full text -> "
-          f"{'FAIL' if not a_ok else 'PASS'}   "
-          f"{'OK, the guard fires' if not a_ok else '<<< GUARD IS VACUOUS'}")
-    for label, lineno, arg, _ in bad:
-        print(f"      caught: {label} L{lineno} arg={arg!r}")
-    b_ok, hs, fs = leg_b()
-    print(f"  leg B probe discriminates ({hs} vs {fs}) -> "
-          f"{'OK' if b_ok else '<<< PROBE IS VACUOUS'}")
-    print("\n  A guard whose legs cannot fail is the I-8 defect. Both can.")
-    raise SystemExit(0 if (not a_ok) and b_ok else 1)
+    ok = report(PKG)
+    print(f"\nWINDOW PARITY: {'PASS' if ok else 'FAIL'}")
+    raise SystemExit(0 if ok else 1)
 
 
 if __name__ == "__main__":
