@@ -1,69 +1,60 @@
-STEP 2 / M3 — CYCLE 4 RESULT
-IMPLEMENTATION 468bee5 banked before this run. BASELINE 0f3da09.
+STEP 2 / M3 — CYCLE 5 RESULT
+IMPLEMENTATION c3c7731 banked before this run. BASELINE 0f3da09.
 PRODUCED BY ORION. NOT A REFERENCE KEY. ZERO ADJUDICATION WEIGHT.
 
   baseline   WHOLE_FILE 168   SPAN 324   total 492
-  derived    WHOLE_FILE 201   SPAN 291   total 492
-  promotions 35   demotions 2   unchanged 455
-  pair splits 0   D14-B 76dbba4 -> SPAN
-  vs historical 214/278 (47 up, 1 down):  WF -13   SPAN +13
+  derived    WHOLE_FILE 200   SPAN 292   total 492
+  promotions 34   demotions 2   unchanged 456
+  D14-B 76dbba4 -> SPAN
 
-  DEMOTIONS (2) — exactly Kai's two accepted, nothing else
+  PAIR REPORT — all six duplicate physical spans, splits 0
+  path                                        start   end  detA        scopeA  detB  scopeB
+  kai-pm/EMBEDDING_BACKEND_STATE.md              621   632  DECIMAL_RUN SPAN    HEX   SPAN
+  kai-pm/ORION_FIELD_NOTES.md                    642   653  DECIMAL_RUN SPAN    HEX   SPAN
+  kai-pm/ORION_FIELD_NOTES.md                    973   984  DECIMAL_RUN SPAN    HEX   SPAN
+  kai-pm/ORION_FIELD_NOTES.md                   1239  1250  DECIMAL_RUN SPAN    HEX   SPAN
+  kai-pm/ORION_FIELD_NOTES.md                   1641  1652  DECIMAL_RUN SPAN    HEX   SPAN
+  kai-pm/RUNTIME_TOPOLOGY_CENSUS.md              551   562  DECIMAL_RUN SPAN    HEX   SPAN
+
+  DEMOTIONS (2)
     kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md	793	833	HEX	L20
     kai-pm/ORION_FIELD_NOTES.md	254	264	DATE	L9
 
-  PROMOTIONS (35). All 24 Kai accepted are retained. NEW marks the 11
-  the cycle-4 mechanism adds.
-        docs/ERROR_LOG.md	109	119	DATE	L5	'**Updated:** 2026-03-22 | **Test suite:** 1,513 passed, '
-        docs/gaps_and_hardening.md	170	182	DATE	L6	'> Updated: 5 March 2026'
-        kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md	35	45	DATE	L1	'# Assurance counterpart research — 2026-08-23'
-        kai-pm/CLEANUP_TODO.md	69	79	DATE	L3	'> ⚠️ **2026-06-18: this tracker describes a plan that di'
-        kai-pm/CODE_AUDIT_CONTINUATION_LOG.md	91	103	DATE	L4	'Log started: 27 July 2026'
-        kai-pm/CODE_AUDIT_FINAL_REPORT.md	232	244	DATE	L5	'Report completed: 27 July 2026'
-        kai-pm/CODE_AUDIT_MASTER.md	137	149	DATE	L5	'Finalised: 27 July 2026'
-        kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md	117	129	DATE	L4	'Review date: 27 July 2026'
-        kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md	177	189	DATE	L6	'Started: 26 July 2026'
-        kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md	223	235	DATE	L6	'Started: 26 July 2026'
-        kai-pm/COMPOSE_DRIFT.md	41	51	DATE	L3	'**Generated:** 2026-07-21'
-        kai-pm/CONVICTION_SCENARIOS.md	50	60	DATE	L3	'**Created:** 2026-07-23'
-    NEW kai-pm/DEEPSEEK_BRIEF_2026-08-07_EMBEDDINGS.md	76	86	DATE	L3	'Sent 2026-08-07. Their answer drove D167; recorded here '
-    NEW kai-pm/DEEPSEEK_BRIEF_2026-08-07_METHOD.md	51	61	DATE	L3	'Sent 2026-08-07. Kept because the answer is worth readin'
-    NEW kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md	70	80	DATE	L3	'2026-08-07. A decision I have deliberately not taken alo'
-    NEW kai-pm/EMBEDDING_BACKEND_STATE.md	77	87	DATE	L3	'**#47 MEASUREMENT: COMPLETE.** Closed 2026-08-12 by oper'
-    NEW kai-pm/EMBEDDING_BACKEND_STATE.md	740	751	HEX	L16	'31568526480 / `189500b`.'
-        kai-pm/EQ_BASELINE_SAMPLES.md	74	84	DATE	L3	'**Created:** 2026-07-23'
-        kai-pm/GPU_ARRIVAL_RUNBOOK.md	36	46	DATE	L3	'**Created:** 2026-07-23'
-        kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md	162	174	DATE	L5	'Prepared: 27 July 2026'
-        kai-pm/MAKEFILE_TARGETS.md	44	54	DATE	L3	'**Generated:** 2026-07-22'
-    NEW kai-pm/NEXT_STINT_PLAN.md	37	47	DATE	L3	'Written 2026-08-07, after `core-tests.yml` reached 67 of'
-    NEW kai-pm/NEXT_STINT_PLAN.md	195	205	DATE	L6	'Agreed with the operator on 2026-08-07. The ordering bel'
-        kai-pm/PHASE1_READINESS.md	39	49	DATE	L3	'**Created:** 2026-07-23'
-        kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md	44	54	DATE	L1	'# Post-mortem — GitHub Actions degradation, 2026-08-06'
-        kai-pm/REALITY_CHECK_2026-05-10.md	18	28	DATE	L1	'# Reality Check — 2026-05-10 UTC'
-        kai-pm/REALITY_CHECK_2026-06-18.md	18	28	DATE	L1	'# Reality Check — 2026-06-18 UTC'
-        kai-pm/REPO_HEALTH_AUDIT_2026-05-10.md	22	32	DATE	L1	'# Repo Health Audit — 2026-05-10'
-        kai-pm/RUNTIME_TOPOLOGY_CENSUS.md	41	51	DATE	L1	'# #41 runtime-topology census — measured 2026-08-12'
-    NEW kai-pm/STATUS.md	53	63	DATE	L3	'- **Last updated (UTC):** 2026-08-01'
-        kai-pm/TECH_DEBT_E402.md	173	183	DATE	L5	'**Opened:** 2026-08-06, during the lint sweep.'
-    NEW kai-pm/UH2_INTAKE_REBUILD_ANALYSIS.md	64	74	DATE	L3	'2026-08-07. **No code written. No trust-boundary change '
-    NEW kai-pm/UH2_INTAKE_REDESIGN.md	39	49	DATE	L3	'2026-08-07. **No implementation. No trust-boundary chang'
-    NEW kai-pm/UH2_SENSOR_INGRESS_PLAN.md	53	63	DATE	L3	'2026-08-07. **No code written. No trust-boundary change '
-        kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md	119	129	DATE	L4	'**Created:** 2026-08-02'
+  PROMOTIONS (34)
+    docs/ERROR_LOG.md	109	119	DATE	L5
+    docs/gaps_and_hardening.md	170	182	DATE	L6
+    kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md	35	45	DATE	L1
+    kai-pm/CLEANUP_TODO.md	69	79	DATE	L3
+    kai-pm/CODE_AUDIT_CONTINUATION_LOG.md	91	103	DATE	L4
+    kai-pm/CODE_AUDIT_FINAL_REPORT.md	232	244	DATE	L5
+    kai-pm/CODE_AUDIT_MASTER.md	137	149	DATE	L5
+    kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md	117	129	DATE	L4
+    kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md	177	189	DATE	L6
+    kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md	223	235	DATE	L6
+    kai-pm/COMPOSE_DRIFT.md	41	51	DATE	L3
+    kai-pm/CONVICTION_SCENARIOS.md	50	60	DATE	L3
+    kai-pm/DEEPSEEK_BRIEF_2026-08-07_EMBEDDINGS.md	76	86	DATE	L3
+    kai-pm/DEEPSEEK_BRIEF_2026-08-07_METHOD.md	51	61	DATE	L3
+    kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md	70	80	DATE	L3
+    kai-pm/EMBEDDING_BACKEND_STATE.md	77	87	DATE	L3
+    kai-pm/EQ_BASELINE_SAMPLES.md	74	84	DATE	L3
+    kai-pm/GPU_ARRIVAL_RUNBOOK.md	36	46	DATE	L3
+    kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md	162	174	DATE	L5
+    kai-pm/MAKEFILE_TARGETS.md	44	54	DATE	L3
+    kai-pm/NEXT_STINT_PLAN.md	37	47	DATE	L3
+    kai-pm/NEXT_STINT_PLAN.md	195	205	DATE	L6
+    kai-pm/PHASE1_READINESS.md	39	49	DATE	L3
+    kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md	44	54	DATE	L1
+    kai-pm/REALITY_CHECK_2026-05-10.md	18	28	DATE	L1
+    kai-pm/REALITY_CHECK_2026-06-18.md	18	28	DATE	L1
+    kai-pm/REPO_HEALTH_AUDIT_2026-05-10.md	22	32	DATE	L1
+    kai-pm/RUNTIME_TOPOLOGY_CENSUS.md	41	51	DATE	L1
+    kai-pm/STATUS.md	53	63	DATE	L3
+    kai-pm/TECH_DEBT_E402.md	173	183	DATE	L5
+    kai-pm/UH2_INTAKE_REBUILD_ANALYSIS.md	64	74	DATE	L3
+    kai-pm/UH2_INTAKE_REDESIGN.md	39	49	DATE	L3
+    kai-pm/UH2_SENSOR_INGRESS_PLAN.md	53	63	DATE	L3
+    kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md	119	129	DATE	L4
 
-  SELF-REPORTED OVER-PROMOTION — one, found by inspecting my own new rows
-  kai-pm/EMBEDDING_BACKEND_STATE.md	740	751	HEX	L16
-      line: "31568526480 / `189500b`."
-      This is a RUN ID in the continuation of a run list, not a dateline.
-      BARE_DATELINE fired because it requires only that nothing precede
-      the witness on the line. It does NOT require the witness to be a
-      DATE, and it does not require the line to be the document's
-      dateline rather than a wrapped list item. The first `##` in that
-      file is at line 24, so line 16 is still root.
-      DEFECT IN MY CYCLE-4 RULE. Not fixed here: the implementation is
-      frozen at 468bee5 and altering it after seeing the run is what the
-      freeze forbids. Flagged for Kai's ruling as an unexpected
-      mechanism class.
-      The other five bare-dateline promotions (DEEPSEEK_BRIEF_TOPOLOGY
-      L3, UH2_INTAKE_REBUILD_ANALYSIS L3, UH2_INTAKE_REDESIGN L3,
-      UH2_SENSOR_INGRESS_PLAN L3) are genuine leading datelines and were
-      named by Kai as positive controls.
+  HISTORICAL RECONCILIATION ONLY — ZERO DESIGN AUTHORITY
+    historical 214 WHOLE_FILE / 278 SPAN, 47 up / 1 down
