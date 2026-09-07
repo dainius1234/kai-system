@@ -839,6 +839,73 @@ Proactive engineering is not autonomous scope expansion.
     > with producer and dependency before the word is accepted.*
     > *OWNER/STAGE: evidence-plane tooling.*
 
+
+50. **AN OBJECTION IS NOT A FINDING UNTIL THE REPOSITORY SAYS SO, AND A
+    HYPOTHESIS MAY NOT SPAWN A CONTROL.** Directed by Dainius after a
+    review thread produced four rounds of governance layering and no new
+    system evidence.
+
+    The order is fixed, and it starts in the system:
+
+    ```
+    REPOSITORY / SYSTEM REALITY -> EVIDENCE -> FINDING
+      -> DECISION -> BUILD / TEST -> ADVERSARIAL REVIEW
+    ```
+
+    It is **not**:
+
+    ```
+    theoretical objection -> theoretical control
+      -> further objection -> further control layer
+    ```
+
+    **BEFORE accepting, rejecting or designing around a technical
+    objection**, the responsible reviewer inspects the implementation
+    where access exists — source, architecture, governing specification,
+    frozen commit, tests, evidence artefacts, runtime mechanism, existing
+    controls — and classifies the response as exactly one of:
+
+    | disposition | meaning |
+    |---|---|
+    | `REPO_CONFIRMED_DEFECT` | opened, and the defect is there |
+    | `REPO_CONFIRMED_CONTROL` | opened, and something already prevents it |
+    | `GOVERNANCE_GAP` | real, and no artefact governs it |
+    | `UNVERIFIED_HYPOTHESIS` | plausible, not yet inspected |
+    | `GENERIC_BEST_PRACTICE` | sound in general, not shown to bind here |
+
+    **Generic architectural reasoning must not silently become a finding
+    about this system.** The last three dispositions create no programme
+    state and authorise no control.
+
+    **Before any control layer is added, four questions must be answered
+    from the repository:** does the implementation already prevent this ·
+    does the defect exist here · is there evidence it can fail · is the
+    control required by frozen governance. Unanswered, the architecture
+    does not expand.
+
+    **This binds every producer and exempts none.** An adversarial
+    reviewer's findings are challenge inputs, never programme authority,
+    and must be independently verified against system evidence before
+    banking. The adjudicator's own conclusions are equally subject to
+    repository verification. The executing producer must **challenge an
+    instruction that conflicts with banked repository evidence rather
+    than implementing it** — rule 38 from the other direction.
+
+    **Governance exists to make the system safer to build, not as an end
+    in itself.** Every sustained review thread converges on one of:
+    confirmed defect · confirmed no-defect · required measurement ·
+    concrete repair · concrete test · explicit governed HOLD. A thread
+    generating only hypothetical controls without new system evidence is
+    **stopped and returned to the implementation**.
+
+    > *ENFORCEMENT: manual. The disposition label is stated with the
+    > response, before any control is proposed.*
+    > *MACHINE HOOK: a check that a banked control cites a
+    > `REPO_CONFIRMED_DEFECT` or `GOVERNANCE_GAP` disposition with its
+    > inspected artefact, and that no control is banked against
+    > `UNVERIFIED_HYPOTHESIS` or `GENERIC_BEST_PRACTICE`.*
+    > *OWNER/STAGE: review process, next governance cycle.*
+
 25. **No agent may silently expand its remit.** Subagents inherit these
     standards and return **evidence, not confidence**.
 26. **No consequential mechanism self-approves or self-verifies.**
@@ -873,6 +940,7 @@ Proactive engineering is not autonomous scope expansion.
 
 | rule | the failure that earned it |
 |---|---|
+| 50 | **a review thread that produced four rounds of governance layering and no new system evidence**, while direct repository inspection immediately found a concrete source-binding weakness nobody had raised: the M3 manifest builder enumerates paths from the requested git tree but reads document content from the working filesystem. One inspection was worth more than the whole abstract thread. Directed by Dainius |
 | 48 | **three incidents in one H2 adjudication session, one mechanism: *bounded measurement → correct local result → unbounded transmitted claim*.** (1) A Pass A `local_context` cut at the 6000-byte window was described as *the source document carries a truncated SHA with no closing backtick* — the source was intact; the instrument's own output had been read as the artefact. (2) `find` over `/tmp/tmp.6xNl2hBs2V` and `/tmp/claude-0` became *"passA.json was not preserved anywhere on disk. I looked."* — it was tracked at `f196366`, 359,173 bytes, and `sha256sum -c PACKAGE.sha256` verified all 14 entries. (3) *0 positive evidence facts carry a witness* was measured over `h2v12-classification.json` and transmitted as a claim about the candidate package — **235 of 316 carry the full nine-field §5 trace** in the package-bound sidecar. Each measurement was locally correct; each sentence was wider than what was measured. Adjudicated by Kai across three exchanges, directed into doctrine by Dainius (D373) |
 | 49 | **the same three incidents, seen from the control side.** Rules 33, 35, 46 and 47 were all banked and all cited — one of them quoted in the very message that broke it — and the mechanism still recurred three times inside a single session. The programme's own record already showed 14 of 17 defects were covered by written doctrine when they occurred (rule 44). What was missing was not another rule but the closed loop: preserve the incident, name the mechanism, search for recurrence, and escalate the control when a confirmed pattern repeats. Directed by Dainius (D374) |
 | 1, 24, 27 | findings "closed" on argument rather than evidence; counts that changed because a fix landed |
