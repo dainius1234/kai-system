@@ -102,7 +102,32 @@ BINDING_PREDICATES = {
     r"planning date": "the document states its own authoring date",
     r"date": "the document states its own date",
     r"version": "the document states its own version point",
+    # CYCLE 4. Document-lifecycle predicates, source-confirmed in the
+    # accepted regression set. Same declared closed-world standing and
+    # the same form of rationale as the entries above.
+    r"created": "the document states its own creation point",
+    r"generated": "the document states its own generation point",
+    r"opened": "the document states when it was opened",
+    r"updated": "the document states its own currency",
+    r"finali[sz]ed": "the document states its own completion point",
+    r"report completed": "the document states its own completion point",
+    r"(?:log|register) started": "the document states when its record began",
+    r"started": "the document states when its record began",
+    r"prepared": "the document states its own preparation point",
+    r"review date": "the document states its own review point",
+    r"sent": "the document states when it was sent",
+    r"written": "the document states when it was written",
+    r"agreed": "the document states when it was agreed",
 }
+# The POSITIVE semantic authority for INPUT 3 at document root. Cycle 3
+# declared these predicates document-binding and then rejected several of
+# them through ARTEFACT_LABEL because their VALUES are artefacts --
+# "audited snapshot" was declared binding and refused for containing the
+# word "snapshot". That contradiction was the cycle-3 root cause.
+# ARTEFACT_LABEL is removed. The question is whether the field defines the
+# document's own provenance or scope, not whether the label names an
+# artefact.
+DOC_BINDING = re.compile(r"^(?:" + "|".join(BINDING_PREDICATES) + r")$", re.I)
 # A structured binding is LABEL, optional markdown emphasis, then a
 # colon, at the START OF A LINE. The requirement is structural-semantic
 # (a labelled field whose subject is the document), not "must be in the
@@ -116,112 +141,88 @@ BINDING_LINE = re.compile(
 # ── M3 scope derivation: the four authorised inputs ───────────────────
 # Rev4: WHOLE_FILE requires BOTH a structural document-level binding AND
 # subject = the document as a whole. Detector is NOT an input.
-#
-# CYCLE 3. Cycle 2 collapsed the conjunction: it treated
-# "labelled field + unique label" as sufficient, and uniqueness is
-# INPUT 2 alone. A unique field may describe one section, one phase, one
-# audited snapshot or one run and still be local. Four source-confirmed
-# over-promotions followed, every one of them a labelled field sitting
-# INSIDE an H2+ section that cycle 2 never looked at.
 
 TABLE_ROW = re.compile(r"^\s{0,3}\|")
 H1 = re.compile(r"^#[^#]", re.M)
 SECTION = re.compile(r"^#{2,}\s", re.M)
+# A bounded parenthetical qualifier is part of the label, not a new
+# predicate: "Last updated (UTC):" is the same field as "Last updated:".
 LABEL_LINE = re.compile(r"^\s{0,3}>?\s*(?:[-*+]\s+)?[*_`]{0,2}\s*"
-                        r"([A-Za-z][A-Za-z0-9 ._/-]{0,40}?)"
+                        r"([A-Za-z][A-Za-z0-9 ._/-]{0,40}?"
+                        r"(?:\s*\([^)]{0,20}\))?)"
                         r"\s*[*_`]{0,2}\s*:[*_`]{0,2}\s")
-# INPUT 3, DECLARED CLOSED-WORLD, same standing as BINDING_PREDICATES:
-# the nouns by which a document refers to itself.
+QUALIFIER = re.compile(r"\s*\([^)]*\)")
 SELF_SUBJECT = re.compile(
     r"\bthis\s+(?:document|file|register|tracker|log|report|plan|brief|"
     r"note|index|census|audit|spec|specification|record|policy|guide)\b",
     re.I)
-# INPUT 3, the other direction. A label whose head noun names an
-# ARTEFACT has that artefact as its subject; the document merely records
-# it. "Findings-bearing audited snapshot: <sha>" is a statement about the
-# snapshot, not about the document that cites it. DECLARED closed-world,
-# with that rationale, because there is no tree to derive it from.
-ARTEFACT_LABEL = re.compile(
-    r"\b(?:snapshot|commit|tree|checkpoint|head|digest|sha|hash|run|"
-    r"artefact|artifact|image|tag|branch|pointer)\b", re.I)
+# A root LIFECYCLE DATELINE carries the same meaning as a labelled field
+# without the colon: "Sent 2026-08-07", "Written 2026-08-07", "Agreed
+# with the operator on 2026-08-07", "Closed 2026-08-12". Bounded like
+# RUN_NEAR: the verb must sit within 40 characters before the witness and
+# in the same clause, so a date in ordinary prose does not qualify.
+ROOT_LIFECYCLE = re.compile(
+    r"\b(?:sent|written|agreed|closed|prepared|published|issued|completed|"
+    r"finali[sz]ed|recorded|measured|started|opened|created|generated|"
+    r"drafted|updated|reviewed)\b[^.;]{0,40}$", re.I)
+# A bare leading date IS the document's dateline when it opens the line
+# at root.
+BARE_DATELINE = re.compile(r"^\s{0,3}>?\s*[*_`]{0,2}\s*$")
 
 
 def _preamble_end(text):
-    """Front matter ends at the first section heading."""
     m = SECTION.search(text)
     return m.start() if m else len(text)
 
 
-def _structural_position(text, ls, line):
-    """INPUT 1, parsed structural position. TABLE_ROW | SECTION | ROOT."""
-    if TABLE_ROW.match(line):
-        return "TABLE_ROW"
-    return "ROOT" if ls < _preamble_end(text) else "SECTION"
+def _label_of(before):
+    """The normalised predicate of a labelled field, or None."""
+    m = LABEL_LINE.match(before)
+    if not m:
+        return None
+    return QUALIFIER.sub("", m.group(1)).strip().lower()
 
 
 def _scope_of(text, start):
-    """WHOLE_FILE iff BOTH conditions of the Rev4 conjunction hold.
-
-    They are evaluated SEPARATELY and neither substitutes for the other:
-
-      structural_document_level  -- INPUT 1, and INPUT 4 as a disqualifier
-      subject_is_whole_document  -- INPUT 3, with INPUT 2 distinguishing a
-                                    unique field from a per-entry stamp
-
-    Residual ambiguity falls to SPAN. Never upward: D367 9 makes an
-    unsupported scope widening a BLOCKER, while an unfound promotion is a
-    coverage finding.
+    """WHOLE_FILE iff BOTH conjuncts of the Rev4 rule hold, derived
+    separately. Uniqueness (INPUT 2) never promotes on its own.
     """
     ls = text.rfind("\n", 0, start) + 1
     le = text.find("\n", start)
     line = text[ls:le if le >= 0 else len(text)]
-    before = text[ls:start + 1]
+    before = text[ls:start]
 
-    pos = _structural_position(text, ls, line)
-
-    # INPUT 4. A table row's subject is the row, whatever label it carries.
-    if pos == "TABLE_ROW":
+    # INPUT 4. A table row's subject is the row.
+    if TABLE_ROW.match(line):
+        return "SPAN"
+    # INPUT 1. Inside an H2+ section the section is a nearer subject.
+    if ls >= _preamble_end(text):
         return "SPAN"
 
-    # INPUT 1. A witness inside an H2+ section is structurally LOCAL. The
-    # enclosing section is a nearer subject than the document, and cycle
-    # 2's defect was never asking. This alone makes all four of Kai's
-    # source-confirmed over-promotions SPAN, with no path exception:
-    # ORION_FIELD_NOTES L9 under "## 0. Where we were...",
-    # STRATEGIC_PLAN L11 under "## Phase 0 - Pre-GPU Hardening",
-    # PLANNING_PACKAGE_QA L21 under "## 2. Repository state verified",
-    # CONTINUATION_LOG L116 under "### Reviewed findings snapshot".
-    if pos == "SECTION":
-        return "SPAN"
-
-    # ---- from here the witness is at the document root ----
-
-    # INPUT 1. The document's own H1 title: the document naming itself.
+    # ---- document root ----
     m1 = H1.search(text)
-    if m1 and m1.start() == ls:
+    if m1 and m1.start() == ls:                 # the document names itself
+        return "WHOLE_FILE"
+    if SELF_SUBJECT.search(line):               # INPUT 3, explicit
         return "WHOLE_FILE"
 
-    # INPUT 3. An explicit self-reference at the root binds the document.
-    if SELF_SUBJECT.search(line):
+    lab = _label_of(before)
+    if lab is not None:
+        # INPUT 3. A root label promotes ONLY on positive document-binding
+        # authority. A generic unique label proves nothing about subject.
+        if not DOC_BINDING.match(lab):
+            return "SPAN"
+        # INPUT 2, and only now: one document-level field, or a repeated
+        # per-entry stamp?
+        hits = sum(1 for ln in text.splitlines()
+                   if not TABLE_ROW.match(ln) and _label_of(ln) == lab)
+        return "WHOLE_FILE" if hits <= 1 else "SPAN"
+
+    # INPUT 3 without a colon: a root lifecycle dateline.
+    if ROOT_LIFECYCLE.search(before) or BARE_DATELINE.match(before):
         return "WHOLE_FILE"
 
-    m = LABEL_LINE.match(before)
-    if not m:
-        return "SPAN"
-    lab = m.group(1).strip().lower()
-
-    # INPUT 3. Root position supplies no narrower subject, but the LABEL
-    # can: one naming an artefact is about that artefact.
-    if ARTEFACT_LABEL.search(lab):
-        return "SPAN"
-
-    # INPUT 2. Uniqueness does ONE job -- separating a per-entry stamp
-    # from a single field. It is not evidence of either conjunct.
-    hits = sum(1 for ln in text.splitlines()
-               if (mm := LABEL_LINE.match(ln)) and
-               mm.group(1).strip().lower() == lab and
-               not TABLE_ROW.match(ln))
-    return "WHOLE_FILE" if hits <= 1 else "SPAN"
+    return "SPAN"
 
 
 def git(repo, *a):
