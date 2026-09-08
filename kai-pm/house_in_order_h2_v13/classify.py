@@ -28,6 +28,15 @@ WHAT IS REPAIRED HERE
   D11 candidate order never decides: two corroborated nominations are
       reported as ambiguity, not resolved by list position.
 
+  M1  a review or inspection event was promoted into TIME_BOUND. M3
+      answers what a witness APPLIES TO; VALIDITY must separately answer
+      whether it ESTABLISHES the document's temporal state. Those are
+      different predicates, and a document-scoped DATE is necessary but
+      not sufficient. VALIDITY now requires a positively identified
+      document-state binding, and it inspects EVERY document-scoped date
+      rather than the first one Pass A emitted -- source order was
+      deciding which date determined the verdict.
+
 CORRECTION E, AND IT COSTS 144 ROWS. Path and title are created as part
 of the same document by the same author. `PATH says audit + TITLE says
 audit` is not two independent proofs of function -- it is one source
@@ -45,9 +54,40 @@ HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import envelope as E                                          # noqa: E402
 import ontology as ont                                        # noqa: E402
+import passa as PA                                            # noqa: E402
 from envelope import Witness                                  # noqa: E402
 
 DOC_BINDING = E.DECLARED_PROMOTIONS[("SPAN", "WHOLE_FILE")]
+
+# ── M1: VALIDITY state-binding predicates. DECLARED CLOSED-WORLD ──────
+# M3 answers ONE question: what does this witness apply to? VALIDITY must
+# separately answer a DIFFERENT one: does this witness establish the
+# document's temporal validity / current-state binding? A WHOLE_FILE DATE
+# is NECESSARY for a positive date-based VALIDITY verdict and is NOT
+# SUFFICIENT.
+#
+# THE SET IS THE DEMONSTRATED ONE, NOT A VOCABULARY. Every predicate here
+# is observed in the subject as a document-scoped DATE whose source
+# language positively states the document's own state or version point. A
+# census of ALL 195 document-scoped DATE witnesses in the subject found no
+# other state-stating predicate present, so this is not an under-supply
+# against source. A future predicate must EARN equivalent semantics from
+# source; resemblance to one of these is not admission.
+STATE_PREDICATES = {
+    "last updated": "the document states its own currency point",
+    "updated": "the document states its own currency point",
+    "version": "the document states its own version/state point",
+}
+# NOT HERE, AND EACH FOR A RULED REASON:
+#   reviewed / last reviewed / review date  an inspection EVENT (class B)
+#   created / generated / opened / started / prepared / planning date,
+#   and the root lifecycle datelines sent / written / closed
+#                                           an ORIGIN event (class C)
+#   date                                    names a date, not a state (E)
+#   H1 dates, bare datelines, contextual Status
+#                                           no predicate at all (class D)
+# All of these may still be document-scoped, may still earn SCOPE, and
+# still emit CARRIES_DATE_STAMP. They do not establish VALIDITY.
 
 # ── FUNCTION vocabulary ───────────────────────────────────────────────
 # Terms are matched with WORD BOUNDARIES and an explicit plural
@@ -95,8 +135,77 @@ def _first_witness(row, *kinds):
     return None
 
 
+def _predicate_of(w):
+    """The SOURCE PREDICATE that labels this witness, or None.
+
+    THE SCANNER'S OWN RECOGNISER, NOT A SECOND LIST. `passa._label_of` is
+    the recogniser that granted this witness its document scope in the
+    first place, so the same grammar decides which predicate granted it.
+    A private extractor here would be a list kept beside the thing it
+    governs (R5) and could admit a label M3 never saw.
+
+    Position matters: `**Reviewed:** X · **Last updated:** Y` carries two
+    predicates on one line, and Y's predicate is the second. The witness
+    is located inside its own complete `local_context` line, and the label
+    is read from the text BEFORE it -- the same geometry `_scope_of` used.
+    If the value occurs more than once and the readings disagree, the
+    position is ambiguous and this FAILS CLOSED to None rather than
+    picking one.
+    """
+    line, value = w["local_context"], w["witness_value"]
+    labels, i = set(), line.find(value)
+    while i >= 0:
+        labels.add(PA._label_of(line[:i]))
+        i = line.find(value, i + 1)
+    return labels.pop() if len(labels) == 1 else None
+
+
+def _state_binding_witnesses(row):
+    """EVERY document-scoped DATE witness that positively binds document
+    state. ALL of them, never the first one found.
+
+    M1's second root defect was that `_binding_witness(row, "DATE")`
+    returns the FIRST WHOLE_FILE DATE in source order, so a `Created:` or
+    a `Status:` line above a `Last updated:` line decided the verdict by
+    position. Source order is not a semantic selection rule. This
+    collects the qualified set and lets the caller test it whole.
+    """
+    return [(Witness(**w), lab) for w in row["witnesses"].get("DATE", [])
+            if w["applicability_scope"] == "WHOLE_FILE"
+            and (lab := _predicate_of(w)) in STATE_PREDICATES]
+
+
+def _trace_witness(qualified):
+    """One qualified witness, for the TRACE only.
+
+    THIS IS NOT PRECEDENCE BETWEEN PREDICATES. The verdict is already
+    fixed by the qualified set being non-empty; every member supports the
+    same TIME_BOUND. The key is the witness's own source position, which
+    is a property of the DOCUMENT and not of the list, so permuting the
+    witness list cannot change either the verdict or the trace. No
+    semantic ranking is invented, because source evidence does not
+    require one.
+    """
+    def key(item):
+        w, _lab = item
+        try:
+            line = int(w.source_selector.lstrip("L"))
+        except ValueError:
+            line = 1 << 30
+        return (line, w.witness_value)
+    return min(qualified, key=key)
+
+
 def _binding_witness(row, *kinds):
-    """A witness whose own applicability is already WHOLE_FILE."""
+    """A witness whose own applicability is already WHOLE_FILE.
+
+    UNCHANGED BY M1, DELIBERATELY. `scope()` consumes this and its
+    semantics are different: a root `Reviewed:` date IS applicable to the
+    document as a whole, so SCOPE=WHOLE_FILE is CORRECT there and must not
+    move. Repairing VALIDITY inside this shared helper would have moved
+    146 SCOPE verdicts as collateral. The M1 repair is VALIDITY-specific
+    and lives above.
+    """
     for k in kinds:
         for w in row["witnesses"].get(k, []):
             if w["applicability_scope"] == "WHOLE_FILE":
@@ -136,10 +245,32 @@ def validity(row, contradiction):
             return E.claim(w, value, scope="WHOLE_FILE",
                            rationale=f"document-level binding, witness kind "
                                      f"VERIFIED as {w.witness_type}")
-    w = _binding_witness(row, "DATE")
-    if w is not None:
+    # M1. A document-scoped DATE is NECESSARY and NOT SUFFICIENT. The
+    # verdict is decided by the qualified SET, never by which member of
+    # it Pass A emitted first.
+    qualified = _state_binding_witnesses(row)
+    if qualified:
+        w, lab = _trace_witness(qualified)
         return E.claim(w, "TIME_BOUND", scope="WHOLE_FILE",
-                       rationale="document-level date binding")
+                       rationale=f"document-state binding: {lab!r} — "
+                                 f"{STATE_PREDICATES[lab]}")
+
+    doc_dates = [(w["source_selector"], _predicate_of(w))
+                 for w in row["witnesses"].get("DATE", [])
+                 if w["applicability_scope"] == "WHOLE_FILE"]
+    if doc_dates:
+        # The M1 abstention, and it is a DIFFERENT observation from the
+        # one below: dates DO bind this document, and none of them says
+        # anything about its state. Both are reported; neither is
+        # collapsed into the other.
+        return E.abstain(
+            "VALIDITY", "a witness that positively binds the document's "
+                        "state, currency or version point",
+            f"document-scoped dates present, none state-binding: "
+            f"{[(s, p) for s, p in doc_dates]}",
+            "a review, origin, lifecycle or bare date applies to the "
+            "document without establishing its temporal validity. "
+            "Someone reviewed it; that is not a currency interval.")
 
     seen = sorted(k for k, v in row["witnesses"].items() if v)
     return E.abstain(
