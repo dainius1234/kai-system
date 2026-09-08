@@ -33525,3 +33525,158 @@ OPEN DEFECT      manifest source-byte binding, REPO_CONFIRMED, repaired
 NEXT             Kai reviews this commit and issues the next engineering
                  ruling. No source-byte repair work begins before that.
 ```
+
+## M3 CYCLE-6 ACCEPTANCE — 2026-09-08 — Kai's cycle-6 ruling: mechanism accepted, M3 engineering repair CLOSED. NO D-NUMBER TAKEN
+
+**Authority.** Kai issued *CYCLE 6 REVIEW COMPLETE — RULING* on
+2026-09-08, relayed by Dainius. This entry records that ruling. It is
+Kai's adjudication, not Orion's conclusion; Orion has zero final
+admission weight and none is claimed here.
+
+**NO D-NUMBER IS TAKEN, AND THAT IS DELIBERATE.** The allocator was
+checked fresh: the highest allocated number is `D374`, and the preceding
+`RATIFICATION` entry expressly reserves *"Next free: D375"* and rules
+that reallocating it requires a further ruling. Kai's cycle-6 ruling
+directs *"the smallest durable M3 Cycle-6 acceptance/ruling record"* and
+does not mention `D375`. Spending a reserved identifier in an
+append-only record on an inference would be filling a gap from
+convenience. This entry therefore follows the `D370 CORRECTION / ERRATA`
+and `RATIFICATION` precedent of a titled, unnumbered entry.
+**`D375` remains unallocated.** If Kai or Dainius rules that this
+acceptance must carry a D-number, that is a further append, not an edit.
+
+### 1. What Kai accepted
+
+```
+ACCEPTED M3 MECHANISM
+  002e0ab796dfbe2a011784a56757bc9b96c38cf6
+CYCLE-6 MEASUREMENT, accepted as REPRODUCIBLE PRODUCER EVIDENCE
+  006be3dfb698ecdf4bc64684ca785481dad038f0
+```
+
+Both SHAs as cited by Kai were verified against the repository by
+`git rev-parse` before this entry was written; both resolve exactly.
+
+### 2. The root finding, and why the repair level is correct
+
+Kai's finding, recorded as ruled: **the Cycle-5 defect was not the single
+`PHASE_0_5_BACKLOG` row.** The root was that
+
+> a generic label failing intrinsic document-binding recognition acted as
+> a terminal proof of local scope, preventing the remaining authorised
+> subject/context evidence from being considered.
+
+Cycle 6 removes that terminal veto and admits **one** bounded
+context-dependent predicate class **without adding `status` to
+`BINDING_PREDICATES`**. Kai: *"That is the correct repair level."*
+
+### 3. The one source-adjudicated delta
+
+```
+kai-pm/PHASE_0_5_BACKLOG.md   273:283   DATE   L6   SPAN -> WHOLE_FILE
+```
+
+**KAI ADJUDICATION: CORRECT.** The source is root metadata and states
+`Status: COMPLETE — all items shipped (2026-07-21)` in the same
+contiguous root metadata block as the independently earned
+`Last updated: 2026-07-21`. The status therefore concerns the backlog
+document as a whole.
+
+This is the only changed identity in the 492. It is Kai's adjudication
+of the source, not Orion's assertion that the delta was right.
+
+### 4. Collateral effect, as ruled
+
+* 491 of 492 identities unchanged.
+* The task/phase `Status` controls remain `SPAN`.
+* Six same-span detector pairs remain unsplit.
+* Identity population remains 492.
+* Historical frozen artefacts remain untouched.
+* **No unsupported scope widening was found.**
+
+### 5. Qualifier preserved exactly
+
+The contextual **value-side exclusion logic is deliberately fail-closed**.
+A future source may demonstrate another whole-document contextual form
+that is still under-assigned. **That would be a NEW source-confirmed
+coverage finding.** It is **not** grounds to hold this candidate today,
+and **the contextual vocabulary must not be expanded speculatively.**
+
+### 6. Historical counts
+
+`214/278` and `47/1` remain **HISTORICAL RECONCILIATION ONLY — ZERO
+DESIGN AUTHORITY**. They are not a target and must never be used as one.
+
+### 7. State transition
+
+```
+M3 ENGINEERING REPAIR                 CLOSED
+M3 ACCEPTED MECHANISM                 002e0ab796dfbe2a011784a56757bc9b96c38cf6
+M3 CANONICAL MEASURED POPULATION      201 WHOLE_FILE / 291 SPAN / 492 TOTAL
+                                      PRODUCER MEASUREMENT. NOT an independent
+                                      answer key and NOT admission authority.
+M3 FROZEN HISTORICAL PREDECESSOR      c3c7731592620227a35da4200b936dd7480140f7
+M3 VALIDATION / QUALIFICATION / ADMISSION   OPEN, governed by the later D367
+                                      qualification / final-40 sequence
+```
+
+### 8. What this acceptance does NOT do
+
+* **No Cycle 7. No further M3 tuning.**
+* **Do NOT create a new M3 blind holdout.** D367 final candidate-level
+  independent admission control remains the **final-40 procedure at its
+  authorised stage**.
+* It does not declare M3 validated, qualified or admitted.
+* It does not give blind weight to any M3 evidence. The 48 remain
+  REFERENCE / REGRESSION CORRECTNESS EVIDENCE WITH ZERO BLIND WEIGHT;
+  blindness was destroyed by Orion's transcript-search contamination
+  (`INC-2026-08-30-12`) and cannot be created retroactively.
+* It does not authorise M1, D2, E2, Stage A, D367 final-40 or `D375`.
+* The `201/291` figure is single-producer reproducible evidence. It is
+  **not** independent corroboration, and Kai's acceptance of it as
+  *reproducible producer evidence* is exactly that and no more.
+
+### THREAD RECOVERY BLOCK
+
+```
+ENTRY            M3 CYCLE-6 ACCEPTANCE, unnumbered. D375 NOT taken, still free.
+DATE             2026-09-08.
+AUTHORITY        Kai's ruling "CYCLE 6 REVIEW COMPLETE", relayed by Dainius.
+ACCEPTED         M3 mechanism 002e0ab796dfbe2a011784a56757bc9b96c38cf6
+MEASUREMENT      006be3dfb698ecdf4bc64684ca785481dad038f0, accepted as
+                 reproducible PRODUCER evidence, not an answer key.
+BOTH SHAS        verified by git rev-parse before writing this entry.
+ROOT CLOSED      a generic label failing intrinsic document-binding
+                 recognition acted as a TERMINAL PROOF OF LOCAL SCOPE.
+                 Cycle 6 removes the veto and admits one bounded
+                 context-dependent class. status NOT in BINDING_PREDICATES.
+ONE DELTA        kai-pm/PHASE_0_5_BACKLOG.md 273:283 DATE L6
+                 SPAN -> WHOLE_FILE. KAI ADJUDICATION: CORRECT.
+CONSERVED        491/492 unchanged · 6 pairs unsplit · population 492 ·
+                 task/phase Status controls remain SPAN · frozen
+                 artefacts untouched · no unsupported scope widening.
+FROZEN           ACCEPTED MECHANISM  002e0ab
+                 PREDECESSOR         c3c7731 (historical, frozen)
+                 CYCLE-6 RESULT      006be3d
+                 CYCLE-5 RESULT      3be6699
+                 PARITY GUARD        a8eefc2
+                 BASELINE            0f3da09
+                 subject commit      d8aac4d49e6ba997e3eb38062c0917186ee3f197
+                 subject tree        3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+STATE            M3 ENGINEERING REPAIR CLOSED · canonical measured
+                 population 201/291/492 as PRODUCER MEASUREMENT ·
+                 VALIDATION / QUALIFICATION / ADMISSION OPEN.
+QUALIFIER        contextual value-side exclusion is deliberately
+                 FAIL-CLOSED. A further under-assigned whole-document
+                 contextual form would be a NEW source-confirmed coverage
+                 finding, not a hold on this candidate. DO NOT expand the
+                 contextual vocabulary speculatively.
+HISTORICAL       214/278 and 47/1 — RECONCILIATION ONLY, ZERO DESIGN
+                 AUTHORITY. Never a target.
+PROHIBITED       No Cycle 7 · no further M3 tuning · NO new M3 blind
+                 holdout · no M1/D2/E2/Stage A/final-40 start · D375 not
+                 allocated.
+NEXT             D367 qualification / final-40 sequence at its authorised
+                 stage, on Kai's ruling and Dainius's authorisation. No
+                 M3 work resumes.
+```
