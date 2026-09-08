@@ -33680,3 +33680,155 @@ NEXT             D367 qualification / final-40 sequence at its authorised
                  stage, on Kai's ruling and Dainius's authorisation. No
                  M3 work resumes.
 ```
+
+## M1 ACCEPTANCE — 2026-09-08 — Kai's M1 ruling: mechanism accepted, M1 engineering repair CLOSED. NO D-NUMBER TAKEN
+
+**Authority.** Kai issued *M1 REVIEW COMPLETE — RULING* on 2026-09-08,
+relayed by Dainius. This entry records that ruling. It is Kai's
+adjudication, not Orion's conclusion; Orion has zero final admission
+weight and none is claimed here.
+
+**NO D-NUMBER IS TAKEN, AND THAT IS DELIBERATE.** The allocator was
+checked fresh: `D374` remains the highest allocated and `D375` is still
+unallocated. Kai's ruling directs *"the smallest durable M1
+acceptance/ruling record only"* and does not mention `D375`. This follows
+the `D370 CORRECTION / ERRATA`, `RATIFICATION` and `M3 CYCLE-6
+ACCEPTANCE` precedent of a titled, unnumbered entry. **`D375` remains
+unallocated.** If Kai or Dainius rules that this acceptance must carry a
+D-number, that is a further append, not an edit.
+
+### 1. What Kai accepted
+
+```
+ACCEPTED M1 MECHANISM
+  53791c4832d77f2527afba5392ca09e7bcc71eb5
+M1 RESULT, accepted as REPRODUCIBLE PRODUCER MEASUREMENT
+  2e725a4cb1dd240ea3bb2b40b36f15fd921e323d
+```
+
+Both SHAs as cited by Kai were verified against the repository with
+`git rev-parse` before this entry was written; both resolve exactly.
+
+### 2. The two coupled root defects, closed
+
+**1. PREDICATE-CLASS CONFLATION.** A `WHOLE_FILE` date was being treated
+as sufficient proof of temporal validity. The correct rule, as ruled:
+**M3 determines applicability; VALIDITY independently determines whether
+that evidence positively establishes document state / currency / version.**
+
+**2. SOURCE-ORDER DETERMINATION.** The first document-scoped `DATE` was
+deciding VALIDITY. The correct rule, as ruled: **all document-scoped
+`DATE` witnesses are examined, and the qualified state-binding set
+determines whether `TIME_BOUND` is earned.**
+
+Both are repaired inside VALIDITY only. `_binding_witness` and `scope()`
+are untouched, because a root `Reviewed:` date IS applicable to the
+document as a whole and SCOPE is correct there.
+
+### 3. Source semantics accepted
+
+Demonstrated state-binding predicates: **`last updated` · `updated` ·
+`version`**. These earn `TIME_BOUND` when the remaining VALIDITY
+requirements are satisfied.
+
+Review, origin, lifecycle, bare-date and non-predicate forms **do not
+independently earn `TIME_BOUND`**. A future source form must earn
+equivalent semantics before admission. **The set is not to be expanded
+speculatively.**
+
+### 4. The accepted result
+
+```
+CANONICAL VALIDITY RESULT
+  UNKNOWN         260
+  TIME_BOUND        7
+  EXACT_SNAPSHOT    5
+  TOTAL           272
+```
+
+177 predecessor `TIME_BOUND` rows correctly abstain. Two rows are
+correctly rescued through independent qualified state witnesses:
+
+```
+kai-pm/PHASE1_READINESS.md    Created L3   -> Last updated L4
+kai-pm/PHASE_0_5_BACKLOG.md   Status  L6   -> Last updated L7
+```
+
+**THE VALUE 7 IS AN OBSERVED CONSEQUENCE. IT IS NOT A TARGET AND NOT AN
+ANSWER-KEY TOTAL.** No target count was used in producing it — not the
+historical 10, and not 5, 7, 38 or any other aggregate.
+
+### 5. Collateral confirmed unchanged
+
+Pass A · M3 `201 WHOLE_FILE / 291 SPAN` · SCOPE verdicts and determining
+witnesses · evidence facts including `CARRIES_DATE_STAMP` · LIFECYCLE ·
+FUNCTION · AUTHORITY · GENERATION · the `EXACT_SNAPSHOT` route ·
+contradiction handling.
+
+**No M3 reopening. No further M1 cycle.**
+
+### 6. State transition
+
+```
+M1 ROOT INVESTIGATION                 CLOSED
+M1 ENGINEERING REPAIR                 CLOSED
+M1 ACCEPTED MECHANISM                 53791c4832d77f2527afba5392ca09e7bcc71eb5
+M1 CANONICAL VALIDITY RESULT          260 UNKNOWN / 7 TIME_BOUND /
+                                      5 EXACT_SNAPSHOT / 272 TOTAL
+                                      PRODUCER MEASUREMENT, not independent
+                                      final admission evidence
+M3                                    CLOSED / UNCHANGED, accepted mechanism
+                                      002e0ab796dfbe2a011784a56757bc9b96c38cf6
+D367 QUALIFICATION / FINAL ADMISSION  OPEN, later programme work
+```
+
+### 7. What this acceptance does NOT do
+
+* It does not make the result independent admission evidence. It is
+  single-producer reproducible measurement.
+* **No further M1 tuning. No new M1 cycle.**
+* It does not authorise D2, E2, M2, Stage A, D367 final-40 or `D375`.
+* It does not reopen M3.
+* It gives no blind weight to any evidence. The 48 remain REFERENCE /
+  REGRESSION CORRECTNESS EVIDENCE WITH ZERO BLIND WEIGHT.
+
+### THREAD RECOVERY BLOCK
+
+```
+ENTRY            M1 ACCEPTANCE, unnumbered. D375 NOT taken, still free.
+DATE             2026-09-08.
+AUTHORITY        Kai's ruling "M1 REVIEW COMPLETE", relayed by Dainius.
+ACCEPTED         M1 mechanism 53791c4832d77f2527afba5392ca09e7bcc71eb5
+RESULT           2e725a4cb1dd240ea3bb2b40b36f15fd921e323d, accepted as
+                 reproducible PRODUCER measurement, not an answer key.
+BOTH SHAS        verified by git rev-parse before writing this entry.
+ROOTS CLOSED     (1) PREDICATE-CLASS CONFLATION — a WHOLE_FILE date was
+                 treated as sufficient proof of temporal validity.
+                 (2) SOURCE-ORDER DETERMINATION — the first
+                 document-scoped DATE was deciding VALIDITY.
+                 Both repaired inside VALIDITY only.
+STATE PREDICATES last updated · updated · version. DEMONSTRATED, not a
+                 vocabulary. Review / origin / lifecycle / bare-date /
+                 non-predicate forms do NOT independently earn TIME_BOUND.
+                 DO NOT EXPAND SPECULATIVELY.
+RESULT           UNKNOWN 260 · TIME_BOUND 7 · EXACT_SNAPSHOT 5 · 272 total
+                 177 predecessor TIME_BOUND rows correctly abstain
+                 2 rescued: PHASE1_READINESS L3->L4, PHASE_0_5_BACKLOG
+                 L6->L7, both through Last updated
+                 7 IS AN OBSERVED CONSEQUENCE, NEVER A TARGET
+UNCHANGED        Pass A · M3 201/291 · SCOPE verdicts and determining
+                 witnesses · evidence facts incl. CARRIES_DATE_STAMP ·
+                 LIFECYCLE · FUNCTION · AUTHORITY · GENERATION ·
+                 EXACT_SNAPSHOT route · contradiction handling
+FROZEN           M1 MECHANISM   53791c4      M1 RESULT   2e725a4
+                 M3 MECHANISM   002e0ab      M3 RESULT   006be3d
+                 M3 PREDECESSOR c3c7731      BASELINE    0f3da09
+                 PARITY GUARD   a8eefc2
+                 subject commit d8aac4d49e6ba997e3eb38062c0917186ee3f197
+                 subject tree   3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+PROHIBITED       No further M1 cycle · no M1 tuning · no M3 reopening ·
+                 no D2/E2/M2/Stage A/final-40 start · D375 not allocated ·
+                 no new blind holdout.
+NEXT             D367 qualification / final admission, later programme
+                 work, on Kai's ruling and Dainius's authorisation.
+```
