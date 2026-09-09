@@ -33832,3 +33832,158 @@ PROHIBITED       No further M1 cycle · no M1 tuning · no M3 reopening ·
 NEXT             D367 qualification / final admission, later programme
                  work, on Kai's ruling and Dainius's authorisation.
 ```
+
+## E2 ACCEPTANCE — 2026-09-09 — Kai's E2 ruling: evidence-class rename accepted, E2 engineering repair CLOSED. NO D-NUMBER TAKEN
+
+**Authority.** Kai issued *E2 REVIEW COMPLETE — RULING* on 2026-09-09,
+relayed by Dainius, who separately authorised the repair itself. This
+entry records that ruling. It is Kai's adjudication, not Orion's
+conclusion; Orion has zero final admission weight and none is claimed.
+
+**NO D-NUMBER IS TAKEN.** Kai's ruling states expressly: *"Do NOT allocate
+D375 unless separately authorised."* The allocator was checked fresh —
+`D374` remains the highest allocated. This follows the `D370 CORRECTION /
+ERRATA`, `RATIFICATION`, `M3 CYCLE-6 ACCEPTANCE` and `M1 ACCEPTANCE`
+precedent of a titled, unnumbered entry. **`D375` remains unallocated.**
+
+### 1. The three artefacts
+
+```
+E2 INVESTIGATION      a766493c8b3756c56cf10fffb5c8167ffc186d1f
+ACCEPTED IMPLEMENTATION 859e0a08d89fd76ba8a28ff9ebcf7455248f7cbe
+ACCEPTED PRODUCER RESULT cb38952440c61e2fd20d6a5435aef561411f711b
+```
+
+All three SHAs as cited by Kai were verified against the repository with
+`git rev-parse` before this entry was written; all three resolve exactly.
+
+### 2. What was repaired
+
+The evidence assertion changed from `CONSUMED_AT_SUBJECT` to
+**`STATIC_REFERENCE_AT_SUBJECT`** — **without changing the evidence that
+determines it.** Two production files: `run_h2_v12.py` (candidate fact
+key, `TRACE_CLASS` key, live `_reader_trace` documentation) and
+`ontology.py` (the `EVIDENCE_FACTS` entry).
+
+The repaired fact means exactly one thing: **a resolvable static
+reference was found within the bounded census analysis.** It makes **no
+claim of runtime execution, invocation or reachability.**
+
+**FALSE REMAINS ABSENCE OF A RESOLVED STATIC REFERENCE WITHIN THE
+ANALYSED SCOPE — NOT PROOF OF RUNTIME NON-CONSUMPTION.**
+
+### 3. The accepted producer measurement
+
+```
+predecessor  CONSUMED_AT_SUBJECT           5
+candidate    STATIC_REFERENCE_AT_SUBJECT   5
+positive identities unchanged             yes
+trace-content changes                     0
+documents                                 272 unchanged
+six-axis verdict delta                    0
+M3                                        201 WHOLE_FILE / 291 SPAN, unchanged
+VALIDITY                                  260 UNKNOWN / 7 TIME_BOUND /
+                                          5 EXACT_SNAPSHOT, unchanged
+all other evidence facts                  unchanged
+A6-ii behaviour                           unchanged
+```
+
+**THE MEASURED VALUE 5 IS AN OBSERVED CONSEQUENCE, NOT A TARGET.**
+
+### 4. Analysis scope
+
+**Existing census provenance was sufficient to express the analysis scope
+for E2; no schema expansion was required.** `census_dependency` carries
+the package and the sha256 of its `MANIFEST.sha256`, which pins
+`opscan.py`, where `source_population`, `SRC_SUFFIX` and `EXCLUDE_DIRS`
+define the analysed universe; the `opscan:` selector prefix names the
+producing instrument.
+
+### 5. S1 — SEPARATE AND OPEN
+
+The E2 investigation separately established a **REPO-CONFIRMED
+provenance defect** in the census read path:
+
+* tracked-file enumeration derives from repository `HEAD`;
+* source bytes derive from the working filesystem;
+* the requested frozen subject is not propagated through that read path.
+
+It was **latent, not realised**, in the E2 measurement because `HEAD`
+matched the subject and the worktree was clean. **S1 REMAINS OPEN AND
+SEPARATE. No S1 repair is authorised or begun.**
+
+### 6. Stale comment, deferred
+
+`passa.py` L547 retains the historical name `CONSUMED_AT_SUBJECT` in a
+comment. Kai's ruling: this is **NON-EXECUTABLE STALE PROSE**. E2 is not
+reopened and production scope is not widened to change it now. **Recorded
+here for later documentation / repository consolidation.**
+
+### 7. State transition
+
+```
+E2 ENGINEERING REPAIR                 CLOSED
+E2 ACCEPTED MECHANISM                 859e0a08d89fd76ba8a28ff9ebcf7455248f7cbe
+E2 ACCEPTED PRODUCER RESULT           cb38952440c61e2fd20d6a5435aef561411f711b
+M1                                    CLOSED / UNCHANGED at 53791c4
+M3                                    CLOSED / UNCHANGED at 002e0ab
+S1 CENSUS SOURCE BINDING              OPEN, SEPARATE, not begun
+D367 QUALIFICATION / FINAL ADMISSION  OPEN, later programme work
+```
+
+### 8. What this acceptance does NOT do
+
+* It does not make the result independent admission evidence. It is
+  single-producer reproducible **producer measurement**.
+* It does not authorise S1 repair, D2, M2, Stage A, D367 final-40 or
+  `D375`.
+* It does not reopen E2, M1 or M3.
+* It gives no blind weight to any evidence. The 48 remain REFERENCE /
+  REGRESSION CORRECTNESS EVIDENCE WITH ZERO BLIND WEIGHT.
+
+### THREAD RECOVERY BLOCK
+
+```
+ENTRY            E2 ACCEPTANCE, unnumbered. D375 NOT taken, still free,
+                 and Kai's ruling forbids allocating it unless separately
+                 authorised.
+DATE             2026-09-09.
+AUTHORITY        Kai's ruling "E2 REVIEW COMPLETE", relayed by Dainius,
+                 who authorised the repair.
+INVESTIGATION    a766493c8b3756c56cf10fffb5c8167ffc186d1f
+ACCEPTED MECH    859e0a08d89fd76ba8a28ff9ebcf7455248f7cbe
+ACCEPTED RESULT  cb38952440c61e2fd20d6a5435aef561411f711b
+ALL THREE SHAS   verified by git rev-parse before writing this entry.
+REPAIR           CONSUMED_AT_SUBJECT -> STATIC_REFERENCE_AT_SUBJECT, with
+                 the determining evidence UNCHANGED. Two production files:
+                 run_h2_v12.py and ontology.py.
+MEANING          a resolvable static reference was found within the
+                 bounded census analysis. NO claim of runtime execution,
+                 invocation or reachability. FALSE = absence of a
+                 resolved static reference within analysed scope, NOT
+                 proof of runtime non-consumption.
+RESULT           old 5 -> new 5 · identities unchanged · trace-content
+                 changes 0 · 272 documents · six-axis delta 0 ·
+                 M3 201/291 · VALIDITY 260/7/5 · all other facts and
+                 A6-ii unchanged.
+                 5 IS AN OBSERVED CONSEQUENCE, NEVER A TARGET.
+SCOPE            existing census provenance sufficient; NO schema added.
+S1               census source binding: enumeration from HEAD, bytes from
+                 the filesystem, frozen subject not propagated.
+                 REPO-CONFIRMED. Latent, not realised (HEAD == subject,
+                 worktree clean). OPEN AND SEPARATE. Not begun.
+DEFERRED         passa.py L547 stale comment naming the old fact.
+                 Non-executable prose. For later consolidation, NOT now.
+FROZEN           E2 MECHANISM 859e0a0   E2 RESULT   cb38952
+                 M1 MECHANISM 53791c4   M1 RESULT  2e725a4
+                 M3 MECHANISM 002e0ab   M3 RESULT  006be3d
+                 M3 PREDECESSOR c3c7731 BASELINE   0f3da09
+                 PARITY GUARD a8eefc2
+                 subject commit d8aac4d49e6ba997e3eb38062c0917186ee3f197
+                 subject tree   3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+PROHIBITED       No S1 repair · no D2 · no M2 · no Stage A · no final-40 ·
+                 D375 not allocated · no new blind holdout · no reopening
+                 of E2, M1 or M3.
+NEXT             Kai's next ruling and Dainius's authorisation. Nothing
+                 resumes before that.
+```
