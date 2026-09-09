@@ -33987,3 +33987,222 @@ PROHIBITED       No S1 repair · no D2 · no M2 · no Stage A · no final-40 ·
 NEXT             Kai's next ruling and Dainius's authorisation. Nothing
                  resumes before that.
 ```
+
+## S1 FINAL ACCEPTANCE — 2026-09-09 — Kai's final S1 ruling: source binding accepted, S1 COMPLETE AND CLOSED. NO D-NUMBER TAKEN
+
+**Authority.** Kai issued *S1 EVIDENCE CLOSE-OUT reviewed — FINAL RULING*
+on 2026-09-09, relayed by Dainius, who authorised each S1 cycle. This
+entry records that ruling. It is Kai's adjudication, not Orion's
+conclusion; Orion has zero final admission weight and none is claimed.
+
+**NO D-NUMBER IS TAKEN.** Kai's ruling states expressly: *"Do NOT allocate
+D375 unless separately authorised."* The allocator was checked fresh —
+`D374` remains the highest allocated. This follows the `M3 CYCLE-6
+ACCEPTANCE`, `M1 ACCEPTANCE` and `E2 ACCEPTANCE` precedent of a titled,
+unnumbered entry. **`D375` remains unallocated.**
+
+### 1. The accepted artefacts
+
+```
+SUPPLEMENT (measurement)   2eef2158fc1dc85f777c0567daa719bf54ada699
+PRIMARY GATE (R4+P1)       ba258b8834ff8ff70789af67907b9f93e39b2527
+PRIMARY RESULT             337cab87bdc0da77270787382973db38ad83dec8
+TOCTOU EVIDENCE            5d1e7ca59e37edd467837072ff04439fef207ba0
+CONSUMPTION HARDENING (O3) bd1cbb4b76790339c7da59829b4019621c09f17f
+CANONICAL O3 RESULT        864993292e667cd98c9c3bb1b59125378b113ce1
+EVIDENCE CLOSE-OUT         5d4c11973fe24d2b3251b2504265030ef0adab4d
+```
+
+Every SHA cited by Kai was verified with `git rev-parse` before this
+entry was written; all resolve exactly.
+
+### 2. The accepted mechanism
+
+**Source-binding gate** (`passa.py`, first statement of `build()`, before
+the census import and before any read): SUBJECT IDENTITY · WORKTREE
+IDENTITY via the frozen command `git status --porcelain=v1
+--untracked-files=all` · TRACKED SYMLINK rejection by Git mode `120000`
+(policy **P1_REJECT**). Each fails closed with a named R11 abort.
+
+**Consumption-time verification** (O3, under Kai's narrow authority
+exception permitting census change *only* at the filesystem consumption
+boundary): one verifier in `passa.py`, injected into `docgraph
+.build_graph` and `opscan.collect` as an optional `read_source`.
+
+```
+frozen population   derived from the frozen Git subject
+frozen bytes        Git OBJECT STORAGE, via `git cat-file --batch`
+comparison          SHA-256(consumed bytes) vs SHA-256(frozen blob bytes)
+object ids          NEVER confused with an ordinary file SHA-256
+order               READ -> VERIFY THAT EXACT BYTE SEQUENCE -> USE
+```
+
+**This closes the demonstrated change-and-restore TOCTOU path.** A
+post-check alone does not: change-and-restore leaves a clean worktree.
+
+### 3. PREDECESSOR DIGEST — QUALIFIED ACCEPTANCE. THE QUALIFICATION IS PERMANENT AND TRAVELS WITH THE CLAIM
+
+The historical pre-O3 Pass A digest
+
+```
+24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+```
+
+**was reproduced under a ONE-FIELD CONTROLLED SUBSTITUTION of
+`census_dependency.package` to its historical canonical ABSOLUTE path
+spelling.**
+
+**IT WAS NOT REPRODUCED BY A COMPLETELY UNTOUCHED SINGLE END-TO-END
+HISTORICAL INVOCATION.** That qualification must remain attached to the
+claim wherever the claim is made.
+
+Everything else in the payload — all 272 rows, every witness, the
+history identity, the census aggregate — was produced by execution of
+the `ba258b8` lineage, extracted from Git objects at the historical
+canonical relative layout, against the frozen subject. That
+`census_dependency.package` is the ONLY degree of freedom was **measured**
+by running the predecessor twice under different spellings, not assumed;
+the candidate spellings were fixed before the run and every digest was
+reported; the substitution method was calibrated known-positive and
+known-negative first (I-8). The matching spelling was unreachable by a
+real run because that path now holds the O3 census, and placing
+historical content there would mean editing production.
+
+### 4. Permanent controls established
+
+**READER BYPASS GUARD — a permanent regression control.**
+
+```
+known-negative   production reader set = {passa}
+known-positive   a synthetic bypass reader appears and the guard FAILS,
+                 naming it
+```
+
+**Any future production reader outside the verified-reader path must fail
+this guard.**
+
+**`read_source=None` — the optional default is NOT removed.** Recorded
+permanently:
+
+* current H2 production **must** supply the verified reader;
+* **no current H2 production path may reach census consumption with
+  `read_source=None`**;
+* standalone census use is a **separate materialised / frozen-subject
+  path** (`run_census.py` materialises with `git archive`, refuses
+  anything but a 40-hex object id, verifies against `git ls-tree`);
+* **superseded v1.1 / v1.2 lineages are NOT retrospectively covered.**
+
+**A future production caller using `None` is a regression and must fail
+the caller/reader controls.**
+
+**ENUMERATION — accepted as Git-bound.** Current production populations
+derive from `git ls-tree -r` at the frozen tree, not arbitrary filesystem
+walking. `untracked_md` is currently **dead / non-production** code.
+**This does NOT mean it can never become relevant**; the permanent
+reader/population guard exists to catch such future drift.
+
+**SYMLINK POLICY — P1 remains accepted.** Tracked mode `120000` refuses
+**before** verified-reader construction, frozen-blob loading, census
+import and filesystem consumption. Proved at runtime, not from line
+numbers.
+
+### 5. DIGEST LINEAGE — BOTH STATES PRESERVED SEPARATELY
+
+```
+PRE-O3   census aggregate eb7aad7c1a565cb2…   Pass A digest 24fb1f5555602…
+O3       census aggregate 29064d650a61296…    Pass A digest 755f8b39a21a5…
+```
+
+**Neither supersedes or rewrites the other.** They are different code
+states measured against the same frozen subject.
+
+### 6. Final S1 state
+
+```
+S1 ROOT DEFECT                    CLOSED
+STATIC DIRTY-WORKTREE DRIFT       CLOSED
+TRACKED-SYMLINK ESCAPE            CLOSED
+TOCTOU CHANGE-AND-RESTORE         CLOSED
+DIRECT-LIBRARY BYPASS             CLOSED FOR CURRENT H2 PRODUCTION
+FUTURE BYPASS                     COVERED BY PERMANENT CAN-FAIL GUARD
+M3                                CLOSED / UNCHANGED at 002e0ab
+M1                                CLOSED / UNCHANGED at 53791c4
+E2                                CLOSED / UNCHANGED at 859e0a0
+D367 QUALIFICATION / ADMISSION    OPEN, later programme work
+```
+
+### 7. What this acceptance does NOT do
+
+* It does not make any S1 result independent admission evidence. It is
+  single-producer reproducible **producer measurement**.
+* It does not authorise D2, M2, Stage A, D367 final-40 or `D375`.
+* It does not reopen S1, E2, M1 or M3. **No further S1 engineering cycle
+  is authorised and no S1 investigation may be started.**
+* It gives no blind weight to any evidence. The 48 remain REFERENCE /
+  REGRESSION CORRECTNESS EVIDENCE WITH ZERO BLIND WEIGHT.
+* **Deferred, unchanged:** `passa.py` L547 stale comment naming
+  `CONSUMED_AT_SUBJECT`. Non-executable prose, for later consolidation.
+
+### THREAD RECOVERY BLOCK
+
+```
+ENTRY            S1 FINAL ACCEPTANCE, unnumbered. D375 NOT taken, still
+                 free, and Kai's ruling forbids allocating it unless
+                 separately authorised.
+DATE             2026-09-09.
+AUTHORITY        Kai's "S1 EVIDENCE CLOSE-OUT reviewed — FINAL RULING",
+                 relayed by Dainius, who authorised each S1 cycle.
+SUPPLEMENT       2eef2158fc1dc85f777c0567daa719bf54ada699
+PRIMARY GATE     ba258b8834ff8ff70789af67907b9f93e39b2527
+PRIMARY RESULT   337cab87bdc0da77270787382973db38ad83dec8
+TOCTOU EVIDENCE  5d1e7ca59e37edd467837072ff04439fef207ba0
+O3 HARDENING     bd1cbb4b76790339c7da59829b4019621c09f17f
+O3 RESULT        864993292e667cd98c9c3bb1b59125378b113ce1
+CLOSE-OUT        5d4c11973fe24d2b3251b2504265030ef0adab4d
+ALL SHAS         verified by git rev-parse before writing this entry.
+MECHANISM        gate first in build(): SUBJECT IDENTITY · WORKTREE
+                 IDENTITY (`git status --porcelain=v1
+                 --untracked-files=all`) · TRACKED SYMLINK P1_REJECT
+                 (mode 120000). Then ONE verifier injected into
+                 docgraph.build_graph and opscan.collect as read_source.
+                 Frozen bytes from GIT OBJECT STORAGE via
+                 `git cat-file --batch`; SHA-256(consumed) vs
+                 SHA-256(frozen blob bytes); no object id is compared;
+                 order READ -> VERIFY THOSE BYTES -> USE.
+QUALIFICATION    THE HISTORICAL DIGEST 24fb1f5555602 77f WAS REPRODUCED
+                 UNDER A ONE-FIELD CONTROLLED SUBSTITUTION OF
+                 census_dependency.package TO ITS HISTORICAL CANONICAL
+                 ABSOLUTE SPELLING. NOT by a completely untouched single
+                 end-to-end historical invocation. THIS QUALIFICATION IS
+                 PERMANENT AND TRAVELS WITH THE CLAIM. Everything else
+                 in the payload was produced by execution.
+GUARDS           reader guard: known-negative {passa}; known-positive a
+                 synthetic bypass reader appears and the guard FAILS
+                 naming it. PERMANENT REGRESSION CONTROL. Any future
+                 production reader outside the verified path must fail
+                 it. A future production caller using read_source=None
+                 is a REGRESSION and must fail the caller/reader
+                 controls.
+ENUMERATION      Git-bound (`git ls-tree -r` at the frozen tree).
+                 untracked_md is currently dead/non-production. That is
+                 NOT a claim it can never become relevant — the
+                 permanent guard exists to catch such drift.
+LINEAGE          PRE-O3 aggregate eb7aad7c… / digest 24fb1f…
+                 O3     aggregate 29064d65… / digest 755f8b…
+                 Neither supersedes or rewrites the other.
+FROZEN           S1 GATE ba258b8   S1 RESULT 337cab8
+                 S1 O3   bd1cbb4   O3 RESULT 8649932  CLOSE-OUT 5d4c119
+                 E2 MECHANISM 859e0a0   E2 RESULT  cb38952
+                 M1 MECHANISM 53791c4   M1 RESULT  2e725a4
+                 M3 MECHANISM 002e0ab   M3 RESULT  006be3d
+                 M3 PREDECESSOR c3c7731 BASELINE   0f3da09
+                 PARITY GUARD a8eefc2
+                 subject commit d8aac4d49e6ba997e3eb38062c0917186ee3f197
+                 subject tree   3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+PROHIBITED       No further S1 engineering cycle · no new S1
+                 investigation · no S1 tuning · no D2 · no M2 · no
+                 Stage A · no final-40 · D375 not allocated · no new
+                 blind holdout · no reopening of S1, E2, M1 or M3.
+NEXT             Kai's next ruling and Dainius's authorisation. Nothing
+                 resumes before that.
+```
