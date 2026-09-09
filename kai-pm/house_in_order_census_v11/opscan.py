@@ -340,8 +340,20 @@ def _shell_ops(fn, txt, rejects, raw):
     return ops
 
 
-def collect(repo: pathlib.Path, docs: list):
+def collect(repo: pathlib.Path, docs: list, read_source=None):
     """Returns (admitted_ops, accounting).
+
+    S1 CONSUMPTION-TIME SOURCE-IDENTITY EXCEPTION, narrowly
+    authorised. `read_source` is an OPTIONAL injected reader. When it
+    is None -- every pre-existing caller, including run_census.py,
+    where the subject is materialised and HEAD is the subject by
+    construction -- behaviour is byte-for-byte what it was. When
+    supplied, the bytes are obtained through it and it refuses to
+    return any that do not match the frozen subject.
+    NOTHING SEMANTIC PASSES THROUGH IT: no population rule, no
+    classification, no interpretation, no graph or op meaning. Only
+    WHERE THE BYTES COME FROM.
+
 
     accounting reconciles the whole denominator, per Kai's D341 ruling:
     raw_candidate_matches, rejected_non_operations (by reason),
@@ -353,7 +365,8 @@ def collect(repo: pathlib.Path, docs: list):
     ops = []
     for fn in source_population(repo):
         try:
-            txt = (repo / fn).read_text(errors="ignore")
+            txt = (read_source(repo, fn) if read_source
+                   else (repo / fn).read_text(errors="ignore"))
         except OSError:
             continue
         if fn.endswith(".py"):

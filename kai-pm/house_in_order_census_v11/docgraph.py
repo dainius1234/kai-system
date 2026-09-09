@@ -112,8 +112,20 @@ def _norm(srcdir, raw):
     return "/".join(parts)
 
 
-def build_graph(repo, docs: list):
-    """Returns edges: (src, dst|None, kind, raw, context)."""
+def build_graph(repo, docs: list, read_source=None):
+    """Returns edges: (src, dst|None, kind, raw, context).
+
+    S1 CONSUMPTION-TIME SOURCE-IDENTITY EXCEPTION, narrowly
+    authorised. `read_source` is an OPTIONAL injected reader. When it
+    is None -- every pre-existing caller, including run_census.py,
+    where the subject is materialised and HEAD is the subject by
+    construction -- behaviour is byte-for-byte what it was. When
+    supplied, the bytes are obtained through it and it refuses to
+    return any that do not match the frozen subject.
+    NOTHING SEMANTIC PASSES THROUGH IT: no population rule, no
+    classification, no interpretation, no graph or op meaning. Only
+    WHERE THE BYTES COME FROM.
+    """
     repo = pathlib.Path(repo)
     docset = set(docs)
     by_base = collections.defaultdict(list)
@@ -123,7 +135,8 @@ def build_graph(repo, docs: list):
     edges = []
     for src in sorted(docs):
         try:
-            txt = (repo / src).read_text(errors="ignore")
+            txt = (read_source(repo, src) if read_source
+                   else (repo / src).read_text(errors="ignore"))
         except OSError:
             continue
         lines, lctx = txt.splitlines(), line_contexts(txt)

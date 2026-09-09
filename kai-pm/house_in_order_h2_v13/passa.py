@@ -641,6 +641,93 @@ def _source_binding_gate(subject_repo, subject):
                                  "found": 0}}
 
 
+# ── S1 TOCTOU: CONSUMPTION-TIME SOURCE-IDENTITY VERIFICATION ──────────
+# The gate above establishes a clean tree BEFORE measurement. That is not
+# enough, and the gap was proven by execution, not argued: a tracked file
+# changed after the gate and restored the moment its bytes were consumed
+# left BOTH a clean pre-check and a clean post-check while foreign bytes
+# entered the measurement. A post-check is a cheap detector for the
+# careless case; it is not a proof.
+#
+# THE ORDER IS READ -> VERIFY THOSE BYTES -> USE. Not verify-then-read,
+# which re-opens the same window, and not read-use-then-verify, which
+# checks something other than what was consumed. The bytes compared are
+# THE SAME OBJECT the caller goes on to use.
+#
+# BYTE IDENTITY, NOT OBJECT-ID EQUALITY. A file's SHA-256 is not a git
+# blob id -- git hashes `blob <len>\0` ahead of the content -- so the
+# comparison is sha256(consumed bytes) against sha256(THE FROZEN BLOB'S
+# BYTES), both computed here by the same method. No git object id is
+# compared against a file hash anywhere.
+
+
+def _frozen_blobs(subject_repo, subject):
+    """Every blob at the frozen subject, path -> bytes, in one batch.
+
+    `git cat-file --batch` once rather than a process per file: ~1000
+    reads would otherwise dominate the run, and a slow verifier is a
+    verifier someone later turns off.
+    """
+    names = [p for p in git(subject_repo, "ls-tree", "-r", "--name-only",
+                            subject).stdout.split("\n") if p]
+    req = "".join(f"{subject}:{p}\n" for p in names).encode()
+    proc = subprocess.run(["git", "-C", str(subject_repo), "cat-file",
+                           "--batch"], input=req, capture_output=True)
+    if proc.returncode != 0:
+        raise SystemExit(f"R11 ABORT: git cat-file --batch failed: "
+                         f"{proc.stderr.decode(errors='replace')[:200]}")
+    out, pos, blobs = proc.stdout, 0, {}
+    for name in names:
+        nl = out.find(b"\n", pos)
+        if nl < 0:
+            raise SystemExit("R11 ABORT: truncated cat-file batch output.")
+        header = out[pos:nl].decode(errors="replace").split()
+        pos = nl + 1
+        if len(header) < 3 or header[1] != "blob":
+            continue                       # missing, or not a blob
+        size = int(header[2])
+        blobs[name] = out[pos:pos + size]
+        pos += size + 1                    # trailing newline
+    return blobs
+
+
+def make_verified_reader(subject_repo, subject):
+    """A reader that REFUSES to hand back bytes it cannot bind.
+
+    Injected into the census so that every filesystem consumption on the
+    Pass A path -- this module's document read, docgraph's link scan and
+    opscan's source read -- is verified at the moment of consumption.
+    Nothing about the census's semantics passes through here: it decides
+    no population, classifies nothing, and interprets nothing. It returns
+    the same text the old expression returned, or it aborts.
+    """
+    frozen = _frozen_blobs(subject_repo, subject)
+
+    def read_source(repo, rel):
+        rel = str(rel)
+        data = (pathlib.Path(repo) / rel).read_bytes()      # THE bytes
+        blob = frozen.get(rel)
+        if blob is None:
+            raise SystemExit(
+                f"R11 ABORT [SOURCE BINDING / PATH NOT IN SUBJECT]: "
+                f"{rel} was read during measurement but is not present in "
+                f"the frozen subject {subject[:12]}. Refusing to measure.")
+        got = hashlib.sha256(data).hexdigest()
+        want = hashlib.sha256(blob).hexdigest()
+        if got != want:
+            raise SystemExit(
+                f"R11 ABORT [SOURCE BINDING / CONSUMED BYTES DIVERGE]: "
+                f"{rel} — the bytes returned by this read do not match the "
+                f"frozen subject. sha256(consumed)={got[:16]} "
+                f"sha256(frozen blob)={want[:16]}. The working tree changed "
+                f"after the source-binding gate and during measurement. No "
+                f"result is written, nothing is retried against newer bytes "
+                f"and the file is not repaired. Refusing to measure.")
+        return data.decode(errors="ignore")
+
+    return read_source
+
+
 def build(subject_repo, history_repo, subject, census_pkg):
     # S1: THE GATE RUNS FIRST. Before the census import, before any
     # enumeration, before any filesystem read. If it returns, source
@@ -659,12 +746,18 @@ def build(subject_repo, history_repo, subject, census_pkg):
     sys.path.insert(0, str(census_pkg))
     import docgraph as G, opscan as O, claims as C     # frozen Census v1.1
 
+    # S1 TOCTOU: one verifier, injected into every consumption boundary
+    # on this path. The census decides everything it decided before; it
+    # simply obtains its bytes through a reader that cannot return
+    # unverified ones.
+    read_source = make_verified_reader(subject_repo, subject)
+
     tracked = G.tracked_md(subject_repo)
-    edges = G.build_graph(subject_repo, tracked)
+    edges = G.build_graph(subject_repo, tracked, read_source=read_source)
     inc = G.incoming(edges)
     out_deg = collections.Counter(s for s, d, k, _r, _c in edges if d)
 
-    ops = O.collect(subject_repo, tracked)[0]
+    ops = O.collect(subject_repo, tracked, read_source=read_source)[0]
     C.classify(ops, tracked, set(O.tracked(subject_repo)))
     exe, writers, readers = (collections.Counter(),
                              collections.defaultdict(set),
@@ -689,7 +782,7 @@ def build(subject_repo, history_repo, subject, census_pkg):
 
     rows = []
     for d in tracked:
-        txt = (pathlib.Path(subject_repo) / d).read_text(errors="ignore")
+        txt = read_source(subject_repo, d)
         title = ""
         for ln in txt.splitlines():
             if ln.startswith("#"):
