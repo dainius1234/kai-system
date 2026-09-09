@@ -1174,7 +1174,7 @@ below is a readable copy of it and can drift — check the module if it matters.
 | `FF_POLICY_MEMORY` | ✗ | D101: auto-distillation of simulation outcomes into ranked strategies — requires FF_CAUSAL_WORLD_MODEL |
 | `FF_GLOBAL_WORKSPACE` | ✗ | D102: Global Workspace Consciousness — serial stream of unified awareness via module bidding; requires GPU + D101 + D98 + ≥3 bidders |
 | `FF_DREAM_PHASE_7` | ✓ | Agent-Evolver insight generation during the dream cycle |
-| `FF_CORTEX_NPU` | ✗ | D114: Cortex Phase 1 — NPU inference on Strix Halo (AMD XDNA 2); moves Level 2/3 synthesis from HTTP delegation to on-device. Pending the target device |
+| `FF_CORTEX_NPU` | ✗ | D114: Cortex Phase 1 — NPU inference on Strix Halo (AMD XDNA 2); moves Level 2/3 synthesis from HTTP delegation to on-device. Pending the target device **and** Linux/driver qualification of the NPU |
 | `FF_OHANA_CORE` | ✗ | D109: Ohana Core — learns the operator's moral fingerprint, injects loyalty context, evaluates action alignment |
 
 ---
@@ -1669,29 +1669,78 @@ FF_GLOBAL_WORKSPACE=false        # D102: GWT bidding cycle + ConsciousMoment str
 **Current:** CPU only — GitHub Codespace / container, `qwen2.5:0.5b`. This is
 what every measurement on this page was taken on.
 
-**Selected target — PLANNING ONLY, NOT ACQUIRED.** Per
-[`kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md`](kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md) §3:
+**Primary target platform — TARGET, NOT YET ACQUIRED.**
 
 | | |
 |---|---|
 | Device | **ASUS ROG Flow Z13 (2025)** |
-| SoC | **AMD Strix Halo / Ryzen AI Max+ 395** |
-| Memory | **128GB unified** preferred; 64GB = reduced model council; 32GB = development/minimal |
-| NPU | XDNA 2 — wake-word, VAD, light classifiers, embeddings, Cortex feature extraction |
-| iGPU | Radeon 8060S — conversational model, specialist council, vision-language |
+| SoC | **AMD Ryzen AI MAX+ 395 / Strix Halo** (Zen 5) |
+| iGPU | **Radeon 8060S** |
+| Memory | **128GB unified — this is the programme target** |
+| Storage | **≥2TB NVMe** target |
+| OS | **Ubuntu** production runtime |
+| NPU | XDNA 2 present; **production use subject to Linux/driver qualification** |
 
-That specification's own status line reads **"TARGET PRODUCT DESIGN —
-PLANNING ONLY"**, and it states that model residency and throughput remain
-**benchmark gates, not promises**. The NPU is explicitly not assumed to run
-arbitrary large LLMs.
+**128GB is the target. 32GB is not.** Lower capacities exist as variants, not
+as the programme configuration: 64GB would mean a reduced model council and
+smaller context budgets, and 32GB is a development/minimal box. Any earlier
+reading of this page that presented 32GB or 64GB as the selected final
+configuration was wrong and is withdrawn.
+
+**Why this platform — the architectural reason, stated precisely.** KAI is a
+dedicated local AI system, not a general-purpose laptop. The unified-memory
+architecture lets CPU and GPU work against one substantially larger shared
+pool than the conventional discrete-laptop-GPU VRAM model, which is where the
+headroom comes from: larger quantised local LLMs, several resident
+council/specialist models at once, larger context and KV caches, embeddings
+and perception workloads, the graph and memory services, Docker and service
+overhead, Hunter orchestration, and future local multimodal work.
+
+The basis of the decision is the **combination** — Zen 5 CPU + Radeon 8060S +
+large unified memory + XDNA 2 NPU + a dedicated single-user KAI workload — and
+its fit for that workload, not an isolated GPU benchmark.
+
+> **Two things this page does not claim.** It does not claim the Radeon 8060S
+> is simply "faster than an RTX 5080"; that is not the basis of the decision
+> and is too broad a statement. And **CUDA remains the more mature conventional
+> AI ecosystem** — choosing this platform is a judgement about whole-
+> architecture suitability for KAI, particularly its memory model and
+> heterogeneous compute, not a claim of ecosystem parity.
+
+**Intended compute roles** (from
+[`kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md`](kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md) §3.2):
+
+| Resource | Role |
+|---|---|
+| **CPU (Zen 5)** | Orchestration, deterministic controls, services, databases, tool execution |
+| **Radeon / ROCm** | Primary candidate for heavy local inference and ML acceleration |
+| **XDNA 2 NPU** | Future low-power accelerator / sentinel candidate — **activation only after Linux qualification** |
+| **128GB unified memory** | A **governed shared resource** across models and system workloads |
+
+**Hardware serves KAI; KAI is not redesigned around hardware.** The software
+architecture stays authoritative. Nothing on this page is a commitment to
+distort the system to exploit one machine.
+
+**The Flow Z13 is the local sovereign node, not an architectural ceiling.**
+KAI retains the ability to use remote compute later. The long-term model is:
+
+```
+LOCAL KAI NODE  →  governed remote/cloud compute when required
+                →  local authority, control and evidence remain with KAI
+```
+
+**Acquiring the machine proves nothing on its own.** Model compatibility,
+quantisation, context limits, ROCm support, throughput and concurrent
+residency are all **benchmark gates, not promises** — to be measured when the
+hardware exists, exactly as the architecture specification requires. The NPU
+is explicitly not assumed to run arbitrary large LLMs.
 
 **The earlier "Lenovo laptop + RTX 5080 + TPM 2.0" target is superseded.** It
 is left named here so anyone who remembers it knows it was replaced rather
-than lost; the reasoning behind the change lives in the architecture
-documents, not on this page.
+than lost; the reasoning lives in the architecture documents, not on this page.
 
-All code runs in both environments — stubs on CPU, GPU-gated paths inactive
-until the device exists.
+All code runs in both environments — stubs on CPU, accelerator-gated paths
+inactive until the device exists.
 
 ### Key Docs (read in order)
 
