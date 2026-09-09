@@ -529,7 +529,133 @@ def scan(path, text, history_repo, subject):
     return dict(out)
 
 
+# ── S1: THE SOURCE-BINDING GATE ───────────────────────────────────────
+# Pass A enumerates from git and reads BYTES FROM THE WORKING FILESYSTEM.
+# That is correct only while the tree matches the frozen subject, and
+# nothing established or checked it. A dirty tree produced a full result
+# file, rc=0, with witnesses taken from uncommitted bytes and stamped
+# with the subject's identity -- demonstrated, not argued.
+#
+# THE GATE LIVES HERE, AT THE MEASUREMENT BOUNDARY, NOT AT THE ENTRYPOINT.
+# main() already asserted HEAD == subject, but build() is importable and
+# the caller census found live callers outside the CLI. An invariant
+# enforced at one entrypoint is not an invariant. Every CLI run passes
+# through build() too, so one gate here covers both.
+#
+# NO ENUMERATION AND NO FILESYSTEM READ MAY PRECEDE IT. Everything the
+# gate itself consults is a GIT OBJECT read.
+CLEAN_TREE_CMD = ("status", "--porcelain=v1", "--untracked-files=all")
+GIT_SYMLINK_MODE = "120000"
+
+
+def _source_binding_gate(subject_repo, subject):
+    """Establish source binding or REFUSE TO MEASURE (R11).
+
+    THREE PREREQUISITES, each failing closed with its own name.
+
+    1 SUBJECT IDENTITY. HEAD must be the frozen subject. Analysing a
+      non-HEAD subject is NOT SUPPORTED and must refuse rather than
+      silently analyse whatever HEAD happens to hold. That is a current
+      capability limit, not a permanent rule.
+
+    2 WORKTREE SOURCE IDENTITY. The abort fires on TRACKED divergence --
+      modification, staged modification, rename, deletion. UNTRACKED
+      FILES ARE RECORDED AND DO NOT ABORT, and the reason is measurable
+      rather than assumed: every byte Pass A reads comes from a path
+      enumerated by `git ls-tree`, so an untracked file is never opened
+      and cannot affect source identity. `--untracked-files=all` is used
+      anyway so the count travels with the evidence instead of being
+      invisible. Claiming untracked files corrupt the measurement would
+      be a wider claim than the reader population supports.
+
+    3 TRACKED SYMLINKS. Rejected on GIT MODE, read from the tree, BEFORE
+      any path is touched. git stores a symlink as a blob whose content
+      is the target PATH; a filesystem read FOLLOWS it instead and can
+      ingest bytes the commit does not contain -- including bytes from
+      outside the repository entirely. Asking Path.is_symlink() after
+      the fact would already have touched the filesystem.
+      THE CHECK IS DELIBERATELY OVER-APPROXIMATE: it rejects a tracked
+      symlink ANYWHERE in the subject, not only in the analysed subset.
+      Computing the exact analysed subset here would restate opscan's
+      population rules in a second place, and a rule kept beside the
+      thing it governs is the R5 defect. A superset cannot miss one; its
+      only cost is refusing a subject whose symlinks are never read.
+
+    Returns the evidence of what was checked, so the record carries the
+    exact command rather than a claim about it.
+    """
+    head = git(subject_repo, "rev-parse", "HEAD").stdout.strip()
+    if head != subject:
+        raise SystemExit(
+            f"R11 ABORT [SOURCE BINDING / SUBJECT IDENTITY]: repository HEAD "
+            f"{head[:12]} != frozen subject {subject[:12]}. Pass A reads "
+            f"bytes from the working tree, so it can only measure a subject "
+            f"that is checked out. Analysing a non-HEAD subject is not "
+            f"supported. Refusing to measure.")
+
+    st = git(subject_repo, *CLEAN_TREE_CMD).stdout
+    lines = [ln for ln in st.split("\n") if ln.strip()]
+    tracked_changes = [ln for ln in lines if not ln.startswith("??")]
+    untracked = [ln for ln in lines if ln.startswith("??")]
+    if tracked_changes:
+        shown = "; ".join(ln.strip() for ln in tracked_changes[:8])
+        raise SystemExit(
+            f"R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: "
+            f"{len(tracked_changes)} tracked path(s) diverge from the frozen "
+            f"subject. Pass A would read the WORKING TREE bytes and stamp "
+            f"them with the subject's identity. "
+            f"`git {' '.join(CLEAN_TREE_CMD)}` reports: {shown}"
+            f"{' …' if len(tracked_changes) > 8 else ''}. Refusing to measure.")
+
+    links = []
+    for ln in git(subject_repo, "ls-tree", "-r", subject).stdout.split("\n"):
+        if not ln.strip():
+            continue
+        meta, _, path = ln.partition("\t")
+        if meta.split()[0] == GIT_SYMLINK_MODE:
+            links.append(path)
+    if links:
+        raise SystemExit(
+            f"R11 ABORT [SOURCE BINDING / TRACKED SYMLINK]: "
+            f"{len(links)} tracked symlink(s) in the frozen subject: "
+            f"{', '.join(links[:8])}{' …' if len(links) > 8 else ''}. "
+            f"git stores a symlink as a blob holding its TARGET PATH, and a "
+            f"filesystem read follows it instead, so the bytes analysed "
+            f"need not be represented by the subject at all. This candidate "
+            f"neither follows nor resolves them. Refusing to measure.")
+
+    return {"gate": "S1_SOURCE_BINDING",
+            "subject_identity": {"head": head, "subject": subject,
+                                 "equal": True},
+            "worktree_identity": {
+                "command": "git " + " ".join(CLEAN_TREE_CMD),
+                "git_version": git(subject_repo, "--version").stdout.strip(),
+                "tracked_divergences": 0,
+                "untracked_paths_recorded": len(untracked),
+                "untracked_abort": False,
+                "untracked_rationale":
+                    "every byte Pass A reads comes from a git-enumerated "
+                    "tracked path, so an untracked file is never opened"},
+            "tracked_symlinks": {"policy": "P1_REJECT",
+                                 "git_mode": GIT_SYMLINK_MODE,
+                                 "found": 0}}
+
+
 def build(subject_repo, history_repo, subject, census_pkg):
+    # S1: THE GATE RUNS FIRST. Before the census import, before any
+    # enumeration, before any filesystem read. If it returns, source
+    # binding holds; if it does not, nothing is measured.
+    #
+    # ITS RETURN VALUE IS DELIBERATELY NOT THREADED THROUGH build().
+    # Widening the signature would break banked control instruments that
+    # call build() directly, and -- more importantly -- adding a field to
+    # the Pass A payload would change its bytes, destroying the digest
+    # that currently PROVES the historical E2 run read the subject's own
+    # bytes. The gate's evidence is recorded by the controls and the
+    # result instead, from the hash-pinned module constants, which is
+    # where Kai's fingerprint requirement puts it.
+    _source_binding_gate(subject_repo, subject)
+
     sys.path.insert(0, str(census_pkg))
     import docgraph as G, opscan as O, claims as C     # frozen Census v1.1
 
