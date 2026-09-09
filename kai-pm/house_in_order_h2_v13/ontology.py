@@ -54,8 +54,13 @@ CAPABILITY_FAILURE = "UNMEASURED"
 # v1.2 adds the two the audits earned: a contradiction between a
 # document's self-claim and the history, and a nominal (self-declared)
 # function. Both are FACTS. Neither is a verdict.
+# E2: CONSUMED_AT_SUBJECT asserted runtime consumption over evidence that
+# is a static reference found by walking a reading file's syntax tree. The
+# fact now states its evidence class. Its FALSE is an abstention -- no
+# resolvable static reference in the analysed scope -- and never a claim
+# that the document is unread.
 EVIDENCE_FACTS = ("MAINTENANCE_OBSERVED", "SELF_ASSERTS_CURRENT",
-                  "CONSUMED_AT_SUBJECT", "CITES_COMMIT", "CITES_RUN",
+                  "STATIC_REFERENCE_AT_SUBJECT", "CITES_COMMIT", "CITES_RUN",
                   "CARRIES_DATE_STAMP", "BINDING_CONTRADICTION",
                   "NOMINAL_FUNCTION", "SELF_ASSERTS_AUTHORITY",
                   "SELF_ASSERTS_NON_AUTHORITY")

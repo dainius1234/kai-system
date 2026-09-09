@@ -115,9 +115,36 @@ def _history_trace(row, subject, count):
 
 
 def _reader_trace(row, subject_repo):
-    """CONSUMED_AT_SUBJECT. The determining evidence is a STATIC READER
-    REFERENCE produced by the Census opscan -- NOT history. v1.3a labelled
-    it `history:` , which named the wrong evidence class entirely.
+    """STATIC_REFERENCE_AT_SUBJECT. The determining evidence is a STATIC
+    READER REFERENCE produced by the Census opscan -- NOT history. v1.3a
+    labelled it `history:`, which named the wrong evidence class entirely.
+
+    E2. THE FACT WAS CALLED `CONSUMED_AT_SUBJECT`, WHICH ASSERTED MORE
+    THAN THE EVIDENCE. The determining evidence is an `ast.walk` over a
+    reading file's syntax tree; nothing anywhere in the chain executes,
+    imports or observes anything. The renamed fact means exactly one
+    thing:
+
+        A RESOLVABLE STATIC REFERENCE WAS FOUND WITHIN THE BOUNDED
+        CENSUS ANALYSIS.
+
+    It does NOT assert runtime consumption, execution, reachability or
+    invocation. A resolvable call site is recorded whether or not the
+    enclosing function is ever called or its guard ever passes.
+
+    AND ITS FALSE IS AN ABSTENTION, NOT A NEGATIVE. False means no
+    resolvable static reference was found in the analysed scope. It does
+    NOT mean the document is unread: most candidate operations resolve to
+    neither a proven target nor a proven irrelevance, and those are
+    unresolved, not absent.
+
+    THE ANALYSED SCOPE IS PINNED, NOT RESTATED. `census_dependency` in
+    the record carries the census package and the sha256 of its
+    MANIFEST.sha256, which pins `opscan.py`, which is where
+    `source_population`, `SRC_SUFFIX` and `EXCLUDE_DIRS` define the
+    universe. The `opscan:` selector prefix names the instrument that
+    produced the reference. No new schema field is added, because the
+    scope is already recoverable from hash-pinned artefacts.
 
     The evidence lives in the READING document, so `source_path` is the
     reader and `local_context` is that document's actual source line. A
@@ -190,7 +217,7 @@ NINE_FIELDS = ("witness_type", "witness_value", "source_path",
 # positive.
 TRACE_CLASS = {
     "MAINTENANCE_OBSERVED":       ("COMMIT_COUNT_IN_WINDOW", "git:rev-list"),
-    "CONSUMED_AT_SUBJECT":        ("STATIC_READER_REFERENCE", "opscan:"),
+    "STATIC_REFERENCE_AT_SUBJECT": ("STATIC_READER_REFERENCE", "opscan:"),
     "CITES_COMMIT":               ("COMMIT", "L"),
     "CITES_RUN":                  ("RUN_ID", "L"),
     "CARRIES_DATE_STAMP":         ("DATE_STAMP", "L"),
@@ -228,7 +255,8 @@ def evidence_facts(row, claims, contradiction, determining=(),
     POSITIVE evidence fact to carry a source-bound witness sufficient for
     independent adjudication, and 81 of 316 positives carried none that
     was bound to the fact itself: 71 MAINTENANCE_OBSERVED and 5
-    CONSUMED_AT_SUBJECT had no witness at all, and 5
+    STATIC_REFERENCE_AT_SUBJECT -- then still named CONSUMED_AT_SUBJECT,
+    which E2 corrected -- had no witness at all, and 5
     BINDING_CONTRADICTION carried a 5-field contradiction record rather
     than a 9-field witness.
 
@@ -241,7 +269,11 @@ def evidence_facts(row, claims, contradiction, determining=(),
     cand["MAINTENANCE_OBSERVED"] = (
         row["commits_in_window"] > 1,
         lambda: _history_trace(row, subject, row["commits_in_window"]))
-    cand["CONSUMED_AT_SUBJECT"] = (
+    # E2: the fact states its EVIDENCE CLASS. `readers` is unchanged --
+    # the field is internal and never surfaced as a fact name -- and the
+    # predicate, the trace and the population are untouched. Only the
+    # claim the name makes is corrected.
+    cand["STATIC_REFERENCE_AT_SUBJECT"] = (
         bool(row["readers"]),
         lambda: _reader_trace(row, subject_repo))
     cand["CITES_COMMIT"] = (bool(row["witnesses"].get("COMMIT")),
