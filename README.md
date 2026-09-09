@@ -130,8 +130,11 @@ make assertion-floors # ratchet: no suite may exercise less than before
 > ships empty — generate one (`openssl rand -hex 32`) or those endpoints
 > return 503.
 >
-> Tracker last updated **2026-08-03**. Where it and this page disagree, the
-> tracker wins.
+> Tracker last updated **2026-08-03**. It remains the detailed UH workstream
+> record. But where its dated status conflicts with mechanically verified
+> current repository state, treat the discrepancy as **documentation drift**:
+> verify against the current repository and the authoritative decision record
+> rather than automatically preferring either document.
 
 ---
 
