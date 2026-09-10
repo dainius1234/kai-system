@@ -34206,3 +34206,205 @@ PROHIBITED       No further S1 engineering cycle · no new S1
 NEXT             Kai's next ruling and Dainius's authorisation. Nothing
                  resumes before that.
 ```
+
+## D375 — 2026-09-10 — House-in-order instrument portability recurrence / control closure. THREE MECHANISMS REPAIRED, ONE HELD.
+
+**Authority.** Kai's ruling *"REMEDIATION AUTHORISED — ONE BOUNDED TRANCHE"*,
+2026-09-10, relayed by Dainius, following the root-cause matrix and its
+evidence closures. Kai allocated this number expressly. **D164 remains the
+originating incident and D340 remains prior evidence that the class had
+already resurfaced;** D375 is the programme-level closure decision for the
+current recurrence, taken before main promotion. It does **not** absorb
+RC-4, RC-5 or RC-6, which are recorded here as separate mechanisms.
+
+### 1. The artefacts
+
+```
+DIAGNOSED AT     3ba60e2c4f04f46f754d03237a215d2d628530c2
+REPAIR TRANCHE   1faedcacb2a8c789ac3ca33496b388975cbcf550
+CONTROLS         kai-pm/house_in_order_h2_v13/build_evidence/d375_controls.py
+RESULT           kai-pm/house_in_order_h2_v13/build_evidence/D375_CONTROLS.txt
+                 31 checks, 0 failures
+```
+
+Four files changed. **No production service code.** Two calibrations
+(`scripts/test_contradiction.py`, `scripts/test_item8_verdicts.py`), one CI
+checkout depth (`.github/workflows/unified-hunter.yml`), and
+`kai-pm/ENGINEERING_DOCTRINE.md`.
+
+### 2. RC-1 — HELD. THE COLLISION IS THE FINDING.
+
+The established chain, accepted by Kai: **D164** (2026-08-04, table row 8 —
+`/home/user/kai-system` hardcoded 13 times, 42 CI failures) → the preventive
+control `test_no_developer_home_paths` → carried to main per
+`suite_floor.json` (2026-08-04) → **D340 §5** independently sighted
+`pass_a.py` hard-coding the same root, remedy left *"not implemented,
+awaiting ruling"* → the pattern is present again at HEAD in five files.
+
+**THE REPAIR WAS WRITTEN, MEASURED AND REVERTED.** Every offending file
+sits inside a hash-frozen evidence package:
+
+| package | aggregate | cited in DECISIONS | offending file(s) |
+|---|---|---|---|
+| `kai-pm/house_in_order_h2` | `8aeeacab8bb53fdc` | 0 | `pass_a.py`, `cal_env.py` |
+| `kai-pm/census_v11_claim_sensitivity` | `397ceda087d50324` | 0 | `run_mutations.py` |
+| `kai-pm/house_in_order_h2_v11` | `be37a0aa5d56255a` | 5 | `passa.py` |
+| `kai-pm/house_in_order_census_v11` | `29064d650a612968` | — | `cal_claims.py` |
+
+Repairing any file invalidates its MANIFEST; regenerating the MANIFEST moves
+the aggregate. The authorisation requires **both** the repair and that
+hashes and evidence identity be preserved, and for these files those cannot
+both hold. **The last aggregate is the O3 census aggregate banked in `S1
+FINAL ACCEPTANCE` and embedded in Pass A digest `755f8b…`.** Moving it is a
+programme decision. R14: the tranche stopped rather than choose silently.
+
+**Two of the four packages have aggregates cited ZERO times in this log**,
+so the cost is not uniform. That is offered as measurement, not as a
+recommendation.
+
+**What is nevertheless proved (D375 regression calibration).** The control
+is intact and detects the recurrence:
+
+* **known-positive, live tree** — 7 occurrences across the 5 named files;
+  the guard fails;
+* **known-positive, newly reintroduced literal** — a probe file the rule has
+  never seen is detected, the count rises by exactly one, the guard names it
+  and still fails, and the probe is removed;
+* **known-negative** — a tree using `Path(__file__).resolve().parents[N]`
+  reports nothing.
+
+All four MANIFESTs are asserted intact, i.e. the repair is genuinely absent.
+
+### 3. RC-4 — the demonstrated leg, repaired. Nothing baselined.
+
+`memu-core/app.py:1052-1053` sets `HF_HUB_OFFLINE` and
+`TRANSFORMERS_OFFLINE` in its module body (first bad **`b5deaaa`**,
+2026-08-07; parent clean; absent from `main`).
+`scripts/test_contradiction.py:23` loads that module, so both variables
+outlived the file. Proved intrinsic: **run alone, it still leaks both.**
+
+Repaired by restoring the two variables around the import. **NOT declared in
+the baseline** — a baseline entry records a leak as accepted debt, and this
+one has no reason to be accepted. The module still loads with them set.
+After: 13 tests pass, the file records **no leakage**, the isolation
+baseline is byte-unchanged, and a synthetic undeclared leak is still
+refused.
+
+**STILL OPEN AND UNTOUCHED — four UNKNOWN A-05 observations:**
+
+| observation | status |
+|---|---|
+| `scripts/test_hse_rams.py` — local ratchet growth `added 1 → 2` | TRANSITION UNKNOWN. File and `scripts/hse_rams.py` both unchanged on this branch, both on `main`. Not traced |
+| `scripts/test_llm_contract.py` — CI-only, `not declared (3 added)` | CI-only; records **no** leakage locally. New on this branch (`c54f544`) but causal mechanism UNKNOWN |
+| `scripts/test_audio_transcribe.py` — CI-only `added 0 → 1` | local matches baseline exactly. TRANSITION UNKNOWN |
+| `scripts/test_tts_service.py` — CI-only `added 2 → 3` | no local entry. TRANSITION UNKNOWN |
+
+**My earlier attribution of the `test_llm_contract.py` growth to `c54f544`
+is WITHDRAWN.** With no local leakage, "that commit causes the growth" was
+never established. Undeclared: yes. Causal: UNKNOWN.
+
+### 4. RC-5 — the calibration now controls its own environment.
+
+`check_item8_authority.py` decides on `GITHUB_EVENT_NAME`. A calibration
+inheriting it measured the trigger, not the guard. The scrub already existed
+inside `authority()` and covered **one call site of four** — a fixed class
+returning as an instance (R6). There is now one `ci_neutral_env()` and every
+invocation uses it.
+
+```
+BEFORE   unset 406/0 PASS · push 406/0 PASS · pull_request 405/1 FAIL
+AFTER    unset 406/0 PASS · push 406/0 PASS · pull_request 406/0 PASS
+```
+
+The assertion count is **identical in all three**, so no check was
+neutralised. `check_item8_authority.py` is byte-unchanged and **still
+refuses a non-sentinel event** — proved by invoking it, not by grepping its
+source.
+
+### 5. RC-6 — the environment now supplies the history.
+
+`_BEFORE_FIX = f50715b` (`f50715bbc3d3466f75bdf95333b7cfc33b684191`,
+2026-08-07), **398 commits behind HEAD**, not an ancestor of `main`.
+`unified-hunter.yml` checked out at `fetch-depth: 2`.
+
+```
+full clone     3/3 git show rc=0    29 passed, 0 failed   PASS
+depth-2 clone  3/3 git show rc=128  25 passed, 1 failed   FAIL
+```
+
+25 is the exact count CI recorded. Repaired by `fetch-depth: 0`. **The
+calibration is NOT relaxed:** a depth-2 clone still fails it, still names
+shallow clone, and inability to read historical evidence is still not a
+PASS. Depth 2 was itself set for `test_item8_verdicts.py` — the class fixed
+for one instrument and left open for the next (R6, twice in one tranche).
+
+### 6. DOCTRINE RULE 51 — SIGNAL IS NOT CAUSE
+
+Banked into `kai-pm/ENGINEERING_DOCTRINE.md` §Repair at Kai's direction,
+with this incident as provenance. A failing test, workflow, gate, metric or
+dashboard state identifies **where an observation surfaced**, not **what
+failed**. Trace the first effective failure; separate independent root
+causes from dependent red surfaces; reproduce environmental and instrument
+effects under control; distinguish product defects from test, calibration,
+CI and evidence defects. **Never weaken a control, change a threshold,
+inflate a baseline or patch a downstream symptom to make a signal green.**
+
+The doctrine integrity gate refused the rule until it carried provenance.
+That is the gate working, and it is recorded as such.
+
+### 7. What this entry does NOT do
+
+* It does not close RC-1. The repair is **held**, not done.
+* It does not authorise moving any package aggregate.
+* It does not absorb RC-4/RC-5/RC-6 into one class.
+* It does not resolve the four UNKNOWN A-05 observations.
+* It does not merge PR #122, and does not treat four green workflows as
+  promotion evidence — the live-stack checks skipped behind RC-1 remain
+  unrun.
+* It touches no production service code, no threshold, no baseline, and no
+  D367 / D2 / M2 / Stage A / final-40 work.
+
+### THREAD RECOVERY BLOCK
+
+```
+ENTRY            D375, allocated by Kai on 2026-09-10.
+AUTHORITY        Kai's "REMEDIATION AUTHORISED — ONE BOUNDED TRANCHE",
+                 relayed by Dainius.
+DIAGNOSED AT     3ba60e2c4f04f46f754d03237a215d2d628530c2
+REPAIR TRANCHE   1faedcacb2a8c789ac3ca33496b388975cbcf550
+CONTROLS         d375_controls.py -> D375_CONTROLS.txt, 31 checks, 0 failures
+LINEAGE          D164 originating incident -> preventive control
+                 test_no_developer_home_paths -> D340 §5 prior sighting,
+                 remedy unimplemented -> present recurrence -> D375.
+RC-1             HELD. All 5 offending files are inside hash-frozen
+                 packages; repair invalidates 4 MANIFESTs, one of whose
+                 aggregates (29064d65) is the banked O3 census aggregate
+                 inside Pass A digest 755f8b. Repair written, collision
+                 measured, repair REVERTED (R14). Control proved intact.
+RC-4             REPAIRED, demonstrated leg only. b5deaaa introduced the
+                 env setdefault in memu-core/app.py:1052-1053;
+                 test_contradiction.py restores both around the import.
+                 Baseline byte-unchanged. FOUR UNKNOWNs untouched.
+                 llm_contract attribution to c54f544 WITHDRAWN.
+RC-5             REPAIRED. One ci_neutral_env(), all four call sites.
+                 406/0 under unset, push and pull_request; identical
+                 assertion count; production authority byte-unchanged and
+                 still refusing, proved by invocation.
+RC-6             REPAIRED. fetch-depth 0. _BEFORE_FIX f50715b is 398
+                 commits back. Depth-2 clone STILL FAILS the calibration.
+DOCTRINE         rule 51 SIGNAL IS NOT CAUSE, with provenance row.
+                 Doctrine fingerprint recomputed by its own gate; 51 rules,
+                 51 provenance entries, contiguous and unduplicated.
+LOCAL EVIDENCE   make test-uh 78 suites 0 failures; doctrine integrity PASS
+                 + calibration 23/0; Item-8 instruments 77/0; frozen Item-8
+                 design byte-identical.
+NOT DONE         full CI green. RC-1 is held and RC-1 is what turns Core
+                 Tests and Python application red. The previously skipped
+                 live-stack sections remain unrun.
+PROHIBITED       No merge of PR #122 · no coverage/test floor change · no
+                 baseline inflation · no gate skipped · no production
+                 architecture change · no D367 / D2 / M2 / Stage A /
+                 final-40 work.
+NEXT             Kai's ruling on the RC-1 manifest collision, then the
+                 remainder of the tranche, then promotion adjudication.
+```
