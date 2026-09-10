@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/services-61_defined-blue?style=flat-square" alt="services">
   <img src="https://img.shields.io/badge/tests-4%2C751_functions-brightgreen?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/GPU-not_yet_acquired-lightgrey?style=flat-square" alt="gpu">
-  <img src="https://img.shields.io/badge/Python-~185%2C914_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/Python-~186%2C315_LOC-yellow?style=flat-square" alt="loc">
   <img src="https://img.shields.io/badge/milestones-45_charted-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
 </p>
@@ -36,7 +36,7 @@
 | **Services** | 61 Docker containers |
 | **Test targets** | 91 (`make test-core`) |
 | **Individual tests** | 4,751 (`def test_` across 244 files) |
-| **Python LOC** | ~185,914 |
+| **Python LOC** | ~186,315 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 45 |
 | **Failures** | 0 |
