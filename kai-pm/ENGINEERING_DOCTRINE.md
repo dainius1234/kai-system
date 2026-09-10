@@ -677,6 +677,40 @@ Proactive engineering is not autonomous scope expansion.
     step level. The method did not, and nothing but redoing it would
     have revealed that.
 
+51. **SIGNAL IS NOT CAUSE.** A failing test, workflow, gate, metric or
+    dashboard state identifies **where an observation surfaced**. It does
+    not establish **what failed**. Before any remediation:
+
+    * trace the **first effective failure**, not the loudest or the last;
+    * separate **independent root causes** from **dependent red surfaces**
+      — one defect routinely lights several indicators, and several
+      indicators routinely mean fewer defects than they appear to;
+    * reproduce **environmental and instrument effects under controlled
+      conditions**, with a known-positive and a known-negative;
+    * distinguish a **product defect** from a **test, calibration, CI or
+      evidence defect**. They demand different repairs, and confusing them
+      damages a working control.
+
+    **Never weaken a control, change a threshold, inflate a baseline or
+    patch a downstream symptom merely to make the signal green.** A green
+    indicator obtained that way is not a repair; it is the removal of the
+    only thing that was telling the truth.
+
+    Earned 2026-09-10, five red surfaces at PR #122's head. What looked
+    like five failures was: **one** defect (a reintroduced developer
+    checkout literal) lighting three of them across two workflows; **one**
+    genuine isolation leak; **one** calibration contaminated by the
+    `pull_request` trigger variable, which no commit caused and which
+    appeared only because a PR had been opened; and **one** calibration
+    starved of git history by a `fetch-depth: 2` checkout. The step
+    labelled "Per-module coverage floors" was red while **no coverage
+    floor was breached** — measured 81% / 71% / 80% against floors of
+    45 / 60 / 60 — because its make prerequisite exited non-zero and the
+    floors were never evaluated. Repairing the indicators would have
+    lowered a floor that was not breached, inflated a baseline over a real
+    leak, and deleted two calibrations that were working exactly as
+    designed. Directed into doctrine by Kai; banked under D375.
+
 ### Records and streams
 
 19. **Machine evidence and human prose stay separate.**
@@ -984,3 +1018,4 @@ Proactive engineering is not autonomous scope expansion.
 | 38 | an instruction to stop the 40-row holdout at the first blocker, when the frozen contract required all forty. Repository state had been verified; the instruction against the contract had not (D369) |
 | 39 | six `EXACT_SNAPSHOT` documents called "independent corroboration" when both the machine rule and the prior source adjudication traced to the same authority (D369) |
 | 32 | the same structural failure in three different mechanisms: R9's watcher whose `pgrep` pattern matched its own command line; a detector whose population included its own docstring (I-8); and Census v1.1's subject reconciliation, whose two supposedly independent sides both dereferenced the same moving symbolic ref, so they agreed perfectly and reported `reconciles: True` while the result was stamped with a different commit than the one measured (D356) |
+| 51 | five red CI surfaces at PR #122's head that were four independent causes: a reintroduced developer-checkout literal lighting three indicators across two workflows; an undeclared `os.environ` leak; an Item-8 calibration contaminated by the `pull_request` trigger variable, caused by no commit at all; and a bind-mount calibration starved of history by `fetch-depth: 2`. The step labelled "Per-module coverage floors" was red with **no floor breached** — 81/71/80 against 45/60/60 — because its prerequisite exited non-zero and the floors were never evaluated. Repairing the indicators would have lowered an unbreached floor, baselined a real leak, and deleted two working calibrations (D375) |

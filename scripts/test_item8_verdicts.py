@@ -56,6 +56,28 @@ SUMMARISE = REPO / "scripts" / "security" / "summarise_item8.py"
 AUTHORITY = REPO / "scripts" / "security" / "check_item8_authority.py"
 PARSER = REPO / "scripts" / "security" / "parse_buildkit_events.py"
 
+# D375 / RC-5. The authority guard decides on GITHUB_RUN_ATTEMPT and
+# GITHUB_EVENT_NAME, which the runner sets for whatever trigger happened
+# to fire. A calibration that inherits them is not measuring the guard,
+# it is measuring the trigger: on `push` these scenarios passed, and the
+# first `pull_request` run turned them red without a line of code
+# changing, because the guard refused on the EVENT before it could reach
+# the property under test. Same safe refusal, wrong boundary.
+#
+# Defined ONCE and used by every invocation in this file. The scrub
+# already existed inside authority() below; it covered one call site and
+# not the three in test_authority_envelope, which is how a fixed class
+# came back as an instance (R6). A scenario that needs a trigger value
+# passes it in `extra` and therefore states it.
+CI_TRIGGER_VARS = ("GITHUB_RUN_ATTEMPT", "GITHUB_EVENT_NAME")
+
+
+def ci_neutral_env(extra: dict | None = None) -> dict:
+    """The ambient environment with the trigger variables removed."""
+    env = {k: v for k, v in os.environ.items() if k not in CI_TRIGGER_VARS}
+    env.update(extra or {})
+    return env
+
 
 def _mod(name):
     import importlib.util
@@ -799,7 +821,8 @@ def test_authority_envelope() -> None:
         td = Path(d)
         p = subprocess.run([sys.executable, str(AUTHORITY), "--sentinel",
                             str(td / "absent"), "--allow-no-ci"],
-                           capture_output=True, text=True, cwd=str(REPO))
+                           capture_output=True, text=True, cwd=str(REPO),
+                           env=ci_neutral_env())
         check("an absent envelope REFUSES", p.returncode == 1, p.stdout)
         check("and says however the job was triggered",
               "however the job was triggered" in p.stdout, p.stdout)
@@ -809,7 +832,7 @@ def test_authority_envelope() -> None:
                      "approved_tree=x\nauthorises=experiment\n")
         p = subprocess.run([sys.executable, str(AUTHORITY), "--sentinel",
                             str(s), "--allow-no-ci"], capture_output=True,
-                           text=True, cwd=str(REPO))
+                           text=True, cwd=str(REPO), env=ci_neutral_env())
         check("an envelope naming the wrong design REFUSES",
               p.returncode == 1, p.stdout)
         check("and says it cannot authorise a moved design",
@@ -818,7 +841,7 @@ def test_authority_envelope() -> None:
         s.write_text("approved_commit=HEAD\n")
         p = subprocess.run([sys.executable, str(AUTHORITY), "--sentinel",
                             str(s), "--allow-no-ci"], capture_output=True,
-                           text=True, cwd=str(REPO))
+                           text=True, cwd=str(REPO), env=ci_neutral_env())
         check("an incomplete envelope REFUSES", p.returncode == 1, p.stdout)
         check("and says it authorises nothing",
               "authorises nothing" in p.stdout, p.stdout)
@@ -982,9 +1005,7 @@ def authority(envelope: str, td: Path, env_extra: dict | None = None,
     argv = [sys.executable, str(AUTHORITY), "--sentinel", str(s)]
     if allow_no_ci:
         argv.append("--allow-no-ci")
-    env = {k: v for k, v in os.environ.items()
-           if k not in ("GITHUB_RUN_ATTEMPT", "GITHUB_EVENT_NAME")}
-    env.update(env_extra or {})
+    env = ci_neutral_env(env_extra)
     r = subprocess.run(argv, capture_output=True, text=True, cwd=str(REPO),
                        env=env)
     return r.returncode, r.stdout + r.stderr

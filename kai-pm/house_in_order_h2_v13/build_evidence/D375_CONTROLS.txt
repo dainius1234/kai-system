@@ -1,0 +1,120 @@
+D375 CONTROLS. PRODUCED BY ORION. ZERO ADJUDICATION WEIGHT.
+Banked WITH the repairs, before any full CI run.
+
+0. FINGERPRINT
+   repository HEAD     3ba60e2c4f04f46f754d03237a215d2d628530c2
+   branch              claude/project-rework-plan-pgvp35
+   instrument          055ecb5049510c8b69517bc7526a24484a05a93405952127a7174d7e3a5f313e
+
+1. RC-1 / D375 — THE PREVENTIVE CONTROL STILL FIRES
+   The production repair is HELD (section 1c). What is proved here
+   is that the control which should have stopped the recurrence is
+   intact and still detects it.
+
+   1a. KNOWN-POSITIVE — the live tree
+   OK  the rule finds the recurrence on the current tree             True
+        7 occurrence(s)
+        kai-pm/census_v11_claim_sensitivity/run_mutations.py:13
+        kai-pm/census_v11_claim_sensitivity/run_mutations.py:14
+        kai-pm/house_in_order_census_v11/cal_claims.py:108
+        kai-pm/house_in_order_census_v11/cal_claims.py:113
+        kai-pm/house_in_order_h2/cal_env.py:13
+        kai-pm/house_in_order_h2/pass_a.py:14
+        kai-pm/house_in_order_h2_v11/passa.py:5
+   OK  across the five instrument files named in the diagnosis       5
+        kai-pm/census_v11_claim_sensitivity/run_mutations.py; kai-pm/house_in_order_census_v11/cal_claims.py; kai-pm/house_in_order_h2/cal_env.py; kai-pm/house_in_order_h2/pass_a.py; kai-pm/house_in_order_h2_v11/passa.py
+   OK  and the guard itself FAILS on it                              True
+        ['______________ TestNoDeprecatedCalls.test_no_developer_home_paths ______________']
+
+   1b. KNOWN-POSITIVE — a NEWLY reintroduced literal is caught too
+   The list of offenders is DERIVED, not maintained beside the rule:
+   a file it has never seen must trip it the moment it appears.
+   OK  the probe file is detected                                    True
+   OK    and the count rises by exactly one                          1
+   OK    and the guard names it                                      True
+   OK    and still fails                                             True
+   OK  the probe was removed                                         False
+
+   1c. KNOWN-NEGATIVE — the rule is not vacuous
+   OK  a tree using self-derived paths reports nothing               []
+
+   1d. WHY THE PRODUCTION REPAIR IS HELD — MEASURED, NOT ASSERTED
+   Every offending file sits inside a hash-frozen evidence package.
+   Repairing any of them invalidates that package's MANIFEST, and
+   regenerating the MANIFEST moves the package aggregate. Kai's
+   authorisation requires the repair AND requires hashes and
+   evidence identity preserved; for these files those two cannot
+   both hold, so the tranche stops here rather than choosing one
+   silently (R14).
+
+   package                                 aggregate           cited in DECISIONS
+   kai-pm/house_in_order_h2                8aeeacab8bb53fdc    0   (pass_a.py, cal_env.py)
+   OK    kai-pm/house_in_order_h2 MANIFEST intact (repair not applied)[]
+   kai-pm/census_v11_claim_sensitivity     397ceda087d50324    0   (run_mutations.py)
+   OK    kai-pm/census_v11_claim_sensitivity MANIFEST intact (repair not applied)[]
+   kai-pm/house_in_order_h2_v11            be37a0aa5d56255a    5   (passa.py)
+   OK    kai-pm/house_in_order_h2_v11 MANIFEST intact (repair not applied)[]
+   kai-pm/house_in_order_census_v11        29064d650a612968    0   (cal_claims.py)
+   OK    kai-pm/house_in_order_census_v11 MANIFEST intact (repair not applied)[]
+
+2. RC-4 — THE DEMONSTRATED LEG ONLY. NOTHING BASELINED.
+   memu-core/app.py:1052-1053 sets HF_HUB_OFFLINE and
+   TRANSFORMERS_OFFLINE in its module body; test_contradiction.py
+   loads that module, so the two variables outlived the file and
+   reached every test after it. They are now restored, not declared.
+
+   OK  test_contradiction.py still passes                            0
+        ['13 passed, 4 warnings in 0.33s']
+   OK  it now records NO cross-file leakage                          None
+        was env_set ['HF_HUB_OFFLINE', 'TRANSFORMERS_OFFLINE']
+
+   KNOWN-POSITIVE — the ratchet still refuses undeclared leakage
+   OK  a synthetic undeclared leak is refused                        True
+        ['- scripts/test_d375_probe.py: not declared (0 added, 1 env)']
+
+   NOT TOUCHED, AND STILL OPEN — the four UNKNOWN observations:
+     scripts/test_hse_rams.py (local ratchet growth)
+     scripts/test_llm_contract.py (CI-only, undeclared)
+     scripts/test_audio_transcribe.py (CI-only +1 added)
+     scripts/test_tts_service.py (CI-only 2 -> 3)
+   OK  the isolation baseline is UNCHANGED                           0
+        no leak was declared away
+
+3. RC-5 — THE CALIBRATION NOW CONTROLS ITS OWN ENVIRONMENT
+   The production authority logic is UNCHANGED; only the
+   calibration's environment is made deterministic.
+
+   event unset                       exit=0  406 passed, 0 failed
+   GITHUB_EVENT_NAME=push            exit=0  406 passed, 0 failed
+   GITHUB_EVENT_NAME=pull_request    exit=0  406 passed, 0 failed
+
+   OK  every trigger state passes                                    [0, 0, 0]
+        pull_request was exit=1, 405 passed / 1 failed
+   OK  and the assertion count is IDENTICAL in all three             1
+        {'406 passed, 0 failed'} — no check was neutralised to get green
+   OK  production authority refusal logic untouched                  0
+   OK    and the guard STILL refuses a non-sentinel event            1
+   OK    naming the event it refused on                              True
+        ['REFUSED: GITHUB_EVENT_NAME=pull_request. Only the sentinel push carries execution authority; a manual dispatch does not, whatever the platform permits']
+
+4. RC-6 — THE ENVIRONMENT NOW SUPPLIES THE HISTORY
+   The calibration is NOT relaxed. It still refuses when it cannot
+   read its known answer; the checkout now gives it one.
+
+   OK  KNOWN-NEGATIVE full clone: the calibration runs               0
+        29 passed, 0 failed
+   OK    with all four calibration checks present                    4
+   OK  a depth-2 clone was created                                   0
+   OK    and it is shallow                                           true
+   OK  KNOWN-POSITIVE shallow clone: the calibration STILL FAILS     True
+        25 passed, 1 failed
+   OK    naming shallow clone as the reason                          True
+   OK    and inability to read history is NOT a PASS                 False
+
+   OK  the UH checkout now requests full history                     True
+   OK    and no fetch-depth: 2 remains in that workflow              False
+
+OUTCOME
+   checks 31   failures 0
+   Every control held. No floor lowered, no baseline inflated,
+   no gate skipped, and every case that must still refuse does.

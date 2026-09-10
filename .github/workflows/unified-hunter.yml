@@ -34,14 +34,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # fetch-depth 2, NOT the default 1. scripts/test_item8_verdicts.py
-          # resolves HEAD~1 to build an authority envelope for a parent
-          # that is not the approved commit. `git rev-parse` echoes its
-          # argument back on stdout when a revision is missing, so at
-          # depth 1 that scenario silently measured a malformed envelope
-          # instead of the property it names -- red here since cf84ac1
-          # while passing locally on a full clone. (R11, I-8)
-          fetch-depth: 2
+          # fetch-depth 0 — the FULL history, not a fixed number.
+          #
+          # Depth 2 was set because scripts/test_item8_verdicts.py resolves
+          # HEAD~1 to build an authority envelope for a parent that is not
+          # the approved commit. `git rev-parse` echoes its argument back
+          # on stdout when a revision is missing, so at depth 1 that
+          # scenario silently measured a malformed envelope instead of the
+          # property it names -- red here since cf84ac1 while passing
+          # locally on a full clone. (R11, I-8)
+          #
+          # That fixed ONE instrument's history requirement and left the
+          # class open (R6). scripts/test_bind_mount_portability.py
+          # calibrates against a known answer read from the tree at
+          # f50715b -- 398 commits back -- with `git show`. At depth 2 all
+          # three of its reads return 128, the suite emits its explicit
+          # "could not read f50715b … (rebase or shallow clone?)" failure,
+          # and `make test-uh` halts there. Measured: depth 2 gives
+          # 25 passed / 1 failed, a full clone gives 29 / 0. The 25 is the
+          # exact count CI recorded.
+          #
+          # A depth number is a promise about how far back every present
+          # and future calibration may look, kept in a file none of them
+          # can see. Depth 0 removes the guess. The instruments are NOT
+          # changed to need less history: an instrument that cannot read
+          # its known answer must fail, and it still does. (D375 / RC-6)
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
