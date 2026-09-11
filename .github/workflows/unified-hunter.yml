@@ -94,10 +94,43 @@ jobs:
             pip install -r "$req" || true
           done
 
+      # The log alone is not evidence. `check_assertion_floors.py --from-log`
+      # binds `status = 0` to a literal, so the branch that refuses to judge
+      # an incomplete run has never executed on the path CI uses: on
+      # 1009f31 the aggregate exited 2, `make` halted at prerequisite 61 of
+      # 78, and the gate reported the five suites that never started as
+      # `missing` — a run that stopped, rendered as a surface that eroded.
+      # The evidence unit is LOG + AUTHORITATIVE PROCESS STATUS, so this
+      # step records both. Nothing reads the status yet; the consumer is
+      # W2.2. (WF-2)
+      #
+      # Every line below is load-bearing, and each was measured rather
+      # than assumed. The shell is `/usr/bin/bash -e {0}` — errexit is on.
+      #
+      #   `status=0` before the pipeline: the green path must reach the
+      #   printf with the variable defined.
+      #
+      #   `set -o pipefail`: `tee` exits 0. Without pipefail the recorded
+      #   status is tee's, and a failing suite would be banked as a zero —
+      #   the same fabrication this step exists to remove, moved one level
+      #   upstream. Measured: 2 becomes 0.
+      #
+      #   `|| status=$?`: under errexit a failing pipeline ends the step
+      #   at that line. Measured: without this, nothing after it runs and
+      #   the status file is never written — on the only path that matters.
+      #   It protects the aggregate pipeline and nothing else; a second
+      #   `||` anywhere here would suppress a failure we need to see.
+      #
+      #   `exit "$status"`: recording evidence must not turn a red suite
+      #   green. The step concludes with the aggregate's own code — 2 on
+      #   1009f31 — exactly as it did before this change.
       - name: Unified Hunter suites
         run: |
           set -o pipefail
-          make test-uh 2>&1 | tee /tmp/test-uh.log
+          status=0
+          make test-uh 2>&1 | tee /tmp/test-uh.log || status=$?
+          printf '%s\n' "$status" > /tmp/test-uh.log.status
+          exit "$status"
 
       # A test run must leave the tree exactly as it found it. Until
       # 2026-08-05 it did not: `make test-uh` appended two signed,
