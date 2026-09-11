@@ -35,8 +35,8 @@
 |---|---|
 | **Services** | 61 Docker containers |
 | **Test targets** | 91 (`make test-core`) |
-| **Individual tests** | 4,751 (`def test_` across 244 files) |
-| **Python LOC** | ~186,315 |
+| **Individual tests** | 4,759 (`def test_` across 244 files) |
+| **Python LOC** | ~186,673 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 45 |
 | **Failures** | 0 |
@@ -72,7 +72,7 @@ one line per item for navigation only.
 make core-up          # Start the minimal stack — 18 services by default
 make core-down        # Stop it
 make full-up          # Start the full stack — 21 services by default
-make test-core        # Run all 91 test targets (4,751 test functions)
+make test-core        # Run all 91 test targets (4,759 test functions)
 make test-uh          # Unified Hunter — all 78 suites
 make go_no_go         # Syntax-check all service entry points
 make merge-gate       # Full pre-merge validation
@@ -1594,7 +1594,7 @@ make full-down     # Stop full stack
 
 # Validate
 make go_no_go      # Syntax check all entry points
-make test-core     # All 91 test targets (4,751 test functions)
+make test-core     # All 91 test targets (4,759 test functions)
 make merge-gate    # Full pre-merge validation
 ```
 
@@ -1793,7 +1793,7 @@ is how this README drifted in the first place.
 - [x] GPU-era stub interfaces fixed (D95–D97, D99–D102) — `can_*()→False` in Phase 0; interfaces frozen, ready to implement once GPU arrives
 - [x] Causal World Model (D101) — CausalGraph, WorldModelSimulator, PolicyMemory stubs; PolicyLibrary JSONL-persisted store() works NOW
 - [x] Global Workspace Consciousness (D102) — GWT WorkspaceBid/ConsciousMoment/GlobalWorkspace; subscribe/submit_bid/get_stream interfaces frozen
-- [x] 91 test targets, 4,751 test functions (`make test-core`); pass/fail is the CI badges, not this page
+- [x] 91 test targets, 4,759 test functions (`make test-core`); pass/fail is the CI badges, not this page
 - [x] Pre-commit, dep scanning, container scanning (Trivy)
 - [x] Circuit breakers, exponential backoff, resilient_call()
 - [x] MARS memory decay, spaced repetition
